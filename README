@@ -1,0 +1,57 @@
+ABOUT
+
+This is QXmpp version 0.1.
+QXmpp is cross-platform C++ library for XMPP. It is based on Qt.
+
+
+BUILDING QXmpp
+
+You need to have Qt 4.5 or higher to build the QXmpp.
+The project uses qmake build system of Qt.
+
+Commands to build QXmpp:
+cd <where QXmppClient.pro is lying>
+qmake
+respective-make = (gmake, make, mingw32-make, nmake)
+
+EXAMPLES
+
+Have a look the available examples to start using this library.
+
+* example_0_connected
+This example just connects to the xmpp server. And start receiving presences (updates) from the server.
+After running this example, you can see this user online, if it's added in your roster (friends list).
+Logging type has been set to stdout. You can see the progress on the command line.
+
+* example_1_echoClient
+This is a very simple bot which echoes the message sent to it.
+Run this example, send it a message from a friend of this bot. You will recieve the message back.
+This example shows how to receive and send messages.
+
+REFERENCE DOCUMENTATION
+
+http://code.google.com/p/qxmpp
+
+
+SUPPORTED PLATFORMS
+
+For this release, the following platforms have been tested:
+
+  win32-g++        (mingw)
+  win32-msvc2005
+
+  linux-g++
+  linux-g++-64
+
+It should work on all the plaforms supported by Qt.
+For a complete list of supported platforms, see
+http://www.qtsoftware.com/developer/supported-platforms/supported-platforms/
+
+
+HOW TO REPORT A BUG
+
+If you think you have found a bug in QXmpp, we would like to hear about
+it so that we can fix it. Before reporting a bug, please check 
+http://code.google.com/p/qxmpp/issues/
+to see if the issue is already known.
+
