@@ -12,7 +12,10 @@ The project uses qmake build system of Qt.
 Commands to build QXmpp:
 cd <where QXmppClient.pro is lying>
 qmake
-respective-make = (gmake, make, mingw32-make, nmake)
+<respective-make-cmd = gmake, make, mingw32-make, nmake>
+
+Using Qt Creator:
+Open the QXmppClient.pro file in Qt Creator and hit Buil All to build all the examples and library.
 
 EXAMPLES
 
