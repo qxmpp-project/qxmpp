@@ -1,0 +1,5 @@
+This example just connects to the xmpp server. And start receiving presences (updates) from the server.
+
+After running this example, you can see this user online, if it's added in your roster (friends list).
+
+Logging type has been set to stdout. You can see the progress on the command line.
