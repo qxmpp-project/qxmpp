@@ -1,7 +1,7 @@
 ABOUT
 
 This is QXmpp version 0.1.
-QXmpp is cross-platform C++ library for XMPP. It is based on Qt.
+QXmpp is cross-platform C++ client library for XMPP. It is based on Qt.
 
 
 BUILDING QXmpp
