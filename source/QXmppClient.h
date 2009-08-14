@@ -47,7 +47,7 @@ public:
     void connectToServer(const QXmppConfiguration&);
     void disconnect();
     QXmppRoster& getRoster();
-    QXmppConfiguration& getConfigurgation();
+    QXmppConfiguration& getConfiguration();
 
 signals:
     void messageReceived(const QXmppMessage&);

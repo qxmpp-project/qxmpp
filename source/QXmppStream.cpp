@@ -78,7 +78,7 @@ QXmppStream::~QXmppStream()
 
 QXmppConfiguration& QXmppStream::getConfiguration()
 {
-    return m_client->getConfigurgation();
+    return m_client->getConfiguration();
 }
 
 void QXmppStream::connect()

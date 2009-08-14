@@ -49,7 +49,7 @@ QXmppClient::~QXmppClient()
 {
 }
 
-QXmppConfiguration& QXmppClient::getConfigurgation()
+QXmppConfiguration& QXmppClient::getConfiguration()
 {
     return m_config;
 }
