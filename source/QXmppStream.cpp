@@ -105,12 +105,14 @@ void QXmppStream::socketHostFound()
 void QXmppStream::socketConnected()
 {
     log(QString("Connected"));
+    emit connected();
     sendStartStream();
 }
 
 void QXmppStream::socketDisconnected()
 {
     log(QString("Disconnected"));
+    emit disconnected();
 }
 
 void QXmppStream::socketEncrypted()
@@ -121,7 +123,9 @@ void QXmppStream::socketEncrypted()
 
 void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 {
-    log(QString("Socket error"));
+    m_socketError = ee;
+    emit error(QXmppClient::SocketError);
+    log(QString("Socket error: " + m_socket.errorString()));
 }
 
 void QXmppStream::socketReadReady()
@@ -237,6 +241,10 @@ void QXmppStream::parser(const QByteArray& data)
                     {
                         // get back add configuration whether to send roster and intial presence in beginning
                         // process SessionIq
+
+                        // xmpp connection made
+                        emit xmppConnected();
+
                         sendRosterRequest();
                         sendInitialPresence();
 
@@ -325,8 +333,8 @@ void QXmppStream::parser(const QByteArray& data)
                     QString from = nodeRecv.attribute("from");
                     QString to = nodeRecv.attribute("to");
                     QString type = nodeRecv.attribute("type");
-                    QString body = nodeRecv.firstChildElement("body").text();
-                    QString sub = nodeRecv.firstChildElement("subject").text();
+                    QString body = unescapeString(nodeRecv.firstChildElement("body").text());
+                    QString sub = unescapeString(nodeRecv.firstChildElement("subject").text());
                     QString thread = nodeRecv.firstChildElement("thread").text();
                     QXmppMessage message(from, to, body, thread);
                     message.setSubject(sub);
@@ -415,12 +423,8 @@ void QXmppStream::sendSessionIQ()
 
 void QXmppStream::sendInitialPresence()
 {
-    QString statusText = getConfiguration().getStatus();
-    
-    QXmppPresence presence(QXmppPresence::Available);
-    presence.setStatus(QXmppPresence::Status(QXmppPresence::Status::Online, statusText));
-    
-    sendPacket(presence);
+    if(m_client)
+        sendPacket(m_client->getClientPresence());
 }
 
 void QXmppStream::acceptSubscriptionRequest(const QString& from, bool accept)
@@ -456,12 +460,7 @@ void QXmppStream::sendRosterRequest()
 
 void QXmppStream::disconnect()
 {
-    QXmppPresence presence(QXmppPresence::Unavailable, 
-        QXmppPresence::Status(QXmppPresence::Status::Online, "Logged out"));
-    sendPacket(presence);
-    
     sendEndStream();
-
     m_socket.disconnectFromHost();
 }
 
@@ -580,4 +579,9 @@ QXmppStanza::Error QXmppStream::parseStanzaError(QDomElement & errorElement)
     error.setTypeFromStr(type);
     error.setText(text);
     return error;
+}
+
+QAbstractSocket::SocketError QXmppStream::getSocketError()
+{
+    return m_socketError;
 }

@@ -26,7 +26,9 @@
 #define QXMPPCLIENT_H
 
 #include <QObject>
+#include <QTcpSocket>
 #include "QXmppConfiguration.h"
+#include "QXmppPresence.h"
 
 class QXmppStream;
 class QXmppPresence;
@@ -34,32 +36,59 @@ class QXmppMessage;
 class QXmppPacket;
 class QXmppIq;
 class QXmppRoster;
+class QXmppReconnectionManager;
 
 class QXmppClient : public QObject
 {
     Q_OBJECT
 
 public:
+    enum Error
+    {
+        SocketError,
+        XmppStreamError,
+        XmppStanzaError
+    };
+
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
     void connectToServer(const QString& host, const QString& user, const QString& passwd,
-                         const QString& domain, int port = 5222);
-    void connectToServer(const QXmppConfiguration&);
+                         const QString& domain, int port = 5222,
+                         const QXmppPresence& initialPresence = QXmppPresence());
+    void connectToServer(const QXmppConfiguration&, const QXmppPresence& initialPresence = QXmppPresence());
     void disconnect();
     QXmppRoster& getRoster();
     QXmppConfiguration& getConfiguration();
+    QXmppReconnectionManager* getReconnectionManager();
+    bool setReconnectionManager(QXmppReconnectionManager*);
+    const QXmppPresence& getClientPresence() const;
 
 signals:
+    void connected();
+    void disconnected();
+    void error(QXmppClient::Error);
     void messageReceived(const QXmppMessage&);
     void presenceReceived(const QXmppPresence&);
     void iqReceived(const QXmppIq&);
 
+public:
+    QAbstractSocket::SocketError getSocketError();
+//    QXmppStanza::Error getXmppStreamError();
+
 public slots:
     void sendPacket(const QXmppPacket&);
+    void sendMessage(const QString& bareJid, const QString& message);
+
+    void setClientPresence(const QXmppPresence&);
+    void setClientPresence(const QString& statusText);
+    void setClientPresence(QXmppPresence::Type presenceType);
+    void setClientPresence(QXmppPresence::Status::Type statusType);
 
 private:
     QXmppStream* m_stream;
     QXmppConfiguration m_config;
+    QXmppPresence m_clientPrecence;
+    QXmppReconnectionManager* m_reconnectionManager;
 };
 
 #endif // QXMPPCLIENT_H

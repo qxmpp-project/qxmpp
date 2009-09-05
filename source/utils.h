@@ -40,4 +40,7 @@ void helperToXmlAddElement(QTextStream& stream, const QString& name, int value);
 void log(const QString& str);
 void log(const QByteArray& str);
 
+QString escapeString(const QString& str);
+QString unescapeString(const QString& str);
+
 #endif // UTILS_H

@@ -28,9 +28,8 @@
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
-    : QXmppStanza(from, to), m_type(Chat), m_body(body), m_thread(thread)
+    : QXmppStanza(from, to), m_type(Chat), m_thread(thread), m_body(body)
 {
-
 }
 
 QXmppMessage::~QXmppMessage()
@@ -126,8 +125,8 @@ QByteArray QXmppMessage::toXml() const
     helperToXmlAddAttribute(stream, "from", getFrom());
     helperToXmlAddAttribute(stream, "type", getTypeStr());
     stream << ">";
-    helperToXmlAddElement(stream, "subject", getSubject());
-    helperToXmlAddElement(stream, "body", getBody());
+    helperToXmlAddElement(stream, "subject", escapeString(getSubject()));
+    helperToXmlAddElement(stream, "body", escapeString(getBody()));
     helperToXmlAddElement(stream, "thread", getThread());
     stream << getError().toXml();
     stream << "</message>";

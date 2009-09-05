@@ -64,3 +64,23 @@ void log(const QByteArray& str)
 {
     QXmppLogger::getLogger()->log(str);
 }
+
+QString escapeString(const QString& str)
+{
+    QString strOut = str;
+    strOut.replace(QChar('&'), "&amp;");
+    strOut.replace(QChar('<'), "&lt;");
+    strOut.replace(QChar('>'), "&gt;");
+    strOut.replace(QChar('"'), "&quot;");
+    return strOut;
+}
+
+QString unescapeString(const QString& str)
+{
+    QString strOut = str;
+    strOut.replace("&lt;", QChar('<'));
+    strOut.replace("&gt;", QChar('>'));
+    strOut.replace("&quot;", QChar('"'));
+    strOut.replace("&amp;", QChar('&'));
+    return strOut;
+}

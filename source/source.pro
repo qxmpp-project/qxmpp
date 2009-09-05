@@ -21,7 +21,8 @@ HEADERS += utils.h \
     QXmppSession.h \
     QXmppStanza.h \
     QXmppStream.h \
-    QXmppLogger.h
+    QXmppLogger.h \
+    QXmppReconnectionManager.h
 
 # Source files
 SOURCES += utils.cpp \
@@ -38,4 +39,5 @@ SOURCES += utils.cpp \
     QXmppSession.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
-    QXmppLogger.cpp
+    QXmppLogger.cpp \
+    QXmppReconnectionManager.cpp

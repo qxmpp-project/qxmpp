@@ -38,7 +38,6 @@ public:
     void setPort(int);
     void setUser(const QString&);
     void setPasswd(const QString&);
-    void setStatus(const QString&);
     void setResource(const QString&);
 
     QString getHost() const;
@@ -54,19 +53,22 @@ public:
     bool getAutoAcceptSubscriptions() const;
     void setAutoAcceptSubscriptions(bool);
 
+    bool getAutoReconnectionEnabled() const;
+    void setAutoReconnectionEnabled(bool);
+
 private:
     QString m_host;
     int m_port;
     QString m_user;
     QString m_passwd;
     QString m_domain;
-    QString m_status;
     QString m_resource;
 
     bool m_autoAcceptSubscriptions; // default is true
     bool m_sendIntialPresence;      // default is true
     bool m_sendRosterRequest;       // default is true
     int m_keepAlivePingsInterval;   // interval in seconds, if negative it won't ping
+    bool m_autoReconnectionEnabled; // will keep reconnecting if disconnected, default is true
 };
 
 #endif // QXMPPCONFIGURATION_H

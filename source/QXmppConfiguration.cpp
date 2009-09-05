@@ -26,7 +26,7 @@
 
 QXmppConfiguration::QXmppConfiguration():m_resource("QXmpp"), m_autoAcceptSubscriptions(true),
                 m_sendIntialPresence(true), m_sendRosterRequest(true), m_port(5222),
-                m_keepAlivePingsInterval(100)
+                m_keepAlivePingsInterval(100), m_autoReconnectionEnabled(true)
 {
 
 }
@@ -61,11 +61,6 @@ void QXmppConfiguration::setPasswd(const QString& str)
     m_passwd = str;
 }
 
-void QXmppConfiguration::setStatus(const QString& str)
-{
-    m_status = str;
-}
-
 void QXmppConfiguration::setResource(const QString& str)
 {
     m_resource = str;
@@ -93,11 +88,6 @@ QString QXmppConfiguration::getUser() const
 QString QXmppConfiguration::getPasswd() const
 {
     return m_passwd;
-}
-
-QString QXmppConfiguration::getStatus() const
-{
-    return m_status;
 }
 
 QString QXmppConfiguration::getResource() const

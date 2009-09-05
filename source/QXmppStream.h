@@ -56,11 +56,22 @@ public:
     QXmppRoster& getRoster();
     void sendPacket(const QXmppPacket&);
 
+    QAbstractSocket::SocketError getSocketError();
+
 signals:
+    // socket host found
     void hostFound();
+
+    // socket connected
     void connected();
+
+    // socket disconnected
     void disconnected();
-    void streamError();
+
+    // xmpp connected
+    void xmppConnected();
+
+    void error(QXmppClient::Error);
     void subscriptionRequestReceived(const QString& from);
     void presenceReceived(const QXmppPresence&);
     void messageReceived(const QXmppMessage&);
@@ -74,7 +85,7 @@ private slots:
     void socketConnected();
     void socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
-    void socketSslErrors(const QList<QSslError> &);
+    void socketSslErrors(const QList<QSslError>&);
 
 private:
     QXmppClient* m_client; // reverse pointer
@@ -85,6 +96,9 @@ private:
 
     QSslSocket m_socket;
     bool m_sessionAvaliable;
+    QAbstractSocket::SocketError m_socketError;
+//    m_xmppStreamError;
+//    m_xmppStanzaError;
 
     QXmppConfiguration& getConfiguration();
     void parser(const QByteArray&);

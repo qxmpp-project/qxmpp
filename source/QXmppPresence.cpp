@@ -47,7 +47,12 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     m_type = type;
 }
 
-QXmppPresence::Status QXmppPresence::getStatus() const
+const QXmppPresence::Status& QXmppPresence::getStatus() const
+{
+    return m_status;
+}
+
+QXmppPresence::Status& QXmppPresence::getStatus()
 {
     return m_status;
 }
