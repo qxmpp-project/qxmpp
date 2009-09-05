@@ -7,7 +7,7 @@ CONFIG(debug, debug|release):TARGET = QXmppClient_d
 else:TARGET = QXmppClient
 
 # Header files
-HEADERS += utils.h \
+HEADERS += QXmppUtils.h \
     QXmppBind.h \
     QXmppClient.h \
     QXmppConfiguration.h \
@@ -25,7 +25,7 @@ HEADERS += utils.h \
     QXmppReconnectionManager.h
 
 # Source files
-SOURCES += utils.cpp \
+SOURCES += QXmppUtils.cpp \
     QXmppBind.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \

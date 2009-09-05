@@ -22,7 +22,7 @@
  */
 
 
-#include "utils.h"
+#include "QXmppUtils.h"
 #include "QXmppIq.h"
 
 #include <QTextStream>

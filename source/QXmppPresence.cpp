@@ -23,7 +23,7 @@
 
 
 #include "QXmppPresence.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include <QtDebug>
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type, const QXmppPresence::Status& status)

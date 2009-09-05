@@ -1,6 +1,6 @@
 #include "QXmppReconnectionManager.h"
 #include "QXmppClient.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 
 QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client):m_timer(this),
     m_reconnectionTries(0), m_client(client), QObject(client)

@@ -23,7 +23,7 @@
 
 
 #include "QXmppMessage.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include <QTextStream>
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 

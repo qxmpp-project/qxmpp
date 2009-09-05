@@ -24,7 +24,7 @@
 
 #include "QXmppStream.h"
 #include "QXmppPacket.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include "QXmppClient.h"
 #include "QXmppRoster.h"
 #include "QXmppPresence.h"

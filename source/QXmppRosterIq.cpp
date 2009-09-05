@@ -24,7 +24,7 @@
 
 #include "QXmppRosterIq.h"
 #include "QXmppConstants.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include <QTextStream>
 
 QXmppRosterIq::QXmppRosterIq(QXmppIq::Type type)

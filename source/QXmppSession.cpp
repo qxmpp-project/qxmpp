@@ -24,7 +24,7 @@
 
 #include "QXmppSession.h"
 #include "QXmppConstants.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include <QTextStream>
 
 QXmppSession::QXmppSession(QXmppIq::Type type)

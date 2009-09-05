@@ -23,7 +23,7 @@
 
 
 #include "QXmppBind.h"
-#include "utils.h"
+#include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
 #include <QTextStream>
