@@ -22,8 +22,8 @@
  */
 
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef QXMPPUTILS_H
+#define QXMPPUTILS_H
 
 
 class QTextStream;
@@ -43,4 +43,4 @@ void log(const QByteArray& str);
 QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
 
-#endif // UTILS_H
+#endif // QXMPPUTILS_H
