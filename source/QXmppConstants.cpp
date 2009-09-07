@@ -32,4 +32,5 @@ const char* ns_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 const char* ns_bind = "urn:ietf:params:xml:ns:xmpp-bind";
 const char* ns_session = "urn:ietf:params:xml:ns:xmpp-session";
 const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
+const char* ns_vcard = "vcard-temp";
 
