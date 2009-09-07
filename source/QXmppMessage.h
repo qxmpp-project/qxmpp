@@ -39,8 +39,8 @@ public:
         Headline
     };
 
-    QXmppMessage(const QString& from = "", const QString& to = "", const QString& body = "", 
-        const QString& thread = "");
+    QXmppMessage(const QString& from = "", const QString& to = "",
+                 const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
     
     QXmppMessage::Type getType() const;

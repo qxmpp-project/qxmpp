@@ -68,7 +68,8 @@ QByteArray QXmppRosterIq::toXmlElementFromChild() const
     return data.toAscii();
 }
 
-QXmppRosterIq::Item::SubscriptionType QXmppRosterIq::Item::getSubscriptionType() const
+QXmppRosterIq::Item::SubscriptionType
+        QXmppRosterIq::Item::getSubscriptionType() const
 {
     return m_type;
 }

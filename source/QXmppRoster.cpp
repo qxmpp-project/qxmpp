@@ -62,8 +62,10 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
                 m_entries[bareJid].setBareJid(bareJid);
                 m_entries[bareJid].setName(items.at(i).getSubscriptionStatus());
                 m_entries[bareJid].setSubscriptionType(
-                    static_cast<QXmppRosterEntry::SubscriptionType>(items.at(i).getSubscriptionType()));
-                m_entries[bareJid].setSubscriptionStatus(items.at(i).getSubscriptionStatus());
+                    static_cast<QXmppRosterEntry::SubscriptionType>(
+                            items.at(i).getSubscriptionType()));
+                m_entries[bareJid].setSubscriptionStatus(
+                        items.at(i).getSubscriptionStatus());
                 m_entries[bareJid].setGroups(items.at(i).getGroups());
                 emit rosterChanged(bareJid);
             }
@@ -88,7 +90,8 @@ QString QXmppRoster::QXmppRosterEntry::getName() const
     return m_name;
 }
 
-QXmppRoster::QXmppRosterEntry::SubscriptionType QXmppRoster::QXmppRosterEntry::getSubscriptionType() const
+QXmppRoster::QXmppRosterEntry::SubscriptionType
+        QXmppRoster::QXmppRosterEntry::getSubscriptionType() const
 {
     return m_type;
 }
@@ -113,7 +116,8 @@ void QXmppRoster::QXmppRosterEntry::setName(const QString& str)
     m_name = str;
 }
 
-void QXmppRoster::QXmppRosterEntry::setSubscriptionType(QXmppRosterEntry::SubscriptionType type)
+void QXmppRoster::QXmppRosterEntry::setSubscriptionType(
+        QXmppRosterEntry::SubscriptionType type)
 {
     m_type = type;
 }
@@ -138,7 +142,8 @@ QStringList QXmppRoster::getRosterBareJids() const
     return m_entries.keys();
 }
 
-QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(const QString& bareJid) const
+QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(
+        const QString& bareJid) const
 {
     // will return blank entry if bareJid does'nt exist
     if(m_entries.contains(bareJid))
@@ -150,7 +155,8 @@ QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(const QString& bareJid
     }
 }
 
-QMap<QString, QXmppRoster::QXmppRosterEntry> QXmppRoster::getRosterEntries() const
+QMap<QString, QXmppRoster::QXmppRosterEntry>
+        QXmppRoster::getRosterEntries() const
 {
     return m_entries;
 }
@@ -165,7 +171,8 @@ QStringList QXmppRoster::getResources(const QString& bareJid) const
         return QStringList();
 }
 
-QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(const QString& bareJid) const
+QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
+        const QString& bareJid) const
 {
     if(m_presences.contains(bareJid))
         return m_presences[bareJid];
@@ -176,7 +183,8 @@ QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(const QStrin
     }
 }
 
-QXmppPresence QXmppRoster::getPresence(const QString& bareJid, const QString& resource) const
+QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
+                                       const QString& resource) const
 {
     if(m_presences.contains(bareJid) && m_presences[bareJid].contains(resource))
         return m_presences[bareJid][resource];

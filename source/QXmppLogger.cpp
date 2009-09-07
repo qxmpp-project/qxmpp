@@ -60,7 +60,8 @@ void QXmppLogger::log(const QString& str)
     case QXmppLogger::FILE:
         m_file.open(QIODevice::Append);
         m_stream.setDevice(&m_file);
-        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<< str << "\n\n";
+        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
+                str << "\n\n";
         m_file.close();
         break;
     case QXmppLogger::STDOUT:
@@ -80,7 +81,8 @@ void QXmppLogger::log(const QByteArray& str)
     case QXmppLogger::FILE:
         m_file.open(QIODevice::Append);
         m_stream.setDevice(&m_file);
-        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<< str << "\n\n";
+        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
+                str << "\n\n";
         m_file.close();
         break;
     case QXmppLogger::STDOUT:

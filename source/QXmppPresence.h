@@ -94,6 +94,7 @@ private:
     QXmppPresence::Status m_status;
 
     QString getTypeStr() const;
+    QByteArray getExtensionsXML() const;
 };
 
 #endif // QXMPPPRESENCE_H

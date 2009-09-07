@@ -37,6 +37,7 @@ class QXmppPacket;
 class QXmppIq;
 class QXmppRoster;
 class QXmppReconnectionManager;
+class QXmppVCardManager;
 
 class QXmppClient : public QObject
 {
@@ -52,16 +53,23 @@ public:
 
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
-    void connectToServer(const QString& host, const QString& user, const QString& passwd,
-                         const QString& domain, int port = 5222,
-                         const QXmppPresence& initialPresence = QXmppPresence());
-    void connectToServer(const QXmppConfiguration&, const QXmppPresence& initialPresence = QXmppPresence());
+    void connectToServer(const QString& host,
+                         const QString& user,
+                         const QString& passwd,
+                         const QString& domain,
+                         int port = 5222,
+                         const QXmppPresence& initialPresence =
+                         QXmppPresence());
+    void connectToServer(const QXmppConfiguration&, 
+                         const QXmppPresence& initialPresence = 
+                         QXmppPresence());
     void disconnect();
     QXmppRoster& getRoster();
     QXmppConfiguration& getConfiguration();
     QXmppReconnectionManager* getReconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
+    QXmppVCardManager& getVCardManager();
 
 signals:
     void connected();

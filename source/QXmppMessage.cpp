@@ -102,7 +102,8 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     else
     {
         setType(static_cast<QXmppMessage::Type>(-1));
-        qWarning("QXmppMessage::setTypeFromStr() invalid input string type: %s", qPrintable(str));
+        qWarning("QXmppMessage::setTypeFromStr() invalid input string type: %s",
+                 qPrintable(str));
         return;
     }
 }

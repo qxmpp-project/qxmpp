@@ -26,7 +26,8 @@
 #include "QXmppUtils.h"
 #include <QtDebug>
 
-QXmppPresence::QXmppPresence(QXmppPresence::Type type, const QXmppPresence::Status& status)
+QXmppPresence::QXmppPresence(QXmppPresence::Type type,
+                             const QXmppPresence::Status& status)
     : QXmppStanza(), m_type(type), m_status(status)
 {
 
@@ -178,15 +179,17 @@ void QXmppPresence::setTypeFromStr(const QString& str)
     else
     {
         type = static_cast<QXmppPresence::Type>(-1);
-        qWarning("QXmppPresence::setTypeFromStr() invalid input string type: %s", qPrintable(str));
+        qWarning("QXmppPresence::setTypeFromStr() invalid input string type: %s",
+                 qPrintable(str));
         setType(type);
         return;
     }
 }
 
 QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
-                             const QString statusText, int priority): m_type(type), 
-                             m_statusText(statusText), m_priority(priority)
+                             const QString statusText, int priority) :
+                                m_type(type),
+                                m_statusText(statusText), m_priority(priority)
 {
 }
 
@@ -269,7 +272,8 @@ QString QXmppPresence::Status::getTypeStr() const
         text = "chat"; 
         break;
     default:
-        qWarning("QXmppPresence::Status::getTypeStr() invalid type %d", (int)getType());
+        qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
+                 (int)getType());
         break;
     }
     return text;

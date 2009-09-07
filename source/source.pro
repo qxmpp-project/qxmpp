@@ -22,7 +22,9 @@ HEADERS += QXmppUtils.h \
     QXmppStanza.h \
     QXmppStream.h \
     QXmppLogger.h \
-    QXmppReconnectionManager.h
+    QXmppReconnectionManager.h \
+    QXmppVCardManager.h \
+    QXmppVCard.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -40,4 +42,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
     QXmppLogger.cpp \
-    QXmppReconnectionManager.cpp
+    QXmppReconnectionManager.cpp \
+    QXmppVCardManager.cpp \
+    QXmppVCard.cpp

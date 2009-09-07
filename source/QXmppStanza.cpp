@@ -31,7 +31,8 @@
 int QXmppStanza::s_uniqeIdNo = 0;
 
 QXmppStanza::Error::Error(): m_type(static_cast<QXmppStanza::Error::Type>(-1)), 
-            m_condition(static_cast<QXmppStanza::Error::Condition>(-1)), m_text("")
+            m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),
+            m_text("")
 {
 }
 
@@ -40,7 +41,8 @@ QXmppStanza::Error::Error(Type type, Condition cond, const QString& text):
 {
 }
 
-QXmppStanza::Error::Error(const QString& type, const QString& cond, const QString& text):
+QXmppStanza::Error::Error(const QString& type, const QString& cond,
+                          const QString& text):
     m_text(text)
 {
     setTypeFromStr(type);

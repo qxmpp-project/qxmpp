@@ -22,39 +22,34 @@
  */
 
 
-#ifndef QXMPPRECONNECTIONMANAGER_H
-#define QXMPPRECONNECTIONMANAGER_H
+#ifndef QXMPPVCARD_H
+#define QXMPPVCARD_H
 
-#include <QObject>
-#include <QTimer>
-#include "QXmppClient.h"
+#include "QXmppIq.h"
+#include <QMap>
+#include <QDomElement>
 
-class QXmppReconnectionManager : public QObject
+class QImage;
+
+class QXmppVCard : public QXmppIq
 {
-    Q_OBJECT
-
 public:
-    QXmppReconnectionManager(QXmppClient* client);
+    QXmppVCard(const QString& bareJid = "");
 
-signals:
-    void reconnectingIn(int);
-    void reconnectingNow();
+    QString getFullName() const;
+    void setFullName(const QString&);
 
-public slots:
-    void cancelReconnection();
+    const QImage& getPhotoAsImage() const;
+    const QByteArray& getPhoto() const;
+    void setPhoto(const QByteArray&);
 
-private slots:
-    void connected();
-    void error(QXmppClient::Error);
-    void reconnect();
+    void parse(const QDomElement&);
 
 private:
-    int getNextReconnectingInTime();
-    int m_reconnectionTries;
-    QTimer m_timer;
+    QByteArray toXmlElementFromChild() const;
 
-    // reference to to client object (no ownership)
-    QXmppClient* m_client;
+    QString m_fullName;
+    QByteArray m_photo;
 };
 
-#endif // QXMPPRECONNECTIONMANAGER_H
+#endif // QXMPPVCARD_H

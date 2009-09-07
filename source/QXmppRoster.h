@@ -69,7 +69,8 @@ public:
         QString m_bareJid;
         SubscriptionType m_type;
         QString m_name;
-        QString m_subscriptionStatus;  // can be subscribe/unsubscribe (attribute "ask")
+        // can be subscribe/unsubscribe (attribute "ask")
+        QString m_subscriptionStatus;
         QSet<QString> m_groups;
     };
 
@@ -82,17 +83,22 @@ public:
     
     QStringList getResources(const QString& bareJid) const;
     QMap<QString, QMap<QString, QXmppPresence> > getAllPresences() const;
-    QMap<QString, QXmppPresence> getAllPresencesForBareJid(const QString& bareJid) const;
-    QXmppPresence getPresence(const QString& bareJid, const QString& resource) const;
+    QMap<QString, QXmppPresence> getAllPresencesForBareJid(
+            const QString& bareJid) const;
+    QXmppPresence getPresence(const QString& bareJid,
+                              const QString& resource) const;
 
 signals:
     void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterChanged(const QString& bareJid);
 
 private:
-    QXmppStream* m_stream; //reverse pointer to stream
-    QMap<QString, QXmppRoster::QXmppRosterEntry> m_entries;  //map of bareJid and its rosterEntry 
-    QMap<QString, QMap<QString, QXmppPresence> > m_presences;    // map of resources of the jid and map of resouces and presences
+    //reverse pointer to stream
+    QXmppStream* m_stream;
+    //map of bareJid and its rosterEntry
+    QMap<QString, QXmppRoster::QXmppRosterEntry> m_entries;
+    // map of resources of the jid and map of resouces and presences
+    QMap<QString, QMap<QString, QXmppPresence> > m_presences;
 
 private slots:
     void presenceReceived(const QXmppPresence&);

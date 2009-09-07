@@ -34,6 +34,7 @@
 #include "QXmppRosterIq.h"
 #include "QXmppMessage.h"
 #include "QXmppConstants.h"
+#include "QXmppVCard.h"
 
 #include <QDomDocument>
 #include <QStringList>
@@ -44,30 +45,45 @@ static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
-    : QObject(client), m_roster(this), m_client(client), m_sessionAvaliable(false)
+    : QObject(client), m_roster(this), m_client(client),
+    m_sessionAvaliable(false), m_vCardManager(m_client)
 {
-    bool check = QObject::connect(&m_socket, SIGNAL(hostFound()), this, SLOT(socketHostFound()));
+    bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
+                                  this, SLOT(socketHostFound()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+    check = QObject::connect(&m_socket, SIGNAL(connected()),
+                             this, SLOT(socketConnected()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+    check = QObject::connect(&m_socket, SIGNAL(disconnected()),
+                             this, SLOT(socketDisconnected()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(readyRead()), this, SLOT(socketReadReady()));
+    check = QObject::connect(&m_socket, SIGNAL(readyRead()),
+                             this, SLOT(socketReadReady()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(encrypted()), this, SLOT(socketEncrypted()));
+    check = QObject::connect(&m_socket, SIGNAL(encrypted()),
+                             this, SLOT(socketEncrypted()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(sslErrors(const QList<QSslError> &)), this, SLOT(socketSslErrors(const QList<QSslError> &)));
+    check = QObject::connect(&m_socket,
+                             SIGNAL(sslErrors(const QList<QSslError>&)), this,
+                             SLOT(socketSslErrors(const QList<QSslError>&)));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(error(QAbstractSocket::SocketError)), 
-        this, SLOT(socketError(QAbstractSocket::SocketError)));
+    check = QObject::connect(&m_socket,
+                             SIGNAL(error(QAbstractSocket::SocketError)), this,
+                             SLOT(socketError(QAbstractSocket::SocketError)));
     Q_ASSERT(check);
 
-    check = QObject::connect(this, SIGNAL(presenceReceived(const QXmppPresence&)), 
-        &m_roster, SLOT(presenceReceived(const QXmppPresence&)));
+    check = QObject::connect(this,
+                            SIGNAL(presenceReceived(const QXmppPresence&)),
+                            &m_roster,
+                            SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
     
     check = QObject::connect(this, SIGNAL(rosterIqReceived(const QXmppRosterIq&)), 
         &m_roster, SLOT(rosterIqReceived(const QXmppRosterIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppRosterIq&)),
+        &m_vCardManager, SLOT(vCardIqReceived(const QXmppRosterIq&)));
     Q_ASSERT(check);
 }
 
@@ -84,8 +100,10 @@ QXmppConfiguration& QXmppStream::getConfiguration()
 void QXmppStream::connect()
 {
     // work with time out
-    log(QString("Connecting to: %1:%2").arg(getConfiguration().getHost()).arg(getConfiguration().getPort()));
-    m_socket.connectToHost(getConfiguration().getHost(), getConfiguration().getPort());
+    log(QString("Connecting to: %1:%2").arg(getConfiguration().
+            getHost()).arg(getConfiguration().getPort()));
+    m_socket.connectToHost(getConfiguration().
+                           getHost(), getConfiguration().getPort());
 }
 
 void QXmppStream::socketSslErrors(const QList<QSslError> & error)
@@ -169,13 +187,16 @@ void QXmppStream::parser(const QByteArray& data)
                     {
                         if(element.namespaceURI() == ns_tls) 
                         {
-                            if(element.tagName() == "starttls" && element.firstChildElement().tagName() == "required")
+                            if(element.tagName() == "starttls" &&
+                               element.firstChildElement().tagName() ==
+                               "required")
                             {
                                 sendStartTls();
                                 return;
                             }
                         }
-                        else if(element.namespaceURI() == ns_sasl && element.tagName() == "mechanisms")
+                        else if(element.namespaceURI() == ns_sasl &&
+                                element.tagName() == "mechanisms")
                         {
                             log(QString("Mechanisms:"));
                             QDomElement subElement = element.firstChildElement();
@@ -191,11 +212,13 @@ void QXmppStream::parser(const QByteArray& data)
                             }
                             sendAuthPlain();
                         }
-                        else if(element.namespaceURI() == ns_bind && element.tagName() == "bind")
+                        else if(element.namespaceURI() == ns_bind &&
+                                element.tagName() == "bind")
                         {
                             sendBindIQ();
                         }
-                        else if(element.namespaceURI() == ns_session && element.tagName() == "session")
+                        else if(element.namespaceURI() == ns_session &&
+                                element.tagName() == "session")
                         {
                             m_sessionAvaliable = true;
                         }
@@ -220,7 +243,6 @@ void QXmppStream::parser(const QByteArray& data)
                     sendStartStream();
                 }
             }
-//===========done below=======================================================================
             else if(ns == ns_client)
             {
                 if(nodeRecv.tagName() == "iq")
@@ -239,7 +261,8 @@ void QXmppStream::parser(const QByteArray& data)
 
                     if(id == m_sessionId)
                     {
-                        // get back add configuration whether to send roster and intial presence in beginning
+                        // get back add configuration whether to send
+                        // roster and intial presence in beginning
                         // process SessionIq
 
                         // xmpp connection made
@@ -257,7 +280,8 @@ void QXmppStream::parser(const QByteArray& data)
                     else if(id == m_bindId)
                     {
                         QXmppBind bind(type);
-                        QString jid = nodeRecv.firstChildElement("bind").firstChildElement("jid").text();
+                        QString jid = nodeRecv.firstChildElement("bind").
+                                      firstChildElement("jid").text();
                         bind.setResource(jidToResource(jid));
                         bind.setJid(jidToBareJid(jid));
                         bind.setId(id);
@@ -266,9 +290,12 @@ void QXmppStream::parser(const QByteArray& data)
                         processBindIq(bind);
                         iqPacket = bind;
                     }
-                    else if(nodeRecv.firstChildElement("query").namespaceURI() == ns_roster)
+                    else if(nodeRecv.firstChildElement("query").
+                            namespaceURI() == ns_roster)
                     {
-                        QDomElement itemElement = nodeRecv.firstChildElement("query").firstChildElement("item");
+                        QDomElement itemElement = nodeRecv.
+                                                  firstChildElement("query").
+                                                  firstChildElement("item");
                         QXmppRosterIq rosterIq(nodeRecv.attribute("type"));
                         rosterIq.setId(id);
                         rosterIq.setTo(to);
@@ -277,17 +304,27 @@ void QXmppStream::parser(const QByteArray& data)
                         {
                             QXmppRosterIq::Item item;
                             item.setBareJid(itemElement.attribute("jid"));
-                            item.setSubscriptionTypeFromStr(itemElement.attribute("subscription"));
-                            item.setSubscriptionStatus(itemElement.attribute("ask"));
+                            item.setSubscriptionTypeFromStr(
+                                    itemElement.attribute("subscription"));
+                            item.setSubscriptionStatus(
+                                    itemElement.attribute("ask"));
                             rosterIq.addItem(item);
                             itemElement = itemElement.nextSiblingElement();
                         }
                         processRosterIq(rosterIq);
                         iqPacket = rosterIq;
                     }
-                    //else if(call extension)
-                    //{
-                    //}
+                    // extensions
+                    // vCard - XEP-0054
+                    // http://xmpp.org/extensions/xep-0054.html
+                    else if(nodeRecv.firstChildElement("vCard").
+                            namespaceURI() == ns_vcard)
+                    {
+                        QXmppVCard vcardIq;
+                        vcardIq.parse(nodeRecv);
+                        emit vCardIqReceived(vcardIq);
+                        iqPacket = vcardIq;
+                    }
                     else // didn't understant the iq...reply with error
                     {
                         QXmppIq iq(QXmppIq::Error);
@@ -310,19 +347,24 @@ void QXmppStream::parser(const QByteArray& data)
                     presence.setFrom(nodeRecv.attribute("from"));
                     presence.setTo(nodeRecv.attribute("to"));
                     
-                    QString statusText = nodeRecv.firstChildElement("status").text();
-                    QString show = nodeRecv.firstChildElement("show").text();
-                    int priority = nodeRecv.firstChildElement("priority").text().toInt();
+                    QString statusText = nodeRecv.
+                                         firstChildElement("status").text();
+                    QString show = nodeRecv.
+                                   firstChildElement("show").text();
+                    int priority = nodeRecv.
+                                   firstChildElement("priority").text().toInt();
                     QXmppPresence::Status status;
                     status.setTypeFromStr(show);
                     status.setStatusText(statusText);
                     status.setPriority(priority);
                     presence.setStatus(status);
 
-                    QDomElement errorElement = nodeRecv.firstChildElement("error");
+                    QDomElement errorElement = nodeRecv.
+                                               firstChildElement("error");
                     if(!errorElement.isNull())
                     {
-                        QXmppStanza::Error error = parseStanzaError(errorElement);
+                        QXmppStanza::Error error =
+                                parseStanzaError(errorElement);
                         presence.setError(error);
                     }
 
@@ -333,14 +375,17 @@ void QXmppStream::parser(const QByteArray& data)
                     QString from = nodeRecv.attribute("from");
                     QString to = nodeRecv.attribute("to");
                     QString type = nodeRecv.attribute("type");
-                    QString body = unescapeString(nodeRecv.firstChildElement("body").text());
-                    QString sub = unescapeString(nodeRecv.firstChildElement("subject").text());
+                    QString body = unescapeString(
+                            nodeRecv.firstChildElement("body").text());
+                    QString sub = unescapeString(
+                            nodeRecv.firstChildElement("subject").text());
                     QString thread = nodeRecv.firstChildElement("thread").text();
                     QXmppMessage message(from, to, body, thread);
                     message.setSubject(sub);
                     message.setTypeFromStr(type);
 
-                    QDomElement errorElement = nodeRecv.firstChildElement("error");
+                    QDomElement errorElement = nodeRecv.
+                                               firstChildElement("error");
                     if(!errorElement.isNull())
                     {
                         QXmppStanza::Error error = parseStanzaError(errorElement);
@@ -399,7 +444,8 @@ void QXmppStream::sendStartTls()
 void QXmppStream::sendAuthPlain()
 {
     QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
-    QString userPass('\0' + getConfiguration().getUser() + '\0' + getConfiguration().getPasswd());
+    QString userPass('\0' + getConfiguration().getUser() +
+                     '\0' + getConfiguration().getPasswd());
     data += userPass.toUtf8().toBase64();
     data += "</auth>";
     sendToServer(data);
@@ -545,7 +591,9 @@ void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
         // then after recieving following iq user requests contact for subscription
         
         // check thet "from" is newly added in the roster...and remove this ask thing...and do this for all items
-        if(rosterIq.getItems().at(0).getSubscriptionType() == QXmppRosterIq::Item::From && rosterIq.getItems().at(0).getSubscriptionStatus().isEmpty())
+        if(rosterIq.getItems().at(0).getSubscriptionType() ==
+           QXmppRosterIq::Item::From && rosterIq.getItems().at(0).
+           getSubscriptionStatus().isEmpty())
             sendSubscriptionRequest(rosterIq.getItems().at(0).getBareJid());
         break;
     default:
@@ -584,4 +632,9 @@ QXmppStanza::Error QXmppStream::parseStanzaError(QDomElement & errorElement)
 QAbstractSocket::SocketError QXmppStream::getSocketError()
 {
     return m_socketError;
+}
+
+QXmppVCardManager& QXmppStream::getVCardManager()
+{
+    return m_vCardManager;
 }

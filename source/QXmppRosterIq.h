@@ -64,7 +64,8 @@ public:
         QString m_bareJid;
         SubscriptionType m_type;
         QString m_name;
-        QString m_subscriptionStatus;  // can be subscribe/unsubscribe (attribute "ask")
+         // can be subscribe/unsubscribe (attribute "ask")
+        QString m_subscriptionStatus;
         QSet<QString> m_groups;
     };
 

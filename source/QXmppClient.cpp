@@ -34,12 +34,12 @@ QXmppClient::QXmppClient(QObject *parent)
 {
     m_stream = new QXmppStream(this);
 
-    bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)), this,
-        SIGNAL(messageReceived(const QXmppMessage&)));
+    bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
+                         this, SIGNAL(messageReceived(const QXmppMessage&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)), this,
-        SIGNAL(presenceReceived(const QXmppPresence&)));
+    check = connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)),
+                    this, SIGNAL(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
     check = connect(m_stream, SIGNAL(iqReceived(const QXmppIq&)), this,
@@ -70,8 +70,10 @@ QXmppConfiguration& QXmppClient::getConfiguration()
     return m_config;
 }
 
-void QXmppClient::connectToServer(const QString& host, const QString& user, const QString& passwd,
-                     const QString& domain, int port, const QXmppPresence& initialPresence)
+void QXmppClient::connectToServer(const QString& host, const QString& user,
+                                  const QString& passwd, const QString& domain,
+                                  int port,
+                                  const QXmppPresence& initialPresence)
 {
     m_config.setHost(host);
     m_config.setUser(user);
@@ -84,7 +86,8 @@ void QXmppClient::connectToServer(const QString& host, const QString& user, cons
     m_stream->connect();
 }
 
-void QXmppClient::connectToServer(const QXmppConfiguration& config, const QXmppPresence& initialPresence)
+void QXmppClient::connectToServer(const QXmppConfiguration& config,
+                                  const QXmppPresence& initialPresence)
 {
     m_config = config;
 
@@ -172,22 +175,29 @@ QXmppReconnectionManager* QXmppClient::getReconnectionManager()
     return m_reconnectionManager;
 }
 
-bool QXmppClient::setReconnectionManager(QXmppReconnectionManager* reconnectionManager)
+bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
+                                         reconnectionManager)
 {
     if(m_reconnectionManager)
         delete m_reconnectionManager;
 
     m_reconnectionManager = reconnectionManager;
 
-    bool check = connect(this, SIGNAL(connected()), m_reconnectionManager, SLOT(connected()));
+    bool check = connect(this, SIGNAL(connected()), m_reconnectionManager,
+                         SLOT(connected()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(error(QXmppClient::Error)), m_reconnectionManager,
-                    SLOT(error(QXmppClient::Error)));
+    check = connect(this, SIGNAL(error(QXmppClient::Error)),
+                    m_reconnectionManager, SLOT(error(QXmppClient::Error)));
     Q_ASSERT(check);
 }
 
 QAbstractSocket::SocketError QXmppClient::getSocketError()
 {
     return m_stream->getSocketError();
+}
+
+QXmppVCardManager& QXmppClient::getVCardManager()
+{
+    return m_stream->getVCardManager();
 }

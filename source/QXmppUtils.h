@@ -29,18 +29,28 @@
 class QTextStream;
 class QByteArray;
 class QString;
+class QImage;
 
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);
 
-void helperToXmlAddAttribute(QTextStream& stream, const QString& name, const QString& value);
-void helperToXmlAddElement(QTextStream& stream, const QString& name, const QString& value);
-void helperToXmlAddElement(QTextStream& stream, const QString& name, int value);
+void helperToXmlAddAttribute(QTextStream& stream, const QString& name,
+                             const QString& value);
+void helperToXmlAddElement(QTextStream& stream, const QString& name,
+                           const QString& value);
+void helperToXmlAddElement(QTextStream& stream, const QString& name,
+                           const QByteArray& value);
+void helperToXmlAddElement(QTextStream& stream, const QString& name,
+                           int value);
 
 void log(const QString& str);
 void log(const QByteArray& str);
 
 QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
+
+QString getImageType(const QByteArray& image);
+QString getImageHash(const QByteArray& image);
+QImage getImageFromByteArray(const QByteArray& image);
 
 #endif // QXMPPUTILS_H

@@ -64,11 +64,16 @@ private:
     QString m_domain;
     QString m_resource;
 
-    bool m_autoAcceptSubscriptions; // default is true
-    bool m_sendIntialPresence;      // default is true
-    bool m_sendRosterRequest;       // default is true
-    int m_keepAlivePingsInterval;   // interval in seconds, if negative it won't ping
-    bool m_autoReconnectionEnabled; // will keep reconnecting if disconnected, default is true
+    // default is true
+    bool m_autoAcceptSubscriptions;
+    // default is true
+    bool m_sendIntialPresence;
+    // default is true
+    bool m_sendRosterRequest;
+    // interval in seconds, if negative it won't ping
+    int m_keepAlivePingsInterval;
+    // will keep reconnecting if disconnected, default is true
+    bool m_autoReconnectionEnabled;
 };
 
 #endif // QXMPPCONFIGURATION_H

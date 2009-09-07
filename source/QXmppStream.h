@@ -30,6 +30,7 @@
 #include "QXmppConfiguration.h"
 #include "QXmppRoster.h"
 #include "QXmppStanza.h"
+#include "QXmppVCardManager.h"
 
 class QDomElement;
 
@@ -40,6 +41,7 @@ class QXmppPresence;
 class QXmppIq;
 class QXmppBind;
 class QXmppRosterIq;
+class QXmppVCard;
 class QXmppMessage;
 
 class QXmppStream : public QObject
@@ -54,6 +56,7 @@ public:
     void sendSubscriptionRequest(const QString& to);
     void disconnect();
     QXmppRoster& getRoster();
+    QXmppVCardManager& getVCardManager();
     void sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
@@ -77,6 +80,7 @@ signals:
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);
     void rosterIqReceived(const QXmppRosterIq&);
+    void vCardIqReceived(const QXmppVCard&);
 
 private slots:
     void socketHostFound();
@@ -99,6 +103,9 @@ private:
     QAbstractSocket::SocketError m_socketError;
 //    m_xmppStreamError;
 //    m_xmppStanzaError;
+
+
+    QXmppVCardManager m_vCardManager;
 
     QXmppConfiguration& getConfiguration();
     void parser(const QByteArray&);

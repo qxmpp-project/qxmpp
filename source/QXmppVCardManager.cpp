@@ -22,39 +22,23 @@
  */
 
 
-#ifndef QXMPPRECONNECTIONMANAGER_H
-#define QXMPPRECONNECTIONMANAGER_H
+#include "QXmppVCardManager.h"
+#include "QXmppVCard.h"
+#include "QXmppUtils.h"
 
-#include <QObject>
-#include <QTimer>
-#include "QXmppClient.h"
-
-class QXmppReconnectionManager : public QObject
+QXmppVCardManager::QXmppVCardManager(QXmppClient* client) :
+        m_client(client), QObject(client)
 {
-    Q_OBJECT
+}
 
-public:
-    QXmppReconnectionManager(QXmppClient* client);
+void QXmppVCardManager::requestVCard(const QString& jid)
+{
+    QXmppVCard vcardIq(jid);
+    m_client->sendPacket(vcardIq);
+}
 
-signals:
-    void reconnectingIn(int);
-    void reconnectingNow();
+void QXmppVCardManager::vCardIqReceived(const QXmppVCard& vcard)
+{
+    emit vCardReceived(vcard);
+}
 
-public slots:
-    void cancelReconnection();
-
-private slots:
-    void connected();
-    void error(QXmppClient::Error);
-    void reconnect();
-
-private:
-    int getNextReconnectingInTime();
-    int m_reconnectionTries;
-    QTimer m_timer;
-
-    // reference to to client object (no ownership)
-    QXmppClient* m_client;
-};
-
-#endif // QXMPPRECONNECTIONMANAGER_H

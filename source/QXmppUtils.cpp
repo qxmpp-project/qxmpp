@@ -27,6 +27,8 @@
 #include <QString>
 #include <QTextStream>
 #include <QByteArray>
+#include <QBuffer>
+#include <QImageReader>
 
 QString jidToResource(const QString& jid)
 {
@@ -38,7 +40,8 @@ QString jidToBareJid(const QString& jid)
     return jid.left(jid.indexOf(QChar('/')));
 }
 
-void helperToXmlAddAttribute(QTextStream& stream, const QString& name, const QString& value)
+void helperToXmlAddAttribute(QTextStream& stream, const QString& name,
+                             const QString& value)
 {
     if(!value.isEmpty())
         stream << " " << name <<"='" << value << "'";
@@ -49,7 +52,15 @@ void helperToXmlAddElement(QTextStream& stream, const QString& name, int value)
     stream << "<" << name << ">" << value << "</" << name << ">";
 }
 
-void helperToXmlAddElement(QTextStream& stream, const QString& name, const QString& value)
+void helperToXmlAddElement(QTextStream& stream, const QString& name,
+                           const QString& value)
+{
+    if(!value.isEmpty())
+        stream << "<" << name << ">" << value << "</" << name << ">";
+}
+
+void helperToXmlAddElement(QTextStream& stream, const QString& name,
+                           const QByteArray& value)
 {
     if(!value.isEmpty())
         stream << "<" << name << ">" << value << "</" << name << ">";
@@ -83,4 +94,43 @@ QString unescapeString(const QString& str)
     strOut.replace("&quot;", QChar('"'));
     strOut.replace("&amp;", QChar('&'));
     return strOut;
+}
+
+QString getImageType(const QByteArray& image)
+{
+    QBuffer buffer;
+    buffer.setData(image);
+    buffer.open(QIODevice::ReadOnly);
+    QString format = QImageReader::imageFormat(&buffer);
+
+    if(format.toUpper() == "PNG")
+        return "image/png";
+    else if(format.toUpper() == "MNG")
+        return "video/x-mng";
+    else if(format.toUpper() == "GIF")
+        return "image/gif";
+    else if(format.toUpper() == "BMP")
+        return "image/bmp";
+    else if(format.toUpper() == "XPM")
+        return "image/x-xpm";
+    else if(format.toUpper() == "SVG")
+        return "image/svg+xml";
+    else if(format.toUpper() == "JPEG")
+        return "image/jpeg";
+
+    return "image/unknown";
+}
+
+QString getImageHash(const QByteArray& image)
+{
+    return "";
+}
+
+QImage getImageFromByteArray(const QByteArray& image)
+{
+    QBuffer buffer;
+    buffer.setData(image);
+    buffer.open(QIODevice::ReadOnly);
+    QImageReader imageReader(&buffer);
+    return imageReader.read();
 }
