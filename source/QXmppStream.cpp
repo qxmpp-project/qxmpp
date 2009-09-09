@@ -82,8 +82,8 @@ QXmppStream::QXmppStream(QXmppClient* client)
         &m_roster, SLOT(rosterIqReceived(const QXmppRosterIq&)));
     Q_ASSERT(check);
 
-    check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppRosterIq&)),
-        &m_vCardManager, SLOT(vCardIqReceived(const QXmppRosterIq&)));
+    check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
+        &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
     Q_ASSERT(check);
 }
 
@@ -122,6 +122,7 @@ void QXmppStream::socketHostFound()
 
 void QXmppStream::socketConnected()
 {
+    flushDataBuffer();
     log(QString("Connected"));
     emit connected();
     sendStartStream();
@@ -129,6 +130,7 @@ void QXmppStream::socketConnected()
 
 void QXmppStream::socketDisconnected()
 {
+    flushDataBuffer();
     log(QString("Disconnected"));
     emit disconnected();
 }
@@ -149,7 +151,7 @@ void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 void QXmppStream::socketReadReady()
 {
     QByteArray data = m_socket.readAll();
-    log("SERVER:" + data);
+    log("SERVER [COULD BE PARTIAL DATA]:" + data);
     parser(data);
 }
 
@@ -157,21 +159,26 @@ void QXmppStream::parser(const QByteArray& data)
 {
     QDomDocument doc;
     QByteArray completeXml;
-    if(hasStartStreamElement(data))
+
+    m_dataBuffer = m_dataBuffer + data;
+
+    if(hasStartStreamElement(m_dataBuffer))
     {
-        completeXml = data + streamRootElementEnd;
+        completeXml = m_dataBuffer + streamRootElementEnd;
     }
     else if(hasEndStreamElement(data))
     {
-        completeXml = streamRootElementStart + data;
+        completeXml = streamRootElementStart + m_dataBuffer;
     }
     else
     {
-        completeXml = streamRootElementStart + data + streamRootElementEnd;
+        completeXml = streamRootElementStart + m_dataBuffer + streamRootElementEnd;
     }
     
     if(doc.setContent(completeXml, true))
     {
+        log("SERVER:" + m_dataBuffer);
+        flushDataBuffer();
         // data has valid elements and is not a start or end stream
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
         while(!nodeRecv.isNull())
@@ -396,6 +403,10 @@ void QXmppStream::parser(const QByteArray& data)
             }
             nodeRecv = nodeRecv.nextSiblingElement();
         }
+    }
+    else
+    {
+        //wait for complete packet
     }
 }
 
@@ -637,4 +648,9 @@ QAbstractSocket::SocketError QXmppStream::getSocketError()
 QXmppVCardManager& QXmppStream::getVCardManager()
 {
     return m_vCardManager;
+}
+
+void QXmppStream::flushDataBuffer()
+{
+    m_dataBuffer.clear();
 }

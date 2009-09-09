@@ -23,7 +23,6 @@
 
 
 #include "QXmppVCardManager.h"
-#include "QXmppVCard.h"
 #include "QXmppUtils.h"
 
 QXmppVCardManager::QXmppVCardManager(QXmppClient* client) :

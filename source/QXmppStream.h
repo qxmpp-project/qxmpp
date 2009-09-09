@@ -97,7 +97,7 @@ private:
     QString m_sessionId;
     QString m_bindId;
     QString m_rosterReqId;
-
+    QByteArray m_dataBuffer;
     QSslSocket m_socket;
     bool m_sessionAvaliable;
     QAbstractSocket::SocketError m_socketError;
@@ -127,6 +127,8 @@ private:
     void processIq(const QXmppIq&);
     void processBindIq(const QXmppBind&);
     void processRosterIq(const QXmppRosterIq&);
+
+    void flushDataBuffer();
 };
 
 #endif // QXMPPSTREAM_H

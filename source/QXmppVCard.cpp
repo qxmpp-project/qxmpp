@@ -85,17 +85,20 @@ QByteArray QXmppVCard::toXmlElementFromChild() const
     stream << ">";
     helperToXmlAddElement(stream, "FN", getFullName());
 
-    stream << "<PHOTO";
-    helperToXmlAddElement(stream, "TYPE", getImageType(getPhoto()));
-    helperToXmlAddElement(stream, "BINVAL", getPhoto());
-    stream << "</PHOTO>";
+    if(!getPhoto().isEmpty())
+    {
+        stream << "<PHOTO";
+        helperToXmlAddElement(stream, "TYPE", getImageType(getPhoto()));
+        helperToXmlAddElement(stream, "BINVAL", getPhoto());
+        stream << "</PHOTO>";
+    }
 
     stream << "</vCard>";
 
     return data.toAscii();
 }
 
-const QImage& QXmppVCard::getPhotoAsImage() const
+QImage QXmppVCard::getPhotoAsImage() const
 {
     return getImageFromByteArray(getPhoto());
 }

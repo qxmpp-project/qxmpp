@@ -29,6 +29,7 @@
 #include <QByteArray>
 #include <QBuffer>
 #include <QImageReader>
+#include <QCryptographicHash>
 
 QString jidToResource(const QString& jid)
 {
@@ -121,9 +122,9 @@ QString getImageType(const QByteArray& image)
     return "image/unknown";
 }
 
-QString getImageHash(const QByteArray& image)
+QByteArray getImageHash(const QByteArray& image)
 {
-    return "";
+    return QCryptographicHash::hash(image, QCryptographicHash::Sha1);
 }
 
 QImage getImageFromByteArray(const QByteArray& image)

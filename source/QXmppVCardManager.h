@@ -27,8 +27,7 @@
 
 #include <QObject>
 #include "QXmppClient.h"
-
-class QXmppVCard;
+#include "QXmppVCard.h"
 
 class QXmppVCardManager : public QObject
 {

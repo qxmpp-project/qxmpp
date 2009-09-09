@@ -39,7 +39,7 @@ public:
     QString getFullName() const;
     void setFullName(const QString&);
 
-    const QImage& getPhotoAsImage() const;
+    QImage getPhotoAsImage() const;
     const QByteArray& getPhoto() const;
     void setPhoto(const QByteArray&);
 
