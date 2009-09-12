@@ -35,7 +35,7 @@ class QXmppVCardManager : public QObject
 
 public:
     QXmppVCardManager(QXmppClient* client);
-    void requestVCard(const QString& bareJid);
+    void requestVCard(const QString& bareJid = "");
 
 signals:
     void vCardReceived(const QXmppVCard&);
