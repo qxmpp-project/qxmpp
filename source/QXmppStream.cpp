@@ -310,11 +310,14 @@ void QXmppStream::parser(const QByteArray& data)
                         while(!itemElement.isNull())
                         {
                             QXmppRosterIq::Item item;
+                            item.setName(itemElement.attribute("name"));
                             item.setBareJid(itemElement.attribute("jid"));
                             item.setSubscriptionTypeFromStr(
                                     itemElement.attribute("subscription"));
                             item.setSubscriptionStatus(
                                     itemElement.attribute("ask"));
+                            item.addGroup(
+                                    itemElement.firstChildElement("group").firstChildElement().text());
                             rosterIq.addItem(item);
                             itemElement = itemElement.nextSiblingElement();
                         }

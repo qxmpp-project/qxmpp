@@ -50,7 +50,7 @@ QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
 
 QString getImageType(const QByteArray& image);
-QByteArray getImageHash(const QByteArray& image);
+QString getImageHash(const QByteArray& image);
 QImage getImageFromByteArray(const QByteArray& image);
 
 #endif // QXMPPUTILS_H

@@ -122,9 +122,9 @@ QString getImageType(const QByteArray& image)
     return "image/unknown";
 }
 
-QByteArray getImageHash(const QByteArray& image)
+QString getImageHash(const QByteArray& image)
 {
-    return QCryptographicHash::hash(image, QCryptographicHash::Sha1);
+    return QString(QCryptographicHash::hash(image, QCryptographicHash::Sha1).toHex());
 }
 
 QImage getImageFromByteArray(const QByteArray& image)

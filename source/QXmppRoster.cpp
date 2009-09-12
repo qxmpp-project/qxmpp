@@ -60,7 +60,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             {
                 QString bareJid = items.at(i).getBareJid();
                 m_entries[bareJid].setBareJid(bareJid);
-                m_entries[bareJid].setName(items.at(i).getSubscriptionStatus());
+                m_entries[bareJid].setName(items.at(i).getName());
                 m_entries[bareJid].setSubscriptionType(
                     static_cast<QXmppRosterEntry::SubscriptionType>(
                             items.at(i).getSubscriptionType()));
