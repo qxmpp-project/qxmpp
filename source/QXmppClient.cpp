@@ -190,6 +190,8 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
                     m_reconnectionManager, SLOT(error(QXmppClient::Error)));
     Q_ASSERT(check);
+
+    return true;
 }
 
 QAbstractSocket::SocketError QXmppClient::getSocketError()

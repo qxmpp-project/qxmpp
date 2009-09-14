@@ -28,6 +28,7 @@
 
 #include <QTextStream>
 #include <QImage>
+#include <QBuffer>
 
 QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
 {
@@ -53,6 +54,15 @@ const QByteArray& QXmppVCard::getPhoto() const
 void QXmppVCard::setPhoto(const QByteArray& photo)
 {
     m_photo = photo;
+}
+
+void QXmppVCard::setPhoto(const QImage& image)
+{
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+    m_photo = ba;
 }
 
 void QXmppVCard::parse(const QDomElement& nodeRecv)
@@ -87,9 +97,9 @@ QByteArray QXmppVCard::toXmlElementFromChild() const
 
     if(!getPhoto().isEmpty())
     {
-        stream << "<PHOTO";
+        stream << "<PHOTO>";
         helperToXmlAddElement(stream, "TYPE", getImageType(getPhoto()));
-        helperToXmlAddElement(stream, "BINVAL", getPhoto());
+        helperToXmlAddElement(stream, "BINVAL", getPhoto().toBase64());
         stream << "</PHOTO>";
     }
 

@@ -42,6 +42,7 @@ public:
     QImage getPhotoAsImage() const;
     const QByteArray& getPhoto() const;
     void setPhoto(const QByteArray&);
+    void setPhoto(const QImage&);
 
     void parse(const QDomElement&);
 
@@ -49,6 +50,8 @@ private:
     QByteArray toXmlElementFromChild() const;
 
     QString m_fullName;
+
+    // not as 64 base
     QByteArray m_photo;
 };
 
