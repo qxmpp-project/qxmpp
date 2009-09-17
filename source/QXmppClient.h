@@ -44,11 +44,13 @@ class QXmppClient : public QObject
     Q_OBJECT
 
 public:
+    /// An enumeration for type of error.
+    /// Error could come due a TCP socket or XML stream or due to various stanzas.
     enum Error
     {
-        SocketError,
-        XmppStreamError,
-        XmppStanzaError
+        SocketError,        ///< Error due to TCP socket
+        XmppStreamError,    ///< Error due to XML stream
+        XmppStanzaError     ///< Error due to stanza
     };
 
     QXmppClient(QObject *parent = 0);
@@ -66,17 +68,57 @@ public:
     void disconnect();
     QXmppRoster& getRoster();
     QXmppConfiguration& getConfiguration();
+    const QXmppConfiguration& getConfiguration() const;
     QXmppReconnectionManager* getReconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
     QXmppVCardManager& getVCardManager();
 
 signals:
+
+    /// This signal is emitted when the client connects sucessfully to the XMPP
+    /// server i.e. when a successful XMPP connection is established.
+    /// XMPP Connection involves following sequential steps:
+    ///     - TCP socket connection
+    ///     - Client sends start stream
+    ///     - Server sends start stream
+    ///     - TLS negotiation (encryption)
+    ///     - Authentication
+    ///     - Resource binding
+    ///     - Session establishment
+    ///
+    /// After all these steps a successful XMPP connection is established and
+    /// connected() signal is emitted.
+    ///
     void connected();
+
+    /// This signal is emitted when the XMPP connection disconnects.
+    ///
     void disconnected();
+
+    /// This signal is emitted when the XMPP connection encounters any error.
+    /// The QXmppClient::Error parameter specifies the type of error occured.
+    /// It could be due to TCP socket or the xml stream or the stanza.
+    /// Depending upon the type of error occured use the respective get function to
+    /// know the error.
     void error(QXmppClient::Error);
+
+    /// Notifies that an XMPP message stanza is received. The QXmppMessage
+    /// parameter contains the details of the message sent to this client.
+    /// In other words whenever someone sends you a message this signal is
+    /// emitted.
     void messageReceived(const QXmppMessage&);
+
+    /// Notifies that an XMPP presence stanza is received. The QXmppPresence
+    /// parameter contains the details of the presence sent to this client.
+    /// This signal is emitted when someone login/logout or when someone's status
+    /// changes Busy, Idle, Invisible etc.
     void presenceReceived(const QXmppPresence&);
+
+    /// Notifies that an XMPP iq stanza is received. The QXmppIq
+    /// parameter contains the details of the iq sent to this client.
+    /// IQ stanzas provide a structured request-response mechanism. Roster
+    /// management, setting-getting vCards etc is done using iq stanzas.
     void iqReceived(const QXmppIq&);
 
 public:
@@ -93,8 +135,9 @@ public slots:
     void setClientPresence(QXmppPresence::Status::Type statusType);
 
 private:
-    QXmppStream* m_stream;
-    QXmppConfiguration m_config;
+    QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
+                            ///< TCP socket and XMPP protocol
+    QXmppConfiguration m_config;    ///<
     QXmppPresence m_clientPrecence;
     QXmppReconnectionManager* m_reconnectionManager;
 };

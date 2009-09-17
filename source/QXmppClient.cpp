@@ -28,6 +28,10 @@
 #include "QXmppMessage.h"
 #include "QXmppReconnectionManager.h"
 
+/// Creates a QXmppClient object.
+/// \param parent is passed to the QObject's contructor.
+/// The default value is 0.
+
 QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent), m_stream(0), m_clientPrecence(QXmppPresence::Available),
     m_reconnectionManager(0)
@@ -61,14 +65,61 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 }
 
+/// Destroys the QXmppClient object.
+///
+
 QXmppClient::~QXmppClient()
 {
 }
+
+/// Returns a modifiable reference to the current configuration of QXmppClient.
+/// \return Reference to the QXmppClient's configuration for the connection.
 
 QXmppConfiguration& QXmppClient::getConfiguration()
 {
     return m_config;
 }
+
+/// Overloaded function. It returns a const reference to the current configuration
+/// of QXmppClient.
+/// \return Constant reference to the QXmppClient's configuration for the connection.
+
+const QXmppConfiguration& QXmppClient::getConfiguration() const
+{
+    return m_config;
+}
+
+/// Attempts to connect to the XMPP server. Server deatils and other configurations
+/// are specified using the config parameter. Use signals connected(), error(QXmppClient::Error)
+/// and disconnected() to know the status of the connection.
+/// \param config Specifies the configuration object for connecting the XMPP server.
+/// This contains the host name, user, passwd etc. See QXmppConfiguration for details.
+/// \param initialPresence The initial presence which will be set for this user
+/// after establishing the session. The default value is QXmppPresence::Available
+
+void QXmppClient::connectToServer(const QXmppConfiguration& config,
+                                  const QXmppPresence& initialPresence)
+{
+    m_config = config;
+
+    m_clientPrecence = initialPresence;
+
+    m_stream->connect();
+}
+
+/// Overloaded function.
+/// \param host host name of the XMPP server where connection has to be made
+/// (e.g. "jabber.org" and "talk.google.com"). It can also be an IP address in
+/// the form of a string (e.g. "192.168.1.25").
+/// \param user Username of the account at the specified XMPP server. It should
+/// be the name without the domain name. E.g. "qxmpp.test1" and not
+/// "qxmpp.test1@gmail.com"
+/// \param passwd Password for the specified username
+/// \param domain Domain name e.g. "gmail.com" and "jabber.org".
+/// \param port Port number at which the XMPP server is listening. The default
+/// value is 5222.
+/// \param initialPresence The initial presence which will be set for this user
+/// after establishing the session. The default value is QXmppPresence::Available
 
 void QXmppClient::connectToServer(const QString& host, const QString& user,
                                   const QString& passwd, const QString& domain,
@@ -86,15 +137,20 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     m_stream->connect();
 }
 
-void QXmppClient::connectToServer(const QXmppConfiguration& config,
-                                  const QXmppPresence& initialPresence)
-{
-    m_config = config;
-
-    m_clientPrecence = initialPresence;
-
-    m_stream->connect();
-}
+/// After successfully connecting to the server use this function to send
+/// stanzas to the server. This function can solely be used to send various kind
+/// of stanzas to the server. QXmppPacket is a parent class of all the stanzas
+/// QXmppMessage, QXmppPresence, QXmppIq, QXmppBind, QXmppRosterIq, QXmppSession
+/// and QXmppVCard.
+///
+/// Following code snippet illustrates how to send a message using this function:
+/// \code
+/// QXmppMessage message(from, to, message);
+/// client.sendPacket(message);
+/// \endcode
+///
+/// \param packet A valid XMPP stanza. It can an iq, a message or a presence stanza.
+///
 
 void QXmppClient::sendPacket(const QXmppPacket& packet)
 {
@@ -103,6 +159,14 @@ void QXmppClient::sendPacket(const QXmppPacket& packet)
         m_stream->sendPacket(packet);
     }
 }
+
+/// Disconnects the client and the current presence of client changes to
+/// QXmppPresence::Unavailable and statatus text changes to "Logged out".
+///
+/// \note Make sure that the clientPresence is changed to
+/// QXmppPresence::Available, if you are again calling connectToServer() after
+/// calling the disconnect() function.
+///
 
 void QXmppClient::disconnect()
 {
@@ -114,11 +178,22 @@ void QXmppClient::disconnect()
         m_stream->disconnect();
 }
 
+/// Returns the reference to QXmppRoster object of the client.
+/// \return Reference to the roster object of the connected client. Use this to
+/// get the list of friends in the roster and there presence information.
+///
+
 QXmppRoster& QXmppClient::getRoster()
 {
     if(m_stream)
         return m_stream->getRoster();
 }
+
+/// Utility function to send message to all the resources associated with the
+/// specified bareJid.
+///
+/// \param bareJid bareJid of the receiving entity
+/// \param message Message string to be sent.
 
 void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 {
@@ -129,21 +204,37 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
     }
 }
 
-// sets the new presence of the connected client
+/// Changes the presence of the connected client.
+///
+/// \param presence QXmppPresence object
+///
+
 void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
     m_clientPrecence = presence;
     sendPacket(m_clientPrecence);
 }
 
-// overloaded function, changes the status text
+/// Overloaded function.
+///
+/// It only changes the status text.
+///
+/// \param statusText New status message string
+///
+
 void QXmppClient::setClientPresence(const QString& statusText)
 {
     m_clientPrecence.getStatus().setStatusText(statusText);
     sendPacket(m_clientPrecence);
 }
 
-// overloaded function, changes the presence type
+/// Overloaded function.
+///
+/// It only changes the QXmppPresence::Type.
+///
+/// \param presenceType New QXmppPresence::Type
+///
+
 void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
 {
     if(presenceType == QXmppPresence::Unavailable)
@@ -157,23 +248,45 @@ void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
     }
 }
 
-// overloaded function, changes the status type
+/// Overloaded function.
+///
+/// It only changes the QXmppPresence::Status::Type.
+///
+/// \param statusType New QXmppPresence::Status::Type
+///
+
 void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
 {
     m_clientPrecence.getStatus().setType(statusType);
     sendPacket(m_clientPrecence);
 }
 
-// returnsn the referece to client presence object
+/// Function to get the client's current presence.
+///
+/// \return Constant reference to the client's presence object
+///
+
 const QXmppPresence& QXmppClient::getClientPresence() const
 {
     return m_clientPrecence;
 }
 
+/// Function to get reconnection manager. By default there exists a reconnection
+/// manager. See QXmppReconnectionManager for more details of the reconnection
+/// mechanism.
+///
+/// \return Pointer to QXmppReconnectionManager
+///
+
 QXmppReconnectionManager* QXmppClient::getReconnectionManager()
 {
     return m_reconnectionManager;
 }
+
+/// Sets the user defined reconnection manager.
+///
+/// \return true if all the signal-slot connections are done correctly.
+///
 
 bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
                                          reconnectionManager)
@@ -194,10 +307,19 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
     return true;
 }
 
+/// Returns the socket error if QXmppClient::Error is QXmppClient::SocketError.
+///
+/// \return QAbstractSocket::SocketError
+///
+
 QAbstractSocket::SocketError QXmppClient::getSocketError()
 {
     return m_stream->getSocketError();
 }
+
+/// Returns the reference to QXmppVCardManager, implimentation of XEP-0054.
+/// http://xmpp.org/extensions/xep-0054.html
+///
 
 QXmppVCardManager& QXmppClient::getVCardManager()
 {
