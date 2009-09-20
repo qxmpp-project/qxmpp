@@ -285,12 +285,15 @@ QXmppReconnectionManager* QXmppClient::getReconnectionManager()
 
 /// Sets the user defined reconnection manager.
 ///
-/// \return true if all the signal-slot connections are done correctly.
+/// \return true if all the signal-slot connections are made correctly.
 ///
 
 bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
                                          reconnectionManager)
 {
+	if(!reconnectionManager)
+		return false;
+		
     if(m_reconnectionManager)
         delete m_reconnectionManager;
 
@@ -299,11 +302,15 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
     bool check = connect(this, SIGNAL(connected()), m_reconnectionManager,
                          SLOT(connected()));
     Q_ASSERT(check);
+	if(!check)
+		return false;
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
                     m_reconnectionManager, SLOT(error(QXmppClient::Error)));
     Q_ASSERT(check);
-
+	if(!check)
+		return false;
+	
     return true;
 }
 

@@ -21,6 +21,20 @@
  *
  */
 
+/// \class QXmppClient
+/// \brief The QXmppClient is the main class for using QXmpp.
+///
+/// It provides the user all the required functionality to connect to the server
+/// and perform operations afterwards.
+///
+/// This class will provide the handle/reference to QXmppRoster (roster management),
+///  QXmppVCardManager (vCard manager) and QXmppReconnectionManager (reconnection
+/// mechanism).
+///
+/// By default, a reconnection mechanism exists, which makes sure of reconnecting
+/// to the server on dissconnections due to an error. User can have a custom
+/// reconnection mechanism as well.
+///
 
 #ifndef QXMPPCLIENT_H
 #define QXMPPCLIENT_H
@@ -137,9 +151,10 @@ public slots:
 private:
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
                             ///< TCP socket and XMPP protocol
-    QXmppConfiguration m_config;    ///<
-    QXmppPresence m_clientPrecence;
-    QXmppReconnectionManager* m_reconnectionManager;
+    QXmppConfiguration m_config;    ///< This object provides the configuration
+                                    ///< required for connecting to the XMPP server.
+    QXmppPresence m_clientPrecence; ///< Stores the current presence of connected client
+    QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
 };
 
 #endif // QXMPPCLIENT_H
