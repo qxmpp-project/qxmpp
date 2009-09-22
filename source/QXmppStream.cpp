@@ -151,7 +151,7 @@ void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 void QXmppStream::socketReadReady()
 {
     QByteArray data = m_socket.readAll();
-    log("SERVER [COULD BE PARTIAL DATA]:" + data);
+    log("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
     parser(data);
 }
 
@@ -337,14 +337,17 @@ void QXmppStream::parser(const QByteArray& data)
                     }
                     else // didn't understant the iq...reply with error
                     {
-                        QXmppIq iq(QXmppIq::Error);
-                        iq.setId(id);
-                        iq.setTo(from);
-                        iq.setFrom(to);
-                        QXmppStanza::Error error(QXmppStanza::Error::Cancel, 
-                            QXmppStanza::Error::FeatureNotImplemented);
-                        iq.setError(error);
-                        sendPacket(iq);
+                        if(type != "result") // but not incase of result iqs
+                        {
+                            QXmppIq iq(QXmppIq::Error);
+                            iq.setId(id);
+                            iq.setTo(from);
+                            iq.setFrom(to);
+                            QXmppStanza::Error error(QXmppStanza::Error::Cancel,
+                                QXmppStanza::Error::FeatureNotImplemented);
+                            iq.setError(error);
+                            sendPacket(iq);
+                        }
                     }
 
                     iqPacket.setError(error);
