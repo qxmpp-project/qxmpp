@@ -35,3 +35,5 @@ const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 const char* ns_vcard = "vcard-temp";
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
+const char* ns_disco_info = "http://jabber.org/protocol/disco#info";
+const char* ns_ibb = "http://jabber.org/protocol/ibb";

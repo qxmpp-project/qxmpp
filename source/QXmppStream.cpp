@@ -36,6 +36,7 @@
 #include "QXmppConstants.h"
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppInformationRequestResult.h"
 
 #include <QDomDocument>
 #include <QStringList>
@@ -358,6 +359,17 @@ void QXmppStream::parser(const QByteArray& data)
                         vcardIq.parse(nodeRecv);
                         emit vCardIqReceived(vcardIq);
                         iqPacket = vcardIq;
+                    }
+                    // XEP-0030 info query
+                    else if(nodeRecv.firstChildElement("query").
+                            namespaceURI() == ns_disco_info &&
+                            type == "get")
+                    {
+                        QXmppInformationRequestResult qxmppFeatures;
+                        qxmppFeatures.setId(id);
+                        qxmppFeatures.setTo(from);
+                        qxmppFeatures.setFrom(to);
+                        sendPacket(qxmppFeatures);
                     }
                     else if(id == m_nonSASLAuthId && type == "result")
                     {
