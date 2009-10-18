@@ -33,4 +33,5 @@ const char* ns_bind = "urn:ietf:params:xml:ns:xmpp-bind";
 const char* ns_session = "urn:ietf:params:xml:ns:xmpp-session";
 const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 const char* ns_vcard = "vcard-temp";
-
+const char* ns_auth = "jabber:iq:auth";
+const char* ns_authFeature = "http://jabber.org/features/iq-auth";

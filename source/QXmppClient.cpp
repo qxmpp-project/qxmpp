@@ -102,6 +102,12 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
 {
     m_config = config;
 
+    if(!m_config.getAutoReconnectionEnabled())
+    {
+        delete m_reconnectionManager;
+        m_reconnectionManager = 0;
+    }
+
     m_clientPrecence = initialPresence;
 
     m_stream->connect();

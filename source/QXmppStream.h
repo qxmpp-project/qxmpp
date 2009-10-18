@@ -101,6 +101,8 @@ private:
     QSslSocket m_socket;
     bool m_sessionAvaliable;
     QAbstractSocket::SocketError m_socketError;
+    QString m_streamId;
+    QString m_nonSASLAuthId;
 //    m_xmppStreamError;
 //    m_xmppStanzaError;
 
@@ -112,6 +114,7 @@ private:
     void sendStartStream();
     void sendEndStream();
     void sendStartTls();
+    void sendNonSASLAuth(bool);
     void sendAuthPlain();
     void sendBindIQ();
     void sendSessionIQ();

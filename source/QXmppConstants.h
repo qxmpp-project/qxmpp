@@ -34,5 +34,7 @@ extern const char* ns_bind;
 extern const char* ns_session;
 extern const char* ns_stanza;
 extern const char* ns_vcard;
+extern const char* ns_auth;
+extern const char* ns_authFeature;
 
 #endif // QXMPPCONSTANTS_H

@@ -35,6 +35,7 @@
 #include "QXmppMessage.h"
 #include "QXmppConstants.h"
 #include "QXmppVCard.h"
+#include "QXmppNonSASLAuth.h"
 
 #include <QDomDocument>
 #include <QStringList>
@@ -179,58 +180,78 @@ void QXmppStream::parser(const QByteArray& data)
     {
         log("SERVER:" + m_dataBuffer);
         flushDataBuffer();
-        // data has valid elements and is not a start or end stream
+
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
+
+        if(nodeRecv.isNull())
+        {
+            QDomElement streamElement = doc.documentElement();
+            if(m_streamId.isEmpty())
+                m_streamId = streamElement.attribute("id");
+        }
+
         while(!nodeRecv.isNull())
         {
             QString ns = nodeRecv.namespaceURI();
-            if(ns == ns_stream)
+            if(ns == ns_stream && nodeRecv.tagName() == "features")
             {
-                QString name = nodeRecv.tagName();
-                if(name == "features")
+                bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
+                                         namespaceURI() == ns_authFeature;
+                bool saslAvailable = nodeRecv.firstChildElement("mechanisms").
+                                     namespaceURI() == ns_sasl;
+                bool useSasl = getConfiguration().getUseSASLAuthentication();
+
+                if(nodeRecv.firstChildElement("starttls").
+                                     namespaceURI() == ns_tls &&
+                                     nodeRecv.firstChildElement("starttls").
+                                     firstChildElement().tagName() == "required")
                 {
-                    QDomElement element = nodeRecv.firstChildElement();
-                    while(!element.isNull())
+                    sendStartTls();
+                    return;
+                }
+
+                if((saslAvailable && nonSaslAvailable && !useSasl) ||
+                   (!saslAvailable && nonSaslAvailable))
+                {
+                    // Non-SASL Authentication
+                    QDomElement streamElement = doc.documentElement();
+                    QString to = streamElement.attribute("from");
+
+                    QXmppNonSASLAuthTypesRequestIq authQuery;
+                    authQuery.setTo(to);
+                    authQuery.setUsername(getConfiguration().getUser());
+
+                    sendPacket(authQuery);
+                }
+                else if(saslAvailable)
+                {
+                    // SASL Authentication
+                    QDomElement element = nodeRecv.firstChildElement("mechanisms");
+                    log(QString("Mechanisms:"));
+                    QDomElement subElement = element.firstChildElement();
+                    QStringList mechanisms;
+                    while(!subElement.isNull())
                     {
-                        if(element.namespaceURI() == ns_tls) 
+                        if(subElement.tagName() == "mechanism")
                         {
-                            if(element.tagName() == "starttls" &&
-                               element.firstChildElement().tagName() ==
-                               "required")
-                            {
-                                sendStartTls();
-                                return;
-                            }
+                            log(subElement.text());
+                            mechanisms << subElement.text();
                         }
-                        else if(element.namespaceURI() == ns_sasl &&
-                                element.tagName() == "mechanisms")
-                        {
-                            log(QString("Mechanisms:"));
-                            QDomElement subElement = element.firstChildElement();
-                            QStringList mechanisms;
-                            while(!subElement.isNull())
-                            {
-                                if(subElement.tagName() == "mechanism")
-                                {
-                                    log(subElement.text());
-                                    mechanisms << subElement.text();
-                                }
-                                subElement = subElement.nextSiblingElement();
-                            }
-                            sendAuthPlain();
-                        }
-                        else if(element.namespaceURI() == ns_bind &&
-                                element.tagName() == "bind")
-                        {
-                            sendBindIQ();
-                        }
-                        else if(element.namespaceURI() == ns_session &&
-                                element.tagName() == "session")
-                        {
-                            m_sessionAvaliable = true;
-                        }
-                        element = element.nextSiblingElement();
+                        subElement = subElement.nextSiblingElement();
                     }
+                    sendAuthPlain();
+                }
+
+                if(nodeRecv.firstChildElement("bind").
+                                     namespaceURI() == ns_bind)
+                {
+                    sendBindIQ();
+                }
+
+                if(nodeRecv.firstChildElement("session").
+                                     namespaceURI() == ns_session)
+                {
+                    m_sessionAvaliable = true;
                 }
             }
             else if(ns == ns_tls)
@@ -252,6 +273,7 @@ void QXmppStream::parser(const QByteArray& data)
             }
             else if(ns == ns_client)
             {
+
                 if(nodeRecv.tagName() == "iq")
                 {
                     QDomElement element = nodeRecv.firstChildElement();
@@ -262,9 +284,11 @@ void QXmppStream::parser(const QByteArray& data)
                     if(type.isEmpty())
                         qWarning("QXmppStream: iq type can't be empty");
                     QXmppIq iqPacket;    // to emit
+
                     
                     QDomElement elemen = nodeRecv.firstChildElement("error");
                     QXmppStanza::Error error = parseStanzaError(elemen);
+
 
                     if(id == m_sessionId)
                     {
@@ -334,6 +358,28 @@ void QXmppStream::parser(const QByteArray& data)
                         vcardIq.parse(nodeRecv);
                         emit vCardIqReceived(vcardIq);
                         iqPacket = vcardIq;
+                    }
+                    else if(id == m_nonSASLAuthId && type == "result")
+                    {
+                        // successful Non-SASL Authentication
+                        log(QString("Authenticated (Non-SASL)"));
+
+                        emit xmppConnected();
+
+                        sendRosterRequest();
+                        sendInitialPresence();
+                    }
+                    else if(nodeRecv.firstChildElement("query").
+                            namespaceURI() == ns_auth)
+                    {
+                        if(type == "result")
+                        {
+                            bool plainText = false;
+                            if ( nodeRecv.firstChildElement("query").
+                                 firstChildElement("digest").isNull() )
+                                plainText = true;
+                            sendNonSASLAuth(plainText);
+                        }
                     }
                     else // didn't understant the iq...reply with error
                     {
@@ -456,6 +502,18 @@ bool QXmppStream::hasEndStreamElement(const QByteArray& data)
 void QXmppStream::sendStartTls()
 {
     sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+}
+
+void QXmppStream::sendNonSASLAuth(bool plainText)
+{
+    QXmppNonSASLAuthIq authQuery;
+    authQuery.setUsername(getConfiguration().getUser());
+    authQuery.setPassword(getConfiguration().getPasswd());
+    authQuery.setResource(getConfiguration().getResource());
+    authQuery.setStreamId(m_streamId);
+    authQuery.setUsePlainText(plainText);
+    m_nonSASLAuthId = authQuery.getId();
+    sendPacket(authQuery);
 }
 
 void QXmppStream::sendAuthPlain()

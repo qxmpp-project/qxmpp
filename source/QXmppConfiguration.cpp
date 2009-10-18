@@ -29,7 +29,8 @@ QXmppConfiguration::QXmppConfiguration() : m_resource("QXmpp"),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
                 m_port(5222),
-                m_keepAlivePingsInterval(100), m_autoReconnectionEnabled(true)
+                m_keepAlivePingsInterval(100), m_autoReconnectionEnabled(true),
+                m_useSASLAuthentication(true)
 {
 
 }
@@ -116,5 +117,34 @@ bool QXmppConfiguration::getAutoAcceptSubscriptions() const
 void QXmppConfiguration::setAutoAcceptSubscriptions(bool check)
 {
     m_autoAcceptSubscriptions = check;
+}
+
+bool QXmppConfiguration::getAutoReconnectionEnabled() const
+{
+    return m_autoReconnectionEnabled;
+}
+
+void QXmppConfiguration::setAutoReconnectionEnabled(bool value)
+{
+    m_autoReconnectionEnabled = value;
+}
+
+/// Returns the type of authentication system specified by the user.
+/// \return true if SASL was specified else false. If the specified
+/// system is not available QXmpp will resort to the other one.
+
+bool QXmppConfiguration::getUseSASLAuthentication() const
+{
+    return m_useSASLAuthentication;
+}
+
+/// Returns the type of authentication system specified by the user.
+/// \param useSASL to hint to use SASL authentication system if available.
+/// false will specify to use NonSASL XEP-0078: Non-SASL Authentication
+/// If the specified one is not availbe, library will use the othe one
+
+void QXmppConfiguration::setUseSASLAuthentication(bool useSASL)
+{
+    m_useSASLAuthentication = useSASL;
 }
 

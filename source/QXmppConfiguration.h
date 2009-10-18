@@ -56,6 +56,9 @@ public:
     bool getAutoReconnectionEnabled() const;
     void setAutoReconnectionEnabled(bool);
 
+    bool getUseSASLAuthentication() const;
+    void setUseSASLAuthentication(bool);
+
 private:
     QString m_host;
     int m_port;
@@ -74,6 +77,10 @@ private:
     int m_keepAlivePingsInterval;
     // will keep reconnecting if disconnected, default is true
     bool m_autoReconnectionEnabled;
+    bool m_useSASLAuthentication; ///< flag to specify what authentication system
+                                  ///< to be used
+                                ///< defualt is true and use SASL
+                                ///< false would use NonSASL if available
 };
 
 #endif // QXMPPCONFIGURATION_H

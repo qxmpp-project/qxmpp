@@ -24,7 +24,8 @@ HEADERS += QXmppUtils.h \
     QXmppLogger.h \
     QXmppReconnectionManager.h \
     QXmppVCardManager.h \
-    QXmppVCard.h
+    QXmppVCard.h \
+    QXmppNonSASLAuth.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -44,4 +45,5 @@ SOURCES += QXmppUtils.cpp \
     QXmppLogger.cpp \
     QXmppReconnectionManager.cpp \
     QXmppVCardManager.cpp \
-    QXmppVCard.cpp
+    QXmppVCard.cpp \
+    QXmppNonSASLAuth.cpp
