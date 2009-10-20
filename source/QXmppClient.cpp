@@ -191,8 +191,7 @@ void QXmppClient::disconnect()
 
 QXmppRoster& QXmppClient::getRoster()
 {
-    if(m_stream)
-        return m_stream->getRoster();
+    return m_stream->getRoster();
 }
 
 /// Utility function to send message to all the resources associated with the

@@ -27,8 +27,10 @@
 #include "QXmppUtils.h"
 
 QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client) :
+        QObject(client),
+        m_reconnectionTries(0),
         m_timer(this),
-        m_reconnectionTries(0), m_client(client), QObject(client)
+        m_client(client)
 {
     m_timer.setSingleShot(true);
     bool check = connect(&m_timer, SIGNAL(timeout()), SLOT(reconnect()));

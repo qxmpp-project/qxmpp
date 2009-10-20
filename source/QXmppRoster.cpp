@@ -77,6 +77,8 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             }
             break;
         }
+    default:
+        break;
     }
 }
 

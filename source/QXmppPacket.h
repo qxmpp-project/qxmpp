@@ -32,7 +32,7 @@ class QXmppPacket
 {
 public:
     QXmppPacket();
-    ~QXmppPacket();
+    virtual ~QXmppPacket();
     
     QByteArray getXmlReceived() const;
     virtual void toXml( QXmlStreamWriter *writer ) const = 0;

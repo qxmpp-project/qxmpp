@@ -24,11 +24,11 @@
 
 #include "QXmppConfiguration.h"
 
-QXmppConfiguration::QXmppConfiguration() : m_resource("QXmpp"),
+QXmppConfiguration::QXmppConfiguration() : m_port(5222),
+                m_resource("QXmpp"),
                 m_autoAcceptSubscriptions(true),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
-                m_port(5222),
                 m_keepAlivePingsInterval(100), m_autoReconnectionEnabled(true),
                 m_useSASLAuthentication(true)
 {

@@ -28,7 +28,7 @@
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
-    : QXmppStanza(from, to), m_type(Chat), m_thread(thread), m_body(body)
+    : QXmppStanza(from, to), m_type(Chat), m_body(body), m_thread(thread)
 {
 }
 

@@ -49,7 +49,7 @@ static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
-    : QObject(client), m_roster(this), m_client(client),
+    : QObject(client), m_client(client), m_roster(this),
     m_sessionAvaliable(false), m_vCardManager(m_client)
 {
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),

@@ -26,7 +26,7 @@
 #include "QXmppUtils.h"
 
 QXmppVCardManager::QXmppVCardManager(QXmppClient* client) :
-        m_client(client), QObject(client)
+        QObject(client), m_client(client)
 {
 }
 
