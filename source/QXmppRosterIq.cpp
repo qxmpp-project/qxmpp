@@ -25,7 +25,7 @@
 #include "QXmppRosterIq.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
-#include <QTextStream>
+#include <QXmlStreamWriter>
 
 QXmppRosterIq::QXmppRosterIq(QXmppIq::Type type)
     : QXmppIq(type)
@@ -53,19 +53,14 @@ QList<QXmppRosterIq::Item> QXmppRosterIq::getItems() const
     return m_items;
 }
 
-QByteArray QXmppRosterIq::toXmlElementFromChild() const
+void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QString data;
-    QTextStream stream(&data);
+    writer->writeStartElement("query");
+    writer->writeAttribute( "xmlns", ns_roster);
 
-    stream << "<query";
-    helperToXmlAddAttribute(stream, "xmlns", ns_roster);
-    stream << ">";
     for(int i = 0; i < m_items.count(); ++i)
-        stream << m_items.at(i).toXml();
-    stream << "</query>";
-
-    return data.toAscii();
+        m_items.at(i).toXml(writer);
+    writer->writeEndElement();
 }
 
 QXmppRosterIq::Item::SubscriptionType
@@ -159,24 +154,19 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
 }
 
-QString QXmppRosterIq::Item::toXml() const
+void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
-    QString data;
-    QTextStream stream(&data);
-
-    stream << "<item";
-    helperToXmlAddAttribute(stream, "jid", m_bareJid);
-    helperToXmlAddAttribute(stream, "name", m_name);
-    helperToXmlAddAttribute(stream, "subscription", getSubscriptionTypeStr());
-    helperToXmlAddAttribute(stream, "ask", getSubscriptionStatus());
-    stream << ">";
+    writer->writeStartElement("item");
+    helperToXmlAddAttribute(writer,"jid", m_bareJid);
+    helperToXmlAddAttribute(writer,"name", m_name);
+    helperToXmlAddAttribute(writer,"subscription", getSubscriptionTypeStr());
+    helperToXmlAddAttribute(writer, "ask", getSubscriptionStatus());
 
     QSet<QString>::const_iterator i = m_groups.constBegin();
     while(i != m_groups.constEnd())
     {
-        helperToXmlAddElement(stream, "group", *i);
+        helperToXmlAddTextElement(writer,"group", *i);
         ++i;
     }
-    stream << "</item>";
-    return data.toAscii();
+    writer->writeEndElement();
 }

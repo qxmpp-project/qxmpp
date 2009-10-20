@@ -42,7 +42,7 @@ public:
 private:
     QString m_jid;
     QString m_resource;
-    QByteArray toXmlElementFromChild() const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 };
 
 #endif // QXMPPBIND_H

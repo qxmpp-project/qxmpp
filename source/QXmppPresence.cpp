@@ -25,6 +25,7 @@
 #include "QXmppPresence.h"
 #include "QXmppUtils.h"
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
                              const QXmppPresence::Status& status)
@@ -63,29 +64,25 @@ void QXmppPresence::setStatus(const QXmppPresence::Status& status)
     m_status = status;
 }
 
-QByteArray QXmppPresence::toXml() const
+void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
 {
-    QString data;
-    
-    QTextStream stream(&data);
 
-    stream << "<presence";
-    helperToXmlAddAttribute(stream, "xml:lang", getLang());
-    helperToXmlAddAttribute(stream, "id", getId());
-    helperToXmlAddAttribute(stream, "to", getTo());
-    helperToXmlAddAttribute(stream, "from", getFrom());
-    helperToXmlAddAttribute(stream, "type", getTypeStr());
-    stream << ">";
-    helperToXmlAddElement(stream, "status", getStatus().getStatusText());
+    xmlWriter->writeStartElement("presence");
+    helperToXmlAddAttribute(xmlWriter,"xml:lang", getLang());
+    helperToXmlAddAttribute(xmlWriter,"id", getId());
+    helperToXmlAddAttribute(xmlWriter,"to", getTo());
+    helperToXmlAddAttribute(xmlWriter,"from", getFrom());
+    helperToXmlAddAttribute(xmlWriter,"type", getTypeStr());
+
+    helperToXmlAddTextElement(xmlWriter,"status", getStatus().getStatusText());
     if(getStatus().getPriority() != 0)
-        helperToXmlAddElement(stream, "priority", getStatus().getPriority());
-    helperToXmlAddElement(stream, "show", getStatus().getTypeStr());
+        helperToXmlAddNumberElement(xmlWriter,"priority", getStatus().getPriority());
+    helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
     
-    stream << getError().toXml();
+    getError().toXml(xmlWriter);
     
-    stream << "</presence>";
-    
-    return data.toAscii();
+    xmlWriter->writeEndElement();
+
 }
 
 QString QXmppPresence::getTypeStr() const

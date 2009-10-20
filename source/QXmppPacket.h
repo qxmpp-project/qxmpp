@@ -27,6 +27,7 @@
 
 #include <QByteArray>
 
+class QXmlStreamWriter;
 class QXmppPacket
 {
 public:
@@ -34,7 +35,7 @@ public:
     ~QXmppPacket();
     
     QByteArray getXmlReceived() const;
-    virtual QByteArray toXml() const = 0;
+    virtual void toXml( QXmlStreamWriter *writer ) const = 0;
 
 private:
     QByteArray m_xmlReceived;

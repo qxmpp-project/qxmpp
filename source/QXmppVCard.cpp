@@ -26,7 +26,7 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-#include <QTextStream>
+#include <QXmlStreamWriter>
 #include <QImage>
 #include <QBuffer>
 
@@ -85,27 +85,21 @@ void QXmppVCard::parse(const QDomElement& nodeRecv)
     setPhoto(QByteArray::fromBase64(base64data));
 }
 
-QByteArray QXmppVCard::toXmlElementFromChild() const
+void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QString data;
-    QTextStream stream(&data);
-
-    stream << "<vCard";
-    helperToXmlAddAttribute(stream, "xmlns", ns_vcard);
-    stream << ">";
-    helperToXmlAddElement(stream, "FN", getFullName());
+    writer->writeStartElement("vCard");
+    helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
+    helperToXmlAddTextElement(writer, "FN", getFullName());
 
     if(!getPhoto().isEmpty())
     {
-        stream << "<PHOTO>";
-        helperToXmlAddElement(stream, "TYPE", getImageType(getPhoto()));
-        helperToXmlAddElement(stream, "BINVAL", getPhoto().toBase64());
-        stream << "</PHOTO>";
+        writer->writeStartElement("PHOTO");
+        helperToXmlAddTextElement(writer, "TYPE", getImageType(getPhoto()));
+        helperToXmlAddTextElement(writer, "BINVAL", getPhoto().toBase64());
+        writer->writeEndElement();
     }
 
-    stream << "</vCard>";
-
-    return data.toAscii();
+    writer->writeEndElement();
 }
 
 QImage QXmppVCard::getPhotoAsImage() const

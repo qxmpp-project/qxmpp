@@ -58,7 +58,7 @@ public:
         void setSubscriptionType(SubscriptionType);
         QString getSubscriptionTypeStr() const;
         void setSubscriptionTypeFromStr(const QString&);
-        QString toXml() const;
+        void toXml(QXmlStreamWriter *writer) const;
         
     private:
         QString m_bareJid;
@@ -75,7 +75,7 @@ public:
     
     void addItem(const Item&);
     QList<Item> getItems() const;
-    QByteArray toXmlElementFromChild() const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     QList<Item> m_items;

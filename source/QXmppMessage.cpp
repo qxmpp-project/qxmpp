@@ -24,7 +24,7 @@
 
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
-#include <QTextStream>
+#include <QXmlStreamWriter>
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
@@ -108,30 +108,20 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     }
 }
 
-QByteArray QXmppMessage::toXml() const
+void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 {
-// yet to take care of escaping xml chars
-// and what if there are multiple bodies in diff langs
-// also error
 
-    // why not qbytearray getback
-    // or use bytearray without text stream..using append
-    QString data;
-    QTextStream stream(&data);
-
-    stream << "<message";
-    helperToXmlAddAttribute(stream, "xml:lang", getLang());
-    helperToXmlAddAttribute(stream, "id", getId());
-    helperToXmlAddAttribute(stream, "to", getTo());
-    helperToXmlAddAttribute(stream, "from", getFrom());
-    helperToXmlAddAttribute(stream, "type", getTypeStr());
-    stream << ">";
-    helperToXmlAddElement(stream, "subject", escapeString(getSubject()));
-    helperToXmlAddElement(stream, "body", escapeString(getBody()));
-    helperToXmlAddElement(stream, "thread", getThread());
-    stream << getError().toXml();
-    stream << "</message>";
-    return data.toAscii();    
+    xmlWriter->writeStartElement("message");
+    helperToXmlAddAttribute(xmlWriter, "xml:lang", getLang());
+    helperToXmlAddAttribute(xmlWriter,  "id", getId());
+    helperToXmlAddAttribute(xmlWriter, "to", getTo());
+    helperToXmlAddAttribute(xmlWriter, "from", getFrom());
+    helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
+    helperToXmlAddTextElement(xmlWriter, "subject", getSubject());
+    helperToXmlAddTextElement(xmlWriter,"body", getBody());
+    helperToXmlAddTextElement(xmlWriter,"thread", getThread());
+    getError().toXml(xmlWriter);
+    xmlWriter->writeEndElement();
 }
 
 QString QXmppMessage::getBody() const

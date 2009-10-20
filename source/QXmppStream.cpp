@@ -37,11 +37,13 @@
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
+#include "QXmppLogger.h"
 
 #include <QDomDocument>
 #include <QStringList>
 #include <QRegExp>
 #include <QHostAddress>
+#include <QXmlStreamWriter>
 
 static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream:stream xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\" xmlns=\"jabber:client\" xml:lang=\"en\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\">\n";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
@@ -157,6 +159,15 @@ void QXmppStream::socketReadReady()
     parser(data);
 }
 
+void QXmppStream::sendNonSASLAuthQuery( const QString &to )
+{
+    QXmppNonSASLAuthTypesRequestIq authQuery;
+    authQuery.setTo(to);
+    authQuery.setUsername(getConfiguration().getUser());
+
+    sendPacket(authQuery);
+}
+
 void QXmppStream::parser(const QByteArray& data)
 {
     QDomDocument doc;
@@ -189,6 +200,20 @@ void QXmppStream::parser(const QByteArray& data)
             QDomElement streamElement = doc.documentElement();
             if(m_streamId.isEmpty())
                 m_streamId = streamElement.attribute("id");
+            if(m_XMPPVersion.isEmpty())
+            {
+                m_XMPPVersion = streamElement.attribute("version");
+                if(m_XMPPVersion.isEmpty())
+                {
+                    // no version specified, signals XMPP Version < 1.0.
+                    // switch to old auth mechanism
+                    sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
+                }
+            }
+        }
+        else
+        {
+            //TODO: Make a login error here.
         }
 
         while(!nodeRecv.isNull())
@@ -214,15 +239,7 @@ void QXmppStream::parser(const QByteArray& data)
                 if((saslAvailable && nonSaslAvailable && !useSasl) ||
                    (!saslAvailable && nonSaslAvailable))
                 {
-                    // Non-SASL Authentication
-                    QDomElement streamElement = doc.documentElement();
-                    QString to = streamElement.attribute("from");
-
-                    QXmppNonSASLAuthTypesRequestIq authQuery;
-                    authQuery.setTo(to);
-                    authQuery.setUsername(getConfiguration().getUser());
-
-                    sendPacket(authQuery);
+                    sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
                 }
                 else if(saslAvailable)
                 {
@@ -483,10 +500,9 @@ void QXmppStream::sendStartStream()
     sendToServer(data);
 }
 
-void QXmppStream::sendToServer(const QByteArray& data)
+void QXmppStream::sendToServer(const QByteArray& packet)
 {
-    log("CLIENT:" + data);
-    m_socket.write(data);
+    m_socket.write( packet );
 }
 
 bool QXmppStream::hasStartStreamElement(const QByteArray& data)
@@ -604,7 +620,16 @@ QXmppRoster& QXmppStream::getRoster()
 
 void QXmppStream::sendPacket(const QXmppPacket& packet)
 {
-    sendToServer(packet.toXml());
+    if(QXmppLogger::getLogger()->getLoggingType() != QXmppLogger::NONE)
+    {
+        QByteArray logPacket;
+        QXmlStreamWriter xmlStreamLog(&logPacket);
+        packet.toXml(&xmlStreamLog);
+        log("CLIENT: "+ logPacket);
+    }
+
+    QXmlStreamWriter xmlStream(&m_socket);
+    packet.toXml(&xmlStream);
 }
 
 void QXmppStream::processPresence(const QXmppPresence& presence)
@@ -639,7 +664,6 @@ void QXmppStream::processPresence(const QXmppPresence& presence)
 
 void QXmppStream::processMessage(const QXmppMessage& message)
 {
-    QString debug = message.toXml();
     emit messageReceived(message);
 }
 

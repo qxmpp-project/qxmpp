@@ -103,6 +103,7 @@ private:
     QAbstractSocket::SocketError m_socketError;
     QString m_streamId;
     QString m_nonSASLAuthId;
+    QString m_XMPPVersion;
 //    m_xmppStreamError;
 //    m_xmppStanzaError;
 
@@ -115,6 +116,7 @@ private:
     void sendEndStream();
     void sendStartTls();
     void sendNonSASLAuth(bool);
+    void sendNonSASLAuthQuery( const QString &to );
     void sendAuthPlain();
     void sendBindIQ();
     void sendSessionIQ();

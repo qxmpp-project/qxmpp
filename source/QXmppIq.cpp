@@ -25,7 +25,7 @@
 #include "QXmppUtils.h"
 #include "QXmppIq.h"
 
-#include <QTextStream>
+#include <QXmlStreamWriter>
 
 QXmppIq::QXmppIq(QXmppIq::Type type)
     : QXmppStanza(), m_type(type)
@@ -55,30 +55,25 @@ void QXmppIq::setType(QXmppIq::Type type)
     m_type = type;
 }
 
-QByteArray QXmppIq::toXml() const
+void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 {
-    QString data;
-    QTextStream stream(&data);
+    xmlWriter->writeStartElement("iq");
 
-    stream << "<iq";
-    helperToXmlAddAttribute(stream, "id", getId());
-    helperToXmlAddAttribute(stream, "to", getTo());
-    helperToXmlAddAttribute(stream, "from", getFrom());
+    helperToXmlAddAttribute(xmlWriter, "id", getId());
+    helperToXmlAddAttribute(xmlWriter, "to", getTo());
+    helperToXmlAddAttribute(xmlWriter, "from", getFrom());
     if(getTypeStr().isEmpty())
-        helperToXmlAddAttribute(stream, "type", "get");
+        helperToXmlAddAttribute(xmlWriter, "type", "get");
     else
-        helperToXmlAddAttribute(stream, "type", getTypeStr());
-    stream << ">";
-    stream << toXmlElementFromChild();
-    stream << getError().toXml();
-    stream << "</iq>";
-
-    return data.toAscii();
+        helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
+    toXmlElementFromChild(xmlWriter);
+    getError().toXml(xmlWriter);
+    xmlWriter->writeEndElement();
 }
 
-QByteArray QXmppIq::toXmlElementFromChild() const
+void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
-    return "";
+    Q_UNUSED(writer);
 }
 
 QString QXmppIq::getTypeStr() const

@@ -47,7 +47,7 @@ public:
     void parse(const QDomElement&);
 
 private:
-    QByteArray toXmlElementFromChild() const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
     QString m_fullName;
 

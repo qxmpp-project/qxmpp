@@ -27,6 +27,7 @@
 #include "QXmppConstants.h"
 
 #include <QTextStream>
+#include <QXmlStreamWriter>
 
 QXmppBind::QXmppBind(QXmppIq::Type type)
     : QXmppIq(type)
@@ -61,18 +62,15 @@ void QXmppBind::setResource(const QString& str)
     m_resource = str;
 }
 
-QByteArray QXmppBind::toXmlElementFromChild() const
+void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     QString data;
     QTextStream stream(&data);
 
-    stream << "<bind";
-    helperToXmlAddAttribute(stream, "xmlns", ns_bind);
-    stream << ">";
-    helperToXmlAddElement(stream, "jid", getJid());
-    helperToXmlAddElement(stream, "resource", getResource());
-    stream << "</bind>";
-
-    return data.toAscii();
+    writer->writeStartElement("bind");
+    helperToXmlAddAttribute(writer, "xmlns", ns_bind);
+    helperToXmlAddTextElement(writer, "jid", getJid() );
+    helperToXmlAddTextElement(writer, "resource", getResource());
+    writer->writeEndElement();
 }
 

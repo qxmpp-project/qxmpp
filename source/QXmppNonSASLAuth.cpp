@@ -1,6 +1,7 @@
 #include "QXmppNonSASLAuth.h"
 #include "QXmppUtils.h"
 #include <QCryptographicHash>
+#include <QXmlStreamWriter>
 
 QXmppNonSASLAuthTypesRequestIq::QXmppNonSASLAuthTypesRequestIq() : QXmppIq(QXmppIq::Get)
 {
@@ -12,13 +13,12 @@ void QXmppNonSASLAuthTypesRequestIq::setUsername( const QString &username )
     m_username = username;
 }
 
-QByteArray QXmppNonSASLAuthTypesRequestIq::toXmlElementFromChild() const
+void QXmppNonSASLAuthTypesRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QByteArray resultingXml;
-    resultingXml += "<query xmlns=\"jabber:iq:auth\">";
-    resultingXml += "<username>" + escapeString(m_username).toUtf8() + "</username>";
-    resultingXml += "</query>";
-    return resultingXml;
+    writer->writeStartElement("query");
+    writer->writeAttribute( "xmlns","jabber:iq:auth");
+    writer->writeTextElement("username", m_username );
+    writer->writeEndElement();
 }
 
 QXmppNonSASLAuthIq::QXmppNonSASLAuthIq() : QXmppIq(QXmppIq::Set), m_useplaintext(false)
@@ -26,23 +26,22 @@ QXmppNonSASLAuthIq::QXmppNonSASLAuthIq() : QXmppIq(QXmppIq::Set), m_useplaintext
 
 }
 
-QByteArray QXmppNonSASLAuthIq::toXmlElementFromChild() const
+void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QByteArray resultingXml;
-    resultingXml += "<query xmlns=\"jabber:iq:auth\">";
-    resultingXml += "<username>" + escapeString(m_username).toUtf8() + "</username>";
+    writer->writeStartElement("query");
+    writer->writeAttribute( "xmlns","jabber:iq:auth");
+    writer->writeTextElement("username", m_username );
     if ( m_useplaintext )
-        resultingXml += "<password>" + escapeString(m_password).toUtf8() + "</password>";
+        writer->writeTextElement("password", m_password );
     else
     {//SHA1(concat(sid, password)).
         QByteArray textSid = m_sid.toUtf8();
         QByteArray encodedPassword = m_password.toUtf8();
         QByteArray digest = QCryptographicHash::hash(textSid + encodedPassword, QCryptographicHash::Sha1 ).toHex();
-        resultingXml += "<digest>" + digest + "</digest>";
+        writer->writeTextElement("digest", digest );
     }
-    resultingXml += "<resource>" + escapeString(m_resource).toUtf8() + "</resource>";
-    resultingXml += "</query>";
-    return resultingXml;
+    writer->writeTextElement("resource", m_resource );
+    writer->writeEndElement();
 }
 
 void QXmppNonSASLAuthIq::setUsername( const QString &username )

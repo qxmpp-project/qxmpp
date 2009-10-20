@@ -26,7 +26,7 @@
 #define QXMPPUTILS_H
 
 
-class QTextStream;
+class QXmlStreamWriter;
 class QByteArray;
 class QString;
 class QImage;
@@ -34,13 +34,11 @@ class QImage;
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);
 
-void helperToXmlAddAttribute(QTextStream& stream, const QString& name,
+void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value);
-void helperToXmlAddElement(QTextStream& stream, const QString& name,
+void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value);
-void helperToXmlAddElement(QTextStream& stream, const QString& name,
-                           const QByteArray& value);
-void helperToXmlAddElement(QTextStream& stream, const QString& name,
+void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
                            int value);
 
 void log(const QString& str);

@@ -26,7 +26,7 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-#include <QTextStream>
+#include <QXmlStreamWriter>
 
 int QXmppStanza::s_uniqeIdNo = 0;
 
@@ -217,38 +217,33 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
         setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
 }
 
-QString QXmppStanza::Error::toXml() const
+void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 {
-    QString data;
     QString cond = getConditionStr();
     QString type = getTypeStr();
     
     if(cond.isEmpty() && type.isEmpty())
-        return data;
+        return;
 
-    QTextStream stream(&data);
-
-    stream << "<error";
-    helperToXmlAddAttribute(stream, "type", type);
-    stream << ">";
+    writer->writeStartElement("error");
+    helperToXmlAddAttribute(writer,"type", type);
     
     if(!cond.isEmpty())
     {
-        stream << "<" << cond;
-        helperToXmlAddAttribute(stream, "xmlns", ns_stanza);
-        stream << "/>";
+        writer->writeStartElement(cond);
+        helperToXmlAddAttribute(writer,"xmlns", ns_stanza);
+        writer->writeEndElement();
     }
     if(!m_text.isEmpty())
     {
-        stream << "<text";
-        helperToXmlAddAttribute(stream, "xml:lang", "en");
-        helperToXmlAddAttribute(stream, "xmlns", ns_stanza);
-        stream << ">";
-        stream << m_text;
-        stream << "</text>";
+        writer->writeStartElement("text");
+        helperToXmlAddAttribute(writer,"xml:lang", "en");
+        helperToXmlAddAttribute(writer,"xmlns", ns_stanza);
+        writer->writeCharacters(m_text);
+        writer->writeEndElement();
     }
-    stream << "</error>";
-    return data;
+
+    writer->writeEndElement();
 }
 
 

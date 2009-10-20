@@ -55,7 +55,8 @@ public:
     QString getThread() const;
     void setThread(const QString&);
 
-    QByteArray toXml() const;
+    void toXml(QXmlStreamWriter *writer) const;
+
 private:
     Type m_type;
 

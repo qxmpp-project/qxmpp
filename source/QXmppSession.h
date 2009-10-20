@@ -35,7 +35,7 @@ public:
     ~QXmppSession();
 
 private:
-    QByteArray toXmlElementFromChild() const;
+    void toXmlElementFromChild( QXmlStreamWriter *writer) const;
     
 };
 

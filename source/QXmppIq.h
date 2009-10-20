@@ -26,6 +26,7 @@
 #define QXMPPIQ_H
 
 #include "QXmppStanza.h"
+class QXmlStreamWriter;
 
 class QXmppIq : public QXmppStanza
 {
@@ -47,8 +48,8 @@ public:
     void setType(QXmppIq::Type);
     void setTypeFromStr(const QString& str);
 
-    QByteArray toXml() const;
-    virtual QByteArray toXmlElementFromChild() const;
+    void toXml( QXmlStreamWriter *writer ) const;
+    virtual void toXmlElementFromChild( QXmlStreamWriter *writer ) const;
 
 private:
     Type m_type;

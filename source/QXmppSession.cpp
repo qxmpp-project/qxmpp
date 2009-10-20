@@ -25,7 +25,7 @@
 #include "QXmppSession.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
-#include <QTextStream>
+#include <QXmlStreamWriter>
 
 QXmppSession::QXmppSession(QXmppIq::Type type)
     : QXmppIq(type)
@@ -41,15 +41,10 @@ QXmppSession::~QXmppSession()
 {
 }
 
-QByteArray QXmppSession::toXmlElementFromChild() const
+void QXmppSession::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QString data;
-    QTextStream stream(&data);
-
-    stream << "<session";
-    helperToXmlAddAttribute(stream, "xmlns", ns_session);
-    stream << "/>";
-
-    return data.toAscii();
+    writer->writeStartElement("session");;
+    writer->writeAttribute( "xmlns", ns_session);
+    writer->writeEndElement();
 }
 

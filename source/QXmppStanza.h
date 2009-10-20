@@ -28,6 +28,8 @@
 #include "QXmppPacket.h"
 #include <QString>
 
+class QXmlStreamWriter;
+
 class QXmppStanza : public QXmppPacket
 {
 public:
@@ -81,7 +83,7 @@ public:
         QString getText() const;
         Condition getCondition() const;
         Type getType() const;
-        QString toXml() const;
+        void toXml( QXmlStreamWriter *writer ) const;
         QString getConditionStr() const;
         QString getTypeStr() const;
 

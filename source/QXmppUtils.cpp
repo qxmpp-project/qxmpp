@@ -25,7 +25,7 @@
 #include "QXmppUtils.h"
 #include "QXmppLogger.h"
 #include <QString>
-#include <QTextStream>
+#include <QXmlStreamWriter>
 #include <QByteArray>
 #include <QBuffer>
 #include <QImageReader>
@@ -41,30 +41,25 @@ QString jidToBareJid(const QString& jid)
     return jid.left(jid.indexOf(QChar('/')));
 }
 
-void helperToXmlAddAttribute(QTextStream& stream, const QString& name,
+void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value)
 {
     if(!value.isEmpty())
-        stream << " " << name <<"='" << value << "'";
+        stream->writeAttribute(name,value);
 }
 
-void helperToXmlAddElement(QTextStream& stream, const QString& name, int value)
+void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name, int value)
 {
-    stream << "<" << name << ">" << value << "</" << name << ">";
+    stream->writeTextElement( name, QString::number(value));
 }
 
-void helperToXmlAddElement(QTextStream& stream, const QString& name,
+void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value)
 {
     if(!value.isEmpty())
-        stream << "<" << name << ">" << value << "</" << name << ">";
-}
-
-void helperToXmlAddElement(QTextStream& stream, const QString& name,
-                           const QByteArray& value)
-{
-    if(!value.isEmpty())
-        stream << "<" << name << ">" << value << "</" << name << ">";
+        stream->writeTextElement( name, value);
+    else
+        stream->writeEmptyElement(name);
 }
 
 void log(const QString& str)

@@ -7,7 +7,7 @@ class QXmppInformationRequestResult : public QXmppIq
 {
 public:
     QXmppInformationRequestResult();
-    virtual QByteArray toXmlElementFromChild() const;
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 };
 
 #endif // QXMPPINFORMATIONREQUESTRESULT_H

@@ -87,7 +87,7 @@ public:
     QXmppPresence::Status& getStatus();
     const QXmppPresence::Status& getStatus() const;
     void setStatus(const QXmppPresence::Status&);
-    QByteArray toXml() const;
+    void toXml( QXmlStreamWriter *writer ) const;
 
 private:
     Type m_type;

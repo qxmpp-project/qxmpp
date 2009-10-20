@@ -8,7 +8,7 @@ class QXmppNonSASLAuthTypesRequestIq : public QXmppIq
 public:
     QXmppNonSASLAuthTypesRequestIq();
     void setUsername( const QString &username );
-    virtual QByteArray toXmlElementFromChild() const;
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 private:
     QString m_username;
 };
@@ -17,7 +17,7 @@ class QXmppNonSASLAuthIq : public QXmppIq
 {
 public:
     QXmppNonSASLAuthIq();
-    virtual QByteArray toXmlElementFromChild() const;
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     void setUsername( const QString &username );
     void setPassword( const QString &password );
     void setResource( const QString &resource );
