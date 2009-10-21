@@ -29,8 +29,12 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_autoAcceptSubscriptions(true),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
-                m_keepAlivePingsInterval(100), m_autoReconnectionEnabled(true),
-                m_useSASLAuthentication(true)
+                m_keepAlivePingsInterval(100),
+                m_autoReconnectionEnabled(true),
+                m_useSASLAuthentication(true),
+                m_streamSecurityMode(QXmppConfiguration::TLSEnabled),
+                m_nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest),
+                m_SASLAuthMechanism(QXmppConfiguration::SASLPlain)
 {
 
 }
@@ -148,3 +152,43 @@ void QXmppConfiguration::setUseSASLAuthentication(bool useSASL)
     m_useSASLAuthentication = useSASL;
 }
 
+/// Returns the specified security mode for the stream. The default value is
+/// QXmppConfiguration::TLSEnabled.
+/// \return StreamSecurityMode
+
+QXmppConfiguration::StreamSecurityMode QXmppConfiguration::getStreamSecurityMode() const
+{
+    return m_streamSecurityMode;
+}
+
+/// Specifies the specified security mode for the stream. The default value is
+/// QXmppConfiguration::TLSEnabled.
+/// \param mode StreamSecurityMode
+
+void QXmppConfiguration::setStreamSecurityMode(
+        QXmppConfiguration::StreamSecurityMode mode)
+{
+    m_streamSecurityMode = mode;
+}
+
+QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::getNonSASLAuthMechanism() const
+{
+    return m_nonSASLAuthMechanism;
+}
+
+void QXmppConfiguration::setNonSASLAuthMechanism(
+        QXmppConfiguration::NonSASLAuthMechanism mech)
+{
+    m_nonSASLAuthMechanism = mech;
+}
+
+QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::getSASLAuthMechanism() const
+{
+    return m_SASLAuthMechanism;
+}
+
+void QXmppConfiguration::setSASLAuthMechanism(
+        QXmppConfiguration::SASLAuthMechanism mech)
+{
+    m_SASLAuthMechanism = mech;
+}

@@ -227,13 +227,42 @@ void QXmppStream::parser(const QByteArray& data)
                                      namespaceURI() == ns_sasl;
                 bool useSasl = getConfiguration().getUseSASLAuthentication();
 
-                if(nodeRecv.firstChildElement("starttls").
-                                     namespaceURI() == ns_tls &&
-                                     nodeRecv.firstChildElement("starttls").
-                                     firstChildElement().tagName() == "required")
+                if(nodeRecv.firstChildElement("starttls").namespaceURI()
+                    == ns_tls && !m_socket.isEncrypted())
                 {
-                    sendStartTls();
-                    return;
+                    if(nodeRecv.firstChildElement("starttls").
+                                     firstChildElement().tagName() == "required")
+                    {
+                        // TLS is must from the server side
+                        sendStartTls();
+                        return;
+                    }
+                    else
+                    {
+                        // TLS is optional from the server side
+                        switch(getConfiguration().getStreamSecurityMode())
+                        {
+                        case QXmppConfiguration::TLSEnabled:
+                        case QXmppConfiguration::TLSRequired:
+                            sendStartTls();
+                            return;
+                        case QXmppConfiguration::TLSDisabled:
+                            break;
+                        }
+                    }
+                }
+                else if(!m_socket.isEncrypted())    // TLS not supported by server
+                {
+                    if(getConfiguration().getStreamSecurityMode() ==
+                       QXmppConfiguration::TLSRequired)
+                    {
+                        // disconnect as the for client TLS is compulsory but
+                        // not available on the server
+                        //
+                        log(QString("Disconnecting as TLS not available at the server"));
+                        disconnect();
+                        return;
+                    }
                 }
 
                 if((saslAvailable && nonSaslAvailable && !useSasl) ||
@@ -403,10 +432,29 @@ void QXmppStream::parser(const QByteArray& data)
                     {
                         if(type == "result")
                         {
+                            bool digest = !nodeRecv.firstChildElement("query").
+                                 firstChildElement("digest").isNull();
+                            bool plain = !nodeRecv.firstChildElement("query").
+                                 firstChildElement("password").isNull();
                             bool plainText = false;
-                            if ( nodeRecv.firstChildElement("query").
-                                 firstChildElement("digest").isNull() )
+
+                            if(plain && digest)
+                            {
+                                if(getConfiguration().getNonSASLAuthMechanism() ==
+                                   QXmppConfiguration::NonSASLDigest)
+                                    plainText = false;
+                                else
+                                    plainText = true;
+                            }
+                            else if(plain)
                                 plainText = true;
+                            else if(digest)
+                                plainText = false;
+                            else
+                            {
+                                //TODO Login error
+                                return;
+                            }
                             sendNonSASLAuth(plainText);
                         }
                     }
@@ -502,6 +550,7 @@ void QXmppStream::sendStartStream()
 
 void QXmppStream::sendToServer(const QByteArray& packet)
 {
+    log("CLIENT: " + packet);
     m_socket.write( packet );
 }
 

@@ -30,6 +30,35 @@
 class QXmppConfiguration
 {
 public:
+    /// An enumeration for type of the Security Mode that is stream is encrypted or not.
+    /// The server may or may not have TLS feature. Server may force the encryption.
+    /// Depending upon all this user can specify following options.
+    enum StreamSecurityMode
+    {
+        TLSEnabled = 0, ///< Default, encryption is used if available
+        TLSDisabled,    ///< No encryption is server allows
+        TLSRequired     ///< Encryption is a must otherwise connection would not
+                        ///< be established
+    };
+
+    /// An enumeration for various Non-SASL authentication mechanisms available.
+    /// The server may or may not allow QXmppConfiguration::Plain mechanism. So
+    /// specifying the mechanism is just a hint to the library.
+    enum NonSASLAuthMechanism
+    {
+       NonSASLPlain = 0,///< Plain
+       NonSASLDigest    ///< Default,
+    };
+
+    /// An enumeration for various SASL authentication mechanisms available.
+    /// The server may or may not allow any particular mechanism. So depending
+    /// upon the availability of mechanisms on the server the library will choose
+    /// a mechanism.
+    enum SASLAuthMechanism
+    {
+       SASLPlain = 0    ///< Default
+    };
+
     QXmppConfiguration();
     ~QXmppConfiguration();
 
@@ -59,6 +88,17 @@ public:
     bool getUseSASLAuthentication() const;
     void setUseSASLAuthentication(bool);
 
+    QXmppConfiguration::StreamSecurityMode getStreamSecurityMode() const;
+    void setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
+
+    QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::
+            getNonSASLAuthMechanism() const;
+    void setNonSASLAuthMechanism(QXmppConfiguration::NonSASLAuthMechanism);
+
+    QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::
+            getSASLAuthMechanism() const;
+    void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
+
 private:
     QString m_host;
     int m_port;
@@ -81,6 +121,10 @@ private:
                                   ///< to be used
                                 ///< defualt is true and use SASL
                                 ///< false would use NonSASL if available
+
+    StreamSecurityMode m_streamSecurityMode;
+    NonSASLAuthMechanism m_nonSASLAuthMechanism;
+    SASLAuthMechanism m_SASLAuthMechanism;
 };
 
 #endif // QXMPPCONFIGURATION_H
