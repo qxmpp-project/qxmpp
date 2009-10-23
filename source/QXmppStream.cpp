@@ -286,7 +286,35 @@ void QXmppStream::parser(const QByteArray& data)
                         }
                         subElement = subElement.nextSiblingElement();
                     }
-                    sendAuthPlain();
+
+                    switch(getConfiguration().getSASLAuthMechanism())
+                    {
+                    case QXmppConfiguration::SASLPlain:
+                        if(mechanisms.contains("PLAIN"))
+                        {
+                            sendAuthPlain();
+                            break;
+                        }
+                    case QXmppConfiguration::SASLDigestMD5:
+                        if(mechanisms.contains("DIGEST-MD5"))
+                        {
+                            sendAuthDigestMD5();
+                            break;
+                        }
+                    default:
+                        log(QString("Desired SASL Auth mechanism not available trying the available ones"));
+                        if(mechanisms.contains("DIGEST-MD5"))
+                            sendAuthDigestMD5();
+                        else if(mechanisms.contains("PLAIN"))
+                            sendAuthPlain();
+                        else
+                        {
+                            log(QString("SASL Auth mechanism not available"));
+                            disconnect();
+                            return;
+                        }
+                        break;
+                    }
                 }
 
                 if(nodeRecv.firstChildElement("bind").
@@ -316,6 +344,10 @@ void QXmppStream::parser(const QByteArray& data)
                 {
                     log(QString("Authenticated"));
                     sendStartStream();
+                }
+                else if(nodeRecv.tagName() == "challenge")
+                {
+                    sendAuthDigestMD5Response(nodeRecv.text());
                 }
             }
             else if(ns == ns_client)
@@ -601,6 +633,99 @@ void QXmppStream::sendAuthPlain()
     data += userPass.toUtf8().toBase64();
     data += "</auth>";
     sendToServer(data);
+}
+
+void QXmppStream::sendAuthDigestMD5()
+{
+    QByteArray packet = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>";
+    sendToServer(packet);
+}
+
+// challenge is BASE64 encoded string
+void QXmppStream::sendAuthDigestMD5Response(const QString& challenge)
+{
+    QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
+
+    //log(ba);
+
+    ba.replace('"', QString(""));
+    QList<QByteArray> list = ba.split(',');
+
+    QMap<QByteArray, QByteArray> map;
+
+    QList<QByteArray> list2;
+    for(int i = 0; i < list.count(); ++i)
+    {
+        list2 = list.at(i).split('=');
+        if(list2.count() == 2)
+            map[list2.at(0).trimmed()] = list2.at(1).trimmed();
+        else
+            log(QString("Invalid challenge send"));
+    }
+
+    QByteArray user = getConfiguration().getUser().toUtf8();
+    QByteArray passwd = getConfiguration().getPasswd().toUtf8();
+    QByteArray domain = getConfiguration().getDomain().toUtf8();
+    QByteArray realm;
+    if(map.contains("realm"))
+        realm = map["realm"];
+
+    QByteArray response;
+
+    // First challenge
+    if(map.contains("nonce"))
+    {
+        QByteArray cnonce(32, 'm');
+        for(int n = 0; n < cnonce.size(); ++n)
+                cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
+
+        QByteArray nc = "00000001";
+        QByteArray digest_uri = "xmpp/" + domain;
+
+        QByteArray a1 = user + ':' + realm + ':' + passwd;
+        QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
+        ha1 += ':' + map["nonce"] + ':' + cnonce;
+
+        if(map.contains("authzid"))
+            ha1 += ':' + map["authzid"];
+
+        QByteArray A1(ha1);
+        QByteArray A2 = "AUTHENTICATE:" + digest_uri;
+        QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+        QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+        QByteArray KD = HA1 + ':' + map["nonce"] + ':' + nc + ':' + cnonce + ':'
+                        + "auth" + ':' + HA2;
+        QByteArray Z = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+
+        response += "username=\"" + user + "\",";
+
+        if(!realm.isEmpty())
+            response += "realm=\"" + realm + "\",";
+
+        response += "nonce=\"" + map["nonce"] + "\",";
+        response += "cnonce=\"" + cnonce + "\",";
+        response += "nc=" + nc + ",";
+        response += "qop=auth,";
+        response += "digest-uri=\"" + digest_uri + "\",";
+        response += "response=" + Z + ",";
+        if(map.contains("authzid"))
+            response += "authzid=\"" + map["authzid"] + "\",";
+        response += "charset=utf-8";
+
+        log(response);
+        QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
+                            + response.toBase64() + "</response>";
+        sendToServer(packet);
+    }
+    else if(map.contains("rspauth"))
+    {
+        sendToServer("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+    }
+    else
+    {
+        disconnect();
+        log(QString("sendAuthDigestMD5Response: Invalid input"));
+    }
 }
 
 void QXmppStream::sendBindIQ()

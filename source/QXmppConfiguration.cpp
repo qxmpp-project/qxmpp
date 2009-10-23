@@ -34,7 +34,7 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_useSASLAuthentication(true),
                 m_streamSecurityMode(QXmppConfiguration::TLSEnabled),
                 m_nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest),
-                m_SASLAuthMechanism(QXmppConfiguration::SASLPlain)
+                m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5)
 {
 
 }

@@ -56,7 +56,8 @@ public:
     /// a mechanism.
     enum SASLAuthMechanism
     {
-       SASLPlain = 0    ///< Default
+       SASLPlain = 0,
+       SASLDigestMD5    ///< Default
     };
 
     QXmppConfiguration();
