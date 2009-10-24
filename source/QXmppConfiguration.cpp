@@ -192,3 +192,26 @@ void QXmppConfiguration::setSASLAuthMechanism(
 {
     m_SASLAuthMechanism = mech;
 }
+
+/// Specifies the network proxy used for the connection made by QXmppClient.
+/// The default value is QNetworkProxy::DefaultProxy that is the proxy is
+/// determined based on the application proxy set using
+/// QNetworkProxy::setApplicationProxy().
+/// \param proxy QNetworkProxy
+
+void QXmppConfiguration::setNetworkProxy(const QNetworkProxy& proxy)
+{
+    m_networkProxy = proxy;
+}
+
+/// Returns the specified network proxy.
+/// The default value is QNetworkProxy::DefaultProxy that is the proxy is
+/// determined based on the application proxy set using
+/// QNetworkProxy::setApplicationProxy().
+/// \return QNetworkProxy
+
+QNetworkProxy QXmppConfiguration::getNetworkProxy()
+{
+    return m_networkProxy;
+}
+

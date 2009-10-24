@@ -103,9 +103,10 @@ QXmppConfiguration& QXmppStream::getConfiguration()
 
 void QXmppStream::connect()
 {
-    // work with time out
     log(QString("Connecting to: %1:%2").arg(getConfiguration().
             getHost()).arg(getConfiguration().getPort()));
+
+    m_socket.setProxy(getConfiguration().getNetworkProxy());
     m_socket.connectToHost(getConfiguration().
                            getHost(), getConfiguration().getPort());
 }

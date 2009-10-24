@@ -26,6 +26,7 @@
 #define QXMPPCONFIGURATION_H
 
 #include <QString>
+#include <QNetworkProxy>
 
 class QXmppConfiguration
 {
@@ -100,6 +101,9 @@ public:
             getSASLAuthMechanism() const;
     void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
 
+    void setNetworkProxy(const QNetworkProxy& proxy);
+    QNetworkProxy getNetworkProxy();
+
 private:
     QString m_host;
     int m_port;
@@ -126,6 +130,8 @@ private:
     StreamSecurityMode m_streamSecurityMode;
     NonSASLAuthMechanism m_nonSASLAuthMechanism;
     SASLAuthMechanism m_SASLAuthMechanism;
+
+    QNetworkProxy m_networkProxy;
 };
 
 #endif // QXMPPCONFIGURATION_H
