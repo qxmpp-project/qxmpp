@@ -102,7 +102,7 @@ public:
     void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
 
     void setNetworkProxy(const QNetworkProxy& proxy);
-    QNetworkProxy getNetworkProxy();
+    QNetworkProxy getNetworkProxy() const;
 
 private:
     QString m_host;

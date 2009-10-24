@@ -210,7 +210,7 @@ void QXmppConfiguration::setNetworkProxy(const QNetworkProxy& proxy)
 /// QNetworkProxy::setApplicationProxy().
 /// \return QNetworkProxy
 
-QNetworkProxy QXmppConfiguration::getNetworkProxy()
+QNetworkProxy QXmppConfiguration::getNetworkProxy() const
 {
     return m_networkProxy;
 }
