@@ -1,10 +1,17 @@
 TEMPLATE = lib
 QT += network \
     xml
+	
 CONFIG += staticlib \
     debug_and_release
-CONFIG(debug, debug|release):TARGET = QXmppClient_d
-else:TARGET = QXmppClient
+
+CONFIG(debug, debug|release){
+        win32:TARGET = QXmppClient_d
+        !win32:TARGET = debug\QXmppClient_d
+}else{
+        win32:TARGET = QXmppClient
+        !win32:TARGET = release\QXmppClient
+}
 
 # Header files
 HEADERS += QXmppUtils.h \

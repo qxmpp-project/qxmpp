@@ -27,7 +27,12 @@
 
 #include <QByteArray>
 
-class QXmlStreamWriter;
+// forward declarations of QXmlStream* classes will not work on Mac, we need to
+// include the whole header.
+// See http://lists.trolltech.com/qt-interest/2008-07/thread00798-0.html
+// for an explanation.
+#include <QXmlStreamWriter>
+
 class QXmppPacket
 {
 public:
