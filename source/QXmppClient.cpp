@@ -92,7 +92,7 @@ const QXmppConfiguration& QXmppClient::getConfiguration() const
     return m_config;
 }
 
-/// Attempts to connect to the XMPP server. Server deatils and other configurations
+/// Attempts to connect to the XMPP server. Server details and other configurations
 /// are specified using the config parameter. Use signals connected(), error(QXmppClient::Error)
 /// and disconnected() to know the status of the connection.
 /// \param config Specifies the configuration object for connecting the XMPP server.
@@ -158,7 +158,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
 /// client.sendPacket(message);
 /// \endcode
 ///
-/// \param packet A valid XMPP stanza. It can an iq, a message or a presence stanza.
+/// \param packet A valid XMPP stanza. It can be an iq, a message or a presence stanza.
 ///
 
 void QXmppClient::sendPacket(const QXmppPacket& packet)
@@ -189,7 +189,7 @@ void QXmppClient::disconnect()
 
 /// Returns the reference to QXmppRoster object of the client.
 /// \return Reference to the roster object of the connected client. Use this to
-/// get the list of friends in the roster and there presence information.
+/// get the list of friends in the roster and their presence information.
 ///
 
 QXmppRoster& QXmppClient::getRoster()

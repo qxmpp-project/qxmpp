@@ -28,7 +28,7 @@
 #include <QTextStream>
 #include <QFile>
 
-/// Singelton class
+/// Singleton class
 class QXmppLogger
 {
 public:
