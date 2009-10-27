@@ -52,6 +52,7 @@ class QXmppIq;
 class QXmppRoster;
 class QXmppReconnectionManager;
 class QXmppVCardManager;
+class QXmppIbbTransferManager;
 
 class QXmppClient : public QObject
 {
@@ -87,6 +88,7 @@ public:
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
     QXmppVCardManager& getVCardManager();
+    QXmppIbbTransferManager* getIbbTransferManager() const;
 
 signals:
 
@@ -155,6 +157,7 @@ private:
                                     ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPrecence; ///< Stores the current presence of connected client
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
+    QXmppIbbTransferManager* m_ibbTransferManager;    ///< Pointer to the ibb transfer manager
 };
 
 #endif // QXMPPCLIENT_H

@@ -38,6 +38,7 @@ class QImage;
 
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);
+QString generateStanzaHash();
 
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value);

@@ -115,7 +115,7 @@ public:
     bool isErrorStanza();
 
 private:
-    static int s_uniqeIdNo;
+    static uint s_uniqeIdNo;
     QString m_to;  
     QString m_from;
     QString m_id;    

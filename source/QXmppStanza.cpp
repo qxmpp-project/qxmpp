@@ -28,7 +28,7 @@
 
 #include <QXmlStreamWriter>
 
-int QXmppStanza::s_uniqeIdNo = 0;
+uint QXmppStanza::s_uniqeIdNo = 0;
 
 QXmppStanza::Error::Error(): m_type(static_cast<QXmppStanza::Error::Type>(-1)), 
             m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),

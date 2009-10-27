@@ -1,16 +1,15 @@
 TEMPLATE = lib
 QT += network \
     xml
-	
 CONFIG += staticlib \
     debug_and_release
-
-CONFIG(debug, debug|release){
-        win32:TARGET = QXmppClient_d
-        !win32:TARGET = debug\QXmppClient_d
-}else{
-        win32:TARGET = QXmppClient
-        !win32:TARGET = release\QXmppClient
+CONFIG(debug, debug|release) { 
+    win32:TARGET = QXmppClient_d
+    !win32:TARGET = debug/QXmppClient_d
+}
+else { 
+    win32:TARGET = QXmppClient
+    !win32:TARGET = release/QXmppClient
 }
 
 # Header files
@@ -33,7 +32,11 @@ HEADERS += QXmppUtils.h \
     QXmppVCardManager.h \
     QXmppVCard.h \
     QXmppNonSASLAuth.h \
-    QXmppInformationRequestResult.h
+    QXmppInformationRequestResult.h \
+    QXmppDataIq.h \
+    QXmppIbbIqs.h \
+    QXmppIbbTransferJob.h \
+    QXmppIbbTransferManager.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -55,4 +58,8 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCardManager.cpp \
     QXmppVCard.cpp \
     QXmppNonSASLAuth.cpp \
-    QXmppInformationRequestResult.cpp
+    QXmppInformationRequestResult.cpp \
+    QXmppDataIq.cpp \
+    QXmppIbbIqs.cpp \
+    QXmppIbbTransferJob.cpp \
+    QXmppIbbTransferManager.cpp

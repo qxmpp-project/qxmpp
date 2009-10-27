@@ -30,6 +30,7 @@
 #include <QBuffer>
 #include <QImageReader>
 #include <QCryptographicHash>
+#include <QDateTime>
 
 QString jidToResource(const QString& jid)
 {
@@ -39,6 +40,18 @@ QString jidToResource(const QString& jid)
 QString jidToBareJid(const QString& jid)
 {
     return jid.left(jid.indexOf(QChar('/')));
+}
+
+QString generateStanzaHash()
+{
+
+    QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    QString hashResult;
+    for ( int idx = 0; idx < 10; ++idx )
+    {
+        hashResult += somechars[(qrand() % 61)];
+    }
+    return hashResult;
 }
 
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,

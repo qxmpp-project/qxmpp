@@ -93,12 +93,10 @@ public:
     QXmppConfiguration::StreamSecurityMode getStreamSecurityMode() const;
     void setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
 
-    QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::
-            getNonSASLAuthMechanism() const;
+    QXmppConfiguration::NonSASLAuthMechanism getNonSASLAuthMechanism() const;
     void setNonSASLAuthMechanism(QXmppConfiguration::NonSASLAuthMechanism);
 
-    QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::
-            getSASLAuthMechanism() const;
+    QXmppConfiguration::SASLAuthMechanism getSASLAuthMechanism() const;
     void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
 
     void setNetworkProxy(const QNetworkProxy& proxy);

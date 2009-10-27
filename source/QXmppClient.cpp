@@ -27,6 +27,7 @@
 #include "QXmppRoster.h"
 #include "QXmppMessage.h"
 #include "QXmppReconnectionManager.h"
+#include "QXmppIbbTransferManager.h"
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's contructor.
@@ -34,7 +35,7 @@
 
 QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent), m_stream(0), m_clientPrecence(QXmppPresence::Available),
-    m_reconnectionManager(0)
+    m_reconnectionManager(0), m_ibbTransferManager(0)
 {
     m_stream = new QXmppStream(this);
 
@@ -63,6 +64,8 @@ QXmppClient::QXmppClient(QObject *parent)
 
     check = setReconnectionManager(new QXmppReconnectionManager(this));
     Q_ASSERT(check);
+
+    m_ibbTransferManager = new QXmppIbbTransferManager(this);
 }
 
 /// Destroys the QXmppClient object.
@@ -336,4 +339,9 @@ QAbstractSocket::SocketError QXmppClient::getSocketError()
 QXmppVCardManager& QXmppClient::getVCardManager()
 {
     return m_stream->getVCardManager();
+}
+
+QXmppIbbTransferManager* QXmppClient::getIbbTransferManager() const
+{
+    return m_ibbTransferManager;
 }

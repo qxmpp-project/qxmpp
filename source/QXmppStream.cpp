@@ -37,7 +37,11 @@
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
+#include "QXmppIbbIqs.h"
+#include "QXmppDataIq.h"
+#include "QXmppIbbTransferManager.h"
 #include "QXmppLogger.h"
+
 
 #include <QDomDocument>
 #include <QStringList>
@@ -216,10 +220,11 @@ void QXmppStream::parser(const QByteArray& data)
         {
             //TODO: Make a login error here.
         }
-
         while(!nodeRecv.isNull())
         {
+
             QString ns = nodeRecv.namespaceURI();
+            log("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
             if(ns == ns_stream && nodeRecv.tagName() == "features")
             {
                 bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
@@ -365,12 +370,56 @@ void QXmppStream::parser(const QByteArray& data)
                         qWarning("QXmppStream: iq type can't be empty");
                     QXmppIq iqPacket;    // to emit
 
-                    
                     QDomElement elemen = nodeRecv.firstChildElement("error");
                     QXmppStanza::Error error = parseStanzaError(elemen);
 
+                    if( QXmppIbbOpenIq::isIbbOpenIq( nodeRecv ) )
+                    {
+                        QXmppIbbOpenIq openIqPacket;
+                        openIqPacket.parse( nodeRecv );
 
-                    if(id == m_sessionId)
+                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->
+                                                   getIbbTransferJob(openIqPacket.getId());
+                        mgr->gotOpen( openIqPacket );
+                    }
+                    else if( QXmppIbbErrorIq::isIbbErrorIq( nodeRecv ) &&
+                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
+                    {
+                        QXmppIbbErrorIq errorIqPacket;
+                        errorIqPacket.parse(nodeRecv);
+
+                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->
+                                                   getIbbTransferJob(errorIqPacket.getId());
+                        mgr->gotError( errorIqPacket );
+                    }
+                    else if( QXmppIbbAckIq::isIbbAckIq( nodeRecv ) &&
+                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
+                    {
+                        QXmppIbbAckIq ackIqPacket;
+                        ackIqPacket.parse(nodeRecv);
+
+                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(ackIqPacket.getId());
+                        mgr->gotAck();
+                    }
+                    else if( QXmppDataIq::isDataIq( nodeRecv ) &&
+                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
+                    {
+                        QXmppDataIq dataIqPacket;
+                        dataIqPacket.parse(nodeRecv);
+
+                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(dataIqPacket.getId());
+                        mgr->gotData(dataIqPacket);
+                    }
+                    else if( QXmppIbbCloseIq::isIbbCloseIq( nodeRecv ) &&
+                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
+                    {
+                        QXmppIbbCloseIq closeIqPacket;
+                        closeIqPacket.parse(nodeRecv);
+
+                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(closeIqPacket.getId());
+                        mgr->gotClose(closeIqPacket);
+                    }
+                    else if(id == m_sessionId)
                     {
                         // get back add configuration whether to send
                         // roster and intial presence in beginning
