@@ -77,7 +77,13 @@ public:
                          int port = 5222,
                          const QXmppPresence& initialPresence =
                          QXmppPresence());
-    void connectToServer(const QXmppConfiguration&, 
+    void connectToServer(const QString& host,
+                         const QString& bareJid,
+                         const QString& passwd,
+                         int port = 5222,
+                         const QXmppPresence& initialPresence =
+                         QXmppPresence());
+    void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
     void disconnect();

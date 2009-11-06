@@ -28,6 +28,7 @@
 #include "QXmppMessage.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppIbbTransferManager.h"
+#include "QXmppUtils.h"
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's contructor.
@@ -144,6 +145,39 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     m_clientPrecence = initialPresence;
 
     m_stream->connect();
+}
+
+/// Overloaded function.
+/// \param host host name of the XMPP server where connection has to be made
+/// (e.g. "jabber.org" and "talk.google.com"). It can also be an IP address in
+/// the form of a string (e.g. "192.168.1.25").
+/// \param bareJid BareJid of the account at the specified XMPP server.
+/// E.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org.
+/// \param passwd Password for the specified username
+/// \param port Port number at which the XMPP server is listening. The default
+/// value is 5222.
+/// \param initialPresence The initial presence which will be set for this user
+/// after establishing the session. The default value is QXmppPresence::Available
+
+void QXmppClient::connectToServer(const QString& host,
+                                  const QString& bareJid,
+                                  const QString& passwd,
+                                  int port,
+                                  const QXmppPresence& initialPresence)
+{
+    QString user, domain;
+    QStringList list = bareJid.split("@");
+    if(list.size() == 2)
+    {
+        user = list.at(0);
+        domain = list.at(1);
+        connectToServer(host, user, passwd, domain, port, initialPresence);
+    }
+    else
+    {
+        qWarning("QXmppClient::connectToServer: Invalid bareJid");
+        log(QString("Invalid bareJid"));
+    }
 }
 
 /// After successfully connecting to the server use this function to send
