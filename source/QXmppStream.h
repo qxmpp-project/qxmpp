@@ -80,6 +80,7 @@ signals:
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);
     void rosterIqReceived(const QXmppRosterIq&);
+    void rosterRequestIqReceived(const QXmppRosterIq&);
     void vCardIqReceived(const QXmppVCard&);
 
 private slots:

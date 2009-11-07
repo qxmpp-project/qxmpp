@@ -90,6 +90,10 @@ QXmppStream::QXmppStream(QXmppClient* client)
         &m_roster, SLOT(rosterIqReceived(const QXmppRosterIq&)));
     Q_ASSERT(check);
 
+    check = QObject::connect(this, SIGNAL(rosterRequestIqReceived(const QXmppRosterIq&)),
+        &m_roster, SLOT(rosterRequestIqReceived(const QXmppRosterIq&)));
+    Q_ASSERT(check);
+
     check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
     Q_ASSERT(check);
@@ -918,7 +922,11 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
 
 void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
 {
-    emit rosterIqReceived(rosterIq);
+    if(m_rosterReqId == rosterIq.getId())
+        emit rosterRequestIqReceived(rosterIq);
+    else
+        emit rosterIqReceived(rosterIq);
+
     switch(rosterIq.getType())
     {
     case QXmppIq::Set:

@@ -28,7 +28,8 @@
 #include "QXmppPresence.h"
 #include "QXmppStream.h"
 
-QXmppRoster::QXmppRoster(QXmppStream* stream) : m_stream(stream)
+QXmppRoster::QXmppRoster(QXmppStream* stream) : m_stream(stream),
+                                m_isRosterReceived(false)
 {
 }
 
@@ -82,15 +83,65 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
     }
 }
 
+void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
+{
+    switch(rosterIq.getType())
+    {
+    case QXmppIq::Set:
+    case QXmppIq::Result:
+        {
+            QList<QXmppRosterIq::Item> items = rosterIq.getItems();
+            for(int i = 0; i < items.count(); ++i)
+            {
+                QString bareJid = items.at(i).getBareJid();
+                m_entries[bareJid].setBareJid(bareJid);
+                m_entries[bareJid].setName(items.at(i).getName());
+                m_entries[bareJid].setSubscriptionType(
+                    static_cast<QXmppRosterEntry::SubscriptionType>(
+                            items.at(i).getSubscriptionType()));
+                m_entries[bareJid].setSubscriptionStatus(
+                        items.at(i).getSubscriptionStatus());
+                m_entries[bareJid].setGroups(items.at(i).getGroups());
+            }
+            if(rosterIq.getType() == QXmppIq::Set) // send result iq
+            {
+                QXmppIq returnIq(QXmppIq::Result);
+                returnIq.setId(rosterIq.getId());
+                m_stream->sendPacket(returnIq);
+            }
+            m_isRosterReceived = true;
+            emit rosterReceived();
+            break;
+        }
+    default:
+        break;
+    }
+}
+
+/// Returns the bareJid of the roster entry.
+///
+/// \return bareJid as a QString
+///
+
 QString QXmppRoster::QXmppRosterEntry::getBareJid() const
 {
     return m_bareJid;
 }
 
+/// Returns the name of the roster entry.
+///
+/// \return name as a QString
+///
+
 QString QXmppRoster::QXmppRosterEntry::getName() const
 {
     return m_name;
 }
+
+/// Returns the subscription type of the roster entry.
+///
+/// \return QXmppRosterEntry::SubscriptionType
+///
 
 QXmppRoster::QXmppRosterEntry::SubscriptionType
         QXmppRoster::QXmppRosterEntry::getSubscriptionType() const
@@ -98,25 +149,53 @@ QXmppRoster::QXmppRosterEntry::SubscriptionType
     return m_type;
 }
 
+/// Sets the subscription status of the roster entry. It is the "ask"
+/// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
+/// or empty.
+///
+/// \return subscription status as a QString
+///
+///
+
 QString QXmppRoster::QXmppRosterEntry::getSubscriptionStatus() const
 {
     return m_subscriptionStatus;
 }
+
+/// Returns the groups of the roster entry.
+///
+/// \return QSet<QString> list of all the groups
+///
 
 QSet<QString> QXmppRoster::QXmppRosterEntry::getGroups() const
 {
     return m_groups;
 }
 
-void QXmppRoster::QXmppRosterEntry::setBareJid(const QString& str)
+/// Sets the bareJid of the roster entry.
+///
+/// \param bareJid as a QString
+///
+
+void QXmppRoster::QXmppRosterEntry::setBareJid(const QString& bareJid )
 {
-    m_bareJid = str;
+    m_bareJid = bareJid ;
 }
 
-void QXmppRoster::QXmppRosterEntry::setName(const QString& str)
+/// Sets the name of the roster entry.
+///
+/// \param name as a QString
+///
+
+void QXmppRoster::QXmppRosterEntry::setName(const QString& name)
 {
-    m_name = str;
+    m_name = name;
 }
+
+/// Sets the subscription type of the roster entry.
+///
+/// \param type as a QXmppRosterEntry::SubscriptionType
+///
 
 void QXmppRoster::QXmppRosterEntry::setSubscriptionType(
         QXmppRosterEntry::SubscriptionType type)
@@ -124,25 +203,54 @@ void QXmppRoster::QXmppRosterEntry::setSubscriptionType(
     m_type = type;
 }
 
-void QXmppRoster::QXmppRosterEntry::setSubscriptionStatus(const QString& str)
+/// Sets the subscription status of the roster entry. It is the "ask"
+/// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
+/// or empty.
+///
+/// \param status as a QString
+///
+
+void QXmppRoster::QXmppRosterEntry::setSubscriptionStatus(const QString& status)
 {
-    m_subscriptionStatus = str;
+    m_subscriptionStatus = status;
 }
 
-void QXmppRoster::QXmppRosterEntry::addGroupEntry(const QString& str)
+/// Adds the group entry of the roster entry.
+///
+/// \param group name as a QString
+///
+
+void QXmppRoster::QXmppRosterEntry::addGroupEntry(const QString& group)
 {
-    m_groups << str;
+    m_groups << group;
 }
+
+/// Sets the groups of the roster entry.
+///
+/// \param groups list of all the groups as a QSet<QString>
+///
 
 void QXmppRoster::QXmppRosterEntry::setGroups(const QSet<QString>& groups)
 {
     m_groups = groups;
 }
 
+/// Function to get all the bareJids present in the roster.
+///
+/// \return QStringList list of all the bareJids
+///
+
 QStringList QXmppRoster::getRosterBareJids() const
 {
     return m_entries.keys();
 }
+
+/// Returns the roster entry of the given bareJid. If the bareJid is not in the
+/// database and empty QXmppRoster::QXmppRosterEntry will be returned.
+///
+/// \param bareJid as a QString
+/// \return QXmppRoster::QXmppRosterEntry
+///
 
 QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(
         const QString& bareJid) const
@@ -157,11 +265,25 @@ QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(
     }
 }
 
+/// [OBSOLETE] Returns all the roster entries in the database.
+///
+/// \return Map of bareJid and its respective QXmppRoster::QXmppRosterEntry
+///
+/// \note This function is obsolete, use getRosterBareJids() and
+/// getRosterEntry() to get all the roster entries.
+///
+
 QMap<QString, QXmppRoster::QXmppRosterEntry>
         QXmppRoster::getRosterEntries() const
 {
     return m_entries;
 }
+
+/// Get all the associated resources with the given bareJid.
+///
+/// \param bareJid as a QString
+/// \return list of associated resources as a QStringList
+///
 
 QStringList QXmppRoster::getResources(const QString& bareJid) const
 {
@@ -172,6 +294,14 @@ QStringList QXmppRoster::getResources(const QString& bareJid) const
     else
         return QStringList();
 }
+
+/// Get all the presences of all the resources of the given bareJid. A bareJid
+/// can have multiple resources and each resource will have a presence
+/// associated with it.
+///
+/// \param bareJid as a QString
+/// \return Map of resource and its respective presence QMap<QString, QXmppPresence>
+///
 
 QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
         const QString& bareJid) const
@@ -185,6 +315,13 @@ QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
     }
 }
 
+/// Get the presence of the given resource of the given bareJid.
+///
+/// \param bareJid as a QString
+/// \param resource as a QString
+/// \return QXmppPresence
+///
+
 QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
                                        const QString& resource) const
 {
@@ -197,7 +334,25 @@ QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
     }
 }
 
+/// [OBSOLETE] Returns all the presence entries in the database.
+///
+/// \return Map of bareJid and map of resource and its presence that is
+/// QMap<QString, QMap<QString, QXmppPresence> >
+///
+/// \note This function is obsolete, use getRosterBareJids(), getResources()
+/// and getPresence() or getAllPresencesForBareJid()
+/// to get all the presence entries.
+
 QMap<QString, QMap<QString, QXmppPresence> > QXmppRoster::getAllPresences() const
 {
     return m_presences;
+}
+
+/// Function to check whether the roster has been received or not.
+///
+/// \return true if roster received else false
+
+bool QXmppRoster::isRosterReceived()
+{
+    return m_isRosterReceived;
 }
