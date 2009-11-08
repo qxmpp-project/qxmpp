@@ -112,6 +112,11 @@ signals:
     /// After all these steps a successful XMPP connection is established and
     /// connected() signal is emitted.
     ///
+    /// After the connected() signal is emitted QXmpp will send the roster request
+    /// to the server. On receiving the roster, QXmpp will emit
+    /// QXmppRoster::rosterReceived(). After this signal, QXmppRoster object gets
+    /// populated and you can use getRoster() to get the handle of QXmppRoster object.
+    ///
     void connected();
 
     /// This signal is emitted when the XMPP connection disconnects.
