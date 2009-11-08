@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-TARGET = example_2_ibbTransfer
+TARGET = example_3_ibbTransferSource
 
 SOURCES +=  main.cpp \
             ibbClient.cpp

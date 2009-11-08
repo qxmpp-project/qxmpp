@@ -1,0 +1,5 @@
+This is a very simple bot which echoes the message sent to it.
+
+Run this example, send it a message from a friend of this bot. You will recieve the message back.
+
+This example shows how to receive and send messages.

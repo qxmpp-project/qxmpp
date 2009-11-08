@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2009 QXmpp Developers
  *
  * Author:
- *	Manjeet Dahiya
+ *	Ian Reinhart Geiser
  *
  * Source:
  *	http://code.google.com/p/qxmpp
