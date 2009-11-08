@@ -1,0 +1,63 @@
+<stream:stream 
+  to='geiseri.com' 
+  xmlns='jabber:client' 
+  xmlns:stream='http://etherx.jabber.org/streams'>
+
+<iq id='A3' type='set'>
+  <query xmlns='jabber:iq:auth'>
+    <username>client</username>
+    <resource>telnet</resource>
+    <password>Passw0rd</password>
+  </query>
+</iq>
+
+<presence/>
+
+<iq type='set' 
+    from='client@geiseri.com/telnet' 
+    to='server@geiseri.com/QXmpp' 
+    id='rpc1'>
+  <query xmlns='jabber:iq:rpc'>
+    <methodCall>
+      <methodName>RemoteInterface.echoString</methodName>
+      <params>
+        <param>
+          <value><string>Test string</string></value>
+        </param>
+      </params>
+    </methodCall>
+  </query>
+</iq>
+
+<iq type='set' 
+    from='client@geiseri.com/telnet' 
+    to='server@geiseri.com/QXmpp' 
+    id='rpc1'>
+  <query xmlns='jabber:iq:rpc'>
+    <methodCall>
+      <methodName>RemoteInterface.badMethod</methodName>
+      <params>
+        <param>
+          <value><string>Test string</string></value>
+        </param>
+      </params>
+    </methodCall>
+  </query>
+</iq>
+
+<iq type='set' 
+    from='client@geiseri.com/telnet' 
+    to='server@geiseri.com/QXmpp' 
+    id='rpc1'>
+  <query xmlns='jabber:iq:rpc'>
+    <methodCall>
+      <methodName>BadInterface.echoString</methodName>
+      <params>
+        <param>
+          <value><string>Test string</string></value>
+        </param>
+      </params>
+    </methodCall>
+  </query>
+</iq>
+

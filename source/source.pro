@@ -36,7 +36,10 @@ HEADERS += QXmppUtils.h \
     QXmppDataIq.h \
     QXmppIbbIqs.h \
     QXmppIbbTransferJob.h \
-    QXmppIbbTransferManager.h
+    QXmppIbbTransferManager.h \
+    xmlrpc.h \
+    QXmppInvokable.h \
+    QXmppRpcIq.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -62,4 +65,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppDataIq.cpp \
     QXmppIbbIqs.cpp \
     QXmppIbbTransferJob.cpp \
-    QXmppIbbTransferManager.cpp
+    QXmppIbbTransferManager.cpp \
+    xmlrpc.cpp \
+    QXmppInvokable.cpp \
+    QXmppRpcIq.cpp 

@@ -39,8 +39,10 @@
 #include "QXmppInformationRequestResult.h"
 #include "QXmppIbbIqs.h"
 #include "QXmppDataIq.h"
+#include "QXmppRpcIq.h"
 #include "QXmppIbbTransferManager.h"
 #include "QXmppLogger.h"
+#include "QXmppUtils.h"
 
 
 #include <QDomDocument>
@@ -422,6 +424,12 @@ void QXmppStream::parser(const QByteArray& data)
 
                         QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(closeIqPacket.getId());
                         mgr->gotClose(closeIqPacket);
+                    }
+                    else if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
+                    {
+                        QXmppRpcInvokeIq rpcIqPacket;
+                        rpcIqPacket.parse(nodeRecv);
+                        m_client->invokeInterfaceMethod(rpcIqPacket);
                     }
                     else if(id == m_sessionId)
                     {

@@ -41,6 +41,9 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QHash>
+#include <QVariant>
+
 #include "QXmppConfiguration.h"
 #include "QXmppPresence.h"
 
@@ -52,6 +55,9 @@ class QXmppIq;
 class QXmppRoster;
 class QXmppReconnectionManager;
 class QXmppVCardManager;
+class QXmppInvokable;
+class QXmppRpcInvokeIq;
+class QXmppRemoteMethod;
 class QXmppIbbTransferManager;
 
 class QXmppClient : public QObject
@@ -150,6 +156,9 @@ signals:
 
 public:
     QAbstractSocket::SocketError getSocketError();
+    void addInvokableInterface( QXmppInvokable *interface );
+    void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
+
 //    QXmppStanza::Error getXmppStreamError();
 
 public slots:
@@ -168,6 +177,7 @@ private:
                                     ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPrecence; ///< Stores the current presence of connected client
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
+    QHash<QString,QXmppInvokable *> m_interfaces;
     QXmppIbbTransferManager* m_ibbTransferManager;    ///< Pointer to the ibb transfer manager
 };
 

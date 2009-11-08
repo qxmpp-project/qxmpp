@@ -16,5 +16,12 @@ void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writ
     writer->writeStartElement("feature");
     writer->writeAttribute("var", ns_ibb );
     writer->writeEndElement();
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_rpc);
+    writer->writeEndElement();
+    writer->writeStartElement("identity");
+    writer->writeAttribute("category", "automation" );
+    writer->writeAttribute("type", "rpc" );
+    writer->writeEndElement();
     writer->writeEndElement();
 }

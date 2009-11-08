@@ -43,6 +43,8 @@ class QXmppBind;
 class QXmppRosterIq;
 class QXmppVCard;
 class QXmppMessage;
+class QXmppRpcResponseIq;
+class QXmppRpcErrorIq;
 
 class QXmppStream : public QObject
 {
@@ -82,6 +84,9 @@ signals:
     void rosterIqReceived(const QXmppRosterIq&);
     void rosterRequestIqReceived(const QXmppRosterIq&);
     void vCardIqReceived(const QXmppVCard&);
+
+    void rpcRequestFinished( const QString &id, const QXmppRpcResponseIq& result );
+    void rpcRequestError( const QString &id, const QXmppRpcErrorIq& err );
 
 private slots:
     void socketHostFound();

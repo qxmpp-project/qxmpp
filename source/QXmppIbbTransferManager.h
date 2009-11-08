@@ -9,6 +9,7 @@ class QXmppClient;
 
 class QXmppIbbTransferManager : public QObject
 {
+    Q_OBJECT
 public:
     QXmppIbbTransferManager(QXmppClient* client);
 

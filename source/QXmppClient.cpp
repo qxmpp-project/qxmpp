@@ -28,6 +28,8 @@
 #include "QXmppMessage.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppIbbTransferManager.h"
+#include "QXmppInvokable.h"
+#include "QXmppRpcIq.h"
 #include "QXmppUtils.h"
 
 /// Creates a QXmppClient object.
@@ -375,7 +377,62 @@ QXmppVCardManager& QXmppClient::getVCardManager()
     return m_stream->getVCardManager();
 }
 
+void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
+{
+    m_interfaces[ interface->metaObject()->className() ] = interface;
+}
+
+
+void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
+{
+    QXmppStanza::Error error;
+    QString interface = iq.getInterface();
+    QXmppInvokable *iface = m_interfaces[ interface ];
+    if( iface )
+    {
+        if ( iface->isAuthorized( iq.getFrom() ) )
+        {
+
+            if ( iface->interfaces().contains( iq.getMethod() ) )
+            {
+                QVariant result = iface->dispatch(iq.getMethod().toLatin1(),
+                                                  iq.getPayload() );
+                QXmppRpcResponseIq resultIq;
+                resultIq.setId(iq.getId());
+                resultIq.setTo(iq.getFrom());
+                resultIq.setFrom( m_config.getJid());
+                resultIq.setPayload(result);
+                m_stream->sendPacket( resultIq );
+                return;
+            }
+            else
+            {
+                error.setType(QXmppStanza::Error::Cancel);
+                error.setCondition(QXmppStanza::Error::ItemNotFound);
+
+            }
+        }
+        else
+        {
+            error.setType(QXmppStanza::Error::Auth);
+            error.setCondition(QXmppStanza::Error::Forbidden);
+        }
+    }
+    else
+    {
+        error.setType(QXmppStanza::Error::Cancel);
+        error.setCondition(QXmppStanza::Error::ItemNotFound);
+    }
+    QXmppRpcErrorIq errorIq;
+    errorIq.setId(iq.getId());
+    errorIq.setTo(iq.getFrom());
+    errorIq.setFrom( m_config.getJid());
+    errorIq.setQuery( iq );
+    errorIq.setError( error );
+    m_stream->sendPacket( errorIq );
+}
+
 QXmppIbbTransferManager* QXmppClient::getIbbTransferManager() const
 {
-    return m_ibbTransferManager;
+   return m_ibbTransferManager;
 }

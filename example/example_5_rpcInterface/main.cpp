@@ -22,22 +22,18 @@
  */
 
 
-#ifndef QXMPPCONSTANTS_H
-#define QXMPPCONSTANTS_H
+#include <QtCore/QCoreApplication>
+#include "rpcClient.h"
+#include "QXmppLogger.h"
 
-extern const char* ns_stream;
-extern const char* ns_client;
-extern const char* ns_roster;
-extern const char* ns_tls;
-extern const char* ns_sasl;
-extern const char* ns_bind;
-extern const char* ns_session;
-extern const char* ns_stanza;
-extern const char* ns_vcard;
-extern const char* ns_auth;
-extern const char* ns_authFeature;
-extern const char* ns_disco_info;
-extern const char* ns_ibb;
-extern const char* ns_rpc;
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+    
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
 
-#endif // QXMPPCONSTANTS_H
+    rpcClient client;
+    client.getConfiguration().setUseSASLAuthentication( false );
+    client.connectToServer("jabber.geiseri.com", "server", "Passw0rd", "geiseri.com");
+    return a.exec();
+}

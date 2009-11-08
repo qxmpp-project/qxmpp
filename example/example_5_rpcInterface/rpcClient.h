@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2009 QXmpp Developers
  *
  * Author:
- *	Manjeet Dahiya
+ *	Ian Reinhart Geiser
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -22,22 +22,19 @@
  */
 
 
-#ifndef QXMPPCONSTANTS_H
-#define QXMPPCONSTANTS_H
+#ifndef RPCCLIENT_H
+#define RPCCLIENT_H
 
-extern const char* ns_stream;
-extern const char* ns_client;
-extern const char* ns_roster;
-extern const char* ns_tls;
-extern const char* ns_sasl;
-extern const char* ns_bind;
-extern const char* ns_session;
-extern const char* ns_stanza;
-extern const char* ns_vcard;
-extern const char* ns_auth;
-extern const char* ns_authFeature;
-extern const char* ns_disco_info;
-extern const char* ns_ibb;
-extern const char* ns_rpc;
+#include "QXmppClient.h"
 
-#endif // QXMPPCONSTANTS_H
+class rpcClient : public QXmppClient
+{
+    Q_OBJECT
+
+public:
+    rpcClient(QObject *parent = 0);
+    ~rpcClient();
+
+};
+
+#endif // RPCCLIENT_H
