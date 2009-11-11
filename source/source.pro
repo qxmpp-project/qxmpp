@@ -39,7 +39,8 @@ HEADERS += QXmppUtils.h \
     QXmppIbbTransferManager.h \
     xmlrpc.h \
     QXmppInvokable.h \
-    QXmppRpcIq.h
+    QXmppRpcIq.h \
+    QXmppRemoteMethod.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -68,4 +69,5 @@ SOURCES += QXmppUtils.cpp \
     QXmppIbbTransferManager.cpp \
     xmlrpc.cpp \
     QXmppInvokable.cpp \
-    QXmppRpcIq.cpp 
+    QXmppRpcIq.cpp \
+    QXmppRemoteMethod.cpp

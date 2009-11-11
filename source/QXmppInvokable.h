@@ -52,9 +52,15 @@ public:
          */
         static QList<QByteArray> paramTypes( const QList<QVariant> &params );
 
+        /**
+          * Reimplement this method to return a true if the invoking JID is allowed to execute the method.
+          */
         virtual bool isAuthorized( const QString &jid ) const = 0;
 
 public slots:
+        /**
+          * This provides a list of interfaces for introspection of the presented interface.
+          */
         QStringList interfaces() const;
 
 private:

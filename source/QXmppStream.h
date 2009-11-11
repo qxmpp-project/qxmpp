@@ -85,8 +85,8 @@ signals:
     void rosterRequestIqReceived(const QXmppRosterIq&);
     void vCardIqReceived(const QXmppVCard&);
 
-    void rpcRequestFinished( const QString &id, const QXmppRpcResponseIq& result );
-    void rpcRequestError( const QString &id, const QXmppRpcErrorIq& err );
+    void rpcCallResponse(const QXmppRpcResponseIq& result );
+    void rpcCallError(const QXmppRpcErrorIq& err );
 
 private slots:
     void socketHostFound();

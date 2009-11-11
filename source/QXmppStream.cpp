@@ -431,6 +431,18 @@ void QXmppStream::parser(const QByteArray& data)
                         rpcIqPacket.parse(nodeRecv);
                         m_client->invokeInterfaceMethod(rpcIqPacket);
                     }
+                    else if ( QXmppRpcResponseIq::isRpcResponseIq( nodeRecv ) )
+                    {
+                        QXmppRpcResponseIq rpcResponseIq;
+                        rpcResponseIq.parse(nodeRecv);
+                        emit rpcCallResponse( rpcResponseIq );
+                    }
+                    else if ( QXmppRpcErrorIq::isRpcErrorIq( nodeRecv ) )
+                    {
+                        QXmppRpcErrorIq rpcErrorIq;
+                        rpcErrorIq.parse(nodeRecv);
+                        emit rpcCallError( rpcErrorIq );
+                    }
                     else if(id == m_sessionId)
                     {
                         // get back add configuration whether to send

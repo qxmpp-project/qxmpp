@@ -30,6 +30,7 @@
 #include "QXmppIbbTransferManager.h"
 #include "QXmppInvokable.h"
 #include "QXmppRpcIq.h"
+#include "QXmppRemoteMethod.h"
 #include "QXmppUtils.h"
 
 /// Creates a QXmppClient object.
@@ -435,4 +436,39 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
 QXmppIbbTransferManager* QXmppClient::getIbbTransferManager() const
 {
    return m_ibbTransferManager;
+}
+
+QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
+                                          const QString &interface,
+                                          const QVariant &arg1,
+                                          const QVariant &arg2,
+                                          const QVariant &arg3,
+                                          const QVariant &arg4,
+                                          const QVariant &arg5,
+                                          const QVariant &arg6,
+                                          const QVariant &arg7,
+                                          const QVariant &arg8,
+                                          const QVariant &arg9,
+                                          const QVariant &arg10 )
+{
+    QVariantList args;
+    if( arg1.isValid() ) args << arg1;
+    if( arg2.isValid() ) args << arg2;
+    if( arg3.isValid() ) args << arg3;
+    if( arg4.isValid() ) args << arg4;
+    if( arg5.isValid() ) args << arg5;
+    if( arg6.isValid() ) args << arg6;
+    if( arg7.isValid() ) args << arg7;
+    if( arg8.isValid() ) args << arg8;
+    if( arg9.isValid() ) args << arg9;
+    if( arg10.isValid() ) args << arg10;
+
+    QXmppRemoteMethod method( jid, interface, args, this );
+    connect( m_stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
+             &method, SLOT(gotResult(QXmppRpcResponseIq)));
+    connect( m_stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
+             &method, SLOT(gotError(QXmppRpcErrorIq)));
+
+
+    return method.call();
 }
