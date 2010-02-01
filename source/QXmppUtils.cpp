@@ -28,6 +28,7 @@
 #include <QXmlStreamWriter>
 #include <QByteArray>
 #include <QBuffer>
+#include <QImage>
 #include <QImageReader>
 #include <QCryptographicHash>
 #include <QDateTime>
