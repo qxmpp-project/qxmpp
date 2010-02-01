@@ -102,7 +102,7 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("vCard");
     helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
     helperToXmlAddTextElement(writer, "FN", getFullName());
-    if(!getNickname().isEmpty())
+    if(!getNickName().isEmpty())
         helperToXmlAddTextElement(writer, "NICKNAME", getNickName());
 
     if(!getPhoto().isEmpty())
