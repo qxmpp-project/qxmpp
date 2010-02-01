@@ -46,6 +46,16 @@ void QXmppVCard::setFullName(const QString& str)
     m_fullName = str;
 }
 
+QString QXmppVCard::getNickName() const
+{
+    return m_nickName;
+}
+
+void QXmppVCard::setNickName(const QString& str)
+{
+    m_nickName = str;
+}
+
 const QByteArray& QXmppVCard::getPhoto() const
 {
     return m_photo;
@@ -79,6 +89,8 @@ void QXmppVCard::parse(const QDomElement& nodeRecv)
     // vCard
     setFullName(nodeRecv.firstChildElement("vCard").
                 firstChildElement("FN").text());
+    setNickName(nodeRecv.firstChildElement("vCard").
+                firstChildElement("NICKNAME").text());
     QByteArray base64data = nodeRecv.firstChildElement("vCard").
                             firstChildElement("PHOTO").
                             firstChildElement("BINVAL").text().toAscii();

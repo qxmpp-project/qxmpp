@@ -39,6 +39,9 @@ public:
     QString getFullName() const;
     void setFullName(const QString&);
 
+    QString getNickName() const;
+    void setNickName(const QString&);
+
     QImage getPhotoAsImage() const;
     const QByteArray& getPhoto() const;
     void setPhoto(const QByteArray&);
@@ -50,6 +53,7 @@ private:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
     QString m_fullName;
+    QString m_nickName;
 
     // not as 64 base
     QByteArray m_photo;
