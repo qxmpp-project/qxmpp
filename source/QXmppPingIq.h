@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2010 Bolloré telecom
  *
  * Author:
- *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,24 +21,20 @@
  *
  */
 
+#ifndef QXMPPPINGIQ_H
+#define QXMPPPINGIQ_H
 
-#ifndef QXMPPCONSTANTS_H
-#define QXMPPCONSTANTS_H
+#include "QXmppIq.h"
 
-extern const char* ns_stream;
-extern const char* ns_client;
-extern const char* ns_roster;
-extern const char* ns_tls;
-extern const char* ns_sasl;
-extern const char* ns_bind;
-extern const char* ns_session;
-extern const char* ns_stanza;
-extern const char* ns_vcard;
-extern const char* ns_auth;
-extern const char* ns_authFeature;
-extern const char* ns_disco_info;
-extern const char* ns_ibb;
-extern const char* ns_rpc;
-extern const char* ns_ping;
+class QXmlStreamWriter;
+class QDomElement;
 
-#endif // QXMPPCONSTANTS_H
+class QXmppPingIq : public QXmppIq
+{
+public:
+    QXmppPingIq();
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    static bool isPingIq( QDomElement &element );
+};
+
+#endif

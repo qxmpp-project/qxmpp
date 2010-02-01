@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2010 Bolloré telecom
  *
  * Author:
- *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,24 +21,26 @@
  *
  */
 
+#include "QXmppConstants.h"
+#include "QXmppPingIq.h"
+#include "QXmppUtils.h"
 
-#ifndef QXMPPCONSTANTS_H
-#define QXMPPCONSTANTS_H
+#include <QDomElement>
 
-extern const char* ns_stream;
-extern const char* ns_client;
-extern const char* ns_roster;
-extern const char* ns_tls;
-extern const char* ns_sasl;
-extern const char* ns_bind;
-extern const char* ns_session;
-extern const char* ns_stanza;
-extern const char* ns_vcard;
-extern const char* ns_auth;
-extern const char* ns_authFeature;
-extern const char* ns_disco_info;
-extern const char* ns_ibb;
-extern const char* ns_rpc;
-extern const char* ns_ping;
+QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
+{
+}
 
-#endif // QXMPPCONSTANTS_H
+bool QXmppPingIq::isPingIq( QDomElement &element )
+{
+    QDomElement pingElement = element.firstChildElement("ping");
+    return (pingElement.namespaceURI() == ns_ping);
+}
+
+void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("ping");
+    helperToXmlAddAttribute(writer, "xmlns", ns_ping);
+    writer->writeEndElement();
+}
+
