@@ -369,6 +369,16 @@ QAbstractSocket::SocketError QXmppClient::getSocketError()
     return m_stream->getSocketError();
 }
 
+/// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
+///
+/// \return QXmppClient::StreamError
+///
+
+QXmppClient::StreamError QXmppClient::getXmppStreamError()
+{
+    return m_stream->getXmppStreamError();
+}
+
 /// Returns the reference to QXmppVCardManager, implimentation of XEP-0054.
 /// http://xmpp.org/extensions/xep-0054.html
 ///

@@ -62,6 +62,7 @@ public:
     void sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
+    QXmppClient::StreamError getXmppStreamError();
 
 signals:
     // socket host found
@@ -110,7 +111,7 @@ private:
     QString m_streamId;
     QString m_nonSASLAuthId;
     QString m_XMPPVersion;
-//    m_xmppStreamError;
+    QXmppClient::StreamError m_xmppStreamError;
 //    m_xmppStanzaError;
 
 

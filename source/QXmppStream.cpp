@@ -341,6 +341,14 @@ void QXmppStream::parser(const QByteArray& data)
                     m_sessionAvaliable = true;
                 }
             }
+            else if(ns == ns_stream && nodeRecv.tagName() == "error")
+            {
+                if (!nodeRecv.firstChildElement("conflict").isNull())
+                    m_xmppStreamError = QXmppClient::ConflictStreamError;
+                else
+                    m_xmppStreamError = QXmppClient::UnknownStreamError;
+                emit error(QXmppClient::XmppStreamError);
+            }
             else if(ns == ns_tls)
             {
                 if(nodeRecv.tagName() == "proceed")
@@ -995,6 +1003,11 @@ QXmppStanza::Error QXmppStream::parseStanzaError(QDomElement & errorElement)
 QAbstractSocket::SocketError QXmppStream::getSocketError()
 {
     return m_socketError;
+}
+
+QXmppClient::StreamError QXmppStream::getXmppStreamError()
+{
+    return m_xmppStreamError;
 }
 
 QXmppVCardManager& QXmppStream::getVCardManager()

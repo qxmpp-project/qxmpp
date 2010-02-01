@@ -75,6 +75,13 @@ public:
         XmppStanzaError     ///< Error due to stanza
     };
 
+    // An enumeration for the type of XMPP stream error.
+    enum StreamError
+    {
+        ConflictStreamError,
+        UnknownStreamError,
+    };
+
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
     void connectToServer(const QString& host,
@@ -173,7 +180,7 @@ public:
                                               const QVariant &arg9 = QVariant(),
                                               const QVariant &arg10 = QVariant() );
 
-//    QXmppStanza::Error getXmppStreamError();
+    QXmppClient::StreamError getXmppStreamError();
 
 public slots:
     void sendPacket(const QXmppPacket&);
