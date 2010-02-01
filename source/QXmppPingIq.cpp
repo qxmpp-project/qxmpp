@@ -34,7 +34,8 @@ QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
 bool QXmppPingIq::isPingIq( QDomElement &element )
 {
     QDomElement pingElement = element.firstChildElement("ping");
-    return (pingElement.namespaceURI() == ns_ping);
+    return (element.attribute("type") == "get" &&
+            pingElement.namespaceURI() == ns_ping);
 }
 
 void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

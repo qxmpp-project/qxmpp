@@ -41,6 +41,7 @@
 #include "QXmppDataIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppIbbTransferManager.h"
+#include "QXmppPingIq.h"
 #include "QXmppLogger.h"
 #include "QXmppUtils.h"
 
@@ -571,6 +572,15 @@ void QXmppStream::parser(const QByteArray& data)
                             }
                             sendNonSASLAuth(plainText);
                         }
+                    }
+                    // XEP-0199 ping
+                    else if(QXmppPingIq::isPingIq(nodeRecv))
+                    {
+                        QXmppIq iq(QXmppIq::Result);
+                        iq.setId(id);
+                        iq.setTo(from);
+                        iq.setFrom(to);
+                        sendPacket(iq);
                     }
                     else // didn't understant the iq...reply with error
                     {
