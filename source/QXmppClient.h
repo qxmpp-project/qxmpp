@@ -75,10 +75,12 @@ public:
         XmppStanzaError     ///< Error due to stanza
     };
 
-    // An enumeration for the type of XMPP stream error.
+    /// An enumeration for the type of XMPP stream error.
+    /// http://xmpp.org/rfcs/rfc3920.html#streams-error
     enum StreamError
     {
-        ConflictStreamError,
+        ConflictStreamError,///< <conflict/> the server is closing the active stream for this
+        ///< entity because a new stream has been initiated that conflicts with the existing stream.
         UnknownStreamError,
     };
 
