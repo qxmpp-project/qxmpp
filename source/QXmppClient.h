@@ -60,6 +60,7 @@ class QXmppRpcInvokeIq;
 class QXmppRemoteMethod;
 class QXmppIbbTransferManager;
 class QXmppRemoteMethodResult;
+class QXmppArchiveManager;
 
 class QXmppClient : public QObject
 {
@@ -111,6 +112,7 @@ public:
     const QXmppPresence& getClientPresence() const;
     QXmppVCardManager& getVCardManager();
     QXmppIbbTransferManager* getIbbTransferManager() const;
+    QXmppArchiveManager& getArchiveManager();
 
 signals:
 

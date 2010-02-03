@@ -482,3 +482,12 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 
     return method.call();
 }
+
+/// Returns the reference to QXmppArchiveManager, implementation of XEP-0136.
+/// http://xmpp.org/extensions/xep-0136.html
+///
+
+QXmppArchiveManager& QXmppClient::getArchiveManager()
+{
+    return m_stream->getArchiveManager();
+}
