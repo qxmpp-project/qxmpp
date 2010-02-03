@@ -14,6 +14,7 @@ else {
 
 # Header files
 HEADERS += QXmppUtils.h \
+    QXmppArchiveManager.h \
     QXmppBind.h \
     QXmppClient.h \
     QXmppConfiguration.h \
@@ -45,6 +46,7 @@ HEADERS += QXmppUtils.h \
 
 # Source files
 SOURCES += QXmppUtils.cpp \
+    QXmppArchiveManager.cpp \
     QXmppBind.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \

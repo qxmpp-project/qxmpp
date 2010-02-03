@@ -41,6 +41,7 @@
 #include "QXmppDataIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppIbbTransferManager.h"
+#include "QXmppArchiveIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppLogger.h"
 #include "QXmppUtils.h"
@@ -57,7 +58,8 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client), m_roster(this),
-    m_sessionAvaliable(false), m_vCardManager(m_client)
+    m_sessionAvaliable(false), m_vCardManager(m_client),
+    m_archiveManager(m_client)
 {
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
@@ -99,6 +101,18 @@ QXmppStream::QXmppStream(QXmppClient* client)
 
     check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(archiveChatIqReceived(const QXmppArchiveChatIq&)),
+        &m_archiveManager, SLOT(archiveChatIqReceived(const QXmppArchiveChatIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(archiveListIqReceived(const QXmppArchiveListIq&)),
+        &m_archiveManager, SLOT(archiveListIqReceived(const QXmppArchiveListIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(archivePrefIqReceived(const QXmppArchivePrefIq&)),
+        &m_archiveManager, SLOT(archivePrefIqReceived(const QXmppArchivePrefIq&)));
     Q_ASSERT(check);
 }
 
@@ -573,6 +587,28 @@ void QXmppStream::parser(const QByteArray& data)
                             sendNonSASLAuth(plainText);
                         }
                     }
+                    // XEP-0136 message archiving
+                    else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
+                    {
+                        QXmppArchiveChatIq archiveIq;
+                        archiveIq.parse(nodeRecv);
+                        emit archiveChatIqReceived(archiveIq);
+                        iqPacket = archiveIq;
+                    }
+                    else if(QXmppArchiveListIq::isArchiveListIq(nodeRecv))
+                    {
+                        QXmppArchiveListIq archiveIq;
+                        archiveIq.parse(nodeRecv);
+                        emit archiveListIqReceived(archiveIq);
+                        iqPacket = archiveIq;
+                    }
+                    else if(QXmppArchivePrefIq::isArchivePrefIq(nodeRecv))
+                    {
+                        QXmppArchivePrefIq archiveIq;
+                        archiveIq.parse(nodeRecv);
+                        emit archivePrefIqReceived(archiveIq);
+                        iqPacket = archiveIq;
+                    }
                     // XEP-0199 ping
                     else if(QXmppPingIq::isPingIq(nodeRecv))
                     {
@@ -1028,4 +1064,9 @@ QXmppVCardManager& QXmppStream::getVCardManager()
 void QXmppStream::flushDataBuffer()
 {
     m_dataBuffer.clear();
+}
+
+QXmppArchiveManager& QXmppStream::getArchiveManager()
+{
+    return m_archiveManager;
 }

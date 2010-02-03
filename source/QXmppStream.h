@@ -31,6 +31,7 @@
 #include "QXmppRoster.h"
 #include "QXmppStanza.h"
 #include "QXmppVCardManager.h"
+#include "QXmppArchiveManager.h"
 
 class QDomElement;
 
@@ -45,6 +46,9 @@ class QXmppVCard;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
+class QXmppArchiveChatIq;
+class QXmppArchiveListIq;
+class QXmppArchivePrefIq;
 
 class QXmppStream : public QObject
 {
@@ -57,6 +61,7 @@ public:
     void acceptSubscriptionRequest(const QString& from, bool accept = true);
     void sendSubscriptionRequest(const QString& to);
     void disconnect();
+    QXmppArchiveManager& getArchiveManager();
     QXmppRoster& getRoster();
     QXmppVCardManager& getVCardManager();
     void sendPacket(const QXmppPacket&);
@@ -89,6 +94,10 @@ signals:
     void rpcCallResponse(const QXmppRpcResponseIq& result );
     void rpcCallError(const QXmppRpcErrorIq& err );
 
+    void archiveChatIqReceived(const QXmppArchiveChatIq&);
+    void archiveListIqReceived(const QXmppArchiveListIq&);
+    void archivePrefIqReceived(const QXmppArchivePrefIq&);
+
 private slots:
     void socketHostFound();
     void socketReadReady();
@@ -116,6 +125,7 @@ private:
 
 
     QXmppVCardManager m_vCardManager;
+    QXmppArchiveManager m_archiveManager;
 
     QXmppConfiguration& getConfiguration();
     void parser(const QByteArray&);
