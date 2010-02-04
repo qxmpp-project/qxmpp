@@ -6,5 +6,6 @@ SUBDIRS = example_0_connected\
           example_3_ibbTransferSource\
           example_4_ibbTransferTarget\
           example_5_rpcInterface\
-          example_6_rpcClient
+          example_6_rpcClient\
+          example_7_archiveHandling
 

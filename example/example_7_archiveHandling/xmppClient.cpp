@@ -1,0 +1,76 @@
+/*
+ * Copyright (C) 2010 Bolloré telecom
+ *
+ * Author:
+ *	Jeremy Lainé
+ *
+ * Source:
+ *	http://code.google.com/p/qxmpp
+ *
+ * This file is a part of QXmpp library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
+
+#include <QDateTime>
+#include <iostream>
+
+#include "QXmppArchiveIq.h"
+#include "QXmppArchiveManager.h"
+
+#include "xmppClient.h"
+
+xmppClient::xmppClient(QObject *parent)
+    : QXmppClient(parent)
+{
+    bool check = connect(this, SIGNAL(connected()),
+        SLOT(clientConnected()));
+    Q_ASSERT(check);
+
+    check = connect(&this->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)),
+        SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    Q_ASSERT(check);
+
+    check = connect(&this->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)),
+        SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    Q_ASSERT(check);
+}
+
+xmppClient::~xmppClient()
+{
+
+}
+
+void xmppClient::clientConnected()
+{
+    std::cout << "example_7_archiveHandling:: CONNECTED" << std::endl;
+    getArchiveManager().listCollections("",
+            QDateTime::currentDateTime().addDays(-7));
+}
+
+void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+{
+    std::cout << "example_7_archiveHandling:: LIST RECEIVED" << std::endl;
+    foreach (const QXmppArchiveChat &chat, chats)
+        getArchiveManager().retrieveCollection(chat.with, chat.start);
+}
+
+void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat)
+{
+    std::cout << "example_7_archiveHandling:: CHAT RECEIVED" << std::endl;
+    foreach (const QXmppArchiveMessage &msg, chat.messages)
+    {
+        std::cout << "example_7_archiveHandling::" << msg.body.toStdString() << std::endl;
+    }
+}
+
