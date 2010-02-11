@@ -32,6 +32,7 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_keepAlivePingsInterval(100),
                 m_autoReconnectionEnabled(true),
                 m_useSASLAuthentication(true),
+                m_ignoreSslErrors(true),
                 m_streamSecurityMode(QXmppConfiguration::TLSEnabled),
                 m_nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest),
                 m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5)
@@ -131,6 +132,22 @@ bool QXmppConfiguration::getAutoReconnectionEnabled() const
 void QXmppConfiguration::setAutoReconnectionEnabled(bool value)
 {
     m_autoReconnectionEnabled = value;
+}
+
+/// Returns whether SSL errors (such as certificate validation errors)
+/// are to be ignored when connecting to the XMPP server.
+
+bool QXmppConfiguration::getIgnoreSslErrors() const
+{
+    return m_ignoreSslErrors;
+}
+
+/// Specifies whether SSL errors (such as certificate validation errors)
+/// are to be ignored when connecting to an XMPP server.
+
+void QXmppConfiguration::setIgnoreSslErrors(bool value)
+{
+    m_ignoreSslErrors = value;
 }
 
 /// Returns the type of authentication system specified by the user.

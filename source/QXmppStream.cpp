@@ -140,9 +140,11 @@ void QXmppStream::connect()
 void QXmppStream::socketSslErrors(const QList<QSslError> & error)
 {
     log(QString("SSL errors"));
-    m_socket.ignoreSslErrors();
     for(int i = 0; i< error.count(); ++i)
         log(error.at(i).errorString());
+
+    if (getConfiguration().getIgnoreSslErrors())
+        m_socket.ignoreSslErrors();
 }
 
 void QXmppStream::socketHostFound()
