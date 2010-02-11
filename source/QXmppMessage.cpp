@@ -117,9 +117,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     helperToXmlAddAttribute(xmlWriter, "to", getTo());
     helperToXmlAddAttribute(xmlWriter, "from", getFrom());
     helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
-    helperToXmlAddTextElement(xmlWriter, "subject", getSubject());
+    if (!getSubject().isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "subject", getSubject());
     helperToXmlAddTextElement(xmlWriter,"body", getBody());
-    helperToXmlAddTextElement(xmlWriter,"thread", getThread());
+    if (!getThread().isEmpty())
+        helperToXmlAddTextElement(xmlWriter,"thread", getThread());
     getError().toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
