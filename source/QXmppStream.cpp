@@ -42,6 +42,7 @@
 #include "QXmppRpcIq.h"
 #include "QXmppIbbTransferManager.h"
 #include "QXmppArchiveIq.h"
+#include "QXmppDiscoveryIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppLogger.h"
 #include "QXmppUtils.h"
@@ -545,6 +546,13 @@ void QXmppStream::parser(const QByteArray& data)
                         qxmppFeatures.setTo(from);
                         qxmppFeatures.setFrom(to);
                         sendPacket(qxmppFeatures);
+                    }
+                    else if(QXmppDiscoveryIq::isDiscoveryIq(nodeRecv))
+                    {
+                        QXmppDiscoveryIq discoIq;
+                        discoIq.parse(nodeRecv);
+                        emit discoveryIqReceived(discoIq);
+                        iqPacket = discoIq;
                     }
                     else if(id == m_nonSASLAuthId && type == "result")
                     {

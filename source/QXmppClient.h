@@ -61,6 +61,7 @@ class QXmppRemoteMethod;
 class QXmppIbbTransferManager;
 class QXmppRemoteMethodResult;
 class QXmppArchiveManager;
+class QXmppDiscoveryIq;
 
 class QXmppClient : public QObject
 {
@@ -165,6 +166,9 @@ signals:
     /// IQ stanzas provide a structured request-response mechanism. Roster
     /// management, setting-getting vCards etc is done using iq stanzas.
     void iqReceived(const QXmppIq&);
+
+    /// Notifies that an XMPP service discovery iq stanza is received.
+    void discoveryIqReceived(const QXmppDiscoveryIq&);
 
 public:
     QAbstractSocket::SocketError getSocketError();

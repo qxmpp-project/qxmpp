@@ -49,6 +49,7 @@ class QXmppRpcErrorIq;
 class QXmppArchiveChatIq;
 class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
+class QXmppDiscoveryIq;
 
 class QXmppStream : public QObject
 {
@@ -97,6 +98,8 @@ signals:
     void archiveChatIqReceived(const QXmppArchiveChatIq&);
     void archiveListIqReceived(const QXmppArchiveListIq&);
     void archivePrefIqReceived(const QXmppArchivePrefIq&);
+
+    void discoveryIqReceived(const QXmppDiscoveryIq&);
 
 private slots:
     void socketHostFound();
