@@ -20,6 +20,7 @@ HEADERS += QXmppUtils.h \
     QXmppClient.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
+    QXmppDiscoveryIq.h \
     QXmppIq.h \
     QXmppMessage.h \
     QXmppPacket.h \
@@ -53,6 +54,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
+    QXmppDiscoveryIq.cpp \
     QXmppIq.cpp \
     QXmppMessage.cpp \
     QXmppPacket.cpp \

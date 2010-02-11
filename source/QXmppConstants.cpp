@@ -36,6 +36,7 @@ const char* ns_vcard = "vcard-temp";
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
 const char* ns_disco_info = "http://jabber.org/protocol/disco#info";
+const char* ns_disco_items = "http://jabber.org/protocol/disco#items";
 const char* ns_ibb = "http://jabber.org/protocol/ibb";
 const char* ns_rpc = "jabber:iq:rpc";
 const char *ns_ping = "urn:xmpp:ping";
