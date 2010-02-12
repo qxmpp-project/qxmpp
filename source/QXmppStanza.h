@@ -25,6 +25,7 @@
 #ifndef QXMPPSTANZA_H
 #define QXMPPSTANZA_H
 
+#include "QXmppElement.h"
 #include "QXmppPacket.h"
 #include <QString>
 
@@ -105,13 +106,15 @@ public:
     QString getId() const;    
     QString getLang() const;    
     QXmppStanza::Error getError() const;    
+    QXmppElement getExtension() const;
 
     void setTo(const QString&);  
     void setFrom(const QString&);
     void setId(const QString&);
     void generateAndSetNextId();
     void setLang(const QString&);
-    void setError(QXmppStanza::Error& error);    
+    void setError(QXmppStanza::Error& error);
+    void setExtension(const QXmppElement &element);
     bool isErrorStanza();
 
 private:
@@ -121,6 +124,7 @@ private:
     QString m_id;    
     QString m_lang;
     QXmppStanza::Error m_error;
+    QXmppElement m_extension;
 };
 
 #endif // QXMPPSTANZA_H

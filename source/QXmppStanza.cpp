@@ -315,6 +315,16 @@ void QXmppStanza::setError(QXmppStanza::Error& error)
     m_error = error;
 }
 
+QXmppElement QXmppStanza::getExtension() const
+{
+    return m_extension;
+}
+
+void QXmppStanza::setExtension(const QXmppElement &extension)
+{
+    m_extension = extension;
+}
+
 bool QXmppStanza::isErrorStanza()
 {
     return !(m_error.getTypeStr().isEmpty() && 

@@ -123,6 +123,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     if (!getThread().isEmpty())
         helperToXmlAddTextElement(xmlWriter,"thread", getThread());
     getError().toXml(xmlWriter);
+    getExtension().toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
 

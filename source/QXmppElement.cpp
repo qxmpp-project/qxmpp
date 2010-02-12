@@ -32,6 +32,9 @@ QXmppElement::QXmppElement()
 
 QXmppElement::QXmppElement(const QDomElement &element)
 {
+    if (element.isNull())
+        return;
+
     m_tagName = element.tagName();
     QString xmlns = element.namespaceURI();
     QString parentns = element.parentNode().namespaceURI();
@@ -94,6 +97,9 @@ void QXmppElement::setTagName(const QString &tagName)
 
 void QXmppElement::toXml(QXmlStreamWriter *writer) const
 {
+    if (isNull())
+        return;
+
     writer->writeStartElement(m_tagName);
     foreach (const QString &attr, m_attributes.keys())
         helperToXmlAddAttribute(writer, attr, m_attributes.value(attr));

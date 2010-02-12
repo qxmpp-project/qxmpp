@@ -674,6 +674,10 @@ void QXmppStream::parser(const QByteArray& data)
                         presence.setError(error);
                     }
 
+                    QDomElement xElement = nodeRecv.firstChildElement("x");
+                    if(!xElement.isNull())
+                        presence.setExtension(QXmppElement(xElement));
+
                     processPresence(presence);
                 }
                 else if(nodeRecv.tagName() == "message")
@@ -697,6 +701,11 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppStanza::Error error = parseStanzaError(errorElement);
                         message.setError(error);
                     }
+
+                    QDomElement xElement = nodeRecv.firstChildElement("x");
+                    if(!xElement.isNull())
+                        message.setExtension(QXmppElement(xElement));
+
                     processMessage(message);
                 }
             }
