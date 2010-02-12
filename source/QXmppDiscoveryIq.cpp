@@ -68,7 +68,7 @@ void QXmppDiscoveryIq::parse( QDomElement &element )
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        m_items.append(QXmppElement(element));
+        m_items.append(QXmppElement(itemElement));
         itemElement = itemElement.nextSiblingElement();
     }
 }
