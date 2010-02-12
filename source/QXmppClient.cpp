@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -77,7 +77,7 @@ QXmppClient::QXmppClient(QObject *parent)
     m_ibbTransferManager = new QXmppIbbTransferManager(this);
 }
 
-/// Destroys the QXmppClient object.
+/// Destructor, destroys the QXmppClient object.
 ///
 
 QXmppClient::~QXmppClient()
@@ -160,7 +160,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
 /// (e.g. "jabber.org" and "talk.google.com"). It can also be an IP address in
 /// the form of a string (e.g. "192.168.1.25").
 /// \param bareJid BareJid of the account at the specified XMPP server.
-/// E.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org.
+/// (e.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org.)
 /// \param passwd Password for the specified username
 /// \param port Port number at which the XMPP server is listening. The default
 /// value is 5222.
