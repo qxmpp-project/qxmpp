@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -24,6 +24,8 @@
 
 #include "QXmppConfiguration.h"
 
+/// Creates a QXmppConfiguration object.
+
 QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_resource("QXmpp"),
                 m_autoAcceptSubscriptions(true),
@@ -40,94 +42,207 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
 
 }
 
+/// Destructor, destroys the QXmppConfiguration object.
+///
+
 QXmppConfiguration::~QXmppConfiguration()
 {
 
 }
 
-void QXmppConfiguration::setHost(const QString& str)
+/// Sets the host name.
+///
+/// \param host host name of the XMPP server where connection has to be made
+/// (e.g. "jabber.org" and "talk.google.com"). It can also be an IP address in
+/// the form of a string (e.g. "192.168.1.25").
+///
+
+void QXmppConfiguration::setHost(const QString& host)
 {
-    m_host = str;
+    m_host = host;
 }
 
-void QXmppConfiguration::setDomain(const QString& str)
+/// Sets the domain name.
+///
+/// \param domain Domain name e.g. "gmail.com" and "jabber.org".
+/// \note host name and domain name can be different for google
+/// domain name is gmail.com and host name is talk.google.com
+///
+
+void QXmppConfiguration::setDomain(const QString& domain)
 {
-    m_domain = str;
+    m_domain = domain;
 }
+
+/// Sets the port number.
+///
+/// \param port Port number at which the XMPP server is listening. The default
+/// value is 5222.
+///
 
 void QXmppConfiguration::setPort(int port)
 {
     m_port = port;
 }
 
-void QXmppConfiguration::setUser(const QString& str)
+/// Sets the username.
+///
+/// \param user Username of the account at the specified XMPP server. It should
+/// be the name without the domain name. E.g. "qxmpp.test1" and not
+/// "qxmpp.test1@gmail.com"
+///
+
+void QXmppConfiguration::setUser(const QString& user)
 {
-    m_user = str;
+    m_user = user;
 }
 
-void QXmppConfiguration::setPasswd(const QString& str)
+/// Sets the password.
+///
+/// \param passwd Password for the specified username
+///
+
+void QXmppConfiguration::setPasswd(const QString& passwd)
 {
-    m_passwd = str;
+    m_passwd = passwd;
 }
 
-void QXmppConfiguration::setResource(const QString& str)
+/// Sets the resource identifier.
+///
+/// \param resource Resource identifier of the client in connection.
+/// Multiple resources (e.g., devices or locations) may connect simultaneously
+/// to a server on behalf of each authorized client, with each resource
+/// differentiated by the resource identifier of an XMPP address
+/// (e.g. <node@domain/home> vs. <node@domain/work>)
+///
+/// The default value is QXmpp
+///
+
+void QXmppConfiguration::setResource(const QString& resource)
 {
-    m_resource = str;
+    m_resource = resource;
 }
+
+/// Returns the host name.
+///
+/// \return host name
+///
 
 QString QXmppConfiguration::getHost() const
 {
     return m_host;
 }
 
+/// Returns the domain name.
+///
+/// \return domain name
+///
+
 QString QXmppConfiguration::getDomain() const
 {
     return m_domain;
 }
+
+/// Returns the port number.
+///
+/// \return port number
+///
 
 int QXmppConfiguration::getPort() const
 {
     return m_port;
 }
 
+/// Returns the username.
+///
+/// \return username
+///
+
 QString QXmppConfiguration::getUser() const
 {
     return m_user;
 }
+
+/// Returns the password.
+///
+/// \return password
+///
+
 QString QXmppConfiguration::getPasswd() const
 {
     return m_passwd;
 }
+
+/// Returns the resource identifier.
+///
+/// \return resource identifier
+///
 
 QString QXmppConfiguration::getResource() const
 {
     return m_resource;
 }
 
+/// Returns the jabber id (jid).
+///
+/// \return jabber id (jid)
+/// (e.g. "qxmpp.test1@gmail.com/resource" or qxmpptest@jabber.org/QXmpp156)
+///
+
 QString QXmppConfiguration::getJid() const
 {
     return getJidBare() + "/" + m_resource;
 }
+
+/// Returns the bare jabber id (jid), without the resource identifier.
+///
+/// \return bare jabber id (jid)
+/// (e.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org)
+///
 
 QString QXmppConfiguration::getJidBare() const
 {
     return m_user+"@"+m_domain;
 }
 
+/// Returns the auto-accept-subscriptions-request configuration.
+///
+/// \return boolean value
+/// true means that auto-accept-subscriptions-request is enabled else disabled for false
+///
+
 bool QXmppConfiguration::getAutoAcceptSubscriptions() const
 {
     return m_autoAcceptSubscriptions;
 }
 
-void QXmppConfiguration::setAutoAcceptSubscriptions(bool check)
+/// Sets the auto-accept-subscriptions-request configuration.
+///
+/// \param value boolean value
+/// true means that auto-accept-subscriptions-request is enabled else disabled for false
+///
+
+void QXmppConfiguration::setAutoAcceptSubscriptions(bool value)
 {
-    m_autoAcceptSubscriptions = check;
+    m_autoAcceptSubscriptions = value;
 }
+
+/// Returns the auto-reconnect-on-disconnection-on-error configuration.
+///
+/// \return boolean value
+/// true means that auto-reconnect is enabled else disabled for false
+///
 
 bool QXmppConfiguration::getAutoReconnectionEnabled() const
 {
     return m_autoReconnectionEnabled;
 }
+
+/// Sets the auto-reconnect-on-disconnection-on-error configuration.
+///
+/// \param value boolean value
+/// true means that auto-reconnect is enabled else disabled for false
+///
 
 void QXmppConfiguration::setAutoReconnectionEnabled(bool value)
 {
@@ -188,10 +303,20 @@ void QXmppConfiguration::setStreamSecurityMode(
     m_streamSecurityMode = mode;
 }
 
+/// Returns the Non-SASL authentication mechanism configuration.
+///
+/// \return QXmppConfiguration::NonSASLAuthMechanism
+///
+
 QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::getNonSASLAuthMechanism() const
 {
     return m_nonSASLAuthMechanism;
 }
+
+/// Hints the library the Non-SASL authentication mechanism to be used for authentication.
+///
+/// \param mech QXmppConfiguration::NonSASLAuthMechanism
+///
 
 void QXmppConfiguration::setNonSASLAuthMechanism(
         QXmppConfiguration::NonSASLAuthMechanism mech)
@@ -199,10 +324,20 @@ void QXmppConfiguration::setNonSASLAuthMechanism(
     m_nonSASLAuthMechanism = mech;
 }
 
+/// Returns the SASL authentication mechanism configuration.
+///
+/// \return QXmppConfiguration::SASLAuthMechanism
+///
+
 QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::getSASLAuthMechanism() const
 {
     return m_SASLAuthMechanism;
 }
+
+/// Hints the library the SASL authentication mechanism to be used for authentication.
+///
+/// \param mech QXmppConfiguration::SASLAuthMechanism
+///
 
 void QXmppConfiguration::setSASLAuthMechanism(
         QXmppConfiguration::SASLAuthMechanism mech)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -21,6 +21,16 @@
  *
  */
 
+
+/// \class QXmppConfiguration
+///
+/// \brief The QXmppConfiguration is a configuration class. Its object can be passed
+/// to the QXmppClient for connecting the an XMPP server.
+///
+/// It is a container of all the settings, configuration required for connecting to
+/// an XMPP server. E.g. server name, username, port, type of authentication mechanism,
+/// type of security used by stream (encryption) etc.
+///
 
 #ifndef QXMPPCONFIGURATION_H
 #define QXMPPCONFIGURATION_H
