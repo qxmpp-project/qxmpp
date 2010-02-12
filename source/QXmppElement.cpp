@@ -39,6 +39,18 @@ QXmppElement::QXmppElement(const QDomElement &element)
         QDomAttr attr = attributes.item(i).toAttr();
         m_attributes.insert(attr.name(), attr.value());
     }
+
+    QDomElement childElement = element.firstChildElement();
+    while (!childElement.isNull())
+    {
+        m_children.append(QXmppElement(childElement));
+        childElement = childElement.nextSiblingElement();
+    }
+}
+
+QStringList QXmppElement::attributeNames() const
+{
+    return m_attributes.keys();
 }
 
 QString QXmppElement::attribute(const QString &name) const
@@ -49,6 +61,16 @@ QString QXmppElement::attribute(const QString &name) const
 void QXmppElement::setAttribute(const QString &name, const QString &value)
 {
     m_attributes.insert(name, value);
+}
+
+QList<QXmppElement> QXmppElement::children() const
+{
+    return m_children;
+}
+
+void QXmppElement::setChildren(QList<QXmppElement> &children)
+{
+    m_children = children;
 }
 
 QString QXmppElement::tagName() const
@@ -66,6 +88,8 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(m_tagName);
     foreach (const QString &attr, m_attributes.keys())
         helperToXmlAddAttribute(writer, attr, m_attributes.value(attr));
+    foreach (const QXmppElement &child, m_children)
+        child.toXml(writer);
     writer->writeEndElement();
 }
 

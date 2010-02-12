@@ -25,7 +25,7 @@
 #define QXMPPELEMENT_H
 
 #include <QMap>
-#include <QString>
+#include <QStringList>
 #include <QXmlStreamWriter>
 
 class QDomElement;
@@ -36,8 +36,13 @@ public:
     QXmppElement();
     QXmppElement(const QDomElement &element);
 
+    QStringList attributeNames() const;
+
     QString attribute(const QString &name) const;
     void setAttribute(const QString &name, const QString &value);
+
+    QList<QXmppElement> children() const;
+    void setChildren(QList<QXmppElement> &children);
 
     QString tagName() const;
     void setTagName(const QString &type);
@@ -46,6 +51,7 @@ public:
 
 private:
     QMap<QString, QString> m_attributes;
+    QList<QXmppElement> m_children;
     QString m_tagName;
 };
 
