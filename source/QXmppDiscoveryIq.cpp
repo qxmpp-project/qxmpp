@@ -27,37 +27,12 @@
 
 #include <QDomElement>
 
-QStringList QXmppDiscoveryItem::attributes() const
-{
-    return m_attributes.keys();
-}
-
-QString QXmppDiscoveryItem::attribute(const QString &name) const
-{
-    return m_attributes.value(name);
-}
-
-void QXmppDiscoveryItem::setAttribute(const QString &name, const QString &value)
-{
-    m_attributes.insert(name, value);
-}
-
-QString QXmppDiscoveryItem::type() const
-{
-    return m_type;
-}
-
-void QXmppDiscoveryItem::setType(const QString &type)
-{
-    m_type = type;
-}
-
-QList<QXmppDiscoveryItem> QXmppDiscoveryIq::getItems() const
+QList<QXmppElement> QXmppDiscoveryIq::getItems() const
 {
     return m_items;
 }
 
-void QXmppDiscoveryIq::setItems(const QList<QXmppDiscoveryItem> &items)
+void QXmppDiscoveryIq::setItems(const QList<QXmppElement> &items)
 {
     m_items = items;
 }
@@ -93,15 +68,7 @@ void QXmppDiscoveryIq::parse( QDomElement &element )
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        QXmppDiscoveryItem item;
-        item.setType(itemElement.tagName());
-        QDomNamedNodeMap attributes = itemElement.attributes();
-        for (int i = 0; i < attributes.size(); i++)
-        {
-            QDomAttr attr = attributes.item(i).toAttr();
-            item.setAttribute(attr.name(), attr.value());
-        }
-        m_items.append(item);
+        m_items.append(QXmppElement(element));
         itemElement = itemElement.nextSiblingElement();
     }
 }
@@ -111,13 +78,8 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("query");
     helperToXmlAddAttribute(writer, "xmlns",
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
-    foreach (const QXmppDiscoveryItem &item, m_items)
-    {
-        writer->writeStartElement(item.type());
-        foreach (const QString &attr, item.attributes())
-            helperToXmlAddAttribute(writer, attr, item.attribute(attr));
-        writer->writeEndElement();
-    }
+    foreach (const QXmppElement &item, m_items)
+        item.toXml(writer);
     writer->writeEndElement();
 }
 

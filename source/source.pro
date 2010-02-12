@@ -14,13 +14,13 @@ else {
 
 # Header files
 HEADERS += QXmppUtils.h \
-    QXmppArchiveIq.h \
     QXmppArchiveManager.h \
     QXmppBind.h \
     QXmppClient.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
     QXmppDiscoveryIq.h \
+    QXmppElement.h \
     QXmppIq.h \
     QXmppMessage.h \
     QXmppPacket.h \
@@ -48,13 +48,13 @@ HEADERS += QXmppUtils.h \
 
 # Source files
 SOURCES += QXmppUtils.cpp \
-    QXmppArchiveIq.cpp \
     QXmppArchiveManager.cpp \
     QXmppBind.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
     QXmppDiscoveryIq.cpp \
+    QXmppElement.cpp \
     QXmppIq.cpp \
     QXmppMessage.cpp \
     QXmppPacket.cpp \

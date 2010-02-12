@@ -21,35 +21,32 @@
  *
  */
 
-#ifndef QXMPPDISCOVERY_H
-#define QXMPPDISCOVERY_H
+#ifndef QXMPPELEMENT_H
+#define QXMPPELEMENT_H
 
-#include "QXmppElement.h"
-#include "QXmppIq.h"
+#include <QMap>
+#include <QString>
+#include <QXmlStreamWriter>
 
 class QDomElement;
 
-class QXmppDiscoveryIq : public QXmppIq
+class QXmppElement
 {
 public:
-    enum QueryType {
-        InfoQuery,
-        ItemsQuery,
-    };
+    QXmppElement();
+    QXmppElement(const QDomElement &element);
 
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isDiscoveryIq( QDomElement &element );
+    QString attribute(const QString &name) const;
+    void setAttribute(const QString &name, const QString &value);
 
-    QList<QXmppElement> getItems() const;
-    void setItems(const QList<QXmppElement> &items);
+    QString tagName() const;
+    void setTagName(const QString &type);
 
-    enum QueryType getQueryType() const;
-    void setQueryType(enum QueryType type);
+    void toXml(QXmlStreamWriter *writer) const;
 
 private:
-    QList<QXmppElement> m_items;
-    enum QueryType m_queryType;
+    QMap<QString, QString> m_attributes;
+    QString m_tagName;
 };
 
 #endif
