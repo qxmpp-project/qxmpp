@@ -47,6 +47,7 @@ public:
     QString tagName() const;
     void setTagName(const QString &type);
 
+    bool isNull() const;
     void toXml(QXmlStreamWriter *writer) const;
 
 private:

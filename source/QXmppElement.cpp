@@ -33,6 +33,10 @@ QXmppElement::QXmppElement()
 QXmppElement::QXmppElement(const QDomElement &element)
 {
     m_tagName = element.tagName();
+    QString xmlns = element.namespaceURI();
+    QString parentns = element.parentNode().namespaceURI();
+    if (!xmlns.isEmpty() && xmlns != parentns)
+        m_attributes.insert("xmlns", xmlns);
     QDomNamedNodeMap attributes = element.attributes();
     for (int i = 0; i < attributes.size(); i++)
     {
@@ -71,6 +75,11 @@ QList<QXmppElement> QXmppElement::children() const
 void QXmppElement::setChildren(QList<QXmppElement> &children)
 {
     m_children = children;
+}
+
+bool QXmppElement::isNull() const
+{
+    return m_tagName.isEmpty();
 }
 
 QString QXmppElement::tagName() const
