@@ -37,15 +37,11 @@ public:
         ItemsQuery,
     };
 
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     void parse( QDomElement &element );
     static bool isDiscoveryIq( QDomElement &element );
 
     enum QueryType getQueryType() const;
     void setQueryType(enum QueryType type);
-
-private:
-    enum QueryType m_queryType;
 };
 
 #endif
