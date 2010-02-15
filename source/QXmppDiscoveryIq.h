@@ -41,14 +41,10 @@ public:
     void parse( QDomElement &element );
     static bool isDiscoveryIq( QDomElement &element );
 
-    QList<QXmppElement> getItems() const;
-    void setItems(const QList<QXmppElement> &items);
-
     enum QueryType getQueryType() const;
     void setQueryType(enum QueryType type);
 
 private:
-    QList<QXmppElement> m_items;
     enum QueryType m_queryType;
 };
 
