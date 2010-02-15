@@ -27,20 +27,24 @@
 
 #include <QDomElement>
 
+QList<QXmppElement> QXmppDiscoveryIq::getQueryItems() const
+{
+    return m_queryItems;
+}
+
+void QXmppDiscoveryIq::setQueryItems(const QList<QXmppElement> &items)
+{
+    m_queryItems = items;
+}
+
 enum QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::getQueryType() const
 {
-    if (getQueryNamespace() == ns_disco_items)
-        return ItemsQuery;
-    else
-        return InfoQuery;
+    return m_queryType;
 }
 
 void QXmppDiscoveryIq::setQueryType(enum QXmppDiscoveryIq::QueryType type)
 {
-    if (type == ItemsQuery)
-        setQueryNamespace(ns_disco_items);
-    else
-        setQueryNamespace(ns_disco_info);
+    m_queryType = type;
 }
 
 bool QXmppDiscoveryIq::isDiscoveryIq( QDomElement &element )
@@ -56,15 +60,26 @@ void QXmppDiscoveryIq::parse( QDomElement &element )
     setTo(element.attribute("to"));
     setTypeFromStr(element.attribute("type"));
     QDomElement queryElement = element.firstChildElement("query");
-    setQueryNamespace(queryElement.namespaceURI());
+    if (queryElement.namespaceURI() == ns_disco_items)
+        m_queryType = ItemsQuery;
+    else
+        m_queryType = InfoQuery;
 
-    QList<QXmppElement> items;
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        items.append(QXmppElement(itemElement));
+        m_queryItems.append(QXmppElement(element));
         itemElement = itemElement.nextSiblingElement();
     }
-    setQueryItems(items);
+}
+
+void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("query");
+    helperToXmlAddAttribute(writer, "xmlns",
+        m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
+    foreach (const QXmppElement &item, m_queryItems)
+        item.toXml(writer);
+    writer->writeEndElement();
 }
 
