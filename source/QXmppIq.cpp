@@ -73,7 +73,13 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 
 void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
-    Q_UNUSED(writer);
+    if (m_queryNamespace.isEmpty() && m_queryItems.isEmpty())
+        return;
+    writer->writeStartElement("query");
+    helperToXmlAddAttribute(writer, "xmlns", m_queryNamespace);
+    foreach (const QXmppElement &item, m_queryItems)
+        item.toXml(writer);
+    writer->writeEndElement();
 }
 
 QString QXmppIq::getTypeStr() const
@@ -124,3 +130,24 @@ void QXmppIq::setTypeFromStr(const QString& str)
         return;
     }
 }
+
+QList<QXmppElement> QXmppIq::getQueryItems() const
+{
+    return m_queryItems;
+}
+
+void QXmppIq::setQueryItems(const QList<QXmppElement> &items)
+{
+    m_queryItems = items;
+}
+
+QString QXmppIq::getQueryNamespace() const
+{
+    return m_queryNamespace;
+}
+
+void QXmppIq::setQueryNamespace(const QString &ns)
+{
+    m_queryNamespace = ns;
+}
+

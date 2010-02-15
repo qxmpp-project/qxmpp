@@ -53,11 +53,19 @@ public:
     void setType(QXmppIq::Type);
     void setTypeFromStr(const QString& str);
 
+    QList<QXmppElement> getQueryItems() const;
+    void setQueryItems(const QList<QXmppElement> &items);
+
+    QString getQueryNamespace() const;
+    void setQueryNamespace(const QString &ns);
+
     void toXml( QXmlStreamWriter *writer ) const;
     virtual void toXmlElementFromChild( QXmlStreamWriter *writer ) const;
 
 private:
     Type m_type;
+    QList<QXmppElement> m_queryItems;
+    QString m_queryNamespace;
 };
 
 #endif // QXMPPIQ_H
