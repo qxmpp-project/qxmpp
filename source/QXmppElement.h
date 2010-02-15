@@ -47,6 +47,9 @@ public:
     QString tagName() const;
     void setTagName(const QString &type);
 
+    QString value() const;
+    void setValue(const QString &text);
+
     bool isNull() const;
     void toXml(QXmlStreamWriter *writer) const;
 
@@ -54,6 +57,7 @@ private:
     QMap<QString, QString> m_attributes;
     QList<QXmppElement> m_children;
     QString m_tagName;
+    QString m_value;
 };
 
 #endif
