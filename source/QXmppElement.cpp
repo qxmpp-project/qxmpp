@@ -73,14 +73,22 @@ void QXmppElement::setAttribute(const QString &name, const QString &value)
     m_attributes.insert(name, value);
 }
 
-QList<QXmppElement> QXmppElement::children() const
+QXmppElementList QXmppElement::children() const
 {
     return m_children;
 }
 
-void QXmppElement::setChildren(QList<QXmppElement> &children)
+void QXmppElement::setChildren(const QXmppElementList &children)
 {
     m_children = children;
+}
+
+QXmppElement QXmppElement::firstChild(const QString &name) const
+{
+    foreach (const QXmppElement &child, m_children)
+        if (child.tagName() == name)
+            return child;
+    return QXmppElement();
 }
 
 bool QXmppElement::isNull() const
@@ -120,5 +128,20 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     foreach (const QXmppElement &child, m_children)
         child.toXml(writer);
     writer->writeEndElement();
+}
+
+QXmppElementList::QXmppElementList()
+{
+}
+
+QXmppElementList::QXmppElementList(const QXmppElement &element)
+{
+    append(element);
+}
+
+
+QXmppElementList::QXmppElementList(const QList<QXmppElement> &other)
+    : QList<QXmppElement>(other)
+{
 }
 

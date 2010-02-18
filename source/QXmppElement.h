@@ -29,6 +29,15 @@
 #include <QXmlStreamWriter>
 
 class QDomElement;
+class QXmppElement;
+
+class QXmppElementList : public QList<QXmppElement>
+{
+public:
+    QXmppElementList();
+    QXmppElementList(const QXmppElement &element);
+    QXmppElementList(const QList<QXmppElement> &other);
+};
 
 class QXmppElement
 {
@@ -41,8 +50,9 @@ public:
     QString attribute(const QString &name) const;
     void setAttribute(const QString &name, const QString &value);
 
-    QList<QXmppElement> children() const;
-    void setChildren(QList<QXmppElement> &children);
+    QXmppElementList children() const;
+    QXmppElement firstChild(const QString &name) const;
+    void setChildren(const QXmppElementList &children);
 
     QString tagName() const;
     void setTagName(const QString &type);
@@ -55,7 +65,7 @@ public:
 
 private:
     QMap<QString, QString> m_attributes;
-    QList<QXmppElement> m_children;
+    QXmppElementList m_children;
     QString m_tagName;
     QString m_value;
 };
