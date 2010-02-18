@@ -80,6 +80,7 @@ void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
     helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
     
     getError().toXml(xmlWriter);
+    getExtension().toXml(xmlWriter);
     
     xmlWriter->writeEndElement();
 
