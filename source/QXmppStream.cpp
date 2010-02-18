@@ -641,6 +641,8 @@ void QXmppStream::parser(const QByteArray& data)
                             iq.setError(error);
                             sendPacket(iq);
                         }
+
+                        iqPacket.parse(nodeRecv);
                     }
 
                     iqPacket.setError(error);
