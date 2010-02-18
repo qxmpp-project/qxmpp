@@ -41,5 +41,11 @@ extern const char* ns_disco_items;
 extern const char* ns_ibb;
 extern const char* ns_rpc;
 extern const char* ns_ping;
+extern const char *ns_conference;
+extern const char *ns_delay;
+extern const char *ns_muc;
+extern const char *ns_muc_admin;
+extern const char *ns_muc_owner;
+extern const char *ns_muc_user;
 
 #endif // QXMPPCONSTANTS_H
