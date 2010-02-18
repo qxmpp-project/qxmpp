@@ -403,7 +403,7 @@ void QXmppStream::parser(const QByteArray& data)
                     QXmppIq iqPacket;    // to emit
 
                     QDomElement elemen = nodeRecv.firstChildElement("error");
-                    QXmppStanza::Error error = parseStanzaError(elemen);
+                    QXmppStanza::Error error = QXmppStanza::parseError(elemen);
 
                     if( QXmppIbbOpenIq::isIbbOpenIq( nodeRecv ) )
                     {
@@ -670,7 +670,7 @@ void QXmppStream::parser(const QByteArray& data)
                     if(!errorElement.isNull())
                     {
                         QXmppStanza::Error error =
-                                parseStanzaError(errorElement);
+                                QXmppStanza::parseError(errorElement);
                         presence.setError(error);
                     }
 
@@ -682,29 +682,8 @@ void QXmppStream::parser(const QByteArray& data)
                 }
                 else if(nodeRecv.tagName() == "message")
                 {
-                    QString from = nodeRecv.attribute("from");
-                    QString to = nodeRecv.attribute("to");
-                    QString type = nodeRecv.attribute("type");
-                    QString body = unescapeString(
-                            nodeRecv.firstChildElement("body").text());
-                    QString sub = unescapeString(
-                            nodeRecv.firstChildElement("subject").text());
-                    QString thread = nodeRecv.firstChildElement("thread").text();
-                    QXmppMessage message(from, to, body, thread);
-                    message.setSubject(sub);
-                    message.setTypeFromStr(type);
-
-                    QDomElement errorElement = nodeRecv.
-                                               firstChildElement("error");
-                    if(!errorElement.isNull())
-                    {
-                        QXmppStanza::Error error = parseStanzaError(errorElement);
-                        message.setError(error);
-                    }
-
-                    QDomElement xElement = nodeRecv.firstChildElement("x");
-                    if(!xElement.isNull())
-                        message.setExtension(QXmppElement(xElement));
+                    QXmppMessage message;
+                    message.parse(nodeRecv);
 
                     processMessage(message);
                 }
@@ -1035,34 +1014,6 @@ void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
     default:
         break;
     }
-}
-
-QXmppStanza::Error QXmppStream::parseStanzaError(QDomElement & errorElement)
-{
-    QXmppStanza::Error error;
- 
-    if(errorElement.isNull())
-        return error;
-
-    QString type = errorElement.attribute("type");
-    QString text;
-    QString cond;
-    QDomElement element = errorElement.firstChildElement();
-    while(!element.isNull())
-    {
-        if(element.tagName() == "text")
-            text = element.text();
-        else if(element.namespaceURI() == ns_stanza)
-        {
-            cond = element.tagName();
-        }        
-        element = element.nextSiblingElement();
-    }
-
-    error.setConditionFromStr(cond);
-    error.setTypeFromStr(type);
-    error.setText(text);
-    return error;
 }
 
 QAbstractSocket::SocketError QXmppStream::getSocketError()

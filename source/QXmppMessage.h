@@ -55,6 +55,7 @@ public:
     QString getThread() const;
     void setThread(const QString&);
 
+    void parse(QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
 private:

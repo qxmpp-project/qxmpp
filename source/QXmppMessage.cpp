@@ -24,6 +24,7 @@
 
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
+#include <QDomElement>
 #include <QXmlStreamWriter>
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
@@ -106,6 +107,30 @@ void QXmppMessage::setTypeFromStr(const QString& str)
                  qPrintable(str));
         return;
     }
+}
+
+void QXmppMessage::parse(QDomElement &element)
+{
+    setFrom(element.attribute("from"));
+    setTo(element.attribute("to"));
+    setTypeFromStr(element.attribute("type"));
+    setBody(unescapeString(
+            element.firstChildElement("body").text()));
+    setSubject(unescapeString(
+            element.firstChildElement("subject").text()));
+    setThread(element.firstChildElement("thread").text());
+
+    QDomElement errorElement = element.
+                               firstChildElement("error");
+    if(!errorElement.isNull())
+    {
+        QXmppStanza::Error error = parseError(errorElement);
+        setError(error);
+    }
+
+    QDomElement xElement = element.firstChildElement("x");
+    if(!xElement.isNull())
+        setExtension(QXmppElement(xElement));
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const

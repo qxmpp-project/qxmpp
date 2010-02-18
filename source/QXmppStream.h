@@ -147,7 +147,6 @@ private:
     void sendToServer(const QByteArray&);
     bool hasStartStreamElement(const QByteArray&);
     bool hasEndStreamElement(const QByteArray&);
-    QXmppStanza::Error parseStanzaError(QDomElement & errorElement);
 
     void processPresence(const QXmppPresence&);
     void processMessage(const QXmppMessage&);
