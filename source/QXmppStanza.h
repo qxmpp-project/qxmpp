@@ -117,6 +117,9 @@ public:
     void setExtension(const QXmppElement &element);
     bool isErrorStanza();
 
+    // FIXME : make this method protected
+    static QXmppStanza::Error parseError(const QDomElement&);
+
 private:
     static uint s_uniqeIdNo;
     QString m_to;  

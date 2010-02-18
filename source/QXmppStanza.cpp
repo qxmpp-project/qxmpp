@@ -26,6 +26,7 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
+#include <QDomElement>
 #include <QXmlStreamWriter>
 
 uint QXmppStanza::s_uniqeIdNo = 0;
@@ -330,3 +331,32 @@ bool QXmppStanza::isErrorStanza()
     return !(m_error.getTypeStr().isEmpty() && 
         m_error.getConditionStr().isEmpty());
 }
+
+QXmppStanza::Error QXmppStanza::parseError(const QDomElement &errorElement)
+{
+    QXmppStanza::Error error;
+ 
+    if(errorElement.isNull())
+        return error;
+
+    QString type = errorElement.attribute("type");
+    QString text;
+    QString cond;
+    QDomElement element = errorElement.firstChildElement();
+    while(!element.isNull())
+    {
+        if(element.tagName() == "text")
+            text = element.text();
+        else if(element.namespaceURI() == ns_stanza)
+        {
+            cond = element.tagName();
+        }        
+        element = element.nextSiblingElement();
+    }
+
+    error.setConditionFromStr(cond);
+    error.setTypeFromStr(type);
+    error.setText(text);
+    return error;
+}
+
