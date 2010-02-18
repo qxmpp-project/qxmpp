@@ -46,3 +46,4 @@ const char *ns_muc = "http://jabber.org/protocol/muc";
 const char *ns_muc_admin = "http://jabber.org/protocol/muc#admin";
 const char *ns_muc_owner = "http://jabber.org/protocol/muc#owner";
 const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
+const char *ns_chat_states = "http://jabber.org/protocol/chatstates";

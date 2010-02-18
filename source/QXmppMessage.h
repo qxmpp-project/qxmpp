@@ -39,6 +39,18 @@ public:
         Headline
     };
 
+    // XEP-0085 : Chat State Notifications
+    // http://xmpp.org/extensions/xep-0085.html
+    enum State
+    {
+        None = 0,
+        Active,
+        Inactive,
+        Gone,
+        Composing,
+        Paused,
+    };
+
     QXmppMessage(const QString& from = "", const QString& to = "",
                  const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
@@ -47,6 +59,9 @@ public:
     QString getTypeStr() const;
     void setType(QXmppMessage::Type);
     void setTypeFromStr(const QString&);
+
+    QXmppMessage::State getState() const;
+    void setState(QXmppMessage::State);
 
     QString getBody() const;
     void setBody(const QString&);
@@ -60,6 +75,7 @@ public:
 
 private:
     Type m_type;
+    State m_state;
 
     QString m_body;
     QString m_subject;

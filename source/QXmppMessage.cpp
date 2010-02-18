@@ -22,14 +22,24 @@
  */
 
 
+#include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
+static const char* chat_states[] = {
+    "",
+    "active",
+    "inactive",
+    "gone",
+    "composing",
+    "paused",
+};
+
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
-    : QXmppStanza(from, to), m_type(Chat), m_body(body), m_thread(thread)
+    : QXmppStanza(from, to), m_type(Chat), m_state(None), m_body(body), m_thread(thread)
 {
 }
 
@@ -109,6 +119,16 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     }
 }
 
+QXmppMessage::State QXmppMessage::getState() const
+{
+    return m_state;
+}
+
+void QXmppMessage::setState(QXmppMessage::State state)
+{
+    m_state = state;
+}
+
 void QXmppMessage::parse(QDomElement &element)
 {
     setFrom(element.attribute("from"));
@@ -126,6 +146,17 @@ void QXmppMessage::parse(QDomElement &element)
     {
         QXmppStanza::Error error = parseError(errorElement);
         setError(error);
+    }
+
+    for (int i = Active; i <= Paused; i++)
+    {
+        QDomElement stateElement = element.firstChildElement(chat_states[i]);
+        if (!stateElement.isNull() &&
+            stateElement.namespaceURI() == ns_chat_states)
+        {
+            m_state = static_cast<QXmppMessage::State>(i);
+            break;
+        }
     }
 
     QDomElement xElement = element.firstChildElement("x");
@@ -148,6 +179,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     if (!getThread().isEmpty())
         helperToXmlAddTextElement(xmlWriter,"thread", getThread());
     getError().toXml(xmlWriter);
+
+    if (m_state > None && m_state <= Paused)
+    {
+        xmlWriter->writeStartElement(chat_states[m_state]);
+        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_chat_states);
+        xmlWriter->writeEndElement();
+    }
+
     getExtension().toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
