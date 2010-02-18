@@ -27,12 +27,12 @@
 
 #include <QDomElement>
 
-QList<QXmppElement> QXmppDiscoveryIq::getQueryItems() const
+QXmppElementList QXmppDiscoveryIq::getQueryItems() const
 {
     return m_queryItems;
 }
 
-void QXmppDiscoveryIq::setQueryItems(const QList<QXmppElement> &items)
+void QXmppDiscoveryIq::setQueryItems(const QXmppElementList &items)
 {
     m_queryItems = items;
 }
