@@ -910,6 +910,7 @@ void QXmppStream::sendRosterRequest()
 void QXmppStream::disconnect()
 {
     sendEndStream();
+    m_socket.flush();
     m_socket.disconnectFromHost();
 }
 
