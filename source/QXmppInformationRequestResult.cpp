@@ -31,5 +31,9 @@ void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writ
     writer->writeAttribute("var", ns_ping);
     writer->writeEndElement();
 
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_chat_states);
+    writer->writeEndElement();
+
     writer->writeEndElement();
 }
