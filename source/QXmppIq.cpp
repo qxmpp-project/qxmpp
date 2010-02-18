@@ -25,6 +25,7 @@
 #include "QXmppUtils.h"
 #include "QXmppIq.h"
 
+#include <QDomElement>
 #include <QXmlStreamWriter>
 
 QXmppIq::QXmppIq(QXmppIq::Type type)
@@ -53,6 +54,20 @@ QXmppIq::Type QXmppIq::getType() const
 void QXmppIq::setType(QXmppIq::Type type)
 {
     m_type = type;
+}
+
+void QXmppIq::parse( QDomElement &element )
+{
+    setFrom(element.attribute("from"));
+    setTo(element.attribute("to"));
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement itemElement = element.firstChildElement();
+    while (!itemElement.isNull())
+    {
+        m_items.append(QXmppElement(itemElement));
+        itemElement = itemElement.nextSiblingElement();
+    }
 }
 
 void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
@@ -126,12 +141,12 @@ void QXmppIq::setTypeFromStr(const QString& str)
     }
 }
 
-QList<QXmppElement> QXmppIq::getItems() const
+QXmppElementList QXmppIq::getItems() const
 {
     return m_items;
 }
 
-void QXmppIq::setItems(const QList<QXmppElement> &items)
+void QXmppIq::setItems(const QXmppElementList &items)
 {
     m_items = items;
 }

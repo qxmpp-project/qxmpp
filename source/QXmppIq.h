@@ -53,15 +53,16 @@ public:
     void setType(QXmppIq::Type);
     void setTypeFromStr(const QString& str);
 
-    QList<QXmppElement> getItems() const;
-    void setItems(const QList<QXmppElement> &items);
+    QXmppElementList getItems() const;
+    void setItems(const QXmppElementList &items);
 
+    void parse( QDomElement &element );
     void toXml( QXmlStreamWriter *writer ) const;
     virtual void toXmlElementFromChild( QXmlStreamWriter *writer ) const;
 
 private:
     Type m_type;
-    QList<QXmppElement> m_items;
+    QXmppElementList m_items;
 };
 
 #endif // QXMPPIQ_H
