@@ -35,12 +35,18 @@
 
 QString jidToResource(const QString& jid)
 {
-    return jid.mid(jid.indexOf(QChar('/'))+1);
+    const int pos = jid.indexOf(QChar('/'));
+    if (pos < 0)
+        return QString;
+    return jid.mid(pos+1);
 }
 
 QString jidToBareJid(const QString& jid)
 {
-    return jid.left(jid.indexOf(QChar('/')));
+    const int pos = jid.indexOf(QChar('/'));
+    if (pos < 0)
+        return jid;
+    return jid.left(pos);
 }
 
 QString generateStanzaHash()
