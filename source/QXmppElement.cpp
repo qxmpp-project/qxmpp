@@ -26,94 +26,171 @@
 
 #include <QDomElement>
 
-QXmppElement::QXmppElement()
+class QXmppElementPrivate
+{
+public:
+    QXmppElementPrivate();
+    QXmppElementPrivate(const QDomElement &element);
+    ~QXmppElementPrivate();
+
+    QAtomicInt counter;
+
+    QMap<QString, QString> attributes;
+    QList<QXmppElementPrivate*> children;
+    QString name;
+    QString value;
+};
+
+QXmppElementPrivate::QXmppElementPrivate()
+    : counter(1)
 {
 }
 
-QXmppElement::QXmppElement(const QDomElement &element)
+QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
+    : counter(1)
 {
     if (element.isNull())
         return;
 
-    m_tagName = element.tagName();
+    name = element.tagName();
     QString xmlns = element.namespaceURI();
     QString parentns = element.parentNode().namespaceURI();
     if (!xmlns.isEmpty() && xmlns != parentns)
-        m_attributes.insert("xmlns", xmlns);
-    QDomNamedNodeMap attributes = element.attributes();
-    for (int i = 0; i < attributes.size(); i++)
+        attributes.insert("xmlns", xmlns);
+    QDomNamedNodeMap attrs = element.attributes();
+    for (int i = 0; i < attrs.size(); i++)
     {
-        QDomAttr attr = attributes.item(i).toAttr();
-        m_attributes.insert(attr.name(), attr.value());
+        QDomAttr attr = attrs.item(i).toAttr();
+        attributes.insert(attr.name(), attr.value());
     }
 
     QDomNode childNode = element.firstChild();
     while (!childNode.isNull())
     {
         if (childNode.isElement())
-            m_children.append(QXmppElement(childNode.toElement()));
+            children.append(new QXmppElementPrivate(childNode.toElement()));
         else if (childNode.isText())
-            m_value += childNode.toText().data();
+            value += childNode.toText().data();
         childNode = childNode.nextSibling();
     }
 }
 
+QXmppElementPrivate::~QXmppElementPrivate()
+{
+    foreach (QXmppElementPrivate *child, children)
+        if (!child->counter.deref())
+            delete child;
+}
+
+QXmppElement::QXmppElement()
+{
+    d = new QXmppElementPrivate();
+}
+
+QXmppElement::QXmppElement(const QXmppElement &other)
+{
+    other.d->counter.ref();
+    d = other.d;
+}
+
+QXmppElement::QXmppElement(QXmppElementPrivate *other)
+{
+    other->counter.ref();
+    d = other;
+}
+
+QXmppElement::QXmppElement(const QDomElement &element)
+{
+    d = new QXmppElementPrivate(element);
+}
+
+QXmppElement::~QXmppElement()
+{
+    if (!d->counter.deref())
+        delete d;
+}
+
+QXmppElement &QXmppElement::operator=(const QXmppElement &other)
+{
+    other.d->counter.ref();
+    if (!d->counter.deref())
+        delete d;
+    d = other.d;
+    return *this;
+}
+
 QStringList QXmppElement::attributeNames() const
 {
-    return m_attributes.keys();
+    return d->attributes.keys();
 }
 
 QString QXmppElement::attribute(const QString &name) const
 {
-    return m_attributes.value(name);
+    return d->attributes.value(name);
 }
 
 void QXmppElement::setAttribute(const QString &name, const QString &value)
 {
-    m_attributes.insert(name, value);
+    d->attributes.insert(name, value);
+}
+
+void QXmppElement::appendChild(const QXmppElement &child)
+{
+    if (!d->children.contains(child.d))
+    {
+        child.d->counter.ref();
+        d->children.append(child.d);
+    }
 }
 
 QXmppElementList QXmppElement::children() const
 {
-    return m_children;
+    QXmppElementList list;
+    foreach (QXmppElementPrivate *child_d, d->children)
+        list.append(QXmppElement(child_d));
+    return list;
 }
 
-void QXmppElement::setChildren(const QXmppElementList &children)
+QXmppElement QXmppElement::firstChildElement(const QString &name) const
 {
-    m_children = children;
-}
-
-QXmppElement QXmppElement::firstChild(const QString &name) const
-{
-    foreach (const QXmppElement &child, m_children)
-        if (child.tagName() == name)
+    foreach (const QXmppElement &child, d->children)
+        if (name.isEmpty() || child.tagName() == name)
             return child;
     return QXmppElement();
 }
 
 bool QXmppElement::isNull() const
 {
-    return m_tagName.isEmpty();
+    return d->name.isEmpty();
+}
+
+void QXmppElement::removeChild(const QXmppElement &child)
+{
+    if (d->children.contains(child.d))
+    {
+        d->children.removeAll(child.d);
+        child.d->counter.deref();
+    }
 }
 
 QString QXmppElement::tagName() const
 {
-    return m_tagName;
+    return d->name;
 }
 
 void QXmppElement::setTagName(const QString &tagName)
 {
-    m_tagName = tagName;
+    d->name = tagName;
 }
 
 QString QXmppElement::value() const
 {
-    return m_value;
+    return d->value;
 }
 
 void QXmppElement::setValue(const QString &value)
 {
-    m_value = value;
+    d->value = value;
 }
 
 void QXmppElement::toXml(QXmlStreamWriter *writer) const
@@ -121,11 +198,11 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     if (isNull())
         return;
 
-    writer->writeStartElement(m_tagName);
-    foreach (const QString &attr, m_attributes.keys())
-        helperToXmlAddAttribute(writer, attr, m_attributes.value(attr));
-    writer->writeCharacters(m_value);
-    foreach (const QXmppElement &child, m_children)
+    writer->writeStartElement(d->name);
+    foreach (const QString &attr, d->attributes.keys())
+        helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
+    writer->writeCharacters(d->value);
+    foreach (const QXmppElement &child, d->children)
         child.toXml(writer);
     writer->writeEndElement();
 }

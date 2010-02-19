@@ -30,6 +30,7 @@
 
 class QDomElement;
 class QXmppElement;
+class QXmppElementPrivate;
 
 class QXmppElementList : public QList<QXmppElement>
 {
@@ -43,16 +44,19 @@ class QXmppElement
 {
 public:
     QXmppElement();
+    QXmppElement(const QXmppElement &other);
     QXmppElement(const QDomElement &element);
+    ~QXmppElement();
 
     QStringList attributeNames() const;
 
     QString attribute(const QString &name) const;
     void setAttribute(const QString &name, const QString &value);
 
+    void appendChild(const QXmppElement &child);
     QXmppElementList children() const;
-    QXmppElement firstChild(const QString &name) const;
-    void setChildren(const QXmppElementList &children);
+    QXmppElement firstChildElement(const QString &name = QString()) const;
+    void removeChild(const QXmppElement &child);
 
     QString tagName() const;
     void setTagName(const QString &type);
@@ -63,11 +67,11 @@ public:
     bool isNull() const;
     void toXml(QXmlStreamWriter *writer) const;
 
+    QXmppElement &operator=(const QXmppElement &other);
+
 private:
-    QMap<QString, QString> m_attributes;
-    QXmppElementList m_children;
-    QString m_tagName;
-    QString m_value;
+    QXmppElement(QXmppElementPrivate *other);
+    QXmppElementPrivate *d;
 };
 
 #endif
