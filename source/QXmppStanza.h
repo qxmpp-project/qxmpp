@@ -106,7 +106,7 @@ public:
     QString getId() const;    
     QString getLang() const;    
     QXmppStanza::Error getError() const;    
-    QXmppElement getExtension() const;
+    QXmppElementList getExtensions() const;
 
     void setTo(const QString&);  
     void setFrom(const QString&);
@@ -114,7 +114,7 @@ public:
     void generateAndSetNextId();
     void setLang(const QString&);
     void setError(QXmppStanza::Error& error);
-    void setExtension(const QXmppElement &element);
+    void setExtensions(const QXmppElementList &elements);
     bool isErrorStanza();
 
     // FIXME : make this method protected
@@ -127,7 +127,7 @@ private:
     QString m_id;    
     QString m_lang;
     QXmppStanza::Error m_error;
-    QXmppElement m_extension;
+    QXmppElementList m_extensions;
 };
 
 #endif // QXMPPSTANZA_H

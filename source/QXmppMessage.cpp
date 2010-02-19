@@ -161,7 +161,7 @@ void QXmppMessage::parse(QDomElement &element)
 
     QDomElement xElement = element.firstChildElement("x");
     if(!xElement.isNull())
-        setExtension(QXmppElement(xElement));
+        setExtensions(QXmppElement(xElement));
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
@@ -187,7 +187,8 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    getExtension().toXml(xmlWriter);
+    foreach (const QXmppElement &extension, getExtensions())
+        extension.toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
 

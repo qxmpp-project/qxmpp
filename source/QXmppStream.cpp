@@ -651,34 +651,7 @@ void QXmppStream::parser(const QByteArray& data)
                 else if(nodeRecv.tagName() == "presence")
                 {
                     QXmppPresence presence;
-                    presence.setTypeFromStr(nodeRecv.attribute("type"));
-                    presence.setFrom(nodeRecv.attribute("from"));
-                    presence.setTo(nodeRecv.attribute("to"));
-                    
-                    QString statusText = nodeRecv.
-                                         firstChildElement("status").text();
-                    QString show = nodeRecv.
-                                   firstChildElement("show").text();
-                    int priority = nodeRecv.
-                                   firstChildElement("priority").text().toInt();
-                    QXmppPresence::Status status;
-                    status.setTypeFromStr(show);
-                    status.setStatusText(statusText);
-                    status.setPriority(priority);
-                    presence.setStatus(status);
-
-                    QDomElement errorElement = nodeRecv.
-                                               firstChildElement("error");
-                    if(!errorElement.isNull())
-                    {
-                        QXmppStanza::Error error =
-                                QXmppStanza::parseError(errorElement);
-                        presence.setError(error);
-                    }
-
-                    QDomElement xElement = nodeRecv.firstChildElement("x");
-                    if(!xElement.isNull())
-                        presence.setExtension(QXmppElement(xElement));
+                    presence.parse(nodeRecv);
 
                     processPresence(presence);
                 }

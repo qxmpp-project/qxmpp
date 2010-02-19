@@ -25,6 +25,7 @@
 #include "QXmppPresence.h"
 #include "QXmppUtils.h"
 #include <QtDebug>
+#include <QDomElement>
 #include <QXmlStreamWriter>
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
@@ -64,6 +65,37 @@ void QXmppPresence::setStatus(const QXmppPresence::Status& status)
     m_status = status;
 }
 
+void QXmppPresence::parse(const QDomElement &element)
+{
+    setTypeFromStr(element.attribute("type"));
+    setFrom(element.attribute("from"));
+    setTo(element.attribute("to"));
+
+    QString statusText = element.
+                         firstChildElement("status").text();
+    QString show = element.
+                   firstChildElement("show").text();
+    int priority = element.
+                   firstChildElement("priority").text().toInt();
+    QXmppPresence::Status status;
+    status.setTypeFromStr(show);
+    status.setStatusText(statusText);
+    status.setPriority(priority);
+    setStatus(status);
+
+    QDomElement errorElement = element.
+                               firstChildElement("error");
+    if(!errorElement.isNull())
+    {
+        QXmppStanza::Error error = parseError(errorElement);
+        setError(error);
+    }
+
+    QDomElement xElement = element.firstChildElement("x");
+    if(!xElement.isNull())
+        setExtensions(QXmppElement(xElement));
+}
+
 void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
 {
 
@@ -80,7 +112,8 @@ void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
     helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
     
     getError().toXml(xmlWriter);
-    getExtension().toXml(xmlWriter);
+    foreach (const QXmppElement &extension, getExtensions())
+        extension.toXml(xmlWriter);
     
     xmlWriter->writeEndElement();
 

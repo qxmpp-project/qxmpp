@@ -316,14 +316,14 @@ void QXmppStanza::setError(QXmppStanza::Error& error)
     m_error = error;
 }
 
-QXmppElement QXmppStanza::getExtension() const
+QXmppElementList QXmppStanza::getExtensions() const
 {
-    return m_extension;
+    return m_extensions;
 }
 
-void QXmppStanza::setExtension(const QXmppElement &extension)
+void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 {
-    m_extension = extension;
+    m_extensions = extensions;
 }
 
 bool QXmppStanza::isErrorStanza()

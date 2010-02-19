@@ -87,6 +87,8 @@ public:
     QXmppPresence::Status& getStatus();
     const QXmppPresence::Status& getStatus() const;
     void setStatus(const QXmppPresence::Status&);
+
+    void parse(const QDomElement &element);
     void toXml( QXmlStreamWriter *writer ) const;
 
 private:
