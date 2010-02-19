@@ -35,6 +35,7 @@ public:
 
     QAtomicInt counter;
 
+    QXmppElementPrivate *parent;
     QMap<QString, QString> attributes;
     QList<QXmppElementPrivate*> children;
     QString name;
@@ -42,12 +43,12 @@ public:
 };
 
 QXmppElementPrivate::QXmppElementPrivate()
-    : counter(1)
+    : counter(1), parent(NULL)
 {
 }
 
 QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
-    : counter(1)
+    : counter(1), parent(NULL)
 {
     if (element.isNull())
         return;
@@ -68,9 +69,13 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
     while (!childNode.isNull())
     {
         if (childNode.isElement())
-            children.append(new QXmppElementPrivate(childNode.toElement()));
-        else if (childNode.isText())
+        {
+            QXmppElementPrivate *child = new QXmppElementPrivate(childNode.toElement());
+            child->parent = this;
+            children.append(child);
+        } else if (childNode.isText()) {
             value += childNode.toText().data();
+        }
         childNode = childNode.nextSibling();
     }
 }
@@ -136,26 +141,32 @@ void QXmppElement::setAttribute(const QString &name, const QString &value)
 
 void QXmppElement::appendChild(const QXmppElement &child)
 {
-    if (!d->children.contains(child.d))
-    {
-        child.d->counter.ref();
-        d->children.append(child.d);
-    }
-}
+    if (child.d->parent == d)
+        return;
 
-QXmppElementList QXmppElement::children() const
-{
-    QXmppElementList list;
-    foreach (QXmppElementPrivate *child_d, d->children)
-        list.append(QXmppElement(child_d));
-    return list;
+    if (child.d->parent)
+        child.d->parent->children.removeAll(child.d);
+    else
+        child.d->counter.ref();
+    d->children.append(child.d);
 }
 
 QXmppElement QXmppElement::firstChildElement(const QString &name) const
 {
-    foreach (const QXmppElement &child, d->children)
-        if (name.isEmpty() || child.tagName() == name)
-            return child;
+    foreach (QXmppElementPrivate *child_d, d->children)
+        if (name.isEmpty() || child_d->name == name)
+            return QXmppElement(child_d);
+    return QXmppElement();
+}
+
+QXmppElement QXmppElement::nextSiblingElement(const QString &name) const
+{
+    if (!d->parent)
+        return QXmppElement();
+    const QList<QXmppElementPrivate*> &siblings_d = d->parent->children;
+    for (int i = siblings_d.indexOf(d) + 1; i < siblings_d.size(); i++)
+        if (name.isEmpty() || siblings_d[i]->name == name)
+            return QXmppElement(siblings_d[i]);
     return QXmppElement();
 }
 
@@ -166,11 +177,12 @@ bool QXmppElement::isNull() const
 
 void QXmppElement::removeChild(const QXmppElement &child)
 {
-    if (d->children.contains(child.d))
-    {
-        d->children.removeAll(child.d);
-        child.d->counter.deref();
-    }
+    if (child.d->parent != d)
+        return;
+
+    d->children.removeAll(child.d);
+    child.d->counter.deref();
+    child.d->parent = NULL;
 }
 
 QString QXmppElement::tagName() const

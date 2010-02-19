@@ -54,8 +54,8 @@ public:
     void setAttribute(const QString &name, const QString &value);
 
     void appendChild(const QXmppElement &child);
-    QXmppElementList children() const;
     QXmppElement firstChildElement(const QString &name = QString()) const;
+    QXmppElement nextSiblingElement(const QString &name = QString()) const;
     void removeChild(const QXmppElement &child);
 
     QString tagName() const;
