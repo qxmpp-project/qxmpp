@@ -37,7 +37,7 @@ QString jidToResource(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
     if (pos < 0)
-        return QString;
+        return QString();
     return jid.mid(pos+1);
 }
 
