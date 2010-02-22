@@ -56,6 +56,7 @@ bool QXmppDiscoveryIq::isDiscoveryIq( QDomElement &element )
 
 void QXmppDiscoveryIq::parse( QDomElement &element )
 {
+    setId(element.attribute("id"));
     setFrom(element.attribute("from"));
     setTo(element.attribute("to"));
     setTypeFromStr(element.attribute("type"));
