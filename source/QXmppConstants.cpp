@@ -47,3 +47,6 @@ const char *ns_muc_admin = "http://jabber.org/protocol/muc#admin";
 const char *ns_muc_owner = "http://jabber.org/protocol/muc#owner";
 const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
 const char *ns_chat_states = "http://jabber.org/protocol/chatstates";
+const char *ns_stream_initiation = "http://jabber.org/protocol/si";
+const char *ns_stream_initiation_file_transfer = "http://jabber.org/protocol/si/profile/file-transfer";
+const char *ns_feature_negotiation = "http://jabber.org/protocol/feature-neg";

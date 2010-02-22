@@ -48,5 +48,8 @@ extern const char *ns_muc_admin;
 extern const char *ns_muc_owner;
 extern const char *ns_muc_user;
 extern const char *ns_chat_states;
+extern const char *ns_stream_initiation;
+extern const char *ns_stream_initiation_file_transfer;
+extern const char *ns_feature_negotiation;
 
 #endif // QXMPPCONSTANTS_H
