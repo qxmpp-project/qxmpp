@@ -138,9 +138,10 @@ private:
     // map of resources of the jid and map of resouces and presences
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
     // flag to store that QXmppRoster has been populated
-    bool m_isRosterReceived ;
+    bool m_isRosterReceived;
 
 private slots:
+    void disconnected();
     void presenceReceived(const QXmppPresence&);
     void rosterIqReceived(const QXmppRosterIq&);
     void rosterRequestIqReceived(const QXmppRosterIq&);

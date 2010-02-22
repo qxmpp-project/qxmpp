@@ -87,6 +87,12 @@ QXmppStream::QXmppStream(QXmppClient* client)
     Q_ASSERT(check);
 
     check = QObject::connect(this,
+                            SIGNAL(disconnected()),
+                            &m_roster,
+                            SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this,
                             SIGNAL(presenceReceived(const QXmppPresence&)),
                             &m_roster,
                             SLOT(presenceReceived(const QXmppPresence&)));

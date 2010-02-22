@@ -38,6 +38,13 @@ QXmppRoster::~QXmppRoster()
 
 }
 
+void QXmppRoster::disconnected()
+{
+    m_entries = QMap<QString, QXmppRoster::QXmppRosterEntry>();
+    m_presences = QMap<QString, QMap<QString, QXmppPresence> >();
+    m_isRosterReceived = false;
+}
+
 void QXmppRoster::presenceReceived(const QXmppPresence& presence)
 {
     QString jid = presence.getFrom();
