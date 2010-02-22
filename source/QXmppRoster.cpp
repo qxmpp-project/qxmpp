@@ -44,7 +44,12 @@ void QXmppRoster::presenceReceived(const QXmppPresence& presence)
     QString bareJid = jidToBareJid(jid);
     QString resource = jidToResource(jid);
 
-    m_presences[bareJid][resource] = presence;
+    if (presence.getType() == QXmppPresence::Available)
+        m_presences[bareJid][resource] = presence;
+    else if (presence.getType() == QXmppPresence::Unavailable)
+        m_presences[bareJid].remove(resource);
+    else
+        return;
 
     emit presenceChanged(bareJid, resource);
 }
