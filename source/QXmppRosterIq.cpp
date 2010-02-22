@@ -140,7 +140,9 @@ void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
 
 void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)
 {
-    if(type == "none")
+    if(type == "")
+        setSubscriptionType(NotSet);
+    else if(type == "none")
         setSubscriptionType(None);
     else if(type == "both")
         setSubscriptionType(Both);
