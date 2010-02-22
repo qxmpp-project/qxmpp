@@ -31,19 +31,25 @@
 
 uint QXmppStanza::s_uniqeIdNo = 0;
 
-QXmppStanza::Error::Error(): m_type(static_cast<QXmppStanza::Error::Type>(-1)), 
-            m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),
-            m_text("")
+QXmppStanza::Error::Error():
+    m_type(static_cast<QXmppStanza::Error::Type>(-1)),
+    m_code(0),
+    m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),
+    m_text("")
 {
 }
 
 QXmppStanza::Error::Error(Type type, Condition cond, const QString& text): 
-        m_type(type), m_condition(cond), m_text(text)
+    m_type(type),
+    m_code(0),
+    m_condition(cond),
+    m_text(text)
 {
 }
 
 QXmppStanza::Error::Error(const QString& type, const QString& cond,
                           const QString& text):
+    m_code(0),
     m_text(text)
 {
     setTypeFromStr(type);
@@ -53,6 +59,11 @@ QXmppStanza::Error::Error(const QString& type, const QString& cond,
 void QXmppStanza::Error::setText(const QString& text)
 {
     m_text = text;
+}
+
+void QXmppStanza::Error::setCode(int code)
+{
+    m_code = code;
 }
 
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
@@ -68,6 +79,11 @@ void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 QString QXmppStanza::Error::getText() const
 {
     return m_text;
+}
+
+int QXmppStanza::Error::getCode() const
+{
+    return m_code;
 }
 
 QXmppStanza::Error::Condition QXmppStanza::Error::getCondition() const
@@ -227,8 +243,11 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
         return;
 
     writer->writeStartElement("error");
-    helperToXmlAddAttribute(writer,"type", type);
-    
+    helperToXmlAddAttribute(writer, "type", type);
+
+    if (m_code > 0)
+        helperToXmlAddAttribute(writer, "code", QString::number(m_code));
+
     if(!cond.isEmpty())
     {
         writer->writeStartElement(cond);
@@ -354,6 +373,7 @@ QXmppStanza::Error QXmppStanza::parseError(const QDomElement &errorElement)
         element = element.nextSiblingElement();
     }
 
+    error.setCode(errorElement.attribute("code").toInt());
     error.setConditionFromStr(cond);
     error.setTypeFromStr(type);
     error.setText(text);

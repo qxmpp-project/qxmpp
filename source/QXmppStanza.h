@@ -80,11 +80,13 @@ public:
         Error(Type type, Condition cond, const QString& text="");
         Error(const QString& type, const QString& cond, const QString& text="");
 
+        void setCode(int code);
         void setText(const QString& text);
         void setCondition(Condition cond);
         void setConditionFromStr(const QString& cond);
         void setType(Type type);
         void setTypeFromStr(const QString& type);
+        int getCode() const;
         QString getText() const;
         Condition getCondition() const;
         Type getType() const;
@@ -93,6 +95,7 @@ public:
         QString getTypeStr() const;
 
     private:
+        int m_code;
         Type m_type;
         Condition m_condition;
         QString m_text;
