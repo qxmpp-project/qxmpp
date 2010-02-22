@@ -58,16 +58,19 @@ void QXmppIq::setType(QXmppIq::Type type)
 
 void QXmppIq::parse( QDomElement &element )
 {
+    setId(element.attribute("id"));
     setFrom(element.attribute("from"));
     setTo(element.attribute("to"));
     setTypeFromStr(element.attribute("type"));
 
+    QXmppElementList extensions;
     QDomElement itemElement = element.firstChildElement();
     while (!itemElement.isNull())
     {
-        m_items.append(QXmppElement(itemElement));
+        extensions.append(QXmppElement(itemElement));
         itemElement = itemElement.nextSiblingElement();
     }
+    setExtensions(extensions);
 }
 
 void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
@@ -88,8 +91,8 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 
 void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
-    foreach (const QXmppElement &item, m_items)
-        item.toXml(writer);
+    foreach (const QXmppElement &extension, getExtensions())
+        extension.toXml(writer);
 }
 
 QString QXmppIq::getTypeStr() const
@@ -139,15 +142,5 @@ void QXmppIq::setTypeFromStr(const QString& str)
                  qPrintable(str));
         return;
     }
-}
-
-QXmppElementList QXmppIq::getItems() const
-{
-    return m_items;
-}
-
-void QXmppIq::setItems(const QXmppElementList &items)
-{
-    m_items = items;
 }
 
