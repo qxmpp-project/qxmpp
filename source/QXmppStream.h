@@ -126,9 +126,9 @@ private:
     QXmppClient::StreamError m_xmppStreamError;
 //    m_xmppStanzaError;
 
-
     QXmppVCardManager m_vCardManager;
     QXmppArchiveManager m_archiveManager;
+    int m_authStep;
 
     QXmppConfiguration& getConfiguration();
     void parser(const QByteArray&);
@@ -139,7 +139,8 @@ private:
     void sendNonSASLAuthQuery( const QString &to );
     void sendAuthPlain();
     void sendAuthDigestMD5();
-    void sendAuthDigestMD5Response(const QString& challenge);
+    void sendAuthDigestMD5ResponseStep1(const QString& challenge);
+    void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
     void sendSessionIQ();
     void sendInitialPresence();

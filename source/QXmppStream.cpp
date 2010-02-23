@@ -60,7 +60,8 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client), m_roster(this),
     m_sessionAvaliable(false), m_vCardManager(m_client),
-    m_archiveManager(m_client)
+    m_archiveManager(m_client),
+    m_authStep(0)
 {
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
@@ -391,7 +392,26 @@ void QXmppStream::parser(const QByteArray& data)
                 }
                 else if(nodeRecv.tagName() == "challenge")
                 {
-                    sendAuthDigestMD5Response(nodeRecv.text());
+                    // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
+                    m_authStep++;
+                    switch (m_authStep)
+                    {
+                    case 1 :
+                        sendAuthDigestMD5ResponseStep1(nodeRecv.text());
+                        break;
+                    case 2 :
+                        sendAuthDigestMD5ResponseStep2();
+                        break;
+                    default :
+                        disconnect();
+                        log(QString("Too many authentication steps"));
+                        break;
+                    }
+                }
+                else if(nodeRecv.tagName() == "failure")
+                {
+                    disconnect();
+                    log(QString("Authentication failure")); 
                 }
             }
             else if(ns == ns_client)
@@ -749,25 +769,59 @@ void QXmppStream::sendAuthDigestMD5()
 }
 
 // challenge is BASE64 encoded string
-void QXmppStream::sendAuthDigestMD5Response(const QString& challenge)
+void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 {
     QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
 
     //log(ba);
 
-    ba.replace('"', QString(""));
-    QList<QByteArray> list = ba.split(',');
-
     QMap<QByteArray, QByteArray> map;
 
-    QList<QByteArray> list2;
-    for(int i = 0; i < list.count(); ++i)
+    QByteArray key;
+    QByteArray value;
+    bool parsingValue = false;
+    int startindex = 0;
+    for(int i = 0; i < ba.length(); i++)
     {
-        list2 = list.at(i).split('=');
-        if(list2.count() == 2)
-            map[list2.at(0).trimmed()] = list2.at(1).trimmed();
-        else
-            log(QString("Invalid challenge send"));
+        char next = ba.at(i);
+        switch (next) {
+            case '=':
+                if (!parsingValue)
+                {
+                    // Trim the key, but do not trim the value as it is in delimiters
+                    key = ba.mid(startindex, i - startindex).trimmed();
+                    // Skip the equals and delimiter
+                    startindex = i + 2;
+                }
+                break;
+            case '"':
+                // Ignore the opening delimiter
+                if (startindex != (i + 1))
+                {
+                    value = ba.mid(startindex, i - startindex);
+                    map[key] = value;
+                    log(key + ":" + value);
+                    // Skip the comma
+                    i += 2;
+                    startindex = i;
+                    parsingValue = false;
+                }
+                else {
+                    parsingValue = true;
+                }
+
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    if (!map.contains("nonce"))
+    {
+        disconnect();
+        log(QString("sendAuthDigestMD5ResponseStep1: Invalid input"));
+        return;
     }
 
     QByteArray user = getConfiguration().getUser().toUtf8();
@@ -779,60 +833,56 @@ void QXmppStream::sendAuthDigestMD5Response(const QString& challenge)
 
     QByteArray response;
 
-    // First challenge
-    if(map.contains("nonce"))
-    {
-        QByteArray cnonce(32, 'm');
-        for(int n = 0; n < cnonce.size(); ++n)
-                cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
+    QByteArray cnonce(32, 'm');
+    for(int n = 0; n < cnonce.size(); ++n)
+            cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
 
-        QByteArray nc = "00000001";
-        QByteArray digest_uri = "xmpp/" + domain;
+    // The random data can the '=' char is not valid as it is a delimiter,
+    // so to be safe, base64 the nonce
+    cnonce = cnonce.toBase64();
 
-        QByteArray a1 = user + ':' + realm + ':' + passwd;
-        QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
-        ha1 += ':' + map["nonce"] + ':' + cnonce;
+    QByteArray nc = "00000001";
+    QByteArray digest_uri = "xmpp/" + domain;
 
-        if(map.contains("authzid"))
-            ha1 += ':' + map["authzid"];
+    QByteArray a1 = user + ':' + realm + ':' + passwd;
+    QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
+    ha1 += ':' + map["nonce"] + ':' + cnonce;
 
-        QByteArray A1(ha1);
-        QByteArray A2 = "AUTHENTICATE:" + digest_uri;
-        QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
-        QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-        QByteArray KD = HA1 + ':' + map["nonce"] + ':' + nc + ':' + cnonce + ':'
-                        + "auth" + ':' + HA2;
-        QByteArray Z = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+    if(map.contains("authzid"))
+        ha1 += ':' + map["authzid"];
 
-        response += "username=\"" + user + "\",";
+    QByteArray A1(ha1);
+    QByteArray A2 = "AUTHENTICATE:" + digest_uri;
+    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+    QByteArray KD = HA1 + ':' + map["nonce"] + ':' + nc + ':' + cnonce + ':'
+                    + "auth" + ':' + HA2;
+    QByteArray Z = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 
-        if(!realm.isEmpty())
-            response += "realm=\"" + realm + "\",";
+    response += "username=\"" + user + "\",";
 
-        response += "nonce=\"" + map["nonce"] + "\",";
-        response += "cnonce=\"" + cnonce + "\",";
-        response += "nc=" + nc + ",";
-        response += "qop=auth,";
-        response += "digest-uri=\"" + digest_uri + "\",";
-        response += "response=" + Z + ",";
-        if(map.contains("authzid"))
-            response += "authzid=\"" + map["authzid"] + "\",";
-        response += "charset=utf-8";
+    if(!realm.isEmpty())
+        response += "realm=\"" + realm + "\",";
 
-        log(response);
-        QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
-                            + response.toBase64() + "</response>";
-        sendToServer(packet);
-    }
-    else if(map.contains("rspauth"))
-    {
-        sendToServer("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
-    }
-    else
-    {
-        disconnect();
-        log(QString("sendAuthDigestMD5Response: Invalid input"));
-    }
+    response += "nonce=\"" + map["nonce"] + "\",";
+    response += "cnonce=\"" + cnonce + "\",";
+    response += "nc=" + nc + ",";
+    response += "qop=auth,";
+    response += "digest-uri=\"" + digest_uri + "\",";
+    response += "response=" + Z + ",";
+    if(map.contains("authzid"))
+        response += "authzid=\"" + map["authzid"] + "\",";
+    response += "charset=utf-8";
+
+    log(response);
+    QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
+                        + response.toBase64() + "</response>";
+    sendToServer(packet);
+}
+
+void QXmppStream::sendAuthDigestMD5ResponseStep2()
+{
+    sendToServer("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
 }
 
 void QXmppStream::sendBindIQ()
