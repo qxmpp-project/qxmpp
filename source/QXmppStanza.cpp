@@ -32,16 +32,16 @@
 uint QXmppStanza::s_uniqeIdNo = 0;
 
 QXmppStanza::Error::Error():
-    m_type(static_cast<QXmppStanza::Error::Type>(-1)),
     m_code(0),
+    m_type(static_cast<QXmppStanza::Error::Type>(-1)),
     m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),
     m_text("")
 {
 }
 
 QXmppStanza::Error::Error(Type type, Condition cond, const QString& text): 
-    m_type(type),
     m_code(0),
+    m_type(type),
     m_condition(cond),
     m_text(text)
 {
