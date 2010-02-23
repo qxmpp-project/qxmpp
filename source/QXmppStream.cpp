@@ -139,6 +139,9 @@ void QXmppStream::connect()
     log(QString("Connecting to: %1:%2").arg(getConfiguration().
             getHost()).arg(getConfiguration().getPort()));
 
+    // prepare for connection
+    m_authStep = 0;
+
     m_socket.setProxy(getConfiguration().getNetworkProxy());
     m_socket.connectToHost(getConfiguration().
                            getHost(), getConfiguration().getPort());
@@ -940,6 +943,7 @@ void QXmppStream::sendRosterRequest()
 
 void QXmppStream::disconnect()
 {
+    m_authStep = 0;
     sendEndStream();
     m_socket.flush();
     m_socket.disconnectFromHost();
