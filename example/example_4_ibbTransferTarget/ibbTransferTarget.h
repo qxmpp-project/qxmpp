@@ -26,6 +26,7 @@
 #define IBBTRANSFERTARGET_H
 
 #include "QXmppClient.h"
+#include "QXmppTransferManager.h"
 
 class QBuffer;
 class IbbTransferTarget : public QXmppClient
@@ -37,8 +38,10 @@ public:
     ~IbbTransferTarget();
 
 public slots:
-    void openReceived( const QString&, const QString& );
-    void closeReceived( const QString&, const QString& );
+    void slotError(QXmppTransferJob::Error error);
+    void slotFileReceived(QXmppTransferJob *job);
+    void slotFinished();
+    void slotProgress(qint64 done, qint64 total);
 private:
     QBuffer *m_buffer;
 };

@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008-2009 QXmpp Developers
+ * Copyright (C) 2008-2010 QXmpp Developers
  *
- * Author:
+ * Authors:
  *	Ian Reinhart Geiser
+ *  Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,22 +22,18 @@
  *
  */
 
+#include <QBuffer>
+#include <QDebug>
+
+#include "QXmppMessage.h"
 
 #include "ibbTransferTarget.h"
-#include "QXmppMessage.h"
-#include "QXmppIbbTransferManager.h"
-#include <QBuffer>
-#include <qdebug.h>
 
 IbbTransferTarget::IbbTransferTarget(QObject *parent)
     : QXmppClient(parent)
 {
-    bool check = connect(getIbbTransferManager(), SIGNAL(byteStreamRequestReceived(QString,QString)),
-                    this, SLOT(openReceived(QString,QString)));
-    Q_ASSERT(check);
-
-    check = connect(getIbbTransferManager(), SIGNAL(byteStreamClosed(QString,QString)),
-                    this, SLOT(closeReceived(QString,QString)));
+    bool check = connect(&getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+                    this, SLOT(slotFileReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
 
     m_buffer = new QBuffer(this);
@@ -47,13 +44,33 @@ IbbTransferTarget::~IbbTransferTarget()
 {
 }
 
-void IbbTransferTarget::openReceived( const QString &sid, const QString& from)
+void IbbTransferTarget::slotFileReceived(QXmppTransferJob *job)
 {
-    qDebug() << "Got open byte stream request from" << from;
-    getIbbTransferManager()->acceptByteStreamRequest(sid, m_buffer);
+    qDebug() << "Got transfer request from:" << job->jid();
+
+    bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(slotError(QXmppTransferJob::Error)));
+    Q_ASSERT(check);
+
+    check = connect(job, SIGNAL(finished()), this, SLOT(slotFinished()));
+    Q_ASSERT(check);
+
+    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(slotProgress(qint64,qint64)));
+    Q_ASSERT(check);
+
+    job->accept(m_buffer);
 }
 
-void IbbTransferTarget::closeReceived( const QString& sid, const QString& reason)
+void IbbTransferTarget::slotError(QXmppTransferJob::Error error)
 {
-     qDebug() << "Stream done:" << m_buffer->data();
+    qDebug() << "Transmission failed:" << error;
+}
+
+void IbbTransferTarget::slotFinished()
+{
+     qDebug() << "Transfer finished:" << m_buffer->data();
+}
+
+void IbbTransferTarget::slotProgress(qint64 done, qint64 total)
+{
+     qDebug() << "Transfer progress:" << done << "/" << total;
 }
