@@ -26,8 +26,7 @@
 #define IBBCLIENT_H
 
 #include "QXmppClient.h"
-
-class QBuffer;
+#include "QXmppTransferManager.h"
 
 class ibbClient : public QXmppClient
 {
@@ -35,17 +34,12 @@ class ibbClient : public QXmppClient
 
 public:
     ibbClient(QObject *parent = 0);
-    ~ibbClient();
 
 public slots:
     void slotConnected();
-    void slotByteStreamRequestReceived( const QString &sid, const QString &remoteJid );
-    void slotByteStreamClosed( const QString &sid , const QString &reason );
-    void slotByteStreamCanceled( const QString &sid , const QString &reason );
-    void slotByteStreamOpened( const QString &sid );
-private:
-    QBuffer *m_buffer;
-
+    void slotError(QXmppTransferJob::Error error);
+    void slotFinished();
+    void slotProgress(qint64 done, qint64 total);
 };
 
 #endif // IBBCLIENT_H

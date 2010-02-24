@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008-2009 QXmpp Developers
+ * Copyright (C) 2008-2010 QXmpp Developers
  *
- * Author:
+ * Authors:
  *	Ian Reinhart Geiser
+ *  Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -22,64 +23,49 @@
  */
 
 
-#include "ibbClient.h"
+#include <QDebug>
+
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
-#include "QXmppIbbTransferManager.h"
-#include <QBuffer>
-#include <qdebug.h>
+
+#include "ibbClient.h"
 
 ibbClient::ibbClient(QObject *parent)
     : QXmppClient(parent)
 {
-    m_buffer = new QBuffer(this);
-    QByteArray bytes;
-    for( int idx = 0; idx < 1000; idx++ )
-        bytes += generateStanzaHash().toLatin1();
-
-    m_buffer->setData( bytes );
-    m_buffer->open(QIODevice::ReadOnly);
-
-    connect( this, SIGNAL(connected()),
-             this, SLOT(slotConnected()));
-    connect( getIbbTransferManager(), SIGNAL(byteStreamCanceled(QString,QString)),
-             this, SLOT( slotByteStreamCanceled(QString,QString)) );
-    connect( getIbbTransferManager(), SIGNAL(byteStreamClosed(QString,QString)),
-             this, SLOT( slotByteStreamClosed(QString,QString)) );
-    connect( getIbbTransferManager(), SIGNAL( byteStreamOpened(QString)),
-             this, SLOT( slotByteStreamOpened(QString)) );
-    connect( getIbbTransferManager(), SIGNAL( byteStreamRequestReceived(QString,QString)),
-             this, SLOT( slotByteStreamRequestReceived(QString,QString)) );
-}
-
-ibbClient::~ibbClient()
-{
-
+    bool check = connect( this, SIGNAL(connected()),
+             this, SLOT(slotConnected()) );
+    Q_ASSERT(check);
 }
 
 void ibbClient::slotConnected()
 {
-    getIbbTransferManager()->sendByteStreamRequest( generateStanzaHash(), "client@geiseri.com/QXmpp", m_buffer );
+    QXmppTransferJob *job = getTransferManager().sendFile( "client@geiseri.com/QXmpp", "ibbClient.cpp" );
+
+    bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
+             this, SLOT(slotError(QXmppTransferJob::Error)) );
+    Q_ASSERT(check);
+
+    check = connect( job, SIGNAL(finished()),
+             this, SLOT(slotFinished()) );
+    Q_ASSERT(check);
+
+    check = connect( job, SIGNAL(progress(qint64,qint64)),
+             this, SLOT(slotProgress(qint64,qint64)) );
+    Q_ASSERT(check);
 }
 
-
-void ibbClient::slotByteStreamRequestReceived( const QString &sid, const QString &remoteJid )
+void ibbClient::slotError(QXmppTransferJob::Error error)
 {
-    qDebug() << "Remote JID:" << remoteJid << " asked for transfer";
-    getIbbTransferManager()->acceptByteStreamRequest( sid, m_buffer );
+    qDebug() << "Transmission failed:" << error;
 }
 
-void ibbClient::slotByteStreamClosed( const QString &sid , const QString &reason )
+void ibbClient::slotFinished()
 {
-    qDebug() << "Transmission done" << m_buffer->buffer();
+    qDebug() << "Transmission finished";
 }
 
-void ibbClient::slotByteStreamCanceled( const QString &sid , const QString &reason )
+void ibbClient::slotProgress(qint64 done, qint64 total)
 {
-    qDebug() << "Transmission canceled" << reason;
-}
-
-void ibbClient::slotByteStreamOpened( const QString &sid )
-{
-    qDebug() << "Bytestream opened";
+    qDebug() << "Transmission progress:" << done << "/" << total;
 }
