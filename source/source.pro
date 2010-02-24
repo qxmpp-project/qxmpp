@@ -39,7 +39,6 @@ HEADERS += QXmppUtils.h \
     QXmppVCard.h \
     QXmppNonSASLAuth.h \
     QXmppInformationRequestResult.h \
-    QXmppDataIq.h \
     QXmppIbbIqs.h \
     QXmppIbbTransferJob.h \
     QXmppIbbTransferManager.h \
@@ -75,7 +74,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCard.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppInformationRequestResult.cpp \
-    QXmppDataIq.cpp \
     QXmppIbbIqs.cpp \
     QXmppIbbTransferJob.cpp \
     QXmppIbbTransferManager.cpp \

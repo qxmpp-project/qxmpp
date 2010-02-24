@@ -200,3 +200,67 @@ void QXmppIbbCloseIq::setSid( const QString &sid )
 {
     m_sid = sid;
 }
+
+QXmppIbbDataIq::QXmppIbbDataIq() : QXmppIq( QXmppIq::Set ), m_seq(0)
+{
+}
+
+quint16 QXmppIbbDataIq::getSequence() const
+{
+    return m_seq;
+}
+
+void QXmppIbbDataIq::setSequence( quint16 seq )
+{
+    m_seq = seq;
+}
+
+QString QXmppIbbDataIq::getSid() const
+{
+    return m_sid;
+}
+
+void QXmppIbbDataIq::setSid( const QString &sid )
+{
+    m_sid = sid;
+}
+
+QByteArray QXmppIbbDataIq::getPayload() const
+{
+    return m_payload;
+}
+
+void QXmppIbbDataIq::setPayload( const QByteArray &data )
+{
+    m_payload = data;
+}
+
+
+void QXmppIbbDataIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("data");
+    writer->writeAttribute( "xmlns",ns_ibb);
+    writer->writeAttribute( "sid",m_sid);
+    writer->writeAttribute( "seq",QString::number(m_seq) );
+    writer->writeCharacters( m_payload.toBase64() );
+    writer->writeEndElement();
+}
+
+void QXmppIbbDataIq::parse( QDomElement &element )
+{
+    QDomElement dataElement = element.firstChildElement("data");
+    setId( element.attribute("id"));
+    setTo( element.attribute("to"));
+    setFrom( element.attribute("from"));
+    setTypeFromStr( element.attribute("type"));
+
+    m_sid = dataElement.attribute( "sid" );
+    m_seq = dataElement.attribute( "seq" ).toLong();
+    m_payload = QByteArray::fromBase64( dataElement.text().toLatin1() );
+}
+
+bool QXmppIbbDataIq::isIbbDataIq( QDomElement &element )
+{
+    QDomElement dataElement = element.firstChildElement("data");
+    return dataElement.namespaceURI() == ns_ibb;
+}

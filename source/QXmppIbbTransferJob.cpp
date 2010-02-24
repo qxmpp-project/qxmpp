@@ -3,7 +3,6 @@
 #include <QIODevice>
 #include <QUuid>
 #include "QXmppIbbIqs.h"
-#include "QXmppDataIq.h"
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
 
@@ -49,7 +48,6 @@ void QXmppIbbTransferJob::setId( const QString &id )
 {
     m_id  = id;
 }
-
 
 void QXmppIbbTransferJob::requestTransfer( )
 {
@@ -164,7 +162,8 @@ void QXmppIbbTransferJob::gotError( const QXmppIbbErrorIq &err )
     emit transferCanceled(m_sid,err.getError().getConditionStr());
     emit readyForTeardown(m_sid);
 }
-void QXmppIbbTransferJob::gotData( const  QXmppDataIq &data )
+
+void QXmppIbbTransferJob::gotData( const QXmppIbbDataIq &data )
 {
     if( m_io &&
         (data.getSequence() == 0 || data.getSequence() > m_sequence) )
@@ -217,7 +216,7 @@ void QXmppIbbTransferJob::sendNextBlock()
         QByteArray buffer = m_io->read( m_blockSize );
 
         m_sequence++;
-        QXmppDataIq sendData;
+        QXmppIbbDataIq sendData;
         sendData.setId(m_id);
         sendData.setTo(m_remoteJid);
         sendData.setFrom(m_localJid);

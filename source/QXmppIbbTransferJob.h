@@ -6,7 +6,7 @@ class QIODevice;
 class QXmppIbbOpenIq;
 class QXmppIbbCloseIq;
 class QXmppIbbErrorIq;
-class QXmppDataIq;
+class QXmppIbbDataIq;
 class QXmppClient;
 
 class QXmppIbbTransferJob : public QObject
@@ -45,7 +45,7 @@ public:
     void gotOpen( const QXmppIbbOpenIq &open );
     void gotClose( const QXmppIbbCloseIq &close );
     void gotError( const QXmppIbbErrorIq &err );
-    void gotData( const  QXmppDataIq &data );
+    void gotData( const  QXmppIbbDataIq &data );
 
 private:
     enum TransferState { Idle, Requesting, Pending, TransferringIn, TransferringOut };

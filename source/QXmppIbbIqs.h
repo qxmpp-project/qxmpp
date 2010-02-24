@@ -67,4 +67,27 @@ public:
 private:
     QString m_sid;
 };
+
+class QXmppIbbDataIq : public QXmppIq
+{
+public:
+    QXmppIbbDataIq();
+
+    quint16 getSequence() const;
+    void setSequence( quint16 seq );
+    QString getSid() const;
+    void setSid( const QString &sid );
+    QByteArray getPayload() const;
+    void setPayload( const QByteArray &data );
+
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parse( QDomElement &element );
+    static bool isIbbDataIq( QDomElement &element );
+
+private:
+    quint16 m_seq;
+    QString m_sid;
+    QByteArray m_payload;
+};
+
 #endif // QXMPPIBBIQS_H

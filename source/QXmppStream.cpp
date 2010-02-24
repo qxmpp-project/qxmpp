@@ -38,7 +38,6 @@
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
 #include "QXmppIbbIqs.h"
-#include "QXmppDataIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppIbbTransferManager.h"
 #include "QXmppArchiveIq.h"
@@ -462,10 +461,10 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(ackIqPacket.getId());
                         mgr->gotAck();
                     }
-                    else if( QXmppDataIq::isDataIq( nodeRecv ) &&
+                    else if( QXmppIbbDataIq::isIbbDataIq( nodeRecv ) &&
                              m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
                     {
-                        QXmppDataIq dataIqPacket;
+                        QXmppIbbDataIq dataIqPacket;
                         dataIqPacket.parse(nodeRecv);
 
                         QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(dataIqPacket.getId());
