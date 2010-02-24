@@ -39,13 +39,12 @@
 #include "QXmppInformationRequestResult.h"
 #include "QXmppIbbIqs.h"
 #include "QXmppRpcIq.h"
-#include "QXmppIbbTransferManager.h"
 #include "QXmppArchiveIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppLogger.h"
-#include "QXmppUtils.h"
-
+#include "QXmppStreamInitiationIq.h"
+#include "QXmppTransferManager.h"
 
 #include <QDomDocument>
 #include <QStringList>
@@ -58,8 +57,10 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client), m_roster(this),
-    m_sessionAvaliable(false), m_vCardManager(m_client),
+    m_sessionAvaliable(false),
     m_archiveManager(m_client),
+    m_transferManager(m_client),
+    m_vCardManager(m_client),
     m_authStep(0)
 {
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
@@ -120,6 +121,28 @@ QXmppStream::QXmppStream(QXmppClient* client)
 
     check = QObject::connect(this, SIGNAL(archivePrefIqReceived(const QXmppArchivePrefIq&)),
         &m_archiveManager, SLOT(archivePrefIqReceived(const QXmppArchivePrefIq&)));
+    Q_ASSERT(check);
+
+    // XEP-0047: In-Band Bytestreams
+    check = QObject::connect(this, SIGNAL(iqReceived(const QXmppIq&)),
+        &m_transferManager, SLOT(iqReceived(const QXmppIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(ibbCloseIqReceived(const QXmppIbbCloseIq&)),
+        &m_transferManager, SLOT(ibbCloseIqReceived(const QXmppIbbCloseIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(ibbDataIqReceived(const QXmppIbbDataIq&)),
+        &m_transferManager, SLOT(ibbDataIqReceived(const QXmppIbbDataIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(ibbOpenIqReceived(const QXmppIbbOpenIq&)),
+        &m_transferManager, SLOT(ibbOpenIqReceived(const QXmppIbbOpenIq&)));
+    Q_ASSERT(check);
+
+    // XEP-0095: Stream Initiation
+    check = QObject::connect(this, SIGNAL(streamInitiationIqReceived(const QXmppStreamInitiationIq&)),
+        &m_transferManager, SLOT(streamInitiationIqReceived(const QXmppStreamInitiationIq&)));
     Q_ASSERT(check);
 }
 
@@ -433,53 +456,7 @@ void QXmppStream::parser(const QByteArray& data)
                     QDomElement elemen = nodeRecv.firstChildElement("error");
                     QXmppStanza::Error error = QXmppStanza::parseError(elemen);
 
-                    if( QXmppIbbOpenIq::isIbbOpenIq( nodeRecv ) )
-                    {
-                        QXmppIbbOpenIq openIqPacket;
-                        openIqPacket.parse( nodeRecv );
-
-                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->
-                                                   getIbbTransferJob(openIqPacket.getId());
-                        mgr->gotOpen( openIqPacket );
-                    }
-                    else if( QXmppIbbErrorIq::isIbbErrorIq( nodeRecv ) &&
-                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
-                    {
-                        QXmppIbbErrorIq errorIqPacket;
-                        errorIqPacket.parse(nodeRecv);
-
-                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->
-                                                   getIbbTransferJob(errorIqPacket.getId());
-                        mgr->gotError( errorIqPacket );
-                    }
-                    else if( QXmppIbbAckIq::isIbbAckIq( nodeRecv ) &&
-                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
-                    {
-                        QXmppIbbAckIq ackIqPacket;
-                        ackIqPacket.parse(nodeRecv);
-
-                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(ackIqPacket.getId());
-                        mgr->gotAck();
-                    }
-                    else if( QXmppIbbDataIq::isIbbDataIq( nodeRecv ) &&
-                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
-                    {
-                        QXmppIbbDataIq dataIqPacket;
-                        dataIqPacket.parse(nodeRecv);
-
-                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(dataIqPacket.getId());
-                        mgr->gotData(dataIqPacket);
-                    }
-                    else if( QXmppIbbCloseIq::isIbbCloseIq( nodeRecv ) &&
-                             m_client->getIbbTransferManager()->isIbbTransferJobId( id ))
-                    {
-                        QXmppIbbCloseIq closeIqPacket;
-                        closeIqPacket.parse(nodeRecv);
-
-                        QXmppIbbTransferJob *mgr = m_client->getIbbTransferManager()->getIbbTransferJob(closeIqPacket.getId());
-                        mgr->gotClose(closeIqPacket);
-                    }
-                    else if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
+                    if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
                     {
                         QXmppRpcInvokeIq rpcIqPacket;
                         rpcIqPacket.parse(nodeRecv);
@@ -625,7 +602,37 @@ void QXmppStream::parser(const QByteArray& data)
                             sendNonSASLAuth(plainText);
                         }
                     }
-                    // XEP-0136 message archiving
+                    // XEP-0047 In-Band Bytestreams
+                    else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
+                    {
+                        QXmppIbbCloseIq ibbCloseIq;
+                        ibbCloseIq.parse(nodeRecv);
+                        emit ibbCloseIqReceived(ibbCloseIq);
+                        iqPacket = ibbCloseIq;
+                    }
+                    else if(QXmppIbbDataIq::isIbbDataIq(nodeRecv))
+                    {
+                        QXmppIbbDataIq ibbDataIq;
+                        ibbDataIq.parse(nodeRecv);
+                        emit ibbDataIqReceived(ibbDataIq);
+                        iqPacket = ibbDataIq;
+                    }
+                    else if(QXmppIbbOpenIq::isIbbOpenIq(nodeRecv))
+                    {
+                        QXmppIbbOpenIq ibbOpenIq;
+                        ibbOpenIq.parse(nodeRecv);
+                        emit ibbOpenIqReceived(ibbOpenIq);
+                        iqPacket = ibbOpenIq;
+                    }
+                    // XEP-0095: Stream Initiation
+                    else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
+                    {
+                        QXmppStreamInitiationIq siIq;
+                        siIq.parse(nodeRecv);
+                        emit streamInitiationIqReceived(siIq);
+                        iqPacket = siIq;
+                    }
+                    // XEP-0136: Message Archiving
                     else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
                     {
                         QXmppArchiveChatIq archiveIq;
@@ -1074,4 +1081,9 @@ void QXmppStream::flushDataBuffer()
 QXmppArchiveManager& QXmppStream::getArchiveManager()
 {
     return m_archiveManager;
+}
+
+QXmppTransferManager& QXmppStream::getTransferManager()
+{
+    return m_transferManager;
 }

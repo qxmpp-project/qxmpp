@@ -35,5 +35,13 @@ void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writ
     writer->writeAttribute("var", ns_chat_states);
     writer->writeEndElement();
 
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_stream_initiation);
+    writer->writeEndElement();
+
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_stream_initiation_file_transfer);
+    writer->writeEndElement();
+
     writer->writeEndElement();
 }

@@ -33,6 +33,7 @@ HEADERS += QXmppUtils.h \
     QXmppStanza.h \
     QXmppStream.h \
     QXmppStreamInitiationIq.h \
+    QXmppTransferManager.h \
     QXmppLogger.h \
     QXmppReconnectionManager.h \
     QXmppVCardManager.h \
@@ -40,8 +41,6 @@ HEADERS += QXmppUtils.h \
     QXmppNonSASLAuth.h \
     QXmppInformationRequestResult.h \
     QXmppIbbIqs.h \
-    QXmppIbbTransferJob.h \
-    QXmppIbbTransferManager.h \
     xmlrpc.h \
     QXmppInvokable.h \
     QXmppRpcIq.h \
@@ -68,6 +67,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
     QXmppStreamInitiationIq.cpp \
+    QXmppTransferManager.cpp \
     QXmppLogger.cpp \
     QXmppReconnectionManager.cpp \
     QXmppVCardManager.cpp \
@@ -75,8 +75,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppInformationRequestResult.cpp \
     QXmppIbbIqs.cpp \
-    QXmppIbbTransferJob.cpp \
-    QXmppIbbTransferManager.cpp \
     xmlrpc.cpp \
     QXmppInvokable.cpp \
     QXmppRpcIq.cpp \

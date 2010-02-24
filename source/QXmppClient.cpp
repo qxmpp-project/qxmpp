@@ -27,7 +27,6 @@
 #include "QXmppRoster.h"
 #include "QXmppMessage.h"
 #include "QXmppReconnectionManager.h"
-#include "QXmppIbbTransferManager.h"
 #include "QXmppInvokable.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
@@ -39,7 +38,7 @@
 
 QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent), m_stream(0), m_clientPrecence(QXmppPresence::Available),
-    m_reconnectionManager(0), m_ibbTransferManager(0)
+    m_reconnectionManager(0)
 {
     m_stream = new QXmppStream(this);
 
@@ -73,8 +72,6 @@ QXmppClient::QXmppClient(QObject *parent)
 
     check = setReconnectionManager(new QXmppReconnectionManager(this));
     Q_ASSERT(check);
-
-    m_ibbTransferManager = new QXmppIbbTransferManager(this);
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -448,11 +445,6 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     m_stream->sendPacket( errorIq );
 }
 
-QXmppIbbTransferManager* QXmppClient::getIbbTransferManager() const
-{
-   return m_ibbTransferManager;
-}
-
 QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
                                           const QString &interface,
                                           const QVariant &arg1,
@@ -495,4 +487,16 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 QXmppArchiveManager& QXmppClient::getArchiveManager()
 {
     return m_stream->getArchiveManager();
+}
+
+/// Returns the reference to QXmppTransferManager, implementation of:
+///
+///  * XEP-0047: In-Band Bytestreams
+///  * XEP-0095: Stream Initiation
+///  * XEP-0096: SI File Transfer
+///
+
+QXmppTransferManager& QXmppClient::getTransferManager()
+{
+    return m_stream->getTransferManager();
 }

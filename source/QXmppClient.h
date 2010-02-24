@@ -58,10 +58,10 @@ class QXmppVCardManager;
 class QXmppInvokable;
 class QXmppRpcInvokeIq;
 class QXmppRemoteMethod;
-class QXmppIbbTransferManager;
 class QXmppRemoteMethodResult;
 class QXmppArchiveManager;
 class QXmppDiscoveryIq;
+class QXmppTransferManager;
 
 class QXmppClient : public QObject
 {
@@ -112,8 +112,8 @@ public:
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
     QXmppVCardManager& getVCardManager();
-    QXmppIbbTransferManager* getIbbTransferManager() const;
     QXmppArchiveManager& getArchiveManager();
+    QXmppTransferManager& getTransferManager();
 
 signals:
 
@@ -207,7 +207,6 @@ private:
     QXmppPresence m_clientPrecence; ///< Stores the current presence of connected client
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QHash<QString,QXmppInvokable *> m_interfaces;
-    QXmppIbbTransferManager* m_ibbTransferManager;    ///< Pointer to the ibb transfer manager
 };
 
 #endif // QXMPPCLIENT_H

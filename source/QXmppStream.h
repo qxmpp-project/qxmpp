@@ -32,6 +32,7 @@
 #include "QXmppStanza.h"
 #include "QXmppVCardManager.h"
 #include "QXmppArchiveManager.h"
+#include "QXmppTransferManager.h"
 
 class QDomElement;
 
@@ -64,6 +65,7 @@ public:
     void disconnect();
     QXmppArchiveManager& getArchiveManager();
     QXmppRoster& getRoster();
+    QXmppTransferManager& getTransferManager();
     QXmppVCardManager& getVCardManager();
     void sendPacket(const QXmppPacket&);
 
@@ -101,6 +103,11 @@ signals:
 
     void discoveryIqReceived(const QXmppDiscoveryIq&);
 
+    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
+    void ibbDataIqReceived(const QXmppIbbDataIq&);
+    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
+    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
+
 private slots:
     void socketHostFound();
     void socketReadReady();
@@ -126,8 +133,9 @@ private:
     QXmppClient::StreamError m_xmppStreamError;
 //    m_xmppStanzaError;
 
-    QXmppVCardManager m_vCardManager;
     QXmppArchiveManager m_archiveManager;
+    QXmppTransferManager m_transferManager;
+    QXmppVCardManager m_vCardManager;
     int m_authStep;
 
     QXmppConfiguration& getConfiguration();
