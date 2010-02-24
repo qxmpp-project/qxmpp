@@ -51,5 +51,6 @@ extern const char *ns_chat_states;
 extern const char *ns_stream_initiation;
 extern const char *ns_stream_initiation_file_transfer;
 extern const char *ns_feature_negotiation;
+extern const char *ns_bytestreams;
 
 #endif // QXMPPCONSTANTS_H
