@@ -29,18 +29,6 @@
 
 static const char *ns_archive = "urn:xmpp:archive";
 
-static QString dateToString(const QDateTime &dt)
-{
-    return dt.toUTC().toString(Qt::ISODate) + ".000000Z";
-}
-
-static QDateTime stringToDate(const QString &str)
-{
-    QDateTime dt = QDateTime::fromString(str, Qt::ISODate);
-    dt.setTimeSpec(Qt::UTC);
-    return dt;
-}
-
 bool QXmppArchiveChatIq::isArchiveChatIq( QDomElement &element )
 {
     QDomElement chatElement = element.firstChildElement("chat");
@@ -57,7 +45,7 @@ void QXmppArchiveChatIq::parse( QDomElement &element )
 {
     QDomElement chatElement = element.firstChildElement("chat");
     m_chat.subject = chatElement.attribute("subject");
-    m_chat.start = stringToDate(chatElement.attribute("start"));
+    m_chat.start = datetimeFromString(chatElement.attribute("start"));
     m_chat.version = chatElement.attribute("version").toInt();
     m_chat.with = chatElement.attribute("with");
 
@@ -144,7 +132,7 @@ void QXmppArchiveListIq::parse( QDomElement &element )
         {
             QXmppArchiveChat chat;
             chat.with = child.attribute("with");
-            chat.start = stringToDate(child.attribute("start"));
+            chat.start = datetimeFromString(child.attribute("start"));
             m_chats << chat;
         }
         child = child.nextSiblingElement();
@@ -158,9 +146,9 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
-        helperToXmlAddAttribute(writer, "start", dateToString(m_start));
+        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
     if (m_end.isValid())
-        helperToXmlAddAttribute(writer, "end", dateToString(m_start));
+        helperToXmlAddAttribute(writer, "end", datetimeToString(m_start));
     if (m_max > 0)
     {
         writer->writeStartElement("set");
@@ -231,7 +219,7 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild( QXmlStreamWriter *writer ) c
     writer->writeStartElement("retrieve");
     helperToXmlAddAttribute(writer, "xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
-    helperToXmlAddAttribute(writer, "start", dateToString(m_start));
+    helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
     if (m_max > 0)
     {
         writer->writeStartElement("set");
