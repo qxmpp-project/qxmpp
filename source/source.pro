@@ -32,6 +32,7 @@ HEADERS += QXmppUtils.h \
     QXmppSession.h \
     QXmppStanza.h \
     QXmppStream.h \
+    QXmppStreamInitiationIq.h \
     QXmppLogger.h \
     QXmppReconnectionManager.h \
     QXmppVCardManager.h \
@@ -67,6 +68,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppSession.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
+    QXmppStreamInitiationIq.cpp \
     QXmppLogger.cpp \
     QXmppReconnectionManager.cpp \
     QXmppVCardManager.cpp \
