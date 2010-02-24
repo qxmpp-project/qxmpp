@@ -33,8 +33,13 @@
 #include <QXmlStreamWriter>
 
 class QByteArray;
+class QDateTime;
 class QString;
 class QImage;
+
+// XEP-0082: XMPP Date and Time Profiles
+QDateTime datetimeFromString(const QString &str);
+QString datetimeToString(const QDateTime &dt);
 
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);

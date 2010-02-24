@@ -33,6 +33,41 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 
+QDateTime datetimeFromString(const QString &str)
+{
+    QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
+    int tzPos = tzRe.indexIn(str, 19);
+    if (str.size() < 20 || tzPos < 0)
+        return QDateTime();
+
+    // process date and time
+    QDateTime dt = QDateTime::fromString(str.left(19), "yyyy-MM-ddThh:mm:ss");
+    dt.setTimeSpec(Qt::UTC);
+
+    // process milliseconds
+    if (tzPos > 20 && str.at(19) == '.')
+    {
+        QString millis = (str.mid(20, tzPos - 20) + "000").left(3);
+        dt = dt.addMSecs(millis.toInt());
+    }
+
+    // process time zone
+    if (tzRe.cap(1) != "Z")
+    {
+        int offset = tzRe.cap(3).toInt() * 3600 + tzRe.cap(4).toInt() * 60;
+        if (tzRe.cap(2) == "+")
+            dt = dt.addSecs(-offset);
+        else
+            dt = dt.addSecs(offset);
+    }
+    return dt;
+}
+
+QString datetimeToString(const QDateTime &dt)
+{
+    return dt.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+}
+
 QString jidToResource(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
