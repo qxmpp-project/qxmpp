@@ -40,6 +40,7 @@
 #include "QXmppIbbIqs.h"
 #include "QXmppRpcIq.h"
 #include "QXmppArchiveIq.h"
+#include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppLogger.h"
@@ -138,6 +139,11 @@ QXmppStream::QXmppStream(QXmppClient* client)
 
     check = QObject::connect(this, SIGNAL(ibbOpenIqReceived(const QXmppIbbOpenIq&)),
         &m_transferManager, SLOT(ibbOpenIqReceived(const QXmppIbbOpenIq&)));
+    Q_ASSERT(check);
+
+    // XEP-0065: SOCKS5 Bytestreams
+    check = QObject::connect(this, SIGNAL(byteStreamIqReceived(const QXmppByteStreamIq&)),
+        &m_transferManager, SLOT(byteStreamIqReceived(const QXmppByteStreamIq&)));
     Q_ASSERT(check);
 
     // XEP-0095: Stream Initiation
@@ -623,6 +629,14 @@ void QXmppStream::parser(const QByteArray& data)
                         ibbOpenIq.parse(nodeRecv);
                         emit ibbOpenIqReceived(ibbOpenIq);
                         iqPacket = ibbOpenIq;
+                    }
+                    // XEP-0065: SOCKS5 Bytestreams
+                    else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
+                    {
+                        QXmppByteStreamIq byteStreamIq;
+                        byteStreamIq.parse(nodeRecv);
+                        emit byteStreamIqReceived(byteStreamIq);
+                        iqPacket = byteStreamIq;
                     }
                     // XEP-0095: Stream Initiation
                     else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))

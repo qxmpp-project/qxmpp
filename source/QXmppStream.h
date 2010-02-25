@@ -50,6 +50,7 @@ class QXmppRpcErrorIq;
 class QXmppArchiveChatIq;
 class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
+class QXmppByteStreamIq;
 class QXmppDiscoveryIq;
 
 class QXmppStream : public QObject
@@ -103,6 +104,7 @@ signals:
 
     void discoveryIqReceived(const QXmppDiscoveryIq&);
 
+    void byteStreamIqReceived(const QXmppByteStreamIq&);
     void ibbCloseIqReceived(const QXmppIbbCloseIq&);
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);

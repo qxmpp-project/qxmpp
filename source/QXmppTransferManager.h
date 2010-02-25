@@ -25,15 +25,18 @@
 #define QXMPPTRANSFERMANAGER_H
 
 #include <QDateTime>
+#include <QHostAddress>
 
 #include "QXmppIq.h"
 
+class QXmppByteStreamIq;
 class QXmppClient;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
+class QXmppSocksClient;
+class QXmppSocksServer;
 class QXmppStreamInitiationIq;
-
 class QXmppTransferManager;
 
 class QXmppTransferJob : public QObject
@@ -50,14 +53,25 @@ public:
 
     enum Method
     {
-        InBandByteStream = 1,
-        SocksByteStream = 2,
+        NoMethod = 0,
+        InBandMethod = 1,
+        SocksMethod = 2,
+        AnyMethod = 3,
+    };
+
+    enum State
+    {
+        StartState = 0,
+        TransferState = 1,
+        FinishedState = 2,
     };
 
     void accept(QIODevice *output);
 
     QXmppTransferJob::Error error() const;
     QString jid() const;
+    QXmppTransferJob::Method method() const;
+    QXmppTransferJob::State state() const;
 
     // XEP-0096 : File transfer
     QDateTime fileDate() const;
@@ -69,26 +83,38 @@ signals:
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64 done, qint64 total);
+    void stateChanged(QXmppTransferJob::State state);
 
 private:
     QXmppTransferJob(const QString &jid, QXmppTransferManager *manager);
+    void setState(QXmppTransferJob::State state);
     void terminate(QXmppTransferJob::Error error);
 
+    int m_blockSize;
     int m_done;
     QXmppTransferJob::Error m_error;
     QIODevice *m_iodevice;
     QString m_jid;
     QString m_sid;
+    Method m_method;
     int m_methods;
     QString m_mimeType;
+    QString m_requestId;
+    State m_state;
 
+    // file meta-data
     QDateTime m_fileDate;
     QString m_fileHash;
     QString m_fileName;
     int m_fileSize;
 
-    QString m_requestId;
+    // for in-band bytestreams
     int m_ibbSequence;
+
+    // for socks5 bytestreams
+    QXmppSocksClient *m_socksClient;
+    QXmppSocksServer *m_socksServer;
+
     friend class QXmppTransferManager;
 };
 
@@ -99,27 +125,42 @@ class QXmppTransferManager : public QObject
 public:
     QXmppTransferManager(QXmppClient* client);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName);
+    int supportedMethods() const;
+    void setSupportedMethods(int methods);
 
 signals:
     void fileReceived(QXmppTransferJob *offer);
 
 private slots:
+    void byteStreamIqReceived(const QXmppByteStreamIq&);
     void ibbCloseIqReceived(const QXmppIbbCloseIq&);
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void iqReceived(const QXmppIq&);
+    void socksClientDataReceived();
+    void socksClientDisconnected();
+    void socksServerDataSent();
+    void socksServerDisconnected();
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
 private:
     QXmppTransferJob *getJobByRequestId(const QString &jid, const QString &id);
     QXmppTransferJob *getJobBySid(const QString &jid, const QString &sid);
+    QXmppTransferJob *getJobBySocksClient(QXmppSocksClient *socksClient);
+    QXmppTransferJob *getJobBySocksServer(QXmppSocksServer *socksServer);
+    void byteStreamResponseReceived(const QXmppIq&);
+    void byteStreamResultReceived(const QXmppByteStreamIq&);
+    void byteStreamSetReceived(const QXmppByteStreamIq&);
+    void ibbResponseReceived(const QXmppIq&);
     void streamInitiationResultReceived(const QXmppStreamInitiationIq&);
     void streamInitiationSetReceived(const QXmppStreamInitiationIq&);
+    void socksServerSendData(QXmppTransferJob *job);
 
     // reference to client object (no ownership)
     QXmppClient* m_client;
     QList<QXmppTransferJob*> m_jobs;
     int m_ibbBlockSize;
+    int m_supportedMethods;
 };
 
 #endif
