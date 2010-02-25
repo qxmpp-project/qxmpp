@@ -367,9 +367,10 @@ void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
         response.setError(error);
         m_client->sendPacket(response);
         return;
-    } else {
-        job->m_blockSize = iq.getBlockSize();
     }
+
+    job->m_blockSize = iq.getBlockSize();
+    job->setState(QXmppTransferJob::TransferState);
 
     // accept transfer
     response.setType(QXmppIq::Result);
@@ -398,22 +399,21 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
             QXmppIbbDataIq dataIq;
             dataIq.setTo(job->m_jid);
             dataIq.setSid(job->m_sid);
-            dataIq.setSequence(job->m_ibbSequence);
+            dataIq.setSequence(job->m_ibbSequence++);
             dataIq.setPayload(buffer);
+            job->m_requestId = dataIq.getId();
             m_client->sendPacket(dataIq);
 
             job->m_done += buffer.size();
-            job->m_requestId = dataIq.getId();
-            job->m_ibbSequence++;
             job->progress(job->m_done, job->fileSize());
         } else {
             // close the bytestream
             QXmppIbbCloseIq closeIq;
             closeIq.setTo(job->m_jid);
             closeIq.setSid(job->m_sid);
+            job->m_requestId = closeIq.getId();
             m_client->sendPacket(closeIq);
 
-            job->m_requestId = closeIq.getId();
             job->terminate(QXmppTransferJob::NoError);
         }
     }
@@ -423,9 +423,9 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
         QXmppIbbCloseIq closeIq;
         closeIq.setTo(job->m_jid);
         closeIq.setSid(job->m_sid);
+        job->m_requestId = closeIq.getId();
         m_client->sendPacket(closeIq);
 
-        job->m_requestId = closeIq.getId();
         job->terminate(QXmppTransferJob::ProtocolError);
     }
 }
