@@ -677,9 +677,11 @@ void QXmppStream::parser(const QByteArray& data)
                         iq.setFrom(to);
                         sendPacket(iq);
                     }
-                    else // didn't understant the iq...reply with error
+                    else
                     {
-                        if(type != "result") // but not incase of result iqs
+                        // if we didn't understant the iq, reply with error
+                        // except for "result" and "error" iqs
+                        if (type != "result" && type != "error")
                         {
                             QXmppIq iq(QXmppIq::Error);
                             iq.setId(id);
