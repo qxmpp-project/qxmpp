@@ -21,7 +21,6 @@
  *
  */
 
-#include <QCryptographicHash>
 #include <QDomElement>
 #include <QFile>
 #include <QFileInfo>
@@ -50,6 +49,7 @@ QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Directi
     m_direction(direction),
     m_done(0),
     m_error(NoError),
+    m_hash(QCryptographicHash::Md5),
     m_iodevice(0),
     m_jid(jid),
     m_method(NoMethod),
@@ -65,6 +65,15 @@ void QXmppTransferJob::accept(QIODevice *iodevice)
 {
     if (!m_iodevice)
         m_iodevice = iodevice;
+}
+
+void QXmppTransferJob::checkData()
+{
+    if ((m_fileSize && m_done != m_fileSize) ||
+        (!m_fileHash.isEmpty() && m_hash.result() != m_fileHash))
+        terminate(QXmppTransferJob::FileCorruptError);
+    else
+        terminate(QXmppTransferJob::NoError);
 }
 
 QXmppTransferJob::Direction QXmppTransferJob::direction() const
@@ -97,7 +106,7 @@ QDateTime QXmppTransferJob::fileDate() const
     return m_fileDate;
 }
 
-QString QXmppTransferJob::fileHash() const
+QByteArray QXmppTransferJob::fileHash() const
 {
     return m_fileHash;
 }
@@ -156,6 +165,18 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
         emit finished();
     else
         emit error(m_error);
+}
+
+bool QXmppTransferJob::writeData(const QByteArray &data)
+{
+    const qint64 written = m_iodevice->write(data);
+    if (written < 0)
+        return false;
+    m_done += written;
+    if (!m_fileHash.isEmpty())
+        m_hash.addData(data);
+    progress(m_done, m_fileSize);
+    return true;
 }
 
 QXmppTransferManager::QXmppTransferManager(QXmppClient *client)
@@ -320,11 +341,8 @@ void QXmppTransferManager::ibbCloseIqReceived(const QXmppIbbCloseIq &iq)
     response.setType(QXmppIq::Result);
     m_client->sendPacket(response);
 
-    // terminate the transfer
-    if (job->fileSize() && job->m_done != job->fileSize())
-        job->terminate(QXmppTransferJob::FileCorruptError);
-    else
-        job->terminate(QXmppTransferJob::NoError);
+    // check received data
+    job->checkData();
 }
 
 void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
@@ -355,11 +373,8 @@ void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
     }
 
     // write data
-    const QByteArray data = iq.getPayload();
-    job->m_iodevice->write(data);
-    job->m_done += data.size();
+    job->writeData(iq.getPayload());
     job->m_ibbSequence++;
-    job->progress(job->m_done, job->fileSize());
 
     // acknowledge the packet
     response.setType(QXmppIq::Result);
@@ -481,6 +496,17 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     fileIo->open(QIODevice::ReadOnly);
     QFileInfo info(*fileIo);
 
+    // hash file
+    QByteArray buffer;
+    while (fileIo->bytesAvailable())
+    {
+        buffer = fileIo->read(16384);
+        job->m_hash.addData(buffer);
+    }
+    fileIo->reset();
+    job->m_fileHash = job->m_hash.result();
+    job->m_hash.reset();
+
     job->m_iodevice = fileIo;
     job->m_sid = generateStanzaHash();
     job->m_fileDate = info.lastModified();
@@ -495,6 +521,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     file.setTagName("file");
     file.setAttribute("xmlns", ns_stream_initiation_file_transfer);
     file.setAttribute("date", datetimeToString(job->fileDate()));
+    file.setAttribute("hash", job->fileHash().toHex());
     file.setAttribute("name", job->fileName());
     file.setAttribute("size", QString::number(job->fileSize()));
     items.append(file);
@@ -560,10 +587,7 @@ void QXmppTransferManager::socksClientDataReceived()
     if (!job || job->state() != QXmppTransferJob::TransferState)
         return;
 
-    QByteArray data = job->m_socksClient->readAll();
-    job->m_iodevice->write(data);
-    job->m_done += data.size();
-    job->progress(job->m_done, job->fileSize());
+    job->writeData(job->m_socksClient->readAll());
 }
 
 void QXmppTransferManager::socksClientDisconnected()
@@ -573,11 +597,8 @@ void QXmppTransferManager::socksClientDisconnected()
     if (!job || job->state() == QXmppTransferJob::FinishedState)
         return;
 
-    // terminate the transfer
-    if (job->fileSize() && job->m_done != job->fileSize())
-        job->terminate(QXmppTransferJob::FileCorruptError);
-    else
-        job->terminate(QXmppTransferJob::NoError);
+    // check received data
+    job->checkData();
 }
 
 void QXmppTransferManager::socksServerDataSent()
@@ -767,7 +788,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         else if (item.tagName() == "file" && item.attribute("xmlns") == ns_stream_initiation_file_transfer)
         {
             job->m_fileDate = datetimeFromString(item.attribute("date"));
-            job->m_fileHash = item.attribute("hash");
+            job->m_fileHash = QByteArray::fromHex(item.attribute("hash").toAscii());
             job->m_fileName = item.attribute("name");
             job->m_fileSize = item.attribute("size").toInt();
         }

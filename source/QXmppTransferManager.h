@@ -24,6 +24,7 @@
 #ifndef QXMPPTRANSFERMANAGER_H
 #define QXMPPTRANSFERMANAGER_H
 
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QHostAddress>
 
@@ -83,7 +84,7 @@ public:
 
     // XEP-0096 : File transfer
     QDateTime fileDate() const;
-    QString fileHash() const;
+    QByteArray fileHash() const;
     QString fileName() const;
     int fileSize() const;
 
@@ -95,13 +96,16 @@ signals:
 
 private:
     QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent);
+    void checkData();
     void setState(QXmppTransferJob::State state);
     void terminate(QXmppTransferJob::Error error);
+    bool writeData(const QByteArray &data);
 
     int m_blockSize;
     QXmppTransferJob::Direction m_direction;
     int m_done;
     QXmppTransferJob::Error m_error;
+    QCryptographicHash m_hash;
     QIODevice *m_iodevice;
     QString m_jid;
     QString m_sid;
@@ -115,7 +119,7 @@ private:
 
     // file meta-data
     QDateTime m_fileDate;
-    QString m_fileHash;
+    QByteArray m_fileHash;
     QString m_fileName;
     int m_fileSize;
 
