@@ -17,6 +17,7 @@ HEADERS += QXmppUtils.h \
     QXmppArchiveIq.h \
     QXmppArchiveManager.h \
     QXmppBind.h \
+    QXmppByteStreamIq.h \
     QXmppClient.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
@@ -30,6 +31,7 @@ HEADERS += QXmppUtils.h \
     QXmppRoster.h \
     QXmppRosterIq.h \
     QXmppSession.h \
+    QXmppSocks.h \
     QXmppStanza.h \
     QXmppStream.h \
     QXmppStreamInitiationIq.h \
@@ -51,6 +53,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppArchiveIq.cpp \
     QXmppArchiveManager.cpp \
     QXmppBind.cpp \
+    QXmppByteStreamIq.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
@@ -64,6 +67,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppRoster.cpp \
     QXmppRosterIq.cpp \
     QXmppSession.cpp \
+    QXmppSocks.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
     QXmppStreamInitiationIq.cpp \
