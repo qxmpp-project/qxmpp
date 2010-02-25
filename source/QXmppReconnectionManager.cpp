@@ -28,6 +28,7 @@
 
 QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client) :
         QObject(client),
+        m_receivedConflict(false),
         m_reconnectionTries(0),
         m_timer(this),
         m_client(client)
@@ -39,12 +40,19 @@ QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client) :
 
 void QXmppReconnectionManager::connected()
 {
+    m_receivedConflict = false;
     m_reconnectionTries = 0;
 }
 
 void QXmppReconnectionManager::error(QXmppClient::Error error)
 {   
-    if(m_client && error == QXmppClient::SocketError)
+    if(m_client && error == QXmppClient::XmppStreamError)
+    {
+        // if we receive a resource conflict, inhibit reconnection
+        if(m_client->getXmppStreamError() == QXmppClient::ConflictStreamError)
+            m_receivedConflict = true;
+    }
+    else if(m_client && error == QXmppClient::SocketError && !m_receivedConflict)
     {
         int time = getNextReconnectingInTime();
 
@@ -82,5 +90,6 @@ void QXmppReconnectionManager::reconnect()
 void QXmppReconnectionManager::cancelReconnection()
 {
     m_timer.stop();
+    m_receivedConflict = false;
     m_reconnectionTries = 0;
 }

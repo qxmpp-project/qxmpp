@@ -50,6 +50,7 @@ private slots:
 
 private:
     int getNextReconnectingInTime();
+    bool m_receivedConflict;
     int m_reconnectionTries;
     QTimer m_timer;
 
