@@ -36,6 +36,7 @@ class QXmppSocksClient : public QObject
 
 public:
     QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent=0);
+    void close();
     void connectToHost(const QString &hostName, quint16 hostPort);
     QString errorString() const;
     QByteArray readAll();
@@ -59,6 +60,7 @@ class QXmppSocksServer : public QObject
 
 public:
     QXmppSocksServer(QObject *parent=0);
+    void close();
     bool listen(const QHostAddress &address, quint16 port = 0);
     QHostAddress serverAddress() const;
     quint16 serverPort() const;

@@ -114,6 +114,11 @@ QXmppSocksClient::QXmppSocksClient(const QHostAddress &proxyAddress, quint16 pro
     m_socket = new QTcpSocket(this);
 }
 
+void QXmppSocksClient::close()
+{
+    m_socket->close();
+}
+
 void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
 {
     m_hostName = hostName;
@@ -203,6 +208,13 @@ QXmppSocksServer::QXmppSocksServer(QObject *parent)
     connect(m_server, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
 }
 
+void QXmppSocksServer::close()
+{
+    m_server->close();
+    if (m_socket)
+        m_socket->close();
+}
+
 bool QXmppSocksServer::listen(const QHostAddress &address, quint16 port)
 {
     return m_server->listen(address, port);
@@ -287,6 +299,7 @@ void QXmppSocksServer::slotNewConnection()
     m_socket->write(buffer);
 
     // connect signals
+    m_server->close();
     connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
     connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SIGNAL(bytesWritten(qint64)));
 }

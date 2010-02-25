@@ -44,9 +44,10 @@ static QString streamHash(const QString &sid, const QString &initiatorJid, const
     return hash.result().toHex();
 }
 
-QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferManager *manager)
-    : QObject(manager),
+QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent)
+    : QObject(parent),
     m_blockSize(16384),
+    m_direction(direction),
     m_done(0),
     m_error(NoError),
     m_iodevice(0),
@@ -66,6 +67,11 @@ void QXmppTransferJob::accept(QIODevice *iodevice)
         m_iodevice = iodevice;
 }
 
+QXmppTransferJob::Direction QXmppTransferJob::direction() const
+{
+    return m_direction;
+}
+
 QXmppTransferJob::Error QXmppTransferJob::error() const
 {
     return m_error;
@@ -74,6 +80,16 @@ QXmppTransferJob::Error QXmppTransferJob::error() const
 QString QXmppTransferJob::jid() const
 {
     return m_jid;
+}
+
+QString QXmppTransferJob::localFilePath() const
+{
+    return m_localFilePath;
+}
+
+void QXmppTransferJob::setLocalFilePath(const QString &path)
+{
+    m_localFilePath = path;
 }
 
 QDateTime QXmppTransferJob::fileDate() const
@@ -117,14 +133,25 @@ void QXmppTransferJob::setState(QXmppTransferJob::State state)
 
 void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
 {
-    // close IO device
-    m_iodevice->close();
+    if (m_state == FinishedState)
+        return;
 
     // change state
-    setState(FinishedState);
-
-    // emit signal
     m_error = cause;
+    m_state = FinishedState;
+
+    // close IO device
+    if (m_iodevice)
+        m_iodevice->close();
+
+    // close sockets
+    if (m_socksClient)
+        m_socksClient->close();
+    if (m_socksServer)
+        m_socksServer->close();
+
+    // emit signals
+    emit stateChanged(m_state);
     if (cause == NoError)
         emit finished();
     else
@@ -155,10 +182,7 @@ void QXmppTransferManager::byteStreamResponseReceived(const QXmppIq &iq)
         return;
 
     if (iq.getType() == QXmppIq::Error)
-    {
-        // FIXME : close sockets?
         job->terminate(QXmppTransferJob::ProtocolError);
-    }
 }
 
 /// Handle a bytestream result, i.e. after the remote party has connected to our stream host.
@@ -440,13 +464,17 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
         ibbResponseReceived(iq);
     else if (job->method() == QXmppTransferJob::SocksMethod)
         byteStreamResponseReceived(iq);
+    else if (iq.getType() == QXmppIq::Error) {
+        // remote user cancelled stream initiation
+        job->terminate(QXmppTransferJob::ProtocolError);
+    }
 }
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName)
 {
 
     // create job
-    QXmppTransferJob *job = new QXmppTransferJob(jid, this);
+    QXmppTransferJob *job = new QXmppTransferJob(jid, QXmppTransferJob::OutgoingDirection, this);
 
     // open file
     QFile *fileIo = new QFile(fileName, job);
@@ -454,7 +482,6 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     QFileInfo info(*fileIo);
 
     job->m_iodevice = fileIo;
-    job->m_methods = m_supportedMethods;
     job->m_sid = generateStanzaHash();
     job->m_fileDate = info.lastModified();
     job->m_fileName = info.fileName();
@@ -489,7 +516,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     x.appendChild(field);
 
     // add supported stream methods
-    if (job->m_methods & QXmppTransferJob::InBandMethod)
+    if (m_supportedMethods & QXmppTransferJob::InBandMethod)
     {
         QXmppElement option;
         option.setTagName("option");
@@ -500,7 +527,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
         value.setValue(ns_ibb);
         option.appendChild(value);
     }
-    if (job->m_methods & QXmppTransferJob::SocksMethod)
+    if (m_supportedMethods & QXmppTransferJob::SocksMethod)
     {
         QXmppElement option;
         option.setTagName("option");
@@ -530,7 +557,7 @@ void QXmppTransferManager::socksClientDataReceived()
 {
     QXmppSocksClient *socks = qobject_cast<QXmppSocksClient*>(sender());
     QXmppTransferJob *job = getJobBySocksClient(socks);
-    if (!job)
+    if (!job || job->state() != QXmppTransferJob::TransferState)
         return;
 
     QByteArray data = job->m_socksClient->readAll();
@@ -543,7 +570,7 @@ void QXmppTransferManager::socksClientDisconnected()
 {
     QXmppSocksClient *socks = qobject_cast<QXmppSocksClient*>(sender());
     QXmppTransferJob *job = getJobBySocksClient(socks);
-    if (!job)
+    if (!job || job->state() == QXmppTransferJob::FinishedState)
         return;
 
     // terminate the transfer
@@ -557,8 +584,7 @@ void QXmppTransferManager::socksServerDataSent()
 {
     QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
     QXmppTransferJob *job = getJobBySocksServer(socksServer);
-    if (!job ||
-        job->state() != QXmppTransferJob::TransferState)
+    if (!job || job->state() != QXmppTransferJob::TransferState)
         return;
 
     // send next data block
@@ -567,7 +593,13 @@ void QXmppTransferManager::socksServerDataSent()
 
 void QXmppTransferManager::socksServerDisconnected()
 {
-    qWarning("Socks server disconnected");
+    QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
+    QXmppTransferJob *job = getJobBySocksServer(socksServer);
+    if (!job || job->state() == QXmppTransferJob::FinishedState)
+        return;
+
+    // terminate transfer
+    job->terminate(QXmppTransferJob::ProtocolError);
 }
 
 void QXmppTransferManager::socksServerSendData(QXmppTransferJob *job)
@@ -609,10 +641,10 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
                 if (field.attribute("var") == "stream-method")
                 {
                     if ((field.firstChildElement("value").value() == ns_ibb) &&
-                        (job->m_methods & QXmppTransferJob::InBandMethod))
+                        (m_supportedMethods & QXmppTransferJob::InBandMethod))
                         job->m_method = QXmppTransferJob::InBandMethod;
                     else if ((field.firstChildElement("value").value() == ns_bytestreams) &&
-                             (job->m_methods & QXmppTransferJob::SocksMethod))
+                             (m_supportedMethods & QXmppTransferJob::SocksMethod))
                         job->m_method = QXmppTransferJob::SocksMethod;
                 }
                 field = field.nextSiblingElement("field");
@@ -636,7 +668,6 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         streamIq.setTo(job->m_jid);
         streamIq.setSid(job->m_sid);
 
-        quint16 port = 40123;
         const QString ownJid = m_client->getConfiguration().getJid();
         QList<QXmppByteStreamIq::StreamHost> streamHosts;
 
@@ -657,7 +688,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
                     entry.netmask() == QHostAddress::Broadcast)
                     continue;
 
-                if (!job->m_socksServer->listen(entry.ip(), port))
+                // we let the server pick a port
+                if (!job->m_socksServer->listen(entry.ip()))
                 {
                     qWarning() << "QXmppSocksServer could not listen on address" << entry.ip();
                     continue;
@@ -705,8 +737,8 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     }
 
     // check the stream type
-    QXmppTransferJob *job = new QXmppTransferJob(iq.getFrom(), this);
-    job->m_methods = QXmppTransferJob::NoMethod;
+    QXmppTransferJob *job = new QXmppTransferJob(iq.getFrom(), QXmppTransferJob::IncomingDirection, this);
+    int offeredMethods = QXmppTransferJob::NoMethod;
     job->m_sid = iq.getSiId();
     job->m_mimeType = iq.getMimeType();
     foreach (const QXmppElement &item, iq.getSiItems())
@@ -722,9 +754,9 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
                     while (!option.isNull())
                     {
                         if (option.firstChildElement("value").value() == ns_ibb)
-                            job->m_methods = job->m_methods | QXmppTransferJob::InBandMethod;
+                            offeredMethods = offeredMethods | QXmppTransferJob::InBandMethod;
                         else if (option.firstChildElement("value").value() == ns_bytestreams)
-                            job->m_methods = job->m_methods | QXmppTransferJob::SocksMethod;
+                            offeredMethods = offeredMethods | QXmppTransferJob::SocksMethod;
                         option = option.nextSiblingElement("option");
                     }
                 }
@@ -740,11 +772,13 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         }
     }
 
-    if (job->m_methods & QXmppTransferJob::SocksMethod)
+    // select a method supported by both parties
+    int sharedMethods = (offeredMethods & m_supportedMethods);
+    if (sharedMethods & QXmppTransferJob::SocksMethod)
         job->m_method = QXmppTransferJob::SocksMethod;
-    else if (job->m_methods & QXmppTransferJob::InBandMethod)
+    else if (sharedMethods & QXmppTransferJob::InBandMethod)
         job->m_method = QXmppTransferJob::InBandMethod;
-    if (!job->m_methods)
+    else
     {
         // FIXME : we should add:
         // <no-valid-streams xmlns='http://jabber.org/protocol/si'/>

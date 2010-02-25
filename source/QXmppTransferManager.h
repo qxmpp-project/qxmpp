@@ -37,13 +37,18 @@ class QXmppIbbOpenIq;
 class QXmppSocksClient;
 class QXmppSocksServer;
 class QXmppStreamInitiationIq;
-class QXmppTransferManager;
 
 class QXmppTransferJob : public QObject
 {
     Q_OBJECT
 
 public:
+    enum Direction
+    {
+        IncomingDirection,
+        OutgoingDirection,
+    };
+
     enum Error
     {
         NoError = 0,
@@ -68,7 +73,10 @@ public:
 
     void accept(QIODevice *output);
 
+    QXmppTransferJob::Direction direction() const;
     QXmppTransferJob::Error error() const;
+    QString localFilePath() const;
+    void setLocalFilePath(const QString &path);
     QString jid() const;
     QXmppTransferJob::Method method() const;
     QXmppTransferJob::State state() const;
@@ -86,21 +94,24 @@ signals:
     void stateChanged(QXmppTransferJob::State state);
 
 private:
-    QXmppTransferJob(const QString &jid, QXmppTransferManager *manager);
+    QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent);
     void setState(QXmppTransferJob::State state);
     void terminate(QXmppTransferJob::Error error);
 
     int m_blockSize;
+    QXmppTransferJob::Direction m_direction;
     int m_done;
     QXmppTransferJob::Error m_error;
     QIODevice *m_iodevice;
     QString m_jid;
     QString m_sid;
     Method m_method;
-    int m_methods;
     QString m_mimeType;
     QString m_requestId;
     State m_state;
+
+    // local path to file
+    QString m_localFilePath;
 
     // file meta-data
     QDateTime m_fileDate;
