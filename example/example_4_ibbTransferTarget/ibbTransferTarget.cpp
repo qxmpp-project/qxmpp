@@ -32,12 +32,13 @@
 IbbTransferTarget::IbbTransferTarget(QObject *parent)
     : QXmppClient(parent)
 {
+    m_buffer = new QBuffer(this);
+
     bool check = connect(&getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
                     this, SLOT(slotFileReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
 
-    m_buffer = new QBuffer(this);
-    m_buffer->open(QIODevice::WriteOnly);
+    getTransferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
 }
 
 IbbTransferTarget::~IbbTransferTarget()
@@ -57,6 +58,7 @@ void IbbTransferTarget::slotFileReceived(QXmppTransferJob *job)
     check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(slotProgress(qint64,qint64)));
     Q_ASSERT(check);
 
+    m_buffer->open(QIODevice::WriteOnly);
     job->accept(m_buffer);
 }
 
@@ -67,7 +69,7 @@ void IbbTransferTarget::slotError(QXmppTransferJob::Error error)
 
 void IbbTransferTarget::slotFinished()
 {
-     qDebug() << "Transfer finished:" << m_buffer->data();
+    qDebug() << "Transfer finished:" << m_buffer->data();
 }
 
 void IbbTransferTarget::slotProgress(qint64 done, qint64 total)
