@@ -24,6 +24,12 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#ifdef Q_OS_WIN
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 #include "QXmppSocks.h"
 
 const static char SocksVersion = 5;
