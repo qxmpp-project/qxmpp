@@ -661,6 +661,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         openIq.setTo(job->m_jid);
         openIq.setSid(job->m_sid);
         openIq.setBlockSize(job->m_blockSize);
+        job->m_requestId = openIq.getId();
         m_client->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
         QXmppByteStreamIq streamIq;
