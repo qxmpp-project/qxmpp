@@ -43,8 +43,13 @@ public:
     bool waitForConnected(int msecs = 30000);
 
 signals:
+    void connected();
     void disconnected();
     void readyRead();
+
+private slots:
+    void slotConnected();
+    void slotReadyRead();
 
 private:
     QHostAddress m_proxyAddress;
@@ -52,6 +57,7 @@ private:
     QString m_hostName;
     quint16 m_hostPort;
     QTcpSocket *m_socket;
+    int m_step;
 };
 
 class QXmppSocksServer : public QObject
@@ -74,12 +80,14 @@ signals:
 
 private slots:
     void slotNewConnection();
+    void slotReadyRead();
 
 private:
     QString m_hostName;
     quint16 m_hostPort;
     QTcpServer *m_server;
     QTcpSocket *m_socket;
+    int m_step;
 };
 
 #endif
