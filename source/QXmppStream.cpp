@@ -64,6 +64,9 @@ QXmppStream::QXmppStream(QXmppClient* client)
     m_vCardManager(m_client),
     m_authStep(0)
 {
+    // Make sure the random number generator is seeded
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
     Q_ASSERT(check);
