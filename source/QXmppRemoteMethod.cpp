@@ -10,7 +10,6 @@
 QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, const QVariantList &args, QXmppClient *client) :
         QObject(client), m_client(client)
 {
-    m_payload.setId( generateStanzaHash() );
     m_payload.setTo( jid );
     m_payload.setFrom( client->getConfiguration().getJid() );
     m_payload.setInterface( method.section('.', 0, 0 ) );
