@@ -86,10 +86,9 @@ QString jidToBareJid(const QString& jid)
 
 QString generateStanzaHash()
 {
-
     QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     QString hashResult;
-    for ( int idx = 0; idx < 10; ++idx )
+    for ( int idx = 0; idx < 32; ++idx )
     {
         hashResult += somechars[(qrand() % 61)];
     }
