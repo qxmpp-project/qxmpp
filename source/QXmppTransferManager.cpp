@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QNetworkInterface>
+#include <QTimer>
 
 #include "QXmppByteStreamIq.h"
 #include "QXmppClient.h"
@@ -116,7 +117,7 @@ QString QXmppTransferJob::fileName() const
     return m_fileName;
 }
 
-int QXmppTransferJob::fileSize() const
+qint64 QXmppTransferJob::fileSize() const
 {
     return m_fileSize;
 }
@@ -140,6 +141,15 @@ void QXmppTransferJob::setState(QXmppTransferJob::State state)
     }
 }
 
+void QXmppTransferJob::slotTerminated()
+{
+    emit stateChanged(m_state);
+    if (m_error == NoError)
+        emit finished();
+    else
+        emit error(m_error);
+}
+
 void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
 {
     if (m_state == FinishedState)
@@ -159,12 +169,8 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
     if (m_socksServer)
         m_socksServer->close();
 
-    // emit signals
-    emit stateChanged(m_state);
-    if (cause == NoError)
-        emit finished();
-    else
-        emit error(m_error);
+    // emit signals later
+    QTimer::singleShot(0, this, SLOT(slotTerminated()));
 }
 
 bool QXmppTransferJob::writeData(const QByteArray &data)
@@ -487,32 +493,43 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName)
 {
+    QFileInfo info(fileName);
 
     // create job
     QXmppTransferJob *job = new QXmppTransferJob(jid, QXmppTransferJob::OutgoingDirection, this);
-
-    // open file
-    QFile *fileIo = new QFile(fileName, job);
-    fileIo->open(QIODevice::ReadOnly);
-    QFileInfo info(*fileIo);
-
-    // hash file
-    QByteArray buffer;
-    while (fileIo->bytesAvailable())
-    {
-        buffer = fileIo->read(16384);
-        job->m_hash.addData(buffer);
-    }
-    fileIo->reset();
-    job->m_fileHash = job->m_hash.result();
-    job->m_hash.reset();
-
-    job->m_iodevice = fileIo;
     job->m_sid = generateStanzaHash();
     job->m_fileDate = info.lastModified();
     job->m_fileName = info.fileName();
     job->m_fileSize = info.size();
-    m_jobs.append(job);
+
+    // check we support some methods
+    if (m_supportedMethods == QXmppTransferJob::NoMethod)
+    {
+        job->terminate(QXmppTransferJob::ProtocolError);
+        return job;
+    }
+
+    // open file
+    job->m_iodevice = new QFile(fileName, job);
+    if (!job->m_iodevice->open(QIODevice::ReadOnly))
+    {
+        job->terminate(QXmppTransferJob::FileAccessError);
+        return job;
+    }
+
+    // hash file
+    if (!job->m_iodevice->isSequential())
+    {
+        QByteArray buffer;
+        while (job->m_iodevice->bytesAvailable())
+        {
+            buffer = job->m_iodevice->read(16384);
+            job->m_hash.addData(buffer);
+        }
+        job->m_iodevice->reset();
+        job->m_fileHash = job->m_hash.result();
+        job->m_hash.reset();
+    }
 
     // prepare negotiation
     QXmppElementList items;
@@ -567,6 +584,9 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     }
 
     items.append(feature);
+
+    // start job
+    m_jobs.append(job);
 
     QXmppStreamInitiationIq request;
     request.setType(QXmppIq::Set);
@@ -863,12 +883,19 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     m_client->sendPacket(response);
 }
 
+/// Return the supported stream methods.
 int QXmppTransferManager::supportedMethods() const
 {
     return m_supportedMethods;
 }
 
+/// Set the supported stream methods. This allows you to selectively
+/// enable or disable stream methods (In-Band or SOCKS5 bytestreams).
+///
+/// The methods argument is a combination of zero or more
+/// QXmppTransferJob::Method.
+///
 void QXmppTransferManager::setSupportedMethods(int methods)
 {
-    m_supportedMethods = methods;
+    m_supportedMethods = (methods & QXmppTransferJob::AnyMethod);
 }

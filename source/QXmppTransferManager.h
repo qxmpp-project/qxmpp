@@ -53,6 +53,7 @@ public:
     enum Error
     {
         NoError = 0,
+        FileAccessError,
         FileCorruptError,
         ProtocolError,
     };
@@ -86,13 +87,16 @@ public:
     QDateTime fileDate() const;
     QByteArray fileHash() const;
     QString fileName() const;
-    int fileSize() const;
+    qint64 fileSize() const;
 
 signals:
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64 done, qint64 total);
     void stateChanged(QXmppTransferJob::State state);
+
+private slots:
+    void slotTerminated();
 
 private:
     QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent);
@@ -103,7 +107,7 @@ private:
 
     int m_blockSize;
     QXmppTransferJob::Direction m_direction;
-    int m_done;
+    qint64 m_done;
     QXmppTransferJob::Error m_error;
     QCryptographicHash m_hash;
     QIODevice *m_iodevice;
