@@ -29,6 +29,7 @@
 #include <QHostAddress>
 
 #include "QXmppIq.h"
+#include "QXmppByteStreamIq.h"
 
 class QXmppByteStreamIq;
 class QXmppClient;
@@ -53,6 +54,7 @@ public:
     enum Error
     {
         NoError = 0,
+        AbortError,
         FileAccessError,
         FileCorruptError,
         ProtocolError,
@@ -73,6 +75,7 @@ public:
         FinishedState = 2,
     };
 
+    void abort();
     void accept(QIODevice *output);
 
     QXmppTransferJob::Direction direction() const;
@@ -133,6 +136,7 @@ private:
     // for socks5 bytestreams
     QXmppSocksClient *m_socksClient;
     QXmppSocksServer *m_socksServer;
+    QXmppByteStreamIq::StreamHost m_socksProxy;
 
     friend class QXmppTransferManager;
 };
@@ -144,6 +148,8 @@ class QXmppTransferManager : public QObject
 public:
     QXmppTransferManager(QXmppClient* client);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName);
+    QString proxy() const;
+    void setProxy(const QString &proxy);
     int supportedMethods() const;
     void setSupportedMethods(int methods);
 
@@ -158,6 +164,8 @@ private slots:
     void iqReceived(const QXmppIq&);
     void socksClientDataReceived();
     void socksClientDisconnected();
+    void socksProxyDataSent();
+    void socksProxyDisconnected();
     void socksServerDataSent();
     void socksServerDisconnected();
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
@@ -174,12 +182,14 @@ private:
     void streamInitiationResultReceived(const QXmppStreamInitiationIq&);
     void streamInitiationSetReceived(const QXmppStreamInitiationIq&);
     void socksServerSendData(QXmppTransferJob *job);
+    void socksServerSendOffer(QXmppTransferJob *job);
 
     // reference to client object (no ownership)
     QXmppClient* m_client;
     QList<QXmppTransferJob*> m_jobs;
     int m_ibbBlockSize;
     int m_supportedMethods;
+    QString m_proxy;
 };
 
 #endif
