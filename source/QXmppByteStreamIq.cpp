@@ -57,6 +57,16 @@ void QXmppByteStreamIq::StreamHost::setPort(quint16 port)
     m_port = port;
 }
 
+QString QXmppByteStreamIq::StreamHost::zeroconf() const
+{
+    return m_zeroconf;
+}
+
+void  QXmppByteStreamIq::StreamHost::setZeroconf(const QString &zeroconf)
+{
+    m_zeroconf = zeroconf;
+}
+
 QXmppByteStreamIq::Mode QXmppByteStreamIq::mode() const
 {
     return m_mode;
@@ -75,6 +85,16 @@ QString QXmppByteStreamIq::sid() const
 void QXmppByteStreamIq::setSid(const QString &sid)
 {
     m_sid = sid;
+}
+
+QString QXmppByteStreamIq::activate() const
+{
+    return m_activate;
+}
+
+void QXmppByteStreamIq::setActivate(const QString &activate)
+{
+    m_activate = activate;
 }
 
 QList<QXmppByteStreamIq::StreamHost> QXmppByteStreamIq::streamHosts() const
@@ -126,10 +146,12 @@ void QXmppByteStreamIq::parse(QDomElement &element)
         streamHost.setHost(QHostAddress(hostElement.attribute("host")));
         streamHost.setJid(hostElement.attribute("jid"));
         streamHost.setPort(hostElement.attribute("port").toInt());
+        streamHost.setZeroconf(hostElement.attribute("zeroconf"));
         m_streamHosts.append(streamHost);
 
         hostElement = hostElement.nextSiblingElement("streamhost");
     }
+    m_activate = queryElement.firstChildElement("activate").text();
     m_streamHostUsed = queryElement.firstChildElement("streamhost-used").attribute("jid");
 }
 
@@ -150,8 +172,11 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "host", streamHost.host().toString());
         helperToXmlAddAttribute(writer, "jid", streamHost.jid());
         helperToXmlAddAttribute(writer, "port", QString::number(streamHost.port()));
+        helperToXmlAddAttribute(writer, "zeroconf", streamHost.zeroconf());
         writer->writeEndElement();
     }
+    if (!m_activate.isEmpty())
+        helperToXmlAddTextElement(writer, "activate", m_activate);
     if (!m_streamHostUsed.isEmpty())
     {
         writer->writeStartElement("streamhost-used");

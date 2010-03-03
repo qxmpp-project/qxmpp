@@ -52,10 +52,14 @@ public:
         quint16 port() const;
         void setPort(quint16 port);
 
+        QString zeroconf() const;
+        void setZeroconf(const QString &zeroconf);
+
     private:
         QHostAddress m_host;
         QString m_jid;
         quint16 m_port;
+        QString m_zeroconf;
     };
 
     QXmppByteStreamIq::Mode mode() const;
@@ -63,6 +67,9 @@ public:
 
     QString sid() const;
     void setSid(const QString &sid);
+
+    QString activate() const;
+    void setActivate(const QString &activate);
 
     QList<QXmppByteStreamIq::StreamHost> streamHosts() const;
     void setStreamHosts(const QList<QXmppByteStreamIq::StreamHost> &streamHosts);
@@ -77,6 +84,8 @@ public:
 private:
     Mode m_mode;
     QString m_sid;
+
+    QString m_activate;
     QList<StreamHost> m_streamHosts;
     QString m_streamHostUsed;
 };
