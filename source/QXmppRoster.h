@@ -82,11 +82,11 @@ public:
             Remove  ///< to delete a roster item
         };
 
-        QString getBareJid() const;
-        QString getName() const;
-        QXmppRosterEntry::SubscriptionType getSubscriptionType() const;
-        QString getSubscriptionStatus() const;
-        QSet<QString> getGroups() const;
+        QString bareJid() const;
+        QString name() const;
+        QXmppRosterEntry::SubscriptionType subscriptionType() const;
+        QString subscriptionStatus() const;
+        QSet<QString> groups() const;
 
         void setBareJid(const QString&);
         void setName(const QString&);
@@ -94,6 +94,13 @@ public:
         void setSubscriptionStatus(const QString&);
         void setGroups(const QSet<QString>&);
         void addGroupEntry(const QString&);
+
+// deprecated accessors, use the form without "get" instead
+        QString Q_DECL_DEPRECATED getBareJid() const;
+        QString Q_DECL_DEPRECATED getName() const;
+        QXmppRosterEntry::SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
+        QString Q_DECL_DEPRECATED getSubscriptionStatus() const;
+        QSet<QString> Q_DECL_DEPRECATED getGroups() const;
 
     private:
         QString m_bareJid;

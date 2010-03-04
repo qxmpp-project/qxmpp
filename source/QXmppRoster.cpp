@@ -135,7 +135,7 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
 /// \return bareJid as a QString
 ///
 
-QString QXmppRoster::QXmppRosterEntry::getBareJid() const
+QString QXmppRoster::QXmppRosterEntry::bareJid() const
 {
     return m_bareJid;
 }
@@ -145,7 +145,7 @@ QString QXmppRoster::QXmppRosterEntry::getBareJid() const
 /// \return name as a QString
 ///
 
-QString QXmppRoster::QXmppRosterEntry::getName() const
+QString QXmppRoster::QXmppRosterEntry::name() const
 {
     return m_name;
 }
@@ -156,7 +156,7 @@ QString QXmppRoster::QXmppRosterEntry::getName() const
 ///
 
 QXmppRoster::QXmppRosterEntry::SubscriptionType
-        QXmppRoster::QXmppRosterEntry::getSubscriptionType() const
+        QXmppRoster::QXmppRosterEntry::subscriptionType() const
 {
     return m_type;
 }
@@ -169,7 +169,7 @@ QXmppRoster::QXmppRosterEntry::SubscriptionType
 ///
 ///
 
-QString QXmppRoster::QXmppRosterEntry::getSubscriptionStatus() const
+QString QXmppRoster::QXmppRosterEntry::subscriptionStatus() const
 {
     return m_subscriptionStatus;
 }
@@ -179,7 +179,7 @@ QString QXmppRoster::QXmppRosterEntry::getSubscriptionStatus() const
 /// \return QSet<QString> list of all the groups
 ///
 
-QSet<QString> QXmppRoster::QXmppRosterEntry::getGroups() const
+QSet<QString> QXmppRoster::QXmppRosterEntry::groups() const
 {
     return m_groups;
 }
@@ -367,4 +367,30 @@ QMap<QString, QMap<QString, QXmppPresence> > QXmppRoster::getAllPresences() cons
 bool QXmppRoster::isRosterReceived()
 {
     return m_isRosterReceived;
+}
+
+QString QXmppRoster::QXmppRosterEntry::getBareJid() const
+{
+    return m_bareJid;
+}
+
+QString QXmppRoster::QXmppRosterEntry::getName() const
+{
+    return m_name;
+}
+
+QXmppRoster::QXmppRosterEntry::SubscriptionType
+        QXmppRoster::QXmppRosterEntry::getSubscriptionType() const
+{
+    return m_type;
+}
+
+QString QXmppRoster::QXmppRosterEntry::getSubscriptionStatus() const
+{
+    return m_subscriptionStatus;
+}
+
+QSet<QString> QXmppRoster::QXmppRosterEntry::getGroups() const
+{
+    return m_groups;
 }
