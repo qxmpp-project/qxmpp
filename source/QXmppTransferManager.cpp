@@ -393,7 +393,7 @@ void QXmppTransferManager::ibbCloseIqReceived(const QXmppIbbCloseIq &iq)
     response.setTo(iq.getFrom());
     response.setId(iq.getId());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.getSid());
+    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -420,7 +420,7 @@ void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
     response.setTo(iq.getFrom());
     response.setId(iq.getId());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.getSid());
+    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -433,7 +433,7 @@ void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
         return;
     }
 
-    if (iq.getSequence() != job->m_ibbSequence)
+    if (iq.sequence() != job->m_ibbSequence)
     {
         // the packet is out of sequence
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::UnexpectedRequest);
@@ -444,7 +444,7 @@ void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
     }
 
     // write data
-    job->writeData(iq.getPayload());
+    job->writeData(iq.payload());
     job->m_ibbSequence++;
 
     // acknowledge the packet
@@ -458,7 +458,7 @@ void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
     response.setTo(iq.getFrom());
     response.setId(iq.getId());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.getSid());
+    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -471,7 +471,7 @@ void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
         return;
     }
 
-    if (iq.getBlockSize() > m_ibbBlockSize)
+    if (iq.blockSize() > m_ibbBlockSize)
     {
         // we prefer a smaller block size
         QXmppStanza::Error error(QXmppStanza::Error::Modify, QXmppStanza::Error::ResourceConstraint);
@@ -481,7 +481,7 @@ void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
         return;
     }
 
-    job->m_blockSize = iq.getBlockSize();
+    job->m_blockSize = iq.blockSize();
     job->setState(QXmppTransferJob::TransferState);
 
     // accept transfer

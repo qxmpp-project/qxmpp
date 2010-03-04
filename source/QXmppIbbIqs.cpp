@@ -35,7 +35,7 @@ bool QXmppIbbOpenIq::isIbbOpenIq( QDomElement &element )
     return openElement.namespaceURI() == ns_ibb;
 }
 
-long QXmppIbbOpenIq::getBlockSize() const
+long QXmppIbbOpenIq::blockSize() const
 {
     return m_block_size;
 }
@@ -45,7 +45,7 @@ void QXmppIbbOpenIq::setBlockSize( long block_size )
     m_block_size = block_size;
 }
 
-QString QXmppIbbOpenIq::getSid() const
+QString QXmppIbbOpenIq::sid() const
 {
    return  m_sid;
 }
@@ -84,7 +84,7 @@ bool QXmppIbbCloseIq::isIbbCloseIq( QDomElement &element )
     return openElement.namespaceURI() == ns_ibb;
 }
 
-QString QXmppIbbCloseIq::getSid() const
+QString QXmppIbbCloseIq::sid() const
 {
    return  m_sid;
 }
@@ -98,7 +98,7 @@ QXmppIbbDataIq::QXmppIbbDataIq() : QXmppIq( QXmppIq::Set ), m_seq(0)
 {
 }
 
-quint16 QXmppIbbDataIq::getSequence() const
+quint16 QXmppIbbDataIq::sequence() const
 {
     return m_seq;
 }
@@ -108,7 +108,7 @@ void QXmppIbbDataIq::setSequence( quint16 seq )
     m_seq = seq;
 }
 
-QString QXmppIbbDataIq::getSid() const
+QString QXmppIbbDataIq::sid() const
 {
     return m_sid;
 }
@@ -118,7 +118,7 @@ void QXmppIbbDataIq::setSid( const QString &sid )
     m_sid = sid;
 }
 
-QByteArray QXmppIbbDataIq::getPayload() const
+QByteArray QXmppIbbDataIq::payload() const
 {
     return m_payload;
 }
