@@ -39,7 +39,7 @@ public:
     QXmppPacket();
     virtual ~QXmppPacket();
     
-    QByteArray getXmlReceived() const;
+    QByteArray xmlReceived() const;
     virtual void toXml( QXmlStreamWriter *writer ) const = 0;
 
 private:

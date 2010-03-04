@@ -34,7 +34,7 @@ QXmppPacket::~QXmppPacket()
 
 }
 
-QByteArray QXmppPacket::getXmlReceived() const
+QByteArray QXmppPacket::xmlReceived() const
 {
     return m_xmlReceived;
 }
