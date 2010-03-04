@@ -25,34 +25,6 @@ private:
     QString m_sid;
 };
 
-class QXmppIbbAckIq: public QXmppIq
-{
-public:
-    QXmppIbbAckIq();
-    void parse( QDomElement &element );
-    static bool isIbbAckIq( QDomElement &element );
-};
-
-class QXmppIbbErrorIq: public QXmppIq
-{
-public:
-    enum Type { Unknown, Cancel, NoSupport, Modify, NotFound };
-    QXmppIbbErrorIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isIbbErrorIq( QDomElement &element );
-
-    Type getErrorType() const;
-    void setErrorType( Type err );
-
-    QString getErrorString() const;
-    void setErrorString( const QString &err );
-
-private:
-    Type m_type;
-    QString m_errorString;
-};
-
 class QXmppIbbCloseIq: public QXmppIq
 {
 public:
