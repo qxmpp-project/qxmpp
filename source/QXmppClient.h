@@ -62,6 +62,7 @@ class QXmppRemoteMethodResult;
 class QXmppArchiveManager;
 class QXmppDiscoveryIq;
 class QXmppTransferManager;
+class QXmppVersionIq;
 
 class QXmppClient : public QObject
 {
@@ -169,6 +170,9 @@ signals:
 
     /// Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
+
+    /// Notifies that an XMPP version iq stanza is received.
+    void versionIqReceived(const QXmppVersionIq&);
 
 public:
     QAbstractSocket::SocketError getSocketError();
