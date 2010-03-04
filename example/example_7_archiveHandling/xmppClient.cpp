@@ -62,15 +62,15 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     std::cout << "example_7_archiveHandling:: LIST RECEIVED" << std::endl;
     foreach (const QXmppArchiveChat &chat, chats)
-        getArchiveManager().retrieveCollection(chat.with, chat.start);
+        getArchiveManager().retrieveCollection(chat.with(), chat.start());
 }
 
 void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     std::cout << "example_7_archiveHandling:: CHAT RECEIVED" << std::endl;
-    foreach (const QXmppArchiveMessage &msg, chat.messages)
+    foreach (const QXmppArchiveMessage &msg, chat.messages())
     {
-        std::cout << "example_7_archiveHandling::" << msg.body.toStdString() << std::endl;
+        std::cout << "example_7_archiveHandling::" << msg.body().toStdString() << std::endl;
     }
 }
 

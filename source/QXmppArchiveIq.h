@@ -34,20 +34,38 @@ class QDomElement;
 class QXmppArchiveMessage
 {
 public:
-    QDateTime datetime;
-    bool local;
-    QString body;
+    QString body() const;
+    void setBody(const QString &body);
+
+    QDateTime date() const;
+    void setDate(const QDateTime &date);
+
+    bool isReceived() const;
+    void setReceived(bool isReceived);
+
+private:
+    QString m_body;
+    QDateTime m_date;
+    bool m_received;
 };
 
 class QXmppArchiveChat
 {
 public:
-    QString with;
-    QDateTime start;
+    QList<QXmppArchiveMessage> messages() const;
+    QDateTime start() const;
+    QString subject() const;
+    int version() const;
+    QString with() const;
 
-    QString subject;
-    QList<QXmppArchiveMessage> messages;
-    int version;
+    void parse(const QDomElement &element);
+
+private:
+    QList<QXmppArchiveMessage> m_messages;
+    QDateTime m_start;
+    QString m_subject;
+    int m_version;
+    QString m_with;
 };
 
 class QXmppArchiveChatIq : public QXmppIq
@@ -66,9 +84,6 @@ class QXmppArchiveListIq : public QXmppIq
 {
 public:
     QXmppArchiveListIq();
-    static bool isArchiveListIq(const QDomElement &element);
-    void parse(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
     QList<QXmppArchiveChat> chats() const;
 
@@ -84,6 +99,10 @@ public:
     QDateTime end() const;
     void setEnd(const QDateTime &end );
 
+    static bool isArchiveListIq(const QDomElement &element);
+    void parse(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
 private:
     int m_max;
     QString m_with;
@@ -96,7 +115,6 @@ class QXmppArchiveRetrieveIq : public QXmppIq
 {
 public:
     QXmppArchiveRetrieveIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
     int max() const;
     void setMax(int max);
@@ -106,6 +124,8 @@ public:
 
     QString with() const;
     void setWith( const QString &with );
+
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     int m_max;

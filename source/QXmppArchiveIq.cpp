@@ -29,6 +29,83 @@
 
 static const char *ns_archive = "urn:xmpp:archive";
 
+QString QXmppArchiveMessage::body() const
+{
+    return m_body;
+}
+
+void QXmppArchiveMessage::setBody(const QString &body)
+{
+    m_body = body;
+}
+
+QDateTime QXmppArchiveMessage::date() const
+{
+    return m_date;
+}
+
+void QXmppArchiveMessage::setDate(const QDateTime &date)
+{
+    m_date = date;
+}
+
+bool QXmppArchiveMessage::isReceived() const
+{
+    return m_received;
+}
+
+void QXmppArchiveMessage::setReceived(bool isReceived)
+{
+    m_received = isReceived;
+}
+
+void QXmppArchiveChat::parse(const QDomElement &element)
+{
+    m_start = datetimeFromString(element.attribute("start"));
+    m_subject = element.attribute("subject");
+    m_version = element.attribute("version").toInt();
+    m_with = element.attribute("with");
+
+    QDomElement child = element.firstChildElement();
+    while (!child.isNull())
+    {
+        if ((child.tagName() == "from") || (child.tagName() == "to"))
+        {
+            QXmppArchiveMessage message;
+            message.setBody(child.firstChildElement("body").text());
+            message.setDate(m_start.addSecs(child.attribute("secs").toInt()));
+            message.setReceived(child.tagName() == "from");
+            m_messages << message;
+        }
+        child = child.nextSiblingElement();
+    }
+}
+
+QList<QXmppArchiveMessage> QXmppArchiveChat::messages() const
+{
+    return m_messages;
+}
+
+QDateTime QXmppArchiveChat::start() const
+{
+    return m_start;
+}
+
+QString QXmppArchiveChat::subject() const
+{
+    return m_subject;
+}
+
+int QXmppArchiveChat::version() const
+{
+    return m_version;
+}
+
+QString QXmppArchiveChat::with() const
+{
+    return m_with;
+}
+
 QXmppArchiveChat QXmppArchiveChatIq::chat() const
 {
     return m_chat;
@@ -45,25 +122,7 @@ void QXmppArchiveChatIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    QDomElement chatElement = element.firstChildElement("chat");
-    m_chat.subject = chatElement.attribute("subject");
-    m_chat.start = datetimeFromString(chatElement.attribute("start"));
-    m_chat.version = chatElement.attribute("version").toInt();
-    m_chat.with = chatElement.attribute("with");
-
-    QDomElement child = chatElement.firstChildElement();
-    while (!child.isNull())
-    {
-        if ((child.tagName() == "from") || (child.tagName() == "to"))
-        {
-            QXmppArchiveMessage message;
-            message.datetime = m_chat.start.addSecs(child.attribute("secs").toInt());
-            message.body = child.firstChildElement("body").text();
-            message.local = (child.tagName() == "to");
-            m_chat.messages << message;
-        }
-        child = child.nextSiblingElement();
-    }
+    m_chat.parse(element.firstChildElement("chat"));
 }
 
 QXmppArchiveListIq::QXmppArchiveListIq()
@@ -135,8 +194,7 @@ void QXmppArchiveListIq::parse(const QDomElement &element)
         if (child.tagName() == "chat")
         {
             QXmppArchiveChat chat;
-            chat.with = child.attribute("with");
-            chat.start = datetimeFromString(child.attribute("start"));
+            chat.parse(child);
             m_chats << chat;
         }
         child = child.nextSiblingElement();
