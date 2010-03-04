@@ -39,22 +39,6 @@ void QXmppRpcErrorIq::parse(const QDomElement &element)
     QXmppStanza::parse(element);
 
     setTypeFromStr(element.attribute("type"));
-
-    QDomElement errorElement = element.firstChildElement("error");
-    QXmppStanza::Error error;
-    error.setTypeFromStr( errorElement.attribute("type"));
-
-    QDomElement conditionElement = errorElement.firstChildElement();
-    while(!conditionElement.isNull())
-    {
-        if(conditionElement.namespaceURI() == ns_stanza)
-        {
-           error.setConditionFromStr( conditionElement.tagName() );
-        }
-        conditionElement = conditionElement.nextSiblingElement();
-    }
-
-    setError( error );
 }
 
 QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )

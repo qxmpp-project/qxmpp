@@ -34,8 +34,8 @@ void QXmppRemoteMethod::gotError( const QXmppRpcErrorIq &iq )
     if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = true;
-        m_result.errorMessage = iq.error().getText();
-        m_result.code = iq.error().getType();
+        m_result.errorMessage = iq.error().text();
+        m_result.code = iq.error().type();
         emit callDone();
     }
 }

@@ -98,7 +98,7 @@ QXmppStanza::Error::Type QXmppStanza::Error::getType() const
 
 QString QXmppStanza::Error::getTypeStr() const
 {
-    switch(getType())
+    switch(m_type)
     {
     case Cancel:
         return "cancel";
@@ -117,7 +117,7 @@ QString QXmppStanza::Error::getTypeStr() const
 
 QString QXmppStanza::Error::getConditionStr() const
 {
-    switch(getCondition())
+    switch(m_condition)
     {
     case BadRequest:
         return "bad-request";
@@ -234,6 +234,34 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
         setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
 }
 
+bool QXmppStanza::Error::isValid()
+{
+    return !(getTypeStr().isEmpty() && getConditionStr().isEmpty());
+}
+
+void QXmppStanza::Error::parse(const QDomElement &errorElement)
+{
+    setCode(errorElement.attribute("code").toInt());
+    setTypeFromStr(errorElement.attribute("type"));
+
+    QString text;
+    QString cond;
+    QDomElement element = errorElement.firstChildElement();
+    while(!element.isNull())
+    {
+        if(element.tagName() == "text")
+            text = element.text();
+        else if(element.namespaceURI() == ns_stanza)
+        {
+            cond = element.tagName();
+        }        
+        element = element.nextSiblingElement();
+    }
+
+    setConditionFromStr(cond);
+    setText(text);
+}
+
 void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 {
     QString cond = getConditionStr();
@@ -345,8 +373,7 @@ void QXmppStanza::generateAndSetNextId()
 
 bool QXmppStanza::isErrorStanza()
 {
-    return !(m_error.getTypeStr().isEmpty() && 
-        m_error.getConditionStr().isEmpty());
+    return m_error.isValid();
 }
 
 void QXmppStanza::parse(const QDomElement &element)
@@ -358,36 +385,7 @@ void QXmppStanza::parse(const QDomElement &element)
 
     QDomElement errorElement = element.firstChildElement("error");
     if(!errorElement.isNull())
-        m_error = parseError(errorElement);
-}
-
-QXmppStanza::Error QXmppStanza::parseError(const QDomElement &errorElement)
-{
-    QXmppStanza::Error error;
- 
-    if(errorElement.isNull())
-        return error;
-
-    QString type = errorElement.attribute("type");
-    QString text;
-    QString cond;
-    QDomElement element = errorElement.firstChildElement();
-    while(!element.isNull())
-    {
-        if(element.tagName() == "text")
-            text = element.text();
-        else if(element.namespaceURI() == ns_stanza)
-        {
-            cond = element.tagName();
-        }        
-        element = element.nextSiblingElement();
-    }
-
-    error.setCode(errorElement.attribute("code").toInt());
-    error.setConditionFromStr(cond);
-    error.setTypeFromStr(type);
-    error.setText(text);
-    return error;
+        m_error.parse(errorElement);
 }
 
 // deprecated

@@ -80,21 +80,37 @@ public:
         Error(Type type, Condition cond, const QString& text="");
         Error(const QString& type, const QString& cond, const QString& text="");
 
+        int code() const;
         void setCode(int code);
+
+        QString text() const;
         void setText(const QString& text);
+
+        Condition condition() const;
         void setCondition(Condition cond);
-        void setConditionFromStr(const QString& cond);
+
         void setType(Type type);
-        void setTypeFromStr(const QString& type);
-        int getCode() const;
-        QString getText() const;
-        Condition getCondition() const;
-        Type getType() const;
-        void toXml( QXmlStreamWriter *writer ) const;
-        QString getConditionStr() const;
-        QString getTypeStr() const;
+        Type type() const;
+
+        // FIXME : remove this once is gone
+        bool isValid();
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+
+        // deprecated accessors, use the form without "get" instead
+        int Q_DECL_DEPRECATED getCode() const;
+        QString Q_DECL_DEPRECATED getText() const;
+        Condition Q_DECL_DEPRECATED getCondition() const;
+        Type Q_DECL_DEPRECATED getType() const;
 
     private:
+        QString getConditionStr() const;
+        void setConditionFromStr(const QString& cond);
+
+        QString getTypeStr() const;
+        void setTypeFromStr(const QString& type);
+
         int m_code;
         Type m_type;
         Condition m_condition;
@@ -135,7 +151,6 @@ public:
 protected:
     void generateAndSetNextId();
     void parse(const QDomElement &element);
-    static QXmppStanza::Error parseError(const QDomElement&);
 
 private:
     static uint s_uniqeIdNo;
