@@ -136,7 +136,6 @@ private:
 
     // for socks5 bytestreams
     QXmppSocksClient *m_socksClient;
-    QXmppSocksServer *m_socksServer;
     QTcpSocket *m_socksSocket;
     QXmppByteStreamIq::StreamHost m_socksProxy;
 
@@ -189,6 +188,7 @@ private:
     QXmppClient* m_client;
     QList<QXmppTransferJob*> m_jobs;
     int m_ibbBlockSize;
+    QXmppSocksServer *m_socksServer;
     int m_supportedMethods;
     QString m_proxy;
 };

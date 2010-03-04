@@ -58,7 +58,6 @@ QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Directi
     m_fileSize(0),
     m_ibbSequence(0),
     m_socksClient(0),
-    m_socksServer(0),
     m_socksSocket(0)
 {
 }
@@ -173,8 +172,6 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
     // close sockets
     if (m_socksClient)
         m_socksClient->close();
-    if (m_socksServer)
-        m_socksServer->close();
     if (m_socksSocket)
         m_socksSocket->close();
 
@@ -197,8 +194,18 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
 QXmppTransferManager::QXmppTransferManager(QXmppClient *client)
     : m_client(client),
     m_ibbBlockSize(4096),
+    m_socksServer(0),
     m_supportedMethods(QXmppTransferJob::AnyMethod)
 {
+    // start SOCKS server
+    m_socksServer = new QXmppSocksServer(this);
+    if (m_socksServer->listen())
+    {
+        connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
+            this, SLOT(socksServerConnected(QTcpSocket*, const QString&, quint16)));
+    } else {
+        qWarning() << "QXmppSocksServer could not start listening";
+    }
 }
 
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
@@ -730,21 +737,16 @@ void QXmppTransferManager::socksClientDisconnected()
 
 void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
-    QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
+    const QString ownJid = m_client->getConfiguration().jid();
     foreach (QXmppTransferJob *job, m_jobs)
     {
-        if (job->m_socksServer == socksServer)
+        if (hostName == streamHash(job->m_sid, ownJid, job->jid()) && port == 0)
         {
-            const QString ownJid = m_client->getConfiguration().jid();
-            if (hostName == streamHash(job->m_sid, ownJid, job->jid()) || port == 0)
-            {
-                job->m_socksSocket = socket;
-                return;
-            }
-            // don't accept any further connections
-            job->m_socksServer->close();
+            job->m_socksSocket = socket;
+            return;
         }
     }
+    qWarning("QXmppSocksServer got a connection for a unknown stream");
     socket->close();
 }
 
@@ -805,7 +807,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 
             QXmppByteStreamIq::StreamHost streamHost;
             streamHost.setHost(entry.ip());
-            streamHost.setPort(job->m_socksServer->serverPort());
+            streamHost.setPort(m_socksServer->serverPort());
             streamHost.setJid(ownJid);
             streamHosts.append(streamHost);
         }
@@ -879,16 +881,12 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->m_requestId = openIq.id();
         m_client->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
-        // start listening
-        job->m_socksServer = new QXmppSocksServer(this);
-        if (!job->m_socksServer->listen())
+        if (!m_socksServer->isListening())
         {
-            qWarning() << "QXmppSocksServer could not start listening";
+            qWarning() << "QXmppSocksServer is not listening";
             job->terminate(QXmppTransferJob::ProtocolError);
             return;
         }
-        qDebug() << "QXmppSocksServer listening on port" << job->m_socksServer->serverPort();
-
         if (!m_proxy.isEmpty())
         {
             job->m_socksProxy.setJid(m_proxy);

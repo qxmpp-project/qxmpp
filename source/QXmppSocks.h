@@ -70,6 +70,7 @@ class QXmppSocksServer : public QObject
 public:
     QXmppSocksServer(QObject *parent=0);
     void close();
+    bool isListening() const;
     bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
 
     QHostAddress serverAddress() const;

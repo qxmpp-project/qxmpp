@@ -265,6 +265,11 @@ bool QXmppSocksServer::listen(const QHostAddress &address, quint16 port)
     return m_server->listen(address, port);
 }
 
+bool QXmppSocksServer::isListening() const
+{
+    return m_server->isListening();
+}
+
 QHostAddress QXmppSocksServer::serverAddress() const
 {
     return m_server->serverAddress();
