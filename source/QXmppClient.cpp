@@ -504,3 +504,20 @@ QXmppTransferManager& QXmppClient::getTransferManager()
 {
     return m_stream->getTransferManager();
 }
+
+/// Reimplement in your subclass of QXmppClient if you want to handle
+/// raw XML elements yourself.
+///
+/// WARNING: you can seriously disrupt packet handling when doing this,
+/// so use with care and at your own risk.
+/// 
+/// Return true if you handled the element yourself, or false if
+/// you want to use the default handling for the element.
+///
+/// If you handle the element yourself, QXmpp will do absolutely no
+/// processing itself, so do not expect the usual signals to trigger.
+
+bool QXmppClient::handleStreamElement(const QDomElement &element)
+{
+    return false;
+}

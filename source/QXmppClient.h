@@ -194,6 +194,8 @@ public:
 
     QXmppClient::StreamError getXmppStreamError();
 
+    virtual bool handleStreamElement(const QDomElement &element);
+
 public slots:
     void sendPacket(const QXmppPacket&);
     void sendMessage(const QString& bareJid, const QString& message);

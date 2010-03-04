@@ -292,7 +292,11 @@ void QXmppStream::parser(const QByteArray& data)
 
             QString ns = nodeRecv.namespaceURI();
             log("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
-            if(ns == ns_stream && nodeRecv.tagName() == "features")
+            if(m_client->handleStreamElement(nodeRecv))
+            {
+                // already handled by client, do nothing
+            }
+            else if(ns == ns_stream && nodeRecv.tagName() == "features")
             {
                 bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
                                          namespaceURI() == ns_authFeature;
