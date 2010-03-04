@@ -37,7 +37,7 @@
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
-#include "QXmppIbbIqs.h"
+#include "QXmppIbbIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppArchiveIq.h"
 #include "QXmppByteStreamIq.h"

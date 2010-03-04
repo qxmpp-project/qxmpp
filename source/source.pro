@@ -23,8 +23,13 @@ HEADERS += QXmppUtils.h \
     QXmppConstants.h \
     QXmppDiscoveryIq.h \
     QXmppElement.h \
+    QXmppIbbIq.h \
+    QXmppInformationRequestResult.h \
+    QXmppInvokable.h \
     QXmppIq.h \
+    QXmppLogger.h \
     QXmppMessage.h \
+    QXmppNonSASLAuth.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
@@ -36,17 +41,12 @@ HEADERS += QXmppUtils.h \
     QXmppStream.h \
     QXmppStreamInitiationIq.h \
     QXmppTransferManager.h \
-    QXmppLogger.h \
     QXmppReconnectionManager.h \
+    QXmppRemoteMethod.h \
+    QXmppRpcIq.h \
     QXmppVCardManager.h \
     QXmppVCard.h \
-    QXmppNonSASLAuth.h \
-    QXmppInformationRequestResult.h \
-    QXmppIbbIqs.h \
-    xmlrpc.h \
-    QXmppInvokable.h \
-    QXmppRpcIq.h \
-    QXmppRemoteMethod.h
+    xmlrpc.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -59,8 +59,13 @@ SOURCES += QXmppUtils.cpp \
     QXmppConstants.cpp \
     QXmppDiscoveryIq.cpp \
     QXmppElement.cpp \
+    QXmppIbbIq.cpp \
+    QXmppInformationRequestResult.cpp \
+    QXmppInvokable.cpp \
     QXmppIq.cpp \
+    QXmppLogger.cpp \
     QXmppMessage.cpp \
+    QXmppNonSASLAuth.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
@@ -72,14 +77,9 @@ SOURCES += QXmppUtils.cpp \
     QXmppStream.cpp \
     QXmppStreamInitiationIq.cpp \
     QXmppTransferManager.cpp \
-    QXmppLogger.cpp \
     QXmppReconnectionManager.cpp \
+    QXmppRemoteMethod.cpp \
+    QXmppRpcIq.cpp \
     QXmppVCardManager.cpp \
     QXmppVCard.cpp \
-    QXmppNonSASLAuth.cpp \
-    QXmppInformationRequestResult.cpp \
-    QXmppIbbIqs.cpp \
-    xmlrpc.cpp \
-    QXmppInvokable.cpp \
-    QXmppRpcIq.cpp \
-    QXmppRemoteMethod.cpp
+    xmlrpc.cpp

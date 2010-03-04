@@ -1,5 +1,5 @@
-#ifndef QXMPPIBBIQS_H
-#define QXMPPIBBIQS_H
+#ifndef QXMPPIBBIQ_H
+#define QXMPPIBBIQ_H
 
 #include "QXmppIq.h"
 
