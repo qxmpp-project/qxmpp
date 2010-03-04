@@ -23,10 +23,9 @@
 
 #include <QDomElement>
 
+#include "QXmppConstants.h"
 #include "QXmppUtils.h"
 #include "QXmppVersionIq.h"
-
-static const char *ns_version = "jabber:iq:version";
 
 QString QXmppVersionIq::name() const
 {

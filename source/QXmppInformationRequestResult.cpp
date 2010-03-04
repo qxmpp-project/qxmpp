@@ -47,5 +47,10 @@ void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writ
     writer->writeAttribute("var", ns_bytestreams);
     writer->writeEndElement();
 
+    // XEP-0092: Software Version
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_version);
+    writer->writeEndElement();
+
     writer->writeEndElement();
 }

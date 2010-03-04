@@ -51,3 +51,6 @@ const char *ns_stream_initiation = "http://jabber.org/protocol/si";
 const char *ns_stream_initiation_file_transfer = "http://jabber.org/protocol/si/profile/file-transfer";
 const char *ns_feature_negotiation = "http://jabber.org/protocol/feature-neg";
 const char *ns_bytestreams = "http://jabber.org/protocol/bytestreams";
+// XEP-0092: Software Version
+const char *ns_version = "jabber:iq:version";
+
