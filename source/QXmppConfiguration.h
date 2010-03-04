@@ -112,23 +112,23 @@ public:
 
 // deprecated accessors, use the form without "get" instead
 // obsolete start
-    QString getHost() const;
-    QString getDomain() const;
-    int getPort() const;
-    QString getUser() const;
-    QString getPasswd() const;
-    QString getResource() const;
-    QString getJid() const;
-    QString getJidBare() const;
+    QString Q_DECL_DEPRECATED getHost() const;
+    QString Q_DECL_DEPRECATED getDomain() const;
+    int Q_DECL_DEPRECATED getPort() const;
+    QString Q_DECL_DEPRECATED getUser() const;
+    QString Q_DECL_DEPRECATED getPasswd() const;
+    QString Q_DECL_DEPRECATED getResource() const;
+    QString Q_DECL_DEPRECATED getJid() const;
+    QString Q_DECL_DEPRECATED getJidBare() const;
 
-    bool getAutoAcceptSubscriptions() const;
-    bool getAutoReconnectionEnabled() const;
-    bool getUseSASLAuthentication() const;
-    bool getIgnoreSslErrors() const;
-    QXmppConfiguration::StreamSecurityMode getStreamSecurityMode() const;
-    QXmppConfiguration::NonSASLAuthMechanism getNonSASLAuthMechanism() const;
-    QXmppConfiguration::SASLAuthMechanism getSASLAuthMechanism() const;
-    QNetworkProxy getNetworkProxy() const;
+    bool Q_DECL_DEPRECATED getAutoAcceptSubscriptions() const;
+    bool Q_DECL_DEPRECATED getAutoReconnectionEnabled() const;
+    bool Q_DECL_DEPRECATED getUseSASLAuthentication() const;
+    bool Q_DECL_DEPRECATED getIgnoreSslErrors() const;
+    QXmppConfiguration::StreamSecurityMode Q_DECL_DEPRECATED getStreamSecurityMode() const;
+    QXmppConfiguration::NonSASLAuthMechanism Q_DECL_DEPRECATED getNonSASLAuthMechanism() const;
+    QXmppConfiguration::SASLAuthMechanism Q_DECL_DEPRECATED getSASLAuthMechanism() const;
+    QNetworkProxy Q_DECL_DEPRECATED getNetworkProxy() const;
 // obsolete end
 
 private:
