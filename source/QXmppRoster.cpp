@@ -68,18 +68,18 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
     case QXmppIq::Set:
     case QXmppIq::Result:
         {
-            QList<QXmppRosterIq::Item> items = rosterIq.getItems();
+            QList<QXmppRosterIq::Item> items = rosterIq.items();
             for(int i = 0; i < items.count(); ++i)
             {
-                QString bareJid = items.at(i).getBareJid();
+                QString bareJid = items.at(i).bareJid();
                 m_entries[bareJid].setBareJid(bareJid);
-                m_entries[bareJid].setName(items.at(i).getName());
+                m_entries[bareJid].setName(items.at(i).name());
                 m_entries[bareJid].setSubscriptionType(
                     static_cast<QXmppRosterEntry::SubscriptionType>(
-                            items.at(i).getSubscriptionType()));
+                            items.at(i).subscriptionType()));
                 m_entries[bareJid].setSubscriptionStatus(
-                        items.at(i).getSubscriptionStatus());
-                m_entries[bareJid].setGroups(items.at(i).getGroups());
+                        items.at(i).subscriptionStatus());
+                m_entries[bareJid].setGroups(items.at(i).groups());
                 emit rosterChanged(bareJid);
             }
             if(rosterIq.type() == QXmppIq::Set) // send result iq
@@ -102,18 +102,18 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
     case QXmppIq::Set:
     case QXmppIq::Result:
         {
-            QList<QXmppRosterIq::Item> items = rosterIq.getItems();
+            QList<QXmppRosterIq::Item> items = rosterIq.items();
             for(int i = 0; i < items.count(); ++i)
             {
-                QString bareJid = items.at(i).getBareJid();
+                QString bareJid = items.at(i).bareJid();
                 m_entries[bareJid].setBareJid(bareJid);
-                m_entries[bareJid].setName(items.at(i).getName());
+                m_entries[bareJid].setName(items.at(i).name());
                 m_entries[bareJid].setSubscriptionType(
                     static_cast<QXmppRosterEntry::SubscriptionType>(
-                            items.at(i).getSubscriptionType()));
+                            items.at(i).subscriptionType()));
                 m_entries[bareJid].setSubscriptionStatus(
-                        items.at(i).getSubscriptionStatus());
-                m_entries[bareJid].setGroups(items.at(i).getGroups());
+                        items.at(i).subscriptionStatus());
+                m_entries[bareJid].setGroups(items.at(i).groups());
             }
             if(rosterIq.type() == QXmppIq::Set) // send result iq
             {
