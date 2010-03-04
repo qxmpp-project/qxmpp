@@ -112,18 +112,24 @@ public:
     QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
 
     QString to() const;
-    QString from() const;
-    QString id() const;
-    QString lang() const;
-    QXmppStanza::Error error() const;
-    QXmppElementList extensions() const;
+    void setTo(const QString&);
 
-    void setTo(const QString&);  
+    QString from() const;
     void setFrom(const QString&);
+
+    QString id() const;
     void setId(const QString&);
+
+    QString lang() const;
     void setLang(const QString&);
+
+    QXmppStanza::Error error() const;
     void setError(QXmppStanza::Error& error);
+
+    QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);
+
+    // FIXME : why is this needed?
     bool isErrorStanza();
 
     // FIXME : make this method protected
