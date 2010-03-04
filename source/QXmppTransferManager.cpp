@@ -58,7 +58,8 @@ QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Directi
     m_fileSize(0),
     m_ibbSequence(0),
     m_socksClient(0),
-    m_socksServer(0)
+    m_socksServer(0),
+    m_socksSocket(0)
 {
 }
 
@@ -174,6 +175,8 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
         m_socksClient->close();
     if (m_socksServer)
         m_socksServer->close();
+    if (m_socksSocket)
+        m_socksSocket->close();
 
     // emit signals later
     QTimer::singleShot(0, this, SLOT(slotTerminated()));
@@ -256,7 +259,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 
         // connect to proxy
         const QString hostName = streamHash(job->m_sid,
-                                            m_client->getConfiguration().jid(),
+                                            m_client->getConfiguration().getJid(),
                                             job->m_jid);
 
         job->m_socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -271,7 +274,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         // activate stream
         QXmppByteStreamIq streamIq;
         streamIq.setType(QXmppIq::Set);
-        streamIq.setFrom(m_client->getConfiguration().jid());
+        streamIq.setFrom(m_client->getConfiguration().getJid());
         streamIq.setTo(streamHost.jid());
         streamIq.setSid(job->m_sid);
         streamIq.setActivate(job->m_jid);
@@ -281,9 +284,15 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
     }
 
     // direction connection, start sending data
+    if (!job->m_socksSocket)
+    {
+        qWarning("Client says they connected to our SOCKS server, but they did not");
+        job->terminate(QXmppTransferJob::ProtocolError);
+        return;
+    }
     job->setState(QXmppTransferJob::TransferState);
-    connect(job->m_socksServer, SIGNAL(bytesWritten(qint64)), this, SLOT(socksServerDataSent()));
-    connect(job->m_socksServer, SIGNAL(disconnected()), this, SLOT(socksServerDisconnected()));
+    connect(job->m_socksSocket, SIGNAL(bytesWritten(qint64)), this, SLOT(socksSocketDataSent()));
+    connect(job->m_socksSocket, SIGNAL(disconnected()), this, SLOT(socksSocketDisconnected()));
     socksServerSendData(job);
 }
 
@@ -319,7 +328,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 
         const QString hostName = streamHash(job->m_sid,
                                             job->m_jid,
-                                            m_client->getConfiguration().jid());
+                                            m_client->getConfiguration().getJid());
 
         // try to connect to stream host
         job->m_socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -379,10 +388,10 @@ QXmppTransferJob* QXmppTransferManager::getJobBySocksClient(QXmppSocksClient *so
     return 0;
 }
 
-QXmppTransferJob* QXmppTransferManager::getJobBySocksServer(QXmppSocksServer *socksServer)
+QXmppTransferJob* QXmppTransferManager::getJobBySocksSocket(QTcpSocket *socksSocket)
 {
     foreach (QXmppTransferJob *job, m_jobs)
-        if (job->m_socksServer == socksServer)
+        if (job->m_socksSocket == socksSocket)
             return job;
     return 0;
 }
@@ -557,8 +566,9 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
                 {
                     // proxy stream activated, start sending data
                     job->setState(QXmppTransferJob::TransferState);
-                    connect(job->m_socksClient, SIGNAL(bytesWritten(qint64)), this, SLOT(socksProxyDataSent()));
-                    connect(job->m_socksClient, SIGNAL(disconnected()), this, SLOT(socksProxyDisconnected()));
+                    job->m_socksSocket = job->m_socksClient->socket();
+                    connect(job->m_socksSocket, SIGNAL(bytesWritten(qint64)), this, SLOT(socksSocketDataSent()));
+                    connect(job->m_socksSocket, SIGNAL(disconnected()), this, SLOT(socksSocketDisconnected()));
                     socksServerSendData(job);
                 } else if (iq.type() == QXmppIq::Error) {
                     // proxy stream not activated, terminate
@@ -718,10 +728,30 @@ void QXmppTransferManager::socksClientDisconnected()
     job->checkData();
 }
 
-void QXmppTransferManager::socksProxyDataSent()
+void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
-    QXmppSocksClient *socksClient = qobject_cast<QXmppSocksClient*>(sender());
-    QXmppTransferJob *job = getJobBySocksClient(socksClient);
+    QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
+    foreach (QXmppTransferJob *job, m_jobs)
+    {
+        if (job->m_socksServer == socksServer)
+        {
+            const QString ownJid = m_client->getConfiguration().getJid();
+            if (hostName == streamHash(job->m_sid, ownJid, job->jid()) || port == 0)
+            {
+                job->m_socksSocket = socket;
+                return;
+            }
+            // don't accept any further connections
+            job->m_socksServer->close();
+        }
+    }
+    socket->close();
+}
+
+void QXmppTransferManager::socksSocketDataSent()
+{
+    QTcpSocket *socksSocket = qobject_cast<QTcpSocket*>(sender());
+    QXmppTransferJob *job = getJobBySocksSocket(socksSocket);
     if (!job || job->state() != QXmppTransferJob::TransferState)
         return;
 
@@ -729,32 +759,10 @@ void QXmppTransferManager::socksProxyDataSent()
     socksServerSendData(job);
 }
 
-void QXmppTransferManager::socksProxyDisconnected()
+void QXmppTransferManager::socksSocketDisconnected()
 {
-    QXmppSocksClient *socksClient = qobject_cast<QXmppSocksClient*>(sender());
-    QXmppTransferJob *job = getJobBySocksClient(socksClient);
-    if (!job || job->state() == QXmppTransferJob::FinishedState)
-        return;
-
-    // terminate transfer
-    job->terminate(QXmppTransferJob::ProtocolError);
-}
-
-void QXmppTransferManager::socksServerDataSent()
-{
-    QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
-    QXmppTransferJob *job = getJobBySocksServer(socksServer);
-    if (!job || job->state() != QXmppTransferJob::TransferState)
-        return;
-
-    // send next data block
-    socksServerSendData(job);
-}
-
-void QXmppTransferManager::socksServerDisconnected()
-{
-    QXmppSocksServer *socksServer = qobject_cast<QXmppSocksServer*>(sender());
-    QXmppTransferJob *job = getJobBySocksServer(socksServer);
+    QTcpSocket *socksSocket = qobject_cast<QTcpSocket*>(sender());
+    QXmppTransferJob *job = getJobBySocksSocket(socksSocket);
     if (!job || job->state() == QXmppTransferJob::FinishedState)
         return;
 
@@ -767,11 +775,7 @@ void QXmppTransferManager::socksServerSendData(QXmppTransferJob *job)
     const QByteArray buffer = job->m_iodevice->read(job->m_blockSize);
     if (buffer.size())
     {
-        if (job->m_socksClient)
-            job->m_socksClient->write(buffer);
-        else
-            job->m_socksServer->write(buffer);
-
+        job->m_socksSocket->write(buffer);
         job->m_done += buffer.size();
         job->progress(job->m_done, job->fileSize());
     } else {
@@ -782,7 +786,7 @@ void QXmppTransferManager::socksServerSendData(QXmppTransferJob *job)
 
 void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 {
-    const QString ownJid = m_client->getConfiguration().jid();
+    const QString ownJid = m_client->getConfiguration().getJid();
 
     // discover local IPs
     QList<QXmppByteStreamIq::StreamHost> streamHosts;
@@ -875,12 +879,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->m_requestId = openIq.id();
         m_client->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
-        const QString ownJid = m_client->getConfiguration().jid();
-
         // start listening
         job->m_socksServer = new QXmppSocksServer(this);
-        job->m_socksServer->setHostName(streamHash(job->m_sid, ownJid, job->jid()));
-        job->m_socksServer->setHostPort(0);
         if (!job->m_socksServer->listen())
         {
             qWarning() << "QXmppSocksServer could not start listening";

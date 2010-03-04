@@ -215,7 +215,6 @@ void QXmppSocksClient::slotReadyRead()
         // FIXME : what do we do with the resulting name / port?
 
         // from now on, forward signals
-        connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SIGNAL(bytesWritten(qint64)));
         disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
         connect(m_socket, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
 
@@ -244,11 +243,13 @@ qint64 QXmppSocksClient::write(const QByteArray &data)
     return m_socket->write(data);
 }
 
+QTcpSocket *QXmppSocksClient::socket()
+{
+    return m_socket;
+}
+
 QXmppSocksServer::QXmppSocksServer(QObject *parent)
-    : QObject(parent),
-    m_hostPort(0),
-    m_socket(0),
-    m_step(ConnectState)
+    : QObject(parent)
 {
     m_server = new QTcpServer(this);
     connect(m_server, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
@@ -257,18 +258,11 @@ QXmppSocksServer::QXmppSocksServer(QObject *parent)
 void QXmppSocksServer::close()
 {
     m_server->close();
-    if (m_socket)
-        m_socket->close();
 }
 
 bool QXmppSocksServer::listen(const QHostAddress &address, quint16 port)
 {
     return m_server->listen(address, port);
-}
-
-QByteArray QXmppSocksServer::readAll()
-{
-    return m_socket->readAll();
 }
 
 QHostAddress QXmppSocksServer::serverAddress() const
@@ -283,30 +277,33 @@ quint16 QXmppSocksServer::serverPort() const
 
 void QXmppSocksServer::slotNewConnection()
 {
-    m_socket = m_server->nextPendingConnection();
-    if (!m_socket)
+    QTcpSocket *socket = m_server->nextPendingConnection();
+    if (!socket)
         return;
 
-    // don't accept any further connections
-    m_server->close();
-    connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    // register socket
+    m_states.insert(socket, ConnectState);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 }
 
 void QXmppSocksServer::slotReadyRead()
 {
-    if (m_step == ConnectState)
+    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket || !m_states.contains(socket))
+        return;
+
+    if (m_states.value(socket) == ConnectState)
     {
-        m_step++;
+        m_states.insert(socket, CommandState);
 
         // receive connect to server request
-        QByteArray buffer = m_socket->readAll();
+        QByteArray buffer = socket->readAll();
         if (buffer.size() < 3 ||
             buffer.at(0) != SocksVersion ||
             buffer.at(1) + 2 != buffer.size())
         {
             qWarning("QXmppSocksServer received invalid handshake");
-            m_socket->close();
+            socket->close();
             return;
         }
 
@@ -323,7 +320,7 @@ void QXmppSocksServer::slotReadyRead()
         if (!foundMethod)
         {
             qWarning("QXmppSocksServer received bad authentication method");
-            m_socket->close();
+            socket->close();
             return;
         }
 
@@ -331,20 +328,23 @@ void QXmppSocksServer::slotReadyRead()
         buffer.resize(2);
         buffer[0] = SocksVersion;
         buffer[1] = NoAuthentication;
-        m_socket->write(buffer);
+        socket->write(buffer);
 
-    } else if (m_step == CommandState) {
-        m_step++;
+    } else if (m_states.value(socket) == CommandState) {
+        m_states.insert(socket, ReadyState);
+
+        // disconnect from signals
+        disconnect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 
         // receive command
-        QByteArray buffer = m_socket->readAll();
+        QByteArray buffer = socket->readAll();
         if (buffer.size() < 4 ||
             buffer.at(0) != SocksVersion ||
             buffer.at(1) != ConnectCommand ||
             buffer.at(2) != 0x00)
         {
             qWarning("QXmppSocksServer received an invalid command");
-            m_socket->close();
+            socket->close();
             return;
         }
 
@@ -355,15 +355,12 @@ void QXmppSocksServer::slotReadyRead()
         if (!parseHostAndPort(buffer.mid(3), hostType, hostName, hostPort))
         {
             qWarning("QXmppSocksServer could not parse type/host/port");
-            m_socket->close();
+            socket->close();
             return;
         }
-        if (hostName != m_hostName || hostPort != m_hostPort)
-        {
-            qWarning("QXmppSocksServer got wrong host or port");
-            m_socket->close();
-            return;
-        }
+
+        // notify of connection
+        emit newConnection(socket, hostName, hostPort);
 
         // send response
         buffer.resize(3);
@@ -372,35 +369,9 @@ void QXmppSocksServer::slotReadyRead()
         buffer[2] = 0x00;
         buffer.append(encodeHostAndPort(
             DomainName,
-            m_hostName.toAscii(),
-            m_hostPort));
-        m_socket->write(buffer);
-
-        // from now on, forward signals
-        connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SIGNAL(bytesWritten(qint64)));
-        disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-        connect(m_socket, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
-
-        // notify of connection
-        emit connected();
+            hostName,
+            hostPort));
+        socket->write(buffer);
     }
-}
-
-void QXmppSocksServer::setHostName(const QString &hostName)
-{
-    m_hostName = hostName;
-}
-
-void QXmppSocksServer::setHostPort(quint16 hostPort)
-{
-    m_hostPort = hostPort;
-}
-
-qint64 QXmppSocksServer::write(const QByteArray &data)
-{
-    if (m_socket)
-        return m_socket->write(data);
-    else
-        return -1;
 }
 

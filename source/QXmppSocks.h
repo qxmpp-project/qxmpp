@@ -43,8 +43,9 @@ public:
     bool waitForConnected(int msecs = 30000);
     qint64 write(const QByteArray &data);
 
+    QTcpSocket *socket();
+
 signals:
-    void bytesWritten(qint64);
     void connected();
     void disconnected();
     void readyRead();
@@ -70,30 +71,20 @@ public:
     QXmppSocksServer(QObject *parent=0);
     void close();
     bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
-    QByteArray readAll();
-    qint64 write(const QByteArray &data);
 
     QHostAddress serverAddress() const;
     quint16 serverPort() const;
-    void setHostName(const QString &hostName);
-    void setHostPort(quint16 hostPort);
 
 signals:
-    void bytesWritten(qint64);
-    void connected();
-    void disconnected();
-    void readyRead();
+    void newConnection(QTcpSocket *socket, QString hostName, quint16 port);
 
 private slots:
     void slotNewConnection();
     void slotReadyRead();
 
 private:
-    QString m_hostName;
-    quint16 m_hostPort;
     QTcpServer *m_server;
-    QTcpSocket *m_socket;
-    int m_step;
+    QMap<QTcpSocket*, int> m_states;
 };
 
 #endif

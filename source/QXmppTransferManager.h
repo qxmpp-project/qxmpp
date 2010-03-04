@@ -31,6 +31,7 @@
 #include "QXmppIq.h"
 #include "QXmppByteStreamIq.h"
 
+class QTcpSocket;
 class QXmppByteStreamIq;
 class QXmppClient;
 class QXmppIbbCloseIq;
@@ -136,6 +137,7 @@ private:
     // for socks5 bytestreams
     QXmppSocksClient *m_socksClient;
     QXmppSocksServer *m_socksServer;
+    QTcpSocket *m_socksSocket;
     QXmppByteStreamIq::StreamHost m_socksProxy;
 
     friend class QXmppTransferManager;
@@ -164,17 +166,16 @@ private slots:
     void iqReceived(const QXmppIq&);
     void socksClientDataReceived();
     void socksClientDisconnected();
-    void socksProxyDataSent();
-    void socksProxyDisconnected();
-    void socksServerDataSent();
-    void socksServerDisconnected();
+    void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
+    void socksSocketDataSent();
+    void socksSocketDisconnected();
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
 private:
     QXmppTransferJob *getJobByRequestId(const QString &jid, const QString &id);
     QXmppTransferJob *getJobBySid(const QString &jid, const QString &sid);
     QXmppTransferJob *getJobBySocksClient(QXmppSocksClient *socksClient);
-    QXmppTransferJob *getJobBySocksServer(QXmppSocksServer *socksServer);
+    QXmppTransferJob *getJobBySocksSocket(QTcpSocket *socksSocket);
     void byteStreamResponseReceived(const QXmppIq&);
     void byteStreamResultReceived(const QXmppByteStreamIq&);
     void byteStreamSetReceived(const QXmppByteStreamIq&);
