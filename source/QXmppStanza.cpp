@@ -274,32 +274,6 @@ m_to(to), m_from(from)
 
 QXmppStanza::~QXmppStanza()
 {
-
-}
-
-QString QXmppStanza::getTo() const
-{
-    return m_to;
-}
-
-QString QXmppStanza::getFrom() const
-{
-    return m_from;
-}
-
-QString QXmppStanza::getId() const    
-{
-    return m_id;
-}
-
-QString QXmppStanza::getLang() const    
-{
-    return m_lang;
-}
-
-QXmppStanza::Error QXmppStanza::getError() const
-{
-    return m_error;
 }
 
 QString QXmppStanza::to() const
@@ -307,24 +281,14 @@ QString QXmppStanza::to() const
     return m_to;
 }
 
-QString QXmppStanza::from() const
-{
-    return m_from;
-}
-
-QString QXmppStanza::id() const    
-{
-    return m_id;
-}
-
-QString QXmppStanza::lang() const    
-{
-    return m_lang;
-}
-
 void QXmppStanza::setTo(const QString& to)  
 {
     m_to = to;
+}
+
+QString QXmppStanza::from() const
+{
+    return m_from;
 }
 
 void QXmppStanza::setFrom(const QString& from)
@@ -332,21 +296,24 @@ void QXmppStanza::setFrom(const QString& from)
     m_from = from;
 }
 
+QString QXmppStanza::id() const    
+{
+    return m_id;
+}
+
 void QXmppStanza::setId(const QString& id)    
 {
     m_id = id;
 }
 
+QString QXmppStanza::lang() const    
+{
+    return m_lang;
+}
+
 void QXmppStanza::setLang(const QString& lang)    
 {
     m_lang = lang;
-}
-
-void QXmppStanza::generateAndSetNextId()
-{
-    // get back
-    ++s_uniqeIdNo;
-    m_id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
 QXmppStanza::Error QXmppStanza::error() const
@@ -367,6 +334,13 @@ QXmppElementList QXmppStanza::extensions() const
 void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 {
     m_extensions = extensions;
+}
+
+void QXmppStanza::generateAndSetNextId()
+{
+    // get back
+    ++s_uniqeIdNo;
+    m_id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
 bool QXmppStanza::isErrorStanza()
@@ -402,5 +376,32 @@ QXmppStanza::Error QXmppStanza::parseError(const QDomElement &errorElement)
     error.setTypeFromStr(type);
     error.setText(text);
     return error;
+}
+
+// deprecated
+
+QString QXmppStanza::getTo() const
+{
+    return m_to;
+}
+
+QString QXmppStanza::getFrom() const
+{
+    return m_from;
+}
+
+QString QXmppStanza::getId() const    
+{
+    return m_id;
+}
+
+QString QXmppStanza::getLang() const    
+{
+    return m_lang;
+}
+
+QXmppStanza::Error QXmppStanza::getError() const
+{
+    return m_error;
 }
 

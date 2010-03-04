@@ -104,13 +104,6 @@ public:
     QXmppStanza(const QString& from = "", const QString& to = "");
     ~QXmppStanza();
     
-    // deprecated accessors, use the form without "get" instead
-    QString Q_DECL_DEPRECATED getTo() const;  
-    QString Q_DECL_DEPRECATED getFrom() const;
-    QString Q_DECL_DEPRECATED getId() const;    
-    QString Q_DECL_DEPRECATED getLang() const;    
-    QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
-
     QString to() const;
     void setTo(const QString&);
 
@@ -134,6 +127,13 @@ public:
 
     // FIXME : make this method protected
     static QXmppStanza::Error parseError(const QDomElement&);
+
+    // deprecated accessors, use the form without "get" instead
+    QString Q_DECL_DEPRECATED getTo() const;  
+    QString Q_DECL_DEPRECATED getFrom() const;
+    QString Q_DECL_DEPRECATED getId() const;    
+    QString Q_DECL_DEPRECATED getLang() const;    
+    QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
 
 protected:
     void generateAndSetNextId();
