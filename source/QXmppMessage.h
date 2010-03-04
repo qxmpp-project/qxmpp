@@ -56,17 +56,17 @@ public:
     ~QXmppMessage();
     
     QXmppMessage::Type getType() const;
-    QString getTypeStr() const;
     void setType(QXmppMessage::Type);
-    void setTypeFromStr(const QString&);
 
     QXmppMessage::State getState() const;
     void setState(QXmppMessage::State);
 
     QString getBody() const;
     void setBody(const QString&);
+
     QString getSubject() const;
     void setSubject(const QString&);
+
     QString getThread() const;
     void setThread(const QString&);
 
@@ -74,6 +74,9 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
 
 private:
+    QString getTypeStr() const;
+    void setTypeFromStr(const QString&);
+
     Type m_type;
     State m_state;
 

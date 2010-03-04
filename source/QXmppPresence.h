@@ -82,7 +82,6 @@ public:
 
     QXmppPresence::Type getType() const;
     void setType(QXmppPresence::Type);
-    void setTypeFromStr(const QString&);
 
     QXmppPresence::Status& getStatus();
     const QXmppPresence::Status& getStatus() const;
@@ -92,11 +91,11 @@ public:
     void toXml( QXmlStreamWriter *writer ) const;
 
 private:
+    QString getTypeStr() const;
+    void setTypeFromStr(const QString&);
+
     Type m_type;
     QXmppPresence::Status m_status;
-
-    QString getTypeStr() const;
-    QByteArray getExtensionsXML() const;
 };
 
 #endif // QXMPPPRESENCE_H
