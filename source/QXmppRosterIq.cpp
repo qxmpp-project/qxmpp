@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -48,7 +48,7 @@ void QXmppRosterIq::addItem(const Item& item)
     m_items.append(item);
 }
 
-QList<QXmppRosterIq::Item> QXmppRosterIq::getItems() const
+QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 {
     return m_items;
 }
@@ -64,27 +64,27 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 }
 
 QXmppRosterIq::Item::SubscriptionType
-        QXmppRosterIq::Item::getSubscriptionType() const
+        QXmppRosterIq::Item::subscriptionType() const
 {
     return m_type;
 }
 
-QString QXmppRosterIq::Item::getName() const
+QString QXmppRosterIq::Item::name() const
 {
     return m_name;
 }
 
-QString QXmppRosterIq::Item::getSubscriptionStatus() const
+QString QXmppRosterIq::Item::subscriptionStatus() const
 {
     return m_subscriptionStatus;
 }
 
-QString QXmppRosterIq::Item::getBareJid() const
+QString QXmppRosterIq::Item::bareJid() const
 {
     return m_bareJid;
 }
 
-QSet<QString> QXmppRosterIq::Item::getGroups() const
+QSet<QString> QXmppRosterIq::Item::groups() const
 {
     return m_groups;
 }
@@ -171,4 +171,35 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
         ++i;
     }
     writer->writeEndElement();
+}
+
+QList<QXmppRosterIq::Item> QXmppRosterIq::getItems() const
+{
+    return m_items;
+}
+
+QXmppRosterIq::Item::SubscriptionType
+        QXmppRosterIq::Item::getSubscriptionType() const
+{
+    return m_type;
+}
+
+QString QXmppRosterIq::Item::getName() const
+{
+    return m_name;
+}
+
+QString QXmppRosterIq::Item::getSubscriptionStatus() const
+{
+    return m_subscriptionStatus;
+}
+
+QString QXmppRosterIq::Item::getBareJid() const
+{
+    return m_bareJid;
+}
+
+QSet<QString> QXmppRosterIq::Item::getGroups() const
+{
+    return m_groups;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -46,11 +46,12 @@ public:
             Remove
         };
 
-        SubscriptionType getSubscriptionType() const;
-        QString getName() const;
-        QString getSubscriptionStatus() const;
-        QString getBareJid() const;
-        QSet<QString> getGroups() const;
+        SubscriptionType subscriptionType() const;
+        QString name() const;
+        QString subscriptionStatus() const;
+        QString bareJid() const;
+        QSet<QString> groups() const;
+
         void setName(const QString&);
         void setSubscriptionStatus(const QString&);
         void addGroup(const QString&);
@@ -60,6 +61,13 @@ public:
         void setSubscriptionTypeFromStr(const QString&);
         void toXml(QXmlStreamWriter *writer) const;
         
+// deprecated accessors, use the form without "get" instead
+        SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
+        QString Q_DECL_DEPRECATED getName() const;
+        QString Q_DECL_DEPRECATED getSubscriptionStatus() const;
+        QString Q_DECL_DEPRECATED getBareJid() const;
+        QSet<QString> Q_DECL_DEPRECATED getGroups() const;
+
     private:
         QString m_bareJid;
         SubscriptionType m_type;
@@ -74,8 +82,11 @@ public:
     ~QXmppRosterIq();
     
     void addItem(const Item&);
-    QList<Item> getItems() const;
+    QList<Item> items() const;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
+// deprecated accessors, use the form without "get" instead
+    QList<Item> Q_DECL_DEPRECATED getItems() const;
 
 private:
     QList<Item> m_items;
