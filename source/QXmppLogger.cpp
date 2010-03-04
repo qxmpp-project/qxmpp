@@ -48,7 +48,7 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
     m_loggingType = log;
 }
 
-QXmppLogger::LoggingType QXmppLogger::getLoggingType()
+QXmppLogger::LoggingType QXmppLogger::loggingType()
 {
     return m_loggingType;
 }
@@ -94,3 +94,9 @@ void QXmppLogger::log(const QByteArray& str)
         break;
     }
 }
+
+QXmppLogger::LoggingType QXmppLogger::getLoggingType()
+{
+    return m_loggingType;
+}
+
