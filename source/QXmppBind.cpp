@@ -66,8 +66,8 @@ void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("bind");
     helperToXmlAddAttribute(writer, "xmlns", ns_bind);
-    helperToXmlAddTextElement(writer, "jid", getJid() );
-    helperToXmlAddTextElement(writer, "resource", getResource());
+    helperToXmlAddTextElement(writer, "jid", jid() );
+    helperToXmlAddTextElement(writer, "resource", resource());
     writer->writeEndElement();
 }
 
