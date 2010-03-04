@@ -46,7 +46,7 @@ QXmppIq::~QXmppIq()
 
 }
 
-QXmppIq::Type QXmppIq::getType() const
+QXmppIq::Type QXmppIq::type() const
 {
     return m_type;
 }
@@ -97,7 +97,7 @@ void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 
 QString QXmppIq::getTypeStr() const
 {
-    switch(getType())
+    switch(m_type)
     {
     case QXmppIq::Error:
         return "error";
@@ -108,7 +108,7 @@ QString QXmppIq::getTypeStr() const
     case QXmppIq::Result:
         return "result";
     default:
-        qWarning("QXmppIq::getTypeStr() invalid type %d", (int)getType());
+        qWarning("QXmppIq::getTypeStr() invalid type %d", (int)m_type);
         return "";
     }
 }
@@ -142,5 +142,12 @@ void QXmppIq::setTypeFromStr(const QString& str)
                  qPrintable(str));
         return;
     }
+}
+
+// deprecated
+
+QXmppIq::Type QXmppIq::getType() const
+{
+    return m_type;
 }
 

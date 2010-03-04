@@ -63,7 +63,7 @@ void QXmppRoster::presenceReceived(const QXmppPresence& presence)
 
 void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
 {
-    switch(rosterIq.getType())
+    switch(rosterIq.type())
     {
     case QXmppIq::Set:
     case QXmppIq::Result:
@@ -82,7 +82,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
                 m_entries[bareJid].setGroups(items.at(i).getGroups());
                 emit rosterChanged(bareJid);
             }
-            if(rosterIq.getType() == QXmppIq::Set) // send result iq
+            if(rosterIq.type() == QXmppIq::Set) // send result iq
             {
                 QXmppIq returnIq(QXmppIq::Result);
                 returnIq.setId(rosterIq.id());
@@ -97,7 +97,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
 
 void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
 {
-    switch(rosterIq.getType())
+    switch(rosterIq.type())
     {
     case QXmppIq::Set:
     case QXmppIq::Result:
@@ -115,7 +115,7 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
                         items.at(i).getSubscriptionStatus());
                 m_entries[bareJid].setGroups(items.at(i).getGroups());
             }
-            if(rosterIq.getType() == QXmppIq::Set) // send result iq
+            if(rosterIq.type() == QXmppIq::Set) // send result iq
             {
                 QXmppIq returnIq(QXmppIq::Result);
                 returnIq.setId(rosterIq.id());

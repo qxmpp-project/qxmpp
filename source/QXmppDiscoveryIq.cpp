@@ -27,7 +27,7 @@
 
 #include <QDomElement>
 
-QXmppElementList QXmppDiscoveryIq::getQueryItems() const
+QXmppElementList QXmppDiscoveryIq::queryItems() const
 {
     return m_queryItems;
 }
@@ -37,7 +37,7 @@ void QXmppDiscoveryIq::setQueryItems(const QXmppElementList &items)
     m_queryItems = items;
 }
 
-enum QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::getQueryType() const
+enum QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::queryType() const
 {
     return m_queryType;
 }

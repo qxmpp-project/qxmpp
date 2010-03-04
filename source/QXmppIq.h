@@ -48,14 +48,19 @@ public:
     QXmppIq(const QString& type);
     ~QXmppIq();
 
-    QXmppIq::Type getType() const;
-    QString getTypeStr() const;
+    QXmppIq::Type type() const;
     void setType(QXmppIq::Type);
-    void setTypeFromStr(const QString& str);
 
     void parse( QDomElement &element );
     void toXml( QXmlStreamWriter *writer ) const;
     virtual void toXmlElementFromChild( QXmlStreamWriter *writer ) const;
+
+    // deprecated accessors, use the form without "get" instead
+    QXmppIq::Type Q_DECL_DEPRECATED getType() const;
+
+protected:
+    QString getTypeStr() const;
+    void setTypeFromStr(const QString& str);
 
 private:
     Type m_type;

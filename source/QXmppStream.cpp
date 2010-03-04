@@ -1040,7 +1040,7 @@ void QXmppStream::sendEndStream()
 
 void QXmppStream::processBindIq(const QXmppBind& bind)
 {
-    switch(bind.getType())
+    switch(bind.type())
     {
     case QXmppIq::Result:
         if(!bind.getResource().isEmpty())
@@ -1060,7 +1060,7 @@ void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
     else
         emit rosterIqReceived(rosterIq);
 
-    switch(rosterIq.getType())
+    switch(rosterIq.type())
     {
     case QXmppIq::Set:
         // when contact subscribes user...user sends 'subscribed' presence 

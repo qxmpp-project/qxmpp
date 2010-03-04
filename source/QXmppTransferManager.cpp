@@ -205,7 +205,7 @@ void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
     {
         if (job->m_socksProxy.jid() == iq.from() && job->m_requestId == iq.id())
         {
-            if (iq.getType() == QXmppIq::Result && iq.streamHosts().size() > 0)
+            if (iq.type() == QXmppIq::Result && iq.streamHosts().size() > 0)
             {
                 job->m_socksProxy = iq.streamHosts().first();
                 socksServerSendOffer(job);
@@ -214,9 +214,9 @@ void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
         }
     }
 
-    if (iq.getType() == QXmppIq::Result)
+    if (iq.type() == QXmppIq::Result)
         byteStreamResultReceived(iq);
-    else if (iq.getType() == QXmppIq::Set)
+    else if (iq.type() == QXmppIq::Set)
         byteStreamSetReceived(iq);
 }
 
@@ -231,7 +231,7 @@ void QXmppTransferManager::byteStreamResponseReceived(const QXmppIq &iq)
         job->state() != QXmppTransferJob::StartState)
         return;
 
-    if (iq.getType() == QXmppIq::Error)
+    if (iq.type() == QXmppIq::Error)
         job->terminate(QXmppTransferJob::ProtocolError);
 }
 
@@ -502,7 +502,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
     if (!job->m_iodevice->isOpen())
         return;
 
-    if (iq.getType() == QXmppIq::Result)
+    if (iq.type() == QXmppIq::Result)
     {
         const QByteArray buffer = job->m_iodevice->read(job->m_blockSize);
         job->setState(QXmppTransferJob::TransferState);
@@ -530,7 +530,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
             job->terminate(QXmppTransferJob::NoError);
         }
     }
-    else if (iq.getType() == QXmppIq::Error)
+    else if (iq.type() == QXmppIq::Error)
     {
         // close the bytestream
         QXmppIbbCloseIq closeIq;
@@ -553,21 +553,21 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
             if (job->m_socksClient)
             {
                 // proxy connection activation result
-                if (iq.getType() == QXmppIq::Result)
+                if (iq.type() == QXmppIq::Result)
                 {
                     // proxy stream activated, start sending data
                     job->setState(QXmppTransferJob::TransferState);
                     connect(job->m_socksClient, SIGNAL(bytesWritten(qint64)), this, SLOT(socksProxyDataSent()));
                     connect(job->m_socksClient, SIGNAL(disconnected()), this, SLOT(socksProxyDisconnected()));
                     socksServerSendData(job);
-                } else if (iq.getType() == QXmppIq::Error) {
+                } else if (iq.type() == QXmppIq::Error) {
                     // proxy stream not activated, terminate
                     qWarning("Could not activate SOCKS5 proxy bytestream");
                     job->terminate(QXmppTransferJob::ProtocolError);
                 }
             } else {
                 // we could not get host/port from proxy, procede without a proxy
-                if (iq.getType() == QXmppIq::Error)
+                if (iq.type() == QXmppIq::Error)
                     socksServerSendOffer(job);
             }
             return;
@@ -582,7 +582,7 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
         ibbResponseReceived(iq);
     else if (job->method() == QXmppTransferJob::SocksMethod)
         byteStreamResponseReceived(iq);
-    else if (iq.getType() == QXmppIq::Error) {
+    else if (iq.type() == QXmppIq::Error) {
         // remote user cancelled stream initiation
         job->terminate(QXmppTransferJob::ProtocolError);
     }
@@ -829,9 +829,9 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 
 void QXmppTransferManager::streamInitiationIqReceived(const QXmppStreamInitiationIq &iq)
 {
-    if (iq.getType() == QXmppIq::Result)
+    if (iq.type() == QXmppIq::Result)
         streamInitiationResultReceived(iq);
-    else if (iq.getType() == QXmppIq::Set)
+    else if (iq.type() == QXmppIq::Set)
         streamInitiationSetReceived(iq);
 }
 
