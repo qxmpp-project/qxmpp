@@ -40,8 +40,8 @@ echoClient::~echoClient()
 
 void echoClient::messageReceived(const QXmppMessage& message)
 {
-    QString from = message.getFrom();
-    QString msg = message.getBody();
+    QString from = message.from();
+    QString msg = message.body();
 
     sendPacket(QXmppMessage("", from, "Your message: " + msg));
 }
