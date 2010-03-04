@@ -1009,7 +1009,7 @@ QXmppRoster& QXmppStream::getRoster()
 
 void QXmppStream::sendPacket(const QXmppPacket& packet)
 {
-    if(QXmppLogger::getLogger()->getLoggingType() != QXmppLogger::NONE)
+    if(QXmppLogger::getLogger()->loggingType() != QXmppLogger::NONE)
     {
         QByteArray logPacket;
         QXmlStreamWriter xmlStreamLog(&logPacket);
