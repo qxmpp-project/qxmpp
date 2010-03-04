@@ -191,7 +191,7 @@ QString QXmppConfiguration::resource() const
 
 QString QXmppConfiguration::jid() const
 {
-    return getJidBare() + "/" + m_resource;
+    return jidBare() + "/" + m_resource;
 }
 
 /// Returns the bare jabber id (jid), without the resource identifier.
@@ -400,7 +400,7 @@ QString QXmppConfiguration::getResource() const
 
 QString QXmppConfiguration::getJid() const
 {
-    return getJidBare() + "/" + m_resource;
+    return jidBare() + "/" + m_resource;
 }
 
 QString QXmppConfiguration::getJidBare() const
