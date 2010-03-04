@@ -34,10 +34,16 @@ public:
     QXmppBind(const QString& type);
     ~QXmppBind();
     
-    QString getJid() const;
-    QString getResource() const;
+    QString jid() const;
+    QString resource() const;
     void setJid(const QString&);
     void setResource(const QString&);
+
+// deprecated accessors, use the form without "get" instead
+// obsolete start
+    QString Q_DECL_DEPRECATED getJid() const;
+    QString Q_DECL_DEPRECATED getResource() const;
+// obsolete end
 
 private:
     QString m_jid;

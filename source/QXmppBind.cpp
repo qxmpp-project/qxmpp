@@ -42,12 +42,12 @@ QXmppBind::~QXmppBind()
 {
 }
 
-QString QXmppBind::getJid() const
+QString QXmppBind::jid() const
 {
     return m_jid;
 }
 
-QString QXmppBind::getResource() const
+QString QXmppBind::resource() const
 {
     return m_resource;
 }
@@ -71,3 +71,12 @@ void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QString QXmppBind::getJid() const
+{
+    return m_jid;
+}
+
+QString QXmppBind::getResource() const
+{
+    return m_resource;
+}
