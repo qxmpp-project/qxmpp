@@ -56,9 +56,19 @@ QXmppStanza::Error::Error(const QString& type, const QString& cond,
     setConditionFromStr(cond);
 }
 
+QString QXmppStanza::Error::text() const
+{
+    return m_text;
+}
+
 void QXmppStanza::Error::setText(const QString& text)
 {
     m_text = text;
+}
+
+int QXmppStanza::Error::code() const
+{
+    return m_code;
 }
 
 void QXmppStanza::Error::setCode(int code)
@@ -66,34 +76,24 @@ void QXmppStanza::Error::setCode(int code)
     m_code = code;
 }
 
+QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
+{
+    return m_condition;
+}
+
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 {
     m_condition = cond;
 }
 
+QXmppStanza::Error::Type QXmppStanza::Error::type() const
+{
+    return m_type;
+}
+
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 {
     m_type = type;
-}
-
-QString QXmppStanza::Error::getText() const
-{
-    return m_text;
-}
-
-int QXmppStanza::Error::getCode() const
-{
-    return m_code;
-}
-
-QXmppStanza::Error::Condition QXmppStanza::Error::getCondition() const
-{
-    return m_condition;
-}
-
-QXmppStanza::Error::Type QXmppStanza::Error::getType() const
-{
-    return m_type;
 }
 
 QString QXmppStanza::Error::getTypeStr() const
@@ -389,6 +389,26 @@ void QXmppStanza::parse(const QDomElement &element)
 }
 
 // deprecated
+
+QString QXmppStanza::Error::getText() const
+{
+    return m_text;
+}
+
+int QXmppStanza::Error::getCode() const
+{
+    return m_code;
+}
+
+QXmppStanza::Error::Condition QXmppStanza::Error::getCondition() const
+{
+    return m_condition;
+}
+
+QXmppStanza::Error::Type QXmppStanza::Error::getType() const
+{
+    return m_type;
+}
 
 QString QXmppStanza::getTo() const
 {
