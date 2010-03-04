@@ -256,7 +256,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 
         // connect to proxy
         const QString hostName = streamHash(job->m_sid,
-                                            m_client->getConfiguration().getJid(),
+                                            m_client->getConfiguration().jid(),
                                             job->m_jid);
 
         job->m_socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -271,7 +271,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         // activate stream
         QXmppByteStreamIq streamIq;
         streamIq.setType(QXmppIq::Set);
-        streamIq.setFrom(m_client->getConfiguration().getJid());
+        streamIq.setFrom(m_client->getConfiguration().jid());
         streamIq.setTo(streamHost.jid());
         streamIq.setSid(job->m_sid);
         streamIq.setActivate(job->m_jid);
@@ -319,7 +319,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 
         const QString hostName = streamHash(job->m_sid,
                                             job->m_jid,
-                                            m_client->getConfiguration().getJid());
+                                            m_client->getConfiguration().jid());
 
         // try to connect to stream host
         job->m_socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -782,7 +782,7 @@ void QXmppTransferManager::socksServerSendData(QXmppTransferJob *job)
 
 void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 {
-    const QString ownJid = m_client->getConfiguration().getJid();
+    const QString ownJid = m_client->getConfiguration().jid();
 
     // discover local IPs
     QList<QXmppByteStreamIq::StreamHost> streamHosts;
@@ -875,7 +875,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->m_requestId = openIq.id();
         m_client->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
-        const QString ownJid = m_client->getConfiguration().getJid();
+        const QString ownJid = m_client->getConfiguration().jid();
 
         // start listening
         job->m_socksServer = new QXmppSocksServer(this);
