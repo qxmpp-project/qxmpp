@@ -128,7 +128,7 @@ void QXmppConfiguration::setResource(const QString& resource)
 /// \return host name
 ///
 
-QString QXmppConfiguration::getHost() const
+QString QXmppConfiguration::host() const
 {
     return m_host;
 }
@@ -138,7 +138,7 @@ QString QXmppConfiguration::getHost() const
 /// \return domain name
 ///
 
-QString QXmppConfiguration::getDomain() const
+QString QXmppConfiguration::domain() const
 {
     return m_domain;
 }
@@ -148,7 +148,7 @@ QString QXmppConfiguration::getDomain() const
 /// \return port number
 ///
 
-int QXmppConfiguration::getPort() const
+int QXmppConfiguration::port() const
 {
     return m_port;
 }
@@ -158,7 +158,7 @@ int QXmppConfiguration::getPort() const
 /// \return username
 ///
 
-QString QXmppConfiguration::getUser() const
+QString QXmppConfiguration::user() const
 {
     return m_user;
 }
@@ -168,7 +168,7 @@ QString QXmppConfiguration::getUser() const
 /// \return password
 ///
 
-QString QXmppConfiguration::getPasswd() const
+QString QXmppConfiguration::passwd() const
 {
     return m_passwd;
 }
@@ -178,7 +178,7 @@ QString QXmppConfiguration::getPasswd() const
 /// \return resource identifier
 ///
 
-QString QXmppConfiguration::getResource() const
+QString QXmppConfiguration::resource() const
 {
     return m_resource;
 }
@@ -189,7 +189,7 @@ QString QXmppConfiguration::getResource() const
 /// (e.g. "qxmpp.test1@gmail.com/resource" or qxmpptest@jabber.org/QXmpp156)
 ///
 
-QString QXmppConfiguration::getJid() const
+QString QXmppConfiguration::jid() const
 {
     return getJidBare() + "/" + m_resource;
 }
@@ -200,7 +200,7 @@ QString QXmppConfiguration::getJid() const
 /// (e.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org)
 ///
 
-QString QXmppConfiguration::getJidBare() const
+QString QXmppConfiguration::jidBare() const
 {
     return m_user+"@"+m_domain;
 }
@@ -211,7 +211,7 @@ QString QXmppConfiguration::getJidBare() const
 /// true means that auto-accept-subscriptions-request is enabled else disabled for false
 ///
 
-bool QXmppConfiguration::getAutoAcceptSubscriptions() const
+bool QXmppConfiguration::autoAcceptSubscriptions() const
 {
     return m_autoAcceptSubscriptions;
 }
@@ -233,7 +233,7 @@ void QXmppConfiguration::setAutoAcceptSubscriptions(bool value)
 /// true means that auto-reconnect is enabled else disabled for false
 ///
 
-bool QXmppConfiguration::getAutoReconnectionEnabled() const
+bool QXmppConfiguration::autoReconnectionEnabled() const
 {
     return m_autoReconnectionEnabled;
 }
@@ -252,7 +252,7 @@ void QXmppConfiguration::setAutoReconnectionEnabled(bool value)
 /// Returns whether SSL errors (such as certificate validation errors)
 /// are to be ignored when connecting to the XMPP server.
 
-bool QXmppConfiguration::getIgnoreSslErrors() const
+bool QXmppConfiguration::ignoreSslErrors() const
 {
     return m_ignoreSslErrors;
 }
@@ -269,7 +269,7 @@ void QXmppConfiguration::setIgnoreSslErrors(bool value)
 /// \return true if SASL was specified else false. If the specified
 /// system is not available QXmpp will resort to the other one.
 
-bool QXmppConfiguration::getUseSASLAuthentication() const
+bool QXmppConfiguration::useSASLAuthentication() const
 {
     return m_useSASLAuthentication;
 }
@@ -288,7 +288,7 @@ void QXmppConfiguration::setUseSASLAuthentication(bool useSASL)
 /// QXmppConfiguration::TLSEnabled.
 /// \return StreamSecurityMode
 
-QXmppConfiguration::StreamSecurityMode QXmppConfiguration::getStreamSecurityMode() const
+QXmppConfiguration::StreamSecurityMode QXmppConfiguration::streamSecurityMode() const
 {
     return m_streamSecurityMode;
 }
@@ -308,7 +308,7 @@ void QXmppConfiguration::setStreamSecurityMode(
 /// \return QXmppConfiguration::NonSASLAuthMechanism
 ///
 
-QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::getNonSASLAuthMechanism() const
+QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::nonSASLAuthMechanism() const
 {
     return m_nonSASLAuthMechanism;
 }
@@ -329,7 +329,7 @@ void QXmppConfiguration::setNonSASLAuthMechanism(
 /// \return QXmppConfiguration::SASLAuthMechanism
 ///
 
-QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::getSASLAuthMechanism() const
+QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::sASLAuthMechanism() const
 {
     return m_SASLAuthMechanism;
 }
@@ -361,6 +361,87 @@ void QXmppConfiguration::setNetworkProxy(const QNetworkProxy& proxy)
 /// determined based on the application proxy set using
 /// QNetworkProxy::setApplicationProxy().
 /// \return QNetworkProxy
+
+QNetworkProxy QXmppConfiguration::networkProxy() const
+{
+    return m_networkProxy;
+}
+
+
+QString QXmppConfiguration::getHost() const
+{
+    return m_host;
+}
+
+QString QXmppConfiguration::getDomain() const
+{
+    return m_domain;
+}
+
+int QXmppConfiguration::getPort() const
+{
+    return m_port;
+}
+
+QString QXmppConfiguration::getUser() const
+{
+    return m_user;
+}
+
+QString QXmppConfiguration::getPasswd() const
+{
+    return m_passwd;
+}
+
+QString QXmppConfiguration::getResource() const
+{
+    return m_resource;
+}
+
+QString QXmppConfiguration::getJid() const
+{
+    return getJidBare() + "/" + m_resource;
+}
+
+QString QXmppConfiguration::getJidBare() const
+{
+    return m_user+"@"+m_domain;
+}
+
+bool QXmppConfiguration::getAutoAcceptSubscriptions() const
+{
+    return m_autoAcceptSubscriptions;
+}
+
+bool QXmppConfiguration::getAutoReconnectionEnabled() const
+{
+    return m_autoReconnectionEnabled;
+}
+
+bool QXmppConfiguration::getUseSASLAuthentication() const
+{
+    return m_useSASLAuthentication;
+}
+
+bool QXmppConfiguration::getIgnoreSslErrors() const
+{
+    return m_ignoreSslErrors;
+}
+
+QXmppConfiguration::StreamSecurityMode QXmppConfiguration::getStreamSecurityMode() const
+{
+    return m_streamSecurityMode;
+}
+
+QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::getNonSASLAuthMechanism() const
+{
+    return m_nonSASLAuthMechanism;
+}
+
+QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::getSASLAuthMechanism() const
+{
+    return m_SASLAuthMechanism;
+}
 
 QNetworkProxy QXmppConfiguration::getNetworkProxy() const
 {
