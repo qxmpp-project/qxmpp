@@ -162,7 +162,7 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer,"jid", m_bareJid);
     helperToXmlAddAttribute(writer,"name", m_name);
     helperToXmlAddAttribute(writer,"subscription", getSubscriptionTypeStr());
-    helperToXmlAddAttribute(writer, "ask", getSubscriptionStatus());
+    helperToXmlAddAttribute(writer, "ask", subscriptionStatus());
 
     QSet<QString>::const_iterator i = m_groups.constBegin();
     while(i != m_groups.constEnd())
