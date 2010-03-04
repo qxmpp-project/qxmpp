@@ -48,14 +48,14 @@ QXmppMessage::~QXmppMessage()
 
 }
 
-QXmppMessage::Type QXmppMessage::getType() const
+QXmppMessage::Type QXmppMessage::type() const
 {
     return m_type;
 }
 
 QString QXmppMessage::getTypeStr() const
 {
-    switch(getType())
+    switch(m_type)
     {
     case QXmppMessage::Error:
         return "error";
@@ -68,7 +68,7 @@ QString QXmppMessage::getTypeStr() const
     case QXmppMessage::Headline:
         return "headline";
     default:
-        qWarning("QXmppMessage::getTypeStr() invalid type %d", (int)getType());
+        qWarning("QXmppMessage::getTypeStr() invalid type %d", (int)m_type);
         return "";
     }
 }
@@ -119,7 +119,7 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     }
 }
 
-QXmppMessage::State QXmppMessage::getState() const
+QXmppMessage::State QXmppMessage::state() const
 {
     return m_state;
 }
@@ -193,7 +193,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 
-QString QXmppMessage::getBody() const
+QString QXmppMessage::body() const
 {
     return m_body;
 }
@@ -203,7 +203,7 @@ void QXmppMessage::setBody(const QString& body)
     m_body = body;
 }
 
-QString QXmppMessage::getSubject() const
+QString QXmppMessage::subject() const
 {
     return m_subject;
 }
@@ -213,7 +213,7 @@ void QXmppMessage::setSubject(const QString& sub)
     m_subject = sub;
 }
 
-QString QXmppMessage::getThread() const
+QString QXmppMessage::thread() const
 {
     return m_thread;
 }
@@ -223,3 +223,29 @@ void QXmppMessage::setThread(const QString& thread)
     m_thread = thread;
 }
 
+// deprecated
+
+QXmppMessage::Type QXmppMessage::getType() const
+{
+    return m_type;
+}
+
+QXmppMessage::State QXmppMessage::getState() const
+{
+    return m_state;
+}
+
+QString QXmppMessage::getBody() const
+{
+    return m_body;
+}
+
+QString QXmppMessage::getSubject() const
+{
+    return m_subject;
+}
+
+QString QXmppMessage::getThread() const
+{
+    return m_thread;
+}

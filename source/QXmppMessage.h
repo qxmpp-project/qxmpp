@@ -55,23 +55,30 @@ public:
                  const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
     
-    QXmppMessage::Type getType() const;
+    QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
-    QXmppMessage::State getState() const;
+    QXmppMessage::State state() const;
     void setState(QXmppMessage::State);
 
-    QString getBody() const;
+    QString body() const;
     void setBody(const QString&);
 
-    QString getSubject() const;
+    QString subject() const;
     void setSubject(const QString&);
 
-    QString getThread() const;
+    QString thread() const;
     void setThread(const QString&);
 
     void parse(QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+
+    // deprecated accessors, use the form without "get" instead
+    QXmppMessage::Type Q_DECL_DEPRECATED getType() const;
+    QXmppMessage::State Q_DECL_DEPRECATED getState() const;
+    QString Q_DECL_DEPRECATED getBody() const;
+    QString Q_DECL_DEPRECATED getSubject() const;
+    QString Q_DECL_DEPRECATED getThread() const;
 
 private:
     QString getTypeStr() const;
