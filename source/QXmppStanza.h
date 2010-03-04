@@ -125,9 +125,6 @@ public:
     // FIXME : why is this needed?
     bool isErrorStanza();
 
-    // FIXME : make this method protected
-    static QXmppStanza::Error parseError(const QDomElement&);
-
     // deprecated accessors, use the form without "get" instead
     QString Q_DECL_DEPRECATED getTo() const;  
     QString Q_DECL_DEPRECATED getFrom() const;
@@ -138,6 +135,7 @@ public:
 protected:
     void generateAndSetNextId();
     void parse(const QDomElement &element);
+    static QXmppStanza::Error parseError(const QDomElement&);
 
 private:
     static uint s_uniqeIdNo;

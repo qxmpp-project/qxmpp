@@ -462,9 +462,6 @@ void QXmppStream::parser(const QByteArray& data)
                         qWarning("QXmppStream: iq type can't be empty");
                     QXmppIq iqPacket;    // to emit
 
-                    QDomElement elemen = nodeRecv.firstChildElement("error");
-                    QXmppStanza::Error error = QXmppStanza::parseError(elemen);
-
                     if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
                     {
                         QXmppRpcInvokeIq rpcIqPacket;
@@ -699,7 +696,6 @@ void QXmppStream::parser(const QByteArray& data)
                         iqPacket.parse(nodeRecv);
                     }
 
-                    iqPacket.setError(error);
                     processIq(iqPacket);
                 }
                 else if(nodeRecv.tagName() == "presence")
