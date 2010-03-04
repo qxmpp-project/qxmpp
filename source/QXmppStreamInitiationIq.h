@@ -39,21 +39,21 @@ public:
         FileTransfer,
     };
 
-    QString getMimeType() const;
+    QString mimeType() const;
     void setMimeType(const QString &mimeType);
 
-    QXmppStreamInitiationIq::Profile getProfile() const;
+    QXmppStreamInitiationIq::Profile profile() const;
     void setProfile(QXmppStreamInitiationIq::Profile profile);
 
-    QString getSiId() const;
+    QString siId() const;
     void setSiId(const QString &id);
 
-    QXmppElementList getSiItems() const;
+    QXmppElementList siItems() const;
     void setSiItems(const QXmppElementList &items);
 
-    void parse(QDomElement &element);
+    static bool isStreamInitiationIq(const QDomElement &element);
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    static bool isStreamInitiationIq(QDomElement &element);
 
 private:
     QString m_mimeType;

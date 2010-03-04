@@ -842,7 +842,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->direction() != QXmppTransferJob::OutgoingDirection)
         return;
 
-    foreach (const QXmppElement &item, iq.getSiItems())
+    foreach (const QXmppElement &item, iq.siItems())
     {
         if (item.tagName() == "feature" && item.attribute("xmlns") == ns_feature_negotiation)
         {
@@ -916,7 +916,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     response.setId(iq.id());
 
     // check we support the profile
-    if (iq.getProfile() != QXmppStreamInitiationIq::FileTransfer)
+    if (iq.profile() != QXmppStreamInitiationIq::FileTransfer)
     {
         // FIXME : we should add:
         // <bad-profile xmlns='http://jabber.org/protocol/si'/>
@@ -932,9 +932,9 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     // check the stream type
     QXmppTransferJob *job = new QXmppTransferJob(iq.from(), QXmppTransferJob::IncomingDirection, this);
     int offeredMethods = QXmppTransferJob::NoMethod;
-    job->m_sid = iq.getSiId();
-    job->m_mimeType = iq.getMimeType();
-    foreach (const QXmppElement &item, iq.getSiItems())
+    job->m_sid = iq.siId();
+    job->m_mimeType = iq.mimeType();
+    foreach (const QXmppElement &item, iq.siItems())
     {
         if (item.tagName() == "feature" && item.attribute("xmlns") == ns_feature_negotiation)
         {
@@ -1028,7 +1028,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     feature.appendChild(x);
 
     response.setType(QXmppIq::Result);
-    response.setProfile(iq.getProfile());
+    response.setProfile(iq.profile());
     response.setSiItems(feature);
 
     m_client->sendPacket(response);

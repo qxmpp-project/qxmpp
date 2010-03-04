@@ -27,7 +27,7 @@
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppUtils.h"
 
-QString QXmppStreamInitiationIq::getMimeType() const
+QString QXmppStreamInitiationIq::mimeType() const
 {
     return m_mimeType;
 }
@@ -37,7 +37,7 @@ void QXmppStreamInitiationIq::setMimeType(const QString &mimeType)
     m_mimeType = mimeType;
 }
 
-QXmppStreamInitiationIq::Profile QXmppStreamInitiationIq::getProfile() const
+QXmppStreamInitiationIq::Profile QXmppStreamInitiationIq::profile() const
 {
     return m_profile;
 }
@@ -47,12 +47,12 @@ void QXmppStreamInitiationIq::setProfile(QXmppStreamInitiationIq::Profile profil
     m_profile = profile;
 }
 
-QXmppElementList QXmppStreamInitiationIq::getSiItems() const
+QXmppElementList QXmppStreamInitiationIq::siItems() const
 {
     return m_siItems;
 }
 
-QString QXmppStreamInitiationIq::getSiId() const
+QString QXmppStreamInitiationIq::siId() const
 {
     return m_siId;
 }
@@ -67,17 +67,16 @@ void QXmppStreamInitiationIq::setSiItems(const QXmppElementList &items)
     m_siItems = items;
 }
 
-bool QXmppStreamInitiationIq::isStreamInitiationIq(QDomElement &element)
+bool QXmppStreamInitiationIq::isStreamInitiationIq(const QDomElement &element)
 {
     QDomElement siElement = element.firstChildElement("si");
     return (siElement.namespaceURI() == ns_stream_initiation);
 }
 
-void QXmppStreamInitiationIq::parse(QDomElement &element)
+void QXmppStreamInitiationIq::parse(const QDomElement &element)
 {
-    setId(element.attribute("id"));
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
 
     QDomElement siElement = element.firstChildElement("si");
