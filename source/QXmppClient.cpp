@@ -115,7 +115,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
 {
     m_config = config;
 
-    if(!m_config.getAutoReconnectionEnabled())
+    if(!m_config.autoReconnectionEnabled())
     {
         delete m_reconnectionManager;
         m_reconnectionManager = 0;
@@ -417,7 +417,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
-                resultIq.setFrom( m_config.getJid());
+                resultIq.setFrom( m_config.jid());
                 resultIq.setPayload(result);
                 m_stream->sendPacket( resultIq );
                 return;
@@ -443,7 +443,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     QXmppRpcErrorIq errorIq;
     errorIq.setId(iq.id());
     errorIq.setTo(iq.from());
-    errorIq.setFrom( m_config.getJid());
+    errorIq.setFrom( m_config.jid());
     errorIq.setQuery( iq );
     errorIq.setError( error );
     m_stream->sendPacket( errorIq );
