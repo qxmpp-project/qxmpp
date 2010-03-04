@@ -24,14 +24,23 @@ QXmppRpcInvokeIq QXmppRpcErrorIq::getQuery() const
     return m_query;
 }
 
-void QXmppRpcErrorIq::parse( QDomElement &element )
+bool QXmppRpcErrorIq::isRpcErrorIq(const QDomElement &element)
 {
+    QString type = element.attribute("type");
     QDomElement errorElement = element.firstChildElement("error");
-    setId( element.attribute("id"));
-    setTo( element.attribute("to"));
-    setFrom( element.attribute("from"));
-    setTypeFromStr( element.attribute("type"));
+    QDomElement queryElement = element.firstChildElement("query");
+    return (type == "error") &&
+            !errorElement.isNull() &&
+            queryElement.namespaceURI() == ns_rpc;
+}
 
+void QXmppRpcErrorIq::parse(const QDomElement &element)
+{
+    QXmppStanza::parse(element);
+
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement errorElement = element.firstChildElement("error");
     QXmppStanza::Error error;
     error.setTypeFromStr( errorElement.attribute("type"));
 
@@ -48,49 +57,8 @@ void QXmppRpcErrorIq::parse( QDomElement &element )
     setError( error );
 }
 
-bool QXmppRpcErrorIq::isRpcErrorIq( QDomElement &element )
-{
-    QString type = element.attribute("type");
-    QDomElement errorElement = element.firstChildElement("error");
-    QDomElement queryElement = element.firstChildElement("query");
-    return (type == "error") &&
-            !errorElement.isNull() &&
-            queryElement.namespaceURI() == ns_rpc;
-}
-
 QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
 {
-}
-
-void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    XMLRPC::ResponseMessage message( m_payload );
-    writer->writeStartElement(ns_rpc, "query");
-    message.writeXml(writer);
-    writer->writeEndElement();
-}
-
-void QXmppRpcResponseIq::parse( QDomElement &element )
-{
-    QDomElement queryElement = element.firstChildElement("query");
-    setId( element.attribute("id"));
-    setTo( element.attribute("to"));
-    setFrom( element.attribute("from"));
-    setTypeFromStr( element.attribute("type"));
-
-    QDomElement methodElement = queryElement.firstChildElement("methodResponse");
-
-    XMLRPC::ResponseMessage message( methodElement );
-    m_payload = message.value();
-
-}
-
-bool QXmppRpcResponseIq::isRpcResponseIq( QDomElement &element )
-{
-    QString type = element.attribute("type");
-    QDomElement dataElement = element.firstChildElement("query");
-    return dataElement.namespaceURI() == ns_rpc &&
-           type == "result";
 }
 
 QVariant QXmppRpcResponseIq::getPayload() const
@@ -103,46 +71,39 @@ void QXmppRpcResponseIq::setPayload( const QVariant &payload )
     m_payload = payload;
 }
 
-
-QXmppRpcInvokeIq::QXmppRpcInvokeIq() : QXmppIq( QXmppIq::Set )
+bool QXmppRpcResponseIq::isRpcResponseIq(const QDomElement &element)
 {
+    QString type = element.attribute("type");
+    QDomElement dataElement = element.firstChildElement("query");
+    return dataElement.namespaceURI() == ns_rpc &&
+           type == "result";
 }
 
-void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+void QXmppRpcResponseIq::parse(const QDomElement &element)
 {
-    QString methodName = m_interface + "." + m_method;
-    XMLRPC::RequestMessage message( methodName.toLatin1() ,m_payload );
+    QXmppStanza::parse(element);
+
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement methodElement = queryElement.firstChildElement("methodResponse");
+
+    XMLRPC::ResponseMessage message( methodElement );
+    m_payload = message.value();
+
+}
+
+void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    XMLRPC::ResponseMessage message( m_payload );
     writer->writeStartElement(ns_rpc, "query");
     message.writeXml(writer);
     writer->writeEndElement();
 }
 
-void QXmppRpcInvokeIq::parse( QDomElement &element )
+QXmppRpcInvokeIq::QXmppRpcInvokeIq() : QXmppIq( QXmppIq::Set )
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    setId( element.attribute("id"));
-    setTo( element.attribute("to"));
-    setFrom( element.attribute("from"));
-    setTypeFromStr( element.attribute("type"));
-
-    QDomElement methodElement = queryElement.firstChildElement("methodCall");
-
-    XMLRPC::RequestMessage message( methodElement );
-
-    m_interface = message.method().split('.').value(0);
-    m_method = message.method().split('.').value(1);
-    m_payload = message.args();
-
 }
-
-bool QXmppRpcInvokeIq::isRpcInvokeIq( QDomElement &element )
-{
-    QString type = element.attribute("type");
-    QDomElement dataElement = element.firstChildElement("query");
-    return dataElement.namespaceURI() == ns_rpc &&
-           type == "set";
-}
-
 
 QVariantList QXmppRpcInvokeIq::getPayload() const
 {
@@ -167,7 +128,43 @@ QString QXmppRpcInvokeIq::getInterface() const
 {
     return m_interface;
 }
+
 void QXmppRpcInvokeIq::setInterface( const QString &interface )
 {
     m_interface = interface;
 }
+
+bool QXmppRpcInvokeIq::isRpcInvokeIq(const QDomElement &element)
+{
+    QString type = element.attribute("type");
+    QDomElement dataElement = element.firstChildElement("query");
+    return dataElement.namespaceURI() == ns_rpc &&
+           type == "set";
+}
+
+void QXmppRpcInvokeIq::parse(const QDomElement &element)
+{
+    QXmppStanza::parse(element);
+
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement methodElement = queryElement.firstChildElement("methodCall");
+
+    XMLRPC::RequestMessage message( methodElement );
+
+    m_interface = message.method().split('.').value(0);
+    m_method = message.method().split('.').value(1);
+    m_payload = message.args();
+
+}
+
+void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    QString methodName = m_interface + "." + m_method;
+    XMLRPC::RequestMessage message( methodName.toLatin1() ,m_payload );
+    writer->writeStartElement(ns_rpc, "query");
+    message.writeXml(writer);
+    writer->writeEndElement();
+}
+

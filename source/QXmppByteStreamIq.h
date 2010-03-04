@@ -77,9 +77,9 @@ public:
     QString streamHostUsed() const;
     void setStreamHostUsed(const QString &jid);
 
-    void parse(QDomElement &element);
+    static bool isByteStreamIq(const QDomElement &element);
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    static bool isByteStreamIq(QDomElement &element);
 
 private:
     Mode m_mode;

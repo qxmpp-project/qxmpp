@@ -53,8 +53,8 @@ public:
 class QXmppArchiveChatIq : public QXmppIq
 {
 public:
-    void parse( QDomElement &element );
-    static bool isArchiveChatIq( QDomElement &element );
+    static bool isArchiveChatIq(const QDomElement &element);
+    void parse(const QDomElement &element);
 
     QXmppArchiveChat chat() const;
 
@@ -66,9 +66,9 @@ class QXmppArchiveListIq : public QXmppIq
 {
 public:
     QXmppArchiveListIq();
+    static bool isArchiveListIq(const QDomElement &element);
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isArchiveListIq( QDomElement &element );
 
     QList<QXmppArchiveChat> chats() const;
 
@@ -116,9 +116,9 @@ private:
 class QXmppArchivePrefIq : public QXmppIq
 {
 public:
+    static bool isArchivePrefIq(const QDomElement &element);
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isArchivePrefIq( QDomElement &element );
 };
 
 #endif // QXMPPARCHIVEIQ_H

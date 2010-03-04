@@ -77,14 +77,9 @@ void QXmppVCard::setPhoto(const QImage& image)
 
 void QXmppVCard::parse(const QDomElement& nodeRecv)
 {
-    QString id = nodeRecv.attribute("id");
-    QString to = nodeRecv.attribute("to");
-    QString from = nodeRecv.attribute("from");
-    QString type = nodeRecv.attribute("type");
-    setTypeFromStr(type);
-    setId(id);
-    setTo(to);
-    setFrom(from);
+    QXmppStanza::parse(nodeRecv);
+
+    setTypeFromStr(nodeRecv.attribute("type"));
 
     // vCard
     setFullName(nodeRecv.firstChildElement("vCard").

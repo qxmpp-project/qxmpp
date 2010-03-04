@@ -349,6 +349,18 @@ bool QXmppStanza::isErrorStanza()
         m_error.getConditionStr().isEmpty());
 }
 
+void QXmppStanza::parse(const QDomElement &element)
+{
+    m_from = element.attribute("from");
+    m_to = element.attribute("to");
+    m_id = element.attribute("id");
+    m_lang = element.attribute("lang");
+
+    QDomElement errorElement = element.firstChildElement("error");
+    if(!errorElement.isNull())
+        m_error = parseError(errorElement);
+}
+
 QXmppStanza::Error QXmppStanza::parseError(const QDomElement &errorElement)
 {
     QXmppStanza::Error error;

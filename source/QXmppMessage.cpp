@@ -129,24 +129,16 @@ void QXmppMessage::setState(QXmppMessage::State state)
     m_state = state;
 }
 
-void QXmppMessage::parse(QDomElement &element)
+void QXmppMessage::parse(const QDomElement &element)
 {
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
     setBody(unescapeString(
             element.firstChildElement("body").text()));
     setSubject(unescapeString(
             element.firstChildElement("subject").text()));
     setThread(element.firstChildElement("thread").text());
-
-    QDomElement errorElement = element.
-                               firstChildElement("error");
-    if(!errorElement.isNull())
-    {
-        QXmppStanza::Error error = parseError(errorElement);
-        setError(error);
-    }
 
     for (int i = Active; i <= Paused; i++)
     {

@@ -29,20 +29,22 @@
 
 static const char *ns_archive = "urn:xmpp:archive";
 
-bool QXmppArchiveChatIq::isArchiveChatIq( QDomElement &element )
+QXmppArchiveChat QXmppArchiveChatIq::chat() const
+{
+    return m_chat;
+}
+
+bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 {
     QDomElement chatElement = element.firstChildElement("chat");
     return !chatElement.attribute("with").isEmpty();
     //return (chatElement.namespaceURI() == ns_archive);
 }
 
-QXmppArchiveChat QXmppArchiveChatIq::chat() const
+void QXmppArchiveChatIq::parse(const QDomElement &element)
 {
-    return m_chat;
-}
+    QXmppStanza::parse(element);
 
-void QXmppArchiveChatIq::parse( QDomElement &element )
-{
     QDomElement chatElement = element.firstChildElement("chat");
     m_chat.subject = chatElement.attribute("subject");
     m_chat.start = datetimeFromString(chatElement.attribute("start"));
@@ -89,7 +91,7 @@ QString QXmppArchiveListIq::with() const
     return m_with;
 }
 
-void QXmppArchiveListIq::setWith( const QString &with )
+void QXmppArchiveListIq::setWith(const QString &with)
 {
     m_with = with;
 }
@@ -99,7 +101,7 @@ QDateTime QXmppArchiveListIq::start() const
     return m_start;
 }
 
-void QXmppArchiveListIq::setStart( const QDateTime &start )
+void QXmppArchiveListIq::setStart(const QDateTime &start)
 {
     m_start = start;
 }
@@ -109,19 +111,21 @@ QDateTime QXmppArchiveListIq::end() const
     return m_end;
 }
 
-void QXmppArchiveListIq::setEnd( const QDateTime &end )
+void QXmppArchiveListIq::setEnd(const QDateTime &end)
 {
     m_end = end;
 }
 
-bool QXmppArchiveListIq::isArchiveListIq( QDomElement &element )
+bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
 {
     QDomElement listElement = element.firstChildElement("list");
     return (listElement.namespaceURI() == ns_archive);
 }
 
-void QXmppArchiveListIq::parse( QDomElement &element )
+void QXmppArchiveListIq::parse(const QDomElement &element)
 {
+    QXmppStanza::parse(element);
+
     QDomElement listElement = element.firstChildElement("list");
     m_with = element.attribute("with");
 
@@ -160,19 +164,21 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-bool QXmppArchivePrefIq::isArchivePrefIq( QDomElement &element )
+bool QXmppArchivePrefIq::isArchivePrefIq(const QDomElement &element)
 {
     QDomElement prefElement = element.firstChildElement("pref");
     return (prefElement.namespaceURI() == ns_archive);
 }
 
-void QXmppArchivePrefIq::parse( QDomElement &element )
+void QXmppArchivePrefIq::parse(const QDomElement &element)
 {
+    QXmppStanza::parse(element);
+
     QDomElement queryElement = element.firstChildElement("pref");
     //setId( element.attribute("id"));
 }
 
-void QXmppArchivePrefIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
+void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("pref");
     helperToXmlAddAttribute(writer, "xmlns", ns_archive);
@@ -199,7 +205,7 @@ QDateTime QXmppArchiveRetrieveIq::start() const
     return m_start;
 }
 
-void QXmppArchiveRetrieveIq::setStart( const QDateTime &start )
+void QXmppArchiveRetrieveIq::setStart(const QDateTime &start)
 {
     m_start = start;
 }
@@ -209,12 +215,12 @@ QString QXmppArchiveRetrieveIq::with() const
     return m_with;
 }
 
-void QXmppArchiveRetrieveIq::setWith( const QString &with )
+void QXmppArchiveRetrieveIq::setWith(const QString &with)
 {
     m_with = with;
 }
 
-void QXmppArchiveRetrieveIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
+void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("retrieve");
     helperToXmlAddAttribute(writer, "xmlns", ns_archive);

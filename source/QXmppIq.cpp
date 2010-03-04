@@ -56,11 +56,10 @@ void QXmppIq::setType(QXmppIq::Type type)
     m_type = type;
 }
 
-void QXmppIq::parse( QDomElement &element )
+void QXmppIq::parse(const QDomElement &element)
 {
-    setId(element.attribute("id"));
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
 
     QXmppElementList extensions;

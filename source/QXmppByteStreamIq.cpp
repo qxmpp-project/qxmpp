@@ -117,16 +117,15 @@ void QXmppByteStreamIq::setStreamHostUsed(const QString &jid)
     m_streamHostUsed = jid;
 }
 
-bool QXmppByteStreamIq::isByteStreamIq(QDomElement &element)
+bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
 {
     return element.firstChildElement("query").namespaceURI() == ns_bytestreams;
 }
 
-void QXmppByteStreamIq::parse(QDomElement &element)
+void QXmppByteStreamIq::parse(const QDomElement &element)
 {
-    setId(element.attribute("id"));
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
 
     QDomElement queryElement = element.firstChildElement("query");

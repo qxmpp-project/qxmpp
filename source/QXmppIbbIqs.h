@@ -10,15 +10,16 @@ class QXmppIbbOpenIq: public QXmppIq
 {
 public:
     QXmppIbbOpenIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isIbbOpenIq( QDomElement &element );
 
     long blockSize() const;
     void setBlockSize( long block_size );
 
     QString sid() const;
     void setSid( const QString &sid );
+
+    static bool isIbbOpenIq(const QDomElement &element);
+    void parse(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     long m_block_size;
@@ -29,12 +30,13 @@ class QXmppIbbCloseIq: public QXmppIq
 {
 public:
     QXmppIbbCloseIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isIbbCloseIq( QDomElement &element );
 
     QString sid() const;
     void setSid( const QString &sid );
+
+    static bool isIbbCloseIq(const QDomElement &element);
+    void parse(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     QString m_sid;
@@ -47,14 +49,16 @@ public:
 
     quint16 sequence() const;
     void setSequence( quint16 seq );
+
     QString sid() const;
     void setSid( const QString &sid );
+
     QByteArray payload() const;
     void setPayload( const QByteArray &data );
 
+    static bool isIbbDataIq(const QDomElement &element);
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isIbbDataIq( QDomElement &element );
 
 private:
     quint16 m_seq;

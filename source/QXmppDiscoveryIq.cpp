@@ -47,18 +47,17 @@ void QXmppDiscoveryIq::setQueryType(enum QXmppDiscoveryIq::QueryType type)
     m_queryType = type;
 }
 
-bool QXmppDiscoveryIq::isDiscoveryIq( QDomElement &element )
+bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
     return (queryElement.namespaceURI() == ns_disco_info ||
             queryElement.namespaceURI() == ns_disco_items); 
 }
 
-void QXmppDiscoveryIq::parse( QDomElement &element )
+void QXmppDiscoveryIq::parse(const QDomElement &element)
 {
-    setId(element.attribute("id"));
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
     QDomElement queryElement = element.firstChildElement("query");
     if (queryElement.namespaceURI() == ns_disco_items)

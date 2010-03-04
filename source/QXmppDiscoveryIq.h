@@ -37,15 +37,15 @@ public:
         ItemsQuery,
     };
 
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    void parse( QDomElement &element );
-    static bool isDiscoveryIq( QDomElement &element );
-
     QXmppElementList queryItems() const;
     void setQueryItems(const QXmppElementList &items);
 
     enum QueryType queryType() const;
     void setQueryType(enum QueryType type);
+
+    static bool isDiscoveryIq(const QDomElement &element);
+    void parse(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     QXmppElementList m_queryItems;

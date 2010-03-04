@@ -70,7 +70,7 @@ public:
     QString thread() const;
     void setThread(const QString&);
 
-    void parse(QDomElement &element);
+    void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
     // deprecated accessors, use the form without "get" instead

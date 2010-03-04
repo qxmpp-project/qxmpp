@@ -67,9 +67,9 @@ void QXmppPresence::setStatus(const QXmppPresence::Status& status)
 
 void QXmppPresence::parse(const QDomElement &element)
 {
+    QXmppStanza::parse(element);
+
     setTypeFromStr(element.attribute("type"));
-    setFrom(element.attribute("from"));
-    setTo(element.attribute("to"));
 
     QString statusText = element.
                          firstChildElement("status").text();
@@ -82,14 +82,6 @@ void QXmppPresence::parse(const QDomElement &element)
     status.setStatusText(statusText);
     status.setPriority(priority);
     setStatus(status);
-
-    QDomElement errorElement = element.
-                               firstChildElement("error");
-    if(!errorElement.isNull())
-    {
-        QXmppStanza::Error error = parseError(errorElement);
-        setError(error);
-    }
 
     QDomElement xElement = element.firstChildElement("x");
     if(!xElement.isNull())

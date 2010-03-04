@@ -137,6 +137,7 @@ public:
 
 protected:
     void generateAndSetNextId();
+    void parse(const QDomElement &element);
 
 private:
     static uint s_uniqeIdNo;
