@@ -109,7 +109,7 @@ public:
     QString getId() const;    
     QString getLang() const;    
     QXmppStanza::Error getError() const;    
-    QXmppElementList getExtensions() const;
+    QXmppElementList extensions() const;
 
     void setTo(const QString&);  
     void setFrom(const QString&);

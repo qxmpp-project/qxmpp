@@ -91,7 +91,7 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 
 void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
-    foreach (const QXmppElement &extension, getExtensions())
+    foreach (const QXmppElement &extension, extensions())
         extension.toXml(writer);
 }
 

@@ -112,7 +112,7 @@ void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
     helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
     
     getError().toXml(xmlWriter);
-    foreach (const QXmppElement &extension, getExtensions())
+    foreach (const QXmppElement &extension, extensions())
         extension.toXml(xmlWriter);
     
     xmlWriter->writeEndElement();

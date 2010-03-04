@@ -335,7 +335,7 @@ void QXmppStanza::setError(QXmppStanza::Error& error)
     m_error = error;
 }
 
-QXmppElementList QXmppStanza::getExtensions() const
+QXmppElementList QXmppStanza::extensions() const
 {
     return m_extensions;
 }
