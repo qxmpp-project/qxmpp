@@ -1067,8 +1067,8 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
     switch(bind.type())
     {
     case QXmppIq::Result:
-        if(!bind.getResource().isEmpty())
-            getConfiguration().setResource(bind.getResource());
+        if(!bind.resource().isEmpty())
+            getConfiguration().setResource(bind.resource());
         if(m_sessionAvaliable)
             sendSessionIQ();
         break;
