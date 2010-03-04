@@ -100,10 +100,10 @@ void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
 {
 
     xmlWriter->writeStartElement("presence");
-    helperToXmlAddAttribute(xmlWriter,"xml:lang", getLang());
-    helperToXmlAddAttribute(xmlWriter,"id", getId());
-    helperToXmlAddAttribute(xmlWriter,"to", getTo());
-    helperToXmlAddAttribute(xmlWriter,"from", getFrom());
+    helperToXmlAddAttribute(xmlWriter,"xml:lang", lang());
+    helperToXmlAddAttribute(xmlWriter,"id", id());
+    helperToXmlAddAttribute(xmlWriter,"to", to());
+    helperToXmlAddAttribute(xmlWriter,"from", from());
     helperToXmlAddAttribute(xmlWriter,"type", getTypeStr());
 
     helperToXmlAddTextElement(xmlWriter,"status", getStatus().getStatusText());
@@ -111,7 +111,7 @@ void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
         helperToXmlAddNumberElement(xmlWriter,"priority", getStatus().getPriority());
     helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
     
-    getError().toXml(xmlWriter);
+    error().toXml(xmlWriter);
     foreach (const QXmppElement &extension, extensions())
         extension.toXml(xmlWriter);
     

@@ -297,6 +297,30 @@ QString QXmppStanza::getLang() const
     return m_lang;
 }
 
+QXmppStanza::Error QXmppStanza::getError() const
+{
+    return m_error;
+}
+
+QString QXmppStanza::to() const
+{
+    return m_to;
+}
+
+QString QXmppStanza::from() const
+{
+    return m_from;
+}
+
+QString QXmppStanza::id() const    
+{
+    return m_id;
+}
+
+QString QXmppStanza::lang() const    
+{
+    return m_lang;
+}
 
 void QXmppStanza::setTo(const QString& to)  
 {
@@ -325,7 +349,7 @@ void QXmppStanza::generateAndSetNextId()
     m_id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
-QXmppStanza::Error QXmppStanza::getError() const
+QXmppStanza::Error QXmppStanza::error() const
 {
     return m_error;
 }

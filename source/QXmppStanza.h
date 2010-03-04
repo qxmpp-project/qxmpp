@@ -104,17 +104,23 @@ public:
     QXmppStanza(const QString& from = "", const QString& to = "");
     ~QXmppStanza();
     
-    QString getTo() const;  
-    QString getFrom() const;
-    QString getId() const;    
-    QString getLang() const;    
-    QXmppStanza::Error getError() const;    
+    // deprecated accessors, use the form without "get" instead
+    QString Q_DECL_DEPRECATED getTo() const;  
+    QString Q_DECL_DEPRECATED getFrom() const;
+    QString Q_DECL_DEPRECATED getId() const;    
+    QString Q_DECL_DEPRECATED getLang() const;    
+    QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
+
+    QString to() const;
+    QString from() const;
+    QString id() const;
+    QString lang() const;
+    QXmppStanza::Error error() const;
     QXmppElementList extensions() const;
 
     void setTo(const QString&);  
     void setFrom(const QString&);
     void setId(const QString&);
-    void generateAndSetNextId();
     void setLang(const QString&);
     void setError(QXmppStanza::Error& error);
     void setExtensions(const QXmppElementList &elements);
@@ -122,6 +128,9 @@ public:
 
     // FIXME : make this method protected
     static QXmppStanza::Error parseError(const QDomElement&);
+
+protected:
+    void generateAndSetNextId();
 
 private:
     static uint s_uniqeIdNo;

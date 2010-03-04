@@ -47,7 +47,7 @@ void QXmppRoster::disconnected()
 
 void QXmppRoster::presenceReceived(const QXmppPresence& presence)
 {
-    QString jid = presence.getFrom();
+    QString jid = presence.from();
     QString bareJid = jidToBareJid(jid);
     QString resource = jidToResource(jid);
 
@@ -85,7 +85,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             if(rosterIq.getType() == QXmppIq::Set) // send result iq
             {
                 QXmppIq returnIq(QXmppIq::Result);
-                returnIq.setId(rosterIq.getId());
+                returnIq.setId(rosterIq.id());
                 m_stream->sendPacket(returnIq);
             }
             break;
@@ -118,7 +118,7 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
             if(rosterIq.getType() == QXmppIq::Set) // send result iq
             {
                 QXmppIq returnIq(QXmppIq::Result);
-                returnIq.setId(rosterIq.getId());
+                returnIq.setId(rosterIq.id());
                 m_stream->sendPacket(returnIq);
             }
             m_isRosterReceived = true;

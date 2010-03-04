@@ -31,18 +31,18 @@ QXmppRemoteMethodResult QXmppRemoteMethod::call( )
 
 void QXmppRemoteMethod::gotError( const QXmppRpcErrorIq &iq )
 {
-    if ( iq.getId() == m_payload.getId() )
+    if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = true;
-        m_result.errorMessage = iq.getError().getText();
-        m_result.code = iq.getError().getType();
+        m_result.errorMessage = iq.error().getText();
+        m_result.code = iq.error().getType();
         emit callDone();
     }
 }
 
 void QXmppRemoteMethod::gotResult( const QXmppRpcResponseIq &iq )
 {
-    if ( iq.getId() == m_payload.getId() )
+    if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = false;
         m_result.result = iq.getPayload();

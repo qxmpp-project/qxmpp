@@ -776,7 +776,7 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
     authQuery.setResource(getConfiguration().getResource());
     authQuery.setStreamId(m_streamId);
     authQuery.setUsePlainText(plainText);
-    m_nonSASLAuthId = authQuery.getId();
+    m_nonSASLAuthId = authQuery.id();
     sendPacket(authQuery);
 }
 
@@ -917,7 +917,7 @@ void QXmppStream::sendBindIQ()
 {
     QXmppBind bind(QXmppIq::Set);
     bind.setResource(getConfiguration().getResource());
-    m_bindId = bind.getId();
+    m_bindId = bind.id();
     sendPacket(bind);
 }
 
@@ -925,7 +925,7 @@ void QXmppStream::sendSessionIQ()
 {
     QXmppSession session(QXmppIq::Set);
     session.setTo(getConfiguration().getDomain());
-    m_sessionId = session.getId();
+    m_sessionId = session.id();
     sendPacket(session);
 }
 
@@ -962,7 +962,7 @@ void QXmppStream::sendRosterRequest()
 {
     QXmppRosterIq roster(QXmppIq::Get);
     roster.setFrom(getConfiguration().getJid());
-    m_rosterReqId = roster.getId();
+    m_rosterReqId = roster.id();
     sendPacket(roster);
 }
 
@@ -1004,11 +1004,11 @@ void QXmppStream::processPresence(const QXmppPresence& presence)
     case QXmppPresence::Unavailable:
         break;
     case QXmppPresence::Subscribe:
-        if(!presence.getFrom().isEmpty())
+        if(!presence.from().isEmpty())
         {
             if(getConfiguration().getAutoAcceptSubscriptions())
-                acceptSubscriptionRequest(presence.getFrom());
-            emit subscriptionRequestReceived(presence.getFrom());
+                acceptSubscriptionRequest(presence.from());
+            emit subscriptionRequestReceived(presence.from());
         }
         break;
     case QXmppPresence::Unsubscribe:
@@ -1055,7 +1055,7 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
 
 void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
 {
-    if(m_rosterReqId == rosterIq.getId())
+    if(m_rosterReqId == rosterIq.id())
         emit rosterRequestIqReceived(rosterIq);
     else
         emit rosterIqReceived(rosterIq);

@@ -403,7 +403,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     QXmppInvokable *iface = m_interfaces[ interface ];
     if( iface )
     {
-        if ( iface->isAuthorized( iq.getFrom() ) )
+        if ( iface->isAuthorized( iq.from() ) )
         {
 
             if ( iface->interfaces().contains( iq.getMethod() ) )
@@ -411,8 +411,8 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
                 QVariant result = iface->dispatch(iq.getMethod().toLatin1(),
                                                   iq.getPayload() );
                 QXmppRpcResponseIq resultIq;
-                resultIq.setId(iq.getId());
-                resultIq.setTo(iq.getFrom());
+                resultIq.setId(iq.id());
+                resultIq.setTo(iq.from());
                 resultIq.setFrom( m_config.getJid());
                 resultIq.setPayload(result);
                 m_stream->sendPacket( resultIq );
@@ -437,8 +437,8 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
         error.setCondition(QXmppStanza::Error::ItemNotFound);
     }
     QXmppRpcErrorIq errorIq;
-    errorIq.setId(iq.getId());
-    errorIq.setTo(iq.getFrom());
+    errorIq.setId(iq.id());
+    errorIq.setTo(iq.from());
     errorIq.setFrom( m_config.getJid());
     errorIq.setQuery( iq );
     errorIq.setError( error );

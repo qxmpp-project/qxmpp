@@ -77,15 +77,15 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 {
     xmlWriter->writeStartElement("iq");
 
-    helperToXmlAddAttribute(xmlWriter, "id", getId());
-    helperToXmlAddAttribute(xmlWriter, "to", getTo());
-    helperToXmlAddAttribute(xmlWriter, "from", getFrom());
+    helperToXmlAddAttribute(xmlWriter, "id", id());
+    helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "from", from());
     if(getTypeStr().isEmpty())
         helperToXmlAddAttribute(xmlWriter, "type", "get");
     else
         helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
     toXmlElementFromChild(xmlWriter);
-    getError().toXml(xmlWriter);
+    error().toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
 

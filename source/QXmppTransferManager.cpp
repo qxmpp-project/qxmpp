@@ -203,7 +203,7 @@ void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
     // handle IQ from proxy
     foreach (QXmppTransferJob *job, m_jobs)
     {
-        if (job->m_socksProxy.jid() == iq.getFrom() && job->m_requestId == iq.getId())
+        if (job->m_socksProxy.jid() == iq.from() && job->m_requestId == iq.id())
         {
             if (iq.getType() == QXmppIq::Result && iq.streamHosts().size() > 0)
             {
@@ -224,7 +224,7 @@ void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 /// that we connected to a stream host.
 void QXmppTransferManager::byteStreamResponseReceived(const QXmppIq &iq)
 {
-    QXmppTransferJob *job = getJobByRequestId(iq.getFrom(), iq.getId());
+    QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::SocksMethod ||
@@ -239,7 +239,7 @@ void QXmppTransferManager::byteStreamResponseReceived(const QXmppIq &iq)
 /// a stream host.
 void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 {
-    QXmppTransferJob *job = getJobByRequestId(iq.getFrom(), iq.getId());
+    QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job ||
         job->direction() != QXmppTransferJob::OutgoingDirection ||
         job->method() != QXmppTransferJob::SocksMethod ||
@@ -275,7 +275,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         streamIq.setTo(streamHost.jid());
         streamIq.setSid(job->m_sid);
         streamIq.setActivate(job->m_jid);
-        job->m_requestId = streamIq.getId();
+        job->m_requestId = streamIq.id();
         m_client->sendPacket(streamIq);
         return;
     }
@@ -292,10 +292,10 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 {
     QXmppIq response;
-    response.setId(iq.getId());
-    response.setTo(iq.getFrom());
+    response.setId(iq.id());
+    response.setTo(iq.from());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
+    QXmppTransferJob *job = getJobBySid(iq.from(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::SocksMethod ||
@@ -331,8 +331,8 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
             connect(job->m_socksClient, SIGNAL(disconnected()), this, SLOT(socksClientDisconnected()));
 
             QXmppByteStreamIq ackIq;
-            ackIq.setId(iq.getId());
-            ackIq.setTo(iq.getFrom());
+            ackIq.setId(iq.id());
+            ackIq.setTo(iq.from());
             ackIq.setType(QXmppIq::Result);
             ackIq.setSid(job->m_sid);
             ackIq.setStreamHostUsed(streamHost.jid());
@@ -390,10 +390,10 @@ QXmppTransferJob* QXmppTransferManager::getJobBySocksServer(QXmppSocksServer *so
 void QXmppTransferManager::ibbCloseIqReceived(const QXmppIbbCloseIq &iq)
 {
     QXmppIq response;
-    response.setTo(iq.getFrom());
-    response.setId(iq.getId());
+    response.setTo(iq.from());
+    response.setId(iq.id());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
+    QXmppTransferJob *job = getJobBySid(iq.from(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -417,10 +417,10 @@ void QXmppTransferManager::ibbCloseIqReceived(const QXmppIbbCloseIq &iq)
 void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
 {
     QXmppIq response;
-    response.setTo(iq.getFrom());
-    response.setId(iq.getId());
+    response.setTo(iq.from());
+    response.setId(iq.id());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
+    QXmppTransferJob *job = getJobBySid(iq.from(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -455,10 +455,10 @@ void QXmppTransferManager::ibbDataIqReceived(const QXmppIbbDataIq &iq)
 void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
 {
     QXmppIq response;
-    response.setTo(iq.getFrom());
-    response.setId(iq.getId());
+    response.setTo(iq.from());
+    response.setId(iq.id());
 
-    QXmppTransferJob *job = getJobBySid(iq.getFrom(), iq.sid());
+    QXmppTransferJob *job = getJobBySid(iq.from(), iq.sid());
     if (!job ||
         job->direction() != QXmppTransferJob::IncomingDirection ||
         job->method() != QXmppTransferJob::InBandMethod)
@@ -491,7 +491,7 @@ void QXmppTransferManager::ibbOpenIqReceived(const QXmppIbbOpenIq &iq)
 
 void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
 {
-    QXmppTransferJob *job = getJobByRequestId(iq.getFrom(), iq.getId());
+    QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job ||
         job->direction() != QXmppTransferJob::OutgoingDirection ||
         job->method() != QXmppTransferJob::InBandMethod ||
@@ -514,7 +514,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
             dataIq.setSid(job->m_sid);
             dataIq.setSequence(job->m_ibbSequence++);
             dataIq.setPayload(buffer);
-            job->m_requestId = dataIq.getId();
+            job->m_requestId = dataIq.id();
             m_client->sendPacket(dataIq);
 
             job->m_done += buffer.size();
@@ -524,7 +524,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
             QXmppIbbCloseIq closeIq;
             closeIq.setTo(job->m_jid);
             closeIq.setSid(job->m_sid);
-            job->m_requestId = closeIq.getId();
+            job->m_requestId = closeIq.id();
             m_client->sendPacket(closeIq);
 
             job->terminate(QXmppTransferJob::NoError);
@@ -536,7 +536,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
         QXmppIbbCloseIq closeIq;
         closeIq.setTo(job->m_jid);
         closeIq.setSid(job->m_sid);
-        job->m_requestId = closeIq.getId();
+        job->m_requestId = closeIq.id();
         m_client->sendPacket(closeIq);
 
         job->terminate(QXmppTransferJob::ProtocolError);
@@ -548,7 +548,7 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
     // handle IQ from proxy
     foreach (QXmppTransferJob *job, m_jobs)
     {
-        if (job->m_socksProxy.jid() == iq.getFrom() && job->m_requestId == iq.getId())
+        if (job->m_socksProxy.jid() == iq.from() && job->m_requestId == iq.id())
         {
             if (job->m_socksClient)
             {
@@ -574,7 +574,7 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
         }
     }
 
-    QXmppTransferJob *job = getJobByRequestId(iq.getFrom(), iq.getId());
+    QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job)
         return;
 
@@ -691,7 +691,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     request.setProfile(QXmppStreamInitiationIq::FileTransfer);
     request.setSiItems(items);
     request.setSiId(job->m_sid);
-    job->m_requestId = request.getId();
+    job->m_requestId = request.id();
     m_client->sendPacket(request);
 
     return job;
@@ -823,7 +823,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
     streamIq.setTo(job->m_jid);
     streamIq.setSid(job->m_sid);
     streamIq.setStreamHosts(streamHosts);
-    job->m_requestId = streamIq.getId();
+    job->m_requestId = streamIq.id();
     m_client->sendPacket(streamIq);
 }
 
@@ -837,7 +837,7 @@ void QXmppTransferManager::streamInitiationIqReceived(const QXmppStreamInitiatio
 
 void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamInitiationIq &iq)
 {
-    QXmppTransferJob *job = getJobByRequestId(iq.getFrom(), iq.getId());
+    QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job ||
         job->direction() != QXmppTransferJob::OutgoingDirection)
         return;
@@ -872,7 +872,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         openIq.setTo(job->m_jid);
         openIq.setSid(job->m_sid);
         openIq.setBlockSize(job->m_blockSize);
-        job->m_requestId = openIq.getId();
+        job->m_requestId = openIq.id();
         m_client->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
         const QString ownJid = m_client->getConfiguration().getJid();
@@ -898,7 +898,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
             streamIq.setType(QXmppIq::Get);
             streamIq.setTo(job->m_socksProxy.jid());
             streamIq.setSid(job->m_sid);
-            job->m_requestId = streamIq.getId();
+            job->m_requestId = streamIq.id();
             m_client->sendPacket(streamIq);
         } else {
             socksServerSendOffer(job);
@@ -912,8 +912,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
 void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiationIq &iq)
 {
     QXmppStreamInitiationIq response;
-    response.setTo(iq.getFrom());
-    response.setId(iq.getId());
+    response.setTo(iq.from());
+    response.setId(iq.id());
 
     // check we support the profile
     if (iq.getProfile() != QXmppStreamInitiationIq::FileTransfer)
@@ -930,7 +930,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     }
 
     // check the stream type
-    QXmppTransferJob *job = new QXmppTransferJob(iq.getFrom(), QXmppTransferJob::IncomingDirection, this);
+    QXmppTransferJob *job = new QXmppTransferJob(iq.from(), QXmppTransferJob::IncomingDirection, this);
     int offeredMethods = QXmppTransferJob::NoMethod;
     job->m_sid = iq.getSiId();
     job->m_mimeType = iq.getMimeType();
