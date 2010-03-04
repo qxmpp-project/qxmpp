@@ -3,13 +3,10 @@ QT += network \
     xml
 CONFIG += staticlib \
     debug_and_release
+
+TARGET = QXmppClient
 CONFIG(debug, debug|release) { 
-    win32:TARGET = QXmppClient_d
-    !win32:TARGET = debug/QXmppClient_d
-}
-else { 
-    win32:TARGET = QXmppClient
-    !win32:TARGET = release/QXmppClient
+    TARGET = $$join(TARGET,,,_d)
 }
 
 # Header files

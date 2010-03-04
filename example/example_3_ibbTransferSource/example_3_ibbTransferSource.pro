@@ -14,7 +14,7 @@ QT += network xml
 CONFIG += console debug_and_release
 
 CONFIG(debug, debug|release) {
-    LIBS += -L../../source/debug -lQXmppClient_d
+    LIBS += -L../../source -lQXmppClient_d
  } else {
-    LIBS += -L../../source/release -lQXmppClient
+    LIBS += -L../../source -lQXmppClient
  }
