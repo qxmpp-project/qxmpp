@@ -1095,10 +1095,10 @@ void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
         // then after recieving following iq user requests contact for subscription
         
         // check thet "from" is newly added in the roster...and remove this ask thing...and do this for all items
-        if(rosterIq.getItems().at(0).getSubscriptionType() ==
-           QXmppRosterIq::Item::From && rosterIq.getItems().at(0).
-           getSubscriptionStatus().isEmpty())
-            sendSubscriptionRequest(rosterIq.getItems().at(0).getBareJid());
+        if(rosterIq.items().at(0).subscriptionType() ==
+           QXmppRosterIq::Item::From && rosterIq.items().at(0).
+           subscriptionStatus().isEmpty())
+            sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
         break;
     default:
         break;
