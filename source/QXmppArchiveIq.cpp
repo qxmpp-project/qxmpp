@@ -36,7 +36,7 @@ bool QXmppArchiveChatIq::isArchiveChatIq( QDomElement &element )
     //return (chatElement.namespaceURI() == ns_archive);
 }
 
-QXmppArchiveChat QXmppArchiveChatIq::getChat() const
+QXmppArchiveChat QXmppArchiveChatIq::chat() const
 {
     return m_chat;
 }
@@ -69,12 +69,12 @@ QXmppArchiveListIq::QXmppArchiveListIq()
 {
 }
 
-QList<QXmppArchiveChat> QXmppArchiveListIq::getChats() const
+QList<QXmppArchiveChat> QXmppArchiveListIq::chats() const
 {
     return m_chats;
 }
 
-int QXmppArchiveListIq::getMax() const
+int QXmppArchiveListIq::max() const
 {
     return m_max;
 }
@@ -84,7 +84,7 @@ void QXmppArchiveListIq::setMax(int max)
     m_max = max;
 }
 
-QString QXmppArchiveListIq::getWith() const
+QString QXmppArchiveListIq::with() const
 {
     return m_with;
 }
@@ -94,7 +94,7 @@ void QXmppArchiveListIq::setWith( const QString &with )
     m_with = with;
 }
 
-QDateTime QXmppArchiveListIq::getStart() const
+QDateTime QXmppArchiveListIq::start() const
 {
     return m_start;
 }
@@ -104,7 +104,7 @@ void QXmppArchiveListIq::setStart( const QDateTime &start )
     m_start = start;
 }
 
-QDateTime QXmppArchiveListIq::getEnd() const
+QDateTime QXmppArchiveListIq::end() const
 {
     return m_end;
 }
@@ -184,7 +184,7 @@ QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
 {
 }
 
-int QXmppArchiveRetrieveIq::getMax() const
+int QXmppArchiveRetrieveIq::max() const
 {
     return m_max;
 }
@@ -194,7 +194,7 @@ void QXmppArchiveRetrieveIq::setMax(int max)
     m_max = max;
 }
 
-QDateTime QXmppArchiveRetrieveIq::getStart() const
+QDateTime QXmppArchiveRetrieveIq::start() const
 {
     return m_start;
 }
@@ -204,7 +204,7 @@ void QXmppArchiveRetrieveIq::setStart( const QDateTime &start )
     m_start = start;
 }
 
-QString QXmppArchiveRetrieveIq::getWith() const
+QString QXmppArchiveRetrieveIq::with() const
 {
     return m_with;
 }

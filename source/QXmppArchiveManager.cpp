@@ -34,12 +34,12 @@ QXmppArchiveManager::QXmppArchiveManager(QXmppClient *client) :
 
 void QXmppArchiveManager::archiveChatIqReceived(const QXmppArchiveChatIq &chatIq)
 {
-    emit archiveChatReceived(chatIq.getChat());
+    emit archiveChatReceived(chatIq.chat());
 }
 
 void QXmppArchiveManager::archiveListIqReceived(const QXmppArchiveListIq &listIq)
 {
-    emit archiveListReceived(listIq.getChats());
+    emit archiveListReceived(listIq.chats());
 }
 
 void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq)

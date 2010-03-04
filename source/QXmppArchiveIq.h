@@ -56,7 +56,7 @@ public:
     void parse( QDomElement &element );
     static bool isArchiveChatIq( QDomElement &element );
 
-    QXmppArchiveChat getChat() const;
+    QXmppArchiveChat chat() const;
 
 private:
     QXmppArchiveChat m_chat;
@@ -70,18 +70,18 @@ public:
     void parse( QDomElement &element );
     static bool isArchiveListIq( QDomElement &element );
 
-    QList<QXmppArchiveChat> getChats() const;
+    QList<QXmppArchiveChat> chats() const;
 
-    int getMax() const;
+    int max() const;
     void setMax(int max);
 
-    QString getWith() const;
+    QString with() const;
     void setWith( const QString &with );
 
-    QDateTime getStart() const;
+    QDateTime start() const;
     void setStart(const QDateTime &start );
 
-    QDateTime getEnd() const;
+    QDateTime end() const;
     void setEnd(const QDateTime &end );
 
 private:
@@ -98,13 +98,13 @@ public:
     QXmppArchiveRetrieveIq();
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
-    int getMax() const;
+    int max() const;
     void setMax(int max);
 
-    QDateTime getStart() const;
+    QDateTime start() const;
     void setStart( const QDateTime &start );
 
-    QString getWith() const;
+    QString with() const;
     void setWith( const QString &with );
 
 private:
