@@ -36,6 +36,9 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
+// time to try to connect to a SOCKS host (7 seconds)
+const int socksTimeout = 7000;
+
 static QString streamHash(const QString &sid, const QString &initiatorJid, const QString &targetJid)
 {
     QCryptographicHash hash(QCryptographicHash::Sha1);
@@ -287,7 +290,8 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 
         QXmppSocksClient *socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
         socksClient->connectToHost(hostName, 0);
-        if (!socksClient->waitForReady())
+        // FIXME : this should probably be made asynchronous as it blocks XMPP packet handling
+        if (!socksClient->waitForReady(socksTimeout))
         {
             qWarning() << "Failed to connect to" << streamHost.host().toString() << streamHost.port() << ":" << socksClient->errorString();
             delete socksClient;
@@ -360,7 +364,8 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
         // try to connect to stream host
         QXmppSocksClient *socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
         socksClient->connectToHost(hostName, 0);
-        if (socksClient->waitForReady())
+        // FIXME : this should probably be made asynchronous as it blocks XMPP packet handling
+        if (socksClient->waitForReady(socksTimeout))
         {
             job->setState(QXmppTransferJob::TransferState);
             job->m_socksSocket = socksClient;
