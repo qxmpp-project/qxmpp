@@ -21,16 +21,11 @@
  *
  */
 
+#include <QDataStream>
 #include <QEventLoop>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
-
-#ifdef Q_OS_WIN
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
 
 #include "QXmppSocks.h"
 
@@ -72,47 +67,39 @@ enum State {
     ReadyState = 2,
 };
 
-QByteArray encodeHostAndPort(quint8 type, const QByteArray &host, quint16 port)
+static QByteArray encodeHostAndPort(quint8 type, const QByteArray &host, quint16 port)
 {
     QByteArray buffer;
-    buffer.resize(2);
+    QDataStream stream(&buffer, QIODevice::WriteOnly);
     // set host name
-    buffer[0] = type;
-    buffer[1] = host.size();
-    buffer.append(host);
+    quint8 hostLength = host.size();
+    stream << type;
+    stream << hostLength;
+    stream.writeRawData(host.constData(), hostLength);
     // set port
-    int pos = buffer.size();
-    buffer.resize(pos + 2);
-    quint16 p = htons(port);
-    memcpy(buffer.data() + pos, &p, 2);
+    stream << port;
     return buffer;
 }
 
-bool parseHostAndPort(const QByteArray buffer, quint8 &type, QByteArray &host, quint16 &port)
+static bool parseHostAndPort(const QByteArray buffer, quint8 &type, QByteArray &host, quint16 &port)
 {
     if (buffer.size() < 4)
         return false;
 
-    // parse host type
-    int pos = 0;
-    type = buffer.at(pos);
-    pos++;
-
-    // parse host name
-    quint8 hostLength = buffer.at(pos);
-    pos++;
+    QDataStream stream(buffer);
+    // get host name
+    quint8 hostLength;
+    stream >> type;
+    stream >> hostLength;
     if (buffer.size() < hostLength + 4)
     {
         qWarning("Invalid host length");
         return false;
     }
-    host = buffer.mid(pos, hostLength);
-    pos += hostLength;
-
-    // parse host port
-    quint16 p;
-    memcpy(&p, buffer.data() + pos, 2);
-    port = ntohs(p);
+    host.resize(hostLength);
+    stream.readRawData(host.data(), hostLength);
+    // get port
+    stream >> port;
     return true;
 }
 
