@@ -300,9 +300,7 @@ QMap<QString, QXmppRoster::QXmppRosterEntry>
 QStringList QXmppRoster::getResources(const QString& bareJid) const
 {
     if(m_presences.contains(bareJid))
-    {
         return m_presences[bareJid].keys();
-    }
     else
         return QStringList();
 }
@@ -321,10 +319,7 @@ QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
     if(m_presences.contains(bareJid))
         return m_presences[bareJid];
     else
-    {
-        qWarning("QXmppRoster::getAllPresences(): invalid bareJid");
         return QMap<QString, QXmppPresence>();
-    }
 }
 
 /// Get the presence of the given resource of the given bareJid.
