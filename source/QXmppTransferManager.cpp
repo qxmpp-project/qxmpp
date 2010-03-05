@@ -54,7 +54,7 @@ QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Directi
     m_iodevice(0),
     m_jid(jid),
     m_method(NoMethod),
-    m_state(StartState),
+    m_state(OfferState),
     m_fileSize(0),
     m_ibbSequence(0),
     m_socksSocket(0)
@@ -71,14 +71,14 @@ void QXmppTransferJob::abort()
 
 /// Call this method if you wish to accept an incoming transfer job.
 ///
-/// To accept the transfer job, you must call the accept() method from
-/// a slot connected to the QXmppTransferManager's fileReceived() signal.
-///
 
 void QXmppTransferJob::accept(QIODevice *iodevice)
 {
-    if (m_direction == IncomingDirection && !m_iodevice)
+    if (m_direction == IncomingDirection && m_state == OfferState && !m_iodevice)
+    {
         m_iodevice = iodevice;
+        setState(QXmppTransferJob::StartState);
+    }
 }
 
 void QXmppTransferJob::checkData()
@@ -610,8 +610,8 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
     else if (job->method() == QXmppTransferJob::SocksMethod)
         byteStreamResponseReceived(iq);
     else if (iq.type() == QXmppIq::Error) {
-        // remote user cancelled stream initiation
-        job->terminate(QXmppTransferJob::ProtocolError);
+        // remote party cancelled stream initiation
+        job->terminate(QXmppTransferJob::AbortError);
     }
 }
 
@@ -632,6 +632,69 @@ void QXmppTransferManager::jobError(QXmppTransferJob::Error error)
         job->m_requestId = closeIq.id();
         m_client->sendPacket(closeIq);
     }
+}
+
+void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
+    if (!job || !m_jobs.contains(job))
+        return;
+
+    if (job->direction() != QXmppTransferJob::IncomingDirection)
+        return;
+
+    // disconnect from the signal
+    disconnect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(jobStateChanged(QXmppTransferJob::State)));
+
+    QXmppStreamInitiationIq response;
+    response.setTo(job->jid());
+    response.setId(job->m_offerId);
+
+    // the job was refused by the local party
+    if (!job->m_iodevice || !job->m_iodevice->isWritable())
+    {
+        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden);
+        error.setCode(403);
+
+        response.setType(QXmppIq::Error);
+        response.setError(error);
+        m_client->sendPacket(response);
+
+        job->terminate(QXmppTransferJob::AbortError);
+        return;
+    }
+
+    // the job was accepted by the local party
+    connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(jobError(QXmppTransferJob::Error)));
+
+    QXmppElement value;
+    value.setTagName("value");
+    if (job->method() == QXmppTransferJob::InBandMethod)
+        value.setValue(ns_ibb);
+    else if (job->method() == QXmppTransferJob::SocksMethod)
+        value.setValue(ns_bytestreams);
+
+    QXmppElement field;
+    field.setTagName("field");
+    field.setAttribute("var", "stream-method");
+    field.appendChild(value);
+
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", "jabber:x:data");
+    x.setAttribute("type", "submit");
+    x.appendChild(field);
+
+    QXmppElement feature;
+    feature.setTagName("feature");
+    feature.setAttribute("xmlns", ns_feature_negotiation);
+    feature.appendChild(x);
+
+    response.setType(QXmppIq::Result);
+    response.setProfile(QXmppStreamInitiationIq::FileTransfer);
+    response.setSiItems(feature);
+
+    m_client->sendPacket(response);
 }
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName)
@@ -876,11 +939,13 @@ void QXmppTransferManager::streamInitiationIqReceived(const QXmppStreamInitiatio
         streamInitiationSetReceived(iq);
 }
 
+// The remote party has accepted an outgoing transfer.
 void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamInitiationIq &iq)
 {
     QXmppTransferJob *job = getJobByRequestId(iq.from(), iq.id());
     if (!job ||
-        job->direction() != QXmppTransferJob::OutgoingDirection)
+        job->direction() != QXmppTransferJob::OutgoingDirection ||
+        job->state() != QXmppTransferJob::OfferState)
         return;
 
     foreach (const QXmppElement &item, iq.siItems())
@@ -904,6 +969,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         }
     }
 
+    // remote party accepted stream initiation
+    job->setState(QXmppTransferJob::StartState);
     if (job->method() == QXmppTransferJob::InBandMethod)
     {
         // lower block size for IBB
@@ -962,9 +1029,22 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         return;
     }
 
+    // check there is a receiver connected to the fileReceived() signal
+    if (!receivers(SIGNAL(fileReceived(QXmppTransferJob*))))
+    {
+        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden);
+        error.setCode(403);
+
+        response.setType(QXmppIq::Error);
+        response.setError(error);
+        m_client->sendPacket(response);
+        return;
+    }
+
     // check the stream type
     QXmppTransferJob *job = new QXmppTransferJob(iq.from(), QXmppTransferJob::IncomingDirection, this);
     int offeredMethods = QXmppTransferJob::NoMethod;
+    job->m_offerId = iq.id();
     job->m_sid = iq.siId();
     job->m_mimeType = iq.mimeType();
     foreach (const QXmppElement &item, iq.siItems())
@@ -1019,53 +1099,12 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         return;
     }
 
+    // register job
+    m_jobs.append(job);
+    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(jobStateChanged(QXmppTransferJob::State)));
+
     // allow user to accept or decline the job
     emit fileReceived(job);
-    if (!job->m_iodevice || !job->m_iodevice->isWritable())
-    {
-        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden);
-        error.setCode(403);
-
-        response.setType(QXmppIq::Error);
-        response.setError(error);
-        m_client->sendPacket(response);
-
-        delete job;
-        return;
-    }
-
-    // the job was accepted
-    m_jobs.append(job);
-    connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(jobError(QXmppTransferJob::Error)));
-
-    QXmppElement value;
-    value.setTagName("value");
-    if (job->method() == QXmppTransferJob::InBandMethod)
-        value.setValue(ns_ibb);
-    else if (job->method() == QXmppTransferJob::SocksMethod)
-        value.setValue(ns_bytestreams);
-
-    QXmppElement field;
-    field.setTagName("field");
-    field.setAttribute("var", "stream-method");
-    field.appendChild(value);
-
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", "jabber:x:data");
-    x.setAttribute("type", "submit");
-    x.appendChild(field);
-
-    QXmppElement feature;
-    feature.setTagName("feature");
-    feature.setAttribute("xmlns", ns_feature_negotiation);
-    feature.appendChild(x);
-
-    response.setType(QXmppIq::Result);
-    response.setProfile(iq.profile());
-    response.setSiItems(feature);
-
-    m_client->sendPacket(response);
 }
 
 /// Return the JID of the bytestream proxy.

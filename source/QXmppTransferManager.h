@@ -73,9 +73,10 @@ public:
 
     enum State
     {
-        StartState = 0,
-        TransferState = 1,
-        FinishedState = 2,
+        OfferState = 0,
+        StartState = 1,
+        TransferState = 2,
+        FinishedState = 3,
     };
 
     void abort();
@@ -132,6 +133,7 @@ private:
     QXmppTransferJob::Error m_error;
     QCryptographicHash m_hash;
     QIODevice *m_iodevice;
+    QString m_offerId;
     QString m_jid;
     QString m_sid;
     Method m_method;
@@ -173,9 +175,8 @@ public:
 signals:
     /// This signal is emitted when a new file transfer offer is received.
     ///
-    /// To accept the transfer job, you must call its accept() method from
-    /// a slot connected to the signal. Otherwise, the offer transfer job
-    /// will be refused.
+    /// To accept the transfer job, call the job's accept() method.
+    /// To refuse the transfer job, call the job's abort() method.
     void fileReceived(QXmppTransferJob *offer);
 
 private slots:
@@ -185,6 +186,7 @@ private slots:
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void iqReceived(const QXmppIq&);
     void jobError(QXmppTransferJob::Error error);
+    void jobStateChanged(QXmppTransferJob::State state);
     void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
     void socksSocketDataReceived();
     void socksSocketDataSent();
