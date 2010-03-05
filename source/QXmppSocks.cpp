@@ -104,48 +104,36 @@ static bool parseHostAndPort(const QByteArray buffer, quint8 &type, QByteArray &
 }
 
 QXmppSocksClient::QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent)
-    : QObject(parent),
+    : QTcpSocket(parent),
     m_proxyAddress(proxyAddress),
     m_proxyPort(proxyPort),
     m_step(ConnectState)
 {
-    m_socket = new QTcpSocket(this);
-    connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(m_socket, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-}
-
-void QXmppSocksClient::close()
-{
-    m_socket->close();
+    connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
+    connect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 }
 
 void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
 {
     m_hostName = hostName;
     m_hostPort = hostPort;
-    m_socket->connectToHost(m_proxyAddress, m_proxyPort);
-}
-
-QString QXmppSocksClient::errorString() const
-{
-    return m_socket->errorString();
-}
-
-QByteArray QXmppSocksClient::readAll()
-{
-    return m_socket->readAll();
+    QTcpSocket::connectToHost(m_proxyAddress, m_proxyPort);
 }
 
 void QXmppSocksClient::slotConnected()
 {
+    m_step == ConnectState;
+
+    // disconnect from signal
+    disconnect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
+
     // send connect to server
     QByteArray buffer;
     buffer.resize(3);
     buffer[0] = SocksVersion;
     buffer[1] = 0x01; // number of methods
     buffer[2] = NoAuthentication;
-    m_socket->write(buffer);
+    write(buffer);
 }
 
 void QXmppSocksClient::slotReadyRead()
@@ -155,11 +143,11 @@ void QXmppSocksClient::slotReadyRead()
         m_step++;
 
         // receive connect to server response
-        QByteArray buffer = m_socket->readAll();
+        QByteArray buffer = readAll();
         if (buffer.size() != 2 || buffer.at(0) != SocksVersion || buffer.at(1) != NoAuthentication)
         {
             qWarning("QXmppSocksClient received an invalid response during handshake");
-            m_socket->close();
+            close();
             return;
         }
 
@@ -172,20 +160,23 @@ void QXmppSocksClient::slotReadyRead()
             DomainName,
             m_hostName.toAscii(),
             m_hostPort));
-        m_socket->write(buffer);
+        write(buffer);
 
     } else if (m_step == CommandState) {
         m_step++;
 
+        // disconnect from signal
+        disconnect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+
         // receive CONNECT response
-        QByteArray buffer = m_socket->readAll();
+        QByteArray buffer = readAll();
         if (buffer.size() < 6 ||
             buffer.at(0) != SocksVersion ||
             buffer.at(1) != Succeeded ||
             buffer.at(2) != 0)
         {
             qWarning("QXmppSocksClient received an invalid response to CONNECT command");
-            m_socket->close();
+            close();
             return;
         }
 
@@ -196,43 +187,28 @@ void QXmppSocksClient::slotReadyRead()
         if (!parseHostAndPort(buffer.mid(3), hostType, hostName, hostPort))
         {
             qWarning("QXmppSocksClient could not parse type/host/port");
-            m_socket->close();
+            close();
             return;
         }
         // FIXME : what do we do with the resulting name / port?
 
-        // from now on, forward signals
-        disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
-        connect(m_socket, SIGNAL(readyRead()), this, SIGNAL(readyRead()));
-
         // notify of connection
-        emit connected();
-
+        emit ready();
     }
 }
 
-bool QXmppSocksClient::waitForConnected(int msecs)
+bool QXmppSocksClient::waitForReady(int msecs)
 {
     QEventLoop loop;
-    connect(this, SIGNAL(connected()), &loop, SLOT(quit()));
     connect(this, SIGNAL(disconnected()), &loop, SLOT(quit()));
+    connect(this, SIGNAL(ready()), &loop, SLOT(quit()));
     QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
 
-    if (m_step == ReadyState && m_socket->isValid())
+    if (m_step == ReadyState && isValid())
         return true;
     else
         return false;
-}
-
-qint64 QXmppSocksClient::write(const QByteArray &data)
-{
-    return m_socket->write(data);
-}
-
-QTcpSocket *QXmppSocksClient::socket()
-{
-    return m_socket;
 }
 
 QXmppSocksServer::QXmppSocksServer(QObject *parent)

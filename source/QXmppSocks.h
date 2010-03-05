@@ -25,30 +25,21 @@
 #define QXMPPSOCKS_H
 
 #include <QHostAddress>
-#include <QObject>
+#include <QTcpSocket>
 
 class QTcpServer;
-class QTcpSocket;
 
-class QXmppSocksClient : public QObject
+class QXmppSocksClient : public QTcpSocket
 {
     Q_OBJECT
 
 public:
     QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent=0);
-    void close();
     void connectToHost(const QString &hostName, quint16 hostPort);
-    QString errorString() const;
-    QByteArray readAll();
-    bool waitForConnected(int msecs = 30000);
-    qint64 write(const QByteArray &data);
-
-    QTcpSocket *socket();
+    bool waitForReady(int msecs = 30000);
 
 signals:
-    void connected();
-    void disconnected();
-    void readyRead();
+    void ready();
 
 private slots:
     void slotConnected();
@@ -59,7 +50,6 @@ private:
     quint16 m_proxyPort;
     QString m_hostName;
     quint16 m_hostPort;
-    QTcpSocket *m_socket;
     int m_step;
 };
 
