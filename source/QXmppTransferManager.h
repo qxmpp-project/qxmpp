@@ -97,9 +97,23 @@ public:
     qint64 fileSize() const;
 
 signals:
+    /// This signal is emitted when an error is encountered while
+    /// processing the transfer job.
     void error(QXmppTransferJob::Error error);
+
+    /// This signal is emitted when the transfer job is finished.
+    ///
+    /// You can determine if the job completed successfully by testing whether
+    /// error() returns QXmppTransferJob::NoError.
+    ///
+    /// Note: Do not delete the job in the slot connected to this signal,
+    /// instead use deleteLater().
     void finished();
+
+    /// This signal is emitted to indicate the progress of this transfer job.
     void progress(qint64 done, qint64 total);
+
+    /// This signal is emitted when the transfer job changes state.
     void stateChanged(QXmppTransferJob::State state);
 
 private slots:
@@ -138,7 +152,6 @@ private:
     int m_ibbSequence;
 
     // for socks5 bytestreams
-    QXmppSocksClient *m_socksClient;
     QTcpSocket *m_socksSocket;
     QXmppByteStreamIq::StreamHost m_socksProxy;
 
@@ -153,7 +166,7 @@ public:
     QXmppTransferManager(QXmppClient* client);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName);
     QString proxy() const;
-    void setProxy(const QString &proxy);
+    void setProxy(const QString &proxyJid);
     int supportedMethods() const;
     void setSupportedMethods(int methods);
 
@@ -171,9 +184,9 @@ private slots:
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void iqReceived(const QXmppIq&);
-    void socksClientDataReceived();
-    void socksClientDisconnected();
+    void jobError(QXmppTransferJob::Error error);
     void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
+    void socksSocketDataReceived();
     void socksSocketDataSent();
     void socksSocketDisconnected();
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
@@ -181,7 +194,6 @@ private slots:
 private:
     QXmppTransferJob *getJobByRequestId(const QString &jid, const QString &id);
     QXmppTransferJob *getJobBySid(const QString &jid, const QString &sid);
-    QXmppTransferJob *getJobBySocksClient(QXmppSocksClient *socksClient);
     QXmppTransferJob *getJobBySocksSocket(QTcpSocket *socksSocket);
     void byteStreamResponseReceived(const QXmppIq&);
     void byteStreamResultReceived(const QXmppByteStreamIq&);
