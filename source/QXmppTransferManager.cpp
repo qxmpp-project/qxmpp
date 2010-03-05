@@ -83,6 +83,25 @@ void QXmppTransferJob::checkData()
         terminate(QXmppTransferJob::NoError);
 }
 
+/// Returns the job's data for a given role.
+///
+/// You can associate arbitrary data with the role using setData.
+
+QVariant QXmppTransferJob::data(int role) const
+{
+    return m_data.value(role);
+}
+
+/// Sets the data for a given role to the given value.
+///
+/// You can set any data you want for use in your application, this
+/// data will not be used internally by QXmppTransferManager.
+
+void QXmppTransferJob::setData(int role, const QVariant &value)
+{
+    m_data.insert(role, value);
+}
+
 QXmppTransferJob::Direction QXmppTransferJob::direction() const
 {
     return m_direction;
@@ -96,16 +115,6 @@ QXmppTransferJob::Error QXmppTransferJob::error() const
 QString QXmppTransferJob::jid() const
 {
     return m_jid;
-}
-
-QString QXmppTransferJob::localFilePath() const
-{
-    return m_localFilePath;
-}
-
-void QXmppTransferJob::setLocalFilePath(const QString &path)
-{
-    m_localFilePath = path;
 }
 
 QDateTime QXmppTransferJob::fileDate() const

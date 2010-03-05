@@ -26,7 +26,9 @@
 
 #include <QCryptographicHash>
 #include <QDateTime>
+#include <QHash>
 #include <QHostAddress>
+#include <QVariant>
 
 #include "QXmppIq.h"
 #include "QXmppByteStreamIq.h"
@@ -79,10 +81,11 @@ public:
     void abort();
     void accept(QIODevice *output);
 
+    QVariant data(int role) const;
+    void setData(int role, const QVariant &value);
+
     QXmppTransferJob::Direction direction() const;
     QXmppTransferJob::Error error() const;
-    QString localFilePath() const;
-    void setLocalFilePath(const QString &path);
     QString jid() const;
     QXmppTransferJob::Method method() const;
     QXmppTransferJob::State state() const;
@@ -122,8 +125,8 @@ private:
     QString m_requestId;
     State m_state;
 
-    // local path to file
-    QString m_localFilePath;
+    // arbitrary data
+    QHash<int, QVariant> m_data;
 
     // file meta-data
     QDateTime m_fileDate;
@@ -155,6 +158,11 @@ public:
     void setSupportedMethods(int methods);
 
 signals:
+    /// This signal is emitted when a new file transfer offer is received.
+    ///
+    /// To accept the transfer job, you must call its accept() method from
+    /// a slot connected to the signal. Otherwise, the offer transfer job
+    /// will be refused.
     void fileReceived(QXmppTransferJob *offer);
 
 private slots:
