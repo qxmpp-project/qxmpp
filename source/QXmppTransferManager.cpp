@@ -95,7 +95,7 @@ void QXmppTransferJob::checkData()
 
 /// Returns the job's data for a given role.
 ///
-/// You can associate arbitrary data with the role using setData.
+/// You can associate arbitrary data with the role using setData().
 
 QVariant QXmppTransferJob::data(int role) const
 {
@@ -112,10 +112,16 @@ void QXmppTransferJob::setData(int role, const QVariant &value)
     m_data.insert(role, value);
 }
 
+/// Returns the job's transfer direction.
+///
+
 QXmppTransferJob::Direction QXmppTransferJob::direction() const
 {
     return m_direction;
 }
+
+/// Returns the last error that was encoutered.
+///
 
 QXmppTransferJob::Error QXmppTransferJob::error() const
 {
@@ -702,6 +708,10 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
     m_client->sendPacket(response);
 }
 
+/// Send file to a remote party.
+///
+/// The remote party will be given the choice to accept or refuse the transfer.
+///
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName)
 {
     QFileInfo info(fileName);
@@ -1129,6 +1139,8 @@ void QXmppTransferManager::setProxy(const QString &proxyJid)
 }
 
 /// Return the supported stream methods.
+///
+/// The methods are a combination of zero or more QXmppTransferJob::Method.
 ///
 
 int QXmppTransferManager::supportedMethods() const

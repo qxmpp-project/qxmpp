@@ -43,6 +43,11 @@ class QXmppSocksClient;
 class QXmppSocksServer;
 class QXmppStreamInitiationIq;
 
+/// The QXmppTransferJob class represent a single file transfer job.
+///
+/// \sa QXmppTransferManager
+///
+
 class QXmppTransferJob : public QObject
 {
     Q_OBJECT
@@ -50,25 +55,25 @@ class QXmppTransferJob : public QObject
 public:
     enum Direction
     {
-        IncomingDirection,
-        OutgoingDirection,
+        IncomingDirection, ///< The file is being received.
+        OutgoingDirection, ///< The file is being sent.
     };
 
     enum Error
     {
-        NoError = 0,
-        AbortError,
-        FileAccessError,
-        FileCorruptError,
-        ProtocolError,
+        NoError = 0,      ///< No error occured.
+        AbortError,       ///< The file transfer was aborted.
+        FileAccessError,  ///< An error was encountered trying to access a local file.
+        FileCorruptError, ///< The file is corrupt: the file size or hash do not match.
+        ProtocolError,    ///< An error was encountered in the file transfer protocol.
     };
 
     enum Method
     {
-        NoMethod = 0,
-        InBandMethod = 1,
-        SocksMethod = 2,
-        AnyMethod = 3,
+        NoMethod = 0,     ///< No transfer method.
+        InBandMethod = 1, ///< XEP-0047: In-Band Bytestreams
+        SocksMethod = 2,  ///< XEP-0065: SOCKS5 Bytestreams
+        AnyMethod = 3,    ///< Any supported transfer method.
     };
 
     enum State
@@ -160,6 +165,13 @@ private:
     friend class QXmppTransferManager;
 };
 
+/// The QXmppTransferManager class provides support for sending and receiving
+/// files.
+///
+/// Stream initiation is performed as described in XEP-0095: Stream Initiation
+/// and XEP-0096: SI File Transfer. The actual file transfer is then performed
+/// using either XEP-0065: SOCKS5 Bytestreams or XEP-0047: In-Band Bytestreams.
+/// 
 class QXmppTransferManager : public QObject
 {
     Q_OBJECT
@@ -175,8 +187,8 @@ public:
 signals:
     /// This signal is emitted when a new file transfer offer is received.
     ///
-    /// To accept the transfer job, call the job's accept() method.
-    /// To refuse the transfer job, call the job's abort() method.
+    /// To accept the transfer job, call the job's QXmppTransferJob::accept() method.
+    /// To refuse the transfer job, call the job's QXmppTransferJob::abort() method.
     void fileReceived(QXmppTransferJob *offer);
 
 private slots:
