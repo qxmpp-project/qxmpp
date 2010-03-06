@@ -21,21 +21,6 @@
  *
  */
 
-/// \class QXmppClient
-/// \brief The QXmppClient is the main class for using QXmpp.
-///
-/// It provides the user all the required functionality to connect to the server
-/// and perform operations afterwards.
-///
-/// This class will provide the handle/reference to QXmppRoster (roster management),
-///  QXmppVCardManager (vCard manager) and QXmppReconnectionManager (reconnection
-/// mechanism).
-///
-/// By default, a reconnection mechanism exists, which makes sure of reconnecting
-/// to the server on dissconnections due to an error. User can have a custom
-/// reconnection mechanism as well.
-///
-
 #ifndef QXMPPCLIENT_H
 #define QXMPPCLIENT_H
 
@@ -63,6 +48,20 @@ class QXmppArchiveManager;
 class QXmppDiscoveryIq;
 class QXmppTransferManager;
 class QXmppVersionIq;
+
+/// \brief The QXmppClient class is the main class for using QXmpp.
+///
+/// It provides the user all the required functionality to connect to the server
+/// and perform operations afterwards.
+///
+/// This class will provide the handle/reference to QXmppRoster (roster management),
+/// QXmppVCardManager (vCard manager), QXmppReconnectionManager (reconnection
+/// mechanism) and QXmppTransferManager (file transfers).
+///
+/// By default, a reconnection mechanism exists, which makes sure of reconnecting
+/// to the server on disconnections due to an error. User can have a custom
+/// reconnection mechanism as well.
+///
 
 class QXmppClient : public QObject
 {

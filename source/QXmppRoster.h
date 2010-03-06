@@ -21,9 +21,20 @@
  *
  */
 
+#ifndef QXMPPROSTER_H
+#define QXMPPROSTER_H
 
-/// \class QXmppRoster
-/// \brief Class for handling the roster of the connected client.
+#include <QObject>
+#include <QMap>
+#include <QSet>
+#include <QStringList>
+
+#include "QXmppClient.h"
+
+class QXmppRosterIq;
+class QXmppPresence;
+
+/// \brief The QXmppRoster class provides access to a connected client's roster.
 ///
 /// \note It's object should not be created using it's constructor. Instead
 /// QXmppClient::getRoster() should be used to get the reference of instantiated
@@ -45,19 +56,6 @@
 /// Signals presenceChanged() or rosterChanged() are emitted whenever presence
 /// or roster changes respectively.
 ///
-
-#ifndef QXMPPROSTER_H
-#define QXMPPROSTER_H
-
-#include <QObject>
-#include <QMap>
-#include <QSet>
-#include <QStringList>
-
-#include "QXmppClient.h"
-
-class QXmppRosterIq;
-class QXmppPresence;
 
 class QXmppRoster : public QObject
 {

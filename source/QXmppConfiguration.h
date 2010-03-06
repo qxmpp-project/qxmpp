@@ -22,21 +22,22 @@
  */
 
 
-/// \class QXmppConfiguration
-///
-/// \brief The QXmppConfiguration is a configuration class. Its object can be passed
-/// to the QXmppClient for connecting the an XMPP server.
-///
-/// It is a container of all the settings, configuration required for connecting to
-/// an XMPP server. E.g. server name, username, port, type of authentication mechanism,
-/// type of security used by stream (encryption) etc.
-///
-
 #ifndef QXMPPCONFIGURATION_H
 #define QXMPPCONFIGURATION_H
 
 #include <QString>
 #include <QNetworkProxy>
+
+/// \brief The QXmppConfiguration class holds configuration options.
+///
+/// It can be passed to QXmppClient to specify the options when connecting to
+/// an XMPP server.
+///
+/// It is a container of all the settings, configuration required for
+/// connecting to an XMPP server. E.g. server name, username, port, type
+/// of authentication mechanism, type of security used by stream (encryption),
+/// etc..
+///
 
 class QXmppConfiguration
 {

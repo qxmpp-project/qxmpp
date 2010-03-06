@@ -43,7 +43,7 @@ class QXmppSocksClient;
 class QXmppSocksServer;
 class QXmppStreamInitiationIq;
 
-/// The QXmppTransferJob class represent a single file transfer job.
+/// \brief The QXmppTransferJob class represents a single file transfer job.
 ///
 /// \sa QXmppTransferManager
 ///
@@ -165,8 +165,8 @@ private:
     friend class QXmppTransferManager;
 };
 
-/// The QXmppTransferManager class provides support for sending and receiving
-/// files.
+/// \brief The QXmppTransferManager class provides support for sending and
+/// receiving files.
 ///
 /// Stream initiation is performed as described in XEP-0095: Stream Initiation
 /// and XEP-0096: SI File Transfer. The actual file transfer is then performed
