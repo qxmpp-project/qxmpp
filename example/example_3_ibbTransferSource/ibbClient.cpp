@@ -36,6 +36,7 @@ ibbClient::ibbClient(QObject *parent)
     bool check = connect( this, SIGNAL(connected()),
              this, SLOT(slotConnected()) );
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void ibbClient::slotConnected()
