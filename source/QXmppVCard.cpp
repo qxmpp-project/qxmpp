@@ -96,15 +96,15 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
-    helperToXmlAddTextElement(writer, "FN", getFullName());
-    if(!getNickName().isEmpty())
-        helperToXmlAddTextElement(writer, "NICKNAME", getNickName());
+    helperToXmlAddTextElement(writer, "FN", fullName());
+    if(!nickName().isEmpty())
+        helperToXmlAddTextElement(writer, "NICKNAME", nickName());
 
-    if(!getPhoto().isEmpty())
+    if(!photo().isEmpty())
     {
         writer->writeStartElement("PHOTO");
-        helperToXmlAddTextElement(writer, "TYPE", getImageType(getPhoto()));
-        helperToXmlAddTextElement(writer, "BINVAL", getPhoto().toBase64());
+        helperToXmlAddTextElement(writer, "TYPE", getImageType(photo()));
+        helperToXmlAddTextElement(writer, "BINVAL", photo().toBase64());
         writer->writeEndElement();
     }
 
@@ -113,7 +113,7 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
 QImage QXmppVCard::photoAsImage() const
 {
-    return getImageFromByteArray(getPhoto());
+    return getImageFromByteArray(photo());
 }
 
 QString QXmppVCard::getFullName() const
@@ -133,6 +133,6 @@ const QByteArray& QXmppVCard::getPhoto() const
 
 QImage QXmppVCard::getPhotoAsImage() const
 {
-    return getImageFromByteArray(getPhoto());
+    return getImageFromByteArray(photo());
 }
 
