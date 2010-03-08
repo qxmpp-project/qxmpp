@@ -662,7 +662,7 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
     response.setId(job->m_offerId);
 
     // the job was refused by the local party
-    if (!job->m_iodevice || !job->m_iodevice->isWritable())
+    if (state != QXmppTransferJob::StartState || !job->m_iodevice || !job->m_iodevice->isWritable())
     {
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden);
         error.setCode(403);
