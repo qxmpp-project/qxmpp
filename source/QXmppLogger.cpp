@@ -57,17 +57,7 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
     return m_loggingType;
 }
 
-void QXmppLogger::debug(const QString &str)
-{
-    log(QtDebugMsg, str);
-}
-
-void QXmppLogger::warning(const QString &str)
-{
-    log(QtWarningMsg, str);
-}
-
-void QXmppLogger::log(QtMsgType type, const QString& str)
+void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
 {
     switch(m_loggingType)
     {

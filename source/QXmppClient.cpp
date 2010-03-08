@@ -187,7 +187,7 @@ void QXmppClient::connectToServer(const QString& host,
     else
     {
         qWarning("QXmppClient::connectToServer: Invalid bareJid");
-        logger()->debug("Invalid bareJid");
+        logger()->log(QXmppLogger::WarningMessage, "Invalid bareJid");
     }
 }
 

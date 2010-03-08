@@ -144,6 +144,7 @@ private:
 
     QXmppConfiguration& getConfiguration();
     void debug(const QString&);
+    void info(const QString&);
     void warning(const QString&);
     void parser(const QByteArray&);
     void sendStartStream();

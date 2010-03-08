@@ -39,23 +39,28 @@ public:
         STDOUT
     };
 
+    enum MessageType
+    {
+        DebugMessage = 0,   ///< Debugging message
+        InformationMessage, ///< Informational message
+        WarningMessage,     ///< Warning message
+        ReceivedMessage,    ///< Message received from server
+        SentMessage,        ///< Message sent to server
+    };
+
     QXmppLogger(QObject *parent = 0);
     static QXmppLogger* getLogger();
 
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
 
-    void debug(const QString& str);
-    void warning(const QString &str);
+    virtual void log(QXmppLogger::MessageType type, const QString& str);
 
     // deprecated accessors, use the form without "get" instead
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
 signals:
-    void message(QtMsgType type, const QString &str);
-
-protected:
-    virtual void log(QtMsgType type, const QString& str);
+    void message(QXmppLogger::MessageType type, const QString &str);
 
 private:
     static QXmppLogger* m_logger;

@@ -169,7 +169,7 @@ QXmppConfiguration& QXmppStream::getConfiguration()
 
 void QXmppStream::connect()
 {
-    debug(QString("Connecting to: %1:%2").arg(getConfiguration().
+    info(QString("Connecting to: %1:%2").arg(getConfiguration().
             host()).arg(getConfiguration().port()));
 
     // prepare for connection
@@ -192,14 +192,14 @@ void QXmppStream::socketSslErrors(const QList<QSslError> & error)
 
 void QXmppStream::socketHostFound()
 {
-    warning("Host found");
+    debug("Host found");
     emit hostFound();
 }
 
 void QXmppStream::socketConnected()
 {
     flushDataBuffer();
-    debug("Connected");
+    info("Connected");
     emit connected();
     sendStartStream();
 }
@@ -207,7 +207,7 @@ void QXmppStream::socketConnected()
 void QXmppStream::socketDisconnected()
 {
     flushDataBuffer();
-    debug("Disconnected");
+    info("Disconnected");
     emit disconnected();
 }
 
@@ -226,8 +226,8 @@ void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 
 void QXmppStream::socketReadReady()
 {
-    QByteArray data = m_socket.readAll();
-    debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
+    const QByteArray data = m_socket.readAll();
+    //debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
     parser(data);
 }
 
@@ -242,12 +242,17 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
 
 void QXmppStream::debug(const QString &data)
 {
-    m_client->logger()->debug(data);
+    m_client->logger()->log(QXmppLogger::DebugMessage, data);
+}
+
+void QXmppStream::info(const QString &data)
+{
+    m_client->logger()->log(QXmppLogger::InformationMessage, data);
 }
 
 void QXmppStream::warning(const QString &data)
 {
-    m_client->logger()->warning(data);
+    m_client->logger()->log(QXmppLogger::WarningMessage, data);
 }
 
 void QXmppStream::parser(const QByteArray& data)
@@ -272,7 +277,7 @@ void QXmppStream::parser(const QByteArray& data)
     
     if(doc.setContent(completeXml, true))
     {
-        debug("SERVER:" + m_dataBuffer);
+        m_client->logger()->log(QXmppLogger::ReceivedMessage, m_dataBuffer);
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -301,7 +306,7 @@ void QXmppStream::parser(const QByteArray& data)
         {
 
             QString ns = nodeRecv.namespaceURI();
-            //debug("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
+            debug("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
             if(m_client->handleStreamElement(nodeRecv))
             {
                 // already handled by client, do nothing
@@ -389,7 +394,7 @@ void QXmppStream::parser(const QByteArray& data)
                             break;
                         }
                     default:
-                        debug("Desired SASL Auth mechanism not available trying the available ones");
+                        info("Desired SASL Auth mechanism not available trying the available ones");
                         if(mechanisms.contains("DIGEST-MD5"))
                             sendAuthDigestMD5();
                         else if(mechanisms.contains("PLAIN"))
@@ -775,7 +780,7 @@ void QXmppStream::sendStartStream()
 
 void QXmppStream::sendToServer(const QByteArray& packet)
 {
-    debug("CLIENT: " + packet);
+    m_client->logger()->log(QXmppLogger::SentMessage, packet);
     m_socket.write( packet );
 }
 
