@@ -194,8 +194,10 @@ public:
 
     QXmppClient::StreamError getXmppStreamError();
 
+    QXmppLogger *logger();
+    void setLogger(QXmppLogger *logger);
+
     virtual bool handleStreamElement(const QDomElement &element);
-    virtual QXmppLogger &logger();
 
 public slots:
     void sendPacket(const QXmppPacket&);
@@ -207,6 +209,7 @@ public slots:
     void setClientPresence(QXmppPresence::Status::Type statusType);
 
 private:
+    QXmppLogger* m_logger;
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
                             ///< TCP socket and XMPP protocol
     QXmppConfiguration m_config;    ///< This object provides the configuration

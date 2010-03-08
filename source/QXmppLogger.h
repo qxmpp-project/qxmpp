@@ -27,7 +27,7 @@
 
 #include <QTextStream>
 
-class QFile;
+class QIODevice;
 
 /// Singleton class
 class QXmppLogger
@@ -40,24 +40,23 @@ public:
         STDOUT
     };
 
-    ~QXmppLogger();
-
     static QXmppLogger* getLogger();
+
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
 
-    QXmppLogger& operator<<(const QByteArray &b);
-    QXmppLogger& operator<<(const QString &str);
+    QDebug debug();
 
     // deprecated methods
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
 private:
     QXmppLogger();
+    ~QXmppLogger();
+
     static QXmppLogger* m_logger;
     QXmppLogger::LoggingType m_loggingType;
-    QFile *m_file;
-    QTextStream m_stream;
+    QIODevice *m_device;
 };
 
 #endif // QXMPPLOGGER_H

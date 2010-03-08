@@ -24,6 +24,7 @@
 
 #include "QXmppUtils.h"
 #include "QXmppLogger.h"
+#include <QDebug>
 #include <QString>
 #include <QXmlStreamWriter>
 #include <QByteArray>
@@ -118,12 +119,12 @@ void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
 
 void log(const QString& str)
 {
-    *QXmppLogger::getLogger() << str;
+    QXmppLogger::getLogger()->debug() << str;
 }
 
 void log(const QByteArray& str)
 {
-    *QXmppLogger::getLogger() << str;
+    QXmppLogger::getLogger()->debug() << str;
 }
 
 QString escapeString(const QString& str)

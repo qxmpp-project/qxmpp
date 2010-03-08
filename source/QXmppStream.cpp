@@ -242,7 +242,7 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
 
 void QXmppStream::log(const QString &data)
 {
-    m_client->logger() << data;
+    m_client->logger()->debug() << data;
 }
 
 void QXmppStream::parser(const QByteArray& data)

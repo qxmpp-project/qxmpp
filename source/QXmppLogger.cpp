@@ -21,6 +21,7 @@
  *
  */
 
+#include <QDebug>
 #include <QFile>
 #include <QTime>
 
@@ -29,13 +30,13 @@
 QXmppLogger* QXmppLogger::m_logger = 0;
 
 QXmppLogger::QXmppLogger()
-    : m_loggingType(QXmppLogger::NONE), m_file(0)
+    : m_loggingType(QXmppLogger::NONE), m_device(0)
 {
 }
 
 QXmppLogger::~QXmppLogger()
 {
-    delete m_file;
+    delete m_device;
 }
 
 QXmppLogger* QXmppLogger::getLogger()
@@ -51,25 +52,27 @@ QXmppLogger* QXmppLogger::getLogger()
 
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
 {
-    if (m_file)
+    if (m_device)
     {
-        delete m_file;
-        m_file = 0;
+        delete m_device;
+        m_device = 0;
     }
+
+    QFile *file = 0;
     switch(log)
     {
     case QXmppLogger::FILE:
-        m_file = new QFile("QXmppClientLog.log");
-        m_file->open(QIODevice::Append);
+        file = new QFile("QXmppClientLog.log");
+        file->open(QIODevice::Append);
         break;
     case QXmppLogger::STDOUT:
-        m_file = new QFile();
-        m_file->open(stdout, QIODevice::WriteOnly);
+        file = new QFile();
+        file->open(stdout, QIODevice::WriteOnly);
         break;
     case QXmppLogger::NONE:
         break;
     }
-    m_stream.setDevice(m_file);
+    m_device = file;
     m_loggingType = log;
 }
 
@@ -78,20 +81,11 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
     return m_loggingType;
 }
 
-QXmppLogger &QXmppLogger::operator<<(const QByteArray &str)
+QDebug QXmppLogger::debug()
 {
-    if (m_loggingType != NONE)
-    {
-        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
-                str << "\n\n";
-        m_stream.flush();
-    }
-    return *this;
-}
-
-QXmppLogger &QXmppLogger::operator<<(const QString &str)
-{
-    return (*this << str.toLocal8Bit());
+    if (m_device)
+        return QDebug(m_device) << QTime::currentTime().toString("hh:mm:ss.zzz") << ":";
+    return QDebug(m_device);
 }
 
 QXmppLogger::LoggingType QXmppLogger::getLoggingType()

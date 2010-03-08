@@ -38,9 +38,10 @@
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
-    : QObject(parent), m_stream(0), m_clientPrecence(QXmppPresence::Available),
+    : QObject(parent), m_logger(0), m_stream(0), m_clientPrecence(QXmppPresence::Available),
     m_reconnectionManager(0)
 {
+    m_logger = QXmppLogger::getLogger();
     m_stream = new QXmppStream(this);
 
     bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
@@ -186,7 +187,7 @@ void QXmppClient::connectToServer(const QString& host,
     else
     {
         qWarning("QXmppClient::connectToServer: Invalid bareJid");
-        logger() << QString("Invalid bareJid");
+        logger()->debug() << QString("Invalid bareJid");
     }
 }
 
@@ -525,7 +526,13 @@ bool QXmppClient::handleStreamElement(const QDomElement &element)
 
 /// Return the QXmppLogger associated with the client.
 
-QXmppLogger &QXmppClient::logger()
+QXmppLogger *QXmppClient::logger()
 {
-    return *QXmppLogger::getLogger();
+    return m_logger;
 }
+
+void QXmppClient::setLogger(QXmppLogger *logger)
+{
+    m_logger = logger;
+}
+
