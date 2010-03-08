@@ -21,22 +21,28 @@
  *
  */
 
+#include <iostream>
+
+#include <QTextStream>
+#include <QFile>
+#include <QTime>
 
 #include "QXmppLogger.h"
-#include <iostream>
-#include <QTime>
 
 QXmppLogger* QXmppLogger::m_logger = 0;
 
 QXmppLogger::QXmppLogger()
-    : m_file("QXmppClientLog.log"), m_loggingType(QXmppLogger::FILE)
+    : m_loggingType(QXmppLogger::NONE)
 {
 }
 
 QXmppLogger* QXmppLogger::getLogger()
 {
     if(!m_logger)
+    {
         m_logger = new QXmppLogger();
+        m_logger->setLoggingType(FILE);
+    }
 
     return m_logger;
 }
@@ -66,16 +72,16 @@ void QXmppLogger::log(QtMsgType type, const QString& str)
     switch(m_loggingType)
     {
     case QXmppLogger::FILE:
-        m_file.open(QIODevice::Append);
-        m_stream.setDevice(&m_file);
-        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
+        {
+            QFile file("QXmppClientLog.log");
+            file.open(QIODevice::Append);
+            QTextStream stream(&file);
+            stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : " <<
                 str << "\n\n";
-        m_file.close();
+        }
         break;
     case QXmppLogger::STDOUT:
-        std::cout<<qPrintable(str)<<std::endl;
-        break;
-    case QXmppLogger::NONE:
+        std::cout << qPrintable(str) << std::endl;
         break;
     default:
         break;
