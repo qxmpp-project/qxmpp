@@ -21,58 +21,28 @@
  *
  */
 
-#include <QDebug>
-#include <QFile>
-#include <QTime>
 
 #include "QXmppLogger.h"
+#include <iostream>
+#include <QTime>
 
 QXmppLogger* QXmppLogger::m_logger = 0;
 
 QXmppLogger::QXmppLogger()
-    : m_loggingType(QXmppLogger::NONE), m_device(0)
+    : m_file("QXmppClientLog.log"), m_loggingType(QXmppLogger::FILE)
 {
-}
-
-QXmppLogger::~QXmppLogger()
-{
-    delete m_device;
 }
 
 QXmppLogger* QXmppLogger::getLogger()
 {
     if(!m_logger)
-    {
         m_logger = new QXmppLogger();
-        m_logger->setLoggingType(QXmppLogger::FILE);
-    }
 
     return m_logger;
 }
 
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
 {
-    if (m_device)
-    {
-        delete m_device;
-        m_device = 0;
-    }
-
-    QFile *file = 0;
-    switch(log)
-    {
-    case QXmppLogger::FILE:
-        file = new QFile("QXmppClientLog.log");
-        file->open(QIODevice::Append);
-        break;
-    case QXmppLogger::STDOUT:
-        file = new QFile();
-        file->open(stdout, QIODevice::WriteOnly);
-        break;
-    case QXmppLogger::NONE:
-        break;
-    }
-    m_device = file;
     m_loggingType = log;
 }
 
@@ -81,11 +51,35 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
     return m_loggingType;
 }
 
-QDebug QXmppLogger::debug()
+void QXmppLogger::debug(const QString &str)
 {
-    if (m_device)
-        return QDebug(m_device) << QTime::currentTime().toString("hh:mm:ss.zzz") << ":";
-    return QDebug(m_device);
+    log(QtDebugMsg, str);
+}
+
+void QXmppLogger::warning(const QString &str)
+{
+    log(QtWarningMsg, str);
+}
+
+void QXmppLogger::log(QtMsgType type, const QString& str)
+{
+    switch(m_loggingType)
+    {
+    case QXmppLogger::FILE:
+        m_file.open(QIODevice::Append);
+        m_stream.setDevice(&m_file);
+        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
+                str << "\n\n";
+        m_file.close();
+        break;
+    case QXmppLogger::STDOUT:
+        std::cout<<qPrintable(str)<<std::endl;
+        break;
+    case QXmppLogger::NONE:
+        break;
+    default:
+        break;
+    }
 }
 
 QXmppLogger::LoggingType QXmppLogger::getLoggingType()

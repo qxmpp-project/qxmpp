@@ -26,8 +26,7 @@
 #define QXMPPLOGGER_H
 
 #include <QTextStream>
-
-class QIODevice;
+#include <QFile>
 
 /// Singleton class
 class QXmppLogger
@@ -41,22 +40,24 @@ public:
     };
 
     static QXmppLogger* getLogger();
-
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
 
-    QDebug debug();
+    void debug(const QString& str);
+    void warning(const QString &str);
 
-    // deprecated methods
+    // deprecated accessors, use the form without "get" instead
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
-private:
+protected:
     QXmppLogger();
-    ~QXmppLogger();
+    virtual void log(QtMsgType type, const QString& str);
 
+private:
     static QXmppLogger* m_logger;
     QXmppLogger::LoggingType m_loggingType;
-    QIODevice *m_device;
+    QFile m_file;
+    QTextStream m_stream;
 };
 
 #endif // QXMPPLOGGER_H

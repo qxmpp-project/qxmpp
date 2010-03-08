@@ -187,7 +187,7 @@ void QXmppClient::connectToServer(const QString& host,
     else
     {
         qWarning("QXmppClient::connectToServer: Invalid bareJid");
-        logger()->debug() << QString("Invalid bareJid");
+        logger()->debug("Invalid bareJid");
     }
 }
 
@@ -521,6 +521,7 @@ QXmppTransferManager& QXmppClient::getTransferManager()
 
 bool QXmppClient::handleStreamElement(const QDomElement &element)
 {
+    Q_UNUSED(element);
     return false;
 }
 
