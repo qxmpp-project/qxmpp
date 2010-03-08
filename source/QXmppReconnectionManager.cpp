@@ -36,6 +36,7 @@ QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client) :
     m_timer.setSingleShot(true);
     bool check = connect(&m_timer, SIGNAL(timeout()), SLOT(reconnect()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void QXmppReconnectionManager::connected()
