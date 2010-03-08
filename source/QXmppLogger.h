@@ -26,7 +26,8 @@
 #define QXMPPLOGGER_H
 
 #include <QTextStream>
-#include <QFile>
+
+class QFile;
 
 /// Singleton class
 class QXmppLogger
@@ -38,6 +39,8 @@ public:
         FILE,
         STDOUT
     };
+
+    ~QXmppLogger();
 
     static QXmppLogger* getLogger();
     QXmppLogger::LoggingType loggingType();
@@ -53,7 +56,7 @@ private:
     QXmppLogger();
     static QXmppLogger* m_logger;
     QXmppLogger::LoggingType m_loggingType;
-    QFile m_file;
+    QFile *m_file;
     QTextStream m_stream;
 };
 
