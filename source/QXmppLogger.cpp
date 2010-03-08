@@ -31,6 +31,25 @@
 
 QXmppLogger* QXmppLogger::m_logger = 0;
 
+static const char *typeName(QXmppLogger::MessageType type)
+{
+    switch (type)
+    {
+    case QXmppLogger::DebugMessage:
+        return "DEBUG";
+    case QXmppLogger::InformationMessage:
+        return "INFO";
+    case QXmppLogger::WarningMessage:
+        return "WARNING";
+    case QXmppLogger::ReceivedMessage:
+        return "SERVER";
+    case QXmppLogger::SentMessage:
+        return "CLIENT";
+    default:
+        return "";
+    }
+}
+
 QXmppLogger::QXmppLogger(QObject *parent)
     : QObject(parent), m_loggingType(QXmppLogger::NONE)
 {
@@ -66,12 +85,13 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
             QFile file("QXmppClientLog.log");
             file.open(QIODevice::Append);
             QTextStream stream(&file);
-            stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : " <<
+            stream << QTime::currentTime().toString("hh:mm:ss.zzz") <<
+                " " << typeName(type) << " " <<
                 str << "\n\n";
         }
         break;
     case QXmppLogger::STDOUT:
-        std::cout << qPrintable(str) << std::endl;
+        std::cout << typeName(type) << " " << qPrintable(str) << std::endl;
         break;
     default:
         break;
