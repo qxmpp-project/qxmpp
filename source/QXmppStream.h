@@ -143,6 +143,7 @@ private:
     int m_authStep;
 
     QXmppConfiguration& getConfiguration();
+    void log(const QString&);
     void parser(const QByteArray&);
     void sendStartStream();
     void sendEndStream();

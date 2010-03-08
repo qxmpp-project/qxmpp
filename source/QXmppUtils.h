@@ -52,8 +52,8 @@ void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
 void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
                            int value);
 
-void log(const QString& str);
-void log(const QByteArray& str);
+void Q_DECL_DEPRECATED log(const QString& str);
+void Q_DECL_DEPRECATED log(const QByteArray& str);
 
 QString escapeString(const QString& str);
 QString unescapeString(const QString& str);

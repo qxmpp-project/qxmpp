@@ -39,13 +39,15 @@ public:
         STDOUT
     };
 
-    static QXmppLogger* getLogger();
+    static QXmppLogger &defaultLogger();
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
-    void log(const QString& str);
-    void log(const QByteArray& str);
 
-    // deprecated accessors, use the form without "get" instead
+    QXmppLogger& operator<<(const QByteArray &b);
+    QXmppLogger& operator<<(const QString &str);
+
+    // deprecated methods
+    static QXmppLogger* Q_DECL_DEPRECATED getLogger();
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
 private:

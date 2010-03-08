@@ -24,6 +24,7 @@
 
 #include "QXmppReconnectionManager.h"
 #include "QXmppClient.h"
+#include "QXmppLogger.h"
 #include "QXmppUtils.h"
 
 QXmppReconnectionManager::QXmppReconnectionManager(QXmppClient* client) :
@@ -82,7 +83,7 @@ void QXmppReconnectionManager::reconnect()
 {
     if(m_client)
     {
-        log(QString("QXmppReconnectionManager::reconnect()"));
+        m_client->logger() << QString("QXmppReconnectionManager::reconnect()");
         emit reconnectingNow();
         m_client->connectToServer(m_client->getConfiguration());
     }

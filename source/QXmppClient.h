@@ -32,6 +32,7 @@
 #include "QXmppConfiguration.h"
 #include "QXmppPresence.h"
 
+class QXmppLogger;
 class QXmppStream;
 class QXmppPresence;
 class QXmppMessage;
@@ -194,6 +195,7 @@ public:
     QXmppClient::StreamError getXmppStreamError();
 
     virtual bool handleStreamElement(const QDomElement &element);
+    virtual QXmppLogger &logger();
 
 public slots:
     void sendPacket(const QXmppPacket&);

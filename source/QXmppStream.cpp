@@ -240,6 +240,11 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
     sendPacket(authQuery);
 }
 
+void QXmppStream::log(const QString &data)
+{
+    m_client->logger() << data;
+}
+
 void QXmppStream::parser(const QByteArray& data)
 {
     QDomDocument doc;

@@ -23,6 +23,7 @@
 
 
 #include "QXmppClient.h"
+#include "QXmppLogger.h"
 #include "QXmppStream.h"
 #include "QXmppRoster.h"
 #include "QXmppMessage.h"
@@ -185,7 +186,7 @@ void QXmppClient::connectToServer(const QString& host,
     else
     {
         qWarning("QXmppClient::connectToServer: Invalid bareJid");
-        log(QString("Invalid bareJid"));
+        logger() << QString("Invalid bareJid");
     }
 }
 
@@ -520,4 +521,11 @@ QXmppTransferManager& QXmppClient::getTransferManager()
 bool QXmppClient::handleStreamElement(const QDomElement &element)
 {
     return false;
+}
+
+/// Return the QXmppLogger associated with the client.
+
+QXmppLogger &QXmppClient::logger()
+{
+    return QXmppLogger::defaultLogger();
 }

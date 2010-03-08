@@ -35,12 +35,17 @@ QXmppLogger::QXmppLogger()
 {
 }
 
-QXmppLogger* QXmppLogger::getLogger()
+QXmppLogger &QXmppLogger::defaultLogger()
 {
     if(!m_logger)
         m_logger = new QXmppLogger();
 
-    return m_logger;
+    return *m_logger;
+}
+
+QXmppLogger* QXmppLogger::getLogger()
+{
+    return &defaultLogger();
 }
 
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
@@ -53,28 +58,7 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
     return m_loggingType;
 }
 
-void QXmppLogger::log(const QString& str)
-{
-    switch(m_loggingType)
-    {
-    case QXmppLogger::FILE:
-        m_file.open(QIODevice::Append);
-        m_stream.setDevice(&m_file);
-        m_stream << QTime::currentTime().toString("hh:mm:ss.zzz") << " : "<<
-                str << "\n\n";
-        m_file.close();
-        break;
-    case QXmppLogger::STDOUT:
-        std::cout<<qPrintable(str)<<std::endl;
-        break;
-    case QXmppLogger::NONE:
-        break;
-    default:
-        break;
-    }
-}
-
-void QXmppLogger::log(const QByteArray& str)
+QXmppLogger &QXmppLogger::operator<<(const QByteArray &str)
 {
     switch(m_loggingType)
     {
@@ -93,6 +77,12 @@ void QXmppLogger::log(const QByteArray& str)
     default:
         break;
     }
+    return *this;
+}
+
+QXmppLogger &QXmppLogger::operator<<(const QString &str)
+{
+    return (*this << str.toLocal8Bit());
 }
 
 QXmppLogger::LoggingType QXmppLogger::getLoggingType()
