@@ -4,9 +4,16 @@ QT += network \
 CONFIG += staticlib \
     debug_and_release
 
-TARGET = QXmppClient
+# Make sure the library gets built in the same location
+# regardless of the platform. On win32 the library is
+# automagically put in debug/release folders, so do the
+# same for other platforms.
 CONFIG(debug, debug|release) { 
-    TARGET = $$join(TARGET,,,_d)
+    win32:TARGET = QXmppClient_d
+    !win32:TARGET = debug/QXmppClient_d
+} else {
+    win32:TARGET = QXmppClient
+    !win32:TARGET = release/QXmppClient
 }
 
 # Header files

@@ -8,14 +8,12 @@ CONFIG += console debug_and_release
 
 CONFIG(debug, debug|release) {
     QXMPP_LIB = QXmppClient_d
+    QXMPP_DIR = ../../source/debug
 } else {
     QXMPP_LIB = QXmppClient
+    QXMPP_DIR = ../../source/release
 }
-LIBS += -L../../source -l$$QXMPP_LIB
 
-win32 {
-    PRE_TARGETDEPS += ../../source/${QXMPP_LIB}.lib
-} else {
-    PRE_TARGETDEPS += ../../source/lib$${QXMPP_LIB}.a
-}
+LIBS += -L$$QXMPP_DIR -l$$QXMPP_LIB
+PRE_TARGETDEPS += $${QXMPP_DIR}/lib$${QXMPP_LIB}.a
 
