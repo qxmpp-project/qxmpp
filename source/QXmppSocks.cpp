@@ -122,7 +122,7 @@ void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
 
 void QXmppSocksClient::slotConnected()
 {
-    m_step == ConnectState;
+    m_step = ConnectState;
 
     // disconnect from signal
     disconnect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
