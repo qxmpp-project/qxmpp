@@ -169,7 +169,7 @@ QXmppConfiguration& QXmppStream::getConfiguration()
 
 void QXmppStream::connect()
 {
-    log(QString("Connecting to: %1:%2").arg(getConfiguration().
+    debug(QString("Connecting to: %1:%2").arg(getConfiguration().
             host()).arg(getConfiguration().port()));
 
     // prepare for connection
@@ -182,9 +182,9 @@ void QXmppStream::connect()
 
 void QXmppStream::socketSslErrors(const QList<QSslError> & error)
 {
-    log(QString("SSL errors"));
+    warning("SSL errors");
     for(int i = 0; i< error.count(); ++i)
-        log(error.at(i).errorString());
+        warning(error.at(i).errorString());
 
     if (getConfiguration().ignoreSslErrors())
         m_socket.ignoreSslErrors();
@@ -192,14 +192,14 @@ void QXmppStream::socketSslErrors(const QList<QSslError> & error)
 
 void QXmppStream::socketHostFound()
 {
-    log(QString("Host found"));
+    warning("Host found");
     emit hostFound();
 }
 
 void QXmppStream::socketConnected()
 {
     flushDataBuffer();
-    log(QString("Connected"));
+    debug("Connected");
     emit connected();
     sendStartStream();
 }
@@ -207,13 +207,13 @@ void QXmppStream::socketConnected()
 void QXmppStream::socketDisconnected()
 {
     flushDataBuffer();
-    log(QString("Disconnected"));
+    debug("Disconnected");
     emit disconnected();
 }
 
 void QXmppStream::socketEncrypted()
 {
-    log(QString("Encrypted"));
+    debug("Encrypted");
     sendStartStream();
 }
 
@@ -221,13 +221,13 @@ void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 {
     m_socketError = ee;
     emit error(QXmppClient::SocketError);
-    log(QString("Socket error: " + m_socket.errorString()));
+    warning(QString("Socket error: " + m_socket.errorString()));
 }
 
 void QXmppStream::socketReadReady()
 {
     QByteArray data = m_socket.readAll();
-    log("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
+    debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
     parser(data);
 }
 
@@ -240,9 +240,14 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
     sendPacket(authQuery);
 }
 
-void QXmppStream::log(const QString &data)
+void QXmppStream::debug(const QString &data)
 {
     m_client->logger()->debug(data);
+}
+
+void QXmppStream::warning(const QString &data)
+{
+    m_client->logger()->warning(data);
 }
 
 void QXmppStream::parser(const QByteArray& data)
@@ -267,7 +272,7 @@ void QXmppStream::parser(const QByteArray& data)
     
     if(doc.setContent(completeXml, true))
     {
-        log("SERVER:" + m_dataBuffer);
+        debug("SERVER:" + m_dataBuffer);
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -296,7 +301,7 @@ void QXmppStream::parser(const QByteArray& data)
         {
 
             QString ns = nodeRecv.namespaceURI();
-            log("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
+            //debug("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
             if(m_client->handleStreamElement(nodeRecv))
             {
                 // already handled by client, do nothing
@@ -341,7 +346,7 @@ void QXmppStream::parser(const QByteArray& data)
                         // disconnect as the for client TLS is compulsory but
                         // not available on the server
                         //
-                        log(QString("Disconnecting as TLS not available at the server"));
+                        warning("Disconnecting as TLS not available at the server");
                         disconnect();
                         return;
                     }
@@ -356,14 +361,14 @@ void QXmppStream::parser(const QByteArray& data)
                 {
                     // SASL Authentication
                     QDomElement element = nodeRecv.firstChildElement("mechanisms");
-                    log(QString("Mechanisms:"));
+                    debug("Mechanisms:");
                     QDomElement subElement = element.firstChildElement();
                     QStringList mechanisms;
                     while(!subElement.isNull())
                     {
                         if(subElement.tagName() == "mechanism")
                         {
-                            log(subElement.text());
+                            debug(subElement.text());
                             mechanisms << subElement.text();
                         }
                         subElement = subElement.nextSiblingElement();
@@ -384,14 +389,14 @@ void QXmppStream::parser(const QByteArray& data)
                             break;
                         }
                     default:
-                        log(QString("Desired SASL Auth mechanism not available trying the available ones"));
+                        debug("Desired SASL Auth mechanism not available trying the available ones");
                         if(mechanisms.contains("DIGEST-MD5"))
                             sendAuthDigestMD5();
                         else if(mechanisms.contains("PLAIN"))
                             sendAuthPlain();
                         else
                         {
-                            log(QString("SASL Auth mechanism not available"));
+                            warning("SASL Auth mechanism not available");
                             disconnect();
                             return;
                         }
@@ -423,7 +428,7 @@ void QXmppStream::parser(const QByteArray& data)
             {
                 if(nodeRecv.tagName() == "proceed")
                 {
-                    log(QString("Starting encryption"));
+                    debug("Starting encryption");
                     m_socket.startClientEncryption();
                     return;
                 }
@@ -432,7 +437,7 @@ void QXmppStream::parser(const QByteArray& data)
             {
                 if(nodeRecv.tagName() == "success")
                 {
-                    log(QString("Authenticated"));
+                    debug("Authenticated");
                     sendStartStream();
                 }
                 else if(nodeRecv.tagName() == "challenge")
@@ -448,15 +453,15 @@ void QXmppStream::parser(const QByteArray& data)
                         sendAuthDigestMD5ResponseStep2();
                         break;
                     default :
+                        warning("Too many authentication steps");
                         disconnect();
-                        log(QString("Too many authentication steps"));
                         break;
                     }
                 }
                 else if(nodeRecv.tagName() == "failure")
                 {
+                    warning("Authentication failure"); 
                     disconnect();
-                    log(QString("Authentication failure")); 
                 }
             }
             else if(ns == ns_client)
@@ -615,7 +620,7 @@ void QXmppStream::parser(const QByteArray& data)
                     else if(id == m_nonSASLAuthId && type == "result")
                     {
                         // successful Non-SASL Authentication
-                        log(QString("Authenticated (Non-SASL)"));
+                        debug("Authenticated (Non-SASL)");
 
                         emit xmppConnected();
 
@@ -770,7 +775,7 @@ void QXmppStream::sendStartStream()
 
 void QXmppStream::sendToServer(const QByteArray& packet)
 {
-    log("CLIENT: " + packet);
+    debug("CLIENT: " + packet);
     m_socket.write( packet );
 }
 
@@ -834,8 +839,6 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 {
     QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
 
-    //log(ba);
-
     QMap<QByteArray, QByteArray> map;
 
     QByteArray key;
@@ -861,7 +864,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
                 {
                     value = ba.mid(startindex, i - startindex);
                     map[key] = value;
-                    log(key + ":" + value);
+                    debug(key + ":" + value);
                     // Skip the comma
                     i += 2;
                     startindex = i;
@@ -880,8 +883,8 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 
     if (!map.contains("nonce"))
     {
+        warning("sendAuthDigestMD5ResponseStep1: Invalid input");
         disconnect();
-        log(QString("sendAuthDigestMD5ResponseStep1: Invalid input"));
         return;
     }
 
@@ -935,7 +938,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
         response += "authzid=\"" + map["authzid"] + "\",";
     response += "charset=utf-8";
 
-    log(response);
+    debug(response);
     QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
                         + response.toBase64() + "</response>";
     sendToServer(packet);
@@ -1019,7 +1022,7 @@ void QXmppStream::sendPacket(const QXmppPacket& packet)
         QByteArray logPacket;
         QXmlStreamWriter xmlStreamLog(&logPacket);
         packet.toXml(&xmlStreamLog);
-        log("CLIENT: "+ logPacket);
+        debug("CLIENT: "+ logPacket);
     }
 
     QXmlStreamWriter xmlStream(&m_socket);
