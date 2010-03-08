@@ -31,8 +31,8 @@
 
 QXmppLogger* QXmppLogger::m_logger = 0;
 
-QXmppLogger::QXmppLogger()
-    : m_loggingType(QXmppLogger::NONE)
+QXmppLogger::QXmppLogger(QObject *parent)
+    : QObject(parent), m_loggingType(QXmppLogger::NONE)
 {
 }
 
@@ -86,6 +86,7 @@ void QXmppLogger::log(QtMsgType type, const QString& str)
     default:
         break;
     }
+    emit message(type, str);
 }
 
 QXmppLogger::LoggingType QXmppLogger::getLoggingType()

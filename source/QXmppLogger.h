@@ -25,9 +25,12 @@
 #ifndef QXMPPLOGGER_H
 #define QXMPPLOGGER_H
 
-/// Singleton class
-class QXmppLogger
+#include <QObject>
+
+class QXmppLogger : public QObject
 {
+    Q_OBJECT
+
 public:
     enum LoggingType
     {
@@ -36,6 +39,7 @@ public:
         STDOUT
     };
 
+    QXmppLogger(QObject *parent = 0);
     static QXmppLogger* getLogger();
 
     QXmppLogger::LoggingType loggingType();
@@ -47,8 +51,10 @@ public:
     // deprecated accessors, use the form without "get" instead
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
+signals:
+    void message(QtMsgType type, const QString &str);
+
 protected:
-    QXmppLogger();
     virtual void log(QtMsgType type, const QString& str);
 
 private:
