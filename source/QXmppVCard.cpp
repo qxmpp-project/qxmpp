@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -36,7 +36,7 @@ QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
     setTo(jid);
 }
 
-QString QXmppVCard::getFullName() const
+QString QXmppVCard::fullName() const
 {
     return m_fullName;
 }
@@ -46,7 +46,7 @@ void QXmppVCard::setFullName(const QString& str)
     m_fullName = str;
 }
 
-QString QXmppVCard::getNickName() const
+QString QXmppVCard::nickName() const
 {
     return m_nickName;
 }
@@ -56,7 +56,7 @@ void QXmppVCard::setNickName(const QString& str)
     m_nickName = str;
 }
 
-const QByteArray& QXmppVCard::getPhoto() const
+const QByteArray& QXmppVCard::photo() const
 {
     return m_photo;
 }
@@ -111,7 +111,28 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QImage QXmppVCard::photoAsImage() const
+{
+    return getImageFromByteArray(getPhoto());
+}
+
+QString QXmppVCard::getFullName() const
+{
+    return m_fullName;
+}
+
+QString QXmppVCard::getNickName() const
+{
+    return m_nickName;
+}
+
+const QByteArray& QXmppVCard::getPhoto() const
+{
+    return m_photo;
+}
+
 QImage QXmppVCard::getPhotoAsImage() const
 {
     return getImageFromByteArray(getPhoto());
 }
+

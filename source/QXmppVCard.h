@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
@@ -36,18 +36,27 @@ class QXmppVCard : public QXmppIq
 public:
     QXmppVCard(const QString& bareJid = "");
 
-    QString getFullName() const;
     void setFullName(const QString&);
 
-    QString getNickName() const;
     void setNickName(const QString&);
 
-    QImage getPhotoAsImage() const;
-    const QByteArray& getPhoto() const;
     void setPhoto(const QByteArray&);
     void setPhoto(const QImage&);
 
     void parse(const QDomElement&);
+
+    QString fullName() const;
+    QString nickName() const;
+    QImage photoAsImage() const;
+    const QByteArray& photo() const;
+
+// deprecated accessors, use the form without "get" instead
+// obsolete start
+    QString Q_DECL_DEPRECATED getFullName() const;
+    QString Q_DECL_DEPRECATED getNickName() const;
+    QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
+    const QByteArray& Q_DECL_DEPRECATED getPhoto() const;
+// obsolete end
 
 private:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
