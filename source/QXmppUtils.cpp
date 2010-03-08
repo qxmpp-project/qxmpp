@@ -118,12 +118,12 @@ void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
 
 void log(const QString& str)
 {
-    QXmppLogger::defaultLogger() << str;
+    *QXmppLogger::getLogger() << str;
 }
 
 void log(const QByteArray& str)
 {
-    QXmppLogger::defaultLogger() << str;
+    *QXmppLogger::getLogger() << str;
 }
 
 QString escapeString(const QString& str)

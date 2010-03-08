@@ -527,5 +527,5 @@ bool QXmppClient::handleStreamElement(const QDomElement &element)
 
 QXmppLogger &QXmppClient::logger()
 {
-    return QXmppLogger::defaultLogger();
+    return *QXmppLogger::getLogger();
 }

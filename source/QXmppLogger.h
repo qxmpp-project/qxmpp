@@ -39,7 +39,7 @@ public:
         STDOUT
     };
 
-    static QXmppLogger &defaultLogger();
+    static QXmppLogger* getLogger();
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
 
@@ -47,15 +47,14 @@ public:
     QXmppLogger& operator<<(const QString &str);
 
     // deprecated methods
-    static QXmppLogger* Q_DECL_DEPRECATED getLogger();
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
 
 private:
     QXmppLogger();
     static QXmppLogger* m_logger;
-    static QXmppLogger::LoggingType m_loggingType;
-    static QFile m_file;
-    static QTextStream m_stream;
+    QXmppLogger::LoggingType m_loggingType;
+    QFile m_file;
+    QTextStream m_stream;
 };
 
 #endif // QXMPPLOGGER_H

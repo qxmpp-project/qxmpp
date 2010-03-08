@@ -27,25 +27,18 @@
 #include <QTime>
 
 QXmppLogger* QXmppLogger::m_logger = 0;
-QXmppLogger::LoggingType QXmppLogger::m_loggingType = QXmppLogger::FILE;
-QFile QXmppLogger::m_file("QXmppClientLog.log");
-QTextStream QXmppLogger::m_stream;
 
 QXmppLogger::QXmppLogger()
+    : m_loggingType(QXmppLogger::FILE), m_file("QXmppClientLog.log")
 {
-}
-
-QXmppLogger &QXmppLogger::defaultLogger()
-{
-    if(!m_logger)
-        m_logger = new QXmppLogger();
-
-    return *m_logger;
 }
 
 QXmppLogger* QXmppLogger::getLogger()
 {
-    return &defaultLogger();
+    if(!m_logger)
+        m_logger = new QXmppLogger();
+
+    return m_logger;
 }
 
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
