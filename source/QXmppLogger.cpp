@@ -94,6 +94,9 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
     case QXmppLogger::STDOUT:
         std::cout << typeName(type) << " " << qPrintable(str) << std::endl;
         break;
+    case QXmppLogger::ONLYSIGNAL:
+        emitMessageSignal = true;
+        break;
     default:
         emitMessageSignal = false;
         break;
