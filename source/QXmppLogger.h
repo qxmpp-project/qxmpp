@@ -37,7 +37,7 @@ public:
         NONE = 0,
         FILE,
         STDOUT,
-        ONLYSIGNAL
+        SIGNALONLY
     };
 
     enum MessageType
