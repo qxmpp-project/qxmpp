@@ -214,7 +214,7 @@ private:
                             ///< TCP socket and XMPP protocol
     QXmppConfiguration m_config;    ///< This object provides the configuration
                                     ///< required for connecting to the XMPP server.
-    QXmppPresence m_clientPrecence; ///< Stores the current presence of connected client
+    QXmppPresence m_clientPrecence; ///< Stores the current presence of the connected client
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QHash<QString,QXmppInvokable *> m_interfaces;
 };
