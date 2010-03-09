@@ -52,5 +52,10 @@ void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writ
     writer->writeAttribute("var", ns_version);
     writer->writeEndElement();
 
+    // XEP-0054: vcard-temp
+    writer->writeStartElement("feature");
+    writer->writeAttribute("var", ns_vcard);
+    writer->writeEndElement();
+
     writer->writeEndElement();
 }
