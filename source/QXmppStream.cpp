@@ -277,7 +277,7 @@ void QXmppStream::parser(const QByteArray& data)
     
     if(doc.setContent(completeXml, true))
     {
-        m_client->logger()->log(QXmppLogger::ReceivedMessage, m_dataBuffer);
+        m_client->logger()->log(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -780,7 +780,7 @@ void QXmppStream::sendStartStream()
 
 void QXmppStream::sendToServer(const QByteArray& packet)
 {
-    m_client->logger()->log(QXmppLogger::SentMessage, packet);
+    m_client->logger()->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
     m_socket.write( packet );
 }
 
@@ -1022,16 +1022,13 @@ QXmppRoster& QXmppStream::getRoster()
 
 void QXmppStream::sendPacket(const QXmppPacket& packet)
 {
-    if(QXmppLogger::getLogger()->loggingType() != QXmppLogger::NONE)
-    {
-        QByteArray logPacket;
-        QXmlStreamWriter xmlStreamLog(&logPacket);
-        packet.toXml(&xmlStreamLog);
-        debug("CLIENT: "+ logPacket);
-    }
-
-    QXmlStreamWriter xmlStream(&m_socket);
+    // prepare packet
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
     packet.toXml(&xmlStream);
+
+    // send packet
+    sendToServer(data);
 }
 
 void QXmppStream::processPresence(const QXmppPresence& presence)
