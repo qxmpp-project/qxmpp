@@ -78,6 +78,7 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
 
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
 {
+    bool emitMessageSignal = true;
     switch(m_loggingType)
     {
     case QXmppLogger::FILE:
@@ -94,9 +95,11 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
         std::cout << typeName(type) << " " << qPrintable(str) << std::endl;
         break;
     default:
+        emitMessageSignal = false;
         break;
     }
-    emit message(type, str);
+    if(emitMessageSignal)
+        emit message(type, str);
 }
 
 QXmppLogger::LoggingType QXmppLogger::getLoggingType()
