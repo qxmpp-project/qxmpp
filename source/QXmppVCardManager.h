@@ -37,8 +37,14 @@ public:
     QXmppVCardManager(QXmppClient* client);
     void requestVCard(const QString& bareJid = "");
 
+    const QXmppVCard& clientVCard() const;
+    void setClientVCard(const QXmppVCard&);
+    void requestClientVCard();
+    bool isClientVCardReceived();
+
 signals:
     void vCardReceived(const QXmppVCard&);
+    void clientVCardReceived();
 
 private slots:
     void vCardIqReceived(const QXmppVCard&);
@@ -46,6 +52,9 @@ private slots:
 private:
     // reference to to client object (no ownership)
     QXmppClient* m_client;
+
+    QXmppVCard m_clientVCard;  ///< Stores the vCard of the connected client
+    bool m_isClientVCardReceived;
 };
 
 #endif // QXMPPVCARDMANAGER_H

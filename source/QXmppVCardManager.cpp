@@ -26,7 +26,7 @@
 #include "QXmppUtils.h"
 
 QXmppVCardManager::QXmppVCardManager(QXmppClient* client) :
-        QObject(client), m_client(client)
+        QObject(client), m_client(client), m_isClientVCardReceived(false)
 {
 }
 
@@ -38,6 +38,38 @@ void QXmppVCardManager::requestVCard(const QString& jid)
 
 void QXmppVCardManager::vCardIqReceived(const QXmppVCard& vcard)
 {
+    // self vCard received
+    if(vcard.from().isEmpty())
+    {
+        m_clientVCard = vcard;
+        m_isClientVCardReceived = true;
+        emit clientVCardReceived();
+    }
+
     emit vCardReceived(vcard);
+}
+
+const QXmppVCard& QXmppVCardManager::clientVCard() const
+{
+    return m_clientVCard;
+}
+
+void QXmppVCardManager::setClientVCard(const QXmppVCard& clientVCard)
+{
+    m_clientVCard = clientVCard;
+    m_clientVCard.setTo("");
+    m_clientVCard.setFrom("");
+    m_clientVCard.setType(QXmppIq::Set);
+    m_client->sendPacket(m_clientVCard);
+}
+
+void QXmppVCardManager::requestClientVCard()
+{
+    requestVCard();
+}
+
+bool QXmppVCardManager::isClientVCardReceived()
+{
+    return m_isClientVCardReceived;
 }
 
