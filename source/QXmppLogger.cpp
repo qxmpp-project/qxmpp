@@ -51,7 +51,8 @@ static const char *typeName(QXmppLogger::MessageType type)
 }
 
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent), m_loggingType(QXmppLogger::NONE)
+    : QObject(parent), m_loggingType(QXmppLogger::NONE),
+    m_logFilePath("QXmppClientLog.log")
 {
 }
 
@@ -83,7 +84,7 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
     {
     case QXmppLogger::FILE:
         {
-            QFile file("QXmppClientLog.log");
+            QFile file(m_logFilePath);
             file.open(QIODevice::Append);
             QTextStream stream(&file);
             stream << QTime::currentTime().toString("hh:mm:ss.zzz") <<
@@ -110,3 +111,12 @@ QXmppLogger::LoggingType QXmppLogger::getLoggingType()
     return m_loggingType;
 }
 
+void QXmppLogger::setLogFilePath(const QString& logFilePath)
+{
+    m_logFilePath = logFilePath;
+}
+
+QString QXmppLogger::logFilePath()
+{
+    return m_logFilePath;
+}

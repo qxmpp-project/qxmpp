@@ -55,6 +55,9 @@ public:
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType);
 
+    void setLogFilePath(const QString&);
+    QString logFilePath();
+
     virtual void log(QXmppLogger::MessageType type, const QString& str);
 
     // deprecated accessors, use the form without "get" instead
@@ -66,6 +69,7 @@ signals:
 private:
     static QXmppLogger* m_logger;
     QXmppLogger::LoggingType m_loggingType;
+    QString m_logFilePath;
 };
 
 #endif // QXMPPLOGGER_H
