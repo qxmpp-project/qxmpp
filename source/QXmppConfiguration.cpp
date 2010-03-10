@@ -31,7 +31,8 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_autoAcceptSubscriptions(true),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
-                m_keepAlivePingsInterval(100),
+                m_keepAliveInterval(0),
+                m_keepAliveTimeout(0),
                 m_autoReconnectionEnabled(true),
                 m_useSASLAuthentication(true),
                 m_ignoreSslErrors(true),
@@ -367,6 +368,39 @@ QNetworkProxy QXmppConfiguration::networkProxy() const
     return m_networkProxy;
 }
 
+/// Specifies the interval in seconds at which keep alive (ping) packets
+/// will be sent to the server.
+/// If set to zero, no keep alive packets will be sent.
+
+void QXmppConfiguration::setKeepAliveInterval(int secs)
+{
+    m_keepAliveInterval = secs;
+}
+
+/// Returns the keep alive interval in seconds.
+
+int QXmppConfiguration::keepAliveInterval() const
+{
+    return m_keepAliveInterval;
+}
+
+/// Specifies the maximum time in seconds to wait for a keep alive response
+/// from the server before considering we are disconnected.
+///
+/// If set to zero or a value larger than the keep alive interval,
+/// no timeout will occur.
+
+void QXmppConfiguration::setKeepAliveTimeout(int secs)
+{
+    m_keepAliveTimeout = secs;
+}
+
+/// Returns the keep alive timeout in seconds.
+
+int QXmppConfiguration::keepAliveTimeout() const
+{
+    return m_keepAliveTimeout;
+}
 
 QString QXmppConfiguration::getHost() const
 {

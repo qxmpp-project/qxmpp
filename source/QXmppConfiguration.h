@@ -93,6 +93,11 @@ public:
     QXmppConfiguration::SASLAuthMechanism sASLAuthMechanism() const;
     QNetworkProxy networkProxy() const;
 
+    int keepAliveInterval() const;
+    void setKeepAliveInterval(int secs);
+    int keepAliveTimeout() const;
+    void setKeepAliveTimeout(int secs);
+
     void setHost(const QString&);
     void setDomain(const QString&);
     void setPort(int);
@@ -146,8 +151,10 @@ private:
     bool m_sendIntialPresence;
     // default is true
     bool m_sendRosterRequest;
-    // interval in seconds, if negative it won't ping
-    int m_keepAlivePingsInterval;
+    // interval in seconds, if zero won't ping
+    int m_keepAliveInterval;
+    // interval in seconds, if zero won't timeout
+    int m_keepAliveTimeout;
     // will keep reconnecting if disconnected, default is true
     bool m_autoReconnectionEnabled;
     bool m_useSASLAuthentication; ///< flag to specify what authentication system
