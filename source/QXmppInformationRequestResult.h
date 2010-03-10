@@ -1,13 +1,12 @@
 #ifndef QXMPPINFORMATIONREQUESTRESULT_H
 #define QXMPPINFORMATIONREQUESTRESULT_H
 
-#include "QXmppIq.h"
+#include "QXmppDiscoveryIq.h"
 
-class QXmppInformationRequestResult : public QXmppIq
+class QXmppInformationRequestResult : public QXmppDiscoveryIq
 {
 public:
     QXmppInformationRequestResult();
-    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 };
 
 #endif // QXMPPINFORMATIONREQUESTRESULT_H

@@ -2,60 +2,39 @@
 #include "QXmppConstants.h"
 #include <QXmlStreamWriter>
 
-QXmppInformationRequestResult::QXmppInformationRequestResult() : QXmppIq(QXmppIq::Result)
+QXmppInformationRequestResult::QXmppInformationRequestResult()
 {
-}
+    setType(QXmppIq::Result);
+    setQueryType(QXmppDiscoveryIq::InfoQuery);
 
-void QXmppInformationRequestResult::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_disco_info );
+    QStringList features;
+    features
+        << ns_rpc               // XEP-0009: Jabber-RPC
+        << ns_disco_info        // XEP-0030: Service Discovery
+        << ns_ibb               // XEP-0047: In-Band Bytestreams
+        << ns_vcard             // XEP-0054: vcard-temp
+        << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
+        << ns_chat_states       // XEP-0085: Chat State Notifications
+        << ns_version           // XEP-0092: Software Version
+        << ns_stream_initiation // XEP-0095: Stream Initiation
+        << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
+        << ns_ping;             // XEP-0199: XMPP Ping
 
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_disco_info );
-    writer->writeEndElement();
+    // build query items
+    QList<QXmppElement> queryItems;
+    foreach (const QString &var, features)
+    {
+        QXmppElement feature;
+        feature.setTagName("feature");
+        feature.setAttribute("var", var);
+        queryItems.append(feature);
+    }
 
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_ibb );
-    writer->writeEndElement();
+    QXmppElement identity;
+    identity.setTagName("identity");
+    identity.setAttribute("category", "automation");
+    identity.setAttribute("type", "rpc");
+    queryItems.append(identity);
 
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_rpc);
-    writer->writeEndElement();
-    writer->writeStartElement("identity");
-    writer->writeAttribute("category", "automation" );
-    writer->writeAttribute("type", "rpc" );
-    writer->writeEndElement();
-
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_ping);
-    writer->writeEndElement();
-
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_chat_states);
-    writer->writeEndElement();
-
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_stream_initiation);
-    writer->writeEndElement();
-
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_stream_initiation_file_transfer);
-    writer->writeEndElement();
-
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_bytestreams);
-    writer->writeEndElement();
-
-    // XEP-0092: Software Version
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_version);
-    writer->writeEndElement();
-
-    // XEP-0054: vcard-temp
-    writer->writeStartElement("feature");
-    writer->writeAttribute("var", ns_vcard);
-    writer->writeEndElement();
-
-    writer->writeEndElement();
+    setQueryItems(queryItems);
 }
