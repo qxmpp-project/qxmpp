@@ -34,10 +34,10 @@ class QXmppLogger : public QObject
 public:
     enum LoggingType
     {
-        NONE = 0,
-        FILE,
-        STDOUT,
-        SIGNALONLY
+        NONE = 0, ///< Log messages are discarded
+        FILE,     ///< Log messages are written to a file
+        STDOUT,   ///< Log messages are written to the standard output
+        SIGNAL,   ///< Log messages are emitted as a signal
     };
 
     enum MessageType
