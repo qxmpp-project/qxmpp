@@ -35,6 +35,7 @@
 #include "QXmppTransferManager.h"
 
 class QDomElement;
+class QTimer;
 
 class QXmppRoster;
 class QXmppClient;
@@ -121,6 +122,11 @@ private slots:
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError>&);
 
+    void pingStart();
+    void pingStop();
+    void pingSend();
+    void pingTimeout();
+
 private:
     QXmppClient* m_client; // reverse pointer
     QXmppRoster m_roster;
@@ -135,6 +141,8 @@ private:
     QString m_nonSASLAuthId;
     QString m_XMPPVersion;
     QXmppClient::StreamError m_xmppStreamError;
+    QTimer *m_pingTimer;
+    QTimer *m_timeoutTimer;
 //    m_xmppStanzaError;
 
     QXmppArchiveManager m_archiveManager;

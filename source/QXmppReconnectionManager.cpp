@@ -62,6 +62,11 @@ void QXmppReconnectionManager::error(QXmppClient::Error error)
         m_timer.start(time*1000);
         emit reconnectingIn(time);
     }
+    else if (m_client && error == QXmppClient::KeepAliveError)
+    {
+        // if we got a keepalive error, reconnect in one second
+        m_timer.start(1000);
+    }
 }
 
 int QXmppReconnectionManager::getNextReconnectingInTime()

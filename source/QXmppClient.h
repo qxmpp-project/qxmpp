@@ -74,6 +74,7 @@ public:
     enum Error
     {
         SocketError,        ///< Error due to TCP socket
+        KeepAliveError,     ///< Error due to no response to a keep alive
         XmppStreamError,    ///< Error due to XML stream
         XmppStanzaError     ///< Error due to stanza
     };

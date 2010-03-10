@@ -54,6 +54,7 @@
 #include <QRegExp>
 #include <QHostAddress>
 #include <QXmlStreamWriter>
+#include <QTimer>
 
 static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream:stream xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\" xmlns=\"jabber:client\" xml:lang=\"en\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\">\n";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
@@ -154,6 +155,22 @@ QXmppStream::QXmppStream(QXmppClient* client)
     // XEP-0095: Stream Initiation
     check = QObject::connect(this, SIGNAL(streamInitiationIqReceived(const QXmppStreamInitiationIq&)),
         &m_transferManager, SLOT(streamInitiationIqReceived(const QXmppStreamInitiationIq&)));
+    Q_ASSERT(check);
+
+    // XEP-0199: XMPP Ping
+    m_pingTimer = new QTimer();
+    check = QObject::connect(m_pingTimer, SIGNAL(timeout()), this, SLOT(pingSend()));
+    Q_ASSERT(check);
+
+    m_timeoutTimer = new QTimer();
+    m_timeoutTimer->setSingleShot(true);
+    check = QObject::connect(m_timeoutTimer, SIGNAL(timeout()), this, SLOT(pingTimeout()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(xmppConnected()), this, SLOT(pingStart()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(this, SIGNAL(disconnected()), this, SLOT(pingStop()));
     Q_ASSERT(check);
 }
 
@@ -307,6 +324,10 @@ void QXmppStream::parser(const QByteArray& data)
 
             QString ns = nodeRecv.namespaceURI();
             debug("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
+
+            // if we receive any kind of data, stop the timeout timer
+            m_timeoutTimer->stop();
+
             if(m_client->handleStreamElement(nodeRecv))
             {
                 // already handled by client, do nothing
@@ -1113,6 +1134,48 @@ void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
     default:
         break;
     }
+}
+
+void QXmppStream::pingStart()
+{
+    const int interval = getConfiguration().keepAliveInterval();
+    // start ping timer
+    if (interval > 0)
+    {
+        m_pingTimer->setInterval(interval * 1000);
+        m_pingTimer->start();
+    }
+}
+
+void QXmppStream::pingStop()
+{
+    // stop all timers
+    m_pingTimer->stop();
+    m_timeoutTimer->stop();
+}
+
+void QXmppStream::pingSend()
+{
+    // send ping packet
+    QXmppPingIq ping;
+    ping.setFrom(getConfiguration().jid());
+    ping.setTo(getConfiguration().domain());
+    sendPacket(ping);
+
+    // start timeout timer
+    const int timeout = getConfiguration().keepAliveTimeout();
+    if (timeout > 0)
+    {
+        m_timeoutTimer->setInterval(timeout * 1000);
+        m_timeoutTimer->start();
+    }
+}
+
+void QXmppStream::pingTimeout()
+{
+    warning("Ping timeout");
+    disconnect();
+    emit error(QXmppClient::KeepAliveError);
 }
 
 QAbstractSocket::SocketError QXmppStream::getSocketError()
