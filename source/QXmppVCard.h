@@ -36,8 +36,10 @@ class QXmppVCard : public QXmppIq
 public:
     QXmppVCard(const QString& bareJid = "");
 
+    void setFirstName(const QString&);
     void setFullName(const QString&);
-
+    void setLastName(const QString&);
+    void setMiddleName(const QString&);
     void setNickName(const QString&);
 
     void setPhoto(const QByteArray&);
@@ -45,8 +47,12 @@ public:
 
     void parse(const QDomElement&);
 
+    QString firstName() const;
     QString fullName() const;
+    QString lastName() const;
+    QString middleName() const;
     QString nickName() const;
+
     QImage photoAsImage() const;
     const QByteArray& photo() const;
 
@@ -61,7 +67,10 @@ public:
 private:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
+    QString m_firstName;
     QString m_fullName;
+    QString m_lastName;
+    QString m_middleName;
     QString m_nickName;
 
     // not as 64 base
