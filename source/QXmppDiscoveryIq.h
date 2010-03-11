@@ -40,6 +40,9 @@ public:
     QXmppElementList queryItems() const;
     void setQueryItems(const QXmppElementList &items);
 
+    QString queryNode() const;
+    void setQueryNode(const QString &node);
+
     enum QueryType queryType() const;
     void setQueryType(enum QueryType type);
 
@@ -49,6 +52,7 @@ public:
 
 private:
     QXmppElementList m_queryItems;
+    QString m_queryNode;
     enum QueryType m_queryType;
 };
 

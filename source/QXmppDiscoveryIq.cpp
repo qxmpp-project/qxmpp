@@ -37,6 +37,16 @@ void QXmppDiscoveryIq::setQueryItems(const QXmppElementList &items)
     m_queryItems = items;
 }
 
+QString QXmppDiscoveryIq::queryNode() const
+{
+    return m_queryNode;
+}
+
+void QXmppDiscoveryIq::setQueryNode(const QString &node)
+{
+    m_queryNode = node;
+}
+
 enum QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::queryType() const
 {
     return m_queryType;
@@ -60,6 +70,7 @@ void QXmppDiscoveryIq::parse(const QDomElement &element)
 
     setTypeFromStr(element.attribute("type"));
     QDomElement queryElement = element.firstChildElement("query");
+    m_queryNode = queryElement.attribute("node");
     if (queryElement.namespaceURI() == ns_disco_items)
         m_queryType = ItemsQuery;
     else
@@ -78,6 +89,7 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("query");
     helperToXmlAddAttribute(writer, "xmlns",
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
+    helperToXmlAddAttribute(writer, "node", m_queryNode);
     foreach (const QXmppElement &item, m_queryItems)
         item.toXml(writer);
     writer->writeEndElement();
