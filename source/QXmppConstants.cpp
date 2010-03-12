@@ -54,3 +54,4 @@ const char *ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0092: Software Version
 const char *ns_version = "jabber:iq:version";
 
+const char *svn_revision = "$Rev$";
