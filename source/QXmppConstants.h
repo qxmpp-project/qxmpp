@@ -53,5 +53,6 @@ extern const char *ns_stream_initiation_file_transfer;
 extern const char *ns_feature_negotiation;
 extern const char *ns_bytestreams;
 extern const char *ns_version;
+extern const char *svn_revision;
 
 #endif // QXMPPCONSTANTS_H
