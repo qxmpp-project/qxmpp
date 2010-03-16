@@ -589,7 +589,8 @@ void QXmppStream::parser(const QByteArray& data)
                         discoIq.parse(nodeRecv);
 
                         if (discoIq.type() == QXmppIq::Get &&
-                            discoIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+                            discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
+                            discoIq.queryNode().isEmpty())
                         {
                             // respond to info query
                             QXmppInformationRequestResult qxmppFeatures;
