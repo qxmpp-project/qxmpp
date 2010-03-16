@@ -25,6 +25,7 @@ HEADERS += QXmppUtils.h \
     QXmppClient.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
+    QXmppDataForm.h \
     QXmppDiscoveryIq.h \
     QXmppElement.h \
     QXmppIbbIq.h \
@@ -62,6 +63,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppClient.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
+    QXmppDataForm.cpp \
     QXmppDiscoveryIq.cpp \
     QXmppElement.cpp \
     QXmppIbbIq.cpp \
