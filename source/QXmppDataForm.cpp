@@ -63,14 +63,14 @@ void QXmppDataForm::Field::setDescription(const QString &description)
     m_description = description;
 }
 
-QString QXmppDataForm::Field::id() const
+QString QXmppDataForm::Field::key() const
 {
-    return m_id;
+    return m_key;
 }
 
-void QXmppDataForm::Field::setId(const QString &id)
+void QXmppDataForm::Field::setKey(const QString &key)
 {
-    m_id = id;
+    m_key = key;
 }
 
 QString QXmppDataForm::Field::label() const
@@ -173,8 +173,16 @@ void QXmppDataForm::setType(QXmppDataForm::Type type)
     m_type = type;
 }
 
+bool QXmppDataForm::isNull() const
+{
+    return m_type == QXmppDataForm::None;
+}
+
 void QXmppDataForm::parse(const QDomElement &element)
 {
+    if (element.isNull())
+        return;
+
     /* form type */
     const QString typeStr = element.attribute("type");
     if (typeStr == "form")
@@ -188,7 +196,7 @@ void QXmppDataForm::parse(const QDomElement &element)
     else
     {
         qWarning() << "Unknown form type" << typeStr;
-        m_type = static_cast<QXmppDataForm::Type>(-1);
+        return;
     }
 
     /* form properties */
@@ -218,7 +226,7 @@ void QXmppDataForm::parse(const QDomElement &element)
 
         /* field attributes */
         field.setLabel(fieldElement.attribute("label"));
-        field.setId(fieldElement.attribute("var"));
+        field.setKey(fieldElement.attribute("var"));
 
         /* field value(s) */
         if (type == QXmppDataForm::Field::BooleanField)
@@ -271,6 +279,9 @@ void QXmppDataForm::parse(const QDomElement &element)
 
 void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 {
+    if (isNull())
+        return;
+
     writer->writeStartElement("x");
     helperToXmlAddAttribute(writer, "xmlns", ns_data);
 
@@ -313,7 +324,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
         /* field attributes */
         helperToXmlAddAttribute(writer, "label", field.label());
-        helperToXmlAddAttribute(writer, "var", field.id());
+        helperToXmlAddAttribute(writer, "var", field.key());
 
         /* field value(s) */
         if (type == QXmppDataForm::Field::BooleanField)

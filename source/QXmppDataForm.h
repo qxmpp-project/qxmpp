@@ -56,8 +56,8 @@ public:
         QString description() const;
         void setDescription(const QString &description);
 
-        QString id() const;
-        void setId(const QString &id);
+        QString key() const;
+        void setKey(const QString &key);
 
         QString label() const;
         void setLabel(const QString &label);
@@ -75,8 +75,8 @@ public:
         void setValue(const QVariant &value);
 
     private:
-        QString m_id;
         QString m_description;
+        QString m_key;
         QString m_label;
         QList<QPair<QString, QString> > m_options;
         bool m_required;
@@ -86,13 +86,14 @@ public:
 
     enum Type
     {
+        None,
         Form,
         Submit,
         Cancel,
         Result,
     };
 
-    QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::Form);
+    QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
 
     QString instructions() const;
     void setInstructions(const QString &instructions);
@@ -106,6 +107,8 @@ public:
 
     QXmppDataForm::Type type() const;
     void setType(QXmppDataForm::Type type);
+
+    bool isNull() const;
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
