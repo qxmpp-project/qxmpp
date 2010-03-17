@@ -27,14 +27,94 @@
 
 #include <QDomElement>
 
-QXmppElementList QXmppDiscoveryIq::queryItems() const
+QString QXmppDiscoveryIq::Identity::category() const
 {
-    return m_queryItems;
+    return m_category;
 }
 
-void QXmppDiscoveryIq::setQueryItems(const QXmppElementList &items)
+void QXmppDiscoveryIq::Identity::setCategory(const QString &category)
 {
-    m_queryItems = items;
+    m_category = category;
+}
+
+QString QXmppDiscoveryIq::Identity::name() const
+{
+    return m_name;
+}
+
+void QXmppDiscoveryIq::Identity::setName(const QString &name)
+{
+    m_name = name;
+}
+
+QString QXmppDiscoveryIq::Identity::type() const
+{
+    return m_type;
+}
+
+void QXmppDiscoveryIq::Identity::setType(const QString &type)
+{
+    m_type = type;
+}
+
+QString QXmppDiscoveryIq::Item::jid() const
+{
+    return m_jid;
+}
+
+void QXmppDiscoveryIq::Item::setJid(const QString &jid)
+{
+    m_jid = jid;
+}
+
+QString QXmppDiscoveryIq::Item::name() const
+{
+    return m_name;
+}
+
+void QXmppDiscoveryIq::Item::setName(const QString &name)
+{
+    m_name = name;
+}
+
+QString QXmppDiscoveryIq::Item::node() const
+{
+    return m_node;
+}
+
+void QXmppDiscoveryIq::Item::setNode(const QString &node)
+{
+    m_node = node;
+}
+
+QStringList QXmppDiscoveryIq::features() const
+{
+    return m_features;
+}
+
+void QXmppDiscoveryIq::setFeatures(const QStringList &features)
+{
+    m_features = features;
+}
+
+QList<QXmppDiscoveryIq::Identity> QXmppDiscoveryIq::identities() const
+{
+    return m_identities;
+}
+
+void QXmppDiscoveryIq::setIdentities(const QList<QXmppDiscoveryIq::Identity> &identities)
+{
+    m_identities = identities;
+}
+
+QList<QXmppDiscoveryIq::Item> QXmppDiscoveryIq::items() const
+{
+    return m_items;
+}
+
+void QXmppDiscoveryIq::setItems(const QList<QXmppDiscoveryIq::Item> &items)
+{
+    m_items = items;
 }
 
 QString QXmppDiscoveryIq::queryNode() const
@@ -79,7 +159,22 @@ void QXmppDiscoveryIq::parse(const QDomElement &element)
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        m_queryItems.append(QXmppElement(itemElement));
+        if (itemElement.tagName() == "feature")
+        {
+            m_features.append(itemElement.attribute("var"));
+        } else if (itemElement.tagName() == "identity") {
+            QXmppDiscoveryIq::Identity identity;
+            identity.setCategory(itemElement.attribute("category"));
+            identity.setName(itemElement.attribute("name"));
+            identity.setType(itemElement.attribute("type"));
+            m_identities.append(identity);
+        } else if (itemElement.tagName() == "item") {
+            QXmppDiscoveryIq::Item item;
+            item.setJid(itemElement.attribute("jid"));
+            item.setName(itemElement.attribute("name"));
+            item.setNode(itemElement.attribute("node"));
+            m_items.append(item);
+        }
         itemElement = itemElement.nextSiblingElement();
     }
 }
@@ -90,8 +185,32 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "xmlns",
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
     helperToXmlAddAttribute(writer, "node", m_queryNode);
-    foreach (const QXmppElement &item, m_queryItems)
-        item.toXml(writer);
+
+    foreach (const QString &feature, m_features)
+    {
+        writer->writeStartElement("feature");
+        helperToXmlAddAttribute(writer, "var", feature);
+        writer->writeEndElement();
+    }
+
+    foreach (const QXmppDiscoveryIq::Identity& identity, m_identities)
+    {
+        writer->writeStartElement("identity");
+        helperToXmlAddAttribute(writer, "category", identity.category());
+        helperToXmlAddAttribute(writer, "name", identity.name());
+        helperToXmlAddAttribute(writer, "type", identity.type());
+        writer->writeEndElement();
+    }
+
+    foreach (const QXmppDiscoveryIq::Item& item, m_items)
+    {
+        writer->writeStartElement("item");
+        helperToXmlAddAttribute(writer, "jid", item.jid());
+        helperToXmlAddAttribute(writer, "name", item.name());
+        helperToXmlAddAttribute(writer, "node", item.node());
+        writer->writeEndElement();
+    }
+
     writer->writeEndElement();
 }
 

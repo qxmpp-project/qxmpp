@@ -32,13 +32,55 @@ class QDomElement;
 class QXmppDiscoveryIq : public QXmppIq
 {
 public:
+    class Identity
+    {
+    public:
+        QString category() const;
+        void setCategory(const QString &category);
+
+        QString name() const;
+        void setName(const QString &name);
+
+        QString type() const;
+        void setType(const QString &type);
+
+    private:
+        QString m_category;
+        QString m_name;
+        QString m_type;
+    };
+
+    class Item
+    {
+    public:
+        QString jid() const;
+        void setJid(const QString &jid);
+
+        QString name() const;
+        void setName(const QString &name);
+
+        QString node() const;
+        void setNode(const QString &node);
+
+    private:
+        QString m_jid;
+        QString m_name;
+        QString m_node;
+    };
+
     enum QueryType {
         InfoQuery,
         ItemsQuery,
     };
 
-    QXmppElementList queryItems() const;
-    void setQueryItems(const QXmppElementList &items);
+    QStringList features() const;
+    void setFeatures(const QStringList &features);
+
+    QList<QXmppDiscoveryIq::Identity> identities() const;
+    void setIdentities(const QList<QXmppDiscoveryIq::Identity> &identities);
+
+    QList<QXmppDiscoveryIq::Item> items() const;
+    void setItems(const QList<QXmppDiscoveryIq::Item> &items);
 
     QString queryNode() const;
     void setQueryNode(const QString &node);
@@ -51,7 +93,9 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
-    QXmppElementList m_queryItems;
+    QStringList m_features;
+    QList<QXmppDiscoveryIq::Identity> m_identities;
+    QList<QXmppDiscoveryIq::Item> m_items;
     QString m_queryNode;
     enum QueryType m_queryType;
 };

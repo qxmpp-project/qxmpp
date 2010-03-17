@@ -1,12 +1,12 @@
 #include "QXmppInformationRequestResult.h"
 #include "QXmppConstants.h"
-#include <QXmlStreamWriter>
 
 QXmppInformationRequestResult::QXmppInformationRequestResult()
 {
     setType(QXmppIq::Result);
     setQueryType(QXmppDiscoveryIq::InfoQuery);
 
+    // features
     QStringList features;
     features
         << ns_rpc               // XEP-0009: Jabber-RPC
@@ -19,22 +19,14 @@ QXmppInformationRequestResult::QXmppInformationRequestResult()
         << ns_stream_initiation // XEP-0095: Stream Initiation
         << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
         << ns_ping;             // XEP-0199: XMPP Ping
+    setFeatures(features);
 
-    // build query items
-    QList<QXmppElement> queryItems;
-    foreach (const QString &var, features)
-    {
-        QXmppElement feature;
-        feature.setTagName("feature");
-        feature.setAttribute("var", var);
-        queryItems.append(feature);
-    }
+    // identities
+    QList<QXmppDiscoveryIq::Identity> identities;
+    QXmppDiscoveryIq::Identity identity;
+    identity.setCategory("automation");
+    identity.setType("rpc");
+    identities.append(identity);
 
-    QXmppElement identity;
-    identity.setTagName("identity");
-    identity.setAttribute("category", "automation");
-    identity.setAttribute("type", "rpc");
-    queryItems.append(identity);
-
-    setQueryItems(queryItems);
+    setIdentities(identities);
 }
