@@ -51,7 +51,7 @@ static const char *typeName(QXmppLogger::MessageType type)
 }
 
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent), m_loggingType(QXmppLogger::NONE),
+    : QObject(parent), m_loggingType(QXmppLogger::NoLogging),
     m_logFilePath("QXmppClientLog.log")
 {
 }
@@ -61,7 +61,7 @@ QXmppLogger* QXmppLogger::getLogger()
     if(!m_logger)
     {
         m_logger = new QXmppLogger();
-        m_logger->setLoggingType(FILE);
+        m_logger->setLoggingType(FileLogging);
     }
 
     return m_logger;
@@ -81,7 +81,7 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
 {
     switch(m_loggingType)
     {
-    case QXmppLogger::FILE:
+    case QXmppLogger::FileLogging:
         {
             QFile file(m_logFilePath);
             file.open(QIODevice::Append);
@@ -91,10 +91,10 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
                 str << "\n\n";
         }
         break;
-    case QXmppLogger::STDOUT:
+    case QXmppLogger::StdoutLogging:
         std::cout << typeName(type) << " " << qPrintable(str) << std::endl;
         break;
-    case QXmppLogger::SIGNAL:
+    case QXmppLogger::SignalLogging:
         emit message(type, str);
         break;
     default:
