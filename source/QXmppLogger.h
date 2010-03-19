@@ -34,14 +34,15 @@ class QXmppLogger : public QObject
 public:
     enum LoggingType
     {
-        NONE = 0, ///< DEPRECATED Log messages are discarded
-        FILE,     ///< DEPRECATED Log messages are written to a file
-        STDOUT,   ///< DEPRECATED Log messages are written to the standard output
-
         NoLogging = 0,  ///< Log messages are discarded
         FileLogging,     ///< Log messages are written to a file
         StdoutLogging,   ///< Log messages are written to the standard output
-        SignalLogging   ///< Log messages are emitted as a signal
+        SignalLogging,   ///< Log messages are emitted as a signal
+
+        // Deprecated
+        NONE = 0, ///< DEPRECATED Log messages are discarded
+        FILE,     ///< DEPRECATED Log messages are written to a file
+        STDOUT   ///< DEPRECATED Log messages are written to the standard output
     };
 
     enum MessageType
