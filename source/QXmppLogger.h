@@ -63,10 +63,11 @@ public:
     void setLogFilePath(const QString&);
     QString logFilePath();
 
-    virtual void log(QXmppLogger::MessageType type, const QString& str);
-
     // deprecated accessors, use the form without "get" instead
     QXmppLogger::LoggingType Q_DECL_DEPRECATED getLoggingType();
+
+public slots:
+    void log(QXmppLogger::MessageType type, const QString& str);
 
 signals:
     void message(QXmppLogger::MessageType type, const QString &str);
