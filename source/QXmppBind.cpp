@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,24 +22,21 @@
  *
  */
 
+#include <QDomElement>
+#include <QTextStream>
+#include <QXmlStreamWriter>
 
 #include "QXmppBind.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-#include <QTextStream>
-#include <QXmlStreamWriter>
-
 QXmppBind::QXmppBind(QXmppIq::Type type)
     : QXmppIq(type)
 {
 }
+
 QXmppBind::QXmppBind(const QString& type)
     : QXmppIq(type)
-{
-}
-
-QXmppBind::~QXmppBind()
 {
 }
 
@@ -62,12 +60,28 @@ void QXmppBind::setResource(const QString& str)
     m_resource = str;
 }
 
+bool QXmppBind::isBind(const QDomElement &element)
+{
+    QDomElement bindElement = element.firstChildElement("bind");
+    return (bindElement.namespaceURI() == ns_bind);
+}
+
+void QXmppBind::parse(const QDomElement &element)
+{
+    QXmppStanza::parse(element);
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement bindElement = element.firstChildElement("bind");
+    m_jid = bindElement.firstChildElement("jid").text();
+    m_resource = bindElement.firstChildElement("resource").text();
+}
+
 void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("bind");
     helperToXmlAddAttribute(writer, "xmlns", ns_bind);
-    helperToXmlAddTextElement(writer, "jid", jid() );
-    helperToXmlAddTextElement(writer, "resource", resource());
+    helperToXmlAddTextElement(writer, "jid", m_jid);
+    helperToXmlAddTextElement(writer, "resource", m_resource);
     writer->writeEndElement();
 }
 

@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -32,12 +33,14 @@ class QXmppBind : public QXmppIq
 public:
     QXmppBind(QXmppIq::Type type);
     QXmppBind(const QString& type);
-    ~QXmppBind();
     
     QString jid() const;
     QString resource() const;
     void setJid(const QString&);
     void setResource(const QString&);
+
+    static bool isBind(const QDomElement &element);
+    void parse(const QDomElement &element);
 
 // deprecated accessors, use the form without "get" instead
 // obsolete start

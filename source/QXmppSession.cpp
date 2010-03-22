@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,11 +22,12 @@
  *
  */
 
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 #include "QXmppSession.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
-#include <QXmlStreamWriter>
 
 QXmppSession::QXmppSession(QXmppIq::Type type)
     : QXmppIq(type)
@@ -37,14 +39,16 @@ QXmppSession::QXmppSession(const QString& type)
 {
 }
 
-QXmppSession::~QXmppSession()
+bool QXmppSession::isSession(const QDomElement &element)
 {
+    QDomElement sessionElement = element.firstChildElement("session");
+    return (sessionElement.namespaceURI() == ns_session);
 }
 
 void QXmppSession::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("session");;
-    writer->writeAttribute( "xmlns", ns_session);
+    writer->writeAttribute("xmlns", ns_session);
     writer->writeEndElement();
 }
 

@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 Manjeet Dahiya
  *
  * Author:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -32,11 +33,11 @@ class QXmppSession : public QXmppIq
 public:
     QXmppSession(QXmppIq::Type type);
     QXmppSession(const QString& type);
-    ~QXmppSession();
+
+    static bool isSession(const QDomElement &element);
 
 private:
-    void toXmlElementFromChild( QXmlStreamWriter *writer) const;
-    
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 };
 
 #endif // QXMPPSESSION_H
