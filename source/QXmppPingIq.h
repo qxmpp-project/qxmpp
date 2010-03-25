@@ -34,7 +34,7 @@ class QXmppPingIq : public QXmppIq
 public:
     QXmppPingIq();
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-    static bool isPingIq( QDomElement &element );
+    static bool isPingIq(const QDomElement &element);
 };
 
 #endif

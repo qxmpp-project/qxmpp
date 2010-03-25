@@ -31,7 +31,7 @@ QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
 {
 }
 
-bool QXmppPingIq::isPingIq( QDomElement &element )
+bool QXmppPingIq::isPingIq(const QDomElement &element)
 {
     QDomElement pingElement = element.firstChildElement("ping");
     return (element.attribute("type") == "get" &&
