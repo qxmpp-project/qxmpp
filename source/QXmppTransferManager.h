@@ -120,6 +120,7 @@ public:
     QXmppTransferJob::Error error() const;
     QString jid() const;
     QXmppTransferJob::Method method() const;
+    QString sid() const;
     QXmppTransferJob::State state() const;
 
     // XEP-0096 : File transfer
@@ -205,10 +206,15 @@ class QXmppTransferManager : public QObject
 
 public:
     QXmppTransferManager(QXmppClient* client);
-    QXmppTransferJob *sendFile(const QString &jid, const QString &fileName);
-    QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo);
+    QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
+    QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
+
     QString proxy() const;
     void setProxy(const QString &proxyJid);
+
+    bool proxyOnly() const;
+    void setProxyOnly(bool proxyOnly);
+
     int supportedMethods() const;
     void setSupportedMethods(int methods);
 
@@ -218,6 +224,7 @@ signals:
     /// To accept the transfer job, call the job's QXmppTransferJob::accept() method.
     /// To refuse the transfer job, call the job's QXmppTransferJob::abort() method.
     void fileReceived(QXmppTransferJob *offer);
+    void finished(QXmppTransferJob *job);
 
 private slots:
     void byteStreamIqReceived(const QXmppByteStreamIq&);
@@ -227,6 +234,7 @@ private slots:
     void iqReceived(const QXmppIq&);
     void jobDestroyed(QObject *object);
     void jobError(QXmppTransferJob::Error error);
+    void jobFinished();
     void jobStateChanged(QXmppTransferJob::State state);
     void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
@@ -244,11 +252,12 @@ private:
 
     // reference to client object (no ownership)
     QXmppClient* m_client;
-    QList<QXmppTransferJob*> m_jobs;
     int m_ibbBlockSize;
+    QList<QXmppTransferJob*> m_jobs;
+    QString m_proxy;
+    bool m_proxyOnly;
     QXmppSocksServer *m_socksServer;
     int m_supportedMethods;
-    QString m_proxy;
 };
 
 #endif

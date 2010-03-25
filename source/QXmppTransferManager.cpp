@@ -215,6 +215,11 @@ QXmppTransferJob::Method QXmppTransferJob::method() const
     return m_method;
 }
 
+QString QXmppTransferJob::sid() const
+{
+    return m_sid;
+}
+
 QXmppTransferJob::State QXmppTransferJob::state() const
 {
     return m_state;
@@ -341,6 +346,7 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
 QXmppTransferManager::QXmppTransferManager(QXmppClient *client)
     : m_client(client),
     m_ibbBlockSize(4096),
+    m_proxyOnly(false),
     m_socksServer(0),
     m_supportedMethods(QXmppTransferJob::AnyMethod)
 {
@@ -778,6 +784,15 @@ void QXmppTransferManager::jobError(QXmppTransferJob::Error error)
     }
 }
 
+void QXmppTransferManager::jobFinished()
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
+    if (!job || !m_jobs.contains(job))
+        return;
+
+    emit finished(job);
+}
+
 void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
@@ -845,7 +860,7 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
-QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName)
+QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName, const QString &sid)
 {
     QFileInfo info(fileName);
 
@@ -877,17 +892,20 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     }
 
     // create job
-    return sendFile(jid, device, fileInfo);
+    return sendFile(jid, device, fileInfo, sid);
 }
 
 /// Send file to a remote party.
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
-QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo)
+QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid)
 {
     QXmppTransferJob *job = new QXmppTransferJob(jid, QXmppTransferJob::OutgoingDirection, this);
-    job->m_sid = generateStanzaHash();
+    if (sid.isEmpty())
+        job->m_sid = generateStanzaHash();
+    else
+        job->m_sid = sid;
     job->m_fileInfo = fileInfo;
     job->m_iodevice = device;
     if (device)
@@ -965,6 +983,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     m_jobs.append(job);
     connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
     connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(jobError(QXmppTransferJob::Error)));
+    connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
 
     QXmppStreamInitiationIq request;
     request.setType(QXmppIq::Set);
@@ -996,29 +1015,34 @@ void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QStrin
 void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 {
     const QString ownJid = m_client->getConfiguration().jid();
+    QList<QXmppByteStreamIq::StreamHost> streamHosts;
 
     // discover local IPs
-    QList<QXmppByteStreamIq::StreamHost> streamHosts;
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    if (!m_proxyOnly)
     {
-        if (!(interface.flags() & QNetworkInterface::IsRunning) ||
-            interface.flags() & QNetworkInterface::IsLoopBack)
-            continue;
-
-        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+        foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
         {
-            if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
-                entry.netmask().isNull() ||
-                entry.netmask() == QHostAddress::Broadcast)
+            if (!(interface.flags() & QNetworkInterface::IsRunning) ||
+                interface.flags() & QNetworkInterface::IsLoopBack)
                 continue;
 
-            QXmppByteStreamIq::StreamHost streamHost;
-            streamHost.setHost(entry.ip());
-            streamHost.setPort(m_socksServer->serverPort());
-            streamHost.setJid(ownJid);
-            streamHosts.append(streamHost);
+            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+            {
+                if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
+                    entry.netmask().isNull() ||
+                    entry.netmask() == QHostAddress::Broadcast)
+                    continue;
+
+                QXmppByteStreamIq::StreamHost streamHost;
+                streamHost.setHost(entry.ip());
+                streamHost.setPort(m_socksServer->serverPort());
+                streamHost.setJid(ownJid);
+                streamHosts.append(streamHost);
+            }
         }
     }
+
+    // add proxy
     if (!job->m_socksProxy.jid().isEmpty())
         streamHosts.append(job->m_socksProxy);
 
@@ -1211,13 +1235,15 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     // register job
     m_jobs.append(job);
     connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
+    connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(jobStateChanged(QXmppTransferJob::State)));
 
     // allow user to accept or decline the job
     emit fileReceived(job);
 }
 
-/// Return the JID of the bytestream proxy.
+/// Return the JID of the bytestream proxy to use for
+/// outgoing transfers.
 ///
 
 QString QXmppTransferManager::proxy() const
@@ -1225,12 +1251,38 @@ QString QXmppTransferManager::proxy() const
     return m_proxy;
 }
 
-/// Set the JID of the bytestream proxy.
+/// Set the JID of the SOCKS5 bytestream proxy to use for
+/// outgoing transfers.
+///
+/// If you set a proxy, when you send a file the proxy will
+/// be offered to the recipient in addition to your own IP
+/// addresses.
 ///
 
 void QXmppTransferManager::setProxy(const QString &proxyJid)
 {
     m_proxy = proxyJid;
+}
+
+/// Return whether the proxy will systematically be used for
+/// outgoing SOCKS5 bytestream transfers.
+///
+
+bool QXmppTransferManager::proxyOnly() const
+{
+    return m_proxyOnly;
+}
+
+/// Set whether the proxy should systematically be used for
+/// outgoing SOCKS5 bytestream transfers.
+///
+/// \note If you set this to true and do not provide a proxy
+/// using setProxy(), your outgoing transfers will fail!
+///
+
+void QXmppTransferManager::setProxyOnly(bool proxyOnly)
+{
+    m_proxyOnly = proxyOnly;
 }
 
 /// Return the supported stream methods.
