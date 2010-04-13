@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
     IbbTransferTarget client;
     client.getConfiguration().setUseSASLAuthentication( false );

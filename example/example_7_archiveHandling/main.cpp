@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FILE);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FileLogging);
 
     xmppClient client;
     client.connectToServer("talk.google.com", "qxmpp.test1@gmail.com", "qxmpp123");
