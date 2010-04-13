@@ -573,7 +573,7 @@ void QXmppStream::parser(const QByteArray& data)
                             item.setSubscriptionStatus(
                                     itemElement.attribute("ask"));
                             item.addGroup(
-                                    itemElement.firstChildElement("group").firstChildElement().text());
+                                    itemElement.firstChildElement("group").text());
                             rosterIq.addItem(item);
                             itemElement = itemElement.nextSiblingElement();
                         }
