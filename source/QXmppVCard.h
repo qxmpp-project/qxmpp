@@ -41,6 +41,7 @@ public:
     void setLastName(const QString&);
     void setMiddleName(const QString&);
     void setNickName(const QString&);
+    void setUrl(const QString&);
 
     void setPhoto(const QByteArray&);
     void setPhoto(const QImage&);
@@ -52,6 +53,7 @@ public:
     QString lastName() const;
     QString middleName() const;
     QString nickName() const;
+    QString url() const;
 
     QImage photoAsImage() const;
     const QByteArray& photo() const;
@@ -72,6 +74,7 @@ private:
     QString m_lastName;
     QString m_middleName;
     QString m_nickName;
+    QString m_url;
 
     // not as 64 base
     QByteArray m_photo;

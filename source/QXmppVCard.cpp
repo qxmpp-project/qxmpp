@@ -86,6 +86,16 @@ void QXmppVCard::setNickName(const QString& str)
     m_nickName = str;
 }
 
+QString QXmppVCard::url() const
+{
+    return m_url;
+}
+
+void QXmppVCard::setUrl(const QString& url)
+{
+    m_url = url;
+}
+
 const QByteArray& QXmppVCard::photo() const
 {
     return m_photo;
@@ -119,6 +129,7 @@ void QXmppVCard::parse(const QDomElement& nodeRecv)
     m_firstName = nameElement.firstChildElement("GIVEN").text();
     m_lastName = nameElement.firstChildElement("FAMILY").text();
     m_middleName = nameElement.firstChildElement("MIDDLE").text();
+    m_url = cardElement.firstChildElement("URL").text();
     QByteArray base64data = cardElement.
                             firstChildElement("PHOTO").
                             firstChildElement("BINVAL").text().toAscii();
@@ -146,6 +157,8 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
             helperToXmlAddTextElement(writer, "MIDDLE", m_middleName);
         writer->writeEndElement();
     }
+    if (!m_url.isEmpty())
+        helperToXmlAddTextElement(writer, "URL", m_url);
 
     if(!photo().isEmpty())
     {
