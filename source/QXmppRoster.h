@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -64,9 +65,7 @@ class QXmppRoster : public QObject
 
 public:
     // FIXME : is this class really necessary?
-    class QXmppRosterEntry : public QXmppRosterIq::Item
-    {
-    };
+    typedef QXmppRosterIq::Item QXmppRosterEntry;
 
     QXmppRoster(QXmppStream* stream);
     ~QXmppRoster();

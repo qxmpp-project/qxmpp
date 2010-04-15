@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -72,14 +73,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             for(int i = 0; i < items.count(); ++i)
             {
                 QString bareJid = items.at(i).bareJid();
-                m_entries[bareJid].setBareJid(bareJid);
-                m_entries[bareJid].setName(items.at(i).name());
-                m_entries[bareJid].setSubscriptionType(
-                    static_cast<QXmppRosterEntry::SubscriptionType>(
-                            items.at(i).subscriptionType()));
-                m_entries[bareJid].setSubscriptionStatus(
-                        items.at(i).subscriptionStatus());
-                m_entries[bareJid].setGroups(items.at(i).groups());
+                m_entries[bareJid] = items.at(i);
                 emit rosterChanged(bareJid);
             }
             if(rosterIq.type() == QXmppIq::Set) // send result iq
@@ -106,14 +100,7 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
             for(int i = 0; i < items.count(); ++i)
             {
                 QString bareJid = items.at(i).bareJid();
-                m_entries[bareJid].setBareJid(bareJid);
-                m_entries[bareJid].setName(items.at(i).name());
-                m_entries[bareJid].setSubscriptionType(
-                    static_cast<QXmppRosterEntry::SubscriptionType>(
-                            items.at(i).subscriptionType()));
-                m_entries[bareJid].setSubscriptionStatus(
-                        items.at(i).subscriptionStatus());
-                m_entries[bareJid].setGroups(items.at(i).groups());
+                m_entries[bareJid] = items.at(i);
             }
             if(rosterIq.type() == QXmppIq::Set) // send result iq
             {
