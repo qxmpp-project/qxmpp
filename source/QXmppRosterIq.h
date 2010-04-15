@@ -36,14 +36,20 @@ public:
     class Item
     {
     public:
+        /// An enumeration for type of subscription with the bareJid in the roster.
         enum SubscriptionType
         {
             NotSet = 0,
-            None,
-            Both,
-            From,
-            To,
-            Remove
+            None,   ///< the user does not have a subscription to the
+                    ///< contact's presence information, and the contact does
+                    ///< not have a subscription to the user's presence information
+            Both,   ///< both the user and the contact have subscriptions to each
+                    ///< other's presence information
+            From,   ///< the contact has a subscription to the user's presence information,
+                    ///< but the user does not have a subscription to the contact's presence information
+            To,     ///< the user has a subscription to the contact's presence information,
+                    ///< but the contact does not have a subscription to the user's presence information
+            Remove  ///< to delete a roster item
         };
 
         QString bareJid() const;

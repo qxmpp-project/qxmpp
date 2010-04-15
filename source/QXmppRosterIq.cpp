@@ -70,51 +70,106 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Returns the bareJid of the roster entry.
+///
+/// \return bareJid as a QString
+///
+
 QString QXmppRosterIq::Item::bareJid() const
 {
     return m_bareJid;
 }
+
+/// Sets the bareJid of the roster entry.
+///
+/// \param bareJid as a QString
+///
 
 void QXmppRosterIq::Item::setBareJid(const QString& str)
 {
     m_bareJid = str;
 }
 
+/// Returns the groups of the roster entry.
+///
+/// \return QSet<QString> list of all the groups
+///
+
 QSet<QString> QXmppRosterIq::Item::groups() const
 {
     return m_groups;
 }
+
+/// Sets the groups of the roster entry.
+///
+/// \param groups list of all the groups as a QSet<QString>
+///
 
 void QXmppRosterIq::Item::setGroups(const QSet<QString>& groups)
 {
     m_groups = groups;
 }
 
+/// Returns the name of the roster entry.
+///
+/// \return name as a QString
+///
+
 QString QXmppRosterIq::Item::name() const
 {
     return m_name;
 }
+
+/// Sets the name of the roster entry.
+///
+/// \param name as a QString
+///
 
 void QXmppRosterIq::Item::setName(const QString& str)
 {
     m_name = str;
 }
 
+/// Returns the subscription status of the roster entry. It is the "ask"
+/// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
+/// or empty.
+///
+/// \return subscription status as a QString
+///
+///
+
 QString QXmppRosterIq::Item::subscriptionStatus() const
 {
     return m_subscriptionStatus;
 }
+
+/// Sets the subscription status of the roster entry. It is the "ask"
+/// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
+/// or empty.
+///
+/// \param status as a QString
+///
 
 void QXmppRosterIq::Item::setSubscriptionStatus(const QString& str)
 {
     m_subscriptionStatus = str;
 }
 
+/// Returns the subscription type of the roster entry.
+///
+/// \return QXmppRosterEntry::SubscriptionType
+///
+
 QXmppRosterIq::Item::SubscriptionType
         QXmppRosterIq::Item::subscriptionType() const
 {
     return m_type;
 }
+
+/// Sets the subscription type of the roster entry.
+///
+/// \param type as a QXmppRosterEntry::SubscriptionType
+///
 
 void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
 {
