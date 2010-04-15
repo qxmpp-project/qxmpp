@@ -35,7 +35,6 @@
 class QByteArray;
 class QDateTime;
 class QString;
-class QImage;
 
 // XEP-0082: XMPP Date and Time Profiles
 QDateTime datetimeFromString(const QString &str);
@@ -54,9 +53,5 @@ void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
 
 QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
-
-QString getImageType(const QByteArray& image);
-QString getImageHash(const QByteArray& image);
-QImage getImageFromByteArray(const QByteArray& image);
 
 #endif // QXMPPUTILS_H

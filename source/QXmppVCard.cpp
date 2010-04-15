@@ -22,13 +22,44 @@
  */
 
 
+#include <QBuffer>
+#include <QXmlStreamWriter>
+
+#ifndef QXMPP_NO_GUI
+#include <QImage>
+#include <QImageReader>
+#endif
+
 #include "QXmppVCard.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-#include <QXmlStreamWriter>
-#include <QImage>
-#include <QBuffer>
+static QString getImageType(const QByteArray& image)
+{
+#ifndef QXMPP_NO_GUI
+    QBuffer buffer;
+    buffer.setData(image);
+    buffer.open(QIODevice::ReadOnly);
+    QString format = QImageReader::imageFormat(&buffer);
+
+    if(format.toUpper() == "PNG")
+        return "image/png";
+    else if(format.toUpper() == "MNG")
+        return "video/x-mng";
+    else if(format.toUpper() == "GIF")
+        return "image/gif";
+    else if(format.toUpper() == "BMP")
+        return "image/bmp";
+    else if(format.toUpper() == "XPM")
+        return "image/x-xpm";
+    else if(format.toUpper() == "SVG")
+        return "image/svg+xml";
+    else if(format.toUpper() == "JPEG")
+        return "image/jpeg";
+#endif
+
+    return "image/unknown";
+}
 
 QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
 {
@@ -106,6 +137,7 @@ void QXmppVCard::setPhoto(const QByteArray& photo)
     m_photo = photo;
 }
 
+#ifndef QXMPP_NO_GUI
 void QXmppVCard::setPhoto(const QImage& image)
 {
     QByteArray ba;
@@ -114,6 +146,7 @@ void QXmppVCard::setPhoto(const QImage& image)
     image.save(&buffer, "PNG");
     m_photo = ba;
 }
+#endif
 
 void QXmppVCard::parse(const QDomElement& nodeRecv)
 {
@@ -171,10 +204,16 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+#ifndef QXMPP_NO_GUI
 QImage QXmppVCard::photoAsImage() const
 {
-    return getImageFromByteArray(photo());
+    QBuffer buffer;
+    buffer.setData(m_photo);
+    buffer.open(QIODevice::ReadOnly);
+    QImageReader imageReader(&buffer);
+    return imageReader.read();
 }
+#endif
 
 QString QXmppVCard::getFullName() const
 {
@@ -191,8 +230,10 @@ const QByteArray& QXmppVCard::getPhoto() const
     return m_photo;
 }
 
+#ifndef QXMPP_NO_GUI
 QImage QXmppVCard::getPhotoAsImage() const
 {
-    return getImageFromByteArray(photo());
+    return photoAsImage();
 }
+#endif
 

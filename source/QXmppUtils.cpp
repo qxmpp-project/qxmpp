@@ -22,17 +22,16 @@
  */
 
 
-#include "QXmppUtils.h"
-#include "QXmppLogger.h"
+#include <QBuffer>
+#include <QByteArray>
+#include <QDateTime>
 #include <QDebug>
+#include <QRegExp>
 #include <QString>
 #include <QXmlStreamWriter>
-#include <QByteArray>
-#include <QBuffer>
-#include <QImage>
-#include <QImageReader>
-#include <QCryptographicHash>
-#include <QDateTime>
+
+#include "QXmppUtils.h"
+#include "QXmppLogger.h"
 
 QDateTime datetimeFromString(const QString &str)
 {
@@ -137,45 +136,4 @@ QString unescapeString(const QString& str)
     return strOut;
 }
 
-QString getImageType(const QByteArray& image)
-{
-    QBuffer buffer;
-    buffer.setData(image);
-    buffer.open(QIODevice::ReadOnly);
-    QString format = QImageReader::imageFormat(&buffer);
 
-    if(format.toUpper() == "PNG")
-        return "image/png";
-    else if(format.toUpper() == "MNG")
-        return "video/x-mng";
-    else if(format.toUpper() == "GIF")
-        return "image/gif";
-    else if(format.toUpper() == "BMP")
-        return "image/bmp";
-    else if(format.toUpper() == "XPM")
-        return "image/x-xpm";
-    else if(format.toUpper() == "SVG")
-        return "image/svg+xml";
-    else if(format.toUpper() == "JPEG")
-        return "image/jpeg";
-
-    return "image/unknown";
-}
-
-QString getImageHash(const QByteArray& image)
-{
-    if(image.isEmpty())
-        return "";
-    else
-        return QString(QCryptographicHash::hash(image,
-            QCryptographicHash::Sha1).toHex());
-}
-
-QImage getImageFromByteArray(const QByteArray& image)
-{
-    QBuffer buffer;
-    buffer.setData(image);
-    buffer.open(QIODevice::ReadOnly);
-    QImageReader imageReader(&buffer);
-    return imageReader.read();
-}
