@@ -85,6 +85,8 @@ public:
     
     void addItem(const Item&);
     QList<Item> items() const;
+
+    void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 // deprecated accessors, use the form without "get" instead

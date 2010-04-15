@@ -21,11 +21,12 @@
  *
  */
 
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 #include "QXmppRosterIq.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
-#include <QXmlStreamWriter>
 
 QXmppRosterIq::QXmppRosterIq(QXmppIq::Type type)
     : QXmppIq(type)
@@ -51,6 +52,30 @@ void QXmppRosterIq::addItem(const Item& item)
 QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 {
     return m_items;
+}
+
+void QXmppRosterIq::parse(const QDomElement &element)
+{
+    QXmppStanza::parse(element);
+    setTypeFromStr(element.attribute("type"));
+
+    QDomElement itemElement = element.
+                              firstChildElement("query").
+                              firstChildElement("item");
+    while(!itemElement.isNull())
+    {
+        QXmppRosterIq::Item item;
+        item.setName(itemElement.attribute("name"));
+        item.setBareJid(itemElement.attribute("jid"));
+        item.setSubscriptionTypeFromStr(
+                itemElement.attribute("subscription"));
+        item.setSubscriptionStatus(
+                itemElement.attribute("ask"));
+        item.addGroup(
+                itemElement.firstChildElement("group").firstChildElement().text());
+        m_items.append(item);
+        itemElement = itemElement.nextSiblingElement();
+    }
 }
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
