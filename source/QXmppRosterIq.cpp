@@ -63,25 +63,14 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QXmppRosterIq::Item::SubscriptionType
-        QXmppRosterIq::Item::subscriptionType() const
-{
-    return m_type;
-}
-
-QString QXmppRosterIq::Item::name() const
-{
-    return m_name;
-}
-
-QString QXmppRosterIq::Item::subscriptionStatus() const
-{
-    return m_subscriptionStatus;
-}
-
 QString QXmppRosterIq::Item::bareJid() const
 {
     return m_bareJid;
+}
+
+void QXmppRosterIq::Item::setBareJid(const QString& str)
+{
+    m_bareJid = str;
 }
 
 QSet<QString> QXmppRosterIq::Item::groups() const
@@ -89,9 +78,24 @@ QSet<QString> QXmppRosterIq::Item::groups() const
     return m_groups;
 }
 
+void QXmppRosterIq::Item::setGroups(const QSet<QString>& groups)
+{
+    m_groups = groups;
+}
+
+QString QXmppRosterIq::Item::name() const
+{
+    return m_name;
+}
+
 void QXmppRosterIq::Item::setName(const QString& str)
 {
     m_name = str;
+}
+
+QString QXmppRosterIq::Item::subscriptionStatus() const
+{
+    return m_subscriptionStatus;
 }
 
 void QXmppRosterIq::Item::setSubscriptionStatus(const QString& str)
@@ -99,14 +103,20 @@ void QXmppRosterIq::Item::setSubscriptionStatus(const QString& str)
     m_subscriptionStatus = str;
 }
 
+QXmppRosterIq::Item::SubscriptionType
+        QXmppRosterIq::Item::subscriptionType() const
+{
+    return m_type;
+}
+
+void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
+{
+    m_type = type;
+}
+
 void QXmppRosterIq::Item::addGroup(const QString& str)
 {
     m_groups << str;
-}
-
-void QXmppRosterIq::Item::setBareJid(const QString& str)
-{
-    m_bareJid = str;
 }
 
 QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
@@ -131,11 +141,6 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
             return "";
         }
     }
-}
-
-void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
-{
-    m_type = type;
 }
 
 void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)

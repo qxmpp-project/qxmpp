@@ -46,17 +46,19 @@ public:
             Remove
         };
 
-        SubscriptionType subscriptionType() const;
-        QString name() const;
-        QString subscriptionStatus() const;
         QString bareJid() const;
         QSet<QString> groups() const;
+        QString name() const;
+        QString subscriptionStatus() const;
+        SubscriptionType subscriptionType() const;
 
+        void setBareJid(const QString&);
+        void setGroups(const QSet<QString>&);
+        void addGroup(const QString&);
         void setName(const QString&);
         void setSubscriptionStatus(const QString&);
-        void addGroup(const QString&);
-        void setBareJid(const QString&);
         void setSubscriptionType(SubscriptionType);
+
         QString getSubscriptionTypeStr() const;
         void setSubscriptionTypeFromStr(const QString&);
         void toXml(QXmlStreamWriter *writer) const;
