@@ -227,16 +227,6 @@ void QXmppRoster::QXmppRosterEntry::setSubscriptionStatus(const QString& status)
     m_subscriptionStatus = status;
 }
 
-/// Adds the group entry of the roster entry.
-///
-/// \param group name as a QString
-///
-
-void QXmppRoster::QXmppRosterEntry::addGroupEntry(const QString& group)
-{
-    m_groups << group;
-}
-
 /// Sets the groups of the roster entry.
 ///
 /// \param groups list of all the groups as a QSet<QString>

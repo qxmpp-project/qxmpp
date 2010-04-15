@@ -54,20 +54,7 @@ void QXmppRosterIq::parse(const QDomElement &element)
     while(!itemElement.isNull())
     {
         QXmppRosterIq::Item item;
-        item.setName(itemElement.attribute("name"));
-        item.setBareJid(itemElement.attribute("jid"));
-        item.setSubscriptionTypeFromStr(
-                itemElement.attribute("subscription"));
-        item.setSubscriptionStatus(
-                itemElement.attribute("ask"));
-
-        QDomElement groupElement = itemElement.firstChildElement("group");
-        while(!groupElement.isNull())
-        {
-            item.addGroup(groupElement.text());
-            groupElement = groupElement.nextSiblingElement("group");
-        }
-
+        item.parse(itemElement);
         m_items.append(item);
         itemElement = itemElement.nextSiblingElement();
     }
@@ -134,11 +121,6 @@ void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
     m_type = type;
 }
 
-void QXmppRosterIq::Item::addGroup(const QString& str)
-{
-    m_groups << str;
-}
-
 QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 {
     switch(m_type)
@@ -179,6 +161,21 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)
         setSubscriptionType(Remove);
     else
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
+}
+
+void QXmppRosterIq::Item::parse(const QDomElement &element)
+{
+    m_name = element.attribute("name");
+    m_bareJid = element.attribute("jid");
+    setSubscriptionTypeFromStr(element.attribute("subscription"));
+    setSubscriptionStatus(element.attribute("ask"));
+
+    QDomElement groupElement = element.firstChildElement("group");
+    while(!groupElement.isNull())
+    {
+        m_groups << groupElement.text();
+        groupElement = groupElement.nextSiblingElement("group");
+    }
 }
 
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const

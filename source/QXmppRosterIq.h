@@ -54,13 +54,11 @@ public:
 
         void setBareJid(const QString&);
         void setGroups(const QSet<QString>&);
-        void addGroup(const QString&);
         void setName(const QString&);
         void setSubscriptionStatus(const QString&);
         void setSubscriptionType(SubscriptionType);
 
-        QString getSubscriptionTypeStr() const;
-        void setSubscriptionTypeFromStr(const QString&);
+        void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
         
 // deprecated accessors, use the form without "get" instead
@@ -71,6 +69,9 @@ public:
         QSet<QString> Q_DECL_DEPRECATED getGroups() const;
 
     private:
+        QString getSubscriptionTypeStr() const;
+        void setSubscriptionTypeFromStr(const QString&);
+
         QString m_bareJid;
         SubscriptionType m_type;
         QString m_name;

@@ -91,7 +91,6 @@ public:
         void setSubscriptionType(QXmppRosterEntry::SubscriptionType);
         void setSubscriptionStatus(const QString&);
         void setGroups(const QSet<QString>&);
-        void addGroupEntry(const QString&);
 
 // deprecated accessors, use the form without "get" instead
         QString Q_DECL_DEPRECATED getBareJid() const;
