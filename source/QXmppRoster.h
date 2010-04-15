@@ -30,6 +30,7 @@
 #include <QStringList>
 
 #include "QXmppClient.h"
+#include "QXmppRosterIq.h"
 
 class QXmppRosterIq;
 class QXmppPresence;
@@ -62,50 +63,9 @@ class QXmppRoster : public QObject
     Q_OBJECT
 
 public:
-    class QXmppRosterEntry
+    // FIXME : is this class really necessary?
+    class QXmppRosterEntry : public QXmppRosterIq::Item
     {
-    public:
-        /// An enumeration for type of subscription with the bareJid in the roster.
-        enum SubscriptionType
-        {
-            None = 1,   ///< the user does not have a subscription to the
-                        ///< contact's presence information, and the contact does
-                        ///< not have a subscription to the user's presence information
-            Both,   ///< both the user and the contact have subscriptions to each
-                    ///< other's presence information
-            From,   ///< the contact has a subscription to the user's presence information,
-                    ///< but the user does not have a subscription to the contact's presence information
-            To,     ///< the user has a subscription to the contact's presence information,
-                    ///< but the contact does not have a subscription to the user's presence information
-            Remove  ///< to delete a roster item
-        };
-
-        QString bareJid() const;
-        QString name() const;
-        QXmppRosterEntry::SubscriptionType subscriptionType() const;
-        QString subscriptionStatus() const;
-        QSet<QString> groups() const;
-
-        void setBareJid(const QString&);
-        void setName(const QString&);
-        void setSubscriptionType(QXmppRosterEntry::SubscriptionType);
-        void setSubscriptionStatus(const QString&);
-        void setGroups(const QSet<QString>&);
-
-// deprecated accessors, use the form without "get" instead
-        QString Q_DECL_DEPRECATED getBareJid() const;
-        QString Q_DECL_DEPRECATED getName() const;
-        QXmppRosterEntry::SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
-        QString Q_DECL_DEPRECATED getSubscriptionStatus() const;
-        QSet<QString> Q_DECL_DEPRECATED getGroups() const;
-
-    private:
-        QString m_bareJid;
-        SubscriptionType m_type;
-        QString m_name;
-        // can be subscribe/unsubscribe (attribute "ask")
-        QString m_subscriptionStatus;
-        QSet<QString> m_groups;
     };
 
     QXmppRoster(QXmppStream* stream);
