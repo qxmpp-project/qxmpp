@@ -553,36 +553,10 @@ void QXmppStream::parser(const QByteArray& data)
                         processBindIq(bind);
                         iqPacket = bind;
                     }
-                    else if(nodeRecv.firstChildElement("query").
-                            namespaceURI() == ns_roster)
+                    else if(QXmppRosterIq::isRosterIq(nodeRecv))
                     {
-                        QDomElement itemElement = nodeRecv.
-                                                  firstChildElement("query").
-                                                  firstChildElement("item");
-                        QXmppRosterIq rosterIq(nodeRecv.attribute("type"));
-                        rosterIq.setId(id);
-                        rosterIq.setTo(to);
-                        rosterIq.setFrom(from);
-                        while(!itemElement.isNull())
-                        {
-                            QXmppRosterIq::Item item;
-                            item.setName(itemElement.attribute("name"));
-                            item.setBareJid(itemElement.attribute("jid"));
-                            item.setSubscriptionTypeFromStr(
-                                    itemElement.attribute("subscription"));
-                            item.setSubscriptionStatus(
-                                    itemElement.attribute("ask"));
-
-                            QDomElement groupElement = itemElement.firstChildElement("group");
-                            while(!groupElement.isNull())
-                            {
-                                item.addGroup(groupElement.text());
-                                groupElement = groupElement.nextSiblingElement("group");
-                            }
-
-                            rosterIq.addItem(item);
-                            itemElement = itemElement.nextSiblingElement();
-                        }
+                        QXmppRosterIq rosterIq;
+                        rosterIq.parse(nodeRecv);
                         processRosterIq(rosterIq);
                         iqPacket = rosterIq;
                     }
@@ -1029,7 +1003,8 @@ void QXmppStream::sendSubscriptionRequest(const QString& to)
 
 void QXmppStream::sendRosterRequest()
 {
-    QXmppRosterIq roster(QXmppIq::Get);
+    QXmppRosterIq roster;
+    roster.setType(QXmppIq::Get);
     roster.setFrom(getConfiguration().jid());
     m_rosterReqId = roster.id();
     sendPacket(roster);

@@ -79,13 +79,10 @@ public:
         QSet<QString> m_groups;
     };
 
-    QXmppRosterIq(QXmppIq::Type type);
-    QXmppRosterIq(const QString& type);
-    ~QXmppRosterIq();
-    
     void addItem(const Item&);
     QList<Item> items() const;
 
+    static bool isRosterIq(const QDomElement &element);
     void parse(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 

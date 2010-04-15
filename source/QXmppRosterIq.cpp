@@ -28,22 +28,6 @@
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
-QXmppRosterIq::QXmppRosterIq(QXmppIq::Type type)
-    : QXmppIq(type)
-{
-
-}
-
-QXmppRosterIq::QXmppRosterIq(const QString& type)
-    : QXmppIq(type)
-{
-}
-
-QXmppRosterIq::~QXmppRosterIq()
-{
-
-}
-
 void QXmppRosterIq::addItem(const Item& item)
 {
     m_items.append(item);
@@ -52,6 +36,11 @@ void QXmppRosterIq::addItem(const Item& item)
 QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 {
     return m_items;
+}
+
+bool QXmppRosterIq::isRosterIq(const QDomElement &element)
+{
+    return (element.firstChildElement("query").namespaceURI() == ns_roster);
 }
 
 void QXmppRosterIq::parse(const QDomElement &element)
@@ -71,8 +60,14 @@ void QXmppRosterIq::parse(const QDomElement &element)
                 itemElement.attribute("subscription"));
         item.setSubscriptionStatus(
                 itemElement.attribute("ask"));
-        item.addGroup(
-                itemElement.firstChildElement("group").firstChildElement().text());
+
+        QDomElement groupElement = itemElement.firstChildElement("group");
+        while(!groupElement.isNull())
+        {
+            item.addGroup(groupElement.text());
+            groupElement = groupElement.nextSiblingElement("group");
+        }
+
         m_items.append(item);
         itemElement = itemElement.nextSiblingElement();
     }
