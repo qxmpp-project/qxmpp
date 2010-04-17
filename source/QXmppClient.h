@@ -63,6 +63,9 @@ class QXmppVersionIq;
 /// to the server on disconnections due to an error. User can have a custom
 /// reconnection mechanism as well.
 ///
+/// For removing QXmpp dependency in QtGui, use DEFINE = QXMPP_NO_GUI
+/// in the source.pro file and build as usual
+///
 
 class QXmppClient : public QObject
 {
