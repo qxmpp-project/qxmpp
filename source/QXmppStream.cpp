@@ -323,7 +323,6 @@ void QXmppStream::parser(const QByteArray& data)
         {
 
             QString ns = nodeRecv.namespaceURI();
-            debug("Namespace: " + ns + " Tag: " + nodeRecv.tagName() );
 
             // if we receive any kind of data, stop the timeout timer
             m_timeoutTimer->stop();
