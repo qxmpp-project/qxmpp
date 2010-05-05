@@ -28,7 +28,7 @@
 
 QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_resource("QXmpp"),
-                m_autoAcceptSubscriptions(true),
+                m_autoAcceptSubscriptions(false),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
                 m_keepAliveInterval(0),

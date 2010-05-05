@@ -145,7 +145,7 @@ private:
     QString m_domain;
     QString m_resource;
 
-    // default is true
+    // default is false
     bool m_autoAcceptSubscriptions;
     // default is true
     bool m_sendIntialPresence;
