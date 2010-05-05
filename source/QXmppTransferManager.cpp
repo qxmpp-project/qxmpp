@@ -284,16 +284,18 @@ void QXmppTransferJob::sendData()
         return;
     }
 
-    char buffer[m_blockSize];
+    char *buffer = new char[m_blockSize];
     qint64 length = m_iodevice->read(buffer, m_blockSize);
     if (length < 0)
     {
+        delete [] buffer;
         terminate(QXmppTransferJob::FileAccessError);
         return;
     }
     if (length > 0)
     {
         m_socksSocket->write(buffer, length);
+        delete [] buffer;
         m_done += length;
         emit progress(m_done, fileSize());
     }

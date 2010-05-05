@@ -44,7 +44,7 @@ class QXmppVCardManager;
 class QXmppInvokable;
 class QXmppRpcInvokeIq;
 class QXmppRemoteMethod;
-class QXmppRemoteMethodResult;
+struct QXmppRemoteMethodResult;
 class QXmppArchiveManager;
 class QXmppDiscoveryIq;
 class QXmppTransferManager;
