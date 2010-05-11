@@ -379,10 +379,10 @@ QAbstractSocket::SocketError QXmppClient::getSocketError()
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
 ///
-/// \return QXmppClient::StreamError
+/// \return QXmppClient::Error::Condition
 ///
 
-QXmppClient::StreamError QXmppClient::getXmppStreamError()
+QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 {
     return m_stream->getXmppStreamError();
 }

@@ -444,9 +444,9 @@ void QXmppStream::parser(const QByteArray& data)
             else if(ns == ns_stream && nodeRecv.tagName() == "error")
             {
                 if (!nodeRecv.firstChildElement("conflict").isNull())
-                    m_xmppStreamError = QXmppClient::ConflictStreamError;
+                    m_xmppStreamError = QXmppStanza::Error::Conflict;
                 else
-                    m_xmppStreamError = QXmppClient::UnknownStreamError;
+                    m_xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                 emit error(QXmppClient::XmppStreamError);
             }
             else if(ns == ns_tls)
@@ -485,6 +485,12 @@ void QXmppStream::parser(const QByteArray& data)
                 }
                 else if(nodeRecv.tagName() == "failure")
                 {
+                    if (!nodeRecv.firstChildElement("not-authorized").isNull())
+                        m_xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                    else
+                        m_xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                    emit error(QXmppClient::XmppStreamError);
+
                     warning("Authentication failure"); 
                     disconnect();
                 }
@@ -1164,7 +1170,7 @@ QAbstractSocket::SocketError QXmppStream::getSocketError()
     return m_socketError;
 }
 
-QXmppClient::StreamError QXmppStream::getXmppStreamError()
+QXmppStanza::Error::Condition QXmppStream::getXmppStreamError()
 {
     return m_xmppStreamError;
 }

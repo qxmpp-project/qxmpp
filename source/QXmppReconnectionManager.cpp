@@ -51,7 +51,7 @@ void QXmppReconnectionManager::error(QXmppClient::Error error)
     if(m_client && error == QXmppClient::XmppStreamError)
     {
         // if we receive a resource conflict, inhibit reconnection
-        if(m_client->getXmppStreamError() == QXmppClient::ConflictStreamError)
+        if(m_client->getXmppStreamError() == QXmppStanza::Error::Conflict)
             m_receivedConflict = true;
     }
     else if(m_client && error == QXmppClient::SocketError && !m_receivedConflict)

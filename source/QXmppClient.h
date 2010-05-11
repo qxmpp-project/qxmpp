@@ -79,16 +79,6 @@ public:
         SocketError,        ///< Error due to TCP socket
         KeepAliveError,     ///< Error due to no response to a keep alive
         XmppStreamError,    ///< Error due to XML stream
-        XmppStanzaError     ///< Error due to stanza
-    };
-
-    /// An enumeration for the type of XMPP stream error.
-    /// http://xmpp.org/rfcs/rfc3920.html#streams-error
-    enum StreamError
-    {
-        ConflictStreamError,///< <conflict/> the server is closing the active stream for this
-        ///< entity because a new stream has been initiated that conflicts with the existing stream.
-        UnknownStreamError,
     };
 
     QXmppClient(QObject *parent = 0);
@@ -196,7 +186,7 @@ public:
                                               const QVariant &arg9 = QVariant(),
                                               const QVariant &arg10 = QVariant() );
 
-    QXmppClient::StreamError getXmppStreamError();
+    QXmppStanza::Error::Condition getXmppStreamError();
 
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);

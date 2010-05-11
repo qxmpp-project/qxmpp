@@ -73,7 +73,7 @@ public:
     void sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
-    QXmppClient::StreamError getXmppStreamError();
+    QXmppStanza::Error::Condition getXmppStreamError();
 
 signals:
     // socket host found
@@ -140,10 +140,9 @@ private:
     QString m_streamId;
     QString m_nonSASLAuthId;
     QString m_XMPPVersion;
-    QXmppClient::StreamError m_xmppStreamError;
+    QXmppStanza::Error::Condition m_xmppStreamError;
     QTimer *m_pingTimer;
     QTimer *m_timeoutTimer;
-//    m_xmppStanzaError;
 
     QXmppArchiveManager m_archiveManager;
     QXmppTransferManager m_transferManager;
