@@ -1209,7 +1209,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
             job->m_fileInfo.setDate(datetimeFromString(item.attribute("date")));
             job->m_fileInfo.setHash(QByteArray::fromHex(item.attribute("hash").toAscii()));
             job->m_fileInfo.setName(item.attribute("name"));
-            job->m_fileInfo.setSize(item.attribute("size").toInt());
+            job->m_fileInfo.setSize(item.attribute("size").toLongLong());
         }
     }
 
