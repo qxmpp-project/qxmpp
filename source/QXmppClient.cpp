@@ -225,8 +225,8 @@ void QXmppClient::sendPacket(const QXmppPacket& packet)
 void QXmppClient::disconnect()
 {
     m_clientPresence.setType(QXmppPresence::Unavailable);
-    m_clientPresence.getStatus().setType(QXmppPresence::Status::Offline);
-    m_clientPresence.getStatus().setStatusText("Logged out");
+    m_clientPresence.status().setType(QXmppPresence::Status::Offline);
+    m_clientPresence.status().setStatusText("Logged out");
     if (m_stream && m_stream->isConnected())
     {
         sendPacket(m_clientPresence);
@@ -270,7 +270,7 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 
 void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
-    if (presence.getType() == QXmppPresence::Unavailable)
+    if (presence.type() == QXmppPresence::Unavailable)
         disconnect();
     else if (!m_stream->isConnected())
         connectToServer(m_config, presence);
@@ -291,7 +291,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 void QXmppClient::setClientPresence(const QString& statusText)
 {
     QXmppPresence newPresence = m_clientPresence;
-    newPresence.getStatus().setStatusText(statusText);
+    newPresence.status().setStatusText(statusText);
     setClientPresence(newPresence);
 }
 
@@ -323,7 +323,7 @@ void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
         newPresence.setType(QXmppPresence::Unavailable);
     else
         newPresence.setType(QXmppPresence::Available);
-    newPresence.getStatus().setType(statusType);
+    newPresence.status().setType(statusType);
     setClientPresence(newPresence);
 }
 

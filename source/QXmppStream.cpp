@@ -1046,7 +1046,7 @@ void QXmppStream::sendPacket(const QXmppPacket& packet)
 
 void QXmppStream::processPresence(const QXmppPresence& presence)
 {
-    switch(presence.getType())
+    switch(presence.type())
     {
     case QXmppPresence::Error:
         break;
