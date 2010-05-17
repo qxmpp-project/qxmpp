@@ -66,6 +66,7 @@ public:
     void acceptSubscriptionRequest(const QString& from, bool accept = true);
     void sendSubscriptionRequest(const QString& to);
     void disconnect();
+    bool isConnected() const;
     QXmppArchiveManager& getArchiveManager();
     QXmppRoster& getRoster();
     QXmppTransferManager& getTransferManager();

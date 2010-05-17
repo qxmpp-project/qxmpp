@@ -1023,6 +1023,11 @@ void QXmppStream::disconnect()
     m_socket.disconnectFromHost();
 }
 
+bool QXmppStream::isConnected() const
+{
+    return m_socket.state() == QAbstractSocket::ConnectedState;
+}
+
 QXmppRoster& QXmppStream::getRoster()
 {
     return m_roster;
