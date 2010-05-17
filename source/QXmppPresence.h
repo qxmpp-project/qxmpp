@@ -59,17 +59,24 @@ public:
         Status(QXmppPresence::Status::Type type = QXmppPresence::Status::Online,
             const QString statusText = "", int priority = 0);
 
-        QXmppPresence::Status::Type getType() const;
+        QXmppPresence::Status::Type type() const;
         void setType(QXmppPresence::Status::Type);
 
-        QString getStatusText() const;
+        QString statusText() const;
         void setStatusText(const QString&);
 
-        int getPriority() const;
+        int priority() const;
         void setPriority(int);
 
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
+
+// deprecated accessors, use the form without "get" instead
+// obsolete start
+        int Q_DECL_DEPRECATED getPriority() const;
+        QString Q_DECL_DEPRECATED getStatusText() const;
+        QXmppPresence::Status::Type Q_DECL_DEPRECATED getType() const;
+// obsolete end
 
     private:
         QString getTypeStr() const;
@@ -84,15 +91,22 @@ public:
         const QXmppPresence::Status& status = QXmppPresence::Status());
     ~QXmppPresence();
 
-    QXmppPresence::Type getType() const;
+    QXmppPresence::Type type() const;
     void setType(QXmppPresence::Type);
 
-    QXmppPresence::Status& getStatus();
-    const QXmppPresence::Status& getStatus() const;
+    QXmppPresence::Status& status();
+    const QXmppPresence::Status& status() const;
     void setStatus(const QXmppPresence::Status&);
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+
+// deprecated accessors, use the form without "get" instead
+// obsolete start
+    QXmppPresence::Type Q_DECL_DEPRECATED getType() const;
+    QXmppPresence::Status Q_DECL_DEPRECATED & getStatus();
+    const QXmppPresence::Status Q_DECL_DEPRECATED & getStatus() const;
+// obsolete end
 
 private:
     QString getTypeStr() const;

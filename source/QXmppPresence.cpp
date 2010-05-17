@@ -40,7 +40,7 @@ QXmppPresence::~QXmppPresence()
 
 }
 
-QXmppPresence::Type QXmppPresence::getType() const
+QXmppPresence::Type QXmppPresence::type() const
 {
     return m_type;
 }
@@ -50,12 +50,12 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     m_type = type;
 }
 
-const QXmppPresence::Status& QXmppPresence::getStatus() const
+const QXmppPresence::Status& QXmppPresence::status() const
 {
     return m_status;
 }
 
-QXmppPresence::Status& QXmppPresence::getStatus()
+QXmppPresence::Status& QXmppPresence::status()
 {
     return m_status;
 }
@@ -97,7 +97,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 QString QXmppPresence::getTypeStr() const
 {
     QString text;
-    switch(getType())
+    switch(m_type)
     {
     case QXmppPresence::Error:
         text = "error"; 
@@ -125,7 +125,7 @@ QString QXmppPresence::getTypeStr() const
         text = "probe"; 
         break;
     default:
-        qWarning("QXmppPresence::getTypeStr() invalid type %d", (int)getType());
+        qWarning("QXmppPresence::getTypeStr() invalid type %d", (int)m_type);
         break;
     }
     return text;
@@ -199,7 +199,7 @@ QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
 {
 }
 
-QXmppPresence::Status::Type QXmppPresence::Status::getType() const
+QXmppPresence::Status::Type QXmppPresence::Status::type() const
 {
     return m_type;
 }
@@ -256,7 +256,7 @@ void QXmppPresence::Status::setTypeFromStr(const QString& str)
 QString QXmppPresence::Status::getTypeStr() const
 {
     QString text;
-    switch(getType())
+    switch(m_type)
     {
     case QXmppPresence::Status::Online:
         // no type-attribute if available
@@ -279,13 +279,13 @@ QString QXmppPresence::Status::getTypeStr() const
         break;
     default:
         qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
-                 (int)getType());
+                 (int)m_type);
         break;
     }
     return text;
 }
 
-QString QXmppPresence::Status::getStatusText() const
+QString QXmppPresence::Status::statusText() const
 {
     return m_statusText;
 }
@@ -295,7 +295,7 @@ void QXmppPresence::Status::setStatusText(const QString& str)
     m_statusText = str;
 }
 
-int QXmppPresence::Status::getPriority() const
+int QXmppPresence::Status::priority() const
 {
     return m_priority;
 }
@@ -320,3 +320,36 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
 }
 
+// obsolete start
+
+QXmppPresence::Type QXmppPresence::getType() const
+{
+    return m_type;
+}
+
+const QXmppPresence::Status& QXmppPresence::getStatus() const
+{
+    return m_status;
+}
+
+QXmppPresence::Status& QXmppPresence::getStatus()
+{
+    return m_status;
+}
+
+QXmppPresence::Status::Type QXmppPresence::Status::getType() const
+{
+    return m_type;
+}
+
+QString QXmppPresence::Status::getStatusText() const
+{
+    return m_statusText;
+}
+
+int QXmppPresence::Status::getPriority() const
+{
+    return m_priority;
+}
+
+// obsolete end
