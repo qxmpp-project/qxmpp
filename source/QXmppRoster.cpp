@@ -141,10 +141,7 @@ QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(
     if(m_entries.contains(bareJid))
         return m_entries.value(bareJid);
     else
-    {
-        qWarning("QXmppRoster::getRosterEntry(): bareJid doesn't exist in roster db");
         return QXmppRoster::QXmppRosterEntry();
-    }
 }
 
 /// [OBSOLETE] Returns all the roster entries in the database.
@@ -205,10 +202,7 @@ QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
     if(m_presences.contains(bareJid) && m_presences[bareJid].contains(resource))
         return m_presences[bareJid][resource];
     else
-    {
-        qWarning("QXmppRoster::getPresence(): invalid bareJid");
         return QXmppPresence();
-    }
 }
 
 /// [OBSOLETE] Returns all the presence entries in the database.
