@@ -61,8 +61,6 @@ public:
 
         QXmppPresence::Status::Type getType() const;
         void setType(QXmppPresence::Status::Type);
-        void setTypeFromStr(const QString&);
-        QString getTypeStr() const;
 
         QString getStatusText() const;
         void setStatusText(const QString&);
@@ -70,7 +68,13 @@ public:
         int getPriority() const;
         void setPriority(int);
 
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+
     private:
+        QString getTypeStr() const;
+        void setTypeFromStr(const QString&);
+
         QXmppPresence::Status::Type m_type;
         QString m_statusText;
         int m_priority;
@@ -88,7 +92,7 @@ public:
     void setStatus(const QXmppPresence::Status&);
 
     void parse(const QDomElement &element);
-    void toXml( QXmlStreamWriter *writer ) const;
+    void toXml(QXmlStreamWriter *writer) const;
 
 private:
     QString getTypeStr() const;

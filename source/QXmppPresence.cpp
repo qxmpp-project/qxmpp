@@ -70,45 +70,28 @@ void QXmppPresence::parse(const QDomElement &element)
     QXmppStanza::parse(element);
 
     setTypeFromStr(element.attribute("type"));
-
-    QString statusText = element.
-                         firstChildElement("status").text();
-    QString show = element.
-                   firstChildElement("show").text();
-    int priority = element.
-                   firstChildElement("priority").text().toInt();
-    QXmppPresence::Status status;
-    status.setTypeFromStr(show);
-    status.setStatusText(statusText);
-    status.setPriority(priority);
-    setStatus(status);
+    m_status.parse(element);
 
     QDomElement xElement = element.firstChildElement("x");
     if(!xElement.isNull())
         setExtensions(QXmppElement(xElement));
 }
 
-void  QXmppPresence::toXml(QXmlStreamWriter *xmlWriter ) const
+void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 {
-
     xmlWriter->writeStartElement("presence");
     helperToXmlAddAttribute(xmlWriter,"xml:lang", lang());
     helperToXmlAddAttribute(xmlWriter,"id", id());
     helperToXmlAddAttribute(xmlWriter,"to", to());
     helperToXmlAddAttribute(xmlWriter,"from", from());
     helperToXmlAddAttribute(xmlWriter,"type", getTypeStr());
+    m_status.toXml(xmlWriter);
 
-    helperToXmlAddTextElement(xmlWriter,"status", getStatus().getStatusText());
-    if(getStatus().getPriority() != 0)
-        helperToXmlAddNumberElement(xmlWriter,"priority", getStatus().getPriority());
-    helperToXmlAddTextElement(xmlWriter,"show", getStatus().getTypeStr());
-    
     error().toXml(xmlWriter);
     foreach (const QXmppElement &extension, extensions())
         extension.toXml(xmlWriter);
     
     xmlWriter->writeEndElement();
-
 }
 
 QString QXmppPresence::getTypeStr() const
@@ -320,5 +303,20 @@ int QXmppPresence::Status::getPriority() const
 void QXmppPresence::Status::setPriority(int priority)
 {
     m_priority = priority;
+}
+
+void QXmppPresence::Status::parse(const QDomElement &element)
+{
+    setTypeFromStr(element.firstChildElement("show").text());
+    m_statusText = element.firstChildElement("status").text();
+    m_priority = element.firstChildElement("priority").text().toInt();
+}
+
+void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
+{
+    helperToXmlAddTextElement(xmlWriter, "show", getTypeStr());
+    helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
+    if (m_priority != 0)
+        helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
 }
 
