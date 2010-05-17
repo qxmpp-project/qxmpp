@@ -44,6 +44,7 @@ void QXmppArchiveManager::archiveListIqReceived(const QXmppArchiveListIq &listIq
 
 void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq)
 {
+    Q_UNUSED(prefIq);
     qDebug() << "got archive preferences";
 }
 
