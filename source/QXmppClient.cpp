@@ -38,7 +38,7 @@
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
-    : QObject(parent), m_logger(0), m_stream(0), m_clientPrecence(QXmppPresence::Available),
+    : QObject(parent), m_logger(0), m_stream(0), m_clientPresence(QXmppPresence::Available),
     m_reconnectionManager(0)
 {
     m_logger = QXmppLogger::getLogger();
@@ -123,7 +123,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
         m_reconnectionManager = 0;
     }
 
-    m_clientPrecence = initialPresence;
+    m_clientPresence = initialPresence;
 
     m_stream->connect();
 }
@@ -153,7 +153,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     m_config.setDomain(domain);
     m_config.setPort(port);
 
-    m_clientPrecence = initialPresence;
+    m_clientPresence = initialPresence;
 
     m_stream->connect();
 }
@@ -224,10 +224,10 @@ void QXmppClient::sendPacket(const QXmppPacket& packet)
 
 void QXmppClient::disconnect()
 {
-    m_clientPrecence.setType(QXmppPresence::Unavailable);
-    m_clientPrecence.getStatus().setType(QXmppPresence::Status::Online);
-    m_clientPrecence.getStatus().setStatusText("Logged out");
-    sendPacket(m_clientPrecence);
+    m_clientPresence.setType(QXmppPresence::Unavailable);
+    m_clientPresence.getStatus().setType(QXmppPresence::Status::Online);
+    m_clientPresence.getStatus().setStatusText("Logged out");
+    sendPacket(m_clientPresence);
     if(m_stream)
         m_stream->disconnect();
 }
@@ -264,8 +264,8 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 
 void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
-    m_clientPrecence = presence;
-    sendPacket(m_clientPrecence);
+    m_clientPresence = presence;
+    sendPacket(m_clientPresence);
 }
 
 /// Overloaded function.
@@ -277,8 +277,8 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
 void QXmppClient::setClientPresence(const QString& statusText)
 {
-    m_clientPrecence.getStatus().setStatusText(statusText);
-    sendPacket(m_clientPrecence);
+    m_clientPresence.getStatus().setStatusText(statusText);
+    sendPacket(m_clientPresence);
 }
 
 /// Overloaded function.
@@ -296,8 +296,8 @@ void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
     }
     else
     {
-        m_clientPrecence.setType(presenceType);
-        sendPacket(m_clientPrecence);
+        m_clientPresence.setType(presenceType);
+        sendPacket(m_clientPresence);
     }
 }
 
@@ -310,8 +310,8 @@ void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
 
 void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
 {
-    m_clientPrecence.getStatus().setType(statusType);
-    sendPacket(m_clientPrecence);
+    m_clientPresence.getStatus().setType(statusType);
+    sendPacket(m_clientPresence);
 }
 
 /// Function to get the client's current presence.
@@ -321,7 +321,7 @@ void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
 
 const QXmppPresence& QXmppClient::getClientPresence() const
 {
-    return m_clientPrecence;
+    return m_clientPresence;
 }
 
 /// Function to get reconnection manager. By default there exists a reconnection
