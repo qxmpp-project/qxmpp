@@ -225,11 +225,13 @@ void QXmppClient::sendPacket(const QXmppPacket& packet)
 void QXmppClient::disconnect()
 {
     m_clientPresence.setType(QXmppPresence::Unavailable);
-    m_clientPresence.getStatus().setType(QXmppPresence::Status::Online);
+    m_clientPresence.getStatus().setType(QXmppPresence::Status::Offline);
     m_clientPresence.getStatus().setStatusText("Logged out");
-    sendPacket(m_clientPresence);
-    if(m_stream)
+    if (m_stream && m_stream->isConnected())
+    {
+        sendPacket(m_clientPresence);
         m_stream->disconnect();
+    }
 }
 
 /// Returns the reference to QXmppRoster object of the client.
@@ -259,13 +261,24 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 
 /// Changes the presence of the connected client.
 ///
+/// If the presence type is QXmppPresence::Unavailable or the presence status
+/// is QXmppPresence::Status::Offline, the connection to the server will be
+/// closed.
+///
 /// \param presence QXmppPresence object
 ///
 
 void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
-    m_clientPresence = presence;
-    sendPacket(m_clientPresence);
+    if (presence.getType() == QXmppPresence::Unavailable)
+        disconnect();
+    else if (!m_stream->isConnected())
+        connectToServer(m_config, presence);
+    else
+    {
+        m_clientPresence = presence;
+        sendPacket(m_clientPresence);
+    }
 }
 
 /// Overloaded function.
@@ -277,8 +290,9 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
 void QXmppClient::setClientPresence(const QString& statusText)
 {
-    m_clientPresence.getStatus().setStatusText(statusText);
-    sendPacket(m_clientPresence);
+    QXmppPresence newPresence = m_clientPresence;
+    newPresence.getStatus().setStatusText(statusText);
+    setClientPresence(newPresence);
 }
 
 /// Overloaded function.
@@ -290,15 +304,9 @@ void QXmppClient::setClientPresence(const QString& statusText)
 
 void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
 {
-    if(presenceType == QXmppPresence::Unavailable)
-    {
-        disconnect();
-    }
-    else
-    {
-        m_clientPresence.setType(presenceType);
-        sendPacket(m_clientPresence);
-    }
+    QXmppPresence newPresence = m_clientPresence;
+    newPresence.setType(presenceType);
+    setClientPresence(newPresence);
 }
 
 /// Overloaded function.
@@ -310,8 +318,13 @@ void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
 
 void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
 {
-    m_clientPresence.getStatus().setType(statusType);
-    sendPacket(m_clientPresence);
+    QXmppPresence newPresence = m_clientPresence;
+    if (statusType == QXmppPresence::Status::Offline)
+        newPresence.setType(QXmppPresence::Unavailable);
+    else
+        newPresence.setType(QXmppPresence::Available);
+    newPresence.getStatus().setType(statusType);
+    setClientPresence(newPresence);
 }
 
 /// Function to get the client's current presence.
