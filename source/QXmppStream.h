@@ -173,8 +173,6 @@ private:
     bool hasEndStreamElement(const QByteArray&);
 
     void processPresence(const QXmppPresence&);
-    void processMessage(const QXmppMessage&);
-    void processIq(const QXmppIq&);
     void processBindIq(const QXmppBind&);
     void processRosterIq(const QXmppRosterIq&);
 
