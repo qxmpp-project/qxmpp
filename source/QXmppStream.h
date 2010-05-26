@@ -106,7 +106,6 @@ signals:
     void archivePrefIqReceived(const QXmppArchivePrefIq&);
 
     void discoveryIqReceived(const QXmppDiscoveryIq&);
-    void versionIqReceived(const QXmppVersionIq&);
 
     void byteStreamIqReceived(const QXmppByteStreamIq&);
     void ibbCloseIqReceived(const QXmppIbbCloseIq&);

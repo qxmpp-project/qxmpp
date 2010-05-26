@@ -60,10 +60,6 @@ QXmppClient::QXmppClient(QObject *parent)
         SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(versionIqReceived(const QXmppVersionIq&)), this,
-        SIGNAL(versionIqReceived(const QXmppVersionIq&)));
-    Q_ASSERT(check);
-
     check = connect(m_stream, SIGNAL(disconnected()), this,
         SIGNAL(disconnected()));
     Q_ASSERT(check);

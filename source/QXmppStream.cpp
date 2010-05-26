@@ -686,10 +686,9 @@ void QXmppStream::parser(const QByteArray& data)
                             responseIq.setVersion(qApp->applicationVersion());
                             sendPacket(responseIq);
                         } else {
-                            emit versionIqReceived(versionIq);
+                            emit iqReceived(versionIq);
                         }
 
-                        emit iqReceived(versionIq);
                     }
                     // XEP-0095: Stream Initiation
                     else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
