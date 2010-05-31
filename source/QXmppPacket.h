@@ -33,17 +33,16 @@
 // for an explanation.
 #include <QXmlStreamWriter>
 
+class QDomElement;
+
 class QXmppPacket
 {
 public:
     QXmppPacket();
     virtual ~QXmppPacket();
     
-    QByteArray xmlReceived() const;
+    virtual void parse(const QDomElement &element) = 0;
     virtual void toXml( QXmlStreamWriter *writer ) const = 0;
-
-private:
-    QByteArray m_xmlReceived;
 };
 
 #endif // QXMPPPACKET_H

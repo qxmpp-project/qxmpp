@@ -26,15 +26,9 @@
 
 QXmppPacket::QXmppPacket()
 {
-
 }
 
 QXmppPacket::~QXmppPacket()
 {
-
 }
 
-QByteArray QXmppPacket::xmlReceived() const
-{
-    return m_xmlReceived;
-}
