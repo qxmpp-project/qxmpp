@@ -76,6 +76,8 @@ public:
     QAbstractSocket::SocketError getSocketError();
     QXmppStanza::Error::Condition getXmppStreamError();
 
+    QXmppConfiguration& getConfiguration();
+
 signals:
     // socket host found
     void hostFound();
@@ -95,7 +97,6 @@ signals:
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);
     void rosterIqReceived(const QXmppRosterIq&);
-    void rosterRequestIqReceived(const QXmppRosterIq&);
     void vCardIqReceived(const QXmppVCard&);
 
     void rpcCallResponse(const QXmppRpcResponseIq& result );
@@ -132,7 +133,6 @@ private:
     QXmppRoster m_roster;
     QString m_sessionId;
     QString m_bindId;
-    QString m_rosterReqId;
     QByteArray m_dataBuffer;
     QSslSocket m_socket;
     bool m_sessionAvaliable;
@@ -149,7 +149,6 @@ private:
     QXmppVCardManager m_vCardManager;
     int m_authStep;
 
-    QXmppConfiguration& getConfiguration();
     void debug(const QString&);
     void info(const QString&);
     void warning(const QString&);
@@ -172,7 +171,6 @@ private:
 
     void processPresence(const QXmppPresence&);
     void processBindIq(const QXmppBind&);
-    void processRosterIq(const QXmppRosterIq&);
 
     void flushDataBuffer();
 };

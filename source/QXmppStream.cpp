@@ -94,26 +94,6 @@ QXmppStream::QXmppStream(QXmppClient* client)
                              SLOT(socketError(QAbstractSocket::SocketError)));
     Q_ASSERT(check);
 
-    check = QObject::connect(this,
-                            SIGNAL(disconnected()),
-                            &m_roster,
-                            SLOT(disconnected()));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this,
-                            SIGNAL(presenceReceived(const QXmppPresence&)),
-                            &m_roster,
-                            SLOT(presenceReceived(const QXmppPresence&)));
-    Q_ASSERT(check);
-    
-    check = QObject::connect(this, SIGNAL(rosterIqReceived(const QXmppRosterIq&)), 
-        &m_roster, SLOT(rosterIqReceived(const QXmppRosterIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(rosterRequestIqReceived(const QXmppRosterIq&)),
-        &m_roster, SLOT(rosterRequestIqReceived(const QXmppRosterIq&)));
-    Q_ASSERT(check);
-
     check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
     Q_ASSERT(check);
@@ -535,8 +515,6 @@ void QXmppStream::parser(const QByteArray& data)
                         // xmpp connection made
                         emit xmppConnected();
 
-                        sendRosterRequest();
-
                         QXmppBind session(type);
                         session.setId(id);
                         session.setTo(to);
@@ -560,7 +538,7 @@ void QXmppStream::parser(const QByteArray& data)
                     {
                         QXmppRosterIq rosterIq;
                         rosterIq.parse(nodeRecv);
-                        processRosterIq(rosterIq);
+                        emit rosterIqReceived(rosterIq);
                         emit iqReceived(rosterIq);
                     }
                     // extensions
@@ -632,9 +610,8 @@ void QXmppStream::parser(const QByteArray& data)
                         // successful Non-SASL Authentication
                         debug("Authenticated (Non-SASL)");
 
+                        // xmpp connection made
                         emit xmppConnected();
-
-                        sendRosterRequest();
                     }
                     else if(nodeRecv.firstChildElement("query").
                             namespaceURI() == ns_auth)
@@ -999,15 +976,6 @@ void QXmppStream::sendSubscriptionRequest(const QString& to)
     sendPacket(presence);
 }
 
-void QXmppStream::sendRosterRequest()
-{
-    QXmppRosterIq roster;
-    roster.setType(QXmppIq::Get);
-    roster.setFrom(getConfiguration().jid());
-    m_rosterReqId = roster.id();
-    sendPacket(roster);
-}
-
 void QXmppStream::disconnect()
 {
     m_authStep = 0;
@@ -1037,6 +1005,7 @@ bool QXmppStream::sendPacket(const QXmppPacket& packet)
     return sendToServer(data);
 }
 
+// FIXME : should this be moved to QXmppRoster?
 void QXmppStream::processPresence(const QXmppPresence& presence)
 {
     switch(presence.type())
@@ -1081,30 +1050,6 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
             getConfiguration().setResource(bind.resource());
         if(m_sessionAvaliable)
             sendSessionIQ();
-        break;
-    default:
-        break;
-    }
-}
-
-void QXmppStream::processRosterIq(const QXmppRosterIq& rosterIq)
-{
-    if(m_rosterReqId == rosterIq.id())
-        emit rosterRequestIqReceived(rosterIq);
-    else
-        emit rosterIqReceived(rosterIq);
-
-    switch(rosterIq.type())
-    {
-    case QXmppIq::Set:
-        // when contact subscribes user...user sends 'subscribed' presence 
-        // then after recieving following iq user requests contact for subscription
-        
-        // check thet "from" is newly added in the roster...and remove this ask thing...and do this for all items
-        if(rosterIq.items().at(0).subscriptionType() ==
-           QXmppRosterIq::Item::From && rosterIq.items().at(0).
-           subscriptionStatus().isEmpty())
-            sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
         break;
     default:
         break;

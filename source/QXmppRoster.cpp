@@ -32,11 +32,37 @@
 QXmppRoster::QXmppRoster(QXmppStream* stream) : m_stream(stream),
                                 m_isRosterReceived(false)
 {
+    bool check = QObject::connect(m_stream, SIGNAL(xmppConnected()),
+        this, SLOT(connected()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(disconnected()),
+        this, SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)),
+        this, SLOT(presenceReceived(const QXmppPresence&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(rosterIqReceived(const QXmppRosterIq&)), 
+        this, SLOT(rosterIqReceived(const QXmppRosterIq&)));
+    Q_ASSERT(check);
 }
 
 QXmppRoster::~QXmppRoster()
 {
 
+}
+
+/// Upon XMPP connection, request the roster.
+///
+void QXmppRoster::connected()
+{
+    QXmppRosterIq roster;
+    roster.setType(QXmppIq::Get);
+    roster.setFrom(m_stream->getConfiguration().jid());
+    m_rosterReqId = roster.id();
+    m_stream->sendPacket(roster);
 }
 
 void QXmppRoster::disconnected()
@@ -64,36 +90,27 @@ void QXmppRoster::presenceReceived(const QXmppPresence& presence)
 
 void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
 {
-    switch(rosterIq.type())
-    {
-    case QXmppIq::Set:
-    case QXmppIq::Result:
-        {
-            QList<QXmppRosterIq::Item> items = rosterIq.items();
-            for(int i = 0; i < items.count(); ++i)
-            {
-                QString bareJid = items.at(i).bareJid();
-                m_entries[bareJid] = items.at(i);
-                emit rosterChanged(bareJid);
-            }
-            if(rosterIq.type() == QXmppIq::Set) // send result iq
-            {
-                QXmppIq returnIq(QXmppIq::Result);
-                returnIq.setId(rosterIq.id());
-                m_stream->sendPacket(returnIq);
-            }
-            break;
-        }
-    default:
-        break;
-    }
-}
+    bool isInitial = (m_rosterReqId == rosterIq.id());
 
-void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
-{
     switch(rosterIq.type())
     {
     case QXmppIq::Set:
+        {
+            // send result iq
+            QXmppIq returnIq(QXmppIq::Result);
+            returnIq.setId(rosterIq.id());
+            m_stream->sendPacket(returnIq);
+
+            // when contact subscribes user...user sends 'subscribed' presence 
+            // then after recieving following iq user requests contact for subscription
+            
+            // check the "from" is newly added in the roster...and remove this ask thing...and do this for all items
+            if(rosterIq.items().at(0).subscriptionType() ==
+               QXmppRosterIq::Item::From && rosterIq.items().at(0).
+               subscriptionStatus().isEmpty())
+                sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
+        }
+        break;
     case QXmppIq::Result:
         {
             QList<QXmppRosterIq::Item> items = rosterIq.items();
@@ -101,15 +118,14 @@ void QXmppRoster::rosterRequestIqReceived(const QXmppRosterIq& rosterIq)
             {
                 QString bareJid = items.at(i).bareJid();
                 m_entries[bareJid] = items.at(i);
+                if (!isInitial)
+                    emit rosterChanged(bareJid);
             }
-            if(rosterIq.type() == QXmppIq::Set) // send result iq
+            if (isInitial)
             {
-                QXmppIq returnIq(QXmppIq::Result);
-                returnIq.setId(rosterIq.id());
-                m_stream->sendPacket(returnIq);
+                m_isRosterReceived = true;
+                emit rosterReceived();
             }
-            m_isRosterReceived = true;
-            emit rosterReceived();
             break;
         }
     default:

@@ -102,12 +102,14 @@ private:
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
     // flag to store that QXmppRoster has been populated
     bool m_isRosterReceived;
+    // id of the initial roster request
+    QString m_rosterReqId;
 
 private slots:
+    void connected();
     void disconnected();
     void presenceReceived(const QXmppPresence&);
     void rosterIqReceived(const QXmppRosterIq&);
-    void rosterRequestIqReceived(const QXmppRosterIq&);
 };
 
 #endif // QXMPPROSTER_H
