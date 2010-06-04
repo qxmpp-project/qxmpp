@@ -203,7 +203,6 @@ private slots:
     void xmppConnected();
 
 private:
-    QXmppLogger* m_logger;
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
                             ///< TCP socket and XMPP protocol
     QXmppConfiguration m_config;    ///< This object provides the configuration

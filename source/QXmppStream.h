@@ -37,6 +37,7 @@ class QTimer;
 
 class QXmppClient;
 class QXmppPacket;
+class QXmppLogger;
 class QXmppPresence;
 class QXmppIq;
 class QXmppBind;
@@ -71,6 +72,9 @@ public:
     QXmppStanza::Error::Condition getXmppStreamError();
 
     QXmppConfiguration& getConfiguration();
+
+    QXmppLogger *logger();
+    void setLogger(QXmppLogger *logger);
 
 signals:
     // socket host found
@@ -124,6 +128,7 @@ private slots:
 
 private:
     QXmppClient* m_client; // reverse pointer
+    QXmppLogger* m_logger;
     QString m_sessionId;
     QString m_bindId;
     QByteArray m_dataBuffer;

@@ -41,10 +41,9 @@
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
-    : QObject(parent), m_logger(0), m_stream(0), m_clientPresence(QXmppPresence::Available),
+    : QObject(parent), m_stream(0), m_clientPresence(QXmppPresence::Available),
     m_reconnectionManager(0)
 {
-    m_logger = QXmppLogger::getLogger();
     m_stream = new QXmppStream(this);
 
     bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
@@ -548,16 +547,18 @@ bool QXmppClient::handleStreamElement(const QDomElement &element)
     return false;
 }
 
-/// Return the QXmppLogger associated with the client.
+/// Returns the QXmppLogger associated with the current QXmppClient.
 
 QXmppLogger *QXmppClient::logger()
 {
-    return m_logger;
+    return m_stream->logger();
 }
+
+/// Sets the QXmppLogger associated with the current QXmppClient.
 
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
-    m_logger = logger;
+    m_stream->setLogger(logger);
 }
 
 /// At connection establishment, send initial presence.

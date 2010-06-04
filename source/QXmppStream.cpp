@@ -69,6 +69,9 @@ QXmppStream::QXmppStream(QXmppClient* client)
     // Make sure the random number generator is seeded
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
+    // initialise logger
+    m_logger = QXmppLogger::getLogger();
+
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
     Q_ASSERT(check);
@@ -220,19 +223,33 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
     sendPacket(authQuery);
 }
 
+/// Returns the QXmppLogger associated with the current QXmppStream.
+
+QXmppLogger *QXmppStream::logger()
+{
+    return m_logger;
+}
+
+/// Sets the QXmppLogger associated with the current QXmppStream.
+
+void QXmppStream::setLogger(QXmppLogger *logger)
+{
+    m_logger = logger;
+}
+
 void QXmppStream::debug(const QString &data)
 {
-    m_client->logger()->log(QXmppLogger::DebugMessage, data);
+    m_logger->log(QXmppLogger::DebugMessage, data);
 }
 
 void QXmppStream::info(const QString &data)
 {
-    m_client->logger()->log(QXmppLogger::InformationMessage, data);
+    m_logger->log(QXmppLogger::InformationMessage, data);
 }
 
 void QXmppStream::warning(const QString &data)
 {
-    m_client->logger()->log(QXmppLogger::WarningMessage, data);
+    m_logger->log(QXmppLogger::WarningMessage, data);
 }
 
 void QXmppStream::parser(const QByteArray& data)
@@ -257,7 +274,7 @@ void QXmppStream::parser(const QByteArray& data)
     
     if(doc.setContent(completeXml, true))
     {
-        m_client->logger()->log(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
+        m_logger->log(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -744,7 +761,7 @@ void QXmppStream::sendStartStream()
 
 bool QXmppStream::sendToServer(const QByteArray& packet)
 {
-    m_client->logger()->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
+    m_logger->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
     if (!isConnected())
         return false;
     return m_socket.write( packet ) == packet.size();
