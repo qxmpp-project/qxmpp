@@ -50,12 +50,10 @@
 QXmppServerConnection::QXmppServerConnection(QSslSocket *socket,
     const QByteArray &data, QObject *parent)
 : QObject(parent)
-, m_logger(0)
 , m_stream(0)
 {
     Q_ASSERT( socket == 0 || socket->state() == QAbstractSocket::ConnectedState );
 
-    m_logger = QXmppLogger::getLogger();
     //m_stream = new QXmppStream(this);
     //m_stream->setSocket( socket );
 
@@ -136,9 +134,9 @@ void QXmppServerConnection::disconnect()
 /// \return QAbstractSocket::SocketError
 ///
 
-QAbstractSocket::SocketError QXmppServerConnection::getSocketError()
+QAbstractSocket::SocketError QXmppServerConnection::socketError()
 {
-    return m_stream->getSocketError();
+    return m_stream->socketError();
 }
 
 /// Returns the XMPP stream error if QXmppServerConnection::Error is QXmppServerConnection::XmppStreamError.
@@ -146,20 +144,20 @@ QAbstractSocket::SocketError QXmppServerConnection::getSocketError()
 /// \return QXmppServerConnection::Error::Condition
 ///
 
-QXmppStanza::Error::Condition QXmppServerConnection::getXmppStreamError()
+QXmppStanza::Error::Condition QXmppServerConnection::xmppStreamError()
 {
-    return m_stream->getXmppStreamError();
+    return m_stream->xmppStreamError();
 }
 
 /// Return the QXmppLogger associated with the client.
 
 QXmppLogger *QXmppServerConnection::logger()
 {
-    return m_logger;
+    return m_stream->logger();
 }
 
 void QXmppServerConnection::setLogger(QXmppLogger *logger)
 {
-    m_logger = logger;
+    m_stream->setLogger(logger);
 }
 

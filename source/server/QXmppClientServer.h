@@ -65,9 +65,8 @@ signals:
     void messageReceived(const QXmppMessage&);
 
 public:
-    QAbstractSocket::SocketError getSocketError();
-
-    QXmppStanza::Error::Condition getXmppStreamError();
+    QAbstractSocket::SocketError socketError();
+    QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
@@ -76,7 +75,6 @@ public slots:
     void sendPacket(const QXmppPacket&);
 
 private:
-    QXmppLogger* m_logger;
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object, a wrapper over
                             ///< TCP socket and XMPP protocol
 };
