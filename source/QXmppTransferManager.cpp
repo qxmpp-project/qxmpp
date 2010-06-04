@@ -451,7 +451,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 
         // connect to proxy
         const QString hostName = streamHash(job->m_sid,
-                                            m_stream->getConfiguration().jid(),
+                                            m_stream->configuration().jid(),
                                             job->m_jid);
 
         QXmppSocksClient *socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -474,7 +474,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         // activate stream
         QXmppByteStreamIq streamIq;
         streamIq.setType(QXmppIq::Set);
-        streamIq.setFrom(m_stream->getConfiguration().jid());
+        streamIq.setFrom(m_stream->configuration().jid());
         streamIq.setTo(streamHost.jid());
         streamIq.setSid(job->m_sid);
         streamIq.setActivate(job->m_jid);
@@ -531,7 +531,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 
         const QString hostName = streamHash(job->m_sid,
                                             job->m_jid,
-                                            m_stream->getConfiguration().jid());
+                                            m_stream->configuration().jid());
 
         // try to connect to stream host
         QXmppSocksClient *socksClient = new QXmppSocksClient(streamHost.host(), streamHost.port(), job);
@@ -1029,7 +1029,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 
 void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
-    const QString ownJid = m_stream->getConfiguration().jid();
+    const QString ownJid = m_stream->configuration().jid();
     foreach (QXmppTransferJob *job, m_jobs)
     {
         if (hostName == streamHash(job->m_sid, ownJid, job->jid()) && port == 0)
@@ -1044,7 +1044,7 @@ void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QStrin
 
 void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 {
-    const QString ownJid = m_stream->getConfiguration().jid();
+    const QString ownJid = m_stream->configuration().jid();
     QList<QXmppByteStreamIq::StreamHost> streamHosts;
 
     // discover local IPs
