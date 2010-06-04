@@ -108,7 +108,7 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             if(rosterIq.items().at(0).subscriptionType() ==
                QXmppRosterIq::Item::From && rosterIq.items().at(0).
                subscriptionStatus().isEmpty())
-                sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
+                m_stream->sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
         }
         break;
     case QXmppIq::Result:
