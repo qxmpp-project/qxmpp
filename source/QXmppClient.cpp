@@ -106,7 +106,7 @@ QXmppClient::~QXmppClient()
 
 QXmppConfiguration& QXmppClient::getConfiguration()
 {
-    return m_config;
+    return m_stream->configuration();
 }
 
 /// Overloaded function. It returns a const reference to the current configuration
@@ -115,7 +115,7 @@ QXmppConfiguration& QXmppClient::getConfiguration()
 
 const QXmppConfiguration& QXmppClient::getConfiguration() const
 {
-    return m_config;
+    return m_stream->configuration();
 }
 
 /// Attempts to connect to the XMPP server. Server details and other configurations
@@ -129,9 +129,8 @@ const QXmppConfiguration& QXmppClient::getConfiguration() const
 void QXmppClient::connectToServer(const QXmppConfiguration& config,
                                   const QXmppPresence& initialPresence)
 {
-    m_config = config;
-
-    if(!m_config.autoReconnectionEnabled())
+    m_stream->configuration() = config;
+    if(!config.autoReconnectionEnabled())
     {
         delete m_reconnectionManager;
         m_reconnectionManager = 0;
@@ -161,11 +160,12 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
                                   int port,
                                   const QXmppPresence& initialPresence)
 {
-    m_config.setHost(host);
-    m_config.setUser(user);
-    m_config.setPasswd(passwd);
-    m_config.setDomain(domain);
-    m_config.setPort(port);
+    QXmppConfiguration &config = m_stream->configuration();
+    config.setHost(host);
+    config.setUser(user);
+    config.setPasswd(passwd);
+    config.setDomain(domain);
+    config.setPort(port);
 
     m_clientPresence = initialPresence;
 
@@ -289,7 +289,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
     if (presence.type() == QXmppPresence::Unavailable)
         disconnect();
     else if (!m_stream->isConnected())
-        connectToServer(m_config, presence);
+        connectToServer(m_stream->configuration(), presence);
     else
     {
         m_clientPresence = presence;
@@ -448,7 +448,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
-                resultIq.setFrom( m_config.jid());
+                resultIq.setFrom(m_stream->configuration().jid());
                 resultIq.setPayload(result);
                 m_stream->sendPacket( resultIq );
                 return;
@@ -474,7 +474,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     QXmppRpcErrorIq errorIq;
     errorIq.setId(iq.id());
     errorIq.setTo(iq.from());
-    errorIq.setFrom( m_config.jid());
+    errorIq.setFrom(m_stream->configuration().jid());
     errorIq.setQuery( iq );
     errorIq.setError( error );
     m_stream->sendPacket( errorIq );

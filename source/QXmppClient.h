@@ -205,8 +205,6 @@ private slots:
 private:
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
                             ///< TCP socket and XMPP protocol
-    QXmppConfiguration m_config;    ///< This object provides the configuration
-                                    ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
     QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager

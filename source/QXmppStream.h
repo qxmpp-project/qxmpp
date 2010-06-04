@@ -131,6 +131,8 @@ private slots:
 
 private:
     QXmppClient* m_client; // reverse pointer
+    QXmppConfiguration m_config;    ///< This object provides the configuration
+                                    ///< required for connecting to the XMPP server.
     QXmppLogger* m_logger;
     QString m_sessionId;
     QString m_bindId;
