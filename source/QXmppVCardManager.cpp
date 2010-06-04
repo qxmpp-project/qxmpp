@@ -26,8 +26,10 @@
 #include "QXmppStream.h"
 #include "QXmppUtils.h"
 
-QXmppVCardManager::QXmppVCardManager(QXmppStream* stream) :
-        QObject(stream), m_stream(stream), m_isClientVCardReceived(false)
+QXmppVCardManager::QXmppVCardManager(QXmppStream* stream, QObject *parent)
+    : QObject(parent),
+    m_stream(stream),
+    m_isClientVCardReceived(false)
 {
     bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         this, SLOT(vCardIqReceived(const QXmppVCard&)));

@@ -36,7 +36,7 @@ class QXmppVCardManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppVCardManager(QXmppStream* stream);
+    QXmppVCardManager(QXmppStream* stream, QObject *parent = 0);
     void requestVCard(const QString& bareJid = "");
 
     const QXmppVCard& clientVCard() const;

@@ -345,8 +345,8 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
     return true;
 }
 
-QXmppTransferManager::QXmppTransferManager(QXmppStream *stream)
-    : QObject(m_stream),
+QXmppTransferManager::QXmppTransferManager(QXmppStream *stream, QObject *parent)
+    : QObject(parent),
     m_stream(stream),
     m_ibbBlockSize(4096),
     m_proxyOnly(false),

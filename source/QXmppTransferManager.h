@@ -205,7 +205,7 @@ class QXmppTransferManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppTransferManager(QXmppStream *stream);
+    QXmppTransferManager(QXmppStream *stream, QObject *parent = 0);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 

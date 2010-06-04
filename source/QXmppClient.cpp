@@ -88,10 +88,10 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // create managers
-    m_roster = new QXmppRoster(m_stream);
-    m_archiveManager = new QXmppArchiveManager(m_stream);
-    m_transferManager = new QXmppTransferManager(m_stream);
-    m_vCardManager = new QXmppVCardManager(m_stream);
+    m_roster = new QXmppRoster(m_stream, this);
+    m_archiveManager = new QXmppArchiveManager(m_stream, this);
+    m_transferManager = new QXmppTransferManager(m_stream, this);
+    m_vCardManager = new QXmppVCardManager(m_stream, this);
 }
 
 /// Destructor, destroys the QXmppClient object.

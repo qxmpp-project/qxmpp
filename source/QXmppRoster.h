@@ -67,7 +67,7 @@ public:
     // FIXME : is this class really necessary?
     typedef QXmppRosterIq::Item QXmppRosterEntry;
 
-    QXmppRoster(QXmppStream* stream);
+    QXmppRoster(QXmppStream* stream, QObject *parent = 0);
     ~QXmppRoster();
     
     bool isRosterReceived();

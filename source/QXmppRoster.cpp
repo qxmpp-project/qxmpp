@@ -29,8 +29,8 @@
 #include "QXmppPresence.h"
 #include "QXmppStream.h"
 
-QXmppRoster::QXmppRoster(QXmppStream* stream)
-    : QObject(stream),
+QXmppRoster::QXmppRoster(QXmppStream* stream, QObject *parent)
+    : QObject(parent),
     m_stream(stream),
     m_isRosterReceived(false)
 {

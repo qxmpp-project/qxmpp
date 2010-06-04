@@ -27,8 +27,9 @@
 
 #include <QDebug>
 
-QXmppArchiveManager::QXmppArchiveManager(QXmppStream *stream) :
-        QObject(stream), m_stream(stream)
+QXmppArchiveManager::QXmppArchiveManager(QXmppStream *stream, QObject *parent)
+    : QObject(parent),
+    m_stream(stream)
 {
     bool check = QObject::connect(m_stream, SIGNAL(archiveChatIqReceived(const QXmppArchiveChatIq&)),
         this, SLOT(archiveChatIqReceived(const QXmppArchiveChatIq&)));
