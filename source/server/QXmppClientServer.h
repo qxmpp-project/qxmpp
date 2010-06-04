@@ -39,14 +39,6 @@ class QXmppClientServer : public QObject
     Q_OBJECT
 
 public:
-    // should probably be moved to QXmppStream
-    enum Error
-    {
-        SocketError,        ///< Error due to TCP socket
-        KeepAliveError,     ///< Error due to no response to a keep alive
-        XmppStreamError,    ///< Error due to XML stream
-    };
-
     QXmppClientServer(QSslSocket *serverSocket,
         const QByteArray &parseData = QByteArray(), QObject *parent = 0);
     ~QXmppClientServer();
