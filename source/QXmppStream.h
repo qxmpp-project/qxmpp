@@ -30,13 +30,11 @@
 #include "QXmppConfiguration.h"
 #include "QXmppStanza.h"
 #include "QXmppVCardManager.h"
-#include "QXmppArchiveManager.h"
 #include "QXmppTransferManager.h"
 
 class QDomElement;
 class QTimer;
 
-class QXmppRoster;
 class QXmppClient;
 class QXmppPacket;
 class QXmppPresence;

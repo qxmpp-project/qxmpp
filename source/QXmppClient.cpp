@@ -27,6 +27,8 @@
 #include "QXmppStream.h"
 #include "QXmppRoster.h"
 #include "QXmppMessage.h"
+
+#include "QXmppArchiveManager.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppInvokable.h"
 #include "QXmppRpcIq.h"
