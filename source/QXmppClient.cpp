@@ -407,7 +407,7 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
 
 QAbstractSocket::SocketError QXmppClient::getSocketError()
 {
-    return m_stream->getSocketError();
+    return m_stream->socketError();
 }
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
@@ -417,7 +417,7 @@ QAbstractSocket::SocketError QXmppClient::getSocketError()
 
 QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 {
-    return m_stream->getXmppStreamError();
+    return m_stream->xmppStreamError();
 }
 
 /// Returns the reference to QXmppVCardManager, implimentation of XEP-0054.

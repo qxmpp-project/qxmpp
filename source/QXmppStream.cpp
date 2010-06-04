@@ -1067,12 +1067,12 @@ void QXmppStream::pingTimeout()
     emit error(QXmppClient::KeepAliveError);
 }
 
-QAbstractSocket::SocketError QXmppStream::getSocketError()
+QAbstractSocket::SocketError QXmppStream::socketError()
 {
     return m_socketError;
 }
 
-QXmppStanza::Error::Condition QXmppStream::getXmppStreamError()
+QXmppStanza::Error::Condition QXmppStream::xmppStreamError()
 {
     return m_xmppStreamError;
 }

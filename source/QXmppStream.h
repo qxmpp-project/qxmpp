@@ -70,8 +70,8 @@ public:
     bool isConnected() const;
     bool sendPacket(const QXmppPacket&);
 
-    QAbstractSocket::SocketError getSocketError();
-    QXmppStanza::Error::Condition getXmppStreamError();
+    QAbstractSocket::SocketError socketError();
+    QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppConfiguration& configuration();
 
