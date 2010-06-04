@@ -784,10 +784,10 @@ void QXmppStream::sendStartStream()
     sendToServer(data);
 }
 
-void QXmppStream::sendToServer(const QByteArray& packet)
+bool QXmppStream::sendToServer(const QByteArray& packet)
 {
     m_client->logger()->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
-    m_socket.write( packet );
+    return m_socket.write( packet ) == packet.size();
 }
 
 bool QXmppStream::hasStartStreamElement(const QByteArray& data)
@@ -1032,7 +1032,7 @@ QXmppRoster& QXmppStream::getRoster()
     return m_roster;
 }
 
-void QXmppStream::sendPacket(const QXmppPacket& packet)
+bool QXmppStream::sendPacket(const QXmppPacket& packet)
 {
     // prepare packet
     QByteArray data;
@@ -1040,7 +1040,7 @@ void QXmppStream::sendPacket(const QXmppPacket& packet)
     packet.toXml(&xmlStream);
 
     // send packet
-    sendToServer(data);
+    return sendToServer(data);
 }
 
 void QXmppStream::processPresence(const QXmppPresence& presence)

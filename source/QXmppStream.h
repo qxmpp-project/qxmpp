@@ -71,7 +71,7 @@ public:
     QXmppRoster& getRoster();
     QXmppTransferManager& getTransferManager();
     QXmppVCardManager& getVCardManager();
-    void sendPacket(const QXmppPacket&);
+    bool sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
     QXmppStanza::Error::Condition getXmppStreamError();
@@ -167,7 +167,7 @@ private:
     void sendSessionIQ();
     void sendInitialPresence();
     void sendRosterRequest();
-    void sendToServer(const QByteArray&);
+    bool sendToServer(const QByteArray&);
     bool hasStartStreamElement(const QByteArray&);
     bool hasEndStreamElement(const QByteArray&);
 

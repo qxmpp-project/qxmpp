@@ -193,6 +193,8 @@ void QXmppClient::connectToServer(const QString& host,
 /// QXmppMessage, QXmppPresence, QXmppIq, QXmppBind, QXmppRosterIq, QXmppSession
 /// and QXmppVCard.
 ///
+/// \return Returns true if the packet was sent, false otherwise.
+///
 /// Following code snippet illustrates how to send a message using this function:
 /// \code
 /// QXmppMessage message(from, to, message);
@@ -202,12 +204,12 @@ void QXmppClient::connectToServer(const QString& host,
 /// \param packet A valid XMPP stanza. It can be an iq, a message or a presence stanza.
 ///
 
-void QXmppClient::sendPacket(const QXmppPacket& packet)
+bool QXmppClient::sendPacket(const QXmppPacket& packet)
 {
     if(m_stream)
-    {
-        m_stream->sendPacket(packet);
-    }
+        return m_stream->sendPacket(packet);
+    else
+        return false;
 }
 
 /// Disconnects the client and the current presence of client changes to
