@@ -209,6 +209,7 @@ private:
                                     ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
+    QXmppRoster *m_roster;          ///< Pointer to the roster manager
     QHash<QString,QXmppInvokable *> m_interfaces;
 };
 

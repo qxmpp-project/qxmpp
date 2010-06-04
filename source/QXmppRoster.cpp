@@ -29,8 +29,10 @@
 #include "QXmppPresence.h"
 #include "QXmppStream.h"
 
-QXmppRoster::QXmppRoster(QXmppStream* stream) : m_stream(stream),
-                                m_isRosterReceived(false)
+QXmppRoster::QXmppRoster(QXmppStream* stream)
+    : QObject(stream),
+    m_stream(stream),
+    m_isRosterReceived(false)
 {
     bool check = QObject::connect(m_stream, SIGNAL(xmppConnected()),
         this, SLOT(connected()));

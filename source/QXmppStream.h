@@ -28,7 +28,6 @@
 #include <QObject>
 #include <QSslSocket>
 #include "QXmppConfiguration.h"
-#include "QXmppRoster.h"
 #include "QXmppStanza.h"
 #include "QXmppVCardManager.h"
 #include "QXmppArchiveManager.h"
@@ -130,7 +129,6 @@ private slots:
 
 private:
     QXmppClient* m_client; // reverse pointer
-    QXmppRoster m_roster;
     QString m_sessionId;
     QString m_bindId;
     QByteArray m_dataBuffer;

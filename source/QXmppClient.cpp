@@ -43,6 +43,7 @@ QXmppClient::QXmppClient(QObject *parent)
 {
     m_logger = QXmppLogger::getLogger();
     m_stream = new QXmppStream(this);
+    m_roster = new QXmppRoster(m_stream);
 
     bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
                          this, SIGNAL(messageReceived(const QXmppMessage&)));
@@ -243,7 +244,7 @@ void QXmppClient::disconnect()
 
 QXmppRoster& QXmppClient::getRoster()
 {
-    return m_stream->getRoster();
+    return *m_roster;
 }
 
 /// Utility function to send message to all the resources associated with the

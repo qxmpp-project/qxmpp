@@ -26,26 +26,27 @@
 #include "QXmppPacket.h"
 #include "QXmppUtils.h"
 #include "QXmppClient.h"
-#include "QXmppRoster.h"
 #include "QXmppPresence.h"
 #include "QXmppIq.h"
 #include "QXmppBind.h"
 #include "QXmppSession.h"
-#include "QXmppRosterIq.h"
 #include "QXmppMessage.h"
 #include "QXmppConstants.h"
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
-#include "QXmppIbbIq.h"
-#include "QXmppRpcIq.h"
+#include "QXmppTransferManager.h"
+
+// IQ types
 #include "QXmppArchiveIq.h"
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
-#include "QXmppPingIq.h"
+#include "QXmppIbbIq.h"
 #include "QXmppLogger.h"
+#include "QXmppPingIq.h"
+#include "QXmppRpcIq.h"
+#include "QXmppRosterIq.h"
 #include "QXmppStreamInitiationIq.h"
-#include "QXmppTransferManager.h"
 #include "QXmppVersionIq.h"
 
 #include <QCoreApplication>
@@ -60,7 +61,7 @@ static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
-    : QObject(client), m_client(client), m_roster(this),
+    : QObject(client), m_client(client),
     m_sessionAvaliable(false),
     m_archiveManager(m_client),
     m_transferManager(m_client),
@@ -987,11 +988,6 @@ void QXmppStream::disconnect()
 bool QXmppStream::isConnected() const
 {
     return m_socket.state() == QAbstractSocket::ConnectedState;
-}
-
-QXmppRoster& QXmppStream::getRoster()
-{
-    return m_roster;
 }
 
 bool QXmppStream::sendPacket(const QXmppPacket& packet)
