@@ -208,6 +208,7 @@ private:
     QXmppConfiguration m_config;    ///< This object provides the configuration
                                     ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
+    QXmppArchiveManager *m_archiveManager; ///< Pointer to the archive manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRoster *m_roster;          ///< Pointer to the roster manager
     QHash<QString,QXmppInvokable *> m_interfaces;

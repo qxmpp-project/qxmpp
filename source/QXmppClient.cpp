@@ -43,7 +43,6 @@ QXmppClient::QXmppClient(QObject *parent)
 {
     m_logger = QXmppLogger::getLogger();
     m_stream = new QXmppStream(this);
-    m_roster = new QXmppRoster(m_stream);
 
     bool check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
                          this, SIGNAL(messageReceived(const QXmppMessage&)));
@@ -79,6 +78,10 @@ QXmppClient::QXmppClient(QObject *parent)
 
     check = setReconnectionManager(new QXmppReconnectionManager(this));
     Q_ASSERT(check);
+
+    // create managers
+    m_roster = new QXmppRoster(m_stream);
+    m_archiveManager = new QXmppArchiveManager(m_stream);
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -508,7 +511,7 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 
 QXmppArchiveManager& QXmppClient::getArchiveManager()
 {
-    return m_stream->getArchiveManager();
+    return *m_archiveManager;
 }
 
 /// Returns the reference to QXmppTransferManager, implementation of:

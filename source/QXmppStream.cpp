@@ -63,7 +63,6 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client),
     m_sessionAvaliable(false),
-    m_archiveManager(m_client),
     m_transferManager(m_client),
     m_vCardManager(m_client),
     m_authStep(0)
@@ -97,18 +96,6 @@ QXmppStream::QXmppStream(QXmppClient* client)
 
     check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(archiveChatIqReceived(const QXmppArchiveChatIq&)),
-        &m_archiveManager, SLOT(archiveChatIqReceived(const QXmppArchiveChatIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(archiveListIqReceived(const QXmppArchiveListIq&)),
-        &m_archiveManager, SLOT(archiveListIqReceived(const QXmppArchiveListIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(archivePrefIqReceived(const QXmppArchivePrefIq&)),
-        &m_archiveManager, SLOT(archivePrefIqReceived(const QXmppArchivePrefIq&)));
     Q_ASSERT(check);
 
     // XEP-0047: In-Band Bytestreams
@@ -1112,11 +1099,6 @@ QXmppVCardManager& QXmppStream::getVCardManager()
 void QXmppStream::flushDataBuffer()
 {
     m_dataBuffer.clear();
-}
-
-QXmppArchiveManager& QXmppStream::getArchiveManager()
-{
-    return m_archiveManager;
 }
 
 QXmppTransferManager& QXmppStream::getTransferManager()

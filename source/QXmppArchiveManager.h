@@ -31,14 +31,14 @@ class QXmppArchiveChat;
 class QXmppArchiveChatIq;
 class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
-class QXmppClient;
+class QXmppStream;
 
 class QXmppArchiveManager : public QObject
 {
     Q_OBJECT
 
 public:
-    QXmppArchiveManager(QXmppClient* client);
+    QXmppArchiveManager(QXmppStream* stream);
     void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
     void getPreferences();
@@ -53,8 +53,8 @@ private slots:
     void archivePrefIqReceived(const QXmppArchivePrefIq&);
 
 private:
-    // reference to to client object (no ownership)
-    QXmppClient* m_client;
+    // reference to xmpp stream (no ownership)
+    QXmppStream* m_stream;
 };
 
 #endif

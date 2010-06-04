@@ -23,13 +23,24 @@
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
-#include "QXmppClient.h"
+#include "QXmppStream.h"
 
 #include <QDebug>
 
-QXmppArchiveManager::QXmppArchiveManager(QXmppClient *client) :
-        QObject(client), m_client(client)
+QXmppArchiveManager::QXmppArchiveManager(QXmppStream *stream) :
+        QObject(stream), m_stream(stream)
 {
+    bool check = QObject::connect(m_stream, SIGNAL(archiveChatIqReceived(const QXmppArchiveChatIq&)),
+        this, SLOT(archiveChatIqReceived(const QXmppArchiveChatIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(archiveListIqReceived(const QXmppArchiveListIq&)),
+        this, SLOT(archiveListIqReceived(const QXmppArchiveListIq&)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(archivePrefIqReceived(const QXmppArchivePrefIq&)),
+        this, SLOT(archivePrefIqReceived(const QXmppArchivePrefIq&)));
+    Q_ASSERT(check);
 }
 
 void QXmppArchiveManager::archiveChatIqReceived(const QXmppArchiveChatIq &chatIq)
@@ -55,7 +66,7 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
     packet.setWith(jid);
     packet.setStart(start);
     packet.setEnd(end);
-    m_client->sendPacket(packet);
+    m_stream->sendPacket(packet);
 }
 
 void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime &start, int max)
@@ -64,11 +75,11 @@ void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime
     packet.setMax(max);
     packet.setStart(start);
     packet.setWith(jid);
-    m_client->sendPacket(packet);
+    m_stream->sendPacket(packet);
 }
 
 void QXmppArchiveManager::getPreferences()
 {
     QXmppArchivePrefIq packet;
-    m_client->sendPacket(packet);
+    m_stream->sendPacket(packet);
 }

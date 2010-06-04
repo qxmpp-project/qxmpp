@@ -66,8 +66,6 @@ public:
     void sendSubscriptionRequest(const QString& to);
     void disconnect();
     bool isConnected() const;
-    QXmppArchiveManager& getArchiveManager();
-    QXmppRoster& getRoster();
     QXmppTransferManager& getTransferManager();
     QXmppVCardManager& getVCardManager();
     bool sendPacket(const QXmppPacket&);
@@ -142,7 +140,6 @@ private:
     QTimer *m_pingTimer;
     QTimer *m_timeoutTimer;
 
-    QXmppArchiveManager m_archiveManager;
     QXmppTransferManager m_transferManager;
     QXmppVCardManager m_vCardManager;
     int m_authStep;
