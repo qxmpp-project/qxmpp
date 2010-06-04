@@ -211,6 +211,7 @@ private:
     QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRoster *m_roster;                  ///< Pointer to the roster manager
+    QXmppTransferManager *m_transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *m_vCardManager;      ///< Pointer to the vCard manager
     QHash<QString,QXmppInvokable *> m_interfaces;
 };

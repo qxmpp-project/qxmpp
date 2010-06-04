@@ -35,7 +35,6 @@
 #include "QXmppVCard.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
-#include "QXmppTransferManager.h"
 
 // IQ types
 #include "QXmppArchiveIq.h"
@@ -63,7 +62,6 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client),
     m_sessionAvaliable(false),
-    m_transferManager(m_client),
     m_authStep(0)
 {
     // Make sure the random number generator is seeded
@@ -94,33 +92,6 @@ QXmppStream::QXmppStream(QXmppClient* client)
     check = QObject::connect(&m_socket,
                              SIGNAL(error(QAbstractSocket::SocketError)), this,
                              SLOT(socketError(QAbstractSocket::SocketError)));
-    Q_ASSERT(check);
-
-    // XEP-0047: In-Band Bytestreams
-    check = QObject::connect(this, SIGNAL(iqReceived(const QXmppIq&)),
-        &m_transferManager, SLOT(iqReceived(const QXmppIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(ibbCloseIqReceived(const QXmppIbbCloseIq&)),
-        &m_transferManager, SLOT(ibbCloseIqReceived(const QXmppIbbCloseIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(ibbDataIqReceived(const QXmppIbbDataIq&)),
-        &m_transferManager, SLOT(ibbDataIqReceived(const QXmppIbbDataIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(ibbOpenIqReceived(const QXmppIbbOpenIq&)),
-        &m_transferManager, SLOT(ibbOpenIqReceived(const QXmppIbbOpenIq&)));
-    Q_ASSERT(check);
-
-    // XEP-0065: SOCKS5 Bytestreams
-    check = QObject::connect(this, SIGNAL(byteStreamIqReceived(const QXmppByteStreamIq&)),
-        &m_transferManager, SLOT(byteStreamIqReceived(const QXmppByteStreamIq&)));
-    Q_ASSERT(check);
-
-    // XEP-0095: Stream Initiation
-    check = QObject::connect(this, SIGNAL(streamInitiationIqReceived(const QXmppStreamInitiationIq&)),
-        &m_transferManager, SLOT(streamInitiationIqReceived(const QXmppStreamInitiationIq&)));
     Q_ASSERT(check);
 
     // XEP-0199: XMPP Ping
@@ -1108,7 +1079,3 @@ void QXmppStream::flushDataBuffer()
     m_dataBuffer.clear();
 }
 
-QXmppTransferManager& QXmppStream::getTransferManager()
-{
-    return m_transferManager;
-}

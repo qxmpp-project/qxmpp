@@ -30,7 +30,6 @@
 #include "QXmppClient.h"
 #include "QXmppConfiguration.h"
 #include "QXmppStanza.h"
-#include "QXmppTransferManager.h"
 
 class QDomElement;
 class QTimer;
@@ -51,6 +50,10 @@ class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
 class QXmppByteStreamIq;
 class QXmppDiscoveryIq;
+class QXmppIbbCloseIq;
+class QXmppIbbDataIq;
+class QXmppIbbOpenIq;
+class QXmppStreamInitiationIq;
 class QXmppVersionIq;
 
 class QXmppStream : public QObject
@@ -65,7 +68,6 @@ public:
     void sendSubscriptionRequest(const QString& to);
     void disconnect();
     bool isConnected() const;
-    QXmppTransferManager& getTransferManager();
     bool sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
@@ -142,7 +144,6 @@ private:
     QTimer *m_pingTimer;
     QTimer *m_timeoutTimer;
 
-    QXmppTransferManager m_transferManager;
     int m_authStep;
 
     void debug(const QString&);

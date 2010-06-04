@@ -34,6 +34,7 @@
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppUtils.h"
+#include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 
 /// Creates a QXmppClient object.
@@ -84,6 +85,7 @@ QXmppClient::QXmppClient(QObject *parent)
     // create managers
     m_roster = new QXmppRoster(m_stream);
     m_archiveManager = new QXmppArchiveManager(m_stream);
+    m_transferManager = new QXmppTransferManager(m_stream);
     m_vCardManager = new QXmppVCardManager(m_stream);
 }
 
@@ -526,7 +528,7 @@ QXmppArchiveManager& QXmppClient::getArchiveManager()
 
 QXmppTransferManager& QXmppClient::getTransferManager()
 {
-    return m_stream->getTransferManager();
+    return *m_transferManager;
 }
 
 /// Reimplement in your subclass of QXmppClient if you want to handle
