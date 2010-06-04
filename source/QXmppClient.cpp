@@ -84,7 +84,7 @@ QXmppClient::QXmppClient(QObject *parent)
 
     // rpc
     check = connect(m_stream, SIGNAL(rpcCallInvoke(QXmppRpcInvokeIq)),
-        this, SIGNAL(invokeInterfaceMethod(QXmppRpcInvokeIq)));
+        this, SLOT(invokeInterfaceMethod(QXmppRpcInvokeIq)));
     Q_ASSERT(check);
 
     // create managers
