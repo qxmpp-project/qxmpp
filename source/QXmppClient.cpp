@@ -65,6 +65,10 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     check = connect(m_stream, SIGNAL(xmppConnected()), this,
+        SLOT(xmppConnected()));
+    Q_ASSERT(check);
+
+    check = connect(m_stream, SIGNAL(xmppConnected()), this,
         SIGNAL(connected()));
     Q_ASSERT(check);
 
@@ -546,5 +550,12 @@ QXmppLogger *QXmppClient::logger()
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
     m_logger = logger;
+}
+
+/// At connection establishment, send initial presence.
+
+void QXmppClient::xmppConnected()
+{
+    sendPacket(m_clientPresence);
 }
 

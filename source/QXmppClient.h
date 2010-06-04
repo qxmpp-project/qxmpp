@@ -198,6 +198,9 @@ public slots:
     void setClientPresence(QXmppPresence::Type presenceType);
     void setClientPresence(QXmppPresence::Status::Type statusType);
 
+private slots:
+    void xmppConnected();
+
 private:
     QXmppLogger* m_logger;
     QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over

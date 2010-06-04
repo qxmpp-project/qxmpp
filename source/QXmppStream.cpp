@@ -536,7 +536,6 @@ void QXmppStream::parser(const QByteArray& data)
                         emit xmppConnected();
 
                         sendRosterRequest();
-                        sendInitialPresence();
 
                         QXmppBind session(type);
                         session.setId(id);
@@ -636,7 +635,6 @@ void QXmppStream::parser(const QByteArray& data)
                         emit xmppConnected();
 
                         sendRosterRequest();
-                        sendInitialPresence();
                     }
                     else if(nodeRecv.firstChildElement("query").
                             namespaceURI() == ns_auth)
@@ -976,12 +974,6 @@ void QXmppStream::sendSessionIQ()
     session.setTo(getConfiguration().domain());
     m_sessionId = session.id();
     sendPacket(session);
-}
-
-void QXmppStream::sendInitialPresence()
-{
-    if(m_client)
-        sendPacket(m_client->getClientPresence());
 }
 
 void QXmppStream::acceptSubscriptionRequest(const QString& from, bool accept)

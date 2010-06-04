@@ -165,7 +165,6 @@ private:
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
     void sendSessionIQ();
-    void sendInitialPresence();
     void sendRosterRequest();
     bool sendToServer(const QByteArray&);
     bool hasStartStreamElement(const QByteArray&);
