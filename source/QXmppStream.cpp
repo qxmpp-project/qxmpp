@@ -463,7 +463,7 @@ void QXmppStream::parser(const QByteArray& data)
                     {
                         QXmppRpcInvokeIq rpcIqPacket;
                         rpcIqPacket.parse(nodeRecv);
-                        m_client->invokeInterfaceMethod(rpcIqPacket);
+                        emit rpcCallInvoke(rpcIqPacket);
                     }
                     else if ( QXmppRpcResponseIq::isRpcResponseIq( nodeRecv ) )
                     {

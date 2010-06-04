@@ -99,8 +99,9 @@ signals:
     void rosterIqReceived(const QXmppRosterIq&);
     void vCardIqReceived(const QXmppVCard&);
 
-    void rpcCallResponse(const QXmppRpcResponseIq& result );
-    void rpcCallError(const QXmppRpcErrorIq& err );
+    void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
+    void rpcCallResponse(const QXmppRpcResponseIq& result);
+    void rpcCallError(const QXmppRpcErrorIq &err);
 
     void archiveChatIqReceived(const QXmppArchiveChatIq&);
     void archiveListIqReceived(const QXmppArchiveListIq&);

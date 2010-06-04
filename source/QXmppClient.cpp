@@ -82,6 +82,11 @@ QXmppClient::QXmppClient(QObject *parent)
     check = setReconnectionManager(new QXmppReconnectionManager(this));
     Q_ASSERT(check);
 
+    // rpc
+    check = connect(m_stream, SIGNAL(rpcCallInvoke(QXmppRpcInvokeIq)),
+        this, SIGNAL(invokeInterfaceMethod(QXmppRpcInvokeIq)));
+    Q_ASSERT(check);
+
     // create managers
     m_roster = new QXmppRoster(m_stream);
     m_archiveManager = new QXmppArchiveManager(m_stream);

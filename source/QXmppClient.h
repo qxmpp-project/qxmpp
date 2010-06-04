@@ -169,7 +169,6 @@ public:
     QAbstractSocket::SocketError getSocketError();
 
     void addInvokableInterface( QXmppInvokable *interface );
-    void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
     QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
                                               const QString &interface,
                                               const QVariant &arg1 = QVariant(),
@@ -200,6 +199,7 @@ public slots:
     void setClientPresence(QXmppPresence::Status::Type statusType);
 
 private slots:
+    void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
     void xmppConnected();
 
 private:
