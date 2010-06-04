@@ -73,7 +73,7 @@ public:
     QAbstractSocket::SocketError getSocketError();
     QXmppStanza::Error::Condition getXmppStreamError();
 
-    QXmppConfiguration& getConfiguration();
+    QXmppConfiguration& configuration();
 
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);

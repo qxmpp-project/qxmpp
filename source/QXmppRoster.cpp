@@ -62,7 +62,7 @@ void QXmppRoster::connected()
 {
     QXmppRosterIq roster;
     roster.setType(QXmppIq::Get);
-    roster.setFrom(m_stream->getConfiguration().jid());
+    roster.setFrom(m_stream->configuration().jid());
     m_rosterReqId = roster.id();
     m_stream->sendPacket(roster);
 }

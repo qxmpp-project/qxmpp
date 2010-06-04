@@ -116,22 +116,22 @@ QXmppStream::~QXmppStream()
 
 }
 
-QXmppConfiguration& QXmppStream::getConfiguration()
+QXmppConfiguration& QXmppStream::configuration()
 {
     return m_client->getConfiguration();
 }
 
 void QXmppStream::connect()
 {
-    info(QString("Connecting to: %1:%2").arg(getConfiguration().
-            host()).arg(getConfiguration().port()));
+    info(QString("Connecting to: %1:%2").arg(configuration().
+            host()).arg(configuration().port()));
 
     // prepare for connection
     m_authStep = 0;
 
-    m_socket.setProxy(getConfiguration().networkProxy());
-    m_socket.connectToHost(getConfiguration().
-                           host(), getConfiguration().port());
+    m_socket.setProxy(configuration().networkProxy());
+    m_socket.connectToHost(configuration().
+                           host(), configuration().port());
 }
 
 void QXmppStream::socketSslErrors(const QList<QSslError> & error)
@@ -140,7 +140,7 @@ void QXmppStream::socketSslErrors(const QList<QSslError> & error)
     for(int i = 0; i< error.count(); ++i)
         warning(error.at(i).errorString());
 
-    if (getConfiguration().ignoreSslErrors())
+    if (configuration().ignoreSslErrors())
         m_socket.ignoreSslErrors();
 }
 
@@ -189,7 +189,7 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
 {
     QXmppNonSASLAuthTypesRequestIq authQuery;
     authQuery.setTo(to);
-    authQuery.setUsername(getConfiguration().user());
+    authQuery.setUsername(configuration().user());
 
     sendPacket(authQuery);
 }
@@ -288,7 +288,7 @@ void QXmppStream::parser(const QByteArray& data)
                                          namespaceURI() == ns_authFeature;
                 bool saslAvailable = nodeRecv.firstChildElement("mechanisms").
                                      namespaceURI() == ns_sasl;
-                bool useSasl = getConfiguration().useSASLAuthentication();
+                bool useSasl = configuration().useSASLAuthentication();
 
                 if(nodeRecv.firstChildElement("starttls").namespaceURI()
                     == ns_tls && !m_socket.isEncrypted())
@@ -303,7 +303,7 @@ void QXmppStream::parser(const QByteArray& data)
                     else
                     {
                         // TLS is optional from the server side
-                        switch(getConfiguration().streamSecurityMode())
+                        switch(configuration().streamSecurityMode())
                         {
                         case QXmppConfiguration::TLSEnabled:
                         case QXmppConfiguration::TLSRequired:
@@ -316,7 +316,7 @@ void QXmppStream::parser(const QByteArray& data)
                 }
                 else if(!m_socket.isEncrypted())    // TLS not supported by server
                 {
-                    if(getConfiguration().streamSecurityMode() ==
+                    if(configuration().streamSecurityMode() ==
                        QXmppConfiguration::TLSRequired)
                     {
                         // disconnect as the for client TLS is compulsory but
@@ -350,7 +350,7 @@ void QXmppStream::parser(const QByteArray& data)
                         subElement = subElement.nextSiblingElement();
                     }
 
-                    switch(getConfiguration().sASLAuthMechanism())
+                    switch(configuration().sASLAuthMechanism())
                     {
                     case QXmppConfiguration::SASLPlain:
                         if(mechanisms.contains("PLAIN"))
@@ -597,7 +597,7 @@ void QXmppStream::parser(const QByteArray& data)
 
                             if(plain && digest)
                             {
-                                if(getConfiguration().nonSASLAuthMechanism() ==
+                                if(configuration().nonSASLAuthMechanism() ==
                                    QXmppConfiguration::NonSASLDigest)
                                     plainText = false;
                                 else
@@ -725,7 +725,7 @@ void QXmppStream::parser(const QByteArray& data)
 void QXmppStream::sendStartStream()
 {
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
-    data.append(getConfiguration().domain());
+    data.append(configuration().domain());
     data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
     sendToServer(data);
 }
@@ -768,9 +768,9 @@ void QXmppStream::sendStartTls()
 void QXmppStream::sendNonSASLAuth(bool plainText)
 {
     QXmppNonSASLAuthIq authQuery;
-    authQuery.setUsername(getConfiguration().user());
-    authQuery.setPassword(getConfiguration().passwd());
-    authQuery.setResource(getConfiguration().resource());
+    authQuery.setUsername(configuration().user());
+    authQuery.setPassword(configuration().passwd());
+    authQuery.setResource(configuration().resource());
     authQuery.setStreamId(m_streamId);
     authQuery.setUsePlainText(plainText);
     m_nonSASLAuthId = authQuery.id();
@@ -780,8 +780,8 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
 void QXmppStream::sendAuthPlain()
 {
     QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
-    QString userPass('\0' + getConfiguration().user() +
-                     '\0' + getConfiguration().passwd());
+    QString userPass('\0' + configuration().user() +
+                     '\0' + configuration().passwd());
     data += userPass.toUtf8().toBase64();
     data += "</auth>";
     sendToServer(data);
@@ -847,9 +847,9 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
         return;
     }
 
-    QByteArray user = getConfiguration().user().toUtf8();
-    QByteArray passwd = getConfiguration().passwd().toUtf8();
-    QByteArray domain = getConfiguration().domain().toUtf8();
+    QByteArray user = configuration().user().toUtf8();
+    QByteArray passwd = configuration().passwd().toUtf8();
+    QByteArray domain = configuration().domain().toUtf8();
     QByteArray realm;
     if(map.contains("realm"))
         realm = map["realm"];
@@ -911,7 +911,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep2()
 void QXmppStream::sendBindIQ()
 {
     QXmppBind bind(QXmppIq::Set);
-    bind.setResource(getConfiguration().resource());
+    bind.setResource(configuration().resource());
     m_bindId = bind.id();
     sendPacket(bind);
 }
@@ -919,7 +919,7 @@ void QXmppStream::sendBindIQ()
 void QXmppStream::sendSessionIQ()
 {
     QXmppSession session(QXmppIq::Set);
-    session.setTo(getConfiguration().domain());
+    session.setTo(configuration().domain());
     m_sessionId = session.id();
     sendPacket(session);
 }
@@ -985,7 +985,7 @@ void QXmppStream::processPresence(const QXmppPresence& presence)
     case QXmppPresence::Subscribe:
         if(!presence.from().isEmpty())
         {
-            if(getConfiguration().autoAcceptSubscriptions())
+            if(configuration().autoAcceptSubscriptions())
                 acceptSubscriptionRequest(presence.from());
             emit subscriptionRequestReceived(presence.from());
         }
@@ -1013,7 +1013,7 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
     {
     case QXmppIq::Result:
         if(!bind.resource().isEmpty())
-            getConfiguration().setResource(bind.resource());
+            configuration().setResource(bind.resource());
         if(m_sessionAvaliable)
             sendSessionIQ();
         break;
@@ -1024,7 +1024,7 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
 
 void QXmppStream::pingStart()
 {
-    const int interval = getConfiguration().keepAliveInterval();
+    const int interval = configuration().keepAliveInterval();
     // start ping timer
     if (interval > 0)
     {
@@ -1044,12 +1044,12 @@ void QXmppStream::pingSend()
 {
     // send ping packet
     QXmppPingIq ping;
-    ping.setFrom(getConfiguration().jid());
-    ping.setTo(getConfiguration().domain());
+    ping.setFrom(configuration().jid());
+    ping.setTo(configuration().domain());
     sendPacket(ping);
 
     // start timeout timer
-    const int timeout = getConfiguration().keepAliveTimeout();
+    const int timeout = configuration().keepAliveTimeout();
     if (timeout > 0)
     {
         m_timeoutTimer->setInterval(timeout * 1000);
