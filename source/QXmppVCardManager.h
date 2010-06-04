@@ -26,15 +26,17 @@
 #define QXMPPVCARDMANAGER_H
 
 #include <QObject>
-#include "QXmppClient.h"
+
 #include "QXmppVCard.h"
+
+class QXmppStream;
 
 class QXmppVCardManager : public QObject
 {
     Q_OBJECT
 
 public:
-    QXmppVCardManager(QXmppClient* client);
+    QXmppVCardManager(QXmppStream* stream);
     void requestVCard(const QString& bareJid = "");
 
     const QXmppVCard& clientVCard() const;
@@ -50,8 +52,8 @@ private slots:
     void vCardIqReceived(const QXmppVCard&);
 
 private:
-    // reference to to client object (no ownership)
-    QXmppClient* m_client;
+    // reference to the xmpp stream (no ownership)
+    QXmppStream* m_stream;
 
     QXmppVCard m_clientVCard;  ///< Stores the vCard of the connected client
     bool m_isClientVCardReceived;

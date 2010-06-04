@@ -27,9 +27,9 @@
 
 #include <QObject>
 #include <QSslSocket>
+#include "QXmppClient.h"
 #include "QXmppConfiguration.h"
 #include "QXmppStanza.h"
-#include "QXmppVCardManager.h"
 #include "QXmppTransferManager.h"
 
 class QDomElement;
@@ -65,7 +65,6 @@ public:
     void disconnect();
     bool isConnected() const;
     QXmppTransferManager& getTransferManager();
-    QXmppVCardManager& getVCardManager();
     bool sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError getSocketError();
@@ -139,7 +138,6 @@ private:
     QTimer *m_timeoutTimer;
 
     QXmppTransferManager m_transferManager;
-    QXmppVCardManager m_vCardManager;
     int m_authStep;
 
     void debug(const QString&);

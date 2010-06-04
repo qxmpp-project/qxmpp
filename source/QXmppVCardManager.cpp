@@ -23,17 +23,21 @@
 
 
 #include "QXmppVCardManager.h"
+#include "QXmppStream.h"
 #include "QXmppUtils.h"
 
-QXmppVCardManager::QXmppVCardManager(QXmppClient* client) :
-        QObject(client), m_client(client), m_isClientVCardReceived(false)
+QXmppVCardManager::QXmppVCardManager(QXmppStream* stream) :
+        QObject(stream), m_stream(stream), m_isClientVCardReceived(false)
 {
+    bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCard&)),
+        this, SLOT(vCardIqReceived(const QXmppVCard&)));
+    Q_ASSERT(check);
 }
 
 void QXmppVCardManager::requestVCard(const QString& jid)
 {
     QXmppVCard vcardIq(jid);
-    m_client->sendPacket(vcardIq);
+    m_stream->sendPacket(vcardIq);
 }
 
 void QXmppVCardManager::vCardIqReceived(const QXmppVCard& vcard)
@@ -60,7 +64,7 @@ void QXmppVCardManager::setClientVCard(const QXmppVCard& clientVCard)
     m_clientVCard.setTo("");
     m_clientVCard.setFrom("");
     m_clientVCard.setType(QXmppIq::Set);
-    m_client->sendPacket(m_clientVCard);
+    m_stream->sendPacket(m_clientVCard);
 }
 
 void QXmppVCardManager::requestClientVCard()

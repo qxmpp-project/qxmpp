@@ -64,7 +64,6 @@ QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client),
     m_sessionAvaliable(false),
     m_transferManager(m_client),
-    m_vCardManager(m_client),
     m_authStep(0)
 {
     // Make sure the random number generator is seeded
@@ -92,10 +91,6 @@ QXmppStream::QXmppStream(QXmppClient* client)
     check = QObject::connect(&m_socket,
                              SIGNAL(error(QAbstractSocket::SocketError)), this,
                              SLOT(socketError(QAbstractSocket::SocketError)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(this, SIGNAL(vCardIqReceived(const QXmppVCard&)),
-        &m_vCardManager, SLOT(vCardIqReceived(const QXmppVCard&)));
     Q_ASSERT(check);
 
     // XEP-0047: In-Band Bytestreams
@@ -1089,11 +1084,6 @@ QAbstractSocket::SocketError QXmppStream::getSocketError()
 QXmppStanza::Error::Condition QXmppStream::getXmppStreamError()
 {
     return m_xmppStreamError;
-}
-
-QXmppVCardManager& QXmppStream::getVCardManager()
-{
-    return m_vCardManager;
 }
 
 void QXmppStream::flushDataBuffer()

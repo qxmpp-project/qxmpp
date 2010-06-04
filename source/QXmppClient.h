@@ -47,6 +47,7 @@ class QXmppRemoteMethod;
 struct QXmppRemoteMethodResult;
 class QXmppArchiveManager;
 class QXmppDiscoveryIq;
+class QXmppVCardManager;
 class QXmppTransferManager;
 
 /// \brief The QXmppClient class is the main class for using QXmpp.
@@ -208,9 +209,10 @@ private:
     QXmppConfiguration m_config;    ///< This object provides the configuration
                                     ///< required for connecting to the XMPP server.
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
-    QXmppArchiveManager *m_archiveManager; ///< Pointer to the archive manager
+    QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
-    QXmppRoster *m_roster;          ///< Pointer to the roster manager
+    QXmppRoster *m_roster;                  ///< Pointer to the roster manager
+    QXmppVCardManager *m_vCardManager;      ///< Pointer to the vCard manager
     QHash<QString,QXmppInvokable *> m_interfaces;
 };
 

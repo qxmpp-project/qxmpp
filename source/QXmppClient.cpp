@@ -34,6 +34,7 @@
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppUtils.h"
+#include "QXmppVCardManager.h"
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's contructor.
@@ -84,6 +85,7 @@ QXmppClient::QXmppClient(QObject *parent)
     // create managers
     m_roster = new QXmppRoster(m_stream);
     m_archiveManager = new QXmppArchiveManager(m_stream);
+    m_vCardManager = new QXmppVCardManager(m_stream);
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -414,7 +416,7 @@ QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 
 QXmppVCardManager& QXmppClient::getVCardManager()
 {
-    return m_stream->getVCardManager();
+    return *m_vCardManager;
 }
 
 void QXmppClient::addInvokableInterface( QXmppInvokable *interface )

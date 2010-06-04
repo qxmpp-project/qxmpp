@@ -33,6 +33,7 @@ class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
 class QXmppStream;
 
+/// XEP-0136: Message Archiving
 class QXmppArchiveManager : public QObject
 {
     Q_OBJECT
