@@ -61,7 +61,7 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QXmppClient* client)
     : QObject(client), m_client(client),
-    m_sessionAvaliable(false),
+    m_sessionAvailable(false),
     m_authStep(0)
 {
     // Make sure the random number generator is seeded
@@ -389,7 +389,7 @@ void QXmppStream::parser(const QByteArray& data)
                 if(nodeRecv.firstChildElement("session").
                                      namespaceURI() == ns_session)
                 {
-                    m_sessionAvaliable = true;
+                    m_sessionAvailable = true;
                 }
             }
             else if(ns == ns_stream && nodeRecv.tagName() == "error")
@@ -1014,7 +1014,7 @@ void QXmppStream::processBindIq(const QXmppBind& bind)
     case QXmppIq::Result:
         if(!bind.resource().isEmpty())
             configuration().setResource(bind.resource());
-        if(m_sessionAvaliable)
+        if(m_sessionAvailable)
             sendSessionIQ();
         break;
     default:

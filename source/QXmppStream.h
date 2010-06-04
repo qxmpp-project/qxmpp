@@ -138,7 +138,7 @@ private:
     QString m_bindId;
     QByteArray m_dataBuffer;
     QSslSocket m_socket;
-    bool m_sessionAvaliable;
+    bool m_sessionAvailable;
     QAbstractSocket::SocketError m_socketError;
     QString m_streamId;
     QString m_nonSASLAuthId;
