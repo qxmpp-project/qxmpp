@@ -787,6 +787,8 @@ void QXmppStream::sendStartStream()
 bool QXmppStream::sendToServer(const QByteArray& packet)
 {
     m_client->logger()->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
+    if (!isConnected())
+        return false;
     return m_socket.write( packet ) == packet.size();
 }
 
