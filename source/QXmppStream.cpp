@@ -59,8 +59,8 @@
 static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream:stream xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\" xmlns=\"jabber:client\" xml:lang=\"en\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\">\n";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
-QXmppStream::QXmppStream(QXmppClient* client)
-    : QObject(client), m_client(client),
+QXmppStream::QXmppStream(QObject *parent)
+    : QObject(parent),
     m_sessionAvailable(false),
     m_authStep(0)
 {
@@ -278,7 +278,10 @@ void QXmppStream::parser(const QByteArray& data)
             // if we receive any kind of data, stop the timeout timer
             m_timeoutTimer->stop();
 
-            if(m_client->handleStreamElement(nodeRecv))
+            bool handled = false;
+            emit elementReceived(nodeRecv, handled);
+
+            if(handled)
             {
                 // already handled by client, do nothing
             }

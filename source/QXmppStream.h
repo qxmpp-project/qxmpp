@@ -61,7 +61,7 @@ class QXmppStream : public QObject
     Q_OBJECT
 
 public:
-    QXmppStream(QXmppClient* client);
+    QXmppStream(QObject *parent);
     ~QXmppStream();
     void connect();
     void acceptSubscriptionRequest(const QString& from, bool accept = true);
@@ -93,6 +93,7 @@ signals:
 
     void error(QXmppClient::Error);
     void subscriptionRequestReceived(const QString& from);
+    void elementReceived(const QDomElement &element, bool &handled);
     void presenceReceived(const QXmppPresence&);
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);
@@ -130,7 +131,6 @@ private slots:
     void pingTimeout();
 
 private:
-    QXmppClient* m_client; // reverse pointer
     QXmppConfiguration m_config;    ///< This object provides the configuration
                                     ///< required for connecting to the XMPP server.
     QXmppLogger* m_logger;
