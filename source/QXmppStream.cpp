@@ -540,17 +540,17 @@ void QXmppStream::parser(const QByteArray& data)
                         emit iqReceived(discoIq);
                     }
                     // XEP-0045: Multi-User Chat
-                    else if (QXmppMucAdminIq::isMucAdminIq(element))
+                    else if (QXmppMucAdminIq::isMucAdminIq(nodeRecv))
                     {
                         QXmppMucAdminIq mucIq;
-                        mucIq.parse(element);
+                        mucIq.parse(nodeRecv);
                         emit mucAdminIqReceived(mucIq);
                         emit iqReceived(mucIq);
                     }
-                    else if (QXmppMucOwnerIq::isMucOwnerIq(element))
+                    else if (QXmppMucOwnerIq::isMucOwnerIq(nodeRecv))
                     {
                         QXmppMucOwnerIq mucIq;
-                        mucIq.parse(element);
+                        mucIq.parse(nodeRecv);
                         emit mucOwnerIqReceived(mucIq);
                         emit iqReceived(mucIq);
                     }
