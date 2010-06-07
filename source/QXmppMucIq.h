@@ -27,8 +27,59 @@
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
-/// \brief The QXmppClient class represents a chat room configuration IQ as
+/// \brief The QXmppMucAdminIq class represents a chat room administration IQ
+/// as defined by XEP-0045: Multi-User Chat.
+///
+/// It is used to get or modify room memberships.
+///
+
+class QXmppMucAdminIq : public QXmppIq
+{
+public:
+    class Item
+    {
+    public:
+        QString affiliation() const;
+        void setAffiliation(const QString &affiliation);
+
+        QString jid() const;
+        void setJid(const QString &jid);
+
+        QString nick() const;
+        void setNick(const QString &nick);
+
+        QString reason() const;
+        void setReason(const QString &reason);
+
+        QString role() const;
+        void setRole(const QString &role);
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+
+    private:
+        QString m_affiliation;
+        QString m_jid;
+        QString m_nick;
+        QString m_reason;
+        QString m_role;
+    };
+
+    QList<QXmppMucAdminIq::Item> items() const;
+    void setItems(const QList<QXmppMucAdminIq::Item> &items);
+
+    static bool isMucAdminIq(const QDomElement &element);
+    void parse(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
+private:
+    QList<QXmppMucAdminIq::Item> m_items;
+};
+
+/// \brief The QXmppMucOwnerIq class represents a chat room configuration IQ as
 /// defined by XEP-0045: Multi-User Chat.
+///
+/// It is used to get or modify room configuration options.
 ///
 /// \sa QXmppDataForm
 ///

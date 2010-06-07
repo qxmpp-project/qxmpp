@@ -53,6 +53,7 @@ class QXmppDiscoveryIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
+class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppStreamInitiationIq;
 class QXmppVersionIq;
@@ -118,6 +119,7 @@ signals:
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
     // XEP-0045: Multi-User Chat
+    void mucAdminIqReceived(const QXmppMucAdminIq&);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
 
 private slots:
