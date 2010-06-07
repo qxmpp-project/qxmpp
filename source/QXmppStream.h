@@ -53,6 +53,7 @@ class QXmppDiscoveryIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
+class QXmppMucOwnerIq;
 class QXmppStreamInitiationIq;
 class QXmppVersionIq;
 
@@ -115,6 +116,9 @@ signals:
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
+
+    // XEP-0045: Multi-User Chat
+    void mucOwnerIqReceived(const QXmppMucOwnerIq&);
 
 private slots:
     void socketHostFound();

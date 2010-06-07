@@ -22,17 +22,16 @@
  */
 
 
-#include "QXmppStream.h"
-#include "QXmppPacket.h"
 #include "QXmppUtils.h"
-#include "QXmppClient.h"
-#include "QXmppPresence.h"
-#include "QXmppIq.h"
 #include "QXmppBind.h"
-#include "QXmppSession.h"
+#include "QXmppIq.h"
+#include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppPacket.h"
+#include "QXmppPresence.h"
+#include "QXmppSession.h"
 #include "QXmppConstants.h"
-#include "QXmppVCard.h"
+#include "QXmppStream.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppInformationRequestResult.h"
 
@@ -41,11 +40,12 @@
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
-#include "QXmppLogger.h"
+#include "QXmppMucIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
 #include "QXmppStreamInitiationIq.h"
+#include "QXmppVCard.h"
 #include "QXmppVersionIq.h"
 
 #include <QCoreApplication>
@@ -538,6 +538,14 @@ void QXmppStream::parser(const QByteArray& data)
                         }
 
                         emit iqReceived(discoIq);
+                    }
+                    // XEP-0045: Multi-User Chat
+                    else if (QXmppMucOwnerIq::isMucOwnerIq(element))
+                    {
+                        QXmppMucOwnerIq mucIq;
+                        mucIq.parse(element);
+                        emit mucOwnerIqReceived(mucIq);
+                        emit iqReceived(mucIq);
                     }
                     // XEP-0047 In-Band Bytestreams
                     else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
