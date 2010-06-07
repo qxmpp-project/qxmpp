@@ -103,10 +103,10 @@ void QXmppMucAdminIq::parse(const QDomElement &element)
     while (!child.isNull())
     {
         QXmppMucAdminIq::Item item;
-        item.setAffiliation(element.attribute("affiliation"));
-        item.setJid(element.attribute("jid"));
-        item.setNick(element.attribute("nick"));
-        item.setRole(element.attribute("role"));
+        item.setAffiliation(child.attribute("affiliation"));
+        item.setJid(child.attribute("jid"));
+        item.setNick(child.attribute("nick"));
+        item.setRole(child.attribute("role"));
         item.setReason(child.firstChildElement("reason").text());
         m_items << item;
         child = child.nextSiblingElement("item");
