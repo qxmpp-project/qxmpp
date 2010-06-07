@@ -31,6 +31,10 @@
 
 class QDomElement;
 
+/// \brief The QXmppDataForm class represents a data form as defined by
+/// XEP-0004: Data Forms.
+///
+
 class QXmppDataForm
 {
 public:
