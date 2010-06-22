@@ -103,6 +103,15 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
             returnIq.setId(rosterIq.id());
             m_stream->sendPacket(returnIq);
 
+            // store updated entries and notify changes
+            QList<QXmppRosterIq::Item> items = rosterIq.items();
+            for (int i = 0; i < items.count(); i++)
+            {
+                QString bareJid = items.at(i).bareJid();
+                m_entries[bareJid] = items.at(i);
+                emit rosterChanged(bareJid);
+            }
+
             // when contact subscribes user...user sends 'subscribed' presence 
             // then after recieving following iq user requests contact for subscription
             
