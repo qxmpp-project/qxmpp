@@ -30,9 +30,9 @@
 #include <QVariant>
 
 #include "QXmppConfiguration.h"
+#include "QXmppLogger.h"
 #include "QXmppPresence.h"
 
-class QXmppLogger;
 class QXmppStream;
 class QXmppPresence;
 class QXmppMessage;
@@ -182,6 +182,9 @@ signals:
 
     /// Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
+
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 public:
     QAbstractSocket::SocketError getSocketError();

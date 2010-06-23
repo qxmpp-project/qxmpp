@@ -467,7 +467,7 @@ void QXmppStream::parser(const QByteArray& data)
                     QString from = nodeRecv.attribute("from");
                     QString type = nodeRecv.attribute("type");
                     if(type.isEmpty())
-                        qWarning("QXmppStream: iq type can't be empty");
+                        warning("QXmppStream: iq type can't be empty");
 
                     if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
                     {

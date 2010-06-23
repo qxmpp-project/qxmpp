@@ -92,6 +92,11 @@ QXmppClient::QXmppClient(QObject *parent)
         this, SLOT(invokeInterfaceMethod(QXmppRpcInvokeIq)));
     Q_ASSERT(check);
 
+    // logging
+    check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        m_stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
     // create managers
     m_roster = new QXmppRoster(m_stream, this);
     m_archiveManager = new QXmppArchiveManager(m_stream, this);
@@ -206,8 +211,7 @@ void QXmppClient::connectToServer(const QString& host,
     }
     else
     {
-        qWarning("QXmppClient::connectToServer: Invalid bareJid");
-        logger()->log(QXmppLogger::WarningMessage, "Invalid bareJid");
+        emit logMessage(QXmppLogger::WarningMessage, "Invalid bareJid");
     }
 }
 
