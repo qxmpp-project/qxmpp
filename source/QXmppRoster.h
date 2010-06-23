@@ -30,11 +30,11 @@
 #include <QSet>
 #include <QStringList>
 
-#include "QXmppClient.h"
 #include "QXmppRosterIq.h"
 
 class QXmppRosterIq;
 class QXmppPresence;
+class QXmppStream;
 
 /// \brief The QXmppRoster class provides access to a connected client's roster.
 ///
