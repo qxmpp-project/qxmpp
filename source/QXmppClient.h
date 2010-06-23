@@ -38,6 +38,7 @@ class QXmppPresence;
 class QXmppMessage;
 class QXmppPacket;
 class QXmppIq;
+class QXmppMucManager;
 class QXmppRoster;
 class QXmppReconnectionManager;
 class QXmppVCardManager;
@@ -100,6 +101,11 @@ public:
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
     void disconnect();
+
+    QXmppMucManager& mucManager();
+
+    // FIXME : these accessors should be deprecated in favour of
+    // versions without the "get".
     QXmppRoster& getRoster();
     QXmppConfiguration& getConfiguration();
     const QXmppConfiguration& getConfiguration() const;
@@ -217,6 +223,7 @@ private:
                             ///< TCP socket and XMPP protocol
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
     QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
+    QXmppMucManager* m_mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRoster *m_roster;                  ///< Pointer to the roster manager
     QXmppTransferManager *m_transferManager;///< Pointer to the transfer manager

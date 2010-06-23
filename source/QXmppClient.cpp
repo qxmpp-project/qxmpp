@@ -29,8 +29,9 @@
 #include "QXmppMessage.h"
 
 #include "QXmppArchiveManager.h"
-#include "QXmppReconnectionManager.h"
 #include "QXmppInvokable.h"
+#include "QXmppMucManager.h"
+#include "QXmppReconnectionManager.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppUtils.h"
@@ -94,6 +95,7 @@ QXmppClient::QXmppClient(QObject *parent)
     // create managers
     m_roster = new QXmppRoster(m_stream, this);
     m_archiveManager = new QXmppArchiveManager(m_stream, this);
+    m_mucManager = new QXmppMucManager(m_stream, this);
     m_transferManager = new QXmppTransferManager(m_stream, this);
     m_vCardManager = new QXmppVCardManager(m_stream, this);
 }
@@ -526,6 +528,14 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 QXmppArchiveManager& QXmppClient::getArchiveManager()
 {
     return *m_archiveManager;
+}
+
+/// Returns the reference to QXmppMucManager, implementation of XEP-0045.
+/// http://xmpp.org/extensions/xep-045.html
+///
+QXmppMucManager& QXmppClient::mucManager()
+{
+    return *m_mucManager;
 }
 
 /// Returns the reference to QXmppTransferManager, implementation of:
