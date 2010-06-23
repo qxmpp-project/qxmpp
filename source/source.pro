@@ -35,6 +35,7 @@ HEADERS += QXmppUtils.h \
     QXmppLogger.h \
     QXmppMessage.h \
     QXmppMucIq.h \
+    QXmppMucManager.h \
     QXmppNonSASLAuth.h \
     QXmppPacket.h \
     QXmppPingIq.h \
@@ -74,6 +75,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppLogger.cpp \
     QXmppMessage.cpp \
     QXmppMucIq.cpp \
+    QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
