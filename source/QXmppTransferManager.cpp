@@ -353,8 +353,13 @@ QXmppTransferManager::QXmppTransferManager(QXmppStream *stream, QObject *parent)
     m_socksServer(0),
     m_supportedMethods(QXmppTransferJob::AnyMethod)
 {
+    // Logging
+    bool check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        m_stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
     // XEP-0047: In-Band Bytestreams
-    bool check = QObject::connect(m_stream, SIGNAL(iqReceived(const QXmppIq&)),
+    check = QObject::connect(m_stream, SIGNAL(iqReceived(const QXmppIq&)),
         this, SLOT(iqReceived(const QXmppIq&)));
     Q_ASSERT(check);
 
@@ -387,7 +392,7 @@ QXmppTransferManager::QXmppTransferManager(QXmppStream *stream, QObject *parent)
         connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
             this, SLOT(socksServerConnected(QTcpSocket*, const QString&, quint16)));
     } else {
-        qWarning() << "QXmppSocksServer could not start listening";
+        emit logMessage(QXmppLogger::WarningMessage, "QXmppSocksServer could not start listening");
     }
 }
 
@@ -443,7 +448,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
     if (iq.streamHostUsed() == job->m_socksProxy.jid())
     {
         const QXmppByteStreamIq::StreamHost streamHost = job->m_socksProxy;
-        m_stream->logger()->log(QXmppLogger::InformationMessage,
+        emit logMessage(QXmppLogger::InformationMessage,
             QString("Connecting to proxy: %1 (%2:%3)").arg(
                 streamHost.jid(),
                 streamHost.host().toString(),
@@ -459,7 +464,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         // FIXME : this should probably be made asynchronous as it blocks XMPP packet handling
         if (!socksClient->waitForReady(socksTimeout))
         {
-            m_stream->logger()->log(QXmppLogger::WarningMessage,
+            emit logMessage(QXmppLogger::WarningMessage,
                 QString("Failed to connect to proxy: %1 (%2:%3)").arg(
                     streamHost.jid(),
                     streamHost.host().toString(),
@@ -486,7 +491,7 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
     // direction connection, start sending data
     if (!job->m_socksSocket)
     {
-        qWarning("Client says they connected to our SOCKS server, but they did not");
+        emit logMessage(QXmppLogger::WarningMessage, "Client says they connected to our SOCKS server, but they did not");
         job->terminate(QXmppTransferJob::ProtocolError);
         return;
     }
@@ -523,7 +528,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
     // try connecting to the offered stream hosts
     foreach (const QXmppByteStreamIq::StreamHost &streamHost, iq.streamHosts())
     {
-        m_stream->logger()->log(QXmppLogger::InformationMessage,
+        emit logMessage(QXmppLogger::InformationMessage,
             QString("Connecting to streamhost: %1 (%2:%3)").arg(
                 streamHost.jid(),
                 streamHost.host().toString(),
@@ -553,7 +558,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
             m_stream->sendPacket(ackIq);
             return;
         } else {
-            m_stream->logger()->log(QXmppLogger::WarningMessage,
+            emit logMessage(QXmppLogger::WarningMessage,
                 QString("Failed to connect to streamhost: %1 (%2:%3)").arg(
                     streamHost.jid(),
                     streamHost.host().toString(),
@@ -764,7 +769,7 @@ void QXmppTransferManager::iqReceived(const QXmppIq &iq)
                     job->sendData();
                 } else if (iq.type() == QXmppIq::Error) {
                     // proxy stream not activated, terminate
-                    qWarning("Could not activate SOCKS5 proxy bytestream");
+                    emit logMessage(QXmppLogger::WarningMessage, "Could not activate SOCKS5 proxy bytestream");
                     job->terminate(QXmppTransferJob::ProtocolError);
                 }
             } else {
@@ -1038,7 +1043,7 @@ void QXmppTransferManager::socksServerConnected(QTcpSocket *socket, const QStrin
             return;
         }
     }
-    qWarning("QXmppSocksServer got a connection for a unknown stream");
+    emit logMessage(QXmppLogger::WarningMessage, "QXmppSocksServer got a connection for a unknown stream");
     socket->close();
 }
 
@@ -1079,7 +1084,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
     // check we have some stream hosts
     if (!streamHosts.size())
     {
-        qWarning("Could not determine local stream hosts");
+        emit logMessage(QXmppLogger::WarningMessage, "Could not determine local stream hosts");
         job->terminate(QXmppTransferJob::ProtocolError);
         return;
     }
@@ -1148,7 +1153,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
         if (!m_socksServer->isListening())
         {
-            qWarning() << "QXmppSocksServer is not listening";
+            emit logMessage(QXmppLogger::WarningMessage, "QXmppSocksServer is not listening");
             job->terminate(QXmppTransferJob::ProtocolError);
             return;
         }
@@ -1167,7 +1172,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
             socksServerSendOffer(job);
         }
     } else {
-        qWarning("We received an unsupported method");
+        emit logMessage(QXmppLogger::WarningMessage, "QXmppTransferManager received an unsupported method");
         job->terminate(QXmppTransferJob::ProtocolError);
     }
 }

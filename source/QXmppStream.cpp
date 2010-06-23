@@ -61,6 +61,7 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 QXmppStream::QXmppStream(QObject *parent)
     : QObject(parent),
+    m_logger(0),
     m_sessionAvailable(false),
     m_authStep(0)
 {
@@ -68,7 +69,7 @@ QXmppStream::QXmppStream(QObject *parent)
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
     // initialise logger
-    m_logger = QXmppLogger::getLogger();
+    setLogger(QXmppLogger::getLogger());
 
     bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
@@ -205,22 +206,28 @@ QXmppLogger *QXmppStream::logger()
 
 void QXmppStream::setLogger(QXmppLogger *logger)
 {
+    if (m_logger)
+        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                            m_logger, SLOT(log(QXmppLogger::MessageType, QString)));
     m_logger = logger;
+    if (m_logger)
+        QObject::connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                         m_logger, SLOT(log(QXmppLogger::MessageType, QString)));
 }
 
 void QXmppStream::debug(const QString &data)
 {
-    m_logger->log(QXmppLogger::DebugMessage, data);
+    emit logMessage(QXmppLogger::DebugMessage, data);
 }
 
 void QXmppStream::info(const QString &data)
 {
-    m_logger->log(QXmppLogger::InformationMessage, data);
+    emit logMessage(QXmppLogger::InformationMessage, data);
 }
 
 void QXmppStream::warning(const QString &data)
 {
-    m_logger->log(QXmppLogger::WarningMessage, data);
+    emit logMessage(QXmppLogger::WarningMessage, data);
 }
 
 void QXmppStream::parser(const QByteArray& data)
@@ -245,7 +252,7 @@ void QXmppStream::parser(const QByteArray& data)
     
     if(doc.setContent(completeXml, true))
     {
-        m_logger->log(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
+        emit logMessage(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -750,7 +757,7 @@ void QXmppStream::sendStartStream()
 
 bool QXmppStream::sendToServer(const QByteArray& packet)
 {
-    m_logger->log(QXmppLogger::SentMessage, QString::fromUtf8(packet));
+    emit logMessage(QXmppLogger::SentMessage, QString::fromUtf8(packet));
     if (!isConnected())
         return false;
     return m_socket.write( packet ) == packet.size();

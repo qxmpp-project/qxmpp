@@ -88,7 +88,6 @@ void QXmppReconnectionManager::reconnect()
 {
     if(m_client)
     {
-        m_client->logger()->log(QXmppLogger::DebugMessage, "QXmppReconnectionManager::reconnect()");
         emit reconnectingNow();
         m_client->connectToServer(m_client->getConfiguration(), m_client->getClientPresence());
     }

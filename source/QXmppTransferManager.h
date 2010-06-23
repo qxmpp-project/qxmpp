@@ -32,6 +32,7 @@
 
 #include "QXmppIq.h"
 #include "QXmppByteStreamIq.h"
+#include "QXmppLogger.h"
 
 class QTcpSocket;
 class QXmppByteStreamIq;
@@ -225,6 +226,9 @@ signals:
     /// To refuse the transfer job, call the job's QXmppTransferJob::abort() method.
     void fileReceived(QXmppTransferJob *offer);
     void finished(QXmppTransferJob *job);
+
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void byteStreamIqReceived(const QXmppByteStreamIq&);

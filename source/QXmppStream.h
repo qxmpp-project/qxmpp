@@ -29,6 +29,7 @@
 #include <QSslSocket>
 #include "QXmppClient.h"
 #include "QXmppConfiguration.h"
+#include "QXmppLogger.h"
 #include "QXmppStanza.h"
 
 class QDomElement;
@@ -36,7 +37,6 @@ class QTimer;
 
 class QXmppClient;
 class QXmppPacket;
-class QXmppLogger;
 class QXmppPresence;
 class QXmppIq;
 class QXmppBind;
@@ -92,6 +92,9 @@ signals:
 
     // xmpp connected
     void xmppConnected();
+
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
     void error(QXmppClient::Error);
     void subscriptionRequestReceived(const QString& from);
