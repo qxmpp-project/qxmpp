@@ -34,12 +34,12 @@ IbbTransferTarget::IbbTransferTarget(QObject *parent)
 {
     m_buffer = new QBuffer(this);
 
-    bool check = connect(&getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+    bool check = connect(&transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
                     this, SLOT(slotFileReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 
-    getTransferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
+    transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
 }
 
 IbbTransferTarget::~IbbTransferTarget()

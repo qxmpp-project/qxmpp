@@ -525,7 +525,7 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 /// http://xmpp.org/extensions/xep-0136.html
 ///
 
-QXmppArchiveManager& QXmppClient::getArchiveManager()
+QXmppArchiveManager& QXmppClient::archiveManager()
 {
     return *m_archiveManager;
 }
@@ -545,7 +545,7 @@ QXmppMucManager& QXmppClient::mucManager()
 ///  * XEP-0096: SI File Transfer
 ///
 
-QXmppTransferManager& QXmppClient::getTransferManager()
+QXmppTransferManager& QXmppClient::transferManager()
 {
     return *m_transferManager;
 }

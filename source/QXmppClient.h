@@ -102,7 +102,9 @@ public:
                          QXmppPresence());
     void disconnect();
 
+    QXmppArchiveManager& archiveManager();
     QXmppMucManager& mucManager();
+    QXmppTransferManager& transferManager();
 
     // FIXME : these accessors should be deprecated in favour of
     // versions without the "get".
@@ -113,8 +115,6 @@ public:
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
     QXmppVCardManager& getVCardManager();
-    QXmppArchiveManager& getArchiveManager();
-    QXmppTransferManager& getTransferManager();
 
 signals:
 

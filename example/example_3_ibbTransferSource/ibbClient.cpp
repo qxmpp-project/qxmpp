@@ -41,8 +41,8 @@ ibbClient::ibbClient(QObject *parent)
 
 void ibbClient::slotConnected()
 {
-    getTransferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
-    QXmppTransferJob *job = getTransferManager().sendFile( "client@geiseri.com/QXmpp", "ibbClient.cpp" );
+    transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
+    QXmppTransferJob *job = transferManager().sendFile( "client@geiseri.com/QXmpp", "ibbClient.cpp" );
 
     bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
              this, SLOT(slotError(QXmppTransferJob::Error)) );

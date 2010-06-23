@@ -37,11 +37,11 @@ xmppClient::xmppClient(QObject *parent)
         SLOT(clientConnected()));
     Q_ASSERT(check);
 
-    check = connect(&this->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)),
+    check = connect(&archiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)),
         SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     Q_ASSERT(check);
 
-    check = connect(&this->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)),
+    check = connect(&archiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)),
         SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
     Q_ASSERT(check);
 }
@@ -54,7 +54,7 @@ xmppClient::~xmppClient()
 void xmppClient::clientConnected()
 {
     std::cout << "example_7_archiveHandling:: CONNECTED" << std::endl;
-    getArchiveManager().listCollections("",
+    archiveManager().listCollections("",
             QDateTime::currentDateTime().addDays(-7));
 }
 
@@ -62,7 +62,7 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     std::cout << "example_7_archiveHandling:: LIST RECEIVED" << std::endl;
     foreach (const QXmppArchiveChat &chat, chats)
-        getArchiveManager().retrieveCollection(chat.with(), chat.start());
+        archiveManager().retrieveCollection(chat.with(), chat.start());
 }
 
 void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat)
