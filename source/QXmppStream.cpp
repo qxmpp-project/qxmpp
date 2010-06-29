@@ -726,7 +726,8 @@ void QXmppStream::parser(const QByteArray& data)
                     QXmppPresence presence;
                     presence.parse(nodeRecv);
 
-                    processPresence(presence);
+                    // emit presence
+                    emit presenceReceived(presence);
                 }
                 else if(nodeRecv.tagName() == "message")
                 {
@@ -994,37 +995,6 @@ bool QXmppStream::sendPacket(const QXmppPacket& packet)
 
     // send packet
     return sendToServer(data);
-}
-
-// FIXME : should this be moved to QXmppRoster?
-void QXmppStream::processPresence(const QXmppPresence& presence)
-{
-    switch(presence.type())
-    {
-    case QXmppPresence::Error:
-        break;
-    case QXmppPresence::Available:
-        break;
-    case QXmppPresence::Unavailable:
-        break;
-    case QXmppPresence::Subscribe:
-        if(!presence.from().isEmpty())
-        {
-            if(configuration().autoAcceptSubscriptions())
-                acceptSubscriptionRequest(presence.from());
-            emit subscriptionRequestReceived(presence.from());
-        }
-        break;
-    case QXmppPresence::Unsubscribe:
-        break;
-    case QXmppPresence::Unsubscribed:
-        break;
-    case QXmppPresence::Probe:
-        break;
-    default:
-        break;
-    }
-    emit presenceReceived(presence);
 }
 
 void QXmppStream::sendEndStream()

@@ -80,14 +80,26 @@ void QXmppRoster::presenceReceived(const QXmppPresence& presence)
     QString bareJid = jidToBareJid(jid);
     QString resource = jidToResource(jid);
 
-    if (presence.type() == QXmppPresence::Available)
-        m_presences[bareJid][resource] = presence;
-    else if (presence.type() == QXmppPresence::Unavailable)
-        m_presences[bareJid].remove(resource);
-    else
+    if (bareJid.isEmpty())
         return;
 
-    emit presenceChanged(bareJid, resource);
+    switch(presence.type())
+    {
+    case QXmppPresence::Available:
+        m_presences[bareJid][resource] = presence;
+        emit presenceChanged(bareJid, resource);
+        break;
+    case QXmppPresence::Unavailable:
+        m_presences[bareJid].remove(resource);
+        emit presenceChanged(bareJid, resource);
+        break;
+    case QXmppPresence::Subscribe:
+        if (m_stream->configuration().autoAcceptSubscriptions())
+            m_stream->acceptSubscriptionRequest(jid);
+        break;
+    default:
+        break;
+    }
 }
 
 void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)

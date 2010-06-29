@@ -97,7 +97,6 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
     void error(QXmppClient::Error);
-    void subscriptionRequestReceived(const QString& from);
     void elementReceived(const QDomElement &element, bool &handled);
     void presenceReceived(const QXmppPresence&);
     void messageReceived(const QXmppMessage&);
@@ -178,7 +177,6 @@ private:
     bool hasStartStreamElement(const QByteArray&);
     bool hasEndStreamElement(const QByteArray&);
 
-    void processPresence(const QXmppPresence&);
     void processBindIq(const QXmppBind&);
 
     void flushDataBuffer();
