@@ -52,6 +52,13 @@ public:
         Paused,
     };
 
+    /// Type of the message timestamp.
+    enum StampType
+    {
+        LegacyDelayedDelivery,  ///< XEP-0091: Legacy Delayed Delivery
+        DelayedDelivery,        ///< XEP-0203: Delayed Delivery
+    };
+
     QXmppMessage(const QString& from = "", const QString& to = "",
                  const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
@@ -90,6 +97,7 @@ private:
 
     Type m_type;
     QDateTime m_stamp;
+    StampType m_stampType;
     State m_state;
 
     QString m_body;

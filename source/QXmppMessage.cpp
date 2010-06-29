@@ -40,7 +40,12 @@ static const char* chat_states[] = {
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
-    : QXmppStanza(from, to), m_type(Chat), m_state(None), m_body(body), m_thread(thread)
+    : QXmppStanza(from, to),
+      m_type(Chat),
+      m_stampType(QXmppMessage::DelayedDelivery),
+      m_state(None),
+      m_body(body),
+      m_thread(thread)
 {
 }
 
@@ -171,16 +176,26 @@ void QXmppMessage::parse(const QDomElement &element)
         }
     }
 
+    // XEP-0203: Delayed Delivery
+    QDomElement delayElement = element.firstChildElement("delay");
+    if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
+    {
+        const QString str = delayElement.attribute("stamp");
+        m_stamp = datetimeFromString(str);
+        m_stampType = QXmppMessage::DelayedDelivery;
+    }
+
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement("x");
     while (!xElement.isNull())
     {
-        if (xElement.namespaceURI() == ns_delay)
+        if (xElement.namespaceURI() == ns_legacy_delayed_delivery)
         {
             // XEP-0091: Legacy Delayed Delivery
             const QString str = xElement.attribute("stamp");
             m_stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
             m_stamp.setTimeSpec(Qt::UTC);
+            m_stampType = QXmppMessage::LegacyDelayedDelivery;
         } else {
             // other extensions
             extensions << QXmppElement(xElement);
@@ -215,14 +230,24 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    // XEP-0091: Legacy Delayed Delivery
+    // time stamp
     if (m_stamp.isValid())
     {
         QDateTime utcStamp = m_stamp.toUTC();
-        xmlWriter->writeStartElement("x");
-        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_delay);
-        helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
-        xmlWriter->writeEndElement();
+        if (m_stampType == QXmppMessage::DelayedDelivery)
+        {
+            // XEP-0203: Delayed Delivery
+            xmlWriter->writeStartElement("delay");
+            helperToXmlAddAttribute(xmlWriter, "xmlns", ns_delayed_delivery);
+            helperToXmlAddAttribute(xmlWriter, "stamp", datetimeToString(utcStamp));
+            xmlWriter->writeEndElement();
+        } else {
+            // XEP-0091: Legacy Delayed Delivery
+            xmlWriter->writeStartElement("x");
+            helperToXmlAddAttribute(xmlWriter, "xmlns", ns_legacy_delayed_delivery);
+            helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
+            xmlWriter->writeEndElement();
+        }
     }
 
     // other extensions
