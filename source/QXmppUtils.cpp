@@ -65,7 +65,11 @@ QDateTime datetimeFromString(const QString &str)
 
 QString datetimeToString(const QDateTime &dt)
 {
-    return dt.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+    QDateTime utc = dt.toUTC();
+    if (utc.time().msec())
+        return utc.toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+    else
+        return utc.toString("yyyy-MM-ddThh:mm:ssZ");
 }
 
 QString jidToResource(const QString& jid)
