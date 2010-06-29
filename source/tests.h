@@ -28,11 +28,15 @@ class TestPackets : public QObject
     Q_OBJECT
 
 private slots:
+    void testBindNoResource();
+    void testBindResource();
+    void testBindResult();
     void testMessage();
     void testMessageFull();
     void testMessageDelay();
     void testMessageLegacyDelay();
     void testPresence();
     void testPresenceFull();
+    void testSession();
 };
 

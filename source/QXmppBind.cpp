@@ -30,12 +30,11 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-QXmppBind::QXmppBind(QXmppIq::Type type)
-    : QXmppIq(type)
+QXmppBind::QXmppBind()
 {
 }
 
-QXmppBind::QXmppBind(const QString& type)
+QXmppBind::QXmppBind(QXmppIq::Type type)
     : QXmppIq(type)
 {
 }
@@ -80,8 +79,10 @@ void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("bind");
     helperToXmlAddAttribute(writer, "xmlns", ns_bind);
-    helperToXmlAddTextElement(writer, "jid", m_jid);
-    helperToXmlAddTextElement(writer, "resource", m_resource);
+    if (!m_jid.isEmpty())
+        helperToXmlAddTextElement(writer, "jid", m_jid);
+    if (!m_resource.isEmpty())
+        helperToXmlAddTextElement(writer, "resource", m_resource);
     writer->writeEndElement();
 }
 

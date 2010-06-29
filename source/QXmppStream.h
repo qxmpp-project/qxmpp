@@ -177,8 +177,6 @@ private:
     bool hasStartStreamElement(const QByteArray&);
     bool hasEndStreamElement(const QByteArray&);
 
-    void processBindIq(const QXmppBind&);
-
     void flushDataBuffer();
 };
 

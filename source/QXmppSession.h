@@ -31,8 +31,8 @@
 class QXmppSession : public QXmppIq
 {
 public:
+    QXmppSession();
     QXmppSession(QXmppIq::Type type);
-    QXmppSession(const QString& type);
 
     static bool isSession(const QDomElement &element);
 

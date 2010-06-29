@@ -29,12 +29,11 @@
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
-QXmppSession::QXmppSession(QXmppIq::Type type)
-    : QXmppIq(type)
+QXmppSession::QXmppSession()
 {
 }
 
-QXmppSession::QXmppSession(const QString& type)
+QXmppSession::QXmppSession(QXmppIq::Type type)
     : QXmppIq(type)
 {
 }

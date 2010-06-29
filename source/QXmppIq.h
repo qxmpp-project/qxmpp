@@ -45,7 +45,6 @@ public:
     };
 
     QXmppIq(QXmppIq::Type type = QXmppIq::Get);
-    QXmppIq(const QString& type);
     ~QXmppIq();
 
     QXmppIq::Type type() const;

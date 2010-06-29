@@ -28,8 +28,10 @@
 #include <QVariant>
 #include <QtTest/QtTest>
 
+#include "QXmppBind.h"
 #include "QXmppMessage.h"
 #include "QXmppPresence.h"
+#include "QXmppSession.h"
 #include "tests.h"
 
 static void parsePacket(QXmppPacket &packet, const QByteArray &xml)
@@ -49,6 +51,58 @@ static void serializePacket(QXmppPacket &packet, const QByteArray &xml)
     packet.toXml(&writer);
     //qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
+}
+
+void TestPackets::testBindNoResource()
+{
+    const QByteArray xml(
+        "<iq id=\"bind_1\" type=\"set\">"
+        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
+        "</iq>");
+
+    QXmppBind bind;
+    parsePacket(bind, xml);
+    QCOMPARE(bind.type(), QXmppIq::Set);
+    QCOMPARE(bind.id(), QString("bind_1"));
+    QCOMPARE(bind.jid(), QString());
+    QCOMPARE(bind.resource(), QString());
+    serializePacket(bind, xml);
+}
+
+void TestPackets::testBindResource()
+{
+    const QByteArray xml(
+        "<iq id=\"bind_2\" type=\"set\">"
+        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">"
+        "<resource>someresource</resource>"
+        "</bind>"
+        "</iq>");
+
+    QXmppBind bind;
+    parsePacket(bind, xml);
+    QCOMPARE(bind.type(), QXmppIq::Set);
+    QCOMPARE(bind.id(), QString("bind_2"));
+    QCOMPARE(bind.jid(), QString());
+    QCOMPARE(bind.resource(), QString("someresource"));
+    serializePacket(bind, xml);
+}
+
+void TestPackets::testBindResult()
+{
+    const QByteArray xml(
+        "<iq id=\"bind_2\" type=\"result\">"
+        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">"
+        "<jid>somenode@example.com/someresource</jid>"
+        "</bind>"
+        "</iq>");
+
+    QXmppBind bind;
+    parsePacket(bind, xml);
+    QCOMPARE(bind.type(), QXmppIq::Result);
+    QCOMPARE(bind.id(), QString("bind_2"));
+    QCOMPARE(bind.jid(), QString("somenode@example.com/someresource"));
+    QCOMPARE(bind.resource(), QString());
+    serializePacket(bind, xml);
 }
 
 void TestPackets::testMessage()
@@ -130,8 +184,7 @@ void TestPackets::testPresenceFull()
         "<show>away</show>"
         "<status>In a meeting</status>"
         "<priority>5</priority>"
-        "</presence>"
-        );
+        "</presence>");
 
     QXmppPresence presence;
     parsePacket(presence, xml);
@@ -141,6 +194,21 @@ void TestPackets::testPresenceFull()
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
     serializePacket(presence, xml);
+}
+
+void TestPackets::testSession()
+{
+    const QByteArray xml(
+        "<iq id=\"session_1\" to=\"example.com\" type=\"set\">"
+        "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
+        "</iq>");
+
+    QXmppSession session;
+    parsePacket(session, xml);
+    QCOMPARE(session.id(), QString("session_1"));
+    QCOMPARE(session.to(), QString("example.com"));
+    QCOMPARE(session.type(), QXmppIq::Set);
+    serializePacket(session, xml);
 }
 
 int main(int argc, char *argv[])

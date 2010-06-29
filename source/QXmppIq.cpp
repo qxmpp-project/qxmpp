@@ -34,13 +34,6 @@ QXmppIq::QXmppIq(QXmppIq::Type type)
     generateAndSetNextId();
 }
 
-QXmppIq::QXmppIq(const QString& type)
-    : QXmppStanza()
-{
-    generateAndSetNextId();
-    setTypeFromStr(type);
-}
-
 QXmppIq::~QXmppIq()
 {
 

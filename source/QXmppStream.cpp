@@ -463,25 +463,23 @@ void QXmppStream::parser(const QByteArray& data)
                 {
                     QDomElement element = nodeRecv.firstChildElement();
                     QString id = nodeRecv.attribute("id");
-                    QString to = nodeRecv.attribute("to");
-                    QString from = nodeRecv.attribute("from");
                     QString type = nodeRecv.attribute("type");
                     if(type.isEmpty())
                         warning("QXmppStream: iq type can't be empty");
 
-                    if( QXmppRpcInvokeIq::isRpcInvokeIq( nodeRecv ) )
+                    if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
                     {
                         QXmppRpcInvokeIq rpcIqPacket;
                         rpcIqPacket.parse(nodeRecv);
                         emit rpcCallInvoke(rpcIqPacket);
                     }
-                    else if ( QXmppRpcResponseIq::isRpcResponseIq( nodeRecv ) )
+                    else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
                     {
                         QXmppRpcResponseIq rpcResponseIq;
                         rpcResponseIq.parse(nodeRecv);
-                        emit rpcCallResponse( rpcResponseIq );
+                        emit rpcCallResponse(rpcResponseIq);
                     }
-                    else if ( QXmppRpcErrorIq::isRpcErrorIq( nodeRecv ) )
+                    else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
                     {
                         QXmppRpcErrorIq rpcErrorIq;
                         rpcErrorIq.parse(nodeRecv);
@@ -489,6 +487,9 @@ void QXmppStream::parser(const QByteArray& data)
                     }
                     else if(id == m_sessionId)
                     {
+                        QXmppSession session;
+                        session.parse(nodeRecv);
+
                         // get back add configuration whether to send
                         // roster and intial presence in beginning
                         // process SessionIq
@@ -496,23 +497,22 @@ void QXmppStream::parser(const QByteArray& data)
                         // xmpp connection made
                         emit xmppConnected();
 
-                        QXmppBind session(type);
-                        session.setId(id);
-                        session.setTo(to);
-                        session.setFrom(from);
                         emit iqReceived(session);
                     }
-                    else if(id == m_bindId)
+                    else if(QXmppBind::isBind(nodeRecv) && id == m_bindId)
                     {
-                        QXmppBind bind(type);
-                        QString jid = nodeRecv.firstChildElement("bind").
-                                      firstChildElement("jid").text();
-                        bind.setResource(jidToResource(jid));
-                        bind.setJid(jidToBareJid(jid));
-                        bind.setId(id);
-                        bind.setTo(to);
-                        bind.setFrom(from);
-                        processBindIq(bind);
+                        QXmppBind bind;
+                        bind.parse(nodeRecv);
+
+                        // bind result
+                        if (bind.type() == QXmppIq::Result)
+                        {
+                            QString resource = jidToResource(bind.jid());
+                            if (!resource.isEmpty())
+                                configuration().setResource(resource);
+                            if (m_sessionAvailable)
+                                sendSessionIQ();
+                        }
                         emit iqReceived(bind);
                     }
                     else if(QXmppRosterIq::isRosterIq(nodeRecv))
@@ -536,9 +536,8 @@ void QXmppStream::parser(const QByteArray& data)
                         {
                             // respond to info query
                             QXmppInformationRequestResult qxmppFeatures;
-                            qxmppFeatures.setId(id);
-                            qxmppFeatures.setTo(from);
-                            qxmppFeatures.setFrom(to);
+                            qxmppFeatures.setId(discoIq.id());
+                            qxmppFeatures.setTo(discoIq.from());
                             sendPacket(qxmppFeatures);
                         } else {
                             emit discoveryIqReceived(discoIq);
@@ -651,8 +650,8 @@ void QXmppStream::parser(const QByteArray& data)
                             // respond to query
                             QXmppVersionIq responseIq;
                             responseIq.setType(QXmppIq::Result);
-                            responseIq.setId(id);
-                            responseIq.setTo(from);
+                            responseIq.setId(versionIq.id());
+                            responseIq.setTo(versionIq.from());
                             responseIq.setName(qApp->applicationName());
                             responseIq.setVersion(qApp->applicationVersion());
                             sendPacket(responseIq);
@@ -694,30 +693,34 @@ void QXmppStream::parser(const QByteArray& data)
                     // XEP-0199: XMPP Ping
                     else if(QXmppPingIq::isPingIq(nodeRecv))
                     {
+                        QXmppPingIq req;
+                        req.parse(nodeRecv);
+
                         QXmppIq iq(QXmppIq::Result);
-                        iq.setId(id);
-                        iq.setTo(from);
-                        iq.setFrom(to);
+                        iq.setId(req.id());
+                        iq.setTo(req.from());
+                        iq.setFrom(req.to());
                         sendPacket(iq);
                     }
                     else
                     {
+                        QXmppIq iqPacket;
+                        iqPacket.parse(nodeRecv);
+
                         // if we didn't understant the iq, reply with error
                         // except for "result" and "error" iqs
                         if (type != "result" && type != "error")
                         {
                             QXmppIq iq(QXmppIq::Error);
-                            iq.setId(id);
-                            iq.setTo(from);
-                            iq.setFrom(to);
+                            iq.setId(iqPacket.id());
+                            iq.setTo(iqPacket.from());
+                            iq.setFrom(iqPacket.to());
                             QXmppStanza::Error error(QXmppStanza::Error::Cancel,
                                 QXmppStanza::Error::FeatureNotImplemented);
                             iq.setError(error);
                             sendPacket(iq);
                         }
 
-                        QXmppIq iqPacket;
-                        iqPacket.parse(nodeRecv);
                         emit iqReceived(iqPacket);
                     }
                 }
@@ -1000,21 +1003,6 @@ bool QXmppStream::sendPacket(const QXmppPacket& packet)
 void QXmppStream::sendEndStream()
 {
     sendToServer(streamRootElementEnd);
-}
-
-void QXmppStream::processBindIq(const QXmppBind& bind)
-{
-    switch(bind.type())
-    {
-    case QXmppIq::Result:
-        if(!bind.resource().isEmpty())
-            configuration().setResource(bind.resource());
-        if(m_sessionAvailable)
-            sendSessionIQ();
-        break;
-    default:
-        break;
-    }
 }
 
 void QXmppStream::pingStart()

@@ -31,8 +31,8 @@
 class QXmppBind : public QXmppIq
 {
 public:
+    QXmppBind();
     QXmppBind(QXmppIq::Type type);
-    QXmppBind(const QString& type);
     
     QString jid() const;
     QString resource() const;
