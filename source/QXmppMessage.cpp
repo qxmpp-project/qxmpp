@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2009 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,12 +22,12 @@
  *
  */
 
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
-#include <QDomElement>
-#include <QXmlStreamWriter>
 
 static const char* chat_states[] = {
     "",
@@ -119,6 +120,24 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     }
 }
 
+/// Returns the message timestamp (if any).
+///
+/// XEP-0091: Legacy Delayed Delivery
+
+QDateTime QXmppMessage::stamp() const
+{
+    return m_stamp;
+}
+
+/// Sets the message timestamp.
+///
+/// XEP-0091: Legacy Delayed Delivery
+
+void QXmppMessage::setStamp(const QDateTime &stamp)
+{
+    m_stamp = stamp;
+}
+
 QXmppMessage::State QXmppMessage::state() const
 {
     return m_state;
@@ -140,6 +159,7 @@ void QXmppMessage::parse(const QDomElement &element)
             element.firstChildElement("subject").text()));
     setThread(element.firstChildElement("thread").text());
 
+    // chat states
     for (int i = Active; i <= Paused; i++)
     {
         QDomElement stateElement = element.firstChildElement(chat_states[i]);
@@ -151,9 +171,23 @@ void QXmppMessage::parse(const QDomElement &element)
         }
     }
 
+    QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement("x");
-    if(!xElement.isNull())
-        setExtensions(QXmppElement(xElement));
+    while (!xElement.isNull())
+    {
+        if (xElement.namespaceURI() == ns_delay)
+        {
+            // XEP-0091: Legacy Delayed Delivery
+            const QString str = xElement.attribute("stamp");
+            m_stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+            m_stamp.setTimeSpec(Qt::UTC);
+        } else {
+            // other extensions
+            extensions << QXmppElement(xElement);
+        }
+        xElement = xElement.nextSiblingElement("x");
+    }
+    setExtensions(extensions);
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
@@ -161,10 +195,10 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 
     xmlWriter->writeStartElement("message");
     helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
-    helperToXmlAddAttribute(xmlWriter,  "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "id", id());
     helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
+    helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "type", getTypeStr());
     if (!m_subject.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "subject", m_subject);
     if (!m_body.isEmpty())
@@ -173,6 +207,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddTextElement(xmlWriter, "thread", m_thread);
     error().toXml(xmlWriter);
 
+    // chat states
     if (m_state > None && m_state <= Paused)
     {
         xmlWriter->writeStartElement(chat_states[m_state]);
@@ -180,6 +215,17 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
+    // XEP-0091: Legacy Delayed Delivery
+    if (m_stamp.isValid())
+    {
+        QDateTime utcStamp = m_stamp.toUTC();
+        xmlWriter->writeStartElement("x");
+        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_delay);
+        helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
+        xmlWriter->writeEndElement();
+    }
+
+    // other extensions
     foreach (const QXmppElement &extension, extensions())
         extension.toXml(xmlWriter);
     xmlWriter->writeEndElement();

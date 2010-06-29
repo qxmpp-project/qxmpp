@@ -25,6 +25,7 @@
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
+#include <QDateTime>
 #include "QXmppStanza.h"
 
 class QXmppMessage : public QXmppStanza
@@ -58,6 +59,9 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
+    QDateTime stamp() const;
+    void setStamp(const QDateTime &stamp);
+
     QXmppMessage::State state() const;
     void setState(QXmppMessage::State);
 
@@ -85,6 +89,7 @@ private:
     void setTypeFromStr(const QString&);
 
     Type m_type;
+    QDateTime m_stamp;
     State m_state;
 
     QString m_body;
