@@ -496,8 +496,6 @@ void QXmppStream::parser(const QByteArray& data)
 
                         // xmpp connection made
                         emit xmppConnected();
-
-                        emit iqReceived(session);
                     }
                     else if(QXmppBind::isBind(nodeRecv) && id == m_bindId)
                     {
@@ -513,14 +511,12 @@ void QXmppStream::parser(const QByteArray& data)
                             if (m_sessionAvailable)
                                 sendSessionIQ();
                         }
-                        emit iqReceived(bind);
                     }
                     else if(QXmppRosterIq::isRosterIq(nodeRecv))
                     {
                         QXmppRosterIq rosterIq;
                         rosterIq.parse(nodeRecv);
                         emit rosterIqReceived(rosterIq);
-                        emit iqReceived(rosterIq);
                     }
                     // extensions
 
@@ -542,8 +538,6 @@ void QXmppStream::parser(const QByteArray& data)
                         } else {
                             emit discoveryIqReceived(discoIq);
                         }
-
-                        emit iqReceived(discoIq);
                     }
                     // XEP-0045: Multi-User Chat
                     else if (QXmppMucAdminIq::isMucAdminIq(nodeRecv))
@@ -551,14 +545,12 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppMucAdminIq mucIq;
                         mucIq.parse(nodeRecv);
                         emit mucAdminIqReceived(mucIq);
-                        emit iqReceived(mucIq);
                     }
                     else if (QXmppMucOwnerIq::isMucOwnerIq(nodeRecv))
                     {
                         QXmppMucOwnerIq mucIq;
                         mucIq.parse(nodeRecv);
                         emit mucOwnerIqReceived(mucIq);
-                        emit iqReceived(mucIq);
                     }
                     // XEP-0047 In-Band Bytestreams
                     else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
@@ -566,21 +558,18 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppIbbCloseIq ibbCloseIq;
                         ibbCloseIq.parse(nodeRecv);
                         emit ibbCloseIqReceived(ibbCloseIq);
-                        emit iqReceived(ibbCloseIq);
                     }
                     else if(QXmppIbbDataIq::isIbbDataIq(nodeRecv))
                     {
                         QXmppIbbDataIq ibbDataIq;
                         ibbDataIq.parse(nodeRecv);
                         emit ibbDataIqReceived(ibbDataIq);
-                        emit iqReceived(ibbDataIq);
                     }
                     else if(QXmppIbbOpenIq::isIbbOpenIq(nodeRecv))
                     {
                         QXmppIbbOpenIq ibbOpenIq;
                         ibbOpenIq.parse(nodeRecv);
                         emit ibbOpenIqReceived(ibbOpenIq);
-                        emit iqReceived(ibbOpenIq);
                     }
                     // XEP-0054: vcard-temp
                     else if(nodeRecv.firstChildElement("vCard").
@@ -589,7 +578,6 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppVCard vcardIq;
                         vcardIq.parse(nodeRecv);
                         emit vCardIqReceived(vcardIq);
-                        emit iqReceived(vcardIq);
                     }
                     // XEP-0065: SOCKS5 Bytestreams
                     else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
@@ -597,7 +585,6 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppByteStreamIq byteStreamIq;
                         byteStreamIq.parse(nodeRecv);
                         emit byteStreamIqReceived(byteStreamIq);
-                        emit iqReceived(byteStreamIq);
                     }
                     // XEP-0078: Non-SASL Authentication
                     else if(id == m_nonSASLAuthId && type == "result")
@@ -666,7 +653,6 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppStreamInitiationIq siIq;
                         siIq.parse(nodeRecv);
                         emit streamInitiationIqReceived(siIq);
-                        emit iqReceived(siIq);
                     }
                     // XEP-0136: Message Archiving
                     else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
@@ -674,21 +660,18 @@ void QXmppStream::parser(const QByteArray& data)
                         QXmppArchiveChatIq archiveIq;
                         archiveIq.parse(nodeRecv);
                         emit archiveChatIqReceived(archiveIq);
-                        emit iqReceived(archiveIq);
                     }
                     else if(QXmppArchiveListIq::isArchiveListIq(nodeRecv))
                     {
                         QXmppArchiveListIq archiveIq;
                         archiveIq.parse(nodeRecv);
                         emit archiveListIqReceived(archiveIq);
-                        emit iqReceived(archiveIq);
                     }
                     else if(QXmppArchivePrefIq::isArchivePrefIq(nodeRecv))
                     {
                         QXmppArchivePrefIq archiveIq;
                         archiveIq.parse(nodeRecv);
                         emit archivePrefIqReceived(archiveIq);
-                        emit iqReceived(archiveIq);
                     }
                     // XEP-0199: XMPP Ping
                     else if(QXmppPingIq::isPingIq(nodeRecv))
@@ -719,9 +702,9 @@ void QXmppStream::parser(const QByteArray& data)
                                 QXmppStanza::Error::FeatureNotImplemented);
                             iq.setError(error);
                             sendPacket(iq);
+                        } else {
+                            emit iqReceived(iqPacket);
                         }
-
-                        emit iqReceived(iqPacket);
                     }
                 }
                 else if(nodeRecv.tagName() == "presence")
