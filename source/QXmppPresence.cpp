@@ -314,8 +314,11 @@ void QXmppPresence::Status::parse(const QDomElement &element)
 
 void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    helperToXmlAddTextElement(xmlWriter, "show", getTypeStr());
-    helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
+    const QString show = getTypeStr();
+    if (!show.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "show", getTypeStr());
+    if (!m_statusText.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
     if (m_priority != 0)
         helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
 }
