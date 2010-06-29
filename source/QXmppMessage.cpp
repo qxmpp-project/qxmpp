@@ -196,8 +196,8 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeStartElement("message");
     helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
     helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
     helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "from", from());
     helperToXmlAddAttribute(xmlWriter, "type", getTypeStr());
     if (!m_subject.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "subject", m_subject);
