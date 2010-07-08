@@ -211,9 +211,13 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
         return;
 
     writer->writeStartElement(d->name);
+    if (d->attributes.contains("xmlns"))
+        helperToXmlAddAttribute(writer, "xmlns", d->attributes.value("xmlns"));
     foreach (const QString &attr, d->attributes.keys())
-        helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
-    writer->writeCharacters(d->value);
+        if (attr != "xmlns")
+            helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
+    if (!d->value.isEmpty())
+        writer->writeCharacters(d->value);
     foreach (const QXmppElement &child, d->children)
         child.toXml(writer);
     writer->writeEndElement();
