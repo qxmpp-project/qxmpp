@@ -40,7 +40,6 @@ public:
     void setResource(const QString&);
 
     static bool isBind(const QDomElement &element);
-    void parse(const QDomElement &element);
 
 // deprecated accessors, use the form without "get" instead
 // obsolete start
@@ -48,10 +47,13 @@ public:
     QString Q_DECL_DEPRECATED getResource() const;
 // obsolete end
 
+protected:
+    void parseElementFromChild(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
 private:
     QString m_jid;
     QString m_resource;
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 };
 
 #endif // QXMPPBIND_H

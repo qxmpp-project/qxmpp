@@ -144,11 +144,8 @@ bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
             queryElement.namespaceURI() == ns_disco_items); 
 }
 
-void QXmppDiscoveryIq::parse(const QDomElement &element)
+void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
     QDomElement queryElement = element.firstChildElement("query");
     m_queryNode = queryElement.attribute("node");
     if (queryElement.namespaceURI() == ns_disco_items)

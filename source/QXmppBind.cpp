@@ -65,11 +65,8 @@ bool QXmppBind::isBind(const QDomElement &element)
     return (bindElement.namespaceURI() == ns_bind);
 }
 
-void QXmppBind::parse(const QDomElement &element)
+void QXmppBind::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement bindElement = element.firstChildElement("bind");
     m_jid = bindElement.firstChildElement("jid").text();
     m_resource = bindElement.firstChildElement("resource").text();

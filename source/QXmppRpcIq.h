@@ -16,12 +16,13 @@ public:
     void setPayload( const QVariant &payload );
 
     static bool isRpcResponseIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     QVariant m_payload;
-
 };
 
 class QXmppRpcInvokeIq : public QXmppIq
@@ -39,7 +40,9 @@ public:
     void setInterface( const QString &interface );
 
     static bool isRpcInvokeIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
@@ -47,6 +50,7 @@ private:
     QString m_method;
     QString m_interface;
 
+    friend class QXmppRpcErrorIq;
 };
 
 class QXmppRpcErrorIq : public QXmppIq
@@ -54,11 +58,13 @@ class QXmppRpcErrorIq : public QXmppIq
 public:
     QXmppRpcErrorIq();
 
-    void setQuery(const QXmppRpcInvokeIq &query );
+    void setQuery(const QXmppRpcInvokeIq &query);
     QXmppRpcInvokeIq getQuery() const;
 
     static bool isRpcErrorIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

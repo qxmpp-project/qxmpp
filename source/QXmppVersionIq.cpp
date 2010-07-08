@@ -63,11 +63,8 @@ bool QXmppVersionIq::isVersionIq(const QDomElement &element)
     return queryElement.namespaceURI() == ns_version;
 }
 
-void QXmppVersionIq::parse(const QDomElement &element)
+void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     m_name = element.firstChildElement("name").text();
     m_os = element.firstChildElement("os").text();

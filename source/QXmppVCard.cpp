@@ -148,12 +148,8 @@ void QXmppVCard::setPhoto(const QImage& image)
 }
 #endif
 
-void QXmppVCard::parse(const QDomElement& nodeRecv)
+void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
 {
-    QXmppStanza::parse(nodeRecv);
-
-    setTypeFromStr(nodeRecv.attribute("type"));
-
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
     m_fullName = cardElement.firstChildElement("FN").text();

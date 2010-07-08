@@ -46,8 +46,6 @@ public:
     void setPhoto(const QByteArray&);
     void setPhoto(const QImage&);
 
-    void parse(const QDomElement&);
-
     QString firstName() const;
     QString fullName() const;
     QString lastName() const;
@@ -66,9 +64,11 @@ public:
     const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
 // obsolete end
 
-private:
+protected:
+    void parseElementFromChild(const QDomElement&);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
+private:
     QString m_firstName;
     QString m_fullName;
     QString m_lastName;

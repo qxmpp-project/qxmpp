@@ -9,11 +9,6 @@ QXmppRpcErrorIq::QXmppRpcErrorIq() : QXmppIq( QXmppIq::Error )
 
 }
 
-void QXmppRpcErrorIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    m_query.toXmlElementFromChild(writer);
-}
-
 void QXmppRpcErrorIq::setQuery(const QXmppRpcInvokeIq &query )
 {
     m_query = query;
@@ -34,11 +29,14 @@ bool QXmppRpcErrorIq::isRpcErrorIq(const QDomElement &element)
             queryElement.namespaceURI() == ns_rpc;
 }
 
-void QXmppRpcErrorIq::parse(const QDomElement &element)
+void QXmppRpcErrorIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
+    m_query.parseElementFromChild(element);
+}
 
-    setTypeFromStr(element.attribute("type"));
+void QXmppRpcErrorIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    m_query.toXmlElementFromChild(writer);
 }
 
 QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
@@ -63,18 +61,13 @@ bool QXmppRpcResponseIq::isRpcResponseIq(const QDomElement &element)
            type == "result";
 }
 
-void QXmppRpcResponseIq::parse(const QDomElement &element)
+void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement methodElement = queryElement.firstChildElement("methodResponse");
 
     XMLRPC::ResponseMessage message( methodElement );
     m_payload = message.value();
-
 }
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -126,12 +119,8 @@ bool QXmppRpcInvokeIq::isRpcInvokeIq(const QDomElement &element)
            type == "set";
 }
 
-void QXmppRpcInvokeIq::parse(const QDomElement &element)
+void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement methodElement = queryElement.firstChildElement("methodCall");
 
@@ -140,7 +129,6 @@ void QXmppRpcInvokeIq::parse(const QDomElement &element)
     m_interface = message.method().split('.').value(0);
     m_method = message.method().split('.').value(1);
     m_payload = message.args();
-
 }
 
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

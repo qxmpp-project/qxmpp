@@ -52,7 +52,9 @@ public:
     void setSiItems(const QXmppElementList &items);
 
     static bool isStreamInitiationIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

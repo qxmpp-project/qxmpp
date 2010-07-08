@@ -73,12 +73,8 @@ bool QXmppStreamInitiationIq::isStreamInitiationIq(const QDomElement &element)
     return (siElement.namespaceURI() == ns_stream_initiation);
 }
 
-void QXmppStreamInitiationIq::parse(const QDomElement &element)
+void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement siElement = element.firstChildElement("si");
     m_siId = siElement.attribute("id");
     m_mimeType = siElement.attribute("mime-type");

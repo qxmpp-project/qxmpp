@@ -18,7 +18,9 @@ public:
     void setSid( const QString &sid );
 
     static bool isIbbOpenIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
@@ -35,7 +37,9 @@ public:
     void setSid( const QString &sid );
 
     static bool isIbbCloseIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
@@ -57,7 +61,9 @@ public:
     void setPayload( const QByteArray &data );
 
     static bool isIbbDataIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

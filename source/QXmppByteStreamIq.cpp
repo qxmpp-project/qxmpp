@@ -122,12 +122,8 @@ bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
     return element.firstChildElement("query").namespaceURI() == ns_bytestreams;
 }
 
-void QXmppByteStreamIq::parse(const QDomElement &element)
+void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     m_sid = queryElement.attribute("sid");
     const QString modeStr = queryElement.attribute("mode");

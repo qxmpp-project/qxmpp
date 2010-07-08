@@ -89,7 +89,9 @@ public:
     void setQueryType(enum QueryType type);
 
     static bool isDiscoveryIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

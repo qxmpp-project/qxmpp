@@ -44,11 +44,8 @@ bool QXmppRosterIq::isRosterIq(const QDomElement &element)
     return (element.firstChildElement("query").namespaceURI() == ns_roster);
 }
 
-void QXmppRosterIq::parse(const QDomElement &element)
+void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement itemElement = element.
                               firstChildElement("query").
                               firstChildElement("item");

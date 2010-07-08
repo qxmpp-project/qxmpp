@@ -35,12 +35,8 @@ bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
     return openElement.namespaceURI() == ns_ibb;
 }
 
-void QXmppIbbOpenIq::parse(const QDomElement &element)
+void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement openElement = element.firstChildElement("open");
     m_sid = openElement.attribute( "sid" );
     m_block_size = openElement.attribute( "block-size" ).toLong();
@@ -76,12 +72,8 @@ bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
     return openElement.namespaceURI() == ns_ibb;
 }
 
-void QXmppIbbCloseIq::parse(const QDomElement &element)
+void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement openElement = element.firstChildElement("close");
     m_sid = openElement.attribute( "sid" );
 }
@@ -135,12 +127,8 @@ bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
     return dataElement.namespaceURI() == ns_ibb;
 }
 
-void QXmppIbbDataIq::parse(const QDomElement &element)
+void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement dataElement = element.firstChildElement("data");
     m_sid = dataElement.attribute( "sid" );
     m_seq = dataElement.attribute( "seq" ).toLong();

@@ -42,7 +42,9 @@ public:
     void setVersion(const QString &version);
 
     static bool isVersionIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

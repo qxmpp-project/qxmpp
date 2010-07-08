@@ -91,11 +91,13 @@ public:
     QList<Item> items() const;
 
     static bool isRosterIq(const QDomElement &element);
-    void parse(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 // deprecated accessors, use the form without "get" instead
     QList<Item> Q_DECL_DEPRECATED getItems() const;
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
     QList<Item> m_items;
