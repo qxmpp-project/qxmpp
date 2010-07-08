@@ -60,10 +60,10 @@ protected:
     virtual void parseElementFromChild(const QDomElement &element);
     virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
+private:
     QString getTypeStr() const;
     void setTypeFromStr(const QString& str);
 
-private:
     Type m_type;
 };
 
