@@ -260,6 +260,14 @@ void QXmppClient::disconnect()
     }
 }
 
+/// Returns true if the client is connected to the XMPP server.
+///
+
+bool QXmppClient::isConnected() const
+{
+    return m_stream && m_stream->isConnected();
+}
+
 /// Returns the reference to QXmppRoster object of the client.
 /// \return Reference to the roster object of the connected client. Use this to
 /// get the list of friends in the roster and their presence information.

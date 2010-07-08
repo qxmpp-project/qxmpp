@@ -101,6 +101,7 @@ public:
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
     void disconnect();
+    bool isConnected() const;
 
     QXmppArchiveManager& archiveManager();
     QXmppMucManager& mucManager();
