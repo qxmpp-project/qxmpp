@@ -69,7 +69,9 @@ public:
     void setItems(const QList<QXmppMucAdminIq::Item> &items);
 
     static bool isMucAdminIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
@@ -91,7 +93,9 @@ public:
     void setForm(const QXmppDataForm &form);
 
     static bool isMucOwnerIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

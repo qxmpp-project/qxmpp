@@ -93,11 +93,8 @@ bool QXmppMucAdminIq::isMucAdminIq(const QDomElement &element)
     return (queryElement.namespaceURI() == ns_muc_admin);
 }
 
-void QXmppMucAdminIq::parse(const QDomElement &element)
+void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement child = queryElement.firstChildElement("item");
     while (!child.isNull())
@@ -146,11 +143,8 @@ bool QXmppMucOwnerIq::isMucOwnerIq(const QDomElement &element)
     return (queryElement.namespaceURI() == ns_muc_owner);
 }
 
-void QXmppMucOwnerIq::parse(const QDomElement &element)
+void QXmppMucOwnerIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
-
     QDomElement queryElement = element.firstChildElement("query");
     m_form.parse(queryElement.firstChildElement("x"));
 }
