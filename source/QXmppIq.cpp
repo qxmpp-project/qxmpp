@@ -52,9 +52,12 @@ void QXmppIq::setType(QXmppIq::Type type)
 void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
-
     setTypeFromStr(element.attribute("type"));
+    parseElementFromChild(element);
+}
 
+void QXmppIq::parseElementFromChild(const QDomElement &element)
+{
     QXmppElementList extensions;
     QDomElement itemElement = element.firstChildElement();
     while (!itemElement.isNull())

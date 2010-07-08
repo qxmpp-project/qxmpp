@@ -52,12 +52,14 @@ public:
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
     // deprecated accessors, use the form without "get" instead
     QXmppIq::Type Q_DECL_DEPRECATED getType() const;
 
 protected:
+    virtual void parseElementFromChild(const QDomElement &element);
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
     QString getTypeStr() const;
     void setTypeFromStr(const QString& str);
 
