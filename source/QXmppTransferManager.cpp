@@ -954,7 +954,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     }
 
     // check we support some methods
-    if (m_supportedMethods == QXmppTransferJob::NoMethod)
+    if (!m_supportedMethods)
     {
         job->terminate(QXmppTransferJob::ProtocolError);
         return job;
@@ -1325,7 +1325,7 @@ void QXmppTransferManager::setProxyOnly(bool proxyOnly)
 /// The methods are a combination of zero or more QXmppTransferJob::Method.
 ///
 
-int QXmppTransferManager::supportedMethods() const
+QXmppTransferJob::Methods QXmppTransferManager::supportedMethods() const
 {
     return m_supportedMethods;
 }
@@ -1337,7 +1337,7 @@ int QXmppTransferManager::supportedMethods() const
 /// QXmppTransferJob::Method.
 ///
 
-void QXmppTransferManager::setSupportedMethods(int methods)
+void QXmppTransferManager::setSupportedMethods(QXmppTransferJob::Methods methods)
 {
-    m_supportedMethods = (methods & QXmppTransferJob::AnyMethod);
+    m_supportedMethods = methods;
 }

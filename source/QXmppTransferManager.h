@@ -102,6 +102,7 @@ public:
         SocksMethod = 2,  ///< XEP-0065: SOCKS5 Bytestreams
         AnyMethod = 3,    ///< Any supported transfer method.
     };
+    Q_DECLARE_FLAGS(Methods, Method)
 
     enum State
     {
@@ -216,8 +217,8 @@ public:
     bool proxyOnly() const;
     void setProxyOnly(bool proxyOnly);
 
-    int supportedMethods() const;
-    void setSupportedMethods(int methods);
+    QXmppTransferJob::Methods supportedMethods() const;
+    void setSupportedMethods(QXmppTransferJob::Methods methods);
 
 signals:
     /// This signal is emitted when a new file transfer offer is received.
@@ -261,7 +262,9 @@ private:
     QString m_proxy;
     bool m_proxyOnly;
     QXmppSocksServer *m_socksServer;
-    int m_supportedMethods;
+    QXmppTransferJob::Methods m_supportedMethods;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppTransferJob::Methods)
 
 #endif
