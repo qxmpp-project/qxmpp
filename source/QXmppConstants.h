@@ -55,6 +55,11 @@ extern const char *ns_feature_negotiation;
 extern const char *ns_bytestreams;
 extern const char *ns_version;
 extern const char *ns_data;
+extern const char *ns_jingle;
+extern const char* ns_jingle_ice_udp;
+extern const char *ns_jingle_rtp;
+extern const char *ns_jingle_rtp_audio;
+extern const char *ns_jingle_rtp_video;
 extern const char *svn_revision;
 
 #endif // QXMPPCONSTANTS_H
