@@ -32,9 +32,23 @@
 #include "QXmppMessage.h"
 #include "QXmppPresence.h"
 #include "QXmppSession.h"
+#include "QXmppUtils.h"
 #include "tests.h"
 
-static void parsePacket(QXmppPacket &packet, const QByteArray &xml)
+void TestUtils::testHmac()
+{
+    QByteArray hmac = generateHmacMd5(QByteArray(16, 0x0b), QByteArray("Hi There"));
+    QCOMPARE(hmac, QByteArray::fromHex("9294727a3638bb1c13f48ef8158bfc9d"));
+
+    hmac = generateHmacMd5(QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
+    QCOMPARE(hmac, QByteArray::fromHex("750c783e6ab0b503eaa86e310a5db738"));
+
+    hmac = generateHmacMd5(QByteArray(16, 0xaa), QByteArray(50, 0xdd));
+    QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
+}
+
+template <class T>
+static void parsePacket(T &packet, const QByteArray &xml)
 {
     //qDebug() << "parsing" << xml;
     QDomDocument doc;
@@ -43,13 +57,15 @@ static void parsePacket(QXmppPacket &packet, const QByteArray &xml)
     packet.parse(element);
 }
 
-static void serializePacket(QXmppPacket &packet, const QByteArray &xml)
+template <class T>
+static void serializePacket(T &packet, const QByteArray &xml)
 {
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     QXmlStreamWriter writer(&buffer);
     packet.toXml(&writer);
-    //qDebug() << "writing" << buffer.data();
+    qDebug() << "expect " << xml;
+    qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
 }
 
@@ -217,6 +233,9 @@ int main(int argc, char *argv[])
 
     // run tests
     int errors = 0;
+
+    TestUtils testUtils;
+    errors += QTest::qExec(&testUtils);
 
     TestPackets testPackets;
     errors += QTest::qExec(&testPackets);

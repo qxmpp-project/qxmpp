@@ -23,6 +23,14 @@
 
 #include <QObject>
 
+class TestUtils : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testHmac();
+};
+
 class TestPackets : public QObject
 {
     Q_OBJECT
