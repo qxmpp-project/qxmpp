@@ -42,7 +42,11 @@ QString datetimeToString(const QDateTime &dt);
 
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);
-QString generateStanzaHash();
+
+quint32 generateCrc32(const QByteArray &input);
+QByteArray generateHmacMd5(const QByteArray &key, const QByteArray &text);
+QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text);
+QString generateStanzaHash(int length=32);
 
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value);
