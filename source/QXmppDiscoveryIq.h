@@ -38,6 +38,9 @@ public:
         QString category() const;
         void setCategory(const QString &category);
 
+        QString language() const;
+        void setLanguage(const QString &language);
+
         QString name() const;
         void setName(const QString &name);
 
@@ -46,6 +49,7 @@ public:
 
     private:
         QString m_category;
+        QString m_language;
         QString m_name;
         QString m_type;
     };
@@ -87,6 +91,8 @@ public:
 
     enum QueryType queryType() const;
     void setQueryType(enum QueryType type);
+
+    QByteArray verificationString() const;
 
     static bool isDiscoveryIq(const QDomElement &element);
 

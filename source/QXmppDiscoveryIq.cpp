@@ -21,11 +21,37 @@
  *
  */
 
+#include <QCryptographicHash>
+#include <QDomElement>
+
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppUtils.h"
 
-#include <QDomElement>
+static bool identityLessThan(const QXmppDiscoveryIq::Identity &i1, const QXmppDiscoveryIq::Identity &i2)
+{
+    if (i1.category() < i2.category())
+        return true;
+    else if (i1.category() > i2.category())
+        return false;
+
+    if (i1.type() < i2.type())
+        return true;
+    else if (i1.type() > i2.type())
+        return false;
+
+    if (i1.language() < i2.language())
+        return true;
+    else if (i1.language() > i2.language())
+        return false;
+
+    if (i1.name() < i2.name())
+        return true;
+    else if (i1.name() > i2.name())
+        return false;
+
+    return false;
+}
 
 QString QXmppDiscoveryIq::Identity::category() const
 {
@@ -35,6 +61,16 @@ QString QXmppDiscoveryIq::Identity::category() const
 void QXmppDiscoveryIq::Identity::setCategory(const QString &category)
 {
     m_category = category;
+}
+
+QString QXmppDiscoveryIq::Identity::language() const
+{
+    return m_language;
+}
+
+void QXmppDiscoveryIq::Identity::setLanguage(const QString &language)
+{
+    m_language = language;
 }
 
 QString QXmppDiscoveryIq::Identity::name() const
@@ -137,6 +173,24 @@ void QXmppDiscoveryIq::setQueryType(enum QXmppDiscoveryIq::QueryType type)
     m_queryType = type;
 }
 
+/// Calculate the verification string for XEP-0115 : Entity Capabilities
+
+QByteArray QXmppDiscoveryIq::verificationString() const
+{
+    QString S;
+    QList<QXmppDiscoveryIq::Identity> sortedIdentities = m_identities;
+    qSort(sortedIdentities.begin(), sortedIdentities.end(), identityLessThan);
+    QStringList sortedFeatures = m_features;
+    qSort(sortedFeatures);
+    foreach (const QXmppDiscoveryIq::Identity &identity, sortedIdentities)
+        S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
+    foreach (const QString &feature, sortedFeatures)
+        S += feature + QLatin1String("<");
+    QCryptographicHash hasher(QCryptographicHash::Sha1);
+    hasher.addData(S.toUtf8());
+    return hasher.result();
+}
+
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -161,6 +215,7 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             m_features.append(itemElement.attribute("var"));
         } else if (itemElement.tagName() == "identity") {
             QXmppDiscoveryIq::Identity identity;
+            identity.setLanguage(itemElement.attribute("xml:lang"));
             identity.setCategory(itemElement.attribute("category"));
             identity.setName(itemElement.attribute("name"));
             identity.setType(itemElement.attribute("type"));
@@ -193,6 +248,7 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     foreach (const QXmppDiscoveryIq::Identity& identity, m_identities)
     {
         writer->writeStartElement("identity");
+        helperToXmlAddAttribute(writer, "xml:lang", identity.language());
         helperToXmlAddAttribute(writer, "category", identity.category());
         helperToXmlAddAttribute(writer, "name", identity.name());
         helperToXmlAddAttribute(writer, "type", identity.type());
