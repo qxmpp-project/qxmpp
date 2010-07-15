@@ -47,6 +47,7 @@ QXmppClient::QXmppClient(QObject *parent)
     m_reconnectionManager(0)
 {
     m_stream = new QXmppStream(this);
+    m_clientPresence.setExtensions(m_stream->presenceExtensions());
 
     bool check = connect(m_stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
                          this, SIGNAL(elementReceived(const QDomElement&, bool&)));
@@ -148,6 +149,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     }
 
     m_clientPresence = initialPresence;
+    m_clientPresence.setExtensions(m_stream->presenceExtensions());
 
     m_stream->connect();
 }
@@ -179,6 +181,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     config.setPort(port);
 
     m_clientPresence = initialPresence;
+    m_clientPresence.setExtensions(m_stream->presenceExtensions());
 
     m_stream->connect();
 }
@@ -311,6 +314,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
     else
     {
         m_clientPresence = presence;
+        m_clientPresence.setExtensions(m_stream->presenceExtensions());
         sendPacket(m_clientPresence);
     }
 }
