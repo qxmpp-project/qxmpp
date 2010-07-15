@@ -80,6 +80,8 @@ public:
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
 
+    QXmppElementList presenceExtensions() const;
+
 signals:
     // socket host found
     void hostFound();
@@ -157,6 +159,7 @@ private:
 
     int m_authStep;
 
+    QXmppDiscoveryIq capabilities() const;
     void debug(const QString&);
     void info(const QString&);
     void warning(const QString&);
