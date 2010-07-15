@@ -29,7 +29,6 @@ HEADERS += QXmppUtils.h \
     QXmppDiscoveryIq.h \
     QXmppElement.h \
     QXmppIbbIq.h \
-    QXmppInformationRequestResult.h \
     QXmppInvokable.h \
     QXmppIq.h \
     QXmppLogger.h \
@@ -69,7 +68,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppDiscoveryIq.cpp \
     QXmppElement.cpp \
     QXmppIbbIq.cpp \
-    QXmppInformationRequestResult.cpp \
     QXmppInvokable.cpp \
     QXmppIq.cpp \
     QXmppLogger.cpp \
