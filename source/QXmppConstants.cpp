@@ -35,6 +35,7 @@ const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 const char* ns_vcard = "vcard-temp";
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
+const char* ns_capabilities = "http://jabber.org/protocol/caps";
 const char* ns_disco_info = "http://jabber.org/protocol/disco#info";
 const char* ns_disco_items = "http://jabber.org/protocol/disco#items";
 const char* ns_ibb = "http://jabber.org/protocol/ibb";
@@ -57,6 +58,7 @@ const char *ns_version = "jabber:iq:version";
 const char *ns_data = "jabber:x:data";
 // XEP-0166: Jingle
 const char *ns_jingle = "urn:xmpp:jingle:1";
+const char *ns_jingle_raw_udp = "urn:xmpp:jingle:transports:raw-udp:1";
 const char* ns_jingle_ice_udp = "urn:xmpp:jingle:transports:ice-udp:1";
 const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
