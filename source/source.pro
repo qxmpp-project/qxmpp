@@ -23,6 +23,7 @@ HEADERS += QXmppUtils.h \
     QXmppBind.h \
     QXmppByteStreamIq.h \
     QXmppClient.h \
+    QXmppCodec.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
     QXmppDataForm.h \
@@ -64,6 +65,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppBind.cpp \
     QXmppByteStreamIq.cpp \
     QXmppClient.cpp \
+    QXmppCodec.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
     QXmppDataForm.cpp \
