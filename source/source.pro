@@ -31,6 +31,7 @@ HEADERS += QXmppUtils.h \
     QXmppIbbIq.h \
     QXmppInvokable.h \
     QXmppIq.h \
+    QXmppJingleIq.h \
     QXmppLogger.h \
     QXmppMessage.h \
     QXmppMucIq.h \
@@ -70,6 +71,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppIbbIq.cpp \
     QXmppInvokable.cpp \
     QXmppIq.cpp \
+    QXmppJingleIq.cpp \
     QXmppLogger.cpp \
     QXmppMessage.cpp \
     QXmppMucIq.cpp \

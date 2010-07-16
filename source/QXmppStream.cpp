@@ -39,6 +39,7 @@
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
+#include "QXmppJingleIq.h"
 #include "QXmppMucIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
@@ -674,6 +675,13 @@ void QXmppStream::parser(const QByteArray& data)
                         archiveIq.parse(nodeRecv);
                         emit archivePrefIqReceived(archiveIq);
                     }
+                    // XEP-0166: Jingle
+                    else if(QXmppJingleIq::isJingleIq(nodeRecv))
+                    {
+                        QXmppJingleIq jingleIq;
+                        jingleIq.parse(nodeRecv);
+                        emit jingleIqReceived(jingleIq);
+                    }
                     // XEP-0199: XMPP Ping
                     else if(QXmppPingIq::isPingIq(nodeRecv))
                     {
@@ -1065,6 +1073,10 @@ QXmppDiscoveryIq QXmppStream::capabilities() const
         << ns_stream_initiation // XEP-0095: Stream Initiation
         << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
         << ns_capabilities      // XEP-0115 : Entity Capabilities
+        << ns_jingle            // XEP-0166 : Jingle
+        << ns_jingle_rtp        // XEP-0167 : Jingle RTP Sessions
+        << ns_jingle_rtp_audio
+        << ns_jingle_ice_udp    // XEP-0176 : Jingle ICE-UDP Transport Method
         << ns_ping;             // XEP-0199: XMPP Ping
     iq.setFeatures(features);
 
