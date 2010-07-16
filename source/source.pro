@@ -47,6 +47,7 @@ HEADERS += QXmppUtils.h \
     QXmppStanza.h \
     QXmppStream.h \
     QXmppStreamInitiationIq.h \
+    QXmppStun.h \
     QXmppTransferManager.h \
     QXmppReconnectionManager.h \
     QXmppRemoteMethod.h \
@@ -87,6 +88,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
     QXmppStreamInitiationIq.cpp \
+    QXmppStun.cpp \
     QXmppTransferManager.cpp \
     QXmppReconnectionManager.cpp \
     QXmppRemoteMethod.cpp \
