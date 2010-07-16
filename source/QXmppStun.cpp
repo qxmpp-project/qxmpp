@@ -505,6 +505,11 @@ void QXmppStunSocket::dumpMessage(const QXmppStunMessage &message, bool sent, co
         qDebug() << " * error   " << message.errorCode << message.errorPhrase;
     if (message.mappedPort)
         qDebug() << " * mapped  " << message.mappedHost.toString() << message.mappedPort;
+#else
+    Q_UNUSED(message);
+    Q_UNUSED(sent);
+    Q_UNUSED(host);
+    Q_UNUSED(port);
 #endif
 }
 
