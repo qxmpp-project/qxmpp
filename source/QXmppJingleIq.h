@@ -97,6 +97,8 @@ public:
     QString type() const;
     void setType(const QString &type);
 
+    bool isNull() const;
+
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 

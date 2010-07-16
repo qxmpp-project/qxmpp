@@ -491,6 +491,11 @@ void QXmppJingleCandidate::setType(const QString &type)
     m_type = type;
 }
 
+bool QXmppJingleCandidate::isNull() const
+{
+    return m_host.isNull() || !m_port;
+}
+
 void QXmppJingleCandidate::parse(const QDomElement &element)
 {
     m_component = element.attribute("component").toInt();
