@@ -48,3 +48,14 @@ private slots:
     void testSession();
 };
 
+class TestJingle : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testSession();
+    void testTerminate();
+    void testPayloadType();
+    void testRinging();
+};
+
