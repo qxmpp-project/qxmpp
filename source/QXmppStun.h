@@ -26,9 +26,11 @@
 
 #include <QObject>
 
+#include "QXmppLogger.h"
 #include "QXmppJingleIq.h"
 
 class QUdpSocket;
+class QTimer;
 class QXmppStunMessage;
 
 /// \brief The QXmppStunSocket class represents an UDP socket capable
@@ -41,6 +43,7 @@ class QXmppStunSocket : public QObject
 
 public:
     QXmppStunSocket(bool iceControlling, QObject *parent=0);
+    ~QXmppStunSocket();
 
     QList<QXmppJingleCandidate> localCandidates() const;
     QString localUser() const;
@@ -51,7 +54,7 @@ public:
     int component() const;
     void setComponent(int component);
 
-    void addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates);
+    bool addRemoteCandidate(const QXmppJingleCandidate &candidate);
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
@@ -61,29 +64,48 @@ public:
     qint64 writeDatagram(const QByteArray &datagram);
 
 private slots:
-    void slotReadyRead();
+    void checkCandidates();
+    void readyRead();
 
 signals:
+    // This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &datagram, const QHostAddress &host, quint16 port);
+
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+
     void ready();
 
 private:
-    void dumpMessage(const QXmppStunMessage &message, bool sent, const QHostAddress &host, quint16 port);
+    class Pair {
+    public:
+        Pair();
+        QString toString() const;
+
+        QIODevice::OpenMode checked;
+        quint32 priority;
+        QXmppJingleCandidate remote;
+        QXmppJingleCandidate reflexive;
+        QByteArray transaction;
+    };
+
+    Pair *addRemoteCandidate(const QHostAddress &host, quint16 port);
+    void debug(const QString &message, QXmppLogger::MessageType = QXmppLogger::DebugMessage);
+    qint64 writeStun(const QXmppStunMessage &message, QXmppStunSocket::Pair *pair);
 
     int m_component;
-    QIODevice::OpenMode m_openMode;
 
     QString m_localUser;
     QString m_localPassword;
 
+    Pair *m_activePair;
     bool m_iceControlling;
-    QList<QXmppJingleCandidate> m_remoteCandidates;
-    QHostAddress m_remoteHost;
-    quint16 m_remotePort;
+    QList<Pair*> m_pairs;
     QString m_remoteUser;
     QString m_remotePassword;
 
     QUdpSocket *m_socket;
+    QTimer *m_timer;
 };
 
 #endif
