@@ -113,6 +113,10 @@ private:
     QString m_type;
 };
 
+/// The QXmppJingleIq represent an IQ used for initiating media sessions
+/// as specified by XEP-0166: Jingle.
+///
+
 class QXmppJingleIq : public QXmppIq
 {
 public:
@@ -133,6 +137,9 @@ public:
         TransportReject,
         TransportReplace,
     };
+
+    /// The QXmppJingleIq::Content class represents the "content" element of a
+    /// QXmppJingleIq.
 
     class Content
     {
@@ -182,6 +189,9 @@ public:
         QList<QXmppJinglePayloadType> m_payloadTypes;
         QList<QXmppJingleCandidate> m_transportCandidates;
     };
+
+    /// The QXmppJingleIq::Reason class represents the "reason" element of a
+    /// QXmppJingleIq.
 
     class Reason
     {
