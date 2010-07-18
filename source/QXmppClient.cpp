@@ -39,6 +39,27 @@
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 
+/// \mainpage
+///
+/// QXmpp is a cross-platform C++ XMPP client library based on the Qt
+/// framework. It tries to use Qt's programming conventions in order to ease
+/// the learning curve for new programmers.
+///
+/// QXmpp based clients are built using QXmppClient instances which handle the
+/// establishment of the XMPP connection and provide a number of high-level
+/// "managers" to perform specific tasks:
+/// 
+/// \sa QXmppRoster
+/// \sa QXmppVCardManager
+/// \sa QXmppTransferManager
+///
+/// If you are interested in a more low-level API, you can refer to the
+/// classes which represent XMPP stanzas.
+///
+/// \sa QXmppIq
+/// \sa QXmppMessage
+/// \sa QXmppPresence
+
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's contructor.
 /// The default value is 0.
