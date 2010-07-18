@@ -101,11 +101,11 @@ public:
         // FIXME : remove this once is gone
         bool isValid();
 
+        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
         // deprecated accessors, use the form without "get" instead
-        /// \cond
         int Q_DECL_DEPRECATED getCode() const;
         QString Q_DECL_DEPRECATED getText() const;
         Condition Q_DECL_DEPRECATED getCondition() const;
@@ -146,21 +146,21 @@ public:
     QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);
 
+    /// \cond
     // FIXME : why is this needed?
     bool isErrorStanza();
 
     // deprecated accessors, use the form without "get" instead
-    /// \cond
     QString Q_DECL_DEPRECATED getTo() const;  
     QString Q_DECL_DEPRECATED getFrom() const;
     QString Q_DECL_DEPRECATED getId() const;    
     QString Q_DECL_DEPRECATED getLang() const;    
     QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
-    /// \endcond
 
 protected:
     void generateAndSetNextId();
     void parse(const QDomElement &element);
+    /// \endcond
 
 private:
     static uint s_uniqeIdNo;

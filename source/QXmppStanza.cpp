@@ -304,30 +304,49 @@ QXmppStanza::~QXmppStanza()
 {
 }
 
+/// Returns the stanza's recipient JID.
+///
+
 QString QXmppStanza::to() const
 {
     return m_to;
 }
+
+/// Sets the stanza's recipient JID.
+///
+/// \param to
 
 void QXmppStanza::setTo(const QString& to)  
 {
     m_to = to;
 }
 
+/// Returns the stanza's sender JID.
+
 QString QXmppStanza::from() const
 {
     return m_from;
 }
+
+/// Sets the stanza's sender JID.
+///
+/// \param from
 
 void QXmppStanza::setFrom(const QString& from)
 {
     m_from = from;
 }
 
+/// Returns the stanza's identifier.
+
 QString QXmppStanza::id() const    
 {
     return m_id;
 }
+
+/// Sets the stanza's identifier.
+///
+/// \param id
 
 void QXmppStanza::setId(const QString& id)    
 {

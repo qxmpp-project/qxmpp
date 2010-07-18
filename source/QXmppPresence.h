@@ -71,11 +71,11 @@ public:
         int priority() const;
         void setPriority(int);
 
+        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
         // deprecated accessors, use the form without "get" instead
-        /// \cond
         int Q_DECL_DEPRECATED getPriority() const;
         QString Q_DECL_DEPRECATED getStatusText() const;
         QXmppPresence::Status::Type Q_DECL_DEPRECATED getType() const;

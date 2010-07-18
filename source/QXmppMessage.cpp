@@ -54,6 +54,26 @@ QXmppMessage::~QXmppMessage()
 
 }
 
+/// Returns the message's body.
+///
+
+QString QXmppMessage::body() const
+{
+    return m_body;
+}
+
+/// Sets the message's body.
+///
+/// \param body
+
+void QXmppMessage::setBody(const QString& body)
+{
+    m_body = body;
+}
+
+/// Returns the message's type.
+///
+
 QXmppMessage::Type QXmppMessage::type() const
 {
     return m_type;
@@ -78,6 +98,10 @@ QString QXmppMessage::getTypeStr() const
         return "";
     }
 }
+
+/// Sets the message's type.
+///
+/// \param type
 
 void QXmppMessage::setType(QXmppMessage::Type type)
 {
@@ -125,28 +149,33 @@ void QXmppMessage::setTypeFromStr(const QString& str)
     }
 }
 
-/// Returns the message timestamp (if any).
-///
-/// XEP-0091: Legacy Delayed Delivery
+/// Returns the message's timestamp (if any).
 
 QDateTime QXmppMessage::stamp() const
 {
     return m_stamp;
 }
 
-/// Sets the message timestamp.
+/// Sets the message's timestamp.
 ///
-/// XEP-0091: Legacy Delayed Delivery
+/// \param stamp
 
 void QXmppMessage::setStamp(const QDateTime &stamp)
 {
     m_stamp = stamp;
 }
 
+/// Returns the message's chat state.
+///
+
 QXmppMessage::State QXmppMessage::state() const
 {
     return m_state;
 }
+
+/// Sets the message's chat state.
+///
+/// \param state
 
 void QXmppMessage::setState(QXmppMessage::State state)
 {
@@ -256,30 +285,33 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 
-QString QXmppMessage::body() const
-{
-    return m_body;
-}
-
-void QXmppMessage::setBody(const QString& body)
-{
-    m_body = body;
-}
+/// Returns the message's subject.
+///
 
 QString QXmppMessage::subject() const
 {
     return m_subject;
 }
 
-void QXmppMessage::setSubject(const QString& sub)
+/// Sets the message's subject.
+///
+/// \param subject
+
+void QXmppMessage::setSubject(const QString& subject)
 {
-    m_subject = sub;
+    m_subject = subject;
 }
+
+/// Returns the message's thread.
 
 QString QXmppMessage::thread() const
 {
     return m_thread;
 }
+
+/// Sets the message's thread.
+///
+/// \param thread
 
 void QXmppMessage::setThread(const QString& thread)
 {

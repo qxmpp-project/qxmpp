@@ -36,6 +36,7 @@
 class QXmppMessage : public QXmppStanza
 {
 public:
+    /// This enum described a message type.
     enum Type
     {
         Error = 0,
@@ -45,8 +46,8 @@ public:
         Headline
     };
 
-    // XEP-0085 : Chat State Notifications
-    // http://xmpp.org/extensions/xep-0085.html
+    /// This enum describes a chat state as defined by 
+    /// XEP-0085 : Chat State Notifications.
     enum State
     {
         None = 0,
@@ -57,19 +58,12 @@ public:
         Paused,
     };
 
-    /// Type of the message timestamp.
-    enum StampType
-    {
-        LegacyDelayedDelivery,  ///< XEP-0091: Legacy Delayed Delivery
-        DelayedDelivery,        ///< XEP-0203: Delayed Delivery
-    };
-
     QXmppMessage(const QString& from = "", const QString& to = "",
                  const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
     
-    QXmppMessage::Type type() const;
-    void setType(QXmppMessage::Type);
+    QString body() const;
+    void setBody(const QString&);
 
     QDateTime stamp() const;
     void setStamp(const QDateTime &stamp);
@@ -77,20 +71,20 @@ public:
     QXmppMessage::State state() const;
     void setState(QXmppMessage::State);
 
-    QString body() const;
-    void setBody(const QString&);
-
     QString subject() const;
     void setSubject(const QString&);
 
     QString thread() const;
     void setThread(const QString&);
 
+    QXmppMessage::Type type() const;
+    void setType(QXmppMessage::Type);
+
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
     // deprecated accessors, use the form without "get" instead
-    /// \cond
     QXmppMessage::Type Q_DECL_DEPRECATED getType() const;
     QXmppMessage::State Q_DECL_DEPRECATED getState() const;
     QString Q_DECL_DEPRECATED getBody() const;
@@ -99,6 +93,13 @@ public:
     /// \endcond
 
 private:
+    /// This enum describe a type of message timestamp.
+    enum StampType
+    {
+        LegacyDelayedDelivery,  ///< XEP-0091: Legacy Delayed Delivery
+        DelayedDelivery,        ///< XEP-0203: Delayed Delivery
+    };
+
     QString getTypeStr() const;
     void setTypeFromStr(const QString&);
 
