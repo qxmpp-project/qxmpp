@@ -26,16 +26,25 @@
 
 #include <QtGlobal>
 
-/// The QXmppCodec class is the base class for audio codecs capable of
-/// encoding / decoding 16-bit mono samples.
+/// \brief The QXmppCodec class is the base class for audio codecs capable of
+/// encoding and decoding audio samples.
+///
+/// Samples must be 16-bit little endian.
 
 class QXmppCodec
 {
 public:
+    /// Reads samples from the input stream, encodes them and writes the
+    /// encoded data to the output stream.
     virtual qint64 encode(QDataStream &input, QDataStream &output) = 0;
+
+    /// Reads encoded data from the input stream, decodes it and writes the
+    /// decoded samples to the output stream.
     virtual qint64 decode(QDataStream &input, QDataStream &output) = 0;
 };
 
+/// \internal
+///
 /// The QXmppG711aCodec class represent a G.711 a-law PCM codec.
 
 class QXmppG711aCodec : public QXmppCodec
@@ -50,6 +59,8 @@ private:
     int m_frequency;
 };
 
+/// \internal
+///
 /// The QXmppG711uCodec class represent a G.711 u-law PCM codec.
 
 class QXmppG711uCodec : public QXmppCodec
@@ -67,6 +78,8 @@ private:
 #ifdef QXMPP_USE_SPEEX
 typedef struct SpeexBits SpeexBits;
 
+/// \internal
+///
 /// The QXmppSpeexCodec class represent a SPEEX codec.
 
 class QXmppSpeexCodec : public QXmppCodec
