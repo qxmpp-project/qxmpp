@@ -650,7 +650,7 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
 
     // find request
     bool found = false;
-    QXmppCall *call;
+    QXmppCall *call = 0;
     QXmppJingleIq request;
     foreach (call, m_calls)
     {
