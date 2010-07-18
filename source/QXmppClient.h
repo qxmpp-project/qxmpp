@@ -52,6 +52,8 @@ class QXmppVCardManager;
 class QXmppTransferManager;
 class QXmppCallManager;
 
+/// \defgroup Core
+
 /// \defgroup Managers
 
 /// \brief The QXmppClient class is the main class for using QXmpp.
@@ -70,6 +72,7 @@ class QXmppCallManager;
 /// For removing QXmpp dependency in QtGui, use DEFINE = QXMPP_NO_GUI
 /// in the source.pro file and build as usual
 ///
+/// \ingroup Core
 
 class QXmppClient : public QObject
 {

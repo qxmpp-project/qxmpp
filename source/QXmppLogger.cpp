@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 Manjeet Dahiya
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -50,11 +51,18 @@ static const char *typeName(QXmppLogger::MessageType type)
     }
 }
 
+/// Constructs a new QXmppLogger.
+///
+/// \param parent
+
 QXmppLogger::QXmppLogger(QObject *parent)
     : QObject(parent), m_loggingType(QXmppLogger::NoLogging),
     m_logFilePath("QXmppClientLog.log")
 {
 }
+
+/// Returns the default logger.
+///
 
 QXmppLogger* QXmppLogger::getLogger()
 {
@@ -67,17 +75,29 @@ QXmppLogger* QXmppLogger::getLogger()
     return m_logger;
 }
 
-void QXmppLogger::setLoggingType(QXmppLogger::LoggingType log)
-{
-    m_loggingType = log;
-}
+/// Returns the handler for logging messages.
+///
 
 QXmppLogger::LoggingType QXmppLogger::loggingType()
 {
     return m_loggingType;
 }
 
-void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
+/// Sets the handler for logging messages.
+///
+/// \param type
+
+void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
+{
+    m_loggingType = type;
+}
+
+/// Add a logging message.
+///
+/// \param type
+/// \param text
+
+void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
 {
     switch(m_loggingType)
     {
@@ -88,26 +108,37 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
             QTextStream stream(&file);
             stream << QTime::currentTime().toString("hh:mm:ss.zzz") <<
                 " " << typeName(type) << " " <<
-                str << "\n\n";
+                text << "\n\n";
         }
         break;
     case QXmppLogger::StdoutLogging:
-        std::cout << typeName(type) << " " << qPrintable(str) << std::endl;
+        std::cout << typeName(type) << " " << qPrintable(text) << std::endl;
         break;
     case QXmppLogger::SignalLogging:
-        emit message(type, str);
+        emit message(type, text);
         break;
     default:
         break;
     }
 }
 
-void QXmppLogger::setLogFilePath(const QString& logFilePath)
-{
-    m_logFilePath = logFilePath;
-}
+/// Returns the path to which logging messages should be written.
+///
+/// \sa loggingType()
 
 QString QXmppLogger::logFilePath()
 {
     return m_logFilePath;
 }
+
+/// Sets the path to which logging messages should be written.
+///
+/// \param path
+///
+/// \sa setLoggingType()
+
+void QXmppLogger::setLogFilePath(const QString &path)
+{
+    m_logFilePath = logFilePath;
+}
+

@@ -27,24 +27,32 @@
 
 #include <QObject>
 
+/// \brief The QXmppLogger class represents a sink for logging messages. 
+///
+/// \ingroup Core
+
 class QXmppLogger : public QObject
 {
     Q_OBJECT
 
 public:
+    /// This enum describes how log message are handled.
     enum LoggingType
     {
-        NoLogging = 0,  ///< Log messages are discarded
-        FileLogging,     ///< Log messages are written to a file
-        StdoutLogging,   ///< Log messages are written to the standard output
-        SignalLogging,   ///< Log messages are emitted as a signal
+        NoLogging = 0,      ///< Log messages are discarded
+        FileLogging = 1,    ///< Log messages are written to a file
+        StdoutLogging = 2,  ///< Log messages are written to the standard output
+        SignalLogging = 4,  ///< Log messages are emitted as a signal
 
         // Deprecated
-        NONE = 0, ///< DEPRECATED Log messages are discarded
-        FILE,     ///< DEPRECATED Log messages are written to a file
-        STDOUT   ///< DEPRECATED Log messages are written to the standard output
+        /// \cond
+        NONE = 0,   ///< DEPRECATED Log messages are discarded
+        FILE = 1,   ///< DEPRECATED Log messages are written to a file
+        STDOUT = 2  ///< DEPRECATED Log messages are written to the standard output
+        /// \endcond
     };
 
+    /// This enum describes a type of log message.
     enum MessageType
     {
         DebugMessage = 0,   ///< Debugging message
@@ -58,16 +66,17 @@ public:
     static QXmppLogger* getLogger();
 
     QXmppLogger::LoggingType loggingType();
-    void setLoggingType(QXmppLogger::LoggingType);
+    void setLoggingType(QXmppLogger::LoggingType type);
 
-    void setLogFilePath(const QString&);
     QString logFilePath();
+    void setLogFilePath(const QString &path);
 
 public slots:
-    void log(QXmppLogger::MessageType type, const QString& str);
+    void log(QXmppLogger::MessageType type, const QString& text);
 
 signals:
-    void message(QXmppLogger::MessageType type, const QString &str);
+    /// This signal is emitted whenever a log message is received.
+    void message(QXmppLogger::MessageType type, const QString &text);
 
 private:
     static QXmppLogger* m_logger;
