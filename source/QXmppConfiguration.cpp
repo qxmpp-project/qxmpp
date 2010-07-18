@@ -110,14 +110,14 @@ void QXmppConfiguration::setPasswd(const QString& passwd)
 
 /// Sets the resource identifier.
 ///
-/// \param resource Resource identifier of the client in connection.
 /// Multiple resources (e.g., devices or locations) may connect simultaneously
 /// to a server on behalf of each authorized client, with each resource
 /// differentiated by the resource identifier of an XMPP address
-/// (e.g. <node@domain/home> vs. <node@domain/work>)
+/// (e.g. node@domain/home vs. node@domain/work)
 ///
-/// The default value is QXmpp
+/// The default value is "QXmpp".
 ///
+/// \param resource Resource identifier of the client in connection.
 
 void QXmppConfiguration::setResource(const QString& resource)
 {
