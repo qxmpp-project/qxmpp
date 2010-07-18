@@ -139,6 +139,6 @@ QString QXmppLogger::logFilePath()
 
 void QXmppLogger::setLogFilePath(const QString &path)
 {
-    m_logFilePath = logFilePath;
+    m_logFilePath = path;
 }
 
