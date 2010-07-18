@@ -34,13 +34,13 @@ xmppClient::xmppClient(QObject *parent)
         SLOT(clientConnected()));
     Q_ASSERT(check);
 
-    check = connect(&this->getRoster(), SIGNAL(rosterReceived()),
+    check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
         SLOT(rosterReceived()));
     Q_ASSERT(check);
 
     /// Then QXmppRoster::presenceChanged() is emitted whenever presence of someone
     /// in roster changes
-    check = connect(&this->getRoster(),
+    check = connect(&this->rosterManager(),
                     SIGNAL(presenceChanged(const QString&, const QString&)),
         SLOT(presenceChanged(const QString&, const QString&)));
     Q_ASSERT(check);
@@ -59,7 +59,7 @@ void xmppClient::clientConnected()
 void xmppClient::rosterReceived()
 {
     std::cout<<"example_2_rosterHandling:: Roster Received"<<std::endl;
-    QStringList list = getRoster().getRosterBareJids();
+    QStringList list = rosterManager().getRosterBareJids();
     for(int i = 0; i < list.size(); ++i)
     {
         std::cout<<"Roster Received:: "<<qPrintable(list.at(i))<<std::endl;
