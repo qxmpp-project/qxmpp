@@ -60,7 +60,7 @@ public:
 
     void close();
     void connectToHost();
-    QIODevice::OpenMode openMode() const;
+    bool isConnected() const;
     qint64 writeDatagram(const QByteArray &datagram);
 
 private slots:
@@ -68,13 +68,14 @@ private slots:
     void readyRead();
 
 signals:
+    // This signal is emitted once ICE negotiation succeeds.
+    void connected();
+
     // This signal is emitted when a data packet is received.
-    void datagramReceived(const QByteArray &datagram, const QHostAddress &host, quint16 port);
+    void datagramReceived(const QByteArray &datagram);
 
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
-    void ready();
 
 private:
     class Pair {

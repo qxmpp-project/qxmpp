@@ -603,12 +603,11 @@ void QXmppStunSocket::connectToHost()
     m_timer->start();
 }
 
-/// Returns the QIODevice::OpenMode which represents the socket's ability
-/// to read and/or write data.
+/// Returns true if ICE negotiation completed, false otherwise.
 
-QIODevice::OpenMode QXmppStunSocket::openMode() const
+bool QXmppStunSocket::isConnected() const
 {
-    return m_activePair ? QIODevice::ReadWrite : QIODevice::NotOpen;
+    return m_activePair != 0;
 }
 
 void QXmppStunSocket::debug(const QString &message, QXmppLogger::MessageType type)
@@ -735,7 +734,7 @@ void QXmppStunSocket::readyRead()
     quint16 messageType = QXmppStunMessage::peekType(buffer);
     if (!messageType)
     {
-        emit datagramReceived(buffer, remoteHost, remotePort);
+        emit datagramReceived(buffer);
         return;
     }
 
@@ -838,7 +837,7 @@ void QXmppStunSocket::readyRead()
         debug(QString("ICE completed %1").arg(pair->toString()));
         m_activePair = pair;
         m_timer->stop();
-        emit ready();
+        emit connected();
     }
 }
 
