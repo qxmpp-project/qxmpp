@@ -152,7 +152,7 @@ public:
     QXmppRoster Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
-    QXmppStanza::Error::Condition getXmppStreamError();
+    QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
     /// \endcond
 
 signals:
