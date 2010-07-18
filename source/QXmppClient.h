@@ -110,6 +110,12 @@ public:
     void disconnect();
     bool isConnected() const;
 
+    QXmppLogger *logger();
+    void setLogger(QXmppLogger *logger);
+
+    QAbstractSocket::SocketError socketError();
+    QXmppStanza::Error::Condition xmppStreamError();
+
     QXmppArchiveManager& archiveManager();
     QXmppCallManager& callManager();
     QXmppMucManager& mucManager();
@@ -126,8 +132,27 @@ public:
     const QXmppPresence& getClientPresence() const;
 
     /// \cond
+    // These methods are not in keeping with the "manager" approach,
+    // the whole RPC support either needs some love or should be pulled.
+    void addInvokableInterface( QXmppInvokable *interface );
+    QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
+                                              const QString &interface,
+                                              const QVariant &arg1 = QVariant(),
+                                              const QVariant &arg2 = QVariant(),
+                                              const QVariant &arg3 = QVariant(),
+                                              const QVariant &arg4 = QVariant(),
+                                              const QVariant &arg5 = QVariant(),
+                                              const QVariant &arg6 = QVariant(),
+                                              const QVariant &arg7 = QVariant(),
+                                              const QVariant &arg8 = QVariant(),
+                                              const QVariant &arg9 = QVariant(),
+                                              const QVariant &arg10 = QVariant() );
+
+    // deprecated accessors, use the form without "get" instead
     QXmppRoster Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
+    QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
+    QXmppStanza::Error::Condition getXmppStreamError();
     /// \endcond
 
 signals:
@@ -201,27 +226,6 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 public:
-    QAbstractSocket::SocketError getSocketError();
-
-    void addInvokableInterface( QXmppInvokable *interface );
-    QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
-                                              const QString &interface,
-                                              const QVariant &arg1 = QVariant(),
-                                              const QVariant &arg2 = QVariant(),
-                                              const QVariant &arg3 = QVariant(),
-                                              const QVariant &arg4 = QVariant(),
-                                              const QVariant &arg5 = QVariant(),
-                                              const QVariant &arg6 = QVariant(),
-                                              const QVariant &arg7 = QVariant(),
-                                              const QVariant &arg8 = QVariant(),
-                                              const QVariant &arg9 = QVariant(),
-                                              const QVariant &arg10 = QVariant() );
-
-    QXmppStanza::Error::Condition getXmppStreamError();
-
-    QXmppLogger *logger();
-    void setLogger(QXmppLogger *logger);
-
 public slots:
     bool sendPacket(const QXmppPacket&);
     void sendMessage(const QString& bareJid, const QString& message);

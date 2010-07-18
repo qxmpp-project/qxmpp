@@ -420,22 +420,18 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
     return true;
 }
 
-/// Returns the socket error if QXmppClient::Error is QXmppClient::SocketError.
-///
-/// \return QAbstractSocket::SocketError
+/// Returns the socket error if error() is QXmppClient::SocketError.
 ///
 
-QAbstractSocket::SocketError QXmppClient::getSocketError()
+QAbstractSocket::SocketError QXmppClient::socketError()
 {
     return m_stream->socketError();
 }
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
 ///
-/// \return QXmppClient::Error::Condition
-///
 
-QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
+QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 {
     return m_stream->xmppStreamError();
 }
@@ -605,8 +601,18 @@ QXmppRoster& QXmppClient::getRoster()
     return *m_roster;
 }
 
+QAbstractSocket::SocketError QXmppClient::getSocketError()
+{
+    return m_stream->socketError();
+}
+
 QXmppVCardManager& QXmppClient::getVCardManager()
 {
     return *m_vCardManager;
+}
+
+QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
+{
+    return m_stream->xmppStreamError();
 }
 
