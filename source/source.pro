@@ -22,6 +22,7 @@ HEADERS += QXmppUtils.h \
     QXmppArchiveManager.h \
     QXmppBind.h \
     QXmppByteStreamIq.h \
+    QXmppCallManager.h \
     QXmppClient.h \
     QXmppCodec.h \
     QXmppConfiguration.h \
@@ -64,6 +65,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppArchiveManager.cpp \
     QXmppBind.cpp \
     QXmppByteStreamIq.cpp \
+    QXmppCallManager.cpp \
     QXmppClient.cpp \
     QXmppCodec.cpp \
     QXmppConfiguration.cpp \

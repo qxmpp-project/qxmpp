@@ -50,6 +50,7 @@ class QXmppArchiveManager;
 class QXmppDiscoveryIq;
 class QXmppVCardManager;
 class QXmppTransferManager;
+class QXmppCallManager;
 
 /// \brief The QXmppClient class is the main class for using QXmpp.
 ///
@@ -104,6 +105,7 @@ public:
     bool isConnected() const;
 
     QXmppArchiveManager& archiveManager();
+    QXmppCallManager& callManager();
     QXmppMucManager& mucManager();
     QXmppTransferManager& transferManager();
 
@@ -227,6 +229,7 @@ private:
                             ///< TCP socket and XMPP protocol
     QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
     QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
+    QXmppCallManager *m_callManager;        ///< Pointer to the call manager
     QXmppMucManager* m_mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRoster *m_roster;                  ///< Pointer to the roster manager
