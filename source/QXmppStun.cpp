@@ -583,7 +583,6 @@ void QXmppStunSocket::checkCandidates()
         } else {
             message.iceControlled = QByteArray(8, 0);
         }
-        // REMOTE PWD
         writeStun(message, pair);
     }
 }
@@ -864,6 +863,6 @@ qint64 QXmppStunSocket::writeStun(const QXmppStunMessage &message, QXmppStunSock
         QString("Sent to %1\n%2").arg(pair->toString(), message.toString()),
         QXmppLogger::SentMessage);
 #endif
-    m_socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
+    return m_socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
 }
 
