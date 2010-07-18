@@ -225,11 +225,6 @@ QXmppG711aCodec::QXmppG711aCodec(int clockrate)
     m_frequency = clockrate;
 }
 
-int QXmppG711aCodec::bitrate() const
-{
-    return m_frequency * 8;
-}
-
 qint64 QXmppG711aCodec::encode(QDataStream &input, QDataStream &output)
 {
     qint64 samples = 0;
@@ -259,11 +254,6 @@ qint64 QXmppG711aCodec::decode(QDataStream &input, QDataStream &output)
 QXmppG711uCodec::QXmppG711uCodec(int clockrate)
 {
     m_frequency = clockrate;
-}
-
-int QXmppG711uCodec::bitrate() const
-{
-    return m_frequency * 8;
 }
 
 qint64 QXmppG711uCodec::encode(QDataStream &input, QDataStream &output)
@@ -323,13 +313,6 @@ QXmppSpeexCodec::~QXmppSpeexCodec()
 {
     delete encoder_bits;
     delete decoder_bits;
-}
-
-int QXmppSpeexCodec::bitrate() const
-{
-    int bitrate;
-    speex_encoder_ctl(encoder_state, SPEEX_GET_BITRATE, &bitrate);
-    return bitrate;
 }
 
 qint64 QXmppSpeexCodec::encode(QDataStream &input, QDataStream &output)

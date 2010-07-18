@@ -32,7 +32,6 @@
 class QXmppCodec
 {
 public:
-    virtual int bitrate() const = 0;
     virtual qint64 encode(QDataStream &input, QDataStream &output) = 0;
     virtual qint64 decode(QDataStream &input, QDataStream &output) = 0;
 };
@@ -44,7 +43,6 @@ class QXmppG711aCodec : public QXmppCodec
 public:
     QXmppG711aCodec(int clockrate);
 
-    int bitrate() const;
     qint64 encode(QDataStream &input, QDataStream &output);
     qint64 decode(QDataStream &input, QDataStream &output);
 
@@ -59,7 +57,6 @@ class QXmppG711uCodec : public QXmppCodec
 public:
     QXmppG711uCodec(int clockrate);
 
-    int bitrate() const;
     qint64 encode(QDataStream &input, QDataStream &output);
     qint64 decode(QDataStream &input, QDataStream &output);
 
@@ -78,7 +75,6 @@ public:
     QXmppSpeexCodec(int clockrate);
     ~QXmppSpeexCodec();
 
-    int bitrate() const;
     qint64 encode(QDataStream &input, QDataStream &output);
     qint64 decode(QDataStream &input, QDataStream &output);
 
