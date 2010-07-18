@@ -38,19 +38,20 @@ class QXmppPresence;
 class QXmppMessage;
 class QXmppPacket;
 class QXmppIq;
-class QXmppMucManager;
-class QXmppRoster;
-class QXmppReconnectionManager;
-class QXmppVCardManager;
 class QXmppInvokable;
 class QXmppRpcInvokeIq;
 class QXmppRemoteMethod;
 struct QXmppRemoteMethodResult;
+
+// managers
 class QXmppArchiveManager;
-class QXmppDiscoveryIq;
-class QXmppVCardManager;
-class QXmppTransferManager;
 class QXmppCallManager;
+class QXmppDiscoveryIq;
+class QXmppMucManager;
+class QXmppReconnectionManager;
+class QXmppRoster;
+class QXmppTransferManager;
+class QXmppVCardManager;
 
 /// \defgroup Core
 
@@ -112,17 +113,22 @@ public:
     QXmppArchiveManager& archiveManager();
     QXmppCallManager& callManager();
     QXmppMucManager& mucManager();
+    QXmppRoster& rosterManager();
     QXmppTransferManager& transferManager();
+    QXmppVCardManager& vCardManager();
 
     // FIXME : these accessors should be deprecated in favour of
     // versions without the "get".
-    QXmppRoster& getRoster();
     QXmppConfiguration& getConfiguration();
     const QXmppConfiguration& getConfiguration() const;
     QXmppReconnectionManager* getReconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
-    QXmppVCardManager& getVCardManager();
+
+    /// \cond
+    QXmppRoster Q_DECL_DEPRECATED & getRoster();
+    QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
+    /// \endcond
 
 signals:
 

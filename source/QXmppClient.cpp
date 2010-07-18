@@ -278,7 +278,7 @@ bool QXmppClient::isConnected() const
 /// get the list of friends in the roster and their presence information.
 ///
 
-QXmppRoster& QXmppClient::getRoster()
+QXmppRoster& QXmppClient::rosterManager()
 {
     return *m_roster;
 }
@@ -444,7 +444,7 @@ QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 /// http://xmpp.org/extensions/xep-0054.html
 ///
 
-QXmppVCardManager& QXmppClient::getVCardManager()
+QXmppVCardManager& QXmppClient::vCardManager()
 {
     return *m_vCardManager;
 }
@@ -596,5 +596,17 @@ void QXmppClient::setLogger(QXmppLogger *logger)
 void QXmppClient::xmppConnected()
 {
     sendPacket(m_clientPresence);
+}
+
+// obsolete
+
+QXmppRoster& QXmppClient::getRoster()
+{
+    return *m_roster;
+}
+
+QXmppVCardManager& QXmppClient::getVCardManager()
+{
+    return *m_vCardManager;
 }
 
