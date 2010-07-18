@@ -34,15 +34,17 @@ QXmppIq::QXmppIq(QXmppIq::Type type)
     generateAndSetNextId();
 }
 
-QXmppIq::~QXmppIq()
-{
-
-}
+/// Returns the IQ's type.
+///
 
 QXmppIq::Type QXmppIq::type() const
 {
     return m_type;
 }
+
+/// Sets the IQ's type.
+///
+/// \param type
 
 void QXmppIq::setType(QXmppIq::Type type)
 {

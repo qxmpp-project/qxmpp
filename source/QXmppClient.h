@@ -52,6 +52,8 @@ class QXmppVCardManager;
 class QXmppTransferManager;
 class QXmppCallManager;
 
+/// \defgroup Managers
+
 /// \brief The QXmppClient class is the main class for using QXmpp.
 ///
 /// It provides the user all the required functionality to connect to the server

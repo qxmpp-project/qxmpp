@@ -33,7 +33,11 @@ class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
 class QXmppStream;
 
-/// XEP-0136: Message Archiving
+/// \brief The QXmppArchiveManager class makes it possible to access message
+/// archives as defined by XEP-0136: Message Archiving.
+///
+/// \ingroup Managers
+
 class QXmppArchiveManager : public QObject
 {
     Q_OBJECT

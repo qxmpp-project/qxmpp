@@ -37,6 +37,7 @@ class QXmppStream;
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by XEP-0045: Multi-User Chat.
 ///
+/// \ingroup Managers
 
 class QXmppMucManager : public QObject
 {

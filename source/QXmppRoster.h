@@ -58,6 +58,7 @@ class QXmppStream;
 /// Signals presenceChanged() or rosterChanged() are emitted whenever presence
 /// or roster changes respectively.
 ///
+/// \ingroup Managers
 
 class QXmppRoster : public QObject
 {

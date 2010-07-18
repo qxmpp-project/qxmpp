@@ -205,7 +205,9 @@ private:
 /// Stream initiation is performed as described in XEP-0095: Stream Initiation
 /// and XEP-0096: SI File Transfer. The actual file transfer is then performed
 /// using either XEP-0065: SOCKS5 Bytestreams or XEP-0047: In-Band Bytestreams.
-/// 
+///
+/// \ingroup Managers
+ 
 class QXmppTransferManager : public QObject
 {
     Q_OBJECT

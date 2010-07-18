@@ -31,6 +31,11 @@
 
 class QXmppStream;
 
+/// \brief The QXmppVCardManager class makes it possible to interact
+/// with XMPP vCards.
+///
+/// \ingroup Managers
+
 class QXmppVCardManager : public QObject
 {
     Q_OBJECT

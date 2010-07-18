@@ -42,7 +42,7 @@ class QXmppStunSocket;
 /// It acts as a QIODevice so that you can read / write audio samples, for
 /// instance using a QAudioInput and/or QAudioOutput.
 ///
-/// \note: THIS API IS NOT FINALIZED YET
+/// \note THIS API IS NOT FINALIZED YET
 
 class QXmppCall : public QIODevice
 {
@@ -170,7 +170,8 @@ private:
 /// (RFC 5245) and data is transfered using Real Time Protocol (RFC 3550)
 /// packets.
 ///
-/// \note: THIS API IS NOT FINALIZED YET
+/// \ingroup Managers
+/// \note THIS API IS NOT FINALIZED YET
 
 class QXmppCallManager : public QObject
 {
