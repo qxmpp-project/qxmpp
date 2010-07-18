@@ -39,7 +39,7 @@ class QXmppStream;
 /// \brief The QXmppRoster class provides access to a connected client's roster.
 ///
 /// \note It's object should not be created using it's constructor. Instead
-/// QXmppClient::getRoster() should be used to get the reference of instantiated
+/// QXmppClient::rosterManager() should be used to get the reference of instantiated
 /// object this class.
 ///
 /// It stores all the Roster and Presence details of all the roster entries (that

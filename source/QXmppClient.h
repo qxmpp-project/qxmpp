@@ -149,7 +149,7 @@ signals:
     /// After the connected() signal is emitted QXmpp will send the roster request
     /// to the server. On receiving the roster, QXmpp will emit
     /// QXmppRoster::rosterReceived(). After this signal, QXmppRoster object gets
-    /// populated and you can use getRoster() to get the handle of QXmppRoster object.
+    /// populated and you can use rosterManager() to get the handle of QXmppRoster object.
     ///
     void connected();
 
