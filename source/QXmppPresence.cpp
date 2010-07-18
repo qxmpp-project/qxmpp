@@ -323,7 +323,7 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
 }
 
-// obsolete start
+/// \cond
 
 QXmppPresence::Type QXmppPresence::getType() const
 {
@@ -355,4 +355,4 @@ int QXmppPresence::Status::getPriority() const
     return m_priority;
 }
 
-// obsolete end
+/// \endcond

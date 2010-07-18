@@ -33,15 +33,20 @@
 // for an explanation.
 #include <QXmlStreamWriter>
 
+/// \brief The QXmppIq packet is the base class for all IQs.
+///
+/// \ingroup Stanzas
+
 class QXmppIq : public QXmppStanza
 {
 public:
+    /// This enum describes the type of IQ.
     enum Type
     {
-        Error = 0,
-        Get,
-        Set,
-        Result
+        Error = 0,  ///< Error response.
+        Get,        ///< Get request.
+        Set,        ///< Set request.
+        Result      ///< Result.
     };
 
     QXmppIq(QXmppIq::Type type = QXmppIq::Get);
@@ -54,7 +59,9 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
 
     // deprecated accessors, use the form without "get" instead
+    /// \cond
     QXmppIq::Type Q_DECL_DEPRECATED getType() const;
+    /// \endcond
 
 protected:
     virtual void parseElementFromChild(const QDomElement &element);

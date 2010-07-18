@@ -32,6 +32,7 @@
 ///
 /// It is used to get or modify room memberships.
 ///
+/// \ingroup Stanzas
 
 class QXmppMucAdminIq : public QXmppIq
 {

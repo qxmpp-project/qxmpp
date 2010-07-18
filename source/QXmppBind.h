@@ -36,16 +36,17 @@ public:
     
     QString jid() const;
     QString resource() const;
+
     void setJid(const QString&);
     void setResource(const QString&);
 
     static bool isBind(const QDomElement &element);
 
-// deprecated accessors, use the form without "get" instead
-// obsolete start
+    // deprecated accessors, use the form without "get" instead
+    /// \cond
     QString Q_DECL_DEPRECATED getJid() const;
     QString Q_DECL_DEPRECATED getResource() const;
-// obsolete end
+    /// \endcond
 
 protected:
     void parseElementFromChild(const QDomElement &element);

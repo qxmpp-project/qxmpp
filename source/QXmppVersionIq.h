@@ -26,8 +26,10 @@
 
 #include "QXmppIq.h"
 
-/// XEP-0092: Software Version
-/// http://xmpp.org/extensions/xep-0092.html
+/// \brief The QXmppVersionIq class represents an IQ for conveying a software
+/// version as defined by XEP-0092: Software Version.
+///
+/// \ingroup Stanzas
 
 class QXmppVersionIq : public QXmppIq
 {

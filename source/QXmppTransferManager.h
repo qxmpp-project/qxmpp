@@ -80,12 +80,14 @@ class QXmppTransferJob : public QObject
     Q_OBJECT
 
 public:
+    /// This enum is used to describe the direction of a transfer job.
     enum Direction
     {
         IncomingDirection, ///< The file is being received.
         OutgoingDirection, ///< The file is being sent.
     };
 
+    /// This enum is used to describe the type of error encountered by a transfer job.
     enum Error
     {
         NoError = 0,      ///< No error occured.
@@ -95,6 +97,7 @@ public:
         ProtocolError,    ///< An error was encountered in the file transfer protocol.
     };
 
+    /// This enum is used to describe a transfer method.
     enum Method
     {
         NoMethod = 0,     ///< No transfer method.
@@ -104,12 +107,13 @@ public:
     };
     Q_DECLARE_FLAGS(Methods, Method)
 
+    /// This enum is used to describe the state of a transfer job.
     enum State
     {
-        OfferState = 0,
-        StartState = 1,
-        TransferState = 2,
-        FinishedState = 3,
+        OfferState = 0,    ///< The transfer is being offered to the remote party.
+        StartState = 1,    ///< The transfer is being connected.
+        TransferState = 2, ///< The transfer is ongoing.
+        FinishedState = 3, ///< The transfer is finished.
     };
 
     void abort();
@@ -226,6 +230,10 @@ signals:
     /// To accept the transfer job, call the job's QXmppTransferJob::accept() method.
     /// To refuse the transfer job, call the job's QXmppTransferJob::abort() method.
     void fileReceived(QXmppTransferJob *offer);
+
+    /// This signal is emitted whenever a transfer job is finished.
+    ///
+    /// \sa QXmppTransferJob::finished()
     void finished(QXmppTransferJob *job);
 
     /// This signal is emitted to send logging messages.

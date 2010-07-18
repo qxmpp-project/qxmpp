@@ -35,6 +35,12 @@
 // for an explanation.
 #include <QXmlStreamWriter>
 
+/// \defgroup Stanzas
+
+/// \brief The QXmppStanza class is the base class for all XMPP stanzas.
+///
+/// \ingroup Stanzas
+
 class QXmppStanza : public QXmppPacket
 {
 public:
@@ -99,10 +105,12 @@ public:
         void toXml(QXmlStreamWriter *writer) const;
 
         // deprecated accessors, use the form without "get" instead
+        /// \cond
         int Q_DECL_DEPRECATED getCode() const;
         QString Q_DECL_DEPRECATED getText() const;
         Condition Q_DECL_DEPRECATED getCondition() const;
         Type Q_DECL_DEPRECATED getType() const;
+        /// \endcond
 
     private:
         QString getConditionStr() const;
@@ -142,11 +150,13 @@ public:
     bool isErrorStanza();
 
     // deprecated accessors, use the form without "get" instead
+    /// \cond
     QString Q_DECL_DEPRECATED getTo() const;  
     QString Q_DECL_DEPRECATED getFrom() const;
     QString Q_DECL_DEPRECATED getId() const;    
     QString Q_DECL_DEPRECATED getLang() const;    
     QXmppStanza::Error Q_DECL_DEPRECATED getError() const;
+    /// \endcond
 
 protected:
     void generateAndSetNextId();

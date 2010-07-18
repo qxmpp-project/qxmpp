@@ -172,7 +172,7 @@ QXmppTransferJob::Direction QXmppTransferJob::direction() const
     return m_direction;
 }
 
-/// Returns the last error that was encoutered.
+/// Returns the last error that was encountered.
 ///
 
 QXmppTransferJob::Error QXmppTransferJob::error() const
@@ -180,10 +180,16 @@ QXmppTransferJob::Error QXmppTransferJob::error() const
     return m_error;
 }
 
+/// Returns the remote party's JID.
+///
+
 QString QXmppTransferJob::jid() const
 {
     return m_jid;
 }
+
+/// Returns meta-data about the file being transfered.
+///
 
 QXmppTransferFileInfo QXmppTransferJob::fileInfo() const
 {
@@ -210,15 +216,24 @@ qint64 QXmppTransferJob::fileSize() const
     return m_fileInfo.size();
 }
 
+/// Returns the job's transfer method.
+///
+
 QXmppTransferJob::Method QXmppTransferJob::method() const
 {
     return m_method;
 }
 
+/// Returns the job's session identifier.
+///
+
 QString QXmppTransferJob::sid() const
 {
     return m_sid;
 }
+
+/// Returns the job's state.
+///
 
 QXmppTransferJob::State QXmppTransferJob::state() const
 {

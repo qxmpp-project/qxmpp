@@ -56,13 +56,13 @@ public:
     QImage photoAsImage() const;
     const QByteArray& photo() const;
 
-// deprecated accessors, use the form without "get" instead
-// obsolete start
+    // deprecated accessors, use the form without "get" instead
+    /// \cond
     QString Q_DECL_DEPRECATED getFullName() const;
     QString Q_DECL_DEPRECATED getNickName() const;
     QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
     const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
-// obsolete end
+    /// \endcond
 
 protected:
     void parseElementFromChild(const QDomElement&);

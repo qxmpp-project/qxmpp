@@ -28,6 +28,11 @@
 #include <QDateTime>
 #include "QXmppStanza.h"
 
+/// \brief The QXmppMessage class represents an XMPP message.
+///
+/// \ingroup Stanzas
+///
+
 class QXmppMessage : public QXmppStanza
 {
 public:
@@ -85,11 +90,13 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
 
     // deprecated accessors, use the form without "get" instead
+    /// \cond
     QXmppMessage::Type Q_DECL_DEPRECATED getType() const;
     QXmppMessage::State Q_DECL_DEPRECATED getState() const;
     QString Q_DECL_DEPRECATED getBody() const;
     QString Q_DECL_DEPRECATED getSubject() const;
     QString Q_DECL_DEPRECATED getThread() const;
+    /// \endcond
 
 private:
     QString getTypeStr() const;

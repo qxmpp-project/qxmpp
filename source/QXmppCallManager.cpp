@@ -102,6 +102,9 @@ void QXmppCall::accept()
         setState(QXmppCall::ConnectingState);
 }
 
+/// Returns the number of bytes that are available for reading.
+///
+
 qint64 QXmppCall::bytesAvailable() const
 {
     return m_incomingBuffer.size();
@@ -149,6 +152,9 @@ void QXmppCall::emitSignals()
     m_signalsEmitted = false;
 }
 
+/// Hangs up the call.
+///
+
 void QXmppCall::hangup()
 {
     if (m_state != QXmppCall::FinishedState)
@@ -159,6 +165,9 @@ bool QXmppCall::isSequential() const
 {
     return true;
 }
+
+/// Returns the remote party's JID.
+///
 
 QString QXmppCall::jid() const
 {
@@ -330,12 +339,17 @@ void QXmppCall::datagramReceived(const QByteArray &buffer)
     emit readyRead();
 }
 
-/// Returns the session identifier for this call.
+/// Returns the call's session identifier.
+///
 
 QString QXmppCall::sid() const
 {
     return m_sid;
 }
+
+/// Returns the call's state.
+///
+/// \sa stateChanged()
 
 QXmppCall::State QXmppCall::state() const
 {

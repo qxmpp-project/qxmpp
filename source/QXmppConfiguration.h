@@ -116,8 +116,8 @@ public:
 
     void setNetworkProxy(const QNetworkProxy& proxy);
 
-// deprecated accessors, use the form without "get" instead
-// obsolete start
+    // deprecated accessors, use the form without "get" instead
+    /// \cond
     QString Q_DECL_DEPRECATED getHost() const;
     QString Q_DECL_DEPRECATED getDomain() const;
     int Q_DECL_DEPRECATED getPort() const;
@@ -135,7 +135,7 @@ public:
     QXmppConfiguration::NonSASLAuthMechanism Q_DECL_DEPRECATED getNonSASLAuthMechanism() const;
     QXmppConfiguration::SASLAuthMechanism Q_DECL_DEPRECATED getSASLAuthMechanism() const;
     QNetworkProxy Q_DECL_DEPRECATED getNetworkProxy() const;
-// obsolete end
+    /// \endcond
 
 private:
     QString m_host;

@@ -27,6 +27,9 @@
 
 #include "QXmppStanza.h"
 
+/// \brief The QXmppPresence class represents an XMPP presence stanza.
+///
+/// \ingroup Stanzas
 class QXmppPresence : public QXmppStanza
 {
 public:
@@ -71,12 +74,12 @@ public:
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
-// deprecated accessors, use the form without "get" instead
-// obsolete start
+        // deprecated accessors, use the form without "get" instead
+        /// \cond
         int Q_DECL_DEPRECATED getPriority() const;
         QString Q_DECL_DEPRECATED getStatusText() const;
         QXmppPresence::Status::Type Q_DECL_DEPRECATED getType() const;
-// obsolete end
+        /// \endcond
 
     private:
         QString getTypeStr() const;
@@ -101,12 +104,12 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
-// deprecated accessors, use the form without "get" instead
-// obsolete start
+    // deprecated accessors, use the form without "get" instead
+    /// \cond
     QXmppPresence::Type Q_DECL_DEPRECATED getType() const;
     QXmppPresence::Status Q_DECL_DEPRECATED & getStatus();
     const QXmppPresence::Status Q_DECL_DEPRECATED & getStatus() const;
-// obsolete end
+    /// \endcond
 
 private:
     QString getTypeStr() const;

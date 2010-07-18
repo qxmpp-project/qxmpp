@@ -102,11 +102,6 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& str)
     }
 }
 
-QXmppLogger::LoggingType QXmppLogger::getLoggingType()
-{
-    return m_loggingType;
-}
-
 void QXmppLogger::setLogFilePath(const QString& logFilePath)
 {
     m_logFilePath = logFilePath;

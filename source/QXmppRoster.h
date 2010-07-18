@@ -73,14 +73,18 @@ public:
     bool isRosterReceived();
     QStringList getRosterBareJids() const;
     QXmppRoster::QXmppRosterEntry getRosterEntry(const QString& bareJid) const;
-    QMap<QString, QXmppRoster::QXmppRosterEntry> Q_DECL_DEPRECATED getRosterEntries() const;
     
     QStringList getResources(const QString& bareJid) const;
-    QMap<QString, QMap<QString, QXmppPresence> > Q_DECL_DEPRECATED getAllPresences() const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
             const QString& bareJid) const;
     QXmppPresence getPresence(const QString& bareJid,
                               const QString& resource) const;
+
+
+    /// \cond
+    QMap<QString, QXmppRoster::QXmppRosterEntry> Q_DECL_DEPRECATED getRosterEntries() const;
+    QMap<QString, QMap<QString, QXmppPresence> > Q_DECL_DEPRECATED getAllPresences() const;
+    /// \endcond
 
 signals:
     /// This signal is emitted when the Roster IQ is received after a successful

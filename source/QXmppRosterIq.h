@@ -30,6 +30,10 @@
 #include <QList>
 #include <QSet>
 
+/// \brief The QXmppRosterIq class represents a roster IQ.
+///
+/// \ingroup Stanzas
+
 class QXmppRosterIq : public QXmppIq
 {
 public:
@@ -68,12 +72,14 @@ public:
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
         
-// deprecated accessors, use the form without "get" instead
+        // deprecated accessors, use the form without "get" instead
+        /// \cond
         SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
         QString Q_DECL_DEPRECATED getName() const;
         QString Q_DECL_DEPRECATED getSubscriptionStatus() const;
         QString Q_DECL_DEPRECATED getBareJid() const;
         QSet<QString> Q_DECL_DEPRECATED getGroups() const;
+        /// \endcond
 
     private:
         QString getSubscriptionTypeStr() const;
@@ -92,8 +98,10 @@ public:
 
     static bool isRosterIq(const QDomElement &element);
 
-// deprecated accessors, use the form without "get" instead
+    // deprecated accessors, use the form without "get" instead
+    /// \cond
     QList<Item> Q_DECL_DEPRECATED getItems() const;
+    /// \endcond
 
 protected:
     void parseElementFromChild(const QDomElement &element);
