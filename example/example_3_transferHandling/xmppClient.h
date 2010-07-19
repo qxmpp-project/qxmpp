@@ -39,10 +39,10 @@ public:
     void sendOnceAvailable(const QString &recipient, const QString &file);
 
 private slots:
-    void slotConnected();
     void slotError(QXmppTransferJob::Error error);
     void slotFileReceived(QXmppTransferJob *job);
     void slotFinished();
+    void slotPresenceReceived(const QXmppPresence &presence);
     void slotProgress(qint64 done, qint64 total);
 
 private:
