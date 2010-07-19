@@ -49,6 +49,7 @@
 /// establishment of the XMPP connection and provide a number of high-level
 /// "managers" to perform specific tasks:
 /// 
+/// \sa QXmppMucManager
 /// \sa QXmppRosterManager
 /// \sa QXmppVCardManager
 /// \sa QXmppTransferManager
