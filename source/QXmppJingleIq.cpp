@@ -535,30 +535,50 @@ QXmppJinglePayloadType::QXmppJinglePayloadType()
 {
 }
 
+/// Returns the number of channels (e.g. 1 for mono, 2 for stereo).
+///
+
 unsigned char QXmppJinglePayloadType::channels() const
 {
     return m_channels;
 }
+
+/// Sets the number of channels (e.g. 1 for mono, 2 for stereo).
+///
+/// \param channels
 
 void QXmppJinglePayloadType::setChannels(unsigned char channels)
 {
     m_channels = channels;
 }
 
+/// Returns the clockrate in Hz, i.e. the number of samples per second.
+///
+
 unsigned int QXmppJinglePayloadType::clockrate() const
 {
     return m_clockrate;
 }
+
+/// Sets the clockrate in Hz, i.e. the number of samples per second.
+///
+/// \param clockrate
 
 void QXmppJinglePayloadType::setClockrate(unsigned int clockrate)
 {
     m_clockrate = clockrate;
 }
 
+/// Returns the payload type identifier.
+///
+
 unsigned char QXmppJinglePayloadType::id() const
 {
     return m_id;
 }
+
+/// Sets the payload type identifier.
+///
 
 void QXmppJinglePayloadType::setId(unsigned char id)
 {
@@ -566,30 +586,51 @@ void QXmppJinglePayloadType::setId(unsigned char id)
     m_id = id;
 }
 
+/// Returns the maximum packet time in milliseconds.
+///
+
 unsigned int QXmppJinglePayloadType::maxptime() const
 {
     return m_maxptime;
 }
+
+/// Sets the maximum packet type in milliseconds.
+///
+/// \param maxptime
 
 void QXmppJinglePayloadType::setMaxptime(unsigned int maxptime)
 {
     m_maxptime = maxptime;
 }
 
+/// Returns the payload type name.
+///
+
 QString QXmppJinglePayloadType::name() const
 {
     return m_name;
 }
+
+/// Sets the payload type name.
+///
+/// \param name
 
 void QXmppJinglePayloadType::setName(const QString &name)
 {
     m_name = name;
 }
 
+/// Returns the packet time in milliseconds (20 by default).
+///
+
 unsigned int QXmppJinglePayloadType::ptime() const
 {
     return m_ptime ? m_ptime : 20;
 }
+
+/// Sets the packet time in milliseconds (20 by default).
+///
+/// \param ptime
 
 void QXmppJinglePayloadType::setPtime(unsigned int ptime)
 {

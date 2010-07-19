@@ -28,6 +28,10 @@
 
 #include "QXmppIq.h"
 
+/// \brief The QXmppJinglePayloadType class represents a payload type
+/// as specified by XEP-0167: Jingle RTP Sessions.
+///
+
 class QXmppJinglePayloadType
 {
 public:
@@ -64,6 +68,10 @@ private:
     QString m_name;
     unsigned int m_ptime;
 };
+
+/// \brief The QXmppJingleCandidate class represents a transport candidate
+/// as specified by XEP-0176: Jingle ICE-UDP Transport Method.
+///
 
 class QXmppJingleCandidate
 {
@@ -267,8 +275,10 @@ public:
     static bool isJingleIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     Action m_action;
