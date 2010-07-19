@@ -46,19 +46,19 @@ class QXmppMucManager : public QObject
 public:
     QXmppMucManager(QXmppStream* stream, QObject *parent = 0);
 
-    bool joinRoom(const QString &bareJid, const QString &nickName);
-    bool leaveRoom(const QString &bareJid);
+    bool joinRoom(const QString &roomJid, const QString &nickName);
+    bool leaveRoom(const QString &roomJid);
 
-    bool requestRoomConfiguration(const QString &bareJid);
-    bool setRoomConfiguration(const QString &bareJid, const QXmppDataForm &form);
+    bool requestRoomConfiguration(const QString &roomJid);
+    bool setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form);
 
-    bool sendMessage(const QString &bareJid, const QString &text);
+    bool sendMessage(const QString &roomJid, const QString &text);
 
     QMap<QString, QXmppPresence> roomParticipants(const QString& bareJid) const;
 
 signals:
-    void roomConfigurationReceived(const QString &bareJid, const QXmppDataForm &configuration);
-    void roomParticipantChanged(const QString &bareJid, const QString &nickName);
+    void roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &configuration);
+    void roomParticipantChanged(const QString &roomJid, const QString &nickName);
 
 private slots:
     void mucAdminIqReceived(const QXmppMucAdminIq &iq);

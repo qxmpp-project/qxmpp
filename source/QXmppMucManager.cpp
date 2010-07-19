@@ -45,13 +45,16 @@ QXmppMucManager::QXmppMucManager(QXmppStream* stream, QObject *parent)
 
 /// Joins the given chat room with the requested nickname.
 ///
+/// \param roomJid
+/// \param nickName
+///
 /// \return true if the request was sent, false otherwise
 ///
 
-bool QXmppMucManager::joinRoom(const QString &bareJid, const QString &nickName)
+bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName)
 {
     QXmppPresence packet;
-    packet.setTo(bareJid + "/" + nickName);
+    packet.setTo(roomJid + "/" + nickName);
     packet.setType(QXmppPresence::Available);
     QXmppElement x;
     x.setTagName("x");
@@ -59,7 +62,7 @@ bool QXmppMucManager::joinRoom(const QString &bareJid, const QString &nickName)
     packet.setExtensions(x);
     if (m_stream->sendPacket(packet))
     {
-        m_nickNames[bareJid] = nickName;
+        m_nickNames[roomJid] = nickName;
         return true;
     } else {
         return false;
@@ -68,72 +71,84 @@ bool QXmppMucManager::joinRoom(const QString &bareJid, const QString &nickName)
 
 /// Leaves the given chat room.
 ///
+/// \param roomJid
+///
 /// \return true if the request was sent, false otherwise
 ///
 
-bool QXmppMucManager::leaveRoom(const QString &bareJid)
+bool QXmppMucManager::leaveRoom(const QString &roomJid)
 {
-    if (!m_nickNames.contains(bareJid))
+    if (!m_nickNames.contains(roomJid))
         return false;
-    QString nickName = m_nickNames.take(bareJid);
+    QString nickName = m_nickNames.take(roomJid);
     QXmppPresence packet;
-    packet.setTo(bareJid + "/" + nickName);
+    packet.setTo(roomJid + "/" + nickName);
     packet.setType(QXmppPresence::Unavailable);
     return m_stream->sendPacket(packet);
 }
 
 /// Retrieves the list of participants for the given room.
 ///
+/// \param roomJid
+///
 
-QMap<QString, QXmppPresence> QXmppMucManager::roomParticipants(const QString& bareJid) const
+QMap<QString, QXmppPresence> QXmppMucManager::roomParticipants(const QString& roomJid) const
 {
-    return m_participants.value(bareJid);
+    return m_participants.value(roomJid);
 }
 
 /// Request the configuration form for the given room.
+///
+/// \param roomJid
 ///
 /// \return true if the request was sent, false otherwise
 ///
 /// \sa roomConfigurationReceived()
 ///
 
-bool QXmppMucManager::requestRoomConfiguration(const QString &bareJid)
+bool QXmppMucManager::requestRoomConfiguration(const QString &roomJid)
 {
     QXmppMucOwnerIq iq;
-    iq.setTo(bareJid);
+    iq.setTo(roomJid);
     return m_stream->sendPacket(iq);
 }
 
 /// Send the configuration form for the given room.
 ///
+/// \param roomJid
+/// \param form
+///
 /// \return true if the request was sent, false otherwise
 ///
 
-bool QXmppMucManager::setRoomConfiguration(const QString &bareJid, const QXmppDataForm &form)
+bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form)
 {
     QXmppMucOwnerIq iqPacket;
     iqPacket.setType(QXmppIq::Set);
-    iqPacket.setTo(bareJid);
+    iqPacket.setTo(roomJid);
     iqPacket.setForm(form);
     return m_stream->sendPacket(iqPacket);
 }
 
 /// Send a message to a chat room.
 ///
+/// \param roomJid
+/// \param text
+///
 /// \return true if the message was sent, false otherwise
 ///
 
-bool QXmppMucManager::sendMessage(const QString &bareJid, const QString &text)
+bool QXmppMucManager::sendMessage(const QString &roomJid, const QString &text)
 {
-    if (!m_nickNames.contains(bareJid))
+    if (!m_nickNames.contains(roomJid))
     {
         qWarning("Cannot send message to unknown chat room");
         return false;
     }
     QXmppMessage msg;
     msg.setBody(text);
-    msg.setFrom(bareJid + "/" + m_nickNames[bareJid]);
-    msg.setTo(bareJid);
+    msg.setFrom(roomJid + "/" + m_nickNames[roomJid]);
+    msg.setTo(roomJid);
     msg.setType(QXmppMessage::GroupChat);
     return m_stream->sendPacket(msg);
 }
