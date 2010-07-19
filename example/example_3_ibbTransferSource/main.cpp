@@ -21,10 +21,13 @@
  *
  */
 
+#include <cstdlib>
+#include <cstdio>
 
 #include <QtCore/QCoreApplication>
-#include "ibbClient.h"
+
 #include "QXmppLogger.h"
+#include "ibbClient.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,8 +35,16 @@ int main(int argc, char *argv[])
     
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
+    // we want one argument : "send" or "receive"
+    if (argc != 2 || (strcmp(argv[1], "send") && strcmp(argv[1], "receive")))
+    {
+        fprintf(stderr, "Usage: ibbClient send|receive\n");
+        return EXIT_FAILURE;
+    }
+    const QString username = strcmp(argv[1], "send") ? QLatin1String("client") : QLatin1String("server");
+
     ibbClient client;
     client.getConfiguration().setUseSASLAuthentication( false );
-    client.connectToServer("jabber.geiseri.com", "server", "Passw0rd", "geiseri.com");
+    client.connectToServer("jabber.geiseri.com", username, "Passw0rd", "geiseri.com");
     return a.exec();
 }

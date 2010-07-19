@@ -28,18 +28,26 @@
 #include "QXmppClient.h"
 #include "QXmppTransferManager.h"
 
+class QBuffer;
+
 class ibbClient : public QXmppClient
 {
     Q_OBJECT
 
 public:
     ibbClient(QObject *parent = 0);
+    void sendOnceAvailable(const QString &recipient, const QString &file);
 
-public slots:
+private slots:
     void slotConnected();
     void slotError(QXmppTransferJob::Error error);
+    void slotFileReceived(QXmppTransferJob *job);
     void slotFinished();
     void slotProgress(qint64 done, qint64 total);
+
+private:
+    QString m_sendFile;
+    QString m_sendRecipient;
 };
 
 #endif // IBBCLIENT_H

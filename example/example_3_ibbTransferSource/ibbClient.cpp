@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QBuffer>
 #include <QDebug>
 
 #include "QXmppMessage.h"
@@ -33,16 +33,36 @@
 ibbClient::ibbClient(QObject *parent)
     : QXmppClient(parent)
 {
-    bool check = connect( this, SIGNAL(connected()),
-             this, SLOT(slotConnected()) );
+    bool check = connect(this, SIGNAL(connected()),
+                         this, SLOT(slotConnected()) );
     Q_ASSERT(check);
-    Q_UNUSED(check);
+
+    check = connect(&transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+                    this, SLOT(slotFileReceived(QXmppTransferJob*)));
+    Q_ASSERT(check);
+}
+
+/// Request that the given file be sent to the recipient once he/she is online.
+///
+/// \param recipient
+/// \param file
+
+void ibbClient::sendOnceAvailable(const QString &recipient, const QString &file)
+{
+    m_sendRecipient = recipient;
+    m_sendFile = file;
 }
 
 void ibbClient::slotConnected()
 {
+    const QLatin1String recipient("client@geiseri.com/QXmpp");
+
+    // if we are the recipient, do nothing
+    if (getConfiguration().jid() == recipient)
+        return;
+
     transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
-    QXmppTransferJob *job = transferManager().sendFile( "client@geiseri.com/QXmpp", "ibbClient.cpp" );
+    QXmppTransferJob *job = transferManager().sendFile(recipient, "ibbClient.cpp");
 
     bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
              this, SLOT(slotError(QXmppTransferJob::Error)) );
@@ -57,15 +77,42 @@ void ibbClient::slotConnected()
     Q_ASSERT(check);
 }
 
+/// A file transfer failed.
+
 void ibbClient::slotError(QXmppTransferJob::Error error)
 {
     qDebug() << "Transmission failed:" << error;
 }
 
+/// A file transfer request was received.
+
+void ibbClient::slotFileReceived(QXmppTransferJob *job)
+{
+    qDebug() << "Got transfer request from:" << job->jid();
+
+    bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(slotError(QXmppTransferJob::Error)));
+    Q_ASSERT(check);
+
+    check = connect(job, SIGNAL(finished()), this, SLOT(slotFinished()));
+    Q_ASSERT(check);
+
+    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(slotProgress(qint64,qint64)));
+    Q_ASSERT(check);
+
+    // allocate a buffer to receive the file
+    QBuffer *buffer = new QBuffer(this);
+    buffer->open(QIODevice::WriteOnly);
+    job->accept(buffer);
+}
+
+/// A file transfer finished.
+
 void ibbClient::slotFinished()
 {
     qDebug() << "Transmission finished";
 }
+
+/// A file transfer has made progress.
 
 void ibbClient::slotProgress(qint64 done, qint64 total)
 {
