@@ -45,17 +45,6 @@ xmppClient::xmppClient(QObject *parent)
     Q_ASSERT(check);
 }
 
-/// Request that the given file be sent to the recipient once he/she is online.
-///
-/// \param recipient
-/// \param file
-
-void xmppClient::sendOnceAvailable(const QString &recipient, const QString &file)
-{
-    m_sendRecipient = recipient;
-    m_sendFile = file;
-}
-
 /// A file transfer failed.
 
 void xmppClient::slotError(QXmppTransferJob::Error error)

@@ -36,7 +36,6 @@ class xmppClient : public QXmppClient
 
 public:
     xmppClient(QObject *parent = 0);
-    void sendOnceAvailable(const QString &recipient, const QString &file);
 
 private slots:
     void slotError(QXmppTransferJob::Error error);
@@ -44,10 +43,6 @@ private slots:
     void slotFinished();
     void slotPresenceReceived(const QXmppPresence &presence);
     void slotProgress(qint64 done, qint64 total);
-
-private:
-    QString m_sendFile;
-    QString m_sendRecipient;
 };
 
 #endif // IBBCLIENT_H
