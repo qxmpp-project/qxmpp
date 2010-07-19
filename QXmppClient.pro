@@ -3,4 +3,4 @@ TEMPLATE = subdirs
 SUBDIRS = source \
           example
 
-CONFIG += ordered
+CONFIG += ordered debug_and_release

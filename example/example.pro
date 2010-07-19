@@ -8,3 +8,4 @@ SUBDIRS = example_0_connected\
           example_6_rpcClient\
           example_7_archiveHandling
 
+CONFIG += debug_and_release
