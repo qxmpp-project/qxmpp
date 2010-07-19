@@ -34,6 +34,7 @@ QXmppVCardManager::QXmppVCardManager(QXmppStream* stream, QObject *parent)
     bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCard&)),
         this, SLOT(vCardIqReceived(const QXmppVCard&)));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void QXmppVCardManager::requestVCard(const QString& jid)

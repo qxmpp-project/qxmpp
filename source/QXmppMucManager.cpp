@@ -140,6 +140,7 @@ bool QXmppMucManager::sendMessage(const QString &bareJid, const QString &text)
 
 void QXmppMucManager::mucAdminIqReceived(const QXmppMucAdminIq &iq)
 {
+    Q_UNUSED(iq);
 }
 
 void QXmppMucManager::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
