@@ -105,7 +105,7 @@ private:
     QMap<QString, QXmppRosterManager::QXmppRosterEntry> m_entries;
     // map of resources of the jid and map of resouces and presences
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
-    // flag to store that QXmppRoster has been populated
+    // flag to store that the roster has been populated
     bool m_isRosterReceived;
     // id of the initial roster request
     QString m_rosterReqId;
