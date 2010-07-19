@@ -36,7 +36,7 @@ class QXmppRosterIq;
 class QXmppPresence;
 class QXmppStream;
 
-/// \brief The QXmppRoster class provides access to a connected client's roster.
+/// \brief The QXmppRosterManager class provides access to a connected client's roster.
 ///
 /// \note It's object should not be created using it's constructor. Instead
 /// QXmppClient::rosterManager() should be used to get the reference of instantiated
@@ -49,10 +49,10 @@ class QXmppStream;
 ///
 /// After the sucessfull xmpp connection that after the signal QXmppClient::connected()
 /// is emitted QXmpp requests for getting the roster. Once QXmpp receives the roster
-/// the signal QXmppRoster::rosterReceived() is emitted and after that user can
+/// the signal QXmppRosterManager::rosterReceived() is emitted and after that user can
 /// use the functions of this class to get roster entries.
 ///
-/// Function QXmppRoster::isRosterReceived() tells whether the roster has been
+/// Function QXmppRosterManager::isRosterReceived() tells whether the roster has been
 /// received or not.
 ///
 /// Signals presenceChanged() or rosterChanged() are emitted whenever presence
@@ -60,7 +60,7 @@ class QXmppStream;
 ///
 /// \ingroup Managers
 
-class QXmppRoster : public QObject
+class QXmppRosterManager : public QObject
 {
     Q_OBJECT
 
@@ -68,12 +68,12 @@ public:
     // FIXME : is this class really necessary?
     typedef QXmppRosterIq::Item QXmppRosterEntry;
 
-    QXmppRoster(QXmppStream* stream, QObject *parent = 0);
-    ~QXmppRoster();
+    QXmppRosterManager(QXmppStream* stream, QObject *parent = 0);
+    ~QXmppRosterManager();
     
     bool isRosterReceived();
     QStringList getRosterBareJids() const;
-    QXmppRoster::QXmppRosterEntry getRosterEntry(const QString& bareJid) const;
+    QXmppRosterManager::QXmppRosterEntry getRosterEntry(const QString& bareJid) const;
     
     QStringList getResources(const QString& bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
@@ -83,7 +83,7 @@ public:
 
 
     /// \cond
-    QMap<QString, QXmppRoster::QXmppRosterEntry> Q_DECL_DEPRECATED getRosterEntries() const;
+    QMap<QString, QXmppRosterManager::QXmppRosterEntry> Q_DECL_DEPRECATED getRosterEntries() const;
     QMap<QString, QMap<QString, QXmppPresence> > Q_DECL_DEPRECATED getAllPresences() const;
     /// \endcond
 
@@ -102,7 +102,7 @@ private:
     //reverse pointer to stream
     QXmppStream* m_stream;
     //map of bareJid and its rosterEntry
-    QMap<QString, QXmppRoster::QXmppRosterEntry> m_entries;
+    QMap<QString, QXmppRosterManager::QXmppRosterEntry> m_entries;
     // map of resources of the jid and map of resouces and presences
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
     // flag to store that QXmppRoster has been populated
@@ -117,4 +117,6 @@ private slots:
     void rosterIqReceived(const QXmppRosterIq&);
 };
 
+// FIXME : remove this after next release
+#define QXmppRoster QXmppRosterManager
 #endif // QXMPPROSTER_H

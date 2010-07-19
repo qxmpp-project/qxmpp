@@ -29,7 +29,7 @@
 #include "QXmppPresence.h"
 #include "QXmppStream.h"
 
-QXmppRoster::QXmppRoster(QXmppStream* stream, QObject *parent)
+QXmppRosterManager::QXmppRosterManager(QXmppStream* stream, QObject *parent)
     : QObject(parent),
     m_stream(stream),
     m_isRosterReceived(false)
@@ -51,14 +51,14 @@ QXmppRoster::QXmppRoster(QXmppStream* stream, QObject *parent)
     Q_ASSERT(check);
 }
 
-QXmppRoster::~QXmppRoster()
+QXmppRosterManager::~QXmppRosterManager()
 {
 
 }
 
 /// Upon XMPP connection, request the roster.
 ///
-void QXmppRoster::connected()
+void QXmppRosterManager::connected()
 {
     QXmppRosterIq roster;
     roster.setType(QXmppIq::Get);
@@ -67,14 +67,14 @@ void QXmppRoster::connected()
     m_stream->sendPacket(roster);
 }
 
-void QXmppRoster::disconnected()
+void QXmppRosterManager::disconnected()
 {
-    m_entries = QMap<QString, QXmppRoster::QXmppRosterEntry>();
+    m_entries = QMap<QString, QXmppRosterManager::QXmppRosterEntry>();
     m_presences = QMap<QString, QMap<QString, QXmppPresence> >();
     m_isRosterReceived = false;
 }
 
-void QXmppRoster::presenceReceived(const QXmppPresence& presence)
+void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
 {
     QString jid = presence.from();
     QString bareJid = jidToBareJid(jid);
@@ -102,7 +102,7 @@ void QXmppRoster::presenceReceived(const QXmppPresence& presence)
     }
 }
 
-void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
+void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
 {
     bool isInitial = (m_rosterReqId == rosterIq.id());
 
@@ -161,38 +161,38 @@ void QXmppRoster::rosterIqReceived(const QXmppRosterIq& rosterIq)
 /// \return QStringList list of all the bareJids
 ///
 
-QStringList QXmppRoster::getRosterBareJids() const
+QStringList QXmppRosterManager::getRosterBareJids() const
 {
     return m_entries.keys();
 }
 
 /// Returns the roster entry of the given bareJid. If the bareJid is not in the
-/// database and empty QXmppRoster::QXmppRosterEntry will be returned.
+/// database and empty QXmppRosterManager::QXmppRosterEntry will be returned.
 ///
 /// \param bareJid as a QString
-/// \return QXmppRoster::QXmppRosterEntry
+/// \return QXmppRosterManager::QXmppRosterEntry
 ///
 
-QXmppRoster::QXmppRosterEntry QXmppRoster::getRosterEntry(
+QXmppRosterManager::QXmppRosterEntry QXmppRosterManager::getRosterEntry(
         const QString& bareJid) const
 {
     // will return blank entry if bareJid does'nt exist
     if(m_entries.contains(bareJid))
         return m_entries.value(bareJid);
     else
-        return QXmppRoster::QXmppRosterEntry();
+        return QXmppRosterManager::QXmppRosterEntry();
 }
 
 /// [OBSOLETE] Returns all the roster entries in the database.
 ///
-/// \return Map of bareJid and its respective QXmppRoster::QXmppRosterEntry
+/// \return Map of bareJid and its respective QXmppRosterManager::QXmppRosterEntry
 ///
 /// \note This function is obsolete, use getRosterBareJids() and
 /// getRosterEntry() to get all the roster entries.
 ///
 
-QMap<QString, QXmppRoster::QXmppRosterEntry>
-        QXmppRoster::getRosterEntries() const
+QMap<QString, QXmppRosterManager::QXmppRosterEntry>
+        QXmppRosterManager::getRosterEntries() const
 {
     return m_entries;
 }
@@ -203,7 +203,7 @@ QMap<QString, QXmppRoster::QXmppRosterEntry>
 /// \return list of associated resources as a QStringList
 ///
 
-QStringList QXmppRoster::getResources(const QString& bareJid) const
+QStringList QXmppRosterManager::getResources(const QString& bareJid) const
 {
     if(m_presences.contains(bareJid))
         return m_presences[bareJid].keys();
@@ -219,7 +219,7 @@ QStringList QXmppRoster::getResources(const QString& bareJid) const
 /// \return Map of resource and its respective presence QMap<QString, QXmppPresence>
 ///
 
-QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
+QMap<QString, QXmppPresence> QXmppRosterManager::getAllPresencesForBareJid(
         const QString& bareJid) const
 {
     if(m_presences.contains(bareJid))
@@ -235,7 +235,7 @@ QMap<QString, QXmppPresence> QXmppRoster::getAllPresencesForBareJid(
 /// \return QXmppPresence
 ///
 
-QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
+QXmppPresence QXmppRosterManager::getPresence(const QString& bareJid,
                                        const QString& resource) const
 {
     if(m_presences.contains(bareJid) && m_presences[bareJid].contains(resource))
@@ -253,7 +253,7 @@ QXmppPresence QXmppRoster::getPresence(const QString& bareJid,
 /// and getPresence() or getAllPresencesForBareJid()
 /// to get all the presence entries.
 
-QMap<QString, QMap<QString, QXmppPresence> > QXmppRoster::getAllPresences() const
+QMap<QString, QMap<QString, QXmppPresence> > QXmppRosterManager::getAllPresences() const
 {
     return m_presences;
 }
@@ -262,7 +262,7 @@ QMap<QString, QMap<QString, QXmppPresence> > QXmppRoster::getAllPresences() cons
 ///
 /// \return true if roster received else false
 
-bool QXmppRoster::isRosterReceived()
+bool QXmppRosterManager::isRosterReceived()
 {
     return m_isRosterReceived;
 }

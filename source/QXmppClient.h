@@ -49,7 +49,7 @@ class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppMucManager;
 class QXmppReconnectionManager;
-class QXmppRoster;
+class QXmppRosterManager;
 class QXmppTransferManager;
 class QXmppVCardManager;
 
@@ -62,7 +62,7 @@ class QXmppVCardManager;
 /// It provides the user all the required functionality to connect to the server
 /// and perform operations afterwards.
 ///
-/// This class will provide the handle/reference to QXmppRoster (roster management),
+/// This class will provide the handle/reference to QXmppRosterManager (roster management),
 /// QXmppVCardManager (vCard manager), QXmppReconnectionManager (reconnection
 /// mechanism) and QXmppTransferManager (file transfers).
 ///
@@ -119,7 +119,7 @@ public:
     QXmppArchiveManager& archiveManager();
     QXmppCallManager& callManager();
     QXmppMucManager& mucManager();
-    QXmppRoster& rosterManager();
+    QXmppRosterManager& rosterManager();
     QXmppTransferManager& transferManager();
     QXmppVCardManager& vCardManager();
 
@@ -149,7 +149,7 @@ public:
                                               const QVariant &arg10 = QVariant() );
 
     // deprecated accessors, use the form without "get" instead
-    QXmppRoster Q_DECL_DEPRECATED & getRoster();
+    QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
     QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
@@ -173,8 +173,8 @@ signals:
     ///
     /// After the connected() signal is emitted QXmpp will send the roster request
     /// to the server. On receiving the roster, QXmpp will emit
-    /// QXmppRoster::rosterReceived(). After this signal, QXmppRoster object gets
-    /// populated and you can use rosterManager() to get the handle of QXmppRoster object.
+    /// QXmppRosterManager::rosterReceived(). After this signal, QXmppRosterManager object gets
+    /// populated and you can use rosterManager() to get the handle of QXmppRosterManager object.
     ///
     void connected();
 
@@ -247,7 +247,7 @@ private:
     QXmppCallManager *m_callManager;        ///< Pointer to the call manager
     QXmppMucManager* m_mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
-    QXmppRoster *m_roster;                  ///< Pointer to the roster manager
+    QXmppRosterManager *m_rosterManager;    ///< Pointer to the roster manager
     QXmppTransferManager *m_transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *m_vCardManager;      ///< Pointer to the vCard manager
     QHash<QString,QXmppInvokable *> m_interfaces;

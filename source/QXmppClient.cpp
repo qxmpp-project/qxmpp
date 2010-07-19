@@ -25,7 +25,6 @@
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
 #include "QXmppStream.h"
-#include "QXmppRoster.h"
 #include "QXmppMessage.h"
 
 #include "QXmppArchiveManager.h"
@@ -35,6 +34,7 @@
 #include "QXmppReconnectionManager.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
+#include "QXmppRoster.h"
 #include "QXmppUtils.h"
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
@@ -49,7 +49,7 @@
 /// establishment of the XMPP connection and provide a number of high-level
 /// "managers" to perform specific tasks:
 /// 
-/// \sa QXmppRoster
+/// \sa QXmppRosterManager
 /// \sa QXmppVCardManager
 /// \sa QXmppTransferManager
 ///
@@ -121,7 +121,7 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // create managers
-    m_roster = new QXmppRoster(m_stream, this);
+    m_rosterManager = new QXmppRosterManager(m_stream, this);
     m_archiveManager = new QXmppArchiveManager(m_stream, this);
     m_callManager = new QXmppCallManager(m_stream, this);
     m_mucManager = new QXmppMucManager(m_stream, this);
@@ -294,14 +294,14 @@ bool QXmppClient::isConnected() const
     return m_stream && m_stream->isConnected();
 }
 
-/// Returns the reference to QXmppRoster object of the client.
+/// Returns the reference to QXmppRosterManager object of the client.
 /// \return Reference to the roster object of the connected client. Use this to
 /// get the list of friends in the roster and their presence information.
 ///
 
-QXmppRoster& QXmppClient::rosterManager()
+QXmppRosterManager& QXmppClient::rosterManager()
 {
-    return *m_roster;
+    return *m_rosterManager;
 }
 
 /// Utility function to send message to all the resources associated with the
@@ -617,9 +617,9 @@ void QXmppClient::xmppConnected()
 
 // obsolete
 
-QXmppRoster& QXmppClient::getRoster()
+QXmppRosterManager& QXmppClient::getRoster()
 {
-    return *m_roster;
+    return *m_rosterManager;
 }
 
 QAbstractSocket::SocketError QXmppClient::getSocketError()
