@@ -28,9 +28,9 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "ibbClient.h"
+#include "xmppClient.h"
 
-ibbClient::ibbClient(QObject *parent)
+xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
     bool check = connect(this, SIGNAL(connected()),
@@ -47,13 +47,13 @@ ibbClient::ibbClient(QObject *parent)
 /// \param recipient
 /// \param file
 
-void ibbClient::sendOnceAvailable(const QString &recipient, const QString &file)
+void xmppClient::sendOnceAvailable(const QString &recipient, const QString &file)
 {
     m_sendRecipient = recipient;
     m_sendFile = file;
 }
 
-void ibbClient::slotConnected()
+void xmppClient::slotConnected()
 {
     const QLatin1String recipient("client@geiseri.com/QXmpp");
 
@@ -62,7 +62,7 @@ void ibbClient::slotConnected()
         return;
 
     transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
-    QXmppTransferJob *job = transferManager().sendFile(recipient, "ibbClient.cpp");
+    QXmppTransferJob *job = transferManager().sendFile(recipient, "xmppClient.cpp");
 
     bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
              this, SLOT(slotError(QXmppTransferJob::Error)) );
@@ -79,14 +79,14 @@ void ibbClient::slotConnected()
 
 /// A file transfer failed.
 
-void ibbClient::slotError(QXmppTransferJob::Error error)
+void xmppClient::slotError(QXmppTransferJob::Error error)
 {
     qDebug() << "Transmission failed:" << error;
 }
 
 /// A file transfer request was received.
 
-void ibbClient::slotFileReceived(QXmppTransferJob *job)
+void xmppClient::slotFileReceived(QXmppTransferJob *job)
 {
     qDebug() << "Got transfer request from:" << job->jid();
 
@@ -107,14 +107,14 @@ void ibbClient::slotFileReceived(QXmppTransferJob *job)
 
 /// A file transfer finished.
 
-void ibbClient::slotFinished()
+void xmppClient::slotFinished()
 {
     qDebug() << "Transmission finished";
 }
 
 /// A file transfer has made progress.
 
-void ibbClient::slotProgress(qint64 done, qint64 total)
+void xmppClient::slotProgress(qint64 done, qint64 total)
 {
     qDebug() << "Transmission progress:" << done << "/" << total;
 }

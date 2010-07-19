@@ -27,7 +27,7 @@
 #include <QtCore/QCoreApplication>
 
 #include "QXmppLogger.h"
-#include "ibbClient.h"
+#include "xmppClient.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     }
     const QString username = strcmp(argv[1], "send") ? QLatin1String("client") : QLatin1String("server");
 
-    ibbClient client;
+    xmppClient client;
     client.getConfiguration().setUseSASLAuthentication( false );
     client.connectToServer("jabber.geiseri.com", username, "Passw0rd", "geiseri.com");
     return a.exec();

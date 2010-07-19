@@ -30,12 +30,12 @@
 
 class QBuffer;
 
-class ibbClient : public QXmppClient
+class xmppClient : public QXmppClient
 {
     Q_OBJECT
 
 public:
-    ibbClient(QObject *parent = 0);
+    xmppClient(QObject *parent = 0);
     void sendOnceAvailable(const QString &recipient, const QString &file);
 
 private slots:
