@@ -117,6 +117,4 @@ private slots:
     void rosterIqReceived(const QXmppRosterIq&);
 };
 
-// FIXME : remove this after next release
-#define QXmppRoster QXmppRosterManager
 #endif // QXMPPROSTER_H
