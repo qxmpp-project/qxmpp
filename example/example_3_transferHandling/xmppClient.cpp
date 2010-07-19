@@ -33,6 +33,9 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
+    // comment the following to use all available methods (highly recommended)
+    transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
+
     bool check = connect(this, SIGNAL(connected()),
                          this, SLOT(slotConnected()) );
     Q_ASSERT(check);
@@ -61,7 +64,6 @@ void xmppClient::slotConnected()
     if (getConfiguration().jid() == recipient)
         return;
 
-    transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
     QXmppTransferJob *job = transferManager().sendFile(recipient, "xmppClient.cpp");
 
     bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
