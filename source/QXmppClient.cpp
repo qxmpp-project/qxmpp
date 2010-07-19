@@ -34,7 +34,7 @@
 #include "QXmppReconnectionManager.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRemoteMethod.h"
-#include "QXmppRoster.h"
+#include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"

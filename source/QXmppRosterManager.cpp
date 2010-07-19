@@ -23,7 +23,7 @@
  */
 
 
-#include "QXmppRoster.h"
+#include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 #include "QXmppRosterIq.h"
 #include "QXmppPresence.h"
