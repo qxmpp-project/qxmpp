@@ -73,7 +73,7 @@ public:
     
     bool isRosterReceived();
     QStringList getRosterBareJids() const;
-    QXmppRosterManager::QXmppRosterEntry getRosterEntry(const QString& bareJid) const;
+    QXmppRosterIq::Item getRosterEntry(const QString& bareJid) const;
     
     QStringList getResources(const QString& bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
@@ -83,7 +83,7 @@ public:
 
 
     /// \cond
-    QMap<QString, QXmppRosterManager::QXmppRosterEntry> Q_DECL_DEPRECATED getRosterEntries() const;
+    QMap<QString, QXmppRosterIq::Item> Q_DECL_DEPRECATED getRosterEntries() const;
     QMap<QString, QMap<QString, QXmppPresence> > Q_DECL_DEPRECATED getAllPresences() const;
     /// \endcond
 
@@ -102,7 +102,7 @@ private:
     //reverse pointer to stream
     QXmppStream* m_stream;
     //map of bareJid and its rosterEntry
-    QMap<QString, QXmppRosterManager::QXmppRosterEntry> m_entries;
+    QMap<QString, QXmppRosterIq::Item> m_entries;
     // map of resources of the jid and map of resouces and presences
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
     // flag to store that the roster has been populated

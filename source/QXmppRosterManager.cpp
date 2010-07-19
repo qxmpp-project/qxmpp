@@ -69,7 +69,7 @@ void QXmppRosterManager::connected()
 
 void QXmppRosterManager::disconnected()
 {
-    m_entries = QMap<QString, QXmppRosterManager::QXmppRosterEntry>();
+    m_entries = QMap<QString, QXmppRosterIq::Item>();
     m_presences = QMap<QString, QMap<QString, QXmppPresence> >();
     m_isRosterReceived = false;
 }
@@ -167,31 +167,30 @@ QStringList QXmppRosterManager::getRosterBareJids() const
 }
 
 /// Returns the roster entry of the given bareJid. If the bareJid is not in the
-/// database and empty QXmppRosterManager::QXmppRosterEntry will be returned.
+/// database and empty QXmppRosterIq::Item will be returned.
 ///
 /// \param bareJid as a QString
-/// \return QXmppRosterManager::QXmppRosterEntry
 ///
 
-QXmppRosterManager::QXmppRosterEntry QXmppRosterManager::getRosterEntry(
+QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
         const QString& bareJid) const
 {
     // will return blank entry if bareJid does'nt exist
     if(m_entries.contains(bareJid))
         return m_entries.value(bareJid);
     else
-        return QXmppRosterManager::QXmppRosterEntry();
+        return QXmppRosterIq::Item();
 }
 
 /// [OBSOLETE] Returns all the roster entries in the database.
 ///
-/// \return Map of bareJid and its respective QXmppRosterManager::QXmppRosterEntry
+/// \return Map of bareJid and its respective QXmppRosterIq::Item
 ///
 /// \note This function is obsolete, use getRosterBareJids() and
 /// getRosterEntry() to get all the roster entries.
 ///
 
-QMap<QString, QXmppRosterManager::QXmppRosterEntry>
+QMap<QString, QXmppRosterIq::Item>
         QXmppRosterManager::getRosterEntries() const
 {
     return m_entries;

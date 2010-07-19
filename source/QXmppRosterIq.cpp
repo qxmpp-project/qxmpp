@@ -155,8 +155,6 @@ void QXmppRosterIq::Item::setSubscriptionStatus(const QString& str)
 
 /// Returns the subscription type of the roster entry.
 ///
-/// \return QXmppRosterEntry::SubscriptionType
-///
 
 QXmppRosterIq::Item::SubscriptionType
         QXmppRosterIq::Item::subscriptionType() const
@@ -166,7 +164,7 @@ QXmppRosterIq::Item::SubscriptionType
 
 /// Sets the subscription type of the roster entry.
 ///
-/// \param type as a QXmppRosterEntry::SubscriptionType
+/// \param type
 ///
 
 void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
