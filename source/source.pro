@@ -9,11 +9,11 @@ CONFIG += staticlib \
 # automagically put in debug/release folders, so do the
 # same for other platforms.
 CONFIG(debug, debug|release) { 
-    win32:TARGET = QXmppClient_d
-    !win32:TARGET = debug/QXmppClient_d
+    DESTDIR = debug
+    TARGET = QXmppClient_d
 } else {
-    win32:TARGET = QXmppClient
-    !win32:TARGET = release/QXmppClient
+    DESTDIR = release
+    TARGET = QXmppClient
 }
 
 # Header files
