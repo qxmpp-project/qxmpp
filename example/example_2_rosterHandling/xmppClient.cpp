@@ -21,11 +21,12 @@
  *
  */
 
+#include <iostream>
+
+#include "QXmppMessage.h"
+#include "QXmppRosterManager.h"
 
 #include "xmppClient.h"
-#include "QXmppMessage.h"
-#include "QXmppRoster.h"
-#include <iostream>
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
