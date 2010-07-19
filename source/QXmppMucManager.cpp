@@ -32,15 +32,21 @@ QXmppMucManager::QXmppMucManager(QXmppStream* stream, QObject *parent)
     : QObject(parent),
     m_stream(stream)
 {
-    bool check = connect(stream, SIGNAL(mucAdminIqReceived(const QXmppMucAdminIq&)),
-        this, SLOT(mucAdminIqReceived(const QXmppMucAdminIq&)));
-
-    check = connect(stream, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)),
-        this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
+    bool check = connect(stream, SIGNAL(messageReceived(QXmppMessage)),
+        this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
-    check = QObject::connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)),
-        this, SLOT(presenceReceived(const QXmppPresence&)));
+    check = connect(stream, SIGNAL(mucAdminIqReceived(QXmppMucAdminIq)),
+        this, SLOT(mucAdminIqReceived(QXmppMucAdminIq)));
+    Q_ASSERT(check);
+
+    check = connect(stream, SIGNAL(mucOwnerIqReceived(QXmppMucOwnerIq)),
+        this, SLOT(mucOwnerIqReceived(QXmppMucOwnerIq)));
+    Q_ASSERT(check);
+
+    check = QObject::connect(m_stream, SIGNAL(presenceReceived(QXmppPresence)),
+        this, SLOT(presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
 }
 
 /// Joins the given chat room with the requested nickname.
@@ -130,6 +136,30 @@ bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDa
     return m_stream->sendPacket(iqPacket);
 }
 
+/// Invite a user to a chat room.
+///
+/// \param roomJid
+/// \param jid
+/// \param reason
+///
+/// \return true if the message was sent, false otherwise
+///
+
+bool QXmppMucManager::sendInvitation(const QString &roomJid, const QString &jid, const QString &reason)
+{
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_conference);
+    x.setAttribute("jid", roomJid);
+    x.setAttribute("reason", reason);
+
+    QXmppMessage message;
+    message.setTo(jid);
+    message.setType(QXmppMessage::Normal);
+    message.setExtensions(x);
+    return m_stream->sendPacket(message);
+}
+
 /// Send a message to a chat room.
 ///
 /// \param roomJid
@@ -151,6 +181,24 @@ bool QXmppMucManager::sendMessage(const QString &roomJid, const QString &text)
     msg.setTo(roomJid);
     msg.setType(QXmppMessage::GroupChat);
     return m_stream->sendPacket(msg);
+}
+
+void QXmppMucManager::messageReceived(const QXmppMessage &msg)
+{
+    if (msg.type() != QXmppMessage::Normal)
+        return;
+
+    // process room invitations
+    foreach (const QXmppElement &extension, msg.extensions())
+    {
+        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
+        {
+            const QString roomJid = extension.attribute("jid");
+            if (!roomJid.isEmpty() && !m_nickNames.contains(roomJid))
+                emit invitationReceived(roomJid, msg.from(), extension.attribute("reason"));
+            break;
+        }
+    }
 }
 
 void QXmppMucManager::mucAdminIqReceived(const QXmppMucAdminIq &iq)

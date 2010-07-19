@@ -30,6 +30,7 @@
 #include "QXmppPresence.h"
 
 class QXmppDataForm;
+class QXmppMessage;
 class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppStream;
@@ -52,15 +53,22 @@ public:
     bool requestRoomConfiguration(const QString &roomJid);
     bool setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form);
 
+    bool sendInvitation(const QString &roomJid, const QString &jid, const QString &reason);
     bool sendMessage(const QString &roomJid, const QString &text);
 
     QMap<QString, QXmppPresence> roomParticipants(const QString& bareJid) const;
 
 signals:
+    /// This signal is emitted when an invitation to a chat room is received.
+    void invitationReceived(const QString &roomJid, const QString &inviter, const QString &reason);
+
+    /// This signal is emitted when the configuration form for a chat room is received.
     void roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &configuration);
+
     void roomParticipantChanged(const QString &roomJid, const QString &nickName);
 
 private slots:
+    void messageReceived(const QXmppMessage &message);
     void mucAdminIqReceived(const QXmppMucAdminIq &iq);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void presenceReceived(const QXmppPresence &presence);
