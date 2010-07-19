@@ -38,6 +38,7 @@ class QXmppRosterIq : public QXmppIq
 {
 public:
 
+    /// \brief The QXmppRosterIq::Item represents a roster entry.
     class Item
     {
     public:
@@ -69,11 +70,11 @@ public:
         void setSubscriptionStatus(const QString&);
         void setSubscriptionType(SubscriptionType);
 
+        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
-        
+
         // deprecated accessors, use the form without "get" instead
-        /// \cond
         SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
         QString Q_DECL_DEPRECATED getName() const;
         QString Q_DECL_DEPRECATED getSubscriptionStatus() const;
