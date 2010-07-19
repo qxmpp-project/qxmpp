@@ -401,95 +401,159 @@ QXmppJingleCandidate::QXmppJingleCandidate()
 {
 }
 
+/// Returns the candidate's component ID.
+ 
 int QXmppJingleCandidate::component() const
 {
     return m_component;
 }
+
+/// Sets the candidates's component ID.
+///
+/// \param component
 
 void QXmppJingleCandidate::setComponent(int component)
 {
     m_component = component;
 }
 
+/// Returns the candidate's foundation.
+
 int QXmppJingleCandidate::foundation() const
 {
     return m_foundation;
 }
+
+/// Sets the candidate's foundation.
+///
+/// \param foundation
 
 void QXmppJingleCandidate::setFoundation(int foundation)
 {
     m_foundation = foundation;
 }
 
+/// Returns the candidate's host address.
+///
+
 QHostAddress QXmppJingleCandidate::host() const
 {
     return m_host;
 }
+
+/// Sets the candidate's host address.
+///
+/// \param host
 
 void QXmppJingleCandidate::setHost(const QHostAddress &host)
 {
     m_host = host;
 }
 
+/// Returns the candidate's unique identifier.
+///
+
 QString QXmppJingleCandidate::id() const
 {
     return m_id;
 }
+
+/// Sets the candidate's unique identifier.
+///
+/// \param id
 
 void QXmppJingleCandidate::setId(const QString &id)
 {
     m_id = id;
 }
 
+/// Returns the network index (starting at 0) the candidate is on.
+///
+
 int QXmppJingleCandidate::network() const
 {
     return m_network;
 }
+
+/// Sets the network index (starting at 0) the candidate is on.
+///
+/// \param network
 
 void QXmppJingleCandidate::setNetwork(int network)
 {
     m_network = network;
 }
 
-int QXmppJingleCandidate::priority() const
-{
-    return m_priority;
-}
-
-void QXmppJingleCandidate::setPriority(int priority)
-{
-    m_priority = priority;
-}
-
-QString QXmppJingleCandidate::protocol() const
-{
-    return m_protocol;
-}
-
-void QXmppJingleCandidate::setProtocol(const QString &protocol)
-{
-    m_protocol = protocol;
-}
+/// Returns the candidate's port number.
+///
 
 quint16 QXmppJingleCandidate::port() const
 {
     return m_port;
 }
 
+/// Sets the candidate's port number.
+///
+/// \param port
+
 void QXmppJingleCandidate::setPort(quint16 port)
 {
     m_port = port;
 }
+
+/// Returns the candidate's priority.
+///
+
+int QXmppJingleCandidate::priority() const
+{
+    return m_priority;
+}
+
+/// Sets the candidate's priority.
+///
+/// \param priority
+
+void QXmppJingleCandidate::setPriority(int priority)
+{
+    m_priority = priority;
+}
+
+/// Returns the candidate's protocol (e.g. "udp").
+///
+
+QString QXmppJingleCandidate::protocol() const
+{
+    return m_protocol;
+}
+
+/// Sets the candidate's protocol (e.g. "udp").
+///
+/// \param protocol
+
+void QXmppJingleCandidate::setProtocol(const QString &protocol)
+{
+    m_protocol = protocol;
+}
+
+/// Returns the candidate type (e.g. "host").
+///
 
 QString QXmppJingleCandidate::type() const
 {
     return m_type;
 }
 
+/// Sets the candidate type (e.g. "host").
+///
+/// \param type
+
 void QXmppJingleCandidate::setType(const QString &type)
 {
     m_type = type;
 }
+
+/// Returns true if the host address or port are empty.
+///
 
 bool QXmppJingleCandidate::isNull() const
 {

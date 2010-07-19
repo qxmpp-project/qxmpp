@@ -29,7 +29,7 @@
 #include "QXmppIq.h"
 
 /// \brief The QXmppJinglePayloadType class represents a payload type
-/// as specified by XEP-0167: Jingle RTP Sessions.
+/// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
 ///
 
 class QXmppJinglePayloadType
@@ -55,8 +55,10 @@ public:
     unsigned int ptime() const;
     void setPtime(unsigned int ptime);
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 
     bool operator==(const QXmppJinglePayloadType &other) const;
 
@@ -107,8 +109,10 @@ public:
 
     bool isNull() const;
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     int m_component;
@@ -185,8 +189,10 @@ public:
         QString transportPassword() const;
         void setTransportPassword(const QString &password);
 
+        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
+        /// \endcond
 
     private:
         QString m_creator;
@@ -240,8 +246,10 @@ public:
         Type type() const;
         void setType(Type type);
 
+        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
+        /// \endcond
 
     private:
         QString m_text;
