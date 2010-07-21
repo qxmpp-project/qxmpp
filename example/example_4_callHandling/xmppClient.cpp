@@ -22,10 +22,11 @@
  *
  */
 
-#include <QBuffer>
+#include <QAudioInput>
+#include <QAudioOutput>
 #include <QDebug>
 
-#include "QXmppMessage.h"
+#include "QXmppCallManager.h"
 #include "QXmppUtils.h"
 
 #include "xmppClient.h"
@@ -53,15 +54,36 @@ void xmppClient::slotCallReceived(QXmppCall *call)
 
     check = connect(call, SIGNAL(finished()), this, SLOT(slotFinished()));
     Q_ASSERT(check);
+
+    // accept call    
+    call->accept();
 }
 
 /// A call connected.
 
 void xmppClient::slotConnected()
 {
+    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    Q_ASSERT(call);
+
     qDebug() << "Call connected";
 
-    // FIXME : show how to use QAudioInput and QAudioOutput
+    // prepare audio format
+    QAudioFormat format;
+    format.setFrequency(call->payloadType().clockrate());
+    format.setChannels(call->payloadType().channels());
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+
+    // initialise audio output
+    QAudioOutput *audioOutput = new QAudioOutput(format, this);
+    audioOutput->start(call);
+
+    // initialise audio input
+    QAudioInput *audioInput = new QAudioInput(format, this);
+    audioInput->start(call); 
 }
 
 /// A call finished.
@@ -85,7 +107,7 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // start the call and connect to the its signals
-    QXmppCall *call = callManager().call(recipient);
+    QXmppCall *call = callManager().call(presence.from());
 
     bool check = connect(call, SIGNAL(connected()), this, SLOT(slotConnected()));
     Q_ASSERT(check);

@@ -26,9 +26,8 @@
 #define XMPPCLIENT_H
 
 #include "QXmppClient.h"
-#include "QXmppCallManager.h"
 
-class QBuffer;
+class QXmppCall;
 
 class xmppClient : public QXmppClient
 {
