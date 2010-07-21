@@ -76,6 +76,12 @@ public:
     bool isSequential() const;
 
 signals:
+    /// This signal is emitted when a call is connected.
+    ///
+    /// Once this signal is emitted, you can connect a QAudioOutput and
+    /// QAudioInput to the call.
+    void connected();
+
     /// This signal is emitted when a call is finished.
     ///
     /// Note: Do not delete the call in the slot connected to this signal,

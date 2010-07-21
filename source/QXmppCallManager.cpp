@@ -245,6 +245,7 @@ void QXmppCall::updateOpenMode()
     {
         open(QIODevice::ReadWrite);
         setState(ActiveState);
+        emit connected();
     }
 }
 
