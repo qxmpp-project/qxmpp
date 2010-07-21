@@ -4,6 +4,12 @@ QT += network \
 CONFIG += staticlib \
     debug_and_release
 
+# To disable the dependency on QtGui, uncomment the following:
+# DEFINES += QXMPP_NO_GUI
+
+# To enable support for the Speex codec, uncomment the following:
+# DEFINES += QXMPP_USE_SPEEX
+
 # Make sure the library gets built in the same location
 # regardless of the platform. On win32 the library is
 # automagically put in debug/release folders, so do the
