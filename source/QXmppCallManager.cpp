@@ -118,6 +118,7 @@ void QXmppCall::terminate()
 
     close();
     m_socket->close();
+    m_rtcpSocket->close();
 
     // emit signals later
     QTimer::singleShot(0, this, SLOT(terminated()));
