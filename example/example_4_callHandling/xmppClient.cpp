@@ -87,10 +87,10 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     // start the call and connect to the its signals
     QXmppCall *call = callManager().call(recipient);
 
-    bool check = connect(job, SIGNAL(connected()), this, SLOT(slotConnected()));
+    bool check = connect(call, SIGNAL(connected()), this, SLOT(slotConnected()));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()), this, SLOT(slotFinished()));
+    check = connect(call, SIGNAL(finished()), this, SLOT(slotFinished()));
     Q_ASSERT(check);
 }
 
