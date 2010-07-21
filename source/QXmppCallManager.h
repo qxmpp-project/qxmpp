@@ -40,7 +40,7 @@ class QXmppStunSocket;
 /// The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
 /// It acts as a QIODevice so that you can read / write audio samples, for
-/// instance using a QAudioInput and/or QAudioOutput.
+/// instance using a QAudioOutput and a QAudioInput.
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
@@ -72,14 +72,18 @@ public:
     QXmppCall::State state() const;
 
     QXmppJinglePayloadType payloadType() const;
+
+    /// \cond
     qint64 bytesAvailable() const;
     bool isSequential() const;
+    /// \endcond
 
 signals:
     /// This signal is emitted when a call is connected.
     ///
     /// Once this signal is emitted, you can connect a QAudioOutput and
-    /// QAudioInput to the call.
+    /// QAudioInput to the call. You can determine the appropriate clockrate
+    /// and the number of channels by calling payloadType().
     void connected();
 
     /// This signal is emitted when a call is finished.
@@ -95,9 +99,6 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
     /// This signal is emitted when the call state changes.
-    ///
-    /// Once the state is QXmppCall::ActiveState, you can connect
-    /// a QAudioOutput and QAudioInput to the call.
     void stateChanged(QXmppCall::State state);
 
 public slots:
@@ -112,8 +113,10 @@ private slots:
     void terminated();
 
 protected:
+    /// \cond
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);
+    /// \endcond
 
 private:
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
@@ -173,7 +176,6 @@ private:
 /// packets.
 ///
 /// \ingroup Managers
-/// \note THIS API IS NOT FINALIZED YET
 
 class QXmppCallManager : public QObject
 {
