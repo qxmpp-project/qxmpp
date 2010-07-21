@@ -88,14 +88,11 @@ signals:
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
-    /// This signal is emitted when the call state.
-    void stateChanged(QXmppCall::State state);
-
-    /// This signal is emitted when the read/write mode changes.
+    /// This signal is emitted when the call state changes.
     ///
-    /// You can connect to this signal to know when you can bind a
-    /// QAudioInput and/or QAudioOutput to the call.
-    void openModeChanged(QIODevice::OpenMode);
+    /// Once the state is QXmppCall::ActiveState, you can connect
+    /// a QAudioOutput and QAudioInput to the call.
+    void stateChanged(QXmppCall::State state);
 
 public slots:
     void accept();
@@ -141,7 +138,6 @@ private:
     qint64 m_writtenSinceLastEmit;
 
     // RTP
-    bool m_buffered;
     QXmppCodec *m_codec;
 
     QByteArray m_incomingBuffer;

@@ -54,7 +54,6 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     m_state(OfferState),
     m_signalsEmitted(false),
     m_writtenSinceLastEmit(0),
-    m_buffered(false),
     m_codec(0),
     m_incomingBuffering(true),
     m_incomingMinimum(0),
@@ -126,7 +125,6 @@ void QXmppCall::terminate()
 
 void QXmppCall::terminated()
 {
-    emit openModeChanged(openMode());
     emit stateChanged(m_state);
     emit finished();
 }
@@ -242,26 +240,10 @@ void QXmppCall::setRemotePassword(const QString &password)
 void QXmppCall::updateOpenMode()
 {
     // determine mode
-    QIODevice::OpenMode mode = QIODevice::NotOpen;
-    if (m_codec && m_socket->isConnected())
+    if (m_codec && m_socket->isConnected() && m_state != ActiveState)
     {
-        // update state
+        open(QIODevice::ReadWrite);
         setState(ActiveState);
-
-        // check whether we are buffering
-        if (m_incomingBuffer.size() >= m_incomingMinimum)
-            m_incomingBuffering = false;
-        if (m_incomingBuffering)
-            mode = QIODevice::WriteOnly;
-        else
-            mode = QIODevice::ReadWrite;
-    }
-
-    // update mode
-    if (mode != openMode())
-    {
-        open(mode);
-        emit openModeChanged(mode);
     }
 }
 
@@ -335,8 +317,11 @@ void QXmppCall::datagramReceived(const QByteArray &buffer)
     output.setByteOrder(QDataStream::LittleEndian);
     m_codec->decode(stream, output);
 
-    updateOpenMode();
-    emit readyRead();
+    // check whether we have filled the initial buffer
+    if (m_incomingBuffer.size() >= m_incomingMinimum)
+        m_incomingBuffering = false;
+    if (!m_incomingBuffering)
+        emit readyRead();
 }
 
 /// Returns the call's session identifier.
@@ -367,6 +352,13 @@ void QXmppCall::setState(QXmppCall::State state)
 
 qint64 QXmppCall::readData(char * data, qint64 maxSize)
 {
+    // if we are filling the buffer, return empty samples
+    if (m_incomingBuffering)
+    {
+        memset(data, 0, maxSize);
+        return maxSize;
+    }
+
     qint64 readSize = qMin(maxSize, qint64(m_incomingBuffer.size()));
     memcpy(data, m_incomingBuffer.constData(), readSize);
     m_incomingBuffer.remove(0, readSize);
