@@ -317,13 +317,12 @@ QXmppSpeexCodec::~QXmppSpeexCodec()
 
 qint64 QXmppSpeexCodec::encode(QDataStream &input, QDataStream &output)
 {
-    qint64 samples = 0;
     QByteArray pcm_buffer(frame_samples * 2, 0);
     const int length = input.readRawData(pcm_buffer.data(), pcm_buffer.size());
     if (length != pcm_buffer.size())
     {
         qWarning() << "Read only read" << length << "bytes";
-        return samples;
+        return 0;
     }
     speex_bits_reset(encoder_bits);
     speex_encode_int(encoder_state, (short*)pcm_buffer.data(), encoder_bits);
@@ -335,8 +334,6 @@ qint64 QXmppSpeexCodec::encode(QDataStream &input, QDataStream &output)
 
 qint64 QXmppSpeexCodec::decode(QDataStream &input, QDataStream &output)
 {
-    qint64 samples = 0;
-    quint8 g711;
     const int length = input.device()->bytesAvailable();
     QByteArray speex_buffer(length, 0);
     input.readRawData(speex_buffer.data(), speex_buffer.size());
