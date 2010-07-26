@@ -97,11 +97,11 @@ QXmppStream::QXmppStream(QObject *parent)
     Q_ASSERT(check);
 
     // XEP-0199: XMPP Ping
-    m_pingTimer = new QTimer();
+    m_pingTimer = new QTimer(this);
     check = QObject::connect(m_pingTimer, SIGNAL(timeout()), this, SLOT(pingSend()));
     Q_ASSERT(check);
 
-    m_timeoutTimer = new QTimer();
+    m_timeoutTimer = new QTimer(this);
     m_timeoutTimer->setSingleShot(true);
     check = QObject::connect(m_timeoutTimer, SIGNAL(timeout()), this, SLOT(pingTimeout()));
     Q_ASSERT(check);
