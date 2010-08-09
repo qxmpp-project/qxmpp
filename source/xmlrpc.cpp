@@ -115,7 +115,7 @@ QVariant XMLRPC::demarshall(const QDomElement &elem, QStringList &errors)
     }
     else if( typeName == "boolean" )
         return QVariant( ( typeData.text().toLower() == "true" || typeData.text() == "1")?true:false );
-    else if( typeName == "datetime" || typeName == "dateTime.iso8601" )
+    else if( typeName == "datetime" || typeName == "datetime.iso8601" )
         return QVariant( QDateTime::fromString( typeData.text(), Qt::ISODate ) );
     else if( typeName == "array" )
     {

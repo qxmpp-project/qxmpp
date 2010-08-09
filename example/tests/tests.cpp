@@ -323,15 +323,6 @@ void TestJingle::testRinging()
 
 static void checkVariant(const QVariant &value, const QByteArray &xml)
 {
-    // parse
-    QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
-    QDomElement element = doc.documentElement();
-    QStringList errors;
-    QVariant test = XMLRPC::demarshall(element, errors);
-    QCOMPARE(errors, QStringList());
-    QCOMPARE(test, value);
-
     // serialise
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
@@ -340,6 +331,17 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     qDebug() << "expect " << xml;
     qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
+
+    // parse
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    QDomElement element = doc.documentElement();
+    QStringList errors;
+    QVariant test = XMLRPC::demarshall(element, errors);
+    if (!errors.isEmpty())
+        qDebug() << errors;
+    QCOMPARE(errors, QStringList());
+    QCOMPARE(test, value);
 }
 
 void TestXmlRpc::testBool()
@@ -349,6 +351,12 @@ void TestXmlRpc::testBool()
                  QByteArray("<value><boolean>false</boolean></value>"));
     checkVariant(true,
                  QByteArray("<value><boolean>true</boolean></value>"));
+}
+
+void TestXmlRpc::testDateTime()
+{
+    checkVariant(QDateTime(QDate(1998, 7, 17), QTime(14, 8, 55)),
+                 QByteArray("<value><dateTime.iso8601>1998-07-17T14:08:55</dateTime.iso8601></value>"));
 }
 
 void TestXmlRpc::testDouble()
