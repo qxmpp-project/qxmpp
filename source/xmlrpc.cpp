@@ -5,32 +5,6 @@
 #include <QStringList>
 #include <QTextStream>
 
-XMLRPC::RequestMessage::RequestMessage( const QByteArray &method, const QList<QVariant> &args )
-: MessageBase()
-{
-    m_method = method;
-    m_args = args;
-}
-
-void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
-{
-    writer->writeStartElement("methodCall");
-    writer->writeTextElement("methodName", m_method );
-    if( !m_args.isEmpty() )
-    {
-        writer->writeStartElement("params");
-        foreach( QVariant arg, m_args)
-        {
-            writer->writeStartElement("param");
-            marshall( writer, arg );
-            writer->writeEndElement();
-        }
-        writer->writeEndElement();
-    }
-    writer->writeEndElement();
-
-}
-
 void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &value ) const
 {
     writer->writeStartElement("value");
@@ -99,43 +73,6 @@ void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &va
         }
     }
     writer->writeEndElement();
-}
-
-XMLRPC::ResponseMessage::ResponseMessage( const QDomElement &element )
-{
-    const QDomElement contents = element.firstChild().toElement();
-    if( contents.tagName().toLower() == "params")
-    {
-        QDomNode param = contents.firstChild();
-        while( !param.isNull() && isValid() )
-        {
-            m_values.append( demarshall( param.firstChild().toElement() ) );
-            param = param.nextSibling();
-        }
-    }
-    else if( contents.tagName().toLower() == "fault")
-    {
-        const QDomElement errElement = contents.firstChild().toElement();
-        const QVariant error = demarshall( errElement );
-
-        setError( QString("XMLRPC Fault %1: %2")
-                        .arg(error.toMap()["faultCode"].toString() )
-                        .arg(error.toMap()["faultString"].toString() ) );
-    }
-    else
-    {
-        setError("Bad XML response");
-    }
-}
-
-int XMLRPC::ResponseMessage::count() const
-{
-    return m_values.count();
-}
-
-QVariant XMLRPC::ResponseMessage::value( int index) const
-{
-    return m_values[index];
 }
 
 bool XMLRPC::MessageBase::isValid() const
@@ -243,10 +180,39 @@ XMLRPC::MessageBase::~MessageBase( )
 {
 }
 
-
-QList< QVariant > XMLRPC::ResponseMessage::values() const
+XMLRPC::RequestMessage::RequestMessage( const QByteArray &method, const QList<QVariant> &args )
+: MessageBase()
 {
-    return m_values;
+    m_method = method;
+    m_args = args;
+}
+
+XMLRPC::RequestMessage::RequestMessage( const QDomElement  &element )
+{
+    m_args.clear();
+    m_method.clear();
+
+    const QDomElement methodName = element.firstChildElement("methodName");
+    if( !methodName.isNull() )
+    {
+        m_method = methodName.text().toLatin1();
+    }
+    else
+    {
+        setError("Missing methodName property.");
+        return;
+    }
+
+    const QDomElement methodParams = element.firstChildElement("params");
+    if( !methodParams.isNull() )
+    {
+        QDomNode param = methodParams.firstChild();
+        while( !param.isNull() && isValid() )
+        {
+            m_args.append( demarshall( param.firstChild().toElement() ) );
+            param = param.nextSibling();
+        }
+    }
 }
 
 QList< QVariant > XMLRPC::RequestMessage::args() const
@@ -259,32 +225,59 @@ QByteArray XMLRPC::RequestMessage::method() const
     return m_method;
 }
 
-XMLRPC::RequestMessage::RequestMessage( const QDomElement  &element )
+void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
 {
-    m_args.clear();
-    m_method.clear();
-
-    const QDomElement methodName = element.firstChildElement("methodName");
-    if( !methodName.isNull() )
+    writer->writeStartElement("methodCall");
+    writer->writeTextElement("methodName", m_method );
+    if( !m_args.isEmpty() )
     {
-            m_method = methodName.text().toLatin1();
+        writer->writeStartElement("params");
+        foreach( QVariant arg, m_args)
+        {
+            writer->writeStartElement("param");
+            marshall( writer, arg );
+            writer->writeEndElement();
+        }
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
+}
+
+XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )
+: MessageBase(), m_values(theValue)
+{
+}
+
+XMLRPC::ResponseMessage::ResponseMessage( const QDomElement &element )
+{
+    const QDomElement contents = element.firstChild().toElement();
+    if( contents.tagName().toLower() == "params")
+    {
+        QDomNode param = contents.firstChild();
+        while( !param.isNull() && isValid() )
+        {
+            m_values.append( demarshall( param.firstChild().toElement() ) );
+            param = param.nextSibling();
+        }
+    }
+    else if( contents.tagName().toLower() == "fault")
+    {
+        const QDomElement errElement = contents.firstChild().toElement();
+        const QVariant error = demarshall( errElement );
+
+        setError( QString("XMLRPC Fault %1: %2")
+                        .arg(error.toMap()["faultCode"].toString() )
+                        .arg(error.toMap()["faultString"].toString() ) );
     }
     else
     {
-            setError("Missing methodName property.");
-            return;
+        setError("Bad XML response");
     }
+}
 
-    const QDomElement methodParams = element.firstChildElement("params");
-    if( !methodParams.isNull() )
-    {
-            QDomNode param = methodParams.firstChild();
-            while( !param.isNull() && isValid() )
-            {
-                    m_args.append( demarshall( param.firstChild().toElement() ) );
-                    param = param.nextSibling();
-            }
-    }
+QList< QVariant > XMLRPC::ResponseMessage::values() const
+{
+    return m_values;
 }
 
 void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
@@ -305,13 +298,3 @@ void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
     writer->writeEndElement();
 }
 
-XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )
-: MessageBase(), m_values(theValue)
-{
-}
-
-XMLRPC::ResponseMessage::ResponseMessage( const QVariant & theValue )
-: MessageBase()
-{
-    m_values << theValue;
-}

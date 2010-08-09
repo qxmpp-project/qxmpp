@@ -22,7 +22,7 @@
 *    ResponseMessage resp( SomeHttpDispatchObject( msg.xml() ) );
 *    if( resp.isValid() )
 *    {
-*        int rows = resp.value().toMap()["widgets"].toInt();
+*        int rows = resp.values().first().toMap()["widgets"].toInt();
 *    }
 *    else
 *        qWarning("Error: %s", resp.error().latin1() );
@@ -121,26 +121,7 @@ public:
      */
     ResponseMessage( const QList< QVariant >& theValue );
 
-    /**
-     * Create a new response message with data. This is exactly like
-     * the above method save for it only takes a single QVariant.
-     */
-    explicit ResponseMessage( const QVariant& theValue );
-
     virtual ~ResponseMessage() {;}
-
-    /**
-    * Returns the number of data elements.  Usually this is only
-    * 1 element, but some services will return mutiple messages in
-    * a single xmlrpc packet.
-    */
-    int count() const;
-
-    /**
-    * Returns the native value for an xmlrpc message at an offset.
-    * Usually this method can be called with no arguments.
-    */
-    QVariant value( int idx = 0 ) const;
 
     /**
     * Return the xml representation of the packet.

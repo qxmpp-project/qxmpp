@@ -67,12 +67,12 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
     QDomElement methodElement = queryElement.firstChildElement("methodResponse");
 
     XMLRPC::ResponseMessage message( methodElement );
-    m_payload = message.value();
+    m_payload = message.values().first();
 }
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    XMLRPC::ResponseMessage message( m_payload );
+    XMLRPC::ResponseMessage message(QList<QVariant>() << m_payload );
     writer->writeStartElement(ns_rpc, "query");
     message.writeXml(writer);
     writer->writeEndElement();
