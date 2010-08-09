@@ -491,7 +491,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
                 resultIq.setFrom(m_stream->configuration().jid());
-                resultIq.setPayload(result);
+                resultIq.setPayload(QVariantList() << result);
                 m_stream->sendPacket( resultIq );
                 return;
             }

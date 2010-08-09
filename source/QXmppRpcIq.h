@@ -12,8 +12,8 @@ class QXmppRpcResponseIq : public QXmppIq
 public:
     QXmppRpcResponseIq();
 
-    QVariant payload() const;
-    void setPayload( const QVariant &payload );
+    QVariantList payload() const;
+    void setPayload( const QVariantList &payload );
 
     static bool isRpcResponseIq(const QDomElement &element);
 
@@ -22,7 +22,7 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
-    QVariant m_payload;
+    QVariantList m_payload;
 };
 
 class QXmppRpcInvokeIq : public QXmppIq

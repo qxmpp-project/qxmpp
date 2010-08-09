@@ -43,12 +43,12 @@ QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
 {
 }
 
-QVariant QXmppRpcResponseIq::payload() const
+QVariantList QXmppRpcResponseIq::payload() const
 {
     return m_payload;
 }
 
-void QXmppRpcResponseIq::setPayload( const QVariant &payload )
+void QXmppRpcResponseIq::setPayload( const QVariantList &payload )
 {
     m_payload = payload;
 }
@@ -68,12 +68,12 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 
     XMLRPC::ResponseMessage message;
     if (message.parse(methodElement))
-        m_payload = message.values().first();
+        m_payload = message.values();
 }
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    XMLRPC::ResponseMessage message(QList<QVariant>() << m_payload );
+    XMLRPC::ResponseMessage message(m_payload);
     writer->writeStartElement(ns_rpc, "query");
     message.writeXml(writer);
     writer->writeEndElement();
@@ -137,7 +137,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     QString methodName = m_interface + "." + m_method;
-    XMLRPC::RequestMessage message( methodName.toLatin1() ,m_payload );
+    XMLRPC::RequestMessage message( methodName.toLatin1(), m_payload );
     writer->writeStartElement(ns_rpc, "query");
     message.writeXml(writer);
     writer->writeEndElement();

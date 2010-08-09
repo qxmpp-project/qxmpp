@@ -1,9 +1,10 @@
 #ifndef PACKET_H
 #define PACKET_H
-#include <QXmlStreamWriter>
-#include <QVariant>
+
 #include <QDomElement>
-#include <QList>
+#include <QVariant>
+#include <QXmlStreamWriter>
+
 /**
 * Packets are serialized QVariants that map to XMLRPC types.
 * @li int -> int
@@ -51,7 +52,7 @@ public:
     /**
     * Creates a method packet that will call method with a list of args.
     */
-    RequestMessage(const QByteArray &method = QByteArray(), const QList<QVariant> &args = QList<QVariant>());
+    RequestMessage(const QByteArray &method = QByteArray(), const QVariantList &args = QVariantList());
 
     /**
     * Parse an xml packet.
@@ -64,11 +65,11 @@ public:
     void writeXml( QXmlStreamWriter *writer ) const;
 
     QByteArray method() const;
-    QList< QVariant > args() const;
+    QVariantList args() const;
 
 private:
     QByteArray m_method;
-    QList<QVariant> m_args;
+    QVariantList m_args;
 };
 
 /**
@@ -81,7 +82,7 @@ public:
     /**
      * Create a new response message with data.
      */
-    ResponseMessage(const QList<QVariant> &theValue = QList<QVariant>());
+    ResponseMessage(const QVariantList &values = QVariantList());
 
     /**
     * Parse an xml packet.
@@ -93,7 +94,7 @@ public:
     */
     void writeXml( QXmlStreamWriter *writer ) const;
 
-    QList< QVariant > values() const;
+    QVariantList values() const;
 
 private:
     QList<QVariant> m_values;
