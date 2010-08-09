@@ -57,6 +57,7 @@ class QXmppJingleIq;
 class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppStreamInitiationIq;
+class QXmppStreamPrivate;
 class QXmppVersionIq;
 
 class QXmppStream : public QObject
@@ -151,9 +152,7 @@ private:
     QString m_sessionId;
     QString m_bindId;
     QByteArray m_dataBuffer;
-    QSslSocket m_socket;
     bool m_sessionAvailable;
-    QAbstractSocket::SocketError m_socketError;
     QString m_streamId;
     QString m_nonSASLAuthId;
     QString m_XMPPVersion;
@@ -182,6 +181,8 @@ private:
     bool hasEndStreamElement(const QByteArray&);
 
     void flushDataBuffer();
+
+    QXmppStreamPrivate * const d;
 };
 
 #endif // QXMPPSTREAM_H

@@ -60,11 +60,19 @@ static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
 static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream:stream xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\" xmlns=\"jabber:client\" xml:lang=\"en\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\">\n";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
+class QXmppStreamPrivate
+{
+public:
+    QSslSocket socket;
+    QAbstractSocket::SocketError socketError;
+};
+
 QXmppStream::QXmppStream(QObject *parent)
     : QObject(parent),
     m_logger(0),
     m_sessionAvailable(false),
-    m_authStep(0)
+    m_authStep(0),
+    d(new QXmppStreamPrivate)
 {
     // Make sure the random number generator is seeded
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
@@ -72,26 +80,26 @@ QXmppStream::QXmppStream(QObject *parent)
     // initialise logger
     setLogger(QXmppLogger::getLogger());
 
-    bool check = QObject::connect(&m_socket, SIGNAL(hostFound()),
+    bool check = QObject::connect(&d->socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(connected()),
+    check = QObject::connect(&d->socket, SIGNAL(connected()),
                              this, SLOT(socketConnected()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(disconnected()),
+    check = QObject::connect(&d->socket, SIGNAL(disconnected()),
                              this, SLOT(socketDisconnected()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(readyRead()),
+    check = QObject::connect(&d->socket, SIGNAL(readyRead()),
                              this, SLOT(socketReadReady()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket, SIGNAL(encrypted()),
+    check = QObject::connect(&d->socket, SIGNAL(encrypted()),
                              this, SLOT(socketEncrypted()));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket,
+    check = QObject::connect(&d->socket,
                              SIGNAL(sslErrors(const QList<QSslError>&)), this,
                              SLOT(socketSslErrors(const QList<QSslError>&)));
     Q_ASSERT(check);
-    check = QObject::connect(&m_socket,
+    check = QObject::connect(&d->socket,
                              SIGNAL(error(QAbstractSocket::SocketError)), this,
                              SLOT(socketError(QAbstractSocket::SocketError)));
     Q_ASSERT(check);
@@ -115,7 +123,7 @@ QXmppStream::QXmppStream(QObject *parent)
 
 QXmppStream::~QXmppStream()
 {
-
+    delete d;
 }
 
 QXmppConfiguration& QXmppStream::configuration()
@@ -131,8 +139,8 @@ void QXmppStream::connect()
     // prepare for connection
     m_authStep = 0;
 
-    m_socket.setProxy(configuration().networkProxy());
-    m_socket.connectToHost(configuration().
+    d->socket.setProxy(configuration().networkProxy());
+    d->socket.connectToHost(configuration().
                            host(), configuration().port());
 }
 
@@ -143,7 +151,7 @@ void QXmppStream::socketSslErrors(const QList<QSslError> & error)
         warning(error.at(i).errorString());
 
     if (configuration().ignoreSslErrors())
-        m_socket.ignoreSslErrors();
+        d->socket.ignoreSslErrors();
 }
 
 void QXmppStream::socketHostFound()
@@ -175,14 +183,14 @@ void QXmppStream::socketEncrypted()
 
 void QXmppStream::socketError(QAbstractSocket::SocketError ee)
 {
-    m_socketError = ee;
+    d->socketError = ee;
     emit error(QXmppClient::SocketError);
-    warning(QString("Socket error: " + m_socket.errorString()));
+    warning(QString("Socket error: " + d->socket.errorString()));
 }
 
 void QXmppStream::socketReadReady()
 {
-    const QByteArray data = m_socket.readAll();
+    const QByteArray data = d->socket.readAll();
     //debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
     parser(data);
 }
@@ -301,7 +309,7 @@ void QXmppStream::parser(const QByteArray& data)
                                      namespaceURI() == ns_sasl;
                 bool useSasl = configuration().useSASLAuthentication();
 
-                if (!m_socket.isEncrypted())
+                if (!d->socket.isEncrypted())
                 {
                     // parse remote TLS mode
                     QXmppConfiguration::StreamSecurityMode remoteSecurity;
@@ -318,7 +326,7 @@ void QXmppStream::parser(const QByteArray& data)
 
                     // determine TLS mode to use
                     const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
-                    if (!m_socket.supportsSsl() &&
+                    if (!d->socket.supportsSsl() &&
                         (localSecurity == QXmppConfiguration::TLSRequired ||
                          remoteSecurity == QXmppConfiguration::TLSRequired))
                     {
@@ -334,7 +342,7 @@ void QXmppStream::parser(const QByteArray& data)
                         return;
                     }
 
-                    if (m_socket.supportsSsl() &&
+                    if (d->socket.supportsSsl() &&
                         (remoteSecurity == QXmppConfiguration::TLSRequired ||
                          localSecurity != QXmppConfiguration::TLSDisabled))
                     {
@@ -430,7 +438,7 @@ void QXmppStream::parser(const QByteArray& data)
                 if(nodeRecv.tagName() == "proceed")
                 {
                     debug("Starting encryption");
-                    m_socket.startClientEncryption();
+                    d->socket.startClientEncryption();
                     return;
                 }
             }
@@ -779,7 +787,7 @@ bool QXmppStream::sendToServer(const QByteArray& packet)
     emit logMessage(QXmppLogger::SentMessage, QString::fromUtf8(packet));
     if (!isConnected())
         return false;
-    return m_socket.write( packet ) == packet.size();
+    return d->socket.write( packet ) == packet.size();
 }
 
 bool QXmppStream::hasStartStreamElement(const QByteArray& data)
@@ -968,13 +976,13 @@ void QXmppStream::disconnect()
 {
     m_authStep = 0;
     sendEndStream();
-    m_socket.flush();
-    m_socket.disconnectFromHost();
+    d->socket.flush();
+    d->socket.disconnectFromHost();
 }
 
 bool QXmppStream::isConnected() const
 {
-    return m_socket.state() == QAbstractSocket::ConnectedState;
+    return d->socket.state() == QAbstractSocket::ConnectedState;
 }
 
 bool QXmppStream::sendPacket(const QXmppPacket& packet)
@@ -1037,7 +1045,7 @@ void QXmppStream::pingTimeout()
 
 QAbstractSocket::SocketError QXmppStream::socketError()
 {
-    return m_socketError;
+    return d->socketError;
 }
 
 QXmppStanza::Error::Condition QXmppStream::xmppStreamError()
