@@ -69,7 +69,6 @@ protected:
     virtual void marshall( QXmlStreamWriter *writer, const QVariant &val ) const;
     virtual QVariant demarshall( const QDomElement &elem ) const;
 
-
 private:
     mutable QString m_message;
     mutable bool m_valid;
@@ -116,11 +115,6 @@ public:
     * Create a new recive packet with an xml packet
     */
     ResponseMessage( const QDomElement &element );
-
-    /**
-    * Create a new recive packet with an xml packet
-    */
-    ResponseMessage( const QByteArray &xml );
 
     /**
      * Create a new response message with data.

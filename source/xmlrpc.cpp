@@ -33,141 +33,98 @@ void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
 
 void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &value ) const
 {
-        writer->writeStartElement("value");
+    writer->writeStartElement("value");
     switch( value.type() )
     {
         case QVariant::Int:
         case QVariant::UInt:
         case QVariant::LongLong:
         case QVariant::ULongLong:
-                        writer->writeTextElement("i4", value.toString());
+            writer->writeTextElement("i4", value.toString());
             break;
         case QVariant::Double:
-                        writer->writeTextElement("double", value.toString());
+            writer->writeTextElement("double", value.toString());
             break;
         case QVariant::Bool:
-                        writer->writeTextElement("boolean", (value.toBool()?"true":"false") );
+            writer->writeTextElement("boolean", (value.toBool()?"true":"false") );
             break;
         case QVariant::Date:
-                        writer->writeTextElement("dateTime.iso8601", value.toDate().toString( Qt::ISODate ) );
+            writer->writeTextElement("dateTime.iso8601", value.toDate().toString( Qt::ISODate ) );
             break;
         case QVariant::DateTime:
-                        writer->writeTextElement("dateTime.iso8601", value.toDateTime().toString( Qt::ISODate ) );
-                        break;
+            writer->writeTextElement("dateTime.iso8601", value.toDateTime().toString( Qt::ISODate ) );
+            break;
         case QVariant::Time:
-                        writer->writeTextElement("dateTime.iso8601", value.toTime().toString( Qt::ISODate ) );
-                        break;
+            writer->writeTextElement("dateTime.iso8601", value.toTime().toString( Qt::ISODate ) );
+            break;
         case QVariant::StringList:
         case QVariant::List:
         {
-                        writer->writeStartElement("array");
-                        writer->writeStartElement("data");
+            writer->writeStartElement("array");
+            writer->writeStartElement("data");
             foreach( QVariant item, value.toList() )
-                                marshall( writer, item );
-                        writer->writeEndElement();
-                        writer->writeEndElement();
+                marshall( writer, item );
+            writer->writeEndElement();
+            writer->writeEndElement();
             break;
         }
         case QVariant::Map:
         {
-                        writer->writeStartElement("struct");
+            writer->writeStartElement("struct");
             QMap<QString, QVariant> map = value.toMap();
             QMap<QString, QVariant>::ConstIterator index = map.begin();
             while( index != map.end() )
             {
-                            writer->writeStartElement("member");
-                            writer->writeTextElement("name", index.key());
-                            marshall( writer, *index );
-                            writer->writeEndElement();
-                            ++index;
+                writer->writeStartElement("member");
+                writer->writeTextElement("name", index.key());
+                marshall( writer, *index );
+                writer->writeEndElement();
+                ++index;
             }
-                        writer->writeEndElement();
+            writer->writeEndElement();
             break;
         }
         case QVariant::ByteArray:
         {
-                        writer->writeTextElement("base64", value.toByteArray().toBase64() );
+            writer->writeTextElement("base64", value.toByteArray().toBase64() );
             break;
         }
         default:
         {
             if( value.canConvert(QVariant::String) )
             {
-                            writer->writeTextElement( "string", value.toString() );
-            }
-            else
-            {
-
+                writer->writeTextElement( "string", value.toString() );
             }
             break;
         }
     }
-        writer->writeEndElement();
-    }
+    writer->writeEndElement();
+}
+
 XMLRPC::ResponseMessage::ResponseMessage( const QDomElement &element )
 {
     const QDomElement contents = element.firstChild().toElement();
     if( contents.tagName().toLower() == "params")
     {
-            QDomNode param = contents.firstChild();
-            while( !param.isNull() && isValid() )
-            {
-                    m_values.append( demarshall( param.firstChild().toElement() ) );
-                    param = param.nextSibling();
-            }
+        QDomNode param = contents.firstChild();
+        while( !param.isNull() && isValid() )
+        {
+            m_values.append( demarshall( param.firstChild().toElement() ) );
+            param = param.nextSibling();
+        }
     }
     else if( contents.tagName().toLower() == "fault")
     {
-            const QDomElement errElement = contents.firstChild().toElement();
-            const QVariant error = demarshall( errElement );
+        const QDomElement errElement = contents.firstChild().toElement();
+        const QVariant error = demarshall( errElement );
 
-            setError( QString("XMLRPC Fault %1: %2")
-                            .arg(error.toMap()["faultCode"].toString() )
-                            .arg(error.toMap()["faultString"].toString() ) );
+        setError( QString("XMLRPC Fault %1: %2")
+                        .arg(error.toMap()["faultCode"].toString() )
+                        .arg(error.toMap()["faultString"].toString() ) );
     }
     else
     {
-            setError("Bad XML response");
-    }
-}
-
-XMLRPC::ResponseMessage::ResponseMessage( const QByteArray &xml )
-: MessageBase()
-{
-    QDomDocument message;
-    QString xmlErrMsg;
-    int xmlErrLine;
-    int xmlErrCol;
-    if( message.setContent(xml, &xmlErrMsg, &xmlErrLine, &xmlErrCol) )
-    {
-        const QDomElement contents = message.documentElement().firstChild().toElement();
-        if( contents.tagName().toLower() == "params")
-        {
-            QDomNode param = contents.firstChild();
-            while( !param.isNull() && isValid() )
-            {
-                m_values.append( demarshall( param.firstChild().toElement() ) );
-                param = param.nextSibling();
-            }
-        }
-        else if( message.documentElement().firstChild().toElement().tagName().toLower() == "fault")
-        {
-            const QDomElement errElement = contents.firstChild().toElement();
-            const QVariant error = demarshall( errElement );
-
-            setError( QString("XMLRPC Fault %1: %2")
-                    .arg(error.toMap()["faultCode"].toString() )
-                    .arg(error.toMap()["faultString"].toString() ) );
-        }
-        else
-        {
-            setError("Bad XML response");
-        }
-    }
-    else
-    {
-    setError(QString( "XML Error: %1 at row %2 and col %3")
-             .arg(xmlErrMsg).arg(xmlErrLine).arg(xmlErrCol));
+        setError("Bad XML response");
     }
 }
 
