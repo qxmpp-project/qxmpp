@@ -1,5 +1,5 @@
-#ifndef PACKET_H
-#define PACKET_H
+#ifndef QXMPPXMLRPC_H
+#define QXMPPXMLRPC_H
 
 #include <QDomElement>
 #include <QVariant>
@@ -19,15 +19,19 @@
 * @code
 *    QList<QVariant> args;
 *    args << m_db << m_username << m_password << dbQuery;
-*    RequestMessage msg( "data.query", args );
-*    ResponseMessage resp( SomeHttpDispatchObject( msg.xml() ) );
-*    if( resp.isValid() )
+*    RequestMessage msg;
+*    msg.setMethod("data.query");
+*    msg.setArguments(args);
+*
+*    ResponseMessage resp;
+*    if (resp.parse(someDomElement))
 *    {
 *        int rows = resp.values().first().toMap()["widgets"].toInt();
 *    }
 *    else
 *        qWarning("Error: %s", resp.error().latin1() );
 * @endcode
+*
 * This example will construct invoke the data.query() method on the XMLRPC
 * interface with the args.  It will then check for the response to see if
 * it was valid.  If its valid the message contains a struct of values, one of
@@ -50,11 +54,6 @@ class RequestMessage
 {
 public:
     /**
-    * Creates a method packet that will call method with a list of args.
-    */
-    RequestMessage(const QByteArray &method = QByteArray(), const QVariantList &args = QVariantList());
-
-    /**
     * Parse an xml packet.
     */
     bool parse(const QDomElement &element);
@@ -65,7 +64,10 @@ public:
     void writeXml( QXmlStreamWriter *writer ) const;
 
     QByteArray method() const;
-    QVariantList args() const;
+    void setMethod(const QByteArray &method);
+
+    QVariantList arguments() const;
+    void setArguments(const QVariantList &args);
 
 private:
     QByteArray m_method;
@@ -80,11 +82,6 @@ class ResponseMessage
 {
 public:
     /**
-     * Create a new response message with data.
-     */
-    ResponseMessage(const QVariantList &values = QVariantList());
-
-    /**
     * Parse an xml packet.
     */
     bool parse(const QDomElement &element);
@@ -95,6 +92,7 @@ public:
     void writeXml( QXmlStreamWriter *writer ) const;
 
     QVariantList values() const;
+    void setValues(const QVariantList &values);
 
 private:
     QList<QVariant> m_values;

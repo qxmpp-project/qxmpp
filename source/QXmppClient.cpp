@@ -486,12 +486,12 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
             if ( iface->interfaces().contains( iq.method() ) )
             {
                 QVariant result = iface->dispatch(iq.method().toLatin1(),
-                                                  iq.payload() );
+                                                  iq.arguments() );
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
                 resultIq.setFrom(m_stream->configuration().jid());
-                resultIq.setPayload(QVariantList() << result);
+                resultIq.setValues(QVariantList() << result);
                 m_stream->sendPacket( resultIq );
                 return;
             }

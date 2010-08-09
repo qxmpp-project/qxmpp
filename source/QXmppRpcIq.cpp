@@ -43,14 +43,14 @@ QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
 {
 }
 
-QVariantList QXmppRpcResponseIq::payload() const
+QVariantList QXmppRpcResponseIq::values() const
 {
-    return m_payload;
+    return m_values;
 }
 
-void QXmppRpcResponseIq::setPayload( const QVariantList &payload )
+void QXmppRpcResponseIq::setValues(const QVariantList &values)
 {
-    m_payload = payload;
+    m_values = values;
 }
 
 bool QXmppRpcResponseIq::isRpcResponseIq(const QDomElement &element)
@@ -68,14 +68,17 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 
     XMLRPC::ResponseMessage message;
     if (message.parse(methodElement))
-        m_payload = message.values();
+        m_values = message.values();
 }
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    XMLRPC::ResponseMessage message(m_payload);
     writer->writeStartElement(ns_rpc, "query");
+
+    XMLRPC::ResponseMessage message;
+    message.setValues(m_values);
     message.writeXml(writer);
+
     writer->writeEndElement();
 }
 
@@ -83,14 +86,14 @@ QXmppRpcInvokeIq::QXmppRpcInvokeIq() : QXmppIq( QXmppIq::Set )
 {
 }
 
-QVariantList QXmppRpcInvokeIq::payload() const
+QVariantList QXmppRpcInvokeIq::arguments() const
 {
-    return m_payload;
+    return m_arguments;
 }
 
-void QXmppRpcInvokeIq::setPayload( const QVariantList &payload )
+void QXmppRpcInvokeIq::setArguments(const QVariantList &arguments)
 {
-    m_payload = payload;
+    m_arguments = arguments;
 }
 
 QString QXmppRpcInvokeIq::method() const
@@ -130,16 +133,20 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
     {
         m_interface = message.method().split('.').value(0);
         m_method = message.method().split('.').value(1);
-        m_payload = message.args();
+        m_arguments = message.arguments();
     }
 }
 
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    QString methodName = m_interface + "." + m_method;
-    XMLRPC::RequestMessage message( methodName.toLatin1(), m_payload );
     writer->writeStartElement(ns_rpc, "query");
+
+    QString methodName = m_interface + "." + m_method;
+    XMLRPC::RequestMessage message;
+    message.setMethod(methodName.toLatin1());
+    message.setArguments(m_arguments);
     message.writeXml(writer);
+
     writer->writeEndElement();
 }
 

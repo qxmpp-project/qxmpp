@@ -37,8 +37,8 @@ static void marshall( QXmlStreamWriter *writer, const QVariant &value)
         {
             writer->writeStartElement("array");
             writer->writeStartElement("data");
-            foreach( QVariant item, value.toList() )
-                marshall( writer, item );
+            foreach(const QVariant &item, value.toList())
+                marshall(writer, item);
             writer->writeEndElement();
             writer->writeEndElement();
             break;
@@ -119,7 +119,7 @@ static QVariant demarshall(const QDomElement &elem, QStringList &errors)
         return QVariant( QDateTime::fromString( typeData.text(), Qt::ISODate ) );
     else if( typeName == "array" )
     {
-        QList<QVariant> arr;
+        QVariantList arr;
         QDomNode valueNode = typeData.firstChild().firstChild();
         while (!valueNode.isNull() && errors.isEmpty())
         {
@@ -160,11 +160,6 @@ static QVariant demarshall(const QDomElement &elem, QStringList &errors)
     return QVariant();
 }
 
-XMLRPC::RequestMessage::RequestMessage(const QByteArray &method, const QList<QVariant> &args)
-    : m_method(method), m_args(args)
-{
-}
-
 bool XMLRPC::RequestMessage::parse(const QDomElement &element)
 {
     QStringList errors;
@@ -199,14 +194,24 @@ bool XMLRPC::RequestMessage::parse(const QDomElement &element)
     return true;
 }
 
-QList< QVariant > XMLRPC::RequestMessage::args() const
+QVariantList XMLRPC::RequestMessage::arguments() const
 {
     return m_args;
+}
+
+void XMLRPC::RequestMessage::setArguments(const QVariantList &args)
+{
+    m_args = args;
 }
 
 QByteArray XMLRPC::RequestMessage::method() const
 {
     return m_method;
+}
+
+void XMLRPC::RequestMessage::setMethod(const QByteArray &method)
+{
+    m_method = method;
 }
 
 void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
@@ -216,20 +221,15 @@ void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
     if( !m_args.isEmpty() )
     {
         writer->writeStartElement("params");
-        foreach( QVariant arg, m_args)
+        foreach(const QVariant &arg, m_args)
         {
             writer->writeStartElement("param");
-            marshall( writer, arg );
+            marshall(writer, arg);
             writer->writeEndElement();
         }
         writer->writeEndElement();
     }
     writer->writeEndElement();
-}
-
-XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )
-    : m_values(theValue)
-{
 }
 
 bool XMLRPC::ResponseMessage::parse(const QDomElement &element)
@@ -266,9 +266,14 @@ bool XMLRPC::ResponseMessage::parse(const QDomElement &element)
     }
 }
 
-QList< QVariant > XMLRPC::ResponseMessage::values() const
+QVariantList XMLRPC::ResponseMessage::values() const
 {
     return m_values;
+}
+
+void XMLRPC::ResponseMessage::setValues(const QVariantList &values)
+{
+    m_values = values;
 }
 
 void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
@@ -278,10 +283,10 @@ void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
     if( !m_values.isEmpty() )
     {
         writer->writeStartElement("params");
-        foreach( QVariant arg, m_values)
+        foreach (const QVariant &arg, m_values)
         {
             writer->writeStartElement("param");
-            marshall( writer, arg );
+            marshall(writer, arg);
             writer->writeEndElement();
         }
         writer->writeEndElement();

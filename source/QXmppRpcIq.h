@@ -12,8 +12,8 @@ class QXmppRpcResponseIq : public QXmppIq
 public:
     QXmppRpcResponseIq();
 
-    QVariantList payload() const;
-    void setPayload( const QVariantList &payload );
+    QVariantList values() const;
+    void setValues(const QVariantList &values);
 
     static bool isRpcResponseIq(const QDomElement &element);
 
@@ -22,7 +22,7 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
-    QVariantList m_payload;
+    QVariantList m_values;
 };
 
 class QXmppRpcInvokeIq : public QXmppIq
@@ -30,14 +30,14 @@ class QXmppRpcInvokeIq : public QXmppIq
 public:
     QXmppRpcInvokeIq();
 
-    QVariantList payload() const;
-    void setPayload( const QVariantList &payload );
+    QString interface() const;
+    void setInterface( const QString &interface );
 
     QString method() const;
     void setMethod( const QString &method );
 
-    QString interface() const;
-    void setInterface( const QString &interface );
+    QVariantList arguments() const;
+    void setArguments(const QVariantList &arguments);
 
     static bool isRpcInvokeIq(const QDomElement &element);
 
@@ -46,7 +46,7 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
-    QVariantList m_payload;
+    QVariantList m_arguments;
     QString m_method;
     QString m_interface;
 

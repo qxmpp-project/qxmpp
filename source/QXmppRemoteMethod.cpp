@@ -14,7 +14,7 @@ QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, 
     m_payload.setFrom( client->getConfiguration().jid() );
     m_payload.setInterface( method.section('.', 0, 0 ) );
     m_payload.setMethod( method.section('.', 1) );
-    m_payload.setPayload( args );
+    m_payload.setArguments( args );
 }
 
 QXmppRemoteMethodResult QXmppRemoteMethod::call( )
@@ -45,7 +45,7 @@ void QXmppRemoteMethod::gotResult( const QXmppRpcResponseIq &iq )
     if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = false;
-        m_result.result = iq.payload();
+        m_result.result = iq.values();
         emit callDone();
     }
 }
