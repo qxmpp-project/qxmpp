@@ -25,6 +25,7 @@
 #define QXMPPDISCOVERY_H
 
 #include "QXmppElement.h"
+#include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
 class QDomElement;
@@ -86,6 +87,9 @@ public:
     QList<QXmppDiscoveryIq::Item> items() const;
     void setItems(const QList<QXmppDiscoveryIq::Item> &items);
 
+    QXmppDataForm form() const;
+    void setForm(const QXmppDataForm &form);
+
     QString queryNode() const;
     void setQueryNode(const QString &node);
 
@@ -104,6 +108,7 @@ private:
     QStringList m_features;
     QList<QXmppDiscoveryIq::Identity> m_identities;
     QList<QXmppDiscoveryIq::Item> m_items;
+    QXmppDataForm m_form;
     QString m_queryNode;
     enum QueryType m_queryType;
 };

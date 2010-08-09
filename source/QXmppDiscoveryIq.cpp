@@ -153,6 +153,26 @@ void QXmppDiscoveryIq::setItems(const QList<QXmppDiscoveryIq::Item> &items)
     m_items = items;
 }
 
+/// Returns the QXmppDataForm for this IQ, as defined by
+/// XEP-0128: Service Discovery Extensions.
+///
+
+QXmppDataForm QXmppDiscoveryIq::form() const
+{
+    return m_form;
+}
+
+/// Sets the QXmppDataForm for this IQ, as define by
+/// XEP-0128: Service Discovery Extensions.
+///
+/// \param form
+///
+
+void QXmppDiscoveryIq::setForm(const QXmppDataForm &form)
+{
+    m_form = form;
+}
+
 QString QXmppDiscoveryIq::queryNode() const
 {
     return m_queryNode;
@@ -213,19 +233,28 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
         if (itemElement.tagName() == "feature")
         {
             m_features.append(itemElement.attribute("var"));
-        } else if (itemElement.tagName() == "identity") {
+        }
+        else if (itemElement.tagName() == "identity")
+        {
             QXmppDiscoveryIq::Identity identity;
             identity.setLanguage(itemElement.attribute("xml:lang"));
             identity.setCategory(itemElement.attribute("category"));
             identity.setName(itemElement.attribute("name"));
             identity.setType(itemElement.attribute("type"));
             m_identities.append(identity);
-        } else if (itemElement.tagName() == "item") {
+        }
+        else if (itemElement.tagName() == "item")
+        {
             QXmppDiscoveryIq::Item item;
             item.setJid(itemElement.attribute("jid"));
             item.setName(itemElement.attribute("name"));
             item.setNode(itemElement.attribute("node"));
             m_items.append(item);
+        }
+        else if (itemElement.tagName() == "x" &&
+                 itemElement.namespaceURI() == ns_data)
+        {
+            m_form.parse(itemElement);
         }
         itemElement = itemElement.nextSiblingElement();
     }
@@ -263,6 +292,8 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "node", item.node());
         writer->writeEndElement();
     }
+
+    m_form.toXml(writer);
 
     writer->writeEndElement();
 }
