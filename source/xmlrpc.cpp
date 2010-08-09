@@ -405,7 +405,7 @@ void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
         writer->writeStartElement("params");
         foreach( QVariant arg, m_values)
         {
-            writer->writeStartElement("params");
+            writer->writeStartElement("param");
             marshall( writer, arg );
             writer->writeEndElement();
         }
