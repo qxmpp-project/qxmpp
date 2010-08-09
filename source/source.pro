@@ -107,3 +107,9 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCard.cpp \
     QXmppVersionIq.cpp \
     xmlrpc.cpp
+
+# Installation
+headers.files = $$HEADERS
+headers.path = /usr/include/qxmpp
+target.path = /usr/lib
+INSTALLS += headers target
