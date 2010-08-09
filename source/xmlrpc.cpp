@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QTextStream>
 
-static void marshall( QXmlStreamWriter *writer, const QVariant &value)
+void XMLRPC::marshall( QXmlStreamWriter *writer, const QVariant &value)
 {
     writer->writeStartElement("value");
     switch( value.type() )
@@ -76,7 +76,7 @@ static void marshall( QXmlStreamWriter *writer, const QVariant &value)
     writer->writeEndElement();
 }
 
-static QVariant demarshall(const QDomElement &elem, QStringList &errors)
+QVariant XMLRPC::demarshall(const QDomElement &elem, QStringList &errors)
 {
     if ( elem.tagName().toLower() != "value" )
     {
@@ -120,11 +120,11 @@ static QVariant demarshall(const QDomElement &elem, QStringList &errors)
     else if( typeName == "array" )
     {
         QVariantList arr;
-        QDomNode valueNode = typeData.firstChild().firstChild();
+        QDomElement valueNode = typeData.firstChildElement("data").firstChildElement();
         while (!valueNode.isNull() && errors.isEmpty())
         {
-            arr.append(demarshall(valueNode.toElement(), errors));
-            valueNode = valueNode.nextSibling();
+            arr.append(demarshall(valueNode, errors));
+            valueNode = valueNode.nextSiblingElement();
         }
         return QVariant( arr );
     }

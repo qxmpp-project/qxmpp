@@ -45,6 +45,10 @@
 
 namespace XMLRPC
 {
+
+void marshall( QXmlStreamWriter *writer, const QVariant &value);
+QVariant demarshall(const QDomElement &elem, QStringList &errors);
+
 /**
 * Creates an XMLRPC message that will call a method with a series of
 * QVariants that will be converted to XMLRPC types.
