@@ -110,6 +110,7 @@ public:
     void disconnect();
     bool isConnected() const;
 
+    QXmppConfiguration &configuration();
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
 
@@ -125,8 +126,6 @@ public:
 
     // FIXME : these accessors should be deprecated in favour of
     // versions without the "get".
-    QXmppConfiguration& getConfiguration();
-    const QXmppConfiguration& getConfiguration() const;
     QXmppReconnectionManager* getReconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
     const QXmppPresence& getClientPresence() const;
@@ -149,6 +148,8 @@ public:
                                               const QVariant &arg10 = QVariant() );
 
     // deprecated accessors, use the form without "get" instead
+    QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
+    const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
     QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();

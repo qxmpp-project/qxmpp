@@ -141,16 +141,7 @@ QXmppClient::~QXmppClient()
 /// Returns a modifiable reference to the current configuration of QXmppClient.
 /// \return Reference to the QXmppClient's configuration for the connection.
 
-QXmppConfiguration& QXmppClient::getConfiguration()
-{
-    return m_stream->configuration();
-}
-
-/// Overloaded function. It returns a const reference to the current configuration
-/// of QXmppClient.
-/// \return Constant reference to the QXmppClient's configuration for the connection.
-
-const QXmppConfiguration& QXmppClient::getConfiguration() const
+QXmppConfiguration& QXmppClient::configuration()
 {
     return m_stream->configuration();
 }
@@ -617,6 +608,16 @@ void QXmppClient::xmppConnected()
 }
 
 // obsolete
+
+QXmppConfiguration& QXmppClient::getConfiguration()
+{
+    return m_stream->configuration();
+}
+
+const QXmppConfiguration& QXmppClient::getConfiguration() const
+{
+    return m_stream->configuration();
+}
 
 QXmppRosterManager& QXmppClient::getRoster()
 {

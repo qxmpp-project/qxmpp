@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
     const QString username = (!strcmp(argv[1], "send")) ? QLatin1String("qxmpp.test1") : QLatin1String("qxmpp.test2");
 
     xmppClient client;
-    client.getConfiguration().setUseSASLAuthentication( false );
     client.connectToServer("talk.google.com", username, "qxmpp123", "gmail.com");
     return a.exec();
 }
