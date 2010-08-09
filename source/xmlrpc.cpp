@@ -1,11 +1,12 @@
 #include "xmlrpc.h"
+#include <QDebug>
 #include <QMap>
 #include <QVariant>
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
 
-void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &value ) const
+static void marshall( QXmlStreamWriter *writer, const QVariant &value)
 {
     writer->writeStartElement("value");
     switch( value.type() )
@@ -75,22 +76,11 @@ void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &va
     writer->writeEndElement();
 }
 
-bool XMLRPC::MessageBase::isValid() const
-{
-    return m_valid;
-}
-
-QString XMLRPC::MessageBase::error() const
-{
-    return m_message;
-}
-
-QVariant XMLRPC::MessageBase::demarshall( const QDomElement &elem ) const
+static QVariant demarshall(const QDomElement &elem, QStringList &errors)
 {
     if ( elem.tagName().toLower() != "value" )
     {
-        m_valid = false;
-        m_message = "bad param value";
+        errors << "Bad param value";
         return QVariant();
     }
 
@@ -103,22 +93,25 @@ QVariant XMLRPC::MessageBase::demarshall( const QDomElement &elem ) const
     const QString typeName = typeData.tagName().toLower();
 
     if ( typeName == "string" )
-                return QVariant( typeData.text() );
+    {
+        return QVariant( typeData.text() );
+    }
     else if (typeName == "int" || typeName == "i4" )
     {
         bool ok = false;
         QVariant val( typeData.text().toInt( &ok ) );
-        if( ok )
+        if (ok)
             return val;
-        m_message = "I was looking for an integer but data was courupt";
+        errors << "I was looking for an integer but data was courupt";
+        return QVariant();
     }
     else if( typeName == "double" )
     {
         bool ok = false;
         QVariant val( typeData.text().toDouble( &ok ) );
-        if( ok )
+        if (ok)
             return val;
-        m_message = "I was looking for an double but data was courupt";
+        errors <<  "I was looking for an double but data was corrupt";
     }
     else if( typeName == "boolean" )
         return QVariant( ( typeData.text().toLower() == "true" || typeData.text() == "1")?true:false );
@@ -128,9 +121,9 @@ QVariant XMLRPC::MessageBase::demarshall( const QDomElement &elem ) const
     {
         QList<QVariant> arr;
         QDomNode valueNode = typeData.firstChild().firstChild();
-        while( !valueNode.isNull() && m_valid )
+        while (!valueNode.isNull() && errors.isEmpty())
         {
-            arr.append( demarshall( valueNode.toElement() ) );
+            arr.append(demarshall(valueNode.toElement(), errors));
             valueNode = valueNode.nextSibling();
         }
         return QVariant( arr );
@@ -139,11 +132,11 @@ QVariant XMLRPC::MessageBase::demarshall( const QDomElement &elem ) const
     {
         QMap<QString,QVariant> stct;
         QDomNode valueNode = typeData.firstChild();
-        while( !valueNode.isNull() && m_valid )
+        while(!valueNode.isNull() && errors.isEmpty())
         {
             const QDomElement memberNode = valueNode.toElement().elementsByTagName("name").item(0).toElement();
             const QDomElement dataNode = valueNode.toElement().elementsByTagName("value").item(0).toElement();
-            stct[ memberNode.text() ] = demarshall( dataNode );
+            stct[ memberNode.text() ] = demarshall(dataNode, errors);
             valueNode = valueNode.nextSibling();
         }
         return QVariant(stct);
@@ -157,38 +150,25 @@ QVariant XMLRPC::MessageBase::demarshall( const QDomElement &elem ) const
         QDataStream ds(&dest, QIODevice::ReadOnly);
         ds.setVersion(QDataStream::Qt_4_0);
         ds >> returnVariant;
-        if( returnVariant.isValid() )
+        if (returnVariant.isValid())
             return returnVariant;
         else
             return QVariant( dest );
     }
-    setError(QString( "Cannot handle type %1").arg(typeName));
+
+    errors << QString( "Cannot handle type %1").arg(typeName);
     return QVariant();
 }
 
-void XMLRPC::MessageBase::setError( const QString & message ) const
-{
-    m_valid = false;
-    m_message = message;
-}
-
-XMLRPC::MessageBase::MessageBase( ) : m_valid(true)
+XMLRPC::RequestMessage::RequestMessage(const QByteArray &method, const QList<QVariant> &args)
+    : m_method(method), m_args(args)
 {
 }
 
-XMLRPC::MessageBase::~MessageBase( )
+bool XMLRPC::RequestMessage::parse(const QDomElement &element)
 {
-}
+    QStringList errors;
 
-XMLRPC::RequestMessage::RequestMessage( const QByteArray &method, const QList<QVariant> &args )
-: MessageBase()
-{
-    m_method = method;
-    m_args = args;
-}
-
-XMLRPC::RequestMessage::RequestMessage( const QDomElement  &element )
-{
     m_args.clear();
     m_method.clear();
 
@@ -199,20 +179,24 @@ XMLRPC::RequestMessage::RequestMessage( const QDomElement  &element )
     }
     else
     {
-        setError("Missing methodName property.");
-        return;
+        errors << "Missing methodName property";
+        return false;
     }
 
     const QDomElement methodParams = element.firstChildElement("params");
     if( !methodParams.isNull() )
     {
         QDomNode param = methodParams.firstChild();
-        while( !param.isNull() && isValid() )
+        while (!param.isNull())
         {
-            m_args.append( demarshall( param.firstChild().toElement() ) );
+            QVariant arg = demarshall(param.firstChild().toElement(), errors);
+            if (!errors.isEmpty())
+                return false;
+            m_args << arg;
             param = param.nextSibling();
         }
     }
+    return true;
 }
 
 QList< QVariant > XMLRPC::RequestMessage::args() const
@@ -244,34 +228,41 @@ void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
 }
 
 XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )
-: MessageBase(), m_values(theValue)
+    : m_values(theValue)
 {
 }
 
-XMLRPC::ResponseMessage::ResponseMessage( const QDomElement &element )
+bool XMLRPC::ResponseMessage::parse(const QDomElement &element)
 {
+    QStringList errors;
     const QDomElement contents = element.firstChild().toElement();
     if( contents.tagName().toLower() == "params")
     {
         QDomNode param = contents.firstChild();
-        while( !param.isNull() && isValid() )
+        while (!param.isNull())
         {
-            m_values.append( demarshall( param.firstChild().toElement() ) );
+            const QVariant value = demarshall(param.firstChild().toElement(), errors);
+            if (!errors.isEmpty())
+                return false;
+            m_values << value;
             param = param.nextSibling();
         }
+        return true;
     }
     else if( contents.tagName().toLower() == "fault")
     {
         const QDomElement errElement = contents.firstChild().toElement();
-        const QVariant error = demarshall( errElement );
+        const QVariant error = demarshall(errElement, errors);
 
-        setError( QString("XMLRPC Fault %1: %2")
+        qWarning() << QString("XMLRPC Fault %1: %2")
                         .arg(error.toMap()["faultCode"].toString() )
-                        .arg(error.toMap()["faultString"].toString() ) );
+                        .arg(error.toMap()["faultString"].toString() );
+        return true;
     }
     else
     {
-        setError("Bad XML response");
+        qWarning("Bad XML response");
+        return false;
     }
 }
 

@@ -66,8 +66,9 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement methodElement = queryElement.firstChildElement("methodResponse");
 
-    XMLRPC::ResponseMessage message( methodElement );
-    m_payload = message.values().first();
+    XMLRPC::ResponseMessage message;
+    if (message.parse(methodElement))
+        m_payload = message.values().first();
 }
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -124,11 +125,13 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement methodElement = queryElement.firstChildElement("methodCall");
 
-    XMLRPC::RequestMessage message( methodElement );
-
-    m_interface = message.method().split('.').value(0);
-    m_method = message.method().split('.').value(1);
-    m_payload = message.args();
+    XMLRPC::RequestMessage message;
+    if (message.parse(methodElement))
+    {
+        m_interface = message.method().split('.').value(0);
+        m_method = message.method().split('.').value(1);
+        m_payload = message.args();
+    }
 }
 
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

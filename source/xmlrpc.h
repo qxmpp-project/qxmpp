@@ -41,55 +41,22 @@
 namespace XMLRPC
 {
 /**
- * Base utility methods for working with XMLRPC messages.
-@author Ian Reinhart Geiser <geiseri@kde.org>
-*/
-class MessageBase
-{
-public:
-    MessageBase();
-    virtual ~MessageBase();
-
-    /**
-    * Returns a human readable error that was recived from the server.
-    */
-    QString error() const;
-
-    /**
-     * Sets the human readable error message.
-     */
-    virtual void setError( const QString &message ) const;
-
-    /**
-    * Returns if the current message is valid.
-    */
-    bool isValid() const;
-
-protected:
-    virtual void marshall( QXmlStreamWriter *writer, const QVariant &val ) const;
-    virtual QVariant demarshall( const QDomElement &elem ) const;
-
-private:
-    mutable QString m_message;
-    mutable bool m_valid;
-};
-
-/**
 * Creates an XMLRPC message that will call a method with a series of
 * QVariants that will be converted to XMLRPC types.
 @author Ian Reinhart Geiser <geiseri@kde.org>
 */
-class RequestMessage : public MessageBase
+class RequestMessage
 {
 public:
-    RequestMessage( const QDomElement &element );
-
     /**
     * Creates a method packet that will call method with a list of args.
     */
-    RequestMessage( const QByteArray &method, const QList<QVariant> &args );
+    RequestMessage(const QByteArray &method = QByteArray(), const QList<QVariant> &args = QList<QVariant>());
 
-    virtual ~RequestMessage() {;}
+    /**
+    * Parse an xml packet.
+    */
+    bool parse(const QDomElement &element);
 
     /**
     * Return the xml representation of the packet.
@@ -108,20 +75,18 @@ private:
 * Decodes an XMLRPC message from a server into a set of QVariants.
 @author Ian Reinhart Geiser <geiseri@kde.org>
 */
-class ResponseMessage : public MessageBase
+class ResponseMessage
 {
 public:
     /**
-    * Create a new recive packet with an xml packet
-    */
-    ResponseMessage( const QDomElement &element );
-
-    /**
      * Create a new response message with data.
      */
-    ResponseMessage( const QList< QVariant >& theValue );
+    ResponseMessage(const QList<QVariant> &theValue = QList<QVariant>());
 
-    virtual ~ResponseMessage() {;}
+    /**
+    * Parse an xml packet.
+    */
+    bool parse(const QDomElement &element);
 
     /**
     * Return the xml representation of the packet.
