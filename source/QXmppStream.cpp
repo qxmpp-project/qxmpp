@@ -318,17 +318,25 @@ void QXmppStream::parser(const QByteArray& data)
 
                     // determine TLS mode to use
                     const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
-                    if (localSecurity == QXmppConfiguration::TLSRequired &&
-                        remoteSecurity == QXmppConfiguration::TLSDisabled)
+                    if (!m_socket.supportsSsl() && 
+                        (localSecurity == QXmppConfiguration::TLSRequired ||
+                         remoteSecurity == QXmppConfiguration::TLSRequired))
                     {
-                        // disconnect as TLS is required by the client
-                        // but not available on the server
-                        warning("Disconnecting as TLS not available at the server");
+                        warning("Disconnecting as TLS is required, but SSL support is not available");
                         disconnect();
                         return;
                     }
-                    if (remoteSecurity == QXmppConfiguration::TLSRequired ||
-                        localSecurity != QXmppConfiguration::TLSDisabled)
+                    if (localSecurity == QXmppConfiguration::TLSRequired &&
+                        remoteSecurity == QXmppConfiguration::TLSDisabled)
+                    {
+                        warning("Disconnecting as TLS is required, but not supported by the server");
+                        disconnect();
+                        return;
+                    }
+
+                    if (m_socket.supportsSsl() &&
+                        (remoteSecurity == QXmppConfiguration::TLSRequired ||
+                         localSecurity != QXmppConfiguration::TLSDisabled))
                     {
                         // enable TLS as it is required by the server
                         // or supported by the client
