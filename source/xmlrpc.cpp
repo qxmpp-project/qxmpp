@@ -12,13 +12,6 @@ XMLRPC::RequestMessage::RequestMessage( const QByteArray &method, const QList<QV
     m_args = args;
 }
 
-XMLRPC::RequestMessage::RequestMessage( const QByteArray &method, const QVariant &arg )
-: MessageBase()
-{
-    m_method = method;
-    m_args.append(arg);
-}
-
 void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
 {
     writer->writeStartElement("methodCall");
@@ -36,19 +29,6 @@ void XMLRPC::RequestMessage::writeXml( QXmlStreamWriter *writer ) const
     }
     writer->writeEndElement();
 
-}
-
-QByteArray XMLRPC::RequestMessage::xml() const
-{
-    if( m_method.isEmpty() )
-        return QByteArray();
-
-    QByteArray returnXML;
-    QXmlStreamWriter writer( &returnXML );
-    writer.writeStartDocument();
-    writeXml(&writer );
-    writer.writeEndDocument();
-    return returnXML;
 }
 
 void XMLRPC::MessageBase::marshall( QXmlStreamWriter *writer, const QVariant &value ) const
@@ -350,52 +330,6 @@ XMLRPC::RequestMessage::RequestMessage( const QDomElement  &element )
     }
 }
 
-XMLRPC::RequestMessage::RequestMessage( const QByteArray & xml )
-{
-    QDomDocument message;
-    QString xmlErrMsg;
-    int xmlErrLine;
-    int xmlErrCol;
-    m_args.clear();
-    m_method.clear();
-
-    if( message.setContent(xml, &xmlErrMsg, &xmlErrLine, &xmlErrCol) )
-    {
-        const QDomElement methodCall = message.firstChildElement("methodCall");
-        if( !methodCall.isNull() )
-        {
-            const QDomElement methodName = methodCall.firstChildElement("methodName");
-            if( !methodName.isNull() )
-            {
-                m_method = methodName.text().toLatin1();
-            }
-            else
-            {
-                setError("Missing methodName property.");
-                return;
-            }
-
-            const QDomElement methodParams = methodCall.firstChildElement("params");
-            if( !methodParams.isNull() )
-            {
-                QDomNode param = methodParams.firstChild();
-                while( !param.isNull() && isValid() )
-                {
-                    m_args.append( demarshall( param.firstChild().toElement() ) );
-                    param = param.nextSibling();
-                }
-            }
-        }
-        else
-            setError("Not a valid methodCall message.");
-    }
-    else
-    {
-        setError(QString( "XML Error: %1 at row %2 and col %3")
-             .arg(xmlErrMsg).arg(xmlErrLine).arg(xmlErrCol));
-    }
-}
-
 void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
 {
     writer->writeStartElement("methodResponse");
@@ -412,22 +346,6 @@ void XMLRPC::ResponseMessage::writeXml( QXmlStreamWriter *writer ) const
         writer->writeEndElement();
     }
     writer->writeEndElement();
-}
-
-QByteArray XMLRPC::ResponseMessage::xml( ) const
-{
-    QByteArray returnXML ;
-    QXmlStreamWriter writer(&returnXML);
-    writer.writeStartDocument();
-    writeXml( &writer );
-    writer.writeEndElement();
-    writer.writeEndDocument();
-    return returnXML;
-}
-
-void XMLRPC::ResponseMessage::setValues( const QList< QVariant > vals )
-{
-    m_values = vals;
 }
 
 XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )

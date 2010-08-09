@@ -83,38 +83,26 @@ private:
 class RequestMessage : public MessageBase
 {
 public:
-        RequestMessage( const QDomElement &element );
-    /**
-         * Creates an RequestMessage from an XML packet.
-     */
-    RequestMessage( const QByteArray &xml );
+    RequestMessage( const QDomElement &element );
+
     /**
     * Creates a method packet that will call method with a list of args.
     */
     RequestMessage( const QByteArray &method, const QList<QVariant> &args );
-
-    /**
-    * Convinence ctor that creates a packet for a method with a single
-    * argument.
-    */
-    RequestMessage( const QByteArray &method, const QVariant &arg );
 
     virtual ~RequestMessage() {;}
 
     /**
     * Return the xml representation of the packet.
     */
-    QByteArray xml() const;
     void writeXml( QXmlStreamWriter *writer ) const;
 
     QByteArray method() const;
     QList< QVariant > args() const;
 
-
 private:
     QByteArray m_method;
     QList<QVariant> m_args;
-
 };
 
 /**
@@ -163,13 +151,9 @@ public:
     /**
     * Return the xml representation of the packet.
     */
-    virtual QByteArray xml() const;
     void writeXml( QXmlStreamWriter *writer ) const;
 
-
     QList< QVariant > values() const;
-protected:
-    void setValues( const QList<QVariant> va2ls);
 
 private:
     QList<QVariant> m_values;
