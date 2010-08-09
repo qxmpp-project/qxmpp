@@ -375,6 +375,12 @@ void QXmppStream::parser(const QByteArray& data)
                             sendAuthDigestMD5();
                             break;
                         }
+                    case QXmppConfiguration::SASLAnonymous:
+                        if(mechanisms.contains("ANONYMOUS"))
+                        {
+                            sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
+                            break;
+                        }
                     default:
                         info("Desired SASL Auth mechanism not available trying the available ones");
                         if(mechanisms.contains("DIGEST-MD5"))

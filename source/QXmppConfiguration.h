@@ -47,7 +47,7 @@ public:
     /// Depending upon all this user can specify following options.
     enum StreamSecurityMode
     {
-        TLSEnabled = 0, ///< Default, encryption is used if available
+        TLSEnabled = 0, ///< Encryption is used if available (default)
         TLSDisabled,    ///< No encryption is server allows
         TLSRequired     ///< Encryption is a must otherwise connection would not
                         ///< be established
@@ -58,8 +58,8 @@ public:
     /// specifying the mechanism is just a hint to the library.
     enum NonSASLAuthMechanism
     {
-       NonSASLPlain = 0,///< Plain
-       NonSASLDigest    ///< Default,
+        NonSASLPlain = 0,///< Plain
+        NonSASLDigest    ///< Digest (default)
     };
 
     /// An enumeration for various SASL authentication mechanisms available.
@@ -68,8 +68,9 @@ public:
     /// a mechanism.
     enum SASLAuthMechanism
     {
-       SASLPlain = 0,
-       SASLDigestMD5    ///< Default
+        SASLPlain = 0,  ///< Plain
+        SASLDigestMD5,  ///< Digest MD5 (default)
+        SASLAnonymous   ///< Anonymous
     };
 
     QXmppConfiguration();
