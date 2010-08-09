@@ -70,4 +70,7 @@ private slots:
     void testDouble();
     void testInt();
     void testString();
+
+    void testArray();
+    void testStruct();
 };

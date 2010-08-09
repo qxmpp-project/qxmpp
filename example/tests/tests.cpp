@@ -383,6 +383,33 @@ void TestXmlRpc::testString()
                  QByteArray("<value><string>hello world</string></value>"));
 }
 
+void TestXmlRpc::testArray()
+{
+    checkVariant(QVariantList() << QString("hello world") << double(-12.214),
+                 QByteArray("<value><array><data>"
+                            "<value><string>hello world</string></value>"
+                            "<value><double>-12.214</double></value>"
+                            "</data></array></value>"));
+}
+
+void TestXmlRpc::testStruct()
+{
+    QMap<QString, QVariant> map;
+    map["bar"] = QString("hello world");
+    map["foo"] = double(-12.214);
+    checkVariant(map,
+                 QByteArray("<value><struct>"
+                            "<member>"
+                                "<name>bar</name>"
+                                "<value><string>hello world</string></value>"
+                            "</member>"
+                            "<member>"
+                                "<name>foo</name>"
+                                "<value><double>-12.214</double></value>"
+                            "</member>"
+                            "</struct></value>"));
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
