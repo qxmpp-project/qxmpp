@@ -59,3 +59,12 @@ private slots:
     void testRinging();
 };
 
+class TestXmlRpc : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBool();
+    void testDouble();
+    void testString();
+};

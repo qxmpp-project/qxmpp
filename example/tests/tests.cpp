@@ -35,6 +35,7 @@
 #include "QXmppSession.h"
 #include "QXmppUtils.h"
 #include "tests.h"
+#include "xmlrpc.h"
 
 void TestUtils::testHmac()
 {
@@ -320,6 +321,48 @@ void TestJingle::testRinging()
     serializePacket(iq, xml);
 }
 
+static void checkVariant(const QVariant &value, const QByteArray &xml)
+{
+    // parse
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    QDomElement element = doc.documentElement();
+    QStringList errors;
+    QVariant test = XMLRPC::demarshall(element, errors);
+    QCOMPARE(errors, QStringList());
+    QCOMPARE(test, value);
+
+    // serialise
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    XMLRPC::marshall(&writer, value);
+    qDebug() << "expect " << xml;
+    qDebug() << "writing" << buffer.data();
+    QCOMPARE(buffer.data(), xml);
+}
+
+void TestXmlRpc::testBool()
+{
+    // FIXME : XML-RPC spec says we should write "0" or "1"
+    checkVariant(false,
+                 QByteArray("<value><boolean>false</boolean></value>"));
+    checkVariant(true,
+                 QByteArray("<value><boolean>true</boolean></value>"));
+}
+
+void TestXmlRpc::testDouble()
+{
+    checkVariant(double(-12.214),
+                 QByteArray("<value><double>-12.214</double></value>"));
+}
+
+void TestXmlRpc::testString()
+{
+    checkVariant(QString("hello world"),
+                 QByteArray("<value><string>hello world</string></value>"));
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -335,6 +378,9 @@ int main(int argc, char *argv[])
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);
+
+    TestXmlRpc testXmlRpc;
+    errors += QTest::qExec(&testXmlRpc);
 
     if (errors)
     {
