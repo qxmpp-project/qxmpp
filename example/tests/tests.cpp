@@ -344,6 +344,12 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     QCOMPARE(test, value);
 }
 
+void TestXmlRpc::testBase64()
+{
+    checkVariant(QByteArray("\0\1\2\3", 4),
+                 QByteArray("<value><base64>AAECAw==</base64></value>"));
+}
+
 void TestXmlRpc::testBool()
 {
     // FIXME : XML-RPC spec says we should write "0" or "1"
@@ -363,6 +369,12 @@ void TestXmlRpc::testDouble()
 {
     checkVariant(double(-12.214),
                  QByteArray("<value><double>-12.214</double></value>"));
+}
+
+void TestXmlRpc::testInt()
+{
+    checkVariant(int(-12),
+                 QByteArray("<value><i4>-12</i4></value>"));
 }
 
 void TestXmlRpc::testString()

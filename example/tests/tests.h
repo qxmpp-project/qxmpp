@@ -64,8 +64,10 @@ class TestXmlRpc : public QObject
     Q_OBJECT
 
 private slots:
+    void testBase64();
     void testBool();
     void testDateTime();
     void testDouble();
+    void testInt();
     void testString();
 };
