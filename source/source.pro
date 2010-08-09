@@ -16,10 +16,10 @@ CONFIG += staticlib \
 # same for other platforms.
 CONFIG(debug, debug|release) { 
     DESTDIR = debug
-    TARGET = QXmppClient_d
+    TARGET = qxmpp_d
 } else {
     DESTDIR = release
-    TARGET = QXmppClient
+    TARGET = qxmpp
 }
 
 # Header files

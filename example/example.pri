@@ -7,10 +7,10 @@ QT += network xml
 CONFIG += console debug_and_release
 
 CONFIG(debug, debug|release) {
-    QXMPP_LIB = QXmppClient_d
+    QXMPP_LIB = qxmpp_d
     QXMPP_DIR = ../../source/debug
 } else {
-    QXMPP_LIB = QXmppClient
+    QXMPP_LIB = qxmpp
     QXMPP_DIR = ../../source/release
 }
 
