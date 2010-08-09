@@ -490,25 +490,7 @@ void QXmppStream::parser(const QByteArray& data)
                     if(type.isEmpty())
                         warning("QXmppStream: iq type can't be empty");
 
-                    if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
-                    {
-                        QXmppRpcInvokeIq rpcIqPacket;
-                        rpcIqPacket.parse(nodeRecv);
-                        emit rpcCallInvoke(rpcIqPacket);
-                    }
-                    else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
-                    {
-                        QXmppRpcResponseIq rpcResponseIq;
-                        rpcResponseIq.parse(nodeRecv);
-                        emit rpcCallResponse(rpcResponseIq);
-                    }
-                    else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
-                    {
-                        QXmppRpcErrorIq rpcErrorIq;
-                        rpcErrorIq.parse(nodeRecv);
-                        emit rpcCallError( rpcErrorIq );
-                    }
-                    else if(id == m_sessionId)
+                    if(id == m_sessionId)
                     {
                         QXmppSession session;
                         session.parse(nodeRecv);
@@ -551,6 +533,26 @@ void QXmppStream::parser(const QByteArray& data)
                         emit rosterIqReceived(rosterIq);
                     }
                     // extensions
+
+                    // XEP-0009: Jabber-RPC
+                    else if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
+                    {
+                        QXmppRpcInvokeIq rpcIqPacket;
+                        rpcIqPacket.parse(nodeRecv);
+                        emit rpcCallInvoke(rpcIqPacket);
+                    }
+                    else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
+                    {
+                        QXmppRpcResponseIq rpcResponseIq;
+                        rpcResponseIq.parse(nodeRecv);
+                        emit rpcCallResponse(rpcResponseIq);
+                    }
+                    else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
+                    {
+                        QXmppRpcErrorIq rpcErrorIq;
+                        rpcErrorIq.parse(nodeRecv);
+                        emit rpcCallError(rpcErrorIq);
+                    }
 
                     // XEP-0030: Service Discovery
                     else if(QXmppDiscoveryIq::isDiscoveryIq(nodeRecv))
