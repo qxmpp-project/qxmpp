@@ -12,7 +12,7 @@ class QXmppRpcResponseIq : public QXmppIq
 public:
     QXmppRpcResponseIq();
 
-    QVariant getPayload() const;
+    QVariant payload() const;
     void setPayload( const QVariant &payload );
 
     static bool isRpcResponseIq(const QDomElement &element);
@@ -30,13 +30,13 @@ class QXmppRpcInvokeIq : public QXmppIq
 public:
     QXmppRpcInvokeIq();
 
-    QVariantList getPayload() const;
+    QVariantList payload() const;
     void setPayload( const QVariantList &payload );
 
-    QString getMethod() const;
+    QString method() const;
     void setMethod( const QString &method );
 
-    QString getInterface() const;
+    QString interface() const;
     void setInterface( const QString &interface );
 
     static bool isRpcInvokeIq(const QDomElement &element);
@@ -58,8 +58,8 @@ class QXmppRpcErrorIq : public QXmppIq
 public:
     QXmppRpcErrorIq();
 
+    QXmppRpcInvokeIq query() const;
     void setQuery(const QXmppRpcInvokeIq &query);
-    QXmppRpcInvokeIq getQuery() const;
 
     static bool isRpcErrorIq(const QDomElement &element);
 

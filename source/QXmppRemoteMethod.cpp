@@ -45,7 +45,7 @@ void QXmppRemoteMethod::gotResult( const QXmppRpcResponseIq &iq )
     if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = false;
-        m_result.result = iq.getPayload();
+        m_result.result = iq.payload();
         emit callDone();
     }
 }

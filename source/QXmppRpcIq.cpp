@@ -9,14 +9,14 @@ QXmppRpcErrorIq::QXmppRpcErrorIq() : QXmppIq( QXmppIq::Error )
 
 }
 
-void QXmppRpcErrorIq::setQuery(const QXmppRpcInvokeIq &query )
-{
-    m_query = query;
-}
-
-QXmppRpcInvokeIq QXmppRpcErrorIq::getQuery() const
+QXmppRpcInvokeIq QXmppRpcErrorIq::query() const
 {
     return m_query;
+}
+
+void QXmppRpcErrorIq::setQuery(const QXmppRpcInvokeIq &query)
+{
+    m_query = query;
 }
 
 bool QXmppRpcErrorIq::isRpcErrorIq(const QDomElement &element)
@@ -43,7 +43,7 @@ QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
 {
 }
 
-QVariant QXmppRpcResponseIq::getPayload() const
+QVariant QXmppRpcResponseIq::payload() const
 {
     return m_payload;
 }
@@ -82,7 +82,7 @@ QXmppRpcInvokeIq::QXmppRpcInvokeIq() : QXmppIq( QXmppIq::Set )
 {
 }
 
-QVariantList QXmppRpcInvokeIq::getPayload() const
+QVariantList QXmppRpcInvokeIq::payload() const
 {
     return m_payload;
 }
@@ -92,7 +92,7 @@ void QXmppRpcInvokeIq::setPayload( const QVariantList &payload )
     m_payload = payload;
 }
 
-QString QXmppRpcInvokeIq::getMethod() const
+QString QXmppRpcInvokeIq::method() const
 {
     return m_method;
 }
@@ -101,7 +101,7 @@ void QXmppRpcInvokeIq::setMethod( const QString &method )
     m_method = method;
 }
 
-QString QXmppRpcInvokeIq::getInterface() const
+QString QXmppRpcInvokeIq::interface() const
 {
     return m_interface;
 }
