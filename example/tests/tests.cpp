@@ -352,11 +352,10 @@ void TestXmlRpc::testBase64()
 
 void TestXmlRpc::testBool()
 {
-    // FIXME : XML-RPC spec says we should write "0" or "1"
     checkVariant(false,
-                 QByteArray("<value><boolean>false</boolean></value>"));
+                 QByteArray("<value><boolean>0</boolean></value>"));
     checkVariant(true,
-                 QByteArray("<value><boolean>true</boolean></value>"));
+                 QByteArray("<value><boolean>1</boolean></value>"));
 }
 
 void TestXmlRpc::testDateTime()

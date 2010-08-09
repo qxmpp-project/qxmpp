@@ -21,7 +21,7 @@ void XMLRPC::marshall( QXmlStreamWriter *writer, const QVariant &value)
             writer->writeTextElement("double", value.toString());
             break;
         case QVariant::Bool:
-            writer->writeTextElement("boolean", (value.toBool()?"true":"false") );
+            writer->writeTextElement("boolean", value.toBool() ? "1" : "0");
             break;
         case QVariant::Date:
             writer->writeTextElement("dateTime.iso8601", value.toDate().toString( Qt::ISODate ) );
@@ -120,7 +120,7 @@ QVariant XMLRPC::demarshall(const QDomElement &elem, QStringList &errors)
         errors <<  "I was looking for an double but data was corrupt";
     }
     else if( typeName == "boolean" )
-        return QVariant( ( typeData.text().toLower() == "true" || typeData.text() == "1")?true:false );
+        return QVariant( typeData.text() == "1" || typeData.text().toLower() == "true" );
     else if( typeName == "datetime" || typeName == "datetime.iso8601" )
         return QVariant( QDateTime::fromString( typeData.text(), Qt::ISODate ) );
     else if( typeName == "array" )
