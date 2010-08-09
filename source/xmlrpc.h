@@ -16,16 +16,16 @@
 *
 * An example of how to use the XML Packets is as follows:
 * @code
-*	QList<QVariant> args;
-*	args << m_db << m_username << m_password << dbQuery;
-*	RequestMessage msg( "data.query", args );
-*	ResponseMessage resp( SomeHttpDispatchObject( msg.xml() ) );
-*	if( resp.isValid() )
-*	{
-*		int rows = resp.value().toMap()["widgets"].toInt();
-*	}
-*	else
-*		qWarning("Error: %s", resp.error().latin1() );
+*     QList<QVariant> args;
+*     args << m_db << m_username << m_password << dbQuery;
+*     RequestMessage msg( "data.query", args );
+*     ResponseMessage resp( SomeHttpDispatchObject( msg.xml() ) );
+*     if( resp.isValid() )
+*     {
+*          int rows = resp.value().toMap()["widgets"].toInt();
+*     }
+*     else
+*          qWarning("Error: %s", resp.error().latin1() );
 * @endcode
 * This example will construct invoke the data.query() method on the XMLRPC
 * interface with the args.  It will then check for the response to see if
@@ -47,32 +47,32 @@ namespace XMLRPC
 class MessageBase
 {
 public:
-	MessageBase();
-	virtual ~MessageBase();
+     MessageBase();
+     virtual ~MessageBase();
 
-	/**
-	* Returns a human readable error that was recived from the server.
-	*/
-	QString error() const;
+     /**
+     * Returns a human readable error that was recived from the server.
+     */
+     QString error() const;
 
-	/**
-	 * Sets the human readable error message.
-	 */
-	virtual void setError( const QString &message ) const;
+     /**
+      * Sets the human readable error message.
+      */
+     virtual void setError( const QString &message ) const;
 
-	/**
-	* Returns if the current message is valid.
-	*/
-	bool isValid() const;
+     /**
+     * Returns if the current message is valid.
+     */
+     bool isValid() const;
 
 protected:
         virtual void marshall( QXmlStreamWriter *writer, const QVariant &val ) const;
-	virtual QVariant demarshall( const QDomElement &elem ) const;
+     virtual QVariant demarshall( const QDomElement &elem ) const;
 
 
 private:
-	mutable QString m_message;
-	mutable bool m_valid;
+     mutable QString m_message;
+     mutable bool m_valid;
 };
 
 /**
@@ -84,36 +84,36 @@ class RequestMessage : public MessageBase
 {
 public:
         RequestMessage( const QDomElement &element );
-	/**
+     /**
          * Creates an RequestMessage from an XML packet.
-	 */
-	RequestMessage( const QByteArray &xml );
-	/**
-	* Creates a method packet that will call method with a list of args.
-	*/
-	RequestMessage( const QByteArray &method, const QList<QVariant> &args );
+      */
+     RequestMessage( const QByteArray &xml );
+     /**
+     * Creates a method packet that will call method with a list of args.
+     */
+     RequestMessage( const QByteArray &method, const QList<QVariant> &args );
 
-	/**
-	* Convinence ctor that creates a packet for a method with a single
-	* argument.
-	*/
-	RequestMessage( const QByteArray &method, const QVariant &arg );
+     /**
+     * Convinence ctor that creates a packet for a method with a single
+     * argument.
+     */
+     RequestMessage( const QByteArray &method, const QVariant &arg );
 
-	virtual ~RequestMessage() {;}
+     virtual ~RequestMessage() {;}
 
-	/**
-	* Return the xml representation of the packet.
-	*/
-	QByteArray xml() const;
+     /**
+     * Return the xml representation of the packet.
+     */
+     QByteArray xml() const;
         void writeXml( QXmlStreamWriter *writer ) const;
 
-	QByteArray method() const;
-	QList< QVariant > args() const;
+     QByteArray method() const;
+     QList< QVariant > args() const;
 
 
 private:
-	QByteArray m_method;
-	QList<QVariant> m_args;
+     QByteArray m_method;
+     QList<QVariant> m_args;
 
 };
 
@@ -129,47 +129,47 @@ public:
         */
         ResponseMessage( const QDomElement &element );
 
-	/**
-	* Create a new recive packet with an xml packet
-	*/
-	ResponseMessage( const QByteArray &xml );
-	/**
-	 * Create a new response message with data.
-	 */
-	ResponseMessage( const QList< QVariant >& theValue );
+     /**
+     * Create a new recive packet with an xml packet
+     */
+     ResponseMessage( const QByteArray &xml );
+     /**
+      * Create a new response message with data.
+      */
+     ResponseMessage( const QList< QVariant >& theValue );
 
-	/**
-	 * Create a new response message with data. This is exactly like
-	 * the above method save for it only takes a single QVariant.
-	 */
-	explicit ResponseMessage( const QVariant& theValue );
+     /**
+      * Create a new response message with data. This is exactly like
+      * the above method save for it only takes a single QVariant.
+      */
+     explicit ResponseMessage( const QVariant& theValue );
 
-	virtual ~ResponseMessage() {;}
-	/**
-	* Returns the number of data elements.  Usually this is only
-	* 1 element, but some services will return mutiple messages in
-	* a single xmlrpc packet.
-	*/
-	int count() const;
-	/**
-	* Returns the native value for an xmlrpc message at an offset.
-	* Usually this method can be called with no arguments.
-	*/
-	QVariant value( int idx = 0 ) const;
+     virtual ~ResponseMessage() {;}
+     /**
+     * Returns the number of data elements.  Usually this is only
+     * 1 element, but some services will return mutiple messages in
+     * a single xmlrpc packet.
+     */
+     int count() const;
+     /**
+     * Returns the native value for an xmlrpc message at an offset.
+     * Usually this method can be called with no arguments.
+     */
+     QVariant value( int idx = 0 ) const;
 
-	/**
-	* Return the xml representation of the packet.
-	*/
-	virtual QByteArray xml() const;
+     /**
+     * Return the xml representation of the packet.
+     */
+     virtual QByteArray xml() const;
         void writeXml( QXmlStreamWriter *writer ) const;
 
 
-	QList< QVariant > values() const;
+     QList< QVariant > values() const;
 protected:
-	void setValues( const QList<QVariant> va2ls);
+     void setValues( const QList<QVariant> va2ls);
 
 private:
-	QList<QVariant> m_values;
+     QList<QVariant> m_values;
 };
 
 }
