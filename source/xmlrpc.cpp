@@ -435,34 +435,6 @@ XMLRPC::ResponseMessage::ResponseMessage( const QList< QVariant > & theValue  )
 {
 }
 
-XMLRPC::FaultMessage::FaultMessage( int code, const QString & message ) :
-ResponseMessage(QList<QVariant>() )
-{
-	QList<QVariant> args;
-	QMap<QString,QVariant> fault;
-	fault["faultCode"] = code;
-	fault["faultString"] = message;
-	args << fault;
-	setValues(args);
-}
-
-void XMLRPC::FaultMessage::writeXml( QXmlStreamWriter *writer ) const
-{
-    writer->writeStartElement("fault");
-    marshall( writer, values().first() );
-    writer->writeEndElement();
-}
-
-QByteArray XMLRPC::FaultMessage::xml( ) const
-{
-    QByteArray returnXML;
-    QXmlStreamWriter writer( &returnXML );
-    writer.writeStartDocument();
-    writeXml(&writer);
-    writer.writeEndDocument();
-    return returnXML;
-}
-
 XMLRPC::ResponseMessage::ResponseMessage( const QVariant & theValue )
 : MessageBase()
 {

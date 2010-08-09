@@ -172,13 +172,5 @@ private:
 	QList<QVariant> m_values;
 };
 
-class FaultMessage : public ResponseMessage
-{
-public:
-	FaultMessage( int code, const QString &message );
-	QByteArray xml() const;
-        void writeXml( QXmlStreamWriter *writer ) const;
-
-};
 }
 #endif
