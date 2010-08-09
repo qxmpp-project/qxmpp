@@ -506,9 +506,18 @@ void QXmppStream::parser(const QByteArray& data)
                         // bind result
                         if (bind.type() == QXmppIq::Result)
                         {
-                            QString resource = jidToResource(bind.jid());
-                            if (!resource.isEmpty())
-                                configuration().setResource(resource);
+                            if (!bind.jid().isEmpty())
+                            {
+                                QRegExp jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
+                                if (jidRegex.exactMatch(bind.jid()))
+                                {
+                                    configuration().setUser(jidRegex.cap(1));
+                                    configuration().setDomain(jidRegex.cap(2));
+                                    configuration().setResource(jidRegex.cap(3));
+                                } else {
+                                    warning("Bind IQ received with invalid JID: " + bind.jid());
+                                }
+                            }
                             if (m_sessionAvailable)
                                 sendSessionIQ();
                         }
