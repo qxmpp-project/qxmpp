@@ -31,7 +31,49 @@
 
 class QUdpSocket;
 class QTimer;
-class QXmppStunMessage;
+
+/// \brief The QXmppStunMessage class represents a STUN message.
+///
+
+class QXmppStunMessage
+{
+public:
+    QXmppStunMessage();
+
+    QByteArray id() const;
+    void setId(const QByteArray &id);
+
+    quint16 type() const;
+    void setType(quint16 type);
+
+    QByteArray encode(const QString &password = QString()) const;
+    bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
+    QString toString() const;
+    static quint16 peekType(const QByteArray &buffer);
+
+    // attributes
+    int errorCode;
+    QString errorPhrase;
+    quint32 priority;
+    QByteArray iceControlling;
+    QByteArray iceControlled;
+    QHostAddress mappedHost;
+    quint16 mappedPort;
+    QHostAddress otherHost;
+    quint16 otherPort;
+    QHostAddress xorMappedHost;
+    quint16 xorMappedPort;
+    QString software;
+    QString username;
+    bool useCandidate;
+
+private:
+    void setBodyLength(QByteArray &buffer, qint16 length) const;
+
+    QByteArray m_id;
+    quint16 m_type;
+};
+
 
 /// \brief The QXmppStunSocket class represents an UDP socket capable
 /// of performing Interactive Connectivity Establishment (RFC 5245).
