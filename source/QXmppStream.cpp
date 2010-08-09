@@ -762,23 +762,17 @@ bool QXmppStream::sendToServer(const QByteArray& packet)
 bool QXmppStream::hasStartStreamElement(const QByteArray& data)
 {
     QString str(data);
-    QRegExp regex("(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
+    QRegExp regex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
     regex.setMinimal(true);
-    if(str.contains(regex))
-        return true;
-    else
-        return false;
+    return str.contains(regex);
 }
 
 bool QXmppStream::hasEndStreamElement(const QByteArray& data)
 {
     QString str(data);
-    QRegExp regex("</stream:stream>");
+    QRegExp regex("</stream:stream>$");
     regex.setMinimal(true);
-    if(str.contains(regex))
-        return true;
-    else
-        return false;
+    return str.contains(regex);
 }
 
 void QXmppStream::sendStartTls()
