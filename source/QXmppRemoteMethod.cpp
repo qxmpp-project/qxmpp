@@ -45,7 +45,8 @@ void QXmppRemoteMethod::gotResult( const QXmppRpcResponseIq &iq )
     if ( iq.id() == m_payload.id() )
     {
         m_result.hasError = false;
-        m_result.result = iq.values();
+        // FIXME: we don't handle multiple responses
+        m_result.result = iq.values().first();
         emit callDone();
     }
 }
