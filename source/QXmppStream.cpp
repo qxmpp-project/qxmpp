@@ -301,40 +301,38 @@ void QXmppStream::parser(const QByteArray& data)
                                      namespaceURI() == ns_sasl;
                 bool useSasl = configuration().useSASLAuthentication();
 
-                if(nodeRecv.firstChildElement("starttls").namespaceURI()
-                    == ns_tls && !m_socket.isEncrypted())
+                if (!m_socket.isEncrypted())
                 {
-                    if(nodeRecv.firstChildElement("starttls").
-                                     firstChildElement().tagName() == "required")
+                    // parse remote TLS mode
+                    QXmppConfiguration::StreamSecurityMode remoteSecurity;
+                    QDomElement tlsElement = nodeRecv.firstChildElement("starttls");
+                    if (tlsElement.namespaceURI() == ns_tls)
                     {
-                        // TLS is must from the server side
-                        sendStartTls();
-                        return;
+                        if (tlsElement.firstChildElement().tagName() == "required")
+                            remoteSecurity = QXmppConfiguration::TLSRequired;
+                        else
+                            remoteSecurity = QXmppConfiguration::TLSEnabled;
+                    } else {
+                        remoteSecurity = QXmppConfiguration::TLSDisabled;
                     }
-                    else
+
+                    // determine TLS mode to use
+                    const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
+                    if (localSecurity == QXmppConfiguration::TLSRequired &&
+                        remoteSecurity == QXmppConfiguration::TLSDisabled)
                     {
-                        // TLS is optional from the server side
-                        switch(configuration().streamSecurityMode())
-                        {
-                        case QXmppConfiguration::TLSEnabled:
-                        case QXmppConfiguration::TLSRequired:
-                            sendStartTls();
-                            return;
-                        case QXmppConfiguration::TLSDisabled:
-                            break;
-                        }
-                    }
-                }
-                else if(!m_socket.isEncrypted())    // TLS not supported by server
-                {
-                    if(configuration().streamSecurityMode() ==
-                       QXmppConfiguration::TLSRequired)
-                    {
-                        // disconnect as the for client TLS is compulsory but
-                        // not available on the server
-                        //
+                        // disconnect as TLS is required by the client
+                        // but not available on the server
                         warning("Disconnecting as TLS not available at the server");
                         disconnect();
+                        return;
+                    }
+                    if (remoteSecurity == QXmppConfiguration::TLSRequired ||
+                        localSecurity != QXmppConfiguration::TLSDisabled)
+                    {
+                        // enable TLS as it is required by the server
+                        // or supported by the client
+                        sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
                         return;
                     }
                 }
@@ -790,11 +788,6 @@ bool QXmppStream::hasEndStreamElement(const QByteArray& data)
     QRegExp regex("</stream:stream>$");
     regex.setMinimal(true);
     return str.contains(regex);
-}
-
-void QXmppStream::sendStartTls()
-{
-    sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 }
 
 void QXmppStream::sendNonSASLAuth(bool plainText)

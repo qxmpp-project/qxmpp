@@ -170,7 +170,6 @@ private:
     void parser(const QByteArray&);
     void sendStartStream();
     void sendEndStream();
-    void sendStartTls();
     void sendNonSASLAuth(bool);
     void sendNonSASLAuthQuery( const QString &to );
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
