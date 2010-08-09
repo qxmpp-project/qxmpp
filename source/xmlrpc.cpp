@@ -66,9 +66,11 @@ void XMLRPC::marshall( QXmlStreamWriter *writer, const QVariant &value)
         }
         default:
         {
-            if( value.canConvert(QVariant::String) )
+            if (value.isNull())
+                writer->writeEmptyElement("nil");
+            else if( value.canConvert(QVariant::String) )
             {
-                writer->writeTextElement( "string", value.toString() );
+                writer->writeTextElement("string", value.toString() );
             }
             break;
         }
@@ -92,6 +94,10 @@ QVariant XMLRPC::demarshall(const QDomElement &elem, QStringList &errors)
     const QDomElement typeData = elem.firstChild().toElement();
     const QString typeName = typeData.tagName().toLower();
 
+    if (typeName == "nil")
+    {
+        return QVariant();
+    }
     if ( typeName == "string" )
     {
         return QVariant( typeData.text() );

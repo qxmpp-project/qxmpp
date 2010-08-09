@@ -377,6 +377,12 @@ void TestXmlRpc::testInt()
                  QByteArray("<value><i4>-12</i4></value>"));
 }
 
+void TestXmlRpc::testNil()
+{
+    checkVariant(QVariant(),
+                 QByteArray("<value><nil/></value>"));
+}
+
 void TestXmlRpc::testString()
 {
     checkVariant(QString("hello world"),

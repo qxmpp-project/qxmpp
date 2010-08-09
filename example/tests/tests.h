@@ -69,6 +69,7 @@ private slots:
     void testDateTime();
     void testDouble();
     void testInt();
+    void testNil();
     void testString();
 
     void testArray();
