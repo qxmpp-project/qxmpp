@@ -173,8 +173,6 @@ private:
     void sendStartTls();
     void sendNonSASLAuth(bool);
     void sendNonSASLAuthQuery( const QString &to );
-    void sendAuthPlain();
-    void sendAuthDigestMD5();
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();

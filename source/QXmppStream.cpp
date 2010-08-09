@@ -377,14 +377,21 @@ void QXmppStream::parser(const QByteArray& data)
                         mechanism = mechanisms.first();
                     }
 
-                    // send SASL Authentication request 
+                    // send SASL Authentication request
                     switch(mechanism)
                     {
                     case QXmppConfiguration::SASLPlain:
-                        sendAuthPlain();
+                        {
+                            QString userPass('\0' + configuration().user() +
+                                             '\0' + configuration().passwd());
+                            QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
+                            data += userPass.toUtf8().toBase64();
+                            data += "</auth>";
+                            sendToServer(data);
+                        }
                         break;
                     case QXmppConfiguration::SASLDigestMD5:
-                        sendAuthDigestMD5();
+                        sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
                         break;
                     case QXmppConfiguration::SASLAnonymous:
                         sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
@@ -800,22 +807,6 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
     authQuery.setUsePlainText(plainText);
     m_nonSASLAuthId = authQuery.id();
     sendPacket(authQuery);
-}
-
-void QXmppStream::sendAuthPlain()
-{
-    QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
-    QString userPass('\0' + configuration().user() +
-                     '\0' + configuration().passwd());
-    data += userPass.toUtf8().toBase64();
-    data += "</auth>";
-    sendToServer(data);
-}
-
-void QXmppStream::sendAuthDigestMD5()
-{
-    QByteArray packet = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>";
-    sendToServer(packet);
 }
 
 // challenge is BASE64 encoded string
