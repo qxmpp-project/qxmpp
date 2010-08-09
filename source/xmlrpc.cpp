@@ -181,14 +181,14 @@ bool XMLRPC::RequestMessage::parse(const QDomElement &element)
     const QDomElement methodParams = element.firstChildElement("params");
     if( !methodParams.isNull() )
     {
-        QDomNode param = methodParams.firstChild();
+        QDomNode param = methodParams.firstChildElement("param");
         while (!param.isNull())
         {
             QVariant arg = demarshall(param.firstChild().toElement(), errors);
             if (!errors.isEmpty())
                 return false;
             m_args << arg;
-            param = param.nextSibling();
+            param = param.nextSiblingElement("param");
         }
     }
     return true;
@@ -238,20 +238,20 @@ bool XMLRPC::ResponseMessage::parse(const QDomElement &element)
     const QDomElement contents = element.firstChild().toElement();
     if( contents.tagName().toLower() == "params")
     {
-        QDomNode param = contents.firstChild();
+        QDomNode param = contents.firstChildElement("param");
         while (!param.isNull())
         {
-            const QVariant value = demarshall(param.firstChild().toElement(), errors);
+            const QVariant value = demarshall(param.firstChildElement(), errors);
             if (!errors.isEmpty())
                 return false;
             m_values << value;
-            param = param.nextSibling();
+            param = param.nextSiblingElement("param");
         }
         return true;
     }
     else if( contents.tagName().toLower() == "fault")
     {
-        const QDomElement errElement = contents.firstChild().toElement();
+        const QDomElement errElement = contents.firstChildElement();
         const QVariant error = demarshall(errElement, errors);
 
         qWarning() << QString("XMLRPC Fault %1: %2")
