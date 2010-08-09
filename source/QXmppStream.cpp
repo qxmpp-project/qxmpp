@@ -346,53 +346,48 @@ void QXmppStream::parser(const QByteArray& data)
                 }
                 else if(saslAvailable)
                 {
-                    // SASL Authentication
+                    // parse advertised SASL Authentication mechanisms
+                    QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
                     QDomElement element = nodeRecv.firstChildElement("mechanisms");
-                    debug("Mechanisms:");
-                    QDomElement subElement = element.firstChildElement();
-                    QStringList mechanisms;
+                    QDomElement subElement = element.firstChildElement("mechanism");
+                    debug("SASL Authentication mechanisms:");
                     while(!subElement.isNull())
                     {
-                        if(subElement.tagName() == "mechanism")
-                        {
-                            debug(subElement.text());
-                            mechanisms << subElement.text();
-                        }
-                        subElement = subElement.nextSiblingElement();
+                        debug(subElement.text());
+                        if (subElement.text() == QLatin1String("PLAIN"))
+                            mechanisms << QXmppConfiguration::SASLPlain;
+                        else if (subElement.text() == QLatin1String("DIGEST-MD5"))
+                            mechanisms << QXmppConfiguration::SASLDigestMD5;
+                        else if (subElement.text() == QLatin1String("ANONYMOUS"))
+                            mechanisms << QXmppConfiguration::SASLAnonymous;
+                        subElement = subElement.nextSiblingElement("mechanism");
                     }
 
-                    switch(configuration().sASLAuthMechanism())
+                    // determine SASL Authentication mechanism to use
+                    QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
+                    if (mechanisms.isEmpty())
+                    {
+                        warning("No supported SASL Authentication mechanism available");
+                        disconnect();
+                        return;
+                    }
+                    else if (!mechanisms.contains(mechanism))
+                    {
+                        info("Desired SASL Auth mechanism is not available, selecting first available one");
+                        mechanism = mechanisms.first();
+                    }
+
+                    // send SASL Authentication request 
+                    switch(mechanism)
                     {
                     case QXmppConfiguration::SASLPlain:
-                        if(mechanisms.contains("PLAIN"))
-                        {
-                            sendAuthPlain();
-                            break;
-                        }
+                        sendAuthPlain();
+                        break;
                     case QXmppConfiguration::SASLDigestMD5:
-                        if(mechanisms.contains("DIGEST-MD5"))
-                        {
-                            sendAuthDigestMD5();
-                            break;
-                        }
+                        sendAuthDigestMD5();
+                        break;
                     case QXmppConfiguration::SASLAnonymous:
-                        if(mechanisms.contains("ANONYMOUS"))
-                        {
-                            sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
-                            break;
-                        }
-                    default:
-                        info("Desired SASL Auth mechanism not available trying the available ones");
-                        if(mechanisms.contains("DIGEST-MD5"))
-                            sendAuthDigestMD5();
-                        else if(mechanisms.contains("PLAIN"))
-                            sendAuthPlain();
-                        else
-                        {
-                            warning("SASL Auth mechanism not available");
-                            disconnect();
-                            return;
-                        }
+                        sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
                         break;
                     }
                 }
