@@ -318,7 +318,7 @@ void QXmppStream::parser(const QByteArray& data)
 
                     // determine TLS mode to use
                     const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
-                    if (!m_socket.supportsSsl() && 
+                    if (!m_socket.supportsSsl() &&
                         (localSecurity == QXmppConfiguration::TLSRequired ||
                          remoteSecurity == QXmppConfiguration::TLSRequired))
                     {
