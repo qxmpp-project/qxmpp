@@ -31,6 +31,12 @@
 class QXmlStreamWriter;
 class QDomElement;
 
+namespace XMLRPC
+{
+    void marshall( QXmlStreamWriter *writer, const QVariant &value);
+    QVariant demarshall(const QDomElement &elem, QStringList &errors);
+}
+
 class QXmppRpcResponseIq : public QXmppIq
 {
 public:

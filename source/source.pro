@@ -62,8 +62,7 @@ HEADERS += QXmppUtils.h \
     QXmppRpcIq.h \
     QXmppVCardManager.h \
     QXmppVCard.h \
-    QXmppVersionIq.h \
-    xmlrpc.h
+    QXmppVersionIq.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -105,8 +104,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppRpcIq.cpp \
     QXmppVCardManager.cpp \
     QXmppVCard.cpp \
-    QXmppVersionIq.cpp \
-    xmlrpc.cpp
+    QXmppVersionIq.cpp
 
 # Installation
 PREFIX = /usr
