@@ -464,7 +464,45 @@ void TestXmlRpc::testResponse()
 
     QXmppRpcResponseIq iq;
     parsePacket(iq, xml);
+    QCOMPARE(iq.faultCode(), 0);
+    QCOMPARE(iq.faultString(), QString());
     QCOMPARE(iq.values(), QVariantList() << QString("Colorado"));
+    serializePacket(iq, xml);
+}
+
+void TestXmlRpc::testResponseFault()
+{
+    const QByteArray xml(
+        "<iq"
+        " id=\"rpc1\""
+        " to=\"requester@company-b.com/jrpc-client\""
+        " from=\"responder@company-a.com/jrpc-server\""
+        " type=\"result\">"
+        "<query xmlns=\"jabber:iq:rpc\">"
+        "<methodResponse>"
+        "<fault>"
+        "<value>"
+            "<struct>"
+                "<member>"
+                    "<name>faultCode</name>"
+                    "<value><i4>404</i4></value>"
+                "</member>"
+                "<member>"
+                    "<name>faultString</name>"
+                    "<value><string>Not found</string></value>"
+                "</member>"
+            "</struct>"
+        "</value>"
+        "</fault>"
+        "</methodResponse>"
+        "</query>"
+        "</iq>");
+
+    QXmppRpcResponseIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.faultCode(), 404);
+    QCOMPARE(iq.faultString(), QLatin1String("Not found"));
+    QCOMPARE(iq.values(), QVariantList());
     serializePacket(iq, xml);
 }
 

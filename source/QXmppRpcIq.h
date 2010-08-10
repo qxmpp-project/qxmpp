@@ -37,10 +37,21 @@ namespace XMLRPC
     QVariant demarshall(const QDomElement &elem, QStringList &errors);
 }
 
+/// \brief The QXmppResponseIq class represents an IQ used to carry
+/// an RPC response as specified by XEP-0009: Jabber-RPC.
+///
+/// \ingroup Stanzas
+
 class QXmppRpcResponseIq : public QXmppIq
 {
 public:
     QXmppRpcResponseIq();
+
+    int faultCode() const;
+    void setFaultCode(int faultCode);
+
+    QString faultString() const;
+    void setFaultString(const QString &faultString);
 
     QVariantList values() const;
     void setValues(const QVariantList &values);
@@ -52,8 +63,15 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
+    int m_faultCode;
+    QString m_faultString;
     QVariantList m_values;
 };
+
+/// \brief The QXmppInvokeIq class represents an IQ used to carry
+/// an RPC invocation as specified by XEP-0009: Jabber-RPC.
+///
+/// \ingroup Stanzas
 
 class QXmppRpcInvokeIq : public QXmppIq
 {

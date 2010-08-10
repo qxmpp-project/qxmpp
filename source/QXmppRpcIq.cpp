@@ -22,7 +22,6 @@
  *
  */
 
-#include <QDebug>
 #include <QDomElement>
 #include <QMap>
 #include <QVariant>
@@ -221,14 +220,57 @@ void QXmppRpcErrorIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     m_query.toXmlElementFromChild(writer);
 }
 
-QXmppRpcResponseIq::QXmppRpcResponseIq() : QXmppIq( QXmppIq::Result )
+QXmppRpcResponseIq::QXmppRpcResponseIq()
+    : QXmppIq(QXmppIq::Result),
+    m_faultCode(0)
 {
 }
+
+/// Returns the fault code.
+///
+
+int QXmppRpcResponseIq::faultCode() const
+{
+    return m_faultCode;
+}
+
+/// Sets the fault code.
+///
+/// \param faultCode
+
+void QXmppRpcResponseIq::setFaultCode(int faultCode)
+{
+    m_faultCode = faultCode;
+}
+
+/// Returns the fault string.
+///
+
+QString QXmppRpcResponseIq::faultString() const
+{
+    return m_faultString;
+}
+
+/// Sets the fault string.
+///
+/// \param faultString
+
+void QXmppRpcResponseIq::setFaultString(const QString& faultString)
+{
+    m_faultString = faultString;
+}
+
+/// Returns the response values.
+///
 
 QVariantList QXmppRpcResponseIq::values() const
 {
     return m_values;
 }
+
+/// Sets the response values.
+///
+/// \param values
 
 void QXmppRpcResponseIq::setValues(const QVariantList &values)
 {
@@ -255,7 +297,7 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
         while (!param.isNull())
         {
             QStringList errors;
-            const QVariant value = XMLRPC::demarshall(param.firstChildElement(), errors);
+            const QVariant value = XMLRPC::demarshall(param.firstChildElement("value"), errors);
             if (!errors.isEmpty())
                 break;
             m_values << value;
@@ -265,12 +307,12 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
     else if( contents.tagName().toLower() == "fault")
     {
         QStringList errors;
-        const QDomElement errElement = contents.firstChildElement();
+        const QDomElement errElement = contents.firstChildElement("value");
         const QVariant error = XMLRPC::demarshall(errElement, errors);
-
-        qWarning() << QString("XMLRPC Fault %1: %2")
-                        .arg(error.toMap()["faultCode"].toString() )
-                        .arg(error.toMap()["faultString"].toString() );
+        if (!errors.isEmpty())
+            return;
+        m_faultCode = error.toMap()["faultCode"].toInt();
+        m_faultString = error.toMap()["faultString"].toString();
     }
 }
 
@@ -280,7 +322,16 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
 
     writer->writeStartElement("methodResponse");
-    if (!m_values.isEmpty())
+    if (m_faultCode)
+    {
+        writer->writeStartElement("fault");
+        QMap<QString,QVariant> fault;
+        fault["faultCode"] = m_faultCode;
+        fault["faultString"] = m_faultString;
+        XMLRPC::marshall(writer, fault);
+        writer->writeEndElement();
+    }
+    else if (!m_values.isEmpty())
     {
         writer->writeStartElement("params");
         foreach (const QVariant &arg, m_values)
@@ -296,14 +347,22 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QXmppRpcInvokeIq::QXmppRpcInvokeIq() : QXmppIq( QXmppIq::Set )
+QXmppRpcInvokeIq::QXmppRpcInvokeIq()
+    : QXmppIq(QXmppIq::Set)
 {
 }
+
+/// Returns the method arguments.
+///
 
 QVariantList QXmppRpcInvokeIq::arguments() const
 {
     return m_arguments;
 }
+
+/// Sets the method arguments.
+///
+/// \param arguments
 
 void QXmppRpcInvokeIq::setArguments(const QVariantList &arguments)
 {
@@ -357,7 +416,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
         while (!param.isNull())
         {
             QStringList errors;
-            QVariant arg = XMLRPC::demarshall(param.firstChildElement(), errors);
+            QVariant arg = XMLRPC::demarshall(param.firstChildElement("value"), errors);
             if (!errors.isEmpty())
                 break;
             m_arguments << arg;
@@ -388,5 +447,4 @@ void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
 

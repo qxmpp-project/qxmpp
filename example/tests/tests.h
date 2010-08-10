@@ -77,4 +77,5 @@ private slots:
 
     void testInvoke();
     void testResponse();
+    void testResponseFault();
 };
