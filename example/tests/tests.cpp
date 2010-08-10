@@ -36,7 +36,6 @@
 #include "QXmppSession.h"
 #include "QXmppUtils.h"
 #include "tests.h"
-#include "xmlrpc.h"
 
 void TestUtils::testHmac()
 {
