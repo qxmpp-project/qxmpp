@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Bolloré telecom
+ * Copyright (C) 2008-2010 The QXmpp developers
  *
  * Author:
  *	Jeremy Lainé

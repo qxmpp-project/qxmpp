@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Manjeet Dahiya
+ * Copyright (C) 2008-2010 The QXmpp developers
  *
  * Authors:
  *	Manjeet Dahiya
