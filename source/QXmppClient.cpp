@@ -321,8 +321,13 @@ QXmppPresence QXmppClient::clientPresence() const
 
 /// Changes the presence of the connected client.
 ///
-/// If the presence type is QXmppPresence::Unavailable, the connection
+/// The connection to the server will be updated accordingly:
+///
+/// \li If the presence type is QXmppPresence::Unavailable, the connection
 /// to the server will be closed.
+///
+/// \li Otherwise, the connection to the server will be established
+/// as needed.
 ///
 /// \param presence QXmppPresence object
 ///
