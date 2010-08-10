@@ -27,30 +27,51 @@
 #include "QXmppUtils.h"
 #include "QXmppVersionIq.h"
 
+/// Returns the name of the software.
+///
+
 QString QXmppVersionIq::name() const
 {
     return m_name;
 }
+
+/// Sets the name of the software.
+///
+/// \param name
 
 void QXmppVersionIq::setName(const QString &name)
 {
     m_name = name;
 }
 
+/// Returns the operating system.
+///
+
 QString QXmppVersionIq::os() const
 {
     return m_os;
 }
+
+/// Sets the operating system.
+///
+/// \param os
 
 void QXmppVersionIq::setOs(const QString &os)
 {
     m_os = os;
 }
 
+/// Returns the software version.
+///
+
 QString QXmppVersionIq::version() const
 {
     return m_version;
 }
+
+/// Sets the software version.
+///
+/// \param version
 
 void QXmppVersionIq::setVersion(const QString &version)
 {
