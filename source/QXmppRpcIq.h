@@ -59,8 +59,10 @@ public:
     static bool isRpcResponseIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     int m_faultCode;
@@ -90,8 +92,10 @@ public:
     static bool isRpcInvokeIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QVariantList m_arguments;
