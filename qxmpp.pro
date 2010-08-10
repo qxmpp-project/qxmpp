@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS = source \
-          example
+          examples
 
 CONFIG += ordered debug_and_release
