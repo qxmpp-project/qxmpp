@@ -1,8 +1,9 @@
 include(../qxmpp.pri)
 
 TEMPLATE = lib
-QT += network \
-    xml
+
+QT += network xml
+
 CONFIG += staticlib
 
 # To disable the dependency on QtGui, uncomment the following:
@@ -11,11 +12,9 @@ CONFIG += staticlib
 # To enable support for the Speex codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX
 
-# Make sure the library gets built in the same location
-# regardless of the platform. On win32 the library is
-# automagically put in debug/release folders, so do the
-# same for other platforms.
+# Target definition
 TARGET = $$QXMPP_LIB
+VERSION = $$QXMPP_VERSION
 DESTDIR = $$QXMPP_LIBRARY_DIR
 
 # Header files
@@ -102,11 +101,12 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCard.cpp \
     QXmppVersionIq.cpp
 
+# pkg-config support
+CONFIG += create_pc create_prl no_install_prl
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+
 # Installation
-PREFIX = /usr
 headers.files = $$HEADERS
-headers.path = $$PREFIX/include/qxmpp
-pkgconfig.files = qxmpp.pc
-pkgconfig.path = $$PREFIX/lib/pkgconfig
-target.path = $$PREFIX/lib
-INSTALLS += headers pkgconfig target
+headers.path = $$[QT_INSTALL_PREFIX]/include/qxmpp
+target.path = $$[QT_INSTALL_PREFIX]/lib
+INSTALLS += headers target
