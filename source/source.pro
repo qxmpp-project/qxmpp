@@ -16,11 +16,7 @@ CONFIG += staticlib
 # automagically put in debug/release folders, so do the
 # same for other platforms.
 TARGET = $$QXMPP_LIB
-CONFIG(debug, debug|release) { 
-    DESTDIR = debug
-} else {
-    DESTDIR = release
-}
+DESTDIR = $$QXMPP_LIBRARY_DIR
 
 # Header files
 HEADERS += QXmppUtils.h \
