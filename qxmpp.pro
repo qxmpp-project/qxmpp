@@ -7,3 +7,5 @@ SUBDIRS = source \
           examples
 
 CONFIG += ordered
+
+include(doc/doc.pri)
