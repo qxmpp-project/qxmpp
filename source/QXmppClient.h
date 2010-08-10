@@ -111,6 +111,7 @@ public:
     bool isConnected() const;
 
     QXmppPresence clientPresence() const;
+    void setClientPresence(const QXmppPresence &presence);
 
     QXmppConfiguration &configuration();
     QXmppLogger *logger();
@@ -156,6 +157,11 @@ public:
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
     QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
+
+    // deprecated methods, use setClientPresence(QXmppPresence) instead.
+    void Q_DECL_DEPRECATED setClientPresence(const QString& statusText);
+    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Type presenceType);
+    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Status::Type statusType);
     /// \endcond
 
 signals:
@@ -231,13 +237,6 @@ signals:
 public slots:
     bool sendPacket(const QXmppPacket&);
     void sendMessage(const QString& bareJid, const QString& message);
-
-    // FIXME: there are too many setClientPresence methods, which makes them
-    // hard to understand. Also, they should probably not be slots.
-    void setClientPresence(const QXmppPresence &presence);
-    void setClientPresence(const QString& statusText);
-    void setClientPresence(QXmppPresence::Type presenceType);
-    void setClientPresence(QXmppPresence::Status::Type statusType);
 
 private slots:
     void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
