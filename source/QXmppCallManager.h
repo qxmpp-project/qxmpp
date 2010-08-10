@@ -37,7 +37,7 @@ class QXmppJinglePayloadType;
 class QXmppStream;
 class QXmppStunSocket;
 
-/// The QXmppCall class represents a Voice-Over-IP call to a remote party.
+/// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
 /// It acts as a QIODevice so that you can read / write audio samples, for
 /// instance using a QAudioOutput and a QAudioInput.
