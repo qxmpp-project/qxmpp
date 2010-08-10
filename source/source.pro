@@ -109,7 +109,10 @@ SOURCES += QXmppUtils.cpp \
     xmlrpc.cpp
 
 # Installation
+PREFIX = /usr
 headers.files = $$HEADERS
-headers.path = /usr/include/qxmpp
-target.path = /usr/lib
-INSTALLS += headers target
+headers.path = $$PREFIX/include/qxmpp
+pkgconfig.files = qxmpp.pc
+pkgconfig.path = $$PREFIX/lib/pkgconfig
+target.path = $$PREFIX/lib
+INSTALLS += headers pkgconfig target
