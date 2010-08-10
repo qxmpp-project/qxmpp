@@ -1,5 +1,30 @@
-#include "QXmppRpcIq.h"
+/*
+ * Copyright (C) 2009-2010 Ian Reinhard Geiser
+ *
+ * Authors:
+ *	Ian Reinhard Geiser
+ *	Jeremy Lainé
+ *
+ * Source:
+ *	http://code.google.com/p/qxmpp
+ *
+ * This file is a part of QXmpp library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
 #include "QXmppConstants.h"
+#include "QXmppRpcIq.h"
+#include "QXmppUtils.h"
 #include "xmlrpc.h"
 
 #include <QDomElement>
@@ -73,7 +98,8 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(ns_rpc, "query");
+    writer->writeStartElement("query");
+    helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
 
     XMLRPC::ResponseMessage message;
     message.setValues(m_values);
@@ -139,7 +165,8 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(ns_rpc, "query");
+    writer->writeStartElement("query");
+    helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
 
     QString methodName = m_interface + "." + m_method;
     XMLRPC::RequestMessage message;

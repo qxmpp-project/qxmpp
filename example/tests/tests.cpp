@@ -32,6 +32,7 @@
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
 #include "QXmppPresence.h"
+#include "QXmppRpcIq.h"
 #include "QXmppSession.h"
 #include "QXmppUtils.h"
 #include "tests.h"
@@ -413,6 +414,59 @@ void TestXmlRpc::testStruct()
                                 "<value><double>-12.214</double></value>"
                             "</member>"
                             "</struct></value>"));
+}
+
+void TestXmlRpc::testInvoke()
+{
+    const QByteArray xml(
+        "<iq"
+        " id=\"rpc1\""
+        " to=\"responder@company-a.com/jrpc-server\""
+        " from=\"requester@company-b.com/jrpc-client\""
+        " type=\"set\">"
+        "<query xmlns=\"jabber:iq:rpc\">"
+        "<methodCall>"
+        "<methodName>examples.getStateName</methodName>"
+        "<params>"
+        "<param>"
+        "<value><i4>6</i4></value>"
+        "</param>"
+        "</params>"
+        "</methodCall>"
+        "</query>"
+        "</iq>");
+
+    QXmppRpcInvokeIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.interface(), QLatin1String("examples"));
+    QCOMPARE(iq.method(), QLatin1String("getStateName"));
+    QCOMPARE(iq.arguments(), QVariantList() << int(6));
+    serializePacket(iq, xml);
+}
+
+void TestXmlRpc::testResponse()
+{
+    const QByteArray xml(
+        "<iq"
+        " id=\"rpc1\""
+        " to=\"requester@company-b.com/jrpc-client\""
+        " from=\"responder@company-a.com/jrpc-server\""
+        " type=\"result\">"
+        "<query xmlns=\"jabber:iq:rpc\">"
+        "<methodResponse>"
+        "<params>"
+        "<param>"
+        "<value><string>Colorado</string></value>"
+        "</param>"
+        "</params>"
+        "</methodResponse>"
+        "</query>"
+        "</iq>");
+
+    QXmppRpcResponseIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.values(), QVariantList() << QString("Colorado"));
+    serializePacket(iq, xml);
 }
 
 int main(int argc, char *argv[])

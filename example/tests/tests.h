@@ -74,4 +74,7 @@ private slots:
 
     void testArray();
     void testStruct();
+
+    void testInvoke();
+    void testResponse();
 };
