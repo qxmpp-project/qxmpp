@@ -89,7 +89,7 @@ void QXmppReconnectionManager::reconnect()
     if(m_client)
     {
         emit reconnectingNow();
-        m_client->connectToServer(m_client->configuration(), m_client->getClientPresence());
+        m_client->connectToServer(m_client->configuration(), m_client->clientPresence());
     }
 }
 

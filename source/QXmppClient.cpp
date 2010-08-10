@@ -67,7 +67,9 @@
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
-    : QObject(parent), m_stream(0), m_clientPresence(QXmppPresence::Available),
+    : QObject(parent),
+    m_stream(0),
+    m_clientPresence(QXmppPresence::Available),
     m_reconnectionManager(0)
 {
     m_stream = new QXmppStream(this);
@@ -312,6 +314,14 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
     }
 }
 
+/// Returns the client's current presence.
+///
+
+QXmppPresence QXmppClient::clientPresence() const
+{
+    return m_clientPresence;
+}
+
 /// Changes the presence of the connected client.
 ///
 /// If the presence type is QXmppPresence::Unavailable or the presence status
@@ -379,16 +389,6 @@ void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
         newPresence.setType(QXmppPresence::Available);
     newPresence.status().setType(statusType);
     setClientPresence(newPresence);
-}
-
-/// Function to get the client's current presence.
-///
-/// \return Constant reference to the client's presence object
-///
-
-const QXmppPresence& QXmppClient::getClientPresence() const
-{
-    return m_clientPresence;
 }
 
 /// Function to get reconnection manager. By default there exists a reconnection
@@ -614,6 +614,11 @@ void QXmppClient::xmppConnected()
 }
 
 // obsolete
+
+const QXmppPresence& QXmppClient::getClientPresence() const
+{
+    return m_clientPresence;
+}
 
 QXmppConfiguration& QXmppClient::getConfiguration()
 {

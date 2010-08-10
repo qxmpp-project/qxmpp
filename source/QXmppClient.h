@@ -110,6 +110,8 @@ public:
     void disconnect();
     bool isConnected() const;
 
+    QXmppPresence clientPresence() const;
+
     QXmppConfiguration &configuration();
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
@@ -124,14 +126,13 @@ public:
     QXmppTransferManager& transferManager();
     QXmppVCardManager& vCardManager();
 
-    // FIXME : these accessors should be deprecated in favour of
+    // FIXME: these accessors should be deprecated in favour of
     // versions without the "get".
     QXmppReconnectionManager* getReconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
-    const QXmppPresence& getClientPresence() const;
 
     /// \cond
-    // These methods are not in keeping with the "manager" approach,
+    // FIXME: these methods are not in keeping with the "manager" approach,
     // the whole RPC support either needs some love or should be pulled.
     void addInvokableInterface( QXmppInvokable *interface );
     QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
@@ -148,6 +149,7 @@ public:
                                               const QVariant &arg10 = QVariant() );
 
     // deprecated accessors, use the form without "get" instead
+    const QXmppPresence Q_DECL_DEPRECATED & getClientPresence() const;
     QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
     const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
     QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
@@ -226,12 +228,13 @@ signals:
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
-public:
 public slots:
     bool sendPacket(const QXmppPacket&);
     void sendMessage(const QString& bareJid, const QString& message);
 
-    void setClientPresence(const QXmppPresence&);
+    // FIXME: there are too many setClientPresence methods, which makes them
+    // hard to understand. Also, they should probably not be slots.
+    void setClientPresence(const QXmppPresence &presence);
     void setClientPresence(const QString& statusText);
     void setClientPresence(QXmppPresence::Type presenceType);
     void setClientPresence(QXmppPresence::Status::Type statusType);
