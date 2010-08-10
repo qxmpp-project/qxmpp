@@ -109,7 +109,7 @@ SOURCES += QXmppUtils.cpp \
 # Installation
 PREFIX = /usr
 documentation.depends = FORCE
-documentation.files = html
+documentation.files = $$PWD/html
 documentation.commands = doxygen
 documentation.path = $$PREFIX/share/doc/qxmpp
 headers.files = $$HEADERS
