@@ -46,7 +46,6 @@ public:
     QXmppArchiveManager(QXmppStream* stream, QObject *parent = 0);
     void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
-    void getPreferences();
 
 signals:
     void archiveListReceived(const QList<QXmppArchiveChat>&);

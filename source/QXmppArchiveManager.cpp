@@ -59,6 +59,14 @@ void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq
     Q_UNUSED(prefIq);
 }
 
+/// Retrieves the list of available collections. Once the results are
+/// received, the archiveChatReceived() signal will be emitted.
+///
+/// \param jid Optional JID if you only want conversations with a specific JID.
+/// \param start Optional start time.
+/// \param end Optional end time.
+/// \param max Optional maximum.
+///
 void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max)
 {
     QXmppArchiveListIq packet;
@@ -69,6 +77,13 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
     m_stream->sendPacket(packet);
 }
 
+/// Retrieves the specified collection. Once the results are received,
+/// the archiveChatReceived() will be emitted.
+///
+/// \param jid The JID of the collection
+/// \param start The start time of the collection.
+/// \param max Optional maximum number of messages to retrieve.
+///
 void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime &start, int max)
 {
     QXmppArchiveRetrieveIq packet;
@@ -78,8 +93,10 @@ void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime
     m_stream->sendPacket(packet);
 }
 
+#if 0
 void QXmppArchiveManager::getPreferences()
 {
     QXmppArchivePrefIq packet;
     m_stream->sendPacket(packet);
 }
+#endif
