@@ -437,8 +437,7 @@ void TestXmlRpc::testInvoke()
 
     QXmppRpcInvokeIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.interface(), QLatin1String("examples"));
-    QCOMPARE(iq.method(), QLatin1String("getStateName"));
+    QCOMPARE(iq.method(), QLatin1String("examples.getStateName"));
     QCOMPARE(iq.arguments(), QVariantList() << int(6));
     serializePacket(iq, xml);
 }

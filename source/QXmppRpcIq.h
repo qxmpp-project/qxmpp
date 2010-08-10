@@ -80,9 +80,6 @@ class QXmppRpcInvokeIq : public QXmppIq
 public:
     QXmppRpcInvokeIq();
 
-    QString interface() const;
-    void setInterface( const QString &interface );
-
     QString method() const;
     void setMethod( const QString &method );
 
@@ -100,7 +97,6 @@ protected:
 private:
     QVariantList m_arguments;
     QString m_method;
-    QString m_interface;
 
     friend class QXmppRpcErrorIq;
 };

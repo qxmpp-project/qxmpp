@@ -35,8 +35,7 @@ QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, 
 {
     m_payload.setTo( jid );
     m_payload.setFrom( client->configuration().jid() );
-    m_payload.setInterface( method.section('.', 0, 0 ) );
-    m_payload.setMethod( method.section('.', 1) );
+    m_payload.setMethod( method );
     m_payload.setArguments( args );
 }
 

@@ -369,23 +369,21 @@ void QXmppRpcInvokeIq::setArguments(const QVariantList &arguments)
     m_arguments = arguments;
 }
 
+/// Returns the method name.
+///
+
 QString QXmppRpcInvokeIq::method() const
 {
     return m_method;
 }
-void QXmppRpcInvokeIq::setMethod( const QString &method )
+
+/// Sets the method name.
+///
+/// \param method
+
+void QXmppRpcInvokeIq::setMethod(const QString &method)
 {
     m_method = method;
-}
-
-QString QXmppRpcInvokeIq::interface() const
-{
-    return m_interface;
-}
-
-void QXmppRpcInvokeIq::setInterface( const QString &interface )
-{
-    m_interface = interface;
 }
 
 bool QXmppRpcInvokeIq::isRpcInvokeIq(const QDomElement &element)
@@ -401,12 +399,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement methodElement = queryElement.firstChildElement("methodCall");
 
-    const QString methodName = methodElement.firstChildElement("methodName").text();
-    if (methodName.count('.') == 1)
-    {
-        m_interface = methodName.split('.').first();
-        m_method = methodName.split('.').last();
-    }
+    m_method = methodElement.firstChildElement("methodName").text();
 
     const QDomElement methodParams = methodElement.firstChildElement("params");
     m_arguments.clear();
@@ -431,7 +424,7 @@ void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
 
     writer->writeStartElement("methodCall");
-    writer->writeTextElement("methodName", m_interface + "." + m_method);
+    writer->writeTextElement("methodName", m_method);
     if (!m_arguments.isEmpty())
     {
         writer->writeStartElement("params");

@@ -468,15 +468,21 @@ void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
 void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
 {
     QXmppStanza::Error error;
-    QXmppInvokable *iface = m_interfaces.value(iq.interface());
+    
+    const QStringList methodBits = iq.method().split('.');
+    if (methodBits.size() != 2)
+        return;
+    const QString interface = methodBits.first();
+    const QString method = methodBits.last();
+    QXmppInvokable *iface = m_interfaces.value(interface);
     if (iface)
     {
         if ( iface->isAuthorized( iq.from() ) )
         {
 
-            if ( iface->interfaces().contains( iq.method() ) )
+            if ( iface->interfaces().contains(method) )
             {
-                QVariant result = iface->dispatch(iq.method().toLatin1(),
+                QVariant result = iface->dispatch(method.toLatin1(),
                                                   iq.arguments() );
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
