@@ -108,9 +108,13 @@ SOURCES += QXmppUtils.cpp \
 
 # Installation
 PREFIX = /usr
+documentation.depends = FORCE
+documentation.files = html
+documentation.commands = doxygen
+documentation.path = $$PREFIX/share/doc/qxmpp
 headers.files = $$HEADERS
 headers.path = $$PREFIX/include/qxmpp
 pkgconfig.files = qxmpp.pc
 pkgconfig.path = $$PREFIX/lib/pkgconfig
 target.path = $$PREFIX/lib
-INSTALLS += headers pkgconfig target
+INSTALLS += documentation headers pkgconfig target
