@@ -38,7 +38,7 @@ class QXmppRosterIq : public QXmppIq
 {
 public:
 
-    /// \brief The QXmppRosterIq::Item represents a roster entry.
+    /// \brief The QXmppRosterIq::Item class represents a roster entry.
     class Item
     {
     public:

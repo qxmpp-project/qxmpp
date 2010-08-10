@@ -37,7 +37,7 @@ namespace XMLRPC
     QVariant demarshall(const QDomElement &elem, QStringList &errors);
 }
 
-/// \brief The QXmppResponseIq class represents an IQ used to carry
+/// \brief The QXmppRpcResponseIq class represents an IQ used to carry
 /// an RPC response as specified by XEP-0009: Jabber-RPC.
 ///
 /// \ingroup Stanzas
@@ -70,7 +70,7 @@ private:
     QVariantList m_values;
 };
 
-/// \brief The QXmppInvokeIq class represents an IQ used to carry
+/// \brief The QXmppRpcInvokeIq class represents an IQ used to carry
 /// an RPC invocation as specified by XEP-0009: Jabber-RPC.
 ///
 /// \ingroup Stanzas
