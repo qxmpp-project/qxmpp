@@ -1,4 +1,4 @@
-include(../example.pri)
+include(../examples.pri)
 
 TARGET = example_1_echoClient
 

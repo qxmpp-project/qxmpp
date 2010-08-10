@@ -1,4 +1,4 @@
-include(../example.pri)
+include(../examples.pri)
 
 QT += multimedia
 
