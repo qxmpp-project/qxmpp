@@ -4,7 +4,7 @@ docs.depends = doc/Doxyfile
 
 # Install rules
 htmldocs.files = doc/html
-htmldocs.path = /usr/share/doc/qxmpp
+htmldocs.path = $$[QT_INSTALL_PREFIX]/share/doc/qxmpp
 htmldocs.CONFIG += no_check_exist directory
 
 QMAKE_EXTRA_TARGETS += docs
