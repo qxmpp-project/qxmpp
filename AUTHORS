@@ -2,11 +2,17 @@ QXMPP AUTHORS
 -------------
 
 Manjeet Dahiya <manjeetdahiya@gmail.com>
- * Initial author of QXmpp
+ * Initial author of QXmpp.
 
 Jeremy Lainé <jeremy.laine@m4x.org>
- * Co-maintainer of QXmpp
+ * Co-author of QXmpp.
 
 Ian Reinhart Geiser <geiseri@kde.org>
  * Initial author of Jabber-RPC support.
+
+Sjors Gielen
+ * Co-author of server-side code.
+
+Rob ten Berge
+ * Co-author of server-side code.
 

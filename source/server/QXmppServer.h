@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Sjors Gielen, Rob ten Berge
+ * Copyright (C) 2008-2010 The QXmpp developers
  *
  * Authors:
  *  Sjors Gielen
