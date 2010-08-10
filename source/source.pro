@@ -1,8 +1,9 @@
+include(../qxmpp.pri)
+
 TEMPLATE = lib
 QT += network \
     xml
-CONFIG += staticlib \
-    debug_and_release
+CONFIG += staticlib
 
 # To disable the dependency on QtGui, uncomment the following:
 # DEFINES += QXMPP_NO_GUI
@@ -14,12 +15,11 @@ CONFIG += staticlib \
 # regardless of the platform. On win32 the library is
 # automagically put in debug/release folders, so do the
 # same for other platforms.
+TARGET = $$QXMPP_LIB
 CONFIG(debug, debug|release) { 
     DESTDIR = debug
-    TARGET = qxmpp_d
 } else {
     DESTDIR = release
-    TARGET = qxmpp
 }
 
 # Header files

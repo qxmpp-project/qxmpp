@@ -1,3 +1,5 @@
+include(../qxmpp.pri)
+
 TEMPLATE = subdirs
 
 SUBDIRS = example_0_connected\
@@ -9,5 +11,3 @@ SUBDIRS = example_0_connected\
           example_6_rpcClient\
           example_7_archiveHandling\
           tests
-
-CONFIG += debug_and_release

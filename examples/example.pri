@@ -1,16 +1,16 @@
+include(../qxmpp.pri)
+
 TEMPLATE = app
 
 INCLUDEPATH += ../../source
 
 QT += network xml
 
-CONFIG += console debug_and_release
+CONFIG += console
 
 CONFIG(debug, debug|release) {
-    QXMPP_LIB = qxmpp_d
     QXMPP_DIR = ../../source/debug
 } else {
-    QXMPP_LIB = qxmpp
     QXMPP_DIR = ../../source/release
 }
 
