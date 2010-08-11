@@ -43,6 +43,7 @@ HEADERS += QXmppUtils.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
+    QXmppRoster.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
     QXmppSession.h \
