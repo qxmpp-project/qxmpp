@@ -389,7 +389,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 /// \return Pointer to QXmppReconnectionManager
 ///
 
-QXmppReconnectionManager* QXmppClient::getReconnectionManager()
+QXmppReconnectionManager* QXmppClient::reconnectionManager()
 {
     return d->reconnectionManager;
 }
@@ -664,5 +664,10 @@ void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
         newPresence.setType(QXmppPresence::Available);
     newPresence.status().setType(statusType);
     setClientPresence(newPresence);
+}
+
+QXmppReconnectionManager* QXmppClient::getReconnectionManager()
+{
+    return d->reconnectionManager;
 }
 

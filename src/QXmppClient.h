@@ -128,9 +128,7 @@ public:
     QXmppTransferManager& transferManager();
     QXmppVCardManager& vCardManager();
 
-    // FIXME: these accessors should be deprecated in favour of
-    // versions without the "get".
-    QXmppReconnectionManager* getReconnectionManager();
+    QXmppReconnectionManager* reconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
 
     /// \cond
@@ -154,6 +152,7 @@ public:
     const QXmppPresence Q_DECL_DEPRECATED & getClientPresence() const;
     QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
     const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
+    QXmppReconnectionManager* Q_DECL_DEPRECATED getReconnectionManager();
     QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
