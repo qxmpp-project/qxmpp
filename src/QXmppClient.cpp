@@ -39,6 +39,33 @@
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 
+class QXmppClientPrivate
+{
+public:
+    QXmppClientPrivate();
+
+    QXmppStream* stream;  ///< Pointer to QXmppStream object a wrapper over
+                          ///< TCP socket and XMPP protocol
+    QXmppPresence clientPresence; ///< Stores the current presence of the connected client
+
+    QXmppArchiveManager *archiveManager;  ///< Pointer to the archive manager
+    QXmppCallManager *callManager;        ///< Pointer to the call manager
+    QXmppMucManager *mucManager;          ///< Pointer to the multi-user chat manager
+    QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
+    QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
+    QXmppTransferManager *transferManager;///< Pointer to the transfer manager
+    QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
+
+    QHash<QString,QXmppInvokable*> interfaces;
+};
+
+QXmppClientPrivate::QXmppClientPrivate()
+    : stream(0),
+    clientPresence(QXmppPresence::Available),
+    reconnectionManager(0)
+{
+}
+
 /// \mainpage
 ///
 /// QXmpp is a cross-platform C++ XMPP client library based on the Qt
@@ -68,46 +95,44 @@
 
 QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent),
-    m_stream(0),
-    m_clientPresence(QXmppPresence::Available),
-    m_reconnectionManager(0)
+    d(new QXmppClientPrivate)
 {
-    m_stream = new QXmppStream(this);
-    m_clientPresence.setExtensions(m_stream->presenceExtensions());
+    d->stream = new QXmppStream(this);
+    d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
-    bool check = connect(m_stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
+    bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
                          this, SIGNAL(elementReceived(const QDomElement&, bool&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(messageReceived(const QXmppMessage&)),
+    check = connect(d->stream, SIGNAL(messageReceived(const QXmppMessage&)),
                          this, SIGNAL(messageReceived(const QXmppMessage&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)),
+    check = connect(d->stream, SIGNAL(presenceReceived(const QXmppPresence&)),
                     this, SIGNAL(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(iqReceived(const QXmppIq&)), this,
+    check = connect(d->stream, SIGNAL(iqReceived(const QXmppIq&)), this,
         SIGNAL(iqReceived(const QXmppIq&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this,
+    check = connect(d->stream, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this,
         SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(disconnected()), this,
+    check = connect(d->stream, SIGNAL(disconnected()), this,
         SIGNAL(disconnected()));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(xmppConnected()), this,
+    check = connect(d->stream, SIGNAL(xmppConnected()), this,
         SLOT(xmppConnected()));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(xmppConnected()), this,
+    check = connect(d->stream, SIGNAL(xmppConnected()), this,
         SIGNAL(connected()));
     Q_ASSERT(check);
 
-    check = connect(m_stream, SIGNAL(error(QXmppClient::Error)), this,
+    check = connect(d->stream, SIGNAL(error(QXmppClient::Error)), this,
         SIGNAL(error(QXmppClient::Error)));
     Q_ASSERT(check);
 
@@ -115,22 +140,22 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // rpc
-    check = connect(m_stream, SIGNAL(rpcCallInvoke(QXmppRpcInvokeIq)),
+    check = connect(d->stream, SIGNAL(rpcCallInvoke(QXmppRpcInvokeIq)),
         this, SLOT(invokeInterfaceMethod(QXmppRpcInvokeIq)));
     Q_ASSERT(check);
 
     // logging
     check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        m_stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+        d->stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
 
     // create managers
-    m_rosterManager = new QXmppRosterManager(m_stream, this);
-    m_archiveManager = new QXmppArchiveManager(m_stream, this);
-    m_callManager = new QXmppCallManager(m_stream, this);
-    m_mucManager = new QXmppMucManager(m_stream, this);
-    m_transferManager = new QXmppTransferManager(m_stream, this);
-    m_vCardManager = new QXmppVCardManager(m_stream, this);
+    d->rosterManager = new QXmppRosterManager(d->stream, this);
+    d->archiveManager = new QXmppArchiveManager(d->stream, this);
+    d->callManager = new QXmppCallManager(d->stream, this);
+    d->mucManager = new QXmppMucManager(d->stream, this);
+    d->transferManager = new QXmppTransferManager(d->stream, this);
+    d->vCardManager = new QXmppVCardManager(d->stream, this);
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -138,6 +163,7 @@ QXmppClient::QXmppClient(QObject *parent)
 
 QXmppClient::~QXmppClient()
 {
+    delete d;
 }
 
 /// Returns a modifiable reference to the current configuration of QXmppClient.
@@ -145,7 +171,7 @@ QXmppClient::~QXmppClient()
 
 QXmppConfiguration& QXmppClient::configuration()
 {
-    return m_stream->configuration();
+    return d->stream->configuration();
 }
 
 /// Attempts to connect to the XMPP server. Server details and other configurations
@@ -159,17 +185,17 @@ QXmppConfiguration& QXmppClient::configuration()
 void QXmppClient::connectToServer(const QXmppConfiguration& config,
                                   const QXmppPresence& initialPresence)
 {
-    m_stream->configuration() = config;
+    d->stream->configuration() = config;
     if(!config.autoReconnectionEnabled())
     {
-        delete m_reconnectionManager;
-        m_reconnectionManager = 0;
+        delete d->reconnectionManager;
+        d->reconnectionManager = 0;
     }
 
-    m_clientPresence = initialPresence;
-    m_clientPresence.setExtensions(m_stream->presenceExtensions());
+    d->clientPresence = initialPresence;
+    d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
-    m_stream->connect();
+    d->stream->connect();
 }
 
 /// Overloaded function.
@@ -191,17 +217,17 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
                                   int port,
                                   const QXmppPresence& initialPresence)
 {
-    QXmppConfiguration &config = m_stream->configuration();
+    QXmppConfiguration &config = d->stream->configuration();
     config.setHost(host);
     config.setUser(user);
     config.setPasswd(passwd);
     config.setDomain(domain);
     config.setPort(port);
 
-    m_clientPresence = initialPresence;
-    m_clientPresence.setExtensions(m_stream->presenceExtensions());
+    d->clientPresence = initialPresence;
+    d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
-    m_stream->connect();
+    d->stream->connect();
 }
 
 /// Overloaded function.
@@ -255,7 +281,7 @@ void QXmppClient::connectToServer(const QString& host,
 
 bool QXmppClient::sendPacket(const QXmppPacket& packet)
 {
-    return m_stream->sendPacket(packet);
+    return d->stream->sendPacket(packet);
 }
 
 /// Disconnects the client and the current presence of client changes to
@@ -268,13 +294,13 @@ bool QXmppClient::sendPacket(const QXmppPacket& packet)
 
 void QXmppClient::disconnect()
 {
-    m_clientPresence.setType(QXmppPresence::Unavailable);
-    m_clientPresence.status().setType(QXmppPresence::Status::Offline);
-    m_clientPresence.status().setStatusText("Logged out");
-    if (m_stream->isConnected())
+    d->clientPresence.setType(QXmppPresence::Unavailable);
+    d->clientPresence.status().setType(QXmppPresence::Status::Offline);
+    d->clientPresence.status().setStatusText("Logged out");
+    if (d->stream->isConnected())
     {
-        sendPacket(m_clientPresence);
-        m_stream->disconnect();
+        sendPacket(d->clientPresence);
+        d->stream->disconnect();
     }
 }
 
@@ -283,7 +309,7 @@ void QXmppClient::disconnect()
 
 bool QXmppClient::isConnected() const
 {
-    return m_stream && m_stream->isConnected();
+    return d->stream && d->stream->isConnected();
 }
 
 /// Returns the reference to QXmppRosterManager object of the client.
@@ -293,7 +319,7 @@ bool QXmppClient::isConnected() const
 
 QXmppRosterManager& QXmppClient::rosterManager()
 {
-    return *m_rosterManager;
+    return *d->rosterManager;
 }
 
 /// Utility function to send message to all the resources associated with the
@@ -316,7 +342,7 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 
 QXmppPresence QXmppClient::clientPresence() const
 {
-    return m_clientPresence;
+    return d->clientPresence;
 }
 
 /// Changes the presence of the connected client.
@@ -336,23 +362,23 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
     if (presence.type() == QXmppPresence::Unavailable)
     {
-        m_clientPresence = presence;
+        d->clientPresence = presence;
 
         // NOTE: we can't call disconnect() because it alters 
         // the client presence
-        if (m_stream->isConnected())
+        if (d->stream->isConnected())
         {
-            sendPacket(m_clientPresence);
-            m_stream->disconnect();
+            sendPacket(d->clientPresence);
+            d->stream->disconnect();
         }
     }
-    else if (!m_stream->isConnected())
-        connectToServer(m_stream->configuration(), presence);
+    else if (!d->stream->isConnected())
+        connectToServer(d->stream->configuration(), presence);
     else
     {
-        m_clientPresence = presence;
-        m_clientPresence.setExtensions(m_stream->presenceExtensions());
-        sendPacket(m_clientPresence);
+        d->clientPresence = presence;
+        d->clientPresence.setExtensions(d->stream->presenceExtensions());
+        sendPacket(d->clientPresence);
     }
 }
 
@@ -365,7 +391,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
 QXmppReconnectionManager* QXmppClient::getReconnectionManager()
 {
-    return m_reconnectionManager;
+    return d->reconnectionManager;
 }
 
 /// Sets the user defined reconnection manager.
@@ -379,19 +405,19 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
 	if(!reconnectionManager)
 		return false;
 		
-    if(m_reconnectionManager)
-        delete m_reconnectionManager;
+    if(d->reconnectionManager)
+        delete d->reconnectionManager;
 
-    m_reconnectionManager = reconnectionManager;
+    d->reconnectionManager = reconnectionManager;
 
-    bool check = connect(this, SIGNAL(connected()), m_reconnectionManager,
+    bool check = connect(this, SIGNAL(connected()), d->reconnectionManager,
                          SLOT(connected()));
     Q_ASSERT(check);
 	if(!check)
 		return false;
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
-                    m_reconnectionManager, SLOT(error(QXmppClient::Error)));
+                    d->reconnectionManager, SLOT(error(QXmppClient::Error)));
     Q_ASSERT(check);
 	if(!check)
 		return false;
@@ -404,7 +430,7 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
 
 QAbstractSocket::SocketError QXmppClient::socketError()
 {
-    return m_stream->socketError();
+    return d->stream->socketError();
 }
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
@@ -412,7 +438,7 @@ QAbstractSocket::SocketError QXmppClient::socketError()
 
 QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 {
-    return m_stream->xmppStreamError();
+    return d->stream->xmppStreamError();
 }
 
 /// Returns the reference to QXmppVCardManager, implimentation of XEP-0054.
@@ -421,12 +447,12 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 
 QXmppVCardManager& QXmppClient::vCardManager()
 {
-    return *m_vCardManager;
+    return *d->vCardManager;
 }
 
 void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
 {
-    m_interfaces[ interface->metaObject()->className() ] = interface;
+    d->interfaces[ interface->metaObject()->className() ] = interface;
 }
 
 
@@ -439,7 +465,7 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
         return;
     const QString interface = methodBits.first();
     const QString method = methodBits.last();
-    QXmppInvokable *iface = m_interfaces.value(interface);
+    QXmppInvokable *iface = d->interfaces.value(interface);
     if (iface)
     {
         if ( iface->isAuthorized( iq.from() ) )
@@ -452,9 +478,9 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
-                resultIq.setFrom(m_stream->configuration().jid());
+                resultIq.setFrom(d->stream->configuration().jid());
                 resultIq.setValues(QVariantList() << result);
-                m_stream->sendPacket( resultIq );
+                d->stream->sendPacket( resultIq );
                 return;
             }
             else
@@ -478,10 +504,10 @@ void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     QXmppRpcErrorIq errorIq;
     errorIq.setId(iq.id());
     errorIq.setTo(iq.from());
-    errorIq.setFrom(m_stream->configuration().jid());
+    errorIq.setFrom(d->stream->configuration().jid());
     errorIq.setQuery( iq );
     errorIq.setError( error );
-    m_stream->sendPacket( errorIq );
+    d->stream->sendPacket( errorIq );
 }
 
 QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
@@ -510,9 +536,9 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
     if( arg10.isValid() ) args << arg10;
 
     QXmppRemoteMethod method( jid, interface, args, this );
-    connect( m_stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
+    connect( d->stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
              &method, SLOT(gotResult(QXmppRpcResponseIq)));
-    connect( m_stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
+    connect( d->stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
              &method, SLOT(gotError(QXmppRpcErrorIq)));
 
 
@@ -525,7 +551,7 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 
 QXmppArchiveManager& QXmppClient::archiveManager()
 {
-    return *m_archiveManager;
+    return *d->archiveManager;
 }
 
 /// Returns the reference to QXmppCallManager, implementation of XEP-0166.
@@ -534,7 +560,7 @@ QXmppArchiveManager& QXmppClient::archiveManager()
 
 QXmppCallManager& QXmppClient::callManager()
 {
-    return *m_callManager;
+    return *d->callManager;
 }
 
 /// Returns the reference to QXmppMucManager, implementation of XEP-0045.
@@ -542,7 +568,7 @@ QXmppCallManager& QXmppClient::callManager()
 ///
 QXmppMucManager& QXmppClient::mucManager()
 {
-    return *m_mucManager;
+    return *d->mucManager;
 }
 
 /// Returns the reference to QXmppTransferManager, implementation of:
@@ -554,84 +580,84 @@ QXmppMucManager& QXmppClient::mucManager()
 
 QXmppTransferManager& QXmppClient::transferManager()
 {
-    return *m_transferManager;
+    return *d->transferManager;
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.
 
 QXmppLogger *QXmppClient::logger()
 {
-    return m_stream->logger();
+    return d->stream->logger();
 }
 
 /// Sets the QXmppLogger associated with the current QXmppClient.
 
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
-    m_stream->setLogger(logger);
+    d->stream->setLogger(logger);
 }
 
 /// At connection establishment, send initial presence.
 
 void QXmppClient::xmppConnected()
 {
-    sendPacket(m_clientPresence);
+    sendPacket(d->clientPresence);
 }
 
 // obsolete
 
 const QXmppPresence& QXmppClient::getClientPresence() const
 {
-    return m_clientPresence;
+    return d->clientPresence;
 }
 
 QXmppConfiguration& QXmppClient::getConfiguration()
 {
-    return m_stream->configuration();
+    return d->stream->configuration();
 }
 
 const QXmppConfiguration& QXmppClient::getConfiguration() const
 {
-    return m_stream->configuration();
+    return d->stream->configuration();
 }
 
 QXmppRosterManager& QXmppClient::getRoster()
 {
-    return *m_rosterManager;
+    return *d->rosterManager;
 }
 
 QAbstractSocket::SocketError QXmppClient::getSocketError()
 {
-    return m_stream->socketError();
+    return d->stream->socketError();
 }
 
 QXmppVCardManager& QXmppClient::getVCardManager()
 {
-    return *m_vCardManager;
+    return *d->vCardManager;
 }
 
 QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 {
-    return m_stream->xmppStreamError();
+    return d->stream->xmppStreamError();
 }
 
 void QXmppClient::setClientPresence(const QString& statusText)
 {
-    QXmppPresence newPresence = m_clientPresence;
+    QXmppPresence newPresence = d->clientPresence;
     newPresence.status().setStatusText(statusText);
     setClientPresence(newPresence);
 }
 
 void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
 {
-    QXmppPresence newPresence = m_clientPresence;
+    QXmppPresence newPresence = d->clientPresence;
     newPresence.setType(presenceType);
     setClientPresence(newPresence);
 }
 
 void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
 {
-    QXmppPresence newPresence = m_clientPresence;
+    QXmppPresence newPresence = d->clientPresence;
     if (statusType == QXmppPresence::Status::Offline)
         newPresence.setType(QXmppPresence::Unavailable);
     else

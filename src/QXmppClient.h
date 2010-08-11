@@ -33,6 +33,7 @@
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
 
+class QXmppClientPrivate;
 class QXmppStream;
 class QXmppPresence;
 class QXmppMessage;
@@ -243,17 +244,7 @@ private slots:
     void xmppConnected();
 
 private:
-    QXmppStream* m_stream;  ///< Pointer to QXmppStream object a wrapper over
-                            ///< TCP socket and XMPP protocol
-    QXmppPresence m_clientPresence; ///< Stores the current presence of the connected client
-    QXmppArchiveManager *m_archiveManager;  ///< Pointer to the archive manager
-    QXmppCallManager *m_callManager;        ///< Pointer to the call manager
-    QXmppMucManager* m_mucManager;          ///< Pointer to the multi-user chat manager
-    QXmppReconnectionManager* m_reconnectionManager;    ///< Pointer to the reconnection manager
-    QXmppRosterManager *m_rosterManager;    ///< Pointer to the roster manager
-    QXmppTransferManager *m_transferManager;///< Pointer to the transfer manager
-    QXmppVCardManager *m_vCardManager;      ///< Pointer to the vCard manager
-    QHash<QString,QXmppInvokable *> m_interfaces;
+    QXmppClientPrivate * const d;
 };
 
 #endif // QXMPPCLIENT_H
