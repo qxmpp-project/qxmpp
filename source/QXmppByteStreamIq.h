@@ -80,8 +80,10 @@ public:
     static bool isByteStreamIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     Mode m_mode;

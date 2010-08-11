@@ -105,8 +105,10 @@ public:
     /// \endcond
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QList<Item> m_items;

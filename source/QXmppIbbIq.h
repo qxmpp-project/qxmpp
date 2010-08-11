@@ -44,8 +44,10 @@ public:
     static bool isIbbOpenIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     long m_block_size;
@@ -63,8 +65,10 @@ public:
     static bool isIbbCloseIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QString m_sid;
@@ -87,8 +91,10 @@ public:
     static bool isIbbDataIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     quint16 m_seq;

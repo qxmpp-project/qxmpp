@@ -49,8 +49,10 @@ public:
     /// \endcond
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QString m_jid;

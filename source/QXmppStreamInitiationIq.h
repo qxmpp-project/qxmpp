@@ -54,8 +54,10 @@ public:
     static bool isStreamInitiationIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QString m_mimeType;

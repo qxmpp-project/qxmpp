@@ -72,8 +72,10 @@ public:
     static bool isMucAdminIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QList<QXmppMucAdminIq::Item> m_items;
@@ -96,8 +98,10 @@ public:
     static bool isMucOwnerIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QXmppDataForm m_form;

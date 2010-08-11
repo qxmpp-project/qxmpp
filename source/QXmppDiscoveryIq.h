@@ -101,8 +101,10 @@ public:
     static bool isDiscoveryIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QStringList m_features;

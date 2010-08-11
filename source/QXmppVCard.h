@@ -65,8 +65,10 @@ public:
     /// \endcond
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement&);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QString m_firstName;

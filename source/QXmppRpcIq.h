@@ -112,8 +112,10 @@ public:
     static bool isRpcErrorIq(const QDomElement &element);
 
 protected:
+    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QXmppRpcInvokeIq m_query;
