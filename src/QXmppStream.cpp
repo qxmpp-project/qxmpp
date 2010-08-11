@@ -267,537 +267,536 @@ void QXmppStream::warning(const QString &data)
 
 void QXmppStream::parser(const QByteArray& data)
 {
-    QDomDocument doc;
-    QByteArray completeXml;
-
     d->dataBuffer.append(data);
 
-    if(hasStartStreamElement(d->dataBuffer))
-    {
+    // FIXME : maybe these QRegExps could be static?
+    QRegExp startStreamRegex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
+    startStreamRegex.setMinimal(true);
+    QRegExp endStreamRegex("</stream:stream>$");
+    endStreamRegex.setMinimal(true);
+
+    // check whether we need to add stream start / end elements
+    QByteArray completeXml;
+    const QString strData = QString::fromUtf8(d->dataBuffer);
+    if(strData.contains(startStreamRegex))
         completeXml = d->dataBuffer + streamRootElementEnd;
-    }
-    else if(hasEndStreamElement(data))
-    {
+    else if(strData.contains(endStreamRegex))
         completeXml = streamRootElementStart + d->dataBuffer;
+    else
+        completeXml = streamRootElementStart + d->dataBuffer + streamRootElementEnd;
+
+    // check whether we have a valid XML document
+    QDomDocument doc;
+    if(!doc.setContent(completeXml, true))
+        return;
+
+    // process stanzas
+    emit logMessage(QXmppLogger::ReceivedMessage, strData);
+    flushDataBuffer();
+
+    // process stanzas
+    QDomElement nodeRecv = doc.documentElement().firstChildElement();
+    if(nodeRecv.isNull())
+    {
+        QDomElement streamElement = doc.documentElement();
+        if(d->streamId.isEmpty())
+            d->streamId = streamElement.attribute("id");
+        if(d->XMPPVersion.isEmpty())
+        {
+            d->XMPPVersion = streamElement.attribute("version");
+            if(d->XMPPVersion.isEmpty())
+            {
+                // no version specified, signals XMPP Version < 1.0.
+                // switch to old auth mechanism
+                sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
+            }
+        }
     }
     else
     {
-        completeXml = streamRootElementStart + d->dataBuffer + streamRootElementEnd;
+        //TODO: Make a login error here.
     }
-    
-    if(doc.setContent(completeXml, true))
+    while(!nodeRecv.isNull())
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, QString::fromUtf8(d->dataBuffer));
-        flushDataBuffer();
 
-        QDomElement nodeRecv = doc.documentElement().firstChildElement();
+        QString ns = nodeRecv.namespaceURI();
 
-        if(nodeRecv.isNull())
+        // if we receive any kind of data, stop the timeout timer
+        d->timeoutTimer->stop();
+
+        bool handled = false;
+        emit elementReceived(nodeRecv, handled);
+
+        if(handled)
         {
-            QDomElement streamElement = doc.documentElement();
-            if(d->streamId.isEmpty())
-                d->streamId = streamElement.attribute("id");
-            if(d->XMPPVersion.isEmpty())
-            {
-                d->XMPPVersion = streamElement.attribute("version");
-                if(d->XMPPVersion.isEmpty())
-                {
-                    // no version specified, signals XMPP Version < 1.0.
-                    // switch to old auth mechanism
-                    sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
-                }
-            }
+            // already handled by client, do nothing
         }
-        else
+        else if(ns == ns_stream && nodeRecv.tagName() == "features")
         {
-            //TODO: Make a login error here.
-        }
-        while(!nodeRecv.isNull())
-        {
+            bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
+                                     namespaceURI() == ns_authFeature;
+            bool saslAvailable = nodeRecv.firstChildElement("mechanisms").
+                                 namespaceURI() == ns_sasl;
+            bool useSasl = configuration().useSASLAuthentication();
 
-            QString ns = nodeRecv.namespaceURI();
-
-            // if we receive any kind of data, stop the timeout timer
-            d->timeoutTimer->stop();
-
-            bool handled = false;
-            emit elementReceived(nodeRecv, handled);
-
-            if(handled)
+            if (!d->socket.isEncrypted())
             {
-                // already handled by client, do nothing
-            }
-            else if(ns == ns_stream && nodeRecv.tagName() == "features")
-            {
-                bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
-                                         namespaceURI() == ns_authFeature;
-                bool saslAvailable = nodeRecv.firstChildElement("mechanisms").
-                                     namespaceURI() == ns_sasl;
-                bool useSasl = configuration().useSASLAuthentication();
-
-                if (!d->socket.isEncrypted())
+                // parse remote TLS mode
+                QXmppConfiguration::StreamSecurityMode remoteSecurity;
+                QDomElement tlsElement = nodeRecv.firstChildElement("starttls");
+                if (tlsElement.namespaceURI() == ns_tls)
                 {
-                    // parse remote TLS mode
-                    QXmppConfiguration::StreamSecurityMode remoteSecurity;
-                    QDomElement tlsElement = nodeRecv.firstChildElement("starttls");
-                    if (tlsElement.namespaceURI() == ns_tls)
-                    {
-                        if (tlsElement.firstChildElement().tagName() == "required")
-                            remoteSecurity = QXmppConfiguration::TLSRequired;
-                        else
-                            remoteSecurity = QXmppConfiguration::TLSEnabled;
-                    } else {
-                        remoteSecurity = QXmppConfiguration::TLSDisabled;
-                    }
-
-                    // determine TLS mode to use
-                    const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
-                    if (!d->socket.supportsSsl() &&
-                        (localSecurity == QXmppConfiguration::TLSRequired ||
-                         remoteSecurity == QXmppConfiguration::TLSRequired))
-                    {
-                        warning("Disconnecting as TLS is required, but SSL support is not available");
-                        disconnect();
-                        return;
-                    }
-                    if (localSecurity == QXmppConfiguration::TLSRequired &&
-                        remoteSecurity == QXmppConfiguration::TLSDisabled)
-                    {
-                        warning("Disconnecting as TLS is required, but not supported by the server");
-                        disconnect();
-                        return;
-                    }
-
-                    if (d->socket.supportsSsl() &&
-                        (remoteSecurity == QXmppConfiguration::TLSRequired ||
-                         localSecurity != QXmppConfiguration::TLSDisabled))
-                    {
-                        // enable TLS as it is required by the server
-                        // or supported by the client
-                        sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
-                        return;
-                    }
+                    if (tlsElement.firstChildElement().tagName() == "required")
+                        remoteSecurity = QXmppConfiguration::TLSRequired;
+                    else
+                        remoteSecurity = QXmppConfiguration::TLSEnabled;
+                } else {
+                    remoteSecurity = QXmppConfiguration::TLSDisabled;
                 }
 
-                if((saslAvailable && nonSaslAvailable && !useSasl) ||
-                   (!saslAvailable && nonSaslAvailable))
+                // determine TLS mode to use
+                const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
+                if (!d->socket.supportsSsl() &&
+                    (localSecurity == QXmppConfiguration::TLSRequired ||
+                     remoteSecurity == QXmppConfiguration::TLSRequired))
                 {
-                    sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
+                    warning("Disconnecting as TLS is required, but SSL support is not available");
+                    disconnect();
+                    return;
                 }
-                else if(saslAvailable)
+                if (localSecurity == QXmppConfiguration::TLSRequired &&
+                    remoteSecurity == QXmppConfiguration::TLSDisabled)
                 {
-                    // parse advertised SASL Authentication mechanisms
-                    QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
-                    QDomElement element = nodeRecv.firstChildElement("mechanisms");
-                    QDomElement subElement = element.firstChildElement("mechanism");
-                    debug("SASL Authentication mechanisms:");
-                    while(!subElement.isNull())
-                    {
-                        debug(subElement.text());
-                        if (subElement.text() == QLatin1String("PLAIN"))
-                            mechanisms << QXmppConfiguration::SASLPlain;
-                        else if (subElement.text() == QLatin1String("DIGEST-MD5"))
-                            mechanisms << QXmppConfiguration::SASLDigestMD5;
-                        else if (subElement.text() == QLatin1String("ANONYMOUS"))
-                            mechanisms << QXmppConfiguration::SASLAnonymous;
-                        subElement = subElement.nextSiblingElement("mechanism");
-                    }
-
-                    // determine SASL Authentication mechanism to use
-                    QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
-                    if (mechanisms.isEmpty())
-                    {
-                        warning("No supported SASL Authentication mechanism available");
-                        disconnect();
-                        return;
-                    }
-                    else if (!mechanisms.contains(mechanism))
-                    {
-                        info("Desired SASL Auth mechanism is not available, selecting first available one");
-                        mechanism = mechanisms.first();
-                    }
-
-                    // send SASL Authentication request
-                    switch(mechanism)
-                    {
-                    case QXmppConfiguration::SASLPlain:
-                        {
-                            QString userPass('\0' + configuration().user() +
-                                             '\0' + configuration().passwd());
-                            QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
-                            data += userPass.toUtf8().toBase64();
-                            data += "</auth>";
-                            sendToServer(data);
-                        }
-                        break;
-                    case QXmppConfiguration::SASLDigestMD5:
-                        sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
-                        break;
-                    case QXmppConfiguration::SASLAnonymous:
-                        sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
-                        break;
-                    }
+                    warning("Disconnecting as TLS is required, but not supported by the server");
+                    disconnect();
+                    return;
                 }
 
-                if(nodeRecv.firstChildElement("bind").
-                                     namespaceURI() == ns_bind)
+                if (d->socket.supportsSsl() &&
+                    (remoteSecurity == QXmppConfiguration::TLSRequired ||
+                     localSecurity != QXmppConfiguration::TLSDisabled))
                 {
-                    sendBindIQ();
-                }
-
-                if(nodeRecv.firstChildElement("session").
-                                     namespaceURI() == ns_session)
-                {
-                    d->sessionAvailable = true;
-                }
-            }
-            else if(ns == ns_stream && nodeRecv.tagName() == "error")
-            {
-                if (!nodeRecv.firstChildElement("conflict").isNull())
-                    d->xmppStreamError = QXmppStanza::Error::Conflict;
-                else
-                    d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-                emit error(QXmppClient::XmppStreamError);
-            }
-            else if(ns == ns_tls)
-            {
-                if(nodeRecv.tagName() == "proceed")
-                {
-                    debug("Starting encryption");
-                    d->socket.startClientEncryption();
+                    // enable TLS as it is required by the server
+                    // or supported by the client
+                    sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
                     return;
                 }
             }
-            else if(ns == ns_sasl)
-            {
-                if(nodeRecv.tagName() == "success")
-                {
-                    debug("Authenticated");
-                    sendStartStream();
-                }
-                else if(nodeRecv.tagName() == "challenge")
-                {
-                    // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
-                    d->authStep++;
-                    switch (d->authStep)
-                    {
-                    case 1 :
-                        sendAuthDigestMD5ResponseStep1(nodeRecv.text());
-                        break;
-                    case 2 :
-                        sendAuthDigestMD5ResponseStep2();
-                        break;
-                    default :
-                        warning("Too many authentication steps");
-                        disconnect();
-                        break;
-                    }
-                }
-                else if(nodeRecv.tagName() == "failure")
-                {
-                    if (!nodeRecv.firstChildElement("not-authorized").isNull())
-                        d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-                    else
-                        d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-                    emit error(QXmppClient::XmppStreamError);
 
-                    warning("Authentication failure"); 
+            if((saslAvailable && nonSaslAvailable && !useSasl) ||
+               (!saslAvailable && nonSaslAvailable))
+            {
+                sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
+            }
+            else if(saslAvailable)
+            {
+                // parse advertised SASL Authentication mechanisms
+                QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
+                QDomElement element = nodeRecv.firstChildElement("mechanisms");
+                QDomElement subElement = element.firstChildElement("mechanism");
+                debug("SASL Authentication mechanisms:");
+                while(!subElement.isNull())
+                {
+                    debug(subElement.text());
+                    if (subElement.text() == QLatin1String("PLAIN"))
+                        mechanisms << QXmppConfiguration::SASLPlain;
+                    else if (subElement.text() == QLatin1String("DIGEST-MD5"))
+                        mechanisms << QXmppConfiguration::SASLDigestMD5;
+                    else if (subElement.text() == QLatin1String("ANONYMOUS"))
+                        mechanisms << QXmppConfiguration::SASLAnonymous;
+                    subElement = subElement.nextSiblingElement("mechanism");
+                }
+
+                // determine SASL Authentication mechanism to use
+                QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
+                if (mechanisms.isEmpty())
+                {
+                    warning("No supported SASL Authentication mechanism available");
                     disconnect();
+                    return;
+                }
+                else if (!mechanisms.contains(mechanism))
+                {
+                    info("Desired SASL Auth mechanism is not available, selecting first available one");
+                    mechanism = mechanisms.first();
+                }
+
+                // send SASL Authentication request
+                switch(mechanism)
+                {
+                case QXmppConfiguration::SASLPlain:
+                    {
+                        QString userPass('\0' + configuration().user() +
+                                         '\0' + configuration().passwd());
+                        QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
+                        data += userPass.toUtf8().toBase64();
+                        data += "</auth>";
+                        sendToServer(data);
+                    }
+                    break;
+                case QXmppConfiguration::SASLDigestMD5:
+                    sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
+                    break;
+                case QXmppConfiguration::SASLAnonymous:
+                    sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
+                    break;
                 }
             }
-            else if(ns == ns_client)
+
+            if(nodeRecv.firstChildElement("bind").
+                                 namespaceURI() == ns_bind)
             {
+                sendBindIQ();
+            }
 
-                if(nodeRecv.tagName() == "iq")
+            if(nodeRecv.firstChildElement("session").
+                                 namespaceURI() == ns_session)
+            {
+                d->sessionAvailable = true;
+            }
+        }
+        else if(ns == ns_stream && nodeRecv.tagName() == "error")
+        {
+            if (!nodeRecv.firstChildElement("conflict").isNull())
+                d->xmppStreamError = QXmppStanza::Error::Conflict;
+            else
+                d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+            emit error(QXmppClient::XmppStreamError);
+        }
+        else if(ns == ns_tls)
+        {
+            if(nodeRecv.tagName() == "proceed")
+            {
+                debug("Starting encryption");
+                d->socket.startClientEncryption();
+                return;
+            }
+        }
+        else if(ns == ns_sasl)
+        {
+            if(nodeRecv.tagName() == "success")
+            {
+                debug("Authenticated");
+                sendStartStream();
+            }
+            else if(nodeRecv.tagName() == "challenge")
+            {
+                // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
+                d->authStep++;
+                switch (d->authStep)
                 {
-                    QDomElement element = nodeRecv.firstChildElement();
-                    QString id = nodeRecv.attribute("id");
-                    QString type = nodeRecv.attribute("type");
-                    if(type.isEmpty())
-                        warning("QXmppStream: iq type can't be empty");
+                case 1 :
+                    sendAuthDigestMD5ResponseStep1(nodeRecv.text());
+                    break;
+                case 2 :
+                    sendAuthDigestMD5ResponseStep2();
+                    break;
+                default :
+                    warning("Too many authentication steps");
+                    disconnect();
+                    break;
+                }
+            }
+            else if(nodeRecv.tagName() == "failure")
+            {
+                if (!nodeRecv.firstChildElement("not-authorized").isNull())
+                    d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                else
+                    d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                emit error(QXmppClient::XmppStreamError);
 
-                    if(id == d->sessionId)
+                warning("Authentication failure");
+                disconnect();
+            }
+        }
+        else if(ns == ns_client)
+        {
+
+            if(nodeRecv.tagName() == "iq")
+            {
+                QDomElement element = nodeRecv.firstChildElement();
+                QString id = nodeRecv.attribute("id");
+                QString type = nodeRecv.attribute("type");
+                if(type.isEmpty())
+                    warning("QXmppStream: iq type can't be empty");
+
+                if(id == d->sessionId)
+                {
+                    QXmppSession session;
+                    session.parse(nodeRecv);
+
+                    // get back add configuration whether to send
+                    // roster and intial presence in beginning
+                    // process SessionIq
+
+                    // xmpp connection made
+                    emit xmppConnected();
+                }
+                else if(QXmppBind::isBind(nodeRecv) && id == d->bindId)
+                {
+                    QXmppBind bind;
+                    bind.parse(nodeRecv);
+
+                    // bind result
+                    if (bind.type() == QXmppIq::Result)
                     {
-                        QXmppSession session;
-                        session.parse(nodeRecv);
-
-                        // get back add configuration whether to send
-                        // roster and intial presence in beginning
-                        // process SessionIq
-
-                        // xmpp connection made
-                        emit xmppConnected();
-                    }
-                    else if(QXmppBind::isBind(nodeRecv) && id == d->bindId)
-                    {
-                        QXmppBind bind;
-                        bind.parse(nodeRecv);
-
-                        // bind result
-                        if (bind.type() == QXmppIq::Result)
+                        if (!bind.jid().isEmpty())
                         {
-                            if (!bind.jid().isEmpty())
+                            QRegExp jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
+                            if (jidRegex.exactMatch(bind.jid()))
                             {
-                                QRegExp jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
-                                if (jidRegex.exactMatch(bind.jid()))
-                                {
-                                    configuration().setUser(jidRegex.cap(1));
-                                    configuration().setDomain(jidRegex.cap(2));
-                                    configuration().setResource(jidRegex.cap(3));
-                                } else {
-                                    warning("Bind IQ received with invalid JID: " + bind.jid());
-                                }
+                                configuration().setUser(jidRegex.cap(1));
+                                configuration().setDomain(jidRegex.cap(2));
+                                configuration().setResource(jidRegex.cap(3));
+                            } else {
+                                warning("Bind IQ received with invalid JID: " + bind.jid());
                             }
-                            if (d->sessionAvailable)
-                                sendSessionIQ();
                         }
+                        if (d->sessionAvailable)
+                            sendSessionIQ();
                     }
-                    else if(QXmppRosterIq::isRosterIq(nodeRecv))
-                    {
-                        QXmppRosterIq rosterIq;
-                        rosterIq.parse(nodeRecv);
-                        emit rosterIqReceived(rosterIq);
-                    }
-                    // extensions
+                }
+                else if(QXmppRosterIq::isRosterIq(nodeRecv))
+                {
+                    QXmppRosterIq rosterIq;
+                    rosterIq.parse(nodeRecv);
+                    emit rosterIqReceived(rosterIq);
+                }
+                // extensions
 
-                    // XEP-0009: Jabber-RPC
-                    else if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
-                    {
-                        QXmppRpcInvokeIq rpcIqPacket;
-                        rpcIqPacket.parse(nodeRecv);
-                        emit rpcCallInvoke(rpcIqPacket);
-                    }
-                    else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
-                    {
-                        QXmppRpcResponseIq rpcResponseIq;
-                        rpcResponseIq.parse(nodeRecv);
-                        emit rpcCallResponse(rpcResponseIq);
-                    }
-                    else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
-                    {
-                        QXmppRpcErrorIq rpcErrorIq;
-                        rpcErrorIq.parse(nodeRecv);
-                        emit rpcCallError(rpcErrorIq);
-                    }
+                // XEP-0009: Jabber-RPC
+                else if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
+                {
+                    QXmppRpcInvokeIq rpcIqPacket;
+                    rpcIqPacket.parse(nodeRecv);
+                    emit rpcCallInvoke(rpcIqPacket);
+                }
+                else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
+                {
+                    QXmppRpcResponseIq rpcResponseIq;
+                    rpcResponseIq.parse(nodeRecv);
+                    emit rpcCallResponse(rpcResponseIq);
+                }
+                else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
+                {
+                    QXmppRpcErrorIq rpcErrorIq;
+                    rpcErrorIq.parse(nodeRecv);
+                    emit rpcCallError(rpcErrorIq);
+                }
 
-                    // XEP-0030: Service Discovery
-                    else if(QXmppDiscoveryIq::isDiscoveryIq(nodeRecv))
-                    {
-                        QXmppDiscoveryIq discoIq;
-                        discoIq.parse(nodeRecv);
+                // XEP-0030: Service Discovery
+                else if(QXmppDiscoveryIq::isDiscoveryIq(nodeRecv))
+                {
+                    QXmppDiscoveryIq discoIq;
+                    discoIq.parse(nodeRecv);
 
-                        if (discoIq.type() == QXmppIq::Get &&
-                            discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-                            (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(capabilitiesNode)))
+                    if (discoIq.type() == QXmppIq::Get &&
+                        discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
+                        (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(capabilitiesNode)))
+                    {
+                        // respond to info query
+                        QXmppDiscoveryIq qxmppFeatures = capabilities();
+                        qxmppFeatures.setId(discoIq.id());
+                        qxmppFeatures.setTo(discoIq.from());
+                        qxmppFeatures.setQueryNode(discoIq.queryNode());
+                        sendPacket(qxmppFeatures);
+                    } else {
+                        emit discoveryIqReceived(discoIq);
+                    }
+                }
+                // XEP-0045: Multi-User Chat
+                else if (QXmppMucAdminIq::isMucAdminIq(nodeRecv))
+                {
+                    QXmppMucAdminIq mucIq;
+                    mucIq.parse(nodeRecv);
+                    emit mucAdminIqReceived(mucIq);
+                }
+                else if (QXmppMucOwnerIq::isMucOwnerIq(nodeRecv))
+                {
+                    QXmppMucOwnerIq mucIq;
+                    mucIq.parse(nodeRecv);
+                    emit mucOwnerIqReceived(mucIq);
+                }
+                // XEP-0047 In-Band Bytestreams
+                else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
+                {
+                    QXmppIbbCloseIq ibbCloseIq;
+                    ibbCloseIq.parse(nodeRecv);
+                    emit ibbCloseIqReceived(ibbCloseIq);
+                }
+                else if(QXmppIbbDataIq::isIbbDataIq(nodeRecv))
+                {
+                    QXmppIbbDataIq ibbDataIq;
+                    ibbDataIq.parse(nodeRecv);
+                    emit ibbDataIqReceived(ibbDataIq);
+                }
+                else if(QXmppIbbOpenIq::isIbbOpenIq(nodeRecv))
+                {
+                    QXmppIbbOpenIq ibbOpenIq;
+                    ibbOpenIq.parse(nodeRecv);
+                    emit ibbOpenIqReceived(ibbOpenIq);
+                }
+                // XEP-0054: vcard-temp
+                else if(nodeRecv.firstChildElement("vCard").
+                        namespaceURI() == ns_vcard)
+                {
+                    QXmppVCard vcardIq;
+                    vcardIq.parse(nodeRecv);
+                    emit vCardIqReceived(vcardIq);
+                }
+                // XEP-0065: SOCKS5 Bytestreams
+                else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
+                {
+                    QXmppByteStreamIq byteStreamIq;
+                    byteStreamIq.parse(nodeRecv);
+                    emit byteStreamIqReceived(byteStreamIq);
+                }
+                // XEP-0078: Non-SASL Authentication
+                else if(id == d->nonSASLAuthId && type == "result")
+                {
+                    // successful Non-SASL Authentication
+                    debug("Authenticated (Non-SASL)");
+
+                    // xmpp connection made
+                    emit xmppConnected();
+                }
+                else if(nodeRecv.firstChildElement("query").
+                        namespaceURI() == ns_auth)
+                {
+                    if(type == "result")
+                    {
+                        bool digest = !nodeRecv.firstChildElement("query").
+                             firstChildElement("digest").isNull();
+                        bool plain = !nodeRecv.firstChildElement("query").
+                             firstChildElement("password").isNull();
+                        bool plainText = false;
+
+                        if(plain && digest)
                         {
-                            // respond to info query
-                            QXmppDiscoveryIq qxmppFeatures = capabilities();
-                            qxmppFeatures.setId(discoIq.id());
-                            qxmppFeatures.setTo(discoIq.from());
-                            qxmppFeatures.setQueryNode(discoIq.queryNode());
-                            sendPacket(qxmppFeatures);
-                        } else {
-                            emit discoveryIqReceived(discoIq);
-                        }
-                    }
-                    // XEP-0045: Multi-User Chat
-                    else if (QXmppMucAdminIq::isMucAdminIq(nodeRecv))
-                    {
-                        QXmppMucAdminIq mucIq;
-                        mucIq.parse(nodeRecv);
-                        emit mucAdminIqReceived(mucIq);
-                    }
-                    else if (QXmppMucOwnerIq::isMucOwnerIq(nodeRecv))
-                    {
-                        QXmppMucOwnerIq mucIq;
-                        mucIq.parse(nodeRecv);
-                        emit mucOwnerIqReceived(mucIq);
-                    }
-                    // XEP-0047 In-Band Bytestreams
-                    else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
-                    {
-                        QXmppIbbCloseIq ibbCloseIq;
-                        ibbCloseIq.parse(nodeRecv);
-                        emit ibbCloseIqReceived(ibbCloseIq);
-                    }
-                    else if(QXmppIbbDataIq::isIbbDataIq(nodeRecv))
-                    {
-                        QXmppIbbDataIq ibbDataIq;
-                        ibbDataIq.parse(nodeRecv);
-                        emit ibbDataIqReceived(ibbDataIq);
-                    }
-                    else if(QXmppIbbOpenIq::isIbbOpenIq(nodeRecv))
-                    {
-                        QXmppIbbOpenIq ibbOpenIq;
-                        ibbOpenIq.parse(nodeRecv);
-                        emit ibbOpenIqReceived(ibbOpenIq);
-                    }
-                    // XEP-0054: vcard-temp
-                    else if(nodeRecv.firstChildElement("vCard").
-                            namespaceURI() == ns_vcard)
-                    {
-                        QXmppVCard vcardIq;
-                        vcardIq.parse(nodeRecv);
-                        emit vCardIqReceived(vcardIq);
-                    }
-                    // XEP-0065: SOCKS5 Bytestreams
-                    else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
-                    {
-                        QXmppByteStreamIq byteStreamIq;
-                        byteStreamIq.parse(nodeRecv);
-                        emit byteStreamIqReceived(byteStreamIq);
-                    }
-                    // XEP-0078: Non-SASL Authentication
-                    else if(id == d->nonSASLAuthId && type == "result")
-                    {
-                        // successful Non-SASL Authentication
-                        debug("Authenticated (Non-SASL)");
-
-                        // xmpp connection made
-                        emit xmppConnected();
-                    }
-                    else if(nodeRecv.firstChildElement("query").
-                            namespaceURI() == ns_auth)
-                    {
-                        if(type == "result")
-                        {
-                            bool digest = !nodeRecv.firstChildElement("query").
-                                 firstChildElement("digest").isNull();
-                            bool plain = !nodeRecv.firstChildElement("query").
-                                 firstChildElement("password").isNull();
-                            bool plainText = false;
-
-                            if(plain && digest)
-                            {
-                                if(configuration().nonSASLAuthMechanism() ==
-                                   QXmppConfiguration::NonSASLDigest)
-                                    plainText = false;
-                                else
-                                    plainText = true;
-                            }
-                            else if(plain)
-                                plainText = true;
-                            else if(digest)
+                            if(configuration().nonSASLAuthMechanism() ==
+                               QXmppConfiguration::NonSASLDigest)
                                 plainText = false;
                             else
-                            {
-                                //TODO Login error
-                                return;
-                            }
-                            sendNonSASLAuth(plainText);
+                                plainText = true;
                         }
-                    }
-                    // XEP-0092: Software Version
-                    else if(QXmppVersionIq::isVersionIq(nodeRecv))
-                    {
-                        QXmppVersionIq versionIq;
-                        versionIq.parse(nodeRecv);
-
-                        if (versionIq.type() == QXmppIq::Get)
+                        else if(plain)
+                            plainText = true;
+                        else if(digest)
+                            plainText = false;
+                        else
                         {
-                            // respond to query
-                            QXmppVersionIq responseIq;
-                            responseIq.setType(QXmppIq::Result);
-                            responseIq.setId(versionIq.id());
-                            responseIq.setTo(versionIq.from());
-                            responseIq.setName(qApp->applicationName());
-                            responseIq.setVersion(qApp->applicationVersion());
-                            sendPacket(responseIq);
-                        } else {
-                            emit iqReceived(versionIq);
+                            //TODO Login error
+                            return;
                         }
+                        sendNonSASLAuth(plainText);
+                    }
+                }
+                // XEP-0092: Software Version
+                else if(QXmppVersionIq::isVersionIq(nodeRecv))
+                {
+                    QXmppVersionIq versionIq;
+                    versionIq.parse(nodeRecv);
 
-                    }
-                    // XEP-0095: Stream Initiation
-                    else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
+                    if (versionIq.type() == QXmppIq::Get)
                     {
-                        QXmppStreamInitiationIq siIq;
-                        siIq.parse(nodeRecv);
-                        emit streamInitiationIqReceived(siIq);
+                        // respond to query
+                        QXmppVersionIq responseIq;
+                        responseIq.setType(QXmppIq::Result);
+                        responseIq.setId(versionIq.id());
+                        responseIq.setTo(versionIq.from());
+                        responseIq.setName(qApp->applicationName());
+                        responseIq.setVersion(qApp->applicationVersion());
+                        sendPacket(responseIq);
+                    } else {
+                        emit iqReceived(versionIq);
                     }
-                    // XEP-0136: Message Archiving
-                    else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
-                    {
-                        QXmppArchiveChatIq archiveIq;
-                        archiveIq.parse(nodeRecv);
-                        emit archiveChatIqReceived(archiveIq);
-                    }
-                    else if(QXmppArchiveListIq::isArchiveListIq(nodeRecv))
-                    {
-                        QXmppArchiveListIq archiveIq;
-                        archiveIq.parse(nodeRecv);
-                        emit archiveListIqReceived(archiveIq);
-                    }
-                    else if(QXmppArchivePrefIq::isArchivePrefIq(nodeRecv))
-                    {
-                        QXmppArchivePrefIq archiveIq;
-                        archiveIq.parse(nodeRecv);
-                        emit archivePrefIqReceived(archiveIq);
-                    }
-                    // XEP-0166: Jingle
-                    else if(QXmppJingleIq::isJingleIq(nodeRecv))
-                    {
-                        QXmppJingleIq jingleIq;
-                        jingleIq.parse(nodeRecv);
-                        emit jingleIqReceived(jingleIq);
-                    }
-                    // XEP-0199: XMPP Ping
-                    else if(QXmppPingIq::isPingIq(nodeRecv))
-                    {
-                        QXmppPingIq req;
-                        req.parse(nodeRecv);
 
-                        QXmppIq iq(QXmppIq::Result);
-                        iq.setId(req.id());
-                        iq.setTo(req.from());
-                        iq.setFrom(req.to());
+                }
+                // XEP-0095: Stream Initiation
+                else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
+                {
+                    QXmppStreamInitiationIq siIq;
+                    siIq.parse(nodeRecv);
+                    emit streamInitiationIqReceived(siIq);
+                }
+                // XEP-0136: Message Archiving
+                else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
+                {
+                    QXmppArchiveChatIq archiveIq;
+                    archiveIq.parse(nodeRecv);
+                    emit archiveChatIqReceived(archiveIq);
+                }
+                else if(QXmppArchiveListIq::isArchiveListIq(nodeRecv))
+                {
+                    QXmppArchiveListIq archiveIq;
+                    archiveIq.parse(nodeRecv);
+                    emit archiveListIqReceived(archiveIq);
+                }
+                else if(QXmppArchivePrefIq::isArchivePrefIq(nodeRecv))
+                {
+                    QXmppArchivePrefIq archiveIq;
+                    archiveIq.parse(nodeRecv);
+                    emit archivePrefIqReceived(archiveIq);
+                }
+                // XEP-0166: Jingle
+                else if(QXmppJingleIq::isJingleIq(nodeRecv))
+                {
+                    QXmppJingleIq jingleIq;
+                    jingleIq.parse(nodeRecv);
+                    emit jingleIqReceived(jingleIq);
+                }
+                // XEP-0199: XMPP Ping
+                else if(QXmppPingIq::isPingIq(nodeRecv))
+                {
+                    QXmppPingIq req;
+                    req.parse(nodeRecv);
+
+                    QXmppIq iq(QXmppIq::Result);
+                    iq.setId(req.id());
+                    iq.setTo(req.from());
+                    iq.setFrom(req.to());
+                    sendPacket(iq);
+                }
+                else
+                {
+                    QXmppIq iqPacket;
+                    iqPacket.parse(nodeRecv);
+
+                    // if we didn't understant the iq, reply with error
+                    // except for "result" and "error" iqs
+                    if (type != "result" && type != "error")
+                    {
+                        QXmppIq iq(QXmppIq::Error);
+                        iq.setId(iqPacket.id());
+                        iq.setTo(iqPacket.from());
+                        iq.setFrom(iqPacket.to());
+                        QXmppStanza::Error error(QXmppStanza::Error::Cancel,
+                            QXmppStanza::Error::FeatureNotImplemented);
+                        iq.setError(error);
                         sendPacket(iq);
+                    } else {
+                        emit iqReceived(iqPacket);
                     }
-                    else
-                    {
-                        QXmppIq iqPacket;
-                        iqPacket.parse(nodeRecv);
-
-                        // if we didn't understant the iq, reply with error
-                        // except for "result" and "error" iqs
-                        if (type != "result" && type != "error")
-                        {
-                            QXmppIq iq(QXmppIq::Error);
-                            iq.setId(iqPacket.id());
-                            iq.setTo(iqPacket.from());
-                            iq.setFrom(iqPacket.to());
-                            QXmppStanza::Error error(QXmppStanza::Error::Cancel,
-                                QXmppStanza::Error::FeatureNotImplemented);
-                            iq.setError(error);
-                            sendPacket(iq);
-                        } else {
-                            emit iqReceived(iqPacket);
-                        }
-                    }
-                }
-                else if(nodeRecv.tagName() == "presence")
-                {
-                    QXmppPresence presence;
-                    presence.parse(nodeRecv);
-
-                    // emit presence
-                    emit presenceReceived(presence);
-                }
-                else if(nodeRecv.tagName() == "message")
-                {
-                    QXmppMessage message;
-                    message.parse(nodeRecv);
-
-                    // emit message
-                    emit messageReceived(message);
                 }
             }
-            nodeRecv = nodeRecv.nextSiblingElement();
+            else if(nodeRecv.tagName() == "presence")
+            {
+                QXmppPresence presence;
+                presence.parse(nodeRecv);
+
+                // emit presence
+                emit presenceReceived(presence);
+            }
+            else if(nodeRecv.tagName() == "message")
+            {
+                QXmppMessage message;
+                message.parse(nodeRecv);
+
+                // emit message
+                emit messageReceived(message);
+            }
         }
-    }
-    else
-    {
-        //wait for complete packet
+        nodeRecv = nodeRecv.nextSiblingElement();
     }
 }
 
@@ -816,22 +815,6 @@ bool QXmppStream::sendToServer(const QByteArray& packet)
     if (!isConnected())
         return false;
     return d->socket.write( packet ) == packet.size();
-}
-
-bool QXmppStream::hasStartStreamElement(const QByteArray& data)
-{
-    QString str(data);
-    QRegExp regex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
-    regex.setMinimal(true);
-    return str.contains(regex);
-}
-
-bool QXmppStream::hasEndStreamElement(const QByteArray& data)
-{
-    QString str(data);
-    QRegExp regex("</stream:stream>$");
-    regex.setMinimal(true);
-    return str.contains(regex);
 }
 
 void QXmppStream::sendNonSASLAuth(bool plainText)

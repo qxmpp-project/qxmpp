@@ -160,8 +160,6 @@ private:
     void sendSessionIQ();
     void sendRosterRequest();
     bool sendToServer(const QByteArray&);
-    bool hasStartStreamElement(const QByteArray&);
-    bool hasEndStreamElement(const QByteArray&);
 
     void flushDataBuffer();
 
