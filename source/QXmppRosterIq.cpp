@@ -83,9 +83,9 @@ QString QXmppRosterIq::Item::bareJid() const
 /// \param bareJid as a QString
 ///
 
-void QXmppRosterIq::Item::setBareJid(const QString& str)
+void QXmppRosterIq::Item::setBareJid(const QString &bareJid)
 {
-    m_bareJid = str;
+    m_bareJid = bareJid;
 }
 
 /// Returns the groups of the roster entry.
@@ -123,9 +123,9 @@ QString QXmppRosterIq::Item::name() const
 /// \param name as a QString
 ///
 
-void QXmppRosterIq::Item::setName(const QString& str)
+void QXmppRosterIq::Item::setName(const QString &name)
 {
-    m_name = str;
+    m_name = name;
 }
 
 /// Returns the subscription status of the roster entry. It is the "ask"
@@ -148,9 +148,9 @@ QString QXmppRosterIq::Item::subscriptionStatus() const
 /// \param status as a QString
 ///
 
-void QXmppRosterIq::Item::setSubscriptionStatus(const QString& str)
+void QXmppRosterIq::Item::setSubscriptionStatus(const QString &status)
 {
-    m_subscriptionStatus = str;
+    m_subscriptionStatus = status;
 }
 
 /// Returns the subscription type of the roster entry.
