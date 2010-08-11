@@ -1,7 +1,7 @@
 # Common definitions
 
 QXMPP_VERSION = 0.1.91
-QXMPP_INCLUDE_DIR = $$PWD/source
+QXMPP_INCLUDE_DIR = $$PWD/src
 QXMPP_LIBRARY_DIR = $$PWD/lib
 
 CONFIG(debug, debug|release) {

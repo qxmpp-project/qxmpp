@@ -2,7 +2,7 @@ include(qxmpp.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS = source \
+SUBDIRS = src \
           tests \
           examples
 
