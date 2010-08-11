@@ -103,7 +103,7 @@ SOURCES += QXmppUtils.cpp \
 
 # pkg-config support
 CONFIG += create_pc create_prl no_install_prl
-QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
 
 # Installation
 headers.files = $$HEADERS
