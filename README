@@ -14,7 +14,7 @@ The project uses qmake build system of Qt.
 
 Building from the command line:
 
-cd <where QXmppClient.pro is lying>
+cd <where qxmpp.pro is located>
 qmake
 <respective-make-cmd = gmake, make, mingw32-make, nmake>
 
@@ -57,11 +57,9 @@ SUPPORTED PLATFORMS
 
 For this release, the following platforms have been tested:
 
-  win32-g++        (mingw)
-  win32-msvc2005
-
-  linux-g++
-  linux-g++-64
+  win32-g++        (Qt SDK)
+  linux-g++        (32-bit and 64-bit)
+  macos-g++        (32-bit and 64-bit)
 
 It should work on all the plaforms supported by Qt. For a complete list of
 platforms support by Qt, see:
