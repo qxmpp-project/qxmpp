@@ -20,7 +20,7 @@ qmake
 
 Building using Qt Creator:
 
-Open the qxmpp.pro file in Qt Creator and hit Buil All to build all
+Open the qxmpp.pro file in Qt Creator and hit Build All to build all
 the examples and library.
 
 
