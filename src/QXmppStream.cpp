@@ -376,11 +376,10 @@ void QXmppStream::parser(const QByteArray& data)
                 }
 
                 if (d->socket->supportsSsl() &&
-                    (remoteSecurity == QXmppConfiguration::TLSRequired ||
-                     localSecurity != QXmppConfiguration::TLSDisabled))
+                    remoteSecurity != QXmppConfiguration::TLSDisabled && 
+                    localSecurity != QXmppConfiguration::TLSDisabled)
                 {
-                    // enable TLS as it is required by the server
-                    // or supported by the client
+                    // enable TLS as it is support by both parties
                     sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
                     return;
                 }
