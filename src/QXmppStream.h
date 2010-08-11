@@ -158,7 +158,6 @@ private:
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
     void sendSessionIQ();
-    void sendRosterRequest();
     bool sendToServer(const QByteArray&);
 
     void flushDataBuffer();
