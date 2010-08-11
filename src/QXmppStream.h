@@ -28,14 +28,13 @@
 #include <QObject>
 #include <QSslSocket>
 #include "QXmppClient.h"
-#include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
 #include "QXmppStanza.h"
 
 class QDomElement;
-class QTimer;
 
 class QXmppClient;
+class QXmppConfiguration;
 class QXmppPacket;
 class QXmppPresence;
 class QXmppIq;
@@ -146,22 +145,6 @@ private slots:
     void pingTimeout();
 
 private:
-    QXmppConfiguration m_config;    ///< This object provides the configuration
-                                    ///< required for connecting to the XMPP server.
-    QXmppLogger* m_logger;
-    QString m_sessionId;
-    QString m_bindId;
-    QByteArray m_dataBuffer;
-    bool m_sessionAvailable;
-    QString m_streamId;
-    QString m_nonSASLAuthId;
-    QString m_XMPPVersion;
-    QXmppStanza::Error::Condition m_xmppStreamError;
-    QTimer *m_pingTimer;
-    QTimer *m_timeoutTimer;
-
-    int m_authStep;
-
     QXmppDiscoveryIq capabilities() const;
     void debug(const QString&);
     void info(const QString&);

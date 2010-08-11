@@ -22,20 +22,20 @@
  */
 
 
-#include "QXmppUtils.h"
-#include "QXmppBind.h"
+#include "QXmppConfiguration.h"
+#include "QXmppConstants.h"
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppPacket.h"
 #include "QXmppPresence.h"
-#include "QXmppSession.h"
-#include "QXmppConstants.h"
 #include "QXmppStream.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppUtils.h"
 
 // IQ types
 #include "QXmppArchiveIq.h"
+#include "QXmppBind.h"
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
@@ -44,6 +44,7 @@
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
+#include "QXmppSession.h"
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppVCard.h"
 #include "QXmppVersionIq.h"
@@ -63,15 +64,40 @@ static const QByteArray streamRootElementEnd = "</stream:stream>";
 class QXmppStreamPrivate
 {
 public:
+    QXmppStreamPrivate();
+
+    // This object provides the configuration
+    // required for connecting to the XMPP server.
+    QXmppConfiguration config;
+    QByteArray dataBuffer;
+    QXmppLogger* logger;
     QSslSocket socket;
     QAbstractSocket::SocketError socketError;
+    QXmppStanza::Error::Condition xmppStreamError;
+
+    // State data
+    int authStep;
+    QString sessionId;
+    QString bindId;
+    bool sessionAvailable;
+    QString streamId;
+    QString nonSASLAuthId;
+    QString XMPPVersion;
+
+    // Timers
+    QTimer *pingTimer;
+    QTimer *timeoutTimer;
 };
+
+QXmppStreamPrivate::QXmppStreamPrivate()
+    : logger(0),
+    authStep(0),
+    sessionAvailable(false)
+{
+}
 
 QXmppStream::QXmppStream(QObject *parent)
     : QObject(parent),
-    m_logger(0),
-    m_sessionAvailable(false),
-    m_authStep(0),
     d(new QXmppStreamPrivate)
 {
     // Make sure the random number generator is seeded
@@ -105,13 +131,13 @@ QXmppStream::QXmppStream(QObject *parent)
     Q_ASSERT(check);
 
     // XEP-0199: XMPP Ping
-    m_pingTimer = new QTimer(this);
-    check = QObject::connect(m_pingTimer, SIGNAL(timeout()), this, SLOT(pingSend()));
+    d->pingTimer = new QTimer(this);
+    check = QObject::connect(d->pingTimer, SIGNAL(timeout()), this, SLOT(pingSend()));
     Q_ASSERT(check);
 
-    m_timeoutTimer = new QTimer(this);
-    m_timeoutTimer->setSingleShot(true);
-    check = QObject::connect(m_timeoutTimer, SIGNAL(timeout()), this, SLOT(pingTimeout()));
+    d->timeoutTimer = new QTimer(this);
+    d->timeoutTimer->setSingleShot(true);
+    check = QObject::connect(d->timeoutTimer, SIGNAL(timeout()), this, SLOT(pingTimeout()));
     Q_ASSERT(check);
 
     check = QObject::connect(this, SIGNAL(xmppConnected()), this, SLOT(pingStart()));
@@ -128,7 +154,7 @@ QXmppStream::~QXmppStream()
 
 QXmppConfiguration& QXmppStream::configuration()
 {
-    return m_config;
+    return d->config;
 }
 
 void QXmppStream::connect()
@@ -137,7 +163,7 @@ void QXmppStream::connect()
             host()).arg(configuration().port()));
 
     // prepare for connection
-    m_authStep = 0;
+    d->authStep = 0;
 
     d->socket.setProxy(configuration().networkProxy());
     d->socket.connectToHost(configuration().
@@ -208,20 +234,20 @@ void QXmppStream::sendNonSASLAuthQuery( const QString &to )
 
 QXmppLogger *QXmppStream::logger()
 {
-    return m_logger;
+    return d->logger;
 }
 
 /// Sets the QXmppLogger associated with the current QXmppStream.
 
 void QXmppStream::setLogger(QXmppLogger *logger)
 {
-    if (m_logger)
+    if (d->logger)
         QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                            m_logger, SLOT(log(QXmppLogger::MessageType, QString)));
-    m_logger = logger;
-    if (m_logger)
+                            d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+    d->logger = logger;
+    if (d->logger)
         QObject::connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                         m_logger, SLOT(log(QXmppLogger::MessageType, QString)));
+                         d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
 }
 
 void QXmppStream::debug(const QString &data)
@@ -244,24 +270,24 @@ void QXmppStream::parser(const QByteArray& data)
     QDomDocument doc;
     QByteArray completeXml;
 
-    m_dataBuffer = m_dataBuffer + data;
+    d->dataBuffer.append(data);
 
-    if(hasStartStreamElement(m_dataBuffer))
+    if(hasStartStreamElement(d->dataBuffer))
     {
-        completeXml = m_dataBuffer + streamRootElementEnd;
+        completeXml = d->dataBuffer + streamRootElementEnd;
     }
     else if(hasEndStreamElement(data))
     {
-        completeXml = streamRootElementStart + m_dataBuffer;
+        completeXml = streamRootElementStart + d->dataBuffer;
     }
     else
     {
-        completeXml = streamRootElementStart + m_dataBuffer + streamRootElementEnd;
+        completeXml = streamRootElementStart + d->dataBuffer + streamRootElementEnd;
     }
     
     if(doc.setContent(completeXml, true))
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, QString::fromUtf8(m_dataBuffer));
+        emit logMessage(QXmppLogger::ReceivedMessage, QString::fromUtf8(d->dataBuffer));
         flushDataBuffer();
 
         QDomElement nodeRecv = doc.documentElement().firstChildElement();
@@ -269,12 +295,12 @@ void QXmppStream::parser(const QByteArray& data)
         if(nodeRecv.isNull())
         {
             QDomElement streamElement = doc.documentElement();
-            if(m_streamId.isEmpty())
-                m_streamId = streamElement.attribute("id");
-            if(m_XMPPVersion.isEmpty())
+            if(d->streamId.isEmpty())
+                d->streamId = streamElement.attribute("id");
+            if(d->XMPPVersion.isEmpty())
             {
-                m_XMPPVersion = streamElement.attribute("version");
-                if(m_XMPPVersion.isEmpty())
+                d->XMPPVersion = streamElement.attribute("version");
+                if(d->XMPPVersion.isEmpty())
                 {
                     // no version specified, signals XMPP Version < 1.0.
                     // switch to old auth mechanism
@@ -292,7 +318,7 @@ void QXmppStream::parser(const QByteArray& data)
             QString ns = nodeRecv.namespaceURI();
 
             // if we receive any kind of data, stop the timeout timer
-            m_timeoutTimer->stop();
+            d->timeoutTimer->stop();
 
             bool handled = false;
             emit elementReceived(nodeRecv, handled);
@@ -422,15 +448,15 @@ void QXmppStream::parser(const QByteArray& data)
                 if(nodeRecv.firstChildElement("session").
                                      namespaceURI() == ns_session)
                 {
-                    m_sessionAvailable = true;
+                    d->sessionAvailable = true;
                 }
             }
             else if(ns == ns_stream && nodeRecv.tagName() == "error")
             {
                 if (!nodeRecv.firstChildElement("conflict").isNull())
-                    m_xmppStreamError = QXmppStanza::Error::Conflict;
+                    d->xmppStreamError = QXmppStanza::Error::Conflict;
                 else
-                    m_xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                    d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                 emit error(QXmppClient::XmppStreamError);
             }
             else if(ns == ns_tls)
@@ -452,8 +478,8 @@ void QXmppStream::parser(const QByteArray& data)
                 else if(nodeRecv.tagName() == "challenge")
                 {
                     // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
-                    m_authStep++;
-                    switch (m_authStep)
+                    d->authStep++;
+                    switch (d->authStep)
                     {
                     case 1 :
                         sendAuthDigestMD5ResponseStep1(nodeRecv.text());
@@ -470,9 +496,9 @@ void QXmppStream::parser(const QByteArray& data)
                 else if(nodeRecv.tagName() == "failure")
                 {
                     if (!nodeRecv.firstChildElement("not-authorized").isNull())
-                        m_xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                        d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                     else
-                        m_xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                        d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     emit error(QXmppClient::XmppStreamError);
 
                     warning("Authentication failure"); 
@@ -490,7 +516,7 @@ void QXmppStream::parser(const QByteArray& data)
                     if(type.isEmpty())
                         warning("QXmppStream: iq type can't be empty");
 
-                    if(id == m_sessionId)
+                    if(id == d->sessionId)
                     {
                         QXmppSession session;
                         session.parse(nodeRecv);
@@ -502,7 +528,7 @@ void QXmppStream::parser(const QByteArray& data)
                         // xmpp connection made
                         emit xmppConnected();
                     }
-                    else if(QXmppBind::isBind(nodeRecv) && id == m_bindId)
+                    else if(QXmppBind::isBind(nodeRecv) && id == d->bindId)
                     {
                         QXmppBind bind;
                         bind.parse(nodeRecv);
@@ -522,7 +548,7 @@ void QXmppStream::parser(const QByteArray& data)
                                     warning("Bind IQ received with invalid JID: " + bind.jid());
                                 }
                             }
-                            if (m_sessionAvailable)
+                            if (d->sessionAvailable)
                                 sendSessionIQ();
                         }
                     }
@@ -622,7 +648,7 @@ void QXmppStream::parser(const QByteArray& data)
                         emit byteStreamIqReceived(byteStreamIq);
                     }
                     // XEP-0078: Non-SASL Authentication
-                    else if(id == m_nonSASLAuthId && type == "result")
+                    else if(id == d->nonSASLAuthId && type == "result")
                     {
                         // successful Non-SASL Authentication
                         debug("Authenticated (Non-SASL)");
@@ -814,9 +840,9 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
     authQuery.setUsername(configuration().user());
     authQuery.setPassword(configuration().passwd());
     authQuery.setResource(configuration().resource());
-    authQuery.setStreamId(m_streamId);
+    authQuery.setStreamId(d->streamId);
     authQuery.setUsePlainText(plainText);
-    m_nonSASLAuthId = authQuery.id();
+    d->nonSASLAuthId = authQuery.id();
     sendPacket(authQuery);
 }
 
@@ -939,7 +965,7 @@ void QXmppStream::sendBindIQ()
 {
     QXmppBind bind(QXmppIq::Set);
     bind.setResource(configuration().resource());
-    m_bindId = bind.id();
+    d->bindId = bind.id();
     sendPacket(bind);
 }
 
@@ -947,7 +973,7 @@ void QXmppStream::sendSessionIQ()
 {
     QXmppSession session(QXmppIq::Set);
     session.setTo(configuration().domain());
-    m_sessionId = session.id();
+    d->sessionId = session.id();
     sendPacket(session);
 }
 
@@ -976,7 +1002,7 @@ void QXmppStream::sendSubscriptionRequest(const QString& to)
 
 void QXmppStream::disconnect()
 {
-    m_authStep = 0;
+    d->authStep = 0;
     sendEndStream();
     d->socket.flush();
     d->socket.disconnectFromHost();
@@ -1009,16 +1035,16 @@ void QXmppStream::pingStart()
     // start ping timer
     if (interval > 0)
     {
-        m_pingTimer->setInterval(interval * 1000);
-        m_pingTimer->start();
+        d->pingTimer->setInterval(interval * 1000);
+        d->pingTimer->start();
     }
 }
 
 void QXmppStream::pingStop()
 {
     // stop all timers
-    m_pingTimer->stop();
-    m_timeoutTimer->stop();
+    d->pingTimer->stop();
+    d->timeoutTimer->stop();
 }
 
 void QXmppStream::pingSend()
@@ -1033,8 +1059,8 @@ void QXmppStream::pingSend()
     const int timeout = configuration().keepAliveTimeout();
     if (timeout > 0)
     {
-        m_timeoutTimer->setInterval(timeout * 1000);
-        m_timeoutTimer->start();
+        d->timeoutTimer->setInterval(timeout * 1000);
+        d->timeoutTimer->start();
     }
 }
 
@@ -1052,12 +1078,12 @@ QAbstractSocket::SocketError QXmppStream::socketError()
 
 QXmppStanza::Error::Condition QXmppStream::xmppStreamError()
 {
-    return m_xmppStreamError;
+    return d->xmppStreamError;
 }
 
 void QXmppStream::flushDataBuffer()
 {
-    m_dataBuffer.clear();
+    d->dataBuffer.clear();
 }
 
 QXmppDiscoveryIq QXmppStream::capabilities() const
