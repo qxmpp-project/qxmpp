@@ -385,7 +385,7 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
                 localSecurity != QXmppConfiguration::TLSDisabled)
             {
                 // enable TLS as it is support by both parties
-                sendToServer("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+                sendData("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
                 return;
             }
         }
@@ -439,14 +439,14 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
                     QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
                     data += userPass.toUtf8().toBase64();
                     data += "</auth>";
-                    sendToServer(data);
+                    sendData(data);
                 }
                 break;
             case QXmppConfiguration::SASLDigestMD5:
-                sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
+                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
                 break;
             case QXmppConfiguration::SASLAnonymous:
-                sendToServer("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
+                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
                 break;
             }
         }
@@ -811,10 +811,10 @@ void QXmppStream::sendStartStream()
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
     data.append(configuration().domain());
     data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
-    sendToServer(data);
+    sendData(data);
 }
 
-bool QXmppStream::sendToServer(const QByteArray& packet)
+bool QXmppStream::sendData(const QByteArray& packet)
 {
     emit logMessage(QXmppLogger::SentMessage, QString::fromUtf8(packet));
     if (!isConnected())
@@ -954,12 +954,12 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
     debug(response);
     QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
                         + response.toBase64() + "</response>";
-    sendToServer(packet);
+    sendData(packet);
 }
 
 void QXmppStream::sendAuthDigestMD5ResponseStep2()
 {
-    sendToServer("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+    sendData("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
 }
 
 void QXmppStream::sendBindIQ()
@@ -1022,12 +1022,12 @@ bool QXmppStream::sendPacket(const QXmppPacket& packet)
     packet.toXml(&xmlStream);
 
     // send packet
-    return sendToServer(data);
+    return sendData(data);
 }
 
 void QXmppStream::sendEndStream()
 {
-    sendToServer(streamRootElementEnd);
+    sendData(streamRootElementEnd);
 }
 
 void QXmppStream::pingStart()

@@ -133,6 +133,7 @@ signals:
 protected:
     virtual void handleStanza(const QDomElement &element);
     virtual void handleStream(const QDomElement &element);
+    bool sendData(const QByteArray&);
 
 private slots:
     void socketHostFound();
@@ -162,7 +163,6 @@ private:
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
     void sendSessionIQ();
-    bool sendToServer(const QByteArray&);
 
     void flushDataBuffer();
 
