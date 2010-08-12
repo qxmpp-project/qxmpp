@@ -97,7 +97,7 @@ QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent),
     d(new QXmppClientPrivate)
 {
-    d->stream = new QXmppStream(this);
+    d->stream = new QXmppStream(new QSslSocket(this), this);
     d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),

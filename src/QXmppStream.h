@@ -64,7 +64,7 @@ class QXmppStream : public QObject
     Q_OBJECT
 
 public:
-    QXmppStream(QObject *parent);
+    QXmppStream(QSslSocket *socket, QObject *parent);
     ~QXmppStream();
     void connect();
     void acceptSubscriptionRequest(const QString& from, bool accept = true);

@@ -97,7 +97,7 @@ QXmppStreamPrivate::QXmppStreamPrivate()
 {
 }
 
-QXmppStream::QXmppStream(QObject *parent)
+QXmppStream::QXmppStream(QSslSocket *socket, QObject *parent)
     : QObject(parent),
     d(new QXmppStreamPrivate)
 {
@@ -108,7 +108,7 @@ QXmppStream::QXmppStream(QObject *parent)
     setLogger(QXmppLogger::getLogger());
 
     // create socket
-    d->socket = new QSslSocket(this);
+    d->socket = socket;
 
     bool check = QObject::connect(d->socket, SIGNAL(hostFound()),
                                   this, SLOT(socketHostFound()));
