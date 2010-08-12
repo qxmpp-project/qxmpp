@@ -298,38 +298,47 @@ void QXmppStream::parser(const QByteArray& data)
     if (streamStart)
     {
         QDomElement streamElement = doc.documentElement();
-        if(d->streamId.isEmpty())
-            d->streamId = streamElement.attribute("id");
-        if (d->streamFrom.isEmpty())
-            d->streamFrom = streamElement.attribute("from");
-        if(d->streamVersion.isEmpty())
-        {
-            d->streamVersion = streamElement.attribute("version");
-
-            // no version specified, signals XMPP Version < 1.0.
-            // switch to old auth mechanism
-            if(d->streamVersion.isEmpty())
-                sendNonSASLAuthQuery();
-        }
+        handleStream(streamElement);
     }
 
     // process stanzas
     while(!nodeRecv.isNull())
     {
-
-        QString ns = nodeRecv.namespaceURI();
-
         // if we receive any kind of data, stop the timeout timer
         d->timeoutTimer->stop();
 
+        // give client opportunity to handle stanza
         bool handled = false;
         emit elementReceived(nodeRecv, handled);
+        if(!handled)
+            handleStanza(nodeRecv);
 
-        if(handled)
-        {
-            // already handled by client, do nothing
-        }
-        else if(ns == ns_stream && nodeRecv.tagName() == "features")
+        nodeRecv = nodeRecv.nextSiblingElement();
+    }
+}
+
+void QXmppStream::handleStream(const QDomElement &streamElement)
+{
+    if(d->streamId.isEmpty())
+        d->streamId = streamElement.attribute("id");
+    if (d->streamFrom.isEmpty())
+        d->streamFrom = streamElement.attribute("from");
+    if(d->streamVersion.isEmpty())
+    {
+        d->streamVersion = streamElement.attribute("version");
+
+        // no version specified, signals XMPP Version < 1.0.
+        // switch to old auth mechanism
+        if(d->streamVersion.isEmpty())
+            sendNonSASLAuthQuery();
+    }
+}
+
+void QXmppStream::handleStanza(const QDomElement &nodeRecv)
+{
+        const QString ns = nodeRecv.namespaceURI();
+
+        if(ns == ns_stream && nodeRecv.tagName() == "features")
         {
             bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
                                      namespaceURI() == ns_authFeature;
@@ -794,8 +803,6 @@ void QXmppStream::parser(const QByteArray& data)
                 emit messageReceived(message);
             }
         }
-        nodeRecv = nodeRecv.nextSiblingElement();
-    }
 }
 
 void QXmppStream::sendStartStream()

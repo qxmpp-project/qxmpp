@@ -130,6 +130,10 @@ signals:
     // XEP-0166: Jingle
     void jingleIqReceived(const QXmppJingleIq&);
 
+protected:
+    virtual void handleStanza(const QDomElement &element);
+    virtual void handleStream(const QDomElement &element);
+
 private slots:
     void socketHostFound();
     void socketReadReady();
