@@ -67,10 +67,9 @@ public:
     QXmppStream(QSslSocket *socket, QObject *parent);
     ~QXmppStream();
     void connect();
-    void acceptSubscriptionRequest(const QString& from, bool accept = true);
-    void sendSubscriptionRequest(const QString& to);
     void disconnect();
     bool isConnected() const;
+    bool sendData(const QByteArray&);
     bool sendPacket(const QXmppPacket&);
 
     QAbstractSocket::SocketError socketError();
@@ -133,7 +132,6 @@ signals:
 protected:
     virtual void handleStanza(const QDomElement &element);
     virtual void handleStream(const QDomElement &element);
-    bool sendData(const QByteArray&);
 
 private slots:
     void socketHostFound();

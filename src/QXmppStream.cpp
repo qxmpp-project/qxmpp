@@ -978,29 +978,6 @@ void QXmppStream::sendSessionIQ()
     sendPacket(session);
 }
 
-void QXmppStream::acceptSubscriptionRequest(const QString& from, bool accept)
-{
-    QXmppPresence presence;
-    presence.setTo(from);
-    if(accept)
-        presence.setType(QXmppPresence::Subscribed);
-    else
-        presence.setType(QXmppPresence::Unsubscribed);
-
-    sendPacket(presence);
-}
-
-void QXmppStream::sendSubscriptionRequest(const QString& to)
-{
-    if(to.isEmpty())
-        return;
-
-    QXmppPresence presence;
-    presence.setTo(to);
-    presence.setType(QXmppPresence::Subscribe);
-    sendPacket(presence);
-}
-
 void QXmppStream::disconnect()
 {
     d->authStep = 0;

@@ -95,7 +95,12 @@ void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
         break;
     case QXmppPresence::Subscribe:
         if (m_stream->configuration().autoAcceptSubscriptions())
-            m_stream->acceptSubscriptionRequest(jid);
+        {
+            QXmppPresence presence;
+            presence.setTo(jid);
+            presence.setType(QXmppPresence::Subscribed);
+            m_stream->sendPacket(presence);
+        }
         break;
     default:
         break;
@@ -116,7 +121,7 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
             m_stream->sendPacket(returnIq);
 
             // store updated entries and notify changes
-            QList<QXmppRosterIq::Item> items = rosterIq.items();
+            const QList<QXmppRosterIq::Item> items = rosterIq.items();
             for (int i = 0; i < items.count(); i++)
             {
                 QString bareJid = items.at(i).bareJid();
@@ -128,10 +133,16 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
             // then after recieving following iq user requests contact for subscription
             
             // check the "from" is newly added in the roster...and remove this ask thing...and do this for all items
-            if(rosterIq.items().at(0).subscriptionType() ==
-               QXmppRosterIq::Item::From && rosterIq.items().at(0).
-               subscriptionStatus().isEmpty())
-                m_stream->sendSubscriptionRequest(rosterIq.items().at(0).bareJid());
+            QXmppRosterIq::Item item = items.at(0);
+            if (!item.bareJid().isEmpty() &&
+                item.subscriptionType() == QXmppRosterIq::Item::From &&
+                item.subscriptionStatus().isEmpty())
+            {
+                QXmppPresence presence;
+                presence.setTo(item.bareJid());
+                presence.setType(QXmppPresence::Subscribe);
+                m_stream->sendPacket(presence);
+            }
         }
         break;
     case QXmppIq::Result:
