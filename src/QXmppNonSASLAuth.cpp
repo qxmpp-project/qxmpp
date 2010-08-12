@@ -57,6 +57,8 @@ void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writer->writeTextElement("username", m_username);
     if (!m_digest.isEmpty())
         writer->writeTextElement("digest", m_digest.toHex());
+    if (!m_password.isEmpty())
+        writer->writeTextElement("password", m_password);
     if (!m_resource.isEmpty())
         writer->writeTextElement("resource", m_resource);
     writer->writeEndElement();

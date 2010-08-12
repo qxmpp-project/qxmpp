@@ -186,14 +186,49 @@ void TestPackets::testMessageLegacyDelay()
 
 void TestPackets::testNonSaslAuth()
 {
-    const QByteArray xml(
+    // Client Requests Authentication Fields from Server
+    const QByteArray xml1(
         "<iq id=\"auth1\" to=\"shakespeare.lit\" type=\"get\">"
         "<query xmlns=\"jabber:iq:auth\"/>"
         "</iq>");
 
-    QXmppNonSASLAuthIq iq;
-    parsePacket(iq, xml);
-    serializePacket(iq, xml);
+    QXmppNonSASLAuthIq iq1;
+    parsePacket(iq1, xml1);
+    serializePacket(iq1, xml1);
+
+    // Client Provides Required Information (Plaintext)
+    const QByteArray xml3(
+        "<iq id=\"auth2\" type=\"set\">"
+        "<query xmlns=\"jabber:iq:auth\">"
+        "<username>bill</username>"
+        "<password>Calli0pe</password>"
+        "<resource>globe</resource>"
+        "</query>"
+        "</iq>");
+    QXmppNonSASLAuthIq iq3;
+    parsePacket(iq3, xml3);
+    QCOMPARE(iq3.username(), QLatin1String("bill"));
+    QCOMPARE(iq3.digest(), QByteArray());
+    QCOMPARE(iq3.password(), QLatin1String("Calli0pe"));
+    QCOMPARE(iq3.resource(), QLatin1String("globe"));
+    serializePacket(iq3, xml3);
+
+    // Client Provides Required Information (Plaintext)
+    const QByteArray xml4(
+        "<iq id=\"auth2\" type=\"set\">"
+        "<query xmlns=\"jabber:iq:auth\">"
+        "<username>bill</username>"
+        "<digest>48fc78be9ec8f86d8ce1c39c320c97c21d62334d</digest>"
+        "<resource>globe</resource>"
+        "</query>"
+        "</iq>");
+    QXmppNonSASLAuthIq iq4;
+    parsePacket(iq4, xml4);
+    QCOMPARE(iq4.username(), QLatin1String("bill"));
+    QCOMPARE(iq4.digest(), QByteArray("\x48\xfc\x78\xbe\x9e\xc8\xf8\x6d\x8c\xe1\xc3\x9c\x32\x0c\x97\xc2\x1d\x62\x33\x4d"));
+    QCOMPARE(iq4.password(), QString());
+    QCOMPARE(iq4.resource(), QLatin1String("globe"));
+    serializePacket(iq4, xml4);
 }
 
 void TestPackets::testPresence()
