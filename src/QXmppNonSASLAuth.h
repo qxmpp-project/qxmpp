@@ -34,7 +34,8 @@ public:
     QString username() const;
     void setUsername(const QString &username);
 
-    QString digest() const;
+    QByteArray digest() const;
+    void setDigest(const QString &streamId, const QString &password);
 
     QString password() const;
     void setPassword(const QString &password);
@@ -42,8 +43,7 @@ public:
     QString resource() const;
     void setResource(const QString &resource);
 
-    void setStreamId(const QString &sid);
-    void setUsePlainText( bool useplaintext );
+    static bool isNonSASLAuthIq(const QDomElement &element);
 
 protected:
     /// \cond
@@ -53,11 +53,9 @@ protected:
 
 private:
     QString m_username;
-    QString m_digest;
+    QByteArray m_digest;
     QString m_password;
     QString m_resource;
-    QString m_sid;
-    bool m_useplaintext;
 };
 
 #endif // QXmppNonSASLAuth_H

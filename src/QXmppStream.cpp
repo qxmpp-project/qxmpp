@@ -653,8 +653,7 @@ void QXmppStream::parser(const QByteArray& data)
                     // xmpp connection made
                     emit xmppConnected();
                 }
-                else if(nodeRecv.firstChildElement("query").
-                        namespaceURI() == ns_auth)
+                else if(QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv))
                 {
                     if(type == "result")
                     {
@@ -678,7 +677,8 @@ void QXmppStream::parser(const QByteArray& data)
                             plainText = false;
                         else
                         {
-                            //TODO Login error
+                            warning("No supported Non-SASL Authentication mechanism available");
+                            disconnect();
                             return;
                         }
                         sendNonSASLAuth(plainText);
@@ -814,10 +814,11 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Set);
     authQuery.setUsername(configuration().user());
-    authQuery.setPassword(configuration().passwd());
+    if (plainText)
+        authQuery.setPassword(configuration().passwd());
+    else
+        authQuery.setDigest(d->streamId, configuration().passwd());
     authQuery.setResource(configuration().resource());
-    authQuery.setStreamId(d->streamId);
-    authQuery.setUsePlainText(plainText);
     d->nonSASLAuthId = authQuery.id();
     sendPacket(authQuery);
 }

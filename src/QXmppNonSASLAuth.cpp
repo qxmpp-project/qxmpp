@@ -30,9 +30,14 @@
 #include "QXmppUtils.h"
 
 QXmppNonSASLAuthIq::QXmppNonSASLAuthIq()
-    : QXmppIq(QXmppIq::Set),
-    m_useplaintext(false)
+    : QXmppIq(QXmppIq::Set)
 {
+}
+
+bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
+{
+    QDomElement queryElement = element.firstChildElement("query");
+    return queryElement.namespaceURI() == ns_auth;
 }
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
@@ -40,7 +45,7 @@ void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement("query");
     m_username = queryElement.firstChildElement("username").text();
     m_password = queryElement.firstChildElement("password").text();
-    m_digest = queryElement.firstChildElement("digest").text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toAscii());
     m_resource = queryElement.firstChildElement("resource").text();
 }
 
@@ -50,18 +55,8 @@ void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute("xmlns", ns_auth);
     if (!m_username.isEmpty())
         writer->writeTextElement("username", m_username);
-    if (!m_password.isEmpty())
-    {
-        if ( m_useplaintext )
-            writer->writeTextElement("password", m_password);
-        else
-        {//SHA1(concat(sid, password)).
-            QByteArray textSid = m_sid.toUtf8();
-            QByteArray encodedPassword = m_password.toUtf8();
-            QByteArray digest = QCryptographicHash::hash(textSid + encodedPassword, QCryptographicHash::Sha1 ).toHex();
-            writer->writeTextElement("digest", digest);
-        }
-    }
+    if (!m_digest.isEmpty())
+        writer->writeTextElement("digest", m_digest.toHex());
     if (!m_resource.isEmpty())
         writer->writeTextElement("resource", m_resource);
     writer->writeEndElement();
@@ -77,9 +72,14 @@ void QXmppNonSASLAuthIq::setUsername( const QString &username )
     m_username = username;
 }
 
-QString QXmppNonSASLAuthIq::digest() const
+QByteArray QXmppNonSASLAuthIq::digest() const
 {
     return m_digest;
+}
+
+void QXmppNonSASLAuthIq::setDigest(const QString &streamId, const QString &password)
+{
+    m_digest = QCryptographicHash::hash(streamId.toUtf8() + password.toUtf8(), QCryptographicHash::Sha1);
 }
 
 QString QXmppNonSASLAuthIq::password() const
@@ -100,15 +100,5 @@ QString QXmppNonSASLAuthIq::resource() const
 void QXmppNonSASLAuthIq::setResource(const QString &resource)
 {
     m_resource = resource;
-}
-
-void QXmppNonSASLAuthIq::setStreamId(const QString &sid)
-{
-    m_sid = sid;
-}
-
-void QXmppNonSASLAuthIq::setUsePlainText(bool use)
-{
-    m_useplaintext = use;
 }
 
