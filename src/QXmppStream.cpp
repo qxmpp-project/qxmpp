@@ -77,12 +77,13 @@ public:
 
     // State data
     int authStep;
-    QString sessionId;
     QString bindId;
+    QString sessionId;
     bool sessionAvailable;
     QString streamId;
+    QString streamFrom;
+    QString streamVersion;
     QString nonSASLAuthId;
-    QString XMPPVersion;
 
     // Timers
     QTimer *pingTimer;
@@ -272,8 +273,12 @@ void QXmppStream::parser(const QByteArray& data)
     // check whether we need to add stream start / end elements
     QByteArray completeXml;
     const QString strData = QString::fromUtf8(d->dataBuffer);
+    bool streamStart = false;
     if(strData.contains(startStreamRegex))
+    {
         completeXml = d->dataBuffer + streamRootElementEnd;
+        streamStart = true;
+    }
     else if(strData.contains(endStreamRegex))
         completeXml = streamRootElementStart + d->dataBuffer;
     else
@@ -284,32 +289,31 @@ void QXmppStream::parser(const QByteArray& data)
     if(!doc.setContent(completeXml, true))
         return;
 
-    // process stanzas
+    // remove data from buffer
     emit logMessage(QXmppLogger::ReceivedMessage, strData);
     flushDataBuffer();
 
-    // process stanzas
+    // process stream start
     QDomElement nodeRecv = doc.documentElement().firstChildElement();
-    if(nodeRecv.isNull())
+    if (streamStart)
     {
         QDomElement streamElement = doc.documentElement();
         if(d->streamId.isEmpty())
             d->streamId = streamElement.attribute("id");
-        if(d->XMPPVersion.isEmpty())
+        if (d->streamFrom.isEmpty())
+            d->streamFrom = streamElement.attribute("from");
+        if(d->streamVersion.isEmpty())
         {
-            d->XMPPVersion = streamElement.attribute("version");
-            if(d->XMPPVersion.isEmpty())
-            {
-                // no version specified, signals XMPP Version < 1.0.
-                // switch to old auth mechanism
-                sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
-            }
+            d->streamVersion = streamElement.attribute("version");
+
+            // no version specified, signals XMPP Version < 1.0.
+            // switch to old auth mechanism
+            if(d->streamVersion.isEmpty())
+                sendNonSASLAuthQuery();
         }
     }
-    else
-    {
-        //TODO: Make a login error here.
-    }
+
+    // process stanzas
     while(!nodeRecv.isNull())
     {
 
@@ -376,10 +380,11 @@ void QXmppStream::parser(const QByteArray& data)
                 }
             }
 
+            // handle authentication
             if((saslAvailable && nonSaslAvailable && !useSasl) ||
                (!saslAvailable && nonSaslAvailable))
             {
-                sendNonSASLAuthQuery(doc.documentElement().attribute("from"));
+                sendNonSASLAuthQuery();
             }
             else if(saslAvailable)
             {
@@ -823,11 +828,13 @@ void QXmppStream::sendNonSASLAuth(bool plainText)
     sendPacket(authQuery);
 }
 
-void QXmppStream::sendNonSASLAuthQuery( const QString &to )
+void QXmppStream::sendNonSASLAuthQuery()
 {
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Get);
-    authQuery.setTo(to);
+    authQuery.setTo(d->streamFrom);
+    // FIXME : why are we setting the username, XEP-0078 states we should
+    // not attempt to guess the required fields?
     authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
 }

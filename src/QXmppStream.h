@@ -152,8 +152,8 @@ private:
     void parser(const QByteArray&);
     void sendStartStream();
     void sendEndStream();
-    void sendNonSASLAuth(bool);
-    void sendNonSASLAuthQuery( const QString &to );
+    void sendNonSASLAuth(bool plaintext);
+    void sendNonSASLAuthQuery();
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
