@@ -31,6 +31,7 @@
 #include "QXmppBind.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
+#include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
 #include "QXmppRpcIq.h"
 #include "QXmppSession.h"
@@ -181,6 +182,18 @@ void TestPackets::testMessageLegacyDelay()
     parsePacket(message, xml);
     QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC));
     serializePacket(message, xml);
+}
+
+void TestPackets::testNonSaslAuth()
+{
+    const QByteArray xml(
+        "<iq id=\"auth1\" to=\"shakespeare.lit\" type=\"get\">"
+        "<query xmlns=\"jabber:iq:auth\"/>"
+        "</iq>");
+
+    QXmppNonSASLAuthIq iq;
+    parsePacket(iq, xml);
+    serializePacket(iq, xml);
 }
 
 void TestPackets::testPresence()

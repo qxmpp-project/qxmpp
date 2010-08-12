@@ -43,6 +43,7 @@ private slots:
     void testMessageFull();
     void testMessageDelay();
     void testMessageLegacyDelay();
+    void testNonSaslAuth();
     void testPresence();
     void testPresenceFull();
     void testSession();

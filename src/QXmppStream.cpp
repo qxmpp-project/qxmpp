@@ -224,15 +224,6 @@ void QXmppStream::socketReadReady()
     parser(data);
 }
 
-void QXmppStream::sendNonSASLAuthQuery( const QString &to )
-{
-    QXmppNonSASLAuthTypesRequestIq authQuery;
-    authQuery.setTo(to);
-    authQuery.setUsername(configuration().user());
-
-    sendPacket(authQuery);
-}
-
 /// Returns the QXmppLogger associated with the current QXmppStream.
 
 QXmppLogger *QXmppStream::logger()
@@ -821,12 +812,22 @@ bool QXmppStream::sendToServer(const QByteArray& packet)
 void QXmppStream::sendNonSASLAuth(bool plainText)
 {
     QXmppNonSASLAuthIq authQuery;
+    authQuery.setType(QXmppIq::Set);
     authQuery.setUsername(configuration().user());
     authQuery.setPassword(configuration().passwd());
     authQuery.setResource(configuration().resource());
     authQuery.setStreamId(d->streamId);
     authQuery.setUsePlainText(plainText);
     d->nonSASLAuthId = authQuery.id();
+    sendPacket(authQuery);
+}
+
+void QXmppStream::sendNonSASLAuthQuery( const QString &to )
+{
+    QXmppNonSASLAuthIq authQuery;
+    authQuery.setType(QXmppIq::Get);
+    authQuery.setTo(to);
+    authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
 }
 
