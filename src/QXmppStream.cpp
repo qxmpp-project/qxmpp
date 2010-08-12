@@ -58,7 +58,6 @@
 #include <QTimer>
 
 static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
-static const QByteArray streamRootElementStart = "<?xml version=\"1.0\"?><stream:stream xmlns:stream=\"http://etherx.jabber.org/streams\" version=\"1.0\" xmlns=\"jabber:client\" xml:lang=\"en\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\">\n";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 class QXmppStreamPrivate
@@ -82,6 +81,7 @@ public:
     bool sessionAvailable;
     QString streamId;
     QString streamFrom;
+    QByteArray streamStart;
     QString streamVersion;
     QString nonSASLAuthId;
 
@@ -278,11 +278,12 @@ void QXmppStream::parser(const QByteArray& data)
     {
         completeXml = d->dataBuffer + streamRootElementEnd;
         streamStart = true;
+        d->streamStart = startStreamRegex.cap(0).toUtf8();
     }
     else if(strData.contains(endStreamRegex))
-        completeXml = streamRootElementStart + d->dataBuffer;
+        completeXml = d->streamStart + d->dataBuffer;
     else
-        completeXml = streamRootElementStart + d->dataBuffer + streamRootElementEnd;
+        completeXml = d->streamStart + d->dataBuffer + streamRootElementEnd;
 
     // check whether we have a valid XML document
     QDomDocument doc;
