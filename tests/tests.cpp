@@ -292,13 +292,14 @@ void TestPackets::testStreamFeatures()
     const QByteArray xml2("<stream:features>"
         "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
         "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
+        "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
         "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
         "</stream:features>");
     QXmppStreamFeatures features2;
     parsePacket(features2, xml2);
     QCOMPARE(features2.isBindAvailable(), true);
     QCOMPARE(features2.isSessionAvailable(), true);
-    QCOMPARE(features2.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>());
+    QCOMPARE(features2.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>() << QXmppConfiguration::SASLPlain);
     QCOMPARE(features2.securityMode(), QXmppConfiguration::TLSEnabled);
     serializePacket(features2, xml2);
 
