@@ -50,6 +50,7 @@ HEADERS += QXmppUtils.h \
     QXmppSocks.h \
     QXmppStanza.h \
     QXmppStream.h \
+    QXmppStreamFeatures.h \
     QXmppStreamInitiationIq.h \
     QXmppStun.h \
     QXmppTransferManager.h \
@@ -92,6 +93,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppSocks.cpp \
     QXmppStanza.cpp \
     QXmppStream.cpp \
+    QXmppStreamFeatures.cpp \
     QXmppStreamInitiationIq.cpp \
     QXmppStun.cpp \
     QXmppTransferManager.cpp \

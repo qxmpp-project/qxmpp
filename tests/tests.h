@@ -47,6 +47,7 @@ private slots:
     void testPresence();
     void testPresenceFull();
     void testSession();
+    void testStreamFeatures();
 };
 
 class TestJingle : public QObject
