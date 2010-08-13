@@ -2,7 +2,7 @@
  * Copyright (C) 2008-2010 The QXmpp developers
  *
  * Authors:
- *	Ian Reinhard Geiser
+ *	Ian Reinhart Geiser
  *
  * Source:
  *	http://code.google.com/p/qxmpp
