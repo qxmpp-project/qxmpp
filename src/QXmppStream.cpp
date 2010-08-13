@@ -57,6 +57,7 @@
 #include <QXmlStreamWriter>
 #include <QTimer>
 
+static bool randomSeeded = false;
 static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
@@ -102,7 +103,11 @@ QXmppStream::QXmppStream(QSslSocket *socket, QObject *parent)
     d(new QXmppStreamPrivate)
 {
     // Make sure the random number generator is seeded
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    if (!randomSeeded)
+    {
+        qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+        randomSeeded = true;
+    }
 
     // initialise logger
     setLogger(QXmppLogger::getLogger());
@@ -807,12 +812,12 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
     }
 }
 
-void QXmppStream::sendStartStream()
+bool QXmppStream::sendStartStream()
 {
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
     data.append(configuration().domain());
     data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
-    sendData(data);
+    return sendData(data);
 }
 
 bool QXmppStream::sendData(const QByteArray& packet)
@@ -1003,9 +1008,9 @@ bool QXmppStream::sendPacket(const QXmppPacket& packet)
     return sendData(data);
 }
 
-void QXmppStream::sendEndStream()
+bool QXmppStream::sendEndStream()
 {
-    sendData(streamRootElementEnd);
+    return sendData(streamRootElementEnd);
 }
 
 void QXmppStream::pingStart()

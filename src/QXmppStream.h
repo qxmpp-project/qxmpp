@@ -130,8 +130,16 @@ signals:
     void jingleIqReceived(const QXmppJingleIq&);
 
 protected:
+    // Logging helpers
+    void debug(const QString&);
+    void info(const QString&);
+    void warning(const QString&);
+
+    // Overridable methods
     virtual void handleStanza(const QDomElement &element);
     virtual void handleStream(const QDomElement &element);
+    virtual bool sendStartStream();
+    virtual bool sendEndStream();
 
 private slots:
     void socketHostFound();
@@ -149,20 +157,14 @@ private slots:
 
 private:
     QXmppDiscoveryIq capabilities() const;
-    void debug(const QString&);
-    void info(const QString&);
-    void warning(const QString&);
+    void flushDataBuffer();
     void parser(const QByteArray&);
-    void sendStartStream();
-    void sendEndStream();
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
     void sendAuthDigestMD5ResponseStep2();
     void sendBindIQ();
     void sendSessionIQ();
-
-    void flushDataBuffer();
 
     QXmppStreamPrivate * const d;
 };
