@@ -38,6 +38,9 @@ public:
     bool isSessionAvailable() const;
     void setSessionAvailable(bool available);
 
+    bool isNonSaslAuthAvailable() const;
+    void setNonSaslAuthAvailable(bool available);
+
     QList<QXmppConfiguration::SASLAuthMechanism> authMechanisms() const;
     void setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMechanism> &mecanisms);
 
@@ -49,9 +52,12 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
+    static bool isStreamFeatures(const QDomElement &element);
+
 private:
     bool m_bindAvailable;
     bool m_sessionAvailable;
+    bool m_nonSaslAuthAvailable;
     QList<QXmppConfiguration::SASLAuthMechanism> m_authMechanisms;
     QXmppConfiguration::StreamSecurityMode m_securityMode;
 };

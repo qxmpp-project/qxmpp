@@ -285,6 +285,7 @@ void TestPackets::testStreamFeatures()
     parsePacket(features, xml);
     QCOMPARE(features.isBindAvailable(), false);
     QCOMPARE(features.isSessionAvailable(), false);
+    QCOMPARE(features.isNonSaslAuthAvailable(), false);
     QCOMPARE(features.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>());
     QCOMPARE(features.securityMode(), QXmppConfiguration::TLSDisabled);
     serializePacket(features, xml);
@@ -293,12 +294,14 @@ void TestPackets::testStreamFeatures()
         "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
         "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
         "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
+        "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
         "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
         "</stream:features>");
     QXmppStreamFeatures features2;
     parsePacket(features2, xml2);
     QCOMPARE(features2.isBindAvailable(), true);
     QCOMPARE(features2.isSessionAvailable(), true);
+    QCOMPARE(features2.isNonSaslAuthAvailable(), true);
     QCOMPARE(features2.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>() << QXmppConfiguration::SASLPlain);
     QCOMPARE(features2.securityMode(), QXmppConfiguration::TLSEnabled);
     serializePacket(features2, xml2);

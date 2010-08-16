@@ -30,6 +30,7 @@
 QXmppStreamFeatures::QXmppStreamFeatures()
     : m_bindAvailable(false),
     m_sessionAvailable(false),
+    m_nonSaslAuthAvailable(false),
     m_securityMode(QXmppConfiguration::TLSEnabled)
 {
 }
@@ -54,6 +55,16 @@ void QXmppStreamFeatures::setSessionAvailable(bool available)
     m_sessionAvailable = available;
 }
 
+bool QXmppStreamFeatures::isNonSaslAuthAvailable() const
+{
+    return m_nonSaslAuthAvailable;
+}
+
+void QXmppStreamFeatures::setNonSaslAuthAvailable(bool available)
+{
+    m_nonSaslAuthAvailable = available;
+}
+
 QList<QXmppConfiguration::SASLAuthMechanism> QXmppStreamFeatures::authMechanisms() const
 {
     return m_authMechanisms;
@@ -74,6 +85,12 @@ void QXmppStreamFeatures::setSecurityMode(QXmppConfiguration::StreamSecurityMode
     m_securityMode = mode;
 }
 
+bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
+{
+    return element.namespaceURI() == ns_stream &&
+           element.tagName() == "features";
+}
+
 void QXmppStreamFeatures::parse(const QDomElement &element)
 {
     m_bindAvailable = !element.firstChildElement("bind").isNull();
@@ -81,23 +98,30 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
     // parse advertised SASL Authentication mechanisms
     QDomElement mechs = element.firstChildElement("mechanisms");
-    QDomElement subElement = mechs.firstChildElement("mechanism");
-    qDebug("SASL Authentication mechanisms:");
-    while(!subElement.isNull())
+    if (mechs.namespaceURI() == ns_sasl)
     {
-        qDebug() << subElement.text();
-        if (subElement.text() == QLatin1String("PLAIN"))
-            m_authMechanisms << QXmppConfiguration::SASLPlain;
-        else if (subElement.text() == QLatin1String("DIGEST-MD5"))
-            m_authMechanisms << QXmppConfiguration::SASLDigestMD5;
-        else if (subElement.text() == QLatin1String("ANONYMOUS"))
-            m_authMechanisms << QXmppConfiguration::SASLAnonymous;
-        subElement = subElement.nextSiblingElement("mechanism");
+        QDomElement subElement = mechs.firstChildElement("mechanism");
+        qDebug("SASL Authentication mechanisms:");
+        while(!subElement.isNull())
+        {
+            qDebug() << subElement.text();
+            if (subElement.text() == QLatin1String("PLAIN"))
+                m_authMechanisms << QXmppConfiguration::SASLPlain;
+            else if (subElement.text() == QLatin1String("DIGEST-MD5"))
+                m_authMechanisms << QXmppConfiguration::SASLDigestMD5;
+            else if (subElement.text() == QLatin1String("ANONYMOUS"))
+                m_authMechanisms << QXmppConfiguration::SASLAnonymous;
+            subElement = subElement.nextSiblingElement("mechanism");
+        }
     }
+
+    // parse advertised Non-SASL Authentication
+    QDomElement authElement = element.firstChildElement("auth");
+    m_nonSaslAuthAvailable = (authElement.namespaceURI() == ns_authFeature);
 
     // parse advertised TLS mode
     QDomElement tlsElement = element.firstChildElement("starttls");
-    if (!tlsElement.isNull())
+    if (tlsElement.namespaceURI() == ns_tls)
     {
         if (tlsElement.firstChildElement().tagName() == "required")
             m_securityMode = QXmppConfiguration::TLSRequired;
@@ -144,6 +168,12 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
             }
             writer->writeEndElement();
         }
+        writer->writeEndElement();
+    }
+    if (m_nonSaslAuthAvailable)
+    {
+        writer->writeStartElement("auth");
+        writer->writeAttribute("xmlns", ns_authFeature);
         writer->writeEndElement();
     }
     if (m_securityMode != QXmppConfiguration::TLSDisabled)
