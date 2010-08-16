@@ -192,7 +192,10 @@ QString QXmppConfiguration::resource() const
 
 QString QXmppConfiguration::jid() const
 {
-    return jidBare() + "/" + m_resource;
+    if (m_user.isEmpty())
+        return m_domain;
+    else
+        return jidBare() + "/" + m_resource;
 }
 
 /// Returns the bare jabber id (jid), without the resource identifier.
@@ -203,7 +206,10 @@ QString QXmppConfiguration::jid() const
 
 QString QXmppConfiguration::jidBare() const
 {
-    return m_user+"@"+m_domain;
+    if (m_user.isEmpty())
+        return m_domain;
+    else
+        return m_user+"@"+m_domain;
 }
 
 /// Returns the auto-accept-subscriptions-request configuration.
@@ -439,12 +445,12 @@ QString QXmppConfiguration::getResource() const
 
 QString QXmppConfiguration::getJid() const
 {
-    return jidBare() + "/" + m_resource;
+    return jid();
 }
 
 QString QXmppConfiguration::getJidBare() const
 {
-    return m_user+"@"+m_domain;
+    return jidBare();
 }
 
 bool QXmppConfiguration::getAutoAcceptSubscriptions() const
