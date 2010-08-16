@@ -30,6 +30,7 @@
 #include "QXmppPacket.h"
 #include "QXmppPresence.h"
 #include "QXmppStream.h"
+#include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppUtils.h"
 
@@ -345,31 +346,20 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
     if (handled)
         return;
  
-    if(ns == ns_stream && nodeRecv.tagName() == "features")
+    if(QXmppStreamFeatures::isStreamFeatures(nodeRecv))
     {
-        bool nonSaslAvailable = nodeRecv.firstChildElement("auth").
-                                 namespaceURI() == ns_authFeature;
-        bool saslAvailable = nodeRecv.firstChildElement("mechanisms").
-                             namespaceURI() == ns_sasl;
-        bool useSasl = configuration().useSASLAuthentication();
+        QXmppStreamFeatures features;
+        features.parse(nodeRecv);
+
+        const bool nonSaslAvailable = features.isNonSaslAuthAvailable();
+        const bool saslAvailable = !features.authMechanisms().isEmpty();
+        const bool useSasl = configuration().useSASLAuthentication();
 
         if (!d->socket->isEncrypted())
         {
-            // parse remote TLS mode
-            QXmppConfiguration::StreamSecurityMode remoteSecurity;
-            QDomElement tlsElement = nodeRecv.firstChildElement("starttls");
-            if (tlsElement.namespaceURI() == ns_tls)
-            {
-                if (tlsElement.firstChildElement().tagName() == "required")
-                    remoteSecurity = QXmppConfiguration::TLSRequired;
-                else
-                    remoteSecurity = QXmppConfiguration::TLSEnabled;
-            } else {
-                remoteSecurity = QXmppConfiguration::TLSDisabled;
-            }
-
             // determine TLS mode to use
             const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
+            const QXmppConfiguration::StreamSecurityMode remoteSecurity = features.securityMode();
             if (!d->socket->supportsSsl() &&
                 (localSecurity == QXmppConfiguration::TLSRequired ||
                  remoteSecurity == QXmppConfiguration::TLSRequired))
@@ -404,24 +394,8 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
         }
         else if(saslAvailable)
         {
-            // parse advertised SASL Authentication mechanisms
-            QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
-            QDomElement element = nodeRecv.firstChildElement("mechanisms");
-            QDomElement subElement = element.firstChildElement("mechanism");
-            debug("SASL Authentication mechanisms:");
-            while(!subElement.isNull())
-            {
-                debug(subElement.text());
-                if (subElement.text() == QLatin1String("PLAIN"))
-                    mechanisms << QXmppConfiguration::SASLPlain;
-                else if (subElement.text() == QLatin1String("DIGEST-MD5"))
-                    mechanisms << QXmppConfiguration::SASLDigestMD5;
-                else if (subElement.text() == QLatin1String("ANONYMOUS"))
-                    mechanisms << QXmppConfiguration::SASLAnonymous;
-                subElement = subElement.nextSiblingElement("mechanism");
-            }
-
             // determine SASL Authentication mechanism to use
+            QList<QXmppConfiguration::SASLAuthMechanism> mechanisms = features.authMechanisms();
             QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
             if (mechanisms.isEmpty())
             {
@@ -457,17 +431,13 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
             }
         }
 
-        if(nodeRecv.firstChildElement("bind").
-                             namespaceURI() == ns_bind)
-        {
+        // check whether bind is available
+        if (features.isBindAvailable())
             sendBindIQ();
-        }
 
-        if(nodeRecv.firstChildElement("session").
-                             namespaceURI() == ns_session)
-        {
+        // check whether session is available
+        if (features.isSessionAvailable())
             d->sessionAvailable = true;
-        }
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
