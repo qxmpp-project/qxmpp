@@ -21,7 +21,6 @@
  *
  */
 
-#include <QDebug>
 #include <QDomElement>
 
 #include "QXmppConstants.h"
@@ -101,10 +100,8 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     if (mechs.namespaceURI() == ns_sasl)
     {
         QDomElement subElement = mechs.firstChildElement("mechanism");
-        qDebug("SASL Authentication mechanisms:");
         while(!subElement.isNull())
         {
-            qDebug() << subElement.text();
             if (subElement.text() == QLatin1String("PLAIN"))
                 m_authMechanisms << QXmppConfiguration::SASLPlain;
             else if (subElement.text() == QLatin1String("DIGEST-MD5"))
