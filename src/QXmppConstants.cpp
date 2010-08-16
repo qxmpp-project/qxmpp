@@ -27,6 +27,7 @@
 const char* ns_stream = "http://etherx.jabber.org/streams";
 const char* ns_client = "jabber:client";
 const char* ns_server = "jabber:server";
+const char* ns_server_dialback = "jabber:server:dialback";
 const char* ns_roster = "jabber:iq:roster";
 const char* ns_tls = "urn:ietf:params:xml:ns:xmpp-tls";
 const char* ns_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";

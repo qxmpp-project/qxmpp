@@ -28,6 +28,7 @@
 extern const char* ns_stream;
 extern const char* ns_client;
 extern const char* ns_server;
+extern const char* ns_server_dialback;
 extern const char* ns_roster;
 extern const char* ns_tls;
 extern const char* ns_sasl;
