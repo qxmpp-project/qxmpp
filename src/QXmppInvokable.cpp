@@ -30,7 +30,7 @@
 #include <qdebug.h>
 
 QXmppInvokable::QXmppInvokable( QObject *parent )
-	: QObject( parent )
+    : QObject( parent )
 {
 
 }
@@ -43,88 +43,88 @@ QXmppInvokable::~QXmppInvokable()
 
 QVariant QXmppInvokable::dispatch( const QByteArray & method, const QList< QVariant > & args )
 {
-	buildMethodHash();
+    buildMethodHash();
 
-	if( !m_methodHash.contains(method))
-		return QVariant();
+    if( !m_methodHash.contains(method))
+        return QVariant();
 
-	int idx = m_methodHash[method];
-	if( paramTypes( args) != metaObject()->method(idx).parameterTypes ())
-		return QVariant();
+    int idx = m_methodHash[method];
+    if( paramTypes( args) != metaObject()->method(idx).parameterTypes ())
+        return QVariant();
 
-	const char *typeName = metaObject()->method(idx).typeName();
-	int resultType = QMetaType::type(typeName);
-	void *result = QMetaType::construct(resultType, 0);
+    const char *typeName = metaObject()->method(idx).typeName();
+    int resultType = QMetaType::type(typeName);
+    void *result = QMetaType::construct(resultType, 0);
 
-	QGenericReturnArgument ret( typeName, result );
-	QList<QGenericArgument> genericArgs;
-	QList<QVariant>::ConstIterator iter = args.begin();
-	while( iter != args.end())
-	{
-		const void *data = iter->data();
-		const char *name = iter->typeName();
-		genericArgs << QGenericArgument(name,data);
-		++iter;
-	}
+    QGenericReturnArgument ret( typeName, result );
+    QList<QGenericArgument> genericArgs;
+    QList<QVariant>::ConstIterator iter = args.begin();
+    while( iter != args.end())
+    {
+        const void *data = iter->data();
+        const char *name = iter->typeName();
+        genericArgs << QGenericArgument(name,data);
+        ++iter;
+    }
 
-	if( QMetaObject::invokeMethod ( this, method.constData(), ret,
-	                                genericArgs.value(0, QGenericArgument() ),
-	                                genericArgs.value(1, QGenericArgument() ),
-	                                genericArgs.value(2, QGenericArgument() ),
-	                                genericArgs.value(3, QGenericArgument() ),
-	                                genericArgs.value(4, QGenericArgument() ),
-	                                genericArgs.value(5, QGenericArgument() ),
-	                                genericArgs.value(6, QGenericArgument() ),
-	                                genericArgs.value(7, QGenericArgument() ),
-	                                genericArgs.value(8, QGenericArgument() ),
-	                                genericArgs.value(9, QGenericArgument() )) )
-	{
-		QVariant returnValue( resultType, result);
-		QMetaType::destroy(resultType, result);
-		return returnValue;
-	}
-	else
-	{
-		qDebug("No such method '%s'", method.constData() );
-		return QVariant();
-	}
+    if( QMetaObject::invokeMethod ( this, method.constData(), ret,
+                                    genericArgs.value(0, QGenericArgument() ),
+                                    genericArgs.value(1, QGenericArgument() ),
+                                    genericArgs.value(2, QGenericArgument() ),
+                                    genericArgs.value(3, QGenericArgument() ),
+                                    genericArgs.value(4, QGenericArgument() ),
+                                    genericArgs.value(5, QGenericArgument() ),
+                                    genericArgs.value(6, QGenericArgument() ),
+                                    genericArgs.value(7, QGenericArgument() ),
+                                    genericArgs.value(8, QGenericArgument() ),
+                                    genericArgs.value(9, QGenericArgument() )) )
+    {
+        QVariant returnValue( resultType, result);
+        QMetaType::destroy(resultType, result);
+        return returnValue;
+    }
+    else
+    {
+        qDebug("No such method '%s'", method.constData() );
+        return QVariant();
+    }
 }
 
 QList< QByteArray > QXmppInvokable::paramTypes( const QList< QVariant > & params )
 {
-	QList<QByteArray> types;
-	foreach( QVariant variant, params)
-		types << variant.typeName();
-	return types;
+    QList<QByteArray> types;
+    foreach( QVariant variant, params)
+        types << variant.typeName();
+    return types;
 }
 
 void QXmppInvokable::buildMethodHash( )
 {
-	QWriteLocker locker(&m_lock);
-	if( m_methodHash.size() > 0 )
-		return;
+    QWriteLocker locker(&m_lock);
+    if( m_methodHash.size() > 0 )
+        return;
 
-	int methodCount = metaObject()->methodCount ();
-	for( int idx = 0; idx < methodCount; ++idx)
-	{
-		QByteArray signature = metaObject()->method(idx).signature();
-		m_methodHash[signature.left(signature.indexOf('('))] = idx;
-// 		qDebug() << metaObject()->method(idx).parameterTypes();
-	}
+    int methodCount = metaObject()->methodCount ();
+    for( int idx = 0; idx < methodCount; ++idx)
+    {
+        QByteArray signature = metaObject()->method(idx).signature();
+        m_methodHash[signature.left(signature.indexOf('('))] = idx;
+//         qDebug() << metaObject()->method(idx).parameterTypes();
+    }
 }
 
 QStringList QXmppInvokable::interfaces( ) const
 {
-	QStringList results;
-	int methodCount = metaObject()->methodCount ();
-	for( int idx = 0; idx < methodCount; ++idx)
-	{
-		if( metaObject()->method(idx).methodType() == QMetaMethod::Slot )
-		{
-			QByteArray signature = metaObject()->method(idx).signature();
-			results << signature.left(signature.indexOf('('));
-		}
-	}
-	return results;
+    QStringList results;
+    int methodCount = metaObject()->methodCount ();
+    for( int idx = 0; idx < methodCount; ++idx)
+    {
+        if( metaObject()->method(idx).methodType() == QMetaMethod::Slot )
+        {
+            QByteArray signature = metaObject()->method(idx).signature();
+            results << signature.left(signature.indexOf('('));
+        }
+    }
+    return results;
 }
 

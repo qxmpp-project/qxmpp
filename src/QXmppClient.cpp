@@ -402,9 +402,9 @@ QXmppReconnectionManager* QXmppClient::reconnectionManager()
 bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
                                          reconnectionManager)
 {
-	if(!reconnectionManager)
-		return false;
-		
+    if(!reconnectionManager)
+        return false;
+
     if(d->reconnectionManager)
         delete d->reconnectionManager;
 
@@ -413,15 +413,15 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
     bool check = connect(this, SIGNAL(connected()), d->reconnectionManager,
                          SLOT(connected()));
     Q_ASSERT(check);
-	if(!check)
-		return false;
+    if(!check)
+        return false;
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
                     d->reconnectionManager, SLOT(error(QXmppClient::Error)));
     Q_ASSERT(check);
-	if(!check)
-		return false;
-	
+    if(!check)
+        return false;
+
     return true;
 }
 
