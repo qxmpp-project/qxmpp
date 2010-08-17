@@ -1,6 +1,6 @@
-QXmpp 0.2 (Aug XX, 2010)
-------------------------
-- New XEPs
+QXmpp 0.2.0 (Aug XX, 2010)
+--------------------------
+  - New XEPs
     * XEP-0030: Service Discovery
     * XEP-0047: In-Band Bytestreams
     * XEP-0054: vcard-temp
@@ -19,30 +19,32 @@ QXmpp 0.2 (Aug XX, 2010)
     * XEP-0203: Delayed Delivery 
     * XEP-0009: Jabber-RPC
     
-- New XEPs (Initial Support) 
+  - New XEPs (Initial Support) 
     * XEP-0136: Message Archiving
     * XEP-0176: Jingle ICE-UDP Transport Method [Experimental]
-    
-- Doxygen Documentation
-- Added targets in *.pro file for packaging, installing and generating documentation
-- Using QXmlStreamWriter while creating stanzas to be sent to the server 
-- clean up getter accessors from "getFoo" to "foo"
-- add proper file transfer management instead of the shaky IBB-only
-- add support for keep-alive pings
-- report authentication errors
-- disable automatic reconnection when a "conflict" stream errors is received
-  (avoid ping-pong between two QXmpp-based clients using the same jid/resource)
-- add initial support for archive managements
-- add initial support for Jingle call establishment
-- fix the XML-RPC code's encoding/decoding for types other than strings
-- add a test suite for stanza parsing / serialisation
-- refactor the logging code
-- Proxy support
-- New Authentication Schemes:
-    * DIGEST-MD5
-    * SASL
-    * NonSASL
-    * Anonymous
+
+  - New authentication schemes
+      * DIGEST-MD5
+      * SASL
+      * NonSASL
+      * Anonymous
+
+  - Add doxygen documentation
+  - Add targets in *.pro file for packaging, installing and generating documentation
+  - Use QXmlStreamWriter while creating stanzas to be sent to the server 
+  - Clean up getter accessors from "getFoo" to "foo"
+  - Add proper file transfer management.
+  - Add support for keep-alive pings
+  - Report authentication errors
+  - Disable automatic reconnection when a "conflict" stream errors is received
+    (avoid ping-pong between two QXmpp-based clients using the same jid/resource)
+
+  - Add initial support for archive managements
+  - Add initial support for Jingle call establishment
+  - Fix the XML-RPC code's encoding/decoding for types other than strings
+  - Add a test suite for stanza parsing / serialisation
+  - Refactor the logging code
+  - Add proxy support
 
 QXmpp 0.1 (Jun 14, 2009)
 ------------------------
