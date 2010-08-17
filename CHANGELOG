@@ -1,6 +1,23 @@
  v0.2 (Aug XX, 2010)
 ---------------------
-
+- New XEPs
+    * XEP-0030: Service Discovery
+    * XEP-0047: In-Band Bytestreams
+    * XEP-0054: vcard-temp
+    * XEP-0065: SOCKS5 Bytestreams
+    * XEP-0078: Non-SASL Authentication
+    * XEP-0085: Chat State Notifications
+    * XEP-0091: Legacy Delayed Delivery
+    * XEP-0092: Software Version
+    * XEP-0095: Stream Initiation
+    * XEP-0096: SI File Transfer
+    * XEP-0115: Entity Capabilities
+    * XEP-0128: Service Discovery Extensions
+    * XEP-0166: Jingle
+    * XEP-0167: Jingle RTP Sessions
+    * XEP-0199: XMPP Ping
+    * XEP-0203: Delayed Delivery 
+    
 - clean up getter accessors from "getFoo" to "foo"
 - add proper file transfer management instead of the shaky IBB-only
 - add support for keep-alive pings
