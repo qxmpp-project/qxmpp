@@ -1,0 +1,21 @@
+ v0.2 (Aug XX, 2010)
+---------------------
+
+- clean up getter accessors from "getFoo" to "foo"
+- add proper file transfer management instead of the shaky IBB-only
+- add support for keep-alive pings
+- report authentication errors
+- disable automatic reconnection when a "conflict" stream errors is received
+  (avoid ping-pong between two QXmpp-based clients using the same jid/resource)
+- add initial support for archive managements
+- add initial support for Jingle call establishment
+- fix the XML-RPC code's encoding/decoding for types other than strings
+- add a test suite for stanza parsing / serialisation
+- add doxygen documentation
+- refactor the logging code
+
+
+ v0.1 (Jun 14, 2009)
+---------------------
+
+  - First public release
