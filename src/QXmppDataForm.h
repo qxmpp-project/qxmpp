@@ -2,10 +2,10 @@
  * Copyright (C) 2008-2010 The QXmpp developers
  *
  * Author:
- *	Jeremy Lainé
+ *  Jeremy Lainé
  *
  * Source:
- *	http://code.google.com/p/qxmpp
+ *  http://code.google.com/p/qxmpp
  *
  * This file is a part of QXmpp library.
  *
