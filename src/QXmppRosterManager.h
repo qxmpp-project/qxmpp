@@ -89,7 +89,9 @@ public:
 
 signals:
     /// This signal is emitted when the Roster IQ is received after a successful
-    /// connection.
+    /// connection. That is the roster entries are empty before this signal is emmitted.
+    /// One should use getRosterBareJids() and getRosterEntry() only after 
+    /// this signal has been emmitted.
     void rosterReceived();
 
     /// This signal is emitted when the presence of a particular bareJid and resource changes.
