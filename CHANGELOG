@@ -17,6 +17,11 @@
     * XEP-0167: Jingle RTP Sessions
     * XEP-0199: XMPP Ping
     * XEP-0203: Delayed Delivery 
+    * XEP-0009: Jabber-RPC
+    
+- New XEPs (Initial Support) 
+    * XEP-0136: Message Archiving
+    * XEP-0176: Jingle ICE-UDP Transport Method [Experimental] 
     
 - clean up getter accessors from "getFoo" to "foo"
 - add proper file transfer management instead of the shaky IBB-only
