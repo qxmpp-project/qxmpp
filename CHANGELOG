@@ -1,5 +1,5 @@
- v0.2 (Aug XX, 2010)
----------------------
+QXmpp 0.2 (Aug XX, 2010)
+------------------------
 - New XEPs
     * XEP-0030: Service Discovery
     * XEP-0047: In-Band Bytestreams
@@ -44,7 +44,6 @@
     * NonSASL
     * Anonymous
 
- v0.1 (Jun 14, 2009)
----------------------
-
+QXmpp 0.1 (Jun 14, 2009)
+------------------------
   - First public release
