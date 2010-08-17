@@ -21,8 +21,11 @@
     
 - New XEPs (Initial Support) 
     * XEP-0136: Message Archiving
-    * XEP-0176: Jingle ICE-UDP Transport Method [Experimental] 
+    * XEP-0176: Jingle ICE-UDP Transport Method [Experimental]
     
+- Doxygen Documentation
+- Added targets in *.pro file for packaging, installing and generating documentation
+- Using QXmlStreamWriter while creating stanzas to be sent to the server 
 - clean up getter accessors from "getFoo" to "foo"
 - add proper file transfer management instead of the shaky IBB-only
 - add support for keep-alive pings
@@ -33,7 +36,6 @@
 - add initial support for Jingle call establishment
 - fix the XML-RPC code's encoding/decoding for types other than strings
 - add a test suite for stanza parsing / serialisation
-- add doxygen documentation
 - refactor the logging code
 
 
