@@ -43,9 +43,9 @@ static const char *typeName(QXmppLogger::MessageType type)
     case QXmppLogger::WarningMessage:
         return "WARNING";
     case QXmppLogger::ReceivedMessage:
-        return "SERVER";
+        return "RECEIVED";
     case QXmppLogger::SentMessage:
-        return "CLIENT";
+        return "SENT";
     default:
         return "";
     }
