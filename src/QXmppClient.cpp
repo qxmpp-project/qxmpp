@@ -320,11 +320,6 @@ void QXmppClient::disconnectFromServer()
     }
 }
 
-void QXmppClient::disconnect()
-{
-    disconnectFromServer();
-}
-
 /// Returns true if the client is connected to the XMPP server.
 ///
 
@@ -660,6 +655,11 @@ QXmppVCardManager& QXmppClient::getVCardManager()
 QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
 {
     return d->stream->xmppStreamError();
+}
+
+void QXmppClient::disconnect()
+{
+    disconnectFromServer();
 }
 
 void QXmppClient::setClientPresence(const QString& statusText)
