@@ -127,6 +127,7 @@ void QXmppVCard::setUrl(const QString& url)
     m_url = url;
 }
 
+/// photo is not stored as base 64
 const QByteArray& QXmppVCard::photo() const
 {
     return m_photo;
