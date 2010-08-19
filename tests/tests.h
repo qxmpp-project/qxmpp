@@ -28,6 +28,7 @@ class TestUtils : public QObject
     Q_OBJECT
 
 private slots:
+    void testCrc32();
     void testHmac();
 };
 

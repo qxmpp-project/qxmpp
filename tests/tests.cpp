@@ -51,6 +51,15 @@ void TestUtils::testHmac()
     QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
 }
 
+void TestUtils::testCrc32()
+{
+    quint32 crc = generateCrc32(QByteArray());
+    QCOMPARE(crc, 0u);
+
+    crc = generateCrc32(QByteArray("Hi There"));
+    QCOMPARE(crc, 0xDB143BBEu);
+}
+
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
