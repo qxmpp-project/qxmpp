@@ -87,10 +87,19 @@ QXmppClientPrivate::QXmppClientPrivate()
 /// - QXmppCallManager
 ///
 /// <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
-/// classes
+/// classes.
 /// - QXmppIq
 /// - QXmppMessage
 /// - QXmppPresence
+///
+/// <BR><BR>
+/// <B>Project Details:</B>
+///
+/// Project Page: http://code.google.com/p/qxmpp/
+/// <BR>
+/// Report Issues: http://code.google.com/p/qxmpp/issues/
+/// <BR>
+/// New Releases: http://code.google.com/p/qxmpp/downloads/
 ///
 
 /// Creates a QXmppClient object.
