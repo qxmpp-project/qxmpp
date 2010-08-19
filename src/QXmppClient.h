@@ -34,7 +34,6 @@
 #include "QXmppPresence.h"
 
 class QXmppClientPrivate;
-class QXmppStream;
 class QXmppPresence;
 class QXmppMessage;
 class QXmppPacket;
