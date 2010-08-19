@@ -47,7 +47,7 @@ class QXmppStream;
 /// functionality to get all the bareJids in the client's roster and Roster and
 /// Presence details of the same.
 ///
-/// After the sucessfull xmpp connection that after the signal QXmppClient::connected()
+/// After the successful xmpp connection that after the signal QXmppClient::connected()
 /// is emitted QXmpp requests for getting the roster. Once QXmpp receives the roster
 /// the signal QXmppRosterManager::rosterReceived() is emitted and after that user can
 /// use the functions of this class to get roster entries.
