@@ -68,6 +68,12 @@ private:
     QString m_with;
 };
 
+/// \brief Represents an archive chat as defined by XEP-0136: Message Archiving.
+///
+/// It is used to get chat as a QXmppArchiveChat.
+///
+/// \ingroup Stanzas
+
 class QXmppArchiveChatIq : public QXmppIq
 {
 public:
@@ -79,6 +85,10 @@ public:
 private:
     QXmppArchiveChat m_chat;
 };
+
+/// \brief Represents an archive list as defined by XEP-0136: Message Archiving.
+///
+/// \ingroup Stanzas
 
 class QXmppArchiveListIq : public QXmppIq
 {
@@ -111,6 +121,10 @@ private:
     QList<QXmppArchiveChat> m_chats;
 };
 
+/// \brief Represents an archive retrieve IQ as defined by XEP-0136: Message Archiving.
+///
+/// \ingroup Stanzas
+
 class QXmppArchiveRetrieveIq : public QXmppIq
 {
 public:
@@ -132,6 +146,10 @@ private:
     QString m_with;
     QDateTime m_start;
 };
+
+/// \brief Represents an archive preference IQ as defined by XEP-0136: Message Archiving.
+///
+/// \ingroup Stanzas
 
 class QXmppArchivePrefIq : public QXmppIq
 {
