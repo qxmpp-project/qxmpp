@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -27,8 +28,10 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
+#include <QDomElement>
 #include <QRegExp>
 #include <QString>
+#include <QStringList>
 #include <QXmlStreamWriter>
 
 #include "QXmppUtils.h"
@@ -217,6 +220,37 @@ void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
     if(!value.isEmpty())
         stream->writeAttribute(name,value);
 }
+
+void helperToXmlAddDomElement(QXmlStreamWriter* stream, const QDomElement& element, const QStringList &omitNamespaces)
+{
+    stream->writeStartElement(element.tagName());
+
+    /* attributes */
+    QString xmlns = element.namespaceURI();
+    if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns))
+        stream->writeAttribute("xmlns", xmlns);
+    QDomNamedNodeMap attrs = element.attributes();
+    for (int i = 0; i < attrs.size(); i++)
+    {
+        QDomAttr attr = attrs.item(i).toAttr();
+        stream->writeAttribute(attr.name(), attr.value());
+    }
+
+    /* children */
+    QDomNode childNode = element.firstChild();
+    while (!childNode.isNull())
+    {
+        if (childNode.isElement())
+        {
+            helperToXmlAddDomElement(stream, childNode.toElement(), QStringList() << xmlns);
+        } else if (childNode.isText()) {
+            stream->writeCharacters(childNode.toText().data());
+        }
+        childNode = childNode.nextSibling();
+    }
+    stream->writeEndElement();
+}
+
 
 void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name, int value)
 {

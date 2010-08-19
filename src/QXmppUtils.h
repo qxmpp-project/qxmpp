@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -34,7 +35,9 @@
 
 class QByteArray;
 class QDateTime;
+class QDomElement;
 class QString;
+class QStringList;
 
 // XEP-0082: XMPP Date and Time Profiles
 QDateTime datetimeFromString(const QString &str);
@@ -50,6 +53,8 @@ QString generateStanzaHash(int length=32);
 
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value);
+void helperToXmlAddDomElement(QXmlStreamWriter* stream,
+    const QDomElement& element, const QStringList &omitNamespaces);
 void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value);
 void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
