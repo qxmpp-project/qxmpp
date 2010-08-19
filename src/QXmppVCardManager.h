@@ -38,19 +38,19 @@ class QXmppStream;
 /// QXmppClient::vCardManager() should be used to get the reference of instantiated
 /// object this class.
 ///
-/// Getting vCards of entries in Roster:
+/// <B>Getting vCards of entries in Roster:</B><BR>
 /// It doesn't store vCards of the JIDs in the roster of connected user. Instead
 /// client has to request for a particular vCard using requestVCard(). And connect to
 /// the signal vCardReceived() to get the requested vCard.
 ///
-/// Getting vCard of the connected client:
+/// <B>Getting vCard of the connected client:</B><BR>
 /// For getting the vCard of the connected user itself. Client can call requestClientVCard()
 /// and on the signal clientVCardReceived() it can get its vCard using clientVCard().
 ///
-/// Settting vCard of the client:
+/// <B>Settting vCard of the client:</B><BR>
 /// Using setClientVCard() client can set its vCard.
 ///
-/// \note Client can't set set/change vCards of roster entries.
+/// \note Client can't set/change vCards of roster entries.
 ///
 /// \ingroup Managers
 
