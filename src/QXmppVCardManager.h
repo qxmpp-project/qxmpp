@@ -31,8 +31,26 @@
 
 class QXmppStream;
 
-/// \brief The QXmppVCardManager class makes it possible to interact
-/// with XMPP vCards.
+/// \brief The QXmppVCardManager gets/sets XMPP vCards. It is an
+/// implentation of <B>XEP-0054: vcard-temp</B>.
+///
+/// \note It's object should not be created using it's constructor. Instead
+/// QXmppClient::vCardManager() should be used to get the reference of instantiated
+/// object this class.
+///
+/// Getting vCards of entries in Roster:
+/// It doesn't store vCards of the JIDs in the roster of connected user. Instead
+/// client has to request for a particular vCard using requestVCard(). And connect to
+/// the signal vCardReceived() to get the requested vCard.
+///
+/// Getting vCard of the connected client:
+/// For getting the vCard of the connected user itself. Client can call requestClientVCard()
+/// and on the signal clientVCardReceived() it can get its vCard using clientVCard().
+///
+/// Settting vCard of the client:
+/// Using setClientVCard() client can set its vCard.
+///
+/// \note Client can't set set/change vCards of roster entries.
 ///
 /// \ingroup Managers
 
