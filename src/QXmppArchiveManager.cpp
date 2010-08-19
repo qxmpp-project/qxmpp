@@ -60,7 +60,7 @@ void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq
 }
 
 /// Retrieves the list of available collections. Once the results are
-/// received, the archiveChatReceived() signal will be emitted.
+/// received, the archiveListReceived() signal will be emitted.
 ///
 /// \param jid Optional JID if you only want conversations with a specific JID.
 /// \param start Optional start time.
