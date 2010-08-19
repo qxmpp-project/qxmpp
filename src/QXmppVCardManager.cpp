@@ -38,7 +38,7 @@ QXmppVCardManager::QXmppVCardManager(QXmppStream* stream, QObject *parent)
 }
 
 /// This function requests the server for vCard of the specified jid.
-/// Once received the signal vCardIqReceived() is emmitted.
+/// Once received the signal vCardReceived() is emmitted.
 ///
 /// \param jid Jid of the specific entry in the roster
 ///
