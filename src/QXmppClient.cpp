@@ -74,20 +74,24 @@ QXmppClientPrivate::QXmppClientPrivate()
 ///
 /// QXmpp based clients are built using QXmppClient instances which handle the
 /// establishment of the XMPP connection and provide a number of high-level
-/// "managers" to perform specific tasks:
+/// "managers" to perform specific tasks.
 /// 
-/// \sa QXmppCallManager
-/// \sa QXmppMucManager
-/// \sa QXmppRosterManager
-/// \sa QXmppVCardManager
-/// \sa QXmppTransferManager
+/// <B>Main Class:</B>
+/// - QXmppClient
 ///
-/// If you are interested in a more low-level API, you can refer to the
-/// classes which represent XMPP stanzas.
+/// <B>Managers to perform specific tasks:</B>
+/// - QXmppCallManager
+/// - QXmppMucManager
+/// - QXmppRosterManager
+/// - QXmppVCardManager
+/// - QXmppTransferManager
 ///
-/// \sa QXmppIq
-/// \sa QXmppMessage
-/// \sa QXmppPresence
+/// <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
+/// classes
+/// - QXmppIq
+/// - QXmppMessage
+/// - QXmppPresence
+///
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's contructor.
