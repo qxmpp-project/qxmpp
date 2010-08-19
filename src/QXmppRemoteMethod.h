@@ -30,7 +30,6 @@
 #include "QXmppRpcIq.h"
 
 class QXmppClient;
-class QXmppStream;
 
 struct QXmppRemoteMethodResult {
     QXmppRemoteMethodResult() : hasError(false), code(0) { }
