@@ -85,6 +85,7 @@ QXmppClientPrivate::QXmppClientPrivate()
 /// - QXmppTransferManager
 /// - QXmppMucManager
 /// - QXmppCallManager
+/// - QXmppArchiveManager
 ///
 /// <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
 /// classes.
