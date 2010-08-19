@@ -83,7 +83,7 @@ void QXmppVCardManager::setClientVCard(const QXmppVCard& clientVCard)
     m_stream->sendPacket(m_clientVCard);
 }
 
-/// This function request the server for vCard of the connected user itself.
+/// This function requests the server for vCard of the connected user itself.
 /// Once received the signal clientVCardReceived() is emmitted. Received vCard
 /// can be get using clientVCard().
 void QXmppVCardManager::requestClientVCard()
