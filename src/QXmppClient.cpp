@@ -211,7 +211,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     d->clientPresence = initialPresence;
     d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
-    d->stream->connect();
+    d->stream->connectToHost();
 }
 
 /// Overloaded function.
@@ -243,7 +243,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     d->clientPresence = initialPresence;
     d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
-    d->stream->connect();
+    d->stream->connectToHost();
 }
 
 /// Overloaded function.
@@ -316,7 +316,7 @@ void QXmppClient::disconnectFromServer()
     if (d->stream->isConnected())
     {
         sendPacket(d->clientPresence);
-        d->stream->disconnect();
+        d->stream->disconnectFromHost();
     }
 }
 
@@ -385,7 +385,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
         if (d->stream->isConnected())
         {
             sendPacket(d->clientPresence);
-            d->stream->disconnect();
+            d->stream->disconnectFromHost();
         }
     }
     else if (!d->stream->isConnected())

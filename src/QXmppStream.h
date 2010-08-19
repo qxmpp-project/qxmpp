@@ -66,8 +66,8 @@ class QXmppStream : public QObject
 public:
     QXmppStream(QSslSocket *socket, QObject *parent);
     ~QXmppStream();
-    void connect();
-    void disconnect();
+    void connectToHost();
+    void disconnectFromHost();
     bool isConnected() const;
     bool sendData(const QByteArray&);
     bool sendPacket(const QXmppPacket&);

@@ -167,7 +167,7 @@ QXmppConfiguration& QXmppStream::configuration()
     return d->config;
 }
 
-void QXmppStream::connect()
+void QXmppStream::connectToHost()
 {
     info(QString("Connecting to: %1:%2").arg(configuration().
             host()).arg(configuration().port()));
@@ -365,14 +365,14 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
                  remoteSecurity == QXmppConfiguration::TLSRequired))
             {
                 warning("Disconnecting as TLS is required, but SSL support is not available");
-                disconnect();
+                disconnectFromHost();
                 return;
             }
             if (localSecurity == QXmppConfiguration::TLSRequired &&
                 remoteSecurity == QXmppConfiguration::TLSDisabled)
             {
                 warning("Disconnecting as TLS is required, but not supported by the server");
-                disconnect();
+                disconnectFromHost();
                 return;
             }
 
@@ -400,7 +400,7 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
             if (mechanisms.isEmpty())
             {
                 warning("No supported SASL Authentication mechanism available");
-                disconnect();
+                disconnectFromHost();
                 return;
             }
             else if (!mechanisms.contains(mechanism))
@@ -477,7 +477,7 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
                 break;
             default :
                 warning("Too many authentication steps");
-                disconnect();
+                disconnectFromHost();
                 break;
             }
         }
@@ -490,7 +490,7 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
             emit error(QXmppClient::XmppStreamError);
 
             warning("Authentication failure");
-            disconnect();
+            disconnectFromHost();
         }
     }
     else if(ns == ns_client)
@@ -669,7 +669,7 @@ void QXmppStream::handleStanza(const QDomElement &nodeRecv)
                     else
                     {
                         warning("No supported Non-SASL Authentication mechanism available");
-                        disconnect();
+                        disconnectFromHost();
                         return;
                     }
                     sendNonSASLAuth(plainText);
@@ -873,7 +873,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
     if (!map.contains("nonce"))
     {
         warning("sendAuthDigestMD5ResponseStep1: Invalid input");
-        disconnect();
+        disconnectFromHost();
         return;
     }
 
@@ -954,7 +954,7 @@ void QXmppStream::sendSessionIQ()
     sendPacket(session);
 }
 
-void QXmppStream::disconnect()
+void QXmppStream::disconnectFromHost()
 {
     d->authStep = 0;
     sendEndStream();
@@ -1021,7 +1021,7 @@ void QXmppStream::pingSend()
 void QXmppStream::pingTimeout()
 {
     warning("Ping timeout");
-    disconnect();
+    disconnectFromHost();
     emit error(QXmppClient::KeepAliveError);
 }
 
