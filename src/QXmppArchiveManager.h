@@ -51,7 +51,12 @@ public:
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
 
 signals:
+    /// This signal is emmitted when archive list is received
+    /// after calling listCollections()
     void archiveListReceived(const QList<QXmppArchiveChat>&);
+
+    /// This signal is emmitted when archive chat is received
+    /// after calling retrieveCollection()
     void archiveChatReceived(const QXmppArchiveChat&);
 
 private slots:
