@@ -108,7 +108,7 @@ public:
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
-    void disconnect();
+    void disconnectFromServer();
     bool isConnected() const;
 
     QXmppPresence clientPresence() const;
@@ -157,6 +157,9 @@ public:
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
     QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
+
+    /// was clashing with QObject::disconnect use disconnectFromServer() instead
+    void Q_DECL_DEPRECATED disconnect();
 
     // deprecated methods, use setClientPresence(QXmppPresence) instead.
     void Q_DECL_DEPRECATED setClientPresence(const QString& statusText);

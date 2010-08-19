@@ -305,10 +305,10 @@ bool QXmppClient::sendPacket(const QXmppPacket& packet)
 ///
 /// \note Make sure that the clientPresence is changed to
 /// QXmppPresence::Available, if you are again calling connectToServer() after
-/// calling the disconnect() function.
+/// calling the disconnectFromServer() function.
 ///
 
-void QXmppClient::disconnect()
+void QXmppClient::disconnectFromServer()
 {
     d->clientPresence.setType(QXmppPresence::Unavailable);
     d->clientPresence.status().setType(QXmppPresence::Status::Offline);
@@ -318,6 +318,11 @@ void QXmppClient::disconnect()
         sendPacket(d->clientPresence);
         d->stream->disconnect();
     }
+}
+
+void QXmppClient::disconnect()
+{
+    disconnectFromServer();
 }
 
 /// Returns true if the client is connected to the XMPP server.
