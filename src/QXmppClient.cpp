@@ -80,11 +80,11 @@ QXmppClientPrivate::QXmppClientPrivate()
 /// - QXmppClient
 ///
 /// <B>Managers to perform specific tasks:</B>
-/// - QXmppCallManager
-/// - QXmppMucManager
 /// - QXmppRosterManager
 /// - QXmppVCardManager
 /// - QXmppTransferManager
+/// - QXmppMucManager
+/// - QXmppCallManager
 ///
 /// <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
 /// classes
