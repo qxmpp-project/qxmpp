@@ -286,6 +286,25 @@ QString unescapeString(const QString& str)
     return strOut;
 }
 
+QByteArray calculateDigestMd5(const QByteArray &a1,
+    const QByteArray &nonce, const QByteArray &nc, const QByteArray &cnonce,
+    const QByteArray &digest_uri, const QByteArray &authzid)
+{
+    QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
+    ha1 += ':' + nonce + ':' + cnonce;
+
+    if (!authzid.isEmpty())
+        ha1 += ':' + authzid;
+
+    QByteArray A1(ha1);
+    QByteArray A2 = "AUTHENTICATE:" + digest_uri;
+    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+    QByteArray KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ':'
+                    + "auth" + ':' + HA2;
+    return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+}
+
 QMap<QByteArray, QByteArray> parseDigestMd5(const QByteArray &ba)
 {
     QMap<QByteArray, QByteArray> map;
