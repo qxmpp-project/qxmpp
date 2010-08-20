@@ -56,12 +56,13 @@ void TestUtils::testDigestMd5()
     QCOMPARE(serializeDigestMd5(empty), QByteArray());
 
     // non-empty
-    const QByteArray bytes("number=12345,quoted=\"quoted string\",string=string");
+    const QByteArray bytes("number=12345,quoted_plain=\"quoted string\",quoted_quote=\"quoted\\\\slash\\\"quote\",string=string");
 
     QMap<QByteArray, QByteArray> map = parseDigestMd5(bytes);
-    QCOMPARE(map.size(), 3);
+    QCOMPARE(map.size(), 4);
     QCOMPARE(map["number"], QByteArray("12345"));
-    QCOMPARE(map["quoted"], QByteArray("quoted string"));
+    QCOMPARE(map["quoted_plain"], QByteArray("quoted string"));
+    QCOMPARE(map["quoted_quote"], QByteArray("quoted\\slash\"quote"));
     QCOMPARE(map["string"], QByteArray("string"));
     QCOMPARE(serializeDigestMd5(map), bytes);
 }

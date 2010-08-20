@@ -303,12 +303,19 @@ QMap<QByteArray, QByteArray> parseDigestMd5(const QByteArray &ba)
             // skip opening quote
             pos++;
             int endPos = ba.indexOf('"', pos);
+            // skip quoted quotes
+            while (endPos >= 0 && ba.at(endPos - 1) == '\\')
+                endPos = ba.indexOf('"', endPos + 1);
             if (endPos < 0)
             {
                 qWarning("Unfinished quoted string");
                 return map;
             }
-            map[key] = ba.mid(pos, endPos - pos);
+            // unquote
+            QByteArray value = ba.mid(pos, endPos - pos);
+            value.replace("\\\"", "\"");
+            value.replace("\\\\", "\\"); 
+            map[key] = value;
             // skip closing quote and comma
             startIndex = endPos + 2;
         } else {
@@ -332,7 +339,7 @@ QByteArray serializeDigestMd5(const QMap<QByteArray, QByteArray> &map)
         if (!ba.isEmpty())
             ba.append(',');
         ba.append(key + "=");
-        const QByteArray value = map[key];
+        QByteArray value = map[key];
         const char *separators = "()<>@,;:\\\"/[]?={} \t";
         bool quote = false;
         for (const char *c = separators; *c; c++)
@@ -344,7 +351,11 @@ QByteArray serializeDigestMd5(const QMap<QByteArray, QByteArray> &map)
             }
         }
         if (quote)
+        {
+            value.replace("\\", "\\\\");
+            value.replace("\"", "\\\"");
             ba.append("\"" + value + "\"");
+        }
         else
             ba.append(value);
     }
