@@ -39,6 +39,33 @@
 #include "QXmppUtils.h"
 #include "tests.h"
 
+void TestUtils::testCrc32()
+{
+    quint32 crc = generateCrc32(QByteArray());
+    QCOMPARE(crc, 0u);
+
+    crc = generateCrc32(QByteArray("Hi There"));
+    QCOMPARE(crc, 0xDB143BBEu);
+}
+
+void TestUtils::testDigestMd5()
+{
+    // empty
+    QMap<QByteArray, QByteArray> empty = parseDigestMd5(QByteArray());
+    QCOMPARE(empty.size(), 0);
+    QCOMPARE(serializeDigestMd5(empty), QByteArray());
+
+    // non-empty
+    const QByteArray bytes("number=12345,quoted=\"quoted string\",string=string");
+
+    QMap<QByteArray, QByteArray> map = parseDigestMd5(bytes);
+    QCOMPARE(map.size(), 3);
+    QCOMPARE(map["number"], QByteArray("12345"));
+    QCOMPARE(map["quoted"], QByteArray("quoted string"));
+    QCOMPARE(map["string"], QByteArray("string"));
+    QCOMPARE(serializeDigestMd5(map), bytes);
+}
+
 void TestUtils::testHmac()
 {
     QByteArray hmac = generateHmacMd5(QByteArray(16, 0x0b), QByteArray("Hi There"));
@@ -49,15 +76,6 @@ void TestUtils::testHmac()
 
     hmac = generateHmacMd5(QByteArray(16, 0xaa), QByteArray(50, 0xdd));
     QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
-}
-
-void TestUtils::testCrc32()
-{
-    quint32 crc = generateCrc32(QByteArray());
-    QCOMPARE(crc, 0u);
-
-    crc = generateCrc32(QByteArray("Hi There"));
-    QCOMPARE(crc, 0xDB143BBEu);
 }
 
 template <class T>

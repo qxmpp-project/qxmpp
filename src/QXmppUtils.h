@@ -26,6 +26,7 @@
 #ifndef QXMPPUTILS_H
 #define QXMPPUTILS_H
 
+#include <QMap>
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
 // include the whole header.
@@ -62,5 +63,9 @@ void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
 
 QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
+
+// Digest MD5 authentication
+QMap<QByteArray, QByteArray> parseDigestMd5(const QByteArray &ba);
+QByteArray serializeDigestMd5(const QMap<QByteArray, QByteArray> &map);
 
 #endif // QXMPPUTILS_H
