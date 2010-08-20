@@ -837,39 +837,24 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
         return;
     }
 
-    QByteArray user = configuration().user().toUtf8();
-    QByteArray passwd = configuration().passwd().toUtf8();
-    QByteArray domain = configuration().domain().toUtf8();
-    QByteArray realm;
-    if(map.contains("realm"))
-        realm = map["realm"];
-
+    const QByteArray user = configuration().user().toUtf8();
+    const QByteArray passwd = configuration().passwd().toUtf8();
+    const QByteArray domain = configuration().domain().toUtf8();
+    const QByteArray realm = map.value("realm");
 
     QByteArray cnonce(32, 'm');
     for(int n = 0; n < cnonce.size(); ++n)
-            cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
+        cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
 
     // The random data can the '=' char is not valid as it is a delimiter,
     // so to be safe, base64 the nonce
     cnonce = cnonce.toBase64();
 
-    QByteArray nc = "00000001";
-    QByteArray digest_uri = "xmpp/" + domain;
-
-    QByteArray a1 = user + ':' + realm + ':' + passwd;
-    QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
-    ha1 += ':' + map["nonce"] + ':' + cnonce;
-
-    if(map.contains("authzid"))
-        ha1 += ':' + map["authzid"];
-
-    QByteArray A1(ha1);
-    QByteArray A2 = "AUTHENTICATE:" + digest_uri;
-    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
-    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-    QByteArray KD = HA1 + ':' + map["nonce"] + ':' + nc + ':' + cnonce + ':'
-                    + "auth" + ':' + HA2;
-    QByteArray Z = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+    const QByteArray nc = "00000001";
+    const QByteArray digest_uri = "xmpp/" + domain;
+    const QByteArray authzid = map.value("authzid");
+    const QByteArray nonce = map.value("nonce");
+    const QByteArray a1 = user + ':' + realm + ':' + passwd;
 
     // Build response
     QMap<QByteArray, QByteArray> response;
@@ -881,9 +866,9 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
     response["nc"] = nc;
     response["qop"] = "auth";
     response["digest-uri"] = digest_uri;
-    response["response"] = Z;
-    if(map.contains("authzid"))
-        response["authzid"] = map["authzid"];
+    response["response"] = calculateDigestMd5(a1, nonce, nc, cnonce, digest_uri, authzid);
+    if(!authzid.isEmpty())
+        response["authzid"] = authzid;
     response["charset"] = "utf-8";
 
     const QByteArray data = serializeDigestMd5(response);
