@@ -828,47 +828,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 {
     QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
 
-    QMap<QByteArray, QByteArray> map;
-
-    QByteArray key;
-    QByteArray value;
-    bool parsingValue = false;
-    int startindex = 0;
-    for(int i = 0; i < ba.length(); i++)
-    {
-        char next = ba.at(i);
-        switch (next) {
-            case '=':
-                if (!parsingValue)
-                {
-                    // Trim the key, but do not trim the value as it is in delimiters
-                    key = ba.mid(startindex, i - startindex).trimmed();
-                    // Skip the equals and delimiter
-                    startindex = i + 2;
-                }
-                break;
-            case '"':
-                // Ignore the opening delimiter
-                if (startindex != (i + 1))
-                {
-                    value = ba.mid(startindex, i - startindex);
-                    map[key] = value;
-                    debug(key + ":" + value);
-                    // Skip the comma
-                    i += 2;
-                    startindex = i;
-                    parsingValue = false;
-                }
-                else {
-                    parsingValue = true;
-                }
-
-                break;
-
-            default:
-                break;
-        }
-    }
+    QMap<QByteArray, QByteArray> map = parseDigestMd5(ba);
 
     if (!map.contains("nonce"))
     {
