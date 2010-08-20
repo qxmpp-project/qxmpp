@@ -866,7 +866,7 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
     response["nc"] = nc;
     response["qop"] = "auth";
     response["digest-uri"] = digest_uri;
-    response["response"] = calculateDigestMd5(a1, nonce, nc, cnonce, digest_uri, authzid);
+    response["response"] = calculateDigestMd5(a1, nonce, nc, cnonce, digest_uri, authzid).toHex();
     if(!authzid.isEmpty())
         response["authzid"] = authzid;
     response["charset"] = "utf-8";

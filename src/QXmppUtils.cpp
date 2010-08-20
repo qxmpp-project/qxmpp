@@ -302,7 +302,7 @@ QByteArray calculateDigestMd5(const QByteArray &a1,
     QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
     QByteArray KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ':'
                     + "auth" + ':' + HA2;
-    return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+    return QCryptographicHash::hash(KD, QCryptographicHash::Md5);
 }
 
 QMap<QByteArray, QByteArray> parseDigestMd5(const QByteArray &ba)
