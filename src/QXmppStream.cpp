@@ -844,7 +844,6 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
     if(map.contains("realm"))
         realm = map["realm"];
 
-    QByteArray response;
 
     QByteArray cnonce(32, 'm');
     for(int n = 0; n < cnonce.size(); ++n)
@@ -872,24 +871,24 @@ void QXmppStream::sendAuthDigestMD5ResponseStep1(const QString& challenge)
                     + "auth" + ':' + HA2;
     QByteArray Z = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 
-    response += "username=\"" + user + "\",";
-
+    // Build response
+    QMap<QByteArray, QByteArray> response;
+    response["username"] = user;
     if(!realm.isEmpty())
-        response += "realm=\"" + realm + "\",";
-
-    response += "nonce=\"" + map["nonce"] + "\",";
-    response += "cnonce=\"" + cnonce + "\",";
-    response += "nc=" + nc + ",";
-    response += "qop=auth,";
-    response += "digest-uri=\"" + digest_uri + "\",";
-    response += "response=" + Z + ",";
+        response["realm"] = realm;
+    response["nonce"] = map["nonce"];
+    response["cnonce"] = cnonce;
+    response["nc"] = nc;
+    response["qop"] = "auth";
+    response["digest-uri"] = digest_uri;
+    response["response"] = Z;
     if(map.contains("authzid"))
-        response += "authzid=\"" + map["authzid"] + "\",";
-    response += "charset=utf-8";
+        response["authzid"] = map["authzid"];
+    response["charset"] = "utf-8";
 
-    debug(response);
+    const QByteArray data = serializeDigestMd5(response);
     QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
-                        + response.toBase64() + "</response>";
+                        + data.toBase64() + "</response>";
     sendData(packet);
 }
 
