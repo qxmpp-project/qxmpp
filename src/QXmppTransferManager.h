@@ -90,7 +90,7 @@ public:
     /// This enum is used to describe the type of error encountered by a transfer job.
     enum Error
     {
-        NoError = 0,      ///< No error occured.
+        NoError = 0,      ///< No error occurred.
         AbortError,       ///< The file transfer was aborted.
         FileAccessError,  ///< An error was encountered trying to access a local file.
         FileCorruptError, ///< The file is corrupt: the file size or hash do not match.
