@@ -41,6 +41,8 @@ QXmpp 0.2.0 (Aug XX, 2010)
   - Add a test suite for stanza parsing / serialisation
   - Refactor the logging code
   - Add proxy support
+  - Fixed compile time warning messages
+  - New examples
 
 QXmpp 0.1 (Jun 14, 2009)
 ------------------------
