@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>QXmpp: Main Page</title>
+<title>QXmpp: QXmppArchiveChatIq Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javaScript" src="search/search.js"></script>
@@ -17,9 +17,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="navigation" id="top">
   <div class="tabs">
     <ul>
-      <li class="current"><a href="index.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="index.html"><span>Main&nbsp;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -36,35 +36,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div class="tabs">
+    <ul>
+      <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
+    </ul>
+  </div>
 </div>
 <div class="contents">
-<h1>QXmpp Documentation</h1><p>QXmpp is a cross-platform C++ XMPP client library based on the Qt framework. It tries to use Qt's programming conventions in order to ease the learning curve for new programmers.</p>
-<p>QXmpp based clients are built using <a class="el" href="classQXmppClient.html" title="The QXmppClient class is the main class for using QXmpp.">QXmppClient</a> instances which handle the establishment of the XMPP connection and provide a number of high-level "managers" to perform specific tasks.</p>
-<p><b>Main Class:</b></p>
-<ul>
-<li><a class="el" href="classQXmppClient.html" title="The QXmppClient class is the main class for using QXmpp.">QXmppClient</a></li>
+<h1>QXmppArchiveChatIq Class Reference<br/>
+<small>
+[<a class="el" href="group__Stanzas.html">Stanzas</a>]</small>
+</h1><!-- doxytag: class="QXmppArchiveChatIq" --><!-- doxytag: inherits="QXmppIq" -->
+<p>Represents an archive chat as defined by XEP-0136: Message Archiving.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="QXmppArchiveIq_8h_source.html">QXmppArchiveIq.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for QXmppArchiveChatIq:</div>
+<div class="dynsection">
+ <div class="center">
+  <img src="classQXmppArchiveChatIq.gif" usemap="#QXmppArchiveChatIq_map" alt=""/>
+  <map id="QXmppArchiveChatIq_map" name="QXmppArchiveChatIq_map">
+<area href="classQXmppIq.html" alt="QXmppIq" shape="rect" coords="0,56,134,80"/>
+<area href="classQXmppStanza.html" alt="QXmppStanza" shape="rect" coords="0,0,134,24"/>
+</map>
+ </div>
+</div>
+
+<p><a href="classQXmppArchiveChatIq-members.html">List of all members.</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fe73ecbb4542fcb263b86efcd710fff"></a><!-- doxytag: member="QXmppArchiveChatIq::parse" ref="a9fe73ecbb4542fcb263b86efcd710fff" args="(const QDomElement &amp;element)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>parse</b> (const QDomElement &amp;element)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af08964b43018061a77c1e20029eaba48"></a><!-- doxytag: member="QXmppArchiveChatIq::chat" ref="af08964b43018061a77c1e20029eaba48" args="() const " -->
+QXmppArchiveChat&nbsp;</td><td class="memItemRight" valign="bottom"><b>chat</b> () const </td></tr>
+<tr><td colspan="2"><h2>Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b1a74b86ec71ee0b13473b0a9ec560b"></a><!-- doxytag: member="QXmppArchiveChatIq::isArchiveChatIq" ref="a3b1a74b86ec71ee0b13473b0a9ec560b" args="(const QDomElement &amp;element)" -->
+static bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isArchiveChatIq</b> (const QDomElement &amp;element)</td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Represents an archive chat as defined by XEP-0136: Message Archiving. </p>
+<p>It is used to get chat as a QXmppArchiveChat. </p>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li><a class="el" href="QXmppArchiveIq_8h_source.html">QXmppArchiveIq.h</a></li>
+<li>QXmppArchiveIq.cpp</li>
 </ul>
-<p><b>Managers to perform specific tasks:</b></p>
-<ul>
-<li><a class="el" href="classQXmppRosterManager.html" title="The QXmppRosterManager class provides access to a connected client&#39;s roster.">QXmppRosterManager</a></li>
-<li><a class="el" href="classQXmppVCardManager.html" title="The QXmppVCardManager gets/sets XMPP vCards. It is an implentation of XEP-0054: vcard-temp...">QXmppVCardManager</a></li>
-<li><a class="el" href="classQXmppTransferManager.html" title="The QXmppTransferManager class provides support for sending and receiving files.">QXmppTransferManager</a></li>
-<li><a class="el" href="classQXmppMucManager.html" title="The QXmppMucManager class makes it possible to interact with multi-user chat rooms...">QXmppMucManager</a></li>
-<li><a class="el" href="classQXmppCallManager.html" title="The QXmppCallManager class provides support for making and receiving voice calls...">QXmppCallManager</a></li>
-<li><a class="el" href="classQXmppArchiveManager.html" title="The QXmppArchiveManager class makes it possible to access message archives as defined...">QXmppArchiveManager</a></li>
-</ul>
-<p><b>XMPP stanzas:</b> If you are interested in a more low-level API, you can refer to these classes.</p>
-<ul>
-<li><a class="el" href="classQXmppIq.html" title="The QXmppIq class is the base class for all IQs.">QXmppIq</a></li>
-<li><a class="el" href="classQXmppMessage.html" title="The QXmppMessage class represents an XMPP message.">QXmppMessage</a></li>
-<li><a class="el" href="classQXmppPresence.html" title="The QXmppPresence class represents an XMPP presence stanza.">QXmppPresence</a></li>
-</ul>
-<p><br/>
-<br/>
- <b>Project Details:</b></p>
-<p>Project Page: <a href="http://code.google.com/p/qxmpp/">http://code.google.com/p/qxmpp/</a> <br/>
- Report Issues: <a href="http://code.google.com/p/qxmpp/issues/">http://code.google.com/p/qxmpp/issues/</a> <br/>
- New Releases: <a href="http://code.google.com/p/qxmpp/downloads/">http://code.google.com/p/qxmpp/downloads/</a> </p>
 </div>
 <!--- window showing the filter options -->
 <div id="MSearchSelectWindow"
