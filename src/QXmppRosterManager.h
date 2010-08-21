@@ -105,7 +105,7 @@ private:
     QXmppStream* m_stream;
     //map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> m_entries;
-    // map of resources of the jid and map of resouces and presences
+    // map of resources of the jid and map of resources and presences
     QMap<QString, QMap<QString, QXmppPresence> > m_presences;
     // flag to store that the roster has been populated
     bool m_isRosterReceived;
