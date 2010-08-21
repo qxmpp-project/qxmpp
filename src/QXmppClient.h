@@ -168,7 +168,7 @@ public:
 
 signals:
 
-    /// This signal is emitted when the client connects sucessfully to the XMPP
+    /// This signal is emitted when the client connects successfully to the XMPP
     /// server i.e. when a successful XMPP connection is established.
     /// XMPP Connection involves following sequential steps:
     ///     - TCP socket connection
