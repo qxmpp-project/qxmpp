@@ -20,6 +20,7 @@ QXmpp 0.2.0 (Aug XX, 2010)
     * XEP-0199: XMPP Ping
     * XEP-0203: Delayed Delivery 
     * XEP-0009: Jabber-RPC
+    * XEP-0004: Data Forms
     
   - New XEPs (Initial Support) 
     * XEP-0136: Message Archiving
