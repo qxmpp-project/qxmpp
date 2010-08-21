@@ -45,6 +45,7 @@ QXmpp 0.2.0 (Aug XX, 2010)
   - Fixed compile time warning messages
   - New examples
   - Support for attaching an extension element to messages and presences (QXmppElement)
+  - Move parsing to the stanzas itself QXmppStanza::parse()
 
 QXmpp 0.1 (Jun 14, 2009)
 ------------------------
