@@ -38,7 +38,7 @@ QXmppVCardManager::QXmppVCardManager(QXmppStream* stream, QObject *parent)
 }
 
 /// This function requests the server for vCard of the specified jid.
-/// Once received the signal vCardReceived() is emmitted.
+/// Once received the signal vCardReceived() is emitted.
 ///
 /// \param jid Jid of the specific entry in the roster
 ///
@@ -84,7 +84,7 @@ void QXmppVCardManager::setClientVCard(const QXmppVCard& clientVCard)
 }
 
 /// This function requests the server for vCard of the connected user itself.
-/// Once received the signal clientVCardReceived() is emmitted. Received vCard
+/// Once received the signal clientVCardReceived() is emitted. Received vCard
 /// can be get using clientVCard().
 void QXmppVCardManager::requestClientVCard()
 {
