@@ -46,7 +46,8 @@ QXmpp 0.2.0 (Aug XX, 2010)
   - New examples
   - Support for attaching an extension element to messages and presences (QXmppElement)
   - Move parsing to the stanzas itself QXmppStanza::parse()
-
+  - QXMPP_NO_GUI define to remove dependency on QtGui
+  
 QXmpp 0.1 (Jun 14, 2009)
 ------------------------
   - First public release
