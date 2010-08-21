@@ -104,7 +104,7 @@ QXmppClientPrivate::QXmppClientPrivate()
 ///
 
 /// Creates a QXmppClient object.
-/// \param parent is passed to the QObject's contructor.
+/// \param parent is passed to the QObject's constructor.
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
