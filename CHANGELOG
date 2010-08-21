@@ -7,6 +7,7 @@ QXmpp 0.2.0 (Aug XX, 2010)
     * XEP-0054: vcard-temp
     * XEP-0065: SOCKS5 Bytestreams
     * XEP-0078: Non-SASL Authentication
+    * XEP-0082: XMPP Date and Time Profiles
     * XEP-0085: Chat State Notifications
     * XEP-0091: Legacy Delayed Delivery
     * XEP-0092: Software Version
