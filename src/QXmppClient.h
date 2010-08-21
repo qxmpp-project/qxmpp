@@ -194,9 +194,9 @@ signals:
     void disconnected();
 
     /// This signal is emitted when the XMPP connection encounters any error.
-    /// The QXmppClient::Error parameter specifies the type of error occured.
+    /// The QXmppClient::Error parameter specifies the type of error occurred.
     /// It could be due to TCP socket or the xml stream or the stanza.
-    /// Depending upon the type of error occured use the respective get function to
+    /// Depending upon the type of error occurred use the respective get function to
     /// know the error.
     void error(QXmppClient::Error);
 
