@@ -34,15 +34,10 @@ QXmpp 0.2.0 (Aug XX, 2010)
   - Add targets in *.pro file for packaging, installing and generating documentation
   - Use QXmlStreamWriter while creating stanzas to be sent to the server 
   - Clean up getter accessors from "getFoo" to "foo"
-  - Add proper file transfer management.
+  - Add proper file transfer management
   - Add support for keep-alive pings
   - Report authentication errors
-  - Disable automatic reconnection when a "conflict" stream errors is received
-    (avoid ping-pong between two QXmpp-based clients using the same jid/resource)
-
-  - Add initial support for archive managements
-  - Add initial support for Jingle call establishment
-  - Fix the XML-RPC code's encoding/decoding for types other than strings
+  - Automatic reconnection mechanism
   - Add a test suite for stanza parsing / serialisation
   - Refactor the logging code
   - Add proxy support
