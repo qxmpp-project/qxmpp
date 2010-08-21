@@ -43,6 +43,7 @@ QXmpp 0.2.0 (Aug XX, 2010)
   - Add proxy support
   - Fixed compile time warning messages
   - New examples
+  - Support for attaching an extension element to messages and presences (QXmppElement)
 
 QXmpp 0.1 (Jun 14, 2009)
 ------------------------
