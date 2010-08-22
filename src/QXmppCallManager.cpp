@@ -27,7 +27,7 @@
 #include "QXmppCodec.h"
 #include "QXmppConstants.h"
 #include "QXmppJingleIq.h"
-#include "QXmppOutgoingClient.h"
+#include "QXmppStream.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
@@ -408,7 +408,7 @@ qint64 QXmppCall::writeData(const char * data, qint64 maxSize)
     return maxSize;
 }
 
-QXmppCallManager::QXmppCallManager(QXmppOutgoingClient *stream, QObject *parent)
+QXmppCallManager::QXmppCallManager(QXmppStream *stream, QObject *parent)
     : QObject(parent), m_stream(stream)
 {
     // setup logging
