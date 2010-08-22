@@ -24,7 +24,7 @@
 #define QXMPP_DEBUG_STUN
 
 #include <QCryptographicHash>
-#include <QDebug>
+#include <QHostInfo>
 #include <QNetworkInterface>
 #include <QUdpSocket>
 #include <QTimer>
@@ -51,6 +51,8 @@ enum MessageType {
 
 enum AttributeType {
     MappedAddress    = 0x0001,
+    SourceAddress    = 0x0004,
+    ChangedAddress   = 0x0005,
     Username         = 0x0006,
     MessageIntegrity = 0x0008,
     ErrorCode        = 0x0009,
@@ -91,8 +93,9 @@ static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &a
     return true;
 }
 
-static void encodeAddress(QDataStream &stream, const QHostAddress &address, quint16 port)
+static void encodeAddress(QDataStream &stream, quint16 type, const QHostAddress &address, quint16 port)
 {
+    stream << type;
     stream << quint16(8);
     stream << quint8(0);
     if (address.protocol() == QAbstractSocket::IPv4Protocol)
@@ -108,9 +111,10 @@ static void encodeAddress(QDataStream &stream, const QHostAddress &address, quin
     }
 }
 
-static void encodeString(QDataStream &stream, const QString &string)
+static void encodeString(QDataStream &stream, quint16 type, const QString &string)
 {
     const QByteArray utf8string = string.toUtf8();
+    stream << type;
     stream << quint16(utf8string.size());
     stream.writeRawData(utf8string.data(), utf8string.size());
     if (utf8string.size() % 4)
@@ -133,8 +137,10 @@ static QByteArray randomByteArray(int length)
 QXmppStunMessage::QXmppStunMessage()
     : errorCode(0),
     priority(0),
+    changedPort(0),
     mappedPort(0),
     otherPort(0),
+    sourcePort(0),
     xorMappedPort(0),
     useCandidate(false)
 {
@@ -256,6 +262,24 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
             if (!decodeAddress(stream, a_length, mappedHost, mappedPort))
             {
                 *errors << QLatin1String("Bad MAPPED-ADDRESS");
+                return false;
+            }
+
+        } else if (a_type == SourceAddress) {
+
+            // SOURCE-ADDRESS
+            if (!decodeAddress(stream, a_length, sourceHost, sourcePort))
+            {
+                *errors << QLatin1String("Bad SOURCE-ADDRESS");
+                return false;
+            }
+
+        } else if (a_type == ChangedAddress) {
+
+            // CHANGED-ADDRESS
+            if (!decodeAddress(stream, a_length, changedHost, changedPort))
+            {
+                *errors << QLatin1String("Bad CHANGED-ADDRESS");
                 return false;
             }
 
@@ -384,6 +408,16 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
     return true;
 }
 
+void QXmppStunMessage::addAddress(QDataStream &stream, quint16 type, const QHostAddress &host, quint16 port) const
+{
+    if (port && !host.isNull() &&
+        (host.protocol() == QAbstractSocket::IPv4Protocol ||
+         host.protocol() == QAbstractSocket::IPv6Protocol))
+    {
+        encodeAddress(stream, type, host, port);
+    }
+}
+
 /// Encodes the current QXmppStunMessage, optionally calculating the
 /// message integrity attribute using the given password.
 /// 
@@ -402,22 +436,16 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
     stream.writeRawData(m_id.data(), m_id.size());
 
     // MAPPED-ADDRESS
-    if (mappedPort && !mappedHost.isNull() &&
-        (mappedHost.protocol() == QAbstractSocket::IPv4Protocol ||
-         mappedHost.protocol() == QAbstractSocket::IPv6Protocol))
-    {
-        stream << quint16(MappedAddress);
-        encodeAddress(stream, mappedHost, mappedPort);
-    }
+    addAddress(stream, MappedAddress, mappedHost, mappedPort);
+
+    // SOURCE-ADDRESS
+    addAddress(stream, SourceAddress, sourceHost, sourcePort);
+
+    // CHANGED-ADDRESS
+    addAddress(stream, ChangedAddress, changedHost, changedPort);
 
     // OTHER-ADDRESS
-    if (otherPort && !otherHost.isNull() &&
-        (otherHost.protocol() == QAbstractSocket::IPv4Protocol ||
-         otherHost.protocol() == QAbstractSocket::IPv6Protocol))
-    {
-        stream << quint16(OtherAddress);
-        encodeAddress(stream, otherHost, otherPort);
-    }
+    addAddress(stream, OtherAddress, otherHost, otherPort);
 
     // XOR-MAPPED-ADDRESS
     if (xorMappedPort && !xorMappedHost.isNull() &&
@@ -482,10 +510,7 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
 
     // SOFTWARE
     if (!software.isEmpty())
-    {
-        stream << quint16(Software);
-        encodeString(stream, software);
-    }
+        encodeString(stream, Software, software);
 
     // ICE-CONTROLLING or ICE-CONTROLLED
     if (!iceControlling.isEmpty())
@@ -501,10 +526,7 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
 
     // USERNAME
     if (!username.isEmpty())
-    {
-        stream << quint16(Username);
-        encodeString(stream, username);
-    }
+        encodeString(stream, Username, username);
 
     // set body length
     setBodyLength(buffer, buffer.size() - STUN_HEADER);
@@ -535,7 +557,7 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
 ///
 /// \param buffer
 
-quint16 QXmppStunMessage::peekType(const QByteArray &buffer)
+quint16 QXmppStunMessage::peekType(const QByteArray &buffer, QByteArray &id)
 {
     if (buffer.size() < STUN_HEADER)
         return 0;
@@ -552,6 +574,8 @@ quint16 QXmppStunMessage::peekType(const QByteArray &buffer)
     if (cookie != STUN_MAGIC || length != buffer.size() - STUN_HEADER)
         return 0;
 
+    id.resize(ID_SIZE);
+    stream.readRawData(id.data(), id.size());
     return type;
 }
  
@@ -598,6 +622,14 @@ QString QXmppStunMessage::toString() const
         dumpLines << QString(" * MAPPED-ADDRESS %1 %2")
             .arg(mappedHost.toString())
             .arg(QString::number(mappedPort));
+    if (sourcePort)
+        dumpLines << QString(" * SOURCE-ADDRESS %1 %2")
+            .arg(sourceHost.toString())
+            .arg(QString::number(sourcePort));
+    if (changedPort)
+        dumpLines << QString(" * CHANGED-ADDRESS %1 %2")
+            .arg(changedHost.toString())
+            .arg(QString::number(changedPort));
     if (otherPort)
         dumpLines << QString(" * OTHER-ADDRESS %1 %2")
             .arg(otherHost.toString())
@@ -638,15 +670,15 @@ QString QXmppStunSocket::Pair::toString() const
 QXmppStunSocket::QXmppStunSocket(bool iceControlling, QObject *parent)
     : QObject(parent),
     m_activePair(0),
-    m_iceControlling(iceControlling)
+    m_iceControlling(iceControlling),
+    m_stunDone(false),
+    m_stunPort(0)
 {
     m_localUser = generateStanzaHash(4);
     m_localPassword = generateStanzaHash(22);
 
     m_socket = new QUdpSocket(this);
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    if (!m_socket->bind())
-        qWarning("QXmppStunSocket could not start listening");
 
     m_timer = new QTimer(this);
     m_timer->setInterval(500);
@@ -657,6 +689,45 @@ QXmppStunSocket::~QXmppStunSocket()
 {
     foreach (Pair *pair, m_pairs)
         delete pair;
+}
+
+bool QXmppStunSocket::bind()
+{
+    if (!m_socket->bind())
+    {
+        debug("QXmppStunSocket could not start listening",
+            QXmppLogger::WarningMessage);
+        return false;
+    }
+
+    // store HOST candidates
+    m_localCandidates.clear();
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if (!(interface.flags() & QNetworkInterface::IsRunning) ||
+            interface.flags() & QNetworkInterface::IsLoopBack)
+            continue;
+
+        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+        {
+            if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
+                entry.netmask().isNull() ||
+                entry.netmask() == QHostAddress::Broadcast)
+                continue;
+
+            QXmppJingleCandidate candidate;
+            candidate.setComponent(m_component);
+            candidate.setHost(entry.ip());
+            candidate.setId(generateStanzaHash(10));
+            candidate.setNetwork(interface.index());
+            candidate.setPort(m_socket->localPort());
+            candidate.setPriority(2130706432 - m_component);
+            candidate.setProtocol("udp");
+            candidate.setType("host");
+            m_localCandidates << candidate;
+        }
+    }
+    return true;
 }
 
 /// Returns the component id for the current socket, e.g. 1 for RTP
@@ -697,6 +768,20 @@ void QXmppStunSocket::checkCandidates()
         }
         writeStun(message, pair);
     }
+
+    /// Send a request to STUN server to determine server-reflexive candidate
+    if (!m_stunHost.isNull() && m_stunPort != 0 && !m_stunDone)
+    {
+        QXmppStunMessage msg;
+        msg.setType(BindingRequest);
+        msg.setId(m_stunId);
+#ifdef QXMPP_DEBUG_STUN
+        debug(
+            QString("Sent to %1 %2\n%3").arg(m_stunHost.toString(), QString::number(m_stunPort), msg.toString()),
+            QXmppLogger::SentMessage);
+#endif
+        m_socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
+    }
 }
 
 /// Closes the socket.
@@ -707,10 +792,13 @@ void QXmppStunSocket::close()
     m_timer->stop();
 }
 
-/// Start ICE connectivity checks.
+/// Starts ICE connectivity checks.
 
 void QXmppStunSocket::connectToHost()
 {
+    if (m_activePair)
+        return;
+
     checkCandidates();
     m_timer->start();
 }
@@ -727,53 +815,16 @@ void QXmppStunSocket::debug(const QString &message, QXmppLogger::MessageType typ
     emit logMessage(type, QString("STUN(%1) %2").arg(QString::number(m_component)).arg(message));
 }
 
-/// Returns the list of local HOST CANDIDATES candidates by iterating
-/// over the available network interfaces.
+/// Returns the list of local candidates.
 
 QList<QXmppJingleCandidate> QXmppStunSocket::localCandidates() const
 {
-    QList<QXmppJingleCandidate> candidates;
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if (!(interface.flags() & QNetworkInterface::IsRunning) ||
-            interface.flags() & QNetworkInterface::IsLoopBack)
-            continue;
-
-        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-        {
-            if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
-                entry.netmask().isNull() ||
-                entry.netmask() == QHostAddress::Broadcast)
-                continue;
-
-            QXmppJingleCandidate candidate;
-            candidate.setComponent(m_component);
-            candidate.setHost(entry.ip());
-            candidate.setId(generateStanzaHash(10));
-            candidate.setNetwork(interface.index());
-            candidate.setPort(m_socket->localPort());
-            candidate.setPriority(2130706432 - m_component);
-            candidate.setProtocol("udp");
-            candidate.setType("host");
-            candidates << candidate;
-        }
-    }
-    return candidates;
-}
-
-QString QXmppStunSocket::localUser() const
-{
-    return m_localUser;
+    return m_localCandidates;
 }
 
 void QXmppStunSocket::setLocalUser(const QString &user)
 {
     m_localUser = user;
-}
-
-QString QXmppStunSocket::localPassword() const
-{
-    return m_localPassword;
 }
 
 void QXmppStunSocket::setLocalPassword(const QString &password)
@@ -786,7 +837,7 @@ void QXmppStunSocket::setLocalPassword(const QString &password)
 bool QXmppStunSocket::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
     if (candidate.component() != m_component ||
-        candidate.type() != "host" ||
+        (candidate.type() != "host" && candidate.type() != "srflx") ||
         candidate.protocol() != "udp")
         return false;
 
@@ -834,6 +885,13 @@ void QXmppStunSocket::setRemotePassword(const QString &password)
     m_remotePassword = password;
 }
 
+void QXmppStunSocket::setStunServer(const QHostAddress &host, quint16 port)
+{
+    m_stunHost = host;
+    m_stunPort = port;
+    m_stunId = randomByteArray(ID_SIZE);
+}
+
 void QXmppStunSocket::readyRead()
 {
     const qint64 size = m_socket->pendingDatagramSize();
@@ -843,17 +901,24 @@ void QXmppStunSocket::readyRead()
     m_socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     // if this is not a STUN message, emit it
-    quint16 messageType = QXmppStunMessage::peekType(buffer);
+    QByteArray messageId;
+    quint16 messageType = QXmppStunMessage::peekType(buffer, messageId);
     if (!messageType)
     {
         emit datagramReceived(buffer);
         return;
     }
 
+    // determine password to use
+    QString messagePassword;
+    if (messageId != m_stunId)
+    {
+        messagePassword = (messageType & 0xFF00) ? m_remotePassword : m_localPassword;
+        if (messagePassword.isEmpty())
+            return;
+    }
+
     // parse STUN message
-    const QString messagePassword = (messageType & 0xFF00) ? m_remotePassword : m_localPassword;
-    if (messagePassword.isEmpty())
-        return;
     QXmppStunMessage message;
     QStringList errors;
     if (!message.decode(buffer, messagePassword, &errors))
@@ -870,10 +935,55 @@ void QXmppStunSocket::readyRead()
         QXmppLogger::ReceivedMessage);
 #endif
 
-    if (m_activePair)
+    // check how to handle message
+    if (message.id() == m_stunId)
+    {
+        m_stunDone = true;
+
+        // determine server-reflexive address
+        QHostAddress reflexiveHost;
+        quint16 reflexivePort = 0;
+        if (!message.xorMappedHost.isNull() && message.xorMappedPort != 0)
+        {
+            reflexiveHost = message.xorMappedHost;
+            reflexivePort = message.xorMappedPort;
+        }
+        else if (!message.mappedHost.isNull() && message.mappedPort != 0)
+        {
+            reflexiveHost = message.mappedHost;
+            reflexivePort = message.mappedPort;
+        } else {
+            debug("STUN server did not provide a reflexive address",
+                QXmppLogger::WarningMessage);
+            return;
+        }
+
+        // check whether this candidates is already known
+        foreach (const QXmppJingleCandidate &candidate, m_localCandidates)
+        {
+            if (candidate.host() == reflexiveHost && candidate.port() == reflexivePort)
+                return;
+        }
+
+        // add the new local candidate
+        debug(QString("Adding server-reflexive candidate %1 %2").arg(reflexiveHost.toString(), QString::number(reflexivePort)));
+        QXmppJingleCandidate candidate;
+        candidate.setComponent(m_component);
+        candidate.setHost(reflexiveHost);
+        candidate.setId(generateStanzaHash(10));
+        candidate.setPort(reflexivePort);
+        candidate.setPriority(2130706432 - m_component);
+        candidate.setProtocol("udp");
+        candidate.setType("srflx");
+        m_localCandidates << candidate;
+
+        emit localCandidatesChanged();
+        return;
+    }
+    else if (m_activePair)
         return;
 
-    // process message
+    // process message from peer
     Pair *pair = 0;
     if (message.type() == BindingRequest)
     {
@@ -924,7 +1034,7 @@ void QXmppStunSocket::readyRead()
             debug(QString("Unknown transaction %1").arg(QString::fromAscii(message.id().toHex())));
             return;
         }
-        // store reflexive address
+        // store peer-reflexive address
         pair->reflexive.setHost(message.xorMappedHost);
         pair->reflexive.setPort(message.xorMappedPort);
 
@@ -976,4 +1086,169 @@ qint64 QXmppStunSocket::writeStun(const QXmppStunMessage &message, QXmppStunSock
 #endif
     return m_socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
 }
+
+QXmppIceConnection::QXmppIceConnection(bool controlling, QObject *parent)
+    : QObject(parent),
+    m_controlling(controlling),
+    m_stunPort(0)
+{
+    m_localUser = generateStanzaHash(4);
+    m_localPassword = generateStanzaHash(22);
+}
+
+void QXmppIceConnection::addComponent(int component)
+{
+    QXmppStunSocket *socket = new QXmppStunSocket(m_controlling, this);
+    socket->setComponent(component);
+    socket->setLocalUser(m_localUser);
+    socket->setLocalPassword(m_localPassword);
+    socket->setStunServer(m_stunHost, m_stunPort);
+
+    bool check = connect(socket, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
+    check = connect(socket, SIGNAL(localCandidatesChanged()),
+        this, SIGNAL(localCandidatesChanged()));
+    Q_ASSERT(check);
+
+    check = connect(socket, SIGNAL(connected()),
+        this, SLOT(slotConnected()));
+    Q_ASSERT(check);
+
+    check = connect(socket, SIGNAL(datagramReceived(QByteArray)),
+        this, SLOT(slotDatagramReceived(QByteArray)));
+    Q_ASSERT(check);
+
+    if (!socket->bind())
+    {
+        qWarning("QXmppStunSocket could not start listening");
+        socket->deleteLater();
+        return;
+    }
+
+    m_components[component] = socket;
+}
+
+void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidate)
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->addRemoteCandidate(candidate);
+}
+
+/// Closes the ICE connection.
+
+void QXmppIceConnection::close()
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->close();
+}
+
+/// Starts ICE connectivity checks.
+
+void QXmppIceConnection::connectToHost()
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->connectToHost();
+}
+
+/// Returns true if ICE negotiation completed, false otherwise.
+
+bool QXmppIceConnection::isConnected() const
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        if (!socket->isConnected())
+            return false;
+    return true;
+}
+
+/// Returns the list of local HOST CANDIDATES candidates by iterating
+/// over the available network interfaces.
+
+QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
+{
+    QList<QXmppJingleCandidate> candidates;
+    foreach (QXmppStunSocket *socket, m_components.values())
+        candidates += socket->localCandidates();
+    return candidates;
+}
+
+QString QXmppIceConnection::localUser() const
+{
+    return m_localUser;
+}
+
+QString QXmppIceConnection::localPassword() const
+{
+    return m_localPassword;
+}
+
+void QXmppIceConnection::setRemoteUser(const QString &user)
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->setRemoteUser(user);
+}
+
+void QXmppIceConnection::setRemotePassword(const QString &password)
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->setRemotePassword(password);
+}
+
+void QXmppIceConnection::setStunServer(const QString &hostName, quint16 port)
+{
+    // lookup STUN server
+    QHostAddress host;
+    QHostInfo hostInfo = QHostInfo::fromName(hostName);
+    foreach (const QHostAddress &address, hostInfo.addresses())
+    {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            host = address;
+            break;
+        }
+    }
+    if (host.isNull())
+    {
+        emit logMessage(QXmppLogger::WarningMessage,
+            QString("Could not lookup STUN server %1").arg(hostName));
+        return;
+    }
+
+    // store STUN server
+    m_stunHost = host;
+    m_stunPort = port;
+    foreach (QXmppStunSocket *socket, m_components.values())
+        socket->setStunServer(host, port);
+}
+
+void QXmppIceConnection::slotConnected()
+{
+    foreach (QXmppStunSocket *socket, m_components.values())
+        if (!socket->isConnected())
+            return;
+    emit connected();
+}
+
+void QXmppIceConnection::slotDatagramReceived(const QByteArray &datagram)
+{
+    QXmppStunSocket *socket = qobject_cast<QXmppStunSocket*>(sender());
+    int component = m_components.key(socket);
+    if (component)
+        emit datagramReceived(component, datagram);
+}
+
+/// Sends a data packet to the remote party.
+///
+/// \param component
+/// \param datagram
+
+qint64 QXmppIceConnection::writeDatagram(int component, const QByteArray &datagram)
+{
+    QXmppStunSocket *socket = m_components.value(component);
+    if (!socket)
+        return -1;
+    return socket->writeDatagram(datagram);
+}
+
 

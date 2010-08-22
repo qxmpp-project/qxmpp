@@ -29,6 +29,7 @@
 #include "QXmppLogger.h"
 #include "QXmppJingleIq.h"
 
+class QDataStream;
 class QUdpSocket;
 class QTimer;
 
@@ -49,7 +50,7 @@ public:
     QByteArray encode(const QString &password = QString()) const;
     bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
     QString toString() const;
-    static quint16 peekType(const QByteArray &buffer);
+    static quint16 peekType(const QByteArray &buffer, QByteArray &id);
 
     // attributes
     int errorCode;
@@ -57,10 +58,14 @@ public:
     quint32 priority;
     QByteArray iceControlling;
     QByteArray iceControlled;
+    QHostAddress changedHost;
+    quint16 changedPort;
     QHostAddress mappedHost;
     quint16 mappedPort;
     QHostAddress otherHost;
     quint16 otherPort;
+    QHostAddress sourceHost;
+    quint16 sourcePort;
     QHostAddress xorMappedHost;
     quint16 xorMappedPort;
     QString software;
@@ -68,16 +73,12 @@ public:
     bool useCandidate;
 
 private:
+    void addAddress(QDataStream &stream, quint16 type, const QHostAddress &host, quint16 port) const;
     void setBodyLength(QByteArray &buffer, qint16 length) const;
 
     QByteArray m_id;
     quint16 m_type;
 };
-
-
-/// \brief The QXmppStunSocket class represents an UDP socket capable
-/// of performing Interactive Connectivity Establishment (RFC 5245).
-///
 
 class QXmppStunSocket : public QObject
 {
@@ -86,11 +87,10 @@ class QXmppStunSocket : public QObject
 public:
     QXmppStunSocket(bool iceControlling, QObject *parent=0);
     ~QXmppStunSocket();
+    void setStunServer(const QHostAddress &host, quint16 port);
 
     QList<QXmppJingleCandidate> localCandidates() const;
-    QString localUser() const;
     void setLocalUser(const QString &user);
-    QString localPassword() const;
     void setLocalPassword(const QString &password);
 
     int component() const;
@@ -100,6 +100,7 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
+    bool bind();
     void close();
     void connectToHost();
     bool isConnected() const;
@@ -115,6 +116,9 @@ signals:
 
     // This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &datagram);
+
+    // This signal is emitted when the list of local candidates changes.
+    void localCandidatesChanged();
 
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
@@ -138,6 +142,7 @@ private:
 
     int m_component;
 
+    QList<QXmppJingleCandidate> m_localCandidates;
     QString m_localUser;
     QString m_localPassword;
 
@@ -149,6 +154,64 @@ private:
 
     QUdpSocket *m_socket;
     QTimer *m_timer;
+
+    // STUN server
+    bool m_stunDone;
+    QByteArray m_stunId;
+    QHostAddress m_stunHost;
+    quint16 m_stunPort;
+};
+
+/// \brief The QXmppIceConnection class represents an UDP socket capable
+/// of performing Interactive Connectivity Establishment (RFC 5245).
+///
+
+class QXmppIceConnection : public QObject
+{
+    Q_OBJECT
+
+public:
+    QXmppIceConnection(bool controlling, QObject *parent = 0);
+    void addComponent(int component);
+    void setStunServer(const QString &hostName, quint16 port = 3478);
+
+    QList<QXmppJingleCandidate> localCandidates() const;
+    QString localUser() const;
+    QString localPassword() const;
+
+    void addRemoteCandidate(const QXmppJingleCandidate &candidate);
+    void setRemoteUser(const QString &user);
+    void setRemotePassword(const QString &password);
+
+    void close();
+    void connectToHost();
+    bool isConnected() const;
+    qint64 writeDatagram(int, const QByteArray &datagram);
+
+signals:
+    // This signal is emitted once ICE negotiation succeeds.
+    void connected();
+
+    // This signal is emitted when a data packet is received.
+    void datagramReceived(int component, const QByteArray &datagram);
+
+    // This signal is emitted when the list of local candidates changes.
+    void localCandidatesChanged();
+
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+
+private slots:
+    void slotConnected();
+    void slotDatagramReceived(const QByteArray &datagram);
+
+private:
+    bool m_controlling;
+    QMap<int, QXmppStunSocket*> m_components;
+    QString m_localUser;
+    QString m_localPassword;
+    QHostAddress m_stunHost;
+    quint16 m_stunPort;
 };
 
 #endif

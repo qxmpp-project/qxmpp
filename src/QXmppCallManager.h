@@ -31,11 +31,11 @@
 #include "QXmppLogger.h"
 
 class QXmppCodec;
+class QXmppIceConnection;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
-class QXmppStream;
-class QXmppStunSocket;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
@@ -92,6 +92,9 @@ signals:
     /// instead use deleteLater().
     void finished();
 
+    /// \internal
+    void localCandidatesChanged();
+
     /// This signal is emitted when the remote party is ringing.
     void ringing();
 
@@ -106,7 +109,7 @@ public slots:
     void hangup();
 
 private slots:
-    void datagramReceived(const QByteArray &datagram);
+    void datagramReceived(int component, const QByteArray &datagram);
     void emitSignals();
     void updateOpenMode();
     void terminate();
@@ -120,18 +123,15 @@ protected:
 
 private:
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
-    void connectToHost();
-    QList<QXmppJingleCandidate> localCandidates() const;
     void setPayloadType(const QXmppJinglePayloadType &type);
     void addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates);
-    void setRemoteUser(const QString &user);
-    void setRemotePassword(const QString &password);
     void setState(QXmppCall::State state);
 
     Direction m_direction;
     QString m_jid;
     QString m_sid;
     State m_state;
+    QString m_contentCreator;
     QString m_contentName;
     QXmppJinglePayloadType m_payloadType;
 
@@ -139,8 +139,7 @@ private:
     QList<QXmppJinglePayloadType> m_commonPayloadTypes;
 
     // ICE-UDP
-    QXmppStunSocket *m_socket;
-    QXmppStunSocket *m_rtcpSocket;
+    QXmppIceConnection *m_connection;
 
     // signals
     bool m_signalsEmitted;
@@ -182,7 +181,7 @@ class QXmppCallManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppCallManager(QXmppStream *stream, QObject *parent = 0);
+    QXmppCallManager(QXmppOutgoingClient *stream, QObject *parent = 0);
     QXmppCall *call(const QString &jid);
 
 signals:
@@ -200,6 +199,7 @@ private slots:
     void callStateChanged(QXmppCall::State state);
     void iqReceived(const QXmppIq &iq);
     void jingleIqReceived(const QXmppJingleIq &iq);
+    void localCandidatesChanged();
 
 private:
     bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
@@ -212,7 +212,7 @@ private:
     QList<QXmppCall*> m_calls;
 
     // reference to xmpp stream (no ownership)
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
 };
 
 #endif
