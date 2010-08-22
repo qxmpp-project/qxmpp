@@ -15,10 +15,10 @@ QXMPP_ARCHIVE = qxmpp-$$QXMPP_VERSION
 dist.commands = \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE && \
     svn export . $$QXMPP_ARCHIVE && \
-    $(COPY_DIR) doc/html $$QXMPP_ARCHIVE/doc && \
+#    $(COPY_DIR) doc/html $$QXMPP_ARCHIVE/doc && \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE/src/server && \
     tar czf $${QXMPP_ARCHIVE}.tar.gz $$QXMPP_ARCHIVE && \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE
-dist.depends = docs
+# dist.depends = docs
 QMAKE_EXTRA_TARGETS += dist
 
