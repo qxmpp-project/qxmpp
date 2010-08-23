@@ -125,6 +125,36 @@ void TestPackets::testArchiveList()
     serializePacket(iq, xml);
 }
 
+void TestPackets::testArchiveChat()
+{
+    const QByteArray xml(
+        "<iq id=\"chat_1\" type=\"result\">"
+        "<chat xmlns=\"urn:xmpp:archive\""
+        " with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:56:15Z\""
+        " subject=\"She speaks!\""
+        " version=\"4\""
+        ">"
+        "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
+        "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
+        "</chat>"
+        "</iq>");
+
+    QXmppArchiveChatIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.type(), QXmppIq::Result);
+    QCOMPARE(iq.id(), QLatin1String("chat_1"));
+    QCOMPARE(iq.chat().with(), QLatin1String("juliet@capulet.com"));
+    QCOMPARE(iq.chat().messages().size(), 2);
+    QCOMPARE(iq.chat().messages()[0].isReceived(), true);
+    QCOMPARE(iq.chat().messages()[0].body(), QLatin1String("Art thou not Romeo, and a Montague?"));
+    QCOMPARE(iq.chat().messages()[0].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 15), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[1].isReceived(), false);
+    QCOMPARE(iq.chat().messages()[1].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 26), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[1].body(), QLatin1String("Neither, fair saint, if either thee dislike."));
+    serializePacket(iq, xml);
+}
+
 void TestPackets::testArchiveRetrieve()
 {
     const QByteArray xml(

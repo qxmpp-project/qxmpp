@@ -39,6 +39,7 @@ class TestPackets : public QObject
 
 private slots:
     void testArchiveList();
+    void testArchiveChat();
     void testArchiveRetrieve();
     void testBindNoResource();
     void testBindResource();
