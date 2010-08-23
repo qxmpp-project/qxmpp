@@ -30,6 +30,8 @@
 
 /// \brief The QXmppSessionIq class represents an IQ used for session
 /// establishment as defined by RFC 5921.
+///
+/// \ingroup Stanzas
 
 class QXmppSessionIq : public QXmppIq
 {
