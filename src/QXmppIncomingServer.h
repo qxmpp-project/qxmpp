@@ -42,6 +42,7 @@ public:
     QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent);
     ~QXmppIncomingServer();
 
+    bool isConnected() const;
     QString localStreamId() const;
 
 signals:

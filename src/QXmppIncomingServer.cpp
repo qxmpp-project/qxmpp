@@ -135,6 +135,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
                                  this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
             Q_ASSERT(check);
+            Q_UNUSED(check);
             stream->setVerify(d->localStreamId, request.key());
             stream->connectToHost();
         }
@@ -150,6 +151,15 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
     } else {
         warning("Received an element, but remote party is not authenticated");
     }
+}
+
+/// Returns true if the socket is connected and the remote server is
+/// authenticated.
+///
+
+bool QXmppIncomingServer::isConnected() const
+{
+    return QXmppStream::isConnected() && d->authenticated;
 }
 
 /// Handles a dialback response received from the authority server.

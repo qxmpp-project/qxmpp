@@ -73,6 +73,7 @@ public:
     ~QXmppOutgoingClient();
 
     void connectToHost();
+    bool isConnected() const;
 
     QAbstractSocket::SocketError socketError();
     QXmppStanza::Error::Condition xmppStreamError();

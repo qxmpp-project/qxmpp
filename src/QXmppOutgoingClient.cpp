@@ -81,6 +81,7 @@ public:
     QString bindId;
     QString sessionId;
     bool sessionAvailable;
+    bool sessionStarted;
     QString streamId;
     QString streamFrom;
     QString streamVersion;
@@ -156,6 +157,14 @@ void QXmppOutgoingClient::connectToHost()
                             configuration().port());
 }
 
+/// Returns true if the socket is connected and a session has been started.
+///
+
+bool QXmppOutgoingClient::isConnected() const
+{
+    return QXmppStream::isConnected() && d->sessionStarted;
+}
+
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)
 {
     warning("SSL errors");
@@ -177,6 +186,7 @@ void QXmppOutgoingClient::handleStart()
 {
     // reset authentication step
     d->authStep = 0;
+    d->sessionStarted = false;
 
     // start stream
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
@@ -387,6 +397,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 // process SessionIq
 
                 // xmpp connection made
+                d->sessionStarted = true;
                 emit connected();
             }
             else if(QXmppBind::isBind(nodeRecv) && id == d->bindId)

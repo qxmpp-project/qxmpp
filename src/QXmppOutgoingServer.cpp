@@ -154,12 +154,12 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     }
 }
 
-/// Returns true if the remote server has been authenticated.
+/// Returns true if the socket is connected and authentication succeeded.
 ///
 
 bool QXmppOutgoingServer::isConnected() const
 {
-    return d->ready;
+    return QXmppStream::isConnected() && d->ready;
 }
 
 QString QXmppOutgoingServer::localStreamKey() const

@@ -71,6 +71,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     bool check = connect(d->idleTimer, SIGNAL(timeout()),
                     this, SLOT(slotTimeout()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 /// Destroys the current stream.
@@ -81,12 +82,15 @@ QXmppIncomingClient::~QXmppIncomingClient()
     delete d;
 }
 
-/// Returns true if the client is authenticated and a resource is bound.
+/// Returns true if the socket is connected, the client is authenticated
+/// and a resource is bound.
 ///
 
 bool QXmppIncomingClient::isConnected() const
 {
-    return !d->username.isEmpty() && !d->resource.isEmpty();
+    return QXmppStream::isConnected() &&
+           !d->username.isEmpty() &&
+           !d->resource.isEmpty();
 }
 
 /// Returns the client's JID.
