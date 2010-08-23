@@ -222,9 +222,7 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 
     QDomElement setElement = listElement.firstChildElement("set");
     if (setElement.namespaceURI() == ns_rsm)
-    {
         m_max = setElement.firstChildElement("max").text().toInt();
-    }
 
     QDomElement child = listElement.firstChildElement();
     while (!child.isNull())
@@ -336,9 +334,12 @@ void QXmppArchiveRetrieveIq::setWith(const QString &with)
 
 void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 {
-    // TODO : implement parsing
     QDomElement retrieveElement = element.firstChildElement("retrieve");
-    Q_UNUSED(retrieveElement);
+    m_with = retrieveElement.attribute("with");
+    m_start = datetimeFromString(retrieveElement.attribute("start"));
+    QDomElement setElement = retrieveElement.firstChildElement("set");
+    if (setElement.namespaceURI() == ns_rsm)
+        m_max = setElement.firstChildElement("max").text().toInt();
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -351,8 +352,7 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     {
         writer->writeStartElement("set");
         helperToXmlAddAttribute(writer, "xmlns", ns_rsm);
-        if (m_max > 0)
-            helperToXmlAddTextElement(writer, "max", QString::number(m_max));
+        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
     }
     writer->writeEndElement();
