@@ -30,33 +30,38 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-QXmppBindIq::QXmppBindIq()
-{
-}
-
-QXmppBindIq::QXmppBindIq(QXmppIq::Type type)
-    : QXmppIq(type)
-{
-}
+/// Returns the bound JID.
+///
 
 QString QXmppBindIq::jid() const
 {
     return m_jid;
 }
 
+/// Sets the bound JID.
+///
+/// \param jid
+
+void QXmppBindIq::setJid(const QString& jid)
+{
+    m_jid = jid;
+}
+
+/// Returns the requested resource.
+///
+
 QString QXmppBindIq::resource() const
 {
     return m_resource;
 }
 
-void QXmppBindIq::setJid(const QString& str)
-{
-    m_jid = str;
-}
+/// Sets the requested resource.
+///
+/// \param resource
 
-void QXmppBindIq::setResource(const QString& str)
+void QXmppBindIq::setResource(const QString& resource)
 {
-    m_resource = str;
+    m_resource = resource;
 }
 
 bool QXmppBindIq::isBindIq(const QDomElement &element)

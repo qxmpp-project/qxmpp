@@ -28,16 +28,18 @@
 
 #include "QXmppIq.h"
 
+/// \brief The QXmppBindIq class represents an IQ used for resource
+/// binding as defined by RFC 5921.
+///
+/// \ingroup Stanzas
+
 class QXmppBindIq : public QXmppIq
 {
 public:
-    QXmppBindIq();
-    QXmppBindIq(QXmppIq::Type type);
-    
     QString jid() const;
-    QString resource() const;
-
     void setJid(const QString&);
+
+    QString resource() const;
     void setResource(const QString&);
 
     static bool isBindIq(const QDomElement &element);
