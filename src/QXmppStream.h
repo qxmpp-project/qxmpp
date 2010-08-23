@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -26,108 +27,46 @@
 #define QXMPPSTREAM_H
 
 #include <QObject>
-#include <QSslSocket>
-#include "QXmppClient.h"
 #include "QXmppLogger.h"
-#include "QXmppStanza.h"
 
 class QDomElement;
-
-class QXmppClient;
-class QXmppConfiguration;
+class QSslSocket;
 class QXmppPacket;
-class QXmppPresence;
-class QXmppIq;
-class QXmppBind;
-class QXmppRosterIq;
-class QXmppVCard;
-class QXmppMessage;
-class QXmppRpcResponseIq;
-class QXmppRpcErrorIq;
-class QXmppArchiveChatIq;
-class QXmppArchiveListIq;
-class QXmppArchivePrefIq;
-class QXmppByteStreamIq;
-class QXmppDiscoveryIq;
-class QXmppIbbCloseIq;
-class QXmppIbbDataIq;
-class QXmppIbbOpenIq;
-class QXmppJingleIq;
-class QXmppMucAdminIq;
-class QXmppMucOwnerIq;
-class QXmppStreamInitiationIq;
 class QXmppStreamPrivate;
-class QXmppVersionIq;
+
+/// \brief The QXmppStream class is the base class for all XMPP streams.
+///
 
 class QXmppStream : public QObject
 {
     Q_OBJECT
 
 public:
-    QXmppStream(QSslSocket *socket, QObject *parent);
+    QXmppStream(QObject *parent);
     ~QXmppStream();
-    void connectToHost();
-    void disconnectFromHost();
+
     bool isConnected() const;
-    bool sendData(const QByteArray&);
-    bool sendPacket(const QXmppPacket&);
-
-    QAbstractSocket::SocketError socketError();
-    QXmppStanza::Error::Condition xmppStreamError();
-
-    QXmppConfiguration& configuration();
+    void disconnectFromHost();
 
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
 
-    QXmppElementList presenceExtensions() const;
+    bool sendData(const QByteArray&);
+    bool sendElement(const QDomElement&);
+    bool sendPacket(const QXmppPacket&);
 
 signals:
-    // socket host found
-    void hostFound();
-
-    // socket connected
+    /// This signal is emitted when the stream is connected.
     void connected();
 
-    // socket disconnected
+    /// This signal is emitted when the stream is disconnected.
     void disconnected();
 
-    // xmpp connected
-    void xmppConnected();
+    /// This signal is emitted when an element is received.
+    void elementReceived(const QDomElement &element, bool &handled);
 
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
-    void error(QXmppClient::Error);
-    void elementReceived(const QDomElement &element, bool &handled);
-    void presenceReceived(const QXmppPresence&);
-    void messageReceived(const QXmppMessage&);
-    void iqReceived(const QXmppIq&);
-    void rosterIqReceived(const QXmppRosterIq&);
-    void vCardIqReceived(const QXmppVCard&);
-
-    void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
-    void rpcCallResponse(const QXmppRpcResponseIq& result);
-    void rpcCallError(const QXmppRpcErrorIq &err);
-
-    void archiveChatIqReceived(const QXmppArchiveChatIq&);
-    void archiveListIqReceived(const QXmppArchiveListIq&);
-    void archivePrefIqReceived(const QXmppArchivePrefIq&);
-
-    void discoveryIqReceived(const QXmppDiscoveryIq&);
-
-    void byteStreamIqReceived(const QXmppByteStreamIq&);
-    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
-    void ibbDataIqReceived(const QXmppIbbDataIq&);
-    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
-    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
-
-    // XEP-0045: Multi-User Chat
-    void mucAdminIqReceived(const QXmppMucAdminIq&);
-    void mucOwnerIqReceived(const QXmppMucOwnerIq&);
-
-    // XEP-0166: Jingle
-    void jingleIqReceived(const QXmppJingleIq&);
 
 protected:
     // Logging helpers
@@ -135,37 +74,22 @@ protected:
     void info(const QString&);
     void warning(const QString&);
 
+    // Access to underlying socket
+    QSslSocket *socket();
+    void setSocket(QSslSocket *socket);
+
     // Overridable methods
-    virtual void handleStanza(const QDomElement &element);
-    virtual void handleStream(const QDomElement &element);
-    virtual bool sendStartStream();
-    virtual bool sendEndStream();
+    virtual void handleStart();
+    virtual void handleStanza(const QDomElement &element) = 0;
+    virtual void handleStream(const QDomElement &element) = 0;
 
 private slots:
-    void socketHostFound();
-    void socketReadReady();
-    void socketEncrypted();
     void socketConnected();
     void socketDisconnected();
-    void socketError(QAbstractSocket::SocketError);
-    void socketSslErrors(const QList<QSslError>&);
-
-    void pingStart();
-    void pingStop();
-    void pingSend();
-    void pingTimeout();
+    void socketEncrypted();
+    void socketReadyRead();
 
 private:
-    QXmppDiscoveryIq capabilities() const;
-    void flushDataBuffer();
-    void parser(const QByteArray&);
-    void sendNonSASLAuth(bool plaintext);
-    void sendNonSASLAuthQuery();
-    void sendAuthDigestMD5ResponseStep1(const QString& challenge);
-    void sendAuthDigestMD5ResponseStep2();
-    void sendBindIQ();
-    void sendSessionIQ();
-
     QXmppStreamPrivate * const d;
 };
 

@@ -40,6 +40,7 @@ HEADERS += QXmppUtils.h \
     QXmppMucIq.h \
     QXmppMucManager.h \
     QXmppNonSASLAuth.h \
+    QXmppOutgoingClient.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
@@ -84,6 +85,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppMucIq.cpp \
     QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
+    QXmppOutgoingClient.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \

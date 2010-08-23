@@ -35,7 +35,7 @@ class QXmppIceConnection;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
-class QXmppStream;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
@@ -181,7 +181,7 @@ class QXmppCallManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppCallManager(QXmppStream *stream, QObject *parent = 0);
+    QXmppCallManager(QXmppOutgoingClient *stream, QObject *parent = 0);
     QXmppCall *call(const QString &jid);
 
 signals:
@@ -212,7 +212,7 @@ private:
     QList<QXmppCall*> m_calls;
 
     // reference to xmpp stream (no ownership)
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
 };
 
 #endif

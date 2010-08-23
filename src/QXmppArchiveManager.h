@@ -31,7 +31,7 @@ class QXmppArchiveChat;
 class QXmppArchiveChatIq;
 class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
-class QXmppStream;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppArchiveManager class makes it possible to access message
 /// archives as defined by XEP-0136: Message Archiving.
@@ -46,7 +46,7 @@ class QXmppArchiveManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppArchiveManager(QXmppStream* stream, QObject *parent = 0);
+    QXmppArchiveManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
 
@@ -66,7 +66,7 @@ private slots:
 
 private:
     // reference to xmpp stream (no ownership)
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
 };
 
 #endif

@@ -29,7 +29,7 @@
 
 #include "QXmppVCard.h"
 
-class QXmppStream;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppVCardManager gets/sets XMPP vCards. It is an
 /// implentation of <B>XEP-0054: vcard-temp</B>.
@@ -59,7 +59,7 @@ class QXmppVCardManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppVCardManager(QXmppStream* stream, QObject *parent = 0);
+    QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     void requestVCard(const QString& bareJid = "");
 
     const QXmppVCard& clientVCard() const;
@@ -81,7 +81,7 @@ private slots:
 
 private:
     // reference to the xmpp stream (no ownership)
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
 
     QXmppVCard m_clientVCard;  ///< Stores the vCard of the connected client
     bool m_isClientVCardReceived;

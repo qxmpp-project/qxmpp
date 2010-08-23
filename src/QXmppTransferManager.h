@@ -36,7 +36,7 @@
 
 class QTcpSocket;
 class QXmppByteStreamIq;
-class QXmppStream;
+class QXmppOutgoingClient;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
@@ -213,7 +213,7 @@ class QXmppTransferManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppTransferManager(QXmppStream *stream, QObject *parent = 0);
+    QXmppTransferManager(QXmppOutgoingClient *stream, QObject *parent = 0);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
@@ -266,7 +266,7 @@ private:
     void socksServerSendOffer(QXmppTransferJob *job);
 
     // reference to XMPP stream (no ownership)
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
     int m_ibbBlockSize;
     QList<QXmppTransferJob*> m_jobs;
     QString m_proxy;

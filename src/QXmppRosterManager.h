@@ -34,7 +34,7 @@
 
 class QXmppRosterIq;
 class QXmppPresence;
-class QXmppStream;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppRosterManager class provides access to a connected client's roster.
 ///
@@ -68,7 +68,7 @@ public:
     // FIXME : is this class really necessary?
     typedef QXmppRosterIq::Item QXmppRosterEntry;
 
-    QXmppRosterManager(QXmppStream* stream, QObject *parent = 0);
+    QXmppRosterManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     ~QXmppRosterManager();
     
     bool isRosterReceived();
@@ -102,7 +102,7 @@ signals:
 
 private:
     //reverse pointer to stream
-    QXmppStream* m_stream;
+    QXmppOutgoingClient* m_stream;
     //map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> m_entries;
     // map of resources of the jid and map of resources and presences

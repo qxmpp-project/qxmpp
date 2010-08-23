@@ -33,7 +33,7 @@ class QXmppDataForm;
 class QXmppMessage;
 class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
-class QXmppStream;
+class QXmppOutgoingClient;
 
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by XEP-0045: Multi-User Chat.
@@ -45,7 +45,7 @@ class QXmppMucManager : public QObject
     Q_OBJECT
 
 public:
-    QXmppMucManager(QXmppStream* stream, QObject *parent = 0);
+    QXmppMucManager(QXmppOutgoingClient* stream, QObject *parent = 0);
 
     bool joinRoom(const QString &roomJid, const QString &nickName);
     bool leaveRoom(const QString &roomJid);
@@ -74,7 +74,7 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
 
 private:
-    QXmppStream *m_stream;
+    QXmppOutgoingClient *m_stream;
     QMap<QString, QString> m_nickNames;
     QMap<QString, QMap<QString, QXmppPresence> > m_participants;
 };

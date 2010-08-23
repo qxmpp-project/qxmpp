@@ -27,14 +27,14 @@
 #include "QXmppUtils.h"
 #include "QXmppRosterIq.h"
 #include "QXmppPresence.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 
-QXmppRosterManager::QXmppRosterManager(QXmppStream* stream, QObject *parent)
+QXmppRosterManager::QXmppRosterManager(QXmppOutgoingClient* stream, QObject *parent)
     : QObject(parent),
     m_stream(stream),
     m_isRosterReceived(false)
 {
-    bool check = QObject::connect(m_stream, SIGNAL(xmppConnected()),
+    bool check = QObject::connect(m_stream, SIGNAL(connected()),
         this, SLOT(connected()));
     Q_ASSERT(check);
 

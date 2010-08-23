@@ -23,11 +23,11 @@
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 
 #include <QDebug>
 
-QXmppArchiveManager::QXmppArchiveManager(QXmppStream *stream, QObject *parent)
+QXmppArchiveManager::QXmppArchiveManager(QXmppOutgoingClient *stream, QObject *parent)
     : QObject(parent),
     m_stream(stream)
 {

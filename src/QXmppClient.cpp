@@ -24,7 +24,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppMessage.h"
 
 #include "QXmppArchiveManager.h"
@@ -44,7 +44,7 @@ class QXmppClientPrivate
 public:
     QXmppClientPrivate();
 
-    QXmppStream* stream;  ///< Pointer to QXmppStream object a wrapper over
+    QXmppOutgoingClient* stream;  ///< Pointer to QXmppOutgoingClient object a wrapper over
                           ///< TCP socket and XMPP protocol
     QXmppPresence clientPresence; ///< Stores the current presence of the connected client
 
@@ -111,9 +111,7 @@ QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent),
     d(new QXmppClientPrivate)
 {
-    QSslSocket *socket = new QSslSocket;
-    d->stream = new QXmppStream(socket, this);
-    socket->setParent(d->stream);
+    d->stream = new QXmppOutgoingClient(this);
     d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
@@ -140,11 +138,11 @@ QXmppClient::QXmppClient(QObject *parent)
         SIGNAL(disconnected()));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(xmppConnected()), this,
+    check = connect(d->stream, SIGNAL(connected()), this,
         SLOT(xmppConnected()));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(xmppConnected()), this,
+    check = connect(d->stream, SIGNAL(connected()), this,
         SIGNAL(connected()));
     Q_ASSERT(check);
 

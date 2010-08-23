@@ -25,10 +25,10 @@
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppUtils.h"
 
-QXmppMucManager::QXmppMucManager(QXmppStream* stream, QObject *parent)
+QXmppMucManager::QXmppMucManager(QXmppOutgoingClient* stream, QObject *parent)
     : QObject(parent),
     m_stream(stream)
 {

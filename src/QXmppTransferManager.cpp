@@ -32,7 +32,7 @@
 #include "QXmppIbbIq.h"
 #include "QXmppLogger.h"
 #include "QXmppSocks.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
@@ -360,7 +360,7 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
     return true;
 }
 
-QXmppTransferManager::QXmppTransferManager(QXmppStream *stream, QObject *parent)
+QXmppTransferManager::QXmppTransferManager(QXmppOutgoingClient *stream, QObject *parent)
     : QObject(parent),
     m_stream(stream),
     m_ibbBlockSize(4096),

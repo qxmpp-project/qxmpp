@@ -23,10 +23,10 @@
 
 
 #include "QXmppVCardManager.h"
-#include "QXmppStream.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppUtils.h"
 
-QXmppVCardManager::QXmppVCardManager(QXmppStream* stream, QObject *parent)
+QXmppVCardManager::QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent)
     : QObject(parent),
     m_stream(stream),
     m_isClientVCardReceived(false)
