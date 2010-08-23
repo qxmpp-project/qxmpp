@@ -22,6 +22,7 @@
  */
 
 #include <QDomElement>
+#include <QFileInfo>
 #include <QSslSocket>
 
 #include "QXmppDialback.h"
@@ -47,10 +48,12 @@ public:
     QXmppPasswordChecker *passwordChecker;
 
     // client-to-server
+    QXmppSslServer *serverForClients;
     QList<QXmppIncomingClient*> incomingClients;
 
     // server-to-server
     QList<QXmppOutgoingServer*> outgoingServers;
+    QXmppSslServer *serverForServers;
 };
 
 QXmppServerPrivate::QXmppServerPrivate()
@@ -67,6 +70,15 @@ QXmppServer::QXmppServer(QObject *parent)
     : QObject(parent),
     d(new QXmppServerPrivate)
 {
+    d->serverForClients = new QXmppSslServer(this);
+    bool check = connect(d->serverForClients, SIGNAL(newConnection(QSslSocket*)),
+                         this, SLOT(slotClientConnection(QSslSocket*)));
+    Q_ASSERT(check);
+
+    d->serverForServers = new QXmppSslServer(this);
+    check = connect(d->serverForServers, SIGNAL(newConnection(QSslSocket*)),
+                    this, SLOT(slotServerConnection(QSslSocket*)));
+    Q_ASSERT(check);
 }
 
 /// Destroys an XMPP server instance.
@@ -128,6 +140,75 @@ void QXmppServer::setPasswordChecker(QXmppPasswordChecker *checker)
     d->passwordChecker = checker;
 }
 
+/// Sets the path for additional SSL CA certificates.
+///
+/// \param path
+
+void QXmppServer::addCaCertificates(const QString &path)
+{
+    if (!path.isEmpty() && !QFileInfo(path).isReadable())
+        qWarning() << "SSL CA certificates are not readable" << path;
+    d->serverForClients->addCaCertificates(path);
+    d->serverForServers->addCaCertificates(path);
+}
+
+/// Sets the path for the local SSL certificate.
+///
+/// \param path
+
+void QXmppServer::setLocalCertificate(const QString &path)
+{
+    if (!path.isEmpty() && !QFileInfo(path).isReadable())
+        qWarning() << "SSL certificate is not readable" << path;
+    d->serverForClients->setLocalCertificate(path);
+    d->serverForServers->setLocalCertificate(path);
+}
+
+/// Sets the path for the local SSL private key.
+///
+/// \param path
+
+void QXmppServer::setPrivateKey(const QString &path)
+{
+    if (!path.isEmpty() && !QFileInfo(path).isReadable())
+        qWarning() << "SSL key is not readable" << path;
+    d->serverForClients->setPrivateKey(path);
+    d->serverForServers->setPrivateKey(path);
+}
+
+/// Listen for incoming XMPP client connections.
+///
+/// \param address
+/// \param port
+
+bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
+{
+    if (!d->serverForClients->listen(address, port))
+    {
+        if (logger())
+            logger()->log(QXmppLogger::WarningMessage,
+                QString("Could not start listening for C2S on port %1").arg(QString::number(port)));
+        return false;
+    }
+    return true;
+}
+
+/// Listen for incoming XMPP server connections.
+///
+/// \param address
+/// \param port
+
+bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
+{
+    if (!d->serverForServers->listen(address, port))
+    {
+        if (logger())
+            logger()->log(QXmppLogger::WarningMessage,
+                QString("Could not start listening for S2S on port %1").arg(QString::number(port)));
+        return false;
+    }
+    return true;
+}
 
 QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
 {
@@ -336,7 +417,6 @@ void QXmppServer::slotElementReceived(const QDomElement &origElement, bool &hand
     if (!incoming)
         return;
     handleStanza(incoming, origElement);
-    handled = true;
 }
 
 /// Handle a new incoming TCP connection from a server.

@@ -34,6 +34,7 @@ class QXmppLogger;
 class QXmppOutgoingServer;
 class QXmppPasswordChecker;
 class QXmppServerPrivate;
+class QXmppSslServer;
 class QXmppStanza;
 class QXmppStream;
 
@@ -57,6 +58,13 @@ public:
 
     QXmppPasswordChecker *passwordChecker();
     void setPasswordChecker(QXmppPasswordChecker *checker);
+
+    void addCaCertificates(const QString &caCertificates);
+    void setLocalCertificate(const QString &sslCertificate);
+    void setPrivateKey(const QString &sslKey);
+
+    bool listenForClients(const QHostAddress &address, quint16 port = 5222);
+    bool listenForServers(const QHostAddress &address, quint16 port = 5269);
 
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
