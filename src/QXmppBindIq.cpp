@@ -26,53 +26,53 @@
 #include <QTextStream>
 #include <QXmlStreamWriter>
 
-#include "QXmppBind.h"
+#include "QXmppBindIq.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-QXmppBind::QXmppBind()
+QXmppBindIq::QXmppBindIq()
 {
 }
 
-QXmppBind::QXmppBind(QXmppIq::Type type)
+QXmppBindIq::QXmppBindIq(QXmppIq::Type type)
     : QXmppIq(type)
 {
 }
 
-QString QXmppBind::jid() const
+QString QXmppBindIq::jid() const
 {
     return m_jid;
 }
 
-QString QXmppBind::resource() const
+QString QXmppBindIq::resource() const
 {
     return m_resource;
 }
 
-void QXmppBind::setJid(const QString& str)
+void QXmppBindIq::setJid(const QString& str)
 {
     m_jid = str;
 }
 
-void QXmppBind::setResource(const QString& str)
+void QXmppBindIq::setResource(const QString& str)
 {
     m_resource = str;
 }
 
-bool QXmppBind::isBind(const QDomElement &element)
+bool QXmppBindIq::isBindIq(const QDomElement &element)
 {
     QDomElement bindElement = element.firstChildElement("bind");
     return (bindElement.namespaceURI() == ns_bind);
 }
 
-void QXmppBind::parseElementFromChild(const QDomElement &element)
+void QXmppBindIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement bindElement = element.firstChildElement("bind");
     m_jid = bindElement.firstChildElement("jid").text();
     m_resource = bindElement.firstChildElement("resource").text();
 }
 
-void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
+void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("bind");
     helperToXmlAddAttribute(writer, "xmlns", ns_bind);
@@ -83,12 +83,3 @@ void QXmppBind::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QString QXmppBind::getJid() const
-{
-    return m_jid;
-}
-
-QString QXmppBind::getResource() const
-{
-    return m_resource;
-}

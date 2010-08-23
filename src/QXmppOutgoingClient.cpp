@@ -38,7 +38,7 @@
 
 // IQ types
 #include "QXmppArchiveIq.h"
-#include "QXmppBind.h"
+#include "QXmppBindIq.h"
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
@@ -312,7 +312,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether bind is available
         if (features.isBindAvailable())
         {
-            QXmppBind bind(QXmppIq::Set);
+            QXmppBindIq bind(QXmppIq::Set);
             bind.setResource(configuration().resource());
             d->bindId = bind.id();
             sendPacket(bind);
@@ -396,9 +396,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 d->sessionStarted = true;
                 emit connected();
             }
-            else if(QXmppBind::isBind(nodeRecv) && id == d->bindId)
+            else if(QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId)
             {
-                QXmppBind bind;
+                QXmppBindIq bind;
                 bind.parse(nodeRecv);
 
                 // bind result

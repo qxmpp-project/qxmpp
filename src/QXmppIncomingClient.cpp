@@ -26,7 +26,7 @@
 #include <QSslSocket>
 #include <QTimer>
 
-#include "QXmppBind.h"
+#include "QXmppBindIq.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppSessionIq.h"
@@ -256,13 +256,14 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         if (nodeRecv.tagName() == "iq")
         {
             const QString type = nodeRecv.attribute("type");
-            if (QXmppBind::isBind(nodeRecv) && type == "set")
+            if (QXmppBindIq::isBindIq(nodeRecv) && type == "set")
             {
-                QXmppBind bindSet;
+                QXmppBindIq bindSet;
                 bindSet.parse(nodeRecv);
                 d->resource = bindSet.resource();
 
-                QXmppBind bindResult(QXmppIq::Result);
+                QXmppBindIq bindResult;
+                bindResult.setType(QXmppIq::Result);
                 bindResult.setId(bindSet.id());
                 bindResult.setJid(jid());
                 sendPacket(bindResult);
@@ -270,12 +271,13 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 // bound
                 emit connected();
             }
-            else if (QXmppSession::isSession(nodeRecv) && type == "set")
+            else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == "set")
             {
-                QXmppSession sessionSet;
+                QXmppSessionIq sessionSet;
                 sessionSet.parse(nodeRecv);
 
-                QXmppSession sessionResult(QXmppIq::Result);
+                QXmppSessionIq sessionResult;
+                sessionResult.setType(QXmppIq::Result);
                 sessionResult.setId(sessionSet.id());
                 sendPacket(sessionResult);
             }

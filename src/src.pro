@@ -21,7 +21,7 @@ DESTDIR = $$QXMPP_LIBRARY_DIR
 HEADERS += QXmppUtils.h \
     QXmppArchiveIq.h \
     QXmppArchiveManager.h \
-    QXmppBind.h \
+    QXmppBindIq.h \
     QXmppByteStreamIq.h \
     QXmppCallManager.h \
     QXmppClient.h \
@@ -70,7 +70,7 @@ HEADERS += QXmppUtils.h \
 SOURCES += QXmppUtils.cpp \
     QXmppArchiveIq.cpp \
     QXmppArchiveManager.cpp \
-    QXmppBind.cpp \
+    QXmppBindIq.cpp \
     QXmppByteStreamIq.cpp \
     QXmppCallManager.cpp \
     QXmppClient.cpp \

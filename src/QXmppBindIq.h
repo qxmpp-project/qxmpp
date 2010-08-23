@@ -23,16 +23,16 @@
  */
 
 
-#ifndef QXMPPBIND_H
-#define QXMPPBIND_H
+#ifndef QXMPPBINDIQ_H
+#define QXMPPBINDIQ_H
 
 #include "QXmppIq.h"
 
-class QXmppBind : public QXmppIq
+class QXmppBindIq : public QXmppIq
 {
 public:
-    QXmppBind();
-    QXmppBind(QXmppIq::Type type);
+    QXmppBindIq();
+    QXmppBindIq(QXmppIq::Type type);
     
     QString jid() const;
     QString resource() const;
@@ -40,13 +40,7 @@ public:
     void setJid(const QString&);
     void setResource(const QString&);
 
-    static bool isBind(const QDomElement &element);
-
-    // deprecated accessors, use the form without "get" instead
-    /// \cond
-    QString Q_DECL_DEPRECATED getJid() const;
-    QString Q_DECL_DEPRECATED getResource() const;
-    /// \endcond
+    static bool isBindIq(const QDomElement &element);
 
 protected:
     /// \cond
