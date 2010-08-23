@@ -30,7 +30,7 @@ QXmppStreamFeatures::QXmppStreamFeatures()
     : m_bindAvailable(false),
     m_sessionAvailable(false),
     m_nonSaslAuthAvailable(false),
-    m_securityMode(QXmppConfiguration::TLSEnabled)
+    m_securityMode(QXmppConfiguration::TLSDisabled)
 {
 }
 
