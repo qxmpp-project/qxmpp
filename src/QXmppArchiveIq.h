@@ -143,10 +143,10 @@ public:
     void setMax(int max);
 
     QDateTime start() const;
-    void setStart( const QDateTime &start );
+    void setStart(const QDateTime &start);
 
     QString with() const;
-    void setWith( const QString &with );
+    void setWith(const QString &with);
 
     static bool isArchiveRetrieveIq(const QDomElement &element);
 

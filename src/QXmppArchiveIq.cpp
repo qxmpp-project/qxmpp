@@ -139,40 +139,68 @@ QList<QXmppArchiveChat> QXmppArchiveListIq::chats() const
     return m_chats;
 }
 
+/// Returns the maximum number of results.
+///
+
 int QXmppArchiveListIq::max() const
 {
     return m_max;
 }
+
+/// Sets the maximum number of results.
+///
+/// \param max
 
 void QXmppArchiveListIq::setMax(int max)
 {
     m_max = max;
 }
 
+/// Returns the JID which archived conversations must match.
+///
+
 QString QXmppArchiveListIq::with() const
 {
     return m_with;
 }
+
+/// Sets the JID which archived conversations must match.
+///
+/// \param with
 
 void QXmppArchiveListIq::setWith(const QString &with)
 {
     m_with = with;
 }
 
+/// Returns the start date/time for the archived conversations.
+///
+
 QDateTime QXmppArchiveListIq::start() const
 {
     return m_start;
 }
+
+/// Sets the start date/time for the archived conversations.
+///
+/// \param start
 
 void QXmppArchiveListIq::setStart(const QDateTime &start)
 {
     m_start = start;
 }
 
+/// Returns the end date/time for the archived conversations.
+///
+
 QDateTime QXmppArchiveListIq::end() const
 {
     return m_end;
 }
+
+/// Sets the end date/time for the archived conversations.
+///
+/// \param end
 
 void QXmppArchiveListIq::setEnd(const QDateTime &end)
 {
@@ -255,30 +283,51 @@ QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
 {
 }
 
+/// Returns the maximum number of results.
+///
+
 int QXmppArchiveRetrieveIq::max() const
 {
     return m_max;
 }
+
+/// Sets the maximum number of results.
+///
+/// \param max
 
 void QXmppArchiveRetrieveIq::setMax(int max)
 {
     m_max = max;
 }
 
+/// Returns the start date/time for the archived conversations.
+///
+
 QDateTime QXmppArchiveRetrieveIq::start() const
 {
     return m_start;
 }
+
+/// Sets the start date/time for the archived conversations.
+///
+/// \param start
 
 void QXmppArchiveRetrieveIq::setStart(const QDateTime &start)
 {
     m_start = start;
 }
 
+/// Returns the JID which archived conversations must match.
+///
+
 QString QXmppArchiveRetrieveIq::with() const
 {
     return m_with;
 }
+
+/// Sets the JID which archived conversations must match.
+///
+/// \param with
 
 void QXmppArchiveRetrieveIq::setWith(const QString &with)
 {
