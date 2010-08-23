@@ -34,7 +34,7 @@
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
 #include "QXmppRpcIq.h"
-#include "QXmppSession.h"
+#include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "tests.h"
@@ -298,7 +298,7 @@ void TestPackets::testSession()
         "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
         "</iq>");
 
-    QXmppSession session;
+    QXmppSessionIq session;
     parsePacket(session, xml);
     QCOMPARE(session.id(), QString("session_1"));
     QCOMPARE(session.to(), QString("example.com"));
