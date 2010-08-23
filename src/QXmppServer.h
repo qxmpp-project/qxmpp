@@ -63,8 +63,8 @@ public:
     void setLocalCertificate(const QString &sslCertificate);
     void setPrivateKey(const QString &sslKey);
 
-    bool listenForClients(const QHostAddress &address, quint16 port = 5222);
-    bool listenForServers(const QHostAddress &address, quint16 port = 5269);
+    bool listenForClients(const QHostAddress &address = QHostAddress::Any, quint16 port = 5222);
+    bool listenForServers(const QHostAddress &address = QHostAddress::Any, quint16 port = 5269);
 
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
@@ -81,7 +81,7 @@ protected:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
     // overridable methods
     virtual void handleStanza(QXmppStream *stream, const QDomElement &element) = 0;
-    virtual void updateStatistics() = 0;
+    virtual void updateStatistics();
 
 private:
     QList<QXmppStream*> getStreams(const QString &to);

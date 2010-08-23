@@ -442,6 +442,10 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
     Q_ASSERT(check);
 }
 
+void QXmppServer::updateStatistics()
+{
+}
+
 class QXmppSslServerPrivate
 {
 public:
