@@ -28,7 +28,7 @@
 #include <QVariant>
 #include <QtTest/QtTest>
 
-#include "QXmppBind.h"
+#include "QXmppBindIq.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
@@ -108,7 +108,7 @@ void TestPackets::testBindNoResource()
         "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
         "</iq>");
 
-    QXmppBind bind;
+    QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Set);
     QCOMPARE(bind.id(), QString("bind_1"));
@@ -126,7 +126,7 @@ void TestPackets::testBindResource()
         "</bind>"
         "</iq>");
 
-    QXmppBind bind;
+    QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Set);
     QCOMPARE(bind.id(), QString("bind_2"));
@@ -144,7 +144,7 @@ void TestPackets::testBindResult()
         "</bind>"
         "</iq>");
 
-    QXmppBind bind;
+    QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Result);
     QCOMPARE(bind.id(), QString("bind_2"));
