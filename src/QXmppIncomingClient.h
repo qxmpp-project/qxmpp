@@ -30,12 +30,14 @@ class QXmppIncomingClientPrivate;
 
 /// Interface for password checkers.
 ///
-/// FIXME : make this an abstract class
 
 class QXmppPasswordChecker
 {
 public:
+    /// Checks that the given credentials are valid.
     virtual bool check(const QString &username, const QString &password) = 0;
+
+    /// Retrieves the password for the given username.
     virtual bool get(const QString &username, QString &password) = 0;
 };
 

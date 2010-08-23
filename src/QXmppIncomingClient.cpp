@@ -47,6 +47,13 @@ public:
     QByteArray saslNonce;
 };
 
+/// Constructs a new incoming client stream.
+///
+/// \param socket The socket for the XMPP stream.
+/// \param domain The local domain.
+/// \param parent The parent QObject for the stream (optional).
+///
+
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
     : QXmppStream(parent),
     d(new QXmppIncomingClientPrivate)
@@ -66,15 +73,24 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     Q_ASSERT(check);
 }
 
+/// Destroys the current stream.
+///
+
 QXmppIncomingClient::~QXmppIncomingClient()
 {
     delete d;
 }
 
+/// Returns true if the client is authenticated and a resource is bound.
+///
+
 bool QXmppIncomingClient::isConnected() const
 {
-    return !d->username.isEmpty();
+    return !d->username.isEmpty() && !d->resource.isEmpty();
 }
+
+/// Returns the client's JID.
+///
 
 QString QXmppIncomingClient::jid() const
 {
@@ -85,6 +101,11 @@ QString QXmppIncomingClient::jid() const
         jid += "/" + d->resource;
     return jid;
 }
+
+/// Sets the password checker used to verify client credentials.
+///
+/// \param checker
+///
 
 void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 {
@@ -277,5 +298,4 @@ void QXmppIncomingClient::slotTimeout()
     warning(QString("Idle timeout for %1").arg(jid()));
     disconnectFromHost();
 }
-
 
