@@ -33,6 +33,8 @@ HEADERS += QXmppUtils.h \
     QXmppDiscoveryIq.h \
     QXmppElement.h \
     QXmppIbbIq.h \
+    QXmppIncomingClient.h \
+    QXmppIncomingServer.h \
     QXmppInvokable.h \
     QXmppIq.h \
     QXmppJingleIq.h \
@@ -42,6 +44,7 @@ HEADERS += QXmppUtils.h \
     QXmppMucManager.h \
     QXmppNonSASLAuth.h \
     QXmppOutgoingClient.h \
+    QXmppOutgoingServer.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
@@ -79,6 +82,8 @@ SOURCES += QXmppUtils.cpp \
     QXmppDiscoveryIq.cpp \
     QXmppElement.cpp \
     QXmppIbbIq.cpp \
+    QXmppIncomingClient.cpp \
+    QXmppIncomingServer.cpp \
     QXmppInvokable.cpp \
     QXmppIq.cpp \
     QXmppJingleIq.cpp \
@@ -88,6 +93,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppOutgoingClient.cpp \
+    QXmppOutgoingServer.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
