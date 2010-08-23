@@ -125,6 +125,28 @@ void TestPackets::testArchiveList()
     serializePacket(iq, xml);
 }
 
+void TestPackets::testArchiveRetrieve()
+{
+    const QByteArray xml(
+        "<iq id=\"retrieve_1\" type=\"get\">"
+        "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:00:00Z\">"
+            "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+            "<max>30</max>"
+            "</set>"
+        "</retrieve>"
+        "</iq>");
+
+    QXmppArchiveRetrieveIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.type(), QXmppIq::Get);
+    QCOMPARE(iq.id(), QLatin1String("retrieve_1"));
+    QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
+    QCOMPARE(iq.max(), 30);
+    serializePacket(iq, xml);
+}
+
 void TestPackets::testBindNoResource()
 {
     const QByteArray xml(
