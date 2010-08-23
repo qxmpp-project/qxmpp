@@ -310,7 +310,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether bind is available
         if (features.isBindAvailable())
         {
-            QXmppBindIq bind(QXmppIq::Set);
+            QXmppBindIq bind;
+            bind.setType(QXmppIq::Set);
             bind.setResource(configuration().resource());
             d->bindId = bind.id();
             sendPacket(bind);
