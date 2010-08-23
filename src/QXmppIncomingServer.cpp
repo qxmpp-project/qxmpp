@@ -190,7 +190,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     if (response.type() == "valid")
     {
         info("Incoming stream is ready");
-        d->authenticated = true;
+        d->authenticated = dialback.from();
         emit connected();
     } else {
         disconnectFromHost();
