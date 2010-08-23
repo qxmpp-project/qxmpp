@@ -40,6 +40,13 @@ public:
     QString localStreamId;
 };
 
+/// Constructs a new incoming server stream.
+///
+/// \param socket The socket for the XMPP stream.
+/// \param domain The local domain.
+/// \param parent The parent QObject for the stream (optional).
+///
+
 QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent)
     : QXmppStream(parent),
     d(new QXmppIncomingServerPrivate)
@@ -50,9 +57,19 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
     d->domain = domain;
 }
 
+/// Destroys the current stream.
+
 QXmppIncomingServer::~QXmppIncomingServer()
 {
     delete d;
+}
+
+/// Returns the stream's identifier.
+///
+
+QString QXmppIncomingServer::localStreamId() const
+{
+    return d->localStreamId;
 }
 
 void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
@@ -133,11 +150,6 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
     }
 }
 
-QString QXmppIncomingServer::localStreamId() const
-{
-    return d->localStreamId;
-}
-
 /// Handles a dialback response received from the authority server.
 ///
 /// \param response
@@ -173,5 +185,4 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     stream->disconnectFromHost();
     stream->deleteLater();
 }
-
 
