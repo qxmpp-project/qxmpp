@@ -55,15 +55,24 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    // we want one argument : the domain to serve
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: xmppServer <domain>\n");
+        return EXIT_FAILURE;
+    }
+    const QString domain = QString::fromLocal8Bit(argv[1]);
+
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
     
     passwordChecker checker;
 
     QXmppServer server;
-    server.setDomain("example.com");
+    server.setDomain(domain);
     server.setLogger(&logger);
     server.setPasswordChecker(&checker);
     server.listenForClients();
+    server.listenForServers();
     return a.exec();
 }
