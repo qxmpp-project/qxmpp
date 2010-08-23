@@ -60,8 +60,8 @@ class QXmppVersionIq;
 
 class QXmppOutgoingClientPrivate;
 
-/// \brief The QXmppStream class represents an outgoing client-to-server
-/// stream.
+/// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
+/// to an XMPP server.
 ///
 
 class QXmppOutgoingClient : public QXmppStream
@@ -124,10 +124,12 @@ signals:
     void jingleIqReceived(const QXmppJingleIq&);
 
 protected:
+    /// \cond
     // Overridable methods
     virtual void handleStart();
     virtual void handleStanza(const QDomElement &element);
     virtual void handleStream(const QDomElement &element);
+    /// \endcond
 
 private slots:
     void socketError(QAbstractSocket::SocketError);

@@ -137,7 +137,9 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             Q_ASSERT(check);
             stream->setVerify(d->localStreamId, request.key());
             stream->connectToHost();
-        } else {
+        }
+        else if (request.command() == QXmppDialback::Verify)
+        {
             emit dialbackRequestReceived(request);
         }
 

@@ -30,7 +30,7 @@ class QXmppDialback;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;
 
-/// The QXmppOutgoingServer class represents an outgoing XMPP stream
+/// \brief The QXmppOutgoingServer class represents an outgoing XMPP stream
 /// to another XMPP server.
 ///
 
@@ -49,11 +49,14 @@ public:
     void setVerify(const QString &id, const QString &key);
 
 signals:
+    /// This signal is emitted when a dialback verify response is received.
     void dialbackResponseReceived(const QXmppDialback &response);
 
 protected:
+    /// \cond
     void handleStart();
     void handleStanza(const QDomElement &stanzaElement);
+    /// \endcond
 
 private:
     Q_DISABLE_COPY(QXmppOutgoingServer)

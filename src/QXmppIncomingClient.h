@@ -28,7 +28,7 @@
 
 class QXmppIncomingClientPrivate;
 
-/// Interface for password checkers.
+/// \brief Interface for password checkers.
 ///
 
 class QXmppPasswordChecker
@@ -41,7 +41,7 @@ public:
     virtual bool get(const QString &username, QString &password) = 0;
 };
 
-/// The QXmppIncomingClient class represents an incoming XMPP stream
+/// \brief The QXmppIncomingClient class represents an incoming XMPP stream
 /// from an XMPP client.
 ///
 
@@ -59,8 +59,10 @@ public:
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
 protected:
+    /// \cond
     void handleStream(const QDomElement &element);
     void handleStanza(const QDomElement &element);
+    /// \endcond
 
 private slots:
     void slotTimeout();

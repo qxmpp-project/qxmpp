@@ -30,7 +30,7 @@ class QXmppDialback;
 class QXmppIncomingServerPrivate;
 class QXmppOutgoingServer;
 
-/// The QXmppIncomingServer class represents an incoming XMPP stream
+/// \brief The QXmppIncomingServer class represents an incoming XMPP stream
 /// from an XMPP server.
 ///
 
@@ -45,11 +45,14 @@ public:
     QString localStreamId() const;
 
 signals:
+    /// This signal is emitted when a dialback verify request is received.
     void dialbackRequestReceived(const QXmppDialback &result);
 
 protected:
+    /// \cond
     void handleStanza(const QDomElement &stanzaElement);
     void handleStream(const QDomElement &streamElement);
+    /// \endcond
 
 private slots:
     void slotDialbackResponseReceived(const QXmppDialback &dialback);
