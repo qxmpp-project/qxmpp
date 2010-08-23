@@ -9,4 +9,5 @@ SUBDIRS = example_0_connected\
           example_4_callHandling\
           example_5_rpcInterface\
           example_6_rpcClient\
-          example_7_archiveHandling
+          example_7_archiveHandling\
+          example_8_server
