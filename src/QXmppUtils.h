@@ -44,6 +44,7 @@ class QStringList;
 QDateTime datetimeFromString(const QString &str);
 QString datetimeToString(const QDateTime &dt);
 
+QString jidToDomain(const QString& jid);
 QString jidToResource(const QString& jid);
 QString jidToBareJid(const QString& jid);
 

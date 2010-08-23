@@ -143,7 +143,10 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             emit dialbackRequestReceived(request);
         }
 
-    } else if (!d->authenticated.isEmpty() && stanza.attribute("from").split("@").last() == d->authenticated) {
+    }
+    else if (!d->authenticated.isEmpty() &&
+             jidToDomain(stanza.attribute("from")) == d->authenticated)
+    {
         // relay packets if the remote party is authenticated
         bool handled = false;
         emit elementReceived(stanza, handled);

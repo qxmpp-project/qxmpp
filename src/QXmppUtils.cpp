@@ -146,6 +146,11 @@ QString datetimeToString(const QDateTime &dt)
         return utc.toString("yyyy-MM-ddThh:mm:ssZ");
 }
 
+QString jidToDomain(const QString &jid)
+{
+    return jidToBareJid(jid).split("@").last();
+}
+
 QString jidToResource(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));

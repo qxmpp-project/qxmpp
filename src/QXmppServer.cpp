@@ -33,11 +33,6 @@
 #include "QXmppServer.h"
 #include "QXmppUtils.h"
 
-static QString jidToDomain(const QString &to)
-{
-    return jidToBareJid(to).split("@").last();
-}
-
 class QXmppServerPrivate
 {
 public:
