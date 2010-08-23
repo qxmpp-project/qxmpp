@@ -61,10 +61,10 @@ void QXmppArchiveMessage::setReceived(bool isReceived)
 
 void QXmppArchiveChat::parse(const QDomElement &element)
 {
+    m_with = element.attribute("with");
     m_start = datetimeFromString(element.attribute("start"));
     m_subject = element.attribute("subject");
     m_version = element.attribute("version").toInt();
-    m_with = element.attribute("with");
 
     QDomElement child = element.firstChildElement();
     while (!child.isNull())
@@ -79,6 +79,25 @@ void QXmppArchiveChat::parse(const QDomElement &element)
         }
         child = child.nextSiblingElement();
     }
+}
+
+void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("chat");
+    helperToXmlAddAttribute(writer, "xmlns", ns_archive);
+    helperToXmlAddAttribute(writer, "with", m_with);
+    if (m_start.isValid())
+        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+    helperToXmlAddAttribute(writer, "subject", m_subject);
+    helperToXmlAddAttribute(writer, "version", QString::number(m_version));
+    foreach (const QXmppArchiveMessage &message, m_messages)
+    {
+        writer->writeStartElement(message.isReceived() ? "from" : "to");
+        helperToXmlAddAttribute(writer, "secs", QString::number(m_start.secsTo(message.date())));
+        writer->writeTextElement("body", message.body());
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
 }
 
 QList<QXmppArchiveMessage> QXmppArchiveChat::messages() const
@@ -125,8 +144,7 @@ void QXmppArchiveChatIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    // TODO : implement serialization
-    Q_UNUSED(writer);
+    m_chat.toXml(writer);
 }
 
 QXmppArchiveListIq::QXmppArchiveListIq()

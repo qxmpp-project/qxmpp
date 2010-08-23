@@ -59,6 +59,7 @@ public:
     QString with() const;
 
     void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
 
 private:
     QList<QXmppArchiveMessage> m_messages;
