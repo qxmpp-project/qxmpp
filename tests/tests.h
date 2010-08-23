@@ -38,6 +38,7 @@ class TestPackets : public QObject
     Q_OBJECT
 
 private slots:
+    void testArchiveList();
     void testBindNoResource();
     void testBindResource();
     void testBindResult();

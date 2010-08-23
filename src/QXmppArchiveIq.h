@@ -77,10 +77,15 @@ private:
 class QXmppArchiveChatIq : public QXmppIq
 {
 public:
-    static bool isArchiveChatIq(const QDomElement &element);
-    void parse(const QDomElement &element);
-
     QXmppArchiveChat chat() const;
+
+    static bool isArchiveChatIq(const QDomElement &element);
+
+protected:
+    /// \cond
+    void parseElementFromChild(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QXmppArchiveChat m_chat;
@@ -110,8 +115,12 @@ public:
     void setEnd(const QDateTime &end );
 
     static bool isArchiveListIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    /// \cond
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     int m_max;
@@ -139,7 +148,13 @@ public:
     QString with() const;
     void setWith( const QString &with );
 
+    static bool isArchiveRetrieveIq(const QDomElement &element);
+
+protected:
+    /// \cond
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     int m_max;
@@ -155,8 +170,12 @@ class QXmppArchivePrefIq : public QXmppIq
 {
 public:
     static bool isArchivePrefIq(const QDomElement &element);
-    void parse(const QDomElement &element);
+
+protected:
+    /// \cond
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 };
 
 #endif // QXMPPARCHIVEIQ_H

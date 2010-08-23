@@ -28,6 +28,7 @@
 #include <QVariant>
 #include <QtTest/QtTest>
 
+#include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
@@ -99,6 +100,29 @@ static void serializePacket(T &packet, const QByteArray &xml)
     qDebug() << "expect " << xml;
     qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
+}
+
+void TestPackets::testArchiveList()
+{
+    const QByteArray xml(
+        "<iq id=\"list_1\" type=\"get\">"
+        "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\">"
+            "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+            "<max>30</max>"
+            "</set>"
+        "</list>"
+        "</iq>");
+
+    QXmppArchiveListIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.type(), QXmppIq::Get);
+    QCOMPARE(iq.id(), QLatin1String("list_1"));
+    QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
+    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
+    QCOMPARE(iq.max(), 30);
+    serializePacket(iq, xml);
 }
 
 void TestPackets::testBindNoResource()

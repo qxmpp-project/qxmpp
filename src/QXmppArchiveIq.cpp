@@ -21,13 +21,13 @@
  *
  */
 
+#include <QDomElement>
+
 #include "QXmppArchiveIq.h"
 #include "QXmppUtils.h"
 
-#include <QDebug>
-#include <QDomElement>
-
 static const char *ns_archive = "urn:xmpp:archive";
+static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
 QString QXmppArchiveMessage::body() const
 {
@@ -118,11 +118,15 @@ bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
     //return (chatElement.namespaceURI() == ns_archive);
 }
 
-void QXmppArchiveChatIq::parse(const QDomElement &element)
+void QXmppArchiveChatIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
     m_chat.parse(element.firstChildElement("chat"));
+}
+
+void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    // TODO : implement serialization
+    Q_UNUSED(writer);
 }
 
 QXmppArchiveListIq::QXmppArchiveListIq()
@@ -181,12 +185,18 @@ bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
     return (listElement.namespaceURI() == ns_archive);
 }
 
-void QXmppArchiveListIq::parse(const QDomElement &element)
+void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
     QDomElement listElement = element.firstChildElement("list");
-    m_with = element.attribute("with");
+    m_with = listElement.attribute("with");
+    m_start = datetimeFromString(listElement.attribute("start"));
+    m_end = datetimeFromString(listElement.attribute("end"));
+
+    QDomElement setElement = listElement.firstChildElement("set");
+    if (setElement.namespaceURI() == ns_rsm)
+    {
+        m_max = setElement.firstChildElement("max").text().toInt();
+    }
 
     QDomElement child = listElement.firstChildElement();
     while (!child.isNull())
@@ -210,13 +220,12 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (m_start.isValid())
         helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
     if (m_end.isValid())
-        helperToXmlAddAttribute(writer, "end", datetimeToString(m_start));
+        helperToXmlAddAttribute(writer, "end", datetimeToString(m_end));
     if (m_max > 0)
     {
         writer->writeStartElement("set");
-        helperToXmlAddAttribute(writer, "xmlns", "http://jabber.org/protocol/rsm");
-        if (m_max > 0)
-            helperToXmlAddTextElement(writer, "max", QString::number(m_max));
+        helperToXmlAddAttribute(writer, "xmlns", ns_rsm);
+        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
     }
     writer->writeEndElement();
@@ -228,12 +237,10 @@ bool QXmppArchivePrefIq::isArchivePrefIq(const QDomElement &element)
     return (prefElement.namespaceURI() == ns_archive);
 }
 
-void QXmppArchivePrefIq::parse(const QDomElement &element)
+void QXmppArchivePrefIq::parseElementFromChild(const QDomElement &element)
 {
-    QXmppStanza::parse(element);
-
     QDomElement queryElement = element.firstChildElement("pref");
-    //setId( element.attribute("id"));
+    Q_UNUSED(queryElement);
 }
 
 void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -278,6 +285,13 @@ void QXmppArchiveRetrieveIq::setWith(const QString &with)
     m_with = with;
 }
 
+void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
+{
+    // TODO : implement parsing
+    QDomElement retrieveElement = element.firstChildElement("retrieve");
+    Q_UNUSED(retrieveElement);
+}
+
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("retrieve");
@@ -287,7 +301,7 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     if (m_max > 0)
     {
         writer->writeStartElement("set");
-        helperToXmlAddAttribute(writer, "xmlns", "http://jabber.org/protocol/rsm");
+        helperToXmlAddAttribute(writer, "xmlns", ns_rsm);
         if (m_max > 0)
             helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
