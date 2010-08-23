@@ -35,7 +35,7 @@
 class QXmppIncomingServerPrivate
 {
 public:
-    bool authenticated;
+    QString authenticated;
     QString domain;
     QString localStreamId;
 };
@@ -53,7 +53,6 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
 {
     setObjectName("S2S-in");
     setSocket(socket);
-    d->authenticated = false;
     d->domain = domain;
 }
 
@@ -125,7 +124,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 
         if (request.command() == QXmppDialback::Result)
         {
-            // etablish dialback connection
+            // establish dialback connection
             QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
             stream->setLogger(logger());
             stream->setObjectName("S2S-dialback-" + domain);
@@ -144,7 +143,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             emit dialbackRequestReceived(request);
         }
 
-    } else if (d->authenticated) {
+    } else if (!d->authenticated.isEmpty() && stanza.attribute("from").split("@").last() == d->authenticated) {
         // relay packets if the remote party is authenticated
         bool handled = false;
         emit elementReceived(stanza, handled);
@@ -159,7 +158,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 
 bool QXmppIncomingServer::isConnected() const
 {
-    return QXmppStream::isConnected() && d->authenticated;
+    return QXmppStream::isConnected() && !d->authenticated.isEmpty();
 }
 
 /// Handles a dialback response received from the authority server.
@@ -172,7 +171,8 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     QXmppOutgoingServer *stream = qobject_cast<QXmppOutgoingServer*>(sender());
     if (!stream ||
         dialback.command() != QXmppDialback::Verify ||
-        dialback.id() != d->localStreamId)
+        dialback.id() != d->localStreamId ||
+        dialback.from() != stream->configuration().domain())
         return;
 
     // relay verify response
