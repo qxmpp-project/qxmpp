@@ -80,7 +80,7 @@ private slots:
 protected:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
     // overridable methods
-    virtual void handleStanza(QXmppStream *stream, const QDomElement &element) = 0;
+    virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
     virtual void updateStatistics();
 
 private:

@@ -26,6 +26,7 @@
 #include <QSslSocket>
 
 #include "QXmppDialback.h"
+#include "QXmppIq.h"
 #include "QXmppIncomingClient.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
@@ -274,6 +275,53 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
     return found;
 }
 
+/// Handles an incoming XML element.
+///
+/// \param stream
+/// \param element
+
+void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    const QString to = element.attribute("to");
+    if (!to.isEmpty() && to != d->domain)
+    {
+        // presence handling
+        if (element.tagName() == "presence")
+        {
+            QXmppPresence presence;
+            presence.parse(element);
+
+            const QString from = presence.from();
+            QSet<QString> subscribers = d->subscribers.value(from);
+            if (presence.type() == QXmppPresence::Available)
+            {
+                //qDebug() << to << "is subscribed to" << stream->jid();
+                subscribers.insert(to);
+                d->subscribers[from] = subscribers;
+            } else if (presence.type() == QXmppPresence::Unavailable) {
+                //qDebug() << to << "is unsubscribed from" << stream->jid();
+                subscribers.remove(to);
+                d->subscribers[from] = subscribers;
+            }
+        }
+
+        // route element or reply on behalf of missing peer
+        if (!sendElement(element) && element.tagName() == "iq")
+        {
+            QXmppIq request;
+            request.parse(element);
+
+            QXmppIq response(QXmppIq::Error);
+            QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ServiceUnavailable);
+            response.setError(error);
+            response.setId(request.id());
+            response.setFrom(request.to());
+            response.setTo(request.from());
+            stream->sendPacket(response);
+        }
+    }
+}
+
 /// Route an XMPP stanza.
 ///
 /// \param element
@@ -411,12 +459,12 @@ void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
 
 /// Handle an incoming XML element.
 
-void QXmppServer::slotElementReceived(const QDomElement &origElement, bool &handled)
+void QXmppServer::slotElementReceived(const QDomElement &element, bool &handled)
 {
     QXmppStream *incoming = qobject_cast<QXmppStream *>(sender());
     if (!incoming)
         return;
-    handleStanza(incoming, origElement);
+    handleStanza(incoming, element);
 }
 
 /// Handle a new incoming TCP connection from a server.
