@@ -138,7 +138,7 @@ void QXmppServer::setPasswordChecker(QXmppPasswordChecker *checker)
 
 /// Sets the path for additional SSL CA certificates.
 ///
-/// \param path
+/// \param path
 
 void QXmppServer::addCaCertificates(const QString &path)
 {
@@ -150,7 +150,7 @@ void QXmppServer::addCaCertificates(const QString &path)
 
 /// Sets the path for the local SSL certificate.
 ///
-/// \param path
+/// \param path
 
 void QXmppServer::setLocalCertificate(const QString &path)
 {
@@ -162,7 +162,7 @@ void QXmppServer::setLocalCertificate(const QString &path)
 
 /// Sets the path for the local SSL private key.
 ///
-/// \param path
+/// \param path
 
 void QXmppServer::setPrivateKey(const QString &path)
 {
