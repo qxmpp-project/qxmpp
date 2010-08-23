@@ -35,9 +35,9 @@ class QXmppOutgoingServerPrivate
 {
 public:
     QString domain;
-    QString incomingId;
-    QString incomingKey;
     QString localStreamKey;
+    QString verifyId;
+    QString verifyKey;
     bool ready;
 };
 
@@ -98,15 +98,15 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             dialback.setKey(d->localStreamKey);
             sendPacket(dialback);
         }
-        else if (!d->incomingId.isEmpty() && !d->incomingKey.isEmpty())
+        else if (!d->verifyId.isEmpty() && !d->verifyKey.isEmpty())
         {
             // send dialback verify
             QXmppDialback verify;
             verify.setCommand(QXmppDialback::Verify);
-            verify.setId(d->incomingId);
+            verify.setId(d->verifyId);
             verify.setTo(configuration().domain());
             verify.setFrom(d->domain);
-            verify.setKey(d->incomingKey);
+            verify.setKey(d->verifyKey);
             sendPacket(verify);
         }
     }
@@ -154,6 +154,9 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     }
 }
 
+/// Returns true if the remote server has been authenticated.
+///
+
 bool QXmppOutgoingServer::isConnected() const
 {
     return d->ready;
@@ -171,7 +174,7 @@ void QXmppOutgoingServer::setLocalStreamKey(const QString &key)
 
 void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 {
-    d->incomingId = id;
-    d->incomingKey = key;
+    d->verifyId = id;
+    d->verifyKey = key;
 }
 
