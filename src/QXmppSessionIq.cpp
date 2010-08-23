@@ -25,26 +25,17 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-#include "QXmppSession.h"
+#include "QXmppSessionIq.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
-QXmppSession::QXmppSession()
-{
-}
-
-QXmppSession::QXmppSession(QXmppIq::Type type)
-    : QXmppIq(type)
-{
-}
-
-bool QXmppSession::isSession(const QDomElement &element)
+bool QXmppSessionIq::isSessionIq(const QDomElement &element)
 {
     QDomElement sessionElement = element.firstChildElement("session");
     return (sessionElement.namespaceURI() == ns_session);
 }
 
-void QXmppSession::toXmlElementFromChild(QXmlStreamWriter *writer) const
+void QXmppSessionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("session");;
     writer->writeAttribute("xmlns", ns_session);

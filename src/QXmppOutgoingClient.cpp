@@ -47,7 +47,7 @@
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
-#include "QXmppSession.h"
+#include "QXmppSessionIq.h"
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppVCard.h"
 #include "QXmppVersionIq.h"
@@ -389,12 +389,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             if(id == d->sessionId)
             {
-                QXmppSession session;
+                QXmppSessionIq session;
                 session.parse(nodeRecv);
-
-                // get back add configuration whether to send
-                // roster and intial presence in beginning
-                // process SessionIq
 
                 // xmpp connection made
                 d->sessionStarted = true;
@@ -424,7 +420,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     // start session if it is available
                     if (d->sessionAvailable)
                     {
-                        QXmppSession session(QXmppIq::Set);
+                        QXmppSessionIq session;
+                        session.setType(QXmppIq::Set);
                         session.setTo(configuration().domain());
                         d->sessionId = session.id();
                         sendPacket(session);

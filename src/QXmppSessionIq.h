@@ -23,21 +23,23 @@
  */
 
 
-#ifndef QXMPPSESSION_H
-#define QXMPPSESSION_H
+#ifndef QXMPPSESSIONIQ_H
+#define QXMPPSESSIONIQ_H
 
 #include "QXmppIq.h"
 
-class QXmppSession : public QXmppIq
+/// \brief The QXmppSessionIq class represents an IQ used for session
+/// establishment as defined by RFC 5921.
+
+class QXmppSessionIq : public QXmppIq
 {
 public:
-    QXmppSession();
-    QXmppSession(QXmppIq::Type type);
-
-    static bool isSession(const QDomElement &element);
+    static bool isSessionIq(const QDomElement &element);
 
 private:
+    /// \cond
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
 };
 
 #endif // QXMPPSESSION_H

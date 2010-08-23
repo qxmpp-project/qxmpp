@@ -29,7 +29,7 @@
 #include "QXmppBind.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
-#include "QXmppSession.h"
+#include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
