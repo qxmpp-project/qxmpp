@@ -78,12 +78,13 @@ private slots:
     void slotServerConnection(QSslSocket *socket);
 
 protected:
-    QXmppOutgoingServer *connectToDomain(const QString &domain);
     // overridable methods
     virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
+    virtual QStringList subscribers(const QString &jid);
     virtual void updateStatistics();
 
 private:
+    QXmppOutgoingServer *connectToDomain(const QString &domain);
     QList<QXmppStream*> getStreams(const QString &to);
     QXmppServerPrivate * const d;
 };

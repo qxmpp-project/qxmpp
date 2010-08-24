@@ -39,7 +39,7 @@ public:
     QXmppServerPrivate();
 
     QString domain;
-    QMap<QString, QSet<QString> > subscribers;
+    QMap<QString, QStringList> subscribers;
     QXmppLogger *logger;
     QXmppPasswordChecker *passwordChecker;
 
@@ -278,29 +278,44 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
 void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
     const QString to = element.attribute("to");
-    if (!to.isEmpty() && to != d->domain)
+
+    // presence handling
+    if (element.tagName() == "presence")
     {
-        // presence handling
-        if (element.tagName() == "presence")
+        if (to.isEmpty() || to == d->domain)
         {
+            // presence to the local domain, broadcast it to subscribers
+            if (element.attribute("type").isEmpty() || element.attribute("type") == "unavailable")
+            {
+                const QString from = element.attribute("from");
+                foreach (QString subscriber, subscribers(from))
+                {
+                    QDomElement changed(element);
+                    changed.setAttribute("to", subscriber);
+                    sendElement(changed);
+
+                }
+            }
+        } else {
             QXmppPresence presence;
             presence.parse(element);
 
             const QString from = presence.from();
-            QSet<QString> subscribers = d->subscribers.value(from);
+            QStringList subscribers = d->subscribers.value(from);
             if (presence.type() == QXmppPresence::Available)
             {
-                //qDebug() << to << "is subscribed to" << stream->jid();
-                subscribers.insert(to);
+                subscribers.append(to);
                 d->subscribers[from] = subscribers;
             } else if (presence.type() == QXmppPresence::Unavailable) {
-                //qDebug() << to << "is unsubscribed from" << stream->jid();
-                subscribers.remove(to);
+                subscribers.removeAll(to);
                 d->subscribers[from] = subscribers;
             }
         }
+    }
 
-        // route element or reply on behalf of missing peer
+    // route element or reply on behalf of missing peer
+    if (!to.isEmpty() && to != d->domain)
+    {
         if (!sendElement(element) && element.tagName() == "iq")
         {
             QXmppIq request;
@@ -315,6 +330,11 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
             stream->sendPacket(response);
         }
     }
+}
+
+QStringList QXmppServer::subscribers(const QString &jid)
+{
+    return d->subscribers.value(jid);
 }
 
 /// Route an XMPP stanza.
