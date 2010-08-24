@@ -123,17 +123,17 @@ void QXmppStream::setLogger(QXmppLogger *logger)
 
 void QXmppStream::debug(const QString &data)
 {
-    emit logMessage(QXmppLogger::DebugMessage, data);
+    emit logMessage(QXmppLogger::DebugMessage, objectName() + " " + data);
 }
 
 void QXmppStream::info(const QString &data)
 {
-    emit logMessage(QXmppLogger::InformationMessage, data);
+    emit logMessage(QXmppLogger::InformationMessage, objectName() + " " + data);
 }
 
 void QXmppStream::warning(const QString &data)
 {
-    emit logMessage(QXmppLogger::WarningMessage, data);
+    emit logMessage(QXmppLogger::WarningMessage, objectName() + " " + data);
 }
 
 /// Returns true if the stream is connected.
@@ -151,7 +151,7 @@ bool QXmppStream::isConnected() const
 
 bool QXmppStream::sendData(const QByteArray &data)
 {
-    emit logMessage(QXmppLogger::SentMessage, QString::fromUtf8(data));
+    emit logMessage(QXmppLogger::SentMessage, objectName() + " " + QString::fromUtf8(data));
     if (!d->socket || d->socket->state() != QAbstractSocket::ConnectedState)
         return false;
     return d->socket->write(data) == data.size();
@@ -283,7 +283,7 @@ void QXmppStream::socketReadyRead()
         return;
 
     // remove data from buffer
-    emit logMessage(QXmppLogger::ReceivedMessage, strData);
+    emit logMessage(QXmppLogger::ReceivedMessage, objectName() + " " + strData);
     d->dataBuffer.clear();
 
     // process stream start
