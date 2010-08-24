@@ -322,6 +322,9 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
                     response.setId(request.id());
                     response.setFrom(domain());
                     response.setTo(request.from());
+                    QXmppStanza::Error error(QXmppStanza::Error::Cancel,
+                        QXmppStanza::Error::FeatureNotImplemented);
+                    response.setError(error);
                     stream->sendPacket(response);
                 }
             }
@@ -354,11 +357,12 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
             request.parse(element);
 
             QXmppIq response(QXmppIq::Error);
-            QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ServiceUnavailable);
-            response.setError(error);
             response.setId(request.id());
             response.setFrom(request.to());
             response.setTo(request.from());
+            QXmppStanza::Error error(QXmppStanza::Error::Cancel,
+                QXmppStanza::Error::ServiceUnavailable);
+            response.setError(error);
             stream->sendPacket(response);
         }
     }
