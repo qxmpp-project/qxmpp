@@ -30,6 +30,7 @@
 #include "QXmppIncomingClient.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
+#include "QXmppPingIq.h"
 #include "QXmppServer.h"
 #include "QXmppUtils.h"
 
@@ -279,10 +280,9 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
     const QString to = element.attribute("to");
 
-    // presence handling
-    if (element.tagName() == "presence")
+    if (to == d->domain)
     {
-        if (to.isEmpty() || to == d->domain)
+        if (element.tagName() == "presence")
         {
             // presence to the local domain, broadcast it to subscribers
             if (element.attribute("type").isEmpty() || element.attribute("type") == "unavailable")
@@ -293,10 +293,45 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
                     QDomElement changed(element);
                     changed.setAttribute("to", subscriber);
                     sendElement(changed);
-
                 }
             }
-        } else {
+        }
+        else if (element.tagName() == "iq")
+        {
+            // XEP-0199: XMPP Ping
+            if (QXmppPingIq::isPingIq(element))
+            {
+                QXmppPingIq request;
+                request.parse(element);
+
+                QXmppIq response(QXmppIq::Result);
+                response.setId(element.attribute("id"));
+                response.setFrom(d->domain);
+                response.setTo(request.from());
+                stream->sendPacket(response);
+            }
+            // Other IQs
+            else
+            {
+                QXmppIq request;
+                request.parse(element);
+
+                if (request.type() != QXmppIq::Error && request.type() != QXmppIq::Result)
+                {
+                    QXmppIq response(QXmppIq::Error);
+                    response.setId(request.id());
+                    response.setFrom(domain());
+                    response.setTo(request.from());
+                    stream->sendPacket(response);
+                }
+            }
+        }
+
+    } else {
+
+        if (element.tagName() == "presence")
+        {
+            // directed presence, update subscribers
             QXmppPresence presence;
             presence.parse(element);
 
@@ -311,11 +346,8 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
                 d->subscribers[from] = subscribers;
             }
         }
-    }
 
-    // route element or reply on behalf of missing peer
-    if (!to.isEmpty() && to != d->domain)
-    {
+        // route element or reply on behalf of missing peer
         if (!sendElement(element) && element.tagName() == "iq")
         {
             QXmppIq request;
@@ -427,7 +459,7 @@ void QXmppServer::slotClientDisconnected()
         return;
 
     // notify subscribed peers of disconnection
-    if (stream->isConnected())
+    if (!stream->jid().isEmpty())
     {
         foreach (QString subscriber, d->subscribers.value(stream->jid()))
         {
