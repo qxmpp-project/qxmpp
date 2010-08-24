@@ -285,6 +285,9 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 QDomElement nodeFull(nodeRecv);
                 nodeFull.setAttribute("from", jid());
+                // if the recipient is empty, set it to the local domain
+                if (nodeFull.attribute("to").isEmpty())
+                    nodeFull.setAttribute("to", d->domain);
                 bool handled = false;
                 emit elementReceived(nodeFull, handled);
             }
@@ -293,6 +296,9 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         {
             QDomElement nodeFull(nodeRecv);
             nodeFull.setAttribute("from", jid());
+            // if the recipient is empty, set it to the local domain
+            if (nodeFull.attribute("to").isEmpty())
+                nodeFull.setAttribute("to", d->domain);
             bool handled = false;
             emit elementReceived(nodeFull, handled);
         }
