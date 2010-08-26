@@ -25,14 +25,14 @@
 #define QXMPPCLIENT_H
 
 #include <QObject>
-#include <QTcpSocket>
-#include <QHash>
+#include <QAbstractSocket>
 #include <QVariant>
 
 #include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
 
+class QXmppClientExtension;
 class QXmppClientPrivate;
 class QXmppPresence;
 class QXmppMessage;
@@ -42,6 +42,7 @@ class QXmppInvokable;
 class QXmppRpcInvokeIq;
 class QXmppRemoteMethod;
 struct QXmppRemoteMethodResult;
+class QXmppStream;
 
 // managers
 class QXmppArchiveManager;
@@ -91,6 +92,9 @@ public:
 
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
+
+    void addExtension(QXmppClientExtension *extension);
+
     void connectToServer(const QString& host,
                          const QString& user,
                          const QString& passwd,
@@ -200,18 +204,6 @@ signals:
     /// know the error.
     void error(QXmppClient::Error);
 
-    /// This signal is emitted when a raw XML element is received. You can
-    /// connect to this signal if you want to handle raw XML elements yourself.
-    ///
-    /// WARNING: this signal is experimental and you can seriously disrupt
-    /// packet handling when using it, so use with care and at your own risk.
-    /// 
-    /// Set 'handled' to true if you handled the element yourself and you wish
-    /// to bypass normal handling for the element. If you do this, QXmpp will
-    /// do absolutely no processing itself, so do not expect the usual signals
-    /// to be emitted.
-    void elementReceived(const QDomElement &element, bool &handled);
-
     /// Notifies that an XMPP message stanza is received. The QXmppMessage
     /// parameter contains the details of the message sent to this client.
     /// In other words whenever someone sends you a message this signal is
@@ -241,11 +233,22 @@ public slots:
     void sendMessage(const QString& bareJid, const QString& message);
 
 private slots:
+    void slotElementReceived(const QDomElement &element, bool &handled);
     void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
     void xmppConnected();
 
 private:
     QXmppClientPrivate * const d;
+};
+
+/// \brief The QXmppClientExtension is the base class for QXmppClient
+/// extensions.
+///
+
+class QXmppClientExtension
+{
+public:
+    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
 };
 
 #endif // QXMPPCLIENT_H

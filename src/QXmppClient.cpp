@@ -44,6 +44,7 @@ class QXmppClientPrivate
 public:
     QXmppClientPrivate();
 
+    QList<QXmppClientExtension*> extensions;
     QXmppOutgoingClient* stream;  ///< Pointer to QXmppOutgoingClient object a wrapper over
                           ///< TCP socket and XMPP protocol
     QXmppPresence clientPresence; ///< Stores the current presence of the connected client
@@ -115,7 +116,7 @@ QXmppClient::QXmppClient(QObject *parent)
     d->clientPresence.setExtensions(d->stream->presenceExtensions());
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
-                         this, SIGNAL(elementReceived(const QDomElement&, bool&)));
+                         this, SLOT(slotElementReceived(const QDomElement&, bool&)));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(messageReceived(const QXmppMessage&)),
@@ -177,7 +178,18 @@ QXmppClient::QXmppClient(QObject *parent)
 
 QXmppClient::~QXmppClient()
 {
+    foreach (QXmppClientExtension *extension, d->extensions)
+        delete d;
     delete d;
+}
+
+/// Registers a new extension with the client.
+///
+/// \param extension
+
+void QXmppClient::addExtension(QXmppClientExtension *extension)
+{
+    d->extensions << extension;
 }
 
 /// Returns a modifiable reference to the current configuration of QXmppClient.
@@ -462,6 +474,23 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 QXmppVCardManager& QXmppClient::vCardManager()
 {
     return *d->vCardManager;
+}
+
+/// Give extensions a chance to handle incoming stanzas.
+///
+/// \param element
+/// \param handled
+
+void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
+{
+    foreach (QXmppClientExtension *extension, d->extensions)
+    {
+        if (extension->handleStanza(d->stream, element))
+        {
+            handled = true;
+            return;
+        }
+    }
 }
 
 void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
