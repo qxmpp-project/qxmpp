@@ -60,6 +60,10 @@ public:
 
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
+signals:
+    /// This signal is emitted when an element is received.
+    void elementReceived(const QDomElement &element, bool &handled);
+
 protected:
     /// \cond
     void handleStream(const QDomElement &element);

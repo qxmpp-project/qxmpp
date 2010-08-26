@@ -49,6 +49,9 @@ signals:
     /// This signal is emitted when a dialback verify request is received.
     void dialbackRequestReceived(const QXmppDialback &result);
 
+    /// This signal is emitted when an element is received.
+    void elementReceived(const QDomElement &element, bool &handled);
+
 protected:
     /// \cond
     void handleStanza(const QDomElement &stanzaElement);

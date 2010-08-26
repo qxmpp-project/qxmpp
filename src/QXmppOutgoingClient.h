@@ -85,6 +85,8 @@ public:
 signals:
     void error(QXmppClient::Error);
 
+    /// This signal is emitted when an element is received.
+    void elementReceived(const QDomElement &element, bool &handled);
     void presenceReceived(const QXmppPresence&);
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);

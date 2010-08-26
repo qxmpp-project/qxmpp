@@ -62,9 +62,6 @@ signals:
     /// This signal is emitted when the stream is disconnected.
     void disconnected();
 
-    /// This signal is emitted when an element is received.
-    void elementReceived(const QDomElement &element, bool &handled);
-
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
