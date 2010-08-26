@@ -147,11 +147,6 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         }
 
     }
-    else
-    {
-        bool handled = false;
-        emit elementReceived(stanza, handled);
-    }
 }
 
 /// Returns true if the socket is connected and authentication succeeded.
