@@ -46,6 +46,7 @@ QString datetimeToString(const QDateTime &dt);
 
 QString jidToDomain(const QString& jid);
 QString jidToResource(const QString& jid);
+QString jidToUser(const QString& jid);
 QString jidToBareJid(const QString& jid);
 
 quint32 generateCrc32(const QByteArray &input);

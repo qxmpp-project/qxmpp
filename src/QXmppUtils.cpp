@@ -159,6 +159,14 @@ QString jidToResource(const QString& jid)
     return jid.mid(pos+1);
 }
 
+QString jidToUser(const QString &jid)
+{
+    const int pos = jid.indexOf(QChar('@'));
+    if (pos < 0)
+        return QString();
+    return jid.left(pos);
+}
+
 QString jidToBareJid(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
