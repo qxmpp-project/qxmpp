@@ -88,7 +88,7 @@ private:
     QXmppServerPrivate * const d;
 };
 
-/// \brief The QXmppServerExtension is the base class for QXmppServer
+/// \brief The QXmppServerExtension class is the base class for QXmppServer
 /// extensions.
 ///
 

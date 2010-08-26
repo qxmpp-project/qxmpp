@@ -241,7 +241,7 @@ private:
     QXmppClientPrivate * const d;
 };
 
-/// \brief The QXmppClientExtension is the base class for QXmppClient
+/// \brief The QXmppClientExtension class is the base class for QXmppClient
 /// extensions.
 ///
 

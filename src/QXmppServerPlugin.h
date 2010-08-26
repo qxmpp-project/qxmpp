@@ -29,7 +29,7 @@
 class QXmppServer;
 class QXmppServerExtension;
 
-/// Interface for all QXmppServer plugins.
+/// \breif Interface for all QXmppServer plugins.
 ///
 
 class QXmppServerPluginInterface
@@ -41,7 +41,7 @@ public:
 
 Q_DECLARE_INTERFACE(QXmppServerPluginInterface, "com.googlecode.qxmpp.ServerPlugin/1.0")
 
-/// The QXmppServerPlugin class is the base class for all QXmppServer plugins.
+/// \brief The QXmppServerPlugin class is the base class for QXmppServer plugins.
 ///
 
 class QXmppServerPlugin : public QObject, public QXmppServerPluginInterface
