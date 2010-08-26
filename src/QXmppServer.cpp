@@ -584,7 +584,7 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
 /// \param stream The QXmppStream on which the stanza was received.
 /// \param stanza The received stanza.
 
-bool handleStanza(QXmppStream *stream, const QDomElement &stanza)
+bool QXmppServerExtension::handleStanza(QXmppStream *stream, const QDomElement &stanza)
 {
     Q_UNUSED(stream);
     Q_UNUSED(stanza);
