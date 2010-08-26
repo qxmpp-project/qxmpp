@@ -508,8 +508,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 emit ibbOpenIqReceived(ibbOpenIq);
             }
             // XEP-0054: vcard-temp
-            else if(nodeRecv.firstChildElement("vCard").
-                    namespaceURI() == ns_vcard)
+            else if(QXmppVCard::isVCard(nodeRecv))
             {
                 QXmppVCard vcardIq;
                 vcardIq.parse(nodeRecv);

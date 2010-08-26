@@ -149,6 +149,11 @@ void QXmppVCard::setPhoto(const QImage& image)
 }
 #endif
 
+bool QXmppVCard::isVCard(const QDomElement &nodeRecv)
+{
+    return nodeRecv.firstChildElement("vCard").namespaceURI() == ns_vcard;
+}
+
 void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
 {
     // vCard

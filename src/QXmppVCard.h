@@ -66,6 +66,8 @@ public:
     QImage photoAsImage() const;
     const QByteArray& photo() const;
 
+    static bool isVCard(const QDomElement &element);
+
     // deprecated accessors, use the form without "get" instead
     /// \cond
     QString Q_DECL_DEPRECATED getFullName() const;
