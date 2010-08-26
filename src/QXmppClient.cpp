@@ -179,7 +179,7 @@ QXmppClient::QXmppClient(QObject *parent)
 QXmppClient::~QXmppClient()
 {
     foreach (QXmppClientExtension *extension, d->extensions)
-        delete d;
+        delete extension;
     delete d;
 }
 
