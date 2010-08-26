@@ -92,8 +92,10 @@ private:
 /// extensions.
 ///
 
-class QXmppServerExtension
+class QXmppServerExtension : public QObject
 {
+    Q_OBJECT
+
 public:
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);

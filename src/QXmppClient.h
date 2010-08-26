@@ -245,8 +245,10 @@ private:
 /// extensions.
 ///
 
-class QXmppClientExtension
+class QXmppClientExtension : public QObject
 {
+    Q_OBJECT
+
 public:
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
 };
