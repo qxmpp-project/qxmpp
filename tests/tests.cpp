@@ -80,6 +80,29 @@ void TestUtils::testHmac()
     QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
 }
 
+void TestUtils::testJid()
+{
+    QCOMPARE(jidToBareJid("foo@example.com/resource"), QLatin1String("foo@example.com"));
+    QCOMPARE(jidToBareJid("foo@example.com"), QLatin1String("foo@example.com"));
+    QCOMPARE(jidToBareJid("example.com"), QLatin1String("example.com"));
+    QCOMPARE(jidToBareJid(QString()), QString());
+
+    QCOMPARE(jidToDomain("foo@example.com/resource"), QLatin1String("example.com"));
+    QCOMPARE(jidToDomain("foo@example.com"), QLatin1String("example.com"));
+    QCOMPARE(jidToDomain("example.com"), QLatin1String("example.com"));
+    QCOMPARE(jidToDomain(QString()), QString());
+
+    QCOMPARE(jidToResource("foo@example.com/resource"), QLatin1String("resource"));
+    QCOMPARE(jidToResource("foo@example.com"), QString());
+    QCOMPARE(jidToResource("example.com"), QString());
+    QCOMPARE(jidToResource(QString()), QString());
+
+    QCOMPARE(jidToUser("foo@example.com/resource"), QLatin1String("foo"));
+    QCOMPARE(jidToUser("foo@example.com"), QLatin1String("foo"));
+    QCOMPARE(jidToUser("example.com"), QString());
+    QCOMPARE(jidToUser(QString()), QString());
+}
+
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
