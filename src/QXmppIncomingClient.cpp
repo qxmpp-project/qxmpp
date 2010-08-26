@@ -146,7 +146,7 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     {
         QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
         mechanisms << QXmppConfiguration::SASLPlain;
-        if (d->passwordChecker->hasPasswords())
+        if (d->passwordChecker->hasGetPassword())
             mechanisms << QXmppConfiguration::SASLDigestMD5;
         features.setAuthMechanisms(mechanisms);
     }
@@ -183,7 +183,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 const QString username = QString::fromUtf8(auth[1]);
                 const QString password = QString::fromUtf8(auth[2]);
-                if (d->passwordChecker && d->passwordChecker->checkCredentials(username, password))
+                if (d->passwordChecker && d->passwordChecker->checkPassword(username, password))
                 {
                     d->username = username;
                     sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
@@ -314,7 +314,7 @@ void QXmppIncomingClient::slotTimeout()
 
 /// Retrieves the password for the given username.
 ///
-/// Reimplement this method to support DIGEST-MD5 authentication.
+/// You need to reimplement this method to support DIGEST-MD5 authentication.
 ///
 /// \param username
 /// \param password
@@ -326,12 +326,10 @@ bool QXmppPasswordChecker::getPassword(const QString &username, QString &passwor
     return false;
 }
 
-/// Returns true if it is possible to retrieve passwords.
+/// Returns true if the getPassword() method is implemented.
 ///
-/// Reimplement this method and return true if you provided a
-/// getPassword() method.
 
-bool QXmppPasswordChecker::hasPasswords() const
+bool QXmppPasswordChecker::hasGetPassword() const
 {
     return false;
 }

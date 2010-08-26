@@ -38,9 +38,9 @@ public:
     ///
     /// \param username
     /// \param password
-    virtual bool checkCredentials(const QString &username, const QString &password) = 0;
+    virtual bool checkPassword(const QString &username, const QString &password) = 0;
     virtual bool getPassword(const QString &username, QString &password);
-    virtual bool hasPasswords() const;
+    virtual bool hasGetPassword() const;
 };
 
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
