@@ -312,3 +312,27 @@ void QXmppIncomingClient::slotTimeout()
     disconnectFromHost();
 }
 
+/// Retrieves the password for the given username.
+///
+/// Reimplement this method to support DIGEST-MD5 authentication.
+///
+/// \param username
+/// \param password
+
+bool QXmppPasswordChecker::getPassword(const QString &username, QString &password)
+{
+    Q_UNUSED(username);
+    Q_UNUSED(password);
+    return false;
+}
+
+/// Returns true if it is possible to retrieve passwords.
+///
+/// Reimplement this method and return true if you provided a
+/// getPassword() method.
+
+bool QXmppPasswordChecker::hasPasswords() const
+{
+    return false;
+}
+
