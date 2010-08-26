@@ -142,11 +142,12 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
         features.setBindAvailable(true);
         features.setSessionAvailable(true);
     }
-    else
+    else if (d->passwordChecker)
     {
         QList<QXmppConfiguration::SASLAuthMechanism> mechanisms;
         mechanisms << QXmppConfiguration::SASLPlain;
-        mechanisms << QXmppConfiguration::SASLDigestMD5;
+        if (d->passwordChecker->hasPasswords())
+            mechanisms << QXmppConfiguration::SASLDigestMD5;
         features.setAuthMechanisms(mechanisms);
     }
     sendPacket(features);
@@ -182,7 +183,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 const QString username = QString::fromUtf8(auth[1]);
                 const QString password = QString::fromUtf8(auth[2]);
-                if (d->passwordChecker && d->passwordChecker->check(username, password))
+                if (d->passwordChecker && d->passwordChecker->checkCredentials(username, password))
                 {
                     d->username = username;
                     sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
@@ -226,7 +227,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             // check credentials
             const QString username = QString::fromUtf8(response.value("username"));
             QString password;
-            if (!d->passwordChecker || !d->passwordChecker->get(username, password))
+            if (!d->passwordChecker || !d->passwordChecker->getPassword(username, password))
             {
                 sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
                 disconnectFromHost();

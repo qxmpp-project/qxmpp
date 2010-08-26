@@ -35,10 +35,24 @@ class QXmppPasswordChecker
 {
 public:
     /// Checks that the given credentials are valid.
-    virtual bool check(const QString &username, const QString &password) = 0;
+    virtual bool checkCredentials(const QString &username, const QString &password) = 0;
 
     /// Retrieves the password for the given username.
-    virtual bool get(const QString &username, QString &password) = 0;
+    ///
+    /// Reimplement this method to support DIGEST-MD5 authentication.
+    virtual bool getPassword(const QString &username, QString &password)
+    {
+        return false;
+    };
+
+    /// Returns true if it is possible to retrieve passwords.
+    ///
+    /// Reimplement this method and return true if you provided a
+    /// getPassword() method.
+    virtual bool hasPasswords() const
+    {
+        return false;
+    };
 };
 
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
