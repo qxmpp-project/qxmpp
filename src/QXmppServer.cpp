@@ -23,6 +23,7 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <QPluginLoader>
 #include <QSslSocket>
 
 #include "QXmppDialback.h"
@@ -32,6 +33,7 @@
 #include "QXmppOutgoingServer.h"
 #include "QXmppPingIq.h"
 #include "QXmppServer.h"
+#include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
 
 class QXmppServerPrivate
@@ -40,6 +42,7 @@ public:
     QXmppServerPrivate();
 
     QString domain;
+    QList<QXmppServerExtension*> extensions;
     QMap<QString, QStringList> subscribers;
     QXmppLogger *logger;
     QXmppPasswordChecker *passwordChecker;
@@ -76,6 +79,17 @@ QXmppServer::QXmppServer(QObject *parent)
     check = connect(d->serverForServers, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(slotServerConnection(QSslSocket*)));
     Q_ASSERT(check);
+
+    QObjectList plugins = QPluginLoader::staticInstances();
+    foreach (QObject *object, plugins)
+    {
+        QXmppServerPlugin *plugin = qobject_cast<QXmppServerPlugin*>(object);
+        if (plugin)
+        {
+            foreach (const QString &key, plugin->keys())
+                addExtension(plugin->create(key, this));
+        }
+    }
 }
 
 /// Destroys an XMPP server instance.
@@ -83,7 +97,18 @@ QXmppServer::QXmppServer(QObject *parent)
 
 QXmppServer::~QXmppServer()
 {
+    foreach (QXmppServerExtension *extension, d->extensions)
+        delete extension;
     delete d;
+}
+
+/// Registers a new extension with the server.
+///
+/// \param extension
+
+void QXmppServer::addExtension(QXmppServerExtension *extension)
+{
+    d->extensions << extension;
 }
 
 /// Returns the server's domain.
@@ -278,8 +303,13 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
 
 void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
-    const QString to = element.attribute("to");
+    // try extensions
+    foreach (QXmppServerExtension *extension, d->extensions)
+        if (extension->handleStanza(stream, element))
+            return;
 
+    // default handlers
+    const QString to = element.attribute("to");
     if (to == d->domain)
     {
         if (element.tagName() == "presence")
@@ -370,7 +400,13 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
 
 QStringList QXmppServer::subscribers(const QString &jid)
 {
-    return d->subscribers.value(jid);
+    QStringList recipients = d->subscribers.value(jid);
+
+    // try extensions
+    foreach (QXmppServerExtension *extension, d->extensions)
+        recipients += extension->presenceSubscribers(jid);
+
+    return recipients;
 }
 
 /// Route an XMPP stanza.
@@ -449,8 +485,7 @@ void QXmppServer::slotClientConnected()
         }
     }
 
-    // update statistics
-    updateStatistics();
+    // FIXME : update statistics
 }
 
 /// Handle a disconnection from a client.
@@ -477,8 +512,7 @@ void QXmppServer::slotClientDisconnected()
     d->incomingClients.removeAll(stream);
     stream->deleteLater();
 
-    // update statistics
-    updateStatistics();
+    // FIXME : update statistics
 }
 
 void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
@@ -512,6 +546,8 @@ void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
 
 void QXmppServer::slotElementReceived(const QDomElement &element, bool &handled)
 {
+    Q_UNUSED(handled);
+
     QXmppStream *incoming = qobject_cast<QXmppStream *>(sender());
     if (!incoming)
         return;
@@ -541,8 +577,28 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
     Q_ASSERT(check);
 }
 
-void QXmppServer::updateStatistics()
+/// Handles an incoming XMPP stanza.
+///
+/// Return true if no further processing should occur, false otherwise.
+///
+/// \param stream The QXmppStream on which the stanza was received.
+/// \param stanza The received stanza.
+
+bool handleStanza(QXmppStream *stream, const QDomElement &stanza)
 {
+    Q_UNUSED(stream);
+    Q_UNUSED(stanza);
+    return false;
+}
+
+/// Returns the list of subscribers for the given JID.
+///
+/// \param jid
+
+QStringList QXmppServerExtension::presenceSubscribers(const QString &jid)
+{
+    Q_UNUSED(jid);
+    return QStringList();
 }
 
 class QXmppSslServerPrivate

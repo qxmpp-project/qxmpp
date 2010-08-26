@@ -52,6 +52,7 @@ HEADERS += QXmppUtils.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
     QXmppServer.h \
+    QXmppServerPlugin.h \
     QXmppSessionIq.h \
     QXmppSocks.h \
     QXmppStanza.h \

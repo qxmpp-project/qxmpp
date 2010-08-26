@@ -33,6 +33,7 @@ class QXmppDialback;
 class QXmppLogger;
 class QXmppOutgoingServer;
 class QXmppPasswordChecker;
+class QXmppServerExtension;
 class QXmppServerPrivate;
 class QXmppSslServer;
 class QXmppStanza;
@@ -49,6 +50,8 @@ class QXmppServer : public QObject
 public:
     QXmppServer(QObject *parent = 0);
     ~QXmppServer();
+
+    void addExtension(QXmppServerExtension *extension);
 
     QString domain() const;
     void setDomain(const QString &domain);
@@ -77,16 +80,23 @@ private slots:
     void slotElementReceived(const QDomElement &element, bool &handled);
     void slotServerConnection(QSslSocket *socket);
 
-protected:
-    // overridable methods
-    virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
-    virtual QStringList subscribers(const QString &jid);
-    virtual void updateStatistics();
-
 private:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
     QList<QXmppStream*> getStreams(const QString &to);
+    virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
+    virtual QStringList subscribers(const QString &jid);
     QXmppServerPrivate * const d;
+};
+
+/// \brief The QXmppServerExtension is the base class for QXmppServer
+/// extensions.
+///
+
+class QXmppServerExtension
+{
+public:
+    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
+    virtual QStringList presenceSubscribers(const QString &jid);
 };
 
 class QXmppSslServerPrivate;
