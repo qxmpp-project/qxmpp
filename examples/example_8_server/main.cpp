@@ -33,13 +33,13 @@
 class passwordChecker : public QXmppPasswordChecker
 {
     /// Checks that the given credentials are valid.
-    bool check(const QString &username, const QString &password)
+    bool checkCredentials(const QString &username, const QString &password)
     {
         return (username == USERNAME && password == PASSWORD);
     };
 
     /// Retrieves the password for the given username.
-    bool get(const QString &username, QString &password)
+    bool getPassword(const QString &username, QString &password)
     {
         if (username == USERNAME)
         {
@@ -48,6 +48,12 @@ class passwordChecker : public QXmppPasswordChecker
         } else {
             return false;
         }
+    };
+
+    /// Returns true as we support retrieving a password.
+    bool hasPasswords() const
+    {
+        return true;
     };
 };
 
