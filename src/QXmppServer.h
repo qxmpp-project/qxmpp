@@ -77,7 +77,7 @@ private slots:
     void slotClientConnected();
     void slotClientDisconnected();
     void slotDialbackRequestReceived(const QXmppDialback &dialback);
-    void slotElementReceived(const QDomElement &element, bool &handled);
+    void slotElementReceived(const QDomElement &element);
     void slotServerConnection(QSslSocket *socket);
 
 private:

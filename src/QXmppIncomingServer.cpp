@@ -147,9 +147,8 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
     else if (!d->authenticated.isEmpty() &&
              jidToDomain(stanza.attribute("from")) == d->authenticated)
     {
-        // relay packets if the remote party is authenticated
-        bool handled = false;
-        emit elementReceived(stanza, handled);
+        // relay stanza if the remote party is authenticated
+        emit elementReceived(stanza);
     } else {
         warning("Received an element, but remote party is not authenticated");
     }

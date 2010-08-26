@@ -242,11 +242,6 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
     stream->configuration().setDomain(domain);
     stream->configuration().setHost(domain);
     stream->configuration().setPort(5269);
-    bool check = connect(stream, SIGNAL(elementReceived(QDomElement, bool&)),
-                         this, SLOT(slotElementReceived(QDomElement, bool&)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-
     d->outgoingServers.append(stream);
 
     // connect to remote server
@@ -459,8 +454,8 @@ void QXmppServer::slotClientConnection(QSslSocket *socket)
                     this, SLOT(slotClientDisconnected()));
     Q_ASSERT(check);
 
-    check = connect(stream, SIGNAL(elementReceived(QDomElement, bool&)),
-                    this, SLOT(slotElementReceived(QDomElement, bool&)));
+    check = connect(stream, SIGNAL(elementReceived(QDomElement)),
+                    this, SLOT(slotElementReceived(QDomElement)));
     Q_ASSERT(check);
 
     d->incomingClients.append(stream);
@@ -544,10 +539,8 @@ void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
 
 /// Handle an incoming XML element.
 
-void QXmppServer::slotElementReceived(const QDomElement &element, bool &handled)
+void QXmppServer::slotElementReceived(const QDomElement &element)
 {
-    Q_UNUSED(handled);
-
     QXmppStream *incoming = qobject_cast<QXmppStream *>(sender());
     if (!incoming)
         return;
@@ -572,8 +565,8 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
                     this, SLOT(slotDialbackRequestReceived(QXmppDialback)));
     Q_ASSERT(check);
 
-    check = connect(stream, SIGNAL(elementReceived(QDomElement, bool&)),
-                    this, SLOT(slotElementReceived(QDomElement, bool&)));
+    check = connect(stream, SIGNAL(elementReceived(QDomElement)),
+                    this, SLOT(slotElementReceived(QDomElement)));
     Q_ASSERT(check);
 }
 

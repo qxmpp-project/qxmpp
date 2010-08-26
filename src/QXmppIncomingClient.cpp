@@ -271,6 +271,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // bound
                 emit connected();
+                return;
             }
             else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == "set")
             {
@@ -281,27 +282,21 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 sessionResult.setType(QXmppIq::Result);
                 sessionResult.setId(sessionSet.id());
                 sendPacket(sessionResult);
-            }
-            else
-            {
-                QDomElement nodeFull(nodeRecv);
-                nodeFull.setAttribute("from", jid());
-                // if the recipient is empty, set it to the local domain
-                if (nodeFull.attribute("to").isEmpty())
-                    nodeFull.setAttribute("to", d->domain);
-                bool handled = false;
-                emit elementReceived(nodeFull, handled);
+                return;
             }
         }
-        else if (nodeRecv.tagName() == "message" || nodeRecv.tagName() == "presence")
+
+        // unhandled stanza, emit it
+        if (nodeRecv.tagName() == "iq" ||
+            nodeRecv.tagName() == "message" ||
+            nodeRecv.tagName() == "presence")
         {
             QDomElement nodeFull(nodeRecv);
             nodeFull.setAttribute("from", jid());
             // if the recipient is empty, set it to the local domain
             if (nodeFull.attribute("to").isEmpty())
                 nodeFull.setAttribute("to", d->domain);
-            bool handled = false;
-            emit elementReceived(nodeFull, handled);
+            emit elementReceived(nodeFull);
         }
     }
 }
