@@ -83,12 +83,11 @@ signals:
 
 private slots:
     void slotClientConnection(QSslSocket *socket);
-    void slotClientConnected();
-    void slotClientDisconnected();
     void slotDialbackRequestReceived(const QXmppDialback &dialback);
     void slotElementReceived(const QDomElement &element);
     void slotServerConnection(QSslSocket *socket);
-    void slotServerDisconnected();
+    void slotStreamConnected();
+    void slotStreamDisconnected();
 
 private:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
