@@ -41,7 +41,10 @@ class QXmppServerPrivate
 {
 public:
     QXmppServerPrivate();
-    void start(QXmppServer *server);
+    void loadExtensions(QXmppServer *server);
+    void startExtensions(QXmppServer *server);
+    void stopExtensions();
+
     void info(const QString &message);
     void warning(const QString &message);
 
@@ -60,12 +63,15 @@ public:
     QList<QXmppOutgoingServer*> outgoingServers;
     QXmppSslServer *serverForServers;
 
+private:
+    bool loaded;
     bool started;
 };
 
 QXmppServerPrivate::QXmppServerPrivate()
     : logger(0),
     passwordChecker(0),
+    loaded(false),
     started(false)
 {
 }
@@ -82,10 +88,36 @@ void QXmppServerPrivate::warning(const QString &message)
         logger->log(QXmppLogger::WarningMessage, message);
 }
 
+/// Load the server's extensions.
+///
+/// \param server
+
+void QXmppServerPrivate::loadExtensions(QXmppServer *server)
+{
+    if (!loaded)
+    {
+        QObjectList plugins = QPluginLoader::staticInstances();
+        foreach (QObject *object, plugins)
+        {
+            QXmppServerPlugin *plugin = qobject_cast<QXmppServerPlugin*>(object);
+            if (!plugin)
+                continue;
+
+            foreach (const QString &key, plugin->keys())
+            {
+                QXmppServerExtension *extension;
+                server->addExtension(plugin->create(key));
+            }
+        }
+        loaded = true;
+    }
+}
+
 /// Start the server's extensions.
 ///
+/// \param server
 
-void QXmppServerPrivate::start(QXmppServer *server)
+void QXmppServerPrivate::startExtensions(QXmppServer *server)
 {
     if (!started)
     {
@@ -93,6 +125,19 @@ void QXmppServerPrivate::start(QXmppServer *server)
             if (!extension->start(server))
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
         started = true;
+    }
+}
+
+/// Stop the server's extensions (in reverse order).
+///
+
+void QXmppServerPrivate::stopExtensions()
+{
+    if (started)
+    {
+        for (int i = extensions.size() - 1; i >= 0; --i)
+            extensions[i]->stop();
+        started = false;
     }
 }
 
@@ -113,18 +158,6 @@ QXmppServer::QXmppServer(QObject *parent)
     check = connect(d->serverForServers, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(slotServerConnection(QSslSocket*)));
     Q_ASSERT(check);
-
-    // load static plugins
-    QObjectList plugins = QPluginLoader::staticInstances();
-    foreach (QObject *object, plugins)
-    {
-        QXmppServerPlugin *plugin = qobject_cast<QXmppServerPlugin*>(object);
-        if (plugin)
-        {
-            foreach (const QString &key, plugin->keys())
-                addExtension(plugin->create(key));
-        }
-    }
 }
 
 /// Destroys an XMPP server instance.
@@ -142,8 +175,9 @@ QXmppServer::~QXmppServer()
 
 void QXmppServer::addExtension(QXmppServerExtension *extension)
 {
-    if (d->extensions.contains(extension))
+    if (!extension || d->extensions.contains(extension))
         return;
+    d->info(QString("Added extension %1").arg(extension->extensionName()));
     extension->setParent(this);
     d->extensions << extension;
 }
@@ -153,6 +187,7 @@ void QXmppServer::addExtension(QXmppServerExtension *extension)
 
 QList<QXmppServerExtension*> QXmppServer::loadedExtensions()
 {
+    d->loadExtensions(this);
     return d->extensions;
 }
 
@@ -257,7 +292,8 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     }
 
     // start extensions
-    d->start(this);
+    d->loadExtensions(this);
+    d->startExtensions(this);
     return true;
 }
 
@@ -270,13 +306,8 @@ void QXmppServer::close()
     d->serverForClients->close();
     d->serverForServers->close();
 
-    // stop extensions in reverse order
-    if (d->started)
-    {
-        for (int i = d->extensions.size() - 1; i >= 0; --i)
-            d->extensions[i]->stop();
-        d->started = false;
-    }
+    // stop extensions
+    d->stopExtensions();
 
     // close XMPP streams
     foreach (QXmppIncomingClient *stream, d->incomingClients)
@@ -301,7 +332,8 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     }
 
     // start extensions
-    d->start(this);
+    d->loadExtensions(this);
+    d->startExtensions(this);
     return true;
 }
 
