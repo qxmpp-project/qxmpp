@@ -55,12 +55,15 @@ public:
     /// This enum describes a type of log message.
     enum MessageType
     {
-        DebugMessage = 0,   ///< Debugging message
-        InformationMessage, ///< Informational message
-        WarningMessage,     ///< Warning message
-        ReceivedMessage,    ///< Message received from server
-        SentMessage,        ///< Message sent to server
+        NoMessage = 0,          ///< No message type
+        DebugMessage = 1,       ///< Debugging message
+        InformationMessage = 2, ///< Informational message
+        WarningMessage = 4,     ///< Warning message
+        ReceivedMessage = 8,    ///< Message received from server
+        SentMessage = 16,       ///< Message sent to server
+        AnyMessage = 31,        ///< Any message type
     };
+    Q_DECLARE_FLAGS(MessageTypes, MessageType)
 
     QXmppLogger(QObject *parent = 0);
     static QXmppLogger* getLogger();
@@ -70,6 +73,9 @@ public:
 
     QString logFilePath();
     void setLogFilePath(const QString &path);
+
+    QXmppLogger::MessageTypes messageTypes();
+    void setMessageTypes(QXmppLogger::MessageTypes types);
 
 public slots:
     void log(QXmppLogger::MessageType type, const QString& text);
@@ -82,6 +88,8 @@ private:
     static QXmppLogger* m_logger;
     QXmppLogger::LoggingType m_loggingType;
     QString m_logFilePath;
+    QXmppLogger::MessageTypes m_messageTypes;
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppLogger::MessageTypes)
 #endif // QXMPPLOGGER_H

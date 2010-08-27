@@ -24,9 +24,9 @@
 
 #include <iostream>
 
+#include <QDateTime>
 #include <QTextStream>
 #include <QFile>
-#include <QTime>
 
 #include "QXmppLogger.h"
 
@@ -51,13 +51,22 @@ static const char *typeName(QXmppLogger::MessageType type)
     }
 }
 
+static QString formatted(QXmppLogger::MessageType type, const QString& text)
+{
+    return QDateTime::currentDateTime().toString() + " " +
+        QString::fromLatin1(typeName(type)) + " " +
+        text;
+}
+
 /// Constructs a new QXmppLogger.
 ///
 /// \param parent
 
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent), m_loggingType(QXmppLogger::NoLogging),
-    m_logFilePath("QXmppClientLog.log")
+    : QObject(parent),
+    m_loggingType(QXmppLogger::NoLogging),
+    m_logFilePath("QXmppClientLog.log"),
+    m_messageTypes(QXmppLogger::AnyMessage)
 {
 }
 
@@ -67,10 +76,7 @@ QXmppLogger::QXmppLogger(QObject *parent)
 QXmppLogger* QXmppLogger::getLogger()
 {
     if(!m_logger)
-    {
         m_logger = new QXmppLogger();
-        m_logger->setLoggingType(FileLogging);
-    }
 
     return m_logger;
 }
@@ -92,6 +98,23 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
     m_loggingType = type;
 }
 
+/// Returns the types of messages to log.
+///
+
+QXmppLogger::MessageTypes QXmppLogger::messageTypes()
+{
+    return m_messageTypes;
+}
+
+/// Sets the types of messages to log.
+///
+/// \param types
+
+void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
+{
+    m_messageTypes = types;
+}
+
 /// Add a logging message.
 ///
 /// \param type
@@ -99,6 +122,10 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
 
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
 {
+    // filter messages
+    if (!m_messageTypes.testFlag(type))
+        return;
+
     switch(m_loggingType)
     {
     case QXmppLogger::FileLogging:
@@ -106,13 +133,11 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
             QFile file(m_logFilePath);
             file.open(QIODevice::Append);
             QTextStream stream(&file);
-            stream << QTime::currentTime().toString("hh:mm:ss.zzz") <<
-                " " << typeName(type) << " " <<
-                text << "\n\n";
+            stream << formatted(type, text) << "\n\n";
         }
         break;
     case QXmppLogger::StdoutLogging:
-        std::cout << typeName(type) << " " << qPrintable(text) << std::endl;
+        std::cout << qPrintable(formatted(type, text)) << std::endl;
         break;
     case QXmppLogger::SignalLogging:
         emit message(type, text);
