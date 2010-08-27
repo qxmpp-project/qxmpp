@@ -52,6 +52,7 @@ public:
     ~QXmppServer();
 
     void addExtension(QXmppServerExtension *extension);
+    QList<QXmppServerExtension*> loadedExtensions();
 
     QString domain() const;
     void setDomain(const QString &domain);
@@ -66,11 +67,19 @@ public:
     void setLocalCertificate(const QString &sslCertificate);
     void setPrivateKey(const QString &sslKey);
 
+    void close();
     bool listenForClients(const QHostAddress &address = QHostAddress::Any, quint16 port = 5222);
     bool listenForServers(const QHostAddress &address = QHostAddress::Any, quint16 port = 5269);
 
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
+
+signals:
+    /// This signal is emitted when an XMPP stream is added.
+    void streamAdded(QXmppStream *stream);
+
+    /// This signal is emitted when an XMPP stream is removed.
+    void streamRemoved(QXmppStream *stream);
 
 private slots:
     void slotClientConnection(QSslSocket *socket);
@@ -79,6 +88,7 @@ private slots:
     void slotDialbackRequestReceived(const QXmppDialback &dialback);
     void slotElementReceived(const QDomElement &element);
     void slotServerConnection(QSslSocket *socket);
+    void slotServerDisconnected();
 
 private:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
@@ -86,19 +96,6 @@ private:
     virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
     virtual QStringList subscribers(const QString &jid);
     QXmppServerPrivate * const d;
-};
-
-/// \brief The QXmppServerExtension class is the base class for QXmppServer
-/// extensions.
-///
-
-class QXmppServerExtension : public QObject
-{
-    Q_OBJECT
-
-public:
-    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
-    virtual QStringList presenceSubscribers(const QString &jid);
 };
 
 class QXmppSslServerPrivate;

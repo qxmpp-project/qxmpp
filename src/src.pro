@@ -52,6 +52,7 @@ HEADERS += QXmppUtils.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
     QXmppServer.h \
+    QXmppServerExtension.h \
     QXmppServerPlugin.h \
     QXmppSessionIq.h \
     QXmppSocks.h \
@@ -102,6 +103,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppRosterIq.cpp \
     QXmppRosterManager.cpp \
     QXmppServer.cpp \
+    QXmppServerExtension.cpp \
     QXmppSessionIq.cpp \
     QXmppSocks.cpp \
     QXmppStanza.cpp \

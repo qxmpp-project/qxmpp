@@ -21,33 +21,31 @@
  *
  */
 
-#ifndef QXMPPSERVERPLUGIN_H
-#define QXMPPSERVERPLUGIN_H
+#ifndef QXMPPSERVEREXTENSION_H
+#define QXMPPSERVEREXTENSION_H
 
-#include <QtPlugin>
+#include <QObject>
+
+class QDomElement;
+class QStringList;
 
 class QXmppServer;
-class QXmppServerExtension;
+class QXmppStream;
 
-/// \breif Interface for all QXmppServer plugins.
+/// \brief The QXmppServerExtension class is the base class for QXmppServer
+/// extensions.
 ///
 
-class QXmppServerPluginInterface
-{
-public:
-    virtual QXmppServerExtension *create(const QString &key) = 0;
-    virtual QStringList keys() const = 0;
-};
-
-Q_DECLARE_INTERFACE(QXmppServerPluginInterface, "com.googlecode.qxmpp.ServerPlugin/1.0")
-
-/// \brief The QXmppServerPlugin class is the base class for QXmppServer plugins.
-///
-
-class QXmppServerPlugin : public QObject, public QXmppServerPluginInterface
+class QXmppServerExtension : public QObject
 {
     Q_OBJECT
-    Q_INTERFACES(QXmppServerPluginInterface)
+
+public:
+    QString extensionName() const;
+    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
+    virtual QStringList presenceSubscribers(const QString &jid);
+    virtual bool start(QXmppServer *server);
+    virtual void stop();
 };
 
 #endif
