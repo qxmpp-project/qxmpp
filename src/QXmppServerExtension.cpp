@@ -26,6 +26,14 @@
 
 #include "QXmppServerExtension.h"
 
+/// Returns the features this extension implements.
+///
+
+QStringList QXmppServerExtension::discoveryFeatures() const
+{
+    return QStringList();
+}
+
 /// Returns the extension's name.
 ///
 

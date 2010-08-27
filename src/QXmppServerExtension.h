@@ -42,6 +42,8 @@ class QXmppServerExtension : public QObject
 
 public:
     QString extensionName() const;
+
+    virtual QStringList discoveryFeatures() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);
     virtual bool start(QXmppServer *server);
