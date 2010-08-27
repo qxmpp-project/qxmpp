@@ -18,7 +18,7 @@ VERSION = $$QXMPP_VERSION
 DESTDIR = $$QXMPP_LIBRARY_DIR
 
 # Header files
-HEADERS += QXmppUtils.h \
+INSTALL_HEADERS = QXmppUtils.h \
     QXmppArchiveIq.h \
     QXmppArchiveManager.h \
     QXmppBindIq.h \
@@ -68,6 +68,7 @@ HEADERS += QXmppUtils.h \
     QXmppVCardManager.h \
     QXmppVCard.h \
     QXmppVersionIq.h
+HEADERS += $$INSTALL_HEADERS
 
 # Source files
 SOURCES += QXmppUtils.cpp \
@@ -119,12 +120,17 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCard.cpp \
     QXmppVersionIq.cpp
 
+# Plugins
+DEFINES += QT_STATICPLUGIN
+HEADERS += server/mod_ping.h
+SOURCES += server/mod_ping.cpp
+
 # pkg-config support
 CONFIG += create_pc create_prl no_install_prl
 QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
 
 # Installation
-headers.files = $$HEADERS
+headers.files = $$INSTALL_HEADERS
 headers.path = $$[QT_INSTALL_PREFIX]/include/qxmpp
 target.path = $$[QT_INSTALL_PREFIX]/lib
 INSTALLS += headers target

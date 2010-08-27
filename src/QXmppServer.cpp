@@ -32,11 +32,13 @@
 #include "QXmppIncomingClient.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
-#include "QXmppPingIq.h"
 #include "QXmppServer.h"
 #include "QXmppServerExtension.h"
 #include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
+
+// Core plugins
+Q_IMPORT_PLUGIN(mod_ping)
 
 class QXmppServerPrivate
 {
@@ -106,10 +108,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
                 continue;
 
             foreach (const QString &key, plugin->keys())
-            {
-                QXmppServerExtension *extension;
                 server->addExtension(plugin->create(key));
-            }
         }
         loaded = true;
     }
@@ -437,35 +436,20 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
         }
         else if (element.tagName() == "iq")
         {
-            // XEP-0199: XMPP Ping
-            if (QXmppPingIq::isPingIq(element))
-            {
-                QXmppPingIq request;
-                request.parse(element);
+            // we do not support the given IQ
+            QXmppIq request;
+            request.parse(element);
 
-                QXmppIq response(QXmppIq::Result);
-                response.setId(element.attribute("id"));
-                response.setFrom(d->domain);
+            if (request.type() != QXmppIq::Error && request.type() != QXmppIq::Result)
+            {
+                QXmppIq response(QXmppIq::Error);
+                response.setId(request.id());
+                response.setFrom(domain());
                 response.setTo(request.from());
+                QXmppStanza::Error error(QXmppStanza::Error::Cancel,
+                    QXmppStanza::Error::FeatureNotImplemented);
+                response.setError(error);
                 stream->sendPacket(response);
-            }
-            // Other IQs
-            else
-            {
-                QXmppIq request;
-                request.parse(element);
-
-                if (request.type() != QXmppIq::Error && request.type() != QXmppIq::Result)
-                {
-                    QXmppIq response(QXmppIq::Error);
-                    response.setId(request.id());
-                    response.setFrom(domain());
-                    response.setTo(request.from());
-                    QXmppStanza::Error error(QXmppStanza::Error::Cancel,
-                        QXmppStanza::Error::FeatureNotImplemented);
-                    response.setError(error);
-                    stream->sendPacket(response);
-                }
             }
         }
 
