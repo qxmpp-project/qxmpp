@@ -38,6 +38,7 @@
 #include "QXmppUtils.h"
 
 // Core plugins
+Q_IMPORT_PLUGIN(mod_disco)
 Q_IMPORT_PLUGIN(mod_ping)
 
 class QXmppServerPrivate

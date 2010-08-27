@@ -122,8 +122,12 @@ SOURCES += QXmppUtils.cpp \
 
 # Plugins
 DEFINES += QT_STATICPLUGIN
-HEADERS += server/mod_ping.h
-SOURCES += server/mod_ping.cpp
+HEADERS += \
+    server/mod_disco.h \
+    server/mod_ping.h 
+SOURCES += \
+    server/mod_disco.cpp \
+    server/mod_ping.cpp
 
 # pkg-config support
 CONFIG += create_pc create_prl no_install_prl
