@@ -164,14 +164,13 @@ bool QXmppStream::sendData(const QByteArray &data)
 bool QXmppStream::sendElement(const QDomElement &element)
 {
     // prepare packet
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
     const QStringList omitNamespaces = QStringList() << ns_client << ns_server;
-    helperToXmlAddDomElement(&writer, element, omitNamespaces);
+    helperToXmlAddDomElement(&xmlStream, element, omitNamespaces);
 
     // send packet
-    return sendData(buffer.data());
+    return sendData(data);
 }
 
 /// Sends an XMPP packet to the peer.
@@ -263,19 +262,18 @@ void QXmppStream::socketReadyRead()
     endStreamRegex.setMinimal(true);
 
     // check whether we need to add stream start / end elements
-    QByteArray completeXml;
+    QByteArray completeXml = d->dataBuffer;
     const QString strData = QString::fromUtf8(d->dataBuffer);
     bool streamStart = false;
     if(strData.contains(startStreamRegex))
     {
-        completeXml = d->dataBuffer + streamRootElementEnd;
         streamStart = true;
         d->streamStart = startStreamRegex.cap(0).toUtf8();
     }
-    else if(strData.contains(endStreamRegex))
-        completeXml = d->streamStart + d->dataBuffer;
     else
-        completeXml = d->streamStart + d->dataBuffer + streamRootElementEnd;
+        completeXml.prepend(d->streamStart);
+    if(!strData.contains(endStreamRegex))
+        completeXml.append(streamRootElementEnd);
 
     // check whether we have a valid XML document
     QDomDocument doc;
