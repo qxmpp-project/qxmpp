@@ -74,6 +74,16 @@ void QXmppStreamFeatures::setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMe
     m_authMechanisms = mechanisms;
 }
 
+QList<QXmppConfiguration::CompressionMethod> QXmppStreamFeatures::compressionMethods() const
+{
+    return m_compressionMethods;
+}
+
+void QXmppStreamFeatures::setCompressionMethods(QList<QXmppConfiguration::CompressionMethod> &methods)
+{
+    m_compressionMethods = methods;
+}
+
 QXmppConfiguration::StreamSecurityMode QXmppStreamFeatures::securityMode() const
 {
     return m_securityMode;
@@ -94,6 +104,19 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 {
     m_bindAvailable = !element.firstChildElement("bind").isNull();
     m_sessionAvailable = !element.firstChildElement("session").isNull();
+
+    // parse advertised compression methods
+    QDomElement compression = element.firstChildElement("compression");
+    if (compression.namespaceURI() == ns_compress)
+    {
+        QDomElement subElement = compression.firstChildElement("method");
+        while(!subElement.isNull())
+        {
+            if (subElement.text() == QLatin1String("zlib"))
+                m_compressionMethods << QXmppConfiguration::ZlibCompression;
+            subElement = subElement.nextSiblingElement("method");
+        }
+    }
 
     // parse advertised SASL Authentication mechanisms
     QDomElement mechs = element.firstChildElement("mechanisms");
@@ -142,6 +165,23 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     {
         writer->writeStartElement("session");
         writer->writeAttribute("xmlns", ns_session);
+        writer->writeEndElement();
+    }
+    if (!m_compressionMethods.isEmpty())
+    {
+        writer->writeStartElement("compression");
+        writer->writeAttribute("xmlns", ns_compress);
+        for (int i = 0; i < m_compressionMethods.size(); i++)
+        {
+            writer->writeStartElement("method");
+            switch (m_compressionMethods[i])
+            {
+            case QXmppConfiguration::ZlibCompression:
+                writer->writeCharacters("zlib");
+                break;
+            }
+            writer->writeEndElement();
+        }
         writer->writeEndElement();
     }
     if (!m_authMechanisms.isEmpty())

@@ -44,6 +44,9 @@ public:
     QList<QXmppConfiguration::SASLAuthMechanism> authMechanisms() const;
     void setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMechanism> &mecanisms);
 
+    QList<QXmppConfiguration::CompressionMethod> compressionMethods() const;
+    void setCompressionMethods(QList<QXmppConfiguration::CompressionMethod> &methods);
+
     QXmppConfiguration::StreamSecurityMode securityMode() const;
     void setSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
 
@@ -59,6 +62,7 @@ private:
     bool m_sessionAvailable;
     bool m_nonSaslAuthAvailable;
     QList<QXmppConfiguration::SASLAuthMechanism> m_authMechanisms;
+    QList<QXmppConfiguration::CompressionMethod> m_compressionMethods;
     QXmppConfiguration::StreamSecurityMode m_securityMode;
 };
 
