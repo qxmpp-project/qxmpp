@@ -125,11 +125,13 @@ DEFINES += QT_STATICPLUGIN
 HEADERS += \
     server/mod_disco.h \
     server/mod_ping.h \
-    server/mod_proxy65.h
+    server/mod_proxy65.h \
+    server/mod_version.h
 SOURCES += \
     server/mod_disco.cpp \
     server/mod_ping.cpp \
-    server/mod_proxy65.cpp
+    server/mod_proxy65.cpp \
+    server/mod_version.cpp
 
 # pkg-config support
 CONFIG += create_pc create_prl no_install_prl
