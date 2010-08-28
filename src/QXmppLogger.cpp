@@ -133,7 +133,7 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
             QFile file(m_logFilePath);
             file.open(QIODevice::Append);
             QTextStream stream(&file);
-            stream << formatted(type, text) << "\n\n";
+            stream << formatted(type, text) << "\n";
         }
         break;
     case QXmppLogger::StdoutLogging:
