@@ -141,7 +141,7 @@ public:
     void setLang(const QString&);
 
     QXmppStanza::Error error() const;
-    void setError(QXmppStanza::Error& error);
+    void setError(const QXmppStanza::Error& error);
 
     QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);

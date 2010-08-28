@@ -368,7 +368,7 @@ QXmppStanza::Error QXmppStanza::error() const
     return m_error;
 }
 
-void QXmppStanza::setError(QXmppStanza::Error& error)
+void QXmppStanza::setError(const QXmppStanza::Error& error)
 {
     m_error = error;
 }
