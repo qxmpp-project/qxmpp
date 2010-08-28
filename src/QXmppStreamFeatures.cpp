@@ -107,7 +107,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
-    if (compression.namespaceURI() == ns_compress)
+    if (compression.namespaceURI() == ns_compressFeature)
     {
         QDomElement subElement = compression.firstChildElement("method");
         while(!subElement.isNull())
@@ -170,7 +170,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     if (!m_compressionMethods.isEmpty())
     {
         writer->writeStartElement("compression");
-        writer->writeAttribute("xmlns", ns_compress);
+        writer->writeAttribute("xmlns", ns_compressFeature);
         for (int i = 0; i < m_compressionMethods.size(); i++)
         {
             writer->writeStartElement("method");

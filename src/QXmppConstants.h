@@ -40,6 +40,7 @@ extern const char* ns_auth;
 extern const char* ns_authFeature;
 extern const char* ns_capabilities;
 extern const char* ns_compress;
+extern const char* ns_compressFeature;
 extern const char* ns_disco_info;
 extern const char* ns_disco_items;
 extern const char* ns_ibb;
