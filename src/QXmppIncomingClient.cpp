@@ -61,7 +61,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     d->passwordChecker = 0;
     d->domain = domain;
 
-    setObjectName("C2S");
+    setObjectName("C2S-in");
     setSocket(socket);
 
     // create inactivity timer
@@ -118,8 +118,6 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
-    Q_UNUSED(streamElement);
-
     d->idleTimer->start();
 
     // start stream
@@ -132,6 +130,20 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
         sessionId,
         d->domain.toAscii());
     sendData(response.toUtf8());
+
+    // check requested domain
+    if (streamElement.attribute("to") != d->domain)
+    {
+        QString response = QString("<stream:error>"
+            "<host-unknown xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\"/>"
+            "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\">"
+                "This server does not serve %1"
+            "</text>"
+            "</stream:error>").arg(streamElement.attribute("to"));
+        sendData(response.toUtf8());
+        disconnectFromHost();
+        return;
+    }
 
     // send stream features
     QXmppStreamFeatures features;
