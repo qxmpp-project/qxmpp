@@ -144,6 +144,7 @@ struct TransferStats
 class QXmppServerProxy65Private
 {
 public:
+    QString domain;
     QString jid;
     QHostAddress host;
     quint16 port;
@@ -231,7 +232,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
             return true;
         }
     }
-    if (element.tagName() == "iq" && QXmppByteStreamIq::isByteStreamIq(element))
+    else if (element.tagName() == "iq" && QXmppByteStreamIq::isByteStreamIq(element))
     {
         QXmppByteStreamIq bsIq;
         bsIq.parse(element);
@@ -259,21 +260,24 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
         {
             QString hash = streamHash(bsIq.sid(), bsIq.from(), bsIq.activate());
             QTcpSocketPair *pair = d->pairs.value(hash);
+
+            QXmppIq responseIq;
+            responseIq.setTo(bsIq.from());
+            responseIq.setFrom(bsIq.to());
+            responseIq.setId(bsIq.id());
+
+            // FIXME : make it possible to specify permissions
             if (pair &&
-                jidToDomain(bsIq.from()) == jidToDomain(d->jid))
+                jidToDomain(bsIq.from()) == d->domain)
             {
                 qDebug() << "Activating connection" << hash << "by" << bsIq.from();
                 pair->activate();
-
-                QXmppIq responseIq;
                 responseIq.setType(QXmppIq::Result);
-                responseIq.setTo(bsIq.from());
-                responseIq.setFrom(bsIq.to());
-                responseIq.setId(bsIq.id());
-                stream->sendPacket(responseIq);
             } else {
                 qWarning() << "Not activating connection" << hash << "by" << bsIq.from();
+                responseIq.setType(QXmppIq::Error);
             }
+            stream->sendPacket(responseIq);
         }
         return true;
     }
@@ -312,6 +316,8 @@ void QXmppServerProxy65::setStatisticsFile(const QString &statisticsFile)
 
 bool QXmppServerProxy65::start(QXmppServer *server)
 {
+    d->domain = server->domain();
+
     // determine jid
     if (d->jid.isEmpty())
         d->jid = "proxy." + server->domain();
@@ -377,10 +383,12 @@ void QXmppServerProxy65::slotPairFinished()
     // store total statistics
     if (d->statistics)
     {
+        d->statistics->beginGroup("socks-proxy");
         d->statistics->setValue("total-bytes",
             d->statistics->value("total-bytes").toULongLong() + pair->transfer);
         d->statistics->setValue("total-transfers",
             d->statistics->value("total-transfers").toULongLong() + 1);
+        d->statistics->endGroup();
     }
 
     // remove socket pair
