@@ -104,6 +104,7 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     setSocket(socket);
 
     // initialise logger
+    setObjectName("C2S-out");
     setLogger(QXmppLogger::getLogger());
 
     bool check = connect(socket, SIGNAL(sslErrors(const QList<QSslError>&)),
