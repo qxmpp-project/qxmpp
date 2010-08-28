@@ -68,11 +68,14 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement
         if (request.queryType() == QXmppDiscoveryIq::ItemsQuery)
         {
             QList<QXmppDiscoveryIq::Item> items;
-            foreach (const QString &jid, m_discoveryItems)
+            foreach (QXmppServerExtension *extension, m_server->loadedExtensions())
             {
-                QXmppDiscoveryIq::Item item;
-                item.setJid(jid);
-                items.append(item);
+                foreach (const QString &jid, extension->discoveryItems())
+                {
+                    QXmppDiscoveryIq::Item item;
+                    item.setJid(jid);
+                    items.append(item);
+                }
             }
             response.setItems(items);
         } else {

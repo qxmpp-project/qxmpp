@@ -44,6 +44,7 @@ public:
     QString extensionName() const;
 
     virtual QStringList discoveryFeatures() const;
+    virtual QStringList discoveryItems() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);
     virtual bool start(QXmppServer *server);
