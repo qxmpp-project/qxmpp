@@ -66,7 +66,7 @@ class QXmppServerProxy65 : public QXmppServerExtension
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "proxy65");
     Q_PROPERTY(QString jid READ jid WRITE setJid);
-    Q_PROPERTY(QString statisticsFile READ statisticsFile WRITE setStatisticsFile);
+    Q_PROPERTY(quint16 port READ port WRITE setPort);
 
 public:
     QXmppServerProxy65();
@@ -75,13 +75,17 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
-    QString statisticsFile() const;
-    void setStatisticsFile(const QString &statisticsFile);
+    quint16 port() const;
+    void setPort(quint16 port);
 
+    /// \cond
     QStringList discoveryItems() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
     bool start();
     void stop();
+    QVariantMap statistics() const;
+    void setStatistics(const QVariantMap &statistics);
+    /// \endcond
 
 private slots:
     void slotPairFinished();

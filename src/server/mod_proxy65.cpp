@@ -149,22 +149,25 @@ public:
     quint16 port;
 
     QMap<QString, QTcpSocketPair*> pairs;
-    QList<TransferStats> recent;
     QXmppSocksServer *server;
-    QSettings *statistics;
-    QString statisticsFile;
+
+    // statistics
+    QList<TransferStats> recent;
     QTimer *statisticsTimer;
+    quint64 totalBytes;
+    quint64 totalTransfers;
 };
 
 QXmppServerProxy65::QXmppServerProxy65()
     : d(new QXmppServerProxy65Private)
 {
-    d->statistics = 0;
+    d->port = 7777;
+    d->server = new QXmppSocksServer(this);
+
     d->statisticsTimer = new QTimer(this);
     d->statisticsTimer->setInterval(300 * 1000);
-    d->statisticsTimer->start();
-
-    d->server = new QXmppSocksServer(this);
+    d->totalBytes = 0;
+    d->totalTransfers = 0;
 
     bool check = connect(d->server, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
         this, SLOT(slotSocketConnected(QTcpSocket*, const QString &, quint16)));
@@ -178,6 +181,40 @@ QXmppServerProxy65::QXmppServerProxy65()
 QXmppServerProxy65::~QXmppServerProxy65()
 {
     delete d;
+}
+
+/// Returns the proxy server's JID.
+///
+
+QString QXmppServerProxy65::jid() const
+{
+    return d->jid;
+}
+
+/// Set the proxy server's JID.
+///
+/// \param jid
+
+void QXmppServerProxy65::setJid(const QString &jid)
+{
+    d->jid = jid;
+}
+
+/// Returns the port on which to listen for SOCKS5 connections.
+///
+
+quint16 QXmppServerProxy65::port() const
+{
+    return d->port;
+}
+
+/// Sets the port on which to listen for SOCKS5 connections.
+///
+/// \param port
+
+void QXmppServerProxy65::setPort(quint16 port)
+{
+    d->port = port;
 }
 
 QStringList QXmppServerProxy65::discoveryItems() const
@@ -219,7 +256,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
                 responseIq.setIdentities(identities);
             }
 
-            stream->sendPacket(responseIq);
+            server()->sendPacket(responseIq);
             return true;
         }
     }
@@ -245,7 +282,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
             streamHosts.append(streamHost);
 
             responseIq.setStreamHosts(streamHosts);
-            stream->sendPacket(responseIq);
+            server()->sendPacket(responseIq);
         }
         else if (bsIq.type() == QXmppIq::Set)
         {
@@ -268,41 +305,11 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
                 qWarning() << "Not activating connection" << hash << "by" << bsIq.from();
                 responseIq.setType(QXmppIq::Error);
             }
-            stream->sendPacket(responseIq);
+            server()->sendPacket(responseIq);
         }
         return true;
     }
     return false;
-}
-
-QString QXmppServerProxy65::jid() const
-{
-    return d->jid;
-}
-
-void QXmppServerProxy65::setJid(const QString &jid)
-{
-    d->jid = jid;
-}
-
-QString QXmppServerProxy65::statisticsFile() const
-{
-    return d->statisticsFile;
-}
-
-void QXmppServerProxy65::setStatisticsFile(const QString &statisticsFile)
-{
-    if (d->statistics)
-    {
-        delete d->statistics;
-        d->statistics = 0;
-    }
-    d->statisticsFile = statisticsFile;
-    if (!statisticsFile.isEmpty())
-    {
-        d->statistics = new QSettings(statisticsFile, QSettings::IniFormat, this);
-        slotUpdateStatistics();
-    }
 }
 
 bool QXmppServerProxy65::start()
@@ -324,22 +331,69 @@ bool QXmppServerProxy65::start()
         }
         hostAddress = hostInfo.addresses().first();
     }
-    quint16 port = 7777;
 
     // start listening
-    if (!d->server->listen(hostAddress, port))
+    if (!d->server->listen(hostAddress, d->port))
         return false;
     d->host = hostAddress;
-    d->port = port;
+
+    // start statistics update
+    d->statisticsTimer->start();
     return true;
 }
 
 void QXmppServerProxy65::stop()
 {
+    // refuse incoming connections
     d->server->close();
+
+    // close socket pairs
     foreach (QTcpSocketPair *pair, d->pairs)
         delete pair;
     d->pairs.clear();
+
+    // stop statistics update
+    d->statisticsTimer->stop();
+}
+
+QVariantMap QXmppServerProxy65::statistics() const
+{
+    // calculate stats
+    qint64 minimumSpeed = -1;
+    qint64 maximumSpeed = 0;
+    qint64 totalSize = 0;
+    qint64 totalElapsed = 0;
+    for (int i = d->recent.size() - 1; i >= 0; --i)
+    {
+        if (d->recent[i].elapsed > 0)
+        {
+            qint64 speed = (1000 * d->recent[i].size) / d->recent[i].elapsed;
+            if (speed > maximumSpeed)
+                maximumSpeed = speed;
+            if (minimumSpeed < 0 || speed < minimumSpeed)
+                minimumSpeed = speed;
+            totalSize += d->recent[i].size;
+            totalElapsed += d->recent[i].elapsed;
+        }
+    }
+    if (minimumSpeed < 0)
+        minimumSpeed = 0;
+    qint64 averageSpeed = totalElapsed > 0 ? (1000 * totalSize) / totalElapsed : 0;
+
+    // store stats
+    QVariantMap stats;
+    stats["total-bytes"] = d->totalBytes;
+    stats["total-transfers"] = d->totalTransfers;
+    stats["average-speed"] = averageSpeed;
+    stats["minimum-speed"] = minimumSpeed;
+    stats["maximum-speed"] = maximumSpeed;
+    return stats;
+}
+
+void QXmppServerProxy65::setStatistics(const QVariantMap &statistics)
+{
+    d->totalBytes = statistics.value("total-bytes").toULongLong();
+    d->totalTransfers = statistics.value("total-transfers").toULongLong();
 }
 
 void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
@@ -372,58 +426,27 @@ void QXmppServerProxy65::slotPairFinished()
     d->recent.prepend(stats);
     slotUpdateStatistics();
 
-    // store total statistics
-    if (d->statistics)
-    {
-        d->statistics->beginGroup("socks-proxy");
-        d->statistics->setValue("total-bytes",
-            d->statistics->value("total-bytes").toULongLong() + pair->transfer);
-        d->statistics->setValue("total-transfers",
-            d->statistics->value("total-transfers").toULongLong() + 1);
-        d->statistics->endGroup();
-    }
+    // update totals
+    d->totalBytes += pair->transfer;
+    d->totalTransfers++;
 
     // remove socket pair
     d->pairs.remove(pair->key);
     pair->deleteLater();
 }
 
+/// Prune obsolete statistics.
+///
+
 void QXmppServerProxy65::slotUpdateStatistics()
 {
-    qint64 minimumSpeed = -1;
-    qint64 maximumSpeed = 0;
-    qint64 totalSize = 0;
-    qint64 totalElapsed = 0;
     QDateTime cutoff = QDateTime::currentDateTime().addDays(-1);
     for (int i = d->recent.size() - 1; i >= 0; --i)
     {
-        // only keep 100 points, less than one day old
         if (i >= 100 || d->recent[i].date < cutoff)
         {
             d->recent.removeAt(i);
-        } else if (d->recent[i].elapsed > 0) {
-            qint64 speed = (1000 * d->recent[i].size) / d->recent[i].elapsed;
-            if (speed > maximumSpeed)
-                maximumSpeed = speed;
-            if (minimumSpeed < 0 || speed < minimumSpeed)
-                minimumSpeed = speed;
-            totalSize += d->recent[i].size;
-            totalElapsed += d->recent[i].elapsed;
         }
-    }
-    if (minimumSpeed < 0)
-        minimumSpeed = 0;
-    qint64 averageSpeed = totalElapsed > 0 ? (1000 * totalSize) / totalElapsed : 0;
-
-    // store statistics
-    if (d->statistics)
-    {
-        d->statistics->beginGroup("socks-proxy");
-        d->statistics->setValue("version", qApp->applicationVersion());
-        d->statistics->setValue("average-speed", averageSpeed);
-        d->statistics->setValue("minimum-speed", minimumSpeed);
-        d->statistics->setValue("maximum-speed", maximumSpeed);
-        d->statistics->endGroup();
     }
 }
 

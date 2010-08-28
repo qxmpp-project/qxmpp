@@ -25,6 +25,7 @@
 #define QXMPPSERVEREXTENSION_H
 
 #include <QObject>
+#include <QVariant>
 
 class QDomElement;
 class QStringList;
@@ -51,6 +52,9 @@ public:
     virtual QStringList discoveryItems() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);
+
+    virtual QVariantMap statistics() const;
+    virtual void setStatistics(const QVariantMap &statistics);
 
     virtual bool start();
     virtual void stop();

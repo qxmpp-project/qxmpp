@@ -56,7 +56,7 @@ bool QXmppServerVersion::handleStanza(QXmppStream *stream, const QDomElement &el
             responseIq.setTo(versionIq.from());
             responseIq.setName(qApp->applicationName());
             responseIq.setVersion(qApp->applicationVersion());
-            stream->sendPacket(responseIq);
+            server()->sendPacket(responseIq);
         }
         return true;
     }

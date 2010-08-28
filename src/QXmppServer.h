@@ -74,6 +74,8 @@ public:
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
 
+    QStringList availableResources(const QString &bareJid);
+
 signals:
     /// This signal is emitted when an XMPP stream is added.
     void streamAdded(QXmppStream *stream);

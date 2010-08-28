@@ -298,16 +298,37 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             }
         }
 
-        // unhandled stanza, emit it
+        // check the sender is legitimate
+        const QString from = nodeRecv.attribute("from");
+        if (!from.isEmpty() && from != jid() && from != jidToBareJid(jid()))
+        {
+            warning(QString("Received a stanza from unexpected JID %1").arg(from));
+            return;
+        }
+
+        // process unhandled stanzas
         if (nodeRecv.tagName() == "iq" ||
             nodeRecv.tagName() == "message" ||
             nodeRecv.tagName() == "presence")
         {
             QDomElement nodeFull(nodeRecv);
-            nodeFull.setAttribute("from", jid());
+
+            // if the sender is empty, set it to the appropriate JID
+            if (nodeFull.attribute("from").isEmpty())
+            {
+                if (nodeFull.tagName() == "presence" &&
+                    (nodeFull.attribute("type") == "subscribe" ||
+                    nodeFull.attribute("type") == "subscribed"))
+                    nodeFull.setAttribute("from", jidToBareJid(jid()));
+                else
+                    nodeFull.setAttribute("from", jid());
+            }
+
             // if the recipient is empty, set it to the local domain
             if (nodeFull.attribute("to").isEmpty())
                 nodeFull.setAttribute("to", d->domain);
+
+            // emit stanza for processing by server
             emit elementReceived(nodeFull);
         }
     }

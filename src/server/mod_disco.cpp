@@ -47,7 +47,7 @@ void QXmppServerDiscovery::setDiscoveryItems(const QStringList &items)
     m_discoveryItems = items;
 }
 
-bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement &element)
+bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
     if (element.attribute("to") != server()->domain())
         return false;
@@ -95,7 +95,7 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement
                 features += extension->discoveryFeatures();
             response.setFeatures(features);
         }
-        incoming->sendPacket(response);
+        server()->sendPacket(response);
         return true;
     }
     return false;

@@ -51,7 +51,7 @@ bool QXmppServerPing::handleStanza(QXmppStream *stream, const QDomElement &eleme
         response.setId(request.id());
         response.setFrom(request.to());
         response.setTo(request.from());
-        stream->sendPacket(response);
+        server()->sendPacket(response);
         return true;
     }
 

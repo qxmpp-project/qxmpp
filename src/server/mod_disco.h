@@ -21,26 +21,30 @@
  *
  */
 
-#ifndef QXMPP_SERVER_DISCOVERY_H
-#define QXMPP_SERVER_DISCOVERY_H
+#ifndef QXMPP_SERVER_DISCO_H
+#define QXMPP_SERVER_DISCO_H
 
 #include <QStringList>
 
 #include "QXmppServerExtension.h"
 
+/// \brief QXmppServer extension for XEP-0030: Service Discovery.
+///
+
 class QXmppServerDiscovery : public QXmppServerExtension
 {
     Q_OBJECT
-    Q_CLASSINFO("ExtensionName", "discovery");
+    Q_CLASSINFO("ExtensionName", "disco");
     Q_PROPERTY(QStringList discoveryItems READ discoveryItems WRITE setDiscoveryItems);
 
 public:
-    QStringList discoveryFeatures() const;
-
     QStringList discoveryItems() const;
     void setDiscoveryItems(const QStringList &items);
 
-    bool handleStanza(QXmppStream *incoming, const QDomElement &element);
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 private:
     QStringList m_discoveryItems;
