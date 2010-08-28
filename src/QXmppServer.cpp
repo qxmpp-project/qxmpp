@@ -40,6 +40,7 @@
 // Core plugins
 Q_IMPORT_PLUGIN(mod_disco)
 Q_IMPORT_PLUGIN(mod_ping)
+Q_IMPORT_PLUGIN(mod_proxy65)
 
 class QXmppServerPrivate
 {
