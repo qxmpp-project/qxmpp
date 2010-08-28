@@ -30,6 +30,7 @@ class QDomElement;
 class QStringList;
 
 class QXmppServer;
+class QXmppServerExtensionPrivate;
 class QXmppStream;
 
 /// \brief The QXmppServerExtension class is the base class for QXmppServer
@@ -41,14 +42,24 @@ class QXmppServerExtension : public QObject
     Q_OBJECT
 
 public:
+    QXmppServerExtension();
+    ~QXmppServerExtension();
     QString extensionName() const;
+    QXmppServer *server();
 
     virtual QStringList discoveryFeatures() const;
     virtual QStringList discoveryItems() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);
-    virtual bool start(QXmppServer *server);
+
+    virtual bool start();
     virtual void stop();
+
+private:
+    void setServer(QXmppServer *server);
+    QXmppServerExtensionPrivate * const d;
+
+    friend class QXmppServer;
 };
 
 #endif

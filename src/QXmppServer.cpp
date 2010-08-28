@@ -47,7 +47,7 @@ class QXmppServerPrivate
 public:
     QXmppServerPrivate();
     void loadExtensions(QXmppServer *server);
-    void startExtensions(QXmppServer *server);
+    void startExtensions();
     void stopExtensions();
 
     void info(const QString &message);
@@ -117,15 +117,13 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 }
 
 /// Start the server's extensions.
-///
-/// \param server
 
-void QXmppServerPrivate::startExtensions(QXmppServer *server)
+void QXmppServerPrivate::startExtensions()
 {
     if (!started)
     {
         foreach (QXmppServerExtension *extension, extensions)
-            if (!extension->start(server))
+            if (!extension->start())
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
         started = true;
     }
@@ -182,6 +180,7 @@ void QXmppServer::addExtension(QXmppServerExtension *extension)
         return;
     d->info(QString("Added extension %1").arg(extension->extensionName()));
     extension->setParent(this);
+    extension->setServer(this);
     d->extensions << extension;
 }
 
@@ -296,7 +295,7 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 
     // start extensions
     d->loadExtensions(this);
-    d->startExtensions(this);
+    d->startExtensions();
     return true;
 }
 
@@ -336,7 +335,7 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 
     // start extensions
     d->loadExtensions(this);
-    d->startExtensions(this);
+    d->startExtensions();
     return true;
 }
 

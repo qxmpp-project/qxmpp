@@ -37,10 +37,6 @@ class QXmppServerPing : public QXmppServerExtension
 public:
     QStringList discoveryFeatures() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
-    bool start(QXmppServer *server);
-
-private:
-    QString m_jid;
 };
 
 #endif

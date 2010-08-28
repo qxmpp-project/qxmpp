@@ -36,14 +36,13 @@ class QXmppServerDiscovery : public QXmppServerExtension
 
 public:
     QStringList discoveryFeatures() const;
+
     QStringList discoveryItems() const;
     void setDiscoveryItems(const QStringList &items);
 
     bool handleStanza(QXmppStream *incoming, const QDomElement &element);
-    bool start(QXmppServer *server);
 
 private:
-    QXmppServer *m_server;
     QStringList m_discoveryItems;
 };
 

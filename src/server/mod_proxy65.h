@@ -80,7 +80,7 @@ public:
 
     QStringList discoveryItems() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
-    bool start(QXmppServer *server);
+    bool start();
     void stop();
 
 private slots:

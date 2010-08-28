@@ -21,6 +21,7 @@
  *
  */
 
+#include <QCoreApplication>
 #include <QDomElement>
 
 #include "QXmppConstants.h"
@@ -48,7 +49,7 @@ void QXmppServerDiscovery::setDiscoveryItems(const QStringList &items)
 
 bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement &element)
 {
-    if (element.attribute("to") != m_server->domain())
+    if (element.attribute("to") != server()->domain())
         return false;
 
     // XEP-0030: Service Discovery
@@ -68,7 +69,7 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement
         if (request.queryType() == QXmppDiscoveryIq::ItemsQuery)
         {
             QList<QXmppDiscoveryIq::Item> items;
-            foreach (QXmppServerExtension *extension, m_server->loadedExtensions())
+            foreach (QXmppServerExtension *extension, server()->loadedExtensions())
             {
                 foreach (const QString &jid, extension->discoveryItems())
                 {
@@ -79,8 +80,18 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement
             }
             response.setItems(items);
         } else {
+            // identities
+            QList<QXmppDiscoveryIq::Identity> identities;
+            QXmppDiscoveryIq::Identity identity;
+            identity.setCategory("server");
+            identity.setType("im");
+            identity.setName(qApp->applicationName());
+            identities.append(identity);
+            response.setIdentities(identities);
+
+            // features
             QStringList features;
-            foreach (QXmppServerExtension *extension, m_server->loadedExtensions())
+            foreach (QXmppServerExtension *extension, server()->loadedExtensions())
                 features += extension->discoveryFeatures();
             response.setFeatures(features);
         }
@@ -88,12 +99,6 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *incoming, const QDomElement
         return true;
     }
     return false;
-}
-
-bool QXmppServerDiscovery::start(QXmppServer *server)
-{
-    m_server = server;
-    return true;
 }
 
 // PLUGIN

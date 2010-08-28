@@ -26,6 +26,23 @@
 
 #include "QXmppServerExtension.h"
 
+class QXmppServerExtensionPrivate
+{
+public:
+    QXmppServer *server;
+};
+
+QXmppServerExtension::QXmppServerExtension()
+    : d(new QXmppServerExtensionPrivate)
+{
+    d->server = 0;
+}
+
+QXmppServerExtension::~QXmppServerExtension()
+{
+    delete d;
+}
+
 /// Returns the discovery features to add to the server.
 ///
 
@@ -79,15 +96,12 @@ QStringList QXmppServerExtension::presenceSubscribers(const QString &jid)
     return QStringList();
 }
 
-/// Starts the extension for the given server.
+/// Starts the extension.
 ///
 /// Return true if the extension was started, false otherwise.
-///
-/// \param server The QXmppServer which started the extension.
 
-bool QXmppServerExtension::start(QXmppServer *server)
+bool QXmppServerExtension::start()
 {
-    Q_UNUSED(server);
     return true;
 }
 
@@ -95,5 +109,21 @@ bool QXmppServerExtension::start(QXmppServer *server)
 
 void QXmppServerExtension::stop()
 {
+}
+
+/// Returns the server which loaded this extension.
+
+QXmppServer *QXmppServerExtension::server()
+{
+    return d->server;
+}
+
+/// Sets the server which loaded this extension.
+///
+/// \param server
+
+void QXmppServerExtension::setServer(QXmppServer *server)
+{
+    d->server = server;
 }
 

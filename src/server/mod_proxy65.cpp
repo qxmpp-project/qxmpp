@@ -144,7 +144,6 @@ struct TransferStats
 class QXmppServerProxy65Private
 {
 public:
-    QString domain;
     QString jid;
     QHostAddress host;
     quint16 port;
@@ -166,17 +165,6 @@ QXmppServerProxy65::QXmppServerProxy65()
     d->statisticsTimer->start();
 
     d->server = new QXmppSocksServer(this);
-
-#if 0
-    // connect signals
-    bool check = connect(client, SIGNAL(connected()),
-        this, SLOT(slotConnected()));
-    Q_ASSERT(check);
-
-    check = connect(client, SIGNAL(disconnected()),
-        this, SLOT(slotDisconnected()));
-    Q_ASSERT(check);
-#endif
 
     bool check = connect(d->server, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
         this, SLOT(slotSocketConnected(QTcpSocket*, const QString &, quint16)));
@@ -207,7 +195,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
         QXmppDiscoveryIq discoIq;
         discoIq.parse(element);
 
-        if (discoIq.type() == QXmppIq::Get && discoIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+        if (discoIq.type() == QXmppIq::Get)
         {
             QXmppDiscoveryIq responseIq;
             responseIq.setTo(discoIq.from());
@@ -216,17 +204,20 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
             responseIq.setType(QXmppIq::Result);
             responseIq.setQueryType(discoIq.queryType());
 
-            QStringList features = QStringList() << ns_disco_info << ns_disco_items << ns_bytestreams;
+            if (discoIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+            {
+                QStringList features = QStringList() << ns_disco_info << ns_disco_items << ns_bytestreams;
 
-            QList<QXmppDiscoveryIq::Identity> identities;
-            QXmppDiscoveryIq::Identity identity;
-            identity.setCategory("proxy");
-            identity.setType("bytestreams");
-            identity.setName("SOCKS5 Bytestreams");
-            identities.append(identity);
+                QList<QXmppDiscoveryIq::Identity> identities;
+                QXmppDiscoveryIq::Identity identity;
+                identity.setCategory("proxy");
+                identity.setType("bytestreams");
+                identity.setName("SOCKS5 Bytestreams");
+                identities.append(identity);
 
-            responseIq.setFeatures(features);
-            responseIq.setIdentities(identities);
+                responseIq.setFeatures(features);
+                responseIq.setIdentities(identities);
+            }
 
             stream->sendPacket(responseIq);
             return true;
@@ -268,7 +259,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
 
             // FIXME : make it possible to specify permissions
             if (pair &&
-                jidToDomain(bsIq.from()) == d->domain)
+                jidToDomain(bsIq.from()) == server()->domain())
             {
                 qDebug() << "Activating connection" << hash << "by" << bsIq.from();
                 pair->activate();
@@ -314,16 +305,14 @@ void QXmppServerProxy65::setStatisticsFile(const QString &statisticsFile)
     }
 }
 
-bool QXmppServerProxy65::start(QXmppServer *server)
+bool QXmppServerProxy65::start()
 {
-    d->domain = server->domain();
-
     // determine jid
     if (d->jid.isEmpty())
-        d->jid = "proxy." + server->domain();
+        d->jid = "proxy." + server()->domain();
 
     // determine address
-    const QString hostName = server->domain();
+    const QString hostName = server()->domain();
     QHostAddress hostAddress;
     if (!hostAddress.setAddress(hostName))
     {
@@ -347,6 +336,10 @@ bool QXmppServerProxy65::start(QXmppServer *server)
 
 void QXmppServerProxy65::stop()
 {
+    d->server->close();
+    foreach (QTcpSocketPair *pair, d->pairs)
+        delete pair;
+    d->pairs.clear();
 }
 
 void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
@@ -355,7 +348,6 @@ void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &
     QTcpSocketPair *pair = d->pairs.value(hostName);
     if (!pair)
     {
-        qDebug() << "SOCKET CONNECTED" << hostName << port;
         pair = new QTcpSocketPair(hostName);
         check = connect(pair, SIGNAL(finished()), this, SLOT(slotPairFinished()));
         Q_ASSERT(check);

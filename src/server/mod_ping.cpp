@@ -38,7 +38,7 @@ QStringList QXmppServerPing::discoveryFeatures() const
 
 bool QXmppServerPing::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
-    if (element.attribute("to") != m_jid)
+    if (element.attribute("to") != server()->domain())
         return false;
 
     // XEP-0199: XMPP Ping
@@ -56,12 +56,6 @@ bool QXmppServerPing::handleStanza(QXmppStream *stream, const QDomElement &eleme
     }
 
     return false;
-}
-
-bool QXmppServerPing::start(QXmppServer *server)
-{
-    m_jid = server->domain();
-    return true;
 }
 
 // PLUGIN
