@@ -54,6 +54,7 @@ private slots:
     void testPresenceFull();
     void testSession();
     void testStreamFeatures();
+    void testVCard();
 };
 
 class TestJingle : public QObject

@@ -38,6 +38,7 @@
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+#include "QXmppVCard.h"
 #include "tests.h"
 
 void TestUtils::testCrc32()
@@ -437,6 +438,30 @@ void TestPackets::testStreamFeatures()
     serializePacket(features2, xml2);
 }
 
+void TestPackets::testVCard()
+{
+    const QByteArray xml(
+        "<iq id=\"vcard1\" type=\"set\">"
+        "<vCard xmlns=\"vcard-temp\">"
+        "<BDAY>1983-09-14</BDAY>"
+        "<EMAIL><INTERNET/><USERID>foo.bar@example.com</USERID></EMAIL>"
+        "<FN>Foo Bar!</FN>"
+        "<NICKNAME>FooBar</NICKNAME>"
+        "<N><GIVEN>Foo</GIVEN><FAMILY>Wiz</FAMILY><MIDDLE>Baz</MIDDLE></N>"
+        "</vCard>"
+        "</iq>");
+
+    QXmppVCard vcard;
+    parsePacket(vcard, xml);
+    QCOMPARE(vcard.birthday(), QDate(1983, 9, 14));
+    QCOMPARE(vcard.email(), QLatin1String("foo.bar@example.com"));
+    QCOMPARE(vcard.nickName(), QLatin1String("FooBar"));
+    QCOMPARE(vcard.fullName(), QLatin1String("Foo Bar!"));
+    QCOMPARE(vcard.firstName(), QLatin1String("Foo"));
+    QCOMPARE(vcard.middleName(), QLatin1String("Baz"));
+    QCOMPARE(vcard.lastName(), QLatin1String("Wiz"));
+    serializePacket(vcard, xml);
+}
 
 void TestJingle::testSession()
 {
