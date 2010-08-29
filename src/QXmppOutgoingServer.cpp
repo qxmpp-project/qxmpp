@@ -83,7 +83,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     {
         QXmppStreamFeatures features;
         features.parse(stanza);
-        if (features.securityMode() != QXmppConfiguration::TLSDisabled)
+        if (features.tlsMode() != QXmppStreamFeatures::Disabled)
         {
             // let QXmppOutgoingClient handle TLS
             QXmppOutgoingClient::handleStanza(stanza);

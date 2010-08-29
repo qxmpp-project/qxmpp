@@ -237,17 +237,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         {
             // determine TLS mode to use
             const QXmppConfiguration::StreamSecurityMode localSecurity = configuration().streamSecurityMode();
-            const QXmppConfiguration::StreamSecurityMode remoteSecurity = features.securityMode();
+            const QXmppStreamFeatures::Mode remoteSecurity = features.tlsMode();
             if (!socket()->supportsSsl() &&
                 (localSecurity == QXmppConfiguration::TLSRequired ||
-                 remoteSecurity == QXmppConfiguration::TLSRequired))
+                 remoteSecurity == QXmppStreamFeatures::Required))
             {
                 warning("Disconnecting as TLS is required, but SSL support is not available");
                 disconnectFromHost();
                 return;
             }
             if (localSecurity == QXmppConfiguration::TLSRequired &&
-                remoteSecurity == QXmppConfiguration::TLSDisabled)
+                remoteSecurity == QXmppStreamFeatures::Disabled)
             {
                 warning("Disconnecting as TLS is required, but not supported by the server");
                 disconnectFromHost();
@@ -255,8 +255,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             }
 
             if (socket()->supportsSsl() &&
-                remoteSecurity != QXmppConfiguration::TLSDisabled && 
-                localSecurity != QXmppConfiguration::TLSDisabled)
+                localSecurity != QXmppConfiguration::TLSDisabled &&
+                remoteSecurity != QXmppStreamFeatures::Disabled) 
             {
                 // enable TLS as it is support by both parties
                 sendData("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
@@ -265,7 +265,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // handle authentication
-        const bool nonSaslAvailable = features.isNonSaslAuthAvailable();
+        const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
         const bool useSasl = configuration().useSASLAuthentication();
         if((saslAvailable && nonSaslAvailable && !useSasl) ||
@@ -313,7 +313,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // check whether bind is available
-        if (features.isBindAvailable())
+        if (features.bindMode() != QXmppStreamFeatures::Disabled)
         {
             QXmppBindIq bind;
             bind.setType(QXmppIq::Set);
@@ -323,7 +323,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // check whether session is available
-        if (features.isSessionAvailable())
+        if (features.sessionMode() != QXmppStreamFeatures::Disabled)
             d->sessionAvailable = true;
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")

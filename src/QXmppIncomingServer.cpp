@@ -90,7 +90,7 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
     // send stream features
     QXmppStreamFeatures features;
     if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
-        features.setSecurityMode(QXmppConfiguration::TLSEnabled);
+        features.setTlsMode(QXmppStreamFeatures::Enabled);
     sendPacket(features);
 }
 

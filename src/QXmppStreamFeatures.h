@@ -32,14 +32,21 @@ class QXmppStreamFeatures : public QXmppStanza
 public:
     QXmppStreamFeatures();
 
-    bool isBindAvailable() const;
-    void setBindAvailable(bool available);
+    enum Mode
+    {
+        Disabled = 0,
+        Enabled,
+        Required
+    };
 
-    bool isSessionAvailable() const;
-    void setSessionAvailable(bool available);
+    Mode bindMode() const;
+    void setBindMode(Mode mode);
 
-    bool isNonSaslAuthAvailable() const;
-    void setNonSaslAuthAvailable(bool available);
+    Mode sessionMode() const;
+    void setSessionMode(Mode mode);
+
+    Mode nonSaslAuthMode() const;
+    void setNonSaslAuthMode(Mode mode);
 
     QList<QXmppConfiguration::SASLAuthMechanism> authMechanisms() const;
     void setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMechanism> &mecanisms);
@@ -47,8 +54,8 @@ public:
     QList<QXmppConfiguration::CompressionMethod> compressionMethods() const;
     void setCompressionMethods(QList<QXmppConfiguration::CompressionMethod> &methods);
 
-    QXmppConfiguration::StreamSecurityMode securityMode() const;
-    void setSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
+    Mode tlsMode() const;
+    void setTlsMode(Mode mode);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -58,12 +65,12 @@ public:
     static bool isStreamFeatures(const QDomElement &element);
 
 private:
-    bool m_bindAvailable;
-    bool m_sessionAvailable;
-    bool m_nonSaslAuthAvailable;
+    Mode m_bindMode;
+    Mode m_sessionMode;
+    Mode m_nonSaslAuthMode;
+    Mode m_tlsMode;
     QList<QXmppConfiguration::SASLAuthMechanism> m_authMechanisms;
     QList<QXmppConfiguration::CompressionMethod> m_compressionMethods;
-    QXmppConfiguration::StreamSecurityMode m_securityMode;
 };
 
 #endif

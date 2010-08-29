@@ -152,11 +152,11 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     // send stream features
     QXmppStreamFeatures features;
     if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
-        features.setSecurityMode(QXmppConfiguration::TLSEnabled);
+        features.setTlsMode(QXmppStreamFeatures::Enabled);
     if (!d->username.isEmpty())
     {
-        features.setBindAvailable(true);
-        features.setSessionAvailable(true);
+        features.setBindMode(QXmppStreamFeatures::Required);
+        features.setSessionMode(QXmppStreamFeatures::Enabled);
     }
     else if (d->passwordChecker)
     {

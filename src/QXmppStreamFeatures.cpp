@@ -27,41 +27,41 @@
 #include "QXmppStreamFeatures.h"
 
 QXmppStreamFeatures::QXmppStreamFeatures()
-    : m_bindAvailable(false),
-    m_sessionAvailable(false),
-    m_nonSaslAuthAvailable(false),
-    m_securityMode(QXmppConfiguration::TLSDisabled)
+    : m_bindMode(Disabled),
+    m_sessionMode(Disabled),
+    m_nonSaslAuthMode(Disabled),
+    m_tlsMode(Disabled)
 {
 }
 
-bool QXmppStreamFeatures::isBindAvailable() const
+QXmppStreamFeatures::Mode QXmppStreamFeatures::bindMode() const
 {
-    return m_bindAvailable;
+    return m_bindMode;
 }
 
-void QXmppStreamFeatures::setBindAvailable(bool available)
+void QXmppStreamFeatures::setBindMode(QXmppStreamFeatures::Mode mode)
 {
-    m_bindAvailable = available;
+    m_bindMode = mode;
 }
 
-bool QXmppStreamFeatures::isSessionAvailable() const
+QXmppStreamFeatures::Mode QXmppStreamFeatures::sessionMode() const
 {
-    return m_sessionAvailable;
+    return m_sessionMode;
 }
 
-void QXmppStreamFeatures::setSessionAvailable(bool available)
+void QXmppStreamFeatures::setSessionMode(Mode mode)
 {
-    m_sessionAvailable = available;
+    m_sessionMode = mode;
 }
 
-bool QXmppStreamFeatures::isNonSaslAuthAvailable() const
+QXmppStreamFeatures::Mode QXmppStreamFeatures::nonSaslAuthMode() const
 {
-    return m_nonSaslAuthAvailable;
+    return m_nonSaslAuthMode;
 }
 
-void QXmppStreamFeatures::setNonSaslAuthAvailable(bool available)
+void QXmppStreamFeatures::setNonSaslAuthMode(QXmppStreamFeatures::Mode mode)
 {
-    m_nonSaslAuthAvailable = available;
+    m_nonSaslAuthMode = mode;
 }
 
 QList<QXmppConfiguration::SASLAuthMechanism> QXmppStreamFeatures::authMechanisms() const
@@ -84,14 +84,14 @@ void QXmppStreamFeatures::setCompressionMethods(QList<QXmppConfiguration::Compre
     m_compressionMethods = methods;
 }
 
-QXmppConfiguration::StreamSecurityMode QXmppStreamFeatures::securityMode() const
+QXmppStreamFeatures::Mode QXmppStreamFeatures::tlsMode() const
 {
-    return m_securityMode;
+    return m_tlsMode;
 }
 
-void QXmppStreamFeatures::setSecurityMode(QXmppConfiguration::StreamSecurityMode mode)
+void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
 {
-    m_securityMode = mode;
+    m_tlsMode = mode;
 }
 
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
@@ -100,10 +100,26 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
            element.tagName() == "features";
 }
 
+static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
+{
+    QDomElement subElement = element.firstChildElement(tagName);
+    if (subElement.namespaceURI() == tagNs)
+    {
+        if (!subElement.firstChildElement("required").isNull())
+            return QXmppStreamFeatures::Required;
+        else
+            return QXmppStreamFeatures::Enabled;
+    } else {
+        return QXmppStreamFeatures::Disabled;
+    }
+}
+
 void QXmppStreamFeatures::parse(const QDomElement &element)
 {
-    m_bindAvailable = !element.firstChildElement("bind").isNull();
-    m_sessionAvailable = !element.firstChildElement("session").isNull();
+    m_bindMode = readFeature(element, "bind", ns_bind);
+    m_sessionMode = readFeature(element, "session", ns_session);
+    m_nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
+    m_tlsMode = readFeature(element, "starttls", ns_tls);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
@@ -134,39 +150,28 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
             subElement = subElement.nextSiblingElement("mechanism");
         }
     }
+}
 
-    // parse advertised Non-SASL Authentication
-    QDomElement authElement = element.firstChildElement("auth");
-    m_nonSaslAuthAvailable = (authElement.namespaceURI() == ns_authFeature);
-
-    // parse advertised TLS mode
-    QDomElement tlsElement = element.firstChildElement("starttls");
-    if (tlsElement.namespaceURI() == ns_tls)
+static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const char *tagNs, QXmppStreamFeatures::Mode mode)
+{
+    if (mode != QXmppStreamFeatures::Disabled)
     {
-        if (tlsElement.firstChildElement().tagName() == "required")
-            m_securityMode = QXmppConfiguration::TLSRequired;
-        else
-            m_securityMode = QXmppConfiguration::TLSEnabled;
-    } else {
-        m_securityMode = QXmppConfiguration::TLSDisabled;
+        writer->writeStartElement(tagName);
+        writer->writeAttribute("xmlns", tagNs);
+        if (mode == QXmppStreamFeatures::Required)
+            writer->writeEmptyElement("required");
+        writer->writeEndElement();
     }
 }
 
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("stream:features");
-    if (m_bindAvailable)
-    {
-        writer->writeStartElement("bind");
-        writer->writeAttribute("xmlns", ns_bind);
-        writer->writeEndElement();
-    }
-    if (m_sessionAvailable)
-    {
-        writer->writeStartElement("session");
-        writer->writeAttribute("xmlns", ns_session);
-        writer->writeEndElement();
-    }
+    writeFeature(writer, "bind", ns_bind, m_bindMode);
+    writeFeature(writer, "session", ns_session, m_sessionMode);
+    writeFeature(writer, "auth", ns_authFeature, m_nonSaslAuthMode);
+    writeFeature(writer, "starttls", ns_tls, m_tlsMode);
+
     if (!m_compressionMethods.isEmpty())
     {
         writer->writeStartElement("compression");
@@ -205,20 +210,6 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
             }
             writer->writeEndElement();
         }
-        writer->writeEndElement();
-    }
-    if (m_nonSaslAuthAvailable)
-    {
-        writer->writeStartElement("auth");
-        writer->writeAttribute("xmlns", ns_authFeature);
-        writer->writeEndElement();
-    }
-    if (m_securityMode != QXmppConfiguration::TLSDisabled)
-    {
-        writer->writeStartElement("starttls");
-        writer->writeAttribute("xmlns", ns_tls);
-        if (m_securityMode == QXmppConfiguration::TLSRequired)
-            writer->writeEmptyElement("required");
         writer->writeEndElement();
     }
     writer->writeEndElement();
