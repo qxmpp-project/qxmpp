@@ -152,24 +152,6 @@ public:
                                               const QVariant &arg8 = QVariant(),
                                               const QVariant &arg9 = QVariant(),
                                               const QVariant &arg10 = QVariant() );
-
-    // deprecated accessors, use the form without "get" instead
-    const QXmppPresence Q_DECL_DEPRECATED & getClientPresence() const;
-    QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
-    const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
-    QXmppReconnectionManager* Q_DECL_DEPRECATED getReconnectionManager();
-    QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
-    QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
-    QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
-    QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
-
-    /// was clashing with QObject::disconnect use disconnectFromServer() instead
-    void Q_DECL_DEPRECATED disconnect();
-
-    // deprecated methods, use setClientPresence(QXmppPresence) instead.
-    void Q_DECL_DEPRECATED setClientPresence(const QString& statusText);
-    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Type presenceType);
-    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Status::Type statusType);
     /// \endcond
 
 signals:
