@@ -32,8 +32,14 @@ int main(int argc, char *argv[])
     
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
+    QXmppConfiguration config;
+    config.setUser("client");
+    config.setDomain("geiseri.com");
+    config.setPasswd("Passw0rd");
+    config.setHost("jabber.geiseri.com");
+    config.setUseSASLAuthentication(false);
+
     rpcClient client;
-    client.configuration().setUseSASLAuthentication( false );
-    client.connectToServer("jabber.geiseri.com", "client", "Passw0rd", "geiseri.com");
+    client.connectToServer(config);
     return a.exec();
 }
