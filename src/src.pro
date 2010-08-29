@@ -14,7 +14,7 @@ CONFIG += staticlib
 # LIBS += -lspeex
 
 # DNS support
-macx {
+unix {
     LIBS += -lresolv
 }
 win32 {

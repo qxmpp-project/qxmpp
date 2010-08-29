@@ -31,17 +31,14 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
-
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
     QXmppClient client;
 
-//  For google talk
-//    client.connectToServer("talk.google.com", "usernamewithoutdomain", "passwd", "gmail.com");
+    // For jabber
+    // client.connectToServer("username@jabber.org", "passwd");
 
-//  For jabber
-//    client.connectToServer("jabber.org", "usernamewithoutdomain", "passwd", "jabber.org");
-
-    client.connectToServer("talk.google.com", "qxmpp.test1", "qxmpp123", "gmail.com");
+    // For google talk
+    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
 
     return a.exec();
 }

@@ -33,6 +33,6 @@ int main(int argc, char *argv[])
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
     echoClient client;
-    client.connectToServer("talk.google.com", "qxmpp.test1", "qxmpp123", "gmail.com");
+    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
     return a.exec();
 }

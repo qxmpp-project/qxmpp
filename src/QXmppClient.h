@@ -111,6 +111,8 @@ public:
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
+    void connectToServer(const QString &jid,
+                         const QString &passwd);
     void disconnectFromServer();
     bool isConnected() const;
 

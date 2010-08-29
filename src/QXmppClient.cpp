@@ -223,6 +223,19 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     d->stream->connectToHost();
 }
 
+/// Overloaded function to simply connect to an XMPP server.
+///
+/// \param jid JID for the account.
+/// \param password Password for the account.
+
+void QXmppClient::connectToServer(const QString &jid, const QString &passwd)
+{
+    d->stream->configuration().setUser(jidToUser(jid));
+    d->stream->configuration().setDomain(jidToDomain(jid));
+    d->stream->configuration().setPasswd(jidToDomain(passwd));
+    d->stream->connectToHost();
+}
+
 /// Overloaded function.
 /// \param host host name of the XMPP server where connection has to be made
 /// (e.g. "jabber.org" and "talk.google.com"). It can also be an IP address in
