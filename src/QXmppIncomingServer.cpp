@@ -128,13 +128,12 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
             stream->setLogger(logger());
             stream->setObjectName("S2S-dialback-" + domain);
-            stream->configuration().setDomain(domain);
             bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
                                  this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
             Q_ASSERT(check);
             Q_UNUSED(check);
             stream->setVerify(d->localStreamId, request.key());
-            stream->connectToHost();
+            stream->connectToHost(domain);
         }
         else if (request.command() == QXmppDialback::Verify)
         {
@@ -172,7 +171,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     if (!stream ||
         dialback.command() != QXmppDialback::Verify ||
         dialback.id() != d->localStreamId ||
-        dialback.from() != stream->configuration().domain())
+        dialback.from() != stream->remoteDomain())
         return;
 
     // relay verify response

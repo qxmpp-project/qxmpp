@@ -361,7 +361,6 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
     stream->setObjectName("S2S-out-" + domain);
     stream->setLocalStreamKey(generateStanzaHash().toAscii());
     stream->setLogger(d->logger);
-    stream->configuration().setDomain(domain);
 
     bool check = connect(stream, SIGNAL(connected()),
                          this, SLOT(slotStreamConnected()));
@@ -376,7 +375,7 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
     emit streamAdded(stream);
 
     // connect to remote server
-    stream->connectToHost();
+    stream->connectToHost(domain);
     return stream;
 }
 
@@ -403,7 +402,7 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
         // look for an outgoing S2S connection
         foreach (QXmppOutgoingServer *conn, d->outgoingServers)
         {
-            if (conn->configuration().domain() == toDomain)
+            if (conn->remoteDomain() == toDomain)
             {
                 found << conn;
                 break;
@@ -605,7 +604,7 @@ void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
         // handle a verify request
         foreach (QXmppOutgoingServer *out, d->outgoingServers)
         {
-            if (out->configuration().domain() != dialback.from())
+            if (out->remoteDomain() != dialback.from())
                 continue;
 
             bool isValid = dialback.key() == out->localStreamKey();

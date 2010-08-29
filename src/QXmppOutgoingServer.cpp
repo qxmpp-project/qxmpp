@@ -35,8 +35,9 @@
 class QXmppOutgoingServerPrivate
 {
 public:
-    QString domain;
+    QString localDomain;
     QString localStreamKey;
+    QString remoteDomain;
     QString verifyId;
     QString verifyKey;
     bool ready;
@@ -50,12 +51,19 @@ public:
 ///
 
 QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
-    : QXmppOutgoingClient(parent),
+    : QXmppStream(parent),
     d(new QXmppOutgoingServerPrivate)
 {
-    d->domain = domain;
+    QSslSocket *socket = new QSslSocket(this);
+    setSocket(socket);
+
+    d->localDomain = domain;
     d->ready = false;
-    configuration().setKeepAliveInterval(0);
+
+    bool check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
+                         this, SLOT(slotSslErrors(QList<QSslError>)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 /// Destroys the stream.
@@ -66,9 +74,9 @@ QXmppOutgoingServer::~QXmppOutgoingServer()
     delete d;
 }
 
-void QXmppOutgoingServer::connectToHost()
+void QXmppOutgoingServer::connectToHost(const QString &domain)
 {
-    const QString domain = configuration().domain();
+    d->remoteDomain = domain;
     QString host;
     quint16 port;
 
@@ -102,6 +110,11 @@ void QXmppOutgoingServer::handleStart()
     sendData(data.toUtf8());
 }
 
+void QXmppOutgoingServer::handleStream(const QDomElement &streamElement)
+{
+    Q_UNUSED(streamElement);
+}
+
 void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 {
     const QString ns = stanza.namespaceURI();
@@ -110,18 +123,34 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     {
         QXmppStreamFeatures features;
         features.parse(stanza);
-        if (features.tlsMode() != QXmppStreamFeatures::Disabled)
+
+        if (!socket()->isEncrypted())
         {
-            // let QXmppOutgoingClient handle TLS
-            QXmppOutgoingClient::handleStanza(stanza);
+            // check we can satisfy TLS constraints
+            if (!socket()->supportsSsl() &&
+                 features.tlsMode() == QXmppStreamFeatures::Required)
+            {
+                warning("Disconnecting as TLS is required, but SSL support is not available");
+                disconnectFromHost();
+                return;
+            }
+
+            // enable TLS if possible
+            if (socket()->supportsSsl() &&
+                features.tlsMode() != QXmppStreamFeatures::Disabled)
+            {
+                sendData("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+                return;
+            }
         }
-        else if (!d->localStreamKey.isEmpty())
+
+        if (!d->localStreamKey.isEmpty())
         {
             // send dialback key
             QXmppDialback dialback;
             dialback.setCommand(QXmppDialback::Result);
-            dialback.setFrom(d->domain);
-            dialback.setTo(configuration().domain());
+            dialback.setFrom(d->localDomain);
+            dialback.setTo(d->remoteDomain);
             dialback.setKey(d->localStreamKey);
             sendPacket(dialback);
         }
@@ -131,8 +160,8 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             QXmppDialback verify;
             verify.setCommand(QXmppDialback::Verify);
             verify.setId(d->verifyId);
-            verify.setTo(configuration().domain());
-            verify.setFrom(d->domain);
+            verify.setFrom(d->localDomain);
+            verify.setTo(d->remoteDomain);
             verify.setKey(d->verifyKey);
             sendPacket(verify);
         }
@@ -153,7 +182,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 
         // check the request is valid
         if (response.from().isEmpty() ||
-            response.to() != d->domain ||
+            response.to() != d->localDomain ||
             response.type().isEmpty()) 
         {
             warning("Invalid dialback response received");
@@ -198,5 +227,18 @@ void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 {
     d->verifyId = id;
     d->verifyKey = key;
+}
+
+QString QXmppOutgoingServer::remoteDomain() const
+{
+    return d->remoteDomain;
+}
+
+void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
+{
+    warning("SSL errors");
+    for(int i = 0; i < errors.count(); ++i)
+        warning(errors.at(i).errorString());
+    socket()->ignoreSslErrors();
 }
 

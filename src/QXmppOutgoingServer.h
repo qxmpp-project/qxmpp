@@ -34,7 +34,7 @@ class QXmppOutgoingServerPrivate;
 /// to another XMPP server.
 ///
 
-class QXmppOutgoingServer : public QXmppOutgoingClient
+class QXmppOutgoingServer : public QXmppStream
 {
     Q_OBJECT
 
@@ -42,12 +42,14 @@ public:
     QXmppOutgoingServer(const QString &domain, QObject *parent);
     ~QXmppOutgoingServer();
 
-    void connectToHost();
+    void connectToHost(const QString &domain);
     bool isConnected() const;
 
     QString localStreamKey() const;
     void setLocalStreamKey(const QString &key);
     void setVerify(const QString &id, const QString &key);
+
+    QString remoteDomain() const;
 
 signals:
     /// This signal is emitted when a dialback verify response is received.
@@ -56,8 +58,12 @@ signals:
 protected:
     /// \cond
     void handleStart();
+    void handleStream(const QDomElement &streamElement);
     void handleStanza(const QDomElement &stanzaElement);
     /// \endcond
+
+private slots:
+    void slotSslErrors(const QList<QSslError> &errors);
 
 private:
     Q_DISABLE_COPY(QXmppOutgoingServer)
