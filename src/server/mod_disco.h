@@ -35,14 +35,15 @@ class QXmppServerDiscovery : public QXmppServerExtension
 {
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "disco");
-    Q_PROPERTY(QStringList discoveryItems READ discoveryItems WRITE setDiscoveryItems);
+    Q_PROPERTY(QStringList items READ items WRITE setItems);
 
 public:
-    QStringList discoveryItems() const;
-    void setDiscoveryItems(const QStringList &items);
+    QStringList items() const;
+    void setItems(const QStringList &items);
 
     /// \cond
     QStringList discoveryFeatures() const;
+    QStringList discoveryItems() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
     /// \endcond
 

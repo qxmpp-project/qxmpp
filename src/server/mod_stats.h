@@ -36,14 +36,14 @@ class QXmppServerStats : public QXmppServerExtension
 {
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "stats");
-    Q_PROPERTY(QString statisticsFile READ statisticsFile WRITE setStatisticsFile);
+    Q_PROPERTY(QString file READ file WRITE setFile);
 
 public:
     QXmppServerStats();
     ~QXmppServerStats();
 
-    QString statisticsFile() const;
-    void setStatisticsFile(const QString &statisticsFile);
+    QString file() const;
+    void setFile(const QString &file);
 
     /// cond
     QStringList discoveryItems() const;

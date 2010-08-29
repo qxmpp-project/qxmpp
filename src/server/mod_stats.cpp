@@ -126,26 +126,26 @@ QXmppServerStats::~QXmppServerStats()
 /// Returns the path of the file to which the statistics are written.
 ///
 
-QString QXmppServerStats::statisticsFile() const
+QString QXmppServerStats::file() const
 {
     return d->statisticsFile;
 }
 
 /// Sets the path of the file to which the statistics are written.
 ///
-/// \param statisticsFile
+/// \param file
 
-void QXmppServerStats::setStatisticsFile(const QString &statisticsFile)
+void QXmppServerStats::setFile(const QString &file)
 {
     if (d->statistics)
     {
         delete d->statistics;
         d->statistics = 0;
     }
-    d->statisticsFile = statisticsFile;
-    if (!statisticsFile.isEmpty())
+    d->statisticsFile = file;
+    if (!file.isEmpty())
     {
-        d->statistics = new QSettings(statisticsFile, QSettings::IniFormat, this);
+        d->statistics = new QSettings(file, QSettings::IniFormat, this);
         readStatistics();
         writeStatistics();
     }

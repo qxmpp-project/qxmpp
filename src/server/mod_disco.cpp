@@ -32,6 +32,16 @@
 
 #include "mod_disco.h"
 
+QStringList QXmppServerDiscovery::items() const
+{
+    return m_discoveryItems;
+}
+
+void QXmppServerDiscovery::setItems(const QStringList &items)
+{
+    m_discoveryItems = items;
+}
+
 QStringList QXmppServerDiscovery::discoveryFeatures() const
 {
     return QStringList() << ns_disco_info << ns_disco_items;
@@ -40,11 +50,6 @@ QStringList QXmppServerDiscovery::discoveryFeatures() const
 QStringList QXmppServerDiscovery::discoveryItems() const
 {
     return m_discoveryItems;
-}
-
-void QXmppServerDiscovery::setDiscoveryItems(const QStringList &items)
-{
-    m_discoveryItems = items;
 }
 
 bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &element)
