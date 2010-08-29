@@ -27,13 +27,13 @@
 #include <QList>
 #include <QString>
 
-/// \brief The QXmppServiceInfo class is used to perform DNS SRV queries.
+/// \brief The QXmppServiceRecord class represents a DNS SRV record.
 ///
 
-class QXmppServiceInfo
+class QXmppServiceRecord
 {
 public:
-    QXmppServiceInfo();
+    QXmppServiceRecord();
 
     QString hostName() const;
     void setHostName(const QString &hostName);
@@ -41,11 +41,25 @@ public:
     quint16 port() const;
     void setPort(quint16 port);
 
-    static bool lookupService(const QString &dname, QList<QXmppServiceInfo> &results);
-
 private:
     QString host_name;
     quint16 host_port;
+};
+
+/// \brief The QXmppServiceInfo class provides static methods for DNS SRV lookups.
+///
+
+class QXmppServiceInfo
+{
+public:
+    QString errorString() const;
+    QList<QXmppServiceRecord> records() const;
+
+    static QXmppServiceInfo fromName(const QString &dname);
+
+private:
+    QString m_errorString;
+    QList<QXmppServiceRecord> m_records;
 };
 
 #endif

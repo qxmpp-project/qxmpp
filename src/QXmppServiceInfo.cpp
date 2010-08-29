@@ -37,46 +37,61 @@
 #include <resolv.h>
 #endif
 
-/// Constructs an empty service info object.
+/// Constructs an empty service record object.
 ///
 
-QXmppServiceInfo::QXmppServiceInfo()
+QXmppServiceRecord::QXmppServiceRecord()
     : host_port(0)
 {
 }
 
-/// Returns host name for this service.
+/// Returns host name for this service record.
 ///
 
-QString QXmppServiceInfo::hostName() const
+QString QXmppServiceRecord::hostName() const
 {
     return host_name;
 }
 
-/// Sets the host name for this service.
+/// Sets the host name for this service record.
 ///
 /// \param hostName
 
-void QXmppServiceInfo::setHostName(const QString &hostName)
+void QXmppServiceRecord::setHostName(const QString &hostName)
 {
     host_name = hostName;
 }
 
-/// Returns the port for this service.
+/// Returns the port for this service record.
 ///
 
-quint16 QXmppServiceInfo::port() const
+quint16 QXmppServiceRecord::port() const
 {
     return host_port;
 }
 
-/// Sets the port for this service.
+/// Sets the port for this service record.
 ///
 /// \param port
 
-void QXmppServiceInfo::setPort(quint16 port)
+void QXmppServiceRecord::setPort(quint16 port)
 {
     host_port = port;
+}
+
+/// If the lookup failed, this function returns a human readable description of the error.
+///
+
+QString QXmppServiceInfo::errorString() const
+{
+    return m_errorString;
+}
+
+/// Returns the list of records associated with this service.
+///
+QList<QXmppServiceRecord> QXmppServiceInfo::records() const
+{
+    return m_records;
 }
 
 /// Perform a DNS lookup for an SRV entry.
@@ -84,18 +99,19 @@ void QXmppServiceInfo::setPort(quint16 port)
 /// Returns true if the lookup was succesful, false if it failed.
 ///
 /// \param dname
-/// \param results
 
-bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInfo> &results)
+QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
 {
+    QXmppServiceInfo result;
+
 #ifdef Q_OS_WIN
     PDNS_RECORD records, ptr;
 
     /* perform DNS query */
     if (DnsQuery_UTF8(dname.toAscii(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
-        qWarning() << "SRV lookup for" << dname << "failed";
-        return false;
+        result.m_errorString = QLatin1String("DnsQuery_UTF8 failed");
+        return result;
     }
 
     /* extract results */
@@ -103,10 +119,10 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
     {
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp(ptr->pName, dname.toAscii()))
         {
-            QXmppServiceInfo info;
-            info.setHostName(ptr->Data.Srv.pNameTarget);
-            info.setPort(ptr->Data.Srv.wPort);
-            results.append(info);
+            QXmppServiceRecord record;
+            record.setHostName(ptr->Data.Srv.pNameTarget);
+            record.setPort(ptr->Data.Srv.wPort);
+            result.m_records.append(record);
         }
     }
 
@@ -123,17 +139,16 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
     responseLength = res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
     if (responseLength < int(sizeof(HEADER)))
     {
-        qWarning() << "SRV lookup for" << dname << "failed";
-        herror("SRV lookup error");
-        return false;
+        result.m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
+        return result;
     }
 
     /* check the response header */
     HEADER *header = (HEADER*)response;
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
-        qWarning() << "SRV lookup for" << dname << "returned an error";
-        return false;
+        result.m_errorString = QLatin1String("res_query returned an error");
+        return result;
     }
 
     /* skip the query */
@@ -142,8 +157,8 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
     int status = dn_expand(response, response + responseLength, p, host, sizeof(host));
     if (status < 0)
     {
-        qWarning("dn_expand failed");
-        return false;
+        result.m_errorString = QLatin1String("dn_expand failed");
+        return result;
     }
     p += status + 4;
 
@@ -155,8 +170,8 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
         status = dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
-            qWarning("dn_expand failed");
-            return false;
+            result.m_errorString = QLatin1String("dn_expand failed");
+            return result;
         }
 
         p += status;
@@ -175,13 +190,13 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
             status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
             {
-                qWarning("dn_expand failed");
-                return false;
+                result.m_errorString = QLatin1String("dn_expand failed");
+                return result;
             }
-            QXmppServiceInfo info;
-            info.setHostName(answer);
-            info.setPort(port);
-            results.append(info);
+            QXmppServiceRecord record;
+            record.setHostName(answer);
+            record.setPort(port);
+            result.m_records.append(record);
         } else {
             qWarning("Unexpected DNS answer type");
         }
@@ -189,5 +204,5 @@ bool QXmppServiceInfo::lookupService(const QString &dname, QList<QXmppServiceInf
         answerIndex++;
     }
 #endif
-    return !results.isEmpty();
+    return result;
 }
