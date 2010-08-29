@@ -55,6 +55,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppServer.h \
     QXmppServerExtension.h \
     QXmppServerPlugin.h \
+    QXmppServiceInfo.h \
     QXmppSessionIq.h \
     QXmppSocks.h \
     QXmppStanza.h \
@@ -107,6 +108,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppSaslAuth.cpp \
     QXmppServer.cpp \
     QXmppServerExtension.cpp \
+    QXmppServiceInfo.cpp \
     QXmppSessionIq.cpp \
     QXmppSocks.cpp \
     QXmppStanza.cpp \
