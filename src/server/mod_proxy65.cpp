@@ -398,6 +398,7 @@ void QXmppServerProxy65::setStatistics(const QVariantMap &statistics)
 
 void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
+    Q_UNUSED(port);
     bool check;
     QTcpSocketPair *pair = d->pairs.value(hostName);
     if (!pair)
