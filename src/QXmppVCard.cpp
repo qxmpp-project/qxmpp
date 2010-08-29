@@ -56,6 +56,8 @@ static QString getImageType(const QByteArray& image)
         return "image/svg+xml";
     else if(format.toUpper() == "JPEG")
         return "image/jpeg";
+#else
+    Q_UNUSED(image);
 #endif
 
     return "image/unknown";
