@@ -129,8 +129,6 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             stream->setLogger(logger());
             stream->setObjectName("S2S-dialback-" + domain);
             stream->configuration().setDomain(domain);
-            stream->configuration().setHost(domain);
-            stream->configuration().setPort(5269);
             bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
                                  this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
             Q_ASSERT(check);

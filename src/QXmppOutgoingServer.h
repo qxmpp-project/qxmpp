@@ -42,6 +42,7 @@ public:
     QXmppOutgoingServer(const QString &domain, QObject *parent);
     ~QXmppOutgoingServer();
 
+    void connectToHost();
     bool isConnected() const;
 
     QString localStreamKey() const;

@@ -32,6 +32,7 @@
 #include "QXmppPacket.h"
 #include "QXmppPresence.h"
 #include "QXmppOutgoingClient.h"
+#include "QXmppServiceInfo.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSaslAuth.h"
@@ -152,12 +153,31 @@ QXmppConfiguration& QXmppOutgoingClient::configuration()
 
 void QXmppOutgoingClient::connectToHost()
 {
-    info(QString("Connecting to: %1:%2").arg(configuration().
-            host()).arg(configuration().port()));
+    const QString domain = configuration().domain();
+    QString host = configuration().host();
+    quint16 port = configuration().port();
 
+    // if we do not have no explicit host was provided, look it up
+    if (host.isEmpty() || !port)
+    {
+        debug(QString("Looking up server for domain %1").arg(domain));
+        QXmppServiceInfo serviceInfo = QXmppServiceInfo::fromName("_xmpp-client._tcp." + domain);
+        if (!serviceInfo.records().isEmpty())
+        {
+            // take the first returned record
+            host = serviceInfo.records().first().hostName();
+            port = serviceInfo.records().first().port();
+        } else {
+            // as a fallback, use domain as the host name
+            warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
+            host = domain;
+        }
+    }
+
+    // connect to server
+    info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
     socket()->setProxy(configuration().networkProxy());
-    socket()->connectToHost(configuration().host(),
-                            configuration().port());
+    socket()->connectToHost(host, port);
 }
 
 /// Returns true if the socket is connected and a session has been started.

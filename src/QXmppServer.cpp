@@ -362,8 +362,6 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
     stream->setLocalStreamKey(generateStanzaHash().toAscii());
     stream->setLogger(d->logger);
     stream->configuration().setDomain(domain);
-    stream->configuration().setHost(domain);
-    stream->configuration().setPort(5269);
 
     bool check = connect(stream, SIGNAL(connected()),
                          this, SLOT(slotStreamConnected()));

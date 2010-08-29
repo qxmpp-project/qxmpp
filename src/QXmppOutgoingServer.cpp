@@ -28,6 +28,7 @@
 #include "QXmppConstants.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
+#include "QXmppServiceInfo.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -63,6 +64,32 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
 QXmppOutgoingServer::~QXmppOutgoingServer()
 {
     delete d;
+}
+
+void QXmppOutgoingServer::connectToHost()
+{
+    const QString domain = configuration().domain();
+    QString host;
+    quint16 port;
+
+    // lookup server for domain
+    debug(QString("Looking up server for domain %1").arg(domain));
+    QXmppServiceInfo serviceInfo = QXmppServiceInfo::fromName("_xmpp-server._tcp." + domain);
+    if (!serviceInfo.records().isEmpty())
+    {
+        // take the first returned record
+        host = serviceInfo.records().first().hostName();
+        port = serviceInfo.records().first().port();
+    } else {
+        // as a fallback, use domain as the host name
+        warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
+        host = domain;
+        port = 5269;
+    }
+
+    // connect to server
+    info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
+    socket()->connectToHost(host, port);
 }
 
 void QXmppOutgoingServer::handleStart()
