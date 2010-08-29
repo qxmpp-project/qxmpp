@@ -412,30 +412,30 @@ void TestPackets::testStreamFeatures()
     const QByteArray xml("<stream:features/>");
     QXmppStreamFeatures features;
     parsePacket(features, xml);
-    QCOMPARE(features.isBindAvailable(), false);
-    QCOMPARE(features.isSessionAvailable(), false);
-    QCOMPARE(features.isNonSaslAuthAvailable(), false);
+    QCOMPARE(features.bindMode(), QXmppStreamFeatures::Disabled);
+    QCOMPARE(features.sessionMode(), QXmppStreamFeatures::Disabled);
+    QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Disabled);
+    QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>());
     QCOMPARE(features.compressionMethods(), QList<QXmppConfiguration::CompressionMethod>());
-    QCOMPARE(features.securityMode(), QXmppConfiguration::TLSDisabled);
     serializePacket(features, xml);
 
     const QByteArray xml2("<stream:features>"
         "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
         "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
-        "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
-        "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
         "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
         "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
+        "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
+        "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
         "</stream:features>");
     QXmppStreamFeatures features2;
     parsePacket(features2, xml2);
-    QCOMPARE(features2.isBindAvailable(), true);
-    QCOMPARE(features2.isSessionAvailable(), true);
-    QCOMPARE(features2.isNonSaslAuthAvailable(), true);
+    QCOMPARE(features2.bindMode(), QXmppStreamFeatures::Enabled);
+    QCOMPARE(features2.sessionMode(), QXmppStreamFeatures::Enabled);
+    QCOMPARE(features2.nonSaslAuthMode(), QXmppStreamFeatures::Enabled);
+    QCOMPARE(features2.tlsMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features2.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>() << QXmppConfiguration::SASLPlain);
     QCOMPARE(features2.compressionMethods(), QList<QXmppConfiguration::CompressionMethod>() << QXmppConfiguration::ZlibCompression);
-    QCOMPARE(features2.securityMode(), QXmppConfiguration::TLSEnabled);
     serializePacket(features2, xml2);
 }
 
