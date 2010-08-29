@@ -33,6 +33,8 @@
 class QXmppServiceInfo
 {
 public:
+    QXmppServiceInfo();
+
     QString hostName() const;
     void setHostName(const QString &hostName);
 

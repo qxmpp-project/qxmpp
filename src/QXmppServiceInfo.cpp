@@ -37,20 +37,42 @@
 #include <resolv.h>
 #endif
 
+/// Constructs an empty service info object.
+///
+
+QXmppServiceInfo::QXmppServiceInfo()
+    : host_port(0)
+{
+}
+
+/// Returns host name for this service.
+///
+
 QString QXmppServiceInfo::hostName() const
 {
     return host_name;
 }
+
+/// Sets the host name for this service.
+///
+/// \param hostName
+
+void QXmppServiceInfo::setHostName(const QString &hostName)
+{
+    host_name = hostName;
+}
+
+/// Returns the port for this service.
+///
 
 quint16 QXmppServiceInfo::port() const
 {
     return host_port;
 }
 
-void QXmppServiceInfo::setHostName(const QString &hostName)
-{
-    host_name = hostName;
-}
+/// Sets the port for this service.
+///
+/// \param port
 
 void QXmppServiceInfo::setPort(quint16 port)
 {
