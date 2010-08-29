@@ -51,6 +51,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppRoster.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
+    QXmppSaslAuth.h \
     QXmppServer.h \
     QXmppServerExtension.h \
     QXmppServerPlugin.h \
@@ -103,6 +104,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppPresence.cpp \
     QXmppRosterIq.cpp \
     QXmppRosterManager.cpp \
+    QXmppSaslAuth.cpp \
     QXmppServer.cpp \
     QXmppServerExtension.cpp \
     QXmppSessionIq.cpp \

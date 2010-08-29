@@ -29,6 +29,7 @@
 #include "QXmppBindIq.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
+#include "QXmppSaslAuth.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
@@ -44,7 +45,8 @@ public:
     QString username;
     QString resource;
     QXmppPasswordChecker *passwordChecker;
-    QByteArray saslNonce;
+    QXmppSaslDigestMd5 saslDigest;
+    int saslStep;
 };
 
 /// Constructs a new incoming client stream.
@@ -60,6 +62,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
 {
     d->passwordChecker = 0;
     d->domain = domain;
+    d->saslStep = 0;
 
     setObjectName("C2S-in");
     setSocket(socket);
@@ -119,6 +122,7 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
     d->idleTimer->start();
+    d->saslStep = 0;
 
     // start stream
     const QByteArray sessionId = generateStanzaHash().toAscii();
@@ -208,14 +212,13 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             else if (mechanism == "DIGEST-MD5")
             {
                 // generate nonce
-                QByteArray nonce(32, 'm');
-                for(int n = 0; n < nonce.size(); ++n)
-                    nonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
-                d->saslNonce = nonce.toBase64();
+                d->saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
+                d->saslDigest.setRealm(d->domain.toUtf8());
+                d->saslStep = 1;
 
                 QMap<QByteArray, QByteArray> challenge;
-                challenge["nonce"] = d->saslNonce;
-                challenge["realm"] = d->domain.toUtf8();
+                challenge["nonce"] = d->saslDigest.nonce();
+                challenge["realm"] = d->saslDigest.realm();
                 challenge["qop"] = "auth";
                 challenge["charset"] = "utf-8";
                 challenge["algorithm"] = "md5-sess";
@@ -236,32 +239,45 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             const QByteArray raw = QByteArray::fromBase64(nodeRecv.text().toAscii());
             QMap<QByteArray, QByteArray> response = parseDigestMd5(raw);
 
-            // check credentials
-            const QString username = QString::fromUtf8(response.value("username"));
-            QString password;
-            if (!d->passwordChecker || !d->passwordChecker->getPassword(username, password))
+            if (d->saslStep == 1)
             {
-                sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
-                disconnectFromHost();
-                return;
-            }
-            const QByteArray a1 = username.toUtf8() + ':' + d->domain.toUtf8() + ':' + password.toUtf8();
-            const QByteArray remote = QByteArray::fromHex(response["response"]);
-            if (remote != calculateDigestMd5(a1,
-                d->saslNonce,
-                response.value("nc"),
-                response.value("cnonce"),
-                response.value("digest-uri"),
-                QByteArray()))
-            {
-                sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
-                disconnectFromHost();
-                return;
-            }
+                // check credentials
+                const QString username = QString::fromUtf8(response.value("username"));
+                QString password;
+                if (!d->passwordChecker || !d->passwordChecker->getPassword(username, password))
+                {
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
+                    disconnectFromHost();
+                    return;
+                }
+                d->saslDigest.setUsername(username.toUtf8());
+                d->saslDigest.setPassword(password.toUtf8());
+                d->saslDigest.setDigestUri(response.value("digest-uri"));
+                d->saslDigest.setNc(response.value("nc"));
+                d->saslDigest.setCnonce(response.value("cnonce"));
+                if (response["response"] != d->saslDigest.calculateDigest(
+                        QByteArray("AUTHENTICATE:") + d->saslDigest.digestUri()))
+                {
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
+                    disconnectFromHost();
+                    return;
+                }
 
-            // authentication succeeded
-            d->username = username;
-            sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+                // send new challenge
+                d->username = username;
+                d->saslStep = 2;
+                QMap<QByteArray, QByteArray> challenge;
+                challenge["rspauth"] = d->saslDigest.calculateDigest(
+                    QByteArray(":") + d->saslDigest.digestUri());
+                const QByteArray data = serializeDigestMd5(challenge).toBase64();
+                sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data +"</challenge>");
+            }
+            else if (d->saslStep == 2)
+            {
+                // authentication succeeded
+                d->saslStep = 3;
+                sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+            }
         }
     }
     else if (ns == ns_client)
@@ -290,9 +306,10 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QXmppSessionIq sessionSet;
                 sessionSet.parse(nodeRecv);
 
-                QXmppSessionIq sessionResult;
+                QXmppIq sessionResult;
                 sessionResult.setType(QXmppIq::Result);
                 sessionResult.setId(sessionSet.id());
+                sessionResult.setTo(jid());
                 sendPacket(sessionResult);
                 return;
             }

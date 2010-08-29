@@ -34,6 +34,7 @@
 #include "QXmppOutgoingClient.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppSaslAuth.h"
 #include "QXmppUtils.h"
 
 // IQ types
@@ -75,7 +76,6 @@ public:
     QXmppStanza::Error::Condition xmppStreamError;
 
     // State data
-    int authStep;
     QString bindId;
     QString sessionId;
     bool sessionAvailable;
@@ -85,14 +85,18 @@ public:
     QString streamVersion;
     QString nonSASLAuthId;
 
+    // SASL
+    QXmppSaslDigestMd5 saslDigest;
+    int saslStep;
+
     // Timers
     QTimer *pingTimer;
     QTimer *timeoutTimer;
 };
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
-    : authStep(0),
-    sessionAvailable(false)
+    : sessionAvailable(false),
+    saslStep(0)
 {
 }
 
@@ -184,7 +188,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError ee)
 void QXmppOutgoingClient::handleStart()
 {
     // reset authentication step
-    d->authStep = 0;
+    d->saslStep = 0;
     d->sessionStarted = false;
 
     // start stream
@@ -349,14 +353,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         else if(nodeRecv.tagName() == "challenge")
         {
             // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
-            d->authStep++;
-            switch (d->authStep)
+            d->saslStep++;
+            switch (d->saslStep)
             {
             case 1 :
                 sendAuthDigestMD5ResponseStep1(nodeRecv.text());
                 break;
             case 2 :
-                sendAuthDigestMD5ResponseStep2();
+                sendAuthDigestMD5ResponseStep2(nodeRecv.text());
                 break;
             default :
                 warning("Too many authentication steps");
@@ -715,7 +719,6 @@ void QXmppOutgoingClient::pingTimeout()
 void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 {
     QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
-
     QMap<QByteArray, QByteArray> map = parseDigestMd5(ba);
 
     if (!map.contains("nonce"))
@@ -725,38 +728,30 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
         return;
     }
 
-    const QByteArray user = configuration().user().toUtf8();
-    const QByteArray passwd = configuration().passwd().toUtf8();
-    const QByteArray domain = configuration().domain().toUtf8();
-    const QByteArray realm = map.value("realm");
-
-    QByteArray cnonce(32, 'm');
-    for(int n = 0; n < cnonce.size(); ++n)
-        cnonce[n] = (char)(256.0*qrand()/(RAND_MAX+1.0));
-
-    // The random data can the '=' char is not valid as it is a delimiter,
-    // so to be safe, base64 the nonce
-    cnonce = cnonce.toBase64();
-
-    const QByteArray nc = "00000001";
-    const QByteArray digest_uri = "xmpp/" + domain;
-    const QByteArray authzid = map.value("authzid");
-    const QByteArray nonce = map.value("nonce");
-    const QByteArray a1 = user + ':' + realm + ':' + passwd;
+    d->saslDigest.setAuthzid(map.value("authzid"));
+    d->saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+    d->saslDigest.setDigestUri(QString("xmpp/%1").arg(configuration().domain()).toUtf8());
+    d->saslDigest.setNc("00000001");
+    d->saslDigest.setNonce(map.value("nonce"));
+    d->saslDigest.setRealm(map.value("realm"));
+    d->saslDigest.setUsername(configuration().user().toUtf8());
+    d->saslDigest.setPassword(configuration().passwd().toUtf8());
 
     // Build response
     QMap<QByteArray, QByteArray> response;
-    response["username"] = user;
-    if(!realm.isEmpty())
-        response["realm"] = realm;
-    response["nonce"] = map["nonce"];
-    response["cnonce"] = cnonce;
-    response["nc"] = nc;
+    response["username"] = d->saslDigest.username();
+    if(!d->saslDigest.realm().isEmpty())
+        response["realm"] = d->saslDigest.realm();
+    response["nonce"] = d->saslDigest.nonce();
+    response["cnonce"] = d->saslDigest.cnonce();
+    response["nc"] = d->saslDigest.nc();
     response["qop"] = "auth";
-    response["digest-uri"] = digest_uri;
-    response["response"] = calculateDigestMd5(a1, nonce, nc, cnonce, digest_uri, authzid).toHex();
-    if(!authzid.isEmpty())
-        response["authzid"] = authzid;
+    response["digest-uri"] = d->saslDigest.digestUri();
+    response["response"] = d->saslDigest.calculateDigest(
+        QByteArray("AUTHENTICATE:") + d->saslDigest.digestUri());
+
+    if(!d->saslDigest.authzid().isEmpty())
+        response["authzid"] = d->saslDigest.authzid();
     response["charset"] = "utf-8";
 
     const QByteArray data = serializeDigestMd5(response);
@@ -765,8 +760,27 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
     sendData(packet);
 }
 
-void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep2()
+void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep2(const QString &challenge)
 {
+    QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
+    QMap<QByteArray, QByteArray> map = parseDigestMd5(ba);
+
+    if (!map.contains("rspauth"))
+    {
+        warning("sendAuthDigestMD5ResponseStep2: Invalid input");
+        disconnectFromHost();
+        return;
+    }
+
+    // check new challenge
+    if (map["rspauth"] !=
+        d->saslDigest.calculateDigest(QByteArray(":") + d->saslDigest.digestUri()))
+    {
+        warning("sendAuthDigestMD5ResponseStep2: Bad challenge");
+        disconnectFromHost();
+        return;
+    }
+
     sendData("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
 }
 

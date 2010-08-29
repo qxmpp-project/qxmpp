@@ -67,9 +67,6 @@ QString escapeString(const QString& str);
 QString unescapeString(const QString& str);
 
 // Digest MD5 authentication
-QByteArray calculateDigestMd5(const QByteArray &a1,
-    const QByteArray &nonce, const QByteArray &nc, const QByteArray &cnonce,
-    const QByteArray &digest_uri, const QByteArray &authzid);
 QMap<QByteArray, QByteArray> parseDigestMd5(const QByteArray &ba);
 QByteArray serializeDigestMd5(const QMap<QByteArray, QByteArray> &map);
 

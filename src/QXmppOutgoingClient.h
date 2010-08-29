@@ -146,7 +146,7 @@ private slots:
 private:
     QXmppDiscoveryIq capabilities() const;
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
-    void sendAuthDigestMD5ResponseStep2();
+    void sendAuthDigestMD5ResponseStep2(const QString& challenge);
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
 
