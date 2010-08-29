@@ -448,6 +448,14 @@ void TestPackets::testVCard()
         "<FN>Foo Bar!</FN>"
         "<NICKNAME>FooBar</NICKNAME>"
         "<N><GIVEN>Foo</GIVEN><FAMILY>Wiz</FAMILY><MIDDLE>Baz</MIDDLE></N>"
+        "<PHOTO>"
+            "<TYPE>image/png</TYPE>"
+            "<BINVAL>"
+            "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+            "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+            "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
+            "</BINVAL>"
+        "</PHOTO>"
         "</vCard>"
         "</iq>");
 
