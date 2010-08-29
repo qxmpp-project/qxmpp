@@ -223,17 +223,18 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     d->stream->connectToHost();
 }
 
-/// Overloaded function to simply connect to an XMPP server.
+/// Overloaded function to simply connect to an XMPP server with a JID and password.
 ///
 /// \param jid JID for the account.
 /// \param password Password for the account.
 
 void QXmppClient::connectToServer(const QString &jid, const QString &passwd)
 {
-    d->stream->configuration().setUser(jidToUser(jid));
-    d->stream->configuration().setDomain(jidToDomain(jid));
-    d->stream->configuration().setPasswd(jidToDomain(passwd));
-    d->stream->connectToHost();
+    QXmppConfiguration config;
+    config.setUser(jidToUser(jid));
+    config.setDomain(jidToDomain(jid));
+    config.setPasswd(jidToDomain(passwd));
+    connectToServer(config);
 }
 
 /// Overloaded function.
@@ -261,11 +262,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
     config.setPasswd(passwd);
     config.setDomain(domain);
     config.setPort(port);
-
-    d->clientPresence = initialPresence;
-    d->clientPresence.setExtensions(d->stream->presenceExtensions());
-
-    d->stream->connectToHost();
+    connectToServer(config, initialPresence);
 }
 
 /// Overloaded function.
@@ -286,18 +283,13 @@ void QXmppClient::connectToServer(const QString& host,
                                   int port,
                                   const QXmppPresence& initialPresence)
 {
-    QString user, domain;
-    QStringList list = bareJid.split("@");
-    if(list.size() == 2)
-    {
-        user = list.at(0);
-        domain = list.at(1);
-        connectToServer(host, user, passwd, domain, port, initialPresence);
-    }
-    else
-    {
-        emit logMessage(QXmppLogger::WarningMessage, "Invalid bareJid");
-    }
+    QXmppConfiguration config;
+    config.setHost(host);
+    config.setUser(jidToUser(bareJid));
+    config.setDomain(jidToDomain(bareJid));
+    config.setPasswd(passwd);
+    config.setPort(port);
+    connectToServer(config, initialPresence);
 }
 
 /// After successfully connecting to the server use this function to send

@@ -95,19 +95,6 @@ public:
 
     void addExtension(QXmppClientExtension *extension);
 
-    void connectToServer(const QString& host,
-                         const QString& user,
-                         const QString& passwd,
-                         const QString& domain,
-                         int port = 5222,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
-    void connectToServer(const QString& host,
-                         const QString& bareJid,
-                         const QString& passwd,
-                         int port = 5222,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
@@ -152,6 +139,22 @@ public:
                                               const QVariant &arg8 = QVariant(),
                                               const QVariant &arg9 = QVariant(),
                                               const QVariant &arg10 = QVariant() );
+
+    // FIXME: these methods are deprecated, their API is just too hard to read.
+    // If you need this level of customisation, work directly with QXmppConfiguration.
+    void Q_DECL_DEPRECATED connectToServer(const QString& host,
+                         const QString& user,
+                         const QString& passwd,
+                         const QString& domain,
+                         int port = 5222,
+                         const QXmppPresence& initialPresence =
+                         QXmppPresence());
+    void Q_DECL_DEPRECATED connectToServer(const QString& host,
+                         const QString& bareJid,
+                         const QString& passwd,
+                         int port = 5222,
+                         const QXmppPresence& initialPresence =
+                         QXmppPresence());
     /// \endcond
 
 signals:
