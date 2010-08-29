@@ -132,3 +132,79 @@ QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A2) const
     return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
+QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &ba)
+{
+    QMap<QByteArray, QByteArray> map;
+    int startIndex = 0;
+    int pos = 0;
+    while ((pos = ba.indexOf("=", startIndex)) >= 0)
+    {
+        // key get name and skip equals
+        const QByteArray key = ba.mid(startIndex, pos - startIndex).trimmed();
+        pos++;
+
+        // check whether string is quoted
+        if (ba.at(pos) == '"')
+        {
+            // skip opening quote
+            pos++;
+            int endPos = ba.indexOf('"', pos);
+            // skip quoted quotes
+            while (endPos >= 0 && ba.at(endPos - 1) == '\\')
+                endPos = ba.indexOf('"', endPos + 1);
+            if (endPos < 0)
+            {
+                qWarning("Unfinished quoted string");
+                return map;
+            }
+            // unquote
+            QByteArray value = ba.mid(pos, endPos - pos);
+            value.replace("\\\"", "\"");
+            value.replace("\\\\", "\\"); 
+            map[key] = value;
+            // skip closing quote and comma
+            startIndex = endPos + 2;
+        } else {
+            // non-quoted string
+            int endPos = ba.indexOf(',', pos);
+            if (endPos < 0)
+                endPos = ba.size();
+            map[key] = ba.mid(pos, endPos - pos);
+            // skip comma
+            startIndex = endPos + 1;
+        }
+    }
+    return map;
+}
+
+QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArray> &map)
+{
+    QByteArray ba;
+    foreach (const QByteArray &key, map.keys())
+    {
+        if (!ba.isEmpty())
+            ba.append(',');
+        ba.append(key + "=");
+        QByteArray value = map[key];
+        const char *separators = "()<>@,;:\\\"/[]?={} \t";
+        bool quote = false;
+        for (const char *c = separators; *c; c++)
+        {
+            if (value.contains(*c))
+            {
+                quote = true;
+                break;
+            }
+        }
+        if (quote)
+        {
+            value.replace("\\", "\\\\");
+            value.replace("\"", "\\\"");
+            ba.append("\"" + value + "\"");
+        }
+        else
+            ba.append(value);
+    }
+    return ba;
+}
+

@@ -223,7 +223,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 challenge["charset"] = "utf-8";
                 challenge["algorithm"] = "md5-sess";
 
-                const QByteArray data = serializeDigestMd5(challenge).toBase64();
+                const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge).toBase64();
                 sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data +"</challenge>");
             }
             else
@@ -237,7 +237,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         else if (nodeRecv.tagName() == "response")
         {
             const QByteArray raw = QByteArray::fromBase64(nodeRecv.text().toAscii());
-            QMap<QByteArray, QByteArray> response = parseDigestMd5(raw);
+            QMap<QByteArray, QByteArray> response = QXmppSaslDigestMd5::parseMessage(raw);
 
             if (d->saslStep == 1)
             {
@@ -269,7 +269,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QMap<QByteArray, QByteArray> challenge;
                 challenge["rspauth"] = d->saslDigest.calculateDigest(
                     QByteArray(":") + d->saslDigest.digestUri());
-                const QByteArray data = serializeDigestMd5(challenge).toBase64();
+                const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge).toBase64();
                 sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data +"</challenge>");
             }
             else if (d->saslStep == 2)

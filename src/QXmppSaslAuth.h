@@ -26,6 +26,7 @@
 #define QXMPPSASLAUTH_H
 
 #include <QByteArray>
+#include <QMap>
 
 class QXmppSaslDigestMd5
 {
@@ -55,6 +56,10 @@ public:
 
     QByteArray calculateDigest(const QByteArray &a2) const;
     static QByteArray generateNonce();
+
+    // message parsing and serialization
+    static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
+    static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
 
 private:
     QByteArray m_authzid;

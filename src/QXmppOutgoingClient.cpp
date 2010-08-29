@@ -718,8 +718,8 @@ void QXmppOutgoingClient::pingTimeout()
 // challenge is BASE64 encoded string
 void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challenge)
 {
-    QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
-    QMap<QByteArray, QByteArray> map = parseDigestMd5(ba);
+    QByteArray ba = QByteArray::fromBase64(challenge.toAscii());
+    QMap<QByteArray, QByteArray> map = QXmppSaslDigestMd5::parseMessage(ba);
 
     if (!map.contains("nonce"))
     {
@@ -754,7 +754,7 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
         response["authzid"] = d->saslDigest.authzid();
     response["charset"] = "utf-8";
 
-    const QByteArray data = serializeDigestMd5(response);
+    const QByteArray data = QXmppSaslDigestMd5::serializeMessage(response);
     QByteArray packet = "<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
                         + data.toBase64() + "</response>";
     sendData(packet);
@@ -762,8 +762,8 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
 
 void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep2(const QString &challenge)
 {
-    QByteArray ba = QByteArray::fromBase64(challenge.toUtf8());
-    QMap<QByteArray, QByteArray> map = parseDigestMd5(ba);
+    QByteArray ba = QByteArray::fromBase64(challenge.toAscii());
+    QMap<QByteArray, QByteArray> map = QXmppSaslDigestMd5::parseMessage(ba);
 
     if (!map.contains("rspauth"))
     {
