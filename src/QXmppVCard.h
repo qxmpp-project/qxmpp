@@ -26,6 +26,7 @@
 #define QXMPPVCARD_H
 
 #include "QXmppIq.h"
+#include <QDate>
 #include <QMap>
 #include <QDomElement>
 
@@ -46,6 +47,8 @@ class QXmppVCard : public QXmppIq
 public:
     QXmppVCard(const QString& bareJid = "");
 
+    void setBirthday(const QDate &birthday);
+    void setEmail(const QString&);
     void setFirstName(const QString&);
     void setFullName(const QString&);
     void setLastName(const QString&);
@@ -56,6 +59,8 @@ public:
     void setPhoto(const QByteArray&);
     void setPhoto(const QImage&);
 
+    QDate birthday() const;
+    QString email() const;
     QString firstName() const;
     QString fullName() const;
     QString lastName() const;
@@ -83,6 +88,8 @@ protected:
     /// \endcond
 
 private:
+    QDate m_birthday;
+    QString m_email;
     QString m_firstName;
     QString m_fullName;
     QString m_lastName;

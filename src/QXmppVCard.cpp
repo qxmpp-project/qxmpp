@@ -67,6 +67,26 @@ QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
     setTo(jid);
 }
 
+QDate QXmppVCard::birthday() const
+{
+    return m_birthday;
+}
+
+void QXmppVCard::setBirthday(const QDate &birthday)
+{
+    m_birthday = birthday;
+}
+
+QString QXmppVCard::email() const
+{
+    return m_email;
+}
+
+void QXmppVCard::setEmail(const QString &email)
+{
+    m_email = email;
+}
+
 QString QXmppVCard::firstName() const
 {
     return m_firstName;
@@ -158,6 +178,9 @@ void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
 {
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
+    m_birthday = QDate::fromString(cardElement.firstChildElement("BDAY").text(), "yyyy-MM-dd");
+    QDomElement emailElement = cardElement.firstChildElement("EMAIL");
+    m_email = emailElement.firstChildElement("USERID").text();
     m_fullName = cardElement.firstChildElement("FN").text();
     m_nickName = cardElement.firstChildElement("NICKNAME").text();
     QDomElement nameElement = cardElement.firstChildElement("N");
@@ -175,6 +198,15 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
+    if (m_birthday.isValid())
+        helperToXmlAddTextElement(writer, "BDAY", m_birthday.toString("yyyy-MM-dd"));
+    if (!m_email.isEmpty())
+    {
+        writer->writeStartElement("EMAIL");
+        writer->writeEmptyElement("INTERNET");
+        helperToXmlAddTextElement(writer, "USERID", m_email);
+        writer->writeEndElement();
+    }
     if (!m_fullName.isEmpty())
         helperToXmlAddTextElement(writer, "FN", m_fullName);
     if(!m_nickName.isEmpty())
