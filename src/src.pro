@@ -11,6 +11,15 @@ CONFIG += staticlib
 
 # To enable support for the Speex codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX
+# LIBS += -lspeex
+
+# DNS support
+macx {
+    LIBS += -lresolv
+}
+win32 {
+    LIBS += -ldnsapi
+}
 
 # Target definition
 TARGET = $$QXMPP_LIBRARY_NAME
