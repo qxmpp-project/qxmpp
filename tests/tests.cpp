@@ -468,6 +468,11 @@ void TestPackets::testVCard()
     QCOMPARE(vcard.firstName(), QLatin1String("Foo"));
     QCOMPARE(vcard.middleName(), QLatin1String("Baz"));
     QCOMPARE(vcard.lastName(), QLatin1String("Wiz"));
+    QCOMPARE(vcard.photo(), QByteArray::fromBase64(
+        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+        "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+        "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
+    QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
     serializePacket(vcard, xml);
 }
 

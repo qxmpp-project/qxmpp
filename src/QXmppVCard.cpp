@@ -147,27 +147,33 @@ void QXmppVCard::setUrl(const QString& url)
     m_url = url;
 }
 
-/// photo is not stored as base 64
-const QByteArray& QXmppVCard::photo() const
+/// Returns the photo's binary contents.
+
+QByteArray QXmppVCard::photo() const
 {
     return m_photo;
 }
+
+/// Sets the photo's binary contents.
 
 void QXmppVCard::setPhoto(const QByteArray& photo)
 {
     m_photo = photo;
 }
 
-#ifndef QXMPP_NO_GUI
-void QXmppVCard::setPhoto(const QImage& image)
+/// Returns the photo's MIME type.
+
+QString QXmppVCard::photoType() const
 {
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "PNG");
-    m_photo = ba;
+    return m_photoType;
 }
-#endif
+
+/// Sets the photo's MIME type.
+
+void QXmppVCard::setPhotoType(const QString& photoType)
+{
+    m_photoType = photoType;
+}
 
 bool QXmppVCard::isVCard(const QDomElement &nodeRecv)
 {
@@ -188,10 +194,11 @@ void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
     m_lastName = nameElement.firstChildElement("FAMILY").text();
     m_middleName = nameElement.firstChildElement("MIDDLE").text();
     m_url = cardElement.firstChildElement("URL").text();
-    QByteArray base64data = cardElement.
-                            firstChildElement("PHOTO").
+    QDomElement photoElement = cardElement.firstChildElement("PHOTO");
+    QByteArray base64data = photoElement.
                             firstChildElement("BINVAL").text().toAscii();
-    setPhoto(QByteArray::fromBase64(base64data));
+    m_photo = QByteArray::fromBase64(base64data);
+    m_photoType = photoElement.firstChildElement("TYPE").text();
 }
 
 void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -230,8 +237,11 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if(!photo().isEmpty())
     {
         writer->writeStartElement("PHOTO");
-        helperToXmlAddTextElement(writer, "TYPE", getImageType(photo()));
-        helperToXmlAddTextElement(writer, "BINVAL", photo().toBase64());
+        QString photoType = m_photoType;
+        if (photoType.isEmpty())
+            photoType = getImageType(m_photo);
+        helperToXmlAddTextElement(writer, "TYPE", photoType);
+        helperToXmlAddTextElement(writer, "BINVAL", m_photo.toBase64());
         writer->writeEndElement();
     }
 
@@ -247,27 +257,15 @@ QImage QXmppVCard::photoAsImage() const
     QImageReader imageReader(&buffer);
     return imageReader.read();
 }
-#endif
 
-QString QXmppVCard::getFullName() const
+void QXmppVCard::setPhoto(const QImage& image)
 {
-    return m_fullName;
-}
-
-QString QXmppVCard::getNickName() const
-{
-    return m_nickName;
-}
-
-const QByteArray& QXmppVCard::getPhoto() const
-{
-    return m_photo;
-}
-
-#ifndef QXMPP_NO_GUI
-QImage QXmppVCard::getPhotoAsImage() const
-{
-    return photoAsImage();
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+    m_photo = ba;
+    m_photoType = "image/png";
 }
 #endif
 

@@ -56,8 +56,11 @@ public:
     void setNickName(const QString&);
     void setUrl(const QString&);
 
+    QByteArray photo() const;
     void setPhoto(const QByteArray&);
-    void setPhoto(const QImage&);
+
+    QString photoType() const;
+    void setPhotoType(const QString &type);
 
     QDate birthday() const;
     QString email() const;
@@ -68,18 +71,12 @@ public:
     QString nickName() const;
     QString url() const;
 
+#ifndef QXMPP_NO_GUI
     QImage photoAsImage() const;
-    const QByteArray& photo() const;
+    void setPhoto(const QImage&);
+#endif
 
     static bool isVCard(const QDomElement &element);
-
-    // deprecated accessors, use the form without "get" instead
-    /// \cond
-    QString Q_DECL_DEPRECATED getFullName() const;
-    QString Q_DECL_DEPRECATED getNickName() const;
-    QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
-    const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
-    /// \endcond
 
 protected:
     /// \cond
@@ -99,6 +96,7 @@ private:
 
     // not as 64 base
     QByteArray m_photo;
+    QString m_photoType;
 };
 
 #endif // QXMPPVCARD_H
