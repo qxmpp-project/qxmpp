@@ -35,6 +35,7 @@
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
 #include "QXmppRpcIq.h"
+#include "QXmppSaslAuth.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
@@ -53,20 +54,20 @@ void TestUtils::testCrc32()
 void TestUtils::testDigestMd5()
 {
     // empty
-    QMap<QByteArray, QByteArray> empty = parseDigestMd5(QByteArray());
+    QMap<QByteArray, QByteArray> empty = QXmppSaslDigestMd5::parseMessage(QByteArray());
     QCOMPARE(empty.size(), 0);
-    QCOMPARE(serializeDigestMd5(empty), QByteArray());
+    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(empty), QByteArray());
 
     // non-empty
     const QByteArray bytes("number=12345,quoted_plain=\"quoted string\",quoted_quote=\"quoted\\\\slash\\\"quote\",string=string");
 
-    QMap<QByteArray, QByteArray> map = parseDigestMd5(bytes);
+    QMap<QByteArray, QByteArray> map = QXmppSaslDigestMd5::parseMessage(bytes);
     QCOMPARE(map.size(), 4);
     QCOMPARE(map["number"], QByteArray("12345"));
     QCOMPARE(map["quoted_plain"], QByteArray("quoted string"));
     QCOMPARE(map["quoted_quote"], QByteArray("quoted\\slash\"quote"));
     QCOMPARE(map["string"], QByteArray("string"));
-    QCOMPARE(serializeDigestMd5(map), bytes);
+    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(map), bytes);
 }
 
 void TestUtils::testHmac()
