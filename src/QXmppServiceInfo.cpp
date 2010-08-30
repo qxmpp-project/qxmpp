@@ -96,7 +96,7 @@ QList<QXmppServiceRecord> QXmppServiceInfo::records() const
 
 /// Perform a DNS lookup for an SRV entry.
 ///
-/// Returns true if the lookup was succesful, false if it failed.
+/// Returns QXmppServiceInfo object with records
 ///
 /// \param dname
 
