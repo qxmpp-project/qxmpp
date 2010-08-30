@@ -11,7 +11,7 @@ LIBS += -L$$QXMPP_LIBRARY_DIR -l$$QXMPP_LIBRARY_NAME
 
 # FIXME: we should be able to use the link_prl option to automatically pull
 # in the extra libraries which the qxmpp library needs, but this does not
-# seem to work on win32, so respecify the dependencies here:
+# seem to work on win32, so we specify the dependencies here:
 unix {
     LIBS += -lresolv
 }
