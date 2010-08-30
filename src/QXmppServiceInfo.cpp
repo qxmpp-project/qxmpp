@@ -108,7 +108,7 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
     PDNS_RECORD records, ptr;
 
     /* perform DNS query */
-    if (DnsQuery_UTF8(dname.toAscii(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
+    if (DnsQuery_UTF8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
         result.m_errorString = QLatin1String("DnsQuery_UTF8 failed");
         return result;
@@ -117,10 +117,10 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
     /* extract results */
     for (ptr = records; ptr != NULL; ptr = ptr->pNext)
     {
-        if ((ptr->wType == DNS_TYPE_SRV) && !strcmp(ptr->pName, dname.toAscii()))
+        if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
         {
             QXmppServiceRecord record;
-            record.setHostName(ptr->Data.Srv.pNameTarget);
+            record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
             result.m_records.append(record);
         }
