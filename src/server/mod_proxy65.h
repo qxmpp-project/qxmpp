@@ -24,6 +24,7 @@
 #ifndef QXMPP_SERVER_PROXY65_H
 #define QXMPP_SERVER_PROXY65_H
 
+#include <QStringList>
 #include <QTime>
 
 #include "QXmppServerExtension.h"
@@ -65,15 +66,23 @@ class QXmppServerProxy65 : public QXmppServerExtension
 {
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "proxy65");
+    Q_PROPERTY(QStringList allowedDomains READ allowedDomains WRITE setAllowedDomains);
     Q_PROPERTY(QString jid READ jid WRITE setJid);
+    Q_PROPERTY(QString host READ host WRITE setHost);
     Q_PROPERTY(quint16 port READ port WRITE setPort);
 
 public:
     QXmppServerProxy65();
     ~QXmppServerProxy65();
 
+    QStringList allowedDomains() const;
+    void setAllowedDomains(const QStringList &allowedDomains);
+
     QString jid() const;
     void setJid(const QString &jid);
+
+    QString host() const;
+    void setHost(const QString &host);
 
     quint16 port() const;
     void setPort(quint16 port);

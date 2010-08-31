@@ -144,10 +144,14 @@ struct TransferStats
 class QXmppServerProxy65Private
 {
 public:
+    // configuration
+    QStringList allowedDomains;
     QString jid;
-    QHostAddress host;
+    QHostAddress hostAddress;
+    QString hostName;
     quint16 port;
 
+    // state
     QMap<QString, QTcpSocketPair*> pairs;
     QXmppSocksServer *server;
 
@@ -183,6 +187,25 @@ QXmppServerProxy65::~QXmppServerProxy65()
     delete d;
 }
 
+/// Returns the XMPP domains which are allowed to use the proxy.
+///
+
+QStringList QXmppServerProxy65::allowedDomains() const
+{
+    return d->allowedDomains;
+}
+
+/// Sets the XMPP domains which are allowed to use the proxy.
+///
+/// If not defined, defaults to the server's domain.
+///
+/// \param allowedDomains
+
+void QXmppServerProxy65::setAllowedDomains(const QStringList &allowedDomains)
+{
+    d->allowedDomains = allowedDomains;
+}
+
 /// Returns the proxy server's JID.
 ///
 
@@ -200,6 +223,25 @@ void QXmppServerProxy65::setJid(const QString &jid)
     d->jid = jid;
 }
 
+/// Returns the host on which to listen for SOCKS5 connections.
+///
+
+QString QXmppServerProxy65::host() const
+{
+    return d->hostName;
+}
+
+/// Sets the host on which to listen for SOCKS5 connections.
+///
+/// If not defined, defaults to the server's domain.
+///
+/// \param host
+
+void QXmppServerProxy65::setHost(const QString &host)
+{
+    d->hostName = host;
+}
+
 /// Returns the port on which to listen for SOCKS5 connections.
 ///
 
@@ -209,6 +251,8 @@ quint16 QXmppServerProxy65::port() const
 }
 
 /// Sets the port on which to listen for SOCKS5 connections.
+///
+/// If not defined, defaults to 7777.
 ///
 /// \param port
 
@@ -277,7 +321,7 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
 
             QXmppByteStreamIq::StreamHost streamHost;
             streamHost.setJid(d->jid);
-            streamHost.setHost(d->host);
+            streamHost.setHost(d->hostAddress);
             streamHost.setPort(d->port);
             streamHosts.append(streamHost);
 
@@ -294,15 +338,14 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
             responseIq.setFrom(bsIq.to());
             responseIq.setId(bsIq.id());
 
-            // FIXME : make it possible to specify permissions
             if (pair &&
-                jidToDomain(bsIq.from()) == server()->domain())
+                d->allowedDomains.contains(jidToDomain(bsIq.from())))
             {
-                qDebug() << "Activating connection" << hash << "by" << bsIq.from();
+                info(QString("Activating connection %1 by %2").arg(hash, bsIq.from()));
                 pair->activate();
                 responseIq.setType(QXmppIq::Result);
             } else {
-                qWarning() << "Not activating connection" << hash << "by" << bsIq.from();
+                warning(QString("Not activating connection %1 by %2").arg(hash, bsIq.from()));
                 responseIq.setType(QXmppIq::Error);
             }
             server()->sendPacket(responseIq);
@@ -314,28 +357,31 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
 
 bool QXmppServerProxy65::start()
 {
+    // determine allowed domains
+    if (d->allowedDomains.isEmpty())
+        d->allowedDomains << server()->domain();
+
     // determine jid
     if (d->jid.isEmpty())
         d->jid = "proxy." + server()->domain();
 
     // determine address
-    const QString hostName = server()->domain();
-    QHostAddress hostAddress;
-    if (!hostAddress.setAddress(hostName))
+    if (d->hostName.isEmpty())
+        d->hostName = server()->domain();
+    if (!d->hostAddress.setAddress(d->hostName))
     {
-        QHostInfo hostInfo = QHostInfo::fromName(hostName);
+        QHostInfo hostInfo = QHostInfo::fromName(d->hostName);
         if (hostInfo.addresses().isEmpty())
         {
-            qWarning() << "Could not lookup host" << hostName;
+            warning(QString("Could not lookup host %1").arg(d->hostName));
             return false;
         }
-        hostAddress = hostInfo.addresses().first();
+        d->hostAddress = hostInfo.addresses().first();
     }
 
     // start listening
-    if (!d->server->listen(hostAddress, d->port))
+    if (!d->server->listen(d->hostAddress, d->port))
         return false;
-    d->host = hostAddress;
 
     // start statistics update
     d->statisticsTimer->start();
@@ -417,7 +463,7 @@ void QXmppServerProxy65::slotPairFinished()
     if (!pair)
         return;
 
-    qDebug() << "Data transfered for" << pair->key << pair->transfer;
+    info(QString("Data transfered for %1 %2").arg(pair->key, QString::number(pair->transfer)));
 
     // update speed statistics
     TransferStats stats;
