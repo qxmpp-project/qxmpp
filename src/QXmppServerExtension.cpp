@@ -24,6 +24,8 @@
 #include <QMetaClassInfo>
 #include <QStringList>
 
+#include "QXmppLogger.h"
+#include "QXmppServer.h"
 #include "QXmppServerExtension.h"
 
 class QXmppServerExtensionPrivate
@@ -143,3 +145,23 @@ void QXmppServerExtension::setServer(QXmppServer *server)
     d->server = server;
 }
 
+void QXmppServerExtension::debug(const QString &message)
+{
+    QXmppLogger *logger = server()->logger();
+    if (logger)
+        logger->log(QXmppLogger::DebugMessage, message);
+}
+
+void QXmppServerExtension::info(const QString &message)
+{
+    QXmppLogger *logger = server()->logger();
+    if (logger)
+        logger->log(QXmppLogger::InformationMessage, message);
+}
+
+void QXmppServerExtension::warning(const QString &message)
+{
+    QXmppLogger *logger = server()->logger();
+    if (logger)
+        logger->log(QXmppLogger::WarningMessage, message);
+}

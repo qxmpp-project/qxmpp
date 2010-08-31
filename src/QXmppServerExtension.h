@@ -59,6 +59,12 @@ public:
     virtual bool start();
     virtual void stop();
 
+protected:
+    // Logging helpers
+    void debug(const QString&);
+    void info(const QString&);
+    void warning(const QString&);
+
 private:
     void setServer(QXmppServer *server);
     QXmppServerExtensionPrivate * const d;
