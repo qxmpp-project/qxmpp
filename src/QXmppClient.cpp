@@ -651,3 +651,73 @@ void QXmppClient::xmppConnected()
     sendPacket(d->clientPresence);
 }
 
+// deprecated functions
+const QXmppPresence& QXmppClient::getClientPresence() const
+{
+    return d->clientPresence;
+}
+
+QXmppConfiguration& QXmppClient::getConfiguration()
+{
+    return d->stream->configuration();
+}
+
+const QXmppConfiguration& QXmppClient::getConfiguration() const
+{
+    return d->stream->configuration();
+}
+
+QXmppRosterManager& QXmppClient::getRoster()
+{
+    return *d->rosterManager;
+}
+
+QAbstractSocket::SocketError QXmppClient::getSocketError()
+{
+    return d->stream->socketError();
+}
+
+QXmppVCardManager& QXmppClient::getVCardManager()
+{
+    return *d->vCardManager;
+}
+
+QXmppStanza::Error::Condition QXmppClient::getXmppStreamError()
+{
+    return d->stream->xmppStreamError();
+}
+
+void QXmppClient::disconnect()
+{
+    disconnectFromServer();
+}
+
+void QXmppClient::setClientPresence(const QString& statusText)
+{
+    QXmppPresence newPresence = d->clientPresence;
+    newPresence.status().setStatusText(statusText);
+    setClientPresence(newPresence);
+}
+
+void QXmppClient::setClientPresence(QXmppPresence::Type presenceType)
+{
+    QXmppPresence newPresence = d->clientPresence;
+    newPresence.setType(presenceType);
+    setClientPresence(newPresence);
+}
+
+void QXmppClient::setClientPresence(QXmppPresence::Status::Type statusType)
+{
+    QXmppPresence newPresence = d->clientPresence;
+    if (statusType == QXmppPresence::Status::Offline)
+        newPresence.setType(QXmppPresence::Unavailable);
+    else
+        newPresence.setType(QXmppPresence::Available);
+    newPresence.status().setType(statusType);
+    setClientPresence(newPresence);
+}
+
+QXmppReconnectionManager* QXmppClient::getReconnectionManager()
+{
+    return d->reconnectionManager;
+}
