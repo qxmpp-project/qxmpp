@@ -84,6 +84,7 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
+    // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     QXmppMessage::Type Q_DECL_DEPRECATED getType() const;
     QXmppMessage::State Q_DECL_DEPRECATED getState() const;

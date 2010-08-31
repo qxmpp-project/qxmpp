@@ -75,6 +75,7 @@ public:
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
+        // deprecated in release 0.2.0
         // deprecated accessors, use the form without "get" instead
         int Q_DECL_DEPRECATED getPriority() const;
         QString Q_DECL_DEPRECATED getStatusText() const;
@@ -104,6 +105,7 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
+    // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     /// \cond
     QXmppPresence::Type Q_DECL_DEPRECATED getType() const;

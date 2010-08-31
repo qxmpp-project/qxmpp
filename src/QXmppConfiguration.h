@@ -123,6 +123,7 @@ public:
 
     void setNetworkProxy(const QNetworkProxy& proxy);
 
+    // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     /// \cond
     QString Q_DECL_DEPRECATED getHost() const;

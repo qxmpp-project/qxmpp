@@ -74,6 +74,7 @@ public:
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
+        // deprecated in release 0.2.0
         // deprecated accessors, use the form without "get" instead
         SubscriptionType Q_DECL_DEPRECATED getSubscriptionType() const;
         QString Q_DECL_DEPRECATED getName() const;
@@ -99,6 +100,7 @@ public:
 
     static bool isRosterIq(const QDomElement &element);
 
+    // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     /// \cond
     QList<Item> Q_DECL_DEPRECATED getItems() const;

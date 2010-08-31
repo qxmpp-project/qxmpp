@@ -82,6 +82,7 @@ public:
                               const QString& resource) const;
 
 
+    // deprecated in release 0.2.0
     /// \cond
     QMap<QString, QXmppRosterIq::Item> Q_DECL_DEPRECATED getRosterEntries() const;
     QMap<QString, QMap<QString, QXmppPresence> > Q_DECL_DEPRECATED getAllPresences() const;
