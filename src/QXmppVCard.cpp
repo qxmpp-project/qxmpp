@@ -271,3 +271,24 @@ void QXmppVCard::setPhoto(const QImage& image)
 }
 #endif
 
+QString QXmppVCard::getFullName() const
+{
+    return m_fullName;
+}
+
+QString QXmppVCard::getNickName() const
+{
+    return m_nickName;
+}
+
+const QByteArray& QXmppVCard::getPhoto() const
+{
+    return m_photo;
+}
+
+#ifndef QXMPP_NO_GUI
+QImage QXmppVCard::getPhotoAsImage() const
+{
+    return photoAsImage();
+}
+#endif

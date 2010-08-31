@@ -78,6 +78,15 @@ public:
 
     static bool isVCard(const QDomElement &element);
 
+// deprecated accessors, use the form without "get" instead
+// deprecated in release 0.2.0
+    /// \cond
+    QString Q_DECL_DEPRECATED getFullName() const;
+    QString Q_DECL_DEPRECATED getNickName() const;
+    QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
+    const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
+    /// \endcond
+
 protected:
     /// \cond
     void parseElementFromChild(const QDomElement&);
