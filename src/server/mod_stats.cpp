@@ -151,6 +151,23 @@ void QXmppServerStats::setFile(const QString &file)
     }
 }
 
+/// Returns the JID from which statistics are served using Service Discovery.
+///
+
+QString QXmppServerStats::jid() const
+{
+    return d->jid;
+}
+
+/// Sets the JID from which statistics are served using Service Discovery.
+///
+/// \param jid
+
+void QXmppServerStats::setJid(const QString &jid)
+{
+    d->jid = jid;
+}
+
 QStringList QXmppServerStats::discoveryItems() const
 {
     return QStringList() << d->jid;

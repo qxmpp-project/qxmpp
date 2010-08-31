@@ -37,6 +37,7 @@ class QXmppServerStats : public QXmppServerExtension
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "stats");
     Q_PROPERTY(QString file READ file WRITE setFile);
+    Q_PROPERTY(QString jid READ jid WRITE setJid);
 
 public:
     QXmppServerStats();
@@ -44,6 +45,9 @@ public:
 
     QString file() const;
     void setFile(const QString &file);
+
+    QString jid() const;
+    void setJid(const QString &jid);
 
     /// cond
     QStringList discoveryItems() const;
