@@ -719,7 +719,9 @@ bool QXmppStunSocket::bind()
             candidate.setComponent(m_component);
             candidate.setHost(entry.ip());
             candidate.setId(generateStanzaHash(10));
+#if QT_VERSION >= 0x040500
             candidate.setNetwork(interface.index());
+#endif
             candidate.setPort(m_socket->localPort());
             candidate.setPriority(2130706432 - m_component);
             candidate.setProtocol("udp");
