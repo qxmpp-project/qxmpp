@@ -360,7 +360,7 @@ qint64 QXmppCall::writeData(const char * data, qint64 maxSize)
         return -1;
     }
 
-    m_outgoingBuffer.append(data, maxSize);
+    m_outgoingBuffer += QByteArray::fromRawData(data, maxSize);
     while (m_outgoingBuffer.size() >= m_outgoingChunk)
     {
         QByteArray header;
