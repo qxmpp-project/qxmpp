@@ -199,6 +199,16 @@ void QXmppVCard::setUrl(const QString& url)
 }
 
 /// Returns the photo's binary contents.
+///
+/// If you want to use the photo as a QImage you can use:
+///
+/// \code
+/// QBuffer buffer;
+/// buffer.setData(myCard.photo());
+/// buffer.open(QIODevice::ReadOnly);
+/// QImageReader imageReader(&buffer);
+/// QImage myImage = imageReader.read();
+/// \endcode
 
 QByteArray QXmppVCard::photo() const
 {
