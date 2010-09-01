@@ -203,7 +203,7 @@ QXmppConfiguration& QXmppClient::configuration()
 /// are specified using the config parameter. Use signals connected(), error(QXmppClient::Error)
 /// and disconnected() to know the status of the connection.
 /// \param config Specifies the configuration object for connecting the XMPP server.
-/// This contains the host name, user, passwd etc. See QXmppConfiguration for details.
+/// This contains the host name, user, password etc. See QXmppConfiguration for details.
 /// \param initialPresence The initial presence which will be set for this user
 /// after establishing the session. The default value is QXmppPresence::Available
 
@@ -228,12 +228,12 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
 /// \param jid JID for the account.
 /// \param password Password for the account.
 
-void QXmppClient::connectToServer(const QString &jid, const QString &passwd)
+void QXmppClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
     config.setUser(jidToUser(jid));
     config.setDomain(jidToDomain(jid));
-    config.setPasswd(passwd);
+    config.setPassword(password);
     connectToServer(config);
 }
 
@@ -244,7 +244,7 @@ void QXmppClient::connectToServer(const QString &jid, const QString &passwd)
 /// \param user Username of the account at the specified XMPP server. It should
 /// be the name without the domain name. E.g. "qxmpp.test1" and not
 /// "qxmpp.test1@gmail.com"
-/// \param passwd Password for the specified username
+/// \param password Password for the specified username
 /// \param domain Domain name e.g. "gmail.com" and "jabber.org".
 /// \param port Port number at which the XMPP server is listening. The default
 /// value is 5222.
@@ -252,14 +252,14 @@ void QXmppClient::connectToServer(const QString &jid, const QString &passwd)
 /// after establishing the session. The default value is QXmppPresence::Available
 
 void QXmppClient::connectToServer(const QString& host, const QString& user,
-                                  const QString& passwd, const QString& domain,
+                                  const QString& password, const QString& domain,
                                   int port,
                                   const QXmppPresence& initialPresence)
 {
     QXmppConfiguration &config = d->stream->configuration();
     config.setHost(host);
     config.setUser(user);
-    config.setPasswd(passwd);
+    config.setPassword(password);
     config.setDomain(domain);
     config.setPort(port);
     connectToServer(config, initialPresence);
@@ -271,7 +271,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
 /// the form of a string (e.g. "192.168.1.25").
 /// \param bareJid BareJid of the account at the specified XMPP server.
 /// (e.g. "qxmpp.test1@gmail.com" or qxmpptest@jabber.org.)
-/// \param passwd Password for the specified username
+/// \param password Password for the specified username
 /// \param port Port number at which the XMPP server is listening. The default
 /// value is 5222.
 /// \param initialPresence The initial presence which will be set for this user
@@ -279,7 +279,7 @@ void QXmppClient::connectToServer(const QString& host, const QString& user,
 
 void QXmppClient::connectToServer(const QString& host,
                                   const QString& bareJid,
-                                  const QString& passwd,
+                                  const QString& password,
                                   int port,
                                   const QXmppPresence& initialPresence)
 {
@@ -287,7 +287,7 @@ void QXmppClient::connectToServer(const QString& host,
     config.setHost(host);
     config.setUser(jidToUser(bareJid));
     config.setDomain(jidToDomain(bareJid));
-    config.setPasswd(passwd);
+    config.setPassword(password);
     config.setPort(port);
     connectToServer(config, initialPresence);
 }

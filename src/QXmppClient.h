@@ -99,7 +99,7 @@ public:
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
     void connectToServer(const QString &jid,
-                         const QString &passwd);
+                         const QString &password);
     void disconnectFromServer();
     bool isConnected() const;
 
@@ -144,14 +144,14 @@ public:
     // If you need this level of customisation, work directly with QXmppConfiguration.
     void Q_DECL_DEPRECATED connectToServer(const QString& host,
                          const QString& user,
-                         const QString& passwd,
+                         const QString& password,
                          const QString& domain,
                          int port = 5222,
                          const QXmppPresence& initialPresence =
                          QXmppPresence());
     void Q_DECL_DEPRECATED connectToServer(const QString& host,
                          const QString& bareJid,
-                         const QString& passwd,
+                         const QString& password,
                          int port = 5222,
                          const QXmppPresence& initialPresence =
                          QXmppPresence());

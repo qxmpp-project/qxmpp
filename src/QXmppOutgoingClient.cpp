@@ -316,7 +316,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             case QXmppConfiguration::SASLPlain:
                 {
                     QString userPass('\0' + configuration().user() +
-                                     '\0' + configuration().passwd());
+                                     '\0' + configuration().password());
                     QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
                     data += userPass.toUtf8().toBase64();
                     data += "</auth>";
@@ -755,7 +755,7 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
     d->saslDigest.setNonce(map.value("nonce"));
     d->saslDigest.setRealm(map.value("realm"));
     d->saslDigest.setUsername(configuration().user().toUtf8());
-    d->saslDigest.setPassword(configuration().passwd().toUtf8());
+    d->saslDigest.setPassword(configuration().password().toUtf8());
 
     // Build response
     QMap<QByteArray, QByteArray> response;
@@ -810,9 +810,9 @@ void QXmppOutgoingClient::sendNonSASLAuth(bool plainText)
     authQuery.setType(QXmppIq::Set);
     authQuery.setUsername(configuration().user());
     if (plainText)
-        authQuery.setPassword(configuration().passwd());
+        authQuery.setPassword(configuration().password());
     else
-        authQuery.setDigest(d->streamId, configuration().passwd());
+        authQuery.setDigest(d->streamId, configuration().password());
     authQuery.setResource(configuration().resource());
     d->nonSASLAuthId = authQuery.id();
     sendPacket(authQuery);

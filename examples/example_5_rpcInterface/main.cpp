@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     QXmppConfiguration config;
     config.setUser("server");
     config.setDomain("geiseri.com");
-    config.setPasswd("Passw0rd");
+    config.setPassword("Passw0rd");
     config.setHost("jabber.geiseri.com");
     config.setUseSASLAuthentication( false );
 
