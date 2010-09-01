@@ -121,19 +121,31 @@ void QXmppStream::setLogger(QXmppLogger *logger)
                 d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
 }
 
-void QXmppStream::debug(const QString &data)
+/// Logs a debugging message.
+///
+/// \param message
+
+void QXmppStream::debug(const QString &message)
 {
-    emit logMessage(QXmppLogger::DebugMessage, data);
+    emit logMessage(QXmppLogger::DebugMessage, message);
 }
 
-void QXmppStream::info(const QString &data)
+/// Logs an informational message.
+///
+/// \param message
+
+void QXmppStream::info(const QString &message)
 {
-    emit logMessage(QXmppLogger::InformationMessage, data);
+    emit logMessage(QXmppLogger::InformationMessage, message);
 }
 
-void QXmppStream::warning(const QString &data)
+/// Logs a warning message.
+///
+/// \param message
+
+void QXmppStream::warning(const QString &message)
 {
-    emit logMessage(QXmppLogger::WarningMessage, data);
+    emit logMessage(QXmppLogger::WarningMessage, message);
 }
 
 /// Returns true if the stream is connected.

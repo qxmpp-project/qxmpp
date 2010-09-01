@@ -29,9 +29,6 @@
 class QXmppServer;
 class QXmppServerExtension;
 
-/// \breif Interface for all QXmppServer plugins.
-///
-
 class QXmppServerPluginInterface
 {
 public:
@@ -48,6 +45,16 @@ class QXmppServerPlugin : public QObject, public QXmppServerPluginInterface
 {
     Q_OBJECT
     Q_INTERFACES(QXmppServerPluginInterface)
+
+public:
+    /// Creates and returns the specified QXmppServerExtension.
+    ///
+    /// \param key The key for the QXmppServerExtension.
+    virtual QXmppServerExtension *create(const QString &key) = 0;
+
+    /// Returns the list of keys supported by this plugin.
+    ///
+    virtual QStringList keys() const = 0;
 };
 
 #endif

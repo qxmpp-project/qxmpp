@@ -69,80 +69,139 @@ QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
     setTo(jid);
 }
 
+/// Returns the date of birth of the individual associated with the vCard.
+///
+
 QDate QXmppVCard::birthday() const
 {
     return m_birthday;
 }
+
+/// Sets the date of birth of the individual associated with the vCard.
+///
+/// \param birthday
 
 void QXmppVCard::setBirthday(const QDate &birthday)
 {
     m_birthday = birthday;
 }
 
+/// Returns the email address.
+///
+
 QString QXmppVCard::email() const
 {
     return m_email;
 }
+
+/// Sets the email address.
+///
+/// \param email
 
 void QXmppVCard::setEmail(const QString &email)
 {
     m_email = email;
 }
 
+/// Returns the first name.
+///
+
 QString QXmppVCard::firstName() const
 {
     return m_firstName;
 }
+
+/// Sets the first name.
+///
+/// \param firstName
 
 void QXmppVCard::setFirstName(const QString &firstName)
 {
     m_firstName = firstName;
 }
 
+/// Returns the full name.
+///
+
 QString QXmppVCard::fullName() const
 {
     return m_fullName;
 }
 
-void QXmppVCard::setFullName(const QString& str)
+/// Sets the full name.
+///
+/// \param fullName
+
+void QXmppVCard::setFullName(const QString &fullName)
 {
-    m_fullName = str;
+    m_fullName = fullName;
 }
+
+/// Returns the last name.
+///
 
 QString QXmppVCard::lastName() const
 {
     return m_lastName;
 }
 
+/// Sets the last name.
+///
+/// \param lastName
+
 void QXmppVCard::setLastName(const QString &lastName)
 {
     m_lastName = lastName;
 }
+
+/// Returns the middle name.
+///
 
 QString QXmppVCard::middleName() const
 {
     return m_middleName;
 }
 
+/// Sets the middle name.
+///
+/// \param middleName
+
 void QXmppVCard::setMiddleName(const QString &middleName)
 {
     m_middleName = middleName;
 }
+
+/// Returns the nickname.
+///
 
 QString QXmppVCard::nickName() const
 {
     return m_nickName;
 }
 
-void QXmppVCard::setNickName(const QString& str)
+/// Sets the nickname.
+///
+/// \param nickName
+
+void QXmppVCard::setNickName(const QString &nickName)
 {
-    m_nickName = str;
+    m_nickName = nickName;
 }
+
+/// Returns the URL associated with the vCard. It can represent the user's
+/// homepage or a location at which you can find real-time information about
+/// the vCard.
 
 QString QXmppVCard::url() const
 {
     return m_url;
 }
+
+/// Sets the URL associated with the vCard. It can represent the user's
+/// homepage or a location at which you can find real-time information about
+/// the vCard.
+///
+/// \param vCard
 
 void QXmppVCard::setUrl(const QString& url)
 {

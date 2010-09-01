@@ -47,14 +47,26 @@ class QXmppVCard : public QXmppIq
 public:
     QXmppVCard(const QString& bareJid = "");
 
+    QDate birthday() const;
     void setBirthday(const QDate &birthday);
+
+    QString email() const;
     void setEmail(const QString&);
+
+    QString firstName() const;
     void setFirstName(const QString&);
+
+    QString fullName() const;
     void setFullName(const QString&);
+
+    QString lastName() const;
     void setLastName(const QString&);
+
+    QString middleName() const;
     void setMiddleName(const QString&);
+
+    QString nickName() const;
     void setNickName(const QString&);
-    void setUrl(const QString&);
 
     QByteArray photo() const;
     void setPhoto(const QByteArray&);
@@ -62,25 +74,21 @@ public:
     QString photoType() const;
     void setPhotoType(const QString &type);
 
-    QDate birthday() const;
-    QString email() const;
-    QString firstName() const;
-    QString fullName() const;
-    QString lastName() const;
-    QString middleName() const;
-    QString nickName() const;
     QString url() const;
-
-#ifndef QXMPP_NO_GUI
-    QImage photoAsImage() const;
-    void setPhoto(const QImage&);
-#endif
+    void setUrl(const QString&);
 
     static bool isVCard(const QDomElement &element);
 
+    /// \cond
+// deprecated in release 0.3.0, as it drags in a dependency
+// on QtGui, whilst the rest of QXmpp does not require QtGui
+#ifndef QXMPP_NO_GUI
+    QImage Q_DECL_DEPRECATED photoAsImage() const;
+    void Q_DECL_DEPRECATED setPhoto(const QImage&);
+#endif
+
 // deprecated accessors, use the form without "get" instead
 // deprecated in release 0.2.0
-    /// \cond
     QString Q_DECL_DEPRECATED getFullName() const;
     QString Q_DECL_DEPRECATED getNickName() const;
     QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
