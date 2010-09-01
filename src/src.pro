@@ -8,6 +8,7 @@ CONFIG += staticlib
 
 # To disable the dependency on QtGui, uncomment the following:
 # DEFINES += QXMPP_NO_GUI
+# QT -= gui
 
 # To enable support for the Speex codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX
