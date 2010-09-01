@@ -82,8 +82,8 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
 
     // lookup server for domain
     debug(QString("Looking up server for domain %1").arg(domain));
-    QXmppSrvLookup srvLookup = QXmppSrvLookup::fromName("_xmpp-server._tcp." + domain);
-    if (!srvLookup.records().isEmpty())
+    QXmppSrvLookup srvLookup;
+    if (srvLookup.fromNameS2S(domain))
     {
         // take the first returned record
         host = srvLookup.records().first().hostName();

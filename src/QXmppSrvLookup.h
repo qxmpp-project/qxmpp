@@ -33,6 +33,9 @@
 class QXmppSrvLookup
 {
 public:
+    static const QString c2sPrefix;
+    static const QString s2sPrefix;
+
     /// \brief Represents a DNS SRV record
     ///
     class SrvRecord
@@ -54,7 +57,9 @@ public:
     QString errorString() const;
     QList<QXmppSrvLookup::SrvRecord> records() const;
 
-    static QXmppSrvLookup fromName(const QString &dname);
+    bool fromName(const QString &name);
+    bool fromNameC2S(const QString &domain);
+    bool fromNameS2S(const QString &domain);
 
 private:
     QString m_errorString;

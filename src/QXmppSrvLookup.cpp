@@ -37,6 +37,9 @@
 #include <resolv.h>
 #endif
 
+const QString QXmppSrvLookup::c2sPrefix = "_xmpp-client._tcp.";
+const QString QXmppSrvLookup::s2sPrefix = "_xmpp-server._tcp.";
+
 /// Constructs an empty service record object.
 ///
 
@@ -94,24 +97,27 @@ QList<QXmppSrvLookup::SrvRecord> QXmppSrvLookup::records() const
     return m_records;
 }
 
-/// Perform a DNS lookup for an SRV entry.
-///
-/// Returns a QXmppSrvLookup object containing the found records.
-///
-/// \param dname
-
-QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
+bool QXmppSrvLookup::fromNameC2S(const QString &domain)
 {
-    QXmppSrvLookup result;
+    return fromName(c2sPrefix+domain);
+}
 
+bool QXmppSrvLookup::fromNameS2S(const QString &domain)
+{
+    return fromName(s2sPrefix+domain);
+}
+
+bool QXmppSrvLookup::fromName(const QString &dname)
+{
+    m_errorString.clear();
 #ifdef Q_OS_WIN
     PDNS_RECORD records, ptr;
 
     /* perform DNS query */
     if (DnsQuery_UTF8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
-        result.m_errorString = QLatin1String("DnsQuery_UTF8 failed");
-        return result;
+        m_errorString = QLatin1String("DnsQuery_UTF8 failed");
+        return false;
     }
 
     /* extract results */
@@ -122,7 +128,7 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
             QXmppSrvLookup::SrvRecord record;
             record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
-            result.m_records.append(record);
+            m_records.append(record);
         }
     }
 
@@ -139,16 +145,16 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
     responseLength = res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
     if (responseLength < int(sizeof(HEADER)))
     {
-        result.m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
-        return result;
+        m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
+        return false;
     }
 
     /* check the response header */
     HEADER *header = (HEADER*)response;
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
-        result.m_errorString = QLatin1String("res_query returned an error");
-        return result;
+        m_errorString = QLatin1String("res_query returned an error");
+        return false;
     }
 
     /* skip the query */
@@ -157,8 +163,8 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
     int status = dn_expand(response, response + responseLength, p, host, sizeof(host));
     if (status < 0)
     {
-        result.m_errorString = QLatin1String("dn_expand failed");
-        return result;
+        m_errorString = QLatin1String("dn_expand failed");
+        return false;
     }
     p += status + 4;
 
@@ -170,8 +176,8 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
         status = dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
-            result.m_errorString = QLatin1String("dn_expand failed");
-            return result;
+            m_errorString = QLatin1String("dn_expand failed");
+            return false;
         }
 
         p += status;
@@ -190,13 +196,13 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
             status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
             {
-                result.m_errorString = QLatin1String("dn_expand failed");
-                return result;
+                m_errorString = QLatin1String("dn_expand failed");
+                return false;
             }
             QXmppSrvLookup::SrvRecord record;
             record.setHostName(answer);
             record.setPort(port);
-            result.m_records.append(record);
+            m_records.append(record);
         } else {
             qWarning("Unexpected DNS answer type");
         }
@@ -204,5 +210,5 @@ QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
         answerIndex++;
     }
 #endif
-    return result;
+    return true;
 }
