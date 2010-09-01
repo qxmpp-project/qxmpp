@@ -23,6 +23,7 @@
 
 
 #include "QXmppConfiguration.h"
+#include "QXmppUtils.h"
 
 /// Creates a QXmppConfiguration object.
 
@@ -122,6 +123,21 @@ void QXmppConfiguration::setPasswd(const QString& passwd)
 void QXmppConfiguration::setResource(const QString& resource)
 {
     m_resource = resource;
+}
+
+/// Sets the JID. If a full JID (i.e. one with a resource) is given, calling
+/// this method will update the username, domain and resource. Otherwise, only
+/// the username and the domain will be updated.
+///
+/// \param jid
+
+void QXmppConfiguration::setJid(const QString& jid)
+{
+    m_user = jidToUser(jid);
+    m_domain = jidToDomain(jid);
+    const QString resource = jidToResource(jid);
+    if (!resource.isEmpty())
+        m_resource = resource;
 }
 
 /// Returns the host name.

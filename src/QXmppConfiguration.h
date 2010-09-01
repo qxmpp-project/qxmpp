@@ -111,6 +111,7 @@ public:
     void setUser(const QString&);
     void setPasswd(const QString&);
     void setResource(const QString&);
+    void setJid(const QString &jid);
 
     void setAutoAcceptSubscriptions(bool);
     void setAutoReconnectionEnabled(bool);
