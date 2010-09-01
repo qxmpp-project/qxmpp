@@ -83,46 +83,61 @@ public:
     ~QXmppConfiguration();
 
     QString host() const;
+    void setHost(const QString&);
+
     QString domain() const;
+    void setDomain(const QString&);
+
     int port() const;
+    void setPort(int);
+
     QString user() const;
-    QString passwd() const;
+    void setUser(const QString&);
+
+    QString password() const;
+    void setPassword(const QString&);
+
     QString resource() const;
+    void setResource(const QString&);
+
     QString jid() const;
+    void setJid(const QString &jid);
+
     QString jidBare() const;
 
     bool autoAcceptSubscriptions() const;
+    void setAutoAcceptSubscriptions(bool);
+
     bool autoReconnectionEnabled() const;
+    void setAutoReconnectionEnabled(bool);
+
     bool useSASLAuthentication() const;
+    void setUseSASLAuthentication(bool);
+
     bool ignoreSslErrors() const;
+    void setIgnoreSslErrors(bool);
+
     QXmppConfiguration::StreamSecurityMode streamSecurityMode() const;
+    void setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
+
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism() const;
+    void setNonSASLAuthMechanism(QXmppConfiguration::NonSASLAuthMechanism);
+
     QXmppConfiguration::SASLAuthMechanism sASLAuthMechanism() const;
+    void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
+
     QNetworkProxy networkProxy() const;
+    void setNetworkProxy(const QNetworkProxy& proxy);
 
     int keepAliveInterval() const;
     void setKeepAliveInterval(int secs);
+
     int keepAliveTimeout() const;
     void setKeepAliveTimeout(int secs);
 
-    void setHost(const QString&);
-    void setDomain(const QString&);
-    void setPort(int);
-    void setUser(const QString&);
-    void setPasswd(const QString&);
-    void setResource(const QString&);
-    void setJid(const QString &jid);
-
-    void setAutoAcceptSubscriptions(bool);
-    void setAutoReconnectionEnabled(bool);
-    void setUseSASLAuthentication(bool);
-    void setIgnoreSslErrors(bool);
-
-    void setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
-    void setNonSASLAuthMechanism(QXmppConfiguration::NonSASLAuthMechanism);
-    void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
-
-    void setNetworkProxy(const QNetworkProxy& proxy);
+    // deprecated in release 0.3.0
+    QString Q_DECL_DEPRECATED passwd() const;
+    void Q_DECL_DEPRECATED setPasswd(const QString&);
 
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
@@ -150,7 +165,7 @@ private:
     QString m_host;
     int m_port;
     QString m_user;
-    QString m_passwd;
+    QString m_password;
     QString m_domain;
     QString m_resource;
 

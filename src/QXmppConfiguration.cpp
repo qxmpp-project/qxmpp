@@ -101,12 +101,12 @@ void QXmppConfiguration::setUser(const QString& user)
 
 /// Sets the password.
 ///
-/// \param passwd Password for the specified username
+/// \param password Password for the specified username
 ///
 
-void QXmppConfiguration::setPasswd(const QString& passwd)
+void QXmppConfiguration::setPassword(const QString& password)
 {
-    m_passwd = passwd;
+    m_password = password;
 }
 
 /// Sets the resource identifier.
@@ -185,9 +185,9 @@ QString QXmppConfiguration::user() const
 /// \return password
 ///
 
-QString QXmppConfiguration::passwd() const
+QString QXmppConfiguration::password() const
 {
-    return m_passwd;
+    return m_password;
 }
 
 /// Returns the resource identifier.
@@ -429,6 +429,18 @@ int QXmppConfiguration::keepAliveTimeout() const
     return m_keepAliveTimeout;
 }
 
+// obsolete
+
+QString QXmppConfiguration::passwd() const
+{
+    return m_password;
+}
+
+void QXmppConfiguration::setPasswd(const QString& password)
+{
+    m_password = password;
+}
+
 QString QXmppConfiguration::getHost() const
 {
     return m_host;
@@ -451,7 +463,7 @@ QString QXmppConfiguration::getUser() const
 
 QString QXmppConfiguration::getPasswd() const
 {
-    return m_passwd;
+    return m_password;
 }
 
 QString QXmppConfiguration::getResource() const
