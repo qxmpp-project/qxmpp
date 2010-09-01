@@ -91,7 +91,9 @@ public:
 // deprecated in release 0.2.0
     QString Q_DECL_DEPRECATED getFullName() const;
     QString Q_DECL_DEPRECATED getNickName() const;
+#ifndef QXMPP_NO_GUI
     QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
+#endif
     const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
     /// \endcond
 
