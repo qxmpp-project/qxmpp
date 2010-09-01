@@ -135,13 +135,13 @@ public:
     int keepAliveTimeout() const;
     void setKeepAliveTimeout(int secs);
 
+    /// \cond
     // deprecated in release 0.3.0
     QString Q_DECL_DEPRECATED passwd() const;
     void Q_DECL_DEPRECATED setPasswd(const QString&);
 
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
-    /// \cond
     QString Q_DECL_DEPRECATED getHost() const;
     QString Q_DECL_DEPRECATED getDomain() const;
     int Q_DECL_DEPRECATED getPort() const;
