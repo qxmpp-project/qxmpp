@@ -40,7 +40,7 @@
 /// Constructs an empty service record object.
 ///
 
-QXmppServiceRecord::QXmppServiceRecord()
+QXmppServiceInfo::SrvRecord::SrvRecord()
     : host_port(0)
 {
 }
@@ -48,7 +48,7 @@ QXmppServiceRecord::QXmppServiceRecord()
 /// Returns host name for this service record.
 ///
 
-QString QXmppServiceRecord::hostName() const
+QString QXmppServiceInfo::SrvRecord::hostName() const
 {
     return host_name;
 }
@@ -57,7 +57,7 @@ QString QXmppServiceRecord::hostName() const
 ///
 /// \param hostName
 
-void QXmppServiceRecord::setHostName(const QString &hostName)
+void QXmppServiceInfo::SrvRecord::setHostName(const QString &hostName)
 {
     host_name = hostName;
 }
@@ -65,7 +65,7 @@ void QXmppServiceRecord::setHostName(const QString &hostName)
 /// Returns the port for this service record.
 ///
 
-quint16 QXmppServiceRecord::port() const
+quint16 QXmppServiceInfo::SrvRecord::port() const
 {
     return host_port;
 }
@@ -74,7 +74,7 @@ quint16 QXmppServiceRecord::port() const
 ///
 /// \param port
 
-void QXmppServiceRecord::setPort(quint16 port)
+void QXmppServiceInfo::SrvRecord::setPort(quint16 port)
 {
     host_port = port;
 }
@@ -89,7 +89,7 @@ QString QXmppServiceInfo::errorString() const
 
 /// Returns the list of records associated with this service.
 ///
-QList<QXmppServiceRecord> QXmppServiceInfo::records() const
+QList<QXmppServiceInfo::SrvRecord> QXmppServiceInfo::records() const
 {
     return m_records;
 }
@@ -119,7 +119,7 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
     {
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
         {
-            QXmppServiceRecord record;
+            QXmppServiceInfo::SrvRecord record;
             record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
             result.m_records.append(record);
@@ -193,7 +193,7 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
                 result.m_errorString = QLatin1String("dn_expand failed");
                 return result;
             }
-            QXmppServiceRecord record;
+            QXmppServiceInfo::SrvRecord record;
             record.setHostName(answer);
             record.setPort(port);
             result.m_records.append(record);
