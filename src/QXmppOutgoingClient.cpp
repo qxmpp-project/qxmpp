@@ -161,15 +161,15 @@ void QXmppOutgoingClient::connectToHost()
     if (host.isEmpty() || !port)
     {
         debug(QString("Looking up server for domain %1").arg(domain));
-        QXmppSrvLookup serviceInfo = QXmppSrvLookup::fromName("_xmpp-client._tcp." + domain);
-        if (!serviceInfo.records().isEmpty())
+        QXmppSrvLookup srvLookup = QXmppSrvLookup::fromName("_xmpp-client._tcp." + domain);
+        if (!srvLookup.records().isEmpty())
         {
             // take the first returned record
-            host = serviceInfo.records().first().hostName();
-            port = serviceInfo.records().first().port();
+            host = srvLookup.records().first().hostName();
+            port = srvLookup.records().first().port();
         } else {
             // as a fallback, use domain as the host name
-            warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
+            warning(QString("Lookup for domain %1 failed: %2").arg(domain, srvLookup.errorString()));
             host = domain;
         }
     }
