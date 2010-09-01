@@ -216,14 +216,41 @@ QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text)
     return generateHmac(QCryptographicHash::Sha1, key, text);
 }
 
+/// Generates a random integer x between 0 and N-1. 
+///
+/// \param N
+
+static int generateRandomInteger(int N)
+{
+    Q_ASSERT(N > 0 && N <= RAND_MAX);
+    int val;
+    while (N <= (val = qrand() / (RAND_MAX/N)));
+    return val;
+}
+
+/// Returns a random byte array of the specified size.
+///
+/// \param length
+
+QByteArray generateRandomBytes(int length)
+{
+    QByteArray bytes(length, 'm');
+    for (int i = 0; i < length; ++i)
+        bytes[i] = (char)generateRandomInteger(256);
+    return bytes;
+}
+
+/// Returns a random alphanumerical string of the specified size.
+///
+/// \param length
+
 QString generateStanzaHash(int length)
 {
-    QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const int N = somechars.size();
     QString hashResult;
     for ( int idx = 0; idx < length; ++idx )
-    {
-        hashResult += somechars[(qrand() % 61)];
-    }
+        hashResult += somechars[generateRandomInteger(N)];
     return hashResult;
 }
 

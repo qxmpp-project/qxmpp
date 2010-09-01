@@ -124,14 +124,6 @@ static void encodeString(QDataStream &stream, quint16 type, const QString &strin
     }
 }
 
-static QByteArray randomByteArray(int length)
-{
-    QByteArray result(length, 0);
-    for (int i = 0; i < length; ++i)
-        result[i] = quint8(qrand() % 255);
-    return result;
-}
-
 /// Constructs a new QXmppStunMessage.
 
 QXmppStunMessage::QXmppStunMessage()
@@ -653,7 +645,7 @@ QXmppStunSocket::Pair::Pair()
 {
     // FIXME : calculate priority
     priority = 1862270975;
-    transaction = randomByteArray(ID_SIZE);
+    transaction = generateRandomBytes(ID_SIZE);
 }
 
 QString QXmppStunSocket::Pair::toString() const
@@ -891,7 +883,7 @@ void QXmppStunSocket::setStunServer(const QHostAddress &host, quint16 port)
 {
     m_stunHost = host;
     m_stunPort = port;
-    m_stunId = randomByteArray(ID_SIZE);
+    m_stunId = generateRandomBytes(ID_SIZE);
 }
 
 void QXmppStunSocket::readyRead()
@@ -1046,7 +1038,7 @@ void QXmppStunSocket::readyRead()
 #if 0
         // send a binding indication
         QXmppStunMessage indication;
-        indication.setId(randomByteArray(ID_SIZE));
+        indication.setId(generateRandomBytes(ID_SIZE));
         indication.setType(BindingIndication);
         m_socket->writeStun(indication, pair);
 #endif
