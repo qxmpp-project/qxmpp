@@ -101,7 +101,7 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 
     // if we are the recipient, or if the presence is not from the recipient,
     // do nothing
-    if (configuration().jidBare() == recipient ||
+    if (jidToBareJid(configuration().jid()) == recipient ||
         jidToBareJid(presence.from()) != recipient ||
         presence.type() != QXmppPresence::Available)
         return;
