@@ -34,32 +34,22 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-static QString getImageType(const QByteArray& image)
+QString getImageType(const QByteArray &contents)
 {
-#ifndef QXMPP_NO_GUI
-    QBuffer buffer;
-    buffer.setData(image);
-    buffer.open(QIODevice::ReadOnly);
-    QString format = QImageReader::imageFormat(&buffer);
-
-    if(format.toUpper() == "PNG")
+    if (contents.startsWith("\x89PNG\x0d\x0a\x1a\x0a"))
         return "image/png";
-    else if(format.toUpper() == "MNG")
+    else if (contents.startsWith("\x8aMNG"))
         return "video/x-mng";
-    else if(format.toUpper() == "GIF")
+    else if (contents.startsWith("GIF8"))
         return "image/gif";
-    else if(format.toUpper() == "BMP")
+    else if (contents.startsWith("BM"))
         return "image/bmp";
-    else if(format.toUpper() == "XPM")
+    else if (contents.contains("/* XPM */"))
         return "image/x-xpm";
-    else if(format.toUpper() == "SVG")
-        return "image/svg+xml";
-    else if(format.toUpper() == "JPEG")
+    else if (contents.contains("<?xml") && contents.contains("<svg"))
+        return "image/svg+xml"; 
+    else if (contents.startsWith("\xFF\xD8\xFF\xE0"))
         return "image/jpeg";
-#else
-    Q_UNUSED(image);
-#endif
-
     return "image/unknown";
 }
 
@@ -201,7 +191,7 @@ QString QXmppVCard::url() const
 /// homepage or a location at which you can find real-time information about
 /// the vCard.
 ///
-/// \param vCard
+/// \param url
 
 void QXmppVCard::setUrl(const QString& url)
 {
