@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-#include "QXmppServiceInfo.h"
+#include "QXmppSrvLookup.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -40,7 +40,7 @@
 /// Constructs an empty service record object.
 ///
 
-QXmppServiceInfo::SrvRecord::SrvRecord()
+QXmppSrvLookup::SrvRecord::SrvRecord()
     : host_port(0)
 {
 }
@@ -48,7 +48,7 @@ QXmppServiceInfo::SrvRecord::SrvRecord()
 /// Returns host name for this service record.
 ///
 
-QString QXmppServiceInfo::SrvRecord::hostName() const
+QString QXmppSrvLookup::SrvRecord::hostName() const
 {
     return host_name;
 }
@@ -57,7 +57,7 @@ QString QXmppServiceInfo::SrvRecord::hostName() const
 ///
 /// \param hostName
 
-void QXmppServiceInfo::SrvRecord::setHostName(const QString &hostName)
+void QXmppSrvLookup::SrvRecord::setHostName(const QString &hostName)
 {
     host_name = hostName;
 }
@@ -65,7 +65,7 @@ void QXmppServiceInfo::SrvRecord::setHostName(const QString &hostName)
 /// Returns the port for this service record.
 ///
 
-quint16 QXmppServiceInfo::SrvRecord::port() const
+quint16 QXmppSrvLookup::SrvRecord::port() const
 {
     return host_port;
 }
@@ -74,7 +74,7 @@ quint16 QXmppServiceInfo::SrvRecord::port() const
 ///
 /// \param port
 
-void QXmppServiceInfo::SrvRecord::setPort(quint16 port)
+void QXmppSrvLookup::SrvRecord::setPort(quint16 port)
 {
     host_port = port;
 }
@@ -82,27 +82,27 @@ void QXmppServiceInfo::SrvRecord::setPort(quint16 port)
 /// If the lookup failed, this function returns a human readable description of the error.
 ///
 
-QString QXmppServiceInfo::errorString() const
+QString QXmppSrvLookup::errorString() const
 {
     return m_errorString;
 }
 
 /// Returns the list of records associated with this service.
 ///
-QList<QXmppServiceInfo::SrvRecord> QXmppServiceInfo::records() const
+QList<QXmppSrvLookup::SrvRecord> QXmppSrvLookup::records() const
 {
     return m_records;
 }
 
 /// Perform a DNS lookup for an SRV entry.
 ///
-/// Returns a QXmppServiceInfo object containing the found records.
+/// Returns a QXmppSrvLookup object containing the found records.
 ///
 /// \param dname
 
-QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
+QXmppSrvLookup QXmppSrvLookup::fromName(const QString &dname)
 {
-    QXmppServiceInfo result;
+    QXmppSrvLookup result;
 
 #ifdef Q_OS_WIN
     PDNS_RECORD records, ptr;
@@ -119,7 +119,7 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
     {
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
         {
-            QXmppServiceInfo::SrvRecord record;
+            QXmppSrvLookup::SrvRecord record;
             record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
             result.m_records.append(record);
@@ -193,7 +193,7 @@ QXmppServiceInfo QXmppServiceInfo::fromName(const QString &dname)
                 result.m_errorString = QLatin1String("dn_expand failed");
                 return result;
             }
-            QXmppServiceInfo::SrvRecord record;
+            QXmppSrvLookup::SrvRecord record;
             record.setHostName(answer);
             record.setPort(port);
             result.m_records.append(record);

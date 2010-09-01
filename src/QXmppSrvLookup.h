@@ -21,16 +21,16 @@
  *
  */
 
-#ifndef QXMPPSERVICEINFO_H
-#define QXMPPSERVICEINFO_H
+#ifndef QXMPPSRVLOOKUP_H
+#define QXMPPSRVLOOKUP_H
 
 #include <QList>
 #include <QString>
 
-/// \brief The QXmppServiceInfo class provides static methods for DNS SRV lookups.
+/// \brief The QXmppSrvLookup class provides static methods for DNS SRV lookups.
 ///
 
-class QXmppServiceInfo
+class QXmppSrvLookup
 {
 public:
     /// \brief Represents a DNS SRV record
@@ -52,13 +52,13 @@ public:
     };
 
     QString errorString() const;
-    QList<QXmppServiceInfo::SrvRecord> records() const;
+    QList<QXmppSrvLookup::SrvRecord> records() const;
 
-    static QXmppServiceInfo fromName(const QString &dname);
+    static QXmppSrvLookup fromName(const QString &dname);
 
 private:
     QString m_errorString;
-    QList<QXmppServiceInfo::SrvRecord> m_records;
+    QList<QXmppSrvLookup::SrvRecord> m_records;
 };
 
 #endif

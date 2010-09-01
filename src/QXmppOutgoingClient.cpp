@@ -32,7 +32,7 @@
 #include "QXmppPacket.h"
 #include "QXmppPresence.h"
 #include "QXmppOutgoingClient.h"
-#include "QXmppServiceInfo.h"
+#include "QXmppSrvLookup.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSaslAuth.h"
@@ -161,7 +161,7 @@ void QXmppOutgoingClient::connectToHost()
     if (host.isEmpty() || !port)
     {
         debug(QString("Looking up server for domain %1").arg(domain));
-        QXmppServiceInfo serviceInfo = QXmppServiceInfo::fromName("_xmpp-client._tcp." + domain);
+        QXmppSrvLookup serviceInfo = QXmppSrvLookup::fromName("_xmpp-client._tcp." + domain);
         if (!serviceInfo.records().isEmpty())
         {
             // take the first returned record
