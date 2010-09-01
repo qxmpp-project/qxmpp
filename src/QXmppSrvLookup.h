@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Manjeet Dahiya
  *
  * Source:
  *  http://code.google.com/p/qxmpp
