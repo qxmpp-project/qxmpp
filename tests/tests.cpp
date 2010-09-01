@@ -42,6 +42,8 @@
 #include "QXmppVCard.h"
 #include "tests.h"
 
+QString getImageType(const QByteArray &contents);
+
 void TestUtils::testCrc32()
 {
     quint32 crc = generateCrc32(QByteArray());
@@ -103,6 +105,25 @@ void TestUtils::testJid()
     QCOMPARE(jidToUser("foo@example.com"), QLatin1String("foo"));
     QCOMPARE(jidToUser("example.com"), QString());
     QCOMPARE(jidToUser(QString()), QString());
+}
+
+static void testMimeType(const QString &fileName, const QString fileType)
+{
+    QFile file(fileName);
+    QCOMPARE(file.open(QIODevice::ReadOnly), true);
+    QCOMPARE(getImageType(file.readAll()), fileType);
+    file.close();
+}
+
+void TestUtils::testMime()
+{
+    testMimeType("test.bmp", "image/bmp");
+    testMimeType("test.gif", "image/gif");
+    testMimeType("test.jpg", "image/jpeg");
+    testMimeType("test.mng", "video/x-mng");
+    testMimeType("test.png", "image/png");
+    testMimeType("test.svg", "image/svg+xml");
+    testMimeType("test.xpm", "image/x-xpm");
 }
 
 template <class T>

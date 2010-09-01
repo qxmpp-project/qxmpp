@@ -32,6 +32,7 @@ private slots:
     void testDigestMd5();
     void testHmac();
     void testJid();
+    void testMime();
 };
 
 class TestPackets : public QObject
