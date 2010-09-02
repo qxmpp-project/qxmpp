@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>test.bmp</file>
+    <file>test.gif</file>
+    <file>test.jpg</file>
+    <file>test.mng</file>
+    <file>test.png</file>
+    <file>test.svg</file>
+    <file>test.xpm</file>
+</qresource>
+</RCC>

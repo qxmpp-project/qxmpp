@@ -109,7 +109,8 @@ void TestUtils::testJid()
 
 static void testMimeType(const QString &fileName, const QString fileType)
 {
-    QFile file(fileName);
+    // load file from resources
+    QFile file(":/" + fileName);
     QCOMPARE(file.open(QIODevice::ReadOnly), true);
     QCOMPARE(getImageType(file.readAll()), fileType);
     file.close();
