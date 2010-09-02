@@ -247,16 +247,4 @@ private:
     QXmppClientPrivate * const d;
 };
 
-/// \brief The QXmppClientExtension class is the base class for QXmppClient
-/// extensions.
-///
-
-class QXmppClientExtension : public QObject
-{
-    Q_OBJECT
-
-public:
-    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
-};
-
 #endif // QXMPPCLIENT_H

@@ -23,6 +23,7 @@
 
 
 #include "QXmppClient.h"
+#include "QXmppClientExtension.h"
 #include "QXmppLogger.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppMessage.h"
@@ -188,6 +189,13 @@ QXmppClient::~QXmppClient()
 void QXmppClient::addExtension(QXmppClientExtension *extension)
 {
     extension->setParent(this);
+
+    // Logging
+    bool check = connect(extension, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        d->stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+
     d->extensions << extension;
 }
 

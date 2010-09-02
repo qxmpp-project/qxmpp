@@ -35,6 +35,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppByteStreamIq.h \
     QXmppCallManager.h \
     QXmppClient.h \
+    QXmppClientExtension.h \
     QXmppCodec.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
@@ -90,6 +91,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppByteStreamIq.cpp \
     QXmppCallManager.cpp \
     QXmppClient.cpp \
+    QXmppClientExtension.cpp \
     QXmppCodec.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
