@@ -46,7 +46,6 @@ public:
     QXmppServerExtension();
     ~QXmppServerExtension();
     QString extensionName() const;
-    QXmppServer *server();
 
     virtual QStringList discoveryFeatures() const;
     virtual QStringList discoveryItems() const;
@@ -60,6 +59,8 @@ public:
     virtual void stop();
 
 protected:
+    QXmppServer *server();
+
     // Logging helpers
     void debug(const QString&);
     void info(const QString&);
