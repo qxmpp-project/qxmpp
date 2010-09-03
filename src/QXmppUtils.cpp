@@ -220,7 +220,7 @@ QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text)
 ///
 /// \param N
 
-static int generateRandomInteger(int N)
+int generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;

@@ -50,6 +50,7 @@ QString jidToBareJid(const QString& jid);
 quint32 generateCrc32(const QByteArray &input);
 QByteArray generateHmacMd5(const QByteArray &key, const QByteArray &text);
 QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text);
+int generateRandomInteger(int N);
 QByteArray generateRandomBytes(int length);
 QString generateStanzaHash(int length=32);
 
