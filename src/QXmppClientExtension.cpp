@@ -23,6 +23,46 @@
 
 #include "QXmppClientExtension.h"
 
+class QXmppClientExtensionPrivate
+{
+public:
+    QXmppClient *client;
+};
+
+/// Constructs a QXmppClient extension.
+///
+
+QXmppClientExtension::QXmppClientExtension()
+    : d(new QXmppClientExtensionPrivate)
+{
+    d->client = 0;
+}
+
+/// Destroys a QXmppClient extension.
+///
+
+QXmppClientExtension::~QXmppClientExtension()
+{
+    delete d;
+}
+
+/// Returns the client which loaded this extension.
+///
+
+QXmppClient *QXmppClientExtension::client()
+{
+    return d->client;
+}
+
+/// Sets the client which loaded this extension.
+///
+/// \param client
+
+void QXmppClientExtension::setClient(QXmppClient *client)
+{
+    d->client = client;
+}
+
 /// Logs a debugging message.
 ///
 /// \param message

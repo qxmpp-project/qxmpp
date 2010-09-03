@@ -189,6 +189,7 @@ QXmppClient::~QXmppClient()
 void QXmppClient::addExtension(QXmppClientExtension *extension)
 {
     extension->setParent(this);
+    extension->setClient(this);
 
     // Logging
     bool check = connect(extension, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
@@ -197,6 +198,14 @@ void QXmppClient::addExtension(QXmppClientExtension *extension)
     Q_UNUSED(check);
 
     d->extensions << extension;
+}
+
+/// Returns a list containing all the client's extensions.
+///
+
+QList<QXmppClientExtension*> QXmppClient::extensions()
+{
+    return d->extensions;
 }
 
 /// Returns a modifiable reference to the current configuration of QXmppClient.

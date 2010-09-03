@@ -27,6 +27,9 @@
 #include "QXmppLogger.h"
 
 class QDomElement;
+
+class QXmppClient;
+class QXmppClientExtensionPrivate;
 class QXmppStream;
 
 /// \brief The QXmppClientExtension class is the base class for QXmppClient
@@ -38,6 +41,8 @@ class QXmppClientExtension : public QObject
     Q_OBJECT
 
 public:
+    QXmppClientExtension();
+    ~QXmppClientExtension();
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
 
 signals:
@@ -45,10 +50,18 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 protected:
+    QXmppClient *client();
+
     // Logging helpers
     void debug(const QString&);
     void info(const QString&);
     void warning(const QString&);
+
+private:
+    void setClient(QXmppClient *client);
+    QXmppClientExtensionPrivate * const d;
+
+    friend class QXmppClient;
 };
 
 #endif

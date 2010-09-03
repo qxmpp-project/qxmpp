@@ -94,6 +94,7 @@ public:
     ~QXmppClient();
 
     void addExtension(QXmppClientExtension *extension);
+    QList<QXmppClientExtension*> extensions();
 
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
