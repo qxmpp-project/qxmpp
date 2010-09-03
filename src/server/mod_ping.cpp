@@ -38,6 +38,8 @@ QStringList QXmppServerPing::discoveryFeatures() const
 
 bool QXmppServerPing::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.attribute("to") != server()->domain())
         return false;
 

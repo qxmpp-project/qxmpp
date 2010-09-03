@@ -189,7 +189,7 @@ void QXmppServer::addExtension(QXmppServerExtension *extension)
 /// Returns the list of loaded extensions.
 ///
 
-QList<QXmppServerExtension*> QXmppServer::loadedExtensions()
+QList<QXmppServerExtension*> QXmppServer::extensions()
 {
     d->loadExtensions(this);
     return d->extensions;

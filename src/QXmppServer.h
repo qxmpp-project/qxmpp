@@ -52,7 +52,7 @@ public:
     ~QXmppServer();
 
     void addExtension(QXmppServerExtension *extension);
-    QList<QXmppServerExtension*> loadedExtensions();
+    QList<QXmppServerExtension*> extensions();
 
     QString domain() const;
     void setDomain(const QString &domain);

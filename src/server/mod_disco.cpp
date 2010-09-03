@@ -54,6 +54,8 @@ QStringList QXmppServerDiscovery::discoveryItems() const
 
 bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.attribute("to") != server()->domain())
         return false;
 
@@ -74,7 +76,7 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &
         if (request.queryType() == QXmppDiscoveryIq::ItemsQuery)
         {
             QList<QXmppDiscoveryIq::Item> items;
-            foreach (QXmppServerExtension *extension, server()->loadedExtensions())
+            foreach (QXmppServerExtension *extension, server()->extensions())
             {
                 foreach (const QString &jid, extension->discoveryItems())
                 {
@@ -96,7 +98,7 @@ bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &
 
             // features
             QStringList features;
-            foreach (QXmppServerExtension *extension, server()->loadedExtensions())
+            foreach (QXmppServerExtension *extension, server()->extensions())
                 features += extension->discoveryFeatures();
             response.setFeatures(features);
         }

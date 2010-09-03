@@ -39,7 +39,7 @@
 
 static QXmppServerExtension *findExtension(QXmppServer *server, const QString &name)
 {
-    foreach (QXmppServerExtension *extension, server->loadedExtensions())
+    foreach (QXmppServerExtension *extension, server->extensions())
         if (extension->extensionName() == name)
             return extension;
     return 0;
@@ -66,7 +66,7 @@ void QXmppServerStats::readStatistics()
     if (!d->statistics)
         return;
 
-    foreach (QXmppServerExtension *extension, server()->loadedExtensions())
+    foreach (QXmppServerExtension *extension, server()->extensions())
     {
         QVariantMap stats;
 
@@ -87,7 +87,7 @@ void QXmppServerStats::writeStatistics()
     if (!d->statistics)
         return;
 
-    foreach (QXmppServerExtension *extension, server()->loadedExtensions())
+    foreach (QXmppServerExtension *extension, server()->extensions())
     {
         const QVariantMap stats = extension->statistics();
         if (stats.isEmpty())
@@ -185,6 +185,8 @@ QVariantMap QXmppServerStats::statistics() const
 
 bool QXmppServerStats::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.attribute("to") != d->jid)
         return false;
 
@@ -246,7 +248,7 @@ bool QXmppServerStats::handleStanza(QXmppStream *stream, const QDomElement &elem
                 QList<QXmppDiscoveryIq::Item> items;
                 if (!extension)
                 {
-                    foreach (QXmppServerExtension *extension, server()->loadedExtensions())
+                    foreach (QXmppServerExtension *extension, server()->extensions())
                     {
                         if (extension->statistics().isEmpty())
                             continue;

@@ -268,6 +268,8 @@ QStringList QXmppServerProxy65::discoveryItems() const
 
 bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.attribute("to") != d->jid)
         return false;
 
