@@ -1,9 +1,8 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Authors:
+ * Author:
  *  Jeremy Lainé
- *  Manjeet Dahiya
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -24,7 +23,7 @@
 
 #include <QDebug>
 
-#include "QXmppSrvLookup.h"
+#include "QXmppSrvInfo.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -38,13 +37,10 @@
 #include <resolv.h>
 #endif
 
-const QString QXmppSrvLookup::c2sPrefix = "_xmpp-client._tcp.";
-const QString QXmppSrvLookup::s2sPrefix = "_xmpp-server._tcp.";
-
 /// Constructs an empty service record object.
 ///
 
-QXmppSrvLookup::SrvRecord::SrvRecord()
+QXmppSrvRecord::QXmppSrvRecord()
     : host_port(0)
 {
 }
@@ -52,7 +48,7 @@ QXmppSrvLookup::SrvRecord::SrvRecord()
 /// Returns host name for this service record.
 ///
 
-QString QXmppSrvLookup::SrvRecord::hostName() const
+QString QXmppSrvRecord::hostName() const
 {
     return host_name;
 }
@@ -61,7 +57,7 @@ QString QXmppSrvLookup::SrvRecord::hostName() const
 ///
 /// \param hostName
 
-void QXmppSrvLookup::SrvRecord::setHostName(const QString &hostName)
+void QXmppSrvRecord::setHostName(const QString &hostName)
 {
     host_name = hostName;
 }
@@ -69,7 +65,7 @@ void QXmppSrvLookup::SrvRecord::setHostName(const QString &hostName)
 /// Returns the port for this service record.
 ///
 
-quint16 QXmppSrvLookup::SrvRecord::port() const
+quint16 QXmppSrvRecord::port() const
 {
     return host_port;
 }
@@ -78,7 +74,7 @@ quint16 QXmppSrvLookup::SrvRecord::port() const
 ///
 /// \param port
 
-void QXmppSrvLookup::SrvRecord::setPort(quint16 port)
+void QXmppSrvRecord::setPort(quint16 port)
 {
     host_port = port;
 }
@@ -86,39 +82,36 @@ void QXmppSrvLookup::SrvRecord::setPort(quint16 port)
 /// If the lookup failed, this function returns a human readable description of the error.
 ///
 
-QString QXmppSrvLookup::errorString() const
+QString QXmppSrvInfo::errorString() const
 {
     return m_errorString;
 }
 
 /// Returns the list of records associated with this service.
 ///
-QList<QXmppSrvLookup::SrvRecord> QXmppSrvLookup::records() const
+QList<QXmppSrvRecord> QXmppSrvInfo::records() const
 {
     return m_records;
 }
 
-bool QXmppSrvLookup::fromNameC2S(const QString &domain)
-{
-    return fromName(c2sPrefix+domain);
-}
+/// Perform a DNS lookup for an SRV entry.
+///
+/// Returns a QXmppSrvInfo object containing the found records.
+///
+/// \param dname
 
-bool QXmppSrvLookup::fromNameS2S(const QString &domain)
+QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 {
-    return fromName(s2sPrefix+domain);
-}
+    QXmppSrvInfo result;
 
-bool QXmppSrvLookup::fromName(const QString &dname)
-{
-    m_errorString.clear();
 #ifdef Q_OS_WIN
     PDNS_RECORD records, ptr;
 
     /* perform DNS query */
     if (DnsQuery_UTF8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
-        m_errorString = QLatin1String("DnsQuery_UTF8 failed");
-        return false;
+        result.m_errorString = QLatin1String("DnsQuery_UTF8 failed");
+        return result;
     }
 
     /* extract results */
@@ -126,10 +119,10 @@ bool QXmppSrvLookup::fromName(const QString &dname)
     {
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
         {
-            QXmppSrvLookup::SrvRecord record;
+            QXmppSrvRecord record;
             record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
-            m_records.append(record);
+            result.m_records.append(record);
         }
     }
 
@@ -146,16 +139,16 @@ bool QXmppSrvLookup::fromName(const QString &dname)
     responseLength = res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
     if (responseLength < int(sizeof(HEADER)))
     {
-        m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
-        return false;
+        result.m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
+        return result;
     }
 
     /* check the response header */
     HEADER *header = (HEADER*)response;
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
-        m_errorString = QLatin1String("res_query returned an error");
-        return false;
+        result.m_errorString = QLatin1String("res_query returned an error");
+        return result;
     }
 
     /* skip the query */
@@ -164,8 +157,8 @@ bool QXmppSrvLookup::fromName(const QString &dname)
     int status = dn_expand(response, response + responseLength, p, host, sizeof(host));
     if (status < 0)
     {
-        m_errorString = QLatin1String("dn_expand failed");
-        return false;
+        result.m_errorString = QLatin1String("dn_expand failed");
+        return result;
     }
     p += status + 4;
 
@@ -177,8 +170,8 @@ bool QXmppSrvLookup::fromName(const QString &dname)
         status = dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
-            m_errorString = QLatin1String("dn_expand failed");
-            return false;
+            result.m_errorString = QLatin1String("dn_expand failed");
+            return result;
         }
 
         p += status;
@@ -197,13 +190,13 @@ bool QXmppSrvLookup::fromName(const QString &dname)
             status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
             {
-                m_errorString = QLatin1String("dn_expand failed");
-                return false;
+                result.m_errorString = QLatin1String("dn_expand failed");
+                return result;
             }
-            QXmppSrvLookup::SrvRecord record;
+            QXmppSrvRecord record;
             record.setHostName(answer);
             record.setPort(port);
-            m_records.append(record);
+            result.m_records.append(record);
         } else {
             qWarning("Unexpected DNS answer type");
         }
@@ -211,5 +204,5 @@ bool QXmppSrvLookup::fromName(const QString &dname)
         answerIndex++;
     }
 #endif
-    return true;
+    return result;
 }

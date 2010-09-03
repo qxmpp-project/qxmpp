@@ -28,7 +28,7 @@
 #include "QXmppConstants.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
-#include "QXmppSrvLookup.h"
+#include "QXmppSrvInfo.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -82,15 +82,15 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
 
     // lookup server for domain
     debug(QString("Looking up server for domain %1").arg(domain));
-    QXmppSrvLookup srvLookup;
-    if (srvLookup.fromNameS2S(domain))
+    QXmppSrvInfo serviceInfo = QXmppSrvInfo::fromName("_xmpp-server._tcp." + domain);
+    if (!serviceInfo.records().isEmpty())
     {
         // take the first returned record
-        host = srvLookup.records().first().hostName();
-        port = srvLookup.records().first().port();
+        host = serviceInfo.records().first().hostName();
+        port = serviceInfo.records().first().port();
     } else {
         // as a fallback, use domain as the host name
-        warning(QString("Lookup for domain %1 failed: %2").arg(domain, srvLookup.errorString()));
+        warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
         host = domain;
         port = 5269;
     }

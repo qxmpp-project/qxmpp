@@ -1,9 +1,8 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Authors:
+ * Author:
  *  Jeremy Lainé
- *  Manjeet Dahiya
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -22,49 +21,45 @@
  *
  */
 
-#ifndef QXMPPSRVLOOKUP_H
-#define QXMPPSRVLOOKUP_H
+#ifndef QXMPPSRVINFO_H
+#define QXMPPSRVINFO_H
 
 #include <QList>
 #include <QString>
 
-/// \brief The QXmppSrvLookup class provides static methods for DNS SRV lookups.
+/// \brief The QXmppSrvRecord class represents a DNS SRV record.
 ///
 
-class QXmppSrvLookup
+class QXmppSrvRecord
 {
 public:
-    static const QString c2sPrefix;
-    static const QString s2sPrefix;
+    QXmppSrvRecord();
 
-    /// \brief Represents a DNS SRV record
-    ///
-    class SrvRecord
-    {
-    public:
-        SrvRecord();
+    QString hostName() const;
+    void setHostName(const QString &hostName);
 
-        QString hostName() const;
-        void setHostName(const QString &hostName);
+    quint16 port() const;
+    void setPort(quint16 port);
 
-        quint16 port() const;
-        void setPort(quint16 port);
+private:
+    QString host_name;
+    quint16 host_port;
+};
 
-    private:
-        QString host_name;
-        quint16 host_port;
-    };
+/// \brief The QXmppSrvInfo class provides static methods for DNS SRV lookups.
+///
 
+class QXmppSrvInfo
+{
+public:
     QString errorString() const;
-    QList<QXmppSrvLookup::SrvRecord> records() const;
+    QList<QXmppSrvRecord> records() const;
 
-    bool fromName(const QString &name);
-    bool fromNameC2S(const QString &domain);
-    bool fromNameS2S(const QString &domain);
+    static QXmppSrvInfo fromName(const QString &dname);
 
 private:
     QString m_errorString;
-    QList<QXmppSrvLookup::SrvRecord> m_records;
+    QList<QXmppSrvRecord> m_records;
 };
 
 #endif
