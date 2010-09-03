@@ -411,7 +411,7 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
 
         // if we did not find an outgoing server,
         // we need to establish the S2S connection
-        if (found.isEmpty())
+        if (found.isEmpty() && d->serverForServers->isListening())
             found << connectToDomain(toDomain);
     }
     return found;
@@ -701,17 +701,15 @@ void QXmppServer::slotStreamDisconnected()
     QXmppIncomingClient *stream = qobject_cast<QXmppIncomingClient *>(sender());
     if (stream && d->incomingClients.contains(stream))
     {
-        // notify subscribed peers of disconnection
+        // synthesis a received unavailable presence
         if (!stream->jid().isEmpty())
         {
-            foreach (QString subscriber, subscribers(stream->jid()))
-            {
-                QXmppPresence presence;
-                presence.setFrom(stream->jid());
-                presence.setTo(subscriber);
-                presence.setType(QXmppPresence::Unavailable);
-                sendPacket(presence);
-            }
+            QDomElement presence;
+            presence.setTagName("presence");
+            presence.setAttribute("from", stream->jid());
+            presence.setAttribute("to", d->domain);
+            presence.setAttribute("type", "unavailable");
+            handleStanza(stream, presence);
         }
 
         // remove stream
