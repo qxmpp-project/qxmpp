@@ -27,6 +27,7 @@
 #include <QtDebug>
 #include <QDomElement>
 #include <QXmlStreamWriter>
+#include "QXmppConstants.h"
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
                              const QXmppPresence::Status& status)
@@ -72,9 +73,36 @@ void QXmppPresence::parse(const QDomElement &element)
     setTypeFromStr(element.attribute("type"));
     m_status.parse(element);
 
+    QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement("x");
-    if(!xElement.isNull())
-        setExtensions(QXmppElement(xElement));
+    m_vCardUpdateType = VCardUpdateNone;
+    while(!xElement.isNull())
+    {
+        if(xElement.namespaceURI() == ns_vcard_update)
+        {
+            QDomElement photoElement = xElement.firstChildElement("photo");
+            if(!photoElement.isNull())
+            {
+                m_photoHash = photoElement.text().toUtf8();
+                if(m_photoHash.isEmpty())
+                    m_vCardUpdateType = PhotoNotAdvertized;
+                else
+                    m_vCardUpdateType = PhotoAdvertised;
+            }
+            else
+            {
+                m_photoHash = "";
+                m_vCardUpdateType = PhotoNotReady;
+            }
+        }
+        else
+        {
+            // other extensions
+            extensions << QXmppElement(xElement);
+        }
+        xElement = xElement.nextSiblingElement("x");
+    }
+    setExtensions(extensions);
 }
 
 void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
@@ -88,9 +116,30 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     m_status.toXml(xmlWriter);
 
     error().toXml(xmlWriter);
+
+    if(m_vCardUpdateType != VCardUpdateNone)
+    {
+        xmlWriter->writeStartElement("x");
+        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_vcard_update);
+        switch(m_vCardUpdateType)
+        {
+        case PhotoNotAdvertized:
+            helperToXmlAddTextElement(xmlWriter, "photo", "");
+            break;
+        case PhotoAdvertised:
+            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash);
+            break;
+        case PhotoNotReady:
+            break;
+        default:
+            break;
+        }
+        xmlWriter->writeEndElement();
+    }
+
     foreach (const QXmppElement &extension, extensions())
         extension.toXml(xmlWriter);
-    
+
     xmlWriter->writeEndElement();
 }
 
@@ -321,6 +370,26 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
     if (m_priority != 0)
         helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
+}
+
+QByteArray QXmppPresence::photoHash() const
+{
+    return m_photoHash;
+}
+
+void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
+{
+    m_photoHash = photoHash;
+}
+
+QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType()
+{
+    return m_vCardUpdateType;
+}
+
+void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
+{
+    m_vCardUpdateType = type;
 }
 
 /// \cond

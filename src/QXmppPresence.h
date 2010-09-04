@@ -45,6 +45,14 @@ public:
         Probe
     };
 
+    enum VCardUpdateType
+    {
+        VCardUpdateNone = 0,
+        PhotoNotAdvertized,
+        PhotoAdvertised,
+        PhotoNotReady
+    };
+
     class Status
     {
     public:
@@ -105,6 +113,11 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
+    QByteArray photoHash() const;
+    void setPhotoHash(const QByteArray&);
+    VCardUpdateType vCardUpdateType();
+    void setVCardUpdateType(VCardUpdateType type);
+
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     /// \cond
@@ -119,6 +132,11 @@ private:
 
     Type m_type;
     QXmppPresence::Status m_status;
+
+
+    //vCard update
+    QByteArray m_photoHash;
+    VCardUpdateType m_vCardUpdateType;
 };
 
 #endif // QXMPPPRESENCE_H
