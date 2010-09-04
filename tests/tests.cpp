@@ -386,12 +386,15 @@ void TestPackets::testNonSaslAuth()
 void TestPackets::testPresence()
 {
     const QByteArray xml(
-        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\"/>");
+        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
+        "<x xmlns=\"vcard-temp:x:update\"/></presence>");
 
     QXmppPresence presence;
     parsePacket(presence, xml);
     QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(presence.photoHash(), QByteArray(""));
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoNotReady);
     serializePacket(presence, xml);
 }
 
@@ -411,6 +414,31 @@ void TestPackets::testPresenceFull()
     QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateNone);
+    serializePacket(presence, xml);
+}
+
+void TestPackets::testPresenceWithVCardUpdate()
+{
+    const QByteArray xml(
+        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
+        "<show>away</show>"
+        "<status>In a meeting</status>"
+        "<priority>5</priority>"
+        "<x xmlns=\"vcard-temp:x:update\">"
+        "<photo>sha1-hash-of-image</photo>"
+        "</x>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
+    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
+    QCOMPARE(presence.status().priority(), 5);
+    QCOMPARE(presence.photoHash(), QByteArray("sha1-hash-of-image"));
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
     serializePacket(presence, xml);
 }
 

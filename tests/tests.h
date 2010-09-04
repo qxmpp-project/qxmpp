@@ -53,6 +53,7 @@ private slots:
     void testNonSaslAuth();
     void testPresence();
     void testPresenceFull();
+    void testPresenceWithVCardUpdate();
     void testSession();
     void testStreamFeatures();
     void testVCard();
