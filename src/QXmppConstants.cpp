@@ -35,6 +35,7 @@ const char* ns_bind = "urn:ietf:params:xml:ns:xmpp-bind";
 const char* ns_session = "urn:ietf:params:xml:ns:xmpp-session";
 const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 const char* ns_vcard = "vcard-temp";
+const char* ns_vcard_update = "vcard-temp:x:update";
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
 const char* ns_capabilities = "http://jabber.org/protocol/caps";
@@ -67,5 +68,3 @@ const char* ns_jingle_ice_udp = "urn:xmpp:jingle:transports:ice-udp:1";
 const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
-
-const char* ns_vcard_update = "vcard-temp:x:update";

@@ -36,6 +36,7 @@ extern const char* ns_bind;
 extern const char* ns_session;
 extern const char* ns_stanza;
 extern const char* ns_vcard;
+extern const char* ns_vcard_update;
 extern const char* ns_auth;
 extern const char* ns_authFeature;
 extern const char* ns_capabilities;
@@ -66,6 +67,5 @@ extern const char* ns_jingle_raw_udp;
 extern const char *ns_jingle_rtp;
 extern const char *ns_jingle_rtp_audio;
 extern const char *ns_jingle_rtp_video;
-extern const char* ns_vcard_update;
 
 #endif // QXMPPCONSTANTS_H
