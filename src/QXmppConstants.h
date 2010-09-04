@@ -66,5 +66,6 @@ extern const char* ns_jingle_raw_udp;
 extern const char *ns_jingle_rtp;
 extern const char *ns_jingle_rtp_audio;
 extern const char *ns_jingle_rtp_video;
+extern const char* ns_vcardUpdate;
 
 #endif // QXMPPCONSTANTS_H
