@@ -136,6 +136,9 @@ private:
 
 
     /// XEP-0153: vCard-Based Avatars
+
+    /// m_photoHash: the SHA1 hash of the avatar image data itself (not the base64-encoded version)
+    /// in accordance with RFC 3174
     QByteArray m_photoHash;
     VCardUpdateType m_vCardUpdateType;
 };
