@@ -45,6 +45,7 @@ public:
         Probe
     };
 
+    /// XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
         VCardUpdateNone = 0,
@@ -134,7 +135,7 @@ private:
     QXmppPresence::Status m_status;
 
 
-    //vCard update
+    /// XEP-0153: vCard-Based Avatars
     QByteArray m_photoHash;
     VCardUpdateType m_vCardUpdateType;
 };

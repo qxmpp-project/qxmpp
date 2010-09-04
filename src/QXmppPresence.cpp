@@ -78,6 +78,7 @@ void QXmppPresence::parse(const QDomElement &element)
     m_vCardUpdateType = VCardUpdateNone;
     while(!xElement.isNull())
     {
+        /// XEP-0153: vCard-Based Avatars
         if(xElement.namespaceURI() == ns_vcard_update)
         {
             QDomElement photoElement = xElement.firstChildElement("photo");
@@ -117,6 +118,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     error().toXml(xmlWriter);
 
+    /// XEP-0153: vCard-Based Avatars
     if(m_vCardUpdateType != VCardUpdateNone)
     {
         xmlWriter->writeStartElement("x");
