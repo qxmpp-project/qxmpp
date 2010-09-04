@@ -68,4 +68,4 @@ const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 
-const char* ns_vcardUpdate = "vcard-temp:x:update";
+const char* ns_vcard_update = "vcard-temp:x:update";
