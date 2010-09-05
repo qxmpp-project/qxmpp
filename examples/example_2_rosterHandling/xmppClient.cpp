@@ -75,6 +75,6 @@ void xmppClient::rosterReceived()
 void xmppClient::presenceChanged(const QString& bareJid,
                                  const QString& resource)
 {
-    std::cout<<"Presence changed:: "<< qPrintable(bareJid)
-            << qPrintable(resource)<<std::endl;
+    QString presenceStr = "Presence Changed:: %1/%2";
+    std::cout<<qPrintable(presenceStr.arg(bareJid).arg(resource))<<std::endl;
 }
