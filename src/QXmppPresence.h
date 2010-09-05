@@ -45,7 +45,7 @@ public:
         Probe
     };
 
-    /// XEP-0153: vCard-Based Avatars
+    // XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
         VCardUpdateNone = 0,
