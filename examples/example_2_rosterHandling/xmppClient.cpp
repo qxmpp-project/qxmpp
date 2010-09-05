@@ -61,9 +61,14 @@ void xmppClient::rosterReceived()
 {
     std::cout<<"example_2_rosterHandling:: Roster Received"<<std::endl;
     QStringList list = rosterManager().getRosterBareJids();
+    QString rosterEntry = "Roster Received:: %1 [%2]";
     for(int i = 0; i < list.size(); ++i)
     {
-        std::cout<<"Roster Received:: "<<qPrintable(list.at(i))<<std::endl;
+        QString bareJid = list.at(i);
+        QString name = rosterManager().getRosterEntry(bareJid).name();
+        if(name.isEmpty())
+            name = "-";
+        std::cout << qPrintable(rosterEntry.arg(bareJid).arg(name)) << std::endl;
     }
 }
 
