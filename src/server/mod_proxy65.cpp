@@ -465,7 +465,7 @@ void QXmppServerProxy65::slotPairFinished()
     if (!pair)
         return;
 
-    info(QString("Data transfered for %1 %2").arg(pair->key, QString::number(pair->transfer)));
+    info(QString("Data transferred for %1 %2").arg(pair->key, QString::number(pair->transfer)));
 
     // update speed statistics
     TransferStats stats;

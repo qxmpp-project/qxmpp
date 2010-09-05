@@ -188,7 +188,7 @@ QString QXmppTransferJob::jid() const
     return m_jid;
 }
 
-/// Returns meta-data about the file being transfered.
+/// Returns meta-data about the file being transferred.
 ///
 
 QXmppTransferFileInfo QXmppTransferJob::fileInfo() const
