@@ -69,8 +69,8 @@ void QXmppRosterManager::connected()
 
 void QXmppRosterManager::disconnected()
 {
-    m_entries = QMap<QString, QXmppRosterIq::Item>();
-    m_presences = QMap<QString, QMap<QString, QXmppPresence> >();
+    m_entries.clear();
+    m_presences.clear();
     m_isRosterReceived = false;
 }
 
