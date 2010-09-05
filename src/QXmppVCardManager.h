@@ -47,7 +47,7 @@ class QXmppOutgoingClient;
 /// For getting the vCard of the connected user itself. Client can call requestClientVCard()
 /// and on the signal clientVCardReceived() it can get its vCard using clientVCard().
 ///
-/// <B>Settting vCard of the client:</B><BR>
+/// <B>Setting vCard of the client:</B><BR>
 /// Using setClientVCard() client can set its vCard.
 ///
 /// \note Client can't set/change vCards of roster entries.
