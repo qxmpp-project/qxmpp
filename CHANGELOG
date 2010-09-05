@@ -1,20 +1,20 @@
 QXmpp 0.3.0 (Unreleased)
 ------------------------
   - New XEPs
-   * XEP-0153: vCard-Based Avatars
+    * XEP-0153: vCard-Based Avatars
 
- - New classes
+  - New classes
     * QXmppServer: base class for building XMPP servers
 
- - Add support for DNS SRV lookups, meaning you can connect to nearly all
-   servers using only a JID and a password.
+  - Add support for DNS SRV lookups, meaning you can connect to nearly all
+    servers using only a JID and a password.
 
- - Improve support for SASL authentication, with a verification of the second
-   challenge message sent by the server.
+  - Improve support for SASL authentication, with a verification of the second
+    challenge message sent by the server.
 
- - Add support for the birthday and URL attributes in vCards.
+  - Add support for the birthday and URL attributes in vCards.
 
- - Improve STUN support for VoIP calls by detecting server-reflexive address.
+  - Improve STUN support for VoIP calls by detecting server-reflexive address.
 
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
