@@ -171,7 +171,7 @@ private:
 /// Method.
 ///
 /// The data stream is connected using Interactive Connectivity Establishment
-/// (RFC 5245) and data is transfered using Real Time Protocol (RFC 3550)
+/// (RFC 5245) and data is transferred using Real Time Protocol (RFC 3550)
 /// packets.
 ///
 /// \ingroup Managers
