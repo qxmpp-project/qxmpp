@@ -23,6 +23,7 @@
  */
 
 
+// deprecated in release 0.2.0
 #warning "QXmppRoster.h is deprecated, use QXmppRosterManager instead"
 
 #include "QXmppRosterManager.h"
