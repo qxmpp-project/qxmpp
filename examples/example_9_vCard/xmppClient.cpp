@@ -1,0 +1,96 @@
+/*
+ * Copyright (C) 2008-2010 The QXmpp developers
+ *
+ * Author:
+ *	Manjeet Dahiya
+ *
+ * Source:
+ *	http://code.google.com/p/qxmpp
+ *
+ * This file is a part of QXmpp library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
+#include "xmppClient.h"
+
+#include <iostream>
+
+#include "QXmppMessage.h"
+#include "QXmppRosterManager.h"
+#include "QXmppVCardManager.h"
+
+#include <QFile>
+#include <QDir>
+#include <QXmlStreamWriter>
+
+xmppClient::xmppClient(QObject *parent)
+    : QXmppClient(parent)
+{
+    bool check = connect(this, SIGNAL(connected()),
+        SLOT(clientConnected()));
+    Q_ASSERT(check);
+
+    check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
+        SLOT(rosterReceived()));
+    Q_ASSERT(check);
+
+}
+
+xmppClient::~xmppClient()
+{
+
+}
+
+void xmppClient::clientConnected()
+{
+    std::cout<<"example_9_vCard:: CONNECTED"<<std::endl;
+}
+
+void xmppClient::rosterReceived()
+{
+    std::cout<<"example_9_vCard:: Roster Received"<<std::endl;
+    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)),
+        SLOT(vCardReceived(const QXmppVCard&)));
+    Q_ASSERT(check);
+
+    QStringList list = rosterManager().getRosterBareJids();
+    for(int i = 0; i < list.size(); ++i)
+    {
+        // request vCard of all the bareJids in roster
+        vCardManager().requestVCard(list.at(i));
+    }
+}
+
+void xmppClient::vCardReceived(const QXmppVCard& vCard)
+{
+    QString bareJid = vCard.from();
+    std::cout<<"example_9_vCard:: vCard Received:: " << qPrintable(bareJid) <<std::endl;
+
+    QString out("FullName: %1\nNickName: %2\n");
+    std::cout<<qPrintable(out.arg(vCard.fullName()).arg(vCard.nickName())) <<std::endl;
+
+    QString vCardsDir("vCards/");
+
+    QDir dir;
+    if(!dir.exists(vCardsDir))
+        dir.mkdir(vCardsDir);
+
+    QFile file("vCards/" + bareJid + ".xml");
+    if(file.open(QIODevice::ReadWrite))
+    {
+        QXmlStreamWriter stream(&file);
+        vCard.toXml(&stream);
+        file.close();
+        std::cout<<"example_9_vCard:: vCard written to the file:: " << qPrintable(bareJid) <<std::endl;
+    }
+}
