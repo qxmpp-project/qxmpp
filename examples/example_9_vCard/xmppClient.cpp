@@ -32,6 +32,9 @@
 #include <QFile>
 #include <QDir>
 #include <QXmlStreamWriter>
+#include <QImage>
+#include <QBuffer>
+#include <QImageReader>
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
@@ -92,5 +95,17 @@ void xmppClient::vCardReceived(const QXmppVCard& vCard)
         vCard.toXml(&stream);
         file.close();
         std::cout<<"example_9_vCard:: vCard written to the file:: " << qPrintable(bareJid) <<std::endl;
+    }
+
+    QString name("vCards/" + bareJid + ".png");
+    QByteArray photo = vCard.photo();
+    QBuffer buffer;
+    buffer.setData(photo);
+    buffer.open(QIODevice::ReadOnly);
+    QImageReader imageReader(&buffer);
+    QImage image = imageReader.read();
+    if(image.save(name))
+    {
+        std::cout<<"example_9_vCard:: Avatar saved to file" <<std::endl<<std::endl;
     }
 }
