@@ -3,8 +3,11 @@ QXmpp 0.3.0 (Unreleased)
   - New XEPs
     * XEP-0153: vCard-Based Avatars
 
-  - New classes
+  - New Classes
     * QXmppServer: base class for building XMPP servers
+  
+  - New Examples
+    * example_9_vCard: vCard handling example
 
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
