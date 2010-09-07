@@ -30,7 +30,7 @@
 #include <QImageReader>
 #endif
 
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
@@ -53,7 +53,7 @@ QString getImageType(const QByteArray &contents)
     return "image/unknown";
 }
 
-QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
+QXmppVCardIq::QXmppVCardIq(const QString& jid) : QXmppIq(QXmppIq::Get)
 {
     // for self jid should be empty
     setTo(jid);
@@ -62,7 +62,7 @@ QXmppVCard::QXmppVCard(const QString& jid) : QXmppIq(QXmppIq::Get)
 /// Returns the date of birth of the individual associated with the vCard.
 ///
 
-QDate QXmppVCard::birthday() const
+QDate QXmppVCardIq::birthday() const
 {
     return m_birthday;
 }
@@ -71,7 +71,7 @@ QDate QXmppVCard::birthday() const
 ///
 /// \param birthday
 
-void QXmppVCard::setBirthday(const QDate &birthday)
+void QXmppVCardIq::setBirthday(const QDate &birthday)
 {
     m_birthday = birthday;
 }
@@ -79,7 +79,7 @@ void QXmppVCard::setBirthday(const QDate &birthday)
 /// Returns the email address.
 ///
 
-QString QXmppVCard::email() const
+QString QXmppVCardIq::email() const
 {
     return m_email;
 }
@@ -88,7 +88,7 @@ QString QXmppVCard::email() const
 ///
 /// \param email
 
-void QXmppVCard::setEmail(const QString &email)
+void QXmppVCardIq::setEmail(const QString &email)
 {
     m_email = email;
 }
@@ -96,7 +96,7 @@ void QXmppVCard::setEmail(const QString &email)
 /// Returns the first name.
 ///
 
-QString QXmppVCard::firstName() const
+QString QXmppVCardIq::firstName() const
 {
     return m_firstName;
 }
@@ -105,7 +105,7 @@ QString QXmppVCard::firstName() const
 ///
 /// \param firstName
 
-void QXmppVCard::setFirstName(const QString &firstName)
+void QXmppVCardIq::setFirstName(const QString &firstName)
 {
     m_firstName = firstName;
 }
@@ -113,7 +113,7 @@ void QXmppVCard::setFirstName(const QString &firstName)
 /// Returns the full name.
 ///
 
-QString QXmppVCard::fullName() const
+QString QXmppVCardIq::fullName() const
 {
     return m_fullName;
 }
@@ -122,7 +122,7 @@ QString QXmppVCard::fullName() const
 ///
 /// \param fullName
 
-void QXmppVCard::setFullName(const QString &fullName)
+void QXmppVCardIq::setFullName(const QString &fullName)
 {
     m_fullName = fullName;
 }
@@ -130,7 +130,7 @@ void QXmppVCard::setFullName(const QString &fullName)
 /// Returns the last name.
 ///
 
-QString QXmppVCard::lastName() const
+QString QXmppVCardIq::lastName() const
 {
     return m_lastName;
 }
@@ -139,7 +139,7 @@ QString QXmppVCard::lastName() const
 ///
 /// \param lastName
 
-void QXmppVCard::setLastName(const QString &lastName)
+void QXmppVCardIq::setLastName(const QString &lastName)
 {
     m_lastName = lastName;
 }
@@ -147,7 +147,7 @@ void QXmppVCard::setLastName(const QString &lastName)
 /// Returns the middle name.
 ///
 
-QString QXmppVCard::middleName() const
+QString QXmppVCardIq::middleName() const
 {
     return m_middleName;
 }
@@ -156,7 +156,7 @@ QString QXmppVCard::middleName() const
 ///
 /// \param middleName
 
-void QXmppVCard::setMiddleName(const QString &middleName)
+void QXmppVCardIq::setMiddleName(const QString &middleName)
 {
     m_middleName = middleName;
 }
@@ -164,7 +164,7 @@ void QXmppVCard::setMiddleName(const QString &middleName)
 /// Returns the nickname.
 ///
 
-QString QXmppVCard::nickName() const
+QString QXmppVCardIq::nickName() const
 {
     return m_nickName;
 }
@@ -173,7 +173,7 @@ QString QXmppVCard::nickName() const
 ///
 /// \param nickName
 
-void QXmppVCard::setNickName(const QString &nickName)
+void QXmppVCardIq::setNickName(const QString &nickName)
 {
     m_nickName = nickName;
 }
@@ -182,7 +182,7 @@ void QXmppVCard::setNickName(const QString &nickName)
 /// homepage or a location at which you can find real-time information about
 /// the vCard.
 
-QString QXmppVCard::url() const
+QString QXmppVCardIq::url() const
 {
     return m_url;
 }
@@ -193,7 +193,7 @@ QString QXmppVCard::url() const
 ///
 /// \param url
 
-void QXmppVCard::setUrl(const QString& url)
+void QXmppVCardIq::setUrl(const QString& url)
 {
     m_url = url;
 }
@@ -210,38 +210,38 @@ void QXmppVCard::setUrl(const QString& url)
 /// QImage myImage = imageReader.read();
 /// \endcode
 
-QByteArray QXmppVCard::photo() const
+QByteArray QXmppVCardIq::photo() const
 {
     return m_photo;
 }
 
 /// Sets the photo's binary contents.
 
-void QXmppVCard::setPhoto(const QByteArray& photo)
+void QXmppVCardIq::setPhoto(const QByteArray& photo)
 {
     m_photo = photo;
 }
 
 /// Returns the photo's MIME type.
 
-QString QXmppVCard::photoType() const
+QString QXmppVCardIq::photoType() const
 {
     return m_photoType;
 }
 
 /// Sets the photo's MIME type.
 
-void QXmppVCard::setPhotoType(const QString& photoType)
+void QXmppVCardIq::setPhotoType(const QString& photoType)
 {
     m_photoType = photoType;
 }
 
-bool QXmppVCard::isVCard(const QDomElement &nodeRecv)
+bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
 {
     return nodeRecv.firstChildElement("vCard").namespaceURI() == ns_vcard;
 }
 
-void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
+void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
 {
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
@@ -262,7 +262,7 @@ void QXmppVCard::parseElementFromChild(const QDomElement& nodeRecv)
     m_photoType = photoElement.firstChildElement("TYPE").text();
 }
 
-void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
+void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
@@ -310,7 +310,7 @@ void QXmppVCard::toXmlElementFromChild(QXmlStreamWriter *writer) const
 }
 
 #ifndef QXMPP_NO_GUI
-QImage QXmppVCard::photoAsImage() const
+QImage QXmppVCardIq::photoAsImage() const
 {
     QBuffer buffer;
     buffer.setData(m_photo);
@@ -319,7 +319,7 @@ QImage QXmppVCard::photoAsImage() const
     return imageReader.read();
 }
 
-void QXmppVCard::setPhoto(const QImage& image)
+void QXmppVCardIq::setPhoto(const QImage& image)
 {
     QByteArray ba;
     QBuffer buffer(&ba);
@@ -330,23 +330,23 @@ void QXmppVCard::setPhoto(const QImage& image)
 }
 #endif
 
-QString QXmppVCard::getFullName() const
+QString QXmppVCardIq::getFullName() const
 {
     return m_fullName;
 }
 
-QString QXmppVCard::getNickName() const
+QString QXmppVCardIq::getNickName() const
 {
     return m_nickName;
 }
 
-const QByteArray& QXmppVCard::getPhoto() const
+const QByteArray& QXmppVCardIq::getPhoto() const
 {
     return m_photo;
 }
 
 #ifndef QXMPP_NO_GUI
-QImage QXmppVCard::getPhotoAsImage() const
+QImage QXmppVCardIq::getPhotoAsImage() const
 {
     return photoAsImage();
 }

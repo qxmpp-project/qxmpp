@@ -79,6 +79,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppRemoteMethod.h \
     QXmppRpcIq.h \
     QXmppVCardManager.h \
+    QXmppVCardIq.h \
     QXmppVCard.h \
     QXmppVersionIq.h
 HEADERS += $$INSTALL_HEADERS
@@ -133,7 +134,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppRemoteMethod.cpp \
     QXmppRpcIq.cpp \
     QXmppVCardManager.cpp \
-    QXmppVCard.cpp \
+    QXmppVCardIq.cpp \
     QXmppVersionIq.cpp
 
 # Plugins
