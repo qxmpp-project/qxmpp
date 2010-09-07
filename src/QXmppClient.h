@@ -53,6 +53,7 @@ class QXmppReconnectionManager;
 class QXmppRosterManager;
 class QXmppTransferManager;
 class QXmppVCardManager;
+class QXmppVersionManager;
 
 /// \defgroup Core
 
@@ -120,6 +121,7 @@ public:
     QXmppRosterManager& rosterManager();
     QXmppTransferManager& transferManager();
     QXmppVCardManager& vCardManager();
+    QXmppVersionManager& versionManager();
 
     QXmppReconnectionManager* reconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);

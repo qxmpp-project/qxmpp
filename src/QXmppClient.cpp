@@ -39,6 +39,7 @@
 #include "QXmppUtils.h"
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
+#include "QXmppVersionManager.h"
 
 class QXmppClientPrivate
 {
@@ -57,6 +58,7 @@ public:
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
     QXmppTransferManager *transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
+    QXmppVersionManager *versionManager;      ///< Pointer to the version manager
 
     QHash<QString,QXmppInvokable*> interfaces;
 };
@@ -172,6 +174,7 @@ QXmppClient::QXmppClient(QObject *parent)
     d->mucManager = new QXmppMucManager(d->stream, this);
     d->transferManager = new QXmppTransferManager(d->stream, this);
     d->vCardManager = new QXmppVCardManager(d->stream, this);
+    d->versionManager = new QXmppVersionManager(d->stream, this);
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -495,6 +498,11 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 QXmppVCardManager& QXmppClient::vCardManager()
 {
     return *d->vCardManager;
+}
+
+QXmppVersionManager& QXmppClient::versionManager()
+{
+    return *d->versionManager;
 }
 
 /// Give extensions a chance to handle incoming stanzas.
