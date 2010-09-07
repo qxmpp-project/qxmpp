@@ -72,11 +72,15 @@ signals:
     /// This signal is emitted when the requested vCard is received
     /// after calling the requestVCard() function.
     void vCardReceived(const QXmppVCardIq&);
-    void vCardReceived(const QXmppVCard&);
 
     /// This signal is emitted when the client's vCard is received
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
+
+    /// \cond
+// deprecated in release 0.3.0
+    void vCardReceived(const QXmppVCard&);
+    /// \endcond
 
 private slots:
     void vCardIqReceived(const QXmppVCardIq&);
