@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Jeremy Lainé
+ *  Manjeet Dahiya
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -57,6 +58,8 @@ private slots:
     void testSession();
     void testStreamFeatures();
     void testVCard();
+    void testVersionGet();
+    void testVersionResult();
 };
 
 class TestJingle : public QObject

@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Manjeet Dahiya
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -40,6 +41,7 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
+#include "QXmppVersionIq.h"
 #include "tests.h"
 
 QString getImageType(const QByteArray &contents);
@@ -525,6 +527,38 @@ void TestPackets::testVCard()
         "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
     QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
     serializePacket(vcard, xml);
+}
+
+void TestPackets::testVersionGet()
+{
+    const QByteArray xmlGet(
+    "<iq id=\"version_1\" to=\"juliet@capulet.com/balcony\" "
+    "from=\"romeo@montague.net/orchard\" type=\"get\">"
+    "<query xmlns=\"jabber:iq:version\"/></iq>");
+
+    QXmppVersionIq verIqGet;
+    parsePacket(verIqGet, xmlGet);
+    serializePacket(verIqGet, xmlGet);
+}
+
+void TestPackets::testVersionResult()
+{
+    const QByteArray xmlResult(
+    "<iq id=\"version_1\" to=\"romeo@montague.net/orchard\" "
+    "from=\"juliet@capulet.com/balcony\" type=\"result\">"
+    "<query xmlns=\"jabber:iq:version\">"
+        "<name>qxmpp</name>"
+        "<os>Windows-XP</os>"
+        "<version>0.2.0</version>"
+    "</query></iq>");
+
+    QXmppVersionIq verIqResult;
+    parsePacket(verIqResult, xmlResult);
+    QCOMPARE(verIqResult.name(), QString("qxmpp"));
+    QCOMPARE(verIqResult.version(), QString("0.2.0"));
+    QCOMPARE(verIqResult.os(), QString("Windows-XP"));
+
+    serializePacket(verIqResult, xmlResult);
 }
 
 void TestJingle::testSession()
