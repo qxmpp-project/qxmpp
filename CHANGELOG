@@ -9,6 +9,9 @@ QXmpp 0.3.0 (Unreleased)
   - New Examples
     * example_9_vCard: vCard handling example
 
+  - Deprecation
+    * QXmppVCard class name changed to QXmppVCardIq
+    
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
 
