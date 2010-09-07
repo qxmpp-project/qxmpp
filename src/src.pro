@@ -81,7 +81,8 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVCardManager.h \
     QXmppVCardIq.h \
     QXmppVCard.h \
-    QXmppVersionIq.h
+    QXmppVersionIq.h\
+    QXmppVersionManager.h
 HEADERS += $$INSTALL_HEADERS
 
 # Source files
@@ -135,7 +136,9 @@ SOURCES += QXmppUtils.cpp \
     QXmppRpcIq.cpp \
     QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
-    QXmppVersionIq.cpp
+    QXmppVersionIq.cpp \
+    QXmppVersionManager.cpp
+
 
 # Plugins
 DEFINES += QT_STATICPLUGIN

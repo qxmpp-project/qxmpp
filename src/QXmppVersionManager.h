@@ -24,8 +24,27 @@
 #ifndef QXMPPVERSIONMANAGER_H
 #define QXMPPVERSIONMANAGER_H
 
-class QXmppVersionManager
+#include <QObject>
+
+class QXmppOutgoingClient;
+class QXmppVersionIq;
+
+class QXmppVersionManager : public QObject
 {
+    Q_OBJECT
+
+public:
+    QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent = 0);
+
+signals:
+    void versionReceived(const QXmppVersionIq&);
+
+private slots:
+    void versionIqReceived(const QXmppVersionIq&);
+
+private:
+    // reference to the xmpp stream (no ownership)
+    QXmppOutgoingClient* m_stream;
 };
 
 #endif // QXMPPVERSIONMANAGER_H
