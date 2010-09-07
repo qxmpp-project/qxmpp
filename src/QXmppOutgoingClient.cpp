@@ -591,21 +591,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 QXmppVersionIq versionIq;
                 versionIq.parse(nodeRecv);
-
-                if (versionIq.type() == QXmppIq::Get)
-                {
-                    // respond to query
-                    QXmppVersionIq responseIq;
-                    responseIq.setType(QXmppIq::Result);
-                    responseIq.setId(versionIq.id());
-                    responseIq.setTo(versionIq.from());
-                    responseIq.setName(qApp->applicationName());
-                    responseIq.setVersion(qApp->applicationVersion());
-                    sendPacket(responseIq);
-                } else {
-                    emit versionIqReceived(versionIq);
-                }
-
+                emit versionIqReceived(versionIq);
             }
             // XEP-0095: Stream Initiation
             else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))

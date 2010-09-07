@@ -23,6 +23,8 @@
 
 #include "QXmppVersionManager.h"
 #include "QXmppOutgoingClient.h"
+#include "QXmppVersionIq.h"
+#include <QCoreApplication>
 
 QXmppVersionManager::QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent)
     : QObject(parent),
@@ -34,7 +36,23 @@ QXmppVersionManager::QXmppVersionManager(QXmppOutgoingClient* stream, QObject *p
     Q_UNUSED(check);
 }
 
-void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& verIq)
+void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& versionIq)
 {
-    emit versionReceived(verIq);
+    if(versionIq.type() == QXmppIq::Get)
+    {
+        // respond to query
+        QXmppVersionIq responseIq;
+        responseIq.setType(QXmppIq::Result);
+        responseIq.setId(versionIq.id());
+        responseIq.setTo(versionIq.from());
+        QString name = qApp->applicationName();
+        if(name.isEmpty())
+            name = "Based on QXmpp";
+        responseIq.setName(name);
+        // TODO set OS aswell
+        responseIq.setVersion(qApp->applicationVersion());
+        m_stream->sendPacket(responseIq);
+    }
+
+    emit versionReceived(versionIq);
 }
