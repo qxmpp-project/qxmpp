@@ -51,7 +51,7 @@
 #include "QXmppRosterIq.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamInitiationIq.h"
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 #include "QXmppVersionIq.h"
 
 #include <QBuffer>
@@ -533,9 +533,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 emit ibbOpenIqReceived(ibbOpenIq);
             }
             // XEP-0054: vcard-temp
-            else if(QXmppVCard::isVCard(nodeRecv))
+            else if(QXmppVCardIq::isVCard(nodeRecv))
             {
-                QXmppVCard vcardIq;
+                QXmppVCardIq vcardIq;
                 vcardIq.parse(nodeRecv);
                 emit vCardIqReceived(vcardIq);
             }

@@ -40,7 +40,7 @@ class QXmppPresence;
 class QXmppIq;
 class QXmppBind;
 class QXmppRosterIq;
-class QXmppVCard;
+class QXmppVCardIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
@@ -110,7 +110,7 @@ signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
 
     // XEP-0054: vcard-temp
-    void vCardIqReceived(const QXmppVCard&);
+    void vCardIqReceived(const QXmppVCardIq&);
 
     // XEP-0065: SOCKS5 Bytestreams
     void byteStreamIqReceived(const QXmppByteStreamIq&);

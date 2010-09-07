@@ -31,8 +31,8 @@ QXmppVCardManager::QXmppVCardManager(QXmppOutgoingClient* stream, QObject *paren
     m_stream(stream),
     m_isClientVCardReceived(false)
 {
-    bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCard&)),
-        this, SLOT(vCardIqReceived(const QXmppVCard&)));
+    bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCardIq&)),
+        this, SLOT(vCardIqReceived(const QXmppVCardIq&)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
@@ -44,11 +44,11 @@ QXmppVCardManager::QXmppVCardManager(QXmppOutgoingClient* stream, QObject *paren
 ///
 void QXmppVCardManager::requestVCard(const QString& jid)
 {
-    QXmppVCard vcardIq(jid);
+    QXmppVCardIq vcardIq(jid);
     m_stream->sendPacket(vcardIq);
 }
 
-void QXmppVCardManager::vCardIqReceived(const QXmppVCard& vcard)
+void QXmppVCardManager::vCardIqReceived(const QXmppVCardIq& vcard)
 {
     // self vCard received
     if(vcard.from().isEmpty())
@@ -65,7 +65,7 @@ void QXmppVCardManager::vCardIqReceived(const QXmppVCard& vcard)
 ///
 /// \return QXmppVCard
 ///
-const QXmppVCard& QXmppVCardManager::clientVCard() const
+const QXmppVCardIq& QXmppVCardManager::clientVCard() const
 {
     return m_clientVCard;
 }
@@ -74,7 +74,7 @@ const QXmppVCard& QXmppVCardManager::clientVCard() const
 ///
 /// \param clientVCard QXmppVCard
 ///
-void QXmppVCardManager::setClientVCard(const QXmppVCard& clientVCard)
+void QXmppVCardManager::setClientVCard(const QXmppVCardIq& clientVCard)
 {
     m_clientVCard = clientVCard;
     m_clientVCard.setTo("");
@@ -100,4 +100,3 @@ bool QXmppVCardManager::isClientVCardReceived()
 {
     return m_isClientVCardReceived;
 }
-

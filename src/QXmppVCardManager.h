@@ -27,7 +27,7 @@
 
 #include <QObject>
 
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 
 class QXmppOutgoingClient;
 
@@ -62,28 +62,28 @@ public:
     QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     void requestVCard(const QString& bareJid = "");
 
-    const QXmppVCard& clientVCard() const;
-    void setClientVCard(const QXmppVCard&);
+    const QXmppVCardIq& clientVCard() const;
+    void setClientVCard(const QXmppVCardIq&);
     void requestClientVCard();
     bool isClientVCardReceived();
 
 signals:
     /// This signal is emitted when the requested vCard is received
     /// after calling the requestVCard() function.
-    void vCardReceived(const QXmppVCard&);
+    void vCardReceived(const QXmppVCardIq&);
 
     /// This signal is emitted when the client's vCard is received
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
 
 private slots:
-    void vCardIqReceived(const QXmppVCard&);
+    void vCardIqReceived(const QXmppVCardIq&);
 
 private:
     // reference to the xmpp stream (no ownership)
     QXmppOutgoingClient* m_stream;
 
-    QXmppVCard m_clientVCard;  ///< Stores the vCard of the connected client
+    QXmppVCardIq m_clientVCard;  ///< Stores the vCard of the connected client
     bool m_isClientVCardReceived;
 };
 
