@@ -603,7 +603,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     responseIq.setVersion(qApp->applicationVersion());
                     sendPacket(responseIq);
                 } else {
-                    emit iqReceived(versionIq);
+                    emit versionIqReceived(versionIq);
                 }
 
             }
