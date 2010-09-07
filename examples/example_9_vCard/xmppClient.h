@@ -27,7 +27,7 @@
 
 #include "QXmppClient.h"
 
-class QXmppVCard;
+class QXmppVCardIq;
 
 class xmppClient : public QXmppClient
 {
@@ -40,7 +40,7 @@ public:
 public slots:
     void clientConnected();
     void rosterReceived();
-    void vCardReceived(const QXmppVCard&);
+    void vCardReceived(const QXmppVCardIq&);
 };
 
 #endif // XMPPCLIENT_H

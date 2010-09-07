@@ -62,8 +62,8 @@ void xmppClient::clientConnected()
 void xmppClient::rosterReceived()
 {
     std::cout<<"example_9_vCard:: Roster Received"<<std::endl;
-    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)),
-        SLOT(vCardReceived(const QXmppVCard&)));
+    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(const QXmppVCardIq&)),
+        SLOT(vCardReceived(const QXmppVCardIq&)));
     Q_ASSERT(check);
 
     QStringList list = rosterManager().getRosterBareJids();
@@ -74,7 +74,7 @@ void xmppClient::rosterReceived()
     }
 }
 
-void xmppClient::vCardReceived(const QXmppVCard& vCard)
+void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
 {
     QString bareJid = vCard.from();
     std::cout<<"example_9_vCard:: vCard Received:: " << qPrintable(bareJid) <<std::endl;
