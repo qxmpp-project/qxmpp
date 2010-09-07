@@ -87,9 +87,9 @@ bool QXmppVersionIq::isVersionIq(const QDomElement &element)
 void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
-    m_name = element.firstChildElement("name").text();
-    m_os = element.firstChildElement("os").text();
-    m_version = element.firstChildElement("version").text();
+    m_name = queryElement.firstChildElement("name").text();
+    m_os = queryElement.firstChildElement("os").text();
+    m_version = queryElement.firstChildElement("version").text();
 }
 
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
