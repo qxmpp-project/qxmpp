@@ -28,10 +28,10 @@ QXmppVersionManager::QXmppVersionManager(QXmppOutgoingClient* stream, QObject *p
     : QObject(parent),
     m_stream(stream)
 {
-//    bool check = QObject::connect(m_stream, SIGNAL(versionIqReceived(const QXmppVersionIq&)),
-//        this, SLOT(versionIqReceived(const QXmppVersionIq&)));
-//    Q_ASSERT(check);
-//    Q_UNUSED(check);
+    bool check = QObject::connect(m_stream, SIGNAL(versionIqReceived(const QXmppVersionIq&)),
+        this, SLOT(versionIqReceived(const QXmppVersionIq&)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& verIq)
