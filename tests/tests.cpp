@@ -39,7 +39,7 @@
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 #include "tests.h"
 
 QString getImageType(const QByteArray &contents);
@@ -510,7 +510,7 @@ void TestPackets::testVCard()
         "</vCard>"
         "</iq>");
 
-    QXmppVCard vcard;
+    QXmppVCardIq vcard;
     parsePacket(vcard, xml);
     QCOMPARE(vcard.birthday(), QDate(1983, 9, 14));
     QCOMPARE(vcard.email(), QLatin1String("foo.bar@example.com"));
