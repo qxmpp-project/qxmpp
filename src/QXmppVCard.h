@@ -36,6 +36,9 @@ public:
     QXmppVCard(const QString& bareJid = ""):QXmppVCardIq(bareJid)
     {
     }
+    QXmppVCard(QXmppVCardIq vcard):QXmppVCardIq(vcard)
+    {
+    }
 };
 
 #endif //QXMPPVCARD_H

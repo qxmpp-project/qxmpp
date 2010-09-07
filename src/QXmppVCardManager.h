@@ -28,6 +28,7 @@
 #include <QObject>
 
 #include "QXmppVCardIq.h"
+#include "QXmppVCard.h"
 
 class QXmppOutgoingClient;
 
@@ -71,6 +72,7 @@ signals:
     /// This signal is emitted when the requested vCard is received
     /// after calling the requestVCard() function.
     void vCardReceived(const QXmppVCardIq&);
+    void vCardReceived(const QXmppVCard&);
 
     /// This signal is emitted when the client's vCard is received
     /// after calling the requestClientVCard() function.

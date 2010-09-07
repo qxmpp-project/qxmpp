@@ -59,6 +59,10 @@ void QXmppVCardManager::vCardIqReceived(const QXmppVCardIq& vcard)
     }
 
     emit vCardReceived(vcard);
+
+// deprecated in 0.3.0 release
+    QXmppVCard oldVCard(vcard);
+    emit vCardReceived(oldVCard);
 }
 
 /// Returns the vCard of the connected client.
