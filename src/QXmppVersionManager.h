@@ -29,6 +29,11 @@
 class QXmppOutgoingClient;
 class QXmppVersionIq;
 
+/// \brief The QXmppVersionManager class makes it possible to request for
+/// the software version of an entity as defined by XEP-0092: Software Version.
+///
+/// \ingroup Managers
+
 class QXmppVersionManager : public QObject
 {
     Q_OBJECT
