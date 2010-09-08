@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons" >
+        <file>resource/green.png</file>
+        <file>resource/orange.png</file>
+        <file>resource/red.png</file>
+        <file>resource/gray.png</file>
+        <file>resource/avatar.png</file>
+        <file>resource/searchIcon.png</file>
+        <file>resource/downArrow.png</file>
+        <file>resource/ajax-loader.gif</file>
+    </qresource>
+</RCC>
