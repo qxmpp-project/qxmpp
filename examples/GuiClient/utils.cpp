@@ -41,6 +41,8 @@ int comparisonWeightsPresenceStatusType(QXmppPresence::Status::Type statusType)
         case QXmppPresence::Status::Offline:
         case QXmppPresence::Status::Invisible:
             return 3;
+        default:
+            return 5;
     }
 }
 
@@ -59,17 +61,19 @@ int comparisonWeightsPresenceType(QXmppPresence::Type type)
         case QXmppPresence::Unsubscribed:
         case QXmppPresence::Probe:
             return 3;
+        default:
+            return 5;
     }
 }
 
 QString presenceToStatusText(const QXmppPresence& presence)
 {
-    QString statusText = presence.getStatus().getStatusText();
+    QString statusText = presence.status().statusText();
     if(statusText.isEmpty())
     {
-        if(presence.getType() == QXmppPresence::Available)
+        if(presence.type() == QXmppPresence::Available)
         {
-            switch(presence.getStatus().getType())
+            switch(presence.status().type())
             {
             case QXmppPresence::Status::Invisible:
             case QXmppPresence::Status::Offline:
