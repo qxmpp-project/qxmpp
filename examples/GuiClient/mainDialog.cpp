@@ -24,7 +24,7 @@
 
 #include "mainDialog.h"
 #include "ui_mainDialog.h"
-#include "QXmppRoster.h"
+#include "QXmppRosterManager.h"
 #include "QXmppPresence.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
@@ -32,7 +32,7 @@
 #include "QXmppReconnectionManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppLogger.h"
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 
 #include <QMovie>
 
@@ -126,8 +126,8 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient.vCardManager(),
-                    SIGNAL(vCardReceived(const QXmppVCard&)), &m_vCardManager,
-                    SLOT(vCardReceived(const QXmppVCard&)));
+                    SIGNAL(vCardReceived(const QXmppVCardIq&)), &m_vCardManager,
+                    SLOT(vCardReceived(const QXmppVCardIq&)));
     Q_ASSERT(check);
 
     check = connect(&m_vCardManager,
@@ -163,7 +163,7 @@ void mainDialog::rosterReceived()
 
 void mainDialog::presenceChanged(const QString& bareJid, const QString& resource)
 {
-    if(bareJid == m_xmppClient.configuration().getJidBare())
+    if(bareJid == m_xmppClient.configuration().jidBare())
         return;
 
     if(!m_rosterItemModel.getRosterItemFromBareJid(bareJid))
@@ -260,9 +260,9 @@ void mainDialog::showChatDialog(const QString& bareJid)
 
 void mainDialog::messageReceived(const QXmppMessage& msg)
 {
-    QString from = msg.getFrom();
+    QString from = msg.from();
     getChatDialog(jidToBareJid(from))->show();
-    getChatDialog(jidToBareJid(from))->messageReceived(msg.getBody());
+    getChatDialog(jidToBareJid(from))->messageReceived(msg.body());
 }
 
 void mainDialog::statusTextChanged(const QString& status)
@@ -276,7 +276,7 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
 {
     if(presenceType == QXmppPresence::Unavailable)
     {
-        m_xmppClient.disconnect();
+        m_xmppClient.disconnectFromServer();
         showSignInPageAfterUserDisconnection();
     }
     else
@@ -300,7 +300,7 @@ void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusTyp
 
 void mainDialog::avatarChanged(const QImage& image)
 {
-    QXmppVCard vcard;
+    QXmppVCardIq vcard;
     vcard.setType(QXmppIq::Set);
     vcard.setPhoto(image);
     m_xmppClient.sendPacket(vcard);
@@ -312,10 +312,10 @@ void mainDialog::updateStatusWidget()
     // fetch selfVCard
     m_xmppClient.vCardManager().requestVCard();
 
-    m_statusWidget.setDisplayName(m_xmppClient.configuration().getJidBare());
+    m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
     m_statusWidget.setStatusText(presenceToStatusText(m_xmppClient.clientPresence()));
-    m_statusWidget.setPresenceAndStatusType(m_xmppClient.clientPresence().getType(),
-                                            m_xmppClient.clientPresence().getStatus().getType());
+    m_statusWidget.setPresenceAndStatusType(m_xmppClient.clientPresence().type(),
+                                            m_xmppClient.clientPresence().status().type());
 }
 
 void mainDialog::signIn()
@@ -332,7 +332,7 @@ void mainDialog::signIn()
     QString passwd = ui->lineEdit_password->text();
 
     m_xmppClient.configuration().setJid(bareJid);
-    m_xmppClient.configuration().setPasswd(passwd);
+    m_xmppClient.configuration().setPassword(passwd);
 
     m_vCardManager.loadAllFromCache();
     m_rosterItemModel.clear();
@@ -343,7 +343,7 @@ void mainDialog::cancelSignIn()
 {
     ui->label_throbber->hide();
     m_xmppClient.reconnectionManager()->cancelReconnection();
-    m_xmppClient.disconnect();
+    m_xmppClient.disconnectFromServer();
     showSignInPage();
     showLoginStatus("Sign in cancelled");
 }
@@ -418,13 +418,13 @@ void mainDialog::showLoginStatusWithCounter(const QString& msg, int time)
 
 void mainDialog::updateVCard(const QString& bareJid)
 {
-    if(bareJid != m_xmppClient.configuration().getJidBare())
+    if(bareJid != m_xmppClient.configuration().jidBare())
         m_rosterItemModel.updateAvatar(bareJid,
                                    m_vCardManager.getVCard(bareJid).image);
     else
     {
         if(m_vCardManager.getSelfFullName().isEmpty())
-            m_statusWidget.setDisplayName(m_xmppClient.configuration().getJidBare());
+            m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
         else
             m_statusWidget.setDisplayName(m_vCardManager.getSelfFullName());
 

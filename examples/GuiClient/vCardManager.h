@@ -28,7 +28,7 @@
 #include <QObject>
 #include <QMap>
 #include <QImage>
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 
 // use sqlite
 
@@ -61,7 +61,7 @@ signals:
     void vCardReadyToUse(const QString& bareJid);
 
 public slots:
-    void vCardReceived(const QXmppVCard&);
+    void vCardReceived(const QXmppVCardIq&);
 
 private:
     QString m_selfFullName;

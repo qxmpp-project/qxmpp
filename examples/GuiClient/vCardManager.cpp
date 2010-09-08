@@ -37,7 +37,7 @@ vCardManager::vCardManager(QXmppClient* client) : QObject(client),
 {
 }
 
-void vCardManager::vCardReceived(const QXmppVCard& vcard)
+void vCardManager::vCardReceived(const QXmppVCardIq& vcard)
 {
     QString from = vcard.getFrom();
     if(from.isEmpty() && m_client)

@@ -27,7 +27,7 @@
 
 #include <QStandardItemModel>
 #include "rosterItem.h"
-#include "QXmppRoster.h"
+#include "QXmppRosterManager.h"
 #include "QXmppPresence.h"
 
 class rosterItemModel : public QStandardItemModel
