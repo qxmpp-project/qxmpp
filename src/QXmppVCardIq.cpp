@@ -348,6 +348,10 @@ const QByteArray& QXmppVCardIq::getPhoto() const
 #ifndef QXMPP_NO_GUI
 QImage QXmppVCardIq::getPhotoAsImage() const
 {
-    return photoAsImage();
+    QBuffer buffer;
+    buffer.setData(m_photo);
+    buffer.open(QIODevice::ReadOnly);
+    QImageReader imageReader(&buffer);
+    return imageReader.read();
 }
 #endif
