@@ -42,6 +42,7 @@
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
 #include "QXmppVersionIq.h"
+#include "QXmppGlobal.h"
 #include "tests.h"
 
 QString getImageType(const QByteArray &contents);
@@ -127,6 +128,11 @@ void TestUtils::testMime()
     testMimeType("test.png", "image/png");
     testMimeType("test.svg", "image/svg+xml");
     testMimeType("test.xpm", "image/x-xpm");
+}
+
+void TestUtils::testLibVersion()
+{
+    QCOMPARE(QXmppVersion(), QString("0.3.0_unreleased"));
 }
 
 template <class T>

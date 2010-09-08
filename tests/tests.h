@@ -34,6 +34,7 @@ private slots:
     void testHmac();
     void testJid();
     void testMime();
+    void testLibVersion();
 };
 
 class TestPackets : public QObject
