@@ -58,9 +58,9 @@ void rosterItemModel::updatePresence(const QString& bareJid, const QMap<QString,
 
     if(presences.count() > 0)
     {
-        QString statusText = presences.begin().value().getStatus().getStatusText();
-        QXmppPresence::Status::Type statusType = presences.begin().value().getStatus().getType();
-        QXmppPresence::Type presenceType = presences.begin().value().getType();
+        QString statusText = presences.begin().value().status().statusText();
+        QXmppPresence::Status::Type statusType = presences.begin().value().status().type();
+        QXmppPresence::Type presenceType = presences.begin().value().type();
 
         if(statusText.isEmpty())
         {
@@ -79,7 +79,7 @@ void rosterItemModel::updateRosterEntry(const QString& bareJid, const QXmppRoste
 {
     addRosterItemIfDontExist(bareJid);
 
-    QString name = rosterEntry.getName();
+    QString name = rosterEntry.name();
     if(name.isEmpty())
     {
         name = bareJid;
