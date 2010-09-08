@@ -10,3 +10,5 @@ CONFIG(debug, debug|release) {
     QXMPP_LIBRARY_NAME = qxmpp
 }
 
+DEFINES = "QXMPP_VERSION=$$QXMPP_VERSION"
+
