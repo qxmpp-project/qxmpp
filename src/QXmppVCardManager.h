@@ -28,7 +28,10 @@
 #include <QObject>
 
 #include "QXmppVCardIq.h"
+
+#define QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 #include "QXmppVCard.h"
+#undef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 
 class QXmppOutgoingClient;
 

@@ -25,7 +25,9 @@
 #define QXMPPVCARD_H
 
 // deprecated in release 0.3.0
+#ifndef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 #warning "QXmppVCard.h is deprecated, use QXmppVCardIq instead"
+#endif
 
 #include "QXmppVCardIq.h"
 
