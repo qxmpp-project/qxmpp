@@ -304,7 +304,13 @@ void mainDialog::avatarChanged(const QImage& image)
 {
     QXmppVCardIq vcard;
     vcard.setType(QXmppIq::Set);
-    vcard.setPhoto(image);
+
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+    vcard.setPhoto(ba);
+
     m_xmppClient.sendPacket(vcard);
     m_statusWidget.setAvatar(image);
 }
