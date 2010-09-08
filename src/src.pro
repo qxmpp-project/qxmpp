@@ -82,7 +82,9 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVCardIq.h \
     QXmppVCard.h \
     QXmppVersionIq.h\
-    QXmppVersionManager.h
+    QXmppVersionManager.h \
+    QXmppGlobal.h
+
 HEADERS += $$INSTALL_HEADERS
 
 # Source files
@@ -137,7 +139,8 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
-    QXmppVersionManager.cpp
+    QXmppVersionManager.cpp \
+    QXmppGlobal.cpp
 
 
 # Plugins
