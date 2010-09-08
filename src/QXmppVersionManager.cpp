@@ -24,6 +24,8 @@
 #include "QXmppVersionManager.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppVersionIq.h"
+#include "QXmppGlobal.h"
+
 #include <QCoreApplication>
 
 QXmppVersionManager::QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent)
@@ -45,12 +47,19 @@ void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& versionIq)
         responseIq.setType(QXmppIq::Result);
         responseIq.setId(versionIq.id());
         responseIq.setTo(versionIq.from());
+
         QString name = qApp->applicationName();
         if(name.isEmpty())
             name = "Based on QXmpp";
         responseIq.setName(name);
+
+        QString version = qApp->applicationVersion();
+        if(version.isEmpty())
+            version = QXmppVersion();
+        responseIq.setVersion(version);
+
         // TODO set OS aswell
-        responseIq.setVersion(qApp->applicationVersion());
+
         m_stream->sendPacket(responseIq);
     }
 
