@@ -32,7 +32,7 @@
 #include <QPushButton>
 
 chatDialog::chatDialog(QWidget *parent): QDialog(parent, Qt::Window),
-    ui(new Ui::chatDialogClass), m_scene(0), m_view(0), m_client(0), m_pushButtonSend(0)
+    ui(new Ui::chatDialogClass), m_view(0), m_scene(0), m_pushButtonSend(0), m_client(0)
 {
     ui->setupUi(this);
     m_view = new chatGraphicsView(this);
