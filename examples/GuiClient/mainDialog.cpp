@@ -281,7 +281,9 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
     }
     else
     {
-        m_xmppClient.setClientPresence(presenceType);
+        QXmppPresence newPresence = m_xmppClient.clientPresence();
+        newPresence.setType(presenceType);
+        m_xmppClient.setClientPresence(newPresence);
     }
     m_statusWidget.setStatusText(
             presenceToStatusText(m_xmppClient.clientPresence()));
