@@ -1,6 +1,6 @@
 # Common definitions
 
-QXMPP_VERSION = 0.2.0
+QXMPP_VERSION = 0.3.0_unreleased
 QXMPP_INCLUDE_DIR = $$PWD/src
 QXMPP_LIBRARY_DIR = $$PWD/lib
 
