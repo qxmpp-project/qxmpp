@@ -39,10 +39,10 @@ vCardManager::vCardManager(QXmppClient* client) : QObject(client),
 
 void vCardManager::vCardReceived(const QXmppVCardIq& vcard)
 {
-    QString from = vcard.getFrom();
+    QString from = vcard.from();
     if(from.isEmpty() && m_client)
     {
-        from = m_client->configuration().getJidBare();
+        from = m_client->configuration().jidBare();
         m_selfFullName = vcard.fullName();
     }
 
@@ -98,7 +98,7 @@ vCardManager::vCard& vCardManager::getVCard(const QString& bareJid)
 
 void vCardManager::saveToCache(const QString& bareJid)
 {
-    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().getJidBare() + "_jidimage";
+    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().jidBare() + "_jidimage";
     QFile file(fileBareJidImageMap);
 
     if(!file.open(QIODevice::ReadWrite))
@@ -119,7 +119,7 @@ void vCardManager::saveToCache(const QString& bareJid)
 //    m_mapBareJidVCard[bareJid].imageOriginal.save(fileName + "_original.png", "PNG");
 //    m_mapBareJidVCard[bareJid].image.save(fileName + "_scaled.png", "PNG");
 //
-//    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().getJidBare() + "_jidimage.xml";
+//    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().jidBare() + "_jidimage.xml";
 //
 //    if(m_domJidImage.documentElement().isNull())
 //    {
@@ -150,7 +150,7 @@ void vCardManager::saveToCache(const QString& bareJid)
 
 void vCardManager::loadAllFromCache()
 {
-    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().getJidBare() + "_jidimage";
+    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().jidBare() + "_jidimage";
     QFile file(fileBareJidImageMap);
     if(!file.open(QIODevice::ReadOnly))
         return;
@@ -171,8 +171,8 @@ void vCardManager::loadAllFromCache()
     }
     file.close();
 
-//    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().getJidBare() + "_jidimage.xml";
-//    QDomDocument doc(m_client->configuration().getJidBare() + "_jidimage");
+//    QString fileBareJidImageMap = getSettingsDir() + m_client->configuration().jidBare() + "_jidimage.xml";
+//    QDomDocument doc(m_client->configuration().jidBare() + "_jidimage");
 //    QFile file(fileBareJidImageMap);
 //
 //    if(!file.open(QIODevice::ReadOnly))
