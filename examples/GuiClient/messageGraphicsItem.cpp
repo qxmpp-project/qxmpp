@@ -134,11 +134,11 @@ void messageGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
     painter->setRenderHint(QPainter::Antialiasing);
     drawPath(painter, path(), m_color, getText(), getTextWidth());
 
-    int spike_x = m_spikeWidth;
-    int spike_y = m_spikeHeight;
-    int corner = m_cornerRadius;
-    int length = m_width - spike_x;
-    int offset = spike_x;
+//    int spike_x = m_spikeWidth;
+//    int spike_y = m_spikeHeight;
+//    int corner = m_cornerRadius;
+//    int length = m_width - spike_x;
+//    int offset = spike_x;
     QFont font;
     font.setBold(true);
     QTextDocument textDoc(getText());
