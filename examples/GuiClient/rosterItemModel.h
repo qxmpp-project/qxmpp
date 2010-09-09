@@ -41,6 +41,7 @@ public:
     void updateAvatar(const QString& bareJid, const QImage& image);
 
     void clear();
+
 private:
     QMap<QString, rosterItem*> m_jidRosterItemMap;
     void addRosterItemIfDontExist(const QString& bareJid);

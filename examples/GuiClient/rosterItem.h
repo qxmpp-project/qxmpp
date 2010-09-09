@@ -32,7 +32,6 @@
 
 class rosterItem : public QStandardItem
 {
-
 public:
     enum userRoles
     {
