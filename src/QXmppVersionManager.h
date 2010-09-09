@@ -40,6 +40,7 @@ class QXmppVersionManager : public QObject
 
 public:
     QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent = 0);
+    void requestVersion(const QString& jid);
 
 signals:
     void versionReceived(const QXmppVersionIq&);

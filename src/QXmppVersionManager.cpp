@@ -65,3 +65,12 @@ void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& versionIq)
 
     emit versionReceived(versionIq);
 }
+
+void QXmppVersionManager::requestVersion(const QString& jid)
+{
+    QXmppVersionIq request;
+    request.setType(QXmppIq::Get);
+    request.setFrom(m_stream->configuration().jid());
+    request.setTo(jid);
+    m_stream->sendPacket(request);
+}
