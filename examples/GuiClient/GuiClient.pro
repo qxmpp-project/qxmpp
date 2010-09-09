@@ -21,7 +21,9 @@ SOURCES += main.cpp \
     avatarWidget.cpp \
     statusTextWidget.cpp \
     customToolButton.cpp \
-    vCardManager.cpp
+    vCardManager.cpp \
+    profileDialog.cpp
+
 HEADERS += messageGraphicsItem.h \
     chatGraphicsScene.h \
     chatGraphicsView.h \
@@ -39,11 +41,13 @@ HEADERS += messageGraphicsItem.h \
     avatarWidget.h \
     statusTextWidget.h \
     customToolButton.h \
-    vCardManager.h
+    vCardManager.h \
+    profileDialog.h
 
 FORMS += mainDialog.ui \
     chatDialog.ui \
-    statusWidget.ui
+    statusWidget.ui \
+    profileDialog.ui
 
 QT += network \
     xml
