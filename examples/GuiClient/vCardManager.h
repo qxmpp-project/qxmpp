@@ -42,6 +42,7 @@ public:
     class vCard
     {
     public:
+        QString fullName;
         QString imageHash;
         QImage image;
         QImage imageOriginal;

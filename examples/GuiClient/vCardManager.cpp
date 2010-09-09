@@ -48,6 +48,8 @@ void vCardManager::vCardReceived(const QXmppVCardIq& vcard)
 
 //    m_mapBareJidVcard[from] = vcard;
 
+    m_mapBareJidVCard[from].fullName = vcard.fullName();
+
     if(m_mapBareJidVCard[from].imageHash == getImageHash(vcard.photo()))
     {
         emit vCardReadyToUse(from);
