@@ -200,7 +200,7 @@ void ItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, 
     rect.moveTop(rect.y() - 3);
     QString statusText = index.data(rosterItem::StatusText).toString();
     QFontMetrics fontMetrics(font);
-    statusText = fontMetrics.elidedText(statusText, Qt::ElideRight, rect.width());
+    statusText = fontMetrics.elidedText(statusText, Qt::ElideRight, rect.width() - 34);
     painter->drawText(rect, statusText);
 
     penDivision.setWidth(0);
