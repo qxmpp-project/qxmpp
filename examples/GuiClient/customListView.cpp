@@ -42,6 +42,10 @@ customListView::customListView(QWidget* parent):QListView(parent), m_chat("Chat"
     check = connect(&m_chat, SIGNAL(triggered()), this,
                          SLOT(showChatDialog_helper()));
     Q_ASSERT(check);
+
+    check = connect(&m_profile, SIGNAL(triggered()), this,
+                         SLOT(showProfile_helper()));
+    Q_ASSERT(check);
 }
 
 bool customListView::event(QEvent* e)
