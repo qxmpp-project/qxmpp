@@ -227,9 +227,9 @@ void ItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, 
     rect.moveTop(rect.y() + (option.rect.height() - pixmap.height())/2);
     rect.moveLeft(option.rect.x() + option.rect.width() - pixmap.width() - 2);
 
-    if(image.isNull())
-        painter->drawPixmap(rect, pixmap);
-    else
+//    if(image.isNull())
+//        painter->drawPixmap(rect, pixmap);
+//    else
         painter->drawImage(rect, image);
 
     painter->restore();
