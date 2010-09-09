@@ -75,6 +75,7 @@ private slots:
     void showLoginStatusWithCounter(const QString& msg, int time);
     void updateVCard(const QString& bareJid);
     void avatarChanged(const QImage&);
+    void showProfile(const QString& bareJid);
 
 private:
     chatDialog* getChatDialog(const QString& bareJid);

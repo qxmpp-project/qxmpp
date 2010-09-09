@@ -34,6 +34,8 @@
 #include "QXmppLogger.h"
 #include "QXmppVCardIq.h"
 
+#include "profileDialog.h"
+
 #include <QMovie>
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
@@ -72,6 +74,10 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
 
     check = connect(ui->listView, SIGNAL(showChatDialog(const QString&)),
                     this, SLOT(showChatDialog(const QString&)));
+    Q_ASSERT(check);
+
+    check = connect(ui->listView, SIGNAL(showProfile(const QString&)),
+                    this, SLOT(showProfile(const QString&)));
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient, SIGNAL(messageReceived(const QXmppMessage&)),
@@ -255,7 +261,8 @@ chatDialog* mainDialog::getChatDialog(const QString& bareJid)
 
 void mainDialog::showChatDialog(const QString& bareJid)
 {
-    getChatDialog(bareJid)->show();
+    if(!bareJid.isEmpty())
+        getChatDialog(bareJid)->show();
 }
 
 void mainDialog::messageReceived(const QXmppMessage& msg)
@@ -438,4 +445,33 @@ void mainDialog::updateVCard(const QString& bareJid)
 
         m_statusWidget.setAvatar(m_vCardManager.getVCard(bareJid).image);
     }
+}
+
+void mainDialog::showProfile(const QString& bareJid)
+{
+    if(bareJid.isEmpty())
+        return;
+
+    profileDialog dlg(this);
+    dlg.setBareJid(bareJid);
+    dlg.setAvatar(m_vCardManager.getVCard(bareJid).imageOriginal);
+    QStringList resources = m_xmppClient.rosterManager().getResources(bareJid);
+
+    dlg.setFullName(m_vCardManager.getVCard(bareJid).fullName);
+
+    QString statusText;
+    for(int i = 0; i < resources.count(); ++i)
+    {
+        QString resource = resources.at(i);
+        statusText += "<B>"+ resource+ "</B>";
+        statusText += "</B><BR>";
+        QXmppPresence presence = m_xmppClient.rosterManager().getPresence(bareJid, resource);
+        statusText += presenceToStatusText(presence);
+
+        if(i < resources.count() - 1) // skip for the last item
+            statusText += "<BR><BR>";
+    }
+    dlg.setStatusText(statusText);
+
+    dlg.exec();
 }
