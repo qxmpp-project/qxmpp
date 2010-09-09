@@ -43,12 +43,17 @@ public slots:
 
 private slots:
     void showChatDialog_helper();
+    void showProfile_helper();
 
 protected:
     void keyPressEvent(QKeyEvent*);
 
 signals:
     void showChatDialog(const QString& bareJid);
+    void showProfile(const QString& bareJid);
+
+private:
+    QString selectedBareJid();
 
 private:
     QAction m_chat;

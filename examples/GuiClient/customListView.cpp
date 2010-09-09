@@ -71,16 +71,26 @@ void customListView::clicked(const QModelIndex& index)
 {
 }
 
+QString customListView::selectedBareJid()
+{
+    if(selectedIndexes().size() > 0)
+        return selectedIndexes().at(0).data(rosterItem::BareJid).toString();
+    else
+        return "";
+}
+
 void customListView::showChatDialog_helper()
 {
-    QString bareJid;
-    if(selectedIndexes().size() > 0)
-    {
-        bareJid = selectedIndexes().at(0).data(rosterItem::BareJid).toString();
+    QString bareJid = selectedBareJid();
+    if(!bareJid.isEmpty())
+        emit showChatDialog(bareJid);
+}
 
-        if(!bareJid.isEmpty())
-            emit showChatDialog(bareJid);
-    }
+void customListView::showProfile_helper()
+{
+    QString bareJid = selectedBareJid();
+    if(!bareJid.isEmpty())
+        emit showProfile(bareJid);
 }
 
 void customListView::keyPressEvent(QKeyEvent* event1)
