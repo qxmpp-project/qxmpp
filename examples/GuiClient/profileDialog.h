@@ -13,6 +13,12 @@ class profileDialog : public QDialog
 
 public:
     explicit profileDialog(QWidget *parent = 0);
+
+    void setAvatar(const QImage&);
+    void setBareJid(const QString&);
+    void setFullName(const QString&);
+    void setStatusText(const QString&);
+
     ~profileDialog();
 
 private:
