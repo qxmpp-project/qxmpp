@@ -77,6 +77,7 @@ public:
 
     QXmppConfiguration& configuration();
 
+    void addFeatures(const QStringList &features);
     QXmppElementList presenceExtensions() const;
 
 signals:

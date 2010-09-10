@@ -74,6 +74,9 @@ public:
     QAbstractSocket::SocketError socketError;
     QXmppStanza::Error::Condition xmppStreamError;
 
+    // Discovery
+    QStringList extraFeatures;
+
     // State data
     QString bindId;
     QString sessionId;
@@ -803,6 +806,11 @@ QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
     return d->xmppStreamError;
 }
 
+void QXmppOutgoingClient::addFeatures(const QStringList &features)
+{
+    d->extraFeatures << features;
+}
+
 QXmppDiscoveryIq QXmppOutgoingClient::capabilities() const
 {
     QXmppDiscoveryIq iq;
@@ -818,7 +826,6 @@ QXmppDiscoveryIq QXmppOutgoingClient::capabilities() const
         << ns_vcard             // XEP-0054: vcard-temp
         << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
         << ns_chat_states       // XEP-0085: Chat State Notifications
-        << ns_version           // XEP-0092: Software Version
         << ns_stream_initiation // XEP-0095: Stream Initiation
         << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
         << ns_capabilities      // XEP-0115 : Entity Capabilities
@@ -827,6 +834,7 @@ QXmppDiscoveryIq QXmppOutgoingClient::capabilities() const
         << ns_jingle_rtp_audio
         << ns_jingle_ice_udp    // XEP-0176 : Jingle ICE-UDP Transport Method
         << ns_ping;             // XEP-0199: XMPP Ping
+    features << d->extraFeatures;
     iq.setFeatures(features);
 
     // identities

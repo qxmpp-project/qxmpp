@@ -206,6 +206,9 @@ void QXmppClient::addExtension(QXmppClientExtension *extension)
     Q_ASSERT(check);
     Q_UNUSED(check);
 
+    // Features
+    d->stream->addFeatures(extension->discoveryFeatures());
+
     d->extensions << extension;
 }
 
