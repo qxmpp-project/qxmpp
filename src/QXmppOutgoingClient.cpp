@@ -45,7 +45,6 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
 #include "QXmppJingleIq.h"
-#include "QXmppMucIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
@@ -498,19 +497,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 } else {
                     emit discoveryIqReceived(discoIq);
                 }
-            }
-            // XEP-0045: Multi-User Chat
-            else if (QXmppMucAdminIq::isMucAdminIq(nodeRecv))
-            {
-                QXmppMucAdminIq mucIq;
-                mucIq.parse(nodeRecv);
-                emit mucAdminIqReceived(mucIq);
-            }
-            else if (QXmppMucOwnerIq::isMucOwnerIq(nodeRecv))
-            {
-                QXmppMucOwnerIq mucIq;
-                mucIq.parse(nodeRecv);
-                emit mucOwnerIqReceived(mucIq);
             }
             // XEP-0047 In-Band Bytestreams
             else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))

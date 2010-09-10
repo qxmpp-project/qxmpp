@@ -53,8 +53,6 @@ class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
 class QXmppJingleIq;
-class QXmppMucAdminIq;
-class QXmppMucOwnerIq;
 class QXmppStreamInitiationIq;
 
 class QXmppOutgoingClientPrivate;
@@ -103,10 +101,6 @@ signals:
     void ibbCloseIqReceived(const QXmppIbbCloseIq&);
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
-
-    // XEP-0045: Multi-User Chat
-    void mucAdminIqReceived(const QXmppMucAdminIq&);
-    void mucOwnerIqReceived(const QXmppMucOwnerIq&);
 
     // XEP-0054: vcard-temp
     void vCardIqReceived(const QXmppVCardIq&);

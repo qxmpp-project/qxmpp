@@ -172,7 +172,10 @@ QXmppClient::QXmppClient(QObject *parent)
     d->rosterManager = new QXmppRosterManager(d->stream, this);
     d->archiveManager = new QXmppArchiveManager(d->stream, this);
     d->callManager = new QXmppCallManager(d->stream, this);
-    d->mucManager = new QXmppMucManager(d->stream, this);
+
+    d->mucManager = new QXmppMucManager(this);
+    addExtension(d->mucManager);
+
     d->transferManager = new QXmppTransferManager(d->stream, this);
     d->vCardManager = new QXmppVCardManager(d->stream, this);
 

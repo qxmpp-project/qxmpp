@@ -21,6 +21,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
@@ -28,25 +30,47 @@
 #include "QXmppOutgoingClient.h"
 #include "QXmppUtils.h"
 
-QXmppMucManager::QXmppMucManager(QXmppOutgoingClient* stream, QObject *parent)
-    : QObject(parent),
-    m_stream(stream)
+QXmppMucManager::QXmppMucManager(QXmppClient* client)
 {
-    bool check = connect(stream, SIGNAL(messageReceived(QXmppMessage)),
+    bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
         this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
-    check = connect(stream, SIGNAL(mucAdminIqReceived(QXmppMucAdminIq)),
-        this, SLOT(mucAdminIqReceived(QXmppMucAdminIq)));
-    Q_ASSERT(check);
-
-    check = connect(stream, SIGNAL(mucOwnerIqReceived(QXmppMucOwnerIq)),
-        this, SLOT(mucOwnerIqReceived(QXmppMucOwnerIq)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(m_stream, SIGNAL(presenceReceived(QXmppPresence)),
+    check = QObject::connect(client, SIGNAL(presenceReceived(QXmppPresence)),
         this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
+}
+
+QStringList QXmppMucManager::discoveryFeatures() const
+{
+    // XEP-0045: Multi-User Chat
+    return QStringList()
+        << ns_muc
+        << ns_muc_admin
+        << ns_muc_owner
+        << ns_muc_user;
+}
+
+bool QXmppMucManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    if (element.tagName() == "iq")
+    {
+        if (QXmppMucAdminIq::isMucAdminIq(element))
+        {
+            QXmppMucAdminIq iq;
+            iq.parse(element);
+            mucAdminIqReceived(iq);
+            return true;
+        }
+        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
+        {
+            QXmppMucOwnerIq iq;
+            iq.parse(element);
+            mucOwnerIqReceived(iq);
+            return true;
+        }
+    }
+    return false;
 }
 
 /// Joins the given chat room with the requested nickname.
@@ -66,7 +90,7 @@ bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName)
     x.setTagName("x");
     x.setAttribute("xmlns", ns_muc);
     packet.setExtensions(x);
-    if (m_stream->sendPacket(packet))
+    if (client()->sendPacket(packet))
     {
         m_nickNames[roomJid] = nickName;
         return true;
@@ -90,7 +114,7 @@ bool QXmppMucManager::leaveRoom(const QString &roomJid)
     QXmppPresence packet;
     packet.setTo(roomJid + "/" + nickName);
     packet.setType(QXmppPresence::Unavailable);
-    return m_stream->sendPacket(packet);
+    return client()->sendPacket(packet);
 }
 
 /// Retrieves the list of participants for the given room.
@@ -116,7 +140,7 @@ bool QXmppMucManager::requestRoomConfiguration(const QString &roomJid)
 {
     QXmppMucOwnerIq iq;
     iq.setTo(roomJid);
-    return m_stream->sendPacket(iq);
+    return client()->sendPacket(iq);
 }
 
 /// Send the configuration form for the given room.
@@ -133,7 +157,25 @@ bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDa
     iqPacket.setType(QXmppIq::Set);
     iqPacket.setTo(roomJid);
     iqPacket.setForm(form);
-    return m_stream->sendPacket(iqPacket);
+    return client()->sendPacket(iqPacket);
+}
+
+bool QXmppMucManager::requestRoomPermissions(const QString &roomJid)
+{
+    QStringList affiliations;
+    affiliations << "member" << "admin" << "owner" << "outcast";
+    foreach (const QString &affiliation, affiliations)
+    {
+        QXmppMucAdminIq::Item item;
+        item.setAffiliation(affiliation);
+
+        QXmppMucAdminIq iq;
+        iq.setTo(roomJid);
+        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
+        if (!client()->sendPacket(iq))
+            return false;
+    }
+    return true;
 }
 
 /// Invite a user to a chat room.
@@ -157,7 +199,7 @@ bool QXmppMucManager::sendInvitation(const QString &roomJid, const QString &jid,
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
-    return m_stream->sendPacket(message);
+    return client()->sendPacket(message);
 }
 
 /// Send a message to a chat room.
@@ -180,7 +222,7 @@ bool QXmppMucManager::sendMessage(const QString &roomJid, const QString &text)
     msg.setFrom(roomJid + "/" + m_nickNames[roomJid]);
     msg.setTo(roomJid);
     msg.setType(QXmppMessage::GroupChat);
-    return m_stream->sendPacket(msg);
+    return client()->sendPacket(msg);
 }
 
 void QXmppMucManager::messageReceived(const QXmppMessage &msg)
@@ -203,7 +245,9 @@ void QXmppMucManager::messageReceived(const QXmppMessage &msg)
 
 void QXmppMucManager::mucAdminIqReceived(const QXmppMucAdminIq &iq)
 {
-    Q_UNUSED(iq);
+    if (iq.type() != QXmppIq::Result) 
+        return;
+    emit roomPermissionsReceived(iq.from(), iq.items());
 }
 
 void QXmppMucManager::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)

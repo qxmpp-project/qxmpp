@@ -24,9 +24,10 @@
 #ifndef QXMPPMUCMANAGER_H
 #define QXMPPMUCMANAGER_H
 
-#include <QObject>
 #include <QMap>
 
+#include "QXmppClientExtension.h"
+#include "QXmppMucIq.h"
 #include "QXmppPresence.h"
 
 class QXmppDataForm;
@@ -40,12 +41,12 @@ class QXmppOutgoingClient;
 ///
 /// \ingroup Managers
 
-class QXmppMucManager : public QObject
+class QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppMucManager(QXmppOutgoingClient* stream, QObject *parent = 0);
+    QXmppMucManager(QXmppClient* client);
 
     bool joinRoom(const QString &roomJid, const QString &nickName);
     bool leaveRoom(const QString &roomJid);
@@ -53,10 +54,17 @@ public:
     bool requestRoomConfiguration(const QString &roomJid);
     bool setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form);
 
+    bool requestRoomPermissions(const QString &roomJid);
+
     bool sendInvitation(const QString &roomJid, const QString &jid, const QString &reason);
     bool sendMessage(const QString &roomJid, const QString &text);
 
     QMap<QString, QXmppPresence> roomParticipants(const QString& bareJid) const;
+
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     /// This signal is emitted when an invitation to a chat room is received.
@@ -64,6 +72,9 @@ signals:
 
     /// This signal is emitted when the configuration form for a chat room is received.
     void roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &configuration);
+
+    /// This signal is emitted when the permissions for a chat room are received.
+    void roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions);
 
     void roomParticipantChanged(const QString &roomJid, const QString &nickName);
 
