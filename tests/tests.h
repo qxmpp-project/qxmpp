@@ -74,6 +74,19 @@ private slots:
     void testRinging();
 };
 
+class TestPubSub : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testItems();
+    void testItemsResponse();
+    void testPublish();
+    void testSubscribe();
+    void testSubscription();
+    void testSubscriptions();
+};
+
 class TestXmlRpc : public QObject
 {
     Q_OBJECT
