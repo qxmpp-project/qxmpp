@@ -27,6 +27,7 @@
 #include "QXmppLogger.h"
 
 class QDomElement;
+class QStringList;
 
 class QXmppClient;
 class QXmppClientExtensionPrivate;
@@ -43,6 +44,8 @@ class QXmppClientExtension : public QObject
 public:
     QXmppClientExtension();
     ~QXmppClientExtension();
+
+    virtual QStringList discoveryFeatures() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
 
 signals:

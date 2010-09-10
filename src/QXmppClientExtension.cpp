@@ -21,6 +21,8 @@
  *
  */
 
+#include <QStringList>
+
 #include "QXmppClientExtension.h"
 
 class QXmppClientExtensionPrivate
@@ -44,6 +46,14 @@ QXmppClientExtension::QXmppClientExtension()
 QXmppClientExtension::~QXmppClientExtension()
 {
     delete d;
+}
+
+/// Returns the discovery features to add to the client.
+///
+
+QStringList QXmppClientExtension::discoveryFeatures() const
+{
+    return QStringList();
 }
 
 /// Returns the client which loaded this extension.
