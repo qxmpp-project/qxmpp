@@ -24,11 +24,11 @@
 
 #include "QXmppGlobal.h"
 
-#define QXMPPSTRINGIZE(n)    _QXMPPSTRINGIZE(n)
-#define _QXMPPSTRINGIZE(n)    #n
-
 QString QXmppVersion()
 {
-    return QString(QXMPPSTRINGIZE(QXMPP_VERSION));
+    return QString("%1.%2.%3").arg(
+        QString::number((QXMPP_VERSION >> 16) & 0xff),
+        QString::number((QXMPP_VERSION >> 8) & 0xff),
+        QString::number(QXMPP_VERSION & 0xff));
 }
 

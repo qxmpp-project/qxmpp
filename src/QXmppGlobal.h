@@ -25,7 +25,18 @@
 #ifndef QXMPPGLOBAL_H
 #define QXMPPGLOBAL_H
 
-#include "QString"
+#include <QString>
+
+/// This macro expands a numeric value of the form 0xMMNNPP (MM =
+/// major, NN = minor, PP = patch) that specifies QXmpp's version
+/// number. For example, if you compile your application against
+/// QXmpp 1.2.3, the QXMPP_VERSION macro will expand to 0x010203.
+///
+/// You can use QXMPP_VERSION to use the latest QXmpp features where
+/// available.
+///
+
+#define QXMPP_VERSION 0x00025a
 
 QString QXmppVersion();
 

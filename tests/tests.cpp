@@ -132,7 +132,7 @@ void TestUtils::testMime()
 
 void TestUtils::testLibVersion()
 {
-    QCOMPARE(QXmppVersion(), QString("0.3.0_unreleased"));
+    QCOMPARE(QXmppVersion(), QString("0.2.90"));
 }
 
 template <class T>
