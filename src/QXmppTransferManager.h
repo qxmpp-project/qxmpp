@@ -255,8 +255,8 @@ private slots:
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
 private:
-    QXmppTransferJob *getJobByRequestId(const QString &jid, const QString &id);
-    QXmppTransferJob *getJobBySid(const QString &jid, const QString &sid);
+    QXmppTransferJob *getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id);
+    QXmppTransferJob *getJobBySid(QXmppTransferJob::Direction, const QString &jid, const QString &sid);
     void byteStreamResponseReceived(const QXmppIq&);
     void byteStreamResultReceived(const QXmppByteStreamIq&);
     void byteStreamSetReceived(const QXmppByteStreamIq&);
