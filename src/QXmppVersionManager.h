@@ -42,6 +42,7 @@ public:
     void requestVersion(const QString& jid);
 
     /// \cond
+    QStringList discoveryFeatures() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
     /// \endcond
 

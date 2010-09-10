@@ -24,10 +24,17 @@
 #include <QCoreApplication>
 #include <QDomElement>
 
-#include "QXmppVersionManager.h"
-#include "QXmppOutgoingClient.h"
-#include "QXmppVersionIq.h"
+#include "QXmppConstants.h"
 #include "QXmppGlobal.h"
+#include "QXmppOutgoingClient.h"
+#include "QXmppVersionManager.h"
+#include "QXmppVersionIq.h"
+
+QStringList QXmppVersionManager::discoveryFeatures() const
+{
+    // XEP-0092: Software Version
+    return QStringList() << ns_version;
+}
 
 bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
