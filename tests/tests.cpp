@@ -544,6 +544,10 @@ void TestPackets::testVersionGet()
 
     QXmppVersionIq verIqGet;
     parsePacket(verIqGet, xmlGet);
+    QCOMPARE(verIqGet.id(), QLatin1String("version_1"));
+    QCOMPARE(verIqGet.to(), QLatin1String("juliet@capulet.com/balcony"));
+    QCOMPARE(verIqGet.from(), QLatin1String("romeo@montague.net/orchard"));
+    QCOMPARE(verIqGet.type(), QXmppIq::Get);
     serializePacket(verIqGet, xmlGet);
 }
 
@@ -560,6 +564,10 @@ void TestPackets::testVersionResult()
 
     QXmppVersionIq verIqResult;
     parsePacket(verIqResult, xmlResult);
+    QCOMPARE(verIqResult.id(), QLatin1String("version_1"));
+    QCOMPARE(verIqResult.to(), QLatin1String("romeo@montague.net/orchard"));
+    QCOMPARE(verIqResult.from(), QLatin1String("juliet@capulet.com/balcony"));
+    QCOMPARE(verIqResult.type(), QXmppIq::Result);
     QCOMPARE(verIqResult.name(), QString("qxmpp"));
     QCOMPARE(verIqResult.version(), QString("0.2.0"));
     QCOMPARE(verIqResult.os(), QString("Windows-XP"));
