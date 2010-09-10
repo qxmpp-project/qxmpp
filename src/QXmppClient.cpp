@@ -175,7 +175,9 @@ QXmppClient::QXmppClient(QObject *parent)
     d->mucManager = new QXmppMucManager(d->stream, this);
     d->transferManager = new QXmppTransferManager(d->stream, this);
     d->vCardManager = new QXmppVCardManager(d->stream, this);
-    d->versionManager = new QXmppVersionManager(d->stream, this);
+
+    d->versionManager = new QXmppVersionManager;
+    addExtension(d->versionManager);
 }
 
 /// Destructor, destroys the QXmppClient object.

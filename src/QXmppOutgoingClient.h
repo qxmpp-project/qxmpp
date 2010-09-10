@@ -56,7 +56,6 @@ class QXmppJingleIq;
 class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppStreamInitiationIq;
-class QXmppVersionIq;
 
 class QXmppOutgoingClientPrivate;
 
@@ -125,9 +124,6 @@ signals:
 
     // XEP-0166: Jingle
     void jingleIqReceived(const QXmppJingleIq&);
-
-    // XEP-0092: Software Version
-    void versionIqReceived(const QXmppVersionIq&);
 
 protected:
     /// \cond

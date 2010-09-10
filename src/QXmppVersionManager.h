@@ -24,7 +24,7 @@
 #ifndef QXMPPVERSIONMANAGER_H
 #define QXMPPVERSIONMANAGER_H
 
-#include <QObject>
+#include "QXmppClientExtension.h"
 
 class QXmppOutgoingClient;
 class QXmppVersionIq;
@@ -34,23 +34,19 @@ class QXmppVersionIq;
 ///
 /// \ingroup Managers
 
-class QXmppVersionManager : public QObject
+class QXmppVersionManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     void requestVersion(const QString& jid);
+
+    /// \cond
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     void versionReceived(const QXmppVersionIq&);
-
-private slots:
-    void versionIqReceived(const QXmppVersionIq&);
-
-private:
-    // reference to the xmpp stream (no ownership)
-    QXmppOutgoingClient* m_stream;
 };
 
 #endif // QXMPPVERSIONMANAGER_H

@@ -21,56 +21,56 @@
  *
  */
 
+#include <QCoreApplication>
+#include <QDomElement>
+
 #include "QXmppVersionManager.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppVersionIq.h"
 #include "QXmppGlobal.h"
 
-#include <QCoreApplication>
-
-QXmppVersionManager::QXmppVersionManager(QXmppOutgoingClient* stream, QObject *parent)
-    : QObject(parent),
-    m_stream(stream)
+bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
-    bool check = QObject::connect(m_stream, SIGNAL(versionIqReceived(const QXmppVersionIq&)),
-        this, SLOT(versionIqReceived(const QXmppVersionIq&)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-}
-
-void QXmppVersionManager::versionIqReceived(const QXmppVersionIq& versionIq)
-{
-    if(versionIq.type() == QXmppIq::Get)
+    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
     {
-        // respond to query
-        QXmppVersionIq responseIq;
-        responseIq.setType(QXmppIq::Result);
-        responseIq.setId(versionIq.id());
-        responseIq.setTo(versionIq.from());
+        QXmppVersionIq versionIq;
+        versionIq.parse(element);
 
-        QString name = qApp->applicationName();
-        if(name.isEmpty())
-            name = "Based on QXmpp";
-        responseIq.setName(name);
+        if(versionIq.type() == QXmppIq::Get)
+        {
+            // respond to query
+            QXmppVersionIq responseIq;
+            responseIq.setType(QXmppIq::Result);
+            responseIq.setId(versionIq.id());
+            responseIq.setTo(versionIq.from());
 
-        QString version = qApp->applicationVersion();
-        if(version.isEmpty())
-            version = QXmppVersion();
-        responseIq.setVersion(version);
+            QString name = qApp->applicationName();
+            if(name.isEmpty())
+                name = "Based on QXmpp";
+            responseIq.setName(name);
 
-        // TODO set OS aswell
+            QString version = qApp->applicationVersion();
+            if(version.isEmpty())
+                version = QXmppVersion();
+            responseIq.setVersion(version);
 
-        m_stream->sendPacket(responseIq);
+            // TODO set OS aswell
+            stream->sendPacket(responseIq);
+        }
+
+        emit versionReceived(versionIq);
+        return true;
     }
 
-    emit versionReceived(versionIq);
+    return false;
 }
 
 void QXmppVersionManager::requestVersion(const QString& jid)
 {
     QXmppVersionIq request;
     request.setType(QXmppIq::Get);
-    request.setFrom(m_stream->configuration().jid());
+    request.setFrom(client()->configuration().jid());
     request.setTo(jid);
-    m_stream->sendPacket(request);
+    client()->sendPacket(request);
 }
+

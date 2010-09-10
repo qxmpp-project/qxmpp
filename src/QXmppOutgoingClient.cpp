@@ -52,7 +52,6 @@
 #include "QXmppSessionIq.h"
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppVCardIq.h"
-#include "QXmppVersionIq.h"
 
 #include <QBuffer>
 #include <QCoreApplication>
@@ -585,13 +584,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     }
                     sendNonSASLAuth(plainText);
                 }
-            }
-            // XEP-0092: Software Version
-            else if(QXmppVersionIq::isVersionIq(nodeRecv))
-            {
-                QXmppVersionIq versionIq;
-                versionIq.parse(nodeRecv);
-                emit versionIqReceived(versionIq);
             }
             // XEP-0095: Stream Initiation
             else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
