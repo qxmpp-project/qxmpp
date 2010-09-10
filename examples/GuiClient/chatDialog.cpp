@@ -75,7 +75,7 @@ void chatDialog::setBareJid(const QString& str)
 void chatDialog::setDisplayName(const QString& str)
 {
     m_displayName = str;
-    setWindowTitle(QString("Chat with %1").arg(m_displayName));
+    setWindowTitle(QString("Chat with %1").arg(m_bareJid));
 
     QFont font;
     font.setBold(true);

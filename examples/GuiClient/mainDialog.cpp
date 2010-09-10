@@ -253,7 +253,7 @@ chatDialog* mainDialog::getChatDialog(const QString& bareJid)
             m_chatDlgsList[bareJid]->setDisplayName(m_rosterItemModel.
                                                 getRosterItemFromBareJid(bareJid)->getName());
         else
-            m_chatDlgsList[bareJid]->setDisplayName(bareJid.split(QChar('@')).at(0));
+            m_chatDlgsList[bareJid]->setDisplayName(jidToUser(bareJid));
 
         m_chatDlgsList[bareJid]->setQXmppClient(&m_xmppClient);
     }

@@ -80,11 +80,6 @@ void rosterItemModel::updateRosterEntry(const QString& bareJid, const QXmppRoste
     addRosterItemIfDontExist(bareJid);
 
     QString name = rosterEntry.name();
-    if(name.isEmpty())
-    {
-        name = bareJid;
-    }
-
     if(getRosterItemFromBareJid(bareJid))
         getRosterItemFromBareJid(bareJid)->setName(name);
 }
