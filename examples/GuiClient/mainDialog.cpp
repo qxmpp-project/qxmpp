@@ -33,6 +33,8 @@
 #include "QXmppVCardManager.h"
 #include "QXmppLogger.h"
 #include "QXmppVCardIq.h"
+#include "QXmppRosterManager.h"
+#include "QXmppRosterIq.h"
 
 #include "profileDialog.h"
 
@@ -452,26 +454,16 @@ void mainDialog::showProfile(const QString& bareJid)
     if(bareJid.isEmpty())
         return;
 
-    profileDialog dlg(this);
+    profileDialog dlg(this, bareJid, m_xmppClient);
     dlg.setBareJid(bareJid);
-    dlg.setAvatar(m_vCardManager.getVCard(bareJid).imageOriginal);
+    if(!m_vCardManager.getVCard(bareJid).imageOriginal.isNull())
+        dlg.setAvatar(m_vCardManager.getVCard(bareJid).imageOriginal);
     QStringList resources = m_xmppClient.rosterManager().getResources(bareJid);
 
     dlg.setFullName(m_vCardManager.getVCard(bareJid).fullName);
 
-    QString statusText;
-    for(int i = 0; i < resources.count(); ++i)
-    {
-        QString resource = resources.at(i);
-        statusText += "<B>"+ resource+ "</B>";
-        statusText += "</B><BR>";
-        QXmppPresence presence = m_xmppClient.rosterManager().getPresence(bareJid, resource);
-        statusText += presenceToStatusText(presence);
-
-        if(i < resources.count() - 1) // skip for the last item
-            statusText += "<BR><BR>";
-    }
-    dlg.setStatusText(statusText);
+    if(m_vCardManager.getVCard(bareJid).fullName.isEmpty())
+        dlg.setFullName(m_xmppClient.rosterManager().getRosterEntry(bareJid).name());
 
     dlg.exec();
 }
