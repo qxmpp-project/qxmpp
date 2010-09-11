@@ -152,8 +152,7 @@ void mainDialog::rosterChanged(const QString& bareJid)
     bool check = m_vCardManager.isVCardAvailable(bareJid);
     if(check)
     {
-        m_rosterItemModel.updateAvatar(bareJid,
-                                   m_vCardManager.getVCard(bareJid).image);
+        m_rosterItemModel.updateAvatar(bareJid, m_vCardManager.getAvatar(bareJid));
     }
     else
     {
@@ -438,8 +437,8 @@ void mainDialog::updateVCard(const QString& bareJid)
     if(bareJid != m_xmppClient.configuration().jidBare())
     {
         m_rosterItemModel.updateAvatar(bareJid,
-                                   m_vCardManager.getVCard(bareJid).image);
-        m_rosterItemModel.updateName(bareJid, m_vCardManager.getVCard(bareJid).fullName);
+                                   m_vCardManager.getAvatar(bareJid));
+        m_rosterItemModel.updateName(bareJid, m_vCardManager.getVCard(bareJid).fullName());
     }
     else
     {
@@ -448,7 +447,7 @@ void mainDialog::updateVCard(const QString& bareJid)
         else
             m_statusWidget.setDisplayName(m_vCardManager.getSelfFullName());
 
-        m_statusWidget.setAvatar(m_vCardManager.getVCard(bareJid).image);
+        m_statusWidget.setAvatar(m_vCardManager.getAvatar(bareJid));
     }
 }
 
@@ -459,13 +458,14 @@ void mainDialog::showProfile(const QString& bareJid)
 
     profileDialog dlg(this, bareJid, m_xmppClient);
     dlg.setBareJid(bareJid);
-    if(!m_vCardManager.getVCard(bareJid).imageOriginal.isNull())
-        dlg.setAvatar(m_vCardManager.getVCard(bareJid).imageOriginal);
+    // TODO use original image
+    if(!m_vCardManager.getAvatar(bareJid).isNull())
+        dlg.setAvatar(m_vCardManager.getAvatar(bareJid));
     QStringList resources = m_xmppClient.rosterManager().getResources(bareJid);
 
-    dlg.setFullName(m_vCardManager.getVCard(bareJid).fullName);
+    dlg.setFullName(m_vCardManager.getVCard(bareJid).fullName());
 
-    if(m_vCardManager.getVCard(bareJid).fullName.isEmpty())
+    if(m_vCardManager.getVCard(bareJid).fullName().isEmpty())
         dlg.setFullName(m_xmppClient.rosterManager().getRosterEntry(bareJid).name());
 
     dlg.exec();

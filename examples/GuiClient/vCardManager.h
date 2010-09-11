@@ -39,21 +39,12 @@ class vCardManager : public QObject
     Q_OBJECT
 
 public:
-    class vCard
-    {
-    public:
-        QString fullName;
-        QString imageHash;
-        QImage image;
-        QImage imageOriginal;
-    };
-
     vCardManager(QXmppClient* client);
     void requestVCard(const QString& bareJid);
 //    bool isVCardReceived(const QString& bareJid);
     bool isVCardAvailable(const QString& bareJid);
-
-    vCardManager::vCard& getVCard(const QString& bareJid);
+    QImage getAvatar(const QString& bareJid) const;
+    QXmppVCardIq& getVCard(const QString& bareJid);
     void loadAllFromCache();
     void saveToCache(const QString& bareJid);
     QString getSelfFullName();
@@ -68,8 +59,7 @@ private:
     QString m_selfFullName;
     QXmppClient* m_client;
 
-//    QMap<QString, QXmppVCard> m_mapBareJidVcard;
-    QMap<QString, vCardManager::vCard> m_mapBareJidVCard;
+    QMap<QString, QXmppVCardIq> m_mapBareJidVcard;
 };
 
 #endif // VCARDMANAGER_H

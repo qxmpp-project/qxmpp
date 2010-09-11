@@ -36,7 +36,7 @@ int comparisonWeightsPresenceType(QXmppPresence::Type);
 
 QString presenceToStatusText(const QXmppPresence& presence);
 
-QString getSettingsDir();
+QString getSettingsDir(const QString& bareJid = "");
 
 QString getImageHash(const QByteArray& image);
 QImage getImageFromByteArray(const QByteArray& image);

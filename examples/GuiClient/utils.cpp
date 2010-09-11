@@ -99,9 +99,12 @@ QString presenceToStatusText(const QXmppPresence& presence)
     return statusText;
 }
 
-QString getSettingsDir()
+QString getSettingsDir(const QString& bareJid)
 {
-    return "appCache/";
+    if(bareJid.isEmpty())
+        return "appCache/";
+    else
+        return QString("appCache/%1/").arg(bareJid);
 }
 
 QString getImageHash(const QByteArray& image)
