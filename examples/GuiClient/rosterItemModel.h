@@ -39,6 +39,7 @@ public:
     void updatePresence(const QString& bareJid, const QMap<QString, QXmppPresence>& presences);
     void updateRosterEntry(const QString& bareJid, const QXmppRosterIq::Item& rosterEntry);
     void updateAvatar(const QString& bareJid, const QImage& image);
+    void updateName(const QString& bareJid, const QString& name);
 
     void clear();
 

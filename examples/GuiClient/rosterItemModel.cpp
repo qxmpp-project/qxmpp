@@ -94,6 +94,16 @@ void rosterItemModel::updateAvatar(const QString& bareJid, const QImage& image)
     getRosterItemFromBareJid(bareJid)->setAvatar(image);
 }
 
+void rosterItemModel::updateName(const QString& bareJid, const QString& name)
+{
+    addRosterItemIfDontExist(bareJid);
+
+    if(name.isEmpty())
+        return;
+
+    getRosterItemFromBareJid(bareJid)->setName(name);
+}
+
 void rosterItemModel::clear()
 {
     QStandardItemModel::clear();
