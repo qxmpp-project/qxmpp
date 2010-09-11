@@ -181,6 +181,8 @@ void vCardManager::loadAllFromCache()
         foreach(QString fileName, list)
         {
             QFile file(getSettingsDir(m_client->configuration().jidBare())+ "vCards/" + fileName);
+            QString bareJid = fileName;
+            bareJid.chop(4);
             if(file.open(QIODevice::ReadOnly))
             {
                 QDomDocument doc;
@@ -188,7 +190,7 @@ void vCardManager::loadAllFromCache()
                 {
                     QXmppVCardIq vCardIq;
                     vCardIq.parse(doc.documentElement());
-                    m_mapBareJidVcard[m_client->configuration().jidBare()] = vCardIq;
+                    m_mapBareJidVcard[bareJid] = vCardIq;
                     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
                 }
             }
