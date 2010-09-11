@@ -152,7 +152,7 @@ void mainDialog::rosterChanged(const QString& bareJid)
     bool check = m_vCardManager.isVCardAvailable(bareJid);
     if(check)
     {
-        m_rosterItemModel.updateAvatar(bareJid, m_vCardManager.getAvatar(bareJid));
+        updateVCard(bareJid);
     }
     else
     {
@@ -350,8 +350,10 @@ void mainDialog::signIn()
     m_xmppClient.configuration().setJid(bareJid);
     m_xmppClient.configuration().setPassword(passwd);
 
-    m_vCardManager.loadAllFromCache();
     m_rosterItemModel.clear();
+
+    m_vCardManager.loadAllFromCache();
+
     startConnection();
 }
 
