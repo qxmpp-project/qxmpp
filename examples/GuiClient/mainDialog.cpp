@@ -436,8 +436,11 @@ void mainDialog::showLoginStatusWithCounter(const QString& msg, int time)
 void mainDialog::updateVCard(const QString& bareJid)
 {
     if(bareJid != m_xmppClient.configuration().jidBare())
+    {
         m_rosterItemModel.updateAvatar(bareJid,
                                    m_vCardManager.getVCard(bareJid).image);
+        m_rosterItemModel.updateName(bareJid, m_vCardManager.getVCard(bareJid).fullName);
+    }
     else
     {
         if(m_vCardManager.getSelfFullName().isEmpty())
