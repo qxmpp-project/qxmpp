@@ -25,10 +25,12 @@
 #include "QXmppEntityTimeManager.h"
 
 #include <QDomElement>
+#include <QDateTime>
 
 #include "QXmppConstants.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppEntityTimeIq.h"
+#include "QXmppUtils.h"
 
 void QXmppEntityTimeManager::requestTime(const QString& jid)
 {
@@ -60,8 +62,24 @@ bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement
             responseIq.setTo(entityTime.from());
 
             // TODO: set valid values
-            responseIq.setTzo("");
-            responseIq.setUtc("");
+            QDateTime currentTime = QDateTime::currentDateTime();
+            QDateTime utc = currentTime.toUTC();
+            responseIq.setUtc(datetimeToString(utc));
+
+            currentTime.setTimeSpec(Qt::UTC);
+            int tzo_sec = currentTime.secsTo(utc);
+            QTime tzo_time;
+            if(tzo_sec < 0)
+                tzo_time.addSecs(-tzo_sec);
+            else
+                tzo_time.addSecs(tzo_sec);
+            QString tzo;
+            if(tzo_sec < 0)
+                tzo = "-" + tzo_time.toString("hh:mm");
+            else
+                tzo = "+" + tzo_time.toString("hh:mm");
+
+            responseIq.setTzo(tzo);
 
             stream->sendPacket(responseIq);
         }
