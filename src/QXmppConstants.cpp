@@ -68,3 +68,5 @@ const char* ns_jingle_ice_udp = "urn:xmpp:jingle:transports:ice-udp:1";
 const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
+
+const char *ns_entity_time = "urn:xmpp:time";
