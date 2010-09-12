@@ -61,6 +61,8 @@ private slots:
     void testVCard();
     void testVersionGet();
     void testVersionResult();
+    void testEntityTimeGet();
+    void testEntityTimeResult();
 };
 
 class TestJingle : public QObject
