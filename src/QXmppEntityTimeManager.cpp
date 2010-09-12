@@ -70,9 +70,9 @@ bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement
             int tzo_sec = currentTime.secsTo(utc);
             QTime tzo_time;
             if(tzo_sec < 0)
-                tzo_time.addSecs(-tzo_sec);
+                tzo_time = tzo_time.addSecs(-tzo_sec);
             else
-                tzo_time.addSecs(tzo_sec);
+                tzo_time = tzo_time.addSecs(tzo_sec);
             QString tzo;
             if(tzo_sec < 0)
                 tzo = "-" + tzo_time.toString("hh:mm");
