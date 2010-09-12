@@ -255,7 +255,7 @@ QString vCardManager::getSelfFullName()
 QImage vCardManager::getAvatar(const QString& bareJid) const
 {
     if(m_mapBareJidVcard.contains(bareJid))
-        return m_mapBareJidVcard[bareJid].photoAsImage();
+        return getImageFromByteArray(m_mapBareJidVcard[bareJid].photo());
     else
         return QImage();
 }
