@@ -40,6 +40,7 @@
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
+#include "QXmppEntityTimeManager.h"
 
 class QXmppClientPrivate
 {
@@ -169,6 +170,7 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // create managers
+    // TODO move manager references to d->extensions
     d->rosterManager = new QXmppRosterManager(d->stream, this);
     d->archiveManager = new QXmppArchiveManager(d->stream, this);
     d->callManager = new QXmppCallManager(d->stream, this);
@@ -181,6 +183,8 @@ QXmppClient::QXmppClient(QObject *parent)
 
     d->versionManager = new QXmppVersionManager;
     addExtension(d->versionManager);
+
+    addExtension(new QXmppEntityTimeManager());
 }
 
 /// Destructor, destroys the QXmppClient object.
