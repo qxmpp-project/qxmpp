@@ -61,7 +61,6 @@ bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement
             responseIq.setId(entityTime.id());
             responseIq.setTo(entityTime.from());
 
-            // TODO: set valid values
             QDateTime currentTime = QDateTime::currentDateTime();
             QDateTime utc = currentTime.toUTC();
             responseIq.setUtc(datetimeToString(utc));
