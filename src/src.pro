@@ -85,7 +85,8 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVersionIq.h\
     QXmppVersionManager.h \
     QXmppGlobal.h \
-    QXmppEntityTimeIq.h
+    QXmppEntityTimeIq.h \
+    QXmppEntityTimeManager.h
 
 
 HEADERS += $$INSTALL_HEADERS
@@ -145,7 +146,8 @@ SOURCES += QXmppUtils.cpp \
     QXmppVersionIq.cpp \
     QXmppVersionManager.cpp \
     QXmppGlobal.cpp \
-    QXmppEntityTimeIq.cpp
+    QXmppEntityTimeIq.cpp \
+    QXmppEntityTimeManager.cpp
 
 
 # Plugins
