@@ -15,14 +15,12 @@ QXmpp 0.3.0 (Unreleased)
     
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
-
   - Improve support for SASL authentication, with a verification of the second
     challenge message sent by the server.
-
   - Add support for the birthday and URL attributes in vCards.
-
   - Improve STUN support for VoIP calls by detecting server-reflexive address.
-
+  - Add QXMPP_VERSION and QXmppVersion() for compile and run time version check  
+  
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
   - New XEPs
