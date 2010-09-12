@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Jeremy Lainé
  *  Manjeet Dahiya
  *
