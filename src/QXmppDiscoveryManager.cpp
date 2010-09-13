@@ -62,6 +62,11 @@ void QXmppDiscoveryManager::requestInformation(const QString& jid)
 {
 }
 
+QStringList QXmppDiscoveryManager::discoveryFeatures() const
+{
+    return QStringList() << ns_disco_info;
+}
+
 QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 {
     QXmppDiscoveryIq iq;
@@ -72,7 +77,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     QStringList features;
     features
         << ns_rpc               // XEP-0009: Jabber-RPC
-        << ns_disco_info        // XEP-0030: Service Discovery
+//        << ns_disco_info        // XEP-0030: Service Discovery
         << ns_ibb               // XEP-0047: In-Band Bytestreams
         << ns_vcard             // XEP-0054: vcard-temp
         << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
