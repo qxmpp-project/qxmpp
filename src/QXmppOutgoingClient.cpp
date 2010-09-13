@@ -809,6 +809,7 @@ void QXmppOutgoingClient::addFeatures(const QStringList &features)
     d->extraFeatures << features;
 }
 
+// TODO: use the one in discoveryManager
 QXmppDiscoveryIq QXmppOutgoingClient::capabilities() const
 {
     QXmppDiscoveryIq iq;
@@ -861,6 +862,7 @@ QXmppElementList QXmppOutgoingClient::presenceExtensions() const
     caps.setAttribute("xmlns", ns_capabilities);
     caps.setAttribute("hash", "sha-1");
     caps.setAttribute("node", QString(capabilities_node));
+    // TODO: refer the capabilities() in discoveryManager
     caps.setAttribute("ver", capabilities().verificationString().toBase64());
     extensions << caps;
 
