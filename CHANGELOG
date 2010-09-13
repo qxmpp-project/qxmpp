@@ -6,12 +6,15 @@ QXmpp 0.3.0 (Unreleased)
   - New Classes
     * QXmppServer: base class for building XMPP servers
     * QXmppVersionManager: manager class for XEP-0092: Software Version
-  
+    * QXmppDiscoveryManager: manager class for XEP-0030: Service Discovery
+    
   - New Examples
     * example_9_vCard: vCard handling example
 
   - Deprecation
     * QXmppVCard class name changed to QXmppVCardIq
+    * Signal QXmppClient::discoveryIqReceived in favour of 
+      QXmppDiscoveryManager::informationReceived
     
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
