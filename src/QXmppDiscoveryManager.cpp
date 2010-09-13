@@ -31,8 +31,6 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppStream.h"
 
-static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
-
 bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
@@ -42,7 +40,7 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
 
         if(infoIq.type() == QXmppIq::Get &&
            infoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (infoIq.queryNode().isEmpty() || infoIq.queryNode().startsWith(capabilitiesNode)))
+           (infoIq.queryNode().isEmpty() || infoIq.queryNode().startsWith(QString(capabilities_node))))
         {
             // respond to query
             QXmppDiscoveryIq qxmppFeatures = capabilities();

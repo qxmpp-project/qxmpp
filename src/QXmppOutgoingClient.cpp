@@ -61,8 +61,6 @@
 #include <QXmlStreamWriter>
 #include <QTimer>
 
-static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
-
 class QXmppOutgoingClientPrivate
 {
 public:
@@ -489,7 +487,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 if (discoIq.type() == QXmppIq::Get &&
                     discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-                    (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(capabilitiesNode)))
+                    (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(QString(capabilities_node))))
                 {
                     // respond to info query
 //                    QXmppDiscoveryIq qxmppFeatures = capabilities();
@@ -862,7 +860,7 @@ QXmppElementList QXmppOutgoingClient::presenceExtensions() const
     caps.setTagName("c");
     caps.setAttribute("xmlns", ns_capabilities);
     caps.setAttribute("hash", "sha-1");
-    caps.setAttribute("node", capabilitiesNode);
+    caps.setAttribute("node", QString(capabilities_node));
     caps.setAttribute("ver", capabilities().verificationString().toBase64());
     extensions << caps;
 

@@ -39,7 +39,6 @@
 #include <QXmlStreamWriter>
 
 static bool randomSeeded = false;
-static const QString capabilitiesNode = "http://code.google.com/p/qxmpp";
 static const QByteArray streamRootElementEnd = "</stream:stream>";
 
 class QXmppStreamPrivate
