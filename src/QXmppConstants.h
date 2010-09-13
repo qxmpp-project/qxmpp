@@ -25,6 +25,8 @@
 #ifndef QXMPPCONSTANTS_H
 #define QXMPPCONSTANTS_H
 
+extern const char* capabilities_node;
+
 extern const char* ns_stream;
 extern const char* ns_client;
 extern const char* ns_server;

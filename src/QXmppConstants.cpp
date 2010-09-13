@@ -24,6 +24,8 @@
 
 #include "QXmppConstants.h"
 
+const char* capabilities_node = "http://code.google.com/p/qxmpp";
+
 const char* ns_stream = "http://etherx.jabber.org/streams";
 const char* ns_client = "jabber:client";
 const char* ns_server = "jabber:server";
