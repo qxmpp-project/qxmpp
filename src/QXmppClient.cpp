@@ -41,6 +41,7 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 #include "QXmppEntityTimeManager.h"
+#include "QXmppDiscoveryManager.h"
 
 class QXmppClientPrivate
 {
@@ -185,6 +186,7 @@ QXmppClient::QXmppClient(QObject *parent)
     addExtension(d->versionManager);
 
     addExtension(new QXmppEntityTimeManager());
+    addExtension(new QXmppDiscoveryManager());
 }
 
 /// Destructor, destroys the QXmppClient object.

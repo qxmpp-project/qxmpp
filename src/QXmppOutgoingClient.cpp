@@ -492,11 +492,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(capabilitiesNode)))
                 {
                     // respond to info query
-                    QXmppDiscoveryIq qxmppFeatures = capabilities();
-                    qxmppFeatures.setId(discoIq.id());
-                    qxmppFeatures.setTo(discoIq.from());
-                    qxmppFeatures.setQueryNode(discoIq.queryNode());
-                    sendPacket(qxmppFeatures);
+//                    QXmppDiscoveryIq qxmppFeatures = capabilities();
+//                    qxmppFeatures.setId(discoIq.id());
+//                    qxmppFeatures.setTo(discoIq.from());
+//                    qxmppFeatures.setQueryNode(discoIq.queryNode());
+//                    sendPacket(qxmppFeatures);
                 } else {
                     emit discoveryIqReceived(discoIq);
                 }
