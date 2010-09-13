@@ -247,8 +247,12 @@ signals:
     /// management, setting-getting vCards etc is done using iq stanzas.
     void iqReceived(const QXmppIq&);
 
+    /// \cond
+    /// Deprecated in relese 0.3.0
+    /// Use QXmppDiscoveryManager::informationReceived(const QXmppDiscoveryIq&)
     /// Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
+    /// \endcond
 
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
