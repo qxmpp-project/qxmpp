@@ -42,11 +42,13 @@
 #include "QXmppVersionManager.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppDiscoveryManager.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppConstants.h"
 
 class QXmppClientPrivate
 {
 public:
-    QXmppClientPrivate();
+    QXmppClientPrivate(QXmppClient *);
 
     QList<QXmppClientExtension*> extensions;
     QXmppOutgoingClient* stream;  ///< Pointer to QXmppOutgoingClient object a wrapper over
@@ -63,13 +65,36 @@ public:
     QXmppVersionManager *versionManager;      ///< Pointer to the version manager
 
     QHash<QString,QXmppInvokable*> interfaces;
+
+    QXmppElementList presenceExtensions() const;
+
+    QXmppClient *client;
 };
 
-QXmppClientPrivate::QXmppClientPrivate()
+QXmppClientPrivate::QXmppClientPrivate(QXmppClient *parentClient)
     : stream(0),
     clientPresence(QXmppPresence::Available),
-    reconnectionManager(0)
+    reconnectionManager(0), client(parentClient)
 {
+}
+
+QXmppElementList QXmppClientPrivate::presenceExtensions() const
+{
+    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager*>();
+    if(!ext)
+        return QXmppElementList();
+
+    QXmppElementList extensions;
+
+    QXmppElement caps;
+    caps.setTagName("c");
+    caps.setAttribute("xmlns", ns_capabilities);
+    caps.setAttribute("hash", "sha-1");
+    caps.setAttribute("node", QString(capabilities_node));
+    caps.setAttribute("ver", ext->capabilities().verificationString().toBase64());
+    extensions << caps;
+
+    return extensions;
 }
 
 /// \mainpage
@@ -116,10 +141,10 @@ QXmppClientPrivate::QXmppClientPrivate()
 
 QXmppClient::QXmppClient(QObject *parent)
     : QObject(parent),
-    d(new QXmppClientPrivate)
+    d(new QXmppClientPrivate(this))
 {
     d->stream = new QXmppOutgoingClient(this);
-    d->clientPresence.setExtensions(d->stream->presenceExtensions());
+    d->clientPresence.setExtensions(d->presenceExtensions());
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
                          this, SLOT(slotElementReceived(const QDomElement&, bool&)));
@@ -253,7 +278,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     }
 
     d->clientPresence = initialPresence;
-    d->clientPresence.setExtensions(d->stream->presenceExtensions());
+    d->clientPresence.setExtensions(d->presenceExtensions());
 
     d->stream->connectToHost();
 }
@@ -442,7 +467,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
     else
     {
         d->clientPresence = presence;
-        d->clientPresence.setExtensions(d->stream->presenceExtensions());
+        d->clientPresence.setExtensions(d->presenceExtensions());
         sendPacket(d->clientPresence);
     }
 }

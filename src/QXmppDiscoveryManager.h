@@ -42,6 +42,7 @@ public:
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    QXmppDiscoveryIq capabilities();
     /// \endcond
 
 signals:
@@ -49,7 +50,6 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
-    QXmppDiscoveryIq capabilities();
 };
 
 #endif // QXMPPDISCOVERYMANAGER_H

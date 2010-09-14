@@ -78,7 +78,6 @@ public:
     QXmppConfiguration& configuration();
 
     void addFeatures(const QStringList &features);
-    QXmppElementList presenceExtensions() const;
 
 signals:
     void error(QXmppClient::Error);
@@ -138,7 +137,6 @@ private slots:
     void pingTimeout();
 
 private:
-    QXmppDiscoveryIq capabilities() const;
     void sendAuthDigestMD5ResponseStep1(const QString& challenge);
     void sendAuthDigestMD5ResponseStep2(const QString& challenge);
     void sendNonSASLAuth(bool plaintext);
