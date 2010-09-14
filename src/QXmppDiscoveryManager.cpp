@@ -63,7 +63,7 @@ void QXmppDiscoveryManager::requestInformation(const QString& jid)
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
     request.setFrom(client()->configuration().jid());
-    client()->sendPacket(request)
+    client()->sendPacket(request);
 }
 
 QStringList QXmppDiscoveryManager::discoveryFeatures() const
