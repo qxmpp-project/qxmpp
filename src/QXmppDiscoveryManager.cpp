@@ -120,6 +120,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 
     iq.setFeatures(features);
 
+    // TODO: get identities from the extensions itself like the features
     // identities
     QList<QXmppDiscoveryIq::Identity> identities;
     QXmppDiscoveryIq::Identity identity;
