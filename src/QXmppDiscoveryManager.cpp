@@ -35,28 +35,43 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
 {
     if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
     {
-        QXmppDiscoveryIq infoIq;
-        infoIq.parse(element);
+        QXmppDiscoveryIq receivedIq;
+        receivedIq.parse(element);
 
-        if(infoIq.type() == QXmppIq::Get &&
-           infoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (infoIq.queryNode().isEmpty() || infoIq.queryNode().startsWith(QString(capabilities_node))))
+        if(receivedIq.type() == QXmppIq::Get &&
+           receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
+           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(QString(capabilities_node))))
         {
             // respond to query
             QXmppDiscoveryIq qxmppFeatures = capabilities();
-            qxmppFeatures.setId(infoIq.id());
-            qxmppFeatures.setTo(infoIq.from());
-            qxmppFeatures.setQueryNode(infoIq.queryNode());
+            qxmppFeatures.setId(receivedIq.id());
+            qxmppFeatures.setTo(receivedIq.from());
+            qxmppFeatures.setQueryNode(receivedIq.queryNode());
             stream->sendPacket(qxmppFeatures);
         }
+        else if(receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+            emit infoReceived(receivedIq);
+        else if(receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery)
+            emit itemsReceived(receivedIq);
 
-        emit informationReceived(infoIq);
         return true;
     }
     return false;
 }
 
-void QXmppDiscoveryManager::requestInformation(const QString& jid, const QString& node)
+void QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& node)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    request.setTo(jid);
+    request.setFrom(client()->configuration().jid());
+    if(!node.isEmpty())
+        request.setQueryNode(node);
+    client()->sendPacket(request);
+}
+
+void QXmppDiscoveryManager::requestItems(const QString& jid, const QString& node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);

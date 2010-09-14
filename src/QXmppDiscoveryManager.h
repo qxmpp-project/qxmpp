@@ -36,7 +36,8 @@ class QXmppDiscoveryManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    void requestInformation(const QString& jid, const QString& node = "");
+    void requestInfo(const QString& jid, const QString& node = "");
+    void requestItems(const QString& jid, const QString& node = "");
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -44,7 +45,8 @@ public:
     /// \endcond
 
 signals:
-    void informationReceived(const QXmppDiscoveryIq&);
+    void infoReceived(const QXmppDiscoveryIq&);
+    void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
     QXmppDiscoveryIq capabilities();
