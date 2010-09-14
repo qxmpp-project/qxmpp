@@ -14,7 +14,7 @@ QXmpp 0.3.0 (Unreleased)
   - Deprecation
     * QXmppVCard class name changed to QXmppVCardIq
     * Signal QXmppClient::discoveryIqReceived in favour of 
-      QXmppDiscoveryManager::informationReceived
+      QXmppDiscoveryManager::infoReceived and QXmppDiscoveryManager::itemsReceived
     
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
