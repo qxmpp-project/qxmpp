@@ -58,6 +58,12 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
 
 void QXmppDiscoveryManager::requestInformation(const QString& jid)
 {
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    request.setTo(jid);
+    request.setFrom(client()->configuration().jid());
+    client()->sendPacket(request)
 }
 
 QStringList QXmppDiscoveryManager::discoveryFeatures() const
