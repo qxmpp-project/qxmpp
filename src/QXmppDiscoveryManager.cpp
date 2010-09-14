@@ -56,13 +56,15 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
     return false;
 }
 
-void QXmppDiscoveryManager::requestInformation(const QString& jid)
+void QXmppDiscoveryManager::requestInformation(const QString& jid, const QString& node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
     request.setFrom(client()->configuration().jid());
+    if(!node.isEmpty())
+        request.setQueryNode(node);
     client()->sendPacket(request);
 }
 

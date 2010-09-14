@@ -36,7 +36,7 @@ class QXmppDiscoveryManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    void requestInformation(const QString& jid);
+    void requestInformation(const QString& jid, const QString& node = "");
 
     /// \cond
     QStringList discoveryFeatures() const;
