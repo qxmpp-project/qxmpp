@@ -31,6 +31,13 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppStream.h"
 
+QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
+    m_identityCategory("client"),
+    m_identityType("pc"),
+    m_identityName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
+{
+}
+
 bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
@@ -129,11 +136,42 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identity.setType("rpc");
     identities.append(identity);
 
-    identity.setCategory("client");
-    identity.setType("pc");
-    identity.setName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()));
+    identity.setCategory(identityCategory());
+    identity.setType(identityType());
+    identity.setName(identityName());
     identities.append(identity);
 
     iq.setIdentities(identities);
     return iq;
+}
+
+/// http://xmpp.org/registrar/disco-categories.html#client
+void QXmppDiscoveryManager::setIdentityCategory(const QString& category)
+{
+    m_identityCategory = category;
+}
+
+void QXmppDiscoveryManager::setIdentityType(const QString& type)
+{
+    m_identityType = type;
+}
+
+void QXmppDiscoveryManager::setIdentityName(const QString& name)
+{
+    m_identityName = name;
+}
+
+QString QXmppDiscoveryManager::identityCategory()
+{
+    return m_identityCategory;
+}
+
+QString QXmppDiscoveryManager::identityType()
+{
+    return m_identityType;
+}
+
+QString QXmppDiscoveryManager::identityName()
+{
+    return m_identityName;
 }

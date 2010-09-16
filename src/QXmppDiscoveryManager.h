@@ -36,8 +36,18 @@ class QXmppDiscoveryManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    QXmppDiscoveryManager();
+
     void requestInfo(const QString& jid, const QString& node = "");
     void requestItems(const QString& jid, const QString& node = "");
+
+    /// http://xmpp.org/registrar/disco-categories.html#client
+    void setIdentityCategory(const QString&);
+    void setIdentityType(const QString&);
+    void setIdentityName(const QString&);
+    QString identityCategory();
+    QString identityType();
+    QString identityName();
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -50,6 +60,9 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
+    QString m_identityCategory;
+    QString m_identityType;
+    QString m_identityName;
 };
 
 #endif // QXMPPDISCOVERYMANAGER_H
