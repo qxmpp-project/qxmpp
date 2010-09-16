@@ -45,12 +45,12 @@ public:
     QString requestItems(const QString& jid, const QString& node = "");
 
     /// http://xmpp.org/registrar/disco-categories.html#client
-    void setIdentityCategory(const QString&);
-    void setIdentityType(const QString&);
-    void setIdentityName(const QString&);
-    QString identityCategory();
-    QString identityType();
-    QString identityName();
+    void setClientCategory(const QString&);
+    void setClientType(const QString&);
+    void setClientName(const QString&);
+    QString clientCategory();
+    QString clientType();
+    QString clientName();
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -63,9 +63,9 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
-    QString m_identityCategory;
-    QString m_identityType;
-    QString m_identityName;
+    QString m_clientCategory;
+    QString m_clientType;
+    QString m_clientName;
 };
 
 #endif // QXMPPDISCOVERYMANAGER_H

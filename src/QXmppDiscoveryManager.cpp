@@ -33,13 +33,13 @@
 #include "QXmppGlobal.h"
 
 QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
-    m_identityCategory("client"),
-    m_identityType("pc"),
-    m_identityName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
+    m_clientCategory("client"),
+    m_clientType("pc"),
+    m_clientName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
 {
-    if(m_identityName.isEmpty())
+    if(m_clientName.isEmpty())
     {
-        m_identityName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
+        m_clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
     }
 }
 
@@ -147,9 +147,9 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identity.setType("rpc");
     identities.append(identity);
 
-    identity.setCategory(identityCategory());
-    identity.setType(identityType());
-    identity.setName(identityName());
+    identity.setCategory(clientCategory());
+    identity.setType(clientType());
+    identity.setName(clientName());
     identities.append(identity);
 
     iq.setIdentities(identities);
@@ -157,32 +157,32 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 }
 
 /// http://xmpp.org/registrar/disco-categories.html#client
-void QXmppDiscoveryManager::setIdentityCategory(const QString& category)
+void QXmppDiscoveryManager::setClientCategory(const QString& category)
 {
-    m_identityCategory = category;
+    m_clientCategory = category;
 }
 
-void QXmppDiscoveryManager::setIdentityType(const QString& type)
+void QXmppDiscoveryManager::setClientType(const QString& type)
 {
-    m_identityType = type;
+    m_clientType = type;
 }
 
-void QXmppDiscoveryManager::setIdentityName(const QString& name)
+void QXmppDiscoveryManager::setClientName(const QString& name)
 {
-    m_identityName = name;
+    m_clientName = name;
 }
 
-QString QXmppDiscoveryManager::identityCategory()
+QString QXmppDiscoveryManager::clientCategory()
 {
-    return m_identityCategory;
+    return m_clientCategory;
 }
 
-QString QXmppDiscoveryManager::identityType()
+QString QXmppDiscoveryManager::clientType()
 {
-    return m_identityType;
+    return m_clientType;
 }
 
-QString QXmppDiscoveryManager::identityName()
+QString QXmppDiscoveryManager::clientName()
 {
-    return m_identityName;
+    return m_clientName;
 }
