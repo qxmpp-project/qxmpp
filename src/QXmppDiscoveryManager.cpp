@@ -30,12 +30,17 @@
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppStream.h"
+#include "QXmppGlobal.h"
 
 QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
     m_identityCategory("client"),
     m_identityType("pc"),
     m_identityName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
 {
+    if(m_identityName.isEmpty())
+    {
+        m_identityName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
+    }
 }
 
 bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement &element)
