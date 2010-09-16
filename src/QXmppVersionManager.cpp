@@ -30,6 +30,17 @@
 #include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"
 
+QXmppVersionManager::QXmppVersionManager() : QXmppClientExtension(),
+    m_name(qApp->applicationName()),
+    m_version(qApp->applicationVersion())
+{
+    if(m_name.isEmpty())
+        m_name = "Based on QXmpp";
+
+    if(m_version.isEmpty())
+        m_version = QXmppVersion();
+}
+
 QStringList QXmppVersionManager::discoveryFeatures() const
 {
     // XEP-0092: Software Version
@@ -51,15 +62,9 @@ bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &e
             responseIq.setId(versionIq.id());
             responseIq.setTo(versionIq.from());
 
-            QString name = qApp->applicationName();
-            if(name.isEmpty())
-                name = "Based on QXmpp";
-            responseIq.setName(name);
-
-            QString version = qApp->applicationVersion();
-            if(version.isEmpty())
-                version = QXmppVersion();
-            responseIq.setVersion(version);
+            responseIq.setName(name());
+            responseIq.setVersion(version());
+            responseIq.setOs(os());
 
             // TODO set OS aswell
             stream->sendPacket(responseIq);
@@ -81,3 +86,32 @@ void QXmppVersionManager::requestVersion(const QString& jid)
     client()->sendPacket(request);
 }
 
+void QXmppVersionManager::setName(const QString& name)
+{
+    m_name = name;
+}
+
+void QXmppVersionManager::setVersion(const QString& version)
+{
+    m_version = version;
+}
+
+void QXmppVersionManager::setOs(const QString& os)
+{
+    m_os = os;
+}
+
+QString QXmppVersionManager::name()
+{
+    return m_name;
+}
+
+QString QXmppVersionManager::version()
+{
+    return m_version;
+}
+
+QString QXmppVersionManager::os()
+{
+    return m_os;
+}

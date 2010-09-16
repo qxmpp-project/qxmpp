@@ -39,7 +39,16 @@ class QXmppVersionManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    QXmppVersionManager();
     void requestVersion(const QString& jid);
+
+    void setName(const QString&);
+    void setVersion(const QString&);
+    void setOs(const QString&);
+
+    QString name();
+    QString version();
+    QString os();
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -48,6 +57,11 @@ public:
 
 signals:
     void versionReceived(const QXmppVersionIq&);
+
+private:
+    QString m_name;
+    QString m_version;
+    QString m_os;
 };
 
 #endif // QXMPPVERSIONMANAGER_H
