@@ -40,7 +40,7 @@ class QXmppVersionManager : public QXmppClientExtension
 
 public:
     QXmppVersionManager();
-    void requestVersion(const QString& jid);
+    QString requestVersion(const QString& jid);
 
     void setName(const QString&);
     void setVersion(const QString&);

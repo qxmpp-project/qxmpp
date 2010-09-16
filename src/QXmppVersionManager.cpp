@@ -77,13 +77,16 @@ bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &e
     return false;
 }
 
-void QXmppVersionManager::requestVersion(const QString& jid)
+QString QXmppVersionManager::requestVersion(const QString& jid)
 {
     QXmppVersionIq request;
     request.setType(QXmppIq::Get);
     request.setFrom(client()->configuration().jid());
     request.setTo(jid);
-    client()->sendPacket(request);
+    if(client()->sendPacket(request))
+        return request.id();
+    else
+        return "";
 }
 
 void QXmppVersionManager::setName(const QString& name)
