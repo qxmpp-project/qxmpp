@@ -71,7 +71,7 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
     return false;
 }
 
-void QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& node)
+QString QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);
@@ -80,10 +80,13 @@ void QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& node)
     request.setFrom(client()->configuration().jid());
     if(!node.isEmpty())
         request.setQueryNode(node);
-    client()->sendPacket(request);
+    if(client()->sendPacket(request))
+        return request.id();
+    else
+        return "";
 }
 
-void QXmppDiscoveryManager::requestItems(const QString& jid, const QString& node)
+QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);
@@ -92,7 +95,10 @@ void QXmppDiscoveryManager::requestItems(const QString& jid, const QString& node
     request.setFrom(client()->configuration().jid());
     if(!node.isEmpty())
         request.setQueryNode(node);
-    client()->sendPacket(request);
+    if(client()->sendPacket(request))
+        return request.id();
+    else
+        return "";
 }
 
 QStringList QXmppDiscoveryManager::discoveryFeatures() const

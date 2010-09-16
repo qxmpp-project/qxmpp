@@ -41,8 +41,8 @@ class QXmppDiscoveryManager : public QXmppClientExtension
 public:
     QXmppDiscoveryManager();
 
-    void requestInfo(const QString& jid, const QString& node = "");
-    void requestItems(const QString& jid, const QString& node = "");
+    QString requestInfo(const QString& jid, const QString& node = "");
+    QString requestItems(const QString& jid, const QString& node = "");
 
     /// http://xmpp.org/registrar/disco-categories.html#client
     void setIdentityCategory(const QString&);
