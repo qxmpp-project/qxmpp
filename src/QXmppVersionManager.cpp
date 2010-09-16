@@ -31,14 +31,14 @@
 #include "QXmppVersionIq.h"
 
 QXmppVersionManager::QXmppVersionManager() : QXmppClientExtension(),
-    m_name(qApp->applicationName()),
-    m_version(qApp->applicationVersion())
+    m_clientName(qApp->applicationName()),
+    m_clientVersion(qApp->applicationVersion())
 {
-    if(m_name.isEmpty())
-        m_name = "Based on QXmpp";
+    if(m_clientName.isEmpty())
+        m_clientName = "Based on QXmpp";
 
-    if(m_version.isEmpty())
-        m_version = QXmppVersion();
+    if(m_clientVersion.isEmpty())
+        m_clientVersion = QXmppVersion();
 }
 
 QStringList QXmppVersionManager::discoveryFeatures() const
@@ -62,9 +62,9 @@ bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &e
             responseIq.setId(versionIq.id());
             responseIq.setTo(versionIq.from());
 
-            responseIq.setName(name());
-            responseIq.setVersion(version());
-            responseIq.setOs(os());
+            responseIq.setName(clientName());
+            responseIq.setVersion(clientVersion());
+            responseIq.setOs(clientOs());
 
             // TODO set OS aswell
             stream->sendPacket(responseIq);
@@ -89,32 +89,32 @@ QString QXmppVersionManager::requestVersion(const QString& jid)
         return "";
 }
 
-void QXmppVersionManager::setName(const QString& name)
+void QXmppVersionManager::setClientName(const QString& name)
 {
-    m_name = name;
+    m_clientName = name;
 }
 
-void QXmppVersionManager::setVersion(const QString& version)
+void QXmppVersionManager::setClientVersion(const QString& version)
 {
-    m_version = version;
+    m_clientVersion = version;
 }
 
-void QXmppVersionManager::setOs(const QString& os)
+void QXmppVersionManager::setClientOs(const QString& os)
 {
-    m_os = os;
+    m_clientOs = os;
 }
 
-QString QXmppVersionManager::name()
+QString QXmppVersionManager::clientName()
 {
-    return m_name;
+    return m_clientName;
 }
 
-QString QXmppVersionManager::version()
+QString QXmppVersionManager::clientVersion()
 {
-    return m_version;
+    return m_clientVersion;
 }
 
-QString QXmppVersionManager::os()
+QString QXmppVersionManager::clientOs()
 {
-    return m_os;
+    return m_clientOs;
 }

@@ -42,13 +42,13 @@ public:
     QXmppVersionManager();
     QString requestVersion(const QString& jid);
 
-    void setName(const QString&);
-    void setVersion(const QString&);
-    void setOs(const QString&);
+    void setClientName(const QString&);
+    void setClientVersion(const QString&);
+    void setClientOs(const QString&);
 
-    QString name();
-    QString version();
-    QString os();
+    QString clientName();
+    QString clientVersion();
+    QString clientOs();
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -59,9 +59,9 @@ signals:
     void versionReceived(const QXmppVersionIq&);
 
 private:
-    QString m_name;
-    QString m_version;
-    QString m_os;
+    QString m_clientName;
+    QString m_clientVersion;
+    QString m_clientOs;
 };
 
 #endif // QXMPPVERSIONMANAGER_H
