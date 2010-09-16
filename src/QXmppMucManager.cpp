@@ -219,7 +219,6 @@ bool QXmppMucManager::sendMessage(const QString &roomJid, const QString &text)
     }
     QXmppMessage msg;
     msg.setBody(text);
-    msg.setFrom(roomJid + "/" + m_nickNames[roomJid]);
     msg.setTo(roomJid);
     msg.setType(QXmppMessage::GroupChat);
     return client()->sendPacket(msg);
