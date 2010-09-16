@@ -30,6 +30,9 @@
 class QXmppOutgoingClient;
 class QXmppEntityTimeIq;
 
+/// \brief The QXmppEntityTimeManager class provided the functionality to get
+/// the local time of an entity as defined by XEP-0202: Entity Time.
+///
 /// \ingroup Managers
 
 class QXmppEntityTimeManager : public QXmppClientExtension

@@ -29,6 +29,9 @@
 class QXmppOutgoingClient;
 class QXmppDiscoveryIq;
 
+/// \brief The QXmppDiscoveryManager class makes it possible to discover information
+/// about other entities as defined by XEP-0030: Service Discovery.
+///
 /// \ingroup Managers
 
 class QXmppDiscoveryManager : public QXmppClientExtension
