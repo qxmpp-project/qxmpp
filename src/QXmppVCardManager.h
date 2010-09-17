@@ -64,11 +64,11 @@ class QXmppVCardManager : public QObject
 
 public:
     QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent = 0);
-    void requestVCard(const QString& bareJid = "");
+    QString requestVCard(const QString& bareJid = "");
 
     const QXmppVCardIq& clientVCard() const;
     void setClientVCard(const QXmppVCardIq&);
-    void requestClientVCard();
+    QString requestClientVCard();
     bool isClientVCardReceived();
 
 signals:
