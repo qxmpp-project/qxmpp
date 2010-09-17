@@ -110,7 +110,7 @@ void profileDialog::updateText()
                           arg(m_time[resource].tzo());
 
         if(i < resources.count() - 1) // skip for the last item
-            statusText += "<BR><BR>";
+            statusText += "<BR>";
     }
     setStatusText(statusText);
 }
