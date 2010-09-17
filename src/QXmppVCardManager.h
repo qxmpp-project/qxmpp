@@ -27,6 +27,7 @@
 
 #include <QObject>
 
+#include "QXmppClientExtension.h"
 #include "QXmppVCardIq.h"
 
 #define QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
@@ -58,18 +59,23 @@ class QXmppOutgoingClient;
 ///
 /// \ingroup Managers
 
-class QXmppVCardManager : public QObject
+class QXmppVCardManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent = 0);
+    QXmppVCardManager();
     QString requestVCard(const QString& bareJid = "");
 
     const QXmppVCardIq& clientVCard() const;
     void setClientVCard(const QXmppVCardIq&);
     QString requestClientVCard();
     bool isClientVCardReceived();
+
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     /// This signal is emitted when the requested vCard is received
@@ -84,9 +90,6 @@ signals:
 // deprecated in release 0.3.0
     void vCardReceived(const QXmppVCard&);
     /// \endcond
-
-private slots:
-    void vCardIqReceived(const QXmppVCardIq&);
 
 private:
     // reference to the xmpp stream (no ownership)

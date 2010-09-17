@@ -25,16 +25,43 @@
 #include "QXmppVCardManager.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppUtils.h"
+#include "QXmppConstants.h"
 
-QXmppVCardManager::QXmppVCardManager(QXmppOutgoingClient* stream, QObject *parent)
-    : QObject(parent),
-    m_stream(stream),
+QXmppVCardManager::QXmppVCardManager()
+    : QXmppClientExtension(),
     m_isClientVCardReceived(false)
 {
-    bool check = QObject::connect(m_stream, SIGNAL(vCardIqReceived(const QXmppVCardIq&)),
-        this, SLOT(vCardIqReceived(const QXmppVCardIq&)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
+}
+
+QStringList QXmppVCardManager::discoveryFeatures() const
+{
+    return QStringList() << ns_vcard;
+}
+
+bool QXmppVCardManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
+    {
+        QXmppVCardIq vCardIq;
+        vCardIq.parse(element);
+
+        if(vCardIq.from().isEmpty())
+        {
+            m_clientVCard = vCardIq;
+            m_isClientVCardReceived = true;
+            emit clientVCardReceived();
+        }
+
+        emit vCardReceived(vCardIq);
+
+    // deprecated in 0.3.0 release
+        QXmppVCard oldVCard(vCardIq);
+        emit vCardReceived(oldVCard);
+
+        return true;
+    }
+
+    return false;
 }
 
 /// This function requests the server for vCard of the specified jid.
@@ -45,27 +72,10 @@ QXmppVCardManager::QXmppVCardManager(QXmppOutgoingClient* stream, QObject *paren
 QString QXmppVCardManager::requestVCard(const QString& jid)
 {
     QXmppVCardIq request(jid);
-    if(m_stream->sendPacket(request))
+    if(client()->sendPacket(request))
         return request.id();
     else
         return "";
-}
-
-void QXmppVCardManager::vCardIqReceived(const QXmppVCardIq& vcard)
-{
-    // self vCard received
-    if(vcard.from().isEmpty())
-    {
-        m_clientVCard = vcard;
-        m_isClientVCardReceived = true;
-        emit clientVCardReceived();
-    }
-
-    emit vCardReceived(vcard);
-
-// deprecated in 0.3.0 release
-    QXmppVCard oldVCard(vcard);
-    emit vCardReceived(oldVCard);
 }
 
 /// Returns the vCard of the connected client.
@@ -87,7 +97,7 @@ void QXmppVCardManager::setClientVCard(const QXmppVCardIq& clientVCard)
     m_clientVCard.setTo("");
     m_clientVCard.setFrom("");
     m_clientVCard.setType(QXmppIq::Set);
-    m_stream->sendPacket(m_clientVCard);
+    client()->sendPacket(m_clientVCard);
 }
 
 /// This function requests the server for vCard of the connected user itself.
