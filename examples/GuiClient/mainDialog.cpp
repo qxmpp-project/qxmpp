@@ -287,10 +287,11 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
         m_xmppClient.disconnectFromServer();
         showSignInPageAfterUserDisconnection();
     }
-    else
+    else if(presenceType == QXmppPresence::Available)
     {
         QXmppPresence newPresence = m_xmppClient.clientPresence();
         newPresence.setType(presenceType);
+        newPresence.status().setType(QXmppPresence::Status::Online);
         m_xmppClient.setClientPresence(newPresence);
     }
     m_statusWidget.setStatusText(
