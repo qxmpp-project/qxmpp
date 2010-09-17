@@ -25,9 +25,11 @@
 
 #include "QXmppSrvInfo.h"
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #include <windows.h>
 #include <windns.h>
+#elif defined(Q_OS_SYMBIAN)
+#include <dns_qry.h>
 #else
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -104,7 +106,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 {
     QXmppSrvInfo result;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     PDNS_RECORD records, ptr;
 
     /* perform DNS query */
@@ -127,6 +129,35 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     }
 
     DnsRecordListFree(records, DnsFreeRecordList);
+#elif defined(Q_OS_SYMBIAN)
+    RHostResolver dnsResolver;
+    RSocketServ dnsSocket;
+
+    /* initialise resolver */
+    TInt err = dnsSocket.Connect();
+    err = dnsResolver.Open(dnsSocket, KAfInet, KProtocolInetUdp);
+    if (err != KErrNone)
+    {
+        result.m_errorString = QLatin1String("RHostResolver::Open failed");
+        return result;
+    }
+
+    /* perform DNS query */
+    TDnsQueryBuf dnsQuery;
+    TDnsRespSRVBuf dnsResponse;
+    dnsQuery().SetClass(KDnsRRClassIN);
+    QByteArray utf8name = dname.toUtf8();
+    TPtrC8 queryPtr(reinterpret_cast<const TUint8*>(utf8name.constData()),utf8name.size());
+    dnsQuery().SetData(queryPtr);
+    dnsQuery().SetType(KDnsRRTypeSRV);
+    err = dnsResolver.Query(dnsQuery, dnsResponse);
+    if (err != KErrNone)
+    {
+        result.m_errorString = QLatin1String("RHostResolver::Query failed");
+        return result;
+    }
+
+    // TODO : extract results
 #else
     unsigned char response[PACKETSZ];
     int responseLength, answerCount, answerIndex;
