@@ -306,6 +306,8 @@ void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusTyp
         presence.setType(QXmppPresence::Available);
     presence.status().setType(statusType);
     m_xmppClient.setClientPresence(presence);
+    m_statusWidget.setStatusText(
+            presenceToStatusText(m_xmppClient.clientPresence()));
 }
 
 void mainDialog::avatarChanged(const QImage& image)

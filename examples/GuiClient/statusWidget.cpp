@@ -69,6 +69,7 @@ void statusWidget::presenceMenuTriggered()
     if(action == actionAvailable)
     {
         emit presenceTypeChanged(QXmppPresence::Available);
+        emit presenceStatusTypeChanged(QXmppPresence::Status::Online);
         icon = "green";
     }
     else if(action == actionBusy)
