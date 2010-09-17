@@ -3,8 +3,8 @@ include(../qxmpp.pri)
 TEMPLATE = lib
 
 QT += network xml
-
 CONFIG += staticlib
+LIBS += $$QXMPP_INTERNAL_LIBS
 
 # To disable the dependency on QtGui, uncomment the following:
 # DEFINES += QXMPP_NO_GUI
@@ -13,14 +13,6 @@ CONFIG += staticlib
 # To enable support for the Speex codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX
 # LIBS += -lspeex
-
-# DNS support
-unix {
-    LIBS += -lresolv
-}
-win32 {
-    LIBS += -ldnsapi
-}
 
 # Target definition
 TARGET = $$QXMPP_LIBRARY_NAME

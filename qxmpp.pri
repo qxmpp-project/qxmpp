@@ -9,19 +9,24 @@ CONFIG(debug, debug|release) {
     QXMPP_LIBRARY_NAME = qxmpp
 }
 
-QXMPP_LIBS = -L$$QXMPP_LIBRARY_DIR -l$${QXMPP_LIBRARY_NAME}
-
-# Symbian needs a .lib extension to recognise the library as static
+# Libraries used internal by QXmpp
 symbian {
-	QXMPP_LIBS = -L$$QXMPP_LIBRARY_DIR -l$${QXMPP_LIBRARY_NAME}.lib
+    unset(QXMPP_INTERNAL_LIBS)
+} else:unix {
+    QXMPP_INTERNAL_LIBS = -lresolv
+} else:win32 {
+    QXMPP_INTERNAL_LIBS = -ldnsapi
+}
+
+# Libraries for apps which use QXmpp
+symbian {
+    # Symbian needs a .lib extension to recognise the library as static
+    QXMPP_LIBS = -L$$QXMPP_LIBRARY_DIR -l$${QXMPP_LIBRARY_NAME}.lib
+} else {
+    QXMPP_LIBS = -L$$QXMPP_LIBRARY_DIR -l$${QXMPP_LIBRARY_NAME}
 }
 
 # FIXME: we should be able to use the link_prl option to automatically pull
 # in the extra libraries which the qxmpp library needs, but this does not
 # seem to work on win32, so we specify the dependencies here:
-unix {
-    QXMPP_LIBS += -lresolv
-}
-win32 {
-    QXMPP_LIBS += -ldnsapi
-}
+QXMPP_LIBS += $$QXMPP_INTERNAL_LIBS
