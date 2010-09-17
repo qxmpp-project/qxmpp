@@ -118,7 +118,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
         << ns_rpc               // XEP-0009: Jabber-RPC
 //        << ns_disco_info        // XEP-0030: Service Discovery
         << ns_ibb               // XEP-0047: In-Band Bytestreams
-        << ns_vcard             // XEP-0054: vcard-temp
+//        << ns_vcard             // XEP-0054: vcard-temp
         << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
         << ns_chat_states       // XEP-0085: Chat State Notifications
         << ns_stream_initiation // XEP-0095: Stream Initiation
