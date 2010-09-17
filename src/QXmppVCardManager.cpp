@@ -35,6 +35,7 @@ QXmppVCardManager::QXmppVCardManager()
 
 QStringList QXmppVCardManager::discoveryFeatures() const
 {
+    // XEP-0054: vcard-temp
     return QStringList() << ns_vcard;
 }
 
