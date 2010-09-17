@@ -7,6 +7,9 @@ QXmpp 0.3.0 (Unreleased)
     * QXmppServer: base class for building XMPP servers
     * QXmppVersionManager: manager class for XEP-0092: Software Version
     * QXmppDiscoveryManager: manager class for XEP-0030: Service Discovery
+    * QXmppClientExtension: base class for managers
+  
+  * Refactor QXmppVCardManager to use QXmppClientExtension
     
   - New Examples
     * example_9_vCard: vCard handling example
