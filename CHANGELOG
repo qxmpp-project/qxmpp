@@ -2,6 +2,7 @@ QXmpp 0.3.0 (Unreleased)
 ------------------------
   - New XEPs
     * XEP-0153: vCard-Based Avatars
+    * XEP-0202: Entity Time
 
   - New Classes
     * QXmppServer: base class for building XMPP servers
