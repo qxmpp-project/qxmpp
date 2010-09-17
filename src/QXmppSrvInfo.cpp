@@ -157,7 +157,13 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         return result;
     }
 
-    // TODO : extract results
+    // extract results
+    QXmppSrvRecord record;
+    record.setHostName(QString::fromUtf8((const char*)dnsResponse().Target().Ptr(),
+                                         dnsResponse().Target().Length()));
+    record.setPort(dnsResponse().Port());
+    result.m_records.append(record);
+
 #else
     unsigned char response[PACKETSZ];
     int responseLength, answerCount, answerIndex;
