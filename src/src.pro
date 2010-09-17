@@ -34,7 +34,11 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppDataForm.h \
     QXmppDialback.h \
     QXmppDiscoveryIq.h \
+    QXmppDiscoveryManager.h \
     QXmppElement.h \
+    QXmppEntityTimeIq.h \
+    QXmppEntityTimeManager.h \
+    QXmppGlobal.h \
     QXmppIbbIq.h \
     QXmppIncomingClient.h \
     QXmppIncomingServer.h \
@@ -75,12 +79,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVCardIq.h \
     QXmppVCard.h \
     QXmppVersionIq.h\
-    QXmppVersionManager.h \
-    QXmppGlobal.h \
-    QXmppEntityTimeIq.h \
-    QXmppEntityTimeManager.h \
-    QXmppDiscoveryManager.h
-
+    QXmppVersionManager.h
 
 HEADERS += $$INSTALL_HEADERS
 
@@ -99,7 +98,11 @@ SOURCES += QXmppUtils.cpp \
     QXmppDataForm.cpp \
     QXmppDialback.cpp \
     QXmppDiscoveryIq.cpp \
+    QXmppDiscoveryManager.cpp \
     QXmppElement.cpp \
+    QXmppEntityTimeIq.cpp \
+    QXmppEntityTimeManager.cpp \
+    QXmppGlobal.cpp \
     QXmppIbbIq.cpp \
     QXmppIncomingClient.cpp \
     QXmppIncomingServer.cpp \
@@ -137,13 +140,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
-    QXmppVersionManager.cpp \
-    QXmppGlobal.cpp \
-    QXmppEntityTimeIq.cpp \
-    QXmppEntityTimeManager.cpp \
-    QXmppDiscoveryManager.cpp
-
-
+    QXmppVersionManager.cpp
 
 # Plugins
 DEFINES += QT_STATICPLUGIN
