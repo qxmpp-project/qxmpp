@@ -518,13 +518,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 ibbOpenIq.parse(nodeRecv);
                 emit ibbOpenIqReceived(ibbOpenIq);
             }
-            // XEP-0054: vcard-temp
-            else if(QXmppVCardIq::isVCard(nodeRecv))
-            {
-                QXmppVCardIq vcardIq;
-                vcardIq.parse(nodeRecv);
-                emit vCardIqReceived(vcardIq);
-            }
             // XEP-0065: SOCKS5 Bytestreams
             else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
             {

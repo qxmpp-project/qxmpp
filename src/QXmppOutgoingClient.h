@@ -102,9 +102,6 @@ signals:
     void ibbDataIqReceived(const QXmppIbbDataIq&);
     void ibbOpenIqReceived(const QXmppIbbOpenIq&);
 
-    // XEP-0054: vcard-temp
-    void vCardIqReceived(const QXmppVCardIq&);
-
     // XEP-0065: SOCKS5 Bytestreams
     void byteStreamIqReceived(const QXmppByteStreamIq&);
 
