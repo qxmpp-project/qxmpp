@@ -40,7 +40,7 @@ class QXmppEntityTimeManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    void requestTime(const QString& jid);
+    QString requestTime(const QString& jid);
 
     /// \cond
     QStringList discoveryFeatures() const;

@@ -32,13 +32,16 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppUtils.h"
 
-void QXmppEntityTimeManager::requestTime(const QString& jid)
+QString QXmppEntityTimeManager::requestTime(const QString& jid)
 {
     QXmppEntityTimeIq request;
     request.setType(QXmppIq::Get);
     request.setFrom(client()->configuration().jid());
     request.setTo(jid);
-    client()->sendPacket(request);
+    if(client()->sendPacket(request))
+        return request.id();
+    else
+        return "";
 }
 
 QStringList QXmppEntityTimeManager::discoveryFeatures() const
