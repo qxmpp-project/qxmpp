@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------------------------
+This is a modified version of example_0_connected for Symbian platform. 
+It shows the logging, the connection progress, in a GUI instead of a console. As console application 
+is not visible in the Symbian environment.
+----------------------------------------------------------------------------------------------------
+
 This example just connects to the xmpp server. And start receiving presences (updates) from the server.
 
 After running this example, you can see this user online, if it's added in your roster (friends list).
