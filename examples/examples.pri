@@ -13,3 +13,18 @@ LIBS += $$QXMPP_LIBS
 # depends on the platform and whether the library is static or dynamic
 # PRE_TARGETDEPS += $${QXMPP_LIBRARY_DIR}/lib$${QXMPP_LIB}.a
 
+# Symbian packaging rules
+symbian {
+    vendorinfo = \
+        "; Localised Vendor name" \
+        "%{\"QXmpp\"}" \
+        " " \
+        "; Unique Vendor name" \
+        ":\"QXmpp\"" \
+        " "
+
+    examples_deployment.pkg_prerules += vendorinfo
+    DEPLOYMENT += examples_deployment
+
+    TARGET.CAPABILITY = "NetworkServices"
+}
