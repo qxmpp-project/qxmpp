@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -22,22 +23,51 @@
  */
 
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
+#include <QDialogButtonBox>
+#include <QLayout>
+#include <QTextBrowser>
 
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
+#include "main.h"
+
+LogViewer::LogViewer()
+{
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+
+    m_browser = new QTextBrowser;
+    vbox->addWidget(m_browser);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttons, SIGNAL(accepted()), qApp, SLOT(quit()));
+    vbox->addWidget(buttons);
+
+    setLayout(vbox);
+}
+
+void LogViewer::log(QXmppLogger::MessageType type, const QString& msg)
+{
+    m_browser->append(msg);
+}
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
+    QApplication a(argc, argv);
+  
+    // Set up logging 
+    QXmppLogger *logger = QXmppLogger::getLogger();
+    logger->setLoggingType(QXmppLogger::SignalLogging);
+
+    LogViewer viewer;
+    QObject::connect(logger, SIGNAL(message(QXmppLogger::MessageType,QString)),
+            &viewer, SLOT(log(QXmppLogger::MessageType,QString)));
+    viewer.show();
+
+    // Connect to server
     QXmppClient client;
-
-    // For jabber
     // client.connectToServer("username@jabber.org", "passwd");
-
-    // For google talk
     client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
 
     return a.exec();
