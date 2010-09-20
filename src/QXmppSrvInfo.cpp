@@ -43,7 +43,9 @@
 ///
 
 QXmppSrvRecord::QXmppSrvRecord()
-    : host_port(0)
+    : m_port(0),
+    m_priority(0),
+    m_weight(0)
 {
 }
 
@@ -69,7 +71,7 @@ void QXmppSrvRecord::setHostName(const QString &hostName)
 
 quint16 QXmppSrvRecord::port() const
 {
-    return host_port;
+    return m_port;
 }
 
 /// Sets the port for this service record.
@@ -78,7 +80,41 @@ quint16 QXmppSrvRecord::port() const
 
 void QXmppSrvRecord::setPort(quint16 port)
 {
-    host_port = port;
+    m_port = port;
+}
+
+/// Returns the priority for this service record.
+///
+
+quint16 QXmppSrvRecord::priority() const
+{
+    return m_priority;
+}
+
+/// Sets the priority for this service record.
+///
+/// \param priority
+
+void QXmppSrvRecord::setPriority(quint16 priority)
+{
+    m_priority = priority;
+}
+
+/// Returns the weight for this service record.
+///
+
+quint16 QXmppSrvRecord::weight() const
+{
+    return m_weight;
+}
+
+/// Sets the weight for this service record.
+///
+/// \param priority
+
+void QXmppSrvRecord::setWeight(quint16 weight)
+{
+    m_weight = weight;
 }
 
 /// If the lookup failed, this function returns a human readable description of the error.
@@ -223,6 +259,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 
         if (type == T_SRV)
         {
+            quint16 priority = (p[0] << 8) | p[1];
+            quint16 weight = (p[2] << 8) | p[3];
             quint16 port = (p[4] << 8) | p[5];
             status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
@@ -233,6 +271,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
             QXmppSrvRecord record;
             record.setHostName(answer);
             record.setPort(port);
+            record.setPriority(priority);
+            record.setWeight(weight);
             result.m_records.append(record);
         } else {
             qWarning("Unexpected DNS answer type");

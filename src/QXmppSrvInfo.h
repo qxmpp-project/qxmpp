@@ -41,9 +41,17 @@ public:
     quint16 port() const;
     void setPort(quint16 port);
 
+    quint16 priority() const;
+    void setPriority(quint16 priority);
+
+    quint16 weight() const;
+    void setWeight(quint16 weight);
+
 private:
     QString host_name;
-    quint16 host_port;
+    quint16 m_port;
+    quint16 m_priority;
+    quint16 m_weight;
 };
 
 /// \brief The QXmppSrvInfo class provides static methods for DNS SRV lookups.
