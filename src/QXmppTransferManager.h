@@ -31,13 +31,12 @@
 #include <QVariant>
 #include <QTime>
 
+#include "QXmppClientExtension.h"
 #include "QXmppIq.h"
 #include "QXmppByteStreamIq.h"
-#include "QXmppLogger.h"
 
 class QTcpSocket;
 class QXmppByteStreamIq;
-class QXmppOutgoingClient;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
@@ -211,12 +210,12 @@ private:
 ///
 /// \ingroup Managers
  
-class QXmppTransferManager : public QObject
+class QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppTransferManager(QXmppOutgoingClient *stream, QObject *parent = 0);
+    QXmppTransferManager(QXmppClient *client);
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
@@ -228,6 +227,11 @@ public:
 
     QXmppTransferJob::Methods supportedMethods() const;
     void setSupportedMethods(QXmppTransferJob::Methods methods);
+
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     /// This signal is emitted when a new file transfer offer is received.
@@ -241,35 +245,30 @@ signals:
     /// \sa QXmppTransferJob::finished()
     void finished(QXmppTransferJob *job);
 
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
 private slots:
-    void byteStreamIqReceived(const QXmppByteStreamIq&);
-    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
-    void ibbDataIqReceived(const QXmppIbbDataIq&);
-    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void iqReceived(const QXmppIq&);
     void jobDestroyed(QObject *object);
     void jobError(QXmppTransferJob::Error error);
     void jobFinished();
     void jobStateChanged(QXmppTransferJob::State state);
     void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
-    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
 private:
     QXmppTransferJob *getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id);
     QXmppTransferJob *getJobBySid(QXmppTransferJob::Direction, const QString &jid, const QString &sid);
+    void byteStreamIqReceived(const QXmppByteStreamIq&);
     void byteStreamResponseReceived(const QXmppIq&);
     void byteStreamResultReceived(const QXmppByteStreamIq&);
     void byteStreamSetReceived(const QXmppByteStreamIq&);
+    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
+    void ibbDataIqReceived(const QXmppIbbDataIq&);
+    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
     void ibbResponseReceived(const QXmppIq&);
+    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
     void streamInitiationResultReceived(const QXmppStreamInitiationIq&);
     void streamInitiationSetReceived(const QXmppStreamInitiationIq&);
     void socksServerSendOffer(QXmppTransferJob *job);
 
-    // reference to XMPP stream (no ownership)
-    QXmppOutgoingClient* m_stream;
     int m_ibbBlockSize;
     QList<QXmppTransferJob*> m_jobs;
     QString m_proxy;

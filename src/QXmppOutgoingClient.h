@@ -44,12 +44,7 @@ class QXmppVCardIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
-class QXmppByteStreamIq;
 class QXmppDiscoveryIq;
-class QXmppIbbCloseIq;
-class QXmppIbbDataIq;
-class QXmppIbbOpenIq;
-class QXmppStreamInitiationIq;
 
 class QXmppOutgoingClientPrivate;
 
@@ -92,17 +87,6 @@ signals:
 
     // XEP-0030: Service Discovery
     void discoveryIqReceived(const QXmppDiscoveryIq&);
-
-    // XEP-0047 In-Band Bytestreams
-    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
-    void ibbDataIqReceived(const QXmppIbbDataIq&);
-    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
-
-    // XEP-0065: SOCKS5 Bytestreams
-    void byteStreamIqReceived(const QXmppByteStreamIq&);
-
-    // XEP-0095: Stream Initiation
-    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
 
 protected:
     /// \cond

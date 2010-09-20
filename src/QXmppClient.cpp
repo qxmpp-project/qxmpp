@@ -210,7 +210,8 @@ QXmppClient::QXmppClient(QObject *parent)
     d->mucManager = new QXmppMucManager(this);
     addExtension(d->mucManager);
 
-    d->transferManager = new QXmppTransferManager(d->stream, this);
+    d->transferManager = new QXmppTransferManager(this);
+    addExtension(d->transferManager);
 
     d->vCardManager = new QXmppVCardManager;
     addExtension(d->vCardManager);

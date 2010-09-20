@@ -116,12 +116,8 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     QStringList features;
     features
         << ns_rpc               // XEP-0009: Jabber-RPC
-        << ns_ibb               // XEP-0047: In-Band Bytestreams
 //        << ns_vcard             // XEP-0054: vcard-temp
-        << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
         << ns_chat_states       // XEP-0085: Chat State Notifications
-        << ns_stream_initiation // XEP-0095: Stream Initiation
-        << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
         << ns_capabilities      // XEP-0115 : Entity Capabilities
         << ns_ping;             // XEP-0199: XMPP Ping
 

@@ -39,16 +39,12 @@
 #include "QXmppUtils.h"
 
 // IQ types
-#include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
-#include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
-#include "QXmppIbbIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
 #include "QXmppSessionIq.h"
-#include "QXmppStreamInitiationIq.h"
 #include "QXmppVCardIq.h"
 
 #include <QBuffer>
@@ -498,32 +494,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     emit discoveryIqReceived(discoIq);
                 }
             }
-            // XEP-0047 In-Band Bytestreams
-            else if(QXmppIbbCloseIq::isIbbCloseIq(nodeRecv))
-            {
-                QXmppIbbCloseIq ibbCloseIq;
-                ibbCloseIq.parse(nodeRecv);
-                emit ibbCloseIqReceived(ibbCloseIq);
-            }
-            else if(QXmppIbbDataIq::isIbbDataIq(nodeRecv))
-            {
-                QXmppIbbDataIq ibbDataIq;
-                ibbDataIq.parse(nodeRecv);
-                emit ibbDataIqReceived(ibbDataIq);
-            }
-            else if(QXmppIbbOpenIq::isIbbOpenIq(nodeRecv))
-            {
-                QXmppIbbOpenIq ibbOpenIq;
-                ibbOpenIq.parse(nodeRecv);
-                emit ibbOpenIqReceived(ibbOpenIq);
-            }
-            // XEP-0065: SOCKS5 Bytestreams
-            else if(QXmppByteStreamIq::isByteStreamIq(nodeRecv))
-            {
-                QXmppByteStreamIq byteStreamIq;
-                byteStreamIq.parse(nodeRecv);
-                emit byteStreamIqReceived(byteStreamIq);
-            }
             // XEP-0078: Non-SASL Authentication
             else if(id == d->nonSASLAuthId && type == "result")
             {
@@ -563,13 +533,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     }
                     sendNonSASLAuth(plainText);
                 }
-            }
-            // XEP-0095: Stream Initiation
-            else if(QXmppStreamInitiationIq::isStreamInitiationIq(nodeRecv))
-            {
-                QXmppStreamInitiationIq siIq;
-                siIq.parse(nodeRecv);
-                emit streamInitiationIqReceived(siIq);
             }
             // XEP-0199: XMPP Ping
             else if(QXmppPingIq::isPingIq(nodeRecv))
