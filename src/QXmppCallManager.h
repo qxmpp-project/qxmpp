@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QIODevice>
 
+#include "QXmppClientExtension.h"
 #include "QXmppJingleIq.h"
 #include "QXmppLogger.h"
 
@@ -176,13 +177,18 @@ private:
 ///
 /// \ingroup Managers
 
-class QXmppCallManager : public QObject
+class QXmppCallManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppCallManager(QXmppOutgoingClient *stream, QObject *parent = 0);
+    QXmppCallManager(QXmppClient *client);
     QXmppCall *call(const QString &jid);
+
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     /// This signal is emitted when a new incoming call is received.
@@ -190,9 +196,6 @@ signals:
     /// To accept the call, invoke the call's QXmppCall::accept() method.
     /// To refuse the call, invoke the call's QXmppCall::abort() method.
     void callReceived(QXmppCall *call);
-
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void callDestroyed(QObject *object);
@@ -210,9 +213,6 @@ private:
     bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
 
     QList<QXmppCall*> m_calls;
-
-    // reference to xmpp stream (no ownership)
-    QXmppOutgoingClient* m_stream;
 };
 
 #endif

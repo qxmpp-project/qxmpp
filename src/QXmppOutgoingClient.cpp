@@ -44,7 +44,6 @@
 #include "QXmppByteStreamIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppIbbIq.h"
-#include "QXmppJingleIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
@@ -590,13 +589,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 QXmppArchivePrefIq archiveIq;
                 archiveIq.parse(nodeRecv);
                 emit archivePrefIqReceived(archiveIq);
-            }
-            // XEP-0166: Jingle
-            else if(QXmppJingleIq::isJingleIq(nodeRecv))
-            {
-                QXmppJingleIq jingleIq;
-                jingleIq.parse(nodeRecv);
-                emit jingleIqReceived(jingleIq);
             }
             // XEP-0199: XMPP Ping
             else if(QXmppPingIq::isPingIq(nodeRecv))

@@ -52,7 +52,6 @@ class QXmppDiscoveryIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
-class QXmppJingleIq;
 class QXmppStreamInitiationIq;
 
 class QXmppOutgoingClientPrivate;
@@ -112,9 +111,6 @@ signals:
     void archiveChatIqReceived(const QXmppArchiveChatIq&);
     void archiveListIqReceived(const QXmppArchiveListIq&);
     void archivePrefIqReceived(const QXmppArchivePrefIq&);
-
-    // XEP-0166: Jingle
-    void jingleIqReceived(const QXmppJingleIq&);
 
 protected:
     /// \cond

@@ -116,7 +116,6 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     QStringList features;
     features
         << ns_rpc               // XEP-0009: Jabber-RPC
-//        << ns_disco_info        // XEP-0030: Service Discovery
         << ns_ibb               // XEP-0047: In-Band Bytestreams
 //        << ns_vcard             // XEP-0054: vcard-temp
         << ns_bytestreams       // XEP-0065: SOCKS5 Bytestreams
@@ -124,10 +123,6 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
         << ns_stream_initiation // XEP-0095: Stream Initiation
         << ns_stream_initiation_file_transfer // XEP-0096: SI File Transfer
         << ns_capabilities      // XEP-0115 : Entity Capabilities
-        << ns_jingle            // XEP-0166 : Jingle
-        << ns_jingle_rtp        // XEP-0167 : Jingle RTP Sessions
-        << ns_jingle_rtp_audio
-        << ns_jingle_ice_udp    // XEP-0176 : Jingle ICE-UDP Transport Method
         << ns_ping;             // XEP-0199: XMPP Ping
 
     foreach(QXmppClientExtension* extension, client()->extensions())

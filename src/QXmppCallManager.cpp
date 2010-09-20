@@ -21,6 +21,7 @@
  *
  */
 
+#include <QDomElement>
 #include <QTimer>
 
 #include "QXmppCallManager.h"
@@ -72,7 +73,7 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     // ICE connection
     bool iceControlling = (m_direction == OutgoingDirection);
     m_connection = new QXmppIceConnection(iceControlling, this);
-    m_connection->setStunServer("stun.ekiga.net");
+    //m_connection->setStunServer("stun.ekiga.net");
     m_connection->addComponent(RTP_COMPONENT);
     m_connection->addComponent(RTCP_COMPONENT);
 
@@ -408,21 +409,40 @@ qint64 QXmppCall::writeData(const char * data, qint64 maxSize)
     return maxSize;
 }
 
-QXmppCallManager::QXmppCallManager(QXmppOutgoingClient *stream, QObject *parent)
-    : QObject(parent), m_stream(stream)
+QXmppCallManager::QXmppCallManager(QXmppClient *client)
 {
-    // setup logging
-    bool check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        m_stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
-
-    check = connect(stream, SIGNAL(iqReceived(QXmppIq)),
+    bool check = connect(client, SIGNAL(iqReceived(QXmppIq)),
         this, SLOT(iqReceived(QXmppIq)));
     Q_ASSERT(check);
+    Q_UNUSED(check);
+}
 
-    check = connect(stream, SIGNAL(jingleIqReceived(QXmppJingleIq)),
-        this, SLOT(jingleIqReceived(QXmppJingleIq)));
-    Q_ASSERT(check);
+QStringList QXmppCallManager::discoveryFeatures() const
+{
+    return QStringList()
+        << ns_jingle            // XEP-0166 : Jingle
+        << ns_jingle_rtp        // XEP-0167 : Jingle RTP Sessions
+        << ns_jingle_rtp_audio
+        << ns_jingle_ice_udp;    // XEP-0176 : Jingle ICE-UDP Transport Method
+}
+
+bool QXmppCallManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    Q_UNUSED(stream);
+
+    if(element.tagName() == "iq")
+    {
+        // XEP-0166: Jingle
+        if (QXmppJingleIq::isJingleIq(element))
+        {
+            QXmppJingleIq jingleIq;
+            jingleIq.parse(element);
+            jingleIqReceived(jingleIq);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /// Initiates a new outgoing call to the specified recipient.
@@ -446,7 +466,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     iq.setTo(jid);
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::SessionInitiate);
-    iq.setInitiator(m_stream->configuration().jid());
+    iq.setInitiator(client()->configuration().jid());
     iq.setSid(call->m_sid);
     iq.content().setCreator(call->m_contentCreator);
     iq.content().setName(call->m_contentName);
@@ -506,7 +526,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
         iq.setTo(call->jid());
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::SessionAccept);
-        iq.setResponder(m_stream->configuration().jid());
+        iq.setResponder(client()->configuration().jid());
         iq.setSid(call->m_sid);
         iq.content().setCreator(call->m_contentCreator);
         iq.content().setName(call->m_contentName);
@@ -790,7 +810,7 @@ void QXmppCallManager::localCandidatesChanged()
     iq.setTo(call->jid());
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::TransportInfo);
-    iq.setInitiator(m_stream->configuration().jid());
+    iq.setInitiator(client()->configuration().jid());
     iq.setSid(call->sid());
 
     iq.content().setCreator(call->m_contentCreator);
@@ -810,7 +830,7 @@ bool QXmppCallManager::sendAck(const QXmppJingleIq &iq)
     ack.setId(iq.id());
     ack.setTo(iq.from());
     ack.setType(QXmppIq::Result);
-    return m_stream->sendPacket(ack);
+    return client()->sendPacket(ack);
 }
 
 /// Sends a Jingle IQ and adds it to outstanding requests.
@@ -819,6 +839,6 @@ bool QXmppCallManager::sendAck(const QXmppJingleIq &iq)
 bool QXmppCallManager::sendRequest(QXmppCall *call, const QXmppJingleIq &iq)
 {
     call->m_requests << iq;
-    return m_stream->sendPacket(iq);
+    return client()->sendPacket(iq);
 }
 
