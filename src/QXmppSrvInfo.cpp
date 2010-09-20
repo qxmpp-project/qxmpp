@@ -195,12 +195,19 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         return result;
     }
 
-    // extract results
-    QXmppSrvRecord record;
-    record.setHostName(QString::fromUtf8((const char*)dnsResponse().Target().Ptr(),
-                                         dnsResponse().Target().Length()));
-    record.setPort(dnsResponse().Port());
-    result.m_records.append(record);
+    /* extract results */
+    while (err == KErrNone)
+    {
+        QXmppSrvRecord record;
+        record.setHostName(QString::fromUtf8((const char*)dnsResponse().Target().Ptr(),
+                                             dnsResponse().Target().Length()));
+        record.setPort(dnsResponse().Port());
+        record.setPriority(dnsResponse().Priority());
+        record.setWeight(dnsResponse().Weight());
+        result.m_records.append(record);
+
+        err = dnsResolver.QueryGetNext(dnsResponse);
+    }
 
 #else
     unsigned char response[PACKETSZ];
