@@ -26,7 +26,6 @@
 
 #include "QXmppClientExtension.h"
 
-class QXmppOutgoingClient;
 class QXmppDiscoveryIq;
 
 /// \brief The QXmppDiscoveryManager class makes it possible to discover information

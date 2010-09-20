@@ -36,7 +36,6 @@ class QXmppIceConnection;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
-class QXmppOutgoingClient;
 
 /// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///

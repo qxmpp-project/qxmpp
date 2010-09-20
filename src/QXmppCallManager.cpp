@@ -25,10 +25,10 @@
 #include <QTimer>
 
 #include "QXmppCallManager.h"
+#include "QXmppClient.h"
 #include "QXmppCodec.h"
 #include "QXmppConstants.h"
 #include "QXmppJingleIq.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 

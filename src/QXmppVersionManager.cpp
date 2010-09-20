@@ -24,9 +24,9 @@
 #include <QCoreApplication>
 #include <QDomElement>
 
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppGlobal.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"
 
@@ -49,6 +49,8 @@ QStringList QXmppVersionManager::discoveryFeatures() const
 
 bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
     {
         QXmppVersionIq versionIq;
@@ -67,7 +69,7 @@ bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &e
             responseIq.setOs(clientOs());
 
             // TODO set OS aswell
-            stream->sendPacket(responseIq);
+            client()->sendPacket(responseIq);
         }
 
         emit versionReceived(versionIq);

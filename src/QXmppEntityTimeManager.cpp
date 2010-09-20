@@ -27,8 +27,8 @@
 #include <QDomElement>
 #include <QDateTime>
 
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppUtils.h"
 
@@ -51,6 +51,8 @@ QStringList QXmppEntityTimeManager::discoveryFeatures() const
 
 bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if(element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element))
     {
         QXmppEntityTimeIq entityTime;
@@ -83,7 +85,7 @@ bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement
 
             responseIq.setTzo(tzo);
 
-            stream->sendPacket(responseIq);
+            client()->sendPacket(responseIq);
         }
 
         emit timeReceived(entityTime);

@@ -25,7 +25,7 @@
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
-#include "QXmppOutgoingClient.h"
+#include "QXmppClient.h"
 
 void QXmppArchiveManager::archiveChatIqReceived(const QXmppArchiveChatIq &chatIq)
 {

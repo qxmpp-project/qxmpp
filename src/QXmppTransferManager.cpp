@@ -28,10 +28,10 @@
 #include <QTimer>
 
 #include "QXmppByteStreamIq.h"
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppIbbIq.h"
 #include "QXmppSocks.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"

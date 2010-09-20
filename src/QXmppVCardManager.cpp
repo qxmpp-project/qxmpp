@@ -22,10 +22,10 @@
  */
 
 
-#include "QXmppVCardManager.h"
-#include "QXmppOutgoingClient.h"
-#include "QXmppUtils.h"
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
+#include "QXmppUtils.h"
+#include "QXmppVCardManager.h"
 
 QXmppVCardManager::QXmppVCardManager()
     : QXmppClientExtension(),

@@ -32,7 +32,6 @@ class QXmppArchiveChat;
 class QXmppArchiveChatIq;
 class QXmppArchiveListIq;
 class QXmppArchivePrefIq;
-class QXmppOutgoingClient;
 
 /// \brief The QXmppArchiveManager class makes it possible to access message
 /// archives as defined by XEP-0136: Message Archiving.

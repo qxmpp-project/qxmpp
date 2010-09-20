@@ -34,8 +34,6 @@
 #include "QXmppVCard.h"
 #undef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 
-class QXmppOutgoingClient;
-
 /// \brief The QXmppVCardManager gets/sets XMPP vCards. It is an
 /// implentation of <B>XEP-0054: vcard-temp</B>.
 ///
@@ -92,9 +90,6 @@ signals:
     /// \endcond
 
 private:
-    // reference to the xmpp stream (no ownership)
-    QXmppOutgoingClient* m_stream;
-
     QXmppVCardIq m_clientVCard;  ///< Stores the vCard of the connected client
     bool m_isClientVCardReceived;
 };

@@ -23,11 +23,11 @@
 
 #include <QDomElement>
 
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppUtils.h"
 
 QXmppMucManager::QXmppMucManager(QXmppClient* client)

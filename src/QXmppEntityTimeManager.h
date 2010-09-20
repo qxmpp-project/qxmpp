@@ -27,7 +27,6 @@
 
 #include "QXmppClientExtension.h"
 
-class QXmppOutgoingClient;
 class QXmppEntityTimeIq;
 
 /// \brief The QXmppEntityTimeManager class provided the functionality to get

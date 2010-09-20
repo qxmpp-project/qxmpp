@@ -26,7 +26,6 @@
 
 #include "QXmppClientExtension.h"
 
-class QXmppOutgoingClient;
 class QXmppVersionIq;
 
 /// \brief The QXmppVersionManager class makes it possible to request for
