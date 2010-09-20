@@ -160,6 +160,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
             QXmppSrvRecord record;
             record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
+            record.setPriority(ptr->Data.Srv.wPriority);
+            record.setWeight(ptr->Data.Srv.wWeight);
             result.m_records.append(record);
         }
     }
