@@ -22,32 +22,27 @@
  *
  */
 
+#include <QDomElement>
 
+#include "QXmppClient.h"
+#include "QXmppPresence.h"
+#include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
-#include "QXmppRosterIq.h"
-#include "QXmppPresence.h"
-#include "QXmppOutgoingClient.h"
 
-QXmppRosterManager::QXmppRosterManager(QXmppOutgoingClient* stream, QObject *parent)
-    : QObject(parent),
-    m_stream(stream),
-    m_isRosterReceived(false)
+QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
+    : m_isRosterReceived(false)
 {
-    bool check = QObject::connect(m_stream, SIGNAL(connected()),
+    bool check = QObject::connect(client, SIGNAL(connected()),
         this, SLOT(connected()));
     Q_ASSERT(check);
 
-    check = QObject::connect(m_stream, SIGNAL(disconnected()),
+    check = QObject::connect(client, SIGNAL(disconnected()),
         this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = QObject::connect(m_stream, SIGNAL(presenceReceived(const QXmppPresence&)),
+    check = QObject::connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
         this, SLOT(presenceReceived(const QXmppPresence&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(m_stream, SIGNAL(rosterIqReceived(const QXmppRosterIq&)), 
-        this, SLOT(rosterIqReceived(const QXmppRosterIq&)));
     Q_ASSERT(check);
 }
 
@@ -62,9 +57,9 @@ void QXmppRosterManager::connected()
 {
     QXmppRosterIq roster;
     roster.setType(QXmppIq::Get);
-    roster.setFrom(m_stream->configuration().jid());
+    roster.setFrom(client()->configuration().jid());
     m_rosterReqId = roster.id();
-    m_stream->sendPacket(roster);
+    client()->sendPacket(roster);
 }
 
 void QXmppRosterManager::disconnected()
@@ -72,6 +67,21 @@ void QXmppRosterManager::disconnected()
     m_entries.clear();
     m_presences.clear();
     m_isRosterReceived = false;
+}
+
+bool QXmppRosterManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    Q_UNUSED(stream);
+
+    if(element.tagName() == "iq" && QXmppRosterIq::isRosterIq(element))
+    {
+        QXmppRosterIq rosterIq;
+        rosterIq.parse(element);
+        rosterIqReceived(rosterIq);
+        return true;
+    }
+
+    return false;
 }
 
 void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
@@ -94,12 +104,12 @@ void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
         emit presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Subscribe:
-        if (m_stream->configuration().autoAcceptSubscriptions())
+        if (client()->configuration().autoAcceptSubscriptions())
         {
             QXmppPresence presence;
             presence.setTo(jid);
             presence.setType(QXmppPresence::Subscribed);
-            m_stream->sendPacket(presence);
+            client()->sendPacket(presence);
         }
         break;
     default:
@@ -118,7 +128,7 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
             // send result iq
             QXmppIq returnIq(QXmppIq::Result);
             returnIq.setId(rosterIq.id());
-            m_stream->sendPacket(returnIq);
+            client()->sendPacket(returnIq);
 
             // store updated entries and notify changes
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
@@ -141,7 +151,7 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
                 QXmppPresence presence;
                 presence.setTo(item.bareJid());
                 presence.setType(QXmppPresence::Subscribe);
-                m_stream->sendPacket(presence);
+                client()->sendPacket(presence);
             }
         }
         break;

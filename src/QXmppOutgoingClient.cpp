@@ -42,7 +42,6 @@
 #include "QXmppBindIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
-#include "QXmppRosterIq.h"
 #include "QXmppSessionIq.h"
 
 #include <QBuffer>
@@ -443,12 +442,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         sendPacket(session);
                     }
                 }
-            }
-            else if(QXmppRosterIq::isRosterIq(nodeRecv))
-            {
-                QXmppRosterIq rosterIq;
-                rosterIq.parse(nodeRecv);
-                emit rosterIqReceived(rosterIq);
             }
             // extensions
 

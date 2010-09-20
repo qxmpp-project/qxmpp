@@ -30,11 +30,11 @@
 #include <QSet>
 #include <QStringList>
 
+#include "QXmppClientExtension.h"
 #include "QXmppRosterIq.h"
 
 class QXmppRosterIq;
 class QXmppPresence;
-class QXmppOutgoingClient;
 
 /// \brief The QXmppRosterManager class provides access to a connected client's roster.
 ///
@@ -60,7 +60,7 @@ class QXmppOutgoingClient;
 ///
 /// \ingroup Managers
 
-class QXmppRosterManager : public QObject
+class QXmppRosterManager : public QXmppClientExtension
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ public:
     // FIXME : is this class really necessary?
     typedef QXmppRosterIq::Item QXmppRosterEntry;
 
-    QXmppRosterManager(QXmppOutgoingClient* stream, QObject *parent = 0);
+    QXmppRosterManager(QXmppClient* stream);
     ~QXmppRosterManager();
     
     bool isRosterReceived();
@@ -81,6 +81,9 @@ public:
     QXmppPresence getPresence(const QString& bareJid,
                               const QString& resource) const;
 
+    /// \cond
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
     // deprecated in release 0.2.0
     /// \cond
@@ -102,8 +105,6 @@ signals:
     void rosterChanged(const QString& bareJid);
 
 private:
-    //reverse pointer to stream
-    QXmppOutgoingClient* m_stream;
     //map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> m_entries;
     // map of resources of the jid and map of resources and presences
@@ -117,6 +118,8 @@ private slots:
     void connected();
     void disconnected();
     void presenceReceived(const QXmppPresence&);
+
+private:
     void rosterIqReceived(const QXmppRosterIq&);
 };
 

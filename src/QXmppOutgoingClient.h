@@ -36,7 +36,6 @@ class QSslError;
 class QXmppConfiguration;
 class QXmppPresence;
 class QXmppIq;
-class QXmppRosterIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
@@ -73,7 +72,6 @@ signals:
     void presenceReceived(const QXmppPresence&);
     void messageReceived(const QXmppMessage&);
     void iqReceived(const QXmppIq&);
-    void rosterIqReceived(const QXmppRosterIq&);
 
     // XEP-0009: Jabber-RPC
     void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);

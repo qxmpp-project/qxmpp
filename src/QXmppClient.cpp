@@ -195,7 +195,8 @@ QXmppClient::QXmppClient(QObject *parent)
 
     // create managers
     // TODO move manager references to d->extensions
-    d->rosterManager = new QXmppRosterManager(d->stream, this);
+    d->rosterManager = new QXmppRosterManager(this);
+    addExtension(d->rosterManager);
 
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
