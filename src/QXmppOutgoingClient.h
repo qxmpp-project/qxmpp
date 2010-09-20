@@ -43,7 +43,6 @@ class QXmppRosterIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
-class QXmppDiscoveryIq;
 
 class QXmppOutgoingClientPrivate;
 
@@ -83,9 +82,6 @@ signals:
     void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
     void rpcCallResponse(const QXmppRpcResponseIq& result);
     void rpcCallError(const QXmppRpcErrorIq &err);
-
-    // XEP-0030: Service Discovery
-    void discoveryIqReceived(const QXmppDiscoveryIq&);
 
 protected:
     /// \cond

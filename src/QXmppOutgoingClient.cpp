@@ -40,7 +40,6 @@
 
 // IQ types
 #include "QXmppBindIq.h"
-#include "QXmppDiscoveryIq.h"
 #include "QXmppPingIq.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
@@ -471,27 +470,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 QXmppRpcErrorIq rpcErrorIq;
                 rpcErrorIq.parse(nodeRecv);
                 emit rpcCallError(rpcErrorIq);
-            }
-
-            // XEP-0030: Service Discovery
-            else if(QXmppDiscoveryIq::isDiscoveryIq(nodeRecv))
-            {
-                QXmppDiscoveryIq discoIq;
-                discoIq.parse(nodeRecv);
-
-                if (discoIq.type() == QXmppIq::Get &&
-                    discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-                    (discoIq.queryNode().isEmpty() || discoIq.queryNode().startsWith(QString(capabilities_node))))
-                {
-                    // respond to info query
-//                    QXmppDiscoveryIq qxmppFeatures = capabilities();
-//                    qxmppFeatures.setId(discoIq.id());
-//                    qxmppFeatures.setTo(discoIq.from());
-//                    qxmppFeatures.setQueryNode(discoIq.queryNode());
-//                    sendPacket(qxmppFeatures);
-                } else {
-                    emit discoveryIqReceived(discoIq);
-                }
             }
             // XEP-0078: Non-SASL Authentication
             else if(id == d->nonSASLAuthId && type == "result")

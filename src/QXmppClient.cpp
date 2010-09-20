@@ -164,10 +164,6 @@ QXmppClient::QXmppClient(QObject *parent)
         SIGNAL(iqReceived(const QXmppIq&)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this,
-        SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)));
-    Q_ASSERT(check);
-
     check = connect(d->stream, SIGNAL(disconnected()), this,
         SIGNAL(disconnected()));
     Q_ASSERT(check);
@@ -220,7 +216,18 @@ QXmppClient::QXmppClient(QObject *parent)
     addExtension(d->versionManager);
 
     addExtension(new QXmppEntityTimeManager());
-    addExtension(new QXmppDiscoveryManager());
+
+    QXmppDiscoveryManager *discoveryManager = new QXmppDiscoveryManager;
+    addExtension(discoveryManager);
+
+    // obsolete signal
+    check = connect(discoveryManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                    this, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
+    check = connect(discoveryManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+                    this, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
 }
 
 /// Destructor, destroys the QXmppClient object.
