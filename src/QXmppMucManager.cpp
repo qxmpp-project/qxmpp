@@ -178,6 +178,23 @@ bool QXmppMucManager::requestRoomPermissions(const QString &roomJid)
     return true;
 }
 
+/// Sets the subject for the given room.
+///
+/// \param roomJid
+/// \param subject
+///
+/// \return true if the request was sent, false otherwise
+///
+
+bool QXmppMucManager::setRoomSubject(const QString &roomJid, const QString &subject)
+{
+    QXmppMessage msg;
+    msg.setTo(roomJid);
+    msg.setType(QXmppMessage::GroupChat);
+    msg.setSubject(subject);
+    return  client()->sendPacket(msg);
+}
+
 /// Invite a user to a chat room.
 ///
 /// \param roomJid

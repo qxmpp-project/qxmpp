@@ -56,6 +56,8 @@ public:
 
     bool requestRoomPermissions(const QString &roomJid);
 
+    bool setRoomSubject(const QString &roomJid, const QString &subject);
+
     bool sendInvitation(const QString &roomJid, const QString &jid, const QString &reason);
     bool sendMessage(const QString &roomJid, const QString &text);
 
