@@ -24,8 +24,9 @@
 #ifndef QXMPPOUTGOINGSERVER_H
 #define QXMPPOUTGOINGSERVER_H
 
-#include "QXmppOutgoingClient.h"
+#include "QXmppStream.h"
 
+class QSslError;
 class QXmppDialback;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;

@@ -32,6 +32,7 @@
 #include "QXmppIncomingClient.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
+#include "QXmppPresence.h"
 #include "QXmppServer.h"
 #include "QXmppServerExtension.h"
 #include "QXmppServerPlugin.h"

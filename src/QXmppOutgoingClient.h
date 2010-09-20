@@ -40,7 +40,6 @@ class QXmppPresence;
 class QXmppIq;
 class QXmppBind;
 class QXmppRosterIq;
-class QXmppVCardIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;

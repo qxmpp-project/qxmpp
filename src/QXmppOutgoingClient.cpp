@@ -45,7 +45,6 @@
 #include "QXmppRpcIq.h"
 #include "QXmppRosterIq.h"
 #include "QXmppSessionIq.h"
-#include "QXmppVCardIq.h"
 
 #include <QBuffer>
 #include <QCoreApplication>
