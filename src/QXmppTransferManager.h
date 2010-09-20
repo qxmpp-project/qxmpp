@@ -29,6 +29,7 @@
 #include <QHash>
 #include <QHostAddress>
 #include <QVariant>
+#include <QTime>
 
 #include "QXmppIq.h"
 #include "QXmppByteStreamIq.h"
@@ -127,6 +128,7 @@ public:
     QString jid() const;
     QXmppTransferJob::Method method() const;
     QString sid() const;
+    qint64 speed() const;
     QXmppTransferJob::State state() const;
 
     // XEP-0096 : File transfer
@@ -182,6 +184,7 @@ private:
     QString m_mimeType;
     QString m_requestId;
     State m_state;
+    QTime m_transferStart;
 
     // arbitrary data
     QHash<int, QVariant> m_data;

@@ -232,6 +232,19 @@ QString QXmppTransferJob::sid() const
     return m_sid;
 }
 
+/// Returns the job's transfer speed in bytes per second.
+///
+/// If the transfer has not started yet or is already finished, returns 0.
+///
+
+qint64 QXmppTransferJob::speed() const
+{
+    qint64 elapsed = m_transferStart.elapsed();
+    if (m_state != QXmppTransferJob::TransferState || !elapsed)
+        return 0;
+    return (m_done * 1000.0) / elapsed;
+}
+
 /// Returns the job's state.
 ///
 
@@ -245,6 +258,8 @@ void QXmppTransferJob::setState(QXmppTransferJob::State state)
     if (m_state != state)
     {
         m_state = state;
+        if (m_state == QXmppTransferJob::TransferState)
+            m_transferStart.start();
         emit stateChanged(m_state);
     }
 }
