@@ -21,28 +21,11 @@
  *
  */
 
+#include <QDomElement>
+
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 #include "QXmppOutgoingClient.h"
-
-#include <QDebug>
-
-QXmppArchiveManager::QXmppArchiveManager(QXmppOutgoingClient *stream, QObject *parent)
-    : QObject(parent),
-    m_stream(stream)
-{
-    bool check = QObject::connect(m_stream, SIGNAL(archiveChatIqReceived(const QXmppArchiveChatIq&)),
-        this, SLOT(archiveChatIqReceived(const QXmppArchiveChatIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(m_stream, SIGNAL(archiveListIqReceived(const QXmppArchiveListIq&)),
-        this, SLOT(archiveListIqReceived(const QXmppArchiveListIq&)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(m_stream, SIGNAL(archivePrefIqReceived(const QXmppArchivePrefIq&)),
-        this, SLOT(archivePrefIqReceived(const QXmppArchivePrefIq&)));
-    Q_ASSERT(check);
-}
 
 void QXmppArchiveManager::archiveChatIqReceived(const QXmppArchiveChatIq &chatIq)
 {
@@ -57,6 +40,37 @@ void QXmppArchiveManager::archiveListIqReceived(const QXmppArchiveListIq &listIq
 void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq)
 {
     Q_UNUSED(prefIq);
+}
+
+bool QXmppArchiveManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+{
+    if (element.tagName() != "iq")
+        return false;
+
+    // XEP-0136: Message Archiving
+    if(QXmppArchiveChatIq::isArchiveChatIq(element))
+    {
+        QXmppArchiveChatIq archiveIq;
+        archiveIq.parse(element);
+        archiveChatIqReceived(archiveIq);
+        return true;
+    }
+    else if(QXmppArchiveListIq::isArchiveListIq(element))
+    {
+        QXmppArchiveListIq archiveIq;
+        archiveIq.parse(element);
+        archiveListIqReceived(archiveIq);
+        return true;
+    }
+    else if(QXmppArchivePrefIq::isArchivePrefIq(element))
+    {
+        QXmppArchivePrefIq archiveIq;
+        archiveIq.parse(element);
+        archivePrefIqReceived(archiveIq);
+        return true;
+    }
+
+    return false;
 }
 
 /// Retrieves the list of available collections. Once the results are
@@ -74,7 +88,7 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
     packet.setWith(jid);
     packet.setStart(start);
     packet.setEnd(end);
-    m_stream->sendPacket(packet);
+    client()->sendPacket(packet);
 }
 
 /// Retrieves the specified collection. Once the results are received,
@@ -90,13 +104,13 @@ void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime
     packet.setMax(max);
     packet.setStart(start);
     packet.setWith(jid);
-    m_stream->sendPacket(packet);
+    client()->sendPacket(packet);
 }
 
 #if 0
 void QXmppArchiveManager::getPreferences()
 {
     QXmppArchivePrefIq packet;
-    m_stream->sendPacket(packet);
+    client()->sendPacket(packet);
 }
 #endif

@@ -571,25 +571,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 siIq.parse(nodeRecv);
                 emit streamInitiationIqReceived(siIq);
             }
-            // XEP-0136: Message Archiving
-            else if(QXmppArchiveChatIq::isArchiveChatIq(nodeRecv))
-            {
-                QXmppArchiveChatIq archiveIq;
-                archiveIq.parse(nodeRecv);
-                emit archiveChatIqReceived(archiveIq);
-            }
-            else if(QXmppArchiveListIq::isArchiveListIq(nodeRecv))
-            {
-                QXmppArchiveListIq archiveIq;
-                archiveIq.parse(nodeRecv);
-                emit archiveListIqReceived(archiveIq);
-            }
-            else if(QXmppArchivePrefIq::isArchivePrefIq(nodeRecv))
-            {
-                QXmppArchivePrefIq archiveIq;
-                archiveIq.parse(nodeRecv);
-                emit archivePrefIqReceived(archiveIq);
-            }
             // XEP-0199: XMPP Ping
             else if(QXmppPingIq::isPingIq(nodeRecv))
             {

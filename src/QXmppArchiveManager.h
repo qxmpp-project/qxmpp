@@ -25,7 +25,8 @@
 #define QXMPPARCHIVEMANAGER_H
 
 #include <QDateTime>
-#include <QObject>
+
+#include "QXmppClientExtension.h"
 
 class QXmppArchiveChat;
 class QXmppArchiveChatIq;
@@ -41,14 +42,17 @@ class QXmppOutgoingClient;
 ///
 /// \ingroup Managers
 
-class QXmppArchiveManager : public QObject
+class QXmppArchiveManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppArchiveManager(QXmppOutgoingClient* stream, QObject *parent = 0);
     void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
+
+    /// \cond
+    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    /// \endcond
 
 signals:
     /// This signal is emitted when archive list is received
@@ -59,14 +63,10 @@ signals:
     /// after calling retrieveCollection()
     void archiveChatReceived(const QXmppArchiveChat&);
 
-private slots:
+private:
     void archiveChatIqReceived(const QXmppArchiveChatIq&);
     void archiveListIqReceived(const QXmppArchiveListIq&);
     void archivePrefIqReceived(const QXmppArchivePrefIq&);
-
-private:
-    // reference to xmpp stream (no ownership)
-    QXmppOutgoingClient* m_stream;
 };
 
 #endif

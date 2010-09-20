@@ -44,9 +44,6 @@ class QXmppVCardIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
 class QXmppRpcErrorIq;
-class QXmppArchiveChatIq;
-class QXmppArchiveListIq;
-class QXmppArchivePrefIq;
 class QXmppByteStreamIq;
 class QXmppDiscoveryIq;
 class QXmppIbbCloseIq;
@@ -106,11 +103,6 @@ signals:
 
     // XEP-0095: Stream Initiation
     void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
-
-    // XEP-0136: Message Archiving
-    void archiveChatIqReceived(const QXmppArchiveChatIq&);
-    void archiveListIqReceived(const QXmppArchiveListIq&);
-    void archivePrefIqReceived(const QXmppArchivePrefIq&);
 
 protected:
     /// \cond
