@@ -44,6 +44,8 @@ void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq
 
 bool QXmppArchiveManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.tagName() != "iq")
         return false;
 

@@ -41,6 +41,8 @@ QStringList QXmppVCardManager::discoveryFeatures() const
 
 bool QXmppVCardManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
     {
         QXmppVCardIq vCardIq;

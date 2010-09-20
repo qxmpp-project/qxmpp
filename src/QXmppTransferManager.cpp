@@ -582,6 +582,8 @@ QStringList QXmppTransferManager::discoveryFeatures() const
 
 bool QXmppTransferManager::handleStanza(QXmppStream *stream, const QDomElement &element)
 {
+    Q_UNUSED(stream);
+
     if (element.tagName() != "iq")
         return false;
 
