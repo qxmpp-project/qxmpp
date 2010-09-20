@@ -33,12 +33,9 @@
 class QDomElement;
 class QSslError;
 
-class QXmppClient;
 class QXmppConfiguration;
-class QXmppPacket;
 class QXmppPresence;
 class QXmppIq;
-class QXmppBind;
 class QXmppRosterIq;
 class QXmppMessage;
 class QXmppRpcResponseIq;
