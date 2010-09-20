@@ -30,3 +30,10 @@ symbian {
 # in the extra libraries which the qxmpp library needs, but this does not
 # seem to work on win32, so we specify the dependencies here:
 QXMPP_LIBS += $$QXMPP_INTERNAL_LIBS
+
+# Path of the QXmpp library file, for expressing dependency.
+symbian {
+} else:unix {
+    QXMPP_LIBRARY_FILE = $${QXMPP_LIBRARY_DIR}/lib$${QXMPP_LIBRARY_NAME}.a
+}
+
