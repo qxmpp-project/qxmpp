@@ -43,7 +43,7 @@ class QXmppClientExtension : public QObject
 
 public:
     QXmppClientExtension();
-    ~QXmppClientExtension();
+    virtual ~QXmppClientExtension();
 
     virtual QStringList discoveryFeatures() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
