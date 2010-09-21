@@ -112,6 +112,22 @@ public:
         }
         return 0;
     }
+    
+    template<typename T>
+    void removeExtension()
+    {
+        QList<QXmppClientExtension*> list = extensions();
+        for (int i = 0; i < list.size(); ++i)
+        {
+            T* extension = qobject_cast<T*>(list.at(i));
+            if(extension)
+            {
+                list.takeAt(i);
+                delete extension;
+            }
+        }
+        return 0;
+    }
 
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
