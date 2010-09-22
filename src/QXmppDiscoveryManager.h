@@ -43,7 +43,7 @@ public:
     QString requestInfo(const QString& jid, const QString& node = "");
     QString requestItems(const QString& jid, const QString& node = "");
 
-    /// http://xmpp.org/registrar/disco-categories.html#client
+    // http://xmpp.org/registrar/disco-categories.html#client
     void setClientCategory(const QString&);
     void setClientType(const QString&);
     void setClientName(const QString&);
