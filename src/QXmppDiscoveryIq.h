@@ -24,7 +24,6 @@
 #ifndef QXMPPDISCOVERY_H
 #define QXMPPDISCOVERY_H
 
-#include "QXmppElement.h"
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
