@@ -20,7 +20,7 @@ profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClien
             SLOT(versionReceived(const QXmppVersionIq&)));
     Q_ASSERT(check);
 
-    QXmppEntityTimeManager* timeManager = m_xmppClient.findExtension<QXmppEntityTimeManager*>();
+    QXmppEntityTimeManager* timeManager = m_xmppClient.findExtension<QXmppEntityTimeManager>();
 
     if(timeManager)
     {
