@@ -97,17 +97,17 @@ public:
     void addExtension(QXmppClientExtension *extension);
     QList<QXmppClientExtension*> extensions();
 
-    /// Returns the extension than can be cast to type T, or 0 if there is
+    /// Returns the extension than can be cast to type T*, or 0 if there is
     /// no such extension.
     ///
     template<typename T>
-    T findExtension()
+    T* findExtension()
     {
         QList<QXmppClientExtension*> list = extensions();
         for (int i = 0; i < list.size(); ++i)
         {
-            T extension = qobject_cast<T>(list.at(i));
-            if (extension)
+            T* extension = qobject_cast<T*>(list.at(i));
+            if(extension)
                 return extension;
         }
         return 0;

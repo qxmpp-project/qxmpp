@@ -80,7 +80,7 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient *parentClient)
 
 QXmppElementList QXmppClientPrivate::presenceExtensions() const
 {
-    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager*>();
+    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
     if(!ext)
         return QXmppElementList();
 
