@@ -385,7 +385,7 @@ void mainDialog::signIn()
     ui->pushButton_cancel->setDisabled(false);
     ui->lineEdit_userName->setDisabled(true);
     ui->lineEdit_password->setDisabled(true);
-    ui->checkBox->setDisabled(true);
+    ui->checkBox_rememberPasswd->setDisabled(true);
     showLoginStatusWithProgress("Connecting");
 
     QString bareJid = ui->lineEdit_userName->text();
@@ -404,6 +404,9 @@ void mainDialog::signIn()
 
 void mainDialog::cancelSignIn()
 {
+    if(!ui->checkBox_rememberPasswd->isChecked())
+        ui->lineEdit_password->setText("");
+
     ui->label_throbber->hide();
     m_xmppClient.reconnectionManager()->cancelReconnection();
     m_xmppClient.disconnectFromServer();
@@ -419,13 +422,17 @@ void mainDialog::showSignInPage()
     ui->pushButton_cancel->setDisabled(true);
     ui->lineEdit_userName->setDisabled(false);
     ui->lineEdit_password->setDisabled(false);
-    ui->checkBox->setDisabled(false);
+    ui->checkBox_rememberPasswd->setDisabled(false);
     ui->stackedWidget->setCurrentIndex(1);
 }
 
 void mainDialog::showSignInPageAfterUserDisconnection()
 {
+    if(!ui->checkBox_rememberPasswd->isChecked())
+        ui->lineEdit_password->setText("");
+
     ui->label_throbber->hide();
+
     showLoginStatus("Disconnected");
     showSignInPage();
 }
@@ -437,7 +444,7 @@ void mainDialog::showSignInPageForAutoReconnection(int i)
     ui->pushButton_cancel->setDisabled(false);
     ui->lineEdit_userName->setDisabled(true);
     ui->lineEdit_password->setDisabled(true);
-    ui->checkBox->setDisabled(true);
+    ui->checkBox_rememberPasswd->setDisabled(true);
     showLoginStatusWithCounter(QString("Reconnecting in %1 sec..."), i);
     ui->stackedWidget->setCurrentIndex(1);
 }
@@ -449,7 +456,7 @@ void mainDialog::showSignInPageForAutoReconnectionNow()
     ui->pushButton_cancel->setDisabled(false);
     ui->lineEdit_userName->setDisabled(true);
     ui->lineEdit_password->setDisabled(true);
-    ui->checkBox->setDisabled(true);
+    ui->checkBox_rememberPasswd->setDisabled(true);
     showLoginStatusWithProgress(QString("Connecting"));
     ui->stackedWidget->setCurrentIndex(1);
 }
@@ -546,5 +553,7 @@ void mainDialog::addAccountToCache()
 {
     QString bareJid = ui->lineEdit_userName->text();
     QString passwd = ui->lineEdit_password->text();
+    if(!ui->checkBox_rememberPasswd->isChecked())
+        passwd = "";
     m_accountsCache.addAccount(bareJid, passwd);
 }
