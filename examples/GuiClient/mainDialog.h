@@ -78,7 +78,7 @@ private slots:
     void updateVCard(const QString& bareJid);
     void avatarChanged(const QImage&);
     void showProfile(const QString& bareJid);
-    void userNameLineEdit_editingFinished();
+    void userNameCompleter_activated(const QString&);
 
 private:
     void loadAccounts();

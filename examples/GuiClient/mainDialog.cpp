@@ -55,9 +55,9 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     showSignInPage();
     loadAccounts();
 
-    bool check = connect(ui->lineEdit_userName,
-                         SIGNAL(editingFinished()),
-                         this, SLOT(userNameLineEdit_editingFinished()));
+    bool check = connect(ui->lineEdit_userName->completer(),
+                         SIGNAL(activated(const QString &)),
+                         this, SLOT(userNameCompleter_activated(const QString &)));
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient.rosterManager(),
@@ -534,8 +534,8 @@ void mainDialog::loadAccounts()
     }
 }
 
-void mainDialog::userNameLineEdit_editingFinished()
+void mainDialog::userNameCompleter_activated(const QString& user)
 {
-    QString passwd = m_accountsCache.getPassword(ui->lineEdit_userName->text());
+    QString passwd = m_accountsCache.getPassword(user);
     ui->lineEdit_password->setText(passwd);
 }
