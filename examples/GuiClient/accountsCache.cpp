@@ -66,6 +66,16 @@ void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
 
 void accountsCache::loadFromFile()
 {
+    QDir dirSettings(getSettingsDir());
+    if(dirSettings.exists())
+    {
+        QFile file(getSettingsDir()+ "accounts.xml");
+        if(file.open(QIODevice::ReadOnly))
+        {
+            QDomDocument doc;
+            doc.setContent(&file, true);
+        }
+    }
 }
 
 void accountsCache::saveToFile()
