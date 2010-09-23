@@ -34,6 +34,7 @@
 #include "statusWidget.h"
 #include "chatDialog.h"
 #include "vCardManager.h"
+#include "capabilitiesCollection.h"
 
 namespace Ui
 {
@@ -86,6 +87,7 @@ private:
     rosterItemSortFilterProxyModel m_rosterItemSortFilterModel;
     statusWidget m_statusWidget;
     vCardManager m_vCardManager;
+    capabilitiesCollection m_capabilitiesCollection;
 
     // map of bare jids and respective chatdlg
     QMap<QString, chatDialog*> m_chatDlgsList;

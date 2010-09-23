@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     statusTextWidget.cpp \
     customToolButton.cpp \
     vCardManager.cpp \
-    profileDialog.cpp
+    profileDialog.cpp \
+    capabilitiesCollection.cpp
 
 HEADERS += messageGraphicsItem.h \
     chatGraphicsScene.h \
@@ -42,7 +43,8 @@ HEADERS += messageGraphicsItem.h \
     statusTextWidget.h \
     customToolButton.h \
     vCardManager.h \
-    profileDialog.h
+    profileDialog.h \
+    capabilitiesCollection.h
 
 FORMS += mainDialog.ui \
     chatDialog.ui \

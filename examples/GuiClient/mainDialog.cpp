@@ -28,6 +28,7 @@
 #include "QXmppPresence.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
+#include "QXmppConstants.h"
 #include "utils.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppVCardManager.h"
@@ -42,7 +43,8 @@
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
-    m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient)
+    m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
+    m_capabilitiesCollection(&m_xmppClient)
 {
     ui->setupUi(this);
     ui->pushButton_cancel->setDisabled(true);
@@ -176,9 +178,36 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
     if(!m_rosterItemModel.getRosterItemFromBareJid(bareJid))
         return;
 
+    QString jid = bareJid + "/" + resource;
     QMap<QString, QXmppPresence> presences = m_xmppClient.rosterManager().
                                              getAllPresencesForBareJid(bareJid);
     m_rosterItemModel.updatePresence(bareJid, presences);
+
+    QXmppPresence& pre = presences[resource];
+    QString nodeVer;
+    foreach(QXmppElement extension, pre.extensions())
+    {
+        if(extension.tagName() == "c" &&
+           extension.attribute("xmlns") == ns_capabilities)
+        {
+            QString node = extension.attribute("node");
+            QString ver = extension.attribute("node");
+            QString exts = extension.attribute("node");
+            nodeVer = node + "#" + ver;
+            if(!m_capabilitiesCollection.isCapabilityAvailable(nodeVer))
+                m_capabilitiesCollection.requestInfo(jid, nodeVer);
+            if(!exts.isEmpty())
+            {
+                foreach(QString ext, exts.split(" ", QString::SkipEmptyParts))
+                {
+                    nodeVer = node + "#" + ext;
+                    if(!m_capabilitiesCollection.isCapabilityAvailable(nodeVer))
+                        m_capabilitiesCollection.requestInfo(jid, nodeVer);
+                }
+            }
+        }
+    }
+
 
 //    QXmppPresence::Type presenceType = presences.begin().value().getType();
 
@@ -356,6 +385,7 @@ void mainDialog::signIn()
     m_rosterItemModel.clear();
 
     m_vCardManager.loadAllFromCache();
+    m_capabilitiesCollection.loadAllFromCache();
 
     startConnection();
 }
