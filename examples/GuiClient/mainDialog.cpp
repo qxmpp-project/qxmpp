@@ -491,7 +491,7 @@ void mainDialog::showProfile(const QString& bareJid)
     if(bareJid.isEmpty())
         return;
 
-    profileDialog dlg(this, bareJid, m_xmppClient);
+    profileDialog dlg(this, bareJid, m_xmppClient, m_capabilitiesCollection);
     dlg.setBareJid(bareJid);
     // TODO use original image
     if(!m_vCardManager.getAvatar(bareJid).isNull())

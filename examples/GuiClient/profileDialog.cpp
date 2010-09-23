@@ -9,10 +9,11 @@
 #include "QXmppUtils.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppEntityTimeIq.h"
+#include "QXmppConstants.h"
 
-profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client) :
+profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCollection& caps) :
     QDialog(parent, Qt::WindowTitleHint|Qt::WindowSystemMenuHint),
-    ui(new Ui::profileDialog), m_bareJid(bareJid), m_xmppClient(client)
+    ui(new Ui::profileDialog), m_bareJid(bareJid), m_xmppClient(client), m_caps(caps)
 {
     ui->setupUi(this);
 
@@ -93,21 +94,28 @@ void profileDialog::updateText()
     {
         QString resource = resources.at(i);
         statusText += "<B>Resource: </B>" + resource;
-        statusText += "</B><BR>";
+        statusText += "<BR>";
         QXmppPresence presence = m_xmppClient.rosterManager().getPresence(m_bareJid, resource);
         statusText += "<B>Status: </B>" + presenceToStatusText(presence);
         statusText += "<BR>";
         if(m_versions.contains(resource))
+        {
             statusText += "<B>Software: </B>" + QString("%1 %2 %3").
                           arg(m_versions[resource].name()).
                           arg(m_versions[resource].version()).
                           arg(m_versions[resource].os());
-        statusText += "<BR>";
+            statusText += "<BR>";
+        }
 
         if(m_time.contains(resource))
+        {
             statusText += "<B>Time: </B>" + QString("utc=%1 [tzo=%2]").
                           arg(m_time[resource].utc()).
                           arg(m_time[resource].tzo());
+            statusText += "<BR>";
+        }
+
+        statusText += getCapability(resource);
 
         if(i < resources.count() - 1) // skip for the last item
             statusText += "<BR>";
@@ -115,3 +123,49 @@ void profileDialog::updateText()
     setStatusText(statusText);
 }
 
+QString profileDialog::getCapability(const QString& resource)
+{
+    QMap<QString, QXmppPresence> presences = m_xmppClient.rosterManager().
+                                             getAllPresencesForBareJid(m_bareJid);
+    QXmppPresence& pre = presences[resource];
+    QString nodeVer;
+    QStringList resultFeatures;
+    QStringList resultIdentities;
+    foreach(QXmppElement extension, pre.extensions())
+    {
+        if(extension.tagName() == "c" &&
+           extension.attribute("xmlns") == ns_capabilities)
+        {
+            QString node = extension.attribute("node");
+            QString ver = extension.attribute("ver");
+            QString exts = extension.attribute("ext");
+            nodeVer = node + "#" + ver;
+            if(m_caps.isCapabilityAvailable(nodeVer))
+            {
+                resultFeatures << m_caps.getFeatures(nodeVer);
+                resultIdentities << m_caps.getIdentities(nodeVer);
+            }
+            if(!exts.isEmpty())
+            {
+                foreach(QString ext, exts.split(" ", QString::SkipEmptyParts))
+                {
+                    nodeVer = node + "#" + ext;
+                    if(m_caps.isCapabilityAvailable(nodeVer))
+                    {
+                        resultFeatures << m_caps.getFeatures(nodeVer);
+                        resultIdentities << m_caps.getIdentities(nodeVer);
+                    }
+                }
+            }
+        }
+    }
+
+    QString result;
+    result += "<B>Disco Identities:</B><BR>";
+    result += resultIdentities.join("<BR>");
+    result += "<BR>";
+    result += "<B>Disco Features:</B><BR>";
+    result += resultFeatures.join("<BR>");
+    result += "<BR>";
+    return result;
+}

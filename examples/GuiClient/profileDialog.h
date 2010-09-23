@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QMap>
+#include "capabilitiesCollection.h"
 
 namespace Ui {
     class profileDialog;
@@ -17,7 +18,7 @@ class profileDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client);
+    explicit profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCollection& caps);
     ~profileDialog();
 
     void setClientRef(QXmppClient& m_xmppClient);
@@ -32,11 +33,13 @@ private slots:
 
 private:
     void updateText();
+    QString getCapability(const QString& resource);
 
 private:
     Ui::profileDialog *ui;
     QString m_bareJid;
     QXmppClient& m_xmppClient;  // reference to the active QXmppClient (No ownership)
+    capabilitiesCollection& m_caps;  // reference to the active QXmppClient (No ownership)
     QMap<QString, QXmppVersionIq> m_versions;
     QMap<QString, QXmppEntityTimeIq> m_time;
 };
