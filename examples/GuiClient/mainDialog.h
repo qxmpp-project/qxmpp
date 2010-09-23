@@ -80,6 +80,8 @@ private slots:
     void showProfile(const QString& bareJid);
 
 private:
+    void loadAccounts();
+
     chatDialog* getChatDialog(const QString& bareJid);
 
     Ui::mainDialogClass* ui;

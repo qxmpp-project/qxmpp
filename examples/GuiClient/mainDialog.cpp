@@ -40,6 +40,8 @@
 #include "profileDialog.h"
 
 #include <QMovie>
+#include <QCompleter>
+
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
@@ -51,7 +53,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui->label_throbber->setMovie(new QMovie(":/icons/resource/ajax-loader.gif"));
     ui->label_throbber->movie()->start();
     showSignInPage();
-
+    loadAccounts();
     bool check = connect(&m_xmppClient.rosterManager(),
                          SIGNAL(rosterReceived()),
                          this, SLOT(rosterReceived()));
@@ -506,4 +508,14 @@ void mainDialog::showProfile(const QString& bareJid)
         dlg.setFullName(m_xmppClient.rosterManager().getRosterEntry(bareJid).name());
 
     dlg.exec();
+}
+
+void mainDialog::loadAccounts()
+{
+    m_accountsCache.loadFromFile();
+    QStringList list = m_accountsCache.getBareJids();
+    QCompleter *completer = new QCompleter(list, this);
+    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->lineEdit_userName->setCompleter(completer);
 }
