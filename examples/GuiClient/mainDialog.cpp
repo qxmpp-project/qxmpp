@@ -525,6 +525,13 @@ void mainDialog::loadAccounts()
     completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->lineEdit_userName->setCompleter(completer);
+
+    if(!list.isEmpty())
+    {
+        ui->lineEdit_userName->setText(list.last());
+        ui->lineEdit_password->setText(m_accountsCache.
+                                       getPassword(list.last()));
+    }
 }
 
 void mainDialog::userNameLineEdit_editingFinished()

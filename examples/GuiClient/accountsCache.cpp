@@ -48,8 +48,8 @@ void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
         {
-            element.firstChildElement("password").setNodeValue(passwd);
-            return;
+            m_accountsDocument.documentElement().removeChild(element);
+            break;
         }
         element = element.nextSiblingElement("account");
     }
