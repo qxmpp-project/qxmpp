@@ -74,7 +74,7 @@ void QXmppPresence::parse(const QDomElement &element)
     m_status.parse(element);
 
     QXmppElementList extensions;
-    QDomElement xElement = element.firstChildElement("x");
+    QDomElement xElement = element.firstChildElement();
     m_vCardUpdateType = VCardUpdateNone;
     while(!xElement.isNull())
     {
@@ -101,7 +101,7 @@ void QXmppPresence::parse(const QDomElement &element)
             // other extensions
             extensions << QXmppElement(xElement);
         }
-        xElement = xElement.nextSiblingElement("x");
+        xElement = xElement.nextSiblingElement();
     }
     setExtensions(extensions);
 }
