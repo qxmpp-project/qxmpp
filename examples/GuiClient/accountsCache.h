@@ -10,7 +10,7 @@ class accountsCache : public QObject
     Q_OBJECT
 
 public:
-    explicit accountsCache(QObject *parent = 0);
+    explicit accountsCache(QObject *parent);
     QStringList getBareJids();
     QString getPassword(const QString& bareJid);
 
@@ -22,7 +22,7 @@ public:
 private:
     void saveToFile();
 
-    QDomElement m_accountsElement;
+    QDomDocument m_accountsDocument;
 };
 
 #endif // ACCOUNTSCACHE_H

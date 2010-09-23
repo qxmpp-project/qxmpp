@@ -11,7 +11,7 @@ accountsCache::accountsCache(QObject *parent) :
 QStringList accountsCache::getBareJids()
 {
     QStringList list;
-    QDomElement element = m_accountsElement.firstChildElement("account");
+    QDomElement element = m_accountsDocument.firstChildElement("account");
     while(!element.isNull())
     {
         list << element.firstChildElement("bareJid").text();
@@ -23,7 +23,7 @@ QStringList accountsCache::getBareJids()
 
 QString accountsCache::getPassword(const QString& bareJid)
 {
-    QDomElement element = m_accountsElement.firstChildElement("account");
+    QDomElement element = m_accountsDocument.firstChildElement("account");
     while(!element.isNull())
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
@@ -38,7 +38,7 @@ QString accountsCache::getPassword(const QString& bareJid)
 
 void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
 {
-    QDomElement element = m_accountsElement.firstChildElement("account");
+    QDomElement element = m_accountsDocument.firstChildElement("account");
     while(!element.isNull())
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
@@ -49,21 +49,19 @@ void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
         element = element.nextSiblingElement("account");
     }
 
-    QDomElement newElement;
-    newElement.setTagName("account");
+    QDomElement newElement = m_accountsDocument.createElement("account");
 
-    QDomElement newElementBareJid;
-    newElementBareJid.setTagName("bareJid");
-    newElementBareJid.setNodeValue(bareJid);
-
-    QDomElement newElementPasswd;
-    newElementPasswd.setTagName("password");
-    newElementPasswd.setNodeValue(passwd);
-
+    QDomElement newElementBareJid = m_accountsDocument.createElement("bareJid");
+    newElementBareJid.appendChild(m_accountsDocument.createTextNode(bareJid));
     newElement.appendChild(newElementBareJid);
+
+    QDomElement newElementPasswd = m_accountsDocument.createElement("password");
+    newElementPasswd.appendChild(m_accountsDocument.createTextNode(passwd));
     newElement.appendChild(newElementPasswd);
 
-    m_accountsElement.appendChild(newElement);
+    m_accountsDocument.appendChild(newElement);
+
+    saveToFile();
 }
 
 void accountsCache::loadFromFile()
@@ -81,7 +79,7 @@ void accountsCache::saveToFile()
     if(file.open(QIODevice::ReadWrite))
     {
         QTextStream tstream(&file);
-        m_accountsElement.save(tstream, 2);
+        m_accountsDocument.save(tstream, 2);
         file.close();
     }
 }
