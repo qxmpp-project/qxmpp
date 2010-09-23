@@ -134,6 +134,9 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     check = connect(&m_xmppClient, SIGNAL(connected()), SLOT(showRosterPage()));
     Q_ASSERT(check);
 
+    check = connect(&m_xmppClient, SIGNAL(connected()), SLOT(addAccountToCache()));
+    Q_ASSERT(check);
+
     check = connect(m_xmppClient.reconnectionManager(),
                     SIGNAL(reconnectingIn(int)),
                     SLOT(showSignInPageForAutoReconnection(int)));
@@ -388,8 +391,6 @@ void mainDialog::signIn()
     QString bareJid = ui->lineEdit_userName->text();
     QString passwd = ui->lineEdit_password->text();
 
-    m_accountsCache.addAccount(bareJid, passwd);
-
     m_xmppClient.configuration().setJid(bareJid);
     m_xmppClient.configuration().setPassword(passwd);
 
@@ -408,6 +409,7 @@ void mainDialog::cancelSignIn()
     m_xmppClient.disconnectFromServer();
     showSignInPage();
     showLoginStatus("Sign in cancelled");
+    addAccountToCache();
 }
 
 void mainDialog::showSignInPage()
@@ -538,4 +540,11 @@ void mainDialog::userNameCompleter_activated(const QString& user)
 {
     QString passwd = m_accountsCache.getPassword(user);
     ui->lineEdit_password->setText(passwd);
+}
+
+void mainDialog::addAccountToCache()
+{
+    QString bareJid = ui->lineEdit_userName->text();
+    QString passwd = ui->lineEdit_password->text();
+    m_accountsCache.addAccount(bareJid, passwd);
 }

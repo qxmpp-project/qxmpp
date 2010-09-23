@@ -79,6 +79,7 @@ private slots:
     void avatarChanged(const QImage&);
     void showProfile(const QString& bareJid);
     void userNameCompleter_activated(const QString&);
+    void addAccountToCache();
 
 private:
     void loadAccounts();
