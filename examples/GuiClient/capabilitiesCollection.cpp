@@ -94,6 +94,8 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
 
 void capabilitiesCollection::loadAllFromCache()
 {
+    m_mapCapabilities.clear();
+
     QDir dirCaps(getSettingsDir(m_client->configuration().jidBare())+ "capabilities/");
     if(dirCaps.exists())
     {
