@@ -54,9 +54,16 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui->label_throbber->movie()->start();
     showSignInPage();
     loadAccounts();
-    bool check = connect(&m_xmppClient.rosterManager(),
+
+    bool check = connect(ui->lineEdit_userName,
+                         SIGNAL(editingFinished()),
+                         this, SLOT(userNameLineEdit_editingFinished()));
+    Q_ASSERT(check);
+
+    check = connect(&m_xmppClient.rosterManager(),
                          SIGNAL(rosterReceived()),
                          this, SLOT(rosterReceived()));
+    Q_ASSERT(check);
 
     check = connect(&m_xmppClient.rosterManager(),
                          SIGNAL(rosterChanged(const QString&)),
@@ -518,4 +525,10 @@ void mainDialog::loadAccounts()
     completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->lineEdit_userName->setCompleter(completer);
+}
+
+void mainDialog::userNameLineEdit_editingFinished()
+{
+    QString passwd = m_accountsCache.getPassword(ui->lineEdit_userName->text());
+    ui->lineEdit_password->setText(passwd);
 }

@@ -136,7 +136,7 @@
        <item>
         <widget class="QLineEdit" name="lineEdit_userName">
          <property name="text">
-          <string>qxmpp.test1@gmail.com</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -150,7 +150,7 @@
        <item>
         <widget class="QLineEdit" name="lineEdit_password">
          <property name="text">
-          <string>qxmpp123</string>
+          <string/>
          </property>
          <property name="echoMode">
           <enum>QLineEdit::Password</enum>
