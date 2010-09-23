@@ -53,7 +53,21 @@ void capabilitiesCollection::requestInfo(const QString& jid, const QString& node
     QXmppDiscoveryManager* ext = m_client->findExtension<QXmppDiscoveryManager>();
     if(ext)
     {
-        ext->requestInfo(jid, node);
+        bool alreadyRequested = false;
+        foreach(QString key, m_mapIdNodeVer.keys())
+        {
+            if(m_mapIdNodeVer[key] == node)
+            {
+                alreadyRequested = true;
+                break;
+            }
+        }
+
+        if(!alreadyRequested)
+        {
+            QString id = ext->requestInfo(jid, node);
+            m_mapIdNodeVer[id] = node;
+        }
     }
 }
 
@@ -63,14 +77,16 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
     if(discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
        discoIq.type() == QXmppIq::Result)
     {
-        if(!discoIq.queryNode().isEmpty())
+        if(discoIq.queryNode().isEmpty())
         {
-            discoIq.setTo("");
-            discoIq.setFrom("");
-            discoIq.setId("");
-            m_mapCapabilities[discoIq.queryNode()] = discoIq;
-            saveToCache(discoIq.queryNode());
+            discoIq.setQueryNode(m_mapIdNodeVer[discoIq.id()]);
         }
+
+        discoIq.setTo("");
+        discoIq.setFrom("");
+        discoIq.setId("");
+        m_mapCapabilities[discoIq.queryNode()] = discoIq;
+        saveToCache(discoIq.queryNode());
     }
 }
 

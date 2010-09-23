@@ -191,8 +191,8 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
            extension.attribute("xmlns") == ns_capabilities)
         {
             QString node = extension.attribute("node");
-            QString ver = extension.attribute("node");
-            QString exts = extension.attribute("node");
+            QString ver = extension.attribute("ver");
+            QString exts = extension.attribute("ext");
             nodeVer = node + "#" + ver;
             if(!m_capabilitiesCollection.isCapabilityAvailable(nodeVer))
                 m_capabilitiesCollection.requestInfo(jid, nodeVer);

@@ -54,6 +54,7 @@ private:
     QXmppClient* m_client;
 
     QMap<QString, QXmppDiscoveryIq> m_mapCapabilities;
+    QMap<QString, QString> m_mapIdNodeVer;
 };
 
 #endif // CAPABILITIESCOLLECTION_H
