@@ -26,7 +26,10 @@
 
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
+#include <utils.h>
+
 #include <QXmlStreamWriter>
+#include <QDir>
 
 capabilitiesCollection::capabilitiesCollection(QXmppClient* client) :
     QObject(client), m_client(client)
@@ -66,6 +69,36 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
             discoIq.setFrom("");
             discoIq.setId("");
             m_mapCapabilities[discoIq.queryNode()] = discoIq;
+            saveToCache(discoIq.queryNode());
         }
+    }
+}
+
+void capabilitiesCollection::loadAllFromCache()
+{
+}
+
+void capabilitiesCollection::saveToCache(const QString& nodeVer)
+{
+    if(!m_mapCapabilities.contains(nodeVer))
+        return;
+
+    QString fileName = getImageHash(nodeVer.toUtf8());
+    QDir dir;
+    if(!dir.exists(getSettingsDir(m_client->configuration().jidBare())))
+        dir.mkpath(getSettingsDir(m_client->configuration().jidBare()));
+
+    QDir dir2;
+    if(!dir2.exists(getSettingsDir(m_client->configuration().jidBare())+ "capabilities/"))
+        dir2.mkpath(getSettingsDir(m_client->configuration().jidBare())+ "capabilities/");
+
+    QString fileCapability = getSettingsDir(m_client->configuration().jidBare()) + "capabilities/" + fileName + ".xml";
+    QFile file(fileCapability);
+
+    if(file.open(QIODevice::ReadWrite))
+    {
+        QXmlStreamWriter stream(&file);
+        m_mapCapabilities[nodeVer].toXml(&stream);
+        file.close();
     }
 }

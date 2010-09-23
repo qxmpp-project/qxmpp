@@ -42,6 +42,9 @@ public:
     bool isCapabilityAvailable(const QString& nodeVer);
     void requestInfo(const QString& jid, const QString& nodeVer);
 
+    void loadAllFromCache();
+    void saveToCache(const QString& nodeVer);
+
 signals:
 
 private slots:
