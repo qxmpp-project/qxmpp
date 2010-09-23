@@ -45,6 +45,9 @@ public:
     void loadAllFromCache();
     void saveToCache(const QString& nodeVer);
 
+    QStringList getFeatures(const QString& nodeVer);
+    QStringList getIdentities(const QString& nodeVer);
+
 signals:
 
 private slots:

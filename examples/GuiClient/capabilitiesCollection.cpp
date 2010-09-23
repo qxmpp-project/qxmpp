@@ -142,3 +142,35 @@ void capabilitiesCollection::saveToCache(const QString& nodeVer)
         file.close();
     }
 }
+
+QStringList capabilitiesCollection::getFeatures(const QString& nodeVer)
+{
+    if(!m_mapCapabilities.contains(nodeVer))
+        return QStringList();
+
+    return m_mapCapabilities[nodeVer].features();
+}
+
+QStringList capabilitiesCollection::getIdentities(const QString& nodeVer)
+{
+    if(!m_mapCapabilities.contains(nodeVer))
+        return QStringList();
+
+    QStringList idList;
+    QList<QXmppDiscoveryIq::Identity> list = m_mapCapabilities[nodeVer].identities();
+    foreach(QXmppDiscoveryIq::Identity identity, list)
+    {
+        QStringList tmpList;
+        if(!identity.name().isEmpty())
+            tmpList << identity.name();
+        if(!identity.category().isEmpty())
+            tmpList << identity.category();
+        if(!identity.type().isEmpty())
+            tmpList << identity.type();
+        if(!identity.language().isEmpty())
+            tmpList << identity.language();
+        idList << tmpList.join(" | ");
+    }
+    return idList;
+}
+
