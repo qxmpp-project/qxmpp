@@ -11,7 +11,7 @@ accountsCache::accountsCache(QObject *parent) :
 QStringList accountsCache::getBareJids()
 {
     QStringList list;
-    QDomElement element = m_accountsDocument.firstChildElement("account");
+    QDomElement element = m_accountsDocument.documentElement().firstChildElement("account");
     while(!element.isNull())
     {
         list << element.firstChildElement("bareJid").text();
@@ -23,7 +23,7 @@ QStringList accountsCache::getBareJids()
 
 QString accountsCache::getPassword(const QString& bareJid)
 {
-    QDomElement element = m_accountsDocument.firstChildElement("account");
+    QDomElement element = m_accountsDocument.documentElement().firstChildElement("account");
     while(!element.isNull())
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
@@ -38,7 +38,12 @@ QString accountsCache::getPassword(const QString& bareJid)
 
 void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
 {
-    QDomElement element = m_accountsDocument.firstChildElement("account");
+    if(m_accountsDocument.documentElement().isNull())
+    {
+        m_accountsDocument.appendChild(m_accountsDocument.createElement("accounts"));
+    }
+
+    QDomElement element = m_accountsDocument.documentElement().firstChildElement("account");
     while(!element.isNull())
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
@@ -59,7 +64,7 @@ void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
     newElementPasswd.appendChild(m_accountsDocument.createTextNode(passwd));
     newElement.appendChild(newElementPasswd);
 
-    m_accountsDocument.appendChild(newElement);
+    m_accountsDocument.documentElement().appendChild(newElement);
 
     saveToFile();
 }
@@ -72,8 +77,7 @@ void accountsCache::loadFromFile()
         QFile file(getSettingsDir()+ "accounts.xml");
         if(file.open(QIODevice::ReadOnly))
         {
-            QDomDocument doc;
-            doc.setContent(&file, true);
+            m_accountsDocument.setContent(&file, true);
         }
     }
 }
