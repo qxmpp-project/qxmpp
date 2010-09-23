@@ -35,6 +35,7 @@
 #include "chatDialog.h"
 #include "vCardManager.h"
 #include "capabilitiesCollection.h"
+#include "accountsCache.h"
 
 namespace Ui
 {
@@ -88,6 +89,7 @@ private:
     statusWidget m_statusWidget;
     vCardManager m_vCardManager;
     capabilitiesCollection m_capabilitiesCollection;
+    accountsCache m_accountsCache;
 
     // map of bare jids and respective chatdlg
     QMap<QString, chatDialog*> m_chatDlgsList;

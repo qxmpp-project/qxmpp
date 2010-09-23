@@ -44,7 +44,7 @@
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
     m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
-    m_capabilitiesCollection(&m_xmppClient)
+    m_capabilitiesCollection(&m_xmppClient), m_accountsCache(this)
 {
     ui->setupUi(this);
     ui->pushButton_cancel->setDisabled(true);
@@ -378,6 +378,8 @@ void mainDialog::signIn()
 
     QString bareJid = ui->lineEdit_userName->text();
     QString passwd = ui->lineEdit_password->text();
+
+    m_accountsCache.addAccount(bareJid, passwd);
 
     m_xmppClient.configuration().setJid(bareJid);
     m_xmppClient.configuration().setPassword(passwd);
