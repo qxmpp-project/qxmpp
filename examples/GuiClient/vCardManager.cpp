@@ -98,6 +98,8 @@ void vCardManager::saveToCache(const QString& bareJid)
 
 void vCardManager::loadAllFromCache()
 {
+    m_mapBareJidVcard.clear();
+
     QDir dirVCards(getSettingsDir(m_client->configuration().jidBare())+ "vCards/");
     if(dirVCards.exists())
     {
