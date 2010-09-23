@@ -28,6 +28,7 @@
 #include "QXmppDiscoveryManager.h"
 #include <utils.h>
 
+#include <QCoreApplication>
 #include <QXmlStreamWriter>
 #include <QDir>
 
@@ -92,6 +93,26 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
 
 void capabilitiesCollection::loadAllFromCache()
 {
+    QDir dirCaps(getSettingsDir(m_client->configuration().jidBare())+ "capabilities/");
+    if(dirCaps.exists())
+    {
+        QStringList list = dirCaps.entryList(QStringList("*.xml"));
+        foreach(QString fileName, list)
+        {
+            QFile file(getSettingsDir(m_client->configuration().jidBare())+ "capabilities/" + fileName);
+            if(file.open(QIODevice::ReadOnly))
+            {
+                QDomDocument doc;
+                if(doc.setContent(&file, true))
+                {
+                    QXmppDiscoveryIq discoIq;
+                    discoIq.parse(doc.documentElement());
+                    m_mapCapabilities[discoIq.queryNode()] = discoIq;
+                    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+                }
+            }
+        }
+    }
 }
 
 void capabilitiesCollection::saveToCache(const QString& nodeVer)
