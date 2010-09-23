@@ -37,7 +37,7 @@ QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
     m_clientType("pc"),
     m_clientName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
 {
-    if(m_clientName.isEmpty())
+    if(qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
     {
         m_clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
     }
