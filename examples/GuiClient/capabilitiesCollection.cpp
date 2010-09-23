@@ -81,6 +81,7 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
         if(discoIq.queryNode().isEmpty())
         {
             discoIq.setQueryNode(m_mapIdNodeVer[discoIq.id()]);
+            m_mapIdNodeVer.remove(discoIq.id());
         }
 
         discoIq.setTo("");
