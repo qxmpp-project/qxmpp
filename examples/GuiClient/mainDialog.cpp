@@ -45,7 +45,7 @@
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
-    m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
+    m_rosterItemSortFilterModel(this), m_vCardCache(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
     m_signOutAction("Sign out", this)
@@ -152,11 +152,11 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient.vCardManager(),
-                    SIGNAL(vCardReceived(const QXmppVCardIq&)), &m_vCardManager,
+                    SIGNAL(vCardReceived(const QXmppVCardIq&)), &m_vCardCache,
                     SLOT(vCardReceived(const QXmppVCardIq&)));
     Q_ASSERT(check);
 
-    check = connect(&m_vCardManager,
+    check = connect(&m_vCardCache,
                     SIGNAL(vCardReadyToUse(const QString&)),
                     SLOT(updateVCard(const QString&)));
     Q_ASSERT(check);
@@ -167,14 +167,14 @@ void mainDialog::rosterChanged(const QString& bareJid)
     m_rosterItemModel.updateRosterEntry(bareJid, m_xmppClient.rosterManager().
                                         getRosterEntry(bareJid));
 
-    bool check = m_vCardManager.isVCardAvailable(bareJid);
+    bool check = m_vCardCache.isVCardAvailable(bareJid);
     if(check)
     {
         updateVCard(bareJid);
     }
     else
     {
-        m_vCardManager.requestVCard(bareJid);
+        m_vCardCache.requestVCard(bareJid);
     }
 }
 
@@ -227,11 +227,11 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
 
 //    QXmppPresence::Type presenceType = presences.begin().value().getType();
 
-//    if(!m_vCardManager.isVCardAvailable(bareJid) &&
+//    if(!m_vCardCache.isVCardAvailable(bareJid) &&
 //       presenceType == QXmppPresence::Available)
 //    {
 //        m_rosterItemModel.updateAvatar(bareJid,
-//                                   m_vCardManager.getVCard(bareJid).image);
+//                                   m_vCardCache.getVCard(bareJid).image);
 //    }
 }
 
@@ -418,7 +418,7 @@ void mainDialog::signIn()
 
     m_rosterItemModel.clear();
 
-    m_vCardManager.loadAllFromCache();
+    m_vCardCache.loadAllFromCache();
     m_capabilitiesCache.loadAllFromCache();
 
     startConnection();
@@ -514,17 +514,17 @@ void mainDialog::updateVCard(const QString& bareJid)
     if(bareJid != m_xmppClient.configuration().jidBare())
     {
         m_rosterItemModel.updateAvatar(bareJid,
-                                   m_vCardManager.getAvatar(bareJid));
-        m_rosterItemModel.updateName(bareJid, m_vCardManager.getVCard(bareJid).fullName());
+                                   m_vCardCache.getAvatar(bareJid));
+        m_rosterItemModel.updateName(bareJid, m_vCardCache.getVCard(bareJid).fullName());
     }
     else
     {
-        if(m_vCardManager.getSelfFullName().isEmpty())
+        if(m_vCardCache.getSelfFullName().isEmpty())
             m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
         else
-            m_statusWidget.setDisplayName(m_vCardManager.getSelfFullName());
+            m_statusWidget.setDisplayName(m_vCardCache.getSelfFullName());
 
-        m_statusWidget.setAvatar(m_vCardManager.getAvatar(bareJid));
+        m_statusWidget.setAvatar(m_vCardCache.getAvatar(bareJid));
     }
 }
 
@@ -536,13 +536,13 @@ void mainDialog::showProfile(const QString& bareJid)
     profileDialog dlg(this, bareJid, m_xmppClient, m_capabilitiesCache);
     dlg.setBareJid(bareJid);
     // TODO use original image
-    if(!m_vCardManager.getAvatar(bareJid).isNull())
-        dlg.setAvatar(m_vCardManager.getAvatar(bareJid));
+    if(!m_vCardCache.getAvatar(bareJid).isNull())
+        dlg.setAvatar(m_vCardCache.getAvatar(bareJid));
     QStringList resources = m_xmppClient.rosterManager().getResources(bareJid);
 
-    dlg.setFullName(m_vCardManager.getVCard(bareJid).fullName());
+    dlg.setFullName(m_vCardCache.getVCard(bareJid).fullName());
 
-    if(m_vCardManager.getVCard(bareJid).fullName().isEmpty())
+    if(m_vCardCache.getVCard(bareJid).fullName().isEmpty())
         dlg.setFullName(m_xmppClient.rosterManager().getRosterEntry(bareJid).name());
 
     dlg.exec();

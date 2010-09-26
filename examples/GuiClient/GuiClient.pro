@@ -21,7 +21,7 @@ SOURCES += main.cpp \
     avatarWidget.cpp \
     statusTextWidget.cpp \
     customToolButton.cpp \
-    vCardManager.cpp \
+    vCardCache.cpp \
     profileDialog.cpp \
     capabilitiesCache.cpp \
     accountsCache.cpp
@@ -43,7 +43,7 @@ HEADERS += messageGraphicsItem.h \
     avatarWidget.h \
     statusTextWidget.h \
     customToolButton.h \
-    vCardManager.h \
+    vCardCache.h \
     profileDialog.h \
     capabilitiesCache.h \
     accountsCache.h

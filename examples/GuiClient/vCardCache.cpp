@@ -22,7 +22,7 @@
  */
 
 
-#include "vCardManager.h"
+#include "vCardCache.h"
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
 #include "utils.h"
@@ -34,12 +34,12 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 
-vCardManager::vCardManager(QXmppClient* client) : QObject(client),
+vCardCache::vCardCache(QXmppClient* client) : QObject(client),
                 m_client(client)
 {
 }
 
-void vCardManager::vCardReceived(const QXmppVCardIq& vcard)
+void vCardCache::vCardReceived(const QXmppVCardIq& vcard)
 {
     QString from = vcard.from();
     if(from.isEmpty() && m_client)
@@ -55,24 +55,24 @@ void vCardManager::vCardReceived(const QXmppVCardIq& vcard)
     emit vCardReadyToUse(from);
 }
 
-bool vCardManager::isVCardAvailable(const QString& bareJid)
+bool vCardCache::isVCardAvailable(const QString& bareJid)
 {
     return m_mapBareJidVcard.contains(bareJid);
 }
 
-void vCardManager::requestVCard(const QString& bareJid)
+void vCardCache::requestVCard(const QString& bareJid)
 {
     if(m_client)
         m_client->vCardManager().requestVCard(bareJid);
 }
 
 //TODO not a good way to handle
-QXmppVCardIq& vCardManager::getVCard(const QString& bareJid)
+QXmppVCardIq& vCardCache::getVCard(const QString& bareJid)
 {
     return m_mapBareJidVcard[bareJid];
 }
 
-void vCardManager::saveToCache(const QString& bareJid)
+void vCardCache::saveToCache(const QString& bareJid)
 {
     QDir dir;
     if(!dir.exists(getSettingsDir(m_client->configuration().jidBare())))
@@ -98,7 +98,7 @@ void vCardManager::saveToCache(const QString& bareJid)
     }
 }
 
-void vCardManager::loadAllFromCache()
+void vCardCache::loadAllFromCache()
 {
     m_mapBareJidVcard.clear();
 
@@ -126,13 +126,13 @@ void vCardManager::loadAllFromCache()
     }
 }
 
-QString vCardManager::getSelfFullName()
+QString vCardCache::getSelfFullName()
 {
     return m_selfFullName;
 }
 
 // this should return scaled image
-QImage vCardManager::getAvatar(const QString& bareJid) const
+QImage vCardCache::getAvatar(const QString& bareJid) const
 {
     if(m_mapBareJidVcard.contains(bareJid))
         return getImageFromByteArray(m_mapBareJidVcard[bareJid].photo());

@@ -34,12 +34,12 @@
 
 class QXmppClient;
 
-class vCardManager : public QObject
+class vCardCache : public QObject
 {
     Q_OBJECT
 
 public:
-    vCardManager(QXmppClient* client);
+    vCardCache(QXmppClient* client);
     void requestVCard(const QString& bareJid);
     bool isVCardAvailable(const QString& bareJid);
     QImage getAvatar(const QString& bareJid) const;

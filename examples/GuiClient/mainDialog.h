@@ -33,7 +33,7 @@
 #include <QMap>
 #include "statusWidget.h"
 #include "chatDialog.h"
-#include "vCardManager.h"
+#include "vCardCache.h"
 #include "capabilitiesCache.h"
 #include "accountsCache.h"
 #include <QSystemTrayIcon>
@@ -99,7 +99,7 @@ private:
     rosterItemModel m_rosterItemModel;
     rosterItemSortFilterProxyModel m_rosterItemSortFilterModel;
     statusWidget m_statusWidget;
-    vCardManager m_vCardManager;
+    vCardCache m_vCardCache;
     capabilitiesCache m_capabilitiesCache;
     accountsCache m_accountsCache;
 
