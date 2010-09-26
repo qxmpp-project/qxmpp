@@ -36,6 +36,8 @@
 #include "vCardManager.h"
 #include "capabilitiesCollection.h"
 #include "accountsCache.h"
+#include <QSystemTrayIcon>
+#include <QMenu>
 
 namespace Ui
 {
@@ -81,8 +83,11 @@ private slots:
     void userNameCompleter_activated(const QString&);
     void addAccountToCache();
 
+    void action_quit();
+
 private:
     void loadAccounts();
+    void createTrayIconAndMenu();
 
     chatDialog* getChatDialog(const QString& bareJid);
 
@@ -97,6 +102,10 @@ private:
 
     // map of bare jids and respective chatdlg
     QMap<QString, chatDialog*> m_chatDlgsList;
+
+    QSystemTrayIcon m_trayIcon;
+    QMenu m_trayIconMenu;
+    QAction m_quitAction;
 };
 
 #endif // MAINDIALOG_H

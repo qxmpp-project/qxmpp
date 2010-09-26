@@ -46,9 +46,12 @@
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
     m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
-    m_capabilitiesCollection(&m_xmppClient), m_accountsCache(this)
+    m_capabilitiesCollection(&m_xmppClient), m_accountsCache(this),
+    m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this)
 {
     ui->setupUi(this);
+    createTrayIconAndMenu();
+
     ui->pushButton_cancel->setDisabled(true);
     ui->label_throbber->setMovie(new QMovie(":/icons/resource/ajax-loader.gif"));
     ui->label_throbber->movie()->start();
@@ -556,4 +559,20 @@ void mainDialog::addAccountToCache()
     if(!ui->checkBox_rememberPasswd->isChecked())
         passwd = "";
     m_accountsCache.addAccount(bareJid, passwd);
+}
+
+void mainDialog::action_quit()
+{
+    m_xmppClient.disconnectFromServer();
+    close();
+}
+
+void mainDialog::createTrayIconAndMenu()
+{
+    bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
+    Q_ASSERT(check);
+
+    m_trayIconMenu.addAction(&m_quitAction);
+    m_trayIcon.setContextMenu(&m_trayIconMenu);
+    m_trayIcon.show();
 }
