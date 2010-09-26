@@ -248,36 +248,54 @@ void mainDialog::filterChanged(const QString& filter)
 
 void mainDialog::keyPressEvent(QKeyEvent* event1)
 {
+    if(ui->stackedWidget->currentIndex() == 0) // roster page
+    {
+        if(event1->matches(QKeySequence::Find) ||(
+           event1->key() <= Qt::Key_9 && event1->key() >= Qt::Key_1) ||
+           (event1->key() <= Qt::Key_Z && event1->key() >= Qt::Key_At) ||
+           event1->key() == Qt::Key_Backspace)
+        {
+            ui->lineEdit_filter->setFocus();
+            ui->lineEdit_filter->event(event1);
+        }
+        else if(event1->key() == Qt::Key_Escape)
+        {
+            ui->lineEdit_filter->clear();
+            ui->listView->setFocus();
+        }
+        else if(event1->key() == Qt::Key_Up ||
+                event1->key() == Qt::Key_Down ||
+                event1->key() == Qt::Key_PageUp ||
+                event1->key() == Qt::Key_PageDown)
+        {
+            ui->listView->setFocus();
+            ui->listView->event(event1);
+        }
+        else if(event1->key() == Qt::Key_Return && ui->listView->hasFocus())
+        {
+            ui->listView->event(event1);
+        }
+    }
+
+// don't close on escape
+    if(event1->key() == Qt::Key_Escape)
+    {
+        event1->ignore();
+        return;
+    }
+#ifdef Q_WS_MAC
+    else if(minimize && e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_Period)
+    {
+        event1->ignore();
+        return;
+    }
+#endif
+// don't close on escape
+
     if(ui->stackedWidget->currentIndex() == 1) // sign in page
     {
         QDialog::keyPressEvent(event1);
         return;
-    }
-
-    if(event1->matches(QKeySequence::Find) ||(
-       event1->key() <= Qt::Key_9 && event1->key() >= Qt::Key_1) ||
-       (event1->key() <= Qt::Key_Z && event1->key() >= Qt::Key_At) ||
-       event1->key() == Qt::Key_Backspace)
-    {
-        ui->lineEdit_filter->setFocus();
-        ui->lineEdit_filter->event(event1);
-    }
-    else if(event1->key() == Qt::Key_Escape)
-    {
-        ui->lineEdit_filter->clear();
-        ui->listView->setFocus();
-    }
-    else if(event1->key() == Qt::Key_Up ||
-            event1->key() == Qt::Key_Down ||
-            event1->key() == Qt::Key_PageUp ||
-            event1->key() == Qt::Key_PageDown)
-    {
-        ui->listView->setFocus();
-        ui->listView->event(event1);
-    }
-    else if(event1->key() == Qt::Key_Return && ui->listView->hasFocus())
-    {
-        ui->listView->event(event1);
     }
 }
 
