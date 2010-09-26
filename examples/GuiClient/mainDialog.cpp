@@ -559,8 +559,10 @@ void mainDialog::loadAccounts()
     if(!list.isEmpty())
     {
         ui->lineEdit_userName->setText(list.last());
-        ui->lineEdit_password->setText(m_accountsCache.
-                                       getPassword(list.last()));
+        QString passwd = m_accountsCache.getPassword(list.last());
+        ui->lineEdit_password->setText(passwd);
+        if(!passwd.isEmpty())
+            ui->checkBox_rememberPasswd->setChecked(true);
     }
 }
 
@@ -568,6 +570,8 @@ void mainDialog::userNameCompleter_activated(const QString& user)
 {
     QString passwd = m_accountsCache.getPassword(user);
     ui->lineEdit_password->setText(passwd);
+    if(!passwd.isEmpty())
+        ui->checkBox_rememberPasswd->setChecked(true);
 }
 
 void mainDialog::addAccountToCache()
