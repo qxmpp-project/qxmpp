@@ -23,16 +23,15 @@
 
 
 #include "vCardCache.h"
+#include "utils.h"
+
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
-#include "utils.h"
 #include "QXmppVCardManager.h"
-#include <QFile>
+
 #include <QDir>
 #include <QDomDocument>
-#include <QTextStream>
 #include <QCoreApplication>
-#include <QDomDocument>
 
 vCardCache::vCardCache(QXmppClient* client) : QObject(client),
                 m_client(client)
@@ -124,7 +123,7 @@ void vCardCache::loadFromFile()
     }
 }
 
-// this should return scaled image
+//TODO: this should return scaled image
 QImage vCardCache::getAvatar(const QString& bareJid) const
 {
     if(m_mapBareJidVcard.contains(bareJid))

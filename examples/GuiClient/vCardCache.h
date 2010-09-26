@@ -27,9 +27,9 @@
 
 #include <QObject>
 #include <QMap>
-#include <QImage>
 #include "QXmppVCardIq.h"
 
+class QImage;
 class QXmppClient;
 
 class vCardCache : public QObject
@@ -56,7 +56,6 @@ private:
     void saveToFile(const QString& bareJid);
 
     QXmppClient* m_client;
-
     QMap<QString, QXmppVCardIq> m_mapBareJidVcard;
 };
 
