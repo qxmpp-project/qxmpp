@@ -34,7 +34,7 @@
 #include "statusWidget.h"
 #include "chatDialog.h"
 #include "vCardManager.h"
-#include "capabilitiesCollection.h"
+#include "capabilitiesCache.h"
 #include "accountsCache.h"
 #include <QSystemTrayIcon>
 #include <QMenu>
@@ -99,7 +99,7 @@ private:
     rosterItemSortFilterProxyModel m_rosterItemSortFilterModel;
     statusWidget m_statusWidget;
     vCardManager m_vCardManager;
-    capabilitiesCollection m_capabilitiesCollection;
+    capabilitiesCache m_capabilitiesCollection;
     accountsCache m_accountsCache;
 
     // map of bare jids and respective chatdlg

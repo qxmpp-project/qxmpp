@@ -22,7 +22,7 @@
  */
 
 
-#include "capabilitiesCollection.h"
+#include "capabilitiesCache.h"
 
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
@@ -32,7 +32,7 @@
 #include <QXmlStreamWriter>
 #include <QDir>
 
-capabilitiesCollection::capabilitiesCollection(QXmppClient* client) :
+capabilitiesCache::capabilitiesCache(QXmppClient* client) :
     QObject(client), m_client(client)
 {
     QXmppDiscoveryManager* ext = m_client->findExtension<QXmppDiscoveryManager>();
@@ -44,12 +44,12 @@ capabilitiesCollection::capabilitiesCollection(QXmppClient* client) :
     }
 }
 
-bool capabilitiesCollection::isCapabilityAvailable(const QString& nodeVer)
+bool capabilitiesCache::isCapabilityAvailable(const QString& nodeVer)
 {
     return m_mapCapabilities.contains(nodeVer);
 }
 
-void capabilitiesCollection::requestInfo(const QString& jid, const QString& node)
+void capabilitiesCache::requestInfo(const QString& jid, const QString& node)
 {
     QXmppDiscoveryManager* ext = m_client->findExtension<QXmppDiscoveryManager>();
     if(ext)
@@ -72,7 +72,7 @@ void capabilitiesCollection::requestInfo(const QString& jid, const QString& node
     }
 }
 
-void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
+void capabilitiesCache::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
 {
     QXmppDiscoveryIq discoIq = discoIqRcv;
     if(discoIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
@@ -92,7 +92,7 @@ void capabilitiesCollection::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
     }
 }
 
-void capabilitiesCollection::loadAllFromCache()
+void capabilitiesCache::loadAllFromCache()
 {
     m_mapCapabilities.clear();
 
@@ -118,7 +118,7 @@ void capabilitiesCollection::loadAllFromCache()
     }
 }
 
-void capabilitiesCollection::saveToCache(const QString& nodeVer)
+void capabilitiesCache::saveToCache(const QString& nodeVer)
 {
     if(!m_mapCapabilities.contains(nodeVer))
         return;
@@ -145,7 +145,7 @@ void capabilitiesCollection::saveToCache(const QString& nodeVer)
     }
 }
 
-QStringList capabilitiesCollection::getFeatures(const QString& nodeVer)
+QStringList capabilitiesCache::getFeatures(const QString& nodeVer)
 {
     if(!m_mapCapabilities.contains(nodeVer))
         return QStringList();
@@ -153,7 +153,7 @@ QStringList capabilitiesCollection::getFeatures(const QString& nodeVer)
     return m_mapCapabilities[nodeVer].features();
 }
 
-QStringList capabilitiesCollection::getIdentities(const QString& nodeVer)
+QStringList capabilitiesCache::getIdentities(const QString& nodeVer)
 {
     if(!m_mapCapabilities.contains(nodeVer))
         return QStringList();

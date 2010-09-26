@@ -11,7 +11,7 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppConstants.h"
 
-profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCollection& caps) :
+profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCache& caps) :
     QDialog(parent, Qt::WindowTitleHint|Qt::WindowSystemMenuHint),
     ui(new Ui::profileDialog), m_bareJid(bareJid), m_xmppClient(client), m_caps(caps)
 {

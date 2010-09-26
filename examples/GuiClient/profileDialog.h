@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QMap>
-#include "capabilitiesCollection.h"
+#include "capabilitiesCache.h"
 
 namespace Ui {
     class profileDialog;
@@ -18,7 +18,7 @@ class profileDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCollection& caps);
+    explicit profileDialog(QWidget *parent, const QString& bareJid, QXmppClient& client, capabilitiesCache& caps);
     ~profileDialog();
 
     void setClientRef(QXmppClient& m_xmppClient);
@@ -39,7 +39,7 @@ private:
     Ui::profileDialog *ui;
     QString m_bareJid;
     QXmppClient& m_xmppClient;  // reference to the active QXmppClient (No ownership)
-    capabilitiesCollection& m_caps;  // reference to the active QXmppClient (No ownership)
+    capabilitiesCache& m_caps;  // reference to the active QXmppClient (No ownership)
     QMap<QString, QXmppVersionIq> m_versions;
     QMap<QString, QXmppEntityTimeIq> m_time;
 };
