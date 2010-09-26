@@ -569,6 +569,8 @@ void mainDialog::action_quit()
 
 void mainDialog::createTrayIconAndMenu()
 {
+    m_trayIcon.setIcon(QIcon(":/icons/resource/icon.png"));
+
     bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
     Q_ASSERT(check);
 
