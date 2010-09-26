@@ -8,5 +8,6 @@
         <file>resource/searchIcon.png</file>
         <file>resource/downArrow.png</file>
         <file>resource/ajax-loader.gif</file>
+        <file>resource/icon.png</file>
     </qresource>
 </RCC>
