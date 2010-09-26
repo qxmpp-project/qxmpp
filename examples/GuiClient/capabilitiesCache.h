@@ -22,8 +22,8 @@
  */
 
 
-#ifndef CAPABILITIESCOLLECTION_H
-#define CAPABILITIESCOLLECTION_H
+#ifndef CAPABILITIESCACHE_H
+#define CAPABILITIESCACHE_H
 
 #include <QObject>
 #include <QDomElement>
@@ -60,4 +60,4 @@ private:
     QMap<QString, QString> m_mapIdNodeVer;
 };
 
-#endif // CAPABILITIESCOLLECTION_H
+#endif // CAPABILITIESCACHE_H
