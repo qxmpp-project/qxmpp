@@ -564,7 +564,7 @@ void mainDialog::addAccountToCache()
 void mainDialog::action_quit()
 {
     m_xmppClient.disconnectFromServer();
-    close();
+    QApplication::quit();
 }
 
 void mainDialog::createTrayIconAndMenu()
@@ -575,4 +575,10 @@ void mainDialog::createTrayIconAndMenu()
     m_trayIconMenu.addAction(&m_quitAction);
     m_trayIcon.setContextMenu(&m_trayIconMenu);
     m_trayIcon.show();
+}
+
+void mainDialog::closeEvent(QCloseEvent *event)
+{
+    hide();
+    event->ignore();
 }

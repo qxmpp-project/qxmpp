@@ -53,6 +53,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent*);
+    void closeEvent(QCloseEvent* event);
 
 private slots:
     void rosterChanged(const QString& bareJid);
