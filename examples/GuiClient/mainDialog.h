@@ -84,6 +84,7 @@ private slots:
     void userNameCompleter_activated(const QString&);
     void addAccountToCache();
 
+    void action_signOut();
     void action_quit();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
@@ -108,6 +109,7 @@ private:
     QSystemTrayIcon m_trayIcon;
     QMenu m_trayIconMenu;
     QAction m_quitAction;
+    QAction m_signOutAction;
 };
 
 #endif // MAINDIALOG_H

@@ -47,7 +47,8 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
     m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
-    m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this)
+    m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
+    m_signOutAction("Sign out", this)
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
@@ -583,6 +584,16 @@ void mainDialog::addAccountToCache()
     m_accountsCache.addAccount(bareJid, passwd);
 }
 
+void mainDialog::action_signOut()
+{
+    m_xmppClient.disconnectFromServer();
+    showSignInPageAfterUserDisconnection();
+
+    // update widget
+    m_statusWidget.setStatusText(
+            presenceToStatusText(m_xmppClient.clientPresence()));
+}
+
 void mainDialog::action_quit()
 {
     m_xmppClient.disconnectFromServer();
@@ -596,11 +607,16 @@ void mainDialog::createTrayIconAndMenu()
     bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
     Q_ASSERT(check);
 
+    check = connect(&m_signOutAction, SIGNAL(triggered()), SLOT(action_signOut()));
+    Q_ASSERT(check);
+
     check = connect(&m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                     SLOT(action_trayIconActivated(QSystemTrayIcon::ActivationReason)));
         Q_ASSERT(check);
 
+    m_trayIconMenu.addAction(&m_signOutAction);
     m_trayIconMenu.addAction(&m_quitAction);
+
     m_trayIcon.setContextMenu(&m_trayIconMenu);
     m_trayIcon.show();
 }
