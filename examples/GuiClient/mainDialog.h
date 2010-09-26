@@ -99,7 +99,7 @@ private:
     rosterItemSortFilterProxyModel m_rosterItemSortFilterModel;
     statusWidget m_statusWidget;
     vCardManager m_vCardManager;
-    capabilitiesCache m_capabilitiesCollection;
+    capabilitiesCache m_capabilitiesCache;
     accountsCache m_accountsCache;
 
     // map of bare jids and respective chatdlg

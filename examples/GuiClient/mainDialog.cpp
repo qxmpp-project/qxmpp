@@ -46,7 +46,7 @@
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
     m_rosterItemSortFilterModel(this), m_vCardManager(&m_xmppClient),
-    m_capabilitiesCollection(&m_xmppClient), m_accountsCache(this),
+    m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this)
 {
     ui->setupUi(this);
@@ -209,15 +209,15 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
             QString ver = extension.attribute("ver");
             QString exts = extension.attribute("ext");
             nodeVer = node + "#" + ver;
-            if(!m_capabilitiesCollection.isCapabilityAvailable(nodeVer))
-                m_capabilitiesCollection.requestInfo(jid, nodeVer);
+            if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
+                m_capabilitiesCache.requestInfo(jid, nodeVer);
             if(!exts.isEmpty())
             {
                 foreach(QString ext, exts.split(" ", QString::SkipEmptyParts))
                 {
                     nodeVer = node + "#" + ext;
-                    if(!m_capabilitiesCollection.isCapabilityAvailable(nodeVer))
-                        m_capabilitiesCollection.requestInfo(jid, nodeVer);
+                    if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
+                        m_capabilitiesCache.requestInfo(jid, nodeVer);
                 }
             }
         }
@@ -418,7 +418,7 @@ void mainDialog::signIn()
     m_rosterItemModel.clear();
 
     m_vCardManager.loadAllFromCache();
-    m_capabilitiesCollection.loadAllFromCache();
+    m_capabilitiesCache.loadAllFromCache();
 
     startConnection();
 }
@@ -532,7 +532,7 @@ void mainDialog::showProfile(const QString& bareJid)
     if(bareJid.isEmpty())
         return;
 
-    profileDialog dlg(this, bareJid, m_xmppClient, m_capabilitiesCollection);
+    profileDialog dlg(this, bareJid, m_xmppClient, m_capabilitiesCache);
     dlg.setBareJid(bareJid);
     // TODO use original image
     if(!m_vCardManager.getAvatar(bareJid).isNull())
