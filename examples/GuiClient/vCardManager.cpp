@@ -90,6 +90,8 @@ void vCardManager::saveToCache(const QString& bareJid)
         if(file.open(QIODevice::ReadWrite))
         {
             QXmlStreamWriter stream(&file);
+            stream.setAutoFormatting(true);
+            stream.setAutoFormattingIndent(2);
             m_mapBareJidVcard[bareJid].toXml(&stream);
             file.close();
         }

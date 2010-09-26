@@ -138,6 +138,8 @@ void capabilitiesCollection::saveToCache(const QString& nodeVer)
     if(file.open(QIODevice::ReadWrite))
     {
         QXmlStreamWriter stream(&file);
+        stream.setAutoFormatting(true);
+        stream.setAutoFormattingIndent(2);
         m_mapCapabilities[nodeVer].toXml(&stream);
         file.close();
     }
