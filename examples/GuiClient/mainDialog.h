@@ -85,6 +85,7 @@ private slots:
     void addAccountToCache();
 
     void action_quit();
+    void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     void loadAccounts();

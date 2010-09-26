@@ -572,6 +572,10 @@ void mainDialog::createTrayIconAndMenu()
     bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
     Q_ASSERT(check);
 
+    check = connect(&m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                    SLOT(action_trayIconActivated(QSystemTrayIcon::ActivationReason)));
+        Q_ASSERT(check);
+
     m_trayIconMenu.addAction(&m_quitAction);
     m_trayIcon.setContextMenu(&m_trayIconMenu);
     m_trayIcon.show();
@@ -581,4 +585,17 @@ void mainDialog::closeEvent(QCloseEvent *event)
 {
     hide();
     event->ignore();
+}
+
+void mainDialog::action_trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason)
+    {
+    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::DoubleClick:
+        show();
+        break;
+    default:
+        ;
+    }
 }
