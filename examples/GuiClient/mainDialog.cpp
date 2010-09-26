@@ -519,10 +519,13 @@ void mainDialog::updateVCard(const QString& bareJid)
     }
     else
     {
-        if(m_vCardCache.getSelfFullName().isEmpty())
-            m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
-        else
-            m_statusWidget.setDisplayName(m_vCardCache.getSelfFullName());
+        QXmppVCardIq& vCard = m_vCardCache.getVCard(m_xmppClient.configuration().jidBare());
+        QString fullName = vCard.fullName();
+
+        if(fullName.isEmpty())
+            fullName = m_xmppClient.configuration().jidBare();
+
+        m_statusWidget.setDisplayName(fullName);
 
         m_statusWidget.setAvatar(m_vCardCache.getAvatar(bareJid));
     }

@@ -42,11 +42,9 @@ vCardCache::vCardCache(QXmppClient* client) : QObject(client),
 void vCardCache::vCardReceived(const QXmppVCardIq& vcard)
 {
     QString from = vcard.from();
+
     if(from.isEmpty() && m_client)
-    {
         from = m_client->configuration().jidBare();
-        m_selfFullName = vcard.fullName();
-    }
 
     m_mapBareJidVcard[from] = vcard;
 
@@ -124,11 +122,6 @@ void vCardCache::loadAllFromCache()
             }
         }
     }
-}
-
-QString vCardCache::getSelfFullName()
-{
-    return m_selfFullName;
 }
 
 // this should return scaled image
