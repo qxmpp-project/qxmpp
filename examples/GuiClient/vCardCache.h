@@ -22,8 +22,8 @@
  */
 
 
-#ifndef VCARDMANAGER_H
-#define VCARDMANAGER_H
+#ifndef VCARDCACHE_H
+#define VCARDCACHE_H
 
 #include <QObject>
 #include <QMap>
@@ -61,4 +61,4 @@ private:
     QMap<QString, QXmppVCardIq> m_mapBareJidVcard;
 };
 
-#endif // VCARDMANAGER_H
+#endif // VCARDCACHE_H
