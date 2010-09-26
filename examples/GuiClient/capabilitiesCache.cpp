@@ -88,11 +88,11 @@ void capabilitiesCache::infoReceived(const QXmppDiscoveryIq& discoIqRcv)
         discoIq.setFrom("");
         discoIq.setId("");
         m_mapCapabilities[discoIq.queryNode()] = discoIq;
-        saveToCache(discoIq.queryNode());
+        saveToFile(discoIq.queryNode());
     }
 }
 
-void capabilitiesCache::loadAllFromCache()
+void capabilitiesCache::loadFromFile()
 {
     m_mapCapabilities.clear();
 
@@ -118,7 +118,7 @@ void capabilitiesCache::loadAllFromCache()
     }
 }
 
-void capabilitiesCache::saveToCache(const QString& nodeVer)
+void capabilitiesCache::saveToFile(const QString& nodeVer)
 {
     if(!m_mapCapabilities.contains(nodeVer))
         return;

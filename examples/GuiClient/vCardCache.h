@@ -44,8 +44,8 @@ public:
     QImage getAvatar(const QString& bareJid) const;
     QXmppVCardIq& getVCard(const QString& bareJid);
 
-    void loadAllFromCache();
-    void saveToCache(const QString& bareJid);
+    void loadFromFile();
+    void saveToFile(const QString& bareJid);
 
 signals:
     void vCardReadyToUse(const QString& bareJid);

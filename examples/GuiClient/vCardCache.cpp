@@ -48,7 +48,7 @@ void vCardCache::vCardReceived(const QXmppVCardIq& vcard)
 
     m_mapBareJidVcard[from] = vcard;
 
-    saveToCache(from);
+    saveToFile(from);
 
     emit vCardReadyToUse(from);
 }
@@ -70,7 +70,7 @@ QXmppVCardIq& vCardCache::getVCard(const QString& bareJid)
     return m_mapBareJidVcard[bareJid];
 }
 
-void vCardCache::saveToCache(const QString& bareJid)
+void vCardCache::saveToFile(const QString& bareJid)
 {
     QDir dir;
     if(!dir.exists(getSettingsDir(m_client->configuration().jidBare())))
@@ -96,7 +96,7 @@ void vCardCache::saveToCache(const QString& bareJid)
     }
 }
 
-void vCardCache::loadAllFromCache()
+void vCardCache::loadFromFile()
 {
     m_mapBareJidVcard.clear();
 

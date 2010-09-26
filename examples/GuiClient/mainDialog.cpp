@@ -418,8 +418,8 @@ void mainDialog::signIn()
 
     m_rosterItemModel.clear();
 
-    m_vCardCache.loadAllFromCache();
-    m_capabilitiesCache.loadAllFromCache();
+    m_vCardCache.loadFromFile();
+    m_capabilitiesCache.loadFromFile();
 
     startConnection();
 }

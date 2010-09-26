@@ -42,8 +42,8 @@ public:
     bool isCapabilityAvailable(const QString& nodeVer);
     void requestInfo(const QString& jid, const QString& nodeVer);
 
-    void loadAllFromCache();
-    void saveToCache(const QString& nodeVer);
+    void loadFromFile();
+    void saveToFile(const QString& nodeVer);
 
     QStringList getFeatures(const QString& nodeVer);
     QStringList getIdentities(const QString& nodeVer);
