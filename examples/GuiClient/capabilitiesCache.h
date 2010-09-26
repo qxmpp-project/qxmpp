@@ -43,7 +43,6 @@ public:
     void requestInfo(const QString& jid, const QString& nodeVer);
 
     void loadFromFile();
-    void saveToFile(const QString& nodeVer);
 
     QStringList getFeatures(const QString& nodeVer);
     QStringList getIdentities(const QString& nodeVer);
@@ -54,6 +53,8 @@ private slots:
     void infoReceived(const QXmppDiscoveryIq&);
 
 private:
+    void saveToFile(const QString& nodeVer);
+
     QXmppClient* m_client;
 
     QMap<QString, QXmppDiscoveryIq> m_mapCapabilities;

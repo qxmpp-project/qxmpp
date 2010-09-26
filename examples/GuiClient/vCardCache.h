@@ -39,13 +39,12 @@ class vCardCache : public QObject
 public:
     vCardCache(QXmppClient* client);
 
-    void requestVCard(const QString& bareJid);
     bool isVCardAvailable(const QString& bareJid);
-    QImage getAvatar(const QString& bareJid) const;
+    void requestVCard(const QString& bareJid);
     QXmppVCardIq& getVCard(const QString& bareJid);
+    QImage getAvatar(const QString& bareJid) const;
 
     void loadFromFile();
-    void saveToFile(const QString& bareJid);
 
 signals:
     void vCardReadyToUse(const QString& bareJid);
@@ -54,6 +53,8 @@ public slots:
     void vCardReceived(const QXmppVCardIq&);
 
 private:
+    void saveToFile(const QString& bareJid);
+
     QXmppClient* m_client;
 
     QMap<QString, QXmppVCardIq> m_mapBareJidVcard;
