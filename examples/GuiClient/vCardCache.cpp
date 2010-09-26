@@ -82,7 +82,7 @@ void vCardCache::saveToCache(const QString& bareJid)
     if(!dir2.exists(getSettingsDir(m_client->configuration().jidBare())+ "vCards/"))
         dir2.mkpath(getSettingsDir(m_client->configuration().jidBare())+ "vCards/");
 
-    foreach(QString bareJid, m_mapBareJidVcard.keys())
+    if(m_mapBareJidVcard.contains(bareJid))
     {
         QString fileVCard = getSettingsDir(m_client->configuration().jidBare()) + "vCards/" + bareJid + ".xml";
         QFile file(fileVCard);
