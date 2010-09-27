@@ -571,7 +571,7 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
 {
     foreach (QXmppClientExtension *extension, d->extensions)
     {
-        if (extension->handleStanza(d->stream, element))
+        if (extension->handleStanza(element))
         {
             handled = true;
             return;

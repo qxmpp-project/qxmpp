@@ -580,10 +580,8 @@ QStringList QXmppTransferManager::discoveryFeatures() const
         << ns_stream_initiation_file_transfer; // XEP-0096: SI File Transfer
 }
 
-bool QXmppTransferManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppTransferManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.tagName() != "iq")
         return false;
 

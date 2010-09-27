@@ -51,10 +51,8 @@ QStringList QXmppMucManager::discoveryFeatures() const
         << ns_muc_user;
 }
 
-bool QXmppMucManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppMucManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.tagName() == "iq")
     {
         if (QXmppMucAdminIq::isMucAdminIq(element))

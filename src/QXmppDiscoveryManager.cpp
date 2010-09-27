@@ -43,7 +43,7 @@ QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
     }
 }
 
-bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
     {
@@ -59,7 +59,7 @@ bool QXmppDiscoveryManager::handleStanza(QXmppStream *stream, const QDomElement 
             qxmppFeatures.setId(receivedIq.id());
             qxmppFeatures.setTo(receivedIq.from());
             qxmppFeatures.setQueryNode(receivedIq.queryNode());
-            stream->sendPacket(qxmppFeatures);
+            client()->sendPacket(qxmppFeatures);
         }
         else if(receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery)
             emit infoReceived(receivedIq);

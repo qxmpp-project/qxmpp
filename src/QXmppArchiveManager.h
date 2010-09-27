@@ -50,7 +50,7 @@ public:
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
 
     /// \cond
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    bool handleStanza(const QDomElement &element);
     /// \endcond
 
 signals:

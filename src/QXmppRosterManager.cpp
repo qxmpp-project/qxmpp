@@ -69,10 +69,8 @@ void QXmppRosterManager::disconnected()
     m_isRosterReceived = false;
 }
 
-bool QXmppRosterManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppRosterManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if(element.tagName() == "iq" && QXmppRosterIq::isRosterIq(element))
     {
         QXmppRosterIq rosterIq;

@@ -82,7 +82,7 @@ public:
                               const QString& resource) const;
 
     /// \cond
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    bool handleStanza(const QDomElement &element);
     /// \endcond
 
     // deprecated in release 0.2.0

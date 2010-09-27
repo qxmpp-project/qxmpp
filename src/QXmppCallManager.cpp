@@ -426,10 +426,8 @@ QStringList QXmppCallManager::discoveryFeatures() const
         << ns_jingle_ice_udp;    // XEP-0176 : Jingle ICE-UDP Transport Method
 }
 
-bool QXmppCallManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppCallManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if(element.tagName() == "iq")
     {
         // XEP-0166: Jingle

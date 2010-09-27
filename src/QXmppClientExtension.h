@@ -46,7 +46,7 @@ public:
     virtual ~QXmppClientExtension();
 
     virtual QStringList discoveryFeatures() const;
-    virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza) = 0;
+    virtual bool handleStanza(const QDomElement &stanza) = 0;
 
 signals:
     /// This signal is emitted to send logging messages.

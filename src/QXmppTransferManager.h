@@ -230,7 +230,7 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const;
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    bool handleStanza(const QDomElement &element);
     /// \endcond
 
 signals:

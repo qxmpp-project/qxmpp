@@ -47,10 +47,8 @@ QStringList QXmppVersionManager::discoveryFeatures() const
     return QStringList() << ns_version;
 }
 
-bool QXmppVersionManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppVersionManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
     {
         QXmppVersionIq versionIq;

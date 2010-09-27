@@ -49,10 +49,8 @@ QStringList QXmppEntityTimeManager::discoveryFeatures() const
     return QStringList() << ns_entity_time;
 }
 
-bool QXmppEntityTimeManager::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if(element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element))
     {
         QXmppEntityTimeIq entityTime;
