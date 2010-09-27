@@ -430,7 +430,8 @@ QXmppRosterManager& QXmppClient::rosterManager()
 }
 
 /// Utility function to send message to all the resources associated with the
-/// specified bareJid.
+/// specified bareJid. If there are no resources available, that is the contact
+/// is offile, it will send an offline message to the bareJid.
 ///
 /// \param bareJid bareJid of the receiving entity
 /// \param message Message string to be sent.
