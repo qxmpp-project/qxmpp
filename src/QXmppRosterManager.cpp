@@ -77,8 +77,16 @@ bool QXmppRosterManager::handleStanza(QXmppStream *stream, const QDomElement &el
     {
         QXmppRosterIq rosterIq;
         rosterIq.parse(element);
-        rosterIqReceived(rosterIq);
-        return true;
+
+        // Security check: only server should send this iq
+        // from() should be either empty or bareJid of the user
+        QString fromJid = rosterIq.from();
+        if(fromJid.isEmpty() ||
+           fromJid == client()->configuration().jidBare())
+        {
+            rosterIqReceived(rosterIq);
+            return true;
+        }
     }
 
     return false;
