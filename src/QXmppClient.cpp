@@ -438,9 +438,16 @@ QXmppRosterManager& QXmppClient::rosterManager()
 void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 {
     QStringList resources = rosterManager().getResources(bareJid);
-    for(int i = 0; i < resources.size(); ++i)
+    if(!resources.isEmpty())
     {
-        sendPacket(QXmppMessage("", bareJid + "/" + resources.at(i), message));
+        for(int i = 0; i < resources.size(); ++i)
+        {
+            sendPacket(QXmppMessage("", bareJid + "/" + resources.at(i), message));
+        }
+    }
+    else
+    {
+        sendPacket(QXmppMessage("", bareJid, message));
     }
 }
 
