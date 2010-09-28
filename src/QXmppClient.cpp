@@ -243,7 +243,7 @@ QXmppClient::~QXmppClient()
 ///
 /// \param extension
 
-void QXmppClient::addExtension(QXmppClientExtension *extension)
+void QXmppClient::addExtension(QXmppClientExtension* extension)
 {
     extension->setParent(this);
     extension->setClient(this);

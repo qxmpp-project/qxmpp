@@ -94,7 +94,7 @@ public:
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
 
-    void addExtension(QXmppClientExtension *extension);
+    void addExtension(QXmppClientExtension* extension);
     void removeExtension(QXmppClientExtension* extension);
 
     QList<QXmppClientExtension*> extensions();
