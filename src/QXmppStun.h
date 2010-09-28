@@ -134,9 +134,10 @@ private:
         QXmppJingleCandidate remote;
         QXmppJingleCandidate reflexive;
         QByteArray transaction;
+        QUdpSocket *socket;
     };
 
-    Pair *addRemoteCandidate(const QHostAddress &host, quint16 port);
+    Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port);
     void debug(const QString &message, QXmppLogger::MessageType = QXmppLogger::DebugMessage);
     qint64 writeStun(const QXmppStunMessage &message, QXmppStunSocket::Pair *pair);
 
@@ -152,7 +153,7 @@ private:
     QString m_remoteUser;
     QString m_remotePassword;
 
-    QUdpSocket *m_socket;
+    QList<QUdpSocket*> m_sockets;
     QTimer *m_timer;
 
     // STUN server
@@ -192,6 +193,9 @@ signals:
     // This signal is emitted once ICE negotiation succeeds.
     void connected();
 
+    // This signal is emitted when ICE negotiation fails.
+    void disconnected();
+
     // This signal is emitted when a data packet is received.
     void datagramReceived(int component, const QByteArray &datagram);
 
@@ -204,8 +208,10 @@ signals:
 private slots:
     void slotConnected();
     void slotDatagramReceived(const QByteArray &datagram);
+    void slotTimeout();
 
 private:
+    QTimer *m_connectTimer;
     bool m_controlling;
     QMap<int, QXmppStunSocket*> m_components;
     QString m_localUser;
