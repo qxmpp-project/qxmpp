@@ -260,6 +260,19 @@ void QXmppClient::addExtension(QXmppClientExtension *extension)
     d->extensions << extension;
 }
 
+void QXmppClient::removeExtension(QXmppClientExtension* extension)
+{
+    QList<QXmppClientExtension*> list = extensions();
+    for (int i = 0; i < list.size(); ++i)
+    {
+        if(extension == list.at(i))
+        {
+            list.takeAt(i);
+            delete extension;
+        }
+    }
+}
+
 /// Returns a list containing all the client's extensions.
 ///
 
