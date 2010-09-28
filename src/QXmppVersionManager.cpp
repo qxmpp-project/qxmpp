@@ -37,6 +37,16 @@ QXmppVersionManager::QXmppVersionManager() : QXmppClientExtension(),
     if(m_clientName.isEmpty())
         m_clientName = "Based on QXmpp";
 
+#if defined(Q_OS_LINUX)
+    m_clientOs = QString::fromLatin1("Linux");
+#elif defined(Q_OS_MAC)
+    m_clientOs = QString::fromLatin1("Mac OS");
+#elif defined(Q_OS_SYMBIAN)
+    m_clientOs = QString::fromLatin1("Symbian");
+#elif defined(Q_OS_WIN)
+    m_clientOs = QString::fromLatin1("Windows");
+#endif
+
     if(m_clientVersion.isEmpty())
         m_clientVersion = QXmppVersion();
 }
