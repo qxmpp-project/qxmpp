@@ -660,7 +660,7 @@ void mainDialog::action_addContact()
 {
     bool ok;
     QString bareJid = QInputDialog::getText(this, "Add a jabber contact",
-                                            "Contact ID:", QLineEdit::Normal, "manjeetd@gmail.com", &ok);
+                                            "Contact ID:", QLineEdit::Normal, "", &ok);
 
     if(ok && !bareJid.isEmpty())
     {
