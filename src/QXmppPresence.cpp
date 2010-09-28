@@ -96,7 +96,7 @@ void QXmppPresence::parse(const QDomElement &element)
                 m_vCardUpdateType = PhotoNotReady;
             }
         }
-        else
+        else if (xElement.tagName() != "error")
         {
             // other extensions
             extensions << QXmppElement(xElement);
