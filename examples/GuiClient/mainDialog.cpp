@@ -41,6 +41,8 @@
 
 #include <QMovie>
 #include <QCompleter>
+#include <QInputDialog>
+#include <QMessageBox>
 
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
@@ -72,6 +74,11 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     check = connect(&m_xmppClient.rosterManager(),
                          SIGNAL(rosterChanged(const QString&)),
                          this, SLOT(rosterChanged(const QString&)));
+    Q_ASSERT(check);
+
+    check = connect(&m_xmppClient,
+                         SIGNAL(presenceReceived(const QXmppPresence&)),
+                         this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FileLogging);
@@ -159,6 +166,9 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     check = connect(&m_vCardCache,
                     SIGNAL(vCardReadyToUse(const QString&)),
                     SLOT(updateVCard(const QString&)));
+    Q_ASSERT(check);
+
+    check = connect(ui->pushButton_addContact, SIGNAL(clicked()), SLOT(action_addContact()));
     Q_ASSERT(check);
 }
 
@@ -640,5 +650,81 @@ void mainDialog::action_trayIconActivated(QSystemTrayIcon::ActivationReason reas
         break;
     default:
         ;
+    }
+}
+
+void mainDialog::action_addContact()
+{
+    bool ok;
+    QString bareJid = QInputDialog::getText(this, "Add a jabber contact",
+                                            "Contact ID:", QLineEdit::Normal, "manjeetd@gmail.com", &ok);
+
+    if(ok && !bareJid.isEmpty())
+    {
+        //TODO: check for valid bareJid
+        QXmppPresence subscribe;
+        subscribe.setTo(bareJid);
+        subscribe.setType(QXmppPresence::Subscribe);
+        m_xmppClient.sendPacket(subscribe);
+    }
+}
+
+void mainDialog::presenceReceived(const QXmppPresence& presence)
+{
+    QString from = presence.from();
+
+    QString message;
+    switch(presence.type())
+    {
+    case QXmppPresence::Subscribe:
+        message = "<B>%1</B> wants to subscribe";
+        break;
+    case QXmppPresence::Subscribed:
+        message = "<B>%1</B> accepted your request";
+        break;
+    case QXmppPresence::Unsubscribe:
+//        message = "<B>%1</B> unsubscribe";
+        break;
+    case QXmppPresence::Unsubscribed:
+//        message = "<B>%1</B> unsubscribed";
+        break;
+    default:
+        return;
+        break;
+    }
+
+    if(message.isEmpty())
+        return;
+
+    int retButton = QMessageBox::question(
+            this, "Contact Subscription", message.arg(from),
+            QMessageBox::Yes, QMessageBox::No);
+
+    switch(retButton)
+    {
+    case QMessageBox::Yes:
+        {
+            QXmppPresence subscribed;
+            subscribed.setTo(from);
+            subscribed.setType(QXmppPresence::Subscribed);
+            m_xmppClient.sendPacket(subscribed);
+
+            // reciprocal subscription
+            QXmppPresence subscribe;
+            subscribe.setTo(from);
+            subscribe.setType(QXmppPresence::Subscribe);
+            m_xmppClient.sendPacket(subscribe);
+        }
+        break;
+    case QMessageBox::No:
+        {
+            QXmppPresence unsubscribed;
+            unsubscribed.setTo(from);
+            unsubscribed.setType(QXmppPresence::Unsubscribed);
+            m_xmppClient.sendPacket(unsubscribed);
+        }
+        break;
+    default:
+        break;
     }
 }

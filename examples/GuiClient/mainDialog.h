@@ -83,7 +83,9 @@ private slots:
     void showProfile(const QString& bareJid);
     void userNameCompleter_activated(const QString&);
     void addAccountToCache();
+    void presenceReceived(const QXmppPresence&);
 
+    void action_addContact();
     void action_signOut();
     void action_quit();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
