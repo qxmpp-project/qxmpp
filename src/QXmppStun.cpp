@@ -614,30 +614,24 @@ QString QXmppStunMessage::toString() const
         dumpLines << QString(" * USERNAME %1").arg(username);
     if (errorCode)
         dumpLines << QString(" * ERROR-CODE %1 %2")
-            .arg(QString::number(errorCode))
-            .arg(errorPhrase);
+            .arg(QString::number(errorCode), errorPhrase);
     if (!software.isEmpty())
         dumpLines << QString(" * SOFTWARE %1").arg(software);
     if (mappedPort)
         dumpLines << QString(" * MAPPED-ADDRESS %1 %2")
-            .arg(mappedHost.toString())
-            .arg(QString::number(mappedPort));
+            .arg(mappedHost.toString(), QString::number(mappedPort));
     if (sourcePort)
         dumpLines << QString(" * SOURCE-ADDRESS %1 %2")
-            .arg(sourceHost.toString())
-            .arg(QString::number(sourcePort));
+            .arg(sourceHost.toString(), QString::number(sourcePort));
     if (changedPort)
         dumpLines << QString(" * CHANGED-ADDRESS %1 %2")
-            .arg(changedHost.toString())
-            .arg(QString::number(changedPort));
+            .arg(changedHost.toString(), QString::number(changedPort));
     if (otherPort)
         dumpLines << QString(" * OTHER-ADDRESS %1 %2")
-            .arg(otherHost.toString())
-            .arg(QString::number(otherPort));
+            .arg(otherHost.toString(), QString::number(otherPort));
     if (xorMappedPort)
         dumpLines << QString(" * XOR-MAPPED-ADDRESS %1 %2")
-            .arg(xorMappedHost.toString())
-            .arg(QString::number(xorMappedPort));
+            .arg(xorMappedHost.toString(), QString::number(xorMappedPort));
     if (priority)
         dumpLines << QString(" * PRIORITY %1").arg(QString::number(priority));
     if (!iceControlling.isEmpty())
