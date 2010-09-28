@@ -86,6 +86,7 @@ private slots:
     void presenceReceived(const QXmppPresence&);
 
     void action_addContact();
+    void action_removeContact(const QString& bareJid);
     void action_signOut();
     void action_quit();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);

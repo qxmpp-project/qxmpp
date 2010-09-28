@@ -738,3 +738,16 @@ void mainDialog::presenceReceived(const QXmppPresence& presence)
     QMessageBox::information(this, "Contact Subscription", message.arg(from),
             QMessageBox::Ok);
 }
+
+void mainDialog::action_removeContact(const QString& bareJid)
+{
+    // TODO: check valid bareJid
+
+    QXmppRosterIq remove;
+    remove.setType(QXmppIq::Set);
+    QXmppRosterIq::Item itemRemove;
+    itemRemove.setSubscriptionType(QXmppRosterIq::Item::Remove);
+    itemRemove.setBareJid(bareJid);
+    remove.addItem(itemRemove);
+    m_xmppClient.sendPacket(remove);
+}
