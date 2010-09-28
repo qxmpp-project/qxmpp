@@ -28,7 +28,8 @@
 #include <QMenu>
 #include <QKeyEvent>
 
-customListView::customListView(QWidget* parent):QListView(parent), m_chat("Chat", this), m_profile("View Profile", this)
+customListView::customListView(QWidget* parent):QListView(parent), m_chat("Chat", this),
+m_profile("View Profile", this), m_removeContact("Remove", this)
 {
     bool check = connect(this, SIGNAL(pressed(const QModelIndex&)), this,
                          SLOT(mousePressed(const QModelIndex&)));
@@ -45,6 +46,10 @@ customListView::customListView(QWidget* parent):QListView(parent), m_chat("Chat"
 
     check = connect(&m_profile, SIGNAL(triggered()), this,
                          SLOT(showProfile_helper()));
+    Q_ASSERT(check);
+
+    check = connect(&m_removeContact, SIGNAL(triggered()), this,
+                         SLOT(removeContact_helper()));
     Q_ASSERT(check);
 }
 
@@ -104,4 +109,11 @@ void customListView::keyPressEvent(QKeyEvent* event1)
         showChatDialog_helper();
     }
     QListView::keyPressEvent(event1);
+}
+
+void customListView::removeContact_helper()
+{
+    QString bareJid = selectedBareJid();
+    if(!bareJid.isEmpty())
+        emit removeContact(bareJid);
 }

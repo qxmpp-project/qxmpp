@@ -44,6 +44,7 @@ public slots:
 private slots:
     void showChatDialog_helper();
     void showProfile_helper();
+    void removeContact_helper();
 
 protected:
     void keyPressEvent(QKeyEvent*);
@@ -51,6 +52,7 @@ protected:
 signals:
     void showChatDialog(const QString& bareJid);
     void showProfile(const QString& bareJid);
+    void removeContact(const QString& bareJid);
 
 private:
     QString selectedBareJid();
@@ -58,6 +60,7 @@ private:
 private:
     QAction m_chat;
     QAction m_profile;
+    QAction m_removeContact;
 };
 
 #endif // CUSTOMLISTVIEW_H
