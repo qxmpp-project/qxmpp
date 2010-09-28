@@ -103,19 +103,25 @@ static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &a
 
 static void encodeAddress(QDataStream &stream, quint16 type, const QHostAddress &address, quint16 port)
 {
-    stream << type;
-    stream << quint16(8);
-    stream << quint8(0);
+    const quint8 reserved = 0;
     if (address.protocol() == QAbstractSocket::IPv4Protocol)
     {
+        stream << type;
+        stream << quint16(8);
+        stream << reserved;
         stream << quint8(STUN_IPV4);
         stream << port;
         stream << address.toIPv4Address();
     } else if (address.protocol() == QAbstractSocket::IPv6Protocol) {
+        stream << type;
+        stream << quint16(20);
+        stream << reserved;
         stream << quint8(STUN_IPV6);
         stream << port;
         Q_IPV6ADDR addr = address.toIPv6Address();
         stream.writeRawData((char*)&addr, sizeof(addr));
+    } else {
+        qWarning("Cannot write STUN attribute for unknown IP version");
     }
 }
 
@@ -452,15 +458,18 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
         (xorMappedHost.protocol() == QAbstractSocket::IPv4Protocol ||
          xorMappedHost.protocol() == QAbstractSocket::IPv6Protocol))
     {
+        const quint8 reserved = 0;
         stream << quint16(XorMappedAddress);
-        stream << quint16(8);
-        stream << quint8(0);
         if (xorMappedHost.protocol() == QAbstractSocket::IPv4Protocol)
         {
+            stream << quint16(8);
+            stream << reserved;
             stream << quint8(STUN_IPV4);
             stream << quint16(xorMappedPort ^ (STUN_MAGIC >> 16));
             stream << quint32(xorMappedHost.toIPv4Address() ^ STUN_MAGIC);
         } else {
+            stream << quint16(20);
+            stream << reserved;
             stream << quint8(STUN_IPV6);
             stream << quint16(xorMappedPort ^ (STUN_MAGIC >> 16));
             Q_IPV6ADDR addr = xorMappedHost.toIPv6Address();
