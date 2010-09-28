@@ -89,6 +89,10 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
         this, SLOT(updateOpenMode()));
     Q_ASSERT(check);
 
+    check = connect(m_connection, SIGNAL(disconnected()),
+        this, SLOT(hangup()));
+    Q_ASSERT(check);
+
     check = connect(m_connection, SIGNAL(datagramReceived(int,QByteArray)),
         this, SLOT(datagramReceived(int, QByteArray)));
     Q_ASSERT(check);
@@ -218,7 +222,7 @@ void QXmppCall::updateOpenMode()
     // determine mode
     if (m_codec && m_connection->isConnected() && m_state != ActiveState)
     {
-        open(QIODevice::ReadWrite);
+        open(QIODevice::ReadWrite | QIODevice::Unbuffered);
         setState(ActiveState);
         emit connected();
     }
