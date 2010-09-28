@@ -680,16 +680,52 @@ void mainDialog::presenceReceived(const QXmppPresence& presence)
     switch(presence.type())
     {
     case QXmppPresence::Subscribe:
-        message = "<B>%1</B> wants to subscribe";
+        {
+            message = "<B>%1</B> wants to subscribe";
+
+            int retButton = QMessageBox::question(
+                    this, "Contact Subscription", message.arg(from),
+                    QMessageBox::Yes, QMessageBox::No);
+
+            switch(retButton)
+            {
+            case QMessageBox::Yes:
+                {
+                    QXmppPresence subscribed;
+                    subscribed.setTo(from);
+                    subscribed.setType(QXmppPresence::Subscribed);
+                    m_xmppClient.sendPacket(subscribed);
+
+                    // reciprocal subscription
+                    QXmppPresence subscribe;
+                    subscribe.setTo(from);
+                    subscribe.setType(QXmppPresence::Subscribe);
+                    m_xmppClient.sendPacket(subscribe);
+                }
+                break;
+            case QMessageBox::No:
+                {
+                    QXmppPresence unsubscribed;
+                    unsubscribed.setTo(from);
+                    unsubscribed.setType(QXmppPresence::Unsubscribed);
+                    m_xmppClient.sendPacket(unsubscribed);
+                }
+                break;
+            default:
+                break;
+            }
+
+            return;
+        }
         break;
     case QXmppPresence::Subscribed:
         message = "<B>%1</B> accepted your request";
         break;
     case QXmppPresence::Unsubscribe:
-//        message = "<B>%1</B> unsubscribe";
+        message = "<B>%1</B> unsubscribe";
         break;
     case QXmppPresence::Unsubscribed:
-//        message = "<B>%1</B> unsubscribed";
+        message = "<B>%1</B> unsubscribed";
         break;
     default:
         return;
@@ -699,35 +735,6 @@ void mainDialog::presenceReceived(const QXmppPresence& presence)
     if(message.isEmpty())
         return;
 
-    int retButton = QMessageBox::question(
-            this, "Contact Subscription", message.arg(from),
-            QMessageBox::Yes, QMessageBox::No);
-
-    switch(retButton)
-    {
-    case QMessageBox::Yes:
-        {
-            QXmppPresence subscribed;
-            subscribed.setTo(from);
-            subscribed.setType(QXmppPresence::Subscribed);
-            m_xmppClient.sendPacket(subscribed);
-
-            // reciprocal subscription
-            QXmppPresence subscribe;
-            subscribe.setTo(from);
-            subscribe.setType(QXmppPresence::Subscribe);
-            m_xmppClient.sendPacket(subscribe);
-        }
-        break;
-    case QMessageBox::No:
-        {
-            QXmppPresence unsubscribed;
-            unsubscribed.setTo(from);
-            unsubscribed.setType(QXmppPresence::Unsubscribed);
-            m_xmppClient.sendPacket(unsubscribed);
-        }
-        break;
-    default:
-        break;
-    }
+    QMessageBox::information(this, "Contact Subscription", message.arg(from),
+            QMessageBox::Ok);
 }
