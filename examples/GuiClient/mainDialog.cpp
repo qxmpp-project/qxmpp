@@ -107,6 +107,10 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
                     this, SLOT(showProfile(const QString&)));
     Q_ASSERT(check);
 
+    check = connect(ui->listView, SIGNAL(removeContact(const QString&)),
+                    this, SLOT(action_removeContact(const QString&)));
+    Q_ASSERT(check);
+
     check = connect(&m_xmppClient, SIGNAL(messageReceived(const QXmppMessage&)),
                     SLOT(messageReceived(const QXmppMessage&)));
     Q_ASSERT(check);

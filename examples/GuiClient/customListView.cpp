@@ -67,6 +67,7 @@ void customListView::mousePressed(const QModelIndex& index)
         menu.addAction(&m_chat);
         menu.setDefaultAction(&m_chat);
         menu.addAction(&m_profile);
+        menu.addAction(&m_removeContact);
         menu.exec(QCursor::pos());
     }
 }
