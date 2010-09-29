@@ -161,6 +161,8 @@ QString profileDialog::getCapability(const QString& resource)
     }
 
     resultIdentities.removeDuplicates();
+    resultFeatures.removeDuplicates();
+
     QString result;
     result += "<B>Disco Identities:</B><BR>";
     result += resultIdentities.join("<BR>");
