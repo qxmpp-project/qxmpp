@@ -32,6 +32,8 @@
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
+static int typeId = qRegisterMetaType<QXmppCall::State>();
+
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
@@ -467,8 +469,11 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 {
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
     call->m_sid = generateStanzaHash();
+
+    // register call
     m_calls << call;
-    connect(call, SIGNAL(destroyed(QObject*)), this, SLOT(callDestroyed(QObject*)));
+    connect(call, SIGNAL(destroyed(QObject*)),
+        this, SLOT(callDestroyed(QObject*)));
     connect(call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
     connect(call, SIGNAL(localCandidatesChanged()),
@@ -715,7 +720,9 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         }
 
         // register call
-        m_calls.append(call);
+        m_calls << call;
+        connect(call, SIGNAL(destroyed(QObject*)),
+            this, SLOT(callDestroyed(QObject*)));
         connect(call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
         connect(call, SIGNAL(localCandidatesChanged()),

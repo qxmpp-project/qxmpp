@@ -26,6 +26,7 @@
 
 #include <QObject>
 #include <QIODevice>
+#include <QMetaType>
 
 #include "QXmppClientExtension.h"
 #include "QXmppJingleIq.h"
@@ -214,5 +215,7 @@ private:
 
     QList<QXmppCall*> m_calls;
 };
+
+Q_DECLARE_METATYPE(QXmppCall::State)
 
 #endif
