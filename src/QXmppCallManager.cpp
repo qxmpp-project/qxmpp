@@ -61,6 +61,7 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     m_codec(0),
     m_incomingBuffering(true),
     m_incomingMinimum(0),
+    m_incomingMaximum(0),
     m_incomingSequence(0),
     m_incomingStamp(0),
     m_outgoingMarker(true),
@@ -207,6 +208,7 @@ void QXmppCall::setPayloadType(const QXmppJinglePayloadType &payloadType)
 
     // initial number of bytes to buffer
     m_incomingMinimum = m_outgoingChunk * 5;
+    m_incomingMaximum = m_outgoingChunk * 8;
 
     updateOpenMode();
 }
@@ -301,6 +303,16 @@ void QXmppCall::datagramReceived(int component, const QByteArray &buffer)
     output.setByteOrder(QDataStream::LittleEndian);
     m_codec->decode(stream, output);
 
+    // check whether we are running late
+    if (m_incomingBuffer.size() > m_incomingMaximum)
+    {
+        const qint64 droppedSize = m_incomingBuffer.size() - m_incomingMinimum;
+        emit logMessage(QXmppLogger::DebugMessage,
+            QString("RTP buffer is too full, dropping %1 bytes")
+                .arg(QString::number(droppedSize)));
+        m_incomingBuffer = m_incomingBuffer.right(m_incomingMinimum);
+        m_incomingStamp += droppedSize / SAMPLE_BYTES;
+    }
     // check whether we have filled the initial buffer
     if (m_incomingBuffer.size() >= m_incomingMinimum)
         m_incomingBuffering = false;

@@ -151,6 +151,7 @@ private:
     QByteArray m_incomingBuffer;
     bool m_incomingBuffering;
     int m_incomingMinimum;
+    int m_incomingMaximum;
     quint16 m_incomingSequence;
     quint32 m_incomingStamp;
 
