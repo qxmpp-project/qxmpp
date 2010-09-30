@@ -710,8 +710,13 @@ bool QXmppStunSocket::bind()
 
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
+            // FIXME: on Mac OS X, sending IPv6 UDP packets fails
+#ifdef Q_OS_MAC
+            if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
+#else
             if ((entry.ip().protocol() != QAbstractSocket::IPv4Protocol &&
                  entry.ip().protocol() != QAbstractSocket::IPv6Protocol) ||
+#endif
                 entry.netmask().isNull() ||
                 entry.netmask() == QHostAddress::Broadcast)
                 continue;
