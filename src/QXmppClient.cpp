@@ -243,8 +243,14 @@ QXmppClient::~QXmppClient()
 ///
 /// \param extension
 
-void QXmppClient::addExtension(QXmppClientExtension* extension)
+bool QXmppClient::addExtension(QXmppClientExtension* extension)
 {
+    if (d->extensions.contains(extension))
+    {
+        qWarning("Cannot add extension, it has already been added");
+        return false;
+    }
+
     extension->setParent(this);
     extension->setClient(this);
 
@@ -258,18 +264,24 @@ void QXmppClient::addExtension(QXmppClientExtension* extension)
     d->stream->addFeatures(extension->discoveryFeatures());
 
     d->extensions << extension;
+    return true;
 }
 
-void QXmppClient::removeExtension(QXmppClientExtension* extension)
+/// Unregisters the given extension from the client. If the extension
+/// is found, it will be destroyed.
+///
+/// \param extension
+
+bool QXmppClient::removeExtension(QXmppClientExtension* extension)
 {
-    QList<QXmppClientExtension*> list = extensions();
-    for (int i = 0; i < list.size(); ++i)
+    if (d->extensions.contains(extension))
     {
-        if(extension == list.at(i))
-        {
-            list.takeAt(i);
-            delete extension;
-        }
+        d->extensions.removeAll(extension);
+        delete extension;
+        return true;
+    } else {
+        qWarning("Cannot remove extension, it was never added");
+        return false;
     }
 }
 
