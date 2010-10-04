@@ -42,4 +42,6 @@ QString getImageHash(const QByteArray& image);
 QImage getImageFromByteArray(const QByteArray& image);
 QString getImageType1(const QByteArray& image);
 
+bool isValidBareJid(const QString& bareJid);
+
 #endif // CLIENTUTILS_H

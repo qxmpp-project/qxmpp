@@ -149,3 +149,9 @@ QString getImageType1(const QByteArray& image)
 
     return "image/unknown";
 }
+
+bool isValidBareJid(const QString& bareJid)
+{
+    QRegExp re("^[^@]+@[^@]+$");
+    return re.exactMatch(bareJid);
+}
