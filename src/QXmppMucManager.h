@@ -47,7 +47,7 @@ class QXmppMucManager : public QXmppClientExtension
 public:
     QXmppMucManager(QXmppClient* client);
 
-    bool joinRoom(const QString &roomJid, const QString &nickName);
+    bool joinRoom(const QString &roomJid, const QString &nickName, const QString &password = QString());
     bool leaveRoom(const QString &roomJid);
 
     bool requestRoomConfiguration(const QString &roomJid);

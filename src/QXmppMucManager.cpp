@@ -77,11 +77,12 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 ///
 /// \param roomJid
 /// \param nickName
+/// \param password an optional password if the room is password-protected
 ///
 /// \return true if the request was sent, false otherwise
 ///
 
-bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName)
+bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName, const QString &password)
 {
     QXmppPresence packet;
     packet.setTo(roomJid + "/" + nickName);
@@ -89,6 +90,13 @@ bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName)
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_muc);
+    if (!password.isEmpty())
+    {
+        QXmppElement p;
+        p.setTagName("password");
+        p.setValue(password);
+        x.appendChild(p);
+    }
     packet.setExtensions(x);
     if (client()->sendPacket(packet))
     {
