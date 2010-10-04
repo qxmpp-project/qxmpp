@@ -666,9 +666,17 @@ void mainDialog::action_addContact()
     QString bareJid = QInputDialog::getText(this, "Add a jabber contact",
                                             "Contact ID:", QLineEdit::Normal, "", &ok);
 
+    if(!ok)
+        return;
+
+    if(!isValidBareJid(bareJid))
+    {
+        QMessageBox::information(this, "Invalid ID", "Specified ID <I>"+bareJid + " </I> is invalid.");
+        return;
+    }
+
     if(ok && !bareJid.isEmpty())
     {
-        //TODO: check for valid bareJid
         QXmppPresence subscribe;
         subscribe.setTo(bareJid);
         subscribe.setType(QXmppPresence::Subscribe);
@@ -745,7 +753,8 @@ void mainDialog::presenceReceived(const QXmppPresence& presence)
 
 void mainDialog::action_removeContact(const QString& bareJid)
 {
-    // TODO: check valid bareJid
+    if(!isValidBareJid(bareJid))
+        return;
 
     QXmppRosterIq remove;
     remove.setType(QXmppIq::Set);
