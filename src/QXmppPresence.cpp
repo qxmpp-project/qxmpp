@@ -102,6 +102,7 @@ void QXmppPresence::parse(const QDomElement &element)
             m_capabilityNode = xElement.attribute("node");
             m_capabilityVer = xElement.attribute("ver");
             m_capabilityHash = xElement.attribute("hash");
+            m_capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
         }
         else if (xElement.tagName() == "error")
         {
@@ -460,6 +461,10 @@ void QXmppPresence::setCapabilityVer(const QString& ver)
     m_capabilityVer = ver;
 }
 
+QStringList QXmppPresence::capabilityExt()
+{
+    return m_capabilityExt;
+}
 
 /// \cond
 

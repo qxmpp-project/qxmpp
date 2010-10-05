@@ -128,6 +128,8 @@ public:
     QString capabilityVer();
     void setCapabilityVer(const QString&);
 
+    QStringList capabilityExt();
+
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
     /// \cond
@@ -155,6 +157,7 @@ private:
     QString m_capabilityHash;
     QString m_capabilityNode;
     QString m_capabilityVer;
+    QStringList m_capabilityExt;
 };
 
 #endif // QXMPPPRESENCE_H
