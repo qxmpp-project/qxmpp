@@ -67,7 +67,6 @@ public:
     QHash<QString,QXmppInvokable*> interfaces;
 
     void addProperCapability(QXmppPresence& presence);
-    QXmppElementList presenceExtensions() const;
 
     QXmppClient *client;
 };
@@ -77,25 +76,6 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient *parentClient)
     clientPresence(QXmppPresence::Available),
     reconnectionManager(0), client(parentClient)
 {
-}
-
-QXmppElementList QXmppClientPrivate::presenceExtensions() const
-{
-    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
-    if(!ext)
-        return QXmppElementList();
-
-    QXmppElementList extensions;
-
-    QXmppElement caps;
-    caps.setTagName("c");
-    caps.setAttribute("xmlns", ns_capabilities);
-    caps.setAttribute("hash", "sha-1");
-    caps.setAttribute("node", QString(capabilities_node));
-    caps.setAttribute("ver", ext->capabilities().verificationString().toBase64());
-    extensions << caps;
-
-    return extensions;
 }
 
 void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
