@@ -131,32 +131,23 @@ QString profileDialog::getCapability(const QString& resource)
     QString nodeVer;
     QStringList resultFeatures;
     QStringList resultIdentities;
-    foreach(QXmppElement extension, pre.extensions())
+
+    QString node = pre.capabilityNode();
+    QString ver = pre.capabilityVer();
+    QStringList exts = pre.capabilityExt();
+    nodeVer = node + "#" + ver;
+    if(m_caps.isCapabilityAvailable(nodeVer))
     {
-        if(extension.tagName() == "c" &&
-           extension.attribute("xmlns") == ns_capabilities)
+        resultFeatures << m_caps.getFeatures(nodeVer);
+        resultIdentities << m_caps.getIdentities(nodeVer);
+    }
+    foreach(QString ext, exts)
+    {
+        nodeVer = node + "#" + ext;
+        if(m_caps.isCapabilityAvailable(nodeVer))
         {
-            QString node = extension.attribute("node");
-            QString ver = extension.attribute("ver");
-            QString exts = extension.attribute("ext");
-            nodeVer = node + "#" + ver;
-            if(m_caps.isCapabilityAvailable(nodeVer))
-            {
-                resultFeatures << m_caps.getFeatures(nodeVer);
-                resultIdentities << m_caps.getIdentities(nodeVer);
-            }
-            if(!exts.isEmpty())
-            {
-                foreach(QString ext, exts.split(" ", QString::SkipEmptyParts))
-                {
-                    nodeVer = node + "#" + ext;
-                    if(m_caps.isCapabilityAvailable(nodeVer))
-                    {
-                        resultFeatures << m_caps.getFeatures(nodeVer);
-                        resultIdentities << m_caps.getIdentities(nodeVer);
-                    }
-                }
-            }
+            resultFeatures << m_caps.getFeatures(nodeVer);
+            resultIdentities << m_caps.getIdentities(nodeVer);
         }
     }
 
