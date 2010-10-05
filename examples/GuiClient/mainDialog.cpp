@@ -217,28 +217,20 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
     m_rosterItemModel.updatePresence(bareJid, presences);
 
     QXmppPresence& pre = presences[resource];
-    QString nodeVer;
-    foreach(QXmppElement extension, pre.extensions())
+
+    QString node = pre.capabilityNode();
+    QString ver = pre.capabilityVer();
+    QStringList exts = pre.capabilityExt();
+
+    QString nodeVer = node + "#" + ver;
+    if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
+        m_capabilitiesCache.requestInfo(jid, nodeVer);
+
+    foreach(QString ext, exts)
     {
-        if(extension.tagName() == "c" &&
-           extension.attribute("xmlns") == ns_capabilities)
-        {
-            QString node = extension.attribute("node");
-            QString ver = extension.attribute("ver");
-            QString exts = extension.attribute("ext");
-            nodeVer = node + "#" + ver;
-            if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
-                m_capabilitiesCache.requestInfo(jid, nodeVer);
-            if(!exts.isEmpty())
-            {
-                foreach(QString ext, exts.split(" ", QString::SkipEmptyParts))
-                {
-                    nodeVer = node + "#" + ext;
-                    if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
-                        m_capabilitiesCache.requestInfo(jid, nodeVer);
-                }
-            }
-        }
+        nodeVer = node + "#" + ext;
+        if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
+            m_capabilitiesCache.requestInfo(jid, nodeVer);
     }
 
 
