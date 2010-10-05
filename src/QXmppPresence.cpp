@@ -96,6 +96,13 @@ void QXmppPresence::parse(const QDomElement &element)
                 m_vCardUpdateType = PhotoNotReady;
             }
         }
+        // XEP-0115: Entity Capabilities
+        else if(xElement.tagName() == "c" && xElement.namespaceURI() == ns_capabilities)
+        {
+            m_capabilityNode = xElement.attribute("node");
+            m_capabilityVer = xElement.attribute("ver");
+            m_capabilityHash = xElement.attribute("hash");
+        }
         else if (xElement.tagName() != "error")
         {
             // other extensions
@@ -137,6 +144,16 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             break;
         }
         xmlWriter->writeEndElement();
+    }
+
+    if(!m_capabilityNode.isEmpty() && !m_capabilityVer.isEmpty()
+        && !m_capabilityHash.isEmpty())
+    {
+        xmlWriter->writeStartElement("c");
+        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_capabilities);
+        helperToXmlAddAttribute(xmlWriter, "hash", m_capabilityHash);
+        helperToXmlAddAttribute(xmlWriter, "node", m_capabilityNode);
+        helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer);
     }
 
     foreach (const QXmppElement &extension, extensions())
@@ -393,6 +410,37 @@ void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
 {
     m_vCardUpdateType = type;
 }
+
+QString QXmppPresence::getCapabilityNode()
+{
+    return m_capabilityNode;
+}
+
+void QXmppPresence::setCapabilityNode(const QString& node)
+{
+    m_capabilityNode = node;
+}
+
+QString QXmppPresence::getCapabilityVer()
+{
+    return m_capabilityVer;
+}
+
+void QXmppPresence::setCapabilityVer(const QString& ver)
+{
+    m_capabilityVer = ver;
+}
+
+QString QXmppPresence::getCapabilityHash()
+{
+    return m_capabilityHash;
+}
+
+void QXmppPresence::setCapabilityHash(const QString& hash)
+{
+    m_capabilityHash = hash;
+}
+
 
 /// \cond
 
