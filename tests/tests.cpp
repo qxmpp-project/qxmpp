@@ -452,6 +452,35 @@ void TestPackets::testPresenceWithVCardUpdate()
     serializePacket(presence, xml);
 }
 
+void TestPackets::testPresenceWithCapability()
+{
+    const QByteArray xml(
+        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
+        "<show>away</show>"
+        "<status>In a meeting</status>"
+        "<priority>5</priority>"
+        "<x xmlns=\"vcard-temp:x:update\">"
+        "<photo>sha1-hash-of-image</photo>"
+        "</x>"
+        "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"http://code.google.com/p/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
+    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
+    QCOMPARE(presence.status().priority(), 5);
+    QCOMPARE(presence.photoHash(), QByteArray("sha1-hash-of-image"));
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
+    QCOMPARE(presence.capabilityHash(), QString("sha-1"));
+    QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
+    QCOMPARE(presence.capabilityVer(), QString("QgayPKawpkPSDYmwT/WM94uAlu0="));
+
+    serializePacket(presence, xml);
+}
+
 void TestPackets::testSession()
 {
     const QByteArray xml(
