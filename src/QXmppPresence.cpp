@@ -424,31 +424,37 @@ void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
     m_vCardUpdateType = type;
 }
 
+/// XEP-0115: Entity Capabilities
 QString QXmppPresence::capabilityHash()
 {
     return m_capabilityHash;
 }
 
+/// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityHash(const QString& hash)
 {
     m_capabilityHash = hash;
 }
 
+/// XEP-0115: Entity Capabilities
 QString QXmppPresence::capabilityNode()
 {
     return m_capabilityNode;
 }
 
+/// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityNode(const QString& node)
 {
     m_capabilityNode = node;
 }
 
+/// XEP-0115: Entity Capabilities
 QString QXmppPresence::capabilityVer()
 {
     return m_capabilityVer;
 }
 
+/// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityVer(const QString& ver)
 {
     m_capabilityVer = ver;

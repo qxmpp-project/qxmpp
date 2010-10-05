@@ -151,6 +151,7 @@ private:
     QByteArray m_photoHash;
     VCardUpdateType m_vCardUpdateType;
 
+    // XEP-0115: Entity Capabilities
     QString m_capabilityHash;
     QString m_capabilityNode;
     QString m_capabilityVer;
