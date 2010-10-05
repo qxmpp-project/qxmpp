@@ -103,7 +103,19 @@ void QXmppPresence::parse(const QDomElement &element)
             m_capabilityVer = xElement.attribute("ver");
             m_capabilityHash = xElement.attribute("hash");
         }
-        else if (xElement.tagName() != "error")
+        else if (xElement.tagName() == "error")
+        {
+        }
+        else if (xElement.tagName() == "show")
+        {
+        }
+        else if (xElement.tagName() == "status")
+        {
+        }
+        else if (xElement.tagName() == "priority")
+        {
+        }
+        else
         {
             // other extensions
             extensions << QXmppElement(xElement);
@@ -154,6 +166,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddAttribute(xmlWriter, "hash", m_capabilityHash);
         helperToXmlAddAttribute(xmlWriter, "node", m_capabilityNode);
         helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer);
+        xmlWriter->writeEndElement();
     }
 
     foreach (const QXmppElement &extension, extensions())
