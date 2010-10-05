@@ -119,14 +119,14 @@ public:
     VCardUpdateType vCardUpdateType();
     void setVCardUpdateType(VCardUpdateType type);
 
+    QString getCapabilityHash();
+    void setCapabilityHash(const QString&);
+
     QString getCapabilityNode();
     void setCapabilityNode(const QString&);
 
     QString getCapabilityVer();
     void setCapabilityVer(const QString&);
-
-    QString getCapabilityHash();
-    void setCapabilityHash(const QString&);
 
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
@@ -151,9 +151,9 @@ private:
     QByteArray m_photoHash;
     VCardUpdateType m_vCardUpdateType;
 
+    QString m_capabilityHash;
     QString m_capabilityNode;
     QString m_capabilityVer;
-    QString m_capabilityHash;
 };
 
 #endif // QXMPPPRESENCE_H
