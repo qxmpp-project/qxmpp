@@ -116,7 +116,6 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     QStringList features;
     features
         << ns_rpc               // XEP-0009: Jabber-RPC
-//        << ns_vcard             // XEP-0054: vcard-temp
         << ns_chat_states       // XEP-0085: Chat State Notifications
         << ns_capabilities      // XEP-0115 : Entity Capabilities
         << ns_ping;             // XEP-0199: XMPP Ping
