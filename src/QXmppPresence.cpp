@@ -461,6 +461,7 @@ void QXmppPresence::setCapabilityVer(const QString& ver)
     m_capabilityVer = ver;
 }
 
+/// Legacy XEP-0115: Entity Capabilities
 QStringList QXmppPresence::capabilityExt()
 {
     return m_capabilityExt;

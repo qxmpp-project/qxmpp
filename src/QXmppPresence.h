@@ -157,6 +157,7 @@ private:
     QString m_capabilityHash;
     QString m_capabilityNode;
     QString m_capabilityVer;
+    // Legacy XEP-0115: Entity Capabilities
     QStringList m_capabilityExt;
 };
 
