@@ -411,7 +411,7 @@ void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
     m_vCardUpdateType = type;
 }
 
-QString QXmppPresence::getCapabilityHash()
+QString QXmppPresence::capabilityHash()
 {
     return m_capabilityHash;
 }
@@ -421,7 +421,7 @@ void QXmppPresence::setCapabilityHash(const QString& hash)
     m_capabilityHash = hash;
 }
 
-QString QXmppPresence::getCapabilityNode()
+QString QXmppPresence::capabilityNode()
 {
     return m_capabilityNode;
 }
@@ -431,7 +431,7 @@ void QXmppPresence::setCapabilityNode(const QString& node)
     m_capabilityNode = node;
 }
 
-QString QXmppPresence::getCapabilityVer()
+QString QXmppPresence::capabilityVer()
 {
     return m_capabilityVer;
 }

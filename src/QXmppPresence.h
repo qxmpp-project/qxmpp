@@ -119,13 +119,13 @@ public:
     VCardUpdateType vCardUpdateType();
     void setVCardUpdateType(VCardUpdateType type);
 
-    QString getCapabilityHash();
+    QString capabilityHash();
     void setCapabilityHash(const QString&);
 
-    QString getCapabilityNode();
+    QString capabilityNode();
     void setCapabilityNode(const QString&);
 
-    QString getCapabilityVer();
+    QString capabilityVer();
     void setCapabilityVer(const QString&);
 
     // deprecated in release 0.2.0
