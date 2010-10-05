@@ -66,6 +66,7 @@ public:
 
     QHash<QString,QXmppInvokable*> interfaces;
 
+    void addProperCapability(QXmppPresence& presence);
     QXmppElementList presenceExtensions() const;
 
     QXmppClient *client;
@@ -95,6 +96,17 @@ QXmppElementList QXmppClientPrivate::presenceExtensions() const
     extensions << caps;
 
     return extensions;
+}
+
+void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
+{
+    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
+    if(ext)
+    {
+        presence.setCapabilityHash("sha-1");
+        presence.setCapabilityNode(QString(capabilities_node));
+        presence.setCapabilityVer(ext->capabilities().verificationString().toBase64());
+    }
 }
 
 /// \mainpage
@@ -146,7 +158,7 @@ QXmppClient::QXmppClient(QObject *parent)
     d(new QXmppClientPrivate(this))
 {
     d->stream = new QXmppOutgoingClient(this);
-    d->clientPresence.setExtensions(d->presenceExtensions());
+    d->addProperCapability(d->clientPresence);
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
                          this, SLOT(slotElementReceived(const QDomElement&, bool&)));
@@ -320,7 +332,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
     }
 
     d->clientPresence = initialPresence;
-    d->clientPresence.setExtensions(d->presenceExtensions());
+    d->addProperCapability(d->clientPresence);
 
     d->stream->connectToHost();
 }
@@ -518,7 +530,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
     else
     {
         d->clientPresence = presence;
-        d->clientPresence.setExtensions(d->presenceExtensions());
+        d->addProperCapability(d->clientPresence);
         sendPacket(d->clientPresence);
     }
 }
