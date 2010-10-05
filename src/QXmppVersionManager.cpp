@@ -76,7 +76,6 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
             responseIq.setVersion(clientVersion());
             responseIq.setOs(clientOs());
 
-            // TODO set OS aswell
             client()->sendPacket(responseIq);
         }
 
