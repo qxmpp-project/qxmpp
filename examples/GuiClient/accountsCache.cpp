@@ -52,7 +52,10 @@ QString accountsCache::getPassword(const QString& bareJid)
     {
         if(element.firstChildElement("bareJid").text() == bareJid)
         {
-            return element.firstChildElement("password").text();
+            QByteArray passwdEncryptedBa = QByteArray::fromBase64(
+                    element.firstChildElement("password").text().toUtf8());
+            QString passwd = calculateXor(passwdEncryptedBa, bareJid.toUtf8());
+            return passwd;
         }
         element = element.nextSiblingElement("account");
     }
@@ -85,7 +88,8 @@ void accountsCache::addAccount(const QString& bareJid, const QString& passwd)
     newElement.appendChild(newElementBareJid);
 
     QDomElement newElementPasswd = m_accountsDocument.createElement("password");
-    newElementPasswd.appendChild(m_accountsDocument.createTextNode(passwd));
+    newElementPasswd.appendChild(m_accountsDocument.createTextNode(
+            calculateXor(passwd.toUtf8(), bareJid.toUtf8()).toBase64()));
     newElement.appendChild(newElementPasswd);
 
     m_accountsDocument.documentElement().appendChild(newElement);
