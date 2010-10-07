@@ -155,3 +155,18 @@ bool isValidBareJid(const QString& bareJid)
     QRegExp re("^[^@]+@[^@]+$");
     return re.exactMatch(bareJid);
 }
+
+QByteArray calculateXor(const QByteArray& data, const QByteArray& key)
+{
+    if(key.isEmpty())
+        return data;
+
+    QByteArray result;
+    for(int i = 0 , j = 0; i < data.length(); ++i , ++j)
+    {
+        if(j == key.length())
+            j = 0;
+        result.append(data.at(i) ^ key.at(j));
+    }
+    return result;
+}

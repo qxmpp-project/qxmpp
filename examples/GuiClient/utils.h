@@ -44,4 +44,6 @@ QString getImageType1(const QByteArray& image);
 
 bool isValidBareJid(const QString& bareJid);
 
+QByteArray calculateXor(const QByteArray& data, const QByteArray& key);
+
 #endif // CLIENTUTILS_H
