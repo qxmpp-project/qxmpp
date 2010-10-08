@@ -101,10 +101,12 @@ QString presenceToStatusText(const QXmppPresence& presence)
 
 QString getSettingsDir(const QString& bareJid)
 {
+    QString dir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    dir.append("/qxmpp");
     if(bareJid.isEmpty())
-        return "appCache/";
+        return dir + "/";
     else
-        return QString("appCache/%1/").arg(bareJid);
+        return QString(dir + "/%1/").arg(bareJid);
 }
 
 QString getImageHash(const QByteArray& image)
