@@ -33,11 +33,15 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
+    QApplication::setOrganizationName("QXmpp");
+    QApplication::setApplicationName("GuiClient");
+
     QDir dir;
     if(!dir.exists(getSettingsDir()))
         dir.mkpath(getSettingsDir());
 
-    QApplication a(argc, argv);
     mainDialog cw;
     cw.show();
     return a.exec();
