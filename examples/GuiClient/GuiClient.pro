@@ -16,7 +16,6 @@ SOURCES += main.cpp \
     customListView.cpp \
     searchLineEdit.cpp \
     statusWidget.cpp \
-    customPushButton.cpp \
     customLabel.cpp \
     statusAvatarWidget.cpp \
     statusTextWidget.cpp \
@@ -38,7 +37,6 @@ HEADERS += messageGraphicsItem.h \
     customListView.h \
     searchLineEdit.h \
     statusWidget.h \
-    customPushButton.h \
     customLabel.h \
     statusAvatarWidget.h \
     statusTextWidget.h \
