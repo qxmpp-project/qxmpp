@@ -36,9 +36,12 @@ void customToolButton::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter painter(this);
-    QStyleOptionToolButton panel;
-    initStyleOption(&panel);
-    style()->drawPrimitive(QStyle::PE_PanelButtonTool, &panel, &painter, this);
+    if(underMouse())
+    {
+        QStyleOptionToolButton panel;
+        initStyleOption(&panel);
+        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &panel, &painter, this);
+    }
     QRect r = rect();
     QFont font;
     painter.setFont(font);
