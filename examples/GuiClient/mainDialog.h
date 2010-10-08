@@ -84,6 +84,7 @@ private slots:
     void userNameCompleter_activated(const QString&);
     void addAccountToCache();
     void presenceReceived(const QXmppPresence&);
+    void errorClient(QXmppClient::Error);
 
     void action_addContact();
     void action_removeContact(const QString& bareJid);

@@ -80,6 +80,11 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient,
+                         SIGNAL(error(QXmppClient::Error)),
+                         this, SLOT(errorClient(QXmppClient::Error)));
+    Q_ASSERT(check);
+
+    check = connect(&m_xmppClient,
                          SIGNAL(presenceReceived(const QXmppPresence&)),
                          this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
@@ -755,4 +760,34 @@ void mainDialog::action_removeContact(const QString& bareJid)
     itemRemove.setBareJid(bareJid);
     remove.addItem(itemRemove);
     m_xmppClient.sendPacket(remove);
+}
+
+void mainDialog::errorClient(QXmppClient::Error error)
+{
+    ui->label_throbber->hide();
+
+    showSignInPage();
+
+    switch(error)
+    {
+    case QXmppClient::SocketError:
+        showLoginStatus("Socket error");
+        break;
+    case QXmppClient::KeepAliveError:
+        showLoginStatus("Keep alive error");
+        break;
+    case QXmppClient::XmppStreamError:
+        switch(m_xmppClient.xmppStreamError())
+        {
+        case QXmppStanza::Error::NotAuthorized:
+            showLoginStatus("Invalid password");
+            break;
+        default:
+            showLoginStatus("Stream error");
+            break;
+        }
+        break;
+    default:
+        break;
+    }
 }
