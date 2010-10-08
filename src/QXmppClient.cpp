@@ -424,8 +424,8 @@ void QXmppClient::disconnectFromServer()
     if (d->stream->isConnected())
     {
         sendPacket(d->clientPresence);
-        d->stream->disconnectFromHost();
     }
+    d->stream->disconnectFromHost();
 }
 
 /// Returns true if the client is connected to the XMPP server.
