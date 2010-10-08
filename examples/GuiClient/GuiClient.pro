@@ -18,7 +18,7 @@ SOURCES += main.cpp \
     statusWidget.cpp \
     customPushButton.cpp \
     customLabel.cpp \
-    avatarWidget.cpp \
+    statusAvatarWidget.cpp \
     statusTextWidget.cpp \
     statusToolButton.cpp \
     vCardCache.cpp \
@@ -40,7 +40,7 @@ HEADERS += messageGraphicsItem.h \
     statusWidget.h \
     customPushButton.h \
     customLabel.h \
-    avatarWidget.h \
+    statusAvatarWidget.h \
     statusTextWidget.h \
     statusToolButton.h \
     vCardCache.h \

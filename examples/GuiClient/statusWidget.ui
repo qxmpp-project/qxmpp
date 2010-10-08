@@ -125,7 +125,7 @@
     </layout>
    </item>
    <item>
-    <widget class="avatarWidget" name="pushButton_avatar">
+    <widget class="statusAvatarWidget" name="pushButton_avatar">
      <property name="text">
       <string/>
      </property>
@@ -190,9 +190,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>avatarWidget</class>
+   <class>statusAvatarWidget</class>
    <extends>QPushButton</extends>
-   <header>avatarWidget.h</header>
+   <header>statusAvatarWidget.h</header>
   </customwidget>
   <customwidget>
    <class>statusTextWidget</class>

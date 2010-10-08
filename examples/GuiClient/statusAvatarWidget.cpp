@@ -22,15 +22,15 @@
  */
 
 
-#include "avatarWidget.h"
+#include "statusAvatarWidget.h"
 #include <QtGui/QPainter>
 
-avatarWidget::avatarWidget(QWidget* parent)
+statusAvatarWidget::statusAvatarWidget(QWidget* parent)
     : QPushButton(parent)
 {
 }
 
-void avatarWidget::paintEvent(QPaintEvent* event)
+void statusAvatarWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter painter(this);
@@ -59,7 +59,7 @@ void avatarWidget::paintEvent(QPaintEvent* event)
     }
 }
 
-QSize avatarWidget::sizeHint() const
+QSize statusAvatarWidget::sizeHint() const
 {
     return QSize(32, 32);
 }
