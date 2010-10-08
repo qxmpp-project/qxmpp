@@ -22,17 +22,17 @@
  */
 
 
-#include "customToolButton.h"
+#include "statusToolButton.h"
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOptionToolButton>
 
-customToolButton::customToolButton(QWidget* parent) : QToolButton(parent)
+statusToolButton::statusToolButton(QWidget* parent) : QToolButton(parent)
 {
     setMinimumSize(QSize(20, 18));
 }
 
-void customToolButton::paintEvent(QPaintEvent* event)
+void statusToolButton::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter painter(this);
@@ -65,7 +65,7 @@ void customToolButton::paintEvent(QPaintEvent* event)
     painter.drawImage(rectDelta, image);
 }
 
-QSize customToolButton::sizeHint() const
+QSize statusToolButton::sizeHint() const
 {
     QFont font;
     font.setBold(true);

@@ -22,17 +22,17 @@
  */
 
 
-#ifndef CUSTOMTOOLBUTTON_H
-#define CUSTOMTOOLBUTTON_H
+#ifndef STATUSTOOLBUTTON_H
+#define STATUSTOOLBUTTON_H
 
 #include <QToolButton>
 
-class customToolButton : public QToolButton
+class statusToolButton : public QToolButton
 {
 public:
-    customToolButton(QWidget* parent = 0);
+    statusToolButton(QWidget* parent = 0);
     void paintEvent(QPaintEvent* event);
     QSize sizeHint() const;
 };
 
-#endif // CUSTOMTOOLBUTTON_H
+#endif // STATUSTOOLBUTTON_H

@@ -59,7 +59,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="customToolButton" name="toolButton_userName">
+        <widget class="statusToolButton" name="toolButton_userName">
          <property name="text">
           <string>toolbutton</string>
          </property>
@@ -201,9 +201,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>customToolButton</class>
+   <class>statusToolButton</class>
    <extends>QToolButton</extends>
-   <header>customToolButton.h</header>
+   <header>statusToolButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -20,7 +20,7 @@ SOURCES += main.cpp \
     customLabel.cpp \
     avatarWidget.cpp \
     statusTextWidget.cpp \
-    customToolButton.cpp \
+    statusToolButton.cpp \
     vCardCache.cpp \
     profileDialog.cpp \
     capabilitiesCache.cpp \
@@ -42,7 +42,7 @@ HEADERS += messageGraphicsItem.h \
     customLabel.h \
     avatarWidget.h \
     statusTextWidget.h \
-    customToolButton.h \
+    statusToolButton.h \
     vCardCache.h \
     profileDialog.h \
     capabilitiesCache.h \
