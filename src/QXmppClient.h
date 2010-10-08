@@ -99,8 +99,9 @@ public:
 
     QList<QXmppClientExtension*> extensions();
 
-    /// Returns the extension than can be cast to type T*, or 0 if there is
-    /// no such extension.
+    /// \return pointer to the desired extension.
+    /// Returns NULL if extension is not found.
+    ///
     ///
     template<typename T>
     T* findExtension()
