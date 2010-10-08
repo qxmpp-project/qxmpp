@@ -102,6 +102,15 @@ public:
     /// \return pointer to the desired extension.
     /// Returns NULL if extension is not found.
     ///
+    /// Usage example:
+    /// \code
+    /// QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
+    /// if(ext)
+    /// {
+    ///     //extension found, do your work
+    /// }
+    /// client.sendPacket(message);
+    /// \endcode
     ///
     template<typename T>
     T* findExtension()
