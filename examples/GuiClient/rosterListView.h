@@ -22,8 +22,8 @@
  */
 
 
-#ifndef CUSTOMLISTVIEW_H
-#define CUSTOMLISTVIEW_H
+#ifndef ROSTERLISTVIEW_H
+#define ROSTERLISTVIEW_H
 
 #include <QListView>
 #include <QAction>
@@ -63,4 +63,4 @@ private:
     QAction m_removeContact;
 };
 
-#endif // CUSTOMLISTVIEW_H
+#endif // ROSTERLISTVIEW_H
