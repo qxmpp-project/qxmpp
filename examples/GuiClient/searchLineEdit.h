@@ -29,12 +29,12 @@
 #include <QLineEdit>
 #include <QPainter>
 
-class ClearButton : public QPushButton
+class searchClearButton : public QPushButton
 {
     Q_OBJECT
 
 public:
-    ClearButton(QWidget *w)
+    searchClearButton(QWidget *w)
         : QPushButton(w)
     {
         setMinimumSize(24, 24);

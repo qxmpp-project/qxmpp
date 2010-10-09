@@ -30,7 +30,7 @@ searchLineEdit::searchLineEdit(QWidget* parent):QLineEdit(parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     setStyleSheet(":enabled { padding-right: 20px; padding-left: 20px }");
-    clearButton = new ClearButton(this);
+    clearButton = new searchClearButton(this);
     clearButton->setVisible(true);
 
     clearButton->setCursor(Qt::ArrowCursor);
