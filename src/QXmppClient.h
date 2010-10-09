@@ -107,9 +107,8 @@ public:
     /// QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
     /// if(ext)
     /// {
-    ///     //extension found, do your work
+    ///     //extension found, do stuff...
     /// }
-    /// client.sendPacket(message);
     /// \endcode
     ///
     template<typename T>
