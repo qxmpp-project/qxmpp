@@ -28,12 +28,12 @@
 #include <QListView>
 #include <QAction>
 
-class customListView : public QListView
+class rosterListView : public QListView
 {
     Q_OBJECT
 
 public:
-    customListView(QWidget* parent = 0);
+    rosterListView(QWidget* parent = 0);
     bool event(QEvent* e);
 
 public slots:

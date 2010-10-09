@@ -22,13 +22,13 @@
  */
 
 
-#include "customListView.h"
+#include "rosterListView.h"
 #include "rosterItem.h"
 #include <QApplication>
 #include <QMenu>
 #include <QKeyEvent>
 
-customListView::customListView(QWidget* parent):QListView(parent), m_chat("Chat", this),
+rosterListView::rosterListView(QWidget* parent):QListView(parent), m_chat("Chat", this),
 m_profile("View Profile", this), m_removeContact("Remove", this)
 {
     bool check = connect(this, SIGNAL(pressed(const QModelIndex&)), this,
@@ -53,12 +53,12 @@ m_profile("View Profile", this), m_removeContact("Remove", this)
     Q_ASSERT(check);
 }
 
-bool customListView::event(QEvent* e)
+bool rosterListView::event(QEvent* e)
 {
     return QListView::event(e);
 }
 
-void customListView::mousePressed(const QModelIndex& index)
+void rosterListView::mousePressed(const QModelIndex& index)
 {
     if(QApplication::mouseButtons() == Qt::RightButton)
     {
@@ -72,16 +72,16 @@ void customListView::mousePressed(const QModelIndex& index)
     }
 }
 
-void customListView::doubleClicked(const QModelIndex& index)
+void rosterListView::doubleClicked(const QModelIndex& index)
 {
     m_chat.trigger();
 }
 
-void customListView::clicked(const QModelIndex& index)
+void rosterListView::clicked(const QModelIndex& index)
 {
 }
 
-QString customListView::selectedBareJid()
+QString rosterListView::selectedBareJid()
 {
     if(selectedIndexes().size() > 0)
         return selectedIndexes().at(0).data(rosterItem::BareJid).toString();
@@ -89,21 +89,21 @@ QString customListView::selectedBareJid()
         return "";
 }
 
-void customListView::showChatDialog_helper()
+void rosterListView::showChatDialog_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())
         emit showChatDialog(bareJid);
 }
 
-void customListView::showProfile_helper()
+void rosterListView::showProfile_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())
         emit showProfile(bareJid);
 }
 
-void customListView::keyPressEvent(QKeyEvent* event1)
+void rosterListView::keyPressEvent(QKeyEvent* event1)
 {
     if(event1->key() == Qt::Key_Return)
     {
@@ -112,7 +112,7 @@ void customListView::keyPressEvent(QKeyEvent* event1)
     QListView::keyPressEvent(event1);
 }
 
-void customListView::removeContact_helper()
+void rosterListView::removeContact_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())

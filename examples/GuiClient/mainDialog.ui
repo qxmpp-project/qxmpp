@@ -54,7 +54,7 @@
         </widget>
        </item>
        <item>
-        <widget class="customListView" name="listView">
+        <widget class="rosterListView" name="listView">
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -341,9 +341,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>customListView</class>
+   <class>rosterListView</class>
    <extends>QListView</extends>
-   <header>customListView.h</header>
+   <header>rosterListView.h</header>
   </customwidget>
   <customwidget>
    <class>searchLineEdit</class>

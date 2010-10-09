@@ -13,7 +13,7 @@ SOURCES += main.cpp \
     rosterItem.cpp \
     rosterItemSortFilterProxyModel.cpp \
     utils.cpp \
-    customListView.cpp \
+    rosterListView.cpp \
     searchLineEdit.cpp \
     statusWidget.cpp \
     customLabel.cpp \
@@ -34,7 +34,7 @@ HEADERS += messageGraphicsItem.h \
     rosterItem.h \
     rosterItemSortFilterProxyModel.h \
     utils.h \
-    customListView.h \
+    rosterListView.h \
     searchLineEdit.h \
     statusWidget.h \
     customLabel.h \
