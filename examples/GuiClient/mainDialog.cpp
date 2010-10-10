@@ -51,7 +51,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
     m_signOutAction("Sign out", this),
-    m_consoleDlg(this)
+    m_consoleDlg(0)
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
