@@ -9,6 +9,7 @@ xmlConsoleDialog::xmlConsoleDialog(QWidget *parent) :
     ui(new Ui::xmlConsoleDialog)
 {
     ui->setupUi(this);
+    setWindowTitle("Debugging Console");
 }
 
 xmlConsoleDialog::~xmlConsoleDialog()
