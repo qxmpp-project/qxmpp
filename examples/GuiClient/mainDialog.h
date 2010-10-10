@@ -92,9 +92,12 @@ private slots:
     void action_quit();
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
+    void action_showXml();
+
 private:
     void loadAccounts();
     void createTrayIconAndMenu();
+    void createSettingsMenu();
 
     chatDialog* getChatDialog(const QString& bareJid);
 

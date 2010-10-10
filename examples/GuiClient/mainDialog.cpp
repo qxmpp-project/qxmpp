@@ -54,9 +54,9 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
+    createSettingsMenu();
 
     ui->pushButton_view->hide();
-    ui->pushButton_4->hide();
 
     ui->pushButton_cancel->setDisabled(true);
     ui->label_throbber->setMovie(new QMovie(":/icons/resource/ajax-loader.gif"));
@@ -638,6 +638,15 @@ void mainDialog::createTrayIconAndMenu()
     m_trayIcon.show();
 }
 
+void mainDialog::createSettingsMenu()
+{
+    QMenu* settingsMenu = new QMenu(ui->pushButton_settings);
+    ui->pushButton_settings->setMenu(settingsMenu);
+    QAction* showXml = new QAction("Show XML Console...", ui->pushButton_settings);
+    connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
+    settingsMenu->addAction(showXml);
+}
+
 void mainDialog::closeEvent(QCloseEvent *event)
 {
     hide();
@@ -790,4 +799,8 @@ void mainDialog::errorClient(QXmppClient::Error error)
     default:
         break;
     }
+}
+
+void mainDialog::action_showXml()
+{
 }
