@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     vCardCache.cpp \
     profileDialog.cpp \
     capabilitiesCache.cpp \
-    accountsCache.cpp
+    accountsCache.cpp \
+    xmlConsoleDialog.cpp
 
 HEADERS += messageGraphicsItem.h \
     chatGraphicsScene.h \
@@ -44,12 +45,14 @@ HEADERS += messageGraphicsItem.h \
     vCardCache.h \
     profileDialog.h \
     capabilitiesCache.h \
-    accountsCache.h
+    accountsCache.h \
+    xmlConsoleDialog.h
 
 FORMS += mainDialog.ui \
     chatDialog.ui \
     statusWidget.ui \
-    profileDialog.ui
+    profileDialog.ui \
+    xmlConsoleDialog.ui
 
 QT += network \
     xml

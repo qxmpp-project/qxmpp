@@ -38,6 +38,7 @@
 #include "QXmppRosterIq.h"
 
 #include "profileDialog.h"
+#include "xmlConsoleDialog.h"
 
 #include <QMovie>
 #include <QCompleter>
@@ -89,7 +90,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
                          this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FileLogging);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::SignalLogging);
 
 
     check = connect(&m_xmppClient.rosterManager(),
@@ -803,4 +804,12 @@ void mainDialog::errorClient(QXmppClient::Error error)
 
 void mainDialog::action_showXml()
 {
+    xmlConsoleDialog dlg(this);
+    bool check = connect(QXmppLogger::getLogger(),
+                 SIGNAL(message(QXmppLogger::MessageType, const QString &)),
+                 &dlg,
+                 SLOT(message(QXmppLogger::MessageType, const QString &)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+    dlg.exec();
 }
