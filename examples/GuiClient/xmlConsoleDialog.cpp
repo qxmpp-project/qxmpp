@@ -30,6 +30,4 @@ void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& tex
         ui->textBrowser->append(formattedText);
     else
         ui->textBrowser->append(text);
-
-    ui->textBrowser->append("\n");
 }
