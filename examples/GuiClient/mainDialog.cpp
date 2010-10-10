@@ -38,7 +38,6 @@
 #include "QXmppRosterIq.h"
 
 #include "profileDialog.h"
-#include "xmlConsoleDialog.h"
 
 #include <QMovie>
 #include <QCompleter>
@@ -51,7 +50,8 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     m_rosterItemSortFilterModel(this), m_vCardCache(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
-    m_signOutAction("Sign out", this)
+    m_signOutAction("Sign out", this),
+    m_consoleDlg(this)
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
@@ -182,6 +182,12 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     Q_ASSERT(check);
 
     check = connect(ui->pushButton_addContact, SIGNAL(clicked()), SLOT(action_addContact()));
+    Q_ASSERT(check);
+
+    check = connect(QXmppLogger::getLogger(),
+                 SIGNAL(message(QXmppLogger::MessageType, const QString &)),
+                 &m_consoleDlg,
+                 SLOT(message(QXmppLogger::MessageType, const QString &)));
     Q_ASSERT(check);
 }
 
@@ -804,12 +810,5 @@ void mainDialog::errorClient(QXmppClient::Error error)
 
 void mainDialog::action_showXml()
 {
-    xmlConsoleDialog dlg(this);
-    bool check = connect(QXmppLogger::getLogger(),
-                 SIGNAL(message(QXmppLogger::MessageType, const QString &)),
-                 &dlg,
-                 SLOT(message(QXmppLogger::MessageType, const QString &)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-    dlg.exec();
+    m_consoleDlg.show();
 }

@@ -38,6 +38,7 @@
 #include "accountsCache.h"
 #include <QSystemTrayIcon>
 #include <QMenu>
+#include "xmlConsoleDialog.h"
 
 namespace Ui
 {
@@ -117,6 +118,8 @@ private:
     QMenu m_trayIconMenu;
     QAction m_quitAction;
     QAction m_signOutAction;
+
+    xmlConsoleDialog m_consoleDlg;
 };
 
 #endif // MAINDIALOG_H
