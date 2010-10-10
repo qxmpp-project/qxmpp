@@ -5,7 +5,7 @@
 #include <QTextStream>
 
 xmlConsoleDialog::xmlConsoleDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::Window),
     ui(new Ui::xmlConsoleDialog)
 {
     ui->setupUi(this);
