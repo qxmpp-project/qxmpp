@@ -19,10 +19,12 @@ xmlConsoleDialog::~xmlConsoleDialog()
 void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& text)
 {
     QDomDocument doc;
+
+// Indent XML string
     bool isXml = doc.setContent(text);
     QString formattedText;
     QTextStream stream(&formattedText);
-    doc.save(stream, 4);
+    doc.save(stream, 2);
 
     if(isXml)
         ui->textBrowser->append(formattedText);
