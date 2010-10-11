@@ -84,7 +84,7 @@ void QXmppPresence::parse(const QDomElement &element)
             QDomElement photoElement = xElement.firstChildElement("photo");
             if(!photoElement.isNull())
             {
-                m_photoHash = photoElement.text().toUtf8();
+                m_photoHash = QByteArray::fromBase64(photoElement.text().toAscii());
                 if(m_photoHash.isEmpty())
                     m_vCardUpdateType = PhotoNotAdvertized;
                 else
@@ -92,7 +92,7 @@ void QXmppPresence::parse(const QDomElement &element)
             }
             else
             {
-                m_photoHash = "";
+                m_photoHash = QByteArray();
                 m_vCardUpdateType = PhotoNotReady;
             }
         }
@@ -149,7 +149,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             helperToXmlAddTextElement(xmlWriter, "photo", "");
             break;
         case PhotoAdvertised:
-            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash);
+            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash.toBase64());
             break;
         case PhotoNotReady:
             break;
