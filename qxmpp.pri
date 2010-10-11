@@ -1,5 +1,6 @@
 # Common definitions
 
+QT += network xml
 QXMPP_INCLUDE_DIR = $$PWD/src
 QXMPP_LIBRARY_DIR = $$PWD/lib
 
