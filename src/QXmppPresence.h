@@ -125,8 +125,8 @@ public:
     QString capabilityNode();
     void setCapabilityNode(const QString&);
 
-    QString capabilityVer();
-    void setCapabilityVer(const QString&);
+    QByteArray capabilityVer();
+    void setCapabilityVer(const QByteArray&);
 
     QStringList capabilityExt();
 
@@ -156,7 +156,7 @@ private:
     // XEP-0115: Entity Capabilities
     QString m_capabilityHash;
     QString m_capabilityNode;
-    QString m_capabilityVer;
+    QByteArray m_capabilityVer;
     // Legacy XEP-0115: Entity Capabilities
     QStringList m_capabilityExt;
 };

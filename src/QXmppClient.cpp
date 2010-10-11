@@ -85,7 +85,7 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
     {
         presence.setCapabilityHash("sha-1");
         presence.setCapabilityNode(QString(capabilities_node));
-        presence.setCapabilityVer(ext->capabilities().verificationString().toBase64());
+        presence.setCapabilityVer(ext->capabilities().verificationString());
     }
 }
 

@@ -477,7 +477,7 @@ void TestPackets::testPresenceWithCapability()
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
     QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
-    QCOMPARE(presence.capabilityVer(), QString("QgayPKawpkPSDYmwT/WM94uAlu0="));
+    QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
 
     serializePacket(presence, xml);
 }

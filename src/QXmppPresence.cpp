@@ -100,7 +100,7 @@ void QXmppPresence::parse(const QDomElement &element)
         else if(xElement.tagName() == "c" && xElement.namespaceURI() == ns_capabilities)
         {
             m_capabilityNode = xElement.attribute("node");
-            m_capabilityVer = xElement.attribute("ver");
+            m_capabilityVer = QByteArray::fromBase64(xElement.attribute("ver").toAscii());
             m_capabilityHash = xElement.attribute("hash");
             m_capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
         }
@@ -166,7 +166,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddAttribute(xmlWriter, "xmlns", ns_capabilities);
         helperToXmlAddAttribute(xmlWriter, "hash", m_capabilityHash);
         helperToXmlAddAttribute(xmlWriter, "node", m_capabilityNode);
-        helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer);
+        helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer.toBase64());
         xmlWriter->writeEndElement();
     }
 
@@ -450,13 +450,13 @@ void QXmppPresence::setCapabilityNode(const QString& node)
 }
 
 /// XEP-0115: Entity Capabilities
-QString QXmppPresence::capabilityVer()
+QByteArray QXmppPresence::capabilityVer()
 {
     return m_capabilityVer;
 }
 
 /// XEP-0115: Entity Capabilities
-void QXmppPresence::setCapabilityVer(const QString& ver)
+void QXmppPresence::setCapabilityVer(const QByteArray& ver)
 {
     m_capabilityVer = ver;
 }
