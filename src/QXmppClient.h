@@ -123,7 +123,7 @@ public:
         }
         return 0;
     }
-    
+
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence = 
                          QXmppPresence());
