@@ -25,6 +25,9 @@ xmlConsoleDialog::~xmlConsoleDialog()
 
 void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& text)
 {
+    if(!ui->checkBox_enable->isChecked())
+        return;
+
     QColor color;
     switch(type)
     {
