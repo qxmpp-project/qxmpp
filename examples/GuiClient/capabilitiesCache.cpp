@@ -123,7 +123,7 @@ void capabilitiesCache::saveToFile(const QString& nodeVer)
     if(!m_mapCapabilities.contains(nodeVer))
         return;
 
-    QString fileName = getImageHash(nodeVer.toUtf8());
+    QString fileName = getSha1HashAsHex(nodeVer.toUtf8());
     QDir dir;
     if(!dir.exists(getSettingsDir(m_client->configuration().jidBare())))
         dir.mkpath(getSettingsDir(m_client->configuration().jidBare()));

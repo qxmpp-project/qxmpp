@@ -108,7 +108,7 @@ QString getSettingsDir(const QString& bareJid)
         return QString(dir + "/%1/").arg(bareJid);
 }
 
-QString getImageHash(const QByteArray& image)
+QString getSha1HashAsHex(const QByteArray& image)
 {
     if(image.isEmpty())
         return "";

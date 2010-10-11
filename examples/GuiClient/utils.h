@@ -38,7 +38,7 @@ QString presenceToStatusText(const QXmppPresence& presence);
 
 QString getSettingsDir(const QString& bareJid = "");
 
-QString getImageHash(const QByteArray& image);
+QString getSha1HashAsHex(const QByteArray& image);
 QImage getImageFromByteArray(const QByteArray& image);
 QString getImageType1(const QByteArray& image);
 
