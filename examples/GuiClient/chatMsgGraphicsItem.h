@@ -22,8 +22,8 @@
  */
 
 
-#ifndef MESSAGEGRAPHICSITEM_H
-#define MESSAGEGRAPHICSITEM_H
+#ifndef CHATMSGGRAPHICSITEM_H
+#define CHATMSGGRAPHICSITEM_H
 
 #include <QGraphicsPathItem>
 
@@ -84,4 +84,4 @@ private:
     Alignment m_alignment;
 };
 
-#endif // MESSAGEGRAPHICSITEM_H
+#endif // CHATMSGGRAPHICSITEM_H
