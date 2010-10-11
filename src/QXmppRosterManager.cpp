@@ -80,7 +80,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
         // from() should be either empty or bareJid of the user
         QString fromJid = rosterIq.from();
         if(fromJid.isEmpty() ||
-           fromJid == client()->configuration().jidBare())
+           jidToBareJid(fromJid) == client()->configuration().jidBare())
         {
             rosterIqReceived(rosterIq);
             return true;
