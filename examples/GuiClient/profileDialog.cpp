@@ -133,7 +133,7 @@ QString profileDialog::getCapability(const QString& resource)
     QStringList resultIdentities;
 
     QString node = pre.capabilityNode();
-    QString ver = pre.capabilityVer();
+    QString ver = pre.capabilityVer().toBase64();
     QStringList exts = pre.capabilityExt();
     nodeVer = node + "#" + ver;
     if(m_caps.isCapabilityAvailable(nodeVer))

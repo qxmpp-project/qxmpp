@@ -230,7 +230,7 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
     QXmppPresence& pre = presences[resource];
 
     QString node = pre.capabilityNode();
-    QString ver = pre.capabilityVer();
+    QString ver = pre.capabilityVer().toBase64();
     QStringList exts = pre.capabilityExt();
 
     QString nodeVer = node + "#" + ver;
