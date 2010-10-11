@@ -209,7 +209,7 @@ void QXmppDataForm::parse(const QDomElement &element)
         QXmppDataForm::Field field;
 
         /* field type */
-        QXmppDataForm::Field::Type type = static_cast<QXmppDataForm::Field::Type>(-1);
+        QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField;
         const QString typeStr = fieldElement.attribute("type");
         struct field_type *ptr;
         for (ptr = field_types; ptr->str; ptr++)
@@ -220,8 +220,6 @@ void QXmppDataForm::parse(const QDomElement &element)
                 break;
             }
         }
-        if (type < 0)
-            qWarning() << "Unknown field type" << typeStr;
         field.setType(type);
 
         /* field attributes */
