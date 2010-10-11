@@ -4,12 +4,18 @@
 #include <QDomDocument>
 #include <QTextStream>
 
+static QString m_colorHexSent("#02aa3f");
+static QString m_colorHexReceived("#aa0000");
+
 xmlConsoleDialog::xmlConsoleDialog(QWidget *parent) :
     QDialog(parent, Qt::Window),
     ui(new Ui::xmlConsoleDialog)
 {
     ui->setupUi(this);
     setWindowTitle("Debugging Console");
+
+    ui->label_legend->setText(
+            QString("<html><body><p><span style=\"color:%1\">Sent</span><span> | </span><span style=\"color:%2\">Received</span></p></body></html>").arg(m_colorHexSent).arg(m_colorHexReceived));
 }
 
 xmlConsoleDialog::~xmlConsoleDialog()
@@ -23,10 +29,10 @@ void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& tex
     switch(type)
     {
     case QXmppLogger::ReceivedMessage:
-        color = QColor("#aa0000");
+        color = QColor(m_colorHexReceived);
         break;
     case QXmppLogger::SentMessage:
-        color = QColor("#02aa3f");
+        color = QColor(m_colorHexSent);
         break;
     default:
         return;

@@ -50,8 +50,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     m_rosterItemSortFilterModel(this), m_vCardCache(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
-    m_signOutAction("Sign out", this),
-    m_consoleDlg(0)
+    m_signOutAction("Sign out", this)
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
