@@ -22,7 +22,7 @@
  */
 
 
-#include "messageGraphicsItem.h"
+#include "chatMsgGraphicsItem.h"
 #include <QPainter>
 #include <QTextDocument>
 #include <QFontMetrics>
@@ -115,7 +115,7 @@ void drawPath(QPainter *p, const QPainterPath &path,
     p->restore();
 }
 
-messageGraphicsItem::messageGraphicsItem(QGraphicsItem * parent):QGraphicsPathItem(parent),
+chatMsgGraphicsItem::chatMsgGraphicsItem(QGraphicsItem * parent):QGraphicsPathItem(parent),
             m_spikeWidth(9),
             m_spikeHeight(6),
             m_cornerRadius(10),
@@ -129,7 +129,7 @@ messageGraphicsItem::messageGraphicsItem(QGraphicsItem * parent):QGraphicsPathIt
     m_timeStampWidth = fm.width(getTime()) + 4;
 }
 
-void messageGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void chatMsgGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setRenderHint(QPainter::Antialiasing);
     drawPath(painter, path(), m_color, getText(), getTextWidth());
@@ -177,37 +177,37 @@ void messageGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
                       Qt::AlignBottom|Qt::AlignLeft, getTime());
 }
 
-void messageGraphicsItem::setText(const QString& text)
+void chatMsgGraphicsItem::setText(const QString& text)
 {
     m_text = text;
     calculateWidth();
     setPath(createPath());
 }
 
-void messageGraphicsItem::setMaxWidth(int width)
+void chatMsgGraphicsItem::setMaxWidth(int width)
 {
     m_maxWidth = width;
     setPath(createPath());
 }
 
-void messageGraphicsItem::setViewWidth(int width)
+void chatMsgGraphicsItem::setViewWidth(int width)
 {
     //25 for scrollbar
     setMaxWidth(width - getBoxStartLength() - 25);
 }
 
-int messageGraphicsItem::getMaxWidth() const
+int chatMsgGraphicsItem::getMaxWidth() const
 {
     return m_maxWidth;
 }
 
-void messageGraphicsItem::setAlignment(Alignment align)
+void chatMsgGraphicsItem::setAlignment(Alignment align)
 {
     m_alignment = align;
     setPath(createPath());
 }
 
-QPainterPath messageGraphicsItem::createPath()
+QPainterPath chatMsgGraphicsItem::createPath()
 {
     calculateWidth();
     int spike_x = m_spikeWidth;
@@ -234,17 +234,17 @@ QPainterPath messageGraphicsItem::createPath()
     return messageBoxPath;
 }
 
-QString messageGraphicsItem::getText() const
+QString chatMsgGraphicsItem::getText() const
 {
     return m_text;
 }
 
-int messageGraphicsItem::getTextWidth() const
+int chatMsgGraphicsItem::getTextWidth() const
 {
     return getMaxWidth() - m_spikeWidth - m_cornerRadius*2;
 }
 
-void messageGraphicsItem::calculateWidth()
+void chatMsgGraphicsItem::calculateWidth()
 {
     QFont font;
     font.setBold(true);
@@ -262,7 +262,7 @@ void messageGraphicsItem::calculateWidth()
         m_width = getMaxWidth();
 }
 
-void messageGraphicsItem::setName(const QString& name)
+void chatMsgGraphicsItem::setName(const QString& name)
 {
     m_name = name;
     if(name != "Me")
@@ -271,32 +271,32 @@ void messageGraphicsItem::setName(const QString& name)
         m_color = QColor(250, 188, 239);
 }
 
-QString messageGraphicsItem::getName() const
+QString chatMsgGraphicsItem::getName() const
 {
     return m_name;
 }
 
-QString messageGraphicsItem::getTime() const
+QString chatMsgGraphicsItem::getTime() const
 {
     return QTime::currentTime().toString("hh:mm");
 }
 
-void messageGraphicsItem::setBoxStartLength(int length)
+void chatMsgGraphicsItem::setBoxStartLength(int length)
 {
     m_boxStartLength = length;
 }
 
-int messageGraphicsItem::getBoxStartLength() const
+int chatMsgGraphicsItem::getBoxStartLength() const
 {
     return m_boxStartLength;
 }
 
-void messageGraphicsItem::setColor(const QColor& color)
+void chatMsgGraphicsItem::setColor(const QColor& color)
 {
     m_color = color;
 }
 
-QRectF messageGraphicsItem::boundingRect() const
+QRectF chatMsgGraphicsItem::boundingRect() const
 {
     QRectF rect = QGraphicsPathItem::boundingRect();
     rect.setLeft(-getBoxStartLength());

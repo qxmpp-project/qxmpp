@@ -23,7 +23,7 @@
 
 
 #include "chatGraphicsScene.h"
-#include "messageGraphicsItem.h"
+#include "chatMsgGraphicsItem.h"
 #include "chatGraphicsView.h"
 
 chatGraphicsScene::chatGraphicsScene(QObject* parent) : QGraphicsScene(parent),
@@ -33,7 +33,7 @@ chatGraphicsScene::chatGraphicsScene(QObject* parent) : QGraphicsScene(parent),
 
 void chatGraphicsScene::addMessage(const QString& user, const QString& message)
 {
-    messageGraphicsItem* item = new messageGraphicsItem();
+    chatMsgGraphicsItem* item = new chatMsgGraphicsItem();
     m_items.append(item);
     item->setName(user);
     item->setBoxStartLength(m_boxStartLength);
@@ -59,7 +59,7 @@ void chatGraphicsScene::verticalReposition()
 {
     m_verticalPosForNewMessage = 0;
 
-    messageGraphicsItem* item = 0;
+    chatMsgGraphicsItem* item = 0;
     for(int i = 0; i < m_items.size(); ++i)
     {
         item = m_items.at(i);

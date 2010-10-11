@@ -4,7 +4,7 @@ TARGET = GuiClient
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    messageGraphicsItem.cpp \
+    chatMsgGraphicsItem.cpp \
     chatGraphicsScene.cpp \
     chatGraphicsView.cpp \
     chatDialog.cpp \
@@ -26,7 +26,7 @@ SOURCES += main.cpp \
     accountsCache.cpp \
     xmlConsoleDialog.cpp
 
-HEADERS += messageGraphicsItem.h \
+HEADERS += chatMsgGraphicsItem.h \
     chatGraphicsScene.h \
     chatGraphicsView.h \
     chatDialog.h \

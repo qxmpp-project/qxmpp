@@ -28,7 +28,7 @@
 #include <QGraphicsScene>
 #include <QList>
 
-class messageGraphicsItem;
+class chatMsgGraphicsItem;
 
 class chatGraphicsScene : public QGraphicsScene
 {
@@ -43,7 +43,7 @@ private:
     int m_verticalPosForNewMessage;
     int m_verticalSpacing;
     int m_boxStartLength;
-    QList <messageGraphicsItem*> m_items;
+    QList <chatMsgGraphicsItem*> m_items;
 };
 
 #endif // CHATGRAPHICSSCENE_H

@@ -27,7 +27,7 @@
 
 #include <QGraphicsPathItem>
 
-class messageGraphicsItem : public QGraphicsPathItem
+class chatMsgGraphicsItem : public QGraphicsPathItem
 {
 public:
     enum Alignment
@@ -36,7 +36,7 @@ public:
         RIGHT
     };
 
-    messageGraphicsItem(QGraphicsItem * parent = 0);
+    chatMsgGraphicsItem(QGraphicsItem * parent = 0);
     void setText(const QString& text);
     void setName(const QString& name);
     QString getName() const;
