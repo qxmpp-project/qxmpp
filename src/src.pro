@@ -2,7 +2,6 @@ include(../qxmpp.pri)
 
 TEMPLATE = lib
 
-QT += network xml
 CONFIG += staticlib
 LIBS += $$QXMPP_INTERNAL_LIBS
 

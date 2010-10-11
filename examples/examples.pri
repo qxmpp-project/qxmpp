@@ -1,9 +1,6 @@
 include(../qxmpp.pri)
 
 TEMPLATE = app
-
-QT += network xml
-
 CONFIG += console
 
 INCLUDEPATH += $$QXMPP_INCLUDE_DIR

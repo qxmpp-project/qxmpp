@@ -1,6 +1,6 @@
 include(../qxmpp.pri)
 
-QT += network xml testlib
+QT += testlib
 
 TARGET = tests
 
