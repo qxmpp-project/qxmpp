@@ -19,6 +19,19 @@ xmlConsoleDialog::~xmlConsoleDialog()
 
 void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& text)
 {
+    QColor color;
+    switch(type)
+    {
+    case QXmppLogger::ReceivedMessage:
+        color = QColor("#aa0000");
+        break;
+    case QXmppLogger::SentMessage:
+        color = QColor("#02aa3f");
+        break;
+    default:
+        return;
+    }
+
     QDomDocument doc;
 
 // Indent XML string
@@ -27,6 +40,7 @@ void xmlConsoleDialog::message(QXmppLogger::MessageType type, const QString& tex
     QTextStream stream(&formattedText);
     doc.save(stream, 2);
 
+    ui->textBrowser->setTextColor(color);
     if(isXml)
         ui->textBrowser->append(formattedText);
     else
