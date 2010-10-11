@@ -78,6 +78,14 @@ private:
 class QXmppJingleCandidate
 {
 public:
+    enum Type
+    {
+        HostType,
+        PeerReflexiveType,
+        ServerReflexiveType,
+        RelayedType,
+    };
+
     QXmppJingleCandidate();
 
     int component() const;
@@ -104,8 +112,8 @@ public:
     QString protocol() const;
     void setProtocol(const QString &protocol);
 
-    QString type() const;
-    void setType(const QString &type);
+    QXmppJingleCandidate::Type type() const;
+    void setType(QXmppJingleCandidate::Type);
 
     bool isNull() const;
 
@@ -124,7 +132,7 @@ private:
     quint16 m_port;
     QString m_protocol;
     int m_priority;
-    QString m_type;
+    QXmppJingleCandidate::Type m_type;
 };
 
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media

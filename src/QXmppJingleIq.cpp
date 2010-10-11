@@ -397,7 +397,8 @@ QXmppJingleCandidate::QXmppJingleCandidate()
     m_generation(0),
     m_network(0),
     m_port(0),
-    m_priority(0)
+    m_priority(0),
+    m_type(HostType)
 {
 }
 
@@ -538,7 +539,7 @@ void QXmppJingleCandidate::setProtocol(const QString &protocol)
 /// Returns the candidate type (e.g. "host").
 ///
 
-QString QXmppJingleCandidate::type() const
+QXmppJingleCandidate::Type QXmppJingleCandidate::type() const
 {
     return m_type;
 }
@@ -547,7 +548,7 @@ QString QXmppJingleCandidate::type() const
 ///
 /// \param type
 
-void QXmppJingleCandidate::setType(const QString &type)
+void QXmppJingleCandidate::setType(QXmppJingleCandidate::Type type)
 {
     m_type = type;
 }
@@ -571,7 +572,17 @@ void QXmppJingleCandidate::parse(const QDomElement &element)
     m_port = element.attribute("port").toInt();
     m_priority = element.attribute("priority").toInt();
     m_protocol = element.attribute("protocol");
-    m_type = element.attribute("type");
+    const QString type = element.attribute("type");
+    if (type == "host")
+        m_type = HostType;
+    else if (type == "prflx")
+        m_type = PeerReflexiveType;
+    else if (type == "srflx")
+        m_type = ServerReflexiveType;
+    else if (type == "relay")
+        m_type = RelayedType;
+    else
+        qWarning() << "Unknown candidate type" << type;
 }
 
 void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
@@ -586,7 +597,23 @@ void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "port", QString::number(m_port));
     helperToXmlAddAttribute(writer, "priority", QString::number(m_priority));
     helperToXmlAddAttribute(writer, "protocol", m_protocol);
-    helperToXmlAddAttribute(writer, "type", m_type);
+    QString type;
+    switch (m_type)
+    {
+    case HostType:
+        type = "host";
+        break;
+    case PeerReflexiveType:
+        type = "prflx";
+        break;
+    case ServerReflexiveType:
+        type = "srflx";
+        break;
+    case RelayedType:
+        type = "relay";
+        break;
+    }
+    helperToXmlAddAttribute(writer, "type", type);
     writer->writeEndElement();
 }
 

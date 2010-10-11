@@ -47,7 +47,7 @@ public:
     quint16 type() const;
     void setType(quint16 type);
 
-    QByteArray encode(const QString &password = QString()) const;
+    QByteArray encode(const QString &password = QString(), bool addFingerprint = true) const;
     bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
     QString toString() const;
     static quint16 peekType(const QByteArray &buffer, QByteArray &id);
@@ -73,9 +73,6 @@ public:
     bool useCandidate;
 
 private:
-    void addAddress(QDataStream &stream, quint16 type, const QHostAddress &host, quint16 port) const;
-    void setBodyLength(QByteArray &buffer, qint16 length) const;
-
     QByteArray m_id;
     quint16 m_type;
 };

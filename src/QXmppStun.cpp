@@ -39,32 +39,63 @@ static const quint16 STUN_HEADER = 20;
 static const quint8 STUN_IPV4 = 0x01;
 static const quint8 STUN_IPV6 = 0x02;
 
+enum MethodType {
+    Binding      = 0x1,
+    SharedSecret = 0x2,
+    Allocate     = 0x3,
+};
+
 enum MessageType {
-    BindingRequest       = 0x0001,
-    BindingIndication    = 0x0011,
-    BindingResponse      = 0x0101,
-    BindingError         = 0x0111,
-    SharedSecretRequest  = 0x0002,
-    SharedSecretResponse = 0x0102,
-    SharedSecretError    = 0x0112,
+    Request    = 0x000,
+    Indication = 0x010,
+    Response   = 0x100,
+    Error      = 0x110,
 };
 
 enum AttributeType {
-    MappedAddress    = 0x0001,
-    SourceAddress    = 0x0004,
-    ChangedAddress   = 0x0005,
-    Username         = 0x0006,
-    MessageIntegrity = 0x0008,
-    ErrorCode        = 0x0009,
-    XorMappedAddress = 0x0020,
-    Priority         = 0x0024,
-    UseCandidate     = 0x0025,
-    Software         = 0x8022,
-    Fingerprint      = 0x8028,
-    IceControlled    = 0x8029,
-    IceControlling   = 0x802a,
-    OtherAddress     = 0x802c,
+    MappedAddress    = 0x0001, // RFC5389
+    SourceAddress    = 0x0004, // RFC5389
+    ChangedAddress   = 0x0005, // RFC5389
+    Username         = 0x0006, // RFC5389
+    MessageIntegrity = 0x0008, // RFC5389
+    ErrorCode        = 0x0009, // RFC5389
+    ChannelNumber    = 0x000c, // RFC5766
+    Lifetime         = 0x000d, // RFC5766
+    XorPeerAddress   = 0x0012, // RFC5766
+    XorMappedAddress = 0x0020, // RFC5389
+    Priority         = 0x0024, // RFC5245
+    UseCandidate     = 0x0025, // RFC5245
+    Software         = 0x8022, // RFC5389
+    Fingerprint      = 0x8028, // RFC5389
+    IceControlled    = 0x8029, // RFC5245
+    IceControlling   = 0x802a, // RFC5245
+    OtherAddress     = 0x802c, // RFC5780
 };
+
+// FIXME : we need to set local preference to discriminate between
+// multiple IP addresses
+static int candidatePriority(const QXmppJingleCandidate &candidate, int localPref = 65535)
+{
+    int typePref;
+    switch (candidate.type())
+    {
+    case QXmppJingleCandidate::HostType:
+        typePref = 126;
+        break;
+    case QXmppJingleCandidate::PeerReflexiveType:
+        typePref = 110;
+        break;
+    case QXmppJingleCandidate::ServerReflexiveType:
+        typePref = 100;
+        break;
+    default:
+        typePref = 0;
+    }
+
+    return (1 << 24) * typePref + \
+           (1 << 8) * localPref + \
+           (256 - candidate.component());
+}
 
 static bool isIPv6LinkLocalAddress(const QHostAddress &addr)
 {
@@ -74,26 +105,42 @@ static bool isIPv6LinkLocalAddress(const QHostAddress &addr)
     return (((ipv6addr[0] << 8) + ipv6addr[1]) & 0xffc0) == 0xfe80;
 }
 
-static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &address, quint16 &port)
+static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &address, quint16 &port, const QByteArray &xorId = QByteArray())
 {
     if (a_length < 4)
         return false;
     quint8 reserved, protocol;
+    quint16 rawPort;
     stream >> reserved;
     stream >> protocol;
-    stream >> port;
+    stream >> rawPort;
+    if (xorId.isEmpty())
+        port = rawPort;
+    else
+        port = rawPort ^ (STUN_MAGIC >> 16);
     if (protocol == STUN_IPV4)
     {
         if (a_length != 8)
             return false;
         quint32 addr;
         stream >> addr;
-        address = QHostAddress(addr);
+        if (xorId.isEmpty())
+            address = QHostAddress(addr);
+        else
+            address = QHostAddress(addr ^ STUN_MAGIC);
     } else if (protocol == STUN_IPV6) {
         if (a_length != 20)
             return false;
         Q_IPV6ADDR addr;
         stream.readRawData((char*)&addr, sizeof(addr));
+        if (!xorId.isEmpty())
+        {
+            QByteArray xpad;
+            QDataStream(&xpad, QIODevice::WriteOnly) << STUN_MAGIC;
+            xpad += xorId;
+            for (int i = 0; i < 16; i++)
+                addr[i] ^= xpad[i];
+        }
         address = QHostAddress(addr);
     } else {
         return false;
@@ -101,7 +148,7 @@ static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &a
     return true;
 }
 
-static void encodeAddress(QDataStream &stream, quint16 type, const QHostAddress &address, quint16 port)
+static void encodeAddress(QDataStream &stream, quint16 type, const QHostAddress &address, quint16 port, const QByteArray &xorId = QByteArray())
 {
     const quint8 reserved = 0;
     if (address.protocol() == QAbstractSocket::IPv4Protocol)
@@ -110,18 +157,43 @@ static void encodeAddress(QDataStream &stream, quint16 type, const QHostAddress 
         stream << quint16(8);
         stream << reserved;
         stream << quint8(STUN_IPV4);
+        quint32 addr = address.toIPv4Address();
+        if (!xorId.isEmpty())
+        {
+            port ^= (STUN_MAGIC >> 16);
+            addr ^= STUN_MAGIC;
+        }
         stream << port;
-        stream << address.toIPv4Address();
+        stream << addr;
     } else if (address.protocol() == QAbstractSocket::IPv6Protocol) {
         stream << type;
         stream << quint16(20);
         stream << reserved;
         stream << quint8(STUN_IPV6);
-        stream << port;
         Q_IPV6ADDR addr = address.toIPv6Address();
+        if (!xorId.isEmpty())
+        {
+            port ^= (STUN_MAGIC >> 16);
+            QByteArray xpad;
+            QDataStream(&xpad, QIODevice::WriteOnly) << STUN_MAGIC;
+            xpad += xorId;
+            for (int i = 0; i < 16; i++)
+                addr[i] ^= xpad[i];
+        }
+        stream << port;
         stream.writeRawData((char*)&addr, sizeof(addr));
     } else {
         qWarning("Cannot write STUN attribute for unknown IP version");
+    }
+}
+
+static void addAddress(QDataStream &stream, quint16 type, const QHostAddress &host, quint16 port, const QByteArray &xorId = QByteArray())
+{
+    if (port && !host.isNull() &&
+        (host.protocol() == QAbstractSocket::IPv4Protocol ||
+         host.protocol() == QAbstractSocket::IPv6Protocol))
+    {
+        encodeAddress(stream, type, host, port, xorId);
     }
 }
 
@@ -138,6 +210,13 @@ static void encodeString(QDataStream &stream, quint16 type, const QString &strin
     }
 }
 
+static void setBodyLength(QByteArray &buffer, qint16 length)
+{
+    QDataStream stream(&buffer, QIODevice::WriteOnly);
+    stream.device()->seek(2);
+    stream << length;
+}
+
 /// Constructs a new QXmppStunMessage.
 
 QXmppStunMessage::QXmppStunMessage()
@@ -148,7 +227,8 @@ QXmppStunMessage::QXmppStunMessage()
     otherPort(0),
     sourcePort(0),
     xorMappedPort(0),
-    useCandidate(false)
+    useCandidate(false),
+    m_type(0)
 {
     m_id = QByteArray(ID_SIZE, 0);
 }
@@ -301,35 +381,9 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
         } else if (a_type == XorMappedAddress) {
 
             // XOR-MAPPED-ADDRESS
-            if (a_length < 4)
-                return false;
-            quint8 reserved, protocol;
-            quint16 xport;
-            stream >> reserved;
-            stream >> protocol;
-            stream >> xport;
-            xorMappedPort = xport ^ (STUN_MAGIC >> 16);
-            if (protocol == STUN_IPV4)
+            if (!decodeAddress(stream, a_length, xorMappedHost, xorMappedPort, m_id))
             {
-                if (a_length != 8)
-                    return false;
-                quint32 xaddr;
-                stream >> xaddr;
-                xorMappedHost = QHostAddress(xaddr ^ STUN_MAGIC);
-            } else if (protocol == STUN_IPV6) {
-                if (a_length != 20)
-                    return false;
-                QByteArray xaddr(16, 0);
-                stream.readRawData(xaddr.data(), xaddr.size());
-                QByteArray xpad;
-                QDataStream(&xpad, QIODevice::WriteOnly) << STUN_MAGIC;
-                xpad += m_id;
-                Q_IPV6ADDR addr;
-                for (int i = 0; i < 16; i++)
-                    addr[i] = xaddr[i] ^ xpad[i];
-                xorMappedHost = QHostAddress(addr);
-            } else {
-                *errors << QString("Bad protocol %1").arg(QString::number(protocol));
+                *errors << QLatin1String("Bad XOR-MAPPED-ADDRESS");
                 return false;
             }
 
@@ -414,22 +468,13 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
     return true;
 }
 
-void QXmppStunMessage::addAddress(QDataStream &stream, quint16 type, const QHostAddress &host, quint16 port) const
-{
-    if (port && !host.isNull() &&
-        (host.protocol() == QAbstractSocket::IPv4Protocol ||
-         host.protocol() == QAbstractSocket::IPv6Protocol))
-    {
-        encodeAddress(stream, type, host, port);
-    }
-}
-
 /// Encodes the current QXmppStunMessage, optionally calculating the
 /// message integrity attribute using the given password.
 /// 
 /// \param password
+/// \param addFingerprint
 
-QByteArray QXmppStunMessage::encode(const QString &password) const
+QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint) const
 {
     QByteArray buffer;
     QDataStream stream(&buffer, QIODevice::WriteOnly);
@@ -454,33 +499,7 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
     addAddress(stream, OtherAddress, otherHost, otherPort);
 
     // XOR-MAPPED-ADDRESS
-    if (xorMappedPort && !xorMappedHost.isNull() &&
-        (xorMappedHost.protocol() == QAbstractSocket::IPv4Protocol ||
-         xorMappedHost.protocol() == QAbstractSocket::IPv6Protocol))
-    {
-        const quint8 reserved = 0;
-        stream << quint16(XorMappedAddress);
-        if (xorMappedHost.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            stream << quint16(8);
-            stream << reserved;
-            stream << quint8(STUN_IPV4);
-            stream << quint16(xorMappedPort ^ (STUN_MAGIC >> 16));
-            stream << quint32(xorMappedHost.toIPv4Address() ^ STUN_MAGIC);
-        } else {
-            stream << quint16(20);
-            stream << reserved;
-            stream << quint8(STUN_IPV6);
-            stream << quint16(xorMappedPort ^ (STUN_MAGIC >> 16));
-            Q_IPV6ADDR addr = xorMappedHost.toIPv6Address();
-            QByteArray xaddr;
-            QDataStream(&xaddr, QIODevice::WriteOnly) << STUN_MAGIC;
-            xaddr += m_id;
-            for (int i = 0; i < 16; i++)
-                xaddr[i] = xaddr[i] ^ addr[i];
-            stream.writeRawData(xaddr.data(), xaddr.size());
-        }
-    }
+    addAddress(stream, XorMappedAddress, xorMappedHost, xorMappedPort, m_id);
 
     // ERROR-CODE
     if (errorCode)
@@ -552,11 +571,14 @@ QByteArray QXmppStunMessage::encode(const QString &password) const
     }
 
     // FINGERPRINT
-    setBodyLength(buffer, buffer.size() - STUN_HEADER + 8);
-    quint32 fingerprint = generateCrc32(buffer) ^ 0x5354554eL;
-    stream << quint16(Fingerprint);
-    stream << quint16(sizeof(fingerprint));
-    stream << fingerprint;
+    if (addFingerprint)
+    {
+        setBodyLength(buffer, buffer.size() - STUN_HEADER + 8);
+        quint32 fingerprint = generateCrc32(buffer) ^ 0x5354554eL;
+        stream << quint16(Fingerprint);
+        stream << quint16(sizeof(fingerprint));
+        stream << fingerprint;
+    }
 
     return buffer;
 }
@@ -588,29 +610,23 @@ quint16 QXmppStunMessage::peekType(const QByteArray &buffer, QByteArray &id)
     return type;
 }
  
-void QXmppStunMessage::setBodyLength(QByteArray &buffer, qint16 length) const
-{
-    QDataStream stream(&buffer, QIODevice::WriteOnly);
-    stream.device()->seek(2);
-    stream << length;
-}
-
 QString QXmppStunMessage::toString() const
 {
     QStringList dumpLines;
     QString typeName;
     switch (m_type & 0x000f)
     {
-        case 1: typeName = "Binding"; break;
-        case 2: typeName = "Shared Secret"; break;
+        case Binding: typeName = "Binding"; break;
+        case SharedSecret: typeName = "Shared Secret"; break;
+        case Allocate: typeName = "Allocate"; break;
         default: typeName = "Unknown"; break;
     }
     switch (m_type & 0x0ff0)
     {
-        case 0x000: typeName += " Request"; break;
-        case 0x010: typeName += " Indication"; break;
-        case 0x100: typeName += " Response"; break;
-        case 0x110: typeName += " Error"; break;
+        case Request: typeName += " Request"; break;
+        case Indication: typeName += " Indication"; break;
+        case Response: typeName += " Response"; break;
+        case Error: typeName += " Error"; break;
         default: break;
     }
     dumpLines << QString(" type %1 (%2)")
@@ -699,6 +715,7 @@ QXmppStunSocket::~QXmppStunSocket()
 bool QXmppStunSocket::bind()
 {
     int preferredPort = 0;
+    int foundation = 0;
 
     // store HOST candidates
     m_localCandidates.clear();
@@ -739,15 +756,17 @@ bool QXmppStunSocket::bind()
 
             QXmppJingleCandidate candidate;
             candidate.setComponent(m_component);
+            candidate.setFoundation(foundation++);
             candidate.setHost(entry.ip());
             candidate.setId(generateStanzaHash(10));
 #if QT_VERSION >= 0x040500
             candidate.setNetwork(interface.index());
 #endif
             candidate.setPort(socket->localPort());
-            candidate.setPriority(2130706432 - m_component);
             candidate.setProtocol("udp");
-            candidate.setType("host");
+            candidate.setType(QXmppJingleCandidate::HostType);
+
+            candidate.setPriority(candidatePriority(candidate));
             m_localCandidates << candidate;
         }
     }
@@ -780,7 +799,7 @@ void QXmppStunSocket::checkCandidates()
         // send a binding request
         QXmppStunMessage message;
         message.setId(pair->transaction);
-        message.setType(BindingRequest);
+        message.setType(Binding | Request);
         message.priority = pair->priority;
         message.username = QString("%1:%2").arg(m_remoteUser, m_localUser);
         if (m_iceControlling)
@@ -799,7 +818,7 @@ void QXmppStunSocket::checkCandidates()
         foreach (QUdpSocket *socket, m_sockets)
         {
             QXmppStunMessage msg;
-            msg.setType(BindingRequest);
+            msg.setType(Binding | Request);
             msg.setId(m_stunId);
 #ifdef QXMPP_DEBUG_STUN
             debug(
@@ -866,7 +885,8 @@ void QXmppStunSocket::setLocalPassword(const QString &password)
 bool QXmppStunSocket::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
     if (candidate.component() != m_component ||
-        (candidate.type() != "host" && candidate.type() != "srflx") ||
+        (candidate.type() != QXmppJingleCandidate::HostType &&
+         candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
         candidate.protocol() != "udp" ||
         (candidate.host().protocol() != QAbstractSocket::IPv4Protocol &&
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
@@ -909,10 +929,15 @@ QXmppStunSocket::Pair *QXmppStunSocket::addRemoteCandidate(QUdpSocket *socket, c
             return pair;
 
     QXmppJingleCandidate candidate;
+    candidate.setComponent(m_component);
     candidate.setHost(host);
+    candidate.setId(generateStanzaHash(10));
     candidate.setPort(port);
     candidate.setProtocol("udp");
-    candidate.setComponent(m_component);
+    candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
+
+    // FIXME : what priority?
+    // candidate.setPriority(candidatePriority(candidate));
 
     Pair *pair = new Pair;
     pair->remote = candidate;
@@ -1023,20 +1048,19 @@ void QXmppStunSocket::readyRead()
         candidate.setHost(reflexiveHost);
         candidate.setId(generateStanzaHash(10));
         candidate.setPort(reflexivePort);
-        candidate.setPriority(2130706432 - m_component);
         candidate.setProtocol("udp");
-        candidate.setType("srflx");
+        candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
+
+        candidate.setPriority(candidatePriority(candidate));
         m_localCandidates << candidate;
 
         emit localCandidatesChanged();
         return;
     }
-    else if (m_activePair)
-        return;
 
     // process message from peer
     Pair *pair = 0;
-    if (message.type() == BindingRequest)
+    if (message.type() == Binding | Request)
     {
         // add remote candidate
         pair = addRemoteCandidate(socket, remoteHost, remotePort);
@@ -1044,7 +1068,7 @@ void QXmppStunSocket::readyRead()
         // send a binding response
         QXmppStunMessage response;
         response.setId(message.id());
-        response.setType(BindingResponse);
+        response.setType(Binding | Response);
         response.username = message.username;
         response.xorMappedHost = pair->remote.host();
         response.xorMappedPort = pair->remote.port();
@@ -1057,19 +1081,19 @@ void QXmppStunSocket::readyRead()
             pair->checked |= QIODevice::ReadOnly;
         }
 
-        if (!m_iceControlling)
+        if (!m_iceControlling && !m_activePair)
         {
             // send a triggered connectivity test
             QXmppStunMessage message;
             message.setId(pair->transaction);
-            message.setType(BindingRequest);
+            message.setType(Binding | Request);
             message.priority = pair->priority;
             message.username = QString("%1:%2").arg(m_remoteUser, m_localUser);
             message.iceControlled = QByteArray(8, 0);
             writeStun(message, pair);
         }
 
-    } else if (message.type() == BindingResponse) {
+    } else if (message.type() == Binding | Response) {
 
         // find the pair for this transaction
         foreach (Pair *ptr, m_pairs)
