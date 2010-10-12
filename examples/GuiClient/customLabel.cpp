@@ -32,6 +32,7 @@ customLabel::customLabel(QWidget* parent):QLabel(parent), m_timer(this),
 
     bool check = connect(&m_timer, SIGNAL(timeout()), SLOT(timeout()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void customLabel::setCustomText(const QString& text, customLabel::Option op,
