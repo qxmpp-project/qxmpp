@@ -49,6 +49,7 @@ chatDialog::chatDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui->verticalLayout->insertWidget(0, m_view);
     bool check = connect(m_pushButtonSend, SIGNAL(clicked(bool)), SLOT(sendMessage()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
     updateSendButtonGeomerty();
 }
 

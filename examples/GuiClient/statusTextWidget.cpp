@@ -138,6 +138,7 @@ void statusTextWidget::addStatusTextToList(const QString& status)
     action->setData(status);
     bool check = connect(action, SIGNAL(triggered()), SLOT(statusTextChanged_menuClick()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
     m_statusTextActionList.append(action);
 }
 

@@ -41,6 +41,7 @@ capabilitiesCache::capabilitiesCache(QXmppClient* client) :
         bool check = connect(ext, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
                              SLOT(infoReceived(const QXmppDiscoveryIq&)));
         Q_ASSERT(check);
+        Q_UNUSED(check);
     }
 }
 
