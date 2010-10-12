@@ -65,6 +65,7 @@ void xmppClient::rosterReceived()
     bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(const QXmppVCardIq&)),
         SLOT(vCardReceived(const QXmppVCardIq&)));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 
     QStringList list = rosterManager().getRosterBareJids();
     for(int i = 0; i < list.size(); ++i)
