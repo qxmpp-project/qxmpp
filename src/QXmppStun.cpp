@@ -1060,7 +1060,7 @@ void QXmppStunSocket::readyRead()
 
     // process message from peer
     Pair *pair = 0;
-    if (message.type() == Binding | Request)
+    if (message.type() == (Binding | Request))
     {
         // add remote candidate
         pair = addRemoteCandidate(socket, remoteHost, remotePort);
@@ -1093,7 +1093,7 @@ void QXmppStunSocket::readyRead()
             writeStun(message, pair);
         }
 
-    } else if (message.type() == Binding | Response) {
+    } else if (message.type() == (Binding | Response)) {
 
         // find the pair for this transaction
         foreach (Pair *ptr, m_pairs)
