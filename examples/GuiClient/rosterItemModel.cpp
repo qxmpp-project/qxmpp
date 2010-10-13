@@ -88,8 +88,8 @@ void rosterItemModel::updateAvatar(const QString& bareJid, const QImage& image)
 {
     addRosterItemIfDontExist(bareJid);
 
-    if(image.isNull())
-        return;
+//    if(image.isNull())
+//        return;
 
     getRosterItemFromBareJid(bareJid)->setAvatar(image);
 }
