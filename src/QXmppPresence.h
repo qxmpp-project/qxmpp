@@ -48,10 +48,12 @@ public:
     // XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
-        VCardUpdateNone = 0,
-        PhotoNotAdvertized,
-        PhotoAdvertised,
-        PhotoNotReady
+        VCardUpdateNone = 0,    ///< Protocol not supported
+        PhotoNotAdvertized,     ///< Not using any avatar
+        PhotoAdvertised,        ///< Using an avatar
+        PhotoNotReady           ///< No info available about the avatar.
+                                ///< It might be there in the vCard but the contact's
+                                ///< client doesn't know it temporarily.
     };
 
     class Status
