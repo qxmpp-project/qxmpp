@@ -132,3 +132,9 @@ QImage vCardCache::getAvatar(const QString& bareJid) const
     else
         return QImage();
 }
+
+QByteArray vCardCache::getPhotoHash(const QString& bareJid) const
+{
+    return QCryptographicHash::hash(m_mapBareJidVcard[bareJid].photo(),
+                                    QCryptographicHash::Sha1);
+}
