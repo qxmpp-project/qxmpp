@@ -84,7 +84,7 @@ void QXmppPresence::parse(const QDomElement &element)
             QDomElement photoElement = xElement.firstChildElement("photo");
             if(!photoElement.isNull())
             {
-                m_photoHash = QByteArray::fromBase64(photoElement.text().toAscii());
+                m_photoHash = QByteArray::fromHex(photoElement.text().toAscii());
                 if(m_photoHash.isEmpty())
                     m_vCardUpdateType = PhotoNotAdvertized;
                 else
