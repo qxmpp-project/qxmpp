@@ -244,6 +244,10 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
             m_capabilitiesCache.requestInfo(jid, nodeVer);
     }
 
+    if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
+    {
+        m_vCardCache.requestVCard(bareJid);
+    }
 
 //    QXmppPresence::Type presenceType = presences.begin().value().getType();
 
