@@ -149,7 +149,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             helperToXmlAddTextElement(xmlWriter, "photo", "");
             break;
         case PhotoAdvertised:
-            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash.toBase64());
+            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash.toHex());
             break;
         case PhotoNotReady:
             break;
