@@ -57,6 +57,7 @@ bool vCardCache::isVCardAvailable(const QString& bareJid)
     return m_mapBareJidVcard.contains(bareJid);
 }
 
+// TODO don't request again, if it is already requested
 void vCardCache::requestVCard(const QString& bareJid)
 {
     if(m_client)
