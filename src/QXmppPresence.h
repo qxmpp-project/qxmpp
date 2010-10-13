@@ -48,6 +48,8 @@ public:
     // XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
+        // TODO fix the enum names PhotoNotAdvertized is confusing
+        // All of these should start with VCardUpdate
         VCardUpdateNone = 0,    ///< Protocol not supported
         PhotoNotAdvertized,     ///< Not using any avatar
         PhotoAdvertised,        ///< Using an avatar
