@@ -437,7 +437,7 @@ void TestPackets::testPresenceWithVCardUpdate()
         "<status>In a meeting</status>"
         "<priority>5</priority>"
         "<x xmlns=\"vcard-temp:x:update\">"
-        "<photo>Ve0tKBkyTOPyZrekN6VJl6ZZZfQ=</photo>"
+        "<photo>73b908bc</photo>"
         "</x>"
         "</presence>");
 
@@ -448,7 +448,7 @@ void TestPackets::testPresenceWithVCardUpdate()
     QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.photoHash(), QByteArray::fromBase64("Ve0tKBkyTOPyZrekN6VJl6ZZZfQ="));
+    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
     serializePacket(presence, xml);
 }
@@ -461,7 +461,7 @@ void TestPackets::testPresenceWithCapability()
         "<status>In a meeting</status>"
         "<priority>5</priority>"
         "<x xmlns=\"vcard-temp:x:update\">"
-        "<photo>Ve0tKBkyTOPyZrekN6VJl6ZZZfQ=</photo>"
+        "<photo>73b908bc</photo>"
         "</x>"
         "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"http://code.google.com/p/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
         "</presence>");
@@ -473,7 +473,7 @@ void TestPackets::testPresenceWithCapability()
     QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.photoHash(), QByteArray::fromBase64("Ve0tKBkyTOPyZrekN6VJl6ZZZfQ="));
+    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc="));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
     QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
