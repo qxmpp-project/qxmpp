@@ -244,9 +244,18 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
             m_capabilitiesCache.requestInfo(jid, nodeVer);
     }
 
-    if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
+    switch(pre.vCardUpdateType())
     {
-        m_vCardCache.requestVCard(bareJid);
+    case QXmppPresence::VCardUpdateNone:
+    case QXmppPresence::PhotoNotReady:
+        break;
+    case QXmppPresence::PhotoNotAdvertized:
+    case QXmppPresence::PhotoAdvertised:
+        if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
+        {
+            m_vCardCache.requestVCard(bareJid);
+        }
+        break;
     }
 
 //    QXmppPresence::Type presenceType = presences.begin().value().getType();
