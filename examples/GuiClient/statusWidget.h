@@ -24,8 +24,12 @@
 
 #ifndef STATUSWIDGET_H
 #define STATUSWIDGET_H
+
 #include "ui_statusWidget.h"
+
 #include "QXmppPresence.h"
+
+/// Main Widget for the client's status/status text/avatar management
 
 class statusWidget : public QWidget, public Ui::statusWidgetClass
 {
@@ -33,6 +37,7 @@ class statusWidget : public QWidget, public Ui::statusWidgetClass
 
 public:
     statusWidget(QWidget* parent = 0);
+
     void setDisplayName(const QString& name);
     void setStatusText(const QString& statusText);
     void setPresenceAndStatusType(QXmppPresence::Type presenceType,

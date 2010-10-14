@@ -30,6 +30,7 @@
 statusWidget::statusWidget(QWidget* parent)
 {
     setupUi(this);
+
     QMenu* menu = new QMenu(this);
     menu->addAction(actionAvailable);
     menu->addAction(actionBusy);
