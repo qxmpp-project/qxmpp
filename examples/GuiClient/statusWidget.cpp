@@ -128,7 +128,8 @@ void statusWidget::setPresenceAndStatusType(QXmppPresence::Type presenceType,
 
 void statusWidget::avatarSelection()
 {
-    QString file = QFileDialog::getOpenFileName(this, "Select your avatar");
+    QString file = QFileDialog::getOpenFileName(this, "Select your avatar", QString(),
+                                                QString("Images (*.png *.jpeg *.jpg)"));
     if(file.isEmpty())
         return;
 
