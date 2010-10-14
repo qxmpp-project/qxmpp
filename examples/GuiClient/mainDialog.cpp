@@ -412,7 +412,7 @@ void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusTyp
 
 void mainDialog::avatarChanged(const QImage& image)
 {
-    QXmppVCardIq& vcard = m_vCardCache.getVCard(m_xmppClient.configuration().jidBare());
+    QXmppVCardIq vcard;
     vcard.setType(QXmppIq::Set);
 
     QByteArray ba;
@@ -425,6 +425,7 @@ void mainDialog::avatarChanged(const QImage& image)
             m_xmppClient.sendPacket(vcard);
             m_statusWidget.setAvatar(image);
 
+            m_vCardCache.getVCard(m_xmppClient.configuration().jidBare()) = vcard;
             // update photo hash
             QXmppPresence presence = m_xmppClient.clientPresence();
             addPhotoHash(presence);
