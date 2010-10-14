@@ -233,7 +233,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="customLabel" name="label_status">
+          <widget class="signInStatusLabel" name="label_status">
            <property name="text">
             <string/>
            </property>
@@ -351,9 +351,9 @@
    <header>searchLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>customLabel</class>
+   <class>signInStatusLabel</class>
    <extends>QLabel</extends>
-   <header>customLabel.h</header>
+   <header>signInStatusLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

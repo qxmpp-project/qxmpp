@@ -541,17 +541,17 @@ void mainDialog::startConnection()
 
 void mainDialog::showLoginStatus(const QString& msg)
 {
-    ui->label_status->setCustomText(msg, customLabel::None);
+    ui->label_status->setCustomText(msg, signInStatusLabel::None);
 }
 
 void mainDialog::showLoginStatusWithProgress(const QString& msg)
 {
-    ui->label_status->setCustomText(msg, customLabel::WithProgressEllipsis);
+    ui->label_status->setCustomText(msg, signInStatusLabel::WithProgressEllipsis);
 }
 
 void mainDialog::showLoginStatusWithCounter(const QString& msg, int time)
 {
-    ui->label_status->setCustomText(msg, customLabel::CountDown, time);
+    ui->label_status->setCustomText(msg, signInStatusLabel::CountDown, time);
 }
 
 void mainDialog::updateVCard(const QString& bareJid)

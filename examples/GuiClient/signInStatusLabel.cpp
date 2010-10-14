@@ -22,10 +22,10 @@
  */
 
 
-#include "customLabel.h"
+#include "signInStatusLabel.h"
 #include <QFontMetrics>
 
-customLabel::customLabel(QWidget* parent):QLabel(parent), m_timer(this),
+signInStatusLabel::signInStatusLabel(QWidget* parent):QLabel(parent), m_timer(this),
         m_option(None)
 {
     m_timer.setSingleShot(false);
@@ -35,7 +35,7 @@ customLabel::customLabel(QWidget* parent):QLabel(parent), m_timer(this),
     Q_UNUSED(check);
 }
 
-void customLabel::setCustomText(const QString& text, customLabel::Option op,
+void signInStatusLabel::setCustomText(const QString& text, signInStatusLabel::Option op,
                    int countDown)
 {
     m_text = text;
@@ -69,7 +69,7 @@ void customLabel::setCustomText(const QString& text, customLabel::Option op,
     updateGeometry();
 }
 
-void customLabel::timeout()
+void signInStatusLabel::timeout()
 {
     switch(m_option)
     {
@@ -101,7 +101,7 @@ void customLabel::timeout()
     updateGeometry();
 }
 
-//QSize customLabel::sizeHint() const
+//QSize signInStatusLabel::sizeHint() const
 //{
 //    QFont font;
 //    QFontMetrics fm(font);

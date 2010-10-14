@@ -16,7 +16,7 @@ SOURCES += main.cpp \
     rosterListView.cpp \
     searchLineEdit.cpp \
     statusWidget.cpp \
-    customLabel.cpp \
+    signInStatusLabel.cpp \
     statusAvatarWidget.cpp \
     statusTextWidget.cpp \
     statusToolButton.cpp \
@@ -38,7 +38,7 @@ HEADERS += chatMsgGraphicsItem.h \
     rosterListView.h \
     searchLineEdit.h \
     statusWidget.h \
-    customLabel.h \
+    signInStatusLabel.h \
     statusAvatarWidget.h \
     statusTextWidget.h \
     statusToolButton.h \
