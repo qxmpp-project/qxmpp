@@ -23,6 +23,7 @@
 
 
 #include "statusWidget.h"
+
 #include <QMenu>
 #include <QFileDialog>
 #include <QMessageBox>
