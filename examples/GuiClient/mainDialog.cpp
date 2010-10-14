@@ -373,6 +373,7 @@ void mainDialog::statusTextChanged(const QString& status)
 {
     QXmppPresence presence = m_xmppClient.clientPresence();
     presence.status().setStatusText(status);
+    addPhotoHash(presence);
     m_xmppClient.setClientPresence(presence);
 }
 
@@ -388,6 +389,7 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
         QXmppPresence newPresence = m_xmppClient.clientPresence();
         newPresence.setType(presenceType);
         newPresence.status().setType(QXmppPresence::Status::Online);
+        addPhotoHash(newPresence);
         m_xmppClient.setClientPresence(newPresence);
     }
     m_statusWidget.setStatusText(
@@ -402,6 +404,7 @@ void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusTyp
     else
         presence.setType(QXmppPresence::Available);
     presence.status().setType(statusType);
+    addPhotoHash(presence);
     m_xmppClient.setClientPresence(presence);
     m_statusWidget.setStatusText(
             presenceToStatusText(m_xmppClient.clientPresence()));
@@ -409,17 +412,25 @@ void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusTyp
 
 void mainDialog::avatarChanged(const QImage& image)
 {
-    QXmppVCardIq vcard;
+    QXmppVCardIq& vcard = m_vCardCache.getVCard(m_xmppClient.configuration().jidBare());
     vcard.setType(QXmppIq::Set);
 
     QByteArray ba;
     QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "PNG");
-    vcard.setPhoto(ba);
+    if(buffer.open(QIODevice::WriteOnly))
+    {
+        if(image.save(&buffer, "PNG"))
+        {
+            vcard.setPhoto(ba);
+            m_xmppClient.sendPacket(vcard);
+            m_statusWidget.setAvatar(image);
 
-    m_xmppClient.sendPacket(vcard);
-    m_statusWidget.setAvatar(image);
+            // update photo hash
+            QXmppPresence presence = m_xmppClient.clientPresence();
+            addPhotoHash(presence);
+            m_xmppClient.setClientPresence(presence);
+        }
+    }
 }
 
 void mainDialog::updateStatusWidget()
@@ -823,4 +834,24 @@ void mainDialog::errorClient(QXmppClient::Error error)
 void mainDialog::action_showXml()
 {
     m_consoleDlg.show();
+}
+
+void mainDialog::addPhotoHash(QXmppPresence& pre)
+{
+    QString clientBareJid = m_xmppClient.configuration().jidBare();
+
+    if(m_vCardCache.isVCardAvailable(clientBareJid))
+    {
+        QByteArray hash = m_vCardCache.getPhotoHash(clientBareJid);
+        if(hash.isEmpty())
+            pre.setVCardUpdateType(QXmppPresence::PhotoNotAdvertized);
+        else
+            pre.setVCardUpdateType(QXmppPresence::PhotoAdvertised);
+        pre.setPhotoHash(hash);
+    }
+    else
+    {
+        pre.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
+        pre.setPhotoHash(QByteArray());
+    }
 }

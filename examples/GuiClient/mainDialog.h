@@ -100,6 +100,8 @@ private:
     void createTrayIconAndMenu();
     void createSettingsMenu();
 
+    void addPhotoHash(QXmppPresence&);
+
     chatDialog* getChatDialog(const QString& bareJid);
 
     Ui::mainDialogClass* ui;
