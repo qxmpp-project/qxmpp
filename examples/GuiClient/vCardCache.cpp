@@ -135,6 +135,9 @@ QImage vCardCache::getAvatar(const QString& bareJid) const
 
 QByteArray vCardCache::getPhotoHash(const QString& bareJid) const
 {
+    if(!m_mapBareJidVcard.contains(bareJid))
+        return QByteArray();
+
     if(m_mapBareJidVcard[bareJid].photo().isEmpty())
         return QByteArray();
     else
