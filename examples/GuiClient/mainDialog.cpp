@@ -195,15 +195,11 @@ void mainDialog::rosterChanged(const QString& bareJid)
     m_rosterItemModel.updateRosterEntry(bareJid, m_xmppClient.rosterManager().
                                         getRosterEntry(bareJid));
 
-    bool check = m_vCardCache.isVCardAvailable(bareJid);
-    if(check)
-    {
+    // if available in cache, update it
+    if(m_vCardCache.isVCardAvailable(bareJid))
         updateVCard(bareJid);
-    }
-    else
-    {
-        m_vCardCache.requestVCard(bareJid);
-    }
+//    else
+//        m_vCardCache.requestVCard(bareJid);
 }
 
 void mainDialog::rosterReceived()
@@ -229,33 +225,36 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
 
     QXmppPresence& pre = presences[resource];
 
-    QString node = pre.capabilityNode();
-    QString ver = pre.capabilityVer().toBase64();
-    QStringList exts = pre.capabilityExt();
-
-    QString nodeVer = node + "#" + ver;
-    if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
-        m_capabilitiesCache.requestInfo(jid, nodeVer);
-
-    foreach(QString ext, exts)
+    if(pre.type() == QXmppPresence::Available)
     {
-        nodeVer = node + "#" + ext;
+        QString node = pre.capabilityNode();
+        QString ver = pre.capabilityVer().toBase64();
+        QStringList exts = pre.capabilityExt();
+
+        QString nodeVer = node + "#" + ver;
         if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
             m_capabilitiesCache.requestInfo(jid, nodeVer);
-    }
 
-    switch(pre.vCardUpdateType())
-    {
-    case QXmppPresence::VCardUpdateNone:
-    case QXmppPresence::PhotoNotReady:
-        break;
-    case QXmppPresence::PhotoNotAdvertized:
-    case QXmppPresence::PhotoAdvertised:
-        if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
+        foreach(QString ext, exts)
         {
-            m_vCardCache.requestVCard(bareJid);
+            nodeVer = node + "#" + ext;
+            if(!m_capabilitiesCache.isCapabilityAvailable(nodeVer))
+                m_capabilitiesCache.requestInfo(jid, nodeVer);
         }
-        break;
+
+        switch(pre.vCardUpdateType())
+        {
+        case QXmppPresence::VCardUpdateNone:
+            if(!m_vCardCache.isVCardAvailable(bareJid))
+                m_vCardCache.requestVCard(bareJid);
+        case QXmppPresence::PhotoNotReady:
+            break;
+        case QXmppPresence::PhotoNotAdvertized:
+        case QXmppPresence::PhotoAdvertised:
+            if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
+                m_vCardCache.requestVCard(bareJid);
+            break;
+        }
     }
 
 //    QXmppPresence::Type presenceType = presences.begin().value().getType();
