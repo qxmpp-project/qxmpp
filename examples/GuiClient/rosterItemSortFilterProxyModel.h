@@ -31,6 +31,8 @@ class rosterItemSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
     rosterItemSortFilterProxyModel(QObject* parent = 0);
+
+private:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 };
 
