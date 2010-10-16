@@ -222,6 +222,7 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
     QMap<QString, QXmppPresence> presences = m_xmppClient.rosterManager().
                                              getAllPresencesForBareJid(bareJid);
     m_rosterItemModel.updatePresence(bareJid, presences);
+//    m_rosterItemSortFilterModel.invalidate();
 
     QXmppPresence& pre = presences[resource];
 
@@ -675,6 +676,13 @@ void mainDialog::createSettingsMenu()
     QAction* showXml = new QAction("Show XML Console...", ui->pushButton_settings);
     connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
     settingsMenu->addAction(showXml);
+
+    QAction* showOfflineContacts = new QAction("Show offline contacts", ui->pushButton_settings);
+    showOfflineContacts->setCheckable(true);
+    showOfflineContacts->setChecked(true);
+    connect(showOfflineContacts, SIGNAL(triggered(bool)),
+            &m_rosterItemSortFilterModel, SLOT(setShowOfflineContacts(bool)));
+    settingsMenu->addAction(showOfflineContacts);
 }
 
 void mainDialog::closeEvent(QCloseEvent *event)
