@@ -27,7 +27,7 @@
 #include "utils.h"
 
 rosterItemSortFilterProxyModel::rosterItemSortFilterProxyModel(QObject* parent):
-                QSortFilterProxyModel(parent)
+                QSortFilterProxyModel(parent), m_showOfflineContacts(true)
 {
     setDynamicSortFilter(true);
     setFilterRole(Qt::DisplayRole);
@@ -63,3 +63,24 @@ bool rosterItemSortFilterProxyModel::lessThan(const QModelIndex &left, const QMo
                 comparisonWeightsPresenceType(static_cast<QXmppPresence::Type>(rightPresenceType));
 }
 
+bool rosterItemSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
+{
+    if(m_showOfflineContacts)
+        return true;
+
+    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+
+    int presenceType = sourceModel()->data(index, rosterItem::PresenceType).toInt();
+
+    if(presenceType == QXmppPresence::Available)
+        return true;
+    else
+        return false;
+}
+
+void rosterItemSortFilterProxyModel::setShowOfflineContacts(bool showOfflineContacts)
+{
+    m_showOfflineContacts = showOfflineContacts;
+
+    invalidateFilter();
+}
