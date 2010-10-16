@@ -94,13 +94,11 @@ bool rosterItemSortFilterProxyModel::filterAcceptsRow(int source_row, const QMod
 void rosterItemSortFilterProxyModel::setShowOfflineContacts(bool showOfflineContacts)
 {
     m_showOfflineContacts = showOfflineContacts;
-
     invalidateFilter();
 }
 
 void rosterItemSortFilterProxyModel::sortByName(bool sortByName)
 {
     m_sortByName = sortByName;
-
     invalidate();
 }
