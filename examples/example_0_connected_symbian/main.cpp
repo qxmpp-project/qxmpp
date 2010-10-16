@@ -49,6 +49,7 @@ LogViewer::LogViewer()
 
 void LogViewer::log(QXmppLogger::MessageType type, const QString& msg)
 {
+    Q_UNUSED(type);
     m_browser->append(msg);
 }
 
