@@ -27,7 +27,9 @@
 #include "utils.h"
 
 rosterItemSortFilterProxyModel::rosterItemSortFilterProxyModel(QObject* parent):
-                QSortFilterProxyModel(parent), m_showOfflineContacts(true)
+                QSortFilterProxyModel(parent),
+                m_showOfflineContacts(true),
+                m_sortByName(false)
 {
     setDynamicSortFilter(true);
     setFilterRole(Qt::DisplayRole);
@@ -36,31 +38,42 @@ rosterItemSortFilterProxyModel::rosterItemSortFilterProxyModel(QObject* parent):
 
 bool rosterItemSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-    int leftPresenceType = sourceModel()->data(left, rosterItem::PresenceType).toInt();
-    int leftStatusType = sourceModel()->data(left, rosterItem::StatusType).toInt();
-    int rightPresenceType = sourceModel()->data(right, rosterItem::PresenceType).toInt();
-    int rightStatusType = sourceModel()->data(right, rosterItem::StatusType).toInt();
-
-    if(leftPresenceType == rightPresenceType)
+    if(m_sortByName)
     {
-        if(leftStatusType == rightStatusType)
-        {
-            // based on display text
-            int compare = left.data().toString().compare(right.data().toString(), Qt::CaseInsensitive);
-            if(compare < 0)
-                return true;
-            else
-                return false;
-        }
+        int compare = left.data().toString().compare(right.data().toString(), Qt::CaseInsensitive);
+        if(compare < 0)
+            return true;
         else
-        {
-            return comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(leftStatusType)) <
-                    comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(rightStatusType));
-        }
+            return false;
     }
     else
-        return comparisonWeightsPresenceType(static_cast<QXmppPresence::Type>(leftPresenceType)) <
-                comparisonWeightsPresenceType(static_cast<QXmppPresence::Type>(rightPresenceType));
+    {
+        int leftPresenceType = sourceModel()->data(left, rosterItem::PresenceType).toInt();
+        int leftStatusType = sourceModel()->data(left, rosterItem::StatusType).toInt();
+        int rightPresenceType = sourceModel()->data(right, rosterItem::PresenceType).toInt();
+        int rightStatusType = sourceModel()->data(right, rosterItem::StatusType).toInt();
+
+        if(leftPresenceType == rightPresenceType)
+        {
+            if(leftStatusType == rightStatusType)
+            {
+                // based on display text
+                int compare = left.data().toString().compare(right.data().toString(), Qt::CaseInsensitive);
+                if(compare < 0)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(leftStatusType)) <
+                        comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(rightStatusType));
+            }
+        }
+        else
+            return comparisonWeightsPresenceType(static_cast<QXmppPresence::Type>(leftPresenceType)) <
+                    comparisonWeightsPresenceType(static_cast<QXmppPresence::Type>(rightPresenceType));
+    }
 }
 
 bool rosterItemSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
@@ -83,4 +96,11 @@ void rosterItemSortFilterProxyModel::setShowOfflineContacts(bool showOfflineCont
     m_showOfflineContacts = showOfflineContacts;
 
     invalidateFilter();
+}
+
+void rosterItemSortFilterProxyModel::sortByName(bool sortByName)
+{
+    m_sortByName = sortByName;
+
+    invalidate();
 }
