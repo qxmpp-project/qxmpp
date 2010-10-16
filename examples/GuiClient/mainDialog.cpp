@@ -683,6 +683,13 @@ void mainDialog::createSettingsMenu()
     connect(showOfflineContacts, SIGNAL(triggered(bool)),
             &m_rosterItemSortFilterModel, SLOT(setShowOfflineContacts(bool)));
     settingsMenu->addAction(showOfflineContacts);
+
+    QAction* sortByName = new QAction("Sort by name", ui->pushButton_settings);
+    sortByName->setCheckable(true);
+    sortByName->setChecked(false);
+    connect(sortByName, SIGNAL(triggered(bool)),
+            &m_rosterItemSortFilterModel, SLOT(sortByName(bool)));
+    settingsMenu->addAction(sortByName);
 }
 
 void mainDialog::closeEvent(QCloseEvent *event)
