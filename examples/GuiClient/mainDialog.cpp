@@ -265,6 +265,8 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
 void mainDialog::filterChanged(const QString& filter)
 {
     m_rosterItemSortFilterModel.setFilterRegExp(filter);
+
+    // follow statement selects the first row
     ui->listView->selectionModel()->select(ui->listView->model()->index(0, 0),
                                            QItemSelectionModel::ClearAndSelect);
 }
