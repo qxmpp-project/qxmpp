@@ -130,16 +130,16 @@ QImage rosterItem::getAvatar()
     return qvariant_cast<QImage>(data(rosterItem::Avatar));
 }
 
-ItemDelegate::ItemDelegate()
+rosterItemDelegate::rosterItemDelegate()
 {
 }
 
-QSize ItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex & index) const
+QSize rosterItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex & index) const
 {
     return QSize(44, 36);
 }
 
-void ItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void rosterItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     painter->save();
     painter->setRenderHint(QPainter::TextAntialiasing);

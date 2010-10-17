@@ -128,7 +128,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui->listView->setModel(&m_rosterItemSortFilterModel);
     m_rosterItemSortFilterModel.sort(0);
 
-    ItemDelegate *delegate = new ItemDelegate();
+    rosterItemDelegate *delegate = new rosterItemDelegate();
     ui->listView->setItemDelegate(delegate);
     ui->listView->setFocus();
     ui->verticalLayout_3->insertWidget(0, &m_statusWidget);

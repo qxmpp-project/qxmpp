@@ -58,10 +58,10 @@ public:
     QXmppPresence::Type getPresenceType();
 };
 
-class ItemDelegate : public QItemDelegate
+class rosterItemDelegate : public QItemDelegate
 {
 public:
-    ItemDelegate();
+    rosterItemDelegate();
     QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 };
