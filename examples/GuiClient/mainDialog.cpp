@@ -38,6 +38,7 @@
 #include "QXmppRosterIq.h"
 
 #include "profileDialog.h"
+#include "aboutDialog.h"
 
 #include <QMovie>
 #include <QCompleter>
@@ -664,6 +665,11 @@ void mainDialog::createSettingsMenu()
 {
     QMenu* settingsMenu = new QMenu(ui->pushButton_settings);
     ui->pushButton_settings->setMenu(settingsMenu);
+
+    QAction* aboutDlg = new QAction("About", ui->pushButton_settings);
+    connect(aboutDlg, SIGNAL(triggered()), SLOT(action_aboutDlg()));
+    settingsMenu->addAction(aboutDlg);
+
     QAction* showXml = new QAction("Show XML Console...", ui->pushButton_settings);
     connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
     settingsMenu->addAction(showXml);
@@ -866,4 +872,10 @@ void mainDialog::addPhotoHash(QXmppPresence& pre)
         pre.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
         pre.setPhotoHash(QByteArray());
     }
+}
+
+void mainDialog::action_aboutDlg()
+{
+    aboutDialog abtDlg(this);
+    abtDlg.exec();
 }

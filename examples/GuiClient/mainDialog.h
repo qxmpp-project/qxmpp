@@ -93,6 +93,7 @@ private slots:
     void action_trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void action_showXml();
+    void action_aboutDlg();
 
 private:
     void loadAccounts();

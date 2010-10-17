@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     profileDialog.cpp \
     capabilitiesCache.cpp \
     accountsCache.cpp \
-    xmlConsoleDialog.cpp
+    xmlConsoleDialog.cpp \
+    aboutDialog.cpp
 
 HEADERS += chatMsgGraphicsItem.h \
     chatGraphicsScene.h \
@@ -46,13 +47,15 @@ HEADERS += chatMsgGraphicsItem.h \
     profileDialog.h \
     capabilitiesCache.h \
     accountsCache.h \
-    xmlConsoleDialog.h
+    xmlConsoleDialog.h \
+    aboutDialog.h
 
 FORMS += mainDialog.ui \
     chatDialog.ui \
     statusWidget.ui \
     profileDialog.ui \
-    xmlConsoleDialog.ui
+    xmlConsoleDialog.ui \
+    aboutDialog.ui
 
 QT += network \
     xml
