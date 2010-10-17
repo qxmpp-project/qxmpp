@@ -51,7 +51,8 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     m_rosterItemSortFilterModel(this), m_vCardCache(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
     m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
-    m_signOutAction("Sign out", this)
+    m_signOutAction("Sign out", this),
+    m_settingsMenu(0)
 {
     ui->setupUi(this);
     createTrayIconAndMenu();
@@ -183,6 +184,11 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
                  SIGNAL(message(QXmppLogger::MessageType, const QString &)),
                  &m_consoleDlg,
                  SLOT(message(QXmppLogger::MessageType, const QString &)));
+    Q_ASSERT(check);
+
+    check = connect(ui->pushButton_settings,
+                 SIGNAL(pressed()),
+                 SLOT(action_settingsPressed()));
     Q_ASSERT(check);
 }
 
@@ -662,21 +668,21 @@ void mainDialog::createTrayIconAndMenu()
 
 void mainDialog::createSettingsMenu()
 {
-    QMenu* settingsMenu = new QMenu(ui->pushButton_settings);
-    ui->pushButton_settings->setMenu(settingsMenu);
+    m_settingsMenu = new QMenu(ui->pushButton_settings);
+//    ui->pushButton_settings->setMenu(m_settingsMenu);
 
     QAction* aboutDlg = new QAction("About", ui->pushButton_settings);
     connect(aboutDlg, SIGNAL(triggered()), SLOT(action_aboutDlg()));
-    settingsMenu->addAction(aboutDlg);
+    m_settingsMenu->addAction(aboutDlg);
 
-    settingsMenu->addSeparator();
+    m_settingsMenu->addSeparator();
 
     QAction* showXml = new QAction("Show XML Console...", ui->pushButton_settings);
     connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
-    settingsMenu->addAction(showXml);
+    m_settingsMenu->addAction(showXml);
 
     QMenu* viewMenu = new QMenu("View", ui->pushButton_settings);
-    settingsMenu->addMenu(viewMenu);
+    m_settingsMenu->addMenu(viewMenu);
 
     QAction* showOfflineContacts = new QAction("Show offline contacts", ui->pushButton_settings);
     showOfflineContacts->setCheckable(true);
@@ -692,8 +698,8 @@ void mainDialog::createSettingsMenu()
             &m_rosterItemSortFilterModel, SLOT(sortByName(bool)));
     viewMenu->addAction(sortByName);
 
-    settingsMenu->addSeparator();
-    settingsMenu->addAction(&m_quitAction);
+    m_settingsMenu->addSeparator();
+    m_settingsMenu->addAction(&m_quitAction);
 }
 
 void mainDialog::closeEvent(QCloseEvent *event)
@@ -879,4 +885,9 @@ void mainDialog::action_aboutDlg()
 {
     aboutDialog abtDlg(this);
     abtDlg.exec();
+}
+
+void mainDialog::action_settingsPressed()
+{
+    m_settingsMenu->exec(ui->pushButton_settings->mapToGlobal(QPoint(0, ui->pushButton_settings->height())));
 }

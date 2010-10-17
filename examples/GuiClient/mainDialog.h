@@ -94,6 +94,7 @@ private slots:
 
     void action_showXml();
     void action_aboutDlg();
+    void action_settingsPressed();
 
 private:
     void loadAccounts();
@@ -122,6 +123,8 @@ private:
     QAction m_signOutAction;
 
     xmlConsoleDialog m_consoleDlg;
+
+    QMenu* m_settingsMenu;
 };
 
 #endif // MAINDIALOG_H
