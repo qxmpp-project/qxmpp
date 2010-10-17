@@ -817,13 +817,19 @@ void mainDialog::action_removeContact(const QString& bareJid)
     if(!isValidBareJid(bareJid))
         return;
 
-    QXmppRosterIq remove;
-    remove.setType(QXmppIq::Set);
-    QXmppRosterIq::Item itemRemove;
-    itemRemove.setSubscriptionType(QXmppRosterIq::Item::Remove);
-    itemRemove.setBareJid(bareJid);
-    remove.addItem(itemRemove);
-    m_xmppClient.sendPacket(remove);
+    int answer = QMessageBox::question(this, "Remove contact",
+                            QString("Do you want to remove the contact <I>%1</I>").arg(bareJid),
+                            QMessageBox::Yes, QMessageBox::No);
+    if(answer == QMessageBox::Yes)
+    {
+        QXmppRosterIq remove;
+        remove.setType(QXmppIq::Set);
+        QXmppRosterIq::Item itemRemove;
+        itemRemove.setSubscriptionType(QXmppRosterIq::Item::Remove);
+        itemRemove.setBareJid(bareJid);
+        remove.addItem(itemRemove);
+        m_xmppClient.sendPacket(remove);
+    }
 }
 
 void mainDialog::errorClient(QXmppClient::Error error)
