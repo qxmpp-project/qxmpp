@@ -192,11 +192,9 @@ void mainDialog::rosterChanged(const QString& bareJid)
     m_rosterItemModel.updateRosterEntry(bareJid, m_xmppClient.rosterManager().
                                         getRosterEntry(bareJid));
 
-    // if available in cache, update it
+    // if available in cache, update it else based on presence it will request if not available
     if(m_vCardCache.isVCardAvailable(bareJid))
         updateVCard(bareJid);
-//    else
-//        m_vCardCache.requestVCard(bareJid);
 }
 
 void mainDialog::rosterReceived()
