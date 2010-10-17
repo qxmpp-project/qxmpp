@@ -10,5 +10,6 @@
         <file>resource/ajax-loader.gif</file>
         <file>resource/icon.png</file>
         <file>resource/settingsButton.png</file>
+        <file>resource/addButton.png</file>
     </qresource>
 </RCC>
