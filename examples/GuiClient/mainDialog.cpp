@@ -681,6 +681,8 @@ void mainDialog::createSettingsMenu()
     connect(sortByName, SIGNAL(triggered(bool)),
             &m_rosterItemSortFilterModel, SLOT(sortByName(bool)));
     settingsMenu->addAction(sortByName);
+
+    settingsMenu->addAction(&m_quitAction);
 }
 
 void mainDialog::closeEvent(QCloseEvent *event)
