@@ -78,6 +78,9 @@ bool rosterItemSortFilterProxyModel::lessThan(const QModelIndex &left, const QMo
 
 bool rosterItemSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
 {
+    if(!filterRegExp().isEmpty())
+        return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+
     if(m_showOfflineContacts)
         return true;
 
