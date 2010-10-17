@@ -60,7 +60,6 @@ private slots:
     void rosterChanged(const QString& bareJid);
     void rosterReceived();
     void presenceChanged(const QString&, const QString&);
-    void sort();
     void filterChanged(const QString& filter);
     void showChatDialog(const QString& bareJid);
     void messageReceived(const QXmppMessage& msg);

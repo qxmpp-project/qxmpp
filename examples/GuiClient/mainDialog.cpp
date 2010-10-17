@@ -97,9 +97,6 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
                     this, SLOT(presenceChanged(const QString&, const QString&)));
     Q_ASSERT(check);
 
-    check = connect(ui->pushButton_view, SIGNAL(clicked()), this, SLOT(sort()));
-    Q_ASSERT(check);
-
     check = connect(ui->lineEdit_filter, SIGNAL(textChanged(const QString&)),
                     this, SLOT(filterChanged(const QString&)));
     Q_ASSERT(check);
@@ -129,7 +126,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
 
     m_rosterItemSortFilterModel.setSourceModel(&m_rosterItemModel);
     ui->listView->setModel(&m_rosterItemSortFilterModel);
-    sort();
+    m_rosterItemSortFilterModel.sort(0);
 
     ItemDelegate *delegate = new ItemDelegate();
     ui->listView->setItemDelegate(delegate);
@@ -266,11 +263,6 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
 //        m_rosterItemModel.updateAvatar(bareJid,
 //                                   m_vCardCache.getVCard(bareJid).image);
 //    }
-}
-
-void mainDialog::sort()
-{
-    m_rosterItemSortFilterModel.sort(0);
 }
 
 void mainDialog::filterChanged(const QString& filter)
