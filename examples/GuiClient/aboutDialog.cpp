@@ -8,6 +8,8 @@ aboutDialog::aboutDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowTitle(QString("About %1").arg(qApp->applicationName()));
+
     ui->textEdit->append(QString("Copyright © 2009-2010, Manjeet Dahiya"));
     ui->textEdit->append(qApp->applicationName() + " " + qApp->applicationVersion());
     ui->textEdit->append(QString("Based on QXmpp v %1").arg(QXmppVersion()));
