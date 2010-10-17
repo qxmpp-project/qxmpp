@@ -668,19 +668,22 @@ void mainDialog::createSettingsMenu()
     connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
     settingsMenu->addAction(showXml);
 
+    QMenu* viewMenu = new QMenu("View", ui->pushButton_settings);
+    settingsMenu->addMenu(viewMenu);
+
     QAction* showOfflineContacts = new QAction("Show offline contacts", ui->pushButton_settings);
     showOfflineContacts->setCheckable(true);
     showOfflineContacts->setChecked(true);
     connect(showOfflineContacts, SIGNAL(triggered(bool)),
             &m_rosterItemSortFilterModel, SLOT(setShowOfflineContacts(bool)));
-    settingsMenu->addAction(showOfflineContacts);
+    viewMenu->addAction(showOfflineContacts);
 
     QAction* sortByName = new QAction("Sort by name", ui->pushButton_settings);
     sortByName->setCheckable(true);
     sortByName->setChecked(false);
     connect(sortByName, SIGNAL(triggered(bool)),
             &m_rosterItemSortFilterModel, SLOT(sortByName(bool)));
-    settingsMenu->addAction(sortByName);
+    viewMenu->addAction(sortByName);
 
     settingsMenu->addAction(&m_quitAction);
 }
