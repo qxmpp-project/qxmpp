@@ -105,3 +105,4 @@ void rosterItemSortFilterProxyModel::sortByName(bool sortByName)
     m_sortByName = sortByName;
     invalidate();
 }
+
