@@ -670,6 +670,8 @@ void mainDialog::createSettingsMenu()
     connect(aboutDlg, SIGNAL(triggered()), SLOT(action_aboutDlg()));
     settingsMenu->addAction(aboutDlg);
 
+    settingsMenu->addSeparator();
+
     QAction* showXml = new QAction("Show XML Console...", ui->pushButton_settings);
     connect(showXml, SIGNAL(triggered()), SLOT(action_showXml()));
     settingsMenu->addAction(showXml);
