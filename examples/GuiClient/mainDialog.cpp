@@ -57,8 +57,6 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     createTrayIconAndMenu();
     createSettingsMenu();
 
-    ui->pushButton_view->hide();
-
     ui->pushButton_cancel->setDisabled(true);
     ui->label_throbber->setMovie(new QMovie(":/icons/resource/ajax-loader.gif"));
     ui->label_throbber->movie()->start();
