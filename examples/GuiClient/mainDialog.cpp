@@ -653,6 +653,7 @@ void mainDialog::createTrayIconAndMenu()
         Q_ASSERT(check);
 
     m_trayIconMenu.addAction(&m_signOutAction);
+    m_trayIconMenu.addSeparator();
     m_trayIconMenu.addAction(&m_quitAction);
 
     m_trayIcon.setContextMenu(&m_trayIconMenu);
