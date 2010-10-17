@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/icons" >
+    <qresource prefix="/icons">
         <file>resource/green.png</file>
         <file>resource/orange.png</file>
         <file>resource/red.png</file>
@@ -9,5 +9,6 @@
         <file>resource/downArrow.png</file>
         <file>resource/ajax-loader.gif</file>
         <file>resource/icon.png</file>
+        <file>resource/settingsButton.png</file>
     </qresource>
 </RCC>
