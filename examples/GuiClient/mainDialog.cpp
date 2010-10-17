@@ -685,6 +685,7 @@ void mainDialog::createSettingsMenu()
             &m_rosterItemSortFilterModel, SLOT(sortByName(bool)));
     viewMenu->addAction(sortByName);
 
+    settingsMenu->addSeparator();
     settingsMenu->addAction(&m_quitAction);
 }
 
