@@ -217,7 +217,6 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
     QMap<QString, QXmppPresence> presences = m_xmppClient.rosterManager().
                                              getAllPresencesForBareJid(bareJid);
     m_rosterItemModel.updatePresence(bareJid, presences);
-//    m_rosterItemSortFilterModel.invalidate();
 
     QXmppPresence& pre = presences[resource];
 
