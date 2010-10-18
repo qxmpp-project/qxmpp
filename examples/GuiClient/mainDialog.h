@@ -26,7 +26,6 @@
 #define MAINDIALOG_H
 
 #include <QDialog>
-#include <QKeyEvent>
 #include <QMap>
 #include <QSystemTrayIcon>
 #include <QMenu>
@@ -34,13 +33,16 @@
 #include "rosterItemModel.h"
 #include "rosterItemSortFilterProxyModel.h"
 #include "statusWidget.h"
-#include "chatDialog.h"
 #include "vCardCache.h"
 #include "capabilitiesCache.h"
 #include "accountsCache.h"
 #include "xmlConsoleDialog.h"
 
 #include "QXmppClient.h"
+
+class chatDialog;
+
+class QKeyEvent;
 
 namespace Ui
 {

@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "profileDialog.h"
 #include "aboutDialog.h"
+#include "chatDialog.h"
 
 #include "QXmppRosterManager.h"
 #include "QXmppPresence.h"
@@ -45,6 +46,7 @@
 #include <QCompleter>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 
 mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
