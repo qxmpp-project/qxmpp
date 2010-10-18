@@ -23,11 +23,9 @@
 
 
 #include "chatMsgGraphicsItem.h"
+
 #include <QPainter>
 #include <QTextDocument>
-#include <QFontMetrics>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QTime>
 
 QLinearGradient getGradient(const QColor &col, const QRectF &rect)
