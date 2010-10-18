@@ -24,21 +24,22 @@
 
 #include "mainDialog.h"
 #include "ui_mainDialog.h"
+
+#include "utils.h"
+#include "profileDialog.h"
+#include "aboutDialog.h"
+
 #include "QXmppRosterManager.h"
 #include "QXmppPresence.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
-#include "utils.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppLogger.h"
 #include "QXmppVCardIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppRosterIq.h"
-
-#include "profileDialog.h"
-#include "aboutDialog.h"
 
 #include <QMovie>
 #include <QCompleter>
