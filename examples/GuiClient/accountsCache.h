@@ -27,7 +27,8 @@
 
 #include <QObject>
 #include <QDomElement>
-#include <QStringList>
+
+class QStringList;
 
 class accountsCache : public QObject
 {

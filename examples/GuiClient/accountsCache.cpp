@@ -24,8 +24,10 @@
 
 #include "accountsCache.h"
 #include "utils.h"
+
 #include <QDir>
 #include <QTextStream>
+#include <QStringList>
 
 accountsCache::accountsCache(QObject *parent) :
     QObject(parent)
