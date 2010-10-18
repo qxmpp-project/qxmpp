@@ -24,11 +24,8 @@
 
 #include <QtGui/QApplication>
 #include <QDir>
-#include "chatDialog.h"
-#include "chatGraphicsView.h"
-#include "chatGraphicsScene.h"
+
 #include "mainDialog.h"
-#include "statusTextWidget.h"
 #include "utils.h"
 
 int main(int argc, char *argv[])
