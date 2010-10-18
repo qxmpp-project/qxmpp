@@ -1,5 +1,6 @@
 #include "aboutDialog.h"
 #include "ui_aboutDialog.h"
+
 #include "QXmppGlobal.h"
 
 aboutDialog::aboutDialog(QWidget *parent) :
