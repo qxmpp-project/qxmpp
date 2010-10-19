@@ -41,6 +41,8 @@ public:
     void updateAvatar(const QString& bareJid, const QImage& image);
     void updateName(const QString& bareJid, const QString& name);
 
+    void removeRosterEntry(const QString& bareJid);
+
     void clear();
 
 private:

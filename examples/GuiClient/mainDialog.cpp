@@ -826,6 +826,8 @@ void mainDialog::action_removeContact(const QString& bareJid)
         itemRemove.setBareJid(bareJid);
         remove.addItem(itemRemove);
         m_xmppClient.sendPacket(remove);
+
+        m_rosterItemModel.removeRosterEntry(bareJid);
     }
 }
 

@@ -109,3 +109,12 @@ void rosterItemModel::clear()
     QStandardItemModel::clear();
     m_jidRosterItemMap.clear();
 }
+
+void rosterItemModel::removeRosterEntry(const QString& bareJid)
+{
+    rosterItem* item = getRosterItemFromBareJid(bareJid);
+    if(item)
+    {
+        removeRow(item->row());
+    }
+}
