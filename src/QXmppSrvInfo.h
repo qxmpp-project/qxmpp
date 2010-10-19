@@ -27,6 +27,10 @@
 #include <QList>
 #include <QString>
 
+class QObject;
+class QXmppSrvInfoPrivate;
+class QXmppSrvRecordPrivate;
+
 /// \brief The QXmppSrvRecord class represents a DNS SRV record.
 ///
 
@@ -34,9 +38,11 @@ class QXmppSrvRecord
 {
 public:
     QXmppSrvRecord();
+    QXmppSrvRecord(const QXmppSrvRecord &other);
+    ~QXmppSrvRecord();
 
-    QString hostName() const;
-    void setHostName(const QString &hostName);
+    QString target() const;
+    void setTarget(const QString &target);
 
     quint16 port() const;
     void setPort(quint16 port);
@@ -47,11 +53,10 @@ public:
     quint16 weight() const;
     void setWeight(quint16 weight);
 
+    QXmppSrvRecord &operator=(const QXmppSrvRecord &other);
+
 private:
-    QString host_name;
-    quint16 m_port;
-    quint16 m_priority;
-    quint16 m_weight;
+    QXmppSrvRecordPrivate *d;
 };
 
 /// \brief The QXmppSrvInfo class provides static methods for DNS SRV lookups.
@@ -60,14 +65,26 @@ private:
 class QXmppSrvInfo
 {
 public:
+    enum Error
+    {
+        NoError = 0,
+        NotFoundError = 1,
+        UnknownError = 2,
+    };
+
+    QXmppSrvInfo();
+    QXmppSrvInfo(const QXmppSrvInfo &other);
+    ~QXmppSrvInfo();
+
+    Error error() const;
     QString errorString() const;
     QList<QXmppSrvRecord> records() const;
 
     static QXmppSrvInfo fromName(const QString &dname);
+    static void lookupService(const QString &name, QObject *receiver, const char *member);
 
 private:
-    QString m_errorString;
-    QList<QXmppSrvRecord> m_records;
+    QXmppSrvInfoPrivate *d;
 };
 
 #endif

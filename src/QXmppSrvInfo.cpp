@@ -21,16 +21,15 @@
  *
  */
 
-#include <QDebug>
-
 #include "QXmppSrvInfo.h"
+#include <QMetaObject>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
 #include <windns.h>
 #elif defined(Q_OS_SYMBIAN)
 #include <dns_qry.h>
-#else
+#elif defined(Q_OS_UNIX)
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -39,31 +38,59 @@
 #include <resolv.h>
 #endif
 
+class QXmppSrvRecordPrivate
+{
+public:
+    QXmppSrvRecordPrivate()
+        : port(0),
+          priority(0),
+          weight(0)
+    { }
+
+    QString target;
+    quint16 port;
+    quint16 priority;
+    quint16 weight;
+};
+
 /// Constructs an empty service record object.
 ///
 
 QXmppSrvRecord::QXmppSrvRecord()
-    : m_port(0),
-    m_priority(0),
-    m_weight(0)
+    : d(new QXmppSrvRecordPrivate)
 {
+}
+
+/// Constructs a copy of \a other.
+
+QXmppSrvRecord::QXmppSrvRecord(const QXmppSrvRecord &other)
+    : d(new QXmppSrvRecordPrivate)
+{
+    *d = *other.d;
+}
+
+/// Destroys a service record.
+
+QXmppSrvRecord::~QXmppSrvRecord()
+{
+    delete d;
 }
 
 /// Returns host name for this service record.
 ///
 
-QString QXmppSrvRecord::hostName() const
+QString QXmppSrvRecord::target() const
 {
-    return host_name;
+    return d->target;
 }
 
 /// Sets the host name for this service record.
 ///
 /// \param hostName
 
-void QXmppSrvRecord::setHostName(const QString &hostName)
+void QXmppSrvRecord::setTarget(const QString &target)
 {
-    host_name = hostName;
+    d->target = target;
 }
 
 /// Returns the port for this service record.
@@ -71,7 +98,7 @@ void QXmppSrvRecord::setHostName(const QString &hostName)
 
 quint16 QXmppSrvRecord::port() const
 {
-    return m_port;
+    return d->port;
 }
 
 /// Sets the port for this service record.
@@ -80,7 +107,7 @@ quint16 QXmppSrvRecord::port() const
 
 void QXmppSrvRecord::setPort(quint16 port)
 {
-    m_port = port;
+    d->port = port;
 }
 
 /// Returns the priority for this service record.
@@ -88,7 +115,7 @@ void QXmppSrvRecord::setPort(quint16 port)
 
 quint16 QXmppSrvRecord::priority() const
 {
-    return m_priority;
+    return d->priority;
 }
 
 /// Sets the priority for this service record.
@@ -97,7 +124,7 @@ quint16 QXmppSrvRecord::priority() const
 
 void QXmppSrvRecord::setPriority(quint16 priority)
 {
-    m_priority = priority;
+    d->priority = priority;
 }
 
 /// Returns the weight for this service record.
@@ -105,7 +132,7 @@ void QXmppSrvRecord::setPriority(quint16 priority)
 
 quint16 QXmppSrvRecord::weight() const
 {
-    return m_weight;
+    return d->weight;
 }
 
 /// Sets the weight for this service record.
@@ -114,22 +141,73 @@ quint16 QXmppSrvRecord::weight() const
 
 void QXmppSrvRecord::setWeight(quint16 weight)
 {
-    m_weight = weight;
+    d->weight = weight;
 }
 
-/// If the lookup failed, this function returns a human readable description of the error.
-///
+/// Assigns the data of the \a other object to this service record object,
+/// and returns a reference to it.
+
+QXmppSrvRecord &QXmppSrvRecord::operator=(const QXmppSrvRecord &other)
+{
+    *d = *other.d;
+    return *this;
+}
+
+class QXmppSrvInfoPrivate
+{
+public:
+    QXmppSrvInfoPrivate()
+        : error(QXmppSrvInfo::NoError)
+    { }
+
+    QXmppSrvInfo::Error error;
+    QString errorString;
+    QList<QXmppSrvRecord> records;
+};
+
+/// Constructs an empty service info.
+
+QXmppSrvInfo::QXmppSrvInfo()
+    : d(new QXmppSrvInfoPrivate)
+{
+}
+
+/// Constructs a copy of \a other.
+
+QXmppSrvInfo::QXmppSrvInfo(const QXmppSrvInfo &other)
+    : d(new QXmppSrvInfoPrivate)
+{
+    *d = *other.d;
+}
+
+/// Destroys a service info.
+
+QXmppSrvInfo::~QXmppSrvInfo()
+{
+    delete d;
+}
+
+/// Returns the type of error that occurred if the service lookup
+/// failed; otherwise returns NoError.
+
+QXmppSrvInfo::Error QXmppSrvInfo::error() const
+{
+    return d->error;
+}
+
+/// If the lookup failed, this function returns a human readable description
+/// of the error.
 
 QString QXmppSrvInfo::errorString() const
 {
-    return m_errorString;
+    return d->errorString;
 }
 
 /// Returns the list of records associated with this service.
 ///
 QList<QXmppSrvRecord> QXmppSrvInfo::records() const
 {
-    return m_records;
+    return d->records;
 }
 
 /// Perform a DNS lookup for an SRV entry.
@@ -148,7 +226,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     /* perform DNS query */
     if (DnsQuery_UTF8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
-        result.m_errorString = QLatin1String("DnsQuery_UTF8 failed");
+        result.d->error = QXmppSrvInfo::NotFoundError;
+        result.d->errorString = QLatin1String("DnsQuery_UTF8 failed");
         return result;
     }
 
@@ -158,15 +237,16 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
         {
             QXmppSrvRecord record;
-            record.setHostName(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
+            record.setTarget(QString::fromUtf8((char*)ptr->Data.Srv.pNameTarget));
             record.setPort(ptr->Data.Srv.wPort);
             record.setPriority(ptr->Data.Srv.wPriority);
             record.setWeight(ptr->Data.Srv.wWeight);
-            result.m_records.append(record);
+            result.d->records.append(record);
         }
     }
 
     DnsRecordListFree(records, DnsFreeRecordList);
+
 #elif defined(Q_OS_SYMBIAN)
     RHostResolver dnsResolver;
     RSocketServ dnsSocket;
@@ -176,7 +256,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     err = dnsResolver.Open(dnsSocket, KAfInet, KProtocolInetUdp);
     if (err != KErrNone)
     {
-        result.m_errorString = QLatin1String("RHostResolver::Open failed");
+        result.d->error = QXmppSrvInfo::UnknownError;
+        result.d->errorString = QLatin1String("RHostResolver::Open failed");
         return result;
     }
 
@@ -191,7 +272,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     err = dnsResolver.Query(dnsQuery, dnsResponse);
     if (err != KErrNone)
     {
-        result.m_errorString = QLatin1String("RHostResolver::Query failed");
+        result.d->error = QXmppSrvInfo::NotFoundError;
+        result.d->errorString = QLatin1String("RHostResolver::Query failed");
         return result;
     }
 
@@ -199,17 +281,17 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     while (err == KErrNone)
     {
         QXmppSrvRecord record;
-        record.setHostName(QString::fromUtf8((const char*)dnsResponse().Target().Ptr(),
+        record.setTarget(QString::fromUtf8((const char*)dnsResponse().Target().Ptr(),
                                              dnsResponse().Target().Length()));
         record.setPort(dnsResponse().Port());
         record.setPriority(dnsResponse().Priority());
         record.setWeight(dnsResponse().Weight());
-        result.m_records.append(record);
+        result.d->records.append(record);
 
         err = dnsResolver.QueryGetNext(dnsResponse);
     }
 
-#else
+#elif defined(Q_OS_UNIX)
     unsigned char response[PACKETSZ];
     int responseLength, answerCount, answerIndex;
 
@@ -221,7 +303,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     responseLength = res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
     if (responseLength < int(sizeof(HEADER)))
     {
-        result.m_errorString = QString("res_query failed: %1").arg(hstrerror(h_errno));
+        result.d->error = QXmppSrvInfo::NotFoundError;
+        result.d->errorString = QString::fromLatin1("res_query failed: %1").arg(QLatin1String(hstrerror(h_errno)));
         return result;
     }
 
@@ -229,7 +312,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     HEADER *header = (HEADER*)response;
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
-        result.m_errorString = QLatin1String("res_query returned an error");
+        result.d->error = QXmppSrvInfo::UnknownError;
+        result.d->errorString = QLatin1String("res_query returned an error");
         return result;
     }
 
@@ -239,7 +323,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     int status = dn_expand(response, response + responseLength, p, host, sizeof(host));
     if (status < 0)
     {
-        result.m_errorString = QLatin1String("dn_expand failed");
+        result.d->error = QXmppSrvInfo::UnknownError;
+        result.d->errorString = QLatin1String("dn_expand failed");
         return result;
     }
     p += status + 4;
@@ -252,7 +337,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         status = dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
-            result.m_errorString = QLatin1String("dn_expand failed");
+            result.d->error = QXmppSrvInfo::UnknownError;
+            result.d->errorString = QLatin1String("dn_expand failed");
             return result;
         }
 
@@ -274,21 +360,33 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
             status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
             {
-                result.m_errorString = QLatin1String("dn_expand failed");
+                result.d->error = QXmppSrvInfo::UnknownError;
+                result.d->errorString = QLatin1String("dn_expand failed");
                 return result;
             }
             QXmppSrvRecord record;
-            record.setHostName(answer);
+            record.setTarget(QString::fromUtf8(answer));
             record.setPort(port);
             record.setPriority(priority);
             record.setWeight(weight);
-            result.m_records.append(record);
-        } else {
-            qWarning("Unexpected DNS answer type");
+            result.d->records.append(record);
         }
         p += size;
         answerIndex++;
     }
 #endif
+    if (result.d->records.isEmpty())
+        result.d->error = QXmppSrvInfo::NotFoundError;
     return result;
 }
+
+/// Performs a DNS lookup for an SRV entry. When the result of the lookup is
+/// ready, the slot or signal \a member in \a receiver is called with a
+/// QXmppSrvInfo argument.
+
+void QXmppSrvInfo::lookupService(const QString &name, QObject *receiver, const char *member)
+{
+    QXmppSrvInfo result = QXmppSrvInfo::fromName(name);
+    QMetaObject::invokeMethod(receiver, member, Qt::QueuedConnection, Q_ARG(QXmppSrvInfo, result));
+}
+
