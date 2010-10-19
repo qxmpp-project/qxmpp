@@ -156,7 +156,7 @@ void QXmppOutgoingClient::connectToHost()
         if (!serviceInfo.records().isEmpty())
         {
             // take the first returned record
-            host = serviceInfo.records().first().hostName();
+            host = serviceInfo.records().first().target();
             port = serviceInfo.records().first().port();
         } else {
             // as a fallback, use domain as the host name
