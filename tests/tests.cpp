@@ -473,7 +473,7 @@ void TestPackets::testPresenceWithCapability()
     QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc="));
+    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
     QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
