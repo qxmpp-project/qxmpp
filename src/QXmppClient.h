@@ -99,12 +99,12 @@ public:
 
     QList<QXmppClientExtension*> extensions();
 
-    /// \return pointer to the desired extension.
-    /// Returns NULL if extension is not found.
+    /// \brief Returns the extension which can be cast into type T, or 0
+    /// if there is no such extension.
     ///
     /// Usage example:
     /// \code
-    /// QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
+    /// QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager*>();
     /// if(ext)
     /// {
     ///     //extension found, do stuff...
@@ -112,12 +112,12 @@ public:
     /// \endcode
     ///
     template<typename T>
-    T* findExtension()
+    T findExtension()
     {
         QList<QXmppClientExtension*> list = extensions();
         for (int i = 0; i < list.size(); ++i)
         {
-            T* extension = qobject_cast<T*>(list.at(i));
+            T extension = qobject_cast<T>(list.at(i));
             if(extension)
                 return extension;
         }
