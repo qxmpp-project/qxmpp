@@ -17,7 +17,8 @@ aboutDialog::aboutDialog(QWidget *parent) :
     ui->textEdit->append(qApp->applicationName() + " " + qApp->applicationVersion());
     ui->textEdit->append(QString("\nBased on:"));
     ui->textEdit->append(QString("QXmpp %1").arg(QXmppVersion()));
-    ui->textEdit->append(QString("Qt %1").arg(qVersion()));
+    ui->textEdit->append(QString("Qt %1 [built-with]").arg(qVersion()));
+    ui->textEdit->append(QString("Qt %1 [running-with]").arg(QT_VERSION_STR));
 }
 
 aboutDialog::~aboutDialog()
