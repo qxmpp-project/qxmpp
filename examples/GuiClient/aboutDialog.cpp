@@ -3,6 +3,8 @@
 
 #include "QXmppGlobal.h"
 
+#include <QtGlobal>
+
 aboutDialog::aboutDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::aboutDialog)
@@ -11,9 +13,11 @@ aboutDialog::aboutDialog(QWidget *parent) :
 
     setWindowTitle(QString("About %1").arg(qApp->applicationName()));
 
-    ui->textEdit->append(QString("Copyright © 2009-2010, Manjeet Dahiya"));
+    ui->textEdit->append(QString("Copyright © 2009-2010, Manjeet Dahiya\n"));
     ui->textEdit->append(qApp->applicationName() + " " + qApp->applicationVersion());
-    ui->textEdit->append(QString("Based on QXmpp v %1").arg(QXmppVersion()));
+    ui->textEdit->append(QString("\nBased on:"));
+    ui->textEdit->append(QString("QXmpp %1").arg(QXmppVersion()));
+    ui->textEdit->append(QString("Qt %1").arg(qVersion()));
 }
 
 aboutDialog::~aboutDialog()
