@@ -144,25 +144,41 @@ QXmppConfiguration& QXmppOutgoingClient::configuration()
 
 void QXmppOutgoingClient::connectToHost()
 {
+    const QString host = configuration().host();
+    const quint16 port = configuration().port();
+
+    // if an explicit host was provided, connect to it
+    if (!host.isEmpty() && port)
+    {
+        info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
+        socket()->setProxy(configuration().networkProxy());
+        socket()->connectToHost(host, port);
+        return;
+    }
+
+    // otherwise, lookup server
+    const QString domain = configuration().domain();
+    debug(QString("Looking up server for domain %1").arg(domain));
+    QXmppSrvInfo::lookupService("_xmpp-client._tcp." + domain, this,
+                                SLOT(connectToHost(QXmppSrvInfo)));
+}
+
+void QXmppOutgoingClient::connectToHost(const QXmppSrvInfo &serviceInfo)
+{
     const QString domain = configuration().domain();
     QString host = configuration().host();
     quint16 port = configuration().port();
 
-    // if we do not have no explicit host was provided, look it up
-    if (host.isEmpty() || !port)
+    if (!serviceInfo.records().isEmpty())
     {
-        debug(QString("Looking up server for domain %1").arg(domain));
-        QXmppSrvInfo serviceInfo = QXmppSrvInfo::fromName("_xmpp-client._tcp." + domain);
-        if (!serviceInfo.records().isEmpty())
-        {
-            // take the first returned record
-            host = serviceInfo.records().first().target();
-            port = serviceInfo.records().first().port();
-        } else {
-            // as a fallback, use domain as the host name
-            warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
-            host = domain;
-        }
+        // take the first returned record
+        host = serviceInfo.records().first().target();
+        port = serviceInfo.records().first().port();
+    } else {
+        // as a fallback, use domain as the host name
+        warning(QString("Lookup for domain %1 failed: %2")
+                .arg(domain, serviceInfo.errorString()));
+        host = domain;
     }
 
     // connect to server

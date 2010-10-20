@@ -22,9 +22,12 @@
  */
 
 #include "QXmppSrvInfo.h"
+#include "QXmppSrvInfo_p.h"
 
+#include <QCoreApplication>
 #include <QLibrary>
 #include <QMetaObject>
+#include <QMetaType>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -40,6 +43,8 @@
 #endif
 #include <resolv.h>
 #endif
+
+Q_GLOBAL_STATIC(QXmppSrvInfoLookupManager, theSrvInfoLookupManager)
 
 #if defined(Q_OS_WIN)
 typedef DNS_STATUS (*dns_query_utf8_proto)(PCSTR,WORD,DWORD,PIP4_ARRAY,PDNS_RECORD*,PVOID*);
@@ -535,7 +540,29 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 
 void QXmppSrvInfo::lookupService(const QString &name, QObject *receiver, const char *member)
 {
-    QXmppSrvInfo result = QXmppSrvInfo::fromName(name);
-    QMetaObject::invokeMethod(receiver, member, Qt::QueuedConnection, Q_ARG(QXmppSrvInfo, result));
+    qRegisterMetaType<QXmppSrvInfo>("QXmppSrvInfo");
+
+    QXmppSrvInfoLookupManager *manager = theSrvInfoLookupManager();
+    if (manager)
+    {
+        // the application is still alive
+        QXmppSrvInfoLookupRunnable *runnable = new QXmppSrvInfoLookupRunnable(name);
+        QObject::connect(runnable, SIGNAL(foundInfo(QXmppSrvInfo)), receiver, member);
+        manager->start(runnable);
+    }
+}
+
+QXmppSrvInfoLookupManager::QXmppSrvInfoLookupManager()
+{
+    moveToThread(QCoreApplication::instance()->thread());
+    connect(QCoreApplication::instance(), SIGNAL(destroyed()),
+            SLOT(waitForThreadPoolDone()), Qt::DirectConnection);
+    setMaxThreadCount(5); // do 5 SRV lookups in parallel
+}
+
+void QXmppSrvInfoLookupRunnable::run()
+{
+    const QXmppSrvInfo result = QXmppSrvInfo::fromName(lookupName);
+    emit foundInfo(result);
 }
 

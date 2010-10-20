@@ -81,6 +81,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVersionManager.h
 
 HEADERS += $$INSTALL_HEADERS
+HEADERS += QXmppSrvInfo_p.h
 
 # Source files
 SOURCES += QXmppUtils.cpp \

@@ -77,12 +77,18 @@ QXmppOutgoingServer::~QXmppOutgoingServer()
 void QXmppOutgoingServer::connectToHost(const QString &domain)
 {
     d->remoteDomain = domain;
-    QString host;
-    quint16 port;
 
     // lookup server for domain
     debug(QString("Looking up server for domain %1").arg(domain));
-    QXmppSrvInfo serviceInfo = QXmppSrvInfo::fromName("_xmpp-server._tcp." + domain);
+    QXmppSrvInfo::lookupService("_xmpp-server._tcp." + domain, this,
+                                SLOT(connectHost(serviceInfo)));
+}
+
+void QXmppOutgoingServer::connectToHost(const QXmppSrvInfo &serviceInfo)
+{
+    QString host;
+    quint16 port;
+
     if (!serviceInfo.records().isEmpty())
     {
         // take the first returned record
@@ -90,8 +96,8 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
         port = serviceInfo.records().first().port();
     } else {
         // as a fallback, use domain as the host name
-        warning(QString("Lookup for domain %1 failed: %2").arg(domain, serviceInfo.errorString()));
-        host = domain;
+        warning(QString("Lookup for domain %1 failed: %2").arg(d->remoteDomain, serviceInfo.errorString()));
+        host = d->remoteDomain;
         port = 5269;
     }
 
