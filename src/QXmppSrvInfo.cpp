@@ -22,6 +22,8 @@
  */
 
 #include "QXmppSrvInfo.h"
+
+#include <QLibrary>
 #include <QMetaObject>
 
 #if defined(Q_OS_WIN)
@@ -31,12 +33,124 @@
 #include <dns_qry.h>
 #elif defined(Q_OS_UNIX)
 #include <sys/types.h>
-#include <netinet/in.h>
 #include <netdb.h>
+#if defined(Q_OS_MAC)
 #include <arpa/nameser.h>
 #include <arpa/nameser_compat.h>
+#endif
 #include <resolv.h>
 #endif
+
+#if defined(Q_OS_WIN)
+typedef DNS_STATUS (*dns_query_utf8_proto)(PCSTR,WORD,DWORD,PIP4_ARRAY,PDNS_RECORD*,PVOID*);
+static dns_query_utf8_proto local_dns_query_utf8 = 0;
+typedef void (*dns_record_list_free_proto)(PDNS_RECORD,DNS_FREE_TYPE);
+static dns_record_list_free_proto local_dns_record_list_free = 0;
+
+static void resolveLibrary()
+{
+    QLibrary lib(QLatin1String("dnsapi.dll"));
+    if (!lib.load())
+        return;
+
+    local_dns_query_utf8 = dns_query_utf8_proto(lib.resolve("DnsQuery_UTF8"));
+    local_dns_record_list_free = dns_record_list_free_proto(lib.resolve("DnsRecordListFree"));
+}
+
+#elif defined(Q_OS_UNIX) && !defined(Q_OS_SYMBIAN)
+typedef int (*dn_expand_proto)(const unsigned char *, const unsigned char *, const unsigned char *, char *, int);
+static dn_expand_proto local_dn_expand = 0;
+typedef int (*res_init_proto)(void);
+static res_init_proto local_res_init = 0;
+typedef int (*res_query_proto)(const char *, int, int, unsigned char *, int);
+static res_query_proto local_res_query = 0;
+
+static void resolveLibrary()
+{
+    QLibrary lib(QLatin1String("resolv"));
+    if (!lib.load())
+        return;
+
+    local_dn_expand = dn_expand_proto(lib.resolve("__dn_expand"));
+    if (!local_dn_expand)
+        local_dn_expand = dn_expand_proto(lib.resolve("dn_expand"));
+
+    local_res_init = res_init_proto(lib.resolve("__res_init"));
+    if (!local_res_init)
+        local_res_init = res_init_proto(lib.resolve("res_init"));
+
+    local_res_query = res_query_proto(lib.resolve("__res_query"));
+    if (!local_res_query)
+        local_res_query = res_query_proto(lib.resolve("res_query"));
+}
+#endif
+
+//#define QSRVINFO_DEBUG
+
+static bool recordLessThan(const QXmppSrvRecord &r1, const QXmppSrvRecord &r2)
+{
+    // Order by priority.
+    if (r1.priority() < r2.priority())
+        return true;
+
+    // If the priority is equal, put zero weight records first.
+    if (r1.priority() == r2.priority() &&
+        r1.weight() == 0 && r2.weight() > 0)
+        return true;
+    return false;
+}
+
+static void sortSrvRecords(QList<QXmppSrvRecord> &records)
+{
+    // If we have no more than one result, we are done.
+    if (records.size() <= 1)
+        return;
+
+    // Order the records by priority, and for records with an equal
+    // priority, put records with a zero weight first.
+    qSort(records.begin(), records.end(), recordLessThan);
+
+    int i = 0;
+    while (i < records.size()) {
+
+        // Determine the slice of records with the current priority.
+        QList<QXmppSrvRecord> slice;
+        const quint16 slicePriority = records[i].priority();
+        int sliceWeight = 0;
+        for (int j = i; j < records.size(); ++j) {
+            if (records[j].priority() != slicePriority)
+                break;
+            sliceWeight += records[j].weight();
+            slice << records[j];
+        }
+#ifdef QSRVINFO_DEBUG
+        qDebug("sortSrvRecords() : priority %i (size: %i, total weight: %i)",
+               slicePriority, slice.size(), sliceWeight);
+#endif
+
+        // Order the slice of records.
+        while (!slice.isEmpty()) {
+            int randVal = qrand() % (sliceWeight + 1);
+            sliceWeight = 0;
+            bool sliceDone = false;
+            int j = 0;
+            while (j < slice.size()) {
+                if (!sliceDone && sliceWeight + slice[j].weight() >= randVal) {
+#ifdef QSRVINFO_DEBUG
+                    qDebug("sortSrvRecords() : adding %s %i (weight: %i)",
+                           qPrintable(slice[j].target()), slice[j].port(),
+                           slice[j].weight());
+#endif
+                    records[i++] = slice.takeAt(j);
+                    sliceDone = true;
+                } else {
+                    sliceWeight += slice[j].weight();
+                    j++;
+                }
+            }
+        }
+    }
+}
 
 class QXmppSrvRecordPrivate
 {
@@ -223,15 +337,31 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 #if defined(Q_OS_WIN)
     PDNS_RECORD records, ptr;
 
-    /* perform DNS query */
-    if (DnsQuery_UTF8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
+    // Load DnsQuery_UTF8 and DnsRecordListFree on demand.
+    static volatile bool triedResolve = false;
+    if (!triedResolve) {
+        if (!triedResolve) {
+            resolveLibrary();
+            triedResolve = true;
+        }
+    }
+
+    // If DnsQuery_UTF8 or DnsRecordListFree is missing, fail.
+    if (!local_dns_query_utf8 || !local_dns_record_list_free) {
+        result.d->error = QXmppSrvInfo::UnknownError;
+        result.d->errorString = QLatin1String("DnsQuery_UTF8 or DnsRecordListFree functions not found");
+        return result;
+    }
+
+    // Perform DNS query.
+    if (local_dns_query_utf8(dname.toUtf8(), DNS_TYPE_SRV, DNS_QUERY_STANDARD, NULL, &records, NULL) != ERROR_SUCCESS)
     {
         result.d->error = QXmppSrvInfo::NotFoundError;
         result.d->errorString = QLatin1String("DnsQuery_UTF8 failed");
         return result;
     }
 
-    /* extract results */
+    // Extract results.
     for (ptr = records; ptr != NULL; ptr = ptr->pNext)
     {
         if ((ptr->wType == DNS_TYPE_SRV) && !strcmp((char*)ptr->pName, dname.toUtf8()))
@@ -245,13 +375,13 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         }
     }
 
-    DnsRecordListFree(records, DnsFreeRecordList);
+    local_dns_record_list_free(records, DnsFreeRecordList);
 
 #elif defined(Q_OS_SYMBIAN)
     RHostResolver dnsResolver;
     RSocketServ dnsSocket;
 
-    /* initialise resolver */
+    // Initialise resolver.
     TInt err = dnsSocket.Connect();
     err = dnsResolver.Open(dnsSocket, KAfInet, KProtocolInetUdp);
     if (err != KErrNone)
@@ -261,7 +391,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         return result;
     }
 
-    /* perform DNS query */
+    // Perform DNS query.
     TDnsQueryBuf dnsQuery;
     TDnsRespSRVBuf dnsResponse;
     dnsQuery().SetClass(KDnsRRClassIN);
@@ -277,7 +407,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         return result;
     }
 
-    /* extract results */
+    // Extract results.
     while (err == KErrNone)
     {
         QXmppSrvRecord record;
@@ -295,20 +425,37 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     unsigned char response[PACKETSZ];
     int responseLength, answerCount, answerIndex;
 
-    /* explicitly call res_init in case config changed */
-    res_init();
+    // Load dn_expand, res_init and res_query on demand.
+    static volatile bool triedResolve = false;
+    if (!triedResolve) {
+        if (!triedResolve) {
+            resolveLibrary();
+            triedResolve = true;
+        }
+    }
 
-    /* perform DNS query */
-    memset(response, 0, sizeof(response));
-    responseLength = res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
-    if (responseLength < int(sizeof(HEADER)))
-    {
-        result.d->error = QXmppSrvInfo::NotFoundError;
-        result.d->errorString = QString::fromLatin1("res_query failed: %1").arg(QLatin1String(hstrerror(h_errno)));
+    // If dn_expand or res_query is missing, fail.
+    if (!local_dn_expand || !local_res_query) {
+        result.d->error = QXmppSrvInfo::UnknownError;
+        result.d->errorString = QLatin1String("dn_expand or res_query functions not found");
         return result;
     }
 
-    /* check the response header */
+    // If res_init is available, poll it.
+    if (local_res_init)
+        local_res_init();
+
+    // Perform DNS query.
+    memset(response, 0, sizeof(response));
+    responseLength = local_res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
+    if (responseLength < int(sizeof(HEADER)))
+    {
+        result.d->error = QXmppSrvInfo::NotFoundError;
+        result.d->errorString = QLatin1String("res_query failed");
+        return result;
+    }
+
+    // Check the response header.
     HEADER *header = (HEADER*)response;
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
@@ -317,10 +464,10 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         return result;
     }
 
-    /* skip the query */
+    // Skip the query.
     char host[PACKETSZ], answer[PACKETSZ];
     unsigned char *p = response + sizeof(HEADER);
-    int status = dn_expand(response, response + responseLength, p, host, sizeof(host));
+    int status = local_dn_expand(response, response + responseLength, p, host, sizeof(host));
     if (status < 0)
     {
         result.d->error = QXmppSrvInfo::UnknownError;
@@ -329,12 +476,12 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     }
     p += status + 4;
 
-    /* parse answers */
+    // Extract results.
     answerIndex = 0;
     while ((p < response + responseLength) && (answerIndex < answerCount))
     {
         int type, klass, ttl, size;
-        status = dn_expand(response, response + responseLength, p, host, sizeof(host));
+        status = local_dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
             result.d->error = QXmppSrvInfo::UnknownError;
@@ -357,7 +504,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
             quint16 priority = (p[0] << 8) | p[1];
             quint16 weight = (p[2] << 8) | p[3];
             quint16 port = (p[4] << 8) | p[5];
-            status = dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
+            status = local_dn_expand(response, response + responseLength, p + 6, answer, sizeof(answer));
             if (status < 0)
             {
                 result.d->error = QXmppSrvInfo::UnknownError;
@@ -377,6 +524,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 #endif
     if (result.d->records.isEmpty())
         result.d->error = QXmppSrvInfo::NotFoundError;
+    else
+        sortSrvRecords(result.d->records);
     return result;
 }
 

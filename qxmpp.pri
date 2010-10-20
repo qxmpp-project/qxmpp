@@ -13,10 +13,6 @@ CONFIG(debug, debug|release) {
 # Libraries used internal by QXmpp
 symbian {
     QXMPP_INTERNAL_LIBS = -lesock
-} else:unix {
-    QXMPP_INTERNAL_LIBS = -lresolv
-} else:win32 {
-    QXMPP_INTERNAL_LIBS = -ldnsapi
 }
 
 # Libraries for apps which use QXmpp
