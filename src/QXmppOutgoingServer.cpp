@@ -81,7 +81,7 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
     // lookup server for domain
     debug(QString("Looking up server for domain %1").arg(domain));
     QXmppSrvInfo::lookupService("_xmpp-server._tcp." + domain, this,
-                                SLOT(connectHost(serviceInfo)));
+                                SLOT(connectToHost(QXmppSrvInfo)));
 }
 
 void QXmppOutgoingServer::connectToHost(const QXmppSrvInfo &serviceInfo)
