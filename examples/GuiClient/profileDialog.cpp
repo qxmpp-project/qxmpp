@@ -110,7 +110,7 @@ void profileDialog::updateText()
         if(m_time.contains(resource))
         {
             statusText += "<B>Time: </B>" + QString("utc=%1 [tzo=%2]").
-                          arg(m_time[resource].utc()).
+                          arg(m_time[resource].utc().toString()).
                           arg(m_time[resource].tzo());
             statusText += "<BR>";
         }
