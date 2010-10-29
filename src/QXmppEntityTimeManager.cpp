@@ -66,7 +66,7 @@ bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
 
             QDateTime currentTime = QDateTime::currentDateTime();
             QDateTime utc = currentTime.toUTC();
-            responseIq.setUtc(datetimeToString(utc));
+            responseIq.setUtc(utc);
 
             currentTime.setTimeSpec(Qt::UTC);
             int tzo_sec = utc.secsTo(currentTime);

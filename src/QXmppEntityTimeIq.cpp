@@ -39,12 +39,12 @@ void QXmppEntityTimeIq::setTzo(const QString &tzo)
     m_tzo = tzo;
 }
 
-QString QXmppEntityTimeIq::utc() const
+QDateTime QXmppEntityTimeIq::utc() const
 {
     return m_utc;
 }
 
-void QXmppEntityTimeIq::setUtc(const QString &utc)
+void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
 {
     m_utc = utc;
 }
@@ -59,7 +59,7 @@ void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
     m_tzo = timeElement.firstChildElement("tzo").text();
-    m_utc = timeElement.firstChildElement("utc").text();
+    m_utc = datetimeFromString(timeElement.firstChildElement("utc").text());
 }
 
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -70,8 +70,8 @@ void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if(!m_tzo.isEmpty())
         helperToXmlAddTextElement(writer, "tzo", m_tzo);
 
-    if(!m_utc.isEmpty())
-        helperToXmlAddTextElement(writer, "utc", m_utc);
+    if(m_utc.isValid())
+        helperToXmlAddTextElement(writer, "utc", datetimeToString(m_utc));
 
     writer->writeEndElement();
 }

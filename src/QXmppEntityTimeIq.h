@@ -25,6 +25,8 @@
 #ifndef QXMPPENTITYTIMEIQ_H
 #define QXMPPENTITYTIMEIQ_H
 
+#include <QDateTime>
+
 #include "QXmppIq.h"
 
 /// \ingroup Stanzas
@@ -35,8 +37,8 @@ public:
     QString tzo() const;
     void setTzo(const QString &tzo);
 
-    QString utc() const;
-    void setUtc(const QString &utc);
+    QDateTime utc() const;
+    void setUtc(const QDateTime &utc);
 
     static bool isEntityTimeIq(const QDomElement &element);
 
@@ -48,7 +50,7 @@ protected:
 
 private:
     QString m_tzo;
-    QString m_utc;
+    QDateTime m_utc;
 };
 
 #endif //QXMPPENTITYTIMEIQ_H
