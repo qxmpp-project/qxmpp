@@ -655,7 +655,7 @@ void TestPackets::testEntityTimeResult()
     QCOMPARE(entityTime.from(), QLatin1String("juliet@capulet.com/balcony"));
     QCOMPARE(entityTime.to(), QLatin1String("romeo@montague.net/orchard"));
     QCOMPARE(entityTime.type(), QXmppIq::Result);
-    QCOMPARE(entityTime.tzo(), QString("-06:00"));
+    QCOMPARE(entityTime.tzo(), -21600);
     QCOMPARE(entityTime.utc(), QDateTime(QDate(2006, 12, 19), QTime(17, 58, 35), Qt::UTC));
     serializePacket(entityTime, xml);
 }
