@@ -41,6 +41,8 @@ class QStringList;
 // XEP-0082: XMPP Date and Time Profiles
 QDateTime datetimeFromString(const QString &str);
 QString datetimeToString(const QDateTime &dt);
+int timezoneOffsetFromString(const QString &str);
+QString timezoneOffsetToString(int secs);
 
 QString jidToDomain(const QString& jid);
 QString jidToResource(const QString& jid);

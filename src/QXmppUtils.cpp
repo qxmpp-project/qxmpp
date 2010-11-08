@@ -146,6 +146,43 @@ QString datetimeToString(const QDateTime &dt)
         return utc.toString("yyyy-MM-ddThh:mm:ssZ");
 }
 
+/// Parses a timezone offset (in seconds) from a string.
+///
+/// \param str
+///
+
+int timezoneOffsetFromString(const QString &str)
+{
+    QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
+    if (!tzRe.exactMatch(str))
+        return 0;
+
+    // No offset from UTC
+    if (tzRe.cap(1) == "Z")
+        return 0;
+
+    // Calculate offset
+    const int offset = tzRe.cap(3).toInt() * 3600 +
+                       tzRe.cap(4).toInt() * 60;
+    if (tzRe.cap(2) == "-")
+        return -offset;
+    else
+        return offset;
+}
+
+/// Serializes a timezone offset (in seconds) to a string.
+///
+/// \param secs
+
+QString timezoneOffsetToString(int secs)
+{
+    if (!secs)
+        return QString::fromLatin1("Z");
+
+    const QTime tzoTime = QTime(0, 0, 0).addSecs(qAbs(secs));
+    return (secs < 0 ? "-" : "+") + tzoTime.toString("hh:mm");
+}
+
 QString jidToDomain(const QString &jid)
 {
     return jidToBareJid(jid).split("@").last();

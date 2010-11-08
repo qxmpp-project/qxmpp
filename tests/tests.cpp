@@ -138,6 +138,21 @@ void TestUtils::testLibVersion()
     QCOMPARE(QXmppVersion(), QString("0.2.90"));
 }
 
+void TestUtils::testTimezoneOffset()
+{
+    // parsing
+    QCOMPARE(timezoneOffsetFromString("Z"), 0);
+    QCOMPARE(timezoneOffsetFromString("+00:00"), 0);
+    QCOMPARE(timezoneOffsetFromString("-00:00"), 0);
+    QCOMPARE(timezoneOffsetFromString("+01:30"), 5400);
+    QCOMPARE(timezoneOffsetFromString("-01:30"), -5400);
+
+    // serialization
+    QCOMPARE(timezoneOffsetToString(0), QLatin1String("Z"));
+    QCOMPARE(timezoneOffsetToString(5400), QLatin1String("+01:30"));
+    QCOMPARE(timezoneOffsetToString(-5400), QLatin1String("-01:30"));
+}
+
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {

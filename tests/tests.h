@@ -35,6 +35,7 @@ private slots:
     void testJid();
     void testMime();
     void testLibVersion();
+    void testTimezoneOffset();
 };
 
 class TestPackets : public QObject
