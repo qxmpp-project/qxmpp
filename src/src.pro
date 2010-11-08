@@ -149,12 +149,14 @@ HEADERS += \
     server/mod_ping.h \
     server/mod_proxy65.h \
     server/mod_stats.h \
+    server/mod_time.h \
     server/mod_version.h
 SOURCES += \
     server/mod_disco.cpp \
     server/mod_ping.cpp \
     server/mod_proxy65.cpp \
     server/mod_stats.cpp \
+    server/mod_time.cpp \
     server/mod_version.cpp
 
 # pkg-config support
