@@ -111,7 +111,7 @@ void profileDialog::updateText()
         {
             statusText += "<B>Time: </B>" + QString("utc=%1 [tzo=%2]").
                           arg(m_time[resource].utc().toString()).
-                          arg(m_time[resource].tzo());
+                          arg(timezoneOffsetToString(m_time[resource].tzo()));
             statusText += "<BR>";
         }
 
