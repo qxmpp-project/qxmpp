@@ -29,20 +29,34 @@
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
-QString QXmppEntityTimeIq::tzo() const
+/// Returns the timezone offset in seconds.
+///
+
+int QXmppEntityTimeIq::tzo() const
 {
     return m_tzo;
 }
 
-void QXmppEntityTimeIq::setTzo(const QString &tzo)
+/// Sets the timezone offset in seconds.
+///
+/// \param tzo
+
+void QXmppEntityTimeIq::setTzo(int tzo)
 {
     m_tzo = tzo;
 }
+
+/// Returns the date/time in Coordinated Universal Time (UTC).
+///
 
 QDateTime QXmppEntityTimeIq::utc() const
 {
     return m_utc;
 }
+
+/// Sets the date/time in Coordinated Universal Time (UTC).
+///
+/// \param utc
 
 void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
 {
@@ -58,7 +72,7 @@ bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
-    m_tzo = timeElement.firstChildElement("tzo").text();
+    m_tzo = timezoneOffsetFromString(timeElement.firstChildElement("tzo").text());
     m_utc = datetimeFromString(timeElement.firstChildElement("utc").text());
 }
 
@@ -67,8 +81,7 @@ void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("time");
     helperToXmlAddAttribute(writer, "xmlns", ns_entity_time);
 
-    if(!m_tzo.isEmpty())
-        helperToXmlAddTextElement(writer, "tzo", m_tzo);
+    helperToXmlAddTextElement(writer, "tzo", timezoneOffsetToString(m_tzo));
 
     if(m_utc.isValid())
         helperToXmlAddTextElement(writer, "utc", datetimeToString(m_utc));

@@ -69,19 +69,7 @@ bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
             responseIq.setUtc(utc);
 
             currentTime.setTimeSpec(Qt::UTC);
-            int tzo_sec = utc.secsTo(currentTime);
-            QTime tzo_time;
-            if(tzo_sec < 0)
-                tzo_time = tzo_time.addSecs(-tzo_sec);
-            else
-                tzo_time = tzo_time.addSecs(tzo_sec);
-            QString tzo;
-            if(tzo_sec < 0)
-                tzo = "-" + tzo_time.toString("hh:mm");
-            else
-                tzo = "+" + tzo_time.toString("hh:mm");
-
-            responseIq.setTzo(tzo);
+            responseIq.setTzo(utc.secsTo(currentTime));
 
             client()->sendPacket(responseIq);
         }

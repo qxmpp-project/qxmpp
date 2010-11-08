@@ -34,8 +34,8 @@
 class QXmppEntityTimeIq : public QXmppIq
 {
 public:
-    QString tzo() const;
-    void setTzo(const QString &tzo);
+    int tzo() const;
+    void setTzo(int tzo);
 
     QDateTime utc() const;
     void setUtc(const QDateTime &utc);
@@ -49,7 +49,7 @@ protected:
     /// \endcond
 
 private:
-    QString m_tzo;
+    int m_tzo;
     QDateTime m_utc;
 };
 
