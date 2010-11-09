@@ -24,12 +24,8 @@
 #ifndef QXMPPTRANSFERMANAGER_H
 #define QXMPPTRANSFERMANAGER_H
 
-#include <QCryptographicHash>
 #include <QDateTime>
-#include <QHash>
-#include <QHostAddress>
 #include <QVariant>
-#include <QTime>
 
 #include "QXmppClientExtension.h"
 #include "QXmppIq.h"
@@ -43,6 +39,7 @@ class QXmppIbbOpenIq;
 class QXmppSocksClient;
 class QXmppSocksServer;
 class QXmppStreamInitiationIq;
+class QXmppTransferJobPrivate;
 
 class QXmppTransferFileInfo
 {
@@ -116,6 +113,8 @@ public:
         FinishedState = 3, ///< The transfer is finished.
     };
 
+    ~QXmppTransferJob();
+
     void abort();
     void accept(QIODevice *output);
 
@@ -170,34 +169,7 @@ private:
     void terminate(QXmppTransferJob::Error error);
     bool writeData(const QByteArray &data);
 
-    int m_blockSize;
-    QXmppTransferJob::Direction m_direction;
-    qint64 m_done;
-    QXmppTransferJob::Error m_error;
-    QCryptographicHash m_hash;
-    QIODevice *m_iodevice;
-    QString m_offerId;
-    QString m_jid;
-    QString m_sid;
-    Method m_method;
-    QString m_mimeType;
-    QString m_requestId;
-    State m_state;
-    QTime m_transferStart;
-
-    // arbitrary data
-    QHash<int, QVariant> m_data;
-
-    // file meta-data
-    QXmppTransferFileInfo m_fileInfo;
-
-    // for in-band bytestreams
-    int m_ibbSequence;
-
-    // for socks5 bytestreams
-    QTcpSocket *m_socksSocket;
-    QXmppByteStreamIq::StreamHost m_socksProxy;
-
+    QXmppTransferJobPrivate *const d;
     friend class QXmppTransferManager;
 };
 
