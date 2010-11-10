@@ -213,13 +213,14 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // generate nonce
                 d->saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
+                d->saslDigest.setQop("auth");
                 d->saslDigest.setRealm(d->domain.toUtf8());
                 d->saslStep = 1;
 
                 QMap<QByteArray, QByteArray> challenge;
                 challenge["nonce"] = d->saslDigest.nonce();
                 challenge["realm"] = d->saslDigest.realm();
-                challenge["qop"] = "auth";
+                challenge["qop"] = d->saslDigest.qop();
                 challenge["charset"] = "utf-8";
                 challenge["algorithm"] = "md5-sess";
 

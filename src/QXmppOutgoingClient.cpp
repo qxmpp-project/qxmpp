@@ -633,6 +633,7 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
     d->saslDigest.setDigestUri(QString("xmpp/%1").arg(configuration().domain()).toUtf8());
     d->saslDigest.setNc("00000001");
     d->saslDigest.setNonce(map.value("nonce"));
+    d->saslDigest.setQop("auth");
     d->saslDigest.setRealm(map.value("realm"));
     d->saslDigest.setUsername(configuration().user().toUtf8());
     d->saslDigest.setPassword(configuration().password().toUtf8());
@@ -645,7 +646,7 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
     response["nonce"] = d->saslDigest.nonce();
     response["cnonce"] = d->saslDigest.cnonce();
     response["nc"] = d->saslDigest.nc();
-    response["qop"] = "auth";
+    response["qop"] = d->saslDigest.qop();
     response["digest-uri"] = d->saslDigest.digestUri();
     response["response"] = d->saslDigest.calculateDigest(
         QByteArray("AUTHENTICATE:") + d->saslDigest.digestUri());

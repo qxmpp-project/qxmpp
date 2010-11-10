@@ -46,6 +46,9 @@ public:
     QByteArray nonce() const;
     void setNonce(const QByteArray &nonce);
 
+    QByteArray qop() const;
+    void setQop(const QByteArray &qop);
+
     QByteArray realm() const;
     void setRealm(const QByteArray &realm);
 
@@ -54,7 +57,8 @@ public:
 
     void setPassword(const QByteArray &password);
 
-    QByteArray calculateDigest(const QByteArray &a2) const;
+    QByteArray calculateDigest(const QByteArray &A2) const;
+    QByteArray calculateDigest(const QByteArray &A1, const QByteArray &A2) const;
     static QByteArray generateNonce();
 
     // message parsing and serialization
@@ -67,6 +71,7 @@ private:
     QByteArray m_digestUri;
     QByteArray m_nc;
     QByteArray m_nonce;
+    QByteArray m_qop;
     QByteArray m_realm;
     QByteArray m_username;
     QByteArray m_password;
