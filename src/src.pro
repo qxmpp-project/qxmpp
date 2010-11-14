@@ -74,6 +74,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppReconnectionManager.h \
     QXmppRemoteMethod.h \
     QXmppRpcIq.h \
+    QXmppRtpChannel.h \
     QXmppVCardManager.h \
     QXmppVCardIq.h \
     QXmppVCard.h \
@@ -122,6 +123,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppPubSubIq.cpp \
     QXmppRosterIq.cpp \
     QXmppRosterManager.cpp \
+    QXmppRtpChannel.cpp \
     QXmppSaslAuth.cpp \
     QXmppServer.cpp \
     QXmppServerExtension.cpp \
