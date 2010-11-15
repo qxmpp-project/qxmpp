@@ -59,6 +59,7 @@ public:
     quint16 outgoingSequence;
     quint32 outgoingStamp;
 
+    quint32 ssrc;
     QXmppJinglePayloadType payloadType;
 };
 
@@ -73,8 +74,10 @@ QXmppRtpChannelPrivate::QXmppRtpChannelPrivate()
     incomingStamp(0),
     outgoingMarker(true),
     outgoingSequence(0),
-    outgoingStamp(0)
+    outgoingStamp(0),
+    ssrc(0)
 {
+    ssrc = qrand();
 }
 
 /// Creates a new RTP channel.
@@ -288,6 +291,43 @@ void QXmppRtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 }
 
+/// Returns the list of supported payload types.
+///
+
+QList<QXmppJinglePayloadType> QXmppRtpChannel::supportedPayloadTypes() const
+{
+    QList<QXmppJinglePayloadType> payloads;
+    QXmppJinglePayloadType payload;
+
+#ifdef QXMPP_USE_SPEEX
+    payload.setId(96);
+    payload.setChannels(1);
+    payload.setName("SPEEX");
+    payload.setClockrate(16000);
+    payloads << payload;
+
+    payload.setId(97);
+    payload.setChannels(1);
+    payload.setName("SPEEX");
+    payload.setClockrate(8000);
+    payloads << payload;
+#endif
+
+    payload.setId(QXmppRtpChannel::G711u);
+    payload.setChannels(1);
+    payload.setName("PCMU");
+    payload.setClockrate(8000);
+    payloads << payload;
+
+    payload.setId(QXmppRtpChannel::G711a);
+    payload.setChannels(1);
+    payload.setName("PCMA");
+    payload.setClockrate(8000);
+    payloads << payload;
+
+    return payloads;
+}
+
 qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
 {
     if (!d->codec)
@@ -313,8 +353,7 @@ qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
         stream << marker_type;
         stream << ++d->outgoingSequence;
         stream << d->outgoingStamp;
-        const quint32 ssrc = 0;
-        stream << ssrc;
+        stream << d->ssrc;
 
         QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
         QDataStream input(chunk);

@@ -61,6 +61,7 @@ public:
 
     QXmppJinglePayloadType payloadType() const;
     void setPayloadType(const QXmppJinglePayloadType &payloadType);
+    QList<QXmppJinglePayloadType> supportedPayloadTypes() const;
 
     /// \cond
     qint64 bytesAvailable() const;
