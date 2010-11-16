@@ -113,7 +113,7 @@ bool QXmppStream::isConnected() const
 
 bool QXmppStream::sendData(const QByteArray &data)
 {
-    emit logMessage(QXmppLogger::SentMessage, QString::fromUtf8(data));
+    logSent(QString::fromUtf8(data));
     if (!d->socket || d->socket->state() != QAbstractSocket::ConnectedState)
         return false;
     return d->socket->write(data) == data.size();
@@ -243,7 +243,7 @@ void QXmppStream::socketReadyRead()
         return;
 
     // remove data from buffer
-    emit logMessage(QXmppLogger::ReceivedMessage, strData);
+    logReceived(strData);
     d->dataBuffer.clear();
 
     // process stream start

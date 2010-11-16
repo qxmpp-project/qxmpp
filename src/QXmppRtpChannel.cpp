@@ -113,15 +113,13 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
 {
     if (!d->codec)
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-                        QLatin1String("QXmppRtpChannel::datagramReceived before codec selection"));
+        warning("QXmppRtpChannel::datagramReceived before codec selection");
         return;
     }
 
     if (ba.size() < 12 || (quint8(ba.at(0)) >> 6) != RTP_VERSION)
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppRtpChannel::datagramReceived got an invalid RTP packet"));
+        warning("QXmppRtpChannel::datagramReceived got an invalid RTP packet");
         return;
     }
 
@@ -141,8 +139,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     const qint64 packetLength = ba.size() - 12;
 
 #ifdef QXMPP_DEBUG_RTP
-    emit logMessage(QXmppLogger::ReceivedMessage,
-        QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+    logReceived(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
             QString::number(sequence),
             QString::number(stamp),
             QString::number(marker),
@@ -153,8 +150,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     // check type
     if (type != d->payloadType.id())
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("RTP packet seq %1 has unknown type %2")
+        warning(QString("RTP packet seq %1 has unknown type %2")
                 .arg(QString::number(sequence))
                 .arg(QString::number(type)));
         return;
@@ -162,8 +158,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
 
     // check sequence number
     if (!marker && sequence != d->incomingSequence + 1)
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("RTP packet seq %1 is out of order, previous was %2")
+        warning(QString("RTP packet seq %1 is out of order, previous was %2")
                 .arg(QString::number(sequence))
                 .arg(QString::number(d->incomingSequence)));
     d->incomingSequence = sequence;
@@ -175,8 +170,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
         packetOffset = (stamp - d->incomingStamp) * SAMPLE_BYTES;
         if (packetOffset < 0)
         {
-            emit logMessage(QXmppLogger::WarningMessage,
-                QString("RTP packet stamp %1 is too old, buffer start is %2")
+            warning(QString("RTP packet stamp %1 is too old, buffer start is %2")
                     .arg(QString::number(stamp))
                     .arg(QString::number(d->incomingStamp)));
             return;
@@ -197,8 +191,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     if (d->incomingBuffer.size() > d->incomingMaximum)
     {
         const qint64 droppedSize = d->incomingBuffer.size() - d->incomingMinimum;
-        emit logMessage(QXmppLogger::DebugMessage,
-            QString("RTP buffer is too full, dropping %1 bytes")
+        debug(QString("RTP buffer is too full, dropping %1 bytes")
                 .arg(QString::number(droppedSize)));
         d->incomingBuffer = d->incomingBuffer.right(d->incomingMinimum);
         d->incomingStamp += droppedSize / SAMPLE_BYTES;
@@ -239,8 +232,7 @@ qint64 QXmppRtpChannel::readData(char * data, qint64 maxSize)
     d->incomingBuffer.remove(0, readSize);
     if (readSize < maxSize)
     {
-        emit logMessage(QXmppLogger::InformationMessage,
-            QString("QXmppRtpChannel::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
+        debug(QString("QXmppRtpChannel::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
         memset(data + readSize, 0, maxSize - readSize);
     }
     d->incomingStamp += readSize / SAMPLE_BYTES;
@@ -274,8 +266,7 @@ void QXmppRtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 #endif
     else
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("QXmppCall got an unknown codec : %1 (%2)")
+        warning(QString("QXmppCall got an unknown codec : %1 (%2)")
                 .arg(QString::number(payloadType.id()))
                 .arg(payloadType.name()));
         return;
@@ -332,8 +323,7 @@ qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
 {
     if (!d->codec)
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppRtpChannel::writeData before codec was set"));
+        warning("QXmppRtpChannel::writeData before codec was set");
         return -1;
     }
 
@@ -360,15 +350,13 @@ qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
         input.setByteOrder(QDataStream::LittleEndian);
         d->outgoingStamp += d->codec->encode(input, stream);
 
-        // FIXME: write data
 #ifdef QXMPP_DEBUG_RTP
-        emit logMessage(QXmppLogger::SentMessage,
-                        QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                                QString::number(d->outgoingSequence),
-                                QString::number(d->outgoingStamp),
-                                QString::number(marker_type & 0x80 != 0),
-                                QString::number(marker_type & 0x7f),
-                                QString::number(header.size() - 12)));
+        logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+                    QString::number(d->outgoingSequence),
+                    QString::number(d->outgoingStamp),
+                    QString::number(marker_type & 0x80 != 0),
+                    QString::number(marker_type & 0x7f),
+                    QString::number(header.size() - 12)));
 #endif
         emit sendDatagram(header);
 

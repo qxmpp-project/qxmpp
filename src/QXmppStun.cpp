@@ -821,8 +821,7 @@ void QXmppStunSocket::checkCandidates()
             msg.setType(Binding | Request);
             msg.setId(m_stunId);
 #ifdef QXMPP_DEBUG_STUN
-            emit logMessage(QXmppLogger::SentMessage,
-                QString("Sent to %1 %2\n%3").arg(m_stunHost.toString(),
+            logSent(QString("Sent to %1 %2\n%3").arg(m_stunHost.toString(),
                     QString::number(m_stunPort), msg.toString()));
 #endif
             socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
@@ -999,7 +998,7 @@ void QXmppStunSocket::readyRead()
         return;
     }
 #ifdef QXMPP_DEBUG_STUN
-    emit logMessage(QXmppLogger::ReceivedMessage, QString("Received from %1 port %2\n%3").arg(remoteHost.toString(),
+    logReceived(QString("Received from %1 port %2\n%3").arg(remoteHost.toString(),
             QString::number(remotePort),
             message.toString()));
 #endif
@@ -1148,11 +1147,7 @@ qint64 QXmppStunSocket::writeStun(const QXmppStunMessage &message, QXmppStunSock
     const QString messagePassword = (message.type() & 0xFF00) ? m_localPassword : m_remotePassword;
     qint64 ret = pair->socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
 #ifdef QXMPP_DEBUG_STUN
-    if (ret < 0)
-        warning(QString("Could not send to %1\n%2").arg(pair->toString(), pair->socket->errorString()));
-    else
-        emit logMessage(QXmppLogger::SentMessage, QString("Sent to %1\n%2").arg(pair->toString(),
-                message.toString()));
+    logSent(QString("Sent to %1\n%2").arg(pair->toString(), message.toString()));
 #endif
     return ret;
 }

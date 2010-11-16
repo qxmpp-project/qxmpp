@@ -104,9 +104,51 @@ public:
 
 protected:
     virtual void childEvent(QChildEvent *event);
-    void debug(const QString &msg);
-    void info(const QString &msg);
-    void warning(const QString &msg);
+
+    /// Logs a debugging message.
+    ///
+    /// \param message
+
+    void debug(const QString &message)
+    {
+        emit logMessage(QXmppLogger::DebugMessage, message);
+    }
+
+    /// Logs an informational message.
+    ///
+    /// \param message
+
+    void info(const QString &message)
+    {
+        emit logMessage(QXmppLogger::InformationMessage, message);
+    }
+
+    /// Logs a warning message.
+    ///
+    /// \param message
+
+    void warning(const QString &message)
+    {
+        emit logMessage(QXmppLogger::WarningMessage, message);
+    }
+
+    /// Logs a received packet.
+    ///
+    /// \param msg
+
+    void logReceived(const QString &message)
+    {
+        emit logMessage(QXmppLogger::ReceivedMessage, message);
+    }
+
+    /// Logs a sent packet.
+    ///
+    /// \param msg
+
+    void logSent(const QString &message)
+    {
+        emit logMessage(QXmppLogger::SentMessage, message);
+    }
 
 signals:
     /// This signal is emitted to send logging messages.

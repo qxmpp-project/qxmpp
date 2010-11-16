@@ -79,6 +79,26 @@ public slots:
     void datagramReceived(const QByteArray &ba);
 
 protected:
+    void debug(const QString &message)
+    {
+        emit logMessage(QXmppLogger::DebugMessage, message);
+    }
+
+    void warning(const QString &message)
+    {
+        emit logMessage(QXmppLogger::WarningMessage, message);
+    }
+
+    void logReceived(const QString &message)
+    {
+        emit logMessage(QXmppLogger::ReceivedMessage, message);
+    }
+
+    void logSent(const QString &message)
+    {
+        emit logMessage(QXmppLogger::SentMessage, message);
+    }
+
     /// \cond
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);

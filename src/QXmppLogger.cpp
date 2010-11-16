@@ -88,33 +88,6 @@ void QXmppLoggable::childEvent(QChildEvent *event)
     }
 }
 
-/// Logs a debugging message.
-///
-/// \param message
-
-void QXmppLoggable::debug(const QString &message)
-{
-    emit logMessage(QXmppLogger::DebugMessage, message);
-}
-
-/// Logs an informational message.
-///
-/// \param message
-
-void QXmppLoggable::info(const QString &message)
-{
-    emit logMessage(QXmppLogger::InformationMessage, message);
-}
-
-/// Logs a warning message.
-///
-/// \param message
-
-void QXmppLoggable::warning(const QString &message)
-{
-    emit logMessage(QXmppLogger::WarningMessage, message);
-}
-
 /// Constructs a new QXmppLogger.
 ///
 /// \param parent
