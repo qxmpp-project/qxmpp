@@ -29,6 +29,7 @@
 #include "QXmppCodec.h"
 #include "QXmppConstants.h"
 #include "QXmppJingleIq.h"
+#include "QXmppRtpChannel.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
@@ -37,68 +38,65 @@ static int typeId = qRegisterMetaType<QXmppCall::State>();
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-const quint8 RTP_VERSION = 0x02;
+class QXmppCallPrivate
+{
+public:
+    QXmppCall::Direction direction;
+    QString jid;
+    QString sid;
+    QXmppCall::State state;
+    QString contentCreator;
+    QString contentName;
 
-enum CodecId {
-    G711u = 0,
-    GSM = 3,
-    G723 = 4,
-    G711a = 8,
-    G722 = 9,
-    L16Stereo = 10,
-    L16Mono = 11,
-    G728 = 15,
-    G729 = 18,
+    QList<QXmppJingleIq> requests;
+
+    // ICE-UDP
+    QXmppIceConnection *connection;
+
+    // RTP
+    QXmppRtpChannel *audioChannel;
+    QList<QXmppJinglePayloadType> commonPayloadTypes;
 };
 
-#define SAMPLE_BYTES 2
-
 QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent)
-    : QIODevice(parent),
-    m_direction(direction),
-    m_jid(jid),
-    m_state(OfferState),
-    m_signalsEmitted(false),
-    m_writtenSinceLastEmit(0),
-    m_codec(0),
-    m_incomingBuffering(true),
-    m_incomingMinimum(0),
-    m_incomingMaximum(0),
-    m_incomingSequence(0),
-    m_incomingStamp(0),
-    m_outgoingMarker(true),
-    m_outgoingSequence(0),
-    m_outgoingStamp(0)
+    : QXmppLoggable(parent),
+    d(new QXmppCallPrivate)
 {
-    m_contentCreator = QLatin1String("initiator");
-    m_contentName = QLatin1String("voice");
+    d->direction = direction;
+    d->jid = jid;
+    d->contentCreator = QLatin1String("initiator");
+    d->contentName = QLatin1String("voice");
 
     // ICE connection
-    bool iceControlling = (m_direction == OutgoingDirection);
-    m_connection = new QXmppIceConnection(iceControlling, this);
-    //m_connection->setStunServer("stun.ekiga.net");
-    m_connection->addComponent(RTP_COMPONENT);
-    m_connection->addComponent(RTCP_COMPONENT);
+    bool iceControlling = (d->direction == OutgoingDirection);
+    d->connection = new QXmppIceConnection(iceControlling, this);
+    //d->connection->setStunServer("stun.ekiga.net");
+    d->connection->addComponent(RTP_COMPONENT);
+    d->connection->addComponent(RTCP_COMPONENT);
 
-    bool check = connect(m_connection, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
-
-    check = connect(m_connection, SIGNAL(localCandidatesChanged()),
+    bool check = connect(d->connection, SIGNAL(localCandidatesChanged()),
         this, SIGNAL(localCandidatesChanged()));
     Q_ASSERT(check);
 
-    check = connect(m_connection, SIGNAL(connected()),
+    check = connect(d->connection, SIGNAL(connected()),
         this, SLOT(updateOpenMode()));
     Q_ASSERT(check);
 
-    check = connect(m_connection, SIGNAL(disconnected()),
+    check = connect(d->connection, SIGNAL(disconnected()),
         this, SLOT(hangup()));
     Q_ASSERT(check);
 
-    check = connect(m_connection, SIGNAL(datagramReceived(int,QByteArray)),
+    check = connect(d->connection, SIGNAL(datagramReceived(int,QByteArray)),
         this, SLOT(datagramReceived(int, QByteArray)));
     Q_ASSERT(check);
+
+    // RTP channel
+    d->audioChannel = new QXmppRtpChannel(this);
+}
+
+QXmppCall::~QXmppCall()
+{
+    delete d;
 }
 
 /// Call this method if you wish to accept an incoming call.
@@ -106,27 +104,33 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
 
 void QXmppCall::accept()
 {
-    if (m_direction == IncomingDirection && m_state == OfferState)
+    if (d->direction == IncomingDirection && d->state == OfferState)
         setState(QXmppCall::ConnectingState);
+}
+
+/// Returns the RTP channel for the audio data.
+///
+/// It acts as a QIODevice so that you can read / write audio samples, for
+/// instance using a QAudioOutput and a QAudioInput.
+///
+
+QXmppRtpChannel *QXmppCall::audioChannel() const
+{
+    return d->audioChannel;
 }
 
 /// Returns the number of bytes that are available for reading.
 ///
 
-qint64 QXmppCall::bytesAvailable() const
-{
-    return m_incomingBuffer.size();
-}
-
 void QXmppCall::terminate()
 {
-    if (m_state == FinishedState)
+    if (d->state == FinishedState)
         return;
 
-    m_state = QXmppCall::FinishedState;
+    d->state = QXmppCall::FinishedState;
 
-    close();
-    m_connection->close();
+    d->audioChannel->close();
+    d->connection->close();
 
     // emit signals later
     QTimer::singleShot(0, this, SLOT(terminated()));
@@ -134,7 +138,7 @@ void QXmppCall::terminate()
 
 void QXmppCall::terminated()
 {
-    emit stateChanged(m_state);
+    emit stateChanged(d->state);
     emit finished();
 }
 
@@ -143,14 +147,7 @@ void QXmppCall::terminated()
 
 QXmppCall::Direction QXmppCall::direction() const
 {
-    return m_direction;
-}
-
-void QXmppCall::emitSignals()
-{
-    emit bytesWritten(m_writtenSinceLastEmit);
-    m_writtenSinceLastEmit = 0;
-    m_signalsEmitted = false;
+    return d->direction;
 }
 
 /// Hangs up the call.
@@ -158,13 +155,8 @@ void QXmppCall::emitSignals()
 
 void QXmppCall::hangup()
 {
-    if (m_state != QXmppCall::FinishedState)
+    if (d->state != QXmppCall::FinishedState)
         setState(QXmppCall::DisconnectingState);
-}
-
-bool QXmppCall::isSequential() const
-{
-    return true;
 }
 
 /// Returns the remote party's JID.
@@ -172,61 +164,26 @@ bool QXmppCall::isSequential() const
 
 QString QXmppCall::jid() const
 {
-    return m_jid;
-}
-
-/// Returns the negociated payload type.
-///
-/// You can use this to determine the QAudioFormat to use with your
-/// QAudioInput/QAudioOutput.
-
-QXmppJinglePayloadType QXmppCall::payloadType() const
-{
-    return m_payloadType;
+    return d->jid;
 }
 
 void QXmppCall::setPayloadType(const QXmppJinglePayloadType &payloadType)
 {
-    m_payloadType = payloadType;
-    if (payloadType.id() == G711u)
-        m_codec = new QXmppG711uCodec(payloadType.clockrate());
-    else if (payloadType.id() == G711a)
-        m_codec = new QXmppG711aCodec(payloadType.clockrate());
-#ifdef QXMPP_USE_SPEEX
-    else if (payloadType.name().toLower() == "speex")
-        m_codec = new QXmppSpeexCodec(payloadType.clockrate());
-#endif
-    else
-    {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("QXmppCall got an unknown codec : %1 (%2)")
-                .arg(QString::number(payloadType.id()))
-                .arg(payloadType.name()));
-        return;
-    }
-
-    // size in bytes of an unencoded packet
-    m_outgoingChunk = SAMPLE_BYTES * payloadType.ptime() * payloadType.clockrate() / 1000;
-
-    // initial number of bytes to buffer
-    m_incomingMinimum = m_outgoingChunk * 5;
-    m_incomingMaximum = m_outgoingChunk * 8;
-
+    d->audioChannel->setPayloadType(payloadType);
     updateOpenMode();
 }
 
 void QXmppCall::addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates)
 {
     foreach (const QXmppJingleCandidate &candidate, candidates)
-        m_connection->addRemoteCandidate(candidate);
+        d->connection->addRemoteCandidate(candidate);
 }
 
 void QXmppCall::updateOpenMode()
 {
     // determine mode
-    if (m_codec && m_connection->isConnected() && m_state != ActiveState)
+    if (d->audioChannel->isOpen() && d->connection->isConnected() && d->state != ActiveState)
     {
-        open(QIODevice::ReadWrite | QIODevice::Unbuffered);
         setState(ActiveState);
         emit connected();
     }
@@ -237,89 +194,7 @@ void QXmppCall::datagramReceived(int component, const QByteArray &buffer)
     if (component != RTP_COMPONENT)
         return;
 
-    if (!m_codec)
-    {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall:datagramReceived before codec selection"));
-        return;
-    }
-
-    if (buffer.size() < 12 || (quint8(buffer.at(0)) >> 6) != RTP_VERSION)
-    {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall::datagramReceived got an invalid RTP packet"));
-        return;
-    }
-
-    // parse RTP header
-    QDataStream stream(buffer);
-    quint8 version, type;
-    quint32 ssrc;
-    quint16 sequence;
-    quint32 stamp;
-    stream >> version;
-    stream >> type;
-    stream >> sequence;
-    stream >> stamp;
-    stream >> ssrc;
-    const qint64 packetLength = buffer.size() - 12;
-
-#ifdef QXMPP_DEBUG_RTP
-    emit logMessage(QXmppLogger::ReceivedMessage,
-        QString("RTP packet seq %1 stamp %2 size %3")
-            .arg(QString::number(sequence))
-            .arg(QString::number(stamp))
-            .arg(QString::number(packetLength)));
-#endif
-
-    // check sequence number
-    if (sequence != m_incomingSequence + 1)
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("RTP packet seq %1 is out of order, previous was %2")
-                .arg(QString::number(sequence))
-                .arg(QString::number(m_incomingSequence)));
-    m_incomingSequence = sequence;
-
-    // determine packet's position in the buffer (in bytes)
-    qint64 packetOffset = 0;
-    if (!buffer.isEmpty())
-    {
-        packetOffset = (stamp - m_incomingStamp) * SAMPLE_BYTES;
-        if (packetOffset < 0)
-        {
-            emit logMessage(QXmppLogger::WarningMessage,
-                QString("RTP packet stamp %1 is too old, buffer start is %2")
-                    .arg(QString::number(stamp))
-                    .arg(QString::number(m_incomingStamp)));
-            return;
-        }
-    } else {
-        m_incomingStamp = stamp;
-    }
-
-    // allocate space for new packet
-    if (packetOffset + packetLength > m_incomingBuffer.size())
-        m_incomingBuffer += QByteArray(packetOffset + packetLength - m_incomingBuffer.size(), 0);
-    QDataStream output(&m_incomingBuffer, QIODevice::WriteOnly);
-    output.device()->seek(packetOffset);
-    output.setByteOrder(QDataStream::LittleEndian);
-    m_codec->decode(stream, output);
-
-    // check whether we are running late
-    if (m_incomingBuffer.size() > m_incomingMaximum)
-    {
-        const qint64 droppedSize = m_incomingBuffer.size() - m_incomingMinimum;
-        emit logMessage(QXmppLogger::DebugMessage,
-            QString("RTP buffer is too full, dropping %1 bytes")
-                .arg(QString::number(droppedSize)));
-        m_incomingBuffer = m_incomingBuffer.right(m_incomingMinimum);
-        m_incomingStamp += droppedSize / SAMPLE_BYTES;
-    }
-    // check whether we have filled the initial buffer
-    if (m_incomingBuffer.size() >= m_incomingMinimum)
-        m_incomingBuffering = false;
-    if (!m_incomingBuffering)
-        emit readyRead();
+    d->audioChannel->datagramReceived(buffer);
 }
 
 /// Returns the call's session identifier.
@@ -327,7 +202,7 @@ void QXmppCall::datagramReceived(int component, const QByteArray &buffer)
 
 QString QXmppCall::sid() const
 {
-    return m_sid;
+    return d->sid;
 }
 
 /// Returns the call's state.
@@ -336,95 +211,16 @@ QString QXmppCall::sid() const
 
 QXmppCall::State QXmppCall::state() const
 {
-    return m_state;
+    return d->state;
 }
 
 void QXmppCall::setState(QXmppCall::State state)
 {
-    if (m_state != state)
+    if (d->state != state)
     {
-        m_state = state;
-        emit stateChanged(m_state);
+        d->state = state;
+        emit stateChanged(d->state);
     }
-}
-
-qint64 QXmppCall::readData(char * data, qint64 maxSize)
-{
-    // if we are filling the buffer, return empty samples
-    if (m_incomingBuffering)
-    {
-        memset(data, 0, maxSize);
-        return maxSize;
-    }
-
-    qint64 readSize = qMin(maxSize, qint64(m_incomingBuffer.size()));
-    memcpy(data, m_incomingBuffer.constData(), readSize);
-    m_incomingBuffer.remove(0, readSize);
-    if (readSize < maxSize)
-    {
-        emit logMessage(QXmppLogger::InformationMessage,
-            QString("QXmppCall::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
-        memset(data + readSize, 0, maxSize - readSize);
-    }
-    m_incomingStamp += readSize / SAMPLE_BYTES;
-    return maxSize;
-}
-
-qint64 QXmppCall::writeData(const char * data, qint64 maxSize)
-{
-    if (!m_codec)
-    {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall::writeData before codec was set"));
-        return -1;
-    }
-
-    m_outgoingBuffer += QByteArray::fromRawData(data, maxSize);
-    while (m_outgoingBuffer.size() >= m_outgoingChunk)
-    {
-        QByteArray header;
-        QDataStream stream(&header, QIODevice::WriteOnly);
-        quint8 version = RTP_VERSION << 6;
-        stream << version;
-        quint8 type = m_payloadType.id();
-        if (m_outgoingMarker)
-        {
-            type |= 0x80;
-            m_outgoingMarker= false;
-        }
-        stream << type;
-        stream << ++m_outgoingSequence;
-        stream << m_outgoingStamp;
-        const quint32 ssrc = 0;
-        stream << ssrc;
-
-        QByteArray chunk = m_outgoingBuffer.left(m_outgoingChunk);
-        QDataStream input(chunk);
-        input.setByteOrder(QDataStream::LittleEndian);
-        m_outgoingStamp += m_codec->encode(input, stream);
-
-        if (m_connection->writeDatagram(RTP_COMPONENT, header) < 0)
-            emit logMessage(QXmppLogger::WarningMessage,
-                QLatin1String("QXmppCall:writeData could not send audio data"));
-#ifdef QXMPP_DEBUG_RTP
-        else
-            emit logMessage(QXmppLogger::SentMessage,
-                QString("RTP packet seq %1 stamp %2 size %3")
-                    .arg(QString::number(m_outgoingSequence))
-                    .arg(QString::number(m_outgoingStamp))
-                    .arg(QString::number(header.size() - 12)));
-#endif
-
-        m_outgoingBuffer.remove(0, chunk.size());
-    }
-
-    m_writtenSinceLastEmit += maxSize;
-    if (!m_signalsEmitted && !signalsBlocked()) {
-        m_signalsEmitted = true;
-        QMetaObject::invokeMethod(this, "emitSignals", Qt::QueuedConnection);
-    }
-
-    return maxSize;
 }
 
 QXmppCallManager::QXmppCallManager(QXmppClient *client)
@@ -468,7 +264,7 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
-    call->m_sid = generateStanzaHash();
+    call->d->sid = generateStanzaHash();
 
     // register call
     m_calls << call;
@@ -478,28 +274,26 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
         this, SLOT(callStateChanged(QXmppCall::State)));
     connect(call, SIGNAL(localCandidatesChanged()),
         this, SLOT(localCandidatesChanged()));
-    connect(call, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
 
     QXmppJingleIq iq;
     iq.setTo(jid);
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::SessionInitiate);
     iq.setInitiator(client()->configuration().jid());
-    iq.setSid(call->m_sid);
-    iq.content().setCreator(call->m_contentCreator);
-    iq.content().setName(call->m_contentName);
+    iq.setSid(call->sid());
+    iq.content().setCreator(call->d->contentCreator);
+    iq.content().setName(call->d->contentName);
     iq.content().setSenders("both");
 
     // description
     iq.content().setDescriptionMedia("audio");
-    foreach (const QXmppJinglePayloadType &payload, localPayloadTypes())
+    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->supportedPayloadTypes())
         iq.content().addPayloadType(payload);
 
     // transport
-    iq.content().setTransportUser(call->m_connection->localUser());
-    iq.content().setTransportPassword(call->m_connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, call->m_connection->localCandidates())
+    iq.content().setTransportUser(call->d->connection->localUser());
+    iq.content().setTransportPassword(call->d->connection->localPassword());
+    foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
         iq.content().addTransportCandidate(candidate);
 
     sendRequest(call, iq);
@@ -531,7 +325,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
         iq.setTo(call->jid());
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::SessionTerminate);
-        iq.setSid(call->m_sid);
+        iq.setSid(call->sid());
         sendRequest(call, iq);
 
         // schedule forceful termination in 5s
@@ -546,25 +340,25 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::SessionAccept);
         iq.setResponder(client()->configuration().jid());
-        iq.setSid(call->m_sid);
-        iq.content().setCreator(call->m_contentCreator);
-        iq.content().setName(call->m_contentName);
+        iq.setSid(call->sid());
+        iq.content().setCreator(call->d->contentCreator);
+        iq.content().setName(call->d->contentName);
 
         // description
         iq.content().setDescriptionMedia("audio");
-        foreach (const QXmppJinglePayloadType &payload, call->m_commonPayloadTypes)
+        foreach (const QXmppJinglePayloadType &payload, call->d->commonPayloadTypes)
             iq.content().addPayloadType(payload);
 
         // transport
-        iq.content().setTransportUser(call->m_connection->localUser());
-        iq.content().setTransportPassword(call->m_connection->localPassword());
-        foreach (const QXmppJingleCandidate &candidate, call->m_connection->localCandidates())
+        iq.content().setTransportUser(call->d->connection->localUser());
+        iq.content().setTransportPassword(call->d->connection->localPassword());
+        foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
             iq.content().addTransportCandidate(candidate);
 
         sendRequest(call, iq);
 
         // perform ICE negotiation
-        call->m_connection->connectToHost();
+        call->d->connection->connectToHost();
     }
 }
 
@@ -573,16 +367,15 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
 
 bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes)
 {
-    foreach (const QXmppJinglePayloadType &payload, localPayloadTypes())
+    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->supportedPayloadTypes())
     {
         int payloadIndex = remotePayloadTypes.indexOf(payload);
         if (payloadIndex >= 0)
-            call->m_commonPayloadTypes << remotePayloadTypes[payloadIndex];
+            call->d->commonPayloadTypes << remotePayloadTypes[payloadIndex];
     }
-    if (call->m_commonPayloadTypes.isEmpty())
+    if (call->d->commonPayloadTypes.isEmpty())
     {
-         emit logMessage(QXmppLogger::WarningMessage,
-            QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
+        warning(QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
 
         // terminate call
         QXmppJingleIq iq;
@@ -594,7 +387,7 @@ bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJingl
         sendRequest(call, iq);
         return false;
     } else {
-        call->setPayloadType(call->m_commonPayloadTypes.first());
+        call->setPayloadType(call->d->commonPayloadTypes.first());
         return true;
     }
 }
@@ -602,7 +395,7 @@ bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJingl
 QXmppCall *QXmppCallManager::findCall(const QString &sid) const
 {
     foreach (QXmppCall *call, m_calls)
-        if (call->m_sid == sid)
+        if (call->sid() == sid)
            return call;
     return 0;
 }
@@ -610,46 +403,9 @@ QXmppCall *QXmppCallManager::findCall(const QString &sid) const
 QXmppCall *QXmppCallManager::findCall(const QString &sid, QXmppCall::Direction direction) const
 {
     foreach (QXmppCall *call, m_calls)
-        if (call->m_sid == sid && call->m_direction == direction)
+        if (call->sid() == sid && call->direction() == direction)
            return call;
     return 0;
-}
-
-/// Returns the list of locally supported payload types.
-///
-
-QList<QXmppJinglePayloadType> QXmppCallManager::localPayloadTypes() const
-{
-    QList<QXmppJinglePayloadType> payloads;
-    QXmppJinglePayloadType payload;
-
-#ifdef QXMPP_USE_SPEEX
-    payload.setId(96);
-    payload.setChannels(1);
-    payload.setName("SPEEX");
-    payload.setClockrate(16000);
-    payloads << payload;
-
-    payload.setId(97);
-    payload.setChannels(1);
-    payload.setName("SPEEX");
-    payload.setClockrate(8000);
-    payloads << payload;
-#endif
-
-    payload.setId(G711u);
-    payload.setChannels(1);
-    payload.setName("PCMU");
-    payload.setClockrate(8000);
-    payloads << payload;
-
-    payload.setId(G711a);
-    payload.setChannels(1);
-    payload.setName("PCMA");
-    payload.setClockrate(8000);
-    payloads << payload;
-
-    return payloads;
 }
 
 /// Handles acknowledgements
@@ -666,11 +422,11 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
     QXmppJingleIq request;
     foreach (call, m_calls)
     {
-        for (int i = 0; i < call->m_requests.size(); i++)
+        for (int i = 0; i < call->d->requests.size(); i++)
         {
-            if (ack.id() == call->m_requests[i].id())
+            if (ack.id() == call->d->requests[i].id())
             {
-                request = call->m_requests.takeAt(i);
+                request = call->d->requests.takeAt(i);
                 found = true;
                 break;
             }
@@ -682,7 +438,7 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
         return;
 
     // process acknowledgement
-    emit logMessage(QXmppLogger::DebugMessage, QString("Received ACK for packet %1").arg(ack.id()));
+    debug(QString("Received ACK for packet %1").arg(ack.id()));
     if (request.action() == QXmppJingleIq::SessionTerminate)
     {
         // terminate
@@ -702,11 +458,11 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
     {
         // build call
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
-        call->m_sid = iq.sid();
-        call->m_contentCreator = iq.content().creator();
-        call->m_contentName = iq.content().name();
-        call->m_connection->setRemoteUser(iq.content().transportUser());
-        call->m_connection->setRemotePassword(iq.content().transportPassword());
+        call->d->sid = iq.sid();
+        call->d->contentCreator = iq.content().creator();
+        call->d->contentName = iq.content().name();
+        call->d->connection->setRemoteUser(iq.content().transportUser());
+        call->d->connection->setRemotePassword(iq.content().transportPassword());
         call->addRemoteCandidates(iq.content().transportCandidates());
 
         // send ack
@@ -727,8 +483,6 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
             this, SLOT(callStateChanged(QXmppCall::State)));
         connect(call, SIGNAL(localCandidatesChanged()),
             this, SLOT(localCandidatesChanged()));
-        connect(call, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-            this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
 
         // send ringing indication
         QXmppJingleIq ringing;
@@ -746,8 +500,7 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = findCall(iq.sid(), QXmppCall::OutgoingDirection);
         if (!call)
         {
-            emit logMessage(QXmppLogger::WarningMessage,
-                QString("Remote party %1 accepted unknown call %2").arg(iq.from(), iq.sid()));
+            warning(QString("Remote party %1 accepted unknown call %2").arg(iq.from(), iq.sid()));
             return;
         }
 
@@ -764,11 +517,11 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         // perform ICE negotiation
         if (!iq.content().transportCandidates().isEmpty())
         {
-            call->m_connection->setRemoteUser(iq.content().transportUser());
-            call->m_connection->setRemotePassword(iq.content().transportPassword());
+            call->d->connection->setRemoteUser(iq.content().transportUser());
+            call->d->connection->setRemotePassword(iq.content().transportPassword());
             call->addRemoteCandidates(iq.content().transportCandidates());
         }
-        call->m_connection->connectToHost();
+        call->d->connection->connectToHost();
 
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
@@ -784,13 +537,11 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = findCall(iq.sid());
         if (!call)
         {
-            emit logMessage(QXmppLogger::WarningMessage,
-                QString("Remote party %1 terminated unknown call %2").arg(iq.from(), iq.sid()));
+            warning(QString("Remote party %1 terminated unknown call %2").arg(iq.from(), iq.sid()));
             return;
         }
 
-        emit logMessage(QXmppLogger::InformationMessage,
-            QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
+        info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
 
         // send ack
         sendAck(iq);
@@ -802,8 +553,7 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = findCall(iq.sid());
         if (!call)
         {
-            emit logMessage(QXmppLogger::WarningMessage,
-                QString("Remote party %1 sent transports for unknown call %2").arg(iq.from(), iq.sid()));
+            warning(QString("Remote party %1 sent transports for unknown call %2").arg(iq.from(), iq.sid()));
             return;
         }
 
@@ -811,10 +561,10 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // perform ICE negotiation
-        call->m_connection->setRemoteUser(iq.content().transportUser());
-        call->m_connection->setRemotePassword(iq.content().transportPassword());
+        call->d->connection->setRemoteUser(iq.content().transportUser());
+        call->d->connection->setRemotePassword(iq.content().transportPassword());
         call->addRemoteCandidates(iq.content().transportCandidates());
-        call->m_connection->connectToHost();
+        call->d->connection->connectToHost();
     }
 }
 
@@ -834,9 +584,9 @@ void QXmppCallManager::localCandidatesChanged()
     iq.setInitiator(client()->configuration().jid());
     iq.setSid(call->sid());
 
-    iq.content().setCreator(call->m_contentCreator);
-    iq.content().setName(call->m_contentName);
-    foreach (const QXmppJingleCandidate &candidate, call->m_connection->localCandidates())
+    iq.content().setCreator(call->d->contentCreator);
+    iq.content().setName(call->d->contentName);
+    foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
         iq.content().addTransportCandidate(candidate);
 
     sendRequest(call, iq);
@@ -859,7 +609,7 @@ bool QXmppCallManager::sendAck(const QXmppJingleIq &iq)
 
 bool QXmppCallManager::sendRequest(QXmppCall *call, const QXmppJingleIq &iq)
 {
-    call->m_requests << iq;
+    call->d->requests << iq;
     return client()->sendPacket(iq);
 }
 

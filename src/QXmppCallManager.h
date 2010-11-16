@@ -29,23 +29,23 @@
 #include <QMetaType>
 
 #include "QXmppClientExtension.h"
-#include "QXmppJingleIq.h"
 #include "QXmppLogger.h"
 
-class QXmppCodec;
-class QXmppIceConnection;
+class QXmppCallPrivate;
+class QXmppIq;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
+class QXmppRtpChannel;
 
 /// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
-/// It acts as a QIODevice so that you can read / write audio samples, for
-/// instance using a QAudioOutput and a QAudioInput.
+/// To get the QIODevice from which you can read / write audio samples, call
+/// audioChannel().
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppCall : public QIODevice
+class QXmppCall : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -67,17 +67,14 @@ public:
         FinishedState = 4,      ///< The call is finished.
     };
 
+    ~QXmppCall();
+
     QXmppCall::Direction direction() const;
     QString jid() const;
     QString sid() const;
     QXmppCall::State state() const;
 
-    QXmppJinglePayloadType payloadType() const;
-
-    /// \cond
-    qint64 bytesAvailable() const;
-    bool isSequential() const;
-    /// \endcond
+    QXmppRtpChannel *audioChannel() const;
 
 signals:
     /// This signal is emitted when a call is connected.
@@ -99,9 +96,6 @@ signals:
     /// This signal is emitted when the remote party is ringing.
     void ringing();
 
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
     /// This signal is emitted when the call state changes.
     void stateChanged(QXmppCall::State state);
 
@@ -111,16 +105,9 @@ public slots:
 
 private slots:
     void datagramReceived(int component, const QByteArray &datagram);
-    void emitSignals();
     void updateOpenMode();
     void terminate();
     void terminated();
-
-protected:
-    /// \cond
-    qint64 readData(char * data, qint64 maxSize);
-    qint64 writeData(const char * data, qint64 maxSize);
-    /// \endcond
 
 private:
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
@@ -128,40 +115,7 @@ private:
     void addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates);
     void setState(QXmppCall::State state);
 
-    Direction m_direction;
-    QString m_jid;
-    QString m_sid;
-    State m_state;
-    QString m_contentCreator;
-    QString m_contentName;
-    QXmppJinglePayloadType m_payloadType;
-
-    QList<QXmppJingleIq> m_requests;
-    QList<QXmppJinglePayloadType> m_commonPayloadTypes;
-
-    // ICE-UDP
-    QXmppIceConnection *m_connection;
-
-    // signals
-    bool m_signalsEmitted;
-    qint64 m_writtenSinceLastEmit;
-
-    // RTP
-    QXmppCodec *m_codec;
-
-    QByteArray m_incomingBuffer;
-    bool m_incomingBuffering;
-    int m_incomingMinimum;
-    int m_incomingMaximum;
-    quint16 m_incomingSequence;
-    quint32 m_incomingStamp;
-
-    quint16 m_outgoingChunk;
-    QByteArray m_outgoingBuffer;
-    bool m_outgoingMarker;
-    quint16 m_outgoingSequence;
-    quint32 m_outgoingStamp;
-
+    QXmppCallPrivate * const d;
     friend class QXmppCallManager;
 };
 
@@ -209,7 +163,6 @@ private:
     bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
     QXmppCall *findCall(const QString &sid) const;
     QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
-    QList<QXmppJinglePayloadType> localPayloadTypes() const;
     bool sendAck(const QXmppJingleIq &iq);
     bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
 
