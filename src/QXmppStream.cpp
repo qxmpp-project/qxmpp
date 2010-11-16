@@ -47,7 +47,6 @@ public:
     QXmppStreamPrivate();
 
     QByteArray dataBuffer;
-    QXmppLogger* logger;
     QSslSocket* socket;
 
     // stream state
@@ -55,8 +54,7 @@ public:
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate()
-    : logger(0),
-    socket(0)
+    : socket(0)
 {
 }
 
@@ -65,7 +63,7 @@ QXmppStreamPrivate::QXmppStreamPrivate()
 /// \param parent
 
 QXmppStream::QXmppStream(QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new QXmppStreamPrivate)
 {
     // Make sure the random number generator is seeded
@@ -98,53 +96,6 @@ void QXmppStream::disconnectFromHost()
 
 void QXmppStream::handleStart()
 {
-}
-
-/// Returns the QXmppLogger associated with the current stream.
-
-QXmppLogger *QXmppStream::logger()
-{
-    return d->logger;
-}
-
-/// Sets the QXmppLogger associated with the current stream.
-
-void QXmppStream::setLogger(QXmppLogger *logger)
-{
-    if (d->logger)
-        disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                   d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
-    d->logger = logger;
-    if (d->logger)
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
-}
-
-/// Logs a debugging message.
-///
-/// \param message
-
-void QXmppStream::debug(const QString &message)
-{
-    emit logMessage(QXmppLogger::DebugMessage, message);
-}
-
-/// Logs an informational message.
-///
-/// \param message
-
-void QXmppStream::info(const QString &message)
-{
-    emit logMessage(QXmppLogger::InformationMessage, message);
-}
-
-/// Logs a warning message.
-///
-/// \param message
-
-void QXmppStream::warning(const QString &message)
-{
-    emit logMessage(QXmppLogger::WarningMessage, message);
 }
 
 /// Returns true if the stream is connected.

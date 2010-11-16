@@ -37,7 +37,7 @@ class QXmppStreamPrivate;
 /// \brief The QXmppStream class is the base class for all XMPP streams.
 ///
 
-class QXmppStream : public QObject
+class QXmppStream : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -47,9 +47,6 @@ public:
 
     bool isConnected() const;
     void disconnectFromHost();
-
-    QXmppLogger *logger();
-    void setLogger(QXmppLogger *logger);
 
     bool sendData(const QByteArray&);
     bool sendElement(const QDomElement&);
@@ -62,15 +59,7 @@ signals:
     /// This signal is emitted when the stream is disconnected.
     void disconnected();
 
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
 protected:
-    // Logging helpers
-    void debug(const QString&);
-    void info(const QString&);
-    void warning(const QString&);
-
     // Access to underlying socket
     QSslSocket *socket();
     void setSocket(QSslSocket *socket);
