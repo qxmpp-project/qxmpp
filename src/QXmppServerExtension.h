@@ -24,8 +24,9 @@
 #ifndef QXMPPSERVEREXTENSION_H
 #define QXMPPSERVEREXTENSION_H
 
-#include <QObject>
 #include <QVariant>
+
+#include "QXmppLogger.h"
 
 class QDomElement;
 class QStringList;
@@ -38,7 +39,7 @@ class QXmppStream;
 /// extensions.
 ///
 
-class QXmppServerExtension : public QObject
+class QXmppServerExtension : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -60,11 +61,6 @@ public:
 
 protected:
     QXmppServer *server();
-
-    // Logging helpers
-    void debug(const QString&);
-    void info(const QString&);
-    void warning(const QString&);
 
 private:
     void setServer(QXmppServer *server);

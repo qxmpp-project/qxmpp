@@ -151,7 +151,7 @@ void QXmppServerPrivate::stopExtensions()
 /// \param parent
 
 QXmppServer::QXmppServer(QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new QXmppServerPrivate)
 {
     d->serverForClients = new QXmppSslServer(this);
@@ -238,7 +238,14 @@ QXmppLogger *QXmppServer::logger()
 
 void QXmppServer::setLogger(QXmppLogger *logger)
 {
+    if (d->logger)
+        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                   d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
     d->logger = logger;
+    d->logger = logger;
+    if (d->logger)
+        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
 }
 
 /// Returns the password checker used to verify client credentials.
@@ -362,7 +369,6 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
     QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
     stream->setObjectName("S2S-out-" + domain);
     stream->setLocalStreamKey(generateStanzaHash().toAscii());
-    stream->setLogger(d->logger);
 
     bool check = connect(stream, SIGNAL(connected()),
                          this, SLOT(slotStreamConnected()));
@@ -575,7 +581,6 @@ void QXmppServer::slotClientConnection(QSslSocket *socket)
 {
     QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
     socket->setParent(stream);
-    stream->setLogger(d->logger);
     stream->setPasswordChecker(d->passwordChecker);
 
     bool check = connect(stream, SIGNAL(connected()),
@@ -640,7 +645,6 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
 {
     QXmppIncomingServer *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
-    stream->setLogger(d->logger);
 
     bool check = connect(stream, SIGNAL(connected()),
                          this, SLOT(slotStreamConnected()));

@@ -73,30 +73,3 @@ void QXmppClientExtension::setClient(QXmppClient *client)
     d->client = client;
 }
 
-/// Logs a debugging message.
-///
-/// \param message
-
-void QXmppClientExtension::debug(const QString &message)
-{
-    emit logMessage(QXmppLogger::DebugMessage, message);
-}
-
-/// Logs an informational message.
-///
-/// \param message
-
-void QXmppClientExtension::info(const QString &message)
-{
-    emit logMessage(QXmppLogger::InformationMessage, message);
-}
-
-/// Logs a warning message.
-///
-/// \param message
-
-void QXmppClientExtension::warning(const QString &message)
-{
-    emit logMessage(QXmppLogger::WarningMessage, message);
-}
-

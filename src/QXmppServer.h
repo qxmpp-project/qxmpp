@@ -26,11 +26,12 @@
 
 #include <QTcpServer>
 
+#include "QXmppLogger.h"
+
 class QDomElement;
 class QSslSocket;
 
 class QXmppDialback;
-class QXmppLogger;
 class QXmppOutgoingServer;
 class QXmppPasswordChecker;
 class QXmppServerExtension;
@@ -43,7 +44,7 @@ class QXmppStream;
 ///
 /// \ingroup Core
 
-class QXmppServer : public QObject
+class QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
 

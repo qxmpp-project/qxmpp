@@ -77,7 +77,7 @@ class QXmppVersionManager;
 ///
 /// \ingroup Core
 
-class QXmppClient : public QObject
+class QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -264,9 +264,6 @@ signals:
     /// Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
     /// \endcond
-
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 public slots:
     bool sendPacket(const QXmppPacket&);

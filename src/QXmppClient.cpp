@@ -51,6 +51,7 @@ public:
     QXmppClientPrivate(QXmppClient *);
 
     QList<QXmppClientExtension*> extensions;
+    QXmppLogger *logger;
     QXmppOutgoingClient* stream;  ///< Pointer to QXmppOutgoingClient object a wrapper over
                           ///< TCP socket and XMPP protocol
     QXmppPresence clientPresence; ///< Stores the current presence of the connected client
@@ -134,7 +135,7 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
 /// The default value is 0.
 
 QXmppClient::QXmppClient(QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new QXmppClientPrivate(this))
 {
     d->stream = new QXmppOutgoingClient(this);
@@ -181,9 +182,8 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // logging
-    check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        d->stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
+    d->logger = 0;
+    setLogger(QXmppLogger::getLogger());
 
     // create managers
     // TODO move manager references to d->extensions
@@ -193,8 +193,10 @@ QXmppClient::QXmppClient(QObject *parent)
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
 
+#if 0
     d->callManager = new QXmppCallManager(this);
     addExtension(d->callManager);
+#endif
 
     d->mucManager = new QXmppMucManager(this);
     addExtension(d->mucManager);
@@ -245,12 +247,6 @@ bool QXmppClient::addExtension(QXmppClientExtension* extension)
 
     extension->setParent(this);
     extension->setClient(this);
-
-    // Logging
-    bool check = connect(extension, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        d->stream, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
 
     // Features
     d->stream->addFeatures(extension->discoveryFeatures());
@@ -742,14 +738,20 @@ QXmppTransferManager& QXmppClient::transferManager()
 
 QXmppLogger *QXmppClient::logger()
 {
-    return d->stream->logger();
+    return d->logger;
 }
 
 /// Sets the QXmppLogger associated with the current QXmppClient.
 
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
-    d->stream->setLogger(logger);
+    if (d->logger)
+        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                   d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+    d->logger = logger;
+    if (d->logger)
+        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
 }
 
 /// At connection establishment, send initial presence.

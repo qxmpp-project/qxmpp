@@ -61,7 +61,6 @@ QStringList QXmppServerExtension::discoveryItems() const
     return QStringList();
 }
 
-
 /// Returns the extension's name.
 ///
 
@@ -145,35 +144,3 @@ void QXmppServerExtension::setServer(QXmppServer *server)
     d->server = server;
 }
 
-/// Logs a debugging message.
-///
-/// \param message
-
-void QXmppServerExtension::debug(const QString &message)
-{
-    QXmppLogger *logger = server()->logger();
-    if (logger)
-        logger->log(QXmppLogger::DebugMessage, message);
-}
-
-/// Logs an informational message.
-///
-/// \param message
-
-void QXmppServerExtension::info(const QString &message)
-{
-    QXmppLogger *logger = server()->logger();
-    if (logger)
-        logger->log(QXmppLogger::InformationMessage, message);
-}
-
-/// Logs a warning message.
-///
-/// \param message
-
-void QXmppServerExtension::warning(const QString &message)
-{
-    QXmppLogger *logger = server()->logger();
-    if (logger)
-        logger->log(QXmppLogger::WarningMessage, message);
-}

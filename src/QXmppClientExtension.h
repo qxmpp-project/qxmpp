@@ -37,7 +37,7 @@ class QXmppStream;
 /// extensions.
 ///
 
-class QXmppClientExtension : public QObject
+class QXmppClientExtension : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -48,17 +48,8 @@ public:
     virtual QStringList discoveryFeatures() const;
     virtual bool handleStanza(const QDomElement &stanza) = 0;
 
-signals:
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
 protected:
     QXmppClient *client();
-
-    // Logging helpers
-    void debug(const QString&);
-    void info(const QString&);
-    void warning(const QString&);
 
 private:
     void setClient(QXmppClient *client);
