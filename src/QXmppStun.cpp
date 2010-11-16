@@ -692,7 +692,7 @@ QString QXmppStunSocket::Pair::toString() const
 ///
 
 QXmppStunSocket::QXmppStunSocket(bool iceControlling, QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     m_activePair(0),
     m_iceControlling(iceControlling),
     m_stunDone(false),
@@ -745,8 +745,7 @@ bool QXmppStunSocket::bind()
 
             if (!socket->bind(ip, preferredPort) && !socket->bind(ip, 0))
             {
-                debug(QString("QXmppStunSocket could not start listening on %1").arg(ip.toString()),
-                    QXmppLogger::WarningMessage);
+                warning(QString("QXmppStunSocket could not start listening on %1").arg(ip.toString()));
                 delete socket;
                 continue;
             }
@@ -789,6 +788,7 @@ int QXmppStunSocket::component() const
 void QXmppStunSocket::setComponent(int component)
 {
     m_component = component;
+    setObjectName(QString("STUN(%1)").arg(QString::number(m_component)));
 }
 
 void QXmppStunSocket::checkCandidates()
@@ -821,10 +821,9 @@ void QXmppStunSocket::checkCandidates()
             msg.setType(Binding | Request);
             msg.setId(m_stunId);
 #ifdef QXMPP_DEBUG_STUN
-            debug(
+            emit logMessage(QXmppLogger::SentMessage,
                 QString("Sent to %1 %2\n%3").arg(m_stunHost.toString(),
-                    QString::number(m_stunPort), msg.toString()),
-                QXmppLogger::SentMessage);
+                    QString::number(m_stunPort), msg.toString()));
 #endif
             socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
         }
@@ -856,11 +855,6 @@ void QXmppStunSocket::connectToHost()
 bool QXmppStunSocket::isConnected() const
 {
     return m_activePair != 0;
-}
-
-void QXmppStunSocket::debug(const QString &message, QXmppLogger::MessageType type)
-{
-    emit logMessage(type, QString("STUN(%1) %2").arg(QString::number(m_component)).arg(message));
 }
 
 /// Returns the list of local candidates.
@@ -1001,14 +995,13 @@ void QXmppStunSocket::readyRead()
     if (!message.decode(buffer, messagePassword, &errors))
     {
         foreach (const QString &error, errors)
-            debug(error, QXmppLogger::WarningMessage);
+            warning(error);
         return;
     }
 #ifdef QXMPP_DEBUG_STUN
-    debug(QString("Received from %1 port %2\n%3").arg(remoteHost.toString(),
+    emit logMessage(QXmppLogger::ReceivedMessage, QString("Received from %1 port %2\n%3").arg(remoteHost.toString(),
             QString::number(remotePort),
-            message.toString()),
-        QXmppLogger::ReceivedMessage);
+            message.toString()));
 #endif
 
     // check how to handle message
@@ -1029,8 +1022,7 @@ void QXmppStunSocket::readyRead()
             reflexiveHost = message.mappedHost;
             reflexivePort = message.mappedPort;
         } else {
-            debug("STUN server did not provide a reflexive address",
-                QXmppLogger::WarningMessage);
+            warning("STUN server did not provide a reflexive address");
             return;
         }
 
@@ -1157,18 +1149,16 @@ qint64 QXmppStunSocket::writeStun(const QXmppStunMessage &message, QXmppStunSock
     qint64 ret = pair->socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
 #ifdef QXMPP_DEBUG_STUN
     if (ret < 0)
-        debug(QString("Could not send to %1\n%2").arg(pair->toString(), pair->socket->errorString()),
-            QXmppLogger::WarningMessage);
+        warning(QString("Could not send to %1\n%2").arg(pair->toString(), pair->socket->errorString()));
     else
-        debug(QString("Sent to %1\n%2").arg(pair->toString(),
-                message.toString()),
-            QXmppLogger::SentMessage);
+        emit logMessage(QXmppLogger::SentMessage, QString("Sent to %1\n%2").arg(pair->toString(),
+                message.toString()));
 #endif
     return ret;
 }
 
 QXmppIceConnection::QXmppIceConnection(bool controlling, QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     m_controlling(controlling),
     m_stunPort(0)
 {
@@ -1191,8 +1181,7 @@ void QXmppIceConnection::addComponent(int component)
 {
     if (m_components.contains(component))
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("Already have component %1").arg(QString::number(component)));
+        warning(QString("Already have component %1").arg(QString::number(component)));
         return;
     }
 
@@ -1202,11 +1191,7 @@ void QXmppIceConnection::addComponent(int component)
     socket->setLocalPassword(m_localPassword);
     socket->setStunServer(m_stunHost, m_stunPort);
 
-    bool check = connect(socket, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
-
-    check = connect(socket, SIGNAL(localCandidatesChanged()),
+    bool check = connect(socket, SIGNAL(localCandidatesChanged()),
         this, SIGNAL(localCandidatesChanged()));
     Q_ASSERT(check);
 
@@ -1232,8 +1217,7 @@ void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidat
     QXmppStunSocket *socket = m_components.value(candidate.component());
     if (!socket)
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("Not adding candidate for unknown component %1").arg(
+        warning(QString("Not adding candidate for unknown component %1").arg(
                 QString::number(candidate.component())));
         return;
     }
@@ -1315,8 +1299,7 @@ void QXmppIceConnection::setStunServer(const QString &hostName, quint16 port)
     }
     if (host.isNull())
     {
-        emit logMessage(QXmppLogger::WarningMessage,
-            QString("Could not lookup STUN server %1").arg(hostName));
+        warning(QString("Could not lookup STUN server %1").arg(hostName));
         return;
     }
 
@@ -1346,7 +1329,7 @@ void QXmppIceConnection::slotDatagramReceived(const QByteArray &datagram)
 
 void QXmppIceConnection::slotTimeout()
 {
-    emit logMessage(QXmppLogger::WarningMessage, QString("ICE negotiation timed out"));
+    warning(QString("ICE negotiation timed out"));
     foreach (QXmppStunSocket *socket, m_components.values())
         socket->close();
     emit disconnected();

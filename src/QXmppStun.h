@@ -77,7 +77,7 @@ private:
     quint16 m_type;
 };
 
-class QXmppStunSocket : public QObject
+class QXmppStunSocket : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -117,9 +117,6 @@ signals:
     // This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
 private:
     class Pair {
     public:
@@ -135,7 +132,6 @@ private:
     };
 
     Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port);
-    void debug(const QString &message, QXmppLogger::MessageType = QXmppLogger::DebugMessage);
     qint64 writeStun(const QXmppStunMessage &message, QXmppStunSocket::Pair *pair);
 
     int m_component;
@@ -164,7 +160,7 @@ private:
 /// of performing Interactive Connectivity Establishment (RFC 5245).
 ///
 
-class QXmppIceConnection : public QObject
+class QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -198,9 +194,6 @@ signals:
 
     // This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
-
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void slotConnected();
