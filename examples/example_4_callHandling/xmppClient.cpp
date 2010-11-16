@@ -27,6 +27,8 @@
 #include <QDebug>
 
 #include "QXmppCallManager.h"
+#include "QXmppJingleIq.h"
+#include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
 #include "xmppClient.h"
@@ -67,11 +69,12 @@ void xmppClient::slotConnected()
     Q_ASSERT(call);
 
     qDebug() << "Call connected";
+    QXmppRtpChannel *channel = call->audioChannel();
 
     // prepare audio format
     QAudioFormat format;
-    format.setFrequency(call->payloadType().clockrate());
-    format.setChannels(call->payloadType().channels());
+    format.setFrequency(channel->payloadType().clockrate());
+    format.setChannels(channel->payloadType().channels());
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
@@ -79,11 +82,11 @@ void xmppClient::slotConnected()
 
     // initialise audio output
     QAudioOutput *audioOutput = new QAudioOutput(format, this);
-    audioOutput->start(call);
+    audioOutput->start(channel);
 
     // initialise audio input
     QAudioInput *audioInput = new QAudioInput(format, this);
-    audioInput->start(call); 
+    audioInput->start(channel); 
 }
 
 /// A call finished.
