@@ -88,6 +88,11 @@ QXmppRtpChannel::QXmppRtpChannel(QObject *parent)
     : QIODevice(parent),
     d(new QXmppRtpChannelPrivate)
 {
+    QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
+    if (logParent) {
+        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    }
 }
 
 /// Destroys an RTP channel.
@@ -232,7 +237,9 @@ qint64 QXmppRtpChannel::readData(char * data, qint64 maxSize)
     d->incomingBuffer.remove(0, readSize);
     if (readSize < maxSize)
     {
+#ifdef QXMPP_DEBUG_RTP
         debug(QString("QXmppRtpChannel::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
+#endif
         memset(data + readSize, 0, maxSize - readSize);
     }
     d->incomingStamp += readSize / SAMPLE_BYTES;
