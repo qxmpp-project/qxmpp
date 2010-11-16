@@ -24,6 +24,7 @@
 
 #include <iostream>
 
+#include <QChildEvent>
 #include <QDateTime>
 #include <QTextStream>
 #include <QFile>
@@ -56,6 +57,62 @@ static QString formatted(QXmppLogger::MessageType type, const QString& text)
     return QDateTime::currentDateTime().toString() + " " +
         QString::fromLatin1(typeName(type)) + " " +
         text;
+}
+
+/// Constructs a new QXmppLoggable.
+///
+/// \param parent
+
+QXmppLoggable::QXmppLoggable(QObject *parent)
+    : QObject(parent)
+{
+    QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
+    if (logParent) {
+        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    }
+}
+
+void QXmppLoggable::childEvent(QChildEvent *event)
+{
+    QXmppLoggable *child = qobject_cast<QXmppLoggable*>(event->child());
+    if (!child)
+        return;
+
+    if (event->added()) {
+        connect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    } else if (event->removed()) {
+        disconnect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    }
+}
+
+/// Logs a debugging message.
+///
+/// \param message
+
+void QXmppLoggable::debug(const QString &message)
+{
+    emit logMessage(QXmppLogger::DebugMessage, message);
+}
+
+/// Logs an informational message.
+///
+/// \param message
+
+void QXmppLoggable::info(const QString &message)
+{
+    emit logMessage(QXmppLogger::InformationMessage, message);
+}
+
+/// Logs a warning message.
+///
+/// \param message
+
+void QXmppLoggable::warning(const QString &message)
+{
+    emit logMessage(QXmppLogger::WarningMessage, message);
 }
 
 /// Constructs a new QXmppLogger.

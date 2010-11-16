@@ -91,5 +91,27 @@ private:
     QXmppLogger::MessageTypes m_messageTypes;
 };
 
+/// \brief The QXmppLoggable class represents a source of logging messages. 
+///
+/// \ingroup Core
+
+class QXmppLoggable : public QObject
+{
+    Q_OBJECT
+
+public:
+    QXmppLoggable(QObject *parent = 0);
+
+protected:
+    virtual void childEvent(QChildEvent *event);
+    void debug(const QString &msg);
+    void info(const QString &msg);
+    void warning(const QString &msg);
+
+signals:
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+};
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppLogger::MessageTypes)
 #endif // QXMPPLOGGER_H
