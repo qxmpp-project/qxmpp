@@ -150,8 +150,11 @@ QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A1, const QByte
 {
     QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
     QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-    QByteArray KD = HA1 + ':' + m_nonce + ':' + m_nc + ':' + m_cnonce + ':'
-                    + m_qop + ':' + HA2;
+    QByteArray KD;
+    if (m_qop == "auth" || m_qop == "auth-int")
+        KD = HA1 + ':' + m_nonce + ':' + m_nc + ':' + m_cnonce + ':' + m_qop + ':' + HA2;
+    else
+        KD = HA1 + ':' + m_nonce + ':' + HA2;
     return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
