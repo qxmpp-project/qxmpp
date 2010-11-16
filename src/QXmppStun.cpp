@@ -821,7 +821,7 @@ void QXmppStunSocket::checkCandidates()
             msg.setType(Binding | Request);
             msg.setId(m_stunId);
 #ifdef QXMPP_DEBUG_STUN
-            logSent(QString("Sent to %1 %2\n%3").arg(m_stunHost.toString(),
+            logSent(QString("STUN packet to %1 %2\n%3").arg(m_stunHost.toString(),
                     QString::number(m_stunPort), msg.toString()));
 #endif
             socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
@@ -998,7 +998,7 @@ void QXmppStunSocket::readyRead()
         return;
     }
 #ifdef QXMPP_DEBUG_STUN
-    logReceived(QString("Received from %1 port %2\n%3").arg(remoteHost.toString(),
+    logReceived(QString("STUN packet from %1 port %2\n%3").arg(remoteHost.toString(),
             QString::number(remotePort),
             message.toString()));
 #endif
