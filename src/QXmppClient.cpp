@@ -193,10 +193,8 @@ QXmppClient::QXmppClient(QObject *parent)
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
 
-#if 0
     d->callManager = new QXmppCallManager(this);
     addExtension(d->callManager);
-#endif
 
     d->mucManager = new QXmppMucManager(this);
     addExtension(d->mucManager);
