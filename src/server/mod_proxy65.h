@@ -31,14 +31,14 @@
 
 class QTcpSocket;
 
-class QTcpSocketPair : public QObject
+class QTcpSocketPair : public QXmppLoggable
 {
     Q_OBJECT
 
 public:
-    QTcpSocketPair(const QString &hash);
+    QTcpSocketPair(const QString &hash, QObject *parent = 0);
 
-    void activate();
+    bool activate();
     void addSocket(QTcpSocket *socket);
 
     QString key;

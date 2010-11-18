@@ -23,7 +23,6 @@
 
 #include <QCoreApplication>
 #include <QCryptographicHash>
-#include <QDebug>
 #include <QDomElement>
 #include <QHostInfo>
 #include <QSettings>
@@ -52,37 +51,46 @@ static QString streamHash(const QString &sid, const QString &initiatorJid, const
     return hash.result().toHex();
 }
 
-QTcpSocketPair::QTcpSocketPair(const QString &hash)
-    : key(hash), transfer(0), target(0), source(0)
+QTcpSocketPair::QTcpSocketPair(const QString &hash, QObject *parent)
+    : QXmppLoggable(parent),
+    key(hash),
+    transfer(0),
+    target(0),
+    source(0)
 {
 }
 
-void QTcpSocketPair::activate()
+bool QTcpSocketPair::activate()
 {
+    if (!source || !target) {
+        warning("Both source and target sockets are needed to activate " + key);
+        return false;
+    }
     time.start();
     connect(target, SIGNAL(bytesWritten(qint64)), this, SLOT(sendData()));
     connect(source, SIGNAL(readyRead()), this, SLOT(sendData()));
+    return true;
 }
 
 void QTcpSocketPair::addSocket(QTcpSocket *socket)
 {
     if (source)
     {
-        qDebug() << "Unexpected connection for" << key;
+        warning("Unexpected connection for " + key);
         socket->deleteLater();
         return;
     }
 
     if (target)
     {
-        qDebug() << "Opened source connection for" << key;
+        debug("Opened source connection for " + key);
         source = socket;
         source->setReadBufferSize(4 * blockSize);
         connect(source, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else
     {
-        qDebug() << "Opened target connection for" << key;
+        debug("Opened target connection for " + key);
         target = socket;
         connect(target, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
@@ -97,10 +105,10 @@ void QTcpSocketPair::disconnected()
 
     if (target == socket)
     {
-        qDebug() << "Closed target connection for" << key;
+        debug("Closed target connection for " + key);
         emit finished();
     } else if (source == socket) {
-        qDebug() << "Closed source connection for" << key;
+        debug("Closed source connection for " + key);
         if (!target || !target->isOpen())
             emit finished();
     }
@@ -124,6 +132,7 @@ void QTcpSocketPair::sendData()
     qint64 length = source->read(buffer, blockSize);
     if (length < 0)
     {
+        warning("Failed to read from source for " + key);
         target->close();
         return;
     }
@@ -343,9 +352,13 @@ bool QXmppServerProxy65::handleStanza(QXmppStream *stream, const QDomElement &el
             if (pair &&
                 d->allowedDomains.contains(jidToDomain(bsIq.from())))
             {
-                info(QString("Activating connection %1 by %2").arg(hash, bsIq.from()));
-                pair->activate();
-                responseIq.setType(QXmppIq::Result);
+                if (pair->activate()) {
+                    info(QString("Activated connection %1 by %2").arg(hash, bsIq.from()));
+                    responseIq.setType(QXmppIq::Result);
+                } else {
+                    warning(QString("Failed to activate connection %1 by %2").arg(hash, bsIq.from()));
+                    responseIq.setType(QXmppIq::Error);
+                }
             } else {
                 warning(QString("Not activating connection %1 by %2").arg(hash, bsIq.from()));
                 responseIq.setType(QXmppIq::Error);
@@ -420,9 +433,9 @@ QVariantMap QXmppServerProxy65::statistics() const
                 maximumSpeed = speed;
             if (minimumSpeed < 0 || speed < minimumSpeed)
                 minimumSpeed = speed;
-            totalSize += d->recent[i].size;
-            totalElapsed += d->recent[i].elapsed;
         }
+        totalSize += d->recent[i].size;
+        totalElapsed += d->recent[i].elapsed;
     }
     if (minimumSpeed < 0)
         minimumSpeed = 0;
@@ -432,9 +445,11 @@ QVariantMap QXmppServerProxy65::statistics() const
     QVariantMap stats;
     stats["total-bytes"] = d->totalBytes;
     stats["total-transfers"] = d->totalTransfers;
-    stats["average-speed"] = averageSpeed;
-    stats["minimum-speed"] = minimumSpeed;
-    stats["maximum-speed"] = maximumSpeed;
+    stats["hourly-bytes"] = totalSize;
+    stats["hourly-transfers"] = d->recent.size();
+    stats["hourly-average-speed"] = averageSpeed;
+    stats["hourly-minimum-speed"] = minimumSpeed;
+    stats["hourly-maximum-speed"] = maximumSpeed;
     return stats;
 }
 
@@ -451,7 +466,7 @@ void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &
     QTcpSocketPair *pair = d->pairs.value(hostName);
     if (!pair)
     {
-        pair = new QTcpSocketPair(hostName);
+        pair = new QTcpSocketPair(hostName, this);
         check = connect(pair, SIGNAL(finished()), this, SLOT(slotPairFinished()));
         Q_ASSERT(check);
         d->pairs.insert(hostName, pair);
@@ -465,9 +480,9 @@ void QXmppServerProxy65::slotPairFinished()
     if (!pair)
         return;
 
-    info(QString("Data transferred for %1 %2").arg(pair->key, QString::number(pair->transfer)));
+    info(QString("Data transfered for %1 %2").arg(pair->key, QString::number(pair->transfer)));
 
-    // update speed statistics
+    // store information for speed statistics
     TransferStats stats;
     stats.date = QDateTime::currentDateTime();
     stats.size = pair->transfer;
@@ -489,14 +504,10 @@ void QXmppServerProxy65::slotPairFinished()
 
 void QXmppServerProxy65::slotUpdateStatistics()
 {
-    QDateTime cutoff = QDateTime::currentDateTime().addDays(-1);
+    QDateTime cutoff = QDateTime::currentDateTime().addSecs(-3600);
     for (int i = d->recent.size() - 1; i >= 0; --i)
-    {
-        if (i >= 100 || d->recent[i].date < cutoff)
-        {
+        if (d->recent[i].date < cutoff)
             d->recent.removeAt(i);
-        }
-    }
 }
 
 // PLUGIN
