@@ -83,14 +83,20 @@ void QTcpSocketPair::addSocket(QTcpSocket *socket)
 
     if (target)
     {
-        debug("Opened source connection for " + key);
+        debug(QString("Opened source connection for %1 %2:%3").arg(
+            key,
+            socket->peerAddress().toString(),
+            QString::number(socket->peerPort())));
         source = socket;
         source->setReadBufferSize(4 * blockSize);
         connect(source, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
     else
     {
-        debug("Opened target connection for " + key);
+        debug(QString("Opened target connection for %1 %2:%3").arg(
+            key,
+            socket->peerAddress().toString(),
+            QString::number(socket->peerPort())));
         target = socket;
         connect(target, SIGNAL(disconnected()), this, SLOT(disconnected()));
     }
@@ -132,8 +138,8 @@ void QTcpSocketPair::sendData()
     qint64 length = source->read(buffer, blockSize);
     if (length < 0)
     {
-        warning("Failed to read from source for " + key);
-        target->close();
+        if (!target->bytesToWrite())
+            target->close();
         return;
     }
     if (length > 0)
