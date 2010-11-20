@@ -310,7 +310,8 @@ void mainDialog::keyPressEvent(QKeyEvent* event1)
         event1->ignore();
         return;
     }
-#ifdef Q_WS_MAC
+// FIXME: I'm not sure what this is supposed to do, but it does not compile.
+#if 0
     else if(minimize && e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_Period)
     {
         event1->ignore();
