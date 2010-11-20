@@ -55,9 +55,13 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppPingIq.h \
     QXmppPresence.h \
     QXmppPubSubIq.h \
+    QXmppReconnectionManager.h \
+    QXmppRemoteMethod.h \
     QXmppRoster.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
+    QXmppRpcIq.h \
+    QXmppRtpChannel.h \
     QXmppSaslAuth.h \
     QXmppServer.h \
     QXmppServerExtension.h \
@@ -71,14 +75,10 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppStreamInitiationIq.h \
     QXmppStun.h \
     QXmppTransferManager.h \
-    QXmppReconnectionManager.h \
-    QXmppRemoteMethod.h \
-    QXmppRpcIq.h \
-    QXmppRtpChannel.h \
     QXmppVCardManager.h \
     QXmppVCardIq.h \
     QXmppVCard.h \
-    QXmppVersionIq.h\
+    QXmppVersionIq.h \
     QXmppVersionManager.h
 
 HEADERS += $$INSTALL_HEADERS
@@ -121,8 +121,11 @@ SOURCES += QXmppUtils.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
     QXmppPubSubIq.cpp \
+    QXmppReconnectionManager.cpp \
+    QXmppRemoteMethod.cpp \
     QXmppRosterIq.cpp \
     QXmppRosterManager.cpp \
+    QXmppRpcIq.cpp \
     QXmppRtpChannel.cpp \
     QXmppSaslAuth.cpp \
     QXmppServer.cpp \
@@ -136,9 +139,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppStreamInitiationIq.cpp \
     QXmppStun.cpp \
     QXmppTransferManager.cpp \
-    QXmppReconnectionManager.cpp \
-    QXmppRemoteMethod.cpp \
-    QXmppRpcIq.cpp \
     QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
