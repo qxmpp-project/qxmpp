@@ -32,6 +32,7 @@
 #include "QXmppLogger.h"
 
 class QXmppCallPrivate;
+class QXmppCallManagerPrivate;
 class QXmppIq;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
@@ -111,12 +112,11 @@ private slots:
 
 private:
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
-    void setPayloadType(const QXmppJinglePayloadType &type);
-    void addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates);
-    void setState(QXmppCall::State state);
 
-    QXmppCallPrivate * const d;
+    QXmppCallPrivate *d;
     friend class QXmppCallManager;
+    friend class QXmppCallManagerPrivate;
+    friend class QXmppCallPrivate;
 };
 
 /// \brief The QXmppCallManager class provides support for making and
@@ -138,6 +138,7 @@ class QXmppCallManager : public QXmppClientExtension
 
 public:
     QXmppCallManager(QXmppClient *client);
+    ~QXmppCallManager();
     QXmppCall *call(const QString &jid);
 
     /// \cond
@@ -160,13 +161,8 @@ private slots:
     void localCandidatesChanged();
 
 private:
-    bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
-    QXmppCall *findCall(const QString &sid) const;
-    QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
-    bool sendAck(const QXmppJingleIq &iq);
-    bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
-
-    QList<QXmppCall*> m_calls;
+    QXmppCallManagerPrivate *d;
+    friend class QXmppCallManagerPrivate;
 };
 
 Q_DECLARE_METATYPE(QXmppCall::State)

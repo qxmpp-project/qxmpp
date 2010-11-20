@@ -41,6 +41,9 @@ const int RTCP_COMPONENT = 2;
 class QXmppCallPrivate
 {
 public:
+    QXmppCallPrivate(QXmppCall *qq);
+    void setState(QXmppCall::State state);
+
     QXmppCall::Direction direction;
     QString jid;
     QString sid;
@@ -56,12 +59,29 @@ public:
     // RTP
     QXmppRtpChannel *audioChannel;
     QList<QXmppJinglePayloadType> commonPayloadTypes;
+
+private:
+    QXmppCall *q;
 };
 
-QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent)
-    : QXmppLoggable(parent),
-    d(new QXmppCallPrivate)
+QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
+    : q(qq)
 {
+}
+
+void QXmppCallPrivate::setState(QXmppCall::State newState)
+{
+    if (state != newState)
+    {
+        state = newState;
+        emit q->stateChanged(state);
+    }
+}
+
+QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent)
+    : QXmppLoggable(parent)
+{
+    d = new QXmppCallPrivate(this);
     d->direction = direction;
     d->jid = jid;
     d->contentCreator = QLatin1String("initiator");
@@ -105,7 +125,7 @@ QXmppCall::~QXmppCall()
 void QXmppCall::accept()
 {
     if (d->direction == IncomingDirection && d->state == OfferState)
-        setState(QXmppCall::ConnectingState);
+        d->setState(QXmppCall::ConnectingState);
 }
 
 /// Returns the RTP channel for the audio data.
@@ -156,7 +176,7 @@ QXmppCall::Direction QXmppCall::direction() const
 void QXmppCall::hangup()
 {
     if (d->state != QXmppCall::FinishedState)
-        setState(QXmppCall::DisconnectingState);
+        d->setState(QXmppCall::DisconnectingState);
 }
 
 /// Returns the remote party's JID.
@@ -167,24 +187,12 @@ QString QXmppCall::jid() const
     return d->jid;
 }
 
-void QXmppCall::setPayloadType(const QXmppJinglePayloadType &payloadType)
-{
-    d->audioChannel->setPayloadType(payloadType);
-    updateOpenMode();
-}
-
-void QXmppCall::addRemoteCandidates(const QList<QXmppJingleCandidate> &candidates)
-{
-    foreach (const QXmppJingleCandidate &candidate, candidates)
-        d->connection->addRemoteCandidate(candidate);
-}
-
 void QXmppCall::updateOpenMode()
 {
     // determine mode
     if (d->audioChannel->isOpen() && d->connection->isConnected() && d->state != ActiveState)
     {
-        setState(ActiveState);
+        d->setState(ActiveState);
         emit connected();
     }
 }
@@ -214,21 +222,77 @@ QXmppCall::State QXmppCall::state() const
     return d->state;
 }
 
-void QXmppCall::setState(QXmppCall::State state)
+class QXmppCallManagerPrivate
 {
-    if (d->state != state)
-    {
-        d->state = state;
-        emit stateChanged(d->state);
-    }
+public:
+    QXmppCallManagerPrivate(QXmppCallManager *qq);
+    bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
+    QXmppCall *findCall(const QString &sid) const;
+    QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
+    bool sendAck(const QXmppJingleIq &iq);
+    bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
+
+    QList<QXmppCall*> calls;
+
+private:
+    QXmppCallManager *q;
+};
+
+QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
+    : q(qq)
+{
+}
+
+QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
+{
+    foreach (QXmppCall *call, calls)
+        if (call->sid() == sid)
+           return call;
+    return 0;
+}
+
+QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Direction direction) const
+{
+    foreach (QXmppCall *call, calls)
+        if (call->sid() == sid && call->direction() == direction)
+           return call;
+    return 0;
+}
+
+/// Sends an acknowledgement for a Jingle IQ.
+///
+
+bool QXmppCallManagerPrivate::sendAck(const QXmppJingleIq &iq)
+{
+    QXmppIq ack;
+    ack.setId(iq.id());
+    ack.setTo(iq.from());
+    ack.setType(QXmppIq::Result);
+    return q->client()->sendPacket(ack);
+}
+
+/// Sends a Jingle IQ and adds it to outstanding requests.
+///
+
+bool QXmppCallManagerPrivate::sendRequest(QXmppCall *call, const QXmppJingleIq &iq)
+{
+    call->d->requests << iq;
+    return q->client()->sendPacket(iq);
 }
 
 QXmppCallManager::QXmppCallManager(QXmppClient *client)
 {
+    d = new QXmppCallManagerPrivate(this);
+
     bool check = connect(client, SIGNAL(iqReceived(QXmppIq)),
         this, SLOT(iqReceived(QXmppIq)));
     Q_ASSERT(check);
     Q_UNUSED(check);
+}
+
+QXmppCallManager::~QXmppCallManager()
+{
+    delete d;
 }
 
 QStringList QXmppCallManager::discoveryFeatures() const
@@ -267,7 +331,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     call->d->sid = generateStanzaHash();
 
     // register call
-    m_calls << call;
+    d->calls << call;
     connect(call, SIGNAL(destroyed(QObject*)),
         this, SLOT(callDestroyed(QObject*)));
     connect(call, SIGNAL(stateChanged(QXmppCall::State)),
@@ -296,20 +360,20 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
         iq.content().addTransportCandidate(candidate);
 
-    sendRequest(call, iq);
+    d->sendRequest(call, iq);
 
     return call;
 }
 
 void QXmppCallManager::callDestroyed(QObject *object)
 {
-    m_calls.removeAll(static_cast<QXmppCall*>(object));
+    d->calls.removeAll(static_cast<QXmppCall*>(object));
 }
 
 void QXmppCallManager::callStateChanged(QXmppCall::State state)
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call || !m_calls.contains(call))
+    if (!call || !d->calls.contains(call))
         return;
 
 #if 0
@@ -326,7 +390,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::SessionTerminate);
         iq.setSid(call->sid());
-        sendRequest(call, iq);
+        d->sendRequest(call, iq);
 
         // schedule forceful termination in 5s
         QTimer::singleShot(5000, call, SLOT(terminate()));
@@ -355,7 +419,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
         foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
             iq.content().addTransportCandidate(candidate);
 
-        sendRequest(call, iq);
+        d->sendRequest(call, iq);
 
         // perform ICE negotiation
         call->d->connection->connectToHost();
@@ -365,7 +429,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
 /// Determine common payload types for a call.
 ///
 
-bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes)
+bool QXmppCallManagerPrivate::checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes)
 {
     foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->supportedPayloadTypes())
     {
@@ -375,7 +439,7 @@ bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJingl
     }
     if (call->d->commonPayloadTypes.isEmpty())
     {
-        warning(QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
+        q->warning(QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
 
         // terminate call
         QXmppJingleIq iq;
@@ -387,25 +451,10 @@ bool QXmppCallManager::checkPayloadTypes(QXmppCall *call, const QList<QXmppJingl
         sendRequest(call, iq);
         return false;
     } else {
-        call->setPayloadType(call->d->commonPayloadTypes.first());
+        call->d->audioChannel->setPayloadType(call->d->commonPayloadTypes.first());
+        call->updateOpenMode();
         return true;
     }
-}
-
-QXmppCall *QXmppCallManager::findCall(const QString &sid) const
-{
-    foreach (QXmppCall *call, m_calls)
-        if (call->sid() == sid)
-           return call;
-    return 0;
-}
-
-QXmppCall *QXmppCallManager::findCall(const QString &sid, QXmppCall::Direction direction) const
-{
-    foreach (QXmppCall *call, m_calls)
-        if (call->sid() == sid && call->direction() == direction)
-           return call;
-    return 0;
 }
 
 /// Handles acknowledgements
@@ -420,7 +469,7 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
     bool found = false;
     QXmppCall *call = 0;
     QXmppJingleIq request;
-    foreach (call, m_calls)
+    foreach (call, d->calls)
     {
         for (int i = 0; i < call->d->requests.size(); i++)
         {
@@ -463,20 +512,21 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         call->d->contentName = iq.content().name();
         call->d->connection->setRemoteUser(iq.content().transportUser());
         call->d->connection->setRemotePassword(iq.content().transportPassword());
-        call->addRemoteCandidates(iq.content().transportCandidates());
+        foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
+            call->d->connection->addRemoteCandidate(candidate);
 
         // send ack
-        sendAck(iq);
+        d->sendAck(iq);
 
         // determine common payload types
-        if (!checkPayloadTypes(call, iq.content().payloadTypes()))
+        if (!d->checkPayloadTypes(call, iq.content().payloadTypes()))
         {
             delete call;
             return;
         }
 
         // register call
-        m_calls << call;
+        d->calls << call;
         connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
         connect(call, SIGNAL(stateChanged(QXmppCall::State)),
@@ -491,13 +541,13 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         ringing.setAction(QXmppJingleIq::SessionInfo);
         ringing.setSid(call->sid());
         ringing.setRinging(true);
-        sendRequest(call, ringing);
+        d->sendRequest(call, ringing);
 
         // notify user
         emit callReceived(call);
 
     } else if (iq.action() == QXmppJingleIq::SessionAccept) {
-        QXmppCall *call = findCall(iq.sid(), QXmppCall::OutgoingDirection);
+        QXmppCall *call = d->findCall(iq.sid(), QXmppCall::OutgoingDirection);
         if (!call)
         {
             warning(QString("Remote party %1 accepted unknown call %2").arg(iq.from(), iq.sid()));
@@ -505,10 +555,10 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         }
 
         // send ack
-        sendAck(iq);
+        d->sendAck(iq);
 
         // determine common payload types
-        if (!checkPayloadTypes(call, iq.content().payloadTypes()))
+        if (!d->checkPayloadTypes(call, iq.content().payloadTypes()))
         {
             delete call;
             return;
@@ -519,13 +569,14 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         {
             call->d->connection->setRemoteUser(iq.content().transportUser());
             call->d->connection->setRemotePassword(iq.content().transportPassword());
-            call->addRemoteCandidates(iq.content().transportCandidates());
+            foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
+                call->d->connection->addRemoteCandidate(candidate);
         }
         call->d->connection->connectToHost();
 
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
-        QXmppCall *call = findCall(iq.sid());
+        QXmppCall *call = d->findCall(iq.sid());
         if (!call)
             return;
 
@@ -534,7 +585,7 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
 
     } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
 
-        QXmppCall *call = findCall(iq.sid());
+        QXmppCall *call = d->findCall(iq.sid());
         if (!call)
         {
             warning(QString("Remote party %1 terminated unknown call %2").arg(iq.from(), iq.sid()));
@@ -544,13 +595,13 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
 
         // send ack
-        sendAck(iq);
+        d->sendAck(iq);
 
         // terminate
         call->terminate();
 
     } else if (iq.action() == QXmppJingleIq::TransportInfo) {
-        QXmppCall *call = findCall(iq.sid());
+        QXmppCall *call = d->findCall(iq.sid());
         if (!call)
         {
             warning(QString("Remote party %1 sent transports for unknown call %2").arg(iq.from(), iq.sid()));
@@ -558,12 +609,13 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         }
 
         // send ack
-        sendAck(iq);
+        d->sendAck(iq);
 
         // perform ICE negotiation
         call->d->connection->setRemoteUser(iq.content().transportUser());
         call->d->connection->setRemotePassword(iq.content().transportPassword());
-        call->addRemoteCandidates(iq.content().transportCandidates());
+        foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
+            call->d->connection->addRemoteCandidate(candidate);
         call->d->connection->connectToHost();
     }
 }
@@ -574,7 +626,7 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
 void QXmppCallManager::localCandidatesChanged()
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call || !m_calls.contains(call))
+    if (!call || !d->calls.contains(call))
         return;
 
     QXmppJingleIq iq;
@@ -589,27 +641,7 @@ void QXmppCallManager::localCandidatesChanged()
     foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
         iq.content().addTransportCandidate(candidate);
 
-    sendRequest(call, iq);
+    d->sendRequest(call, iq);
 }
 
-/// Sends an acknowledgement for a Jingle IQ.
-///
-
-bool QXmppCallManager::sendAck(const QXmppJingleIq &iq)
-{
-    QXmppIq ack;
-    ack.setId(iq.id());
-    ack.setTo(iq.from());
-    ack.setType(QXmppIq::Result);
-    return client()->sendPacket(ack);
-}
-
-/// Sends a Jingle IQ and adds it to outstanding requests.
-///
-
-bool QXmppCallManager::sendRequest(QXmppCall *call, const QXmppJingleIq &iq)
-{
-    call->d->requests << iq;
-    return client()->sendPacket(iq);
-}
 
