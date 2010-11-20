@@ -162,7 +162,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     }
 
     // check sequence number
-    if (!marker && sequence != d->incomingSequence + 1)
+    if (d->incomingSequence && sequence != d->incomingSequence + 1)
         warning(QString("RTP packet seq %1 is out of order, previous was %2")
                 .arg(QString::number(sequence))
                 .arg(QString::number(d->incomingSequence)));
