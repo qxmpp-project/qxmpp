@@ -139,7 +139,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     stream >> sequence;
     stream >> stamp;
     stream >> ssrc;
-    const bool marker = marker_type & 0x80;
+    //const bool marker = marker_type & 0x80;
     const quint8 type = marker_type & 0x7f;
     const qint64 packetLength = ba.size() - 12;
 
