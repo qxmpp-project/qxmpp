@@ -267,7 +267,12 @@ QXmppPresence QXmppRosterManager::getPresence(const QString& bareJid,
     if(m_presences.contains(bareJid) && m_presences[bareJid].contains(resource))
         return m_presences[bareJid][resource];
     else
-        return QXmppPresence();
+    {
+        QXmppPresence presence;
+        presence.setType(QXmppPresence::Unavailable);
+        presence.setStatus(QXmppPresence::Status::Offline);
+        return presence;
+    }
 }
 
 /// [OBSOLETE] Returns all the presence entries in the database.
