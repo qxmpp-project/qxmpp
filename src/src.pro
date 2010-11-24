@@ -3,6 +3,7 @@ include(../qxmpp.pri)
 TEMPLATE = lib
 
 CONFIG += staticlib
+INCLUDEPATH += $$QXMPP_INCLUDE_DIR
 LIBS += $$QXMPP_INTERNAL_LIBS
 
 # To disable the dependency on QtGui, uncomment the following:
