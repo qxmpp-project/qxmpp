@@ -31,7 +31,10 @@
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
                              const QXmppPresence::Status& status)
-    : QXmppStanza(), m_type(type), m_status(status)
+    : QXmppStanza(),
+    m_type(type),
+    m_status(status),
+    m_vCardUpdateType(VCardUpdateNone)
 {
 
 }
