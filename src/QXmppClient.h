@@ -191,7 +191,7 @@ public:
     const QXmppPresence Q_DECL_DEPRECATED & getClientPresence() const;
     QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
     const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
-    QXmppReconnectionManager* Q_DECL_DEPRECATED getReconnectionManager();
+    QXmppReconnectionManager Q_DECL_DEPRECATED * getReconnectionManager();
     QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
     QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
     QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
