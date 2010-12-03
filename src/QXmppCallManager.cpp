@@ -106,11 +106,15 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     Q_ASSERT(check);
 
     check = connect(d->connection, SIGNAL(datagramReceived(int,QByteArray)),
-        this, SLOT(datagramReceived(int, QByteArray)));
+        this, SLOT(datagramReceived(int,QByteArray)));
     Q_ASSERT(check);
 
     // RTP channel
     d->audioChannel = new QXmppRtpChannel(this);
+
+    check = connect(d->audioChannel, SIGNAL(sendDatagram(QByteArray)),
+        this, SLOT(sendDatagram(QByteArray)));
+    Q_ASSERT(check);
 }
 
 QXmppCall::~QXmppCall()
@@ -198,10 +202,13 @@ void QXmppCall::updateOpenMode()
 
 void QXmppCall::datagramReceived(int component, const QByteArray &buffer)
 {
-    if (component != RTP_COMPONENT)
-        return;
+    if (component == RTP_COMPONENT)
+        d->audioChannel->datagramReceived(buffer);
+}
 
-    d->audioChannel->datagramReceived(buffer);
+void QXmppCall::sendDatagram(const QByteArray &buffer)
+{
+    d->connection->writeDatagram(RTP_COMPONENT, buffer);
 }
 
 /// Returns the call's session identifier.

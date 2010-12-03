@@ -106,9 +106,10 @@ public slots:
 
 private slots:
     void datagramReceived(int component, const QByteArray &datagram);
-    void updateOpenMode();
+    void sendDatagram(const QByteArray &datagram);
     void terminate();
     void terminated();
+    void updateOpenMode();
 
 private:
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
