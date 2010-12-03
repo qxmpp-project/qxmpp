@@ -58,7 +58,6 @@ public:
 
     // RTP
     QXmppRtpChannel *audioChannel;
-    QList<QXmppJinglePayloadType> commonPayloadTypes;
 
 private:
     QXmppCall *q;
@@ -351,7 +350,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     // description
     iq.content().setDescriptionMedia("audio");
-    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->supportedPayloadTypes())
+    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->localPayloadTypes())
         iq.content().addPayloadType(payload);
 
     // transport
@@ -410,7 +409,7 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
 
         // description
         iq.content().setDescriptionMedia("audio");
-        foreach (const QXmppJinglePayloadType &payload, call->d->commonPayloadTypes)
+        foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->localPayloadTypes())
             iq.content().addPayloadType(payload);
 
         // transport
@@ -431,14 +430,8 @@ void QXmppCallManager::callStateChanged(QXmppCall::State state)
 
 bool QXmppCallManagerPrivate::checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes)
 {
-    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->supportedPayloadTypes())
-    {
-        int payloadIndex = remotePayloadTypes.indexOf(payload);
-        if (payloadIndex >= 0)
-            call->d->commonPayloadTypes << remotePayloadTypes[payloadIndex];
-    }
-    if (call->d->commonPayloadTypes.isEmpty())
-    {
+    call->d->audioChannel->setRemotePayloadTypes(remotePayloadTypes);
+    if (!call->d->audioChannel->isOpen()) {
         q->warning(QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
 
         // terminate call
@@ -451,7 +444,6 @@ bool QXmppCallManagerPrivate::checkPayloadTypes(QXmppCall *call, const QList<QXm
         sendRequest(call, iq);
         return false;
     } else {
-        call->d->audioChannel->setPayloadType(call->d->commonPayloadTypes.first());
         call->updateOpenMode();
         return true;
     }

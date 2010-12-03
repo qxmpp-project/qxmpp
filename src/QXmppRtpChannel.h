@@ -60,8 +60,9 @@ public:
     ~QXmppRtpChannel();
 
     QXmppJinglePayloadType payloadType() const;
-    void setPayloadType(const QXmppJinglePayloadType &payloadType);
-    QList<QXmppJinglePayloadType> supportedPayloadTypes() const;
+
+    QList<QXmppJinglePayloadType> localPayloadTypes() const;
+    void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
 
     /// \cond
     qint64 bytesAvailable() const;
@@ -106,6 +107,7 @@ protected:
 
 private slots:
     void emitSignals();
+    void writeDatagram();
 
 private:
     QXmppRtpChannelPrivate * const d;

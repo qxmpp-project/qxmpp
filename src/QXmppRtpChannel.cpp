@@ -22,6 +22,7 @@
  */
 
 #include <QDataStream>
+#include <QTimer>
 
 #include "QXmppCodec.h"
 #include "QXmppJingleIq.h"
@@ -36,28 +37,33 @@ class QXmppRtpChannelPrivate
 {
 public:
     QXmppRtpChannelPrivate();
+    QXmppCodec *codecForPayloadType(const QXmppJinglePayloadType &payloadType);
+    QList<QXmppJinglePayloadType> supportedPayloadTypes() const;
 
     // signals
     bool signalsEmitted;
     qint64 writtenSinceLastEmit;
 
     // RTP
-    QXmppCodec *codec;
     QHostAddress remoteHost;
     quint16 remotePort;
 
     QByteArray incomingBuffer;
     bool incomingBuffering;
+    QMap<int, QXmppCodec*> incomingCodecs;
     int incomingMinimum;
     int incomingMaximum;
     quint16 incomingSequence;
     quint32 incomingStamp;
 
-    quint16 outgoingChunk;
     QByteArray outgoingBuffer;
+    quint16 outgoingChunk;
+    QXmppCodec *outgoingCodec;
     bool outgoingMarker;
+    QList<QXmppJinglePayloadType> outgoingPayloadTypes;
     quint16 outgoingSequence;
     quint32 outgoingStamp;
+    QTimer *outgoingTimer;
 
     quint32 ssrc;
     QXmppJinglePayloadType payloadType;
@@ -66,18 +72,72 @@ public:
 QXmppRtpChannelPrivate::QXmppRtpChannelPrivate()
     : signalsEmitted(false),
     writtenSinceLastEmit(0),
-    codec(0),
     incomingBuffering(true),
     incomingMinimum(0),
     incomingMaximum(0),
     incomingSequence(0),
     incomingStamp(0),
+    outgoingCodec(0),
     outgoingMarker(true),
     outgoingSequence(0),
     outgoingStamp(0),
     ssrc(0)
 {
+    outgoingPayloadTypes = supportedPayloadTypes();
     ssrc = qrand();
+}
+
+/// Returns the audio codec for the given payload type.
+///
+
+QXmppCodec *QXmppRtpChannelPrivate::codecForPayloadType(const QXmppJinglePayloadType &payloadType)
+{
+    if (payloadType.id() == QXmppRtpChannel::G711u)
+        return new QXmppG711uCodec(payloadType.clockrate());
+    else if (payloadType.id() == QXmppRtpChannel::G711a)
+        return new QXmppG711aCodec(payloadType.clockrate());
+#ifdef QXMPP_USE_SPEEX
+    else if (payloadType.name().toLower() == "speex")
+        return new QXmppSpeexCodec(payloadType.clockrate());
+#endif
+    return 0;
+}
+
+/// Returns the list of supported payload types.
+///
+
+QList<QXmppJinglePayloadType> QXmppRtpChannelPrivate::supportedPayloadTypes() const
+{
+    QList<QXmppJinglePayloadType> payloads;
+    QXmppJinglePayloadType payload;
+
+#ifdef QXMPP_USE_SPEEX
+    payload.setId(96);
+    payload.setChannels(1);
+    payload.setName("speex");
+    payload.setClockrate(8000);
+    payloads << payload;
+#endif
+
+    payload.setId(QXmppRtpChannel::G711u);
+    payload.setChannels(1);
+    payload.setName("PCMU");
+    payload.setClockrate(8000);
+    payloads << payload;
+
+    payload.setId(QXmppRtpChannel::G711a);
+    payload.setChannels(1);
+    payload.setName("PCMA");
+    payload.setClockrate(8000);
+    payloads << payload;
+
+    payload.setId(101);
+    payload.setChannels(1);
+    payload.setName("telephone-event");
+    payload.setClockrate(8000);
+    payloads << payload;
+
+    return payloads;
 }
 
 /// Creates a new RTP channel.
@@ -93,6 +153,8 @@ QXmppRtpChannel::QXmppRtpChannel(QObject *parent)
         connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                 logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     }
+    d->outgoingTimer = new QTimer(this);
+    connect(d->outgoingTimer, SIGNAL(timeout()), this, SLOT(writeDatagram()));
 }
 
 /// Destroys an RTP channel.
@@ -100,6 +162,8 @@ QXmppRtpChannel::QXmppRtpChannel(QObject *parent)
 
 QXmppRtpChannel::~QXmppRtpChannel()
 {
+    foreach (QXmppCodec *codec, d->incomingCodecs)
+        delete codec;
     delete d;
 }
 
@@ -114,14 +178,9 @@ qint64 QXmppRtpChannel::bytesAvailable() const
 /// Processes an incoming RTP packet.
 ///
 /// \param ba
+
 void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
 {
-    if (!d->codec)
-    {
-        warning("QXmppRtpChannel::datagramReceived before codec selection");
-        return;
-    }
-
     if (ba.size() < 12 || (quint8(ba.at(0)) >> 6) != RTP_VERSION)
     {
         warning("QXmppRtpChannel::datagramReceived got an invalid RTP packet");
@@ -139,11 +198,11 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     stream >> sequence;
     stream >> stamp;
     stream >> ssrc;
-    //const bool marker = marker_type & 0x80;
     const quint8 type = marker_type & 0x7f;
     const qint64 packetLength = ba.size() - 12;
 
 #ifdef QXMPP_DEBUG_RTP
+    const bool marker = marker_type & 0x80;
     logReceived(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
             QString::number(sequence),
             QString::number(stamp),
@@ -153,8 +212,8 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
 #endif
 
     // check type
-    if (type != d->payloadType.id())
-    {
+    QXmppCodec *codec = d->incomingCodecs.value(type);
+    if (!codec) {
         warning(QString("RTP packet seq %1 has unknown type %2")
                 .arg(QString::number(sequence))
                 .arg(QString::number(type)));
@@ -190,7 +249,7 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     QDataStream output(&d->incomingBuffer, QIODevice::WriteOnly);
     output.device()->seek(packetOffset);
     output.setByteOrder(QDataStream::LittleEndian);
-    d->codec->decode(stream, output);
+    codec->decode(stream, output);
 
     // check whether we are running late
     if (d->incomingBuffer.size() > d->incomingMaximum)
@@ -256,125 +315,129 @@ QXmppJinglePayloadType QXmppRtpChannel::payloadType() const
     return d->payloadType;
 }
 
-/// Sets the RTP channel's payload type.
+/// Returns the local payload types.
 ///
-/// \param payloadType
 
-void QXmppRtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
+QList<QXmppJinglePayloadType> QXmppRtpChannel::localPayloadTypes() const
 {
-    d->payloadType = payloadType;
-    if (payloadType.id() == G711u)
-        d->codec = new QXmppG711uCodec(payloadType.clockrate());
-    else if (payloadType.id() == G711a)
-        d->codec = new QXmppG711aCodec(payloadType.clockrate());
-#ifdef QXMPP_USE_SPEEX
-    else if (payloadType.name().toLower() == "speex")
-        d->codec = new QXmppSpeexCodec(payloadType.clockrate());
-#endif
-    else
-    {
-        warning(QString("QXmppCall got an unknown codec : %1 (%2)")
+    return d->outgoingPayloadTypes;
+}
+
+/// Sets the remote payload types.
+///
+/// \param remotePayloadTypes
+
+void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes)
+{
+    QList<QXmppJinglePayloadType> commonPayloadTypes;
+
+    foreach (const QXmppJinglePayloadType &payloadType, remotePayloadTypes) {
+
+        // check we support this payload type
+        int index = d->outgoingPayloadTypes.indexOf(payloadType);
+        if (index < 0)
+            continue;
+
+        // create codec for this payload type
+        QXmppCodec *codec = d->codecForPayloadType(payloadType);
+        if (!codec)
+            continue;
+
+        commonPayloadTypes << d->outgoingPayloadTypes[index];
+        if (commonPayloadTypes.size() == 1) {
+
+            // store outgoing codec
+            d->payloadType = d->outgoingPayloadTypes[index];
+            d->outgoingCodec = codec;
+
+        } else if (payloadType.ptime() != d->payloadType.ptime() ||
+                   payloadType.clockrate() != d->payloadType.clockrate()) {
+
+            warning(QString("QXmppRtpChannel skipping payload due to ptime or clockrate mismatch : %1 (%2)")
                 .arg(QString::number(payloadType.id()))
                 .arg(payloadType.name()));
+            delete codec;
+            continue;
+
+        }
+
+        // store incoming codec
+        d->incomingCodecs[payloadType.id()] = codec;
+    }
+    d->outgoingPayloadTypes = commonPayloadTypes;
+    if (d->outgoingPayloadTypes.isEmpty()) {
+        warning("QXmppRtpChannel could not negociate a common codec");
         return;
     }
 
-    // size in bytes of an unencoded packet
-    d->outgoingChunk = SAMPLE_BYTES * payloadType.ptime() * payloadType.clockrate() / 1000;
+    // size in bytes of an decoded packet
+    d->outgoingChunk = SAMPLE_BYTES * d->payloadType.ptime() * d->payloadType.clockrate() / 1000;
+    d->outgoingTimer->setInterval(d->payloadType.ptime());
 
-    // initial number of bytes to buffer
     d->incomingMinimum = d->outgoingChunk * 5;
     d->incomingMaximum = d->outgoingChunk * 8;
 
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 }
 
-/// Returns the list of supported payload types.
-///
-
-QList<QXmppJinglePayloadType> QXmppRtpChannel::supportedPayloadTypes() const
-{
-    QList<QXmppJinglePayloadType> payloads;
-    QXmppJinglePayloadType payload;
-
-#ifdef QXMPP_USE_SPEEX
-    payload.setId(96);
-    payload.setChannels(1);
-    payload.setName("SPEEX");
-    payload.setClockrate(16000);
-    payloads << payload;
-
-    payload.setId(97);
-    payload.setChannels(1);
-    payload.setName("SPEEX");
-    payload.setClockrate(8000);
-    payloads << payload;
-#endif
-
-    payload.setId(QXmppRtpChannel::G711u);
-    payload.setChannels(1);
-    payload.setName("PCMU");
-    payload.setClockrate(8000);
-    payloads << payload;
-
-    payload.setId(QXmppRtpChannel::G711a);
-    payload.setChannels(1);
-    payload.setName("PCMA");
-    payload.setClockrate(8000);
-    payloads << payload;
-
-    return payloads;
-}
-
 qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
 {
-    if (!d->codec)
+    if (!d->outgoingCodec)
     {
         warning("QXmppRtpChannel::writeData before codec was set");
         return -1;
     }
 
     d->outgoingBuffer += QByteArray::fromRawData(data, maxSize);
-    while (d->outgoingBuffer.size() >= d->outgoingChunk)
-    {
-        QByteArray header;
-        QDataStream stream(&header, QIODevice::WriteOnly);
-        quint8 version = RTP_VERSION << 6;
-        stream << version;
-        quint8 marker_type = d->payloadType.id();
-        if (d->outgoingMarker)
-        {
-            marker_type |= 0x80;
-            d->outgoingMarker= false;
-        }
-        stream << marker_type;
-        stream << ++d->outgoingSequence;
-        stream << d->outgoingStamp;
-        stream << d->ssrc;
 
-        QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
-        QDataStream input(chunk);
-        input.setByteOrder(QDataStream::LittleEndian);
-        d->outgoingStamp += d->codec->encode(input, stream);
-
-#ifdef QXMPP_DEBUG_RTP
-        logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                    QString::number(d->outgoingSequence),
-                    QString::number(d->outgoingStamp),
-                    QString::number(marker_type & 0x80 != 0),
-                    QString::number(marker_type & 0x7f),
-                    QString::number(header.size() - 12)));
-#endif
-        emit sendDatagram(header);
-
-        d->outgoingBuffer.remove(0, chunk.size());
+    if (!d->outgoingTimer->isActive()) {
+        writeDatagram();
+        d->outgoingTimer->start();
     }
 
-    d->writtenSinceLastEmit += maxSize;
+    return maxSize;
+}
+
+void QXmppRtpChannel::writeDatagram()
+{
+    if (d->outgoingBuffer.size() < d->outgoingChunk)
+        return;
+
+    QByteArray header;
+    QDataStream stream(&header, QIODevice::WriteOnly);
+    quint8 version = RTP_VERSION << 6;
+    stream << version;
+    quint8 marker_type = d->payloadType.id();
+    if (d->outgoingMarker)
+    {
+        marker_type |= 0x80;
+        d->outgoingMarker= false;
+    }
+    stream << marker_type;
+    stream << ++d->outgoingSequence;
+    stream << d->outgoingStamp;
+    stream << d->ssrc;
+
+    QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
+    QDataStream input(chunk);
+    input.setByteOrder(QDataStream::LittleEndian);
+    d->outgoingStamp += d->outgoingCodec->encode(input, stream);
+
+#ifdef QXMPP_DEBUG_RTP
+    logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+                QString::number(d->outgoingSequence),
+                QString::number(d->outgoingStamp),
+                QString::number(marker_type & 0x80 != 0),
+                QString::number(marker_type & 0x7f),
+                QString::number(header.size() - 12)));
+#endif
+    emit sendDatagram(header);
+
+    d->outgoingBuffer.remove(0, chunk.size());
+
+    d->writtenSinceLastEmit += chunk.size();
     if (!d->signalsEmitted && !signalsBlocked()) {
         d->signalsEmitted = true;
         QMetaObject::invokeMethod(this, "emitSignals", Qt::QueuedConnection);
     }
-
-    return maxSize;
 }
