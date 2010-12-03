@@ -64,8 +64,8 @@ private:
 };
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
-    : q(qq),
-    state(QXmppCall::OfferState)
+    : state(QXmppCall::OfferState),
+    q(qq)
 {
 }
 
