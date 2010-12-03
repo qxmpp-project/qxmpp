@@ -39,13 +39,31 @@ class QTimer;
 class QXmppStunMessage
 {
 public:
+    enum MethodType {
+        Binding      = 0x1,
+        SharedSecret = 0x2,
+        Allocate     = 0x3,
+    };
+
+    enum MessageType {
+        Request    = 0x000,
+        Indication = 0x010,
+        Response   = 0x100,
+        Error      = 0x110,
+    };
+
     QXmppStunMessage();
+
+    quint32 cookie() const;
+    void setCookie(quint32 cookie);
 
     QByteArray id() const;
     void setId(const QByteArray &id);
 
     quint16 type() const;
     void setType(quint16 type);
+
+    void setChangeRequest(quint32 changeRequest);
 
     QByteArray encode(const QString &password = QString(), bool addFingerprint = true) const;
     bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
@@ -73,8 +91,12 @@ public:
     bool useCandidate;
 
 private:
+    quint32 m_cookie;
     QByteArray m_id;
     quint16 m_type;
+
+    quint32 m_changeRequest;
+    bool m_haveChangeRequest;
 };
 
 class QXmppStunSocket : public QXmppLoggable
@@ -97,11 +119,14 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
-    bool bind();
     void close();
     void connectToHost();
     bool isConnected() const;
+    void setSockets(QList<QUdpSocket*> sockets);
     qint64 writeDatagram(const QByteArray &datagram);
+
+    static QList<QHostAddress> discoverAddresses();
+    static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = 0);
 
 private slots:
     void checkCandidates();
@@ -141,6 +166,7 @@ private:
     QString m_localPassword;
 
     Pair *m_activePair;
+    Pair *m_fallbackPair;
     bool m_iceControlling;
     QList<Pair*> m_pairs;
     QString m_remoteUser;
@@ -177,6 +203,7 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
+    bool bind(const QList<QHostAddress> &addresses);
     void close();
     void connectToHost();
     bool isConnected() const;

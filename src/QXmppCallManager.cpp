@@ -93,6 +93,7 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     //d->connection->setStunServer("stun.ekiga.net");
     d->connection->addComponent(RTP_COMPONENT);
     d->connection->addComponent(RTCP_COMPONENT);
+    d->connection->bind(QXmppStunSocket::discoverAddresses());
 
     bool check = connect(d->connection, SIGNAL(localCandidatesChanged()),
         this, SIGNAL(localCandidatesChanged()));
