@@ -661,7 +661,7 @@ QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint
 ///
 /// \param buffer
 
-quint16 QXmppStunMessage::peekType(const QByteArray &buffer, QByteArray &id)
+quint16 QXmppStunMessage::peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id)
 {
     if (buffer.size() < STUN_HEADER)
         return 0;
@@ -670,7 +670,6 @@ quint16 QXmppStunMessage::peekType(const QByteArray &buffer, QByteArray &id)
     QDataStream stream(buffer);
     quint16 type;
     quint16 length;
-    quint32 cookie;
     stream >> type;
     stream >> length;
     stream >> cookie;
@@ -1033,9 +1032,10 @@ void QXmppIceComponent::readyRead()
     socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     // if this is not a STUN message, emit it
+    quint32 messageCookie;
     QByteArray messageId;
-    quint16 messageType = QXmppStunMessage::peekType(buffer, messageId);
-    if (!messageType)
+    quint16 messageType = QXmppStunMessage::peekType(buffer, messageCookie, messageId);
+    if (!messageType || messageCookie != STUN_MAGIC)
     {
         // use this as an opportunity to flag a potential pair
         if (!m_fallbackPair) {

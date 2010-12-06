@@ -77,7 +77,7 @@ public:
     QByteArray encode(const QString &password = QString(), bool addFingerprint = true) const;
     bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
     QString toString() const;
-    static quint16 peekType(const QByteArray &buffer, QByteArray &id);
+    static quint16 peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id);
 
     // attributes
     int errorCode;
