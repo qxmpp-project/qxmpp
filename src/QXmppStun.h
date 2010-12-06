@@ -63,7 +63,16 @@ public:
     quint16 type() const;
     void setType(quint16 type);
 
+    // attributes
+
+    quint32 changeRequest() const;
     void setChangeRequest(quint32 changeRequest);
+
+    quint32 priority() const;
+    void setPriority(quint32 priority);
+
+    QString software() const;
+    void setSoftware(const QString &software);
 
     QByteArray encode(const QString &password = QString(), bool addFingerprint = true) const;
     bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
@@ -73,7 +82,6 @@ public:
     // attributes
     int errorCode;
     QString errorPhrase;
-    quint32 priority;
     QByteArray iceControlling;
     QByteArray iceControlled;
     QHostAddress changedHost;
@@ -86,7 +94,6 @@ public:
     quint16 sourcePort;
     QHostAddress xorMappedHost;
     quint16 xorMappedPort;
-    QString software;
     QString username;
     bool useCandidate;
 
@@ -95,17 +102,23 @@ private:
     QByteArray m_id;
     quint16 m_type;
 
+    QSet<quint16> m_attributes;
     quint32 m_changeRequest;
-    bool m_haveChangeRequest;
+    quint32 m_priority;
+    QString m_software;
 };
 
-class QXmppStunSocket : public QXmppLoggable
+/// The QXmppIceComponent class represents a piece of a media stream
+/// requiring a single transport address, as defined by RFC 2525
+/// (Interactive Connectivity Establishment).
+
+class QXmppIceComponent : public QXmppLoggable
 {
     Q_OBJECT
 
 public:
-    QXmppStunSocket(bool iceControlling, QObject *parent=0);
-    ~QXmppStunSocket();
+    QXmppIceComponent(bool controlling, QObject *parent=0);
+    ~QXmppIceComponent();
     void setStunServer(const QHostAddress &host, quint16 port);
 
     QList<QXmppJingleCandidate> localCandidates() const;
@@ -119,14 +132,16 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
-    void close();
-    void connectToHost();
     bool isConnected() const;
     void setSockets(QList<QUdpSocket*> sockets);
-    qint64 writeDatagram(const QByteArray &datagram);
 
     static QList<QHostAddress> discoverAddresses();
     static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = 0);
+
+public slots:
+    void close();
+    void connectToHost();
+    qint64 sendDatagram(const QByteArray &datagram);
 
 private slots:
     void checkCandidates();
@@ -157,7 +172,7 @@ private:
     };
 
     Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port);
-    qint64 writeStun(const QXmppStunMessage &message, QXmppStunSocket::Pair *pair);
+    qint64 writeStun(const QXmppStunMessage &message, QXmppIceComponent::Pair *pair);
 
     int m_component;
 
@@ -192,8 +207,9 @@ class QXmppIceConnection : public QXmppLoggable
 
 public:
     QXmppIceConnection(bool controlling, QObject *parent = 0);
+
+    QXmppIceComponent *component(int component);
     void addComponent(int component);
-    void setStunServer(const QString &hostName, quint16 port = 3478);
 
     QList<QXmppJingleCandidate> localCandidates() const;
     QString localUser() const;
@@ -203,11 +219,10 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
+    void setStunServer(const QString &hostName, quint16 port = 3478);
+
     bool bind(const QList<QHostAddress> &addresses);
-    void close();
-    void connectToHost();
     bool isConnected() const;
-    qint64 writeDatagram(int, const QByteArray &datagram);
 
 signals:
     // This signal is emitted once ICE negotiation succeeds.
@@ -216,21 +231,21 @@ signals:
     // This signal is emitted when ICE negotiation fails.
     void disconnected();
 
-    // This signal is emitted when a data packet is received.
-    void datagramReceived(int component, const QByteArray &datagram);
-
     // This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
+public slots:
+    void close();
+    void connectToHost();
+
 private slots:
     void slotConnected();
-    void slotDatagramReceived(const QByteArray &datagram);
     void slotTimeout();
 
 private:
     QTimer *m_connectTimer;
     bool m_controlling;
-    QMap<int, QXmppStunSocket*> m_components;
+    QMap<int, QXmppIceComponent*> m_components;
     QString m_localUser;
     QString m_localPassword;
     QHostAddress m_stunHost;

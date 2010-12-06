@@ -93,7 +93,7 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     //d->connection->setStunServer("stun.ekiga.net");
     d->connection->addComponent(RTP_COMPONENT);
     d->connection->addComponent(RTCP_COMPONENT);
-    d->connection->bind(QXmppStunSocket::discoverAddresses());
+    d->connection->bind(QXmppIceComponent::discoverAddresses());
 
     bool check = connect(d->connection, SIGNAL(localCandidatesChanged()),
         this, SIGNAL(localCandidatesChanged()));
@@ -107,15 +107,16 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
         this, SLOT(hangup()));
     Q_ASSERT(check);
 
-    check = connect(d->connection, SIGNAL(datagramReceived(int,QByteArray)),
-        this, SLOT(datagramReceived(int,QByteArray)));
-    Q_ASSERT(check);
-
     // RTP channel
     d->audioChannel = new QXmppRtpChannel(this);
+    QXmppIceComponent *rtpComponent = d->connection->component(RTP_COMPONENT);
+
+    check = connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
+                    d->audioChannel, SLOT(datagramReceived(QByteArray)));
+    Q_ASSERT(check);
 
     check = connect(d->audioChannel, SIGNAL(sendDatagram(QByteArray)),
-        this, SLOT(sendDatagram(QByteArray)));
+                    rtpComponent, SLOT(sendDatagram(QByteArray)));
     Q_ASSERT(check);
 }
 
@@ -200,17 +201,6 @@ void QXmppCall::updateOpenMode()
         d->setState(ActiveState);
         emit connected();
     }
-}
-
-void QXmppCall::datagramReceived(int component, const QByteArray &buffer)
-{
-    if (component == RTP_COMPONENT)
-        d->audioChannel->datagramReceived(buffer);
-}
-
-void QXmppCall::sendDatagram(const QByteArray &buffer)
-{
-    d->connection->writeDatagram(RTP_COMPONENT, buffer);
 }
 
 /// Returns the call's session identifier.

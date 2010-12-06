@@ -105,8 +105,6 @@ public slots:
     void hangup();
 
 private slots:
-    void datagramReceived(int component, const QByteArray &datagram);
-    void sendDatagram(const QByteArray &datagram);
     void terminate();
     void terminated();
     void updateOpenMode();
