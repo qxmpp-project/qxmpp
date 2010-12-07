@@ -89,6 +89,11 @@ platforms support by Qt, see:
 
 http://doc.qt.nokia.com/supported-platforms.html
 
+Please note that on Symbian, you will need to make sure your add the
+"NetworkServices" to your application to enable it to access the network.
+You can do this by adding the following to your .pro file:
+
+   TARGET.CAPABILITY = "NetworkServices"
 
 HOW TO REPORT A BUG
 -------------------
