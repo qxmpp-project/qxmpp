@@ -25,11 +25,6 @@
 #include <QBuffer>
 #include <QXmlStreamWriter>
 
-#ifndef QXMPP_NO_GUI
-#include <QImage>
-#include <QImageReader>
-#endif
-
 #include "QXmppVCardIq.h"
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
@@ -309,27 +304,6 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-#ifndef QXMPP_NO_GUI
-QImage QXmppVCardIq::photoAsImage() const
-{
-    QBuffer buffer;
-    buffer.setData(m_photo);
-    buffer.open(QIODevice::ReadOnly);
-    QImageReader imageReader(&buffer);
-    return imageReader.read();
-}
-
-void QXmppVCardIq::setPhoto(const QImage& image)
-{
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "PNG");
-    m_photo = ba;
-    m_photoType = "image/png";
-}
-#endif
-
 QString QXmppVCardIq::getFullName() const
 {
     return m_fullName;
@@ -345,13 +319,3 @@ const QByteArray& QXmppVCardIq::getPhoto() const
     return m_photo;
 }
 
-#ifndef QXMPP_NO_GUI
-QImage QXmppVCardIq::getPhotoAsImage() const
-{
-    QBuffer buffer;
-    buffer.setData(m_photo);
-    buffer.open(QIODevice::ReadOnly);
-    QImageReader imageReader(&buffer);
-    return imageReader.read();
-}
-#endif

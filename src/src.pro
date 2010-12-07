@@ -1,14 +1,12 @@
 include(../qxmpp.pri)
 
+QT -= gui
+
 TEMPLATE = lib
 
 CONFIG += staticlib
 INCLUDEPATH += $$QXMPP_INCLUDE_DIR
 LIBS += $$QXMPP_INTERNAL_LIBS
-
-# To disable the dependency on QtGui, uncomment the following:
-# DEFINES += QXMPP_NO_GUI
-# QT -= gui
 
 # To enable support for the Speex codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX

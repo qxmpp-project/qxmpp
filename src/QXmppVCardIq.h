@@ -79,21 +79,10 @@ public:
 
     static bool isVCard(const QDomElement &element);
 
-    /// \cond
-// deprecated in release 0.3.0, as it drags in a dependency
-// on QtGui, whilst the rest of QXmpp does not require QtGui
-#ifndef QXMPP_NO_GUI
-    QImage Q_DECL_DEPRECATED photoAsImage() const;
-    void Q_DECL_DEPRECATED setPhoto(const QImage&);
-#endif
-
 // deprecated accessors, use the form without "get" instead
 // deprecated in release 0.2.0
     QString Q_DECL_DEPRECATED getFullName() const;
     QString Q_DECL_DEPRECATED getNickName() const;
-#ifndef QXMPP_NO_GUI
-    QImage Q_DECL_DEPRECATED getPhotoAsImage() const;
-#endif
     const QByteArray Q_DECL_DEPRECATED & getPhoto() const;
     /// \endcond
 
