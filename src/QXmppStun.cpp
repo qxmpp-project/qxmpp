@@ -938,6 +938,9 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
         }
         pair->socket = socket;
         m_pairs << pair;
+
+        if (!m_fallbackPair)
+            m_fallbackPair = pair;
     }
     return true;
 }
@@ -1038,13 +1041,11 @@ void QXmppIceComponent::readyRead()
     if (!messageType || messageCookie != STUN_MAGIC)
     {
         // use this as an opportunity to flag a potential pair
-        if (!m_fallbackPair) {
-            foreach (Pair *pair, m_pairs) {
-                if (pair->remote.host() == remoteHost &&
-                    pair->remote.port() == remotePort) {
-                    m_fallbackPair = pair;
-                    break;
-                }
+        foreach (Pair *pair, m_pairs) {
+            if (pair->remote.host() == remoteHost &&
+                pair->remote.port() == remotePort) {
+                m_fallbackPair = pair;
+                break;
             }
         }
         emit datagramReceived(buffer);
