@@ -46,7 +46,6 @@ class QXmppStream;
 
 // managers
 class QXmppArchiveManager;
-class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppMucManager;
 class QXmppReconnectionManager;
@@ -140,7 +139,6 @@ public:
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppArchiveManager& archiveManager();
-    QXmppCallManager& callManager();
     QXmppMucManager& mucManager();
     QXmppRosterManager& rosterManager();
     QXmppTransferManager& transferManager();

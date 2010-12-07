@@ -29,7 +29,6 @@
 #include "QXmppMessage.h"
 
 #include "QXmppArchiveManager.h"
-#include "QXmppCallManager.h"
 #include "QXmppInvokable.h"
 #include "QXmppMucManager.h"
 #include "QXmppReconnectionManager.h"
@@ -57,7 +56,6 @@ public:
     QXmppPresence clientPresence; ///< Stores the current presence of the connected client
 
     QXmppArchiveManager *archiveManager;  ///< Pointer to the archive manager
-    QXmppCallManager *callManager;        ///< Pointer to the call manager
     QXmppMucManager *mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
@@ -192,9 +190,6 @@ QXmppClient::QXmppClient(QObject *parent)
 
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
-
-    d->callManager = new QXmppCallManager(this);
-    addExtension(d->callManager);
 
     d->mucManager = new QXmppMucManager(this);
     addExtension(d->mucManager);
@@ -701,15 +696,6 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
 QXmppArchiveManager& QXmppClient::archiveManager()
 {
     return *d->archiveManager;
-}
-
-/// Returns the reference to QXmppCallManager, implementation of XEP-0166.
-/// http://xmpp.org/extensions/xep-0166.html
-///
-
-QXmppCallManager& QXmppClient::callManager()
-{
-    return *d->callManager;
 }
 
 /// Returns the reference to QXmppMucManager, implementation of XEP-0045.
