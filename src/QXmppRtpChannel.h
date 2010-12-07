@@ -56,6 +56,26 @@ public:
         G729 = 18,
     };
 
+    /// This enum is used to describe a DTMF tone.
+    enum Tone {
+        Tone_0 = 0, ///< Tone for the 0 key.
+        Tone_1,     ///< Tone for the 1 key.
+        Tone_2,     ///< Tone for the 2 key.  
+        Tone_3,     ///< Tone for the 3 key.
+        Tone_4,     ///< Tone for the 4 key.
+        Tone_5,     ///< Tone for the 5 key.
+        Tone_6,     ///< Tone for the 6 key.
+        Tone_7,     ///< Tone for the 7 key.
+        Tone_8,     ///< Tone for the 8 key.
+        Tone_9,     ///< Tone for the 9 key.
+        Tone_Star,  ///< Tone for the * key.
+        Tone_Pound, ///< Tone for the # key.
+        Tone_A,     ///< Tone for the A key.
+        Tone_B,     ///< Tone for the B key.
+        Tone_C,     ///< Tone for the C key.
+        Tone_D      ///< Tone for the D key.
+    };
+
     QXmppRtpChannel(QObject *parent = 0);
     ~QXmppRtpChannel();
 
@@ -78,6 +98,8 @@ signals:
 
 public slots:
     void datagramReceived(const QByteArray &ba);
+    void startTone(QXmppRtpChannel::Tone tone);
+    void stopTone(QXmppRtpChannel::Tone tone);
 
 protected:
     void debug(const QString &message)
