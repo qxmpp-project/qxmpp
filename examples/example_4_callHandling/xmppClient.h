@@ -28,6 +28,7 @@
 #include "QXmppClient.h"
 
 class QXmppCall;
+class QXmppCallManager;
 
 class xmppClient : public QXmppClient
 {
@@ -41,6 +42,9 @@ private slots:
     void slotConnected();
     void slotFinished();
     void slotPresenceReceived(const QXmppPresence &presence);
+
+private:
+    QXmppCallManager *callManager;
 };
 
 #endif // IBBCLIENT_H

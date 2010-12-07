@@ -36,11 +36,15 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
+    // add QXmppCallManager extension
+    callManager = new QXmppCallManager(this);
+    addExtension(callManager);
+
     bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
                          this, SLOT(slotPresenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(&callManager(), SIGNAL(callReceived(QXmppCall*)),
+    check = connect(callManager, SIGNAL(callReceived(QXmppCall*)),
                     this, SLOT(slotCallReceived(QXmppCall*)));
     Q_ASSERT(check);
 }
@@ -110,7 +114,7 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // start the call and connect to the its signals
-    QXmppCall *call = callManager().call(presence.from());
+    QXmppCall *call = callManager->call(presence.from());
 
     bool check = connect(call, SIGNAL(connected()), this, SLOT(slotConnected()));
     Q_ASSERT(check);
