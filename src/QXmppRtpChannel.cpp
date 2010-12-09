@@ -36,6 +36,18 @@
 
 const quint8 RTP_VERSION = 0x02;
 
+enum CodecId {
+    G711u = 0,
+    GSM = 3,
+    G723 = 4,
+    G711a = 8,
+    G722 = 9,
+    L16Stereo = 10,
+    L16Mono = 11,
+    G728 = 15,
+    G729 = 18,
+};
+
 struct ToneInfo
 {
     QXmppRtpChannel::Tone tone;
@@ -65,6 +77,22 @@ static QPair<int, int> toneFreqs(QXmppRtpChannel::Tone tone)
     case QXmppRtpChannel::Tone_D: return qMakePair(941, 1633);
     }
     return qMakePair(0, 0);
+}
+
+QByteArray renderTone(QXmppRtpChannel::Tone tone, int clockrate, quint32 clockTick, qint64 samples)
+{
+    QPair<int,int> tf = toneFreqs(tone);
+    const float clockMult = 2.0 * M_PI / float(clockrate);
+    QByteArray chunk;
+    chunk.reserve(samples * SAMPLE_BYTES);
+    QDataStream output(&chunk, QIODevice::WriteOnly);
+    output.setByteOrder(QDataStream::LittleEndian);
+    for (quint32 i = 0; i < samples; ++i) {
+        quint16 val = 16383.0 * (sin(clockMult * clockTick * tf.first) + sin(clockMult * clockTick * tf.second));
+        output << val;
+        clockTick++;
+    }
+    return chunk;
 }
 
 class QXmppRtpChannelPrivate
@@ -131,9 +159,9 @@ QXmppRtpChannelPrivate::QXmppRtpChannelPrivate()
 
 QXmppCodec *QXmppRtpChannelPrivate::codecForPayloadType(const QXmppJinglePayloadType &payloadType)
 {
-    if (payloadType.id() == QXmppRtpChannel::G711u)
+    if (payloadType.id() == G711u)
         return new QXmppG711uCodec(payloadType.clockrate());
-    else if (payloadType.id() == QXmppRtpChannel::G711a)
+    else if (payloadType.id() == G711a)
         return new QXmppG711aCodec(payloadType.clockrate());
 #ifdef QXMPP_USE_SPEEX
     else if (payloadType.name().toLower() == "speex")
@@ -158,13 +186,13 @@ QList<QXmppJinglePayloadType> QXmppRtpChannelPrivate::supportedPayloadTypes() co
     payloads << payload;
 #endif
 
-    payload.setId(QXmppRtpChannel::G711u);
+    payload.setId(G711u);
     payload.setChannels(1);
     payload.setName("PCMU");
     payload.setClockrate(8000);
     payloads << payload;
 
-    payload.setId(QXmppRtpChannel::G711a);
+    payload.setId(G711a);
     payload.setChannels(1);
     payload.setName("PCMA");
     payload.setClockrate(8000);
@@ -340,6 +368,17 @@ qint64 QXmppRtpChannel::readData(char * data, qint64 maxSize)
 #endif
         memset(data + readSize, 0, maxSize - readSize);
     }
+
+    // add local DTMF echo
+    if (!d->outgoingTones.isEmpty()) {
+        const QByteArray chunk = renderTone(
+            d->outgoingTones[0].tone,
+            d->payloadType.clockrate(),
+            d->incomingStamp - d->outgoingTones[0].incomingStart,
+            maxSize / SAMPLE_BYTES);
+        memcpy(data, chunk.constData(), chunk.size());
+    }
+
     d->incomingStamp += readSize / SAMPLE_BYTES;
     return maxSize;
 }
@@ -479,37 +518,72 @@ void QXmppRtpChannel::writeDatagram()
     QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
     d->outgoingBuffer.remove(0, chunk.size());
 
+    bool sendAudio = true;
     if (!d->outgoingTones.isEmpty()) {
-        const quint32 packetTicks = (d->outgoingTonesType.clockrate() * d->outgoingTonesType.ptime()) / 1000;
+        const quint32 packetTicks = (d->payloadType.clockrate() * d->payloadType.ptime()) / 1000;
+        const ToneInfo info = d->outgoingTones[0];
 
-        // generate in-band DTMF
-        QPair<int,int> tf = toneFreqs(d->outgoingTones[0].tone);
-        const float clockMult = 2.0 * M_PI / float(d->outgoingTonesType.clockrate());
-        chunk.clear();
-        QDataStream output(&chunk, QIODevice::WriteOnly);
-        output.setByteOrder(QDataStream::LittleEndian);
-        quint32 clockTick = d->outgoingStamp;
-        for (quint32 i = 0; i < packetTicks; ++i) {
-            quint16 val = 16383.0 * cos(clockMult * clockTick * tf.first)
-                        + 16383.0 * cos(clockMult * clockTick * tf.second);
-            output << val;
-            clockTick++;
+        if (d->outgoingTonesType.id()) {
+            // send RFC 2833 DTMF
+            QByteArray header;
+            QDataStream stream(&header, QIODevice::WriteOnly);
+            quint8 marker_type = d->outgoingTonesType.id();
+            if (info.outgoingStart == d->outgoingStamp)
+                marker_type |= 0x80;
+
+            stream << quint8(RTP_VERSION << 6);
+            stream << marker_type;
+            stream << d->outgoingSequence;
+            stream << info.outgoingStart;
+            stream << d->ssrc;
+
+            stream << quint8(info.tone);
+            stream << quint8(info.finished ? 0x80 : 0x00);
+            stream << quint16(d->outgoingStamp + packetTicks - info.outgoingStart);
+#ifdef QXMPP_DEBUG_RTP
+            logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+                        QString::number(d->outgoingSequence),
+                        QString::number(d->outgoingStamp),
+                        QString::number(marker_type & 0x80 != 0),
+                        QString::number(marker_type & 0x7f),
+                        QString::number(header.size() - 12)));
+#endif
+            emit sendDatagram(header);
+            d->outgoingSequence++;
+            d->outgoingStamp += packetTicks;
+
+            sendAudio = false;
+        } else {
+            // generate in-band DTMF
+            chunk = renderTone(info.tone, d->payloadType.clockrate(), d->outgoingStamp - info.outgoingStart, packetTicks);
         }
 
-        // send RFC 2833 DTMF
+        // if the tone is finished, remove it
+        if (info.finished)
+            d->outgoingTones.removeFirst();
+    }
+
+    if (sendAudio) {
+        // send audio data
         QByteArray header;
         QDataStream stream(&header, QIODevice::WriteOnly);
-        quint8 marker_type = d->outgoingTonesType.id();
-
+        quint8 marker_type = d->payloadType.id();
+        if (d->outgoingMarker)
+        {
+            marker_type |= 0x80;
+            d->outgoingMarker= false;
+        }
         stream << quint8(RTP_VERSION << 6);
         stream << marker_type;
         stream << d->outgoingSequence;
-        stream << d->outgoingTones[0].outgoingStart;
+        stream << d->outgoingStamp;
         stream << d->ssrc;
 
-        stream << quint8(d->outgoingTones[0].tone);
-        stream << quint8(d->outgoingTones[0].finished ? 0x80 : 0x00);
-        stream << quint16(d->outgoingStamp + packetTicks - d->outgoingTones[0].outgoingStart);
+        // encode audio chunk
+        QDataStream input(chunk);
+        input.setByteOrder(QDataStream::LittleEndian);
+        const qint64 packetTicks = d->outgoingCodec->encode(input, stream);
+
 #ifdef QXMPP_DEBUG_RTP
         logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
                     QString::number(d->outgoingSequence),
@@ -520,44 +594,10 @@ void QXmppRtpChannel::writeDatagram()
 #endif
         emit sendDatagram(header);
         d->outgoingSequence++;
-
-        // if the tone is finished, remove it
-        if (d->outgoingTones[0].finished)
-            d->outgoingTones.removeFirst();
+        d->outgoingStamp += packetTicks;
     }
 
-    // send audio data
-    QByteArray header;
-    QDataStream stream(&header, QIODevice::WriteOnly);
-    quint8 marker_type = d->payloadType.id();
-    if (d->outgoingMarker)
-    {
-        marker_type |= 0x80;
-        d->outgoingMarker= false;
-    }
-    stream << quint8(RTP_VERSION << 6);
-    stream << marker_type;
-    stream << d->outgoingSequence;
-    stream << d->outgoingStamp;
-    stream << d->ssrc;
-
-    // encode audio chunk
-    QDataStream input(chunk);
-    input.setByteOrder(QDataStream::LittleEndian);
-    const qint64 packetTicks = d->outgoingCodec->encode(input, stream);
-
-#ifdef QXMPP_DEBUG_RTP
-    logSent(QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                QString::number(d->outgoingSequence),
-                QString::number(d->outgoingStamp),
-                QString::number(marker_type & 0x80 != 0),
-                QString::number(marker_type & 0x7f),
-                QString::number(header.size() - 12)));
-#endif
-    emit sendDatagram(header);
-    d->outgoingSequence++;
-    d->outgoingStamp += packetTicks;
-
+    // queue signals
     d->writtenSinceLastEmit += chunk.size();
     if (!d->signalsEmitted && !signalsBlocked()) {
         d->signalsEmitted = true;

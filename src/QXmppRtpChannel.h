@@ -44,23 +44,11 @@ class QXmppRtpChannel : public QIODevice
     Q_OBJECT
 
 public:
-    enum CodecId {
-        G711u = 0,
-        GSM = 3,
-        G723 = 4,
-        G711a = 8,
-        G722 = 9,
-        L16Stereo = 10,
-        L16Mono = 11,
-        G728 = 15,
-        G729 = 18,
-    };
-
     /// This enum is used to describe a DTMF tone.
     enum Tone {
         Tone_0 = 0, ///< Tone for the 0 key.
         Tone_1,     ///< Tone for the 1 key.
-        Tone_2,     ///< Tone for the 2 key.  
+        Tone_2,     ///< Tone for the 2 key.
         Tone_3,     ///< Tone for the 3 key.
         Tone_4,     ///< Tone for the 4 key.
         Tone_5,     ///< Tone for the 5 key.
@@ -90,10 +78,10 @@ public:
     /// \endcond
 
 signals:
-    /// This signal is emitted when a datagram needs to be sent.
+    /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
-    /// This signal is emitted to send logging messages.
+    /// \brief This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 public slots:
@@ -102,6 +90,7 @@ public slots:
     void stopTone(QXmppRtpChannel::Tone tone);
 
 protected:
+    /// \cond
     void debug(const QString &message)
     {
         emit logMessage(QXmppLogger::DebugMessage, message);
@@ -122,7 +111,6 @@ protected:
         emit logMessage(QXmppLogger::SentMessage, message);
     }
 
-    /// \cond
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);
     /// \endcond
