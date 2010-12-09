@@ -254,9 +254,9 @@ signals:
     void iqReceived(const QXmppIq&);
 
     /// \cond
-    /// Deprecated in relese 0.3.0
-    /// Use QXmppDiscoveryManager::informationReceived(const QXmppDiscoveryIq&)
-    /// Notifies that an XMPP service discovery iq stanza is received.
+    // Deprecated in relese 0.3.0
+    // Use QXmppDiscoveryManager::informationReceived(const QXmppDiscoveryIq&)
+    // Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
     /// \endcond
 

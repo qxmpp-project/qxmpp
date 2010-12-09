@@ -563,7 +563,7 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
     return d->stream->xmppStreamError();
 }
 
-/// Returns the reference to QXmppVCardManager, implimentation of XEP-0054.
+/// Returns the reference to QXmppVCardManager, implementation of XEP-0054.
 /// http://xmpp.org/extensions/xep-0054.html
 ///
 
@@ -571,6 +571,10 @@ QXmppVCardManager& QXmppClient::vCardManager()
 {
     return *d->vCardManager;
 }
+
+/// Returns the reference to QXmppVersionManager, implementation of XEP-0092.
+/// http://xmpp.org/extensions/xep-0092.html
+///
 
 QXmppVersionManager& QXmppClient::versionManager()
 {
