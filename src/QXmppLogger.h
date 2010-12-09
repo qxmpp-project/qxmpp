@@ -103,7 +103,9 @@ public:
     QXmppLoggable(QObject *parent = 0);
 
 protected:
+    /// \cond
     virtual void childEvent(QChildEvent *event);
+    /// \endcond
 
     /// Logs a debugging message.
     ///
@@ -134,7 +136,7 @@ protected:
 
     /// Logs a received packet.
     ///
-    /// \param msg
+    /// \param message
 
     void logReceived(const QString &message)
     {
@@ -143,7 +145,7 @@ protected:
 
     /// Logs a sent packet.
     ///
-    /// \param msg
+    /// \param message
 
     void logSent(const QString &message)
     {
