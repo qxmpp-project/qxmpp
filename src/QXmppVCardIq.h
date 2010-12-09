@@ -77,10 +77,11 @@ public:
     QString url() const;
     void setUrl(const QString&);
 
+    /// \cond
     static bool isVCard(const QDomElement &element);
 
-// deprecated accessors, use the form without "get" instead
-// deprecated in release 0.2.0
+    // deprecated accessors, use the form without "get" instead
+    // deprecated in release 0.2.0
     QString Q_DECL_DEPRECATED getFullName() const;
     QString Q_DECL_DEPRECATED getNickName() const;
     const QByteArray Q_DECL_DEPRECATED & getPhoto() const;

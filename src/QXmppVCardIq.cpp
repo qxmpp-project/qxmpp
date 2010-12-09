@@ -48,6 +48,10 @@ QString getImageType(const QByteArray &contents)
     return "image/unknown";
 }
 
+/// Constructs a QXmppVCardIq for the specified recipient.
+///
+/// \param jid
+
 QXmppVCardIq::QXmppVCardIq(const QString& jid) : QXmppIq(QXmppIq::Get)
 {
     // for self jid should be empty
