@@ -46,6 +46,11 @@ public:
     virtual ~QXmppClientExtension();
 
     virtual QStringList discoveryFeatures() const;
+
+    /// \brief Handles the incoming XMPP \a stanza.
+    ///
+    /// Returns true if the stanza was handled and no further processing
+    /// should occur, or false otherwise.
     virtual bool handleStanza(const QDomElement &stanza) = 0;
 
 protected:
