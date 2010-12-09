@@ -145,16 +145,17 @@ public slots:
 
 private slots:
     void checkCandidates();
+    void checkStun();
     void readyRead();
 
 signals:
-    // This signal is emitted once ICE negotiation succeeds.
+    /// \brief This signal is emitted once ICE negotiation succeeds.
     void connected();
 
-    // This signal is emitted when a data packet is received.
+    /// \brief This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &datagram);
 
-    // This signal is emitted when the list of local candidates changes.
+    /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
 private:
@@ -191,14 +192,15 @@ private:
     QTimer *m_timer;
 
     // STUN server
-    bool m_stunDone;
     QByteArray m_stunId;
     QHostAddress m_stunHost;
     quint16 m_stunPort;
+    QTimer *m_stunTimer;
+    int m_stunTries;
 };
 
-/// \brief The QXmppIceConnection class represents an UDP socket capable
-/// of performing Interactive Connectivity Establishment (RFC 5245).
+/// \brief The QXmppIceConnection class represents a set of UDP sockets
+/// capable of performing Interactive Connectivity Establishment (RFC 5245).
 ///
 
 class QXmppIceConnection : public QXmppLoggable

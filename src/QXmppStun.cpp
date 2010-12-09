@@ -773,8 +773,8 @@ QXmppIceComponent::QXmppIceComponent(bool controlling, QObject *parent)
     m_activePair(0),
     m_fallbackPair(0),
     m_iceControlling(controlling),
-    m_stunDone(false),
-    m_stunPort(0)
+    m_stunPort(0),
+    m_stunTries(0)
 {
     m_localUser = generateStanzaHash(4);
     m_localPassword = generateStanzaHash(22);
@@ -782,6 +782,10 @@ QXmppIceComponent::QXmppIceComponent(bool controlling, QObject *parent)
     m_timer = new QTimer(this);
     m_timer->setInterval(500);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(checkCandidates())); 
+
+    m_stunTimer = new QTimer(this);
+    m_stunTimer->setInterval(500);
+    connect(m_stunTimer, SIGNAL(timeout()), this, SLOT(checkStun()));
 }
 
 /// Destroys the QXmppIceComponent.
@@ -835,21 +839,28 @@ void QXmppIceComponent::checkCandidates()
         writeStun(message, pair);
     }
 
-    /// Send a request to STUN server to determine server-reflexive candidate
-    if (!m_stunHost.isNull() && m_stunPort != 0 && !m_stunDone)
-    {
-        foreach (QUdpSocket *socket, m_sockets)
-        {
-            QXmppStunMessage msg;
-            msg.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-            msg.setId(m_stunId);
-#ifdef QXMPP_DEBUG_STUN
-            logSent(QString("STUN packet to %1 %2\n%3").arg(m_stunHost.toString(),
-                    QString::number(m_stunPort), msg.toString()));
-#endif
-            socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
-        }
+}
+
+void QXmppIceComponent::checkStun()
+{
+    if (m_stunHost.isNull() || !m_stunPort || m_stunTries > 10) {
+        m_stunTimer->stop();
+        return;
     }
+
+    // Send a request to STUN server to determine server-reflexive candidate
+    foreach (QUdpSocket *socket, m_sockets)
+    {
+        QXmppStunMessage msg;
+        msg.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+        msg.setId(m_stunId);
+#ifdef QXMPP_DEBUG_STUN
+        logSent(QString("STUN packet to %1 %2\n%3").arg(m_stunHost.toString(),
+                QString::number(m_stunPort), msg.toString()));
+#endif
+        socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
+    }
+    m_stunTries++;
 }
 
 /// Stops ICE connectivity checks and closes the underlying sockets.
@@ -859,6 +870,7 @@ void QXmppIceComponent::close()
     foreach (QUdpSocket *socket, m_sockets)
         socket->close();
     m_timer->stop();
+    m_stunTimer->stop();
 }
 
 /// Starts ICE connectivity checks.
@@ -1013,6 +1025,13 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         m_sockets << socket;
         m_localCandidates << candidate;
     }
+
+    // start STUN checks
+    if (!m_stunHost.isNull() && m_stunPort) {
+        m_stunTries = 0;
+        checkStun();
+        m_stunTimer->start();
+    }
 }
 
 void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
@@ -1079,7 +1098,7 @@ void QXmppIceComponent::readyRead()
     // check how to handle message
     if (message.id() == m_stunId)
     {
-        m_stunDone = true;
+        m_stunTimer->stop();
 
         // determine server-reflexive address
         QHostAddress reflexiveHost;
