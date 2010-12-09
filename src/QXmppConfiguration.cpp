@@ -114,7 +114,7 @@ void QXmppConfiguration::setPassword(const QString& password)
 /// Multiple resources (e.g., devices or locations) may connect simultaneously
 /// to a server on behalf of each authorized client, with each resource
 /// differentiated by the resource identifier of an XMPP address
-/// (e.g. node@domain/home vs. node@domain/work)
+/// (e.g. node\@domain/home vs. node\@domain/work)
 ///
 /// The default value is "QXmpp".
 ///
