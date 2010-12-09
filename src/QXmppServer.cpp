@@ -228,6 +228,7 @@ void QXmppServer::setDomain(const QString &domain)
 }
 
 /// Returns the QXmppLogger associated with the server.
+///
 
 QXmppLogger *QXmppServer::logger()
 {
@@ -235,6 +236,8 @@ QXmppLogger *QXmppServer::logger()
 }
 
 /// Sets the QXmppLogger associated with the server.
+///
+/// \param logger
 
 void QXmppServer::setLogger(QXmppLogger *logger)
 {
@@ -249,8 +252,6 @@ void QXmppServer::setLogger(QXmppLogger *logger)
 }
 
 /// Returns the password checker used to verify client credentials.
-///
-/// \param checker
 ///
 
 QXmppPasswordChecker *QXmppServer::passwordChecker()
