@@ -78,26 +78,27 @@ public:
     QXmppRtpChannel *audioChannel() const;
 
 signals:
-    /// This signal is emitted when a call is connected.
+    /// \brief This signal is emitted when a call is connected.
     ///
     /// Once this signal is emitted, you can connect a QAudioOutput and
     /// QAudioInput to the call. You can determine the appropriate clockrate
     /// and the number of channels by calling payloadType().
     void connected();
 
-    /// This signal is emitted when a call is finished.
+    /// \brief This signal is emitted when a call is finished.
     ///
     /// Note: Do not delete the call in the slot connected to this signal,
     /// instead use deleteLater().
     void finished();
 
-    /// \internal
+    /// \cond
     void localCandidatesChanged();
+    /// \endcond
 
-    /// This signal is emitted when the remote party is ringing.
+    /// \brief This signal is emitted when the remote party is ringing.
     void ringing();
 
-    /// This signal is emitted when the call state changes.
+    /// \brief This signal is emitted when the call state changes.
     void stateChanged(QXmppCall::State state);
 
 public slots:
@@ -149,7 +150,7 @@ signals:
     /// This signal is emitted when a new incoming call is received.
     ///
     /// To accept the call, invoke the call's QXmppCall::accept() method.
-    /// To refuse the call, invoke the call's QXmppCall::abort() method.
+    /// To refuse the call, invoke the call's QXmppCall::hangup() method.
     void callReceived(QXmppCall *call);
 
 private slots:

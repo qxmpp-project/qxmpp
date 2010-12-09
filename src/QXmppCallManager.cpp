@@ -278,6 +278,11 @@ bool QXmppCallManagerPrivate::sendRequest(QXmppCall *call, const QXmppJingleIq &
     return q->client()->sendPacket(iq);
 }
 
+/// Constructs a QXmppCallManager object to handle incoming and outgoing
+/// Voice-Over-IP calls.
+///
+/// \param client
+
 QXmppCallManager::QXmppCallManager(QXmppClient *client)
 {
     d = new QXmppCallManagerPrivate(this);
@@ -287,6 +292,8 @@ QXmppCallManager::QXmppCallManager(QXmppClient *client)
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
+
+/// Destroys the QXmppCallManager object.
 
 QXmppCallManager::~QXmppCallManager()
 {
