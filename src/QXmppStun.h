@@ -33,7 +33,9 @@ class QDataStream;
 class QUdpSocket;
 class QTimer;
 
-/// \brief The QXmppStunMessage class represents a STUN message.
+/// \internal
+///
+/// The QXmppStunMessage class represents a STUN message.
 ///
 
 class QXmppStunMessage

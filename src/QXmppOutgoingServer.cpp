@@ -45,7 +45,6 @@ public:
 
 /// Constructs a new outgoing server-to-server stream.
 ///
-/// \param socket
 /// \param domain the local domain
 /// \param parent the parent object
 ///
@@ -73,6 +72,10 @@ QXmppOutgoingServer::~QXmppOutgoingServer()
 {
     delete d;
 }
+
+/// Attempts to connect to an XMPP server for the specified \a domain.
+///
+/// \param domain
 
 void QXmppOutgoingServer::connectToHost(const QString &domain)
 {
@@ -219,21 +222,34 @@ bool QXmppOutgoingServer::isConnected() const
     return QXmppStream::isConnected() && d->ready;
 }
 
+/// Returns the stream's local dialback key.
+
 QString QXmppOutgoingServer::localStreamKey() const
 {
     return d->localStreamKey;
 }
+
+/// Sets the stream's local dialback key.
+///
+/// \param key
 
 void QXmppOutgoingServer::setLocalStreamKey(const QString &key)
 {
     d->localStreamKey = key;
 }
 
+/// Sets the stream's verification information.
+///
+/// \param id
+/// \param key
+
 void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 {
     d->verifyId = id;
     d->verifyKey = key;
 }
+
+/// Returns the remote server's domain.
 
 QString QXmppOutgoingServer::remoteDomain() const
 {

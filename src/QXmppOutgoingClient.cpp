@@ -92,6 +92,10 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
 {
 }
 
+/// Constructs an outgoing client stream.
+///
+/// \param parent
+
 QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     : QXmppStream(parent),
     d(new QXmppOutgoingClientPrivate)
@@ -131,15 +135,21 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     Q_ASSERT(check);
 }
 
+/// Destroys an outgoing client stream.
+
 QXmppOutgoingClient::~QXmppOutgoingClient()
 {
     delete d;
 }
 
+/// Returns a reference to the stream's configuration.
+
 QXmppConfiguration& QXmppOutgoingClient::configuration()
 {
     return d->config;
 }
+
+/// Attempts to connect to the XMPP server.
 
 void QXmppOutgoingClient::connectToHost()
 {
