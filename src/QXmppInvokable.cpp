@@ -38,6 +38,12 @@ QXmppInvokable::QXmppInvokable(QObject *parent)
 {
 }
 
+/// Destroys a QXmppInvokable.
+
+QXmppInvokable::~QXmppInvokable()
+{
+}
+
 QVariant QXmppInvokable::dispatch( const QByteArray & method, const QList< QVariant > & args )
 {
     buildMethodHash();
