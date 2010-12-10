@@ -21,6 +21,7 @@
  *
  */
 
+#include <QDomElement>
 #include <QMetaClassInfo>
 #include <QStringList>
 
