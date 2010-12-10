@@ -138,7 +138,7 @@ bool QXmppRpcManager::handleStanza(const QDomElement &element)
     {
         QXmppRpcInvokeIq rpcIqPacket;
         rpcIqPacket.parse(element);
-        emit rpcCallInvoke(rpcIqPacket);
+        invokeInterfaceMethod(rpcIqPacket);
         return true;
     }
     else if(QXmppRpcResponseIq::isRpcResponseIq(element))

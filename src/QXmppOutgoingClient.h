@@ -37,8 +37,6 @@ class QXmppConfiguration;
 class QXmppPresence;
 class QXmppIq;
 class QXmppMessage;
-class QXmppRpcResponseIq;
-class QXmppRpcErrorIq;
 class QXmppSrvInfo;
 
 class QXmppOutgoingClientPrivate;
@@ -78,13 +76,6 @@ signals:
 
     /// This signal is emitted when an IQ is received.
     void iqReceived(const QXmppIq&);
-
-    /// \cond
-    // XEP-0009: Jabber-RPC
-    void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
-    void rpcCallResponse(const QXmppRpcResponseIq& result);
-    void rpcCallError(const QXmppRpcErrorIq &err);
-    /// \endcond
 
 protected:
     /// \cond

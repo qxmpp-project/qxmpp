@@ -63,15 +63,13 @@ public:
 
 signals:
     /// \cond
-    void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
     void rpcCallResponse(const QXmppRpcResponseIq& result);
     void rpcCallError(const QXmppRpcErrorIq &err);
     /// \endcond
 
-private slots:
+private:
     void invokeInterfaceMethod(const QXmppRpcInvokeIq &iq);
 
-private:
     QMap<QString,QXmppInvokable*> m_interfaces;
 };
 

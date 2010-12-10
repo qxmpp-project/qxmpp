@@ -41,7 +41,6 @@
 // IQ types
 #include "QXmppBindIq.h"
 #include "QXmppPingIq.h"
-#include "QXmppRpcIq.h"
 #include "QXmppSessionIq.h"
 
 #include <QBuffer>
@@ -467,25 +466,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             }
             // extensions
 
-            // XEP-0009: Jabber-RPC
-            else if(QXmppRpcInvokeIq::isRpcInvokeIq(nodeRecv))
-            {
-                QXmppRpcInvokeIq rpcIqPacket;
-                rpcIqPacket.parse(nodeRecv);
-                emit rpcCallInvoke(rpcIqPacket);
-            }
-            else if(QXmppRpcResponseIq::isRpcResponseIq(nodeRecv))
-            {
-                QXmppRpcResponseIq rpcResponseIq;
-                rpcResponseIq.parse(nodeRecv);
-                emit rpcCallResponse(rpcResponseIq);
-            }
-            else if(QXmppRpcErrorIq::isRpcErrorIq(nodeRecv))
-            {
-                QXmppRpcErrorIq rpcErrorIq;
-                rpcErrorIq.parse(nodeRecv);
-                emit rpcCallError(rpcErrorIq);
-            }
             // XEP-0078: Non-SASL Authentication
             else if(id == d->nonSASLAuthId && type == "result")
             {

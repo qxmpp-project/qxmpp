@@ -33,6 +33,7 @@
 #include "QXmppMucManager.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppRpcIq.h"
+#include "QXmppRpcManager.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
@@ -59,11 +60,10 @@ public:
     QXmppMucManager *mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
+    QXmppRpcManager *rpcManager;    ///< Pointer to the RPC manager
     QXmppTransferManager *transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
     QXmppVersionManager *versionManager;      ///< Pointer to the version manager
-
-    QHash<QString,QXmppInvokable*> interfaces;
 
     void addProperCapability(QXmppPresence& presence);
 
@@ -174,11 +174,6 @@ QXmppClient::QXmppClient(QObject *parent)
     check = setReconnectionManager(new QXmppReconnectionManager(this));
     Q_ASSERT(check);
 
-    // rpc
-    check = connect(d->stream, SIGNAL(rpcCallInvoke(QXmppRpcInvokeIq)),
-        this, SLOT(invokeInterfaceMethod(QXmppRpcInvokeIq)));
-    Q_ASSERT(check);
-
     // logging
     d->logger = 0;
     setLogger(QXmppLogger::getLogger());
@@ -187,6 +182,9 @@ QXmppClient::QXmppClient(QObject *parent)
     // TODO move manager references to d->extensions
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
+
+    d->rpcManager = new QXmppRpcManager;
+    addExtension(d->rpcManager);
 
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
@@ -596,62 +594,7 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
 
 void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
 {
-    d->interfaces[ interface->metaObject()->className() ] = interface;
-}
-
-
-void QXmppClient::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
-{
-    QXmppStanza::Error error;
-    
-    const QStringList methodBits = iq.method().split('.');
-    if (methodBits.size() != 2)
-        return;
-    const QString interface = methodBits.first();
-    const QString method = methodBits.last();
-    QXmppInvokable *iface = d->interfaces.value(interface);
-    if (iface)
-    {
-        if ( iface->isAuthorized( iq.from() ) )
-        {
-
-            if ( iface->interfaces().contains(method) )
-            {
-                QVariant result = iface->dispatch(method.toLatin1(),
-                                                  iq.arguments() );
-                QXmppRpcResponseIq resultIq;
-                resultIq.setId(iq.id());
-                resultIq.setTo(iq.from());
-                resultIq.setFrom(d->stream->configuration().jid());
-                resultIq.setValues(QVariantList() << result);
-                d->stream->sendPacket( resultIq );
-                return;
-            }
-            else
-            {
-                error.setType(QXmppStanza::Error::Cancel);
-                error.setCondition(QXmppStanza::Error::ItemNotFound);
-
-            }
-        }
-        else
-        {
-            error.setType(QXmppStanza::Error::Auth);
-            error.setCondition(QXmppStanza::Error::Forbidden);
-        }
-    }
-    else
-    {
-        error.setType(QXmppStanza::Error::Cancel);
-        error.setCondition(QXmppStanza::Error::ItemNotFound);
-    }
-    QXmppRpcErrorIq errorIq;
-    errorIq.setId(iq.id());
-    errorIq.setTo(iq.from());
-    errorIq.setFrom(d->stream->configuration().jid());
-    errorIq.setQuery( iq );
-    errorIq.setError( error );
-    d->stream->sendPacket( errorIq );
+    d->rpcManager->addInvokableInterface(interface);
 }
 
 QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
@@ -667,26 +610,7 @@ QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
                                           const QVariant &arg9,
                                           const QVariant &arg10 )
 {
-    QVariantList args;
-    if( arg1.isValid() ) args << arg1;
-    if( arg2.isValid() ) args << arg2;
-    if( arg3.isValid() ) args << arg3;
-    if( arg4.isValid() ) args << arg4;
-    if( arg5.isValid() ) args << arg5;
-    if( arg6.isValid() ) args << arg6;
-    if( arg7.isValid() ) args << arg7;
-    if( arg8.isValid() ) args << arg8;
-    if( arg9.isValid() ) args << arg9;
-    if( arg10.isValid() ) args << arg10;
-
-    QXmppRemoteMethod method( jid, interface, args, this );
-    connect( d->stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
-             &method, SLOT(gotResult(QXmppRpcResponseIq)));
-    connect( d->stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
-             &method, SLOT(gotError(QXmppRpcErrorIq)));
-
-
-    return method.call();
+    return d->rpcManager->callRemoteMethod(jid, interface, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 }
 
 /// Returns the reference to QXmppArchiveManager, implementation of XEP-0136.

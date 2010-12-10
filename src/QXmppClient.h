@@ -254,7 +254,7 @@ signals:
     void iqReceived(const QXmppIq&);
 
     /// \cond
-    // Deprecated in relese 0.3.0
+    // Deprecated in release 0.3.0
     // Use QXmppDiscoveryManager::informationReceived(const QXmppDiscoveryIq&)
     // Notifies that an XMPP service discovery iq stanza is received.
     void discoveryIqReceived(const QXmppDiscoveryIq&);
@@ -266,7 +266,6 @@ public slots:
 
 private slots:
     void slotElementReceived(const QDomElement &element, bool &handled);
-    void invokeInterfaceMethod( const QXmppRpcInvokeIq &iq );
     void xmppConnected();
 
 private:
