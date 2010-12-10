@@ -86,6 +86,10 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
     return false;
 }
 
+/// Request version information from the specified XMPP entity.
+///
+/// \param jid
+
 QString QXmppVersionManager::requestVersion(const QString& jid)
 {
     QXmppVersionIq request;
@@ -98,30 +102,57 @@ QString QXmppVersionManager::requestVersion(const QString& jid)
         return "";
 }
 
+/// Sets the local XMPP client's name.
+///
+/// \param name
+
 void QXmppVersionManager::setClientName(const QString& name)
 {
     m_clientName = name;
 }
+
+/// Sets the local XMPP client's version.
+///
+/// \param version
 
 void QXmppVersionManager::setClientVersion(const QString& version)
 {
     m_clientVersion = version;
 }
 
+/// Sets the local XMPP client's operating system.
+///
+/// \param os
+
 void QXmppVersionManager::setClientOs(const QString& os)
 {
     m_clientOs = os;
 }
+
+/// Returns the local XMPP client's name.
+///
+/// By default this is set to the QApplication::applicationName(), or
+/// "Based on QXmpp" if not specified.
 
 QString QXmppVersionManager::clientName()
 {
     return m_clientName;
 }
 
+/// Returns the local XMPP client's version.
+///
+/// By default this is set to QApplication::applicationVersion(), or
+/// QXmpp's version if not specified.
+
 QString QXmppVersionManager::clientVersion()
 {
     return m_clientVersion;
 }
+
+/// Returns the local XMPP client's operating system.
+///
+/// By default this is "Linux", "Mac OS", "Symbian" or "Windows" depending
+/// on the platform QXmpp was compiled for.
 
 QString QXmppVersionManager::clientOs()
 {

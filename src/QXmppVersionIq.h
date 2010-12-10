@@ -43,7 +43,9 @@ public:
     QString version() const;
     void setVersion(const QString &version);
 
+    /// \cond
     static bool isVersionIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond

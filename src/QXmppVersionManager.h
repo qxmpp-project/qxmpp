@@ -55,6 +55,7 @@ public:
     /// \endcond
 
 signals:
+    /// \brief This signal is emitted when a version response is received.
     void versionReceived(const QXmppVersionIq&);
 
 private:
