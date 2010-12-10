@@ -31,6 +31,10 @@
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950288
+#endif
+
 //#define QXMPP_DEBUG_RTP
 #define SAMPLE_BYTES 2
 
