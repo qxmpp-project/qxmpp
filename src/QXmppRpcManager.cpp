@@ -69,7 +69,6 @@ void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
             {
                 error.setType(QXmppStanza::Error::Cancel);
                 error.setCondition(QXmppStanza::Error::ItemNotFound);
-
             }
         }
         else
@@ -129,6 +128,14 @@ QStringList QXmppRpcManager::discoveryFeatures() const
 {
     // XEP-0009: Jabber-RPC
     return QStringList() << ns_rpc;
+}
+
+QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const
+{
+    QXmppDiscoveryIq::Identity identity;
+    identity.setCategory("automation");
+    identity.setType("rpc");
+    return QList<QXmppDiscoveryIq::Identity>() << identity;
 }
 
 bool QXmppRpcManager::handleStanza(const QDomElement &element)

@@ -137,19 +137,20 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 
     iq.setFeatures(features);
 
-    // TODO: get identities from the extensions itself like the features
     // identities
     QList<QXmppDiscoveryIq::Identity> identities;
+
     QXmppDiscoveryIq::Identity identity;
-
-    identity.setCategory("automation");
-    identity.setType("rpc");
-    identities.append(identity);
-
     identity.setCategory(clientCategory());
     identity.setType(clientType());
     identity.setName(clientName());
-    identities.append(identity);
+    identities << identity;
+
+    foreach(QXmppClientExtension* extension, client()->extensions())
+    {
+        if(extension)
+            identities << extension->discoveryIdentities();
+    }
 
     iq.setIdentities(identities);
     return iq;

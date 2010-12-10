@@ -58,6 +58,7 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const;
+    virtual QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const;
     bool handleStanza(const QDomElement &element);
     /// \endcond
 

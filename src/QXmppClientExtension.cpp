@@ -56,6 +56,14 @@ QStringList QXmppClientExtension::discoveryFeatures() const
     return QStringList();
 }
 
+/// Returns the discovery identities to add to the client.
+///
+
+QList<QXmppDiscoveryIq::Identity> QXmppClientExtension::discoveryIdentities() const
+{
+    return QList<QXmppDiscoveryIq::Identity>();
+}
+
 /// Returns the client which loaded this extension.
 ///
 

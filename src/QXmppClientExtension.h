@@ -24,6 +24,7 @@
 #ifndef QXMPPCLIENTEXTENSION_H
 #define QXMPPCLIENTEXTENSION_H
 
+#include "QXmppDiscoveryIq.h"
 #include "QXmppLogger.h"
 
 class QDomElement;
@@ -46,6 +47,7 @@ public:
     virtual ~QXmppClientExtension();
 
     virtual QStringList discoveryFeatures() const;
+    virtual QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const;
 
     /// \brief Handles the incoming XMPP \a stanza.
     ///
