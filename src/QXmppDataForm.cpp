@@ -48,130 +48,208 @@ static field_type field_types[] = {
     {static_cast<QXmppDataForm::Field::Type>(-1), NULL},
 };
 
+/// Constructs a QXmppDataForm::Field of the specified \a type.
+///
+/// \param type
+
 QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type)
     : m_type(type)
 {
 }
+
+/// Returns the field's description.
 
 QString QXmppDataForm::Field::description() const
 {
     return m_description;
 }
 
+/// Sets the field's description.
+///
+/// \param description
+
 void QXmppDataForm::Field::setDescription(const QString &description)
 {
     m_description = description;
 }
+
+/// Returns the field's key.
 
 QString QXmppDataForm::Field::key() const
 {
     return m_key;
 }
 
+/// Sets the field's key.
+///
+/// \param key
+
 void QXmppDataForm::Field::setKey(const QString &key)
 {
     m_key = key;
 }
+
+/// Returns the field's label.
 
 QString QXmppDataForm::Field::label() const
 {
     return m_label;
 }
 
+/// Sets the field's label.
+///
+/// \param label
+
 void QXmppDataForm::Field::setLabel(const QString &label)
 {
     m_label = label;
 }
+
+/// Returns the field's options.
 
 QList<QPair<QString, QString> > QXmppDataForm::Field::options() const
 {
     return m_options;
 }
 
+/// Sets the field's options.
+///
+/// \param options
+
 void QXmppDataForm::Field::setOptions(const QList<QPair<QString, QString> > &options)
 {
     m_options = options;
 }
+
+/// Returns true if the field is required, false otherwise.
 
 bool QXmppDataForm::Field::isRequired() const
 {
     return m_required;
 }
 
+/// Set to true if the field is required, false otherwise.
+///
+/// \param required
+
 void QXmppDataForm::Field::setRequired(bool required)
 {
     m_required = required;
 }
+
+/// Returns the field's type.
 
 QXmppDataForm::Field::Type QXmppDataForm::Field::type() const
 {
     return m_type;
 }
 
+/// Sets the field's type.
+///
+/// \param type
+
 void QXmppDataForm::Field::setType(QXmppDataForm::Field::Type type)
 {
     m_type = type;
 }
+
+/// Returns the field's value.
 
 QVariant QXmppDataForm::Field::value() const
 {
     return m_value;
 }
 
+/// Sets the field's value.
+///
+/// \param value
+
 void QXmppDataForm::Field::setValue(const QVariant &value)
 {
     m_value = value;
 }
+
+/// Constructs a QXmppDataForm of the specified \a type.
+///
+/// \param type
 
 QXmppDataForm::QXmppDataForm(QXmppDataForm::Type type)
     : m_type(type)
 {
 }
 
+/// Returns the form's fields.
+
 QList<QXmppDataForm::Field> QXmppDataForm::fields() const
 {
     return m_fields;
 }
+
+/// Returns the form's fields by reference.
 
 QList<QXmppDataForm::Field> &QXmppDataForm::fields()
 {
     return m_fields;
 }
 
+/// Sets the form's fields.
+///
+/// \param fields
+
 void QXmppDataForm::setFields(const QList<QXmppDataForm::Field> &fields)
 {
     m_fields = fields;
 }
+
+/// Returns the form's instructions.
 
 QString QXmppDataForm::instructions() const
 {
     return m_instructions;
 }
 
+/// Sets the form's instructions.
+///
+/// \param instructions
+
 void QXmppDataForm::setInstructions(const QString &instructions)
 {
     m_instructions = instructions;
 }
+
+/// Returns the form's title.
 
 QString QXmppDataForm::title() const
 {
     return m_title;
 }
 
+/// Sets the form's title.
+///
+/// \param title
+
 void QXmppDataForm::setTitle(const QString &title)
 {
     m_title = title;
 }
+
+/// Returns the form's type.
 
 QXmppDataForm::Type QXmppDataForm::type() const
 {
     return m_type;
 }
 
+/// Sets the form's type.
+///
+/// \param type
+
 void QXmppDataForm::setType(QXmppDataForm::Type type)
 {
     m_type = type;
 }
+
+/// Returns true if the form has an unknown type.
 
 bool QXmppDataForm::isNull() const
 {

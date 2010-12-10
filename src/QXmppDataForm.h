@@ -38,9 +38,14 @@ class QDomElement;
 class QXmppDataForm
 {
 public:
+    /// \brief The QxmppDataForm::Field class represents a data form field
+    /// as defined by XEP-0004: Data Forms.
+    ///
+
     class Field
     {
     public:
+        /// This enum is used to describe a field's type.
         enum Type
         {
             BooleanField,
@@ -88,13 +93,19 @@ public:
         QVariant m_value;
     };
 
+    /// This enum is used to describe a form's type.
     enum Type
     {
-        None,
-        Form,
-        Submit,
-        Cancel,
-        Result,
+        None,   ///< Unknown form type
+        Form,   ///< The form-processing entity is asking the form-submitting
+                ///< entity to complete a form.
+        Submit, ///< The form-submitting entity is submitting data to the
+                ///< form-processing entity.
+        Cancel, ///< The form-submitting entity has cancelled submission
+                ///< of data to the form-processing entity.
+        Result, ///< The form-processing entity is returning data
+                ///< (e.g., search results) to the form-submitting entity,
+                ///< or the data is a generic data set.
     };
 
     QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
@@ -114,8 +125,10 @@ public:
 
     bool isNull() const;
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QString m_instructions;
