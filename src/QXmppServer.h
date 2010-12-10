@@ -118,6 +118,7 @@ public:
     void setPrivateKey(const QString &privateKey);
 
 signals:
+    /// This signal is emitted when a new connection is established.
     void newConnection(QSslSocket *socket);
 
 private:

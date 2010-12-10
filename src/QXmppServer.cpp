@@ -790,15 +790,28 @@ void QXmppSslServer::incomingConnection(int socketDescriptor)
     emit newConnection(socket);
 }
 
+/// Adds the given certificates to the CA certificate database to be used
+/// for incoming connnections.
+///
+/// \param caCertificates
+
 void QXmppSslServer::addCaCertificates(const QString &caCertificates)
 {
     d->caCertificates = caCertificates;
 }
 
+/// Sets the local certificate to be used for incoming connections.
+///
+/// \param localCertificate
+
 void QXmppSslServer::setLocalCertificate(const QString &localCertificate)
 {
     d->localCertificate = localCertificate;
 }
+
+/// Sets the local private key to be used for incoming connections.
+///
+/// \param privateKey
 
 void QXmppSslServer::setPrivateKey(const QString &privateKey)
 {

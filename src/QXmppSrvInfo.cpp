@@ -205,7 +205,7 @@ QString QXmppSrvRecord::target() const
 
 /// Sets the host name for this service record.
 ///
-/// \param hostName
+/// \param target
 
 void QXmppSrvRecord::setTarget(const QString &target)
 {
@@ -256,7 +256,7 @@ quint16 QXmppSrvRecord::weight() const
 
 /// Sets the weight for this service record.
 ///
-/// \param priority
+/// \param weight
 
 void QXmppSrvRecord::setWeight(quint16 weight)
 {

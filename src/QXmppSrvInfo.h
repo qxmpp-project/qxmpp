@@ -65,6 +65,7 @@ private:
 class QXmppSrvInfo
 {
 public:
+    /// This enum is used to describe the error encountered during lookup.
     enum Error
     {
         NoError = 0,
