@@ -58,7 +58,10 @@ public:
     /// \endcond
 
 signals:
+    /// This signal is emitted when an information response is received.
     void infoReceived(const QXmppDiscoveryIq&);
+
+    /// This signal is emitted when an items response is received.
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:

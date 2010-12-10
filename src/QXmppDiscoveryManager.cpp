@@ -71,6 +71,11 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
     return false;
 }
 
+/// Requests information from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
+
 QString QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& node)
 {
     QXmppDiscoveryIq request;
@@ -85,6 +90,11 @@ QString QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& no
     else
         return "";
 }
+
+/// Requests items from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
 
 QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& node)
 {
@@ -146,31 +156,60 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     return iq;
 }
 
-/// http://xmpp.org/registrar/disco-categories.html#client
+/// Sets the category of the local XMPP client.
+///
+/// You can find a list of valid categories at:
+/// http://xmpp.org/registrar/disco-categories.html
+///
+/// \param category
+
 void QXmppDiscoveryManager::setClientCategory(const QString& category)
 {
     m_clientCategory = category;
 }
+
+/// Sets the type of the local XMPP client.
+///
+/// You can find a list of valid types at:
+/// http://xmpp.org/registrar/disco-categories.html
+///
+/// \param type
 
 void QXmppDiscoveryManager::setClientType(const QString& type)
 {
     m_clientType = type;
 }
 
+/// Sets the name of the local XMPP client.
+///
+/// \param name
+
 void QXmppDiscoveryManager::setClientName(const QString& name)
 {
     m_clientName = name;
 }
+
+/// Returns the category of the local XMPP client.
+///
+/// By default this is "client".
 
 QString QXmppDiscoveryManager::clientCategory()
 {
     return m_clientCategory;
 }
 
+/// Returns the type of the local XMPP client.
+///
+/// By default this is "pc".
+
 QString QXmppDiscoveryManager::clientType()
 {
     return m_clientType;
 }
+
+/// Returns the name of the local XMPP client.
+///
+/// By default this is "Based on QXmpp x.y.z".
 
 QString QXmppDiscoveryManager::clientName()
 {
