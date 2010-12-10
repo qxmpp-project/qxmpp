@@ -77,6 +77,9 @@ signals:
     /// This signal is emitted when the permissions for a chat room are received.
     void roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions);
 
+    /// This signal is emitted when a room participant's presence changed.
+    ///
+    /// \sa roomParticipants()
     void roomParticipantChanged(const QString &roomJid, const QString &nickName);
 
 private slots:

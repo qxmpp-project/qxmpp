@@ -30,6 +30,10 @@
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
 
+/// Constructs a QXmppMucManager to interact with multi-user chat rooms.
+///
+/// \param client
+
 QXmppMucManager::QXmppMucManager(QXmppClient* client)
 {
     bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
@@ -142,7 +146,6 @@ QMap<QString, QXmppPresence> QXmppMucManager::roomParticipants(const QString& ro
 /// \return true if the request was sent, false otherwise
 ///
 /// \sa roomConfigurationReceived()
-///
 
 bool QXmppMucManager::requestRoomConfiguration(const QString &roomJid)
 {
@@ -157,7 +160,6 @@ bool QXmppMucManager::requestRoomConfiguration(const QString &roomJid)
 /// \param form
 ///
 /// \return true if the request was sent, false otherwise
-///
 
 bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form)
 {
@@ -167,6 +169,12 @@ bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDa
     iqPacket.setForm(form);
     return client()->sendPacket(iqPacket);
 }
+
+/// Request the room's permissions.
+///
+/// \param roomJid
+///
+/// \return true if the request was sent, false otherwise
 
 bool QXmppMucManager::requestRoomPermissions(const QString &roomJid)
 {

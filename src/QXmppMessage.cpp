@@ -38,6 +38,13 @@ static const char* chat_states[] = {
     "paused",
 };
 
+/// Constructs a QXmppMessage.
+///
+/// \param from
+/// \param to
+/// \param body
+/// \param thread
+
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
                          QString& body, const QString& thread)
     : QXmppStanza(from, to),

@@ -77,10 +77,16 @@ void QXmppMucAdminIq::Item::setRole(const QString &role)
     m_role = role;
 }
 
+/// Returns the IQ's items.
+
 QList<QXmppMucAdminIq::Item> QXmppMucAdminIq::items() const
 {
     return m_items;
 }
+
+/// Sets the IQ's items.
+///
+/// \param items
 
 void QXmppMucAdminIq::setItems(const QList<QXmppMucAdminIq::Item> &items)
 {
@@ -127,10 +133,16 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Returns the IQ's data form.
+
 QXmppDataForm QXmppMucOwnerIq::form() const
 {
     return m_form;
 }
+
+/// Sets the IQ's data form.
+///
+/// \param form
 
 void QXmppMucOwnerIq::setForm(const QXmppDataForm &form)
 {

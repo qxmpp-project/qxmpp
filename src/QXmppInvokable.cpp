@@ -29,16 +29,13 @@
 
 #include <qdebug.h>
 
-QXmppInvokable::QXmppInvokable( QObject *parent )
-    : QObject( parent )
+/// Constructs a QXmppInvokable with the specified \a parent.
+///
+/// \param parent
+
+QXmppInvokable::QXmppInvokable(QObject *parent)
+    : QObject(parent)
 {
-
-}
-
-
-QXmppInvokable::~QXmppInvokable()
-{
-
 }
 
 QVariant QXmppInvokable::dispatch( const QByteArray & method, const QList< QVariant > & args )
