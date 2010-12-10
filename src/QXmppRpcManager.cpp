@@ -117,12 +117,11 @@ QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
     if( arg10.isValid() ) args << arg10;
 
     QXmppRemoteMethod method( jid, interface, args, client() );
-#if 0
-    connect( d->stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
-             &method, SLOT(gotResult(QXmppRpcResponseIq)));
-    connect( d->stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
-             &method, SLOT(gotError(QXmppRpcErrorIq)));
-#endif
+    connect(this, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
+            &method, SLOT(gotResult(QXmppRpcResponseIq)));
+    connect(this, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
+            &method, SLOT(gotError(QXmppRpcErrorIq)));
+
     return method.call();
 }
 
@@ -139,21 +138,21 @@ bool QXmppRpcManager::handleStanza(const QDomElement &element)
     {
         QXmppRpcInvokeIq rpcIqPacket;
         rpcIqPacket.parse(element);
-        //emit rpcCallInvoke(rpcIqPacket);
+        emit rpcCallInvoke(rpcIqPacket);
         return true;
     }
     else if(QXmppRpcResponseIq::isRpcResponseIq(element))
     {
         QXmppRpcResponseIq rpcResponseIq;
         rpcResponseIq.parse(element);
-        //emit rpcCallResponse(rpcResponseIq);
+        emit rpcCallResponse(rpcResponseIq);
         return true;
     }
     else if(QXmppRpcErrorIq::isRpcErrorIq(element))
     {
         QXmppRpcErrorIq rpcErrorIq;
         rpcErrorIq.parse(element);
-        //emit rpcCallError(rpcErrorIq);
+        emit rpcCallError(rpcErrorIq);
         return true;
     }
     return false;

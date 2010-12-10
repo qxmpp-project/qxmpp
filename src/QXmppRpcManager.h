@@ -31,7 +31,9 @@
 
 class QXmppInvokable;
 class QXmppRemoteMethodResult;
+class QXmppRpcErrorIq;
 class QXmppRpcInvokeIq;
+class QXmppRpcResponseIq;
 
 class QXmppRpcManager : public QXmppClientExtension
 {
@@ -57,6 +59,13 @@ public:
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(const QDomElement &element);
+    /// \endcond
+
+signals:
+    /// \cond
+    void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
+    void rpcCallResponse(const QXmppRpcResponseIq& result);
+    void rpcCallError(const QXmppRpcErrorIq &err);
     /// \endcond
 
 private slots:
