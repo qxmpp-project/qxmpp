@@ -29,6 +29,11 @@
 #include <QXmlStreamWriter>
 #include "QXmppConstants.h"
 
+/// Constructs a QXmppPresence.
+///
+/// \param type
+/// \param status
+
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
                              const QXmppPresence::Status& status)
     : QXmppStanza(),
@@ -39,30 +44,51 @@ QXmppPresence::QXmppPresence(QXmppPresence::Type type,
 
 }
 
+/// Destroys a QXmppPresence.
+
 QXmppPresence::~QXmppPresence()
 {
 
 }
+
+/// Returns the presence type.
+///
+/// You can use this method to determine the action which needs to be
+/// taken in response to receiving the presence. For instance, if the type is
+/// QXmppPresence::Available or QXmppPresence::Unavailable, you could update
+/// the icon representing a contact's availability.
 
 QXmppPresence::Type QXmppPresence::type() const
 {
     return m_type;
 }
 
+/// Sets the presence type.
+///
+/// \param type
+
 void QXmppPresence::setType(QXmppPresence::Type type)
 {
     m_type = type;
 }
+
+/// Returns the presence status.
 
 const QXmppPresence::Status& QXmppPresence::status() const
 {
     return m_status;
 }
 
+/// Returns a reference to the presence status, allowing you to change it.
+
 QXmppPresence::Status& QXmppPresence::status()
 {
     return m_status;
 }
+
+/// Sets the presence status.
+///
+/// \param status
 
 void QXmppPresence::setStatus(const QXmppPresence::Status& status)
 {

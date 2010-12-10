@@ -33,6 +33,7 @@
 class QXmppPresence : public QXmppStanza
 {
 public:
+    /// This enum is used to describe a presence type.
     enum Type
     {
         Error = 0,
@@ -115,8 +116,10 @@ public:
     const QXmppPresence::Status& status() const;
     void setStatus(const QXmppPresence::Status&);
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 
     QByteArray photoHash() const;
     void setPhotoHash(const QByteArray&);
