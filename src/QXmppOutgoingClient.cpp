@@ -226,7 +226,7 @@ void QXmppOutgoingClient::handleStart()
 
     // start stream
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
-    data.append(configuration().domain());
+    data.append(configuration().domain().toUtf8());
     data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
     sendData(data);
 }
