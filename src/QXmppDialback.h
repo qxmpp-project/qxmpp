@@ -34,9 +34,12 @@
 class QXmppDialback : public QXmppStanza
 {
 public:
+    /// This enum is used to describe a dialback command.
     enum Command {
-        Result,
-        Verify,
+        Result, ///< A dialback command between the originating server
+                ///< and the receiving server.
+        Verify, ///< A dialback command between the receiving server
+                ///< and the authoritative server.
     };
 
     QXmppDialback();
@@ -53,9 +56,9 @@ public:
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
     static bool isDialback(const QDomElement &element);
+    /// \endcond
 
 private:
     Command m_command;

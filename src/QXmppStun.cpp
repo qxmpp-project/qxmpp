@@ -1292,13 +1292,14 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
     return addresses;
 }
 
-/// Tries to bind \a count UDP sockets on eich of the given \a addresses.
+/// Tries to bind \a count UDP sockets on each of the given \a addresses.
 ///
 /// The port numbers are chosen so that they are consecutive, starting at
 /// an even port. This makes them suitable for RTP/RTCP sockets pairs.
 ///
 /// \param addresses The network address on which to bind the sockets.
 /// \param count     The number of ports to reserve.
+/// \param parent    The parent object for the sockets.
 
 QList<QUdpSocket*> QXmppIceComponent::reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent)
 {

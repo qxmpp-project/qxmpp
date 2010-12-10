@@ -28,6 +28,10 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
+/// Constructs a QXmppIq with the specified \a type.
+///
+/// \param type
+
 QXmppIq::QXmppIq(QXmppIq::Type type)
     : QXmppStanza(), m_type(type)
 {
