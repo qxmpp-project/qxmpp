@@ -69,7 +69,9 @@ public:
     QList<QXmppMucAdminIq::Item> items() const;
     void setItems(const QList<QXmppMucAdminIq::Item> &items);
 
+    /// \cond
     static bool isMucAdminIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -95,7 +97,9 @@ public:
     QXmppDataForm form() const;
     void setForm(const QXmppDataForm &form);
 
+    /// \cond
     static bool isMucOwnerIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond

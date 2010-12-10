@@ -42,7 +42,9 @@ public:
     QString resource() const;
     void setResource(const QString&);
 
+    /// \cond
     static bool isBindIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond

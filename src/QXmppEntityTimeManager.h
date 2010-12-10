@@ -47,6 +47,7 @@ public:
     /// \endcond
 
 signals:
+    /// \brief This signal is emitted when a time response is received.
     void timeReceived(const QXmppEntityTimeIq&);
 };
 

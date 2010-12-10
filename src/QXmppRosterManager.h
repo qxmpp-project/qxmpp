@@ -65,11 +65,7 @@ class QXmppRosterManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    // FIXME : is this class really necessary?
-    typedef QXmppRosterIq::Item QXmppRosterEntry;
-
     QXmppRosterManager(QXmppClient* stream);
-    ~QXmppRosterManager();
     
     bool isRosterReceived();
     QStringList getRosterBareJids() const;

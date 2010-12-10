@@ -36,7 +36,9 @@
 class QXmppSessionIq : public QXmppIq
 {
 public:
+    /// \cond
     static bool isSessionIq(const QDomElement &element);
+    /// \endcond
 
 private:
     /// \cond

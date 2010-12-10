@@ -32,6 +32,10 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppUtils.h"
 
+/// Request the time from an XMPP entity.
+///
+/// \param jid
+
 QString QXmppEntityTimeManager::requestTime(const QString& jid)
 {
     QXmppEntityTimeIq request;

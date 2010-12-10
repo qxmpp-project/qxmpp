@@ -30,6 +30,8 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
+/// Constructs a roster manager.
+
 QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
     : m_isRosterReceived(false)
 {
@@ -44,11 +46,6 @@ QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
     check = QObject::connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
         this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
-}
-
-QXmppRosterManager::~QXmppRosterManager()
-{
-
 }
 
 /// Upon XMPP connection, request the roster.

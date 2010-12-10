@@ -56,7 +56,9 @@ public:
     QVariantList values() const;
     void setValues(const QVariantList &values);
 
+    /// \cond
     static bool isRpcResponseIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -86,7 +88,9 @@ public:
     QVariantList arguments() const;
     void setArguments(const QVariantList &arguments);
 
+    /// \cond
     static bool isRpcInvokeIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -109,7 +113,9 @@ public:
     QXmppRpcInvokeIq query() const;
     void setQuery(const QXmppRpcInvokeIq &query);
 
+    /// \cond
     static bool isRpcErrorIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond

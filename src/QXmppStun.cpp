@@ -316,6 +316,7 @@ void QXmppStunMessage::setPriority(quint32 priority)
 ///
 /// \param buffer
 /// \param password
+/// \param errors
 
 bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password, QStringList *errors)
 {
@@ -660,6 +661,8 @@ QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint
 /// type, otherwise returns 0.
 ///
 /// \param buffer
+/// \param cookie
+/// \param id
 
 quint16 QXmppStunMessage::peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id)
 {
