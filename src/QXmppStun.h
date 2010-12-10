@@ -108,8 +108,8 @@ private:
     QString m_software;
 };
 
-/// The QXmppIceComponent class represents a piece of a media stream
-/// requiring a single transport address, as defined by RFC 2525
+/// \brief The QXmppIceComponent class represents a piece of a media stream
+/// requiring a single transport address, as defined by RFC 5245
 /// (Interactive Connectivity Establishment).
 
 class QXmppIceComponent : public QXmppLoggable
@@ -227,13 +227,13 @@ public:
     bool isConnected() const;
 
 signals:
-    // This signal is emitted once ICE negotiation succeeds.
+    /// \brief This signal is emitted once ICE negotiation succeeds.
     void connected();
 
-    // This signal is emitted when ICE negotiation fails.
+    /// \brief This signal is emitted when ICE negotiation fails.
     void disconnected();
 
-    // This signal is emitted when the list of local candidates changes.
+    /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
 public slots:

@@ -987,15 +987,27 @@ QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socke
     return pair;
 }
 
+/// Sets the remote user fragment.
+///
+/// \param user
+
 void QXmppIceComponent::setRemoteUser(const QString &user)
 {
     m_remoteUser = user;
 }
 
+/// Sets the remote password.
+///
+/// \param password
+
 void QXmppIceComponent::setRemotePassword(const QString &password)
 {
     m_remotePassword = password;
 }
+
+/// Sets the list of sockets to use for this component.
+///
+/// \param sockets
 
 void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
 {
@@ -1033,6 +1045,12 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         m_stunTimer->start();
     }
 }
+
+/// Sets the STUN server to use to determine server-reflexive addresses
+/// and ports.
+///
+/// \param host The address of the STUN server.
+/// \param port The port of the STUN server.
 
 void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
 {
@@ -1517,6 +1535,12 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
     foreach (QXmppIceComponent *socket, m_components.values())
         socket->setRemotePassword(password);
 }
+
+/// Sets the STUN server to use to determine server-reflexive addresses
+/// and ports.
+///
+/// \param hostName The host name or address of the STUN server.
+/// \param port     The port of the STUN server.
 
 void QXmppIceConnection::setStunServer(const QString &hostName, quint16 port)
 {
