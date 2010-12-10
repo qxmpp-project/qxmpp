@@ -29,30 +29,47 @@
 static const char *ns_archive = "urn:xmpp:archive";
 static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
+/// Returns the archived message's body.
+
 QString QXmppArchiveMessage::body() const
 {
     return m_body;
 }
 
+/// Sets the archived message's body.
+///
+/// \param body
 void QXmppArchiveMessage::setBody(const QString &body)
 {
     m_body = body;
 }
+
+/// Returns the archived message's date.
 
 QDateTime QXmppArchiveMessage::date() const
 {
     return m_date;
 }
 
+//// Sets the archived message's date.
+///
+/// \param date
+
 void QXmppArchiveMessage::setDate(const QDateTime &date)
 {
     m_date = date;
 }
 
+/// Returns true if the archived message was received, false if it was sent.
+
 bool QXmppArchiveMessage::isReceived() const
 {
     return m_received;
 }
+
+/// Set to true if the archived message was received, false if it was sent.
+///
+/// \param isReceived
 
 void QXmppArchiveMessage::setReceived(bool isReceived)
 {
@@ -100,30 +117,42 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Returns the conversation's messages.
+
 QList<QXmppArchiveMessage> QXmppArchiveChat::messages() const
 {
     return m_messages;
 }
+
+/// Returns the start of this conversation.
 
 QDateTime QXmppArchiveChat::start() const
 {
     return m_start;
 }
 
+/// Returns the conversation's subject.
+
 QString QXmppArchiveChat::subject() const
 {
     return m_subject;
 }
+
+/// Returns the conversation's version.
 
 int QXmppArchiveChat::version() const
 {
     return m_version;
 }
 
+/// Returns the JID of the remote party.
+ 
 QString QXmppArchiveChat::with() const
 {
     return m_with;
 }
+
+/// Returns the chat conversation carried by this IQ.
 
 QXmppArchiveChat QXmppArchiveChatIq::chat() const
 {
@@ -147,10 +176,14 @@ void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     m_chat.toXml(writer);
 }
 
+/// Constructs a QXmppArchiveListIq.
+
 QXmppArchiveListIq::QXmppArchiveListIq()
     : QXmppIq(QXmppIq::Get), m_max(0)
 {
 }
+
+/// Returns the list of chat conversations.
 
 QList<QXmppArchiveChat> QXmppArchiveListIq::chats() const
 {

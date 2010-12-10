@@ -31,6 +31,9 @@
 class QXmlStreamWriter;
 class QDomElement;
 
+/// \brief The QXmppArchiveMessage represents an archived message
+/// as defined by XEP-0136: Message Archiving.
+
 class QXmppArchiveMessage
 {
 public:
@@ -49,6 +52,9 @@ private:
     bool m_received;
 };
 
+/// \brief The QXmppArchiveChat represents an archived conversation
+/// as defined by XEP-0136: Message Archiving.
+
 class QXmppArchiveChat
 {
 public:
@@ -58,8 +64,10 @@ public:
     int version() const;
     QString with() const;
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 
 private:
     QList<QXmppArchiveMessage> m_messages;
@@ -80,7 +88,9 @@ class QXmppArchiveChatIq : public QXmppIq
 public:
     QXmppArchiveChat chat() const;
 
+    /// \cond
     static bool isArchiveChatIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -115,7 +125,9 @@ public:
     QDateTime end() const;
     void setEnd(const QDateTime &end );
 
+    /// \cond
     static bool isArchiveListIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -149,7 +161,9 @@ public:
     QString with() const;
     void setWith(const QString &with);
 
+    /// \cond
     static bool isArchiveRetrieveIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
@@ -170,7 +184,9 @@ private:
 class QXmppArchivePrefIq : public QXmppIq
 {
 public:
+    /// \cond
     static bool isArchivePrefIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
