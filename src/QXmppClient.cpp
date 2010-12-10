@@ -32,7 +32,6 @@
 #include "QXmppInvokable.h"
 #include "QXmppMucManager.h"
 #include "QXmppReconnectionManager.h"
-#include "QXmppRpcIq.h"
 #include "QXmppRpcManager.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppRosterManager.h"

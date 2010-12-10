@@ -38,11 +38,11 @@ class QXmppPresence;
 class QXmppMessage;
 class QXmppPacket;
 class QXmppIq;
-class QXmppInvokable;
-class QXmppRpcInvokeIq;
-class QXmppRemoteMethod;
-struct QXmppRemoteMethodResult;
 class QXmppStream;
+
+// obsolete
+class QXmppInvokable;
+struct QXmppRemoteMethodResult;
 
 // managers
 class QXmppArchiveManager;
