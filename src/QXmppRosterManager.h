@@ -31,10 +31,10 @@
 #include <QStringList>
 
 #include "QXmppClientExtension.h"
+#include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 
 class QXmppRosterIq;
-class QXmppPresence;
 
 /// \brief The QXmppRosterManager class provides access to a connected client's roster.
 ///
