@@ -21,46 +21,52 @@
  *
  */
 
+#include <QDebug>
+#include <QTimer>
+
+#include "QXmppRemoteMethod.h"
+#include "QXmppUtils.h"
 
 #include "rpcClient.h"
-#include "QXmppRemoteMethod.h"
-#include <qdebug.h>
-#include <QTimer>
 
 rpcClient::rpcClient(QObject *parent)
     : QXmppClient(parent)
 {
-    connect( this, SIGNAL(connected()), this, SLOT(isConnected()));
+    bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
+                         this, SLOT(slotPresenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 rpcClient::~rpcClient()
 {
-
 }
 
-void rpcClient::isConnected()
-{
-    //We need to wait until we have sent the presense stuff, or for some
-    //reason the server ignores us...
-    QTimer::singleShot(5000, this, SLOT(invokeRemoteMethod()));
-}
-
-void rpcClient::invokeRemoteMethod()
+void rpcClient::slotInvokeRemoteMethod()
 {
     QXmppRemoteMethodResult methodResult = callRemoteMethod(
-            "server@geiseri.com/QXmpp", "RemoteInterface.echoString", "This is a test" );
+            m_remoteJid, "RemoteInterface.echoString", "This is a test" );
     if( methodResult.hasError )
-        error( methodResult.code, methodResult.errorMessage );
+        qDebug() << "Error:" << methodResult.code << methodResult.errorMessage;
     else
-        result( methodResult.result );
+        qDebug() << "Result:" << methodResult.result;
 }
 
-void rpcClient::result(const QVariant &value )
+/// A presence was received.
+
+void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
 {
-    qDebug() << "Result:" << value;
+    const QLatin1String recipient("qxmpp.test1@gmail.com");
+
+    // if we are the recipient, or if the presence is not from the recipient,
+    // do nothing
+    if (jidToBareJid(configuration().jid()) == recipient ||
+        jidToBareJid(presence.from()) != recipient ||
+        presence.type() != QXmppPresence::Available)
+        return;
+
+    // invoke the remote method in 1 second
+    m_remoteJid = presence.from();
+    QTimer::singleShot(1000, this, SLOT(slotInvokeRemoteMethod()));
 }
 
-void rpcClient::error( int code, const QString &message )
-{
-    qDebug() << "Error:" << code << message;
-}

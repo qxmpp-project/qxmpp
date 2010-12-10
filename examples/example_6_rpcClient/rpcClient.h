@@ -35,12 +35,12 @@ public:
     rpcClient(QObject *parent = 0);
     ~rpcClient();
 
-public slots:
-    void isConnected();
-    void invokeRemoteMethod();
-    void result(const QVariant &value );
-    void error( int code, const QString &message );
+private slots:
+    void slotInvokeRemoteMethod();
+    void slotPresenceReceived(const QXmppPresence &presence);
 
+private:
+    QString m_remoteJid;
 };
 
 #endif // RPCCLIENT_H
