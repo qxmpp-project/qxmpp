@@ -422,6 +422,10 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
     return true;
 }
 
+/// Constructs a QXmppTransferManager to handle incoming and outgoing
+/// file transfers.
+///
+/// \param client
 QXmppTransferManager::QXmppTransferManager(QXmppClient *client)
     : m_ibbBlockSize(4096),
     m_proxyOnly(false),

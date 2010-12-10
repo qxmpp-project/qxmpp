@@ -66,7 +66,15 @@ protected:
 
     // Overridable methods
     virtual void handleStart();
+
+    /// Handles an incoming XMPP stanza.
+    ///
+    /// \param element
     virtual void handleStanza(const QDomElement &element) = 0;
+
+    /// Handles an incoming XMPP stream start.
+    ///
+    /// \param element
     virtual void handleStream(const QDomElement &element) = 0;
 
 private slots:

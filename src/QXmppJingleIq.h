@@ -78,12 +78,16 @@ private:
 class QXmppJingleCandidate
 {
 public:
+    /// This enum is used to describe a candidate's type.
     enum Type
     {
-        HostType,
-        PeerReflexiveType,
-        ServerReflexiveType,
-        RelayedType,
+        HostType,               ///< Host candidate, a local address/port.
+        PeerReflexiveType,      ///< Peer-reflexive candidate,
+                                ///< the address/port as seen from the peer.
+        ServerReflexiveType,    ///< Server-reflexive candidate,
+                                ///< the address/port as seen by the STUN server
+        RelayedType,            ///< Relayed candidate, a candidate from
+                                ///< a TURN relay.
     };
 
     QXmppJingleCandidate();
@@ -143,6 +147,7 @@ private:
 class QXmppJingleIq : public QXmppIq
 {
 public:
+    /// This enum is used to describe a Jingle action.
     enum Action {
         ContentAccept,
         ContentAdd,
@@ -278,17 +283,25 @@ public:
     QString sid() const;
     void setSid(const QString &sid);
 
+    /// Returns a reference to the IQ's content element.
     Content& content() { return m_content; };
+
+    /// Returns a const reference to the IQ's content element.
     const Content& content() const { return m_content; };
 
+    /// Returns a reference to the IQ's reason element.
     Reason& reason() { return m_reason; };
+
+    /// Returns a const reference to the IQ's reason element.
     const Reason& reason() const { return m_reason; };
 
     // XEP-0167: Jingle RTP Sessions
     bool ringing() const;
     void setRinging(bool ringing);
 
+    /// \cond
     static bool isJingleIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond

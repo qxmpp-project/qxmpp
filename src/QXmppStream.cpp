@@ -94,6 +94,9 @@ void QXmppStream::disconnectFromHost()
     }
 }
 
+/// Handles a stream start event, which occurs when the underlying transport
+/// becomes ready (socket connected, encryption started).
+
 void QXmppStream::handleStart()
 {
 }

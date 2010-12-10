@@ -131,10 +131,13 @@ public:
 
     // XEP-0096 : File transfer
     QXmppTransferFileInfo fileInfo() const;
+
+    /// \cond
     QDateTime fileDate() const;
     QByteArray fileHash() const;
     QString fileName() const;
     qint64 fileSize() const;
+    /// \endcond
 
 signals:
     /// This signal is emitted when an error is encountered while

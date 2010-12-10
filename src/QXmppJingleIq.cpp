@@ -281,45 +281,71 @@ void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Constructs a QXmppJingleIq.
+
 QXmppJingleIq::QXmppJingleIq()
     : m_ringing(false)
 {
 }
+
+/// Returns the Jingle IQ's action.
 
 QXmppJingleIq::Action QXmppJingleIq::action() const
 {
     return m_action;
 }
 
+/// Sets the Jingle IQ's action.
+///
+/// \param action
+
 void QXmppJingleIq::setAction(QXmppJingleIq::Action action)
 {
     m_action = action;
 }
+
+/// Returns the session initiator.
 
 QString QXmppJingleIq::initiator() const
 {
     return m_initiator;
 }
 
+/// Sets the session initiator.
+///
+/// \param initiator
+
 void QXmppJingleIq::setInitiator(const QString &initiator)
 {
     m_initiator = initiator;
 }
+
+/// Returns the session responder.
 
 QString QXmppJingleIq::responder() const
 {
     return m_responder;
 }
 
+/// Sets the session responder.
+///
+/// \param responder
+
 void QXmppJingleIq::setResponder(const QString &responder)
 {
     m_responder = responder;
 }
 
+/// Returns the session ID.
+
 QString QXmppJingleIq::sid() const
 {
     return m_sid;
 }
+
+/// Sets the session ID.
+///
+/// \param sid
 
 void QXmppJingleIq::setSid(const QString &sid)
 {
@@ -332,10 +358,16 @@ bool QXmppJingleIq::isJingleIq(const QDomElement &element)
     return (jingleElement.namespaceURI() == ns_jingle);
 }
 
+/// Returns true if the call is ringing.
+
 bool QXmppJingleIq::ringing() const
 {
     return m_ringing;
 }
+
+/// Set to true if the call is ringing.
+///
+/// \param ringing
 
 void QXmppJingleIq::setRinging(bool ringing)
 {
@@ -755,6 +787,10 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "ptime", QString::number(m_ptime));
     writer->writeEndElement();
 }
+
+/// Returns true if this QXmppJinglePayloadType and \a other refer to the same payload type.
+///
+/// \param other
 
 bool QXmppJinglePayloadType::operator==(const QXmppJinglePayloadType &other) const
 {
