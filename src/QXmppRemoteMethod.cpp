@@ -24,11 +24,10 @@
 #include "QXmppRemoteMethod.h"
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
-#include "QXmppConfiguration.h"
 
+#include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
-#include <qdebug.h>
 
 QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, const QVariantList &args, QXmppClient *client) :
         QObject(client), m_client(client)
@@ -41,6 +40,8 @@ QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, 
 
 QXmppRemoteMethodResult QXmppRemoteMethod::call( )
 {
+    // FIXME : spinning an event loop is a VERY bad idea, it can cause
+    // us to lose incoming packets
     QEventLoop loop(this);
     connect( this, SIGNAL(callDone()), &loop, SLOT(quit()));
     QTimer::singleShot(30000,&loop, SLOT(quit())); // Timeout incase the other end hangs...
