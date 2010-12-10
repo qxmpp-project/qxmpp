@@ -24,7 +24,14 @@
 #ifndef QXMPPRPCMANAGER_H
 #define QXMPPRPCMANAGER_H
 
+#include <QMap>
+#include <QVariant>
+
 #include "QXmppClientExtension.h"
+
+class QXmppInvokable;
+class QXmppRemoteMethodResult;
+class QXmppRpcInvokeIq;
 
 class QXmppRpcManager : public QXmppClientExtension
 {
@@ -33,10 +40,30 @@ class QXmppRpcManager : public QXmppClientExtension
 public:
     QXmppRpcManager();
 
+    void addInvokableInterface( QXmppInvokable *interface );
+    QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
+                                              const QString &interface,
+                                              const QVariant &arg1 = QVariant(),
+                                              const QVariant &arg2 = QVariant(),
+                                              const QVariant &arg3 = QVariant(),
+                                              const QVariant &arg4 = QVariant(),
+                                              const QVariant &arg5 = QVariant(),
+                                              const QVariant &arg6 = QVariant(),
+                                              const QVariant &arg7 = QVariant(),
+                                              const QVariant &arg8 = QVariant(),
+                                              const QVariant &arg9 = QVariant(),
+                                              const QVariant &arg10 = QVariant() );
+
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(const QDomElement &element);
     /// \endcond
+
+private slots:
+    void invokeInterfaceMethod(const QXmppRpcInvokeIq &iq);
+
+private:
+    QMap<QString,QXmppInvokable*> m_interfaces;
 };
 
 #endif

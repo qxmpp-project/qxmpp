@@ -21,7 +21,10 @@
  *
  */
 
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
+#include "QXmppInvokable.h"
+#include "QXmppRemoteMethod.h"
 #include "QXmppRpcIq.h"
 #include "QXmppRpcManager.h"
 
@@ -29,6 +32,98 @@
 
 QXmppRpcManager::QXmppRpcManager()
 {
+}
+
+void QXmppRpcManager::addInvokableInterface( QXmppInvokable *interface )
+{
+    m_interfaces[ interface->metaObject()->className() ] = interface;
+}
+
+void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
+{
+    QXmppStanza::Error error;
+    
+    const QStringList methodBits = iq.method().split('.');
+    if (methodBits.size() != 2)
+        return;
+    const QString interface = methodBits.first();
+    const QString method = methodBits.last();
+    QXmppInvokable *iface = m_interfaces.value(interface);
+    if (iface)
+    {
+        if ( iface->isAuthorized( iq.from() ) )
+        {
+
+            if ( iface->interfaces().contains(method) )
+            {
+                QVariant result = iface->dispatch(method.toLatin1(),
+                                                  iq.arguments() );
+                QXmppRpcResponseIq resultIq;
+                resultIq.setId(iq.id());
+                resultIq.setTo(iq.from());
+                resultIq.setValues(QVariantList() << result);
+                client()->sendPacket( resultIq );
+                return;
+            }
+            else
+            {
+                error.setType(QXmppStanza::Error::Cancel);
+                error.setCondition(QXmppStanza::Error::ItemNotFound);
+
+            }
+        }
+        else
+        {
+            error.setType(QXmppStanza::Error::Auth);
+            error.setCondition(QXmppStanza::Error::Forbidden);
+        }
+    }
+    else
+    {
+        error.setType(QXmppStanza::Error::Cancel);
+        error.setCondition(QXmppStanza::Error::ItemNotFound);
+    }
+    QXmppRpcErrorIq errorIq;
+    errorIq.setId(iq.id());
+    errorIq.setTo(iq.from());
+    errorIq.setQuery(iq);
+    errorIq.setError(error);
+    client()->sendPacket(errorIq);
+}
+
+QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
+                                          const QString &interface,
+                                          const QVariant &arg1,
+                                          const QVariant &arg2,
+                                          const QVariant &arg3,
+                                          const QVariant &arg4,
+                                          const QVariant &arg5,
+                                          const QVariant &arg6,
+                                          const QVariant &arg7,
+                                          const QVariant &arg8,
+                                          const QVariant &arg9,
+                                          const QVariant &arg10 )
+{
+    QVariantList args;
+    if( arg1.isValid() ) args << arg1;
+    if( arg2.isValid() ) args << arg2;
+    if( arg3.isValid() ) args << arg3;
+    if( arg4.isValid() ) args << arg4;
+    if( arg5.isValid() ) args << arg5;
+    if( arg6.isValid() ) args << arg6;
+    if( arg7.isValid() ) args << arg7;
+    if( arg8.isValid() ) args << arg8;
+    if( arg9.isValid() ) args << arg9;
+    if( arg10.isValid() ) args << arg10;
+
+    QXmppRemoteMethod method( jid, interface, args, client() );
+#if 0
+    connect( d->stream, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
+             &method, SLOT(gotResult(QXmppRpcResponseIq)));
+    connect( d->stream, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
+             &method, SLOT(gotError(QXmppRpcErrorIq)));
+#endif
+    return method.call();
 }
 
 QStringList QXmppRpcManager::discoveryFeatures() const
