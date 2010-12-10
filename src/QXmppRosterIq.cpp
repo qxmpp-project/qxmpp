@@ -29,10 +29,16 @@
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
+/// Adds an item to the roster IQ.
+///
+/// \param item
+
 void QXmppRosterIq::addItem(const Item& item)
 {
     m_items.append(item);
 }
+
+/// Returns the roster IQ's items.
 
 QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 {

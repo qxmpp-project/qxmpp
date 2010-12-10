@@ -98,11 +98,11 @@ public:
     void addItem(const Item&);
     QList<Item> items() const;
 
+    /// \cond
     static bool isRosterIq(const QDomElement &element);
 
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
-    /// \cond
     QList<Item> Q_DECL_DEPRECATED getItems() const;
     /// \endcond
 

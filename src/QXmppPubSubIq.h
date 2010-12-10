@@ -57,6 +57,7 @@ private:
 class QXmppPubSubIq : public QXmppIq
 {
 public:
+    /// This enum is used to describe a publish-subscribe query type.
     enum QueryType
     {
         AffiliationsQuery,
@@ -85,7 +86,9 @@ public:
     QString subscriptionId() const;
     void setSubscriptionId(const QString &id);
 
+    /// \cond
     static bool isPubSubIq(const QDomElement &element);
+    /// \endcond
 
 protected:
     /// \cond
