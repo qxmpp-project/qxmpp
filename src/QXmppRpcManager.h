@@ -30,7 +30,7 @@
 #include "QXmppClientExtension.h"
 
 class QXmppInvokable;
-class QXmppRemoteMethodResult;
+struct QXmppRemoteMethodResult;
 class QXmppRpcErrorIq;
 class QXmppRpcInvokeIq;
 class QXmppRpcResponseIq;
