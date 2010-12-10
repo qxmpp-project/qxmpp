@@ -63,21 +63,28 @@ public:
 
     QXmppConfiguration& configuration();
 
-    void addFeatures(const QStringList &features);
-
 signals:
+    /// This signal is emitted when an error is encountered.
     void error(QXmppClient::Error);
 
     /// This signal is emitted when an element is received.
     void elementReceived(const QDomElement &element, bool &handled);
+
+    /// This signal is emitted when a presence is received.
     void presenceReceived(const QXmppPresence&);
+
+    /// This signal is emitted when a message is received.
     void messageReceived(const QXmppMessage&);
+
+    /// This signal is emitted when an IQ is received.
     void iqReceived(const QXmppIq&);
 
+    /// \cond
     // XEP-0009: Jabber-RPC
     void rpcCallInvoke(const QXmppRpcInvokeIq &invoke);
     void rpcCallResponse(const QXmppRpcResponseIq& result);
     void rpcCallError(const QXmppRpcErrorIq &err);
+    /// \endcond
 
 protected:
     /// \cond

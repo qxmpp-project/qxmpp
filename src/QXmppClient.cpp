@@ -240,10 +240,6 @@ bool QXmppClient::addExtension(QXmppClientExtension* extension)
 
     extension->setParent(this);
     extension->setClient(this);
-
-    // Features
-    d->stream->addFeatures(extension->discoveryFeatures());
-
     d->extensions << extension;
     return true;
 }

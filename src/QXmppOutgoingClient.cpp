@@ -64,9 +64,6 @@ public:
     QAbstractSocket::SocketError socketError;
     QXmppStanza::Error::Condition xmppStreamError;
 
-    // Discovery
-    QStringList extraFeatures;
-
     // State data
     QString bindId;
     QString sessionId;
@@ -719,17 +716,17 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
     sendPacket(authQuery);
 }
 
+/// Returns the type of the last socket error that occured.
+
 QAbstractSocket::SocketError QXmppOutgoingClient::socketError()
 {
     return d->socketError;
 }
+
+/// Returns the type of the last XMPP stream error that occured.
 
 QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 {
     return d->xmppStreamError;
 }
 
-void QXmppOutgoingClient::addFeatures(const QStringList &features)
-{
-    d->extraFeatures << features;
-}
