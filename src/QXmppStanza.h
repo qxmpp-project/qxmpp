@@ -126,7 +126,7 @@ public:
         QString m_text;
     };
 
-    QXmppStanza(const QString& from = "", const QString& to = "");
+    QXmppStanza(const QString& from = QString(), const QString& to = QString());
     ~QXmppStanza();
     
     QString to() const;

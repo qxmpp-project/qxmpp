@@ -34,8 +34,7 @@ uint QXmppStanza::s_uniqeIdNo = 0;
 QXmppStanza::Error::Error():
     m_code(0),
     m_type(static_cast<QXmppStanza::Error::Type>(-1)),
-    m_condition(static_cast<QXmppStanza::Error::Condition>(-1)),
-    m_text("")
+    m_condition(static_cast<QXmppStanza::Error::Condition>(-1))
 {
 }
 
@@ -294,11 +293,19 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
     writer->writeEndElement();
 }
 
+/// Constructs a QXmppStanza with the specified sender and recipient.
+///
+/// \param from
+/// \param to
 
-QXmppStanza::QXmppStanza(const QString& from, const QString& to) : QXmppPacket(),
-m_to(to), m_from(from)
+QXmppStanza::QXmppStanza(const QString& from, const QString& to)
+    : QXmppPacket(),
+    m_to(to),
+    m_from(from)
 {
 }
+
+/// Destroys a QXmppStanza.
 
 QXmppStanza::~QXmppStanza()
 {
@@ -353,30 +360,50 @@ void QXmppStanza::setId(const QString& id)
     m_id = id;
 }
 
+/// Returns the stanza's language.
+
 QString QXmppStanza::lang() const    
 {
     return m_lang;
 }
+
+/// Sets the stanza's language.
+///
+/// \param lang
 
 void QXmppStanza::setLang(const QString& lang)    
 {
     m_lang = lang;
 }
 
+/// Returns the stanza's error.
+
 QXmppStanza::Error QXmppStanza::error() const
 {
     return m_error;
 }
+
+/// Sets the stanza's error.
+///
+/// \param error
 
 void QXmppStanza::setError(const QXmppStanza::Error& error)
 {
     m_error = error;
 }
 
+/// Returns the stanza's "extensions".
+///
+/// Extensions are XML elements which are not handled internally by QXmpp.
+
 QXmppElementList QXmppStanza::extensions() const
 {
     return m_extensions;
 }
+
+/// Sets the stanza's "extensions".
+///
+/// \param extensions
 
 void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 {
