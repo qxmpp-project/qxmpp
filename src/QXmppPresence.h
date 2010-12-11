@@ -36,14 +36,14 @@ public:
     /// This enum is used to describe a presence type.
     enum Type
     {
-        Error = 0,
-        Available,
-        Unavailable,
-        Subscribe,
-        Subscribed,
-        Unsubscribe,
-        Unsubscribed,
-        Probe
+        Error = 0,      ///< An error has occurred regarding processing or delivery of a previously-sent presence stanza.
+        Available,      ///< Signals that the sender is online and available for communication.
+        Unavailable,    ///< Signals that the sender is no longer available for communication.
+        Subscribe,      ///< The sender wishes to subscribe to the recipient's  presence.
+        Subscribed,     ///< The sender has allowed the recipient to receive their presence.
+        Unsubscribe,    ///< The sender is unsubscribing from another entity's presence.
+        Unsubscribed,   ///< The subscription request has been denied or a previously-granted subscription has been cancelled.
+        Probe           ///< A request for an entity's current presence; SHOULD be generated only by a server on behalf of a user.
     };
 
     // XEP-0153: vCard-Based Avatars
@@ -59,18 +59,24 @@ public:
                                 ///< client doesn't know it temporarily.
     };
 
+    /// The QXmppPresence::Status class represents the status of an XMPP entity.
+    ///
+    /// It stores information such as the "away", "busy" status of a user, or
+    /// a human-readable description.
+
     class Status
     {
     public:
+        /// This enum is used to describe an availability status.
         enum Type
         {
-            Offline = 0, 
-            Online, 
-            Away, 
-            XA, 
-            DND, 
-            Chat,
-            Invisible 
+            Offline = 0,
+            Online,      ///< The entity or resource is online.
+            Away,        ///< The entity or resource is temporarily away.
+            XA,          ///< The entity or resource is away for an extended period. 
+            DND,         ///< The entity or resource is busy ("Do Not Disturb").
+            Chat,        ///< The entity or resource is actively interested in chatting.
+            Invisible
         };
 
         Status(QXmppPresence::Status::Type type = QXmppPresence::Status::Online,

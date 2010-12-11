@@ -303,6 +303,8 @@ void QXmppPresence::setTypeFromStr(const QString& str)
     }
 }
 
+/// Constructs a presence status.
+
 QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
                              const QString statusText, int priority) :
                                 m_type(type),
@@ -310,10 +312,14 @@ QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
 {
 }
 
+/// Returns the status type, for instance busy or away.
+
 QXmppPresence::Status::Type QXmppPresence::Status::type() const
 {
     return m_type;
 }
+
+/// Sets the status type.
 
 void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
 {
@@ -396,20 +402,32 @@ QString QXmppPresence::Status::getTypeStr() const
     return text;
 }
 
+/// Returns the status text, a textual description of the user's status.
+
 QString QXmppPresence::Status::statusText() const
 {
     return m_statusText;
 }
+
+/// Sets the status text, a textual description of the user's status.
+///
+/// \param str The status text, for example "Gone fishing".
 
 void QXmppPresence::Status::setStatusText(const QString& str)
 {
     m_statusText = str;
 }
 
+/// Returns the priority level of the resource.
+
 int QXmppPresence::Status::priority() const
 {
     return m_priority;
 }
+
+/// Sets the priority level of the resource.
+///
+/// \param priority
 
 void QXmppPresence::Status::setPriority(int priority)
 {
