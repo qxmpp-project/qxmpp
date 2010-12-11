@@ -37,8 +37,8 @@ class QXmppStream;
 /// \brief The QXmppClientExtension class is the base class for QXmppClient
 /// extensions.
 ///
-/// If you want to extend QXmpp, for instance to support an IQ type which
-/// is not natively supported by QXmpp, you can subclass QXmppClientExtension
+/// If you want to extend QXmppClient, for instance to support an IQ type
+/// which is not natively supported, you can subclass QXmppClientExtension
 /// and implement handleStanza(). You can then add your extension to the
 /// client instance using QXmppClient::addExtension().
 ///
