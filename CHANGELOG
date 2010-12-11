@@ -28,6 +28,8 @@ QXmpp 0.3.0 (Unreleased)
   - Improve STUN support for VoIP calls by detecting server-reflexive address.
   - Add QXMPP_VERSION and QXmppVersion() for compile and run time version check  
   - Documentation updates
+  - Fix Symbian build
+  - Remove QtGui dependency
   
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
