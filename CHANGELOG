@@ -5,10 +5,14 @@ QXmpp 0.3.0 (Unreleased)
     * XEP-0202: Entity Time
 
   - New Classes
+    * QXmppClientExtension: base class for QXmppClient extensions (managers)
     * QXmppServer: base class for building XMPP servers
-    * QXmppVersionManager: manager class for XEP-0092: Software Version
+    * QXmppServerExtension: base class for QXmppServer extensions
     * QXmppDiscoveryManager: manager class for XEP-0030: Service Discovery
-    * QXmppClientExtension: base class for managers
+    * QXmppVersionManager: manager class for XEP-0092: Software Version
+    * QXmppIceConnection: class representing an Interactive Connectivity
+      Establishment (ICE) over UDP "connection"
+    * QXmppRtpChannel: class representing an RTP audio channel for VoIP calls
   
   * Refactor QXmppVCardManager to use QXmppClientExtension
     
@@ -27,12 +31,11 @@ QXmpp 0.3.0 (Unreleased)
     challenge message sent by the server.
   - Add support for the birthday and URL attributes in vCards.
   - Improve STUN support for VoIP calls by detecting server-reflexive address.
-  - Add QXMPP_VERSION and QXmppVersion() for compile and run time version check  
-  - Documentation updates
-  - Fix Symbian build
-  - Remove QtGui dependency
-  - Fix MSVC build
-  - SASL refactoring
+  - Add QXMPP_VERSION and QXmppVersion() for compile and run time version checks. 
+  - Improve code documentation coverage and quality.
+  - Remove dependency on QtGui, making it easier to write console applications.
+  - Fix MSVC 2005 and 2008 build issues.
+  - Fix Symbian build issues, add DNS SRV support for Symbian devices.
   
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
