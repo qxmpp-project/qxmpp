@@ -14,6 +14,7 @@ QXmpp 0.3.0 (Unreleased)
     
   - New Examples
     * example_9_vCard: vCard handling example
+    * GuiClient: Graphical chat client, test bench for QXmpp functionalities
 
   - Deprecation
     * QXmppVCard class name changed to QXmppVCardIq
