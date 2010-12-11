@@ -42,6 +42,13 @@ class QXmppStream;
 
 /// \brief The QXmppServer class represents an XMPP server.
 ///
+/// It provides support for both client-to-server and server-to-server
+/// communications, SSL encryption and logging facilities.
+///
+/// QXmppServer comes with a number of modules for service discovery,
+/// XMPP ping, statistics and file transfer proxy support. You can write
+/// your own extensions for QXmppServer by subclassing QXmppServerExtension.
+///
 /// \ingroup Core
 
 class QXmppServer : public QXmppLoggable

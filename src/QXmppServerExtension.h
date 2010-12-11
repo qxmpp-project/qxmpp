@@ -38,6 +38,12 @@ class QXmppStream;
 /// \brief The QXmppServerExtension class is the base class for QXmppServer
 /// extensions.
 ///
+/// If you want to extend QXmppServer, for instance to support an IQ type
+/// which is not natively supported, you can subclass QXmppServerExtension
+/// and implement handleStanza(). You can then add your extension to the
+/// client instance using QXmppServer::addExtension().
+///
+/// \ingroup Core
 
 class QXmppServerExtension : public QXmppLoggable
 {
