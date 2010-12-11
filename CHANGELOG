@@ -30,6 +30,8 @@ QXmpp 0.3.0 (Unreleased)
   - Documentation updates
   - Fix Symbian build
   - Remove QtGui dependency
+  - Fix MSVC build
+  - SASL refactoring
   
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
