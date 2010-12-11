@@ -27,6 +27,7 @@ QXmpp 0.3.0 (Unreleased)
   - Add support for the birthday and URL attributes in vCards.
   - Improve STUN support for VoIP calls by detecting server-reflexive address.
   - Add QXMPP_VERSION and QXmppVersion() for compile and run time version check  
+  - Documentation updates
   
 QXmpp 0.2.0 (Aug 22, 2010)
 --------------------------
