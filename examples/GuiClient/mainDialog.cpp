@@ -244,10 +244,10 @@ void mainDialog::presenceChanged(const QString& bareJid, const QString& resource
         case QXmppPresence::VCardUpdateNone:
             if(!m_vCardCache.isVCardAvailable(bareJid))
                 m_vCardCache.requestVCard(bareJid);
-        case QXmppPresence::PhotoNotReady:
+        case QXmppPresence::VCardUpdateNotReady:
             break;
-        case QXmppPresence::PhotoNotAdvertized:
-        case QXmppPresence::PhotoAdvertised:
+        case QXmppPresence::VCardUpdateNoPhoto:
+        case QXmppPresence::VCardUpdateValidPhoto:
             if(m_vCardCache.getPhotoHash(bareJid) != pre.photoHash())
                 m_vCardCache.requestVCard(bareJid);
             break;
@@ -875,9 +875,9 @@ void mainDialog::addPhotoHash(QXmppPresence& pre)
     {
         QByteArray hash = m_vCardCache.getPhotoHash(clientBareJid);
         if(hash.isEmpty())
-            pre.setVCardUpdateType(QXmppPresence::PhotoNotAdvertized);
+            pre.setVCardUpdateType(QXmppPresence::VCardUpdateNoPhoto);
         else
-            pre.setVCardUpdateType(QXmppPresence::PhotoAdvertised);
+            pre.setVCardUpdateType(QXmppPresence::VCardUpdateValidPhoto);
         pre.setPhotoHash(hash);
     }
     else
