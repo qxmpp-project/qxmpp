@@ -55,6 +55,8 @@ public:
         PhotoNotAdvertized,     ///< User is not using any image
         PhotoAdvertised,        ///< User is advertising an image
         PhotoNotReady           ///< User is not ready to advertise an image
+/// \note This enables recipients to distinguish between the absence of an image
+/// (empty photo element) and mere support for the protocol (empty update child).
     };
 
     /// The QXmppPresence::Status class represents the status of an XMPP entity.
