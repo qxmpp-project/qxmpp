@@ -40,7 +40,7 @@ class QXmppArchivePrefIq;
 /// the QXmppClient instance as follows:
 ///
 /// \code
-/// QXmppArchiveManager *manager = new QXmppArchiveManager(client);
+/// QXmppArchiveManager *manager = new QXmppArchiveManager;
 /// client->addExtension(manager);
 /// \endcode
 ///
