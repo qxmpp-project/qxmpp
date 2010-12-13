@@ -30,12 +30,10 @@
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
 
-/// Constructs a QXmppMucManager to interact with multi-user chat rooms.
-///
-/// \param client
-
-QXmppMucManager::QXmppMucManager(QXmppClient* client)
+void QXmppMucManager::setClient(QXmppClient* client)
 {
+    QXmppClientExtension::setClient(client);
+
     bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
         this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);

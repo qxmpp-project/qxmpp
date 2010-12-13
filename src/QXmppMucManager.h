@@ -38,6 +38,14 @@ class QXmppMucOwnerIq;
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by XEP-0045: Multi-User Chat.
 ///
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
+///
+/// \code
+/// QXmppMucManager *manager = new QXmppMucManager;
+/// client->addExtension(manager);
+/// \endcode
+///
 /// \ingroup Managers
 
 class QXmppMucManager : public QXmppClientExtension
@@ -45,8 +53,6 @@ class QXmppMucManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    QXmppMucManager(QXmppClient* client);
-
     bool joinRoom(const QString &roomJid, const QString &nickName, const QString &password = QString());
     bool leaveRoom(const QString &roomJid);
 
@@ -81,6 +87,11 @@ signals:
     ///
     /// \sa roomParticipants()
     void roomParticipantChanged(const QString &roomJid, const QString &nickName);
+
+protected:
+    /// \cond
+    void setClient(QXmppClient* client);
+    /// \endcond
 
 private slots:
     void messageReceived(const QXmppMessage &message);
