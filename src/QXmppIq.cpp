@@ -40,6 +40,7 @@ QXmppIq::QXmppIq(QXmppIq::Type type)
 
 /// Returns the IQ's type.
 ///
+/// \return QXmppIq::Type
 
 QXmppIq::Type QXmppIq::type() const
 {
@@ -48,7 +49,7 @@ QXmppIq::Type QXmppIq::type() const
 
 /// Sets the IQ's type.
 ///
-/// \param type
+/// \param type as QXmppIq::Type
 
 void QXmppIq::setType(QXmppIq::Type type)
 {
