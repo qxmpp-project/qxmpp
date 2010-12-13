@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *	Manjeet Dahiya
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -21,10 +22,13 @@
  *
  */
 
+#include <QCoreApplication>
 
-#include <QtCore/QCoreApplication>
-#include "rpcClient.h"
+#include "QXmppClient.h"
 #include "QXmppLogger.h"
+#include "QXmppRpcManager.h"
+
+#include "remoteinterface.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,7 +36,13 @@ int main(int argc, char *argv[])
     
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
-    rpcClient client;
+    QXmppClient client;
+
+    // add RPC extension and register interface
+    QXmppRpcManager *manager = new QXmppRpcManager;
+    client.addExtension(manager);
+    manager->addInvokableInterface(new RemoteInterface(&client));
+
     client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
     return a.exec();
 }
