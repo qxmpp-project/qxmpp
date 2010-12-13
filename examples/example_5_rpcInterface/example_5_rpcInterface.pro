@@ -3,10 +3,8 @@ include(../examples.pri)
 TARGET = example_5_rpcInterface
 
 SOURCES += main.cpp \
-           rpcClient.cpp \
            remoteinterface.cpp
 
-HEADERS += rpcClient.h \
-           remoteinterface.h
+HEADERS += remoteinterface.h
 
 OTHER_FILES += README
