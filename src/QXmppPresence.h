@@ -51,12 +51,10 @@ public:
     {
         // TODO fix the enum names PhotoNotAdvertized is confusing
         // All of these should start with VCardUpdate
-        VCardUpdateNone = 0,    ///< Protocol not supported
-        PhotoNotAdvertized,     ///< Not using any avatar
-        PhotoAdvertised,        ///< Using an avatar
-        PhotoNotReady           ///< No info available about the avatar.
-                                ///< It might be there in the vCard but the contact's
-                                ///< client doesn't know it temporarily.
+        VCardUpdateNone = 0,    ///< Protocol is not supported
+        PhotoNotAdvertized,     ///< User is not using any image
+        PhotoAdvertised,        ///< User is advertising an image
+        PhotoNotReady           ///< User is not ready to advertise an image
     };
 
     /// The QXmppPresence::Status class represents the status of an XMPP entity.
