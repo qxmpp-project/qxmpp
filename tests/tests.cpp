@@ -420,7 +420,7 @@ void TestPackets::testPresence()
     QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
     QCOMPARE(presence.photoHash(), QByteArray(""));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoNotReady);
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateNotReady);
     serializePacket(presence, xml);
 }
 
@@ -464,7 +464,7 @@ void TestPackets::testPresenceWithVCardUpdate()
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
     serializePacket(presence, xml);
 }
 
@@ -489,7 +489,7 @@ void TestPackets::testPresenceWithCapability()
     QCOMPARE(presence.status().statusText(), QString("In a meeting"));
     QCOMPARE(presence.status().priority(), 5);
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::PhotoAdvertised);
+    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
     QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
     QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
