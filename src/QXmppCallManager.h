@@ -134,7 +134,7 @@ private:
 /// the QXmppClient instance as follows:
 ///
 /// \code
-/// QXmppCallManager *manager = new QXmppCallManager(client);
+/// QXmppCallManager *manager = new QXmppCallManager;
 /// client->addExtension(manager);
 /// \endcode
 ///
@@ -145,7 +145,7 @@ class QXmppCallManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    QXmppCallManager(QXmppClient *client);
+    QXmppCallManager();
     ~QXmppCallManager();
     QXmppCall *call(const QString &jid);
 
@@ -160,6 +160,11 @@ signals:
     /// To accept the call, invoke the call's QXmppCall::accept() method.
     /// To refuse the call, invoke the call's QXmppCall::hangup() method.
     void callReceived(QXmppCall *call);
+
+protected:
+    /// \cond
+    void setClient(QXmppClient* client);
+    /// \endcond
 
 private slots:
     void callDestroyed(QObject *object);

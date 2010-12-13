@@ -281,16 +281,10 @@ bool QXmppCallManagerPrivate::sendRequest(QXmppCall *call, const QXmppJingleIq &
 /// Constructs a QXmppCallManager object to handle incoming and outgoing
 /// Voice-Over-IP calls.
 ///
-/// \param client
 
-QXmppCallManager::QXmppCallManager(QXmppClient *client)
+QXmppCallManager::QXmppCallManager()
 {
     d = new QXmppCallManagerPrivate(this);
-
-    bool check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-        this, SLOT(iqReceived(QXmppIq)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 /// Destroys the QXmppCallManager object.
@@ -324,6 +318,16 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
     }
 
     return false;
+}
+
+void QXmppCallManager::setClient(QXmppClient *client)
+{
+    QXmppClientExtension::setClient(client);
+
+    bool check = connect(client, SIGNAL(iqReceived(QXmppIq)),
+        this, SLOT(iqReceived(QXmppIq)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 /// Initiates a new outgoing call to the specified recipient.

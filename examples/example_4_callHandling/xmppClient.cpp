@@ -37,7 +37,7 @@ xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
     // add QXmppCallManager extension
-    callManager = new QXmppCallManager(this);
+    callManager = new QXmppCallManager;
     addExtension(callManager);
 
     bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
