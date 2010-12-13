@@ -452,20 +452,36 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
 }
 
+/// Returns the photo-hash of the VCardUpdate.
+///
+/// \return QByteArray
+
 QByteArray QXmppPresence::photoHash() const
 {
     return m_photoHash;
 }
+
+/// Sets the photo-hash of the VCardUpdate.
+///
+/// \param photoHash as QByteArray
 
 void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
 {
     m_photoHash = photoHash;
 }
 
+/// Returns the type of VCardUpdate
+///
+/// \return VCardUpdateType
+
 QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType()
 {
     return m_vCardUpdateType;
 }
+
+/// Sets the type of VCardUpdate
+///
+/// \param type VCardUpdateType
 
 void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
 {
