@@ -130,6 +130,14 @@ private:
 /// (RFC 5245) and data is transferred using Real Time Protocol (RFC 3550)
 /// packets.
 ///
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
+///
+/// \code
+/// QXmppCallManager *manager = new QXmppCallManager(client);
+/// client->addExtension(manager);
+/// \endcode
+///
 /// \ingroup Managers
 
 class QXmppCallManager : public QXmppClientExtension
