@@ -557,7 +557,7 @@ QXmppSrvInfoLookupManager::QXmppSrvInfoLookupManager()
     moveToThread(QCoreApplication::instance()->thread());
     connect(QCoreApplication::instance(), SIGNAL(destroyed()),
             SLOT(waitForThreadPoolDone()), Qt::DirectConnection);
-    setMaxThreadCount(5); // do 5 SRV lookups in parallel
+    setMaxThreadCount(1); // don't do parallel SRV lookups
 }
 
 void QXmppSrvInfoLookupRunnable::run()
