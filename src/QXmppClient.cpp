@@ -24,25 +24,22 @@
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
+#include "QXmppConstants.h"
 #include "QXmppLogger.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppMessage.h"
+#include "QXmppUtils.h"
 
 #include "QXmppArchiveManager.h"
-#include "QXmppInvokable.h"
 #include "QXmppMucManager.h"
 #include "QXmppReconnectionManager.h"
-#include "QXmppRpcManager.h"
-#include "QXmppRemoteMethod.h"
 #include "QXmppRosterManager.h"
-#include "QXmppUtils.h"
 #include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppDiscoveryIq.h"
-#include "QXmppConstants.h"
 
 class QXmppClientPrivate
 {
@@ -59,7 +56,6 @@ public:
     QXmppMucManager *mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
-    QXmppRpcManager *rpcManager;    ///< Pointer to the RPC manager
     QXmppTransferManager *transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
     QXmppVersionManager *versionManager;      ///< Pointer to the version manager
@@ -182,9 +178,6 @@ QXmppClient::QXmppClient(QObject *parent)
     // TODO move manager references to d->extensions
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
-
-    d->rpcManager = new QXmppRpcManager;
-    addExtension(d->rpcManager);
 
     d->archiveManager = new QXmppArchiveManager;
     addExtension(d->archiveManager);
@@ -590,27 +583,6 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
             return;
         }
     }
-}
-
-void QXmppClient::addInvokableInterface( QXmppInvokable *interface )
-{
-    d->rpcManager->addInvokableInterface(interface);
-}
-
-QXmppRemoteMethodResult QXmppClient::callRemoteMethod( const QString &jid,
-                                          const QString &interface,
-                                          const QVariant &arg1,
-                                          const QVariant &arg2,
-                                          const QVariant &arg3,
-                                          const QVariant &arg4,
-                                          const QVariant &arg5,
-                                          const QVariant &arg6,
-                                          const QVariant &arg7,
-                                          const QVariant &arg8,
-                                          const QVariant &arg9,
-                                          const QVariant &arg10 )
-{
-    return d->rpcManager->callRemoteMethod(jid, interface, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 }
 
 /// Returns the reference to QXmppArchiveManager, implementation of XEP-0136.

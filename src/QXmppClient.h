@@ -40,10 +40,6 @@ class QXmppPacket;
 class QXmppIq;
 class QXmppStream;
 
-// obsolete
-class QXmppInvokable;
-struct QXmppRemoteMethodResult;
-
 // managers
 class QXmppArchiveManager;
 class QXmppDiscoveryIq;
@@ -149,22 +145,6 @@ public:
     bool setReconnectionManager(QXmppReconnectionManager*);
 
     /// \cond
-    // FIXME: these methods are not in keeping with the "manager" approach,
-    // the whole RPC support either needs some love or should be pulled.
-    void addInvokableInterface( QXmppInvokable *interface );
-    QXmppRemoteMethodResult callRemoteMethod( const QString &jid,
-                                              const QString &interface,
-                                              const QVariant &arg1 = QVariant(),
-                                              const QVariant &arg2 = QVariant(),
-                                              const QVariant &arg3 = QVariant(),
-                                              const QVariant &arg4 = QVariant(),
-                                              const QVariant &arg5 = QVariant(),
-                                              const QVariant &arg6 = QVariant(),
-                                              const QVariant &arg7 = QVariant(),
-                                              const QVariant &arg8 = QVariant(),
-                                              const QVariant &arg9 = QVariant(),
-                                              const QVariant &arg10 = QVariant() );
-
     // FIXME: these methods are deprecated, their API is just too hard to read.
     // If you need this level of customisation, work directly with QXmppConfiguration.
     void Q_DECL_DEPRECATED connectToServer(const QString& host,
