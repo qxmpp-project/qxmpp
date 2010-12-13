@@ -98,7 +98,10 @@ void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     client()->sendPacket(errorIq);
 }
 
-/// Call a remote method using RPC with the specified arguments.
+/// Calls a remote method using RPC with the specified arguments.
+///
+/// \note This method blocks until the response is received, and it may
+/// cause XMPP stanzas to be lost!
 
 QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
                                           const QString &interface,
