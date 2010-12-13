@@ -28,6 +28,7 @@
 #include "QXmppClient.h"
 
 class QXmppArchiveChat;
+class QXmppArchiveManager;
 
 class xmppClient : public QXmppClient
 {
@@ -41,6 +42,9 @@ public slots:
     void clientConnected();
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void archiveChatReceived(const QXmppArchiveChat &chat);
+
+private:
+    QXmppArchiveManager *archiveManager;
 };
 
 #endif // XMPPCLIENT_H

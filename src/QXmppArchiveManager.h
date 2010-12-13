@@ -36,6 +36,14 @@ class QXmppArchivePrefIq;
 /// \brief The QXmppArchiveManager class makes it possible to access message
 /// archives as defined by XEP-0136: Message Archiving.
 ///
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
+///
+/// \code
+/// QXmppArchiveManager *manager = new QXmppArchiveManager(client);
+/// client->addExtension(manager);
+/// \endcode
+///
 /// \note Few servers support message archiving. Check if the server in use supports
 /// this XEP.
 ///

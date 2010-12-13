@@ -30,7 +30,6 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "QXmppArchiveManager.h"
 #include "QXmppMucManager.h"
 #include "QXmppReconnectionManager.h"
 #include "QXmppRosterManager.h"
@@ -52,7 +51,6 @@ public:
                           ///< TCP socket and XMPP protocol
     QXmppPresence clientPresence; ///< Stores the current presence of the connected client
 
-    QXmppArchiveManager *archiveManager;  ///< Pointer to the archive manager
     QXmppMucManager *mucManager;          ///< Pointer to the multi-user chat manager
     QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
@@ -178,9 +176,6 @@ QXmppClient::QXmppClient(QObject *parent)
     // TODO move manager references to d->extensions
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
-
-    d->archiveManager = new QXmppArchiveManager;
-    addExtension(d->archiveManager);
 
     d->mucManager = new QXmppMucManager(this);
     addExtension(d->mucManager);
@@ -583,15 +578,6 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
             return;
         }
     }
-}
-
-/// Returns the reference to QXmppArchiveManager, implementation of XEP-0136.
-/// http://xmpp.org/extensions/xep-0136.html
-///
-
-QXmppArchiveManager& QXmppClient::archiveManager()
-{
-    return *d->archiveManager;
 }
 
 /// Returns the reference to QXmppMucManager, implementation of XEP-0045.
