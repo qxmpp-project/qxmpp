@@ -28,12 +28,28 @@
 #include <QVariant>
 
 #include "QXmppClientExtension.h"
+#include "QXmppInvokable.h"
+#include "QXmppRemoteMethod.h"
 
-class QXmppInvokable;
-struct QXmppRemoteMethodResult;
 class QXmppRpcErrorIq;
 class QXmppRpcInvokeIq;
 class QXmppRpcResponseIq;
+
+/// \brief The QXmppRpcManager class make it possible to invoke remote methods
+/// and to expose local interfaces for remote procedure calls, as specified by
+/// XEP-0009: Jabber-RPC.
+///
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
+///
+/// \code
+/// QXmppRpcManager *manager = new QXmppRpcManager;
+/// client->addExtension(manager);
+/// \endcode
+///
+/// \note THIS API IS NOT FINALIZED YET
+///
+/// \ingroup Managers
 
 class QXmppRpcManager : public QXmppClientExtension
 {

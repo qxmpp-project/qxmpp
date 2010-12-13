@@ -34,10 +34,18 @@ QXmppRpcManager::QXmppRpcManager()
 {
 }
 
+/// Adds a local interface which can be queried using RPC.
+///
+/// \param interface
+
 void QXmppRpcManager::addInvokableInterface( QXmppInvokable *interface )
 {
     m_interfaces[ interface->metaObject()->className() ] = interface;
 }
+
+/// Invokes a remote interface using RPC.
+///
+/// \param iq
 
 void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
 {
@@ -89,6 +97,8 @@ void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     errorIq.setError(error);
     client()->sendPacket(errorIq);
 }
+
+/// Call a remote method using RPC with the specified arguments.
 
 QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
                                           const QString &interface,
