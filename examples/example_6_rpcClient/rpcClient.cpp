@@ -25,7 +25,6 @@
 #include <QDebug>
 #include <QTimer>
 
-#include "QXmppRemoteMethod.h"
 #include "QXmppRpcManager.h"
 #include "QXmppUtils.h"
 

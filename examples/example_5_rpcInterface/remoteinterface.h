@@ -1,7 +1,7 @@
 #ifndef REMOTEINTERFACE_H
 #define REMOTEINTERFACE_H
 
-#include "QXmppInvokable.h"
+#include "QXmppRpcManager.h"
 
 class RemoteInterface : public QXmppInvokable
 {
