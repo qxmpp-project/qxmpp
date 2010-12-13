@@ -175,7 +175,7 @@ QXmppClient::QXmppClient(QObject *parent)
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
 
-    d->transferManager = new QXmppTransferManager(this);
+    d->transferManager = new QXmppTransferManager;
     addExtension(d->transferManager);
 
     d->vCardManager = new QXmppVCardManager;

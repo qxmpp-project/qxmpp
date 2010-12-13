@@ -190,7 +190,7 @@ class QXmppTransferManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    QXmppTransferManager(QXmppClient *client);
+    QXmppTransferManager();
     QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
@@ -219,6 +219,11 @@ signals:
     ///
     /// \sa QXmppTransferJob::finished()
     void finished(QXmppTransferJob *job);
+
+protected:
+    /// \cond
+    void setClient(QXmppClient* client);
+    /// \endcond
 
 private slots:
     void iqReceived(const QXmppIq&);

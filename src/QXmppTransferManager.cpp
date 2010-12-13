@@ -424,29 +424,35 @@ bool QXmppTransferJob::writeData(const QByteArray &data)
 
 /// Constructs a QXmppTransferManager to handle incoming and outgoing
 /// file transfers.
-///
-/// \param client
-QXmppTransferManager::QXmppTransferManager(QXmppClient *client)
+
+QXmppTransferManager::QXmppTransferManager()
     : m_ibbBlockSize(4096),
     m_proxyOnly(false),
     m_socksServer(0),
     m_supportedMethods(QXmppTransferJob::AnyMethod)
 {
-    // XEP-0047: In-Band Bytestreams
-    bool check = QObject::connect(client, SIGNAL(iqReceived(const QXmppIq&)),
-        this, SLOT(iqReceived(const QXmppIq&)));
-    Q_ASSERT(check);
-
     // start SOCKS server
     m_socksServer = new QXmppSocksServer(this);
     if (m_socksServer->listen())
     {
-        check = connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
+        bool check = connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
                         this, SLOT(socksServerConnected(QTcpSocket*, const QString&, quint16)));
         Q_ASSERT(check);
+        Q_UNUSED(check);
     } else {
         qWarning("QXmppSocksServer could not start listening");
     }
+}
+
+void QXmppTransferManager::setClient(QXmppClient *client)
+{
+    QXmppClientExtension::setClient(client);
+
+    // XEP-0047: In-Band Bytestreams
+    bool check = QObject::connect(client, SIGNAL(iqReceived(const QXmppIq&)),
+        this, SLOT(iqReceived(const QXmppIq&)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
