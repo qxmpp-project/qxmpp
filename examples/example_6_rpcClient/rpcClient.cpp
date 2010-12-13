@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *	Ian Reinhart Geiser
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -25,6 +26,7 @@
 #include <QTimer>
 
 #include "QXmppRemoteMethod.h"
+#include "QXmppRpcManager.h"
 #include "QXmppUtils.h"
 
 #include "rpcClient.h"
@@ -32,6 +34,11 @@
 rpcClient::rpcClient(QObject *parent)
     : QXmppClient(parent)
 {
+    // add RPC manager
+    m_rpcManager = new QXmppRpcManager;
+    addExtension(m_rpcManager);
+
+    // observe incoming presences
     bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
                          this, SLOT(slotPresenceReceived(QXmppPresence)));
     Q_ASSERT(check);
@@ -44,7 +51,7 @@ rpcClient::~rpcClient()
 
 void rpcClient::slotInvokeRemoteMethod()
 {
-    QXmppRemoteMethodResult methodResult = callRemoteMethod(
+    QXmppRemoteMethodResult methodResult = m_rpcManager->callRemoteMethod(
             m_remoteJid, "RemoteInterface.echoString", "This is a test" );
     if( methodResult.hasError )
         qDebug() << "Error:" << methodResult.code << methodResult.errorMessage;

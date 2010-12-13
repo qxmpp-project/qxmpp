@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2008-2010 The QXmpp developers
  *
- * Author:
+ * Authors:
  *	Ian Reinhart Geiser
+ *	Jeremy Lainé
  *
  * Source:
  *	http://code.google.com/p/qxmpp
@@ -27,6 +28,8 @@
 
 #include "QXmppClient.h"
 
+class QXmppRpcManager;
+
 class rpcClient : public QXmppClient
 {
     Q_OBJECT
@@ -41,6 +44,7 @@ private slots:
 
 private:
     QString m_remoteJid;
+    QXmppRpcManager *m_rpcManager;
 };
 
 #endif // RPCCLIENT_H
