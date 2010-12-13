@@ -49,12 +49,11 @@ public:
     // XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
-        // TODO fix the enum names PhotoNotAdvertized is confusing
-        // All of these should start with VCardUpdate
         VCardUpdateNone = 0,    ///< Protocol is not supported
-        PhotoNotAdvertized,     ///< User is not using any image
-        PhotoAdvertised,        ///< User is advertising an image
-        PhotoNotReady           ///< User is not ready to advertise an image
+        VCardUpdateNoPhoto,     ///< User is not using any image
+        VCardUpdateValidPhoto,  ///< User is advertising an image
+        VCardUpdateNotReady     ///< User is not ready to advertise an image
+
 /// \note This enables recipients to distinguish between the absence of an image
 /// (empty photo element) and mere support for the protocol (empty update child).
     };

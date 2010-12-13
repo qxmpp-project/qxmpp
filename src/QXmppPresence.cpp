@@ -115,14 +115,14 @@ void QXmppPresence::parse(const QDomElement &element)
             {
                 m_photoHash = QByteArray::fromHex(photoElement.text().toAscii());
                 if(m_photoHash.isEmpty())
-                    m_vCardUpdateType = PhotoNotAdvertized;
+                    m_vCardUpdateType = VCardUpdateNoPhoto;
                 else
-                    m_vCardUpdateType = PhotoAdvertised;
+                    m_vCardUpdateType = VCardUpdateValidPhoto;
             }
             else
             {
                 m_photoHash = QByteArray();
-                m_vCardUpdateType = PhotoNotReady;
+                m_vCardUpdateType = VCardUpdateNotReady;
             }
         }
         // XEP-0115: Entity Capabilities
@@ -174,13 +174,13 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddAttribute(xmlWriter, "xmlns", ns_vcard_update);
         switch(m_vCardUpdateType)
         {
-        case PhotoNotAdvertized:
+        case VCardUpdateNoPhoto:
             helperToXmlAddTextElement(xmlWriter, "photo", "");
             break;
-        case PhotoAdvertised:
+        case VCardUpdateValidPhoto:
             helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash.toHex());
             break;
-        case PhotoNotReady:
+        case VCardUpdateNotReady:
             break;
         default:
             break;
