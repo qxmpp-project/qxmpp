@@ -34,7 +34,7 @@
 #include "QXmppVCard.h"
 #undef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 
-/// \brief The QXmppVCardManager gets/sets XMPP vCards. It is an
+/// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
 /// implentation of <B>XEP-0054: vcard-temp</B>.
 ///
 /// \note It's object should not be created using it's constructor. Instead

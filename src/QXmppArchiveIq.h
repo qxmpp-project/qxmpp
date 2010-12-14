@@ -31,7 +31,7 @@
 class QXmlStreamWriter;
 class QDomElement;
 
-/// \brief The QXmppArchiveMessage represents an archived message
+/// \brief The QXmppArchiveMessage class represents an archived message
 /// as defined by XEP-0136: Message Archiving.
 
 class QXmppArchiveMessage
@@ -52,7 +52,7 @@ private:
     bool m_received;
 };
 
-/// \brief The QXmppArchiveChat represents an archived conversation
+/// \brief The QXmppArchiveChat class represents an archived conversation
 /// as defined by XEP-0136: Message Archiving.
 
 class QXmppArchiveChat
