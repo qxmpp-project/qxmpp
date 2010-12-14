@@ -58,7 +58,7 @@ public:
 /// (empty photo element) and mere support for the protocol (empty update child).
     };
 
-    /// The QXmppPresence::Status class represents the status of an XMPP entity.
+    /// \brief The QXmppPresence::Status class represents the status of an XMPP entity.
     ///
     /// It stores information such as the "away", "busy" status of a user, or
     /// a human-readable description.

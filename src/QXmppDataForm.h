@@ -38,7 +38,7 @@ class QDomElement;
 class QXmppDataForm
 {
 public:
-    /// \brief The QxmppDataForm::Field class represents a data form field
+    /// \brief The QXmppDataForm::Field class represents a data form field
     /// as defined by XEP-0004: Data Forms.
     ///
 
