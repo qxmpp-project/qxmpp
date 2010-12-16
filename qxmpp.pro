@@ -4,7 +4,8 @@ TEMPLATE = subdirs
 
 SUBDIRS = src \
           tests \
-          examples
+          examples \
+          doc
 
 CONFIG += ordered
 
