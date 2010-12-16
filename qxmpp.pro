@@ -9,7 +9,8 @@ SUBDIRS = src \
 
 CONFIG += ordered
 
-include(doc/doc.pri)
+# Documentation generation
+docs.commands = $(MAKE) -C doc docs
 
 # Source distribution
 QXMPP_ARCHIVE = qxmpp-0.2.90
@@ -20,5 +21,11 @@ dist.commands = \
     tar czf $${QXMPP_ARCHIVE}.tar.gz $$QXMPP_ARCHIVE && \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE
 dist.depends = docs
-QMAKE_EXTRA_TARGETS += dist
 
+# Install rules
+htmldocs.files = doc/html
+htmldocs.path = $$[QT_INSTALL_PREFIX]/share/doc/qxmpp
+htmldocs.CONFIG += no_check_exist directory
+
+QMAKE_EXTRA_TARGETS += dist docs
+INSTALLS += htmldocs
