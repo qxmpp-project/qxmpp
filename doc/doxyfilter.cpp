@@ -22,9 +22,11 @@
  */
 
 #include <cstdlib>
+#include <iostream>
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QProcess>
 #include <QRegExp>
 #include <QTextStream>
 
@@ -37,25 +39,36 @@ static void setField(QString &code, const QString &name, const QString &value)
         QString("\\1 %1").arg(value));
 }
 
+static void usage() {
+    QTextStream output(stderr);
+    output << "Usage:" << endl;
+    output << "  doxyfilter              Generate documentation" << endl;
+    output << "  doxyfilter -g           Generate Doxyfile" << endl;
+    output << "  doxyfilter <sourcefile> Filter the given file's code" << endl;
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    if (argc != 2) {
-        qWarning("Usage: doxyfilter <sourcefile>");
+
+    if (argc == 1)
+        return QProcess::execute("doxygen");
+    else if (argc != 2) {
+        usage();
         return 1;
     }
 
-    // read source code
-    QFile source(QString::fromLocal8Bit(argv[1]));
-    if (!source.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open %s", qPrintable(source.fileName()));
-        return 1;
-    }
-    QString code = QString::fromUtf8(source.readAll());
-    source.close();
+    if (!strcmp(argv[1], "-g")) {
+        // generate default Doxyfile
+        QProcess process;
+        process.start("doxygen", QStringList() << "-g" << "-");
+        if (!process.waitForFinished()) {
+            qWarning("Could not run doxygen");
+            return 1;
+        }
+        QString code = QString::fromUtf8(process.readAll());
 
-    if (source.fileName() == "Doxyfile") {
-        // adjust doxyfile
+        // adjust Doxyfile
         setField(code, "ALPHABETICAL_INDEX", "NO");
         setField(code, "EXCLUDE_PATTERNS", "*/moc_*");
         setField(code, "FULL_PATH_NAMES", "NO");
@@ -71,20 +84,34 @@ int main(int argc, char *argv[])
                 QString::number(QXMPP_VERSION & 0xff)));
 
         // write doxyfile
-        if (!source.open(QIODevice::WriteOnly)) {
-            qWarning("Could not write to %s", qPrintable(source.fileName()));
+        QFile output("Doxyfile");
+        if (!output.open(QIODevice::WriteOnly)) {
+            qWarning("Could not write to %s", qPrintable(output.fileName()));
             return 1;
         }
-        source.write(code.toUtf8());
+        output.write(code.toUtf8());
+        output.close();
+
+    } else if (!strcmp(argv[1], "-h")) {
+        usage();
+        return 0;
+    } else {
+        // read source code
+        QFile source(QString::fromLocal8Bit(argv[1]));
+        if (!source.open(QIODevice::ReadOnly)) {
+            qWarning("Could not open %s", qPrintable(source.fileName()));
+            return 1;
+        }
+        QString code = QString::fromUtf8(source.readAll());
         source.close();
-    }
-    else {
+
         // add links for XEPs
         code.replace(QRegExp("(XEP-([0-9]{4}))"), "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
 
         QTextStream output(stdout);
         output << code;
     }
+
     return 0;
 }
 
