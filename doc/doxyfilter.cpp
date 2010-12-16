@@ -28,6 +28,15 @@
 #include <QRegExp>
 #include <QTextStream>
 
+#include "QXmppGlobal.h"
+
+static void setField(QString &code, const QString &name, const QString &value)
+{
+    code.replace(
+        QRegExp(QString("(%1\\s*=)[^\\r\\n]*").arg(name)),
+        QString("\\1 %1").arg(value));
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -43,11 +52,39 @@ int main(int argc, char *argv[])
         return 1;
     }
     QString code = QString::fromUtf8(source.readAll());
+    source.close();
 
-    // add links for XEPs
-    code.replace(QRegExp("(XEP-([0-9]{4}))"), "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
-    QTextStream output(stdout);
-    output << code;
+    if (source.fileName() == "Doxyfile") {
+        // adjust doxyfile
+        setField(code, "ALPHABETICAL_INDEX", "NO");
+        setField(code, "EXCLUDE_PATTERNS", "*/moc_*");
+        setField(code, "FULL_PATH_NAMES", "NO");
+        setField(code, "HIDE_UNDOC_CLASSES", "YES");
+        setField(code, "GENERATE_LATEX", "NO");
+        setField(code, "HTML_TIMESTAMP", "NO");
+        setField(code, "INPUT", "../src");
+        setField(code, "INPUT_FILTER", QString::fromLocal8Bit(argv[0]));
+        setField(code, "PROJECT_NAME", "QXmpp");
+        setField(code, "PROJECT_NUMBER", QString("%1.%2.%3").arg(
+                QString::number((QXMPP_VERSION >> 16) & 0xff),
+                QString::number((QXMPP_VERSION >> 8) & 0xff),
+                QString::number(QXMPP_VERSION & 0xff)));
+
+        // write doxyfile
+        if (!source.open(QIODevice::WriteOnly)) {
+            qWarning("Could not write to %s", qPrintable(source.fileName()));
+            return 1;
+        }
+        source.write(code.toUtf8());
+        source.close();
+    }
+    else {
+        // add links for XEPs
+        code.replace(QRegExp("(XEP-([0-9]{4}))"), "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
+
+        QTextStream output(stdout);
+        output << code;
+    }
     return 0;
 }
 
