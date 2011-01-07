@@ -54,8 +54,8 @@ public:
                         ///< but the contact does not have a subscription to the user's presence information
             Both = 3,   ///< both the user and the contact have subscriptions to each
                         ///< other's presence information
-            Remove = 4  ///< to delete a roster item
-            NotSet = 8, ///< the subscription state was not specified
+            Remove = 4, ///< to delete a roster item
+            NotSet = 8  ///< the subscription state was not specified
         };
 
         QString bareJid() const;
