@@ -53,7 +53,8 @@ static field_type field_types[] = {
 /// \param type
 
 QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type)
-    : m_type(type)
+    : m_required(false),
+    m_type(type)
 {
 }
 
