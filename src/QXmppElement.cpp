@@ -148,6 +148,7 @@ void QXmppElement::appendChild(const QXmppElement &child)
         child.d->parent->children.removeAll(child.d);
     else
         child.d->counter.ref();
+    child.d->parent = d;
     d->children.append(child.d);
 }
 
