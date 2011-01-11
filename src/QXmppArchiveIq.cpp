@@ -29,6 +29,11 @@
 static const char *ns_archive = "urn:xmpp:archive";
 static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
+QXmppArchiveMessage::QXmppArchiveMessage()
+    : m_received(false)
+{
+}
+
 /// Returns the archived message's body.
 
 QString QXmppArchiveMessage::body() const
@@ -76,11 +81,17 @@ void QXmppArchiveMessage::setReceived(bool isReceived)
     m_received = isReceived;
 }
 
+QXmppArchiveChat::QXmppArchiveChat()
+    : m_version(0)
+{
+}
+
 void QXmppArchiveChat::parse(const QDomElement &element)
 {
     m_with = element.attribute("with");
     m_start = datetimeFromString(element.attribute("start"));
     m_subject = element.attribute("subject");
+    m_thread = element.attribute("thread");
     m_version = element.attribute("version").toInt();
 
     QDomElement child = element.firstChildElement();
@@ -106,7 +117,9 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
     if (m_start.isValid())
         helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
     helperToXmlAddAttribute(writer, "subject", m_subject);
-    helperToXmlAddAttribute(writer, "version", QString::number(m_version));
+    helperToXmlAddAttribute(writer, "thread", m_thread);
+    if (m_version)
+        helperToXmlAddAttribute(writer, "version", QString::number(m_version));
     foreach (const QXmppArchiveMessage &message, m_messages)
     {
         writer->writeStartElement(message.isReceived() ? "from" : "to");
@@ -124,11 +137,25 @@ QList<QXmppArchiveMessage> QXmppArchiveChat::messages() const
     return m_messages;
 }
 
+/// Sets the conversation's messages.
+
+void QXmppArchiveChat::setMessages(const QList<QXmppArchiveMessage> &messages)
+{
+    m_messages = messages;
+}
+
 /// Returns the start of this conversation.
 
 QDateTime QXmppArchiveChat::start() const
 {
     return m_start;
+}
+
+/// Sets the start of this conversation.
+
+void QXmppArchiveChat::setStart(const QDateTime &start)
+{
+    m_start = start;
 }
 
 /// Returns the conversation's subject.
@@ -138,6 +165,27 @@ QString QXmppArchiveChat::subject() const
     return m_subject;
 }
 
+/// Sets the conversation's subject.
+
+void QXmppArchiveChat::setSubject(const QString &subject)
+{
+    m_subject = subject;
+}
+
+/// Returns the conversation's thread.
+
+QString QXmppArchiveChat::thread() const
+{
+    return m_thread;
+}
+
+/// Sets the conversation's thread.
+
+void QXmppArchiveChat::setThread(const QString &thread)
+{
+    m_thread = thread;
+}
+
 /// Returns the conversation's version.
 
 int QXmppArchiveChat::version() const
@@ -145,11 +193,25 @@ int QXmppArchiveChat::version() const
     return m_version;
 }
 
+/// Sets the conversation's version.
+
+void QXmppArchiveChat::setVersion(int version)
+{
+    m_version = version;
+}
+
 /// Returns the JID of the remote party.
- 
+
 QString QXmppArchiveChat::with() const
 {
     return m_with;
+}
+
+/// Sets the JID of the remote party.
+
+void QXmppArchiveChat::setWith(const QString &with)
+{
+    m_with = with;
 }
 
 /// Returns the chat conversation carried by this IQ.
@@ -157,6 +219,13 @@ QString QXmppArchiveChat::with() const
 QXmppArchiveChat QXmppArchiveChatIq::chat() const
 {
     return m_chat;
+}
+
+/// Sets the chat conversation carried by this IQ.
+
+void QXmppArchiveChatIq::setChat(const QXmppArchiveChat &chat)
+{
+    m_chat = chat;
 }
 
 bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
@@ -188,6 +257,13 @@ QXmppArchiveListIq::QXmppArchiveListIq()
 QList<QXmppArchiveChat> QXmppArchiveListIq::chats() const
 {
     return m_chats;
+}
+
+/// Sets the list of chat conversations.
+
+void QXmppArchiveListIq::setChats(const QList<QXmppArchiveChat> &chats)
+{
+    m_chats = chats;
 }
 
 /// Returns the maximum number of results.
@@ -305,6 +381,8 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
     }
+    foreach (const QXmppArchiveChat &chat, m_chats)
+        chat.toXml(writer);
     writer->writeEndElement();
 }
 
@@ -381,6 +459,12 @@ QString QXmppArchiveRetrieveIq::with() const
 void QXmppArchiveRetrieveIq::setWith(const QString &with)
 {
     m_with = with;
+}
+
+bool QXmppArchiveRetrieveIq::isArchiveRetrieveIq(const QDomElement &element)
+{
+    QDomElement retrieveElement = element.firstChildElement("retrieve");
+    return (retrieveElement.namespaceURI() == ns_archive);
 }
 
 void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)

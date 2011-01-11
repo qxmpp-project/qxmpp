@@ -31,12 +31,14 @@
 class QXmlStreamWriter;
 class QDomElement;
 
-/// \brief The QXmppArchiveMessage class represents an archived message
+/// \brief The QXmppArchiveMessage represents an archived message
 /// as defined by XEP-0136: Message Archiving.
 
 class QXmppArchiveMessage
 {
 public:
+    QXmppArchiveMessage();
+
     QString body() const;
     void setBody(const QString &body);
 
@@ -52,17 +54,31 @@ private:
     bool m_received;
 };
 
-/// \brief The QXmppArchiveChat class represents an archived conversation
+/// \brief The QXmppArchiveChat represents an archived conversation
 /// as defined by XEP-0136: Message Archiving.
 
 class QXmppArchiveChat
 {
 public:
+    QXmppArchiveChat();
+
     QList<QXmppArchiveMessage> messages() const;
+    void setMessages(const QList<QXmppArchiveMessage> &messages);
+
     QDateTime start() const;
+    void setStart(const QDateTime &start);
+
     QString subject() const;
+    void setSubject(const QString &subject);
+
+    QString thread() const;
+    void setThread(const QString &thread);
+
     int version() const;
+    void setVersion(int version);
+
     QString with() const;
+    void setWith(const QString &with);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -73,6 +89,7 @@ private:
     QList<QXmppArchiveMessage> m_messages;
     QDateTime m_start;
     QString m_subject;
+    QString m_thread;
     int m_version;
     QString m_with;
 };
@@ -87,6 +104,7 @@ class QXmppArchiveChatIq : public QXmppIq
 {
 public:
     QXmppArchiveChat chat() const;
+    void setChat(const QXmppArchiveChat &chat);
 
     /// \cond
     static bool isArchiveChatIq(const QDomElement &element);
@@ -112,6 +130,7 @@ public:
     QXmppArchiveListIq();
 
     QList<QXmppArchiveChat> chats() const;
+    void setChats(const QList<QXmppArchiveChat> &chats);
 
     int max() const;
     void setMax(int max);
