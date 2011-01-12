@@ -167,6 +167,8 @@ QSslSocket *QXmppStream::socket()
 void QXmppStream::setSocket(QSslSocket *socket)
 {
     d->socket = socket;
+    if (!d->socket)
+        return;
 
     // socket events
     bool check = connect(socket, SIGNAL(connected()),
