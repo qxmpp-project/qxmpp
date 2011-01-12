@@ -45,10 +45,10 @@ public:
     QXmppStream(QObject *parent);
     ~QXmppStream();
 
-    bool isConnected() const;
+    virtual bool isConnected() const;
     void disconnectFromHost();
 
-    bool sendData(const QByteArray&);
+    virtual bool sendData(const QByteArray&);
     bool sendElement(const QDomElement&);
     bool sendPacket(const QXmppPacket&);
 
