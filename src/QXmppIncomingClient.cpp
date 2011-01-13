@@ -292,7 +292,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 bindSet.parse(nodeRecv);
                 d->resource = bindSet.resource().trimmed();
                 if (d->resource.isEmpty())
-                    d->resource = generateStanzaHash()
+                    d->resource = generateStanzaHash();
 
                 QXmppBindIq bindResult;
                 bindResult.setType(QXmppIq::Result);
