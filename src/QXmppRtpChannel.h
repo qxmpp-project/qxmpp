@@ -93,22 +93,22 @@ protected:
     /// \cond
     void debug(const QString &message)
     {
-        emit logMessage(QXmppLogger::DebugMessage, message);
+        emit logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
     }
 
     void warning(const QString &message)
     {
-        emit logMessage(QXmppLogger::WarningMessage, message);
+        emit logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
     }
 
     void logReceived(const QString &message)
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, message);
+        emit logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
     }
 
     void logSent(const QString &message)
     {
-        emit logMessage(QXmppLogger::SentMessage, message);
+        emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
     qint64 readData(char * data, qint64 maxSize);
