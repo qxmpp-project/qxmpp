@@ -604,17 +604,7 @@ void QXmppJingleCandidate::parse(const QDomElement &element)
     m_port = element.attribute("port").toInt();
     m_priority = element.attribute("priority").toInt();
     m_protocol = element.attribute("protocol");
-    const QString type = element.attribute("type");
-    if (type == "host")
-        m_type = HostType;
-    else if (type == "prflx")
-        m_type = PeerReflexiveType;
-    else if (type == "srflx")
-        m_type = ServerReflexiveType;
-    else if (type == "relay")
-        m_type = RelayedType;
-    else
-        qWarning() << "Unknown candidate type" << type;
+    m_type = typeFromString(element.attribute("type"));
 }
 
 void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
@@ -629,24 +619,51 @@ void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "port", QString::number(m_port));
     helperToXmlAddAttribute(writer, "priority", QString::number(m_priority));
     helperToXmlAddAttribute(writer, "protocol", m_protocol);
-    QString type;
-    switch (m_type)
+    helperToXmlAddAttribute(writer, "type", typeToString(m_type));
+    writer->writeEndElement();
+}
+
+QXmppJingleCandidate::Type QXmppJingleCandidate::typeFromString(const QString &typeStr, bool *ok)
+{
+    QXmppJingleCandidate::Type type;
+    if (typeStr == "host")
+        type = HostType;
+    else if (typeStr == "prflx")
+        type = PeerReflexiveType;
+    else if (typeStr == "srflx")
+        type = ServerReflexiveType;
+    else if (typeStr == "relay")
+        type = RelayedType;
+    else {
+        qWarning() << "Unknown candidate type" << typeStr;
+        if (ok)
+            *ok = false;
+        return HostType;
+    }
+    if (ok)
+        *ok = true;
+    return type;
+}
+
+QString QXmppJingleCandidate::typeToString(QXmppJingleCandidate::Type type)
+{
+    QString typeStr;
+    switch (type)
     {
     case HostType:
-        type = "host";
+        typeStr = "host";
         break;
     case PeerReflexiveType:
-        type = "prflx";
+        typeStr = "prflx";
         break;
     case ServerReflexiveType:
-        type = "srflx";
+        typeStr = "srflx";
         break;
     case RelayedType:
-        type = "relay";
+        typeStr = "relay";
         break;
     }
-    helperToXmlAddAttribute(writer, "type", type);
-    writer->writeEndElement();
+    return typeStr;
 }
 
 QXmppJinglePayloadType::QXmppJinglePayloadType()

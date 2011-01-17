@@ -121,6 +121,9 @@ public:
 
     bool isNull() const;
 
+    static QXmppJingleCandidate::Type typeFromString(const QString &typeStr, bool *ok = 0);
+    static QString typeToString(QXmppJingleCandidate::Type type);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
