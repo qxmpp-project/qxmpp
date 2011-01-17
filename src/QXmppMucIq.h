@@ -40,8 +40,27 @@ public:
     class Item
     {
     public:
-        QString affiliation() const;
-        void setAffiliation(const QString &affiliation);
+        enum Affiliation {
+            UnspecifiedAffiliation,
+            OutcastAffiliation,
+            NoAffiliation,
+            MemberAffiliation,
+            AdminAffiliation,
+            OwnerAffiliation,
+        };
+
+        enum Role {
+            UnspecifiedRole,
+            NoRole,
+            VisitorRole,
+            ParticipantRole,
+            ModeratorRole,
+        };
+
+        Item();
+
+        Affiliation affiliation() const;
+        void setAffiliation(Affiliation affiliation);
 
         QString jid() const;
         void setJid(const QString &jid);
@@ -52,18 +71,24 @@ public:
         QString reason() const;
         void setReason(const QString &reason);
 
-        QString role() const;
-        void setRole(const QString &role);
+        Role role() const;
+        void setRole(Role role);
 
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
 
+        /// \cond
+        static Affiliation affiliationFromString(const QString &affiliationStr);
+        static QString affiliationToString(Affiliation affiliation);
+        static Role roleFromString(const QString &roleStr);
+        static QString roleToString(Role role);
+        /// \endcond
     private:
-        QString m_affiliation;
+        Affiliation m_affiliation;
         QString m_jid;
         QString m_nick;
         QString m_reason;
-        QString m_role;
+        Role m_role;
     };
 
     QList<QXmppMucAdminIq::Item> items() const;

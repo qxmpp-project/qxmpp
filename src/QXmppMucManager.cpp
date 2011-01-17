@@ -176,9 +176,12 @@ bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDa
 
 bool QXmppMucManager::requestRoomPermissions(const QString &roomJid)
 {
-    QStringList affiliations;
-    affiliations << "member" << "admin" << "owner" << "outcast";
-    foreach (const QString &affiliation, affiliations)
+    QList<QXmppMucAdminIq::Item::Affiliation> affiliations;
+    affiliations << QXmppMucAdminIq::Item::OwnerAffiliation;
+    affiliations << QXmppMucAdminIq::Item::AdminAffiliation;
+    affiliations << QXmppMucAdminIq::Item::MemberAffiliation;
+    affiliations << QXmppMucAdminIq::Item::OutcastAffiliation;
+    foreach (QXmppMucAdminIq::Item::Affiliation affiliation, affiliations)
     {
         QXmppMucAdminIq::Item item;
         item.setAffiliation(affiliation);
