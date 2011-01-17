@@ -46,7 +46,7 @@ public:
     ~QXmppStream();
 
     virtual bool isConnected() const;
-    void disconnectFromHost();
+    virtual void disconnectFromHost();
 
     virtual bool sendData(const QByteArray&);
     bool sendElement(const QDomElement&);
