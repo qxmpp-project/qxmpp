@@ -33,9 +33,12 @@
 class passwordChecker : public QXmppPasswordChecker
 {
     /// Checks that the given credentials are valid.
-    bool checkPassword(const QString &username, const QString &password)
+    QXmppPasswordChecker::Error checkPassword(const QString &username, const QString &password)
     {
-        return (username == USERNAME && password == PASSWORD);
+        if (username == USERNAME && password == PASSWORD)
+            return QXmppPasswordChecker::NoError;
+        else
+            return QXmppPasswordChecker::AuthorizationError;
     };
 
     /// Retrieves the password for the given username.
