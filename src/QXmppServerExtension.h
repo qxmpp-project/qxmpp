@@ -58,6 +58,7 @@ public:
     virtual QStringList discoveryItems() const;
     virtual bool handleStanza(QXmppStream *stream, const QDomElement &stanza);
     virtual QStringList presenceSubscribers(const QString &jid);
+    virtual QStringList presenceSubscriptions(const QString &jid);
 
     virtual QVariantMap statistics() const;
     virtual void setStatistics(const QVariantMap &statistics);

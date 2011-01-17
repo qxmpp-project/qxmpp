@@ -98,6 +98,16 @@ QStringList QXmppServerExtension::presenceSubscribers(const QString &jid)
     return QStringList();
 }
 
+/// Returns the list of subscriptions for the given JID.
+///
+/// \param jid
+
+QStringList QXmppServerExtension::presenceSubscriptions(const QString &jid)
+{
+    Q_UNUSED(jid);
+    return QStringList();
+}
+
 /// Returns the extension's statistics.
 ///
 
