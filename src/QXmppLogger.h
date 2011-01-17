@@ -27,6 +27,12 @@
 
 #include <QObject>
 
+#ifdef QXMPP_LOGGABLE_TRACE
+#define qxmpp_loggable_trace(x) QString("%1(0x%2) %3").arg(metaObject()->className(), QString::number(reinterpret_cast<qint64>(this), 16), x)
+#else
+#define qxmpp_loggable_trace(x) (x)
+#endif
+
 /// \brief The QXmppLogger class represents a sink for logging messages. 
 ///
 /// \ingroup Core
@@ -113,7 +119,7 @@ protected:
 
     void debug(const QString &message)
     {
-        emit logMessage(QXmppLogger::DebugMessage, message);
+        emit logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs an informational message.
@@ -122,7 +128,7 @@ protected:
 
     void info(const QString &message)
     {
-        emit logMessage(QXmppLogger::InformationMessage, message);
+        emit logMessage(QXmppLogger::InformationMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a warning message.
@@ -131,7 +137,7 @@ protected:
 
     void warning(const QString &message)
     {
-        emit logMessage(QXmppLogger::WarningMessage, message);
+        emit logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a received packet.
@@ -140,7 +146,7 @@ protected:
 
     void logReceived(const QString &message)
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, message);
+        emit logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a sent packet.
@@ -149,7 +155,7 @@ protected:
 
     void logSent(const QString &message)
     {
-        emit logMessage(QXmppLogger::SentMessage, message);
+        emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
 signals:
