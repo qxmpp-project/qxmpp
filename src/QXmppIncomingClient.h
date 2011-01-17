@@ -34,11 +34,18 @@ class QXmppIncomingClientPrivate;
 class QXmppPasswordChecker
 {
 public:
+    /// This enum is used to describe authentication errors.
+    enum Error {
+        NoError = 0,
+        AuthorizationError,
+        TemporaryError,
+    };
+
     /// Checks that the given credentials are valid.
     ///
     /// \param username
     /// \param password
-    virtual bool checkPassword(const QString &username, const QString &password) = 0;
+    virtual Error checkPassword(const QString &username, const QString &password) = 0;
     virtual bool getPassword(const QString &username, QString &password);
     virtual bool hasGetPassword() const;
 };
@@ -58,6 +65,7 @@ public:
     bool isConnected() const;
     QString jid() const;
 
+    void setInactivityTimeout(int secs);
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
 signals:

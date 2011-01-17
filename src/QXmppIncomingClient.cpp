@@ -64,12 +64,15 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     d->domain = domain;
     d->saslStep = 0;
 
-    setObjectName("C2S-in");
-    setSocket(socket);
+    if (socket) {
+        info(QString("Incoming client connection from %1 %2").arg(
+            socket->peerAddress().toString(),
+            QString::number(socket->peerPort())));
+        setSocket(socket);
+    }
 
     // create inactivity timer
     d->idleTimer = new QTimer(this);
-    d->idleTimer->setInterval(70000);
     d->idleTimer->setSingleShot(true);
     bool check = connect(d->idleTimer, SIGNAL(timeout()),
                     this, SLOT(slotTimeout()));
@@ -109,6 +112,17 @@ QString QXmppIncomingClient::jid() const
     return jid;
 }
 
+/// Sets the number of seconds after which a client will be disconnected
+/// for inactivity.
+
+void QXmppIncomingClient::setInactivityTimeout(int secs)
+{
+    d->idleTimer->stop();
+    d->idleTimer->setInterval(secs * 1000);
+    if (d->idleTimer->interval())
+        d->idleTimer->start();
+}
+
 /// Sets the password checker used to verify client credentials.
 ///
 /// \param checker
@@ -121,7 +135,8 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
-    d->idleTimer->start();
+    if (d->idleTimer->interval())
+        d->idleTimer->start();
     d->saslStep = 0;
 
     // start stream
@@ -151,7 +166,7 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 
     // send stream features
     QXmppStreamFeatures features;
-    if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
+    if (socket() && !socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
         features.setTlsMode(QXmppStreamFeatures::Enabled);
     if (!d->username.isEmpty())
     {
@@ -173,7 +188,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 {
     const QString ns = nodeRecv.namespaceURI();
 
-    d->idleTimer->start();
+    if (d->idleTimer->interval())
+        d->idleTimer->start();
 
     if (ns == ns_tls && nodeRecv.tagName() == "starttls")
     {
@@ -192,19 +208,35 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QList<QByteArray> auth = QByteArray::fromBase64(nodeRecv.text().toAscii()).split('\0');
                 if (auth.size() != 3)
                 {
-                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><incorrect-encoding/></failure>");
                     disconnectFromHost();
                     return;
                 }
 
                 const QString username = QString::fromUtf8(auth[1]);
                 const QString password = QString::fromUtf8(auth[2]);
-                if (d->passwordChecker && d->passwordChecker->checkPassword(username, password))
+                if (!d->passwordChecker) {
+                    // FIXME: what type of failure?
+                    warning(QString("Cannot authenticate '%1', no password checker").arg(username));
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+                    disconnectFromHost();
+                    return;
+                }
+
+                QXmppPasswordChecker::Error error = d->passwordChecker->checkPassword(username, password);
+                if (error == QXmppPasswordChecker::NoError)
                 {
                     d->username = username;
+                    info(QString("Authentication succeeded for '%1'").arg(d->username));
                     sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
-                } else {
+                } else if (error == QXmppPasswordChecker::AuthorizationError) {
+                    warning(QString("Authentication failed for '%1'").arg(username));
                     sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
+                    disconnectFromHost();
+                    return;
+                } else {
+                    warning(QString("Temporary authentication failure for '%1'").arg(username));
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><temporary-auth-failure/></failure>");
                     disconnectFromHost();
                     return;
                 }
@@ -277,6 +309,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // authentication succeeded
                 d->saslStep = 3;
+                info(QString("Authentication succeeded for '%1'").arg(d->username));
                 sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
             }
         }
