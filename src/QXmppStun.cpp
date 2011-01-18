@@ -1141,7 +1141,9 @@ void QXmppIceComponent::readyRead()
         // check whether this candidates is already known
         foreach (const QXmppJingleCandidate &candidate, m_localCandidates)
         {
-            if (candidate.host() == reflexiveHost && candidate.port() == reflexivePort)
+            if (candidate.host() == reflexiveHost &&
+                candidate.port() == reflexivePort &&
+                candidate.type() == QXmppJingleCandidate::ServerReflexiveType)
                 return;
         }
 
