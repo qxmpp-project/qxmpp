@@ -109,9 +109,15 @@ void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
     case QXmppPresence::Subscribe:
         if (client()->configuration().autoAcceptSubscriptions())
         {
+            // accept subscription request
             QXmppPresence presence;
             presence.setTo(jid);
             presence.setType(QXmppPresence::Subscribed);
+            client()->sendPacket(presence);
+
+            // ask for reciprocal subscription
+            presence.setTo(bareJid);
+            presence.setType(QXmppPresence::Subscribe);
             client()->sendPacket(presence);
         }
         break;
@@ -140,21 +146,6 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
                 QString bareJid = items.at(i).bareJid();
                 m_entries[bareJid] = items.at(i);
                 emit rosterChanged(bareJid);
-            }
-
-            // when contact subscribes user...user sends 'subscribed' presence 
-            // then after recieving following iq user requests contact for subscription
-            
-            // check the "from" is newly added in the roster...and remove this ask thing...and do this for all items
-            QXmppRosterIq::Item item = items.at(0);
-            if (!item.bareJid().isEmpty() &&
-                item.subscriptionType() == QXmppRosterIq::Item::From &&
-                item.subscriptionStatus().isEmpty())
-            {
-                QXmppPresence presence;
-                presence.setTo(item.bareJid());
-                presence.setType(QXmppPresence::Subscribe);
-                client()->sendPacket(presence);
             }
         }
         break;
