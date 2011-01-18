@@ -196,8 +196,8 @@ void QXmppStream::setSocket(QSslSocket *socket)
 void QXmppStream::socketConnected()
 {
     info(QString("Socket connected to %1 %2").arg(
-        socket()->peerAddress().toString(),
-        QString::number(socket()->peerPort())));
+        d->socket->peerAddress().toString(),
+        QString::number(d->socket->peerPort())));
     d->dataBuffer.clear();
     handleStart();
 }
@@ -217,7 +217,7 @@ void QXmppStream::socketEncrypted()
 
 void QXmppStream::socketReadyRead()
 {
-    const QByteArray data = socket()->readAll();
+    const QByteArray data = d->socket->readAll();
     //debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
 
     d->dataBuffer.append(data);
