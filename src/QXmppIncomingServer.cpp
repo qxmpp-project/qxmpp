@@ -51,9 +51,14 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
     : QXmppStream(parent),
     d(new QXmppIncomingServerPrivate)
 {
-    setObjectName("S2S-in");
-    setSocket(socket);
     d->domain = domain;
+
+    if (socket) {
+        info(QString("Incoming server connection from %1 %2").arg(
+            socket->peerAddress().toString(),
+            QString::number(socket->peerPort())));
+        setSocket(socket);
+    }
 }
 
 /// Destroys the current stream.
@@ -73,8 +78,9 @@ QString QXmppIncomingServer::localStreamId() const
 
 void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 {
-    if (!streamElement.attribute("from").isEmpty())
-        setObjectName("S2S-in-" + streamElement.attribute("from"));
+    const QString from = streamElement.attribute("from");
+    if (!from.isEmpty())
+        info(QString("Incoming server stream from %1").arg(from));
 
     // start stream
     d->localStreamId = generateStanzaHash().toAscii();
@@ -120,13 +126,12 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         }
 
         const QString domain = request.from();
-        setObjectName("S2S-in-" + domain);
-
         if (request.command() == QXmppDialback::Result)
         {
+            debug(QString("Received a dialback result from %1").arg(domain));
+
             // establish dialback connection
             QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
-            stream->setObjectName("S2S-dialback-" + domain);
             bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
                                  this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
             Q_ASSERT(check);
@@ -136,6 +141,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         }
         else if (request.command() == QXmppDialback::Verify)
         {
+            debug(QString("Received a dialback verify from %1").arg(domain));
             emit dialbackRequestReceived(request);
         }
 
