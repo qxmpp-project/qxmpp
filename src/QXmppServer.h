@@ -32,8 +32,10 @@ class QDomElement;
 class QSslSocket;
 
 class QXmppDialback;
+class QXmppIncomingClient;
 class QXmppOutgoingServer;
 class QXmppPasswordChecker;
+class QXmppPresence;
 class QXmppServerExtension;
 class QXmppServerPrivate;
 class QXmppSslServer;
@@ -82,11 +84,15 @@ public:
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
 
-    QStringList availableResources(const QString &bareJid);
+    void addIncomingClient(QXmppIncomingClient *stream);
+    QList<QXmppPresence> availablePresences(const QString &bareJid);
 
 signals:
     /// This signal is emitted when an XMPP stream is added.
     void streamAdded(QXmppStream *stream);
+
+    /// This signal is emitted when an XMPP stream is connected.
+    void streamConnected(QXmppStream *stream);
 
     /// This signal is emitted when an XMPP stream is removed.
     void streamRemoved(QXmppStream *stream);
@@ -103,7 +109,6 @@ private:
     QXmppOutgoingServer *connectToDomain(const QString &domain);
     QList<QXmppStream*> getStreams(const QString &to);
     virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
-    virtual QStringList subscribers(const QString &jid);
     QXmppServerPrivate * const d;
 };
 

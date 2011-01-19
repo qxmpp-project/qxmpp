@@ -51,6 +51,8 @@ class QXmppServerPrivate
 public:
     QXmppServerPrivate();
     void loadExtensions(QXmppServer *server);
+    QStringList presenceSubscribers(const QString &jid);
+    QStringList presenceSubscriptions(const QString &jid);
     void startExtensions();
     void stopExtensions();
 
@@ -59,6 +61,7 @@ public:
 
     QString domain;
     QList<QXmppServerExtension*> extensions;
+    QMap<QString, QMap<QString, QXmppPresence> > presences;
     QMap<QString, QSet<QString> > subscribers;
     QXmppLogger *logger;
     QXmppPasswordChecker *passwordChecker;
@@ -118,6 +121,38 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
         }
         loaded = true;
     }
+}
+
+QStringList QXmppServerPrivate::presenceSubscribers(const QString &jid)
+{
+    // start with directed presences
+    QSet<QString> recipients = subscribers.value(jid);
+
+    // query extensions
+    foreach (QXmppServerExtension *extension, extensions)
+    {
+        const QStringList extras = extension->presenceSubscribers(jid);
+        foreach (const QString &extra, extras)
+            recipients.insert(extra);
+    }
+
+    return recipients.toList();
+}
+
+QStringList QXmppServerPrivate::presenceSubscriptions(const QString &jid)
+{
+    // FIXME : start with directed presences?
+    QSet<QString> recipients;
+
+    // query extensions
+    foreach (QXmppServerExtension *extension, extensions)
+    {
+        const QStringList extras = extension->presenceSubscriptions(jid);
+        foreach (const QString &extra, extras)
+            recipients.insert(extra);
+    }
+
+    return recipients.toList();
 }
 
 /// Start the server's extensions.
@@ -201,13 +236,9 @@ QList<QXmppServerExtension*> QXmppServer::extensions()
 ///
 /// \param bareJid
 
-QStringList QXmppServer::availableResources(const QString &bareJid)
+QList<QXmppPresence> QXmppServer::availablePresences(const QString &bareJid)
 {
-    QStringList fullJids;
-    foreach (QXmppIncomingClient *client, d->incomingClients)
-        if (client->isConnected() && jidToBareJid(client->jid()) == bareJid)
-            fullJids << client->jid();
-    return fullJids;
+    return d->presences.value(bareJid).values();
 }
 
 /// Returns the server's domain.
@@ -368,7 +399,6 @@ QXmppOutgoingServer* QXmppServer::connectToDomain(const QString &domain)
 {
     // initialise outgoing server-to-server
     QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
-    stream->setObjectName("S2S-out-" + domain);
     stream->setLocalStreamKey(generateStanzaHash().toAscii());
 
     bool check = connect(stream, SIGNAL(connected()),
@@ -407,6 +437,9 @@ QList<QXmppStream*> QXmppServer::getStreams(const QString &to)
             if (conn->jid() == to || jidToBareJid(conn->jid()) == to)
                 found << conn;
         }
+    } else if (toDomain.endsWith("." + d->domain)) {
+        // refuse to route packets to sub-domains
+        return found;
     } else {
         // look for an outgoing S2S connection
         foreach (QXmppOutgoingServer *conn, d->outgoingServers)
@@ -448,11 +481,48 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
             if (element.attribute("type").isEmpty() || element.attribute("type") == "unavailable")
             {
                 const QString from = element.attribute("from");
-                foreach (QString subscriber, subscribers(from))
+                const QString bareFrom = jidToBareJid(from);
+                bool isInitial = false;
+
+                // record the presence for future use
+                QXmppPresence presence;
+                presence.parse(element);
+                if (presence.type() == QXmppPresence::Available) {
+                    isInitial = !d->presences.value(bareFrom).contains(from);
+                    d->presences[bareFrom][from] = presence;
+                } else {
+                    d->presences[bareFrom].remove(from);
+                }
+
+                // broadcast it to subscribers
+                foreach (const QString &subscriber, d->presenceSubscribers(from))
                 {
+                    // avoid loop
+                    if (subscriber == to)
+                        continue;
                     QDomElement changed(element);
                     changed.setAttribute("to", subscriber);
-                    sendElement(changed);
+                    handleStanza(stream, changed);
+                }
+
+                // get presences from subscriptions
+                if (isInitial) {
+                    foreach (const QString &subscription, d->presenceSubscriptions(from))
+                    {
+                        if (jidToDomain(subscription) != d->domain) {
+                            QXmppPresence probe;
+                            probe.setType(QXmppPresence::Probe);
+                            probe.setFrom(from);
+                            probe.setTo(subscription);
+                            sendPacket(probe);
+                        } else {
+                            QXmppPresence push;
+                            foreach (push, d->presences.value(subscription).values()) {
+                                push.setTo(from);
+                                sendPacket(push);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -508,22 +578,6 @@ void QXmppServer::handleStanza(QXmppStream *stream, const QDomElement &element)
     }
 }
 
-QStringList QXmppServer::subscribers(const QString &jid)
-{
-    // start with directed presences
-    QSet<QString> recipients = d->subscribers.value(jid);
-
-    // query extensions
-    foreach (QXmppServerExtension *extension, d->extensions)
-    {
-        const QStringList extras = extension->presenceSubscribers(jid);
-        foreach (const QString &extra, extras)
-            recipients.insert(extra);
-    }
-
-    return recipients.toList();
-}
-
 /// Route an XMPP stanza.
 ///
 /// \param element
@@ -574,14 +628,12 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
     return sent;
 }
 
-/// Handle a new incoming TCP connection from a client.
+/// Add a new incoming client stream.
 ///
-/// \param socket
+/// \param stream
 
-void QXmppServer::slotClientConnection(QSslSocket *socket)
+void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 {
-    QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
-    socket->setParent(stream);
     stream->setPasswordChecker(d->passwordChecker);
 
     bool check = connect(stream, SIGNAL(connected()),
@@ -599,6 +651,18 @@ void QXmppServer::slotClientConnection(QSslSocket *socket)
     // add stream
     d->incomingClients.append(stream);
     emit streamAdded(stream);
+}
+
+/// Handle a new incoming TCP connection from a client.
+///
+/// \param socket
+
+void QXmppServer::slotClientConnection(QSslSocket *socket)
+{
+    QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
+    stream->setInactivityTimeout(120);
+    socket->setParent(stream);
+    addIncomingClient(stream);
 }
 
 void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
@@ -673,9 +737,13 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
 
 void QXmppServer::slotStreamConnected()
 {
+    QXmppStream *stream = qobject_cast<QXmppStream*>(sender());
+    if (!stream)
+        return;
+
     // handle incoming clients
-    QXmppIncomingClient *client = qobject_cast<QXmppIncomingClient *>(sender());
-    if (client || d->incomingClients.contains(client))
+    QXmppIncomingClient *client = qobject_cast<QXmppIncomingClient *>(stream);
+    if (client)
     {
         // check whether the connection conflicts with another one
         foreach (QXmppIncomingClient *conn, d->incomingClients)
@@ -689,14 +757,15 @@ void QXmppServer::slotStreamConnected()
     }
 
     // flush queue
-    QXmppStream *stream = qobject_cast<QXmppStream*>(sender());
-    if (stream && d->queues.contains(stream))
+    if (d->queues.contains(stream))
     {
-        qDebug("FLUSHING QUEUE");
         foreach (const QByteArray &data, d->queues[stream])
             stream->sendData(data);
         d->queues.remove(stream);
     }
+
+    // emit signal
+    emit streamConnected(stream);
 }
 
 /// Handle a stream disconnection.
@@ -708,15 +777,28 @@ void QXmppServer::slotStreamDisconnected()
     QXmppIncomingClient *stream = qobject_cast<QXmppIncomingClient *>(sender());
     if (stream && d->incomingClients.contains(stream))
     {
-        // synthesis a received unavailable presence
-        if (!stream->jid().isEmpty())
-        {
-            QDomElement presence;
-            presence.setTagName("presence");
+        const QString jid = stream->jid();
+
+        // check the user exited cleanly
+        if (!jid.isEmpty()) {
+            QDomDocument doc;
+            QDomElement presence = doc.createElement("presence");
             presence.setAttribute("from", stream->jid());
-            presence.setAttribute("to", d->domain);
             presence.setAttribute("type", "unavailable");
-            handleStanza(stream, presence);
+
+            if (d->presences.value(jidToBareJid(jid)).contains(jid)) {
+                // the client had sent an initial available presence but did
+                // not sent an unavailable presence, synthesize it
+                presence.setAttribute("to", d->domain);
+                handleStanza(stream, presence);
+            } else {
+                // synthesize unavailable presence to directed presence receivers
+                const QSet<QString> recipients = d->subscribers.value(jid);
+                foreach (const QString &recipient, recipients) {
+                    presence.setAttribute("to", recipient);
+                    handleStanza(stream, presence);
+                }
+            }
         }
 
         // remove stream
