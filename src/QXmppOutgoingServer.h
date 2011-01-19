@@ -66,6 +66,7 @@ protected:
 
 private slots:
     void connectToHost(const QXmppSrvInfo &serviceInfo);
+    void sendDialback();
     void slotSslErrors(const QList<QSslError> &errors);
 
 private:

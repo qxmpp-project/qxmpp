@@ -131,6 +131,8 @@ void QXmppOutgoingServer::handleStart()
 
 void QXmppOutgoingServer::handleStream(const QDomElement &streamElement)
 {
+    Q_UNUSED(streamElement);
+
     // gmail.com servers are broken: they never send <stream:features>,
     // so we schedule sending the dialback in a couple of seconds
     d->dialbackTimer->start();
