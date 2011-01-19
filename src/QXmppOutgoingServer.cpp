@@ -24,6 +24,7 @@
 #include <QDomElement>
 #include <QSslKey>
 #include <QSslSocket>
+#include <QTimer>
 
 #include "QXmppConstants.h"
 #include "QXmppDialback.h"
@@ -40,6 +41,7 @@ public:
     QString remoteDomain;
     QString verifyId;
     QString verifyKey;
+    QTimer *dialbackTimer;
     bool ready;
 };
 
@@ -53,16 +55,24 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     : QXmppStream(parent),
     d(new QXmppOutgoingServerPrivate)
 {
+    bool check;
+
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
+
+    d->dialbackTimer = new QTimer(this);
+    d->dialbackTimer->setInterval(5000);
+    d->dialbackTimer->setSingleShot(true);
+    check = connect(d->dialbackTimer, SIGNAL(timeout()),
+                    this, SLOT(sendDialback()));
+    Q_ASSERT(check);
 
     d->localDomain = domain;
     d->ready = false;
 
-    bool check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
-                         this, SLOT(slotSslErrors(QList<QSslError>)));
+    check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
+                    this, SLOT(slotSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 /// Destroys the stream.
@@ -121,7 +131,9 @@ void QXmppOutgoingServer::handleStart()
 
 void QXmppOutgoingServer::handleStream(const QDomElement &streamElement)
 {
-    Q_UNUSED(streamElement);
+    // gmail.com servers are broken: they never send <stream:features>,
+    // so we schedule sending the dialback in a couple of seconds
+    d->dialbackTimer->start();
 }
 
 void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
@@ -153,27 +165,9 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             }
         }
 
-        if (!d->localStreamKey.isEmpty())
-        {
-            // send dialback key
-            QXmppDialback dialback;
-            dialback.setCommand(QXmppDialback::Result);
-            dialback.setFrom(d->localDomain);
-            dialback.setTo(d->remoteDomain);
-            dialback.setKey(d->localStreamKey);
-            sendPacket(dialback);
-        }
-        else if (!d->verifyId.isEmpty() && !d->verifyKey.isEmpty())
-        {
-            // send dialback verify
-            QXmppDialback verify;
-            verify.setCommand(QXmppDialback::Verify);
-            verify.setId(d->verifyId);
-            verify.setFrom(d->localDomain);
-            verify.setTo(d->remoteDomain);
-            verify.setKey(d->verifyKey);
-            sendPacket(verify);
-        }
+        // send dialback if needed
+        d->dialbackTimer->stop();
+        sendDialback();
     }
     else if (ns == ns_tls)
     {
@@ -201,7 +195,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         {
             if (response.type() == "valid")
             {
-                info("Outgoing stream is ready");
+                info(QString("Outgoing server stream to %1 is ready").arg(response.from()));
                 d->ready = true;
                 emit connected();
             }
@@ -254,6 +248,33 @@ void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 QString QXmppOutgoingServer::remoteDomain() const
 {
     return d->remoteDomain;
+}
+
+void QXmppOutgoingServer::sendDialback()
+{
+    if (!d->localStreamKey.isEmpty())
+    {
+        // send dialback key
+        debug(QString("Sending dialback result to %1").arg(d->remoteDomain));
+        QXmppDialback dialback;
+        dialback.setCommand(QXmppDialback::Result);
+        dialback.setFrom(d->localDomain);
+        dialback.setTo(d->remoteDomain);
+        dialback.setKey(d->localStreamKey);
+        sendPacket(dialback);
+    }
+    else if (!d->verifyId.isEmpty() && !d->verifyKey.isEmpty())
+    {
+        // send dialback verify
+        debug(QString("Sending dialback verify to %1").arg(d->remoteDomain));
+        QXmppDialback verify;
+        verify.setCommand(QXmppDialback::Verify);
+        verify.setId(d->verifyId);
+        verify.setFrom(d->localDomain);
+        verify.setTo(d->remoteDomain);
+        verify.setKey(d->verifyKey);
+        sendPacket(verify);
+    }
 }
 
 void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
