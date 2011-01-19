@@ -474,7 +474,7 @@ void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
 ///
 /// \return VCardUpdateType
 
-QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType()
+QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType() const
 {
     return m_vCardUpdateType;
 }
@@ -489,7 +489,7 @@ void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
 }
 
 /// XEP-0115: Entity Capabilities
-QString QXmppPresence::capabilityHash()
+QString QXmppPresence::capabilityHash() const
 {
     return m_capabilityHash;
 }
@@ -501,7 +501,7 @@ void QXmppPresence::setCapabilityHash(const QString& hash)
 }
 
 /// XEP-0115: Entity Capabilities
-QString QXmppPresence::capabilityNode()
+QString QXmppPresence::capabilityNode() const
 {
     return m_capabilityNode;
 }
@@ -513,7 +513,7 @@ void QXmppPresence::setCapabilityNode(const QString& node)
 }
 
 /// XEP-0115: Entity Capabilities
-QByteArray QXmppPresence::capabilityVer()
+QByteArray QXmppPresence::capabilityVer() const
 {
     return m_capabilityVer;
 }
@@ -525,7 +525,7 @@ void QXmppPresence::setCapabilityVer(const QByteArray& ver)
 }
 
 /// Legacy XEP-0115: Entity Capabilities
-QStringList QXmppPresence::capabilityExt()
+QStringList QXmppPresence::capabilityExt() const
 {
     return m_capabilityExt;
 }

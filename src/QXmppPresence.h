@@ -128,19 +128,20 @@ public:
 
     QByteArray photoHash() const;
     void setPhotoHash(const QByteArray&);
-    VCardUpdateType vCardUpdateType();
+
+    VCardUpdateType vCardUpdateType() const;
     void setVCardUpdateType(VCardUpdateType type);
 
-    QString capabilityHash();
+    QString capabilityHash() const;
     void setCapabilityHash(const QString&);
 
-    QString capabilityNode();
+    QString capabilityNode() const;
     void setCapabilityNode(const QString&);
 
-    QByteArray capabilityVer();
+    QByteArray capabilityVer() const;
     void setCapabilityVer(const QByteArray&);
 
-    QStringList capabilityExt();
+    QStringList capabilityExt() const;
 
     // deprecated in release 0.2.0
     // deprecated accessors, use the form without "get" instead
