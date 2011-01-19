@@ -70,6 +70,7 @@ public:
     bool isRosterReceived();
     QStringList getRosterBareJids() const;
     QXmppRosterIq::Item getRosterEntry(const QString& bareJid) const;
+    void removeRosterEntry(const QString &bareJid);
     
     QStringList getResources(const QString& bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(

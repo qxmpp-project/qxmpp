@@ -126,6 +126,25 @@ void QXmppRosterManager::presenceReceived(const QXmppPresence& presence)
     }
 }
 
+/// Removes a roster entry and cancels subscriptions to and from the contact.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// rosterChanged() signal to be emitted.
+///
+/// \param bareJid
+
+void QXmppRosterManager::removeRosterEntry(const QString &bareJid)
+{
+    QXmppRosterIq::Item item;
+    item.setBareJid(bareJid);
+    item.setSubscriptionType(QXmppRosterIq::Item::Remove);
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    client()->sendPacket(iq);
+}
+
 void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
 {
     bool isInitial = (m_rosterReqId == rosterIq.id());
