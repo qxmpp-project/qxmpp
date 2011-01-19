@@ -513,7 +513,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 QXmppIq iq(QXmppIq::Result);
                 iq.setId(req.id());
                 iq.setTo(req.from());
-                iq.setFrom(req.to());
                 sendPacket(iq);
             }
             else
@@ -528,7 +527,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     QXmppIq iq(QXmppIq::Error);
                     iq.setId(iqPacket.id());
                     iq.setTo(iqPacket.from());
-                    iq.setFrom(iqPacket.to());
                     QXmppStanza::Error error(QXmppStanza::Error::Cancel,
                         QXmppStanza::Error::FeatureNotImplemented);
                     iq.setError(error);
@@ -579,7 +577,6 @@ void QXmppOutgoingClient::pingSend()
 {
     // send ping packet
     QXmppPingIq ping;
-    ping.setFrom(configuration().jid());
     ping.setTo(configuration().domain());
     sendPacket(ping);
 

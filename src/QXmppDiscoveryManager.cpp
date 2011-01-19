@@ -82,13 +82,12 @@ QString QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& no
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::InfoQuery);
     request.setTo(jid);
-    request.setFrom(client()->configuration().jid());
     if(!node.isEmpty())
         request.setQueryNode(node);
     if(client()->sendPacket(request))
         return request.id();
     else
-        return "";
+        return QString();
 }
 
 /// Requests items from the specified XMPP entity.
@@ -102,13 +101,12 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
-    request.setFrom(client()->configuration().jid());
     if(!node.isEmpty())
         request.setQueryNode(node);
     if(client()->sendPacket(request))
         return request.id();
     else
-        return "";
+        return QString();
 }
 
 QStringList QXmppDiscoveryManager::discoveryFeatures() const

@@ -40,12 +40,11 @@ QString QXmppEntityTimeManager::requestTime(const QString& jid)
 {
     QXmppEntityTimeIq request;
     request.setType(QXmppIq::Get);
-    request.setFrom(client()->configuration().jid());
     request.setTo(jid);
     if(client()->sendPacket(request))
         return request.id();
     else
-        return "";
+        return QString();
 }
 
 QStringList QXmppEntityTimeManager::discoveryFeatures() const

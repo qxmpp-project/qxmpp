@@ -76,7 +76,7 @@ QString QXmppVCardManager::requestVCard(const QString& jid)
     if(client()->sendPacket(request))
         return request.id();
     else
-        return "";
+        return QString();
 }
 
 /// Returns the vCard of the connected client.
