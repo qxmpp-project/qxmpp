@@ -35,7 +35,7 @@
 class QXmppIncomingServerPrivate
 {
 public:
-    QString authenticated;
+    QSet<QString> authenticated;
     QString domain;
     QString localStreamId;
 };
@@ -146,13 +146,13 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         }
 
     }
-    else if (!d->authenticated.isEmpty() &&
-             jidToDomain(stanza.attribute("from")) == d->authenticated)
+    else if (d->authenticated.contains(jidToDomain(stanza.attribute("from"))))
     {
         // relay stanza if the remote party is authenticated
         emit elementReceived(stanza);
     } else {
-        warning("Received an element, but remote party is not authenticated");
+        warning(QString("Received an element from unverified domain %1").arg(jidToDomain(stanza.attribute("from"))));
+        disconnectFromHost();
     }
 }
 
@@ -190,10 +190,13 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     // check for success
     if (response.type() == "valid")
     {
-        info("Incoming stream is ready");
-        d->authenticated = dialback.from();
-        emit connected();
+        info(QString("Verified incoming domain %1").arg(dialback.from()));
+        const bool wasConnected = !d->authenticated.isEmpty();
+        d->authenticated.insert(dialback.from());
+        if (!wasConnected)
+            emit connected();
     } else {
+        warning(QString("Failed to verify incoming domain %1").arg(dialback.from()));
         disconnectFromHost();
     }
 
