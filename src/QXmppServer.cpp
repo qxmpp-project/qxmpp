@@ -825,7 +825,7 @@ void QXmppServer::slotStreamDisconnected()
     if (outgoing && d->outgoingServers.contains(outgoing))
     {
         d->outgoingServers.removeAll(outgoing);
-        d->queues.remove(incoming);
+        d->queues.remove(outgoing);
         emit streamRemoved(outgoing);
         outgoing->deleteLater();
         return;
