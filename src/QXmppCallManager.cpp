@@ -640,6 +640,10 @@ void QXmppCallManager::localCandidatesChanged()
 
     iq.content().setCreator(call->d->contentCreator);
     iq.content().setName(call->d->contentName);
+
+    // transport
+    iq.content().setTransportUser(call->d->connection->localUser());
+    iq.content().setTransportPassword(call->d->connection->localPassword());
     foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
         iq.content().addTransportCandidate(candidate);
 
