@@ -33,6 +33,7 @@
 #include "QXmppGlobal.h"
 
 QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
+    m_clientCapabilitiesNode("http://code.google.com/p/qxmpp"),
     m_clientCategory("client"),
     m_clientType("pc"),
     m_clientName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
@@ -52,7 +53,7 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
 
         if(receivedIq.type() == QXmppIq::Get &&
            receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(QString(capabilities_node))))
+           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(m_clientCapabilitiesNode)))
         {
             // respond to query
             QXmppDiscoveryIq qxmppFeatures = capabilities();
@@ -154,6 +155,15 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     return iq;
 }
 
+/// Sets the capabilities node of the local XMPP client.
+///
+/// \param node
+
+void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString &node)
+{
+    m_clientCapabilitiesNode = node;
+}
+
 /// Sets the category of the local XMPP client.
 ///
 /// You can find a list of valid categories at:
@@ -187,11 +197,20 @@ void QXmppDiscoveryManager::setClientName(const QString& name)
     m_clientName = name;
 }
 
+/// Returns the capabilities node of the local XMPP client.
+///
+/// By default this is "http://code.google.com/p/qxmpp".
+
+QString QXmppDiscoveryManager::clientCapabilitiesNode() const
+{
+    return m_clientCapabilitiesNode;
+}
+
 /// Returns the category of the local XMPP client.
 ///
 /// By default this is "client".
 
-QString QXmppDiscoveryManager::clientCategory()
+QString QXmppDiscoveryManager::clientCategory() const
 {
     return m_clientCategory;
 }
@@ -200,7 +219,7 @@ QString QXmppDiscoveryManager::clientCategory()
 ///
 /// By default this is "pc".
 
-QString QXmppDiscoveryManager::clientType()
+QString QXmppDiscoveryManager::clientType() const
 {
     return m_clientType;
 }
@@ -209,7 +228,7 @@ QString QXmppDiscoveryManager::clientType()
 ///
 /// By default this is "Based on QXmpp x.y.z".
 
-QString QXmppDiscoveryManager::clientName()
+QString QXmppDiscoveryManager::clientName() const
 {
     return m_clientName;
 }

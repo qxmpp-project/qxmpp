@@ -43,13 +43,18 @@ public:
     QString requestInfo(const QString& jid, const QString& node = "");
     QString requestItems(const QString& jid, const QString& node = "");
 
+    QString clientCapabilitiesNode() const;
+    void setClientCapabilitiesNode(const QString&);
+
     // http://xmpp.org/registrar/disco-categories.html#client
+    QString clientCategory() const;
     void setClientCategory(const QString&);
-    void setClientType(const QString&);
+
     void setClientName(const QString&);
-    QString clientCategory();
-    QString clientType();
-    QString clientName();
+    QString clientName() const;
+
+    QString clientType() const;
+    void setClientType(const QString&);
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -65,6 +70,7 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
+    QString m_clientCapabilitiesNode;
     QString m_clientCategory;
     QString m_clientType;
     QString m_clientName;
