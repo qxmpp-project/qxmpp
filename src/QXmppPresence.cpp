@@ -449,7 +449,7 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
     if (!m_statusText.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
     if (m_priority != 0)
-        helperToXmlAddNumberElement(xmlWriter, "priority", m_priority);
+        helperToXmlAddTextElement(xmlWriter, "priority", QString::number(m_priority));
 }
 
 /// Returns the photo-hash of the VCardUpdate.

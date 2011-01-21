@@ -62,7 +62,5 @@ void helperToXmlAddDomElement(QXmlStreamWriter* stream,
     const QDomElement& element, const QStringList &omitNamespaces);
 void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value);
-void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
-                           int value);
 
 #endif // QXMPPUTILS_H

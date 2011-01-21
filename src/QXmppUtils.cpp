@@ -328,12 +328,6 @@ void helperToXmlAddDomElement(QXmlStreamWriter* stream, const QDomElement& eleme
     stream->writeEndElement();
 }
 
-
-void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name, int value)
-{
-    stream->writeTextElement( name, QString::number(value));
-}
-
 void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value)
 {
