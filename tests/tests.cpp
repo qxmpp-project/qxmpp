@@ -319,7 +319,7 @@ void TestPackets::testMessageFull()
     const QByteArray xml(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
         "<subject>test subject</subject>"
-        "<body>test body</body>"
+        "<body>test body &amp; stuff</body>"
         "<thread>test thread</thread>"
         "<composing xmlns=\"http://jabber.org/protocol/chatstates\"/>"
         "</message>");
@@ -329,7 +329,7 @@ void TestPackets::testMessageFull()
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
     QCOMPARE(message.type(), QXmppMessage::Normal);
-    QCOMPARE(message.body(), QString("test body"));
+    QCOMPARE(message.body(), QString("test body & stuff"));
     QCOMPARE(message.subject(), QString("test subject"));
     QCOMPARE(message.thread(), QString("test thread"));
     QCOMPARE(message.state(), QXmppMessage::Composing);
