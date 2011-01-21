@@ -65,7 +65,4 @@ void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
 void helperToXmlAddNumberElement(QXmlStreamWriter* stream, const QString& name,
                            int value);
 
-QString escapeString(const QString& str);
-QString unescapeString(const QString& str);
-
 #endif // QXMPPUTILS_H
