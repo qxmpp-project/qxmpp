@@ -79,7 +79,7 @@ void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("time");
-    helperToXmlAddAttribute(writer, "xmlns", ns_entity_time);
+    writer->writeAttribute("xmlns", ns_entity_time);
 
     if(m_utc.isValid())
     {

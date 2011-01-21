@@ -278,14 +278,14 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
     if(!cond.isEmpty())
     {
         writer->writeStartElement(cond);
-        helperToXmlAddAttribute(writer,"xmlns", ns_stanza);
+        writer->writeAttribute("xmlns", ns_stanza);
         writer->writeEndElement();
     }
     if(!m_text.isEmpty())
     {
         writer->writeStartElement("text");
-        helperToXmlAddAttribute(writer,"xml:lang", "en");
-        helperToXmlAddAttribute(writer,"xmlns", ns_stanza);
+        writer->writeAttribute("xml:lang", "en");
+        writer->writeAttribute("xmlns", ns_stanza);
         writer->writeCharacters(m_text);
         writer->writeEndElement();
     }

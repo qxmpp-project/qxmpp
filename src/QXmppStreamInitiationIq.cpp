@@ -94,7 +94,7 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
 void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("si");
-    helperToXmlAddAttribute(writer, "xmlns", ns_stream_initiation);
+    writer->writeAttribute("xmlns", ns_stream_initiation);
     helperToXmlAddAttribute(writer, "id", m_siId);
     helperToXmlAddAttribute(writer, "mime-type", m_mimeType);
     if (m_profile == FileTransfer)

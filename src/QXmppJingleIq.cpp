@@ -210,7 +210,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     if (!m_descriptionType.isEmpty() || !m_payloadTypes.isEmpty())
     {
         writer->writeStartElement("description");
-        helperToXmlAddAttribute(writer, "xmlns", m_descriptionType);
+        writer->writeAttribute("xmlns", m_descriptionType);
         helperToXmlAddAttribute(writer, "media", m_descriptionMedia);
         foreach (const QXmppJinglePayloadType &payload, m_payloadTypes)
             payload.toXml(writer);
@@ -221,7 +221,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     if (!m_transportType.isEmpty() || !m_transportCandidates.isEmpty())
     {
         writer->writeStartElement("transport");
-        helperToXmlAddAttribute(writer, "xmlns", m_transportType);
+        writer->writeAttribute("xmlns", m_transportType);
         helperToXmlAddAttribute(writer, "ufrag", m_transportUser);
         helperToXmlAddAttribute(writer, "pwd", m_transportPassword);
         foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
@@ -404,7 +404,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("jingle");
-    helperToXmlAddAttribute(writer, "xmlns", ns_jingle);
+    writer->writeAttribute("xmlns", ns_jingle);
     helperToXmlAddAttribute(writer, "action", jingle_actions[m_action]);
     helperToXmlAddAttribute(writer, "initiator", m_initiator);
     helperToXmlAddAttribute(writer, "responder", m_responder);
@@ -416,7 +416,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (m_ringing)
     {
         writer->writeStartElement("ringing");
-        helperToXmlAddAttribute(writer, "xmlns", ns_jingle_rtp_info);
+        writer->writeAttribute("xmlns", ns_jingle_rtp_info);
         writer->writeEndElement();
     }
 

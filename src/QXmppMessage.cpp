@@ -260,7 +260,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     if (m_state > None && m_state <= Paused)
     {
         xmlWriter->writeStartElement(chat_states[m_state]);
-        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_chat_states);
+        xmlWriter->writeAttribute("xmlns", ns_chat_states);
         xmlWriter->writeEndElement();
     }
 
@@ -272,13 +272,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         {
             // XEP-0203: Delayed Delivery
             xmlWriter->writeStartElement("delay");
-            helperToXmlAddAttribute(xmlWriter, "xmlns", ns_delayed_delivery);
+            xmlWriter->writeAttribute("xmlns", ns_delayed_delivery);
             helperToXmlAddAttribute(xmlWriter, "stamp", datetimeToString(utcStamp));
             xmlWriter->writeEndElement();
         } else {
             // XEP-0091: Legacy Delayed Delivery
             xmlWriter->writeStartElement("x");
-            helperToXmlAddAttribute(xmlWriter, "xmlns", ns_legacy_delayed_delivery);
+            xmlWriter->writeAttribute("xmlns", ns_legacy_delayed_delivery);
             helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
             xmlWriter->writeEndElement();
         }

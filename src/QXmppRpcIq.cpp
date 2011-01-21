@@ -319,7 +319,7 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
+    writer->writeAttribute("xmlns", ns_rpc);
 
     writer->writeStartElement("methodResponse");
     if (m_faultCode)
@@ -421,7 +421,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    helperToXmlAddAttribute(writer, "xmlns", ns_rpc);
+    writer->writeAttribute("xmlns", ns_rpc);
 
     writer->writeStartElement("methodCall");
     writer->writeTextElement("methodName", m_method);

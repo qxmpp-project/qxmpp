@@ -171,7 +171,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if(m_vCardUpdateType != VCardUpdateNone)
     {
         xmlWriter->writeStartElement("x");
-        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_vcard_update);
+        xmlWriter->writeAttribute("xmlns", ns_vcard_update);
         switch(m_vCardUpdateType)
         {
         case VCardUpdateNoPhoto:
@@ -192,7 +192,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         && !m_capabilityHash.isEmpty())
     {
         xmlWriter->writeStartElement("c");
-        helperToXmlAddAttribute(xmlWriter, "xmlns", ns_capabilities);
+        xmlWriter->writeAttribute("xmlns", ns_capabilities);
         helperToXmlAddAttribute(xmlWriter, "hash", m_capabilityHash);
         helperToXmlAddAttribute(xmlWriter, "node", m_capabilityNode);
         helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer.toBase64());

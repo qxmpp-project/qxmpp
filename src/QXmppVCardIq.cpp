@@ -264,7 +264,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
-    helperToXmlAddAttribute(writer,"xmlns", ns_vcard);
+    writer->writeAttribute("xmlns", ns_vcard);
     if (m_birthday.isValid())
         helperToXmlAddTextElement(writer, "BDAY", m_birthday.toString("yyyy-MM-dd"));
     if (!m_email.isEmpty())

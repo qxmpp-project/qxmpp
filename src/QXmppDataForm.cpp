@@ -360,7 +360,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         return;
 
     writer->writeStartElement("x");
-    helperToXmlAddAttribute(writer, "xmlns", ns_data);
+    writer->writeAttribute("xmlns", ns_data);
 
     /* form type */
     QString typeStr;

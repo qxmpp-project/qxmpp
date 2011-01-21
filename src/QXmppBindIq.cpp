@@ -80,7 +80,7 @@ void QXmppBindIq::parseElementFromChild(const QDomElement &element)
 void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("bind");
-    helperToXmlAddAttribute(writer, "xmlns", ns_bind);
+    writer->writeAttribute("xmlns", ns_bind);
     if (!m_jid.isEmpty())
         helperToXmlAddTextElement(writer, "jid", m_jid);
     if (!m_resource.isEmpty())

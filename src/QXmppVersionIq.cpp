@@ -95,7 +95,7 @@ void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    helperToXmlAddAttribute(writer, "xmlns", ns_version);
+    writer->writeAttribute("xmlns", ns_version);
 
     if (!m_name.isEmpty())
         helperToXmlAddTextElement(writer, "name", m_name);

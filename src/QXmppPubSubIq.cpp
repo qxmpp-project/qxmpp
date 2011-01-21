@@ -226,7 +226,7 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("pubsub");
-    helperToXmlAddAttribute(writer, "xmlns", ns_pubsub);
+    writer->writeAttribute("xmlns", ns_pubsub);
 
     // write query type
     writer->writeStartElement(pubsub_queries[m_queryType]);

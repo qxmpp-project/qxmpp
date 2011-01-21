@@ -112,7 +112,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
 void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("chat");
-    helperToXmlAddAttribute(writer, "xmlns", ns_archive);
+    writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
         helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
@@ -367,7 +367,7 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("list");
-    helperToXmlAddAttribute(writer, "xmlns", ns_archive);
+    writer->writeAttribute("xmlns", ns_archive);
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
@@ -377,7 +377,7 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (m_max > 0)
     {
         writer->writeStartElement("set");
-        helperToXmlAddAttribute(writer, "xmlns", ns_rsm);
+        writer->writeAttribute("xmlns", ns_rsm);
         helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
     }
@@ -401,7 +401,7 @@ void QXmppArchivePrefIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("pref");
-    helperToXmlAddAttribute(writer, "xmlns", ns_archive);
+    writer->writeAttribute("xmlns", ns_archive);
     writer->writeEndElement();
 }
 
@@ -480,13 +480,13 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("retrieve");
-    helperToXmlAddAttribute(writer, "xmlns", ns_archive);
+    writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
     if (m_max > 0)
     {
         writer->writeStartElement("set");
-        helperToXmlAddAttribute(writer, "xmlns", ns_rsm);
+        writer->writeAttribute("xmlns", ns_rsm);
         helperToXmlAddTextElement(writer, "max", QString::number(m_max));
         writer->writeEndElement();
     }
