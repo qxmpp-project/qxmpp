@@ -194,11 +194,9 @@ void QXmppMessage::parse(const QDomElement &element)
     QXmppStanza::parse(element);
 
     setTypeFromStr(element.attribute("type"));
-    setBody(unescapeString(
-            element.firstChildElement("body").text()));
-    setSubject(unescapeString(
-            element.firstChildElement("subject").text()));
-    setThread(element.firstChildElement("thread").text());
+    m_body = element.firstChildElement("body").text();
+    m_subject = element.firstChildElement("subject").text();
+    m_thread = element.firstChildElement("thread").text();
 
     // chat states
     for (int i = Active; i <= Paused; i++)
