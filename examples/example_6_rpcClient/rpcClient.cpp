@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 The QXmpp developers
+ * Copyright (C) 2008-2011 The QXmpp developers
  *
  * Authors:
  *	Ian Reinhart Geiser
