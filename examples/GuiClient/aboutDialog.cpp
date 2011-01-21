@@ -37,7 +37,7 @@ aboutDialog::aboutDialog(QWidget *parent) :
 
     setWindowTitle(QString("About %1").arg(qApp->applicationName()));
 
-    ui->textEdit->append(QString("Copyright © 2009-2010, Manjeet Dahiya\n"));
+    ui->textEdit->append(QString("Copyright © 2009-2011, Manjeet Dahiya\n"));
     ui->textEdit->append(qApp->applicationName() + " " + qApp->applicationVersion());
     ui->textEdit->append(QString("\nBased on:"));
     ui->textEdit->append(QString("QXmpp %1").arg(QXmppVersion()));
