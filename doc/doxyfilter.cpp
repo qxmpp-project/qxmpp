@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
         setField(code, "INPUT", "../src");
         setField(code, "INPUT_FILTER", QString::fromLocal8Bit(argv[0]));
         setField(code, "PROJECT_NAME", "QXmpp");
-        setField(code, "PROJECT_NUMBER", QString("%1.%2.%3").arg(
+        setField(code, "PROJECT_NUMBER", QString("Version: %1.%2.%3").arg(
                 QString::number((QXMPP_VERSION >> 16) & 0xff),
                 QString::number((QXMPP_VERSION >> 8) & 0xff),
                 QString::number(QXMPP_VERSION & 0xff)));
