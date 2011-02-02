@@ -47,9 +47,9 @@
 Q_GLOBAL_STATIC(QXmppSrvInfoLookupManager, theSrvInfoLookupManager)
 
 #if defined(Q_OS_WIN)
-typedef DNS_STATUS (*dns_query_utf8_proto)(PCSTR,WORD,DWORD,PIP4_ARRAY,PDNS_RECORD*,PVOID*);
+typedef DNS_STATUS (WINAPI *dns_query_utf8_proto)(PCSTR,WORD,DWORD,PIP4_ARRAY,PDNS_RECORD*,PVOID*);
 static dns_query_utf8_proto local_dns_query_utf8 = 0;
-typedef void (*dns_record_list_free_proto)(PDNS_RECORD,DNS_FREE_TYPE);
+typedef void (WINAPI *dns_record_list_free_proto)(PDNS_RECORD,DNS_FREE_TYPE);
 static dns_record_list_free_proto local_dns_record_list_free = 0;
 
 static void resolveLibrary()
