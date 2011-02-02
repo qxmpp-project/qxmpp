@@ -49,22 +49,21 @@ Path of installations:
 EXAMPLES
 --------
 
-Have a look the available examples to start using this library. Logging has
-been set to stdout so you can see the progress on the command line.
+Look at the example directory for various examples.
 
 * example_0_connected
-
 This example just connects to the xmpp server and start receiving presences
 (updates) from the server. After running this example, you can see this user
 online, if it's added in your roster (friends list).
 
 
 * example_1_echoClient
-
 This is a very simple bot which echoes the message sent to it. Run this
 example, send it a message from a friend of this bot and you will
 receive the message back. This example shows how to receive and send messages.
 
+* GuiClient
+This is a full fledged Graphical XMPP client. This example will uses most of the part of this library.
 
 DOCUMENTATION
 -------------
