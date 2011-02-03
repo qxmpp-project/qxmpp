@@ -223,7 +223,7 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
-    void setStunServer(const QString &hostName, quint16 port = 3478);
+    void setStunServer(const QHostAddress &host, quint16 port = 3478);
 
     bool bind(const QList<QHostAddress> &addresses);
     bool isConnected() const;

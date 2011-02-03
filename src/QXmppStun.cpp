@@ -1545,29 +1545,11 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 /// Sets the STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
-/// \param hostName The host name or address of the STUN server.
-/// \param port     The port of the STUN server.
+/// \param host The address of the STUN server.
+/// \param port The port of the STUN server.
 
-void QXmppIceConnection::setStunServer(const QString &hostName, quint16 port)
+void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 {
-    // lookup STUN server
-    QHostAddress host;
-    QHostInfo hostInfo = QHostInfo::fromName(hostName);
-    foreach (const QHostAddress &address, hostInfo.addresses())
-    {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            host = address;
-            break;
-        }
-    }
-    if (host.isNull())
-    {
-        warning(QString("Could not lookup STUN server %1").arg(hostName));
-        return;
-    }
-
-    // store STUN server
     m_stunHost = host;
     m_stunPort = port;
     foreach (QXmppIceComponent *socket, m_components.values())
