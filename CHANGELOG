@@ -26,11 +26,15 @@ QXmpp 0.3.0 (Unreleased)
       QXmppDiscoveryManager::infoReceived and QXmppDiscoveryManager::itemsReceived
   
   - Removal
+    Extensions QXmppArchiveManager, QXmppMucManager, QXmppCallManager, QXmppTransferManager
+    will not load by default. Therefore following functions to provide the reference 
+    have been removed.
     QXmppClient::transferManager()
     QXmppClient::archiveManager()
     QXmppClient::callManager()
     QXmppClient::mucManager()
-    Note: Use QXmppClient::addExtension() and QXmppClient::findExtension()
+    Note: Once should use QXmppClient::addExtension() and QXmppClient::findExtension()
+          to load or enable these extensions.
   
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
