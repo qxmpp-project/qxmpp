@@ -175,8 +175,9 @@ QXmppClient::QXmppClient(QObject *parent)
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
 
-    d->transferManager = new QXmppTransferManager;
-    addExtension(d->transferManager);
+//    Disable transferManager from the default managers.
+//    d->transferManager = new QXmppTransferManager;
+//    addExtension(d->transferManager);
 
     d->vCardManager = new QXmppVCardManager;
     addExtension(d->vCardManager);
@@ -573,18 +574,6 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
             return;
         }
     }
-}
-
-/// Returns the reference to QXmppTransferManager, implementation of:
-///
-///  * XEP-0047: In-Band Bytestreams
-///  * XEP-0095: Stream Initiation
-///  * XEP-0096: SI File Transfer
-///
-
-QXmppTransferManager& QXmppClient::transferManager()
-{
-    return *d->transferManager;
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.

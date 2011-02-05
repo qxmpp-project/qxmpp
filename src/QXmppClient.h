@@ -133,7 +133,6 @@ public:
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppRosterManager& rosterManager();
-    QXmppTransferManager& transferManager();
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
 
