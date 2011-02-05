@@ -44,7 +44,6 @@ class QXmppStream;
 class QXmppDiscoveryIq;
 class QXmppReconnectionManager;
 class QXmppRosterManager;
-class QXmppTransferManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
 
