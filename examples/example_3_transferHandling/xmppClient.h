@@ -43,6 +43,9 @@ private slots:
     void slotFinished();
     void slotPresenceReceived(const QXmppPresence &presence);
     void slotProgress(qint64 done, qint64 total);
+
+private:
+    QXmppTransferManager *transferManager;
 };
 
 #endif // IBBCLIENT_H

@@ -31,16 +31,20 @@
 #include "xmppClient.h"
 
 xmppClient::xmppClient(QObject *parent)
-    : QXmppClient(parent)
+    : QXmppClient(parent), transferManager(0)
 {
+    // add transfer manager
+    transferManager = new QXmppTransferManager;
+    addExtension(transferManager);
+
     // comment the following to use all available methods (highly recommended)
-    transferManager().setSupportedMethods(QXmppTransferJob::InBandMethod);
+    transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
 
     bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
                          this, SLOT(slotPresenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(&transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+    check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
                     this, SLOT(slotFileReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
 }
@@ -94,7 +98,7 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // send the file and connect to the job's signals
-    QXmppTransferJob *job = transferManager().sendFile(presence.from(), "xmppClient.cpp");
+    QXmppTransferJob *job = transferManager->sendFile(presence.from(), "xmppClient.cpp");
 
     bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
              this, SLOT(slotError(QXmppTransferJob::Error)) );
