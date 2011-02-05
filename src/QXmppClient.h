@@ -26,7 +26,6 @@
 
 #include <QObject>
 #include <QAbstractSocket>
-#include <QVariant>
 
 #include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
