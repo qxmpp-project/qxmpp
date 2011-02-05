@@ -32,7 +32,6 @@
 
 #include "QXmppReconnectionManager.h"
 #include "QXmppRosterManager.h"
-#include "QXmppTransferManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 #include "QXmppEntityTimeManager.h"
@@ -52,7 +51,6 @@ public:
 
     QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
     QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
-    QXmppTransferManager *transferManager;///< Pointer to the transfer manager
     QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
     QXmppVersionManager *versionManager;      ///< Pointer to the version manager
 
@@ -174,10 +172,6 @@ QXmppClient::QXmppClient(QObject *parent)
     // TODO move manager references to d->extensions
     d->rosterManager = new QXmppRosterManager(this);
     addExtension(d->rosterManager);
-
-//    Disable transferManager from the default managers.
-//    d->transferManager = new QXmppTransferManager;
-//    addExtension(d->transferManager);
 
     d->vCardManager = new QXmppVCardManager;
     addExtension(d->vCardManager);
