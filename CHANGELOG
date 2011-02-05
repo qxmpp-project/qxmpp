@@ -24,7 +24,10 @@ QXmpp 0.3.0 (Unreleased)
     * QXmppVCard class name changed to QXmppVCardIq
     * Signal QXmppClient::discoveryIqReceived in favour of 
       QXmppDiscoveryManager::infoReceived and QXmppDiscoveryManager::itemsReceived
-    
+  - Removal
+    QXmppClient::transferManager()
+    Note: Use QXmppClient::addExtension() and QXmppClient::findExtension()
+  
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
     servers using only a JID and a password.
   - Improve support for SASL authentication, with a verification of the second
