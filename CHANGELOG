@@ -24,6 +24,7 @@ QXmpp 0.3.0 (Unreleased)
     * QXmppVCard class name changed to QXmppVCardIq
     * Signal QXmppClient::discoveryIqReceived in favour of 
       QXmppDiscoveryManager::infoReceived and QXmppDiscoveryManager::itemsReceived
+  
   - Removal
     QXmppClient::transferManager()
     QXmppClient::archiveManager()
