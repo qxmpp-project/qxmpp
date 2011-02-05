@@ -64,6 +64,11 @@ class QXmppVersionManager;
 /// to the server on disconnections due to an error. User can have a custom
 /// reconnection mechanism as well.
 ///
+/// Not all the managers or extensions have been enabled by default. One can
+/// enable/disable the managers using the funtions addExtension() and
+/// removeExtension(). findExtension() can be used to find reference/pointer to
+/// particular instansiated and enabled manager.
+///
 /// \ingroup Core
 
 class QXmppClient : public QXmppLoggable
