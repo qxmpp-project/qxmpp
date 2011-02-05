@@ -183,6 +183,14 @@ private:
 /// and XEP-0096: SI File Transfer. The actual file transfer is then performed
 /// using either XEP-0065: SOCKS5 Bytestreams or XEP-0047: In-Band Bytestreams.
 ///
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
+///
+/// \code
+/// QXmppTransferManager *manager = new QXmppTransferManager;
+/// client->addExtension(manager);
+/// \endcode
+///
 /// \ingroup Managers
  
 class QXmppTransferManager : public QXmppClientExtension
