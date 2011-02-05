@@ -69,6 +69,13 @@ class QXmppVersionManager;
 /// removeExtension(). findExtension() can be used to find reference/pointer to
 /// particular instansiated and enabled manager.
 ///
+/// List of managers enabled by default:
+/// - QXmppRosterManager
+/// - QXmppVCardManager
+/// - QXmppVersionManager
+/// - QXmppDiscoveryManager
+/// - QXmppEntityTimeManager
+///
 /// \ingroup Core
 
 class QXmppClient : public QXmppLoggable
