@@ -58,7 +58,7 @@ class QXmppVersionManager;
 ///
 /// This class will provide the handle/reference to QXmppRosterManager (roster management),
 /// QXmppVCardManager (vCard manager), QXmppReconnectionManager (reconnection
-/// mechanism) and QXmppTransferManager (file transfers).
+/// mechanism) and QXmppVersionManager (software version information).
 ///
 /// By default, a reconnection mechanism exists, which makes sure of reconnecting
 /// to the server on disconnections due to an error. User can have a custom
