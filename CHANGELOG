@@ -26,6 +26,9 @@ QXmpp 0.3.0 (Unreleased)
       QXmppDiscoveryManager::infoReceived and QXmppDiscoveryManager::itemsReceived
   - Removal
     QXmppClient::transferManager()
+    QXmppClient::archiveManager()
+    QXmppClient::callManager()
+    QXmppClient::mucManager()
     Note: Use QXmppClient::addExtension() and QXmppClient::findExtension()
   
   - Add support for DNS SRV lookups, meaning you can connect to nearly all
