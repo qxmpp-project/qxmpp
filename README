@@ -81,6 +81,7 @@ For this release, the following platforms have been tested:
 
   win32-g++        (Qt SDK)
   win32-msvc2008   (Qt MSVC-2008)
+  win64-msvc2008   (Qt MSVC-2008)
   symbian-gcce     (Nokia Qt SDK)
   linux-g++        (32-bit and 64-bit)
   macos-g++        (32-bit and 64-bit)
