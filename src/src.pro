@@ -169,5 +169,5 @@ QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
 # Installation
 headers.files = $$INSTALL_HEADERS
 headers.path = $$[QT_INSTALL_PREFIX]/include/qxmpp
-target.path = $$[QT_INSTALL_PREFIX]/lib
+target.path = $$[QT_INSTALL_LIBS]
 INSTALLS += headers target
