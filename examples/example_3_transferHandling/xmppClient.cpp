@@ -37,8 +37,10 @@ xmppClient::xmppClient(QObject *parent)
     transferManager = new QXmppTransferManager;
     addExtension(transferManager);
 
-    // comment the following to use all available methods (highly recommended)
-    transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
+    // uncomment one of the following if you only want to use a specific transfer method:
+    //
+    // transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
+    // transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
     bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
                          this, SLOT(slotPresenceReceived(QXmppPresence)));
