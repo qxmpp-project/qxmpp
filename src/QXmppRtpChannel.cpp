@@ -119,8 +119,9 @@ public:
     QMap<int, QXmppCodec*> incomingCodecs;
     int incomingMinimum;
     int incomingMaximum;
+    // position of the head of the incoming buffer, in bytes
+    qint64 incomingPos;
     quint16 incomingSequence;
-    quint32 incomingStamp;
     QXmppJinglePayloadType incomingTonesType;
 
     QByteArray outgoingBuffer;
@@ -144,8 +145,8 @@ QXmppRtpChannelPrivate::QXmppRtpChannelPrivate()
     incomingBuffering(true),
     incomingMinimum(0),
     incomingMaximum(0),
+    incomingPos(0),
     incomingSequence(0),
-    incomingStamp(0),
     outgoingCodec(0),
     outgoingMarker(true),
     outgoingSequence(1),
@@ -292,26 +293,28 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     }
 
     // check sequence number
+#if 0
     if (d->incomingSequence && sequence != d->incomingSequence + 1)
         warning(QString("RTP packet seq %1 is out of order, previous was %2")
                 .arg(QString::number(sequence))
                 .arg(QString::number(d->incomingSequence)));
+#endif
     d->incomingSequence = sequence;
 
     // determine packet's position in the buffer (in bytes)
     qint64 packetOffset = 0;
     if (!d->incomingBuffer.isEmpty())
     {
-        packetOffset = (stamp - d->incomingStamp) * SAMPLE_BYTES;
+        packetOffset = stamp * SAMPLE_BYTES - d->incomingPos;
         if (packetOffset < 0)
         {
             warning(QString("RTP packet stamp %1 is too old, buffer start is %2")
                     .arg(QString::number(stamp))
-                    .arg(QString::number(d->incomingStamp)));
+                    .arg(QString::number(d->incomingPos)));
             return;
         }
     } else {
-        d->incomingStamp = stamp;
+        d->incomingPos = stamp * SAMPLE_BYTES + (d->incomingPos % SAMPLE_BYTES);
     }
 
     // allocate space for new packet
@@ -325,11 +328,14 @@ void QXmppRtpChannel::datagramReceived(const QByteArray &ba)
     // check whether we are running late
     if (d->incomingBuffer.size() > d->incomingMaximum)
     {
-        const qint64 droppedSize = d->incomingBuffer.size() - d->incomingMinimum;
-        debug(QString("RTP buffer is too full, dropping %1 bytes")
+        qint64 droppedSize = d->incomingBuffer.size() - d->incomingMinimum;
+        const int remainder = droppedSize % SAMPLE_BYTES;
+        if (remainder)
+            droppedSize -= remainder;
+        warning(QString("Incoming RTP buffer is too full, dropping %1 bytes")
                 .arg(QString::number(droppedSize)));
-        d->incomingBuffer = d->incomingBuffer.right(d->incomingMinimum);
-        d->incomingStamp += droppedSize / SAMPLE_BYTES;
+        d->incomingBuffer.remove(0, droppedSize);
+        d->incomingPos += droppedSize;
     }
     // check whether we have filled the initial buffer
     if (d->incomingBuffer.size() >= d->incomingMinimum)
@@ -358,6 +364,8 @@ qint64 QXmppRtpChannel::readData(char * data, qint64 maxSize)
     // if we are filling the buffer, return empty samples
     if (d->incomingBuffering)
     {
+        // FIXME: if we are asked for a non-integer number of samples,
+        // we will return junk on next read as we don't increment d->incomingPos
         memset(data, 0, maxSize);
         return maxSize;
     }
@@ -375,15 +383,17 @@ qint64 QXmppRtpChannel::readData(char * data, qint64 maxSize)
 
     // add local DTMF echo
     if (!d->outgoingTones.isEmpty()) {
+        const int headOffset = d->incomingPos % SAMPLE_BYTES;
+        const int samples = (headOffset + maxSize + SAMPLE_BYTES - 1) / SAMPLE_BYTES;
         const QByteArray chunk = renderTone(
             d->outgoingTones[0].tone,
             d->payloadType.clockrate(),
-            d->incomingStamp - d->outgoingTones[0].incomingStart,
-            maxSize / SAMPLE_BYTES);
-        memcpy(data, chunk.constData(), chunk.size());
+            d->incomingPos / SAMPLE_BYTES - d->outgoingTones[0].incomingStart,
+            samples);
+        memcpy(data, chunk.constData() + headOffset, maxSize);
     }
 
-    d->incomingStamp += readSize / SAMPLE_BYTES;
+    d->incomingPos += maxSize;
     return maxSize;
 }
 
@@ -403,6 +413,31 @@ QXmppJinglePayloadType QXmppRtpChannel::payloadType() const
 QList<QXmppJinglePayloadType> QXmppRtpChannel::localPayloadTypes() const
 {
     return d->outgoingPayloadTypes;
+}
+
+/// Returns the position in the received audio data.
+
+qint64 QXmppRtpChannel::pos() const
+{
+    return d->incomingPos;
+}
+
+/// Seeks in the received audio data.
+///
+/// Seeking backwards will result in empty samples being added at the start
+/// of the buffer.
+///
+/// \param pos
+
+bool QXmppRtpChannel::seek(qint64 pos)
+{
+    qint64 delta = pos - d->incomingPos;
+    if (delta < 0)
+        d->incomingBuffer.prepend(QByteArray(-delta, 0));
+    else
+        d->incomingBuffer.remove(0, delta);
+    d->incomingPos = pos;
+    return true;
 }
 
 /// Sets the remote payload types.
@@ -463,7 +498,7 @@ void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> 
     d->outgoingTimer->setInterval(d->payloadType.ptime());
 
     d->incomingMinimum = d->outgoingChunk * 5;
-    d->incomingMaximum = d->outgoingChunk * 8;
+    d->incomingMaximum = d->outgoingChunk * 15;
 
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 }
@@ -476,7 +511,7 @@ void QXmppRtpChannel::startTone(QXmppRtpChannel::Tone tone)
 {
     ToneInfo info;
     info.tone = tone;
-    info.incomingStart = d->incomingStamp;
+    info.incomingStart = d->incomingPos / SAMPLE_BYTES;
     info.outgoingStart = d->outgoingStamp;
     info.finished = false;
     d->outgoingTones << info;
@@ -506,10 +541,9 @@ qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
 
     d->outgoingBuffer += QByteArray::fromRawData(data, maxSize);
 
-    if (!d->outgoingTimer->isActive()) {
-        writeDatagram();
+    // start sending audio chunks
+    if (!d->outgoingTimer->isActive())
         d->outgoingTimer->start();
-    }
 
     return maxSize;
 }
@@ -517,10 +551,14 @@ qint64 QXmppRtpChannel::writeData(const char * data, qint64 maxSize)
 void QXmppRtpChannel::writeDatagram()
 {
     // read audio chunk
-    if (d->outgoingBuffer.size() < d->outgoingChunk)
-        return;
-    QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
-    d->outgoingBuffer.remove(0, chunk.size());
+    QByteArray chunk;
+    if (d->outgoingBuffer.size() < d->outgoingChunk) {
+        warning("Outgoing RTP buffer is starved");
+        chunk = QByteArray(d->outgoingChunk, 0);
+    } else {
+        chunk = d->outgoingBuffer.left(d->outgoingChunk);
+        d->outgoingBuffer.remove(0, d->outgoingChunk);
+    }
 
     bool sendAudio = true;
     if (!d->outgoingTones.isEmpty()) {
