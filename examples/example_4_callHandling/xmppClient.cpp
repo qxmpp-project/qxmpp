@@ -84,17 +84,18 @@ void xmppClient::slotConnected()
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
 
-    // the size in bytes of the audio samples for a single RTP packet
-    const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+    // the size in bytes of the audio buffers to/from sound devices
+    // 160 ms seems to be the minimum to work consistently on Linux/Mac/Windows
+    const int bufferSize = (format.frequency() * format.channels() * (format.sampleSize() / 8) * 160) / 1000;
 
     // initialise audio output
     QAudioOutput *audioOutput = new QAudioOutput(format, this);
-    audioOutput->setBufferSize(2 * packetSize);
+    audioOutput->setBufferSize(bufferSize);
     audioOutput->start(channel);
 
     // initialise audio input
     QAudioInput *audioInput = new QAudioInput(format, this);
-    audioInput->setBufferSize(2 * packetSize);
+    audioInput->setBufferSize(bufferSize);
     audioInput->start(channel);
 }
 
