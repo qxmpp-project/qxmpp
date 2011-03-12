@@ -26,8 +26,9 @@
 
 #include <QChildEvent>
 #include <QDateTime>
-#include <QTextStream>
 #include <QFile>
+#include <QMetaType>
+#include <QTextStream>
 
 #include "QXmppLogger.h"
 
@@ -98,6 +99,8 @@ QXmppLogger::QXmppLogger(QObject *parent)
     m_logFilePath("QXmppClientLog.log"),
     m_messageTypes(QXmppLogger::AnyMessage)
 {
+    // make it possible to pass QXmppLogger::MessageType between threads
+    qRegisterMetaType< QXmppLogger::MessageType >("QXmppLogger::MessageType");
 }
 
 /// Returns the default logger.
