@@ -47,10 +47,17 @@ enum AttributeType {
     Username         = 0x0006, // RFC5389
     MessageIntegrity = 0x0008, // RFC5389
     ErrorCode        = 0x0009, // RFC5389
-    ChannelNumber    = 0x000c, // RFC5766
-    Lifetime         = 0x000d, // RFC5766
-    XorPeerAddress   = 0x0012, // RFC5766
+    ChannelNumber    = 0x000c, // RFC5766 : TURN
+    Lifetime         = 0x000d, // RFC5766 : TURN
+    XorPeerAddress   = 0x0012, // RFC5766 : TURN
+    DataAttr         = 0x0013, // RFC5766 : TURN
+    Realm            = 0x0014, // RFC5389
+    Nonce            = 0x0015, // RFC5389
+    XorRelayedAddress= 0x0016, // RFC5766 : TURN
+    EvenPort         = 0x0018, // RFC5766 : TURN
+    RequestedTransport=0x0019, // RFC5766 : TURN
     XorMappedAddress = 0x0020, // RFC5389
+    ReservationToken = 0x0022, // RFC5766 : TURN
     Priority         = 0x0024, // RFC5245
     UseCandidate     = 0x0025, // RFC5245
     Software         = 0x8022, // RFC5389
@@ -214,10 +221,14 @@ QXmppStunMessage::QXmppStunMessage()
     otherPort(0),
     sourcePort(0),
     xorMappedPort(0),
+    xorPeerPort(0),
+    xorRelayedPort(0),
     useCandidate(false),
     m_cookie(STUN_MAGIC),
     m_type(0),
     m_changeRequest(0),
+    m_channelNumber(0),
+    m_lifetime(0),
     m_priority(0)
 {
     m_id = QByteArray(ID_SIZE, 0);
@@ -242,6 +253,16 @@ void QXmppStunMessage::setId(const QByteArray &id)
 {
     Q_ASSERT(id.size() == ID_SIZE);
     m_id = id;
+}
+
+quint16 QXmppStunMessage::messageClass() const
+{
+    return m_type & 0x0110;
+}
+
+quint16 QXmppStunMessage::messageMethod() const
+{
+    return m_type & 0x3eef;
 }
 
 quint16 QXmppStunMessage::type() const
@@ -273,23 +294,72 @@ void QXmppStunMessage::setChangeRequest(quint32 changeRequest)
     m_attributes << ChangeRequest;
 }
 
-/// Returns the SOFTWARE attribute, containing a textual description of the
-/// software being used.
+/// Returns the CHANNEL-NUMBER attribute.
 
-QString QXmppStunMessage::software() const
+quint16 QXmppStunMessage::channelNumber() const
 {
-    return m_software;
+    return m_channelNumber;
 }
 
-/// Sets the SOFTWARE attribute, containing a textual description of the
-/// software being used.
+/// Sets the CHANNEL-NUMBER attribute.
 ///
-/// \param software
+/// \param channelNumber
 
-void QXmppStunMessage::setSoftware(const QString &software)
+void QXmppStunMessage::setChannelNumber(quint16 channelNumber)
 {
-    m_software = software;
-    m_attributes << Software;
+    m_channelNumber = channelNumber;
+    m_attributes << ChannelNumber;
+}
+
+/// Returns the DATA attribute.
+
+QByteArray QXmppStunMessage::data() const
+{
+    return m_data;
+}
+
+/// Sets the DATA attribute.
+
+void QXmppStunMessage::setData(const QByteArray &data)
+{
+    m_data = data;
+    m_attributes << DataAttr;
+}
+
+/// Returns the LIFETIME attribute, indicating the duration in seconds for
+/// which the server will maintain an allocation.
+
+quint32 QXmppStunMessage::lifetime() const
+{
+    return m_lifetime;
+}
+
+/// Sets the LIFETIME attribute, indicating the duration in seconds for
+/// which the server will maintain an allocation.
+///
+/// \param lifetime
+
+void QXmppStunMessage::setLifetime(quint32 lifetime)
+{
+    m_lifetime = lifetime;
+    m_attributes << Lifetime;
+}
+
+/// Returns the NONCE attribute.
+
+QByteArray QXmppStunMessage::nonce() const
+{
+    return m_nonce;
+}
+
+/// Sets the NONCE attribute.
+///
+/// \param nonce
+
+void QXmppStunMessage::setNonce(const QByteArray &nonce)
+{
+    m_nonce = nonce;
+    m_attributes << Nonce;
 }
 
 /// Returns the PRIORITY attribute, the priority that would be assigned to
@@ -311,14 +381,103 @@ void QXmppStunMessage::setPriority(quint32 priority)
     m_attributes << Priority;
 }
 
-/// Decodes a QXmppStunMessage and checks its integrity using the given
-/// password.
+/// Returns the REALM attribute.
+
+QString QXmppStunMessage::realm() const
+{
+    return m_realm;
+}
+
+/// Sets the REALM attribute.
+///
+/// \param realm
+
+void QXmppStunMessage::setRealm(const QString &realm)
+{
+    m_realm = realm;
+    m_attributes << Realm;
+}
+
+/// Returns the REQUESTED-TRANSPORT attribute.
+
+quint8 QXmppStunMessage::requestedTransport() const
+{
+    return m_requestedTransport;
+}
+
+/// Sets the REQUESTED-TRANSPORT attribute.
+///
+/// \param requestedTransport
+
+void QXmppStunMessage::setRequestedTransport(quint8 requestedTransport)
+{
+    m_requestedTransport = requestedTransport;
+    m_attributes << RequestedTransport;
+}
+
+/// Returns the RESERVATION-TOKEN attribute.
+
+QByteArray QXmppStunMessage::reservationToken() const
+{
+    return m_reservationToken;
+}
+
+/// Sets the RESERVATION-TOKEN attribute.
+///
+/// \param reservationToken
+
+void QXmppStunMessage::setReservationToken(const QByteArray &reservationToken)
+{
+    m_reservationToken = reservationToken;
+    m_reservationToken.resize(8);
+    m_attributes << ReservationToken;
+}
+
+/// Returns the SOFTWARE attribute, containing a textual description of the
+/// software being used.
+
+QString QXmppStunMessage::software() const
+{
+    return m_software;
+}
+
+/// Sets the SOFTWARE attribute, containing a textual description of the
+/// software being used.
+///
+/// \param software
+
+void QXmppStunMessage::setSoftware(const QString &software)
+{
+    m_software = software;
+    m_attributes << Software;
+}
+
+/// Returns the USERNAME attribute, containing the username to use for
+/// authentication.
+
+QString QXmppStunMessage::username() const
+{
+    return m_username;
+}
+
+/// Sets the USERNAME attribute, containing the username to use for
+/// authentication.
+///
+/// \param username
+
+void QXmppStunMessage::setUsername(const QString &username)
+{
+    m_username = username;
+    m_attributes << Username;
+}
+
+/// Decodes a QXmppStunMessage and checks its integrity using the given key.
 ///
 /// \param buffer
-/// \param password
+/// \param key
 /// \param errors
 
-bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password, QStringList *errors)
+bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, QStringList *errors)
 {
     QStringList silent;
     if (!errors)
@@ -393,6 +552,63 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
                 return false;
             useCandidate = true;
 
+        } else if (a_type == ChannelNumber) {
+
+            // CHANNEL-NUMBER
+            if (a_length != 4)
+                return false;
+            stream >> m_channelNumber;
+            stream.skipRawData(2);
+            m_attributes << ChannelNumber;
+
+        } else if (a_type == DataAttr) {
+
+            // DATA
+            m_data.resize(a_length);
+            stream.readRawData(m_data.data(), m_data.size());
+            m_attributes << DataAttr;
+
+        } else if (a_type == Lifetime) {
+
+            // LIFETIME
+            if (a_length != sizeof(m_lifetime))
+                return false;
+            stream >> m_lifetime;
+            m_attributes << Lifetime;
+
+        } else if (a_type == Nonce) {
+
+            // NONCE
+            m_nonce.resize(a_length);
+            stream.readRawData(m_nonce.data(), m_nonce.size());
+            m_attributes << Nonce;
+
+        } else if (a_type == Realm) {
+
+            // REALM
+            QByteArray utf8Realm(a_length, 0);
+            stream.readRawData(utf8Realm.data(), utf8Realm.size());
+            m_realm = QString::fromUtf8(utf8Realm);
+            m_attributes << Realm;
+
+        } else if (a_type == RequestedTransport) {
+
+            // REQUESTED-TRANSPORT
+            if (a_length != 4)
+                return false;
+            stream >> m_requestedTransport;
+            stream.skipRawData(3);
+            m_attributes << RequestedTransport;
+
+        } else if (a_type == ReservationToken) {
+
+            // RESERVATION-TOKEN
+            if (a_length != 8)
+                return false;
+            m_reservationToken.resize(a_length);
+            stream.readRawData(m_reservationToken.data(), m_reservationToken.size());
+            m_attributes << ReservationToken;
+
         } else if (a_type == Software) {
 
             // SOFTWARE
@@ -400,6 +616,14 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
             stream.readRawData(utf8Software.data(), utf8Software.size());
             m_software = QString::fromUtf8(utf8Software);
             m_attributes << Software;
+
+        } else if (a_type == Username) {
+
+            // USERNAME
+            QByteArray utf8Username(a_length, 0);
+            stream.readRawData(utf8Username.data(), utf8Username.size());
+            m_username = QString::fromUtf8(utf8Username);
+            m_attributes << Username;
 
         } else if (a_type == MappedAddress) {
 
@@ -454,6 +678,24 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
                 return false;
             }
 
+        } else if (a_type == XorPeerAddress) {
+
+            // XOR-PEER-ADDRESS
+            if (!decodeAddress(stream, a_length, xorPeerHost, xorPeerPort, m_id))
+            {
+                *errors << QLatin1String("Bad XOR-PEER-ADDRESS");
+                return false;
+            }
+
+        } else if (a_type == XorRelayedAddress) {
+
+            // XOR-RELAYED-ADDRESS
+            if (!decodeAddress(stream, a_length, xorRelayedHost, xorRelayedPort, m_id))
+            {
+                *errors << QLatin1String("Bad XOR-RELAYED-ADDRESS");
+                return false;
+            }
+
         } else if (a_type == MessageIntegrity) {
 
             // MESSAGE-INTEGRITY
@@ -463,9 +705,8 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
             stream.readRawData(integrity.data(), integrity.size());
 
             // check HMAC-SHA1
-            if (!password.isEmpty())
+            if (!key.isEmpty())
             {
-                const QByteArray key = password.toUtf8();
                 QByteArray copy = buffer.left(STUN_HEADER + done);
                 setBodyLength(copy, done + 24);
                 if (integrity != generateHmacSha1(key, copy))
@@ -504,7 +745,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
             /// ICE-CONTROLLING
             if (a_length != 8)
                 return false;
-            iceControlling.resize(8);
+            iceControlling.resize(a_length);
             stream.readRawData(iceControlling.data(), iceControlling.size());
 
          } else if (a_type == IceControlled) {
@@ -512,15 +753,8 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
             /// ICE-CONTROLLED
             if (a_length != 8)
                 return false;
-            iceControlled.resize(8);
+            iceControlled.resize(a_length);
             stream.readRawData(iceControlled.data(), iceControlled.size());
-
-        } else if (a_type == Username) {
-
-            // USERNAME
-            QByteArray utf8Username(a_length, 0);
-            stream.readRawData(utf8Username.data(), utf8Username.size());
-            username = QString::fromUtf8(utf8Username);
 
         } else {
 
@@ -536,12 +770,12 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QString &password,
 }
 
 /// Encodes the current QXmppStunMessage, optionally calculating the
-/// message integrity attribute using the given password.
+/// message integrity attribute using the given key.
 /// 
-/// \param password
+/// \param key
 /// \param addFingerprint
 
-QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint) const
+QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) const
 {
     QByteArray buffer;
     QDataStream stream(&buffer, QIODevice::WriteOnly);
@@ -574,6 +808,12 @@ QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint
 
     // XOR-MAPPED-ADDRESS
     addAddress(stream, XorMappedAddress, xorMappedHost, xorMappedPort, m_id);
+
+    // XOR-PEER-ADDRESS
+    addAddress(stream, XorPeerAddress, xorPeerHost, xorPeerPort, m_id);
+
+    // XOR-RELAYED-ADDRESS
+    addAddress(stream, XorRelayedAddress, xorRelayedHost, xorRelayedPort, m_id);
 
     // ERROR-CODE
     if (errorCode)
@@ -610,9 +850,66 @@ QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint
         stream << quint16(0);
     }
 
+    // CHANNEL-NUMBER
+    if (m_attributes.contains(ChannelNumber)) {
+        stream << quint16(ChannelNumber);
+        stream << quint16(4);
+        stream << m_channelNumber;
+        stream << quint16(0);
+    }
+
+    // DATA
+    if (m_attributes.contains(DataAttr)) {
+        stream << quint16(DataAttr);
+        stream << quint16(m_data.size());
+        stream.writeRawData(m_data.data(), m_data.size());
+        if (m_data.size() % 4) {
+            const QByteArray padding(4 - (m_data.size() %  4), 0);
+            stream.writeRawData(padding.data(), padding.size());
+        }
+    }
+
+    // LIFETIME
+    if (m_attributes.contains(Lifetime)) {
+        stream << quint16(Lifetime);
+        stream << quint16(sizeof(m_lifetime));
+        stream << m_lifetime;
+    }
+
+    // NONCE
+    if (m_attributes.contains(Nonce)) {
+        stream << quint16(Nonce);
+        stream << quint16(m_nonce.size());
+        stream.writeRawData(m_nonce.data(), m_nonce.size());
+    }
+
+    // REALM
+    if (m_attributes.contains(Realm))
+        encodeString(stream, Realm, m_realm);
+
+    // REQUESTED-TRANSPORT
+    if (m_attributes.contains(RequestedTransport)) {
+        const QByteArray reserved(3, 0);
+        stream << quint16(RequestedTransport);
+        stream << quint16(4);
+        stream << m_requestedTransport;
+        stream.writeRawData(reserved.data(), reserved.size());
+    }
+
+    // RESERVATION-TOKEN
+    if (m_attributes.contains(ReservationToken)) {
+        stream << quint16(ReservationToken);
+        stream << quint16(m_reservationToken.size());
+        stream.writeRawData(m_reservationToken.data(), m_reservationToken.size());
+    }
+
     // SOFTWARE
     if (m_attributes.contains(Software))
         encodeString(stream, Software, m_software);
+
+    // USERNAME
+    if (m_attributes.contains(Username))
+        encodeString(stream, Username, m_username);
 
     // ICE-CONTROLLING or ICE-CONTROLLED
     if (!iceControlling.isEmpty())
@@ -626,17 +923,12 @@ QByteArray QXmppStunMessage::encode(const QString &password, bool addFingerprint
         stream.writeRawData(iceControlled.data(), iceControlled.size());
     }
 
-    // USERNAME
-    if (!username.isEmpty())
-        encodeString(stream, Username, username);
-
     // set body length
     setBodyLength(buffer, buffer.size() - STUN_HEADER);
 
     // MESSAGE-INTEGRITY
-    if (!password.isEmpty())
+    if (!key.isEmpty())
     {
-        const QByteArray key = password.toUtf8();
         setBodyLength(buffer, buffer.size() - STUN_HEADER + 24);
         QByteArray integrity = generateHmacSha1(key, buffer);
         stream << quint16(MessageIntegrity);
@@ -689,14 +981,19 @@ QString QXmppStunMessage::toString() const
 {
     QStringList dumpLines;
     QString typeName;
-    switch (m_type & 0x000f)
+    switch (messageMethod())
     {
         case Binding: typeName = "Binding"; break;
         case SharedSecret: typeName = "Shared Secret"; break;
         case Allocate: typeName = "Allocate"; break;
+        case Refresh: typeName = "Refresh"; break;
+        case Send: typeName = "Send"; break;
+        case Data: typeName = "Data"; break;
+        case CreatePermission: typeName = "CreatePermission"; break;
+        case ChannelBind: typeName = "ChannelBind"; break;
         default: typeName = "Unknown"; break;
     }
-    switch (m_type & 0x0ff0)
+    switch (messageClass())
     {
         case Request: typeName += " Request"; break;
         case Indication: typeName += " Indication"; break;
@@ -710,13 +1007,25 @@ QString QXmppStunMessage::toString() const
     dumpLines << QString(" id %1").arg(QString::fromAscii(m_id.toHex()));
 
     // attributes
-    if (!username.isEmpty())
-        dumpLines << QString(" * USERNAME %1").arg(username);
+    if (m_attributes.contains(ChannelNumber))
+        dumpLines << QString(" * CHANNEL-NUMBER %1").arg(QString::number(m_channelNumber));
     if (errorCode)
         dumpLines << QString(" * ERROR-CODE %1 %2")
             .arg(QString::number(errorCode), errorPhrase);
+    if (m_attributes.contains(Lifetime))
+        dumpLines << QString(" * LIFETIME %1").arg(QString::number(m_lifetime));
+    if (m_attributes.contains(Nonce))
+        dumpLines << QString(" * NONCE %1").arg(QString::fromLatin1(m_nonce));
+    if (m_attributes.contains(Realm))
+        dumpLines << QString(" * REALM %1").arg(m_realm);
+    if (m_attributes.contains(RequestedTransport))
+        dumpLines << QString(" * REQUESTED-TRANSPORT 0x%1").arg(QString::number(m_requestedTransport, 16));
+    if (m_attributes.contains(ReservationToken))
+        dumpLines << QString(" * RESERVATION-TOKEN %1").arg(QString::fromAscii(m_reservationToken.toHex()));
     if (m_attributes.contains(Software))
         dumpLines << QString(" * SOFTWARE %1").arg(m_software);
+    if (m_attributes.contains(Username))
+        dumpLines << QString(" * USERNAME %1").arg(m_username);
     if (mappedPort)
         dumpLines << QString(" * MAPPED-ADDRESS %1 %2")
             .arg(mappedHost.toString(), QString::number(mappedPort));
@@ -735,6 +1044,12 @@ QString QXmppStunMessage::toString() const
     if (xorMappedPort)
         dumpLines << QString(" * XOR-MAPPED-ADDRESS %1 %2")
             .arg(xorMappedHost.toString(), QString::number(xorMappedPort));
+    if (xorPeerPort)
+        dumpLines << QString(" * XOR-PEER-ADDRESS %1 %2")
+            .arg(xorPeerHost.toString(), QString::number(xorPeerPort));
+    if (xorRelayedPort)
+        dumpLines << QString(" * XOR-RELAYED-ADDRESS %1 %2")
+            .arg(xorRelayedHost.toString(), QString::number(xorRelayedPort));
     if (m_attributes.contains(Priority))
         dumpLines << QString(" * PRIORITY %1").arg(QString::number(m_priority));
     if (!iceControlling.isEmpty())
@@ -745,6 +1060,305 @@ QString QXmppStunMessage::toString() const
             .arg(QString::fromAscii(iceControlled.toHex()));
 
     return dumpLines.join("\n");
+}
+
+/// Constructs a new QXmppTurnAllocation.
+///
+/// \param parent
+
+QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
+    : QXmppLoggable(parent),
+    m_relayedPort(0),
+    m_turnPort(0),
+    m_channelNumber(0x4000),
+    m_lifetime(600),
+    m_state(UnconnectedState)
+{
+    socket = new QUdpSocket(this);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
+}
+
+/// Binds the local socket.
+
+bool QXmppTurnAllocation::bind(const QHostAddress &address, quint16 port)
+{
+    return socket->bind(address, port);
+}
+
+/// Allocates the TURN allocation.
+
+void QXmppTurnAllocation::connectToHost()
+{
+    if (m_state != UnconnectedState)
+        return;
+
+    // send allocate request
+    QXmppStunMessage request;
+    request.setType(QXmppStunMessage::Allocate);
+    request.setId(generateRandomBytes(12));
+    request.setLifetime(m_lifetime);
+    request.setRequestedTransport(0x11);
+    writeStun(request);
+
+    // update state
+    setState(ConnectingState);
+}
+
+/// Releases the TURN allocation.
+
+void QXmppTurnAllocation::disconnectFromHost()
+{
+    timer->stop();
+    if (m_state != ConnectedState)
+        return;
+
+    // send refresh request with zero lifetime
+    QXmppStunMessage request;
+    request.setType(QXmppStunMessage::Refresh);
+    request.setId(generateRandomBytes(12));
+    request.setNonce(m_nonce);
+    request.setRealm(m_realm);
+    request.setUsername(m_username);
+    request.setLifetime(0);
+    writeStun(request);
+
+    // update state
+    setState(ClosingState);
+}
+
+void QXmppTurnAllocation::readyRead()
+{
+    const qint64 size = socket->pendingDatagramSize();
+    QHostAddress remoteHost;
+    quint16 remotePort;
+
+    QByteArray buffer(size, 0);
+    socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    // demultiplex channel data
+    if (buffer.size() >= 4 && (buffer[0] & 0xc0) == 0x40) {
+        QDataStream stream(buffer);
+        quint16 channel, length;
+        stream >> channel;
+        stream >> length;
+        if (m_channels.contains(channel) && length <= buffer.size() - 4) {
+            emit datagramReceived(buffer.mid(4, length), m_channels[channel].first,
+                m_channels[channel].second);
+        }
+        return;
+    }
+
+    // parse STUN message
+    QXmppStunMessage message;
+    QStringList errors;
+    if (!message.decode(buffer, QByteArray(), &errors)) {
+        foreach (const QString &error, errors)
+            warning(error);
+        return;
+    }
+
+#ifdef QXMPP_DEBUG_STUN
+    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+            remoteHost.toString(),
+            QString::number(remotePort),
+            message.toString()));
+#endif
+
+    // handle authentication
+    if (message.messageClass() == QXmppStunMessage::Error &&
+        message.errorCode == 401 &&
+        message.id() == m_request.id())
+    {
+        if (m_nonce != message.nonce() ||
+            m_realm != message.realm()) {
+            // update long-term credentials
+            m_nonce = message.nonce();
+            m_realm = message.realm();
+            QCryptographicHash hash(QCryptographicHash::Md5);
+            hash.addData((m_username + ":" + m_realm + ":" + m_password).toUtf8());
+            m_key = hash.result();
+
+            // retry request
+            QXmppStunMessage request(m_request);
+            request.setId(generateRandomBytes(12));
+            request.setNonce(m_nonce);
+            request.setRealm(m_realm);
+            request.setUsername(m_username);
+            writeStun(request);
+            return;
+        }
+    }
+
+    if (message.messageMethod() == QXmppStunMessage::Allocate) {
+        if (message.messageClass() == QXmppStunMessage::Error) {
+            warning(QString("Allocation failed: %1 %2").arg(
+                QString::number(message.errorCode), message.errorPhrase));
+            setState(UnconnectedState);
+            return;
+        }
+        if (message.xorRelayedHost.isNull() ||
+            message.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
+            !message.xorRelayedPort) {
+            warning("Allocation did not yield a valid relayed address");
+            setState(UnconnectedState);
+            return;
+        }
+
+        // store relayed address
+        m_relayedHost = message.xorRelayedHost;
+        m_relayedPort = message.xorRelayedPort;
+
+        // schedule refresh
+        m_lifetime = message.lifetime();
+        timer->start((m_lifetime - 60) * 1000);
+
+        setState(ConnectedState);
+
+    } else if (message.messageMethod() == QXmppStunMessage::ChannelBind) {
+        if (message.messageClass() == QXmppStunMessage::Error) {
+            warning(QString("ChannelBind failed: %1 %2").arg(
+                QString::number(message.errorCode), message.errorPhrase));
+            return;
+        }
+
+    } else if (message.messageMethod() == QXmppStunMessage::Refresh) {
+        if (message.messageClass() == QXmppStunMessage::Error) {
+            warning(QString("Refresh failed: %1 %2").arg(
+                QString::number(message.errorCode), message.errorPhrase));
+            setState(UnconnectedState);
+            return;
+        }
+
+        if (m_state == ClosingState) {
+            setState(UnconnectedState);
+            return;
+        }
+
+        // schedule refresh
+        m_lifetime = message.lifetime();
+        timer->start((m_lifetime - 60) * 1000);
+    }
+}
+
+void QXmppTurnAllocation::refresh()
+{
+    QXmppStunMessage request;
+    request.setType(QXmppStunMessage::Refresh);
+    request.setId(generateRandomBytes(12));
+    request.setNonce(m_nonce);
+    request.setRealm(m_realm);
+    request.setUsername(m_username);
+    writeStun(request);
+}
+
+/// Returns the relayed host address, i.e. the address on the server
+/// used to communicate with peers.
+
+QHostAddress QXmppTurnAllocation::relayedHost() const
+{
+    return m_relayedHost;
+}
+
+/// Returns the relayed port, i.e. the port on the server used to communicate
+/// with peers.
+
+quint16 QXmppTurnAllocation::relayedPort() const
+{
+    return m_relayedPort;
+}
+
+/// Sets the password used to authenticate with the TURN server.
+///
+/// \param password
+
+void QXmppTurnAllocation::setPassword(const QString &password)
+{
+    m_password = password;
+}
+
+/// Sets the TURN server to use.
+///
+/// \param host The address of the TURN server.
+/// \param port The port of the TURN server.
+
+void QXmppTurnAllocation::setServer(const QHostAddress &host, quint16 port)
+{
+    m_turnHost = host;
+    m_turnPort = port;
+}
+
+/// Sets the username used to authenticate with the TURN server.
+///
+/// \param username
+
+void QXmppTurnAllocation::setUsername(const QString &username)
+{
+    m_username = username;
+}
+
+void QXmppTurnAllocation::setState(AllocationState state)
+{
+    if (state == m_state)
+        return;
+    m_state = state;
+    if (m_state == ConnectedState) {
+        emit connected();
+    } else if (m_state == UnconnectedState) {
+        timer->stop();
+        emit disconnected();
+    }
+}
+
+void QXmppTurnAllocation::writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port)
+{
+    const Address addr = qMakePair(host, port);
+    quint16 channel = m_channels.key(addr);
+
+    if (!channel) {
+        channel = m_channelNumber++;
+
+        // create channel
+        QXmppStunMessage request;
+        request.setType(QXmppStunMessage::ChannelBind);
+        request.setId(generateRandomBytes(12));
+        request.setNonce(m_nonce);
+        request.setRealm(m_realm);
+        request.setUsername(m_username);
+        request.setChannelNumber(channel);
+        request.xorPeerHost = host;
+        request.xorPeerPort = port;
+        writeStun(request);
+
+        m_channels.insert(channel, addr);
+    }
+
+    // send data
+    QByteArray channelData;
+    channelData.reserve(4 + data.size());
+    QDataStream stream(&channelData, QIODevice::WriteOnly);
+    stream << channel;
+    stream << quint16(data.size());
+    stream.writeRawData(data.data(), data.size());
+    socket->writeDatagram(channelData, m_turnHost, m_turnPort);
+}
+
+qint64 QXmppTurnAllocation::writeStun(const QXmppStunMessage &message)
+{
+    qint64 ret = socket->writeDatagram(message.encode(m_key),
+        m_turnHost, m_turnPort);
+    if (message.messageClass() == QXmppStunMessage::Request)
+        m_request = message;
+#ifdef QXMPP_DEBUG_STUN
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(
+            m_turnHost.toString(),
+            QString::number(m_turnPort),
+            message.toString()));
+#endif
+    return ret;
 }
 
 QXmppIceComponent::Pair::Pair()
@@ -831,7 +1445,7 @@ void QXmppIceComponent::checkCandidates()
         message.setId(pair->transaction);
         message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
         message.setPriority(pair->priority);
-        message.username = QString("%1:%2").arg(m_remoteUser, m_localUser);
+        message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
         if (m_iceControlling)
         {
             message.iceControlling = QByteArray(8, 0);
@@ -1104,14 +1718,15 @@ void QXmppIceComponent::readyRead()
     // parse STUN message
     QXmppStunMessage message;
     QStringList errors;
-    if (!message.decode(buffer, messagePassword, &errors))
+    if (!message.decode(buffer, messagePassword.toUtf8(), &errors))
     {
         foreach (const QString &error, errors)
             warning(error);
         return;
     }
 #ifdef QXMPP_DEBUG_STUN
-    logReceived(QString("STUN packet from %1 port %2\n%3").arg(remoteHost.toString(),
+    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+            remoteHost.toString(),
             QString::number(remotePort),
             message.toString()));
 #endif
@@ -1175,7 +1790,7 @@ void QXmppIceComponent::readyRead()
         QXmppStunMessage response;
         response.setId(message.id());
         response.setType(QXmppStunMessage::Binding | QXmppStunMessage::Response);
-        response.username = message.username;
+        response.setUsername(message.username());
         response.xorMappedHost = pair->remote.host();
         response.xorMappedPort = pair->remote.port();
         writeStun(response, pair);
@@ -1194,7 +1809,7 @@ void QXmppIceComponent::readyRead()
             message.setId(pair->transaction);
             message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
             message.setPriority(pair->priority);
-            message.username = QString("%1:%2").arg(m_remoteUser, m_localUser);
+            message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
             message.iceControlled = QByteArray(8, 0);
             writeStun(message, pair);
         }
@@ -1360,7 +1975,10 @@ qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
 qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, QXmppIceComponent::Pair *pair)
 {
     const QString messagePassword = (message.type() & 0xFF00) ? m_localPassword : m_remotePassword;
-    qint64 ret = pair->socket->writeDatagram(message.encode(messagePassword), pair->remote.host(), pair->remote.port());
+    qint64 ret = pair->socket->writeDatagram(
+        message.encode(messagePassword.toUtf8()),
+        pair->remote.host(),
+        pair->remote.port());
 #ifdef QXMPP_DEBUG_STUN
     logSent(QString("Sent to %1\n%2").arg(pair->toString(), message.toString()));
 #endif

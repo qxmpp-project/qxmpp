@@ -45,9 +45,14 @@ public:
         Binding      = 0x1,
         SharedSecret = 0x2,
         Allocate     = 0x3,
+        Refresh      = 0x4,
+        Send         = 0x6,
+        Data         = 0x7,
+        CreatePermission = 0x8,
+        ChannelBind  = 0x9,
     };
 
-    enum MessageType {
+    enum ClassType {
         Request    = 0x000,
         Indication = 0x010,
         Response   = 0x100,
@@ -62,6 +67,9 @@ public:
     QByteArray id() const;
     void setId(const QByteArray &id);
 
+    quint16 messageClass() const;
+    quint16 messageMethod() const;
+
     quint16 type() const;
     void setType(quint16 type);
 
@@ -70,14 +78,38 @@ public:
     quint32 changeRequest() const;
     void setChangeRequest(quint32 changeRequest);
 
+    quint16 channelNumber() const;
+    void setChannelNumber(quint16 channelNumber);
+
+    QByteArray data() const;
+    void setData(const QByteArray &data);
+
+    quint32 lifetime() const;
+    void setLifetime(quint32 changeRequest);
+
+    QByteArray nonce() const;
+    void setNonce(const QByteArray &nonce);
+
     quint32 priority() const;
     void setPriority(quint32 priority);
+
+    QString realm() const;
+    void setRealm(const QString &realm);
+
+    QByteArray reservationToken() const;
+    void setReservationToken(const QByteArray &reservationToken);
+
+    quint8 requestedTransport() const;
+    void setRequestedTransport(quint8 requestedTransport);
 
     QString software() const;
     void setSoftware(const QString &software);
 
-    QByteArray encode(const QString &password = QString(), bool addFingerprint = true) const;
-    bool decode(const QByteArray &buffer, const QString &password = QString(), QStringList *errors = 0);
+    QString username() const;
+    void setUsername(const QString &username);
+
+    QByteArray encode(const QByteArray &key = QByteArray(), bool addFingerprint = true) const;
+    bool decode(const QByteArray &buffer, const QByteArray &key = QByteArray(), QStringList *errors = 0);
     QString toString() const;
     static quint16 peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id);
 
@@ -96,7 +128,10 @@ public:
     quint16 sourcePort;
     QHostAddress xorMappedHost;
     quint16 xorMappedPort;
-    QString username;
+    QHostAddress xorPeerHost;
+    quint16 xorPeerPort;
+    QHostAddress xorRelayedHost;
+    quint16 xorRelayedPort;
     bool useCandidate;
 
 private:
@@ -104,10 +139,95 @@ private:
     QByteArray m_id;
     quint16 m_type;
 
+    // attributes
     QSet<quint16> m_attributes;
     quint32 m_changeRequest;
+    quint16 m_channelNumber;
+    QByteArray m_data;
+    quint32 m_lifetime;
+    QByteArray m_nonce;
     quint32 m_priority;
+    QString m_realm;
+    quint8 m_requestedTransport;
+    QByteArray m_reservationToken;
     QString m_software;
+    QString m_username;
+};
+
+/// \internal
+///
+/// The QXmppTurnAllocation class represents a TURN allocation as defined
+/// by RFC 5766 Traversal Using Relays around NAT (TURN).
+///
+
+class QXmppTurnAllocation : public QXmppLoggable
+{
+    Q_OBJECT
+
+public:
+    enum AllocationState
+    {
+        UnconnectedState,
+        ConnectingState,
+        ConnectedState,
+        ClosingState,
+    };
+
+    QXmppTurnAllocation(QObject *parent = 0);
+    bool bind(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
+
+    QHostAddress relayedHost() const;
+    quint16 relayedPort() const;
+
+    void setServer(const QHostAddress &host, quint16 port = 3478);
+    void setUsername(const QString &username);
+    void setPassword(const QString &password);
+
+    void writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+
+signals:
+    /// \brief This signal is emitted once TURN allocation succeeds.
+    void connected();
+
+    /// \brief This signal is emitted when a data packet is received.
+    void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
+
+    /// \brief This signal is emitted when TURN allocation fails.
+    void disconnected();
+
+public slots:
+    void connectToHost();
+    void disconnectFromHost();
+
+private slots:
+    void readyRead();
+    void refresh();
+
+private:
+    void setState(AllocationState state);
+    qint64 writeStun(const QXmppStunMessage &message);
+
+    QUdpSocket *socket;
+    QTimer *timer;
+    QString m_password;
+    QString m_username;
+    QHostAddress m_relayedHost;
+    quint16 m_relayedPort;
+    QHostAddress m_turnHost;
+    quint16 m_turnPort;
+
+    // channels
+    typedef QPair<QHostAddress, quint16> Address;
+    quint16 m_channelNumber;
+    QMap<quint16, Address> m_channels;
+
+    // state
+    quint32 m_lifetime;
+    QByteArray m_key;
+    QString m_realm;
+    QByteArray m_nonce;
+    QXmppStunMessage m_request;
+    AllocationState m_state;
 };
 
 /// \brief The QXmppIceComponent class represents a piece of a media stream
