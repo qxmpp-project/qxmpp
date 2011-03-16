@@ -60,6 +60,10 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
+    check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
+                    this, SLOT(socketError(QAbstractSocket::SocketError)));
+    Q_ASSERT(check);
+
     d->dialbackTimer = new QTimer(this);
     d->dialbackTimer->setInterval(5000);
     d->dialbackTimer->setSingleShot(true);
@@ -285,5 +289,11 @@ void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
     for(int i = 0; i < errors.count(); ++i)
         warning(errors.at(i).errorString());
     socket()->ignoreSslErrors();
+}
+
+void QXmppOutgoingServer::socketError(QAbstractSocket::SocketError error)
+{
+    warning(QString("Socket error: " + socket()->errorString()));
+    emit disconnected();
 }
 

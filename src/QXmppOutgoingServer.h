@@ -24,6 +24,8 @@
 #ifndef QXMPPOUTGOINGSERVER_H
 #define QXMPPOUTGOINGSERVER_H
 
+#include <QAbstractSocket>
+
 #include "QXmppStream.h"
 
 class QSslError;
@@ -68,6 +70,7 @@ private slots:
     void connectToHost(const QXmppSrvInfo &serviceInfo);
     void sendDialback();
     void slotSslErrors(const QList<QSslError> &errors);
+    void socketError(QAbstractSocket::SocketError error);
 
 private:
     Q_DISABLE_COPY(QXmppOutgoingServer)
