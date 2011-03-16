@@ -29,6 +29,8 @@
 #include "QXmppLogger.h"
 
 class QDomElement;
+class QSslCertificate;
+class QSslKey;
 class QSslSocket;
 
 class QXmppDialback;
@@ -74,8 +76,8 @@ public:
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
     void addCaCertificates(const QString &caCertificates);
-    void setLocalCertificate(const QString &sslCertificate);
-    void setPrivateKey(const QString &sslKey);
+    void setLocalCertificate(const QString &path);
+    void setPrivateKey(const QString &path);
 
     void close();
     bool listenForClients(const QHostAddress &address = QHostAddress::Any, quint16 port = 5222);
@@ -125,9 +127,9 @@ public:
     QXmppSslServer(QObject *parent = 0);
     ~QXmppSslServer();
 
-    void addCaCertificates(const QString &caCertificates);
-    void setLocalCertificate(const QString &localCertificate);
-    void setPrivateKey(const QString &privateKey);
+    void addCaCertificates(const QList<QSslCertificate> &certificates);
+    void setLocalCertificate(const QSslCertificate &certificate);
+    void setPrivateKey(const QSslKey &key);
 
 signals:
     /// This signal is emitted when a new connection is established.

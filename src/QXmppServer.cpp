@@ -24,6 +24,8 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QPluginLoader>
+#include <QSslCertificate>
+#include <QSslKey>
 #include <QSslSocket>
 
 #include "QXmppConstants.h"
@@ -308,8 +310,9 @@ void QXmppServer::addCaCertificates(const QString &path)
 {
     if (!path.isEmpty() && !QFileInfo(path).isReadable())
         d->warning(QString("SSL CA certificates are not readable %1").arg(path));
-    d->serverForClients->addCaCertificates(path);
-    d->serverForServers->addCaCertificates(path);
+    QList<QSslCertificate> certificates = QSslCertificate::fromPath(path);
+    d->serverForClients->addCaCertificates(certificates);
+    d->serverForServers->addCaCertificates(certificates);
 }
 
 /// Sets the path for the local SSL certificate.
@@ -318,10 +321,14 @@ void QXmppServer::addCaCertificates(const QString &path)
 
 void QXmppServer::setLocalCertificate(const QString &path)
 {
-    if (!path.isEmpty() && !QFileInfo(path).isReadable())
+    QSslCertificate certificate;
+    QFile file(path);
+    if (!path.isEmpty() && file.open(QIODevice::ReadOnly | QIODevice::Text))
+        certificate = QSslCertificate(file.readAll());
+    else
         d->warning(QString("SSL certificate is not readable %1").arg(path));
-    d->serverForClients->setLocalCertificate(path);
-    d->serverForServers->setLocalCertificate(path);
+    d->serverForClients->setLocalCertificate(certificate);
+    d->serverForServers->setLocalCertificate(certificate);
 }
 
 /// Sets the path for the local SSL private key.
@@ -330,10 +337,14 @@ void QXmppServer::setLocalCertificate(const QString &path)
 
 void QXmppServer::setPrivateKey(const QString &path)
 {
-    if (!path.isEmpty() && !QFileInfo(path).isReadable())
+    QSslKey key;
+    QFile file(path);
+    if (!path.isEmpty() && file.open(QIODevice::ReadOnly))
+        key = QSslKey(file.readAll(), QSsl::Rsa);
+    else
         d->warning(QString("SSL key is not readable %1").arg(path));
-    d->serverForClients->setPrivateKey(path);
-    d->serverForServers->setPrivateKey(path);
+    d->serverForClients->setPrivateKey(key);
+    d->serverForServers->setPrivateKey(key);
 }
 
 /// Listen for incoming XMPP client connections.
@@ -835,9 +846,9 @@ void QXmppServer::slotStreamDisconnected()
 class QXmppSslServerPrivate
 {
 public:
-    QString caCertificates;
-    QString localCertificate;
-    QString privateKey;
+    QList<QSslCertificate> caCertificates;
+    QSslCertificate localCertificate;
+    QSslKey privateKey;
 };
 
 /// Constructs a new SSL server instance.
@@ -862,7 +873,7 @@ void QXmppSslServer::incomingConnection(int socketDescriptor)
 {
     QSslSocket *socket = new QSslSocket;
     socket->setSocketDescriptor(socketDescriptor);
-    if (!d->localCertificate.isEmpty() && !d->privateKey.isEmpty())
+    if (!d->localCertificate.isNull() && !d->privateKey.isNull())
     {
         socket->setProtocol(QSsl::AnyProtocol);
         socket->addCaCertificates(d->caCertificates);
@@ -875,28 +886,28 @@ void QXmppSslServer::incomingConnection(int socketDescriptor)
 /// Adds the given certificates to the CA certificate database to be used
 /// for incoming connnections.
 ///
-/// \param caCertificates
+/// \param certificates
 
-void QXmppSslServer::addCaCertificates(const QString &caCertificates)
+void QXmppSslServer::addCaCertificates(const QList<QSslCertificate> &certificates)
 {
-    d->caCertificates = caCertificates;
+    d->caCertificates += certificates;
 }
 
 /// Sets the local certificate to be used for incoming connections.
 ///
-/// \param localCertificate
+/// \param certificate
 
-void QXmppSslServer::setLocalCertificate(const QString &localCertificate)
+void QXmppSslServer::setLocalCertificate(const QSslCertificate &certificate)
 {
-    d->localCertificate = localCertificate;
+    d->localCertificate = certificate;
 }
 
 /// Sets the local private key to be used for incoming connections.
 ///
-/// \param privateKey
+/// \param key
 
-void QXmppSslServer::setPrivateKey(const QString &privateKey)
+void QXmppSslServer::setPrivateKey(const QSslKey &key)
 {
-    d->privateKey = privateKey;
+    d->privateKey = key;
 }
 
