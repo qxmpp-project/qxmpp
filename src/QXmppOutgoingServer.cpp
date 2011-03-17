@@ -293,6 +293,7 @@ void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
 
 void QXmppOutgoingServer::socketError(QAbstractSocket::SocketError error)
 {
+    Q_UNUSED(error);
     warning(QString("Socket error: " + socket()->errorString()));
     emit disconnected();
 }
