@@ -530,36 +530,3 @@ QStringList QXmppPresence::capabilityExt() const
     return m_capabilityExt;
 }
 
-/// \cond
-
-QXmppPresence::Type QXmppPresence::getType() const
-{
-    return m_type;
-}
-
-const QXmppPresence::Status& QXmppPresence::getStatus() const
-{
-    return m_status;
-}
-
-QXmppPresence::Status& QXmppPresence::getStatus()
-{
-    return m_status;
-}
-
-QXmppPresence::Status::Type QXmppPresence::Status::getType() const
-{
-    return m_type;
-}
-
-QString QXmppPresence::Status::getStatusText() const
-{
-    return m_statusText;
-}
-
-int QXmppPresence::Status::getPriority() const
-{
-    return m_priority;
-}
-
-/// \endcond

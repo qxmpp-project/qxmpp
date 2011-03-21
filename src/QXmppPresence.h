@@ -93,12 +93,6 @@ public:
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
-
-        // deprecated in release 0.2.0
-        // deprecated accessors, use the form without "get" instead
-        int Q_DECL_DEPRECATED getPriority() const;
-        QString Q_DECL_DEPRECATED getStatusText() const;
-        QXmppPresence::Status::Type Q_DECL_DEPRECATED getType() const;
         /// \endcond
 
     private:
@@ -142,14 +136,6 @@ public:
     void setCapabilityVer(const QByteArray&);
 
     QStringList capabilityExt() const;
-
-    // deprecated in release 0.2.0
-    // deprecated accessors, use the form without "get" instead
-    /// \cond
-    QXmppPresence::Type Q_DECL_DEPRECATED getType() const;
-    QXmppPresence::Status Q_DECL_DEPRECATED & getStatus();
-    const QXmppPresence::Status Q_DECL_DEPRECATED & getStatus() const;
-    /// \endcond
 
 private:
     QString getTypeStr() const;
