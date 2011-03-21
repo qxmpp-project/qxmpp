@@ -145,10 +145,3 @@ void QXmppIq::setTypeFromStr(const QString& str)
     }
 }
 
-// deprecated
-
-QXmppIq::Type QXmppIq::getType() const
-{
-    return m_type;
-}
-
