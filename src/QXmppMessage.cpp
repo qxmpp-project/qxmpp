@@ -323,29 +323,3 @@ void QXmppMessage::setThread(const QString& thread)
     m_thread = thread;
 }
 
-// deprecated
-
-QXmppMessage::Type QXmppMessage::getType() const
-{
-    return m_type;
-}
-
-QXmppMessage::State QXmppMessage::getState() const
-{
-    return m_state;
-}
-
-QString QXmppMessage::getBody() const
-{
-    return m_body;
-}
-
-QString QXmppMessage::getSubject() const
-{
-    return m_subject;
-}
-
-QString QXmppMessage::getThread() const
-{
-    return m_thread;
-}
