@@ -1,8 +1,3 @@
-QXmpp 0.3.x (UNRELEASED)
-------------------------
-
-  - Fix STUN unit tests to build with Qt 4.7.2
-
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------
   - New XEPs
