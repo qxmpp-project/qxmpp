@@ -175,15 +175,17 @@ public:
 
     QXmppTurnAllocation(QObject *parent = 0);
     bool bind(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
+    void close();
 
     QHostAddress relayedHost() const;
     quint16 relayedPort() const;
+    AllocationState state() const;
 
     void setServer(const QHostAddress &host, quint16 port = 3478);
-    void setUsername(const QString &username);
+    void setUser(const QString &user);
     void setPassword(const QString &password);
 
-    void writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
 
 signals:
     /// \brief This signal is emitted once TURN allocation succeeds.
@@ -242,6 +244,9 @@ public:
     QXmppIceComponent(bool controlling, QObject *parent=0);
     ~QXmppIceComponent();
     void setStunServer(const QHostAddress &host, quint16 port);
+    void setTurnServer(const QHostAddress &host, quint16 port);
+    void setTurnUser(const QString &user);
+    void setTurnPassword(const QString &password);
 
     QList<QXmppJingleCandidate> localCandidates() const;
     void setLocalUser(const QString &user);
@@ -268,7 +273,9 @@ public slots:
 private slots:
     void checkCandidates();
     void checkStun();
+    void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port, QUdpSocket *socket = 0);
     void readyRead();
+    void turnConnected();
 
 signals:
     /// \brief This signal is emitted once ICE negotiation succeeds.
@@ -319,6 +326,10 @@ private:
     quint16 m_stunPort;
     QTimer *m_stunTimer;
     int m_stunTries;
+
+    // TURN server
+    QXmppTurnAllocation *m_turnAllocation;
+    bool m_turnConfigured;
 };
 
 /// \brief The QXmppIceConnection class represents a set of UDP sockets
@@ -337,13 +348,18 @@ public:
 
     QList<QXmppJingleCandidate> localCandidates() const;
     QString localUser() const;
+    void setLocalUser(const QString &user);
     QString localPassword() const;
+    void setLocalPassword(const QString &password);
 
     void addRemoteCandidate(const QXmppJingleCandidate &candidate);
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
     void setStunServer(const QHostAddress &host, quint16 port = 3478);
+    void setTurnServer(const QHostAddress &host, quint16 port = 3478);
+    void setTurnUser(const QString &user);
+    void setTurnPassword(const QString &password);
 
     bool bind(const QList<QHostAddress> &addresses);
     bool isConnected() const;
@@ -374,6 +390,10 @@ private:
     QString m_localPassword;
     QHostAddress m_stunHost;
     quint16 m_stunPort;
+    QHostAddress m_turnHost;
+    quint16 m_turnPort;
+    QString m_turnUser;
+    QString m_turnPassword;
 };
 
 #endif
