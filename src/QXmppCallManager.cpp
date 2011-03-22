@@ -63,6 +63,28 @@ private:
     QXmppCall *q;
 };
 
+class QXmppCallManagerPrivate
+{
+public:
+    QXmppCallManagerPrivate(QXmppCallManager *qq);
+    bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
+    QXmppCall *findCall(const QString &sid) const;
+    QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
+    bool sendAck(const QXmppJingleIq &iq);
+    bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
+
+    QList<QXmppCall*> calls;
+    QHostAddress stunHost;
+    quint16 stunPort;
+    QHostAddress turnHost;
+    quint16 turnPort;
+    QString turnUser;
+    QString turnPassword;
+
+private:
+    QXmppCallManager *q;
+};
+
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : state(QXmppCall::OfferState),
     q(qq)
@@ -78,7 +100,7 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
-QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent)
+QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent)
     : QXmppLoggable(parent)
 {
     d = new QXmppCallPrivate(this);
@@ -90,7 +112,10 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject
     // ICE connection
     bool iceControlling = (d->direction == OutgoingDirection);
     d->connection = new QXmppIceConnection(iceControlling, this);
-    //d->connection->setStunServer("stun.ekiga.net");
+    d->connection->setStunServer(parent->d->stunHost, parent->d->stunPort);
+    d->connection->setTurnServer(parent->d->turnHost, parent->d->turnPort);
+    d->connection->setTurnUser(parent->d->turnUser);
+    d->connection->setTurnPassword(parent->d->turnPassword);
     d->connection->addComponent(RTP_COMPONENT);
     d->connection->addComponent(RTCP_COMPONENT);
     d->connection->bind(QXmppIceComponent::discoverAddresses());
@@ -145,9 +170,6 @@ QXmppRtpChannel *QXmppCall::audioChannel() const
     return d->audioChannel;
 }
 
-/// Returns the number of bytes that are available for reading.
-///
-
 void QXmppCall::terminate()
 {
     if (d->state == FinishedState)
@@ -181,8 +203,13 @@ QXmppCall::Direction QXmppCall::direction() const
 
 void QXmppCall::hangup()
 {
-    if (d->state != QXmppCall::FinishedState)
-        d->setState(QXmppCall::DisconnectingState);
+    if (d->state == QXmppCall::DisconnectingState ||
+        d->state == QXmppCall::FinishedState)
+        return;
+
+    d->setState(QXmppCall::DisconnectingState);
+    d->audioChannel->close();
+    d->connection->close();
 }
 
 /// Returns the remote party's JID.
@@ -220,24 +247,10 @@ QXmppCall::State QXmppCall::state() const
     return d->state;
 }
 
-class QXmppCallManagerPrivate
-{
-public:
-    QXmppCallManagerPrivate(QXmppCallManager *qq);
-    bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
-    QXmppCall *findCall(const QString &sid) const;
-    QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
-    bool sendAck(const QXmppJingleIq &iq);
-    bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
-
-    QList<QXmppCall*> calls;
-
-private:
-    QXmppCallManager *q;
-};
-
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
-    : q(qq)
+    : q(qq),
+    stunPort(0),
+    turnPort(0)
 {
 }
 
@@ -618,7 +631,6 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         call->d->connection->setRemotePassword(iq.content().transportPassword());
         foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
             call->d->connection->addRemoteCandidate(candidate);
-        call->d->connection->connectToHost();
     }
 }
 
@@ -650,4 +662,44 @@ void QXmppCallManager::localCandidatesChanged()
     d->sendRequest(call, iq);
 }
 
+/// Sets the STUN server to use to determine server-reflexive addresses
+/// and ports.
+///
+/// \param host The address of the STUN server.
+/// \param port The port of the STUN server.
+
+void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
+{
+    d->stunHost = host;
+    d->stunPort = port;
+}
+
+/// Sets the TURN server to use to relay packets in double-NAT configurations.
+///
+/// \param host The address of the TURN server.
+/// \param port The port of the TURN server.
+
+void QXmppCallManager::setTurnServer(const QHostAddress &host, quint16 port)
+{
+    d->turnHost = host;
+    d->turnPort = port;
+}
+
+/// Sets the \a user used for authentication with the TURN server.
+///
+/// \param user
+
+void QXmppCallManager::setTurnUser(const QString &user)
+{
+    d->turnUser = user;
+}
+
+/// Sets the \a password used for authentication with the TURN server.
+///
+/// \param password
+
+void QXmppCallManager::setTurnPassword(const QString &password)
+{
+    d->turnPassword = password;
+}
 

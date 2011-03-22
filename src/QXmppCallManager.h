@@ -31,7 +31,9 @@
 #include "QXmppClientExtension.h"
 #include "QXmppLogger.h"
 
+class QHostAddress;
 class QXmppCallPrivate;
+class QXmppCallManager;
 class QXmppCallManagerPrivate;
 class QXmppIq;
 class QXmppJingleCandidate;
@@ -111,7 +113,7 @@ private slots:
     void updateOpenMode();
 
 private:
-    QXmppCall(const QString &jid, QXmppCall::Direction direction, QObject *parent);
+    QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
 
     QXmppCallPrivate *d;
     friend class QXmppCallManager;
@@ -148,6 +150,10 @@ public:
     QXmppCallManager();
     ~QXmppCallManager();
     QXmppCall *call(const QString &jid);
+    void setStunServer(const QHostAddress &host, quint16 port = 3478);
+    void setTurnServer(const QHostAddress &host, quint16 port = 3478);
+    void setTurnUser(const QString &user);
+    void setTurnPassword(const QString &password);
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -175,6 +181,7 @@ private slots:
 
 private:
     QXmppCallManagerPrivate *d;
+    friend class QXmppCall;
     friend class QXmppCallManagerPrivate;
 };
 
