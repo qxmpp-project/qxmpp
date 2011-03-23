@@ -69,7 +69,7 @@ enum AttributeType {
 
 // FIXME : we need to set local preference to discriminate between
 // multiple IP addresses
-static int candidatePriority(const QXmppJingleCandidate &candidate, int localPref = 65535)
+static quint32 candidatePriority(const QXmppJingleCandidate &candidate, int localPref = 65535)
 {
     int typePref;
     switch (candidate.type())
@@ -1385,13 +1385,26 @@ qint64 QXmppTurnAllocation::writeStun(const QXmppStunMessage &message)
     return ret;
 }
 
-QXmppIceComponent::Pair::Pair()
+QXmppIceComponent::Pair::Pair(int component, bool controlling)
     : checked(QIODevice::NotOpen),
-    socket(0)
+    socket(0),
+    m_component(component),
+    m_controlling(controlling)
 {
-    // FIXME : calculate priority
-    priority = 1862270975;
     transaction = generateRandomBytes(ID_SIZE);
+}
+
+quint64 QXmppIceComponent::Pair::priority() const
+{
+    QXmppJingleCandidate local;
+    local.setComponent(m_component);
+    local.setType(socket ? QXmppJingleCandidate::HostType : QXmppJingleCandidate::RelayedType);
+    local.setPriority(candidatePriority(local));
+
+    // see RFC 5245 - 5.7.2. Computing Pair Priority and Ordering Pairs
+    const quint32 G = m_controlling ? local.priority() : remote.priority();
+    const quint32 D = m_controlling ? remote.priority() : local.priority();
+    return (quint64(1) << 32) * qMin(G, D) + 2 * qMax(G, D) + (G > D ? 1 : 0);
 }
 
 QString QXmppIceComponent::Pair::toString() const
@@ -1413,9 +1426,11 @@ QString QXmppIceComponent::Pair::toString() const
 
 QXmppIceComponent::QXmppIceComponent(bool controlling, QObject *parent)
     : QXmppLoggable(parent),
+    m_component(0),
     m_activePair(0),
     m_fallbackPair(0),
     m_iceControlling(controlling),
+    m_peerReflexivePriority(0),
     m_stunPort(0),
     m_stunTries(0),
     m_turnConfigured(false)
@@ -1469,6 +1484,14 @@ int QXmppIceComponent::component() const
 void QXmppIceComponent::setComponent(int component)
 {
     m_component = component;
+
+    // calculate peer-reflexive candidate priority
+    // see RFC 5245 -  7.1.2.1. PRIORITY and USE-CANDIDATE
+    QXmppJingleCandidate reflexive;
+    reflexive.setComponent(m_component);
+    reflexive.setType(QXmppJingleCandidate::PeerReflexiveType);
+    m_peerReflexivePriority = candidatePriority(reflexive);
+
     setObjectName(QString("STUN(%1)").arg(QString::number(m_component)));
 }
 
@@ -1484,7 +1507,7 @@ void QXmppIceComponent::checkCandidates()
         QXmppStunMessage message;
         message.setId(pair->transaction);
         message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        message.setPriority(pair->priority);
+        message.setPriority(m_peerReflexivePriority);
         message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
         if (m_iceControlling)
         {
@@ -1599,7 +1622,7 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
             isIPv6LinkLocalAddress(socket->localAddress()) != isIPv6LinkLocalAddress(candidate.host()))
             continue;
 
-        Pair *pair = new Pair;
+        Pair *pair = new Pair(m_component, m_iceControlling);
         pair->remote = candidate;
         if (isIPv6LinkLocalAddress(pair->remote.host()))
         {
@@ -1616,7 +1639,7 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
 
     // only use relaying for IPv4 candidates
     if (m_turnConfigured && candidate.host().protocol() == QAbstractSocket::IPv4Protocol) {
-        Pair *pair = new Pair;
+        Pair *pair = new Pair(m_component, m_iceControlling);
         pair->remote = candidate;
         pair->socket = 0;
         m_pairs << pair;
@@ -1624,9 +1647,9 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
     return true;
 }
 
-/// Adds a discovered STUN candidate.
+/// Adds a discovered peer-reflexive STUN candidate.
 
-QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port)
+QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority)
 {
     foreach (Pair *pair, m_pairs)
         if (pair->remote.host() == host &&
@@ -1639,13 +1662,11 @@ QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socke
     candidate.setHost(host);
     candidate.setId(generateStanzaHash(10));
     candidate.setPort(port);
+    candidate.setPriority(priority);
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
 
-    // FIXME : what priority?
-    // candidate.setPriority(candidatePriority(candidate));
-
-    Pair *pair = new Pair;
+    Pair *pair = new Pair(m_component, m_iceControlling);
     pair->remote = candidate;
     pair->socket = socket;
     m_pairs << pair;
@@ -1872,7 +1893,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (message.type() == (QXmppStunMessage::Binding | QXmppStunMessage::Request))
     {
         // add remote candidate
-        pair = addRemoteCandidate(socket, remoteHost, remotePort);
+        pair = addRemoteCandidate(socket, remoteHost, remotePort, message.priority());
 
         // send a binding response
         QXmppStunMessage response;
@@ -1886,7 +1907,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         // update state
         if (m_iceControlling || message.useCandidate)
         {
-            debug(QString("ICE reverse check %1").arg(pair->toString()));
+            debug(QString("ICE reverse check complete %1").arg(pair->toString()));
             pair->checked |= QIODevice::ReadOnly;
         }
 
@@ -1896,7 +1917,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             QXmppStunMessage message;
             message.setId(pair->transaction);
             message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-            message.setPriority(pair->priority);
+            message.setPriority(m_peerReflexivePriority);
             message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
             message.iceControlled = QByteArray(8, 0);
             writeStun(message, pair);
@@ -1922,9 +1943,6 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         pair->reflexive.setHost(message.xorMappedHost);
         pair->reflexive.setPort(message.xorMappedPort);
 
-        // FIXME : add the new remote candidate?
-        //addRemoteCandidate(socket, remoteHost, remotePort);
-
 #if 0
         // send a binding indication
         QXmppStunMessage indication;
@@ -1932,18 +1950,24 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         indication.setType(BindingIndication);
         m_socket->writeStun(indication, pair);
 #endif
+
         // outgoing media can flow
-        debug(QString("ICE forward check %1").arg(pair->toString()));
+        debug(QString("ICE forward check complete %1").arg(pair->toString()));
         pair->checked |= QIODevice::WriteOnly;
     }
 
     // signal completion
     if (pair && pair->checked == QIODevice::ReadWrite)
     { 
-        debug(QString("ICE completed %1").arg(pair->toString()));
-        m_activePair = pair;
         m_timer->stop();
-        emit connected();
+        if (!m_activePair || pair->priority() > m_activePair->priority()) {
+            info(QString("ICE pair selected %1 (priority: %2)").arg(
+                pair->toString(), QString::number(pair->priority())));
+            const bool wasConnected = (m_activePair != 0);
+            m_activePair = pair;
+            if (!wasConnected)
+                emit connected();
+        }
     }
 }
 
@@ -2099,7 +2123,7 @@ qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, QXmppIceCom
             pair->remote.host(),
             pair->remote.port());
     else
-        ret = -1;
+        return -1;
 #ifdef QXMPP_DEBUG_STUN
     logSent(QString("Sent to %1\n%2").arg(pair->toString(), message.toString()));
 #endif

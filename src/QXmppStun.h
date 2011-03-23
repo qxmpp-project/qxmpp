@@ -290,18 +290,22 @@ signals:
 private:
     class Pair {
     public:
-        Pair();
+        Pair(int component, bool controlling);
+        quint64 priority() const;
         QString toString() const;
 
         QIODevice::OpenMode checked;
-        quint32 priority;
         QXmppJingleCandidate remote;
         QXmppJingleCandidate reflexive;
         QByteArray transaction;
         QUdpSocket *socket;
+
+    private:
+        int m_component;
+        bool m_controlling;
     };
 
-    Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port);
+    Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
     qint64 writeStun(const QXmppStunMessage &message, QXmppIceComponent::Pair *pair);
 
     int m_component;
@@ -314,6 +318,7 @@ private:
     Pair *m_fallbackPair;
     bool m_iceControlling;
     QList<Pair*> m_pairs;
+    quint32 m_peerReflexivePriority;
     QString m_remoteUser;
     QString m_remotePassword;
 

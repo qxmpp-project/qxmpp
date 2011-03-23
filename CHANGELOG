@@ -7,6 +7,8 @@ QXmpp 0.x.y (UNRELEASED)
     QXmppIq
     QXmppStanza
 
+  - Add TURN support for VoIP calls to use a relay in double-NAT network topologies.
+
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------
   - New XEPs
@@ -23,7 +25,7 @@ QXmpp 0.3.0 (Mar 05, 2011)
       Establishment (ICE) over UDP "connection"
     * QXmppRtpChannel: class representing an RTP audio channel for VoIP calls
   
-  * Refactor QXmppVCardManager to use QXmppClientExtension
+  - Refactor QXmppVCardManager to use QXmppClientExtension
     
   - New Examples
     * example_9_vCard: vCard handling example
