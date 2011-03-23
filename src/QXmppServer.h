@@ -108,10 +108,8 @@ private slots:
     void slotStreamDisconnected();
 
 private:
-    QXmppOutgoingServer *connectToDomain(const QString &domain);
-    QList<QXmppStream*> getStreams(const QString &to);
-    virtual void handleStanza(QXmppStream *stream, const QDomElement &element);
-    QXmppServerPrivate * const d;
+    friend class QXmppServerPrivate;
+    QXmppServerPrivate *d;
 };
 
 class QXmppSslServerPrivate;
