@@ -156,6 +156,37 @@ private:
 
 /// \internal
 ///
+/// The QXmppStunTransaction class represents a STUN transaction.
+///
+
+class QXmppStunTransaction : public QXmppLoggable
+{
+    Q_OBJECT
+
+public:
+    QXmppStunTransaction(const QXmppStunMessage &request, QObject *parent);
+    QXmppStunMessage request() const;
+    QXmppStunMessage response() const;
+
+signals:
+    void finished();
+    void writeStun(const QXmppStunMessage &request);
+
+public slots:
+    void readStun(const QXmppStunMessage &response);
+
+private slots:
+    void retry();
+
+private:
+    QXmppStunMessage m_request;
+    QXmppStunMessage m_response;
+    QTimer *m_retryTimer;
+    int m_tries;
+};
+
+/// \internal
+///
 /// The QXmppTurnAllocation class represents a TURN allocation as defined
 /// by RFC 5766 Traversal Using Relays around NAT (TURN).
 ///
@@ -204,13 +235,16 @@ public slots:
 private slots:
     void readyRead();
     void refresh();
+    void refreshChannels();
+    void transactionFinished();
+    void writeStun(const QXmppStunMessage &message);
 
 private:
     void setState(AllocationState state);
-    qint64 writeStun(const QXmppStunMessage &message);
 
     QUdpSocket *socket;
-    QTimer *timer;
+    QTimer *m_timer;
+    QTimer *m_channelTimer;
     QString m_password;
     QString m_username;
     QHostAddress m_relayedHost;
@@ -228,8 +262,8 @@ private:
     QByteArray m_key;
     QString m_realm;
     QByteArray m_nonce;
-    QXmppStunMessage m_request;
     AllocationState m_state;
+    QList<QXmppStunTransaction*> m_transactions;
 };
 
 /// \brief The QXmppIceComponent class represents a piece of a media stream
