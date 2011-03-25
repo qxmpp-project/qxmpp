@@ -205,8 +205,7 @@ public:
     };
 
     QXmppTurnAllocation(QObject *parent = 0);
-    bool bind(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
-    void close();
+    ~QXmppTurnAllocation();
 
     QHostAddress relayedHost() const;
     quint16 relayedPort() const;

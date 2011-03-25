@@ -1167,23 +1167,12 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
     Q_ASSERT(check);
 }
 
-/// Binds the local socket.
+/// Destroys the TURN allocation.
 
-bool QXmppTurnAllocation::bind(const QHostAddress &address, quint16 port)
+QXmppTurnAllocation::~QXmppTurnAllocation()
 {
-    return socket->bind(address, port);
-}
-
-/// Disconnects from the server and closes the local socket.
-
-void QXmppTurnAllocation::close()
-{
-    disconnectFromHost();
-    socket->close();
-    foreach (QXmppStunTransaction *transaction, m_transactions)
-        delete transaction;
-    m_transactions.clear();
-    setState(UnconnectedState);
+    if (m_state == ConnectedState)
+        disconnectFromHost();
 }
 
 /// Allocates the TURN allocation.
@@ -1192,6 +1181,14 @@ void QXmppTurnAllocation::connectToHost()
 {
     if (m_state != UnconnectedState)
         return;
+
+    // start listening for UDP
+    if (socket->state() == QAbstractSocket::UnconnectedState) {
+        if (!socket->bind()) {
+            warning("Could not start listening for TURN");
+            return;
+        }
+    }
 
     // send allocate request
     QXmppStunMessage request;
@@ -1211,21 +1208,28 @@ void QXmppTurnAllocation::disconnectFromHost()
 {
     m_channelTimer->stop();
     m_timer->stop();
-    if (m_state != ConnectedState)
-        return;
 
-    // send refresh request with zero lifetime
-    QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
-    request.setId(generateRandomBytes(12));
-    request.setNonce(m_nonce);
-    request.setRealm(m_realm);
-    request.setUsername(m_username);
-    request.setLifetime(0);
-    m_transactions << new QXmppStunTransaction(request, this);
+    // clear channels and any outstanding transactions
+    m_channels.clear();
+    foreach (QXmppStunTransaction *transaction, m_transactions)
+        delete transaction;
+    m_transactions.clear();
 
-    // update state
-    setState(ClosingState);
+    // end allocation
+    if (m_state == ConnectedState) {
+        QXmppStunMessage request;
+        request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
+        request.setId(generateRandomBytes(12));
+        request.setNonce(m_nonce);
+        request.setRealm(m_realm);
+        request.setUsername(m_username);
+        request.setLifetime(0);
+        m_transactions << new QXmppStunTransaction(request, this);
+
+        setState(ClosingState);
+    } else {
+        setState(UnconnectedState);
+    }
 }
 
 void QXmppTurnAllocation::readyRead()
@@ -1681,7 +1685,7 @@ void QXmppIceComponent::close()
 {
     foreach (QUdpSocket *socket, m_sockets)
         socket->close();
-    m_turnAllocation->close();
+    m_turnAllocation->disconnectFromHost();
     m_timer->stop();
     m_stunTimer->stop();
 }
@@ -1866,10 +1870,8 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
     }
 
     // connect to TURN server
-    if (m_turnConfigured) {
-        m_turnAllocation->bind();
+    if (m_turnConfigured)
         m_turnAllocation->connectToHost();
-    }
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses
