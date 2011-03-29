@@ -1005,11 +1005,18 @@ void TestServer::testConnect()
     config.setDomain(testDomain);
     config.setHost(testHost.toString());
     config.setUser(testUser);
-    config.setPassword(testPassword);
     config.setPort(testPort);
+
+    // check bad password fails
+    config.setPassword("badpassword");
     client.connectToServer(config);
     loop.exec();
+    QCOMPARE(client.isConnected(), false);
 
+    // check correct password works
+    config.setPassword(testPassword);
+    client.connectToServer(config);
+    loop.exec();
     QCOMPARE(client.isConnected(), true);
 }
 
