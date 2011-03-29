@@ -941,16 +941,16 @@ public:
     };
 
     /// Retrieves the password for the given username.
-    bool getPassword(const QString &username, const QString &domain, QString &password)
+    Error getPassword(const QString &username, const QString &domain, QString &password)
     {
         Q_UNUSED(domain);
 
         if (username == m_username)
         {
             password = m_password;
-            return true;
+            return NoError;
         } else {
-            return false;
+            return AuthorizationError;
         }
     };
 

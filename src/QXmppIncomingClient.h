@@ -42,11 +42,11 @@ public:
     };
 
     virtual Error checkPassword(const QString &username, const QString &domain, const QString &password);
-    virtual bool getDigest(const QString &username, const QString &domain, QByteArray &digest);
+    virtual Error getDigest(const QString &username, const QString &domain, QByteArray &digest);
     virtual bool hasGetPassword() const;
 
 protected:
-    virtual bool getPassword(const QString &username, const QString &domain, QString &password);
+    virtual Error getPassword(const QString &username, const QString &domain, QString &password);
 };
 
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream

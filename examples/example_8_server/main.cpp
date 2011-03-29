@@ -33,16 +33,16 @@
 class passwordChecker : public QXmppPasswordChecker
 {
     /// Retrieves the password for the given username.
-    bool getPassword(const QString &username, const QString &domain, QString &password)
+    QXmppPasswordChecker::Error getPassword(const QString &username, const QString &domain, QString &password)
     {
         Q_UNUSED(domain);
 
         if (username == USERNAME)
         {
             password = PASSWORD;
-            return true;
+            return NoError;
         } else {
-            return false;
+            return AuthorizationError;
         }
     };
 

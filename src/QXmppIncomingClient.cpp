@@ -276,9 +276,18 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // check credentials
                 const QString username = QString::fromUtf8(response.value("username"));
+                if (!d->passwordChecker) {
+                    // FIXME: what type of failure?
+                    warning(QString("Cannot authenticate '%1', no password checker").arg(username));
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+                    disconnectFromHost();
+                    return;
+                }
+
                 QByteArray secret;
-                if (!d->passwordChecker || !d->passwordChecker->getDigest(username, d->domain, secret))
-                {
+                QXmppPasswordChecker::Error error = d->passwordChecker->getDigest(username, d->domain, secret);
+                if (error == QXmppPasswordChecker::TemporaryError) {
+                    warning(QString("Temporary authentication failure for '%1'").arg(username));
                     sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><temporary-auth-failure/></failure>");
                     disconnectFromHost();
                     return;
@@ -394,6 +403,8 @@ void QXmppIncomingClient::slotTimeout()
 
 /// Checks that the given credentials are valid.
 ///
+/// The base implementation requires that you reimplement getPassword().
+///
 /// \param username
 /// \param domain
 /// \param password
@@ -401,42 +412,47 @@ void QXmppIncomingClient::slotTimeout()
 QXmppPasswordChecker::Error QXmppPasswordChecker::checkPassword(const QString &username, const QString &domain, const QString &password)
 {
     QString secret;
-    if (!getPassword(username, domain, secret))
-        return TemporaryError;
+    Error error = getPassword(username, domain, secret);
+    if (error != NoError)
+        return error;
 
     return (password == secret) ? NoError : AuthorizationError;
 }
 
 /// Retrieves the MD5 digest for the given username.
 ///
+/// Reimplement this method if your backend natively supports
+/// retrieving MD5 digests.
+///
 /// \param username
 
-bool QXmppPasswordChecker::getDigest(const QString &username, const QString &domain, QByteArray &digest)
+QXmppPasswordChecker::Error QXmppPasswordChecker::getDigest(const QString &username, const QString &domain, QByteArray &digest)
 {
-    QString password;
-    if (!getPassword(username, domain, password))
-        return false;
+    QString secret;
+    Error error = getPassword(username, domain, secret);
+    if (error != NoError)
+        return error;
 
     digest = QCryptographicHash::hash(
-        (username + ":" + domain + ":" + password).toUtf8(),
+        (username + ":" + domain + ":" + secret).toUtf8(),
         QCryptographicHash::Md5);
-    return true;
+    return NoError;
 }
 
 /// Retrieves the password for the given username.
 ///
-/// You need to reimplement this method to support DIGEST-MD5 authentication.
+/// The simplest way to write a password checker is to reimplement this method.
 ///
 /// \param username
 /// \param domain
 /// \param password
 
-bool QXmppPasswordChecker::getPassword(const QString &username, const QString &domain, QString &password)
+QXmppPasswordChecker::Error QXmppPasswordChecker::getPassword(const QString &username, const QString &domain, QString &password)
 {
     Q_UNUSED(username);
     Q_UNUSED(domain);
     Q_UNUSED(password);
-    return false;
+    return TemporaryError;
 }
 
 /// Returns true if the getPassword() method is implemented.
