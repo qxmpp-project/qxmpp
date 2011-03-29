@@ -89,29 +89,9 @@ void QXmppSaslDigestMd5::setQop(const QByteArray &qop)
     m_qop = qop;
 }
 
-QByteArray QXmppSaslDigestMd5::realm() const
+void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
 {
-    return m_realm;
-}
-
-void QXmppSaslDigestMd5::setRealm(const QByteArray &realm)
-{
-    m_realm = realm;
-}
-
-QByteArray QXmppSaslDigestMd5::username() const
-{
-    return m_username;
-}
-
-void QXmppSaslDigestMd5::setUsername(const QByteArray &username)
-{
-    m_username = username;
-}
-
-void QXmppSaslDigestMd5::setPassword(const QByteArray &password)
-{
-    m_password = password;
+    m_secret = secret;
 }
 
 QByteArray QXmppSaslDigestMd5::generateNonce()
@@ -130,9 +110,7 @@ QByteArray QXmppSaslDigestMd5::generateNonce()
 
 QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A2) const
 {
-    const QByteArray a1 = m_username + ':' + m_realm + ':' + m_password;
-    QByteArray ha1 = QCryptographicHash::hash(a1, QCryptographicHash::Md5);
-    ha1 += ':' + m_nonce + ':' + m_cnonce;
+    QByteArray ha1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
 
     if (!m_authzid.isEmpty())
         ha1 += ':' + m_authzid;

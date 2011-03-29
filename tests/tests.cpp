@@ -940,18 +940,11 @@ public:
     {
     };
 
-    /// Checks that the given credentials are valid.
-    QXmppPasswordChecker::Error checkPassword(const QString &username, const QString &password)
-    {
-        if (username == m_username && password == m_password)
-            return QXmppPasswordChecker::NoError;
-        else
-            return QXmppPasswordChecker::AuthorizationError;
-    };
-
     /// Retrieves the password for the given username.
-    bool getPassword(const QString &username, QString &password)
+    bool getPassword(const QString &username, const QString &domain, QString &password)
     {
+        Q_UNUSED(domain);
+
         if (username == m_username)
         {
             password = m_password;

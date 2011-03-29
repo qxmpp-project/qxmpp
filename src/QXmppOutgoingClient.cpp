@@ -22,6 +22,7 @@
  *
  */
 
+#include <QCryptographicHash>
 #include <QSslSocket>
 
 #include "QXmppConfiguration.h"
@@ -615,15 +616,15 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep1(const QString& challeng
     d->saslDigest.setNc("00000001");
     d->saslDigest.setNonce(map.value("nonce"));
     d->saslDigest.setQop("auth");
-    d->saslDigest.setRealm(map.value("realm"));
-    d->saslDigest.setUsername(configuration().user().toUtf8());
-    d->saslDigest.setPassword(configuration().password().toUtf8());
+    d->saslDigest.setSecret(QCryptographicHash::hash(
+        configuration().user().toUtf8() + ":" + map.value("realm") + ":" + configuration().password().toUtf8(),
+        QCryptographicHash::Md5));
 
     // Build response
     QMap<QByteArray, QByteArray> response;
-    response["username"] = d->saslDigest.username();
-    if(!d->saslDigest.realm().isEmpty())
-        response["realm"] = d->saslDigest.realm();
+    response["username"] = configuration().user().toUtf8();
+    if (map.contains("realm"))
+        response["realm"] = map.value("realm");
     response["nonce"] = d->saslDigest.nonce();
     response["cnonce"] = d->saslDigest.cnonce();
     response["nc"] = d->saslDigest.nc();

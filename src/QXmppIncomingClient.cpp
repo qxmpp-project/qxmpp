@@ -21,6 +21,7 @@
  *
  */
 
+#include <QCryptographicHash>
 #include <QDomElement>
 #include <QSslKey>
 #include <QSslSocket>
@@ -223,7 +224,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                     return;
                 }
 
-                QXmppPasswordChecker::Error error = d->passwordChecker->checkPassword(username, password);
+                QXmppPasswordChecker::Error error = d->passwordChecker->checkPassword(username, d->domain, password);
                 if (error == QXmppPasswordChecker::NoError)
                 {
                     d->username = username;
@@ -246,12 +247,11 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 // generate nonce
                 d->saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
                 d->saslDigest.setQop("auth");
-                d->saslDigest.setRealm(d->domain.toUtf8());
                 d->saslStep = 1;
 
                 QMap<QByteArray, QByteArray> challenge;
                 challenge["nonce"] = d->saslDigest.nonce();
-                challenge["realm"] = d->saslDigest.realm();
+                challenge["realm"] = d->domain.toUtf8();
                 challenge["qop"] = d->saslDigest.qop();
                 challenge["charset"] = "utf-8";
                 challenge["algorithm"] = "md5-sess";
@@ -276,15 +276,14 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // check credentials
                 const QString username = QString::fromUtf8(response.value("username"));
-                QString password;
-                if (!d->passwordChecker || !d->passwordChecker->getPassword(username, password))
+                QByteArray secret;
+                if (!d->passwordChecker || !d->passwordChecker->getDigest(username, d->domain, secret))
                 {
-                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
+                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><temporary-auth-failure/></failure>");
                     disconnectFromHost();
                     return;
                 }
-                d->saslDigest.setUsername(username.toUtf8());
-                d->saslDigest.setPassword(password.toUtf8());
+                d->saslDigest.setSecret(secret);
                 d->saslDigest.setDigestUri(response.value("digest-uri"));
                 d->saslDigest.setNc(response.value("nc"));
                 d->saslDigest.setCnonce(response.value("cnonce"));
@@ -393,16 +392,49 @@ void QXmppIncomingClient::slotTimeout()
     disconnectFromHost();
 }
 
+/// Checks that the given credentials are valid.
+///
+/// \param username
+/// \param domain
+/// \param password
+
+QXmppPasswordChecker::Error QXmppPasswordChecker::checkPassword(const QString &username, const QString &domain, const QString &password)
+{
+    QString secret;
+    if (!getPassword(username, domain, secret))
+        return TemporaryError;
+
+    return (password == secret) ? NoError : AuthorizationError;
+}
+
+/// Retrieves the MD5 digest for the given username.
+///
+/// \param username
+
+bool QXmppPasswordChecker::getDigest(const QString &username, const QString &domain, QByteArray &digest)
+{
+    QString password;
+    if (!getPassword(username, domain, password))
+        return false;
+
+    digest = QCryptographicHash::hash(
+        (username + ":" + domain + ":" + password).toUtf8(),
+        QCryptographicHash::Md5);
+    return true;
+}
+
 /// Retrieves the password for the given username.
 ///
 /// You need to reimplement this method to support DIGEST-MD5 authentication.
 ///
 /// \param username
+/// \param domain
 /// \param password
 
-bool QXmppPasswordChecker::getPassword(const QString &username, QString &password)
+bool QXmppPasswordChecker::getPassword(const QString &username, const QString &domain, QString &password)
 {
     Q_UNUSED(username);
+    Q_UNUSED(domain);
     Q_UNUSED(password);
     return false;
 }

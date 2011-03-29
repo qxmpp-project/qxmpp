@@ -41,13 +41,12 @@ public:
         TemporaryError,
     };
 
-    /// Checks that the given credentials are valid.
-    ///
-    /// \param username
-    /// \param password
-    virtual Error checkPassword(const QString &username, const QString &password) = 0;
-    virtual bool getPassword(const QString &username, QString &password);
+    virtual Error checkPassword(const QString &username, const QString &domain, const QString &password);
+    virtual bool getDigest(const QString &username, const QString &domain, QByteArray &digest);
     virtual bool hasGetPassword() const;
+
+protected:
+    virtual bool getPassword(const QString &username, const QString &domain, QString &password);
 };
 
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream

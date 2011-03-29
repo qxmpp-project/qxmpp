@@ -49,13 +49,7 @@ public:
     QByteArray qop() const;
     void setQop(const QByteArray &qop);
 
-    QByteArray realm() const;
-    void setRealm(const QByteArray &realm);
-
-    QByteArray username() const;
-    void setUsername(const QByteArray &username);
-
-    void setPassword(const QByteArray &password);
+    void setSecret(const QByteArray &secret);
 
     QByteArray calculateDigest(const QByteArray &A2) const;
     QByteArray calculateDigest(const QByteArray &A1, const QByteArray &A2) const;
@@ -72,9 +66,7 @@ private:
     QByteArray m_nc;
     QByteArray m_nonce;
     QByteArray m_qop;
-    QByteArray m_realm;
-    QByteArray m_username;
-    QByteArray m_password;
+    QByteArray m_secret;
 };
 
 #endif
