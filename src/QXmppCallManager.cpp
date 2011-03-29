@@ -248,9 +248,9 @@ QXmppCall::State QXmppCall::state() const
 }
 
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
-    : q(qq),
-    stunPort(0),
-    turnPort(0)
+    : stunPort(0),
+    turnPort(0),
+    q(qq)
 {
 }
 
