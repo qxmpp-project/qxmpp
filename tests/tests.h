@@ -91,6 +91,14 @@ private slots:
     void testSubscriptions();
 };
 
+class TestServer : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testConnect();
+};
+
 class TestStun : public QObject
 {
     Q_OBJECT

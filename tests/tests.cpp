@@ -26,11 +26,14 @@
 
 #include <QCoreApplication>
 #include <QDomDocument>
+#include <QEventLoop>
 #include <QVariant>
 #include <QtTest/QtTest>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
+#include "QXmppClient.h"
+#include "QXmppIncomingClient.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
@@ -39,6 +42,7 @@
 #include "QXmppRpcIq.h"
 #include "QXmppSaslAuth.h"
 #include "QXmppSessionIq.h"
+#include "QXmppServer.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
@@ -928,6 +932,94 @@ void TestPubSub::testSubscriptions()
     serializePacket(iq, xml);
 }
 
+class TestPasswordChecker : public QXmppPasswordChecker
+{
+public:
+    TestPasswordChecker(const QString &username, const QString &password)
+        : m_getPassword(true), m_username(username), m_password(password)
+    {
+    };
+
+    /// Checks that the given credentials are valid.
+    QXmppPasswordChecker::Error checkPassword(const QString &username, const QString &password)
+    {
+        if (username == m_username && password == m_password)
+            return QXmppPasswordChecker::NoError;
+        else
+            return QXmppPasswordChecker::AuthorizationError;
+    };
+
+    /// Retrieves the password for the given username.
+    bool getPassword(const QString &username, QString &password)
+    {
+        if (username == m_username)
+        {
+            password = m_password;
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    void setGetPassword(bool getPassword)
+    {
+        m_getPassword = getPassword;
+    }
+
+    /// Returns true as we implemented getPassword().
+    bool hasGetPassword() const
+    {
+        return m_getPassword;
+    };
+
+private:
+    bool m_getPassword;
+    QString m_username;
+    QString m_password;
+};
+
+void TestServer::testConnect()
+{
+    const QString testDomain("localhost");
+    const QString testPassword("testpwd");
+    const QString testUser("testuser");
+    const QHostAddress testHost(QHostAddress::LocalHost);
+    const quint16 testPort = 12345;
+
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
+
+    // prepare server
+    TestPasswordChecker passwordChecker(testUser, testPassword);
+
+    QXmppServer server;
+    server.setDomain(testDomain);
+    server.setLogger(&logger);
+    server.setPasswordChecker(&passwordChecker);
+    server.listenForClients(testHost, testPort);
+
+    // prepare client
+    QXmppClient client;
+    client.setLogger(&logger);
+
+    QEventLoop loop;
+    connect(&client, SIGNAL(connected()),
+            &loop, SLOT(quit()));
+    connect(&client, SIGNAL(disconnected()),
+            &loop, SLOT(quit()));
+
+    QXmppConfiguration config;
+    config.setDomain(testDomain);
+    config.setHost(testHost.toString());
+    config.setUser(testUser);
+    config.setPassword(testPassword);
+    config.setPort(testPort);
+    client.connectToServer(config);
+    loop.exec();
+
+    QCOMPARE(client.isConnected(), true);
+}
+
 void TestStun::testFingerprint()
 {
     // without fingerprint
@@ -1223,6 +1315,9 @@ int main(int argc, char *argv[])
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
+
+    TestServer testServer;
+    errors += QTest::qExec(&testServer);
 
     TestStun testStun;
     errors += QTest::qExec(&testStun);
