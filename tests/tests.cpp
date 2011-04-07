@@ -33,10 +33,10 @@
 #include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
 #include "QXmppClient.h"
-#include "QXmppIncomingClient.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppPasswordChecker.h"
 #include "QXmppPresence.h"
 #include "QXmppPubSubIq.h"
 #include "QXmppRpcIq.h"
@@ -941,25 +941,24 @@ public:
     };
 
     /// Retrieves the password for the given username.
-    Error getPassword(const QString &username, const QString &domain, QString &password)
+    QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password)
     {
-        Q_UNUSED(domain);
-
-        if (username == m_username)
+        if (request.username() == m_username)
         {
             password = m_password;
-            return NoError;
+            return QXmppPasswordReply::NoError;
         } else {
-            return AuthorizationError;
+            return QXmppPasswordReply::AuthorizationError;
         }
     };
 
+    /// Sets whether getPassword() is enabled.
     void setGetPassword(bool getPassword)
     {
         m_getPassword = getPassword;
     }
 
-    /// Returns true as we implemented getPassword().
+    /// Returns whether getPassword() is enabled.
     bool hasGetPassword() const
     {
         return m_getPassword;

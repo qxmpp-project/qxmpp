@@ -51,6 +51,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppOutgoingClient.h \
     QXmppOutgoingServer.h \
     QXmppPacket.h \
+    QXmppPasswordChecker.h \
     QXmppPingIq.h \
     QXmppPresence.h \
     QXmppPubSubIq.h \
@@ -118,6 +119,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppOutgoingClient.cpp \
     QXmppOutgoingServer.cpp \
     QXmppPacket.cpp \
+    QXmppPasswordChecker.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
     QXmppPubSubIq.cpp \

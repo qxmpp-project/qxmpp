@@ -27,27 +27,10 @@
 #include "QXmppStream.h"
 
 class QXmppIncomingClientPrivate;
+class QXmppPasswordChecker;
 
 /// \brief Interface for password checkers.
 ///
-
-class QXmppPasswordChecker
-{
-public:
-    /// This enum is used to describe authentication errors.
-    enum Error {
-        NoError = 0,
-        AuthorizationError,
-        TemporaryError,
-    };
-
-    virtual Error checkPassword(const QString &username, const QString &domain, const QString &password);
-    virtual Error getDigest(const QString &username, const QString &domain, QByteArray &digest);
-    virtual bool hasGetPassword() const;
-
-protected:
-    virtual Error getPassword(const QString &username, const QString &domain, QString &password);
-};
 
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
 /// from an XMPP client.
@@ -78,7 +61,9 @@ protected:
     /// \endcond
 
 private slots:
-    void slotTimeout();
+    void onDigestReply();
+    void onPasswordReply();
+    void onTimeout();
 
 private:
     Q_DISABLE_COPY(QXmppIncomingClient)
