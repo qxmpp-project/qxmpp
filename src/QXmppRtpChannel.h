@@ -74,6 +74,7 @@ public:
 
     /// \cond
     qint64 bytesAvailable() const;
+    void close();
     bool isSequential() const;
     qint64 pos() const;
     bool seek(qint64 pos);

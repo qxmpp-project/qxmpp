@@ -247,6 +247,15 @@ qint64 QXmppRtpChannel::bytesAvailable() const
     return d->incomingBuffer.size();
 }
 
+/// Closes the RTP channel.
+///
+
+void QXmppRtpChannel::close()
+{
+    d->outgoingTimer->stop();
+    QIODevice::close();
+}
+
 /// Processes an incoming RTP packet.
 ///
 /// \param ba
