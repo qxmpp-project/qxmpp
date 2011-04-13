@@ -12,6 +12,6 @@ SUBDIRS = example_0_connected\
           example_6_rpcClient\
           example_7_archiveHandling\
           example_8_server\
-          example_9_vCard\
-          GuiClient
+          example_9_vCard
+#          GuiClient
           
