@@ -39,7 +39,8 @@ class QXmppIq;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
-class QXmppRtpChannel;
+class QXmppRtpAudioChannel;
+class QXmppRtpVideoChannel;
 
 /// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
 ///
@@ -77,7 +78,8 @@ public:
     QString sid() const;
     QXmppCall::State state() const;
 
-    QXmppRtpChannel *audioChannel() const;
+    QXmppRtpAudioChannel *audioChannel() const;
+    QXmppRtpVideoChannel *videoChannel() const;
 
 signals:
     /// \brief This signal is emitted when a call is connected.
@@ -93,21 +95,22 @@ signals:
     /// instead use deleteLater().
     void finished();
 
-    /// \cond
-    void localCandidatesChanged();
-    /// \endcond
-
     /// \brief This signal is emitted when the remote party is ringing.
     void ringing();
 
     /// \brief This signal is emitted when the call state changes.
     void stateChanged(QXmppCall::State state);
 
+    /// \brief This signal is emitted when the video channel changes.
+    void videoModeChanged(QIODevice::OpenMode mode);
+
 public slots:
     void accept();
     void hangup();
+    void startVideo();
 
 private slots:
+    void localCandidatesChanged();
     void terminate();
     void terminated();
     void updateOpenMode();
@@ -174,14 +177,13 @@ protected:
 
 private slots:
     void callDestroyed(QObject *object);
-    void callStateChanged(QXmppCall::State state);
     void iqReceived(const QXmppIq &iq);
     void jingleIqReceived(const QXmppJingleIq &iq);
-    void localCandidatesChanged();
 
 private:
     QXmppCallManagerPrivate *d;
     friend class QXmppCall;
+    friend class QXmppCallPrivate;
     friend class QXmppCallManagerPrivate;
 };
 

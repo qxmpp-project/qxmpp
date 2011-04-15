@@ -35,29 +35,49 @@
 
 static int typeId = qRegisterMetaType<QXmppCall::State>();
 
-const int RTP_COMPONENT = 1;
-const int RTCP_COMPONENT = 2;
+static const int RTP_COMPONENT = 1;
+static const int RTCP_COMPONENT = 2;
+
+static const QLatin1String AUDIO_MEDIA("audio");
+static const QLatin1String VIDEO_MEDIA("video");
 
 class QXmppCallPrivate
 {
 public:
+    class Stream {
+    public:
+        QXmppRtpChannel *channel;
+        QXmppIceConnection *connection;
+        QString creator;
+        QString media;
+        QString name;
+    };
+
     QXmppCallPrivate(QXmppCall *qq);
+    Stream *createStream(const QString &media);
+    Stream *findStreamByMedia(const QString &media);
+    Stream *findStreamByName(const QString &name);
+    void handleAck(const QXmppIq &iq);
+    bool handleDescription(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content);
+    void handleRequest(const QXmppJingleIq &iq);
+    bool handleTransport(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content);
     void setState(QXmppCall::State state);
+    bool sendAck(const QXmppJingleIq &iq);
+    bool sendInvite();
+    bool sendRequest(const QXmppJingleIq &iq);
 
     QXmppCall::Direction direction;
     QString jid;
+    QString ownJid;
+    QXmppCallManager *manager;
+    QList<QXmppJingleIq> requests;
     QString sid;
     QXmppCall::State state;
-    QString contentCreator;
-    QString contentName;
 
-    QList<QXmppJingleIq> requests;
-
-    // ICE-UDP
-    QXmppIceConnection *connection;
-
-    // RTP
-    QXmppRtpChannel *audioChannel;
+    // Media streams
+    QList<Stream*> streams;
+    QIODevice::OpenMode audioMode;
+    QIODevice::OpenMode videoMode;
 
 private:
     QXmppCall *q;
@@ -67,11 +87,8 @@ class QXmppCallManagerPrivate
 {
 public:
     QXmppCallManagerPrivate(QXmppCallManager *qq);
-    bool checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes);
     QXmppCall *findCall(const QString &sid) const;
     QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
-    bool sendAck(const QXmppJingleIq &iq);
-    bool sendRequest(QXmppCall *call, const QXmppJingleIq &iq);
 
     QList<QXmppCall*> calls;
     QHostAddress stunHost;
@@ -87,8 +104,314 @@ private:
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : state(QXmppCall::OfferState),
+    audioMode(QIODevice::NotOpen),
+    videoMode(QIODevice::NotOpen),
     q(qq)
 {
+}
+
+QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &media)
+{
+    foreach (Stream *stream, streams)
+        if (stream->media == media)
+            return stream;
+    return 0;
+}
+
+QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByName(const QString &name)
+{
+    foreach (Stream *stream, streams)
+        if (stream->name == name)
+            return stream;
+    return 0;
+}
+
+void QXmppCallPrivate::handleAck(const QXmppIq &ack)
+{
+    const QString id = ack.id();
+    for (int i = 0; i < requests.size(); ++i) {
+        if (id == requests[i].id()) {
+            // process acknowledgement
+            const QXmppJingleIq request = requests.takeAt(i);
+            q->debug(QString("Received ACK for packet %1").arg(id));
+
+            // handle termination
+            if (request.action() == QXmppJingleIq::SessionTerminate)
+                q->terminate();
+            return;
+        }
+    }
+}
+
+bool QXmppCallPrivate::handleDescription(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content)
+{
+    stream->channel->setRemotePayloadTypes(content.payloadTypes());
+    if (!(stream->channel->openMode() & QIODevice::ReadWrite)) {
+        q->warning(QString("Remote party %1 did not provide any known %2 payloads for call %3").arg(jid, stream->media, sid));
+        return false;
+    }
+    q->updateOpenMode();
+    return true;
+}
+
+bool QXmppCallPrivate::handleTransport(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content)
+{
+    stream->connection->setRemoteUser(content.transportUser());
+    stream->connection->setRemotePassword(content.transportPassword());
+    foreach (const QXmppJingleCandidate &candidate, content.transportCandidates())
+        stream->connection->addRemoteCandidate(candidate);
+
+    // perform ICE negotiation
+    if (!content.transportCandidates().isEmpty())
+        stream->connection->connectToHost();
+    return true;
+}
+
+void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
+{
+    if (iq.action() == QXmppJingleIq::SessionAccept) {
+
+        if (direction == QXmppCall::IncomingDirection) {
+            q->warning("Ignoring Session-Accept for an incoming call");
+            return;
+        }
+
+        // send ack
+        sendAck(iq);
+
+        // check content description and transport
+        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        if (!stream ||
+            !handleDescription(stream, iq.content()) ||
+            !handleTransport(stream, iq.content())) {
+
+            // terminate call
+            QXmppJingleIq iq;
+            iq.setTo(q->jid());
+            iq.setType(QXmppIq::Set);
+            iq.setAction(QXmppJingleIq::SessionTerminate);
+            iq.setSid(q->sid());
+            iq.reason().setType(QXmppJingleIq::Reason::FailedApplication);
+            sendRequest(iq);
+
+            q->terminate();
+            return;
+        }
+
+        // check for call establishment
+        setState(QXmppCall::ConnectingState);
+        q->updateOpenMode();
+
+    } else if (iq.action() == QXmppJingleIq::SessionInfo) {
+
+        // notify user
+        QTimer::singleShot(0, q, SIGNAL(ringing()));
+
+    } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
+
+        // send ack
+        sendAck(iq);
+
+        // terminate
+        q->info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
+        q->terminate();
+
+    } else if (iq.action() == QXmppJingleIq::ContentAccept) {
+
+        // send ack
+        sendAck(iq);
+
+        // check content description and transport
+        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        if (!stream ||
+            !handleDescription(stream, iq.content()) ||
+            !handleTransport(stream, iq.content())) {
+
+            // FIXME: what action?
+            return;
+        }
+
+    } else if (iq.action() == QXmppJingleIq::ContentAdd) {
+
+        // send ack
+        sendAck(iq);
+
+        // check media stream does not exist yet
+        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        if (stream)
+            return;
+
+        // create media stream
+        stream = createStream(iq.content().descriptionMedia());
+        if (!stream)
+            return;
+        stream->creator = iq.content().creator();
+        stream->name = iq.content().name();
+
+        // check content description
+        if (!handleDescription(stream, iq.content()) ||
+            !handleTransport(stream, iq.content())) {
+
+            QXmppJingleIq iq;
+            iq.setTo(q->jid());
+            iq.setType(QXmppIq::Set);
+            iq.setAction(QXmppJingleIq::ContentReject);
+            iq.setSid(q->sid());
+            iq.reason().setType(QXmppJingleIq::Reason::FailedApplication);
+            sendRequest(iq);
+            delete stream;
+            return;
+        }
+        streams << stream;
+
+         // accept content
+        QXmppJingleIq iq;
+        iq.setTo(q->jid());
+        iq.setType(QXmppIq::Set);
+        iq.setAction(QXmppJingleIq::ContentAccept);
+        iq.setSid(q->sid());
+        iq.content().setCreator(stream->creator);
+        iq.content().setName(stream->name);
+
+        // description
+        iq.content().setDescriptionMedia(stream->media);
+        foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
+            iq.content().addPayloadType(payload);
+
+        // transport
+        iq.content().setTransportUser(stream->connection->localUser());
+        iq.content().setTransportPassword(stream->connection->localPassword());
+        foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
+            iq.content().addTransportCandidate(candidate);
+
+        sendRequest(iq);
+
+    } else if (iq.action() == QXmppJingleIq::TransportInfo) {
+
+        // send ack
+        sendAck(iq);
+
+        // check content transport
+        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        if (!stream ||
+            !handleTransport(stream, iq.content())) {
+            // FIXME: what action?
+            return;
+        }
+
+    }
+}
+
+QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
+{
+    Q_ASSERT(manager);
+
+    Stream *stream = new Stream;
+    stream->media = media;
+
+    // RTP channel
+    QObject *channelObject = 0;
+    if (media == AUDIO_MEDIA) {
+        QXmppRtpAudioChannel *audioChannel = new QXmppRtpAudioChannel(q);
+        stream->channel = audioChannel;
+        channelObject = audioChannel;
+    } else if (media == VIDEO_MEDIA) {
+        QXmppRtpVideoChannel *videoChannel = new QXmppRtpVideoChannel(q);
+        stream->channel = videoChannel;
+        channelObject = videoChannel;
+    } else {
+        q->warning(QString("Unsupported media type %1").arg(media));
+        delete stream;
+        return 0;
+    }
+
+    // ICE connection
+    stream->connection = new QXmppIceConnection(q);
+    stream->connection->setIceControlling(direction == QXmppCall::OutgoingDirection);
+    stream->connection->setStunServer(manager->d->stunHost, manager->d->stunPort);
+    stream->connection->setTurnServer(manager->d->turnHost, manager->d->turnPort);
+    stream->connection->setTurnUser(manager->d->turnUser);
+    stream->connection->setTurnPassword(manager->d->turnPassword);
+    stream->connection->addComponent(RTP_COMPONENT);
+    stream->connection->addComponent(RTCP_COMPONENT);
+    stream->connection->bind(QXmppIceComponent::discoverAddresses());
+
+    // connect signals
+    bool check = QObject::connect(stream->connection, SIGNAL(localCandidatesChanged()),
+        q, SLOT(localCandidatesChanged()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(stream->connection, SIGNAL(connected()),
+        q, SLOT(updateOpenMode()));
+    Q_ASSERT(check);
+
+    check = QObject::connect(stream->connection, SIGNAL(disconnected()),
+        q, SLOT(hangup()));
+    Q_ASSERT(check);
+
+    if (channelObject) {
+        QXmppIceComponent *rtpComponent = stream->connection->component(RTP_COMPONENT);
+
+        check = QObject::connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
+                        channelObject, SLOT(datagramReceived(QByteArray)));
+        Q_ASSERT(check);
+
+        check = QObject::connect(channelObject, SIGNAL(sendDatagram(QByteArray)),
+                        rtpComponent, SLOT(sendDatagram(QByteArray)));
+        Q_ASSERT(check);
+    }
+    return stream;
+}
+
+/// Sends an acknowledgement for a Jingle IQ.
+///
+
+bool QXmppCallPrivate::sendAck(const QXmppJingleIq &iq)
+{
+    QXmppIq ack;
+    ack.setId(iq.id());
+    ack.setTo(iq.from());
+    ack.setType(QXmppIq::Result);
+    return manager->client()->sendPacket(ack);
+}
+
+bool QXmppCallPrivate::sendInvite()
+{
+    QXmppJingleIq iq;
+    iq.setTo(jid);
+    iq.setType(QXmppIq::Set);
+    iq.setAction(QXmppJingleIq::SessionInitiate);
+    iq.setInitiator(ownJid);
+    iq.setSid(sid);
+
+    // create audio stream
+    QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
+    Q_ASSERT(stream);
+    iq.content().setCreator(stream->creator);
+    iq.content().setName(stream->name);
+    iq.content().setSenders("both");
+
+    // description
+    iq.content().setDescriptionMedia(stream->media);
+    foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
+        iq.content().addPayloadType(payload);
+
+    // transport
+    iq.content().setTransportUser(stream->connection->localUser());
+    iq.content().setTransportPassword(stream->connection->localPassword());
+    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
+        iq.content().addTransportCandidate(candidate);
+
+    return sendRequest(iq);
+}
+
+/// Sends a Jingle IQ and adds it to outstanding requests.
+///
+
+bool QXmppCallPrivate::sendRequest(const QXmppJingleIq &iq)
+{
+    requests << iq;
+    return manager->client()->sendPacket(iq);
 }
 
 void QXmppCallPrivate::setState(QXmppCall::State newState)
@@ -106,47 +429,20 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCa
     d = new QXmppCallPrivate(this);
     d->direction = direction;
     d->jid = jid;
-    d->contentCreator = QLatin1String("initiator");
-    d->contentName = QLatin1String("voice");
+    d->ownJid = parent->client()->configuration().jid();
+    d->manager = parent;
 
-    // ICE connection
-    bool iceControlling = (d->direction == OutgoingDirection);
-    d->connection = new QXmppIceConnection(iceControlling, this);
-    d->connection->setStunServer(parent->d->stunHost, parent->d->stunPort);
-    d->connection->setTurnServer(parent->d->turnHost, parent->d->turnPort);
-    d->connection->setTurnUser(parent->d->turnUser);
-    d->connection->setTurnPassword(parent->d->turnPassword);
-    d->connection->addComponent(RTP_COMPONENT);
-    d->connection->addComponent(RTCP_COMPONENT);
-    d->connection->bind(QXmppIceComponent::discoverAddresses());
-
-    bool check = connect(d->connection, SIGNAL(localCandidatesChanged()),
-        this, SIGNAL(localCandidatesChanged()));
-    Q_ASSERT(check);
-
-    check = connect(d->connection, SIGNAL(connected()),
-        this, SLOT(updateOpenMode()));
-    Q_ASSERT(check);
-
-    check = connect(d->connection, SIGNAL(disconnected()),
-        this, SLOT(hangup()));
-    Q_ASSERT(check);
-
-    // RTP channel
-    d->audioChannel = new QXmppRtpChannel(this);
-    QXmppIceComponent *rtpComponent = d->connection->component(RTP_COMPONENT);
-
-    check = connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
-                    d->audioChannel, SLOT(datagramReceived(QByteArray)));
-    Q_ASSERT(check);
-
-    check = connect(d->audioChannel, SIGNAL(sendDatagram(QByteArray)),
-                    rtpComponent, SLOT(sendDatagram(QByteArray)));
-    Q_ASSERT(check);
+    // create audio stream
+    QXmppCallPrivate::Stream *stream = d->createStream(AUDIO_MEDIA);
+    stream->creator = QLatin1String("initiator");
+    stream->name = QLatin1String("voice");
+    d->streams << stream;
 }
 
 QXmppCall::~QXmppCall()
 {
+    foreach (QXmppCallPrivate::Stream *stream, d->streams)
+        delete stream;
     delete d;
 }
 
@@ -156,7 +452,37 @@ QXmppCall::~QXmppCall()
 void QXmppCall::accept()
 {
     if (d->direction == IncomingDirection && d->state == OfferState)
+    {
+        Q_ASSERT(d->streams.size() == 1);
+        QXmppCallPrivate::Stream *stream = d->streams.first();
+
+        // accept incoming call
+        QXmppJingleIq iq;
+        iq.setTo(d->jid);
+        iq.setType(QXmppIq::Set);
+        iq.setAction(QXmppJingleIq::SessionAccept);
+        iq.setResponder(d->ownJid);
+        iq.setSid(d->sid);
+        iq.content().setCreator(stream->creator);
+        iq.content().setName(stream->name);
+
+        // description
+        iq.content().setDescriptionMedia(stream->media);
+        foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
+            iq.content().addPayloadType(payload);
+
+        // transport
+        iq.content().setTransportUser(stream->connection->localUser());
+        iq.content().setTransportPassword(stream->connection->localPassword());
+        foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
+            iq.content().addTransportCandidate(candidate);
+
+        d->sendRequest(iq);
+
+        // check for call establishment
         d->setState(QXmppCall::ConnectingState);
+        updateOpenMode();
+    }
 }
 
 /// Returns the RTP channel for the audio data.
@@ -165,9 +491,21 @@ void QXmppCall::accept()
 /// instance using a QAudioOutput and a QAudioInput.
 ///
 
-QXmppRtpChannel *QXmppCall::audioChannel() const
+QXmppRtpAudioChannel *QXmppCall::audioChannel() const
 {
-    return d->audioChannel;
+    QXmppCallPrivate::Stream *stream = d->findStreamByMedia(AUDIO_MEDIA);
+    Q_ASSERT(stream);
+    return (QXmppRtpAudioChannel*)stream->channel;
+}
+
+/// Returns the RTP channel for the video data.
+///
+
+QXmppRtpVideoChannel *QXmppCall::videoChannel() const
+{
+    QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
+    Q_ASSERT(stream);
+    return (QXmppRtpVideoChannel*)stream->channel;
 }
 
 void QXmppCall::terminate()
@@ -177,8 +515,10 @@ void QXmppCall::terminate()
 
     d->state = QXmppCall::FinishedState;
 
-    d->audioChannel->close();
-    d->connection->close();
+    foreach (QXmppCallPrivate::Stream *stream, d->streams) {
+        stream->channel->close();
+        stream->connection->close();
+    }
 
     // emit signals later
     QTimer::singleShot(0, this, SLOT(terminated()));
@@ -207,9 +547,59 @@ void QXmppCall::hangup()
         d->state == QXmppCall::FinishedState)
         return;
 
+    // hangup up call
+    QXmppJingleIq iq;
+    iq.setTo(d->jid);
+    iq.setType(QXmppIq::Set);
+    iq.setAction(QXmppJingleIq::SessionTerminate);
+    iq.setSid(d->sid);
+    d->sendRequest(iq);
+
+    // close streams
+    foreach (QXmppCallPrivate::Stream *stream, d->streams) {
+        stream->channel->close();
+        stream->connection->close();
+    }
+
+    // schedule forceful termination in 5s
+    QTimer::singleShot(5000, this, SLOT(terminate()));
     d->setState(QXmppCall::DisconnectingState);
-    d->audioChannel->close();
-    d->connection->close();
+}
+
+/// Sends a transport-info to inform the remote party of new local candidates.
+///
+
+void QXmppCall::localCandidatesChanged()
+{
+    // find the stream
+    QXmppIceConnection *conn = qobject_cast<QXmppIceConnection*>(sender());
+    QXmppCallPrivate::Stream *stream = 0;
+    foreach (QXmppCallPrivate::Stream *ptr, d->streams) {
+        if (ptr->connection == conn) {
+            stream = ptr;
+            break;
+        }
+    }
+    if (!stream)
+        return;
+
+    QXmppJingleIq iq;
+    iq.setTo(d->jid);
+    iq.setType(QXmppIq::Set);
+    iq.setAction(QXmppJingleIq::TransportInfo);
+    iq.setInitiator(d->ownJid);
+    iq.setSid(d->sid);
+
+    iq.content().setCreator(stream->creator);
+    iq.content().setName(stream->name);
+
+    // transport
+    iq.content().setTransportUser(stream->connection->localUser());
+    iq.content().setTransportPassword(stream->connection->localPassword());
+    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
+        iq.content().addTransportCandidate(candidate);
+
+    d->sendRequest(iq);
 }
 
 /// Returns the remote party's JID.
@@ -222,11 +612,27 @@ QString QXmppCall::jid() const
 
 void QXmppCall::updateOpenMode()
 {
-    // determine mode
-    if (d->audioChannel->isOpen() && d->connection->isConnected() && d->state != ActiveState)
+    // determine audio mode
+    QXmppCallPrivate::Stream *stream = d->findStreamByMedia(AUDIO_MEDIA);
+    if (stream &&
+        (stream->channel->openMode() & QIODevice::ReadWrite) &&
+        stream->connection->isConnected() &&
+        d->state == ConnectingState)
     {
         d->setState(ActiveState);
         emit connected();
+    }
+    
+    // determine video mode
+    stream = d->findStreamByMedia(VIDEO_MEDIA);
+    QIODevice::OpenMode mode = QIODevice::NotOpen;
+    if (stream) {
+        if (stream->connection->isConnected())
+            mode = stream->channel->openMode() & QIODevice::ReadWrite;
+    }
+    if (mode != d->videoMode) {
+        d->videoMode = mode;
+        emit videoModeChanged(mode);
     }
 }
 
@@ -245,6 +651,43 @@ QString QXmppCall::sid() const
 QXmppCall::State QXmppCall::state() const
 {
     return d->state;
+}
+
+void QXmppCall::startVideo()
+{
+    QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
+    if (stream)
+        return;
+
+    // create video stream
+    stream = d->createStream(VIDEO_MEDIA);
+    stream->creator = QLatin1String("initiator");
+    stream->name = QLatin1String("webcam");
+    d->streams << stream;
+
+    // build request
+    QXmppJingleIq iq;
+    iq.setTo(d->jid);
+    iq.setType(QXmppIq::Set);
+    iq.setAction(QXmppJingleIq::ContentAdd);
+    iq.setInitiator(d->ownJid);
+    iq.setSid(d->sid);
+    iq.content().setCreator(stream->creator);
+    iq.content().setName(stream->name);
+    iq.content().setSenders("both");
+
+    // description
+    iq.content().setDescriptionMedia(stream->media);
+    foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
+        iq.content().addPayloadType(payload);
+
+    // transport
+    iq.content().setTransportUser(stream->connection->localUser());
+    iq.content().setTransportPassword(stream->connection->localPassword());
+    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
+        iq.content().addTransportCandidate(candidate);
+
+    d->sendRequest(iq);
 }
 
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
@@ -270,27 +713,6 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
     return 0;
 }
 
-/// Sends an acknowledgement for a Jingle IQ.
-///
-
-bool QXmppCallManagerPrivate::sendAck(const QXmppJingleIq &iq)
-{
-    QXmppIq ack;
-    ack.setId(iq.id());
-    ack.setTo(iq.from());
-    ack.setType(QXmppIq::Result);
-    return q->client()->sendPacket(ack);
-}
-
-/// Sends a Jingle IQ and adds it to outstanding requests.
-///
-
-bool QXmppCallManagerPrivate::sendRequest(QXmppCall *call, const QXmppJingleIq &iq)
-{
-    call->d->requests << iq;
-    return q->client()->sendPacket(iq);
-}
-
 /// Constructs a QXmppCallManager object to handle incoming and outgoing
 /// Voice-Over-IP calls.
 ///
@@ -313,6 +735,7 @@ QStringList QXmppCallManager::discoveryFeatures() const
         << ns_jingle            // XEP-0166 : Jingle
         << ns_jingle_rtp        // XEP-0167 : Jingle RTP Sessions
         << ns_jingle_rtp_audio
+        << ns_jingle_rtp_video
         << ns_jingle_ice_udp;    // XEP-0176 : Jingle ICE-UDP Transport Method
 }
 
@@ -349,6 +772,11 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
+    if (jid == client()->configuration().jid()) {
+        warning("Refusing to call self");
+        return 0;
+    }
+
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
     call->d->sid = generateStanzaHash();
 
@@ -356,120 +784,14 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     d->calls << call;
     connect(call, SIGNAL(destroyed(QObject*)),
         this, SLOT(callDestroyed(QObject*)));
-    connect(call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(callStateChanged(QXmppCall::State)));
-    connect(call, SIGNAL(localCandidatesChanged()),
-        this, SLOT(localCandidatesChanged()));
 
-    QXmppJingleIq iq;
-    iq.setTo(jid);
-    iq.setType(QXmppIq::Set);
-    iq.setAction(QXmppJingleIq::SessionInitiate);
-    iq.setInitiator(client()->configuration().jid());
-    iq.setSid(call->sid());
-    iq.content().setCreator(call->d->contentCreator);
-    iq.content().setName(call->d->contentName);
-    iq.content().setSenders("both");
-
-    // description
-    iq.content().setDescriptionMedia("audio");
-    foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->localPayloadTypes())
-        iq.content().addPayloadType(payload);
-
-    // transport
-    iq.content().setTransportUser(call->d->connection->localUser());
-    iq.content().setTransportPassword(call->d->connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
-        iq.content().addTransportCandidate(candidate);
-
-    d->sendRequest(call, iq);
-
+    call->d->sendInvite();
     return call;
 }
 
 void QXmppCallManager::callDestroyed(QObject *object)
 {
     d->calls.removeAll(static_cast<QXmppCall*>(object));
-}
-
-void QXmppCallManager::callStateChanged(QXmppCall::State state)
-{
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call || !d->calls.contains(call))
-        return;
-
-#if 0
-    // disconnect from the signal
-    disconnect(call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(callStateChanged(QXmppCall::State)));
-#endif
-
-    if (state == QXmppCall::DisconnectingState)
-    {
-        // hangup up call
-        QXmppJingleIq iq;
-        iq.setTo(call->jid());
-        iq.setType(QXmppIq::Set);
-        iq.setAction(QXmppJingleIq::SessionTerminate);
-        iq.setSid(call->sid());
-        d->sendRequest(call, iq);
-
-        // schedule forceful termination in 5s
-        QTimer::singleShot(5000, call, SLOT(terminate()));
-    }
-    else if (state == QXmppCall::ConnectingState &&
-             call->direction() == QXmppCall::IncomingDirection)
-    {
-        // accept incoming call
-        QXmppJingleIq iq;
-        iq.setTo(call->jid());
-        iq.setType(QXmppIq::Set);
-        iq.setAction(QXmppJingleIq::SessionAccept);
-        iq.setResponder(client()->configuration().jid());
-        iq.setSid(call->sid());
-        iq.content().setCreator(call->d->contentCreator);
-        iq.content().setName(call->d->contentName);
-
-        // description
-        iq.content().setDescriptionMedia("audio");
-        foreach (const QXmppJinglePayloadType &payload, call->d->audioChannel->localPayloadTypes())
-            iq.content().addPayloadType(payload);
-
-        // transport
-        iq.content().setTransportUser(call->d->connection->localUser());
-        iq.content().setTransportPassword(call->d->connection->localPassword());
-        foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
-            iq.content().addTransportCandidate(candidate);
-
-        d->sendRequest(call, iq);
-
-        // perform ICE negotiation
-        call->d->connection->connectToHost();
-    }
-}
-
-/// Determine common payload types for a call.
-///
-
-bool QXmppCallManagerPrivate::checkPayloadTypes(QXmppCall *call, const QList<QXmppJinglePayloadType> &remotePayloadTypes)
-{
-    call->d->audioChannel->setRemotePayloadTypes(remotePayloadTypes);
-    if (!call->d->audioChannel->isOpen()) {
-        q->warning(QString("Remote party %1 did not provide any known payload types for call %2").arg(call->jid(), call->sid()));
-
-        // terminate call
-        QXmppJingleIq iq;
-        iq.setTo(call->jid());
-        iq.setType(QXmppIq::Set);
-        iq.setAction(QXmppJingleIq::SessionTerminate);
-        iq.setSid(call->sid());
-        iq.reason().setType(QXmppJingleIq::Reason::FailedApplication);
-        sendRequest(call, iq);
-        return false;
-    } else {
-        call->updateOpenMode();
-        return true;
-    }
 }
 
 /// Handles acknowledgements
@@ -481,33 +803,8 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
         return;
 
     // find request
-    bool found = false;
-    QXmppCall *call = 0;
-    QXmppJingleIq request;
-    foreach (call, d->calls)
-    {
-        for (int i = 0; i < call->d->requests.size(); i++)
-        {
-            if (ack.id() == call->d->requests[i].id())
-            {
-                request = call->d->requests.takeAt(i);
-                found = true;
-                break;
-            }
-        }
-        if (found)
-            break;
-    }
-    if (!found)
-        return;
-
-    // process acknowledgement
-    debug(QString("Received ACK for packet %1").arg(ack.id()));
-    if (request.action() == QXmppJingleIq::SessionTerminate)
-    {
-        // terminate
-        call->terminate();
-    }
+    foreach (QXmppCall *call, d->calls)
+        call->d->handleAck(ack);
 }
 
 /// Handle Jingle IQs.
@@ -523,19 +820,29 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         // build call
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
         call->d->sid = iq.sid();
-        call->d->contentCreator = iq.content().creator();
-        call->d->contentName = iq.content().name();
-        call->d->connection->setRemoteUser(iq.content().transportUser());
-        call->d->connection->setRemotePassword(iq.content().transportPassword());
-        foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
-            call->d->connection->addRemoteCandidate(candidate);
+
+        QXmppCallPrivate::Stream *stream = call->d->findStreamByMedia(iq.content().descriptionMedia());
+        if (!stream)
+            return;
+        stream->creator = iq.content().creator();
+        stream->name = iq.content().name();
 
         // send ack
-        d->sendAck(iq);
+        call->d->sendAck(iq);
 
-        // determine common payload types
-        if (!d->checkPayloadTypes(call, iq.content().payloadTypes()))
-        {
+        // check content description and transport
+        if (!call->d->handleDescription(stream, iq.content()) ||
+            !call->d->handleTransport(stream, iq.content())) {
+
+            // terminate call
+            QXmppJingleIq iq;
+            iq.setTo(call->jid());
+            iq.setType(QXmppIq::Set);
+            iq.setAction(QXmppJingleIq::SessionTerminate);
+            iq.setSid(call->sid());
+            iq.reason().setType(QXmppJingleIq::Reason::FailedApplication);
+            call->d->sendRequest(iq);
+
             delete call;
             return;
         }
@@ -544,10 +851,6 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         d->calls << call;
         connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
-        connect(call, SIGNAL(stateChanged(QXmppCall::State)),
-            this, SLOT(callStateChanged(QXmppCall::State)));
-        connect(call, SIGNAL(localCandidatesChanged()),
-            this, SLOT(localCandidatesChanged()));
 
         // send ringing indication
         QXmppJingleIq ringing;
@@ -556,110 +859,22 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
         ringing.setAction(QXmppJingleIq::SessionInfo);
         ringing.setSid(call->sid());
         ringing.setRinging(true);
-        d->sendRequest(call, ringing);
+        call->d->sendRequest(ringing);
 
         // notify user
         emit callReceived(call);
-
-    } else if (iq.action() == QXmppJingleIq::SessionAccept) {
-        QXmppCall *call = d->findCall(iq.sid(), QXmppCall::OutgoingDirection);
-        if (!call)
-        {
-            warning(QString("Remote party %1 accepted unknown call %2").arg(iq.from(), iq.sid()));
-            return;
-        }
-
-        // send ack
-        d->sendAck(iq);
-
-        // determine common payload types
-        if (!d->checkPayloadTypes(call, iq.content().payloadTypes()))
-        {
-            delete call;
-            return;
-        }
-
-        // perform ICE negotiation
-        if (!iq.content().transportCandidates().isEmpty())
-        {
-            call->d->connection->setRemoteUser(iq.content().transportUser());
-            call->d->connection->setRemotePassword(iq.content().transportPassword());
-            foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
-                call->d->connection->addRemoteCandidate(candidate);
-        }
-        call->d->connection->connectToHost();
-
-    } else if (iq.action() == QXmppJingleIq::SessionInfo) {
-
-        QXmppCall *call = d->findCall(iq.sid());
-        if (!call)
-            return;
-
-        // notify user
-        QTimer::singleShot(0, call, SIGNAL(ringing()));
-
-    } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
-
-        QXmppCall *call = d->findCall(iq.sid());
-        if (!call)
-        {
-            warning(QString("Remote party %1 terminated unknown call %2").arg(iq.from(), iq.sid()));
-            return;
-        }
-
-        info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
-
-        // send ack
-        d->sendAck(iq);
-
-        // terminate
-        call->terminate();
-
-    } else if (iq.action() == QXmppJingleIq::TransportInfo) {
-        QXmppCall *call = d->findCall(iq.sid());
-        if (!call)
-        {
-            warning(QString("Remote party %1 sent transports for unknown call %2").arg(iq.from(), iq.sid()));
-            return;
-        }
-
-        // send ack
-        d->sendAck(iq);
-
-        // perform ICE negotiation
-        call->d->connection->setRemoteUser(iq.content().transportUser());
-        call->d->connection->setRemotePassword(iq.content().transportPassword());
-        foreach (const QXmppJingleCandidate &candidate, iq.content().transportCandidates())
-            call->d->connection->addRemoteCandidate(candidate);
-    }
-}
-
-/// Sends a transport-info to inform the remote party of new local candidates.
-///
-
-void QXmppCallManager::localCandidatesChanged()
-{
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call || !d->calls.contains(call))
         return;
 
-    QXmppJingleIq iq;
-    iq.setTo(call->jid());
-    iq.setType(QXmppIq::Set);
-    iq.setAction(QXmppJingleIq::TransportInfo);
-    iq.setInitiator(client()->configuration().jid());
-    iq.setSid(call->sid());
+    } else {
 
-    iq.content().setCreator(call->d->contentCreator);
-    iq.content().setName(call->d->contentName);
-
-    // transport
-    iq.content().setTransportUser(call->d->connection->localUser());
-    iq.content().setTransportPassword(call->d->connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, call->d->connection->localCandidates())
-        iq.content().addTransportCandidate(candidate);
-
-    d->sendRequest(call, iq);
+        // for all other requests, require a valid call
+        QXmppCall *call = d->findCall(iq.sid());
+        if (!call) {
+            warning(QString("Remote party %1 sent a request for an unknown call %2").arg(iq.from(), iq.sid()));
+            return;
+        }
+        call->d->handleRequest(iq);
+    }
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses

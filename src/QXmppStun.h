@@ -239,6 +239,7 @@ private slots:
     void writeStun(const QXmppStunMessage &message);
 
 private:
+    void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port);
     void setState(AllocationState state);
 
     QUdpSocket *socket;
@@ -274,8 +275,9 @@ class QXmppIceComponent : public QXmppLoggable
     Q_OBJECT
 
 public:
-    QXmppIceComponent(bool controlling, QObject *parent=0);
+    QXmppIceComponent(QObject *parent=0);
     ~QXmppIceComponent();
+    void setIceControlling(bool controlling);
     void setStunServer(const QHostAddress &host, quint16 port);
     void setTurnServer(const QHostAddress &host, quint16 port);
     void setTurnUser(const QString &user);
@@ -379,10 +381,11 @@ class QXmppIceConnection : public QXmppLoggable
     Q_OBJECT
 
 public:
-    QXmppIceConnection(bool controlling, QObject *parent = 0);
+    QXmppIceConnection(QObject *parent = 0);
 
     QXmppIceComponent *component(int component);
     void addComponent(int component);
+    void setIceControlling(bool controlling);
 
     QList<QXmppJingleCandidate> localCandidates() const;
     QString localUser() const;
@@ -422,7 +425,7 @@ private slots:
 
 private:
     QTimer *m_connectTimer;
-    bool m_controlling;
+    bool m_iceControlling;
     QMap<int, QXmppIceComponent*> m_components;
     QString m_localUser;
     QString m_localPassword;

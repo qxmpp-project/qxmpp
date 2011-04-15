@@ -25,21 +25,42 @@
 #define QXMPPRTPCHANNEL_H
 
 #include <QIODevice>
+#include <QSize>
 
+#include "QXmppJingleIq.h"
 #include "QXmppLogger.h"
 
 class QXmppCodec;
 class QXmppJinglePayloadType;
-class QXmppRtpChannelPrivate;
+class QXmppRtpAudioChannelPrivate;
+class QXmppRtpVideoChannelPrivate;
 
-/// \brief The QXmppRtpChannel class represents an RTP channel to a remote party.
+class QXmppRtpChannel
+{
+public:
+    QXmppRtpChannel();
+
+    virtual void close() = 0;
+    virtual QIODevice::OpenMode openMode() const = 0;
+    QList<QXmppJinglePayloadType> localPayloadTypes();
+    void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
+
+protected:
+    virtual void payloadTypesChanged();
+
+    QList<QXmppJinglePayloadType> m_incomingPayloadTypes;
+    QList<QXmppJinglePayloadType> m_outgoingPayloadTypes;
+    bool m_outgoingPayloadNumbered;
+};
+
+/// \brief The QXmppRtpAudioChannel class represents an RTP audio channel to a remote party.
 ///
 /// It acts as a QIODevice so that you can read / write audio samples, for
 /// instance using a QAudioOutput and a QAudioInput.
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppRtpChannel : public QIODevice
+class QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChannel
 {
     Q_OBJECT
 
@@ -64,18 +85,16 @@ public:
         Tone_D      ///< Tone for the D key.
     };
 
-    QXmppRtpChannel(QObject *parent = 0);
-    ~QXmppRtpChannel();
+    QXmppRtpAudioChannel(QObject *parent = 0);
+    ~QXmppRtpAudioChannel();
 
     QXmppJinglePayloadType payloadType() const;
-
-    QList<QXmppJinglePayloadType> localPayloadTypes() const;
-    void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
 
     /// \cond
     qint64 bytesAvailable() const;
     void close();
     bool isSequential() const;
+    QIODevice::OpenMode openMode() const;
     qint64 pos() const;
     bool seek(qint64 pos);
     /// \endcond
@@ -89,8 +108,8 @@ signals:
 
 public slots:
     void datagramReceived(const QByteArray &ba);
-    void startTone(QXmppRtpChannel::Tone tone);
-    void stopTone(QXmppRtpChannel::Tone tone);
+    void startTone(QXmppRtpAudioChannel::Tone tone);
+    void stopTone(QXmppRtpAudioChannel::Tone tone);
 
 protected:
     /// \cond
@@ -114,6 +133,7 @@ protected:
         emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
+    void payloadTypesChanged();
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);
     /// \endcond
@@ -123,7 +143,91 @@ private slots:
     void writeDatagram();
 
 private:
-    QXmppRtpChannelPrivate * const d;
+    friend class QXmppRtpAudioChannelPrivate;
+    QXmppRtpAudioChannelPrivate * d;
+};
+
+class QXmppVideoPlane
+{
+public:
+    QByteArray data;
+    int width;
+    int height;
+    int stride;
+};
+
+class QXmppVideoFrame
+{
+public:
+    enum PixelFormat {
+        Format_YUV420P = 18,
+    };
+
+    QXmppVideoPlane planes[3];
+};
+
+class QXmppVideoFormat
+{
+public:
+    QSize frameSize() const {
+        return m_frameSize;
+    }
+
+    void setFrameSize(const QSize &frameSize) {
+        m_frameSize = frameSize;
+    }
+
+    QXmppVideoFrame::PixelFormat pixelFormat() const {
+        return m_pixelFormat;
+    }
+
+    void setPixelFormat(QXmppVideoFrame::PixelFormat pixelFormat) {
+        m_pixelFormat = pixelFormat;
+    }
+
+private:
+    QSize m_frameSize;
+    QXmppVideoFrame::PixelFormat m_pixelFormat;
+};
+
+
+/// \brief The QXmppRtpVideoChannel class represents an RTP video channel to a remote party.
+///
+/// \note THIS API IS NOT FINALIZED YET
+
+class QXmppRtpVideoChannel : public QXmppLoggable, public QXmppRtpChannel
+{
+    Q_OBJECT
+
+public:
+    QXmppRtpVideoChannel(QObject *parent = 0);
+    ~QXmppRtpVideoChannel();
+
+    // incoming stream
+    QXmppVideoFormat decoderFormat() const;
+    QList<QXmppVideoFrame> readFrames();
+
+    // outgoing stream
+    QXmppVideoFormat encoderFormat() const;
+    void setEncoderFormat(const QXmppVideoFormat &format);
+    void writeFrame(const QXmppVideoFrame &frame);
+
+    QIODevice::OpenMode openMode() const;
+    void close();
+
+signals:
+    /// \brief This signal is emitted when a datagram needs to be sent.
+    void sendDatagram(const QByteArray &ba);
+
+public slots:
+    void datagramReceived(const QByteArray &ba);
+
+protected:
+    void payloadTypesChanged();
+
+private:
+    friend class QXmppRtpVideoChannelPrivate;
+    QXmppRtpVideoChannelPrivate * d;
 };
 
 #endif

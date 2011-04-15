@@ -1234,13 +1234,19 @@ void QXmppTurnAllocation::disconnectFromHost()
 
 void QXmppTurnAllocation::readyRead()
 {
-    const qint64 size = socket->pendingDatagramSize();
+    QByteArray buffer;
     QHostAddress remoteHost;
     quint16 remotePort;
+    while (socket->hasPendingDatagrams()) {
+        const qint64 size = socket->pendingDatagramSize();
+        buffer.resize(size);
+        socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+        handleDatagram(buffer, remoteHost, remotePort);
+    }
+}
 
-    QByteArray buffer(size, 0);
-    socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-
+void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAddress &remoteHost, quint16 remotePort)
+{
     // demultiplex channel data
     if (buffer.size() >= 4 && (buffer[0] & 0xc0) == 0x40) {
         QDataStream stream(buffer);
@@ -1560,12 +1566,12 @@ QString QXmppIceComponent::Pair::toString() const
 /// \param controlling
 /// \param parent
 
-QXmppIceComponent::QXmppIceComponent(bool controlling, QObject *parent)
+QXmppIceComponent::QXmppIceComponent(QObject *parent)
     : QXmppLoggable(parent),
     m_component(0),
     m_activePair(0),
     m_fallbackPair(0),
-    m_iceControlling(controlling),
+    m_iceControlling(false),
     m_peerReflexivePriority(0),
     m_stunPort(0),
     m_stunTries(0),
@@ -1706,6 +1712,11 @@ void QXmppIceComponent::connectToHost()
 bool QXmppIceComponent::isConnected() const
 {
     return m_activePair != 0;
+}
+
+void QXmppIceComponent::setIceControlling(bool controlling)
+{
+    m_iceControlling = controlling;
 }
 
 /// Returns the list of local candidates.
@@ -1851,7 +1862,13 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         QXmppJingleCandidate candidate;
         candidate.setComponent(m_component);
         candidate.setFoundation(foundation++);
-        candidate.setHost(socket->localAddress());
+        // remove scope ID from IPv6 non-link local addresses
+        QHostAddress addr(socket->localAddress());
+        if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
+            !isIPv6LinkLocalAddress(addr)) {
+            addr.setScopeId(QString());
+        }
+        candidate.setHost(addr);
         candidate.setId(generateStanzaHash(10));
         candidate.setPort(socket->localPort());
         candidate.setProtocol("udp");
@@ -1922,12 +1939,15 @@ void QXmppIceComponent::readyRead()
     if (!socket)
         return;
 
-    const qint64 size = socket->pendingDatagramSize();
+    QByteArray buffer;
     QHostAddress remoteHost;
     quint16 remotePort;
-    QByteArray buffer(size, 0);
-    socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-    handleDatagram(buffer, remoteHost, remotePort, socket);
+    while (socket->hasPendingDatagrams()) {
+        const qint64 size = socket->pendingDatagramSize();
+        buffer.resize(size);
+        socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+        handleDatagram(buffer, remoteHost, remotePort, socket);
+    }
 }
 
 void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddress &remoteHost, quint16 remotePort, QUdpSocket *socket)
@@ -2153,21 +2173,25 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
 
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
-            if ((entry.ip().protocol() != QAbstractSocket::IPv4Protocol &&
-                 entry.ip().protocol() != QAbstractSocket::IPv6Protocol) ||
+            QHostAddress ip = entry.ip();
+            if ((ip.protocol() != QAbstractSocket::IPv4Protocol &&
+                 ip.protocol() != QAbstractSocket::IPv6Protocol) ||
                 entry.netmask().isNull() ||
                 entry.netmask() == QHostAddress::Broadcast)
                 continue;
 
 #ifdef Q_OS_MAC
             // FIXME: on Mac OS X, sending IPv6 UDP packets fails
-            if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+            if (ip.protocol() == QAbstractSocket::IPv6Protocol)
                 continue;
 #endif
 
-            QHostAddress ip = entry.ip();
-            if (isIPv6LinkLocalAddress(ip))
-               ip.setScopeId(interface.name());
+            // FIXME: for now skip IPv6 link-local addresses, seems to upset
+            // clients such as empathy
+            if (isIPv6LinkLocalAddress(ip)) {
+                ip.setScopeId(interface.name());
+                continue;
+            }
             addresses << ip;
         }
     }
@@ -2190,7 +2214,7 @@ QList<QUdpSocket*> QXmppIceComponent::reservePorts(const QList<QHostAddress> &ad
         return sockets;
 
     const int expectedSize = addresses.size() * count;
-    quint16 port = 40000;
+    quint16 port = 49152;
     while (sockets.size() != expectedSize) {
         // reserve first port (even number)
         if (port % 2)
@@ -2269,9 +2293,9 @@ qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, QXmppIceCom
 /// \param controlling
 /// \param parent
 
-QXmppIceConnection::QXmppIceConnection(bool controlling, QObject *parent)
+QXmppIceConnection::QXmppIceConnection(QObject *parent)
     : QXmppLoggable(parent),
-    m_controlling(controlling),
+    m_iceControlling(false),
     m_stunPort(0)
 {
     bool check;
@@ -2311,8 +2335,9 @@ void QXmppIceConnection::addComponent(int component)
         return;
     }
 
-    QXmppIceComponent *socket = new QXmppIceComponent(m_controlling, this);
+    QXmppIceComponent *socket = new QXmppIceComponent(this);
     socket->setComponent(component);
+    socket->setIceControlling(m_iceControlling);
     socket->setLocalUser(m_localUser);
     socket->setLocalPassword(m_localPassword);
     socket->setStunServer(m_stunHost, m_stunPort);
@@ -2388,6 +2413,7 @@ void QXmppIceConnection::connectToHost()
     m_connectTimer->start();
 }
 
+
 /// Returns true if ICE negotiation completed, false otherwise.
 
 bool QXmppIceConnection::isConnected() const
@@ -2396,6 +2422,13 @@ bool QXmppIceConnection::isConnected() const
         if (!socket->isConnected())
             return false;
     return true;
+}
+
+void QXmppIceConnection::setIceControlling(bool controlling)
+{
+    m_iceControlling = controlling;
+    foreach (QXmppIceComponent *socket, m_components.values())
+        socket->setIceControlling(controlling);
 }
 
 /// Returns the list of local HOST CANDIDATES candidates by iterating
