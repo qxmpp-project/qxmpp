@@ -760,6 +760,20 @@ void QXmppJinglePayloadType::setName(const QString &name)
     m_name = name;
 }
 
+/// Returns the payload parameters.
+
+QMap<QString,QString> QXmppJinglePayloadType::parameters() const
+{
+    return m_parameters;
+}
+
+/// Sets the payload parameters.
+
+void QXmppJinglePayloadType::setParameters(const QMap<QString, QString> &parameters)
+{
+    m_parameters = parameters;
+}
+
 /// Returns the packet time in milliseconds (20 by default).
 ///
 
@@ -787,6 +801,12 @@ void QXmppJinglePayloadType::parse(const QDomElement &element)
     m_clockrate = element.attribute("clockrate").toInt();
     m_maxptime = element.attribute("maxptime").toInt();
     m_ptime = element.attribute("ptime").toInt();
+
+    QDomElement child = element.firstChildElement("parameter");
+    while (!child.isNull()) {
+        m_parameters.insert(child.attribute("name"), child.attribute("value"));
+        child = child.nextSiblingElement("parameter");
+    }
 }
 
 void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
@@ -802,6 +822,13 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "maxptime", QString::number(m_maxptime));
     if (m_ptime > 0)
         helperToXmlAddAttribute(writer, "ptime", QString::number(m_ptime));
+
+    foreach (const QString &key, m_parameters.keys()) {
+        writer->writeStartElement("parameter");
+        writer->writeAttribute("name", key);
+        writer->writeAttribute("value", m_parameters.value(key));
+        writer->writeEndElement();
+    }
     writer->writeEndElement();
 }
 

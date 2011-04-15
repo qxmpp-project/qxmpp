@@ -52,6 +52,9 @@ public:
     QString name() const;
     void setName(const QString &name);
 
+    QMap<QString, QString> parameters() const;
+    void setParameters(const QMap<QString, QString> &parameters);
+
     unsigned int ptime() const;
     void setPtime(unsigned int ptime);
 
@@ -68,6 +71,7 @@ private:
     unsigned char m_id;
     unsigned int m_maxptime;
     QString m_name;
+    QMap<QString, QString> m_parameters;
     unsigned int m_ptime;
 };
 
