@@ -1,6 +1,7 @@
 include(../examples.pri)
 
-QT += multimedia
+CONFIG += mobility
+MOBILITY += multimedia
 
 TARGET = example_4_callHandling
 

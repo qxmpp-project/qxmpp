@@ -73,7 +73,7 @@ void xmppClient::slotConnected()
     Q_ASSERT(call);
 
     qDebug() << "Call connected";
-    QXmppRtpChannel *channel = call->audioChannel();
+    QXmppRtpAudioChannel *channel = call->audioChannel();
 
     // prepare audio format
     QAudioFormat format;
