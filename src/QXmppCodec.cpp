@@ -27,11 +27,20 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QSize>
 
 #include "QXmppCodec.h"
+#include "QXmppRtpChannel.h"
+
+#include <cstring>
 
 #ifdef QXMPP_USE_SPEEX
 #include <speex/speex.h>
+#endif
+
+#ifdef QXMPP_USE_THEORA
+#include <theora/theoradec.h>
+#include <theora/theoraenc.h>
 #endif
 
 #define BIAS        (0x84)  /* Bias for linear code. */
@@ -350,3 +359,445 @@ qint64 QXmppSpeexCodec::decode(QDataStream &input, QDataStream &output)
 
 #endif
 
+#ifdef QXMPP_USE_THEORA
+
+class QXmppTheoraDecoderPrivate
+{
+public:
+    bool decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame);
+
+    th_comment comment;
+    th_info info;
+    th_setup_info *setup_info;
+    th_dec_ctx *ctx;
+
+    QByteArray packetBuffer;
+};
+
+bool QXmppTheoraDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
+{
+    ogg_packet packet;
+    packet.packet = (unsigned char*) buffer.data();
+    packet.bytes = buffer.size();
+    packet.b_o_s = 1;
+    packet.e_o_s = 0;
+    packet.granulepos = -1;
+    packet.packetno = 0;
+    if (th_decode_packetin(ctx, &packet, 0) != 0) {
+        qWarning("Theora packet could not be decoded");
+        return false;
+    }
+
+    th_ycbcr_buffer ycbcr_buffer;
+    if (th_decode_ycbcr_out(ctx, ycbcr_buffer) != 0) {
+        qWarning("Theora packet has no Y'CbCr");
+        return false;
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        QXmppVideoPlane *plane = &frame->planes[i];
+        plane->width = ycbcr_buffer[i].width;
+        plane->height = ycbcr_buffer[i].height;
+        plane->stride = ycbcr_buffer[i].stride;
+        plane->data.resize(plane->stride * plane->height);
+        memcpy(plane->data.data(), ycbcr_buffer[i].data, plane->data.size());
+    }
+    return true;
+}
+
+
+QXmppTheoraDecoder::QXmppTheoraDecoder()
+{
+    d = new QXmppTheoraDecoderPrivate;
+    th_comment_init(&d->comment);
+    th_info_init(&d->info);
+    d->setup_info = 0;
+    d->ctx = 0;
+}
+
+QXmppTheoraDecoder::~QXmppTheoraDecoder()
+{
+    th_comment_clear(&d->comment);
+    th_info_clear(&d->info);
+    if (d->setup_info)
+        th_setup_free(d->setup_info);
+    if (d->ctx)
+        th_decode_free(d->ctx);
+    delete d;
+}
+
+QXmppVideoFormat QXmppTheoraDecoder::format() const
+{
+    QXmppVideoFormat format;
+    format.setFrameSize(QSize(d->info.frame_width, d->info.frame_height));
+    if (d->info.pixel_fmt == TH_PF_420) {
+        format.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
+    }
+    return format;
+}
+
+QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(QDataStream &stream)
+{
+    QList<QXmppVideoFrame> frames;
+
+    // theora deframing: draft-ietf-avt-rtp-theora-00
+    quint32 theora_header;
+    stream >> theora_header;
+
+    quint32 theora_ident = (theora_header >> 8) & 0xffffff;
+    quint8 theora_frag = (theora_header & 0xc0) >> 6;
+    quint8 theora_type = (theora_header & 0x30) >> 4;
+    quint8 theora_packets = (theora_header & 0x0f);
+
+    //qDebug("ident: 0x%08x, F: %d, TDT: %d, packets: %d", theora_ident, theora_frag, theora_type, theora_packets);
+
+    // We only handle raw theora data
+    if (theora_type != 0)
+        return frames;
+
+    QXmppVideoFrame frame;
+    quint16 packetLength;
+
+    if (theora_frag == 0) {
+        // unfragmented packet(s)
+        for (int i = 0; i < theora_packets; ++i) {
+            stream >> packetLength;
+            if (packetLength > stream.device()->bytesAvailable()) {
+                qWarning("Theora unfragmented packet has an invalid length");
+                return frames;
+            }
+
+            d->packetBuffer.resize(packetLength);
+            stream.readRawData(d->packetBuffer.data(), packetLength);
+            if (d->ctx && d->decodeFrame(d->packetBuffer, &frame))
+                frames << frame;
+        }
+    } else {
+        // fragments
+        stream >> packetLength;
+        if (packetLength > stream.device()->bytesAvailable()) {
+            qWarning("Theora packet has an invalid length");
+            return frames;
+        }
+
+        int pos;
+        if (theora_frag == 1) {
+            // start fragment
+            pos = 0;
+            d->packetBuffer.resize(packetLength);
+        } else {
+            // continuation or end fragment
+            pos = d->packetBuffer.size();
+            d->packetBuffer.resize(pos + packetLength);
+        }
+        stream.readRawData(d->packetBuffer.data() + pos, packetLength);
+
+        if (theora_frag == 3) {
+            // end fragment
+            if (d->ctx && d->decodeFrame(d->packetBuffer, &frame))
+                frames << frame;
+            d->packetBuffer.resize(0);
+        }
+    }
+    return frames;
+}
+
+bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
+{
+    QByteArray config = QByteArray::fromBase64(parameters.value("configuration").toAscii());
+    QDataStream stream(config);
+    const QIODevice *device = stream.device();
+
+    if (device->bytesAvailable() < 4) {
+        qWarning("Theora configuration is too small");
+        return false;
+    }
+
+    // Process packed headers
+    int done = 0;
+    quint32 header_count;
+    stream >> header_count;
+    for (quint32 i = 0; i < header_count; ++i) {
+        if (device->bytesAvailable() < 6) {
+            qWarning("Theora configuration is too small");
+            return false;
+        }
+        QByteArray ident(3, 0);
+        quint16 length;
+        quint8 h_count;
+
+        stream.readRawData(ident.data(), ident.size());
+        stream >> length;
+        stream >> h_count;
+#ifdef QXMPP_DEBUG_THEORA
+        qDebug("Theora packed header %u ident=%s bytes=%u count=%u", i, ident.toHex().data(), length, h_count);
+#endif
+
+        // get header sizes
+        QList<qint64> h_sizes;
+        for (int h = 0; h < h_count; ++h) {
+            quint16 h_size = 0;
+            quint8 b;
+            do {
+                if (device->bytesAvailable() < 1) {
+                    qWarning("Theora configuration is too small");
+                    return false;
+                }
+                stream >> b;
+                h_size = (h_size << 7) | (b & 0x7f);
+            } while (b & 0x80);
+            h_sizes << h_size;
+#ifdef QXMPP_DEBUG_THEORA
+            qDebug("Theora header %d size %u", h_sizes.size() - 1, h_sizes.last());
+#endif
+            length -= h_size;
+        }
+        h_sizes << length;
+#ifdef QXMPP_DEBUG_THEORA
+        qDebug("Theora header %d size %u", h_sizes.size() - 1, h_sizes.last());
+#endif
+
+        // decode headers
+        ogg_packet packet;
+        packet.b_o_s = 1;
+        packet.e_o_s = 0;
+        packet.granulepos = -1;
+        packet.packetno = 0;
+
+        foreach (int h_size, h_sizes) {
+            if (device->bytesAvailable() < h_size) {
+                qWarning("Theora configuration is too small");
+                return false;
+            }
+
+            packet.packet = (unsigned char*) (config.data() + device->pos());
+            packet.bytes = h_size;
+            int ret = th_decode_headerin(&d->info, &d->comment, &d->setup_info, &packet);
+            if (ret < 0) {
+                qWarning("Theora header could not be decoded");
+                return false;
+            }
+            done += ret;
+            stream.skipRawData(h_size);
+        }
+    }
+
+    // check for completion
+    if (done < 3) {
+        qWarning("Theora configuration did not contain enough headers");
+        return false;
+    }
+    qDebug("Theora frame_width %i, frame_height %i, colorspace %i, pixel_fmt: %i, target_bitrate: %i, quality: %i, keyframe_granule_shift: %i",
+        d->info.frame_width,
+        d->info.frame_height,
+        d->info.colorspace,
+        d->info.pixel_fmt,
+        d->info.target_bitrate,
+        d->info.quality,
+        d->info.keyframe_granule_shift);
+    if (d->info.pixel_fmt != TH_PF_420) {
+        qWarning("Theora frames have an unsupported pixel format %d", d->info.pixel_fmt);
+        return false;
+    }
+    if (d->ctx)
+        th_decode_free(d->ctx);
+    d->ctx = th_decode_alloc(&d->info, d->setup_info);
+    if (!d->ctx) {
+        qWarning("Theora decoder could not be allocated");
+        return false;
+    }
+    return true;
+}
+
+class QXmppTheoraEncoderPrivate
+{
+public:
+    void writeFrame(QDataStream &stream, quint8 theora_frag, quint8 theora_packets, const char *data, quint16 length);
+
+    th_comment comment;
+    th_info info;
+    th_setup_info *setup_info;
+    th_enc_ctx *ctx;
+
+    QByteArray configuration;
+    QByteArray ident;
+};
+
+void QXmppTheoraEncoderPrivate::writeFrame(QDataStream &stream, quint8 theora_frag, quint8 theora_packets, const char *data, quint16 length)
+{
+    // raw data
+    const quint8 theora_type = 0;
+    stream.writeRawData(ident.constData(), ident.size());
+    stream << quint8(((theora_frag << 6) & 0xc0) |
+                     ((theora_type << 4) & 0x30) |
+                     (theora_packets & 0x0f));
+    stream << quint16(length);
+    stream.writeRawData(data, length);
+}
+
+QXmppTheoraEncoder::QXmppTheoraEncoder()
+{
+    d = new QXmppTheoraEncoderPrivate;
+    d->ident = QByteArray("\xc3\x45\xae");
+    th_comment_init(&d->comment);
+    th_info_init(&d->info);
+    d->setup_info = 0;
+    d->ctx = 0;
+}
+
+QXmppTheoraEncoder::~QXmppTheoraEncoder()
+{
+    th_comment_clear(&d->comment);
+    th_info_clear(&d->info);
+    if (d->setup_info)
+        th_setup_free(d->setup_info);
+    if (d->ctx)
+        th_encode_free(d->ctx);
+    delete d;
+}
+
+bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
+{
+    if (format.pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
+        d->info.pixel_fmt = TH_PF_420;
+    } else {
+        qWarning("Theora decoder does not support the given format");
+        return false;
+    }
+    d->info.frame_width = format.frameSize().width();
+    d->info.frame_height = format.frameSize().height();
+    d->info.pic_height = format.frameSize().height();
+    d->info.pic_width = format.frameSize().width();
+    d->info.pic_x = 0;
+    d->info.pic_y = 0;
+    d->info.colorspace = TH_CS_UNSPECIFIED;
+    d->info.target_bitrate = 0;
+    d->info.quality = 48;
+    d->info.keyframe_granule_shift = 6;
+
+    // frame rate
+    d->info.fps_numerator = 30;
+    d->info.fps_denominator = 1;
+
+    if (d->ctx) {
+        th_encode_free(d->ctx);
+        d->ctx = 0;
+    }
+    d->ctx = th_encode_alloc(&d->info);
+    if (!d->ctx) {
+        qWarning("Theora encoder could not be allocated");
+        return false;
+    }
+
+    // fetch headers
+    QList<QByteArray> headers;
+    ogg_packet packet;
+    while (th_encode_flushheader(d->ctx, &d->comment, &packet) > 0)
+        headers << QByteArray((const char*)packet.packet, packet.bytes);
+
+    // store configuration
+    d->configuration.clear();
+    QDataStream stream(&d->configuration, QIODevice::WriteOnly);
+    stream << quint32(1);
+
+    quint16 length = 0;
+    foreach (const QByteArray &header, headers)
+        length += header.size();
+
+    quint8 h_count = headers.size() - 1;
+    stream.writeRawData(d->ident.constData(), d->ident.size());
+    stream << length;
+    stream << h_count;
+#ifdef QXMPP_DEBUG_THEORA
+    qDebug("Theora packed header %u ident=%s bytes=%u count=%u", 0, d->ident.toHex().data(), length, h_count);
+#endif
+
+    // write header sizes
+    for (int h = 0; h < h_count; ++h) {
+        quint16 h_size = headers[h].size();
+        do {
+            quint8 b = (h_size & 0x7f);
+            h_size >>= 7;
+            if (h_size)
+                b |= 0x80;
+            stream << b;
+        } while (h_size);
+    }
+
+    // write headers
+    for (int h = 0; h < headers.size(); ++h) {
+#ifdef QXMPP_DEBUG_THEORA
+        qDebug("Header %d size %d", h, headers[h].size());
+#endif
+        stream.writeRawData(headers[h].data(), headers[h].size());
+    }
+    
+    return true;
+}
+
+QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
+{
+    QList<QByteArray> packets;
+    const int PACKET_MAX = 1388;
+
+    th_ycbcr_buffer ycbcr_buffer;
+    for (int i = 0; i < 3; ++i) {
+        const QXmppVideoPlane *plane = &frame.planes[i];
+        ycbcr_buffer[i].width = plane->width;
+        ycbcr_buffer[i].height = plane->height;
+        ycbcr_buffer[i].stride = plane->stride;
+        ycbcr_buffer[i].data = (unsigned char*)plane->data.constData();
+    }
+    if (th_encode_ycbcr_in(d->ctx, ycbcr_buffer) != 0) {
+        qWarning("Theora encoder could not handle frame");
+        return packets;
+    }
+
+    // raw data
+    quint8 theora_type = 0;
+    QByteArray payload;
+    ogg_packet packet;
+    while (th_encode_packetout(d->ctx, 0, &packet) > 0) {
+#ifdef QXMPP_DEBUG_THEORA
+        qDebug("Theora encoded packet %d bytes", packet.bytes);
+#endif
+        QDataStream stream(&payload, QIODevice::WriteOnly);
+        const char *data = (const char*) packet.packet;
+        int size = packet.bytes;
+        quint8 theora_frag = 0;
+        if (size <= PACKET_MAX) {
+            // no fragmentation
+            stream.device()->reset();
+            payload.clear();
+            d->writeFrame(stream, theora_frag, 1, data, size);
+            packets << payload;
+       } else {
+            // fragmentation
+            theora_frag = 1;
+            while (size) {
+                const int length = qMin(PACKET_MAX, size);
+                payload.clear();
+                stream.device()->reset();
+                d->writeFrame(stream, theora_frag, 0, data, length);
+                data += length;
+                size -= length;
+                theora_frag = (size < length) ? 3 : 2;
+                packets << payload;
+            }
+        }
+    }
+
+    return packets;
+}
+
+QMap<QString, QString> QXmppTheoraEncoder::parameters() const
+{
+    QMap<QString, QString> params;
+    if (d->ctx) {
+        params.insert("delivery-method", "inline");
+        params.insert("configuration", d->configuration.toBase64());
+    }
+    return params;
+}
+
+#endif

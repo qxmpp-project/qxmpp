@@ -26,6 +26,9 @@
 
 #include <QtGlobal>
 
+class QXmppVideoFormat;
+class QXmppVideoFrame;
+
 /// \brief The QXmppCodec class is the base class for audio codecs capable of
 /// encoding and decoding audio samples.
 ///
@@ -97,6 +100,58 @@ private:
     SpeexBits *decoder_bits;
     void *decoder_state;
     int frame_samples;
+};
+#endif
+
+/// \brief The QXmppVideoDecoder class is the base class for video decoders.
+///
+
+class QXmppVideoDecoder
+{
+public:
+    virtual QXmppVideoFormat format() const = 0;
+    virtual QList<QXmppVideoFrame> handlePacket(QDataStream &input) = 0;
+    virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
+};
+
+class QXmppVideoEncoder
+{
+public:
+    virtual bool setFormat(const QXmppVideoFormat &format) = 0;
+    virtual QList<QByteArray> handleFrame(const QXmppVideoFrame &frame) = 0;
+    virtual QMap<QString, QString> parameters() const = 0;
+};
+
+#ifdef QXMPP_USE_THEORA
+class QXmppTheoraDecoderPrivate;
+class QXmppTheoraEncoderPrivate;
+
+class QXmppTheoraDecoder : public QXmppVideoDecoder
+{
+public:
+    QXmppTheoraDecoder();
+    ~QXmppTheoraDecoder();
+
+    QXmppVideoFormat format() const;
+    QList<QXmppVideoFrame> handlePacket(QDataStream &input);
+    bool setParameters(const QMap<QString, QString> &parameters);
+
+private:
+    QXmppTheoraDecoderPrivate *d;
+};
+
+class QXmppTheoraEncoder : public QXmppVideoEncoder
+{
+public:
+    QXmppTheoraEncoder();
+    ~QXmppTheoraEncoder();
+
+    bool setFormat(const QXmppVideoFormat &format);
+    QList<QByteArray> handleFrame(const QXmppVideoFrame &frame);
+    QMap<QString, QString> parameters() const;
+
+private:
+    QXmppTheoraEncoderPrivate *d;
 };
 #endif
 
