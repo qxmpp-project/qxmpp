@@ -445,6 +445,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(QDataStream &stream)
     stream >> theora_header;
 
     quint32 theora_ident = (theora_header >> 8) & 0xffffff;
+    Q_UNUSED(theora_ident);
     quint8 theora_frag = (theora_header & 0xc0) >> 6;
     quint8 theora_type = (theora_header & 0x30) >> 4;
     quint8 theora_packets = (theora_header & 0x0f);
@@ -753,8 +754,6 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
         return packets;
     }
 
-    // raw data
-    quint8 theora_type = 0;
     QByteArray payload;
     ogg_packet packet;
     while (th_encode_packetout(d->ctx, 0, &packet) > 0) {
