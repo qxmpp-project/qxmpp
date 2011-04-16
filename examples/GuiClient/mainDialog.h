@@ -121,8 +121,11 @@ private:
     // map of bare jids and respective chatdlg
     QMap<QString, chatDialog*> m_chatDlgsList;
 
+#ifndef QT_NO_SYSTEMTRAYICON
     QSystemTrayIcon m_trayIcon;
     QMenu m_trayIconMenu;
+#endif
+
     QAction m_quitAction;
     QAction m_signOutAction;
 

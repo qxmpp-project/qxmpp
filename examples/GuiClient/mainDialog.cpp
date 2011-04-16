@@ -47,7 +47,12 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     ui(new Ui::mainDialogClass), m_rosterItemModel(this),
     m_rosterItemSortFilterModel(this), m_vCardCache(&m_xmppClient),
     m_capabilitiesCache(&m_xmppClient), m_accountsCache(this),
-    m_trayIcon(this), m_trayIconMenu(this), m_quitAction("Quit", this),
+
+#ifndef QT_NO_SYSTEMTRAYICON
+    m_trayIcon(this), m_trayIconMenu(this),
+#endif
+
+    m_quitAction("Quit", this),
     m_signOutAction("Sign out", this),
     m_settingsMenu(0)
 {
@@ -644,13 +649,14 @@ void mainDialog::action_quit()
 
 void mainDialog::createTrayIconAndMenu()
 {
-    m_trayIcon.setIcon(QIcon(":/icons/resource/icon.png"));
-
     bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
     Q_ASSERT(check);
 
     check = connect(&m_signOutAction, SIGNAL(triggered()), SLOT(action_signOut()));
     Q_ASSERT(check);
+
+#ifndef QT_NO_SYSTEMTRAYICON
+    m_trayIcon.setIcon(QIcon(":/icons/resource/icon.png"));
 
     check = connect(&m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                     SLOT(action_trayIconActivated(QSystemTrayIcon::ActivationReason)));
@@ -662,6 +668,7 @@ void mainDialog::createTrayIconAndMenu()
 
     m_trayIcon.setContextMenu(&m_trayIconMenu);
     m_trayIcon.show();
+#endif
 }
 
 void mainDialog::createSettingsMenu()
