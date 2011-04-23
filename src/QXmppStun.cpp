@@ -1694,6 +1694,7 @@ void QXmppIceComponent::close()
     m_turnAllocation->disconnectFromHost();
     m_timer->stop();
     m_stunTimer->stop();
+    m_activePair = 0;
 }
 
 /// Starts ICE connectivity checks.
@@ -2408,6 +2409,9 @@ void QXmppIceConnection::close()
 
 void QXmppIceConnection::connectToHost()
 {
+    if (isConnected() || m_connectTimer->isActive())
+        return;
+
     foreach (QXmppIceComponent *socket, m_components.values())
         socket->connectToHost();
     m_connectTimer->start();
