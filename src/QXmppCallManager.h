@@ -64,11 +64,10 @@ public:
     /// This enum is used to describe the state of a call.
     enum State
     {
-        OfferState = 0,         ///< The remote part is being called.
-        ConnectingState = 1,    ///< The call is being connected.
-        ActiveState = 2,        ///< The call is active.
-        DisconnectingState = 3, ///< The call is being disconnected.
-        FinishedState = 4,      ///< The call is finished.
+        ConnectingState = 0,    ///< The call is being connected.
+        ActiveState = 1,        ///< The call is active.
+        DisconnectingState = 2, ///< The call is being disconnected.
+        FinishedState = 3,      ///< The call is finished.
     };
 
     ~QXmppCall();
@@ -101,6 +100,9 @@ signals:
     /// \brief This signal is emitted when the call state changes.
     void stateChanged(QXmppCall::State state);
 
+    /// \brief This signal is emitted when the audio channel changes.
+    void audioModeChanged(QIODevice::OpenMode mode);
+
     /// \brief This signal is emitted when the video channel changes.
     void videoModeChanged(QIODevice::OpenMode mode);
 
@@ -111,7 +113,6 @@ public slots:
 
 private slots:
     void localCandidatesChanged();
-    void terminate();
     void terminated();
     void updateOpenMode();
 
