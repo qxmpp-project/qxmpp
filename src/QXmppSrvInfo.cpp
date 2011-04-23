@@ -65,10 +65,10 @@ static void resolveLibrary()
 #elif defined(Q_OS_UNIX) && !defined(Q_OS_SYMBIAN)
 typedef int (*dn_expand_proto)(const unsigned char *, const unsigned char *, const unsigned char *, char *, int);
 static dn_expand_proto local_dn_expand = 0;
-typedef int (*res_init_proto)(void);
-static res_init_proto local_res_init = 0;
-typedef int (*res_query_proto)(const char *, int, int, unsigned char *, int);
-static res_query_proto local_res_query = 0;
+typedef int (*res_ninit_proto)(res_state);
+static res_ninit_proto local_res_ninit = 0;
+typedef int (*res_nquery_proto)(res_state, const char *, int, int, unsigned char *, int);
+static res_nquery_proto local_res_nquery = 0;
 
 static void resolveLibrary()
 {
@@ -80,13 +80,17 @@ static void resolveLibrary()
     if (!local_dn_expand)
         local_dn_expand = dn_expand_proto(lib.resolve("dn_expand"));
 
-    local_res_init = res_init_proto(lib.resolve("__res_init"));
-    if (!local_res_init)
-        local_res_init = res_init_proto(lib.resolve("res_init"));
+    local_res_ninit = res_ninit_proto(lib.resolve("__res_ninit"));
+    if (!local_res_ninit)
+        local_res_ninit = res_ninit_proto(lib.resolve("res_9_ninit"));
+    if (!local_res_ninit)
+        local_res_ninit = res_ninit_proto(lib.resolve("res_ninit"));
 
-    local_res_query = res_query_proto(lib.resolve("__res_query"));
-    if (!local_res_query)
-        local_res_query = res_query_proto(lib.resolve("res_query"));
+    local_res_nquery = res_nquery_proto(lib.resolve("__res_nquery"));
+    if (!local_res_nquery)
+        local_res_nquery = res_nquery_proto(lib.resolve("res_9_nquery"));
+    if (!local_res_nquery)
+        local_res_nquery = res_nquery_proto(lib.resolve("res_nquery"));
 }
 #endif
 
@@ -430,7 +434,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     unsigned char response[PACKETSZ];
     int responseLength, answerCount, answerIndex;
 
-    // Load dn_expand, res_init and res_query on demand.
+    // Load dn_expand, res_ninit and res_nquery on demand.
     static volatile bool triedResolve = false;
     if (!triedResolve) {
         if (!triedResolve) {
@@ -439,24 +443,24 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         }
     }
 
-    // If dn_expand or res_query is missing, fail.
-    if (!local_dn_expand || !local_res_query) {
+    // If dn_expand or res_nquery is missing, fail.
+    if (!local_dn_expand || !local_res_ninit || !local_res_nquery) {
         result.d->error = QXmppSrvInfo::UnknownError;
-        result.d->errorString = QLatin1String("dn_expand or res_query functions not found");
+        result.d->errorString = QLatin1String("dn_expand, res_ninit or res_nquery functions not found");
         return result;
     }
 
-    // If res_init is available, poll it.
-    if (local_res_init)
-        local_res_init();
+    // Initialise state.
+    struct __res_state state;
+    local_res_ninit(&state);
 
     // Perform DNS query.
     memset(response, 0, sizeof(response));
-    responseLength = local_res_query(dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
+    responseLength = local_res_nquery(&state, dname.toAscii(), C_IN, T_SRV, response, sizeof(response));
     if (responseLength < int(sizeof(HEADER)))
     {
         result.d->error = QXmppSrvInfo::NotFoundError;
-        result.d->errorString = QLatin1String("res_query failed");
+        result.d->errorString = QLatin1String("res_nquery failed");
         return result;
     }
 
@@ -465,7 +469,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     if (header->rcode != NOERROR || !(answerCount = ntohs(header->ancount)))
     {
         result.d->error = QXmppSrvInfo::UnknownError;
-        result.d->errorString = QLatin1String("res_query returned an error");
+        result.d->errorString = QLatin1String("res_nquery returned an error");
         return result;
     }
 
@@ -557,7 +561,7 @@ QXmppSrvInfoLookupManager::QXmppSrvInfoLookupManager()
     moveToThread(QCoreApplication::instance()->thread());
     connect(QCoreApplication::instance(), SIGNAL(destroyed()),
             SLOT(waitForThreadPoolDone()), Qt::DirectConnection);
-    setMaxThreadCount(1); // don't do parallel SRV lookups
+    setMaxThreadCount(5); // up to 5 parallel SRV lookups
 }
 
 void QXmppSrvInfoLookupRunnable::run()
