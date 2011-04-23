@@ -110,7 +110,7 @@ class QXmppVideoDecoder
 {
 public:
     virtual QXmppVideoFormat format() const = 0;
-    virtual QList<QXmppVideoFrame> handlePacket(QDataStream &input) = 0;
+    virtual QList<QXmppVideoFrame> handlePacket(const QByteArray &ba) = 0;
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
 };
 
@@ -133,7 +133,7 @@ public:
     ~QXmppTheoraDecoder();
 
     QXmppVideoFormat format() const;
-    QList<QXmppVideoFrame> handlePacket(QDataStream &input);
+    QList<QXmppVideoFrame> handlePacket(const QByteArray &ba);
     bool setParameters(const QMap<QString, QString> &parameters);
 
 private:

@@ -394,17 +394,63 @@ bool QXmppTheoraDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideo
         return false;
     }
 
-    for (int i = 0; i < 3; ++i) {
-        QXmppVideoPlane *plane = &frame->planes[i];
-        plane->width = ycbcr_buffer[i].width;
-        plane->height = ycbcr_buffer[i].height;
-        plane->stride = ycbcr_buffer[i].stride;
-        plane->data.resize(plane->stride * plane->height);
-        memcpy(plane->data.data(), ycbcr_buffer[i].data, plane->data.size());
-    }
-    return true;
-}
+    if (info.pixel_fmt == TH_PF_420) {
+        if (!frame->isValid()) {
+            const int bytes = ycbcr_buffer[0].stride * ycbcr_buffer[0].height
+                            + ycbcr_buffer[1].stride * ycbcr_buffer[1].height
+                            + ycbcr_buffer[2].stride * ycbcr_buffer[2].height;
 
+            *frame = QXmppVideoFrame(bytes,
+                QSize(ycbcr_buffer[0].width, ycbcr_buffer[0].height),
+                ycbcr_buffer[0].stride,
+                QXmppVideoFrame::Format_YUV420P);
+        }
+        uchar *output = frame->bits();
+        for (int i = 0; i < 3; ++i) {
+            const int length = ycbcr_buffer[i].stride * ycbcr_buffer[i].height;
+            memcpy(output, ycbcr_buffer[i].data, length);
+            output += length;
+        }
+        return true;
+    } else if (info.pixel_fmt == TH_PF_422) {
+        if (!frame->isValid()) {
+            const int bytes = ycbcr_buffer[0].width * ycbcr_buffer[0].height * 2;
+
+            *frame = QXmppVideoFrame(bytes,
+                QSize(ycbcr_buffer[0].width, ycbcr_buffer[0].height),
+                ycbcr_buffer[0].width * 2,
+                QXmppVideoFrame::Format_YUYV);
+        }
+
+        // YUV 4:2:2 packing
+        const int width = ycbcr_buffer[0].width;
+        const int height = ycbcr_buffer[0].height;
+        const int y_stride = ycbcr_buffer[0].stride;
+        const int c_stride = ycbcr_buffer[1].stride;
+        const uchar *y_row = ycbcr_buffer[0].data;
+        const uchar *cb_row = ycbcr_buffer[1].data;
+        const uchar *cr_row = ycbcr_buffer[2].data;
+        uchar *output = frame->bits();
+        for (int y = 0; y < height; ++y) {
+            const uchar *y_ptr = y_row;
+            const uchar *cb_ptr = cb_row;
+            const uchar *cr_ptr = cr_row;
+            for (int x = 0; x < width; x += 2) {
+                *(output++) = *(y_ptr++);
+                *(output++) = *(cb_ptr++);
+                *(output++) = *(y_ptr++);
+                *(output++) = *(cr_ptr++);
+            }
+            y_row += y_stride;
+            cb_row += c_stride;
+            cr_row += c_stride;
+        }
+        return true;
+    } else {
+        qWarning("Theora decoder received an unsupported frame format");
+        return false;
+    }
+}
 
 QXmppTheoraDecoder::QXmppTheoraDecoder()
 {
@@ -430,17 +476,23 @@ QXmppVideoFormat QXmppTheoraDecoder::format() const
 {
     QXmppVideoFormat format;
     format.setFrameSize(QSize(d->info.frame_width, d->info.frame_height));
-    if (d->info.pixel_fmt == TH_PF_420) {
+    if (d->info.pixel_fmt == TH_PF_420)
         format.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
-    }
+    else if (d->info.pixel_fmt == TH_PF_422)
+        format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+    else
+        format.setPixelFormat(QXmppVideoFrame::Format_Invalid);
+    if (d->info.fps_denominator > 0)
+        format.setFrameRate(qreal(d->info.fps_numerator) / qreal(d->info.fps_denominator));
     return format;
 }
 
-QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(QDataStream &stream)
+QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
 {
     QList<QXmppVideoFrame> frames;
 
     // theora deframing: draft-ietf-avt-rtp-theora-00
+    QDataStream stream(ba);
     quint32 theora_header;
     stream >> theora_header;
 
@@ -472,6 +524,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(QDataStream &stream)
             stream.readRawData(d->packetBuffer.data(), packetLength);
             if (d->ctx && d->decodeFrame(d->packetBuffer, &frame))
                 frames << frame;
+            d->packetBuffer.resize(0);
         }
     } else {
         // fragments
@@ -596,7 +649,7 @@ bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
         d->info.target_bitrate,
         d->info.quality,
         d->info.keyframe_granule_shift);
-    if (d->info.pixel_fmt != TH_PF_420) {
+    if (d->info.pixel_fmt != TH_PF_420 && d->info.pixel_fmt != TH_PF_422) {
         qWarning("Theora frames have an unsupported pixel format %d", d->info.pixel_fmt);
         return false;
     }
@@ -619,7 +672,9 @@ public:
     th_info info;
     th_setup_info *setup_info;
     th_enc_ctx *ctx;
+    th_ycbcr_buffer ycbcr_buffer;
 
+    QByteArray buffer;
     QByteArray configuration;
     QByteArray ident;
 };
@@ -659,12 +714,13 @@ QXmppTheoraEncoder::~QXmppTheoraEncoder()
 
 bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
 {
-    if (format.pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
-        d->info.pixel_fmt = TH_PF_420;
-    } else {
+    const QXmppVideoFrame::PixelFormat pixelFormat = format.pixelFormat();
+    if ((pixelFormat != QXmppVideoFrame::Format_YUV420P) &&
+        (pixelFormat != QXmppVideoFrame::Format_YUYV)) {
         qWarning("Theora decoder does not support the given format");
         return false;
     }
+
     d->info.frame_width = format.frameSize().width();
     d->info.frame_height = format.frameSize().height();
     d->info.pic_height = format.frameSize().height();
@@ -676,10 +732,36 @@ bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
     d->info.quality = 48;
     d->info.keyframe_granule_shift = 6;
 
-    // frame rate
-    d->info.fps_numerator = 30;
+    // FIXME: how do we handle floating point frame rates?
+    d->info.fps_numerator = format.frameRate();
     d->info.fps_denominator = 1;
 
+    if (pixelFormat == QXmppVideoFrame::Format_YUV420P) {
+        d->info.pixel_fmt = TH_PF_420;
+        d->ycbcr_buffer[0].width = d->info.frame_width;
+        d->ycbcr_buffer[0].height = d->info.frame_height;
+        d->ycbcr_buffer[1].width = d->ycbcr_buffer[0].width / 2;
+        d->ycbcr_buffer[1].height = d->ycbcr_buffer[0].height / 2;
+        d->ycbcr_buffer[2].width = d->ycbcr_buffer[1].width;
+        d->ycbcr_buffer[2].height = d->ycbcr_buffer[1].height;
+    } else if (pixelFormat == QXmppVideoFrame::Format_YUYV) {
+        d->info.pixel_fmt = TH_PF_422;
+        d->buffer.resize(d->info.frame_width * d->info.frame_height * 2);
+        d->ycbcr_buffer[0].width = d->info.frame_width;
+        d->ycbcr_buffer[0].height = d->info.frame_height;
+        d->ycbcr_buffer[0].stride = d->info.frame_width;
+        d->ycbcr_buffer[0].data = (uchar*) d->buffer.data();
+        d->ycbcr_buffer[1].width = d->ycbcr_buffer[0].width / 2;
+        d->ycbcr_buffer[1].height = d->ycbcr_buffer[0].height;
+        d->ycbcr_buffer[1].stride = d->ycbcr_buffer[0].stride / 2;
+        d->ycbcr_buffer[1].data = d->ycbcr_buffer[0].data + d->ycbcr_buffer[0].stride * d->ycbcr_buffer[0].height;
+        d->ycbcr_buffer[2].width = d->ycbcr_buffer[1].width;
+        d->ycbcr_buffer[2].height = d->ycbcr_buffer[1].height;
+        d->ycbcr_buffer[2].stride = d->ycbcr_buffer[1].stride;
+        d->ycbcr_buffer[2].data = d->ycbcr_buffer[1].data + d->ycbcr_buffer[1].stride * d->ycbcr_buffer[1].height;
+    }
+
+    // create encoder
     if (d->ctx) {
         th_encode_free(d->ctx);
         d->ctx = 0;
@@ -741,15 +823,41 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
     QList<QByteArray> packets;
     const int PACKET_MAX = 1388;
 
-    th_ycbcr_buffer ycbcr_buffer;
-    for (int i = 0; i < 3; ++i) {
-        const QXmppVideoPlane *plane = &frame.planes[i];
-        ycbcr_buffer[i].width = plane->width;
-        ycbcr_buffer[i].height = plane->height;
-        ycbcr_buffer[i].stride = plane->stride;
-        ycbcr_buffer[i].data = (unsigned char*)plane->data.constData();
+    if (!d->ctx)
+        return packets;
+
+    if (d->info.pixel_fmt == TH_PF_420) {
+        d->ycbcr_buffer[0].stride = frame.bytesPerLine();
+        d->ycbcr_buffer[0].data = (unsigned char*) frame.bits();
+        d->ycbcr_buffer[1].stride = d->ycbcr_buffer[0].stride / 2;
+        d->ycbcr_buffer[1].data = d->ycbcr_buffer[0].data + d->ycbcr_buffer[0].stride * d->ycbcr_buffer[0].height;
+        d->ycbcr_buffer[2].stride = d->ycbcr_buffer[1].stride;
+        d->ycbcr_buffer[2].data = d->ycbcr_buffer[1].data + d->ycbcr_buffer[1].stride * d->ycbcr_buffer[1].height;
+    } else if (d->info.pixel_fmt = TH_PF_422) {
+        // YUV 4:2:2 unpacking
+        const int width = frame.width();
+        const int height = frame.height();
+        const int stride = frame.bytesPerLine();
+        const uchar *row = frame.bits();
+        uchar *y_out = d->ycbcr_buffer[0].data;
+        uchar *cb_out = d->ycbcr_buffer[1].data;
+        uchar *cr_out = d->ycbcr_buffer[2].data;
+        for (int y = 0; y < height; ++y) {
+            const uchar *ptr = row;
+            for (int x = 0; x < width; x += 2) {
+                *(y_out++) = *(ptr++);
+                *(cb_out++) = *(ptr++);
+                *(y_out++) = *(ptr++);
+                *(cr_out++) = *(ptr++);
+            }
+            row += stride;
+        }
+    } else {
+        qWarning("Theora encoder received an unsupported frame format");
+        return packets;
     }
-    if (th_encode_ycbcr_in(d->ctx, ycbcr_buffer) != 0) {
+
+    if (th_encode_ycbcr_in(d->ctx, d->ycbcr_buffer) != 0) {
         qWarning("Theora encoder could not handle frame");
         return packets;
     }
@@ -767,7 +875,7 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
         if (size <= PACKET_MAX) {
             // no fragmentation
             stream.device()->reset();
-            payload.clear();
+            payload.resize(0);
             d->writeFrame(stream, theora_frag, 1, data, size);
             packets << payload;
        } else {
@@ -775,12 +883,12 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
             theora_frag = 1;
             while (size) {
                 const int length = qMin(PACKET_MAX, size);
-                payload.clear();
                 stream.device()->reset();
+                payload.resize(0);
                 d->writeFrame(stream, theora_frag, 0, data, length);
                 data += length;
                 size -= length;
-                theora_frag = (size < length) ? 3 : 2;
+                theora_frag = (size > PACKET_MAX) ? 2 : 3;
                 packets << payload;
             }
         }

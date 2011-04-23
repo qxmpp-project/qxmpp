@@ -36,9 +36,85 @@
 #endif
 
 //#define QXMPP_DEBUG_RTP
+//#define QXMPP_DEBUG_RTP_BUFFER
 #define SAMPLE_BYTES 2
 
 const quint8 RTP_VERSION = 0x02;
+
+/// Parses an RTP packet.
+///
+/// \param ba
+
+bool QXmppRtpPacket::decode(const QByteArray &ba)
+{
+    if (ba.isEmpty())
+        return false;
+
+    // fixed header
+    quint8 tmp;
+    QDataStream stream(ba);
+    stream >> tmp;
+    version = (tmp >> 6);
+    const quint8 cc = (tmp >> 1) & 0xf;
+    const int hlen = 12 + 4 * cc;
+    if (version != RTP_VERSION || ba.size() < hlen)
+        return false;
+    stream >> tmp;
+    marker = (tmp >> 7);
+    type = tmp & 0x7f;
+    stream >> sequence;
+    stream >> stamp;
+    stream >> ssrc;
+
+    // contributing source IDs
+    csrc.clear();
+    quint32 src;
+    for (int i = 0; i < cc; ++i) {
+        stream >> src;
+        csrc << src;
+    }
+
+    // retrieve payload
+    payload = ba.right(ba.size() - hlen);
+    return true;
+}
+
+/// Encodes an RTP packet.
+
+QByteArray QXmppRtpPacket::encode() const
+{
+    Q_ASSERT(csrc.size() < 16);
+
+    // fixed header
+    QByteArray ba;
+    ba.resize(payload.size() + 12 + 4 * csrc.size());
+    QDataStream stream(&ba, QIODevice::WriteOnly);
+    stream << quint8(((version & 0x3) << 6) |
+                     ((csrc.size() & 0xf) << 1));
+    stream << quint8((type & 0x7f) | (marker << 7));
+    stream << sequence;
+    stream << stamp;
+    stream << ssrc;
+
+    // contributing source ids
+    foreach (const quint32 &src, csrc)
+        stream << src;
+
+    stream.writeRawData(payload.constData(), payload.size());
+    return ba;
+}
+
+/// Returns a string representation of the RTP header.
+
+QString QXmppRtpPacket::toString() const
+{
+    return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+        QString::number(sequence),
+        QString::number(stamp),
+        QString::number(marker),
+        QString::number(type),
+        QString::number(payload.size()));
+}
 
 /// Creates a new RTP channel.
 
@@ -315,87 +391,68 @@ void QXmppRtpAudioChannel::close()
 
 void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
 {
-    if (ba.size() < 12 || (quint8(ba.at(0)) >> 6) != RTP_VERSION)
-    {
-        warning("QXmppRtpAudioChannel::datagramReceived got an invalid RTP packet");
+    QXmppRtpPacket packet;
+    if (!packet.decode(ba))
         return;
-    }
-
-    // parse RTP header
-    QDataStream stream(ba);
-    quint8 version, marker_type;
-    quint32 ssrc;
-    quint16 sequence;
-    quint32 stamp;
-    stream >> version;
-    stream >> marker_type;
-    stream >> sequence;
-    stream >> stamp;
-    stream >> ssrc;
-    const quint8 type = marker_type & 0x7f;
-    const qint64 packetLength = ba.size() - 12;
 
 #ifdef QXMPP_DEBUG_RTP
-    const bool marker = marker_type & 0x80;
-    logReceived(QString("RTP audio packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-            QString::number(sequence),
-            QString::number(stamp),
-            QString::number(marker),
-            QString::number(type),
-            QString::number(packetLength)));
+    logReceived(packet.toString());
 #endif
 
     // check sequence number
 #if 0
-    if (d->incomingSequence && sequence != d->incomingSequence + 1)
+    if (d->incomingSequence && packet.sequence != d->incomingSequence + 1)
         warning(QString("RTP packet seq %1 is out of order, previous was %2")
-                .arg(QString::number(sequence))
+                .arg(QString::number(packet.sequence))
                 .arg(QString::number(d->incomingSequence)));
 #endif
-    d->incomingSequence = sequence;
+    d->incomingSequence = packet.sequence;
 
     // get or create codec
     QXmppCodec *codec = 0;
-    if (!d->incomingCodecs.contains(type)) {
+    if (!d->incomingCodecs.contains(packet.type)) {
         foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
-            if (type == payload.id()) {
+            if (packet.type == payload.id()) {
                 codec = d->codecForPayloadType(payload);
                 break;
             }
         }
         if (codec)
-            d->incomingCodecs.insert(type, codec);
+            d->incomingCodecs.insert(packet.type, codec);
         else
-            warning(QString("Could not find codec for RTP type %1").arg(QString::number(type)));
+            warning(QString("Could not find codec for RTP type %1").arg(QString::number(packet.type)));
     } else {
-        codec = d->incomingCodecs.value(type);
+        codec = d->incomingCodecs.value(packet.type);
     }
     if (!codec)
         return;
 
     // determine packet's position in the buffer (in bytes)
     qint64 packetOffset = 0;
-    if (!d->incomingBuffer.isEmpty())
-    {
-        packetOffset = stamp * SAMPLE_BYTES - d->incomingPos;
-        if (packetOffset < 0)
-        {
+    if (!d->incomingBuffer.isEmpty()) {
+        packetOffset = packet.stamp * SAMPLE_BYTES - d->incomingPos;
+        if (packetOffset < 0) {
+#ifdef QXMPP_DEBUG_RTP_BUFFER
             warning(QString("RTP packet stamp %1 is too old, buffer start is %2")
-                    .arg(QString::number(stamp))
+                    .arg(QString::number(packet.stamp))
                     .arg(QString::number(d->incomingPos)));
+#endif
             return;
         }
     } else {
-        d->incomingPos = stamp * SAMPLE_BYTES + (d->incomingPos % SAMPLE_BYTES);
+        d->incomingPos = packet.stamp * SAMPLE_BYTES + (d->incomingPos % SAMPLE_BYTES);
     }
 
     // allocate space for new packet
+    // FIXME: this is wrong, we want the decoded data size!
+    qint64 packetLength = packet.payload.size();
     if (packetOffset + packetLength > d->incomingBuffer.size())
         d->incomingBuffer += QByteArray(packetOffset + packetLength - d->incomingBuffer.size(), 0);
+    QDataStream input(packet.payload);
     QDataStream output(&d->incomingBuffer, QIODevice::WriteOnly);
     output.device()->seek(packetOffset);
     output.setByteOrder(QDataStream::LittleEndian);
-    codec->decode(stream, output);
+    codec->decode(input, output);
 
     // check whether we are running late
     if (d->incomingBuffer.size() > d->incomingMaximum)
@@ -404,8 +461,10 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
         const int remainder = droppedSize % SAMPLE_BYTES;
         if (remainder)
             droppedSize -= remainder;
+#ifdef QXMPP_DEBUG_RTP_BUFFER
         warning(QString("Incoming RTP buffer is too full, dropping %1 bytes")
                 .arg(QString::number(droppedSize)));
+#endif
         d->incomingBuffer.remove(0, droppedSize);
         d->incomingPos += droppedSize;
     }
@@ -596,7 +655,9 @@ void QXmppRtpAudioChannel::writeDatagram()
     // read audio chunk
     QByteArray chunk;
     if (d->outgoingBuffer.size() < d->outgoingChunk) {
+#ifdef QXMPP_DEBUG_RTP_BUFFER
         warning("Outgoing RTP buffer is starved");
+#endif
         chunk = QByteArray(d->outgoingChunk, 0);
     } else {
         chunk = d->outgoingBuffer.left(d->outgoingChunk);
@@ -610,30 +671,22 @@ void QXmppRtpAudioChannel::writeDatagram()
 
         if (d->outgoingTonesType.id()) {
             // send RFC 2833 DTMF
-            QByteArray header;
-            QDataStream stream(&header, QIODevice::WriteOnly);
-            quint8 marker_type = d->outgoingTonesType.id();
-            if (info.outgoingStart == d->outgoingStamp)
-                marker_type |= 0x80;
+            QXmppRtpPacket packet;
+            packet.version = RTP_VERSION;
+            packet.marker = (info.outgoingStart == d->outgoingStamp);
+            packet.type = d->outgoingTonesType.id();
+            packet.sequence = d->outgoingSequence;
+            packet.stamp = info.outgoingStart;
+            packet.ssrc = d->outgoingSsrc;
 
-            stream << quint8(RTP_VERSION << 6);
-            stream << marker_type;
-            stream << d->outgoingSequence;
-            stream << info.outgoingStart;
-            stream << d->outgoingSsrc;
-
-            stream << quint8(info.tone);
-            stream << quint8(info.finished ? 0x80 : 0x00);
-            stream << quint16(d->outgoingStamp + packetTicks - info.outgoingStart);
+            QDataStream output(&packet.payload, QIODevice::WriteOnly);
+            output << quint8(info.tone);
+            output << quint8(info.finished ? 0x80 : 0x00);
+            output << quint16(d->outgoingStamp + packetTicks - info.outgoingStart);
 #ifdef QXMPP_DEBUG_RTP
-            logSent(QString("RTP audio packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                        QString::number(d->outgoingSequence),
-                        QString::number(d->outgoingStamp),
-                        QString::number(marker_type & 0x80 != 0),
-                        QString::number(marker_type & 0x7f),
-                        QString::number(header.size() - 12)));
+            logSent(packet.toString());
 #endif
-            emit sendDatagram(header);
+            emit sendDatagram(packet.encode());
             d->outgoingSequence++;
             d->outgoingStamp += packetTicks;
 
@@ -650,34 +703,30 @@ void QXmppRtpAudioChannel::writeDatagram()
 
     if (sendAudio) {
         // send audio data
-        QByteArray header;
-        QDataStream stream(&header, QIODevice::WriteOnly);
-        quint8 marker_type = d->payloadType.id();
+        QXmppRtpPacket packet;
+        packet.version = RTP_VERSION;
         if (d->outgoingMarker)
         {
-            marker_type |= 0x80;
-            d->outgoingMarker= false;
+            packet.marker = true;
+            d->outgoingMarker = false;
+        } else {
+            packet.marker = false;
         }
-        stream << quint8(RTP_VERSION << 6);
-        stream << marker_type;
-        stream << d->outgoingSequence;
-        stream << d->outgoingStamp;
-        stream << d->outgoingSsrc;
+        packet.type = d->payloadType.id();
+        packet.sequence = d->outgoingSequence;
+        packet.stamp = d->outgoingStamp;
+        packet.ssrc = d->outgoingSsrc;
 
         // encode audio chunk
         QDataStream input(chunk);
         input.setByteOrder(QDataStream::LittleEndian);
-        const qint64 packetTicks = d->outgoingCodec->encode(input, stream);
+        QDataStream output(&packet.payload, QIODevice::WriteOnly);
+        const qint64 packetTicks = d->outgoingCodec->encode(input, output);
 
 #ifdef QXMPP_DEBUG_RTP
-        logSent(QString("RTP audio packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                    QString::number(d->outgoingSequence),
-                    QString::number(d->outgoingStamp),
-                    QString::number(marker_type & 0x80 != 0),
-                    QString::number(marker_type & 0x7f),
-                    QString::number(header.size() - 12)));
+        logSent(packet.toString());
 #endif
-        emit sendDatagram(header);
+        emit sendDatagram(packet.encode());
         d->outgoingSequence++;
         d->outgoingStamp += packetTicks;
     }
@@ -690,12 +739,100 @@ void QXmppRtpAudioChannel::writeDatagram()
     }
 }
 
+/** Constructs a null video frame.
+ */
+QXmppVideoFrame::QXmppVideoFrame()
+    : m_bytesPerLine(0),
+    m_height(0),
+    m_mappedBytes(0),
+    m_pixelFormat(Format_Invalid),
+    m_width(0)
+{
+}
+
+/** Constructs a video frame of the given pixel format and size in pixels.
+ *
+ * @param bytes
+ * @param size
+ * @param bytesPerLine
+ * @param format
+ */
+QXmppVideoFrame::QXmppVideoFrame(int bytes, const QSize &size, int bytesPerLine, PixelFormat format)
+    : m_bytesPerLine(bytesPerLine),
+    m_height(size.height()),
+    m_mappedBytes(bytes),
+    m_pixelFormat(format),
+    m_width(size.width())
+{
+    m_data.resize(bytes);
+}
+
+uchar *QXmppVideoFrame::bits()
+{
+    return (uchar*)m_data.data();
+}
+
+const uchar *QXmppVideoFrame::bits() const
+{
+    return (const uchar*)m_data.constData();
+}
+
+/** Returns the number of bytes in a scan line.
+ */
+int QXmppVideoFrame::bytesPerLine() const
+{
+    return m_bytesPerLine;
+}
+
+/** Returns the height of a video frame.
+ */
+int QXmppVideoFrame::height() const
+{
+    return m_height;
+}
+
+/** Returns true if the frame is valid.
+ */
+bool QXmppVideoFrame::isValid() const
+{
+    return m_pixelFormat != Format_Invalid &&
+           m_height > 0 && m_width > 0 &&
+           m_mappedBytes > 0;
+}
+
+/** Returns the number of bytes occupied by the mapped frame data.
+ */
+int QXmppVideoFrame::mappedBytes() const
+{
+    return m_mappedBytes;
+}
+
+/** Returns the color format of a video frame.
+ */
+QXmppVideoFrame::PixelFormat QXmppVideoFrame::pixelFormat() const
+{
+    return m_pixelFormat;
+}
+
+/** Returns the size of a video frame.
+ */
+QSize QXmppVideoFrame::size() const
+{
+    return QSize(m_width, m_height);
+}
+
+/** Returns the width of a video frame.
+ */
+int QXmppVideoFrame::width() const
+{
+    return m_width;
+}
+
 class QXmppRtpVideoChannelPrivate
 {
 public:
     QXmppRtpVideoChannelPrivate();
     QMap<int, QXmppVideoDecoder*> decoders;
-    QList<QXmppVideoEncoder*> encoders;
     QXmppVideoEncoder *encoder;
     QList<QXmppVideoFrame> frames;
 
@@ -721,8 +858,9 @@ QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
     : QXmppLoggable(parent)
 {
     d = new QXmppRtpVideoChannelPrivate;
+    d->outgoingFormat.setFrameRate(15.0);
     d->outgoingFormat.setFrameSize(QSize(320, 240));
-    d->outgoingFormat.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
+    d->outgoingFormat.setPixelFormat(QXmppVideoFrame::Format_YUYV);
 
     // set supported codecs
 #ifdef QXMPP_USE_THEORA
@@ -760,41 +898,19 @@ void QXmppRtpVideoChannel::close()
 
 void QXmppRtpVideoChannel::datagramReceived(const QByteArray &ba)
 {
-    if (ba.size() < 12 || (quint8(ba.at(0)) >> 6) != RTP_VERSION)
-    {
-        warning("QXmppRtpVideoChannel::datagramReceived got an invalid RTP packet");
+    QXmppRtpPacket packet;
+    if (!packet.decode(ba))
         return;
-    }
-
-    // parse RTP header
-    QDataStream stream(ba);
-    quint8 version, marker_type;
-    quint32 ssrc;
-    quint16 sequence;
-    quint32 stamp;
-    stream >> version;
-    stream >> marker_type;
-    stream >> sequence;
-    stream >> stamp;
-    stream >> ssrc;
-    const quint8 type = marker_type & 0x7f;
-    const qint64 packetLength = ba.size() - 12;
 
 #ifdef QXMPP_DEBUG_RTP
-    const bool marker = marker_type & 0x80;
-    logReceived(QString("RTP video packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-            QString::number(sequence),
-            QString::number(stamp),
-            QString::number(marker),
-            QString::number(type),
-            QString::number(packetLength)));
+    logReceived(packet.toString());
 #endif
 
     // get codec
-    QXmppVideoDecoder *decoder = d->decoders.value(type);
+    QXmppVideoDecoder *decoder = d->decoders.value(packet.type);
     if (!decoder)
         return;
-    d->frames << decoder->handlePacket(stream);
+    d->frames << decoder->handlePacket(packet.payload);
 }
 
 QXmppVideoFormat QXmppRtpVideoChannel::decoderFormat() const
@@ -875,32 +991,24 @@ QList<QXmppVideoFrame> QXmppRtpVideoChannel::readFrames()
 void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
 {
     if (!d->encoder) {
-        warning("QXmppRtpVideoChannel::writeData before codec was set");
+        warning("QXmppRtpVideoChannel::writeFrame before codec was set");
         return;
     }
 
-    const quint8 marker_type = d->outgoingId;
-    QByteArray packet;
+    QXmppRtpPacket packet;
+    packet.version = RTP_VERSION;
+    packet.marker = false;
+    packet.type = d->outgoingId;
+    packet.ssrc = d->outgoingSsrc;
     foreach (const QByteArray &payload, d->encoder->handleFrame(frame)) {
-        packet.clear();
-        QDataStream stream(&packet, QIODevice::WriteOnly);
-        stream << quint8(RTP_VERSION << 6);
-        stream << marker_type;
-        stream << d->outgoingSequence;
-        stream << d->outgoingStamp;
-        stream << d->outgoingSsrc;
-        stream.writeRawData(payload.constData(), payload.size());
-#if QXMPP_DEBUG_RTP
-        logSent(QString("RTP video packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-                    QString::number(d->outgoingSequence),
-                    QString::number(d->outgoingStamp),
-                    QString::number(marker_type & 0x80 != 0),
-                    QString::number(marker_type & 0x7f),
-                    QString::number(packet.size() - 12)));
+        packet.sequence = d->outgoingSequence++;
+        packet.stamp = d->outgoingStamp;
+        packet.payload = payload;
+#ifdef QXMPP_DEBUG_RTP
+        logSent(packet.toString());
 #endif
-
-        emit sendDatagram(packet);
-        d->outgoingSequence++;
+        emit sendDatagram(packet.encode());
     }
+    d->outgoingStamp += 1;
 }
 

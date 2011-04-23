@@ -35,6 +35,26 @@ class QXmppJinglePayloadType;
 class QXmppRtpAudioChannelPrivate;
 class QXmppRtpVideoChannelPrivate;
 
+/// \brief The QXmppRtpPacket class represents an RTP packet.
+///
+
+class QXmppRtpPacket
+{
+public:
+    bool decode(const QByteArray &ba);
+    QByteArray encode() const;
+    QString toString() const;
+
+    quint8 version;
+    bool marker;
+    quint8 type;
+    quint32 ssrc;
+    QList<quint32> csrc;
+    quint16 sequence;
+    quint32 stamp;
+    QByteArray payload;
+};
+
 class QXmppRtpChannel
 {
 public:
@@ -147,28 +167,59 @@ private:
     QXmppRtpAudioChannelPrivate * d;
 };
 
-class QXmppVideoPlane
-{
-public:
-    QByteArray data;
-    int width;
-    int height;
-    int stride;
-};
+/// \brief The QXmppVideoFrame class provides a representation of a frame of video data.
+///
+/// \note THIS API IS NOT FINALIZED YET
 
 class QXmppVideoFrame
 {
 public:
     enum PixelFormat {
+        Format_Invalid = 0,
         Format_YUV420P = 18,
+        Format_YUYV = 21,
     };
 
-    QXmppVideoPlane planes[3];
+    QXmppVideoFrame();
+    QXmppVideoFrame(int bytes, const QSize &size, int bytesPerLine, PixelFormat format);
+    uchar *bits();
+    const uchar *bits() const;
+    int bytesPerLine() const;
+    int height() const;
+    bool isValid() const;
+    int mappedBytes() const;
+    PixelFormat pixelFormat() const;
+    QSize size() const;
+    int width() const;
+
+private:
+    int m_bytesPerLine;
+    QByteArray m_data;
+    int m_height;
+    int m_mappedBytes;
+    PixelFormat m_pixelFormat;
+    int m_width;
 };
 
 class QXmppVideoFormat
 {
 public:
+    int frameHeight() const {
+        return m_frameSize.height();
+    }
+
+    int frameWidth() const {
+        return m_frameSize.width();
+    }
+
+    qreal frameRate() const {
+        return m_frameRate;
+    }
+
+    void setFrameRate(qreal frameRate) {
+        m_frameRate = frameRate;
+    }
+
     QSize frameSize() const {
         return m_frameSize;
     }
@@ -186,6 +237,7 @@ public:
     }
 
 private:
+    qreal m_frameRate;
     QSize m_frameSize;
     QXmppVideoFrame::PixelFormat m_pixelFormat;
 };
