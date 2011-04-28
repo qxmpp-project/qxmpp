@@ -186,6 +186,8 @@ QString QXmppMucRoom::jid() const
 }
 
 /// Joins the chat room.
+///
+/// \return true if the request was sent, false otherwise
 
 bool QXmppMucRoom::join()
 {
@@ -211,6 +213,8 @@ bool QXmppMucRoom::join()
 }
 
 /// Leaves the chat room.
+///
+/// \return true if the request was sent, false otherwise
 
 bool QXmppMucRoom::leave()
 {
@@ -231,6 +235,8 @@ QString QXmppMucRoom::nickName() const
 ///
 /// \param jid
 /// \param reason
+///
+/// \return true if the request was sent, false otherwise
 
 bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
 {
@@ -248,6 +254,8 @@ bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
 }
 
 /// Sends a message to the room.
+///
+/// \return true if the request was sent, false otherwise
 
 bool QXmppMucRoom::sendMessage(const QString &text)
 {
@@ -388,6 +396,8 @@ bool QXmppMucRoom::requestPermissions()
 }
 
 /// Sets the room's permissions.
+///
+/// \param permissions
 ///
 /// \return true if the request was sent, false otherwise
 

@@ -89,10 +89,7 @@ private:
 /// \brief The QXmppMucRoom class represents a multi-user chat room
 /// as defined by XEP-0045: Multi-User Chat.
 ///
-/// \code
-/// QXmppMucManager *manager = new QXmppMucManager;
-/// client->addExtension(manager);
-/// \endcode
+/// \sa QXmppMucManager
 
 class QXmppMucRoom : public QObject
 {
@@ -105,12 +102,13 @@ class QXmppMucRoom : public QObject
 
 public:
 
+    /// This enum is used to describe chat room actions.
     enum Action {
-        NoAction = 0,
-        SubjectAction = 1,
-        ConfigurationAction = 2,
-        PermissionsAction = 4,
-        KickAction = 8,
+        NoAction = 0,               ///< no action
+        SubjectAction = 1,          ///< change the room's subject
+        ConfigurationAction = 2,    ///< change the room's configuration
+        PermissionsAction = 4,      ///< change the room's permissions
+        KickAction = 8,             ///< kick users from the room
     };
     Q_DECLARE_FLAGS(Actions, Action)
 
