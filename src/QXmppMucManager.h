@@ -34,6 +34,8 @@ class QXmppDataForm;
 class QXmppMessage;
 class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
+class QXmppMucRoom;
+class QXmppMucRoomPrivate;
 
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by XEP-0045: Multi-User Chat.
@@ -46,6 +48,14 @@ class QXmppMucOwnerIq;
 /// client->addExtension(manager);
 /// \endcode
 ///
+/// You can then join a room as follows:
+///
+/// \code
+/// QXmppMucRoom *room = manager->addRoom("room@conference.example.com");
+/// room->setNickName("mynick");
+/// room->join();
+/// \endcode
+///
 /// \ingroup Managers
 
 class QXmppMucManager : public QXmppClientExtension
@@ -53,20 +63,7 @@ class QXmppMucManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    bool joinRoom(const QString &roomJid, const QString &nickName, const QString &password = QString());
-    bool leaveRoom(const QString &roomJid);
-
-    bool requestRoomConfiguration(const QString &roomJid);
-    bool setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form);
-
-    bool requestRoomPermissions(const QString &roomJid);
-
-    bool setRoomSubject(const QString &roomJid, const QString &subject);
-
-    bool sendInvitation(const QString &roomJid, const QString &jid, const QString &reason);
-    bool sendMessage(const QString &roomJid, const QString &text);
-
-    QMap<QString, QXmppPresence> roomParticipants(const QString& bareJid) const;
+    QXmppMucRoom *addRoom(const QString &roomJid);
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -77,17 +74,6 @@ signals:
     /// This signal is emitted when an invitation to a chat room is received.
     void invitationReceived(const QString &roomJid, const QString &inviter, const QString &reason);
 
-    /// This signal is emitted when the configuration form for a chat room is received.
-    void roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &configuration);
-
-    /// This signal is emitted when the permissions for a chat room are received.
-    void roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions);
-
-    /// This signal is emitted when a room participant's presence changed.
-    ///
-    /// \sa roomParticipants()
-    void roomParticipantChanged(const QString &roomJid, const QString &nickName);
-
 protected:
     /// \cond
     void setClient(QXmppClient* client);
@@ -95,13 +81,112 @@ protected:
 
 private slots:
     void messageReceived(const QXmppMessage &message);
-    void mucAdminIqReceived(const QXmppMucAdminIq &iq);
-    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
-    void presenceReceived(const QXmppPresence &presence);
 
 private:
-    QMap<QString, QString> m_nickNames;
-    QMap<QString, QMap<QString, QXmppPresence> > m_participants;
+    QMap<QString, QXmppMucRoom*> m_rooms;
 };
+
+/// \brief The QXmppMucRoom class represents a multi-user chat room
+/// as defined by XEP-0045: Multi-User Chat.
+///
+/// \code
+/// QXmppMucManager *manager = new QXmppMucManager;
+/// client->addExtension(manager);
+/// \endcode
+
+class QXmppMucRoom : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString jid READ jid)
+    Q_PROPERTY(QString nickName READ nickName WRITE setNickName)
+    Q_PROPERTY(QStringList participants READ participants)
+    Q_PROPERTY(QString password READ password WRITE setPassword)
+    Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
+
+public:
+
+    enum Action {
+        NoAction = 0,
+        SubjectAction = 1,
+        ConfigurationAction = 2,
+        PermissionsAction = 4,
+        KickAction = 8,
+    };
+    Q_DECLARE_FLAGS(Actions, Action)
+
+    ~QXmppMucRoom();
+
+    Actions allowedActions() const;
+    bool isJoined() const;
+    QString jid() const;
+
+    QString nickName() const;
+    void setNickName(const QString &nickName);
+
+    QXmppPresence participantPresence(const QString &jid) const;
+    QStringList participants() const;
+
+    QString password() const;
+    void setPassword(const QString &password);
+
+    QString subject() const;
+    void setSubject(const QString &subject);
+
+    QXmppPresence::Status status() const;
+    void setStatus(const QXmppPresence::Status &status);
+
+signals:
+    /// This signal is emitted when the configuration form for the room is received.
+    void configurationReceived(const QXmppDataForm &configuration);
+
+    /// This signal is emitted once you have joined the room.
+    void joined();
+
+    /// This signal is emitted if you get kicked from the room.
+    void kicked(const QString &reason);
+
+    /// This signal is emiited once you have left the room.
+    void left();
+
+    /// This signal is emitted when a message is received.
+    void messageReceived(const QXmppMessage &message);
+
+    /// This signal is emitted when a participant joins the room.
+    void participantAdded(const QString &jid);
+
+    /// This signal is emitted when a participant changes.
+    void participantChanged(const QString &jid);
+
+    /// This signal is emitted when a participant leaves the room.
+    void participantRemoved(const QString &jid);
+
+    /// This signal is emitted when the room's permissions are received.
+    void permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions);
+
+    /// This signal is emitted when the room's subject changes.
+    void subjectChanged(const QString &subject);
+
+public slots:
+    bool join();
+    bool leave();
+    bool requestConfiguration();
+    bool requestPermissions();
+    bool setConfiguration(const QXmppDataForm &form);
+    bool setPermissions(const QList<QXmppMucAdminIq::Item> &permissions);
+    bool sendInvitation(const QString &jid, const QString &reason);
+    bool sendMessage(const QString &text);
+
+private slots:
+    void _q_disconnected();
+    void _q_messageReceived(const QXmppMessage &message);
+    void _q_presenceReceived(const QXmppPresence &presence);
+
+private:
+    QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent);
+    QXmppMucRoomPrivate *d;
+    friend class QXmppMucManager;
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppMucRoom::Actions)
 
 #endif

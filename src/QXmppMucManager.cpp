@@ -30,16 +30,41 @@
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
 
+class QXmppMucRoomPrivate
+{
+public:
+    QString ownJid() const { return jid + "/" + nickName; }
+    QXmppClient *client;
+    QXmppMucRoom::Actions allowedActions;
+    QString jid;
+    QMap<QString, QXmppPresence> participants;
+    QString password;
+    QMap<QString, QXmppMucAdminIq::Item::Affiliation> affiliations;
+    QString nickName;
+    QXmppPresence::Status status;
+    QString subject;
+};
+
+/// Adds the given chat room to the set of manged rooms.
+///
+/// \param roomJid
+
+QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
+{
+    QXmppMucRoom *room = m_rooms.value(roomJid);
+    if (!room) {
+        room = new QXmppMucRoom(client(), roomJid, this);
+        m_rooms.insert(roomJid, room);
+    }
+    return room;
+}
+
 void QXmppMucManager::setClient(QXmppClient* client)
 {
     QXmppClientExtension::setClient(client);
 
     bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
         this, SLOT(messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
-
-    check = QObject::connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-        this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 }
 
@@ -61,201 +86,30 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
         {
             QXmppMucAdminIq iq;
             iq.parse(element);
-            mucAdminIqReceived(iq);
+
+            QXmppMucRoom *room = m_rooms.value(iq.from());
+            if (room && iq.type() == QXmppIq::Result) {
+                foreach (const QXmppMucAdminIq::Item &item, iq.items()) {
+                    const QString jid = item.jid();
+                    if (!room->d->affiliations.contains(jid))
+                        room->d->affiliations.insert(jid, item.affiliation());
+                }
+                emit room->permissionsReceived(iq.items());
+            }
             return true;
         }
         else if (QXmppMucOwnerIq::isMucOwnerIq(element))
         {
             QXmppMucOwnerIq iq;
             iq.parse(element);
-            mucOwnerIqReceived(iq);
+
+            QXmppMucRoom *room = m_rooms.value(iq.from());
+            if (room && iq.type() == QXmppIq::Result && !iq.form().isNull())
+                emit room->configurationReceived(iq.form());
             return true;
         }
     }
     return false;
-}
-
-/// Joins the given chat room with the requested nickname.
-///
-/// \param roomJid
-/// \param nickName
-/// \param password an optional password if the room is password-protected
-///
-/// \return true if the request was sent, false otherwise
-///
-
-bool QXmppMucManager::joinRoom(const QString &roomJid, const QString &nickName, const QString &password)
-{
-    QXmppPresence packet;
-    packet.setTo(roomJid + "/" + nickName);
-    packet.setType(QXmppPresence::Available);
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_muc);
-    if (!password.isEmpty())
-    {
-        QXmppElement p;
-        p.setTagName("password");
-        p.setValue(password);
-        x.appendChild(p);
-    }
-    packet.setExtensions(x);
-    if (client()->sendPacket(packet))
-    {
-        m_nickNames[roomJid] = nickName;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/// Leaves the given chat room.
-///
-/// \param roomJid
-///
-/// \return true if the request was sent, false otherwise
-///
-
-bool QXmppMucManager::leaveRoom(const QString &roomJid)
-{
-    if (!m_nickNames.contains(roomJid))
-        return false;
-    QString nickName = m_nickNames.take(roomJid);
-    QXmppPresence packet;
-    packet.setTo(roomJid + "/" + nickName);
-    packet.setType(QXmppPresence::Unavailable);
-    return client()->sendPacket(packet);
-}
-
-/// Retrieves the list of participants for the given room.
-///
-/// \param roomJid
-///
-
-QMap<QString, QXmppPresence> QXmppMucManager::roomParticipants(const QString& roomJid) const
-{
-    return m_participants.value(roomJid);
-}
-
-/// Request the configuration form for the given room.
-///
-/// \param roomJid
-///
-/// \return true if the request was sent, false otherwise
-///
-/// \sa roomConfigurationReceived()
-
-bool QXmppMucManager::requestRoomConfiguration(const QString &roomJid)
-{
-    QXmppMucOwnerIq iq;
-    iq.setTo(roomJid);
-    return client()->sendPacket(iq);
-}
-
-/// Send the configuration form for the given room.
-///
-/// \param roomJid
-/// \param form
-///
-/// \return true if the request was sent, false otherwise
-
-bool QXmppMucManager::setRoomConfiguration(const QString &roomJid, const QXmppDataForm &form)
-{
-    QXmppMucOwnerIq iqPacket;
-    iqPacket.setType(QXmppIq::Set);
-    iqPacket.setTo(roomJid);
-    iqPacket.setForm(form);
-    return client()->sendPacket(iqPacket);
-}
-
-/// Request the room's permissions.
-///
-/// \param roomJid
-///
-/// \return true if the request was sent, false otherwise
-
-bool QXmppMucManager::requestRoomPermissions(const QString &roomJid)
-{
-    QList<QXmppMucAdminIq::Item::Affiliation> affiliations;
-    affiliations << QXmppMucAdminIq::Item::OwnerAffiliation;
-    affiliations << QXmppMucAdminIq::Item::AdminAffiliation;
-    affiliations << QXmppMucAdminIq::Item::MemberAffiliation;
-    affiliations << QXmppMucAdminIq::Item::OutcastAffiliation;
-    foreach (QXmppMucAdminIq::Item::Affiliation affiliation, affiliations)
-    {
-        QXmppMucAdminIq::Item item;
-        item.setAffiliation(affiliation);
-
-        QXmppMucAdminIq iq;
-        iq.setTo(roomJid);
-        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
-        if (!client()->sendPacket(iq))
-            return false;
-    }
-    return true;
-}
-
-/// Sets the subject for the given room.
-///
-/// \param roomJid
-/// \param subject
-///
-/// \return true if the request was sent, false otherwise
-///
-
-bool QXmppMucManager::setRoomSubject(const QString &roomJid, const QString &subject)
-{
-    QXmppMessage msg;
-    msg.setTo(roomJid);
-    msg.setType(QXmppMessage::GroupChat);
-    msg.setSubject(subject);
-    return  client()->sendPacket(msg);
-}
-
-/// Invite a user to a chat room.
-///
-/// \param roomJid
-/// \param jid
-/// \param reason
-///
-/// \return true if the message was sent, false otherwise
-///
-
-bool QXmppMucManager::sendInvitation(const QString &roomJid, const QString &jid, const QString &reason)
-{
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_conference);
-    x.setAttribute("jid", roomJid);
-    x.setAttribute("reason", reason);
-
-    QXmppMessage message;
-    message.setTo(jid);
-    message.setType(QXmppMessage::Normal);
-    message.setExtensions(x);
-    return client()->sendPacket(message);
-}
-
-/// Send a message to a chat room.
-///
-/// \param roomJid
-/// \param text
-///
-/// \return true if the message was sent, false otherwise
-///
-
-bool QXmppMucManager::sendMessage(const QString &roomJid, const QString &text)
-{
-    if (!m_nickNames.contains(roomJid))
-    {
-        qWarning("Cannot send message to unknown chat room");
-        return false;
-    }
-    QXmppMessage msg;
-    msg.setBody(text);
-    msg.setTo(roomJid);
-    msg.setType(QXmppMessage::GroupChat);
-    return client()->sendPacket(msg);
 }
 
 void QXmppMucManager::messageReceived(const QXmppMessage &msg)
@@ -269,41 +123,403 @@ void QXmppMucManager::messageReceived(const QXmppMessage &msg)
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
         {
             const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && !m_nickNames.contains(roomJid))
+            if (!roomJid.isEmpty() && !m_rooms.contains(roomJid))
                 emit invitationReceived(roomJid, msg.from(), extension.attribute("reason"));
             break;
         }
     }
 }
 
-void QXmppMucManager::mucAdminIqReceived(const QXmppMucAdminIq &iq)
+/// Constructs a new QXmppMucRoom.
+///
+/// \param parent
+
+QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent)
+    : QObject(parent)
 {
-    if (iq.type() != QXmppIq::Result) 
-        return;
-    emit roomPermissionsReceived(iq.from(), iq.items());
+    bool check;
+
+    d = new QXmppMucRoomPrivate;
+    d->allowedActions = NoAction;
+    d->client = client;
+    d->jid = jid;
+
+    check = connect(d->client, SIGNAL(disconnected()),
+                    this, SLOT(_q_disconnected()));
+    Q_ASSERT(check);
+
+    check = connect(d->client, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(_q_messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+
+    check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
 }
 
-void QXmppMucManager::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
+/// Destroys a QXmppMucRoom.
+
+QXmppMucRoom::~QXmppMucRoom()
 {
-    if (iq.type() == QXmppIq::Result && !iq.form().isNull())
-        emit roomConfigurationReceived(iq.from(), iq.form());
+    delete d;
 }
 
-void QXmppMucManager::presenceReceived(const QXmppPresence &presence)
+/// Returns the actions you are allowed to perform on the room.
+
+QXmppMucRoom::Actions QXmppMucRoom::allowedActions() const
 {
-    QString jid = presence.from();
-    QString bareJid = jidToBareJid(jid);
-    QString resource = jidToResource(jid);
-    if (!m_nickNames.contains(bareJid))
-        return;
-
-    if (presence.type() == QXmppPresence::Available)
-        m_participants[bareJid][resource] = presence;
-    else if (presence.type() == QXmppPresence::Unavailable)
-        m_participants[bareJid].remove(resource);
-    else
-        return;
-
-    emit roomParticipantChanged(bareJid, resource);
+    return d->allowedActions;
 }
 
+/// Returns true if you are currently in the room.
+
+bool QXmppMucRoom::isJoined() const
+{
+    return d->participants.contains(d->ownJid());
+}
+
+/// Returns the chat room's bare JID.
+
+QString QXmppMucRoom::jid() const
+{
+    return d->jid;
+}
+
+/// Joins the chat room.
+
+bool QXmppMucRoom::join()
+{
+    if (isJoined() || d->nickName.isEmpty())
+        return false;
+
+    QXmppPresence packet;
+    packet.setTo(d->ownJid());
+    packet.setType(QXmppPresence::Available);
+    packet.setStatus(d->status);
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_muc);
+    if (!d->password.isEmpty())
+    {
+        QXmppElement p;
+        p.setTagName("password");
+        p.setValue(d->password);
+        x.appendChild(p);
+    }
+    packet.setExtensions(x);
+    return d->client->sendPacket(packet);
+}
+
+/// Leaves the chat room.
+
+bool QXmppMucRoom::leave()
+{
+    QXmppPresence packet;
+    packet.setTo(d->ownJid());
+    packet.setType(QXmppPresence::Unavailable);
+    return d->client->sendPacket(packet);
+}
+
+/// Returns your own nickname.
+
+QString QXmppMucRoom::nickName() const
+{
+    return d->nickName;
+}
+
+/// Invites a user to the chat room.
+///
+/// \param jid
+/// \param reason
+
+bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
+{
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_conference);
+    x.setAttribute("jid", d->jid);
+    x.setAttribute("reason", reason);
+
+    QXmppMessage message;
+    message.setTo(jid);
+    message.setType(QXmppMessage::Normal);
+    message.setExtensions(x);
+    return d->client->sendPacket(message);
+}
+
+/// Sends a message to the room.
+
+bool QXmppMucRoom::sendMessage(const QString &text)
+{
+    QXmppMessage msg;
+    msg.setTo(d->jid);
+    msg.setType(QXmppMessage::GroupChat);
+    msg.setBody(text);
+    return d->client->sendPacket(msg);
+}
+
+/// Sets your own nickname.
+
+void QXmppMucRoom::setNickName(const QString &nickName)
+{
+    d->nickName = nickName;
+}
+
+/// Returns the presence for the given participant.
+///
+/// \param jid
+
+QXmppPresence QXmppMucRoom::participantPresence(const QString &jid) const
+{
+    if (d->participants.contains(jid))
+        return d->participants.value(jid);
+
+    QXmppPresence presence;
+    presence.setFrom(jid);
+    presence.setType(QXmppPresence::Unavailable);
+    return presence;
+}
+
+/// Returns the list of participant JIDs.
+
+QStringList QXmppMucRoom::participants() const
+{
+    return d->participants.keys();
+}
+
+/// Returns the chat room password.
+
+QString QXmppMucRoom::password() const
+{
+    return d->password;
+}
+
+/// Sets the chat room password.
+///
+/// \param password
+
+void QXmppMucRoom::setPassword(const QString &password)
+{
+    d->password = password;
+}
+
+QXmppPresence::Status QXmppMucRoom::status() const
+{
+    return d->status;
+}
+
+void QXmppMucRoom::setStatus(const QXmppPresence::Status &status)
+{
+    d->status = status;
+}
+
+/// Returns the room's subject.
+
+QString QXmppMucRoom::subject() const
+{
+    return d->subject;
+}
+
+/// Sets the chat room's subject.
+///
+/// \param subject
+
+void QXmppMucRoom::setSubject(const QString &subject)
+{
+    QXmppMessage msg;
+    msg.setTo(d->jid);
+    msg.setType(QXmppMessage::GroupChat);
+    msg.setSubject(subject);
+    d->client->sendPacket(msg);
+}
+
+/// Request the configuration form for the chat room.
+///
+/// \return true if the request was sent, false otherwise
+///
+/// \sa configurationReceived()
+
+bool QXmppMucRoom::requestConfiguration()
+{
+    QXmppMucOwnerIq iq;
+    iq.setTo(d->jid);
+    return d->client->sendPacket(iq);
+}
+
+/// Send the configuration form for the chat room.
+///
+/// \param form
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::setConfiguration(const QXmppDataForm &form)
+{
+    QXmppMucOwnerIq iqPacket;
+    iqPacket.setType(QXmppIq::Set);
+    iqPacket.setTo(d->jid);
+    iqPacket.setForm(form);
+    return d->client->sendPacket(iqPacket);
+}
+
+/// Request the room's permissions.
+///
+/// \return true if the request was sent, false otherwise
+///
+/// \sa permissionsReceived()
+
+bool QXmppMucRoom::requestPermissions()
+{
+    QList<QXmppMucAdminIq::Item::Affiliation> affiliations;
+    affiliations << QXmppMucAdminIq::Item::OwnerAffiliation;
+    affiliations << QXmppMucAdminIq::Item::AdminAffiliation;
+    affiliations << QXmppMucAdminIq::Item::MemberAffiliation;
+    affiliations << QXmppMucAdminIq::Item::OutcastAffiliation;
+    foreach (QXmppMucAdminIq::Item::Affiliation affiliation, affiliations) {
+        QXmppMucAdminIq::Item item;
+        item.setAffiliation(affiliation);
+
+        QXmppMucAdminIq iq;
+        iq.setTo(d->jid);
+        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
+        if (!d->client->sendPacket(iq))
+            return false;
+    }
+    return true;
+}
+
+/// Sets the room's permissions.
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::setPermissions(const QList<QXmppMucAdminIq::Item> &permissions)
+{
+    QList<QXmppMucAdminIq::Item> items;
+
+    // Process changed members
+    foreach (const QXmppMucAdminIq::Item &item, permissions) {
+        const QString jid = item.jid();
+        if (d->affiliations.value(jid) != item.affiliation())
+            items << item;
+        d->affiliations.remove(jid);
+    }
+
+    // Process deleted members
+    foreach (const QString &jid, d->affiliations.keys()) {
+        QXmppMucAdminIq::Item item;
+        item.setAffiliation(QXmppMucAdminIq::Item::NoAffiliation);
+        item.setJid(jid);
+        items << item;
+        d->affiliations.remove(jid);
+    }
+
+    // Don't send request if there are no changes
+    if (items.isEmpty())
+        return false;
+
+    QXmppMucAdminIq iq;
+    iq.setTo(d->jid);
+    iq.setType(QXmppIq::Set);
+    iq.setItems(items);
+    return d->client->sendPacket(iq);
+}
+
+void QXmppMucRoom::_q_disconnected()
+{
+    const bool wasJoined = isJoined();
+
+    // clear chat room participants
+    const QStringList removed = d->participants.keys();
+    d->participants.clear();
+    foreach (const QString &jid, removed)
+        emit participantRemoved(jid);
+
+    // emit "left" signal if we had joined the room
+    if (wasJoined)
+        emit left();
+}
+
+void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
+{
+    if (jidToBareJid(message.from())!= d->jid ||
+        message.type() != QXmppMessage::GroupChat)
+        return;
+
+    // handle message subject
+    const QString subject = message.subject();
+    if (!subject.isEmpty()) {
+        d->subject = subject;
+        emit subjectChanged(subject);
+    }
+
+    emit messageReceived(message);
+}
+
+void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
+{
+    const QString jid = presence.from();
+    if (jidToBareJid(jid)!= d->jid)
+        return;
+
+    if (presence.type() == QXmppPresence::Available) {
+        const bool added = !d->participants.contains(jid);
+        d->participants.insert(jid, presence);
+        if (added) {
+            emit participantAdded(jid);
+            if (jid == d->ownJid()) {
+
+                // check whether we own the room
+                foreach (const QXmppElement &x, presence.extensions()) {
+                    if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
+                    {
+                        QXmppElement item = x.firstChildElement("item");
+                        if (item.attribute("jid") == d->client->configuration().jid()) {
+                            d->allowedActions = NoAction;
+
+                            // role
+                            if (item.attribute("role") == "moderator")
+                                d->allowedActions |= (KickAction | SubjectAction);
+
+                            // affiliation
+                            if (item.attribute("affiliation") == "owner")
+                                d->allowedActions |= (ConfigurationAction | PermissionsAction | SubjectAction);
+                            else if (item.attribute("affiliation") == "admin")
+                                d->allowedActions |= (PermissionsAction | SubjectAction);
+                        }
+                    }
+                }
+
+                emit joined();
+            }
+        } else {
+            emit participantChanged(jid);
+        }
+    }
+    else if (presence.type() == QXmppPresence::Unavailable) {
+        if (d->participants.remove(jid)) {
+            emit participantRemoved(jid);
+
+            // check whether this was our own presence
+            if (jid == d->ownJid()) {
+
+                // check whether we were kicked
+                foreach (const QXmppElement &extension, presence.extensions()) {
+                    if (extension.tagName() == "x" &&
+                        extension.attribute("xmlns") == ns_muc_user) {
+                        QXmppElement status = extension.firstChildElement("status");
+                        while (!status.isNull()) {
+                            if (status.attribute("code").toInt() == 307) {
+                                QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
+                                emit kicked(reason.value());
+                                break;
+                            }
+                            status = status.nextSiblingElement("status");
+                        }
+                    }
+                }
+
+                // notify user we left the room
+                emit left();
+            }
+        }
+    }
+}
