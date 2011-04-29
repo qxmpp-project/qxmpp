@@ -236,6 +236,7 @@ bool QXmppMucRoom::join()
 /// Kicks the specified user from the chat room.
 ///
 /// \param jid
+/// \param reason
 ///
 /// \return true if the request was sent, false otherwise
 
