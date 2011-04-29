@@ -55,8 +55,10 @@ class QXmppRosterIq;
 /// Function QXmppRosterManager::isRosterReceived() tells whether the roster has been
 /// received or not.
 ///
-/// Signals presenceChanged() or rosterChanged() are emitted whenever presence
-/// or roster changes respectively.
+/// The itemAdded(), itemChanged() and itemRemoved() signals are emitted whenever roster
+/// entries are added, changed or removed.
+///
+/// The presenceChanged() signal is emitted whenever the presence for a roster item changes.
 ///
 /// \ingroup Managers
 
@@ -98,8 +100,18 @@ signals:
     /// This signal is emitted when the presence of a particular bareJid and resource changes.
     void presenceChanged(const QString& bareJid, const QString& resource);
 
-    /// This signal is emitted when the roster entry of a particular bareJid changes.
+    /// \cond
+    // deprecated in release 0.4.0
     void rosterChanged(const QString& bareJid);
+    /// \endcond
+
+    /// This signal is emitted when the roster entry of a particular bareJid is
+    /// added as a result of roster push.
+    void itemAdded(const QString& bareJid);
+
+    /// This signal is emitted when the roster entry of a particular bareJid
+    /// changes as a result of roster push.
+    void itemChanged(const QString& bareJid);
 
     /// This signal is emitted when the roster entry of a particular bareJid is
     /// removed as a result of roster push.

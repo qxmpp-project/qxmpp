@@ -163,12 +163,22 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
             foreach (const QXmppRosterIq::Item &item, items) {
                 const QString bareJid = item.bareJid();
                 if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
-                    // notify the user that the item was removed if we previously had it
-                    if (m_entries.remove(bareJid))
+                    if (m_entries.remove(bareJid)) {
+                        // notify the user that the item was removed
                         emit itemRemoved(bareJid);
+                    }
                 } else {
-                    // notify the user that the item changed
+                    const bool added = !m_entries.contains(bareJid);
                     m_entries.insert(bareJid, item);
+                    if (added) {
+                        // notify the user that the item was added
+                        emit itemAdded(bareJid);
+                    } else {
+                        // notify the user that the item changed
+                        emit itemChanged(bareJid);
+                    }
+
+                    // FIXME: remove legacy signal
                     emit rosterChanged(bareJid);
                 }
             }
