@@ -160,11 +160,17 @@ void QXmppRosterManager::rosterIqReceived(const QXmppRosterIq& rosterIq)
 
             // store updated entries and notify changes
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
-            for (int i = 0; i < items.count(); i++)
-            {
-                QString bareJid = items.at(i).bareJid();
-                m_entries[bareJid] = items.at(i);
-                emit rosterChanged(bareJid);
+            foreach (const QXmppRosterIq::Item &item, items) {
+                const QString bareJid = item.bareJid();
+                if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
+                    // notify the user that the item was removed if we previously had it
+                    if (m_entries.remove(bareJid))
+                        emit itemRemoved(bareJid);
+                } else {
+                    // notify the user that the item changed
+                    m_entries.insert(bareJid, item);
+                    emit rosterChanged(bareJid);
+                }
             }
         }
         break;

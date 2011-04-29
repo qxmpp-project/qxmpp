@@ -101,6 +101,10 @@ signals:
     /// This signal is emitted when the roster entry of a particular bareJid changes.
     void rosterChanged(const QString& bareJid);
 
+    /// This signal is emitted when the roster entry of a particular bareJid is
+    /// removed as a result of roster push.
+    void itemRemoved(const QString& bareJid);
+
 private:
     //map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> m_entries;
