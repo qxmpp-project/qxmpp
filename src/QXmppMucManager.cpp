@@ -22,6 +22,7 @@
  */
 
 #include <QDomElement>
+#include <QMap>
 
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
@@ -29,6 +30,12 @@
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
+
+class QXmppMucManagerPrivate
+{
+public:
+    QMap<QString, QXmppMucRoom*> rooms;
+};
 
 class QXmppMucRoomPrivate
 {
@@ -45,16 +52,31 @@ public:
     QString subject;
 };
 
+/// Constructs a new QXmppMucManager.
+
+QXmppMucManager::QXmppMucManager()
+{
+    d = new QXmppMucManagerPrivate;
+}
+
+
+/// Destroys a new QXmppMucManager.
+
+QXmppMucManager::~QXmppMucManager()
+{
+    delete d;
+}
+
 /// Adds the given chat room to the set of manged rooms.
 ///
 /// \param roomJid
 
 QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
 {
-    QXmppMucRoom *room = m_rooms.value(roomJid);
+    QXmppMucRoom *room = d->rooms.value(roomJid);
     if (!room) {
         room = new QXmppMucRoom(client(), roomJid, this);
-        m_rooms.insert(roomJid, room);
+        d->rooms.insert(roomJid, room);
     }
     return room;
 }
@@ -64,7 +86,7 @@ void QXmppMucManager::setClient(QXmppClient* client)
     QXmppClientExtension::setClient(client);
 
     bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
-        this, SLOT(messageReceived(QXmppMessage)));
+        this, SLOT(_q_messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 }
 
@@ -87,7 +109,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
             QXmppMucAdminIq iq;
             iq.parse(element);
 
-            QXmppMucRoom *room = m_rooms.value(iq.from());
+            QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result) {
                 foreach (const QXmppMucAdminIq::Item &item, iq.items()) {
                     const QString jid = item.jid();
@@ -103,7 +125,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
             QXmppMucOwnerIq iq;
             iq.parse(element);
 
-            QXmppMucRoom *room = m_rooms.value(iq.from());
+            QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result && !iq.form().isNull())
                 emit room->configurationReceived(iq.form());
             return true;
@@ -112,7 +134,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
     return false;
 }
 
-void QXmppMucManager::messageReceived(const QXmppMessage &msg)
+void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
 {
     if (msg.type() != QXmppMessage::Normal)
         return;
@@ -123,7 +145,7 @@ void QXmppMucManager::messageReceived(const QXmppMessage &msg)
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
         {
             const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && !m_rooms.contains(roomJid))
+            if (!roomJid.isEmpty() && !d->rooms.contains(roomJid))
                 emit invitationReceived(roomJid, msg.from(), extension.attribute("reason"));
             break;
         }
@@ -210,6 +232,27 @@ bool QXmppMucRoom::join()
     }
     packet.setExtensions(x);
     return d->client->sendPacket(packet);
+}
+
+/// Kicks the specified user from the chat room.
+///
+/// \param jid
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::kick(const QString &jid, const QString &reason)
+{
+    QXmppMucAdminIq::Item item;
+    item.setNick(jidToResource(jid));
+    item.setRole(QXmppMucAdminIq::Item::NoRole);
+    item.setReason(reason);
+
+    QXmppMucAdminIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.setTo(d->jid);
+    iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
+
+    return d->client->sendPacket(iq);
 }
 
 /// Leaves the chat room.
@@ -319,6 +362,14 @@ QXmppPresence::Status QXmppMucRoom::status() const
 void QXmppMucRoom::setStatus(const QXmppPresence::Status &status)
 {
     d->status = status;
+
+    if (isJoined()) {
+        QXmppPresence packet;
+        packet.setTo(d->ownJid());
+        packet.setType(QXmppPresence::Available);
+        packet.setStatus(status);
+        d->client->sendPacket(packet);
+    }
 }
 
 /// Returns the room's subject.
@@ -467,7 +518,12 @@ void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
 void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
-    if (jidToBareJid(jid)!= d->jid)
+
+    // if our own presence changes, reflect it in the chat room
+    if (jid == d->client->configuration().jid())
+        setStatus(presence.status());
+
+    if (jidToBareJid(jid) != d->jid)
         return;
 
     if (presence.type() == QXmppPresence::Available) {
@@ -518,8 +574,10 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                         QXmppElement status = extension.firstChildElement("status");
                         while (!status.isNull()) {
                             if (status.attribute("code").toInt() == 307) {
-                                QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
-                                emit kicked(reason.value());
+                                // emit kick
+                                const QString actor = extension.firstChildElement("item").firstChildElement("actor").attribute("jid");
+                                const QString reason = extension.firstChildElement("item").firstChildElement("reason").value();
+                                emit kicked(actor, reason);
                                 break;
                             }
                             status = status.nextSiblingElement("status");
@@ -532,4 +590,16 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
             }
         }
     }
+    else if (presence.type() == QXmppPresence::Error) {
+        foreach (const QXmppElement &extension, presence.extensions()) {
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc) {
+                // emit error
+                emit error(presence.error());
+
+                // notify the user we left the room
+                emit left();
+                break;
+            }
+        }
+   }
 }

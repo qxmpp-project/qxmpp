@@ -24,16 +24,13 @@
 #ifndef QXMPPMUCMANAGER_H
 #define QXMPPMUCMANAGER_H
 
-#include <QMap>
-
 #include "QXmppClientExtension.h"
 #include "QXmppMucIq.h"
 #include "QXmppPresence.h"
 
 class QXmppDataForm;
 class QXmppMessage;
-class QXmppMucAdminIq;
-class QXmppMucOwnerIq;
+class QXmppMucManagerPrivate;
 class QXmppMucRoom;
 class QXmppMucRoomPrivate;
 
@@ -63,6 +60,9 @@ class QXmppMucManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    QXmppMucManager();
+    ~QXmppMucManager();
+
     QXmppMucRoom *addRoom(const QString &roomJid);
 
     /// \cond
@@ -80,10 +80,10 @@ protected:
     /// \endcond
 
 private slots:
-    void messageReceived(const QXmppMessage &message);
+    void _q_messageReceived(const QXmppMessage &message);
 
 private:
-    QMap<QString, QXmppMucRoom*> m_rooms;
+    QXmppMucManagerPrivate *d;
 };
 
 /// \brief The QXmppMucRoom class represents a multi-user chat room
@@ -137,11 +137,14 @@ signals:
     /// This signal is emitted when the configuration form for the room is received.
     void configurationReceived(const QXmppDataForm &configuration);
 
+    /// This signal is emitted when an error is encountered.
+    void error(const QXmppStanza::Error &error);
+
     /// This signal is emitted once you have joined the room.
     void joined();
 
     /// This signal is emitted if you get kicked from the room.
-    void kicked(const QString &reason);
+    void kicked(const QString &jid, const QString &reason);
 
     /// This signal is emiited once you have left the room.
     void left();
@@ -166,6 +169,7 @@ signals:
 
 public slots:
     bool join();
+    bool kick(const QString &jid, const QString &reason);
     bool leave();
     bool requestConfiguration();
     bool requestPermissions();
