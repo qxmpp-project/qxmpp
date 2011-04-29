@@ -130,9 +130,6 @@ public:
     QString subject() const;
     void setSubject(const QString &subject);
 
-    QXmppPresence::Status status() const;
-    void setStatus(const QXmppPresence::Status &status);
-
 signals:
     /// This signal is emitted when the configuration form for the room is received.
     void configurationReceived(const QXmppDataForm &configuration);

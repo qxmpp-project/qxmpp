@@ -48,7 +48,6 @@ public:
     QString password;
     QMap<QString, QXmppMucAdminIq::Item::Affiliation> affiliations;
     QString nickName;
-    QXmppPresence::Status status;
     QString subject;
 };
 
@@ -216,10 +215,10 @@ bool QXmppMucRoom::join()
     if (isJoined() || d->nickName.isEmpty())
         return false;
 
-    QXmppPresence packet;
+    // reflect our current presence in the chat room
+    QXmppPresence packet = d->client->clientPresence();
     packet.setTo(d->ownJid());
     packet.setType(QXmppPresence::Available);
-    packet.setStatus(d->status);
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_muc);
@@ -310,10 +309,23 @@ bool QXmppMucRoom::sendMessage(const QString &text)
 }
 
 /// Sets your own nickname.
+///
+/// You need to set your nickname before calling join().
+///
+/// \param nickName
 
 void QXmppMucRoom::setNickName(const QString &nickName)
 {
+    const bool wasJoined = isJoined();
     d->nickName = nickName;
+
+    // if we had already joined the room, request nickname change
+    if (wasJoined) {
+        QXmppPresence packet = d->client->clientPresence();
+        packet.setTo(d->ownJid());
+        packet.setType(QXmppPresence::Available);
+        d->client->sendPacket(packet);
+    }
 }
 
 /// Returns the presence for the given participant.
@@ -352,24 +364,6 @@ QString QXmppMucRoom::password() const
 void QXmppMucRoom::setPassword(const QString &password)
 {
     d->password = password;
-}
-
-QXmppPresence::Status QXmppMucRoom::status() const
-{
-    return d->status;
-}
-
-void QXmppMucRoom::setStatus(const QXmppPresence::Status &status)
-{
-    d->status = status;
-
-    if (isJoined()) {
-        QXmppPresence packet;
-        packet.setTo(d->ownJid());
-        packet.setType(QXmppPresence::Available);
-        packet.setStatus(status);
-        d->client->sendPacket(packet);
-    }
 }
 
 /// Returns the room's subject.
@@ -520,8 +514,11 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
     const QString jid = presence.from();
 
     // if our own presence changes, reflect it in the chat room
-    if (jid == d->client->configuration().jid())
-        setStatus(presence.status());
+    if (isJoined() && jid == d->client->configuration().jid()) {
+        QXmppPresence packet = d->client->clientPresence();
+        packet.setTo(d->ownJid());
+        d->client->sendPacket(packet);
+    }
 
     if (jidToBareJid(jid) != d->jid)
         return;
