@@ -1,13 +1,14 @@
 QXmpp 0.x.y (UNRELEASED)
 ------------------------
 
-  - Removed deprecated  "get*" getter accessors from:
+  - Remove deprecated  "get*" getter accessors from:
     QXmppMessage
     QXmppPresence
     QXmppIq
     QXmppStanza
 
   - Add TURN support for VoIP calls to use a relay in double-NAT network topologies.
+  - Overhaul Multi-User Chat support to make it easier and more fully featured.
 
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------
