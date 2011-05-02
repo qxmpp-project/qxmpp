@@ -511,8 +511,7 @@ void QXmppMucRoom::_q_disconnected()
 
 void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
 {
-    if (jidToBareJid(message.from())!= d->jid ||
-        message.type() != QXmppMessage::GroupChat)
+    if (jidToBareJid(message.from())!= d->jid)
         return;
 
     // handle message subject
