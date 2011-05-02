@@ -89,6 +89,7 @@ void QXmppMucManager::setClient(QXmppClient* client)
     bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
         this, SLOT(_q_messageReceived(QXmppMessage)));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 QStringList QXmppMucManager::discoveryFeatures() const
