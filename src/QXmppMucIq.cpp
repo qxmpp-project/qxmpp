@@ -27,133 +27,192 @@
 #include "QXmppMucIq.h"
 #include "QXmppUtils.h"
 
-QXmppMucAdminIq::Item::Item()
-    : m_affiliation(QXmppMucAdminIq::Item::UnspecifiedAffiliation),
-    m_role(QXmppMucAdminIq::Item::UnspecifiedRole)
+QXmppMucItem::QXmppMucItem()
+    : m_affiliation(QXmppMucItem::UnspecifiedAffiliation),
+    m_role(QXmppMucItem::UnspecifiedRole)
 {
 }
 
-QXmppMucAdminIq::Item::Affiliation QXmppMucAdminIq::Item::affiliation() const
+bool QXmppMucItem::isNull() const
+{
+    return m_actor.isEmpty() &&
+           m_affiliation == UnspecifiedAffiliation &&
+           m_jid.isEmpty() &&
+           m_nick.isEmpty() &&
+           m_reason.isEmpty() &&
+           m_role == UnspecifiedRole;
+}
+
+QString QXmppMucItem::actor() const
+{
+    return m_actor;
+}
+
+void QXmppMucItem::setActor(const QString &actor)
+{
+    m_actor = actor;
+}
+
+/// Returns the user's affiliation, i.e. long-lived permissions.
+
+QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
 {
     return m_affiliation;
 }
 
-QXmppMucAdminIq::Item::Affiliation QXmppMucAdminIq::Item::affiliationFromString(const QString &affiliationStr)
+QXmppMucItem::Affiliation QXmppMucItem::affiliationFromString(const QString &affiliationStr)
 {
     if (affiliationStr == "owner")
-        return QXmppMucAdminIq::Item::OwnerAffiliation;
+        return QXmppMucItem::OwnerAffiliation;
     else if (affiliationStr == "admin")
-        return QXmppMucAdminIq::Item::AdminAffiliation;
+        return QXmppMucItem::AdminAffiliation;
     else if (affiliationStr == "member")
-        return QXmppMucAdminIq::Item::MemberAffiliation;
+        return QXmppMucItem::MemberAffiliation;
     else if (affiliationStr == "outcast")
-        return QXmppMucAdminIq::Item::OutcastAffiliation;
+        return QXmppMucItem::OutcastAffiliation;
     else if (affiliationStr == "none")
-        return QXmppMucAdminIq::Item::NoAffiliation;
+        return QXmppMucItem::NoAffiliation;
     else
-        return QXmppMucAdminIq::Item::UnspecifiedAffiliation;
+        return QXmppMucItem::UnspecifiedAffiliation;
 }
 
-QString QXmppMucAdminIq::Item::affiliationToString(Affiliation affiliation)
+QString QXmppMucItem::affiliationToString(Affiliation affiliation)
 {
     switch (affiliation) {
-    case QXmppMucAdminIq::Item::OwnerAffiliation:
+    case QXmppMucItem::OwnerAffiliation:
         return "owner";
-    case QXmppMucAdminIq::Item::AdminAffiliation:
+    case QXmppMucItem::AdminAffiliation:
         return "admin";
-    case QXmppMucAdminIq::Item::MemberAffiliation:
+    case QXmppMucItem::MemberAffiliation:
         return "member";
-    case QXmppMucAdminIq::Item::OutcastAffiliation:
+    case QXmppMucItem::OutcastAffiliation:
         return "outcast";
-    case QXmppMucAdminIq::Item::NoAffiliation:
+    case QXmppMucItem::NoAffiliation:
         return "none";
     default:
         return QString();
     }
 }
 
-void QXmppMucAdminIq::Item::setAffiliation(Affiliation affiliation)
+/// Sets the user's affiliation, i.e. long-lived permissions.
+///
+/// \param affiliation
+
+void QXmppMucItem::setAffiliation(Affiliation affiliation)
 {
     m_affiliation = affiliation;
 }
 
-QString QXmppMucAdminIq::Item::jid() const
+/// Returns the user's real JID.
+
+QString QXmppMucItem::jid() const
 {
     return m_jid;
 }
 
-void QXmppMucAdminIq::Item::setJid(const QString &jid)
+/// Sets the user's real JID.
+///
+/// \param jid
+
+void QXmppMucItem::setJid(const QString &jid)
 {
     m_jid = jid;
 }
 
-QString QXmppMucAdminIq::Item::nick() const
+/// Returns the user's nickname.
+
+QString QXmppMucItem::nick() const
 {
     return m_nick;
 }
 
-void QXmppMucAdminIq::Item::setNick(const QString &nick)
+/// Sets the user's nickname.
+///
+/// \param nick
+
+void QXmppMucItem::setNick(const QString &nick)
 {
     m_nick = nick;
 }
 
-QString QXmppMucAdminIq::Item::reason() const
+QString QXmppMucItem::reason() const
 {
     return m_reason;
 }
 
-void QXmppMucAdminIq::Item::setReason(const QString &reason)
+void QXmppMucItem::setReason(const QString &reason)
 {
     m_reason = reason;
 }
 
-QXmppMucAdminIq::Item::Role QXmppMucAdminIq::Item::role() const
+/// Returns the user's role, i.e. short-lived permissions.
+
+QXmppMucItem::Role QXmppMucItem::role() const
 {
     return m_role;
 }
 
-QXmppMucAdminIq::Item::Role QXmppMucAdminIq::Item::roleFromString(const QString &roleStr)
+QXmppMucItem::Role QXmppMucItem::roleFromString(const QString &roleStr)
 {
     if (roleStr == "moderator")
-        return QXmppMucAdminIq::Item::ModeratorRole;
+        return QXmppMucItem::ModeratorRole;
     else if (roleStr == "participant")
-        return QXmppMucAdminIq::Item::ParticipantRole;
+        return QXmppMucItem::ParticipantRole;
     else if (roleStr == "visitor")
-        return QXmppMucAdminIq::Item::VisitorRole;
+        return QXmppMucItem::VisitorRole;
     else if (roleStr == "none")
-        return QXmppMucAdminIq::Item::NoRole;
+        return QXmppMucItem::NoRole;
     else
-        return QXmppMucAdminIq::Item::UnspecifiedRole;
+        return QXmppMucItem::UnspecifiedRole;
 }
 
-QString QXmppMucAdminIq::Item::roleToString(Role role)
+QString QXmppMucItem::roleToString(Role role)
 {
     switch (role) {
-    case QXmppMucAdminIq::Item::ModeratorRole:
+    case QXmppMucItem::ModeratorRole:
         return "moderator";
-    case QXmppMucAdminIq::Item::ParticipantRole:
+    case QXmppMucItem::ParticipantRole:
         return "participant";
-    case QXmppMucAdminIq::Item::VisitorRole:
+    case QXmppMucItem::VisitorRole:
         return "visitor";
-    case QXmppMucAdminIq::Item::NoRole:
+    case QXmppMucItem::NoRole:
         return "none";
     default:
         return QString();
     }
 }
 
-void QXmppMucAdminIq::Item::setRole(Role role)
+/// Sets the user's role, i.e. short-lived permissions.
+///
+/// \param role
+
+void QXmppMucItem::setRole(Role role)
 {
     m_role = role;
 }
 
-void QXmppMucAdminIq::Item::toXml(QXmlStreamWriter *writer) const
+void QXmppMucItem::parse(const QDomElement &element)
+{
+    m_affiliation = QXmppMucItem::affiliationFromString(element.attribute("affiliation").toLower());
+    m_jid = element.attribute("jid");
+    m_nick = element.attribute("nick");
+    m_role = QXmppMucItem::roleFromString(element.attribute("role").toLower());
+    m_actor = element.firstChildElement("actor").attribute("jid");
+    m_reason = element.firstChildElement("reason").text();
+}
+
+void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("item");
-    helperToXmlAddAttribute(writer, "jid", m_jid);
     helperToXmlAddAttribute(writer, "affiliation", affiliationToString(m_affiliation));
+    helperToXmlAddAttribute(writer, "jid", m_jid);
     helperToXmlAddAttribute(writer, "nick", m_nick);
     helperToXmlAddAttribute(writer, "role", roleToString(m_role));
+    if (!m_actor.isEmpty()) {
+        writer->writeStartElement("actor");
+        helperToXmlAddAttribute(writer, "jid", m_actor);
+        writer->writeEndElement();
+    }
     if (!m_reason.isEmpty())
         helperToXmlAddTextElement(writer, "reason", m_reason);
     writer->writeEndElement();
@@ -161,7 +220,7 @@ void QXmppMucAdminIq::Item::toXml(QXmlStreamWriter *writer) const
 
 /// Returns the IQ's items.
 
-QList<QXmppMucAdminIq::Item> QXmppMucAdminIq::items() const
+QList<QXmppMucItem> QXmppMucAdminIq::items() const
 {
     return m_items;
 }
@@ -170,7 +229,7 @@ QList<QXmppMucAdminIq::Item> QXmppMucAdminIq::items() const
 ///
 /// \param items
 
-void QXmppMucAdminIq::setItems(const QList<QXmppMucAdminIq::Item> &items)
+void QXmppMucAdminIq::setItems(const QList<QXmppMucItem> &items)
 {
     m_items = items;
 }
@@ -187,12 +246,8 @@ void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
     QDomElement child = queryElement.firstChildElement("item");
     while (!child.isNull())
     {
-        QXmppMucAdminIq::Item item;
-        item.setAffiliation(QXmppMucAdminIq::Item::affiliationFromString(child.attribute("affiliation").toLower()));
-        item.setJid(child.attribute("jid"));
-        item.setNick(child.attribute("nick"));
-        item.setRole(QXmppMucAdminIq::Item::roleFromString(child.attribute("role").toLower()));
-        item.setReason(child.firstChildElement("reason").text());
+        QXmppMucItem item;
+        item.parse(child);
         m_items << item;
         child = child.nextSiblingElement("item");
     }
@@ -202,7 +257,7 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeAttribute("xmlns", ns_muc_admin);
-    foreach (const QXmppMucAdminIq::Item &item, m_items)
+    foreach (const QXmppMucItem &item, m_items)
         item.toXml(writer);
     writer->writeEndElement();
 }

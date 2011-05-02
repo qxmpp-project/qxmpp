@@ -27,6 +27,73 @@
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
+/// \brief The QXmppMucItem class represents a chat room "item".
+///
+/// It is used to convey information such as permissions.
+///
+/// \ingroup Stanzas
+
+class QXmppMucItem
+{
+public:
+    /// This enum is used to represent long-lived permissions in a room (affiliations).
+    enum Affiliation {
+        UnspecifiedAffiliation,
+        OutcastAffiliation,
+        NoAffiliation,
+        MemberAffiliation,
+        AdminAffiliation,
+        OwnerAffiliation,
+    };
+
+    /// This enum is used to represent short-lived permissions in a room (roles).
+    enum Role {
+        UnspecifiedRole,
+        NoRole,
+        VisitorRole,
+        ParticipantRole,
+        ModeratorRole,
+    };
+
+    QXmppMucItem();
+    bool isNull() const;
+
+    QString actor() const;
+    void setActor(const QString &actor);
+
+    Affiliation affiliation() const;
+    void setAffiliation(Affiliation affiliation);
+
+    QString jid() const;
+    void setJid(const QString &jid);
+
+    QString nick() const;
+    void setNick(const QString &nick);
+
+    QString reason() const;
+    void setReason(const QString &reason);
+
+    Role role() const;
+    void setRole(Role role);
+
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    /// \cond
+    static Affiliation affiliationFromString(const QString &affiliationStr);
+    static QString affiliationToString(Affiliation affiliation);
+    static Role roleFromString(const QString &roleStr);
+    static QString roleToString(Role role);
+    /// \endcond
+private:
+    QString m_actor;
+    Affiliation m_affiliation;
+    QString m_jid;
+    QString m_nick;
+    QString m_reason;
+    Role m_role;
+};
+
 /// \brief The QXmppMucAdminIq class represents a chat room administration IQ
 /// as defined by XEP-0045: Multi-User Chat.
 ///
@@ -37,62 +104,8 @@
 class QXmppMucAdminIq : public QXmppIq
 {
 public:
-    class Item
-    {
-    public:
-        enum Affiliation {
-            UnspecifiedAffiliation,
-            OutcastAffiliation,
-            NoAffiliation,
-            MemberAffiliation,
-            AdminAffiliation,
-            OwnerAffiliation,
-        };
-
-        enum Role {
-            UnspecifiedRole,
-            NoRole,
-            VisitorRole,
-            ParticipantRole,
-            ModeratorRole,
-        };
-
-        Item();
-
-        Affiliation affiliation() const;
-        void setAffiliation(Affiliation affiliation);
-
-        QString jid() const;
-        void setJid(const QString &jid);
-
-        QString nick() const;
-        void setNick(const QString &nick);
-
-        QString reason() const;
-        void setReason(const QString &reason);
-
-        Role role() const;
-        void setRole(Role role);
-
-        void parse(const QDomElement &element);
-        void toXml(QXmlStreamWriter *writer) const;
-
-        /// \cond
-        static Affiliation affiliationFromString(const QString &affiliationStr);
-        static QString affiliationToString(Affiliation affiliation);
-        static Role roleFromString(const QString &roleStr);
-        static QString roleToString(Role role);
-        /// \endcond
-    private:
-        Affiliation m_affiliation;
-        QString m_jid;
-        QString m_nick;
-        QString m_reason;
-        Role m_role;
-    };
-
-    QList<QXmppMucAdminIq::Item> items() const;
-    void setItems(const QList<QXmppMucAdminIq::Item> &items);
+    QList<QXmppMucItem> items() const;
+    void setItems(const QList<QXmppMucItem> &items);
 
     /// \cond
     static bool isMucAdminIq(const QDomElement &element);
@@ -105,7 +118,7 @@ protected:
     /// \endcond
 
 private:
-    QList<QXmppMucAdminIq::Item> m_items;
+    QList<QXmppMucItem> m_items;
 };
 
 /// \brief The QXmppMucOwnerIq class represents a chat room configuration IQ as

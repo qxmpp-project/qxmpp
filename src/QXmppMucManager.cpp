@@ -46,7 +46,7 @@ public:
     QString jid;
     QMap<QString, QXmppPresence> participants;
     QString password;
-    QMap<QString, QXmppMucAdminIq::Item::Affiliation> affiliations;
+    QMap<QString, QXmppMucItem::Affiliation> affiliations;
     QString nickName;
     QString subject;
 };
@@ -59,7 +59,7 @@ QXmppMucManager::QXmppMucManager()
 }
 
 
-/// Destroys a new QXmppMucManager.
+/// Destroys a QXmppMucManager.
 
 QXmppMucManager::~QXmppMucManager()
 {
@@ -76,6 +76,8 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
     if (!room) {
         room = new QXmppMucRoom(client(), roomJid, this);
         d->rooms.insert(roomJid, room);
+        connect(room, SIGNAL(destroyed(QObject*)),
+            this, SLOT(_q_roomDestroyed(QObject*)));
     }
     return room;
 }
@@ -110,7 +112,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result) {
-                foreach (const QXmppMucAdminIq::Item &item, iq.items()) {
+                foreach (const QXmppMucItem &item, iq.items()) {
                     const QString jid = item.jid();
                     if (!room->d->affiliations.contains(jid))
                         room->d->affiliations.insert(jid, item.affiliation());
@@ -149,6 +151,12 @@ void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
             break;
         }
     }
+}
+
+void QXmppMucManager::_q_roomDestroyed(QObject *object)
+{
+    const QString key = d->rooms.key(static_cast<QXmppMucRoom*>(object));
+    d->rooms.remove(key);
 }
 
 /// Constructs a new QXmppMucRoom.
@@ -242,15 +250,15 @@ bool QXmppMucRoom::join()
 
 bool QXmppMucRoom::kick(const QString &jid, const QString &reason)
 {
-    QXmppMucAdminIq::Item item;
+    QXmppMucItem item;
     item.setNick(jidToResource(jid));
-    item.setRole(QXmppMucAdminIq::Item::NoRole);
+    item.setRole(QXmppMucItem::NoRole);
     item.setReason(reason);
 
     QXmppMucAdminIq iq;
     iq.setType(QXmppIq::Set);
     iq.setTo(d->jid);
-    iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
+    iq.setItems(QList<QXmppMucItem>() << item);
 
     return d->client->sendPacket(iq);
 }
@@ -423,18 +431,18 @@ bool QXmppMucRoom::setConfiguration(const QXmppDataForm &form)
 
 bool QXmppMucRoom::requestPermissions()
 {
-    QList<QXmppMucAdminIq::Item::Affiliation> affiliations;
-    affiliations << QXmppMucAdminIq::Item::OwnerAffiliation;
-    affiliations << QXmppMucAdminIq::Item::AdminAffiliation;
-    affiliations << QXmppMucAdminIq::Item::MemberAffiliation;
-    affiliations << QXmppMucAdminIq::Item::OutcastAffiliation;
-    foreach (QXmppMucAdminIq::Item::Affiliation affiliation, affiliations) {
-        QXmppMucAdminIq::Item item;
+    QList<QXmppMucItem::Affiliation> affiliations;
+    affiliations << QXmppMucItem::OwnerAffiliation;
+    affiliations << QXmppMucItem::AdminAffiliation;
+    affiliations << QXmppMucItem::MemberAffiliation;
+    affiliations << QXmppMucItem::OutcastAffiliation;
+    foreach (QXmppMucItem::Affiliation affiliation, affiliations) {
+        QXmppMucItem item;
         item.setAffiliation(affiliation);
 
         QXmppMucAdminIq iq;
         iq.setTo(d->jid);
-        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
+        iq.setItems(QList<QXmppMucItem>() << item);
         if (!d->client->sendPacket(iq))
             return false;
     }
@@ -447,12 +455,12 @@ bool QXmppMucRoom::requestPermissions()
 ///
 /// \return true if the request was sent, false otherwise
 
-bool QXmppMucRoom::setPermissions(const QList<QXmppMucAdminIq::Item> &permissions)
+bool QXmppMucRoom::setPermissions(const QList<QXmppMucItem> &permissions)
 {
-    QList<QXmppMucAdminIq::Item> items;
+    QList<QXmppMucItem> items;
 
     // Process changed members
-    foreach (const QXmppMucAdminIq::Item &item, permissions) {
+    foreach (const QXmppMucItem &item, permissions) {
         const QString jid = item.jid();
         if (d->affiliations.value(jid) != item.affiliation())
             items << item;
@@ -461,8 +469,8 @@ bool QXmppMucRoom::setPermissions(const QList<QXmppMucAdminIq::Item> &permission
 
     // Process deleted members
     foreach (const QString &jid, d->affiliations.keys()) {
-        QXmppMucAdminIq::Item item;
-        item.setAffiliation(QXmppMucAdminIq::Item::NoAffiliation);
+        QXmppMucItem item;
+        item.setAffiliation(QXmppMucItem::NoAffiliation);
         item.setJid(jid);
         items << item;
         d->affiliations.remove(jid);
@@ -532,24 +540,19 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
             if (jid == d->ownJid()) {
 
                 // check whether we own the room
-                foreach (const QXmppElement &x, presence.extensions()) {
-                    if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
-                    {
-                        QXmppElement item = x.firstChildElement("item");
-                        if (item.attribute("jid") == d->client->configuration().jid()) {
-                            d->allowedActions = NoAction;
+                QXmppMucItem mucItem = presence.mucItem();
+                if (mucItem.jid() == d->client->configuration().jid()) {
+                    d->allowedActions = NoAction;
 
-                            // role
-                            if (item.attribute("role") == "moderator")
-                                d->allowedActions |= (KickAction | SubjectAction);
+                    // role
+                    if (mucItem.role() == QXmppMucItem::ModeratorRole)
+                        d->allowedActions |= (KickAction | SubjectAction);
 
-                            // affiliation
-                            if (item.attribute("affiliation") == "owner")
-                                d->allowedActions |= (ConfigurationAction | PermissionsAction | SubjectAction);
-                            else if (item.attribute("affiliation") == "admin")
-                                d->allowedActions |= (PermissionsAction | SubjectAction);
-                        }
-                    }
+                    // affiliation
+                    if (mucItem.affiliation() == QXmppMucItem::OwnerAffiliation)
+                        d->allowedActions |= (ConfigurationAction | PermissionsAction | SubjectAction);
+                    else if (mucItem.affiliation() == QXmppMucItem::AdminAffiliation)
+                        d->allowedActions |= (PermissionsAction | SubjectAction);
                 }
 
                 emit joined();
@@ -566,22 +569,17 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
             if (jid == d->ownJid()) {
 
                 // check whether we were kicked
-                foreach (const QXmppElement &extension, presence.extensions()) {
-                    if (extension.tagName() == "x" &&
-                        extension.attribute("xmlns") == ns_muc_user) {
-                        QXmppElement status = extension.firstChildElement("status");
-                        while (!status.isNull()) {
-                            if (status.attribute("code").toInt() == 307) {
-                                // emit kick
-                                const QString actor = extension.firstChildElement("item").firstChildElement("actor").attribute("jid");
-                                const QString reason = extension.firstChildElement("item").firstChildElement("reason").value();
-                                emit kicked(actor, reason);
-                                break;
-                            }
-                            status = status.nextSiblingElement("status");
-                        }
-                    }
+                if (presence.mucStatusCodes().contains(307)) {
+                    const QString actor = presence.mucItem().actor();
+                    const QString reason = presence.mucItem().reason();
+                    emit kicked(actor, reason);
                 }
+
+                // clear chat room participants
+                const QStringList removed = d->participants.keys();
+                d->participants.clear();
+                foreach (const QString &jid, removed)
+                    emit participantRemoved(jid);
 
                 // notify user we left the room
                 emit left();

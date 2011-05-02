@@ -81,6 +81,7 @@ protected:
 
 private slots:
     void _q_messageReceived(const QXmppMessage &message);
+    void _q_roomDestroyed(QObject *object);
 
 private:
     QXmppMucManagerPrivate *d;
@@ -159,7 +160,7 @@ signals:
     void participantRemoved(const QString &jid);
 
     /// This signal is emitted when the room's permissions are received.
-    void permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions);
+    void permissionsReceived(const QList<QXmppMucItem> &permissions);
 
     /// This signal is emitted when the room's subject changes.
     void subjectChanged(const QString &subject);
@@ -171,7 +172,7 @@ public slots:
     bool requestConfiguration();
     bool requestPermissions();
     bool setConfiguration(const QXmppDataForm &form);
-    bool setPermissions(const QList<QXmppMucAdminIq::Item> &permissions);
+    bool setPermissions(const QList<QXmppMucItem> &permissions);
     bool sendInvitation(const QString &jid, const QString &reason);
     bool sendMessage(const QString &text);
 
