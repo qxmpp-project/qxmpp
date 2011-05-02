@@ -503,6 +503,36 @@ void TestPackets::testPresenceWithCapability()
     serializePacket(presence, xml);
 }
 
+void TestPackets::testPresenceWithMuc()
+{
+    const QByteArray xml(
+        "<presence "
+            "to=\"pistol@shakespeare.lit/harfleur\" "
+            "from=\"harfleur@henryv.shakespeare.lit/pistol\" "
+            "type=\"unavailable\">"
+            "<x xmlns=\"http://jabber.org/protocol/muc#user\">"
+            "<item affiliation=\"none\" role=\"none\">"
+                "<actor jid=\"fluellen@shakespeare.lit\"/>"
+                "<reason>Avaunt, you cullion!</reason>"
+            "</item>"
+            "<status code=\"307\"/>"
+            "</x>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.to(), QLatin1String("pistol@shakespeare.lit/harfleur"));
+    QCOMPARE(presence.from(), QLatin1String("harfleur@henryv.shakespeare.lit/pistol"));
+    QCOMPARE(presence.type(), QXmppPresence::Unavailable);
+    QCOMPARE(presence.mucItem().actor(), QLatin1String("fluellen@shakespeare.lit"));
+    QCOMPARE(presence.mucItem().affiliation(), QXmppMucItem::NoAffiliation);
+    QCOMPARE(presence.mucItem().jid(), QString());
+    QCOMPARE(presence.mucItem().reason(), QLatin1String("Avaunt, you cullion!"));
+    QCOMPARE(presence.mucItem().role(), QXmppMucItem::NoRole);
+    QCOMPARE(presence.mucStatusCodes(), QList<int>() << 307);
+    serializePacket(presence, xml);
+}
+
 void TestPackets::testSession()
 {
     const QByteArray xml(

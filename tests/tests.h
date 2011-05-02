@@ -58,6 +58,7 @@ private slots:
     void testPresenceFull();
     void testPresenceWithVCardUpdate();
     void testPresenceWithCapability();
+    void testPresenceWithMuc();
     void testSession();
     void testStreamFeatures();
     void testVCard();
