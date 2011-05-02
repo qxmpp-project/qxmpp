@@ -107,8 +107,20 @@ void QXmppPresence::parse(const QDomElement &element)
     m_vCardUpdateType = VCardUpdateNone;
     while(!xElement.isNull())
     {
+        // XEP-0045: Multi-User Chat
+        if(xElement.namespaceURI() == ns_muc_user)
+        {
+            QDomElement itemElement = xElement.firstChildElement("item");
+            m_mucItem.parse(itemElement);
+            QDomElement statusElement = xElement.firstChildElement("status");
+            m_mucStatusCodes.clear();
+            while (!statusElement.isNull()) {
+                m_mucStatusCodes << statusElement.attribute("code").toInt();
+                statusElement = statusElement.nextSiblingElement("status");
+            }
+        }
         // XEP-0153: vCard-Based Avatars
-        if(xElement.namespaceURI() == ns_vcard_update)
+        else if(xElement.namespaceURI() == ns_vcard_update)
         {
             QDomElement photoElement = xElement.firstChildElement("photo");
             if(!photoElement.isNull())
@@ -166,6 +178,21 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     m_status.toXml(xmlWriter);
 
     error().toXml(xmlWriter);
+
+    // XEP-0045: Multi-User Chat
+    if(!m_mucItem.isNull() || !m_mucStatusCodes.isEmpty())
+    {
+        xmlWriter->writeStartElement("x");
+        xmlWriter->writeAttribute("xmlns", ns_muc_user);
+        if (!m_mucItem.isNull())
+            m_mucItem.toXml(xmlWriter);
+        foreach (int code, m_mucStatusCodes) {
+            xmlWriter->writeStartElement("status");
+            xmlWriter->writeAttribute("code", QString::number(code));
+            xmlWriter->writeEndElement();
+        }
+        xmlWriter->writeEndElement();
+    }
 
     // XEP-0153: vCard-Based Avatars
     if(m_vCardUpdateType != VCardUpdateNone)
@@ -528,5 +555,37 @@ void QXmppPresence::setCapabilityVer(const QByteArray& ver)
 QStringList QXmppPresence::capabilityExt() const
 {
     return m_capabilityExt;
+}
+
+/// Returns the MUC item.
+
+QXmppMucItem QXmppPresence::mucItem() const
+{
+    return m_mucItem;
+}
+
+/// Sets the MUC item.
+///
+/// \param item
+
+void QXmppPresence::setMucItem(const QXmppMucItem &item)
+{
+    m_mucItem = item;
+}
+
+/// Returns the MUC status codes.
+
+QList<int> QXmppPresence::mucStatusCodes() const
+{
+    return m_mucStatusCodes;
+}
+
+/// Sets the MUC item.
+///
+/// \param item
+
+void QXmppPresence::setMucStatusCodes(const QList<int> &statusCodes)
+{
+    m_mucStatusCodes = statusCodes;
 }
 

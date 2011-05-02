@@ -26,6 +26,7 @@
 #define QXMPPPRESENCE_H
 
 #include "QXmppStanza.h"
+#include "QXmppMucIq.h"
 
 /// \brief The QXmppPresence class represents an XMPP presence stanza.
 ///
@@ -120,12 +121,21 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
+    // XEP-0045: Multi-User Chat
+    QXmppMucItem mucItem() const;
+    void setMucItem(const QXmppMucItem &mucItem);
+
+    QList<int> mucStatusCodes() const;
+    void setMucStatusCodes(const QList<int> &mucStatusCodes);
+
+    /// XEP-0153: vCard-Based Avatars
     QByteArray photoHash() const;
     void setPhotoHash(const QByteArray&);
 
     VCardUpdateType vCardUpdateType() const;
     void setVCardUpdateType(VCardUpdateType type);
 
+    // XEP-0115: Entity Capabilities
     QString capabilityHash() const;
     void setCapabilityHash(const QString&);
 
@@ -158,6 +168,10 @@ private:
     QByteArray m_capabilityVer;
     // Legacy XEP-0115: Entity Capabilities
     QStringList m_capabilityExt;
+
+    // XEP-0045: Multi-User Chat
+    QXmppMucItem m_mucItem;
+    QList<int> m_mucStatusCodes;
 };
 
 #endif // QXMPPPRESENCE_H
