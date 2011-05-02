@@ -580,7 +580,7 @@ QList<int> QXmppPresence::mucStatusCodes() const
     return m_mucStatusCodes;
 }
 
-/// Sets the MUC item.
+/// Sets the MUC status codes.
 ///
 /// \param item
 
