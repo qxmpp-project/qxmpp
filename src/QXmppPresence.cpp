@@ -582,10 +582,10 @@ QList<int> QXmppPresence::mucStatusCodes() const
 
 /// Sets the MUC status codes.
 ///
-/// \param item
+/// \param codes
 
-void QXmppPresence::setMucStatusCodes(const QList<int> &statusCodes)
+void QXmppPresence::setMucStatusCodes(const QList<int> &codes)
 {
-    m_mucStatusCodes = statusCodes;
+    m_mucStatusCodes = codes;
 }
 

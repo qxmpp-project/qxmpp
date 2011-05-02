@@ -123,10 +123,10 @@ public:
 
     // XEP-0045: Multi-User Chat
     QXmppMucItem mucItem() const;
-    void setMucItem(const QXmppMucItem &mucItem);
+    void setMucItem(const QXmppMucItem &item);
 
     QList<int> mucStatusCodes() const;
-    void setMucStatusCodes(const QList<int> &mucStatusCodes);
+    void setMucStatusCodes(const QList<int> &codes);
 
     /// XEP-0153: vCard-Based Avatars
     QByteArray photoHash() const;
