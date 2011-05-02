@@ -266,13 +266,19 @@ bool QXmppMucRoom::kick(const QString &jid, const QString &reason)
 
 /// Leaves the chat room.
 ///
+/// \param message An optional message.
+///
 /// \return true if the request was sent, false otherwise
 
-bool QXmppMucRoom::leave()
+bool QXmppMucRoom::leave(const QString &message)
 {
     QXmppPresence packet;
     packet.setTo(d->ownJid());
     packet.setType(QXmppPresence::Unavailable);
+
+    QXmppPresence::Status status;
+    status.setStatusText(message);
+    packet.setStatus(status);
     return d->client->sendPacket(packet);
 }
 

@@ -168,7 +168,7 @@ signals:
 public slots:
     bool join();
     bool kick(const QString &jid, const QString &reason);
-    bool leave();
+    bool leave(const QString &message = QString());
     bool requestConfiguration();
     bool requestPermissions();
     bool setConfiguration(const QXmppDataForm &form);
