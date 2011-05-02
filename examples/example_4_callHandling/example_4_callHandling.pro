@@ -9,3 +9,8 @@ SOURCES +=  main.cpp \
             xmppClient.cpp
 
 HEADERS +=  xmppClient.h
+
+# Symbian packaging rules
+symbian {
+    TARGET.CAPABILITY = "UserEnvironment"
+}
