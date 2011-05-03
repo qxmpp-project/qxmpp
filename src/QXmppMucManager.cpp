@@ -46,7 +46,8 @@ public:
     QString jid;
     QMap<QString, QXmppPresence> participants;
     QString password;
-    QMap<QString, QXmppMucItem::Affiliation> affiliations;
+    QMap<QString, QXmppMucItem> permissions;
+    QSet<QString> permissionsQueue;
     QString nickName;
     QString subject;
 };
@@ -112,13 +113,15 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
             iq.parse(element);
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
-            if (room && iq.type() == QXmppIq::Result) {
+            if (room && iq.type() == QXmppIq::Result && room->d->permissionsQueue.remove(iq.id())) {
                 foreach (const QXmppMucItem &item, iq.items()) {
                     const QString jid = item.jid();
-                    if (!room->d->affiliations.contains(jid))
-                        room->d->affiliations.insert(jid, item.affiliation());
+                    if (!room->d->permissions.contains(jid))
+                        room->d->permissions.insert(jid, item);
                 }
-                emit room->permissionsReceived(iq.items());
+                if (room->d->permissionsQueue.isEmpty()) {
+                    emit room->permissionsReceived(room->d->permissions.values());
+                }
             }
             return true;
         }
@@ -443,6 +446,9 @@ bool QXmppMucRoom::requestPermissions()
     affiliations << QXmppMucItem::AdminAffiliation;
     affiliations << QXmppMucItem::MemberAffiliation;
     affiliations << QXmppMucItem::OutcastAffiliation;
+
+    d->permissions.clear();
+    d->permissionsQueue.clear();
     foreach (QXmppMucItem::Affiliation affiliation, affiliations) {
         QXmppMucItem item;
         item.setAffiliation(affiliation);
@@ -452,6 +458,7 @@ bool QXmppMucRoom::requestPermissions()
         iq.setItems(QList<QXmppMucItem>() << item);
         if (!d->client->sendPacket(iq))
             return false;
+        d->permissionsQueue += iq.id();
     }
     return true;
 }
@@ -469,18 +476,18 @@ bool QXmppMucRoom::setPermissions(const QList<QXmppMucItem> &permissions)
     // Process changed members
     foreach (const QXmppMucItem &item, permissions) {
         const QString jid = item.jid();
-        if (d->affiliations.value(jid) != item.affiliation())
+        if (d->permissions.value(jid).affiliation() != item.affiliation())
             items << item;
-        d->affiliations.remove(jid);
+        d->permissions.remove(jid);
     }
 
     // Process deleted members
-    foreach (const QString &jid, d->affiliations.keys()) {
+    foreach (const QString &jid, d->permissions.keys()) {
         QXmppMucItem item;
         item.setAffiliation(QXmppMucItem::NoAffiliation);
         item.setJid(jid);
         items << item;
-        d->affiliations.remove(jid);
+        d->permissions.remove(jid);
     }
 
     // Don't send request if there are no changes
