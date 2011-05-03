@@ -76,6 +76,7 @@ public:
     QXmppCall::State state;
 
     // Media streams
+    bool sendVideo;
     QList<Stream*> streams;
     QIODevice::OpenMode audioMode;
     QIODevice::OpenMode videoMode;
@@ -105,6 +106,7 @@ private:
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : state(QXmppCall::ConnectingState),
+    sendVideo(false),
     audioMode(QIODevice::NotOpen),
     videoMode(QIODevice::NotOpen),
     q(qq)
@@ -193,7 +195,6 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
         // check for call establishment
         setState(QXmppCall::ActiveState);
-        q->updateOpenMode();
 
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
@@ -338,6 +339,10 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
         q, SLOT(updateOpenMode()));
     Q_ASSERT(check);
 
+    check = QObject::connect(q, SIGNAL(stateChanged(QXmppCall::State)),
+        q, SLOT(updateOpenMode()));
+    Q_ASSERT(check);
+
     check = QObject::connect(stream->connection, SIGNAL(disconnected()),
         q, SLOT(hangup()));
     Q_ASSERT(check);
@@ -416,6 +421,8 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
 
         if (state == QXmppCall::ActiveState)
             emit q->connected();
+        else if (state == QXmppCall::FinishedState)
+            emit q->finished();
     }
 }
 
@@ -499,7 +506,6 @@ void QXmppCall::accept()
 
         // check for call establishment
         d->setState(QXmppCall::ActiveState);
-        updateOpenMode();
     }
 }
 
@@ -512,8 +518,10 @@ void QXmppCall::accept()
 QXmppRtpAudioChannel *QXmppCall::audioChannel() const
 {
     QXmppCallPrivate::Stream *stream = d->findStreamByMedia(AUDIO_MEDIA);
-    Q_ASSERT(stream);
-    return (QXmppRtpAudioChannel*)stream->channel;
+    if (stream)
+        return (QXmppRtpAudioChannel*)stream->channel;
+    else
+        return 0;
 }
 
 /// Returns the RTP channel for the video data.
@@ -522,8 +530,10 @@ QXmppRtpAudioChannel *QXmppCall::audioChannel() const
 QXmppRtpVideoChannel *QXmppCall::videoChannel() const
 {
     QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
-    Q_ASSERT(stream);
-    return (QXmppRtpVideoChannel*)stream->channel;
+    if (stream)
+        return (QXmppRtpVideoChannel*)stream->channel;
+    else
+        return 0;
 }
 
 void QXmppCall::terminated()
@@ -535,10 +545,7 @@ void QXmppCall::terminated()
     }
 
     // update state
-    d->state = QXmppCall::FinishedState;
-    updateOpenMode();
-    emit stateChanged(d->state);
-    emit finished();
+    d->setState(QXmppCall::FinishedState);
 }
 
 /// Returns the call's direction.
@@ -608,7 +615,7 @@ void QXmppCall::updateOpenMode()
     // determine audio mode
     mode = QIODevice::NotOpen;
     stream = d->findStreamByMedia(AUDIO_MEDIA);
-    if (stream && stream->connection->isConnected())
+    if (d->state == QXmppCall::ActiveState && stream && stream->connection->isConnected())
         mode = stream->channel->openMode() & QIODevice::ReadWrite;
     if (mode != d->audioMode) {
         d->audioMode = mode;
@@ -618,8 +625,11 @@ void QXmppCall::updateOpenMode()
     // determine video mode
     mode = QIODevice::NotOpen;
     stream = d->findStreamByMedia(VIDEO_MEDIA);
-    if (stream && stream->connection->isConnected())
-        mode = stream->channel->openMode() & QIODevice::ReadWrite;
+    if (d->state == QXmppCall::ActiveState && stream && stream->connection->isConnected()) {
+        mode |= (stream->channel->openMode() & QIODevice::ReadOnly);
+        if (d->sendVideo)
+            mode |= (stream->channel->openMode() & QIODevice::WriteOnly);
+    }
     if (mode != d->videoMode) {
         d->videoMode = mode;
         emit videoModeChanged(mode);
@@ -650,9 +660,12 @@ void QXmppCall::startVideo()
         return;
     }
 
+    d->sendVideo = true;
     QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
-    if (stream)
+    if (stream) {
+        updateOpenMode();
         return;
+    }
 
     // create video stream
     stream = d->createStream(VIDEO_MEDIA);
