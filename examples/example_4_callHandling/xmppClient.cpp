@@ -93,7 +93,7 @@ void xmppClient::slotCallReceived(QXmppCall *call)
     qDebug() << "Got call from:" << call->jid();
 
     bool check;
-    check = connect(call, SIGNAL(stateChanged()),
+    check = connect(call, SIGNAL(stateChanged(QXmppCall::State)),
                     this, SLOT(slotCallStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
 
@@ -133,10 +133,13 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     // start the call and connect to the its signals
     QXmppCall *call = callManager->call(presence.from());
 
-    bool check = connect(call, SIGNAL(connected()), this, SLOT(slotConnected()));
+    bool check;
+    check = connect(call, SIGNAL(stateChanged(QXmppCall:State)),
+                    this, SLOT(slotCallStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
 
-    check = connect(call, SIGNAL(finished()), this, SLOT(slotFinished()));
+    check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                    this, SLOT(slotAudioModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
 }
 
