@@ -25,10 +25,8 @@
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
+#include "QXmppCallManager.h"
 #include "QXmppClient.h"
-
-class QXmppCall;
-class QXmppCallManager;
 
 class xmppClient : public QXmppClient
 {
@@ -38,9 +36,9 @@ public:
     xmppClient(QObject *parent = 0);
 
 private slots:
+    void slotAudioModeChanged(QIODevice::OpenMode mode);
     void slotCallReceived(QXmppCall *call);
-    void slotConnected();
-    void slotFinished();
+    void slotCallStateChanged(QXmppCall::State state);
     void slotPresenceReceived(const QXmppPresence &presence);
 
 private:

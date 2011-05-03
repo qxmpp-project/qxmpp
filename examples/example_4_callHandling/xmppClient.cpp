@@ -49,30 +49,12 @@ xmppClient::xmppClient(QObject *parent)
     Q_ASSERT(check);
 }
 
-/// A call was received.
+/// The audio mode of a call changed.
 
-void xmppClient::slotCallReceived(QXmppCall *call)
-{
-    qDebug() << "Got call from:" << call->jid();
-
-    bool check = connect(call, SIGNAL(connected()), this, SLOT(slotConnected()));
-    Q_ASSERT(check);
-
-    check = connect(call, SIGNAL(finished()), this, SLOT(slotFinished()));
-    Q_ASSERT(check);
-
-    // accept call    
-    call->accept();
-}
-
-/// A call connected.
-
-void xmppClient::slotConnected()
+void xmppClient::slotAudioModeChanged(QIODevice::OpenMode mode)
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
     Q_ASSERT(call);
-
-    qDebug() << "Call connected";
     QXmppRtpAudioChannel *channel = call->audioChannel();
 
     // prepare audio format
@@ -88,22 +70,51 @@ void xmppClient::slotConnected()
     // 160 ms seems to be the minimum to work consistently on Linux/Mac/Windows
     const int bufferSize = (format.frequency() * format.channels() * (format.sampleSize() / 8) * 160) / 1000;
 
-    // initialise audio output
-    QAudioOutput *audioOutput = new QAudioOutput(format, this);
-    audioOutput->setBufferSize(bufferSize);
-    audioOutput->start(channel);
+    if (mode & QIODevice::ReadOnly) {
+        // initialise audio output
+        QAudioOutput *audioOutput = new QAudioOutput(format, this);
+        audioOutput->setBufferSize(bufferSize);
+        audioOutput->start(channel);
+    }
 
-    // initialise audio input
-    QAudioInput *audioInput = new QAudioInput(format, this);
-    audioInput->setBufferSize(bufferSize);
-    audioInput->start(channel);
+    if (mode & QIODevice::WriteOnly) {
+        // initialise audio input
+        QAudioInput *audioInput = new QAudioInput(format, this);
+        audioInput->setBufferSize(bufferSize);
+        audioInput->start(channel);
+    }
 }
 
-/// A call finished.
 
-void xmppClient::slotFinished()
+/// A call was received.
+
+void xmppClient::slotCallReceived(QXmppCall *call)
 {
-    qDebug() << "Call finished";
+    qDebug() << "Got call from:" << call->jid();
+
+    bool check;
+    check = connect(call, SIGNAL(stateChanged()),
+                    this, SLOT(slotCallStateChanged(QXmppCall::State)));
+    Q_ASSERT(check);
+
+    check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                    this, SLOT(slotAudioModeChanged(QIODevice::OpenMode)));
+    Q_ASSERT(check);
+
+    // accept call    
+    call->accept();
+}
+
+/// A call changed state.
+
+void xmppClient::slotCallStateChanged(QXmppCall::State state)
+{
+    if (state == QXmppCall::ActiveState)
+        qDebug("Call active");
+    else if (state == QXmppCall::DisconnectingState)
+        qDebug("Call disconnecting");
+    else if (state == QXmppCall::FinishedState)
+        qDebug("Call finished");
 }
 
 /// A presence was received.
