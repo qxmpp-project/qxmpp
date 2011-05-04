@@ -511,6 +511,12 @@ void QXmppMucRoom::_q_disconnected()
     foreach (const QString &jid, removed)
         emit participantRemoved(jid);
 
+    // update available actions
+    if (d->allowedActions != NoAction) {
+        d->allowedActions = NoAction;
+        emit allowedActionsChanged(d->allowedActions);
+    }
+
     // emit "left" signal if we had joined the room
     if (wasJoined)
         emit left();
@@ -548,28 +554,33 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
     if (presence.type() == QXmppPresence::Available) {
         const bool added = !d->participants.contains(jid);
         d->participants.insert(jid, presence);
+
+        // refresh allowed actions
+        if (jid == d->ownJid()) {
+
+            QXmppMucItem mucItem = presence.mucItem();
+            Actions newActions = NoAction;
+
+            // role
+            if (mucItem.role() == QXmppMucItem::ModeratorRole)
+                newActions |= (KickAction | SubjectAction);
+
+            // affiliation
+            if (mucItem.affiliation() == QXmppMucItem::OwnerAffiliation)
+                newActions |= (ConfigurationAction | PermissionsAction | SubjectAction);
+            else if (mucItem.affiliation() == QXmppMucItem::AdminAffiliation)
+                newActions |= (PermissionsAction | SubjectAction);
+
+            if (newActions != d->allowedActions) {
+                d->allowedActions = newActions;
+                emit allowedActionsChanged(d->allowedActions);
+            }
+        }
+
         if (added) {
             emit participantAdded(jid);
-            if (jid == d->ownJid()) {
-
-                // check whether we own the room
-                QXmppMucItem mucItem = presence.mucItem();
-                if (mucItem.jid() == d->client->configuration().jid()) {
-                    d->allowedActions = NoAction;
-
-                    // role
-                    if (mucItem.role() == QXmppMucItem::ModeratorRole)
-                        d->allowedActions |= (KickAction | SubjectAction);
-
-                    // affiliation
-                    if (mucItem.affiliation() == QXmppMucItem::OwnerAffiliation)
-                        d->allowedActions |= (ConfigurationAction | PermissionsAction | SubjectAction);
-                    else if (mucItem.affiliation() == QXmppMucItem::AdminAffiliation)
-                        d->allowedActions |= (PermissionsAction | SubjectAction);
-                }
-
+            if (jid == d->ownJid())
                 emit joined();
-            }
         } else {
             emit participantChanged(jid);
         }
@@ -593,6 +604,12 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                 d->participants.clear();
                 foreach (const QString &jid, removed)
                     emit participantRemoved(jid);
+
+                // update available actions
+                if (d->allowedActions != NoAction) {
+                    d->allowedActions = NoAction;
+                    emit allowedActionsChanged(d->allowedActions);
+                }
 
                 // notify user we left the room
                 emit left();

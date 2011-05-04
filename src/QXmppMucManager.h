@@ -95,6 +95,7 @@ private:
 class QXmppMucRoom : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppMucRoom::Actions allowedActions READ allowedActions NOTIFY allowedActionsChanged)
     Q_PROPERTY(QString jid READ jid)
     Q_PROPERTY(QString nickName READ nickName WRITE setNickName)
     Q_PROPERTY(QStringList participants READ participants)
@@ -132,6 +133,9 @@ public:
     void setSubject(const QString &subject);
 
 signals:
+    /// This signal is emitted when the allowed actions change.
+    void allowedActionsChanged(QXmppMucRoom::Actions actions) const;
+
     /// This signal is emitted when the configuration form for the room is received.
     void configurationReceived(const QXmppDataForm &configuration);
 
