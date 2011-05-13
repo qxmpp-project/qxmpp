@@ -30,6 +30,7 @@
 #include <QNetworkInterface>
 #include <QTime>
 #include <QTimer>
+#include <QUrl>
 
 #include "QXmppByteStreamIq.h"
 #include "QXmppClient.h"
@@ -116,6 +117,7 @@ public:
     QIODevice *iodevice;
     QString offerId;
     QString jid;
+    QUrl localFileUrl;
     QString sid;
     QXmppTransferJob::Method method;
     QString mimeType;
@@ -151,7 +153,7 @@ QXmppTransferJobPrivate::QXmppTransferJobPrivate()
 }
 
 QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new QXmppTransferJobPrivate)
 {
     d->direction = direction;
@@ -169,6 +171,27 @@ QXmppTransferJob::~QXmppTransferJob()
 void QXmppTransferJob::abort()
 {
     terminate(AbortError);
+}
+
+/// Call this method if you wish to accept an incoming transfer job.
+///
+
+void QXmppTransferJob::accept(const QString &filePath)
+{
+    if (d->direction == IncomingDirection && d->state == OfferState && !d->iodevice)
+    {
+        QFile *file = new QFile(filePath, this);
+        if (!file->open(QIODevice::WriteOnly))
+        {
+            warning(QString("Could not write to %1").arg(filePath));
+            abort();
+            return;
+        }
+
+        d->iodevice = file;
+        setLocalFileUrl(QUrl::fromLocalFile(filePath));
+        setState(QXmppTransferJob::StartState);
+    }
 }
 
 /// Call this method if you wish to accept an incoming transfer job.
@@ -233,6 +256,27 @@ QXmppTransferJob::Error QXmppTransferJob::error() const
 QString QXmppTransferJob::jid() const
 {
     return d->jid;
+}
+
+/// Returns the local file URL.
+///
+
+QUrl QXmppTransferJob::localFileUrl() const
+{
+    return d->localFileUrl;
+}
+
+/// Sets the local file URL.
+///
+/// \note You do not need to call this method if you called accept()
+///  with a file path.
+
+void QXmppTransferJob::setLocalFileUrl(const QUrl &localFileUrl)
+{
+    if (localFileUrl != d->localFileUrl) {
+        d->localFileUrl = localFileUrl;
+        emit localFileUrlChanged(localFileUrl);
+    }
 }
 
 /// Returns meta-data about the file being transferred.
@@ -1016,9 +1060,9 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
-QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &fileName, const QString &sid)
+QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &sid)
 {
-    QFileInfo info(fileName);
+    QFileInfo info(filePath);
 
     QXmppTransferFileInfo fileInfo;
     fileInfo.setDate(info.lastModified());
@@ -1026,9 +1070,10 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     fileInfo.setSize(info.size());
 
     // open file
-    QIODevice *device = new QFile(fileName);
+    QIODevice *device = new QFile(filePath);
     if (!device->open(QIODevice::ReadOnly))
     {
+        warning(QString("Could not read from %1").arg(filePath));
         delete device;
         device = 0;
     }
@@ -1048,7 +1093,9 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     }
 
     // create job
-    return sendFile(jid, device, fileInfo, sid);
+    QXmppTransferJob *job = sendFile(jid, device, fileInfo, sid);
+    job->setLocalFileUrl(filePath);
+    return job;
 }
 
 /// Send file to a remote party.

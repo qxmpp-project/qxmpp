@@ -25,6 +25,7 @@
 #define QXMPPTRANSFERMANAGER_H
 
 #include <QDateTime>
+#include <QUrl>
 #include <QVariant>
 
 #include "QXmppClientExtension.h"
@@ -72,9 +73,18 @@ private:
 /// \sa QXmppTransferManager
 ///
 
-class QXmppTransferJob : public QObject
+class QXmppTransferJob : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(Direction Error Method State)
+    Q_PROPERTY(Direction direction READ direction CONSTANT)
+    Q_PROPERTY(QUrl localFileUrl READ localFileUrl WRITE setLocalFileUrl NOTIFY localFileUrlChanged)
+    Q_PROPERTY(QString jid READ jid CONSTANT)
+    Q_PROPERTY(Method method READ method CONSTANT)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
+
+    Q_PROPERTY(QString fileName READ fileName CONSTANT)
+    Q_PROPERTY(qint64 fileSize READ fileSize CONSTANT)
 
 public:
     /// This enum is used to describe the direction of a transfer job.
@@ -115,9 +125,6 @@ public:
 
     ~QXmppTransferJob();
 
-    void abort();
-    void accept(QIODevice *output);
-
     QVariant data(int role) const;
     void setData(int role, const QVariant &value);
 
@@ -131,6 +138,8 @@ public:
 
     // XEP-0096 : File transfer
     QXmppTransferFileInfo fileInfo() const;
+    QUrl localFileUrl() const;
+    void setLocalFileUrl(const QUrl &localFileUrl);
 
     /// \cond
     QDateTime fileDate() const;
@@ -153,11 +162,19 @@ signals:
     /// instead use deleteLater().
     void finished();
 
+    /// This signal is emitted when the local file URL changes.
+    void localFileUrlChanged(const QUrl &localFileUrl);
+
     /// This signal is emitted to indicate the progress of this transfer job.
     void progress(qint64 done, qint64 total);
 
     /// This signal is emitted when the transfer job changes state.
     void stateChanged(QXmppTransferJob::State state);
+
+public slots:
+    void abort();
+    void accept(const QString &filePath);
+    void accept(QIODevice *output);
 
 private slots:
     void disconnected();
@@ -199,7 +216,7 @@ class QXmppTransferManager : public QXmppClientExtension
 
 public:
     QXmppTransferManager();
-    QXmppTransferJob *sendFile(const QString &jid, const QString &fileName, const QString &sid = QString());
+    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
     QString proxy() const;
