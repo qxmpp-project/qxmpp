@@ -61,7 +61,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppPubSubIq.h \
     QXmppReconnectionManager.h \
     QXmppRemoteMethod.h \
-    QXmppRoster.h \
     QXmppRosterIq.h \
     QXmppRosterManager.h \
     QXmppRpcIq.h \
