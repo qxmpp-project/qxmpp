@@ -59,7 +59,6 @@ QXmppMucManager::QXmppMucManager()
     d = new QXmppMucManagerPrivate;
 }
 
-
 /// Destroys a QXmppMucManager.
 
 QXmppMucManager::~QXmppMucManager()
@@ -187,6 +186,12 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
 
     check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(joined()), this, SIGNAL(isJoinedChanged()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(left()), this, SIGNAL(isJoinedChanged()));
     Q_ASSERT(check);
 }
 
@@ -335,8 +340,12 @@ bool QXmppMucRoom::sendMessage(const QString &text)
 
 void QXmppMucRoom::setNickName(const QString &nickName)
 {
+    if (nickName == d->nickName)
+        return;
+
     const bool wasJoined = isJoined();
     d->nickName = nickName;
+    emit nickNameChanged(nickName);
 
     // if we had already joined the room, request nickname change
     if (wasJoined) {
@@ -586,8 +595,11 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
         }
     }
     else if (presence.type() == QXmppPresence::Unavailable) {
-        if (d->participants.remove(jid)) {
+        if (d->participants.contains(jid)) {
+            d->participants.insert(jid, presence);
+
             emit participantRemoved(jid);
+            d->participants.remove(jid);
 
             // check whether this was our own presence
             if (jid == d->ownJid()) {

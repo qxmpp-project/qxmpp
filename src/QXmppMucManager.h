@@ -95,9 +95,11 @@ private:
 class QXmppMucRoom : public QObject
 {
     Q_OBJECT
+    Q_FLAGS(Action Actions)
     Q_PROPERTY(QXmppMucRoom::Actions allowedActions READ allowedActions NOTIFY allowedActionsChanged)
-    Q_PROPERTY(QString jid READ jid)
-    Q_PROPERTY(QString nickName READ nickName WRITE setNickName)
+    Q_PROPERTY(bool isJoined READ isJoined NOTIFY isJoinedChanged)
+    Q_PROPERTY(QString jid READ jid CONSTANT)
+    Q_PROPERTY(QString nickName READ nickName WRITE setNickName NOTIFY nickNameChanged)
     Q_PROPERTY(QStringList participants READ participants)
     Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
@@ -148,11 +150,18 @@ signals:
     /// This signal is emitted if you get kicked from the room.
     void kicked(const QString &jid, const QString &reason);
 
+    /// \cond
+    void isJoinedChanged();
+    /// \endconf
+
     /// This signal is emiited once you have left the room.
     void left();
 
     /// This signal is emitted when a message is received.
     void messageReceived(const QXmppMessage &message);
+
+    /// This signal is emitted when your own nick name changes.
+    void nickNameChanged(const QString &nickName);
 
     /// This signal is emitted when a participant joins the room.
     void participantAdded(const QString &jid);
