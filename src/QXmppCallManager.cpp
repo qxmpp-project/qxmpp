@@ -504,6 +504,9 @@ void QXmppCall::accept()
 
         d->sendRequest(iq);
 
+        // notify user
+        d->manager->callStarted(this);
+
         // check for call establishment
         d->setState(QXmppCall::ActiveState);
     }
@@ -524,6 +527,13 @@ QXmppRtpAudioChannel *QXmppCall::audioChannel() const
         return 0;
 }
 
+/// Returns the audio mode.
+
+QIODevice::OpenMode QXmppCall::audioMode() const
+{
+    return d->audioMode;
+}
+
 /// Returns the RTP channel for the video data.
 ///
 
@@ -534,6 +544,13 @@ QXmppRtpVideoChannel *QXmppCall::videoChannel() const
         return (QXmppRtpVideoChannel*)stream->channel;
     else
         return 0;
+}
+
+/// Returns the video mode.
+
+QIODevice::OpenMode QXmppCall::videoMode() const
+{
+    return d->videoMode;
 }
 
 void QXmppCall::terminated()
@@ -653,6 +670,8 @@ QXmppCall::State QXmppCall::state() const
     return d->state;
 }
 
+/// Starts sending video to the remote party.
+
 void QXmppCall::startVideo()
 {
     if (d->state != QXmppCall::ActiveState) {
@@ -695,6 +714,19 @@ void QXmppCall::startVideo()
         iq.content().addTransportCandidate(candidate);
 
     d->sendRequest(iq);
+}
+
+/// Stops sending video to the remote party.
+
+void QXmppCall::stopVideo()
+{
+    if (!d->sendVideo)
+        return;
+
+    d->sendVideo = false;
+    QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
+    if (stream)
+        updateOpenMode();
 }
 
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
@@ -791,8 +823,10 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     d->calls << call;
     connect(call, SIGNAL(destroyed(QObject*)),
         this, SLOT(callDestroyed(QObject*)));
+    emit callStarted(call);
 
     call->d->sendInvite();
+
     return call;
 }
 

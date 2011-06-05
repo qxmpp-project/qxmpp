@@ -52,6 +52,13 @@ class QXmppRtpVideoChannel;
 class QXmppCall : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(Direction State)
+    Q_FLAGS(QIODevice::OpenModeFlag QIODevice::OpenMode)
+    Q_PROPERTY(Direction direction READ direction CONSTANT)
+    Q_PROPERTY(QString jid READ jid CONSTANT)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(QIODevice::OpenMode audioMode READ audioMode NOTIFY audioModeChanged)
+    Q_PROPERTY(QIODevice::OpenMode videoMode READ videoMode NOTIFY videoModeChanged)
 
 public:
     /// This enum is used to describe the direction of a call.
@@ -78,7 +85,9 @@ public:
     QXmppCall::State state() const;
 
     QXmppRtpAudioChannel *audioChannel() const;
+    QIODevice::OpenMode audioMode() const;
     QXmppRtpVideoChannel *videoChannel() const;
+    QIODevice::OpenMode videoMode() const;
 
 signals:
     /// \brief This signal is emitted when a call is connected.
@@ -110,6 +119,7 @@ public slots:
     void accept();
     void hangup();
     void startVideo();
+    void stopVideo();
 
 private slots:
     void localCandidatesChanged();
@@ -153,7 +163,6 @@ class QXmppCallManager : public QXmppClientExtension
 public:
     QXmppCallManager();
     ~QXmppCallManager();
-    QXmppCall *call(const QString &jid);
     void setStunServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnUser(const QString &user);
@@ -170,6 +179,11 @@ signals:
     /// To accept the call, invoke the call's QXmppCall::accept() method.
     /// To refuse the call, invoke the call's QXmppCall::hangup() method.
     void callReceived(QXmppCall *call);
+
+    void callStarted(QXmppCall *call);
+
+public slots:
+    QXmppCall *call(const QString &jid);
 
 protected:
     /// \cond
