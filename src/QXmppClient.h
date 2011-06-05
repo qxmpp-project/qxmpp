@@ -149,43 +149,6 @@ public:
     QXmppReconnectionManager* reconnectionManager();
     bool setReconnectionManager(QXmppReconnectionManager*);
 
-    /// \cond
-    // FIXME: these methods are deprecated, their API is just too hard to read.
-    // If you need this level of customisation, work directly with QXmppConfiguration.
-    void Q_DECL_DEPRECATED connectToServer(const QString& host,
-                         const QString& user,
-                         const QString& password,
-                         const QString& domain,
-                         int port = 5222,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
-    void Q_DECL_DEPRECATED connectToServer(const QString& host,
-                         const QString& bareJid,
-                         const QString& password,
-                         int port = 5222,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
-
-    // deprecated in release 0.2.0
-    // deprecated accessors, use the form without "get" instead
-    const QXmppPresence Q_DECL_DEPRECATED & getClientPresence() const;
-    QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration();
-    const QXmppConfiguration Q_DECL_DEPRECATED & getConfiguration() const;
-    QXmppReconnectionManager Q_DECL_DEPRECATED * getReconnectionManager();
-    QXmppRosterManager Q_DECL_DEPRECATED & getRoster();
-    QXmppVCardManager Q_DECL_DEPRECATED & getVCardManager();
-    QAbstractSocket::SocketError Q_DECL_DEPRECATED getSocketError();
-    QXmppStanza::Error::Condition Q_DECL_DEPRECATED getXmppStreamError();
-
-    /// was clashing with QObject::disconnect use disconnectFromServer() instead
-    void Q_DECL_DEPRECATED disconnect();
-
-    // deprecated methods, use setClientPresence(QXmppPresence) instead.
-    void Q_DECL_DEPRECATED setClientPresence(const QString& statusText);
-    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Type presenceType);
-    void Q_DECL_DEPRECATED setClientPresence(QXmppPresence::Status::Type statusType);
-    /// \endcond
-
 signals:
 
     /// This signal is emitted when the client connects successfully to the XMPP
