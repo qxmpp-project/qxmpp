@@ -83,6 +83,7 @@ protected:
 class QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChannel
 {
     Q_OBJECT
+    Q_ENUMS(Tone)
 
 public:
     /// This enum is used to describe a DTMF tone.
@@ -176,6 +177,8 @@ class QXmppVideoFrame
 public:
     enum PixelFormat {
         Format_Invalid = 0,
+        Format_RGB32 = 3,
+        Format_RGB24 = 4,
         Format_YUV420P = 18,
         Format_YUYV = 21,
     };
