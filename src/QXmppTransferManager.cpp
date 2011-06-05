@@ -982,16 +982,16 @@ void QXmppTransferManager::jobError(QXmppTransferJob::Error error)
     }
 }
 
-void QXmppTransferManager::jobFinished()
+void QXmppTransferManager::onJobFinished()
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !m_jobs.contains(job))
         return;
 
-    emit finished(job);
+    emit jobFinished(job);
 }
 
-void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
+void QXmppTransferManager::onJobStateChanged(QXmppTransferJob::State state)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !m_jobs.contains(job))
@@ -1001,7 +1001,7 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
         return;
 
     // disconnect from the signal
-    disconnect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(jobStateChanged(QXmppTransferJob::State)));
+    disconnect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(onJobStateChanged(QXmppTransferJob::State)));
 
     // the job was refused by the local party
     if (state != QXmppTransferJob::StartState || !job->d->iodevice || !job->d->iodevice->isWritable())
@@ -1054,6 +1054,9 @@ void QXmppTransferManager::jobStateChanged(QXmppTransferJob::State state)
     response.setSiItems(feature);
 
     client()->sendPacket(response);
+
+    // notify user
+    emit jobStarted(job);
 }
 
 /// Send file to a remote party.
@@ -1186,7 +1189,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     m_jobs.append(job);
     connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
     connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(jobError(QXmppTransferJob::Error)));
-    connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
+    connect(job, SIGNAL(finished()), this, SLOT(onJobFinished()));
 
     QXmppStreamInitiationIq request;
     request.setType(QXmppIq::Set);
@@ -1196,6 +1199,9 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     request.setSiId(job->d->sid);
     job->d->requestId = request.id();
     client()->sendPacket(request);
+
+    // notify user
+    emit jobStarted(job);
 
     return job;
 }
@@ -1437,8 +1443,8 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     // register job
     m_jobs.append(job);
     connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
-    connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
-    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(jobStateChanged(QXmppTransferJob::State)));
+    connect(job, SIGNAL(finished()), this, SLOT(onJobFinished()));
+    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(onJobStateChanged(QXmppTransferJob::State)));
 
     // allow user to accept or decline the job
     emit fileReceived(job);

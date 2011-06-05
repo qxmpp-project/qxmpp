@@ -76,7 +76,8 @@ private:
 class QXmppTransferJob : public QXmppLoggable
 {
     Q_OBJECT
-    Q_ENUMS(Direction Error Method State)
+    Q_ENUMS(Direction Error State)
+    Q_FLAGS(Method Methods)
     Q_PROPERTY(Direction direction READ direction CONSTANT)
     Q_PROPERTY(QUrl localFileUrl READ localFileUrl WRITE setLocalFileUrl NOTIFY localFileUrlChanged)
     Q_PROPERTY(QString jid READ jid CONSTANT)
@@ -213,11 +214,12 @@ private:
 class QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT
+    Q_PROPERTY(QString proxy READ proxy WRITE setProxy)
+    Q_PROPERTY(bool proxyOnly READ proxyOnly WRITE setProxyOnly)
+    Q_PROPERTY(QXmppTransferJob::Methods supportedMethods READ supportedMethods WRITE setSupportedMethods)
 
 public:
     QXmppTransferManager();
-    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString());
-    QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
     QString proxy() const;
     void setProxy(const QString &proxyJid);
@@ -238,12 +240,19 @@ signals:
     ///
     /// To accept the transfer job, call the job's QXmppTransferJob::accept() method.
     /// To refuse the transfer job, call the job's QXmppTransferJob::abort() method.
-    void fileReceived(QXmppTransferJob *offer);
+    void fileReceived(QXmppTransferJob *job);
+
+    /// This signal is emitted whenever a transfer job is started.
+    void jobStarted(QXmppTransferJob *job);
 
     /// This signal is emitted whenever a transfer job is finished.
     ///
     /// \sa QXmppTransferJob::finished()
-    void finished(QXmppTransferJob *job);
+    void jobFinished(QXmppTransferJob *job);
+
+public slots:
+    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString());
+    QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
 protected:
     /// \cond
@@ -254,8 +263,8 @@ private slots:
     void iqReceived(const QXmppIq&);
     void jobDestroyed(QObject *object);
     void jobError(QXmppTransferJob::Error error);
-    void jobFinished();
-    void jobStateChanged(QXmppTransferJob::State state);
+    void onJobFinished();
+    void onJobStateChanged(QXmppTransferJob::State state);
     void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
 
 private:
