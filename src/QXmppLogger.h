@@ -40,6 +40,11 @@
 class QXmppLogger : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(LoggingType)
+    Q_FLAGS(MessageType MessageTypes)
+    Q_PROPERTY(QString logFilePath READ logFilePath WRITE setLogFilePath)
+    Q_PROPERTY(LoggingType loggingType READ loggingType WRITE setLoggingType)
+    Q_PROPERTY(MessageTypes messageTypes READ messageTypes WRITE setMessageTypes)
 
 public:
     /// This enum describes how log message are handled.
@@ -49,13 +54,6 @@ public:
         FileLogging = 1,    ///< Log messages are written to a file
         StdoutLogging = 2,  ///< Log messages are written to the standard output
         SignalLogging = 4,  ///< Log messages are emitted as a signal
-
-        // Deprecated
-        /// \cond
-        NONE = 0,   ///< DEPRECATED Log messages are discarded
-        FILE = 1,   ///< DEPRECATED Log messages are written to a file
-        STDOUT = 2  ///< DEPRECATED Log messages are written to the standard output
-        /// \endcond
     };
 
     /// This enum describes a type of log message.
