@@ -308,18 +308,3 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QString QXmppVCardIq::getFullName() const
-{
-    return m_fullName;
-}
-
-QString QXmppVCardIq::getNickName() const
-{
-    return m_nickName;
-}
-
-const QByteArray& QXmppVCardIq::getPhoto() const
-{
-    return m_photo;
-}
-
