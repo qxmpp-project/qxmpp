@@ -151,6 +151,8 @@ void QXmppOutgoingClient::connectToHost()
     const QString host = configuration().host();
     const quint16 port = configuration().port();
 
+    socket()->setCaCertificates(configuration().caCertificates());
+
     // if an explicit host was provided, connect to it
     if (!host.isEmpty() && port)
     {

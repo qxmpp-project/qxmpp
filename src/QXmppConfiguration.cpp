@@ -22,6 +22,7 @@
  */
 
 
+#include <QSslSocket>
 #include "QXmppConfiguration.h"
 #include "QXmppUtils.h"
 
@@ -39,7 +40,8 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_ignoreSslErrors(true),
                 m_streamSecurityMode(QXmppConfiguration::TLSEnabled),
                 m_nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest),
-                m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5)
+                m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5),
+                m_caCertificates(QSslSocket::defaultCaCertificates())
 {
 
 }
@@ -427,6 +429,20 @@ void QXmppConfiguration::setKeepAliveTimeout(int secs)
 int QXmppConfiguration::keepAliveTimeout() const
 {
     return m_keepAliveTimeout;
+}
+
+/// Specifies a list of trusted CA certificates.
+
+void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCertificates)
+{
+    m_caCertificates = caCertificates;
+}
+
+/// Returns the a list of trusted CA certificates.
+
+QList<QSslCertificate> QXmppConfiguration::caCertificates() const
+{
+    return m_caCertificates;
 }
 
 // obsolete

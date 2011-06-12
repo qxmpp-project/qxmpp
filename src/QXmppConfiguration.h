@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <QNetworkProxy>
+#include <QSslCertificate>
 
 /// \brief The QXmppConfiguration class holds configuration options.
 ///
@@ -135,6 +136,9 @@ public:
     int keepAliveTimeout() const;
     void setKeepAliveTimeout(int secs);
 
+    QList<QSslCertificate> caCertificates() const;
+    void setCaCertificates(const QList<QSslCertificate> &);
+
     /// \cond
     // deprecated in release 0.3.0
     QString Q_DECL_DEPRECATED passwd() const;
@@ -193,6 +197,8 @@ private:
     SASLAuthMechanism m_SASLAuthMechanism;
 
     QNetworkProxy m_networkProxy;
+
+    QList<QSslCertificate> m_caCertificates;
 };
 
 #endif // QXMPPCONFIGURATION_H
