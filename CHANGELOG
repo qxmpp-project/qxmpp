@@ -8,6 +8,7 @@ QXmpp 0.x.y (UNRELEASED)
     QXmppIq
     QXmppStanza
 	QXmppVCardIq
+	QXmppRosterIq
 
   - Remove deprecated QXmppRoster.h header.
   - Add TURN support for VoIP calls to use a relay in double-NAT network topologies.
