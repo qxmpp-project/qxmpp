@@ -251,34 +251,3 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
-
-QList<QXmppRosterIq::Item> QXmppRosterIq::getItems() const
-{
-    return m_items;
-}
-
-QXmppRosterIq::Item::SubscriptionType
-        QXmppRosterIq::Item::getSubscriptionType() const
-{
-    return m_type;
-}
-
-QString QXmppRosterIq::Item::getName() const
-{
-    return m_name;
-}
-
-QString QXmppRosterIq::Item::getSubscriptionStatus() const
-{
-    return m_subscriptionStatus;
-}
-
-QString QXmppRosterIq::Item::getBareJid() const
-{
-    return m_bareJid;
-}
-
-QSet<QString> QXmppRosterIq::Item::getGroups() const
-{
-    return m_groups;
-}
