@@ -12,6 +12,10 @@ QXmpp 0.x.y (UNRELEASED)
   - Add TURN support for VoIP calls to use a relay in double-NAT network topologies.
   - Overhaul Multi-User Chat support to make it easier and more fully featured.
 
+Issue Fixes:
+	Issue 106: 	QXmppClient can't override Qt's set of trusted SSL CAs  
+	
+	
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------
   - New XEPs
