@@ -150,11 +150,11 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(connected()), this,
-        SLOT(xmppConnected()));
+        SIGNAL(connected()));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(connected()), this,
-        SIGNAL(connected()));
+        SLOT(xmppConnected()));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(error(QXmppClient::Error)), this,
