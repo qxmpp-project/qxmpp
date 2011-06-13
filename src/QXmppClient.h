@@ -93,11 +93,12 @@ public:
         XmppStreamError,    ///< Error due to XML stream
     };
 
+    /// This enumeration describes a client state.
     enum State
     {
-        DisconnectedState,
-        ConnectingState,
-        ConnectedState,
+        DisconnectedState,  ///< Disconnected from the server.
+        ConnectingState,    ///< Trying to connect to the server.
+        ConnectedState,     ///< Connected to the server.
     };
 
     QXmppClient(QObject *parent = 0);
