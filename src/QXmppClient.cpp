@@ -21,6 +21,7 @@
  *
  */
 
+#include <QSslSocket>
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
@@ -130,35 +131,35 @@ QXmppClient::QXmppClient(QObject *parent)
     d->addProperCapability(d->clientPresence);
 
     bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
-                         this, SLOT(slotElementReceived(const QDomElement&, bool&)));
+                         this, SLOT(_q_elementReceived(const QDomElement&, bool&)));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(messageReceived(const QXmppMessage&)),
-                         this, SIGNAL(messageReceived(const QXmppMessage&)));
+                    this, SIGNAL(messageReceived(const QXmppMessage&)));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(presenceReceived(const QXmppPresence&)),
                     this, SIGNAL(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(iqReceived(const QXmppIq&)), this,
-        SIGNAL(iqReceived(const QXmppIq&)));
+    check = connect(d->stream, SIGNAL(iqReceived(const QXmppIq&)),
+                    this, SIGNAL(iqReceived(const QXmppIq&)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(disconnected()), this,
-        SIGNAL(disconnected()));
+    check = connect(d->stream->socket(), SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+                    this, SLOT(_q_socketStateChanged(QAbstractSocket::SocketState)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(connected()), this,
-        SIGNAL(connected()));
+    check = connect(d->stream, SIGNAL(connected()),
+                    this, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(connected()), this,
-        SLOT(xmppConnected()));
+    check = connect(d->stream, SIGNAL(disconnected()),
+                    this, SLOT(_q_streamDisconnected()));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(error(QXmppClient::Error)), this,
-        SIGNAL(error(QXmppClient::Error)));
+    check = connect(d->stream, SIGNAL(error(QXmppClient::Error)),
+                    this, SIGNAL(error(QXmppClient::Error)));
     Q_ASSERT(check);
 
     check = setReconnectionManager(new QXmppReconnectionManager(this));
@@ -339,7 +340,7 @@ void QXmppClient::disconnectFromServer()
 
 bool QXmppClient::isConnected() const
 {
-    return d->stream && d->stream->isConnected();
+    return d->stream->isConnected();
 }
 
 /// Returns the reference to QXmppRosterManager object of the client.
@@ -376,6 +377,19 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
     }
 }
 
+/// Returns the client's current state.
+
+QXmppClient::State QXmppClient::state() const
+{
+    if (d->stream->isConnected())
+        return QXmppClient::ConnectedState;
+    else if (d->stream->socket()->state() != QAbstractSocket::UnconnectedState &&
+             d->stream->socket()->state() != QAbstractSocket::ClosingState)
+        return QXmppClient::ConnectingState;
+    else
+        return QXmppClient::DisconnectedState;
+}
+
 /// Returns the client's current presence.
 ///
 
@@ -399,10 +413,11 @@ QXmppPresence QXmppClient::clientPresence() const
 
 void QXmppClient::setClientPresence(const QXmppPresence& presence)
 {
+    d->clientPresence = presence;
+    d->addProperCapability(d->clientPresence);
+
     if (presence.type() == QXmppPresence::Unavailable)
     {
-        d->clientPresence = presence;
-
         // NOTE: we can't call disconnect() because it alters 
         // the client presence
         if (d->stream->isConnected())
@@ -411,14 +426,10 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
             d->stream->disconnectFromHost();
         }
     }
-    else if (!d->stream->isConnected())
-        connectToServer(d->stream->configuration(), presence);
-    else
-    {
-        d->clientPresence = presence;
-        d->addProperCapability(d->clientPresence);
+    else if (d->stream->isConnected())
         sendPacket(d->clientPresence);
-    }
+    else
+        connectToServer(d->stream->configuration(), presence);
 }
 
 /// Function to get reconnection manager. By default there exists a reconnection
@@ -469,7 +480,7 @@ bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
 
 QAbstractSocket::SocketError QXmppClient::socketError()
 {
-    return d->stream->socketError();
+    return d->stream->socket()->error();
 }
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
@@ -503,7 +514,7 @@ QXmppVersionManager& QXmppClient::versionManager()
 /// \param element
 /// \param handled
 
-void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
+void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
     foreach (QXmppClientExtension *extension, d->extensions)
     {
@@ -513,6 +524,31 @@ void QXmppClient::slotElementReceived(const QDomElement &element, bool &handled)
             return;
         }
     }
+}
+
+void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState)
+{
+    Q_UNUSED(socketState);
+    emit stateChanged(state());
+}
+
+/// At connection establishment, send initial presence.
+
+void QXmppClient::_q_streamConnected()
+{
+    // notify managers
+    emit connected();
+    emit stateChanged(QXmppClient::ConnectedState);
+
+    // send initial presence
+    sendPacket(d->clientPresence);
+}
+
+void QXmppClient::_q_streamDisconnected()
+{
+    // notify managers
+    emit disconnected();
+    emit stateChanged(QXmppClient::DisconnectedState);
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.
@@ -535,10 +571,4 @@ void QXmppClient::setLogger(QXmppLogger *logger)
                 d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
 }
 
-/// At connection establishment, send initial presence.
-
-void QXmppClient::xmppConnected()
-{
-    sendPacket(d->clientPresence);
-}
 

@@ -61,7 +61,6 @@ public:
     // This object provides the configuration
     // required for connecting to the XMPP server.
     QXmppConfiguration config;
-    QAbstractSocket::SocketError socketError;
     QXmppStanza::Error::Condition xmppStreamError;
 
     // State data
@@ -214,9 +213,9 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)
         socket()->ignoreSslErrors();
 }
 
-void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError ee)
+void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
-    d->socketError = ee;
+    Q_UNUSED(socketError);
     emit error(QXmppClient::SocketError);
     warning(QString("Socket error: " + socket()->errorString()));
 }
@@ -695,13 +694,6 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
     // not attempt to guess the required fields?
     authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
-}
-
-/// Returns the type of the last socket error that occured.
-
-QAbstractSocket::SocketError QXmppOutgoingClient::socketError()
-{
-    return d->socketError;
 }
 
 /// Returns the type of the last XMPP stream error that occured.

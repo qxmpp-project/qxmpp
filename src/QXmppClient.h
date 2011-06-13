@@ -80,6 +80,8 @@ class QXmppVersionManager;
 class QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(Error State)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
     /// An enumeration for type of error.
@@ -89,6 +91,13 @@ public:
         SocketError,        ///< Error due to TCP socket
         KeepAliveError,     ///< Error due to no response to a keep alive
         XmppStreamError,    ///< Error due to XML stream
+    };
+
+    enum State
+    {
+        DisconnectedState,
+        ConnectingState,
+        ConnectedState,
     };
 
     QXmppClient(QObject *parent = 0);
@@ -140,6 +149,7 @@ public:
     void setLogger(QXmppLogger *logger);
 
     QAbstractSocket::SocketError socketError();
+    State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppRosterManager& rosterManager();
@@ -187,19 +197,22 @@ signals:
     /// parameter contains the details of the message sent to this client.
     /// In other words whenever someone sends you a message this signal is
     /// emitted.
-    void messageReceived(const QXmppMessage&);
+    void messageReceived(const QXmppMessage &message);
 
     /// Notifies that an XMPP presence stanza is received. The QXmppPresence
     /// parameter contains the details of the presence sent to this client.
     /// This signal is emitted when someone login/logout or when someone's status
     /// changes Busy, Idle, Invisible etc.
-    void presenceReceived(const QXmppPresence&);
+    void presenceReceived(const QXmppPresence &presence);
 
     /// Notifies that an XMPP iq stanza is received. The QXmppIq
     /// parameter contains the details of the iq sent to this client.
     /// IQ stanzas provide a structured request-response mechanism. Roster
     /// management, setting-getting vCards etc is done using iq stanzas.
-    void iqReceived(const QXmppIq&);
+    void iqReceived(const QXmppIq &iq);
+
+    /// This signal is emitted when the client state changes.
+    void stateChanged(State state);
 
     /// \cond
     // Deprecated in release 0.3.0
@@ -213,8 +226,10 @@ public slots:
     void sendMessage(const QString& bareJid, const QString& message);
 
 private slots:
-    void slotElementReceived(const QDomElement &element, bool &handled);
-    void xmppConnected();
+    void _q_elementReceived(const QDomElement &element, bool &handled);
+    void _q_socketStateChanged(QAbstractSocket::SocketState state);
+    void _q_streamConnected();
+    void _q_streamDisconnected();
 
 private:
     QXmppClientPrivate * const d;

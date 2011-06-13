@@ -61,7 +61,7 @@ signals:
 
 protected:
     // Access to underlying socket
-    QSslSocket *socket();
+    QSslSocket *socket() const;
     void setSocket(QSslSocket *socket);
 
     // Overridable methods

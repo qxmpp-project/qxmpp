@@ -56,7 +56,7 @@ public:
     void connectToHost();
     bool isConnected() const;
 
-    QAbstractSocket::SocketError socketError();
+    QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppConfiguration& configuration();

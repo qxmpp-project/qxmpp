@@ -156,7 +156,7 @@ bool QXmppStream::sendPacket(const QXmppPacket &packet)
 /// Returns the QSslSocket used for this stream.
 ///
 
-QSslSocket *QXmppStream::socket()
+QSslSocket *QXmppStream::socket() const
 {
     return d->socket;
 }
