@@ -42,36 +42,40 @@
 class QXmppClientPrivate
 {
 public:
-    QXmppClientPrivate(QXmppClient *);
+    QXmppClientPrivate(QXmppClient *qq);
 
+    QXmppPresence clientPresence;                   ///< Current presence of the client
     QList<QXmppClientExtension*> extensions;
     QXmppLogger *logger;
-    QXmppOutgoingClient* stream;  ///< Pointer to QXmppOutgoingClient object a wrapper over
-                          ///< TCP socket and XMPP protocol
-    QXmppPresence clientPresence; ///< Stores the current presence of the connected client
+    QXmppOutgoingClient *stream;                    ///< Pointer to the XMPP stream
 
-    QXmppReconnectionManager *reconnectionManager;    ///< Pointer to the reconnection manager
-    QXmppRosterManager *rosterManager;    ///< Pointer to the roster manager
-    QXmppVCardManager *vCardManager;      ///< Pointer to the vCard manager
-    QXmppVersionManager *versionManager;      ///< Pointer to the version manager
+    QXmppReconnectionManager *reconnectionManager;  ///< Pointer to the reconnection manager
+    QXmppRosterManager *rosterManager;              ///< Pointer to the roster manager
+    QXmppVCardManager *vCardManager;                ///< Pointer to the vCard manager
+    QXmppVersionManager *versionManager;            ///< Pointer to the version manager
 
     void addProperCapability(QXmppPresence& presence);
 
-    QXmppClient *client;
+private:
+    QXmppClient *q;
 };
 
-QXmppClientPrivate::QXmppClientPrivate(QXmppClient *parentClient)
-    : stream(0),
-    clientPresence(QXmppPresence::Available),
-    reconnectionManager(0), client(parentClient)
+QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
+    : clientPresence(QXmppPresence::Available),
+    logger(0),
+    stream(0),
+    reconnectionManager(0),
+    rosterManager(0),
+    vCardManager(0),
+    versionManager(0),
+    q(qq)
 {
 }
 
 void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
 {
-    QXmppDiscoveryManager* ext = client->findExtension<QXmppDiscoveryManager>();
-    if(ext)
-    {
+    QXmppDiscoveryManager* ext = q->findExtension<QXmppDiscoveryManager>();
+    if(ext) {
         presence.setCapabilityHash("sha-1");
         presence.setCapabilityNode(ext->clientCapabilitiesNode());
         presence.setCapabilityVer(ext->capabilities().verificationString());
@@ -166,7 +170,6 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     // logging
-    d->logger = 0;
     setLogger(QXmppLogger::getLogger());
 
     // create managers
@@ -553,7 +556,7 @@ void QXmppClient::_q_streamDisconnected()
 
 /// Returns the QXmppLogger associated with the current QXmppClient.
 
-QXmppLogger *QXmppClient::logger()
+QXmppLogger *QXmppClient::logger() const
 {
     return d->logger;
 }
@@ -562,13 +565,19 @@ QXmppLogger *QXmppClient::logger()
 
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
-    if (d->logger)
-        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                   d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
-    d->logger = logger;
-    if (d->logger)
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
-}
+    if (logger != d->logger) {
+        if (d->logger) {
+            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                       d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+        }
 
+        d->logger = logger;
+        if (d->logger) {
+            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                    d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+        }
+
+        emit loggerChanged(d->logger);
+    }
+}
 

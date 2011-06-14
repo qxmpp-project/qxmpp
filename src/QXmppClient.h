@@ -81,6 +81,7 @@ class QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(Error State)
+    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
@@ -88,9 +89,10 @@ public:
     /// Error could come due a TCP socket or XML stream or due to various stanzas.
     enum Error
     {
-        SocketError,        ///< Error due to TCP socket
-        KeepAliveError,     ///< Error due to no response to a keep alive
-        XmppStreamError,    ///< Error due to XML stream
+        NoError,            ///< No error.
+        SocketError,        ///< Error due to TCP socket.
+        KeepAliveError,     ///< Error due to no response to a keep alive.
+        XmppStreamError,    ///< Error due to XML stream.
     };
 
     /// This enumeration describes a client state.
@@ -146,7 +148,7 @@ public:
     void setClientPresence(const QXmppPresence &presence);
 
     QXmppConfiguration &configuration();
-    QXmppLogger *logger();
+    QXmppLogger *logger() const;
     void setLogger(QXmppLogger *logger);
 
     QAbstractSocket::SocketError socketError();
@@ -193,6 +195,9 @@ signals:
     /// Depending upon the type of error occurred use the respective get function to
     /// know the error.
     void error(QXmppClient::Error);
+
+    /// This signal is emitted when the logger changes.
+    void loggerChanged(QXmppLogger *logger);
 
     /// Notifies that an XMPP message stanza is received. The QXmppMessage
     /// parameter contains the details of the message sent to this client.
