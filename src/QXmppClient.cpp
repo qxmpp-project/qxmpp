@@ -134,8 +134,8 @@ QXmppClient::QXmppClient(QObject *parent)
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
-    bool check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool)),
-                         this, SLOT(_q_elementReceived(QDomElement,bool)));
+    bool check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool&)),
+                         this, SLOT(_q_elementReceived(QDomElement,bool&)));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(messageReceived(QXmppMessage)),
