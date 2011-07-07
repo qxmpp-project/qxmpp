@@ -134,20 +134,20 @@ QXmppClient::QXmppClient(QObject *parent)
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
-    bool check = connect(d->stream, SIGNAL(elementReceived(const QDomElement&, bool&)),
-                         this, SLOT(_q_elementReceived(const QDomElement&, bool&)));
+    bool check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool)),
+                         this, SLOT(_q_elementReceived(QDomElement,bool)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(messageReceived(const QXmppMessage&)),
-                    this, SIGNAL(messageReceived(const QXmppMessage&)));
+    check = connect(d->stream, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SIGNAL(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(presenceReceived(const QXmppPresence&)),
-                    this, SIGNAL(presenceReceived(const QXmppPresence&)));
+    check = connect(d->stream, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SIGNAL(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(iqReceived(const QXmppIq&)),
-                    this, SIGNAL(iqReceived(const QXmppIq&)));
+    check = connect(d->stream, SIGNAL(iqReceived(QXmppIq)),
+                    this, SIGNAL(iqReceived(QXmppIq)));
     Q_ASSERT(check);
 
     check = connect(d->stream->socket(), SIGNAL(stateChanged(QAbstractSocket::SocketState)),
@@ -567,14 +567,14 @@ void QXmppClient::setLogger(QXmppLogger *logger)
 {
     if (logger != d->logger) {
         if (d->logger) {
-            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                       d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                       d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
         }
 
         d->logger = logger;
         if (d->logger) {
-            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                    d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                    d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
         }
 
         emit loggerChanged(d->logger);

@@ -42,8 +42,8 @@ xmppClient::xmppClient(QObject *parent)
     /// Then QXmppRoster::presenceChanged() is emitted whenever presence of someone
     /// in roster changes
     check = connect(&this->rosterManager(),
-                    SIGNAL(presenceChanged(const QString&, const QString&)),
-        SLOT(presenceChanged(const QString&, const QString&)));
+                    SIGNAL(presenceChanged(QString,QString)),
+        SLOT(presenceChanged(QString,QString)));
     Q_ASSERT(check);
 }
 

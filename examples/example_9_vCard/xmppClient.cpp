@@ -62,8 +62,8 @@ void xmppClient::clientConnected()
 void xmppClient::rosterReceived()
 {
     std::cout<<"example_9_vCard:: Roster Received"<<std::endl;
-    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(const QXmppVCardIq&)),
-        SLOT(vCardReceived(const QXmppVCardIq&)));
+    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),
+        SLOT(vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 

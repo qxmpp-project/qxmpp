@@ -38,8 +38,8 @@ capabilitiesCache::capabilitiesCache(QXmppClient* client) :
     QXmppDiscoveryManager* ext = m_client->findExtension<QXmppDiscoveryManager>();
     if(ext)
     {
-        bool check = connect(ext, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
-                             SLOT(infoReceived(const QXmppDiscoveryIq&)));
+        bool check = connect(ext, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                             SLOT(infoReceived(QXmppDiscoveryIq)));
         Q_ASSERT(check);
         Q_UNUSED(check);
     }

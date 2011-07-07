@@ -100,8 +100,8 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     setSocket(socket);
 
     // initialise logger
-    bool check = connect(socket, SIGNAL(sslErrors(const QList<QSslError>&)),
-                         this, SLOT(socketSslErrors(const QList<QSslError>&)));
+    bool check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
+                         this, SLOT(socketSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),

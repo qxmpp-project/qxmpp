@@ -81,7 +81,7 @@ statusTextWidget::statusTextWidget(QWidget* parent) : QWidget(parent),
 
     bool check = connect(m_statusButton, SIGNAL(clicked(bool)), SLOT(showMenu()));
     Q_ASSERT(check);
-    check = connect(m_statusLineEdit, SIGNAL(textChanged(const QString&)), SLOT(textChanged()));
+    check = connect(m_statusLineEdit, SIGNAL(textChanged(QString)), SLOT(textChanged()));
     Q_ASSERT(check);
     check = connect(m_statusLineEdit, SIGNAL(editingFinished()), SLOT(statusTextChanged_helper()));
     Q_ASSERT(check);

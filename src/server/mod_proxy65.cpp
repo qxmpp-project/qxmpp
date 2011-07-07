@@ -188,8 +188,8 @@ QXmppServerProxy65::QXmppServerProxy65()
     d->totalBytes = 0;
     d->totalTransfers = 0;
 
-    bool check = connect(d->server, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
-        this, SLOT(slotSocketConnected(QTcpSocket*, const QString &, quint16)));
+    bool check = connect(d->server, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+        this, SLOT(slotSocketConnected(QTcpSocket*,QString,quint16)));
     Q_ASSERT(check);
 
     check = connect(d->statisticsTimer, SIGNAL(timeout()),

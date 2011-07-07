@@ -41,16 +41,16 @@ profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClien
 {
     ui->setupUi(this);
 
-    bool check = connect(&m_xmppClient.versionManager(), SIGNAL(versionReceived(const QXmppVersionIq&)),
-            SLOT(versionReceived(const QXmppVersionIq&)));
+    bool check = connect(&m_xmppClient.versionManager(), SIGNAL(versionReceived(QXmppVersionIq)),
+            SLOT(versionReceived(QXmppVersionIq)));
     Q_ASSERT(check);
 
     QXmppEntityTimeManager* timeManager = m_xmppClient.findExtension<QXmppEntityTimeManager>();
 
     if(timeManager)
     {
-        check = connect(timeManager, SIGNAL(timeReceived(const QXmppEntityTimeIq&)),
-            SLOT(timeReceived(const QXmppEntityTimeIq&)));
+        check = connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
+            SLOT(timeReceived(QXmppEntityTimeIq)));
         Q_ASSERT(check);
     }
 

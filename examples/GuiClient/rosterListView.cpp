@@ -31,14 +31,14 @@
 rosterListView::rosterListView(QWidget* parent):QListView(parent), m_chat("Chat", this),
 m_profile("View Profile", this), m_removeContact("Remove", this)
 {
-    bool check = connect(this, SIGNAL(pressed(const QModelIndex&)), this,
-                         SLOT(mousePressed(const QModelIndex&)));
+    bool check = connect(this, SIGNAL(pressed(QModelIndex)), this,
+                         SLOT(mousePressed(QModelIndex)));
     Q_ASSERT(check);
-    check = connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this,
-                         SLOT(doubleClicked(const QModelIndex&)));
+    check = connect(this, SIGNAL(doubleClicked(QModelIndex)), this,
+                         SLOT(doubleClicked(QModelIndex)));
     Q_ASSERT(check);
-    check = connect(this, SIGNAL(clicked(const QModelIndex&)), this,
-                         SLOT(clicked(const QModelIndex&)));
+    check = connect(this, SIGNAL(clicked(QModelIndex)), this,
+                         SLOT(clicked(QModelIndex)));
     Q_ASSERT(check);
     check = connect(&m_chat, SIGNAL(triggered()), this,
                          SLOT(showChatDialog_helper()));

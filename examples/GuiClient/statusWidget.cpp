@@ -41,7 +41,7 @@ statusWidget::statusWidget(QWidget* parent)
     menu->addAction(actionSign_out);
     toolButton_userName->setMenu(menu);
 
-    bool check = connect(statusTextWidgetObject, SIGNAL(statusTextChanged(const QString&)), SIGNAL(statusTextChanged(const QString&)));
+    bool check = connect(statusTextWidgetObject, SIGNAL(statusTextChanged(QString)), SIGNAL(statusTextChanged(QString)));
     Q_ASSERT(check);
 
     check = connect(actionAvailable, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));

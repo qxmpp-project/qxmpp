@@ -43,8 +43,8 @@ QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
         this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = QObject::connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
-        this, SLOT(presenceReceived(const QXmppPresence&)));
+    check = QObject::connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+        this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 }
 

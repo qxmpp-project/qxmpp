@@ -455,8 +455,8 @@ QXmppLogger *QXmppServer::logger()
 void QXmppServer::setLogger(QXmppLogger *logger)
 {
     if (d->logger)
-        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                   d->logger, SLOT(log(QXmppLogger::MessageType, QString)));
+        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                   d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
     d->logger = logger;
     d->logger = logger;
     if (d->logger)

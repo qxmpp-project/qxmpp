@@ -479,8 +479,8 @@ QXmppTransferManager::QXmppTransferManager()
     m_socksServer = new QXmppSocksServer(this);
     if (m_socksServer->listen())
     {
-        bool check = connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*, const QString&, quint16)),
-                        this, SLOT(socksServerConnected(QTcpSocket*, const QString&, quint16)));
+        bool check = connect(m_socksServer, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+                        this, SLOT(socksServerConnected(QTcpSocket*,QString,quint16)));
         Q_ASSERT(check);
         Q_UNUSED(check);
     } else {
@@ -493,8 +493,8 @@ void QXmppTransferManager::setClient(QXmppClient *client)
     QXmppClientExtension::setClient(client);
 
     // XEP-0047: In-Band Bytestreams
-    bool check = QObject::connect(client, SIGNAL(iqReceived(const QXmppIq&)),
-        this, SLOT(iqReceived(const QXmppIq&)));
+    bool check = QObject::connect(client, SIGNAL(iqReceived(QXmppIq)),
+        this, SLOT(iqReceived(QXmppIq)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
