@@ -126,9 +126,6 @@ public:
 
     ~QXmppTransferJob();
 
-    QVariant data(int role) const;
-    void setData(int role, const QVariant &value);
-
     QXmppTransferJob::Direction direction() const;
     QXmppTransferJob::Error error() const;
     QString jid() const;
@@ -178,10 +175,10 @@ public slots:
     void accept(QIODevice *output);
 
 private slots:
-    void disconnected();
-    void receiveData();
-    void sendData();
-    void slotTerminated();
+    void _q_disconnected();
+    void _q_receiveData();
+    void _q_sendData();
+    void _q_terminated();
 
 private:
     QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QObject *parent);
@@ -260,12 +257,12 @@ protected:
     /// \endcond
 
 private slots:
-    void iqReceived(const QXmppIq&);
-    void jobDestroyed(QObject *object);
-    void jobError(QXmppTransferJob::Error error);
-    void onJobFinished();
-    void onJobStateChanged(QXmppTransferJob::State state);
-    void socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
+    void _q_iqReceived(const QXmppIq&);
+    void _q_jobDestroyed(QObject *object);
+    void _q_jobError(QXmppTransferJob::Error error);
+    void _q_jobFinished();
+    void _q_jobStateChanged(QXmppTransferJob::State state);
+    void _q_socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
 
 private:
     QXmppTransferJob *getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id);
