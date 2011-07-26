@@ -821,6 +821,9 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (jid.isEmpty()) {
         warning("Refusing to call an empty jid");
         return 0;
@@ -836,8 +839,9 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     // register call
     d->calls << call;
-    connect(call, SIGNAL(destroyed(QObject*)),
-            this, SLOT(_q_callDestroyed(QObject*)));
+    check = connect(call, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(_q_callDestroyed(QObject*)));
+    Q_ASSERT(check);
     emit callStarted(call);
 
     call->d->sendInvite();
@@ -919,6 +923,9 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (iq.type() != QXmppIq::Set)
         return;
 
@@ -950,8 +957,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 
         // register call
         d->calls << call;
-        connect(call, SIGNAL(destroyed(QObject*)),
-            this, SLOT(callDestroyed(QObject*)));
+        check = connect(call, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(_q_callDestroyed(QObject*)));
+        Q_ASSERT(check);
 
         // send ringing indication
         QXmppJingleIq ringing;
