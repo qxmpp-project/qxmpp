@@ -180,6 +180,7 @@ public:
         Format_RGB32 = 3,
         Format_RGB24 = 4,
         Format_YUV420P = 18,
+        Format_UYVY = 20,
         Format_YUYV = 21,
     };
 

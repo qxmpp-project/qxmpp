@@ -787,7 +787,7 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
         {
             QXmppJingleIq jingleIq;
             jingleIq.parse(element);
-            jingleIqReceived(jingleIq);
+            _q_jingleIqReceived(jingleIq);
             return true;
         }
     }
@@ -797,12 +797,22 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
 
 void QXmppCallManager::setClient(QXmppClient *client)
 {
+    bool check;
+    Q_UNUSED(check);
+
     QXmppClientExtension::setClient(client);
 
-    bool check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-        this, SLOT(iqReceived(QXmppIq)));
+    check = connect(client, SIGNAL(disconnected()),
+                    this, SLOT(_q_disconnected()));
     Q_ASSERT(check);
-    Q_UNUSED(check);
+
+    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
+                    this, SLOT(_q_iqReceived(QXmppIq)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
 }
 
 /// Initiates a new outgoing call to the specified recipient.
@@ -811,6 +821,11 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
+    if (jid.isEmpty()) {
+        warning("Refusing to call an empty jid");
+        return 0;
+    }
+
     if (jid == client()->configuration().jid()) {
         warning("Refusing to call self");
         return 0;
@@ -822,7 +837,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     // register call
     d->calls << call;
     connect(call, SIGNAL(destroyed(QObject*)),
-        this, SLOT(callDestroyed(QObject*)));
+            this, SLOT(_q_callDestroyed(QObject*)));
     emit callStarted(call);
 
     call->d->sendInvite();
@@ -830,15 +845,66 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     return call;
 }
 
-void QXmppCallManager::callDestroyed(QObject *object)
+/// Sets the STUN server to use to determine server-reflexive addresses
+/// and ports.
+///
+/// \param host The address of the STUN server.
+/// \param port The port of the STUN server.
+
+void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
+{
+    d->stunHost = host;
+    d->stunPort = port;
+}
+
+/// Sets the TURN server to use to relay packets in double-NAT configurations.
+///
+/// \param host The address of the TURN server.
+/// \param port The port of the TURN server.
+
+void QXmppCallManager::setTurnServer(const QHostAddress &host, quint16 port)
+{
+    d->turnHost = host;
+    d->turnPort = port;
+}
+
+/// Sets the \a user used for authentication with the TURN server.
+///
+/// \param user
+
+void QXmppCallManager::setTurnUser(const QString &user)
+{
+    d->turnUser = user;
+}
+
+/// Sets the \a password used for authentication with the TURN server.
+///
+/// \param password
+
+void QXmppCallManager::setTurnPassword(const QString &password)
+{
+    d->turnPassword = password;
+}
+
+/// Handles call destruction.
+
+void QXmppCallManager::_q_callDestroyed(QObject *object)
 {
     d->calls.removeAll(static_cast<QXmppCall*>(object));
 }
 
-/// Handles acknowledgements
+/// Handles disconnection from server.
+
+void QXmppCallManager::_q_disconnected()
+{
+    foreach (QXmppCall *call, d->calls)
+        call->d->terminate(QXmppJingleIq::Reason::Gone);
+}
+
+/// Handles acknowledgements.
 ///
 
-void QXmppCallManager::iqReceived(const QXmppIq &ack)
+void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 {
     if (ack.type() != QXmppIq::Result)
         return;
@@ -848,10 +914,10 @@ void QXmppCallManager::iqReceived(const QXmppIq &ack)
         call->d->handleAck(ack);
 }
 
-/// Handle Jingle IQs.
+/// Handles a Jingle IQ.
 ///
 
-void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
+void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
     if (iq.type() != QXmppIq::Set)
         return;
@@ -912,44 +978,18 @@ void QXmppCallManager::jingleIqReceived(const QXmppJingleIq &iq)
     }
 }
 
-/// Sets the STUN server to use to determine server-reflexive addresses
-/// and ports.
-///
-/// \param host The address of the STUN server.
-/// \param port The port of the STUN server.
+/// Handles a presence.
 
-void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
+void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
 {
-    d->stunHost = host;
-    d->stunPort = port;
-}
+    if (presence.type() != QXmppPresence::Unavailable)
+        return;
 
-/// Sets the TURN server to use to relay packets in double-NAT configurations.
-///
-/// \param host The address of the TURN server.
-/// \param port The port of the TURN server.
-
-void QXmppCallManager::setTurnServer(const QHostAddress &host, quint16 port)
-{
-    d->turnHost = host;
-    d->turnPort = port;
-}
-
-/// Sets the \a user used for authentication with the TURN server.
-///
-/// \param user
-
-void QXmppCallManager::setTurnUser(const QString &user)
-{
-    d->turnUser = user;
-}
-
-/// Sets the \a password used for authentication with the TURN server.
-///
-/// \param password
-
-void QXmppCallManager::setTurnPassword(const QString &password)
-{
-    d->turnPassword = password;
+    foreach (QXmppCall *call, d->calls) {
+        if (presence.from() == call->jid()) {
+            // the remote party has gone away, terminate call
+            call->d->terminate(QXmppJingleIq::Reason::Gone);
+        }
+    }
 }
 

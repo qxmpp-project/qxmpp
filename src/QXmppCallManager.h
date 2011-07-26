@@ -39,6 +39,7 @@ class QXmppIq;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
+class QXmppPresence;
 class QXmppRtpAudioChannel;
 class QXmppRtpVideoChannel;
 
@@ -191,9 +192,11 @@ protected:
     /// \endcond
 
 private slots:
-    void callDestroyed(QObject *object);
-    void iqReceived(const QXmppIq &iq);
-    void jingleIqReceived(const QXmppJingleIq &iq);
+    void _q_callDestroyed(QObject *object);
+    void _q_disconnected();
+    void _q_iqReceived(const QXmppIq &iq);
+    void _q_jingleIqReceived(const QXmppJingleIq &iq);
+    void _q_presenceReceived(const QXmppPresence &presence);
 
 private:
     QXmppCallManagerPrivate *d;

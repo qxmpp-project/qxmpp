@@ -16,6 +16,10 @@ LIBS += $$QXMPP_INTERNAL_LIBS
 # DEFINES += QXMPP_USE_THEORA
 # LIBS += -ltheoradec -ltheoraenc
 
+# To enable support for the Vpx video codec, uncomment the following:
+# DEFINES += QXMPP_USE_VPX
+# LIBS += -lvpx
+
 # Target definition
 TARGET = $$QXMPP_LIBRARY_NAME
 VERSION = $$QXMPP_VERSION

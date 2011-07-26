@@ -43,6 +43,14 @@
 #include <theora/theoraenc.h>
 #endif
 
+#ifdef QXMPP_USE_VPX
+#define VPX_CODEC_DISABLE_COMPAT 1
+#include <vpx/vpx_decoder.h>
+#include <vpx/vpx_encoder.h>
+#include <vpx/vp8cx.h>
+#include <vpx/vp8dx.h>
+#endif
+
 #define BIAS        (0x84)  /* Bias for linear code. */
 #define CLIP        8159
 
@@ -51,6 +59,13 @@
 #define NSEGS       (8)     /* Number of A-law segments. */
 #define SEG_SHIFT   (4)     /* Left shift for segment number. */
 #define SEG_MASK    (0x70)  /* Segment field mask. */
+
+enum FragmentType {
+    NoFragment = 0,
+    StartFragment,
+    MiddleFragment,
+    EndFragment,
+};
 
 static qint16 seg_aend[8] = {0x1F, 0x3F, 0x7F, 0xFF,
                 0x1FF, 0x3FF, 0x7FF, 0xFFF};
@@ -376,6 +391,9 @@ public:
 
 bool QXmppTheoraDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
 {
+    if (!ctx)
+        return false;
+
     ogg_packet packet;
     packet.packet = (unsigned char*) buffer.data();
     packet.bytes = buffer.size();
@@ -487,12 +505,12 @@ QXmppVideoFormat QXmppTheoraDecoder::format() const
     return format;
 }
 
-QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
+QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &packet)
 {
     QList<QXmppVideoFrame> frames;
 
     // theora deframing: draft-ietf-avt-rtp-theora-00
-    QDataStream stream(ba);
+    QDataStream stream(packet.payload);
     quint32 theora_header;
     stream >> theora_header;
 
@@ -511,7 +529,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
     QXmppVideoFrame frame;
     quint16 packetLength;
 
-    if (theora_frag == 0) {
+    if (theora_frag == NoFragment) {
         // unfragmented packet(s)
         for (int i = 0; i < theora_packets; ++i) {
             stream >> packetLength;
@@ -522,7 +540,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
 
             d->packetBuffer.resize(packetLength);
             stream.readRawData(d->packetBuffer.data(), packetLength);
-            if (d->ctx && d->decodeFrame(d->packetBuffer, &frame))
+            if (d->decodeFrame(d->packetBuffer, &frame))
                 frames << frame;
             d->packetBuffer.resize(0);
         }
@@ -535,7 +553,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
         }
 
         int pos;
-        if (theora_frag == 1) {
+        if (theora_frag == StartFragment) {
             // start fragment
             pos = 0;
             d->packetBuffer.resize(packetLength);
@@ -546,9 +564,9 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QByteArray &ba)
         }
         stream.readRawData(d->packetBuffer.data() + pos, packetLength);
 
-        if (theora_frag == 3) {
+        if (theora_frag == EndFragment) {
             // end fragment
-            if (d->ctx && d->decodeFrame(d->packetBuffer, &frame))
+            if (d->decodeFrame(d->packetBuffer, &frame))
                 frames << frame;
             d->packetBuffer.resize(0);
         }
@@ -641,6 +659,8 @@ bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
         qWarning("Theora configuration did not contain enough headers");
         return false;
     }
+
+#ifdef QXMPP_DEBUG_THEORA
     qDebug("Theora frame_width %i, frame_height %i, colorspace %i, pixel_fmt: %i, target_bitrate: %i, quality: %i, keyframe_granule_shift: %i",
         d->info.frame_width,
         d->info.frame_height,
@@ -649,6 +669,7 @@ bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
         d->info.target_bitrate,
         d->info.quality,
         d->info.keyframe_granule_shift);
+#endif
     if (d->info.pixel_fmt != TH_PF_420 && d->info.pixel_fmt != TH_PF_422) {
         qWarning("Theora frames have an unsupported pixel format %d", d->info.pixel_fmt);
         return false;
@@ -666,7 +687,7 @@ bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
 class QXmppTheoraEncoderPrivate
 {
 public:
-    void writeFrame(QDataStream &stream, quint8 theora_frag, quint8 theora_packets, const char *data, quint16 length);
+    void writeFragment(QDataStream &stream, FragmentType frag_type, quint8 theora_packets, const char *data, quint16 length);
 
     th_comment comment;
     th_info info;
@@ -679,12 +700,12 @@ public:
     QByteArray ident;
 };
 
-void QXmppTheoraEncoderPrivate::writeFrame(QDataStream &stream, quint8 theora_frag, quint8 theora_packets, const char *data, quint16 length)
+void QXmppTheoraEncoderPrivate::writeFragment(QDataStream &stream, FragmentType frag_type, quint8 theora_packets, const char *data, quint16 length)
 {
-    // raw data
-    const quint8 theora_type = 0;
+    // theora framing: draft-ietf-avt-rtp-theora-00
+    const quint8 theora_type = 0; // raw data
     stream.writeRawData(ident.constData(), ident.size());
-    stream << quint8(((theora_frag << 6) & 0xc0) |
+    stream << quint8(((frag_type << 6) & 0xc0) |
                      ((theora_type << 4) & 0x30) |
                      (theora_packets & 0x0f));
     stream << quint16(length);
@@ -717,7 +738,7 @@ bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
     const QXmppVideoFrame::PixelFormat pixelFormat = format.pixelFormat();
     if ((pixelFormat != QXmppVideoFrame::Format_YUV420P) &&
         (pixelFormat != QXmppVideoFrame::Format_YUYV)) {
-        qWarning("Theora decoder does not support the given format");
+        qWarning("Theora encoder does not support the given format");
         return false;
     }
 
@@ -833,7 +854,7 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
         d->ycbcr_buffer[1].data = d->ycbcr_buffer[0].data + d->ycbcr_buffer[0].stride * d->ycbcr_buffer[0].height;
         d->ycbcr_buffer[2].stride = d->ycbcr_buffer[1].stride;
         d->ycbcr_buffer[2].data = d->ycbcr_buffer[1].data + d->ycbcr_buffer[1].stride * d->ycbcr_buffer[1].height;
-    } else if (d->info.pixel_fmt = TH_PF_422) {
+    } else if (d->info.pixel_fmt == TH_PF_422) {
         // YUV 4:2:2 unpacking
         const int width = frame.width();
         const int height = frame.height();
@@ -871,24 +892,23 @@ QList<QByteArray> QXmppTheoraEncoder::handleFrame(const QXmppVideoFrame &frame)
         QDataStream stream(&payload, QIODevice::WriteOnly);
         const char *data = (const char*) packet.packet;
         int size = packet.bytes;
-        quint8 theora_frag = 0;
         if (size <= PACKET_MAX) {
             // no fragmentation
             stream.device()->reset();
             payload.resize(0);
-            d->writeFrame(stream, theora_frag, 1, data, size);
+            d->writeFragment(stream, NoFragment, 1, data, size);
             packets << payload;
        } else {
             // fragmentation
-            theora_frag = 1;
+            FragmentType frag_type = StartFragment;
             while (size) {
                 const int length = qMin(PACKET_MAX, size);
                 stream.device()->reset();
                 payload.resize(0);
-                d->writeFrame(stream, theora_frag, 0, data, length);
+                d->writeFragment(stream, frag_type, 0, data, length);
                 data += length;
                 size -= length;
-                theora_frag = (size > PACKET_MAX) ? 2 : 3;
+                frag_type = (size > PACKET_MAX) ? MiddleFragment : EndFragment;
                 packets << payload;
             }
         }
@@ -905,6 +925,294 @@ QMap<QString, QString> QXmppTheoraEncoder::parameters() const
         params.insert("configuration", d->configuration.toBase64());
     }
     return params;
+}
+
+#endif
+
+#ifdef QXMPP_USE_VPX
+
+class QXmppVpxDecoderPrivate
+{
+public:
+    bool decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame);
+
+    vpx_codec_ctx_t codec;
+    QByteArray packetBuffer;
+};
+
+bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
+{
+    if (vpx_codec_decode(&codec, (const uint8_t*)buffer.constData(), buffer.size(), NULL, 0) != VPX_CODEC_OK) {
+        qWarning("Vpx packet could not be decoded: %s", vpx_codec_error_detail(&codec));
+        return false;
+    }
+
+    vpx_codec_iter_t iter = NULL;
+    vpx_image_t *img;
+    while ((img = vpx_codec_get_frame(&codec, &iter))) {
+        if (img->fmt == VPX_IMG_FMT_I420) {
+            if (!frame->isValid()) {
+                const int bytes = img->d_w * img->d_h * 3 / 2;
+
+                *frame = QXmppVideoFrame(bytes,
+                    QSize(img->d_w, img->d_h),
+                    img->d_w,
+                    QXmppVideoFrame::Format_YUV420P);
+            }
+            uchar *output = frame->bits();
+
+            for (int i = 0; i < 3; ++i) {
+                uchar *input = img->planes[i];
+                const int div = (i == 0) ? 1 : 2;
+                for (unsigned int y = 0; y < img->d_h / div; ++y) {
+                    memcpy(output, input, img->d_w / div);
+                    input += img->stride[i];
+                    output += img->d_w / div;
+                }
+            }
+        } else {
+            qWarning("Vpx decoder received an unsupported frame format: %d", img->fmt);
+        }
+    }
+
+    return true;
+}
+
+QXmppVpxDecoder::QXmppVpxDecoder()
+{
+    d = new QXmppVpxDecoderPrivate;
+    if (vpx_codec_dec_init(&d->codec, vpx_codec_vp8_dx(), NULL, 0) != VPX_CODEC_OK) {
+        qWarning("Vpx decoder could not be initialised");
+    }
+}
+
+QXmppVpxDecoder::~QXmppVpxDecoder()
+{
+    vpx_codec_destroy(&d->codec);
+    delete d;
+}
+
+QXmppVideoFormat QXmppVpxDecoder::format() const
+{
+    QXmppVideoFormat format;
+    format.setFrameRate(15.0);
+    format.setFrameSize(QSize(320, 240));
+    format.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
+    return format;
+}
+
+QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packet)
+{
+    QList<QXmppVideoFrame> frames;
+
+    // vp8 deframing: http://tools.ietf.org/html/draft-westin-payload-vp8-00
+    QDataStream stream(packet.payload);
+    quint8 vpx_header;
+    stream >> vpx_header;
+
+    const bool have_id = (vpx_header & 0x10) != 0;
+    const quint8 frag_type = (vpx_header & 0x6) >> 1;
+    if (have_id) {
+        qWarning("Vpx decoder does not support pictureId yet");
+        return frames;
+    }
+
+    const int packetLength = packet.payload.size() - 1;
+#ifdef QXMPP_DEBUG_VPX
+    qDebug("Vpx fragment FI: %d, size %d", frag_type, packetLength);
+#endif
+
+    QXmppVideoFrame frame;
+
+    if (frag_type == NoFragment) {
+        // unfragmented packet
+        if (d->decodeFrame(packet.payload.mid(1), &frame))
+            frames << frame;
+        d->packetBuffer.resize(0);
+    } else {
+        // fragments
+        if (frag_type == StartFragment) {
+            // start fragment
+            d->packetBuffer = packet.payload.mid(1);
+        } else {
+            // continuation or end fragment
+            const int packetPos = d->packetBuffer.size();
+            d->packetBuffer.resize(packetPos + packetLength);
+            stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
+        }
+
+        if (frag_type == EndFragment) {
+            // end fragment
+            if (d->decodeFrame(d->packetBuffer, &frame))
+                frames << frame;
+            d->packetBuffer.resize(0);
+        }
+
+    }
+
+    return frames;
+}
+
+bool QXmppVpxDecoder::setParameters(const QMap<QString, QString> &parameters)
+{
+    return true;
+}
+
+class QXmppVpxEncoderPrivate
+{
+public:
+    void writeFragment(QDataStream &stream, FragmentType frag_type, const char *data, quint16 length);
+
+    vpx_codec_ctx_t codec;
+    vpx_codec_enc_cfg_t cfg;
+    vpx_image_t *imageBuffer;
+    int frameCount;
+};
+
+void QXmppVpxEncoderPrivate::writeFragment(QDataStream &stream, FragmentType frag_type, const char *data, quint16 length)
+{
+    // vp8 framing: http://tools.ietf.org/html/draft-westin-payload-vp8-00
+#ifdef QXMPP_DEBUG_VPX
+    qDebug("Vpx encoder writing packet frag: %i, size: %u", frag_type, length);
+#endif
+    stream << quint8(((frag_type << 1) & 0x6) |
+                      (frag_type == NoFragment || frag_type == StartFragment));
+    stream.writeRawData(data, length);
+}
+
+QXmppVpxEncoder::QXmppVpxEncoder()
+{
+    d = new QXmppVpxEncoderPrivate;
+    d->frameCount = 0;
+    d->imageBuffer = 0;
+    vpx_codec_enc_config_default(vpx_codec_vp8_cx(), &d->cfg, 0);
+}
+
+QXmppVpxEncoder::~QXmppVpxEncoder()
+{
+    vpx_codec_destroy(&d->codec);
+    if (d->imageBuffer)
+        vpx_img_free(d->imageBuffer);
+    delete d;
+}
+
+bool QXmppVpxEncoder::setFormat(const QXmppVideoFormat &format)
+{
+    const QXmppVideoFrame::PixelFormat pixelFormat = format.pixelFormat();
+    if (pixelFormat != QXmppVideoFrame::Format_YUYV) {
+        qWarning("Vpx encoder does not support the given format");
+        return false;
+    }
+
+    d->cfg.rc_target_bitrate = format.frameSize().width() * format.frameSize().height() * d->cfg.rc_target_bitrate / d->cfg.g_w  / d->cfg.g_h;
+    d->cfg.g_w = format.frameSize().width();
+    d->cfg.g_h = format.frameSize().height();
+    if (vpx_codec_enc_init(&d->codec, vpx_codec_vp8_cx(), &d->cfg, 0) != VPX_CODEC_OK) {
+        qWarning("Vpx encoder could not be initialised");
+        return false;
+    }
+
+    d->imageBuffer = vpx_img_alloc(NULL, VPX_IMG_FMT_I420,
+            format.frameSize().width(), format.frameSize().height(), 1);
+    return true;
+}
+
+QList<QByteArray> QXmppVpxEncoder::handleFrame(const QXmppVideoFrame &frame)
+{
+    const int PACKET_MAX = 1388;
+    QList<QByteArray> packets;
+
+    // try to encode frame
+    if (frame.pixelFormat() == QXmppVideoFrame::Format_YUYV) {
+        // YUYV -> YUV420P
+        const int width = frame.width();
+        const int height = frame.height();
+        const int stride = frame.bytesPerLine();
+        const uchar *row = frame.bits();
+        uchar *y_row = d->imageBuffer->planes[VPX_PLANE_Y];
+        uchar *cb_row = d->imageBuffer->planes[VPX_PLANE_U];
+        uchar *cr_row = d->imageBuffer->planes[VPX_PLANE_V];
+        for (int y = 0; y < height; y += 2) {
+            // odd row
+            const uchar *ptr = row;
+            uchar *y_out = y_row;
+            uchar *cb_out = cb_row;
+            uchar *cr_out = cr_row;
+            for (int x = 0; x < width; x += 2) {
+                *(y_out++) = *(ptr++);
+                *(cb_out++) = *(ptr++);
+                *(y_out++) = *(ptr++);
+                *(cr_out++) = *(ptr++);
+            }
+            row += stride;
+            y_row += d->imageBuffer->stride[VPX_PLANE_Y];
+            cb_row += d->imageBuffer->stride[VPX_PLANE_U];
+            cr_row += d->imageBuffer->stride[VPX_PLANE_V];
+
+            // even row
+            ptr = row;
+            y_out = y_row;
+            for (int x = 0; x < width; x += 2) {
+                *(y_out++) = *(ptr++);
+                ptr++;
+                *(y_out++) = *(ptr++);
+                ptr++;
+            }
+            row += stride;
+            y_row += d->imageBuffer->stride[VPX_PLANE_Y];
+        }
+    } else {
+        qWarning("Vpx encoder does not support the given format");
+        return packets;
+    }
+
+    if (vpx_codec_encode(&d->codec, d->imageBuffer, d->frameCount, 1,  0, VPX_DL_REALTIME) != VPX_CODEC_OK) {
+        qWarning("Vpx encoder could not handle frame: %s", vpx_codec_error_detail(&d->codec));
+        return packets;
+    }
+
+    // extract data
+    QByteArray payload;
+    vpx_codec_iter_t iter = NULL;
+    const vpx_codec_cx_pkt_t *pkt;
+    while ((pkt = vpx_codec_get_cx_data(&d->codec, &iter))) {
+        if (pkt->kind == VPX_CODEC_CX_FRAME_PKT) {
+#ifdef QXMPP_DEBUG_VPX
+            qDebug("Vpx encoded packet %lu bytes", pkt->data.frame.sz);
+#endif
+            QDataStream stream(&payload, QIODevice::WriteOnly);
+            const char *data = (const char*) pkt->data.frame.buf;
+            int size = pkt->data.frame.sz;
+            if (size <= PACKET_MAX) {
+                // no fragmentation
+                stream.device()->reset();
+                payload.resize(0);
+                d->writeFragment(stream, NoFragment, data, size);
+                packets << payload;
+           } else {
+                // fragmentation
+                FragmentType frag_type = StartFragment;
+                while (size) {
+                    const int length = qMin(PACKET_MAX, size);
+                    stream.device()->reset();
+                    payload.resize(0);
+                    d->writeFragment(stream, frag_type, data, length);
+                    data += length;
+                    size -= length;
+                    frag_type = (size > PACKET_MAX) ? MiddleFragment : EndFragment;
+                    packets << payload;
+                }
+            }
+        }
+    }
+    d->frameCount++;
+
+    return packets;
+}
+
+QMap<QString, QString> QXmppVpxEncoder::parameters() const
+{
+    return QMap<QString, QString>();
 }
 
 #endif

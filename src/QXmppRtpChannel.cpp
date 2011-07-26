@@ -863,11 +863,26 @@ QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
     d->outgoingFormat.setPixelFormat(QXmppVideoFrame::Format_YUYV);
 
     // set supported codecs
-#ifdef QXMPP_USE_THEORA
-    QXmppVideoEncoder *encoder = new QXmppTheoraEncoder;
-    encoder->setFormat(d->outgoingFormat);
+    QXmppVideoEncoder *encoder;
     QXmppJinglePayloadType payload;
+    Q_UNUSED(encoder);
+    Q_UNUSED(payload);
+
+#ifdef QXMPP_USE_VPX
+    encoder = new QXmppVpxEncoder;
+    encoder->setFormat(d->outgoingFormat);
     payload.setId(96);
+    payload.setName("vp8");
+    payload.setClockrate(90000);
+    payload.setParameters(encoder->parameters());
+    m_outgoingPayloadTypes << payload;
+    delete encoder;
+#endif
+
+#ifdef QXMPP_USE_THEORA
+    encoder = new QXmppTheoraEncoder;
+    encoder->setFormat(d->outgoingFormat);
+    payload.setId(97);
     payload.setName("theora");
     payload.setClockrate(90000);
     payload.setParameters(encoder->parameters());
@@ -910,7 +925,7 @@ void QXmppRtpVideoChannel::datagramReceived(const QByteArray &ba)
     QXmppVideoDecoder *decoder = d->decoders.value(packet.type);
     if (!decoder)
         return;
-    d->frames << decoder->handlePacket(packet.payload);
+    d->frames << decoder->handlePacket(packet);
 }
 
 QXmppVideoFormat QXmppRtpVideoChannel::decoderFormat() const
@@ -951,9 +966,15 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     d->decoders.clear();
     foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
         QXmppVideoDecoder *decoder = 0;
+        if (false)
+            {}
 #ifdef QXMPP_USE_THEORA
-        if (payload.name().toLower() == "theora")
+        else if (payload.name().toLower() == "theora")
             decoder = new QXmppTheoraDecoder;
+#endif
+#ifdef QXMPP_USE_VPX
+        else if (payload.name().toLower() == "vp8")
+            decoder = new QXmppVpxDecoder;
 #endif
         if (decoder) {
             decoder->setParameters(payload.parameters());
@@ -968,9 +989,16 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     }
     foreach (const QXmppJinglePayloadType &payload, m_outgoingPayloadTypes) {
         QXmppVideoEncoder *encoder = 0;
+        if (false)
+            {}
 #ifdef QXMPP_USE_THEORA
-        if (payload.name().toLower() == "theora")
+        else if (payload.name().toLower() == "theora")
             encoder = new QXmppTheoraEncoder;
+#endif
+#ifdef QXMPP_USE_VPX
+        else if (payload.name().toLower() == "vp8") {
+            encoder = new QXmppVpxEncoder;
+        }
 #endif
         if (encoder) {
             encoder->setFormat(d->outgoingFormat);

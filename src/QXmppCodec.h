@@ -26,6 +26,7 @@
 
 #include <QtGlobal>
 
+class QXmppRtpPacket;
 class QXmppVideoFormat;
 class QXmppVideoFrame;
 
@@ -110,7 +111,7 @@ class QXmppVideoDecoder
 {
 public:
     virtual QXmppVideoFormat format() const = 0;
-    virtual QList<QXmppVideoFrame> handlePacket(const QByteArray &ba) = 0;
+    virtual QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet) = 0;
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
 };
 
@@ -133,7 +134,7 @@ public:
     ~QXmppTheoraDecoder();
 
     QXmppVideoFormat format() const;
-    QList<QXmppVideoFrame> handlePacket(const QByteArray &ba);
+    QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet);
     bool setParameters(const QMap<QString, QString> &parameters);
 
 private:
@@ -152,6 +153,39 @@ public:
 
 private:
     QXmppTheoraEncoderPrivate *d;
+};
+#endif
+
+#ifdef QXMPP_USE_VPX
+class QXmppVpxDecoderPrivate;
+class QXmppVpxEncoderPrivate;
+
+class QXmppVpxDecoder : public QXmppVideoDecoder
+{
+public:
+    QXmppVpxDecoder();
+    ~QXmppVpxDecoder();
+
+    QXmppVideoFormat format() const;
+    QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet);
+    bool setParameters(const QMap<QString, QString> &parameters);
+
+private:
+    QXmppVpxDecoderPrivate *d;
+};
+
+class QXmppVpxEncoder : public QXmppVideoEncoder
+{
+public:
+    QXmppVpxEncoder();
+    ~QXmppVpxEncoder();
+
+    bool setFormat(const QXmppVideoFormat &format);
+    QList<QByteArray> handleFrame(const QXmppVideoFrame &frame);
+    QMap<QString, QString> parameters() const;
+
+private:
+    QXmppVpxEncoderPrivate *d;
 };
 #endif
 
