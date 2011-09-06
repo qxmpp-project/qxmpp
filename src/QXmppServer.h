@@ -100,12 +100,12 @@ signals:
     void streamRemoved(QXmppStream *stream);
 
 private slots:
-    void slotClientConnection(QSslSocket *socket);
-    void slotDialbackRequestReceived(const QXmppDialback &dialback);
-    void slotElementReceived(const QDomElement &element);
-    void slotServerConnection(QSslSocket *socket);
-    void slotStreamConnected();
-    void slotStreamDisconnected();
+    void _q_clientConnection(QSslSocket *socket);
+    void _q_dialbackRequestReceived(const QXmppDialback &dialback);
+    void _q_elementReceived(const QDomElement &element);
+    void _q_serverConnection(QSslSocket *socket);
+    void _q_streamConnected();
+    void _q_streamDisconnected();
 
 private:
     friend class QXmppServerPrivate;

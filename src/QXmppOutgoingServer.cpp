@@ -125,6 +125,8 @@ void QXmppOutgoingServer::connectToHost(const QXmppSrvInfo &serviceInfo)
 
 void QXmppOutgoingServer::handleStart()
 {
+    QXmppStream::handleStart();
+
     QString data = QString("<?xml version='1.0'?><stream:stream"
         " xmlns='%1' xmlns:db='%2' xmlns:stream='%3' version='1.0'>").arg(
             ns_server,
@@ -294,7 +296,6 @@ void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
 void QXmppOutgoingServer::socketError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error);
-    warning(QString("Socket error: " + socket()->errorString()));
     emit disconnected();
 }
 

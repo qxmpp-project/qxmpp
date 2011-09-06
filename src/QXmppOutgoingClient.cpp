@@ -217,11 +217,12 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
     emit error(QXmppClient::SocketError);
-    warning(QString("Socket error: " + socket()->errorString()));
 }
 
 void QXmppOutgoingClient::handleStart()
 {
+    QXmppStream::handleStart();
+
     // reset authentication step
     d->saslStep = 0;
     d->sessionStarted = false;

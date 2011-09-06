@@ -13,10 +13,11 @@ QXmpp 0.x.y (UNRELEASED)
   - Remove deprecated QXmppRoster.h header.
   - Add TURN support for VoIP calls to use a relay in double-NAT network topologies.
   - Overhaul Multi-User Chat support to make it easier and more fully featured.
+  - Improve QXmppServer packet routing performance.
 
 Issue Fixes:
-	Issue 106: 	QXmppClient can't override Qt's set of trusted SSL CAs  
-	Issue 105: 	Initial presence is set before the roster request	
+	Issue 106: 	QXmppClient can't override Qt's set of trusted SSL CAs
+	Issue 105: 	Initial presence is set before the roster request
 	
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------

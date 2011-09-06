@@ -66,6 +66,7 @@ public:
 
     QString domain;
     QList<QXmppServerExtension*> extensions;
+    // bare-jid -> full-jid -> presence
     QMap<QString, QMap<QString, QXmppPresence> > presences;
     QMap<QString, QSet<QString> > subscribers;
     QXmppLogger *logger;
@@ -74,6 +75,8 @@ public:
     // client-to-server
     QXmppSslServer *serverForClients;
     QList<QXmppIncomingClient*> incomingClients;
+    QMap<QString, QXmppIncomingClient*> incomingClientsByJid;
+    QMap<QString, QSet<QXmppIncomingClient*> > incomingClientsByBareJid;
 
     // server-to-server
     QList<QXmppIncomingServer*> incomingServers;
@@ -109,11 +112,11 @@ QXmppOutgoingServer* QXmppServerPrivate::connectToDomain(const QString &toDomain
     stream->setLocalStreamKey(generateStanzaHash().toAscii());
 
     check = QObject::connect(stream, SIGNAL(connected()),
-                             q, SLOT(slotStreamConnected()));
+                             q, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
     check = QObject::connect(stream, SIGNAL(disconnected()),
-                             q, SLOT(slotStreamDisconnected()));
+                             q, SLOT(_q_streamDisconnected()));
     Q_UNUSED(check);
 
     // add stream
@@ -138,8 +141,12 @@ QList<QXmppStream*> QXmppServerPrivate::getStreams(const QString &to)
     const QString toDomain = jidToDomain(to);
     if (toDomain == domain) {
         // look for a client connection
-        foreach (QXmppIncomingClient *conn, incomingClients) {
-            if (conn->jid() == to || jidToBareJid(conn->jid()) == to)
+        if (jidToResource(to).isEmpty()) {
+            foreach (QXmppIncomingClient *conn, incomingClientsByBareJid.value(to))
+                found << conn;
+        } else {
+            QXmppIncomingClient *conn = incomingClientsByJid.value(to);
+            if (conn)
                 found << conn;
         }
     } else if (toDomain.endsWith("." + domain)) {
@@ -373,12 +380,12 @@ QXmppServer::QXmppServer(QObject *parent)
     d = new QXmppServerPrivate(this);
     d->serverForClients = new QXmppSslServer(this);
     bool check = connect(d->serverForClients, SIGNAL(newConnection(QSslSocket*)),
-                         this, SLOT(slotClientConnection(QSslSocket*)));
+                         this, SLOT(_q_clientConnection(QSslSocket*)));
     Q_ASSERT(check);
 
     d->serverForServers = new QXmppSslServer(this);
     check = connect(d->serverForServers, SIGNAL(newConnection(QSslSocket*)),
-                    this, SLOT(slotServerConnection(QSslSocket*)));
+                    this, SLOT(_q_serverConnection(QSslSocket*)));
     Q_ASSERT(check);
 }
 
@@ -641,15 +648,15 @@ void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
     stream->setPasswordChecker(d->passwordChecker);
 
     bool check = connect(stream, SIGNAL(connected()),
-                         this, SLOT(slotStreamConnected()));
+                         this, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(disconnected()),
-                    this, SLOT(slotStreamDisconnected()));
+                    this, SLOT(_q_streamDisconnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(elementReceived(QDomElement)),
-                    this, SLOT(slotElementReceived(QDomElement)));
+                    this, SLOT(_q_elementReceived(QDomElement)));
     Q_ASSERT(check);
 
     // add stream
@@ -661,15 +668,21 @@ void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 ///
 /// \param socket
 
-void QXmppServer::slotClientConnection(QSslSocket *socket)
+void QXmppServer::_q_clientConnection(QSslSocket *socket)
 {
+    // check the socket didn't die since the signal was emitted
+    if (socket->state() != QAbstractSocket::ConnectedState) {
+        delete socket;
+        return;
+    }
+
     QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
     stream->setInactivityTimeout(120);
     socket->setParent(stream);
     addIncomingClient(stream);
 }
 
-void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
+void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
 {
     QXmppIncomingServer *stream = qobject_cast<QXmppIncomingServer *>(sender());
     if (!stream)
@@ -698,7 +711,7 @@ void QXmppServer::slotDialbackRequestReceived(const QXmppDialback &dialback)
 
 /// Handle an incoming XML element.
 
-void QXmppServer::slotElementReceived(const QDomElement &element)
+void QXmppServer::_q_elementReceived(const QDomElement &element)
 {
     QXmppStream *incoming = qobject_cast<QXmppStream *>(sender());
     if (!incoming)
@@ -710,25 +723,31 @@ void QXmppServer::slotElementReceived(const QDomElement &element)
 ///
 /// \param socket
 
-void QXmppServer::slotServerConnection(QSslSocket *socket)
+void QXmppServer::_q_serverConnection(QSslSocket *socket)
 {
+    // check the socket didn't die since the signal was emitted
+    if (socket->state() != QAbstractSocket::ConnectedState) {
+        delete socket;
+        return;
+    }
+
     QXmppIncomingServer *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
     bool check = connect(stream, SIGNAL(connected()),
-                         this, SLOT(slotStreamConnected()));
+                         this, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(disconnected()),
-                         this, SLOT(slotStreamDisconnected()));
+                         this, SLOT(_q_streamDisconnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(dialbackRequestReceived(QXmppDialback)),
-                    this, SLOT(slotDialbackRequestReceived(QXmppDialback)));
+                    this, SLOT(_q_dialbackRequestReceived(QXmppDialback)));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(elementReceived(QDomElement)),
-                    this, SLOT(slotElementReceived(QDomElement)));
+                    this, SLOT(_q_elementReceived(QDomElement)));
     Q_ASSERT(check);
 
     // add stream
@@ -739,7 +758,7 @@ void QXmppServer::slotServerConnection(QSslSocket *socket)
 /// Handle a successful stream connection.
 ///
 
-void QXmppServer::slotStreamConnected()
+void QXmppServer::_q_streamConnected()
 {
     QXmppStream *stream = qobject_cast<QXmppStream*>(sender());
     if (!stream)
@@ -747,22 +766,22 @@ void QXmppServer::slotStreamConnected()
 
     // handle incoming clients
     QXmppIncomingClient *client = qobject_cast<QXmppIncomingClient *>(stream);
-    if (client)
-    {
+    if (client) {
+        // FIXME: at this point the JID must contain a resource, assert it?
+        const QString jid = client->jid();
+
         // check whether the connection conflicts with another one
-        foreach (QXmppIncomingClient *conn, d->incomingClients)
-        {
-            if (conn != client && conn->jid() == client->jid())
-            {
-                conn->sendData("<stream:error><conflict xmlns='urn:ietf:params:xml:ns:xmpp-streams'/><text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>Replaced by new connection</text></stream:error>");
-                conn->disconnectFromHost();
-            }
+        QXmppIncomingClient *old = d->incomingClientsByJid.value(jid);
+        if (old && old != client) {
+            old->sendData("<stream:error><conflict xmlns='urn:ietf:params:xml:ns:xmpp-streams'/><text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>Replaced by new connection</text></stream:error>");
+            old->disconnectFromHost();
         }
+        d->incomingClientsByJid.insert(jid, client);
+        d->incomingClientsByBareJid[jidToBareJid(jid)].insert(client);
     }
 
     // flush queue
-    if (d->queues.contains(stream))
-    {
+    if (d->queues.contains(stream)) {
         foreach (const QByteArray &data, d->queues[stream])
             stream->sendData(data);
         d->queues.remove(stream);
@@ -775,19 +794,18 @@ void QXmppServer::slotStreamConnected()
 /// Handle a stream disconnection.
 ///
 
-void QXmppServer::slotStreamDisconnected()
+void QXmppServer::_q_streamDisconnected()
 {
     // handle clients
     QXmppIncomingClient *stream = qobject_cast<QXmppIncomingClient *>(sender());
-    if (stream && d->incomingClients.contains(stream))
-    {
+    if (stream && d->incomingClients.contains(stream)) {
         const QString jid = stream->jid();
 
         // check the user exited cleanly
         if (!jid.isEmpty()) {
             QDomDocument doc;
             QDomElement presence = doc.createElement("presence");
-            presence.setAttribute("from", stream->jid());
+            presence.setAttribute("from", jid);
             presence.setAttribute("type", "unavailable");
 
             if (d->presences.value(jidToBareJid(jid)).contains(jid)) {
@@ -803,6 +821,13 @@ void QXmppServer::slotStreamDisconnected()
                     d->handleStanza(stream, presence);
                 }
             }
+
+            // remove stream from routing tables
+            if (d->incomingClientsByJid.value(jid) == stream)
+                d->incomingClientsByJid.remove(jid);
+            const QString bareJid = jidToBareJid(jid);
+            if (d->incomingClientsByBareJid.contains(bareJid))
+                d->incomingClientsByBareJid[bareJid].remove(stream);
         }
 
         // remove stream
@@ -865,9 +890,12 @@ QXmppSslServer::~QXmppSslServer()
 void QXmppSslServer::incomingConnection(int socketDescriptor)
 {
     QSslSocket *socket = new QSslSocket;
-    socket->setSocketDescriptor(socketDescriptor);
-    if (!d->localCertificate.isNull() && !d->privateKey.isNull())
-    {
+    if (!socket->setSocketDescriptor(socketDescriptor)) {
+        delete socket;
+        return;
+    }
+
+    if (!d->localCertificate.isNull() && !d->privateKey.isNull()) {
         socket->setProtocol(QSsl::AnyProtocol);
         socket->addCaCertificates(d->caCertificates);
         socket->setLocalCertificate(d->localCertificate);

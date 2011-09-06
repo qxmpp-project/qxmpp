@@ -26,6 +26,7 @@
 #ifndef QXMPPSTREAM_H
 #define QXMPPSTREAM_H
 
+#include <QAbstractSocket>
 #include <QObject>
 #include "QXmppLogger.h"
 
@@ -78,10 +79,11 @@ protected:
     virtual void handleStream(const QDomElement &element) = 0;
 
 private slots:
-    void socketConnected();
-    void socketDisconnected();
-    void socketEncrypted();
-    void socketReadyRead();
+    void _q_socketConnected();
+    void _q_socketDisconnected();
+    void _q_socketEncrypted();
+    void _q_socketError(QAbstractSocket::SocketError error);
+    void _q_socketReadyRead();
 
 private:
     QXmppStreamPrivate * const d;

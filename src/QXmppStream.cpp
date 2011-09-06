@@ -96,9 +96,13 @@ void QXmppStream::disconnectFromHost()
 
 /// Handles a stream start event, which occurs when the underlying transport
 /// becomes ready (socket connected, encryption started).
+///
+/// If you redefine handleStart(), make sure to call the base class's method.
 
 void QXmppStream::handleStart()
 {
+    d->dataBuffer.clear();
+    d->streamStart.clear();
 }
 
 /// Returns true if the stream is connected.
@@ -172,19 +176,22 @@ void QXmppStream::setSocket(QSslSocket *socket)
 
     // socket events
     bool check = connect(socket, SIGNAL(connected()),
-                    this, SLOT(socketConnected()));
+                    this, SLOT(_q_socketConnected()));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(socketDisconnected()));
+                    this, SLOT(_q_socketDisconnected()));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(encrypted()),
-                    this, SLOT(socketEncrypted()));
+                    this, SLOT(_q_socketEncrypted()));
     Q_ASSERT(check);
 
+    check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
+                    this, SLOT(_q_socketError(QAbstractSocket::SocketError)));
+
     check = connect(socket, SIGNAL(readyRead()),
-                    this, SLOT(socketReadyRead()));
+                    this, SLOT(_q_socketReadyRead()));
     Q_ASSERT(check);
 
     // relay signals
@@ -193,34 +200,34 @@ void QXmppStream::setSocket(QSslSocket *socket)
     Q_ASSERT(check);
 }
 
-void QXmppStream::socketConnected()
+void QXmppStream::_q_socketConnected()
 {
     info(QString("Socket connected to %1 %2").arg(
         d->socket->peerAddress().toString(),
         QString::number(d->socket->peerPort())));
-    d->dataBuffer.clear();
     handleStart();
 }
 
-void QXmppStream::socketDisconnected()
+void QXmppStream::_q_socketDisconnected()
 {
     info("Socket disconnected");
-    d->dataBuffer.clear();
 }
 
-void QXmppStream::socketEncrypted()
+void QXmppStream::_q_socketEncrypted()
 {
     debug("Socket encrypted");
-    d->dataBuffer.clear();
     handleStart();
 }
 
-void QXmppStream::socketReadyRead()
+void QXmppStream::_q_socketError(QAbstractSocket::SocketError socketError)
 {
-    const QByteArray data = d->socket->readAll();
-    //debug("SERVER [COULD BE PARTIAL DATA]:" + data.left(20));
+    Q_UNUSED(socketError);
+    warning(QString("Socket error: " + socket()->errorString()));
+}
 
-    d->dataBuffer.append(data);
+void QXmppStream::_q_socketReadyRead()
+{
+    d->dataBuffer.append(d->socket->readAll());
 
     // FIXME : maybe these QRegExps could be static?
     QRegExp startStreamRegex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
@@ -232,36 +239,31 @@ void QXmppStream::socketReadyRead()
     QByteArray completeXml = d->dataBuffer;
     const QString strData = QString::fromUtf8(d->dataBuffer);
     bool streamStart = false;
-    if(strData.contains(startStreamRegex))
-    {
+    if (d->streamStart.isEmpty() && strData.contains(startStreamRegex))
         streamStart = true;
-        d->streamStart = startStreamRegex.cap(0).toUtf8();
-    }
     else
         completeXml.prepend(d->streamStart);
-    if(!strData.contains(endStreamRegex))
+    if (!strData.contains(endStreamRegex))
         completeXml.append(streamRootElementEnd);
 
     // check whether we have a valid XML document
     QDomDocument doc;
-    if(!doc.setContent(completeXml, true))
+    if (!doc.setContent(completeXml, true))
         return;
 
     // remove data from buffer
     logReceived(strData);
     d->dataBuffer.clear();
+    if (streamStart)
+        d->streamStart = startStreamRegex.cap(0).toUtf8();
 
     // process stream start
-    QDomElement nodeRecv = doc.documentElement().firstChildElement();
     if (streamStart)
-    {
-        QDomElement streamElement = doc.documentElement();
-        handleStream(streamElement);
-    }
+        handleStream(doc.documentElement());
 
     // process stanzas
-    while(!nodeRecv.isNull())
-    {
+    QDomElement nodeRecv = doc.documentElement().firstChildElement();
+    while (!nodeRecv.isNull()) {
         handleStanza(nodeRecv);
         nodeRecv = nodeRecv.nextSiblingElement();
     }
