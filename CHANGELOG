@@ -16,8 +16,9 @@ QXmpp 0.x.y (UNRELEASED)
   - Improve QXmppServer packet routing performance.
 
 Issue Fixes:
-	Issue 106: 	QXmppClient can't override Qt's set of trusted SSL CAs
-	Issue 105: 	Initial presence is set before the roster request
+	Issue 105: Initial presence is set before the roster request
+	Issue 106: QXmppClient can't override Qt's set of trusted SSL CAs
+    Issue 116: sessionStarted not set for non-SASL connections
 	
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------

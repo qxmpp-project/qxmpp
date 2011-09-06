@@ -477,6 +477,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 debug("Authenticated (Non-SASL)");
 
                 // xmpp connection made
+                d->sessionStarted = true;
                 emit connected();
             }
             else if(QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv))
