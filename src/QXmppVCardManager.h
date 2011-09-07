@@ -68,7 +68,7 @@ public:
     const QXmppVCardIq& clientVCard() const;
     void setClientVCard(const QXmppVCardIq&);
     QString requestClientVCard();
-    bool isClientVCardReceived();
+    bool isClientVCardReceived() const;
 
     /// \cond
     QStringList discoveryFeatures() const;

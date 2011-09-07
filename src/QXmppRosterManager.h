@@ -66,7 +66,7 @@ class QXmppRosterManager : public QXmppClientExtension
 public:
     QXmppRosterManager(QXmppClient* stream);
     
-    bool isRosterReceived();
+    bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
     QXmppRosterIq::Item getRosterEntry(const QString& bareJid) const;
     

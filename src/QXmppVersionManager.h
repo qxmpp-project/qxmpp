@@ -45,9 +45,9 @@ public:
     void setClientVersion(const QString&);
     void setClientOs(const QString&);
 
-    QString clientName();
-    QString clientVersion();
-    QString clientOs();
+    QString clientName() const;
+    QString clientVersion() const;
+    QString clientOs() const;
 
     /// \cond
     QStringList discoveryFeatures() const;

@@ -114,7 +114,7 @@ QString QXmppVCardManager::requestClientVCard()
 ///
 /// \return bool
 ///
-bool QXmppVCardManager::isClientVCardReceived()
+bool QXmppVCardManager::isClientVCardReceived() const
 {
     return m_isClientVCardReceived;
 }

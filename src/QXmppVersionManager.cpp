@@ -133,7 +133,7 @@ void QXmppVersionManager::setClientOs(const QString& os)
 /// By default this is set to the QApplication::applicationName(), or
 /// "Based on QXmpp" if not specified.
 
-QString QXmppVersionManager::clientName()
+QString QXmppVersionManager::clientName() const
 {
     return m_clientName;
 }
@@ -143,7 +143,7 @@ QString QXmppVersionManager::clientName()
 /// By default this is set to QApplication::applicationVersion(), or
 /// QXmpp's version if not specified.
 
-QString QXmppVersionManager::clientVersion()
+QString QXmppVersionManager::clientVersion() const
 {
     return m_clientVersion;
 }
@@ -153,7 +153,7 @@ QString QXmppVersionManager::clientVersion()
 /// By default this is "Linux", "Mac OS", "Symbian" or "Windows" depending
 /// on the platform QXmpp was compiled for.
 
-QString QXmppVersionManager::clientOs()
+QString QXmppVersionManager::clientOs() const
 {
     return m_clientOs;
 }

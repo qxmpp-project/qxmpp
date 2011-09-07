@@ -338,7 +338,7 @@ QXmppPresence QXmppRosterManager::getPresence(const QString& bareJid,
 ///
 /// \return true if roster received else false
 
-bool QXmppRosterManager::isRosterReceived()
+bool QXmppRosterManager::isRosterReceived() const
 {
     return m_isRosterReceived;
 }
