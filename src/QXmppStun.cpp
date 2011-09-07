@@ -1075,6 +1075,7 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
     m_tries(0)
 {
     bool check;
+    Q_UNUSED(check);
 
     check = connect(this, SIGNAL(writeStun(QXmppStunMessage)),
                     receiver, SLOT(writeStun(QXmppStunMessage)));
@@ -1147,6 +1148,7 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
     m_state(UnconnectedState)
 {
     bool check;
+    Q_UNUSED(check);
 
     socket = new QUdpSocket(this);
     check = connect(socket, SIGNAL(readyRead()),
@@ -1578,6 +1580,8 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
     m_turnConfigured(false)
 {
     bool check;
+    Q_UNUSED(check);
+
     m_localUser = generateStanzaHash(4);
     m_localPassword = generateStanzaHash(22);
 
@@ -2330,6 +2334,9 @@ QXmppIceComponent *QXmppIceConnection::component(int component)
 
 void QXmppIceConnection::addComponent(int component)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (m_components.contains(component))
     {
         warning(QString("Already have component %1").arg(QString::number(component)));
@@ -2346,12 +2353,12 @@ void QXmppIceConnection::addComponent(int component)
     socket->setTurnUser(m_turnUser);
     socket->setTurnPassword(m_turnPassword);
 
-    bool check = connect(socket, SIGNAL(localCandidatesChanged()),
-        this, SIGNAL(localCandidatesChanged()));
+    check = connect(socket, SIGNAL(localCandidatesChanged()),
+                    this, SIGNAL(localCandidatesChanged()));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(connected()),
-        this, SLOT(slotConnected()));
+                    this, SLOT(slotConnected()));
     Q_ASSERT(check);
 
     m_components[component] = socket;

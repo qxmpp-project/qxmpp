@@ -96,12 +96,15 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     : QXmppStream(parent),
     d(new QXmppOutgoingClientPrivate)
 {
+    bool check;
+    Q_UNUSED(check);
+
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
     // initialise logger
-    bool check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
-                         this, SLOT(socketSslErrors(QList<QSslError>)));
+    check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
+                    this, SLOT(socketSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),

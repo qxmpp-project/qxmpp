@@ -489,7 +489,7 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     answerIndex = 0;
     while ((p < response + responseLength) && (answerIndex < answerCount))
     {
-        int type, klass, ttl, size;
+        int type, size;
         status = local_dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
@@ -501,9 +501,9 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         p += status;
         type = (p[0] << 8) | p[1];
         p += 2;
-        klass = (p[0] << 8) | p[1];
+        //klass = (p[0] << 8) | p[1];
         p += 2;
-        ttl = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+        //ttl = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
         p += 4;
         size = (p[0] << 8) | p[1];
         p += 2;

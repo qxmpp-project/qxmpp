@@ -131,11 +131,14 @@ QXmppClient::QXmppClient(QObject *parent)
     : QXmppLoggable(parent),
     d(new QXmppClientPrivate(this))
 {
+    bool check;
+    Q_UNUSED(check);
+
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
-    bool check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool&)),
-                         this, SLOT(_q_elementReceived(QDomElement,bool&)));
+    check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool&)),
+                    this, SLOT(_q_elementReceived(QDomElement,bool&)));
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(messageReceived(QXmppMessage)),

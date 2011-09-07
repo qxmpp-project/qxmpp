@@ -35,16 +35,19 @@
 QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
     : m_isRosterReceived(false)
 {
-    bool check = QObject::connect(client, SIGNAL(connected()),
-        this, SLOT(connected()));
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(client, SIGNAL(connected()),
+                    this, SLOT(connected()));
     Q_ASSERT(check);
 
-    check = QObject::connect(client, SIGNAL(disconnected()),
-        this, SLOT(disconnected()));
+    check = connect(client, SIGNAL(disconnected()),
+                    this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = QObject::connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-        this, SLOT(presenceReceived(QXmppPresence)));
+    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 }
 

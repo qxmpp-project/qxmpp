@@ -170,12 +170,15 @@ QSslSocket *QXmppStream::socket() const
 
 void QXmppStream::setSocket(QSslSocket *socket)
 {
+    bool check;
+    Q_UNUSED(check);
+
     d->socket = socket;
     if (!d->socket)
         return;
 
     // socket events
-    bool check = connect(socket, SIGNAL(connected()),
+    check = connect(socket, SIGNAL(connected()),
                     this, SLOT(_q_socketConnected()));
     Q_ASSERT(check);
 

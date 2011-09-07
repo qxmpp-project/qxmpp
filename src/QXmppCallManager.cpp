@@ -298,6 +298,8 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
 {
+    bool check;
+    Q_UNUSED(check);
     Q_ASSERT(manager);
 
     Stream *stream = new Stream;
@@ -331,7 +333,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     stream->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    bool check = QObject::connect(stream->connection, SIGNAL(localCandidatesChanged()),
+    check = QObject::connect(stream->connection, SIGNAL(localCandidatesChanged()),
         q, SLOT(localCandidatesChanged()));
     Q_ASSERT(check);
 

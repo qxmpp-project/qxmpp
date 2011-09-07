@@ -84,12 +84,14 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
 
 void QXmppMucManager::setClient(QXmppClient* client)
 {
+    bool check;
+    Q_UNUSED(check);
+
     QXmppClientExtension::setClient(client);
 
-    bool check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
-        this, SLOT(_q_messageReceived(QXmppMessage)));
+    check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(_q_messageReceived(QXmppMessage)));
     Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 QStringList QXmppMucManager::discoveryFeatures() const
@@ -170,6 +172,7 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     : QObject(parent)
 {
     bool check;
+    Q_UNUSED(check);
 
     d = new QXmppMucRoomPrivate;
     d->allowedActions = NoAction;

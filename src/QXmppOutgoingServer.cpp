@@ -56,6 +56,7 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     d(new QXmppOutgoingServerPrivate)
 {
     bool check;
+    Q_UNUSED(check);
 
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);

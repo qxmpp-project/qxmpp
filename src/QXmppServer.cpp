@@ -377,10 +377,13 @@ void QXmppServerPrivate::stopExtensions()
 QXmppServer::QXmppServer(QObject *parent)
     : QXmppLoggable(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     d = new QXmppServerPrivate(this);
     d->serverForClients = new QXmppSslServer(this);
-    bool check = connect(d->serverForClients, SIGNAL(newConnection(QSslSocket*)),
-                         this, SLOT(_q_clientConnection(QSslSocket*)));
+    check = connect(d->serverForClients, SIGNAL(newConnection(QSslSocket*)),
+                    this, SLOT(_q_clientConnection(QSslSocket*)));
     Q_ASSERT(check);
 
     d->serverForServers = new QXmppSslServer(this);
@@ -645,10 +648,13 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
 
 void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 {
+    bool check;
+    Q_UNUSED(check);
+
     stream->setPasswordChecker(d->passwordChecker);
 
-    bool check = connect(stream, SIGNAL(connected()),
-                         this, SLOT(_q_streamConnected()));
+    check = connect(stream, SIGNAL(connected()),
+                    this, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(disconnected()),
@@ -725,6 +731,9 @@ void QXmppServer::_q_elementReceived(const QDomElement &element)
 
 void QXmppServer::_q_serverConnection(QSslSocket *socket)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // check the socket didn't die since the signal was emitted
     if (socket->state() != QAbstractSocket::ConnectedState) {
         delete socket;
@@ -734,12 +743,12 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
     QXmppIncomingServer *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
-    bool check = connect(stream, SIGNAL(connected()),
-                         this, SLOT(_q_streamConnected()));
+    check = connect(stream, SIGNAL(connected()),
+                    this, SLOT(_q_streamConnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(disconnected()),
-                         this, SLOT(_q_streamDisconnected()));
+                    this, SLOT(_q_streamDisconnected()));
     Q_ASSERT(check);
 
     check = connect(stream, SIGNAL(dialbackRequestReceived(QXmppDialback)),
