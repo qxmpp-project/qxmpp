@@ -250,7 +250,7 @@ QString QXmppPresence::getTypeStr() const
     case QXmppPresence::Unsubscribed:
         return "unsubscribed";
     case QXmppPresence::Probe:
-        return "probe"; 
+        return "probe";
     default:
         qWarning("QXmppPresence::getTypeStr() invalid type %d", (int)m_type);
         return "";
@@ -327,21 +327,20 @@ void QXmppPresence::Status::setTypeFromStr(const QString& str)
 
 QString QXmppPresence::Status::getTypeStr() const
 {
-    switch(m_type)
-    {
+    switch(m_type) {
     case QXmppPresence::Status::Online:
-        return ""; 
+        return "";
     case QXmppPresence::Status::Offline:
         // FIXME: there is no keyword for Offline
-        return ""; 
+        return "";
     case QXmppPresence::Status::Away:
-        return "away"; 
+        return "away";
     case QXmppPresence::Status::XA:
-        return "xa"; 
+        return "xa";
     case QXmppPresence::Status::DND:
-        return "dnd"; 
+        return "dnd";
     case QXmppPresence::Status::Chat:
-        return "chat"; 
+        return "chat";
     default:
         qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
                  (int)m_type);
