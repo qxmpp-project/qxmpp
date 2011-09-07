@@ -234,99 +234,51 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
 QString QXmppPresence::getTypeStr() const
 {
-    QString text;
-    switch(m_type)
-    {
+    switch(m_type) {
     case QXmppPresence::Error:
-        text = "error"; 
-        break;
+        return "error";
     case QXmppPresence::Available:
-        // no type-attribute if available
-        text = ""; 
-        break;
+        return "";
     case QXmppPresence::Unavailable:
-        text = "unavailable"; 
-        break;
+        return "unavailable";
     case QXmppPresence::Subscribe:
-        text = "subscribe"; 
-        break;
+        return "subscribe";
     case QXmppPresence::Subscribed:
-        text = "subscribed"; 
-        break;
+        return "subscribed";
     case QXmppPresence::Unsubscribe:
-        text = "unsubscribe"; 
-        break;
+        return "unsubscribe";
     case QXmppPresence::Unsubscribed:
-        text = "unsubscribed"; 
-        break;
+        return "unsubscribed";
     case QXmppPresence::Probe:
-        text = "probe"; 
-        break;
+        return "probe"; 
     default:
         qWarning("QXmppPresence::getTypeStr() invalid type %d", (int)m_type);
-        break;
+        return "";
     }
-    return text;
 }
 
 void QXmppPresence::setTypeFromStr(const QString& str)
 {
-    QXmppPresence::Type type;
     if(str == "error")
-    {
-        type = QXmppPresence::Error;
-        setType(type);
-        return;
-    }
-    else if(str == "unavailable")
-    {
-        type = QXmppPresence::Unavailable;
-        setType(type);
-        return;
-    }
-    else if(str == "subscribe")
-    {
-        type = QXmppPresence::Subscribe;
-        setType(type);
-        return;
-    }
-    else if(str == "subscribed")
-    {
-        type = QXmppPresence::Subscribed;
-        setType(type);
-        return;
-    }
-    else if(str == "unsubscribe")
-    {
-        type = QXmppPresence::Unsubscribe;
-        setType(type);
-        return;
-    }
-    else if(str == "unsubscribed")
-    {
-        type = QXmppPresence::Unsubscribed;
-        setType(type);
-        return;
-    }
-    else if(str == "probe")
-    {
-        type = QXmppPresence::Probe;
-        setType(type);
-        return;
-    }
+        m_type = QXmppPresence::Error;
     else if(str == "")
-    {
-        type = QXmppPresence::Available;
-        setType(type);
-        return;
-    }
-    else
-    {
-        type = static_cast<QXmppPresence::Type>(-1);
+        m_type = QXmppPresence::Available;
+    else if(str == "unavailable")
+        m_type = QXmppPresence::Unavailable;
+    else if(str == "subscribe")
+        m_type = QXmppPresence::Subscribe;
+    else if(str == "subscribed")
+        m_type = QXmppPresence::Subscribed;
+    else if(str == "unsubscribe")
+        m_type = QXmppPresence::Unsubscribe;
+    else if(str == "unsubscribed")
+        m_type = QXmppPresence::Unsubscribed;
+    else if(str == "probe")
+        m_type = QXmppPresence::Probe;
+    else {
         qWarning("QXmppPresence::setTypeFromStr() invalid input string type: %s",
                  qPrintable(str));
-        setType(type);
-        return;
+        m_type = QXmppPresence::Error;
     }
 }
 
@@ -355,78 +307,46 @@ void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
 
 void QXmppPresence::Status::setTypeFromStr(const QString& str)
 {
-    // there is no keyword for Offline
-
-    QXmppPresence::Status::Type type;
-    if(str == "")   // not type-attribute means online
-    {
-        type = QXmppPresence::Status::Online;
-        setType(type);
-        return;
-    }
+    // FIXME: there is no keyword for Offline
+    if(str == "")
+        m_type = QXmppPresence::Status::Online;
     else if(str == "away")
-    {
-        type = QXmppPresence::Status::Away;
-        setType(type);
-        return;
-    }
-    else if(str == "xa")
-    {
-        type = QXmppPresence::Status::XA;
-        setType(type);
-        return;
-    }
-    else if(str == "dnd")
-    {
-        type = QXmppPresence::Status::DND;
-        setType(type);
-        return;
-    }
+        m_type = QXmppPresence::Status::Away;
     else if(str == "chat")
-    {
-        type = QXmppPresence::Status::Chat;
-        setType(type);
-        return;
-    }
-    else
-    {
-        type = static_cast<QXmppPresence::Status::Type>(-1);
+        m_type = QXmppPresence::Status::Chat;
+    else if(str == "dnd")
+        m_type = QXmppPresence::Status::DND;
+    else if(str == "xa")
+        m_type = QXmppPresence::Status::XA;
+    else {
         qWarning("QXmppPresence::Status::setTypeFromStr() invalid input string type %s", 
             qPrintable(str));
-        setType(type);
+        m_type = QXmppPresence::Status::Online;
     }
 }
 
 QString QXmppPresence::Status::getTypeStr() const
 {
-    QString text;
     switch(m_type)
     {
     case QXmppPresence::Status::Online:
-        // no type-attribute if available
-        text = ""; 
-        break;
+        return ""; 
     case QXmppPresence::Status::Offline:
-        text = ""; 
-        break;
+        // FIXME: there is no keyword for Offline
+        return ""; 
     case QXmppPresence::Status::Away:
-        text = "away"; 
-        break;
+        return "away"; 
     case QXmppPresence::Status::XA:
-        text = "xa"; 
-        break;
+        return "xa"; 
     case QXmppPresence::Status::DND:
-        text = "dnd"; 
-        break;
+        return "dnd"; 
     case QXmppPresence::Status::Chat:
-        text = "chat"; 
-        break;
+        return "chat"; 
     default:
         qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
                  (int)m_type);
-        break;
+        return "";
     }
-    return text;
 }
 
 /// Returns the status text, a textual description of the user's status.
