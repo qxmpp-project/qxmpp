@@ -180,6 +180,9 @@ public:
 QXmppServerProxy65::QXmppServerProxy65()
     : d(new QXmppServerProxy65Private)
 {
+    bool check;
+    Q_UNUSED(check);
+
     d->port = 7777;
     d->server = new QXmppSocksServer(this);
 
@@ -188,12 +191,12 @@ QXmppServerProxy65::QXmppServerProxy65()
     d->totalBytes = 0;
     d->totalTransfers = 0;
 
-    bool check = connect(d->server, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
-        this, SLOT(slotSocketConnected(QTcpSocket*,QString,quint16)));
+    check = connect(d->server, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+                    this, SLOT(slotSocketConnected(QTcpSocket*,QString,quint16)));
     Q_ASSERT(check);
 
     check = connect(d->statisticsTimer, SIGNAL(timeout()),
-        this, SLOT(slotUpdateStatistics()));
+                    this, SLOT(slotUpdateStatistics()));
     Q_ASSERT(check);
 }
 
@@ -468,12 +471,16 @@ void QXmppServerProxy65::setStatistics(const QVariantMap &statistics)
 void QXmppServerProxy65::slotSocketConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
     Q_UNUSED(port);
-    bool check;
+
     QTcpSocketPair *pair = d->pairs.value(hostName);
     if (!pair)
     {
+        bool check;
+        Q_UNUSED(check);
+
         pair = new QTcpSocketPair(hostName, this);
-        check = connect(pair, SIGNAL(finished()), this, SLOT(slotPairFinished()));
+        check = connect(pair, SIGNAL(finished()),
+                        this, SLOT(slotPairFinished()));
         Q_ASSERT(check);
         d->pairs.insert(hostName, pair);
     }

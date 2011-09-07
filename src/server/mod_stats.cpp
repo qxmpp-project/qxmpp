@@ -280,16 +280,19 @@ bool QXmppServerStats::handleStanza(QXmppStream *stream, const QDomElement &elem
 
 bool QXmppServerStats::start()
 {
+    bool check;
+    Q_UNUSED(check);
+
     // determine jid
     if (d->jid.isEmpty())
         d->jid = "statistics." + server()->domain();
 
-    bool check = connect(server(), SIGNAL(streamAdded(QXmppStream*)),
-        this, SLOT(streamAdded(QXmppStream*)));
+    check = connect(server(), SIGNAL(streamAdded(QXmppStream*)),
+                    this, SLOT(streamAdded(QXmppStream*)));
     Q_ASSERT(check);
 
     check = connect(server(), SIGNAL(streamRemoved(QXmppStream*)),
-        this, SLOT(streamRemoved(QXmppStream*)));
+                    this, SLOT(streamRemoved(QXmppStream*)));
     Q_ASSERT(check);
 
     d->statisticsTimer->start();
