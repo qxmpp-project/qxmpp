@@ -171,12 +171,14 @@ SOURCES += \
     server/mod_time.cpp \
     server/mod_version.cpp
 
-# pkg-config support
-CONFIG += create_pc create_prl no_install_prl
-QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
-
 # Installation
 headers.files = $$INSTALL_HEADERS
 headers.path = $$[QT_INSTALL_PREFIX]/include/qxmpp
 target.path = $$[QT_INSTALL_LIBS]
 INSTALLS += headers target
+
+# pkg-config support
+CONFIG += create_pc create_prl no_install_prl
+QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$headers.path
