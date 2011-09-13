@@ -28,7 +28,6 @@
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QSslSocket>
-#include <QtConcurrentRun>
 
 #include "QXmppConstants.h"
 #include "QXmppDialback.h"
