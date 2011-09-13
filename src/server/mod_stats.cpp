@@ -28,9 +28,6 @@
 
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
-#include "QXmppIncomingClient.h"
-#include "QXmppIncomingServer.h"
-#include "QXmppOutgoingServer.h"
 #include "QXmppServer.h"
 #include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
@@ -173,20 +170,13 @@ QStringList QXmppServerStats::discoveryItems() const
     return QStringList() << d->jid;
 }
 
-QVariantMap QXmppServerStats::statistics() const
+QVariantMap QXmppServerStats::statistics()
 {
-    QVariantMap stats;
-    stats["version"] = qApp->applicationVersion();
-    stats["incoming-clients"] = d->incomingClients;
-    stats["incoming-servers"] = d->incomingServers;
-    stats["outgoing-servers"] = d->outgoingServers;
-    return stats;
+    return server()->statistics();
 }
 
-bool QXmppServerStats::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppServerStats::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.attribute("to") != d->jid)
         return false;
 
@@ -280,20 +270,9 @@ bool QXmppServerStats::handleStanza(QXmppStream *stream, const QDomElement &elem
 
 bool QXmppServerStats::start()
 {
-    bool check;
-    Q_UNUSED(check);
-
     // determine jid
     if (d->jid.isEmpty())
         d->jid = "statistics." + server()->domain();
-
-    check = connect(server(), SIGNAL(streamAdded(QXmppStream*)),
-                    this, SLOT(streamAdded(QXmppStream*)));
-    Q_ASSERT(check);
-
-    check = connect(server(), SIGNAL(streamRemoved(QXmppStream*)),
-                    this, SLOT(streamRemoved(QXmppStream*)));
-    Q_ASSERT(check);
 
     d->statisticsTimer->start();
 
@@ -303,36 +282,6 @@ bool QXmppServerStats::start()
 void QXmppServerStats::stop()
 {
     d->statisticsTimer->stop();
-
-    disconnect(server(), SIGNAL(streamAdded(QXmppStream*)),
-        this, SLOT(streamAdded(QXmppStream*)));
-
-    disconnect(server(), SIGNAL(streamRemoved(QXmppStream*)),
-        this, SLOT(streamRemoved(QXmppStream*)));
-}
-
-void QXmppServerStats::streamAdded(QXmppStream *stream)
-{
-    if (qobject_cast<QXmppIncomingClient*>(stream))
-        d->incomingClients++;
-    else if (qobject_cast<QXmppIncomingServer*>(stream))
-        d->incomingServers++;
-    else if (qobject_cast<QXmppOutgoingServer*>(stream))
-        d->outgoingServers++;
-    else
-        return;
-}
-
-void QXmppServerStats::streamRemoved(QXmppStream *stream)
-{
-    if (qobject_cast<QXmppIncomingClient*>(stream))
-        d->incomingClients--;
-    else if (qobject_cast<QXmppIncomingServer*>(stream))
-        d->incomingServers--;
-    else if (qobject_cast<QXmppOutgoingServer*>(stream))
-        d->outgoingServers--;
-    else
-        return;
 }
 
 // PLUGIN

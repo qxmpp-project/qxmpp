@@ -46,7 +46,6 @@ public:
     QXmppOutgoingServer(const QString &domain, QObject *parent);
     ~QXmppOutgoingServer();
 
-    void connectToHost(const QString &domain);
     bool isConnected() const;
 
     QString localStreamKey() const;
@@ -65,6 +64,10 @@ protected:
     void handleStream(const QDomElement &streamElement);
     void handleStanza(const QDomElement &stanzaElement);
     /// \endcond
+
+public slots:
+    void connectToHost(const QString &domain);
+    void queueData(const QByteArray &data);
 
 private slots:
     void connectToHost(const QXmppSrvInfo &serviceInfo);

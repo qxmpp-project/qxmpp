@@ -190,7 +190,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     if (d->idleTimer->interval())
         d->idleTimer->start();
 
-    if (ns == ns_tls && nodeRecv.tagName() == "starttls")
+    if (ns == ns_tls && nodeRecv.tagName() == QLatin1String("starttls"))
     {
         sendData("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
         socket()->flush();
@@ -199,10 +199,10 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     }
     else if (ns == ns_sasl)
     {
-        if (nodeRecv.tagName() == "auth")
+        if (nodeRecv.tagName() == QLatin1String("auth"))
         {
             const QString mechanism = nodeRecv.attribute("mechanism");
-            if (mechanism == "PLAIN")
+            if (mechanism == QLatin1String("PLAIN"))
             {
                 QList<QByteArray> auth = QByteArray::fromBase64(nodeRecv.text().toAscii()).split('\0');
                 if (auth.size() != 3)
@@ -229,7 +229,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 reply->setProperty("__sasl_username", request.username());
                 connect(reply, SIGNAL(finished()), this, SLOT(onPasswordReply()));
             }
-            else if (mechanism == "DIGEST-MD5")
+            else if (mechanism == QLatin1String("DIGEST-MD5"))
             {
                 // generate nonce
                 d->saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
@@ -254,7 +254,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
         }
-        else if (nodeRecv.tagName() == "response")
+        else if (nodeRecv.tagName() == QLatin1String("response"))
         {
             if (d->saslDigestStep == 1)
             {
@@ -294,10 +294,10 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     }
     else if (ns == ns_client)
     {
-        if (nodeRecv.tagName() == "iq")
+        if (nodeRecv.tagName() == QLatin1String("iq"))
         {
             const QString type = nodeRecv.attribute("type");
-            if (QXmppBindIq::isBindIq(nodeRecv) && type == "set")
+            if (QXmppBindIq::isBindIq(nodeRecv) && type == QLatin1String("set"))
             {
                 QXmppBindIq bindSet;
                 bindSet.parse(nodeRecv);
@@ -316,7 +316,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 emit connected();
                 return;
             }
-            else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == "set")
+            else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == QLatin1String("set"))
             {
                 QXmppSessionIq sessionSet;
                 sessionSet.parse(nodeRecv);
@@ -339,18 +339,18 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // process unhandled stanzas
-        if (nodeRecv.tagName() == "iq" ||
-            nodeRecv.tagName() == "message" ||
-            nodeRecv.tagName() == "presence")
+        if (nodeRecv.tagName() == QLatin1String("iq") ||
+            nodeRecv.tagName() == QLatin1String("message") ||
+            nodeRecv.tagName() == QLatin1String("presence"))
         {
             QDomElement nodeFull(nodeRecv);
 
             // if the sender is empty, set it to the appropriate JID
             if (nodeFull.attribute("from").isEmpty())
             {
-                if (nodeFull.tagName() == "presence" &&
-                    (nodeFull.attribute("type") == "subscribe" ||
-                    nodeFull.attribute("type") == "subscribed"))
+                if (nodeFull.tagName() == QLatin1String("presence") &&
+                    (nodeFull.attribute("type") == QLatin1String("subscribe") ||
+                    nodeFull.attribute("type") == QLatin1String("subscribed")))
                     nodeFull.setAttribute("from", jidToBareJid(d->jid));
                 else
                     nodeFull.setAttribute("from", d->jid);

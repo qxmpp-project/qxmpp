@@ -37,10 +37,8 @@ QStringList QXmppServerVersion::discoveryFeatures() const
     return QStringList() << ns_version;
 }
 
-bool QXmppServerVersion::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppServerVersion::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.attribute("to") != server()->domain())
         return false;
 

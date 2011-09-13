@@ -37,10 +37,8 @@ QStringList QXmppServerTime::discoveryFeatures() const
     return QStringList() << ns_entity_time;
 }
 
-bool QXmppServerTime::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppServerTime::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.attribute("to") != server()->domain())
         return false;
 

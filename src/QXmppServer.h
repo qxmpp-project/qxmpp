@@ -25,6 +25,7 @@
 #define QXMPPSERVER_H
 
 #include <QTcpServer>
+#include <QVariantMap>
 
 #include "QXmppLogger.h"
 
@@ -75,6 +76,8 @@ public:
     QXmppPasswordChecker *passwordChecker();
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
+    QVariantMap statistics() const;
+
     void addCaCertificates(const QString &caCertificates);
     void setLocalCertificate(const QString &path);
     void setPrivateKey(const QString &path);
@@ -86,26 +89,30 @@ public:
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
 
+    /// \cond
+    // FIXME: this method should not be public, but it is needed to
+    // implement BOSH support as an extension.
     void addIncomingClient(QXmppIncomingClient *stream);
-    QList<QXmppPresence> availablePresences(const QString &bareJid);
+    /// \endcond
 
 signals:
-    /// This signal is emitted when an XMPP stream is added.
-    void streamAdded(QXmppStream *stream);
+    /// This signal is emitted when a client has connected.
+    void clientConnected(const QString &jid);
 
-    /// This signal is emitted when an XMPP stream is connected.
-    void streamConnected(QXmppStream *stream);
+    /// This signal is emitted when a client has disconnected.
+    void clientDisconnected(const QString &jid);
 
-    /// This signal is emitted when an XMPP stream is removed.
-    void streamRemoved(QXmppStream *stream);
+public slots:
+    void handleElement(const QDomElement &element);
 
 private slots:
     void _q_clientConnection(QSslSocket *socket);
+    void _q_clientConnected();
+    void _q_clientDisconnected();
     void _q_dialbackRequestReceived(const QXmppDialback &dialback);
-    void _q_elementReceived(const QDomElement &element);
+    void _q_outgoingServerDisconnected();
     void _q_serverConnection(QSslSocket *socket);
-    void _q_streamConnected();
-    void _q_streamDisconnected();
+    void _q_serverDisconnected();
 
 private:
     friend class QXmppServerPrivate;

@@ -44,7 +44,7 @@ public:
     /// \cond
     QStringList discoveryFeatures() const;
     QStringList discoveryItems() const;
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    bool handleStanza(const QDomElement &element);
     /// \endcond
 
 private:

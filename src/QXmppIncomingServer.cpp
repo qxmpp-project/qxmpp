@@ -104,7 +104,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 {
     const QString ns = stanza.namespaceURI();
 
-    if (ns == ns_tls && stanza.tagName() == "starttls")
+    if (ns == ns_tls && stanza.tagName() == QLatin1String("starttls"))
     {
         sendData("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
         socket()->flush();
@@ -188,7 +188,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     sendPacket(response);
 
     // check for success
-    if (response.type() == "valid")
+    if (response.type() == QLatin1String("valid"))
     {
         info(QString("Verified incoming domain %1").arg(dialback.from()));
         const bool wasConnected = !d->authenticated.isEmpty();

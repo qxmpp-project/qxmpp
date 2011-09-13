@@ -36,6 +36,7 @@
 class QXmppOutgoingServerPrivate
 {
 public:
+    QList<QByteArray> dataQueue;
     QString localDomain;
     QString localStreamKey;
     QString remoteDomain;
@@ -180,7 +181,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     }
     else if (ns == ns_tls)
     {
-        if (stanza.tagName() == "proceed")
+        if (stanza.tagName() == QLatin1String("proceed"))
         {
             debug("Starting encryption");
             socket()->startClientEncryption();
@@ -202,10 +203,17 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         }
         if (response.command() == QXmppDialback::Result)
         {
-            if (response.type() == "valid")
+            if (response.type() == QLatin1String("valid"))
             {
                 info(QString("Outgoing server stream to %1 is ready").arg(response.from()));
                 d->ready = true;
+
+                // send queued data
+                foreach (const QByteArray &data, d->dataQueue)
+                    sendData(data);
+                d->dataQueue.clear();
+
+                // emit signal
                 emit connected();
             }
         }
@@ -250,6 +258,18 @@ void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 {
     d->verifyId = id;
     d->verifyKey = key;
+}
+
+/// Sends or queues data until connected.
+///
+/// \param data
+
+void QXmppOutgoingServer::queueData(const QByteArray &data)
+{
+    if (isConnected())
+        sendData(data);
+    else
+        d->dataQueue.append(data);
 }
 
 /// Returns the remote server's domain.

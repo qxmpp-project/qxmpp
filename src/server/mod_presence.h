@@ -21,22 +21,40 @@
  *
  */
 
-#ifndef QXMPP_SERVER_TIME_H
-#define QXMPP_SERVER_TIME_H
+#ifndef QXMPP_SERVER_PRESENCE_H
+#define QXMPP_SERVER_PRESENCE_H
 
 #include "QXmppServerExtension.h"
 
-/// \brief QXmppServer extension for XEP-0202: Entity Time.
+class QXmppPresence;
+class QXmppServerPresencePrivate;
+
+/// \brief QXmppServer extension for presence handling.
 ///
 
-class QXmppServerTime : public QXmppServerExtension
+class QXmppServerPresence : public QXmppServerExtension
 {
     Q_OBJECT
-    Q_CLASSINFO("ExtensionName", "time");
+    Q_CLASSINFO("ExtensionName", "presence");
 
 public:
-    QStringList discoveryFeatures() const;
+    QXmppServerPresence();
+    ~QXmppServerPresence();
+
+    QList<QXmppPresence> availablePresences(const QString &bareJid) const;
     bool handleStanza(const QDomElement &element);
+    QSet<QString> presenceSubscribers(const QString &jid);
+    bool start();
+    void stop();
+
+    static QXmppServerPresence* instance(QXmppServer *server);
+
+private slots:
+    void _q_clientDisconnected(const QString &jid);
+
+private:
+    friend class QXmppServerPresencePrivate;
+    QXmppServerPresencePrivate *d;
 };
 
 #endif

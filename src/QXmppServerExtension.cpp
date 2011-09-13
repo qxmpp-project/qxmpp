@@ -78,12 +78,10 @@ QString QXmppServerExtension::extensionName() const
 ///
 /// Return true if no further processing should occur, false otherwise.
 ///
-/// \param stream The QXmppStream on which the stanza was received.
 /// \param stanza The received stanza.
 
-bool QXmppServerExtension::handleStanza(QXmppStream *stream, const QDomElement &stanza)
+bool QXmppServerExtension::handleStanza(const QDomElement &stanza)
 {
-    Q_UNUSED(stream);
     Q_UNUSED(stanza);
     return false;
 }
@@ -92,20 +90,20 @@ bool QXmppServerExtension::handleStanza(QXmppStream *stream, const QDomElement &
 ///
 /// \param jid
 
-QStringList QXmppServerExtension::presenceSubscribers(const QString &jid)
+QSet<QString> QXmppServerExtension::presenceSubscribers(const QString &jid)
 {
     Q_UNUSED(jid);
-    return QStringList();
+    return QSet<QString>();
 }
 
 /// Returns the list of subscriptions for the given JID.
 ///
 /// \param jid
 
-QStringList QXmppServerExtension::presenceSubscriptions(const QString &jid)
+QSet<QString> QXmppServerExtension::presenceSubscriptions(const QString &jid)
 {
     Q_UNUSED(jid);
-    return QStringList();
+    return QSet<QString>();
 }
 
 /// Returns the extension's statistics.

@@ -51,15 +51,13 @@ public:
 
     /// cond
     QStringList discoveryItems() const;
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
-    QVariantMap statistics() const;
+    bool handleStanza(const QDomElement &element);
+    QVariantMap statistics();
     bool start();
     void stop();
     /// \endcond
 
 private slots:
-    void streamAdded(QXmppStream *stream);
-    void streamRemoved(QXmppStream *stream);
     void writeStatistics();
 
 private:

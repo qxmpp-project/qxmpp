@@ -66,6 +66,7 @@ class QXmppServerProxy65 : public QXmppServerExtension
 {
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "proxy65");
+    Q_PROPERTY(QString advertisedHost READ advertisedHost WRITE setAdvertisedHost);
     Q_PROPERTY(QStringList allowedDomains READ allowedDomains WRITE setAllowedDomains);
     Q_PROPERTY(QString jid READ jid WRITE setJid);
     Q_PROPERTY(QString host READ host WRITE setHost);
@@ -74,6 +75,9 @@ class QXmppServerProxy65 : public QXmppServerExtension
 public:
     QXmppServerProxy65();
     ~QXmppServerProxy65();
+
+    QString advertisedHost() const;
+    void setAdvertisedHost(const QString &advertisedHost);
 
     QStringList allowedDomains() const;
     void setAllowedDomains(const QStringList &allowedDomains);
@@ -89,7 +93,7 @@ public:
 
     /// \cond
     QStringList discoveryItems() const;
-    bool handleStanza(QXmppStream *stream, const QDomElement &element);
+    bool handleStanza(const QDomElement &element);
     bool start();
     void stop();
     QVariantMap statistics() const;

@@ -52,10 +52,8 @@ QStringList QXmppServerDiscovery::discoveryItems() const
     return m_discoveryItems;
 }
 
-bool QXmppServerDiscovery::handleStanza(QXmppStream *stream, const QDomElement &element)
+bool QXmppServerDiscovery::handleStanza(const QDomElement &element)
 {
-    Q_UNUSED(stream);
-
     if (element.attribute("to") != server()->domain())
         return false;
 
