@@ -106,7 +106,8 @@ int main(int argc, char *argv[])
         source.close();
 
         // add links for XEPs
-        code.replace(QRegExp("(XEP-([0-9]{4}))"), "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
+        QRegExp regexp("(XEP-([0-9]{4})(: [^\\s.]+( [A-Z][^\\s.]*)*)?)");
+        code.replace(regexp, "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
 
         QTextStream output(stdout);
         output << code;
