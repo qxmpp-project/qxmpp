@@ -322,6 +322,23 @@ void TestPackets::testMessage()
     QCOMPARE(message.subject(), QString());
     QCOMPARE(message.thread(), QString());
     QCOMPARE(message.state(), QXmppMessage::None);
+    QCOMPARE(message.isAttentionRequested(), false);
+    serializePacket(message, xml);
+}
+
+void TestPackets::testMessageAttention()
+{
+    const QByteArray xml(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<attention xmlns=\"urn:xmpp:attention:0\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(message.type(), QXmppMessage::Normal);
+    QCOMPARE(message.isAttentionRequested(), true);
     serializePacket(message, xml);
 }
 

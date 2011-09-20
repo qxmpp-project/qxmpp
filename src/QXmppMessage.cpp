@@ -51,6 +51,7 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
       m_type(Chat),
       m_stampType(QXmppMessage::DelayedDelivery),
       m_state(None),
+      m_attentionRequested(false),
       m_body(body),
       m_thread(thread)
 {
@@ -76,6 +77,24 @@ QString QXmppMessage::body() const
 void QXmppMessage::setBody(const QString& body)
 {
     m_body = body;
+}
+
+/// Returns true if the user's attention is requested, as defined
+/// by XEP-0224: Attention.
+
+bool QXmppMessage::isAttentionRequested() const
+{
+    return m_attentionRequested;
+}
+
+/// Sets whether the user's attention is requested, as defined
+/// by XEP-0224: Attention.
+///
+/// \a param requested
+
+void QXmppMessage::setAttentionRequested(bool requested)
+{
+    m_attentionRequested = requested;
 }
 
 /// Returns the message's type.
@@ -219,6 +238,9 @@ void QXmppMessage::parse(const QDomElement &element)
         m_stampType = QXmppMessage::DelayedDelivery;
     }
 
+    // XEP-0224: Attention
+    m_attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
+
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement("x");
     while (!xElement.isNull())
@@ -282,6 +304,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
             helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
             xmlWriter->writeEndElement();
         }
+    }
+
+    // XEP-0224: Attention
+    if (m_attentionRequested) {
+        xmlWriter->writeStartElement("attention");
+        xmlWriter->writeAttribute("xmlns", ns_attention);
+        xmlWriter->writeEndElement();
     }
 
     // other extensions

@@ -51,6 +51,7 @@ private slots:
     void testBindResult();
     void testMessage();
     void testMessageFull();
+    void testMessageAttention();
     void testMessageDelay();
     void testMessageLegacyDelay();
     void testNonSaslAuth();

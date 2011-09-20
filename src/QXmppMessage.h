@@ -61,10 +61,13 @@ public:
     QXmppMessage(const QString& from = "", const QString& to = "",
                  const QString& body = "", const QString& thread = "");
     ~QXmppMessage();
-    
+
     QString body() const;
     void setBody(const QString&);
 
+    bool isAttentionRequested() const;
+    void setAttentionRequested(bool requested);
+ 
     QDateTime stamp() const;
     void setStamp(const QDateTime &stamp);
 
@@ -101,6 +104,7 @@ private:
     StampType m_stampType;
     State m_state;
 
+    bool m_attentionRequested;
     QString m_body;
     QString m_subject;
     QString m_thread;
