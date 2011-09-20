@@ -317,6 +317,11 @@ void TestPackets::testMessage()
     parsePacket(message, xml);
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(message.type(), QXmppMessage::Normal);
+    QCOMPARE(message.body(), QString());
+    QCOMPARE(message.subject(), QString());
+    QCOMPARE(message.thread(), QString());
+    QCOMPARE(message.state(), QXmppMessage::None);
     serializePacket(message, xml);
 }
 
