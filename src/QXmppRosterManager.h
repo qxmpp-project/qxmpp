@@ -33,6 +33,8 @@
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 
+class QXmppRosterManagerPrivate;
+
 /// \brief The QXmppRosterManager class provides access to a connected client's roster.
 ///
 /// \note It's object should not be created using it's constructor. Instead
@@ -65,6 +67,7 @@ class QXmppRosterManager : public QXmppClientExtension
 
 public:
     QXmppRosterManager(QXmppClient* stream);
+    ~QXmppRosterManager();
     
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
@@ -128,23 +131,13 @@ signals:
     /// removed as a result of roster push.
     void itemRemoved(const QString& bareJid);
 
-private:
-    //map of bareJid and its rosterEntry
-    QMap<QString, QXmppRosterIq::Item> m_entries;
-    // map of resources of the jid and map of resources and presences
-    QMap<QString, QMap<QString, QXmppPresence> > m_presences;
-    // flag to store that the roster has been populated
-    bool m_isRosterReceived;
-    // id of the initial roster request
-    QString m_rosterReqId;
-
 private slots:
-    void connected();
-    void disconnected();
-    void presenceReceived(const QXmppPresence&);
+    void _q_connected();
+    void _q_disconnected();
+    void _q_presenceReceived(const QXmppPresence&);
 
 private:
-    void rosterIqReceived(const QXmppRosterIq&);
+    QXmppRosterManagerPrivate *d;
 };
 
 #endif // QXMPPROSTER_H
