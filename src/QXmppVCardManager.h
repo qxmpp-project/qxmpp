@@ -35,7 +35,7 @@
 #undef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
 
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
-/// implentation of <B>XEP-0054: vcard-temp</B>.
+/// implentation of XEP-0054: vcard-temp.
 ///
 /// \note It's object should not be created using it's constructor. Instead
 /// QXmppClient::vCardManager() should be used to get the reference of instantiated
