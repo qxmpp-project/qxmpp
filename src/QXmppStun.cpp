@@ -2181,8 +2181,7 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
             QHostAddress ip = entry.ip();
             if ((ip.protocol() != QAbstractSocket::IPv4Protocol &&
                  ip.protocol() != QAbstractSocket::IPv6Protocol) ||
-                entry.netmask().isNull() ||
-                entry.netmask() == QHostAddress::Broadcast)
+                entry.netmask().isNull())
                 continue;
 
 #ifdef Q_OS_MAC
