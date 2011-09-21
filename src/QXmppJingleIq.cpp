@@ -435,7 +435,7 @@ QXmppJingleCandidate::QXmppJingleCandidate()
 }
 
 /// Returns the candidate's component ID.
- 
+
 int QXmppJingleCandidate::component() const
 {
     return m_component;

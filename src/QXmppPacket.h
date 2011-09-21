@@ -40,7 +40,7 @@ class QXmppPacket
 public:
     QXmppPacket();
     virtual ~QXmppPacket();
-    
+
     virtual void parse(const QDomElement &element) = 0;
     virtual void toXml( QXmlStreamWriter *writer ) const = 0;
 };

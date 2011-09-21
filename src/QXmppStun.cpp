@@ -773,7 +773,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
 /// Encodes the current QXmppStunMessage, optionally calculating the
 /// message integrity attribute using the given key.
-/// 
+///
 /// \param key
 /// \param addFingerprint
 
@@ -978,7 +978,7 @@ quint16 QXmppStunMessage::peekType(const QByteArray &buffer, quint32 &cookie, QB
     stream.readRawData(id.data(), id.size());
     return type;
 }
- 
+
 QString QXmppStunMessage::toString() const
 {
     QStringList dumpLines;
@@ -2117,7 +2117,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
     // signal completion
     if (pair && pair->checked == QIODevice::ReadWrite)
-    { 
+    {
         m_timer->stop();
         if (!m_activePair || pair->priority() > m_activePair->priority()) {
             info(QString("ICE pair selected %1 (priority: %2)").arg(

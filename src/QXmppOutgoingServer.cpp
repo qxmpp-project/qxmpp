@@ -196,7 +196,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         // check the request is valid
         if (response.from().isEmpty() ||
             response.to() != d->localDomain ||
-            response.type().isEmpty()) 
+            response.type().isEmpty())
         {
             warning("Invalid dialback response received");
             return;

@@ -121,7 +121,7 @@ public:
 
     QXmppStanza(const QString& from = QString(), const QString& to = QString());
     ~QXmppStanza();
-    
+
     QString to() const;
     void setTo(const QString&);
 
@@ -151,9 +151,9 @@ protected:
 
 private:
     static uint s_uniqeIdNo;
-    QString m_to;  
+    QString m_to;
     QString m_from;
-    QString m_id;    
+    QString m_id;
     QString m_lang;
     QXmppStanza::Error m_error;
     QXmppElementList m_extensions;

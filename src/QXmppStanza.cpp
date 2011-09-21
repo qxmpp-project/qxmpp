@@ -38,7 +38,7 @@ QXmppStanza::Error::Error():
 {
 }
 
-QXmppStanza::Error::Error(Type type, Condition cond, const QString& text): 
+QXmppStanza::Error::Error(Type type, Condition cond, const QString& text):
     m_code(0),
     m_type(type),
     m_condition(cond),
@@ -253,7 +253,7 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
         else if(element.namespaceURI() == ns_stanza)
         {
             cond = element.tagName();
-        }        
+        }
         element = element.nextSiblingElement();
     }
 
@@ -265,7 +265,7 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 {
     QString cond = getConditionStr();
     QString type = getTypeStr();
-    
+
     if(cond.isEmpty() && type.isEmpty())
         return;
 
@@ -323,7 +323,7 @@ QString QXmppStanza::to() const
 ///
 /// \param to
 
-void QXmppStanza::setTo(const QString& to)  
+void QXmppStanza::setTo(const QString& to)
 {
     m_to = to;
 }
@@ -346,7 +346,7 @@ void QXmppStanza::setFrom(const QString& from)
 
 /// Returns the stanza's identifier.
 
-QString QXmppStanza::id() const    
+QString QXmppStanza::id() const
 {
     return m_id;
 }
@@ -355,14 +355,14 @@ QString QXmppStanza::id() const
 ///
 /// \param id
 
-void QXmppStanza::setId(const QString& id)    
+void QXmppStanza::setId(const QString& id)
 {
     m_id = id;
 }
 
 /// Returns the stanza's language.
 
-QString QXmppStanza::lang() const    
+QString QXmppStanza::lang() const
 {
     return m_lang;
 }
@@ -371,7 +371,7 @@ QString QXmppStanza::lang() const
 ///
 /// \param lang
 
-void QXmppStanza::setLang(const QString& lang)    
+void QXmppStanza::setLang(const QString& lang)
 {
     m_lang = lang;
 }

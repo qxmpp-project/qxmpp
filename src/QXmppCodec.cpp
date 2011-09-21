@@ -75,7 +75,7 @@ static qint16 seg_uend[8] = {0x3F, 0x7F, 0xFF, 0x1FF,
 static qint16 search(qint16 val, qint16 *table, qint16 size)
 {
    qint16 i;
-   
+
    for (i = 0; i < size; i++) {
       if (val <= *table++)
      return (i);
@@ -107,7 +107,7 @@ quint8 linear2alaw(qint16 pcm_val)
    qint16 mask;
    qint16 seg;
    quint8 aval;
-   
+
    pcm_val = pcm_val >> 3;
 
    if (pcm_val >= 0) {
@@ -116,12 +116,12 @@ quint8 linear2alaw(qint16 pcm_val)
       mask = 0x55;      /* sign bit = 0 */
       pcm_val = -pcm_val - 1;
    }
-   
+
    /* Convert the scaled magnitude to segment number. */
    seg = search(pcm_val, seg_aend, 8);
-   
+
    /* Combine the sign, segment, and quantization bits. */
-   
+
    if (seg >= 8)        /* out of range, return maximum value. */
       return (quint8) (0x7F ^ mask);
    else {
@@ -142,9 +142,9 @@ qint16 alaw2linear(quint8 a_val)
 {
    qint16 t;
    qint16 seg;
-   
+
    a_val ^= 0x55;
-   
+
    t = (a_val & QUANT_MASK) << 4;
    seg = ((qint16)a_val & SEG_MASK) >> SEG_SHIFT;
    switch (seg) {
@@ -195,7 +195,7 @@ quint8 linear2ulaw(qint16 pcm_val)
    qint16 mask;
    qint16 seg;
    quint8 uval;
-   
+
    /* Get the sign and the magnitude of the value. */
    pcm_val = pcm_val >> 2;
    if (pcm_val < 0) {
@@ -206,10 +206,10 @@ quint8 linear2ulaw(qint16 pcm_val)
    }
    if (pcm_val > CLIP) pcm_val = CLIP;        /* clip the magnitude */
    pcm_val += (BIAS >> 2);
-   
+
    /* Convert the scaled magnitude to segment number. */
    seg = search(pcm_val, seg_uend, 8);
-   
+
    /*
    * Combine the sign, segment, quantization bits;
    * and complement the code word.
@@ -234,17 +234,17 @@ quint8 linear2ulaw(qint16 pcm_val)
 qint16 ulaw2linear(quint8 u_val)
 {
    qint16 t;
-   
+
    /* Complement to obtain normal u-law value. */
    u_val = ~u_val;
-   
+
    /*
     * Extract and bias the quantization bits. Then
     * shift up by the segment number and subtract out the bias.
     */
    t = ((u_val & QUANT_MASK) << 3) + BIAS;
    t <<= ((unsigned)u_val & SEG_MASK) >> SEG_SHIFT;
-   
+
    return ((u_val & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
 }
 
@@ -835,7 +835,7 @@ bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
 #endif
         stream.writeRawData(headers[h].data(), headers[h].size());
     }
-    
+
     return true;
 }
 

@@ -46,7 +46,7 @@ public:
         Headline
     };
 
-    /// This enum describes a chat state as defined by 
+    /// This enum describes a chat state as defined by
     /// XEP-0085 : Chat State Notifications.
     enum State
     {
@@ -67,7 +67,7 @@ public:
 
     bool isAttentionRequested() const;
     void setAttentionRequested(bool requested);
- 
+
     QDateTime stamp() const;
     void setStamp(const QDateTime &stamp);
 

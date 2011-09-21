@@ -50,7 +50,7 @@ void QXmppRpcManager::addInvokableInterface( QXmppInvokable *interface )
 void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
 {
     QXmppStanza::Error error;
-    
+
     const QStringList methodBits = iq.method().split('.');
     if (methodBits.size() != 2)
         return;

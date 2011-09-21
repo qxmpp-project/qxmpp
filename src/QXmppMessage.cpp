@@ -45,7 +45,7 @@ static const char* chat_states[] = {
 /// \param body
 /// \param thread
 
-QXmppMessage::QXmppMessage(const QString& from, const QString& to, const 
+QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
                          QString& body, const QString& thread)
     : QXmppStanza(from, to),
       m_type(Chat),
@@ -141,7 +141,7 @@ void QXmppMessage::setTypeFromStr(const QString& str)
         setType(QXmppMessage::Error);
         return;
     }
-    else if(str == "")   // if no type is specified 
+    else if(str == "")   // if no type is specified
     {
         setType(QXmppMessage::Normal);
         return;

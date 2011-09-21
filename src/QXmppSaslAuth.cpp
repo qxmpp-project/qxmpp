@@ -164,7 +164,7 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
             // unquote
             QByteArray value = ba.mid(pos, endPos - pos);
             value.replace("\\\"", "\"");
-            value.replace("\\\\", "\\"); 
+            value.replace("\\\\", "\\");
             map[key] = value;
             // skip closing quote and comma
             startIndex = endPos + 2;

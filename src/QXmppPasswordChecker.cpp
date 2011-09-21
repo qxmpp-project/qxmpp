@@ -143,7 +143,7 @@ QString QXmppPasswordReply::password() const
 
 /// Sets the received password.
 ///
-/// \param password 
+/// \param password
 
 void QXmppPasswordReply::setPassword(const QString &password)
 {

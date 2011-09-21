@@ -73,7 +73,7 @@ public:
             Offline = 0,
             Online,      ///< The entity or resource is online.
             Away,        ///< The entity or resource is temporarily away.
-            XA,          ///< The entity or resource is away for an extended period. 
+            XA,          ///< The entity or resource is away for an extended period.
             DND,         ///< The entity or resource is busy ("Do Not Disturb").
             Chat,        ///< The entity or resource is actively interested in chatting.
         };
@@ -104,7 +104,7 @@ public:
         int m_priority;
     };
 
-    QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available, 
+    QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available,
         const QXmppPresence::Status& status = QXmppPresence::Status());
     ~QXmppPresence();
 

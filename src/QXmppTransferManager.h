@@ -207,7 +207,7 @@ private:
 /// \endcode
 ///
 /// \ingroup Managers
- 
+
 class QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT

@@ -266,7 +266,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
     emit elementReceived(nodeRecv, handled);
     if (handled)
         return;
- 
+
     if(QXmppStreamFeatures::isStreamFeatures(nodeRecv))
     {
         QXmppStreamFeatures features;
@@ -295,7 +295,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             if (socket()->supportsSsl() &&
                 localSecurity != QXmppConfiguration::TLSDisabled &&
-                remoteSecurity != QXmppStreamFeatures::Disabled) 
+                remoteSecurity != QXmppStreamFeatures::Disabled)
             {
                 // enable TLS as it is support by both parties
                 sendData("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");

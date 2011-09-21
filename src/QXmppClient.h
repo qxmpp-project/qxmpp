@@ -137,7 +137,7 @@ public:
     }
 
     void connectToServer(const QXmppConfiguration&,
-                         const QXmppPresence& initialPresence = 
+                         const QXmppPresence& initialPresence =
                          QXmppPresence());
     void connectToServer(const QString &jid,
                          const QString &password);

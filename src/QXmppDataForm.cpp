@@ -312,8 +312,8 @@ void QXmppDataForm::parse(const QDomElement &element)
             field.setValue(valueStr == "1" || valueStr == "true");
         }
         else if (type == QXmppDataForm::Field::ListMultiField ||
-            type == QXmppDataForm::Field::JidMultiField || 
-            type == QXmppDataForm::Field::TextMultiField) 
+            type == QXmppDataForm::Field::JidMultiField ||
+            type == QXmppDataForm::Field::TextMultiField)
         {
             QStringList values;
             QDomElement valueElement = fieldElement.firstChildElement("value");
@@ -332,14 +332,14 @@ void QXmppDataForm::parse(const QDomElement &element)
         /* field options */
         if (type == QXmppDataForm::Field::ListMultiField ||
             type == QXmppDataForm::Field::ListSingleField)
-        { 
+        {
             QList<QPair<QString, QString> > options;
             QDomElement optionElement = fieldElement.firstChildElement("option");
             while (!optionElement.isNull())
             {
                 options.append(QPair<QString, QString>(optionElement.attribute("label"),
                     optionElement.firstChildElement("value").text()));
-                optionElement = optionElement.nextSiblingElement("option"); 
+                optionElement = optionElement.nextSiblingElement("option");
             }
             field.setOptions(options);
         }
@@ -380,7 +380,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     if (!m_instructions.isEmpty())
         helperToXmlAddTextElement(writer, "instructions", m_instructions);
 
-   
+
     foreach (const QXmppDataForm::Field &field, m_fields)
     {
         writer->writeStartElement("field");
@@ -407,7 +407,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         if (type == QXmppDataForm::Field::BooleanField)
         {
             helperToXmlAddTextElement(writer, "value", field.value().toBool() ? "1" : "0");
-        } 
+        }
         else if (type == QXmppDataForm::Field::ListMultiField ||
             type == QXmppDataForm::Field::JidMultiField ||
             type == QXmppDataForm::Field::TextMultiField)

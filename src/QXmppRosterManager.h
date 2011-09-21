@@ -68,11 +68,11 @@ class QXmppRosterManager : public QXmppClientExtension
 public:
     QXmppRosterManager(QXmppClient* stream);
     ~QXmppRosterManager();
-    
+
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
     QXmppRosterIq::Item getRosterEntry(const QString& bareJid) const;
-    
+
     QStringList getResources(const QString& bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
             const QString& bareJid) const;
@@ -98,7 +98,7 @@ public slots:
 signals:
     /// This signal is emitted when the Roster IQ is received after a successful
     /// connection. That is the roster entries are empty before this signal is emitted.
-    /// One should use getRosterBareJids() and getRosterEntry() only after 
+    /// One should use getRosterBareJids() and getRosterEntry() only after
     /// this signal has been emitted.
     void rosterReceived();
 

@@ -92,7 +92,7 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
 /// establishment of the XMPP connection and provide a number of high-level
 /// "managers" to perform specific tasks. You can write your own managers to
 /// extend QXmpp by subclassing QXmppClientExtension.
-/// 
+///
 /// <B>Main Class:</B>
 /// - QXmppClient
 ///
@@ -424,7 +424,7 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
     if (presence.type() == QXmppPresence::Unavailable)
     {
-        // NOTE: we can't call disconnect() because it alters 
+        // NOTE: we can't call disconnect() because it alters
         // the client presence
         if (d->stream->isConnected())
         {

@@ -731,7 +731,7 @@ bool QXmppTransferManager::handleStanza(const QDomElement &element)
 
     return false;
 }
- 
+
 QXmppTransferJob* QXmppTransferManager::getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id)
 {
     foreach (QXmppTransferJob *job, m_jobs)
@@ -1174,7 +1174,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     file.setAttribute("name", job->fileName());
     file.setAttribute("size", QString::number(job->fileSize()));
     items.append(file);
- 
+
     QXmppElement feature;
     feature.setTagName("feature");
     feature.setAttribute("xmlns", ns_feature_negotiation);
@@ -1478,7 +1478,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         response.setType(QXmppIq::Error);
         response.setError(error);
         client()->sendPacket(response);
-    
+
         delete job;
         return;
     }

@@ -215,7 +215,7 @@ bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
     return (queryElement.namespaceURI() == ns_disco_info ||
-            queryElement.namespaceURI() == ns_disco_items); 
+            queryElement.namespaceURI() == ns_disco_items);
 }
 
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)

@@ -33,7 +33,7 @@
 #define qxmpp_loggable_trace(x) (x)
 #endif
 
-/// \brief The QXmppLogger class represents a sink for logging messages. 
+/// \brief The QXmppLogger class represents a sink for logging messages.
 ///
 /// \ingroup Core
 
@@ -95,7 +95,7 @@ private:
     QXmppLogger::MessageTypes m_messageTypes;
 };
 
-/// \brief The QXmppLoggable class represents a source of logging messages. 
+/// \brief The QXmppLoggable class represents a source of logging messages.
 ///
 /// \ingroup Core
 

@@ -253,7 +253,7 @@ QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text)
     return generateHmac(QCryptographicHash::Sha1, key, text);
 }
 
-/// Generates a random integer x between 0 and N-1. 
+/// Generates a random integer x between 0 and N-1.
 ///
 /// \param N
 

@@ -319,7 +319,7 @@ void QXmppPresence::Status::setTypeFromStr(const QString& str)
     else if(str == "xa")
         m_type = QXmppPresence::Status::XA;
     else {
-        qWarning("QXmppPresence::Status::setTypeFromStr() invalid input string type %s", 
+        qWarning("QXmppPresence::Status::setTypeFromStr() invalid input string type %s",
             qPrintable(str));
         m_type = QXmppPresence::Status::Online;
     }
