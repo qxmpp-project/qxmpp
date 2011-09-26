@@ -76,7 +76,8 @@ public:
 
     // SASL
     QXmppSaslDigestMd5 saslDigest;
-    int saslStep;
+    int saslDigestStep;
+    int saslMechanism;
 
     // Timers
     QTimer *pingTimer;
@@ -85,7 +86,8 @@ public:
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
     : sessionAvailable(false),
-    saslStep(0)
+    saslDigestStep(0),
+    saslMechanism(-1)
 {
 }
 
@@ -228,7 +230,8 @@ void QXmppOutgoingClient::handleStart()
     QXmppStream::handleStart();
 
     // reset authentication step
-    d->saslStep = 0;
+    d->saslDigestStep = 0;
+    d->saslMechanism = -1;
     d->sessionStarted = false;
 
     // start stream
@@ -316,22 +319,23 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         else if(saslAvailable)
         {
             // determine SASL Authentication mechanism to use
-            QList<QXmppConfiguration::SASLAuthMechanism> mechanisms = features.authMechanisms();
-            QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
+            const QList<QXmppConfiguration::SASLAuthMechanism> mechanisms = features.authMechanisms();
             if (mechanisms.isEmpty())
             {
                 warning("No supported SASL Authentication mechanism available");
                 disconnectFromHost();
                 return;
             }
-            else if (!mechanisms.contains(mechanism))
+            else if (!mechanisms.contains(configuration().sASLAuthMechanism()))
             {
                 info("Desired SASL Auth mechanism is not available, selecting first available one");
-                mechanism = mechanisms.first();
+                d->saslMechanism = mechanisms.first();
+            } else {
+                d->saslMechanism = configuration().sASLAuthMechanism();
             }
 
             // send SASL Authentication request
-            switch(mechanism)
+            switch(d->saslMechanism)
             {
             case QXmppConfiguration::SASLPlain:
                 {
@@ -395,13 +399,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if(nodeRecv.tagName() == "challenge")
         {
-            // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
-            QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
-            switch(mechanism)
+            switch(d->saslMechanism)
             {
             case QXmppConfiguration::SASLDigestMD5:
-                d->saslStep++;
-                switch (d->saslStep)
+                d->saslDigestStep++;
+                switch (d->saslDigestStep)
                 {
                 case 1 :
                     sendAuthDigestMD5ResponseStep1(nodeRecv.text());
@@ -419,6 +421,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 sendAuthXFacebookResponse(nodeRecv.text());
                 break;
             default:
+                warning("Unexpected SASL challenge");
+                disconnectFromHost();
                 break;
             }
         }
