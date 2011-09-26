@@ -230,6 +230,57 @@ QString QXmppConfiguration::jidBare() const
         return m_user+"@"+m_domain;
 }
 
+/// Returns the access token used for X-FACEBOOK-PLATFORM authentication.
+
+QString QXmppConfiguration::facebookAccessToken() const
+{
+    return m_facebookAccessToken;
+}
+
+/// Sets the access token used for X-FACEBOOK-PLATFORM authentication.
+///
+/// This token is returned by Facebook at the end of the OAuth authentication
+/// process.
+///
+/// \param accessToken
+
+void QXmppConfiguration::setFacebookAccessToken(const QString& accessToken)
+{
+    m_facebookAccessToken = accessToken;
+}
+
+/// Returns the application ID used for X-FACEBOOK-PLATFORM authentication.
+
+QString QXmppConfiguration::facebookAppId() const
+{
+    return m_facebookAppId;
+}
+
+/// Sets the application ID used for X-FACEBOOK-PLATFORM authentication.
+///
+/// \param appId
+
+void QXmppConfiguration::setFacebookAppId(const QString& appId)
+{
+    m_facebookAppId = appId;
+}
+
+/// Returns the application secret used for X-FACEBOOK-PLATFORM authentication.
+
+QString QXmppConfiguration::facebookAppSecret() const
+{
+    return m_facebookAppSecret;
+}
+
+/// Sets the application secret used for X-FACEBOOK-PLATFORM authentication.
+///
+/// \param appSecret
+
+void QXmppConfiguration::setFacebookAppSecret(const QString& appSecret)
+{
+    m_facebookAppSecret = appSecret;
+}
+
 /// Returns the auto-accept-subscriptions-request configuration.
 ///
 /// \return boolean value

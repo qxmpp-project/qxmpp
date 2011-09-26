@@ -69,9 +69,10 @@ public:
     /// a mechanism.
     enum SASLAuthMechanism
     {
-        SASLPlain = 0,  ///< Plain
-        SASLDigestMD5,  ///< Digest MD5 (default)
-        SASLAnonymous   ///< Anonymous
+        SASLPlain = 0,         ///< Plain
+        SASLDigestMD5,         ///< Digest MD5 (default)
+        SASLAnonymous,         ///< Anonymous
+        SASLXFacebookPlatform, ///< Facebook Platform
     };
 
     /// An enumeration for stream compression methods.
@@ -105,6 +106,15 @@ public:
     void setJid(const QString &jid);
 
     QString jidBare() const;
+
+    QString facebookAccessToken() const;
+    void setFacebookAccessToken(const QString&);
+
+    QString facebookAppId() const;
+    void setFacebookAppId(const QString&);
+
+    QString facebookAppSecret() const;
+    void setFacebookAppSecret(const QString&);
 
     bool autoAcceptSubscriptions() const;
     void setAutoAcceptSubscriptions(bool);
@@ -172,6 +182,11 @@ private:
     QString m_password;
     QString m_domain;
     QString m_resource;
+
+    // Facebook
+    QString m_facebookAccessToken;
+    QString m_facebookAppId;
+    QString m_facebookAppSecret;
 
     // default is false
     bool m_autoAcceptSubscriptions;
