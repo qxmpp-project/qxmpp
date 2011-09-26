@@ -24,9 +24,14 @@ QXmpp 0.4.0 (UNRELEASED)
   - Add support for X-FACEBOOK-PLATFORM SASL method.
 
   - Fix issues:
+    * Issue 103: Does not compile for Symbian^3 with NokiaQtSDK 1.1 Beta
     * Issue 105: Initial presence is set before the roster request
     * Issue 106: QXmppClient can't override Qt's set of trusted SSL CAs
+    * Issue 109: Patch for XEP-0224 (Attention)
+    * Issue 113: qxmpp.pc sets incorrect include path
     * Issue 116: sessionStarted not set for non-SASL connections
+    * Issue 119: ICE negotiation time out after successful ICE check
+    * Issue 120: QXmppIceComponent doesn't accept interfaces with 255.255.255.255 netmask as a local candidate
 	
 QXmpp 0.3.0 (Mar 05, 2011)
 ------------------------
