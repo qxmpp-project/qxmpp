@@ -85,7 +85,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppTransferManager.h \
     QXmppVCardManager.h \
     QXmppVCardIq.h \
-    QXmppVCard.h \
     QXmppVersionIq.h \
     QXmppVersionManager.h
 

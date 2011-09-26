@@ -30,10 +30,6 @@
 #include "QXmppClientExtension.h"
 #include "QXmppVCardIq.h"
 
-#define QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
-#include "QXmppVCard.h"
-#undef QXMPP_SUPRESS_INTERNAL_VCARD_WARNING
-
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
 /// implementation of XEP-0054: vcard-temp.
 ///
@@ -83,11 +79,6 @@ signals:
     /// This signal is emitted when the client's vCard is received
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
-
-    /// \cond
-// deprecated in release 0.3.0
-    void vCardReceived(const QXmppVCard&);
-    /// \endcond
 
 private:
     QXmppVCardIq m_clientVCard;  ///< Stores the vCard of the connected client
