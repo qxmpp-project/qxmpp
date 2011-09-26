@@ -146,32 +146,6 @@ public:
     QList<QSslCertificate> caCertificates() const;
     void setCaCertificates(const QList<QSslCertificate> &);
 
-    /// \cond
-    // deprecated in release 0.3.0
-    QString Q_DECL_DEPRECATED passwd() const;
-    void Q_DECL_DEPRECATED setPasswd(const QString&);
-
-    // deprecated in release 0.2.0
-    // deprecated accessors, use the form without "get" instead
-    QString Q_DECL_DEPRECATED getHost() const;
-    QString Q_DECL_DEPRECATED getDomain() const;
-    int Q_DECL_DEPRECATED getPort() const;
-    QString Q_DECL_DEPRECATED getUser() const;
-    QString Q_DECL_DEPRECATED getPasswd() const;
-    QString Q_DECL_DEPRECATED getResource() const;
-    QString Q_DECL_DEPRECATED getJid() const;
-    QString Q_DECL_DEPRECATED getJidBare() const;
-
-    bool Q_DECL_DEPRECATED getAutoAcceptSubscriptions() const;
-    bool Q_DECL_DEPRECATED getAutoReconnectionEnabled() const;
-    bool Q_DECL_DEPRECATED getUseSASLAuthentication() const;
-    bool Q_DECL_DEPRECATED getIgnoreSslErrors() const;
-    QXmppConfiguration::StreamSecurityMode Q_DECL_DEPRECATED getStreamSecurityMode() const;
-    QXmppConfiguration::NonSASLAuthMechanism Q_DECL_DEPRECATED getNonSASLAuthMechanism() const;
-    QXmppConfiguration::SASLAuthMechanism Q_DECL_DEPRECATED getSASLAuthMechanism() const;
-    QNetworkProxy Q_DECL_DEPRECATED getNetworkProxy() const;
-    /// \endcond
-
 private:
     QString m_host;
     int m_port;

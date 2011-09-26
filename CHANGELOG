@@ -6,6 +6,7 @@ QXmpp 0.x.y (UNRELEASED)
 
   - Remove deprecated  "get*" getter accessors from:
     QXmppClient
+    QXmppConfiguration
     QXmppMessage
     QXmppPresence
     QXmppIq
