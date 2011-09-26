@@ -24,6 +24,7 @@
 
 #include <QCryptographicHash>
 #include <QSslSocket>
+#include <QUrl>
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
@@ -348,6 +349,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             case QXmppConfiguration::SASLAnonymous:
                 sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
                 break;
+            case QXmppConfiguration::SASLXFacebookPlatform:
+                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='X-FACEBOOK-PLATFORM'/>");
+                break;
             }
         }
 
@@ -392,18 +396,29 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         else if(nodeRecv.tagName() == "challenge")
         {
             // TODO: Track which mechanism was used for when other SASL protocols which use challenges are supported
-            d->saslStep++;
-            switch (d->saslStep)
+            QXmppConfiguration::SASLAuthMechanism mechanism = configuration().sASLAuthMechanism();
+            switch(mechanism)
             {
-            case 1 :
-                sendAuthDigestMD5ResponseStep1(nodeRecv.text());
+            case QXmppConfiguration::SASLDigestMD5:
+                d->saslStep++;
+                switch (d->saslStep)
+                {
+                case 1 :
+                    sendAuthDigestMD5ResponseStep1(nodeRecv.text());
+                    break;
+                case 2 :
+                    sendAuthDigestMD5ResponseStep2(nodeRecv.text());
+                    break;
+                default :
+                    warning("Too many authentication steps");
+                    disconnectFromHost();
+                    break;
+                }
                 break;
-            case 2 :
-                sendAuthDigestMD5ResponseStep2(nodeRecv.text());
+            case QXmppConfiguration::SASLXFacebookPlatform:
+                sendAuthXFacebookResponse(nodeRecv.text());
                 break;
-            default :
-                warning("Too many authentication steps");
-                disconnectFromHost();
+            default:
                 break;
             }
         }
@@ -674,6 +689,30 @@ void QXmppOutgoingClient::sendAuthDigestMD5ResponseStep2(const QString &challeng
     }
 
     sendData("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+}
+
+void QXmppOutgoingClient::sendAuthXFacebookResponse(const QString& challenge)
+{
+    // parse request
+    QUrl request;
+    request.setEncodedQuery(QByteArray::fromBase64(challenge.toAscii()));
+    if (!request.hasQueryItem("method") || !request.hasQueryItem("nonce")) {
+        warning("sendAuthXFacebookResponse: Invalid input");
+        disconnectFromHost();
+        return;
+    }
+
+    // build response
+    QUrl response;
+    response.addQueryItem("access_token", configuration().facebookAccessToken());
+    response.addQueryItem("api_key", configuration().facebookAppId());
+    response.addQueryItem("call_id", 0);
+    response.addQueryItem("method", request.queryItemValue("method"));
+    response.addQueryItem("nonce", request.queryItemValue("nonce"));
+    response.addQueryItem("v", "1.0");
+
+    sendData("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>"
+             + response.encodedQuery().toBase64() + "</response>");
 }
 
 void QXmppOutgoingClient::sendNonSASLAuth(bool plainText)
