@@ -152,9 +152,9 @@ signals:
 
     /// \cond
     void isJoinedChanged();
-    /// \endconf
+    /// \endcond
 
-    /// This signal is emiited once you have left the room.
+    /// This signal is emitted once you have left the room.
     void left();
 
     /// This signal is emitted when a message is received.
