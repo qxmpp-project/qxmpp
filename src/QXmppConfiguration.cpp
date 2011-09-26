@@ -265,22 +265,6 @@ void QXmppConfiguration::setFacebookAppId(const QString& appId)
     m_facebookAppId = appId;
 }
 
-/// Returns the application secret used for X-FACEBOOK-PLATFORM authentication.
-
-QString QXmppConfiguration::facebookAppSecret() const
-{
-    return m_facebookAppSecret;
-}
-
-/// Sets the application secret used for X-FACEBOOK-PLATFORM authentication.
-///
-/// \param appSecret
-
-void QXmppConfiguration::setFacebookAppSecret(const QString& appSecret)
-{
-    m_facebookAppSecret = appSecret;
-}
-
 /// Returns the auto-accept-subscriptions-request configuration.
 ///
 /// \return boolean value

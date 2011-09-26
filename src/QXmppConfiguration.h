@@ -113,9 +113,6 @@ public:
     QString facebookAppId() const;
     void setFacebookAppId(const QString&);
 
-    QString facebookAppSecret() const;
-    void setFacebookAppSecret(const QString&);
-
     bool autoAcceptSubscriptions() const;
     void setAutoAcceptSubscriptions(bool);
 
@@ -186,7 +183,6 @@ private:
     // Facebook
     QString m_facebookAccessToken;
     QString m_facebookAppId;
-    QString m_facebookAppSecret;
 
     // default is false
     bool m_autoAcceptSubscriptions;
