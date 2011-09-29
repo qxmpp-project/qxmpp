@@ -23,6 +23,7 @@ QXmpp 0.4.0 (UNRELEASED)
   - Improve QXmppServer packet routing performance.
   - Add support for X-FACEBOOK-PLATFORM SASL method.
   - Improve XEP-0136 support to enable archive deletion.
+  - Set default keep-alive timeout to 20 seconds, enables detection of broken connections.
 
   - Fix issues:
     * Issue 103: Does not compile for Symbian^3 with NokiaQtSDK 1.1 Beta

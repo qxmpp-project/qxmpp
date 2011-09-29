@@ -34,7 +34,7 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_sendIntialPresence(true),
                 m_sendRosterRequest(true),
                 m_keepAliveInterval(60),
-                m_keepAliveTimeout(0),
+                m_keepAliveTimeout(20),
                 m_autoReconnectionEnabled(true),
                 m_useSASLAuthentication(true),
                 m_ignoreSslErrors(true),
@@ -453,6 +453,8 @@ int QXmppConfiguration::keepAliveInterval() const
 ///
 /// If set to zero or a value larger than the keep alive interval,
 /// no timeout will occur.
+///
+/// The default value is 20 seconds.
 
 void QXmppConfiguration::setKeepAliveTimeout(int secs)
 {
@@ -460,6 +462,8 @@ void QXmppConfiguration::setKeepAliveTimeout(int secs)
 }
 
 /// Returns the keep alive timeout in seconds.
+///
+/// The default value is 20 seconds.
 
 int QXmppConfiguration::keepAliveTimeout() const
 {
