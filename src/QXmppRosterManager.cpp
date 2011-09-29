@@ -254,6 +254,28 @@ bool QXmppRosterManager::removeItem(const QString &bareJid)
     return client()->sendPacket(iq);
 }
 
+/// Renames a roster item.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemChanged() signal to be emitted.
+///
+/// \param bareJid
+/// \param name
+
+bool QXmppRosterManager::renameItem(const QString &bareJid, const QString &name)
+{
+    if (!d->entries.contains(bareJid))
+        return false;
+
+    QXmppRosterIq::Item item = d->entries.value(bareJid);
+    item.setName(name);
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    return client()->sendPacket(iq);
+}
+
 /// Requests a subscription to the given contact.
 ///
 /// As a result, the server will initiate a roster push, causing the
