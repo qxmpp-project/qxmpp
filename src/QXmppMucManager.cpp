@@ -66,7 +66,7 @@ QXmppMucManager::~QXmppMucManager()
     delete d;
 }
 
-/// Adds the given chat room to the set of manged rooms.
+/// Adds the given chat room to the set of managed rooms.
 ///
 /// \param roomJid
 
@@ -151,7 +151,7 @@ void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
         {
             const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && !d->rooms.contains(roomJid))
+            if (!roomJid.isEmpty() && (!d->rooms.contains(roomJid) || !d->rooms.value(roomJid)->isJoined()))
                 emit invitationReceived(roomJid, msg.from(), extension.attribute("reason"));
             break;
         }
@@ -191,6 +191,7 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
+    // convenience signals for properties
     check = connect(this, SIGNAL(joined()), this, SIGNAL(isJoinedChanged()));
     Q_ASSERT(check);
 
@@ -522,6 +523,7 @@ void QXmppMucRoom::_q_disconnected()
     d->participants.clear();
     foreach (const QString &jid, removed)
         emit participantRemoved(jid);
+    emit participantsChanged();
 
     // update available actions
     if (d->allowedActions != NoAction) {
@@ -591,6 +593,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
 
         if (added) {
             emit participantAdded(jid);
+            emit participantsChanged();
             if (jid == d->ownJid())
                 emit joined();
         } else {
@@ -603,6 +606,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
 
             emit participantRemoved(jid);
             d->participants.remove(jid);
+            emit participantsChanged();
 
             // check whether this was our own presence
             if (jid == d->ownJid()) {
@@ -619,6 +623,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                 d->participants.clear();
                 foreach (const QString &jid, removed)
                     emit participantRemoved(jid);
+                emit participantsChanged();
 
                 // update available actions
                 if (d->allowedActions != NoAction) {

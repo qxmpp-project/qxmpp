@@ -100,7 +100,7 @@ class QXmppMucRoom : public QObject
     Q_PROPERTY(bool isJoined READ isJoined NOTIFY isJoinedChanged)
     Q_PROPERTY(QString jid READ jid CONSTANT)
     Q_PROPERTY(QString nickName READ nickName WRITE setNickName NOTIFY nickNameChanged)
-    Q_PROPERTY(QStringList participants READ participants)
+    Q_PROPERTY(QStringList participants READ participants NOTIFY participantsChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
 
@@ -171,6 +171,10 @@ signals:
 
     /// This signal is emitted when a participant leaves the room.
     void participantRemoved(const QString &jid);
+
+    /// \cond
+    void participantsChanged();
+    /// \endcond
 
     /// This signal is emitted when the room's permissions are received.
     void permissionsReceived(const QList<QXmppMucItem> &permissions);
