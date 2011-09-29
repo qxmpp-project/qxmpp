@@ -293,8 +293,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
 void QXmppClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
-    config.setUser(jidToUser(jid));
-    config.setDomain(jidToDomain(jid));
+    config.setJid(jid);
     config.setPassword(password);
     connectToServer(config);
 }
