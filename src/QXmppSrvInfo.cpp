@@ -62,7 +62,7 @@ static void resolveLibrary()
     local_dns_record_list_free = dns_record_list_free_proto(lib.resolve("DnsRecordListFree"));
 }
 
-#elif defined(Q_OS_UNIX) && !defined(Q_OS_SYMBIAN)
+#elif defined(Q_OS_UNIX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_SYMBIAN)
 typedef int (*dn_expand_proto)(const unsigned char *, const unsigned char *, const unsigned char *, char *, int);
 static dn_expand_proto local_dn_expand = 0;
 typedef int (*res_ninit_proto)(res_state);
@@ -386,6 +386,8 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
 
     local_dns_record_list_free(records, DnsFreeRecordList);
 
+#elif defined(Q_OS_ANDROID)
+    // TODO
 #elif defined(Q_OS_SYMBIAN)
     RHostResolver dnsResolver;
     RSocketServ dnsSocket;
@@ -489,7 +491,6 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
     answerIndex = 0;
     while ((p < response + responseLength) && (answerIndex < answerCount))
     {
-        int type, size;
         status = local_dn_expand(response, response + responseLength, p, host, sizeof(host));
         if (status < 0)
         {
@@ -499,13 +500,13 @@ QXmppSrvInfo QXmppSrvInfo::fromName(const QString &dname)
         }
 
         p += status;
-        type = (p[0] << 8) | p[1];
+        const int type = (p[0] << 8) | p[1];
         p += 2;
-        //klass = (p[0] << 8) | p[1];
+        //const int klass = (p[0] << 8) | p[1];
         p += 2;
-        //ttl = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+        //const int ttl = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
         p += 4;
-        size = (p[0] << 8) | p[1];
+        const int size = (p[0] << 8) | p[1];
         p += 2;
 
         if (type == T_SRV)
