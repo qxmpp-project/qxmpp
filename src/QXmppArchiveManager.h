@@ -55,6 +55,7 @@ class QXmppArchiveManager : public QXmppClientExtension
 
 public:
     void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
+    void removeCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime());
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
 
     /// \cond
@@ -69,11 +70,6 @@ signals:
     /// This signal is emitted when archive chat is received
     /// after calling retrieveCollection()
     void archiveChatReceived(const QXmppArchiveChat&);
-
-private:
-    void archiveChatIqReceived(const QXmppArchiveChatIq&);
-    void archiveListIqReceived(const QXmppArchiveListIq&);
-    void archivePrefIqReceived(const QXmppArchivePrefIq&);
 };
 
 #endif

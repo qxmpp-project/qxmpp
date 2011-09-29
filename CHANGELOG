@@ -22,6 +22,7 @@ QXmpp 0.4.0 (UNRELEASED)
   - Overhaul Multi-User Chat support to make it easier and more fully featured.
   - Improve QXmppServer packet routing performance.
   - Add support for X-FACEBOOK-PLATFORM SASL method.
+  - Improve XEP-0136 support to enable archive deletion.
 
   - Fix issues:
     * Issue 103: Does not compile for Symbian^3 with NokiaQtSDK 1.1 Beta

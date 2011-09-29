@@ -405,6 +405,84 @@ void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Returns the JID which archived conversations must match.
+///
+
+QString QXmppArchiveRemoveIq::with() const
+{
+    return m_with;
+}
+
+/// Sets the JID which archived conversations must match.
+///
+/// \param with
+
+void QXmppArchiveRemoveIq::setWith(const QString &with)
+{
+    m_with = with;
+}
+
+/// Returns the start date/time for the archived conversations.
+///
+
+QDateTime QXmppArchiveRemoveIq::start() const
+{
+    return m_start;
+}
+
+/// Sets the start date/time for the archived conversations.
+///
+/// \param start
+
+void QXmppArchiveRemoveIq::setStart(const QDateTime &start)
+{
+    m_start = start;
+}
+
+/// Returns the end date/time for the archived conversations.
+///
+
+QDateTime QXmppArchiveRemoveIq::end() const
+{
+    return m_end;
+}
+
+/// Sets the end date/time for the archived conversations.
+///
+/// \param end
+
+void QXmppArchiveRemoveIq::setEnd(const QDateTime &end)
+{
+    m_end = end;
+}
+
+bool QXmppArchiveRemoveIq::isArchiveRemoveIq(const QDomElement &element)
+{
+    QDomElement retrieveElement = element.firstChildElement("remove");
+    return (retrieveElement.namespaceURI() == ns_archive);
+}
+
+void QXmppArchiveRemoveIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement listElement = element.firstChildElement("remove");
+    m_with = listElement.attribute("with");
+    m_start = datetimeFromString(listElement.attribute("start"));
+    m_end = datetimeFromString(listElement.attribute("end"));
+}
+
+void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("remove");
+    writer->writeAttribute("xmlns", ns_archive);
+    if (!m_with.isEmpty())
+        helperToXmlAddAttribute(writer, "with", m_with);
+    if (m_start.isValid())
+        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+    if (m_end.isValid())
+        helperToXmlAddAttribute(writer, "end", datetimeToString(m_end));
+    writer->writeEndElement();
+}
+
 QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
     : QXmppIq(QXmppIq::Get), m_max(0)
 {

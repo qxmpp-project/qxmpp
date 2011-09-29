@@ -27,21 +27,6 @@
 #include "QXmppArchiveManager.h"
 #include "QXmppClient.h"
 
-void QXmppArchiveManager::archiveChatIqReceived(const QXmppArchiveChatIq &chatIq)
-{
-    emit archiveChatReceived(chatIq.chat());
-}
-
-void QXmppArchiveManager::archiveListIqReceived(const QXmppArchiveListIq &listIq)
-{
-    emit archiveListReceived(listIq.chats());
-}
-
-void QXmppArchiveManager::archivePrefIqReceived(const QXmppArchivePrefIq &prefIq)
-{
-    Q_UNUSED(prefIq);
-}
-
 bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() != "iq")
@@ -52,21 +37,21 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
     {
         QXmppArchiveChatIq archiveIq;
         archiveIq.parse(element);
-        archiveChatIqReceived(archiveIq);
+        emit archiveChatReceived(archiveIq.chat());
         return true;
     }
     else if(QXmppArchiveListIq::isArchiveListIq(element))
     {
         QXmppArchiveListIq archiveIq;
         archiveIq.parse(element);
-        archiveListIqReceived(archiveIq);
+        emit archiveListReceived(archiveIq.chats());
         return true;
     }
     else if(QXmppArchivePrefIq::isArchivePrefIq(element))
     {
+        // TODO: handle preference iq
         QXmppArchivePrefIq archiveIq;
         archiveIq.parse(element);
-        archivePrefIqReceived(archiveIq);
         return true;
     }
 
@@ -79,12 +64,28 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 /// \param jid Optional JID if you only want conversations with a specific JID.
 /// \param start Optional start time.
 /// \param end Optional end time.
-/// \param max Optional maximum.
+/// \param max Optional maximum number of collections to list.
 ///
 void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max)
 {
     QXmppArchiveListIq packet;
     packet.setMax(max);
+    packet.setWith(jid);
+    packet.setStart(start);
+    packet.setEnd(end);
+    client()->sendPacket(packet);
+}
+
+/// Removes the specified collection(s).
+///
+/// \param jid The JID of the collection
+/// \param start Optional start time.
+/// \param end Optional end time.
+///
+void QXmppArchiveManager::removeCollections(const QString &jid, const QDateTime &start, const QDateTime &end)
+{
+    QXmppArchiveRemoveIq packet;
+    packet.setType(QXmppIq::Set);
     packet.setWith(jid);
     packet.setStart(start);
     packet.setEnd(end);

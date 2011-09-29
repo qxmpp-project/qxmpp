@@ -162,6 +162,38 @@ private:
     QList<QXmppArchiveChat> m_chats;
 };
 
+/// \brief Represents an archive remove IQ as defined by XEP-0136: Message Archiving.
+///
+/// \ingroup Stanzas
+
+class QXmppArchiveRemoveIq : public QXmppIq
+{
+public:
+    QString with() const;
+    void setWith( const QString &with );
+
+    QDateTime start() const;
+    void setStart(const QDateTime &start );
+
+    QDateTime end() const;
+    void setEnd(const QDateTime &end );
+
+    /// \cond
+    static bool isArchiveRemoveIq(const QDomElement &element);
+    /// \endcond
+
+protected:
+    /// \cond
+    void parseElementFromChild(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QString m_with;
+    QDateTime m_start;
+    QDateTime m_end;
+};
+
 /// \brief Represents an archive retrieve IQ as defined by XEP-0136: Message Archiving.
 ///
 /// \ingroup Stanzas
