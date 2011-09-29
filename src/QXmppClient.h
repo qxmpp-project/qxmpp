@@ -139,9 +139,6 @@ public:
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence =
                          QXmppPresence());
-    void connectToServer(const QString &jid,
-                         const QString &password);
-    void disconnectFromServer();
     bool isConnected() const;
 
     QXmppPresence clientPresence() const;
@@ -228,6 +225,9 @@ signals:
     /// \endcond
 
 public slots:
+    void connectToServer(const QString &jid,
+                         const QString &password);
+    void disconnectFromServer();
     bool sendPacket(const QXmppPacket&);
     void sendMessage(const QString& bareJid, const QString& message);
 
