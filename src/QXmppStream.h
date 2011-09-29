@@ -50,7 +50,6 @@ public:
     virtual void disconnectFromHost();
 
     virtual bool sendData(const QByteArray&);
-    bool sendElement(const QDomElement&);
     bool sendPacket(const QXmppPacket&);
 
 signals:

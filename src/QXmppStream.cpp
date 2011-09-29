@@ -126,22 +126,6 @@ bool QXmppStream::sendData(const QByteArray &data)
     return d->socket->write(data) == data.size();
 }
 
-/// Sends an XML element to the peer.
-///
-/// \param element
-
-bool QXmppStream::sendElement(const QDomElement &element)
-{
-    // prepare packet
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    const QStringList omitNamespaces = QStringList() << ns_client << ns_server;
-    helperToXmlAddDomElement(&xmlStream, element, omitNamespaces);
-
-    // send packet
-    return sendData(data);
-}
-
 /// Sends an XMPP packet to the peer.
 ///
 /// \param packet
