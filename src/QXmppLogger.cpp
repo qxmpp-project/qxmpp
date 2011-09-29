@@ -89,18 +89,45 @@ void QXmppLoggable::childEvent(QChildEvent *event)
     }
 }
 
+class QXmppLoggerPrivate
+{
+public:
+    QXmppLoggerPrivate(QXmppLogger *qq);
+
+    QXmppLogger::LoggingType loggingType;
+    QFile *logFile;
+    QString logFilePath;
+    QXmppLogger::MessageTypes messageTypes;
+
+private:
+    QXmppLogger *q;
+};
+
+QXmppLoggerPrivate::QXmppLoggerPrivate(QXmppLogger *qq)
+    : loggingType(QXmppLogger::NoLogging),
+    logFile(0),
+    logFilePath("QXmppClientLog.log"),
+    messageTypes(QXmppLogger::AnyMessage),
+    q(qq)
+{
+}
+
 /// Constructs a new QXmppLogger.
 ///
 /// \param parent
 
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent),
-    m_loggingType(QXmppLogger::NoLogging),
-    m_logFilePath("QXmppClientLog.log"),
-    m_messageTypes(QXmppLogger::AnyMessage)
+    : QObject(parent)
 {
+    d = new QXmppLoggerPrivate(this);
+
     // make it possible to pass QXmppLogger::MessageType between threads
     qRegisterMetaType< QXmppLogger::MessageType >("QXmppLogger::MessageType");
+}
+
+QXmppLogger::~QXmppLogger()
+{
+    delete d;
 }
 
 /// Returns the default logger.
@@ -119,7 +146,7 @@ QXmppLogger* QXmppLogger::getLogger()
 
 QXmppLogger::LoggingType QXmppLogger::loggingType()
 {
-    return m_loggingType;
+    return d->loggingType;
 }
 
 /// Sets the handler for logging messages.
@@ -128,7 +155,10 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
 
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
 {
-    m_loggingType = type;
+    if (d->loggingType != type) {
+        d->loggingType = type;
+        reopen();
+    }
 }
 
 /// Returns the types of messages to log.
@@ -136,7 +166,7 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
 
 QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 {
-    return m_messageTypes;
+    return d->messageTypes;
 }
 
 /// Sets the types of messages to log.
@@ -145,7 +175,7 @@ QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 
 void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 {
-    m_messageTypes = types;
+    d->messageTypes = types;
 }
 
 /// Add a logging message.
@@ -156,18 +186,17 @@ void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
 {
     // filter messages
-    if (!m_messageTypes.testFlag(type))
+    if (!d->messageTypes.testFlag(type))
         return;
 
-    switch(m_loggingType)
+    switch(d->loggingType)
     {
     case QXmppLogger::FileLogging:
-        {
-            QFile file(m_logFilePath);
-            file.open(QIODevice::Append);
-            QTextStream stream(&file);
-            stream << formatted(type, text) << "\n";
+        if (!d->logFile) {
+            d->logFile = new QFile(d->logFilePath);
+            d->logFile->open(QIODevice::WriteOnly | QIODevice::Append);
         }
+        QTextStream(d->logFile) << formatted(type, text) << "\n";
         break;
     case QXmppLogger::StdoutLogging:
         std::cout << qPrintable(formatted(type, text)) << std::endl;
@@ -186,7 +215,7 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
 
 QString QXmppLogger::logFilePath()
 {
-    return m_logFilePath;
+    return d->logFilePath;
 }
 
 /// Sets the path to which logging messages should be written.
@@ -197,6 +226,20 @@ QString QXmppLogger::logFilePath()
 
 void QXmppLogger::setLogFilePath(const QString &path)
 {
-    m_logFilePath = path;
+    if (d->logFilePath != path) {
+        d->logFilePath = path;
+        reopen();
+    }
+}
+
+/// If logging to a file, causes the file to be re-opened.
+///
+
+void QXmppLogger::reopen()
+{
+    if (d->logFile) {
+        delete d->logFile;
+        d->logFile = 0;
+    }
 }
 

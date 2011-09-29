@@ -3,6 +3,7 @@
  *
  * Author:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -32,6 +33,8 @@
 #else
 #define qxmpp_loggable_trace(x) (x)
 #endif
+
+class QXmppLoggerPrivate;
 
 /// \brief The QXmppLogger class represents a sink for logging messages.
 ///
@@ -70,6 +73,8 @@ public:
     Q_DECLARE_FLAGS(MessageTypes, MessageType)
 
     QXmppLogger(QObject *parent = 0);
+    ~QXmppLogger();
+
     static QXmppLogger* getLogger();
 
     QXmppLogger::LoggingType loggingType();
@@ -83,6 +88,7 @@ public:
 
 public slots:
     void log(QXmppLogger::MessageType type, const QString& text);
+    void reopen();
 
 signals:
     /// This signal is emitted whenever a log message is received.
@@ -90,9 +96,7 @@ signals:
 
 private:
     static QXmppLogger* m_logger;
-    QXmppLogger::LoggingType m_loggingType;
-    QString m_logFilePath;
-    QXmppLogger::MessageTypes m_messageTypes;
+    QXmppLoggerPrivate *d;
 };
 
 /// \brief The QXmppLoggable class represents a source of logging messages.
