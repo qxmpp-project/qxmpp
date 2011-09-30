@@ -10,7 +10,7 @@ SUBDIRS = src \
 CONFIG += ordered
 
 # Documentation generation
-docs.commands = $(MAKE) -C doc docs
+docs.commands = cd doc/ && $(QMAKE) && $(MAKE) docs
 
 # Source distribution
 QXMPP_ARCHIVE = qxmpp-0.3.91
