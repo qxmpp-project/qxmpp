@@ -78,8 +78,18 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
         d->rooms.insert(roomJid, room);
         connect(room, SIGNAL(destroyed(QObject*)),
             this, SLOT(_q_roomDestroyed(QObject*)));
+
+        // emit signal
+        emit roomAdded(room);
     }
     return room;
+}
+
+/// Returns the list of managed rooms.
+
+QList<QXmppMucRoom*> QXmppMucManager::rooms() const
+{
+    return d->rooms.values();
 }
 
 void QXmppMucManager::setClient(QXmppClient* client)

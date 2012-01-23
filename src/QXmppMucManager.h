@@ -58,12 +58,14 @@ class QXmppMucRoomPrivate;
 class QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
+    Q_PROPERTY(QList<QXmppMucRoom*> rooms READ rooms NOTIFY roomAdded)
 
 public:
     QXmppMucManager();
     ~QXmppMucManager();
 
     QXmppMucRoom *addRoom(const QString &roomJid);
+    QList<QXmppMucRoom*> rooms() const;
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -73,6 +75,9 @@ public:
 signals:
     /// This signal is emitted when an invitation to a chat room is received.
     void invitationReceived(const QString &roomJid, const QString &inviter, const QString &reason);
+
+    /// This signal is emitted when a new room is managed.
+    void roomAdded(QXmppMucRoom *room);
 
 protected:
     /// \cond
