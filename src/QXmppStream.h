@@ -47,9 +47,6 @@ public:
     ~QXmppStream();
 
     virtual bool isConnected() const;
-    virtual void disconnectFromHost();
-
-    virtual bool sendData(const QByteArray&);
     bool sendPacket(const QXmppPacket&);
 
 signals:
@@ -76,6 +73,10 @@ protected:
     ///
     /// \param element
     virtual void handleStream(const QDomElement &element) = 0;
+
+public slots:
+    virtual void disconnectFromHost();
+    virtual bool sendData(const QByteArray&);
 
 private slots:
     void _q_socketConnected();
