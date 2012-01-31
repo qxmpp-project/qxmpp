@@ -49,16 +49,6 @@
 
 QT_BEGIN_NAMESPACE
 
-static void resolveLibrary()
-{
-    QLibrary lib(QLatin1String("dnsapi"));
-    if (!lib.load())
-        return;
-
-    local_dns_query_utf8 = (dns_query_utf8_proto) lib.resolve(QLatin1String("dnsapi"), "DnsQuery_UTF8");
-    local_dns_record_list_free = (dns_record_list_free_proto) lib.resolve(QLatin1String("dnsapi"), "DnsRecordListFree");
-}
-
 void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestName, QDnsLookupReply *reply)
 {
     RHostResolver dnsResolver;
@@ -68,7 +58,7 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
     TInt err = dnsSocket.Connect();
     err = dnsResolver.Open(dnsSocket, KAfInet, KProtocolInetUdp);
     if (err != KErrNone) {
-        reply->error = QXmppSrvInfo::UnknownError;
+        reply->error = QDnsLookup::ResolverError;
         reply->errorString = QLatin1String("RHostResolver::Open failed");
         return;
     }
@@ -77,13 +67,13 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
     TDnsQueryBuf dnsQuery;
     TDnsRespSRVBuf dnsResponse;
     dnsQuery().SetClass(KDnsRRClassIN);
-    TPtrC8 queryPtr(reinterpret_cast<const TUint8*>(requestName.constData()), requestNname.size());
+    TPtrC8 queryPtr(reinterpret_cast<const TUint8*>(requestName.constData()), requestName.size());
     dnsQuery().SetData(queryPtr);
-    dnsQuery().SetType(KDnsRRTypeSRV);
+    dnsQuery().SetType(requestType);
     err = dnsResolver.Query(dnsQuery, dnsResponse);
     if (err != KErrNone) {
-        error = QXmppSrvInfo::NotFoundError;
-        errorString = QLatin1String("RHostResolver::Query failed");
+        reply->error = QDnsLookup::NotFoundError;
+        reply->errorString = QLatin1String("RHostResolver::Query failed");
         return;
     }
 
@@ -93,11 +83,11 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
                                  dnsResponse().Target().Length());
 
         QDnsServiceRecord record;
-        record.d->name = name;
+        record.d->name = QUrl::fromAce(requestName);
         record.d->target = QUrl::fromAce(aceName);
         record.d->port = dnsResponse().Port();
         record.d->priority = dnsResponse().Priority();
-        //record.d->timeToLive = 0;
+        record.d->timeToLive = dnsResponse().RRTtl();
         record.d->weight = dnsResponse().Weight();
         reply->serviceRecords.append(record);
 
