@@ -2,7 +2,7 @@ include(../qxmpp.pri)
 
 QT += testlib
 
-TARGET = tests
+TARGET = qxmpp-tests
 
 RESOURCES += tests.qrc
 SOURCES += tests.cpp
