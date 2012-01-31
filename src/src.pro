@@ -153,6 +153,14 @@ SOURCES += QXmppUtils.cpp \
     QXmppVersionIq.cpp \
     QXmppVersionManager.cpp
 
+# DNS
+HEADERS += qdnslookup.h qdnslookup_p.h
+SOURCES += qdnslookup.cpp
+android:SOURCES += qdnslookup_stub.cpp
+else:symbian:SOURCES += qdnslookup_symbian.cpp
+else:unix:SOURCES += qdnslookup_unix.cpp
+else:win32:SOURCES += qdnslookup_win.cpp
+
 # Plugins
 DEFINES += QT_STATICPLUGIN
 HEADERS += \
