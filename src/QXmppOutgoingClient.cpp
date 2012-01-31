@@ -25,6 +25,7 @@
 #include <QCryptographicHash>
 #include <QSslSocket>
 #include <QUrl>
+#include "qdnslookup.h"
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
@@ -34,7 +35,6 @@
 #include "QXmppPacket.h"
 #include "QXmppPresence.h"
 #include "QXmppOutgoingClient.h"
-#include "QXmppSrvInfo.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSaslAuth.h"
@@ -66,6 +66,7 @@ public:
 
     // State data
     QString bindId;
+    QDnsLookup dns;
     QString sessionId;
     bool sessionAvailable;
     bool sessionStarted;
@@ -102,16 +103,21 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
+    // initialise socket
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
-    // initialise logger
     check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
                     this, SLOT(socketSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
                     this, SLOT(socketError(QAbstractSocket::SocketError)));
+    Q_ASSERT(check);
+
+    // DNS lookups
+    check = connect(&d->dns, SIGNAL(finished()),
+                    this, SLOT(_q_dnsLookupFinished()));
     Q_ASSERT(check);
 
     // XEP-0199: XMPP Ping
@@ -162,8 +168,7 @@ void QXmppOutgoingClient::connectToHost()
     }
 
     // if an explicit host was provided, connect to it
-    if (!host.isEmpty() && port)
-    {
+    if (!host.isEmpty() && port) {
         info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
         socket()->setProxy(configuration().networkProxy());
         socket()->connectToHost(host, port);
@@ -173,26 +178,27 @@ void QXmppOutgoingClient::connectToHost()
     // otherwise, lookup server
     const QString domain = configuration().domain();
     debug(QString("Looking up server for domain %1").arg(domain));
-    QXmppSrvInfo::lookupService("_xmpp-client._tcp." + domain, this,
-                                SLOT(connectToHost(QXmppSrvInfo)));
+    d->dns.setName("_xmpp-client._tcp." + domain);
+    d->dns.setType(QDnsLookup::SRV);
+    d->dns.lookup();
 }
 
-void QXmppOutgoingClient::connectToHost(const QXmppSrvInfo &serviceInfo)
+void QXmppOutgoingClient::_q_dnsLookupFinished()
 {
-    const QString domain = configuration().domain();
-    QString host = configuration().host();
-    quint16 port = configuration().port();
+    QString host;
+    quint16 port;
 
-    if (!serviceInfo.records().isEmpty())
-    {
+    if (d->dns.error() == QDnsLookup::NoError &&
+        !d->dns.serviceRecords().isEmpty()) {
         // take the first returned record
-        host = serviceInfo.records().first().target();
-        port = serviceInfo.records().first().port();
+        host = d->dns.serviceRecords().first().target();
+        port = d->dns.serviceRecords().first().port();
     } else {
         // as a fallback, use domain as the host name
         warning(QString("Lookup for domain %1 failed: %2")
-                .arg(domain, serviceInfo.errorString()));
-        host = domain;
+                .arg(d->dns.name(), d->dns.errorString()));
+        host = configuration().domain();
+        port = configuration().port();
     }
 
     // connect to server

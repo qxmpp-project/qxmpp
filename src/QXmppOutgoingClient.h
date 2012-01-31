@@ -37,7 +37,6 @@ class QXmppConfiguration;
 class QXmppPresence;
 class QXmppIq;
 class QXmppMessage;
-class QXmppSrvInfo;
 
 class QXmppOutgoingClientPrivate;
 
@@ -86,7 +85,7 @@ protected:
     /// \endcond
 
 private slots:
-    void connectToHost(const QXmppSrvInfo &serviceInfo);
+    void _q_dnsLookupFinished();
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError>&);
 

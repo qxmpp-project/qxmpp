@@ -25,11 +25,11 @@
 #include <QSslKey>
 #include <QSslSocket>
 #include <QTimer>
+#include "qdnslookup.h"
 
 #include "QXmppConstants.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
-#include "QXmppSrvInfo.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -37,6 +37,7 @@ class QXmppOutgoingServerPrivate
 {
 public:
     QList<QByteArray> dataQueue;
+    QDnsLookup dns;
     QString localDomain;
     QString localStreamKey;
     QString remoteDomain;
@@ -59,11 +60,17 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     bool check;
     Q_UNUSED(check);
 
+    // socket initialisation
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
                     this, SLOT(socketError(QAbstractSocket::SocketError)));
+    Q_ASSERT(check);
+
+    // DNS lookups
+    check = connect(&d->dns, SIGNAL(finished()),
+                    this, SLOT(_q_dnsLookupFinished()));
     Q_ASSERT(check);
 
     d->dialbackTimer = new QTimer(this);
@@ -99,23 +106,25 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
 
     // lookup server for domain
     debug(QString("Looking up server for domain %1").arg(domain));
-    QXmppSrvInfo::lookupService("_xmpp-server._tcp." + domain, this,
-                                SLOT(connectToHost(QXmppSrvInfo)));
+    d->dns.setName("_xmpp-server._tcp." + domain);
+    d->dns.setType(QDnsLookup::SRV);
+    d->dns.lookup();
 }
 
-void QXmppOutgoingServer::connectToHost(const QXmppSrvInfo &serviceInfo)
+void QXmppOutgoingServer::_q_dnsLookupFinished()
 {
     QString host;
     quint16 port;
 
-    if (!serviceInfo.records().isEmpty())
-    {
+    if (d->dns.error() == QDnsLookup::NoError &&
+        !d->dns.serviceRecords().isEmpty()) {
         // take the first returned record
-        host = serviceInfo.records().first().target();
-        port = serviceInfo.records().first().port();
+        host = d->dns.serviceRecords().first().target();
+        port = d->dns.serviceRecords().first().port();
     } else {
         // as a fallback, use domain as the host name
-        warning(QString("Lookup for domain %1 failed: %2").arg(d->remoteDomain, serviceInfo.errorString()));
+        warning(QString("Lookup for domain %1 failed: %2")
+                .arg(d->dns.name(), d->dns.errorString()));
         host = d->remoteDomain;
         port = 5269;
     }

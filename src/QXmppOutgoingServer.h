@@ -32,7 +32,6 @@ class QSslError;
 class QXmppDialback;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;
-class QXmppSrvInfo;
 
 /// \brief The QXmppOutgoingServer class represents an outgoing XMPP stream
 /// to another XMPP server.
@@ -70,7 +69,7 @@ public slots:
     void queueData(const QByteArray &data);
 
 private slots:
-    void connectToHost(const QXmppSrvInfo &serviceInfo);
+    void _q_dnsLookupFinished();
     void sendDialback();
     void slotSslErrors(const QList<QSslError> &errors);
     void socketError(QAbstractSocket::SocketError error);
