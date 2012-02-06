@@ -99,7 +99,7 @@ public:
         Type type() const;
 
         // FIXME : remove this once is gone
-        bool isValid();
+        bool isValid() const;
 
         /// \cond
         void parse(const QDomElement &element);
@@ -142,7 +142,7 @@ public:
 
     /// \cond
     // FIXME : why is this needed?
-    bool isErrorStanza();
+    bool isErrorStanza() const;
 
 protected:
     void generateAndSetNextId();

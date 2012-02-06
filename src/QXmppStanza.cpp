@@ -233,7 +233,7 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
         setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
 }
 
-bool QXmppStanza::Error::isValid()
+bool QXmppStanza::Error::isValid() const
 {
     return !(getTypeStr().isEmpty() && getConditionStr().isEmpty());
 }
@@ -417,7 +417,7 @@ void QXmppStanza::generateAndSetNextId()
     m_id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
-bool QXmppStanza::isErrorStanza()
+bool QXmppStanza::isErrorStanza() const
 {
     return m_error.isValid();
 }
