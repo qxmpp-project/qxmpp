@@ -323,6 +323,7 @@ void TestPackets::testMessage()
     QCOMPARE(message.thread(), QString());
     QCOMPARE(message.state(), QXmppMessage::None);
     QCOMPARE(message.isAttentionRequested(), false);
+    QCOMPARE(message.isReceiptRequested(), false);
     serializePacket(message, xml);
 }
 
@@ -338,7 +339,29 @@ void TestPackets::testMessageAttention()
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
     QCOMPARE(message.type(), QXmppMessage::Normal);
+    QCOMPARE(message.body(), QString());
     QCOMPARE(message.isAttentionRequested(), true);
+    QCOMPARE(message.isReceiptRequested(), false);
+    serializePacket(message, xml);
+}
+
+void TestPackets::testMessageDelivery()
+{
+    const QByteArray xml(
+        "<message id=\"richard2-4.1.247\" to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>My lord, dispatch; read o'er these articles.</body>"
+          "<request xmlns=\"urn:xmpp:receipts\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.id(), QString("richard2-4.1.247"));
+    QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(message.type(), QXmppMessage::Normal);
+    QCOMPARE(message.body(), QLatin1String("My lord, dispatch; read o'er these articles."));
+    QCOMPARE(message.isAttentionRequested(), false);
+    QCOMPARE(message.isReceiptRequested(), true);
     serializePacket(message, xml);
 }
 

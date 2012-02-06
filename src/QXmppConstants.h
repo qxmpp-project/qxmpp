@@ -48,6 +48,7 @@ extern const char* ns_ibb;
 extern const char* ns_rpc;
 extern const char* ns_ping;
 extern const char *ns_conference;
+extern const char *ns_message_receipts;
 extern const char *ns_delayed_delivery;
 extern const char *ns_legacy_delayed_delivery;
 extern const char *ns_muc;

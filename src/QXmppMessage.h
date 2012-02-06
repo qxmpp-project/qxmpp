@@ -68,6 +68,9 @@ public:
     bool isAttentionRequested() const;
     void setAttentionRequested(bool requested);
 
+    bool isReceiptRequested() const;
+    void setReceiptRequested(bool requested);
+
     QDateTime stamp() const;
     void setStamp(const QDateTime &stamp);
 
@@ -108,6 +111,9 @@ private:
     QString m_body;
     QString m_subject;
     QString m_thread;
+
+    // Request message receipt as per XEP-0184.
+    bool m_receiptRequested;
 };
 
 #endif // QXMPPMESSAGE_H

@@ -47,6 +47,7 @@ const char* ns_ibb = "http://jabber.org/protocol/ibb";
 const char* ns_rpc = "jabber:iq:rpc";
 const char *ns_ping = "urn:xmpp:ping";
 const char *ns_conference = "jabber:x:conference";
+const char *ns_message_receipts = "urn:xmpp:receipts";
 const char *ns_delayed_delivery = "urn:xmpp:delay";
 const char *ns_legacy_delayed_delivery = "jabber:x:delay";
 const char *ns_muc = "http://jabber.org/protocol/muc";

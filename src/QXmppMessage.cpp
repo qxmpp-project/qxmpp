@@ -53,7 +53,8 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
       m_state(None),
       m_attentionRequested(false),
       m_body(body),
-      m_thread(thread)
+      m_thread(thread),
+      m_receiptRequested(false)
 {
 }
 
@@ -95,6 +96,26 @@ bool QXmppMessage::isAttentionRequested() const
 void QXmppMessage::setAttentionRequested(bool requested)
 {
     m_attentionRequested = requested;
+}
+
+/// Returns true if a delivery receipt is requested, as defined
+/// by XEP-0184: Message Delivery Receipts.
+
+bool QXmppMessage::isReceiptRequested() const
+{
+    return m_receiptRequested;
+}
+
+/// Sets whether a delivery receipt is requested, as defined
+/// by XEP-0184: Message Delivery Receipts.
+///
+/// \a param requested
+
+void QXmppMessage::setReceiptRequested(bool requested)
+{
+    m_receiptRequested = requested;
+    if (requested && id().isEmpty())
+        generateAndSetNextId();
 }
 
 /// Returns the message's type.
@@ -229,6 +250,9 @@ void QXmppMessage::parse(const QDomElement &element)
         }
     }
 
+    // XEP-0184: Message Delivery Receipts
+    m_receiptRequested = element.firstChildElement("request").namespaceURI() == ns_message_receipts;
+
     // XEP-0203: Delayed Delivery
     QDomElement delayElement = element.firstChildElement("delay");
     if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
@@ -304,6 +328,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
             helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
             xmlWriter->writeEndElement();
         }
+    }
+
+    // XEP-0184: Message Delivery Receipts
+    if (m_receiptRequested) {
+        xmlWriter->writeStartElement("request");
+        xmlWriter->writeAttribute("xmlns", ns_message_receipts);
+        xmlWriter->writeEndElement();
     }
 
     // XEP-0224: Attention
