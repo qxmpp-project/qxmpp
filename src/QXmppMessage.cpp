@@ -118,6 +118,22 @@ void QXmppMessage::setReceiptRequested(bool requested)
         generateAndSetNextId();
 }
 
+/// If this message is a delivery receipt, returns the ID of the
+/// original message.
+
+QString QXmppMessage::receiptId() const
+{
+    return m_receiptId;
+}
+
+/// Make this message a delivery receipt for the message with
+/// the given \a id.
+
+void QXmppMessage::setReceiptId(const QString &id)
+{
+    m_receiptId = id;
+}
+
 /// Returns the message's type.
 ///
 
@@ -251,6 +267,12 @@ void QXmppMessage::parse(const QDomElement &element)
     }
 
     // XEP-0184: Message Delivery Receipts
+    QDomElement receivedElement = element.firstChildElement("received");
+    if (!receivedElement.isNull() && receivedElement.namespaceURI() == ns_message_receipts) {
+        m_receiptId = receivedElement.attribute("id");
+    } else {
+        m_receiptId = QString();
+    }
     m_receiptRequested = element.firstChildElement("request").namespaceURI() == ns_message_receipts;
 
     // XEP-0203: Delayed Delivery
@@ -331,6 +353,12 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     }
 
     // XEP-0184: Message Delivery Receipts
+    if (!m_receiptId.isEmpty()) {
+        xmlWriter->writeStartElement("received");
+        xmlWriter->writeAttribute("xmlns", ns_message_receipts);
+        xmlWriter->writeAttribute("id", m_receiptId);
+        xmlWriter->writeEndElement();
+    }
     if (m_receiptRequested) {
         xmlWriter->writeStartElement("request");
         xmlWriter->writeAttribute("xmlns", ns_message_receipts);

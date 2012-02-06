@@ -71,6 +71,9 @@ public:
     bool isReceiptRequested() const;
     void setReceiptRequested(bool requested);
 
+    QString receiptId() const;
+    void setReceiptId(const QString &id);
+
     QDateTime stamp() const;
     void setStamp(const QDateTime &stamp);
 
@@ -113,6 +116,7 @@ private:
     QString m_thread;
 
     // Request message receipt as per XEP-0184.
+    QString m_receiptId;
     bool m_receiptRequested;
 };
 
