@@ -53,10 +53,12 @@ void QXmppMessageReceiptManager::setAutoReceipt(bool autoReceipt)
  */
 void QXmppMessageReceiptManager::sendReceipt(const QString &jid, const QString &id)
 {
-    QXmppMessage msg;
-    msg.setTo(jid);
-    msg.setReceiptId(id);
-    client()->sendPacket(msg);
+    if (!jid.isEmpty() && !id.isEmpty()) {
+        QXmppMessage msg;
+        msg.setTo(jid);
+        msg.setReceiptId(id);
+        client()->sendPacket(msg);
+    }
 }
 
 QStringList QXmppMessageReceiptManager::discoveryFeatures() const
@@ -78,19 +80,10 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
         return true;
     }
 
-    // If autoreceipt is enabled, we queue sending back receipt, otherwise
-    // we just ignore the message. In either case, we don't cancel any
-    // further processing.
-    if (m_autoReceipt
-        && message.isReceiptRequested()
-        && !message.from().isEmpty()
-        && !message.id().isEmpty()) {
-        
-        QMetaObject::invokeMethod(this,
-                "sendReceipt",
-                Q_ARG(QString, message.from()),
-                Q_ARG(QString, message.id()));
-    }
+    // If autoreceipt is enabled, send a receipt.
+    if (m_autoReceipt && message.isReceiptRequested())
+        sendReceipt(message.from(), message.id());
 
+    // Continue processing.
     return false;
 }
