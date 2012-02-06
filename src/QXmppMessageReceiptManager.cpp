@@ -69,37 +69,27 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     if (stanza.tagName() != "message")
         return false;
 
-    // Case 1: incoming receipt
-    // This way we handle the receipt and cancel any further processing.
-    const QDomElement &received = stanza.firstChildElement("received");
-    if (received.namespaceURI() == ns_message_receipts)
-    {
-        QString id = received.attribute("id");
+    QXmppMessage message;
+    message.parse(stanza);
 
-        // check if it's old-style XEP
-        if (id.isEmpty())
-            id = stanza.attribute("id");
-
-        emit messageDelivered(stanza.attribute("from"), id);
+    // Handle receipts and cancel any further processing.
+    if (!message.receiptId().isEmpty()) {
+        emit messageDelivered(message.from(), message.receiptId());
         return true;
     }
 
-    // Case 2: incoming message requesting receipt
     // If autoreceipt is enabled, we queue sending back receipt, otherwise
     // we just ignore the message. In either case, we don't cancel any
     // further processing.
-    if (m_autoReceipt && stanza.firstChildElement("request").namespaceURI() == ns_message_receipts)
-    {
-        const QString &jid = stanza.attribute("from");
-        const QString &id = stanza.attribute("id");
-
-        // Send out receipt only if jid and id is not empty, otherwise fail
-        // silently.
-        if (!jid.isEmpty() && !id.isEmpty())
-            QMetaObject::invokeMethod(this,
-                    "sendReceipt",
-                    Q_ARG(QString, jid),
-                    Q_ARG(QString, id));
+    if (m_autoReceipt
+        && message.isReceiptRequested()
+        && !message.from().isEmpty()
+        && !message.id().isEmpty()) {
+        
+        QMetaObject::invokeMethod(this,
+                "sendReceipt",
+                Q_ARG(QString, message.from()),
+                Q_ARG(QString, message.id()));
     }
 
     return false;
