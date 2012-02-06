@@ -383,6 +383,22 @@ void TestPackets::testMessageReceipt()
     QCOMPARE(receipt.isReceiptRequested(), false);
     QCOMPARE(receipt.receiptId(), QString("richard2-4.1.247"));
     serializePacket(receipt, receiptXml);
+
+    const QByteArray oldXml(
+        "<message id=\"richard2-4.1.247\" to=\"northumberland@shakespeare.lit/westminster\" from=\"kingrichard@royalty.england.lit/throne\" type=\"normal\">"
+          "<received xmlns=\"urn:xmpp:receipts\"/>"
+        "</message>");
+
+    QXmppMessage old;
+    parsePacket(old, oldXml);
+    QCOMPARE(old.id(), QString("richard2-4.1.247"));
+    QCOMPARE(old.to(), QString("northumberland@shakespeare.lit/westminster"));
+    QCOMPARE(old.from(), QString("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(old.type(), QXmppMessage::Normal);
+    QCOMPARE(old.body(), QString());
+    QCOMPARE(old.isAttentionRequested(), false);
+    QCOMPARE(old.isReceiptRequested(), false);
+    QCOMPARE(old.receiptId(), QString("richard2-4.1.247"));
 }
 
 void TestPackets::testMessageFull()
