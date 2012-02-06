@@ -40,8 +40,7 @@ QXmppConfiguration::QXmppConfiguration() : m_port(5222),
                 m_ignoreSslErrors(true),
                 m_streamSecurityMode(QXmppConfiguration::TLSEnabled),
                 m_nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest),
-                m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5),
-                m_caCertificates(QSslSocket::defaultCaCertificates())
+                m_SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5)
 {
 
 }
