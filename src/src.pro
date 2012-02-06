@@ -53,6 +53,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppJingleIq.h \
     QXmppLogger.h \
     QXmppMessage.h \
+    QXmppMessageReceiptManager.h \
     QXmppMucIq.h \
     QXmppMucManager.h \
     QXmppNonSASLAuth.h \
@@ -117,6 +118,7 @@ SOURCES += QXmppUtils.cpp \
     QXmppJingleIq.cpp \
     QXmppLogger.cpp \
     QXmppMessage.cpp \
+    QXmppMessageReceiptManager.cpp \
     QXmppMucIq.cpp \
     QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
