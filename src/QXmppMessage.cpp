@@ -270,6 +270,10 @@ void QXmppMessage::parse(const QDomElement &element)
     QDomElement receivedElement = element.firstChildElement("received");
     if (!receivedElement.isNull() && receivedElement.namespaceURI() == ns_message_receipts) {
         m_receiptId = receivedElement.attribute("id");
+
+        // compatibility with old-style XEP
+        if (m_receiptId.isEmpty())
+            m_receiptId = id();
     } else {
         m_receiptId = QString();
     }
