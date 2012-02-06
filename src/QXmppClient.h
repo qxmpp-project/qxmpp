@@ -215,7 +215,7 @@ signals:
     void iqReceived(const QXmppIq &iq);
 
     /// This signal is emitted when the client state changes.
-    void stateChanged(State state);
+    void stateChanged(QXmppClient::State state);
 
     /// \cond
     // Deprecated in release 0.3.0
