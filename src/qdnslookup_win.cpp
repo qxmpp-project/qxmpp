@@ -47,6 +47,7 @@
 
 #include <windows.h>
 #include <windns.h>
+#include <winsock2.h>
 
 QT_BEGIN_NAMESPACE
 
