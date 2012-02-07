@@ -235,7 +235,30 @@ bool QXmppRosterManager::refuseSubscription(const QString &bareJid)
     return client()->sendPacket(presence);
 }
 
-/// Removes a roster entry and cancels subscriptions to and from the contact.
+/// Adds a new item to the roster without sending any subscription requests.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemAdded() or itemChanged() signal to be emitted.
+///
+/// \param bareJid
+/// \param name Optional name for the item.
+/// \param groups Optional groups for the item.
+
+bool QXmppRosterManager::addItem(const QString &bareJid, const QString &name, const QSet<QString> &groups)
+{
+    QXmppRosterIq::Item item;
+    item.setBareJid(bareJid);
+    item.setName(name);
+    item.setGroups(groups);
+    item.setSubscriptionType(QXmppRosterIq::Item::NotSet);
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    return client()->sendPacket(iq);
+}
+
+/// Removes a roster item and cancels subscriptions to and from the contact.
 ///
 /// As a result, the server will initiate a roster push, causing the
 /// itemRemoved() signal to be emitted.

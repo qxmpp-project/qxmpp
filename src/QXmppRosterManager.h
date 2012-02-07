@@ -91,6 +91,7 @@ public:
 public slots:
     bool acceptSubscription(const QString &bareJid);
     bool refuseSubscription(const QString &bareJid);
+    bool addItem(const QString &bareJid, const QString &name = QString(), const QSet<QString> &groups = QSet<QString>());
     bool removeItem(const QString &bareJid);
     bool renameItem(const QString &bareJid, const QString &name);
     bool subscribe(const QString &bareJid);
