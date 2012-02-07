@@ -64,18 +64,22 @@ public:
     QXmppConfiguration config;
     QXmppStanza::Error::Condition xmppStreamError;
 
-    // State data
-    QString bindId;
+    // DNS
     QDnsLookup dns;
-    QString sessionId;
-    bool sessionAvailable;
-    bool sessionStarted;
+
+    // Stream
     QString streamId;
     QString streamFrom;
     QString streamVersion;
-    QString nonSASLAuthId;
 
-    // SASL
+    // Session
+    QString bindId;
+    QString sessionId;
+    bool sessionAvailable;
+    bool sessionStarted;
+
+    // Authentication
+    QString nonSASLAuthId;
     QXmppSaslDigestMd5 saslDigest;
     int saslDigestStep;
     int saslMechanism;
@@ -235,9 +239,19 @@ void QXmppOutgoingClient::handleStart()
 {
     QXmppStream::handleStart();
 
+    // reset stream information
+    d->streamId.clear();
+    d->streamFrom.clear();
+    d->streamVersion.clear();
+
     // reset authentication step
     d->saslDigestStep = 0;
     d->saslMechanism = -1;
+
+    // reset session information
+    d->bindId.clear();
+    d->sessionId.clear();
+    d->sessionAvailable = false;
     d->sessionStarted = false;
 
     // start stream
