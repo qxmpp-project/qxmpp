@@ -40,7 +40,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppConfiguration.h \
     QXmppConstants.h \
     QXmppDataForm.h \
-    QXmppDialback.h \
     QXmppDiscoveryIq.h \
     QXmppDiscoveryManager.h \
     QXmppElement.h \
@@ -48,8 +47,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppEntityTimeManager.h \
     QXmppGlobal.h \
     QXmppIbbIq.h \
-    QXmppIncomingClient.h \
-    QXmppIncomingServer.h \
     QXmppInvokable.h \
     QXmppIq.h \
     QXmppJingleIq.h \
@@ -60,7 +57,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppMucManager.h \
     QXmppNonSASLAuth.h \
     QXmppOutgoingClient.h \
-    QXmppOutgoingServer.h \
     QXmppPacket.h \
     QXmppPasswordChecker.h \
     QXmppPingIq.h \
@@ -74,9 +70,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppRpcManager.h \
     QXmppRtpChannel.h \
     QXmppSaslAuth.h \
-    QXmppServer.h \
-    QXmppServerExtension.h \
-    QXmppServerPlugin.h \
     QXmppSessionIq.h \
     QXmppSocks.h \
     QXmppStanza.h \
@@ -88,7 +81,14 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppVCardManager.h \
     QXmppVCardIq.h \
     QXmppVersionIq.h \
-    QXmppVersionManager.h
+    QXmppVersionManager.h \
+    server/QXmppDialback.h \
+    server/QXmppIncomingClient.h \
+    server/QXmppIncomingServer.h \
+    server/QXmppOutgoingServer.h \
+    server/QXmppServer.h \
+    server/QXmppServerExtension.h \
+    server/QXmppServerPlugin.h
 
 HEADERS += $$INSTALL_HEADERS
 
@@ -107,7 +107,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppConfiguration.cpp \
     QXmppConstants.cpp \
     QXmppDataForm.cpp \
-    QXmppDialback.cpp \
     QXmppDiscoveryIq.cpp \
     QXmppDiscoveryManager.cpp \
     QXmppElement.cpp \
@@ -115,8 +114,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppEntityTimeManager.cpp \
     QXmppGlobal.cpp \
     QXmppIbbIq.cpp \
-    QXmppIncomingClient.cpp \
-    QXmppIncomingServer.cpp \
     QXmppInvokable.cpp \
     QXmppIq.cpp \
     QXmppJingleIq.cpp \
@@ -127,7 +124,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppOutgoingClient.cpp \
-    QXmppOutgoingServer.cpp \
     QXmppPacket.cpp \
     QXmppPasswordChecker.cpp \
     QXmppPingIq.cpp \
@@ -141,8 +137,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppRpcManager.cpp \
     QXmppRtpChannel.cpp \
     QXmppSaslAuth.cpp \
-    QXmppServer.cpp \
-    QXmppServerExtension.cpp \
     QXmppSessionIq.cpp \
     QXmppSocks.cpp \
     QXmppStanza.cpp \
@@ -154,7 +148,13 @@ SOURCES += QXmppUtils.cpp \
     QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
-    QXmppVersionManager.cpp
+    QXmppVersionManager.cpp \
+    server/QXmppDialback.cpp \
+    server/QXmppIncomingClient.cpp \
+    server/QXmppIncomingServer.cpp \
+    server/QXmppOutgoingServer.cpp \
+    server/QXmppServer.cpp \
+    server/QXmppServerExtension.cpp
 
 # DNS
 HEADERS += qdnslookup.h qdnslookup_p.h
