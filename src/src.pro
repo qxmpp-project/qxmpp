@@ -58,7 +58,6 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppNonSASLAuth.h \
     QXmppOutgoingClient.h \
     QXmppPacket.h \
-    QXmppPasswordChecker.h \
     QXmppPingIq.h \
     QXmppPresence.h \
     QXmppPubSubIq.h \
@@ -86,6 +85,7 @@ INSTALL_HEADERS = QXmppUtils.h \
     server/QXmppIncomingClient.h \
     server/QXmppIncomingServer.h \
     server/QXmppOutgoingServer.h \
+    server/QXmppPasswordChecker.h \
     server/QXmppServer.h \
     server/QXmppServerExtension.h \
     server/QXmppServerPlugin.h
@@ -125,7 +125,6 @@ SOURCES += QXmppUtils.cpp \
     QXmppNonSASLAuth.cpp \
     QXmppOutgoingClient.cpp \
     QXmppPacket.cpp \
-    QXmppPasswordChecker.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
     QXmppPubSubIq.cpp \
@@ -153,6 +152,7 @@ SOURCES += QXmppUtils.cpp \
     server/QXmppIncomingClient.cpp \
     server/QXmppIncomingServer.cpp \
     server/QXmppOutgoingServer.cpp \
+    server/QXmppPasswordChecker.cpp \
     server/QXmppServer.cpp \
     server/QXmppServerExtension.cpp
 
