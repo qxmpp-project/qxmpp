@@ -1,7 +1,7 @@
 # Common definitions
 
 QT += network xml
-QXMPP_INCLUDEPATH = $$PWD/src $$PWD/src/server
+QXMPP_INCLUDEPATH = $$PWD/src $$PWD/src/client $$PWD/src/server
 QXMPP_LIBRARY_DIR = $$PWD/lib
 
 CONFIG(debug, debug|release) {

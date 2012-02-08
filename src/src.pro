@@ -28,23 +28,23 @@ DESTDIR = $$QXMPP_LIBRARY_DIR
 # Header files
 INSTALL_HEADERS = QXmppUtils.h \
     QXmppArchiveIq.h \
-    QXmppArchiveManager.h \
+    client/QXmppArchiveManager.h \
     QXmppBindIq.h \
-    QXmppBookmarkManager.h \
+    client/QXmppBookmarkManager.h \
     QXmppBookmarkSet.h \
     QXmppByteStreamIq.h \
-    QXmppCallManager.h \
-    QXmppClient.h \
-    QXmppClientExtension.h \
+    client/QXmppCallManager.h \
+    client/QXmppClient.h \
+    client/QXmppClientExtension.h \
     QXmppCodec.h \
-    QXmppConfiguration.h \
+    client/QXmppConfiguration.h \
     QXmppConstants.h \
     QXmppDataForm.h \
     QXmppDiscoveryIq.h \
-    QXmppDiscoveryManager.h \
+    client/QXmppDiscoveryManager.h \
     QXmppElement.h \
     QXmppEntityTimeIq.h \
-    QXmppEntityTimeManager.h \
+    client/QXmppEntityTimeManager.h \
     QXmppGlobal.h \
     QXmppIbbIq.h \
     QXmppInvokable.h \
@@ -52,21 +52,21 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppJingleIq.h \
     QXmppLogger.h \
     QXmppMessage.h \
-    QXmppMessageReceiptManager.h \
+    client/QXmppMessageReceiptManager.h \
     QXmppMucIq.h \
-    QXmppMucManager.h \
+    client/QXmppMucManager.h \
     QXmppNonSASLAuth.h \
-    QXmppOutgoingClient.h \
+    client/QXmppOutgoingClient.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
     QXmppPubSubIq.h \
-    QXmppReconnectionManager.h \
-    QXmppRemoteMethod.h \
+    client/QXmppReconnectionManager.h \
+    client/QXmppRemoteMethod.h \
     QXmppRosterIq.h \
-    QXmppRosterManager.h \
+    client/QXmppRosterManager.h \
     QXmppRpcIq.h \
-    QXmppRpcManager.h \
+    client/QXmppRpcManager.h \
     QXmppRtpChannel.h \
     QXmppSaslAuth.h \
     QXmppSessionIq.h \
@@ -76,11 +76,11 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppStreamFeatures.h \
     QXmppStreamInitiationIq.h \
     QXmppStun.h \
-    QXmppTransferManager.h \
-    QXmppVCardManager.h \
+    client/QXmppTransferManager.h \
+    client/QXmppVCardManager.h \
     QXmppVCardIq.h \
     QXmppVersionIq.h \
-    QXmppVersionManager.h \
+    client/QXmppVersionManager.h \
     server/QXmppDialback.h \
     server/QXmppIncomingClient.h \
     server/QXmppIncomingServer.h \
@@ -95,23 +95,23 @@ HEADERS += $$INSTALL_HEADERS
 # Source files
 SOURCES += QXmppUtils.cpp \
     QXmppArchiveIq.cpp \
-    QXmppArchiveManager.cpp \
+    client/QXmppArchiveManager.cpp \
     QXmppBindIq.cpp \
-    QXmppBookmarkManager.cpp \
+    client/QXmppBookmarkManager.cpp \
     QXmppBookmarkSet.cpp \
     QXmppByteStreamIq.cpp \
-    QXmppCallManager.cpp \
-    QXmppClient.cpp \
-    QXmppClientExtension.cpp \
+    client/QXmppCallManager.cpp \
+    client/QXmppClient.cpp \
+    client/QXmppClientExtension.cpp \
     QXmppCodec.cpp \
-    QXmppConfiguration.cpp \
+    client/QXmppConfiguration.cpp \
     QXmppConstants.cpp \
     QXmppDataForm.cpp \
     QXmppDiscoveryIq.cpp \
-    QXmppDiscoveryManager.cpp \
+    client/QXmppDiscoveryManager.cpp \
     QXmppElement.cpp \
     QXmppEntityTimeIq.cpp \
-    QXmppEntityTimeManager.cpp \
+    client/QXmppEntityTimeManager.cpp \
     QXmppGlobal.cpp \
     QXmppIbbIq.cpp \
     QXmppInvokable.cpp \
@@ -119,21 +119,21 @@ SOURCES += QXmppUtils.cpp \
     QXmppJingleIq.cpp \
     QXmppLogger.cpp \
     QXmppMessage.cpp \
-    QXmppMessageReceiptManager.cpp \
+    client/QXmppMessageReceiptManager.cpp \
     QXmppMucIq.cpp \
-    QXmppMucManager.cpp \
+    client/QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
-    QXmppOutgoingClient.cpp \
+    client/QXmppOutgoingClient.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
     QXmppPubSubIq.cpp \
-    QXmppReconnectionManager.cpp \
-    QXmppRemoteMethod.cpp \
+    client/QXmppReconnectionManager.cpp \
+    client/QXmppRemoteMethod.cpp \
     QXmppRosterIq.cpp \
-    QXmppRosterManager.cpp \
+    client/QXmppRosterManager.cpp \
     QXmppRpcIq.cpp \
-    QXmppRpcManager.cpp \
+    client/QXmppRpcManager.cpp \
     QXmppRtpChannel.cpp \
     QXmppSaslAuth.cpp \
     QXmppSessionIq.cpp \
@@ -143,11 +143,11 @@ SOURCES += QXmppUtils.cpp \
     QXmppStreamFeatures.cpp \
     QXmppStreamInitiationIq.cpp \
     QXmppStun.cpp \
-    QXmppTransferManager.cpp \
-    QXmppVCardManager.cpp \
+    client/QXmppTransferManager.cpp \
+    client/QXmppVCardManager.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
-    QXmppVersionManager.cpp \
+    client/QXmppVersionManager.cpp \
     server/QXmppDialback.cpp \
     server/QXmppIncomingClient.cpp \
     server/QXmppIncomingServer.cpp \
