@@ -24,7 +24,7 @@ dist.depends = docs
 
 # Install rules
 htmldocs.files = doc/html
-htmldocs.path = $$[QT_INSTALL_PREFIX]/share/doc/qxmpp
+htmldocs.path = $$PREFIX/share/doc/qxmpp
 htmldocs.CONFIG += no_check_exist directory
 
 QMAKE_EXTRA_TARGETS += dist docs

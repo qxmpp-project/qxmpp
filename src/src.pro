@@ -181,8 +181,8 @@ SOURCES += \
 
 # Installation
 headers.files = $$INSTALL_HEADERS
-headers.path = $$[QT_INSTALL_PREFIX]/include/qxmpp
-target.path = $$[QT_INSTALL_LIBS]
+headers.path = $$PREFIX/include/qxmpp
+target.path = $$PREFIX/lib
 INSTALLS += headers target
 
 # pkg-config support
