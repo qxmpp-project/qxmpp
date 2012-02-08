@@ -139,7 +139,7 @@ void QXmppServerExtension::stop()
 
 /// Returns the server which loaded this extension.
 
-QXmppServer *QXmppServerExtension::server()
+QXmppServer *QXmppServerExtension::server() const
 {
     return d->server;
 }

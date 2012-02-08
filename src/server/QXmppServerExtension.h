@@ -67,7 +67,7 @@ public:
     virtual void stop();
 
 protected:
-    QXmppServer *server();
+    QXmppServer *server() const;
 
 private:
     void setServer(QXmppServer *server);
