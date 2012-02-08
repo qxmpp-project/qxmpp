@@ -91,7 +91,7 @@ public:
     static bool isBookmarkSet(const QDomElement &element);
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endconf
+    /// \endcond
 
 private:
     QList<QXmppBookmarkConference> m_conferences;
