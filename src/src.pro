@@ -8,6 +8,8 @@ CONFIG += staticlib
 INCLUDEPATH += $$QXMPP_INCLUDEPATH $$QXMPP_INTERNAL_INCLUDES
 LIBS += $$QXMPP_INTERNAL_LIBS
 
+DEFINES += QT_STATICPLUGIN
+
 # To enable support for the Speex audio codec, uncomment the following:
 # DEFINES += QXMPP_USE_SPEEX
 # LIBS += -lspeex
@@ -62,36 +64,7 @@ INSTALL_HEADERS = \
     QXmppStun.h \
     QXmppUtils.h \
     QXmppVCardIq.h \
-    QXmppVersionIq.h \
-    client/QXmppArchiveManager.h \
-    client/QXmppBookmarkManager.h \
-    client/QXmppCallManager.h \
-    client/QXmppClient.h \
-    client/QXmppClientExtension.h \
-    client/QXmppConfiguration.h \
-    client/QXmppDiscoveryManager.h \
-    client/QXmppEntityTimeManager.h \
-    client/QXmppInvokable.h \
-    client/QXmppMessageReceiptManager.h \
-    client/QXmppMucManager.h \
-    client/QXmppOutgoingClient.h \
-    client/QXmppReconnectionManager.h \
-    client/QXmppRemoteMethod.h \
-    client/QXmppRosterManager.h \
-    client/QXmppRpcManager.h \
-    client/QXmppTransferManager.h \
-    client/QXmppVCardManager.h \
-    client/QXmppVersionManager.h \
-    server/QXmppDialback.h \
-    server/QXmppIncomingClient.h \
-    server/QXmppIncomingServer.h \
-    server/QXmppOutgoingServer.h \
-    server/QXmppPasswordChecker.h \
-    server/QXmppServer.h \
-    server/QXmppServerExtension.h \
-    server/QXmppServerPlugin.h
-
-HEADERS += $$INSTALL_HEADERS
+    QXmppVersionIq.h
 
 # Source files
 SOURCES += \
@@ -130,33 +103,7 @@ SOURCES += \
     QXmppStun.cpp \
     QXmppUtils.cpp \
     QXmppVCardIq.cpp \
-    QXmppVersionIq.cpp \
-    client/QXmppDiscoveryManager.cpp \
-    client/QXmppArchiveManager.cpp \
-    client/QXmppBookmarkManager.cpp \
-    client/QXmppCallManager.cpp \
-    client/QXmppClient.cpp \
-    client/QXmppClientExtension.cpp \
-    client/QXmppConfiguration.cpp \
-    client/QXmppEntityTimeManager.cpp \
-    client/QXmppInvokable.cpp \
-    client/QXmppMessageReceiptManager.cpp \
-    client/QXmppMucManager.cpp \
-    client/QXmppOutgoingClient.cpp \
-    client/QXmppReconnectionManager.cpp \
-    client/QXmppRemoteMethod.cpp \
-    client/QXmppRosterManager.cpp \
-    client/QXmppRpcManager.cpp \
-    client/QXmppTransferManager.cpp \
-    client/QXmppVCardManager.cpp \
-    client/QXmppVersionManager.cpp \
-    server/QXmppDialback.cpp \
-    server/QXmppIncomingClient.cpp \
-    server/QXmppIncomingServer.cpp \
-    server/QXmppOutgoingServer.cpp \
-    server/QXmppPasswordChecker.cpp \
-    server/QXmppServer.cpp \
-    server/QXmppServerExtension.cpp
+    QXmppVersionIq.cpp
 
 # DNS
 HEADERS += qdnslookup.h qdnslookup_p.h
@@ -166,24 +113,10 @@ else:symbian:SOURCES += qdnslookup_symbian.cpp
 else:unix:SOURCES += qdnslookup_unix.cpp
 else:win32:SOURCES += qdnslookup_win.cpp
 
-# Plugins
-DEFINES += QT_STATICPLUGIN
-HEADERS += \
-    server/mod_disco.h \
-    server/mod_ping.h \
-    server/mod_presence.h \
-    server/mod_proxy65.h \
-    server/mod_stats.h \
-    server/mod_time.h \
-    server/mod_version.h
-SOURCES += \
-    server/mod_disco.cpp \
-    server/mod_ping.cpp \
-    server/mod_presence.cpp \
-    server/mod_proxy65.cpp \
-    server/mod_stats.cpp \
-    server/mod_time.cpp \
-    server/mod_version.cpp
+include(client/client.pri)
+include(server/server.pri)
+
+HEADERS += $$INSTALL_HEADERS
 
 # Installation
 headers.files = $$INSTALL_HEADERS
