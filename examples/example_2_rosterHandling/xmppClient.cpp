@@ -31,19 +31,21 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
-    bool check = connect(this, SIGNAL(connected()),
-        SLOT(clientConnected()));
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(this, SIGNAL(connected()),
+                    SLOT(clientConnected()));
     Q_ASSERT(check);
 
     check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
-        SLOT(rosterReceived()));
+                    SLOT(rosterReceived()));
     Q_ASSERT(check);
 
     /// Then QXmppRoster::presenceChanged() is emitted whenever presence of someone
     /// in roster changes
-    check = connect(&this->rosterManager(),
-                    SIGNAL(presenceChanged(QString,QString)),
-        SLOT(presenceChanged(QString,QString)));
+    check = connect(&this->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
+                    SLOT(presenceChanged(QString,QString)));
     Q_ASSERT(check);
 }
 

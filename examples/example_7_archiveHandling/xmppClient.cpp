@@ -33,13 +33,16 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // add archive manager
     archiveManager = new QXmppArchiveManager;
     addExtension(archiveManager);
 
     // connect signals
-    bool check = connect(this, SIGNAL(connected()),
-                         this, SLOT(clientConnected()));
+    check = connect(this, SIGNAL(connected()),
+                    this, SLOT(clientConnected()));
     Q_ASSERT(check);
 
     check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat)),

@@ -33,6 +33,9 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent), transferManager(0)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // add transfer manager
     transferManager = new QXmppTransferManager;
     addExtension(transferManager);
@@ -42,8 +45,8 @@ xmppClient::xmppClient(QObject *parent)
     // transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
     // transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
-    bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
-                         this, SLOT(slotPresenceReceived(QXmppPresence)));
+    check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(slotPresenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
     check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
@@ -62,15 +65,21 @@ void xmppClient::slotError(QXmppTransferJob::Error error)
 
 void xmppClient::slotFileReceived(QXmppTransferJob *job)
 {
+    bool check;
+    Q_UNUSED(check);
+
     qDebug() << "Got transfer request from:" << job->jid();
 
-    bool check = connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(slotError(QXmppTransferJob::Error)));
+    check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
+                    this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()), this, SLOT(slotFinished()));
+    check = connect(job, SIGNAL(finished()),
+                    this, SLOT(slotFinished()));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)), this, SLOT(slotProgress(qint64,qint64)));
+    check = connect(job, SIGNAL(progress(qint64,qint64)),
+                    this, SLOT(slotProgress(qint64,qint64)));
     Q_ASSERT(check);
 
     // allocate a buffer to receive the file
@@ -90,6 +99,9 @@ void xmppClient::slotFinished()
 
 void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 {
+    bool check;
+    Q_UNUSED(check);
+
     const QLatin1String recipient("qxmpp.test2@gmail.com");
 
     // if we are the recipient, or if the presence is not from the recipient,
@@ -102,16 +114,16 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     // send the file and connect to the job's signals
     QXmppTransferJob *job = transferManager->sendFile(presence.from(), "xmppClient.cpp");
 
-    bool check = connect( job, SIGNAL(error(QXmppTransferJob::Error)),
-             this, SLOT(slotError(QXmppTransferJob::Error)) );
+    check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
+                    this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect( job, SIGNAL(finished()),
-             this, SLOT(slotFinished()) );
+    check = connect(job, SIGNAL(finished()),
+                    this, SLOT(slotFinished()));
     Q_ASSERT(check);
 
-    check = connect( job, SIGNAL(progress(qint64,qint64)),
-             this, SLOT(slotProgress(qint64,qint64)) );
+    check = connect(job, SIGNAL(progress(qint64,qint64)),
+                    this, SLOT(slotProgress(qint64,qint64)));
     Q_ASSERT(check);
 }
 

@@ -39,14 +39,16 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
-    bool check = connect(this, SIGNAL(connected()),
-        SLOT(clientConnected()));
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(this, SIGNAL(connected()),
+                    SLOT(clientConnected()));
     Q_ASSERT(check);
 
     check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
-        SLOT(rosterReceived()));
+                    SLOT(rosterReceived()));
     Q_ASSERT(check);
-
 }
 
 xmppClient::~xmppClient()
