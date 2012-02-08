@@ -49,7 +49,7 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
-    /// cond
+    /// \cond
     QStringList discoveryItems() const;
     bool handleStanza(const QDomElement &element);
     QVariantMap statistics() const;
