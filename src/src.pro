@@ -30,6 +30,8 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppArchiveIq.h \
     QXmppArchiveManager.h \
     QXmppBindIq.h \
+    QXmppBookmarkManager.h \
+    QXmppBookmarkSet.h \
     QXmppByteStreamIq.h \
     QXmppCallManager.h \
     QXmppClient.h \
@@ -95,6 +97,8 @@ SOURCES += QXmppUtils.cpp \
     QXmppArchiveIq.cpp \
     QXmppArchiveManager.cpp \
     QXmppBindIq.cpp \
+    QXmppBookmarkManager.cpp \
+    QXmppBookmarkSet.cpp \
     QXmppByteStreamIq.cpp \
     QXmppCallManager.cpp \
     QXmppClient.cpp \

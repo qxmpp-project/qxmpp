@@ -2,6 +2,7 @@ QXmpp 0.4.0 (UNRELEASED)
 ------------------------
 
   - New XEPs
+    * XEP-0048: Bookmarks
     * XEP-0184: Message Delivery Receipts
     * XEP-0224: Attention
 
