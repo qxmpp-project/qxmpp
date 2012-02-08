@@ -10,7 +10,7 @@ CONFIG(debug, debug|release) {
     QXMPP_LIBRARY_NAME = qxmpp
 }
 
-# Libraries used internal by QXmpp
+# Libraries used internally by QXmpp
 symbian {
     QXMPP_INTERNAL_INCLUDES = $$APP_LAYER_SYSTEMINCLUDE
     QXMPP_INTERNAL_LIBS = -lesock
