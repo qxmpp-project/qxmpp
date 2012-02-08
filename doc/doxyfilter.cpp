@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
         // adjust Doxyfile
         setField(code, "ALPHABETICAL_INDEX", "NO");
-        setField(code, "EXCLUDE_PATTERNS", "*/moc_* */qdnslookup*");
+        setField(code, "EXCLUDE_PATTERNS", "*/moc_* */mod_* */qdnslookup*");
         setField(code, "FULL_PATH_NAMES", "NO");
         setField(code, "HIDE_UNDOC_CLASSES", "YES");
         setField(code, "GENERATE_LATEX", "NO");
@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
                 QString::number((QXMPP_VERSION >> 16) & 0xff),
                 QString::number((QXMPP_VERSION >> 8) & 0xff),
                 QString::number(QXMPP_VERSION & 0xff)));
+        setField(code, "RECURSIVE", "YES");
 
         // write doxyfile
         QFile output("Doxyfile");
