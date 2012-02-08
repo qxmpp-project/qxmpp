@@ -5,7 +5,7 @@ CONFIG += console
 CONFIG -= app_bundle
 QT -= gui
 
-INCLUDEPATH += $$QXMPP_INCLUDE_DIR
+INCLUDEPATH += $$QXMPP_INCLUDEPATH
 TARGET = doxyfilter
 SOURCES += doxyfilter.cpp
 

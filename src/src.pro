@@ -5,7 +5,7 @@ QT -= gui
 TEMPLATE = lib
 
 CONFIG += staticlib
-INCLUDEPATH += $$QXMPP_INCLUDE_DIR $$QXMPP_INTERNAL_INCLUDES
+INCLUDEPATH += $$QXMPP_INCLUDEPATH $$QXMPP_INTERNAL_INCLUDES
 LIBS += $$QXMPP_INTERNAL_LIBS
 
 # To enable support for the Speex audio codec, uncomment the following:
