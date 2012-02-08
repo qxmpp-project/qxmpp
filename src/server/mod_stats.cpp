@@ -170,7 +170,7 @@ QStringList QXmppServerStats::discoveryItems() const
     return QStringList() << d->jid;
 }
 
-QVariantMap QXmppServerStats::statistics()
+QVariantMap QXmppServerStats::statistics() const
 {
     return server()->statistics();
 }

@@ -52,7 +52,7 @@ public:
     /// cond
     QStringList discoveryItems() const;
     bool handleStanza(const QDomElement &element);
-    QVariantMap statistics();
+    QVariantMap statistics() const;
     bool start();
     void stop();
     /// \endcond
