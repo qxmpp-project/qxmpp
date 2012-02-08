@@ -186,7 +186,7 @@ SOURCES += \
 # Installation
 headers.files = $$INSTALL_HEADERS
 headers.path = $$PREFIX/include/qxmpp
-target.path = $$PREFIX/lib
+target.path = $$PREFIX/$$LIBDIR
 INSTALLS += headers target
 
 # pkg-config support
