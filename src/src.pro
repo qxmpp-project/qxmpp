@@ -26,47 +26,31 @@ VERSION = $$QXMPP_VERSION
 DESTDIR = $$QXMPP_LIBRARY_DIR
 
 # Header files
-INSTALL_HEADERS = QXmppUtils.h \
+INSTALL_HEADERS = \
     QXmppArchiveIq.h \
-    client/QXmppArchiveManager.h \
     QXmppBindIq.h \
-    client/QXmppBookmarkManager.h \
     QXmppBookmarkSet.h \
     QXmppByteStreamIq.h \
-    client/QXmppCallManager.h \
-    client/QXmppClient.h \
-    client/QXmppClientExtension.h \
     QXmppCodec.h \
-    client/QXmppConfiguration.h \
     QXmppConstants.h \
     QXmppDataForm.h \
     QXmppDiscoveryIq.h \
-    client/QXmppDiscoveryManager.h \
     QXmppElement.h \
     QXmppEntityTimeIq.h \
-    client/QXmppEntityTimeManager.h \
     QXmppGlobal.h \
     QXmppIbbIq.h \
-    QXmppInvokable.h \
     QXmppIq.h \
     QXmppJingleIq.h \
     QXmppLogger.h \
     QXmppMessage.h \
-    client/QXmppMessageReceiptManager.h \
     QXmppMucIq.h \
-    client/QXmppMucManager.h \
     QXmppNonSASLAuth.h \
-    client/QXmppOutgoingClient.h \
     QXmppPacket.h \
     QXmppPingIq.h \
     QXmppPresence.h \
     QXmppPubSubIq.h \
-    client/QXmppReconnectionManager.h \
-    client/QXmppRemoteMethod.h \
     QXmppRosterIq.h \
-    client/QXmppRosterManager.h \
     QXmppRpcIq.h \
-    client/QXmppRpcManager.h \
     QXmppRtpChannel.h \
     QXmppSaslAuth.h \
     QXmppSessionIq.h \
@@ -76,10 +60,27 @@ INSTALL_HEADERS = QXmppUtils.h \
     QXmppStreamFeatures.h \
     QXmppStreamInitiationIq.h \
     QXmppStun.h \
-    client/QXmppTransferManager.h \
-    client/QXmppVCardManager.h \
+    QXmppUtils.h \
     QXmppVCardIq.h \
     QXmppVersionIq.h \
+    client/QXmppArchiveManager.h \
+    client/QXmppBookmarkManager.h \
+    client/QXmppCallManager.h \
+    client/QXmppClient.h \
+    client/QXmppClientExtension.h \
+    client/QXmppConfiguration.h \
+    client/QXmppDiscoveryManager.h \
+    client/QXmppEntityTimeManager.h \
+    client/QXmppInvokable.h \
+    client/QXmppMessageReceiptManager.h \
+    client/QXmppMucManager.h \
+    client/QXmppOutgoingClient.h \
+    client/QXmppReconnectionManager.h \
+    client/QXmppRemoteMethod.h \
+    client/QXmppRosterManager.h \
+    client/QXmppRpcManager.h \
+    client/QXmppTransferManager.h \
+    client/QXmppVCardManager.h \
     client/QXmppVersionManager.h \
     server/QXmppDialback.h \
     server/QXmppIncomingClient.h \
@@ -93,47 +94,31 @@ INSTALL_HEADERS = QXmppUtils.h \
 HEADERS += $$INSTALL_HEADERS
 
 # Source files
-SOURCES += QXmppUtils.cpp \
+SOURCES += \
     QXmppArchiveIq.cpp \
-    client/QXmppArchiveManager.cpp \
     QXmppBindIq.cpp \
-    client/QXmppBookmarkManager.cpp \
     QXmppBookmarkSet.cpp \
     QXmppByteStreamIq.cpp \
-    client/QXmppCallManager.cpp \
-    client/QXmppClient.cpp \
-    client/QXmppClientExtension.cpp \
     QXmppCodec.cpp \
-    client/QXmppConfiguration.cpp \
     QXmppConstants.cpp \
     QXmppDataForm.cpp \
     QXmppDiscoveryIq.cpp \
-    client/QXmppDiscoveryManager.cpp \
     QXmppElement.cpp \
     QXmppEntityTimeIq.cpp \
-    client/QXmppEntityTimeManager.cpp \
     QXmppGlobal.cpp \
     QXmppIbbIq.cpp \
-    QXmppInvokable.cpp \
     QXmppIq.cpp \
     QXmppJingleIq.cpp \
     QXmppLogger.cpp \
     QXmppMessage.cpp \
-    client/QXmppMessageReceiptManager.cpp \
     QXmppMucIq.cpp \
-    client/QXmppMucManager.cpp \
     QXmppNonSASLAuth.cpp \
-    client/QXmppOutgoingClient.cpp \
     QXmppPacket.cpp \
     QXmppPingIq.cpp \
     QXmppPresence.cpp \
     QXmppPubSubIq.cpp \
-    client/QXmppReconnectionManager.cpp \
-    client/QXmppRemoteMethod.cpp \
     QXmppRosterIq.cpp \
-    client/QXmppRosterManager.cpp \
     QXmppRpcIq.cpp \
-    client/QXmppRpcManager.cpp \
     QXmppRtpChannel.cpp \
     QXmppSaslAuth.cpp \
     QXmppSessionIq.cpp \
@@ -143,10 +128,27 @@ SOURCES += QXmppUtils.cpp \
     QXmppStreamFeatures.cpp \
     QXmppStreamInitiationIq.cpp \
     QXmppStun.cpp \
-    client/QXmppTransferManager.cpp \
-    client/QXmppVCardManager.cpp \
+    QXmppUtils.cpp \
     QXmppVCardIq.cpp \
     QXmppVersionIq.cpp \
+    client/QXmppDiscoveryManager.cpp \
+    client/QXmppArchiveManager.cpp \
+    client/QXmppBookmarkManager.cpp \
+    client/QXmppCallManager.cpp \
+    client/QXmppClient.cpp \
+    client/QXmppClientExtension.cpp \
+    client/QXmppConfiguration.cpp \
+    client/QXmppEntityTimeManager.cpp \
+    client/QXmppInvokable.cpp \
+    client/QXmppMessageReceiptManager.cpp \
+    client/QXmppMucManager.cpp \
+    client/QXmppOutgoingClient.cpp \
+    client/QXmppReconnectionManager.cpp \
+    client/QXmppRemoteMethod.cpp \
+    client/QXmppRosterManager.cpp \
+    client/QXmppRpcManager.cpp \
+    client/QXmppTransferManager.cpp \
+    client/QXmppVCardManager.cpp \
     client/QXmppVersionManager.cpp \
     server/QXmppDialback.cpp \
     server/QXmppIncomingClient.cpp \
