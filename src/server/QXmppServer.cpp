@@ -41,7 +41,7 @@
 #include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
 
-#include "server/mod_presence.h"
+#include "mod_presence.h"
 
 // Core plugins
 Q_IMPORT_PLUGIN(mod_disco)
@@ -462,8 +462,12 @@ void QXmppServer::setPrivateKey(const QString &path)
 
 bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 {
-    if (!d->serverForClients->listen(address, port))
-    {
+    if (d->domain.isEmpty()) {
+        d->warning("No domain was specified!");
+        return false;
+    }
+
+    if (!d->serverForClients->listen(address, port)) {
         d->warning(QString("Could not start listening for C2S on port %1").arg(QString::number(port)));
         return false;
     }
@@ -502,8 +506,12 @@ void QXmppServer::close()
 
 bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 {
-    if (!d->serverForServers->listen(address, port))
-    {
+    if (d->domain.isEmpty()) {
+        d->warning("No domain was specified!");
+        return false;
+    }
+
+    if (!d->serverForServers->listen(address, port)) {
         d->warning(QString("Could not start listening for S2S on port %1").arg(QString::number(port)));
         return false;
     }
@@ -630,8 +638,11 @@ void QXmppServer::_q_clientDisconnected()
             if (d->incomingClientsByJid.value(jid) == client)
                 d->incomingClientsByJid.remove(jid);
             const QString bareJid = jidToBareJid(jid);
-            if (d->incomingClientsByBareJid.contains(bareJid))
+            if (d->incomingClientsByBareJid.contains(bareJid)) {
                 d->incomingClientsByBareJid[bareJid].remove(client);
+                if (d->incomingClientsByBareJid[bareJid].isEmpty())
+                    d->incomingClientsByBareJid.remove(bareJid);
+            }
         }
 
         // destroy client
