@@ -15,7 +15,7 @@ symbian {
     QXMPP_INTERNAL_INCLUDES = $$APP_LAYER_SYSTEMINCLUDE
     QXMPP_INTERNAL_LIBS = -lesock
 } else:win32 {
-    QXMPP_INTERNAL_LIBS = -lws2_32
+    QXMPP_INTERNAL_LIBS = -ldnsapi -lws2_32
 }
 
 # Libraries for apps which use QXmpp
