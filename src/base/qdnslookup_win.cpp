@@ -39,6 +39,7 @@
 **
 ****************************************************************************/
 
+#include <winsock2.h>
 #include "qdnslookup_p.h"
 
 #include <QUrl>
@@ -47,48 +48,14 @@
 
 #include <windows.h>
 #include <windns.h>
-#include <winsock2.h>
 
 QT_BEGIN_NAMESPACE
 
-static QMutex local_dns_mutex;
-typedef DNS_STATUS (*dns_query_utf8_proto)(PCSTR,WORD,DWORD,PIP4_ARRAY,PDNS_RECORD*,PVOID*);
-static dns_query_utf8_proto local_dns_query_utf8 = 0;
-typedef void (*dns_record_list_free_proto)(PDNS_RECORD,DNS_FREE_TYPE);
-static dns_record_list_free_proto local_dns_record_list_free = 0;
-
-static void resolveLibrary()
-{
-    QLibrary lib(QLatin1String("dnsapi"));
-    if (!lib.load())
-        return;
-
-    local_dns_query_utf8 = (dns_query_utf8_proto) lib.resolve(QLatin1String("dnsapi"), "DnsQuery_UTF8");
-    local_dns_record_list_free = (dns_record_list_free_proto) lib.resolve(QLatin1String("dnsapi"), "DnsRecordListFree");
-}
-
 void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestName, QDnsLookupReply *reply)
 {
-    // Load DnsQuery_UTF8 and DnsRecordListFree on demand.
-    static volatile bool triedResolve = false;
-    if (!triedResolve) {
-        QMutexLocker locker(&local_dns_mutex);
-        if (!triedResolve) {
-            resolveLibrary();
-            triedResolve = true;
-        }
-    }
-
-    // If DnsQuery_UTF8 or DnsRecordListFree is missing, fail.
-    if (!local_dns_query_utf8 || !local_dns_record_list_free) {
-        reply->error = QDnsLookup::ResolverError,
-        reply->errorString = tr("Resolver functions not found");
-        return;
-    }
-
     // Perform DNS query.
-    PDNS_RECORD dns_records;
-    const DNS_STATUS status = local_dns_query_utf8(requestName, requestType, DNS_QUERY_STANDARD, NULL, &dns_records, NULL);
+    PDNS_RECORD dns_records = 0;
+    const DNS_STATUS status = DnsQuery_UTF8(requestName, requestType, DNS_QUERY_STANDARD, NULL, &dns_records, NULL);
     switch (status) {
     case ERROR_SUCCESS:
         break;
@@ -177,7 +144,7 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
         }
     }
 
-    local_dns_record_list_free(dns_records, DnsFreeRecordList);
+    DnsRecordListFree(dns_records, DnsFreeRecordList);
 }
 
 QT_END_NAMESPACE
