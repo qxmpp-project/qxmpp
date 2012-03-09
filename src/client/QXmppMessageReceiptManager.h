@@ -38,7 +38,6 @@ class QXmppMessageReceiptManager : public QXmppClientExtension
     Q_OBJECT
 public:
     QXmppMessageReceiptManager();
-    ~QXmppMessageReceiptManager();
 
     /// \cond
     virtual QStringList discoveryFeatures() const;
