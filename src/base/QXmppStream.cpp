@@ -216,6 +216,12 @@ void QXmppStream::_q_socketReadyRead()
 {
     d->dataBuffer.append(d->socket->readAll());
 
+    // handle whitespace pings
+    if (!d->dataBuffer.isEmpty() && d->dataBuffer.trimmed().isEmpty()) {
+        d->dataBuffer.clear();
+        handleStanza(QDomElement());
+    }
+
     // FIXME : maybe these QRegExps could be static?
     QRegExp startStreamRegex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
     startStreamRegex.setMinimal(true);
