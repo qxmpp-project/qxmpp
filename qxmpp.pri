@@ -2,7 +2,6 @@
 
 QT += network xml
 QXMPP_INCLUDEPATH = $$PWD/src/base $$PWD/src/client $$PWD/src/server
-QXMPP_LIBRARY_DIR = $$PWD/lib
 
 CONFIG(debug, debug|release) {
     QXMPP_LIBRARY_NAME = qxmpp_d
@@ -11,7 +10,13 @@ CONFIG(debug, debug|release) {
 }
 
 # Libraries used internally by QXmpp
-symbian {
+android|symbian {
+
+} else:contains(MEEGO_EDITION,harmattan) {
+    # meego/harmattan has speex for sure
+    QXMPP_INTERNAL_DEFINES += QXMPP_USE_SPEEX
+    QXMPP_INTERNAL_LIBS += -lspeex
+} else:symbian {
     QXMPP_INTERNAL_INCLUDES = $$APP_LAYER_SYSTEMINCLUDE
     QXMPP_INTERNAL_LIBS = -lesock
 } else:win32 {
