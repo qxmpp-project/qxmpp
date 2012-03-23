@@ -27,6 +27,7 @@ QXmpp 0.4.0 (UNRELEASED)
   - Improve XEP-0136 support to enable archive deletion.
   - Set default keep-alive timeout to 20 seconds, enables detection of broken connections.
   - Make install path configurable using the PREFIX variable instead of Qt's installation path.
+  - Make it possible to build a shared library by invoking "qmake QXMPP_LIBRARY_TYPE=lib".
 
   - Fix issues:
     * Issue 95: Patch for several utility methods in RosterManager

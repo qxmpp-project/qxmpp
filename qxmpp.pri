@@ -1,7 +1,7 @@
 # Common definitions
 
 QT += network xml
-QXMPP_VERSION = 0.3.92
+QXMPP_VERSION = 0.3.93
 QXMPP_INCLUDEPATH = $$PWD/src/base $$PWD/src/client $$PWD/src/server
 
 CONFIG(debug, debug|release) {
