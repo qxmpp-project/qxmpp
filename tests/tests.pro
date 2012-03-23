@@ -9,4 +9,4 @@ SOURCES += tests.cpp
 HEADERS += tests.h 
 
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
-LIBS += -L ../src $$QXMPP_LIBS
+LIBS += -L../src $$QXMPP_LIBS

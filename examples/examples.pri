@@ -4,7 +4,7 @@ TEMPLATE = app
 CONFIG += console
 
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
-LIBS += -L ../../src $$QXMPP_LIBS
+LIBS += -L../../src $$QXMPP_LIBS
 
 # Symbian packaging rules
 symbian {
