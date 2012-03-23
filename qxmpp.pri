@@ -32,10 +32,16 @@ symbian {
     QXMPP_LIBS = -l$${QXMPP_LIBRARY_NAME}
 }
 
-# FIXME: we should be able to use the link_prl option to automatically pull
-# in the extra libraries which the qxmpp library needs, but this does not
-# seem to work on win32, so we specify the dependencies here:
-QXMPP_LIBS += $$QXMPP_INTERNAL_LIBS
+# Determine library type (lib or staticlib)
+isEmpty(QXMPP_LIBRARY_TYPE) {
+    QXMPP_LIBRARY_TYPE = staticlib
+}
+contains(QXMPP_LIBRARY_TYPE,staticlib) {
+    # FIXME: we should be able to use the link_prl option to automatically pull
+    # in the extra libraries which the qxmpp library needs, but this does not
+    # seem to work on win32, so we specify the dependencies here:
+    QXMPP_LIBS += $$QXMPP_INTERNAL_LIBS
+}
 
 # Installation prefix and library directory
 isEmpty(PREFIX) {
