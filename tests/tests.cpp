@@ -234,6 +234,24 @@ void TestPackets::testArchiveChat()
     serializePacket(iq, xml);
 }
 
+void TestPackets::testArchiveRemove()
+{
+    const QByteArray xml(
+        "<iq id=\"remove_1\" type=\"set\">"
+        "<remove xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\"/>"
+        "</iq>");
+
+    QXmppArchiveRemoveIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.type(), QXmppIq::Set);
+    QCOMPARE(iq.id(), QLatin1String("remove_1"));
+    QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
+    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
+    serializePacket(iq, xml);
+}
+
 void TestPackets::testArchiveRetrieve()
 {
     const QByteArray xml(
