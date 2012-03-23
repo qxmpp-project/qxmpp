@@ -25,7 +25,9 @@ DEFINES += QT_STATICPLUGIN
 # Target definition
 TARGET = $$QXMPP_LIBRARY_NAME
 VERSION = $$QXMPP_VERSION
-DESTDIR = $$QXMPP_LIBRARY_DIR
+win32 {
+    DESTDIR = $$OUT_PWD
+}
 
 include(base/base.pri)
 include(client/client.pri)
@@ -41,6 +43,5 @@ INSTALLS += headers target
 
 # pkg-config support
 CONFIG += create_pc create_prl no_install_prl
-QMAKE_PKGCONFIG_DESTDIR = $$QXMPP_LIBRARY_DIR/pkgconfig
 QMAKE_PKGCONFIG_LIBDIR = $$target.path
 QMAKE_PKGCONFIG_INCDIR = $$headers.path
