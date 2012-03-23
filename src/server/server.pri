@@ -1,5 +1,6 @@
 # Headers
 INSTALL_HEADERS += \
+    server/mod_presence.h \
     server/QXmppDialback.h \
     server/QXmppIncomingClient.h \
     server/QXmppIncomingServer.h \
@@ -23,7 +24,6 @@ SOURCES += \
 HEADERS += \
     server/mod_disco.h \
     server/mod_ping.h \
-    server/mod_presence.h \
     server/mod_proxy65.h \
     server/mod_stats.h \
     server/mod_time.h \
