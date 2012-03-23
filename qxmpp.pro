@@ -13,7 +13,7 @@ CONFIG += ordered
 docs.commands = cd doc/ && $(QMAKE) && $(MAKE) docs
 
 # Source distribution
-QXMPP_ARCHIVE = qxmpp-0.3.92
+QXMPP_ARCHIVE = qxmpp-$$QXMPP_VERSION
 dist.commands = \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE && \
     svn export . $$QXMPP_ARCHIVE && \
