@@ -58,6 +58,7 @@ public:
             NotSet = 8  ///< the subscription state was not specified
         };
 
+        Item();
         QString bareJid() const;
         QSet<QString> groups() const;
         QString name() const;

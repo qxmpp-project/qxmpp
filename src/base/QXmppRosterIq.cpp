@@ -74,6 +74,13 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+/// Constructs a new roster entry.
+
+QXmppRosterIq::Item::Item()
+    : m_type(NotSet)
+{
+}
+
 /// Returns the bareJid of the roster entry.
 ///
 /// \return bareJid as a QString
