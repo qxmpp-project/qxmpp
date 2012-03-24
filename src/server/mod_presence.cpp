@@ -95,6 +95,13 @@ QList<QXmppPresence> QXmppServerPresence::availablePresences(const QString &bare
     return d->presences.value(bareJid).values();
 }
 
+int QXmppServerPresence::extensionPriority() const
+{
+    // FIXME: until we can handle presence errors, we need to
+    // keep this extension last.
+    return -1000;
+}
+
 bool QXmppServerPresence::handleStanza(const QDomElement &element)
 {
     if (element.tagName() != QLatin1String("presence"))

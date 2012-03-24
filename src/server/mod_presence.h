@@ -42,6 +42,7 @@ public:
     ~QXmppServerPresence();
 
     QList<QXmppPresence> availablePresences(const QString &bareJid) const;
+    int extensionPriority() const;
     bool handleStanza(const QDomElement &element);
     QSet<QString> presenceSubscribers(const QString &jid);
     bool start();

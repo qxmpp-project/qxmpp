@@ -53,6 +53,7 @@ public:
     QXmppServerExtension();
     ~QXmppServerExtension();
     QString extensionName() const;
+    virtual int extensionPriority() const;
 
     virtual QStringList discoveryFeatures() const;
     virtual QStringList discoveryItems() const;

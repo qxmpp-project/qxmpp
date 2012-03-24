@@ -46,6 +46,7 @@
 // Core plugins
 Q_IMPORT_PLUGIN(mod_disco)
 Q_IMPORT_PLUGIN(mod_ping)
+Q_IMPORT_PLUGIN(mod_presence)
 Q_IMPORT_PLUGIN(mod_proxy65)
 Q_IMPORT_PLUGIN(mod_stats)
 Q_IMPORT_PLUGIN(mod_time)
@@ -237,11 +238,9 @@ void QXmppServerPrivate::warning(const QString &message)
 
 void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 {
-    if (!loaded)
-    {
+    if (!loaded) {
         QObjectList plugins = QPluginLoader::staticInstances();
-        foreach (QObject *object, plugins)
-        {
+        foreach (QObject *object, plugins) {
             QXmppServerPlugin *plugin = qobject_cast<QXmppServerPlugin*>(object);
             if (!plugin)
                 continue;
@@ -249,10 +248,6 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
             foreach (const QString &key, plugin->keys())
                 server->addExtension(plugin->create(key));
         }
-
-        // FIXME: until we can handle presence errors, we need to
-        // keep this extension last.
-        server->addExtension(new QXmppServerPresence);
         loaded = true;
     }
 }
@@ -261,8 +256,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 
 void QXmppServerPrivate::startExtensions()
 {
-    if (!started)
-    {
+    if (!started) {
         foreach (QXmppServerExtension *extension, extensions)
             if (!extension->start())
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
@@ -275,8 +269,7 @@ void QXmppServerPrivate::startExtensions()
 
 void QXmppServerPrivate::stopExtensions()
 {
-    if (started)
-    {
+    if (started) {
         for (int i = extensions.size() - 1; i >= 0; --i)
             extensions[i]->stop();
         started = false;
@@ -327,6 +320,15 @@ void QXmppServer::addExtension(QXmppServerExtension *extension)
     d->info(QString("Added extension %1").arg(extension->extensionName()));
     extension->setParent(this);
     extension->setServer(this);
+
+    // keep extensions sorted by priority
+    for (int i = 0; i < d->extensions.size(); ++i) {
+        QXmppServerExtension *other = d->extensions[i];
+        if (other->extensionPriority() < extension->extensionPriority()) {
+            d->extensions.insert(i, extension);
+            return;
+        }
+    }
     d->extensions << extension;
 }
 

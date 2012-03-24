@@ -74,6 +74,18 @@ QString QXmppServerExtension::extensionName() const
     return QString::fromLatin1(name);
 }
 
+/// Returns the extension's priority.
+///
+/// Higher priority extensions are called first when handling
+/// incoming stanzas.
+///
+/// The default implementation returns 0.
+
+int QXmppServerExtension::extensionPriority() const
+{
+    return 0;
+}
+
 /// Handles an incoming XMPP stanza.
 ///
 /// Return true if no further processing should occur, false otherwise.
