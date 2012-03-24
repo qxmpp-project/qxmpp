@@ -52,7 +52,7 @@ class QXmppServerExtension : public QXmppLoggable
 public:
     QXmppServerExtension();
     ~QXmppServerExtension();
-    QString extensionName() const;
+    virtual QString extensionName() const;
     virtual int extensionPriority() const;
 
     virtual QStringList discoveryFeatures() const;
