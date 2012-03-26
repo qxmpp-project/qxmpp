@@ -45,10 +45,7 @@
 
 // Core plugins
 Q_IMPORT_PLUGIN(mod_disco)
-Q_IMPORT_PLUGIN(mod_ping)
 Q_IMPORT_PLUGIN(mod_presence)
-Q_IMPORT_PLUGIN(mod_proxy65)
-Q_IMPORT_PLUGIN(mod_stats)
 Q_IMPORT_PLUGIN(mod_time)
 Q_IMPORT_PLUGIN(mod_version)
 
