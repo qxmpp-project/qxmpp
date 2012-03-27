@@ -21,12 +21,4 @@ SOURCES += \
     server/QXmppServerExtension.cpp
 
 # Plugins
-HEADERS += \
-    server/mod_disco.h \
-    server/mod_time.h \
-    server/mod_version.h
-SOURCES += \
-    server/mod_disco.cpp \
-    server/mod_presence.cpp \
-    server/mod_time.cpp \
-    server/mod_version.cpp
+SOURCES += server/mod_presence.cpp
