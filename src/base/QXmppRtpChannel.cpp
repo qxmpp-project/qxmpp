@@ -373,7 +373,7 @@ QXmppRtpAudioChannel::~QXmppRtpAudioChannel()
 
 qint64 QXmppRtpAudioChannel::bytesAvailable() const
 {
-    return d->incomingBuffer.size();
+    return QIODevice::bytesAvailable() + d->incomingBuffer.size();
 }
 
 /// Closes the RTP channel.
