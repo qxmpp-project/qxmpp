@@ -17,6 +17,7 @@ INSTALL_HEADERS += \
     client/QXmppRosterManager.h \
     client/QXmppRpcManager.h \
     client/QXmppTransferManager.h \
+    client/QXmppTransferManager_p.h \
     client/QXmppVCardManager.h \
     client/QXmppVersionManager.h
 
