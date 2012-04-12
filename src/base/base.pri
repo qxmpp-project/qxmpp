@@ -1,6 +1,7 @@
 # Header files
 INSTALL_HEADERS += \
     base/qdnslookup.h \
+    base/qdnslookup_p.h \
     base/QXmppArchiveIq.h \
     base/QXmppBindIq.h \
     base/QXmppBookmarkSet.h \
@@ -78,7 +79,6 @@ SOURCES += \
     base/QXmppVersionIq.cpp
 
 # DNS
-HEADERS += base/qdnslookup_p.h
 SOURCES += base/qdnslookup.cpp
 android:SOURCES += base/qdnslookup_stub.cpp
 else:symbian:SOURCES += base/qdnslookup_symbian.cpp
