@@ -111,7 +111,8 @@ QStringList QXmppMucManager::discoveryFeatures() const
         << ns_muc
         << ns_muc_admin
         << ns_muc_owner
-        << ns_muc_user;
+        << ns_muc_user
+        << ns_conference;
 }
 
 bool QXmppMucManager::handleStanza(const QDomElement &element)
