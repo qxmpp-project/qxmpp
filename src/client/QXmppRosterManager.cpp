@@ -122,7 +122,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
     // Security check: only server should send this iq
     // from() should be either empty or bareJid of the user
     const QString fromJid = element.attribute("from");
-    if (!fromJid.isEmpty() && jidToBareJid(fromJid) != client()->configuration().jidBare())
+    if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare())
         return false;
 
     QXmppRosterIq rosterIq;
@@ -190,8 +190,8 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
 void QXmppRosterManager::_q_presenceReceived(const QXmppPresence& presence)
 {
     const QString jid = presence.from();
-    const QString bareJid = jidToBareJid(jid);
-    const QString resource = jidToResource(jid);
+    const QString bareJid = QXmppUtils::jidToBareJid(jid);
+    const QString resource = QXmppUtils::jidToResource(jid);
 
     if (bareJid.isEmpty())
         return;
@@ -307,7 +307,7 @@ bool QXmppRosterManager::renameItem(const QString &bareJid, const QString &name)
 bool QXmppRosterManager::subscribe(const QString &bareJid)
 {
     QXmppPresence packet;
-    packet.setTo(jidToBareJid(bareJid));
+    packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Subscribe);
     return client()->sendPacket(packet);
 }
@@ -320,7 +320,7 @@ bool QXmppRosterManager::subscribe(const QString &bareJid)
 bool QXmppRosterManager::unsubscribe(const QString &bareJid)
 {
     QXmppPresence packet;
-    packet.setTo(jidToBareJid(bareJid));
+    packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Unsubscribe);
     return client()->sendPacket(packet);
 }

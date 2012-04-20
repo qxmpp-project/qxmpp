@@ -134,9 +134,9 @@ void QXmppConfiguration::setResource(const QString& resource)
 
 void QXmppConfiguration::setJid(const QString& jid)
 {
-    m_user = jidToUser(jid);
-    m_domain = jidToDomain(jid);
-    const QString resource = jidToResource(jid);
+    m_user = QXmppUtils::jidToUser(jid);
+    m_domain = QXmppUtils::jidToDomain(jid);
+    const QString resource = QXmppUtils::jidToResource(jid);
     if (!resource.isEmpty())
         m_resource = resource;
 }

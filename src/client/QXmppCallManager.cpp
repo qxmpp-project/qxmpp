@@ -837,7 +837,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     }
 
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
-    call->d->sid = generateStanzaHash();
+    call->d->sid = QXmppUtils::generateStanzaHash();
 
     // register call
     d->calls << call;

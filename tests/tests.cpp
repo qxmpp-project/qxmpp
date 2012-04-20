@@ -58,10 +58,10 @@ QString getImageType(const QByteArray &contents);
 
 void TestUtils::testCrc32()
 {
-    quint32 crc = generateCrc32(QByteArray());
+    quint32 crc = QXmppUtils::generateCrc32(QByteArray());
     QCOMPARE(crc, 0u);
 
-    crc = generateCrc32(QByteArray("Hi There"));
+    crc = QXmppUtils::generateCrc32(QByteArray("Hi There"));
     QCOMPARE(crc, 0xDB143BBEu);
 }
 
@@ -86,37 +86,37 @@ void TestUtils::testDigestMd5()
 
 void TestUtils::testHmac()
 {
-    QByteArray hmac = generateHmacMd5(QByteArray(16, 0x0b), QByteArray("Hi There"));
+    QByteArray hmac = QXmppUtils::generateHmacMd5(QByteArray(16, 0x0b), QByteArray("Hi There"));
     QCOMPARE(hmac, QByteArray::fromHex("9294727a3638bb1c13f48ef8158bfc9d"));
 
-    hmac = generateHmacMd5(QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
+    hmac = QXmppUtils::generateHmacMd5(QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
     QCOMPARE(hmac, QByteArray::fromHex("750c783e6ab0b503eaa86e310a5db738"));
 
-    hmac = generateHmacMd5(QByteArray(16, 0xaa), QByteArray(50, 0xdd));
+    hmac = QXmppUtils::generateHmacMd5(QByteArray(16, 0xaa), QByteArray(50, 0xdd));
     QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
 }
 
 void TestUtils::testJid()
 {
-    QCOMPARE(jidToBareJid("foo@example.com/resource"), QLatin1String("foo@example.com"));
-    QCOMPARE(jidToBareJid("foo@example.com"), QLatin1String("foo@example.com"));
-    QCOMPARE(jidToBareJid("example.com"), QLatin1String("example.com"));
-    QCOMPARE(jidToBareJid(QString()), QString());
+    QCOMPARE(QXmppUtils::jidToBareJid("foo@example.com/resource"), QLatin1String("foo@example.com"));
+    QCOMPARE(QXmppUtils::jidToBareJid("foo@example.com"), QLatin1String("foo@example.com"));
+    QCOMPARE(QXmppUtils::jidToBareJid("example.com"), QLatin1String("example.com"));
+    QCOMPARE(QXmppUtils::jidToBareJid(QString()), QString());
 
-    QCOMPARE(jidToDomain("foo@example.com/resource"), QLatin1String("example.com"));
-    QCOMPARE(jidToDomain("foo@example.com"), QLatin1String("example.com"));
-    QCOMPARE(jidToDomain("example.com"), QLatin1String("example.com"));
-    QCOMPARE(jidToDomain(QString()), QString());
+    QCOMPARE(QXmppUtils::jidToDomain("foo@example.com/resource"), QLatin1String("example.com"));
+    QCOMPARE(QXmppUtils::jidToDomain("foo@example.com"), QLatin1String("example.com"));
+    QCOMPARE(QXmppUtils::jidToDomain("example.com"), QLatin1String("example.com"));
+    QCOMPARE(QXmppUtils::jidToDomain(QString()), QString());
 
-    QCOMPARE(jidToResource("foo@example.com/resource"), QLatin1String("resource"));
-    QCOMPARE(jidToResource("foo@example.com"), QString());
-    QCOMPARE(jidToResource("example.com"), QString());
-    QCOMPARE(jidToResource(QString()), QString());
+    QCOMPARE(QXmppUtils::jidToResource("foo@example.com/resource"), QLatin1String("resource"));
+    QCOMPARE(QXmppUtils::jidToResource("foo@example.com"), QString());
+    QCOMPARE(QXmppUtils::jidToResource("example.com"), QString());
+    QCOMPARE(QXmppUtils::jidToResource(QString()), QString());
 
-    QCOMPARE(jidToUser("foo@example.com/resource"), QLatin1String("foo"));
-    QCOMPARE(jidToUser("foo@example.com"), QLatin1String("foo"));
-    QCOMPARE(jidToUser("example.com"), QString());
-    QCOMPARE(jidToUser(QString()), QString());
+    QCOMPARE(QXmppUtils::jidToUser("foo@example.com/resource"), QLatin1String("foo"));
+    QCOMPARE(QXmppUtils::jidToUser("foo@example.com"), QLatin1String("foo"));
+    QCOMPARE(QXmppUtils::jidToUser("example.com"), QString());
+    QCOMPARE(QXmppUtils::jidToUser(QString()), QString());
 }
 
 static void testMimeType(const QString &fileName, const QString fileType)
@@ -147,16 +147,16 @@ void TestUtils::testLibVersion()
 void TestUtils::testTimezoneOffset()
 {
     // parsing
-    QCOMPARE(timezoneOffsetFromString("Z"), 0);
-    QCOMPARE(timezoneOffsetFromString("+00:00"), 0);
-    QCOMPARE(timezoneOffsetFromString("-00:00"), 0);
-    QCOMPARE(timezoneOffsetFromString("+01:30"), 5400);
-    QCOMPARE(timezoneOffsetFromString("-01:30"), -5400);
+    QCOMPARE(QXmppUtils::timezoneOffsetFromString("Z"), 0);
+    QCOMPARE(QXmppUtils::timezoneOffsetFromString("+00:00"), 0);
+    QCOMPARE(QXmppUtils::timezoneOffsetFromString("-00:00"), 0);
+    QCOMPARE(QXmppUtils::timezoneOffsetFromString("+01:30"), 5400);
+    QCOMPARE(QXmppUtils::timezoneOffsetFromString("-01:30"), -5400);
 
     // serialization
-    QCOMPARE(timezoneOffsetToString(0), QLatin1String("Z"));
-    QCOMPARE(timezoneOffsetToString(5400), QLatin1String("+01:30"));
-    QCOMPARE(timezoneOffsetToString(-5400), QLatin1String("-01:30"));
+    QCOMPARE(QXmppUtils::timezoneOffsetToString(0), QLatin1String("Z"));
+    QCOMPARE(QXmppUtils::timezoneOffsetToString(5400), QLatin1String("+01:30"));
+    QCOMPARE(QXmppUtils::timezoneOffsetToString(-5400), QLatin1String("-01:30"));
 }
 
 template <class T>

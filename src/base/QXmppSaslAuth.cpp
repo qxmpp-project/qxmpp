@@ -96,7 +96,7 @@ void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
 
 QByteArray QXmppSaslDigestMd5::generateNonce()
 {
-    QByteArray nonce = generateRandomBytes(32);
+    QByteArray nonce = QXmppUtils::generateRandomBytes(32);
 
     // The random data can the '=' char is not valid as it is a delimiter,
     // so to be safe, base64 the nonce

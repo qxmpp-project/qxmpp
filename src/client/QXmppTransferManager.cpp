@@ -1257,7 +1257,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 
     QXmppTransferOutgoingJob *job = new QXmppTransferOutgoingJob(jid, client(), this);
     if (sid.isEmpty())
-        job->d->sid = generateStanzaHash();
+        job->d->sid = QXmppUtils::generateStanzaHash();
     else
         job->d->sid = sid;
     job->d->fileInfo = fileInfo;
@@ -1285,7 +1285,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     QXmppElement file;
     file.setTagName("file");
     file.setAttribute("xmlns", ns_stream_initiation_file_transfer);
-    file.setAttribute("date", datetimeToString(job->fileDate()));
+    file.setAttribute("date", QXmppUtils::datetimeToString(job->fileDate()));
     file.setAttribute("hash", job->fileHash().toHex());
     file.setAttribute("name", job->fileName());
     file.setAttribute("size", QString::number(job->fileSize()));
@@ -1571,7 +1571,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
         }
         else if (item.tagName() == "file" && item.attribute("xmlns") == ns_stream_initiation_file_transfer)
         {
-            job->d->fileInfo.setDate(datetimeFromString(item.attribute("date")));
+            job->d->fileInfo.setDate(QXmppUtils::datetimeFromString(item.attribute("date")));
             job->d->fileInfo.setHash(QByteArray::fromHex(item.attribute("hash").toAscii()));
             job->d->fileInfo.setName(item.attribute("name"));
             job->d->fileInfo.setSize(item.attribute("size").toLongLong());

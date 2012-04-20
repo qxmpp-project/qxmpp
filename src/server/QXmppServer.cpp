@@ -123,7 +123,7 @@ QXmppServerPrivate::QXmppServerPrivate(QXmppServer *qq)
 bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 {
     // refuse to route packets to empty destination, own domain or sub-domains
-    const QString toDomain = jidToDomain(to);
+    const QString toDomain = QXmppUtils::jidToDomain(to);
     if (to.isEmpty() || to == domain || toDomain.endsWith("." + domain))
         return false;
 
@@ -131,7 +131,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // look for a client connection
         QList<QXmppIncomingClient*> found;
-        if (jidToResource(to).isEmpty()) {
+        if (QXmppUtils::jidToResource(to).isEmpty()) {
             foreach (QXmppIncomingClient *conn, incomingClientsByBareJid.value(to))
                 found << conn;
         } else {
@@ -162,7 +162,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         // if we did not find an outgoing server,
         // we need to establish the S2S connection
         QXmppOutgoingServer *conn = new QXmppOutgoingServer(domain, 0);
-        conn->setLocalStreamKey(generateStanzaHash().toAscii());
+        conn->setLocalStreamKey(QXmppUtils::generateStanzaHash().toAscii());
         conn->moveToThread(q->thread());
         conn->setParent(q);
 
@@ -638,7 +638,7 @@ void QXmppServer::_q_clientConnected()
         old->disconnectFromHost();
     }
     d->incomingClientsByJid.insert(jid, client);
-    d->incomingClientsByBareJid[jidToBareJid(jid)].insert(client);
+    d->incomingClientsByBareJid[QXmppUtils::jidToBareJid(jid)].insert(client);
 
     // emit signal
     emit clientConnected(jid);
@@ -658,7 +658,7 @@ void QXmppServer::_q_clientDisconnected()
         if (!jid.isEmpty()) {
             if (d->incomingClientsByJid.value(jid) == client)
                 d->incomingClientsByJid.remove(jid);
-            const QString bareJid = jidToBareJid(jid);
+            const QString bareJid = QXmppUtils::jidToBareJid(jid);
             if (d->incomingClientsByBareJid.contains(bareJid)) {
                 d->incomingClientsByBareJid[bareJid].remove(client);
                 if (d->incomingClientsByBareJid[bareJid].isEmpty())

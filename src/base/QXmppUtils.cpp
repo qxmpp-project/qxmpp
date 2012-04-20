@@ -107,7 +107,7 @@ static quint32 crctable[256] =
     0xB40BBE37L, 0xC30C8EA1L, 0x5A05DF1BL, 0x2D02EF8DL
 };
 
-QDateTime datetimeFromString(const QString &str)
+QDateTime QXmppUtils::datetimeFromString(const QString &str)
 {
     QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
     int tzPos = tzRe.indexIn(str, 19);
@@ -137,7 +137,7 @@ QDateTime datetimeFromString(const QString &str)
     return dt;
 }
 
-QString datetimeToString(const QDateTime &dt)
+QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     QDateTime utc = dt.toUTC();
     if (utc.time().msec())
@@ -151,7 +151,7 @@ QString datetimeToString(const QDateTime &dt)
 /// \param str
 ///
 
-int timezoneOffsetFromString(const QString &str)
+int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
     QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
     if (!tzRe.exactMatch(str))
@@ -174,7 +174,7 @@ int timezoneOffsetFromString(const QString &str)
 ///
 /// \param secs
 
-QString timezoneOffsetToString(int secs)
+QString QXmppUtils::timezoneOffsetToString(int secs)
 {
     if (!secs)
         return QString::fromLatin1("Z");
@@ -183,12 +183,12 @@ QString timezoneOffsetToString(int secs)
     return (secs < 0 ? "-" : "+") + tzoTime.toString("hh:mm");
 }
 
-QString jidToDomain(const QString &jid)
+QString QXmppUtils::jidToDomain(const QString &jid)
 {
     return jidToBareJid(jid).split("@").last();
 }
 
-QString jidToResource(const QString& jid)
+QString QXmppUtils::jidToResource(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
     if (pos < 0)
@@ -196,7 +196,7 @@ QString jidToResource(const QString& jid)
     return jid.mid(pos+1);
 }
 
-QString jidToUser(const QString &jid)
+QString QXmppUtils::jidToUser(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('@'));
     if (pos < 0)
@@ -204,7 +204,7 @@ QString jidToUser(const QString &jid)
     return jid.left(pos);
 }
 
-QString jidToBareJid(const QString& jid)
+QString QXmppUtils::jidToBareJid(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
     if (pos < 0)
@@ -212,7 +212,7 @@ QString jidToBareJid(const QString& jid)
     return jid.left(pos);
 }
 
-quint32 generateCrc32(const QByteArray &in)
+quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
     quint32 result = 0xffffffff;
     for(int n = 0; n < in.size(); ++n)
@@ -243,12 +243,12 @@ static QByteArray generateHmac(QCryptographicHash::Algorithm algorithm, const QB
     return hasher.result();
 }
 
-QByteArray generateHmacMd5(const QByteArray &key, const QByteArray &text)
+QByteArray QXmppUtils::generateHmacMd5(const QByteArray &key, const QByteArray &text)
 {
     return generateHmac(QCryptographicHash::Md5, key, text);
 }
 
-QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text)
+QByteArray QXmppUtils::generateHmacSha1(const QByteArray &key, const QByteArray &text)
 {
     return generateHmac(QCryptographicHash::Sha1, key, text);
 }
@@ -257,7 +257,7 @@ QByteArray generateHmacSha1(const QByteArray &key, const QByteArray &text)
 ///
 /// \param N
 
-int generateRandomInteger(int N)
+int QXmppUtils::generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;
@@ -269,7 +269,7 @@ int generateRandomInteger(int N)
 ///
 /// \param length
 
-QByteArray generateRandomBytes(int length)
+QByteArray QXmppUtils::generateRandomBytes(int length)
 {
     QByteArray bytes(length, 'm');
     for (int i = 0; i < length; ++i)
@@ -281,7 +281,7 @@ QByteArray generateRandomBytes(int length)
 ///
 /// \param length
 
-QString generateStanzaHash(int length)
+QString QXmppUtils::generateStanzaHash(int length)
 {
     const QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const int N = somechars.size();

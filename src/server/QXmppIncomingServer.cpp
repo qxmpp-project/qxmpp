@@ -83,7 +83,7 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
         info(QString("Incoming server stream from %1").arg(from));
 
     // start stream
-    d->localStreamId = generateStanzaHash().toAscii();
+    d->localStreamId = QXmppUtils::generateStanzaHash().toAscii();
     QString data = QString("<?xml version='1.0'?><stream:stream"
         " xmlns='%1' xmlns:db='%2' xmlns:stream='%3'"
         " id='%4' version=\"1.0\">").arg(
@@ -146,12 +146,12 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         }
 
     }
-    else if (d->authenticated.contains(jidToDomain(stanza.attribute("from"))))
+    else if (d->authenticated.contains(QXmppUtils::jidToDomain(stanza.attribute("from"))))
     {
         // relay stanza if the remote party is authenticated
         emit elementReceived(stanza);
     } else {
-        warning(QString("Received an element from unverified domain %1").arg(jidToDomain(stanza.attribute("from"))));
+        warning(QString("Received an element from unverified domain %1").arg(QXmppUtils::jidToDomain(stanza.attribute("from"))));
         disconnectFromHost();
     }
 }

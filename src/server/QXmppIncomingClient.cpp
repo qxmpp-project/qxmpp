@@ -139,7 +139,7 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     d->saslDigestUsername.clear();
 
     // start stream
-    const QByteArray sessionId = generateStanzaHash().toAscii();
+    const QByteArray sessionId = QXmppUtils::generateStanzaHash().toAscii();
     QString response = QString("<?xml version='1.0'?><stream:stream"
         " xmlns=\"%1\" xmlns:stream=\"%2\""
         " id=\"%3\" from=\"%4\" version=\"1.0\" xml:lang=\"en\">").arg(
@@ -303,7 +303,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 bindSet.parse(nodeRecv);
                 d->resource = bindSet.resource().trimmed();
                 if (d->resource.isEmpty())
-                    d->resource = generateStanzaHash();
+                    d->resource = QXmppUtils::generateStanzaHash();
                 d->jid = QString("%1@%2/%3").arg(d->username, d->domain, d->resource);
 
                 QXmppBindIq bindResult;
@@ -332,7 +332,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
         // check the sender is legitimate
         const QString from = nodeRecv.attribute("from");
-        if (!from.isEmpty() && from != d->jid && from != jidToBareJid(d->jid))
+        if (!from.isEmpty() && from != d->jid && from != QXmppUtils::jidToBareJid(d->jid))
         {
             warning(QString("Received a stanza from unexpected JID %1").arg(from));
             return;
@@ -351,7 +351,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 if (nodeFull.tagName() == QLatin1String("presence") &&
                     (nodeFull.attribute("type") == QLatin1String("subscribe") ||
                     nodeFull.attribute("type") == QLatin1String("subscribed")))
-                    nodeFull.setAttribute("from", jidToBareJid(d->jid));
+                    nodeFull.setAttribute("from", QXmppUtils::jidToBareJid(d->jid));
                 else
                     nodeFull.setAttribute("from", d->jid);
             }

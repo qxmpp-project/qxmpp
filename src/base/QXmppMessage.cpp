@@ -284,7 +284,7 @@ void QXmppMessage::parse(const QDomElement &element)
     if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
     {
         const QString str = delayElement.attribute("stamp");
-        m_stamp = datetimeFromString(str);
+        m_stamp = QXmppUtils::datetimeFromString(str);
         m_stampType = QXmppMessage::DelayedDelivery;
     }
 
@@ -345,7 +345,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
             // XEP-0203: Delayed Delivery
             xmlWriter->writeStartElement("delay");
             xmlWriter->writeAttribute("xmlns", ns_delayed_delivery);
-            helperToXmlAddAttribute(xmlWriter, "stamp", datetimeToString(utcStamp));
+            helperToXmlAddAttribute(xmlWriter, "stamp", QXmppUtils::datetimeToString(utcStamp));
             xmlWriter->writeEndElement();
         } else {
             // XEP-0091: Legacy Delayed Delivery

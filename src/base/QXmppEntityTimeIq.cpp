@@ -72,8 +72,8 @@ bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
-    m_tzo = timezoneOffsetFromString(timeElement.firstChildElement("tzo").text());
-    m_utc = datetimeFromString(timeElement.firstChildElement("utc").text());
+    m_tzo = QXmppUtils::timezoneOffsetFromString(timeElement.firstChildElement("tzo").text());
+    m_utc = QXmppUtils::datetimeFromString(timeElement.firstChildElement("utc").text());
 }
 
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -83,8 +83,8 @@ void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     if(m_utc.isValid())
     {
-        helperToXmlAddTextElement(writer, "tzo", timezoneOffsetToString(m_tzo));
-        helperToXmlAddTextElement(writer, "utc", datetimeToString(m_utc));
+        helperToXmlAddTextElement(writer, "tzo", QXmppUtils::timezoneOffsetToString(m_tzo));
+        helperToXmlAddTextElement(writer, "utc", QXmppUtils::datetimeToString(m_utc));
     }
     writer->writeEndElement();
 }

@@ -89,7 +89,7 @@ QXmppArchiveChat::QXmppArchiveChat()
 void QXmppArchiveChat::parse(const QDomElement &element)
 {
     m_with = element.attribute("with");
-    m_start = datetimeFromString(element.attribute("start"));
+    m_start = QXmppUtils::datetimeFromString(element.attribute("start"));
     m_subject = element.attribute("subject");
     m_thread = element.attribute("thread");
     m_version = element.attribute("version").toInt();
@@ -115,7 +115,7 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
-        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+        helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     helperToXmlAddAttribute(writer, "subject", m_subject);
     helperToXmlAddAttribute(writer, "thread", m_thread);
     if (m_version)
@@ -344,8 +344,8 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement listElement = element.firstChildElement("list");
     m_with = listElement.attribute("with");
-    m_start = datetimeFromString(listElement.attribute("start"));
-    m_end = datetimeFromString(listElement.attribute("end"));
+    m_start = QXmppUtils::datetimeFromString(listElement.attribute("start"));
+    m_end = QXmppUtils::datetimeFromString(listElement.attribute("end"));
 
     QDomElement setElement = listElement.firstChildElement("set");
     if (setElement.namespaceURI() == ns_rsm)
@@ -371,9 +371,9 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
-        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+        helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (m_end.isValid())
-        helperToXmlAddAttribute(writer, "end", datetimeToString(m_end));
+        helperToXmlAddAttribute(writer, "end", QXmppUtils::datetimeToString(m_end));
     if (m_max > 0)
     {
         writer->writeStartElement("set");
@@ -466,8 +466,8 @@ void QXmppArchiveRemoveIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement listElement = element.firstChildElement("remove");
     m_with = listElement.attribute("with");
-    m_start = datetimeFromString(listElement.attribute("start"));
-    m_end = datetimeFromString(listElement.attribute("end"));
+    m_start = QXmppUtils::datetimeFromString(listElement.attribute("start"));
+    m_end = QXmppUtils::datetimeFromString(listElement.attribute("end"));
 }
 
 void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -477,9 +477,9 @@ void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
-        helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+        helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (m_end.isValid())
-        helperToXmlAddAttribute(writer, "end", datetimeToString(m_end));
+        helperToXmlAddAttribute(writer, "end", QXmppUtils::datetimeToString(m_end));
     writer->writeEndElement();
 }
 
@@ -549,7 +549,7 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement retrieveElement = element.firstChildElement("retrieve");
     m_with = retrieveElement.attribute("with");
-    m_start = datetimeFromString(retrieveElement.attribute("start"));
+    m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
     QDomElement setElement = retrieveElement.firstChildElement("set");
     if (setElement.namespaceURI() == ns_rsm)
         m_max = setElement.firstChildElement("max").text().toInt();
@@ -560,7 +560,7 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     writer->writeStartElement("retrieve");
     writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
-    helperToXmlAddAttribute(writer, "start", datetimeToString(m_start));
+    helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (m_max > 0)
     {
         writer->writeStartElement("set");

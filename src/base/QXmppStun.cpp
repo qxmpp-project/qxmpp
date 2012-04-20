@@ -711,7 +711,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             {
                 QByteArray copy = buffer.left(STUN_HEADER + done);
                 setBodyLength(copy, done + 24);
-                if (integrity != generateHmacSha1(key, copy))
+                if (integrity != QXmppUtils::generateHmacSha1(key, copy))
                 {
                     *errors << QLatin1String("Bad message integrity");
                     return false;
@@ -732,7 +732,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // check CRC32
             QByteArray copy = buffer.left(STUN_HEADER + done);
             setBodyLength(copy, done + 8);
-            const quint32 expected = generateCrc32(copy) ^ 0x5354554eL;
+            const quint32 expected = QXmppUtils::generateCrc32(copy) ^ 0x5354554eL;
             if (fingerprint != expected)
             {
                 *errors << QLatin1String("Bad fingerprint");
@@ -932,7 +932,7 @@ QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) 
     if (!key.isEmpty())
     {
         setBodyLength(buffer, buffer.size() - STUN_HEADER + 24);
-        QByteArray integrity = generateHmacSha1(key, buffer);
+        QByteArray integrity = QXmppUtils::generateHmacSha1(key, buffer);
         stream << quint16(MessageIntegrity);
         stream << quint16(integrity.size());
         stream.writeRawData(integrity.data(), integrity.size());
@@ -942,7 +942,7 @@ QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) 
     if (addFingerprint)
     {
         setBodyLength(buffer, buffer.size() - STUN_HEADER + 8);
-        quint32 fingerprint = generateCrc32(buffer) ^ 0x5354554eL;
+        quint32 fingerprint = QXmppUtils::generateCrc32(buffer) ^ 0x5354554eL;
         stream << quint16(Fingerprint);
         stream << quint16(sizeof(fingerprint));
         stream << fingerprint;
@@ -1195,7 +1195,7 @@ void QXmppTurnAllocation::connectToHost()
     // send allocate request
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Allocate | QXmppStunMessage::Request);
-    request.setId(generateRandomBytes(12));
+    request.setId(QXmppUtils::generateRandomBytes(12));
     request.setLifetime(m_lifetime);
     request.setRequestedTransport(0x11);
     m_transactions << new QXmppStunTransaction(request, this);
@@ -1221,7 +1221,7 @@ void QXmppTurnAllocation::disconnectFromHost()
     if (m_state == ConnectedState) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
-        request.setId(generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(12));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1294,7 +1294,7 @@ void QXmppTurnAllocation::refresh()
 {
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
-    request.setId(generateRandomBytes(12));
+    request.setId(QXmppUtils::generateRandomBytes(12));
     request.setNonce(m_nonce);
     request.setRealm(m_realm);
     request.setUsername(m_username);
@@ -1308,7 +1308,7 @@ void QXmppTurnAllocation::refreshChannels()
     foreach (quint16 channel, m_channels.keys()) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
-        request.setId(generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(12));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1407,7 +1407,7 @@ void QXmppTurnAllocation::transactionFinished()
 
         // retry request
         QXmppStunMessage request(transaction->request());
-        request.setId(generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(12));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1491,7 +1491,7 @@ qint64 QXmppTurnAllocation::writeDatagram(const QByteArray &data, const QHostAdd
         // bind channel
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
-        request.setId(generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(12));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1535,7 +1535,7 @@ QXmppIceComponent::Pair::Pair(int component, bool controlling)
     m_component(component),
     m_controlling(controlling)
 {
-    transaction = generateRandomBytes(ID_SIZE);
+    transaction = QXmppUtils::generateRandomBytes(ID_SIZE);
 }
 
 quint64 QXmppIceComponent::Pair::priority() const
@@ -1582,8 +1582,8 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    m_localUser = generateStanzaHash(4);
-    m_localPassword = generateStanzaHash(22);
+    m_localUser = QXmppUtils::generateStanzaHash(4);
+    m_localPassword = QXmppUtils::generateStanzaHash(22);
 
     m_timer = new QTimer(this);
     m_timer->setInterval(500);
@@ -1812,7 +1812,7 @@ QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socke
     QXmppJingleCandidate candidate;
     candidate.setComponent(m_component);
     candidate.setHost(host);
-    candidate.setId(generateStanzaHash(10));
+    candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(port);
     candidate.setPriority(priority);
     candidate.setProtocol("udp");
@@ -1874,7 +1874,7 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
             addr.setScopeId(QString());
         }
         candidate.setHost(addr);
-        candidate.setId(generateStanzaHash(10));
+        candidate.setId(QXmppUtils::generateStanzaHash(10));
         candidate.setPort(socket->localPort());
         candidate.setProtocol("udp");
         candidate.setType(QXmppJingleCandidate::HostType);
@@ -1906,7 +1906,7 @@ void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
 {
     m_stunHost = host;
     m_stunPort = port;
-    m_stunId = generateRandomBytes(ID_SIZE);
+    m_stunId = QXmppUtils::generateRandomBytes(ID_SIZE);
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
@@ -2036,7 +2036,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         QXmppJingleCandidate candidate;
         candidate.setComponent(m_component);
         candidate.setHost(reflexiveHost);
-        candidate.setId(generateStanzaHash(10));
+        candidate.setId(QXmppUtils::generateStanzaHash(10));
         candidate.setPort(reflexivePort);
         candidate.setProtocol("udp");
         candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
@@ -2105,7 +2105,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 #if 0
         // send a binding indication
         QXmppStunMessage indication;
-        indication.setId(generateRandomBytes(ID_SIZE));
+        indication.setId(QXmppUtils::generateRandomBytes(ID_SIZE));
         indication.setType(BindingIndication);
         m_socket->writeStun(indication, pair);
 #endif
@@ -2139,7 +2139,7 @@ void QXmppIceComponent::turnConnected()
     QXmppJingleCandidate candidate;
     candidate.setComponent(m_component);
     candidate.setHost(m_turnAllocation->relayedHost());
-    candidate.setId(generateStanzaHash(10));
+    candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(m_turnAllocation->relayedPort());
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::RelayedType);
@@ -2304,8 +2304,8 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
 {
     bool check;
 
-    m_localUser = generateStanzaHash(4);
-    m_localPassword = generateStanzaHash(22);
+    m_localUser = QXmppUtils::generateStanzaHash(4);
+    m_localPassword = QXmppUtils::generateStanzaHash(22);
 
     // timer to limit connection time to 30 seconds
     m_connectTimer = new QTimer(this);

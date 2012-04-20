@@ -275,7 +275,7 @@ bool QXmppMucRoom::join()
 bool QXmppMucRoom::kick(const QString &jid, const QString &reason)
 {
     QXmppMucItem item;
-    item.setNick(jidToResource(jid));
+    item.setNick(QXmppUtils::jidToResource(jid));
     item.setRole(QXmppMucItem::NoRole);
     item.setReason(reason);
 
@@ -549,7 +549,7 @@ void QXmppMucRoom::_q_disconnected()
 
 void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
 {
-    if (jidToBareJid(message.from())!= d->jid)
+    if (QXmppUtils::jidToBareJid(message.from())!= d->jid)
         return;
 
     // handle message subject
@@ -573,7 +573,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
         d->client->sendPacket(packet);
     }
 
-    if (jidToBareJid(jid) != d->jid)
+    if (QXmppUtils::jidToBareJid(jid) != d->jid)
         return;
 
     if (presence.type() == QXmppPresence::Available) {
