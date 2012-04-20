@@ -29,7 +29,7 @@
 #include "QXmppUtils.h"
 #include "QXmppConstants.h"
 
-QString getImageType(const QByteArray &contents)
+static QString getImageType(const QByteArray &contents)
 {
     if (contents.startsWith("\x89PNG\x0d\x0a\x1a\x0a"))
         return "image/png";
