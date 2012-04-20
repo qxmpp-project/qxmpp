@@ -40,6 +40,6 @@
 
 #define QXMPP_VERSION 0x000400
 
-QString QXmppVersion();
+QXMPP_EXPORT QString QXmppVersion();
 
 #endif //QXMPPGLOBAL_H
