@@ -11,7 +11,7 @@ CONFIG(debug, debug|release) {
 }
 
 # Libraries used internally by QXmpp
-android|symbian {
+android {
 
 } else:contains(MEEGO_EDITION,harmattan) {
     # meego/harmattan has speex for sure
