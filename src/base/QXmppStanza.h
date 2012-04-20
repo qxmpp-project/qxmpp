@@ -142,8 +142,6 @@ public:
     void setExtensions(const QXmppElementList &elements);
 
     /// \cond
-    // FIXME : why is this needed?
-    bool isErrorStanza() const;
     virtual void parse(const QDomElement &element);
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
 

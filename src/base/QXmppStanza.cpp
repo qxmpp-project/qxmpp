@@ -416,11 +416,6 @@ void QXmppStanza::generateAndSetNextId()
     m_id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
-bool QXmppStanza::isErrorStanza() const
-{
-    return m_error.isValid();
-}
-
 void QXmppStanza::parse(const QDomElement &element)
 {
     m_from = element.attribute("from");
