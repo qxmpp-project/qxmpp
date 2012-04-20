@@ -41,6 +41,9 @@ contains(QXMPP_LIBRARY_TYPE,staticlib) {
     # in the extra libraries which the qxmpp library needs, but this does not
     # seem to work on win32, so we specify the dependencies here:
     QXMPP_LIBS += $$QXMPP_INTERNAL_LIBS
+    DEFINES += QXMPP_STATIC
+} else {
+    DEFINES += QXMPP_SHARED
 }
 
 # Installation prefix and library directory
