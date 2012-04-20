@@ -37,8 +37,6 @@ class QXmppByteStreamIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
-class QXmppSocksClient;
-class QXmppSocksServer;
 class QXmppStreamInitiationIq;
 class QXmppTransferJobPrivate;
 class QXmppTransferManager;
@@ -177,15 +175,12 @@ public slots:
     void accept(QIODevice *output);
 
 private slots:
-    void _q_disconnected();
     void _q_terminated();
 
 private:
     QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QXmppClient *client, QObject *parent);
-    void checkData();
     void setState(QXmppTransferJob::State state);
     void terminate(QXmppTransferJob::Error error);
-    bool writeData(const QByteArray &data);
 
     QXmppTransferJobPrivate *const d;
     friend class QXmppTransferManager;
@@ -283,13 +278,6 @@ private:
     void streamInitiationResultReceived(const QXmppStreamInitiationIq&);
     void streamInitiationSetReceived(const QXmppStreamInitiationIq&);
     void socksServerSendOffer(QXmppTransferJob *job);
-
-    int m_ibbBlockSize;
-    QList<QXmppTransferJob*> m_jobs;
-    QString m_proxy;
-    bool m_proxyOnly;
-    QXmppSocksServer *m_socksServer;
-    QXmppTransferJob::Methods m_supportedMethods;
 
     friend class QXmppTransferManagerPrivate;
 };

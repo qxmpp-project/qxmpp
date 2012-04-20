@@ -37,17 +37,22 @@
 // We mean it.
 //
 
+class QXmppSocksClient;
+
 class QXmppTransferIncomingJob : public QXmppTransferJob
 {
     Q_OBJECT
 
 public:
     QXmppTransferIncomingJob(const QString &jid, QXmppClient *client, QObject *parent);
+    void checkData();
     void connectToHosts(const QXmppByteStreamIq &iq);
+    bool writeData(const QByteArray &data);
 
 private slots:
     void _q_candidateDisconnected();
     void _q_candidateReady();
+    void _q_disconnected();
     void _q_receiveData();
 
 private:
@@ -70,6 +75,7 @@ public:
     void startSending();
 
 private slots:
+    void _q_disconnected();
     void _q_proxyReady();
     void _q_sendData();
 };
