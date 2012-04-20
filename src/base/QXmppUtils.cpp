@@ -298,36 +298,6 @@ void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
         stream->writeAttribute(name,value);
 }
 
-void helperToXmlAddDomElement(QXmlStreamWriter* stream, const QDomElement& element, const QStringList &omitNamespaces)
-{
-    stream->writeStartElement(element.tagName());
-
-    /* attributes */
-    QString xmlns = element.namespaceURI();
-    if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns))
-        stream->writeAttribute("xmlns", xmlns);
-    QDomNamedNodeMap attrs = element.attributes();
-    for (int i = 0; i < attrs.size(); i++)
-    {
-        QDomAttr attr = attrs.item(i).toAttr();
-        stream->writeAttribute(attr.name(), attr.value());
-    }
-
-    /* children */
-    QDomNode childNode = element.firstChild();
-    while (!childNode.isNull())
-    {
-        if (childNode.isElement())
-        {
-            helperToXmlAddDomElement(stream, childNode.toElement(), QStringList() << xmlns);
-        } else if (childNode.isText()) {
-            stream->writeCharacters(childNode.toText().data());
-        }
-        childNode = childNode.nextSibling();
-    }
-    stream->writeEndElement();
-}
-
 void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value)
 {
