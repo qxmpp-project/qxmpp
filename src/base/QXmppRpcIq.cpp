@@ -32,7 +32,7 @@
 #include "QXmppRpcIq.h"
 #include "QXmppUtils.h"
 
-void XMLRPC::marshall(QXmlStreamWriter *writer, const QVariant &value)
+void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &value)
 {
     writer->writeStartElement("value");
     switch( value.type() )
@@ -104,7 +104,7 @@ void XMLRPC::marshall(QXmlStreamWriter *writer, const QVariant &value)
     writer->writeEndElement();
 }
 
-QVariant XMLRPC::demarshall(const QDomElement &elem, QStringList &errors)
+QVariant QXmppRpcMarshaller::demarshall(const QDomElement &elem, QStringList &errors)
 {
     if ( elem.tagName().toLower() != "value" )
     {
@@ -297,7 +297,7 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
         while (!param.isNull())
         {
             QStringList errors;
-            const QVariant value = XMLRPC::demarshall(param.firstChildElement("value"), errors);
+            const QVariant value = QXmppRpcMarshaller::demarshall(param.firstChildElement("value"), errors);
             if (!errors.isEmpty())
                 break;
             m_values << value;
@@ -308,7 +308,7 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
     {
         QStringList errors;
         const QDomElement errElement = contents.firstChildElement("value");
-        const QVariant error = XMLRPC::demarshall(errElement, errors);
+        const QVariant error = QXmppRpcMarshaller::demarshall(errElement, errors);
         if (!errors.isEmpty())
             return;
         m_faultCode = error.toMap()["faultCode"].toInt();
@@ -328,7 +328,7 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         QMap<QString,QVariant> fault;
         fault["faultCode"] = m_faultCode;
         fault["faultString"] = m_faultString;
-        XMLRPC::marshall(writer, fault);
+        QXmppRpcMarshaller::marshall(writer, fault);
         writer->writeEndElement();
     }
     else if (!m_values.isEmpty())
@@ -337,7 +337,7 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         foreach (const QVariant &arg, m_values)
         {
             writer->writeStartElement("param");
-            XMLRPC::marshall(writer, arg);
+            QXmppRpcMarshaller::marshall(writer, arg);
             writer->writeEndElement();
         }
         writer->writeEndElement();
@@ -409,7 +409,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
         while (!param.isNull())
         {
             QStringList errors;
-            QVariant arg = XMLRPC::demarshall(param.firstChildElement("value"), errors);
+            QVariant arg = QXmppRpcMarshaller::demarshall(param.firstChildElement("value"), errors);
             if (!errors.isEmpty())
                 break;
             m_arguments << arg;
@@ -431,7 +431,7 @@ void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         foreach(const QVariant &arg, m_arguments)
         {
             writer->writeStartElement("param");
-            XMLRPC::marshall(writer, arg);
+            QXmppRpcMarshaller::marshall(writer, arg);
             writer->writeEndElement();
         }
         writer->writeEndElement();

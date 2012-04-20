@@ -31,11 +31,12 @@
 class QXmlStreamWriter;
 class QDomElement;
 
-namespace XMLRPC
+class QXMPP_EXPORT QXmppRpcMarshaller
 {
-    void marshall( QXmlStreamWriter *writer, const QVariant &value);
-    QVariant demarshall(const QDomElement &elem, QStringList &errors);
-}
+public:
+    static void marshall( QXmlStreamWriter *writer, const QVariant &value);
+    static QVariant demarshall(const QDomElement &elem, QStringList &errors);
+};
 
 /// \brief The QXmppRpcResponseIq class represents an IQ used to carry
 /// an RPC response as specified by XEP-0009: Jabber-RPC.

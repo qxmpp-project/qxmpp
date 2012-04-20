@@ -1346,7 +1346,7 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     QBuffer buffer;
     buffer.open(QIODevice::ReadWrite);
     QXmlStreamWriter writer(&buffer);
-    XMLRPC::marshall(&writer, value);
+    QXmppRpcMarshaller::marshall(&writer, value);
     qDebug() << "expect " << xml;
     qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
@@ -1356,7 +1356,7 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     QCOMPARE(doc.setContent(xml, true), true);
     QDomElement element = doc.documentElement();
     QStringList errors;
-    QVariant test = XMLRPC::demarshall(element, errors);
+    QVariant test = QXmppRpcMarshaller::demarshall(element, errors);
     if (!errors.isEmpty())
         qDebug() << errors;
     QCOMPARE(errors, QStringList());
