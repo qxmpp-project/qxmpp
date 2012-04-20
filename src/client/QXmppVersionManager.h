@@ -33,7 +33,7 @@ class QXmppVersionIq;
 ///
 /// \ingroup Managers
 
-class QXmppVersionManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppVersionManager : public QXmppClientExtension
 {
     Q_OBJECT
 

@@ -77,7 +77,7 @@ class QXmppVersionManager;
 ///
 /// \ingroup Core
 
-class QXmppClient : public QXmppLoggable
+class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(Error State)

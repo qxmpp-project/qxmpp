@@ -29,6 +29,8 @@
 #include <QNetworkProxy>
 #include <QSslCertificate>
 
+#include "QXmppGlobal.h"
+
 /// \brief The QXmppConfiguration class holds configuration options.
 ///
 /// It can be passed to QXmppClient to specify the options when connecting to
@@ -40,7 +42,7 @@
 /// etc..
 ///
 
-class QXmppConfiguration
+class QXMPP_EXPORT QXmppConfiguration
 {
 public:
     /// An enumeration for type of the Security Mode that is stream is encrypted or not.

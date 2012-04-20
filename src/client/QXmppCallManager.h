@@ -50,7 +50,7 @@ class QXmppRtpVideoChannel;
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppCall : public QXmppLoggable
+class QXMPP_EXPORT QXmppCall : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(Direction State)
@@ -157,7 +157,7 @@ private:
 ///
 /// \ingroup Managers
 
-class QXmppCallManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppCallManager : public QXmppClientExtension
 {
     Q_OBJECT
 

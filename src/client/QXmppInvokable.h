@@ -30,12 +30,14 @@
 #include <QWriteLocker>
 #include <QStringList>
 
+#include "QXmppGlobal.h"
+
 /**
 This is the base class for all objects that will be invokable via RPC.  All public slots of objects derived from this class will be exposed to the RPC interface.  As a note for all methods, they can only understand types that QVariant knows about.
 
         @author Ian Reinhart Geiser <geiseri@kde.org>
 */
-class QXmppInvokable : public QObject
+class QXMPP_EXPORT QXmppInvokable : public QObject
 {
         Q_OBJECT
 public:

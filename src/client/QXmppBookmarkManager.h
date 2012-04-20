@@ -35,7 +35,7 @@ class QXmppBookmarkSet;
 /// bookmarks as defined by XEP-0048: Bookmarks.
 ///
 
-class QXmppBookmarkManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppBookmarkManager : public QXmppClientExtension
 {
     Q_OBJECT
 

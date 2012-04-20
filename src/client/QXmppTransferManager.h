@@ -42,7 +42,7 @@ class QXmppTransferJobPrivate;
 class QXmppTransferManager;
 class QXmppTransferManagerPrivate;
 
-class QXmppTransferFileInfo
+class QXMPP_EXPORT QXmppTransferFileInfo
 {
 public:
     QXmppTransferFileInfo();
@@ -73,7 +73,7 @@ private:
 /// \sa QXmppTransferManager
 ///
 
-class QXmppTransferJob : public QXmppLoggable
+class QXMPP_EXPORT QXmppTransferJob : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(Direction Error State)
@@ -206,7 +206,7 @@ private:
 ///
 /// \ingroup Managers
 
-class QXmppTransferManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT
     Q_PROPERTY(QString proxy READ proxy WRITE setProxy)

@@ -61,7 +61,7 @@ class QXmppRosterManagerPrivate;
 ///
 /// \ingroup Managers
 
-class QXmppRosterManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
 {
     Q_OBJECT
 

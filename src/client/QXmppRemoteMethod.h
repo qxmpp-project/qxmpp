@@ -39,7 +39,7 @@ struct QXmppRemoteMethodResult {
     QVariant result;
 };
 
-class QXmppRemoteMethod : public QObject
+class QXMPP_EXPORT QXmppRemoteMethod : public QObject
 {
     Q_OBJECT
 public:

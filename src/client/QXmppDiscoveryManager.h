@@ -33,7 +33,7 @@ class QXmppDiscoveryIq;
 ///
 /// \ingroup Managers
 
-class QXmppDiscoveryManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppDiscoveryManager : public QXmppClientExtension
 {
     Q_OBJECT
 

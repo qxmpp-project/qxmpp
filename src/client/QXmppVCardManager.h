@@ -53,7 +53,7 @@
 ///
 /// \ingroup Managers
 
-class QXmppVCardManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
 {
     Q_OBJECT
 

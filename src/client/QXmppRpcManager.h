@@ -51,7 +51,7 @@ class QXmppRpcResponseIq;
 ///
 /// \ingroup Managers
 
-class QXmppRpcManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppRpcManager : public QXmppClientExtension
 {
     Q_OBJECT
 

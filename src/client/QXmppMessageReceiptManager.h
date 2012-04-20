@@ -33,7 +33,7 @@
 ///
 /// \ingroup Managers
 
-class QXmppMessageReceiptManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppMessageReceiptManager : public QXmppClientExtension
 {
     Q_OBJECT
 public:

@@ -29,7 +29,7 @@
 #include <QTimer>
 #include "QXmppClient.h"
 
-class QXmppReconnectionManager : public QObject
+class QXMPP_EXPORT QXmppReconnectionManager : public QObject
 {
     Q_OBJECT
 

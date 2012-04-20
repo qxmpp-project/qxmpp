@@ -55,7 +55,7 @@ class QXmppMucRoomPrivate;
 ///
 /// \ingroup Managers
 
-class QXmppMucManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
     Q_PROPERTY(QList<QXmppMucRoom*> rooms READ rooms NOTIFY roomAdded)
@@ -97,7 +97,7 @@ private:
 ///
 /// \sa QXmppMucManager
 
-class QXmppMucRoom : public QObject
+class QXMPP_EXPORT QXmppMucRoom : public QObject
 {
     Q_OBJECT
     Q_FLAGS(Action Actions)

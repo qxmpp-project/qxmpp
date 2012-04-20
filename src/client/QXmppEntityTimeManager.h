@@ -34,7 +34,7 @@ class QXmppEntityTimeIq;
 ///
 /// \ingroup Managers
 
-class QXmppEntityTimeManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppEntityTimeManager : public QXmppClientExtension
 {
     Q_OBJECT
 

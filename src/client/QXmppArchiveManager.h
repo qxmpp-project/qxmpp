@@ -49,7 +49,7 @@ class QXmppArchivePrefIq;
 ///
 /// \ingroup Managers
 
-class QXmppArchiveManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppArchiveManager : public QXmppClientExtension
 {
     Q_OBJECT
 
