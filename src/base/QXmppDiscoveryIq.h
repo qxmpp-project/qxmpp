@@ -32,7 +32,7 @@ class QDomElement;
 class QXMPP_EXPORT QXmppDiscoveryIq : public QXmppIq
 {
 public:
-    class Identity
+    class QXMPP_EXPORT Identity
     {
     public:
         QString category() const;
@@ -54,7 +54,7 @@ public:
         QString m_type;
     };
 
-    class Item
+    class QXMPP_EXPORT Item
     {
     public:
         QString jid() const;

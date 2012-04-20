@@ -39,7 +39,7 @@ class QXMPP_EXPORT QXmppRosterIq : public QXmppIq
 public:
 
     /// \brief The QXmppRosterIq::Item class represents a roster entry.
-    class Item
+    class QXMPP_EXPORT Item
     {
     public:
         /// An enumeration for type of subscription with the bareJid in the roster.

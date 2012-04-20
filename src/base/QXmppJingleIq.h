@@ -178,7 +178,7 @@ public:
     /// The QXmppJingleIq::Content class represents the "content" element of a
     /// QXmppJingleIq.
 
-    class Content
+    class QXMPP_EXPORT Content
     {
     public:
         Content();
@@ -234,7 +234,7 @@ public:
     /// The QXmppJingleIq::Reason class represents the "reason" element of a
     /// QXmppJingleIq.
 
-    class Reason
+    class QXMPP_EXPORT Reason
     {
     public:
         enum Type {

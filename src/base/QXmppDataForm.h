@@ -44,7 +44,7 @@ public:
     /// as defined by XEP-0004: Data Forms.
     ///
 
-    class Field
+    class QXMPP_EXPORT Field
     {
     public:
         /// This enum is used to describe a field's type.

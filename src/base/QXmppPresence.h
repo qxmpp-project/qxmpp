@@ -64,7 +64,7 @@ public:
     /// It stores information such as the "away", "busy" status of a user, or
     /// a human-readable description.
 
-    class Status
+    class QXMPP_EXPORT Status
     {
     public:
         /// This enum is used to describe an availability status.

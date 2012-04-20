@@ -40,7 +40,7 @@ public:
         Udp,
     };
 
-    class StreamHost
+    class QXMPP_EXPORT StreamHost
     {
     public:
         QString jid() const;

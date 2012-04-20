@@ -44,7 +44,7 @@
 class QXMPP_EXPORT QXmppStanza : public QXmppPacket
 {
 public:
-    class Error
+    class QXMPP_EXPORT Error
     {
     public:
         enum Type
