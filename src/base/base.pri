@@ -20,7 +20,6 @@ INSTALL_HEADERS += \
     base/QXmppMessage.h \
     base/QXmppMucIq.h \
     base/QXmppNonSASLAuth.h \
-    base/QXmppPacket.h \
     base/QXmppPingIq.h \
     base/QXmppPresence.h \
     base/QXmppPubSubIq.h \
@@ -59,7 +58,6 @@ SOURCES += \
     base/QXmppMessage.cpp \
     base/QXmppMucIq.cpp \
     base/QXmppNonSASLAuth.cpp \
-    base/QXmppPacket.cpp \
     base/QXmppPingIq.cpp \
     base/QXmppPresence.cpp \
     base/QXmppPubSubIq.cpp \

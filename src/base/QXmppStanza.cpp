@@ -299,9 +299,8 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 /// \param to
 
 QXmppStanza::QXmppStanza(const QString& from, const QString& to)
-    : QXmppPacket(),
-    m_to(to),
-    m_from(from)
+    : m_to(to)
+    , m_from(from)
 {
 }
 

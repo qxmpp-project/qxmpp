@@ -3,6 +3,7 @@ QXmpp 0.5.0 (UNRELEASED)
 
   - Advertise support for XEP-0249: Direct MUC Invitations
   - Make QXmppTransferManager fully asynchronous.
+  - Remove QXmppPacket class.
 
   - Fix issues:
     * Issue 79: Export classes for Visual C++ Compiler

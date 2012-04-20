@@ -25,8 +25,7 @@
 #ifndef QXMPPSTANZA_H
 #define QXMPPSTANZA_H
 
-#include "QXmppElement.h"
-#include "QXmppPacket.h"
+#include <QByteArray>
 #include <QString>
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
@@ -35,13 +34,15 @@
 // for an explanation.
 #include <QXmlStreamWriter>
 
+#include "QXmppElement.h"
+
 /// \defgroup Stanzas
 
 /// \brief The QXmppStanza class is the base class for all XMPP stanzas.
 ///
 /// \ingroup Stanzas
 
-class QXMPP_EXPORT QXmppStanza : public QXmppPacket
+class QXMPP_EXPORT QXmppStanza
 {
 public:
     class QXMPP_EXPORT Error
@@ -143,10 +144,11 @@ public:
     /// \cond
     // FIXME : why is this needed?
     bool isErrorStanza() const;
+    virtual void parse(const QDomElement &element);
+    virtual void toXml(QXmlStreamWriter *writer) const;
 
 protected:
     void generateAndSetNextId();
-    void parse(const QDomElement &element);
     /// \endcond
 
 private:
