@@ -34,7 +34,7 @@ class QXmppOutgoingServer;
 /// from an XMPP server.
 ///
 
-class QXmppIncomingServer : public QXmppStream
+class QXMPP_EXPORT QXmppIncomingServer : public QXmppStream
 {
     Q_OBJECT
 

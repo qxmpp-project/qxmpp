@@ -36,7 +36,7 @@ class QXmppPasswordChecker;
 /// from an XMPP client.
 ///
 
-class QXmppIncomingClient : public QXmppStream
+class QXMPP_EXPORT QXmppIncomingClient : public QXmppStream
 {
     Q_OBJECT
 

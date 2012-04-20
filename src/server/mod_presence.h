@@ -32,7 +32,7 @@ class QXmppServerPresencePrivate;
 /// \brief QXmppServer extension for presence handling.
 ///
 
-class QXmppServerPresence : public QXmppServerExtension
+class QXMPP_EXPORT QXmppServerPresence : public QXmppServerExtension
 {
     Q_OBJECT
     Q_CLASSINFO("ExtensionName", "presence");

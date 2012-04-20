@@ -31,7 +31,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppDialback : public QXmppStanza
+class QXMPP_EXPORT QXmppDialback : public QXmppStanza
 {
 public:
     /// This enum is used to describe a dialback command.

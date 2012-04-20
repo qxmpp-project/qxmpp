@@ -26,9 +26,11 @@
 
 #include <QObject>
 
+#include "QXmppGlobal.h"
+
 /// \brief The QXmppPasswordRequest class represents a password request.
 ///
-class QXmppPasswordRequest
+class QXMPP_EXPORT QXmppPasswordRequest
 {
 public:
     // This enum is used to describe request types.
@@ -53,7 +55,7 @@ private:
 
 /// \brief The QXmppPasswordRequest class represents a password reply.
 ///
-class QXmppPasswordReply : public QObject
+class QXMPP_EXPORT QXmppPasswordReply : public QObject
 {
     Q_OBJECT
 
@@ -95,7 +97,7 @@ private:
 /// \brief The QXmppPasswordChecker class represents an abstract password checker.
 ///
 
-class QXmppPasswordChecker
+class QXMPP_EXPORT QXmppPasswordChecker
 {
 public:
     virtual QXmppPasswordReply *checkPassword(const QXmppPasswordRequest &request);

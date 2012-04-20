@@ -26,10 +26,12 @@
 
 #include <QtPlugin>
 
+#include "QXmppGlobal.h"
+
 class QXmppServer;
 class QXmppServerExtension;
 
-class QXmppServerPluginInterface
+class QXMPP_EXPORT QXmppServerPluginInterface
 {
 public:
     virtual QXmppServerExtension *create(const QString &key) = 0;
@@ -41,7 +43,7 @@ Q_DECLARE_INTERFACE(QXmppServerPluginInterface, "com.googlecode.qxmpp.ServerPlug
 /// \brief The QXmppServerPlugin class is the base class for QXmppServer plugins.
 ///
 
-class QXmppServerPlugin : public QObject, public QXmppServerPluginInterface
+class QXMPP_EXPORT QXmppServerPlugin : public QObject, public QXmppServerPluginInterface
 {
     Q_OBJECT
     Q_INTERFACES(QXmppServerPluginInterface)

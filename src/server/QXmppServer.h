@@ -56,7 +56,7 @@ class QXmppStream;
 ///
 /// \ingroup Core
 
-class QXmppServer : public QXmppLoggable
+class QXMPP_EXPORT QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -124,7 +124,7 @@ class QXmppSslServerPrivate;
 /// \brief The QXmppSslServer class represents an SSL-enabled TCP server.
 ///
 
-class QXmppSslServer : public QTcpServer
+class QXMPP_EXPORT QXmppSslServer : public QTcpServer
 {
     Q_OBJECT
 

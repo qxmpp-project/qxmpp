@@ -45,7 +45,7 @@ class QXmppStream;
 ///
 /// \ingroup Core
 
-class QXmppServerExtension : public QXmppLoggable
+class QXMPP_EXPORT QXmppServerExtension : public QXmppLoggable
 {
     Q_OBJECT
 
