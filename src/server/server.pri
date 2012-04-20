@@ -1,6 +1,5 @@
 # Headers
 INSTALL_HEADERS += \
-    server/mod_presence.h \
     server/QXmppDialback.h \
     server/QXmppIncomingClient.h \
     server/QXmppIncomingServer.h \
@@ -19,6 +18,3 @@ SOURCES += \
     server/QXmppPasswordChecker.cpp \
     server/QXmppServer.cpp \
     server/QXmppServerExtension.cpp
-
-# Plugins
-SOURCES += server/mod_presence.cpp

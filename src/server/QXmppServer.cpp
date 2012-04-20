@@ -41,11 +41,6 @@
 #include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
 
-#include "mod_presence.h"
-
-// Core plugins
-Q_IMPORT_PLUGIN(mod_presence)
-
 class QXmppServerPrivate
 {
 public:
