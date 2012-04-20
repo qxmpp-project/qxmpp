@@ -25,7 +25,7 @@
 
 #include "QXmppConstants.h"
 #include "QXmppLogger.h"
-#include "QXmppPacket.h"
+#include "QXmppStanza.h"
 #include "QXmppStream.h"
 #include "QXmppUtils.h"
 
@@ -130,7 +130,7 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 /// \param packet
 
-bool QXmppStream::sendPacket(const QXmppPacket &packet)
+bool QXmppStream::sendPacket(const QXmppStanza &packet)
 {
     // prepare packet
     QByteArray data;

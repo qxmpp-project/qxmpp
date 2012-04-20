@@ -32,7 +32,6 @@
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
-#include "QXmppPacket.h"
 #include "QXmppPresence.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppStreamFeatures.h"

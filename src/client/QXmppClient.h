@@ -35,7 +35,6 @@ class QXmppClientExtension;
 class QXmppClientPrivate;
 class QXmppPresence;
 class QXmppMessage;
-class QXmppPacket;
 class QXmppIq;
 class QXmppStream;
 
@@ -228,7 +227,7 @@ public slots:
     void connectToServer(const QString &jid,
                          const QString &password);
     void disconnectFromServer();
-    bool sendPacket(const QXmppPacket&);
+    bool sendPacket(const QXmppStanza&);
     void sendMessage(const QString& bareJid, const QString& message);
 
 private slots:

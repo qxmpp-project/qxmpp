@@ -300,7 +300,7 @@ void QXmppClient::connectToServer(const QString &jid, const QString &password)
 
 /// After successfully connecting to the server use this function to send
 /// stanzas to the server. This function can solely be used to send various kind
-/// of stanzas to the server. QXmppPacket is a parent class of all the stanzas
+/// of stanzas to the server. QXmppStanza is a parent class of all the stanzas
 /// QXmppMessage, QXmppPresence, QXmppIq, QXmppBind, QXmppRosterIq, QXmppSession
 /// and QXmppVCard.
 ///
@@ -315,7 +315,7 @@ void QXmppClient::connectToServer(const QString &jid, const QString &password)
 /// \param packet A valid XMPP stanza. It can be an iq, a message or a presence stanza.
 ///
 
-bool QXmppClient::sendPacket(const QXmppPacket& packet)
+bool QXmppClient::sendPacket(const QXmppStanza& packet)
 {
     return d->stream->sendPacket(packet);
 }

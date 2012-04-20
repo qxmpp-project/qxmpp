@@ -32,7 +32,7 @@
 
 class QDomElement;
 class QSslSocket;
-class QXmppPacket;
+class QXmppStanza;
 class QXmppStreamPrivate;
 
 /// \brief The QXmppStream class is the base class for all XMPP streams.
@@ -47,7 +47,7 @@ public:
     ~QXmppStream();
 
     virtual bool isConnected() const;
-    bool sendPacket(const QXmppPacket&);
+    bool sendPacket(const QXmppStanza&);
 
 signals:
     /// This signal is emitted when the stream is connected.
