@@ -99,9 +99,6 @@ public:
         void setType(Type type);
         Type type() const;
 
-        // FIXME : remove this once is gone
-        bool isValid() const;
-
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;

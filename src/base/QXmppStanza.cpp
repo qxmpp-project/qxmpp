@@ -233,11 +233,6 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
         setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
 }
 
-bool QXmppStanza::Error::isValid() const
-{
-    return !(getTypeStr().isEmpty() && getConditionStr().isEmpty());
-}
-
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
     setCode(errorElement.attribute("code").toInt());
