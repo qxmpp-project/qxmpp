@@ -66,8 +66,8 @@ void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
 
     // if we are the recipient, or if the presence is not from the recipient,
     // do nothing
-    if (jidToBareJid(configuration().jid()) == recipient ||
-        jidToBareJid(presence.from()) != recipient ||
+    if (QXmppUtils::jidToBareJid(configuration().jid()) == recipient ||
+        QXmppUtils::jidToBareJid(presence.from()) != recipient ||
         presence.type() != QXmppPresence::Available)
         return;
 
