@@ -27,7 +27,15 @@
 
 #include <QString>
 
-#define QXMPP_EXPORT
+#if defined(QXMPP_SHARED)
+#  if defined(QXMPP_BUILD)
+#    define QXMPP_EXPORT Q_DECL_EXPORT
+#  else
+#    define QXMPP_EXPORT Q_DECL_IMPORT
+#  endif
+#else
+#  define QXMPP_EXPORT
+#endif
 
 /// This macro expands a numeric value of the form 0xMMNNPP (MM =
 /// major, NN = minor, PP = patch) that specifies QXmpp's version
