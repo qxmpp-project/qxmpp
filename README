@@ -36,13 +36,13 @@ Path of installations:
     Linux:
     -----
     Headers:            /usr/include/qxmpp
-    Static Library:     /usr/lib
+    Library:            /usr/lib
     API Documentation:  /usr/share/doc/qxmpp
 
     Windows: [Note much of use though]
     -----
     Headers:            %QTDIR%\include\qxmpp
-    Static Library:     %QTDIR%\lib
+    Library:            %QTDIR%\lib
     API Documentation:  %QTDIR%\share\doc\qxmpp\html
 
 
