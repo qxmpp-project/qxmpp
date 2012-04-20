@@ -28,7 +28,9 @@
 #include <QByteArray>
 #include <QMap>
 
-class QXmppSaslDigestMd5
+#include "QXmppGlobal.h"
+
+class QXMPP_EXPORT QXmppSaslDigestMd5
 {
 public:
     QByteArray authzid() const;
