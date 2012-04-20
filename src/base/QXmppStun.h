@@ -38,7 +38,7 @@ class QTimer;
 /// The QXmppStunMessage class represents a STUN message.
 ///
 
-class QXmppStunMessage
+class QXMPP_EXPORT QXmppStunMessage
 {
 public:
     enum MethodType {
@@ -159,7 +159,7 @@ private:
 /// The QXmppStunTransaction class represents a STUN transaction.
 ///
 
-class QXmppStunTransaction : public QXmppLoggable
+class QXMPP_EXPORT QXmppStunTransaction : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -191,7 +191,7 @@ private:
 /// by RFC 5766 Traversal Using Relays around NAT (TURN).
 ///
 
-class QXmppTurnAllocation : public QXmppLoggable
+class QXMPP_EXPORT QXmppTurnAllocation : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -270,7 +270,7 @@ private:
 /// requiring a single transport address, as defined by RFC 5245
 /// (Interactive Connectivity Establishment).
 
-class QXmppIceComponent : public QXmppLoggable
+class QXMPP_EXPORT QXmppIceComponent : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -376,7 +376,7 @@ private:
 /// capable of performing Interactive Connectivity Establishment (RFC 5245).
 ///
 
-class QXmppIceConnection : public QXmppLoggable
+class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
 

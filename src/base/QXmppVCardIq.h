@@ -42,7 +42,7 @@ class QImage;
 /// field to this class.
 ///
 
-class QXmppVCardIq : public QXmppIq
+class QXMPP_EXPORT QXmppVCardIq : public QXmppIq
 {
 public:
     QXmppVCardIq(const QString& bareJid = "");

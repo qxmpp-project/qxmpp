@@ -33,7 +33,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppBindIq : public QXmppIq
+class QXMPP_EXPORT QXmppBindIq : public QXmppIq
 {
 public:
     QString jid() const;

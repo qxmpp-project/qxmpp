@@ -28,11 +28,13 @@
 #include <QStringList>
 #include <QXmlStreamWriter>
 
+#include "QXmppGlobal.h"
+
 class QDomElement;
 class QXmppElement;
 class QXmppElementPrivate;
 
-class QXmppElementList : public QList<QXmppElement>
+class QXMPP_EXPORT QXmppElementList : public QList<QXmppElement>
 {
 public:
     QXmppElementList();
@@ -40,7 +42,7 @@ public:
     QXmppElementList(const QList<QXmppElement> &other);
 };
 
-class QXmppElement
+class QXMPP_EXPORT QXmppElement
 {
 public:
     QXmppElement();

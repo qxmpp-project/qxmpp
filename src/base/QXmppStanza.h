@@ -41,7 +41,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppStanza : public QXmppPacket
+class QXMPP_EXPORT QXmppStanza : public QXmppPacket
 {
 public:
     class Error

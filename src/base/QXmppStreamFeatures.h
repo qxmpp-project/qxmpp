@@ -27,7 +27,7 @@
 #include "QXmppConfiguration.h"
 #include "QXmppStanza.h"
 
-class QXmppStreamFeatures : public QXmppStanza
+class QXMPP_EXPORT QXmppStreamFeatures : public QXmppStanza
 {
 public:
     QXmppStreamFeatures();

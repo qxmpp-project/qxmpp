@@ -33,7 +33,7 @@
 /// \ingroup Stanzas
 ///
 
-class QXmppMessage : public QXmppStanza
+class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 {
 public:
     /// This enum described a message type.

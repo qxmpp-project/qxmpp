@@ -42,7 +42,7 @@ namespace XMLRPC
 ///
 /// \ingroup Stanzas
 
-class QXmppRpcResponseIq : public QXmppIq
+class QXMPP_EXPORT QXmppRpcResponseIq : public QXmppIq
 {
 public:
     QXmppRpcResponseIq();
@@ -77,7 +77,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppRpcInvokeIq : public QXmppIq
+class QXMPP_EXPORT QXmppRpcInvokeIq : public QXmppIq
 {
 public:
     QXmppRpcInvokeIq();
@@ -105,7 +105,7 @@ private:
     friend class QXmppRpcErrorIq;
 };
 
-class QXmppRpcErrorIq : public QXmppIq
+class QXMPP_EXPORT QXmppRpcErrorIq : public QXmppIq
 {
 public:
     QXmppRpcErrorIq();

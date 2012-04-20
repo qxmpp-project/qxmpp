@@ -38,7 +38,7 @@ class QXmppRtpVideoChannelPrivate;
 /// \brief The QXmppRtpPacket class represents an RTP packet.
 ///
 
-class QXmppRtpPacket
+class QXMPP_EXPORT QXmppRtpPacket
 {
 public:
     bool decode(const QByteArray &ba);
@@ -55,7 +55,7 @@ public:
     QByteArray payload;
 };
 
-class QXmppRtpChannel
+class QXMPP_EXPORT QXmppRtpChannel
 {
 public:
     QXmppRtpChannel();
@@ -80,7 +80,7 @@ protected:
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChannel
+class QXMPP_EXPORT QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChannel
 {
     Q_OBJECT
     Q_ENUMS(Tone)
@@ -172,7 +172,7 @@ private:
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppVideoFrame
+class QXMPP_EXPORT QXmppVideoFrame
 {
 public:
     enum PixelFormat {
@@ -205,7 +205,7 @@ private:
     int m_width;
 };
 
-class QXmppVideoFormat
+class QXMPP_EXPORT QXmppVideoFormat
 {
 public:
     int frameHeight() const {
@@ -251,7 +251,7 @@ private:
 ///
 /// \note THIS API IS NOT FINALIZED YET
 
-class QXmppRtpVideoChannel : public QXmppLoggable, public QXmppRtpChannel
+class QXMPP_EXPORT QXmppRtpVideoChannel : public QXmppLoggable, public QXmppRtpChannel
 {
     Q_OBJECT
 

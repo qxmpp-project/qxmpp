@@ -74,7 +74,7 @@ private:
     QString m_sid;
 };
 
-class QXmppIbbDataIq : public QXmppIq
+class QXMPP_EXPORT QXmppIbbDataIq : public QXmppIq
 {
 public:
     QXmppIbbDataIq();

@@ -33,7 +33,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppSessionIq : public QXmppIq
+class QXMPP_EXPORT QXmppSessionIq : public QXmppIq
 {
 public:
     /// \cond

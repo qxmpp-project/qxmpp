@@ -37,7 +37,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppIq : public QXmppStanza
+class QXMPP_EXPORT QXmppIq : public QXmppStanza
 {
 public:
     /// This enum describes the type of IQ.

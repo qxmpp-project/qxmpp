@@ -32,7 +32,7 @@
 /// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
 ///
 
-class QXmppJinglePayloadType
+class QXMPP_EXPORT QXmppJinglePayloadType
 {
 public:
     QXmppJinglePayloadType();
@@ -79,7 +79,7 @@ private:
 /// as specified by XEP-0176: Jingle ICE-UDP Transport Method.
 ///
 
-class QXmppJingleCandidate
+class QXMPP_EXPORT QXmppJingleCandidate
 {
 public:
     /// This enum is used to describe a candidate's type.
@@ -151,7 +151,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppJingleIq : public QXmppIq
+class QXMPP_EXPORT QXmppJingleIq : public QXmppIq
 {
 public:
     /// This enum is used to describe a Jingle action.

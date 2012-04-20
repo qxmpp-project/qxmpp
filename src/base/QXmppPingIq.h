@@ -29,7 +29,7 @@
 class QXmlStreamWriter;
 class QDomElement;
 
-class QXmppPingIq : public QXmppIq
+class QXMPP_EXPORT QXmppPingIq : public QXmppIq
 {
 public:
     QXmppPingIq();

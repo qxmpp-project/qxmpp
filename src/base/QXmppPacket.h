@@ -33,9 +33,11 @@
 // for an explanation.
 #include <QXmlStreamWriter>
 
+#include "QXmppGlobal.h"
+
 class QDomElement;
 
-class QXmppPacket
+class QXMPP_EXPORT QXmppPacket
 {
 public:
     QXmppPacket();

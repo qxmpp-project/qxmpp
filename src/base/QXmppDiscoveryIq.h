@@ -29,7 +29,7 @@
 
 class QDomElement;
 
-class QXmppDiscoveryIq : public QXmppIq
+class QXMPP_EXPORT QXmppDiscoveryIq : public QXmppIq
 {
 public:
     class Identity

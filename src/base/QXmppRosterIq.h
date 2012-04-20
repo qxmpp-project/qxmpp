@@ -34,7 +34,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppRosterIq : public QXmppIq
+class QXMPP_EXPORT QXmppRosterIq : public QXmppIq
 {
 public:
 

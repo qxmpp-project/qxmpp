@@ -33,7 +33,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppMucItem
+class QXMPP_EXPORT QXmppMucItem
 {
 public:
     /// This enum is used to represent long-lived permissions in a room (affiliations).
@@ -101,7 +101,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppMucAdminIq : public QXmppIq
+class QXMPP_EXPORT QXmppMucAdminIq : public QXmppIq
 {
 public:
     QList<QXmppMucItem> items() const;
@@ -129,7 +129,7 @@ private:
 /// \sa QXmppDataForm
 ///
 
-class QXmppMucOwnerIq : public QXmppIq
+class QXMPP_EXPORT QXmppMucOwnerIq : public QXmppIq
 {
 public:
     QXmppDataForm form() const;

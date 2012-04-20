@@ -34,7 +34,7 @@ class QDomElement;
 /// \brief The QXmppArchiveMessage represents an archived message
 /// as defined by XEP-0136: Message Archiving.
 
-class QXmppArchiveMessage
+class QXMPP_EXPORT QXmppArchiveMessage
 {
 public:
     QXmppArchiveMessage();
@@ -57,7 +57,7 @@ private:
 /// \brief The QXmppArchiveChat represents an archived conversation
 /// as defined by XEP-0136: Message Archiving.
 
-class QXmppArchiveChat
+class QXMPP_EXPORT QXmppArchiveChat
 {
 public:
     QXmppArchiveChat();
@@ -100,7 +100,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppArchiveChatIq : public QXmppIq
+class QXMPP_EXPORT QXmppArchiveChatIq : public QXmppIq
 {
 public:
     QXmppArchiveChat chat() const;
@@ -124,7 +124,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppArchiveListIq : public QXmppIq
+class QXMPP_EXPORT QXmppArchiveListIq : public QXmppIq
 {
 public:
     QXmppArchiveListIq();
@@ -166,7 +166,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppArchiveRemoveIq : public QXmppIq
+class QXMPP_EXPORT QXmppArchiveRemoveIq : public QXmppIq
 {
 public:
     QString with() const;
@@ -198,7 +198,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppArchiveRetrieveIq : public QXmppIq
+class QXMPP_EXPORT QXmppArchiveRetrieveIq : public QXmppIq
 {
 public:
     QXmppArchiveRetrieveIq();
@@ -232,7 +232,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppArchivePrefIq : public QXmppIq
+class QXMPP_EXPORT QXmppArchivePrefIq : public QXmppIq
 {
 public:
     /// \cond

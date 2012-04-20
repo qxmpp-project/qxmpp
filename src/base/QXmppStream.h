@@ -38,7 +38,7 @@ class QXmppStreamPrivate;
 /// \brief The QXmppStream class is the base class for all XMPP streams.
 ///
 
-class QXmppStream : public QXmppLoggable
+class QXMPP_EXPORT QXmppStream : public QXmppLoggable
 {
     Q_OBJECT
 

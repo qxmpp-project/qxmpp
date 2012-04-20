@@ -30,7 +30,7 @@
 /// as defined by XEP-0060: Publish-Subscribe.
 ///
 
-class QXmppPubSubItem
+class QXMPP_EXPORT QXmppPubSubItem
 {
 public:
     QString id() const;
@@ -54,7 +54,7 @@ private:
 ///
 /// \ingroup Stanzas
 
-class QXmppPubSubIq : public QXmppIq
+class QXMPP_EXPORT QXmppPubSubIq : public QXmppIq
 {
 public:
     /// This enum is used to describe a publish-subscribe query type.

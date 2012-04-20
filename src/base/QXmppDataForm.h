@@ -29,13 +29,15 @@
 #include <QVariant>
 #include <QXmlStreamWriter>
 
+#include "QXmppGlobal.h"
+
 class QDomElement;
 
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// XEP-0004: Data Forms.
 ///
 
-class QXmppDataForm
+class QXMPP_EXPORT QXmppDataForm
 {
 public:
     /// \brief The QXmppDataForm::Field class represents a data form field

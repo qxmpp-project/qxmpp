@@ -26,6 +26,8 @@
 
 #include <QtGlobal>
 
+#include "QXmppGlobal.h"
+
 class QXmppRtpPacket;
 class QXmppVideoFormat;
 class QXmppVideoFrame;
@@ -35,7 +37,7 @@ class QXmppVideoFrame;
 ///
 /// Samples must be 16-bit little endian.
 
-class QXmppCodec
+class QXMPP_EXPORT QXmppCodec
 {
 public:
     /// Reads samples from the input stream, encodes them and writes the
@@ -86,7 +88,7 @@ typedef struct SpeexBits SpeexBits;
 ///
 /// The QXmppSpeexCodec class represent a SPEEX codec.
 
-class QXmppSpeexCodec : public QXmppCodec
+class QXMPP_EXPORT QXmppSpeexCodec : public QXmppCodec
 {
 public:
     QXmppSpeexCodec(int clockrate);
@@ -107,7 +109,7 @@ private:
 /// \brief The QXmppVideoDecoder class is the base class for video decoders.
 ///
 
-class QXmppVideoDecoder
+class QXMPP_EXPORT QXmppVideoDecoder
 {
 public:
     virtual QXmppVideoFormat format() const = 0;
@@ -115,7 +117,7 @@ public:
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
 };
 
-class QXmppVideoEncoder
+class QXMPP_EXPORT QXmppVideoEncoder
 {
 public:
     virtual bool setFormat(const QXmppVideoFormat &format) = 0;
@@ -127,7 +129,7 @@ public:
 class QXmppTheoraDecoderPrivate;
 class QXmppTheoraEncoderPrivate;
 
-class QXmppTheoraDecoder : public QXmppVideoDecoder
+class QXMPP_EXPORT QXmppTheoraDecoder : public QXmppVideoDecoder
 {
 public:
     QXmppTheoraDecoder();
@@ -141,7 +143,7 @@ private:
     QXmppTheoraDecoderPrivate *d;
 };
 
-class QXmppTheoraEncoder : public QXmppVideoEncoder
+class QXMPP_EXPORT QXmppTheoraEncoder : public QXmppVideoEncoder
 {
 public:
     QXmppTheoraEncoder();
@@ -160,7 +162,7 @@ private:
 class QXmppVpxDecoderPrivate;
 class QXmppVpxEncoderPrivate;
 
-class QXmppVpxDecoder : public QXmppVideoDecoder
+class QXMPP_EXPORT QXmppVpxDecoder : public QXmppVideoDecoder
 {
 public:
     QXmppVpxDecoder();
@@ -174,7 +176,7 @@ private:
     QXmppVpxDecoderPrivate *d;
 };
 
-class QXmppVpxEncoder : public QXmppVideoEncoder
+class QXMPP_EXPORT QXmppVpxEncoder : public QXmppVideoEncoder
 {
 public:
     QXmppVpxEncoder();

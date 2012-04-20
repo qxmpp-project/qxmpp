@@ -26,7 +26,7 @@
 
 #include "QXmppIq.h"
 
-class QXmppNonSASLAuthIq : public QXmppIq
+class QXMPP_EXPORT QXmppNonSASLAuthIq : public QXmppIq
 {
 public:
     QXmppNonSASLAuthIq();

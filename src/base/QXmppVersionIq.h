@@ -31,7 +31,7 @@
 ///
 /// \ingroup Stanzas
 
-class QXmppVersionIq : public QXmppIq
+class QXMPP_EXPORT QXmppVersionIq : public QXmppIq
 {
 public:
     QString name() const;

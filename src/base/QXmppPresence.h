@@ -31,7 +31,7 @@
 /// \brief The QXmppPresence class represents an XMPP presence stanza.
 ///
 /// \ingroup Stanzas
-class QXmppPresence : public QXmppStanza
+class QXMPP_EXPORT QXmppPresence : public QXmppStanza
 {
 public:
     /// This enum is used to describe a presence type.

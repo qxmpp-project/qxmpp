@@ -31,7 +31,7 @@
 
 /// \ingroup Stanzas
 
-class QXmppEntityTimeIq : public QXmppIq
+class QXMPP_EXPORT QXmppEntityTimeIq : public QXmppIq
 {
 public:
     int tzo() const;

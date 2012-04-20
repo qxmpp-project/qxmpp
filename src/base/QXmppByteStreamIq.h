@@ -31,7 +31,7 @@
 class QDomElement;
 class QXmlStreamWriter;
 
-class QXmppByteStreamIq : public QXmppIq
+class QXMPP_EXPORT QXmppByteStreamIq : public QXmppIq
 {
 public:
     enum Mode {

@@ -27,9 +27,11 @@
 #include <QHostAddress>
 #include <QTcpSocket>
 
+#include "QXmppGlobal.h"
+
 class QTcpServer;
 
-class QXmppSocksClient : public QTcpSocket
+class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
 {
     Q_OBJECT
 
@@ -53,7 +55,7 @@ private:
     int m_step;
 };
 
-class QXmppSocksServer : public QObject
+class QXMPP_EXPORT QXmppSocksServer : public QObject
 {
     Q_OBJECT
 
