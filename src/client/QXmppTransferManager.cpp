@@ -550,7 +550,7 @@ void QXmppTransferOutgoingJob::connectToProxy()
 void QXmppTransferOutgoingJob::startSending()
 {
     bool check;
-    Q_ASSERT(check);
+    Q_UNUSED(check);
 
     setState(QXmppTransferJob::TransferState);
 
