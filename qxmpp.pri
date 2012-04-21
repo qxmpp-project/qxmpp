@@ -13,7 +13,7 @@ CONFIG(debug, debug|release) {
 
 # Determine library type (lib or staticlib)
 isEmpty(QXMPP_LIBRARY_TYPE) {
-    QXMPP_LIBRARY_TYPE = staticlib
+    QXMPP_LIBRARY_TYPE = lib
 }
 
 # Libraries used internally by QXmpp
