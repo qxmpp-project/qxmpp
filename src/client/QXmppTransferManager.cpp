@@ -1186,7 +1186,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     response.setId(job->d->offerId);
     response.setType(QXmppIq::Result);
     response.setProfile(QXmppStreamInitiationIq::FileTransfer);
-    response.setSiItems(feature);
+    response.setSiItems(QXmppElementList() << feature);
 
     client()->sendPacket(response);
 

@@ -261,7 +261,7 @@ bool QXmppMucRoom::join()
         p.setValue(d->password);
         x.appendChild(p);
     }
-    packet.setExtensions(x);
+    packet.setExtensions(QXmppElementList() << x);
     return d->client->sendPacket(packet);
 }
 
@@ -330,7 +330,7 @@ bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
     QXmppMessage message;
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
-    message.setExtensions(x);
+    message.setExtensions(QXmppElementList() << x);
     return d->client->sendPacket(message);
 }
 

@@ -34,14 +34,7 @@ class QDomElement;
 class QXmppElement;
 class QXmppElementPrivate;
 
-class QXMPP_EXPORT QXmppElementList : public QList<QXmppElement>
-{
-public:
-    QXmppElementList();
-    QXmppElementList(const QXmppElement &element);
-    QXmppElementList(const QList<QXmppElement> &other);
-};
-
+typedef QList<QXmppElement> QXmppElementList;
 class QXMPP_EXPORT QXmppElement
 {
 public:

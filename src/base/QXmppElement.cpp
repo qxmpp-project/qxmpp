@@ -223,19 +223,3 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
         child.toXml(writer);
     writer->writeEndElement();
 }
-
-QXmppElementList::QXmppElementList()
-{
-}
-
-QXmppElementList::QXmppElementList(const QXmppElement &element)
-{
-    append(element);
-}
-
-
-QXmppElementList::QXmppElementList(const QList<QXmppElement> &other)
-    : QList<QXmppElement>(other)
-{
-}
-
