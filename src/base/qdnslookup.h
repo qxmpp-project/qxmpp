@@ -48,6 +48,8 @@
 #include <QSharedPointer>
 #include <QString>
 
+#include "QXmppGlobal.h"
+
 QT_BEGIN_HEADER
 
 QT_BEGIN_NAMESPACE
@@ -62,7 +64,7 @@ class QDnsMailExchangeRecordPrivate;
 class QDnsServiceRecordPrivate;
 class QDnsTextRecordPrivate;
 
-class QDnsDomainNameRecord
+class QXMPP_EXPORT QDnsDomainNameRecord
 {
 public:
     QDnsDomainNameRecord();
@@ -80,7 +82,7 @@ private:
     friend class QDnsLookupRunnable;
 };
 
-class QDnsHostAddressRecord
+class QXMPP_EXPORT QDnsHostAddressRecord
 {
 public:
     QDnsHostAddressRecord();
@@ -98,7 +100,7 @@ private:
     friend class QDnsLookupRunnable;
 };
 
-class QDnsMailExchangeRecord
+class QXMPP_EXPORT QDnsMailExchangeRecord
 {
 public:
     QDnsMailExchangeRecord();
@@ -117,7 +119,7 @@ private:
     friend class QDnsLookupRunnable;
 };
 
-class QDnsServiceRecord
+class QXMPP_EXPORT QDnsServiceRecord
 {
 public:
     QDnsServiceRecord();
@@ -138,7 +140,7 @@ private:
     friend class QDnsLookupRunnable;
 };
 
-class QDnsTextRecord
+class QXMPP_EXPORT QDnsTextRecord
 {
 public:
     QDnsTextRecord();
@@ -156,7 +158,7 @@ private:
     friend class QDnsLookupRunnable;
 };
 
-class QDnsLookup : public QObject
+class QXMPP_EXPORT QDnsLookup : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error Type)
