@@ -16,7 +16,8 @@ docs.commands = cd doc/ && $(QMAKE) && $(MAKE) docs
 QXMPP_ARCHIVE = qxmpp-$$QXMPP_VERSION
 dist.commands = \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE && \
-    svn export . $$QXMPP_ARCHIVE && \
+    $(MKDIR) $$QXMPP_ARCHIVE && \
+    git archive master | tar -x -C $$QXMPP_ARCHIVE && \
     $(COPY_DIR) doc/html $$QXMPP_ARCHIVE/doc && \
     tar czf $${QXMPP_ARCHIVE}.tar.gz $$QXMPP_ARCHIVE && \
     $(DEL_FILE) -r $$QXMPP_ARCHIVE
