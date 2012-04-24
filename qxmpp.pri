@@ -21,8 +21,7 @@ android {
 
 } else:contains(MEEGO_EDITION,harmattan) {
     # meego/harmattan has speex for sure
-    QXMPP_INTERNAL_DEFINES += QXMPP_USE_SPEEX
-    QXMPP_INTERNAL_LIBS += -lspeex
+    QXMPP_USE_SPEEX=1
 } else:symbian {
     QXMPP_INTERNAL_INCLUDES = $$APP_LAYER_SYSTEMINCLUDE
     QXMPP_INTERNAL_LIBS = -lesock

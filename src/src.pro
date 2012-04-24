@@ -10,17 +10,23 @@ DEFINES += $$QXMPP_INTERNAL_DEFINES
 INCLUDEPATH += $$QXMPP_INCLUDEPATH $$QXMPP_INTERNAL_INCLUDES
 LIBS += $$QXMPP_INTERNAL_LIBS
 
-# To enable support for the Speex audio codec, uncomment the following:
-# DEFINES += QXMPP_USE_SPEEX
-# LIBS += -lspeex
+# To enable support for the Speex audio codec, pass QXMPP_USE_SPEEX=1 to qmake.
+!isEmpty(QXMPP_USE_SPEEX) {
+    DEFINES += QXMPP_USE_SPEEX
+    LIBS += -lspeex
+}
 
-# To enable support for the Theora video codec, uncomment the following:
-# DEFINES += QXMPP_USE_THEORA
-# LIBS += -ltheoradec -ltheoraenc
+# To enable support for the Theora video codec, pass QXMPP_USE_THEORA=1 to qmake.
+!isEmpty(QXMPP_USE_THEORA) {
+    DEFINES += QXMPP_USE_THEORA
+    LIBS += -ltheoradec -ltheoraenc
+}
 
-# To enable support for the Vpx video codec, uncomment the following:
-# DEFINES += QXMPP_USE_VPX
-# LIBS += -lvpx
+# To enable support for the Vpx video codec, pass QXMPP_USE_VPX=1 to qmake.
+!isEmpty(QXMPP_USE_VPX) {
+    DEFINES += QXMPP_USE_VPX
+    LIBS += -lvpx
+}
 
 # Target definition
 TARGET = $$QXMPP_LIBRARY_NAME
