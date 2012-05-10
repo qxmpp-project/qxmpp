@@ -118,7 +118,7 @@ public:
     };
 
     QXmppStanza(const QString& from = QString(), const QString& to = QString());
-    ~QXmppStanza();
+    virtual ~QXmppStanza();
 
     QString to() const;
     void setTo(const QString&);
