@@ -279,7 +279,9 @@ public slots:
     void datagramReceived(const QByteArray &ba);
 
 protected:
+    /// cond
     void payloadTypesChanged();
+    /// \endcond
 
 private:
     friend class QXmppRtpVideoChannelPrivate;

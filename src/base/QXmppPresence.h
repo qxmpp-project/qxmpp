@@ -47,7 +47,8 @@ public:
         Probe           ///< A request for an entity's current presence; SHOULD be generated only by a server on behalf of a user.
     };
 
-    // XEP-0153: vCard-Based Avatars
+    /// This enum is used to describe vCard updates as defined by
+    /// XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
     {
         VCardUpdateNone = 0,    ///< Protocol is not supported

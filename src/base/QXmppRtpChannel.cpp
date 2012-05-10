@@ -307,9 +307,7 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
     return 0;
 }
 
-/// Creates a new RTP audio channel.
-///
-/// \param parent
+/// Constructs a new RTP audio channel with the given \a parent.
 
 QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     : QIODevice(parent)
@@ -489,6 +487,8 @@ bool QXmppRtpAudioChannel::isSequential() const
 {
     return true;
 }
+
+/// Returns the mode in which the channel has been opened.
 
 QIODevice::OpenMode QXmppRtpAudioChannel::openMode() const
 {
@@ -858,6 +858,8 @@ QXmppRtpVideoChannelPrivate::QXmppRtpVideoChannelPrivate()
     outgoingSsrc = qrand();
 }
 
+/// Constructs a new RTP video channel with the given \a parent.
+
 QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
     : QXmppLoggable(parent)
 {
@@ -952,6 +954,8 @@ void QXmppRtpVideoChannel::setEncoderFormat(const QXmppVideoFormat &format)
     d->outgoingFormat = format;
 }
 
+/// Returns the mode in which the channel has been opened.
+
 QIODevice::OpenMode QXmppRtpVideoChannel::openMode() const
 {
     QIODevice::OpenMode mode = QIODevice::NotOpen;
@@ -1013,12 +1017,16 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     }
 }
 
+/// Decodes buffered RTP packets and returns a list of video frames.
+
 QList<QXmppVideoFrame> QXmppRtpVideoChannel::readFrames()
 {
     const QList<QXmppVideoFrame> frames = d->frames;
     d->frames.clear();
     return frames;
 }
+
+/// Encodes a video \a frame and sends RTP packets.
 
 void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
 {
