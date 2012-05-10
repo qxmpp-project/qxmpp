@@ -248,6 +248,24 @@ static qint16 ulaw2linear(quint8 u_val)
    return ((u_val & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
 }
 
+/// Destroys an audio codec.
+
+QXmppCodec::~QXmppCodec()
+{
+}
+
+/// Destroys a video decoder.
+
+QXmppVideoDecoder::~QXmppVideoDecoder()
+{
+}
+
+/// Destroys a video encoder.
+
+QXmppVideoEncoder::~QXmppVideoEncoder()
+{
+}
+
 QXmppG711aCodec::QXmppG711aCodec(int clockrate)
 {
     m_frequency = clockrate;

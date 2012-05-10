@@ -40,6 +40,8 @@ class QXmppVideoFrame;
 class QXMPP_EXPORT QXmppCodec
 {
 public:
+    virtual ~QXmppCodec();
+
     /// Reads samples from the input stream, encodes them and writes the
     /// encoded data to the output stream.
     virtual qint64 encode(QDataStream &input, QDataStream &output) = 0;
@@ -112,14 +114,19 @@ private:
 class QXMPP_EXPORT QXmppVideoDecoder
 {
 public:
+    virtual ~QXmppVideoDecoder();
     virtual QXmppVideoFormat format() const = 0;
     virtual QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet) = 0;
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
 };
 
+/// \brief The QXmppVideoEncoder class is the base class for video encoders.
+///
+
 class QXMPP_EXPORT QXmppVideoEncoder
 {
 public:
+    virtual ~QXmppVideoEncoder();
     virtual bool setFormat(const QXmppVideoFormat &format) = 0;
     virtual QList<QByteArray> handleFrame(const QXmppVideoFrame &frame) = 0;
     virtual QMap<QString, QString> parameters() const = 0;
