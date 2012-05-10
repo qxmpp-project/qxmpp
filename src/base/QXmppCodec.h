@@ -115,8 +115,14 @@ class QXMPP_EXPORT QXmppVideoDecoder
 {
 public:
     virtual ~QXmppVideoDecoder();
+
+    /// Returns the format of the video stream.
     virtual QXmppVideoFormat format() const = 0;
+
+    /// Handles an RTP \a packet and returns a list of decoded video frames.
     virtual QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet) = 0;
+
+    /// Sets the video stream's \a parameters.
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
 };
 
@@ -127,8 +133,14 @@ class QXMPP_EXPORT QXmppVideoEncoder
 {
 public:
     virtual ~QXmppVideoEncoder();
+
+    /// Sets the \a format of the video stream.
     virtual bool setFormat(const QXmppVideoFormat &format) = 0;
+
+    /// Handles a video \a frame and returns a list of RTP packet payloads.
     virtual QList<QByteArray> handleFrame(const QXmppVideoFrame &frame) = 0;
+
+    /// Returns the video stream's parameters.
     virtual QMap<QString, QString> parameters() const = 0;
 };
 

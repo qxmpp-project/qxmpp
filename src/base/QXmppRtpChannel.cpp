@@ -767,32 +767,36 @@ QXmppVideoFrame::QXmppVideoFrame(int bytes, const QSize &size, int bytesPerLine,
     m_data.resize(bytes);
 }
 
+/// Returns a pointer to the start of the frame data buffer.
+
 uchar *QXmppVideoFrame::bits()
 {
     return (uchar*)m_data.data();
 }
+
+/// Returns a pointer to the start of the frame data buffer.
 
 const uchar *QXmppVideoFrame::bits() const
 {
     return (const uchar*)m_data.constData();
 }
 
-/** Returns the number of bytes in a scan line.
- */
+/// Returns the number of bytes in a scan line.
+
 int QXmppVideoFrame::bytesPerLine() const
 {
     return m_bytesPerLine;
 }
 
-/** Returns the height of a video frame.
- */
+/// Returns the height of a video frame.
+
 int QXmppVideoFrame::height() const
 {
     return m_height;
 }
 
-/** Returns true if the frame is valid.
- */
+/// Returns true if the frame is valid.
+
 bool QXmppVideoFrame::isValid() const
 {
     return m_pixelFormat != Format_Invalid &&
@@ -800,29 +804,29 @@ bool QXmppVideoFrame::isValid() const
            m_mappedBytes > 0;
 }
 
-/** Returns the number of bytes occupied by the mapped frame data.
- */
+/// Returns the number of bytes occupied by the mapped frame data.
+
 int QXmppVideoFrame::mappedBytes() const
 {
     return m_mappedBytes;
 }
 
-/** Returns the color format of a video frame.
- */
+/// Returns the color format of a video frame.
+
 QXmppVideoFrame::PixelFormat QXmppVideoFrame::pixelFormat() const
 {
     return m_pixelFormat;
 }
 
-/** Returns the size of a video frame.
- */
+/// Returns the size of a video frame.
+
 QSize QXmppVideoFrame::size() const
 {
     return QSize(m_width, m_height);
 }
 
-/** Returns the width of a video frame.
- */
+/// Returns the width of a video frame.
+
 int QXmppVideoFrame::width() const
 {
     return m_width;
