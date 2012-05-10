@@ -107,6 +107,9 @@ static quint32 crctable[256] =
     0xB40BBE37L, 0xC30C8EA1L, 0x5A05DF1BL, 0x2D02EF8DL
 };
 
+/// Parses a date-time from a string according to
+/// XEP-0082: XMPP Date and Time Profiles.
+
 QDateTime QXmppUtils::datetimeFromString(const QString &str)
 {
     QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
@@ -137,6 +140,9 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
     return dt;
 }
 
+/// Serializes a date-time to a string according to
+/// XEP-0082: XMPP Date and Time Profiles.
+
 QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     QDateTime utc = dt.toUTC();
@@ -146,10 +152,8 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
         return utc.toString("yyyy-MM-ddThh:mm:ssZ");
 }
 
-/// Parses a timezone offset (in seconds) from a string.
-///
-/// \param str
-///
+/// Parses a timezone offset (in seconds) from a string according to
+/// XEP-0082: XMPP Date and Time Profiles.
 
 int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
@@ -170,9 +174,8 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
         return offset;
 }
 
-/// Serializes a timezone offset (in seconds) to a string.
-///
-/// \param secs
+/// Serializes a timezone offset (in seconds) to a string according to
+/// XEP-0082: XMPP Date and Time Profiles.
 
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
@@ -183,10 +186,14 @@ QString QXmppUtils::timezoneOffsetToString(int secs)
     return (secs < 0 ? "-" : "+") + tzoTime.toString("hh:mm");
 }
 
+/// Returns the domain for the given \a jid.
+
 QString QXmppUtils::jidToDomain(const QString &jid)
 {
     return jidToBareJid(jid).split("@").last();
 }
+
+/// Returns the resource for the given \a jid.
 
 QString QXmppUtils::jidToResource(const QString& jid)
 {
@@ -196,6 +203,8 @@ QString QXmppUtils::jidToResource(const QString& jid)
     return jid.mid(pos+1);
 }
 
+/// Returns the user for the given \a jid.
+
 QString QXmppUtils::jidToUser(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('@'));
@@ -204,6 +213,8 @@ QString QXmppUtils::jidToUser(const QString &jid)
     return jid.left(pos);
 }
 
+/// Returns the bare jid (i.e. without resource) for the given \a jid.
+
 QString QXmppUtils::jidToBareJid(const QString& jid)
 {
     const int pos = jid.indexOf(QChar('/'));
@@ -211,6 +222,8 @@ QString QXmppUtils::jidToBareJid(const QString& jid)
         return jid;
     return jid.left(pos);
 }
+
+/// Calculates the CRC32 checksum for the given input.
 
 quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
@@ -243,10 +256,14 @@ static QByteArray generateHmac(QCryptographicHash::Algorithm algorithm, const QB
     return hasher.result();
 }
 
+/// Generates the MD5 HMAC for the given \a key and \a text.
+
 QByteArray QXmppUtils::generateHmacMd5(const QByteArray &key, const QByteArray &text)
 {
     return generateHmac(QCryptographicHash::Md5, key, text);
 }
+
+/// Generates the SHA1 HMAC for the given \a key and \a text.
 
 QByteArray QXmppUtils::generateHmacSha1(const QByteArray &key, const QByteArray &text)
 {

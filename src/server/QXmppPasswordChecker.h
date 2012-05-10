@@ -33,7 +33,7 @@
 class QXMPP_EXPORT QXmppPasswordRequest
 {
 public:
-    // This enum is used to describe request types.
+    /// This enum is used to describe request types.
     enum Type {
         CheckPassword = 0,
     };
@@ -85,6 +85,7 @@ public slots:
     void finishLater();
 
 signals:
+    /// This signal is emitted when the reply has finished.
     void finished();
 
 private:

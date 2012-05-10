@@ -43,10 +43,14 @@ void QXmppPasswordRequest::setDomain(const QString &domain)
     m_domain = domain;
 }
 
+/// Returns the given password.
+
 QString QXmppPasswordRequest::password() const
 {
     return m_password;
 }
+
+/// Sets the given \a password.
 
 void QXmppPasswordRequest::setPassword(const QString &password)
 {

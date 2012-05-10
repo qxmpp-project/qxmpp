@@ -76,10 +76,10 @@ public:
     Role role() const;
     void setRole(Role role);
 
+    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
-    /// \cond
     static Affiliation affiliationFromString(const QString &affiliationStr);
     static QString affiliationToString(Affiliation affiliation);
     static Role roleFromString(const QString &roleStr);

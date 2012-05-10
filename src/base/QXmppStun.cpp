@@ -1565,7 +1565,6 @@ QString QXmppIceComponent::Pair::toString() const
 
 /// Constructs a new QXmppIceComponent.
 ///
-/// \param controlling
 /// \param parent
 
 QXmppIceComponent::QXmppIceComponent(QObject *parent)
@@ -1718,6 +1717,8 @@ bool QXmppIceComponent::isConnected() const
 {
     return m_activePair != 0;
 }
+
+/// Sets whether the local party has the ICE controlling role.
 
 void QXmppIceComponent::setIceControlling(bool controlling)
 {
@@ -2294,7 +2295,6 @@ qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, QXmppIceCom
 
 /// Constructs a new ICE connection.
 ///
-/// \param controlling
 /// \param parent
 
 QXmppIceConnection::QXmppIceConnection(QObject *parent)
@@ -2433,6 +2433,8 @@ bool QXmppIceConnection::isConnected() const
             return false;
     return true;
 }
+
+/// Sets whether the local party has the ICE controlling role.
 
 void QXmppIceConnection::setIceControlling(bool controlling)
 {

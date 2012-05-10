@@ -181,6 +181,7 @@ signals:
     /// To refuse the call, invoke the call's QXmppCall::hangup() method.
     void callReceived(QXmppCall *call);
 
+    /// This signal is emitted when a call (incoming or outgoing) is started.
     void callStarted(QXmppCall *call);
 
 public slots:

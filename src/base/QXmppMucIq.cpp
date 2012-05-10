@@ -33,6 +33,8 @@ QXmppMucItem::QXmppMucItem()
 {
 }
 
+/// Returns true if the current item is null.
+
 bool QXmppMucItem::isNull() const
 {
     return m_actor.isEmpty() &&
@@ -43,10 +45,16 @@ bool QXmppMucItem::isNull() const
            m_role == UnspecifiedRole;
 }
 
+/// Returns the actor for this item, for instance the admin who kicked
+/// a user out of a room.
+
 QString QXmppMucItem::actor() const
 {
     return m_actor;
 }
+
+/// Sets the \a actor for this item, for instance the admin who kicked
+/// a user out of a room.
 
 void QXmppMucItem::setActor(const QString &actor)
 {
@@ -135,10 +143,16 @@ void QXmppMucItem::setNick(const QString &nick)
     m_nick = nick;
 }
 
+/// Returns the reason for this item, for example the reason for kicking
+/// a user out of a room.
+
 QString QXmppMucItem::reason() const
 {
     return m_reason;
 }
+
+/// Sets the \a reason for this item, for example the reason for kicking
+/// a user out of a room.
 
 void QXmppMucItem::setReason(const QString &reason)
 {
