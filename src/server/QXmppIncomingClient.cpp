@@ -22,6 +22,7 @@
  */
 
 #include <QDomElement>
+#include <QHostAddress>
 #include <QSslKey>
 #include <QSslSocket>
 #include <QTimer>

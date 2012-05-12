@@ -23,6 +23,7 @@
  */
 
 #include <QCryptographicHash>
+#include <QNetworkProxy>
 #include <QSslSocket>
 #include <QUrl>
 #include "qdnslookup.h"

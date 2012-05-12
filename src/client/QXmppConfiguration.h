@@ -26,11 +26,11 @@
 #define QXMPPCONFIGURATION_H
 
 #include <QString>
-#include <QNetworkProxy>
 #include <QSharedDataPointer>
 
 #include "QXmppGlobal.h"
 
+class QNetworkProxy;
 class QSslCertificate;
 class QXmppConfigurationPrivate;
 

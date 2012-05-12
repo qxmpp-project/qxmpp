@@ -21,8 +21,9 @@
  *
  */
 
-
+#include <QNetworkProxy>
 #include <QSslSocket>
+
 #include "QXmppConfiguration.h"
 #include "QXmppUtils.h"
 
