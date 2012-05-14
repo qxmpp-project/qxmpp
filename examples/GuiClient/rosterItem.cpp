@@ -78,7 +78,7 @@ void rosterItem::setStatusType(QXmppPresence::Status::Type type)
     case QXmppPresence::Status::DND:
         icon = "red";
         break;
-    case QXmppPresence::Status::Invisible:
+    //case QXmppPresence::Status::Invisible:
     case QXmppPresence::Status::Offline:
         icon = "gray";
         break;

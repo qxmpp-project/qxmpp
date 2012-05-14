@@ -98,14 +98,14 @@ void profileDialog::setStatusText(const QString& status)
 
 void profileDialog::versionReceived(const QXmppVersionIq& ver)
 {
-    m_versions[jidToResource(ver.from())] = ver;
+    m_versions[QXmppUtils::jidToResource(ver.from())] = ver;
     if(ver.type() == QXmppIq::Result)
         updateText();
 }
 
 void profileDialog::timeReceived(const QXmppEntityTimeIq& time)
 {
-    m_time[jidToResource(time.from())] = time;
+    m_time[QXmppUtils::jidToResource(time.from())] = time;
     if(time.type() == QXmppIq::Result)
         updateText();
 }
@@ -135,7 +135,7 @@ void profileDialog::updateText()
         {
             statusText += "<B>Time: </B>" + QString("utc=%1 [tzo=%2]").
                           arg(m_time[resource].utc().toString()).
-                          arg(timezoneOffsetToString(m_time[resource].tzo()));
+                          arg(QXmppUtils::timezoneOffsetToString(m_time[resource].tzo()));
             statusText += "<BR>";
         }
 

@@ -39,7 +39,7 @@ int comparisonWeightsPresenceStatusType(QXmppPresence::Status::Type statusType)
         case QXmppPresence::Status::XA:
             return 2;
         case QXmppPresence::Status::Offline:
-        case QXmppPresence::Status::Invisible:
+        //case QXmppPresence::Status::Invisible:
             return 3;
         default:
             return 5;
@@ -75,7 +75,7 @@ QString presenceToStatusText(const QXmppPresence& presence)
         {
             switch(presence.status().type())
             {
-            case QXmppPresence::Status::Invisible:
+            //case QXmppPresence::Status::Invisible:
             case QXmppPresence::Status::Offline:
                 statusText = "Offline";
                 break;

@@ -347,7 +347,7 @@ chatDialog* mainDialog::getChatDialog(const QString& bareJid)
             m_chatDlgsList[bareJid]->setDisplayName(m_rosterItemModel.
                                                 getRosterItemFromBareJid(bareJid)->getName());
         else
-            m_chatDlgsList[bareJid]->setDisplayName(jidToUser(bareJid));
+            m_chatDlgsList[bareJid]->setDisplayName(QXmppUtils::jidToUser(bareJid));
 
         m_chatDlgsList[bareJid]->setQXmppClient(&m_xmppClient);
     }
@@ -364,8 +364,8 @@ void mainDialog::showChatDialog(const QString& bareJid)
 void mainDialog::messageReceived(const QXmppMessage& msg)
 {
     QString from = msg.from();
-    getChatDialog(jidToBareJid(from))->show();
-    getChatDialog(jidToBareJid(from))->messageReceived(msg.body());
+    getChatDialog(QXmppUtils::jidToBareJid(from))->show();
+    getChatDialog(QXmppUtils::jidToBareJid(from))->messageReceived(msg.body());
 }
 
 void mainDialog::statusTextChanged(const QString& status)

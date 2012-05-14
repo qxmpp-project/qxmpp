@@ -50,8 +50,8 @@ statusWidget::statusWidget(QWidget* parent)
     Q_ASSERT(check);
     check = connect(actionAway, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
-    check = connect(actionInvisible, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
-    Q_ASSERT(check);
+//    check = connect(actionInvisible, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
+//    Q_ASSERT(check);
     check = connect(actionSign_out, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
 
@@ -83,11 +83,13 @@ void statusWidget::presenceMenuTriggered()
         emit presenceStatusTypeChanged(QXmppPresence::Status::Away);
         icon = "orange";
     }
+#if 0
     else if(action == actionInvisible)
     {
         emit presenceStatusTypeChanged(QXmppPresence::Status::Invisible);
         icon = "gray";
     }
+#endif
     else if(action == actionSign_out)
     {
         emit presenceTypeChanged(QXmppPresence::Unavailable);
@@ -115,7 +117,7 @@ void statusWidget::setPresenceAndStatusType(QXmppPresence::Type presenceType,
         case QXmppPresence::Status::DND:
             icon = "red";
             break;
-        case QXmppPresence::Status::Invisible:
+        //case QXmppPresence::Status::Invisible:
         case QXmppPresence::Status::Offline:
             icon = "gray";
             break;
