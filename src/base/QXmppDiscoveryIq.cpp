@@ -206,6 +206,33 @@ QByteArray QXmppDiscoveryIq::verificationString() const
         S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
     foreach (const QString &feature, sortedFeatures)
         S += feature + QLatin1String("<");
+
+    if (!m_form.isNull()) {
+        QMap<QString, QXmppDataForm::Field> fieldMap;
+        foreach (const QXmppDataForm::Field &field, m_form.fields()) {
+            fieldMap.insert(field.key(), field);
+        }
+
+        if (fieldMap.contains("FORM_TYPE")) {
+            const QXmppDataForm::Field field = fieldMap.take("FORM_TYPE");
+            S += field.value().toString() + QLatin1String("<");
+
+            QStringList keys = fieldMap.keys();
+            qSort(keys);
+            foreach (const QString &key, keys) {
+                const QXmppDataForm::Field field = fieldMap.value(key);
+                S += key + QLatin1String("<");
+                if (field.value().canConvert<QStringList>())
+                    S += field.value().toStringList().join(QLatin1String("<"));
+                else
+                    S += field.value().toString();
+                S += QLatin1String("<");
+            }
+        } else {
+            qWarning("QXmppDiscoveryIq form does not contain FORM_TYPE");
+        }
+    }
+
     QCryptographicHash hasher(QCryptographicHash::Sha1);
     hasher.addData(S.toUtf8());
     return hasher.result();
@@ -241,6 +268,17 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             identity.setCategory(itemElement.attribute("category"));
             identity.setName(itemElement.attribute("name"));
             identity.setType(itemElement.attribute("type"));
+
+            // FIXME: for some reason the language does not found,
+            // so we are forced to use QDomNamedNodeMap
+            QDomNamedNodeMap m(itemElement.attributes());
+            for (int i = 0; i < m.size(); ++i) {
+                if (m.item(i).nodeName() == "xml:lang") {
+                    identity.setLanguage(m.item(i).nodeValue());
+                    break;
+                }
+            }
+
             m_identities.append(identity);
         }
         else if (itemElement.tagName() == "item")

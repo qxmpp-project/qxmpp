@@ -50,7 +50,8 @@ private slots:
     void testBindNoResource();
     void testBindResource();
     void testBindResult();
-    void testDiscoveryIq();
+    void testDiscovery();
+    void testDiscoveryWithForm();
     void testMessage();
     void testMessageFull();
     void testMessageAttention();
