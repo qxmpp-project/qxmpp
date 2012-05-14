@@ -27,6 +27,7 @@
 
 #include "QXmppMessage.h"
 #include "QXmppRosterManager.h"
+#include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
 #include <QFile>
