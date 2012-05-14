@@ -30,25 +30,39 @@
 #include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"
 
-QXmppVersionManager::QXmppVersionManager() : QXmppClientExtension(),
-    m_clientName(qApp->applicationName()),
-    m_clientVersion(qApp->applicationVersion())
+class QXmppVersionManagerPrivate
 {
-    if(m_clientName.isEmpty())
-        m_clientName = "Based on QXmpp";
+public:
+    QString clientName;
+    QString clientVersion;
+    QString clientOs;
+};
+
+QXmppVersionManager::QXmppVersionManager()
+    : d(new QXmppVersionManagerPrivate)
+{
+    d->clientName = qApp->applicationName();
+    if (d->clientName.isEmpty())
+        d->clientName = "Based on QXmpp";
 
 #if defined(Q_OS_LINUX)
-    m_clientOs = QString::fromLatin1("Linux");
+    d->clientOs = QString::fromLatin1("Linux");
 #elif defined(Q_OS_MAC)
-    m_clientOs = QString::fromLatin1("Mac OS");
+    d->clientOs = QString::fromLatin1("Mac OS");
 #elif defined(Q_OS_SYMBIAN)
-    m_clientOs = QString::fromLatin1("Symbian");
+    d->clientOs = QString::fromLatin1("Symbian");
 #elif defined(Q_OS_WIN)
-    m_clientOs = QString::fromLatin1("Windows");
+    d->clientOs = QString::fromLatin1("Windows");
 #endif
 
-    if(m_clientVersion.isEmpty())
-        m_clientVersion = QXmppVersion();
+    d->clientVersion = qApp->applicationVersion();
+    if (d->clientVersion.isEmpty())
+        d->clientVersion = QXmppVersion();
+}
+
+QXmppVersionManager::~QXmppVersionManager()
+{
+    delete d;
 }
 
 QStringList QXmppVersionManager::discoveryFeatures() const
@@ -107,7 +121,7 @@ QString QXmppVersionManager::requestVersion(const QString& jid)
 
 void QXmppVersionManager::setClientName(const QString& name)
 {
-    m_clientName = name;
+    d->clientName = name;
 }
 
 /// Sets the local XMPP client's version.
@@ -116,7 +130,7 @@ void QXmppVersionManager::setClientName(const QString& name)
 
 void QXmppVersionManager::setClientVersion(const QString& version)
 {
-    m_clientVersion = version;
+    d->clientVersion = version;
 }
 
 /// Sets the local XMPP client's operating system.
@@ -125,7 +139,7 @@ void QXmppVersionManager::setClientVersion(const QString& version)
 
 void QXmppVersionManager::setClientOs(const QString& os)
 {
-    m_clientOs = os;
+    d->clientOs = os;
 }
 
 /// Returns the local XMPP client's name.
@@ -135,7 +149,7 @@ void QXmppVersionManager::setClientOs(const QString& os)
 
 QString QXmppVersionManager::clientName() const
 {
-    return m_clientName;
+    return d->clientName;
 }
 
 /// Returns the local XMPP client's version.
@@ -145,7 +159,7 @@ QString QXmppVersionManager::clientName() const
 
 QString QXmppVersionManager::clientVersion() const
 {
-    return m_clientVersion;
+    return d->clientVersion;
 }
 
 /// Returns the local XMPP client's operating system.
@@ -155,5 +169,5 @@ QString QXmppVersionManager::clientVersion() const
 
 QString QXmppVersionManager::clientOs() const
 {
-    return m_clientOs;
+    return d->clientOs;
 }

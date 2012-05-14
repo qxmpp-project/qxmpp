@@ -27,6 +27,7 @@
 #include "QXmppClientExtension.h"
 
 class QXmppVersionIq;
+class QXmppVersionManagerPrivate;
 
 /// \brief The QXmppVersionManager class makes it possible to request for
 /// the software version of an entity as defined by XEP-0092: Software Version.
@@ -39,6 +40,8 @@ class QXMPP_EXPORT QXmppVersionManager : public QXmppClientExtension
 
 public:
     QXmppVersionManager();
+    ~QXmppVersionManager();
+
     QString requestVersion(const QString& jid);
 
     void setClientName(const QString&);
@@ -59,9 +62,7 @@ signals:
     void versionReceived(const QXmppVersionIq&);
 
 private:
-    QString m_clientName;
-    QString m_clientVersion;
-    QString m_clientOs;
+    QXmppVersionManagerPrivate *d;
 };
 
 #endif // QXMPPVERSIONMANAGER_H
