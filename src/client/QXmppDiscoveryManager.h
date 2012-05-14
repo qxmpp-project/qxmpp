@@ -27,6 +27,7 @@
 #include "QXmppClientExtension.h"
 
 class QXmppDiscoveryIq;
+class QXmppDiscoveryManagerPrivate;
 
 /// \brief The QXmppDiscoveryManager class makes it possible to discover information
 /// about other entities as defined by XEP-0030: Service Discovery.
@@ -39,6 +40,7 @@ class QXMPP_EXPORT QXmppDiscoveryManager : public QXmppClientExtension
 
 public:
     QXmppDiscoveryManager();
+    ~QXmppDiscoveryManager();
 
     QString requestInfo(const QString& jid, const QString& node = "");
     QString requestItems(const QString& jid, const QString& node = "");
@@ -70,10 +72,7 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
-    QString m_clientCapabilitiesNode;
-    QString m_clientCategory;
-    QString m_clientType;
-    QString m_clientName;
+    QXmppDiscoveryManagerPrivate *d;
 };
 
 #endif // QXMPPDISCOVERYMANAGER_H

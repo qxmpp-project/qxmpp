@@ -32,16 +32,30 @@
 #include "QXmppStream.h"
 #include "QXmppGlobal.h"
 
-QXmppDiscoveryManager::QXmppDiscoveryManager() : QXmppClientExtension(),
-    m_clientCapabilitiesNode("http://code.google.com/p/qxmpp"),
-    m_clientCategory("client"),
-    m_clientType("pc"),
-    m_clientName(QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion()))
+class QXmppDiscoveryManagerPrivate
 {
-    if(qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
-    {
-        m_clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
-    }
+public:
+    QString clientCapabilitiesNode;
+    QString clientCategory;
+    QString clientType;
+    QString clientName;
+};
+
+QXmppDiscoveryManager::QXmppDiscoveryManager()
+    : d(new QXmppDiscoveryManagerPrivate)
+{
+    d->clientCapabilitiesNode = "http://code.google.com/p/qxmpp";
+    d->clientCategory = "client";
+    d->clientType = "pc";
+    if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
+        d->clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
+    else
+        d->clientName = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
+}
+
+QXmppDiscoveryManager::~QXmppDiscoveryManager()
+{
+    delete d;
 }
 
 bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
@@ -53,7 +67,7 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
 
         if(receivedIq.type() == QXmppIq::Get &&
            receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(m_clientCapabilitiesNode)))
+           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(d->clientCapabilitiesNode)))
         {
             // respond to query
             QXmppDiscoveryIq qxmppFeatures = capabilities();
@@ -162,7 +176,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 
 void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString &node)
 {
-    m_clientCapabilitiesNode = node;
+    d->clientCapabilitiesNode = node;
 }
 
 /// Sets the category of the local XMPP client.
@@ -174,7 +188,7 @@ void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString &node)
 
 void QXmppDiscoveryManager::setClientCategory(const QString& category)
 {
-    m_clientCategory = category;
+    d->clientCategory = category;
 }
 
 /// Sets the type of the local XMPP client.
@@ -186,7 +200,7 @@ void QXmppDiscoveryManager::setClientCategory(const QString& category)
 
 void QXmppDiscoveryManager::setClientType(const QString& type)
 {
-    m_clientType = type;
+    d->clientType = type;
 }
 
 /// Sets the name of the local XMPP client.
@@ -195,7 +209,7 @@ void QXmppDiscoveryManager::setClientType(const QString& type)
 
 void QXmppDiscoveryManager::setClientName(const QString& name)
 {
-    m_clientName = name;
+    d->clientName = name;
 }
 
 /// Returns the capabilities node of the local XMPP client.
@@ -204,7 +218,7 @@ void QXmppDiscoveryManager::setClientName(const QString& name)
 
 QString QXmppDiscoveryManager::clientCapabilitiesNode() const
 {
-    return m_clientCapabilitiesNode;
+    return d->clientCapabilitiesNode;
 }
 
 /// Returns the category of the local XMPP client.
@@ -213,7 +227,7 @@ QString QXmppDiscoveryManager::clientCapabilitiesNode() const
 
 QString QXmppDiscoveryManager::clientCategory() const
 {
-    return m_clientCategory;
+    return d->clientCategory;
 }
 
 /// Returns the type of the local XMPP client.
@@ -222,7 +236,7 @@ QString QXmppDiscoveryManager::clientCategory() const
 
 QString QXmppDiscoveryManager::clientType() const
 {
-    return m_clientType;
+    return d->clientType;
 }
 
 /// Returns the name of the local XMPP client.
@@ -231,5 +245,5 @@ QString QXmppDiscoveryManager::clientType() const
 
 QString QXmppDiscoveryManager::clientName() const
 {
-    return m_clientName;
+    return d->clientName;
 }
