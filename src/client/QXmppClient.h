@@ -234,9 +234,11 @@ public slots:
 
 private slots:
     void _q_elementReceived(const QDomElement &element, bool &handled);
+    void _q_reconnect();
     void _q_socketStateChanged(QAbstractSocket::SocketState state);
     void _q_streamConnected();
     void _q_streamDisconnected();
+    void _q_streamError(QXmppClient::Error error);
 
 private:
     QXmppClientPrivate * const d;

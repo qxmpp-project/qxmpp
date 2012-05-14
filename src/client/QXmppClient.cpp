@@ -22,6 +22,7 @@
  */
 
 #include <QSslSocket>
+#include <QTimer>
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
@@ -31,7 +32,6 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "QXmppReconnectionManager.h"
 #include "QXmppRosterManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
@@ -49,26 +49,34 @@ public:
     QXmppLogger *logger;
     QXmppOutgoingClient *stream;                    ///< Pointer to the XMPP stream
 
-    QXmppReconnectionManager *reconnectionManager;  ///< Pointer to the reconnection manager
-    QXmppRosterManager *rosterManager;              ///< Pointer to the roster manager
-    QXmppVCardManager *vCardManager;                ///< Pointer to the vCard manager
-    QXmppVersionManager *versionManager;            ///< Pointer to the version manager
+    // reconnection
+    bool receivedConflict;
+    int reconnectionTries;
+    QTimer *reconnectionTimer;
+
+    // managers
+    QXmppRosterManager *rosterManager;
+    QXmppVCardManager *vCardManager;
+    QXmppVersionManager *versionManager;
 
     void addProperCapability(QXmppPresence& presence);
+    int getNextReconnectTime() const;
 
 private:
     QXmppClient *q;
 };
 
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
-    : clientPresence(QXmppPresence::Available),
-    logger(0),
-    stream(0),
-    reconnectionManager(0),
-    rosterManager(0),
-    vCardManager(0),
-    versionManager(0),
-    q(qq)
+    : clientPresence(QXmppPresence::Available)
+    , logger(0)
+    , stream(0)
+    , receivedConflict(false)
+    , reconnectionTries(0)
+    , reconnectionTimer(0)
+    , rosterManager(0)
+    , vCardManager(0)
+    , versionManager(0)
+    , q(qq)
 {
 }
 
@@ -80,6 +88,18 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
         presence.setCapabilityNode(ext->clientCapabilitiesNode());
         presence.setCapabilityVer(ext->capabilities().verificationString());
     }
+}
+
+int QXmppClientPrivate::getNextReconnectTime() const
+{
+    if (reconnectionTries < 5)
+        return 10;
+    else if (reconnectionTries < 10)
+        return 20;
+    else if (reconnectionTries < 15)
+        return 40;
+    else
+        return 60;
 }
 
 /// \mainpage
@@ -166,10 +186,14 @@ QXmppClient::QXmppClient(QObject *parent)
     Q_ASSERT(check);
 
     check = connect(d->stream, SIGNAL(error(QXmppClient::Error)),
-                    this, SIGNAL(error(QXmppClient::Error)));
+                    this, SLOT(_q_streamError(QXmppClient::Error)));
     Q_ASSERT(check);
 
-    check = setReconnectionManager(new QXmppReconnectionManager(this));
+    // reconnection
+    d->reconnectionTimer = new QTimer(this);
+    d->reconnectionTimer->setSingleShot(true);
+    connect(d->reconnectionTimer, SIGNAL(timeout()),
+            this, SLOT(_q_reconnect()));
     Q_ASSERT(check);
 
     // logging
@@ -273,12 +297,6 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
                                   const QXmppPresence& initialPresence)
 {
     d->stream->configuration() = config;
-    if(!config.autoReconnectionEnabled())
-    {
-        delete d->reconnectionManager;
-        d->reconnectionManager = 0;
-    }
-
     d->clientPresence = initialPresence;
     d->addProperCapability(d->clientPresence);
 
@@ -439,32 +457,13 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
 QXmppReconnectionManager* QXmppClient::reconnectionManager()
 {
-    return d->reconnectionManager;
+    return 0;
 }
 
 bool QXmppClient::setReconnectionManager(QXmppReconnectionManager* reconnectionManager)
 {
-    if(!reconnectionManager)
-        return false;
-
-    if(d->reconnectionManager)
-        delete d->reconnectionManager;
-
-    d->reconnectionManager = reconnectionManager;
-
-    bool check = connect(this, SIGNAL(connected()), d->reconnectionManager,
-                         SLOT(connected()));
-    Q_ASSERT(check);
-    if(!check)
-        return false;
-
-    check = connect(this, SIGNAL(error(QXmppClient::Error)),
-                    d->reconnectionManager, SLOT(error(QXmppClient::Error)));
-    Q_ASSERT(check);
-    if(!check)
-        return false;
-
-    return true;
+    Q_UNUSED(reconnectionManager);
+    return false;
 }
 
 /// Returns the socket error if error() is QXmppClient::SocketError.
@@ -518,6 +517,14 @@ void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
     }
 }
 
+void QXmppClient::_q_reconnect()
+{
+    if (d->stream->configuration().autoReconnectionEnabled()) {
+        debug("Reconnecting to server");
+        d->stream->connectToHost();
+    }
+}
+
 void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     Q_UNUSED(socketState);
@@ -528,6 +535,9 @@ void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState
 
 void QXmppClient::_q_streamConnected()
 {
+    d->receivedConflict = false;
+    d->reconnectionTries = 0;
+
     // notify managers
     emit connected();
     emit stateChanged(QXmppClient::ConnectedState);
@@ -541,6 +551,26 @@ void QXmppClient::_q_streamDisconnected()
     // notify managers
     emit disconnected();
     emit stateChanged(QXmppClient::DisconnectedState);
+}
+
+void QXmppClient::_q_streamError(QXmppClient::Error err)
+{
+    if (d->stream->configuration().autoReconnectionEnabled()) {
+        if (err == QXmppClient::XmppStreamError) {
+            // if we receive a resource conflict, inhibit reconnection
+            if (d->stream->xmppStreamError() == QXmppStanza::Error::Conflict)
+                d->receivedConflict = true;
+        } else if (err == QXmppClient::SocketError && !d->receivedConflict) {
+            // schedule reconnect
+            d->reconnectionTimer->start(d->getNextReconnectTime());
+        } else if (err == QXmppClient::KeepAliveError) {
+            // if we got a keepalive error, reconnect in one second
+            d->reconnectionTimer->start(1000);
+        }
+    }
+
+    // notify managers
+    emit error(err);
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.
