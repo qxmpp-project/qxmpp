@@ -25,6 +25,7 @@
 #define QXMPPDATAFORM_H
 
 #include <QPair>
+#include <QSharedDataPointer>
 #include <QString>
 #include <QVariant>
 #include <QXmlStreamWriter>
@@ -32,6 +33,8 @@
 #include "QXmppGlobal.h"
 
 class QDomElement;
+class QXmppDataFormPrivate;
+class QXmppDataFormFieldPrivate;
 
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// XEP-0004: Data Forms.
@@ -63,6 +66,10 @@ public:
         };
 
         Field(QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField);
+        Field(const QXmppDataForm::Field &other);
+        ~Field();
+
+        QXmppDataForm::Field& operator=(const QXmppDataForm::Field &other);
 
         QString description() const;
         void setDescription(const QString &description);
@@ -86,13 +93,7 @@ public:
         void setValue(const QVariant &value);
 
     private:
-        QString m_description;
-        QString m_key;
-        QString m_label;
-        QList<QPair<QString, QString> > m_options;
-        bool m_required;
-        QXmppDataForm::Field::Type m_type;
-        QVariant m_value;
+        QSharedDataPointer<QXmppDataFormFieldPrivate> d;
     };
 
     /// This enum is used to describe a form's type.
@@ -111,6 +112,10 @@ public:
     };
 
     QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
+    QXmppDataForm(const QXmppDataForm &other);
+    ~QXmppDataForm();
+
+    QXmppDataForm& operator=(const QXmppDataForm &other);
 
     QString instructions() const;
     void setInstructions(const QString &instructions);
@@ -133,10 +138,7 @@ public:
     /// \endcond
 
 private:
-    QString m_instructions;
-    QList<Field> m_fields;
-    QString m_title;
-    QXmppDataForm::Type m_type;
+    QSharedDataPointer<QXmppDataFormPrivate> d;
 };
 
 #endif

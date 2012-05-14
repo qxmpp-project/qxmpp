@@ -48,21 +48,60 @@ static field_type field_types[] = {
     {static_cast<QXmppDataForm::Field::Type>(-1), NULL},
 };
 
+class QXmppDataFormFieldPrivate : public QSharedData
+{
+public:
+    QXmppDataFormFieldPrivate();
+
+    QString description;
+    QString key;
+    QString label;
+    QList<QPair<QString, QString> > options;
+    bool required;
+    QXmppDataForm::Field::Type type;
+    QVariant value;
+};
+
+QXmppDataFormFieldPrivate::QXmppDataFormFieldPrivate()
+    : required(false)
+    , type(QXmppDataForm::Field::TextSingleField)
+{
+}
+
 /// Constructs a QXmppDataForm::Field of the specified \a type.
-///
-/// \param type
 
 QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type)
-    : m_required(false),
-    m_type(type)
+    : d(new QXmppDataFormFieldPrivate)
 {
+    d->type = type;
+}
+
+/// Constructs a copy of \a other.
+
+QXmppDataForm::Field::Field(const QXmppDataForm::Field &other)
+    : d(other.d)
+{
+}
+
+/// Destroys the form field.
+
+QXmppDataForm::Field::~Field()
+{
+}
+
+/// Assigns \a other to this field.
+
+QXmppDataForm::Field& QXmppDataForm::Field::operator=(const QXmppDataForm::Field &other)
+{
+    d = other.d;
+    return *this;
 }
 
 /// Returns the field's description.
 
 QString QXmppDataForm::Field::description() const
 {
-    return m_description;
+    return d->description;
 }
 
 /// Sets the field's description.
@@ -71,14 +110,14 @@ QString QXmppDataForm::Field::description() const
 
 void QXmppDataForm::Field::setDescription(const QString &description)
 {
-    m_description = description;
+    d->description = description;
 }
 
 /// Returns the field's key.
 
 QString QXmppDataForm::Field::key() const
 {
-    return m_key;
+    return d->key;
 }
 
 /// Sets the field's key.
@@ -87,14 +126,14 @@ QString QXmppDataForm::Field::key() const
 
 void QXmppDataForm::Field::setKey(const QString &key)
 {
-    m_key = key;
+    d->key = key;
 }
 
 /// Returns the field's label.
 
 QString QXmppDataForm::Field::label() const
 {
-    return m_label;
+    return d->label;
 }
 
 /// Sets the field's label.
@@ -103,14 +142,14 @@ QString QXmppDataForm::Field::label() const
 
 void QXmppDataForm::Field::setLabel(const QString &label)
 {
-    m_label = label;
+    d->label = label;
 }
 
 /// Returns the field's options.
 
 QList<QPair<QString, QString> > QXmppDataForm::Field::options() const
 {
-    return m_options;
+    return d->options;
 }
 
 /// Sets the field's options.
@@ -119,14 +158,14 @@ QList<QPair<QString, QString> > QXmppDataForm::Field::options() const
 
 void QXmppDataForm::Field::setOptions(const QList<QPair<QString, QString> > &options)
 {
-    m_options = options;
+    d->options = options;
 }
 
 /// Returns true if the field is required, false otherwise.
 
 bool QXmppDataForm::Field::isRequired() const
 {
-    return m_required;
+    return d->required;
 }
 
 /// Set to true if the field is required, false otherwise.
@@ -135,14 +174,14 @@ bool QXmppDataForm::Field::isRequired() const
 
 void QXmppDataForm::Field::setRequired(bool required)
 {
-    m_required = required;
+    d->required = required;
 }
 
 /// Returns the field's type.
 
 QXmppDataForm::Field::Type QXmppDataForm::Field::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 /// Sets the field's type.
@@ -151,14 +190,14 @@ QXmppDataForm::Field::Type QXmppDataForm::Field::type() const
 
 void QXmppDataForm::Field::setType(QXmppDataForm::Field::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// Returns the field's value.
 
 QVariant QXmppDataForm::Field::value() const
 {
-    return m_value;
+    return d->value;
 }
 
 /// Sets the field's value.
@@ -167,30 +206,66 @@ QVariant QXmppDataForm::Field::value() const
 
 void QXmppDataForm::Field::setValue(const QVariant &value)
 {
-    m_value = value;
+    d->value = value;
+}
+
+class QXmppDataFormPrivate : public QSharedData
+{
+public:
+    QXmppDataFormPrivate();
+
+    QString instructions;
+    QList<QXmppDataForm::Field> fields;
+    QString title;
+    QXmppDataForm::Type type;
+};
+
+QXmppDataFormPrivate::QXmppDataFormPrivate()
+    : type(QXmppDataForm::None)
+{
 }
 
 /// Constructs a QXmppDataForm of the specified \a type.
-///
-/// \param type
 
 QXmppDataForm::QXmppDataForm(QXmppDataForm::Type type)
-    : m_type(type)
+    : d(new QXmppDataFormPrivate)
 {
+    d->type = type;
+}
+
+/// Constructs a copy of \a other.
+
+QXmppDataForm::QXmppDataForm(const QXmppDataForm &other)
+    : d(other.d)
+{
+}
+
+/// Destroys the form.
+
+QXmppDataForm::~QXmppDataForm()
+{
+}
+
+/// Assigns \a other to this form.
+
+QXmppDataForm& QXmppDataForm::operator=(const QXmppDataForm &other)
+{
+    d = other.d;
+    return *this;
 }
 
 /// Returns the form's fields.
 
 QList<QXmppDataForm::Field> QXmppDataForm::fields() const
 {
-    return m_fields;
+    return d->fields;
 }
 
 /// Returns the form's fields by reference.
 
 QList<QXmppDataForm::Field> &QXmppDataForm::fields()
 {
-    return m_fields;
+    return d->fields;
 }
 
 /// Sets the form's fields.
@@ -199,14 +274,14 @@ QList<QXmppDataForm::Field> &QXmppDataForm::fields()
 
 void QXmppDataForm::setFields(const QList<QXmppDataForm::Field> &fields)
 {
-    m_fields = fields;
+    d->fields = fields;
 }
 
 /// Returns the form's instructions.
 
 QString QXmppDataForm::instructions() const
 {
-    return m_instructions;
+    return d->instructions;
 }
 
 /// Sets the form's instructions.
@@ -215,14 +290,14 @@ QString QXmppDataForm::instructions() const
 
 void QXmppDataForm::setInstructions(const QString &instructions)
 {
-    m_instructions = instructions;
+    d->instructions = instructions;
 }
 
 /// Returns the form's title.
 
 QString QXmppDataForm::title() const
 {
-    return m_title;
+    return d->title;
 }
 
 /// Sets the form's title.
@@ -231,14 +306,14 @@ QString QXmppDataForm::title() const
 
 void QXmppDataForm::setTitle(const QString &title)
 {
-    m_title = title;
+    d->title = title;
 }
 
 /// Returns the form's type.
 
 QXmppDataForm::Type QXmppDataForm::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 /// Sets the form's type.
@@ -247,14 +322,14 @@ QXmppDataForm::Type QXmppDataForm::type() const
 
 void QXmppDataForm::setType(QXmppDataForm::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// Returns true if the form has an unknown type.
 
 bool QXmppDataForm::isNull() const
 {
-    return m_type == QXmppDataForm::None;
+    return d->type == QXmppDataForm::None;
 }
 
 void QXmppDataForm::parse(const QDomElement &element)
@@ -265,13 +340,13 @@ void QXmppDataForm::parse(const QDomElement &element)
     /* form type */
     const QString typeStr = element.attribute("type");
     if (typeStr == "form")
-        m_type = QXmppDataForm::Form;
+        d->type = QXmppDataForm::Form;
     else if (typeStr == "submit")
-        m_type = QXmppDataForm::Submit;
+        d->type = QXmppDataForm::Submit;
     else if (typeStr == "cancel")
-        m_type = QXmppDataForm::Cancel;
+        d->type = QXmppDataForm::Cancel;
     else if (typeStr == "result")
-        m_type = QXmppDataForm::Result;
+        d->type = QXmppDataForm::Result;
     else
     {
         qWarning() << "Unknown form type" << typeStr;
@@ -279,8 +354,8 @@ void QXmppDataForm::parse(const QDomElement &element)
     }
 
     /* form properties */
-    m_title = element.firstChildElement("title").text();
-    m_instructions = element.firstChildElement("instructions").text();
+    d->title = element.firstChildElement("title").text();
+    d->instructions = element.firstChildElement("instructions").text();
 
     QDomElement fieldElement = element.firstChildElement("field");
     while (!fieldElement.isNull())
@@ -348,7 +423,7 @@ void QXmppDataForm::parse(const QDomElement &element)
         field.setDescription(fieldElement.firstChildElement("description").text());
         field.setRequired(!fieldElement.firstChildElement("required").isNull());
 
-        m_fields.append(field);
+        d->fields.append(field);
 
         fieldElement = fieldElement.nextSiblingElement("field");
     }
@@ -364,25 +439,24 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
     /* form type */
     QString typeStr;
-    if (m_type == QXmppDataForm::Form)
+    if (d->type == QXmppDataForm::Form)
         typeStr = "form";
-    else if (m_type == QXmppDataForm::Submit)
+    else if (d->type == QXmppDataForm::Submit)
         typeStr = "submit";
-    else if (m_type == QXmppDataForm::Cancel)
+    else if (d->type == QXmppDataForm::Cancel)
         typeStr = "cancel";
-    else if (m_type == QXmppDataForm::Result)
+    else if (d->type == QXmppDataForm::Result)
         typeStr = "result";
-    helperToXmlAddAttribute(writer, "type", typeStr);
+    writer->writeAttribute("type", typeStr);
 
     /* form properties */
-    if (!m_title.isEmpty())
-        helperToXmlAddTextElement(writer, "title", m_title);
-    if (!m_instructions.isEmpty())
-        helperToXmlAddTextElement(writer, "instructions", m_instructions);
+    if (!d->title.isEmpty())
+        writer->writeAttribute("title", d->title);
+    if (!d->instructions.isEmpty())
+        writer->writeAttribute("instructions", d->instructions);
 
 
-    foreach (const QXmppDataForm::Field &field, m_fields)
-    {
+    foreach (const QXmppDataForm::Field &field, d->fields) {
         writer->writeStartElement("field");
 
         /* field type */
@@ -397,7 +471,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
                 break;
             }
         }
-        helperToXmlAddAttribute(writer, "type", typeStr);
+        writer->writeAttribute("type", typeStr);
 
         /* field attributes */
         helperToXmlAddAttribute(writer, "label", field.label());
