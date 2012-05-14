@@ -25,12 +25,25 @@
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
+#include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
-QXmppVCardManager::QXmppVCardManager()
-    : QXmppClientExtension(),
-    m_isClientVCardReceived(false)
+class QXmppVCardManagerPrivate
 {
+public:
+    QXmppVCardIq clientVCard;
+    bool isClientVCardReceived;
+};
+
+QXmppVCardManager::QXmppVCardManager()
+    : d(new QXmppVCardManagerPrivate)
+{
+    d->isClientVCardReceived = false;
+}
+
+QXmppVCardManager::~QXmppVCardManager()
+{
+    delete d;
 }
 
 QStringList QXmppVCardManager::discoveryFeatures() const
@@ -46,10 +59,9 @@ bool QXmppVCardManager::handleStanza(const QDomElement &element)
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);
 
-        if(vCardIq.from().isEmpty())
-        {
-            m_clientVCard = vCardIq;
-            m_isClientVCardReceived = true;
+        if (vCardIq.from().isEmpty()) {
+            d->clientVCard = vCardIq;
+            d->isClientVCardReceived = true;
             emit clientVCardReceived();
         }
 
@@ -81,7 +93,7 @@ QString QXmppVCardManager::requestVCard(const QString& jid)
 ///
 const QXmppVCardIq& QXmppVCardManager::clientVCard() const
 {
-    return m_clientVCard;
+    return d->clientVCard;
 }
 
 /// Sets the vCard of the connected client.
@@ -90,11 +102,11 @@ const QXmppVCardIq& QXmppVCardManager::clientVCard() const
 ///
 void QXmppVCardManager::setClientVCard(const QXmppVCardIq& clientVCard)
 {
-    m_clientVCard = clientVCard;
-    m_clientVCard.setTo("");
-    m_clientVCard.setFrom("");
-    m_clientVCard.setType(QXmppIq::Set);
-    client()->sendPacket(m_clientVCard);
+    d->clientVCard = clientVCard;
+    d->clientVCard.setTo("");
+    d->clientVCard.setFrom("");
+    d->clientVCard.setType(QXmppIq::Set);
+    client()->sendPacket(d->clientVCard);
 }
 
 /// This function requests the server for vCard of the connected user itself.
@@ -112,5 +124,5 @@ QString QXmppVCardManager::requestClientVCard()
 ///
 bool QXmppVCardManager::isClientVCardReceived() const
 {
-    return m_isClientVCardReceived;
+    return d->isClientVCardReceived;
 }

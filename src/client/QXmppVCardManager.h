@@ -25,10 +25,10 @@
 #ifndef QXMPPVCARDMANAGER_H
 #define QXMPPVCARDMANAGER_H
 
-#include <QObject>
-
 #include "QXmppClientExtension.h"
-#include "QXmppVCardIq.h"
+
+class QXmppVCardIq;
+class QXmppVCardManagerPrivate;
 
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
 /// implementation of XEP-0054: vcard-temp.
@@ -59,10 +59,13 @@ class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
 
 public:
     QXmppVCardManager();
+    ~QXmppVCardManager();
+
     QString requestVCard(const QString& bareJid = "");
 
     const QXmppVCardIq& clientVCard() const;
     void setClientVCard(const QXmppVCardIq&);
+
     QString requestClientVCard();
     bool isClientVCardReceived() const;
 
@@ -81,8 +84,7 @@ signals:
     void clientVCardReceived();
 
 private:
-    QXmppVCardIq m_clientVCard;  ///< Stores the vCard of the connected client
-    bool m_isClientVCardReceived;
+    QXmppVCardManagerPrivate *d;
 };
 
 #endif // QXMPPVCARDMANAGER_H
