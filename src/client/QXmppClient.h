@@ -51,12 +51,12 @@ class QXmppVersionManager;
 
 /// \brief The QXmppClient class is the main class for using QXmpp.
 ///
-/// It provides the user all the required functionality to connect to the server
-/// and perform operations afterwards.
+/// It provides the user all the required functionality to connect to the
+/// server and perform operations afterwards.
 ///
-/// This class will provide the handle/reference to QXmppRosterManager (roster management),
-/// QXmppVCardManager (vCard manager), QXmppReconnectionManager (reconnection
-/// mechanism) and QXmppVersionManager (software version information).
+/// This class will provide the handle/reference to QXmppRosterManager
+/// (roster management), QXmppVCardManager (vCard manager), and
+/// QXmppVersionManager (software version information).
 ///
 /// By default, a reconnection mechanism exists, which makes sure of reconnecting
 /// to the server on disconnections due to an error. User can have a custom
@@ -155,8 +155,10 @@ public:
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
 
-    QXmppReconnectionManager* reconnectionManager();
-    bool setReconnectionManager(QXmppReconnectionManager*);
+    /// cond
+    QXmppReconnectionManager* Q_DECL_DEPRECATED reconnectionManager();
+    bool Q_DECL_DEPRECATED setReconnectionManager(QXmppReconnectionManager*);
+    /// \endcond
 
 signals:
 

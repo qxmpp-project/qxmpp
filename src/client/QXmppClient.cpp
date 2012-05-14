@@ -437,25 +437,12 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
         connectToServer(d->stream->configuration(), presence);
 }
 
-/// Function to get reconnection manager. By default there exists a reconnection
-/// manager. See QXmppReconnectionManager for more details of the reconnection
-/// mechanism.
-///
-/// \return Pointer to QXmppReconnectionManager
-///
-
 QXmppReconnectionManager* QXmppClient::reconnectionManager()
 {
     return d->reconnectionManager;
 }
 
-/// Sets the user defined reconnection manager.
-///
-/// \return true if all the signal-slot connections are made correctly.
-///
-
-bool QXmppClient::setReconnectionManager(QXmppReconnectionManager*
-                                         reconnectionManager)
+bool QXmppClient::setReconnectionManager(QXmppReconnectionManager* reconnectionManager)
 {
     if(!reconnectionManager)
         return false;
