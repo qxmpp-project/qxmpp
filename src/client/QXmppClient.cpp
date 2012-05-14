@@ -93,13 +93,13 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
 int QXmppClientPrivate::getNextReconnectTime() const
 {
     if (reconnectionTries < 5)
-        return 10;
+        return 10 * 1000;
     else if (reconnectionTries < 10)
-        return 20;
+        return 20 * 1000;
     else if (reconnectionTries < 15)
-        return 40;
+        return 40 * 1000;
     else
-        return 60;
+        return 60 * 1000;
 }
 
 /// \mainpage
