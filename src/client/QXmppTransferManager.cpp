@@ -53,56 +53,87 @@ static QString streamHash(const QString &sid, const QString &initiatorJid, const
     return hash.result().toHex();
 }
 
+class QXmppTransferFileInfoPrivate : public QSharedData
+{
+public:
+    QXmppTransferFileInfoPrivate();
+
+    QDateTime date;
+    QByteArray hash;
+    QString name;
+    qint64 size;
+};
+
+QXmppTransferFileInfoPrivate::QXmppTransferFileInfoPrivate()
+    : size(0)
+{
+}
+
 QXmppTransferFileInfo::QXmppTransferFileInfo()
-    : m_size(0)
+    : d(new QXmppTransferFileInfoPrivate)
+{
+}
+
+QXmppTransferFileInfo::QXmppTransferFileInfo(const QXmppTransferFileInfo &other)
+    : d(other.d)
+{
+}
+
+QXmppTransferFileInfo::~QXmppTransferFileInfo()
 {
 }
 
 QDateTime QXmppTransferFileInfo::date() const
 {
-    return m_date;
+    return d->date;
 }
 
 void QXmppTransferFileInfo::setDate(const QDateTime &date)
 {
-    m_date = date;
+    d->date = date;
 }
 
 QByteArray QXmppTransferFileInfo::hash() const
 {
-    return m_hash;
+    return d->hash;
 }
 
 void QXmppTransferFileInfo::setHash(const QByteArray &hash)
 {
-    m_hash = hash;
+    d->hash = hash;
 }
 
 QString QXmppTransferFileInfo::name() const
 {
-    return m_name;
+    return d->name;
 }
 
 void QXmppTransferFileInfo::setName(const QString &name)
 {
-    m_name = name;
+    d->name = name;
 }
 
 qint64 QXmppTransferFileInfo::size() const
 {
-    return m_size;
+    return d->size;
 }
 
 void QXmppTransferFileInfo::setSize(qint64 size)
 {
-    m_size = size;
+    d->size = size;
+}
+
+QXmppTransferFileInfo& QXmppTransferFileInfo::operator=(const QXmppTransferFileInfo &other)
+{
+    d = other.d;
+    return *this;
 }
 
 bool QXmppTransferFileInfo::operator==(const QXmppTransferFileInfo &other) const
 {
-    return other.m_size == m_size &&
-        other.m_hash == m_hash &&
-        other.m_name == m_name;
+    return other.d->size == d->size &&
+        other.d->hash == d->hash &&
+        other.d->name == d->name;
 }
 
 class QXmppTransferJobPrivate

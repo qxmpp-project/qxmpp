@@ -25,19 +25,20 @@
 #define QXMPPTRANSFERMANAGER_H
 
 #include <QDateTime>
+#include <QSharedData>
 #include <QUrl>
 #include <QVariant>
 
 #include "QXmppClientExtension.h"
-#include "QXmppIq.h"
-#include "QXmppByteStreamIq.h"
 
 class QTcpSocket;
 class QXmppByteStreamIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;
 class QXmppIbbOpenIq;
+class QXmppIq;
 class QXmppStreamInitiationIq;
+class QXmppTransferFileInfoPrivate;
 class QXmppTransferJobPrivate;
 class QXmppTransferManager;
 class QXmppTransferManagerPrivate;
@@ -46,6 +47,8 @@ class QXMPP_EXPORT QXmppTransferFileInfo
 {
 public:
     QXmppTransferFileInfo();
+    QXmppTransferFileInfo(const QXmppTransferFileInfo &other);
+    ~QXmppTransferFileInfo();
 
     QDateTime date() const;
     void setDate(const QDateTime &date);
@@ -59,13 +62,11 @@ public:
     qint64 size() const;
     void setSize(qint64 size);
 
+    QXmppTransferFileInfo& operator=(const QXmppTransferFileInfo &other);
     bool operator==(const QXmppTransferFileInfo &other) const;
 
 private:
-    QDateTime m_date;
-    QByteArray m_hash;
-    QString m_name;
-    qint64 m_size;
+    QSharedDataPointer<QXmppTransferFileInfoPrivate> d;
 };
 
 /// \brief The QXmppTransferJob class represents a single file transfer job.

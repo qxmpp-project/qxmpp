@@ -24,6 +24,7 @@
 #ifndef QXMPPTRANSFERMANAGER_P_H
 #define QXMPPTRANSFERMANAGER_P_H
 
+#include "QXmppByteStreamIq.h"
 #include "QXmppTransferManager.h"
 
 //
