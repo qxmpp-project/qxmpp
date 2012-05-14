@@ -34,6 +34,7 @@
 #include "QXmppBindIq.h"
 #include "QXmppClient.h"
 #include "QXmppCodec.h"
+#include "QXmppDiscoveryIq.h"
 #include "QXmppJingleIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
@@ -331,6 +332,25 @@ void TestPackets::testBindResult()
     QCOMPARE(bind.jid(), QString("somenode@example.com/someresource"));
     QCOMPARE(bind.resource(), QString());
     serializePacket(bind, xml);
+}
+
+void TestPackets::testDiscoveryIq()
+{
+    const QByteArray xml(
+        "<iq id=\"disco1\" from=\"benvolio@capulet.lit/230193\" type=\"result\">"
+        "<query xmlns=\"http://jabber.org/protocol/disco#info\">"
+        "<identity category=\"client\" name=\"Exodus 0.9.1\" type=\"pc\"/>"
+        "<feature var=\"http://jabber.org/protocol/caps\"/>"
+        "<feature var=\"http://jabber.org/protocol/disco#info\"/>"
+        "<feature var=\"http://jabber.org/protocol/disco#items\"/>"
+        "<feature var=\"http://jabber.org/protocol/muc\"/>"
+        "</query>"
+        "</iq>");
+
+    QXmppDiscoveryIq disco;
+    parsePacket(disco, xml);
+    QCOMPARE(disco.verificationString(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
+    serializePacket(disco, xml);
 }
 
 void TestPackets::testMessage()

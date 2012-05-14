@@ -267,30 +267,29 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
     helperToXmlAddAttribute(writer, "node", m_queryNode);
 
-    foreach (const QString &feature, m_features)
-    {
-        writer->writeStartElement("feature");
-        helperToXmlAddAttribute(writer, "var", feature);
-        writer->writeEndElement();
-    }
+    if (m_queryType == InfoQuery) {
+        foreach (const QXmppDiscoveryIq::Identity& identity, m_identities) {
+            writer->writeStartElement("identity");
+            helperToXmlAddAttribute(writer, "xml:lang", identity.language());
+            helperToXmlAddAttribute(writer, "category", identity.category());
+            helperToXmlAddAttribute(writer, "name", identity.name());
+            helperToXmlAddAttribute(writer, "type", identity.type());
+            writer->writeEndElement();
+        }
 
-    foreach (const QXmppDiscoveryIq::Identity& identity, m_identities)
-    {
-        writer->writeStartElement("identity");
-        helperToXmlAddAttribute(writer, "xml:lang", identity.language());
-        helperToXmlAddAttribute(writer, "category", identity.category());
-        helperToXmlAddAttribute(writer, "name", identity.name());
-        helperToXmlAddAttribute(writer, "type", identity.type());
-        writer->writeEndElement();
-    }
-
-    foreach (const QXmppDiscoveryIq::Item& item, m_items)
-    {
-        writer->writeStartElement("item");
-        helperToXmlAddAttribute(writer, "jid", item.jid());
-        helperToXmlAddAttribute(writer, "name", item.name());
-        helperToXmlAddAttribute(writer, "node", item.node());
-        writer->writeEndElement();
+        foreach (const QString &feature, m_features) {
+            writer->writeStartElement("feature");
+            helperToXmlAddAttribute(writer, "var", feature);
+            writer->writeEndElement();
+        }
+    } else {
+        foreach (const QXmppDiscoveryIq::Item& item, m_items) {
+            writer->writeStartElement("item");
+            helperToXmlAddAttribute(writer, "jid", item.jid());
+            helperToXmlAddAttribute(writer, "name", item.name());
+            helperToXmlAddAttribute(writer, "node", item.node());
+            writer->writeEndElement();
+        }
     }
 
     m_form.toXml(writer);
