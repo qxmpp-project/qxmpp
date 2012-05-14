@@ -58,9 +58,9 @@ class QXmppVersionManager;
 /// (roster management), QXmppVCardManager (vCard manager), and
 /// QXmppVersionManager (software version information).
 ///
-/// By default, a reconnection mechanism exists, which makes sure of reconnecting
-/// to the server on disconnections due to an error. User can have a custom
-/// reconnection mechanism as well.
+/// By default, the client will automatically try reconnecting to the server.
+/// You can change this a behaviour using
+/// QXmppConfiguration::setAutoReconnectionEnabled().
 ///
 /// Not all the managers or extensions have been enabled by default. One can
 /// enable/disable the managers using the funtions addExtension() and
