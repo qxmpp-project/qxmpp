@@ -156,7 +156,7 @@ public:
     QXmppVersionManager& versionManager();
 
     /// cond
-    QXmppReconnectionManager* Q_DECL_DEPRECATED reconnectionManager();
+    QXmppReconnectionManager Q_DECL_DEPRECATED *reconnectionManager();
     bool Q_DECL_DEPRECATED setReconnectionManager(QXmppReconnectionManager*);
     /// \endcond
 
