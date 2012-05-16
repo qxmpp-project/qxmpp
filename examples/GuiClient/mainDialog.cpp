@@ -33,7 +33,6 @@
 #include "QXmppPresence.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
-#include "QXmppReconnectionManager.h"
 #include "QXmppVCardManager.h"
 
 #include <QMovie>
@@ -159,14 +158,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     check = connect(&m_xmppClient, SIGNAL(connected()), SLOT(addAccountToCache()));
     Q_ASSERT(check);
 
-    check = connect(m_xmppClient.reconnectionManager(),
-                    SIGNAL(reconnectingIn(int)),
-                    SLOT(showSignInPageForAutoReconnection(int)));
-    Q_ASSERT(check);
-
-    check = connect(m_xmppClient.reconnectionManager(),
-                    SIGNAL(reconnectingNow()),
-                    SLOT(showSignInPageForAutoReconnectionNow()));
+    check = connect(&m_xmppClient, SIGNAL(disconnected()), SLOT(showSignInPageAfterUserDisconnection()));
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient.vCardManager(),
@@ -381,7 +373,6 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
     if(presenceType == QXmppPresence::Unavailable)
     {
         m_xmppClient.disconnectFromServer();
-        showSignInPageAfterUserDisconnection();
     }
     else if(presenceType == QXmppPresence::Available)
     {
@@ -474,7 +465,6 @@ void mainDialog::cancelSignIn()
         ui->lineEdit_password->setText("");
 
     ui->label_throbber->hide();
-    m_xmppClient.reconnectionManager()->cancelReconnection();
     m_xmppClient.disconnectFromServer();
     showSignInPage();
     showLoginStatus("Sign in cancelled");
@@ -501,30 +491,6 @@ void mainDialog::showSignInPageAfterUserDisconnection()
 
     showLoginStatus("Disconnected");
     showSignInPage();
-}
-
-void mainDialog::showSignInPageForAutoReconnection(int i)
-{
-    ui->label_throbber->hide();
-    ui->pushButton_signIn->setDisabled(true);
-    ui->pushButton_cancel->setDisabled(false);
-    ui->lineEdit_userName->setDisabled(true);
-    ui->lineEdit_password->setDisabled(true);
-    ui->checkBox_rememberPasswd->setDisabled(true);
-    showLoginStatusWithCounter(QString("Reconnecting in %1 sec..."), i);
-    ui->stackedWidget->setCurrentIndex(1);
-}
-
-void mainDialog::showSignInPageForAutoReconnectionNow()
-{
-    ui->label_throbber->show();
-    ui->pushButton_signIn->setDisabled(true);
-    ui->pushButton_cancel->setDisabled(false);
-    ui->lineEdit_userName->setDisabled(true);
-    ui->lineEdit_password->setDisabled(true);
-    ui->checkBox_rememberPasswd->setDisabled(true);
-    showLoginStatusWithProgress(QString("Connecting"));
-    ui->stackedWidget->setCurrentIndex(1);
 }
 
 void mainDialog::showRosterPage()
@@ -634,7 +600,6 @@ void mainDialog::addAccountToCache()
 void mainDialog::action_signOut()
 {
     m_xmppClient.disconnectFromServer();
-    showSignInPageAfterUserDisconnection();
 
     // update widget
     m_statusWidget.setStatusText(

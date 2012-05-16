@@ -74,8 +74,6 @@ private slots:
     void cancelSignIn();
     void showSignInPage();
     void showSignInPageAfterUserDisconnection();
-    void showSignInPageForAutoReconnection(int);
-    void showSignInPageForAutoReconnectionNow();
     void showRosterPage();
     void startConnection();
     void updateStatusWidget();
