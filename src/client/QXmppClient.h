@@ -40,7 +40,6 @@ class QXmppStream;
 
 // managers
 class QXmppDiscoveryIq;
-class QXmppReconnectionManager;
 class QXmppRosterManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
@@ -154,11 +153,6 @@ public:
     QXmppRosterManager& rosterManager();
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
-
-    /// cond
-    QXmppReconnectionManager Q_DECL_DEPRECATED *reconnectionManager();
-    bool Q_DECL_DEPRECATED setReconnectionManager(QXmppReconnectionManager*);
-    /// \endcond
 
 signals:
 

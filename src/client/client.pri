@@ -12,7 +12,6 @@ INSTALL_HEADERS += \
     client/QXmppMessageReceiptManager.h \
     client/QXmppMucManager.h \
     client/QXmppOutgoingClient.h \
-    client/QXmppReconnectionManager.h \
     client/QXmppRemoteMethod.h \
     client/QXmppRosterManager.h \
     client/QXmppRpcManager.h \
@@ -35,7 +34,6 @@ SOURCES += \
     client/QXmppMessageReceiptManager.cpp \
     client/QXmppMucManager.cpp \
     client/QXmppOutgoingClient.cpp \
-    client/QXmppReconnectionManager.cpp \
     client/QXmppRemoteMethod.cpp \
     client/QXmppRosterManager.cpp \
     client/QXmppRpcManager.cpp \

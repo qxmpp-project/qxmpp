@@ -455,17 +455,6 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
         connectToServer(d->stream->configuration(), presence);
 }
 
-QXmppReconnectionManager* QXmppClient::reconnectionManager()
-{
-    return 0;
-}
-
-bool QXmppClient::setReconnectionManager(QXmppReconnectionManager* reconnectionManager)
-{
-    Q_UNUSED(reconnectionManager);
-    return false;
-}
-
 /// Returns the socket error if error() is QXmppClient::SocketError.
 ///
 

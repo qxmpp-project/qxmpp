@@ -6,7 +6,7 @@ QXmpp 0.5.0 (UNRELEASED)
   - Make QXmppTransferManager fully asynchronous.
   - Remove QXmppPacket class.
   - Move utility method to a QXmppUtils class.
-  - Deprecate QXmppReconnectionManager, QXmppClient handles reconnections.
+  - Remove QXmppReconnectionManager, QXmppClient handles reconnections.
 
   - Fix issues:
     * Issue 64: Compile qxmpp as shared library by default
