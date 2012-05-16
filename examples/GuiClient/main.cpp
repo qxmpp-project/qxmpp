@@ -41,5 +41,6 @@ int main(int argc, char *argv[])
 
     mainDialog cw;
     cw.show();
+    cw.raise();
     return a.exec();
 }
