@@ -348,6 +348,9 @@ bool QXmppClient::sendPacket(const QXmppStanza& packet)
 
 void QXmppClient::disconnectFromServer()
 {
+    // cancel reconnection
+    d->reconnectionTimer->stop();
+
     d->clientPresence.setType(QXmppPresence::Unavailable);
     d->clientPresence.status().setType(QXmppPresence::Status::Offline);
     d->clientPresence.status().setStatusText("Logged out");
@@ -441,6 +444,9 @@ void QXmppClient::setClientPresence(const QXmppPresence& presence)
 
     if (presence.type() == QXmppPresence::Unavailable)
     {
+        // cancel reconnection
+        d->reconnectionTimer->stop();
+
         // NOTE: we can't call disconnect() because it alters
         // the client presence
         if (d->stream->isConnected())
