@@ -53,6 +53,8 @@ Path of installations:
     Library:            %QTDIR%\lib
     API Documentation:  %QTDIR%\share\doc\qxmpp\html
 
+To link against the shared version of QXmpp, you need to add -DQXMPP_SHARED
+to your C++ flags.
 
 EXAMPLES
 --------
