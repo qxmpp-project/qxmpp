@@ -63,11 +63,13 @@ protected:
 private slots:
     void onDigestReply();
     void onPasswordReply();
+    void onSocketDisconnected();
     void onTimeout();
 
 private:
     Q_DISABLE_COPY(QXmppIncomingClient)
-    QXmppIncomingClientPrivate* const d;
+    QXmppIncomingClientPrivate* d;
+    friend class QXmppIncomingClientPrivate;
 };
 
 #endif
