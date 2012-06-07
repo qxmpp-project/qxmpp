@@ -44,9 +44,8 @@ public:
     QTimer *idleTimer;
 
     QString domain;
-    QString username;
-    QString resource;
     QString jid;
+    QString resource;
     QXmppPasswordChecker *passwordChecker;
     QXmppSaslDigestMd5 saslDigest;
     int saslDigestStep;
@@ -99,7 +98,7 @@ QXmppIncomingClient::~QXmppIncomingClient()
 bool QXmppIncomingClient::isConnected() const
 {
     return QXmppStream::isConnected() &&
-           !d->username.isEmpty() &&
+           !d->jid.isEmpty() &&
            !d->resource.isEmpty();
 }
 
@@ -168,7 +167,7 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     QXmppStreamFeatures features;
     if (socket() && !socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
         features.setTlsMode(QXmppStreamFeatures::Enabled);
-    if (!d->username.isEmpty())
+    if (!d->jid.isEmpty())
     {
         features.setBindMode(QXmppStreamFeatures::Required);
         features.setSessionMode(QXmppStreamFeatures::Enabled);
@@ -285,9 +284,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // authentication succeeded
                 d->saslDigestStep = 3;
-                d->username = d->saslDigestUsername;
-                d->jid = QString("%1@%2").arg(d->username, d->domain);
-                info(QString("Authentication succeeded for '%1'").arg(d->username));
+                d->jid = QString("%1@%2").arg(d->saslDigestUsername, d->domain);
+                info(QString("Authentication succeeded for '%1'").arg(d->jid));
                 sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
                 handleStart();
             }
@@ -305,7 +303,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 d->resource = bindSet.resource().trimmed();
                 if (d->resource.isEmpty())
                     d->resource = QXmppUtils::generateStanzaHash();
-                d->jid = QString("%1@%2/%3").arg(d->username, d->domain, d->resource);
+                d->jid = QString("%1/%2").arg(QXmppUtils::jidToBareJid(d->jid), d->resource);
 
                 QXmppBindIq bindResult;
                 bindResult.setType(QXmppIq::Result);
@@ -413,21 +411,21 @@ void QXmppIncomingClient::onPasswordReply()
     reply->deleteLater();
 
     const QString username = reply->property("__sasl_username").toString();
+    const QString jid = QString("%1@%2").arg(username, d->domain);
     switch (reply->error()) {
     case QXmppPasswordReply::NoError:
-        d->username = username;
-        d->jid = QString("%1@%2").arg(d->username, d->domain);
-        info(QString("Authentication succeeded for '%1'").arg(username));
+        d->jid = jid;
+        info(QString("Authentication succeeded for '%1'").arg(d->jid));
         sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
         handleStart();
         break;
     case QXmppPasswordReply::AuthorizationError:
-        warning(QString("Authentication failed for '%1'").arg(username));
+        warning(QString("Authentication failed for '%1'").arg(jid));
         sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
         disconnectFromHost();
         break;
     case QXmppPasswordReply::TemporaryError:
-        warning(QString("Temporary authentication failure for '%1'").arg(username));
+        warning(QString("Temporary authentication failure for '%1'").arg(jid));
         sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><temporary-auth-failure/></failure>");
         disconnectFromHost();
         break;
