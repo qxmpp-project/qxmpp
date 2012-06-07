@@ -27,14 +27,14 @@
 
 #include <QString>
 
-#if defined(QXMPP_SHARED)
+#if defined(QXMPP_STATIC)
+#  define QXMPP_EXPORT
+#else
 #  if defined(QXMPP_BUILD)
 #    define QXMPP_EXPORT Q_DECL_EXPORT
 #  else
 #    define QXMPP_EXPORT Q_DECL_IMPORT
 #  endif
-#else
-#  define QXMPP_EXPORT
 #endif
 
 /// This macro expands a numeric value of the form 0xMMNNPP (MM =

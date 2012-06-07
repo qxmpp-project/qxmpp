@@ -26,6 +26,10 @@ You can pass the following arguments to qmake:
   QXMPP_USE_THEORA=1            to enable theora video codec
   QXMPP_USE_VPX=1               to enable vpx video codec
 
+Note: by default QXmpp is built as a shared library. If you decide to build
+a static library instead, you will need to pass -DQXMPP_STATIC when building
+your programs against QXmpp.
+
 Building using Qt Creator:
 
 Open the qxmpp.pro file in Qt Creator and hit "Build All" to build all
