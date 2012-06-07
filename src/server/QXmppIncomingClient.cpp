@@ -68,7 +68,11 @@ QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
 
 QString QXmppIncomingClientPrivate::origin() const
 {
-    return q->socket()->peerAddress().toString() + " " + QString::number(q->socket()->peerPort());
+    QSslSocket *socket = q->socket();
+    if (socket)
+        return socket->peerAddress().toString() + " " + QString::number(socket->peerPort());
+    else
+        return "<unknown>";
 }
 
 /// Constructs a new incoming client stream.
@@ -87,11 +91,13 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(onSocketDisconnected()));
-    Q_ASSERT(check);
+    if (socket) {
+        check = connect(socket, SIGNAL(disconnected()),
+                        this, SLOT(onSocketDisconnected()));
+        Q_ASSERT(check);
 
-    setSocket(socket);
+        setSocket(socket);
+    }
 
     info(QString("Incoming client connection from %1").arg(d->origin()));
 
