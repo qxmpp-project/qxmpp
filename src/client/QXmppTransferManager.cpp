@@ -394,6 +394,7 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
 QXmppTransferIncomingJob::QXmppTransferIncomingJob(const QString& jid, QXmppClient* client, QObject* parent)
     : QXmppTransferJob(jid, IncomingDirection, client, parent)
     , m_candidateClient(0)
+    , m_candidateTimer(0)
 {
 }
 
@@ -439,6 +440,7 @@ void QXmppTransferIncomingJob::connectToNextHost()
 
     // try to connect to stream host
     m_candidateClient = new QXmppSocksClient(m_candidateHost.host(), m_candidateHost.port(), this);
+    m_candidateTimer = new QTimer(this);
 
     check = connect(m_candidateClient, SIGNAL(disconnected()),
                     this, SLOT(_q_candidateDisconnected()));
@@ -448,6 +450,12 @@ void QXmppTransferIncomingJob::connectToNextHost()
                     this, SLOT(_q_candidateReady()));
     Q_ASSERT(check);
 
+    check = connect(m_candidateTimer, SIGNAL(timeout()),
+                    this, SLOT(_q_candidateDisconnected()));
+    Q_ASSERT(check);
+
+    m_candidateTimer->setSingleShot(true);
+    m_candidateTimer->start(socksTimeout);
     m_candidateClient->connectToHost(hostName, 0);
 }
 
@@ -483,9 +491,16 @@ void QXmppTransferIncomingJob::_q_candidateReady()
     if (!m_candidateClient)
         return;
 
+    info(QString("Connected to streamhost: %1 (%2:%3)").arg(
+            m_candidateHost.jid(),
+            m_candidateHost.host().toString(),
+            QString::number(m_candidateHost.port())));
+
     setState(QXmppTransferJob::TransferState);
     d->socksSocket = m_candidateClient;
     m_candidateClient = 0;
+    m_candidateTimer->deleteLater();
+    m_candidateTimer = 0;
 
     check = connect(d->socksSocket, SIGNAL(readyRead()),
                     this, SLOT(_q_receiveData()));
@@ -516,6 +531,8 @@ void QXmppTransferIncomingJob::_q_candidateDisconnected()
 
     m_candidateClient->deleteLater();
     m_candidateClient = 0;
+    m_candidateTimer->deleteLater();
+    m_candidateTimer = 0;
 
     // try next host
     connectToNextHost();

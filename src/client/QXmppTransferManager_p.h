@@ -38,6 +38,7 @@
 // We mean it.
 //
 
+class QTimer;
 class QXmppSocksClient;
 
 class QXmppTransferIncomingJob : public QXmppTransferJob
@@ -61,6 +62,7 @@ private:
 
     QXmppByteStreamIq::StreamHost m_candidateHost;
     QXmppSocksClient *m_candidateClient;
+    QTimer *m_candidateTimer;
     QList<QXmppByteStreamIq::StreamHost> m_streamCandidates;
     QString m_streamOfferId;
     QString m_streamOfferFrom;
