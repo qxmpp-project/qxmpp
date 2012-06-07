@@ -38,7 +38,6 @@ class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
 public:
     QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent=0);
     void connectToHost(const QString &hostName, quint16 hostPort);
-    bool waitForReady(int msecs = 30000);
 
 signals:
     void ready();
