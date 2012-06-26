@@ -1442,8 +1442,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
             foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
             {
                 if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
-                    entry.netmask().isNull() ||
-                    entry.netmask() == QHostAddress::Broadcast)
+                    entry.netmask().isNull())
                     continue;
 
                 QXmppByteStreamIq::StreamHost streamHost;
