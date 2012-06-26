@@ -41,6 +41,7 @@
 class QXmppIncomingClientPrivate
 {
 public:
+    QXmppIncomingClientPrivate(QXmppIncomingClient *qq);
     QTimer *idleTimer;
 
     QString domain;
@@ -50,7 +51,29 @@ public:
     QXmppSaslDigestMd5 saslDigest;
     int saslDigestStep;
     QString saslDigestUsername;
+
+    QString origin() const;
+
+private:
+    QXmppIncomingClient *q;
 };
+
+QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
+    : idleTimer(0)
+    , passwordChecker(0)
+    , saslDigestStep(0)
+    , q(qq)
+{
+}
+
+QString QXmppIncomingClientPrivate::origin() const
+{
+    QSslSocket *socket = q->socket();
+    if (socket)
+        return socket->peerAddress().toString() + " " + QString::number(socket->peerPort());
+    else
+        return "<unknown>";
+}
 
 /// Constructs a new incoming client stream.
 ///
@@ -60,27 +83,30 @@ public:
 ///
 
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent),
-    d(new QXmppIncomingClientPrivate)
+    : QXmppStream(parent)
 {
-    d->passwordChecker = 0;
+    bool check;
+    Q_UNUSED(check);
+
+    d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
-    d->saslDigestStep = 0;
 
     if (socket) {
-        info(QString("Incoming client connection from %1 %2").arg(
-            socket->peerAddress().toString(),
-            QString::number(socket->peerPort())));
+        check = connect(socket, SIGNAL(disconnected()),
+                        this, SLOT(onSocketDisconnected()));
+        Q_ASSERT(check);
+
         setSocket(socket);
     }
+
+    info(QString("Incoming client connection from %1").arg(d->origin()));
 
     // create inactivity timer
     d->idleTimer = new QTimer(this);
     d->idleTimer->setSingleShot(true);
-    bool check = connect(d->idleTimer, SIGNAL(timeout()),
+    check = connect(d->idleTimer, SIGNAL(timeout()),
                     this, SLOT(onTimeout()));
     Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 /// Destroys the current stream.
@@ -285,7 +311,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 // authentication succeeded
                 d->saslDigestStep = 3;
                 d->jid = QString("%1@%2").arg(d->saslDigestUsername, d->domain);
-                info(QString("Authentication succeeded for '%1'").arg(d->jid));
+                info(QString("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
                 sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
                 handleStart();
             }
@@ -415,26 +441,31 @@ void QXmppIncomingClient::onPasswordReply()
     switch (reply->error()) {
     case QXmppPasswordReply::NoError:
         d->jid = jid;
-        info(QString("Authentication succeeded for '%1'").arg(d->jid));
+        info(QString("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
         sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
         handleStart();
         break;
     case QXmppPasswordReply::AuthorizationError:
-        warning(QString("Authentication failed for '%1'").arg(jid));
+        warning(QString("Authentication failed for '%1' from %2").arg(jid, d->origin()));
         sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><not-authorized/></failure>");
         disconnectFromHost();
         break;
     case QXmppPasswordReply::TemporaryError:
-        warning(QString("Temporary authentication failure for '%1'").arg(jid));
+        warning(QString("Temporary authentication failure for '%1' from %2").arg(jid, d->origin()));
         sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><temporary-auth-failure/></failure>");
         disconnectFromHost();
         break;
     }
 }
 
+void QXmppIncomingClient::onSocketDisconnected()
+{
+    info(QString("Socket disconnected for '%1' from %2").arg(d->jid, d->origin()));
+}
+
 void QXmppIncomingClient::onTimeout()
 {
-    warning(QString("Idle timeout for '%1'").arg(d->jid));
+    warning(QString("Idle timeout for '%1' from %2").arg(d->jid, d->origin()));
     disconnectFromHost();
 
     // make sure disconnected() gets emitted no matter what

@@ -60,10 +60,12 @@ protected:
 
 private slots:
     void slotDialbackResponseReceived(const QXmppDialback &dialback);
+    void slotSocketDisconnected();
 
 private:
     Q_DISABLE_COPY(QXmppIncomingServer)
-    QXmppIncomingServerPrivate* const d;
+    QXmppIncomingServerPrivate* d;
+    friend class QXmppIncomingServerPrivate;
 };
 
 #endif

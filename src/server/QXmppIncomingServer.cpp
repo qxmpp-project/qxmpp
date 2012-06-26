@@ -36,10 +36,30 @@
 class QXmppIncomingServerPrivate
 {
 public:
+    QXmppIncomingServerPrivate(QXmppIncomingServer *qq);
+    QString origin() const;
+
     QSet<QString> authenticated;
     QString domain;
     QString localStreamId;
+
+private:
+    QXmppIncomingServer *q;
 };
+
+QXmppIncomingServerPrivate::QXmppIncomingServerPrivate(QXmppIncomingServer *qq)
+    : q(qq)
+{
+}
+
+QString QXmppIncomingServerPrivate::origin() const
+{
+    QSslSocket *socket = q->socket();
+    if (socket)
+        return socket->peerAddress().toString() + " " + QString::number(socket->peerPort());
+    else
+        return "<unknown>";
+}
 
 /// Constructs a new incoming server stream.
 ///
@@ -49,17 +69,22 @@ public:
 ///
 
 QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent),
-    d(new QXmppIncomingServerPrivate)
+    : QXmppStream(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
+    d = new QXmppIncomingServerPrivate(this);
     d->domain = domain;
 
     if (socket) {
-        info(QString("Incoming server connection from %1 %2").arg(
-            socket->peerAddress().toString(),
-            QString::number(socket->peerPort())));
+        check = connect(socket, SIGNAL(disconnected()),
+                        this, SLOT(slotSocketDisconnected()));
+        Q_ASSERT(check);
+
         setSocket(socket);
     }
+    info(QString("Incoming server connection from %1").arg(d->origin()));
 }
 
 /// Destroys the current stream.
@@ -81,7 +106,7 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 {
     const QString from = streamElement.attribute("from");
     if (!from.isEmpty())
-        info(QString("Incoming server stream from %1").arg(from));
+        info(QString("Incoming server stream from %1 on %2").arg(from, d->origin()));
 
     // start stream
     d->localStreamId = QXmppUtils::generateStanzaHash().toAscii();
@@ -122,14 +147,14 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             request.to() != d->domain ||
             request.key().isEmpty())
         {
-            warning("Invalid dialback received");
+            warning(QString("Invalid dialback received on %1").arg(d->origin()));
             return;
         }
 
         const QString domain = request.from();
         if (request.command() == QXmppDialback::Result)
         {
-            debug(QString("Received a dialback result from %1").arg(domain));
+            debug(QString("Received a dialback result from '%1' on %2").arg(domain, d->origin()));
 
             // establish dialback connection
             QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
@@ -142,7 +167,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         }
         else if (request.command() == QXmppDialback::Verify)
         {
-            debug(QString("Received a dialback verify from %1").arg(domain));
+            debug(QString("Received a dialback verify from '%1' on %2").arg(domain, d->origin()));
             emit dialbackRequestReceived(request);
         }
 
@@ -152,7 +177,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         // relay stanza if the remote party is authenticated
         emit elementReceived(stanza);
     } else {
-        warning(QString("Received an element from unverified domain %1").arg(QXmppUtils::jidToDomain(stanza.attribute("from"))));
+        warning(QString("Received an element from unverified domain '%1' on %2").arg(QXmppUtils::jidToDomain(stanza.attribute("from")), d->origin()));
         disconnectFromHost();
     }
 }
@@ -191,13 +216,13 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     // check for success
     if (response.type() == QLatin1String("valid"))
     {
-        info(QString("Verified incoming domain %1").arg(dialback.from()));
+        info(QString("Verified incoming domain '%1' on %2").arg(dialback.from(), d->origin()));
         const bool wasConnected = !d->authenticated.isEmpty();
         d->authenticated.insert(dialback.from());
         if (!wasConnected)
             emit connected();
     } else {
-        warning(QString("Failed to verify incoming domain %1").arg(dialback.from()));
+        warning(QString("Failed to verify incoming domain '%1' on %2").arg(dialback.from(), d->origin()));
         disconnectFromHost();
     }
 
@@ -206,3 +231,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     stream->deleteLater();
 }
 
+void QXmppIncomingServer::slotSocketDisconnected()
+{
+    info(QString("Socket disconnected from %1").arg(d->origin()));
+}

@@ -197,7 +197,7 @@ void QXmppStream::_q_socketConnected()
 
 void QXmppStream::_q_socketDisconnected()
 {
-    info("Socket disconnected");
+    debug("Socket disconnected");
 }
 
 void QXmppStream::_q_socketEncrypted()
