@@ -224,6 +224,7 @@ void TestPackets::testArchiveChat()
         ">"
         "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
         "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
+        "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
         "</chat>"
         "</iq>");
 
@@ -232,13 +233,16 @@ void TestPackets::testArchiveChat()
     QCOMPARE(iq.type(), QXmppIq::Result);
     QCOMPARE(iq.id(), QLatin1String("chat_1"));
     QCOMPARE(iq.chat().with(), QLatin1String("juliet@capulet.com"));
-    QCOMPARE(iq.chat().messages().size(), 2);
+    QCOMPARE(iq.chat().messages().size(), 3);
     QCOMPARE(iq.chat().messages()[0].isReceived(), true);
     QCOMPARE(iq.chat().messages()[0].body(), QLatin1String("Art thou not Romeo, and a Montague?"));
     QCOMPARE(iq.chat().messages()[0].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 15), Qt::UTC));
     QCOMPARE(iq.chat().messages()[1].isReceived(), false);
     QCOMPARE(iq.chat().messages()[1].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 26), Qt::UTC));
     QCOMPARE(iq.chat().messages()[1].body(), QLatin1String("Neither, fair saint, if either thee dislike."));
+    QCOMPARE(iq.chat().messages()[2].isReceived(), true);
+    QCOMPARE(iq.chat().messages()[2].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 33), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[2].body(), QLatin1String("How cam'st thou hither, tell me, and wherefore?"));
     serializePacket(iq, xml);
 }
 
