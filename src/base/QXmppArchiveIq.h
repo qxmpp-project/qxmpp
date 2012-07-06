@@ -25,6 +25,7 @@
 #define QXMPPARCHIVEIQ_H
 
 #include "QXmppIq.h"
+#include "QXmppResultSet.h"
 
 #include <QDateTime>
 
@@ -155,11 +156,12 @@ protected:
     /// \endcond
 
 private:
-    int m_max;
     QString m_with;
     QDateTime m_start;
     QDateTime m_end;
     QList<QXmppArchiveChat> m_chats;
+    QXmppResultSetQuery m_rsmQuery;
+    QXmppResultSetReply m_rsmReply;
 };
 
 /// \brief Represents an archive remove IQ as defined by XEP-0136: Message Archiving.
@@ -223,7 +225,7 @@ protected:
     /// \endcond
 
 private:
-    int m_max;
+    QXmppResultSetQuery m_rsm;
     QString m_with;
     QDateTime m_start;
 };

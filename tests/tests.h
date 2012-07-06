@@ -158,3 +158,14 @@ private slots:
     void testResponse();
     void testResponseFault();
 };
+
+class TestRsm : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testQuery_data();
+    void testQuery();
+    void testReply_data();
+    void testReply();
+};

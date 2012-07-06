@@ -27,7 +27,6 @@
 #include "QXmppUtils.h"
 
 static const char *ns_archive = "urn:xmpp:archive";
-static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
 QXmppArchiveMessage::QXmppArchiveMessage()
     : m_received(false)
@@ -248,7 +247,7 @@ void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 /// Constructs a QXmppArchiveListIq.
 
 QXmppArchiveListIq::QXmppArchiveListIq()
-    : QXmppIq(QXmppIq::Get), m_max(0)
+    : QXmppIq(QXmppIq::Get)
 {
 }
 
@@ -271,7 +270,7 @@ void QXmppArchiveListIq::setChats(const QList<QXmppArchiveChat> &chats)
 
 int QXmppArchiveListIq::max() const
 {
-    return m_max;
+    return m_rsmQuery.max();
 }
 
 /// Sets the maximum number of results.
@@ -280,7 +279,7 @@ int QXmppArchiveListIq::max() const
 
 void QXmppArchiveListIq::setMax(int max)
 {
-    m_max = max;
+    m_rsmQuery.setMax(max);
 }
 
 /// Returns the JID which archived conversations must match.
@@ -347,9 +346,8 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
     m_start = QXmppUtils::datetimeFromString(listElement.attribute("start"));
     m_end = QXmppUtils::datetimeFromString(listElement.attribute("end"));
 
-    QDomElement setElement = listElement.firstChildElement("set");
-    if (setElement.namespaceURI() == ns_rsm)
-        m_max = setElement.firstChildElement("max").text().toInt();
+    m_rsmQuery.parse(listElement);
+    m_rsmReply.parse(listElement);
 
     QDomElement child = listElement.firstChildElement();
     while (!child.isNull())
@@ -374,13 +372,10 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (m_end.isValid())
         helperToXmlAddAttribute(writer, "end", QXmppUtils::datetimeToString(m_end));
-    if (m_max > 0)
-    {
-        writer->writeStartElement("set");
-        writer->writeAttribute("xmlns", ns_rsm);
-        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
-        writer->writeEndElement();
-    }
+    if (!m_rsmQuery.isNull())
+        m_rsmQuery.toXml(writer);
+    else if (!m_rsmReply.isNull())
+        m_rsmReply.toXml(writer);
     foreach (const QXmppArchiveChat &chat, m_chats)
         chat.toXml(writer);
     writer->writeEndElement();
@@ -484,7 +479,7 @@ void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 }
 
 QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
-    : QXmppIq(QXmppIq::Get), m_max(0)
+    : QXmppIq(QXmppIq::Get)
 {
 }
 
@@ -493,7 +488,7 @@ QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
 
 int QXmppArchiveRetrieveIq::max() const
 {
-    return m_max;
+    return m_rsm.max();
 }
 
 /// Sets the maximum number of results.
@@ -502,7 +497,7 @@ int QXmppArchiveRetrieveIq::max() const
 
 void QXmppArchiveRetrieveIq::setMax(int max)
 {
-    m_max = max;
+    m_rsm.setMax(max);
 }
 
 /// Returns the start date/time for the archived conversations.
@@ -550,9 +545,8 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
     QDomElement retrieveElement = element.firstChildElement("retrieve");
     m_with = retrieveElement.attribute("with");
     m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
-    QDomElement setElement = retrieveElement.firstChildElement("set");
-    if (setElement.namespaceURI() == ns_rsm)
-        m_max = setElement.firstChildElement("max").text().toInt();
+    m_rsm.parse(retrieveElement);
+
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -561,12 +555,6 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
-    if (m_max > 0)
-    {
-        writer->writeStartElement("set");
-        writer->writeAttribute("xmlns", ns_rsm);
-        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
-        writer->writeEndElement();
-    }
+    m_rsm.toXml(writer);
     writer->writeEndElement();
 }

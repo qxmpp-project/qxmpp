@@ -23,6 +23,7 @@ INSTALL_HEADERS += \
     base/QXmppPingIq.h \
     base/QXmppPresence.h \
     base/QXmppPubSubIq.h \
+    base/QXmppResultSet.h \
     base/QXmppRosterIq.h \
     base/QXmppRpcIq.h \
     base/QXmppRtpChannel.h \
@@ -61,6 +62,7 @@ SOURCES += \
     base/QXmppPingIq.cpp \
     base/QXmppPresence.cpp \
     base/QXmppPubSubIq.cpp \
+    base/QXmppResultSet.cpp \
     base/QXmppRosterIq.cpp \
     base/QXmppRpcIq.cpp \
     base/QXmppRtpChannel.cpp \
