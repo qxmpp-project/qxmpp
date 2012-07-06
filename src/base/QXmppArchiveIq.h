@@ -133,9 +133,6 @@ public:
     QList<QXmppArchiveChat> chats() const;
     void setChats(const QList<QXmppArchiveChat> &chats);
 
-    int max() const;
-    void setMax(int max);
-
     QString with() const;
     void setWith( const QString &with );
 
@@ -144,6 +141,11 @@ public:
 
     QDateTime end() const;
     void setEnd(const QDateTime &end );
+
+    QXmppResultSetQuery resultSetQuery() const;
+    void setResultSetQuery(const QXmppResultSetQuery &rsm);
+    QXmppResultSetReply resultSetReply() const;
+    void setResultSetReply(const QXmppResultSetReply &rsm);
 
     /// \cond
     static bool isArchiveListIq(const QDomElement &element);

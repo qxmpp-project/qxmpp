@@ -44,7 +44,7 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
     {
         QXmppArchiveListIq archiveIq;
         archiveIq.parse(element);
-        emit archiveListReceived(archiveIq.chats());
+        emit archiveListReceived(archiveIq.chats(), archiveIq.resultSetReply());
         return true;
     }
     else if(QXmppArchivePrefIq::isArchivePrefIq(element))
@@ -64,17 +64,35 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 /// \param jid Optional JID if you only want conversations with a specific JID.
 /// \param start Optional start time.
 /// \param end Optional end time.
-/// \param max Optional maximum number of collections to list.
+/// \param rsm Result Set Management query
 ///
-void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max)
+void QXmppArchiveManager::listCollections(const QString& jid, const QDateTime& start,
+                                          const QDateTime& end, const QXmppResultSetQuery &rsm)
 {
     QXmppArchiveListIq packet;
-    packet.setMax(max);
+    packet.setResultSetQuery(rsm);
     packet.setWith(jid);
     packet.setStart(start);
     packet.setEnd(end);
     client()->sendPacket(packet);
 }
+
+/// \overload
+/// Retrieves the list of available collections. Once the results are
+/// received, the archiveListReceived() signal will be emitted.
+///
+/// \param jid Optional JID if you only want conversations with a specific JID.
+/// \param start Optional start time.
+/// \param end Optional end time.
+/// \param max Optional maximum number of collections to list.
+///
+void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max)
+{
+    QXmppResultSetQuery rsm;
+    rsm.setMax(max);
+    listCollections(jid, start, end, rsm);
+}
+
 
 /// Removes the specified collection(s).
 ///

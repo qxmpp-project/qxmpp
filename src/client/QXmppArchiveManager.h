@@ -27,6 +27,7 @@
 #include <QDateTime>
 
 #include "QXmppClientExtension.h"
+#include "QXmppResultSet.h"
 
 class QXmppArchiveChat;
 class QXmppArchiveChatIq;
@@ -54,7 +55,9 @@ class QXMPP_EXPORT QXmppArchiveManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(), int max = 0);
+    void listCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(),
+                         const QXmppResultSetQuery &rsm = QXmppResultSetQuery());
+    void listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max);
     void removeCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime());
     void retrieveCollection(const QString &jid, const QDateTime &start, int max = 0);
 
@@ -65,7 +68,7 @@ public:
 signals:
     /// This signal is emitted when archive list is received
     /// after calling listCollections()
-    void archiveListReceived(const QList<QXmppArchiveChat>&);
+    void archiveListReceived(const QList<QXmppArchiveChat>&, const QXmppResultSetReply &rsm = QXmppResultSetReply());
 
     /// This signal is emitted when archive chat is received
     /// after calling retrieveCollection()

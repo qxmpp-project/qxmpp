@@ -265,23 +265,6 @@ void QXmppArchiveListIq::setChats(const QList<QXmppArchiveChat> &chats)
     m_chats = chats;
 }
 
-/// Returns the maximum number of results.
-///
-
-int QXmppArchiveListIq::max() const
-{
-    return m_rsmQuery.max();
-}
-
-/// Sets the maximum number of results.
-///
-/// \param max
-
-void QXmppArchiveListIq::setMax(int max)
-{
-    m_rsmQuery.setMax(max);
-}
-
 /// Returns the JID which archived conversations must match.
 ///
 
@@ -332,6 +315,25 @@ void QXmppArchiveListIq::setEnd(const QDateTime &end)
 {
     m_end = end;
 }
+
+QXmppResultSetQuery QXmppArchiveListIq::resultSetQuery() const
+{
+    return m_rsmQuery;
+}
+void QXmppArchiveListIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
+{
+    m_rsmQuery = rsm;
+}
+
+QXmppResultSetReply QXmppArchiveListIq::resultSetReply() const
+{
+    return m_rsmReply;
+}
+void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply& rsm)
+{
+    m_rsmReply = rsm;
+}
+
 
 bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
 {
