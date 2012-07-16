@@ -10,6 +10,7 @@ QXmpp 0.5.0 (UNRELEASED)
   - Remove QXmppPacket class.
   - Move utility method to a QXmppUtils class.
   - Remove QXmppReconnectionManager, QXmppClient handles reconnections.
+  - Improve QXmppArchiveManager to allow paginated navigation (Olivier Goffart).
 
   - Fix issues:
     * Issue 64: Compile qxmpp as shared library by default
