@@ -93,6 +93,8 @@ void QXmppArchiveChat::parse(const QDomElement &element)
     m_thread = element.attribute("thread");
     m_version = element.attribute("version").toInt();
 
+    QDateTime timeAccu = m_start;
+
     QDomElement child = element.firstChildElement();
     while (!child.isNull())
     {
@@ -100,7 +102,8 @@ void QXmppArchiveChat::parse(const QDomElement &element)
         {
             QXmppArchiveMessage message;
             message.setBody(child.firstChildElement("body").text());
-            message.setDate(m_start.addSecs(child.attribute("secs").toInt()));
+            timeAccu = timeAccu.addSecs(child.attribute("secs").toInt());
+            message.setDate(timeAccu);
             message.setReceived(child.tagName() == "from");
             m_messages << message;
         }
@@ -119,12 +122,16 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "thread", m_thread);
     if (m_version)
         helperToXmlAddAttribute(writer, "version", QString::number(m_version));
+
+    QDateTime prevTime = m_start;
+
     foreach (const QXmppArchiveMessage &message, m_messages)
     {
         writer->writeStartElement(message.isReceived() ? "from" : "to");
-        helperToXmlAddAttribute(writer, "secs", QString::number(m_start.secsTo(message.date())));
+        helperToXmlAddAttribute(writer, "secs", QString::number(prevTime.secsTo(message.date())));
         writer->writeTextElement("body", message.body());
         writer->writeEndElement();
+        prevTime = message.date();
     }
     writer->writeEndElement();
 }
