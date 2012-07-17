@@ -31,7 +31,8 @@
 static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
 QXmppResultSetQuery::QXmppResultSetQuery()
-    : m_index(-1), m_max(-1)
+    : m_index(-1)
+    , m_max(-1)
 {}
 
 int QXmppResultSetQuery::max() const
@@ -110,10 +111,9 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
     writer->writeEndElement();
 }
 
-
-
 QXmppResultSetReply::QXmppResultSetReply()
-    : m_count(-1), m_index(-1)
+    : m_count(-1)
+    , m_index(-1)
 {}
 
 QString QXmppResultSetReply::first() const
@@ -161,7 +161,6 @@ bool QXmppResultSetReply::isNull() const
     return m_count == -1 && m_index == -1 && m_first.isNull() && m_last.isNull();
 }
 
-
 void QXmppResultSetReply::parse(const QDomElement& element)
 {
     QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
@@ -196,8 +195,3 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter* writer) const
         helperToXmlAddTextElement(writer, "count", QString::number(m_count));
     writer->writeEndElement();
 }
-
-
-
-
-

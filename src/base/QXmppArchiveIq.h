@@ -144,6 +144,7 @@ public:
 
     QXmppResultSetQuery resultSetQuery() const;
     void setResultSetQuery(const QXmppResultSetQuery &rsm);
+
     QXmppResultSetReply resultSetReply() const;
     void setResultSetReply(const QXmppResultSetReply &rsm);
 

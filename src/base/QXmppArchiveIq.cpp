@@ -327,6 +327,7 @@ QXmppResultSetQuery QXmppArchiveListIq::resultSetQuery() const
 {
     return m_rsmQuery;
 }
+
 void QXmppArchiveListIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
 {
     m_rsmQuery = rsm;
@@ -336,11 +337,11 @@ QXmppResultSetReply QXmppArchiveListIq::resultSetReply() const
 {
     return m_rsmReply;
 }
+
 void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply& rsm)
 {
     m_rsmReply = rsm;
 }
-
 
 bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
 {
@@ -555,7 +556,6 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
     m_with = retrieveElement.attribute("with");
     m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
     m_rsm.parse(retrieveElement);
-
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
