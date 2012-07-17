@@ -35,10 +35,21 @@ QXmppResultSetQuery::QXmppResultSetQuery()
     , m_max(-1)
 {}
 
+/// Returns the maximum number of results.
+///
+/// \note -1 means no limit, 0 means no results are wanted.
+///
+
 int QXmppResultSetQuery::max() const
 {
     return m_max;
 }
+
+/// Sets the maximum number of results.
+///
+/// \note -1 means no limit, 0 means no results are wanted.
+///
+/// \param max
 
 void QXmppResultSetQuery::setMax(int max)
 {
@@ -55,20 +66,36 @@ void QXmppResultSetQuery::setIndex(int index)
     m_index=index;
 }
 
+/// Returns the UID of the first result in the next page.
+///
+/// This is used for for paging backwards through results.
+
 QString QXmppResultSetQuery::before() const
 {
     return m_before;
 }
+
+/// Sets the UID of the first result in the next page.
+///
+/// This is used for for paging backwards through results.
 
 void QXmppResultSetQuery::setBefore(const QString& before)
 {
     m_before=before;
 }
 
+/// Returns the UID of the last result in the previous page.
+///
+/// This is used for for paging forwards through results.
+
 QString QXmppResultSetQuery::after() const
 {
     return m_after;
 }
+
+/// Sets the UID of the last result in the previous page.
+///
+/// This is used for for paging forwards through results.
 
 void QXmppResultSetQuery::setAfter(const QString& after)
 {
@@ -116,30 +143,46 @@ QXmppResultSetReply::QXmppResultSetReply()
     , m_index(-1)
 {}
 
+/// Returns the UID of the first result in the set.
+
 QString QXmppResultSetReply::first() const
 {
     return m_first;
 }
+
+/// Sets the UID of the first result in the set.
 
 void QXmppResultSetReply::setFirst(const QString& first)
 {
     m_first=first;
 }
 
+/// Returns the UID of the last result in the set.
+
 QString QXmppResultSetReply::last() const
 {
     return m_last;
 }
+
+/// Sets the UID of the last result in the set.
 
 void QXmppResultSetReply::setLast(const QString& last)
 {
     m_last=last;
 }
 
+/// Returns the number of items in the set.
+///
+/// \note This may be an approximate count.
+
 int QXmppResultSetReply::count() const
 {
     return m_count;
 }
+
+/// Sets the number of items in the set.
+///
+/// \note This may be an approximate count.
 
 void QXmppResultSetReply::setCount(int count)
 {
@@ -153,7 +196,7 @@ int QXmppResultSetReply::index() const
 
 void QXmppResultSetReply::setIndex(int index)
 {
-    m_index=index;
+    m_index = index;
 }
 
 bool QXmppResultSetReply::isNull() const
