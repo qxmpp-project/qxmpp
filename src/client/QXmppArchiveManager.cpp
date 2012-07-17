@@ -26,6 +26,13 @@
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 #include "QXmppClient.h"
+#include "QXmppConstants.h"
+
+QStringList QXmppArchiveManager::discoveryFeatures() const
+{
+    // XEP-0036: Message Archiving
+    return QStringList() << ns_archive;
+}
 
 bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 {

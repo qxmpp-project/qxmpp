@@ -24,9 +24,8 @@
 #include <QDomElement>
 
 #include "QXmppArchiveIq.h"
+#include "QXmppConstants.h"
 #include "QXmppUtils.h"
-
-static const char *ns_archive = "urn:xmpp:archive";
 
 QXmppArchiveMessage::QXmppArchiveMessage()
     : m_received(false)

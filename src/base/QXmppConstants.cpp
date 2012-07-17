@@ -64,6 +64,8 @@ const char *ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0092: Software Version
 const char *ns_version = "jabber:iq:version";
 const char *ns_data = "jabber:x:data";
+// XEP-0136: Message Archiving
+const char *ns_archive = "urn:xmpp:archive";
 // XEP-0166: Jingle
 const char *ns_jingle = "urn:xmpp:jingle:1";
 const char *ns_jingle_raw_udp = "urn:xmpp:jingle:transports:raw-udp:1";

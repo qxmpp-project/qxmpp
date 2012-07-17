@@ -63,6 +63,7 @@ extern const char *ns_bytestreams;
 extern const char *ns_rsm;
 extern const char *ns_version;
 extern const char *ns_data;
+extern const char *ns_archive;
 extern const char *ns_jingle;
 extern const char* ns_jingle_ice_udp;
 extern const char* ns_jingle_raw_udp;
