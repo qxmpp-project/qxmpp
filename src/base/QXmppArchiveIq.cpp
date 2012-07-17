@@ -493,23 +493,6 @@ QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
 {
 }
 
-/// Returns the maximum number of results.
-///
-
-int QXmppArchiveRetrieveIq::max() const
-{
-    return m_rsm.max();
-}
-
-/// Sets the maximum number of results.
-///
-/// \param max
-
-void QXmppArchiveRetrieveIq::setMax(int max)
-{
-    m_rsm.setMax(max);
-}
-
 /// Returns the start date/time for the archived conversations.
 ///
 
@@ -544,6 +527,26 @@ void QXmppArchiveRetrieveIq::setWith(const QString &with)
     m_with = with;
 }
 
+QXmppResultSetQuery QXmppArchiveRetrieveIq::resultSetQuery() const
+{
+    return m_rsmQuery;
+}
+
+void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
+{
+    m_rsmQuery = rsm;
+}
+
+QXmppResultSetReply QXmppArchiveRetrieveIq::resultSetReply() const
+{
+    return m_rsmReply;
+}
+
+void QXmppArchiveRetrieveIq::setResultSetReply(const QXmppResultSetReply& rsm)
+{
+    m_rsmReply = rsm;
+}
+
 bool QXmppArchiveRetrieveIq::isArchiveRetrieveIq(const QDomElement &element)
 {
     QDomElement retrieveElement = element.firstChildElement("retrieve");
@@ -555,7 +558,9 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
     QDomElement retrieveElement = element.firstChildElement("retrieve");
     m_with = retrieveElement.attribute("with");
     m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
-    m_rsm.parse(retrieveElement);
+
+    m_rsmQuery.parse(element);
+    m_rsmReply.parse(element);
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -564,6 +569,9 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     writer->writeAttribute("xmlns", ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
-    m_rsm.toXml(writer);
+    if (!m_rsmQuery.isNull())
+        m_rsmQuery.toXml(writer);
+    else if (!m_rsmReply.isNull())
+        m_rsmReply.toXml(writer);
     writer->writeEndElement();
 }

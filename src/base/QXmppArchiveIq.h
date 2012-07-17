@@ -208,14 +208,17 @@ class QXMPP_EXPORT QXmppArchiveRetrieveIq : public QXmppIq
 public:
     QXmppArchiveRetrieveIq();
 
-    int max() const;
-    void setMax(int max);
-
     QDateTime start() const;
     void setStart(const QDateTime &start);
 
     QString with() const;
     void setWith(const QString &with);
+
+    QXmppResultSetQuery resultSetQuery() const;
+    void setResultSetQuery(const QXmppResultSetQuery &rsm);
+
+    QXmppResultSetReply resultSetReply() const;
+    void setResultSetReply(const QXmppResultSetReply &rsm);
 
     /// \cond
     static bool isArchiveRetrieveIq(const QDomElement &element);
@@ -228,9 +231,10 @@ protected:
     /// \endcond
 
 private:
-    QXmppResultSetQuery m_rsm;
     QString m_with;
     QDateTime m_start;
+    QXmppResultSetQuery m_rsmQuery;
+    QXmppResultSetReply m_rsmReply;
 };
 
 /// \brief Represents an archive preference IQ as defined by XEP-0136: Message Archiving.

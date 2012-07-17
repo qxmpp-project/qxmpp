@@ -282,7 +282,7 @@ void TestPackets::testArchiveRetrieve()
     QCOMPARE(iq.id(), QLatin1String("retrieve_1"));
     QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
     QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
-    QCOMPARE(iq.max(), 30);
+    QCOMPARE(iq.resultSetQuery().max(), 30);
     serializePacket(iq, xml);
 }
 

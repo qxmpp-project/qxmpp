@@ -119,8 +119,11 @@ void QXmppArchiveManager::removeCollections(const QString &jid, const QDateTime 
 ///
 void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime &start, int max)
 {
+    QXmppResultSetQuery rsm;
+    rsm.setMax(max);
+
     QXmppArchiveRetrieveIq packet;
-    packet.setMax(max);
+    packet.setResultSetQuery(rsm);
     packet.setStart(start);
     packet.setWith(jid);
     client()->sendPacket(packet);
