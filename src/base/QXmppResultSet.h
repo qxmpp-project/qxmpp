@@ -64,7 +64,7 @@ private:
     QString m_before;
 };
 
-/// \brief The QXmppResultSetQuery class represents a set element in a reply
+/// \brief The QXmppResultSetReply class represents a set element in a reply
 /// as defined by XEP-0059: Result Set Management.
 
 class QXMPP_EXPORT QXmppResultSetReply

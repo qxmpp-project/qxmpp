@@ -53,7 +53,7 @@ private:
     QString m_username;
 };
 
-/// \brief The QXmppPasswordRequest class represents a password reply.
+/// \brief The QXmppPasswordReply class represents a password reply.
 ///
 class QXMPP_EXPORT QXmppPasswordReply : public QObject
 {
