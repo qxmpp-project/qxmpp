@@ -537,16 +537,6 @@ void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
     m_rsmQuery = rsm;
 }
 
-QXmppResultSetReply QXmppArchiveRetrieveIq::resultSetReply() const
-{
-    return m_rsmReply;
-}
-
-void QXmppArchiveRetrieveIq::setResultSetReply(const QXmppResultSetReply& rsm)
-{
-    m_rsmReply = rsm;
-}
-
 bool QXmppArchiveRetrieveIq::isArchiveRetrieveIq(const QDomElement &element)
 {
     QDomElement retrieveElement = element.firstChildElement("retrieve");
@@ -560,7 +550,6 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
     m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
 
     m_rsmQuery.parse(retrieveElement);
-    m_rsmReply.parse(retrieveElement);
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -571,7 +560,5 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (!m_rsmQuery.isNull())
         m_rsmQuery.toXml(writer);
-    else if (!m_rsmReply.isNull())
-        m_rsmReply.toXml(writer);
     writer->writeEndElement();
 }
