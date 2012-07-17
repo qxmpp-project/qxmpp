@@ -189,9 +189,20 @@ static void serializePacket(T &packet, const QByteArray &xml)
     QCOMPARE(buffer.data(), xml);
 }
 
-void TestPackets::testArchiveList()
+void TestPackets::testArchiveList_data()
 {
-    const QByteArray xml(
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("max");
+
+    QTest::newRow("no rsm") <<
+        QByteArray(
+        "<iq id=\"list_1\" type=\"get\">"
+        "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\"/>"
+        "</iq>") << -1;
+
+    QTest::newRow("with rsm") <<
+        QByteArray(
         "<iq id=\"list_1\" type=\"get\">"
         "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
         " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\">"
@@ -199,7 +210,13 @@ void TestPackets::testArchiveList()
             "<max>30</max>"
             "</set>"
         "</list>"
-        "</iq>");
+        "</iq>") << 30;
+}
+
+void TestPackets::testArchiveList()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, max);
 
     QXmppArchiveListIq iq;
     parsePacket(iq, xml);
@@ -208,7 +225,7 @@ void TestPackets::testArchiveList()
     QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
     QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
     QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
-    QCOMPARE(iq.resultSetQuery().max(), 30);
+    QCOMPARE(iq.resultSetQuery().max(), max);
     serializePacket(iq, xml);
 }
 
@@ -264,9 +281,20 @@ void TestPackets::testArchiveRemove()
     serializePacket(iq, xml);
 }
 
-void TestPackets::testArchiveRetrieve()
+void TestPackets::testArchiveRetrieve_data()
 {
-    const QByteArray xml(
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("max");
+
+    QTest::newRow("no rsm") <<
+        QByteArray(
+        "<iq id=\"retrieve_1\" type=\"get\">"
+        "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:00:00Z\"/>"
+        "</iq>") << -1;
+
+    QTest::newRow("with rsm") <<
+        QByteArray(
         "<iq id=\"retrieve_1\" type=\"get\">"
         "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
         " start=\"1469-07-21T02:00:00Z\">"
@@ -274,7 +302,13 @@ void TestPackets::testArchiveRetrieve()
             "<max>30</max>"
             "</set>"
         "</retrieve>"
-        "</iq>");
+        "</iq>") << 30;
+}
+
+void TestPackets::testArchiveRetrieve()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, max);
 
     QXmppArchiveRetrieveIq iq;
     parsePacket(iq, xml);
@@ -282,7 +316,7 @@ void TestPackets::testArchiveRetrieve()
     QCOMPARE(iq.id(), QLatin1String("retrieve_1"));
     QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
     QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
-    QCOMPARE(iq.resultSetQuery().max(), 30);
+    QCOMPARE(iq.resultSetQuery().max(), max);
     serializePacket(iq, xml);
 }
 

@@ -43,9 +43,11 @@ class TestPackets : public QObject
     Q_OBJECT
 
 private slots:
+    void testArchiveList_data();
     void testArchiveList();
     void testArchiveChat();
     void testArchiveRemove();
+    void testArchiveRetrieve_data();
     void testArchiveRetrieve();
     void testBindNoResource();
     void testBindResource();
