@@ -111,7 +111,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
     }
 }
 
-void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
+void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply &rsm) const
 {
     writer->writeStartElement("chat");
     writer->writeAttribute("xmlns", ns_archive);
@@ -133,6 +133,8 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
         prevTime = message.date();
     }
+    if (!rsm.isNull())
+        rsm.toXml(writer);
     writer->writeEndElement();
 }
 
@@ -234,6 +236,16 @@ void QXmppArchiveChatIq::setChat(const QXmppArchiveChat &chat)
     m_chat = chat;
 }
 
+QXmppResultSetReply QXmppArchiveChatIq::resultSetReply() const
+{
+    return m_rsmReply;
+}
+
+void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply& rsm)
+{
+    m_rsmReply = rsm;
+}
+
 bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 {
     QDomElement chatElement = element.firstChildElement("chat");
@@ -243,12 +255,14 @@ bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 
 void QXmppArchiveChatIq::parseElementFromChild(const QDomElement &element)
 {
-    m_chat.parse(element.firstChildElement("chat"));
+    QDomElement chatElement = element.firstChildElement("chat");
+    m_chat.parse(chatElement);
+    m_rsmReply.parse(chatElement);
 }
 
 void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    m_chat.toXml(writer);
+    m_chat.toXml(writer, m_rsmReply);
 }
 
 /// Constructs a QXmppArchiveListIq.

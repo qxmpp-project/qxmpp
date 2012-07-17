@@ -73,7 +73,7 @@ signals:
 
     /// This signal is emitted when archive chat is received
     /// after calling retrieveCollection()
-    void archiveChatReceived(const QXmppArchiveChat&);
+    void archiveChatReceived(const QXmppArchiveChat&, const QXmppResultSetReply &rsm = QXmppResultSetReply());
 };
 
 #endif

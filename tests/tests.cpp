@@ -229,9 +229,13 @@ void TestPackets::testArchiveList()
     serializePacket(iq, xml);
 }
 
-void TestPackets::testArchiveChat()
+void TestPackets::testArchiveChat_data()
 {
-    const QByteArray xml(
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("count");
+
+    QTest::newRow("no rsm") <<
+        QByteArray(
         "<iq id=\"chat_1\" type=\"result\">"
         "<chat xmlns=\"urn:xmpp:archive\""
         " with=\"juliet@capulet.com\""
@@ -243,7 +247,31 @@ void TestPackets::testArchiveChat()
         "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
         "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
         "</chat>"
-        "</iq>");
+        "</iq>") << -1;
+
+    QTest::newRow("with rsm") <<
+        QByteArray(
+        "<iq id=\"chat_1\" type=\"result\">"
+        "<chat xmlns=\"urn:xmpp:archive\""
+        " with=\"juliet@capulet.com\""
+        " start=\"1469-07-21T02:56:15Z\""
+        " subject=\"She speaks!\""
+        " version=\"4\""
+        ">"
+        "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
+        "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
+        "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
+        "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+        "<count>3</count>"
+        "</set>"
+        "</chat>"
+        "</iq>") << 3;
+}
+
+void TestPackets::testArchiveChat()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, count);
 
     QXmppArchiveChatIq iq;
     parsePacket(iq, xml);
@@ -260,6 +288,7 @@ void TestPackets::testArchiveChat()
     QCOMPARE(iq.chat().messages()[2].isReceived(), true);
     QCOMPARE(iq.chat().messages()[2].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 33), Qt::UTC));
     QCOMPARE(iq.chat().messages()[2].body(), QLatin1String("How cam'st thou hither, tell me, and wherefore?"));
+    QCOMPARE(iq.resultSetReply().count(), count);
     serializePacket(iq, xml);
 }
 

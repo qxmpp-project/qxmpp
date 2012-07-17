@@ -37,7 +37,7 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
     {
         QXmppArchiveChatIq archiveIq;
         archiveIq.parse(element);
-        emit archiveChatReceived(archiveIq.chat());
+        emit archiveChatReceived(archiveIq.chat(), archiveIq.resultSetReply());
         return true;
     }
     else if(QXmppArchiveListIq::isArchiveListIq(element))

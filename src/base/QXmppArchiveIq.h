@@ -83,7 +83,7 @@ public:
 
     /// \cond
     void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void toXml(QXmlStreamWriter *writer, const QXmppResultSetReply &rsm = QXmppResultSetReply()) const;
     /// \endcond
 
 private:
@@ -107,6 +107,9 @@ public:
     QXmppArchiveChat chat() const;
     void setChat(const QXmppArchiveChat &chat);
 
+    QXmppResultSetReply resultSetReply() const;
+    void setResultSetReply(const QXmppResultSetReply &rsm);
+
     /// \cond
     static bool isArchiveChatIq(const QDomElement &element);
     /// \endcond
@@ -119,6 +122,7 @@ protected:
 
 private:
     QXmppArchiveChat m_chat;
+    QXmppResultSetReply m_rsmReply;
 };
 
 /// \brief Represents an archive list as defined by XEP-0136: Message Archiving.
@@ -217,9 +221,6 @@ public:
     QXmppResultSetQuery resultSetQuery() const;
     void setResultSetQuery(const QXmppResultSetQuery &rsm);
 
-    QXmppResultSetReply resultSetReply() const;
-    void setResultSetReply(const QXmppResultSetReply &rsm);
-
     /// \cond
     static bool isArchiveRetrieveIq(const QDomElement &element);
     /// \endcond
@@ -234,7 +235,6 @@ private:
     QString m_with;
     QDateTime m_start;
     QXmppResultSetQuery m_rsmQuery;
-    QXmppResultSetReply m_rsmReply;
 };
 
 /// \brief Represents an archive preference IQ as defined by XEP-0136: Message Archiving.
