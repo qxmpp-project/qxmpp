@@ -138,6 +138,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     // features
     QStringList features;
     features
+        << ns_data              // XEP-0004: Data Forms
         << ns_rsm               // XEP-0059: Result Set Management
         << ns_chat_states       // XEP-0085: Chat State Notifications
         << ns_capabilities      // XEP-0115: Entity Capabilities
