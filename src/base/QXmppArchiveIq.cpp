@@ -559,8 +559,8 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
     m_with = retrieveElement.attribute("with");
     m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute("start"));
 
-    m_rsmQuery.parse(element);
-    m_rsmReply.parse(element);
+    m_rsmQuery.parse(retrieveElement);
+    m_rsmReply.parse(retrieveElement);
 }
 
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
