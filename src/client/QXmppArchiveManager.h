@@ -59,7 +59,8 @@ public:
                          const QXmppResultSetQuery &rsm = QXmppResultSetQuery());
     void listCollections(const QString &jid, const QDateTime &start, const QDateTime &end, int max);
     void removeCollections(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime());
-    void retrieveCollection(const QString &jid, const QDateTime &start, int max = -1);
+    void retrieveCollection(const QString &jid, const QDateTime &start, const QXmppResultSetQuery &rsm = QXmppResultSetQuery());
+    void retrieveCollection(const QString &jid, const QDateTime &start, int max);
 
     /// \cond
     bool handleStanza(const QDomElement &element);
