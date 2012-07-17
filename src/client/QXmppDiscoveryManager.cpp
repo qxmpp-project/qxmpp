@@ -138,8 +138,9 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     // features
     QStringList features;
     features
+        << ns_rsm               // XEP-0059: Result Set Management
         << ns_chat_states       // XEP-0085: Chat State Notifications
-        << ns_capabilities      // XEP-0115 : Entity Capabilities
+        << ns_capabilities      // XEP-0115: Entity Capabilities
         << ns_ping              // XEP-0199: XMPP Ping
         << ns_attention;        // XEP-0224: Attention
 

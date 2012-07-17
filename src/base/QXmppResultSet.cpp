@@ -22,13 +22,12 @@
  */
 
 
+#include "QXmppConstants.h"
 #include "QXmppResultSet.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
 #include <QDebug>
-
-static const char *ns_rsm = "http://jabber.org/protocol/rsm";
 
 QXmppResultSetQuery::QXmppResultSetQuery()
     : m_index(-1)
