@@ -35,6 +35,7 @@
 class QDomElement;
 class QXmppDataFormPrivate;
 class QXmppDataFormFieldPrivate;
+class QXmppDataFormMediaPrivate;
 
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// XEP-0004: Data Forms.
@@ -43,6 +44,32 @@ class QXmppDataFormFieldPrivate;
 class QXMPP_EXPORT QXmppDataForm
 {
 public:
+    /// \brief The QXmppDataForm::Media class represents a media field
+    /// as defined by XEP-0221: Data Forms Media Element.
+    ///
+
+    class QXMPP_EXPORT Media
+    {
+    public:
+        Media();
+        Media(const QXmppDataForm::Media &other);
+        ~Media();
+
+        int height() const;
+        void setHeight(int height);
+
+        int width() const;
+        void setWidth(int width);
+
+        QList<QPair<QString, QString> > uris() const;
+        void setUris(const QList<QPair<QString, QString> > &uris);
+
+        bool isNull() const;
+
+    private:
+        QSharedDataPointer<QXmppDataFormMediaPrivate> d;
+    };
+
     /// \brief The QXmppDataForm::Field class represents a data form field
     /// as defined by XEP-0004: Data Forms.
     ///
@@ -79,6 +106,9 @@ public:
 
         QString label() const;
         void setLabel(const QString &label);
+
+        Media media() const;
+        void setMedia(const Media &media);
 
         QList<QPair<QString, QString> > options() const;
         void setOptions(const QList<QPair<QString, QString> > &options);

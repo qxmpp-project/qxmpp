@@ -1,6 +1,9 @@
 QXmpp 0.6.0 (UNRELEASED)
 ------------------------
 
+  - New XEPs
+    * XEP-0221: Data Forms Media Element
+
   - Fix data form title/instructions XML serialization.
 
 QXmpp 0.5.0 (Jul 18, 2012)

@@ -75,5 +75,7 @@ const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 // XEP-0202: Entity Time
 const char *ns_entity_time = "urn:xmpp:time";
+// XEP-0221: Data Forms Media Element
+const char *ns_media_element = "urn:xmpp:media-element";
 // XEP-0224: Attention
 const char *ns_attention = "urn:xmpp:attention:0";

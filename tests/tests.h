@@ -91,6 +91,7 @@ class TestDataForm : public QObject
 
 private slots:
     void testSimple();
+    void testMedia();
 };
 
 class TestJingle : public QObject
