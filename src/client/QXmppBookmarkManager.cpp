@@ -26,10 +26,9 @@
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
+#include "QXmppConstants.h"
 #include "QXmppIq.h"
 #include "QXmppUtils.h"
-
-static const char * ns_private_storage = "jabber:iq:private";
 
 // The QXmppPrivateStorageIq class represents an XML private storage IQ
 // as defined by XEP-0049: Private XML Storage.
@@ -65,7 +64,7 @@ void QXmppPrivateStorageIq::setBookmarks(const QXmppBookmarkSet &bookmarks)
 bool QXmppPrivateStorageIq::isPrivateStorageIq(const QDomElement &element)
 {
     const QDomElement queryElement = element.firstChildElement("query");
-    return queryElement.namespaceURI() == ns_private_storage &&
+    return queryElement.namespaceURI() == ns_private &&
            QXmppBookmarkSet::isBookmarkSet(queryElement.firstChildElement());
 }
 
@@ -78,7 +77,7 @@ void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)
 void QXmppPrivateStorageIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_private_storage);
+    writer->writeAttribute("xmlns", ns_private);
     m_bookmarks.toXml(writer);
     writer->writeEndElement();
 }
