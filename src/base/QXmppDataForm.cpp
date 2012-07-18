@@ -598,7 +598,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             foreach (const QString &value, field.value().toStringList())
                 helperToXmlAddTextElement(writer, "value", value);
         }
-        else
+        else if (!field.value().isNull())
         {
             helperToXmlAddTextElement(writer, "value", field.value().toString());
         }

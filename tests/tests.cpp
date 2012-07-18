@@ -945,10 +945,9 @@ void TestDataForm::testSimple()
 {
     const QByteArray xml(
         "<x xmlns=\"jabber:x:data\" type=\"form\">"
-        "<title>Search</title>"
+        "<title>Joggle Search</title>"
         "<instructions>Fill out this form to search for information!</instructions>"
         "<field type=\"text-single\" var=\"search_request\">"
-        "<value/>"
         "<required/>"
         "</field>"
         "</x>");
@@ -957,7 +956,8 @@ void TestDataForm::testSimple()
     parsePacket(form, xml);
 
     QCOMPARE(form.isNull(), false);
-    QCOMPARE(form.instructions(), QString("Fill out this form to search for information!"));
+    QCOMPARE(form.title(), QLatin1String("Joggle Search"));
+    QCOMPARE(form.instructions(), QLatin1String("Fill out this form to search for information!"));
     QCOMPARE(form.fields().size(), 1);
     QCOMPARE(form.fields().at(0).type(), QXmppDataForm::Field::TextSingleField);
     QCOMPARE(form.fields().at(0).isRequired(), true);
