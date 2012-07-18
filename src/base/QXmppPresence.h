@@ -71,8 +71,7 @@ public:
         /// This enum is used to describe an availability status.
         enum Type
         {
-            Offline = 0,
-            Online,      ///< The entity or resource is online.
+            Online = 0,  ///< The entity or resource is online.
             Away,        ///< The entity or resource is temporarily away.
             XA,          ///< The entity or resource is away for an extended period.
             DND,         ///< The entity or resource is busy ("Do Not Disturb").

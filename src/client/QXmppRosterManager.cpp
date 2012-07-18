@@ -398,7 +398,6 @@ QXmppPresence QXmppRosterManager::getPresence(const QString& bareJid,
     {
         QXmppPresence presence;
         presence.setType(QXmppPresence::Unavailable);
-        presence.setStatus(QXmppPresence::Status::Offline);
         return presence;
     }
 }

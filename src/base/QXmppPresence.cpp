@@ -307,7 +307,6 @@ void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
 
 void QXmppPresence::Status::setTypeFromStr(const QString& str)
 {
-    // FIXME: there is no keyword for Offline
     if(str == "")
         m_type = QXmppPresence::Status::Online;
     else if(str == "away")
@@ -331,9 +330,6 @@ QString QXmppPresence::Status::getTypeStr() const
 {
     switch(m_type) {
     case QXmppPresence::Status::Online:
-        return "";
-    case QXmppPresence::Status::Offline:
-        // FIXME: there is no keyword for Offline
         return "";
     case QXmppPresence::Status::Away:
         return "away";
