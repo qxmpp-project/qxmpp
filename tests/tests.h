@@ -22,7 +22,31 @@
  *
  */
 
+#include <QDomDocument>
 #include <QObject>
+#include <QtTest/QtTest>
+
+template <class T>
+static void parsePacket(T &packet, const QByteArray &xml)
+{
+    //qDebug() << "parsing" << xml;
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    QDomElement element = doc.documentElement();
+    packet.parse(element);
+}
+
+template <class T>
+static void serializePacket(T &packet, const QByteArray &xml)
+{
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    packet.toXml(&writer);
+    qDebug() << "expect " << xml;
+    qDebug() << "writing" << buffer.data();
+    QCOMPARE(buffer.data(), xml);
+}
 
 class TestUtils : public QObject
 {
