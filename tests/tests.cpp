@@ -54,6 +54,7 @@
 #include "QXmppEntityTimeIq.h"
 
 #include "dataform.h"
+#include "register.h"
 #include "rtp.h"
 #include "tests.h"
 
@@ -1742,6 +1743,9 @@ int main(int argc, char *argv[])
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
+
+    tst_QXmppRegisterIq testRegister;
+    errors += QTest::qExec(&testRegister);
 
     TestRsm testRsm;
     errors += QTest::qExec(&testRsm);
