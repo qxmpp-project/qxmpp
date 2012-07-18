@@ -86,11 +86,6 @@ private slots:
     void testMessageDelay();
     void testMessageLegacyDelay();
     void testNonSaslAuth();
-    void testPresence();
-    void testPresenceFull();
-    void testPresenceWithVCardUpdate();
-    void testPresenceWithCapability();
-    void testPresenceWithMuc();
     void testSession();
     void testStreamFeatures();
     void testVCard();

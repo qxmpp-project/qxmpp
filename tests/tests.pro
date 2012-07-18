@@ -7,12 +7,14 @@ TARGET = qxmpp-tests
 RESOURCES += tests.qrc
 SOURCES += \
     dataform.cpp \
+    presence.cpp \
     register.cpp \
     rsm.cpp \
     rtp.cpp \
     tests.cpp
 HEADERS += \
     dataform.h \
+    presence.h \
     register.h \
     rsm.h \
     rtp.h \

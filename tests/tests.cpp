@@ -54,6 +54,7 @@
 #include "QXmppEntityTimeIq.h"
 
 #include "dataform.h"
+#include "presence.h"
 #include "register.h"
 #include "rsm.h"
 #include "rtp.h"
@@ -629,124 +630,6 @@ void TestPackets::testNonSaslAuth()
     QCOMPARE(iq4.password(), QString());
     QCOMPARE(iq4.resource(), QLatin1String("globe"));
     serializePacket(iq4, xml4);
-}
-
-void TestPackets::testPresence()
-{
-    const QByteArray xml(
-        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
-        "<x xmlns=\"vcard-temp:x:update\"/></presence>");
-
-    QXmppPresence presence;
-    parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(presence.photoHash(), QByteArray(""));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateNotReady);
-    serializePacket(presence, xml);
-}
-
-void TestPackets::testPresenceFull()
-{
-    const QByteArray xml(
-        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
-        "<show>away</show>"
-        "<status>In a meeting</status>"
-        "<priority>5</priority>"
-        "</presence>");
-
-    QXmppPresence presence;
-    parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
-    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
-    QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateNone);
-    serializePacket(presence, xml);
-}
-
-void TestPackets::testPresenceWithVCardUpdate()
-{
-    const QByteArray xml(
-        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
-        "<show>away</show>"
-        "<status>In a meeting</status>"
-        "<priority>5</priority>"
-        "<x xmlns=\"vcard-temp:x:update\">"
-        "<photo>73b908bc</photo>"
-        "</x>"
-        "</presence>");
-
-    QXmppPresence presence;
-    parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
-    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
-    QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
-    serializePacket(presence, xml);
-}
-
-void TestPackets::testPresenceWithCapability()
-{
-    const QByteArray xml(
-        "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
-        "<show>away</show>"
-        "<status>In a meeting</status>"
-        "<priority>5</priority>"
-        "<x xmlns=\"vcard-temp:x:update\">"
-        "<photo>73b908bc</photo>"
-        "</x>"
-        "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"http://code.google.com/p/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
-        "</presence>");
-
-    QXmppPresence presence;
-    parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
-    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
-    QCOMPARE(presence.status().priority(), 5);
-    QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
-    QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
-    QCOMPARE(presence.capabilityHash(), QString("sha-1"));
-    QCOMPARE(presence.capabilityNode(), QString("http://code.google.com/p/qxmpp"));
-    QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
-
-    serializePacket(presence, xml);
-}
-
-void TestPackets::testPresenceWithMuc()
-{
-    const QByteArray xml(
-        "<presence "
-            "to=\"pistol@shakespeare.lit/harfleur\" "
-            "from=\"harfleur@henryv.shakespeare.lit/pistol\" "
-            "type=\"unavailable\">"
-            "<x xmlns=\"http://jabber.org/protocol/muc#user\">"
-            "<item affiliation=\"none\" role=\"none\">"
-                "<actor jid=\"fluellen@shakespeare.lit\"/>"
-                "<reason>Avaunt, you cullion!</reason>"
-            "</item>"
-            "<status code=\"307\"/>"
-            "</x>"
-        "</presence>");
-
-    QXmppPresence presence;
-    parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QLatin1String("pistol@shakespeare.lit/harfleur"));
-    QCOMPARE(presence.from(), QLatin1String("harfleur@henryv.shakespeare.lit/pistol"));
-    QCOMPARE(presence.type(), QXmppPresence::Unavailable);
-    QCOMPARE(presence.mucItem().actor(), QLatin1String("fluellen@shakespeare.lit"));
-    QCOMPARE(presence.mucItem().affiliation(), QXmppMucItem::NoAffiliation);
-    QCOMPARE(presence.mucItem().jid(), QString());
-    QCOMPARE(presence.mucItem().reason(), QLatin1String("Avaunt, you cullion!"));
-    QCOMPARE(presence.mucItem().role(), QXmppMucItem::NoRole);
-    QCOMPARE(presence.mucStatusCodes(), QList<int>() << 307);
-    serializePacket(presence, xml);
 }
 
 void TestPackets::testSession()
@@ -1615,6 +1498,9 @@ int main(int argc, char *argv[])
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);
+
+    tst_QXmppPresence testPresence;
+    errors += QTest::qExec(&testPresence);
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
