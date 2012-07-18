@@ -64,22 +64,22 @@ void QXmppStreamFeatures::setNonSaslAuthMode(QXmppStreamFeatures::Mode mode)
     m_nonSaslAuthMode = mode;
 }
 
-QList<QXmppConfiguration::SASLAuthMechanism> QXmppStreamFeatures::authMechanisms() const
+QStringList QXmppStreamFeatures::authMechanisms() const
 {
     return m_authMechanisms;
 }
 
-void QXmppStreamFeatures::setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMechanism> &mechanisms)
+void QXmppStreamFeatures::setAuthMechanisms(const QStringList &mechanisms)
 {
     m_authMechanisms = mechanisms;
 }
 
-QList<QXmppConfiguration::CompressionMethod> QXmppStreamFeatures::compressionMethods() const
+QStringList QXmppStreamFeatures::compressionMethods() const
 {
     return m_compressionMethods;
 }
 
-void QXmppStreamFeatures::setCompressionMethods(QList<QXmppConfiguration::CompressionMethod> &methods)
+void QXmppStreamFeatures::setCompressionMethods(const QStringList &methods)
 {
     m_compressionMethods = methods;
 }
@@ -128,8 +128,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
         QDomElement subElement = compression.firstChildElement("method");
         while(!subElement.isNull())
         {
-            if (subElement.text() == QLatin1String("zlib"))
-                m_compressionMethods << QXmppConfiguration::ZlibCompression;
+            m_compressionMethods << subElement.text();
             subElement = subElement.nextSiblingElement("method");
         }
     }
@@ -139,16 +138,8 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     if (mechs.namespaceURI() == ns_sasl)
     {
         QDomElement subElement = mechs.firstChildElement("mechanism");
-        while(!subElement.isNull())
-        {
-            if (subElement.text() == QLatin1String("PLAIN"))
-                m_authMechanisms << QXmppConfiguration::SASLPlain;
-            else if (subElement.text() == QLatin1String("DIGEST-MD5"))
-                m_authMechanisms << QXmppConfiguration::SASLDigestMD5;
-            else if (subElement.text() == QLatin1String("ANONYMOUS"))
-                m_authMechanisms << QXmppConfiguration::SASLAnonymous;
-            else if (subElement.text() == QLatin1String("X-FACEBOOK-PLATFORM"))
-                m_authMechanisms << QXmppConfiguration::SASLXFacebookPlatform;
+        while(!subElement.isNull()) {
+            m_authMechanisms << subElement.text();
             subElement = subElement.nextSiblingElement("mechanism");
         }
     }
@@ -178,43 +169,16 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     {
         writer->writeStartElement("compression");
         writer->writeAttribute("xmlns", ns_compressFeature);
-        for (int i = 0; i < m_compressionMethods.size(); i++)
-        {
-            writer->writeStartElement("method");
-            switch (m_compressionMethods[i])
-            {
-            case QXmppConfiguration::ZlibCompression:
-                writer->writeCharacters("zlib");
-                break;
-            }
-            writer->writeEndElement();
-        }
+        foreach (const QString &method, m_compressionMethods)
+            writer->writeTextElement("method", method);
         writer->writeEndElement();
     }
     if (!m_authMechanisms.isEmpty())
     {
         writer->writeStartElement("mechanisms");
         writer->writeAttribute("xmlns", ns_sasl);
-        for (int i = 0; i < m_authMechanisms.size(); i++)
-        {
-            writer->writeStartElement("mechanism");
-            switch (m_authMechanisms[i])
-            {
-            case QXmppConfiguration::SASLPlain:
-                writer->writeCharacters("PLAIN");
-                break;
-            case QXmppConfiguration::SASLDigestMD5:
-                writer->writeCharacters("DIGEST-MD5");
-                break;
-            case QXmppConfiguration::SASLAnonymous:
-                writer->writeCharacters("ANONYMOUS");
-                break;
-            case QXmppConfiguration::SASLXFacebookPlatform:
-                writer->writeCharacters("X-FACEBOOK-PLATFORM");
-                break;
-            }
-            writer->writeEndElement();
-        }
+        foreach (const QString &mechanism, m_authMechanisms)
+            writer->writeTextElement("mechanism",  mechanism);
         writer->writeEndElement();
     }
     writer->writeEndElement();

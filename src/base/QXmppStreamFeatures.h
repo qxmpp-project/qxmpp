@@ -24,7 +24,6 @@
 #ifndef QXMPPSTREAMFEATURES_H
 #define QXMPPSTREAMFEATURES_H
 
-#include "QXmppConfiguration.h"
 #include "QXmppStanza.h"
 
 class QXMPP_EXPORT QXmppStreamFeatures : public QXmppStanza
@@ -48,11 +47,11 @@ public:
     Mode nonSaslAuthMode() const;
     void setNonSaslAuthMode(Mode mode);
 
-    QList<QXmppConfiguration::SASLAuthMechanism> authMechanisms() const;
-    void setAuthMechanisms(QList<QXmppConfiguration::SASLAuthMechanism> &mecanisms);
+    QStringList authMechanisms() const;
+    void setAuthMechanisms(const QStringList &mechanisms);
 
-    QList<QXmppConfiguration::CompressionMethod> compressionMethods() const;
-    void setCompressionMethods(QList<QXmppConfiguration::CompressionMethod> &methods);
+    QStringList compressionMethods() const;
+    void setCompressionMethods(const QStringList &methods);
 
     Mode tlsMode() const;
     void setTlsMode(Mode mode);
@@ -69,8 +68,8 @@ private:
     Mode m_sessionMode;
     Mode m_nonSaslAuthMode;
     Mode m_tlsMode;
-    QList<QXmppConfiguration::SASLAuthMechanism> m_authMechanisms;
-    QList<QXmppConfiguration::CompressionMethod> m_compressionMethods;
+    QStringList m_authMechanisms;
+    QStringList m_compressionMethods;
 };
 
 #endif

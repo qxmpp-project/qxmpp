@@ -82,7 +82,7 @@ public:
     QString nonSASLAuthId;
     QXmppSaslDigestMd5 saslDigest;
     int saslDigestStep;
-    int saslMechanism;
+    QString saslMechanism;
 
     // Timers
     QTimer *pingTimer;
@@ -90,9 +90,8 @@ public:
 };
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
-    : sessionAvailable(false),
-    saslDigestStep(0),
-    saslMechanism(-1)
+    : sessionAvailable(false)
+    , saslDigestStep(0)
 {
 }
 
@@ -246,7 +245,7 @@ void QXmppOutgoingClient::handleStart()
 
     // reset authentication step
     d->saslDigestStep = 0;
-    d->saslMechanism = -1;
+    d->saslMechanism = QString();
 
     // reset session information
     d->bindId.clear();
@@ -338,44 +337,51 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if(saslAvailable)
         {
+            // supported and preferred SASL auth mechanisms
+            const QStringList supportedMechanisms = QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM";
+            QString preferredMechanism;
+            switch (configuration().sASLAuthMechanism()) {
+            case QXmppConfiguration::SASLPlain:
+                preferredMechanism = "PLAIN";
+                break;
+            case QXmppConfiguration::SASLDigestMD5:
+                preferredMechanism = "DIGEST-MD5";
+                break;
+            case QXmppConfiguration::SASLAnonymous:
+                preferredMechanism = "ANONYMOUS";
+                break;
+            case QXmppConfiguration::SASLXFacebookPlatform:
+                preferredMechanism = "X-FACEBOOK-PLATFORM";
+                break;
+            }
+
             // determine SASL Authentication mechanism to use
-            const QList<QXmppConfiguration::SASLAuthMechanism> mechanisms = features.authMechanisms();
-            if (mechanisms.isEmpty())
-            {
+            QStringList commonMechanisms;
+            foreach (const QString &mechanism, features.authMechanisms()) {
+                if (supportedMechanisms.contains(mechanism))
+                    commonMechanisms << mechanism;
+            }
+            if (commonMechanisms.isEmpty()) {
                 warning("No supported SASL Authentication mechanism available");
                 disconnectFromHost();
                 return;
-            }
-            else if (!mechanisms.contains(configuration().sASLAuthMechanism()))
-            {
-                info("Desired SASL Auth mechanism is not available, selecting first available one");
-                d->saslMechanism = mechanisms.first();
+            } else if (!commonMechanisms.contains(preferredMechanism)) {
+                info(QString("Desired SASL Auth mechanism '%1' is not available, selecting first available one").arg(preferredMechanism));
+                d->saslMechanism = commonMechanisms.first();
             } else {
-                d->saslMechanism = configuration().sASLAuthMechanism();
+                d->saslMechanism = preferredMechanism;
             }
 
             // send SASL Authentication request
-            switch(d->saslMechanism)
-            {
-            case QXmppConfiguration::SASLPlain:
-                {
-                    QString userPass('\0' + configuration().user() +
-                                     '\0' + configuration().password());
-                    QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
-                    data += userPass.toUtf8().toBase64();
-                    data += "</auth>";
-                    sendData(data);
-                }
-                break;
-            case QXmppConfiguration::SASLDigestMD5:
-                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>");
-                break;
-            case QXmppConfiguration::SASLAnonymous:
-                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='ANONYMOUS'/>");
-                break;
-            case QXmppConfiguration::SASLXFacebookPlatform:
-                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='X-FACEBOOK-PLATFORM'/>");
-                break;
+            if (d->saslMechanism == "PLAIN") {
+                QString userPass('\0' + configuration().user() +
+                                 '\0' + configuration().password());
+                QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>";
+                data += userPass.toUtf8().toBase64();
+                data += "</auth>";
+                sendData(data);
+            } else {
+                sendData("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='" + d->saslMechanism.toLatin1() + "'/>");
             }
         }
 
@@ -419,9 +425,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if(nodeRecv.tagName() == "challenge")
         {
-            switch(d->saslMechanism)
-            {
-            case QXmppConfiguration::SASLDigestMD5:
+            if (d->saslMechanism == "DIGEST-MD5") {
                 d->saslDigestStep++;
                 switch (d->saslDigestStep)
                 {
@@ -436,14 +440,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     disconnectFromHost();
                     break;
                 }
-                break;
-            case QXmppConfiguration::SASLXFacebookPlatform:
+            } else if (d->saslMechanism == "X-FACEBOOK-PLATFORM") {
                 sendAuthXFacebookResponse(nodeRecv.text());
-                break;
-            default:
+            } else {
                 warning("Unexpected SASL challenge");
                 disconnectFromHost();
-                break;
             }
         }
         else if(nodeRecv.tagName() == "failure")

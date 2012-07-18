@@ -773,8 +773,8 @@ void TestPackets::testStreamFeatures()
     QCOMPARE(features.sessionMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Disabled);
-    QCOMPARE(features.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>());
-    QCOMPARE(features.compressionMethods(), QList<QXmppConfiguration::CompressionMethod>());
+    QCOMPARE(features.authMechanisms(), QStringList());
+    QCOMPARE(features.compressionMethods(), QStringList());
     serializePacket(features, xml);
 
     const QByteArray xml2("<stream:features>"
@@ -791,8 +791,8 @@ void TestPackets::testStreamFeatures()
     QCOMPARE(features2.sessionMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features2.nonSaslAuthMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features2.tlsMode(), QXmppStreamFeatures::Enabled);
-    QCOMPARE(features2.authMechanisms(), QList<QXmppConfiguration::SASLAuthMechanism>() << QXmppConfiguration::SASLPlain);
-    QCOMPARE(features2.compressionMethods(), QList<QXmppConfiguration::CompressionMethod>() << QXmppConfiguration::ZlibCompression);
+    QCOMPARE(features2.authMechanisms(), QStringList() << "PLAIN");
+    QCOMPARE(features2.compressionMethods(), QStringList() << "zlib");
     serializePacket(features2, xml2);
 }
 

@@ -80,12 +80,6 @@ public:
         SASLXFacebookPlatform, ///< Facebook Platform
     };
 
-    /// An enumeration for stream compression methods.
-    enum CompressionMethod
-    {
-        ZlibCompression = 0 ///< zlib compression
-    };
-
     QXmppConfiguration();
     QXmppConfiguration(const QXmppConfiguration &other);
     ~QXmppConfiguration();
