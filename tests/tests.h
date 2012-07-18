@@ -79,12 +79,6 @@ private slots:
     void testBindResult();
     void testDiscovery();
     void testDiscoveryWithForm();
-    void testMessage();
-    void testMessageFull();
-    void testMessageAttention();
-    void testMessageReceipt();
-    void testMessageDelay();
-    void testMessageLegacyDelay();
     void testNonSaslAuth();
     void testSession();
     void testStreamFeatures();
