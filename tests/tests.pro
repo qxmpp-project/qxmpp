@@ -8,11 +8,13 @@ RESOURCES += tests.qrc
 SOURCES += \
     dataform.cpp \
     register.cpp \
+    rsm.cpp \
     rtp.cpp \
     tests.cpp
 HEADERS += \
     dataform.h \
     register.h \
+    rsm.h \
     rtp.h \
     tests.h
 
