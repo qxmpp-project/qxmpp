@@ -6,9 +6,11 @@ TARGET = qxmpp-tests
 
 RESOURCES += tests.qrc
 SOURCES += \
+    dataform.cpp \
     rtp.cpp \
     tests.cpp
 HEADERS += \
+    dataform.h \
     rtp.h \
     tests.h
 
