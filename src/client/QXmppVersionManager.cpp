@@ -78,8 +78,7 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
         QXmppVersionIq versionIq;
         versionIq.parse(element);
 
-        if(versionIq.type() == QXmppIq::Get)
-        {
+        if (versionIq.type() == QXmppIq::Get) {
             // respond to query
             QXmppVersionIq responseIq;
             responseIq.setType(QXmppIq::Result);
@@ -91,9 +90,11 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
             responseIq.setOs(clientOs());
 
             client()->sendPacket(responseIq);
+        } else if (versionIq.type() == QXmppIq::Result) {
+            // emit response
+            emit versionReceived(versionIq);
         }
 
-        emit versionReceived(versionIq);
         return true;
     }
 
