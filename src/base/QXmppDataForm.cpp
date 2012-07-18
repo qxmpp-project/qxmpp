@@ -451,10 +451,9 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
     /* form properties */
     if (!d->title.isEmpty())
-        writer->writeAttribute("title", d->title);
+        writer->writeTextElement("title", d->title);
     if (!d->instructions.isEmpty())
-        writer->writeAttribute("instructions", d->instructions);
-
+        writer->writeTextElement("instructions", d->instructions);
 
     foreach (const QXmppDataForm::Field &field, d->fields) {
         writer->writeStartElement("field");

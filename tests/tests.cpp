@@ -962,6 +962,31 @@ void TestCodec::testTheoraEncoder()
 #endif
 }
 
+void TestDataForm::testSimple()
+{
+    const QByteArray xml(
+        "<x xmlns=\"jabber:x:data\" type=\"form\">"
+        "<title>Search</title>"
+        "<instructions>Fill out this form to search for information!</instructions>"
+        "<field type=\"text-single\" var=\"search_request\">"
+        "<value/>"
+        "<required/>"
+        "</field>"
+        "</x>");
+
+    QXmppDataForm form;
+    parsePacket(form, xml);
+
+    QCOMPARE(form.isNull(), false);
+    QCOMPARE(form.instructions(), QString("Fill out this form to search for information!"));
+    QCOMPARE(form.fields().size(), 1);
+    QCOMPARE(form.fields().at(0).type(), QXmppDataForm::Field::TextSingleField);
+    QCOMPARE(form.fields().at(0).isRequired(), true);
+    QCOMPARE(form.fields().at(0).key(), QString("search_request"));
+
+    serializePacket(form, xml);
+}
+
 void TestJingle::testSession()
 {
     const QByteArray xml(
@@ -1804,6 +1829,9 @@ int main(int argc, char *argv[])
 
     TestCodec testCodec;
     errors += QTest::qExec(&testCodec);
+
+    TestDataForm testDataForm;
+    errors += QTest::qExec(&testDataForm);
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);

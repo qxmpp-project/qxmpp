@@ -85,6 +85,14 @@ private slots:
     void testTheoraEncoder();
 };
 
+class TestDataForm : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testSimple();
+};
+
 class TestJingle : public QObject
 {
     Q_OBJECT

@@ -1,3 +1,8 @@
+QXmpp 0.6.0 (UNRELEASED)
+------------------------
+
+  - Fix data form title/instructions XML serialization.
+
 QXmpp 0.5.0 (Jul 18, 2012)
 --------------------------
 
