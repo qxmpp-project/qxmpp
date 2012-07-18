@@ -12,6 +12,7 @@ QXmpp 0.5.0 (UNRELEASED)
   - Remove QXmppReconnectionManager, QXmppClient handles reconnections.
   - Improve QXmppArchiveManager to allow paginated navigation (Olivier Goffart).
   - Only emit QXmppVersionManager::versionReceived() for results.
+  - Remove deprecated QXmppClient::discoveryIqReceived() signal.
 
   - Fix issues:
     * Issue 64: Compile qxmpp as shared library by default

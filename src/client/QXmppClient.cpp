@@ -211,18 +211,7 @@ QXmppClient::QXmppClient(QObject *parent)
     addExtension(d->versionManager);
 
     addExtension(new QXmppEntityTimeManager());
-
-    QXmppDiscoveryManager *discoveryManager = new QXmppDiscoveryManager;
-    addExtension(discoveryManager);
-
-    // obsolete signal
-    check = connect(discoveryManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
-
-    check = connect(discoveryManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
-                    this, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
+    addExtension(new QXmppDiscoveryManager());
 }
 
 /// Destructor, destroys the QXmppClient object.
