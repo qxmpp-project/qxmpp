@@ -119,6 +119,7 @@ void tst_QXmppRegisterIq::testResultWithForm()
     QVERIFY(iq.password().isNull());
     QVERIFY(iq.email().isNull());
     QVERIFY(!iq.form().isNull());
+    QCOMPARE(iq.form().title(), QLatin1String("Contest Registration"));
     serializePacket(iq, xml);
 }
 
@@ -143,5 +144,43 @@ void tst_QXmppRegisterIq::testSet()
     QCOMPARE(iq.password(), QLatin1String("Calliope"));
     QCOMPARE(iq.email(), QLatin1String("bard@shakespeare.lit"));
     QVERIFY(iq.form().isNull());
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppRegisterIq::testSetWithForm()
+{
+    const QByteArray xml(
+        "<iq id=\"reg4\" to=\"contests.shakespeare.lit\" from=\"juliet@capulet.com/balcony\" type=\"set\">"
+        "<query xmlns=\"jabber:iq:register\">"
+        "<x xmlns=\"jabber:x:data\" type=\"submit\">"
+        "<field type=\"hidden\" var=\"FORM_TYPE\">"
+        "<value>jabber:iq:register</value>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Given Name\" var=\"first\">"
+        "<value>Juliet</value>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Family Name\" var=\"last\">"
+        "<value>Capulet</value>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Email Address\" var=\"email\">"
+        "<value>juliet@capulet.com</value>"
+        "</field>"
+        "<field type=\"list-single\" label=\"Gender\" var=\"x-gender\">"
+        "<value>F</value>"
+        "</field>"
+        "</x>"
+        "</query>"
+        "</iq>");
+
+    QXmppRegisterIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.id(), QLatin1String("reg4"));
+    QCOMPARE(iq.to(), QLatin1String("contests.shakespeare.lit"));
+    QCOMPARE(iq.from(), QLatin1String("juliet@capulet.com/balcony"));
+    QCOMPARE(iq.type(), QXmppIq::Set);
+    QVERIFY(iq.username().isNull());
+    QVERIFY(iq.password().isNull());
+    QVERIFY(iq.email().isNull());
+    QVERIFY(!iq.form().isNull());
     serializePacket(iq, xml);
 }

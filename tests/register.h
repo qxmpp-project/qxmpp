@@ -32,5 +32,6 @@ private slots:
     void testResult();
     void testResultWithForm();
     void testSet();
+    void testSetWithForm();
 };
 
