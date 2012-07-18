@@ -35,43 +35,66 @@ extern const char* ns_sasl;
 extern const char* ns_bind;
 extern const char* ns_session;
 extern const char* ns_stanza;
-extern const char* ns_vcard;
-extern const char* ns_vcard_update;
 extern const char* ns_auth;
 extern const char* ns_authFeature;
 extern const char* ns_capabilities;
 extern const char* ns_compress;
 extern const char* ns_compressFeature;
+extern const char *ns_legacy_delayed_delivery;
+// XEP-0009: Jabber-RPC
+extern const char* ns_rpc;
+// XEP-0020: Feature Negotiation
+extern const char *ns_feature_negotiation;
+// XEP-0030: Service Discovery
 extern const char* ns_disco_info;
 extern const char* ns_disco_items;
-extern const char* ns_ibb;
-extern const char* ns_rpc;
-extern const char* ns_ping;
-extern const char *ns_conference;
-extern const char *ns_message_receipts;
-extern const char *ns_delayed_delivery;
-extern const char *ns_legacy_delayed_delivery;
+// XEP-0045: Multi-User Chat
 extern const char *ns_muc;
 extern const char *ns_muc_admin;
 extern const char *ns_muc_owner;
 extern const char *ns_muc_user;
-extern const char *ns_chat_states;
-extern const char *ns_stream_initiation;
-extern const char *ns_stream_initiation_file_transfer;
-extern const char *ns_feature_negotiation;
-extern const char *ns_bytestreams;
+// XEP-0047: In-Band Bytestreams
+extern const char* ns_ibb;
+// XEP-0054: vcard-temp
+extern const char* ns_vcard;
+// XEP-0059: Result Set Management
 extern const char *ns_rsm;
+// XEP-0065: SOCKS5 Bytestreams
+extern const char *ns_bytestreams;
+// XEP-0077: In-Band Registration
+extern const char *ns_register;
+// XEP-0085: Chat State Notifications
+extern const char *ns_chat_states;
+// XEP-0092: Software Version
 extern const char *ns_version;
 extern const char *ns_data;
+// XEP-0095: Stream Initiation
+extern const char *ns_stream_initiation;
+extern const char *ns_stream_initiation_file_transfer;
+// XEP-0136: Message Archiving
 extern const char *ns_archive;
+// XEP-0153: vCard-Based Avatars
+extern const char* ns_vcard_update;
+// XEP-0166: Jingle
 extern const char *ns_jingle;
 extern const char* ns_jingle_ice_udp;
 extern const char* ns_jingle_raw_udp;
 extern const char *ns_jingle_rtp;
 extern const char *ns_jingle_rtp_audio;
 extern const char *ns_jingle_rtp_video;
+// XEP-0184: Message Receipts
+extern const char *ns_message_receipts;
+// XEP-0199: XMPP Ping
+extern const char* ns_ping;
+// XEP-0202: Entity Time
 extern const char *ns_entity_time;
+// XEP-0203: Delayed Delivery
+extern const char *ns_delayed_delivery;
+// XEP-0221: Data Forms Media Element
 extern const char *ns_media_element;
+// XEP-0224: Attention
 extern const char *ns_attention;
+// XEP-0249: Direct MUC Invitations
+extern const char *ns_conference;
 
 #endif // QXMPPCONSTANTS_H
