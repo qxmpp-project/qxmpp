@@ -30,6 +30,7 @@ class tst_QXmppDataForm : public QObject
 
 private slots:
     void testSimple();
+    void testSubmit();
     void testMedia();
 };
 

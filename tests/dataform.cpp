@@ -52,6 +52,21 @@ void tst_QXmppDataForm::testSimple()
     serializePacket(form, xml);
 }
 
+void tst_QXmppDataForm::testSubmit()
+{
+    const QByteArray xml(
+        "<x xmlns=\"jabber:x:data\" type=\"submit\">"
+        "<field type=\"text-single\" var=\"search_request\">"
+        "<value>verona</value>"
+        "</field>"
+        "</x>");
+
+    QXmppDataForm form;
+    parsePacket(form, xml);
+    QCOMPARE(form.isNull(), false);
+    serializePacket(form, xml);
+}
+
 void tst_QXmppDataForm::testMedia()
 {
     const QByteArray xml(
