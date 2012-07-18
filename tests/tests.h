@@ -129,6 +129,17 @@ private slots:
     void testWithCsrc();
 };
 
+class TestRsm : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testQuery_data();
+    void testQuery();
+    void testReply_data();
+    void testReply();
+};
+
 class TestServer : public QObject
 {
     Q_OBJECT
@@ -169,15 +180,4 @@ private slots:
     void testInvoke();
     void testResponse();
     void testResponseFault();
-};
-
-class TestRsm : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testQuery_data();
-    void testQuery();
-    void testReply_data();
-    void testReply();
 };
