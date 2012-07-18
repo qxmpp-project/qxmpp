@@ -23,7 +23,7 @@
 
 #include <QObject>
 
-class TestRtp : public QObject
+class tst_QXmppRtpPacket : public QObject
 {
     Q_OBJECT
 

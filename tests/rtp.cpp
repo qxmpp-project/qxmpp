@@ -27,7 +27,7 @@
 
 #include "rtp.h"
 
-void TestRtp::testBad()
+void tst_QXmppRtpPacket::testBad()
 {
     QXmppRtpPacket packet;
 
@@ -40,7 +40,7 @@ void TestRtp::testBad()
     QCOMPARE(packet.decode(QByteArray("\x40\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e", 12)), false);
 }
 
-void TestRtp::testSimple()
+void tst_QXmppRtpPacket::testSimple()
 {
     QByteArray data("\x80\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\x12\x34\x56", 15);
     QXmppRtpPacket packet;
@@ -56,7 +56,7 @@ void TestRtp::testSimple()
     QCOMPARE(packet.encode(), data);
 }
 
-void TestRtp::testWithCsrc()
+void tst_QXmppRtpPacket::testWithCsrc()
 {
     QByteArray data("\x84\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\xab\xcd\xef\x01\xde\xad\xbe\xef\x12\x34\x56", 23);
     QXmppRtpPacket packet;

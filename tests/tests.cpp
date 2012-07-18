@@ -1828,7 +1828,7 @@ int main(int argc, char *argv[])
     TestRsm testRsm;
     errors += QTest::qExec(&testRsm);
 
-    TestRtp testRtp;
+    tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);
 
     TestServer testServer;
