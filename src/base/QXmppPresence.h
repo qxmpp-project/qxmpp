@@ -77,6 +77,7 @@ public:
             XA,          ///< The entity or resource is away for an extended period.
             DND,         ///< The entity or resource is busy ("Do Not Disturb").
             Chat,        ///< The entity or resource is actively interested in chatting.
+            Invisible    ///< obsolete XEP-0018: Invisible Presence
         };
 
         Status(QXmppPresence::Status::Type type = QXmppPresence::Status::Online,

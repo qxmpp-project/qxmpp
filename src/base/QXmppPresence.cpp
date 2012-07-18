@@ -318,6 +318,8 @@ void QXmppPresence::Status::setTypeFromStr(const QString& str)
         m_type = QXmppPresence::Status::DND;
     else if(str == "xa")
         m_type = QXmppPresence::Status::XA;
+    else if(str == "invisible")
+        m_type = QXmppPresence::Status::Invisible;
     else {
         qWarning("QXmppPresence::Status::setTypeFromStr() invalid input string type %s",
             qPrintable(str));
@@ -341,6 +343,8 @@ QString QXmppPresence::Status::getTypeStr() const
         return "dnd";
     case QXmppPresence::Status::Chat:
         return "chat";
+    case QXmppPresence::Status::Invisible:
+        return "invisible";
     default:
         qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
                  (int)m_type);
