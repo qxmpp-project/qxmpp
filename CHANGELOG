@@ -5,6 +5,8 @@ QXmpp 0.6.0 (UNRELEASED)
     * XEP-0221: Data Forms Media Element
 
   - Fix data form title/instructions XML serialization.
+  - Deprecate QXmppConfiguration::setSASLAuthMechanism(), replaced by
+    the string-based QXmppConfiguration::setSaslAuthMechanism().
 
 QXmpp 0.5.0 (Jul 18, 2012)
 --------------------------

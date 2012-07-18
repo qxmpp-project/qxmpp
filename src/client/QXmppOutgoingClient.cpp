@@ -339,21 +339,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         {
             // supported and preferred SASL auth mechanisms
             const QStringList supportedMechanisms = QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM";
-            QString preferredMechanism;
-            switch (configuration().sASLAuthMechanism()) {
-            case QXmppConfiguration::SASLPlain:
-                preferredMechanism = "PLAIN";
-                break;
-            case QXmppConfiguration::SASLDigestMD5:
-                preferredMechanism = "DIGEST-MD5";
-                break;
-            case QXmppConfiguration::SASLAnonymous:
-                preferredMechanism = "ANONYMOUS";
-                break;
-            case QXmppConfiguration::SASLXFacebookPlatform:
-                preferredMechanism = "X-FACEBOOK-PLATFORM";
-                break;
-            }
+            const QString preferredMechanism = configuration().saslAuthMechanism();
 
             // determine SASL Authentication mechanism to use
             QStringList commonMechanisms;

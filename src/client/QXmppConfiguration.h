@@ -72,13 +72,6 @@ public:
     /// The server may or may not allow any particular mechanism. So depending
     /// upon the availability of mechanisms on the server the library will choose
     /// a mechanism.
-    enum SASLAuthMechanism
-    {
-        SASLPlain = 0,         ///< Plain
-        SASLDigestMD5,         ///< Digest MD5 (default)
-        SASLAnonymous,         ///< Anonymous
-        SASLXFacebookPlatform, ///< Facebook Platform
-    };
 
     QXmppConfiguration();
     QXmppConfiguration(const QXmppConfiguration &other);
@@ -132,8 +125,8 @@ public:
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism() const;
     void setNonSASLAuthMechanism(QXmppConfiguration::NonSASLAuthMechanism);
 
-    QXmppConfiguration::SASLAuthMechanism sASLAuthMechanism() const;
-    void setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
+    QString saslAuthMechanism() const;
+    void setSaslAuthMechanism(const QString &mechanism);
 
     QNetworkProxy networkProxy() const;
     void setNetworkProxy(const QNetworkProxy& proxy);
@@ -146,6 +139,19 @@ public:
 
     QList<QSslCertificate> caCertificates() const;
     void setCaCertificates(const QList<QSslCertificate> &);
+
+    /// \cond
+    // deprecated since 0.6.0
+    enum SASLAuthMechanism
+    {
+        SASLPlain = 0,
+        SASLDigestMD5,
+        SASLAnonymous,
+        SASLXFacebookPlatform
+    };
+    QXmppConfiguration::SASLAuthMechanism Q_DECL_DEPRECATED sASLAuthMechanism() const;
+    void Q_DECL_DEPRECATED setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
+    /// \endcond
 
 private:
     QSharedDataPointer<QXmppConfigurationPrivate> d;

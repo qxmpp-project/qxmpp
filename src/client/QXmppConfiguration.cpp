@@ -64,7 +64,7 @@ public:
 
     QXmppConfiguration::StreamSecurityMode streamSecurityMode;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism;
-    QXmppConfiguration::SASLAuthMechanism SASLAuthMechanism;
+    QString saslAuthMechanism;
 
     QNetworkProxy networkProxy;
 
@@ -84,7 +84,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , ignoreSslErrors(true)
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
-    , SASLAuthMechanism(QXmppConfiguration::SASLDigestMD5)
+    , saslAuthMechanism("DIGEST-MD5")
 {
 }
 
@@ -447,25 +447,22 @@ void QXmppConfiguration::setNonSASLAuthMechanism(
     d->nonSASLAuthMechanism = mech;
 }
 
-/// Returns the SASL authentication mechanism configuration.
+/// Returns the preferred SASL authentication mechanism.
 ///
-/// \return QXmppConfiguration::SASLAuthMechanism
-///
+/// Default value: "DIGEST-MD5"
 
-QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::sASLAuthMechanism() const
+QString QXmppConfiguration::saslAuthMechanism() const
 {
-    return d->SASLAuthMechanism;
+    return d->saslAuthMechanism;
 }
 
-/// Hints the library the SASL authentication mechanism to be used for authentication.
+/// Sets the preferred SASL authentication \a mechanism.
 ///
-/// \param mech QXmppConfiguration::SASLAuthMechanism
-///
+/// Valid values: "PLAIN", "DIGEST-MD5", "ANONYMOUS", "X-FACEBOOK-PLATFORM"
 
-void QXmppConfiguration::setSASLAuthMechanism(
-        QXmppConfiguration::SASLAuthMechanism mech)
+void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
 {
-    d->SASLAuthMechanism = mech;
+    d->saslAuthMechanism = mechanism;
 }
 
 /// Specifies the network proxy used for the connection made by QXmppClient.
@@ -545,5 +542,40 @@ void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCerti
 QList<QSslCertificate> QXmppConfiguration::caCertificates() const
 {
     return d->caCertificates;
+}
+
+// obsolete
+
+QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::sASLAuthMechanism() const
+{
+    if (d->saslAuthMechanism == "PLAIN")
+        return SASLPlain;
+    else if (d->saslAuthMechanism == "DIGEST-MD5")
+        return SASLDigestMD5;
+    else if (d->saslAuthMechanism == "ANONYMOUS")
+        return SASLAnonymous;
+    else if (d->saslAuthMechanism == "X-FACEBOOK-PLATFORM")
+        return SASLXFacebookPlatform;
+    else
+        return SASLDigestMD5;
+}
+
+void QXmppConfiguration::setSASLAuthMechanism(
+        QXmppConfiguration::SASLAuthMechanism mech)
+{
+    switch (mech) {
+    case QXmppConfiguration::SASLPlain:
+        d->saslAuthMechanism = "PLAIN";
+        break;
+    case QXmppConfiguration::SASLDigestMD5:
+        d->saslAuthMechanism = "DIGEST-MD5";
+        break;
+    case QXmppConfiguration::SASLAnonymous:
+        d->saslAuthMechanism = "ANONYMOUS";
+        break;
+    case QXmppConfiguration::SASLXFacebookPlatform:
+        d->saslAuthMechanism = "X-FACEBOOK-PLATFORM";
+        break;
+    }
 }
 
