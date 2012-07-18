@@ -119,16 +119,6 @@ private slots:
     void testSubscriptions();
 };
 
-class TestRtp : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testBad();
-    void testSimple();
-    void testWithCsrc();
-};
-
 class TestRsm : public QObject
 {
     Q_OBJECT
