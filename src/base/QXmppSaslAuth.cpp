@@ -154,30 +154,38 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
             return false;
         }
 
-        m_saslDigest.setAuthzid(input.value("authzid"));
-        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+        // determine realm
+        const QByteArray realm = input.value("realm");
+
+        // determine quality of protection
+        const QList<QByteArray> qops = input.value("qop").split(',');
+        if (qops.contains("auth")) {
+            m_saslDigest.setQop("auth");
+            m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+            m_saslDigest.setNc("00000001");
+        }
+
         m_saslDigest.setDigestUri(QString("xmpp/%1").arg(server()).toUtf8());
-        m_saslDigest.setNc("00000001");
         m_saslDigest.setNonce(input.value("nonce"));
-        m_saslDigest.setQop("auth");
         m_saslDigest.setSecret(QCryptographicHash::hash(
-            username().toUtf8() + ":" + input.value("realm") + ":" + password().toUtf8(),
+            username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
             QCryptographicHash::Md5));
 
         // Build response
         QMap<QByteArray, QByteArray> output;
         output["username"] = username().toUtf8();
-        if (input.contains("realm"))
-            output["realm"] = input.value("realm");
+        if (!realm.isEmpty())
+            output["realm"] = realm;
         output["nonce"] = m_saslDigest.nonce();
-        output["cnonce"] = m_saslDigest.cnonce();
-        output["nc"] = m_saslDigest.nc();
-        output["qop"] = m_saslDigest.qop();
+        if (!m_saslDigest.qop().isEmpty()) {
+            output["qop"] = m_saslDigest.qop();
+            output["cnonce"] = m_saslDigest.cnonce();
+            output["nc"] = m_saslDigest.nc();
+        }
         output["digest-uri"] = m_saslDigest.digestUri();
         output["response"] = m_saslDigest.calculateDigest(
             QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
-
-        if(!m_saslDigest.authzid().isEmpty())
+        if (!m_saslDigest.authzid().isEmpty())
             output["authzid"] = m_saslDigest.authzid();
         output["charset"] = "utf-8";
 
