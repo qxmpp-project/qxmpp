@@ -174,7 +174,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         output["nc"] = m_saslDigest.nc();
         output["qop"] = m_saslDigest.qop();
         output["digest-uri"] = m_saslDigest.digestUri();
-        output["output"] = m_saslDigest.calculateDigest(
+        output["response"] = m_saslDigest.calculateDigest(
             QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
 
         if(!m_saslDigest.authzid().isEmpty())
