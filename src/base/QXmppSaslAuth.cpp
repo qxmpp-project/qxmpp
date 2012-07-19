@@ -28,6 +28,7 @@
 #include <QUrl>
 
 #include "QXmppSaslAuth.h"
+#include "QXmppSaslAuth_p.h"
 #include "QXmppUtils.h"
 
 class QXmppSaslClientPrivate
@@ -46,6 +47,21 @@ QXmppSaslClient::QXmppSaslClient()
 QXmppSaslClient::~QXmppSaslClient()
 {
     delete d;
+}
+
+QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism)
+{
+    if (mechanism == "PLAIN") {
+        return new QXmppSaslClientPlain;
+    } else if (mechanism == "DIGEST-MD5") {
+        return new QXmppSaslClientDigestMd5;
+    } else if (mechanism == "ANONYMOUS") {
+        return new QXmppSaslClientAnonymous;
+    } else if (mechanism == "X-FACEBOOK-PLATFORM") {
+        return new QXmppSaslClientFacebook;
+    } else {
+        return 0;
+    }
 }
 
 /// Returns the server.

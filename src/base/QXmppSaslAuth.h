@@ -94,54 +94,10 @@ public:
     virtual QString mechanism() const = 0;
     virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
 
+    static QXmppSaslClient* create(const QString &mechanism);
+
 private:
     QXmppSaslClientPrivate *d;
 };
-
-class QXmppSaslClientAnonymous : public QXmppSaslClient
-{
-public:
-    QXmppSaslClientAnonymous();
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
-
-private:
-    int m_step;
-};
-
-class QXmppSaslClientDigestMd5 : public QXmppSaslClient
-{
-public:
-    QXmppSaslClientDigestMd5();
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
-
-private:
-    QXmppSaslDigestMd5 m_saslDigest;
-    int m_step;
-};
-
-class QXmppSaslClientFacebook : public QXmppSaslClient
-{
-public:
-    QXmppSaslClientFacebook();
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
-
-private:
-    int m_step;
-};
-
-class QXmppSaslClientPlain : public QXmppSaslClient
-{
-public:
-    QXmppSaslClientPlain();
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
-
-private:
-    int m_step;
-};
-
 
 #endif
