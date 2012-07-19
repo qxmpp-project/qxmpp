@@ -59,6 +59,7 @@
 #include "register.h"
 #include "rsm.h"
 #include "rtp.h"
+#include "sasl.h"
 #include "tests.h"
 
 void TestUtils::testCrc32()
@@ -1376,6 +1377,9 @@ int main(int argc, char *argv[])
 
     tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);
+
+    tst_QXmppSaslClient testSasl;
+    errors += QTest::qExec(&testSasl);
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);

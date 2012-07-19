@@ -25,9 +25,235 @@
 #include <cstdlib>
 
 #include <QCryptographicHash>
+#include <QUrl>
 
 #include "QXmppSaslAuth.h"
 #include "QXmppUtils.h"
+
+class QXmppSaslClientPrivate
+{
+public:
+    QString server;
+    QString username;
+    QString password;
+};
+
+QXmppSaslClient::QXmppSaslClient()
+    : d(new QXmppSaslClientPrivate)
+{
+}
+
+QXmppSaslClient::~QXmppSaslClient()
+{
+    delete d;
+}
+
+/// Returns the server.
+
+QString QXmppSaslClient::server() const
+{
+    return d->server;
+}
+
+/// Sets the server.
+
+void QXmppSaslClient::setServer(const QString &server)
+{
+    d->server = server;
+}
+
+/// Returns the username.
+
+QString QXmppSaslClient::username() const
+{
+    return d->username;
+}
+
+/// Sets the username.
+
+void QXmppSaslClient::setUsername(const QString &username)
+{
+    d->username = username;
+}
+
+/// Returns the password.
+
+QString QXmppSaslClient::password() const
+{
+    return d->password;
+}
+
+/// Sets the password.
+
+void QXmppSaslClient::setPassword(const QString &password)
+{
+    d->password = password;
+}
+
+QXmppSaslClientAnonymous::QXmppSaslClientAnonymous()
+    : m_step(0)
+{
+}
+
+QString QXmppSaslClientAnonymous::mechanism() const
+{
+    return "ANONYMOUS";
+}
+
+bool QXmppSaslClientAnonymous::respond(const QByteArray &challenge, QByteArray &response)
+{
+    Q_UNUSED(challenge);
+    if (m_step == 0) {
+        response = QByteArray();
+        m_step++;
+        return true;
+    } else {
+        qWarning("QXmppSaslClientAnonymous : Invalid step");
+        return false;
+    }
+}
+
+QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5()
+    : m_step(0)
+{
+}
+
+QString QXmppSaslClientDigestMd5::mechanism() const
+{
+    return "DIGEST-MD5";
+}
+
+bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &response)
+{
+    Q_UNUSED(challenge);
+    if (m_step == 0) {
+        response = QByteArray();
+        m_step++;
+        return true;
+    } else if (m_step == 1) {
+        const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(challenge);
+
+        if (!input.contains("nonce")) {
+            qWarning("QXmppSaslClientDigestMd5 : Invalid input on step 1");
+            return false;
+        }
+
+        m_saslDigest.setAuthzid(input.value("authzid"));
+        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+        m_saslDigest.setDigestUri(QString("xmpp/%1").arg(server()).toUtf8());
+        m_saslDigest.setNc("00000001");
+        m_saslDigest.setNonce(input.value("nonce"));
+        m_saslDigest.setQop("auth");
+        m_saslDigest.setSecret(QCryptographicHash::hash(
+            username().toUtf8() + ":" + input.value("realm") + ":" + password().toUtf8(),
+            QCryptographicHash::Md5));
+
+        // Build response
+        QMap<QByteArray, QByteArray> output;
+        output["username"] = username().toUtf8();
+        if (input.contains("realm"))
+            output["realm"] = input.value("realm");
+        output["nonce"] = m_saslDigest.nonce();
+        output["cnonce"] = m_saslDigest.cnonce();
+        output["nc"] = m_saslDigest.nc();
+        output["qop"] = m_saslDigest.qop();
+        output["digest-uri"] = m_saslDigest.digestUri();
+        output["output"] = m_saslDigest.calculateDigest(
+            QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
+
+        if(!m_saslDigest.authzid().isEmpty())
+            output["authzid"] = m_saslDigest.authzid();
+        output["charset"] = "utf-8";
+
+        response = QXmppSaslDigestMd5::serializeMessage(output);
+        m_step++;
+        return true;
+    } else if (m_step == 2) {
+        const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(challenge);
+
+        // check new challenge
+        if (input.value("rspauth") !=
+            m_saslDigest.calculateDigest(QByteArray(":") + m_saslDigest.digestUri())) {
+            qWarning("QXmppSaslClientDigestMd5 : Invalid challenge on step 2");
+            return false;
+        }
+
+        response = QByteArray();
+        m_step++;
+        return true;
+    } else {
+        qWarning("QXmppSaslClientDigestMd5 : Invalid step");
+        return false;
+    }
+}
+
+QXmppSaslClientFacebook::QXmppSaslClientFacebook()
+    : m_step(0)
+{
+}
+
+QString QXmppSaslClientFacebook::mechanism() const
+{
+    return "X-FACEBOOK-PLATFORM";
+}
+
+bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &response)
+{
+    if (m_step == 0) {
+        // no initial response
+        response = QByteArray();
+        m_step++;
+        return true;
+    } else if (m_step == 1) {
+        // parse request
+        QUrl requestUrl;
+        requestUrl.setEncodedQuery(challenge);
+        if (!requestUrl.hasQueryItem("method") || !requestUrl.hasQueryItem("nonce")) {
+            qWarning("QXmppSaslClientFacebook : Invalid challenge, nonce or method missing");
+            return false;
+        }
+
+        // build response
+        QUrl responseUrl;
+        responseUrl.addQueryItem("access_token", username());
+        responseUrl.addQueryItem("api_key", password());
+        responseUrl.addQueryItem("call_id", 0);
+        responseUrl.addQueryItem("method", requestUrl.queryItemValue("method"));
+        responseUrl.addQueryItem("nonce", requestUrl.queryItemValue("nonce"));
+        responseUrl.addQueryItem("v", "1.0");
+
+        response = responseUrl.encodedQuery();
+        m_step++;
+        return true;
+    } else {
+        qWarning("QXmppSaslClientFacebook : Invalid step");
+        return false;
+    }
+}
+
+QXmppSaslClientPlain::QXmppSaslClientPlain()
+    : m_step(0)
+{
+}
+
+QString QXmppSaslClientPlain::mechanism() const
+{
+    return "PLAIN";
+}
+
+bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &response)
+{
+    Q_UNUSED(challenge);
+    if (m_step == 0) {
+        response = QString('\0' + username() + '\0' + password()).toUtf8();
+        m_step++;
+        return true;
+    } else {
+        qWarning("QXmppSaslClientPlain : Invalid step");
+        return false;
+    }
+}
+
 
 QByteArray QXmppSaslDigestMd5::authzid() const
 {

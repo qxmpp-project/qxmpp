@@ -30,6 +30,8 @@
 
 #include "QXmppGlobal.h"
 
+class QXmppSaslClientPrivate;
+
 class QXMPP_EXPORT QXmppSaslDigestMd5
 {
 public:
@@ -70,5 +72,76 @@ private:
     QByteArray m_qop;
     QByteArray m_secret;
 };
+
+/// The QXmppSaslClient class is the base class for all SASL client
+//  authentication methods.
+
+class QXMPP_EXPORT QXmppSaslClient
+{
+public:
+    QXmppSaslClient();
+    virtual ~QXmppSaslClient();
+
+    QString server() const;
+    void setServer(const QString &server);
+
+    QString username() const;
+    void setUsername(const QString &username);
+
+    QString password() const;
+    void setPassword(const QString &password);
+
+    virtual QString mechanism() const = 0;
+    virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
+
+private:
+    QXmppSaslClientPrivate *d;
+};
+
+class QXmppSaslClientAnonymous : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientAnonymous();
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
+class QXmppSaslClientDigestMd5 : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientDigestMd5();
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    QXmppSaslDigestMd5 m_saslDigest;
+    int m_step;
+};
+
+class QXmppSaslClientFacebook : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientFacebook();
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
+class QXmppSaslClientPlain : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientPlain();
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
 
 #endif

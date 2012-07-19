@@ -12,6 +12,7 @@ SOURCES += \
     register.cpp \
     rsm.cpp \
     rtp.cpp \
+    sasl.cpp \
     tests.cpp
 HEADERS += \
     dataform.h \
@@ -20,6 +21,7 @@ HEADERS += \
     register.h \
     rsm.h \
     rtp.h \
+    sasl.h \
     tests.h
 
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
