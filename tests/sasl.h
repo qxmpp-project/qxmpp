@@ -30,6 +30,7 @@ class tst_QXmppSaslClient : public QObject
 private slots:
     void testAnonymous();
     void testDigestMd5();
+    void testDigestMd5_data();
     void testFacebook();
     void testPlain();
 };
