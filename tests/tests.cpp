@@ -136,7 +136,7 @@ void TestUtils::testMime()
 
 void TestUtils::testLibVersion()
 {
-    QCOMPARE(QXmppVersion(), QString("0.5.0"));
+    QCOMPARE(QXmppVersion(), QString("0.5.5"));
 }
 
 void TestUtils::testTimezoneOffset()
