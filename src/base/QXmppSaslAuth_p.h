@@ -81,4 +81,53 @@ private:
     int m_step;
 };
 
+class QXmppSaslServerAnonymous : public QXmppSaslServer
+{
+public:
+    QXmppSaslServerAnonymous(QObject *parent = 0);
+    QString mechanism() const;
+
+    Response respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
+class QXmppSaslServerDigestMd5 : public QXmppSaslServer
+{
+public:
+    QXmppSaslServerDigestMd5(QObject *parent = 0);
+    QString mechanism() const;
+
+    Response respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    QXmppSaslDigestMd5 m_saslDigest;
+    int m_step;
+};
+
+class QXmppSaslServerFacebook : public QXmppSaslServer
+{
+public:
+    QXmppSaslServerFacebook(QObject *parent = 0);
+    QString mechanism() const;
+
+    Response respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
+class QXmppSaslServerPlain : public QXmppSaslServer
+{
+public:
+    QXmppSaslServerPlain(QObject *parent = 0);
+    QString mechanism() const;
+    
+    Response respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
 #endif

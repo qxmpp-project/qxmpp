@@ -1378,8 +1378,11 @@ int main(int argc, char *argv[])
     tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);
 
-    tst_QXmppSaslClient testSasl;
-    errors += QTest::qExec(&testSasl);
+    tst_QXmppSaslClient testSaslClient;
+    errors += QTest::qExec(&testSaslClient);
+
+    tst_QXmppSaslServer testSaslServer;
+    errors += QTest::qExec(&testSaslServer);
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);

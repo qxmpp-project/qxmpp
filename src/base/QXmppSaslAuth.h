@@ -32,6 +32,7 @@
 #include "QXmppLogger.h"
 
 class QXmppSaslClientPrivate;
+class QXmppSaslServerPrivate;
 
 class QXMPP_EXPORT QXmppSaslDigestMd5
 {
@@ -103,6 +104,33 @@ public:
 
 private:
     QXmppSaslClientPrivate *d;
+};
+
+class QXMPP_EXPORT QXmppSaslServer : public QXmppLoggable
+{
+public:
+    enum Response {
+        Challenge = 0,
+        Succeeded = 1,
+        Failed = 2
+    };
+
+    QXmppSaslServer(QObject *parent = 0);
+    virtual ~QXmppSaslServer();
+
+    QString username() const;
+    void setUsername(const QString &username);
+
+    QString password() const;
+    void setPassword(const QString &password);
+
+    virtual QString mechanism() const = 0;
+    virtual Response respond(const QByteArray &challenge, QByteArray &response) = 0;
+
+    static QXmppSaslServer* create(const QString &mechanism, QObject *parent = 0);
+
+private:
+    QXmppSaslServerPrivate *d;
 };
 
 #endif

@@ -104,7 +104,7 @@ void QXmppSaslClient::setServiceType(const QString &serviceType)
     d->serviceType = serviceType;
 }
 
-/// Returns the host.
+/// Returns the username.
 
 QString QXmppSaslClient::username() const
 {
@@ -305,6 +305,153 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
     } else {
         warning("QXmppSaslClientPlain : Invalid step");
         return false;
+    }
+}
+
+class QXmppSaslServerPrivate
+{
+public:
+    QString username;
+    QString password;
+};
+
+QXmppSaslServer::QXmppSaslServer(QObject *parent)
+    : QXmppLoggable(parent)
+    , d(new QXmppSaslServerPrivate)
+{
+}
+
+QXmppSaslServer::~QXmppSaslServer()
+{
+    delete d;
+}
+
+/// Creates an SASL server for the given mechanism.
+
+QXmppSaslServer* QXmppSaslServer::create(const QString &mechanism, QObject *parent)
+{
+    if (mechanism == "PLAIN") {
+        return new QXmppSaslServerPlain(parent);
+    } else if (mechanism == "DIGEST-MD5") {
+        return new QXmppSaslServerDigestMd5(parent);
+    } else if (mechanism == "ANONYMOUS") {
+        return new QXmppSaslServerAnonymous(parent);
+    }
+}
+
+/// Returns the username.
+
+QString QXmppSaslServer::username() const
+{
+    return d->username;
+}
+
+/// Sets the username.
+
+void QXmppSaslServer::setUsername(const QString &username)
+{
+    d->username = username;
+}
+
+/// Returns the password.
+
+QString QXmppSaslServer::password() const
+{
+    return d->password;
+}
+
+/// Sets the password.
+
+void QXmppSaslServer::setPassword(const QString &password)
+{
+    d->password = password;
+}
+
+QXmppSaslServerAnonymous::QXmppSaslServerAnonymous(QObject *parent)
+    : QXmppSaslServer(parent)
+    , m_step(0)
+{
+}
+
+QString QXmppSaslServerAnonymous::mechanism() const
+{
+    return "ANONYMOUS";
+}
+
+QXmppSaslServer::Response QXmppSaslServerAnonymous::respond(const QByteArray &request, QByteArray &response)
+{
+    Q_UNUSED(request);
+    if (m_step == 0) {
+        m_step++;
+        response = QByteArray();
+        return Succeeded;
+    } else {
+        warning("QXmppSaslServerAnonymous : Invalid step");
+        return Failed;
+    }
+}
+
+QXmppSaslServerDigestMd5::QXmppSaslServerDigestMd5(QObject *parent)
+    : QXmppSaslServer(parent)
+    , m_step(0)
+{
+}
+
+QString QXmppSaslServerDigestMd5::mechanism() const
+{
+    return "DIGEST-MD5";
+}
+
+QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &request, QByteArray &response)
+{
+    if (m_step == 0) {
+        // generate nonce
+        m_saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
+        //m_saslDigest.setQop("auth");
+
+        QMap<QByteArray, QByteArray> challenge;
+        challenge["nonce"] = m_saslDigest.nonce();
+        //challenge["realm"] = m_domain.toUtf8();
+        challenge["qop"] = "auth";
+        challenge["charset"] = "utf-8";
+        challenge["algorithm"] = "md5-sess";
+
+        m_step++;
+        response = QXmppSaslDigestMd5::serializeMessage(challenge);
+        return Challenge;
+    } else {
+        return Failed;
+    }
+}
+
+QXmppSaslServerPlain::QXmppSaslServerPlain(QObject *parent)
+    : QXmppSaslServer(parent)
+    , m_step(0)
+{
+}
+
+QString QXmppSaslServerPlain::mechanism() const
+{
+    return "PLAIN";
+}
+
+QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &request, QByteArray &response)
+{
+    if (m_step == 0) {
+        QList<QByteArray> auth = request.split('\0');
+        if (auth.size() != 3) {
+            warning("QXmppSaslServerPlain : Invalid input");
+            return Failed;
+        }
+        setUsername(QString::fromUtf8(auth[1]));
+        setPassword(QString::fromUtf8(auth[2]));
+
+        m_step++;
+        response = QByteArray();
+        return Succeeded;
+    } else {
+        warning("QXmppSaslServerPlain : Invalid step");
+        return Failed;
     }
 }
 

@@ -31,6 +31,12 @@ void tst_QXmppSaslClient::testAvailableMechanisms()
     QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM");
 }
 
+void tst_QXmppSaslClient::testBadMechanism()
+{
+    QXmppSaslClient *client = QXmppSaslClient::create("BAD-MECH");
+    QVERIFY(client == 0);
+}
+
 void tst_QXmppSaslClient::testAnonymous()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("ANONYMOUS");
@@ -41,7 +47,7 @@ void tst_QXmppSaslClient::testAnonymous()
     QByteArray response;
     QVERIFY(client->respond(QByteArray(), response));
     QCOMPARE(response, QByteArray());
- 
+
     // any further step is an error
     QVERIFY(!client->respond(QByteArray(), response));
 
@@ -131,3 +137,63 @@ void tst_QXmppSaslClient::testPlain()
     delete client;
 }
 
+void tst_QXmppSaslServer::testBadMechanism()
+{
+    QXmppSaslServer *server = QXmppSaslServer::create("BAD-MECH");
+    QVERIFY(server == 0);
+}
+
+void tst_QXmppSaslServer::testAnonymous()
+{
+    QXmppSaslServer *server = QXmppSaslServer::create("ANONYMOUS");
+    QVERIFY(server != 0);
+    QCOMPARE(server->mechanism(), QLatin1String("ANONYMOUS"));
+
+    // initial step returns success
+    QByteArray response;
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Succeeded);
+    QCOMPARE(response, QByteArray());
+
+    // any further step is an error
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+
+    delete server;
+}
+
+void tst_QXmppSaslServer::testDigestMd5()
+{
+    qsrand(0);
+
+    QXmppSaslServer *server = QXmppSaslServer::create("DIGEST-MD5");
+    QVERIFY(server != 0);
+    QCOMPARE(server->mechanism(), QLatin1String("DIGEST-MD5"));
+
+    // initial step returns challenge
+    QByteArray response;
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Challenge);
+    QCOMPARE(response, QByteArray("algorithm=md5-sess,charset=utf-8,nonce=\"AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=\",qop=auth"));
+
+    // any further step is an error
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+
+    delete server;
+}
+
+void tst_QXmppSaslServer::testPlain()
+{
+    QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
+    QVERIFY(server != 0);
+    QCOMPARE(server->mechanism(), QLatin1String("PLAIN"));
+
+    // initial step returns success
+    QByteArray response;
+    QCOMPARE(server->respond(QByteArray("\0foo\0bar", 8), response), QXmppSaslServer::Succeeded);
+    QCOMPARE(response, QByteArray());
+    QCOMPARE(server->username(), QLatin1String("foo"));
+    QCOMPARE(server->password(), QLatin1String("bar"));
+
+    // any further step is an error
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+
+    delete server;
+}
