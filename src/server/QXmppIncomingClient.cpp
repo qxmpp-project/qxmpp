@@ -296,10 +296,12 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if (nodeRecv.tagName() == QLatin1String("response"))
         {
+            QXmppSaslResponse response;
+            response.parse(nodeRecv);
+
             if (d->saslDigestStep == 1)
             {
-                const QByteArray raw = QByteArray::fromBase64(nodeRecv.text().toAscii());
-                QMap<QByteArray, QByteArray> saslResponse = QXmppSaslDigestMd5::parseMessage(raw);
+                QMap<QByteArray, QByteArray> saslResponse = QXmppSaslDigestMd5::parseMessage(response.value());
 
                 // check credentials
                 const QString username = QString::fromUtf8(saslResponse.value("username"));
@@ -310,7 +312,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 QXmppPasswordReply *reply = d->passwordChecker->getDigest(request);
                 reply->setParent(this);
-                reply->setProperty("__sasl_raw", raw);
+                reply->setProperty("__sasl_raw", response.value());
                 connect(reply, SIGNAL(finished()), this, SLOT(onDigestReply()));
             }
             else if (d->saslDigestStep == 2)

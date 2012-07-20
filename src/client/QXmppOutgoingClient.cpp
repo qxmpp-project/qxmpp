@@ -444,7 +444,10 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if(nodeRecv.tagName() == "failure")
         {
-            if (!nodeRecv.firstChildElement("not-authorized").isNull())
+            QXmppSaslFailure failure;
+            failure.parse(nodeRecv);
+
+            if (failure.condition() == "not-authorized")
                 d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
             else
                 d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
