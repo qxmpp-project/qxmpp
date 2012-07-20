@@ -1012,11 +1012,24 @@ private:
     QString m_password;
 };
 
+void TestServer::testConnect_data()
+{
+    QTest::addColumn<QString>("username");
+    QTest::addColumn<QString>("password");
+    QTest::addColumn<bool>("connected");
+
+    QTest::newRow("good") << "testuser" << "testpwd" << true;
+    QTest::newRow("bad-username") << "baduser" << "testpwd" << false;
+    QTest::newRow("bad-password") << "testuser" << "badpwd" << false;
+}
+
 void TestServer::testConnect()
 {
+    QFETCH(QString, username);
+    QFETCH(QString, password);
+    QFETCH(bool, connected);
+
     const QString testDomain("localhost");
-    const QString testPassword("testpwd");
-    const QString testUser("testuser");
     const QHostAddress testHost(QHostAddress::LocalHost);
     const quint16 testPort = 12345;
 
@@ -1024,7 +1037,7 @@ void TestServer::testConnect()
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     // prepare server
-    TestPasswordChecker passwordChecker(testUser, testPassword);
+    TestPasswordChecker passwordChecker("testuser", "testpwd");
 
     QXmppServer server;
     server.setDomain(testDomain);
@@ -1045,20 +1058,12 @@ void TestServer::testConnect()
     QXmppConfiguration config;
     config.setDomain(testDomain);
     config.setHost(testHost.toString());
-    config.setUser(testUser);
     config.setPort(testPort);
-
-    // check bad password fails
-    config.setPassword("badpassword");
+    config.setUser(username);
+    config.setPassword(password);
     client.connectToServer(config);
     loop.exec();
-    QCOMPARE(client.isConnected(), false);
-
-    // check correct password works
-    config.setPassword(testPassword);
-    client.connectToServer(config);
-    loop.exec();
-    QCOMPARE(client.isConnected(), true);
+    QCOMPARE(client.isConnected(), connected);
 }
 
 void TestStun::testFingerprint()
