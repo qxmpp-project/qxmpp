@@ -86,7 +86,8 @@ void tst_QXmppSaslClient::testDigestMd5()
 {
     QFETCH(QByteArray, qop);
 
-    qsrand(0);
+    QXmppSaslDigestMd5::setNonce("AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=");
+
     QXmppSaslClient *client = QXmppSaslClient::create("DIGEST-MD5");
     QVERIFY(client != 0);
     QCOMPARE(client->mechanism(), QLatin1String("DIGEST-MD5"));
@@ -182,7 +183,7 @@ void tst_QXmppSaslServer::testAnonymous()
 
 void tst_QXmppSaslServer::testDigestMd5()
 {
-    qsrand(1);
+    QXmppSaslDigestMd5::setNonce("OI08/m+QRm6Ma+fKOjuqVXtz40sR5u9/u5GN6sSW0rs=");
 
     QXmppSaslServer *server = QXmppSaslServer::create("DIGEST-MD5");
     QVERIFY(server != 0);

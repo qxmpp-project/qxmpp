@@ -35,6 +35,8 @@
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
+static QByteArray forcedNonce;
+
 // Calculate digest response for use with XMPP/SASL.
 
 static QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri, const QByteArray &secret, const QByteArray &nonce, const QByteArray &cnonce, const QByteArray &nc)
@@ -50,6 +52,9 @@ static QByteArray calculateDigest(const QByteArray &method, const QByteArray &di
 
 static QByteArray generateNonce()
 {
+    if (!forcedNonce.isEmpty())
+        return forcedNonce;
+
     QByteArray nonce = QXmppUtils::generateRandomBytes(32);
 
     // The random data can the '=' char is not valid as it is a delimiter,
@@ -653,6 +658,11 @@ QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &reques
         warning("QXmppSaslServerPlain : Invalid step");
         return Failed;
     }
+}
+
+void QXmppSaslDigestMd5::setNonce(const QByteArray &nonce)
+{
+    forcedNonce = nonce;
 }
 
 QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &ba)

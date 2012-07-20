@@ -44,6 +44,8 @@
 class QXmppSaslDigestMd5
 {
 public:
+    static void setNonce(const QByteArray &nonce);
+
     // message parsing and serialization
     static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
     static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
