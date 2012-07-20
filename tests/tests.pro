@@ -26,5 +26,10 @@ HEADERS += \
     sasl.h \
     tests.h
 
+win32 {
+    HEADERS -= codec.h sasl.h
+    SOURCES -= codec.cpp sasl.cpp
+}
+
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
 LIBS += -L../src $$QXMPP_LIBS

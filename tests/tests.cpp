@@ -1311,8 +1311,10 @@ int main(int argc, char *argv[])
     TestPackets testPackets;
     errors += QTest::qExec(&testPackets);
 
+#ifndef Q_OS_WIN
     TestCodec testCodec;
     errors += QTest::qExec(&testCodec);
+#endif
 
     tst_QXmppDataForm testDataForm;
     errors += QTest::qExec(&testDataForm);
@@ -1338,6 +1340,7 @@ int main(int argc, char *argv[])
     tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);
 
+#ifndef Q_OS_WIN
     tst_QXmppSasl testSasl;
     errors += QTest::qExec(&testSasl);
 
@@ -1346,6 +1349,7 @@ int main(int argc, char *argv[])
 
     tst_QXmppSaslServer testSaslServer;
     errors += QTest::qExec(&testSaslServer);
+#endif
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);
