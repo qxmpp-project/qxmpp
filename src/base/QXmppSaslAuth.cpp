@@ -34,7 +34,8 @@
 class QXmppSaslClientPrivate
 {
 public:
-    QString server;
+    QString host;
+    QString serviceType;
     QString username;
     QString password;
 };
@@ -64,21 +65,35 @@ QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism)
     }
 }
 
-/// Returns the server.
+/// Returns the host.
 
-QString QXmppSaslClient::server() const
+QString QXmppSaslClient::host() const
 {
-    return d->server;
+    return d->host;
 }
 
-/// Sets the server.
+/// Sets the host.
 
-void QXmppSaslClient::setServer(const QString &server)
+void QXmppSaslClient::setHost(const QString &host)
 {
-    d->server = server;
+    d->host = host;
 }
 
-/// Returns the username.
+/// Returns the service type, e.g. "xmpp".
+
+QString QXmppSaslClient::serviceType() const
+{
+    return d->serviceType;
+}
+
+/// Sets the service type, e.g. "xmpp".
+
+void QXmppSaslClient::setServiceType(const QString &serviceType)
+{
+    d->serviceType = serviceType;
+}
+
+/// Returns the host.
 
 QString QXmppSaslClient::username() const
 {
@@ -167,7 +182,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         m_saslDigest.setQop("auth");
         m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
         m_saslDigest.setNc("00000001");
-        m_saslDigest.setDigestUri(QString("xmpp/%1").arg(server()).toUtf8());
+        m_saslDigest.setDigestUri(QString("%1/%2").arg(serviceType(), host()).toUtf8());
         m_saslDigest.setNonce(input.value("nonce"));
         m_saslDigest.setSecret(QCryptographicHash::hash(
             username().toUtf8() + ":" + realm + ":" + password().toUtf8(),

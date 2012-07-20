@@ -63,7 +63,8 @@ void tst_QXmppSaslClient::testDigestMd5()
 
     client->setUsername("qxmpp1");
     client->setPassword("qxmpp123");
-    client->setServer("jabber.ru");
+    client->setHost("jabber.ru");
+    client->setServiceType("xmpp");
 
     // initial step returns nothing
     QByteArray response;

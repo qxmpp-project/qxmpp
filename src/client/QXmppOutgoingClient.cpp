@@ -366,7 +366,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
             info(QString("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
-            d->saslClient->setServer(configuration().domain());
+            d->saslClient->setHost(configuration().host());
+            d->saslClient->setServiceType("xmpp");
             if (d->saslClient->mechanism() == "X-FACEBOOK-PLATFORM") {
                 d->saslClient->setUsername(configuration().facebookAppId());
                 d->saslClient->setPassword(configuration().facebookAccessToken());

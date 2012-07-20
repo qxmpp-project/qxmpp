@@ -82,8 +82,11 @@ public:
     QXmppSaslClient();
     virtual ~QXmppSaslClient();
 
-    QString server() const;
-    void setServer(const QString &server);
+    QString host() const;
+    void setHost(const QString &host);
+
+    QString serviceType() const;
+    void setServiceType(const QString &serviceType);
 
     QString username() const;
     void setUsername(const QString &username);
