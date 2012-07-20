@@ -43,7 +43,6 @@ void tst_QXmppSaslClient::testAnonymous()
     QCOMPARE(response, QByteArray());
  
     // any further step is an error
-    QTest::ignoreMessage(QtWarningMsg, "QXmppSaslClientAnonymous : Invalid step");
     QVERIFY(!client->respond(QByteArray(), response));
 
     delete client;
@@ -83,7 +82,6 @@ void tst_QXmppSaslClient::testDigestMd5()
     QCOMPARE(response, QByteArray());
 
     // any further step is an error
-    QTest::ignoreMessage(QtWarningMsg, "QXmppSaslClientDigestMd5 : Invalid step");
     QVERIFY(!client->respond(QByteArray(), response));
 
     delete client;
@@ -108,7 +106,6 @@ void tst_QXmppSaslClient::testFacebook()
     QCOMPARE(response, QByteArray("access_token=123456789012345&api_key=abcdefghijlkmno&call_id=&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8&v=1.0"));
 
     // any further step is an error
-    QTest::ignoreMessage(QtWarningMsg, "QXmppSaslClientFacebook : Invalid step");
     QVERIFY(!client->respond(QByteArray(), response));
 
     delete client;
@@ -129,7 +126,6 @@ void tst_QXmppSaslClient::testPlain()
     QCOMPARE(response, QByteArray("\0foo\0bar", 8));
 
     // any further step is an error
-    QTest::ignoreMessage(QtWarningMsg, "QXmppSaslClientPlain : Invalid step");
     QVERIFY(!client->respond(QByteArray(), response));
 
     delete client;

@@ -41,8 +41,9 @@ public:
     QString password;
 };
 
-QXmppSaslClient::QXmppSaslClient()
-    : d(new QXmppSaslClientPrivate)
+QXmppSaslClient::QXmppSaslClient(QObject *parent)
+    : QXmppLoggable(parent)
+    , d(new QXmppSaslClientPrivate)
 {
 }
 
@@ -51,21 +52,25 @@ QXmppSaslClient::~QXmppSaslClient()
     delete d;
 }
 
+/// Returns a list of supported mechanisms.
+
 QStringList QXmppSaslClient::availableMechanisms()
 {
     return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM";
 }
 
-QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism)
+/// Creates an SASL client for the given mechanism.
+
+QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == "PLAIN") {
-        return new QXmppSaslClientPlain;
+        return new QXmppSaslClientPlain(parent);
     } else if (mechanism == "DIGEST-MD5") {
-        return new QXmppSaslClientDigestMd5;
+        return new QXmppSaslClientDigestMd5(parent);
     } else if (mechanism == "ANONYMOUS") {
-        return new QXmppSaslClientAnonymous;
+        return new QXmppSaslClientAnonymous(parent);
     } else if (mechanism == "X-FACEBOOK-PLATFORM") {
-        return new QXmppSaslClientFacebook;
+        return new QXmppSaslClientFacebook(parent);
     } else {
         return 0;
     }
@@ -127,8 +132,9 @@ void QXmppSaslClient::setPassword(const QString &password)
     d->password = password;
 }
 
-QXmppSaslClientAnonymous::QXmppSaslClientAnonymous()
-    : m_step(0)
+QXmppSaslClientAnonymous::QXmppSaslClientAnonymous(QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_step(0)
 {
 }
 
@@ -145,13 +151,14 @@ bool QXmppSaslClientAnonymous::respond(const QByteArray &challenge, QByteArray &
         m_step++;
         return true;
     } else {
-        qWarning("QXmppSaslClientAnonymous : Invalid step");
+        warning("QXmppSaslClientAnonymous : Invalid step");
         return false;
     }
 }
 
-QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5()
-    : m_step(0)
+QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_step(0)
 {
 }
 
@@ -171,7 +178,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(challenge);
 
         if (!input.contains("nonce")) {
-            qWarning("QXmppSaslClientDigestMd5 : Invalid input on step 1");
+            warning("QXmppSaslClientDigestMd5 : Invalid input on step 1");
             return false;
         }
 
@@ -181,7 +188,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         // determine quality of protection
         const QList<QByteArray> qops = input.value("qop", "auth").split(',');
         if (!qops.contains("auth")) {
-            qWarning("QXmppSaslClientDigestMd5 : Invalid quality of protection");
+            warning("QXmppSaslClientDigestMd5 : Invalid quality of protection");
             return false;
         }
 
@@ -219,7 +226,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         // check new challenge
         if (input.value("rspauth") !=
             m_saslDigest.calculateDigest(QByteArray(":") + m_saslDigest.digestUri())) {
-            qWarning("QXmppSaslClientDigestMd5 : Invalid challenge on step 2");
+            warning("QXmppSaslClientDigestMd5 : Invalid challenge on step 2");
             return false;
         }
 
@@ -227,13 +234,14 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         m_step++;
         return true;
     } else {
-        qWarning("QXmppSaslClientDigestMd5 : Invalid step");
+        warning("QXmppSaslClientDigestMd5 : Invalid step");
         return false;
     }
 }
 
-QXmppSaslClientFacebook::QXmppSaslClientFacebook()
-    : m_step(0)
+QXmppSaslClientFacebook::QXmppSaslClientFacebook(QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_step(0)
 {
 }
 
@@ -254,7 +262,7 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         QUrl requestUrl;
         requestUrl.setEncodedQuery(challenge);
         if (!requestUrl.hasQueryItem("method") || !requestUrl.hasQueryItem("nonce")) {
-            qWarning("QXmppSaslClientFacebook : Invalid challenge, nonce or method missing");
+            warning("QXmppSaslClientFacebook : Invalid challenge, nonce or method missing");
             return false;
         }
 
@@ -271,13 +279,14 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         m_step++;
         return true;
     } else {
-        qWarning("QXmppSaslClientFacebook : Invalid step");
+        warning("QXmppSaslClientFacebook : Invalid step");
         return false;
     }
 }
 
-QXmppSaslClientPlain::QXmppSaslClientPlain()
-    : m_step(0)
+QXmppSaslClientPlain::QXmppSaslClientPlain(QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_step(0)
 {
 }
 
@@ -294,11 +303,10 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
         m_step++;
         return true;
     } else {
-        qWarning("QXmppSaslClientPlain : Invalid step");
+        warning("QXmppSaslClientPlain : Invalid step");
         return false;
     }
 }
-
 
 QByteArray QXmppSaslDigestMd5::authzid() const
 {

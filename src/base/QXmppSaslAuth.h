@@ -29,6 +29,7 @@
 #include <QMap>
 
 #include "QXmppGlobal.h"
+#include "QXmppLogger.h"
 
 class QXmppSaslClientPrivate;
 
@@ -74,12 +75,12 @@ private:
 };
 
 /// The QXmppSaslClient class is the base class for all SASL client
-//  authentication methods.
+/// authentication methods.
 
-class QXMPP_EXPORT QXmppSaslClient
+class QXMPP_EXPORT QXmppSaslClient : public QXmppLoggable
 {
 public:
-    QXmppSaslClient();
+    QXmppSaslClient(QObject *parent = 0);
     virtual ~QXmppSaslClient();
 
     QString host() const;
@@ -98,7 +99,7 @@ public:
     virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
 
     static QStringList availableMechanisms();
-    static QXmppSaslClient* create(const QString &mechanism);
+    static QXmppSaslClient* create(const QString &mechanism, QObject *parent = 0);
 
 private:
     QXmppSaslClientPrivate *d;

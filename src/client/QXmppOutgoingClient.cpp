@@ -359,7 +359,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 usedMechanism = preferredMechanism;
             }
 
-            d->saslClient = QXmppSaslClient::create(usedMechanism);
+            d->saslClient = QXmppSaslClient::create(usedMechanism, this);
             if (!d->saslClient) {
                 warning("SASL mechanism negotiation failed");
                 disconnectFromHost();

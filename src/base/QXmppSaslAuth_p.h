@@ -39,7 +39,7 @@
 class QXmppSaslClientAnonymous : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientAnonymous();
+    QXmppSaslClientAnonymous(QObject *parent = 0);
     QString mechanism() const;
     bool respond(const QByteArray &challenge, QByteArray &response);
 
@@ -50,7 +50,7 @@ private:
 class QXmppSaslClientDigestMd5 : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientDigestMd5();
+    QXmppSaslClientDigestMd5(QObject *parent = 0);
     QString mechanism() const;
     bool respond(const QByteArray &challenge, QByteArray &response);
 
@@ -62,7 +62,7 @@ private:
 class QXmppSaslClientFacebook : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientFacebook();
+    QXmppSaslClientFacebook(QObject *parent = 0);
     QString mechanism() const;
     bool respond(const QByteArray &challenge, QByteArray &response);
 
@@ -73,7 +73,7 @@ private:
 class QXmppSaslClientPlain : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientPlain();
+    QXmppSaslClientPlain(QObject *parent = 0);
     QString mechanism() const;
     bool respond(const QByteArray &challenge, QByteArray &response);
 
