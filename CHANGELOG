@@ -1,4 +1,4 @@
-QXmpp 0.5.5 (Jul 20, 2012)
+QXmpp 0.6.0 (Jul 20, 2012)
 --------------------------
 
   - New XEPs
@@ -10,6 +10,7 @@ QXmpp 0.5.5 (Jul 20, 2012)
     the string-based QXmppConfiguration::setSaslAuthMechanism().
 
   - Fix issues:
+    * Issue 111: QXmppPresence::Status::getTypeStr() gives warning if type is invisible
     * Issue 126: Modularize SASL mechanisms
 
 QXmpp 0.5.0 (Jul 18, 2012)
