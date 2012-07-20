@@ -37,6 +37,12 @@
 #  endif
 #endif
 
+#if defined(QXMPP_BUILD_INTERNAL)
+#    define QXMPP_AUTOTEST_EXPORT QXMPP_EXPORT
+#else
+#    define QXMPP_AUTOTEST_EXPORT
+#endif
+
 /// This macro expands a numeric value of the form 0xMMNNPP (MM =
 /// major, NN = minor, PP = patch) that specifies QXmpp's version
 /// number. For example, if you compile your application against

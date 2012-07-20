@@ -6,6 +6,7 @@ TARGET = qxmpp-tests
 
 RESOURCES += tests.qrc
 SOURCES += \
+    codec.cpp \
     dataform.cpp \
     message.cpp \
     presence.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
     sasl.cpp \
     tests.cpp
 HEADERS += \
+    codec.h \
     dataform.h \
     message.h \
     presence.h \

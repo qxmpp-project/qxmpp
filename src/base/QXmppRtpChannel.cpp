@@ -27,7 +27,7 @@
 #include <QMetaType>
 #include <QTimer>
 
-#include "QXmppCodec.h"
+#include "QXmppCodec_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
 

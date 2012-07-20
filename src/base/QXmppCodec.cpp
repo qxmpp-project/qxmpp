@@ -29,7 +29,7 @@
 #include <QDebug>
 #include <QSize>
 
-#include "QXmppCodec.h"
+#include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
 
 #include <cstring>

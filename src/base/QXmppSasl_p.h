@@ -48,7 +48,7 @@ class QXmppSaslServerPrivate;
 // We mean it.
 //
 
-class QXmppSaslClient : public QXmppLoggable
+class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
 public:
     QXmppSaslClient(QObject *parent = 0);
@@ -79,7 +79,7 @@ private:
 /// The QXmppServerClient class is the base class for all SASL server
 /// authentication methods.
 
-class QXmppSaslServer : public QXmppLoggable
+class QXMPP_AUTOTEST_EXPORT QXmppSaslServer : public QXmppLoggable
 {
 public:
     enum Response {
@@ -113,8 +113,7 @@ private:
     QXmppSaslServerPrivate *d;
 };
 
-
-class QXmppSaslDigestMd5
+class QXMPP_AUTOTEST_EXPORT QXmppSaslDigestMd5
 {
 public:
     static void setNonce(const QByteArray &nonce);

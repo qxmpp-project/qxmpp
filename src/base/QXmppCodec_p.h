@@ -24,6 +24,7 @@
 #ifndef QXMPPCODEC_H
 #define QXMPPCODEC_H
 
+#include <QMap>
 #include <QtGlobal>
 
 #include "QXmppGlobal.h"
@@ -37,7 +38,7 @@ class QXmppVideoFrame;
 ///
 /// Samples must be 16-bit little endian.
 
-class QXMPP_EXPORT QXmppCodec
+class QXMPP_AUTOTEST_EXPORT QXmppCodec
 {
 public:
     virtual ~QXmppCodec();
@@ -90,7 +91,7 @@ typedef struct SpeexBits SpeexBits;
 ///
 /// The QXmppSpeexCodec class represent a SPEEX codec.
 
-class QXMPP_EXPORT QXmppSpeexCodec : public QXmppCodec
+class QXMPP_AUTOTEST_EXPORT QXmppSpeexCodec : public QXmppCodec
 {
 public:
     QXmppSpeexCodec(int clockrate);
@@ -111,7 +112,7 @@ private:
 /// \brief The QXmppVideoDecoder class is the base class for video decoders.
 ///
 
-class QXMPP_EXPORT QXmppVideoDecoder
+class QXMPP_AUTOTEST_EXPORT QXmppVideoDecoder
 {
 public:
     virtual ~QXmppVideoDecoder();
@@ -129,7 +130,7 @@ public:
 /// \brief The QXmppVideoEncoder class is the base class for video encoders.
 ///
 
-class QXMPP_EXPORT QXmppVideoEncoder
+class QXMPP_AUTOTEST_EXPORT QXmppVideoEncoder
 {
 public:
     virtual ~QXmppVideoEncoder();
@@ -148,7 +149,7 @@ public:
 class QXmppTheoraDecoderPrivate;
 class QXmppTheoraEncoderPrivate;
 
-class QXMPP_EXPORT QXmppTheoraDecoder : public QXmppVideoDecoder
+class QXMPP_AUTOTEST_EXPORT QXmppTheoraDecoder : public QXmppVideoDecoder
 {
 public:
     QXmppTheoraDecoder();
@@ -162,7 +163,7 @@ private:
     QXmppTheoraDecoderPrivate *d;
 };
 
-class QXMPP_EXPORT QXmppTheoraEncoder : public QXmppVideoEncoder
+class QXMPP_AUTOTEST_EXPORT QXmppTheoraEncoder : public QXmppVideoEncoder
 {
 public:
     QXmppTheoraEncoder();
@@ -181,7 +182,7 @@ private:
 class QXmppVpxDecoderPrivate;
 class QXmppVpxEncoderPrivate;
 
-class QXMPP_EXPORT QXmppVpxDecoder : public QXmppVideoDecoder
+class QXMPP_AUTOTEST_EXPORT QXmppVpxDecoder : public QXmppVideoDecoder
 {
 public:
     QXmppVpxDecoder();
@@ -195,7 +196,7 @@ private:
     QXmppVpxDecoderPrivate *d;
 };
 
-class QXMPP_EXPORT QXmppVpxEncoder : public QXmppVideoEncoder
+class QXMPP_AUTOTEST_EXPORT QXmppVpxEncoder : public QXmppVideoEncoder
 {
 public:
     QXmppVpxEncoder();

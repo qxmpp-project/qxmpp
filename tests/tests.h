@@ -88,15 +88,6 @@ private slots:
     void testEntityTimeResult();
 };
 
-class TestCodec : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testTheoraDecoder();
-    void testTheoraEncoder();
-};
-
 class TestJingle : public QObject
 {
     Q_OBJECT
