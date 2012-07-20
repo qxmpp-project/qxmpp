@@ -38,31 +38,10 @@
 // We mean it.
 //
 
-class QXmppSaslAuth : public QXmppStanza
-{
-public:
-    QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
-
-    QString mechanism() const;
-    void setMechanism(const QString &mechanism);
-
-    QByteArray value() const;
-    void setValue(const QByteArray &value);
-
-    /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
-
-private:
-    QString m_mechanism;
-    QByteArray m_value;
-};
-
 class QXmppSaslStanza : public QXmppStanza
 {
 public:
-    QXmppSaslStanza(const QString &type = QString(), const QByteArray &value = QByteArray());
+    QXmppSaslStanza(const QString &type, const QByteArray &value = QByteArray());
 
     QString type() const;
     void setType(const QString &type);
@@ -78,6 +57,41 @@ public:
 private:
     QString m_type;
     QByteArray m_value;
+};
+
+class QXmppSaslAuth : public QXmppSaslStanza
+{
+public:
+    QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
+
+    QString mechanism() const;
+    void setMechanism(const QString &mechanism);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QString m_mechanism;
+};
+
+class QXmppSaslChallenge : public QXmppSaslStanza
+{
+public:
+    QXmppSaslChallenge(const QByteArray &value = QByteArray());
+};
+
+class QXmppSaslFailure : public QXmppSaslStanza
+{
+public:
+    QXmppSaslFailure();
+};
+
+class QXmppSaslSuccess : public QXmppSaslStanza
+{
+public:
+    QXmppSaslSuccess();
 };
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient

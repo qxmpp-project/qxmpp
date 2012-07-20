@@ -36,25 +36,25 @@
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
 QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
-    : m_mechanism(mechanism)
-    , m_value(value)
+    : QXmppSaslStanza("auth", value)
+    , m_mechanism(mechanism)
 {
 }
 
-QByteArray QXmppSaslAuth::value() const
+QString QXmppSaslAuth::mechanism() const
 {
-    return m_value;
+    return m_mechanism;
 }
 
-void QXmppSaslAuth::setValue(const QByteArray &value)
+void QXmppSaslAuth::setMechanism(const QString &mechanism)
 {
-    m_value = value;
+    m_mechanism = mechanism;
 }
 
 void QXmppSaslAuth::parse(const QDomElement &element)
 {
     m_mechanism = element.attribute("mechanism");
-    m_value = QByteArray::fromBase64(element.text().toAscii());
+    setValue(QByteArray::fromBase64(element.text().toAscii()));
 }
 
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
@@ -62,9 +62,24 @@ void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement("auth");
     writer->writeAttribute("xmlns", ns_xmpp_sasl);
     writer->writeAttribute("mechanism", m_mechanism);
-    if (!m_value.isEmpty())
-        writer->writeCharacters(m_value.toBase64());
+    if (!value().isEmpty())
+        writer->writeCharacters(value().toBase64());
     writer->writeEndElement();
+}
+
+QXmppSaslChallenge::QXmppSaslChallenge(const QByteArray &value)
+    : QXmppSaslStanza("challenge", value)
+{
+}
+
+QXmppSaslFailure::QXmppSaslFailure()
+    : QXmppSaslStanza("failure")
+{
+}
+
+QXmppSaslSuccess::QXmppSaslSuccess()
+    : QXmppSaslStanza("success")
+{
 }
 
 QXmppSaslStanza::QXmppSaslStanza(const QString &type, const QByteArray &value)
