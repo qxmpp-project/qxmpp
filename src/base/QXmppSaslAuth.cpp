@@ -72,8 +72,38 @@ QXmppSaslChallenge::QXmppSaslChallenge(const QByteArray &value)
 {
 }
 
-QXmppSaslFailure::QXmppSaslFailure()
+QXmppSaslFailure::QXmppSaslFailure(const QString &condition)
     : QXmppSaslStanza("failure")
+    , m_condition(condition)
+{
+}
+
+QString QXmppSaslFailure::condition() const
+{
+    return m_condition;
+}
+
+void QXmppSaslFailure::setCondition(const QString &condition)
+{
+    m_condition = condition;
+}
+
+void QXmppSaslFailure::parse(const QDomElement &element)
+{
+    m_condition = element.firstChildElement().tagName();
+}
+
+void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("failure");
+    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    if (!m_condition.isEmpty())
+        writer->writeEmptyElement(m_condition);
+    writer->writeEndElement();
+}
+
+QXmppSaslResponse::QXmppSaslResponse(const QByteArray &value)
+    : QXmppSaslStanza("response", value)
 {
 }
 

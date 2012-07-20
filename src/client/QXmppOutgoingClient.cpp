@@ -431,9 +431,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         else if(nodeRecv.tagName() == "challenge")
         {
+            QXmppSaslChallenge challenge;
+            challenge.parse(nodeRecv);
+
             QByteArray response;
-            if (d->saslClient->respond(QByteArray::fromBase64(nodeRecv.text().toAscii()), response)) {
-                sendData("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + response.toBase64() + "</response>");
+            if (d->saslClient->respond(challenge.value(), response)) {
+                sendPacket(QXmppSaslResponse(response));
             } else {
                 warning("Could not respond to SASL challenge");
                 disconnectFromHost();

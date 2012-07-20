@@ -85,7 +85,24 @@ public:
 class QXmppSaslFailure : public QXmppSaslStanza
 {
 public:
-    QXmppSaslFailure();
+    QXmppSaslFailure(const QString &condition = QString());
+
+    QString condition() const;
+    void setCondition(const QString &condition);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QString m_condition;
+};
+
+class QXmppSaslResponse : public QXmppSaslStanza
+{
+public:
+    QXmppSaslResponse(const QByteArray &value = QByteArray());
 };
 
 class QXmppSaslSuccess : public QXmppSaslStanza
