@@ -338,7 +338,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         else if(saslAvailable)
         {
             // supported and preferred SASL auth mechanisms
-            const QStringList supportedMechanisms = QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM";
+            const QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
             const QString preferredMechanism = configuration().saslAuthMechanism();
 
             // determine SASL Authentication mechanism to use

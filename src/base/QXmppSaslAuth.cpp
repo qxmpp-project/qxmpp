@@ -25,6 +25,7 @@
 #include <cstdlib>
 
 #include <QCryptographicHash>
+#include <QStringList>
 #include <QUrl>
 
 #include "QXmppSaslAuth.h"
@@ -48,6 +49,11 @@ QXmppSaslClient::QXmppSaslClient()
 QXmppSaslClient::~QXmppSaslClient()
 {
     delete d;
+}
+
+QStringList QXmppSaslClient::availableMechanisms()
+{
+    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM";
 }
 
 QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism)

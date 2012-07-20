@@ -28,6 +28,7 @@ class tst_QXmppSaslClient : public QObject
     Q_OBJECT
 
 private slots:
+    void testAvailableMechanisms();
     void testAnonymous();
     void testDigestMd5();
     void testDigestMd5_data();

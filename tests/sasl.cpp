@@ -26,6 +26,11 @@
 #include "sasl.h"
 #include "tests.h"
 
+void tst_QXmppSaslClient::testAvailableMechanisms()
+{
+    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM");
+}
+
 void tst_QXmppSaslClient::testAnonymous()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("ANONYMOUS");

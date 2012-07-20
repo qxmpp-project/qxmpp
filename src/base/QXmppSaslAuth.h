@@ -97,6 +97,7 @@ public:
     virtual QString mechanism() const = 0;
     virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
 
+    static QStringList availableMechanisms();
     static QXmppSaslClient* create(const QString &mechanism);
 
 private:
