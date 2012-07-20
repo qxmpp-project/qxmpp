@@ -73,6 +73,9 @@ private:
     QXmppSaslClientPrivate *d;
 };
 
+/// The QXmppServerClient class is the base class for all SASL server
+/// authentication methods.
+
 class QXMPP_EXPORT QXmppSaslServer : public QXmppLoggable
 {
 public:
