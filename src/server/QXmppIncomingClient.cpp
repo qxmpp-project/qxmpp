@@ -32,6 +32,7 @@
 #include "QXmppMessage.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppSaslAuth.h"
+#include "QXmppSaslAuth_p.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
@@ -230,7 +231,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         if (!d->passwordChecker) {
             // FIXME: what type of failure?
             warning("Cannot perform authentication, no password checker");
-            sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+            sendPacket(QXmppSaslStanza("failure"));
             disconnectFromHost();
             return;
         }
@@ -241,7 +242,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             d->saslServer = QXmppSaslServer::create(mechanism, this);
             if (!d->saslServer) {
                 // unsupported method
-                sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'></failure>");
+                sendPacket(QXmppSaslStanza("failure"));
                 disconnectFromHost();
                 return;
             }
@@ -253,7 +254,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QByteArray challenge;
                 QXmppSaslServer::Response response = d->saslServer->respond(QByteArray::fromBase64(nodeRecv.text().toAscii()), challenge);
                 if (response != QXmppSaslServer::InputNeeded) {
-                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><incorrect-encoding/></failure>");
+                    sendPacket(QXmppSaslStanza("failure"));
                     disconnectFromHost();
                     return;
                 }
@@ -275,20 +276,19 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 d->saslDigest.setQop("auth");
                 d->saslDigestStep = 1;
 
-                QMap<QByteArray, QByteArray> challenge;
-                challenge["nonce"] = d->saslDigest.nonce();
-                challenge["realm"] = d->domain.toUtf8();
-                challenge["qop"] = d->saslDigest.qop();
-                challenge["charset"] = "utf-8";
-                challenge["algorithm"] = "md5-sess";
+                QMap<QByteArray, QByteArray> output;
+                output["nonce"] = d->saslDigest.nonce();
+                output["realm"] = d->domain.toUtf8();
+                output["qop"] = d->saslDigest.qop();
+                output["charset"] = "utf-8";
+                output["algorithm"] = "md5-sess";
 
-                const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge);
-                sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data.toBase64() +"</challenge>");
+                sendPacket(QXmppSaslStanza("challenge", QXmppSaslDigestMd5::serializeMessage(output)));
             }
             else
             {
                 // unsupported method
-                sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'></failure>");
+                sendPacket(QXmppSaslStanza("failure"));
                 disconnectFromHost();
                 return;
             }
@@ -318,7 +318,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 d->saslDigestStep = 3;
                 d->jid = QString("%1@%2").arg(d->saslDigestUsername, d->domain);
                 info(QString("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
-                sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+                sendPacket(QXmppSaslStanza("success"));
                 handleStart();
             }
         }
@@ -431,8 +431,7 @@ void QXmppIncomingClient::onDigestReply()
     QMap<QByteArray, QByteArray> challenge;
     challenge["rspauth"] = d->saslDigest.calculateDigest(
         QByteArray(":") + d->saslDigest.digestUri());
-    const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge).toBase64();
-    sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data +"</challenge>");
+    sendPacket(QXmppSaslStanza("challenge", QXmppSaslDigestMd5::serializeMessage(challenge)));
 }
 
 void QXmppIncomingClient::onPasswordReply()
@@ -448,7 +447,7 @@ void QXmppIncomingClient::onPasswordReply()
     case QXmppPasswordReply::NoError:
         d->jid = jid;
         info(QString("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
-        sendData("<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+        sendPacket(QXmppSaslStanza("success"));
         handleStart();
         break;
     case QXmppPasswordReply::AuthorizationError:

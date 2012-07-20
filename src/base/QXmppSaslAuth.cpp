@@ -25,12 +25,49 @@
 #include <cstdlib>
 
 #include <QCryptographicHash>
+#include <QDomElement>
 #include <QStringList>
 #include <QUrl>
 
 #include "QXmppSaslAuth.h"
 #include "QXmppSaslAuth_p.h"
 #include "QXmppUtils.h"
+
+const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
+
+QXmppSaslStanza::QXmppSaslStanza(const QString &type, const QByteArray &value)
+    : m_type(type)
+    , m_value(value)
+{
+}
+
+QByteArray QXmppSaslStanza::value() const
+{
+    return m_value;
+}
+
+void QXmppSaslStanza::setValue(const QByteArray &value)
+{
+    m_value = value;
+}
+
+
+void QXmppSaslStanza::parse(const QDomElement &element)
+{
+    m_type = element.nodeName();
+    m_value = QByteArray::fromBase64(element.text().toAscii());
+}
+
+void QXmppSaslStanza::toXml(QXmlStreamWriter *writer) const
+{
+    if (!m_type.isEmpty()) {
+        writer->writeStartElement(m_type);
+        writer->writeAttribute("xmlns", ns_xmpp_sasl);
+        if (!m_value.isEmpty())
+            writer->writeCharacters(m_value.toBase64());
+        writer->writeEndElement();
+    }
+}
 
 class QXmppSaslClientPrivate
 {

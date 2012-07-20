@@ -25,6 +25,8 @@
 #ifndef QXMPPSASLAUTH_P_H
 #define QXMPPSASLAUTH_P_H
 
+#include "QXmppStanza.h"
+
 //
 //  W A R N I N G
 //  -------------
@@ -35,6 +37,27 @@
 //
 // We mean it.
 //
+
+class QXmppSaslStanza : public QXmppStanza
+{
+public:
+    QXmppSaslStanza(const QString &type = QString(), const QByteArray &value = QByteArray());
+
+    QString type() const;
+    void setType(const QString &type);
+
+    QByteArray value() const;
+    void setValue(const QByteArray &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QString m_type;
+    QByteArray m_value;
+};
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient
 {
