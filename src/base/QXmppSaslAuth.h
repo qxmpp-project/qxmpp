@@ -125,6 +125,9 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    QByteArray passwordDigest() const;
+    void setPasswordDigest(const QByteArray &digest);
+
     QString realm() const;
     void setRealm(const QString &realm);
 

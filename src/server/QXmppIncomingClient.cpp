@@ -50,9 +50,6 @@ public:
     QString resource;
     QXmppPasswordChecker *passwordChecker;
     QXmppSaslServer *saslServer;
-    QXmppSaslDigestMd5 saslDigest;
-    int saslDigestStep;
-    QString saslDigestUsername;
 
     QString origin() const;
 
@@ -64,7 +61,6 @@ QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
     : idleTimer(0)
     , passwordChecker(0)
     , saslServer(0)
-    , saslDigestStep(0)
     , q(qq)
 {
 }
@@ -164,8 +160,10 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->idleTimer->interval())
         d->idleTimer->start();
-    d->saslDigestStep = 0;
-    d->saslDigestUsername.clear();
+    if (d->saslServer != 0) {
+        delete d->saslServer;
+        d->saslServer = 0;
+    }
 
     // start stream
     const QByteArray sessionId = QXmppUtils::generateStanzaHash().toAscii();
@@ -229,9 +227,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     else if (ns == ns_sasl)
     {
         if (!d->passwordChecker) {
-            // FIXME: what type of failure?
             warning("Cannot perform authentication, no password checker");
-            sendPacket(QXmppSaslFailure());
+            sendPacket(QXmppSaslFailure("temporary-auth-failure"));
             disconnectFromHost();
             return;
         }
@@ -242,24 +239,18 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
             d->saslServer = QXmppSaslServer::create(auth.mechanism(), this);
             if (!d->saslServer) {
-                // unsupported method
-                sendPacket(QXmppSaslFailure());
+                sendPacket(QXmppSaslFailure("invalid-mechanism"));
                 disconnectFromHost();
                 return;
             }
 
             d->saslServer->setRealm(d->domain.toUtf8());
 
-            if (d->saslServer->mechanism() == QLatin1String("PLAIN"))
-            {
-                QByteArray challenge;
-                QXmppSaslServer::Response response = d->saslServer->respond(auth.value(), challenge);
-                if (response != QXmppSaslServer::InputNeeded) {
-                    sendPacket(QXmppSaslFailure());
-                    disconnectFromHost();
-                    return;
-                }
+            QByteArray challenge;
+            QXmppSaslServer::Response result = d->saslServer->respond(auth.value(), challenge);
 
+            if (result == QXmppSaslServer::InputNeeded) {
+                // FIXME: this is PLAIN only
                 QXmppPasswordRequest request;
                 request.setDomain(d->saslServer->realm());
                 request.setUsername(d->saslServer->username());
@@ -267,28 +258,11 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 QXmppPasswordReply *reply = d->passwordChecker->checkPassword(request);
                 reply->setParent(this);
-                reply->setProperty("__sasl_username", request.username());
                 connect(reply, SIGNAL(finished()), this, SLOT(onPasswordReply()));
-            }
-            else if (d->saslServer->mechanism() == QLatin1String("DIGEST-MD5"))
-            {
-                // generate nonce
-                d->saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
-                d->saslDigest.setQop("auth");
-                d->saslDigestStep = 1;
-
-                QMap<QByteArray, QByteArray> output;
-                output["nonce"] = d->saslDigest.nonce();
-                output["realm"] = d->domain.toUtf8();
-                output["qop"] = d->saslDigest.qop();
-                output["charset"] = "utf-8";
-                output["algorithm"] = "md5-sess";
-
-                sendPacket(QXmppSaslChallenge(QXmppSaslDigestMd5::serializeMessage(output)));
-            }
-            else
-            {
-                // unsupported method
+            } else if (result == QXmppSaslServer::Challenge) {
+                sendPacket(QXmppSaslChallenge(challenge));
+            } else {
+                // FIXME: what condition?
                 sendPacket(QXmppSaslFailure());
                 disconnectFromHost();
                 return;
@@ -299,30 +273,28 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslResponse response;
             response.parse(nodeRecv);
 
-            if (d->saslDigestStep == 1)
-            {
-                QMap<QByteArray, QByteArray> saslResponse = QXmppSaslDigestMd5::parseMessage(response.value());
-
+            QByteArray challenge;
+            QXmppSaslServer::Response result = d->saslServer->respond(response.value(), challenge);
+            if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                const QString username = QString::fromUtf8(saslResponse.value("username"));
-
                 QXmppPasswordRequest request;
-                request.setUsername(username);
+                request.setUsername(d->saslServer->username());
                 request.setDomain(d->domain);
 
                 QXmppPasswordReply *reply = d->passwordChecker->getDigest(request);
                 reply->setParent(this);
                 reply->setProperty("__sasl_raw", response.value());
                 connect(reply, SIGNAL(finished()), this, SLOT(onDigestReply()));
-            }
-            else if (d->saslDigestStep == 2)
-            {
+            } else if (result == QXmppSaslServer::Succeeded) {
                 // authentication succeeded
-                d->saslDigestStep = 3;
-                d->jid = QString("%1@%2").arg(d->saslDigestUsername, d->domain);
+                d->jid = QString("%1@%2").arg(d->saslServer->username(), d->domain);
                 info(QString("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
                 sendPacket(QXmppSaslSuccess());
                 handleStart();
+            } else {
+                // FIXME: what condition?
+                sendPacket(QXmppSaslFailure());
+                disconnectFromHost();
             }
         }
     }
@@ -407,34 +379,25 @@ void QXmppIncomingClient::onDigestReply()
         return;
     reply->deleteLater();
 
-    const QMap<QByteArray, QByteArray> saslResponse = QXmppSaslDigestMd5::parseMessage(reply->property("__sasl_raw").toByteArray());
-    const QString username = QString::fromUtf8(saslResponse.value("username"));
     if (reply->error() == QXmppPasswordReply::TemporaryError) {
-        warning(QString("Temporary authentication failure for '%1'").arg(username));
+        warning(QString("Temporary authentication failure for '%1'").arg(d->saslServer->username()));
         sendPacket(QXmppSaslFailure("temporary-auth-failure"));
         disconnectFromHost();
         return;
     }
 
-    d->saslDigest.setSecret(reply->digest());
-    d->saslDigest.setDigestUri(saslResponse.value("digest-uri"));
-    d->saslDigest.setNc(saslResponse.value("nc"));
-    d->saslDigest.setCnonce(saslResponse.value("cnonce"));
-    if (saslResponse.value("response") != d->saslDigest.calculateDigest(
-            QByteArray("AUTHENTICATE:") + d->saslDigest.digestUri()))
-    {
+    QByteArray challenge;
+    d->saslServer->setPasswordDigest(reply->digest());
+
+    QXmppSaslServer::Response result = d->saslServer->respond(reply->property("__sasl_raw").toByteArray(), challenge);
+    if (result != QXmppSaslServer::Challenge) {
         sendPacket(QXmppSaslFailure("not-authorized"));
         disconnectFromHost();
         return;
     }
 
     // send new challenge
-    d->saslDigestUsername = username;
-    d->saslDigestStep = 2;
-    QMap<QByteArray, QByteArray> challenge;
-    challenge["rspauth"] = d->saslDigest.calculateDigest(
-        QByteArray(":") + d->saslDigest.digestUri());
-    sendPacket(QXmppSaslChallenge(QXmppSaslDigestMd5::serializeMessage(challenge)));
+    sendPacket(QXmppSaslChallenge(challenge));
 }
 
 void QXmppIncomingClient::onPasswordReply()
@@ -444,8 +407,7 @@ void QXmppIncomingClient::onPasswordReply()
         return;
     reply->deleteLater();
 
-    const QString username = reply->property("__sasl_username").toString();
-    const QString jid = QString("%1@%2").arg(username, d->domain);
+    const QString jid = QString("%1@%2").arg(d->saslServer->username(), d->domain);
     switch (reply->error()) {
     case QXmppPasswordReply::NoError:
         d->jid = jid;

@@ -427,6 +427,7 @@ class QXmppSaslServerPrivate
 public:
     QString username;
     QString password;
+    QByteArray passwordDigest;
     QString realm;
 };
 
@@ -482,6 +483,20 @@ QString QXmppSaslServer::password() const
 void QXmppSaslServer::setPassword(const QString &password)
 {
     d->password = password;
+}
+
+/// Returns the password digest.
+
+QByteArray QXmppSaslServer::passwordDigest() const
+{
+    return d->passwordDigest;
+}
+
+/// Sets the password digest.
+
+void QXmppSaslServer::setPasswordDigest(const QByteArray &digest)
+{
+    d->passwordDigest = digest;
 }
 
 /// Returns the realm.
@@ -556,16 +571,20 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         const QByteArray realm = input.value("realm");
 
         setUsername(QString::fromUtf8(input.value("username")));
-        if (password().isEmpty())
+        if (password().isEmpty() && passwordDigest().isEmpty())
             return InputNeeded;
 
         m_saslDigest.setQop("auth");
         m_saslDigest.setDigestUri(input.value("digest-uri"));
         m_saslDigest.setNc(input.value("nc"));
         m_saslDigest.setCnonce(input.value("cnonce"));
-        m_saslDigest.setSecret(QCryptographicHash::hash(
-            username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
-            QCryptographicHash::Md5));
+        if (!password().isEmpty()) {
+            m_saslDigest.setSecret(QCryptographicHash::hash(
+                username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
+                QCryptographicHash::Md5));
+        } else {
+            m_saslDigest.setSecret(passwordDigest());
+        }
 
         const QByteArray expectedResponse = m_saslDigest.calculateDigest(
             QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
