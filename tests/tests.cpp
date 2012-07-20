@@ -1016,17 +1016,23 @@ void TestServer::testConnect_data()
 {
     QTest::addColumn<QString>("username");
     QTest::addColumn<QString>("password");
+    QTest::addColumn<QString>("mechanism");
     QTest::addColumn<bool>("connected");
 
-    QTest::newRow("good") << "testuser" << "testpwd" << true;
-    QTest::newRow("bad-username") << "baduser" << "testpwd" << false;
-    QTest::newRow("bad-password") << "testuser" << "badpwd" << false;
+    QTest::newRow("plain-good") << "testuser" << "testpwd" << "PLAIN" << true;
+    QTest::newRow("plain-bad-username") << "baduser" << "testpwd" << "PLAIN" << false;
+    QTest::newRow("plain-bad-password") << "testuser" << "badpwd" << "PLAIN" << false;
+
+    QTest::newRow("digest-good") << "testuser" << "testpwd" << "DIGEST-MD5" << true;
+    QTest::newRow("digest-bad-username") << "baduser" << "testpwd" << "DIGEST-MD5" << false;
+    QTest::newRow("digest-bad-password") << "testuser" << "badpwd" << "DIGEST-MD5" << false;
 }
 
 void TestServer::testConnect()
 {
     QFETCH(QString, username);
     QFETCH(QString, password);
+    QFETCH(QString, mechanism);
     QFETCH(bool, connected);
 
     const QString testDomain("localhost");
@@ -1061,6 +1067,7 @@ void TestServer::testConnect()
     config.setPort(testPort);
     config.setUser(username);
     config.setPassword(password);
+    config.setSaslAuthMechanism(mechanism);
     client.connectToServer(config);
     loop.exec();
     QCOMPARE(client.isConnected(), connected);
