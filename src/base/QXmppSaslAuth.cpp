@@ -158,13 +158,15 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         const QByteArray realm = input.value("realm");
 
         // determine quality of protection
-        const QList<QByteArray> qops = input.value("qop").split(',');
-        if (qops.contains("auth")) {
-            m_saslDigest.setQop("auth");
-            m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
-            m_saslDigest.setNc("00000001");
+        const QList<QByteArray> qops = input.value("qop", "auth").split(',');
+        if (!qops.contains("auth")) {
+            qWarning("QXmppSaslClientDigestMd5 : Invalid quality of protection");
+            return false;
         }
 
+        m_saslDigest.setQop("auth");
+        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+        m_saslDigest.setNc("00000001");
         m_saslDigest.setDigestUri(QString("xmpp/%1").arg(server()).toUtf8());
         m_saslDigest.setNonce(input.value("nonce"));
         m_saslDigest.setSecret(QCryptographicHash::hash(
@@ -177,11 +179,9 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         if (!realm.isEmpty())
             output["realm"] = realm;
         output["nonce"] = m_saslDigest.nonce();
-        if (!m_saslDigest.qop().isEmpty()) {
-            output["qop"] = m_saslDigest.qop();
-            output["cnonce"] = m_saslDigest.cnonce();
-            output["nc"] = m_saslDigest.nc();
-        }
+        output["qop"] = m_saslDigest.qop();
+        output["cnonce"] = m_saslDigest.cnonce();
+        output["nc"] = m_saslDigest.nc();
         output["digest-uri"] = m_saslDigest.digestUri();
         output["response"] = m_saslDigest.calculateDigest(
             QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
