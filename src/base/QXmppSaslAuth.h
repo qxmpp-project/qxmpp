@@ -58,8 +58,6 @@ public:
     void setSecret(const QByteArray &secret);
 
     QByteArray calculateDigest(const QByteArray &A2) const;
-    QByteArray calculateDigest(const QByteArray &A1, const QByteArray &A2) const;
-    static QByteArray generateNonce();
 
     // message parsing and serialization
     static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);

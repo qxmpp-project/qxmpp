@@ -35,6 +35,15 @@
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
+static QByteArray generateNonce()
+{
+    QByteArray nonce = QXmppUtils::generateRandomBytes(32);
+
+    // The random data can the '=' char is not valid as it is a delimiter,
+    // so to be safe, base64 the nonce
+    return nonce.toBase64();
+}
+
 QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
     : QXmppSaslStanza("auth", value)
     , m_mechanism(mechanism)
@@ -307,7 +316,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         }
 
         m_saslDigest.setQop("auth");
-        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+        m_saslDigest.setCnonce(generateNonce());
         m_saslDigest.setNc("00000001");
         m_saslDigest.setDigestUri(QString("%1/%2").arg(serviceType(), host()).toUtf8());
         m_saslDigest.setNonce(input.value("nonce"));
@@ -552,7 +561,7 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
 {
     if (m_step == 0) {
         // generate nonce
-        m_saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
+        m_saslDigest.setNonce(generateNonce());
         //m_saslDigest.setQop("auth");
 
         QMap<QByteArray, QByteArray> output;
@@ -706,15 +715,6 @@ void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
     m_secret = secret;
 }
 
-QByteArray QXmppSaslDigestMd5::generateNonce()
-{
-    QByteArray nonce = QXmppUtils::generateRandomBytes(32);
-
-    // The random data can the '=' char is not valid as it is a delimiter,
-    // so to be safe, base64 the nonce
-    return nonce.toBase64();
-}
-
 /// Calculate digest response for use with XMPP/SASL.
 ///
 /// \param A2
@@ -722,22 +722,11 @@ QByteArray QXmppSaslDigestMd5::generateNonce()
 
 QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A2) const
 {
-    QByteArray ha1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
+    QByteArray A1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
 
     if (!m_authzid.isEmpty())
-        ha1 += ':' + m_authzid;
+        A1 += ':' + m_authzid;
 
-    return calculateDigest(ha1, A2);
-}
-
-/// Calculate generic digest response.
-///
-/// \param A1
-/// \param A2
-///
-
-QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A1, const QByteArray &A2) const
-{
     QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
     QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
     QByteArray KD;
