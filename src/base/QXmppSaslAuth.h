@@ -112,7 +112,8 @@ public:
     enum Response {
         Challenge = 0,
         Succeeded = 1,
-        Failed = 2
+        Failed = 2,
+        InputNeeded = 3
     };
 
     QXmppSaslServer(QObject *parent = 0);

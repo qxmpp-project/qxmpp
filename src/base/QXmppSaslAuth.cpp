@@ -442,9 +442,9 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         const QByteArray realm = input.value("realm");
 
         setUsername(QString::fromUtf8(input.value("username")));
-        qDebug("username: %s", qPrintable(username()));
+        if (password().isEmpty())
+            return InputNeeded;
 
-        //m_saslDigest.setSecret(reply->digest());
         m_saslDigest.setQop("auth");
         m_saslDigest.setDigestUri(input.value("digest-uri"));
         m_saslDigest.setNc(input.value("nc"));

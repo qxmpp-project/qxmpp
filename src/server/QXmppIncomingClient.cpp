@@ -253,7 +253,6 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QByteArray challenge;
                 QXmppSaslServer::Response response = d->saslServer->respond(QByteArray::fromBase64(nodeRecv.text().toAscii()), challenge);
                 if (response != QXmppSaslServer::Succeeded) {
-
                     sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><incorrect-encoding/></failure>");
                     disconnectFromHost();
                     return;
