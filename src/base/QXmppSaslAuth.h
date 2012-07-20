@@ -124,6 +124,9 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    QString realm() const;
+    void setRealm(const QString &realm);
+
     virtual QString mechanism() const = 0;
     virtual Response respond(const QByteArray &challenge, QByteArray &response) = 0;
 

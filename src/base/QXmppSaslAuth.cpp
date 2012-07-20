@@ -313,6 +313,7 @@ class QXmppSaslServerPrivate
 public:
     QString username;
     QString password;
+    QString realm;
 };
 
 QXmppSaslServer::QXmppSaslServer(QObject *parent)
@@ -336,6 +337,8 @@ QXmppSaslServer* QXmppSaslServer::create(const QString &mechanism, QObject *pare
         return new QXmppSaslServerDigestMd5(parent);
     } else if (mechanism == "ANONYMOUS") {
         return new QXmppSaslServerAnonymous(parent);
+    } else {
+        return 0;
     }
 }
 
@@ -365,6 +368,20 @@ QString QXmppSaslServer::password() const
 void QXmppSaslServer::setPassword(const QString &password)
 {
     d->password = password;
+}
+
+/// Returns the realm.
+
+QString QXmppSaslServer::realm() const
+{
+    return d->realm;
+}
+
+/// Sets the realm.
+
+void QXmppSaslServer::setRealm(const QString &realm)
+{
+    d->realm = realm;
 }
 
 QXmppSaslServerAnonymous::QXmppSaslServerAnonymous(QObject *parent)
@@ -409,17 +426,53 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         m_saslDigest.setNonce(QXmppSaslDigestMd5::generateNonce());
         //m_saslDigest.setQop("auth");
 
-        QMap<QByteArray, QByteArray> challenge;
-        challenge["nonce"] = m_saslDigest.nonce();
-        //challenge["realm"] = m_domain.toUtf8();
-        challenge["qop"] = "auth";
-        challenge["charset"] = "utf-8";
-        challenge["algorithm"] = "md5-sess";
+        QMap<QByteArray, QByteArray> output;
+        output["nonce"] = m_saslDigest.nonce();
+        if (!realm().isEmpty())
+            output["realm"] = realm().toUtf8();
+        output["qop"] = "auth";
+        output["charset"] = "utf-8";
+        output["algorithm"] = "md5-sess";
 
         m_step++;
-        response = QXmppSaslDigestMd5::serializeMessage(challenge);
+        response = QXmppSaslDigestMd5::serializeMessage(output);
         return Challenge;
+    } else if (m_step == 1) {
+        const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(request);
+        const QByteArray realm = input.value("realm");
+
+        setUsername(QString::fromUtf8(input.value("username")));
+        qDebug("username: %s", qPrintable(username()));
+
+        //m_saslDigest.setSecret(reply->digest());
+        m_saslDigest.setQop("auth");
+        m_saslDigest.setDigestUri(input.value("digest-uri"));
+        m_saslDigest.setNc(input.value("nc"));
+        m_saslDigest.setCnonce(input.value("cnonce"));
+        m_saslDigest.setSecret(QCryptographicHash::hash(
+            username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
+            QCryptographicHash::Md5));
+
+        const QByteArray expectedResponse = m_saslDigest.calculateDigest(
+            QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
+
+        if (input.value("response") != expectedResponse) {
+            return Failed;
+        }
+
+        QMap<QByteArray, QByteArray> output;
+        output["rspauth"] = m_saslDigest.calculateDigest(
+            QByteArray(":") + m_saslDigest.digestUri());
+
+        m_step++;
+        response = QXmppSaslDigestMd5::serializeMessage(output);
+        return Challenge;
+    } else if (m_step == 2) {
+        m_step++;
+        response = QByteArray();
+        return Succeeded;
     } else {
+        warning("QXmppSaslServerDigestMd5 : Invalid step");
         return Failed;
     }
 }

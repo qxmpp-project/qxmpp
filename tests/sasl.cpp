@@ -162,16 +162,27 @@ void tst_QXmppSaslServer::testAnonymous()
 
 void tst_QXmppSaslServer::testDigestMd5()
 {
-    qsrand(0);
+    qsrand(1);
 
     QXmppSaslServer *server = QXmppSaslServer::create("DIGEST-MD5");
     QVERIFY(server != 0);
     QCOMPARE(server->mechanism(), QLatin1String("DIGEST-MD5"));
 
+    // FIXME: support actual server workflow..
+    server->setPassword("qxmpp123");
+
     // initial step returns challenge
     QByteArray response;
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Challenge);
-    QCOMPARE(response, QByteArray("algorithm=md5-sess,charset=utf-8,nonce=\"AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=\",qop=auth"));
+    QCOMPARE(response, QByteArray("algorithm=md5-sess,charset=utf-8,nonce=\"OI08/m+QRm6Ma+fKOjuqVXtz40sR5u9/u5GN6sSW0rs=\",qop=auth"));
+
+    // another challenge
+    QCOMPARE(server->respond(QByteArray("charset=utf-8,cnonce=\"AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=\",digest-uri=\"xmpp/jabber.ru\",nc=00000001,nonce=\"OI08/m+QRm6Ma+fKOjuqVXtz40sR5u9/u5GN6sSW0rs=\",qop=auth,response=70e9063257ee2bf6bfd108975b917410,username=qxmpp1"), response), QXmppSaslServer::Challenge);
+    QCOMPARE(response, QByteArray("rspauth=2821a3add271b9ae02b813bed57ec878"));
+
+    // success
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Succeeded);
+    QCOMPARE(response, QByteArray());
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
