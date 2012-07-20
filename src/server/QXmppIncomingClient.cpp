@@ -273,6 +273,13 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslResponse response;
             response.parse(nodeRecv);
 
+            if (!d->saslServer) {
+                warning("SASL response received, but no mechanism selected");
+                sendPacket(QXmppSaslFailure());
+                disconnectFromHost();
+                return;
+            }
+
             QByteArray challenge;
             QXmppSaslServer::Response result = d->saslServer->respond(response.value(), challenge);
             if (result == QXmppSaslServer::InputNeeded) {
