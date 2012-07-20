@@ -201,7 +201,7 @@ void tst_QXmppSaslServer::testPlain()
 
     // initial step returns success
     QByteArray response;
-    QCOMPARE(server->respond(QByteArray("\0foo\0bar", 8), response), QXmppSaslServer::Succeeded);
+    QCOMPARE(server->respond(QByteArray("\0foo\0bar", 8), response), QXmppSaslServer::InputNeeded);
     QCOMPARE(response, QByteArray());
     QCOMPARE(server->username(), QLatin1String("foo"));
     QCOMPARE(server->password(), QLatin1String("bar"));

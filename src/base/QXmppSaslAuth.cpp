@@ -501,7 +501,7 @@ QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &reques
 
         m_step++;
         response = QByteArray();
-        return Succeeded;
+        return InputNeeded;
     } else {
         warning("QXmppSaslServerPlain : Invalid step");
         return Failed;
