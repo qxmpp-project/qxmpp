@@ -38,6 +38,7 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSaslAuth.h"
+#include "QXmppSaslAuth_p.h"
 #include "QXmppUtils.h"
 
 // IQ types
@@ -383,12 +384,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 disconnectFromHost();
                 return;
             }
-            QByteArray data = "<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='"+ d->saslClient->mechanism().toLatin1() + "'";
-            if (response.isEmpty())
-                data += "/>";
-            else
-                data += ">" + response.toBase64() + "</auth>";
-            sendData(data);
+            sendPacket(QXmppSaslAuth(d->saslClient->mechanism().toLatin1(), response));
         }
 
         // check whether bind is available

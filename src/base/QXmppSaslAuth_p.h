@@ -38,6 +38,27 @@
 // We mean it.
 //
 
+class QXmppSaslAuth : public QXmppStanza
+{
+public:
+    QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
+
+    QString mechanism() const;
+    void setMechanism(const QString &mechanism);
+
+    QByteArray value() const;
+    void setValue(const QByteArray &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QString m_mechanism;
+    QByteArray m_value;
+};
+
 class QXmppSaslStanza : public QXmppStanza
 {
 public:

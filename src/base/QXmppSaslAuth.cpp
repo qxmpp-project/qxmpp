@@ -35,6 +35,38 @@
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
+QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
+    : m_mechanism(mechanism)
+    , m_value(value)
+{
+}
+
+QByteArray QXmppSaslAuth::value() const
+{
+    return m_value;
+}
+
+void QXmppSaslAuth::setValue(const QByteArray &value)
+{
+    m_value = value;
+}
+
+void QXmppSaslAuth::parse(const QDomElement &element)
+{
+    m_mechanism = element.attribute("mechanism");
+    m_value = QByteArray::fromBase64(element.text().toAscii());
+}
+
+void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("auth");
+    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeAttribute("mechanism", m_mechanism);
+    if (!m_value.isEmpty())
+        writer->writeCharacters(m_value.toBase64());
+    writer->writeEndElement();
+}
+
 QXmppSaslStanza::QXmppSaslStanza(const QString &type, const QByteArray &value)
     : m_type(type)
     , m_value(value)
