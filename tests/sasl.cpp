@@ -21,8 +21,7 @@
  *
  */
 
-#include "QXmppSaslAuth.h"
-#include "QXmppSaslAuth_p.h"
+#include "QXmppSasl_p.h"
 
 #include "sasl.h"
 #include "tests.h"

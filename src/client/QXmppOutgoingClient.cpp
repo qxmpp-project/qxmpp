@@ -37,8 +37,7 @@
 #include "QXmppOutgoingClient.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppNonSASLAuth.h"
-#include "QXmppSaslAuth.h"
-#include "QXmppSaslAuth_p.h"
+#include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
 
 // IQ types

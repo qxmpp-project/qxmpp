@@ -29,8 +29,7 @@
 #include <QStringList>
 #include <QUrl>
 
-#include "QXmppSaslAuth.h"
-#include "QXmppSaslAuth_p.h"
+#include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
