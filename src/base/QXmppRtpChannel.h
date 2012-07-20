@@ -279,7 +279,7 @@ public slots:
     void datagramReceived(const QByteArray &ba);
 
 protected:
-    /// cond
+    /// \cond
     void payloadTypesChanged();
     /// \endcond
 
