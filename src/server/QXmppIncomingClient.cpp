@@ -48,6 +48,7 @@ public:
     QString jid;
     QString resource;
     QXmppPasswordChecker *passwordChecker;
+    QXmppSaslServer *saslServer;
     QXmppSaslDigestMd5 saslDigest;
     int saslDigestStep;
     QString saslDigestUsername;
@@ -61,6 +62,7 @@ private:
 QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
     : idleTimer(0)
     , passwordChecker(0)
+    , saslServer(0)
     , saslDigestStep(0)
     , q(qq)
 {
@@ -225,9 +227,18 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     }
     else if (ns == ns_sasl)
     {
+        if (!d->passwordChecker) {
+            // FIXME: what type of failure?
+            warning("Cannot perform authentication, no password checker");
+            sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
+            disconnectFromHost();
+            return;
+        }
+
         if (nodeRecv.tagName() == QLatin1String("auth"))
         {
             const QString mechanism = nodeRecv.attribute("mechanism");
+            d->saslServer = QXmppSaslServer::create(mechanism);
             if (mechanism == QLatin1String("PLAIN"))
             {
                 QList<QByteArray> auth = QByteArray::fromBase64(nodeRecv.text().toAscii()).split('\0');
@@ -242,13 +253,6 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 request.setDomain(d->domain);
                 request.setUsername(QString::fromUtf8(auth[1]));
                 request.setPassword(QString::fromUtf8(auth[2]));
-                if (!d->passwordChecker) {
-                    // FIXME: what type of failure?
-                    warning(QString("Cannot authenticate '%1', no password checker").arg(request.username()));
-                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
-                    disconnectFromHost();
-                    return;
-                }
 
                 QXmppPasswordReply *reply = d->passwordChecker->checkPassword(request);
                 reply->setParent(this);
@@ -289,13 +293,6 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // check credentials
                 const QString username = QString::fromUtf8(saslResponse.value("username"));
-                if (!d->passwordChecker) {
-                    // FIXME: what type of failure?
-                    warning(QString("Cannot authenticate '%1', no password checker").arg(username));
-                    sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>");
-                    disconnectFromHost();
-                    return;
-                }
 
                 QXmppPasswordRequest request;
                 request.setUsername(username);
