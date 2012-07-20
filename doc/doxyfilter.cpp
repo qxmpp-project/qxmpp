@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
         // adjust Doxyfile
         setField(code, "ALPHABETICAL_INDEX", "NO");
-        setField(code, "EXCLUDE_PATTERNS", "*/moc_* */mod_* */qdnslookup*");
+        setField(code, "EXCLUDE_PATTERNS", "*/moc_* */mod_* */qdnslookup* */*_p.h");
         setField(code, "FULL_PATH_NAMES", "NO");
         setField(code, "HIDE_UNDOC_CLASSES", "YES");
         setField(code, "GENERATE_LATEX", "NO");

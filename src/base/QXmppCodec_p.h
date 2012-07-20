@@ -25,7 +25,6 @@
 #define QXMPPCODEC_H
 
 #include <QMap>
-#include <QtGlobal>
 
 #include "QXmppGlobal.h"
 
