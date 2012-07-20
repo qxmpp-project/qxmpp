@@ -293,6 +293,8 @@ QString QXmppSaslClientDigestMd5::mechanism() const
 bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &response)
 {
     Q_UNUSED(challenge);
+    const QByteArray digestUri = QString("%1/%2").arg(serviceType(), host()).toUtf8();
+
     if (m_step == 0) {
         response = QByteArray();
         m_step++;
@@ -315,10 +317,8 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
             return false;
         }
 
-        m_saslDigest.setQop("auth");
         m_saslDigest.setCnonce(generateNonce());
         m_saslDigest.setNc("00000001");
-        m_saslDigest.setDigestUri(QString("%1/%2").arg(serviceType(), host()).toUtf8());
         m_saslDigest.setNonce(input.value("nonce"));
         m_saslDigest.setSecret(QCryptographicHash::hash(
             username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
@@ -330,14 +330,11 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         if (!realm.isEmpty())
             output["realm"] = realm;
         output["nonce"] = m_saslDigest.nonce();
-        output["qop"] = m_saslDigest.qop();
+        output["qop"] = "auth";
         output["cnonce"] = m_saslDigest.cnonce();
         output["nc"] = m_saslDigest.nc();
-        output["digest-uri"] = m_saslDigest.digestUri();
-        output["response"] = m_saslDigest.calculateDigest(
-            QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
-        if (!m_saslDigest.authzid().isEmpty())
-            output["authzid"] = m_saslDigest.authzid();
+        output["digest-uri"] = digestUri;
+        output["response"] = m_saslDigest.calculateDigest("AUTHENTICATE", digestUri);
         output["charset"] = "utf-8";
 
         response = QXmppSaslDigestMd5::serializeMessage(output);
@@ -347,8 +344,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(challenge);
 
         // check new challenge
-        if (input.value("rspauth") !=
-            m_saslDigest.calculateDigest(QByteArray(":") + m_saslDigest.digestUri())) {
+        if (input.value("rspauth") != m_saslDigest.calculateDigest(QByteArray(), digestUri)) {
             warning("QXmppSaslClientDigestMd5 : Invalid challenge on step 2");
             return false;
         }
@@ -578,13 +574,17 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
     } else if (m_step == 1) {
         const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(request);
         const QByteArray realm = input.value("realm");
+        const QByteArray digestUri = input.value("digest-uri");
+
+        if (input.value("qop") != "auth") {
+            warning("QXmppSaslServerDigestMd5 : Invalid quality of protection");
+            return Failed;
+        }
 
         setUsername(QString::fromUtf8(input.value("username")));
         if (password().isEmpty() && passwordDigest().isEmpty())
             return InputNeeded;
 
-        m_saslDigest.setQop("auth");
-        m_saslDigest.setDigestUri(input.value("digest-uri"));
         m_saslDigest.setNc(input.value("nc"));
         m_saslDigest.setCnonce(input.value("cnonce"));
         if (!password().isEmpty()) {
@@ -595,16 +595,11 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
             m_saslDigest.setSecret(passwordDigest());
         }
 
-        const QByteArray expectedResponse = m_saslDigest.calculateDigest(
-            QByteArray("AUTHENTICATE:") + m_saslDigest.digestUri());
-
-        if (input.value("response") != expectedResponse) {
+        if (input.value("response") != m_saslDigest.calculateDigest("AUTHENTICATE", digestUri))
             return Failed;
-        }
 
         QMap<QByteArray, QByteArray> output;
-        output["rspauth"] = m_saslDigest.calculateDigest(
-            QByteArray(":") + m_saslDigest.digestUri());
+        output["rspauth"] = m_saslDigest.calculateDigest(QByteArray(), digestUri);
 
         m_step++;
         response = QXmppSaslDigestMd5::serializeMessage(output);
@@ -650,16 +645,6 @@ QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &reques
     }
 }
 
-QByteArray QXmppSaslDigestMd5::authzid() const
-{
-    return m_authzid;
-}
-
-void QXmppSaslDigestMd5::setAuthzid(const QByteArray &authzid)
-{
-    m_authzid = authzid;
-}
-
 QByteArray QXmppSaslDigestMd5::cnonce() const
 {
     return m_cnonce;
@@ -668,16 +653,6 @@ QByteArray QXmppSaslDigestMd5::cnonce() const
 void QXmppSaslDigestMd5::setCnonce(const QByteArray &cnonce)
 {
     m_cnonce = cnonce;
-}
-
-QByteArray QXmppSaslDigestMd5::digestUri() const
-{
-    return m_digestUri;
-}
-
-void QXmppSaslDigestMd5::setDigestUri(const QByteArray &digestUri)
-{
-    m_digestUri = digestUri;
 }
 
 QByteArray QXmppSaslDigestMd5::nc() const
@@ -700,16 +675,6 @@ void QXmppSaslDigestMd5::setNonce(const QByteArray &nonce)
     m_nonce = nonce;
 }
 
-QByteArray QXmppSaslDigestMd5::qop() const
-{
-    return m_qop;
-}
-
-void QXmppSaslDigestMd5::setQop(const QByteArray &qop)
-{
-    m_qop = qop;
-}
-
 void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
 {
     m_secret = secret;
@@ -720,20 +685,14 @@ void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
 /// \param A2
 ///
 
-QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &A2) const
+QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &method, const QByteArray &digestUri) const
 {
-    QByteArray A1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
-
-    if (!m_authzid.isEmpty())
-        A1 += ':' + m_authzid;
+    const QByteArray A1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
+    const QByteArray A2 = method + ':' + digestUri;
 
     QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
     QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-    QByteArray KD;
-    if (m_qop == "auth" || m_qop == "auth-int")
-        KD = HA1 + ':' + m_nonce + ':' + m_nc + ':' + m_cnonce + ':' + m_qop + ':' + HA2;
-    else
-        KD = HA1 + ':' + m_nonce + ':' + HA2;
+    const QByteArray KD = HA1 + ':' + m_nonce + ':' + m_nc + ':' + m_cnonce + ":auth:" + HA2;
     return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
