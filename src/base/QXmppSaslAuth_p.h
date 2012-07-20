@@ -25,6 +25,9 @@
 #ifndef QXMPPSASLAUTH_P_H
 #define QXMPPSASLAUTH_P_H
 
+#include <QByteArray>
+#include <QMap>
+
 #include "QXmppStanza.h"
 
 //
@@ -37,6 +40,14 @@
 //
 // We mean it.
 //
+
+class QXmppSaslDigestMd5
+{
+public:
+    // message parsing and serialization
+    static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
+    static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
+};
 
 class QXmppSaslStanza : public QXmppStanza
 {

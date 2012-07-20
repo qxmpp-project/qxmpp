@@ -42,7 +42,6 @@
 #include "QXmppPresence.h"
 #include "QXmppPubSubIq.h"
 #include "QXmppRpcIq.h"
-#include "QXmppSaslAuth.h"
 #include "QXmppSessionIq.h"
 #include "QXmppServer.h"
 #include "QXmppStreamFeatures.h"
@@ -69,25 +68,6 @@ void TestUtils::testCrc32()
 
     crc = QXmppUtils::generateCrc32(QByteArray("Hi There"));
     QCOMPARE(crc, 0xDB143BBEu);
-}
-
-void TestUtils::testDigestMd5()
-{
-    // empty
-    QMap<QByteArray, QByteArray> empty = QXmppSaslDigestMd5::parseMessage(QByteArray());
-    QCOMPARE(empty.size(), 0);
-    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(empty), QByteArray());
-
-    // non-empty
-    const QByteArray bytes("number=12345,quoted_plain=\"quoted string\",quoted_quote=\"quoted\\\\slash\\\"quote\",string=string");
-
-    QMap<QByteArray, QByteArray> map = QXmppSaslDigestMd5::parseMessage(bytes);
-    QCOMPARE(map.size(), 4);
-    QCOMPARE(map["number"], QByteArray("12345"));
-    QCOMPARE(map["quoted_plain"], QByteArray("quoted string"));
-    QCOMPARE(map["quoted_quote"], QByteArray("quoted\\slash\"quote"));
-    QCOMPARE(map["string"], QByteArray("string"));
-    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(map), bytes);
 }
 
 void TestUtils::testHmac()

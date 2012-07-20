@@ -22,9 +22,29 @@
  */
 
 #include "QXmppSaslAuth.h"
+#include "QXmppSaslAuth_p.h"
 
 #include "sasl.h"
 #include "tests.h"
+
+void tst_QXmppSasl::testParsing()
+{
+    // empty
+    QMap<QByteArray, QByteArray> empty = QXmppSaslDigestMd5::parseMessage(QByteArray());
+    QCOMPARE(empty.size(), 0);
+    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(empty), QByteArray());
+
+    // non-empty
+    const QByteArray bytes("number=12345,quoted_plain=\"quoted string\",quoted_quote=\"quoted\\\\slash\\\"quote\",string=string");
+
+    QMap<QByteArray, QByteArray> map = QXmppSaslDigestMd5::parseMessage(bytes);
+    QCOMPARE(map.size(), 4);
+    QCOMPARE(map["number"], QByteArray("12345"));
+    QCOMPARE(map["quoted_plain"], QByteArray("quoted string"));
+    QCOMPARE(map["quoted_quote"], QByteArray("quoted\\slash\"quote"));
+    QCOMPARE(map["string"], QByteArray("string"));
+    QCOMPARE(QXmppSaslDigestMd5::serializeMessage(map), bytes);
+}
 
 void tst_QXmppSaslClient::testAvailableMechanisms()
 {

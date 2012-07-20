@@ -25,22 +25,11 @@
 #ifndef QXMPPSASLAUTH_H
 #define QXMPPSASLAUTH_H
 
-#include <QByteArray>
-#include <QMap>
-
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
 
 class QXmppSaslClientPrivate;
 class QXmppSaslServerPrivate;
-
-class QXMPP_EXPORT QXmppSaslDigestMd5
-{
-public:
-    // message parsing and serialization
-    static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
-    static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
-};
 
 /// The QXmppSaslClient class is the base class for all SASL client
 /// authentication methods.

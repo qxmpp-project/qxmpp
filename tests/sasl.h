@@ -23,6 +23,14 @@
 
 #include <QObject>
 
+class tst_QXmppSasl : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testParsing();
+};
+
 class tst_QXmppSaslClient : public QObject
 {
     Q_OBJECT
