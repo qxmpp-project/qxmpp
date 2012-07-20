@@ -384,7 +384,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 disconnectFromHost();
                 return;
             }
-            sendPacket(QXmppSaslAuth(d->saslClient->mechanism().toLatin1(), response));
+            sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
         }
 
         // check whether bind is available
