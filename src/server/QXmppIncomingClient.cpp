@@ -50,6 +50,7 @@ public:
     QXmppPasswordChecker *passwordChecker;
     QXmppSaslServer *saslServer;
 
+    void checkCredentials(const QByteArray &response);
     QString origin() const;
 
 private:
@@ -62,6 +63,29 @@ QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
     , saslServer(0)
     , q(qq)
 {
+}
+
+void QXmppIncomingClientPrivate::checkCredentials(const QByteArray &response)
+{
+    QXmppPasswordRequest request;
+    request.setDomain(domain);
+    request.setUsername(saslServer->username());
+
+    if (saslServer->mechanism() == "PLAIN") {
+        request.setPassword(saslServer->password());
+
+        QXmppPasswordReply *reply = passwordChecker->checkPassword(request);
+        reply->setParent(q);
+        reply->setProperty("__sasl_raw", response);
+        QObject::connect(reply, SIGNAL(finished()),
+                         q, SLOT(onPasswordReply()));
+    } else if (saslServer->mechanism() == "DIGEST-MD5") {
+        QXmppPasswordReply *reply = passwordChecker->getDigest(request);
+        reply->setParent(q);
+        reply->setProperty("__sasl_raw", response);
+        QObject::connect(reply, SIGNAL(finished()),
+                         q, SLOT(onDigestReply()));
+    }
 }
 
 QString QXmppIncomingClientPrivate::origin() const
@@ -249,15 +273,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslServer::Response result = d->saslServer->respond(auth.value(), challenge);
 
             if (result == QXmppSaslServer::InputNeeded) {
-                // FIXME: this is PLAIN only
-                QXmppPasswordRequest request;
-                request.setDomain(d->saslServer->realm());
-                request.setUsername(d->saslServer->username());
-                request.setPassword(d->saslServer->password());
-
-                QXmppPasswordReply *reply = d->passwordChecker->checkPassword(request);
-                reply->setParent(this);
-                connect(reply, SIGNAL(finished()), this, SLOT(onPasswordReply()));
+                // check credentials
+                d->checkCredentials(auth.value());
             } else if (result == QXmppSaslServer::Challenge) {
                 sendPacket(QXmppSaslChallenge(challenge));
             } else {
@@ -283,14 +300,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslServer::Response result = d->saslServer->respond(response.value(), challenge);
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                QXmppPasswordRequest request;
-                request.setUsername(d->saslServer->username());
-                request.setDomain(d->domain);
-
-                QXmppPasswordReply *reply = d->passwordChecker->getDigest(request);
-                reply->setParent(this);
-                reply->setProperty("__sasl_raw", response.value());
-                connect(reply, SIGNAL(finished()), this, SLOT(onDigestReply()));
+                d->checkCredentials(response.value());
             } else if (result == QXmppSaslServer::Succeeded) {
                 // authentication succeeded
                 d->jid = QString("%1@%2").arg(d->saslServer->username(), d->domain);

@@ -54,5 +54,6 @@ private slots:
     void testAnonymous();
     void testDigestMd5();
     void testPlain();
+    void testPlainChallenge();
 };
 

@@ -642,6 +642,11 @@ QString QXmppSaslServerPlain::mechanism() const
 QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &request, QByteArray &response)
 {
     if (m_step == 0) {
+        if (request.isEmpty()) {
+            response = QByteArray();
+            return Challenge;
+        }
+
         QList<QByteArray> auth = request.split('\0');
         if (auth.size() != 3) {
             warning("QXmppSaslServerPlain : Invalid input");

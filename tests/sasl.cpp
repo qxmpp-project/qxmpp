@@ -231,3 +231,26 @@ void tst_QXmppSaslServer::testPlain()
 
     delete server;
 }
+
+void tst_QXmppSaslServer::testPlainChallenge()
+{
+    QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
+    QVERIFY(server != 0);
+    QCOMPARE(server->mechanism(), QLatin1String("PLAIN"));
+
+    // initial step returns challenge
+    QByteArray response;
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Challenge);
+    QCOMPARE(response, QByteArray());
+
+    // initial step returns success
+    QCOMPARE(server->respond(QByteArray("\0foo\0bar", 8), response), QXmppSaslServer::InputNeeded);
+    QCOMPARE(response, QByteArray());
+    QCOMPARE(server->username(), QLatin1String("foo"));
+    QCOMPARE(server->password(), QLatin1String("bar"));
+
+    // any further step is an error
+    QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+
+    delete server;
+}
