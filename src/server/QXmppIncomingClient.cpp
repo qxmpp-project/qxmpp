@@ -238,21 +238,31 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         if (nodeRecv.tagName() == QLatin1String("auth"))
         {
             const QString mechanism = nodeRecv.attribute("mechanism");
-            d->saslServer = QXmppSaslServer::create(mechanism);
+            d->saslServer = QXmppSaslServer::create(mechanism, this);
+            if (!d->saslServer) {
+                // unsupported method
+                sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'></failure>");
+                disconnectFromHost();
+                return;
+            }
+
+            d->saslServer->setRealm(d->domain.toUtf8());
+
             if (mechanism == QLatin1String("PLAIN"))
             {
-                QList<QByteArray> auth = QByteArray::fromBase64(nodeRecv.text().toAscii()).split('\0');
-                if (auth.size() != 3)
-                {
+                QByteArray challenge;
+                QXmppSaslServer::Response response = d->saslServer->respond(QByteArray::fromBase64(nodeRecv.text().toAscii()), challenge);
+                if (response != QXmppSaslServer::Succeeded) {
+
                     sendData("<failure xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><incorrect-encoding/></failure>");
                     disconnectFromHost();
                     return;
                 }
 
                 QXmppPasswordRequest request;
-                request.setDomain(d->domain);
-                request.setUsername(QString::fromUtf8(auth[1]));
-                request.setPassword(QString::fromUtf8(auth[2]));
+                request.setDomain(d->saslServer->realm());
+                request.setUsername(d->saslServer->username());
+                request.setPassword(d->saslServer->password());
 
                 QXmppPasswordReply *reply = d->passwordChecker->checkPassword(request);
                 reply->setParent(this);
@@ -273,8 +283,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 challenge["charset"] = "utf-8";
                 challenge["algorithm"] = "md5-sess";
 
-                const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge).toBase64();
-                sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data +"</challenge>");
+                const QByteArray data = QXmppSaslDigestMd5::serializeMessage(challenge);
+                sendData("<challenge xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + data.toBase64() +"</challenge>");
             }
             else
             {
