@@ -35,6 +35,19 @@
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
+// Calculate digest response for use with XMPP/SASL.
+
+static QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri, const QByteArray &secret, const QByteArray &nonce, const QByteArray &cnonce, const QByteArray &nc)
+{
+    const QByteArray A1 = secret + ':' + nonce + ':' + cnonce;
+    const QByteArray A2 = method + ':' + digestUri;
+
+    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+    const QByteArray KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ":auth:" + HA2;
+    return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+}
+
 static QByteArray generateNonce()
 {
     QByteArray nonce = QXmppUtils::generateRandomBytes(32);
@@ -281,8 +294,10 @@ bool QXmppSaslClientAnonymous::respond(const QByteArray &challenge, QByteArray &
 
 QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
     : QXmppSaslClient(parent)
+    , m_nc("00000001")
     , m_step(0)
 {
+    m_cnonce = generateNonce();
 }
 
 QString QXmppSaslClientDigestMd5::mechanism() const
@@ -317,24 +332,22 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
             return false;
         }
 
-        m_saslDigest.setCnonce(generateNonce());
-        m_saslDigest.setNc("00000001");
-        m_saslDigest.setNonce(input.value("nonce"));
-        m_saslDigest.setSecret(QCryptographicHash::hash(
+        m_nonce = input.value("nonce");
+        m_secret = QCryptographicHash::hash(
             username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
-            QCryptographicHash::Md5));
+            QCryptographicHash::Md5);
 
         // Build response
         QMap<QByteArray, QByteArray> output;
         output["username"] = username().toUtf8();
         if (!realm.isEmpty())
             output["realm"] = realm;
-        output["nonce"] = m_saslDigest.nonce();
+        output["nonce"] = m_nonce;
         output["qop"] = "auth";
-        output["cnonce"] = m_saslDigest.cnonce();
-        output["nc"] = m_saslDigest.nc();
+        output["cnonce"] = m_cnonce;
+        output["nc"] = m_nc;
         output["digest-uri"] = digestUri;
-        output["response"] = m_saslDigest.calculateDigest("AUTHENTICATE", digestUri);
+        output["response"] = calculateDigest("AUTHENTICATE", digestUri, m_secret, m_nonce, m_cnonce, m_nc);
         output["charset"] = "utf-8";
 
         response = QXmppSaslDigestMd5::serializeMessage(output);
@@ -344,7 +357,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         const QMap<QByteArray, QByteArray> input = QXmppSaslDigestMd5::parseMessage(challenge);
 
         // check new challenge
-        if (input.value("rspauth") != m_saslDigest.calculateDigest(QByteArray(), digestUri)) {
+        if (input.value("rspauth") != calculateDigest(QByteArray(), digestUri, m_secret, m_nonce, m_cnonce, m_nc)) {
             warning("QXmppSaslClientDigestMd5 : Invalid challenge on step 2");
             return false;
         }
@@ -546,6 +559,7 @@ QXmppSaslServerDigestMd5::QXmppSaslServerDigestMd5(QObject *parent)
     : QXmppSaslServer(parent)
     , m_step(0)
 {
+    m_nonce = generateNonce();
 }
 
 QString QXmppSaslServerDigestMd5::mechanism() const
@@ -556,12 +570,8 @@ QString QXmppSaslServerDigestMd5::mechanism() const
 QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &request, QByteArray &response)
 {
     if (m_step == 0) {
-        // generate nonce
-        m_saslDigest.setNonce(generateNonce());
-        //m_saslDigest.setQop("auth");
-
         QMap<QByteArray, QByteArray> output;
-        output["nonce"] = m_saslDigest.nonce();
+        output["nonce"] = m_nonce;
         if (!realm().isEmpty())
             output["realm"] = realm().toUtf8();
         output["qop"] = "auth";
@@ -585,21 +595,21 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         if (password().isEmpty() && passwordDigest().isEmpty())
             return InputNeeded;
 
-        m_saslDigest.setNc(input.value("nc"));
-        m_saslDigest.setCnonce(input.value("cnonce"));
+        m_nc = input.value("nc");
+        m_cnonce = input.value("cnonce");
         if (!password().isEmpty()) {
-            m_saslDigest.setSecret(QCryptographicHash::hash(
+            m_secret = QCryptographicHash::hash(
                 username().toUtf8() + ":" + realm + ":" + password().toUtf8(),
-                QCryptographicHash::Md5));
+                QCryptographicHash::Md5);
         } else {
-            m_saslDigest.setSecret(passwordDigest());
+            m_secret = passwordDigest();
         }
 
-        if (input.value("response") != m_saslDigest.calculateDigest("AUTHENTICATE", digestUri))
+        if (input.value("response") != calculateDigest("AUTHENTICATE", digestUri, m_secret, m_nonce, m_cnonce, m_nc))
             return Failed;
 
         QMap<QByteArray, QByteArray> output;
-        output["rspauth"] = m_saslDigest.calculateDigest(QByteArray(), digestUri);
+        output["rspauth"] = calculateDigest(QByteArray(), digestUri, m_secret, m_nonce, m_cnonce, m_nc);
 
         m_step++;
         response = QXmppSaslDigestMd5::serializeMessage(output);
@@ -643,57 +653,6 @@ QXmppSaslServer::Response QXmppSaslServerPlain::respond(const QByteArray &reques
         warning("QXmppSaslServerPlain : Invalid step");
         return Failed;
     }
-}
-
-QByteArray QXmppSaslDigestMd5::cnonce() const
-{
-    return m_cnonce;
-}
-
-void QXmppSaslDigestMd5::setCnonce(const QByteArray &cnonce)
-{
-    m_cnonce = cnonce;
-}
-
-QByteArray QXmppSaslDigestMd5::nc() const
-{
-    return m_nc;
-}
-
-void QXmppSaslDigestMd5::setNc(const QByteArray &nc)
-{
-    m_nc = nc;
-}
-
-QByteArray QXmppSaslDigestMd5::nonce() const
-{
-    return m_nonce;
-}
-
-void QXmppSaslDigestMd5::setNonce(const QByteArray &nonce)
-{
-    m_nonce = nonce;
-}
-
-void QXmppSaslDigestMd5::setSecret(const QByteArray &secret)
-{
-    m_secret = secret;
-}
-
-/// Calculate digest response for use with XMPP/SASL.
-///
-/// \param A2
-///
-
-QByteArray QXmppSaslDigestMd5::calculateDigest(const QByteArray &method, const QByteArray &digestUri) const
-{
-    const QByteArray A1 = m_secret + ':' + m_nonce + ':' + m_cnonce;
-    const QByteArray A2 = method + ':' + digestUri;
-
-    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
-    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-    const QByteArray KD = HA1 + ':' + m_nonce + ':' + m_nc + ':' + m_cnonce + ":auth:" + HA2;
-    return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
 QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &ba)

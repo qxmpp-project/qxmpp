@@ -130,7 +130,10 @@ public:
     bool respond(const QByteArray &challenge, QByteArray &response);
 
 private:
-    QXmppSaslDigestMd5 m_saslDigest;
+    QByteArray m_cnonce;
+    QByteArray m_nc;
+    QByteArray m_nonce;
+    QByteArray m_secret;
     int m_step;
 };
 
@@ -177,7 +180,10 @@ public:
     Response respond(const QByteArray &challenge, QByteArray &response);
 
 private:
-    QXmppSaslDigestMd5 m_saslDigest;
+    QByteArray m_cnonce;
+    QByteArray m_nc;
+    QByteArray m_nonce;
+    QByteArray m_secret;
     int m_step;
 };
 

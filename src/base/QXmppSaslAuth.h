@@ -37,29 +37,9 @@ class QXmppSaslServerPrivate;
 class QXMPP_EXPORT QXmppSaslDigestMd5
 {
 public:
-    QByteArray cnonce() const;
-    void setCnonce(const QByteArray &cnonce);
-
-    QByteArray nc() const;
-    void setNc(const QByteArray &nc);
-
-    QByteArray nonce() const;
-    void setNonce(const QByteArray &nonce);
-
-    void setSecret(const QByteArray &secret);
-
-    QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri) const;
-
     // message parsing and serialization
     static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
     static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
-
-private:
-    QByteArray m_cnonce;
-    QByteArray m_nc;
-    QByteArray m_nonce;
-    QByteArray m_qop;
-    QByteArray m_secret;
 };
 
 /// The QXmppSaslClient class is the base class for all SASL client
