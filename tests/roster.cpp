@@ -29,38 +29,51 @@
 void tst_QXmppRosterIq::testItem_data()
 {
     QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QString>("name");
     QTest::addColumn<int>("subscriptionType");
 
     QTest::newRow("none")
         << QByteArray("<item jid=\"foo@example.com\" subscription=\"none\"/>")
+        << ""
         << int(QXmppRosterIq::Item::None);
     QTest::newRow("from")
         << QByteArray("<item jid=\"foo@example.com\" subscription=\"from\"/>")
+        << ""
         << int(QXmppRosterIq::Item::From);
     QTest::newRow("to")
         << QByteArray("<item jid=\"foo@example.com\" subscription=\"to\"/>")
+        << ""
         << int(QXmppRosterIq::Item::To);
     QTest::newRow("both")
         << QByteArray("<item jid=\"foo@example.com\" subscription=\"both\"/>")
+        << ""
         << int(QXmppRosterIq::Item::Both);
     QTest::newRow("remove")
         << QByteArray("<item jid=\"foo@example.com\" subscription=\"remove\"/>")
+        << ""
         << int(QXmppRosterIq::Item::Remove);
     QTest::newRow("notset")
         << QByteArray("<item jid=\"foo@example.com\"/>")
+        << ""
+        << int(QXmppRosterIq::Item::NotSet);
+
+    QTest::newRow("name")
+        << QByteArray("<item jid=\"foo@example.com\" name=\"foo bar\"/>")
+        << "foo bar"
         << int(QXmppRosterIq::Item::NotSet);
 }
 
 void tst_QXmppRosterIq::testItem()
 {
     QFETCH(QByteArray, xml);
+    QFETCH(QString, name);
     QFETCH(int, subscriptionType);
 
     QXmppRosterIq::Item item;
     parsePacket(item, xml);
     QCOMPARE(item.bareJid(), QLatin1String("foo@example.com"));
     QCOMPARE(item.groups(), QSet<QString>());
-    QCOMPARE(item.name(), QString());
+    QCOMPARE(item.name(), name);
     QCOMPARE(int(item.subscriptionType()), subscriptionType);
     QCOMPARE(item.subscriptionStatus(), QString());
     serializePacket(item, xml);
