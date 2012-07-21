@@ -31,7 +31,11 @@ private slots:
     void testParsing();
     void testAuth_data();
     void testAuth();
+    void testChallenge_data();
+    void testChallenge();
     void testFailure();
+    void testResponse_data();
+    void testResponse();
     void testSuccess();
 };
 

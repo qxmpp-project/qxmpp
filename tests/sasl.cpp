@@ -74,6 +74,32 @@ void tst_QXmppSasl::testAuth()
     serializePacket(auth, xml);
 }
 
+void tst_QXmppSasl::testChallenge_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QByteArray>("value");
+
+    QTest::newRow("empty")
+        << QByteArray("<challenge xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>")
+        << QByteArray();
+
+    QTest::newRow("value")
+        << QByteArray("<challenge xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\">AGZvbwBiYXI=</challenge>")
+        << QByteArray("\0foo\0bar", 8);
+}
+
+void tst_QXmppSasl::testChallenge()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QByteArray, value);
+
+    // no condition
+    QXmppSaslChallenge challenge;
+    parsePacket(challenge, xml);
+    QCOMPARE(challenge.value(), value);
+    serializePacket(challenge, xml);
+}
+
 void tst_QXmppSasl::testFailure()
 {
     // no condition
@@ -89,6 +115,32 @@ void tst_QXmppSasl::testFailure()
     parsePacket(failure2, xml2);
     QCOMPARE(failure2.condition(), QLatin1String("not-authorized"));
     serializePacket(failure2, xml2);
+}
+
+void tst_QXmppSasl::testResponse_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QByteArray>("value");
+
+    QTest::newRow("empty")
+        << QByteArray("<response xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>")
+        << QByteArray();
+
+    QTest::newRow("value")
+        << QByteArray("<response xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\">AGZvbwBiYXI=</response>")
+        << QByteArray("\0foo\0bar", 8);
+}
+
+void tst_QXmppSasl::testResponse()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QByteArray, value);
+
+    // no condition
+    QXmppSaslResponse response;
+    parsePacket(response, xml);
+    QCOMPARE(response.value(), value);
+    serializePacket(response, xml);
 }
 
 void tst_QXmppSasl::testSuccess()
