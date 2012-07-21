@@ -74,7 +74,7 @@ public:
     };
 
     /// \cond
-    // Deprecated since 0.7.0
+    // deprecated since 0.6.2
     class QXMPP_EXPORT Status
     {
     public:
