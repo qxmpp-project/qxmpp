@@ -38,6 +38,7 @@ QXmppMessageReceiptManager::QXmppMessageReceiptManager()
 {
 }
 
+/// \cond
 QStringList QXmppMessageReceiptManager::discoveryFeatures() const
 {
     return QStringList(ns_message_receipts);
@@ -70,3 +71,4 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     // Continue processing.
     return false;
 }
+/// \endcond

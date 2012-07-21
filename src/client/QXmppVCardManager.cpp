@@ -46,33 +46,6 @@ QXmppVCardManager::~QXmppVCardManager()
     delete d;
 }
 
-QStringList QXmppVCardManager::discoveryFeatures() const
-{
-    // XEP-0054: vcard-temp
-    return QStringList() << ns_vcard;
-}
-
-bool QXmppVCardManager::handleStanza(const QDomElement &element)
-{
-    if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
-    {
-        QXmppVCardIq vCardIq;
-        vCardIq.parse(element);
-
-        if (vCardIq.from().isEmpty()) {
-            d->clientVCard = vCardIq;
-            d->isClientVCardReceived = true;
-            emit clientVCardReceived();
-        }
-
-        emit vCardReceived(vCardIq);
-
-        return true;
-    }
-
-    return false;
-}
-
 /// This function requests the server for vCard of the specified jid.
 /// Once received the signal vCardReceived() is emitted.
 ///
@@ -126,3 +99,32 @@ bool QXmppVCardManager::isClientVCardReceived() const
 {
     return d->isClientVCardReceived;
 }
+
+/// \cond
+QStringList QXmppVCardManager::discoveryFeatures() const
+{
+    // XEP-0054: vcard-temp
+    return QStringList() << ns_vcard;
+}
+
+bool QXmppVCardManager::handleStanza(const QDomElement &element)
+{
+    if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
+    {
+        QXmppVCardIq vCardIq;
+        vCardIq.parse(element);
+
+        if (vCardIq.from().isEmpty()) {
+            d->clientVCard = vCardIq;
+            d->isClientVCardReceived = true;
+            emit clientVCardReceived();
+        }
+
+        emit vCardReceived(vCardIq);
+
+        return true;
+    }
+
+    return false;
+}
+/// \endcond

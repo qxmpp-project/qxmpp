@@ -232,6 +232,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
     emit error(QXmppClient::SocketError);
 }
 
+/// \cond
 void QXmppOutgoingClient::handleStart()
 {
     QXmppStream::handleStart();
@@ -601,6 +602,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
     }
 }
+/// \endcond
 
 void QXmppOutgoingClient::pingStart()
 {

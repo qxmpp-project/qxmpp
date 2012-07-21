@@ -142,6 +142,7 @@ bool QXmppBookmarkManager::setBookmarks(const QXmppBookmarkSet &bookmarks)
     return true;
 }
 
+/// \cond
 void QXmppBookmarkManager::setClient(QXmppClient *client)
 {
     bool check;
@@ -190,6 +191,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
     }
     return false;
 }
+/// \endcond
 
 void QXmppBookmarkManager::slotConnected()
 {

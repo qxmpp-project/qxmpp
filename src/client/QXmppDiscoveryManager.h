@@ -42,6 +42,8 @@ public:
     QXmppDiscoveryManager();
     ~QXmppDiscoveryManager();
 
+    QXmppDiscoveryIq capabilities();
+
     QString requestInfo(const QString& jid, const QString& node = "");
     QString requestItems(const QString& jid, const QString& node = "");
 
@@ -61,7 +63,6 @@ public:
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(const QDomElement &element);
-    QXmppDiscoveryIq capabilities();
     /// \endcond
 
 signals:

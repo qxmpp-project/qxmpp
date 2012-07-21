@@ -102,6 +102,7 @@ QString QXmppIncomingServer::localStreamId() const
     return d->localStreamId;
 }
 
+/// \cond
 void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 {
     const QString from = streamElement.attribute("from");
@@ -181,6 +182,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         disconnectFromHost();
     }
 }
+/// \endcond
 
 /// Returns true if the socket is connected and the remote server is
 /// authenticated.

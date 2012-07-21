@@ -769,6 +769,7 @@ QXmppCallManager::~QXmppCallManager()
     delete d;
 }
 
+/// \cond
 QStringList QXmppCallManager::discoveryFeatures() const
 {
     return QStringList()
@@ -815,6 +816,7 @@ void QXmppCallManager::setClient(QXmppClient *client)
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 }
+/// \endcond
 
 /// Initiates a new outgoing call to the specified recipient.
 ///

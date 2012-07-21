@@ -115,6 +115,7 @@ void QXmppRosterManager::_q_disconnected()
     d->isRosterReceived = false;
 }
 
+/// \cond
 bool QXmppRosterManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() != "iq" || !QXmppRosterIq::isRosterIq(element))
@@ -187,6 +188,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
 
     return true;
 }
+/// \endcond
 
 void QXmppRosterManager::_q_presenceReceived(const QXmppPresence& presence)
 {

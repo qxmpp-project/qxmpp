@@ -65,42 +65,6 @@ QXmppVersionManager::~QXmppVersionManager()
     delete d;
 }
 
-QStringList QXmppVersionManager::discoveryFeatures() const
-{
-    // XEP-0092: Software Version
-    return QStringList() << ns_version;
-}
-
-bool QXmppVersionManager::handleStanza(const QDomElement &element)
-{
-    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
-    {
-        QXmppVersionIq versionIq;
-        versionIq.parse(element);
-
-        if (versionIq.type() == QXmppIq::Get) {
-            // respond to query
-            QXmppVersionIq responseIq;
-            responseIq.setType(QXmppIq::Result);
-            responseIq.setId(versionIq.id());
-            responseIq.setTo(versionIq.from());
-
-            responseIq.setName(clientName());
-            responseIq.setVersion(clientVersion());
-            responseIq.setOs(clientOs());
-
-            client()->sendPacket(responseIq);
-        } else if (versionIq.type() == QXmppIq::Result) {
-            // emit response
-            emit versionReceived(versionIq);
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 /// Request version information from the specified XMPP entity.
 ///
 /// \param jid
@@ -172,3 +136,41 @@ QString QXmppVersionManager::clientOs() const
 {
     return d->clientOs;
 }
+
+/// \cond
+QStringList QXmppVersionManager::discoveryFeatures() const
+{
+    // XEP-0092: Software Version
+    return QStringList() << ns_version;
+}
+
+bool QXmppVersionManager::handleStanza(const QDomElement &element)
+{
+    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
+    {
+        QXmppVersionIq versionIq;
+        versionIq.parse(element);
+
+        if (versionIq.type() == QXmppIq::Get) {
+            // respond to query
+            QXmppVersionIq responseIq;
+            responseIq.setType(QXmppIq::Result);
+            responseIq.setId(versionIq.id());
+            responseIq.setTo(versionIq.from());
+
+            responseIq.setName(clientName());
+            responseIq.setVersion(clientVersion());
+            responseIq.setOs(clientOs());
+
+            client()->sendPacket(responseIq);
+        } else if (versionIq.type() == QXmppIq::Result) {
+            // emit response
+            emit versionReceived(versionIq);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+/// \endcond

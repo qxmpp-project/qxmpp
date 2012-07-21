@@ -757,19 +757,6 @@ QXmppTransferManager::~QXmppTransferManager()
     delete d;
 }
 
-void QXmppTransferManager::setClient(QXmppClient *client)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    QXmppClientExtension::setClient(client);
-
-    // XEP-0047: In-Band Bytestreams
-    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-                    this, SLOT(_q_iqReceived(QXmppIq)));
-    Q_ASSERT(check);
-}
-
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 {
     // handle IQ from proxy
@@ -868,6 +855,7 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
     job->connectToHosts(iq);
 }
 
+/// \cond
 QStringList QXmppTransferManager::discoveryFeatures() const
 {
     return QStringList()
@@ -923,6 +911,20 @@ bool QXmppTransferManager::handleStanza(const QDomElement &element)
 
     return false;
 }
+
+void QXmppTransferManager::setClient(QXmppClient *client)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    QXmppClientExtension::setClient(client);
+
+    // XEP-0047: In-Band Bytestreams
+    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
+                    this, SLOT(_q_iqReceived(QXmppIq)));
+    Q_ASSERT(check);
+}
+/// \endcond
 
 void QXmppTransferManager::ibbCloseIqReceived(const QXmppIbbCloseIq &iq)
 {

@@ -58,34 +58,6 @@ QXmppDiscoveryManager::~QXmppDiscoveryManager()
     delete d;
 }
 
-bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
-{
-    if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
-    {
-        QXmppDiscoveryIq receivedIq;
-        receivedIq.parse(element);
-
-        if(receivedIq.type() == QXmppIq::Get &&
-           receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(d->clientCapabilitiesNode)))
-        {
-            // respond to query
-            QXmppDiscoveryIq qxmppFeatures = capabilities();
-            qxmppFeatures.setId(receivedIq.id());
-            qxmppFeatures.setTo(receivedIq.from());
-            qxmppFeatures.setQueryNode(receivedIq.queryNode());
-            client()->sendPacket(qxmppFeatures);
-        }
-        else if(receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery)
-            emit infoReceived(receivedIq);
-        else if(receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery)
-            emit itemsReceived(receivedIq);
-
-        return true;
-    }
-    return false;
-}
-
 /// Requests information from the specified XMPP entity.
 ///
 /// \param jid  The target entity's JID.
@@ -124,10 +96,7 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
         return QString();
 }
 
-QStringList QXmppDiscoveryManager::discoveryFeatures() const
-{
-    return QStringList() << ns_disco_info;
-}
+/// Returns the client's full capabilities.
 
 QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 {
@@ -250,3 +219,38 @@ QString QXmppDiscoveryManager::clientName() const
 {
     return d->clientName;
 }
+
+/// \cond
+QStringList QXmppDiscoveryManager::discoveryFeatures() const
+{
+    return QStringList() << ns_disco_info;
+}
+
+bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
+{
+    if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
+    {
+        QXmppDiscoveryIq receivedIq;
+        receivedIq.parse(element);
+
+        if(receivedIq.type() == QXmppIq::Get &&
+           receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
+           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(d->clientCapabilitiesNode)))
+        {
+            // respond to query
+            QXmppDiscoveryIq qxmppFeatures = capabilities();
+            qxmppFeatures.setId(receivedIq.id());
+            qxmppFeatures.setTo(receivedIq.from());
+            qxmppFeatures.setQueryNode(receivedIq.queryNode());
+            client()->sendPacket(qxmppFeatures);
+        }
+        else if(receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+            emit infoReceived(receivedIq);
+        else if(receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery)
+            emit itemsReceived(receivedIq);
+
+        return true;
+    }
+    return false;
+}
+/// \endcond

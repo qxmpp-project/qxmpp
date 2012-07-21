@@ -778,4 +778,3 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
     }
     return ba;
 }
-

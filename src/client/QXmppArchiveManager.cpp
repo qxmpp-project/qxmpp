@@ -28,6 +28,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
 
+/// \cond
 QStringList QXmppArchiveManager::discoveryFeatures() const
 {
     // XEP-0036: Message Archiving
@@ -64,6 +65,7 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 
     return false;
 }
+/// \endcond
 
 /// Retrieves the list of available collections. Once the results are
 /// received, the archiveListReceived() signal will be emitted.
