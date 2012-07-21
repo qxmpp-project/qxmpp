@@ -120,27 +120,6 @@ public:
     static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
 };
 
-class QXmppSaslStanza : public QXmppStanza
-{
-public:
-    QXmppSaslStanza(const QString &type, const QByteArray &value = QByteArray());
-
-    QString type() const;
-    void setType(const QString &type);
-
-    QByteArray value() const;
-    void setValue(const QByteArray &value);
-
-    /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
-
-private:
-    QString m_type;
-    QByteArray m_value;
-};
-
 class QXmppSaslAuth : public QXmppStanza
 {
 public:
@@ -162,10 +141,21 @@ private:
     QByteArray m_value;
 };
 
-class QXmppSaslChallenge : public QXmppSaslStanza
+class QXmppSaslChallenge : public QXmppStanza
 {
 public:
     QXmppSaslChallenge(const QByteArray &value = QByteArray());
+
+    QByteArray value() const;
+    void setValue(const QByteArray &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QByteArray m_value;
 };
 
 class QXmppSaslFailure : public QXmppStanza
@@ -185,10 +175,21 @@ private:
     QString m_condition;
 };
 
-class QXmppSaslResponse : public QXmppSaslStanza
+class QXmppSaslResponse : public QXmppStanza
 {
 public:
     QXmppSaslResponse(const QByteArray &value = QByteArray());
+
+    QByteArray value() const;
+    void setValue(const QByteArray &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QByteArray m_value;
 };
 
 class QXmppSaslSuccess : public QXmppStanza

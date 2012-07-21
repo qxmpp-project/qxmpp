@@ -104,8 +104,32 @@ void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 }
 
 QXmppSaslChallenge::QXmppSaslChallenge(const QByteArray &value)
-    : QXmppSaslStanza("challenge", value)
+    : m_value(value)
 {
+}
+
+QByteArray QXmppSaslChallenge::value() const
+{
+    return m_value;
+}
+
+void QXmppSaslChallenge::setValue(const QByteArray &value)
+{
+    m_value = value;
+}
+
+void QXmppSaslChallenge::parse(const QDomElement &element)
+{
+    m_value = QByteArray::fromBase64(element.text().toAscii());
+}
+
+void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("challenge");
+    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    if (!m_value.isEmpty())
+        writer->writeCharacters(m_value.toBase64());
+    writer->writeEndElement();
 }
 
 QXmppSaslFailure::QXmppSaslFailure(const QString &condition)
@@ -138,8 +162,32 @@ void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 }
 
 QXmppSaslResponse::QXmppSaslResponse(const QByteArray &value)
-    : QXmppSaslStanza("response", value)
+    : m_value(value)
 {
+}
+
+QByteArray QXmppSaslResponse::value() const
+{
+    return m_value;
+}
+
+void QXmppSaslResponse::setValue(const QByteArray &value)
+{
+    m_value = value;
+}
+
+void QXmppSaslResponse::parse(const QDomElement &element)
+{
+    m_value = QByteArray::fromBase64(element.text().toAscii());
+}
+
+void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("response");
+    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    if (!m_value.isEmpty())
+        writer->writeCharacters(m_value.toBase64());
+    writer->writeEndElement();
 }
 
 QXmppSaslSuccess::QXmppSaslSuccess()
@@ -155,39 +203,6 @@ void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement("success");
     writer->writeAttribute("xmlns", ns_xmpp_sasl);
     writer->writeEndElement();
-}
-
-QXmppSaslStanza::QXmppSaslStanza(const QString &type, const QByteArray &value)
-    : m_type(type)
-    , m_value(value)
-{
-}
-
-QByteArray QXmppSaslStanza::value() const
-{
-    return m_value;
-}
-
-void QXmppSaslStanza::setValue(const QByteArray &value)
-{
-    m_value = value;
-}
-
-void QXmppSaslStanza::parse(const QDomElement &element)
-{
-    m_type = element.nodeName();
-    m_value = QByteArray::fromBase64(element.text().toAscii());
-}
-
-void QXmppSaslStanza::toXml(QXmlStreamWriter *writer) const
-{
-    if (!m_type.isEmpty()) {
-        writer->writeStartElement(m_type);
-        writer->writeAttribute("xmlns", ns_xmpp_sasl);
-        if (!m_value.isEmpty())
-            writer->writeCharacters(m_value.toBase64());
-        writer->writeEndElement();
-    }
 }
 
 class QXmppSaslClientPrivate
