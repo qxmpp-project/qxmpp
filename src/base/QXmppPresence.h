@@ -71,11 +71,8 @@ public:
 /// (empty photo element) and mere support for the protocol (empty update child).
     };
 
-    /// \brief The QXmppPresence::Status class represents the status of an XMPP entity.
-    ///
-    /// It stores information such as the "away", "busy" status of a user, or
-    /// a human-readable description.
-
+    /// \cond
+    // Deprecated since 0.7.0
     class QXMPP_EXPORT Status
     {
     public:
@@ -102,10 +99,8 @@ public:
         int priority() const;
         void setPriority(int);
 
-        /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
-        /// \endcond
 
     private:
         QString getTypeStr() const;
@@ -116,8 +111,13 @@ public:
         int m_priority;
     };
 
-    QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available,
-        const QXmppPresence::Status& status = QXmppPresence::Status());
+    Q_DECL_DEPRECATED QXmppPresence(QXmppPresence::Type type, const QXmppPresence::Status& status);
+    QXmppPresence::Status Q_DECL_DEPRECATED &status();
+    const QXmppPresence::Status Q_DECL_DEPRECATED &status() const;
+    void Q_DECL_DEPRECATED setStatus(const QXmppPresence::Status&);
+    /// \endcond
+
+    QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available);
     ~QXmppPresence();
 
     AvailableStatusType availableStatusType() const;
@@ -128,10 +128,6 @@ public:
 
     QXmppPresence::Type type() const;
     void setType(QXmppPresence::Type);
-
-    QXmppPresence::Status& status();
-    const QXmppPresence::Status& status() const;
-    void setStatus(const QXmppPresence::Status&);
 
     QString statusText() const;
     void setStatusText(const QString& statusText);

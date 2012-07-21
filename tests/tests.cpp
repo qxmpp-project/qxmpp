@@ -1190,6 +1190,9 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    QXmppPresence pres;
+    pres.availableStatusType();
+
     // run tests
     int errors = 0;
 

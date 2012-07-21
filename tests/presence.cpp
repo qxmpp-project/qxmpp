@@ -29,6 +29,8 @@
 
 void tst_QXmppPresence::testPresence_data()
 {
+    QXmppPresence foo;
+
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("type");
     QTest::addColumn<int>("priority");

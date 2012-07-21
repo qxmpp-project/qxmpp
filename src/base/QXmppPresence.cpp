@@ -32,7 +32,12 @@
 /// Constructs a QXmppPresence.
 ///
 /// \param type
-/// \param status
+
+QXmppPresence::QXmppPresence(QXmppPresence::Type type)
+    : m_type(type),
+    m_vCardUpdateType(VCardUpdateNone)
+{
+}
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type,
                              const QXmppPresence::Status& status)
@@ -41,7 +46,6 @@ QXmppPresence::QXmppPresence(QXmppPresence::Type type,
     m_status(status),
     m_vCardUpdateType(VCardUpdateNone)
 {
-
 }
 
 /// Destroys a QXmppPresence.
@@ -58,7 +62,7 @@ QXmppPresence::~QXmppPresence()
 
 QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
 {
-    return static_cast<AvailableStatusType>(m_status.type());
+    return static_cast<QXmppPresence::AvailableStatusType>(m_status.type());
 }
 
 /// Sets the availability status type, for instance busy or away.
