@@ -290,14 +290,33 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 }
 /// \endcond
 
+class QXmppStanzaPrivate : public QSharedData
+{
+public:
+    QString to;
+    QString from;
+    QString id;
+    QString lang;
+    QXmppStanza::Error error;
+    QXmppElementList extensions;
+};
+
 /// Constructs a QXmppStanza with the specified sender and recipient.
 ///
 /// \param from
 /// \param to
 
 QXmppStanza::QXmppStanza(const QString& from, const QString& to)
-    : m_to(to)
-    , m_from(from)
+    : d(new QXmppStanzaPrivate)
+{
+    d->to = to;
+    d->from = from;
+}
+
+/// Constructs a copy of \a other.
+
+QXmppStanza::QXmppStanza(const QXmppStanza &other)
+    : d(other.d)
 {
 }
 
@@ -307,12 +326,20 @@ QXmppStanza::~QXmppStanza()
 {
 }
 
+/// Assigns \a other to this stanza.
+
+QXmppStanza& QXmppStanza::operator=(const QXmppStanza &other)
+{
+    d = other.d;
+    return *this;
+}
+
 /// Returns the stanza's recipient JID.
 ///
 
 QString QXmppStanza::to() const
 {
-    return m_to;
+    return d->to;
 }
 
 /// Sets the stanza's recipient JID.
@@ -321,14 +348,14 @@ QString QXmppStanza::to() const
 
 void QXmppStanza::setTo(const QString& to)
 {
-    m_to = to;
+    d->to = to;
 }
 
 /// Returns the stanza's sender JID.
 
 QString QXmppStanza::from() const
 {
-    return m_from;
+    return d->from;
 }
 
 /// Sets the stanza's sender JID.
@@ -337,14 +364,14 @@ QString QXmppStanza::from() const
 
 void QXmppStanza::setFrom(const QString& from)
 {
-    m_from = from;
+    d->from = from;
 }
 
 /// Returns the stanza's identifier.
 
 QString QXmppStanza::id() const
 {
-    return m_id;
+    return d->id;
 }
 
 /// Sets the stanza's identifier.
@@ -353,14 +380,14 @@ QString QXmppStanza::id() const
 
 void QXmppStanza::setId(const QString& id)
 {
-    m_id = id;
+    d->id = id;
 }
 
 /// Returns the stanza's language.
 
 QString QXmppStanza::lang() const
 {
-    return m_lang;
+    return d->lang;
 }
 
 /// Sets the stanza's language.
@@ -369,14 +396,14 @@ QString QXmppStanza::lang() const
 
 void QXmppStanza::setLang(const QString& lang)
 {
-    m_lang = lang;
+    d->lang = lang;
 }
 
 /// Returns the stanza's error.
 
 QXmppStanza::Error QXmppStanza::error() const
 {
-    return m_error;
+    return d->error;
 }
 
 /// Sets the stanza's error.
@@ -385,7 +412,7 @@ QXmppStanza::Error QXmppStanza::error() const
 
 void QXmppStanza::setError(const QXmppStanza::Error& error)
 {
-    m_error = error;
+    d->error = error;
 }
 
 /// Returns the stanza's "extensions".
@@ -394,7 +421,7 @@ void QXmppStanza::setError(const QXmppStanza::Error& error)
 
 QXmppElementList QXmppStanza::extensions() const
 {
-    return m_extensions;
+    return d->extensions;
 }
 
 /// Sets the stanza's "extensions".
@@ -403,7 +430,7 @@ QXmppElementList QXmppStanza::extensions() const
 
 void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 {
-    m_extensions = extensions;
+    d->extensions = extensions;
 }
 
 /// \cond
@@ -411,18 +438,18 @@ void QXmppStanza::generateAndSetNextId()
 {
     // get back
     ++s_uniqeIdNo;
-    m_id = "qxmpp" + QString::number(s_uniqeIdNo);
+    d->id = "qxmpp" + QString::number(s_uniqeIdNo);
 }
 
 void QXmppStanza::parse(const QDomElement &element)
 {
-    m_from = element.attribute("from");
-    m_to = element.attribute("to");
-    m_id = element.attribute("id");
-    m_lang = element.attribute("lang");
+    d->from = element.attribute("from");
+    d->to = element.attribute("to");
+    d->id = element.attribute("id");
+    d->lang = element.attribute("lang");
 
     QDomElement errorElement = element.firstChildElement("error");
     if(!errorElement.isNull())
-        m_error.parse(errorElement);
+        d->error.parse(errorElement);
 }
 /// \endcond

@@ -27,6 +27,7 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QSharedData>
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
 // include the whole header.
@@ -35,6 +36,8 @@
 #include <QXmlStreamWriter>
 
 #include "QXmppElement.h"
+
+class QXmppStanzaPrivate;
 
 /// \defgroup Stanzas
 
@@ -118,7 +121,10 @@ public:
     };
 
     QXmppStanza(const QString& from = QString(), const QString& to = QString());
+    QXmppStanza(const QXmppStanza &other);
     virtual ~QXmppStanza();
+
+    QXmppStanza& operator=(const QXmppStanza &other);
 
     QString to() const;
     void setTo(const QString&);
@@ -147,13 +153,8 @@ protected:
     /// \endcond
 
 private:
+    QSharedDataPointer<QXmppStanzaPrivate> d;
     static uint s_uniqeIdNo;
-    QString m_to;
-    QString m_from;
-    QString m_id;
-    QString m_lang;
-    QXmppStanza::Error m_error;
-    QXmppElementList m_extensions;
 };
 
 #endif // QXMPPSTANZA_H
