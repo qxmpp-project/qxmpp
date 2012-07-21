@@ -34,7 +34,10 @@ class QXmppServerExtension;
 class QXMPP_EXPORT QXmppServerPluginInterface
 {
 public:
+    /// Creates the server extension identified by \a key.
     virtual QXmppServerExtension *create(const QString &key) = 0;
+
+    /// Returns a list of valid extension keys.
     virtual QStringList keys() const = 0;
 };
 

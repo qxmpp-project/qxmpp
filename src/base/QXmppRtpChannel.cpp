@@ -367,15 +367,13 @@ QXmppRtpAudioChannel::~QXmppRtpAudioChannel()
 }
 
 /// Returns the number of bytes that are available for reading.
-///
 
 qint64 QXmppRtpAudioChannel::bytesAvailable() const
 {
     return QIODevice::bytesAvailable() + d->incomingBuffer.size();
 }
 
-/// Closes the RTP channel.
-///
+/// Closes the RTP audio channel.
 
 void QXmppRtpAudioChannel::close()
 {
@@ -906,8 +904,7 @@ QXmppRtpVideoChannel::~QXmppRtpVideoChannel()
     delete d;
 }
 
-/// Closes the RTP channel.
-///
+/// Closes the RTP video channel.
 
 void QXmppRtpVideoChannel::close()
 {
@@ -934,6 +931,8 @@ void QXmppRtpVideoChannel::datagramReceived(const QByteArray &ba)
     d->frames << decoder->handlePacket(packet);
 }
 
+/// Returns the video format used by the encoder.
+
 QXmppVideoFormat QXmppRtpVideoChannel::decoderFormat() const
 {
     if (d->decoders.isEmpty())
@@ -942,10 +941,14 @@ QXmppVideoFormat QXmppRtpVideoChannel::decoderFormat() const
     return d->decoders.value(key)->format();
 }
 
+/// Returns the video format used by the encoder.
+
 QXmppVideoFormat QXmppRtpVideoChannel::encoderFormat() const
 {
     return d->outgoingFormat;
 }
+
+/// Sets the video format used by the encoder.
 
 void QXmppRtpVideoChannel::setEncoderFormat(const QXmppVideoFormat &format)
 {

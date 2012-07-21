@@ -45,13 +45,21 @@ public:
     QByteArray encode() const;
     QString toString() const;
 
+    ///  RTP version.
     quint8 version;
+    /// Marker flag.
     bool marker;
+    /// Payload type.
     quint8 type;
+    /// Synchronization source.
     quint32 ssrc;
+    /// Contributing sources.
     QList<quint32> csrc;
+    /// Sequence number.
     quint16 sequence;
+    /// Timestamp.
     quint32 stamp;
+    /// Raw payload data.
     QByteArray payload;
 };
 
@@ -60,17 +68,21 @@ class QXMPP_EXPORT QXmppRtpChannel
 public:
     QXmppRtpChannel();
 
+    /// Closes the RTP channel.
     virtual void close() = 0;
+    /// Returns the RTP channel's current read/write mode.
     virtual QIODevice::OpenMode openMode() const = 0;
     QList<QXmppJinglePayloadType> localPayloadTypes();
     void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
 
 protected:
+    /// \cond
     virtual void payloadTypesChanged();
 
     QList<QXmppJinglePayloadType> m_incomingPayloadTypes;
     QList<QXmppJinglePayloadType> m_outgoingPayloadTypes;
     bool m_outgoingPayloadNumbered;
+    /// \endcond
 };
 
 /// \brief The QXmppRtpAudioChannel class represents an RTP audio channel to a remote party.
@@ -175,13 +187,25 @@ private:
 class QXMPP_EXPORT QXmppVideoFrame
 {
 public:
+    /// This enum describes a pixel format.
     enum PixelFormat {
-        Format_Invalid = 0,
-        Format_RGB32 = 3,
-        Format_RGB24 = 4,
-        Format_YUV420P = 18,
-        Format_UYVY = 20,
-        Format_YUYV = 21,
+        Format_Invalid = 0,     ///< The frame is invalid.
+        Format_RGB32 = 3,       ///< The frame stored using a 32-bit RGB format (0xffRRGGBB).
+        Format_RGB24 = 4,       ///< The frame is stored using a 24-bit RGB format (8-8-8).
+        Format_YUV420P = 18,    ///< The frame is stored using an 8-bit per component planar
+                                ///< YUV format with the U and V planes horizontally and
+                                ///< vertically sub-sampled, i.e. the height and width of the
+                                ///< U and V planes are half that of the Y plane.
+        Format_UYVY = 20,       ///< The frame is stored using an 8-bit per component packed
+                                ///< YUV format with the U and V planes horizontally
+                                ///< sub-sampled (U-Y-V-Y), i.e. two horizontally adjacent
+                                ///< pixels are stored as a 32-bit macropixel which has a Y
+                                ///< value for each pixel and common U and V values.
+        Format_YUYV = 21,       ///< The frame is stored using an 8-bit per component packed
+                                ///< YUV format with the U and V planes horizontally
+                                ///< sub-sampled (Y-U-Y-V), i.e. two horizontally adjacent
+                                ///< pixels are stored as a 32-bit macropixel which has a Y
+                                ///< value for each pixel and common U and V values.
     };
 
     QXmppVideoFrame();
@@ -268,8 +292,10 @@ public:
     void setEncoderFormat(const QXmppVideoFormat &format);
     void writeFrame(const QXmppVideoFrame &frame);
 
+    /// \cond
     QIODevice::OpenMode openMode() const;
     void close();
+    /// \endcond
 
 signals:
     /// \brief This signal is emitted when a datagram needs to be sent.

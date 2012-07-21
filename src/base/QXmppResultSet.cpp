@@ -109,6 +109,8 @@ void QXmppResultSetQuery::setAfter(const QString& after)
     m_after=after;
 }
 
+/// Returns true if no result set information is present.
+
 bool QXmppResultSetQuery::isNull() const
 {
     return m_max == -1 && m_index == -1 && m_after.isNull() && m_before.isNull();
@@ -196,15 +198,25 @@ void QXmppResultSetReply::setCount(int count)
     m_count = count;
 }
 
+/// Returns the index for the first result in the set.
+///
+/// This is used for retrieving pages out of order.
+
 int QXmppResultSetReply::index() const
 {
     return m_index;
 }
 
+/// Sets the index for the first result in the set.
+///
+/// This is used for retrieving pages out of order.
+
 void QXmppResultSetReply::setIndex(int index)
 {
     m_index = index;
 }
+
+/// Returns true if no result set information is present.
 
 bool QXmppResultSetReply::isNull() const
 {
