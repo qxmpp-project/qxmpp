@@ -29,6 +29,10 @@ class tst_QXmppSasl : public QObject
 
 private slots:
     void testParsing();
+    void testAuth_data();
+    void testAuth();
+    void testFailure();
+    void testSuccess();
 };
 
 class tst_QXmppSaslClient : public QObject

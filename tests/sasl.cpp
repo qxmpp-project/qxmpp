@@ -45,6 +45,60 @@ void tst_QXmppSasl::testParsing()
     QCOMPARE(QXmppSaslDigestMd5::serializeMessage(map), bytes);
 }
 
+void tst_QXmppSasl::testAuth_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QString>("mechanism");
+    QTest::addColumn<QByteArray>("value");
+
+    QTest::newRow("plain")
+        << QByteArray("<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" mechanism=\"PLAIN\">AGZvbwBiYXI=</auth>")
+        << "PLAIN" << QByteArray("\0foo\0bar", 8);
+
+    QTest::newRow("digest-md5")
+        << QByteArray("<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" mechanism=\"DIGEST-MD5\"/>")
+        << "DIGEST-MD5" << QByteArray();
+}
+
+void tst_QXmppSasl::testAuth()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QString, mechanism);
+    QFETCH(QByteArray, value);
+
+    // no condition
+    QXmppSaslAuth auth;
+    parsePacket(auth, xml);
+    QCOMPARE(auth.mechanism(), mechanism);
+    QCOMPARE(auth.value(), value);
+    serializePacket(auth, xml);
+}
+
+void tst_QXmppSasl::testFailure()
+{
+    // no condition
+    const QByteArray xml = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
+    QXmppSaslFailure failure;
+    parsePacket(failure, xml);
+    QCOMPARE(failure.condition(), QString());
+    serializePacket(failure, xml);
+
+    // not authorized
+    const QByteArray xml2 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><not-authorized/></failure>";
+    QXmppSaslFailure failure2;
+    parsePacket(failure2, xml2);
+    QCOMPARE(failure2.condition(), QLatin1String("not-authorized"));
+    serializePacket(failure2, xml2);
+}
+
+void tst_QXmppSasl::testSuccess()
+{
+    const QByteArray xml = "<success xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
+    QXmppSaslSuccess stanza;
+    parsePacket(stanza, xml);
+    serializePacket(stanza, xml);
+}
+
 void tst_QXmppSaslClient::testAvailableMechanisms()
 {
     QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM");

@@ -141,13 +141,16 @@ private:
     QByteArray m_value;
 };
 
-class QXmppSaslAuth : public QXmppSaslStanza
+class QXmppSaslAuth : public QXmppStanza
 {
 public:
     QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
 
     QString mechanism() const;
     void setMechanism(const QString &mechanism);
+
+    QByteArray value() const;
+    void setValue(const QByteArray &value);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -156,6 +159,7 @@ public:
 
 private:
     QString m_mechanism;
+    QByteArray m_value;
 };
 
 class QXmppSaslChallenge : public QXmppSaslStanza
