@@ -103,9 +103,6 @@ public:
         void toXml(QXmlStreamWriter *writer) const;
 
     private:
-        QString getTypeStr() const;
-        void setTypeFromStr(const QString&);
-
         QXmppPresence::Status::Type m_type;
         QString m_statusText;
         int m_priority;
@@ -164,9 +161,6 @@ public:
     QStringList capabilityExt() const;
 
 private:
-    QString getTypeStr() const;
-    void setTypeFromStr(const QString&);
-
     AvailableStatusType m_availableStatusType;
     Type m_type;
     QXmppPresence::Status m_status;

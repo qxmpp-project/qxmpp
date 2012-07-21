@@ -29,6 +29,26 @@
 #include <QXmlStreamWriter>
 #include "QXmppConstants.h"
 
+static const char* presence_types[] = {
+    "error",
+    "",
+    "unavailable",
+    "subscribe",
+    "subscribed",
+    "unsubscribe",
+    "unsubscribed",
+    "probe"
+};
+
+static const char* presence_shows[] = {
+    "",
+    "away",
+    "xa",
+    "dnd",
+    "chat",
+    "invisible"
+};
+
 /// Constructs a QXmppPresence.
 ///
 /// \param type
@@ -128,7 +148,14 @@ void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    setTypeFromStr(element.attribute("type"));
+    m_type = Error;
+    const QString type = element.attribute("type");
+    for (int i = Error; i <= Probe; i++) {
+        if (type == presence_types[i]) {
+            m_type = static_cast<Type>(i);
+            break;
+        }
+    }
     m_status.parse(element);
 
     QXmppElementList extensions;
@@ -203,7 +230,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     helperToXmlAddAttribute(xmlWriter,"id", id());
     helperToXmlAddAttribute(xmlWriter,"to", to());
     helperToXmlAddAttribute(xmlWriter,"from", from());
-    helperToXmlAddAttribute(xmlWriter,"type", getTypeStr());
+    helperToXmlAddAttribute(xmlWriter,"type", presence_types[m_type]);
     m_status.toXml(xmlWriter);
 
     error().toXml(xmlWriter);
@@ -261,56 +288,6 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 /// \endcond
-
-QString QXmppPresence::getTypeStr() const
-{
-    switch(m_type) {
-    case QXmppPresence::Error:
-        return "error";
-    case QXmppPresence::Available:
-        return "";
-    case QXmppPresence::Unavailable:
-        return "unavailable";
-    case QXmppPresence::Subscribe:
-        return "subscribe";
-    case QXmppPresence::Subscribed:
-        return "subscribed";
-    case QXmppPresence::Unsubscribe:
-        return "unsubscribe";
-    case QXmppPresence::Unsubscribed:
-        return "unsubscribed";
-    case QXmppPresence::Probe:
-        return "probe";
-    default:
-        qWarning("QXmppPresence::getTypeStr() invalid type %d", (int)m_type);
-        return "";
-    }
-}
-
-void QXmppPresence::setTypeFromStr(const QString& str)
-{
-    if(str == "error")
-        m_type = QXmppPresence::Error;
-    else if(str == "")
-        m_type = QXmppPresence::Available;
-    else if(str == "unavailable")
-        m_type = QXmppPresence::Unavailable;
-    else if(str == "subscribe")
-        m_type = QXmppPresence::Subscribe;
-    else if(str == "subscribed")
-        m_type = QXmppPresence::Subscribed;
-    else if(str == "unsubscribe")
-        m_type = QXmppPresence::Unsubscribe;
-    else if(str == "unsubscribed")
-        m_type = QXmppPresence::Unsubscribed;
-    else if(str == "probe")
-        m_type = QXmppPresence::Probe;
-    else {
-        qWarning("QXmppPresence::setTypeFromStr() invalid input string type: %s",
-                 qPrintable(str));
-        m_type = QXmppPresence::Error;
-    }
-}
 
 /// Returns the photo-hash of the VCardUpdate.
 ///
@@ -455,49 +432,6 @@ void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
     m_type = type;
 }
 
-void QXmppPresence::Status::setTypeFromStr(const QString& str)
-{
-    if(str == "")
-        m_type = QXmppPresence::Status::Online;
-    else if(str == "away")
-        m_type = QXmppPresence::Status::Away;
-    else if(str == "chat")
-        m_type = QXmppPresence::Status::Chat;
-    else if(str == "dnd")
-        m_type = QXmppPresence::Status::DND;
-    else if(str == "xa")
-        m_type = QXmppPresence::Status::XA;
-    else if(str == "invisible")
-        m_type = QXmppPresence::Status::Invisible;
-    else {
-        qWarning("QXmppPresence::Status::setTypeFromStr() invalid input string type %s",
-            qPrintable(str));
-        m_type = QXmppPresence::Status::Online;
-    }
-}
-
-QString QXmppPresence::Status::getTypeStr() const
-{
-    switch(m_type) {
-    case QXmppPresence::Status::Online:
-        return "";
-    case QXmppPresence::Status::Away:
-        return "away";
-    case QXmppPresence::Status::XA:
-        return "xa";
-    case QXmppPresence::Status::DND:
-        return "dnd";
-    case QXmppPresence::Status::Chat:
-        return "chat";
-    case QXmppPresence::Status::Invisible:
-        return "invisible";
-    default:
-        qWarning("QXmppPresence::Status::getTypeStr() invalid type %d",
-                 (int)m_type);
-        return "";
-    }
-}
-
 QString QXmppPresence::Status::statusText() const
 {
     return m_statusText;
@@ -520,16 +454,22 @@ void QXmppPresence::Status::setPriority(int priority)
 
 void QXmppPresence::Status::parse(const QDomElement &element)
 {
-    setTypeFromStr(element.firstChildElement("show").text());
+    const QString show = element.firstChildElement("show").text();
+    for (int i = Online; i <= Invisible; i++) {
+        if (show == presence_shows[i]) {
+            m_type = static_cast<Type>(i);
+            break;
+        }
+    }
     m_statusText = element.firstChildElement("status").text();
     m_priority = element.firstChildElement("priority").text().toInt();
 }
 
 void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    const QString show = getTypeStr();
+    const QString show = presence_shows[m_type];
     if (!show.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "show", getTypeStr());
+        helperToXmlAddTextElement(xmlWriter, "show", show);
     if (!m_statusText.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
     if (m_priority != 0)
