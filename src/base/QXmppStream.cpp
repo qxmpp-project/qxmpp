@@ -69,7 +69,7 @@ QXmppStream::QXmppStream(QObject *parent)
     // Make sure the random number generator is seeded
     if (!randomSeeded)
     {
-        qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+        qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()) ^ reinterpret_cast<quintptr>(this));
         randomSeeded = true;
     }
 }
