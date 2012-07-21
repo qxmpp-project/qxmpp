@@ -341,7 +341,7 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
-    d->clientPresence.status().setStatusText("Logged out");
+    d->clientPresence.setStatusText("Logged out");
     if (d->stream->isConnected())
         sendPacket(d->clientPresence);
 

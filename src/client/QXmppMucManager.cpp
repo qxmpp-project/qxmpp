@@ -298,10 +298,7 @@ bool QXmppMucRoom::leave(const QString &message)
     QXmppPresence packet;
     packet.setTo(d->ownJid());
     packet.setType(QXmppPresence::Unavailable);
-
-    QXmppPresence::Status status;
-    status.setStatusText(message);
-    packet.setStatus(status);
+    packet.setStatusText(message);
     return d->client->sendPacket(packet);
 }
 
