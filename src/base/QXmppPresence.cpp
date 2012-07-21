@@ -51,6 +51,23 @@ QXmppPresence::~QXmppPresence()
 
 }
 
+/// Returns the availability status type, for instance busy or away.
+///
+/// This will not tell you whether a contact is connected, check whether
+/// type() is QXmppPresence::Available instead.
+
+QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
+{
+    return static_cast<AvailableStatusType>(m_status.type());
+}
+
+/// Sets the availability status type, for instance busy or away.
+
+void QXmppPresence::setAvailableStatusType(AvailableStatusType type)
+{
+    m_status.setType(static_cast<QXmppPresence::Status::Type>(m_status.type()));
+}
+
 /// Returns the priority level of the resource.
 
 int QXmppPresence::priority() const

@@ -47,6 +47,17 @@ public:
         Probe           ///< A request for an entity's current presence; SHOULD be generated only by a server on behalf of a user.
     };
 
+    /// This enum is used to describe an availability status.
+    enum AvailableStatusType
+    {
+        Online = 0,      ///< The entity or resource is online.
+        Away,           ///< The entity or resource is temporarily away.
+        XA,             ///< The entity or resource is away for an extended period.
+        DND,            ///< The entity or resource is busy ("Do Not Disturb").
+        Chat,           ///< The entity or resource is actively interested in chatting.
+        Invisible       ///< obsolete XEP-0018: Invisible Presence
+    };
+
     /// This enum is used to describe vCard updates as defined by
     /// XEP-0153: vCard-Based Avatars
     enum VCardUpdateType
@@ -109,6 +120,9 @@ public:
         const QXmppPresence::Status& status = QXmppPresence::Status());
     ~QXmppPresence();
 
+    AvailableStatusType availableStatusType() const;
+    void setAvailableStatusType(AvailableStatusType type);
+
     int priority() const;
     void setPriority(int priority);
 
@@ -157,9 +171,9 @@ private:
     QString getTypeStr() const;
     void setTypeFromStr(const QString&);
 
+    AvailableStatusType m_availableStatusType;
     Type m_type;
     QXmppPresence::Status m_status;
-
 
     /// XEP-0153: vCard-Based Avatars
 
