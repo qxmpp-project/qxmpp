@@ -27,7 +27,6 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QEventLoop>
-#include <QVariant>
 #include <QtTest/QtTest>
 
 #include "QXmppArchiveIq.h"
@@ -37,11 +36,9 @@
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppPubSubIq.h"
-#include "QXmppRpcIq.h"
 #include "QXmppSessionIq.h"
 #include "QXmppServer.h"
 #include "QXmppStreamFeatures.h"
-#include "QXmppStun.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
 #include "QXmppVersionIq.h"
@@ -55,9 +52,11 @@
 #include "message.h"
 #include "presence.h"
 #include "register.h"
+#include "rpc.h"
 #include "rsm.h"
 #include "rtp.h"
 #include "sasl.h"
+#include "stun.h"
 #include "tests.h"
 
 void TestUtils::testCrc32()
@@ -908,283 +907,6 @@ void TestServer::testConnect()
     client.connectToServer(config);
     loop.exec();
     QCOMPARE(client.isConnected(), connected);
-}
-
-void TestStun::testFingerprint()
-{
-    // without fingerprint
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    QCOMPARE(msg.encode(QByteArray(), false),
-             QByteArray("\x00\x01\x00\x00\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 20));
-
-    // with fingerprint
-    QCOMPARE(msg.encode(QByteArray(), true),
-             QByteArray("\x00\x01\x00\x08\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x28\x00\x04\xB2\xAA\xF9\xF6", 28));
-}
-
-void TestStun::testIntegrity()
-{
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    QCOMPARE(msg.encode(QByteArray("somesecret"), false),
-             QByteArray("\x00\x01\x00\x18\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x14\x96\x4B\x40\xD1\x84\x67\x6A\xFD\xB5\xE0\x7C\xC5\x1F\xFB\xBD\xA2\x61\xAF\xB1\x26", 44));
-}
-
-void TestStun::testIPv4Address()
-{
-    // encode
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    msg.mappedHost = QHostAddress("127.0.0.1");
-    msg.mappedPort = 12345;
-    QByteArray packet = msg.encode(QByteArray(), false);
-    QCOMPARE(packet,
-             QByteArray("\x00\x01\x00\x0C\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x08\x00\x01\x30\x39\x7F\x00\x00\x01", 32));
-
-    // decode
-    QXmppStunMessage msg2;
-    msg2.decode(packet);
-    QCOMPARE(msg2.mappedHost, QHostAddress("127.0.0.1"));
-    QCOMPARE(msg2.mappedPort, quint16(12345));
-}
-
-void TestStun::testIPv6Address()
-{
-    // encode
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    msg.mappedHost = QHostAddress("::1");
-    msg.mappedPort = 12345;
-    const QByteArray packet = msg.encode(QByteArray(), false);
-    QCOMPARE(packet,
-             QByteArray("\x00\x01\x00\x18\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x14\x00\x02\x30\x39\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01", 44));
-
-    // decode
-    QXmppStunMessage msg2;
-    msg2.decode(packet);
-    QCOMPARE(msg2.mappedHost, QHostAddress("::1"));
-    QCOMPARE(msg2.mappedPort, quint16(12345));
-}
-
-void TestStun::testXorIPv4Address()
-{
-    // encode
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    msg.xorMappedHost = QHostAddress("127.0.0.1");
-    msg.xorMappedPort = 12345;
-    QByteArray packet = msg.encode(QByteArray(), false);
-    QCOMPARE(packet,
-             QByteArray("\x00\x01\x00\x0C\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x20\x00\x08\x00\x01\x11\x2B\x5E\x12\xA4\x43", 32));
-
-    // decode
-    QXmppStunMessage msg2;
-    msg2.decode(packet);
-    QCOMPARE(msg2.xorMappedHost, QHostAddress("127.0.0.1"));
-    QCOMPARE(msg2.xorMappedPort, quint16(12345));
-}
-
-void TestStun::testXorIPv6Address()
-{
-    // encode
-    QXmppStunMessage msg;
-    msg.setType(0x0001);
-    msg.xorMappedHost = QHostAddress("::1");
-    msg.xorMappedPort = 12345;
-    const QByteArray packet = msg.encode(QByteArray(), false);
-    QCOMPARE(packet,
-             QByteArray("\x00\x01\x00\x18\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x20\x00\x14\x00\x02\x11\x2B\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01", 44));
-
-    // decode
-    QXmppStunMessage msg2;
-    msg2.decode(packet);
-    QCOMPARE(msg2.xorMappedHost, QHostAddress("::1"));
-    QCOMPARE(msg2.xorMappedPort, quint16(12345));
-}
-
-static void checkVariant(const QVariant &value, const QByteArray &xml)
-{
-    // serialise
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    QXmppRpcMarshaller::marshall(&writer, value);
-    qDebug() << "expect " << xml;
-    qDebug() << "writing" << buffer.data();
-    QCOMPARE(buffer.data(), xml);
-
-    // parse
-    QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
-    QDomElement element = doc.documentElement();
-    QStringList errors;
-    QVariant test = QXmppRpcMarshaller::demarshall(element, errors);
-    if (!errors.isEmpty())
-        qDebug() << errors;
-    QCOMPARE(errors, QStringList());
-    QCOMPARE(test, value);
-}
-
-void TestXmlRpc::testBase64()
-{
-    checkVariant(QByteArray("\0\1\2\3", 4),
-                 QByteArray("<value><base64>AAECAw==</base64></value>"));
-}
-
-void TestXmlRpc::testBool()
-{
-    checkVariant(false,
-                 QByteArray("<value><boolean>0</boolean></value>"));
-    checkVariant(true,
-                 QByteArray("<value><boolean>1</boolean></value>"));
-}
-
-void TestXmlRpc::testDateTime()
-{
-    checkVariant(QDateTime(QDate(1998, 7, 17), QTime(14, 8, 55)),
-                 QByteArray("<value><dateTime.iso8601>1998-07-17T14:08:55</dateTime.iso8601></value>"));
-}
-
-void TestXmlRpc::testDouble()
-{
-    checkVariant(double(-12.214),
-                 QByteArray("<value><double>-12.214</double></value>"));
-}
-
-void TestXmlRpc::testInt()
-{
-    checkVariant(int(-12),
-                 QByteArray("<value><i4>-12</i4></value>"));
-}
-
-void TestXmlRpc::testNil()
-{
-    checkVariant(QVariant(),
-                 QByteArray("<value><nil/></value>"));
-}
-
-void TestXmlRpc::testString()
-{
-    checkVariant(QString("hello world"),
-                 QByteArray("<value><string>hello world</string></value>"));
-}
-
-void TestXmlRpc::testArray()
-{
-    checkVariant(QVariantList() << QString("hello world") << double(-12.214),
-                 QByteArray("<value><array><data>"
-                            "<value><string>hello world</string></value>"
-                            "<value><double>-12.214</double></value>"
-                            "</data></array></value>"));
-}
-
-void TestXmlRpc::testStruct()
-{
-    QMap<QString, QVariant> map;
-    map["bar"] = QString("hello world");
-    map["foo"] = double(-12.214);
-    checkVariant(map,
-                 QByteArray("<value><struct>"
-                            "<member>"
-                                "<name>bar</name>"
-                                "<value><string>hello world</string></value>"
-                            "</member>"
-                            "<member>"
-                                "<name>foo</name>"
-                                "<value><double>-12.214</double></value>"
-                            "</member>"
-                            "</struct></value>"));
-}
-
-void TestXmlRpc::testInvoke()
-{
-    const QByteArray xml(
-        "<iq"
-        " id=\"rpc1\""
-        " to=\"responder@company-a.com/jrpc-server\""
-        " from=\"requester@company-b.com/jrpc-client\""
-        " type=\"set\">"
-        "<query xmlns=\"jabber:iq:rpc\">"
-        "<methodCall>"
-        "<methodName>examples.getStateName</methodName>"
-        "<params>"
-        "<param>"
-        "<value><i4>6</i4></value>"
-        "</param>"
-        "</params>"
-        "</methodCall>"
-        "</query>"
-        "</iq>");
-
-    QXmppRpcInvokeIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.method(), QLatin1String("examples.getStateName"));
-    QCOMPARE(iq.arguments(), QVariantList() << int(6));
-    serializePacket(iq, xml);
-}
-
-void TestXmlRpc::testResponse()
-{
-    const QByteArray xml(
-        "<iq"
-        " id=\"rpc1\""
-        " to=\"requester@company-b.com/jrpc-client\""
-        " from=\"responder@company-a.com/jrpc-server\""
-        " type=\"result\">"
-        "<query xmlns=\"jabber:iq:rpc\">"
-        "<methodResponse>"
-        "<params>"
-        "<param>"
-        "<value><string>Colorado</string></value>"
-        "</param>"
-        "</params>"
-        "</methodResponse>"
-        "</query>"
-        "</iq>");
-
-    QXmppRpcResponseIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.faultCode(), 0);
-    QCOMPARE(iq.faultString(), QString());
-    QCOMPARE(iq.values(), QVariantList() << QString("Colorado"));
-    serializePacket(iq, xml);
-}
-
-void TestXmlRpc::testResponseFault()
-{
-    const QByteArray xml(
-        "<iq"
-        " id=\"rpc1\""
-        " to=\"requester@company-b.com/jrpc-client\""
-        " from=\"responder@company-a.com/jrpc-server\""
-        " type=\"result\">"
-        "<query xmlns=\"jabber:iq:rpc\">"
-        "<methodResponse>"
-        "<fault>"
-        "<value>"
-            "<struct>"
-                "<member>"
-                    "<name>faultCode</name>"
-                    "<value><i4>404</i4></value>"
-                "</member>"
-                "<member>"
-                    "<name>faultString</name>"
-                    "<value><string>Not found</string></value>"
-                "</member>"
-            "</struct>"
-        "</value>"
-        "</fault>"
-        "</methodResponse>"
-        "</query>"
-        "</iq>");
-
-    QXmppRpcResponseIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.faultCode(), 404);
-    QCOMPARE(iq.faultString(), QLatin1String("Not found"));
-    QCOMPARE(iq.values(), QVariantList());
-    serializePacket(iq, xml);
 }
 
 int main(int argc, char *argv[])

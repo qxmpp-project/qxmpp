@@ -1,5 +1,6 @@
 include(../qxmpp.pri)
 
+QT -= gui
 QT += testlib
 
 TARGET = qxmpp-tests
@@ -12,8 +13,10 @@ SOURCES += \
     message.cpp \
     presence.cpp \
     register.cpp \
+    rpc.cpp \
     rsm.cpp \
     rtp.cpp \
+    stun.cpp \
     tests.cpp
 HEADERS += \
     dataform.h \
@@ -22,8 +25,10 @@ HEADERS += \
     message.h \
     presence.h \
     register.h \
+    rpc.h \
     rsm.h \
     rtp.h \
+    stun.h \
     tests.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
