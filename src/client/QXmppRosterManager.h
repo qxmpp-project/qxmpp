@@ -89,13 +89,13 @@ public:
     /// \endcond
 
 public slots:
-    bool acceptSubscription(const QString &bareJid);
-    bool refuseSubscription(const QString &bareJid);
+    bool acceptSubscription(const QString &bareJid, const QString &reason = QString());
+    bool refuseSubscription(const QString &bareJid, const QString &reason = QString());
     bool addItem(const QString &bareJid, const QString &name = QString(), const QSet<QString> &groups = QSet<QString>());
     bool removeItem(const QString &bareJid);
     bool renameItem(const QString &bareJid, const QString &name);
-    bool subscribe(const QString &bareJid);
-    bool unsubscribe(const QString &bareJid);
+    bool subscribe(const QString &bareJid, const QString &reason = QString());
+    bool unsubscribe(const QString &bareJid, const QString &reason = QString());
 
 signals:
     /// This signal is emitted when the Roster IQ is received after a successful
