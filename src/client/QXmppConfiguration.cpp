@@ -546,6 +546,7 @@ QList<QSslCertificate> QXmppConfiguration::caCertificates() const
 
 // obsolete
 
+/// \cond
 QXmppConfiguration::SASLAuthMechanism QXmppConfiguration::sASLAuthMechanism() const
 {
     if (d->saslAuthMechanism == "PLAIN")
@@ -578,4 +579,4 @@ void QXmppConfiguration::setSASLAuthMechanism(
         break;
     }
 }
-
+/// \endcond

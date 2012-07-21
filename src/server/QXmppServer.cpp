@@ -574,9 +574,10 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
     return d->routeData(packet.to(), data);
 }
 
-/// Add a new incoming client stream.
+/// Add a new incoming client \a stream.
 ///
-/// \param stream
+/// This method can be used for instance to implement BOSH support
+/// as a server extension.
 
 void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 {

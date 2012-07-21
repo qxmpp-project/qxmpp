@@ -74,6 +74,7 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
     }
 }
 
+/// \cond
 void QXmppLoggable::childEvent(QChildEvent *event)
 {
     QXmppLoggable *child = qobject_cast<QXmppLoggable*>(event->child());
@@ -88,6 +89,7 @@ void QXmppLoggable::childEvent(QChildEvent *event)
                 this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     }
 }
+/// \endcond
 
 class QXmppLoggerPrivate
 {

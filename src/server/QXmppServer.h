@@ -89,11 +89,7 @@ public:
     bool sendElement(const QDomElement &element);
     bool sendPacket(const QXmppStanza &stanza);
 
-    /// \cond
-    // FIXME: this method should not be public, but it is needed to
-    // implement BOSH support as an extension.
     void addIncomingClient(QXmppIncomingClient *stream);
-    /// \endcond
 
 signals:
     /// This signal is emitted when a client has connected.

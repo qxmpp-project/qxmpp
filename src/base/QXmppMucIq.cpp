@@ -68,6 +68,7 @@ QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
     return m_affiliation;
 }
 
+/// \cond
 QXmppMucItem::Affiliation QXmppMucItem::affiliationFromString(const QString &affiliationStr)
 {
     if (affiliationStr == "owner")
@@ -101,6 +102,7 @@ QString QXmppMucItem::affiliationToString(Affiliation affiliation)
         return QString();
     }
 }
+/// \endcond
 
 /// Sets the user's affiliation, i.e. long-lived permissions.
 ///
@@ -166,6 +168,7 @@ QXmppMucItem::Role QXmppMucItem::role() const
     return m_role;
 }
 
+/// \cond
 QXmppMucItem::Role QXmppMucItem::roleFromString(const QString &roleStr)
 {
     if (roleStr == "moderator")
@@ -195,6 +198,7 @@ QString QXmppMucItem::roleToString(Role role)
         return QString();
     }
 }
+/// \endcond
 
 /// Sets the user's role, i.e. short-lived permissions.
 ///
