@@ -88,18 +88,6 @@ private slots:
     void testEntityTimeResult();
 };
 
-class TestJingle : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testSession();
-    void testTerminate();
-    void testAudioPayloadType();
-    void testVideoPayloadType();
-    void testRinging();
-};
-
 class TestPubSub : public QObject
 {
     Q_OBJECT

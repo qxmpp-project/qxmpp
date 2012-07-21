@@ -8,6 +8,7 @@ RESOURCES += tests.qrc
 SOURCES += \
     codec.cpp \
     dataform.cpp \
+    jingle.cpp \
     message.cpp \
     presence.cpp \
     register.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
 HEADERS += \
     codec.h \
     dataform.h \
+    jingle.h \
     message.h \
     presence.h \
     register.h \
