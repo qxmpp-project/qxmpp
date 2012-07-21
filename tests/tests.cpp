@@ -50,6 +50,7 @@
 
 #include "codec.h"
 #include "dataform.h"
+#include "iq.h"
 #include "jingle.h"
 #include "message.h"
 #include "presence.h"
@@ -1209,6 +1210,9 @@ int main(int argc, char *argv[])
 
     tst_QXmppDataForm testDataForm;
     errors += QTest::qExec(&testDataForm);
+
+    tst_QXmppIq testIq;
+    errors += QTest::qExec(&testIq);
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);
