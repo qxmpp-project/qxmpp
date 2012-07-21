@@ -39,6 +39,14 @@ static const char* chat_states[] = {
     "paused",
 };
 
+static const char* message_types[] = {
+    "error",
+    "normal",
+    "chat",
+    "groupchat",
+    "headline"
+};
+
 static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 
 /// Constructs a QXmppMessage.
@@ -145,26 +153,6 @@ QXmppMessage::Type QXmppMessage::type() const
     return m_type;
 }
 
-QString QXmppMessage::getTypeStr() const
-{
-    switch(m_type)
-    {
-    case QXmppMessage::Error:
-        return "error";
-    case QXmppMessage::Normal:
-        return "normal";
-    case QXmppMessage::Chat:
-        return "chat";
-    case QXmppMessage::GroupChat:
-        return "groupchat";
-    case QXmppMessage::Headline:
-        return "headline";
-    default:
-        qWarning("QXmppMessage::getTypeStr() invalid type %d", (int)m_type);
-        return "";
-    }
-}
-
 /// Sets the message's type.
 ///
 /// \param type
@@ -172,47 +160,6 @@ QString QXmppMessage::getTypeStr() const
 void QXmppMessage::setType(QXmppMessage::Type type)
 {
     m_type = type;
-}
-
-void QXmppMessage::setTypeFromStr(const QString& str)
-{
-    if(str == "error")
-    {
-        setType(QXmppMessage::Error);
-        return;
-    }
-    else if(str == "")   // if no type is specified
-    {
-        setType(QXmppMessage::Normal);
-        return;
-    }
-    else if(str == "normal")
-    {
-        setType(QXmppMessage::Normal);
-        return;
-    }
-    else if(str == "chat")
-    {
-        setType(QXmppMessage::Chat);
-        return;
-    }
-    else if(str == "groupchat")
-    {
-        setType(QXmppMessage::GroupChat);
-        return;
-    }
-    else if(str == "headline")
-    {
-        setType(QXmppMessage::Headline);
-        return;
-    }
-    else
-    {
-        setType(static_cast<QXmppMessage::Type>(-1));
-        qWarning("QXmppMessage::setTypeFromStr() invalid input string type: %s",
-                 qPrintable(str));
-        return;
-    }
 }
 
 /// Returns the message's timestamp (if any).
@@ -302,7 +249,15 @@ void QXmppMessage::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    setTypeFromStr(element.attribute("type"));
+    const QString type = element.attribute("type");
+    m_type = Normal;
+    for (int i = Error; i <= Headline; i++) {
+        if (type == message_types[i]) {
+            m_type = static_cast<Type>(i);
+            break;
+        }
+    }
+
     m_body = element.firstChildElement("body").text();
     m_subject = element.firstChildElement("subject").text();
     m_thread = element.firstChildElement("thread").text();
@@ -381,13 +336,12 @@ void QXmppMessage::parse(const QDomElement &element)
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 {
-
     xmlWriter->writeStartElement("message");
     helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
     helperToXmlAddAttribute(xmlWriter, "id", id());
     helperToXmlAddAttribute(xmlWriter, "to", to());
     helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", getTypeStr());
+    helperToXmlAddAttribute(xmlWriter, "type", message_types[m_type]);
     if (!m_subject.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "subject", m_subject);
     if (!m_body.isEmpty())

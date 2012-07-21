@@ -105,9 +105,6 @@ private:
         DelayedDelivery,        ///< XEP-0203: Delayed Delivery
     };
 
-    QString getTypeStr() const;
-    void setTypeFromStr(const QString&);
-
     Type m_type;
     QDateTime m_stamp;
     StampType m_stampType;
