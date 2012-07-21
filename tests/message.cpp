@@ -34,9 +34,25 @@ void tst_QXmppMessage::testBasic_data()
     QTest::addColumn<QString>("subject");
     QTest::addColumn<QString>("thread");
 
-    QTest::newRow("minimal")
+    QTest::newRow("error")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"error\"/>")
+        << int(QXmppMessage::Error)
+        << QString() << QString() << QString();
+    QTest::newRow("normal")
         << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\"/>")
         << int(QXmppMessage::Normal)
+        << QString() << QString() << QString();
+    QTest::newRow("chat")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"chat\"/>")
+        << int(QXmppMessage::Chat)
+        << QString() << QString() << QString();
+    QTest::newRow("groupchat")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"groupchat\"/>")
+        << int(QXmppMessage::GroupChat)
+        << QString() << QString() << QString();
+    QTest::newRow("headline")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"headline\"/>")
+        << int(QXmppMessage::Headline)
         << QString() << QString() << QString();
 
     QTest::newRow("full")
