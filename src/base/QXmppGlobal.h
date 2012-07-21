@@ -37,7 +37,7 @@
 #  endif
 #endif
 
-#if defined(QXMPP_BUILD_INTERNAL)
+#if defined(QXMPP_AUTOTEST_INTERNAL)
 #    define QXMPP_AUTOTEST_EXPORT QXMPP_EXPORT
 #else
 #    define QXMPP_AUTOTEST_EXPORT
@@ -52,7 +52,7 @@
 /// available.
 ///
 
-#define QXMPP_VERSION 0x000601
+#define QXMPP_VERSION 0x000602
 
 QXMPP_EXPORT QString QXmppVersion();
 

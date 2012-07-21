@@ -6,7 +6,6 @@ TARGET = qxmpp-tests
 
 RESOURCES += tests.qrc
 SOURCES += \
-    codec.cpp \
     dataform.cpp \
     jingle.cpp \
     message.cpp \
@@ -14,10 +13,8 @@ SOURCES += \
     register.cpp \
     rsm.cpp \
     rtp.cpp \
-    sasl.cpp \
     tests.cpp
 HEADERS += \
-    codec.h \
     dataform.h \
     jingle.h \
     message.h \
@@ -25,12 +22,11 @@ HEADERS += \
     register.h \
     rsm.h \
     rtp.h \
-    sasl.h \
     tests.h
 
-win32 {
-    HEADERS -= codec.h sasl.h
-    SOURCES -= codec.cpp sasl.cpp
+!isEmpty(QXMPP_AUTOTEST_INTERNAL) {
+    HEADERS += codec.h sasl.h
+    SOURCES += codec.cpp sasl.cpp
 }
 
 INCLUDEPATH += $$QXMPP_INCLUDEPATH

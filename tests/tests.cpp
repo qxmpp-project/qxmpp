@@ -134,7 +134,7 @@ void TestUtils::testMime()
 
 void TestUtils::testLibVersion()
 {
-    QCOMPARE(QXmppVersion(), QString("0.6.1"));
+    QCOMPARE(QXmppVersion(), QString("0.6.2"));
 }
 
 void TestUtils::testTimezoneOffset()
@@ -1199,7 +1199,7 @@ int main(int argc, char *argv[])
     TestPackets testPackets;
     errors += QTest::qExec(&testPackets);
 
-#ifndef Q_OS_WIN
+#ifdef QXMPP_AUTOTEST_INTERNAL
     TestCodec testCodec;
     errors += QTest::qExec(&testCodec);
 #endif
@@ -1228,7 +1228,7 @@ int main(int argc, char *argv[])
     tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);
 
-#ifndef Q_OS_WIN
+#ifdef QXMPP_AUTOTEST_INTERNAL
     tst_QXmppSasl testSasl;
     errors += QTest::qExec(&testSasl);
 

@@ -1,7 +1,7 @@
 # Common definitions
 
 QT += network xml
-QXMPP_VERSION = 0.6.1
+QXMPP_VERSION = 0.6.2
 QXMPP_INCLUDEPATH = $$PWD/src/base $$PWD/src/client $$PWD/src/server
 
 # Determine library name
@@ -52,4 +52,9 @@ isEmpty(PREFIX) {
 }
 isEmpty(LIBDIR) {
     LIBDIR=lib
+}
+
+# Internal API auto-tests
+!isEmpty(QXMPP_AUTOTEST_INTERNAL) {
+    DEFINES += QXMPP_AUTOTEST_INTERNAL
 }

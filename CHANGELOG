@@ -1,3 +1,9 @@
+QXmpp 0.6.2 (UNRELEASED)
+------------------------
+
+  - Improve SASL code test coverage.
+  - Improve QXmppMessage test coverage.
+
 QXmpp 0.6.1 (Jul 20, 2012)
 --------------------------
 
