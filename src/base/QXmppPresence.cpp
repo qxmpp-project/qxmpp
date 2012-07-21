@@ -65,7 +65,7 @@ QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
 
 void QXmppPresence::setAvailableStatusType(AvailableStatusType type)
 {
-    m_status.setType(static_cast<QXmppPresence::Status::Type>(m_status.type()));
+    m_status.setType(static_cast<QXmppPresence::Status::Type>(type));
 }
 
 /// Returns the priority level of the resource.
