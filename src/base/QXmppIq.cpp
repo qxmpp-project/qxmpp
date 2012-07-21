@@ -28,6 +28,13 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
+static const char* iq_types[] = {
+    "error",
+    "get",
+    "set",
+    "result"
+};
+
 /// Constructs a QXmppIq with the specified \a type.
 ///
 /// \param type
@@ -59,7 +66,15 @@ void QXmppIq::setType(QXmppIq::Type type)
 void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
-    setTypeFromStr(element.attribute("type"));
+
+    const QString type = element.attribute("type");
+    for (int i = Error; i <= Result; i++) {
+        if (type == iq_types[i]) {
+            m_type = static_cast<Type>(i);
+            break;
+        }
+    }
+
     parseElementFromChild(element);
 }
 
@@ -82,10 +97,7 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
     helperToXmlAddAttribute(xmlWriter, "id", id());
     helperToXmlAddAttribute(xmlWriter, "to", to());
     helperToXmlAddAttribute(xmlWriter, "from", from());
-    if(getTypeStr().isEmpty())
-        helperToXmlAddAttribute(xmlWriter, "type", "get");
-    else
-        helperToXmlAddAttribute(xmlWriter,  "type", getTypeStr());
+    helperToXmlAddAttribute(xmlWriter, "type", iq_types[m_type]);
     toXmlElementFromChild(xmlWriter);
     error().toXml(xmlWriter);
     xmlWriter->writeEndElement();
@@ -97,53 +109,3 @@ void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
         extension.toXml(writer);
 }
 /// \endcond
-
-QString QXmppIq::getTypeStr() const
-{
-    switch(m_type)
-    {
-    case QXmppIq::Error:
-        return "error";
-    case QXmppIq::Get:
-        return "get";
-    case QXmppIq::Set:
-        return "set";
-    case QXmppIq::Result:
-        return "result";
-    default:
-        qWarning("QXmppIq::getTypeStr() invalid type %d", (int)m_type);
-        return "";
-    }
-}
-
-void QXmppIq::setTypeFromStr(const QString& str)
-{
-    if(str == "error")
-    {
-        setType(QXmppIq::Error);
-        return;
-    }
-    else if(str == "get")
-    {
-        setType(QXmppIq::Get);
-        return;
-    }
-    else if(str == "set")
-    {
-        setType(QXmppIq::Set);
-        return;
-    }
-    else if(str == "result")
-    {
-        setType(QXmppIq::Result);
-        return;
-    }
-    else
-    {
-        setType(static_cast<QXmppIq::Type>(-1));
-        qWarning("QXmppIq::setTypeFromStr() invalid input string type: %s",
-                 qPrintable(str));
-        return;
-    }
-}
-

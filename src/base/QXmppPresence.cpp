@@ -148,7 +148,6 @@ void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    m_type = Error;
     const QString type = element.attribute("type");
     for (int i = Error; i <= Probe; i++) {
         if (type == presence_types[i]) {

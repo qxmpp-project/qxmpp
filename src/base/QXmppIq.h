@@ -64,9 +64,6 @@ protected:
     /// \endcond
 
 private:
-    QString getTypeStr() const;
-    void setTypeFromStr(const QString& str);
-
     Type m_type;
 };
 
