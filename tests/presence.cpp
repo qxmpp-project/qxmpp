@@ -37,30 +37,30 @@ void tst_QXmppPresence::testPresence_data()
     QTest::addColumn<int>("vcardUpdate");
     QTest::addColumn<QByteArray>("photoHash");
 
-    QTest::newRow("empty") << QByteArray("<presence/>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("unavailable") << QByteArray("<presence type=\"unavailable\"/>") << int(QXmppPresence::Unavailable) << 0 << int(QXmppPresence::Status::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("error") << QByteArray("<presence type=\"error\"/>") << int(QXmppPresence::Error) << 0 << int(QXmppPresence::Status::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("empty") << QByteArray("<presence/>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("unavailable") << QByteArray("<presence type=\"unavailable\"/>") << int(QXmppPresence::Unavailable) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("error") << QByteArray("<presence type=\"error\"/>") << int(QXmppPresence::Error) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
     
-    QTest::newRow("full") << QByteArray("<presence><show>away</show><status>In a meeting</status><priority>5</priority></presence>") << int(QXmppPresence::Available) << 5 << int(QXmppPresence::Status::Away) << "In a meeting" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("full") << QByteArray("<presence><show>away</show><status>In a meeting</status><priority>5</priority></presence>") << int(QXmppPresence::Available) << 5 << int(QXmppPresence::Away) << "In a meeting" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
 
     // status type
-    QTest::newRow("away") << QByteArray("<presence><show>away</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Away) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("dnd") << QByteArray("<presence><show>dnd</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::DND) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("chat") << QByteArray("<presence><show>chat</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Chat) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("xa") << QByteArray("<presence><show>xa</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::XA) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
-    QTest::newRow("invisible") << QByteArray("<presence><show>invisible</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Invisible) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("away") << QByteArray("<presence><show>away</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Away) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("dnd") << QByteArray("<presence><show>dnd</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::DND) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("chat") << QByteArray("<presence><show>chat</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Chat) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("xa") << QByteArray("<presence><show>xa</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::XA) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
+    QTest::newRow("invisible") << QByteArray("<presence><show>invisible</show></presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Invisible) << "" << int(QXmppPresence::VCardUpdateNone) << QByteArray();
 
     QTest::newRow("vcard-photo") << QByteArray(
         "<presence>"
         "<x xmlns=\"vcard-temp:x:update\">"
         "<photo>73b908bc</photo>"
         "</x>"
-        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Online) << "" << int(QXmppPresence::VCardUpdateValidPhoto) << QByteArray::fromHex("73b908bc");
+        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateValidPhoto) << QByteArray::fromHex("73b908bc");
 
     QTest::newRow("vard-not-ready") << QByteArray(
         "<presence>"
         "<x xmlns=\"vcard-temp:x:update\"/>"
-        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Status::Online) << "" << int(QXmppPresence::VCardUpdateNotReady) << QByteArray();
+        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNotReady) << QByteArray();
 }
 
 void tst_QXmppPresence::testPresence()
@@ -107,9 +107,9 @@ void tst_QXmppPresence::testPresenceWithCapability()
     parsePacket(presence, xml);
     QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(presence.status().type(), QXmppPresence::Status::Away);
-    QCOMPARE(presence.status().statusText(), QString("In a meeting"));
-    QCOMPARE(presence.status().priority(), 5);
+    QCOMPARE(presence.availableStatusType(), QXmppPresence::Away);
+    QCOMPARE(presence.statusText(), QString("In a meeting"));
+    QCOMPARE(presence.priority(), 5);
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
