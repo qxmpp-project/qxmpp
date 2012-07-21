@@ -51,6 +51,36 @@ QXmppPresence::~QXmppPresence()
 
 }
 
+/// Returns the priority level of the resource.
+
+int QXmppPresence::priority() const
+{
+    return m_status.priority();
+}
+
+/// Sets the \a priority level of the resource.
+
+void QXmppPresence::setPriority(int priority)
+{
+    m_status.setPriority(priority);
+}
+
+/// Returns the status text, a textual description of the user's status.
+
+QString QXmppPresence::statusText() const
+{
+    return m_status.statusText();
+}
+
+/// Sets the status text, a textual description of the user's status.
+///
+/// \param str The status text, for example "Gone fishing".
+
+void QXmppPresence::setStatusText(const QString& statusText)
+{
+    m_status.setStatusText(statusText);
+}
+
 /// Returns the presence type.
 ///
 /// You can use this method to determine the action which needs to be

@@ -76,11 +76,16 @@ void tst_QXmppPresence::testPresence()
     QXmppPresence presence;
     parsePacket(presence, xml);
     QCOMPARE(int(presence.type()), type);
-    QCOMPARE(presence.status().priority(), priority);
+    QCOMPARE(presence.priority(), priority);
     QCOMPARE(int(presence.status().type()), statusType);
-    QCOMPARE(presence.status().statusText(), statusText);
+    QCOMPARE(presence.statusText(), statusText);
     QCOMPARE(int(presence.vCardUpdateType()), vcardUpdate);
     QCOMPARE(presence.photoHash(), photoHash);
+
+    // legacy
+    QCOMPARE(presence.status().priority(), priority);
+    QCOMPARE(presence.status().statusText(), statusText);
+
     serializePacket(presence, xml);
 }
 

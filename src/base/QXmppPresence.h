@@ -109,12 +109,18 @@ public:
         const QXmppPresence::Status& status = QXmppPresence::Status());
     ~QXmppPresence();
 
+    int priority() const;
+    void setPriority(int priority);
+
     QXmppPresence::Type type() const;
     void setType(QXmppPresence::Type);
 
     QXmppPresence::Status& status();
     const QXmppPresence::Status& status() const;
     void setStatus(const QXmppPresence::Status&);
+
+    QString statusText() const;
+    void setStatusText(const QString& statusText);
 
     /// \cond
     void parse(const QDomElement &element);
