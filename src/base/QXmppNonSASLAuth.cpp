@@ -34,36 +34,6 @@ QXmppNonSASLAuthIq::QXmppNonSASLAuthIq()
 {
 }
 
-bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
-{
-    QDomElement queryElement = element.firstChildElement("query");
-    return queryElement.namespaceURI() == ns_auth;
-}
-
-void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
-{
-    QDomElement queryElement = element.firstChildElement("query");
-    m_username = queryElement.firstChildElement("username").text();
-    m_password = queryElement.firstChildElement("password").text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toAscii());
-    m_resource = queryElement.firstChildElement("resource").text();
-}
-
-void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_auth);
-    if (!m_username.isEmpty())
-        writer->writeTextElement("username", m_username);
-    if (!m_digest.isEmpty())
-        writer->writeTextElement("digest", m_digest.toHex());
-    if (!m_password.isEmpty())
-        writer->writeTextElement("password", m_password);
-    if (!m_resource.isEmpty())
-        writer->writeTextElement("resource", m_resource);
-    writer->writeEndElement();
-}
-
 QString QXmppNonSASLAuthIq::username() const
 {
     return m_username;
@@ -104,3 +74,34 @@ void QXmppNonSASLAuthIq::setResource(const QString &resource)
     m_resource = resource;
 }
 
+/// \cond
+bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
+{
+    QDomElement queryElement = element.firstChildElement("query");
+    return queryElement.namespaceURI() == ns_auth;
+}
+
+void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement queryElement = element.firstChildElement("query");
+    m_username = queryElement.firstChildElement("username").text();
+    m_password = queryElement.firstChildElement("password").text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toAscii());
+    m_resource = queryElement.firstChildElement("resource").text();
+}
+
+void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("query");
+    writer->writeAttribute("xmlns", ns_auth);
+    if (!m_username.isEmpty())
+        writer->writeTextElement("username", m_username);
+    if (!m_digest.isEmpty())
+        writer->writeTextElement("digest", m_digest.toHex());
+    if (!m_password.isEmpty())
+        writer->writeTextElement("password", m_password);
+    if (!m_resource.isEmpty())
+        writer->writeTextElement("resource", m_resource);
+    writer->writeEndElement();
+}
+/// \endcond

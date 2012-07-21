@@ -179,6 +179,7 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
     d->passwordChecker = checker;
 }
 
+/// \cond
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->idleTimer->interval())
@@ -387,6 +388,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         }
     }
 }
+/// \endcond
 
 void QXmppIncomingClient::onDigestReply()
 {

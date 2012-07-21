@@ -235,6 +235,7 @@ void QXmppVCardIq::setPhotoType(const QString& photoType)
     m_photoType = photoType;
 }
 
+/// \cond
 bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
 {
     return nodeRecv.firstChildElement("vCard").namespaceURI() == ns_vcard;
@@ -307,4 +308,4 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
+/// \endcond

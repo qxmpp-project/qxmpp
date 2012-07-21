@@ -248,6 +248,56 @@ void QXmppMessage::setState(QXmppMessage::State state)
     m_state = state;
 }
 
+/// Returns the message's subject.
+///
+
+QString QXmppMessage::subject() const
+{
+    return m_subject;
+}
+
+/// Sets the message's subject.
+///
+/// \param subject
+
+void QXmppMessage::setSubject(const QString& subject)
+{
+    m_subject = subject;
+}
+
+/// Returns the message's thread.
+
+QString QXmppMessage::thread() const
+{
+    return m_thread;
+}
+
+/// Sets the message's thread.
+///
+/// \param thread
+
+void QXmppMessage::setThread(const QString& thread)
+{
+    m_thread = thread;
+}
+
+/// Returns the message's XHTML body as defined by
+/// XEP-0071: XHTML-IM.
+
+QString QXmppMessage::xhtml() const
+{
+    return m_xhtml;
+}
+
+/// Sets the message's XHTML body as defined by
+/// XEP-0071: XHTML-IM.
+
+void QXmppMessage::setXhtml(const QString &xhtml)
+{
+    m_xhtml = xhtml;
+}
+
+/// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
@@ -411,52 +461,4 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         extension.toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
-
-/// Returns the message's subject.
-///
-
-QString QXmppMessage::subject() const
-{
-    return m_subject;
-}
-
-/// Sets the message's subject.
-///
-/// \param subject
-
-void QXmppMessage::setSubject(const QString& subject)
-{
-    m_subject = subject;
-}
-
-/// Returns the message's thread.
-
-QString QXmppMessage::thread() const
-{
-    return m_thread;
-}
-
-/// Sets the message's thread.
-///
-/// \param thread
-
-void QXmppMessage::setThread(const QString& thread)
-{
-    m_thread = thread;
-}
-
-/// Returns the message's XHTML body as defined by
-/// XEP-0071: XHTML-IM.
-
-QString QXmppMessage::xhtml() const
-{
-    return m_xhtml;
-}
-
-/// Sets the message's XHTML body as defined by
-/// XEP-0071: XHTML-IM.
-
-void QXmppMessage::setXhtml(const QString &xhtml)
-{
-    m_xhtml = xhtml;
-}
+/// \endcond

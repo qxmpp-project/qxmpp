@@ -98,6 +98,7 @@ void QXmppRegisterIq::setUsername(const QString &username)
     m_username = username;
 }
 
+/// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
     return (element.firstChildElement("query").namespaceURI() == ns_register);
@@ -138,3 +139,4 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     m_form.toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond

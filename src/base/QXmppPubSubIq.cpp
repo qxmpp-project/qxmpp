@@ -75,6 +75,7 @@ void QXmppPubSubItem::setContents(const QXmppElement &contents)
     m_contents = contents;
 }
 
+/// \cond
 void QXmppPubSubItem::parse(const QDomElement &element)
 {
     m_id = element.attribute("id");
@@ -88,6 +89,7 @@ void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
     m_contents.toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns the PubSub queryType for this IQ.
 ///
@@ -174,6 +176,7 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
     m_items = items;
 }
 
+/// \cond
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
     const QDomElement pubSubElement = element.firstChildElement("pubsub");
@@ -251,3 +254,4 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
     writer->writeEndElement();
 }
+/// \endcond

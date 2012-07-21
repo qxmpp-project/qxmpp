@@ -53,6 +53,7 @@ void QXmppIbbOpenIq::setSid( const QString &sid )
     m_sid = sid;
 }
 
+/// \cond
 bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
 {
     QDomElement openElement = element.firstChildElement("open");
@@ -74,6 +75,7 @@ void QXmppIbbOpenIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute( "block-size",QString::number(m_block_size) );
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppIbbCloseIq::QXmppIbbCloseIq() : QXmppIq(QXmppIq::Set)
 {
@@ -90,6 +92,7 @@ void QXmppIbbCloseIq::setSid( const QString &sid )
     m_sid = sid;
 }
 
+/// \cond
 bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
 {
     QDomElement openElement = element.firstChildElement("close");
@@ -109,6 +112,7 @@ void QXmppIbbCloseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute( "sid",m_sid);
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppIbbDataIq::QXmppIbbDataIq() : QXmppIq( QXmppIq::Set ), m_seq(0)
 {
@@ -144,6 +148,7 @@ void QXmppIbbDataIq::setPayload( const QByteArray &data )
     m_payload = data;
 }
 
+/// \cond
 bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
 {
     QDomElement dataElement = element.firstChildElement("data");
@@ -167,3 +172,4 @@ void QXmppIbbDataIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeCharacters( m_payload.toBase64() );
     writer->writeEndElement();
 }
+/// \endcond

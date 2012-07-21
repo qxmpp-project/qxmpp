@@ -174,6 +174,7 @@ void QXmppBookmarkSet::setUrls(const QList<QXmppBookmarkUrl> &urls)
     m_urls = urls;
 }
 
+/// \cond
 bool QXmppBookmarkSet::isBookmarkSet(const QDomElement &element)
 {
     return element.tagName() == "storage" &&
@@ -229,4 +230,4 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
-
+/// \endcond

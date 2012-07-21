@@ -238,6 +238,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     return hasher.result();
 }
 
+/// \cond
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -334,4 +335,4 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
+/// \endcond

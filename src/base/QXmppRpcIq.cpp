@@ -200,6 +200,7 @@ void QXmppRpcErrorIq::setQuery(const QXmppRpcInvokeIq &query)
     m_query = query;
 }
 
+/// \cond
 bool QXmppRpcErrorIq::isRpcErrorIq(const QDomElement &element)
 {
     QString type = element.attribute("type");
@@ -219,6 +220,7 @@ void QXmppRpcErrorIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     m_query.toXmlElementFromChild(writer);
 }
+/// \endcond
 
 QXmppRpcResponseIq::QXmppRpcResponseIq()
     : QXmppIq(QXmppIq::Result),
@@ -277,6 +279,7 @@ void QXmppRpcResponseIq::setValues(const QVariantList &values)
     m_values = values;
 }
 
+/// \cond
 bool QXmppRpcResponseIq::isRpcResponseIq(const QDomElement &element)
 {
     QString type = element.attribute("type");
@@ -346,6 +349,7 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppRpcInvokeIq::QXmppRpcInvokeIq()
     : QXmppIq(QXmppIq::Set)
@@ -386,6 +390,7 @@ void QXmppRpcInvokeIq::setMethod(const QString &method)
     m_method = method;
 }
 
+/// \cond
 bool QXmppRpcInvokeIq::isRpcInvokeIq(const QDomElement &element)
 {
     QString type = element.attribute("type");
@@ -440,4 +445,4 @@ void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
+/// \endcond

@@ -55,6 +55,7 @@ void QXmppIq::setType(QXmppIq::Type type)
     m_type = type;
 }
 
+/// \cond
 void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
@@ -95,6 +96,7 @@ void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
     foreach (const QXmppElement &extension, extensions())
         extension.toXml(writer);
 }
+/// \endcond
 
 QString QXmppIq::getTypeStr() const
 {

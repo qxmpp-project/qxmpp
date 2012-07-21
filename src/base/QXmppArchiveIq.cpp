@@ -84,6 +84,7 @@ QXmppArchiveChat::QXmppArchiveChat()
 {
 }
 
+/// \cond
 void QXmppArchiveChat::parse(const QDomElement &element)
 {
     m_with = element.attribute("with");
@@ -136,6 +137,7 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
         rsm.toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns the conversation's messages.
 
@@ -253,6 +255,7 @@ void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply& rsm)
     m_rsmReply = rsm;
 }
 
+/// \cond
 bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 {
     QDomElement chatElement = element.firstChildElement("chat");
@@ -271,6 +274,7 @@ void QXmppArchiveChatIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     m_chat.toXml(writer, m_rsmReply);
 }
+/// \endcond
 
 /// Constructs a QXmppArchiveListIq.
 
@@ -380,6 +384,7 @@ void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply& rsm)
     m_rsmReply = rsm;
 }
 
+/// \cond
 bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
 {
     QDomElement listElement = element.firstChildElement("list");
@@ -446,6 +451,7 @@ void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute("xmlns", ns_archive);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns the JID which archived conversations must match.
 ///
@@ -498,6 +504,7 @@ void QXmppArchiveRemoveIq::setEnd(const QDateTime &end)
     m_end = end;
 }
 
+/// \cond
 bool QXmppArchiveRemoveIq::isArchiveRemoveIq(const QDomElement &element)
 {
     QDomElement retrieveElement = element.firstChildElement("remove");
@@ -524,6 +531,7 @@ void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "end", QXmppUtils::datetimeToString(m_end));
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppArchiveRetrieveIq::QXmppArchiveRetrieveIq()
     : QXmppIq(QXmppIq::Get)
@@ -582,6 +590,7 @@ void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
     m_rsmQuery = rsm;
 }
 
+/// \cond
 bool QXmppArchiveRetrieveIq::isArchiveRetrieveIq(const QDomElement &element)
 {
     QDomElement retrieveElement = element.firstChildElement("retrieve");
@@ -607,3 +616,4 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
         m_rsmQuery.toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond

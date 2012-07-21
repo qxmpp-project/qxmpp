@@ -424,6 +424,7 @@ bool QXmppDataForm::isNull() const
     return d->type == QXmppDataForm::None;
 }
 
+/// \cond
 void QXmppDataForm::parse(const QDomElement &element)
 {
     if (element.isNull())
@@ -648,4 +649,4 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
+/// \endcond

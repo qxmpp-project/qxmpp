@@ -45,6 +45,7 @@ QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
     return m_items;
 }
 
+/// \cond
 bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 {
     return (element.firstChildElement("query").namespaceURI() == ns_roster);
@@ -73,6 +74,7 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         m_items.at(i).toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Constructs a new roster entry.
 
@@ -227,6 +229,7 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
 }
 
+/// \cond
 void QXmppRosterIq::Item::parse(const QDomElement &element)
 {
     m_name = element.attribute("name");
@@ -258,3 +261,4 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
+/// \endcond

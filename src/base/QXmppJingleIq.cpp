@@ -160,6 +160,7 @@ void QXmppJingleIq::Content::setTransportPassword(const QString &password)
     m_transportPassword = password;
 }
 
+/// \cond
 void QXmppJingleIq::Content::parse(const QDomElement &element)
 {
     m_creator = element.attribute("creator");
@@ -230,6 +231,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppJingleIq::Reason::Reason()
     : m_type(None)
@@ -256,6 +258,7 @@ void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
     m_type = type;
 }
 
+/// \cond
 void QXmppJingleIq::Reason::parse(const QDomElement &element)
 {
     m_text = element.firstChildElement("text").text();
@@ -280,6 +283,7 @@ void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
     writer->writeEmptyElement(jingle_reasons[m_type]);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Constructs a QXmppJingleIq.
 
@@ -352,12 +356,6 @@ void QXmppJingleIq::setSid(const QString &sid)
     m_sid = sid;
 }
 
-bool QXmppJingleIq::isJingleIq(const QDomElement &element)
-{
-    QDomElement jingleElement = element.firstChildElement("jingle");
-    return (jingleElement.namespaceURI() == ns_jingle);
-}
-
 /// Returns true if the call is ringing.
 
 bool QXmppJingleIq::ringing() const
@@ -372,6 +370,13 @@ bool QXmppJingleIq::ringing() const
 void QXmppJingleIq::setRinging(bool ringing)
 {
     m_ringing = ringing;
+}
+
+/// \cond
+bool QXmppJingleIq::isJingleIq(const QDomElement &element)
+{
+    QDomElement jingleElement = element.firstChildElement("jingle");
+    return (jingleElement.namespaceURI() == ns_jingle);
 }
 
 void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
@@ -422,6 +427,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppJingleCandidate::QXmppJingleCandidate()
     : m_component(0),
@@ -593,6 +599,7 @@ bool QXmppJingleCandidate::isNull() const
     return m_host.isNull() || !m_port;
 }
 
+/// \cond
 void QXmppJingleCandidate::parse(const QDomElement &element)
 {
     m_component = element.attribute("component").toInt();
@@ -665,6 +672,7 @@ QString QXmppJingleCandidate::typeToString(QXmppJingleCandidate::Type type)
     }
     return typeStr;
 }
+/// \endcond
 
 QXmppJinglePayloadType::QXmppJinglePayloadType()
     : m_channels(1),
@@ -791,6 +799,7 @@ void QXmppJinglePayloadType::setPtime(unsigned int ptime)
     m_ptime = ptime;
 }
 
+/// \cond
 void QXmppJinglePayloadType::parse(const QDomElement &element)
 {
     m_id = element.attribute("id").toInt();
@@ -831,6 +840,7 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns true if this QXmppJinglePayloadType and \a other refer to the same payload type.
 ///

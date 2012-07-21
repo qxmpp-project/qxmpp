@@ -64,6 +64,7 @@ void QXmppBindIq::setResource(const QString& resource)
     m_resource = resource;
 }
 
+/// \cond
 bool QXmppBindIq::isBindIq(const QDomElement &element)
 {
     QDomElement bindElement = element.firstChildElement("bind");
@@ -87,4 +88,4 @@ void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, "resource", m_resource);
     writer->writeEndElement();
 }
-
+/// \endcond

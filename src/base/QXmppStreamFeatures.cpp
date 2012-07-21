@@ -94,6 +94,7 @@ void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
     m_tlsMode = mode;
 }
 
+/// \cond
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
     return element.namespaceURI() == ns_stream &&
@@ -183,4 +184,4 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
-
+/// \endcond

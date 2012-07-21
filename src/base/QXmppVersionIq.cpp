@@ -78,6 +78,7 @@ void QXmppVersionIq::setVersion(const QString &version)
     m_version = version;
 }
 
+/// \cond
 bool QXmppVersionIq::isVersionIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -108,4 +109,4 @@ void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-
+/// \endcond

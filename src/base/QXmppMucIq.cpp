@@ -205,6 +205,7 @@ void QXmppMucItem::setRole(Role role)
     m_role = role;
 }
 
+/// \cond
 void QXmppMucItem::parse(const QDomElement &element)
 {
     m_affiliation = QXmppMucItem::affiliationFromString(element.attribute("affiliation").toLower());
@@ -231,6 +232,7 @@ void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, "reason", m_reason);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns the IQ's items.
 
@@ -248,6 +250,7 @@ void QXmppMucAdminIq::setItems(const QList<QXmppMucItem> &items)
     m_items = items;
 }
 
+/// \cond
 bool QXmppMucAdminIq::isMucAdminIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -275,6 +278,7 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         item.toXml(writer);
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Returns the IQ's data form.
 
@@ -292,6 +296,7 @@ void QXmppMucOwnerIq::setForm(const QXmppDataForm &form)
     m_form = form;
 }
 
+/// \cond
 bool QXmppMucOwnerIq::isMucOwnerIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -311,4 +316,4 @@ void QXmppMucOwnerIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     m_form.toXml(writer);
     writer->writeEndElement();
 }
-
+/// \endcond

@@ -134,6 +134,8 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     socket()->connectToHost(host, port);
 }
 
+/// \cond
+
 void QXmppOutgoingServer::handleStart()
 {
     QXmppStream::handleStart();
@@ -233,6 +235,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 
     }
 }
+/// \endcond
 
 /// Returns true if the socket is connected and authentication succeeded.
 ///

@@ -116,6 +116,7 @@ bool QXmppResultSetQuery::isNull() const
     return m_max == -1 && m_index == -1 && m_after.isNull() && m_before.isNull();
 }
 
+/// \cond
 void QXmppResultSetQuery::parse(const QDomElement& element)
 {
     QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
@@ -146,6 +147,7 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
         helperToXmlAddTextElement(writer, "index", QString::number(m_index));
     writer->writeEndElement();
 }
+/// \endcond
 
 QXmppResultSetReply::QXmppResultSetReply()
     : m_count(-1)
@@ -223,6 +225,7 @@ bool QXmppResultSetReply::isNull() const
     return m_count == -1 && m_index == -1 && m_first.isNull() && m_last.isNull();
 }
 
+/// \cond
 void QXmppResultSetReply::parse(const QDomElement& element)
 {
     QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
@@ -257,3 +260,4 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter* writer) const
         helperToXmlAddTextElement(writer, "count", QString::number(m_count));
     writer->writeEndElement();
 }
+/// \endcond

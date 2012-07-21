@@ -63,6 +63,7 @@ void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
     m_utc = utc;
 }
 
+/// \cond
 bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
@@ -88,3 +89,4 @@ void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
     writer->writeEndElement();
 }
+/// \endcond

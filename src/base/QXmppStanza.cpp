@@ -95,6 +95,7 @@ void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
     m_type = type;
 }
 
+/// \cond
 QString QXmppStanza::Error::getTypeStr() const
 {
     switch(m_type)
@@ -287,6 +288,7 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 
     writer->writeEndElement();
 }
+/// \endcond
 
 /// Constructs a QXmppStanza with the specified sender and recipient.
 ///
@@ -404,6 +406,7 @@ void QXmppStanza::setExtensions(const QXmppElementList &extensions)
     m_extensions = extensions;
 }
 
+/// \cond
 void QXmppStanza::generateAndSetNextId()
 {
     // get back
@@ -422,4 +425,4 @@ void QXmppStanza::parse(const QDomElement &element)
     if(!errorElement.isNull())
         m_error.parse(errorElement);
 }
-
+/// \endcond
