@@ -36,5 +36,6 @@ HEADERS += \
     SOURCES += codec.cpp sasl.cpp
 }
 
+QMAKE_LIBDIR += ../src
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
-LIBS += -L../src $$QXMPP_LIBS
+LIBS += $$QXMPP_LIBS

@@ -3,8 +3,9 @@ include(../qxmpp.pri)
 TEMPLATE = app
 CONFIG += console
 
+QMAKE_LIBDIR += ../../src
 INCLUDEPATH += $$QXMPP_INCLUDEPATH
-LIBS += -L../../src $$QXMPP_LIBS
+LIBS += $$QXMPP_LIBS
 
 # Symbian packaging rules
 symbian {
