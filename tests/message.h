@@ -29,11 +29,13 @@ class tst_QXmppMessage : public QObject
     Q_OBJECT
 
 private slots:
-    void testMessage();
-    void testMessageFull();
+    void testBasic_data();
+    void testBasic();
     void testMessageAttention();
     void testMessageReceipt();
-    void testMessageDelay();
-    void testMessageLegacyDelay();
+    void testDelay_data();
+    void testDelay();
+    void testState_data();
+    void testState();
 };
 

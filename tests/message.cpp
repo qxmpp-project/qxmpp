@@ -26,19 +26,45 @@
 #include "message.h"
 #include "tests.h"
 
-void tst_QXmppMessage::testMessage()
+void tst_QXmppMessage::testBasic_data()
 {
-    const QByteArray xml(
-        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\"/>");
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("type");
+    QTest::addColumn<QString>("body");
+    QTest::addColumn<QString>("subject");
+    QTest::addColumn<QString>("thread");
+
+    QTest::newRow("minimal")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\"/>")
+        << int(QXmppMessage::Normal)
+        << QString() << QString() << QString();
+
+    QTest::newRow("full")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+        "<subject>test subject</subject>"
+        "<body>test body &amp; stuff</body>"
+        "<thread>test thread</thread>"
+        "</message>")
+        << int(QXmppMessage::Normal)
+        << "test body & stuff" << "test subject" << "test thread";
+}
+
+void tst_QXmppMessage::testBasic()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, type);
+    QFETCH(QString, body);
+    QFETCH(QString, subject);
+    QFETCH(QString, thread);
 
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(message.type(), QXmppMessage::Normal);
-    QCOMPARE(message.body(), QString());
-    QCOMPARE(message.subject(), QString());
-    QCOMPARE(message.thread(), QString());
+    QCOMPARE(int(message.type()), type);
+    QCOMPARE(message.body(), body);
+    QCOMPARE(message.subject(), subject);
+    QCOMPARE(message.thread(), thread);
     QCOMPARE(message.state(), QXmppMessage::None);
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), false);
@@ -119,51 +145,72 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(old.receiptId(), QString("richard2-4.1.247"));
 }
 
-void tst_QXmppMessage::testMessageFull()
+void tst_QXmppMessage::testDelay_data()
 {
-    const QByteArray xml(
-        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<subject>test subject</subject>"
-        "<body>test body &amp; stuff</body>"
-        "<thread>test thread</thread>"
-        "<composing xmlns=\"http://jabber.org/protocol/chatstates\"/>"
-        "</message>");
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QDateTime>("stamp");
 
-    QXmppMessage message;
-    parsePacket(message, xml);
-    QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
-    QCOMPARE(message.type(), QXmppMessage::Normal);
-    QCOMPARE(message.body(), QString("test body & stuff"));
-    QCOMPARE(message.subject(), QString("test subject"));
-    QCOMPARE(message.thread(), QString("test thread"));
-    QCOMPARE(message.state(), QXmppMessage::Composing);
-    serializePacket(message, xml);
-}
-
-void tst_QXmppMessage::testMessageDelay()
-{
-    const QByteArray xml(
-        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+    QTest::newRow("delay")
+        << QByteArray("<message type=\"normal\">"
         "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
-        "</message>");
+        "</message>")
+        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
 
-    QXmppMessage message;
-    parsePacket(message, xml);
-    QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC));
-    serializePacket(message, xml);
-}
-
-void tst_QXmppMessage::testMessageLegacyDelay()
-{
-    const QByteArray xml(
-        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+    QTest::newRow("legacy")
+        << QByteArray("<message type=\"normal\">"
         "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
-        "</message>");
+        "</message>")
+        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
+}
+
+void tst_QXmppMessage::testDelay()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QDateTime, stamp);
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC));
+    QCOMPARE(message.stamp(), stamp);
     serializePacket(message, xml);
 }
 
+void tst_QXmppMessage::testState_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("state");
+
+    QTest::newRow("none")
+        << QByteArray("<message type=\"normal\"/>")
+        << int(QXmppMessage::None);
+
+    QTest::newRow("active")
+        << QByteArray("<message type=\"normal\"><active xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << int(QXmppMessage::Active);
+
+    QTest::newRow("inactive")
+        << QByteArray("<message type=\"normal\"><inactive xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << int(QXmppMessage::Inactive);
+
+    QTest::newRow("gone")
+        << QByteArray("<message type=\"normal\"><gone xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << int(QXmppMessage::Gone);
+
+    QTest::newRow("composing")
+        << QByteArray("<message type=\"normal\"><composing xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << int(QXmppMessage::Composing);
+
+    QTest::newRow("paused")
+        << QByteArray("<message type=\"normal\"><paused xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << int(QXmppMessage::Paused);
+}
+
+void tst_QXmppMessage::testState()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, state);
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(int(message.state()), state);
+    serializePacket(message, xml);
+}
