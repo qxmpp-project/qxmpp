@@ -55,10 +55,18 @@ void QXmppResultSetQuery::setMax(int max)
     m_max = max;
 }
 
+/// Returns the index for the first element in the page.
+///
+/// This is used for retrieving pages out of order.
+
 int QXmppResultSetQuery::index() const
 {
     return m_index;
 }
+
+/// Sets the index for the first element in the page.
+///
+/// This is used for retrieving pages out of order.
 
 void QXmppResultSetQuery::setIndex(int index)
 {

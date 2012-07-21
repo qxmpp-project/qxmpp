@@ -95,7 +95,7 @@ QString QXmppPresence::statusText() const
 
 /// Sets the status text, a textual description of the user's status.
 ///
-/// \param str The status text, for example "Gone fishing".
+/// \param statusText The status text, for example "Gone fishing".
 
 void QXmppPresence::setStatusText(const QString& statusText)
 {

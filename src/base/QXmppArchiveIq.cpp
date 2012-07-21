@@ -235,10 +235,18 @@ void QXmppArchiveChatIq::setChat(const QXmppArchiveChat &chat)
     m_chat = chat;
 }
 
+/// Returns the result set management reply.
+///
+/// This is used for paging through messages.
+
 QXmppResultSetReply QXmppArchiveChatIq::resultSetReply() const
 {
     return m_rsmReply;
 }
+
+/// Sets the result set management reply.
+///
+/// This is used for paging through messages.
 
 void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply& rsm)
 {
@@ -336,20 +344,36 @@ void QXmppArchiveListIq::setEnd(const QDateTime &end)
     m_end = end;
 }
 
+/// Returns the result set management query.
+///
+/// This is used for paging through conversations.
+
 QXmppResultSetQuery QXmppArchiveListIq::resultSetQuery() const
 {
     return m_rsmQuery;
 }
+
+/// Sets the result set management query.
+///
+/// This is used for paging through conversations.
 
 void QXmppArchiveListIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
 {
     m_rsmQuery = rsm;
 }
 
+/// Returns the result set management reply.
+///
+/// This is used for paging through conversations.
+
 QXmppResultSetReply QXmppArchiveListIq::resultSetReply() const
 {
     return m_rsmReply;
 }
+
+/// Sets the result set management reply.
+///
+/// This is used for paging through conversations.
 
 void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply& rsm)
 {
@@ -540,10 +564,18 @@ void QXmppArchiveRetrieveIq::setWith(const QString &with)
     m_with = with;
 }
 
+/// Returns the result set management query.
+///
+/// This is used for paging through messages.
+
 QXmppResultSetQuery QXmppArchiveRetrieveIq::resultSetQuery() const
 {
     return m_rsmQuery;
 }
+
+/// Sets the result set management query.
+///
+/// This is used for paging through messages.
 
 void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
 {

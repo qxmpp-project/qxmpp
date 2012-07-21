@@ -112,10 +112,8 @@ public:
 
     /// \cond
     static bool isArchiveChatIq(const QDomElement &element);
-    /// \endcond
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
@@ -189,10 +187,8 @@ public:
 
     /// \cond
     static bool isArchiveRemoveIq(const QDomElement &element);
-    /// \endcond
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
@@ -223,10 +219,8 @@ public:
 
     /// \cond
     static bool isArchiveRetrieveIq(const QDomElement &element);
-    /// \endcond
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
@@ -246,10 +240,8 @@ class QXMPP_EXPORT QXmppArchivePrefIq : public QXmppIq
 public:
     /// \cond
     static bool isArchivePrefIq(const QDomElement &element);
-    /// \endcond
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
