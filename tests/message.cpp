@@ -69,6 +69,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), false);
     QCOMPARE(message.receiptId(), QString());
+    QCOMPARE(message.xhtml(), QString());
     serializePacket(message, xml);
 }
 
@@ -212,5 +213,22 @@ void tst_QXmppMessage::testState()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(int(message.state()), state);
+    serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testXhtml()
+{
+    const QByteArray xml("<message type=\"normal\">"
+        "<body>hi!</body>"
+        "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
+        "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+        "<p style=\"font-weight:bold\">hi!</p>"
+        "</body>"
+        "</html>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.xhtml(), QLatin1String("<p style=\"font-weight:bold\">hi!</p>"));
     serializePacket(message, xml);
 }

@@ -58,6 +58,8 @@ extern const char* ns_vcard;
 extern const char* ns_rsm;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char* ns_bytestreams;
+// XEP-0071: XHTML-IM
+extern const char *ns_xhtml_im;
 // XEP-0077: In-Band Registration
 extern const char* ns_register;
 // XEP-0078: Non-SASL Authentication

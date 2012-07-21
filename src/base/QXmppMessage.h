@@ -89,6 +89,9 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
+    QString xhtml() const;
+    void setXhtml(const QString &xhtml);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
@@ -114,6 +117,9 @@ private:
     QString m_body;
     QString m_subject;
     QString m_thread;
+
+    // XEP-0071: XHTML-IM
+    QString m_xhtml;
 
     // Request message receipt as per XEP-0184.
     QString m_receiptId;

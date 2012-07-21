@@ -23,6 +23,7 @@
  */
 
 #include <QDomElement>
+#include <QTextStream>
 #include <QXmlStreamWriter>
 
 #include "QXmppConstants.h"
@@ -37,6 +38,8 @@ static const char* chat_states[] = {
     "composing",
     "paused",
 };
+
+static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 
 /// Constructs a QXmppMessage.
 ///
@@ -266,6 +269,21 @@ void QXmppMessage::parse(const QDomElement &element)
         }
     }
 
+    // XEP-0071: XHTML-IM
+    QDomElement htmlElement = element.firstChildElement("html");
+    if (!htmlElement.isNull() && htmlElement.namespaceURI() == ns_xhtml_im) {
+        QDomElement bodyElement = htmlElement.firstChildElement("body");
+        if (!bodyElement.isNull() && bodyElement.namespaceURI() == ns_xhtml) {
+            QTextStream stream(&m_xhtml, QIODevice::WriteOnly);
+            bodyElement.save(stream, 0);
+
+            m_xhtml = m_xhtml.mid(m_xhtml.indexOf('>') + 1);
+            m_xhtml.replace(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
+            m_xhtml.replace("</body>", "");
+            m_xhtml = m_xhtml.trimmed();
+        }
+    }
+
     // XEP-0184: Message Delivery Receipts
     QDomElement receivedElement = element.firstChildElement("received");
     if (!receivedElement.isNull() && receivedElement.namespaceURI() == ns_message_receipts) {
@@ -333,6 +351,18 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     {
         xmlWriter->writeStartElement(chat_states[m_state]);
         xmlWriter->writeAttribute("xmlns", ns_chat_states);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0071: XHTML-IM
+    if (!m_xhtml.isEmpty()) {
+        xmlWriter->writeStartElement("html");
+        xmlWriter->writeAttribute("xmlns", ns_xhtml_im);
+        xmlWriter->writeStartElement("body");
+        xmlWriter->writeAttribute("xmlns", ns_xhtml);
+        xmlWriter->writeCharacters("");
+        xmlWriter->device()->write(m_xhtml.toUtf8());
+        xmlWriter->writeEndElement();
         xmlWriter->writeEndElement();
     }
 
@@ -415,3 +445,18 @@ void QXmppMessage::setThread(const QString& thread)
     m_thread = thread;
 }
 
+/// Returns the message's XHTML body as defined by
+/// XEP-0071: XHTML-IM.
+
+QString QXmppMessage::xhtml() const
+{
+    return m_xhtml;
+}
+
+/// Sets the message's XHTML body as defined by
+/// XEP-0071: XHTML-IM.
+
+void QXmppMessage::setXhtml(const QString &xhtml)
+{
+    m_xhtml = xhtml;
+}

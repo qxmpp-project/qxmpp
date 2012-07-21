@@ -1,6 +1,9 @@
 QXmpp 0.6.2 (UNRELEASED)
 ------------------------
 
+  - New XEPs
+    * XEP-0071: XHTML-IM
+
   - Improve SASL code test coverage.
   - Improve QXmppMessage test coverage.
 

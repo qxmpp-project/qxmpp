@@ -37,5 +37,6 @@ private slots:
     void testDelay();
     void testState_data();
     void testState();
+    void testXhtml();
 };
 

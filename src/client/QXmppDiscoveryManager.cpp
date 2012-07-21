@@ -140,6 +140,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     features
         << ns_data              // XEP-0004: Data Forms
         << ns_rsm               // XEP-0059: Result Set Management
+        << ns_xhtml_im          // XEP-0071: XHTML-IM
         << ns_chat_states       // XEP-0085: Chat State Notifications
         << ns_capabilities      // XEP-0115: Entity Capabilities
         << ns_ping              // XEP-0199: XMPP Ping
