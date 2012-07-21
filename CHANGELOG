@@ -10,6 +10,7 @@ QXmpp 0.6.2 (UNRELEASED)
   - Refactor QXmppPresence:
     * add availableStatusType(), priority(), statusText()
     * deprecate QXmppPresence::Status
+  - Remove deprecated QXmppRosterManager::removeRosterEntry().
 
 QXmpp 0.6.1 (Jul 20, 2012)
 --------------------------

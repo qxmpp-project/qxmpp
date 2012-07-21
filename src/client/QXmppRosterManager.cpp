@@ -416,11 +416,3 @@ bool QXmppRosterManager::isRosterReceived() const
 {
     return d->isRosterReceived;
 }
-
-// deprecated
-
-void QXmppRosterManager::removeRosterEntry(const QString &bareJid)
-{
-    removeItem(bareJid);
-}
-

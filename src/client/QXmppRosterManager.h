@@ -83,11 +83,6 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-    // deprecated in release 0.4.0
-    /// \cond
-    void Q_DECL_DEPRECATED removeRosterEntry(const QString &bareJid);
-    /// \endcond
-
 public slots:
     bool acceptSubscription(const QString &bareJid, const QString &reason = QString());
     bool refuseSubscription(const QString &bareJid, const QString &reason = QString());
