@@ -55,6 +55,8 @@ public:
         Media(const QXmppDataForm::Media &other);
         ~Media();
 
+        QXmppDataForm::Media& operator=(const QXmppDataForm::Media &other);
+
         int height() const;
         void setHeight(int height);
 

@@ -76,6 +76,14 @@ QXmppDataForm::Media::~Media()
 {
 }
 
+/// Assigns \a other to this media.
+
+QXmppDataForm::Media& QXmppDataForm::Media::operator=(const QXmppDataForm::Media &other)
+{
+    d = other.d;
+    return *this;
+}
+
 /// Returns media's height.
 
 int QXmppDataForm::Media::height() const
