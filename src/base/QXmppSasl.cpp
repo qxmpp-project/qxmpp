@@ -196,6 +196,7 @@ QXmppSaslSuccess::QXmppSaslSuccess()
 
 void QXmppSaslSuccess::parse(const QDomElement &element)
 {
+    Q_UNUSED(element);
 }
 
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
