@@ -49,22 +49,48 @@ static const char* presence_shows[] = {
     "invisible"
 };
 
+class QXmppPresencePrivate : public QSharedData
+{
+public:
+    QXmppPresence::AvailableStatusType availableStatusType;
+    QXmppPresence::Type type;
+    QXmppPresence::Status status;
+
+    /// XEP-0153: vCard-Based Avatars
+
+    /// photoHash: the SHA1 hash of the avatar image data itself (not the base64-encoded version)
+    /// in accordance with RFC 3174
+    QByteArray photoHash;
+    QXmppPresence::VCardUpdateType vCardUpdateType;
+
+    // XEP-0115: Entity Capabilities
+    QString capabilityHash;
+    QString capabilityNode;
+    QByteArray capabilityVer;
+    // Legacy XEP-0115: Entity Capabilities
+    QStringList capabilityExt;
+
+    // XEP-0045: Multi-User Chat
+    QXmppMucItem mucItem;
+    QList<int> mucStatusCodes;
+};
+
 /// Constructs a QXmppPresence.
 ///
 /// \param type
 
 QXmppPresence::QXmppPresence(QXmppPresence::Type type)
-    : m_type(type),
-    m_vCardUpdateType(VCardUpdateNone)
+    : d(new QXmppPresencePrivate)
 {
+    d->type = type;
+    d->vCardUpdateType = VCardUpdateNone;
 }
 
-QXmppPresence::QXmppPresence(QXmppPresence::Type type,
-                             const QXmppPresence::Status& status)
-    : QXmppStanza(),
-    m_type(type),
-    m_status(status),
-    m_vCardUpdateType(VCardUpdateNone)
+/// Constructs a copy of \a other.
+
+QXmppPresence::QXmppPresence(const QXmppPresence &other)
+    : QXmppStanza(other)
+    , d(other.d)
 {
 }
 
@@ -75,6 +101,15 @@ QXmppPresence::~QXmppPresence()
 
 }
 
+/// Assigns \a other to this presence.
+
+QXmppPresence &QXmppPresence::operator=(const QXmppPresence &other)
+{
+    QXmppStanza::operator=(other);
+    d = other.d;
+    return *this;
+}
+
 /// Returns the availability status type, for instance busy or away.
 ///
 /// This will not tell you whether a contact is connected, check whether
@@ -82,35 +117,35 @@ QXmppPresence::~QXmppPresence()
 
 QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
 {
-    return static_cast<QXmppPresence::AvailableStatusType>(m_status.type());
+    return static_cast<QXmppPresence::AvailableStatusType>(d->status.type());
 }
 
 /// Sets the availability status type, for instance busy or away.
 
 void QXmppPresence::setAvailableStatusType(AvailableStatusType type)
 {
-    m_status.setType(static_cast<QXmppPresence::Status::Type>(type));
+    d->status.setType(static_cast<QXmppPresence::Status::Type>(type));
 }
 
 /// Returns the priority level of the resource.
 
 int QXmppPresence::priority() const
 {
-    return m_status.priority();
+    return d->status.priority();
 }
 
 /// Sets the \a priority level of the resource.
 
 void QXmppPresence::setPriority(int priority)
 {
-    m_status.setPriority(priority);
+    d->status.setPriority(priority);
 }
 
 /// Returns the status text, a textual description of the user's status.
 
 QString QXmppPresence::statusText() const
 {
-    return m_status.statusText();
+    return d->status.statusText();
 }
 
 /// Sets the status text, a textual description of the user's status.
@@ -119,7 +154,7 @@ QString QXmppPresence::statusText() const
 
 void QXmppPresence::setStatusText(const QString& statusText)
 {
-    m_status.setStatusText(statusText);
+    d->status.setStatusText(statusText);
 }
 
 /// Returns the presence type.
@@ -131,7 +166,7 @@ void QXmppPresence::setStatusText(const QString& statusText)
 
 QXmppPresence::Type QXmppPresence::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 /// Sets the presence type.
@@ -140,7 +175,7 @@ QXmppPresence::Type QXmppPresence::type() const
 
 void QXmppPresence::setType(QXmppPresence::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// \cond
@@ -151,26 +186,26 @@ void QXmppPresence::parse(const QDomElement &element)
     const QString type = element.attribute("type");
     for (int i = Error; i <= Probe; i++) {
         if (type == presence_types[i]) {
-            m_type = static_cast<Type>(i);
+            d->type = static_cast<Type>(i);
             break;
         }
     }
-    m_status.parse(element);
+    d->status.parse(element);
 
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement();
-    m_vCardUpdateType = VCardUpdateNone;
+    d->vCardUpdateType = VCardUpdateNone;
     while(!xElement.isNull())
     {
         // XEP-0045: Multi-User Chat
         if(xElement.namespaceURI() == ns_muc_user)
         {
             QDomElement itemElement = xElement.firstChildElement("item");
-            m_mucItem.parse(itemElement);
+            d->mucItem.parse(itemElement);
             QDomElement statusElement = xElement.firstChildElement("status");
-            m_mucStatusCodes.clear();
+            d->mucStatusCodes.clear();
             while (!statusElement.isNull()) {
-                m_mucStatusCodes << statusElement.attribute("code").toInt();
+                d->mucStatusCodes << statusElement.attribute("code").toInt();
                 statusElement = statusElement.nextSiblingElement("status");
             }
         }
@@ -180,25 +215,25 @@ void QXmppPresence::parse(const QDomElement &element)
             QDomElement photoElement = xElement.firstChildElement("photo");
             if(!photoElement.isNull())
             {
-                m_photoHash = QByteArray::fromHex(photoElement.text().toAscii());
-                if(m_photoHash.isEmpty())
-                    m_vCardUpdateType = VCardUpdateNoPhoto;
+                d->photoHash = QByteArray::fromHex(photoElement.text().toAscii());
+                if(d->photoHash.isEmpty())
+                    d->vCardUpdateType = VCardUpdateNoPhoto;
                 else
-                    m_vCardUpdateType = VCardUpdateValidPhoto;
+                    d->vCardUpdateType = VCardUpdateValidPhoto;
             }
             else
             {
-                m_photoHash = QByteArray();
-                m_vCardUpdateType = VCardUpdateNotReady;
+                d->photoHash = QByteArray();
+                d->vCardUpdateType = VCardUpdateNotReady;
             }
         }
         // XEP-0115: Entity Capabilities
         else if(xElement.tagName() == "c" && xElement.namespaceURI() == ns_capabilities)
         {
-            m_capabilityNode = xElement.attribute("node");
-            m_capabilityVer = QByteArray::fromBase64(xElement.attribute("ver").toAscii());
-            m_capabilityHash = xElement.attribute("hash");
-            m_capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
+            d->capabilityNode = xElement.attribute("node");
+            d->capabilityVer = QByteArray::fromBase64(xElement.attribute("ver").toAscii());
+            d->capabilityHash = xElement.attribute("hash");
+            d->capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
         }
         else if (xElement.tagName() == "error")
         {
@@ -229,19 +264,19 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     helperToXmlAddAttribute(xmlWriter,"id", id());
     helperToXmlAddAttribute(xmlWriter,"to", to());
     helperToXmlAddAttribute(xmlWriter,"from", from());
-    helperToXmlAddAttribute(xmlWriter,"type", presence_types[m_type]);
-    m_status.toXml(xmlWriter);
+    helperToXmlAddAttribute(xmlWriter,"type", presence_types[d->type]);
+    d->status.toXml(xmlWriter);
 
     error().toXml(xmlWriter);
 
     // XEP-0045: Multi-User Chat
-    if(!m_mucItem.isNull() || !m_mucStatusCodes.isEmpty())
+    if(!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty())
     {
         xmlWriter->writeStartElement("x");
         xmlWriter->writeAttribute("xmlns", ns_muc_user);
-        if (!m_mucItem.isNull())
-            m_mucItem.toXml(xmlWriter);
-        foreach (int code, m_mucStatusCodes) {
+        if (!d->mucItem.isNull())
+            d->mucItem.toXml(xmlWriter);
+        foreach (int code, d->mucStatusCodes) {
             xmlWriter->writeStartElement("status");
             xmlWriter->writeAttribute("code", QString::number(code));
             xmlWriter->writeEndElement();
@@ -250,17 +285,17 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     }
 
     // XEP-0153: vCard-Based Avatars
-    if(m_vCardUpdateType != VCardUpdateNone)
+    if(d->vCardUpdateType != VCardUpdateNone)
     {
         xmlWriter->writeStartElement("x");
         xmlWriter->writeAttribute("xmlns", ns_vcard_update);
-        switch(m_vCardUpdateType)
+        switch(d->vCardUpdateType)
         {
         case VCardUpdateNoPhoto:
             helperToXmlAddTextElement(xmlWriter, "photo", "");
             break;
         case VCardUpdateValidPhoto:
-            helperToXmlAddTextElement(xmlWriter, "photo", m_photoHash.toHex());
+            helperToXmlAddTextElement(xmlWriter, "photo", d->photoHash.toHex());
             break;
         case VCardUpdateNotReady:
             break;
@@ -270,14 +305,14 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    if(!m_capabilityNode.isEmpty() && !m_capabilityVer.isEmpty()
-        && !m_capabilityHash.isEmpty())
+    if(!d->capabilityNode.isEmpty() && !d->capabilityVer.isEmpty()
+        && !d->capabilityHash.isEmpty())
     {
         xmlWriter->writeStartElement("c");
         xmlWriter->writeAttribute("xmlns", ns_capabilities);
-        helperToXmlAddAttribute(xmlWriter, "hash", m_capabilityHash);
-        helperToXmlAddAttribute(xmlWriter, "node", m_capabilityNode);
-        helperToXmlAddAttribute(xmlWriter, "ver", m_capabilityVer.toBase64());
+        helperToXmlAddAttribute(xmlWriter, "hash", d->capabilityHash);
+        helperToXmlAddAttribute(xmlWriter, "node", d->capabilityNode);
+        helperToXmlAddAttribute(xmlWriter, "ver", d->capabilityVer.toBase64());
         xmlWriter->writeEndElement();
     }
 
@@ -294,7 +329,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
 QByteArray QXmppPresence::photoHash() const
 {
-    return m_photoHash;
+    return d->photoHash;
 }
 
 /// Sets the photo-hash of the VCardUpdate.
@@ -303,7 +338,7 @@ QByteArray QXmppPresence::photoHash() const
 
 void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
 {
-    m_photoHash = photoHash;
+    d->photoHash = photoHash;
 }
 
 /// Returns the type of VCardUpdate
@@ -312,7 +347,7 @@ void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
 
 QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType() const
 {
-    return m_vCardUpdateType;
+    return d->vCardUpdateType;
 }
 
 /// Sets the type of VCardUpdate
@@ -321,56 +356,56 @@ QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType() const
 
 void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
 {
-    m_vCardUpdateType = type;
+    d->vCardUpdateType = type;
 }
 
 /// XEP-0115: Entity Capabilities
 QString QXmppPresence::capabilityHash() const
 {
-    return m_capabilityHash;
+    return d->capabilityHash;
 }
 
 /// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityHash(const QString& hash)
 {
-    m_capabilityHash = hash;
+    d->capabilityHash = hash;
 }
 
 /// XEP-0115: Entity Capabilities
 QString QXmppPresence::capabilityNode() const
 {
-    return m_capabilityNode;
+    return d->capabilityNode;
 }
 
 /// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityNode(const QString& node)
 {
-    m_capabilityNode = node;
+    d->capabilityNode = node;
 }
 
 /// XEP-0115: Entity Capabilities
 QByteArray QXmppPresence::capabilityVer() const
 {
-    return m_capabilityVer;
+    return d->capabilityVer;
 }
 
 /// XEP-0115: Entity Capabilities
 void QXmppPresence::setCapabilityVer(const QByteArray& ver)
 {
-    m_capabilityVer = ver;
+    d->capabilityVer = ver;
 }
 
 /// Legacy XEP-0115: Entity Capabilities
 QStringList QXmppPresence::capabilityExt() const
 {
-    return m_capabilityExt;
+    return d->capabilityExt;
 }
 
 /// Returns the MUC item.
 
 QXmppMucItem QXmppPresence::mucItem() const
 {
-    return m_mucItem;
+    return d->mucItem;
 }
 
 /// Sets the MUC item.
@@ -379,14 +414,14 @@ QXmppMucItem QXmppPresence::mucItem() const
 
 void QXmppPresence::setMucItem(const QXmppMucItem &item)
 {
-    m_mucItem = item;
+    d->mucItem = item;
 }
 
 /// Returns the MUC status codes.
 
 QList<int> QXmppPresence::mucStatusCodes() const
 {
-    return m_mucStatusCodes;
+    return d->mucStatusCodes;
 }
 
 /// Sets the MUC status codes.
@@ -395,23 +430,23 @@ QList<int> QXmppPresence::mucStatusCodes() const
 
 void QXmppPresence::setMucStatusCodes(const QList<int> &codes)
 {
-    m_mucStatusCodes = codes;
+    d->mucStatusCodes = codes;
 }
 
 /// \cond
 const QXmppPresence::Status& QXmppPresence::status() const
 {
-    return m_status;
+    return d->status;
 }
 
 QXmppPresence::Status& QXmppPresence::status()
 {
-    return m_status;
+    return d->status;
 }
 
 void QXmppPresence::setStatus(const QXmppPresence::Status& status)
 {
-    m_status = status;
+    d->status = status;
 }
 
 QXmppPresence::Status::Status(QXmppPresence::Status::Type type,

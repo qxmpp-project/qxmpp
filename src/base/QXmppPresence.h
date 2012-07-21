@@ -28,6 +28,8 @@
 #include "QXmppStanza.h"
 #include "QXmppMucIq.h"
 
+class QXmppPresencePrivate;
+
 /// \brief The QXmppPresence class represents an XMPP presence stanza.
 ///
 /// \ingroup Stanzas
@@ -108,14 +110,16 @@ public:
         int m_priority;
     };
 
-    Q_DECL_DEPRECATED QXmppPresence(QXmppPresence::Type type, const QXmppPresence::Status& status);
     QXmppPresence::Status Q_DECL_DEPRECATED &status();
     const QXmppPresence::Status Q_DECL_DEPRECATED &status() const;
     void Q_DECL_DEPRECATED setStatus(const QXmppPresence::Status&);
     /// \endcond
 
     QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available);
+    QXmppPresence(const QXmppPresence &other);
     ~QXmppPresence();
+
+    QXmppPresence& operator=(const QXmppPresence &other);
 
     AvailableStatusType availableStatusType() const;
     void setAvailableStatusType(AvailableStatusType type);
@@ -161,27 +165,7 @@ public:
     QStringList capabilityExt() const;
 
 private:
-    AvailableStatusType m_availableStatusType;
-    Type m_type;
-    QXmppPresence::Status m_status;
-
-    /// XEP-0153: vCard-Based Avatars
-
-    /// m_photoHash: the SHA1 hash of the avatar image data itself (not the base64-encoded version)
-    /// in accordance with RFC 3174
-    QByteArray m_photoHash;
-    VCardUpdateType m_vCardUpdateType;
-
-    // XEP-0115: Entity Capabilities
-    QString m_capabilityHash;
-    QString m_capabilityNode;
-    QByteArray m_capabilityVer;
-    // Legacy XEP-0115: Entity Capabilities
-    QStringList m_capabilityExt;
-
-    // XEP-0045: Multi-User Chat
-    QXmppMucItem m_mucItem;
-    QList<int> m_mucStatusCodes;
+    QSharedDataPointer<QXmppPresencePrivate> d;
 };
 
 #endif // QXMPPPRESENCE_H
