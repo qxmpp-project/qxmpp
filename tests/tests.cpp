@@ -52,6 +52,7 @@
 #include "message.h"
 #include "presence.h"
 #include "register.h"
+#include "roster.h"
 #include "rpc.h"
 #include "rsm.h"
 #include "rtp.h"
@@ -953,6 +954,9 @@ int main(int argc, char *argv[])
 
     tst_QXmppResultSet testRsm;
     errors += QTest::qExec(&testRsm);
+
+    tst_QXmppRosterIq testRoster;
+    errors += QTest::qExec(&testRoster);
 
     tst_QXmppRtpPacket testRtp;
     errors += QTest::qExec(&testRtp);

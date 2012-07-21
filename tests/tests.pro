@@ -13,6 +13,7 @@ SOURCES += \
     message.cpp \
     presence.cpp \
     register.cpp \
+    roster.cpp \
     rpc.cpp \
     rsm.cpp \
     rtp.cpp \
@@ -25,6 +26,7 @@ HEADERS += \
     message.h \
     presence.h \
     register.h \
+    roster.h \
     rpc.h \
     rsm.h \
     rtp.h \
