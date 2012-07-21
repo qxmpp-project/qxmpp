@@ -70,14 +70,16 @@ public:
 
     /// Closes the RTP channel.
     virtual void close() = 0;
-    /// Returns the RTP channel's current read/write mode.
+
+    /// Returns the mode in which the channel has been opened.
     virtual QIODevice::OpenMode openMode() const = 0;
+
     QList<QXmppJinglePayloadType> localPayloadTypes();
     void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
 
 protected:
     /// \cond
-    virtual void payloadTypesChanged();
+    virtual void payloadTypesChanged() = 0;
 
     QList<QXmppJinglePayloadType> m_incomingPayloadTypes;
     QList<QXmppJinglePayloadType> m_outgoingPayloadTypes;
@@ -121,16 +123,13 @@ public:
     QXmppRtpAudioChannel(QObject *parent = 0);
     ~QXmppRtpAudioChannel();
 
-    QXmppJinglePayloadType payloadType() const;
-
-    /// \cond
     qint64 bytesAvailable() const;
     void close();
     bool isSequential() const;
     QIODevice::OpenMode openMode() const;
+    QXmppJinglePayloadType payloadType() const;
     qint64 pos() const;
     bool seek(qint64 pos);
-    /// \endcond
 
 signals:
     /// \brief This signal is emitted when a datagram needs to be sent.
@@ -283,6 +282,9 @@ public:
     QXmppRtpVideoChannel(QObject *parent = 0);
     ~QXmppRtpVideoChannel();
 
+    void close();
+    QIODevice::OpenMode openMode() const;
+
     // incoming stream
     QXmppVideoFormat decoderFormat() const;
     QList<QXmppVideoFrame> readFrames();
@@ -291,11 +293,6 @@ public:
     QXmppVideoFormat encoderFormat() const;
     void setEncoderFormat(const QXmppVideoFormat &format);
     void writeFrame(const QXmppVideoFrame &frame);
-
-    /// \cond
-    QIODevice::OpenMode openMode() const;
-    void close();
-    /// \endcond
 
 signals:
     /// \brief This signal is emitted when a datagram needs to be sent.

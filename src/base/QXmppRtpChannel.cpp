@@ -167,10 +167,6 @@ void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> 
     payloadTypesChanged();
 }
 
-void QXmppRtpChannel::payloadTypesChanged()
-{
-}
-
 enum CodecId {
     G711u = 0,
     GSM = 3,
@@ -493,6 +489,17 @@ QIODevice::OpenMode QXmppRtpAudioChannel::openMode() const
     return QIODevice::openMode();
 }
 
+/// Returns the RTP channel's payload type.
+///
+/// You can use this to determine the QAudioFormat to use with your
+/// QAudioInput/QAudioOutput.
+
+QXmppJinglePayloadType QXmppRtpAudioChannel::payloadType() const
+{
+    return d->payloadType;
+}
+
+/// \cond
 qint64 QXmppRtpAudioChannel::readData(char * data, qint64 maxSize)
 {
     // if we are filling the buffer, return empty samples
@@ -529,16 +536,6 @@ qint64 QXmppRtpAudioChannel::readData(char * data, qint64 maxSize)
 
     d->incomingPos += maxSize;
     return maxSize;
-}
-
-/// Returns the RTP channel's payload type.
-///
-/// You can use this to determine the QAudioFormat to use with your
-/// QAudioInput/QAudioOutput.
-
-QXmppJinglePayloadType QXmppRtpAudioChannel::payloadType() const
-{
-    return d->payloadType;
 }
 
 void QXmppRtpAudioChannel::payloadTypesChanged()
@@ -578,6 +575,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
 
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 }
+/// \endcond
 
 /// Returns the position in the received audio data.
 
@@ -632,6 +630,7 @@ void QXmppRtpAudioChannel::stopTone(QXmppRtpAudioChannel::Tone tone)
     }
 }
 
+/// \cond
 qint64 QXmppRtpAudioChannel::writeData(const char * data, qint64 maxSize)
 {
     if (!d->outgoingCodec) {
@@ -647,6 +646,7 @@ qint64 QXmppRtpAudioChannel::writeData(const char * data, qint64 maxSize)
 
     return maxSize;
 }
+/// \endcond
 
 void QXmppRtpAudioChannel::writeDatagram()
 {
@@ -969,6 +969,7 @@ QIODevice::OpenMode QXmppRtpVideoChannel::openMode() const
     return mode;
 }
 
+/// \cond
 void QXmppRtpVideoChannel::payloadTypesChanged()
 {
     // refresh decoders
@@ -1019,6 +1020,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
         }
     }
 }
+/// \endcond
 
 /// Decodes buffered RTP packets and returns a list of video frames.
 
