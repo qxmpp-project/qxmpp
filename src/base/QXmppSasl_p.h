@@ -76,9 +76,6 @@ private:
     QXmppSaslClientPrivate *d;
 };
 
-/// The QXmppServerClient class is the base class for all SASL server
-/// authentication methods.
-
 class QXMPP_AUTOTEST_EXPORT QXmppSaslServer : public QXmppLoggable
 {
 public:
@@ -167,7 +164,7 @@ public:
     QXmppSaslChallenge(const QByteArray &value = QByteArray());
 };
 
-class QXmppSaslFailure : public QXmppSaslStanza
+class QXmppSaslFailure : public QXmppStanza
 {
 public:
     QXmppSaslFailure(const QString &condition = QString());
@@ -190,10 +187,15 @@ public:
     QXmppSaslResponse(const QByteArray &value = QByteArray());
 };
 
-class QXmppSaslSuccess : public QXmppSaslStanza
+class QXmppSaslSuccess : public QXmppStanza
 {
 public:
     QXmppSaslSuccess();
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
 };
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient
