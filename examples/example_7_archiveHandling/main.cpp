@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FileLogging);
 
     xmppClient client;
+    client.setPageSize(15);
+    client.setPageDirection(xmppClient::PageBackwards);
     client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
     return a.exec();
 }

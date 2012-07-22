@@ -23,15 +23,27 @@
 
 
 #include <QDateTime>
-#include <iostream>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 
 #include "xmppClient.h"
 
+static void logStart(const QString &msg)
+{
+    qDebug("example_7_archiveHandling : %s", qPrintable(msg));
+}
+
+static void logEnd(const QString &msg)
+{
+    qDebug(" => %s", qPrintable(msg));
+}
+
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
+    , m_collectionCount(-1)
+    , m_pageDirection(PageForwards)
+    , m_pageSize(10)
 {
     bool check;
     Q_UNUSED(check);
@@ -45,13 +57,17 @@ xmppClient::xmppClient(QObject *parent)
                     this, SLOT(clientConnected()));
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat)),
-                    SLOT(archiveChatReceived(QXmppArchiveChat)));
+    check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)),
+                    SLOT(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)));
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveListReceived(QList<QXmppArchiveChat>)),
-                    SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
+    check = connect(archiveManager, SIGNAL(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)),
+                    SLOT(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)));
     Q_ASSERT(check);
+
+    // set limits
+    m_startDate = QDateTime::currentDateTime().addDays(-21);
+    m_endDate = QDateTime::currentDateTime();
 }
 
 xmppClient::~xmppClient()
@@ -59,26 +75,70 @@ xmppClient::~xmppClient()
 
 }
 
+void xmppClient::setPageDirection(PageDirection direction)
+{
+    m_pageDirection = direction;
+}
+
+void xmppClient::setPageSize(int size)
+{
+    m_pageSize = size;
+}
+
 void xmppClient::clientConnected()
 {
-    std::cout << "example_7_archiveHandling:: CONNECTED" << std::endl;
-    archiveManager->listCollections("",
-            QDateTime::currentDateTime().addDays(-7));
+    logEnd("connected");
+
+    // we want 0 results, i.e. only result-set management information (count)
+    logStart("fetching collection count");
+    QXmppResultSetQuery rsmQuery;
+    rsmQuery.setMax(0);
+    archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
 }
 
-void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply)
 {
-    std::cout << "example_7_archiveHandling:: LIST RECEIVED" << std::endl;
-    foreach (const QXmppArchiveChat &chat, chats)
-        archiveManager->retrieveCollection(chat.with(), chat.start());
+    if (m_collectionCount < 0) {
+        logEnd(QString::number(rsmReply.count()) + " items");
+        m_collectionCount = rsmReply.count();
+
+        // fetch first page
+        logStart("fetching collection first page");
+        QXmppResultSetQuery rsmQuery;
+        rsmQuery.setMax(m_pageSize);
+        if (m_pageDirection == PageBackwards)
+            rsmQuery.setBefore("");
+        archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
+    } else if (!chats.size()) {
+        logEnd("no items");
+    } else {
+        logEnd(QString("items %1 to %2 of %3").arg(QString::number(rsmReply.index()), QString::number(rsmReply.index() + chats.size() - 1), QString::number(rsmReply.count())));
+        foreach (const QXmppArchiveChat &chat, chats) {
+            qDebug("chat start %s", qPrintable(chat.start().toString()));
+            // NOTE: to actually retrieve conversations, uncomment this
+            //archiveManager->retrieveCollection(chat.with(), chat.start());
+        }
+        if (!rsmReply.isNull()) {
+            // fetch next page
+            QXmppResultSetQuery rsmQuery;
+            rsmQuery.setMax(m_pageSize);
+            if (m_pageDirection == PageBackwards) {
+                logStart("fetching collection previous page");
+                rsmQuery.setBefore(rsmReply.first());
+            } else {
+                logStart("fetching collection next page");
+                rsmQuery.setAfter(rsmReply.last());
+            }
+            archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
+        }
+    }
 }
 
-void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat)
+void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply)
 {
-    std::cout << "example_7_archiveHandling:: CHAT RECEIVED" << std::endl;
-    foreach (const QXmppArchiveMessage &msg, chat.messages())
-    {
-        std::cout << "example_7_archiveHandling::" << msg.body().toStdString() << std::endl;
+    logEnd(QString("chat received, RSM count %1").arg(QString::number(rsmReply.count())));
+    foreach (const QXmppArchiveMessage &msg, chat.messages()) {
+        qDebug("example_7_archiveHandling : %s", qPrintable(msg.body()));
     }
 }
 

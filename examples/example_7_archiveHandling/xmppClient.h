@@ -25,26 +25,42 @@
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
+#include <QDateTime>
+
 #include "QXmppClient.h"
 
 class QXmppArchiveChat;
 class QXmppArchiveManager;
+class QXmppResultSetReply;
 
 class xmppClient : public QXmppClient
 {
     Q_OBJECT
 
 public:
+    enum PageDirection {
+        PageForwards = 0,
+        PageBackwards
+    };
+
     xmppClient(QObject *parent = 0);
     ~xmppClient();
 
+    void setPageDirection(PageDirection direction);
+    void setPageSize(int size);
+
 public slots:
     void clientConnected();
-    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void archiveChatReceived(const QXmppArchiveChat &chat);
+    void archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply);
+    void archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply);
 
 private:
     QXmppArchiveManager *archiveManager;
+    int m_collectionCount;
+    QDateTime m_startDate;
+    QDateTime m_endDate;
+    PageDirection m_pageDirection;
+    int m_pageSize;
 };
 
 #endif // XMPPCLIENT_H
