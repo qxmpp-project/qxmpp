@@ -1,3 +1,8 @@
+QXmpp 0.6.3 (Jul 24, 2012)
+--------------------------
+
+  - Fix regression in X-FACEBOOK-PLATFORM authentication.
+
 QXmpp 0.6.2 (Jul 22, 2012)
 --------------------------
 
