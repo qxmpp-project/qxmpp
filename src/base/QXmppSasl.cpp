@@ -438,8 +438,8 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
 
         // build response
         QUrl responseUrl;
-        responseUrl.addQueryItem("access_token", username());
-        responseUrl.addQueryItem("api_key", password());
+        responseUrl.addQueryItem("access_token", password());
+        responseUrl.addQueryItem("api_key", username());
         responseUrl.addQueryItem("call_id", 0);
         responseUrl.addQueryItem("method", requestUrl.queryItemValue("method"));
         responseUrl.addQueryItem("nonce", requestUrl.queryItemValue("nonce"));

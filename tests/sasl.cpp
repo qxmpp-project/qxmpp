@@ -235,7 +235,7 @@ void tst_QXmppSaslClient::testFacebook()
    
     // challenge response 
     QVERIFY(client->respond(QByteArray("version=1&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8"), response));
-    QCOMPARE(response, QByteArray("access_token=123456789012345&api_key=abcdefghijlkmno&call_id=&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8&v=1.0"));
+    QCOMPARE(response, QByteArray("access_token=abcdefghijlkmno&api_key=123456789012345&call_id=&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8&v=1.0"));
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray(), response));
