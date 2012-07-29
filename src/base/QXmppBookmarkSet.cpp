@@ -189,7 +189,7 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
         if (childElement.tagName() == "conference")
         {
             QXmppBookmarkConference conference;
-            conference.setAutoJoin(childElement.attribute("autojoin") == "true");
+            conference.setAutoJoin(childElement.attribute("autojoin") == "true" || childElement.attribut("autojoin") == "1");
             conference.setJid(childElement.attribute("jid"));
             conference.setName(childElement.attribute("name"));
             conference.setNickName(childElement.firstChildElement("nick").text());
