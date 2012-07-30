@@ -1,3 +1,9 @@
+QXmpp 0.6.4 (UNRELEASED)
+------------------------
+
+  - Fix issues:
+    * Issue 144: QXmppBookmarkConference autojoin parsing
+
 QXmpp 0.6.3 (Jul 24, 2012)
 --------------------------
 
