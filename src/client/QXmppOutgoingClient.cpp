@@ -57,7 +57,8 @@
 class QXmppOutgoingClientPrivate
 {
 public:
-    QXmppOutgoingClientPrivate();
+    QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
+    void connectToHost(const QString &host, quint16 port);
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -66,6 +67,8 @@ public:
 
     // DNS
     QDnsLookup dns;
+    QString usedHost;
+    quint16 usedPort;
 
     // Stream
     QString streamId;
@@ -85,12 +88,33 @@ public:
     // Timers
     QTimer *pingTimer;
     QTimer *timeoutTimer;
+
+private:
+    QXmppOutgoingClient *q;
 };
 
-QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
+QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : sessionAvailable(false)
     , saslClient(0)
+    , q(qq)
 {
+}
+
+void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port)
+{
+    q->info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
+
+    // override CA certificates if requested
+    if (!config.caCertificates().isEmpty())
+        q->socket()->setCaCertificates(config.caCertificates());
+
+    // respect proxy
+    q->socket()->setProxy(config.networkProxy());
+
+    // connect to host and make a note of used host/port
+    q->socket()->connectToHost(host, port);
+    usedHost = host;
+    usedPort = port;
 }
 
 /// Constructs an outgoing client stream.
@@ -99,7 +123,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate()
 
 QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     : QXmppStream(parent),
-    d(new QXmppOutgoingClientPrivate)
+    d(new QXmppOutgoingClientPrivate(this))
 {
     bool check;
     Q_UNUSED(check);
@@ -160,19 +184,9 @@ QXmppConfiguration& QXmppOutgoingClient::configuration()
 
 void QXmppOutgoingClient::connectToHost()
 {
-    const QString host = configuration().host();
-    const quint16 port = configuration().port();
-
-    // override CA certificates if requested
-    if (!configuration().caCertificates().isEmpty()) {
-        socket()->setCaCertificates(configuration().caCertificates());
-    }
-
     // if an explicit host was provided, connect to it
-    if (!host.isEmpty() && port) {
-        info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
-        socket()->setProxy(configuration().networkProxy());
-        socket()->connectToHost(host, port);
+    if (!d->config.host().isEmpty() && d->config.port()) {
+        d->connectToHost(d->config.host(), d->config.port());
         return;
     }
 
@@ -186,26 +200,18 @@ void QXmppOutgoingClient::connectToHost()
 
 void QXmppOutgoingClient::_q_dnsLookupFinished()
 {
-    QString host;
-    quint16 port;
-
     if (d->dns.error() == QDnsLookup::NoError &&
         !d->dns.serviceRecords().isEmpty()) {
         // take the first returned record
-        host = d->dns.serviceRecords().first().target();
-        port = d->dns.serviceRecords().first().port();
+        d->connectToHost(
+            d->dns.serviceRecords().first().target(),
+            d->dns.serviceRecords().first().port());
     } else {
         // as a fallback, use domain as the host name
         warning(QString("Lookup for domain %1 failed: %2")
                 .arg(d->dns.name(), d->dns.errorString()));
-        host = configuration().domain();
-        port = configuration().port();
+        d->connectToHost(d->config.domain(), d->config.port());
     }
-
-    // connect to server
-    info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
-    socket()->setProxy(configuration().networkProxy());
-    socket()->connectToHost(host, port);
 }
 
 /// Returns true if the socket is connected and a session has been started.
@@ -367,7 +373,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
             info(QString("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
-            d->saslClient->setHost(configuration().host());
+            d->saslClient->setHost(d->usedHost);
             d->saslClient->setServiceType("xmpp");
             if (d->saslClient->mechanism() == "X-FACEBOOK-PLATFORM") {
                 d->saslClient->setUsername(configuration().facebookAppId());

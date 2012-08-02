@@ -98,6 +98,7 @@ private:
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
 
+    friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate * const d;
 };
 
