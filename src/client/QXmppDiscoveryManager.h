@@ -26,6 +26,7 @@
 
 #include "QXmppClientExtension.h"
 
+class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
 
@@ -59,6 +60,9 @@ public:
 
     QString clientType() const;
     void setClientType(const QString&);
+
+    QXmppDataForm clientInfoForm() const;
+    void setClientInfoForm(const QXmppDataForm &form);
 
     /// \cond
     QStringList discoveryFeatures() const;

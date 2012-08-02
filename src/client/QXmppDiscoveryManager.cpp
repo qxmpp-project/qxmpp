@@ -28,6 +28,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
+#include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppStream.h"
 #include "QXmppGlobal.h"
@@ -39,6 +40,7 @@ public:
     QString clientCategory;
     QString clientType;
     QString clientName;
+    QXmppDataForm clientInfoForm;
 };
 
 QXmppDiscoveryManager::QXmppDiscoveryManager()
@@ -139,6 +141,11 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     }
 
     iq.setIdentities(identities);
+
+    // extended information
+    if (!d->clientInfoForm.isNull())
+        iq.setForm(d->infoForm);
+
     return iq;
 }
 
@@ -218,6 +225,22 @@ QString QXmppDiscoveryManager::clientType() const
 QString QXmppDiscoveryManager::clientName() const
 {
     return d->clientName;
+}
+
+/// Returns the client's extended information form, as defined
+/// by XEP-0128 Service Discovery Extensions.
+
+QXmppDataForm QXmppDiscoveryManager::clientInfoForm() const
+{
+    return d->clientInfoForm;
+}
+
+/// Sets the client's extended information form, as defined
+/// by XEP-0128 Service Discovery Extensions.
+
+void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm &form)
+{
+    d->clientInfoForm = form;
 }
 
 /// \cond
