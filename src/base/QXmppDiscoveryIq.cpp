@@ -202,6 +202,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     qSort(sortedIdentities.begin(), sortedIdentities.end(), identityLessThan);
     QStringList sortedFeatures = m_features;
     qSort(sortedFeatures);
+    sortedFeatures.removeDuplicates();
     foreach (const QXmppDiscoveryIq::Identity &identity, sortedIdentities)
         S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
     foreach (const QString &feature, sortedFeatures)
@@ -222,10 +223,13 @@ QByteArray QXmppDiscoveryIq::verificationString() const
             foreach (const QString &key, keys) {
                 const QXmppDataForm::Field field = fieldMap.value(key);
                 S += key + QLatin1String("<");
-                if (field.value().canConvert<QStringList>())
-                    S += field.value().toStringList().join(QLatin1String("<"));
-                else
+                if (field.value().canConvert<QStringList>()) {
+                    QStringList list = field.value().toStringList();
+                    list.sort();
+                    S += list.join(QLatin1String("<"));
+                } else {
                     S += field.value().toString();
+                }
                 S += QLatin1String("<");
             }
         } else {
