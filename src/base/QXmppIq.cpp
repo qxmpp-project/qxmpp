@@ -35,14 +35,43 @@ static const char* iq_types[] = {
     "result"
 };
 
+class QXmppIqPrivate : public QSharedData
+{
+public:
+    QXmppIq::Type type;
+};
+
 /// Constructs a QXmppIq with the specified \a type.
 ///
 /// \param type
 
 QXmppIq::QXmppIq(QXmppIq::Type type)
-    : QXmppStanza(), m_type(type)
+    : QXmppStanza()
+    , d(new QXmppIqPrivate)
 {
+    d->type = type;
     generateAndSetNextId();
+}
+
+/// Constructs a copy of \a other.
+
+QXmppIq::QXmppIq(const QXmppIq &other)
+    : QXmppStanza(other)
+    , d(other.d)
+{
+}
+
+QXmppIq::~QXmppIq()
+{
+}
+
+/// Assigns \a other to this IQ.
+
+QXmppIq& QXmppIq::operator=(const QXmppIq &other)
+{
+    QXmppStanza::operator=(other);
+    d = other.d;
+    return *this;
 }
 
 /// Returns the IQ's type.
@@ -50,7 +79,7 @@ QXmppIq::QXmppIq(QXmppIq::Type type)
 
 QXmppIq::Type QXmppIq::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 /// Sets the IQ's type.
@@ -59,7 +88,7 @@ QXmppIq::Type QXmppIq::type() const
 
 void QXmppIq::setType(QXmppIq::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// \cond
@@ -70,7 +99,7 @@ void QXmppIq::parse(const QDomElement &element)
     const QString type = element.attribute("type");
     for (int i = Error; i <= Result; i++) {
         if (type == iq_types[i]) {
-            m_type = static_cast<Type>(i);
+            d->type = static_cast<Type>(i);
             break;
         }
     }
@@ -97,7 +126,7 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
     helperToXmlAddAttribute(xmlWriter, "id", id());
     helperToXmlAddAttribute(xmlWriter, "to", to());
     helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", iq_types[m_type]);
+    helperToXmlAddAttribute(xmlWriter, "type", iq_types[d->type]);
     toXmlElementFromChild(xmlWriter);
     error().toXml(xmlWriter);
     xmlWriter->writeEndElement();
