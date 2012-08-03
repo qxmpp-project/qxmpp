@@ -56,7 +56,7 @@ public:
     QXmppVCardEmail::Type type;
 };
 
-/// Constructs an empty vCard e-mail address.
+/// Constructs an empty e-mail address.
 
 QXmppVCardEmail::QXmppVCardEmail()
     : d(new QXmppVCardEmailPrivate)
@@ -74,7 +74,7 @@ QXmppVCardEmail::~QXmppVCardEmail()
 {
 }
 
-/// Assigns \a other to this vCard e-mail address.
+/// Assigns \a other to this e-mail address.
 
 QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
 {
@@ -142,6 +142,132 @@ void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+class QXmppVCardPhonePrivate : public QSharedData
+{
+public:
+    QXmppVCardPhonePrivate() : type(QXmppVCardPhone::None) {};
+    QString number;
+    QXmppVCardPhone::Type type;
+};
+
+/// Constructs an empty phone number.
+
+QXmppVCardPhone::QXmppVCardPhone()
+    : d(new QXmppVCardPhonePrivate)
+{
+}
+
+/// Constructs a copy of \a other.
+
+QXmppVCardPhone::QXmppVCardPhone(const QXmppVCardPhone &other)
+    : d(other.d)
+{
+}
+
+QXmppVCardPhone::~QXmppVCardPhone()
+{
+}
+
+/// Assigns \a other to this phone number.
+
+QXmppVCardPhone& QXmppVCardPhone::operator=(const QXmppVCardPhone &other)
+{
+    d = other.d;
+    return *this;
+}
+
+/// Returns the phone number.
+
+QString QXmppVCardPhone::number() const
+{
+    return d->number;
+}
+
+/// Sets the phone \a number.
+
+void QXmppVCardPhone::setNumber(const QString &number)
+{
+    d->number = number;
+}
+
+/// Returns the e-mail type, which is a combination of TypeFlag.
+
+QXmppVCardPhone::Type QXmppVCardPhone::type() const
+{
+    return d->type;
+}
+
+/// Sets the e-mail \a type, which is a combination of TypeFlag.
+
+void QXmppVCardPhone::setType(QXmppVCardPhone::Type type)
+{
+    d->type = type;
+}
+
+void QXmppVCardPhone::parse(const QDomElement &element)
+{
+    if (!element.firstChildElement("HOME").isNull())
+        d->type |= Home;
+    if (!element.firstChildElement("WORK").isNull())
+        d->type |= Work;
+    if (!element.firstChildElement("VOICE").isNull())
+        d->type |= Voice;
+    if (!element.firstChildElement("FAX").isNull())
+        d->type |= Fax;
+    if (!element.firstChildElement("PAGER").isNull())
+        d->type |= Pager;
+    if (!element.firstChildElement("MSG").isNull())
+        d->type |= Messaging;
+    if (!element.firstChildElement("CELL").isNull())
+        d->type |= Cell;
+    if (!element.firstChildElement("VIDEO").isNull())
+        d->type |= Video;
+    if (!element.firstChildElement("BBS").isNull())
+        d->type |= BBS;
+    if (!element.firstChildElement("MODEM").isNull())
+        d->type |= Modem;
+    if (!element.firstChildElement("ISDN").isNull())
+        d->type |= ISDN;
+    if (!element.firstChildElement("PCS").isNull())
+        d->type |= PCS;
+    if (!element.firstChildElement("PREF").isNull())
+        d->type |= Preferred;
+    d->number = element.firstChildElement("NUMBER").text();
+}
+
+void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("PHONE");
+    if (d->type & Home)
+        writer->writeEmptyElement("HOME");
+    if (d->type & Work)
+        writer->writeEmptyElement("WORK");
+    if (d->type & Voice)
+        writer->writeEmptyElement("VOICE");
+    if (d->type & Fax)
+        writer->writeEmptyElement("FAX");
+    if (d->type & Pager)
+        writer->writeEmptyElement("PAGER");
+    if (d->type & Messaging)
+        writer->writeEmptyElement("MSG");
+    if (d->type & Cell)
+        writer->writeEmptyElement("CELL");
+    if (d->type & Video)
+        writer->writeEmptyElement("VIDEO");
+    if (d->type & BBS)
+        writer->writeEmptyElement("BBS");
+    if (d->type & Modem)
+        writer->writeEmptyElement("MODEM");
+    if (d->type & ISDN)
+        writer->writeEmptyElement("ISDN");
+    if (d->type & PCS)
+        writer->writeEmptyElement("PCS");
+    if (d->type & Preferred)
+        writer->writeEmptyElement("PREF");
+    writer->writeTextElement("NUMBER", d->number);
+    writer->writeEndElement();
+}
+
 class QXmppVCardIqPrivate : public QSharedData
 {
 public:
@@ -158,6 +284,7 @@ public:
     QString photoType;
 
     QList<QXmppVCardEmail> emails;
+    QList<QXmppVCardPhone> phones;
 };
 
 /// Constructs a QXmppVCardIq for the specified recipient.
@@ -390,6 +517,19 @@ void QXmppVCardIq::setEmails(const QList<QXmppVCardEmail> &emails)
     d->emails = emails;
 }
 
+/// Returns the phone numbers.
+
+QList<QXmppVCardPhone> QXmppVCardIq::phones() const
+{
+    return d->phones;
+}
+
+/// Sets the phone numbers.
+
+void QXmppVCardIq::setPhones(const QList<QXmppVCardPhone> &phones)
+{
+    d->phones = phones;
+}
 /// \cond
 bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
 {
@@ -420,6 +560,10 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
             QXmppVCardEmail email;
             email.parse(child);
             d->emails << email;
+        } else if (child.tagName() == "PHONE") {
+            QXmppVCardPhone phone;
+            phone.parse(child);
+            d->phones << phone;
         }
         child = child.nextSiblingElement();
     }
@@ -450,9 +594,9 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
             helperToXmlAddTextElement(writer, "MIDDLE", d->middleName);
         writer->writeEndElement();
     }
-    if (!d->url.isEmpty())
-        helperToXmlAddTextElement(writer, "URL", d->url);
 
+    foreach (const QXmppVCardPhone &phone, d->phones)
+        phone.toXml(writer);
     if(!photo().isEmpty())
     {
         writer->writeStartElement("PHOTO");
@@ -463,6 +607,8 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, "BINVAL", d->photo.toBase64());
         writer->writeEndElement();
     }
+    if (!d->url.isEmpty())
+        helperToXmlAddTextElement(writer, "URL", d->url);
 
     writer->writeEndElement();
 }

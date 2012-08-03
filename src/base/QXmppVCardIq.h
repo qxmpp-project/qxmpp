@@ -31,6 +31,7 @@
 #include <QDomElement>
 
 class QXmppVCardEmailPrivate;
+class QXmppVCardPhonePrivate;
 class QXmppVCardIqPrivate;
 
 /// \brief Represents a vCard e-mail address.
@@ -68,6 +69,51 @@ public:
 
 private:
     QSharedDataPointer<QXmppVCardEmailPrivate> d;
+};
+
+/// \brief Represents a vCard phone number.
+
+class QXmppVCardPhone
+{
+public:
+    /// \brief Describes phone number types.
+    enum TypeFlag {
+        None        = 0x0,
+        Home        = 0x1,
+        Work        = 0x2,
+        Voice       = 0x4,
+        Fax         = 0x8,
+        Pager       = 0x10,
+        Messaging   = 0x20,
+        Cell        = 0x40,
+        Video       = 0x80,
+        BBS         = 0x100,
+        Modem       = 0x200,
+        ISDN        = 0x400,
+        PCS         = 0x800,
+        Preferred   = 0x1000
+    };
+    Q_DECLARE_FLAGS(Type, TypeFlag);
+
+    QXmppVCardPhone();
+    QXmppVCardPhone(const QXmppVCardPhone &other);
+    ~QXmppVCardPhone();
+
+    QXmppVCardPhone& operator=(const QXmppVCardPhone &other);
+
+    QString number() const;
+    void setNumber(const QString &number);
+
+    Type type() const;
+    void setType(Type type);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *stream) const;
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppVCardPhonePrivate> d;
 };
 
 /// \brief Represents the XMPP vCard.
@@ -121,6 +167,9 @@ public:
 
     QList<QXmppVCardEmail> emails() const;
     void setEmails(const QList<QXmppVCardEmail> &emails);
+    
+    QList<QXmppVCardPhone> phones() const;
+    void setPhones(const QList<QXmppVCardPhone> &phones);
 
     /// \cond
     static bool isVCard(const QDomElement &element);
