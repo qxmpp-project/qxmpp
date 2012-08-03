@@ -81,7 +81,6 @@ private slots:
     void testNonSaslAuth();
     void testSession();
     void testStreamFeatures();
-    void testVCard();
     void testVersionGet();
     void testVersionResult();
     void testEntityTimeGet();

@@ -18,7 +18,8 @@ SOURCES += \
     rsm.cpp \
     rtp.cpp \
     stun.cpp \
-    tests.cpp
+    tests.cpp \
+    vcard.cpp
 HEADERS += \
     dataform.h \
     iq.h \
@@ -31,7 +32,8 @@ HEADERS += \
     rsm.h \
     rtp.h \
     stun.h \
-    tests.h
+    tests.h \
+    vcard.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     HEADERS += codec.h sasl.h

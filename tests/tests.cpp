@@ -40,7 +40,6 @@
 #include "QXmppServer.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
-#include "QXmppVCardIq.h"
 #include "QXmppVersionIq.h"
 #include "QXmppGlobal.h"
 #include "QXmppEntityTimeIq.h"
@@ -59,6 +58,7 @@
 #include "sasl.h"
 #include "stun.h"
 #include "tests.h"
+#include "vcard.h"
 
 void TestUtils::testCrc32()
 {
@@ -519,44 +519,6 @@ void TestPackets::testStreamFeatures()
     serializePacket(features2, xml2);
 }
 
-void TestPackets::testVCard()
-{
-    const QByteArray xml(
-        "<iq id=\"vcard1\" type=\"set\">"
-        "<vCard xmlns=\"vcard-temp\">"
-        "<BDAY>1983-09-14</BDAY>"
-        "<EMAIL><INTERNET/><USERID>foo.bar@example.com</USERID></EMAIL>"
-        "<FN>Foo Bar!</FN>"
-        "<NICKNAME>FooBar</NICKNAME>"
-        "<N><GIVEN>Foo</GIVEN><FAMILY>Wiz</FAMILY><MIDDLE>Baz</MIDDLE></N>"
-        "<PHOTO>"
-            "<TYPE>image/png</TYPE>"
-            "<BINVAL>"
-            "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
-            "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
-            "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
-            "</BINVAL>"
-        "</PHOTO>"
-        "</vCard>"
-        "</iq>");
-
-    QXmppVCardIq vcard;
-    parsePacket(vcard, xml);
-    QCOMPARE(vcard.birthday(), QDate(1983, 9, 14));
-    QCOMPARE(vcard.email(), QLatin1String("foo.bar@example.com"));
-    QCOMPARE(vcard.nickName(), QLatin1String("FooBar"));
-    QCOMPARE(vcard.fullName(), QLatin1String("Foo Bar!"));
-    QCOMPARE(vcard.firstName(), QLatin1String("Foo"));
-    QCOMPARE(vcard.middleName(), QLatin1String("Baz"));
-    QCOMPARE(vcard.lastName(), QLatin1String("Wiz"));
-    QCOMPARE(vcard.photo(), QByteArray::fromBase64(
-        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
-        "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
-        "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
-    QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
-    serializePacket(vcard, xml);
-}
-
 void TestPackets::testVersionGet()
 {
     const QByteArray xmlGet(
@@ -977,6 +939,9 @@ int main(int argc, char *argv[])
 
     TestStun testStun;
     errors += QTest::qExec(&testStun);
+
+    tst_QXmppVCardIq testVCard;
+    errors += QTest::qExec(&testVCard);
 
     TestXmlRpc testXmlRpc;
     errors += QTest::qExec(&testXmlRpc);

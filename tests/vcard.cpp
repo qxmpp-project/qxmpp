@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2008-2012 The QXmpp developers
+ *
+ * Author:
+ *  Jeremy Lainé
+ *
+ * Source:
+ *  http://code.google.com/p/qxmpp
+ *
+ * This file is a part of QXmpp library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ */
+
+#include "QXmppVCardIq.h"
+
+#include "tests.h"
+#include "vcard.h"
+
+void tst_QXmppVCardIq::testVCard()
+{
+    const QByteArray xml(
+        "<iq id=\"vcard1\" type=\"set\">"
+        "<vCard xmlns=\"vcard-temp\">"
+        "<BDAY>1983-09-14</BDAY>"
+        "<EMAIL><INTERNET/><USERID>foo.bar@example.com</USERID></EMAIL>"
+        "<FN>Foo Bar!</FN>"
+        "<NICKNAME>FooBar</NICKNAME>"
+        "<N><GIVEN>Foo</GIVEN><FAMILY>Wiz</FAMILY><MIDDLE>Baz</MIDDLE></N>"
+        "<PHOTO>"
+            "<TYPE>image/png</TYPE>"
+            "<BINVAL>"
+            "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+            "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+            "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
+            "</BINVAL>"
+        "</PHOTO>"
+        "</vCard>"
+        "</iq>");
+
+    QXmppVCardIq vcard;
+    parsePacket(vcard, xml);
+    QCOMPARE(vcard.birthday(), QDate(1983, 9, 14));
+    QCOMPARE(vcard.email(), QLatin1String("foo.bar@example.com"));
+    QCOMPARE(vcard.nickName(), QLatin1String("FooBar"));
+    QCOMPARE(vcard.fullName(), QLatin1String("Foo Bar!"));
+    QCOMPARE(vcard.firstName(), QLatin1String("Foo"));
+    QCOMPARE(vcard.middleName(), QLatin1String("Baz"));
+    QCOMPARE(vcard.lastName(), QLatin1String("Wiz"));
+    QCOMPARE(vcard.photo(), QByteArray::fromBase64(
+        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+        "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+        "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
+    QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
+    serializePacket(vcard, xml);
+}
