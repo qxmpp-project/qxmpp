@@ -26,6 +26,26 @@
 #include "tests.h"
 #include "vcard.h"
 
+void tst_QXmppVCardIq::testAddress_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("type");
+
+    QTest::newRow("none") << QByteArray("<ADR/>") << int(QXmppVCardAddress::None);
+    QTest::newRow("HOME") << QByteArray("<ADR><HOME/></ADR>") << int(QXmppVCardAddress::Home);
+}
+
+void tst_QXmppVCardIq::testAddress()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, type);
+
+    QXmppVCardAddress address;
+    parsePacket(address, xml);
+    QCOMPARE(int(address.type()), type);
+    serializePacket(address, xml);
+}
+
 void tst_QXmppVCardIq::testEmail_data()
 {
     QTest::addColumn<QByteArray>("xml");

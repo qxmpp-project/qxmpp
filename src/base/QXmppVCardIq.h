@@ -30,9 +30,43 @@
 #include <QMap>
 #include <QDomElement>
 
+class QXmppVCardAddressPrivate;
 class QXmppVCardEmailPrivate;
 class QXmppVCardPhonePrivate;
 class QXmppVCardIqPrivate;
+
+/// \brief Represent a vCard address.
+
+class QXMPP_EXPORT QXmppVCardAddress
+{
+public:
+    /// \brief Describes e-mail address types.
+    enum TypeFlag {
+        None        = 0x0,
+        Home        = 0x1,
+        Work        = 0x2,
+        Postal      = 0x4,
+        Preferred   = 0x8
+    };
+    Q_DECLARE_FLAGS(Type, TypeFlag);
+
+    QXmppVCardAddress();
+    QXmppVCardAddress(const QXmppVCardAddress &other);
+    ~QXmppVCardAddress();
+
+    QXmppVCardAddress& operator=(const QXmppVCardAddress &other);
+
+    Type type() const;
+    void setType(Type type);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *stream) const;
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppVCardAddressPrivate> d;
+};
 
 /// \brief Represents a vCard e-mail address.
 
@@ -165,6 +199,9 @@ public:
     QString url() const;
     void setUrl(const QString&);
 
+    QList<QXmppVCardAddress> addresses() const;
+    void setAddresses(const QList<QXmppVCardAddress> &addresses);
+    
     QList<QXmppVCardEmail> emails() const;
     void setEmails(const QList<QXmppVCardEmail> &emails);
     

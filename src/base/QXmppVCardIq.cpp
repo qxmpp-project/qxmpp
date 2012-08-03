@@ -48,6 +48,79 @@ static QString getImageType(const QByteArray &contents)
     return "image/unknown";
 }
 
+class QXmppVCardAddressPrivate : public QSharedData
+{
+public:
+    QXmppVCardAddressPrivate() : type(QXmppVCardAddress::None) {};
+    QXmppVCardAddress::Type type;
+};
+
+/// Constructs an empty address.
+
+QXmppVCardAddress::QXmppVCardAddress()
+    : d(new QXmppVCardAddressPrivate)
+{
+}
+
+/// Constructs a copy of \a other.
+
+QXmppVCardAddress::QXmppVCardAddress(const QXmppVCardAddress &other)
+    : d(other.d)
+{
+}
+
+QXmppVCardAddress::~QXmppVCardAddress()
+{
+}
+
+/// Assigns \a other to this address.
+
+QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
+{
+    d = other.d;
+    return *this;
+}
+
+/// Returns the address type, which is a combination of TypeFlag.
+
+QXmppVCardAddress::Type QXmppVCardAddress::type() const
+{
+    return d->type;
+}
+
+/// Sets the address \a type, which is a combination of TypeFlag.
+
+void QXmppVCardAddress::setType(QXmppVCardAddress::Type type)
+{
+    d->type = type;
+}
+
+void QXmppVCardAddress::parse(const QDomElement &element)
+{
+    if (!element.firstChildElement("HOME").isNull())
+        d->type |= Home;
+    if (!element.firstChildElement("WORK").isNull())
+        d->type |= Work;
+    if (!element.firstChildElement("POSTAL").isNull())
+        d->type |= Postal;
+    if (!element.firstChildElement("PREF").isNull())
+        d->type |= Preferred;
+}
+
+void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("ADR");
+    if (d->type & Home)
+        writer->writeEmptyElement("HOME");
+    if (d->type & Work)
+        writer->writeEmptyElement("WORK");
+    if (d->type & Postal)
+        writer->writeEmptyElement("POSTAL");
+    if (d->type & Preferred)
+        writer->writeEmptyElement("PREF");
+    writer->writeEndElement();
+}
+
 class QXmppVCardEmailPrivate : public QSharedData
 {
 public:
@@ -190,14 +263,14 @@ void QXmppVCardPhone::setNumber(const QString &number)
     d->number = number;
 }
 
-/// Returns the e-mail type, which is a combination of TypeFlag.
+/// Returns the phone number type, which is a combination of TypeFlag.
 
 QXmppVCardPhone::Type QXmppVCardPhone::type() const
 {
     return d->type;
 }
 
-/// Sets the e-mail \a type, which is a combination of TypeFlag.
+/// Sets the phone number \a type, which is a combination of TypeFlag.
 
 void QXmppVCardPhone::setType(QXmppVCardPhone::Type type)
 {
@@ -283,6 +356,7 @@ public:
     QByteArray photo;
     QString photoType;
 
+    QList<QXmppVCardAddress> addresses;
     QList<QXmppVCardEmail> emails;
     QList<QXmppVCardPhone> phones;
 };
@@ -503,6 +577,20 @@ void QXmppVCardIq::setPhotoType(const QString& photoType)
     d->photoType = photoType;
 }
 
+/// Returns the addresses.
+
+QList<QXmppVCardAddress> QXmppVCardIq::addresses() const
+{
+    return d->addresses;
+}
+
+/// Sets the addresses.
+
+void QXmppVCardIq::setAddresses(const QList<QXmppVCardAddress> &addresses)
+{
+    d->addresses = addresses;
+}
+
 /// Returns the e-mail addresses.
 
 QList<QXmppVCardEmail> QXmppVCardIq::emails() const
@@ -556,7 +644,11 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
 
     QDomElement child = cardElement.firstChildElement();
     while (!child.isNull()) {
-        if (child.tagName() == "EMAIL") {
+        if (child.tagName() == "ADR") {
+            QXmppVCardAddress address;
+            address.parse(child);
+            d->addresses << address;
+        } else if (child.tagName() == "EMAIL") {
             QXmppVCardEmail email;
             email.parse(child);
             d->emails << email;
@@ -573,6 +665,8 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     writer->writeAttribute("xmlns", ns_vcard);
+    foreach (const QXmppVCardAddress &address, d->addresses)
+        address.toXml(writer);
     if (d->birthday.isValid())
         helperToXmlAddTextElement(writer, "BDAY", d->birthday.toString("yyyy-MM-dd"));
     foreach (const QXmppVCardEmail &email, d->emails)
