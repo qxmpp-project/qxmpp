@@ -67,8 +67,6 @@ public:
 
     // DNS
     QDnsLookup dns;
-    QString usedHost;
-    quint16 usedPort;
 
     // Stream
     QString streamId;
@@ -111,10 +109,8 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
 
-    // connect to host and make a note of used host/port
+    // connect to host
     q->socket()->connectToHost(host, port);
-    usedHost = host;
-    usedPort = port;
 }
 
 /// Constructs an outgoing client stream.
@@ -373,7 +369,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
             info(QString("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
-            d->saslClient->setHost(d->usedHost);
+            d->saslClient->setHost(d->config.domain());
             d->saslClient->setServiceType("xmpp");
             if (d->saslClient->mechanism() == "X-FACEBOOK-PLATFORM") {
                 d->saslClient->setUsername(configuration().facebookAppId());
