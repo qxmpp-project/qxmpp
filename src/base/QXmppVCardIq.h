@@ -31,6 +31,7 @@
 #include <QDomElement>
 
 class QXmppVCardEmailPrivate;
+class QXmppVCardIqPrivate;
 
 /// \brief Represents a vCard e-mail address.
 
@@ -83,6 +84,10 @@ class QXMPP_EXPORT QXmppVCardIq : public QXmppIq
 {
 public:
     QXmppVCardIq(const QString& bareJid = "");
+    QXmppVCardIq(const QXmppVCardIq &other);
+    ~QXmppVCardIq();
+
+    QXmppVCardIq& operator=(const QXmppVCardIq &other);
 
     QDate birthday() const;
     void setBirthday(const QDate &birthday);
@@ -128,19 +133,7 @@ protected:
     /// \endcond
 
 private:
-    QDate m_birthday;
-    QString m_firstName;
-    QString m_fullName;
-    QString m_lastName;
-    QString m_middleName;
-    QString m_nickName;
-    QString m_url;
-
-    // not as 64 base
-    QByteArray m_photo;
-    QString m_photoType;
-
-    QList<QXmppVCardEmail> m_emails;
+    QSharedDataPointer<QXmppVCardIqPrivate> d;
 };
 
 #endif // QXMPPVCARDIQ_H

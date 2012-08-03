@@ -142,14 +142,55 @@ void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+class QXmppVCardIqPrivate : public QSharedData
+{
+public:
+    QDate birthday;
+    QString firstName;
+    QString fullName;
+    QString lastName;
+    QString middleName;
+    QString nickName;
+    QString url;
+
+    // not as 64 base
+    QByteArray photo;
+    QString photoType;
+
+    QList<QXmppVCardEmail> emails;
+};
+
 /// Constructs a QXmppVCardIq for the specified recipient.
 ///
 /// \param jid
 
-QXmppVCardIq::QXmppVCardIq(const QString& jid) : QXmppIq(QXmppIq::Get)
+QXmppVCardIq::QXmppVCardIq(const QString& jid)
+    : QXmppIq()
+    , d(new QXmppVCardIqPrivate)
 {
     // for self jid should be empty
     setTo(jid);
+}
+
+/// Constructs a copy of \a other.
+
+QXmppVCardIq::QXmppVCardIq(const QXmppVCardIq &other)
+    : QXmppIq(other)
+    , d(other.d)
+{
+}
+
+QXmppVCardIq::~QXmppVCardIq()
+{
+}
+
+/// Assigns \a other to this vCard IQ.
+
+QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
+{
+    QXmppIq::operator=(other);
+    d = other.d;
+    return *this;
 }
 
 /// Returns the date of birth of the individual associated with the vCard.
@@ -157,7 +198,7 @@ QXmppVCardIq::QXmppVCardIq(const QString& jid) : QXmppIq(QXmppIq::Get)
 
 QDate QXmppVCardIq::birthday() const
 {
-    return m_birthday;
+    return d->birthday;
 }
 
 /// Sets the date of birth of the individual associated with the vCard.
@@ -166,7 +207,7 @@ QDate QXmppVCardIq::birthday() const
 
 void QXmppVCardIq::setBirthday(const QDate &birthday)
 {
-    m_birthday = birthday;
+    d->birthday = birthday;
 }
 
 /// Returns the email address.
@@ -174,10 +215,10 @@ void QXmppVCardIq::setBirthday(const QDate &birthday)
 
 QString QXmppVCardIq::email() const
 {
-    if (m_emails.isEmpty())
+    if (d->emails.isEmpty())
         return QString();
     else
-        return m_emails.first().address();
+        return d->emails.first().address();
 }
 
 /// Sets the email address.
@@ -189,7 +230,7 @@ void QXmppVCardIq::setEmail(const QString &email)
     QXmppVCardEmail first;
     first.setAddress(email);
     first.setType(QXmppVCardEmail::Internet);
-    m_emails = QList<QXmppVCardEmail>() << first;
+    d->emails = QList<QXmppVCardEmail>() << first;
 }
 
 /// Returns the first name.
@@ -197,7 +238,7 @@ void QXmppVCardIq::setEmail(const QString &email)
 
 QString QXmppVCardIq::firstName() const
 {
-    return m_firstName;
+    return d->firstName;
 }
 
 /// Sets the first name.
@@ -206,7 +247,7 @@ QString QXmppVCardIq::firstName() const
 
 void QXmppVCardIq::setFirstName(const QString &firstName)
 {
-    m_firstName = firstName;
+    d->firstName = firstName;
 }
 
 /// Returns the full name.
@@ -214,7 +255,7 @@ void QXmppVCardIq::setFirstName(const QString &firstName)
 
 QString QXmppVCardIq::fullName() const
 {
-    return m_fullName;
+    return d->fullName;
 }
 
 /// Sets the full name.
@@ -223,7 +264,7 @@ QString QXmppVCardIq::fullName() const
 
 void QXmppVCardIq::setFullName(const QString &fullName)
 {
-    m_fullName = fullName;
+    d->fullName = fullName;
 }
 
 /// Returns the last name.
@@ -231,7 +272,7 @@ void QXmppVCardIq::setFullName(const QString &fullName)
 
 QString QXmppVCardIq::lastName() const
 {
-    return m_lastName;
+    return d->lastName;
 }
 
 /// Sets the last name.
@@ -240,7 +281,7 @@ QString QXmppVCardIq::lastName() const
 
 void QXmppVCardIq::setLastName(const QString &lastName)
 {
-    m_lastName = lastName;
+    d->lastName = lastName;
 }
 
 /// Returns the middle name.
@@ -248,7 +289,7 @@ void QXmppVCardIq::setLastName(const QString &lastName)
 
 QString QXmppVCardIq::middleName() const
 {
-    return m_middleName;
+    return d->middleName;
 }
 
 /// Sets the middle name.
@@ -257,7 +298,7 @@ QString QXmppVCardIq::middleName() const
 
 void QXmppVCardIq::setMiddleName(const QString &middleName)
 {
-    m_middleName = middleName;
+    d->middleName = middleName;
 }
 
 /// Returns the nickname.
@@ -265,7 +306,7 @@ void QXmppVCardIq::setMiddleName(const QString &middleName)
 
 QString QXmppVCardIq::nickName() const
 {
-    return m_nickName;
+    return d->nickName;
 }
 
 /// Sets the nickname.
@@ -274,7 +315,7 @@ QString QXmppVCardIq::nickName() const
 
 void QXmppVCardIq::setNickName(const QString &nickName)
 {
-    m_nickName = nickName;
+    d->nickName = nickName;
 }
 
 /// Returns the URL associated with the vCard. It can represent the user's
@@ -283,7 +324,7 @@ void QXmppVCardIq::setNickName(const QString &nickName)
 
 QString QXmppVCardIq::url() const
 {
-    return m_url;
+    return d->url;
 }
 
 /// Sets the URL associated with the vCard. It can represent the user's
@@ -294,7 +335,7 @@ QString QXmppVCardIq::url() const
 
 void QXmppVCardIq::setUrl(const QString& url)
 {
-    m_url = url;
+    d->url = url;
 }
 
 /// Returns the photo's binary contents.
@@ -311,42 +352,42 @@ void QXmppVCardIq::setUrl(const QString& url)
 
 QByteArray QXmppVCardIq::photo() const
 {
-    return m_photo;
+    return d->photo;
 }
 
 /// Sets the photo's binary contents.
 
 void QXmppVCardIq::setPhoto(const QByteArray& photo)
 {
-    m_photo = photo;
+    d->photo = photo;
 }
 
 /// Returns the photo's MIME type.
 
 QString QXmppVCardIq::photoType() const
 {
-    return m_photoType;
+    return d->photoType;
 }
 
 /// Sets the photo's MIME type.
 
 void QXmppVCardIq::setPhotoType(const QString& photoType)
 {
-    m_photoType = photoType;
+    d->photoType = photoType;
 }
 
 /// Returns the e-mail addresses.
 
 QList<QXmppVCardEmail> QXmppVCardIq::emails() const
 {
-    return m_emails;
+    return d->emails;
 }
 
 /// Sets the e-mail addresses.
 
 void QXmppVCardIq::setEmails(const QList<QXmppVCardEmail> &emails)
 {
-    m_emails = emails;
+    d->emails = emails;
 }
 
 /// \cond
@@ -359,26 +400,26 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
 {
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
-    m_birthday = QDate::fromString(cardElement.firstChildElement("BDAY").text(), "yyyy-MM-dd");
-    m_fullName = cardElement.firstChildElement("FN").text();
-    m_nickName = cardElement.firstChildElement("NICKNAME").text();
+    d->birthday = QDate::fromString(cardElement.firstChildElement("BDAY").text(), "yyyy-MM-dd");
+    d->fullName = cardElement.firstChildElement("FN").text();
+    d->nickName = cardElement.firstChildElement("NICKNAME").text();
     QDomElement nameElement = cardElement.firstChildElement("N");
-    m_firstName = nameElement.firstChildElement("GIVEN").text();
-    m_lastName = nameElement.firstChildElement("FAMILY").text();
-    m_middleName = nameElement.firstChildElement("MIDDLE").text();
-    m_url = cardElement.firstChildElement("URL").text();
+    d->firstName = nameElement.firstChildElement("GIVEN").text();
+    d->lastName = nameElement.firstChildElement("FAMILY").text();
+    d->middleName = nameElement.firstChildElement("MIDDLE").text();
+    d->url = cardElement.firstChildElement("URL").text();
     QDomElement photoElement = cardElement.firstChildElement("PHOTO");
     QByteArray base64data = photoElement.
                             firstChildElement("BINVAL").text().toAscii();
-    m_photo = QByteArray::fromBase64(base64data);
-    m_photoType = photoElement.firstChildElement("TYPE").text();
+    d->photo = QByteArray::fromBase64(base64data);
+    d->photoType = photoElement.firstChildElement("TYPE").text();
 
     QDomElement child = cardElement.firstChildElement();
     while (!child.isNull()) {
         if (child.tagName() == "EMAIL") {
             QXmppVCardEmail email;
             email.parse(child);
-            m_emails << email;
+            d->emails << email;
         }
         child = child.nextSiblingElement();
     }
@@ -388,38 +429,38 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     writer->writeAttribute("xmlns", ns_vcard);
-    if (m_birthday.isValid())
-        helperToXmlAddTextElement(writer, "BDAY", m_birthday.toString("yyyy-MM-dd"));
-    foreach (const QXmppVCardEmail &email, m_emails)
+    if (d->birthday.isValid())
+        helperToXmlAddTextElement(writer, "BDAY", d->birthday.toString("yyyy-MM-dd"));
+    foreach (const QXmppVCardEmail &email, d->emails)
         email.toXml(writer);
-    if (!m_fullName.isEmpty())
-        helperToXmlAddTextElement(writer, "FN", m_fullName);
-    if(!m_nickName.isEmpty())
-        helperToXmlAddTextElement(writer, "NICKNAME", m_nickName);
-    if (!m_firstName.isEmpty() ||
-        !m_lastName.isEmpty() ||
-        !m_middleName.isEmpty())
+    if (!d->fullName.isEmpty())
+        helperToXmlAddTextElement(writer, "FN", d->fullName);
+    if(!d->nickName.isEmpty())
+        helperToXmlAddTextElement(writer, "NICKNAME", d->nickName);
+    if (!d->firstName.isEmpty() ||
+        !d->lastName.isEmpty() ||
+        !d->middleName.isEmpty())
     {
         writer->writeStartElement("N");
-        if (!m_firstName.isEmpty())
-            helperToXmlAddTextElement(writer, "GIVEN", m_firstName);
-        if (!m_lastName.isEmpty())
-            helperToXmlAddTextElement(writer, "FAMILY", m_lastName);
-        if (!m_middleName.isEmpty())
-            helperToXmlAddTextElement(writer, "MIDDLE", m_middleName);
+        if (!d->firstName.isEmpty())
+            helperToXmlAddTextElement(writer, "GIVEN", d->firstName);
+        if (!d->lastName.isEmpty())
+            helperToXmlAddTextElement(writer, "FAMILY", d->lastName);
+        if (!d->middleName.isEmpty())
+            helperToXmlAddTextElement(writer, "MIDDLE", d->middleName);
         writer->writeEndElement();
     }
-    if (!m_url.isEmpty())
-        helperToXmlAddTextElement(writer, "URL", m_url);
+    if (!d->url.isEmpty())
+        helperToXmlAddTextElement(writer, "URL", d->url);
 
     if(!photo().isEmpty())
     {
         writer->writeStartElement("PHOTO");
-        QString photoType = m_photoType;
+        QString photoType = d->photoType;
         if (photoType.isEmpty())
-            photoType = getImageType(m_photo);
+            photoType = getImageType(d->photo);
         helperToXmlAddTextElement(writer, "TYPE", photoType);
-        helperToXmlAddTextElement(writer, "BINVAL", m_photo.toBase64());
+        helperToXmlAddTextElement(writer, "BINVAL", d->photo.toBase64());
         writer->writeEndElement();
     }
 
