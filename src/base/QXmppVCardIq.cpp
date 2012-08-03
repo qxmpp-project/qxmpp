@@ -48,6 +48,100 @@ static QString getImageType(const QByteArray &contents)
     return "image/unknown";
 }
 
+class QXmppVCardEmailPrivate : public QSharedData
+{
+public:
+    QXmppVCardEmailPrivate() : type(QXmppVCardEmail::None) {};
+    QString address;
+    QXmppVCardEmail::Type type;
+};
+
+/// Constructs an empty vCard e-mail address.
+
+QXmppVCardEmail::QXmppVCardEmail()
+    : d(new QXmppVCardEmailPrivate)
+{
+}
+
+/// Constructs a copy of \a other.
+
+QXmppVCardEmail::QXmppVCardEmail(const QXmppVCardEmail &other)
+    : d(other.d)
+{
+}
+
+QXmppVCardEmail::~QXmppVCardEmail()
+{
+}
+
+/// Assigns \a other to this vCard e-mail address.
+
+QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
+{
+    d = other.d;
+    return *this;
+}
+
+/// Returns the e-mail address.
+
+QString QXmppVCardEmail::address() const
+{
+    return d->address;
+}
+
+/// Sets the e-mail \a address.
+
+void QXmppVCardEmail::setAddress(const QString &address)
+{
+    d->address = address;
+}
+
+/// Returns the e-mail type, which is a combination of TypeFlag.
+
+QXmppVCardEmail::Type QXmppVCardEmail::type() const
+{
+    return d->type;
+}
+
+/// Sets the e-mail \a type, which is a combination of TypeFlag.
+
+void QXmppVCardEmail::setType(QXmppVCardEmail::Type type)
+{
+    d->type = type;
+}
+
+void QXmppVCardEmail::parse(const QDomElement &element)
+{
+    if (!element.firstChildElement("HOME").isNull())
+        d->type |= Home;
+    if (!element.firstChildElement("WORK").isNull())
+        d->type |= Work;
+    if (!element.firstChildElement("INTERNET").isNull())
+        d->type |= Internet;
+    if (!element.firstChildElement("PREF").isNull())
+        d->type |= Preferred;
+    if (!element.firstChildElement("X400").isNull())
+        d->type |= X400;
+    d->address = element.firstChildElement("USERID").text();
+}
+
+void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("EMAIL");
+    if (d->type & Home)
+        writer->writeEmptyElement("HOME");
+    if (d->type & Work)
+        writer->writeEmptyElement("WORK");
+    if (d->type & Internet)
+        writer->writeEmptyElement("INTERNET");
+    if (d->type & Preferred)
+        writer->writeEmptyElement("PREF");
+    if (d->type & X400)
+        writer->writeEmptyElement("X400");
+    writer->writeTextElement("USERID", d->address);
+    writer->writeEndElement();
+}
+
 /// Constructs a QXmppVCardIq for the specified recipient.
 ///
 /// \param jid

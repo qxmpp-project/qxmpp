@@ -26,6 +26,29 @@
 #include "tests.h"
 #include "vcard.h"
 
+void tst_QXmppVCardIq::testEmail_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<int>("type");
+
+    QTest::newRow("none") << QByteArray("<EMAIL><USERID>foo.bar@example.com</USERID></EMAIL>") << int(QXmppVCardEmail::None);
+    QTest::newRow("internet") << QByteArray("<EMAIL><INTERNET/><USERID>foo.bar@example.com</USERID></EMAIL>") << int(QXmppVCardEmail::Internet);
+    QTest::newRow("x400") << QByteArray("<EMAIL><X400/><USERID>foo.bar@example.com</USERID></EMAIL>") << int(QXmppVCardEmail::X400);
+    QTest::newRow("all") << QByteArray("<EMAIL><HOME/><WORK/><INTERNET/><PREF/><X400/><USERID>foo.bar@example.com</USERID></EMAIL>") << int(QXmppVCardEmail::Home | QXmppVCardEmail::Work | QXmppVCardEmail::Internet | QXmppVCardEmail::Preferred | QXmppVCardEmail::X400);
+}
+
+void tst_QXmppVCardIq::testEmail()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(int, type);
+
+    QXmppVCardEmail email;
+    parsePacket(email, xml);
+    QCOMPARE(email.address(), QLatin1String("foo.bar@example.com"));
+    QCOMPARE(int(email.type()), type);
+    serializePacket(email, xml);
+}
+
 void tst_QXmppVCardIq::testVCard()
 {
     const QByteArray xml(

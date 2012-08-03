@@ -30,7 +30,44 @@
 #include <QMap>
 #include <QDomElement>
 
-class QImage;
+class QXmppVCardEmailPrivate;
+
+/// \brief Represents a vCard e-mail address.
+
+class QXMPP_EXPORT QXmppVCardEmail
+{
+public:
+    /// \brief Describes e-mail address types.
+    enum TypeFlag {
+        None        = 0x0,
+        Home        = 0x1,
+        Work        = 0x2,
+        Internet    = 0x4,
+        Preferred   = 0x8,
+        X400        = 0x10
+    };
+    Q_DECLARE_FLAGS(Type, TypeFlag);
+
+    QXmppVCardEmail();
+    QXmppVCardEmail(const QXmppVCardEmail &other);
+    ~QXmppVCardEmail();
+
+    QXmppVCardEmail& operator=(const QXmppVCardEmail &other);
+
+    QString address() const;
+    void setAddress(const QString &address);
+
+    Type type() const;
+    void setType(Type type);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *stream) const;
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppVCardEmailPrivate> d;
+};
 
 /// \brief Represents the XMPP vCard.
 ///

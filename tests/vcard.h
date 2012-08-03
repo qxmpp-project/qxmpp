@@ -28,5 +28,7 @@ class tst_QXmppVCardIq : public QObject
     Q_OBJECT
 
 private slots:
+    void testEmail_data();
+    void testEmail();
     void testVCard();
 };
