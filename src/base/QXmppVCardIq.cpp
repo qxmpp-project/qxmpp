@@ -52,6 +52,11 @@ class QXmppVCardAddressPrivate : public QSharedData
 {
 public:
     QXmppVCardAddressPrivate() : type(QXmppVCardAddress::None) {};
+    QString country;
+    QString locality;
+    QString postcode;
+    QString region;
+    QString street;
     QXmppVCardAddress::Type type;
 };
 
@@ -81,6 +86,76 @@ QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
     return *this;
 }
 
+/// Returns the country.
+
+QString QXmppVCardAddress::country() const
+{
+    return d->country;
+}
+
+/// Sets the country.
+
+void QXmppVCardAddress::setCountry(const QString &country)
+{
+    d->country = country;
+}
+
+/// Returns the locality.
+
+QString QXmppVCardAddress::locality() const
+{
+    return d->locality;
+}
+
+/// Sets the locality.
+
+void QXmppVCardAddress::setLocality(const QString &locality)
+{
+    d->locality = locality;
+}
+
+/// Returns the postcode.
+
+QString QXmppVCardAddress::postcode() const
+{
+    return d->postcode;
+}
+
+/// Sets the postcode.
+
+void QXmppVCardAddress::setPostcode(const QString &postcode)
+{
+    d->postcode = postcode;
+}
+
+/// Returns the region.
+
+QString QXmppVCardAddress::region() const
+{
+    return d->region;
+}
+
+/// Sets the region.
+
+void QXmppVCardAddress::setRegion(const QString &region)
+{
+    d->region = region;
+}
+
+/// Returns the street address.
+
+QString QXmppVCardAddress::street() const
+{
+    return d->street;
+}
+
+/// Sets the street address.
+
+void QXmppVCardAddress::setStreet(const QString &street)
+{
+    d->street = street;
+}
+
 /// Returns the address type, which is a combination of TypeFlag.
 
 QXmppVCardAddress::Type QXmppVCardAddress::type() const
@@ -105,6 +180,12 @@ void QXmppVCardAddress::parse(const QDomElement &element)
         d->type |= Postal;
     if (!element.firstChildElement("PREF").isNull())
         d->type |= Preferred;
+
+    d->country = element.firstChildElement("CTRY").text();
+    d->locality = element.firstChildElement("LOCALITY").text();
+    d->postcode = element.firstChildElement("PCODE").text();
+    d->region = element.firstChildElement("REGION").text();
+    d->street = element.firstChildElement("STREET").text();
 }
 
 void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
@@ -118,6 +199,18 @@ void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
         writer->writeEmptyElement("POSTAL");
     if (d->type & Preferred)
         writer->writeEmptyElement("PREF");
+
+    if (!d->country.isEmpty())
+        writer->writeTextElement("CTRY", d->country);
+    if (!d->locality.isEmpty())
+        writer->writeTextElement("LOCALITY", d->locality);
+    if (!d->postcode.isEmpty())
+        writer->writeTextElement("PCODE", d->postcode);
+    if (!d->region.isEmpty())
+        writer->writeTextElement("REGION", d->region);
+    if (!d->street.isEmpty())
+        writer->writeTextElement("STREET", d->street);
+
     writer->writeEndElement();
 }
 

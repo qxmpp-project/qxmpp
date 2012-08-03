@@ -2,6 +2,7 @@ QXmpp 0.6.4 (UNRELEASED)
 ------------------------
 
   - Improve vCard support:
+    * Make it possible to have several addresses.
     * Make it possible to have several e-mail addresses.
     * Make it possible to have several phone numbers.
   - Make it possible to set the client's extended information form (XEP-0128).

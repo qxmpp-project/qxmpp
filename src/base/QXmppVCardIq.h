@@ -56,6 +56,21 @@ public:
 
     QXmppVCardAddress& operator=(const QXmppVCardAddress &other);
 
+    QString country() const;
+    void setCountry(const QString &country);
+
+    QString locality() const;
+    void setLocality(const QString &locality);
+
+    QString postcode() const;
+    void setPostcode(const QString &postcode);
+
+    QString region() const;
+    void setRegion(const QString &region);
+
+    QString street() const;
+    void setStreet(const QString &street);
+
     Type type() const;
     void setType(Type type);
 
