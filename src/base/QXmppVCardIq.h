@@ -114,6 +114,9 @@ public:
     QString url() const;
     void setUrl(const QString&);
 
+    QList<QXmppVCardEmail> emails() const;
+    void setEmails(const QList<QXmppVCardEmail> &emails);
+
     /// \cond
     static bool isVCard(const QDomElement &element);
     /// \endcond
@@ -126,7 +129,6 @@ protected:
 
 private:
     QDate m_birthday;
-    QString m_email;
     QString m_firstName;
     QString m_fullName;
     QString m_lastName;
@@ -137,6 +139,8 @@ private:
     // not as 64 base
     QByteArray m_photo;
     QString m_photoType;
+
+    QList<QXmppVCardEmail> m_emails;
 };
 
 #endif // QXMPPVCARDIQ_H

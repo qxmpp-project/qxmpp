@@ -84,5 +84,8 @@ void tst_QXmppVCardIq::testVCard()
         "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
         "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
     QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
+    QCOMPARE(vcard.emails().size(), 1);
+    QCOMPARE(vcard.emails()[0].address(), QLatin1String("foo.bar@example.com"));
+    QCOMPARE(int(vcard.emails()[0].type()), int(QXmppVCardEmail::Internet));
     serializePacket(vcard, xml);
 }

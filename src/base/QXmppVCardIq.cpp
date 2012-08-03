@@ -174,7 +174,10 @@ void QXmppVCardIq::setBirthday(const QDate &birthday)
 
 QString QXmppVCardIq::email() const
 {
-    return m_email;
+    if (m_emails.isEmpty())
+        return QString();
+    else
+        return m_emails.first().address();
 }
 
 /// Sets the email address.
@@ -183,7 +186,10 @@ QString QXmppVCardIq::email() const
 
 void QXmppVCardIq::setEmail(const QString &email)
 {
-    m_email = email;
+    QXmppVCardEmail first;
+    first.setAddress(email);
+    first.setType(QXmppVCardEmail::Internet);
+    m_emails = QList<QXmppVCardEmail>() << first;
 }
 
 /// Returns the first name.
@@ -329,6 +335,20 @@ void QXmppVCardIq::setPhotoType(const QString& photoType)
     m_photoType = photoType;
 }
 
+/// Returns the e-mail addresses.
+
+QList<QXmppVCardEmail> QXmppVCardIq::emails() const
+{
+    return m_emails;
+}
+
+/// Sets the e-mail addresses.
+
+void QXmppVCardIq::setEmails(const QList<QXmppVCardEmail> &emails)
+{
+    m_emails = emails;
+}
+
 /// \cond
 bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
 {
@@ -340,8 +360,6 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
     m_birthday = QDate::fromString(cardElement.firstChildElement("BDAY").text(), "yyyy-MM-dd");
-    QDomElement emailElement = cardElement.firstChildElement("EMAIL");
-    m_email = emailElement.firstChildElement("USERID").text();
     m_fullName = cardElement.firstChildElement("FN").text();
     m_nickName = cardElement.firstChildElement("NICKNAME").text();
     QDomElement nameElement = cardElement.firstChildElement("N");
@@ -354,6 +372,16 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
                             firstChildElement("BINVAL").text().toAscii();
     m_photo = QByteArray::fromBase64(base64data);
     m_photoType = photoElement.firstChildElement("TYPE").text();
+
+    QDomElement child = cardElement.firstChildElement();
+    while (!child.isNull()) {
+        if (child.tagName() == "EMAIL") {
+            QXmppVCardEmail email;
+            email.parse(child);
+            m_emails << email;
+        }
+        child = child.nextSiblingElement();
+    }
 }
 
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -362,13 +390,8 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute("xmlns", ns_vcard);
     if (m_birthday.isValid())
         helperToXmlAddTextElement(writer, "BDAY", m_birthday.toString("yyyy-MM-dd"));
-    if (!m_email.isEmpty())
-    {
-        writer->writeStartElement("EMAIL");
-        writer->writeEmptyElement("INTERNET");
-        helperToXmlAddTextElement(writer, "USERID", m_email);
-        writer->writeEndElement();
-    }
+    foreach (const QXmppVCardEmail &email, m_emails)
+        email.toXml(writer);
     if (!m_fullName.isEmpty())
         helperToXmlAddTextElement(writer, "FN", m_fullName);
     if(!m_nickName.isEmpty())
