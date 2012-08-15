@@ -216,10 +216,10 @@ public:
 
     QList<QXmppVCardAddress> addresses() const;
     void setAddresses(const QList<QXmppVCardAddress> &addresses);
-    
+
     QList<QXmppVCardEmail> emails() const;
     void setEmails(const QList<QXmppVCardEmail> &emails);
-    
+
     QList<QXmppVCardPhone> phones() const;
     void setPhones(const QList<QXmppVCardPhone> &phones);
 

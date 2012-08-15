@@ -100,7 +100,7 @@ void tst_QXmppVCardIq::testPhone_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("type");
-    
+
     QTest::newRow("none") << QByteArray("<PHONE><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::None);
     QTest::newRow("HOME") << QByteArray("<PHONE><HOME/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Home);
     QTest::newRow("WORK") << QByteArray("<PHONE><WORK/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Work);

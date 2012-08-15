@@ -296,7 +296,7 @@ class QXmppSaslServerPlain : public QXmppSaslServer
 public:
     QXmppSaslServerPlain(QObject *parent = 0);
     QString mechanism() const;
-    
+
     Response respond(const QByteArray &challenge, QByteArray &response);
 
 private:
