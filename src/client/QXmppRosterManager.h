@@ -102,11 +102,6 @@ signals:
     /// This signal is emitted when the presence of a particular bareJid and resource changes.
     void presenceChanged(const QString& bareJid, const QString& resource);
 
-    /// \cond
-    // deprecated in release 0.4.0
-    void rosterChanged(const QString& bareJid);
-    /// \endcond
-
     /// This signal is emitted when a contact asks to subscribe to your presence.
     ///
     /// You can either accept the request by calling acceptSubscription() or refuse it
