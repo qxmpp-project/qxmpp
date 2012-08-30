@@ -270,7 +270,7 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
                   receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
             // info result
             emit infoReceived(receivedIq);
-        } else if(receivedIq.type() == QXmppIq::Result &&
+        } else if(receivedIq.type() == QXmppIq::Result &&
                   receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
             // items result
             emit itemsReceived(receivedIq);
