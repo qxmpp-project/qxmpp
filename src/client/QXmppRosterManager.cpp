@@ -159,9 +159,6 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
                         // notify the user that the item changed
                         emit itemChanged(bareJid);
                     }
-
-                    // FIXME: remove legacy signal
-                    emit rosterChanged(bareJid);
                 }
             }
         }
@@ -172,8 +169,6 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
             foreach (const QXmppRosterIq::Item &item, items) {
                 const QString bareJid = item.bareJid();
                 d->entries.insert(bareJid, item);
-                if (!isInitial)
-                    emit rosterChanged(bareJid);
             }
             if (isInitial)
             {
