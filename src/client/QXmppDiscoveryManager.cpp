@@ -258,19 +258,23 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
 
         if(receivedIq.type() == QXmppIq::Get &&
            receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (receivedIq.queryNode().isEmpty() || receivedIq.queryNode().startsWith(d->clientCapabilitiesNode)))
-        {
+           (receivedIq.queryNode().isEmpty() ||
+            receivedIq.queryNode().startsWith(d->clientCapabilitiesNode))) {
             // respond to query
             QXmppDiscoveryIq qxmppFeatures = capabilities();
             qxmppFeatures.setId(receivedIq.id());
             qxmppFeatures.setTo(receivedIq.from());
             qxmppFeatures.setQueryNode(receivedIq.queryNode());
             client()->sendPacket(qxmppFeatures);
-        }
-        else if(receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery)
+        } else if(receivedIq.type() == QXmppIq::Result &&
+                  receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
+            // info result
             emit infoReceived(receivedIq);
-        else if(receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery)
+        } else if(receivedIq.type() == QXmppIq::Result &&
+                  receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
+            // items result
             emit itemsReceived(receivedIq);
+        }
 
         return true;
     }
