@@ -73,6 +73,10 @@ public:
     QString streamFrom;
     QString streamVersion;
 
+    // Redirection
+    QString redirectHost;
+    quint16 redirectPort;
+
     // Session
     QString bindId;
     QString sessionId;
@@ -92,7 +96,8 @@ private:
 };
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
-    : sessionAvailable(false)
+    : redirectPort(0)
+    , sessionAvailable(false)
     , saslClient(0)
     , q(qq)
 {
@@ -225,7 +230,13 @@ bool QXmppOutgoingClient::isConnected() const
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
-    emit disconnected();
+    if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
+        d->connectToHost(d->redirectHost, d->redirectPort);
+        d->redirectHost = QString();
+        d->redirectPort = 0;
+    } else {
+        emit disconnected();
+    }
 }
 
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)
@@ -415,6 +426,15 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
+        // handle redirects
+        QRegExp redirectRegex("([^:]+)(:[0-9]+)?");
+        if (redirectRegex.exactMatch(nodeRecv.firstChildElement("see-other-host").text())) {
+            d->redirectHost = redirectRegex.cap(0);
+            d->redirectPort = 5222; //hostPort.size() > 1 ? hostPort[1].toUShort() : 5222;
+            disconnectFromHost();
+            return;
+        }
+
         if (!nodeRecv.firstChildElement("conflict").isNull())
             d->xmppStreamError = QXmppStanza::Error::Conflict;
         else
