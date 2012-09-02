@@ -86,6 +86,7 @@ protected:
 
 private slots:
     void _q_dnsLookupFinished();
+    void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError>&);
 

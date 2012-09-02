@@ -236,4 +236,5 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
 void QXmppIncomingServer::slotSocketDisconnected()
 {
     info(QString("Socket disconnected from %1").arg(d->origin()));
+    emit disconnected();
 }

@@ -80,7 +80,6 @@ public slots:
 
 private slots:
     void _q_socketConnected();
-    void _q_socketDisconnected();
     void _q_socketEncrypted();
     void _q_socketError(QAbstractSocket::SocketError error);
     void _q_socketReadyRead();

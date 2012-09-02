@@ -64,6 +64,10 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
+    check = connect(socket, SIGNAL(disconnected()),
+                    this, SLOT(_q_socketDisconnected()));
+    Q_ASSERT(check);
+
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
                     this, SLOT(socketError(QAbstractSocket::SocketError)));
     Q_ASSERT(check);
@@ -132,6 +136,12 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     // connect to server
     info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
     socket()->connectToHost(host, port);
+}
+
+void QXmppOutgoingServer::_q_socketDisconnected()
+{
+    debug("Socket disconnected");
+    emit disconnected();
 }
 
 /// \cond

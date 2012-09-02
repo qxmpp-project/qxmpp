@@ -166,10 +166,6 @@ void QXmppStream::setSocket(QSslSocket *socket)
                     this, SLOT(_q_socketConnected()));
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(_q_socketDisconnected()));
-    Q_ASSERT(check);
-
     check = connect(socket, SIGNAL(encrypted()),
                     this, SLOT(_q_socketEncrypted()));
     Q_ASSERT(check);
@@ -180,11 +176,6 @@ void QXmppStream::setSocket(QSslSocket *socket)
     check = connect(socket, SIGNAL(readyRead()),
                     this, SLOT(_q_socketReadyRead()));
     Q_ASSERT(check);
-
-    // relay signals
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SIGNAL(disconnected()));
-    Q_ASSERT(check);
 }
 
 void QXmppStream::_q_socketConnected()
@@ -193,11 +184,6 @@ void QXmppStream::_q_socketConnected()
         d->socket->peerAddress().toString(),
         QString::number(d->socket->peerPort())));
     handleStart();
-}
-
-void QXmppStream::_q_socketDisconnected()
-{
-    debug("Socket disconnected");
 }
 
 void QXmppStream::_q_socketEncrypted()

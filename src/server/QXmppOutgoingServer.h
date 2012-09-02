@@ -70,6 +70,7 @@ public slots:
 
 private slots:
     void _q_dnsLookupFinished();
+    void _q_socketDisconnected();
     void sendDialback();
     void slotSslErrors(const QList<QSslError> &errors);
     void socketError(QAbstractSocket::SocketError error);

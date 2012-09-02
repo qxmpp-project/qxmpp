@@ -128,6 +128,10 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
+    check = connect(socket, SIGNAL(disconnected()),
+                    this, SLOT(_q_socketDisconnected()));
+    Q_ASSERT(check);
+
     check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
                     this, SLOT(socketSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
@@ -216,6 +220,12 @@ void QXmppOutgoingClient::_q_dnsLookupFinished()
 bool QXmppOutgoingClient::isConnected() const
 {
     return QXmppStream::isConnected() && d->sessionStarted;
+}
+
+void QXmppOutgoingClient::_q_socketDisconnected()
+{
+    debug("Socket disconnected");
+    emit disconnected();
 }
 
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)

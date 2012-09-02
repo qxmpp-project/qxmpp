@@ -449,6 +449,7 @@ void QXmppIncomingClient::onPasswordReply()
 void QXmppIncomingClient::onSocketDisconnected()
 {
     info(QString("Socket disconnected for '%1' from %2").arg(d->jid, d->origin()));
+    emit disconnected();
 }
 
 void QXmppIncomingClient::onTimeout()
