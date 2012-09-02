@@ -2,6 +2,7 @@ QXmpp 0.6.4 (UNRELEASED)
 ------------------------
 
   - Improve vCard support:
+    * Add support for free-form descriptive text.
     * Make it possible to have several addresses.
     * Make it possible to have several e-mail addresses.
     * Make it possible to have several phone numbers.
