@@ -137,6 +137,7 @@ void tst_QXmppVCardIq::testVCard()
         "<vCard xmlns=\"vcard-temp\">"
         "<ADR><CTRY>France</CTRY></ADR>"
         "<BDAY>1983-09-14</BDAY>"
+        "<DESC>I like XMPP.</DESC>"
         "<EMAIL><INTERNET/><USERID>foo.bar@example.com</USERID></EMAIL>"
         "<FN>Foo Bar!</FN>"
         "<NICKNAME>FooBar</NICKNAME>"
@@ -161,6 +162,7 @@ void tst_QXmppVCardIq::testVCard()
     QCOMPARE(vcard.addresses()[0].country(), QLatin1String("France"));
     QCOMPARE(int(vcard.addresses()[0].type()), int(QXmppVCardEmail::None));
     QCOMPARE(vcard.birthday(), QDate(1983, 9, 14));
+    QCOMPARE(vcard.description(), QLatin1String("I like XMPP."));
     QCOMPARE(vcard.email(), QLatin1String("foo.bar@example.com"));
     QCOMPARE(vcard.emails().size(), 1);
     QCOMPARE(vcard.emails()[0].address(), QLatin1String("foo.bar@example.com"));

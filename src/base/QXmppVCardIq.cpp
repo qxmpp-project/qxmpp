@@ -438,6 +438,7 @@ class QXmppVCardIqPrivate : public QSharedData
 {
 public:
     QDate birthday;
+    QString description;
     QString firstName;
     QString fullName;
     QString lastName;
@@ -502,6 +503,20 @@ QDate QXmppVCardIq::birthday() const
 void QXmppVCardIq::setBirthday(const QDate &birthday)
 {
     d->birthday = birthday;
+}
+
+/// Returns the free-form descriptive text.
+
+QString QXmppVCardIq::description() const
+{
+    return d->description;
+}
+
+/// Sets the free-form descriptive text.
+
+void QXmppVCardIq::setDescription(const QString &description)
+{
+    d->description = description;
 }
 
 /// Returns the email address.
@@ -722,6 +737,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
     d->birthday = QDate::fromString(cardElement.firstChildElement("BDAY").text(), "yyyy-MM-dd");
+    d->description = cardElement.firstChildElement("DESC").text();
     d->fullName = cardElement.firstChildElement("FN").text();
     d->nickName = cardElement.firstChildElement("NICKNAME").text();
     QDomElement nameElement = cardElement.firstChildElement("N");
@@ -762,6 +778,8 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         address.toXml(writer);
     if (d->birthday.isValid())
         helperToXmlAddTextElement(writer, "BDAY", d->birthday.toString("yyyy-MM-dd"));
+    if (!d->description.isEmpty())
+        helperToXmlAddTextElement(writer, "DESC", d->description);
     foreach (const QXmppVCardEmail &email, d->emails)
         email.toXml(writer);
     if (!d->fullName.isEmpty())

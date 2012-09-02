@@ -187,6 +187,9 @@ public:
     QDate birthday() const;
     void setBirthday(const QDate &birthday);
 
+    QString description() const;
+    void setDescription(const QString &description);
+
     QString email() const;
     void setEmail(const QString&);
 
