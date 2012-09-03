@@ -493,6 +493,7 @@ QString QXmppSaslClientWindowsLive::mechanism() const
 
 bool QXmppSaslClientWindowsLive::respond(const QByteArray &challenge, QByteArray &response)
 {
+    Q_UNUSED(challenge);
     if (m_step == 0) {
         // send initial response
         response = QByteArray::fromBase64(password().toLatin1());
