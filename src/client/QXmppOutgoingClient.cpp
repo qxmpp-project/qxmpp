@@ -395,6 +395,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             if (d->saslClient->mechanism() == "X-FACEBOOK-PLATFORM") {
                 d->saslClient->setUsername(configuration().facebookAppId());
                 d->saslClient->setPassword(configuration().facebookAccessToken());
+            } else if (d->saslClient->mechanism() == "X-MESSENGER-OAUTH2") {
+                d->saslClient->setPassword(configuration().windowsLiveAccessToken());
             } else {
                 d->saslClient->setUsername(configuration().user());
                 d->saslClient->setPassword(configuration().password());

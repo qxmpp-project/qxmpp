@@ -12,6 +12,7 @@ QXmpp 0.6.4 (UNRELEASED)
   - Fix issues:
     * Issue 144: QXmppBookmarkConference autojoin parsing
   - Add support for see-other-host server change.
+  - Add support for X-MESSENGER-OAUTH2 authentication for Windows Live Messenger.
   - Remove deprecated QXmppRosterManager::rosterChanged().
 
 QXmpp 0.6.3 (Jul 24, 2012)

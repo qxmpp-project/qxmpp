@@ -43,6 +43,9 @@ public:
     QString facebookAccessToken;
     QString facebookAppId;
 
+    // Windows Live
+    QString windowsLiveAccessToken;
+
     // default is false
     bool autoAcceptSubscriptions;
     // default is true
@@ -326,6 +329,25 @@ QString QXmppConfiguration::facebookAppId() const
 void QXmppConfiguration::setFacebookAppId(const QString& appId)
 {
     d->facebookAppId = appId;
+}
+
+/// Returns the access token used for X-MESSENGER-OAUTH2 authentication.
+
+QString QXmppConfiguration::windowsLiveAccessToken() const
+{
+    return d->windowsLiveAccessToken;
+}
+
+/// Sets the access token used for X-MESSENGER-OAUTH2 authentication.
+///
+/// This token is returned by Windows Live at the end of the OAuth authentication
+/// process.
+///
+/// \param accessToken
+
+void QXmppConfiguration::setWindowsLiveAccessToken(const QString& accessToken)
+{
+    d->windowsLiveAccessToken = accessToken;
 }
 
 /// Returns the auto-accept-subscriptions-request configuration.

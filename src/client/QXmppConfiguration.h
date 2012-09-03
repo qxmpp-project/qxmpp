@@ -107,6 +107,9 @@ public:
     QString facebookAppId() const;
     void setFacebookAppId(const QString&);
 
+    QString windowsLiveAccessToken() const;
+    void setWindowsLiveAccessToken(const QString &accessToken);
+
     bool autoAcceptSubscriptions() const;
     void setAutoAcceptSubscriptions(bool);
 
