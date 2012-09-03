@@ -122,7 +122,7 @@ private:
 
 /// \brief Represents a vCard phone number.
 
-class QXmppVCardPhone
+class QXMPP_EXPORT QXmppVCardPhone
 {
 public:
     /// \brief Describes phone number types.
