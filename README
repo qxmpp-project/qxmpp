@@ -45,17 +45,10 @@ Installing from the command line:
 <respective-make-cmd = gmake, make, mingw32-make, nmake> install
 
 Path of installations:
-    Linux:
-    -----
-    Headers:            /usr/include/qxmpp
-    Library:            /usr/lib
-    API Documentation:  /usr/share/doc/qxmpp
 
-    Windows: [Note much of use though]
-    -----
-    Headers:            %QTDIR%\include\qxmpp
-    Library:            %QTDIR%\lib
-    API Documentation:  %QTDIR%\share\doc\qxmpp\html
+    Headers:            PREFIX/include/qxmpp
+    Library:            PREFIX/lib
+    API Documentation:  PREFIX/share/doc/qxmpp
 
 To link against the shared version of QXmpp, you need to add -DQXMPP_SHARED
 to your C++ flags.
