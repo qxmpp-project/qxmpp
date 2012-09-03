@@ -194,8 +194,8 @@ public:
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
 
 protected:
+    void extensionsToXml(QXmlStreamWriter *writer) const;
     void generateAndSetNextId();
-    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
 
 private:

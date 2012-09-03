@@ -456,8 +456,8 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     }
 
     // other extensions
-    foreach (const QXmppElement &extension, extensions())
-        extension.toXml(xmlWriter);
+    QXmppStanza::extensionsToXml(xmlWriter);
+
     xmlWriter->writeEndElement();
 }
 /// \endcond

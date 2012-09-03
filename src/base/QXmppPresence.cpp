@@ -316,8 +316,8 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    foreach (const QXmppElement &extension, extensions())
-        extension.toXml(xmlWriter);
+    // other extensions
+    QXmppStanza::extensionsToXml(xmlWriter);
 
     xmlWriter->writeEndElement();
 }

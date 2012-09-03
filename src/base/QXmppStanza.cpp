@@ -606,15 +606,8 @@ void QXmppStanza::parse(const QDomElement &element)
     }
 }
 
-void QXmppStanza::toXmlElementFromChild(QXmlStreamWriter *xmlWriter) const
+void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const
 {
-    helperToXmlAddAttribute(xmlWriter, "xml:lang", d->lang);
-    helperToXmlAddAttribute(xmlWriter, "id", d->id);
-    helperToXmlAddAttribute(xmlWriter, "to", d->to);
-    helperToXmlAddAttribute(xmlWriter, "from", d->from);
-
-    d->error.toXml(xmlWriter);
-
     // XEP-0033: Extended Stanza Addressing
     if (!d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
@@ -623,6 +616,10 @@ void QXmppStanza::toXmlElementFromChild(QXmlStreamWriter *xmlWriter) const
             address.toXml(xmlWriter);
         xmlWriter->writeEndElement();
     }
+
+    // other extensions
+    foreach (const QXmppElement &extension, d->extensions)
+        extension.toXml(xmlWriter);
 }
 
 /// \endcond
