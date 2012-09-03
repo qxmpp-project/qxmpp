@@ -192,10 +192,10 @@ public:
     /// \cond
     virtual void parse(const QDomElement &element);
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
-    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 protected:
     void generateAndSetNextId();
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
 
 private:
