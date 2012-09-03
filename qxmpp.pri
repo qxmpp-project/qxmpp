@@ -48,14 +48,10 @@ contains(QXMPP_LIBRARY_TYPE,staticlib) {
 
 # Installation prefix and library directory
 isEmpty(PREFIX) {
-    contains(MEEGO_EDITION,harmattan) {
-        PREFIX = /usr
-    } else:unix {
-        PREFIX = /usr/local
-    }
+    PREFIX = $$[QT_INSTALL_PREFIX]
 }
 isEmpty(LIBDIR) {
-    LIBDIR=lib
+    LIBDIR = lib
 }
 
 # Internal API auto-tests
