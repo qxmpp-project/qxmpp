@@ -73,7 +73,7 @@ public:
 
     /// \cond
     void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer);
+    void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
 private:

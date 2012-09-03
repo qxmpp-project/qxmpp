@@ -145,7 +145,7 @@ void QXmppExtendedAddress::parse(const QDomElement &element)
     d->type = element.attribute("type");
 }
 
-void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter)
+void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement("address");
     if (d->delivered)
