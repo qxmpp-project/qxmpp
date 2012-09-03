@@ -41,12 +41,11 @@
 
 class QXmppExtendedAddressPrivate;
 
-/// \brief Represents an extended address as in XEP-0033.
+/// \brief Represents an extended address as defined by XEP-0033: Extended Stanza Addressing.
 ///
-/// Extended addresses maybe of different types. While XEP-0033 explicitly defines
-/// some of them, other XEPs introduce other types (like the Remote Controlling
-/// Clients XEP, for example). That's why extended address' type is a string rather
-/// then a member of some enum.
+/// Extended addresses maybe of different types: some are defined by XEP-0033,
+/// others are defined in separate XEPs (for instance XEP-0146: Remote Controlling Clients).
+/// That is why the "type" property is a string rather than an enumerated type.
 
 class QXMPP_EXPORT QXmppExtendedAddress
 {
