@@ -1,3 +1,8 @@
+QXmpp 0.7.1 (Sep 3, 2012)
+-------------------------
+
+  - Fix export of QXmppVCardPhone class.
+
 QXmpp 0.7.0 (Sep 3, 2012)
 -------------------------
 
