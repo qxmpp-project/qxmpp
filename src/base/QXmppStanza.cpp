@@ -425,6 +425,7 @@ public:
     QString lang;
     QXmppStanza::Error error;
     QXmppElementList extensions;
+    QList<QXmppExtendedAddress> extendedAddresses;
 };
 
 /// Constructs a QXmppStanza with the specified sender and recipient.
@@ -559,6 +560,22 @@ void QXmppStanza::setExtensions(const QXmppElementList &extensions)
     d->extensions = extensions;
 }
 
+/// Returns the stanza's extended addresses as defined by
+/// XEP-0033: Extended Stanza Addressing.
+
+QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
+{
+    return d->extendedAddresses;
+}
+
+/// Sets the stanza's extended addresses as defined by
+/// XEP-0033: Extended Stanza Addressing.
+
+void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addresses)
+{
+    d->extendedAddresses = addresses;
+}
+
 /// \cond
 void QXmppStanza::generateAndSetNextId()
 {
@@ -577,5 +594,35 @@ void QXmppStanza::parse(const QDomElement &element)
     QDomElement errorElement = element.firstChildElement("error");
     if(!errorElement.isNull())
         d->error.parse(errorElement);
+
+    // XEP-0033: Extended Stanza Addressing
+    QDomElement addressElement = element.firstChildElement("addresses").firstChildElement("address");
+    while (!addressElement.isNull()) {
+        QXmppExtendedAddress address;
+        address.parse(addressElement);
+        if (address.isValid())
+            d->extendedAddresses << address;
+        addressElement = addressElement.nextSiblingElement("address");
+    }
 }
+
+void QXmppStanza::toXmlElementFromChild(QXmlStreamWriter *xmlWriter) const
+{
+    helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
+    helperToXmlAddAttribute(xmlWriter, "id", id());
+    helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "from", from());
+
+    d->error.toXml(xmlWriter);
+
+    // XEP-0033: Extended Stanza Addressing
+    if (!extendedAddresses().isEmpty()) {
+        xmlWriter->writeStartElement("addresses");
+        xmlWriter->writeAttribute("xmlns", ns_extended_addressing);
+        foreach (const QXmppExtendedAddress &address, extendedAddresses())
+            address.toXml(xmlWriter);
+        xmlWriter->writeEndElement();
+    }
+}
+
 /// \endcond

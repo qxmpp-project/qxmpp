@@ -186,9 +186,13 @@ public:
     QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);
 
+    QList<QXmppExtendedAddress> extendedAddresses() const;
+    void setExtendedAddresses(const QList<QXmppExtendedAddress> &extendedAddresses);
+
     /// \cond
     virtual void parse(const QDomElement &element);
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
+    virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 protected:
     void generateAndSetNextId();
