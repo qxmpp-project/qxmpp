@@ -137,6 +137,7 @@ public:
     void connectToServer(const QXmppConfiguration&,
                          const QXmppPresence& initialPresence =
                          QXmppPresence());
+    bool isAuthenticated() const;
     bool isConnected() const;
 
     QXmppPresence clientPresence() const;

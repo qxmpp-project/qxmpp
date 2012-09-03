@@ -53,6 +53,7 @@ public:
     ~QXmppOutgoingClient();
 
     void connectToHost();
+    bool isAuthenticated() const;
     bool isConnected() const;
 
     QSslSocket *socket() const { return QXmppStream::socket(); };

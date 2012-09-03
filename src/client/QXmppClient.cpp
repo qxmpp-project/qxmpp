@@ -348,6 +348,13 @@ void QXmppClient::disconnectFromServer()
     d->stream->disconnectFromHost();
 }
 
+/// Returns true if the client has authenticated with the XMPP server.
+
+bool QXmppClient::isAuthenticated() const
+{
+    return d->stream->isAuthenticated();
+}
+
 /// Returns true if the client is connected to the XMPP server.
 ///
 

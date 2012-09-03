@@ -84,6 +84,7 @@ public:
     bool sessionStarted;
 
     // Authentication
+    bool isAuthenticated;
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
 
@@ -98,6 +99,7 @@ private:
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : redirectPort(0)
     , sessionAvailable(false)
+    , isAuthenticated(false)
     , saslClient(0)
     , q(qq)
 {
@@ -219,6 +221,13 @@ void QXmppOutgoingClient::_q_dnsLookupFinished()
     }
 }
 
+/// Returns true if authentication has succeeded.
+
+bool QXmppOutgoingClient::isAuthenticated() const
+{
+    return d->isAuthenticated;
+}
+
 /// Returns true if the socket is connected and a session has been started.
 
 bool QXmppOutgoingClient::isConnected() const
@@ -229,6 +238,7 @@ bool QXmppOutgoingClient::isConnected() const
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
+    d->isAuthenticated = false;
     if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
         d->connectToHost(d->redirectHost, d->redirectPort);
         d->redirectHost = QString();
@@ -477,6 +487,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         if(nodeRecv.tagName() == "success")
         {
             debug("Authenticated");
+            d->isAuthenticated = true;
             handleStart();
         }
         else if(nodeRecv.tagName() == "challenge")
@@ -570,6 +581,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 // successful Non-SASL Authentication
                 debug("Authenticated (Non-SASL)");
+                d->isAuthenticated = true;
 
                 // xmpp connection made
                 d->sessionStarted = true;

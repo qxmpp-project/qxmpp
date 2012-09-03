@@ -21,6 +21,8 @@ QXmpp 0.6.4 (UNRELEASED)
   - Add support for see-other-host server change.
   - Add support for X-MESSENGER-OAUTH2 authentication for Windows Live Messenger.
   - Make it possible to disable non-SASL authentication.
+  - Add QXmppClient::isAuthenticated() to query whether authentication has been
+    performed.
 
 QXmpp 0.6.3 (Jul 24, 2012)
 --------------------------
