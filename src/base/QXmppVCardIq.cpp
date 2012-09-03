@@ -170,6 +170,7 @@ void QXmppVCardAddress::setType(QXmppVCardAddress::Type type)
     d->type = type;
 }
 
+/// \cond
 void QXmppVCardAddress::parse(const QDomElement &element)
 {
     if (!element.firstChildElement("HOME").isNull())
@@ -213,6 +214,7 @@ void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
+/// \endcond
 
 class QXmppVCardEmailPrivate : public QSharedData
 {
@@ -276,6 +278,7 @@ void QXmppVCardEmail::setType(QXmppVCardEmail::Type type)
     d->type = type;
 }
 
+/// \cond
 void QXmppVCardEmail::parse(const QDomElement &element)
 {
     if (!element.firstChildElement("HOME").isNull())
@@ -307,6 +310,7 @@ void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
     writer->writeTextElement("USERID", d->address);
     writer->writeEndElement();
 }
+/// \endcond
 
 class QXmppVCardPhonePrivate : public QSharedData
 {
@@ -370,6 +374,7 @@ void QXmppVCardPhone::setType(QXmppVCardPhone::Type type)
     d->type = type;
 }
 
+/// \cond
 void QXmppVCardPhone::parse(const QDomElement &element)
 {
     if (!element.firstChildElement("HOME").isNull())
@@ -433,6 +438,7 @@ void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
     writer->writeTextElement("NUMBER", d->number);
     writer->writeEndElement();
 }
+/// \endcond
 
 class QXmppVCardIqPrivate : public QSharedData
 {

@@ -137,6 +137,7 @@ bool QXmppExtendedAddress::isValid() const
     return !d->type.isEmpty() && !d->jid.isEmpty();
 }
 
+/// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
     d->delivered = element.attribute("delivered") == "true";
@@ -156,6 +157,7 @@ void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeAttribute("type", d->type);
     xmlWriter->writeEndElement();
 }
+/// \endcond
 
 QXmppStanza::Error::Error():
     m_code(0),
