@@ -1,6 +1,9 @@
 QXmpp 0.6.4 (UNRELEASED)
 ------------------------
 
+  - New XEPs
+    * XEP-0033: Extended Stanza Addressing
+
   - Improve vCard support:
     * Add support for free-form descriptive text.
     * Make it possible to have several addresses.
