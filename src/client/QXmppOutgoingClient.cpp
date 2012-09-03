@@ -220,7 +220,6 @@ void QXmppOutgoingClient::_q_dnsLookupFinished()
 }
 
 /// Returns true if the socket is connected and a session has been started.
-///
 
 bool QXmppOutgoingClient::isConnected() const
 {
@@ -405,9 +404,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
             sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
+            return;
         } else if(nonSaslAvailable && configuration().useNonSASLAuthentication()) {
             sendNonSASLAuthQuery();
+            return;
         }
+
+        // store whether session is available
+        d->sessionAvailable = (features.sessionMode() != QXmppStreamFeatures::Disabled);
 
         // check whether bind is available
         if (features.bindMode() != QXmppStreamFeatures::Disabled)
@@ -417,11 +421,23 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             bind.setResource(configuration().resource());
             d->bindId = bind.id();
             sendPacket(bind);
+            return;
         }
 
         // check whether session is available
-        if (features.sessionMode() != QXmppStreamFeatures::Disabled)
-            d->sessionAvailable = true;
+        if (d->sessionAvailable)
+        {
+            // start session if it is available
+            QXmppSessionIq session;
+            session.setType(QXmppIq::Set);
+            session.setTo(configuration().domain());
+            d->sessionId = session.id();
+            sendPacket(session);
+        } else {
+            // otherwise we are done
+            d->sessionStarted = true;
+            emit connected();
+        }
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
@@ -532,14 +548,18 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         }
                     }
 
-                    // start session if it is available
                     if (d->sessionAvailable)
                     {
+                        // start session if it is available
                         QXmppSessionIq session;
                         session.setType(QXmppIq::Set);
                         session.setTo(configuration().domain());
                         d->sessionId = session.id();
                         sendPacket(session);
+                    } else {
+                        // otherwise we are done
+                        d->sessionStarted = true;
+                        emit connected();
                     }
                 }
             }
