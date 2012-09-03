@@ -20,6 +20,7 @@ QXmpp 0.6.4 (UNRELEASED)
     * Issue 144: QXmppBookmarkConference autojoin parsing
   - Add support for see-other-host server change.
   - Add support for X-MESSENGER-OAUTH2 authentication for Windows Live Messenger.
+  - Make it possible to disable non-SASL authentication.
 
 QXmpp 0.6.3 (Jul 24, 2012)
 --------------------------

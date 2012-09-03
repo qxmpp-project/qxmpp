@@ -119,6 +119,9 @@ public:
     bool useSASLAuthentication() const;
     void setUseSASLAuthentication(bool);
 
+    bool useNonSASLAuthentication() const;
+    void setUseNonSASLAuthentication(bool);
+
     bool ignoreSslErrors() const;
     void setIgnoreSslErrors(bool);
 

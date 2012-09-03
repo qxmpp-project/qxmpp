@@ -353,13 +353,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // handle authentication
         const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
-        const bool useSasl = configuration().useSASLAuthentication();
-        if((saslAvailable && nonSaslAvailable && !useSasl) ||
-           (!saslAvailable && nonSaslAvailable))
-        {
-            sendNonSASLAuthQuery();
-        }
-        else if(saslAvailable)
+        if (saslAvailable && configuration().useSASLAuthentication())
         {
             // supported and preferred SASL auth mechanisms
             const QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
@@ -410,6 +404,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 return;
             }
             sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
+        } else if(nonSaslAvailable && configuration().useNonSASLAuthentication()) {
+            sendNonSASLAuthQuery();
         }
 
         // check whether bind is available
