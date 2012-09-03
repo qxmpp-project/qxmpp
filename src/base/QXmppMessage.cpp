@@ -382,10 +382,8 @@ void QXmppMessage::parse(const QDomElement &element)
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement("message");
-    helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
+    QXmppStanza::toXmlElementFromChild(xmlWriter);
+
     helperToXmlAddAttribute(xmlWriter, "type", message_types[d->type]);
     if (!d->subject.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "subject", d->subject);
@@ -393,7 +391,6 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddTextElement(xmlWriter, "body", d->body);
     if (!d->thread.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "thread", d->thread);
-    error().toXml(xmlWriter);
 
     // chat states
     if (d->state > None && d->state <= Paused)
