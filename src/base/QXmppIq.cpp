@@ -123,10 +123,12 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 {
     xmlWriter->writeStartElement("iq");
 
-    QXmppStanza::toXmlElementFromChild(xmlWriter);
+    helperToXmlAddAttribute(xmlWriter, "id", id());
+    helperToXmlAddAttribute(xmlWriter, "to", to());
+    helperToXmlAddAttribute(xmlWriter, "from", from());
     helperToXmlAddAttribute(xmlWriter, "type", iq_types[d->type]);
     toXmlElementFromChild(xmlWriter);
-
+    error().toXml(xmlWriter);
     xmlWriter->writeEndElement();
 }
 

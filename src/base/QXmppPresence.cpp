@@ -260,10 +260,14 @@ void QXmppPresence::parse(const QDomElement &element)
 void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement("presence");
-    QXmppStanza::toXmlElementFromChild(xmlWriter);
-
+    helperToXmlAddAttribute(xmlWriter,"xml:lang", lang());
+    helperToXmlAddAttribute(xmlWriter,"id", id());
+    helperToXmlAddAttribute(xmlWriter,"to", to());
+    helperToXmlAddAttribute(xmlWriter,"from", from());
     helperToXmlAddAttribute(xmlWriter,"type", presence_types[d->type]);
     d->status.toXml(xmlWriter);
+
+    error().toXml(xmlWriter);
 
     // XEP-0045: Multi-User Chat
     if(!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty())
