@@ -531,7 +531,8 @@ void QXmppClient::_q_streamConnected()
     emit stateChanged(QXmppClient::ConnectedState);
 
     // send initial presence
-    sendPacket(d->clientPresence);
+    if (d->stream->isAuthenticated())
+        sendPacket(d->clientPresence);
 }
 
 void QXmppClient::_q_streamDisconnected()

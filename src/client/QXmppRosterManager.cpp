@@ -105,7 +105,8 @@ void QXmppRosterManager::_q_connected()
     roster.setType(QXmppIq::Get);
     roster.setFrom(client()->configuration().jid());
     d->rosterReqId = roster.id();
-    client()->sendPacket(roster);
+    if (client()->isAuthenticated())
+        client()->sendPacket(roster);
 }
 
 void QXmppRosterManager::_q_disconnected()
