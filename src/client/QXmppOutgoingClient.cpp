@@ -430,7 +430,10 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         QRegExp redirectRegex("([^:]+)(:[0-9]+)?");
         if (redirectRegex.exactMatch(nodeRecv.firstChildElement("see-other-host").text())) {
             d->redirectHost = redirectRegex.cap(0);
-            d->redirectPort = 5222; //hostPort.size() > 1 ? hostPort[1].toUShort() : 5222;
+            if (!redirectRegex.cap(2).isEmpty())
+                d->redirectPort = redirectRegex.cap(2).mid(1).toUShort();
+            else
+                d->redirectPort = 5222;
             disconnectFromHost();
             return;
         }
