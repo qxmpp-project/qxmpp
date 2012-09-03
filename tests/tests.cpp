@@ -56,6 +56,7 @@
 #include "rsm.h"
 #include "rtp.h"
 #include "sasl.h"
+#include "stanza.h"
 #include "stun.h"
 #include "tests.h"
 #include "vcard.h"
@@ -936,6 +937,9 @@ int main(int argc, char *argv[])
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);
+
+    tst_QXmppStanza testStanza;
+    errors += QTest::qExec(&testStanza);
 
     TestStun testStun;
     errors += QTest::qExec(&testStun);

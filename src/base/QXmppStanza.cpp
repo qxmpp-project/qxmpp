@@ -1,8 +1,10 @@
 /*
  * Copyright (C) 2008-2012 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
+ *  Georg Rudoy
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -30,6 +32,130 @@
 #include <QXmlStreamWriter>
 
 uint QXmppStanza::s_uniqeIdNo = 0;
+
+class QXmppExtendedAddressPrivate : public QSharedData
+{
+public:
+    bool delivered;
+    QString description;
+    QString jid;
+    QString type;
+};
+
+/// Constructs an empty extended address.
+
+QXmppExtendedAddress::QXmppExtendedAddress()
+    : d(new QXmppExtendedAddressPrivate())
+{
+    d->delivered = false;
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+///
+QXmppExtendedAddress::QXmppExtendedAddress(const QXmppExtendedAddress &other)
+    : d(other.d)
+{
+}
+
+QXmppExtendedAddress::~QXmppExtendedAddress()
+{
+}
+
+/// Assigns the other address to this one.
+///
+/// \param other
+///
+QXmppExtendedAddress& QXmppExtendedAddress::operator=(const QXmppExtendedAddress& other)
+{
+    d = other.d;
+    return *this;
+}
+
+/// Returns the human-readable description of the address.
+
+QString QXmppExtendedAddress::description() const
+{
+    return d->description;
+}
+
+/// Sets the human-readable \a description of the address.
+
+void QXmppExtendedAddress::setDescription(const QString &description)
+{
+    d->description = description;
+}
+
+/// Returns the JID of the address.
+
+QString QXmppExtendedAddress::jid() const
+{
+    return d->jid;
+}
+
+/// Sets the JID of the address.
+
+void QXmppExtendedAddress::setJid(const QString &jid)
+{
+    d->jid = jid;
+}
+
+/// Returns the type of the address.
+
+QString QXmppExtendedAddress::type() const
+{
+    return d->type;
+}
+
+/// Sets the \a type of the address.
+
+void QXmppExtendedAddress::setType(const QString &type)
+{
+    d->type = type;
+}
+
+/// Returns whether the stanza has been delivered to this address.
+
+bool QXmppExtendedAddress::isDelivered() const
+{
+    return d->delivered;
+}
+
+/// Sets whether the stanza has been \a delivered to this address.
+
+void QXmppExtendedAddress::setDelivered(bool delivered)
+{
+    d->delivered = delivered;
+}
+
+/// Checks whether this address is valid. The extended address is considered
+/// to be valid if at least type and JID fields are non-empty.
+
+bool QXmppExtendedAddress::isValid() const
+{
+    return !d->type.isEmpty() && !d->jid.isEmpty();
+}
+
+void QXmppExtendedAddress::parse(const QDomElement &element)
+{
+    d->delivered = element.attribute("delivered") == "true";
+    d->description = element.attribute("desc");
+    d->jid = element.attribute("jid");
+    d->type = element.attribute("type");
+}
+
+void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("address");
+    if (d->delivered)
+        xmlWriter->writeAttribute("delivered", "true");
+    if (!d->description.isEmpty())
+        xmlWriter->writeAttribute("desc", d->description);
+    xmlWriter->writeAttribute("jid", d->jid);
+    xmlWriter->writeAttribute("type", d->type);
+    xmlWriter->writeEndElement();
+}
 
 QXmppStanza::Error::Error():
     m_code(0),

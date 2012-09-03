@@ -1,8 +1,10 @@
 /*
  * Copyright (C) 2008-2012 The QXmpp developers
  *
- * Author:
+ * Authors:
  *  Manjeet Dahiya
+ *  Jeremy Lainé
+ *  Georg Rudoy
  *
  * Source:
  *  http://code.google.com/p/qxmpp
@@ -36,6 +38,47 @@
 #include <QXmlStreamWriter>
 
 #include "QXmppElement.h"
+
+class QXmppExtendedAddressPrivate;
+
+/// \brief Represents an extended address as in XEP-0033.
+///
+/// Extended addresses maybe of different types. While XEP-0033 explicitly defines
+/// some of them, other XEPs introduce other types (like the Remote Controlling
+/// Clients XEP, for example). That's why extended address' type is a string rather
+/// then a member of some enum.
+
+class QXMPP_EXPORT QXmppExtendedAddress
+{
+public:
+    QXmppExtendedAddress();
+    QXmppExtendedAddress(const QXmppExtendedAddress&);
+    ~QXmppExtendedAddress();
+
+    QXmppExtendedAddress& operator=(const QXmppExtendedAddress&);
+
+    QString description() const;
+    void setDescription(const QString &description);
+
+    QString jid() const;
+    void setJid(const QString &jid);
+
+    QString type() const;
+    void setType(const QString &type);
+
+    bool isDelivered() const;
+    void setDelivered(bool);
+
+    bool isValid() const;
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer);
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppExtendedAddressPrivate> d;
+};
 
 class QXmppStanzaPrivate;
 
