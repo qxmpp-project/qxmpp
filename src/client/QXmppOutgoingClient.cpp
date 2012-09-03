@@ -295,9 +295,10 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
         d->streamVersion = streamElement.attribute("version");
 
         // no version specified, signals XMPP Version < 1.0.
-        // switch to old auth mechanism
-        if(d->streamVersion.isEmpty())
+        // switch to old auth mechanism if enabled
+        if(d->streamVersion.isEmpty() && configuration().useNonSASLAuthentication()) {
             sendNonSASLAuthQuery();
+        }
     }
 }
 
