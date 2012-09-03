@@ -10,3 +10,5 @@ Jeremy Lainé <jeremy.laine@m4x.org>
 Ian Reinhart Geiser <geiseri@kde.org>
  * Initial author of Jabber-RPC support.
 
+Georg Rudoy <0xd34df00d@gmail.com>
+ * Author of receipts manager, extended stanza addressing.
