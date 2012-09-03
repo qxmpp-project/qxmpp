@@ -143,19 +143,6 @@ public:
     QList<QSslCertificate> caCertificates() const;
     void setCaCertificates(const QList<QSslCertificate> &);
 
-    /// \cond
-    // deprecated since 0.6.0
-    enum SASLAuthMechanism
-    {
-        SASLPlain = 0,
-        SASLDigestMD5,
-        SASLAnonymous,
-        SASLXFacebookPlatform
-    };
-    QXmppConfiguration::SASLAuthMechanism Q_DECL_DEPRECATED sASLAuthMechanism() const;
-    void Q_DECL_DEPRECATED setSASLAuthMechanism(QXmppConfiguration::SASLAuthMechanism);
-    /// \endcond
-
 private:
     QSharedDataPointer<QXmppConfigurationPrivate> d;
 };

@@ -1,8 +1,12 @@
 QXmpp 0.6.4 (UNRELEASED)
 ------------------------
 
-  - New XEPs
+  - New XEPs:
     * XEP-0033: Extended Stanza Addressing
+
+  - Remove deprecated APIs:
+    * QXmppRosterManager::rosterChanged()
+    * QXmppConfiguration::sASLAuthMechanism()
 
   - Improve vCard support:
     * Add support for free-form descriptive text.
