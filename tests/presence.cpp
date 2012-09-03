@@ -129,6 +129,28 @@ void tst_QXmppPresence::testPresenceWithCapability()
     serializePacket(presence, xml);
 }
 
+void tst_QXmppPresence::testPresenceWithExtendedAddresses()
+{
+    const QByteArray xml(
+        "<presence to=\"multicast.jabber.org\" from=\"hildjj@jabber.com\" type=\"unavailable\">"
+            "<addresses xmlns=\"http://jabber.org/protocol/address\">"
+                "<address jid=\"temas@jabber.org\" type=\"bcc\"/>"
+                "<address jid=\"jer@jabber.org\" type=\"bcc\"/>"
+            "</addresses>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.extendedAddresses().size(), 2);
+    QCOMPARE(presence.extendedAddresses()[0].description(), QString());
+    QCOMPARE(presence.extendedAddresses()[0].jid(), QLatin1String("temas@jabber.org"));
+    QCOMPARE(presence.extendedAddresses()[0].type(), QLatin1String("bcc"));
+    QCOMPARE(presence.extendedAddresses()[1].description(), QString());
+    QCOMPARE(presence.extendedAddresses()[1].jid(), QLatin1String("jer@jabber.org"));
+    QCOMPARE(presence.extendedAddresses()[1].type(), QLatin1String("bcc"));
+    serializePacket(presence, xml);
+}
+
 void tst_QXmppPresence::testPresenceWithMuc()
 {
     const QByteArray xml(

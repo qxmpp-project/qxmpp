@@ -77,6 +77,7 @@ void tst_QXmppMessage::testBasic()
     parsePacket(message, xml);
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(int(message.type()), type);
     QCOMPARE(message.body(), body);
     QCOMPARE(message.subject(), subject);
@@ -100,6 +101,7 @@ void tst_QXmppMessage::testMessageAttention()
     parsePacket(message, xml);
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
     QCOMPARE(message.body(), QString());
     QCOMPARE(message.isAttentionRequested(), true);
@@ -121,6 +123,7 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(message.id(), QString("richard2-4.1.247"));
     QCOMPARE(message.to(), QString("kingrichard@royalty.england.lit/throne"));
     QCOMPARE(message.from(), QString("northumberland@shakespeare.lit/westminster"));
+    QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
     QCOMPARE(message.body(), QString("My lord, dispatch; read o'er these articles."));
     QCOMPARE(message.isAttentionRequested(), false);
@@ -138,6 +141,7 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(receipt.id(), QString("bi29sg183b4v"));
     QCOMPARE(receipt.to(), QString("northumberland@shakespeare.lit/westminster"));
     QCOMPARE(receipt.from(), QString("kingrichard@royalty.england.lit/throne"));
+    QVERIFY(receipt.extendedAddresses().isEmpty());
     QCOMPARE(receipt.type(), QXmppMessage::Normal);
     QCOMPARE(receipt.body(), QString());
     QCOMPARE(receipt.isAttentionRequested(), false);
@@ -155,6 +159,7 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(old.id(), QString("richard2-4.1.247"));
     QCOMPARE(old.to(), QString("northumberland@shakespeare.lit/westminster"));
     QCOMPARE(old.from(), QString("kingrichard@royalty.england.lit/throne"));
+    QVERIFY(old.extendedAddresses().isEmpty());
     QCOMPARE(old.type(), QXmppMessage::Normal);
     QCOMPARE(old.body(), QString());
     QCOMPARE(old.isAttentionRequested(), false);
@@ -188,6 +193,28 @@ void tst_QXmppMessage::testDelay()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.stamp(), stamp);
+    serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testExtendedAddresses()
+{
+    QByteArray xml(
+        "<message to=\"multicast.jabber.org\" type=\"normal\">"
+            "<addresses xmlns=\"http://jabber.org/protocol/address\">"
+                "<address desc=\"Joe Hildebrand\" jid=\"hildjj@jabber.org/Work\" type=\"to\"/>"
+                "<address desc=\"Jeremie Miller\" jid=\"jer@jabber.org/Home\" type=\"cc\"/>"
+            "</addresses>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.extendedAddresses().size(), 2);
+    QCOMPARE(message.extendedAddresses()[0].description(), QLatin1String("Joe Hildebrand"));
+    QCOMPARE(message.extendedAddresses()[0].jid(), QLatin1String("hildjj@jabber.org/Work"));
+    QCOMPARE(message.extendedAddresses()[0].type(), QLatin1String("to"));
+    QCOMPARE(message.extendedAddresses()[1].description(), QLatin1String("Jeremie Miller"));
+    QCOMPARE(message.extendedAddresses()[1].jid(), QLatin1String("jer@jabber.org/Home"));
+    QCOMPARE(message.extendedAddresses()[1].type(), QLatin1String("cc"));
     serializePacket(message, xml);
 }
 

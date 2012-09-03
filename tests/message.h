@@ -35,6 +35,7 @@ private slots:
     void testMessageReceipt();
     void testDelay_data();
     void testDelay();
+    void testExtendedAddresses();
     void testState_data();
     void testState();
     void testXhtml();

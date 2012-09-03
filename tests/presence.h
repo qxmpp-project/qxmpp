@@ -32,6 +32,7 @@ private slots:
     void testPresence();
     void testPresence_data();
     void testPresenceWithCapability();
+    void testPresenceWithExtendedAddresses();
     void testPresenceWithMuc();
 };
 
