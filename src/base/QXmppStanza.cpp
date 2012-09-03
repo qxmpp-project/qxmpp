@@ -608,18 +608,18 @@ void QXmppStanza::parse(const QDomElement &element)
 
 void QXmppStanza::toXmlElementFromChild(QXmlStreamWriter *xmlWriter) const
 {
-    helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
+    helperToXmlAddAttribute(xmlWriter, "xml:lang", d->lang);
+    helperToXmlAddAttribute(xmlWriter, "id", d->id);
+    helperToXmlAddAttribute(xmlWriter, "to", d->to);
+    helperToXmlAddAttribute(xmlWriter, "from", d->from);
 
     d->error.toXml(xmlWriter);
 
     // XEP-0033: Extended Stanza Addressing
-    if (!extendedAddresses().isEmpty()) {
+    if (!d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
         xmlWriter->writeAttribute("xmlns", ns_extended_addressing);
-        foreach (const QXmppExtendedAddress &address, extendedAddresses())
+        foreach (const QXmppExtendedAddress &address, d->extendedAddresses)
             address.toXml(xmlWriter);
         xmlWriter->writeEndElement();
     }
