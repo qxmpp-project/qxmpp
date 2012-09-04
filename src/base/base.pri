@@ -1,7 +1,5 @@
 # Header files
 INSTALL_HEADERS += \
-    base/qdnslookup.h \
-    base/qdnslookup_p.h \
     base/QXmppArchiveIq.h \
     base/QXmppBindIq.h \
     base/QXmppBookmarkSet.h \
@@ -83,8 +81,12 @@ SOURCES += \
     base/QXmppVersionIq.cpp
 
 # DNS
-SOURCES += base/qdnslookup.cpp
-android:SOURCES += base/qdnslookup_stub.cpp
-else:symbian:SOURCES += base/qdnslookup_symbian.cpp
-else:unix:SOURCES += base/qdnslookup_unix.cpp
-else:win32:SOURCES += base/qdnslookup_win.cpp
+qt_version = $$QT_MAJOR_VERSION
+contains(qt_version, 4) {
+    INSTALL_HEADERS += base/qdnslookup.h base/qdnslookup_p.h
+    SOURCES += base/qdnslookup.cpp
+    android:SOURCES += base/qdnslookup_stub.cpp
+    else:symbian:SOURCES += base/qdnslookup_symbian.cpp
+    else:unix:SOURCES += base/qdnslookup_unix.cpp
+    else:win32:SOURCES += base/qdnslookup_win.cpp
+}
