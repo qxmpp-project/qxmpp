@@ -256,6 +256,9 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         QXmppDiscoveryIq receivedIq;
         receivedIq.parse(element);
 
+        const bool isReplyType = receivedIq.type() == QXmppIq::Result ||
+                receivedIq.type() == QXmppIq::Error;
+
         if(receivedIq.type() == QXmppIq::Get &&
            receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
            (receivedIq.queryNode().isEmpty() ||
@@ -266,11 +269,11 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
             qxmppFeatures.setTo(receivedIq.from());
             qxmppFeatures.setQueryNode(receivedIq.queryNode());
             client()->sendPacket(qxmppFeatures);
-        } else if(receivedIq.type() == QXmppIq::Result &&
+        } else if(isReplyType &&
                   receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
             // info result
             emit infoReceived(receivedIq);
-        } else if(receivedIq.type() == QXmppIq::Result &&
+        } else if(isReplyType &&
                   receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
             // items result
             emit itemsReceived(receivedIq);
