@@ -1,3 +1,9 @@
+QXmpp 0.7.2 (Unreleased)
+-------------------------
+
+  - Handle Error replies in QXmppDiscoveryManager so that library users can know
+    about errors.
+
 QXmpp 0.7.1 (Sep 3, 2012)
 -------------------------
 
