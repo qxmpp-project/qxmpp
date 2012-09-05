@@ -208,9 +208,11 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
+    if (d->discoManager) {
+        check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                        this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
+        Q_ASSERT(check);
+    }
 
     // convenience signals for properties
     check = connect(this, SIGNAL(joined()), this, SIGNAL(isJoinedChanged()));
