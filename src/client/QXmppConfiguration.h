@@ -107,6 +107,9 @@ public:
     QString facebookAppId() const;
     void setFacebookAppId(const QString&);
 
+    QString googleAccessToken() const;
+    void setGoogleAccessToken(const QString &accessToken);
+
     QString windowsLiveAccessToken() const;
     void setWindowsLiveAccessToken(const QString &accessToken);
 

@@ -240,6 +240,17 @@ private:
     int m_step;
 };
 
+class QXmppSaslClientGoogle : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientGoogle(QObject *parent = 0);
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    int m_step;
+};
+
 class QXmppSaslClientPlain : public QXmppSaslClient
 {
 public:

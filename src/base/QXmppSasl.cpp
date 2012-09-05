@@ -230,7 +230,7 @@ QXmppSaslClient::~QXmppSaslClient()
 
 QStringList QXmppSaslClient::availableMechanisms()
 {
-    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2";
+    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2";
 }
 
 /// Creates an SASL client for the given mechanism.
@@ -247,6 +247,8 @@ QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism, QObject *pare
         return new QXmppSaslClientFacebook(parent);
     } else if (mechanism == "X-MESSENGER-OAUTH2") {
         return new QXmppSaslClientWindowsLive(parent);
+    } else if (mechanism == "X-OAUTH2") {
+        return new QXmppSaslClientGoogle(parent);
     } else {
         return 0;
     }
@@ -452,6 +454,31 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         return true;
     } else {
         warning("QXmppSaslClientFacebook : Invalid step");
+        return false;
+    }
+}
+
+QXmppSaslClientGoogle::QXmppSaslClientGoogle(QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_step(0)
+{
+}
+
+QString QXmppSaslClientGoogle::mechanism() const
+{
+    return "X-OAUTH2";
+}
+
+bool QXmppSaslClientGoogle::respond(const QByteArray &challenge, QByteArray &response)
+{
+    Q_UNUSED(challenge);
+    if (m_step == 0) {
+        // send initial response
+        response = QString('\0' + username() + '\0' + password()).toUtf8();
+        m_step++;
+        return true;
+    } else {
+        warning("QXmppSaslClientGoogle : Invalid step");
         return false;
     }
 }

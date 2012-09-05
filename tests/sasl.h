@@ -50,6 +50,7 @@ private slots:
     void testDigestMd5();
     void testDigestMd5_data();
     void testFacebook();
+    void testGoogle();
     void testPlain();
     void testWindowsLive();
 };

@@ -43,6 +43,9 @@ public:
     QString facebookAccessToken;
     QString facebookAppId;
 
+    // Google
+    QString googleAccessToken;
+
     // Windows Live
     QString windowsLiveAccessToken;
 
@@ -329,6 +332,25 @@ QString QXmppConfiguration::facebookAppId() const
 void QXmppConfiguration::setFacebookAppId(const QString& appId)
 {
     d->facebookAppId = appId;
+}
+
+/// Returns the access token used for X-OAUTH2 authentication.
+
+QString QXmppConfiguration::googleAccessToken() const
+{
+    return d->googleAccessToken;
+}
+
+/// Sets the access token used for X-OAUTH2 authentication.
+///
+/// This token is returned by Google at the end of the OAuth authentication
+/// process.
+///
+/// \param accessToken
+
+void QXmppConfiguration::setGoogleAccessToken(const QString& accessToken)
+{
+    d->googleAccessToken = accessToken;
 }
 
 /// Returns the access token used for X-MESSENGER-OAUTH2 authentication.
