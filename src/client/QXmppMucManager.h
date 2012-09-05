@@ -188,6 +188,7 @@ signals:
     void subjectChanged(const QString &subject);
 
 public slots:
+    bool ban(const QString &jid, const QString &reason);
     bool join();
     bool kick(const QString &jid, const QString &reason);
     bool leave(const QString &message = QString());

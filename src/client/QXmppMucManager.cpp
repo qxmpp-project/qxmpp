@@ -226,6 +226,41 @@ QXmppMucRoom::Actions QXmppMucRoom::allowedActions() const
     return d->allowedActions;
 }
 
+/// Bans the specified user from the chat room.
+///
+/// The specified \a jid can be either an "anonymized" room participant JID
+/// such of the form theroom@conference.example.com/nickname or a real JID.
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::ban(const QString &jid, const QString &reason)
+{
+    QString realJid;
+    if (QXmppUtils::jidToBareJid(jid) == d->jid) {
+        // an "anonymized" JID was specified, look up the real JID
+        if (d->participants.contains(jid))
+            realJid = d->participants.value(jid).mucItem().jid();
+        if (realJid.isEmpty()) {
+            qWarning("Coud not determine real JID for %s", qPrintable(jid));
+            return false;
+        }
+    } else {
+        realJid = jid;
+    }
+
+    QXmppMucItem item;
+    item.setAffiliation(QXmppMucItem::OutcastAffiliation);
+    item.setJid(realJid);
+    item.setReason(reason);
+
+    QXmppMucAdminIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.setTo(d->jid);
+    iq.setItems(QList<QXmppMucItem>() << item);
+
+    return d->client->sendPacket(iq);
+}
+
 /// Returns true if you are currently in the room.
 
 bool QXmppMucRoom::isJoined() const
