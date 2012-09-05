@@ -228,29 +228,20 @@ QXmppMucRoom::Actions QXmppMucRoom::allowedActions() const
 
 /// Bans the specified user from the chat room.
 ///
-/// The specified \a jid can be either an "anonymized" room participant JID
-/// such of the form theroom@conference.example.com/nickname or a real JID.
+/// The specified \a jid is the Bare JID of the form "user@host".
 ///
 /// \return true if the request was sent, false otherwise
 
 bool QXmppMucRoom::ban(const QString &jid, const QString &reason)
 {
-    QString realJid;
-    if (QXmppUtils::jidToBareJid(jid) == d->jid) {
-        // an "anonymized" JID was specified, look up the real JID
-        if (d->participants.contains(jid))
-            realJid = d->participants.value(jid).mucItem().jid();
-        if (realJid.isEmpty()) {
-            qWarning("Coud not determine real JID for %s", qPrintable(jid));
-            return false;
-        }
-    } else {
-        realJid = jid;
+    if (!QXmppUtils::jidToResource(jid).isEmpty()) {
+        qWarning("QXmppMucRoom::ban expects a bare JID");
+        return false;
     }
 
     QXmppMucItem item;
     item.setAffiliation(QXmppMucItem::OutcastAffiliation);
-    item.setJid(realJid);
+    item.setJid(jid);
     item.setReason(reason);
 
     QXmppMucAdminIq iq;
