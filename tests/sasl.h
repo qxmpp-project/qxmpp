@@ -51,6 +51,7 @@ private slots:
     void testDigestMd5_data();
     void testFacebook();
     void testPlain();
+    void testWindowsLive();
 };
 
 class tst_QXmppSaslServer : public QObject

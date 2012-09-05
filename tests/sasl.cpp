@@ -153,7 +153,7 @@ void tst_QXmppSasl::testSuccess()
 
 void tst_QXmppSaslClient::testAvailableMechanisms()
 {
-    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM");
+    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2");
 }
 
 void tst_QXmppSaslClient::testBadMechanism()
@@ -256,6 +256,25 @@ void tst_QXmppSaslClient::testPlain()
     QByteArray response;
     QVERIFY(client->respond(QByteArray(), response));
     QCOMPARE(response, QByteArray("\0foo\0bar", 8));
+
+    // any further step is an error
+    QVERIFY(!client->respond(QByteArray(), response));
+
+    delete client;
+}
+
+void tst_QXmppSaslClient::testWindowsLive()
+{
+    QXmppSaslClient *client = QXmppSaslClient::create("X-MESSENGER-OAUTH2");
+    QVERIFY(client != 0);
+    QCOMPARE(client->mechanism(), QLatin1String("X-MESSENGER-OAUTH2"));
+
+    client->setPassword(QByteArray("footoken").toBase64());
+
+    // initial step returns data
+    QByteArray response;
+    QVERIFY(client->respond(QByteArray(), response));
+    QCOMPARE(response, QByteArray("footoken", 8));
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray(), response));
