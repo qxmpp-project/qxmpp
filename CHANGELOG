@@ -4,7 +4,9 @@ QXmpp 0.7.2 (Unreleased)
   - Handle Error replies in QXmppDiscoveryManager so that library users can know
     about errors.
   - If building with Qt 5, use Qt's QDnsLookup instead of our backport.
-  - Add QXmppMucRoom::ban() slot to ban users.
+  - Improve MUC scritability:
+    * Add QXmppMucRoom::ban() to ban users.
+    * Add QXmppMucRoom::participantFullJid() to lookup an occupant full JID.
 
 QXmpp 0.7.1 (Sep 3, 2012)
 -------------------------

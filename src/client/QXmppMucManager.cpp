@@ -304,8 +304,7 @@ bool QXmppMucRoom::join()
 
 /// Kicks the specified user from the chat room.
 ///
-/// \param jid
-/// \param reason
+/// The specified \a jid is the Occupant JID of the form "room@service/nick".
 ///
 /// \return true if the request was sent, false otherwise
 
@@ -403,6 +402,18 @@ void QXmppMucRoom::setNickName(const QString &nickName)
         packet.setType(QXmppPresence::Available);
         d->client->sendPacket(packet);
     }
+}
+
+/// Returns the "Full JID" of the given participant.
+///
+/// The specified \a jid is the Occupant JID of the form "room@service/nick".
+
+QString QXmppMucRoom::participantFullJid(const QString &jid) const
+{
+    if (d->participants.contains(jid))
+        return d->participants.value(jid).mucItem().jid();
+    else
+        return QString();
 }
 
 /// Returns the presence for the given participant.

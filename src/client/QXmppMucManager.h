@@ -130,6 +130,7 @@ public:
     QString nickName() const;
     void setNickName(const QString &nickName);
 
+    Q_INVOKABLE QString participantFullJid(const QString &jid) const;
     QXmppPresence participantPresence(const QString &jid) const;
     QStringList participants() const;
 
