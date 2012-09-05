@@ -29,6 +29,7 @@
 #include "QXmppPresence.h"
 
 class QXmppDataForm;
+class QXmppDiscoveryIq;
 class QXmppMessage;
 class QXmppMucManagerPrivate;
 class QXmppMucRoom;
@@ -104,6 +105,7 @@ class QXMPP_EXPORT QXmppMucRoom : public QObject
     Q_PROPERTY(QXmppMucRoom::Actions allowedActions READ allowedActions NOTIFY allowedActionsChanged)
     Q_PROPERTY(bool isJoined READ isJoined NOTIFY isJoinedChanged)
     Q_PROPERTY(QString jid READ jid CONSTANT)
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString nickName READ nickName WRITE setNickName NOTIFY nickNameChanged)
     Q_PROPERTY(QStringList participants READ participants NOTIFY participantsChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword)
@@ -126,6 +128,7 @@ public:
     Actions allowedActions() const;
     bool isJoined() const;
     QString jid() const;
+    QString name() const;
 
     QString nickName() const;
     void setNickName(const QString &nickName);
@@ -166,6 +169,9 @@ signals:
     /// This signal is emitted when a message is received.
     void messageReceived(const QXmppMessage &message);
 
+    /// This signal is emitted when the room's human-readable name changes.
+    void nameChanged(const QString &name);
+
     /// This signal is emitted when your own nick name changes.
     void nickNameChanged(const QString &nickName);
 
@@ -202,6 +208,7 @@ public slots:
 
 private slots:
     void _q_disconnected();
+    void _q_discoveryInfoReceived(const QXmppDiscoveryIq &iq);
     void _q_messageReceived(const QXmppMessage &message);
     void _q_presenceReceived(const QXmppPresence &presence);
 

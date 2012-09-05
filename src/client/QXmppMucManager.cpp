@@ -26,6 +26,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
@@ -42,8 +43,10 @@ class QXmppMucRoomPrivate
 public:
     QString ownJid() const { return jid + "/" + nickName; }
     QXmppClient *client;
+    QXmppDiscoveryManager *discoManager;
     QXmppMucRoom::Actions allowedActions;
     QString jid;
+    QString name;
     QMap<QString, QXmppPresence> participants;
     QString password;
     QMap<QString, QXmppMucItem> permissions;
@@ -190,6 +193,7 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     d = new QXmppMucRoomPrivate;
     d->allowedActions = NoAction;
     d->client = client;
+    d->discoManager = client->findExtension<QXmppDiscoveryManager>();
     d->jid = jid;
 
     check = connect(d->client, SIGNAL(disconnected()),
@@ -202,6 +206,10 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
 
     check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
+
+    check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                    this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     // convenience signals for properties
@@ -327,6 +335,15 @@ bool QXmppMucRoom::leave(const QString &message)
     packet.setType(QXmppPresence::Unavailable);
     packet.setStatusText(message);
     return d->client->sendPacket(packet);
+}
+
+/// Returns the chat room's human-readable name.
+///
+/// This name will only be available after the room has been joined.
+
+QString QXmppMucRoom::name() const
+{
+    return d->name;
 }
 
 /// Returns your own nickname.
@@ -585,6 +602,22 @@ void QXmppMucRoom::_q_disconnected()
         emit left();
 }
 
+void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
+{
+    QString name;
+    foreach (const QXmppDiscoveryIq::Identity &identity, iq.identities()) {
+        if (identity.category() == "conference") {
+            name = identity.name();
+            break;
+        }
+    }
+
+    if (name != d->name) {
+        d->name = name;
+        emit nameChanged(name);
+    }
+}
+
 void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
 {
     if (QXmppUtils::jidToBareJid(message.from())!= d->jid)
@@ -643,8 +676,13 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
         if (added) {
             emit participantAdded(jid);
             emit participantsChanged();
-            if (jid == d->ownJid())
+            if (jid == d->ownJid()) {
+                // request room information
+                if (d->discoManager)
+                    d->discoManager->requestInfo(d->jid);
+
                 emit joined();
+            }
         } else {
             emit participantChanged(jid);
         }
