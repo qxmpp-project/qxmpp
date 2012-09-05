@@ -409,7 +409,7 @@ QString QXmppMucRoom::participantFullJid(const QString &jid) const
 
 /// Returns the presence for the given participant.
 ///
-/// \param jid
+/// The specified \a jid is the Occupant JID of the form "room@service/nick".
 
 QXmppPresence QXmppMucRoom::participantPresence(const QString &jid) const
 {
@@ -423,6 +423,8 @@ QXmppPresence QXmppMucRoom::participantPresence(const QString &jid) const
 }
 
 /// Returns the list of participant JIDs.
+///
+/// These JIDs are Occupant JIDs of the form "room@service/nick".
 
 QStringList QXmppMucRoom::participants() const
 {
