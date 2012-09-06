@@ -1,3 +1,8 @@
+QXmpp 0.7.3 (UNRELEASED)
+------------------------
+
+  - Fix QXmppMucRoom::name(), only consider discovery IQs from the room.
+
 QXmpp 0.7.2 (Sep 6, 2012)
 -------------------------
 

@@ -606,17 +606,19 @@ void QXmppMucRoom::_q_disconnected()
 
 void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
 {
-    QString name;
-    foreach (const QXmppDiscoveryIq::Identity &identity, iq.identities()) {
-        if (identity.category() == "conference") {
-            name = identity.name();
-            break;
+    if (iq.from() == d->jid) {
+        QString name;
+        foreach (const QXmppDiscoveryIq::Identity &identity, iq.identities()) {
+            if (identity.category() == "conference") {
+                name = identity.name();
+                break;
+            }
         }
-    }
 
-    if (name != d->name) {
-        d->name = name;
-        emit nameChanged(name);
+        if (name != d->name) {
+            d->name = name;
+            emit nameChanged(name);
+        }
     }
 }
 
