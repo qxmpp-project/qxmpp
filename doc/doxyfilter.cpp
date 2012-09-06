@@ -107,6 +107,10 @@ int main(int argc, char *argv[])
         QString code = QString::fromUtf8(source.readAll());
         source.close();
 
+        // add links for RFCs
+        QRegExp rfcRegexp("(RFC ([0-9]{4})(: [^\\s.]+( [A-Z][^\\s.]*)*)?)");
+        code.replace(rfcRegexp, "<a href=\"http://www.rfc-editor.org/rfc/rfc\\2.txt\">\\1</a>");
+
         // add links for XEPs
         QRegExp regexp("(XEP-([0-9]{4})(: [^\\s.]+( [A-Z][^\\s.]*)*)?)");
         code.replace(regexp, "<a href=\"http://xmpp.org/extensions/xep-\\2.html\">\\1</a>");
