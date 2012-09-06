@@ -137,6 +137,11 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
         port = 5269;
     }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
+    // set the name the SSL certificate should match
+    socket()->setPeerVerifyName(d->remoteDomain);
+#endif
+
     // connect to server
     info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
     socket()->connectToHost(host, port);

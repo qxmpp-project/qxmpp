@@ -8,6 +8,7 @@ QXmpp 0.7.2 (Unreleased)
     * Add QXmppMucRoom::ban() to ban users.
     * Add QXmppMucRoom::name() to get the room's human-readable name.
     * Add QXmppMucRoom::participantFullJid() to lookup an occupant full JID.
+  - With Qt >= 4.8, verify peer SSL certificate against domain name as specified by RFC 3920.
 
 QXmpp 0.7.1 (Sep 3, 2012)
 -------------------------
