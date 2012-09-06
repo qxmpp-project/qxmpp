@@ -256,30 +256,38 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         QXmppDiscoveryIq receivedIq;
         receivedIq.parse(element);
 
-        const bool isReplyType = receivedIq.type() == QXmppIq::Result ||
-                receivedIq.type() == QXmppIq::Error;
+        switch (receivedIq.type()) {
+        case QXmppIq::Get:
+            if (receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
+                (receivedIq.queryNode().isEmpty() ||
+                 receivedIq.queryNode().startsWith(d->clientCapabilitiesNode))) {
 
-        if(receivedIq.type() == QXmppIq::Get &&
-           receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-           (receivedIq.queryNode().isEmpty() ||
-            receivedIq.queryNode().startsWith(d->clientCapabilitiesNode))) {
-            // respond to query
-            QXmppDiscoveryIq qxmppFeatures = capabilities();
-            qxmppFeatures.setId(receivedIq.id());
-            qxmppFeatures.setTo(receivedIq.from());
-            qxmppFeatures.setQueryNode(receivedIq.queryNode());
-            client()->sendPacket(qxmppFeatures);
-        } else if(isReplyType &&
-                  receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
-            // info result
-            emit infoReceived(receivedIq);
-        } else if(isReplyType &&
-                  receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
-            // items result
-            emit itemsReceived(receivedIq);
+                // respond to info queries for the client itself
+                QXmppDiscoveryIq qxmppFeatures = capabilities();
+                qxmppFeatures.setId(receivedIq.id());
+                qxmppFeatures.setTo(receivedIq.from());
+                qxmppFeatures.setQueryNode(receivedIq.queryNode());
+                client()->sendPacket(qxmppFeatures);
+                return true;
+            } else {
+                // let other managers handle other queries
+                return false;
+            }
+
+        case QXmppIq::Result:
+        case QXmppIq::Error:
+            // handle all replies
+            if (receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
+                emit infoReceived(receivedIq);
+            } else if (receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
+                emit itemsReceived(receivedIq);
+            }
+            return true;
+
+        case QXmppIq::Set:
+            // let other manager handle "set" IQs
+            return false;
         }
-
-        return true;
     }
     return false;
 }
