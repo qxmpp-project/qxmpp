@@ -29,7 +29,7 @@
 #include "QXmppIq.h"
 
 /// \brief The QXmppBindIq class represents an IQ used for resource
-/// binding as defined by RFC 5921.
+/// binding as defined by RFC 3921.
 ///
 /// \ingroup Stanzas
 
