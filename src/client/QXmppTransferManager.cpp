@@ -61,6 +61,7 @@ public:
     QDateTime date;
     QByteArray hash;
     QString name;
+    QString description;
     qint64 size;
 };
 
@@ -111,6 +112,16 @@ QString QXmppTransferFileInfo::name() const
 void QXmppTransferFileInfo::setName(const QString &name)
 {
     d->name = name;
+}
+
+QString QXmppTransferFileInfo::description() const
+{
+    return d->description;
+}
+
+void QXmppTransferFileInfo::setDescription(const QString &description)
+{
+    d->description = description;
 }
 
 qint64 QXmppTransferFileInfo::size() const
@@ -1252,7 +1263,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
-QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &sid)
+QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &sid, const QString &description)
 {
     if (jid.isEmpty()) {
         warning("Refusing to send file to an empty jid");
@@ -1265,6 +1276,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     fileInfo.setDate(info.lastModified());
     fileInfo.setName(info.fileName());
     fileInfo.setSize(info.size());
+    fileInfo.setDescription(description);
 
     // open file
     QIODevice *device = new QFile(filePath);
@@ -1343,6 +1355,13 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     file.setAttribute("hash", job->fileHash().toHex());
     file.setAttribute("name", job->fileName());
     file.setAttribute("size", QString::number(job->fileSize()));
+    if (!fileInfo.description().isEmpty())
+    {
+        QXmppElement desc;
+        desc.setTagName("desc");
+        desc.setValue(fileInfo.description());
+        file.appendChild(desc);
+    }
     items.append(file);
 
     QXmppElement feature;
@@ -1628,6 +1647,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
             job->d->fileInfo.setHash(QByteArray::fromHex(item.attribute("hash").toAscii()));
             job->d->fileInfo.setName(item.attribute("name"));
             job->d->fileInfo.setSize(item.attribute("size").toLongLong());
+            job->d->fileInfo.setDescription(item.firstChildElement("desc").value());
         }
     }
 
