@@ -94,6 +94,8 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
                     this, SLOT(slotSslErrors(QList<QSslError>)));
     Q_ASSERT(check);
+
+    incrementCounter("outgoing-server.create");
 }
 
 /// Destroys the stream.
@@ -101,6 +103,7 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
 
 QXmppOutgoingServer::~QXmppOutgoingServer()
 {
+    incrementCounter("outgoing-server.destroy");
     delete d;
 }
 

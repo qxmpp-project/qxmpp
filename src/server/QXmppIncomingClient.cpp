@@ -122,6 +122,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     }
 
     info(QString("Incoming client connection from %1").arg(d->origin()));
+    incrementCounter("incoming-client.create");
 
     // create inactivity timer
     d->idleTimer = new QTimer(this);
@@ -136,6 +137,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
 
 QXmppIncomingClient::~QXmppIncomingClient()
 {
+    incrementCounter("incoming-client.destroy");
     delete d;
 }
 
