@@ -66,6 +66,8 @@ static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
                      to, SIGNAL(incrementCounter(QString)));
     QObject::connect(from, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                      to, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    QObject::connect(from, SIGNAL(setGauge(QString,double)),
+                     to, SIGNAL(setGauge(QString,double)));
 }
 
 /// Constructs a new QXmppLoggable.
@@ -95,6 +97,8 @@ void QXmppLoggable::childEvent(QChildEvent *event)
                 this, SIGNAL(incrementCounter(QString)));
         disconnect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                 this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        disconnect(child, SIGNAL(setGauge(QString,double)),
+                this, SIGNAL(setGauge(QString,double)));
     }
 }
 /// \endcond
@@ -226,6 +230,16 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
     default:
         break;
     }
+}
+
+/// Sets the given \a gauge to \a value.
+///
+/// NOTE: the base implementation does nothing.
+
+void QXmppLogger::setGauge(const QString &gauge, double value)
+{
+    Q_UNUSED(gauge);
+    Q_UNUSED(value);
 }
 
 /// Returns the path to which logging messages should be written.

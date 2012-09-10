@@ -90,6 +90,8 @@ public:
 
 public slots:
     virtual void incrementCounter(const QString &counter);
+    virtual void setGauge(const QString &gauge, double value);
+
     void log(QXmppLogger::MessageType type, const QString& text);
     void reopen();
 
@@ -166,6 +168,9 @@ protected:
 signals:
     /// Increment the given \a counter.
     void incrementCounter(const QString &counter);
+
+    /// Sets the given \a gauge to \a value.
+    void setGauge(const QString &gauge, double value);
 
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);

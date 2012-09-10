@@ -579,6 +579,8 @@ void QXmppClient::setLogger(QXmppLogger *logger)
                        d->logger, SLOT(incrementCounter(QString)));
             disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                        d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+            disconnect(this, SIGNAL(setGauge(QString,double)),
+                       d->logger, SLOT(setGauge(QString,double)));
         }
 
         d->logger = logger;
@@ -587,6 +589,8 @@ void QXmppClient::setLogger(QXmppLogger *logger)
                     d->logger, SLOT(incrementCounter(QString)));
             connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                     d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+            connect(this, SIGNAL(setGauge(QString,double)),
+                    d->logger, SLOT(setGauge(QString,double)));
         }
 
         emit loggerChanged(d->logger);
