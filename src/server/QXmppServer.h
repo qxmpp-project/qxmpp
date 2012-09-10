@@ -59,6 +59,7 @@ class QXmppStream;
 class QXMPP_EXPORT QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
 
 public:
     QXmppServer(QObject *parent = 0);
@@ -97,6 +98,9 @@ signals:
 
     /// This signal is emitted when a client has disconnected.
     void clientDisconnected(const QString &jid);
+
+    /// This signal is emitted when the logger changes.
+    void loggerChanged(QXmppLogger *logger);
 
 public slots:
     void handleElement(const QDomElement &element);

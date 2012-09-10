@@ -391,14 +391,24 @@ QXmppLogger *QXmppServer::logger()
 
 void QXmppServer::setLogger(QXmppLogger *logger)
 {
-    if (d->logger)
-        QObject::disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                   d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
-    d->logger = logger;
-    d->logger = logger;
-    if (d->logger)
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    if (logger != d->logger) {
+        if (d->logger) {
+            disconnect(this, SIGNAL(incrementCounter(QString)),
+                       d->logger, SLOT(incrementCounter(QString)));
+            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                       d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+        }
+
+        d->logger = logger;
+        if (d->logger) {
+            connect(this, SIGNAL(incrementCounter(QString)),
+                    d->logger, SLOT(incrementCounter(QString)));
+            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                    d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+        }
+
+        emit loggerChanged(d->logger);
+    }
 }
 
 /// Returns the password checker used to verify client credentials.

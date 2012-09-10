@@ -60,6 +60,14 @@ static QString formatted(QXmppLogger::MessageType type, const QString& text)
         text;
 }
 
+static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
+{
+    QObject::connect(from, SIGNAL(incrementCounter(QString)),
+                     to, SIGNAL(incrementCounter(QString)));
+    QObject::connect(from, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                     to, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+}
+
 /// Constructs a new QXmppLoggable.
 ///
 /// \param parent
@@ -69,8 +77,7 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
 {
     QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        relaySignals(this, logParent);
     }
 }
 
@@ -82,9 +89,10 @@ void QXmppLoggable::childEvent(QChildEvent *event)
         return;
 
     if (event->added()) {
-        connect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        relaySignals(child, this);
     } else if (event->removed()) {
+        disconnect(child, SIGNAL(incrementCounter(QString)),
+                this, SIGNAL(incrementCounter(QString)));
         disconnect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                 this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     }
@@ -178,6 +186,15 @@ QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 {
     d->messageTypes = types;
+}
+
+/// Increments the given \a counter.
+///
+/// NOTE: the base implementation does nothing.
+
+void QXmppLogger::incrementCounter(const QString &counter)
+{
+    Q_UNUSED(counter);
 }
 
 /// Add a logging message.

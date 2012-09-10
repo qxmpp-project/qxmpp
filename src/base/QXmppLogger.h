@@ -89,6 +89,7 @@ public:
     void setMessageTypes(QXmppLogger::MessageTypes types);
 
 public slots:
+    virtual void incrementCounter(const QString &counter);
     void log(QXmppLogger::MessageType type, const QString& text);
     void reopen();
 
