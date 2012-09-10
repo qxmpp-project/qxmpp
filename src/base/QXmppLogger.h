@@ -163,6 +163,9 @@ protected:
     }
 
 signals:
+    /// Increment the given \a counter.
+    void incrementCounter(const QString &counter);
+
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 };
