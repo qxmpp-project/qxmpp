@@ -61,9 +61,6 @@ public:
     virtual QSet<QString> presenceSubscribers(const QString &jid);
     virtual QSet<QString> presenceSubscriptions(const QString &jid);
 
-    virtual QVariantMap statistics() const;
-    virtual void setStatistics(const QVariantMap &statistics);
-
     virtual bool start();
     virtual void stop();
 

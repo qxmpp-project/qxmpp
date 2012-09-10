@@ -118,22 +118,6 @@ QSet<QString> QXmppServerExtension::presenceSubscriptions(const QString &jid)
     return QSet<QString>();
 }
 
-/// Returns the extension's statistics.
-///
-
-QVariantMap QXmppServerExtension::statistics() const
-{
-    return QVariantMap();
-}
-
-/// Sets the extension's statistics.
-///
-
-void QXmppServerExtension::setStatistics(const QVariantMap &statistics)
-{
-    Q_UNUSED(statistics);
-}
-
 /// Starts the extension.
 ///
 /// Return true if the extension was started, false otherwise.
