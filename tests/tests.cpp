@@ -56,6 +56,7 @@
 #include "rsm.h"
 #include "rtp.h"
 #include "sasl.h"
+#include "si.h"
 #include "stanza.h"
 #include "stun.h"
 #include "tests.h"
@@ -940,6 +941,9 @@ int main(int argc, char *argv[])
 
     tst_QXmppStanza testStanza;
     errors += QTest::qExec(&testStanza);
+
+    tst_QXmppStreamInitiationIq testSI;
+    errors += QTest::qExec(&testSI);
 
     TestStun testStun;
     errors += QTest::qExec(&testStun);

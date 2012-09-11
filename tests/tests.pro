@@ -17,6 +17,7 @@ SOURCES += \
     rpc.cpp \
     rsm.cpp \
     rtp.cpp \
+    si.cpp \
     stanza.cpp \
     stun.cpp \
     tests.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     rpc.h \
     rsm.h \
     rtp.h \
+    si.h \
     stanza.h \
     stun.h \
     tests.h \
