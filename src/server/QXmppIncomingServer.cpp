@@ -86,14 +86,12 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
     }
 
     info(QString("Incoming server connection from %1").arg(d->origin()));
-    updateCounter("incoming-server.create");
 }
 
 /// Destroys the current stream.
 
 QXmppIncomingServer::~QXmppIncomingServer()
 {
-    updateCounter("incoming-server.destroy");
     delete d;
 }
 
