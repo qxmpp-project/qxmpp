@@ -59,6 +59,9 @@ public:
     QString name() const;
     void setName(const QString &name);
 
+    QString description() const;
+    void setDescription(const QString &description);
+
     qint64 size() const;
     void setSize(qint64 size);
 
@@ -248,7 +251,7 @@ signals:
     void jobFinished(QXmppTransferJob *job);
 
 public slots:
-    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString());
+    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString(), const QString &description = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
 protected:
