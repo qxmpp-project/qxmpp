@@ -40,8 +40,8 @@ HEADERS += \
     vcard.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
-    HEADERS += codec.h sasl.h
-    SOURCES += codec.cpp sasl.cpp
+    HEADERS += codec.h sasl.h si.h
+    SOURCES += codec.cpp sasl.cpp si.cpp
 }
 
 QMAKE_LIBDIR += ../src

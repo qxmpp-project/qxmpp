@@ -942,8 +942,10 @@ int main(int argc, char *argv[])
     tst_QXmppStanza testStanza;
     errors += QTest::qExec(&testStanza);
 
+#ifdef QXMPP_AUTOTEST_INTERNAL
     tst_QXmppStreamInitiationIq testSI;
     errors += QTest::qExec(&testSI);
+#endif
 
     TestStun testStun;
     errors += QTest::qExec(&testStun);
