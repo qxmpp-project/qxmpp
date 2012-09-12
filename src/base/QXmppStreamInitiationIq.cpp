@@ -27,6 +27,16 @@
 #include "QXmppStreamInitiationIq.h"
 #include "QXmppUtils.h"
 
+QXmppDataForm QXmppStreamInitiationIq::featureForm() const
+{
+    return m_featureForm;
+}
+
+void QXmppStreamInitiationIq::setFeatureForm(const QXmppDataForm &form)
+{
+    m_featureForm = form;
+}
+
 QString QXmppStreamInitiationIq::mimeType() const
 {
     return m_mimeType;
@@ -87,7 +97,11 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
     QDomElement itemElement = siElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        m_siItems.append(QXmppElement(itemElement));
+        if (itemElement.tagName() == "feature" && itemElement.namespaceURI() == ns_feature_negotiation) {
+            m_featureForm.parse(itemElement.firstChildElement());
+        } else {
+            m_siItems.append(QXmppElement(itemElement));
+        }
         itemElement = itemElement.nextSiblingElement();
     }
 }
@@ -102,6 +116,12 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
         helperToXmlAddAttribute(writer, "profile", ns_stream_initiation_file_transfer);
     foreach (const QXmppElement &item, m_siItems)
         item.toXml(writer);
+    if (!m_featureForm.isNull()) {
+        writer->writeStartElement("feature");
+        writer->writeAttribute("xmlns", ns_feature_negotiation);
+        m_featureForm.toXml(writer);
+        writer->writeEndElement();
+    }
     writer->writeEndElement();
 }
 /// \endcond

@@ -26,6 +26,7 @@
 
 #include <QDateTime>
 
+#include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
 class QDomElement;
@@ -38,6 +39,9 @@ public:
         None = 0,
         FileTransfer,
     };
+
+    QXmppDataForm featureForm() const;
+    void setFeatureForm(const QXmppDataForm &form);
 
     QString mimeType() const;
     void setMimeType(const QString &mimeType);
@@ -60,6 +64,7 @@ protected:
     /// \endcond
 
 private:
+    QXmppDataForm m_featureForm;
     QString m_mimeType;
     Profile m_profile;
     QString m_siId;

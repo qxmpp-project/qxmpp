@@ -1223,35 +1223,23 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
             this, SLOT(_q_jobError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    QXmppElement value;
-    value.setTagName("value");
+    QXmppDataForm form;
+    form.setType(QXmppDataForm::Submit);
+
+    QXmppDataForm::Field methodField(QXmppDataForm::Field::ListSingleField);
+    methodField.setKey("stream-method");
     if (job->method() == QXmppTransferJob::InBandMethod)
-        value.setValue(ns_ibb);
+        methodField.setValue(ns_ibb);
     else if (job->method() == QXmppTransferJob::SocksMethod)
-        value.setValue(ns_bytestreams);
-
-    QXmppElement field;
-    field.setTagName("field");
-    field.setAttribute("var", "stream-method");
-    field.appendChild(value);
-
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", "jabber:x:data");
-    x.setAttribute("type", "submit");
-    x.appendChild(field);
-
-    QXmppElement feature;
-    feature.setTagName("feature");
-    feature.setAttribute("xmlns", ns_feature_negotiation);
-    feature.appendChild(x);
+        methodField.setValue(ns_bytestreams);
+    form.setFields(QList<QXmppDataForm::Field>() << methodField);
 
     QXmppStreamInitiationIq response;
     response.setTo(job->jid());
     response.setId(job->d->offerId);
     response.setType(QXmppIq::Result);
     response.setProfile(QXmppStreamInitiationIq::FileTransfer);
-    response.setSiItems(QXmppElementList() << feature);
+    response.setFeatureForm(form);
 
     client()->sendPacket(response);
 
@@ -1364,47 +1352,17 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     }
     items.append(file);
 
-    QXmppElement feature;
-    feature.setTagName("feature");
-    feature.setAttribute("xmlns", ns_feature_negotiation);
-
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", "jabber:x:data");
-    x.setAttribute("type", "form");
-    feature.appendChild(x);
-
-    QXmppElement field;
-    field.setTagName("field");
-    field.setAttribute("var", "stream-method");
-    field.setAttribute("type", "list-single");
-    x.appendChild(field);
-
     // add supported stream methods
+    QXmppDataForm form;
+    form.setType(QXmppDataForm::Form);
+
+    QXmppDataForm::Field methodField(QXmppDataForm::Field::ListSingleField);
+    methodField.setKey("stream-method");
     if (d->supportedMethods & QXmppTransferJob::InBandMethod)
-    {
-        QXmppElement option;
-        option.setTagName("option");
-        field.appendChild(option);
-
-        QXmppElement value;
-        value.setTagName("value");
-        value.setValue(ns_ibb);
-        option.appendChild(value);
-    }
+        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_ibb)));
     if (d->supportedMethods & QXmppTransferJob::SocksMethod)
-    {
-        QXmppElement option;
-        option.setTagName("option");
-        field.appendChild(option);
-
-        QXmppElement value;
-        value.setTagName("value");
-        value.setValue(ns_bytestreams);
-        option.appendChild(value);
-    }
-
-    items.append(feature);
+        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_bytestreams)));
+    form.setFields(QList<QXmppDataForm::Field>() << methodField);
 
     // start job
     d->jobs.append(job);
@@ -1424,6 +1382,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     request.setType(QXmppIq::Set);
     request.setTo(jid);
     request.setProfile(QXmppStreamInitiationIq::FileTransfer);
+    request.setFeatureForm(form);
     request.setSiItems(items);
     request.setSiId(job->d->sid);
     job->d->requestId = request.id();
@@ -1517,24 +1476,14 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->state() != QXmppTransferJob::OfferState)
         return;
 
-    foreach (const QXmppElement &item, iq.siItems())
-    {
-        if (item.tagName() == "feature" && item.attribute("xmlns") == ns_feature_negotiation)
-        {
-            QXmppElement field = item.firstChildElement("x").firstChildElement("field");
-            while (!field.isNull())
-            {
-                if (field.attribute("var") == "stream-method")
-                {
-                    if ((field.firstChildElement("value").value() == ns_ibb) &&
-                        (d->supportedMethods & QXmppTransferJob::InBandMethod))
-                        job->d->method = QXmppTransferJob::InBandMethod;
-                    else if ((field.firstChildElement("value").value() == ns_bytestreams) &&
-                             (d->supportedMethods & QXmppTransferJob::SocksMethod))
-                        job->d->method = QXmppTransferJob::SocksMethod;
-                }
-                field = field.nextSiblingElement("field");
-            }
+    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+        if (field.key() == "stream-method") {
+            if ((field.value().toString() == ns_ibb) &&
+                (d->supportedMethods & QXmppTransferJob::InBandMethod))
+                job->d->method = QXmppTransferJob::InBandMethod;
+            else if ((field.value().toString() == ns_bytestreams) &&
+                     (d->supportedMethods & QXmppTransferJob::SocksMethod))
+                job->d->method = QXmppTransferJob::SocksMethod;
         }
     }
 
@@ -1619,29 +1568,20 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     job->d->offerId = iq.id();
     job->d->sid = iq.siId();
     job->d->mimeType = iq.mimeType();
-    foreach (const QXmppElement &item, iq.siItems())
-    {
-        if (item.tagName() == "feature" && item.attribute("xmlns") == ns_feature_negotiation)
-        {
-            QXmppElement field = item.firstChildElement("x").firstChildElement("field");
-            while (!field.isNull())
-            {
-                if (field.attribute("var") == "stream-method" && field.attribute("type") == "list-single")
-                {
-                    QXmppElement option = field.firstChildElement("option");
-                    while (!option.isNull())
-                    {
-                        if (option.firstChildElement("value").value() == ns_ibb)
-                            offeredMethods = offeredMethods | QXmppTransferJob::InBandMethod;
-                        else if (option.firstChildElement("value").value() == ns_bytestreams)
-                            offeredMethods = offeredMethods | QXmppTransferJob::SocksMethod;
-                        option = option.nextSiblingElement("option");
-                    }
-                }
-                field = field.nextSiblingElement("field");
+    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+        if (field.key() == "stream-method") {
+            QPair<QString, QString> option;
+            foreach (option, field.options()) {
+                if (option.second == ns_ibb)
+                    offeredMethods = offeredMethods | QXmppTransferJob::InBandMethod;
+                else if (option.second == ns_bytestreams)
+                    offeredMethods = offeredMethods | QXmppTransferJob::SocksMethod;
             }
         }
-        else if (item.tagName() == "file" && item.attribute("xmlns") == ns_stream_initiation_file_transfer)
+    }
+    foreach (const QXmppElement &item, iq.siItems())
+    {
+        if (item.tagName() == "file" && item.attribute("xmlns") == ns_stream_initiation_file_transfer)
         {
             job->d->fileInfo.setDate(QXmppUtils::datetimeFromString(item.attribute("date")));
             job->d->fileInfo.setHash(QByteArray::fromHex(item.attribute("hash").toAscii()));
