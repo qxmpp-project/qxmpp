@@ -358,12 +358,6 @@ QString QXmppMucRoom::nickName() const
 
 bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
 {
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_conference);
-    x.setAttribute("jid", d->jid);
-    x.setAttribute("reason", reason);
-
     QXmppMessage message;
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
