@@ -27,7 +27,6 @@
 
 rosterItem::rosterItem(const QString& bareJid) //: QStandardItem(bareJid)
 {
-    setStatusType(QXmppPresence::Status::Offline);
     setStatusText("Offline");
 }
 
@@ -78,8 +77,7 @@ void rosterItem::setStatusType(QXmppPresence::Status::Type type)
     case QXmppPresence::Status::DND:
         icon = "red";
         break;
-    //case QXmppPresence::Status::Invisible:
-    case QXmppPresence::Status::Offline:
+    case QXmppPresence::Status::Invisible:
         icon = "gray";
         break;
     }

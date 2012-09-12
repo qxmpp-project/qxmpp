@@ -117,8 +117,7 @@ void statusWidget::setPresenceAndStatusType(QXmppPresence::Type presenceType,
         case QXmppPresence::Status::DND:
             icon = "red";
             break;
-        //case QXmppPresence::Status::Invisible:
-        case QXmppPresence::Status::Offline:
+        case QXmppPresence::Status::Invisible:
             icon = "gray";
             break;
         }

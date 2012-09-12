@@ -389,10 +389,7 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
 void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusType)
 {
     QXmppPresence presence = m_xmppClient.clientPresence();
-    if(statusType == QXmppPresence::Status::Offline)
-        presence.setType(QXmppPresence::Unavailable);
-    else
-        presence.setType(QXmppPresence::Available);
+    presence.setType(QXmppPresence::Available);
     presence.status().setType(statusType);
     addPhotoHash(presence);
     m_xmppClient.setClientPresence(presence);
