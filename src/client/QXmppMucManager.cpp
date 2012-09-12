@@ -352,7 +352,7 @@ bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
     QXmppMessage message;
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
-    message.setMucInvitationJid(jid);
+    message.setMucInvitationJid(d->jid);
     message.setMucInvitationReason(reason);
     return d->client->sendPacket(message);
 }
