@@ -23,9 +23,61 @@
  */
 
 #include "QXmppStreamInitiationIq.h"
+#include "QXmppTransferManager.h"
 
 #include "si.h"
 #include "tests.h"
+
+void tst_QXmppStreamInitiationIq::testFileInfo_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QDateTime>("date");
+    QTest::addColumn<QString>("description");
+    QTest::addColumn<QByteArray>("hash");
+    QTest::addColumn<QString>("name");
+    QTest::addColumn<qint64>("size");
+
+    QTest::newRow("normal")
+        << QByteArray("<file xmlns=\"http://jabber.org/protocol/si/profile/file-transfer\" name=\"test.txt\" size=\"1022\"/>")
+        << QDateTime()
+        << QString()
+        << QByteArray()
+        << QString("test.txt")
+        << qint64(1022);
+
+    QTest::newRow("full")
+        << QByteArray("<file xmlns=\"http://jabber.org/protocol/si/profile/file-transfer\" "
+            "date=\"1969-07-21T02:56:15Z\" "
+            "hash=\"552da749930852c69ae5d2141d3766b1\" "
+            "name=\"test.txt\" "
+            "size=\"1022\">"
+                "<desc>This is a test. If this were a real file...</desc>"
+            "</file>")
+        << QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), Qt::UTC)
+        << QString("This is a test. If this were a real file...")
+        << QByteArray::fromHex("552da749930852c69ae5d2141d3766b1")
+        << QString("test.txt")
+        << qint64(1022);
+}
+
+void tst_QXmppStreamInitiationIq::testFileInfo()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QDateTime, date);
+    QFETCH(QString, description);
+    QFETCH(QByteArray, hash);
+    QFETCH(QString, name);
+    QFETCH(qint64, size);
+
+    QXmppTransferFileInfo info;
+    parsePacket(info, xml);
+    QCOMPARE(info.date(), date);
+    QCOMPARE(info.description(), description);
+    QCOMPARE(info.hash(), hash);
+    QCOMPARE(info.name(), name);
+    QCOMPARE(info.size(), size);
+    serializePacket(info, xml);
+}
 
 void tst_QXmppStreamInitiationIq::testOffer()
 {

@@ -147,6 +147,32 @@ bool QXmppTransferFileInfo::operator==(const QXmppTransferFileInfo &other) const
         other.d->name == d->name;
 }
 
+void QXmppTransferFileInfo::parse(const QDomElement &element)
+{
+    d->date = QXmppUtils::datetimeFromString(element.attribute("date"));
+    d->hash = QByteArray::fromHex(element.attribute("hash").toAscii());
+    d->name = element.attribute("name");
+    d->size = element.attribute("size").toLongLong();
+    d->description = element.firstChildElement("desc").text();
+}
+
+void QXmppTransferFileInfo::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("file");
+    writer->writeAttribute("xmlns", ns_stream_initiation_file_transfer);
+    if (d->date.isValid())
+        writer->writeAttribute("date", QXmppUtils::datetimeToString(d->date));
+    if (!d->hash.isEmpty())
+        writer->writeAttribute("hash", d->hash.toHex());
+    if (!d->name.isEmpty())
+        writer->writeAttribute("name", d->name);
+    if (d->size > 0)
+        writer->writeAttribute("size", QString::number(d->size));
+    if (!d->description.isEmpty())
+        writer->writeTextElement("desc", d->description);
+    writer->writeEndElement();
+}
+
 class QXmppTransferJobPrivate
 {
 public:

@@ -68,6 +68,11 @@ public:
     QXmppTransferFileInfo& operator=(const QXmppTransferFileInfo &other);
     bool operator==(const QXmppTransferFileInfo &other) const;
 
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
 private:
     QSharedDataPointer<QXmppTransferFileInfoPrivate> d;
 };
