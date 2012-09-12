@@ -283,17 +283,8 @@ bool QXmppMucRoom::join()
     QXmppPresence packet = d->client->clientPresence();
     packet.setTo(d->ownJid());
     packet.setType(QXmppPresence::Available);
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_muc);
-    if (!d->password.isEmpty())
-    {
-        QXmppElement p;
-        p.setTagName("password");
-        p.setValue(d->password);
-        x.appendChild(p);
-    }
-    packet.setExtensions(QXmppElementList() << x);
+    packet.setMucPassword(d->password);
+    packet.setMucSupported(true);
     return d->client->sendPacket(packet);
 }
 
@@ -717,15 +708,12 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
         }
     }
     else if (presence.type() == QXmppPresence::Error) {
-        foreach (const QXmppElement &extension, presence.extensions()) {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc) {
-                // emit error
-                emit error(presence.error());
+        if (presence.isMucSupported()) {
+            // emit error
+            emit error(presence.error());
 
-                // notify the user we left the room
-                emit left();
-                break;
-            }
+            // notify the user we left the room
+            emit left();
         }
    }
 }

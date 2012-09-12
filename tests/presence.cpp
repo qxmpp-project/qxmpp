@@ -151,7 +151,7 @@ void tst_QXmppPresence::testPresenceWithExtendedAddresses()
     serializePacket(presence, xml);
 }
 
-void tst_QXmppPresence::testPresenceWithMuc()
+void tst_QXmppPresence::testPresenceWithMucItem()
 {
     const QByteArray xml(
         "<presence "
@@ -178,6 +178,46 @@ void tst_QXmppPresence::testPresenceWithMuc()
     QCOMPARE(presence.mucItem().reason(), QLatin1String("Avaunt, you cullion!"));
     QCOMPARE(presence.mucItem().role(), QXmppMucItem::NoRole);
     QCOMPARE(presence.mucStatusCodes(), QList<int>() << 307);
+    serializePacket(presence, xml);
+}
+
+void tst_QXmppPresence::testPresenceWithMucPassword()
+{
+    const QByteArray xml(
+        "<presence "
+        "to=\"coven@chat.shakespeare.lit/thirdwitch\" "
+        "from=\"hag66@shakespeare.lit/pda\">"
+            "<x xmlns=\"http://jabber.org/protocol/muc\">"
+                "<password>pass</password>"
+            "</x>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.to(), QLatin1String("coven@chat.shakespeare.lit/thirdwitch"));
+    QCOMPARE(presence.from(), QLatin1String("hag66@shakespeare.lit/pda"));
+    QCOMPARE(presence.type(), QXmppPresence::Available);
+    QCOMPARE(presence.isMucSupported(), true);
+    QCOMPARE(presence.mucPassword(), QLatin1String("pass"));
+    serializePacket(presence, xml);
+}
+
+void tst_QXmppPresence::testPresenceWithMucSupport()
+{
+    const QByteArray xml(
+        "<presence "
+        "to=\"coven@chat.shakespeare.lit/thirdwitch\" "
+        "from=\"hag66@shakespeare.lit/pda\">"
+            "<x xmlns=\"http://jabber.org/protocol/muc\"/>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QCOMPARE(presence.to(), QLatin1String("coven@chat.shakespeare.lit/thirdwitch"));
+    QCOMPARE(presence.from(), QLatin1String("hag66@shakespeare.lit/pda"));
+    QCOMPARE(presence.type(), QXmppPresence::Available);
+    QCOMPARE(presence.isMucSupported(), true);
+    QVERIFY(presence.mucPassword().isEmpty());
     serializePacket(presence, xml);
 }
 

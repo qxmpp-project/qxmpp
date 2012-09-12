@@ -142,8 +142,14 @@ public:
     QXmppMucItem mucItem() const;
     void setMucItem(const QXmppMucItem &item);
 
+    QString mucPassword() const;
+    void setMucPassword(const QString &password);
+
     QList<int> mucStatusCodes() const;
     void setMucStatusCodes(const QList<int> &codes);
+
+    bool isMucSupported() const;
+    void setMucSupported(bool supported);
 
     /// XEP-0153: vCard-Based Avatars
     QByteArray photoHash() const;

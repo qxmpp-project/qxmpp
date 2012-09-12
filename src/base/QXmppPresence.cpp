@@ -72,7 +72,9 @@ public:
 
     // XEP-0045: Multi-User Chat
     QXmppMucItem mucItem;
+    QString mucPassword;
     QList<int> mucStatusCodes;
+    bool mucSupported;
 };
 
 /// Constructs a QXmppPresence.
@@ -83,6 +85,7 @@ QXmppPresence::QXmppPresence(QXmppPresence::Type type)
     : d(new QXmppPresencePrivate)
 {
     d->type = type;
+    d->mucSupported = false;
     d->vCardUpdateType = VCardUpdateNone;
 }
 
@@ -198,7 +201,11 @@ void QXmppPresence::parse(const QDomElement &element)
     while(!xElement.isNull())
     {
         // XEP-0045: Multi-User Chat
-        if(xElement.namespaceURI() == ns_muc_user)
+        if(xElement.namespaceURI() == ns_muc) {
+            d->mucSupported = true;
+            d->mucPassword = xElement.firstChildElement("password").text();
+        }
+        else if(xElement.namespaceURI() == ns_muc_user)
         {
             QDomElement itemElement = xElement.firstChildElement("item");
             d->mucItem.parse(itemElement);
@@ -273,6 +280,14 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     error().toXml(xmlWriter);
 
     // XEP-0045: Multi-User Chat
+    if(d->mucSupported) {
+        xmlWriter->writeStartElement("x");
+        xmlWriter->writeAttribute("xmlns", ns_muc);
+        if (!d->mucPassword.isEmpty())
+            xmlWriter->writeTextElement("password", d->mucPassword);
+        xmlWriter->writeEndElement();
+    }
+
     if(!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty())
     {
         xmlWriter->writeStartElement("x");
@@ -420,6 +435,20 @@ void QXmppPresence::setMucItem(const QXmppMucItem &item)
     d->mucItem = item;
 }
 
+/// Returns the password used to join a MUC room.
+
+QString QXmppPresence::mucPassword() const
+{
+    return d->mucPassword;
+}
+
+/// Sets the password used to join a MUC room.
+
+void QXmppPresence::setMucPassword(const QString &password)
+{
+    d->mucPassword = password;
+}
+
 /// Returns the MUC status codes.
 
 QList<int> QXmppPresence::mucStatusCodes() const
@@ -434,6 +463,20 @@ QList<int> QXmppPresence::mucStatusCodes() const
 void QXmppPresence::setMucStatusCodes(const QList<int> &codes)
 {
     d->mucStatusCodes = codes;
+}
+
+/// Returns true if the sender has indicated MUC support.
+
+bool QXmppPresence::isMucSupported() const
+{
+    return d->mucSupported;
+}
+
+/// Sets whether MUC is \a supported.
+
+void QXmppPresence::setMucSupported(bool supported)
+{
+    d->mucSupported = supported;
 }
 
 /// \cond
