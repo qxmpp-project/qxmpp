@@ -24,7 +24,7 @@
 #include <QDomElement>
 
 #include "QXmppConstants.h"
-#include "QXmppStreamInitiationIq.h"
+#include "QXmppStreamInitiationIq_p.h"
 #include "QXmppUtils.h"
 
 QXmppDataForm QXmppStreamInitiationIq::featureForm() const

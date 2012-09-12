@@ -30,7 +30,6 @@ INSTALL_HEADERS += \
     base/QXmppStanza.h \
     base/QXmppStream.h \
     base/QXmppStreamFeatures.h \
-    base/QXmppStreamInitiationIq.h \
     base/QXmppStun.h \
     base/QXmppUtils.h \
     base/QXmppVCardIq.h \
@@ -38,7 +37,8 @@ INSTALL_HEADERS += \
 
 HEADERS += \
     base/QXmppCodec_p.h \
-    base/QXmppSasl_p.h
+    base/QXmppSasl_p.h \
+    base/QXmppStreamInitiationIq.h
 
 # Source files
 SOURCES += \

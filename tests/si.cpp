@@ -22,7 +22,7 @@
  *
  */
 
-#include "QXmppStreamInitiationIq.h"
+#include "QXmppStreamInitiationIq_p.h"
 #include "QXmppTransferManager.h"
 
 #include "si.h"

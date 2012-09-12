@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef QXMPPSTREAMINITIATIONIQ_H
-#define QXMPPSTREAMINITIATIONIQ_H
+#ifndef QXMPPSTREAMINITIATIONIQ_P_H
+#define QXMPPSTREAMINITIATIONIQ_P_H
 
 #include <QDateTime>
 
@@ -33,7 +33,20 @@
 class QDomElement;
 class QXmlStreamWriter;
 
-class QXMPP_EXPORT QXmppStreamInitiationIq : public QXmppIq
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QXmpp API.  It exists for the convenience
+// of the QXmppTransferManager class.
+//
+// This header file may change from version to version without notice,
+// or even be removed.
+//
+// We mean it.
+//
+
+class QXMPP_AUTOTEST_EXPORT QXmppStreamInitiationIq : public QXmppIq
 {
 public:
     enum Profile {
