@@ -65,6 +65,7 @@ public:
     qint64 size() const;
     void setSize(qint64 size);
 
+    bool isNull() const;
     QXmppTransferFileInfo& operator=(const QXmppTransferFileInfo &other);
     bool operator==(const QXmppTransferFileInfo &other) const;
 

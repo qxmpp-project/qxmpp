@@ -98,5 +98,29 @@ void tst_QXmppStreamInitiationIq::testOffer()
 
     QXmppStreamInitiationIq iq;
     parsePacket(iq, xml);
+    QVERIFY(!iq.fileInfo().isNull());
+    QCOMPARE(iq.fileInfo().name(), QString("test.txt"));
+    QCOMPARE(iq.fileInfo().size(), qint64(1022));
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppStreamInitiationIq::testResult()
+{
+    QByteArray xml(
+        "<iq id=\"offer1\" to=\"sender@jabber.org/resource\" type=\"result\">"
+          "<si xmlns=\"http://jabber.org/protocol/si\">"
+            "<feature xmlns=\"http://jabber.org/protocol/feature-neg\">"
+              "<x xmlns=\"jabber:x:data\" type=\"submit\">"
+                "<field type=\"list-single\" var=\"stream-method\">"
+                  "<value>http://jabber.org/protocol/bytestreams</value>"
+                "</field>"
+              "</x>"
+            "</feature>"
+          "</si>"
+        "</iq>");
+
+    QXmppStreamInitiationIq iq;
+    parsePacket(iq, xml);
+    QVERIFY(iq.fileInfo().isNull());
     serializePacket(iq, xml);
 }

@@ -134,6 +134,15 @@ void QXmppTransferFileInfo::setSize(qint64 size)
     d->size = size;
 }
 
+bool QXmppTransferFileInfo::isNull() const
+{
+    return d->date.isNull()
+        && d->description.isEmpty()
+        && d->hash.isEmpty()
+        && d->name.isEmpty()
+        && d->size == 0;
+}
+
 QXmppTransferFileInfo& QXmppTransferFileInfo::operator=(const QXmppTransferFileInfo &other)
 {
     d = other.d;
@@ -1359,26 +1368,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
         return job;
     }
 
-    // prepare negotiation
-    QXmppElementList items;
-
-    QXmppElement file;
-    file.setTagName("file");
-    file.setAttribute("xmlns", ns_stream_initiation_file_transfer);
-    file.setAttribute("date", QXmppUtils::datetimeToString(job->fileDate()));
-    file.setAttribute("hash", job->fileHash().toHex());
-    file.setAttribute("name", job->fileName());
-    file.setAttribute("size", QString::number(job->fileSize()));
-    if (!fileInfo.description().isEmpty())
-    {
-        QXmppElement desc;
-        desc.setTagName("desc");
-        desc.setValue(fileInfo.description());
-        file.appendChild(desc);
-    }
-    items.append(file);
-
-    // add supported stream methods
+    // collect supported stream methods
     QXmppDataForm form;
     form.setType(QXmppDataForm::Form);
 
@@ -1408,8 +1398,8 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     request.setType(QXmppIq::Set);
     request.setTo(jid);
     request.setProfile(QXmppStreamInitiationIq::FileTransfer);
+    request.setFileInfo(job->d->fileInfo);
     request.setFeatureForm(form);
-    request.setSiItems(items);
     request.setSiId(job->d->sid);
     job->d->requestId = request.id();
     client()->sendPacket(request);
@@ -1594,6 +1584,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     job->d->offerId = iq.id();
     job->d->sid = iq.siId();
     job->d->mimeType = iq.mimeType();
+    job->d->fileInfo = iq.fileInfo();
     foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
         if (field.key() == "stream-method") {
             QPair<QString, QString> option;
@@ -1603,17 +1594,6 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
                 else if (option.second == ns_bytestreams)
                     offeredMethods = offeredMethods | QXmppTransferJob::SocksMethod;
             }
-        }
-    }
-    foreach (const QXmppElement &item, iq.siItems())
-    {
-        if (item.tagName() == "file" && item.attribute("xmlns") == ns_stream_initiation_file_transfer)
-        {
-            job->d->fileInfo.setDate(QXmppUtils::datetimeFromString(item.attribute("date")));
-            job->d->fileInfo.setHash(QByteArray::fromHex(item.attribute("hash").toAscii()));
-            job->d->fileInfo.setName(item.attribute("name"));
-            job->d->fileInfo.setSize(item.attribute("size").toLongLong());
-            job->d->fileInfo.setDescription(item.firstChildElement("desc").value());
         }
     }
 

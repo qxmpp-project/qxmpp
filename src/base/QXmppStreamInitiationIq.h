@@ -28,6 +28,7 @@
 
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
+#include "QXmppTransferManager.h"
 
 class QDomElement;
 class QXmlStreamWriter;
@@ -43,6 +44,9 @@ public:
     QXmppDataForm featureForm() const;
     void setFeatureForm(const QXmppDataForm &form);
 
+    QXmppTransferFileInfo fileInfo() const;
+    void setFileInfo(const QXmppTransferFileInfo &info);
+
     QString mimeType() const;
     void setMimeType(const QString &mimeType);
 
@@ -51,9 +55,6 @@ public:
 
     QString siId() const;
     void setSiId(const QString &id);
-
-    QXmppElementList siItems() const;
-    void setSiItems(const QXmppElementList &items);
 
     static bool isStreamInitiationIq(const QDomElement &element);
 
@@ -65,10 +66,10 @@ protected:
 
 private:
     QXmppDataForm m_featureForm;
+    QXmppTransferFileInfo m_fileInfo;
     QString m_mimeType;
     Profile m_profile;
     QString m_siId;
-    QXmppElementList m_siItems;
 };
 
 #endif

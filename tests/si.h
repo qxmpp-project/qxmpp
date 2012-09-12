@@ -32,5 +32,6 @@ private slots:
     void testFileInfo_data();
     void testFileInfo();
     void testOffer();
+    void testResult();
 };
 
