@@ -76,7 +76,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     Q_ASSERT(check);
 
     check = connect(&m_xmppClient.rosterManager(),
-                         SIGNAL(rosterChanged(QString)),
+                         SIGNAL(itemChanged(QString)),
                          this, SLOT(rosterChanged(QString)));
     Q_ASSERT(check);
 
