@@ -48,13 +48,13 @@ public:
     QString getName();
     void setBareJid(const QString& bareJid);
     void setStatusText(const QString& text);
-    void setStatusType(QXmppPresence::Status::Type type);
+    void setStatusType(QXmppPresence::AvailableStatusType type);
     void setPresenceType(QXmppPresence::Type type);
     void setAvatar(const QImage& image);
     QImage getAvatar();
     QString getBareJid();
     QString getStatusText();
-    QXmppPresence::Status::Type getStatusType();
+    QXmppPresence::AvailableStatusType getStatusType();
     QXmppPresence::Type getPresenceType();
 };
 

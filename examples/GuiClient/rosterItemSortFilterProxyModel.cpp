@@ -66,8 +66,8 @@ bool rosterItemSortFilterProxyModel::lessThan(const QModelIndex &left, const QMo
             }
             else
             {
-                return comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(leftStatusType)) <
-                        comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::Status::Type>(rightStatusType));
+                return comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::AvailableStatusType>(leftStatusType)) <
+                        comparisonWeightsPresenceStatusType(static_cast<QXmppPresence::AvailableStatusType>(rightStatusType));
             }
         }
         else

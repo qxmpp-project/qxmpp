@@ -60,24 +60,24 @@ QString rosterItem::getStatusText()
     return data(rosterItem::StatusText).toString();
 }
 
-void rosterItem::setStatusType(QXmppPresence::Status::Type type)
+void rosterItem::setStatusType(QXmppPresence::AvailableStatusType type)
 {
     setData(static_cast<int>(type), StatusType);
     QString icon;
     switch(type)
     {
-    case QXmppPresence::Status::Online:
-    case QXmppPresence::Status::Chat:
+    case QXmppPresence::Online:
+    case QXmppPresence::Chat:
         icon = "green";
         break;
-    case QXmppPresence::Status::Away:
-    case QXmppPresence::Status::XA:
+    case QXmppPresence::Away:
+    case QXmppPresence::XA:
         icon = "orange";
         break;
-    case QXmppPresence::Status::DND:
+    case QXmppPresence::DND:
         icon = "red";
         break;
-    case QXmppPresence::Status::Invisible:
+    case QXmppPresence::Invisible:
         icon = "gray";
         break;
     }
@@ -85,9 +85,9 @@ void rosterItem::setStatusType(QXmppPresence::Status::Type type)
         setIcon(QIcon(":/icons/resource/"+icon+".png"));
 }
 
-QXmppPresence::Status::Type rosterItem::getStatusType()
+QXmppPresence::AvailableStatusType rosterItem::getStatusType()
 {
-    return static_cast<QXmppPresence::Status::Type>(data(StatusType).toInt());
+    return static_cast<QXmppPresence::AvailableStatusType>(data(StatusType).toInt());
 }
 
 void rosterItem::setPresenceType(QXmppPresence::Type type)

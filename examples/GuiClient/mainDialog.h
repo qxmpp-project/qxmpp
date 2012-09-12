@@ -69,7 +69,7 @@ private slots:
     void messageReceived(const QXmppMessage& msg);
     void statusTextChanged(const QString&);
     void presenceTypeChanged(QXmppPresence::Type);
-    void presenceStatusTypeChanged(QXmppPresence::Status::Type);
+    void presenceStatusTypeChanged(QXmppPresence::AvailableStatusType);
     void signIn();
     void cancelSignIn();
     void showSignInPage();

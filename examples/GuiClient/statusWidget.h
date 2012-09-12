@@ -41,7 +41,7 @@ public:
     void setDisplayName(const QString& name);
     void setStatusText(const QString& statusText);
     void setPresenceAndStatusType(QXmppPresence::Type presenceType,
-                                  QXmppPresence::Status::Type statusType);
+                                  QXmppPresence::AvailableStatusType statusType);
     void setAvatar(const QImage&);
 
 private slots:
@@ -51,7 +51,7 @@ private slots:
 signals:
     void statusTextChanged(const QString&);
     void presenceTypeChanged(QXmppPresence::Type);
-    void presenceStatusTypeChanged(QXmppPresence::Status::Type);
+    void presenceStatusTypeChanged(QXmppPresence::AvailableStatusType);
     void avatarChanged(const QImage&);
 };
 

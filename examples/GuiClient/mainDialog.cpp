@@ -141,8 +141,8 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
                     SLOT(presenceTypeChanged(QXmppPresence::Type)));
     Q_ASSERT(check);
     check = connect(&m_statusWidget,
-                    SIGNAL(presenceStatusTypeChanged(QXmppPresence::Status::Type)),
-                    SLOT(presenceStatusTypeChanged(QXmppPresence::Status::Type)));
+                    SIGNAL(presenceStatusTypeChanged(QXmppPresence::AvailableStatusType)),
+                    SLOT(presenceStatusTypeChanged(QXmppPresence::AvailableStatusType)));
     Q_ASSERT(check);
     check = connect(&m_statusWidget,
                     SIGNAL(avatarChanged(QImage)),
@@ -363,7 +363,7 @@ void mainDialog::messageReceived(const QXmppMessage& msg)
 void mainDialog::statusTextChanged(const QString& status)
 {
     QXmppPresence presence = m_xmppClient.clientPresence();
-    presence.status().setStatusText(status);
+    presence.setStatusText(status);
     addPhotoHash(presence);
     m_xmppClient.setClientPresence(presence);
 }
@@ -378,7 +378,7 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
     {
         QXmppPresence newPresence = m_xmppClient.clientPresence();
         newPresence.setType(presenceType);
-        newPresence.status().setType(QXmppPresence::Status::Online);
+        newPresence.setAvailableStatusType(QXmppPresence::Online);
         addPhotoHash(newPresence);
         m_xmppClient.setClientPresence(newPresence);
     }
@@ -386,11 +386,11 @@ void mainDialog::presenceTypeChanged(QXmppPresence::Type presenceType)
             presenceToStatusText(m_xmppClient.clientPresence()));
 }
 
-void mainDialog::presenceStatusTypeChanged(QXmppPresence::Status::Type statusType)
+void mainDialog::presenceStatusTypeChanged(QXmppPresence::AvailableStatusType statusType)
 {
     QXmppPresence presence = m_xmppClient.clientPresence();
     presence.setType(QXmppPresence::Available);
-    presence.status().setType(statusType);
+    presence.setAvailableStatusType(statusType);
     addPhotoHash(presence);
     m_xmppClient.setClientPresence(presence);
     m_statusWidget.setStatusText(
@@ -429,7 +429,7 @@ void mainDialog::updateStatusWidget()
     m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
     m_statusWidget.setStatusText(presenceToStatusText(m_xmppClient.clientPresence()));
     m_statusWidget.setPresenceAndStatusType(m_xmppClient.clientPresence().type(),
-                                            m_xmppClient.clientPresence().status().type());
+                                            m_xmppClient.clientPresence().availableStatusType());
 }
 
 void mainDialog::signIn()

@@ -26,19 +26,19 @@
 #include <QDir>
 #include <QDesktopServices>
 
-int comparisonWeightsPresenceStatusType(QXmppPresence::Status::Type statusType)
+int comparisonWeightsPresenceStatusType(QXmppPresence::AvailableStatusType statusType)
 {
     switch(statusType)
     {
-        case QXmppPresence::Status::Online:
-        case QXmppPresence::Status::Chat:
+        case QXmppPresence::Online:
+        case QXmppPresence::Chat:
             return 0;
-        case QXmppPresence::Status::DND:
+        case QXmppPresence::DND:
             return 1;
-        case QXmppPresence::Status::Away:
-        case QXmppPresence::Status::XA:
+        case QXmppPresence::Away:
+        case QXmppPresence::XA:
             return 2;
-        case QXmppPresence::Status::Invisible:
+        case QXmppPresence::Invisible:
             return 3;
         default:
             return 5;
@@ -74,18 +74,18 @@ QString presenceToStatusText(const QXmppPresence& presence)
         {
             switch(presence.status().type())
             {
-            case QXmppPresence::Status::Invisible:
+            case QXmppPresence::Invisible:
                 statusText = "Offline";
                 break;
-            case QXmppPresence::Status::Online:
-            case QXmppPresence::Status::Chat:
+            case QXmppPresence::Online:
+            case QXmppPresence::Chat:
                 statusText = "Available";
                 break;
-            case QXmppPresence::Status::Away:
-            case QXmppPresence::Status::XA:
+            case QXmppPresence::Away:
+            case QXmppPresence::XA:
                 statusText = "Idle";
                 break;
-            case QXmppPresence::Status::DND:
+            case QXmppPresence::DND:
                 statusText = "Busy";
                 break;
             }

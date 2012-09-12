@@ -31,7 +31,7 @@
 #include <QBuffer>
 #include <QImageReader>
 
-int comparisonWeightsPresenceStatusType(QXmppPresence::Status::Type);
+int comparisonWeightsPresenceStatusType(QXmppPresence::AvailableStatusType);
 int comparisonWeightsPresenceType(QXmppPresence::Type);
 
 QString presenceToStatusText(const QXmppPresence& presence);

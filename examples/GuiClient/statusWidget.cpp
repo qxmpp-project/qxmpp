@@ -75,18 +75,18 @@ void statusWidget::presenceMenuTriggered()
     }
     else if(action == actionBusy)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::Status::DND);
+        emit presenceStatusTypeChanged(QXmppPresence::DND);
         icon = "red";
     }
     else if(action == actionAway)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::Status::Away);
+        emit presenceStatusTypeChanged(QXmppPresence::Away);
         icon = "orange";
     }
 #if 0
     else if(action == actionInvisible)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::Status::Invisible);
+        emit presenceStatusTypeChanged(QXmppPresence::Invisible);
         icon = "gray";
     }
 #endif
@@ -99,25 +99,25 @@ void statusWidget::presenceMenuTriggered()
 }
 
 void statusWidget::setPresenceAndStatusType(QXmppPresence::Type presenceType,
-                                  QXmppPresence::Status::Type statusType)
+                                  QXmppPresence::AvailableStatusType statusType)
 {
     if(presenceType == QXmppPresence::Available)
     {
         QString icon = "green";
         switch(statusType)
         {
-        case QXmppPresence::Status::Online:
-        case QXmppPresence::Status::Chat:
+        case QXmppPresence::Online:
+        case QXmppPresence::Chat:
             icon = "green";
             break;
-        case QXmppPresence::Status::Away:
-        case QXmppPresence::Status::XA:
+        case QXmppPresence::Away:
+        case QXmppPresence::XA:
             icon = "orange";
             break;
-        case QXmppPresence::Status::DND:
+        case QXmppPresence::DND:
             icon = "red";
             break;
-        case QXmppPresence::Status::Invisible:
+        case QXmppPresence::Invisible:
             icon = "gray";
             break;
         }
