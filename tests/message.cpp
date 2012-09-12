@@ -218,6 +218,21 @@ void tst_QXmppMessage::testExtendedAddresses()
     serializePacket(message, xml);
 }
 
+void tst_QXmppMessage::testMucInvitation()
+{
+    QByteArray xml(
+        "<message to=\"hecate@shakespeare.lit\" from=\"crone1@shakespeare.lit/desktop\" type=\"normal\">"
+            "<x xmlns=\"jabber:x:conference\" jid=\"darkcave@macbeth.shakespeare.lit\" password=\"cauldronburn\" reason=\"Hey Hecate, this is the place for all good witches!\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.mucInvitationJid(), QLatin1String("darkcave@macbeth.shakespeare.lit"));
+    QCOMPARE(message.mucInvitationPassword(), QLatin1String("cauldronburn"));
+    QCOMPARE(message.mucInvitationReason(), QLatin1String("Hey Hecate, this is the place for all good witches!"));
+    serializePacket(message, xml);
+}
+
 void tst_QXmppMessage::testState_data()
 {
     QTest::addColumn<QByteArray>("xml");

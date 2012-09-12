@@ -162,15 +162,9 @@ void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
         return;
 
     // process room invitations
-    foreach (const QXmppElement &extension, msg.extensions())
-    {
-        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
-        {
-            const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && (!d->rooms.contains(roomJid) || !d->rooms.value(roomJid)->isJoined()))
-                emit invitationReceived(roomJid, msg.from(), extension.attribute("reason"));
-            break;
-        }
+    const QString roomJid = msg.mucInvitationJid();
+    if (!roomJid.isEmpty() && (!d->rooms.contains(roomJid) || !d->rooms.value(roomJid)->isJoined())) {
+        emit invitationReceived(roomJid, msg.from(), msg.mucInvitationReason());
     }
 }
 
@@ -373,7 +367,8 @@ bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
     QXmppMessage message;
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
-    message.setExtensions(QXmppElementList() << x);
+    message.setMucInvitationJid(jid);
+    message.setMucInvitationReason(reason);
     return d->client->sendPacket(message);
 }
 

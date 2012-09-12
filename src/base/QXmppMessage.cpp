@@ -74,6 +74,11 @@ public:
     // Request message receipt as per XEP-0184.
     QString receiptId;
     bool receiptRequested;
+
+    // XEP-0249: Direct MUC Invitations
+    QString mucInvitationJid;
+    QString mucInvitationPassword;
+    QString mucInvitationReason;
 };
 
 /// Constructs a QXmppMessage.
@@ -188,6 +193,54 @@ QString QXmppMessage::receiptId() const
 void QXmppMessage::setReceiptId(const QString &id)
 {
     d->receiptId = id;
+}
+
+/// Returns the JID for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+QString QXmppMessage::mucInvitationJid() const
+{
+    return d->mucInvitationJid;
+}
+
+/// Sets the JID for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+void QXmppMessage::setMucInvitationJid(const QString &jid)
+{
+    d->mucInvitationJid = jid;
+}
+
+/// Returns the password for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+QString QXmppMessage::mucInvitationPassword() const
+{
+    return d->mucInvitationPassword;
+}
+
+/// Sets the \a password for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+void QXmppMessage::setMucInvitationPassword(const QString &password)
+{
+    d->mucInvitationPassword = password;
+}
+
+/// Returns the reason for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+QString QXmppMessage::mucInvitationReason() const
+{
+    return d->mucInvitationReason;
+}
+
+/// Sets the \a reason for a multi-user chat direct invitation as defined
+/// by XEP-0249: Direct MUC Invitations.
+
+void QXmppMessage::setMucInvitationReason(const QString &reason)
+{
+    d->mucInvitationReason = reason;
 }
 
 /// Returns the message's type.
@@ -370,6 +423,11 @@ void QXmppMessage::parse(const QDomElement &element)
             d->stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
             d->stamp.setTimeSpec(Qt::UTC);
             d->stampType = LegacyDelayedDelivery;
+        } else if (xElement.namespaceURI() == ns_conference) {
+            // XEP-0249: Direct MUC Invitations
+            d->mucInvitationJid = xElement.attribute("jid");
+            d->mucInvitationPassword = xElement.attribute("password");
+            d->mucInvitationReason = xElement.attribute("reason");
         } else {
             // other extensions
             extensions << QXmppElement(xElement);
@@ -452,6 +510,18 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     if (d->attentionRequested) {
         xmlWriter->writeStartElement("attention");
         xmlWriter->writeAttribute("xmlns", ns_attention);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0249: Direct MUC Invitations
+    if (!d->mucInvitationJid.isEmpty()) {
+        xmlWriter->writeStartElement("x");
+        xmlWriter->writeAttribute("xmlns", ns_conference);
+        xmlWriter->writeAttribute("jid", d->mucInvitationJid);
+        if (!d->mucInvitationPassword.isEmpty())
+            xmlWriter->writeAttribute("password", d->mucInvitationPassword);
+        if (!d->mucInvitationReason.isEmpty())
+            xmlWriter->writeAttribute("reason", d->mucInvitationReason);
         xmlWriter->writeEndElement();
     }
 

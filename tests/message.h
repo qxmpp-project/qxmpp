@@ -36,6 +36,7 @@ private slots:
     void testDelay_data();
     void testDelay();
     void testExtendedAddresses();
+    void testMucInvitation();
     void testState_data();
     void testState();
     void testXhtml();

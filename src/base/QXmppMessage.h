@@ -76,6 +76,15 @@ public:
     bool isReceiptRequested() const;
     void setReceiptRequested(bool requested);
 
+    QString mucInvitationJid() const;
+    void setMucInvitationJid(const QString &jid);
+
+    QString mucInvitationPassword() const;
+    void setMucInvitationPassword(const QString &password);
+
+    QString mucInvitationReason() const;
+    void setMucInvitationReason(const QString &reason);
+
     QString receiptId() const;
     void setReceiptId(const QString &id);
 
