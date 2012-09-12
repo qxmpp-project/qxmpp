@@ -37,7 +37,7 @@
 #include "QXmppConstants.h"
 #include "QXmppIbbIq.h"
 #include "QXmppSocks.h"
-#include "QXmppStreamInitiationIq.h"
+#include "QXmppStreamInitiationIq_p.h"
 #include "QXmppTransferManager.h"
 #include "QXmppTransferManager_p.h"
 #include "QXmppUtils.h"
