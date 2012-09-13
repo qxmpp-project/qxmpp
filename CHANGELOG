@@ -4,6 +4,7 @@ QXmpp 0.7.4 (UNRELEASED)
   - Move server statistics to a counter / gauge system.
   - Add XEP-0249: Direct MUC Invitations attributes to QXmppMessage.
   - Add XEP-0045: Multi-User Chat attributes to QXmppPresence.
+  - Improve GuiClient, stop using deprecated APIs.
 
 QXmpp 0.7.3 (Sep 7, 2012)
 ------------------------
