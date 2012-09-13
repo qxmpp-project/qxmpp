@@ -46,8 +46,8 @@ public:
     void clear();
 
 private:
+    rosterItem* getOrCreateItem(const QString& bareJid);
     QMap<QString, rosterItem*> m_jidRosterItemMap;
-    void addRosterItemIfDontExist(const QString& bareJid);
 };
 
 #endif // ROSTERITEMMODEL_H

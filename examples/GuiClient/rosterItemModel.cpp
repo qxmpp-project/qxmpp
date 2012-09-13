@@ -40,50 +40,41 @@ rosterItem* rosterItemModel::getRosterItemFromBareJid(const QString& bareJid)
         return 0;
 }
 
-void rosterItemModel::addRosterItemIfDontExist(const QString& bareJid)
+rosterItem* rosterItemModel::getOrCreateItem(const QString& bareJid)
 {
-    if(!m_jidRosterItemMap.contains(bareJid))
-    {
+    if(m_jidRosterItemMap.contains(bareJid)) {
+        return m_jidRosterItemMap[bareJid];
+    } else {
         rosterItem* item = new rosterItem(bareJid);
         m_jidRosterItemMap[bareJid] = item;
         appendRow(item);
+        return item;
     }
 }
 
 void rosterItemModel::updatePresence(const QString& bareJid, const QMap<QString, QXmppPresence>& presences)
 {
-    addRosterItemIfDontExist(bareJid);
+    rosterItem *item = getOrCreateItem(bareJid);
     if (!presences.isEmpty())
-        getRosterItemFromBareJid(bareJid)->setPresence(*presences.begin());
+        item->setPresence(*presences.begin());
+    else
+        item->setPresence(QXmppPresence(QXmppPresence::Unavailable));
 }
 
 void rosterItemModel::updateRosterEntry(const QString& bareJid, const QXmppRosterIq::Item& rosterEntry)
 {
-    addRosterItemIfDontExist(bareJid);
-
-    QString name = rosterEntry.name();
-    if(getRosterItemFromBareJid(bareJid))
-        getRosterItemFromBareJid(bareJid)->setName(name);
+    getOrCreateItem(bareJid)->setName(rosterEntry.name());
 }
 
 void rosterItemModel::updateAvatar(const QString& bareJid, const QImage& image)
 {
-    addRosterItemIfDontExist(bareJid);
-
-//    if(image.isNull())
-//        return;
-
-    getRosterItemFromBareJid(bareJid)->setAvatar(image);
+    getOrCreateItem(bareJid)->setAvatar(image);
 }
 
 void rosterItemModel::updateName(const QString& bareJid, const QString& name)
 {
-    addRosterItemIfDontExist(bareJid);
-
-    if(name.isEmpty())
-        return;
-
-    getRosterItemFromBareJid(bareJid)->setName(name);
+    if (!name.isEmpty())
+        getOrCreateItem(bareJid)->setName(name);
 }
 
 void rosterItemModel::clear()
