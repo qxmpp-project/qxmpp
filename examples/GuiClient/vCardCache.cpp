@@ -52,7 +52,7 @@ void vCardCache::vCardReceived(const QXmppVCardIq& vcard)
     emit vCardReadyToUse(from);
 }
 
-bool vCardCache::isVCardAvailable(const QString& bareJid)
+bool vCardCache::isVCardAvailable(const QString& bareJid) const
 {
     return m_mapBareJidVcard.contains(bareJid);
 }

@@ -39,7 +39,7 @@ class vCardCache : public QObject
 public:
     vCardCache(QXmppClient* client);
 
-    bool isVCardAvailable(const QString& bareJid);
+    bool isVCardAvailable(const QString& bareJid) const;
     void requestVCard(const QString& bareJid);
     QXmppVCardIq& getVCard(const QString& bareJid);
     QImage getAvatar(const QString& bareJid) const;

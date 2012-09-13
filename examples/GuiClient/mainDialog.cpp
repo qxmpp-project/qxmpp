@@ -431,13 +431,16 @@ void mainDialog::avatarChanged(const QImage& image)
 
 void mainDialog::updateStatusWidget()
 {
-    // fetch selfVCard
-    m_xmppClient.vCardManager().requestVCard();
+    const QString bareJid = m_xmppClient.configuration().jidBare();
 
-    m_statusWidget.setDisplayName(m_xmppClient.configuration().jidBare());
+    // initialise status widget
+    updateVCard(bareJid);
     m_statusWidget.setStatusText(presenceToStatusText(m_xmppClient.clientPresence()));
     m_statusWidget.setPresenceAndStatusType(m_xmppClient.clientPresence().type(),
                                             m_xmppClient.clientPresence().availableStatusType());
+
+    // fetch own vCard
+    m_vCardCache.requestVCard(bareJid);
 }
 
 void mainDialog::signIn()
