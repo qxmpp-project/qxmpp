@@ -355,9 +355,14 @@ void mainDialog::showChatDialog(const QString& bareJid)
 
 void mainDialog::messageReceived(const QXmppMessage& msg)
 {
-    QString from = msg.from();
-    getChatDialog(QXmppUtils::jidToBareJid(from))->show();
-    getChatDialog(QXmppUtils::jidToBareJid(from))->messageReceived(msg.body());
+    if (msg.body().isEmpty())
+        return;
+
+    chatDialog *dialog = getChatDialog(QXmppUtils::jidToBareJid(msg.from()));
+    if (dialog) {
+        dialog->show();
+        dialog->messageReceived(msg.body());
+    }
 }
 
 void mainDialog::statusTextChanged(const QString& status)
