@@ -1,6 +1,5 @@
 include(../examples.pri)
 
-CONFIG += debug
 TARGET = GuiClient
 TEMPLATE = app
 
