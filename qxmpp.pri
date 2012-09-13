@@ -13,7 +13,11 @@ CONFIG(debug, debug|release) {
 
 # Determine library type (shared or staticlib)
 isEmpty(QXMPP_LIBRARY_TYPE) {
-    QXMPP_LIBRARY_TYPE = shared
+    android {
+        QXMPP_LIBRARY_TYPE = staticlib
+    } else {
+        QXMPP_LIBRARY_TYPE = shared
+    }
 }
 
 # Libraries used internally by QXmpp
