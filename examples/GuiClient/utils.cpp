@@ -67,12 +67,12 @@ int comparisonWeightsPresenceType(QXmppPresence::Type type)
 
 QString presenceToStatusText(const QXmppPresence& presence)
 {
-    QString statusText = presence.status().statusText();
+    QString statusText = presence.statusText();
     if(statusText.isEmpty())
     {
         if(presence.type() == QXmppPresence::Available)
         {
-            switch(presence.status().type())
+            switch(presence.availableStatusType())
             {
             case QXmppPresence::Invisible:
                 statusText = "Offline";
