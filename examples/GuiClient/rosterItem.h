@@ -44,18 +44,11 @@ public:
 
     rosterItem(const QString& bareJid);
 
-    void setName(const QString& name);
-    QString getName();
-    void setBareJid(const QString& bareJid);
-    void setStatusText(const QString& text);
-    void setStatusType(QXmppPresence::AvailableStatusType type);
-    void setPresenceType(QXmppPresence::Type type);
     void setAvatar(const QImage& image);
+    void setPresence(const QXmppPresence &presence);
+    void setName(const QString& name);
     QImage getAvatar();
-    QString getBareJid();
-    QString getStatusText();
-    QXmppPresence::AvailableStatusType getStatusType();
-    QXmppPresence::Type getPresenceType();
+    QString getName();
 };
 
 class rosterItemDelegate : public QItemDelegate

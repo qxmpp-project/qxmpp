@@ -47,32 +47,14 @@ void rosterItemModel::addRosterItemIfDontExist(const QString& bareJid)
         rosterItem* item = new rosterItem(bareJid);
         m_jidRosterItemMap[bareJid] = item;
         appendRow(item);
-        item->setStatusText("Offline");
-        item->setBareJid(bareJid);
     }
 }
 
 void rosterItemModel::updatePresence(const QString& bareJid, const QMap<QString, QXmppPresence>& presences)
 {
     addRosterItemIfDontExist(bareJid);
-
-    if(presences.count() > 0)
-    {
-        QString statusText = presences.begin().value().statusText();
-        QXmppPresence::AvailableStatusType statusType = presences.begin().value().availableStatusType();
-        QXmppPresence::Type presenceType = presences.begin().value().type();
-
-        if(statusText.isEmpty())
-        {
-            if(presenceType == QXmppPresence::Available)
-                statusText = "Available";
-            else if(presenceType == QXmppPresence::Unavailable)
-                statusText = "Offline";
-        }
-        getRosterItemFromBareJid(bareJid)->setStatusText(statusText);
-        getRosterItemFromBareJid(bareJid)->setStatusType(statusType);
-        getRosterItemFromBareJid(bareJid)->setPresenceType(presenceType);
-    }
+    if (!presences.isEmpty())
+        getRosterItemFromBareJid(bareJid)->setPresence(*presences.begin());
 }
 
 void rosterItemModel::updateRosterEntry(const QString& bareJid, const QXmppRosterIq::Item& rosterEntry)

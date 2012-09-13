@@ -25,9 +25,10 @@
 #include "rosterItem.h"
 #include <QImage>
 
-rosterItem::rosterItem(const QString& bareJid) //: QStandardItem(bareJid)
+rosterItem::rosterItem(const QString& bareJid)
 {
-    setStatusText("Offline");
+    setData(bareJid, rosterItem::BareJid);
+    setData("Offline", rosterItem::StatusText);
 }
 
 void rosterItem::setName(const QString& name)
@@ -40,82 +41,47 @@ QString rosterItem::getName()
     return text();
 }
 
-void rosterItem::setBareJid(const QString& bareJid)
+void rosterItem::setPresence(const QXmppPresence &presence)
 {
-    setData(bareJid, rosterItem::BareJid);
-}
-
-void rosterItem::setStatusText(const QString& text)
-{
-    setData(text, rosterItem::StatusText);
-}
-
-QString rosterItem::getBareJid()
-{
-    return data(rosterItem::BareJid).toString();
-}
-
-QString rosterItem::getStatusText()
-{
-    return data(rosterItem::StatusText).toString();
-}
-
-void rosterItem::setStatusType(QXmppPresence::AvailableStatusType type)
-{
-    setData(static_cast<int>(type), StatusType);
-    QString icon;
-    switch(type)
-    {
-    case QXmppPresence::Online:
-    case QXmppPresence::Chat:
-        icon = "green";
-        break;
-    case QXmppPresence::Away:
-    case QXmppPresence::XA:
-        icon = "orange";
-        break;
-    case QXmppPresence::DND:
-        icon = "red";
-        break;
-    case QXmppPresence::Invisible:
-        icon = "gray";
-        break;
+    // determine status text
+    QString statusText = presence.statusText();
+    if (statusText.isEmpty()) {
+        if(presence.type() == QXmppPresence::Available)
+            statusText = "Available";
+        else if(presence.type() == QXmppPresence::Unavailable)
+            statusText = "Offline";
     }
-    if(!icon.isEmpty())
-        setIcon(QIcon(":/icons/resource/"+icon+".png"));
-}
 
-QXmppPresence::AvailableStatusType rosterItem::getStatusType()
-{
-    return static_cast<QXmppPresence::AvailableStatusType>(data(StatusType).toInt());
-}
+    // store data
+    setData(statusText, rosterItem::StatusText);
+    setData(static_cast<int>(presence.type()), PresenceType);
+    setData(static_cast<int>(presence.availableStatusType()), StatusType);
 
-void rosterItem::setPresenceType(QXmppPresence::Type type)
-{
-    setData(static_cast<int>(type), PresenceType);
+    // update icon
     QString icon;
-    switch(type)
-    {
-    case QXmppPresence::Available:
-        break;
-    case QXmppPresence::Unavailable:
+    if (presence.type() == QXmppPresence::Available) {
+        switch (presence.availableStatusType())
+        {
+        case QXmppPresence::Online:
+        case QXmppPresence::Chat:
+            icon = "green";
+            break;
+        case QXmppPresence::Away:
+        case QXmppPresence::XA:
+            icon = "orange";
+            break;
+        case QXmppPresence::DND:
+            icon = "red";
+            break;
+        case QXmppPresence::Invisible:
+            icon = "gray";
+            break;
+        }
+    } else {
         icon = "gray";
-        break;
-    case QXmppPresence::Error:
-    case QXmppPresence::Subscribe:
-    case QXmppPresence::Subscribed:
-    case QXmppPresence::Unsubscribe:
-    case QXmppPresence::Unsubscribed:
-    case QXmppPresence::Probe:
-        break;
     }
-    if(!icon.isEmpty())
+    if (!icon.isEmpty())
         setIcon(QIcon(":/icons/resource/"+icon+".png"));
-}
-
-QXmppPresence::Type rosterItem::getPresenceType()
-{
-    return static_cast<QXmppPresence::Type>(data(PresenceType).toInt());
 }
 
 void rosterItem::setAvatar(const QImage& image)
