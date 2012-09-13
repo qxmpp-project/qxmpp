@@ -518,23 +518,22 @@ void mainDialog::showLoginStatusWithCounter(const QString& msg, int time)
 
 void mainDialog::updateVCard(const QString& bareJid)
 {
-    if(bareJid != m_xmppClient.configuration().jidBare())
-    {
-        m_rosterItemModel.updateAvatar(bareJid,
-                                   m_vCardCache.getAvatar(bareJid));
-        m_rosterItemModel.updateName(bareJid, m_vCardCache.getVCard(bareJid).fullName());
-    }
-    else
-    {
-        QXmppVCardIq& vCard = m_vCardCache.getVCard(m_xmppClient.configuration().jidBare());
-        QString fullName = vCard.fullName();
+    const QXmppVCardIq vCard = m_vCardCache.getVCard(bareJid);
+    const QImage avatar = m_vCardCache.getAvatar(bareJid);
 
-        if(fullName.isEmpty())
-            fullName = m_xmppClient.configuration().jidBare();
+    // determine full name
+    QString fullName = vCard.fullName();
+    if (fullName.isEmpty())
+        fullName = bareJid;
 
+    if (bareJid == m_xmppClient.configuration().jidBare()) {
+        // update our own information
+        m_statusWidget.setAvatar(avatar);
         m_statusWidget.setDisplayName(fullName);
-
-        m_statusWidget.setAvatar(m_vCardCache.getAvatar(bareJid));
+    } else {
+        // update roster information
+        m_rosterItemModel.updateAvatar(bareJid, avatar);
+        m_rosterItemModel.updateName(bareJid, fullName);
     }
 }
 
