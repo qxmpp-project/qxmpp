@@ -29,6 +29,7 @@ rosterItem::rosterItem(const QString& bareJid)
 {
     setData(bareJid, rosterItem::BareJid);
     setData("Offline", rosterItem::StatusText);
+    setAvatar(QImage(":/icons/resource/avatar.png"));
     setIcon(QIcon(":/icons/resource/gray.png"));
 }
 

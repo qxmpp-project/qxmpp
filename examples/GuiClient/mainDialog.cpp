@@ -529,13 +529,16 @@ void mainDialog::showLoginStatusWithCounter(const QString& msg, int time)
 
 void mainDialog::updateVCard(const QString& bareJid)
 {
-    const QXmppVCardIq vCard = m_vCardCache.getVCard(bareJid);
-    const QImage avatar = m_vCardCache.getAvatar(bareJid);
-
     // determine full name
+    const QXmppVCardIq vCard = m_vCardCache.getVCard(bareJid);
     QString fullName = vCard.fullName();
     if (fullName.isEmpty())
         fullName = bareJid;
+
+    // determine avatar
+    QImage avatar = m_vCardCache.getAvatar(bareJid);
+    if (avatar.isNull())
+        avatar = QImage(":/icons/resource/avatar.png");
 
     if (bareJid == m_xmppClient.configuration().jidBare()) {
         // update our own information
