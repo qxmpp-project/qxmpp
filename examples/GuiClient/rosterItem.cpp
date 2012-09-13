@@ -101,6 +101,8 @@ rosterItemDelegate::rosterItemDelegate()
 
 QSize rosterItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex & index) const
 {
+    Q_UNUSED(option);
+    Q_UNUSED(index);
     return QSize(44, 36);
 }
 

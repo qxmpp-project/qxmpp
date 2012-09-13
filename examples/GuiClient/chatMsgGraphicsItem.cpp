@@ -67,9 +67,7 @@ QLinearGradient darken(const QLinearGradient &gradient)
     return g;
 }
 
-void drawPath(QPainter *p, const QPainterPath &path,
-              const QColor &col, const QString &name, int textWidth,
-              bool dark = false)
+static void drawPath(QPainter *p, const QPainterPath &path, const QColor &col, bool dark = false)
 {
     const QRectF pathRect = path.boundingRect();
 
@@ -129,8 +127,11 @@ chatMsgGraphicsItem::chatMsgGraphicsItem(QGraphicsItem * parent):QGraphicsPathIt
 
 void chatMsgGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     painter->setRenderHint(QPainter::Antialiasing);
-    drawPath(painter, path(), m_color, getText(), getTextWidth());
+    drawPath(painter, path(), m_color);
 
 //    int spike_x = m_spikeWidth;
 //    int spike_y = m_spikeHeight;

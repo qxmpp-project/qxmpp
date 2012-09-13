@@ -52,6 +52,8 @@ void chatGraphicsScene::addMessage(const QString& user, const QString& message)
 
 void chatGraphicsScene::setWidthResize(int newWidth, int oldWidth)
 {
+    Q_UNUSED(newWidth);
+    Q_UNUSED(oldWidth);
 //    verticalReposition();
 }
 

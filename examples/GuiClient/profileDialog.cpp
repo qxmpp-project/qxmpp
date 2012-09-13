@@ -39,9 +39,12 @@ profileDialog::profileDialog(QWidget *parent, const QString& bareJid, QXmppClien
     QDialog(parent, Qt::WindowTitleHint|Qt::WindowSystemMenuHint),
     ui(new Ui::profileDialog), m_bareJid(bareJid), m_xmppClient(client), m_caps(caps)
 {
+    bool check;
+    Q_UNUSED(check);
+
     ui->setupUi(this);
 
-    bool check = connect(&m_xmppClient.versionManager(), SIGNAL(versionReceived(QXmppVersionIq)),
+    check = connect(&m_xmppClient.versionManager(), SIGNAL(versionReceived(QXmppVersionIq)),
             SLOT(versionReceived(QXmppVersionIq)));
     Q_ASSERT(check);
 

@@ -67,9 +67,15 @@ void statusLineEdit::mousePressEvent(QMouseEvent* event)
     QLineEdit::selectAll();
 }
 
-statusTextWidget::statusTextWidget(QWidget* parent) : QWidget(parent),
-        m_statusLineEdit(0), m_statusButton(0), m_clearStatusTextHistory("Clear Status Message", this)
+statusTextWidget::statusTextWidget(QWidget* parent)
+    : QWidget(parent)
+    , m_statusLineEdit(0)
+    , m_statusButton(0)
+    , m_clearStatusTextHistory("Clear Status Message", this)
 {
+    bool check;
+    Q_UNUSED(check);
+
     m_statusLineEdit = new statusLineEdit(this);
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(m_statusLineEdit);
@@ -79,12 +85,15 @@ statusTextWidget::statusTextWidget(QWidget* parent) : QWidget(parent),
     layout->addWidget(m_statusButton);
     setLayout(layout);
 
-    bool check = connect(m_statusButton, SIGNAL(clicked(bool)), SLOT(showMenu()));
+    check = connect(m_statusButton, SIGNAL(clicked(bool)), SLOT(showMenu()));
     Q_ASSERT(check);
+
     check = connect(m_statusLineEdit, SIGNAL(textChanged(QString)), SLOT(textChanged()));
     Q_ASSERT(check);
+
     check = connect(m_statusLineEdit, SIGNAL(editingFinished()), SLOT(statusTextChanged_helper()));
     Q_ASSERT(check);
+
     check = connect(&m_clearStatusTextHistory, SIGNAL(triggered()), SLOT(clearStatusTextHistory()));
     Q_ASSERT(check);
 }

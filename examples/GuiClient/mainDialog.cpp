@@ -55,6 +55,9 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     m_signOutAction("Sign out", this),
     m_settingsMenu(0)
 {
+    bool check;
+    Q_UNUSED(check);
+
     ui->setupUi(this);
     createTrayIconAndMenu();
     createSettingsMenu();
@@ -65,7 +68,7 @@ mainDialog::mainDialog(QWidget *parent): QDialog(parent, Qt::Window),
     showSignInPage();
     loadAccounts();
 
-    bool check = connect(ui->lineEdit_userName->completer(),
+    check = connect(ui->lineEdit_userName->completer(),
                          SIGNAL(activated(QString)),
                          this, SLOT(userNameCompleter_activated(QString)));
     Q_ASSERT(check);
@@ -615,7 +618,10 @@ void mainDialog::action_quit()
 
 void mainDialog::createTrayIconAndMenu()
 {
-    bool check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(&m_quitAction, SIGNAL(triggered()), SLOT(action_quit()));
     Q_ASSERT(check);
 
     check = connect(&m_signOutAction, SIGNAL(triggered()), SLOT(action_signOut()));
@@ -626,7 +632,7 @@ void mainDialog::createTrayIconAndMenu()
 
     check = connect(&m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                     SLOT(action_trayIconActivated(QSystemTrayIcon::ActivationReason)));
-        Q_ASSERT(check);
+    Q_ASSERT(check);
 
     m_trayIconMenu.addAction(&m_signOutAction);
     m_trayIconMenu.addSeparator();

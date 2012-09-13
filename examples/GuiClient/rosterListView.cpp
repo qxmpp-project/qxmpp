@@ -28,10 +28,16 @@
 #include <QMenu>
 #include <QKeyEvent>
 
-rosterListView::rosterListView(QWidget* parent):QListView(parent), m_chat("Chat", this),
-m_profile("View Profile", this), m_removeContact("Remove", this)
+rosterListView::rosterListView(QWidget* parent)
+    : QListView(parent)
+    , m_chat("Chat", this)
+    , m_profile("View Profile", this)
+    , m_removeContact("Remove", this)
 {
-    bool check = connect(this, SIGNAL(pressed(QModelIndex)), this,
+    bool check;
+    Q_UNUSED(check);
+
+    check = connect(this, SIGNAL(pressed(QModelIndex)), this,
                          SLOT(mousePressed(QModelIndex)));
     Q_ASSERT(check);
     check = connect(this, SIGNAL(doubleClicked(QModelIndex)), this,
@@ -74,11 +80,13 @@ void rosterListView::mousePressed(const QModelIndex& index)
 
 void rosterListView::doubleClicked(const QModelIndex& index)
 {
+    Q_UNUSED(index);
     m_chat.trigger();
 }
 
 void rosterListView::clicked(const QModelIndex& index)
 {
+    Q_UNUSED(index);
 }
 
 QString rosterListView::selectedBareJid()

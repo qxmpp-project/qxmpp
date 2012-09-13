@@ -29,7 +29,11 @@
 #include <QMessageBox>
 
 statusWidget::statusWidget(QWidget* parent)
+    : QWidget(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     setupUi(this);
 
     QMenu* menu = new QMenu(this);
@@ -41,17 +45,21 @@ statusWidget::statusWidget(QWidget* parent)
     menu->addAction(actionSign_out);
     toolButton_userName->setMenu(menu);
 
-    bool check = connect(statusTextWidgetObject, SIGNAL(statusTextChanged(QString)), SIGNAL(statusTextChanged(QString)));
+    check = connect(statusTextWidgetObject, SIGNAL(statusTextChanged(QString)), SIGNAL(statusTextChanged(QString)));
     Q_ASSERT(check);
 
     check = connect(actionAvailable, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
+
     check = connect(actionBusy, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
+
     check = connect(actionAway, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
+
 //    check = connect(actionInvisible, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
 //    Q_ASSERT(check);
+
     check = connect(actionSign_out, SIGNAL(triggered()), SLOT(presenceMenuTriggered()));
     Q_ASSERT(check);
 
