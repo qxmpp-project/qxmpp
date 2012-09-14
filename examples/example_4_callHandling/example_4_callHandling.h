@@ -34,6 +34,7 @@ class xmppClient : public QXmppClient
 
 public:
     xmppClient(QObject *parent = 0);
+    void setRecipient(const QString &recipient);
 
 private slots:
     void slotAudioModeChanged(QIODevice::OpenMode mode);
@@ -43,6 +44,7 @@ private slots:
 
 private:
     QXmppCallManager *callManager;
+    QString m_recipient;
 };
 
 #endif // IBBCLIENT_H

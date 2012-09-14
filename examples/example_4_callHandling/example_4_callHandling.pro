@@ -5,10 +5,9 @@ MOBILITY += multimedia
 
 TARGET = example_4_callHandling
 
-SOURCES +=  main.cpp \
-            xmppClient.cpp
+SOURCES += example_4_callHandling.cpp
 
-HEADERS +=  xmppClient.h
+HEADERS += example_4_callHandling.h
 
 # Symbian packaging rules
 symbian {

@@ -22,8 +22,12 @@
  *
  */
 
+#include <cstdlib>
+#include <cstdio>
+
 #include <QAudioInput>
 #include <QAudioOutput>
+#include <QCoreApplication>
 #include <QDebug>
 
 #include "QXmppCallManager.h"
@@ -31,7 +35,7 @@
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
-#include "xmppClient.h"
+#include "example_4_callHandling.h"
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
@@ -47,6 +51,11 @@ xmppClient::xmppClient(QObject *parent)
     check = connect(callManager, SIGNAL(callReceived(QXmppCall*)),
                     this, SLOT(slotCallReceived(QXmppCall*)));
     Q_ASSERT(check);
+}
+
+void xmppClient::setRecipient(const QString &recipient)
+{
+    m_recipient = recipient;
 }
 
 /// The audio mode of a call changed.
@@ -121,12 +130,10 @@ void xmppClient::slotCallStateChanged(QXmppCall::State state)
 
 void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 {
-    const QLatin1String recipient("qxmpp.test2@gmail.com");
-
-    // if we are the recipient, or if the presence is not from the recipient,
+    // if we don't have a recipient, or if the presence is not from the recipient,
     // do nothing
-    if (jidToBareJid(configuration().jid()) == recipient ||
-        jidToBareJid(presence.from()) != recipient ||
+    if (m_recipient.isEmpty() ||
+        QXmppUtils::jidToBareJid(presence.from()) != m_recipient ||
         presence.type() != QXmppPresence::Available)
         return;
 
@@ -143,3 +150,25 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     Q_ASSERT(check);
 }
 
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    // we want one argument : "send" or "receive"
+    if (argc != 2 || (strcmp(argv[1], "send") && strcmp(argv[1], "receive")))
+    {
+        fprintf(stderr, "Usage: %s send|receive\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    xmppClient client;
+    client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
+    if (!strcmp(argv[1], "send")) {
+        client.setRecipient("qxmpp.test2@qxmpp.org");
+        client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    } else {
+        client.connectToServer("qxmpp.test2@qxmpp.org", "qxmpp456");
+    }
+
+    return a.exec();
+}
