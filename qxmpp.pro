@@ -2,10 +2,12 @@ include(qxmpp.pri)
 
 TEMPLATE = subdirs
 
-SUBDIRS = src \
-          tests \
-          examples \
-          doc
+SUBDIRS = src
+
+android {
+} else {
+    SUBDIRS += tests examples doc
+}
 
 CONFIG += ordered
 
