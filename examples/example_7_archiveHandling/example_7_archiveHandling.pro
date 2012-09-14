@@ -2,7 +2,6 @@ include(../examples.pri)
 
 TARGET = example_7_archiveHandling
 
-SOURCES +=  main.cpp \
-            xmppClient.cpp
+SOURCES += example_7_archiveHandling.cpp
 
-HEADERS +=  xmppClient.h
+HEADERS += example_7_archiveHandling.h

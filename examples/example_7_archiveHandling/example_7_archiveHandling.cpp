@@ -21,13 +21,13 @@
  *
  */
 
-
+#include <QCoreApplication>
 #include <QDateTime>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 
-#include "xmppClient.h"
+#include "example_7_archiveHandling.h"
 
 static void logStart(const QString &msg)
 {
@@ -142,3 +142,14 @@ void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat, const QXmppRe
     }
 }
 
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    xmppClient client;
+    client.setPageSize(15);
+    client.setPageDirection(xmppClient::PageBackwards);
+    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+
+    return a.exec();
+}
