@@ -22,13 +22,17 @@
  *
  */
 
+#include <cstdlib>
+#include <cstdio>
+
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QDebug>
 
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "xmppClient.h"
+#include "example_3_transferHandling.h"
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent), transferManager(0)
@@ -52,6 +56,11 @@ xmppClient::xmppClient(QObject *parent)
     check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
                     this, SLOT(slotFileReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
+}
+
+void xmppClient::setRecipient(const QString &recipient)
+{
+    m_recipient = recipient;
 }
 
 /// A file transfer failed.
@@ -102,12 +111,10 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     bool check;
     Q_UNUSED(check);
 
-    const QLatin1String recipient("qxmpp.test2@gmail.com");
-
-    // if we are the recipient, or if the presence is not from the recipient,
+    // if we don't have a recipient, or if the presence is not from the recipient,
     // do nothing
-    if (QXmppUtils::jidToBareJid(configuration().jid()) == recipient ||
-        QXmppUtils::jidToBareJid(presence.from()) != recipient ||
+    if (m_recipient.isEmpty() ||
+        QXmppUtils::jidToBareJid(presence.from()) != m_recipient ||
         presence.type() != QXmppPresence::Available)
         return;
 
@@ -132,4 +139,27 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 void xmppClient::slotProgress(qint64 done, qint64 total)
 {
     qDebug() << "Transmission progress:" << done << "/" << total;
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    // we want one argument : "send" or "receive"
+    if (argc != 2 || (strcmp(argv[1], "send") && strcmp(argv[1], "receive")))
+    {
+        fprintf(stderr, "Usage: %s send|receive\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    xmppClient client;
+    client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
+    if (!strcmp(argv[1], "send")) {
+        client.setRecipient("qxmpp.test2@qxmpp.org");
+        client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    } else {
+        client.connectToServer("qxmpp.test2@qxmpp.org", "qxmpp456");
+    }
+
+    return a.exec();
 }

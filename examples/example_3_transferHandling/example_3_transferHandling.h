@@ -36,6 +36,7 @@ class xmppClient : public QXmppClient
 
 public:
     xmppClient(QObject *parent = 0);
+    void setRecipient(const QString &recipient);
 
 private slots:
     void slotError(QXmppTransferJob::Error error);
@@ -45,6 +46,7 @@ private slots:
     void slotProgress(qint64 done, qint64 total);
 
 private:
+    QString m_recipient;
     QXmppTransferManager *transferManager;
 };
 

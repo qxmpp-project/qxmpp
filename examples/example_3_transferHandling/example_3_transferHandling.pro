@@ -2,7 +2,6 @@ include(../examples.pri)
 
 TARGET = example_3_transferHandling
 
-SOURCES +=  main.cpp \
-            xmppClient.cpp
+SOURCES += example_3_transferHandling.cpp
 
-HEADERS +=  xmppClient.h
+HEADERS += example_3_transferHandling.h
