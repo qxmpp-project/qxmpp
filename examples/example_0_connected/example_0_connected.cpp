@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     // client.connectToServer("username@jabber.org", "passwd");
 
     // For google talk
-    // client.connectToServer("qxmpp.test1@gmail.com", "passwd");
+    // client.connectToServer("username@gmail.com", "passwd");
 
     client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
 

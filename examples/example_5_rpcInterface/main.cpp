@@ -43,6 +43,6 @@ int main(int argc, char *argv[])
     client.addExtension(manager);
     manager->addInvokableInterface(new RemoteInterface(&client));
 
-    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
+    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
     return a.exec();
 }
