@@ -7,6 +7,7 @@ SUBDIRS = src
 android {
 } else {
     SUBDIRS += tests examples doc
+    INSTALLS += htmldocs
 }
 
 CONFIG += ordered
@@ -31,4 +32,3 @@ htmldocs.path = $$PREFIX/share/doc/qxmpp
 htmldocs.CONFIG += no_check_exist directory
 
 QMAKE_EXTRA_TARGETS += dist docs
-INSTALLS += htmldocs
