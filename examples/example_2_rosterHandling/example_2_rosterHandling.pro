@@ -2,9 +2,8 @@ include(../examples.pri)
 
 TARGET = example_2_rosterHandling
 
-SOURCES +=  main.cpp \
-            xmppClient.cpp
+SOURCES += example_2_rosterHandling.cpp
 
-HEADERS +=  xmppClient.h
+HEADERS += example_2_rosterHandling.h
 
 OTHER_FILES += README

@@ -22,17 +22,42 @@
  */
 
 
-#include <QtCore/QCoreApplication>
-#include "xmppClient.h"
+#include <QCoreApplication>
+
 #include "QXmppLogger.h"
+#include "QXmppMessage.h"
+
+#include "example_1_echoClient.h"
+
+echoClient::echoClient(QObject *parent)
+    : QXmppClient(parent)
+{
+    bool check = connect(this, SIGNAL(messageReceived(QXmppMessage)),
+        SLOT(messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+}
+
+echoClient::~echoClient()
+{
+
+}
+
+void echoClient::messageReceived(const QXmppMessage& message)
+{
+    QString from = message.from();
+    QString msg = message.body();
+
+    sendPacket(QXmppMessage("", from, "Your message: " + msg));
+}
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::FileLogging);
+    QCoreApplication app(argc, argv);
 
-    xmppClient client;
-    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
-    return a.exec();
+    echoClient client;
+    client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
+    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+
+    return app.exec();
 }

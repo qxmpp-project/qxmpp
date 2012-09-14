@@ -21,12 +21,12 @@
  *
  */
 
-#include <iostream>
+#include <QCoreApplication>
 
 #include "QXmppMessage.h"
 #include "QXmppRosterManager.h"
 
-#include "xmppClient.h"
+#include "example_2_rosterHandling.h"
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
@@ -56,27 +56,32 @@ xmppClient::~xmppClient()
 
 void xmppClient::clientConnected()
 {
-    std::cout<<"example_2_rosterHandling:: CONNECTED"<<std::endl;
+    qDebug("example_2_rosterHandling:: CONNECTED");
 }
 
 void xmppClient::rosterReceived()
 {
-    std::cout<<"example_2_rosterHandling:: Roster Received"<<std::endl;
-    QStringList list = rosterManager().getRosterBareJids();
-    QString rosterEntry = "Roster Received:: %1 [%2]";
-    for(int i = 0; i < list.size(); ++i)
-    {
-        QString bareJid = list.at(i);
+    qDebug("example_2_rosterHandling:: Roster received");
+    foreach (const QString &bareJid, rosterManager().getRosterBareJids()) {
         QString name = rosterManager().getRosterEntry(bareJid).name();
         if(name.isEmpty())
             name = "-";
-        std::cout << qPrintable(rosterEntry.arg(bareJid).arg(name)) << std::endl;
+        qDebug("example_2_rosterHandling:: Roster received: %s [%s]", qPrintable(bareJid), qPrintable(name));
     }
 }
 
 void xmppClient::presenceChanged(const QString& bareJid,
                                  const QString& resource)
 {
-    QString presenceStr = "Presence Changed:: %1/%2";
-    std::cout<<qPrintable(presenceStr.arg(bareJid).arg(resource))<<std::endl;
+    qDebug("example_2_rosterHandling:: Presence changed %s/%s", qPrintable(bareJid), qPrintable(resource));
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+
+    xmppClient client;
+    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+
+    return app.exec();
 }

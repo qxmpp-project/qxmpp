@@ -2,9 +2,8 @@ include(../examples.pri)
 
 TARGET = example_1_echoClient
 
-SOURCES +=  main.cpp \
-            echoClient.cpp
+SOURCES += example_1_echoClient.cpp
 
-HEADERS +=  echoClient.h
+HEADERS += example_1_echoClient.h
 
 OTHER_FILES += README

@@ -22,7 +22,7 @@
  */
 
 
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
