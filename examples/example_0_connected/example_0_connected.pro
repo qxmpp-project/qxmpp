@@ -2,6 +2,6 @@ include(../examples.pri)
 
 TARGET = example_0_connected
 
-SOURCES += main.cpp
+SOURCES += example_0_connected.cpp
 
 OTHER_FILES += README
