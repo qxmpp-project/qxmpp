@@ -29,9 +29,6 @@
 
 #include <QDateTime>
 
-class QXmlStreamWriter;
-class QDomElement;
-
 /// \brief The QXmppArchiveMessage class represents an archived message
 /// as defined by XEP-0136: Message Archiving.
 

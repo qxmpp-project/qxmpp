@@ -28,9 +28,6 @@
 #include "QXmppIq.h"
 #include <QVariant>
 
-class QXmlStreamWriter;
-class QDomElement;
-
 class QXMPP_EXPORT QXmppRpcMarshaller
 {
 public:

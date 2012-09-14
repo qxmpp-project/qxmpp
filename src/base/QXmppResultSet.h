@@ -24,11 +24,9 @@
 #ifndef QXMPPRESULTSET_H
 #define QXMPPRESULTSET_H
 
-#include "QXmppElement.h"
 #include <QDateTime>
 
-class QXmlStreamWriter;
-class QDomElement;
+#include "QXmppStanza.h"
 
 /// \brief The QXmppResultSetQuery class represents a set element in a query
 /// as defined by XEP-0059: Result Set Management.

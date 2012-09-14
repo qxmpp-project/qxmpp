@@ -27,8 +27,6 @@
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
-class QDomElement;
-
 class QXMPP_EXPORT QXmppDiscoveryIq : public QXmppIq
 {
 public:

@@ -30,9 +30,6 @@
 #include "QXmppIq.h"
 #include "QXmppTransferManager.h"
 
-class QDomElement;
-class QXmlStreamWriter;
-
 //
 //  W A R N I N G
 //  -------------

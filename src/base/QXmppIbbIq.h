@@ -27,9 +27,6 @@
 
 #include "QXmppIq.h"
 
-class QDomElement;
-class QXmlStreamWriter;
-
 class QXmppIbbOpenIq: public QXmppIq
 {
 public:

@@ -25,14 +25,10 @@
 #define QXMPPDATAFORM_H
 
 #include <QPair>
-#include <QSharedDataPointer>
-#include <QString>
 #include <QVariant>
-#include <QXmlStreamWriter>
 
-#include "QXmppGlobal.h"
+#include "QXmppStanza.h"
 
-class QDomElement;
 class QXmppDataFormPrivate;
 class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;

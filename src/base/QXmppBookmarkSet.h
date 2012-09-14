@@ -25,13 +25,9 @@
 #define QXMPPBOOKMARKSET_H
 
 #include <QList>
-#include <QString>
 #include <QUrl>
-#include <QXmlStreamWriter>
 
-#include "QXmppGlobal.h"
-
-class QDomElement;
+#include "QXmppStanza.h"
 
 /// \brief The QXmppBookmarkConference class represents a bookmark for a conference room,
 /// as defined by XEP-0048: Bookmarks.

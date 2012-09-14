@@ -28,9 +28,6 @@
 
 #include <QHostAddress>
 
-class QDomElement;
-class QXmlStreamWriter;
-
 class QXMPP_EXPORT QXmppByteStreamIq : public QXmppIq
 {
 public:

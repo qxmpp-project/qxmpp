@@ -26,9 +26,6 @@
 
 #include "QXmppIq.h"
 
-class QXmlStreamWriter;
-class QDomElement;
-
 class QXMPP_EXPORT QXmppPingIq : public QXmppIq
 {
 public:
