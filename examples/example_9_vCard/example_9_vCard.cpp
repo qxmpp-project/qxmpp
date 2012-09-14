@@ -21,21 +21,22 @@
  *
  */
 
-#include "xmppClient.h"
-
 #include <iostream>
+
+#include <QBuffer>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QImage>
+#include <QImageReader>
+#include <QXmlStreamWriter>
 
 #include "QXmppMessage.h"
 #include "QXmppRosterManager.h"
 #include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
-#include <QFile>
-#include <QDir>
-#include <QXmlStreamWriter>
-#include <QImage>
-#include <QBuffer>
-#include <QImageReader>
+#include "example_9_vCard.h"
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
@@ -112,4 +113,14 @@ void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
     {
         std::cout<<"example_9_vCard:: Avatar saved to file" <<std::endl<<std::endl;
     }
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    xmppClient client;
+    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+
+    return a.exec();
 }

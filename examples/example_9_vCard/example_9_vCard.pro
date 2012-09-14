@@ -2,7 +2,6 @@ include(../examples.pri)
 
 TARGET = example_9_vCard
 
-SOURCES +=  main.cpp \
-            xmppClient.cpp
+SOURCES += example_9_vCard.cpp
 
-HEADERS +=  xmppClient.h
+HEADERS += example_9_vCard.h
