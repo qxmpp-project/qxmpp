@@ -38,6 +38,7 @@
 #include "QXmppIbbIq.h"
 #include "QXmppSocks.h"
 #include "QXmppStreamInitiationIq_p.h"
+#include "QXmppStun.h"
 #include "QXmppTransferManager.h"
 #include "QXmppTransferManager_p.h"
 #include "QXmppUtils.h"
@@ -735,6 +736,7 @@ public:
     QString proxy;
     bool proxyOnly;
     QXmppSocksServer *socksServer;
+    QXmppSocksServer *socksServerV6;
     QXmppTransferJob::Methods supportedMethods;
 
 private:
@@ -746,6 +748,7 @@ QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *q
     : ibbBlockSize(4096)
     , proxyOnly(false)
     , socksServer(0)
+    , socksServerV6(0)
     , supportedMethods(QXmppTransferJob::AnyMethod)
     , q(qq)
 {
@@ -793,12 +796,19 @@ QXmppTransferManager::QXmppTransferManager()
 
     // start SOCKS server
     d->socksServer = new QXmppSocksServer(this);
-    if (d->socksServer->listen()) {
-        check = connect(d->socksServer, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
-                        this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
-        Q_ASSERT(check);
-    } else {
-        qWarning("QXmppSocksServer could not start listening");
+    check = connect(d->socksServer, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+                    this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
+    Q_ASSERT(check);
+    if (!d->socksServer->listen(QHostAddress::Any)) {
+        qWarning("QXmppSocksServer could not start listening for IPv4");
+    }
+
+    d->socksServerV6 = new QXmppSocksServer(this);
+    check = connect(d->socksServerV6, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+                    this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
+    Q_ASSERT(check);
+    if (!d->socksServerV6->listen(QHostAddress::AnyIPv6)) {
+        qWarning("QXmppSocksServer could not start listening for IPv6");
     }
 }
 
@@ -1431,24 +1441,16 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
     QList<QXmppByteStreamIq::StreamHost> streamHosts;
 
     // discover local IPs
-    if (!d->proxyOnly)
-    {
-        foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-        {
-            if (!(interface.flags() & QNetworkInterface::IsRunning) ||
-                interface.flags() & QNetworkInterface::IsLoopBack)
-                continue;
-
-            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-            {
-                if (entry.ip().protocol() != QAbstractSocket::IPv4Protocol ||
-                    entry.netmask().isNull())
-                    continue;
-
-                QXmppByteStreamIq::StreamHost streamHost;
-                streamHost.setHost(entry.ip().toString());
+    if (!d->proxyOnly) {
+        foreach (const QHostAddress &address, QXmppIceComponent::discoverAddresses()) {
+            QXmppByteStreamIq::StreamHost streamHost;
+            streamHost.setJid(ownJid);
+            streamHost.setHost(address.toString());
+            if (address.protocol() == QAbstractSocket::IPv4Protocol && d->socksServer->isListening()) {
                 streamHost.setPort(d->socksServer->serverPort());
-                streamHost.setJid(ownJid);
+                streamHosts.append(streamHost);
+            } else if (address.protocol() == QAbstractSocket::IPv6Protocol && d->socksServerV6->isListening()) {
+                streamHost.setPort(d->socksServerV6->serverPort());
                 streamHosts.append(streamHost);
             }
         }
@@ -1517,12 +1519,6 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->d->requestId = openIq.id();
         client()->sendPacket(openIq);
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
-        if (!d->socksServer->isListening())
-        {
-            warning("QXmppSocksServer is not listening");
-            job->terminate(QXmppTransferJob::ProtocolError);
-            return;
-        }
         if (!d->proxy.isEmpty())
         {
             job->d->socksProxy.setJid(d->proxy);
