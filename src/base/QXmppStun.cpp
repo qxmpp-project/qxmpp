@@ -2185,12 +2185,6 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
                 entry.netmask().isNull())
                 continue;
 
-#ifdef Q_OS_MAC
-            // FIXME: on Mac OS X, sending IPv6 UDP packets fails
-            if (ip.protocol() == QAbstractSocket::IPv6Protocol)
-                continue;
-#endif
-
             // FIXME: for now skip IPv6 link-local addresses, seems to upset
             // clients such as empathy
             if (isIPv6LinkLocalAddress(ip)) {
