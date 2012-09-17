@@ -10,6 +10,7 @@ QXmpp 0.7.4 (UNRELEASED)
       multiple times to supported multiple IP address / ports.
   - Improve QXmppTransferManager:
     * Change third argument of QXmppTransferManager::sendFile to a description.
+    * Enable file transfer using IPv6.
     * Allow StreamHost::host to contain a host name.
 
 QXmpp 0.7.3 (Sep 7, 2012)
