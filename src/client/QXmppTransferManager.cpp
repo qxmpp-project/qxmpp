@@ -1286,7 +1286,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
-QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &sid, const QString &description)
+QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &description)
 {
     if (jid.isEmpty()) {
         warning("Refusing to send file to an empty jid");
@@ -1325,7 +1325,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     }
 
     // create job
-    QXmppTransferJob *job = sendFile(jid, device, fileInfo, sid);
+    QXmppTransferJob *job = sendFile(jid, device, fileInfo);
     job->setLocalFileUrl(filePath);
     return job;
 }

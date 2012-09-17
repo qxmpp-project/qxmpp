@@ -257,7 +257,7 @@ signals:
     void jobFinished(QXmppTransferJob *job);
 
 public slots:
-    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &sid = QString(), const QString &description = QString());
+    QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &description = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
 protected:
