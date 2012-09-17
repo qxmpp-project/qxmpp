@@ -478,9 +478,9 @@ void QXmppTransferIncomingJob::connectToNextHost()
 
     // try next host
     m_candidateHost = m_streamCandidates.takeFirst();
-    info(QString("Connecting to streamhost: %1 (%2:%3)").arg(
+    info(QString("Connecting to streamhost: %1 (%2 %3)").arg(
             m_candidateHost.jid(),
-            m_candidateHost.host().toString(),
+            m_candidateHost.host(),
             QString::number(m_candidateHost.port())));
 
     const QString hostName = streamHash(d->sid,
@@ -540,9 +540,9 @@ void QXmppTransferIncomingJob::_q_candidateReady()
     if (!m_candidateClient)
         return;
 
-    info(QString("Connected to streamhost: %1 (%2:%3)").arg(
+    info(QString("Connected to streamhost: %1 (%2 %3)").arg(
             m_candidateHost.jid(),
-            m_candidateHost.host().toString(),
+            m_candidateHost.host(),
             QString::number(m_candidateHost.port())));
 
     setState(QXmppTransferJob::TransferState);
@@ -573,9 +573,9 @@ void QXmppTransferIncomingJob::_q_candidateDisconnected()
     if (!m_candidateClient)
         return;
 
-    warning(QString("Failed to connect to streamhost: %1 (%2:%3)").arg(
+    warning(QString("Failed to connect to streamhost: %1 (%2 %3)").arg(
             m_candidateHost.jid(),
-            m_candidateHost.host().toString(),
+            m_candidateHost.host(),
             QString::number(m_candidateHost.port())));
 
     m_candidateClient->deleteLater();
@@ -621,9 +621,9 @@ void QXmppTransferOutgoingJob::connectToProxy()
     bool check;
     Q_UNUSED(check);
 
-    info(QString("Connecting to proxy: %1 (%2:%3)").arg(
+    info(QString("Connecting to proxy: %1 (%2 %3)").arg(
             d->socksProxy.jid(),
-            d->socksProxy.host().toString(),
+            d->socksProxy.host(),
             QString::number(d->socksProxy.port())));
 
     const QString hostName = streamHash(d->sid,
@@ -1446,7 +1446,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
                     continue;
 
                 QXmppByteStreamIq::StreamHost streamHost;
-                streamHost.setHost(entry.ip());
+                streamHost.setHost(entry.ip().toString());
                 streamHost.setPort(d->socksServer->serverPort());
                 streamHost.setJid(ownJid);
                 streamHosts.append(streamHost);

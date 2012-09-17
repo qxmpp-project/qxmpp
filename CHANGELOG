@@ -8,6 +8,8 @@ QXmpp 0.7.4 (UNRELEASED)
     * Move statistics to a counter / gauge system.
     * Make it possible to call listenForClients and listenForServers
       multiple times to supported multiple IP address / ports.
+  - Improve QXmppTransferManager:
+    * Allow StreamHost::host to contain a host name
 
 QXmpp 0.7.3 (Sep 7, 2012)
 ------------------------

@@ -102,9 +102,9 @@ static bool parseHostAndPort(const QByteArray buffer, quint8 &type, QByteArray &
     return true;
 }
 
-QXmppSocksClient::QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent)
+QXmppSocksClient::QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent)
     : QTcpSocket(parent),
-    m_proxyAddress(proxyAddress),
+    m_proxyHost(proxyHost),
     m_proxyPort(proxyPort),
     m_step(ConnectState)
 {
@@ -116,7 +116,7 @@ void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
 {
     m_hostName = hostName;
     m_hostPort = hostPort;
-    QTcpSocket::connectToHost(m_proxyAddress, m_proxyPort);
+    QTcpSocket::connectToHost(m_proxyHost, m_proxyPort);
 }
 
 void QXmppSocksClient::slotConnected()

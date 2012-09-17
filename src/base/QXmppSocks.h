@@ -36,7 +36,7 @@ class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
     Q_OBJECT
 
 public:
-    QXmppSocksClient(const QHostAddress &proxyAddress, quint16 proxyPort, QObject *parent=0);
+    QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent=0);
     void connectToHost(const QString &hostName, quint16 hostPort);
 
 signals:
@@ -47,7 +47,7 @@ private slots:
     void slotReadyRead();
 
 private:
-    QHostAddress m_proxyAddress;
+    QString m_proxyHost;
     quint16 m_proxyPort;
     QString m_hostName;
     quint16 m_hostPort;

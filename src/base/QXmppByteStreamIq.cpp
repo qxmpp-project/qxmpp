@@ -27,12 +27,12 @@
 #include "QXmppConstants.h"
 #include "QXmppUtils.h"
 
-QHostAddress QXmppByteStreamIq::StreamHost::host() const
+QString QXmppByteStreamIq::StreamHost::host() const
 {
     return m_host;
 }
 
-void QXmppByteStreamIq::StreamHost::setHost(const QHostAddress &host)
+void QXmppByteStreamIq::StreamHost::setHost(const QString &host)
 {
     m_host = host;
 }
@@ -139,7 +139,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
     while (!hostElement.isNull())
     {
         StreamHost streamHost;
-        streamHost.setHost(QHostAddress(hostElement.attribute("host")));
+        streamHost.setHost(hostElement.attribute("host"));
         streamHost.setJid(hostElement.attribute("jid"));
         streamHost.setPort(hostElement.attribute("port").toInt());
         streamHost.setZeroconf(hostElement.attribute("zeroconf"));
@@ -165,7 +165,7 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     foreach (const StreamHost& streamHost, m_streamHosts)
     {
         writer->writeStartElement("streamhost");
-        helperToXmlAddAttribute(writer, "host", streamHost.host().toString());
+        helperToXmlAddAttribute(writer, "host", streamHost.host());
         helperToXmlAddAttribute(writer, "jid", streamHost.jid());
         helperToXmlAddAttribute(writer, "port", QString::number(streamHost.port()));
         helperToXmlAddAttribute(writer, "zeroconf", streamHost.zeroconf());
