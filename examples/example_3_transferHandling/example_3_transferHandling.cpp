@@ -42,6 +42,7 @@ xmppClient::xmppClient(QObject *parent)
 
     // add transfer manager
     transferManager = new QXmppTransferManager;
+    transferManager->setProxy("proxy.qxmpp.org");
     addExtension(transferManager);
 
     // uncomment one of the following if you only want to use a specific transfer method:
