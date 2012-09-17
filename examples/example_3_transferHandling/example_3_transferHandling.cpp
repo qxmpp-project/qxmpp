@@ -119,7 +119,7 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // send the file and connect to the job's signals
-    QXmppTransferJob *job = transferManager->sendFile(presence.from(), "xmppClient.cpp");
+    QXmppTransferJob *job = transferManager->sendFile(presence.from(), ":/example_3_transferHandling.cpp");
 
     check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
                     this, SLOT(slotError(QXmppTransferJob::Error)));
