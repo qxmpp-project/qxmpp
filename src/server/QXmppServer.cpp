@@ -531,7 +531,7 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
-        d->warning(QString("Could not start listening for C2S on port %1").arg(QString::number(port)));
+        d->warning(QString("Could not start listening for C2S on %1 %2").arg(address.toString(), QString::number(port)));
         delete server;
         return false;
     }
@@ -594,7 +594,7 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
-        d->warning(QString("Could not start listening for S2S on port %1").arg(QString::number(port)));
+        d->warning(QString("Could not start listening for S2S on %1 %2").arg(address.toString(), QString::number(port)));
         delete server;
         return false;
     }
