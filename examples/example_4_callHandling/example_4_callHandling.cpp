@@ -40,6 +40,8 @@
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
+    , m_turnPort(0)
+    , m_turnFinished(false)
 {
     bool check;
     Q_UNUSED(check);
@@ -144,7 +146,7 @@ void xmppClient::slotConnected()
 {
     // lookup TURN server
     const QString domain = configuration().domain();
-    debug(QString("Looking up STUN server for domain %1").arg(domain));
+    debug(QString("Looking up TURN server for domain %1").arg(domain));
     m_dns.setType(QDnsLookup::SRV);
     m_dns.setName("_turn._udp." + domain);
     m_dns.lookup();
@@ -162,25 +164,27 @@ void xmppClient::slotDnsLookupFinished()
                               this, SLOT(slotHostInfoFinished(QHostInfo)));
     } else {
         warning("Could not find STUN server for domain " + configuration().domain());
+        m_turnFinished = true;
+        startCall();
     }
 }
 
 void xmppClient::slotHostInfoFinished(const QHostInfo &hostInfo)
 {
     if (!hostInfo.addresses().isEmpty()) {
+        info(QString("Found TURN server %1 port %2 for domain %3").arg(hostInfo.addresses().first().toString(), QString::number(m_turnPort), configuration().domain()));
         callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
         callManager->setTurnUser(configuration().user());
         callManager->setTurnPassword(configuration().password());
     }
+    m_turnFinished = true;
+    startCall();
 }
 
 /// A presence was received.
 
 void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 {
-    bool check;
-    Q_UNUSED(check);
-
     // if we don't have a recipient, or if the presence is not from the recipient,
     // do nothing
     if (m_recipient.isEmpty() ||
@@ -189,9 +193,22 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // start the call and connect to the its signals
-    QXmppCall *call = callManager->call(presence.from());
+    m_recipientFullJid = presence.from();
+    startCall();
+}
 
-    check = connect(call, SIGNAL(stateChanged(QXmppCall:State)),
+void xmppClient::startCall()
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (!m_turnFinished || m_recipientFullJid.isEmpty())
+        return;
+
+    // start the call and connect to the its signals
+    QXmppCall *call = callManager->call(m_recipientFullJid);
+
+    check = connect(call, SIGNAL(stateChanged(QXmppCall::State)),
                     this, SLOT(slotCallStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
 

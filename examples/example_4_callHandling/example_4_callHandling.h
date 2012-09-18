@@ -49,10 +49,14 @@ private slots:
     void slotPresenceReceived(const QXmppPresence &presence);
 
 private:
+    void startCall();
+
     QXmppCallManager *callManager;
     QDnsLookup m_dns;
     QString m_recipient;
+    QString m_recipientFullJid;
     quint16 m_turnPort;
+    bool m_turnFinished;
 };
 
 #endif // IBBCLIENT_H
