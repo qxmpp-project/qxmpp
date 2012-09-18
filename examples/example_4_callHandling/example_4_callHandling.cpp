@@ -29,6 +29,7 @@
 #include <QAudioOutput>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QHostInfo>
 
 #include "QXmppCallManager.h"
 #include "QXmppJingleIq.h"
@@ -40,16 +41,27 @@
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // add QXmppCallManager extension
     callManager = new QXmppCallManager;
     addExtension(callManager);
 
-    bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
-                         this, SLOT(slotPresenceReceived(QXmppPresence)));
+    check = connect(this, SIGNAL(connected()),
+                    this, SLOT(slotConnected()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(slotPresenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
     check = connect(callManager, SIGNAL(callReceived(QXmppCall*)),
                     this, SLOT(slotCallReceived(QXmppCall*)));
+    Q_ASSERT(check);
+
+    check = connect(&m_dns, SIGNAL(finished()),
+                    this, SLOT(slotDnsLookupFinished()));
     Q_ASSERT(check);
 }
 
@@ -99,9 +111,11 @@ void xmppClient::slotAudioModeChanged(QIODevice::OpenMode mode)
 
 void xmppClient::slotCallReceived(QXmppCall *call)
 {
+    bool check;
+    Q_UNUSED(check);
+
     qDebug() << "Got call from:" << call->jid();
 
-    bool check;
     check = connect(call, SIGNAL(stateChanged(QXmppCall::State)),
                     this, SLOT(slotCallStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
@@ -126,10 +140,47 @@ void xmppClient::slotCallStateChanged(QXmppCall::State state)
         qDebug("Call finished");
 }
 
+void xmppClient::slotConnected()
+{
+    // lookup TURN server
+    const QString domain = configuration().domain();
+    debug(QString("Looking up STUN server for domain %1").arg(domain));
+    m_dns.setType(QDnsLookup::SRV);
+    m_dns.setName("_turn._udp." + domain);
+    m_dns.lookup();
+}
+
+/// The DNS SRV lookup for TURN completed.
+
+void xmppClient::slotDnsLookupFinished()
+{
+    QString serverName;
+
+    if (m_dns.error() == QDnsLookup::NoError && !m_dns.serviceRecords().isEmpty()) {
+        m_turnPort = m_dns.serviceRecords().first().port();
+        QHostInfo::lookupHost(m_dns.serviceRecords().first().target(),
+                              this, SLOT(slotHostInfoFinished(QHostInfo)));
+    } else {
+        warning("Could not find STUN server for domain " + configuration().domain());
+    }
+}
+
+void xmppClient::slotHostInfoFinished(const QHostInfo &hostInfo)
+{
+    if (!hostInfo.addresses().isEmpty()) {
+        callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
+        callManager->setTurnUser(configuration().user());
+        callManager->setTurnPassword(configuration().password());
+    }
+}
+
 /// A presence was received.
 
 void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // if we don't have a recipient, or if the presence is not from the recipient,
     // do nothing
     if (m_recipient.isEmpty() ||
@@ -140,7 +191,6 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     // start the call and connect to the its signals
     QXmppCall *call = callManager->call(presence.from());
 
-    bool check;
     check = connect(call, SIGNAL(stateChanged(QXmppCall:State)),
                     this, SLOT(slotCallStateChanged(QXmppCall::State)));
     Q_ASSERT(check);

@@ -27,6 +27,9 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
+#include "qdnslookup.h"
+
+class QHostInfo;
 
 class xmppClient : public QXmppClient
 {
@@ -40,11 +43,16 @@ private slots:
     void slotAudioModeChanged(QIODevice::OpenMode mode);
     void slotCallReceived(QXmppCall *call);
     void slotCallStateChanged(QXmppCall::State state);
+    void slotConnected();
+    void slotDnsLookupFinished();
+    void slotHostInfoFinished(const QHostInfo &hostInfo);
     void slotPresenceReceived(const QXmppPresence &presence);
 
 private:
     QXmppCallManager *callManager;
+    QDnsLookup m_dns;
     QString m_recipient;
+    quint16 m_turnPort;
 };
 
 #endif // IBBCLIENT_H
