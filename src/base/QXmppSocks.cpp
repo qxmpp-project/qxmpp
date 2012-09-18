@@ -221,11 +221,6 @@ bool QXmppSocksServer::listen(quint16 port)
     return true;
 }
 
-bool QXmppSocksServer::isListening() const
-{
-    return m_server->isListening();
-}
-
 quint16 QXmppSocksServer::serverPort() const
 {
     return m_server->serverPort();
