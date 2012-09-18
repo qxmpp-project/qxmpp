@@ -201,26 +201,29 @@ QXmppSocksServer::QXmppSocksServer(QObject *parent)
 {
     m_server = new QTcpServer(this);
     connect(m_server, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
+
+    m_server_v6 = new QTcpServer(this);
+    connect(m_server_v6, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
 }
 
 void QXmppSocksServer::close()
 {
     m_server->close();
+    m_server_v6->close();
 }
 
-bool QXmppSocksServer::listen(const QHostAddress &address, quint16 port)
+bool QXmppSocksServer::listen(quint16 port)
 {
-    return m_server->listen(address, port);
+    if (!m_server->listen(QHostAddress::Any, port))
+        return false;
+
+    m_server_v6->listen(QHostAddress::AnyIPv6, m_server->serverPort());
+    return true;
 }
 
 bool QXmppSocksServer::isListening() const
 {
     return m_server->isListening();
-}
-
-QHostAddress QXmppSocksServer::serverAddress() const
-{
-    return m_server->serverAddress();
 }
 
 quint16 QXmppSocksServer::serverPort() const
@@ -230,7 +233,11 @@ quint16 QXmppSocksServer::serverPort() const
 
 void QXmppSocksServer::slotNewConnection()
 {
-    QTcpSocket *socket = m_server->nextPendingConnection();
+    QTcpServer *server = qobject_cast<QTcpServer*>(sender());
+    if (!server)
+        return;
+
+    QTcpSocket *socket = server->nextPendingConnection();
     if (!socket)
         return;
 

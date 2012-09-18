@@ -736,7 +736,6 @@ public:
     QString proxy;
     bool proxyOnly;
     QXmppSocksServer *socksServer;
-    QXmppSocksServer *socksServerV6;
     QXmppTransferJob::Methods supportedMethods;
 
 private:
@@ -748,7 +747,6 @@ QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *q
     : ibbBlockSize(4096)
     , proxyOnly(false)
     , socksServer(0)
-    , socksServerV6(0)
     , supportedMethods(QXmppTransferJob::AnyMethod)
     , q(qq)
 {
@@ -799,16 +797,8 @@ QXmppTransferManager::QXmppTransferManager()
     check = connect(d->socksServer, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
                     this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
     Q_ASSERT(check);
-    if (!d->socksServer->listen(QHostAddress::Any)) {
-        qWarning("QXmppSocksServer could not start listening for IPv4");
-    }
-
-    d->socksServerV6 = new QXmppSocksServer(this);
-    check = connect(d->socksServerV6, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
-                    this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
-    Q_ASSERT(check);
-    if (!d->socksServerV6->listen(QHostAddress::AnyIPv6)) {
-        qWarning("QXmppSocksServer could not start listening for IPv6");
+    if (!d->socksServer->listen()) {
+        qWarning("QXmppSocksServer could not start listening");
     }
 }
 
@@ -1446,13 +1436,8 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
             QXmppByteStreamIq::StreamHost streamHost;
             streamHost.setJid(ownJid);
             streamHost.setHost(address.toString());
-            if (address.protocol() == QAbstractSocket::IPv4Protocol && d->socksServer->isListening()) {
-                streamHost.setPort(d->socksServer->serverPort());
-                streamHosts.append(streamHost);
-            } else if (address.protocol() == QAbstractSocket::IPv6Protocol && d->socksServerV6->isListening()) {
-                streamHost.setPort(d->socksServerV6->serverPort());
-                streamHosts.append(streamHost);
-            }
+            streamHost.setPort(d->socksServer->serverPort());
+            streamHosts.append(streamHost);
         }
     }
 
