@@ -3,4 +3,5 @@ SUBDIRS = \
     all \
     qxmppiq \
     qxmppmessage \
-    qxmpppresence
+    qxmpppresence \
+    qxmppstreaminitiationiq

@@ -24,9 +24,18 @@
 
 #include "QXmppStreamInitiationIq_p.h"
 #include "QXmppTransferManager.h"
-
-#include "si.h"
 #include "util.h"
+
+class tst_QXmppStreamInitiationIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testFileInfo_data();
+    void testFileInfo();
+    void testOffer();
+    void testResult();
+};
 
 void tst_QXmppStreamInitiationIq::testFileInfo_data()
 {
@@ -124,3 +133,6 @@ void tst_QXmppStreamInitiationIq::testResult()
     QVERIFY(iq.fileInfo().isNull());
     serializePacket(iq, xml);
 }
+
+QTEST_MAIN(tst_QXmppStreamInitiationIq)
+#include "tst_qxmppstreaminitiationiq.moc"

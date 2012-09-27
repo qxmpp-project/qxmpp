@@ -47,14 +47,12 @@
 #include "codec.h"
 #include "dataform.h"
 #include "jingle.h"
-#include "message.h"
 #include "register.h"
 #include "roster.h"
 #include "rpc.h"
 #include "rsm.h"
 #include "rtp.h"
 #include "sasl.h"
-#include "si.h"
 #include "stanza.h"
 #include "stun.h"
 #include "tests.h"
@@ -899,9 +897,6 @@ int main(int argc, char *argv[])
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);
-
-    tst_QXmppMessage testMessage;
-    errors += QTest::qExec(&testMessage);
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
