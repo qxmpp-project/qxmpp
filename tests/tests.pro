@@ -11,6 +11,7 @@ SUBDIRS = \
     qxmpprosteriq \
     qxmpprpciq \
     qxmpprtppacket \
+    qxmppserver \
     qxmppstanza \
     qxmppstunmessage \
     qxmpputils \

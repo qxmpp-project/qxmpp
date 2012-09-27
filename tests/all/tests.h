@@ -63,11 +63,3 @@ private slots:
     void testSubscriptions();
 };
 
-class TestServer : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testConnect_data();
-    void testConnect();
-};

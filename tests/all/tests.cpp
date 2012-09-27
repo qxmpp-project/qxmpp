@@ -25,19 +25,14 @@
 #include <cstdlib>
 
 #include <QCoreApplication>
-#include <QDomDocument>
-#include <QEventLoop>
 #include <QtTest>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
-#include "QXmppClient.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppNonSASLAuth.h"
-#include "QXmppPasswordChecker.h"
 #include "QXmppPubSubIq.h"
 #include "QXmppSessionIq.h"
-#include "QXmppServer.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppVersionIq.h"
@@ -666,111 +661,9 @@ void TestPubSub::testSubscriptions()
     serializePacket(iq, xml);
 }
 
-class TestPasswordChecker : public QXmppPasswordChecker
-{
-public:
-    TestPasswordChecker(const QString &username, const QString &password)
-        : m_getPassword(true), m_username(username), m_password(password)
-    {
-    };
-
-    /// Retrieves the password for the given username.
-    QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password)
-    {
-        if (request.username() == m_username)
-        {
-            password = m_password;
-            return QXmppPasswordReply::NoError;
-        } else {
-            return QXmppPasswordReply::AuthorizationError;
-        }
-    };
-
-    /// Sets whether getPassword() is enabled.
-    void setGetPassword(bool getPassword)
-    {
-        m_getPassword = getPassword;
-    }
-
-    /// Returns whether getPassword() is enabled.
-    bool hasGetPassword() const
-    {
-        return m_getPassword;
-    };
-
-private:
-    bool m_getPassword;
-    QString m_username;
-    QString m_password;
-};
-
-void TestServer::testConnect_data()
-{
-    QTest::addColumn<QString>("username");
-    QTest::addColumn<QString>("password");
-    QTest::addColumn<QString>("mechanism");
-    QTest::addColumn<bool>("connected");
-
-    QTest::newRow("plain-good") << "testuser" << "testpwd" << "PLAIN" << true;
-    QTest::newRow("plain-bad-username") << "baduser" << "testpwd" << "PLAIN" << false;
-    QTest::newRow("plain-bad-password") << "testuser" << "badpwd" << "PLAIN" << false;
-
-    QTest::newRow("digest-good") << "testuser" << "testpwd" << "DIGEST-MD5" << true;
-    QTest::newRow("digest-bad-username") << "baduser" << "testpwd" << "DIGEST-MD5" << false;
-    QTest::newRow("digest-bad-password") << "testuser" << "badpwd" << "DIGEST-MD5" << false;
-}
-
-void TestServer::testConnect()
-{
-    QFETCH(QString, username);
-    QFETCH(QString, password);
-    QFETCH(QString, mechanism);
-    QFETCH(bool, connected);
-
-    const QString testDomain("localhost");
-    const QHostAddress testHost(QHostAddress::LocalHost);
-    const quint16 testPort = 12345;
-
-    QXmppLogger logger;
-    logger.setLoggingType(QXmppLogger::StdoutLogging);
-
-    // prepare server
-    TestPasswordChecker passwordChecker("testuser", "testpwd");
-
-    QXmppServer server;
-    server.setDomain(testDomain);
-    server.setLogger(&logger);
-    server.setPasswordChecker(&passwordChecker);
-    server.listenForClients(testHost, testPort);
-
-    // prepare client
-    QXmppClient client;
-    client.setLogger(&logger);
-
-    QEventLoop loop;
-    connect(&client, SIGNAL(connected()),
-            &loop, SLOT(quit()));
-    connect(&client, SIGNAL(disconnected()),
-            &loop, SLOT(quit()));
-
-    QXmppConfiguration config;
-    config.setDomain(testDomain);
-    config.setHost(testHost.toString());
-    config.setPort(testPort);
-    config.setUser(username);
-    config.setPassword(password);
-    config.setSaslAuthMechanism(mechanism);
-    client.connectToServer(config);
-    loop.exec();
-    QCOMPARE(client.isConnected(), connected);
-}
-
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-
-    QXmppPresence pres;
-    pres.availableStatusType();
 
     // run tests
     int errors = 0;
@@ -780,9 +673,6 @@ int main(int argc, char *argv[])
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
-
-    TestServer testServer;
-    errors += QTest::qExec(&testServer);
 
     if (errors)
     {
