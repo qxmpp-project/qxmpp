@@ -48,7 +48,6 @@
 #include "dataform.h"
 #include "jingle.h"
 #include "message.h"
-#include "presence.h"
 #include "register.h"
 #include "roster.h"
 #include "rpc.h"
@@ -903,9 +902,6 @@ int main(int argc, char *argv[])
 
     tst_QXmppMessage testMessage;
     errors += QTest::qExec(&testMessage);
-
-    tst_QXmppPresence testPresence;
-    errors += QTest::qExec(&testPresence);
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);

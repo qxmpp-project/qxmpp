@@ -22,10 +22,25 @@
  *
  */
 
+#include <QObject>
+
 #include "QXmppPresence.h"
 
-#include "presence.h"
 #include "util.h"
+
+class tst_QXmppPresence : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testPresence();
+    void testPresence_data();
+    void testPresenceWithCapability();
+    void testPresenceWithExtendedAddresses();
+    void testPresenceWithMucItem();
+    void testPresenceWithMucPassword();
+    void testPresenceWithMucSupport();
+};
 
 void tst_QXmppPresence::testPresence_data()
 {
@@ -221,3 +236,5 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
     serializePacket(presence, xml);
 }
 
+QTEST_MAIN(tst_QXmppPresence)
+#include "tst_qxmpppresence.moc"

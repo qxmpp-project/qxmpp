@@ -7,7 +7,6 @@ SOURCES += \
     dataform.cpp \
     jingle.cpp \
     message.cpp \
-    presence.cpp \
     register.cpp \
     roster.cpp \
     rpc.cpp \
@@ -21,7 +20,6 @@ HEADERS += \
     dataform.h \
     jingle.h \
     message.h \
-    presence.h \
     register.h \
     roster.h \
     rpc.h \
