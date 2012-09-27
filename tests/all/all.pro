@@ -9,7 +9,6 @@ SOURCES += \
     roster.cpp \
     rpc.cpp \
     rsm.cpp \
-    stanza.cpp \
     stun.cpp \
     tests.cpp
 HEADERS += \
@@ -18,7 +17,6 @@ HEADERS += \
     roster.h \
     rpc.h \
     rsm.h \
-    stanza.h \
     stun.h \
     tests.h
 

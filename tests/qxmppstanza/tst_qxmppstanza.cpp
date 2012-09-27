@@ -21,10 +21,18 @@
  *
  */
 
+#include <QObject>
 #include "QXmppStanza.h"
-
-#include "stanza.h"
 #include "util.h"
+
+class tst_QXmppStanza : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testExtendedAddress_data();
+    void testExtendedAddress();
+};
 
 void tst_QXmppStanza::testExtendedAddress_data()
 {
@@ -65,3 +73,6 @@ void tst_QXmppStanza::testExtendedAddress()
     QCOMPARE(address.type(), type);
     serializePacket(address, xml);
 }
+
+QTEST_MAIN(tst_QXmppStanza)
+#include "tst_qxmppstanza.moc"
