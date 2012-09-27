@@ -24,19 +24,6 @@
 
 #include <QObject>
 
-class TestUtils : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testCrc32();
-    void testHmac();
-    void testJid();
-    void testMime();
-    void testLibVersion();
-    void testTimezoneOffset();
-};
-
 class TestPackets : public QObject
 {
     Q_OBJECT

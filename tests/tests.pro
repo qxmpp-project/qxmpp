@@ -13,6 +13,7 @@ SUBDIRS = \
     qxmpprtppacket \
     qxmppstanza \
     qxmppstunmessage \
+    qxmpputils \
     qxmppvcardiq
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
