@@ -39,34 +39,24 @@ private slots:
     void testResponse_data();
     void testResponse();
     void testSuccess();
-};
 
-class tst_QXmppSaslClient : public QObject
-{
-    Q_OBJECT
+    // client
+    void testClientAvailableMechanisms();
+    void testClientBadMechanism();
+    void testClientAnonymous();
+    void testClientDigestMd5();
+    void testClientDigestMd5_data();
+    void testClientFacebook();
+    void testClientGoogle();
+    void testClientPlain();
+    void testClientWindowsLive();
 
-private slots:
-    void testAvailableMechanisms();
-    void testBadMechanism();
-    void testAnonymous();
-    void testDigestMd5();
-    void testDigestMd5_data();
-    void testFacebook();
-    void testGoogle();
-    void testPlain();
-    void testWindowsLive();
-};
-
-class tst_QXmppSaslServer : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void testBadMechanism();
-    void testAnonymous();
-    void testDigestMd5();
-    void testPlain();
-    void testPlainChallenge();
+    // server
+    void testServerBadMechanism();
+    void testServerAnonymous();
+    void testServerDigestMd5();
+    void testServerPlain();
+    void testServerPlainChallenge();
 };
 
 void tst_QXmppSasl::testParsing()
@@ -194,18 +184,18 @@ void tst_QXmppSasl::testSuccess()
     serializePacket(stanza, xml);
 }
 
-void tst_QXmppSaslClient::testAvailableMechanisms()
+void tst_QXmppSasl::testClientAvailableMechanisms()
 {
     QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2");
 }
 
-void tst_QXmppSaslClient::testBadMechanism()
+void tst_QXmppSasl::testClientBadMechanism()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("BAD-MECH");
     QVERIFY(client == 0);
 }
 
-void tst_QXmppSaslClient::testAnonymous()
+void tst_QXmppSasl::testClientAnonymous()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("ANONYMOUS");
     QVERIFY(client != 0);
@@ -222,7 +212,7 @@ void tst_QXmppSaslClient::testAnonymous()
     delete client;
 }
 
-void tst_QXmppSaslClient::testDigestMd5_data()
+void tst_QXmppSasl::testClientDigestMd5_data()
 {
     QTest::addColumn<QByteArray>("qop");
     QTest::newRow("qop-none") << QByteArray();
@@ -230,7 +220,7 @@ void tst_QXmppSaslClient::testDigestMd5_data()
     QTest::newRow("qop-multi") << QByteArray(",qop=\"auth,auth-int\"");
 }
 
-void tst_QXmppSaslClient::testDigestMd5()
+void tst_QXmppSasl::testClientDigestMd5()
 {
     QFETCH(QByteArray, qop);
 
@@ -262,7 +252,7 @@ void tst_QXmppSaslClient::testDigestMd5()
     delete client;
 }
 
-void tst_QXmppSaslClient::testFacebook()
+void tst_QXmppSasl::testClientFacebook()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("X-FACEBOOK-PLATFORM");
     QVERIFY(client != 0);
@@ -286,7 +276,7 @@ void tst_QXmppSaslClient::testFacebook()
     delete client;
 }
 
-void tst_QXmppSaslClient::testGoogle()
+void tst_QXmppSasl::testClientGoogle()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("X-OAUTH2");
     QVERIFY(client != 0);
@@ -306,7 +296,7 @@ void tst_QXmppSaslClient::testGoogle()
     delete client;
 }
 
-void tst_QXmppSaslClient::testPlain()
+void tst_QXmppSasl::testClientPlain()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("PLAIN");
     QVERIFY(client != 0);
@@ -326,7 +316,7 @@ void tst_QXmppSaslClient::testPlain()
     delete client;
 }
 
-void tst_QXmppSaslClient::testWindowsLive()
+void tst_QXmppSasl::testClientWindowsLive()
 {
     QXmppSaslClient *client = QXmppSaslClient::create("X-MESSENGER-OAUTH2");
     QVERIFY(client != 0);
@@ -345,13 +335,13 @@ void tst_QXmppSaslClient::testWindowsLive()
     delete client;
 }
 
-void tst_QXmppSaslServer::testBadMechanism()
+void tst_QXmppSasl::testServerBadMechanism()
 {
     QXmppSaslServer *server = QXmppSaslServer::create("BAD-MECH");
     QVERIFY(server == 0);
 }
 
-void tst_QXmppSaslServer::testAnonymous()
+void tst_QXmppSasl::testServerAnonymous()
 {
     QXmppSaslServer *server = QXmppSaslServer::create("ANONYMOUS");
     QVERIFY(server != 0);
@@ -368,7 +358,7 @@ void tst_QXmppSaslServer::testAnonymous()
     delete server;
 }
 
-void tst_QXmppSaslServer::testDigestMd5()
+void tst_QXmppSasl::testServerDigestMd5()
 {
     QXmppSaslDigestMd5::setNonce("OI08/m+QRm6Ma+fKOjuqVXtz40sR5u9/u5GN6sSW0rs=");
 
@@ -401,7 +391,7 @@ void tst_QXmppSaslServer::testDigestMd5()
     delete server;
 }
 
-void tst_QXmppSaslServer::testPlain()
+void tst_QXmppSasl::testServerPlain()
 {
     QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
     QVERIFY(server != 0);
@@ -420,7 +410,7 @@ void tst_QXmppSaslServer::testPlain()
     delete server;
 }
 
-void tst_QXmppSaslServer::testPlainChallenge()
+void tst_QXmppSasl::testServerPlainChallenge()
 {
     QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
     QVERIFY(server != 0);
