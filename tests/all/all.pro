@@ -5,7 +5,6 @@ TARGET = tst_all
 RESOURCES += tests.qrc
 SOURCES += \
     dataform.cpp \
-    iq.cpp \
     jingle.cpp \
     message.cpp \
     presence.cpp \
@@ -20,7 +19,6 @@ SOURCES += \
     vcard.cpp
 HEADERS += \
     dataform.h \
-    iq.h \
     jingle.h \
     message.h \
     presence.h \
