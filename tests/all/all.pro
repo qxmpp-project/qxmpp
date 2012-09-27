@@ -5,15 +5,11 @@ TARGET = tst_all
 RESOURCES += tests.qrc
 SOURCES += \
     jingle.cpp \
-    register.cpp \
-    roster.cpp \
     rpc.cpp \
     stun.cpp \
     tests.cpp
 HEADERS += \
     jingle.h \
-    register.h \
-    roster.h \
     rpc.h \
     stun.h \
     tests.h

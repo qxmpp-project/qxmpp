@@ -46,8 +46,6 @@
 
 #include "codec.h"
 #include "jingle.h"
-#include "register.h"
-#include "roster.h"
 #include "rpc.h"
 #include "sasl.h"
 #include "stun.h"
@@ -892,12 +890,6 @@ int main(int argc, char *argv[])
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
-
-    tst_QXmppRegisterIq testRegister;
-    errors += QTest::qExec(&testRegister);
-
-    tst_QXmppRosterIq testRoster;
-    errors += QTest::qExec(&testRoster);
 
 #ifdef QXMPP_AUTOTEST_INTERNAL
     tst_QXmppSasl testSasl;

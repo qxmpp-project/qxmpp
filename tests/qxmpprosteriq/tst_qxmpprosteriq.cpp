@@ -21,10 +21,18 @@
  *
  */
 
+#include <QObject>
 #include "QXmppRosterIq.h"
-
-#include "roster.h"
 #include "util.h"
+
+class tst_QXmppRosterIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testItem_data();
+    void testItem();
+};
 
 void tst_QXmppRosterIq::testItem_data()
 {
@@ -79,3 +87,5 @@ void tst_QXmppRosterIq::testItem()
     serializePacket(item, xml);
 }
 
+QTEST_MAIN(tst_QXmppRosterIq)
+#include "tst_qxmpprosteriq.moc"

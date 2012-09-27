@@ -21,10 +21,21 @@
  *
  */
 
+#include <QObject>
 #include "QXmppRegisterIq.h"
-
 #include "util.h"
-#include "register.h"
+
+class tst_QXmppRegisterIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testGet();
+    void testResult();
+    void testResultWithForm();
+    void testSet();
+    void testSetWithForm();
+};
 
 void tst_QXmppRegisterIq::testGet()
 {
@@ -184,3 +195,6 @@ void tst_QXmppRegisterIq::testSetWithForm()
     QVERIFY(!iq.form().isNull());
     serializePacket(iq, xml);
 }
+
+QTEST_MAIN(tst_QXmppRegisterIq)
+#include "tst_qxmppregisteriq.moc"
