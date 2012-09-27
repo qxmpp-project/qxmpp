@@ -6,6 +6,7 @@ SUBDIRS = \
     qxmppjingleiq \
     qxmppmessage \
     qxmpppresence \
+    qxmpppubsubiq \
     qxmppregisteriq \
     qxmppresultset \
     qxmpprosteriq \
