@@ -22,9 +22,27 @@
  *
  */
 
+#include <QObject>
 #include "QXmppMessage.h"
-#include "message.h"
 #include "util.h"
+
+class tst_QXmppMessage : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBasic_data();
+    void testBasic();
+    void testMessageAttention();
+    void testMessageReceipt();
+    void testDelay_data();
+    void testDelay();
+    void testExtendedAddresses();
+    void testMucInvitation();
+    void testState_data();
+    void testState();
+    void testXhtml();
+};
 
 void tst_QXmppMessage::testBasic_data()
 {
@@ -290,3 +308,6 @@ void tst_QXmppMessage::testXhtml()
     QCOMPARE(message.xhtml(), QLatin1String("<p style=\"font-weight:bold\">hi!</p>"));
     serializePacket(message, xml);
 }
+
+QTEST_MAIN(tst_QXmppMessage)
+#include "tst_qxmppmessage.moc"

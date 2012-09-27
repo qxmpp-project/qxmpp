@@ -1,2 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS = all qxmppiq qxmpppresence
+SUBDIRS = \
+    all \
+    qxmppiq \
+    qxmppmessage \
+    qxmpppresence

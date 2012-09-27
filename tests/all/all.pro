@@ -6,7 +6,6 @@ RESOURCES += tests.qrc
 SOURCES += \
     dataform.cpp \
     jingle.cpp \
-    message.cpp \
     register.cpp \
     roster.cpp \
     rpc.cpp \
@@ -19,7 +18,6 @@ SOURCES += \
 HEADERS += \
     dataform.h \
     jingle.h \
-    message.h \
     register.h \
     roster.h \
     rpc.h \
