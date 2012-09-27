@@ -22,10 +22,20 @@
  *
  */
 
+#include <QObject>
 #include "QXmppResultSet.h"
-
-#include "rsm.h"
 #include "util.h"
+
+class tst_QXmppResultSet : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testQuery_data();
+    void testQuery();
+    void testReply_data();
+    void testReply();
+};
 
 void tst_QXmppResultSet::testQuery_data()
 {
@@ -153,3 +163,5 @@ void tst_QXmppResultSet::testReply()
     serializePacket(iq, xml);
 }
 
+QTEST_MAIN(tst_QXmppResultSet)
+#include "tst_qxmppresultset.moc"

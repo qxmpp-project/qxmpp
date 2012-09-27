@@ -8,7 +8,6 @@ SOURCES += \
     register.cpp \
     roster.cpp \
     rpc.cpp \
-    rsm.cpp \
     stun.cpp \
     tests.cpp
 HEADERS += \
@@ -16,7 +15,6 @@ HEADERS += \
     register.h \
     roster.h \
     rpc.h \
-    rsm.h \
     stun.h \
     tests.h
 

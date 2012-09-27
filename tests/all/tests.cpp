@@ -49,7 +49,6 @@
 #include "register.h"
 #include "roster.h"
 #include "rpc.h"
-#include "rsm.h"
 #include "sasl.h"
 #include "stun.h"
 #include "tests.h"
@@ -896,9 +895,6 @@ int main(int argc, char *argv[])
 
     tst_QXmppRegisterIq testRegister;
     errors += QTest::qExec(&testRegister);
-
-    tst_QXmppResultSet testRsm;
-    errors += QTest::qExec(&testRsm);
 
     tst_QXmppRosterIq testRoster;
     errors += QTest::qExec(&testRoster);

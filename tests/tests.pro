@@ -5,6 +5,7 @@ SUBDIRS = \
     qxmppiq \
     qxmppmessage \
     qxmpppresence \
+    qxmppresultset \
     qxmpprtppacket \
     qxmppstanza \
     qxmppvcardiq
