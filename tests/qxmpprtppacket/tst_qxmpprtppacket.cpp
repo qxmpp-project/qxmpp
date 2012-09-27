@@ -21,11 +21,19 @@
  *
  */
 
-#include <QtTest/QtTest>
-
+#include <QObject>
+#include <QtTest>
 #include "QXmppRtpChannel.h"
 
-#include "rtp.h"
+class tst_QXmppRtpPacket : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBad();
+    void testSimple();
+    void testWithCsrc();
+};
 
 void tst_QXmppRtpPacket::testBad()
 {
@@ -73,4 +81,5 @@ void tst_QXmppRtpPacket::testWithCsrc()
     QCOMPARE(packet.encode(), data);
 }
 
-
+QTEST_MAIN(tst_QXmppRtpPacket)
+#include "tst_qxmpprtppacket.moc"

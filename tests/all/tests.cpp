@@ -50,7 +50,6 @@
 #include "roster.h"
 #include "rpc.h"
 #include "rsm.h"
-#include "rtp.h"
 #include "sasl.h"
 #include "stanza.h"
 #include "stun.h"
@@ -904,9 +903,6 @@ int main(int argc, char *argv[])
 
     tst_QXmppRosterIq testRoster;
     errors += QTest::qExec(&testRoster);
-
-    tst_QXmppRtpPacket testRtp;
-    errors += QTest::qExec(&testRtp);
 
 #ifdef QXMPP_AUTOTEST_INTERNAL
     tst_QXmppSasl testSasl;

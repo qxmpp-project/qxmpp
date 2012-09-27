@@ -5,6 +5,7 @@ SUBDIRS = \
     qxmppiq \
     qxmppmessage \
     qxmpppresence \
+    qxmpprtppacket \
     qxmppvcardiq
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
