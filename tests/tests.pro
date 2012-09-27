@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = all qxmppiq
+SUBDIRS = all qxmppiq qxmpppresence
