@@ -2,7 +2,6 @@ include(../tests.pri)
 
 TARGET = tst_all
 
-RESOURCES += tests.qrc
 SOURCES += tests.cpp
 HEADERS += tests.h
 
