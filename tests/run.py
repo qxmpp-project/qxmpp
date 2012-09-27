@@ -36,11 +36,14 @@ else:
     os.environ['LD_LIBRARY_PATH'] = path
 
 # run tests
-if platform.system() == 'Darwin':
-    prog = os.path.join(root, 'qxmpp-tests.app', 'Contents', 'MacOS', 'qxmpp-tests')
-else:
-    prog = os.path.join(root, 'qxmpp-tests.app')
-if report_path:
-    os.system('%s -xunitxml -o %s/%s.xml' % (prog, report_path, test))
-else:
-    os.system(prog)
+for test in os.listdir(root):
+    test_path = os.path.join(root, test)
+    if os.path.isdir(test_path):
+        if platform.system() == 'Darwin':
+            prog = os.path.join(test_path, 'tst_' + test + '.app', 'Contents', 'MacOS', 'tst_' + test)
+        else:
+            prog = os.path.join(test_path, 'tst_' + test)
+        if report_path:
+            os.system('%s -xunitxml -o %s/%s.xml' % (prog, report_path, test))
+        else:
+            os.system(prog)

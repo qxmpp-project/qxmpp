@@ -60,6 +60,7 @@
 #include "stanza.h"
 #include "stun.h"
 #include "tests.h"
+#include "util.h"
 #include "vcard.h"
 
 void TestUtils::testCrc32()

@@ -24,7 +24,7 @@
 #include "QXmppSasl_p.h"
 
 #include "sasl.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppSasl::testParsing()
 {

@@ -24,7 +24,7 @@
 
 #include "QXmppMessage.h"
 #include "message.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppMessage::testBasic_data()
 {

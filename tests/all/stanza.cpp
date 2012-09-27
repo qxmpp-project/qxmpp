@@ -24,7 +24,7 @@
 #include "QXmppStanza.h"
 
 #include "stanza.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppStanza::testExtendedAddress_data()
 {

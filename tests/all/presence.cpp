@@ -25,7 +25,7 @@
 #include "QXmppPresence.h"
 
 #include "presence.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppPresence::testPresence_data()
 {

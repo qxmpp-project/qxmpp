@@ -26,7 +26,7 @@
 #include "QXmppTransferManager.h"
 
 #include "si.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppStreamInitiationIq::testFileInfo_data()
 {

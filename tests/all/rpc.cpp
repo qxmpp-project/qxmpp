@@ -24,7 +24,7 @@
 #include "QXmppRpcIq.h"
 
 #include "rpc.h"
-#include "tests.h"
+#include "util.h"
 
 static void checkVariant(const QVariant &value, const QByteArray &xml)
 {

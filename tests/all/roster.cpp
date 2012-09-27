@@ -24,7 +24,7 @@
 #include "QXmppRosterIq.h"
 
 #include "roster.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppRosterIq::testItem_data()
 {

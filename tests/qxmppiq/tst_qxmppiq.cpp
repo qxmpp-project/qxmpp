@@ -21,9 +21,19 @@
  *
  */
 
+#include <QObject>
+
 #include "QXmppIq.h"
-#include "iq.h"
-#include "tests.h"
+#include "util.h"
+
+class tst_QXmppIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBasic_data();
+    void testBasic();
+};
 
 void tst_QXmppIq::testBasic_data()
 {
@@ -59,3 +69,6 @@ void tst_QXmppIq::testBasic()
     QCOMPARE(int(iq.type()), type);
     serializePacket(iq, xml);
 }
+
+QTEST_MAIN(tst_QXmppIq)
+#include "tst_qxmppiq.moc"

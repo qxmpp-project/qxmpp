@@ -23,7 +23,7 @@
 
 #include "QXmppRegisterIq.h"
 
-#include "tests.h"
+#include "util.h"
 #include "register.h"
 
 void tst_QXmppRegisterIq::testGet()

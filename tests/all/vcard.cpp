@@ -23,7 +23,7 @@
 
 #include "QXmppVCardIq.h"
 
-#include "tests.h"
+#include "util.h"
 #include "vcard.h"
 
 void tst_QXmppVCardIq::testAddress_data()

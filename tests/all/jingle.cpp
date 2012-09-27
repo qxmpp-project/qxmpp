@@ -24,7 +24,7 @@
 #include "QXmppJingleIq.h"
 
 #include "jingle.h"
-#include "tests.h"
+#include "util.h"
 
 void TestJingle::testSession()
 {

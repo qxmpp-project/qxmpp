@@ -25,7 +25,7 @@
 #include "QXmppDataForm.h"
 
 #include "dataform.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppDataForm::testSimple()
 {

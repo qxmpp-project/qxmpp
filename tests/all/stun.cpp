@@ -24,7 +24,7 @@
 #include "QXmppStun.h"
 
 #include "stun.h"
-#include "tests.h"
+#include "util.h"
 
 void TestStun::testFingerprint()
 {

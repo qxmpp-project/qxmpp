@@ -25,7 +25,7 @@
 #include "QXmppResultSet.h"
 
 #include "rsm.h"
-#include "tests.h"
+#include "util.h"
 
 void tst_QXmppResultSet::testQuery_data()
 {
