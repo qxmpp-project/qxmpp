@@ -48,7 +48,6 @@
 #include "jingle.h"
 #include "rpc.h"
 #include "sasl.h"
-#include "stun.h"
 #include "tests.h"
 #include "util.h"
 
@@ -904,9 +903,6 @@ int main(int argc, char *argv[])
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);
-
-    TestStun testStun;
-    errors += QTest::qExec(&testStun);
 
     TestXmlRpc testXmlRpc;
     errors += QTest::qExec(&testXmlRpc);

@@ -21,12 +21,24 @@
  *
  */
 
+#include <QObject>
 #include "QXmppStun.h"
-
-#include "stun.h"
 #include "util.h"
 
-void TestStun::testFingerprint()
+class tst_QXmppStunMessage : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testFingerprint();
+    void testIntegrity();
+    void testIPv4Address();
+    void testIPv6Address();
+    void testXorIPv4Address();
+    void testXorIPv6Address();
+};
+
+void tst_QXmppStunMessage::testFingerprint()
 {
     // without fingerprint
     QXmppStunMessage msg;
@@ -39,7 +51,7 @@ void TestStun::testFingerprint()
              QByteArray("\x00\x01\x00\x08\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x28\x00\x04\xB2\xAA\xF9\xF6", 28));
 }
 
-void TestStun::testIntegrity()
+void tst_QXmppStunMessage::testIntegrity()
 {
     QXmppStunMessage msg;
     msg.setType(0x0001);
@@ -47,7 +59,7 @@ void TestStun::testIntegrity()
              QByteArray("\x00\x01\x00\x18\x21\x12\xA4\x42\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x14\x96\x4B\x40\xD1\x84\x67\x6A\xFD\xB5\xE0\x7C\xC5\x1F\xFB\xBD\xA2\x61\xAF\xB1\x26", 44));
 }
 
-void TestStun::testIPv4Address()
+void tst_QXmppStunMessage::testIPv4Address()
 {
     // encode
     QXmppStunMessage msg;
@@ -65,7 +77,7 @@ void TestStun::testIPv4Address()
     QCOMPARE(msg2.mappedPort, quint16(12345));
 }
 
-void TestStun::testIPv6Address()
+void tst_QXmppStunMessage::testIPv6Address()
 {
     // encode
     QXmppStunMessage msg;
@@ -83,7 +95,7 @@ void TestStun::testIPv6Address()
     QCOMPARE(msg2.mappedPort, quint16(12345));
 }
 
-void TestStun::testXorIPv4Address()
+void tst_QXmppStunMessage::testXorIPv4Address()
 {
     // encode
     QXmppStunMessage msg;
@@ -101,7 +113,7 @@ void TestStun::testXorIPv4Address()
     QCOMPARE(msg2.xorMappedPort, quint16(12345));
 }
 
-void TestStun::testXorIPv6Address()
+void tst_QXmppStunMessage::testXorIPv6Address()
 {
     // encode
     QXmppStunMessage msg;
@@ -118,3 +130,6 @@ void TestStun::testXorIPv6Address()
     QCOMPARE(msg2.xorMappedHost, QHostAddress("::1"));
     QCOMPARE(msg2.xorMappedPort, quint16(12345));
 }
+
+QTEST_MAIN(tst_QXmppStunMessage)
+#include "tst_qxmppstunmessage.moc"
