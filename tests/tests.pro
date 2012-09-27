@@ -9,6 +9,7 @@ SUBDIRS = \
     qxmppregisteriq \
     qxmppresultset \
     qxmpprosteriq \
+    qxmpprpciq \
     qxmpprtppacket \
     qxmppstanza \
     qxmppstunmessage \

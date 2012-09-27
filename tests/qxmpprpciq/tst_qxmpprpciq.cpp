@@ -21,9 +21,8 @@
  *
  */
 
+#include <QObject>
 #include "QXmppRpcIq.h"
-
-#include "rpc.h"
 #include "util.h"
 
 static void checkVariant(const QVariant &value, const QByteArray &xml)
@@ -49,13 +48,33 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     QCOMPARE(test, value);
 }
 
-void TestXmlRpc::testBase64()
+class tst_QXmppRpcIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBase64();
+    void testBool();
+    void testDateTime();
+    void testDouble();
+    void testInt();
+    void testNil();
+    void testString();
+
+    void testArray();
+    void testStruct();
+
+    void testInvoke();
+    void testResponse();
+    void testResponseFault();
+};
+void tst_QXmppRpcIq::testBase64()
 {
     checkVariant(QByteArray("\0\1\2\3", 4),
                  QByteArray("<value><base64>AAECAw==</base64></value>"));
 }
 
-void TestXmlRpc::testBool()
+void tst_QXmppRpcIq::testBool()
 {
     checkVariant(false,
                  QByteArray("<value><boolean>0</boolean></value>"));
@@ -63,37 +82,37 @@ void TestXmlRpc::testBool()
                  QByteArray("<value><boolean>1</boolean></value>"));
 }
 
-void TestXmlRpc::testDateTime()
+void tst_QXmppRpcIq::testDateTime()
 {
     checkVariant(QDateTime(QDate(1998, 7, 17), QTime(14, 8, 55)),
                  QByteArray("<value><dateTime.iso8601>1998-07-17T14:08:55</dateTime.iso8601></value>"));
 }
 
-void TestXmlRpc::testDouble()
+void tst_QXmppRpcIq::testDouble()
 {
     checkVariant(double(-12.214),
                  QByteArray("<value><double>-12.214</double></value>"));
 }
 
-void TestXmlRpc::testInt()
+void tst_QXmppRpcIq::testInt()
 {
     checkVariant(int(-12),
                  QByteArray("<value><i4>-12</i4></value>"));
 }
 
-void TestXmlRpc::testNil()
+void tst_QXmppRpcIq::testNil()
 {
     checkVariant(QVariant(),
                  QByteArray("<value><nil/></value>"));
 }
 
-void TestXmlRpc::testString()
+void tst_QXmppRpcIq::testString()
 {
     checkVariant(QString("hello world"),
                  QByteArray("<value><string>hello world</string></value>"));
 }
 
-void TestXmlRpc::testArray()
+void tst_QXmppRpcIq::testArray()
 {
     checkVariant(QVariantList() << QString("hello world") << double(-12.214),
                  QByteArray("<value><array><data>"
@@ -102,7 +121,7 @@ void TestXmlRpc::testArray()
                             "</data></array></value>"));
 }
 
-void TestXmlRpc::testStruct()
+void tst_QXmppRpcIq::testStruct()
 {
     QMap<QString, QVariant> map;
     map["bar"] = QString("hello world");
@@ -120,7 +139,7 @@ void TestXmlRpc::testStruct()
                             "</struct></value>"));
 }
 
-void TestXmlRpc::testInvoke()
+void tst_QXmppRpcIq::testInvoke()
 {
     const QByteArray xml(
         "<iq"
@@ -147,7 +166,7 @@ void TestXmlRpc::testInvoke()
     serializePacket(iq, xml);
 }
 
-void TestXmlRpc::testResponse()
+void tst_QXmppRpcIq::testResponse()
 {
     const QByteArray xml(
         "<iq"
@@ -174,7 +193,7 @@ void TestXmlRpc::testResponse()
     serializePacket(iq, xml);
 }
 
-void TestXmlRpc::testResponseFault()
+void tst_QXmppRpcIq::testResponseFault()
 {
     const QByteArray xml(
         "<iq"
@@ -210,3 +229,5 @@ void TestXmlRpc::testResponseFault()
     serializePacket(iq, xml);
 }
 
+QTEST_MAIN(tst_QXmppRpcIq)
+#include "tst_qxmpprpciq.moc"

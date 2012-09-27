@@ -3,12 +3,8 @@ include(../tests.pri)
 TARGET = tst_all
 
 RESOURCES += tests.qrc
-SOURCES += \
-    rpc.cpp \
-    tests.cpp
-HEADERS += \
-    rpc.h \
-    tests.h
+SOURCES += tests.cpp
+HEADERS += tests.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     HEADERS += sasl.h

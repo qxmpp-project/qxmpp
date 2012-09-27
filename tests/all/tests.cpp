@@ -44,7 +44,6 @@
 #include "QXmppGlobal.h"
 #include "QXmppEntityTimeIq.h"
 
-#include "rpc.h"
 #include "sasl.h"
 #include "tests.h"
 #include "util.h"
@@ -893,9 +892,6 @@ int main(int argc, char *argv[])
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);
-
-    TestXmlRpc testXmlRpc;
-    errors += QTest::qExec(&testXmlRpc);
 
     if (errors)
     {
