@@ -18,5 +18,6 @@ SUBDIRS = \
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     SUBDIRS += qxmppcodec
+    SUBDIRS += qxmppsasl
     SUBDIRS += qxmppstreaminitiationiq
 }

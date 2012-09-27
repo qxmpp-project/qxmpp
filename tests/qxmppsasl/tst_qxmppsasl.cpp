@@ -21,10 +21,53 @@
  *
  */
 
+#include <QObject>
 #include "QXmppSasl_p.h"
-
-#include "sasl.h"
 #include "util.h"
+
+class tst_QXmppSasl : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testParsing();
+    void testAuth_data();
+    void testAuth();
+    void testChallenge_data();
+    void testChallenge();
+    void testFailure();
+    void testResponse_data();
+    void testResponse();
+    void testSuccess();
+};
+
+class tst_QXmppSaslClient : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testAvailableMechanisms();
+    void testBadMechanism();
+    void testAnonymous();
+    void testDigestMd5();
+    void testDigestMd5_data();
+    void testFacebook();
+    void testGoogle();
+    void testPlain();
+    void testWindowsLive();
+};
+
+class tst_QXmppSaslServer : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testBadMechanism();
+    void testAnonymous();
+    void testDigestMd5();
+    void testPlain();
+    void testPlainChallenge();
+};
 
 void tst_QXmppSasl::testParsing()
 {
@@ -399,3 +442,6 @@ void tst_QXmppSaslServer::testPlainChallenge()
 
     delete server;
 }
+
+QTEST_MAIN(tst_QXmppSasl)
+#include "tst_qxmppsasl.moc"

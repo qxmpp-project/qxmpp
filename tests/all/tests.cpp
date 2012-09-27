@@ -27,7 +27,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QEventLoop>
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppBindIq.h"
@@ -41,10 +41,8 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppVersionIq.h"
-#include "QXmppGlobal.h"
 #include "QXmppEntityTimeIq.h"
 
-#include "sasl.h"
 #include "tests.h"
 #include "util.h"
 
@@ -782,17 +780,6 @@ int main(int argc, char *argv[])
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);
-
-#ifdef QXMPP_AUTOTEST_INTERNAL
-    tst_QXmppSasl testSasl;
-    errors += QTest::qExec(&testSasl);
-
-    tst_QXmppSaslClient testSaslClient;
-    errors += QTest::qExec(&testSaslClient);
-
-    tst_QXmppSaslServer testSaslServer;
-    errors += QTest::qExec(&testSaslServer);
-#endif
 
     TestServer testServer;
     errors += QTest::qExec(&testServer);
