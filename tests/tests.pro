@@ -14,5 +14,6 @@ SUBDIRS = \
     qxmppvcardiq
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
+    SUBDIRS += qxmppcodec
     SUBDIRS += qxmppstreaminitiationiq
 }

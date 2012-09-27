@@ -44,7 +44,6 @@
 #include "QXmppGlobal.h"
 #include "QXmppEntityTimeIq.h"
 
-#include "codec.h"
 #include "jingle.h"
 #include "rpc.h"
 #include "sasl.h"
@@ -878,11 +877,6 @@ int main(int argc, char *argv[])
 
     TestPackets testPackets;
     errors += QTest::qExec(&testPackets);
-
-#ifdef QXMPP_AUTOTEST_INTERNAL
-    TestCodec testCodec;
-    errors += QTest::qExec(&testCodec);
-#endif
 
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);

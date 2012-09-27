@@ -13,6 +13,6 @@ HEADERS += \
     tests.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
-    HEADERS += codec.h sasl.h
-    SOURCES += codec.cpp sasl.cpp
+    HEADERS += sasl.h
+    SOURCES += sasl.cpp
 }
