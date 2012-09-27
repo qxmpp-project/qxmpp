@@ -64,7 +64,7 @@ private:
     QString m_password;
 };
 
-class TestServer : public QObject
+class tst_QXmppServer : public QObject
 {
     Q_OBJECT
 
@@ -73,7 +73,7 @@ private slots:
     void testConnect();
 };
 
-void TestServer::testConnect_data()
+void tst_QXmppServer::testConnect_data()
 {
     QTest::addColumn<QString>("username");
     QTest::addColumn<QString>("password");
@@ -89,7 +89,7 @@ void TestServer::testConnect_data()
     QTest::newRow("digest-bad-password") << "testuser" << "badpwd" << "DIGEST-MD5" << false;
 }
 
-void TestServer::testConnect()
+void tst_QXmppServer::testConnect()
 {
     QFETCH(QString, username);
     QFETCH(QString, password);
@@ -134,5 +134,5 @@ void TestServer::testConnect()
     QCOMPARE(client.isConnected(), connected);
 }
 
-QTEST_MAIN(TestServer)
+QTEST_MAIN(tst_QXmppServer)
 #include "tst_qxmppserver.moc"
