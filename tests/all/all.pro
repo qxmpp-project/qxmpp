@@ -4,7 +4,6 @@ TARGET = tst_all
 
 RESOURCES += tests.qrc
 SOURCES += \
-    dataform.cpp \
     jingle.cpp \
     register.cpp \
     roster.cpp \
@@ -15,7 +14,6 @@ SOURCES += \
     stun.cpp \
     tests.cpp
 HEADERS += \
-    dataform.h \
     jingle.h \
     register.h \
     roster.h \

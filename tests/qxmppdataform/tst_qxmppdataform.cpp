@@ -22,10 +22,19 @@
  *
  */
 
+#include <QObject>
 #include "QXmppDataForm.h"
-
-#include "dataform.h"
 #include "util.h"
+
+class tst_QXmppDataForm : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testSimple();
+    void testSubmit();
+    void testMedia();
+};
 
 void tst_QXmppDataForm::testSimple()
 {
@@ -103,3 +112,5 @@ void tst_QXmppDataForm::testMedia()
     serializePacket(form, xml);
 }
 
+QTEST_MAIN(tst_QXmppDataForm)
+#include "tst_qxmppdataform.moc"

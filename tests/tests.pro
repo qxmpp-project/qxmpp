@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS = \
     all \
+    qxmppdataform \
     qxmppiq \
     qxmppmessage \
     qxmpppresence \

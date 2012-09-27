@@ -45,7 +45,6 @@
 #include "QXmppEntityTimeIq.h"
 
 #include "codec.h"
-#include "dataform.h"
 #include "jingle.h"
 #include "register.h"
 #include "roster.h"
@@ -57,7 +56,6 @@
 #include "stun.h"
 #include "tests.h"
 #include "util.h"
-#include "vcard.h"
 
 void TestUtils::testCrc32()
 {
@@ -892,9 +890,6 @@ int main(int argc, char *argv[])
     errors += QTest::qExec(&testCodec);
 #endif
 
-    tst_QXmppDataForm testDataForm;
-    errors += QTest::qExec(&testDataForm);
-
     TestJingle testJingle;
     errors += QTest::qExec(&testJingle);
 
@@ -930,16 +925,8 @@ int main(int argc, char *argv[])
     tst_QXmppStanza testStanza;
     errors += QTest::qExec(&testStanza);
 
-#ifdef QXMPP_AUTOTEST_INTERNAL
-    tst_QXmppStreamInitiationIq testSI;
-    errors += QTest::qExec(&testSI);
-#endif
-
     TestStun testStun;
     errors += QTest::qExec(&testStun);
-
-    tst_QXmppVCardIq testVCard;
-    errors += QTest::qExec(&testVCard);
 
     TestXmlRpc testXmlRpc;
     errors += QTest::qExec(&testXmlRpc);
