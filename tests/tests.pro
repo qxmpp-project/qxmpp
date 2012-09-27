@@ -4,4 +4,8 @@ SUBDIRS = \
     qxmppiq \
     qxmppmessage \
     qxmpppresence \
-    qxmppstreaminitiationiq
+    qxmppvcardiq
+
+!isEmpty(QXMPP_AUTOTEST_INTERNAL) {
+    SUBDIRS += qxmppstreaminitiationiq
+}

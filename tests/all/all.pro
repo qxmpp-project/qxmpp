@@ -13,8 +13,7 @@ SOURCES += \
     rtp.cpp \
     stanza.cpp \
     stun.cpp \
-    tests.cpp \
-    vcard.cpp
+    tests.cpp
 HEADERS += \
     dataform.h \
     jingle.h \
@@ -25,8 +24,7 @@ HEADERS += \
     rtp.h \
     stanza.h \
     stun.h \
-    tests.h \
-    vcard.h
+    tests.h
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     HEADERS += codec.h sasl.h si.h

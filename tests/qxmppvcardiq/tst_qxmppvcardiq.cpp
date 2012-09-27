@@ -21,10 +21,23 @@
  *
  */
 
+#include <QObject>
 #include "QXmppVCardIq.h"
-
 #include "util.h"
-#include "vcard.h"
+
+class tst_QXmppVCardIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testAddress_data();
+    void testAddress();
+    void testEmail_data();
+    void testEmail();
+    void testPhone_data();
+    void testPhone();
+    void testVCard();
+};
 
 void tst_QXmppVCardIq::testAddress_data()
 {
@@ -185,3 +198,6 @@ void tst_QXmppVCardIq::testVCard()
     QCOMPARE(vcard.url(), QLatin1String("http://code.google.com/p/qxmpp/"));
     serializePacket(vcard, xml);
 }
+
+QTEST_MAIN(tst_QXmppVCardIq)
+#include "tst_qxmppvcardiq.moc"
