@@ -21,12 +21,23 @@
  *
  */
 
+#include <QObject>
 #include "QXmppJingleIq.h"
-
-#include "jingle.h"
 #include "util.h"
 
-void TestJingle::testSession()
+class tst_QXmppJingleIq : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testSession();
+    void testTerminate();
+    void testAudioPayloadType();
+    void testVideoPayloadType();
+    void testRinging();
+};
+
+void tst_QXmppJingleIq::testSession()
 {
     const QByteArray xml(
         "<iq"
@@ -57,7 +68,7 @@ void TestJingle::testSession()
     serializePacket(session, xml);
 }
 
-void TestJingle::testTerminate()
+void tst_QXmppJingleIq::testTerminate()
 {
     const QByteArray xml(
         "<iq"
@@ -84,7 +95,7 @@ void TestJingle::testTerminate()
     serializePacket(session, xml);
 }
 
-void TestJingle::testAudioPayloadType()
+void tst_QXmppJingleIq::testAudioPayloadType()
 {
     const QByteArray xml("<payload-type id=\"103\" name=\"L16\" channels=\"2\" clockrate=\"16000\"/>");
     QXmppJinglePayloadType payload;
@@ -96,7 +107,7 @@ void TestJingle::testAudioPayloadType()
     serializePacket(payload, xml);
 }
 
-void TestJingle::testVideoPayloadType()
+void tst_QXmppJingleIq::testVideoPayloadType()
 {
     const QByteArray xml(
         "<payload-type id=\"98\" name=\"theora\" clockrate=\"90000\">"
@@ -114,7 +125,7 @@ void TestJingle::testVideoPayloadType()
     serializePacket(payload, xml);
 }
 
-void TestJingle::testRinging()
+void tst_QXmppJingleIq::testRinging()
 {
     const QByteArray xml(
         "<iq"
@@ -135,3 +146,6 @@ void TestJingle::testRinging()
     QCOMPARE(iq.ringing(), true);
     serializePacket(iq, xml);
 }
+
+QTEST_MAIN(tst_QXmppJingleIq)
+#include "tst_qxmppjingleiq.moc"

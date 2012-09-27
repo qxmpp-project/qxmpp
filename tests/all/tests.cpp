@@ -44,7 +44,6 @@
 #include "QXmppGlobal.h"
 #include "QXmppEntityTimeIq.h"
 
-#include "jingle.h"
 #include "rpc.h"
 #include "sasl.h"
 #include "tests.h"
@@ -877,9 +876,6 @@ int main(int argc, char *argv[])
 
     TestPackets testPackets;
     errors += QTest::qExec(&testPackets);
-
-    TestJingle testJingle;
-    errors += QTest::qExec(&testJingle);
 
     TestPubSub testPubSub;
     errors += QTest::qExec(&testPubSub);

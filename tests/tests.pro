@@ -3,6 +3,7 @@ SUBDIRS = \
     all \
     qxmppdataform \
     qxmppiq \
+    qxmppjingleiq \
     qxmppmessage \
     qxmpppresence \
     qxmppregisteriq \
