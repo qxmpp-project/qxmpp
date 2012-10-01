@@ -27,7 +27,6 @@
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
-#include "QXmppVersionIq.h"
 #include "util.h"
 
 class TestPackets : public QObject
@@ -38,8 +37,6 @@ private slots:
     void testNonSaslAuth();
     void testSession();
     void testStreamFeatures();
-    void testVersionGet();
-    void testVersionResult();
     void testEntityTimeGet();
     void testEntityTimeResult();
 };
@@ -136,46 +133,6 @@ void TestPackets::testStreamFeatures()
     QCOMPARE(features2.authMechanisms(), QStringList() << "PLAIN");
     QCOMPARE(features2.compressionMethods(), QStringList() << "zlib");
     serializePacket(features2, xml2);
-}
-
-void TestPackets::testVersionGet()
-{
-    const QByteArray xmlGet(
-    "<iq id=\"version_1\" to=\"juliet@capulet.com/balcony\" "
-    "from=\"romeo@montague.net/orchard\" type=\"get\">"
-    "<query xmlns=\"jabber:iq:version\"/></iq>");
-
-    QXmppVersionIq verIqGet;
-    parsePacket(verIqGet, xmlGet);
-    QCOMPARE(verIqGet.id(), QLatin1String("version_1"));
-    QCOMPARE(verIqGet.to(), QLatin1String("juliet@capulet.com/balcony"));
-    QCOMPARE(verIqGet.from(), QLatin1String("romeo@montague.net/orchard"));
-    QCOMPARE(verIqGet.type(), QXmppIq::Get);
-    serializePacket(verIqGet, xmlGet);
-}
-
-void TestPackets::testVersionResult()
-{
-    const QByteArray xmlResult(
-    "<iq id=\"version_1\" to=\"romeo@montague.net/orchard\" "
-    "from=\"juliet@capulet.com/balcony\" type=\"result\">"
-    "<query xmlns=\"jabber:iq:version\">"
-        "<name>qxmpp</name>"
-        "<os>Windows-XP</os>"
-        "<version>0.2.0</version>"
-    "</query></iq>");
-
-    QXmppVersionIq verIqResult;
-    parsePacket(verIqResult, xmlResult);
-    QCOMPARE(verIqResult.id(), QLatin1String("version_1"));
-    QCOMPARE(verIqResult.to(), QLatin1String("romeo@montague.net/orchard"));
-    QCOMPARE(verIqResult.from(), QLatin1String("juliet@capulet.com/balcony"));
-    QCOMPARE(verIqResult.type(), QXmppIq::Result);
-    QCOMPARE(verIqResult.name(), QString("qxmpp"));
-    QCOMPARE(verIqResult.version(), QString("0.2.0"));
-    QCOMPARE(verIqResult.os(), QString("Windows-XP"));
-
-    serializePacket(verIqResult, xmlResult);
 }
 
 void TestPackets::testEntityTimeGet()
