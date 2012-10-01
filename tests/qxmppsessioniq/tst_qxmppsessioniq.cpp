@@ -49,4 +49,4 @@ void TestPackets::testSession()
 }
 
 QTEST_MAIN(TestPackets)
-#include "tests.moc"
+#include "tst_qxmppsessioniq.moc"

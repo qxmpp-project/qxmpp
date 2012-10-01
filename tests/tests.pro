@@ -1,6 +1,5 @@
 TEMPLATE = subdirs
 SUBDIRS = \
-    all \
     qxmpparchiveiq \
     qxmppbindiq \
     qxmppdataform \
@@ -18,6 +17,7 @@ SUBDIRS = \
     qxmpprpciq \
     qxmpprtppacket \
     qxmppserver \
+    qxmppsessioniq \
     qxmppstanza \
     qxmppstreamfeatures \
     qxmppstunmessage \
