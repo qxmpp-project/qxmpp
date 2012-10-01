@@ -26,7 +26,6 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppNonSASLAuth.h"
-#include "QXmppPubSubIq.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
