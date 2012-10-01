@@ -22,7 +22,6 @@
  *
  */
 
-#include "QXmppEntityTimeIq.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSessionIq.h"
 #include "QXmppStreamFeatures.h"
@@ -37,8 +36,6 @@ private slots:
     void testNonSaslAuth();
     void testSession();
     void testStreamFeatures();
-    void testEntityTimeGet();
-    void testEntityTimeResult();
 };
 
 void TestPackets::testNonSaslAuth()
@@ -133,44 +130,6 @@ void TestPackets::testStreamFeatures()
     QCOMPARE(features2.authMechanisms(), QStringList() << "PLAIN");
     QCOMPARE(features2.compressionMethods(), QStringList() << "zlib");
     serializePacket(features2, xml2);
-}
-
-void TestPackets::testEntityTimeGet()
-{
-    const QByteArray xml("<iq id=\"time_1\" "
-        "to=\"juliet@capulet.com/balcony\" "
-        "from=\"romeo@montague.net/orchard\" type=\"get\">"
-      "<time xmlns=\"urn:xmpp:time\"/>"
-    "</iq>");
-
-    QXmppEntityTimeIq entityTime;
-    parsePacket(entityTime, xml);
-    QCOMPARE(entityTime.id(), QLatin1String("time_1"));
-    QCOMPARE(entityTime.to(), QLatin1String("juliet@capulet.com/balcony"));
-    QCOMPARE(entityTime.from(), QLatin1String("romeo@montague.net/orchard"));
-    QCOMPARE(entityTime.type(), QXmppIq::Get);
-    serializePacket(entityTime, xml);
-}
-
-void TestPackets::testEntityTimeResult()
-{
-    const QByteArray xml(
-    "<iq id=\"time_1\" to=\"romeo@montague.net/orchard\" from=\"juliet@capulet.com/balcony\" type=\"result\">"
-      "<time xmlns=\"urn:xmpp:time\">"
-        "<tzo>-06:00</tzo>"
-        "<utc>2006-12-19T17:58:35Z</utc>"
-      "</time>"
-    "</iq>");
-
-    QXmppEntityTimeIq entityTime;
-    parsePacket(entityTime, xml);
-    QCOMPARE(entityTime.id(), QLatin1String("time_1"));
-    QCOMPARE(entityTime.from(), QLatin1String("juliet@capulet.com/balcony"));
-    QCOMPARE(entityTime.to(), QLatin1String("romeo@montague.net/orchard"));
-    QCOMPARE(entityTime.type(), QXmppIq::Result);
-    QCOMPARE(entityTime.tzo(), -21600);
-    QCOMPARE(entityTime.utc(), QDateTime(QDate(2006, 12, 19), QTime(17, 58, 35), Qt::UTC));
-    serializePacket(entityTime, xml);
 }
 
 QTEST_MAIN(TestPackets)

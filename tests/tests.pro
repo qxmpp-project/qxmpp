@@ -5,6 +5,7 @@ SUBDIRS = \
     qxmppbindiq \
     qxmppdataform \
     qxmppdiscoveryiq \
+    qxmppentitytimeiq \
     qxmppiq \
     qxmppjingleiq \
     qxmppmessage \
