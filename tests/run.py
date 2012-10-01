@@ -41,8 +41,12 @@ for test in os.listdir(root):
     if os.path.isdir(test_path):
         if platform.system() == 'Darwin':
             prog = os.path.join(test_path, 'tst_' + test + '.app', 'Contents', 'MacOS', 'tst_' + test)
+        elif platform.system() == 'Windows':
+            prog = os.path.join(test_path, 'tst_' + test + '.exe')
         else:
             prog = os.path.join(test_path, 'tst_' + test)
+        if not os.path.exists(prog):
+            continue
         if report_path:
             os.system('%s -xunitxml -o %s/%s.xml' % (prog, report_path, test))
         else:
