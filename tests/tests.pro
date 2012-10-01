@@ -19,6 +19,7 @@ SUBDIRS = \
     qxmpprtppacket \
     qxmppserver \
     qxmppstanza \
+    qxmppstreamfeatures \
     qxmppstunmessage \
     qxmpputils \
     qxmppvcardiq \

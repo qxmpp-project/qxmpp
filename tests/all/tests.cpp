@@ -23,7 +23,6 @@
  */
 
 #include "QXmppSessionIq.h"
-#include "QXmppStreamFeatures.h"
 #include "util.h"
 
 class TestPackets : public QObject
@@ -32,7 +31,6 @@ class TestPackets : public QObject
 
 private slots:
     void testSession();
-    void testStreamFeatures();
 };
 
 void TestPackets::testSession()
@@ -48,38 +46,6 @@ void TestPackets::testSession()
     QCOMPARE(session.to(), QString("example.com"));
     QCOMPARE(session.type(), QXmppIq::Set);
     serializePacket(session, xml);
-}
-
-void TestPackets::testStreamFeatures()
-{
-    const QByteArray xml("<stream:features/>");
-    QXmppStreamFeatures features;
-    parsePacket(features, xml);
-    QCOMPARE(features.bindMode(), QXmppStreamFeatures::Disabled);
-    QCOMPARE(features.sessionMode(), QXmppStreamFeatures::Disabled);
-    QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Disabled);
-    QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Disabled);
-    QCOMPARE(features.authMechanisms(), QStringList());
-    QCOMPARE(features.compressionMethods(), QStringList());
-    serializePacket(features, xml);
-
-    const QByteArray xml2("<stream:features>"
-        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
-        "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
-        "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
-        "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
-        "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
-        "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
-        "</stream:features>");
-    QXmppStreamFeatures features2;
-    parsePacket(features2, xml2);
-    QCOMPARE(features2.bindMode(), QXmppStreamFeatures::Enabled);
-    QCOMPARE(features2.sessionMode(), QXmppStreamFeatures::Enabled);
-    QCOMPARE(features2.nonSaslAuthMode(), QXmppStreamFeatures::Enabled);
-    QCOMPARE(features2.tlsMode(), QXmppStreamFeatures::Enabled);
-    QCOMPARE(features2.authMechanisms(), QStringList() << "PLAIN");
-    QCOMPARE(features2.compressionMethods(), QStringList() << "zlib");
-    serializePacket(features2, xml2);
 }
 
 QTEST_MAIN(TestPackets)
