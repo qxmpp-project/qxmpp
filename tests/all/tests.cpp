@@ -22,7 +22,6 @@
  *
  */
 
-#include "QXmppBindIq.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppNonSASLAuth.h"
@@ -37,9 +36,6 @@ class TestPackets : public QObject
     Q_OBJECT
 
 private slots:
-    void testBindNoResource();
-    void testBindResource();
-    void testBindResult();
     void testDiscovery();
     void testDiscoveryWithForm();
     void testNonSaslAuth();
@@ -50,58 +46,6 @@ private slots:
     void testEntityTimeGet();
     void testEntityTimeResult();
 };
-
-void TestPackets::testBindNoResource()
-{
-    const QByteArray xml(
-        "<iq id=\"bind_1\" type=\"set\">"
-        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
-        "</iq>");
-
-    QXmppBindIq bind;
-    parsePacket(bind, xml);
-    QCOMPARE(bind.type(), QXmppIq::Set);
-    QCOMPARE(bind.id(), QString("bind_1"));
-    QCOMPARE(bind.jid(), QString());
-    QCOMPARE(bind.resource(), QString());
-    serializePacket(bind, xml);
-}
-
-void TestPackets::testBindResource()
-{
-    const QByteArray xml(
-        "<iq id=\"bind_2\" type=\"set\">"
-        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">"
-        "<resource>someresource</resource>"
-        "</bind>"
-        "</iq>");
-
-    QXmppBindIq bind;
-    parsePacket(bind, xml);
-    QCOMPARE(bind.type(), QXmppIq::Set);
-    QCOMPARE(bind.id(), QString("bind_2"));
-    QCOMPARE(bind.jid(), QString());
-    QCOMPARE(bind.resource(), QString("someresource"));
-    serializePacket(bind, xml);
-}
-
-void TestPackets::testBindResult()
-{
-    const QByteArray xml(
-        "<iq id=\"bind_2\" type=\"result\">"
-        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">"
-        "<jid>somenode@example.com/someresource</jid>"
-        "</bind>"
-        "</iq>");
-
-    QXmppBindIq bind;
-    parsePacket(bind, xml);
-    QCOMPARE(bind.type(), QXmppIq::Result);
-    QCOMPARE(bind.id(), QString("bind_2"));
-    QCOMPARE(bind.jid(), QString("somenode@example.com/someresource"));
-    QCOMPARE(bind.resource(), QString());
-    serializePacket(bind, xml);
-}
 
 void TestPackets::testDiscovery()
 {

@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 SUBDIRS = \
     all \
     qxmpparchiveiq \
+    qxmppbindiq \
     qxmppdataform \
     qxmppiq \
     qxmppjingleiq \
