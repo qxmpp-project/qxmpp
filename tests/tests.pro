@@ -9,6 +9,7 @@ SUBDIRS = \
     qxmppiq \
     qxmppjingleiq \
     qxmppmessage \
+    qxmppnonsaslauthiq \
     qxmpppresence \
     qxmpppubsubiq \
     qxmppregisteriq \
