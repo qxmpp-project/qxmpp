@@ -217,6 +217,7 @@ bool QXmppSocksServer::listen(quint16 port)
     if (!m_server->listen(QHostAddress::Any, port))
         return false;
 
+    // FIXME: this fails on Linux if /proc/sys/net/ipv6/bindv6only is 0
     m_server_v6->listen(QHostAddress::AnyIPv6, m_server->serverPort());
     return true;
 }
