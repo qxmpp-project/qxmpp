@@ -89,4 +89,5 @@ contains(qt_version, 4) {
     else:symbian:SOURCES += base/qdnslookup_symbian.cpp
     else:unix:SOURCES += base/qdnslookup_unix.cpp
     else:win32:SOURCES += base/qdnslookup_win.cpp
+    else:SOURCES += base/qdnslookup_stub.cpp
 }
