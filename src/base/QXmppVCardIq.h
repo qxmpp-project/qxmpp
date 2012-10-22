@@ -48,7 +48,7 @@ public:
         Postal      = 0x4,
         Preferred   = 0x8
     };
-    Q_DECLARE_FLAGS(Type, TypeFlag);
+    Q_DECLARE_FLAGS(Type, TypeFlag)
 
     QXmppVCardAddress();
     QXmppVCardAddress(const QXmppVCardAddress &other);
@@ -97,7 +97,7 @@ public:
         Preferred   = 0x8,
         X400        = 0x10
     };
-    Q_DECLARE_FLAGS(Type, TypeFlag);
+    Q_DECLARE_FLAGS(Type, TypeFlag)
 
     QXmppVCardEmail();
     QXmppVCardEmail(const QXmppVCardEmail &other);
@@ -142,7 +142,7 @@ public:
         PCS         = 0x800,
         Preferred   = 0x1000
     };
-    Q_DECLARE_FLAGS(Type, TypeFlag);
+    Q_DECLARE_FLAGS(Type, TypeFlag)
 
     QXmppVCardPhone();
     QXmppVCardPhone(const QXmppVCardPhone &other);
