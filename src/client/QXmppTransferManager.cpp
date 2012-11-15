@@ -50,7 +50,7 @@ static QString streamHash(const QString &sid, const QString &initiatorJid, const
 {
     QCryptographicHash hash(QCryptographicHash::Sha1);
     QString str = sid + initiatorJid + targetJid;
-    hash.addData(str.toAscii());
+    hash.addData(str.toLatin1());
     return hash.result().toHex();
 }
 
@@ -160,7 +160,7 @@ bool QXmppTransferFileInfo::operator==(const QXmppTransferFileInfo &other) const
 void QXmppTransferFileInfo::parse(const QDomElement &element)
 {
     d->date = QXmppUtils::datetimeFromString(element.attribute("date"));
-    d->hash = QByteArray::fromHex(element.attribute("hash").toAscii());
+    d->hash = QByteArray::fromHex(element.attribute("hash").toLatin1());
     d->name = element.attribute("name");
     d->size = element.attribute("size").toLongLong();
     d->description = element.firstChildElement("desc").text();

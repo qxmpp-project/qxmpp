@@ -167,7 +167,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         // if we did not find an outgoing server,
         // we need to establish the S2S connection
         QXmppOutgoingServer *conn = new QXmppOutgoingServer(domain, 0);
-        conn->setLocalStreamKey(QXmppUtils::generateStanzaHash().toAscii());
+        conn->setLocalStreamKey(QXmppUtils::generateStanzaHash().toLatin1());
         conn->moveToThread(q->thread());
         conn->setParent(q);
 

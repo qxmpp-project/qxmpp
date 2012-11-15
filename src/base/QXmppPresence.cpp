@@ -222,7 +222,7 @@ void QXmppPresence::parse(const QDomElement &element)
             QDomElement photoElement = xElement.firstChildElement("photo");
             if(!photoElement.isNull())
             {
-                d->photoHash = QByteArray::fromHex(photoElement.text().toAscii());
+                d->photoHash = QByteArray::fromHex(photoElement.text().toLatin1());
                 if(d->photoHash.isEmpty())
                     d->vCardUpdateType = VCardUpdateNoPhoto;
                 else
@@ -238,7 +238,7 @@ void QXmppPresence::parse(const QDomElement &element)
         else if(xElement.tagName() == "c" && xElement.namespaceURI() == ns_capabilities)
         {
             d->capabilityNode = xElement.attribute("node");
-            d->capabilityVer = QByteArray::fromBase64(xElement.attribute("ver").toAscii());
+            d->capabilityVer = QByteArray::fromBase64(xElement.attribute("ver").toLatin1());
             d->capabilityHash = xElement.attribute("hash");
             d->capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
         }

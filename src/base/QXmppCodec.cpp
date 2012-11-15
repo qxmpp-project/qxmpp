@@ -588,7 +588,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
 
 bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
 {
-    QByteArray config = QByteArray::fromBase64(parameters.value("configuration").toAscii());
+    QByteArray config = QByteArray::fromBase64(parameters.value("configuration").toLatin1());
     QDataStream stream(config);
     const QIODevice *device = stream.device();
 

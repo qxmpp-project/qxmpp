@@ -753,7 +753,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
     d->url = cardElement.firstChildElement("URL").text();
     QDomElement photoElement = cardElement.firstChildElement("PHOTO");
     QByteArray base64data = photoElement.
-                            firstChildElement("BINVAL").text().toAscii();
+                            firstChildElement("BINVAL").text().toLatin1();
     d->photo = QByteArray::fromBase64(base64data);
     d->photoType = photoElement.firstChildElement("TYPE").text();
 

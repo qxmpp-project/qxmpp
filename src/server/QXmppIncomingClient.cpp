@@ -190,14 +190,14 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     }
 
     // start stream
-    const QByteArray sessionId = QXmppUtils::generateStanzaHash().toAscii();
+    const QByteArray sessionId = QXmppUtils::generateStanzaHash().toLatin1();
     QString response = QString("<?xml version='1.0'?><stream:stream"
         " xmlns=\"%1\" xmlns:stream=\"%2\""
         " id=\"%3\" from=\"%4\" version=\"1.0\" xml:lang=\"en\">").arg(
         ns_client,
         ns_stream,
         sessionId,
-        d->domain.toAscii());
+        d->domain.toLatin1());
     sendData(response.toUtf8());
 
     // check requested domain

@@ -90,7 +90,7 @@ void QXmppSaslAuth::setValue(const QByteArray &value)
 void QXmppSaslAuth::parse(const QDomElement &element)
 {
     m_mechanism = element.attribute("mechanism");
-    m_value = QByteArray::fromBase64(element.text().toAscii());
+    m_value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
@@ -120,7 +120,7 @@ void QXmppSaslChallenge::setValue(const QByteArray &value)
 
 void QXmppSaslChallenge::parse(const QDomElement &element)
 {
-    m_value = QByteArray::fromBase64(element.text().toAscii());
+    m_value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
@@ -178,7 +178,7 @@ void QXmppSaslResponse::setValue(const QByteArray &value)
 
 void QXmppSaslResponse::parse(const QDomElement &element)
 {
-    m_value = QByteArray::fromBase64(element.text().toAscii());
+    m_value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const

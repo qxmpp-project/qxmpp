@@ -111,7 +111,7 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
         info(QString("Incoming server stream from %1 on %2").arg(from, d->origin()));
 
     // start stream
-    d->localStreamId = QXmppUtils::generateStanzaHash().toAscii();
+    d->localStreamId = QXmppUtils::generateStanzaHash().toLatin1();
     QString data = QString("<?xml version='1.0'?><stream:stream"
         " xmlns='%1' xmlns:db='%2' xmlns:stream='%3'"
         " id='%4' version=\"1.0\">").arg(

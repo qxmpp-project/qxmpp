@@ -157,7 +157,7 @@ void QXmppSocksClient::slotReadyRead()
         buffer[2] = 0x00; // reserved
         buffer.append(encodeHostAndPort(
             DomainName,
-            m_hostName.toAscii(),
+            m_hostName.toLatin1(),
             m_hostPort));
         write(buffer);
 

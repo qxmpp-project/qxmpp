@@ -86,7 +86,7 @@ void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement("query");
     m_username = queryElement.firstChildElement("username").text();
     m_password = queryElement.firstChildElement("password").text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toAscii());
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toLatin1());
     m_resource = queryElement.firstChildElement("resource").text();
 }
 
