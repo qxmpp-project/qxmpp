@@ -27,7 +27,11 @@
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QStringList>
+#if QT_VERSION >= 0x050000
+#include <QUrlQuery>
+#else
 #include <QUrl>
+#endif
 
 #include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
@@ -433,15 +437,23 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         return true;
     } else if (m_step == 1) {
         // parse request
+#if QT_VERSION >= 0x050000
+        QUrlQuery requestUrl(challenge);
+#else
         QUrl requestUrl;
         requestUrl.setEncodedQuery(challenge);
+#endif
         if (!requestUrl.hasQueryItem("method") || !requestUrl.hasQueryItem("nonce")) {
             warning("QXmppSaslClientFacebook : Invalid challenge, nonce or method missing");
             return false;
         }
 
         // build response
+#if QT_VERSION >= 0x050000
+        QUrlQuery responseUrl;
+#else
         QUrl responseUrl;
+#endif
         responseUrl.addQueryItem("access_token", password());
         responseUrl.addQueryItem("api_key", username());
         responseUrl.addQueryItem("call_id", 0);
@@ -449,7 +461,11 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         responseUrl.addQueryItem("nonce", requestUrl.queryItemValue("nonce"));
         responseUrl.addQueryItem("v", "1.0");
 
+#if QT_VERSION >= 0x050000
+        response = responseUrl.query().toUtf8();
+#else
         response = responseUrl.encodedQuery();
+#endif
         m_step++;
         return true;
     } else {
