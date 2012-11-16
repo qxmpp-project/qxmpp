@@ -1006,7 +1006,7 @@ QString QXmppStunMessage::toString() const
     dumpLines << QString(" type %1 (%2)")
         .arg(typeName)
         .arg(QString::number(m_type));
-    dumpLines << QString(" id %1").arg(QString::fromAscii(m_id.toHex()));
+    dumpLines << QString(" id %1").arg(QString::fromLatin1(m_id.toHex()));
 
     // attributes
     if (m_attributes.contains(ChannelNumber))
@@ -1023,7 +1023,7 @@ QString QXmppStunMessage::toString() const
     if (m_attributes.contains(RequestedTransport))
         dumpLines << QString(" * REQUESTED-TRANSPORT 0x%1").arg(QString::number(m_requestedTransport, 16));
     if (m_attributes.contains(ReservationToken))
-        dumpLines << QString(" * RESERVATION-TOKEN %1").arg(QString::fromAscii(m_reservationToken.toHex()));
+        dumpLines << QString(" * RESERVATION-TOKEN %1").arg(QString::fromLatin1(m_reservationToken.toHex()));
     if (m_attributes.contains(Software))
         dumpLines << QString(" * SOFTWARE %1").arg(m_software);
     if (m_attributes.contains(Username))
@@ -1056,10 +1056,10 @@ QString QXmppStunMessage::toString() const
         dumpLines << QString(" * PRIORITY %1").arg(QString::number(m_priority));
     if (!iceControlling.isEmpty())
         dumpLines << QString(" * ICE-CONTROLLING %1")
-            .arg(QString::fromAscii(iceControlling.toHex()));
+            .arg(QString::fromLatin1(iceControlling.toHex()));
     if (!iceControlled.isEmpty())
         dumpLines << QString(" * ICE-CONTROLLED %1")
-            .arg(QString::fromAscii(iceControlled.toHex()));
+            .arg(QString::fromLatin1(iceControlled.toHex()));
 
     return dumpLines.join("\n");
 }
@@ -2096,7 +2096,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         }
         if (!pair)
         {
-            debug(QString("Unknown transaction %1").arg(QString::fromAscii(message.id().toHex())));
+            debug(QString("Unknown transaction %1").arg(QString::fromLatin1(message.id().toHex())));
             return;
         }
         // store peer-reflexive address
