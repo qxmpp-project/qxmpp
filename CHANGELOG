@@ -1,3 +1,9 @@
+QXmpp 0.7.5 (Jan 11, 2013)
+--------------------------
+
+  - Replace toAscii/fromAscii with toLatin1/fromLatin1 for Qt 5 compatibility.
+  - Fix build using clang in pedantic mode.
+
 QXmpp 0.7.4 (Oct 1, 2012)
 -------------------------
 

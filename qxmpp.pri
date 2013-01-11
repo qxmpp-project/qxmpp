@@ -1,7 +1,7 @@
 # Common definitions
 
 QT += network xml
-QXMPP_VERSION = 0.7.4
+QXMPP_VERSION = 0.7.5
 QXMPP_INCLUDEPATH = $$PWD/src/base $$PWD/src/client $$PWD/src/server
 
 # Determine library name
