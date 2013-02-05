@@ -104,6 +104,7 @@ public:
     QXmppClient(QObject *parent = 0);
     ~QXmppClient();
 
+    bool insertExtension(int index, QXmppClientExtension* extension);
     bool addExtension(QXmppClientExtension* extension);
     bool removeExtension(QXmppClientExtension* extension);
 

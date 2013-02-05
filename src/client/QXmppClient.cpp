@@ -208,9 +208,10 @@ QXmppClient::~QXmppClient()
 
 /// Registers a new extension with the client.
 ///
+/// \param index
 /// \param extension
 
-bool QXmppClient::addExtension(QXmppClientExtension* extension)
+bool QXmppClient::insertExtension(int index, QXmppClientExtension *extension)
 {
     if (d->extensions.contains(extension))
     {
@@ -220,8 +221,17 @@ bool QXmppClient::addExtension(QXmppClientExtension* extension)
 
     extension->setParent(this);
     extension->setClient(this);
-    d->extensions << extension;
+    d->extensions.insert(index, extension);
     return true;
+}
+
+/// Registers a new extension with the client.
+///
+/// \param extension
+
+bool QXmppClient::addExtension(QXmppClientExtension* extension)
+{
+    return insertExtension(d->extensions.size(), extension);
 }
 
 /// Unregisters the given extension from the client. If the extension
