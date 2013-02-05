@@ -1,3 +1,8 @@
+QXmpp 0.7.6 (UNRELEASED)
+------------------------
+
+  - Add QXmppClient::insertExtension to insert an extension at a given index.
+
 QXmpp 0.7.5 (Jan 11, 2013)
 --------------------------
 
