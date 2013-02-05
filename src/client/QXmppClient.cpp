@@ -206,7 +206,16 @@ QXmppClient::~QXmppClient()
     delete d;
 }
 
-/// Registers a new extension with the client.
+/// Registers a new \a extension with the client.
+///
+/// \param extension
+
+bool QXmppClient::addExtension(QXmppClientExtension* extension)
+{
+    return insertExtension(d->extensions.size(), extension);
+}
+
+/// Registers a new \a extension with the client at the given \a index.
 ///
 /// \param index
 /// \param extension
@@ -223,15 +232,6 @@ bool QXmppClient::insertExtension(int index, QXmppClientExtension *extension)
     extension->setClient(this);
     d->extensions.insert(index, extension);
     return true;
-}
-
-/// Registers a new extension with the client.
-///
-/// \param extension
-
-bool QXmppClient::addExtension(QXmppClientExtension* extension)
-{
-    return insertExtension(d->extensions.size(), extension);
 }
 
 /// Unregisters the given extension from the client. If the extension
