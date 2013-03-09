@@ -1,5 +1,5 @@
-QXmpp 0.7.6 (UNRELEASED)
-------------------------
+QXmpp 0.7.6 (Mar 9, 2013)
+-------------------------
 
   - Add QXmppClient::insertExtension to insert an extension at a given index.
   - Disable Facebook / Google / Facebook specific mechanisms if we do not
