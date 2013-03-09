@@ -377,6 +377,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // supported and preferred SASL auth mechanisms
             QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
             const QString preferredMechanism = configuration().saslAuthMechanism();
+            if (configuration().facebookAppId().isEmpty() || configuration().facebookAccessToken().isEmpty())
+                supportedMechanisms.removeAll("X-FACEBOOK-PLATFORM");
+            if (configuration().windowsLiveAccessToken().isEmpty())
+                supportedMechanisms.removeAll("X-MESSENGER-OAUTH2");
+            if (configuration().googleAccessToken().isEmpty())
+                supportedMechanisms.removeAll("X-OAUTH2");
 
             // determine SASL Authentication mechanism to use
             QStringList commonMechanisms;
