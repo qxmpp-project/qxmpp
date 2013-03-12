@@ -381,16 +381,16 @@ void QXmppMucRoom::setNickName(const QString &nickName)
     if (nickName == d->nickName)
         return;
 
-    const bool wasJoined = isJoined();
-    d->nickName = nickName;
-    emit nickNameChanged(nickName);
-
     // if we had already joined the room, request nickname change
-    if (wasJoined) {
+    if (isJoined()) {
         QXmppPresence packet = d->client->clientPresence();
-        packet.setTo(d->ownJid());
+        packet.setTo(d->jid + "/" + nickName);
         packet.setType(QXmppPresence::Available);
         d->client->sendPacket(packet);
+    }
+    else {
+        d->nickName = nickName;
+        emit nickNameChanged(nickName);
     }
 }
 
@@ -681,6 +681,12 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
 
             // check whether this was our own presence
             if (jid == d->ownJid()) {
+                const QString newNick = presence.mucItem().nick();
+                if (!newNick.isEmpty() && newNick != d->nickName) {
+                    d->nickName = newNick;
+                    emit nickNameChanged(newNick);
+                    return;
+                }
 
                 // check whether we were kicked
                 if (presence.mucStatusCodes().contains(307)) {
