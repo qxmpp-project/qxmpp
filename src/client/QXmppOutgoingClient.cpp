@@ -103,6 +103,7 @@ private:
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : redirectPort(0)
     , sessionAvailable(false)
+    , sessionStarted(false)
     , isAuthenticated(false)
     , saslClient(0)
     , q(qq)
