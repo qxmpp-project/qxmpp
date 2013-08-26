@@ -865,7 +865,11 @@ QXmppSslServer::~QXmppSslServer()
     delete d;
 }
 
+#if QT_VERSION < 0x050000
 void QXmppSslServer::incomingConnection(int socketDescriptor)
+#else
+void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
+#endif
 {
     QSslSocket *socket = new QSslSocket;
     if (!socket->setSocketDescriptor(socketDescriptor)) {

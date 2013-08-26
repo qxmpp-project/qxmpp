@@ -141,7 +141,11 @@ signals:
     void newConnection(QSslSocket *socket);
 
 private:
+    #if QT_VERSION < 0x050000
     void incomingConnection(int socketDescriptor);
+    #else
+    void incomingConnection(qintptr socketDescriptor);
+    #endif
     QXmppSslServerPrivate * const d;
 };
 
