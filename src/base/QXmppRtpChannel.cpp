@@ -280,6 +280,7 @@ QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate(QXmppRtpAudioChannel *q
     outgoingPayloadNumbered(false),
     outgoingSequence(1),
     outgoingStamp(0),
+    outgoingTimer(0),
     outgoingSsrc(0),
     q(qq)
 {
