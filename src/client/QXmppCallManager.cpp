@@ -104,8 +104,8 @@ private:
 };
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
-    : state(QXmppCall::ConnectingState),
-    manager(0),
+    : manager(0),
+    state(QXmppCall::ConnectingState),
     sendVideo(false),
     audioMode(QIODevice::NotOpen),
     videoMode(QIODevice::NotOpen),
