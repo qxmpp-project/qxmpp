@@ -58,6 +58,7 @@ FORMS += mainDialog.ui \
     aboutDialog.ui
 
 QT += network \
-    xml
+    xml \
+    widgets
 
 RESOURCES += resources.qrc

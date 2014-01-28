@@ -26,8 +26,8 @@
 #include <QHBoxLayout>
 #include <QMenu>
 
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOptionFrameV2>
+#include <QStyle>
+#include <QStyleOptionFrameV2>
 
 QSize statusLineEdit::sizeHint() const
 {
