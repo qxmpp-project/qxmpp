@@ -60,6 +60,14 @@ public:
         Paused,     ///< User had been composing but now has stopped.
     };
 
+    // XEP-0334: Message Processing Hints
+    enum Hint {
+        NoPermanentStorage = 0,
+        NoStorage,
+        NoCopies,
+        AllowPermantStorage
+    };
+
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
                  const QString& body = QString(), const QString& thread = QString());
     QXmppMessage(const QXmppMessage &other);
@@ -105,6 +113,11 @@ public:
 
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
+
+    // XEP-0334: Message Processing Hints
+    bool hasHint(const Hint& hint);
+    void addHint(const Hint& hint);
+    void removeHint(const Hint& hint);
 
     /// \cond
     void parse(const QDomElement &element);
