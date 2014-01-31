@@ -121,6 +121,11 @@ public:
     QXmppMessage forwarded() const;
     void setForwarded(const QXmppMessage& forwarded);
 
+    // XEP-0313
+    bool hasMaMMessage() const;
+    QXmppMessage mamMessage() const;
+    void setMaMMessage(const QXmppMessage& message);
+
     // XEP-0333
     bool isMarkable() const;
     void setMarkable(const bool);
@@ -133,6 +138,9 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
+
+protected:
+    QXmppMessage parseForward(QDomElement &element);
 
 private:
     QSharedDataPointer<QXmppMessagePrivate> d;

@@ -54,8 +54,10 @@ class QXMPP_EXPORT QXmppSimpleArchiveManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    void retrieveMessages(const QString &jid, const QDateTime &start = QDateTime(), const QDateTime &end = QDateTime(),
-                         const QXmppResultSetQuery &rsm = QXmppResultSetQuery());
+    void retrieveMessages(const QString &jid = QString(),
+                          const QDateTime &start = QDateTime(),
+                          const QDateTime &end = QDateTime(),
+                          const QXmppResultSetQuery &rsm = QXmppResultSetQuery());
 
     /// \cond
     QStringList discoveryFeatures() const;

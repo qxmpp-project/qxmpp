@@ -39,19 +39,23 @@ QStringList QXmppSimpleArchiveManager::discoveryFeatures() const
 bool QXmppSimpleArchiveManager::handleStanza(const QDomElement &element)
 {
     bool isIq = (element.tagName() == "iq");
-    if (!isIq && (element.tagName() != "message"))
+    if (!isIq && (element.tagName() != "message")) {
         return false;
+    }
 
     // XEP-0313: Message Archiving
-    if(isIq && !QXmppSimpleArchiveQueryIq::isSimpleArchiveQueryIq(element))
+    if(isIq && !QXmppSimpleArchiveQueryIq::isSimpleArchiveQueryIq(element)) {
         return false;
+    }
 
     if (isIq && (element.attribute("type") == "result")) {
         QString id = element.attribute("id");
         if (m_pendingQueries.contains(id)) {
             PendingQuery pendingQuery = m_pendingQueries.value(id);
             m_pendingQueries.remove(id);
-            emit archiveMessagesReceived(pendingQuery.jid, pendingQuery.messages, QXmppResultSetReply());
+            QXmppSimpleArchiveQueryIq packet;
+            packet.parse(element);
+            emit archiveMessagesReceived(pendingQuery.jid, pendingQuery.messages, packet.resultSetReply());
             return true;
         }
     } else if (isIq && (element.attribute("type") == "error")) {
@@ -73,7 +77,7 @@ bool QXmppSimpleArchiveManager::handleStanza(const QDomElement &element)
             if (m_pendingQueries.contains(queryId)) {
                 QXmppMessage msg;
                 msg.parse(element);
-                m_pendingQueries[queryId].messages.append(msg.forwarded());
+                m_pendingQueries[queryId].messages.append(msg.mamMessage());
                 
                 return true;
             } else {
@@ -94,7 +98,10 @@ bool QXmppSimpleArchiveManager::handleStanza(const QDomElement &element)
 /// \param end The end time of messages to retrieve.
 /// \param rsm Optional Result Set Management query
 ///
-void QXmppSimpleArchiveManager::retrieveMessages(const QString &jid, const QDateTime &start, const QDateTime &end, const QXmppResultSetQuery &rsm)
+void QXmppSimpleArchiveManager::retrieveMessages(const QString &jid,
+                                                 const QDateTime &start,
+                                                 const QDateTime &end,
+                                                 const QXmppResultSetQuery &rsm)
 {
     QXmppSimpleArchiveQueryIq packet;
     packet.setResultSetQuery(rsm);
@@ -114,5 +121,9 @@ void QXmppSimpleArchiveManager::retrieveMessages(const QString &jid, const QDate
     packet.setQueryId(queryId);
     packet.setId(queryId);
     
-    client()->sendPacket(packet);
+    QXmppClient * const conn = client();
+    if (conn)
+    {
+        conn->sendPacket(packet);
+    }
 }
