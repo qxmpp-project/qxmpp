@@ -161,6 +161,8 @@ void QXmppStream::setSocket(QSslSocket *socket)
     if (!d->socket)
         return;
 
+    socket->setSocketOption(QAbstractSocket::LowDelayOption, QVariant(1));
+
     // socket events
     check = connect(socket, SIGNAL(connected()),
                     this, SLOT(_q_socketConnected()));
