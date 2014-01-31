@@ -86,10 +86,14 @@ extern const char* ns_compress;
 extern const char* ns_compressFeature;
 // XEP-0145: Annotations
 extern const char* ns_rosternotes;
+// XEP-0152: Reachability Addresses
+extern const char* ns_reach;
 // XEP-0153: vCard-Based Avatars
 extern const char* ns_vcard_update;
 // XEP-0158: CAPTCHA Forms
 extern const char* ns_captcha;
+// XEP-0163: Personal Eventing Protocol
+extern const char* ns_personal_eventing_protocol;
 // XEP-0166: Jingle
 extern const char* ns_jingle;
 extern const char* ns_jingle_ice_udp;

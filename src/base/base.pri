@@ -41,7 +41,8 @@ HEADERS += \
     base/QXmppSasl_p.h \
     base/QXmppStreamInitiationIq_p.h \
     base/QXmppSimpleArchivePreferenceIq.h \
-    base/QXmppMessageCarbonsIq.h
+    base/QXmppMessageCarbonsIq.h \
+    base/QXmppReachAddress.h
 
 # Source files
 SOURCES += \
@@ -84,7 +85,8 @@ SOURCES += \
     base/QXmppVCardIq.cpp \
     base/QXmppVersionIq.cpp \
     base/QXmppSimpleArchivePreferenceIq.cpp \
-    base/QXmppMessageCarbonsIq.cpp
+    base/QXmppMessageCarbonsIq.cpp \
+    base/QXmppReachAddress.cpp
 
 # DNS
 qt_version = $$QT_MAJOR_VERSION
