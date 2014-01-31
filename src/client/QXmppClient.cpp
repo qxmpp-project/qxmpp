@@ -181,6 +181,19 @@ QXmppClient::QXmppClient(QObject *parent)
                     this, SLOT(_q_streamError(QXmppClient::Error)));
     Q_ASSERT(check);
 
+    // XEP-0198: Stream Management
+    check = connect(d->stream, SIGNAL(messageAcknowledged(QXmppMessage,bool)),
+                    this, SIGNAL(messageAcknowledged(QXmppMessage,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(iqAcknowledged(QXmppIq,bool)),
+                    this, SIGNAL(iqAcknowledged(QXmppIq,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(presenceAcknowledged(QXmppPresence,bool)),
+                    this, SIGNAL(presenceAcknowledged(QXmppPresence,bool)));
+    Q_ASSERT(check);
+
     // reconnection
     d->reconnectionTimer = new QTimer(this);
     d->reconnectionTimer->setSingleShot(true);
@@ -322,7 +335,7 @@ bool QXmppClient::sendPacket(const QXmppStanza& packet)
 }
 
 /// Disconnects the client and the current presence of client changes to
-/// QXmppPresence::Unavailable.
+/// QXmppPresence::Unavailable and status text changes to "Logged out".
 ///
 /// \note Make sure that the clientPresence is changed to
 /// QXmppPresence::Available, if you are again calling connectToServer() after
@@ -335,6 +348,7 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
+    d->clientPresence.setStatusText("Logged out");
     if (d->stream->isConnected())
         sendPacket(d->clientPresence);
 

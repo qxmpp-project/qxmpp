@@ -103,6 +103,8 @@ extern const char* ns_jingle_rtp_audio;
 extern const char* ns_jingle_rtp_video;
 // XEP-0184: Message Receipts
 extern const char* ns_message_receipts;
+// XEP-0198: Stream Management
+extern const char* ns_stream_management;
 // XEP-0199: XMPP Ping
 extern const char* ns_ping;
 // XEP-0202: Entity Time
@@ -131,5 +133,7 @@ extern const char* ns_replace_message;
 extern const char* ns_message_carbons;
 // XEP-0334: Message Processing Hints:
 extern const char * ns_message_processing_hints;
+// Truphone-Notification
+extern const char * ns_check_credit;
 
 #endif // QXMPPCONSTANTS_H

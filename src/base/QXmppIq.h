@@ -63,6 +63,7 @@ public:
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    StanzaType getStanzaType() const;
 
 protected:
     virtual void parseElementFromChild(const QDomElement &element);

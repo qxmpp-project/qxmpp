@@ -357,6 +357,13 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     xmlWriter->writeEndElement();
 }
+
+
+QXmppStanza::StanzaType QXmppPresence::getStanzaType() const
+{
+    return Presence;
+}
+
 /// \endcond
 
 /// Returns the photo-hash of the VCardUpdate.
@@ -573,4 +580,5 @@ void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
     if (m_priority != 0)
         helperToXmlAddTextElement(xmlWriter, "priority", QString::number(m_priority));
 }
+
 /// \endcond

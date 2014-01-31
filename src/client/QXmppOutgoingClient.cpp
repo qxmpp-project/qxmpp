@@ -58,6 +58,8 @@
 #include <QXmlStreamWriter>
 #include <QTimer>
 
+#include <QXmppStreamManagement.h>
+
 class QXmppOutgoingClientPrivate
 {
 public:
@@ -92,6 +94,11 @@ public:
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
 
+    // XEP-0198: Stream Management
+    QXmppConfiguration::StreamManagementMode streamManagementMode;
+    bool streamManagementEnabled;
+    QXmppStreamManagement *streamManagement;
+
     // Timers
     QTimer *pingTimer;
     QTimer *timeoutTimer;
@@ -106,6 +113,9 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     , sessionStarted(false)
     , isAuthenticated(false)
     , saslClient(0)
+    , streamManagementMode(QXmppConfiguration::SMDisabled)
+    , streamManagementEnabled(false)
+    , streamManagement(0)
     , pingTimer(0)
     , timeoutTimer(0)
     , q(qq)
@@ -198,6 +208,11 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
 
 QXmppOutgoingClient::~QXmppOutgoingClient()
 {
+    if(d->streamManagement)
+    {
+        delete d->streamManagement;
+        d->streamManagement = 0;
+    }
     delete d;
 }
 
@@ -260,6 +275,11 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
     d->isAuthenticated = false;
+    //Send the messages that couldnt be ack back to the app
+    if(d->streamManagement->isStreamManagementEnabled())
+    {
+        d->streamManagement->socketDisconnected();
+    }
     if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
         d->connectToHost(d->redirectHost, d->redirectPort);
         d->redirectHost = QString();
@@ -332,6 +352,23 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
     }
 }
 
+bool QXmppOutgoingClient::sendPacket(const QXmppStanza &stanza)
+{
+    if(d->streamManagementEnabled)
+    {
+        if(QXmppStream::sendPacket(stanza))
+        {
+            d->streamManagement->stanzaSent(stanza);
+            //streamManagementStanzaSent(stanza);
+            if(d->streamManagement->outboundCounter() % 10 == 0) //every 10 packets we ask for ack
+                sendStreamManagementRequest();
+            return true;
+        }else
+            return false;
+    }else
+        return (QXmppStream::sendPacket(stanza));
+}
+
 void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 {
     // if we receive any kind of data, stop the timeout timer
@@ -342,13 +379,35 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
     // give client opportunity to handle stanza
     bool handled = false;
     emit elementReceived(nodeRecv, handled);
-    if (handled)
+    if (handled){
+        d->streamManagement->stanzaHandled();
         return;
+    }
+
+    if(isStreamManagement(nodeRecv))
+    {
+        handleStreamManagement(nodeRecv);
+        return;
+    }
 
     if(QXmppStreamFeatures::isStreamFeatures(nodeRecv))
     {
         QXmppStreamFeatures features;
         features.parse(nodeRecv);
+
+        // in case that the configuration and the server supports stream management, it gets enabled now
+        if(features.streamManagementMode() == QXmppStreamFeatures::Enabled)
+        {
+            // server supports stream management
+            // check client config
+            if(d->config.streamManagementMode() == QXmppConfiguration::SMEnabled )
+            {
+                d->streamManagementMode = QXmppConfiguration::SMEnabled;
+            }else if (d->config.streamManagementMode() == QXmppConfiguration::SMSessionResumptionEnabled)
+            {
+                d->streamManagementMode = QXmppConfiguration::SMSessionResumptionEnabled;
+            }
+        }
 
         if (!socket()->isEncrypted())
         {
@@ -475,9 +534,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             sendPacket(session);
         } else {
             // otherwise we are done
-            d->sessionStarted = true;
+            enableStreamManagement();
             emit connected();
-        }
+        } 
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
@@ -566,6 +625,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // xmpp connection made
                 d->sessionStarted = true;
+                enableStreamManagement();
                 emit connected();
             }
             else if(QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId)
@@ -600,6 +660,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     } else {
                         // otherwise we are done
                         d->sessionStarted = true;
+                        enableStreamManagement();
                         emit connected();
                     }
                 }
@@ -615,6 +676,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // xmpp connection made
                 d->sessionStarted = true;
+                enableStreamManagement();
                 emit connected();
             }
             else if(QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv))
@@ -677,6 +739,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     sendPacket(iq);
                 } else {
                     emit iqReceived(iqPacket);
+                    d->streamManagement->stanzaHandled();
+
                 }
             }
         }
@@ -687,6 +751,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // emit presence
             emit presenceReceived(presence);
+            d->streamManagement->stanzaHandled();
+
         }
         else if(nodeRecv.tagName() == "message")
         {
@@ -695,6 +761,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // emit message
             emit messageReceived(message);
+            d->streamManagement->stanzaHandled();
+
         }
     }
 }
@@ -764,6 +832,77 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
     // not attempt to guess the required fields?
     authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
+}
+
+void QXmppOutgoingClient::enableStreamManagement()
+{
+    if(d->streamManagementMode == QXmppConfiguration::SMSessionResumptionEnabled )
+        sendStreamManagementEnable(true);
+    else if(d->streamManagementMode == QXmppConfiguration::SMEnabled)
+        sendStreamManagementEnable(false);
+
+    d->streamManagement->enableStreamManagement();
+
+}
+
+void QXmppOutgoingClient::sendStreamManagementEnable(const bool resume)
+{
+    debug("SM SENT ENABLE");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->enableToXml(&xmlStream, resume);
+
+    sendData(data);
+
+}
+
+void QXmppOutgoingClient::sendStreamManagementAck()
+{
+    debug("SM SENT ACK");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->ackToXml(&xmlStream);
+
+    sendData(data);
+}
+
+void QXmppOutgoingClient::sendStreamManagementRequest()
+{
+    debug("SM SENT REQUEST");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->requestToXml(&xmlStream);
+
+    sendData(data);
+}
+
+
+
+bool QXmppOutgoingClient::isStreamManagement(const QDomElement &element)
+{
+    if(element.namespaceURI() == ns_stream_management)
+        return true;
+    else return false;
+}
+
+void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
+{
+
+    if(element.tagName() == "enabled")
+    {
+        debug("SM ENABLED RECEIVED");
+
+    }else if(element.tagName() == "r")
+    {
+        debug("SM REQUEST RECV");
+        sendStreamManagementAck();
+    }else if(element.tagName() == "a")
+    {
+        const QString h = element.attribute("h");
+        debug(QString("SM ACK RECV h=%1 outbound count=%2").arg(h).arg(QString::number(d->streamManagement->outboundCounter())));
+        int handled = h.toInt();
+        d->streamManagement->ackReceived(handled);
+    }
 }
 
 /// Returns the type of the last XMPP stream error that occured.

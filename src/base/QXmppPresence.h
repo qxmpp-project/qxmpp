@@ -136,7 +136,9 @@ public:
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    StanzaType getStanzaType()const;
     /// \endcond
+    ///
 
     // XEP-0045: Multi-User Chat
     QXmppMucItem mucItem() const;

@@ -39,6 +39,8 @@ class QXmppIq;
 class QXmppMessage;
 
 class QXmppOutgoingClientPrivate;
+class QXmppStreamManagement;
+
 
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
 /// to an XMPP server.
@@ -55,6 +57,7 @@ public:
     void connectToHost();
     bool isAuthenticated() const;
     bool isConnected() const;
+    bool sendPacket(const QXmppStanza &stanza);
 
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();
@@ -76,6 +79,15 @@ signals:
 
     /// This signal is emitted when an IQ is received.
     void iqReceived(const QXmppIq&);
+
+    /// This singal is emitted when the server AKC/NACK a message
+    void messageAcknowledged(const QXmppMessage&, const bool);
+
+    /// This singal is emitted when the server AKC/NACK a presence
+    void presenceAcknowledged(const QXmppPresence&, const bool);
+
+    /// This singal is emitted when the server AKC a iq
+    void iqAcknowledged(const QXmppIq&, const bool);
 
 protected:
     /// \cond
@@ -100,8 +112,22 @@ private:
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
 
+    // XEP-0198: Stream Management
+    void enableStreamManagement();
+
+    void sendStreamManagementEnable(const bool resume);
+    void sendStreamManagementAck();
+    void sendStreamManagementRequest();
+
+    void handleStreamManagement(const QDomElement &element);
+
+    bool isStreamManagement(const QDomElement &element);
+
+
+
     friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate * const d;
+
 };
 
 #endif // QXMPPOUTGOINGCLIENT_H

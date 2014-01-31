@@ -214,6 +214,25 @@ signals:
     /// This signal is emitted when the client state changes.
     void stateChanged(QXmppClient::State state);
 
+    /// XEP-0198: Stream Management
+    /// Notifies that an XMPP message stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppMessage parameter contains the details
+    /// of the message sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void messageAcknowledged(const QXmppMessage&, const bool);
+
+    /// Notifies that an XMPP presence stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppPresence parameter contains the details
+    /// of the presence sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void presenceAcknowledged(const QXmppPresence&, const bool);
+
+    /// Notifies that an XMPP iq stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppIq parameter contains the details
+    /// of the iq sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void iqAcknowledged(const QXmppIq&, const bool);
+
 public slots:
     void connectToServer(const QString &jid,
                          const QString &password);

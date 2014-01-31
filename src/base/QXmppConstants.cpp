@@ -102,6 +102,8 @@ const char* ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char* ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 // XEP-0184: Message Receipts
 const char* ns_message_receipts = "urn:xmpp:receipts";
+// XEP-0198: Stream Management
+const char* ns_stream_management = "urn:xmpp:sm:3";
 // XEP-0199: XMPP Ping
 const char* ns_ping = "urn:xmpp:ping";
 // XEP-0202: Entity Time
@@ -130,3 +132,5 @@ const char* ns_replace_message = "urn:xmpp:message-correct:0";
 const char* ns_message_carbons = "urn:xmpp:carbons:2";
 // XEP-0334: Message Processing Hints
 const char* ns_message_processing_hints = "urn:xmpp:hints";
+// Truphone-Notification
+const char * ns_check_credit = "urn:truphone:check-credit";

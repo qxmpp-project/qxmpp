@@ -47,7 +47,7 @@ public:
     ~QXmppStream();
 
     virtual bool isConnected() const;
-    bool sendPacket(const QXmppStanza&);
+    virtual bool sendPacket(const QXmppStanza&);
 
 signals:
     /// This signal is emitted when the stream is connected.

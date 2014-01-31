@@ -156,11 +156,14 @@ public:
     void setReplace(const QString& replaceId);
     QString replaceId() const;
 
+    // Truphone-Notification
+    bool isNotification() const;
 
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
+    StanzaType getStanzaType() const;
 
 protected:
     QXmppMessage parseForward(QDomElement &element);
