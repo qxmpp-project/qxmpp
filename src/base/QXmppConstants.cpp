@@ -114,3 +114,5 @@ const char* ns_attention = "urn:xmpp:attention:0";
 const char* ns_bob = "urn:xmpp:bob";
 // XEP-0249: Direct MUC Invitations
 const char* ns_conference = "jabber:x:conference";
+// XEP-0297: Message Forwarding
+const char* ns_stanza_forwarding = "urn:xmpp:forward:0";

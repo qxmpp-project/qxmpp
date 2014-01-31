@@ -76,6 +76,9 @@ public:
     QString receiptId;
     bool receiptRequested;
 
+    // XEP-0297: Stanza Forwarding
+    QSharedPointer<QXmppMessage> forwarded;
+
     // XEP-0249: Direct MUC Invitations
     QString mucInvitationJid;
     QString mucInvitationPassword;
@@ -363,6 +366,26 @@ namespace
     }
 }
 
+bool QXmppMessage::hasForwarded() const
+{
+    return !d->forwarded.isNull();
+}
+
+QXmppMessage QXmppMessage::forwarded() const
+{
+    if (d->forwarded.isNull()) {
+        return QXmppMessage(); // default constructed
+    }
+    
+    return *(d->forwarded);
+}
+
+void QXmppMessage::setForwarded(const QXmppMessage& forwarded)
+{
+    // make a new shared pointer
+    d->forwarded = QSharedPointer<QXmppMessage>(new QXmppMessage(forwarded));
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -428,6 +451,25 @@ void QXmppMessage::parse(const QDomElement &element)
         const QString str = delayElement.attribute("stamp");
         d->stamp = QXmppUtils::datetimeFromString(str);
         d->stampType = DelayedDelivery;
+    }
+
+    // XEP-0297: Forwarding
+    QDomElement forwardedElement = element.firstChildElement("forwarded");
+    if (!forwardedElement.isNull() && forwardedElement.namespaceURI() == ns_stanza_forwarding)
+    {
+        QDomElement msgElement = forwardedElement.firstChildElement("message");
+        
+        QXmppMessage fwd;
+        fwd.parse(msgElement);
+        
+        QDomElement delayElement = forwardedElement.firstChildElement("delay");
+        if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery) {
+            const QString str = delayElement.attribute("stamp");
+            fwd.d->stamp = QXmppUtils::datetimeFromString(str);
+            fwd.d->stampType = DelayedDelivery;
+        }
+        
+        setForwarded(fwd);
     }
 
     // XEP-0224: Attention
