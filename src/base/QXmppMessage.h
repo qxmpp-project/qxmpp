@@ -69,6 +69,13 @@ public:
         Acknowledged
     };
 
+    enum Hint {
+        NoPermanentStorage = 0,
+        NoStorage,
+        NoCopies,
+        AllowPermantStorage
+    };
+
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
                  const QString& body = QString(), const QString& thread = QString());
 
@@ -131,7 +138,10 @@ public:
     QXmppMessage carbonMessage() const;
     void setMessagecarbon(const QXmppMessage& message);
 
-
+    // XEP-0334: Message Processing Hints
+    bool hasHint(const Hint& hint);
+    void addHint(const Hint& hint);
+    void removeHint(const Hint& hint);
 
     // XEP-0333
     bool isMarkable() const;

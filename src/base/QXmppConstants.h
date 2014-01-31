@@ -123,5 +123,7 @@ extern const char* ns_simple_archive;
 extern const char* ns_chat_markers;
 // XEP-0280: Message Carbons
 extern const char* ns_message_carbons;
+// XEP-0334: Message Processing Hints:
+extern const char * ns_message_processing_hints;
 
 #endif // QXMPPCONSTANTS_H

@@ -46,6 +46,7 @@ private slots:
     void testForwarding();
     void testChatMarkers();
     void testMessageCarbons();
+    void testProcessingHints();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -565,6 +566,35 @@ void tst_QXmppMessage::testMessageCarbons()
     QCOMPARE(fwd.body(), QString("ABC"));
     QCOMPARE(fwd.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(fwd.from(), QString("bar@example.com/QXmpp"));
+}
+
+void tst_QXmppMessage::testProcessingHints()
+{
+    const QByteArray xml("<message "
+                         "to=\"juliet@capulet.lit/laptop\" "
+                         "from=\"romeo@montague.lit/laptop\" "
+                         "type=\"chat\">"
+                       "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+                       "<no-copy xmlns=\"urn:xmpp:hints\"/>"
+                       "<no-store xmlns=\"urn:xmpp:hints\"/>"
+                       "<allow-permanent-storage xmlns=\"urn:xmpp:hints\"/>"
+                     "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.hasHint(QXmppMessage::NoCopies), true);
+    QCOMPARE(message.hasHint(QXmppMessage::NoStorage), true);
+    QCOMPARE(message.hasHint(QXmppMessage::AllowPermantStorage), true);
+
+    QXmppMessage message2;
+    message2.setType(QXmppMessage::Chat);
+    message2.setFrom(QString("romeo@montague.lit/laptop"));
+    message2.setTo(QString("juliet@capulet.lit/laptop"));
+    message2.setBody(QString("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
+    message2.addHint(QXmppMessage::NoCopies);
+    message2.addHint(QXmppMessage::NoStorage);
+    message2.addHint(QXmppMessage::AllowPermantStorage);
+    serializePacket(message2, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

@@ -122,3 +122,5 @@ const char* ns_simple_archive = "urn:xmpp:mam:tmp";
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 // XEP-0280: Message Carbons
 const char* ns_message_carbons = "urn:xmpp:carbons:2";
+// XEP-0334: Message Processing Hints
+const char* ns_message_processing_hints = "urn:xmpp:hints";
