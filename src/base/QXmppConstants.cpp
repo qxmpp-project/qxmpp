@@ -86,13 +86,13 @@ const char* ns_compressFeature = "http://jabber.org/features/compress";
 // XEP-0145: Annotations
 const char* ns_rosternotes = "storage:rosternotes";
 // XEP-0152: Reachability Addresses
-extern const char* ns_reach = "urn:xmpp:reach:0";
+const char* ns_reach = "urn:xmpp:reach:0";
 // XEP-0153: vCard-Based Avatars
 const char* ns_vcard_update = "vcard-temp:x:update";
 // XEP-0158: CAPTCHA Forms
 const char* ns_captcha = "urn:xmpp:captcha";
 // XEP-0163: Personal Eventing Protocol
-extern const char* ns_personal_eventing_protocol = "http://jabber.org/protocol/pubsub#event";
+const char* ns_personal_eventing_protocol = "http://jabber.org/protocol/pubsub#event";
 // XEP-0166: Jingle
 const char* ns_jingle = "urn:xmpp:jingle:1";
 const char* ns_jingle_raw_udp = "urn:xmpp:jingle:transports:raw-udp:1";
@@ -124,6 +124,8 @@ const char* ns_stanza_forwarding = "urn:xmpp:forward:0";
 const char* ns_simple_archive = "urn:xmpp:mam:tmp";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
+// XEP-0308: Last Message Correction
+const char* ns_replace_message = "urn:xmpp:message-correct:0";
 // XEP-0280: Message Carbons
 const char* ns_message_carbons = "urn:xmpp:carbons:2";
 // XEP-0334: Message Processing Hints

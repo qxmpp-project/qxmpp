@@ -48,6 +48,7 @@ private slots:
     void testChatMarkers();
     void testMessageCarbons();
     void testProcessingHints();
+    void testReplaceMessage();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -606,6 +607,36 @@ void tst_QXmppMessage::testProcessingHints()
     message2.addHint(QXmppMessage::NoStorage);
     message2.addHint(QXmppMessage::AllowPermantStorage);
     serializePacket(message2, xml);
+}
+
+void tst_QXmppMessage::testReplaceMessage()
+{
+    const QByteArray replaceXml(
+                "<message to='juliet@capulet.net/balcony' id='good1'>"
+                  "<body>But soft, what light through yonder window breaks?</body>"
+                  "<replace id='bad1' xmlns='urn:xmpp:message-correct:0'/>"
+                "</message>");
+
+    QXmppMessage replaceMessage;
+    parsePacket(replaceMessage, replaceXml);
+    QCOMPARE(replaceMessage.isReplace(), true);
+    QCOMPARE(replaceMessage.replaceId(), QString("bad1"));
+
+
+    const QByteArray replaceSerialisation(
+                "<message id=\"good1\" to=\"juliet@capulet.net/balcony\" type=\"chat\">"
+                  "<body>But soft, what light through yonder window breaks?</body>"
+                  "<replace id=\"bad1\" xmlns=\"urn:xmpp:message-correct:0\"/>"
+                "</message>");
+
+    QXmppMessage serialisationMessage;
+    serialisationMessage.setTo("juliet@capulet.net/balcony");
+    serialisationMessage.setId("good1");
+    serialisationMessage.setBody("But soft, what light through yonder window breaks?");
+    serialisationMessage.setReplace("bad1");
+
+    serializePacket(serialisationMessage, replaceSerialisation);
+
 }
 
 QTEST_MAIN(tst_QXmppMessage)

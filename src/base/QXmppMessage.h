@@ -151,6 +151,12 @@ public:
     QString markedThread() const;
     void setMarker(const Marker, const QString& id, const QString& thread = QString());
     
+    // XEP-0308: Last Message Correction
+    bool isReplace() const;
+    void setReplace(const QString& replaceId);
+    QString replaceId() const;
+
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

@@ -112,6 +112,10 @@ public:
     QXmppMessage::Marker marker;
     QString markedId;
     QString markedThread;
+
+    // XEP-0308: Last Message Correction
+    bool replace;
+    QString replaceId;
 };
 
 /// Constructs a QXmppMessage.
@@ -136,6 +140,8 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
 
     d->markable = false;
     d->marker = NoMarker;
+
+    d->replace = false;
 }
 
 /// Constructs a copy of \a other.
@@ -472,6 +478,22 @@ void QXmppMessage::setMarker(const Marker marker,
     d->markedThread = thread;
 }
 
+bool QXmppMessage::isReplace() const
+{
+    return d->replace;
+}
+
+QString QXmppMessage::replaceId() const
+{
+    return d->replaceId;
+}
+
+void QXmppMessage::setReplace(const QString& replaceId)
+{
+    d->replace   = true;
+    d->replaceId = replaceId;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -611,6 +633,17 @@ void QXmppMessage::parse(const QDomElement &element)
             d->marker = marker;
             d->markedId = chatStateElement.attribute("id", QString());
             d->markedThread = chatStateElement.attribute("thread", QString());
+        }
+    }
+
+    // XEP-0308: Last Message Correction
+    QDomElement replaceElement = element.firstChildElement("replace");
+    if(!replaceElement.isNull())
+    {
+        if(replaceElement.namespaceURI() == ns_replace_message)
+        {
+            d->replace = true;
+            d->replaceId = replaceElement.attribute("id", QString());
         }
     }
 
@@ -779,6 +812,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
             xmlWriter->writeAttribute("thread", d->markedThread);
         }
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0308: Last Message Correction
+    if(d->replace) {
+        xmlWriter->writeStartElement("replace");
+        xmlWriter->writeAttribute("id",d->replaceId);
+        xmlWriter->writeAttribute("xmlns",ns_replace_message);
         xmlWriter->writeEndElement();
     }
 
