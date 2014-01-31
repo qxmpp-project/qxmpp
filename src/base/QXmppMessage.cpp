@@ -48,6 +48,13 @@ static const char* message_types[] = {
     "headline"
 };
 
+static const char* marker_types[] = {
+    "",
+    "received",
+    "displayed",
+    "acknowledged"
+};
+
 static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 
 enum StampType
@@ -83,6 +90,12 @@ public:
     QString mucInvitationJid;
     QString mucInvitationPassword;
     QString mucInvitationReason;
+
+    // XEP-0333: Chat Markers
+    bool markable;
+    QXmppMessage::Marker marker;
+    QString markedId;
+    QString markedThread;
 };
 
 /// Constructs a QXmppMessage.
@@ -104,6 +117,9 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
     d->body = body;
     d->thread = thread;
     d->receiptRequested = false;
+
+    d->markable = false;
+    d->marker = NoMarker;
 }
 
 /// Constructs a copy of \a other.
@@ -386,6 +402,40 @@ void QXmppMessage::setForwarded(const QXmppMessage& forwarded)
     d->forwarded = QSharedPointer<QXmppMessage>(new QXmppMessage(forwarded));
 }
 
+bool QXmppMessage::isMarkable() const
+{
+    return d->markable;
+}
+
+void QXmppMessage::setMarkable(const bool markable)
+{
+    d->markable = markable;
+}
+
+QXmppMessage::Marker QXmppMessage::marker() const
+{
+    return d->marker;
+}
+
+QString QXmppMessage::markedId() const
+{
+    return d->markedId;
+}
+
+QString QXmppMessage::markedThread() const
+{
+    return d->markedThread;
+}
+
+void QXmppMessage::setMarker(const Marker marker,
+                             const QString& id,
+                             const QString& thread)
+{
+    d->marker = marker;
+    d->markedId = id;
+    d->markedThread = thread;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -474,6 +524,36 @@ void QXmppMessage::parse(const QDomElement &element)
 
     // XEP-0224: Attention
     d->attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
+
+    // XEP-0333: Chat Markers
+    QDomElement markableElement = element.firstChildElement("markable");
+    if (!markableElement.isNull())
+    {
+        d->markable = true;
+    }
+    // check for all the marker types
+    QDomElement chatStateElement;
+    QXmppMessage::Marker marker = QXmppMessage::NoMarker;
+    for (int i = Received; i <= Acknowledged; i++)
+    {
+        chatStateElement = element.firstChildElement(marker_types[i]);
+        if (!chatStateElement.isNull() &&
+            chatStateElement.namespaceURI() == ns_chat_markers)
+        {
+            marker = static_cast<QXmppMessage::Marker>(i);
+            break;
+        }
+    }
+    // if marker is present, check it's the right ns
+    if (!chatStateElement.isNull())
+    {
+        if (chatStateElement.namespaceURI() == ns_chat_markers)
+        {
+            d->marker = marker;
+            d->markedId = chatStateElement.attribute("id", QString());
+            d->markedThread = chatStateElement.attribute("thread", QString());
+        }
+    }
 
     const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
 
@@ -594,6 +674,22 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
             xmlWriter->writeAttribute("password", d->mucInvitationPassword);
         if (!d->mucInvitationReason.isEmpty())
             xmlWriter->writeAttribute("reason", d->mucInvitationReason);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0333: Chat Markers
+    if (d->markable) {
+        xmlWriter->writeStartElement("markable");
+        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
+        xmlWriter->writeEndElement();
+    }
+    if (d->marker != NoMarker) {
+        xmlWriter->writeStartElement(marker_types[d->marker]);
+        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
+        xmlWriter->writeAttribute("id", d->markedId);
+        if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
+            xmlWriter->writeAttribute("thread", d->markedThread);
+        }
         xmlWriter->writeEndElement();
     }
 

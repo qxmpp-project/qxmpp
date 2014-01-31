@@ -118,4 +118,5 @@ const char* ns_conference = "jabber:x:conference";
 const char* ns_stanza_forwarding = "urn:xmpp:forward:0";
 // XEP-0313: Message Archieve Management
 const char* ns_simple_archive = "urn:xmpp:mam:tmp";
-
+// XEP-0333: Chat Markers
+const char* ns_chat_markers = "urn:xmpp:chat-markers:0";

@@ -119,5 +119,7 @@ extern const char* ns_conference;
 extern const char* ns_stanza_forwarding;
 // XEP-0313: Message Archieve Management
 extern const char* ns_simple_archive;
+// XEP-0333: Char Markers
+extern const char* ns_chat_markers;
 
 #endif // QXMPPCONSTANTS_H
