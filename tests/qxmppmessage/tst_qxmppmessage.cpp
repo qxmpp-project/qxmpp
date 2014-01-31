@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include "QXmppMessage.h"
+#include "QXmppMessageCarbonsIq.h"
 #include "util.h"
 
 class tst_QXmppMessage : public QObject
@@ -566,6 +567,16 @@ void tst_QXmppMessage::testMessageCarbons()
     QCOMPARE(fwd.body(), QString("ABC"));
     QCOMPARE(fwd.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(fwd.from(), QString("bar@example.com/QXmpp"));
+
+
+    const QByteArray carbonXml("<iq id=\"id1\""
+                               " type=\"set\">"
+                                   "<enable xmlns=\"urn:xmpp:carbons:2\"/>"
+                              "</iq>");
+
+    QXmppMessageCarbonsIq carbonIq;
+    carbonIq.setId("id1");
+    serializePacket(carbonIq, carbonXml);
 }
 
 void tst_QXmppMessage::testProcessingHints()

@@ -22,7 +22,7 @@ public:
     /// \cond
 
 protected:
-    void toXml(QXmlStreamWriter *writer) const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
 
 };

@@ -5,7 +5,6 @@
 
 #include <QBuffer>
 #include <QDomElement>
-#include <QDebug>
 
 
 QXmppReachAddress::QXmppReachAddress()
