@@ -715,10 +715,10 @@ void QXmppTransferOutgoingJob::_q_sendData()
     if (length >= 0)
     {
         d->socksSocket->write(buffer, length);
-        delete [] buffer;
         d->done += length;
         emit progress(d->done, fileSize());
     }
+    delete [] buffer;
 }
 /// \endcond
 

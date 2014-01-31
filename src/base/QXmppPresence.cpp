@@ -184,7 +184,7 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     d->type = type;
 }
 
-/// \cond
+/// \cond
 void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
@@ -496,3 +496,81 @@ void QXmppPresence::setMucSupported(bool supported)
 {
     d->mucSupported = supported;
 }
+
+/// \cond
+const QXmppPresence::Status& QXmppPresence::status() const
+{
+    return d->status;
+}
+
+QXmppPresence::Status& QXmppPresence::status()
+{
+    return d->status;
+}
+
+void QXmppPresence::setStatus(const QXmppPresence::Status& status)
+{
+    d->status = status;
+}
+
+QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
+                             const QString& statusText, int priority) :
+                                m_type(type),
+                                m_statusText(statusText), m_priority(priority)
+{
+}
+
+QXmppPresence::Status::Type QXmppPresence::Status::type() const
+{
+    return m_type;
+}
+
+void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
+{
+    m_type = type;
+}
+
+QString QXmppPresence::Status::statusText() const
+{
+    return m_statusText;
+}
+
+void QXmppPresence::Status::setStatusText(const QString& str)
+{
+    m_statusText = str;
+}
+
+int QXmppPresence::Status::priority() const
+{
+    return m_priority;
+}
+
+void QXmppPresence::Status::setPriority(int priority)
+{
+    m_priority = priority;
+}
+
+void QXmppPresence::Status::parse(const QDomElement &element)
+{
+    const QString show = element.firstChildElement("show").text();
+    for (int i = Online; i <= Invisible; i++) {
+        if (show == presence_shows[i]) {
+            m_type = static_cast<Type>(i);
+            break;
+        }
+    }
+    m_statusText = element.firstChildElement("status").text();
+    m_priority = element.firstChildElement("priority").text().toInt();
+}
+
+void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
+{
+    const QString show = presence_shows[m_type];
+    if (!show.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "show", show);
+    if (!m_statusText.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
+    if (m_priority != 0)
+        helperToXmlAddTextElement(xmlWriter, "priority", QString::number(m_priority));
+}
+/// \endcond
