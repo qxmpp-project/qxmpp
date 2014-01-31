@@ -116,3 +116,6 @@ const char* ns_bob = "urn:xmpp:bob";
 const char* ns_conference = "jabber:x:conference";
 // XEP-0297: Message Forwarding
 const char* ns_stanza_forwarding = "urn:xmpp:forward:0";
+// XEP-0313: Message Archieve Management
+const char* ns_simple_archive = "urn:xmpp:mam:tmp";
+

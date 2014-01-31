@@ -117,5 +117,7 @@ extern const char* ns_bob;
 extern const char* ns_conference;
 // XEP-0296: Message Forwarding
 extern const char* ns_stanza_forwarding;
+// XEP-0313: Message Archieve Management
+extern const char* ns_simple_archive;
 
 #endif // QXMPPCONSTANTS_H

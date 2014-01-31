@@ -26,6 +26,7 @@ INSTALL_HEADERS += \
     base/QXmppRpcIq.h \
     base/QXmppRtpChannel.h \
     base/QXmppSessionIq.h \
+    base/QXmppSimpleArchiveIq.h \
     base/QXmppSocks.h \
     base/QXmppStanza.h \
     base/QXmppStream.h \
@@ -70,6 +71,7 @@ SOURCES += \
     base/QXmppRtpChannel.cpp \
     base/QXmppSasl.cpp \
     base/QXmppSessionIq.cpp \
+    base/QXmppSimpleArchiveIq.cpp \
     base/QXmppSocks.cpp \
     base/QXmppStanza.cpp \
     base/QXmppStream.cpp \
