@@ -126,6 +126,13 @@ public:
     QXmppMessage mamMessage() const;
     void setMaMMessage(const QXmppMessage& message);
 
+    // XEP-0280
+    bool hasMessageCarbon() const;
+    QXmppMessage carbonMessage() const;
+    void setMessagecarbon(const QXmppMessage& message);
+
+
+
     // XEP-0333
     bool isMarkable() const;
     void setMarkable(const bool);

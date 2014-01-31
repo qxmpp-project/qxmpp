@@ -121,5 +121,7 @@ extern const char* ns_stanza_forwarding;
 extern const char* ns_simple_archive;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
+// XEP-0280: Message Carbons
+extern const char* ns_message_carbons;
 
 #endif // QXMPPCONSTANTS_H

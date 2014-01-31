@@ -120,3 +120,5 @@ const char* ns_stanza_forwarding = "urn:xmpp:forward:0";
 const char* ns_simple_archive = "urn:xmpp:mam:tmp";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
+// XEP-0280: Message Carbons
+const char* ns_message_carbons = "urn:xmpp:carbons:2";

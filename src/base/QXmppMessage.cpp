@@ -31,6 +31,9 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
+#include <QtDebug>
+
+
 static const char* chat_states[] = {
     "",
     "active",
@@ -88,6 +91,9 @@ public:
 
     // XEP-0313: Simple Message Archive Management
     QSharedPointer<QXmppMessage> mamMessage;
+
+    // XEP-0280: Message Carbons
+    QSharedPointer<QXmppMessage> carbonMessage;
 
     // XEP-0249: Direct MUC Invitations
     QString mucInvitationJid;
@@ -537,6 +543,17 @@ void QXmppMessage::parse(const QDomElement &element)
         }
     }
 
+    // XEP-0280: message carbons
+    QDomElement carbonElement = element.firstChildElement("sent");
+    if (!carbonElement.isNull() && carbonElement.namespaceURI() == ns_message_carbons)
+    {
+        QDomElement forwardedElement = carbonElement.firstChildElement("forwarded");
+        if (!forwardedElement.isNull() && forwardedElement.namespaceURI() == ns_stanza_forwarding)
+        {
+            setMessagecarbon(parseForward(forwardedElement));
+        }
+    }
+
     // XEP-0297: Forwarding
     QDomElement forwardedElement = element.firstChildElement("forwarded");
     if (!forwardedElement.isNull() && forwardedElement.namespaceURI() == ns_stanza_forwarding)
@@ -743,3 +760,25 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 /// \endcond
+
+
+bool QXmppMessage::hasMessageCarbon() const
+{
+    return !d->carbonMessage.isNull();
+}
+
+QXmppMessage QXmppMessage::carbonMessage() const
+{
+    if (d->carbonMessage.isNull()) {
+        return QXmppMessage(); // default constructed
+    }
+
+    return *(d->carbonMessage);
+
+}
+
+void QXmppMessage::setMessagecarbon(const QXmppMessage& message)
+{
+    // make a new shared pointer
+    d->carbonMessage = QSharedPointer<QXmppMessage>(new QXmppMessage(message));
+}
