@@ -9,14 +9,23 @@
 class QXmppStreamManagementPrivate
 {
 public:
+    QXmppStreamManagementPrivate();
     QXmppConfiguration::StreamManagementMode streamManagementMode;
     bool streamManagementEnabled;
     int  outboundCount;
     int  inboundCount;
     QMap <int, QXmppStanza*> outboundBuffer;
-    QXmppStreamManagement m_streamManagement;
 
 };
+
+QXmppStreamManagementPrivate::QXmppStreamManagementPrivate()
+    : streamManagementMode(QXmppConfiguration::SMDisabled)
+    , streamManagementEnabled(false)
+    , outboundCount(0)
+    , inboundCount(0)
+{
+
+}
 
 QXmppStreamManagement::QXmppStreamManagement(QObject *parent)
     : QXmppLoggable(parent)

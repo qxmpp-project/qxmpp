@@ -25,7 +25,8 @@ SUBDIRS = \
     qxmpputils \
     qxmppvcardiq \
     qxmppversioniq \
-	 qxmpppep
+    qxmppstreammanagement \
+    qxmpppep
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     SUBDIRS += qxmppcodec

@@ -202,17 +202,28 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     check = connect(this, SIGNAL(disconnected()),
                     this, SLOT(pingStop()));
     Q_ASSERT(check);
+
+    // XEP-0198: Stram Management
+    d->streamManagement = new QXmppStreamManagement(this);
+    check = connect(d->streamManagement, SIGNAL(messageAcknowledged(QXmppMessage,bool)),
+                    this, SIGNAL(messageAcknowledged(QXmppMessage,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->streamManagement, SIGNAL(presenceAcknowledged(QXmppPresence,bool)),
+                    this, SIGNAL(presenceAcknowledged(QXmppPresence,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->streamManagement, SIGNAL(iqAcknowledged(QXmppIq,bool)),
+                    this, SIGNAL(iqAcknowledged(QXmppIq,bool)));
+    Q_ASSERT(check);
+
+
 }
 
 /// Destroys an outgoing client stream.
 
 QXmppOutgoingClient::~QXmppOutgoingClient()
 {
-    if(d->streamManagement)
-    {
-        delete d->streamManagement;
-        d->streamManagement = 0;
-    }
     delete d;
 }
 
@@ -275,7 +286,7 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
     d->isAuthenticated = false;
-    //Send the messages that couldnt be ack back to the app
+    // Notify the stream management that the socket is in a disconect status
     if(d->streamManagement->isStreamManagementEnabled())
     {
         d->streamManagement->socketDisconnected();
@@ -354,19 +365,17 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
 
 bool QXmppOutgoingClient::sendPacket(const QXmppStanza &stanza)
 {
-    if(d->streamManagementEnabled)
+    if(QXmppStream::sendPacket(stanza))
     {
-        if(QXmppStream::sendPacket(stanza))
+        if(d->streamManagementEnabled)
         {
             d->streamManagement->stanzaSent(stanza);
-            //streamManagementStanzaSent(stanza);
-            if(d->streamManagement->outboundCounter() % 10 == 0) //every 10 packets we ask for ack
+            if(d->streamManagement->outboundCounter() % 10 == 0) //every 10 packets a request is sent
                 sendStreamManagementRequest();
-            return true;
-        }else
-            return false;
-    }else
-        return (QXmppStream::sendPacket(stanza));
+        }
+        return true;
+    }
+    return false;
 }
 
 void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)

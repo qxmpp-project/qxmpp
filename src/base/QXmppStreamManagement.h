@@ -11,7 +11,7 @@
 
 class QXmppStreamManagementPrivate;
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagement : public QXmppLoggable
+class QXMPP_EXPORT QXmppStreamManagement : public QXmppLoggable
 {
     Q_OBJECT
 public:
