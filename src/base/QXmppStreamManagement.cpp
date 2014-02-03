@@ -11,7 +11,11 @@ class QXmppStreamManagementPrivate
 public:
     QXmppStreamManagementPrivate();
     QXmppConfiguration::StreamManagementMode streamManagementMode;
-    bool streamManagementEnabled;
+    bool outboundEnabled;
+    bool inboundEnabled;
+    bool resumeEnabled;
+    QString resumeId;
+    QString resumeLocation;
     int  outboundCount;
     int  inboundCount;
     QMap <int, QXmppStanza*> outboundBuffer;
@@ -20,7 +24,8 @@ public:
 
 QXmppStreamManagementPrivate::QXmppStreamManagementPrivate()
     : streamManagementMode(QXmppConfiguration::SMDisabled)
-    , streamManagementEnabled(false)
+    , outboundEnabled(false)
+    , inboundEnabled(false)
     , outboundCount(0)
     , inboundCount(0)
 {
@@ -33,10 +38,24 @@ QXmppStreamManagement::QXmppStreamManagement(QObject *parent)
 {
 }
 
-void QXmppStreamManagement::enableStreamManagement()
+void QXmppStreamManagement::enableSent()
 {
-    d->streamManagementEnabled = true;
+    d->outboundEnabled = true;
     d->outboundCount = 0;
+}
+
+void QXmppStreamManagement::enabledReceived(const QDomElement &element)
+{
+    d->inboundEnabled = true;
+    if(element.hasAttribute("id"))
+        d->resumeId = element.attribute("id");
+    if(element.hasAttribute("location"))
+        d->resumeLocation = element.attribute("location");
+    if(element.hasAttribute("resume"))
+    {
+        if(element.attribute("resume") == "true")
+            d->resumeEnabled = true;
+    }
     d->inboundCount = 0;
 }
 
@@ -129,8 +148,7 @@ void QXmppStreamManagement::ackToXml(QXmlStreamWriter *xmlStream)
 {
     xmlStream->writeStartElement("a");
     xmlStream->writeAttribute("xmlns",ns_stream_management);
-    QString counter = QString::number(d->inboundCount);
-    xmlStream->writeAttribute("h",counter);
+    xmlStream->writeAttribute("h", QString::number(d->inboundCount));
     xmlStream->writeEndElement();
 }
 
@@ -141,14 +159,53 @@ void QXmppStreamManagement::requestToXml(QXmlStreamWriter *xmlStream)
     xmlStream->writeEndElement();
 }
 
-bool QXmppStreamManagement::isStreamManagementEnabled() const
+void QXmppStreamManagement::resumeToXml(QXmlStreamWriter *xmlStream)
 {
-    return d->streamManagementEnabled;
+    xmlStream->writeStartElement("resume");
+    xmlStream->writeAttribute("xmlns",ns_stream_management);
+    xmlStream->writeAttribute("h", QString::number(d->inboundCount));
+    xmlStream->writeAttribute("previd",d->resumeId);
+    xmlStream->writeEndElement();
+}
+
+bool QXmppStreamManagement::isEnabled() const
+{
+    return (d->inboundEnabled && d->outboundEnabled);
+}
+
+bool QXmppStreamManagement::isOutboundEnabled() const
+{
+    return d->outboundEnabled;
+}
+
+bool QXmppStreamManagement::isInboundEnabled() const
+{
+    return d->inboundEnabled;
+}
+
+bool QXmppStreamManagement::isResumeEnabled() const
+{
+    return d->resumeEnabled;
 }
 
 int QXmppStreamManagement::outboundCounter() const
 {
     return d->outboundCount;
+}
+
+int QXmppStreamManagement::inboudCounter() const
+{
+    return d->inboundCount;
+}
+
+QString QXmppStreamManagement::resumeId() const
+{
+    return d->resumeId;
+}
+
+QString QXmppStreamManagement::resumeLocation() const
+{
+    return d->resumeLocation;
 }
 
 void QXmppStreamManagement::socketDisconnected()

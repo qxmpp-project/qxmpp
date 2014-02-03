@@ -96,7 +96,6 @@ public:
 
     // XEP-0198: Stream Management
     QXmppConfiguration::StreamManagementMode streamManagementMode;
-    bool streamManagementEnabled;
     QXmppStreamManagement *streamManagement;
 
     // Timers
@@ -114,7 +113,6 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     , isAuthenticated(false)
     , saslClient(0)
     , streamManagementMode(QXmppConfiguration::SMDisabled)
-    , streamManagementEnabled(false)
     , streamManagement(0)
     , pingTimer(0)
     , timeoutTimer(0)
@@ -287,7 +285,7 @@ void QXmppOutgoingClient::_q_socketDisconnected()
     debug("Socket disconnected");
     d->isAuthenticated = false;
     // Notify the stream management that the socket is in a disconect status
-    if(d->streamManagement->isStreamManagementEnabled())
+    if(d->streamManagement->isEnabled())
     {
         d->streamManagement->socketDisconnected();
     }
@@ -367,7 +365,7 @@ bool QXmppOutgoingClient::sendPacket(const QXmppStanza &stanza)
 {
     if(QXmppStream::sendPacket(stanza))
     {
-        if(d->streamManagementEnabled)
+        if(d->streamManagement->isOutboundEnabled())
         {
             d->streamManagement->stanzaSent(stanza);
             if(d->streamManagement->outboundCounter() % 10 == 0) //every 10 packets a request is sent
@@ -850,8 +848,7 @@ void QXmppOutgoingClient::enableStreamManagement()
     else if(d->streamManagementMode == QXmppConfiguration::SMEnabled)
         sendStreamManagementEnable(false);
 
-    d->streamManagement->enableStreamManagement();
-
+    d->streamManagement->enableSent();
 }
 
 void QXmppOutgoingClient::sendStreamManagementEnable(const bool resume)
@@ -899,8 +896,7 @@ void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
 
     if(element.tagName() == "enabled")
     {
-        debug("SM ENABLED RECEIVED");
-
+        d->streamManagement->enabledReceived(element);
     }else if(element.tagName() == "r")
     {
         debug("SM REQUEST RECV");

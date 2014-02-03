@@ -17,7 +17,8 @@ class QXMPP_EXPORT QXmppStreamManagement : public QXmppLoggable
 public:
     QXmppStreamManagement(QObject* parent = 0);
 
-    void enableStreamManagement();
+    void enableSent();
+    void enabledReceived(const QDomElement &element);
 
     void stanzaSent(const QXmppStanza& stanza);
     void ackReceived(const int handled);
@@ -27,9 +28,18 @@ public:
     void enableToXml(QXmlStreamWriter *xmlStream, const bool resume);
     void ackToXml(QXmlStreamWriter *xmlStream);
     void requestToXml(QXmlStreamWriter *xmlStream);
+    void resumeToXml(QXmlStreamWriter *xmlStream);
 
-    bool isStreamManagementEnabled() const;
+    bool isEnabled() const;
+    bool isOutboundEnabled() const;
+    bool isInboundEnabled() const;
+    bool isResumeEnabled() const;
+
     int  outboundCounter() const;
+    int  inboudCounter() const;
+
+    QString resumeId() const;
+    QString resumeLocation() const;
 
     void socketDisconnected();
 

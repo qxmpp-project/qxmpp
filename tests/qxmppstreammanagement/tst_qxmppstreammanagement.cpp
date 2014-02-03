@@ -41,6 +41,8 @@ private slots:
     void testEnableStreamManagement();
     void testRequestStreamManagement();
     void testAckStreamManagement();
+    void testEnableResume();
+    void testResumeStreamManagement();
 
 private:
     QXmppStreamManagement *streamManagement;
@@ -96,6 +98,40 @@ void tst_QXmppStreamManagement::testAckStreamManagement()
     qDebug() << "expect " << xml;
     qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
+}
+
+
+
+void tst_QXmppStreamManagement::testEnableResume()
+{
+    const QByteArray xml( "<enabled xmlns=\"urn:xmpp:sm:3\""
+                "id=\"some-long-sm-id\""
+                "location=\"[2001:41D0:1:A49b::1]:9222\""
+                "resume=\"true\"/>");
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+
+    streamManagement->enabledReceived(doc.documentElement());
+
+    QCOMPARE(streamManagement->isResumeEnabled(), true);
+    QCOMPARE(streamManagement->resumeId(), QString("some-long-sm-id"));
+    QCOMPARE(streamManagement->resumeLocation(), QString("[2001:41D0:1:A49b::1]:9222"));
+
+}
+
+void tst_QXmppStreamManagement::testResumeStreamManagement()
+{
+     const QByteArray xml( "<resume xmlns=\"urn:xmpp:sm:3\""
+                            " h=\"0\""
+                            " previd=\"some-long-sm-id\"/>");
+     QBuffer buffer;
+     buffer.open(QIODevice::ReadWrite);
+     QXmlStreamWriter writer(&buffer);
+     streamManagement->resumeToXml(&writer);
+     qDebug() << "expect " << xml;
+     qDebug() << "writing" << buffer.data();
+     QCOMPARE(buffer.data(), xml);
 }
 
 void tst_QXmppStreamManagement::messageACKReceived(const QXmppMessage& message, bool ack)
