@@ -128,6 +128,16 @@ void QXmppStreamManagement::ackReceived(const int handled)
     }
 }
 
+void QXmppStreamManagement::failedReceived(const QDomElement &element, QXmppStanza::Error::Condition &condition)
+{
+    QXmppStanza::Error error;
+    error.parse(element);
+    condition = error.condition();
+    d->resumeEnabled = false;
+    d->inboundCount = false;
+    d->outboundEnabled = false;
+}
+
 void QXmppStreamManagement::stanzaHandled()
 {
     d->inboundCount++;

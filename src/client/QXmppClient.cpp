@@ -194,6 +194,11 @@ QXmppClient::QXmppClient(QObject *parent)
                     this, SIGNAL(presenceAcknowledged(QXmppPresence,bool)));
     Q_ASSERT(check);
 
+    check = connect(d->stream, SIGNAL(streamManagementError(QXmppStanza::Error::Condition)),
+                    this, SIGNAL(streamManagementError(QXmppStanza::Error::Condition)));
+    Q_ASSERT(check);
+
+
     // reconnection
     d->reconnectionTimer = new QTimer(this);
     d->reconnectionTimer->setSingleShot(true);

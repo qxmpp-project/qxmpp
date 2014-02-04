@@ -190,6 +190,11 @@ signals:
     /// know the error.
     void error(QXmppClient::Error);
 
+    /// This signal is emitted when the Stream Management encounters any error.
+    /// The QXmppStanza::Error::Condition parameter specifies the error conditions
+    /// defined in RFC 6120.
+    void streamManagementError(QXmppStanza::Error::Condition);
+
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);
 

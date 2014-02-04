@@ -43,6 +43,10 @@ private slots:
     void testAckStreamManagement();
     void testEnableResume();
     void testResumeStreamManagement();
+    void testFailedResumeOrEnabled();
+    void testLoadOutboundBuffer();
+    void testAckReceived();
+    void testSocketDisconnected();
 
 private:
     QXmppStreamManagement *streamManagement;
@@ -134,31 +138,88 @@ void tst_QXmppStreamManagement::testResumeStreamManagement()
      QCOMPARE(buffer.data(), xml);
 }
 
+void tst_QXmppStreamManagement::testFailedResumeOrEnabled()
+{
+    const QByteArray xml("<failed xmlns='urn:xmpp:sm:3'>"
+                              "<unexpected-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
+                          "</failed>");
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    QXmppStanza::Error::Condition condition;
+    streamManagement->failedReceived(doc.documentElement(), condition);
+    QXmppStanza::Error::Condition conditionExpected = QXmppStanza::Error::UnexpectedRequest;
+    QCOMPARE(condition, conditionExpected);
+}
+
+void tst_QXmppStreamManagement::testLoadOutboundBuffer()
+{
+    const QByteArray xmlPresence(
+        "<presence "
+        "to=\"coven@chat.shakespeare.lit/thirdwitch\" "
+        "from=\"hag66@shakespeare.lit/pda\">"
+            "<x xmlns=\"http://jabber.org/protocol/muc\">"
+                "<password>pass</password>"
+            "</x>"
+        "</presence>");
+    QXmppPresence presence;
+    parsePacket(presence, xmlPresence);
+    streamManagement->stanzaSent(presence);
+    QCOMPARE(1,streamManagement->outboundCounter());
+
+    const QByteArray xmlMessage(
+        "<message id=\"richard2-4.1.247\" to=\"kingrichard@royalty.england.lit/throne\" from=\"northumberland@shakespeare.lit/westminster\" type=\"normal\">"
+          "<body>My lord, dispatch; read o'er these articles.</body>"
+          "<request xmlns=\"urn:xmpp:receipts\"/>"
+        "</message>");
+    QXmppMessage message;
+    parsePacket(message, xmlMessage);
+    streamManagement->stanzaSent(message);
+    QCOMPARE(2,streamManagement->outboundCounter());
+
+    const QByteArray xmlIq("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"result\"/>");
+    QXmppIq iq;
+    parsePacket(iq,xmlIq);
+    streamManagement->stanzaSent(iq);
+    QCOMPARE(3,streamManagement->outboundCounter());
+
+
+
+}
+
+void tst_QXmppStreamManagement::testAckReceived()
+{
+    streamManagement->ackReceived(3);
+}
+
 void tst_QXmppStreamManagement::messageACKReceived(const QXmppMessage& message, bool ack)
 {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    message.toXml(&writer);
-    qDebug() << "expect " << buffer.data();
+    const QByteArray xmlMessage(
+        "<message id=\"richard2-4.1.247\" to=\"kingrichard@royalty.england.lit/throne\" from=\"northumberland@shakespeare.lit/westminster\" type=\"normal\">"
+          "<body>My lord, dispatch; read o'er these articles.</body>"
+          "<request xmlns=\"urn:xmpp:receipts\"/>"
+        "</message>");
+    serializePacket(message, xmlMessage);
 }
 
 void tst_QXmppStreamManagement::iqACKReceived(const QXmppIq& iq, bool ack)
 {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    iq.toXml(&writer);
-    qDebug() << "expect " << buffer.data();
+   const QByteArray xmlIq("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"result\"/>");
+   serializePacket(iq, xmlIq);
 }
 
 void tst_QXmppStreamManagement::presenceACKReceived(const QXmppPresence& presence, bool ack)
-{
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    presence.toXml(&writer);
-    qDebug() << "expect " << buffer.data();
+{  
+    const QByteArray xmlPresence(
+        "<presence "
+        "to=\"coven@chat.shakespeare.lit/thirdwitch\" "
+        "from=\"hag66@shakespeare.lit/pda\">"
+            "<x xmlns=\"http://jabber.org/protocol/muc\">"
+                "<password>pass</password>"
+            "</x>"
+        "</presence>");
+
+    serializePacket(presence, xmlPresence);
 }
 
 

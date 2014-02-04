@@ -907,6 +907,10 @@ void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
         debug(QString("SM ACK RECV h=%1 outbound count=%2").arg(h).arg(QString::number(d->streamManagement->outboundCounter())));
         int handled = h.toInt();
         d->streamManagement->ackReceived(handled);
+    }else if(element.tagName() == "failed")
+    {
+        d->streamManagement->failedReceived(element, d->xmppStreamError);
+        emit streamManagementError(d->xmppStreamError);
     }
 }
 

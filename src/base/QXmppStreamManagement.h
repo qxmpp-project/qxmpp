@@ -23,6 +23,8 @@ public:
     void stanzaSent(const QXmppStanza& stanza);
     void ackReceived(const int handled);
 
+    void failedReceived(const QDomElement &element, QXmppStanza::Error::Condition &condition);
+
     void stanzaHandled();
 
     void enableToXml(QXmlStreamWriter *xmlStream, const bool resume);

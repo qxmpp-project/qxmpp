@@ -89,6 +89,9 @@ signals:
     /// This singal is emitted when the server AKC a iq
     void iqAcknowledged(const QXmppIq&, const bool);
 
+    /// This signal is emitted when an error is ecountered in the stream management
+    void streamManagementError(QXmppStanza::Error::Condition);
+
 protected:
     /// \cond
     // Overridable methods
