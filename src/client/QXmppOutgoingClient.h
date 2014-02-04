@@ -93,6 +93,11 @@ signals:
     /// This signal is emitted when an error is ecountered in the stream management
     void streamManagementError(QXmppStanza::Error::Condition);
 
+    /// This signal is emitted when the Stream Management has been enabled
+    void streamManagementEnabled(bool resumeEnabled);
+
+
+
 protected:
     /// \cond
     // Overridable methods

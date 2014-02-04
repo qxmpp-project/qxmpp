@@ -898,6 +898,9 @@ void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
     if(element.tagName() == "enabled")
     {
         d->streamManagement->enabledReceived(element);
+        if(d->streamManagement->isEnabled())
+            emit streamManagementEnabled(d->streamManagement->isResumeEnabled());
+
     }else if(element.tagName() == "r")
     {
         debug("SM REQUEST RECV");
