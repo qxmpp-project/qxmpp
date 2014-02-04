@@ -499,6 +499,13 @@ QXmppVersionManager& QXmppClient::versionManager()
 {
     return *findExtension<QXmppVersionManager>();
 }
+/// Sends a stream management request XEP-0198: Stream Management
+///
+
+void QXmppClient::sendRequestStreamManagement()
+{
+    d->stream->sendStreamManagementRequest();
+}
 
 /// Give extensions a chance to handle incoming stanzas.
 ///

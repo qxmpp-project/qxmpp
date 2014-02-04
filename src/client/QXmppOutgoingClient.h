@@ -58,6 +58,7 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const;
     bool sendPacket(const QXmppStanza &stanza);
+    void sendStreamManagementRequest();
 
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();
@@ -120,7 +121,6 @@ private:
 
     void sendStreamManagementEnable(const bool resume);
     void sendStreamManagementAck();
-    void sendStreamManagementRequest();
 
     void handleStreamManagement(const QDomElement &element);
 

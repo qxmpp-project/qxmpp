@@ -874,15 +874,16 @@ void QXmppOutgoingClient::sendStreamManagementAck()
 
 void QXmppOutgoingClient::sendStreamManagementRequest()
 {
-    debug("SM SENT REQUEST");
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    d->streamManagement->requestToXml(&xmlStream);
+    if(d->streamManagement->isEnabled())
+    {
+        debug("SM SENT REQUEST");
+        QByteArray data;
+        QXmlStreamWriter xmlStream(&data);
+        d->streamManagement->requestToXml(&xmlStream);
 
-    sendData(data);
+        sendData(data);
+    }
 }
-
-
 
 bool QXmppOutgoingClient::isStreamManagement(const QDomElement &element)
 {

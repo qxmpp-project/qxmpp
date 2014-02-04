@@ -46,7 +46,6 @@ private slots:
     void testFailedResumeOrEnabled();
     void testLoadOutboundBuffer();
     void testAckReceived();
-    void testSocketDisconnected();
 
 private:
     QXmppStreamManagement *streamManagement;
@@ -183,8 +182,6 @@ void tst_QXmppStreamManagement::testLoadOutboundBuffer()
     streamManagement->stanzaSent(iq);
     QCOMPARE(3,streamManagement->outboundCounter());
 
-
-
 }
 
 void tst_QXmppStreamManagement::testAckReceived()
@@ -221,7 +218,6 @@ void tst_QXmppStreamManagement::presenceACKReceived(const QXmppPresence& presenc
 
     serializePacket(presence, xmlPresence);
 }
-
 
 
 QTEST_MAIN(tst_QXmppStreamManagement)

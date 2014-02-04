@@ -156,6 +156,8 @@ public:
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
 
+    void sendRequestStreamManagement();
+
 signals:
 
     /// This signal is emitted when the client connects successfully to the XMPP
