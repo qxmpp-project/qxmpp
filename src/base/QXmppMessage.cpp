@@ -342,6 +342,26 @@ void QXmppMessage::setXhtml(const QString &xhtml)
     d->xhtml = xhtml;
 }
 
+namespace
+{
+    static QStringList knownMessageSubelems()
+    {
+        QStringList result;
+        result << "body"
+               << "subject"
+               << "thread"
+               << "html"
+               << "received"
+               << "request"
+               << "delay"
+               << "attention"
+               << "addresses";
+        for (int i = QXmppMessage::Active; i <= QXmppMessage::Paused; i++)
+            result << chat_states[i];
+        return result;
+    }
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -412,27 +432,35 @@ void QXmppMessage::parse(const QDomElement &element)
     // XEP-0224: Attention
     d->attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
 
+    const QStringList &knownElems = knownMessageSubelems();
+
     QXmppElementList extensions;
-    QDomElement xElement = element.firstChildElement("x");
+    QDomElement xElement = element.firstChildElement();
     while (!xElement.isNull())
     {
-        if (xElement.namespaceURI() == ns_legacy_delayed_delivery)
+        if (xElement.tagName() == "x")
         {
-            // XEP-0091: Legacy Delayed Delivery
-            const QString str = xElement.attribute("stamp");
-            d->stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-            d->stamp.setTimeSpec(Qt::UTC);
-            d->stampType = LegacyDelayedDelivery;
-        } else if (xElement.namespaceURI() == ns_conference) {
-            // XEP-0249: Direct MUC Invitations
-            d->mucInvitationJid = xElement.attribute("jid");
-            d->mucInvitationPassword = xElement.attribute("password");
-            d->mucInvitationReason = xElement.attribute("reason");
-        } else {
+            if (xElement.namespaceURI() == ns_legacy_delayed_delivery)
+            {
+                // XEP-0091: Legacy Delayed Delivery
+                const QString str = xElement.attribute("stamp");
+                d->stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+                d->stamp.setTimeSpec(Qt::UTC);
+                d->stampType = LegacyDelayedDelivery;
+            } else if (xElement.namespaceURI() == ns_conference) {
+                // XEP-0249: Direct MUC Invitations
+                d->mucInvitationJid = xElement.attribute("jid");
+                d->mucInvitationPassword = xElement.attribute("password");
+                d->mucInvitationReason = xElement.attribute("reason");
+            }
+            else {
+                extensions << QXmppElement(xElement);
+            }
+        } else if (!knownElems.contains(xElement.tagName())) {
             // other extensions
             extensions << QXmppElement(xElement);
         }
-        xElement = xElement.nextSiblingElement("x");
+        xElement = xElement.nextSiblingElement();
     }
     setExtensions(extensions);
 }
