@@ -494,6 +494,26 @@ void QXmppMessage::setReplace(const QString& replaceId)
     d->replaceId = replaceId;
 }
 
+namespace
+{
+    static QStringList knownMessageSubelems()
+    {
+        QStringList result;
+        result << "body"
+               << "subject"
+               << "thread"
+               << "html"
+               << "received"
+               << "request"
+               << "delay"
+               << "attention"
+               << "addresses";
+        for (int i = QXmppMessage::Active; i <= QXmppMessage::Paused; i++)
+            result << chat_states[i];
+        return result;
+    }
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -646,6 +666,8 @@ void QXmppMessage::parse(const QDomElement &element)
             d->replaceId = replaceElement.attribute("id", QString());
         }
     }
+
+    const QStringList &knownElems = knownMessageSubelems();
 
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement();
