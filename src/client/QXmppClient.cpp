@@ -348,7 +348,7 @@ bool QXmppClient::sendPacket(const QXmppStanza& packet)
 }
 
 /// Disconnects the client and the current presence of client changes to
-/// QXmppPresence::Unavailable and status text changes to "Logged out".
+/// QXmppPresence::Unavailable.
 ///
 /// \note Make sure that the clientPresence is changed to
 /// QXmppPresence::Available, if you are again calling connectToServer() after
@@ -361,7 +361,6 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
-    d->clientPresence.setStatusText("Logged out");
     if (d->stream->isConnected())
         sendPacket(d->clientPresence);
 
