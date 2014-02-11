@@ -49,6 +49,7 @@ private slots:
     void testMessageCarbons();
     void testProcessingHints();
     void testReplaceMessage();
+    void testSubextensions();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -350,10 +351,7 @@ void tst_QXmppMessage::testForwarding()
         "<body>ABC</body>"
         "</message>"
         "</forwarded>"
-        "</message>");
 
-    QXmppMessage message;
-    parsePacket(message, xml);
     QCOMPARE(message.hasForwarded(), true);
 
     QXmppMessage fwd = message.forwarded();
@@ -361,6 +359,27 @@ void tst_QXmppMessage::testForwarding()
     QCOMPARE(fwd.body(), QString("ABC"));
     QCOMPARE(fwd.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(fwd.from(), QString("bar@example.com/QXmpp"));
+}
+
+void tst_QXmppMessage::testSubextensions()
+{
+    const QByteArray xml("<message id=\"aeb214\" to=\"juliet@capulet.lit/chamber\" type=\"normal\">"
+        "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
+        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
+        "<message from=\"juliet@capulet.lit/balcony\" id=\"8a54s\" "
+        "to=\"romeo@montague.lit/orchard\" type=\"chat\">"
+        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
+        "</message>"
+        "</forwarded>"
+        "</result>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.extensions().size(), 1);
+    QCOMPARE(message.extensions().first().tagName(), QLatin1String("result"));
+    serializePacket(message, xml);
 }
 
 void tst_QXmppMessage::testChatMarkers()
@@ -636,7 +655,6 @@ void tst_QXmppMessage::testReplaceMessage()
     serialisationMessage.setReplace("bad1");
 
     serializePacket(serialisationMessage, replaceSerialisation);
-
 }
 
 QTEST_MAIN(tst_QXmppMessage)
