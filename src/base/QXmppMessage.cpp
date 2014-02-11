@@ -116,7 +116,6 @@ public:
     // XEP-0308: Last Message Correction
     bool replace;
     QString replaceId;
-
 };
 
 /// Constructs a QXmppMessage.
@@ -494,7 +493,6 @@ void QXmppMessage::setReplace(const QString& replaceId)
     d->replace   = true;
     d->replaceId = replaceId;
 }
-
 
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
