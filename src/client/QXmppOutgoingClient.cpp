@@ -250,6 +250,19 @@ void QXmppOutgoingClient::connectToHost()
     d->dns.lookup();
 }
 
+void QXmppOutgoingClient::disconnectFromHost(const bool sendCloseStream)
+{
+    if(sendCloseStream)
+    {
+        d->streamManagement->disable();
+    }
+
+    if(d->streamManagement->isResumeEnabled())
+        QXmppStream::disconnectFromHost(false);
+    else
+        QXmppStream::disconnectFromHost(sendCloseStream);
+}
+
 void QXmppOutgoingClient::_q_dnsLookupFinished()
 {
     if (d->dns.error() == QDnsLookup::NoError &&
@@ -522,12 +535,16 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether bind is available
         if (features.bindMode() != QXmppStreamFeatures::Disabled)
         {
-            QXmppBindIq bind;
-            bind.setType(QXmppIq::Set);
-            bind.setResource(configuration().resource());
-            d->bindId = bind.id();
-            sendPacket(bind);
-            return;
+            // TODO if athentificated and stream management resume is avaliable send resume
+            if(d->streamManagement->isResumeEnabled()){
+                sendStreamManagementResume();
+                return;
+            }else{
+                if(!bindResource())
+                    warning("Problem binding the resource");
+                return;
+            }
+
         }
 
         // check whether session is available
@@ -543,7 +560,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // otherwise we are done
             enableStreamManagement();
             emit connected();
-        } 
+        }
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
@@ -584,6 +601,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         {
             debug("Authenticated");
             d->isAuthenticated = true;
+
             handleStart();
         }
         else if(nodeRecv.tagName() == "challenge")
@@ -872,9 +890,19 @@ void QXmppOutgoingClient::sendStreamManagementAck()
     sendData(data);
 }
 
+void QXmppOutgoingClient::sendStreamManagementResume()
+{
+    debug("SM SENDING RESUME");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->resumeToXml(&xmlStream);
+
+    sendData(data);
+}
+
 void QXmppOutgoingClient::sendStreamManagementRequest()
 {
-    if(d->streamManagement->isEnabled())
+    if(d->streamManagement->isEnabled() && !d->streamManagement->isResumming())
     {
         debug("SM SENT REQUEST");
         QByteArray data;
@@ -892,6 +920,16 @@ bool QXmppOutgoingClient::isStreamManagement(const QDomElement &element)
     else return false;
 }
 
+bool QXmppOutgoingClient::bindResource()
+{
+    debug("Binding resource");
+    QXmppBindIq bind;
+    bind.setType(QXmppIq::Set);
+    bind.setResource(configuration().resource());
+    d->bindId = bind.id();
+    return sendPacket(bind);
+}
+
 void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
 {
 
@@ -899,7 +937,7 @@ void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
     {
         d->streamManagement->enabledReceived(element);
         if(d->streamManagement->isEnabled())
-            emit streamManagementEnabled(d->streamManagement->isResumeEnabled());
+           emit streamManagementEnabled(d->streamManagement->isResumeEnabled());
 
     }else if(element.tagName() == "r")
     {
@@ -907,12 +945,48 @@ void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
         sendStreamManagementAck();
     }else if(element.tagName() == "a")
     {
-        const QString h = element.attribute("h");
-        debug(QString("SM ACK RECV h=%1 outbound count=%2").arg(h).arg(QString::number(d->streamManagement->outboundCounter())));
-        int handled = h.toInt();
-        d->streamManagement->ackReceived(handled);
+        d->streamManagement->ackReceived(element);
+    }else if(element.tagName() == "resumed"){
+        if(element.hasAttribute("previd"))
+        {
+            if(element.attribute("previd") == d->streamManagement->resumeId())
+            {
+                if(element.hasAttribute("h"))
+                {
+                    foreach(const QXmppStanza *stanza, d->streamManagement->outBoundBuffer() )
+                    {
+                        sendPacket(*stanza);
+                    }
+                    d->streamManagement->resumedReceived();
+                    d->sessionStarted = true;
+                    emit streamManagementResumed(true);
+                }
+            }else{
+                warning("Resume IDs did not match");
+
+                if(!bindResource())
+                    warning("Problem binding the resource");
+
+                //notify that resume has failed
+                emit streamManagementResumed(false);
+                return;
+            }
+        }
     }else if(element.tagName() == "failed")
     {
+        // If resume has failed
+        if(d->streamManagement->isResumming()){
+            //bind resource
+            warning("Stream Management Resume failed");
+
+            if(!bindResource())
+                warning("Problem binding the resource");
+
+            //notify that resume has failed
+            emit streamManagementResumed(false);
+            return;
+        }
+
         d->streamManagement->failedReceived(element, d->xmppStreamError);
         emit streamManagementError(d->xmppStreamError);
     }

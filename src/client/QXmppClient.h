@@ -240,6 +240,12 @@ signals:
     /// has been acknowledged.
     void iqAcknowledged(const QXmppIq&, const bool);
 
+    /// This signal is emitted when the Stream Management has been enabled
+    void streamManagementEnabled(bool resumeEnabled);
+
+    /// This signal is emitted when the session has been resumed
+    void streamManagementResumed(bool resumed);
+
 public slots:
     void connectToServer(const QString &jid,
                          const QString &password);
@@ -254,6 +260,7 @@ private slots:
     void _q_streamConnected();
     void _q_streamDisconnected();
     void _q_streamError(QXmppClient::Error error);
+    void _q_streamManagementResumed(bool resumed);
 
 private:
     QXmppClientPrivate * const d;

@@ -44,7 +44,7 @@ class QXmppStreamManagement;
 
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
 /// to an XMPP server.
-///
+/// \note The Stream Management part is under development
 
 class QXMPP_EXPORT QXmppOutgoingClient : public QXmppStream
 {
@@ -55,6 +55,7 @@ public:
     ~QXmppOutgoingClient();
 
     void connectToHost();
+    void disconnectFromHost(const bool sendCloseStream = true);
     bool isAuthenticated() const;
     bool isConnected() const;
     bool sendPacket(const QXmppStanza &stanza);
@@ -96,6 +97,9 @@ signals:
     /// This signal is emitted when the Stream Management has been enabled
     void streamManagementEnabled(bool resumeEnabled);
 
+    /// This signal is emitted when the session has been resumed
+    void streamManagementResumed(bool resumed);
+
 
 
 protected:
@@ -126,10 +130,13 @@ private:
 
     void sendStreamManagementEnable(const bool resume);
     void sendStreamManagementAck();
+    void sendStreamManagementResume();
 
     void handleStreamManagement(const QDomElement &element);
 
     bool isStreamManagement(const QDomElement &element);
+
+    bool bindResource();
 
 
 

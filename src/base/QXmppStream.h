@@ -75,7 +75,7 @@ protected:
     virtual void handleStream(const QDomElement &element) = 0;
 
 public slots:
-    virtual void disconnectFromHost();
+    virtual void disconnectFromHost(const bool sendCloseStream = true);
     virtual bool sendData(const QByteArray&);
 
 private slots:

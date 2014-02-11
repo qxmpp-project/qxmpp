@@ -84,9 +84,10 @@ QXmppStream::~QXmppStream()
 /// Disconnects from the remote host.
 ///
 
-void QXmppStream::disconnectFromHost()
+void QXmppStream::disconnectFromHost(const bool sendCloseStream)
 {
-    sendData(streamRootElementEnd);
+    if(sendCloseStream)
+        sendData(streamRootElementEnd);
     if (d->socket)
     {
         d->socket->flush();

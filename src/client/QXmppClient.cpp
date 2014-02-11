@@ -198,6 +198,14 @@ QXmppClient::QXmppClient(QObject *parent)
                     this, SIGNAL(streamManagementError(QXmppStanza::Error::Condition)));
     Q_ASSERT(check);
 
+    check = connect(d->stream, SIGNAL(streamManagementEnabled(bool)),
+                    this, SIGNAL(streamManagementEnabled(bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(streamManagementResumed(bool)),
+                    this, SIGNAL(streamManagementResumed(bool)));
+    Q_ASSERT(check);
+
 
     // reconnection
     d->reconnectionTimer = new QTimer(this);
@@ -579,6 +587,18 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
 
     // notify managers
     emit error(err);
+}
+
+void QXmppClient::_q_streamManagementResumed(bool resumed)
+{
+    if(resumed)
+    {
+        d->receivedConflict = false;
+        d->reconnectionTries = 0;
+
+        // notify managers
+        emit stateChanged(QXmppClient::ConnectedState);
+    }
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.

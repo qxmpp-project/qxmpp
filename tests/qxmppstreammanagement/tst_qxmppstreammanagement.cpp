@@ -39,6 +39,7 @@ public slots:
 private slots:
     void initStreamManagement();
     void testEnableStreamManagement();
+    void testEnableStreamManagementResume();
     void testRequestStreamManagement();
     void testAckStreamManagement();
     void testEnableResume();
@@ -78,6 +79,18 @@ void tst_QXmppStreamManagement::testEnableStreamManagement()
     QCOMPARE(buffer.data(), xml);
 }
 
+void tst_QXmppStreamManagement::testEnableStreamManagementResume()
+{
+    const QByteArray xml("<enable xmlns=\"urn:xmpp:sm:3\" resume=\"true\"/>");
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    streamManagement->enableToXml(&writer,true);
+    qDebug() << "expect " << xml;
+    qDebug() << "writing" << buffer.data();
+    QCOMPARE(buffer.data(), xml);
+}
+
 
 void tst_QXmppStreamManagement::testRequestStreamManagement ()
 {
@@ -102,8 +115,6 @@ void tst_QXmppStreamManagement::testAckStreamManagement()
     qDebug() << "writing" << buffer.data();
     QCOMPARE(buffer.data(), xml);
 }
-
-
 
 void tst_QXmppStreamManagement::testEnableResume()
 {
@@ -186,7 +197,12 @@ void tst_QXmppStreamManagement::testLoadOutboundBuffer()
 
 void tst_QXmppStreamManagement::testAckReceived()
 {
-    streamManagement->ackReceived(3);
+    const QByteArray xml("<a xmlns='urn:xmpp:sm:3' h=\"1\"/>");
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+
+    streamManagement->ackReceived(doc.documentElement());
 }
 
 void tst_QXmppStreamManagement::messageACKReceived(const QXmppMessage& message, bool ack)
