@@ -132,5 +132,3 @@ const char* ns_replace_message = "urn:xmpp:message-correct:0";
 const char* ns_message_carbons = "urn:xmpp:carbons:2";
 // XEP-0334: Message Processing Hints
 const char* ns_message_processing_hints = "urn:xmpp:hints";
-// Truphone-Notification
-const char * ns_check_credit = "urn:truphone:check-credit";

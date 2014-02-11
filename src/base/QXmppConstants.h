@@ -133,7 +133,5 @@ extern const char* ns_replace_message;
 extern const char* ns_message_carbons;
 // XEP-0334: Message Processing Hints:
 extern const char * ns_message_processing_hints;
-// Truphone-Notification
-extern const char * ns_check_credit;
 
 #endif // QXMPPCONSTANTS_H
