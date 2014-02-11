@@ -29,9 +29,10 @@
 #include "QXmppConstants.h"
 
 #include <QDomElement>
+#include <QUuid>
 #include <QXmlStreamWriter>
 
-uint QXmppStanza::s_uniqeIdNo = 0;
+
 
 class QXmppExtendedAddressPrivate : public QSharedData
 {
@@ -582,8 +583,7 @@ void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addres
 void QXmppStanza::generateAndSetNextId()
 {
     // get back
-    ++s_uniqeIdNo;
-    d->id = "qxmpp" + QString::number(s_uniqeIdNo);
+    d->id = "qxmpp" + QUuid::createUuid().toString();
 }
 
 void QXmppStanza::parse(const QDomElement &element)
