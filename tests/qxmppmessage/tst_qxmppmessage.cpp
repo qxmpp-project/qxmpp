@@ -42,6 +42,7 @@ private slots:
     void testState_data();
     void testState();
     void testXhtml();
+    void testSubextensions();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -306,6 +307,27 @@ void tst_QXmppMessage::testXhtml()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.xhtml(), QLatin1String("<p style=\"font-weight:bold\">hi!</p>"));
+    serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testSubextensions()
+{
+    const QByteArray xml("<message id=\"aeb214\" to=\"juliet@capulet.lit/chamber\" type=\"normal\">"
+        "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
+        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
+        "<message from=\"juliet@capulet.lit/balcony\" id=\"8a54s\" "
+        "to=\"romeo@montague.lit/orchard\" type=\"chat\">"
+        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
+        "</message>"
+        "</forwarded>"
+        "</result>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.extensions().size(), 1);
+    QCOMPARE(message.extensions().first().tagName(), QLatin1String("result"));
     serializePacket(message, xml);
 }
 
