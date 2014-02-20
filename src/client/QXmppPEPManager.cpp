@@ -32,7 +32,7 @@ QStringList QXmppPEPManager::discoveryFeatures() const
 
     // XEP-0152: Reachability Addresses
     if(m_reachActive)
-        features << ns_reach;
+        features << ns_reach << ns_reach_notify;
 
     return features;
 }

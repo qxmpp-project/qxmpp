@@ -88,6 +88,7 @@ extern const char* ns_compressFeature;
 extern const char* ns_rosternotes;
 // XEP-0152: Reachability Addresses
 extern const char* ns_reach;
+extern const char* ns_reach_notify;
 // XEP-0153: vCard-Based Avatars
 extern const char* ns_vcard_update;
 // XEP-0158: CAPTCHA Forms

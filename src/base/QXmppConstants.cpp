@@ -87,6 +87,7 @@ const char* ns_compressFeature = "http://jabber.org/features/compress";
 const char* ns_rosternotes = "storage:rosternotes";
 // XEP-0152: Reachability Addresses
 const char* ns_reach = "urn:xmpp:reach:0";
+const char* ns_reach_notify = "urn:xmpp:reach:0+notify";
 // XEP-0153: vCard-Based Avatars
 const char* ns_vcard_update = "vcard-temp:x:update";
 // XEP-0158: CAPTCHA Forms
