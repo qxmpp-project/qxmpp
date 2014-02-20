@@ -861,6 +861,8 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
 
 void QXmppOutgoingClient::enableStreamManagement()
 {
+    if(d->streamManagementMode == QXmppConfiguration::SMDisabled)
+        return;
     if(d->streamManagementMode == QXmppConfiguration::SMSessionResumptionEnabled )
         sendStreamManagementEnable(true);
     else if(d->streamManagementMode == QXmppConfiguration::SMEnabled)
