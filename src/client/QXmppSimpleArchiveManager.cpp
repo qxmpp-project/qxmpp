@@ -110,7 +110,7 @@ void QXmppSimpleArchiveManager::retrieveMessages(const QString &jid,
     packet.setWith(jid);
     
     // set query ID
-    QString queryId = "query_" + jid;
+    QString queryId = packet.id();
     while (m_pendingQueries.contains(queryId)) {
         queryId.append("_x");
     }
