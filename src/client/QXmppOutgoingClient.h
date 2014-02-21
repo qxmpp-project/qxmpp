@@ -138,6 +138,8 @@ private:
 
     bool bindResource();
 
+    bool iQsSecuirityCheck(const QDomElement &element);
+
 
 
     friend class QXmppOutgoingClientPrivate;
