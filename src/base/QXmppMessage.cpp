@@ -496,20 +496,20 @@ void QXmppMessage::setReplace(const QString& replaceId)
 
 namespace
 {
-    static QStringList knownMessageSubelems()
+    static QList<QPair<QString, QString> > knownMessageSubelems()
     {
-        QStringList result;
-        result << "body"
-               << "subject"
-               << "thread"
-               << "html"
-               << "received"
-               << "request"
-               << "delay"
-               << "attention"
-               << "addresses";
+        QList<QPair<QString, QString> > result;
+        result << qMakePair(QString("body"), QString())
+               << qMakePair(QString("subject"), QString())
+               << qMakePair(QString("thread"), QString())
+               << qMakePair(QString("html"), QString())
+               << qMakePair(QString("received"), QString(ns_message_receipts))
+               << qMakePair(QString("request"), QString())
+               << qMakePair(QString("delay"), QString())
+               << qMakePair(QString("attention"), QString())
+               << qMakePair(QString("addresses"), QString());
         for (int i = QXmppMessage::Active; i <= QXmppMessage::Paused; i++)
-            result << chat_states[i];
+            result << qMakePair(QString(chat_states[i]), QString());
         return result;
     }
 }
@@ -668,6 +668,7 @@ void QXmppMessage::parse(const QDomElement &element)
     }
 
     const QStringList &knownElems = knownMessageSubelems();
+    const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
 
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement();
