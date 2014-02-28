@@ -40,6 +40,8 @@ public:
     QList<QXmppElementPrivate*> children;
     QString name;
     QString value;
+
+    QDomElement source;
 };
 
 QXmppElementPrivate::QXmppElementPrivate()
@@ -48,7 +50,7 @@ QXmppElementPrivate::QXmppElementPrivate()
 }
 
 QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
-    : counter(1), parent(NULL)
+    : counter(1), parent(NULL), source(element)
 {
     if (element.isNull())
         return;
@@ -122,6 +124,11 @@ QXmppElement &QXmppElement::operator=(const QXmppElement &other)
         delete d;
     d = other.d;
     return *this;
+}
+
+const QDomElement &QXmppElement::sourceDomElement() const
+{
+    return d->source;
 }
 
 QStringList QXmppElement::attributeNames() const

@@ -43,6 +43,8 @@ public:
     QXmppElement(const QDomElement &element);
     ~QXmppElement();
 
+    const QDomElement &sourceDomElement() const;
+
     QStringList attributeNames() const;
 
     QString attribute(const QString &name) const;
