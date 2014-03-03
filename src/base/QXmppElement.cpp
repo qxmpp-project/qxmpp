@@ -25,6 +25,7 @@
 #include "QXmppUtils.h"
 
 #include <QDomElement>
+#include <QTextStream>
 
 class QXmppElementPrivate
 {
@@ -41,7 +42,7 @@ public:
     QString name;
     QString value;
 
-    QDomElement source;
+    QByteArray serializedSource;
 };
 
 QXmppElementPrivate::QXmppElementPrivate()
@@ -50,7 +51,7 @@ QXmppElementPrivate::QXmppElementPrivate()
 }
 
 QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
-    : counter(1), parent(NULL), source(element)
+    : counter(1), parent(NULL)
 {
     if (element.isNull())
         return;
@@ -80,6 +81,9 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
         }
         childNode = childNode.nextSibling();
     }
+
+    QTextStream stream(&serializedSource);
+    element.save(stream, 0);
 }
 
 QXmppElementPrivate::~QXmppElementPrivate()
@@ -126,9 +130,19 @@ QXmppElement &QXmppElement::operator=(const QXmppElement &other)
     return *this;
 }
 
-const QDomElement &QXmppElement::sourceDomElement() const
+QDomElement QXmppElement::sourceDomElement() const
 {
-    return d->source;
+    if (d->serializedSource.isEmpty())
+        return QDomElement();
+
+    QDomDocument doc;
+    if (!doc.setContent(d->serializedSource, true))
+    {
+        qWarning("[QXmpp] QXmppElement::sourceDomElement(): cannot parse source element");
+        return QDomElement();
+    }
+
+    return doc.documentElement();
 }
 
 QStringList QXmppElement::attributeNames() const
