@@ -25,6 +25,7 @@
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
+#include <QPair>
 
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
