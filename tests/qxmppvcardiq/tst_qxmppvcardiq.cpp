@@ -166,6 +166,12 @@ void tst_QXmppVCardIq::testVCard()
             "</BINVAL>"
         "</PHOTO>"
         "<URL>http://code.google.com/p/qxmpp/</URL>"
+        "<ORG>"
+            "<ORGNAME>QXmpp foundation</ORGNAME>"
+            "<ORGUNIT>Main QXmpp dev unit</ORGUNIT>"
+        "</ORG>"
+        "<TITLE>Executive Director</TITLE>"
+        "<ROLE>Patron Saint</ROLE>"
         "</vCard>"
         "</iq>");
 
@@ -196,6 +202,13 @@ void tst_QXmppVCardIq::testVCard()
         "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
     QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
     QCOMPARE(vcard.url(), QLatin1String("http://code.google.com/p/qxmpp/"));
+
+    const QXmppVCardOrganization &orgInfo = vcard.organization();
+    QCOMPARE(orgInfo.organization(), QLatin1String("QXmpp foundation"));
+    QCOMPARE(orgInfo.unit(), QLatin1String("Main QXmpp dev unit"));
+    QCOMPARE(orgInfo.title(), QLatin1String("Executive Director"));
+    QCOMPARE(orgInfo.role(), QLatin1String("Patron Saint"));
+
     serializePacket(vcard, xml);
 }
 
