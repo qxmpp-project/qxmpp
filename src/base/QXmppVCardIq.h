@@ -33,6 +33,7 @@
 class QXmppVCardAddressPrivate;
 class QXmppVCardEmailPrivate;
 class QXmppVCardPhonePrivate;
+class QXmppVCardOrganizationPrivate;
 class QXmppVCardIqPrivate;
 
 /// \brief Represent a vCard address.
@@ -165,6 +166,41 @@ private:
     QSharedDataPointer<QXmppVCardPhonePrivate> d;
 };
 
+/// \brief Represents organization information in XMPP vCards.
+///
+/// This contains both information about organization itself and
+/// information about job position in the organization.
+
+class QXMPP_EXPORT QXmppVCardOrganization
+{
+public:
+    QXmppVCardOrganization();
+    QXmppVCardOrganization(const QXmppVCardOrganization &other);
+    ~QXmppVCardOrganization();
+
+    QXmppVCardOrganization& operator=(const QXmppVCardOrganization &other);
+
+    QString organization() const;
+    void setOrganization(const QString&);
+
+    QString unit() const;
+    void setUnit(const QString&);
+
+    QString title() const;
+    void setTitle(const QString&);
+
+    QString role() const;
+    void setRole(const QString&);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *stream) const;
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppVCardOrganizationPrivate> d;
+};
+
 /// \brief Represents the XMPP vCard.
 ///
 /// The functions names are self explanatory.
@@ -225,6 +261,9 @@ public:
 
     QList<QXmppVCardPhone> phones() const;
     void setPhones(const QList<QXmppVCardPhone> &phones);
+
+    QXmppVCardOrganization organization() const;
+    void setOrganization(const QXmppVCardOrganization&);
 
     /// \cond
     static bool isVCard(const QDomElement &element);

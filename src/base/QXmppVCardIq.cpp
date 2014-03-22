@@ -440,6 +440,99 @@ void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
 }
 /// \endcond
 
+class QXmppVCardOrganizationPrivate : public QSharedData
+{
+public:
+    QString organization;
+    QString unit;
+    QString role;
+    QString title;
+};
+
+QXmppVCardOrganization::QXmppVCardOrganization()
+    : d(new QXmppVCardOrganizationPrivate)
+{
+}
+
+QXmppVCardOrganization::QXmppVCardOrganization(const QXmppVCardOrganization &other)
+    : d(other.d)
+{
+}
+
+QXmppVCardOrganization::~QXmppVCardOrganization()
+{
+}
+
+QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrganization &other)
+{
+    d = other.d;
+    return *this;
+}
+
+QString QXmppVCardOrganization::organization() const
+{
+    return d->organization;
+}
+
+void QXmppVCardOrganization::setOrganization(const QString &org)
+{
+    d->organization = org;
+}
+
+QString QXmppVCardOrganization::unit() const
+{
+    return d->unit;
+}
+
+void QXmppVCardOrganization::setUnit(const QString &unit)
+{
+    d->unit = unit;
+}
+
+QString QXmppVCardOrganization::role() const
+{
+    return d->role;
+}
+
+void QXmppVCardOrganization::setRole(const QString &role)
+{
+    d->role = role;
+}
+
+QString QXmppVCardOrganization::title() const
+{
+    return d->title;
+}
+
+void QXmppVCardOrganization::setTitle(const QString &title)
+{
+    d->title = title;
+}
+
+void QXmppVCardOrganization::parse(const QDomElement &cardElem)
+{
+    d->title = cardElem.firstChildElement("TITLE").text();
+    d->role = cardElem.firstChildElement("ROLE").text();
+
+    const QDomElement &orgElem = cardElem.firstChildElement("ORG");
+    d->organization = orgElem.firstChildElement("ORGNAME").text();
+    d->unit = orgElem.firstChildElement("ORGUNIT").text();
+}
+
+void QXmppVCardOrganization::toXml(QXmlStreamWriter *stream) const
+{
+    if (!d->unit.isEmpty() || !d->organization.isEmpty())
+    {
+        stream->writeStartElement("ORG");
+        stream->writeTextElement("ORGNAME", d->organization);
+        stream->writeTextElement("ORGUNIT", d->unit);
+        stream->writeEndElement();
+    }
+
+    helperToXmlAddTextElement(stream, "TITLE", d->title);
+    helperToXmlAddTextElement(stream, "ROLE", d->role);
+}
+
 class QXmppVCardIqPrivate : public QSharedData
 {
 public:
@@ -459,6 +552,7 @@ public:
     QList<QXmppVCardAddress> addresses;
     QList<QXmppVCardEmail> emails;
     QList<QXmppVCardPhone> phones;
+    QXmppVCardOrganization organization;
 };
 
 /// Constructs a QXmppVCardIq for the specified recipient.
@@ -732,6 +826,21 @@ void QXmppVCardIq::setPhones(const QList<QXmppVCardPhone> &phones)
 {
     d->phones = phones;
 }
+
+/// Returns the organization info.
+
+QXmppVCardOrganization QXmppVCardIq::organization() const
+{
+    return d->organization;
+}
+
+/// Sets the organization info.
+
+void QXmppVCardIq::setOrganization(const QXmppVCardOrganization &org)
+{
+    d->organization = org;
+}
+
 /// \cond
 bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
 {
@@ -774,6 +883,8 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
         }
         child = child.nextSiblingElement();
     }
+
+    d->organization.parse(cardElement);
 }
 
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -820,6 +931,8 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
     if (!d->url.isEmpty())
         helperToXmlAddTextElement(writer, "URL", d->url);
+
+    d->organization.toXml(writer);
 
     writer->writeEndElement();
 }
