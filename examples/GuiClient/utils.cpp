@@ -24,7 +24,11 @@
 
 #include "utils.h"
 #include <QDir>
+#if QT_VERSION >= 0x050000
 #include <QStandardPaths>
+#else
+#include <QDesktopServices>
+#endif
 
 int comparisonWeightsPresenceStatusType(QXmppPresence::AvailableStatusType statusType)
 {
@@ -99,8 +103,12 @@ QString presenceToStatusText(const QXmppPresence& presence)
 
 QString getSettingsDir(const QString& bareJid)
 {
+#if QT_VERSION >= 0x050000
     QStringList dirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
     QString dir = dirList.size() > 0 ? dirList.at(0) : "";
+#else
+    QString dir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
     if(bareJid.isEmpty())
         return dir + "/";
     else
