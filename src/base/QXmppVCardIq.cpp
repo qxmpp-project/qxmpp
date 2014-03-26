@@ -449,10 +449,14 @@ public:
     QString title;
 };
 
+/// Constructs an empty organization information.
+
 QXmppVCardOrganization::QXmppVCardOrganization()
     : d(new QXmppVCardOrganizationPrivate)
 {
 }
+
+/// Constructs a copy of \a other.
 
 QXmppVCardOrganization::QXmppVCardOrganization(const QXmppVCardOrganization &other)
     : d(other.d)
@@ -463,46 +467,64 @@ QXmppVCardOrganization::~QXmppVCardOrganization()
 {
 }
 
+/// Assigns \a other to this organization info.
+
 QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrganization &other)
 {
     d = other.d;
     return *this;
 }
 
+/// Returns the name of the organization.
+
 QString QXmppVCardOrganization::organization() const
 {
     return d->organization;
 }
 
-void QXmppVCardOrganization::setOrganization(const QString &org)
+/// Sets the organization \a name.
+
+void QXmppVCardOrganization::setOrganization(const QString &name)
 {
-    d->organization = org;
+    d->organization = name;
 }
+
+/// Returns the organization unit (also known as department).
 
 QString QXmppVCardOrganization::unit() const
 {
     return d->unit;
 }
 
+/// Sets the \a unit within the organization.
+
 void QXmppVCardOrganization::setUnit(const QString &unit)
 {
     d->unit = unit;
 }
+
+/// Returns the job role within the organization.
 
 QString QXmppVCardOrganization::role() const
 {
     return d->role;
 }
 
+/// Sets the job \a role within the organization.
+
 void QXmppVCardOrganization::setRole(const QString &role)
 {
     d->role = role;
 }
 
+/// Returns the job title within the organization.
+
 QString QXmppVCardOrganization::title() const
 {
     return d->title;
 }
+
+/// Sets the job \a title within the organization.
 
 void QXmppVCardOrganization::setTitle(const QString &title)
 {
