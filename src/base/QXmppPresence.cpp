@@ -53,8 +53,9 @@ class QXmppPresencePrivate : public QSharedData
 {
 public:
     QXmppPresence::AvailableStatusType availableStatusType;
+    int priority;
+    QString statusText;
     QXmppPresence::Type type;
-    QXmppPresence::Status status;
 
     /// XEP-0153: vCard-Based Avatars
 
@@ -84,6 +85,8 @@ public:
 QXmppPresence::QXmppPresence(QXmppPresence::Type type)
     : d(new QXmppPresencePrivate)
 {
+    d->availableStatusType = Online;
+    d->priority = 0;
     d->type = type;
     d->mucSupported = false;
     d->vCardUpdateType = VCardUpdateNone;
@@ -120,35 +123,35 @@ QXmppPresence &QXmppPresence::operator=(const QXmppPresence &other)
 
 QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
 {
-    return static_cast<QXmppPresence::AvailableStatusType>(d->status.type());
+    return d->availableStatusType;
 }
 
 /// Sets the availability status type, for instance busy or away.
 
 void QXmppPresence::setAvailableStatusType(AvailableStatusType type)
 {
-    d->status.setType(static_cast<QXmppPresence::Status::Type>(type));
+    d->availableStatusType = type;
 }
 
 /// Returns the priority level of the resource.
 
 int QXmppPresence::priority() const
 {
-    return d->status.priority();
+    return d->priority;
 }
 
 /// Sets the \a priority level of the resource.
 
 void QXmppPresence::setPriority(int priority)
 {
-    d->status.setPriority(priority);
+    d->priority = priority;
 }
 
 /// Returns the status text, a textual description of the user's status.
 
 QString QXmppPresence::statusText() const
 {
-    return d->status.statusText();
+    return d->statusText;
 }
 
 /// Sets the status text, a textual description of the user's status.
@@ -157,7 +160,7 @@ QString QXmppPresence::statusText() const
 
 void QXmppPresence::setStatusText(const QString& statusText)
 {
-    d->status.setStatusText(statusText);
+    d->statusText = statusText;
 }
 
 /// Returns the presence type.
@@ -193,7 +196,15 @@ void QXmppPresence::parse(const QDomElement &element)
             break;
         }
     }
-    d->status.parse(element);
+    const QString show = element.firstChildElement("show").text();
+    for (int i = Online; i <= Invisible; i++) {
+        if (show == presence_shows[i]) {
+            d->availableStatusType = static_cast<AvailableStatusType>(i);
+            break;
+        }
+    }
+    d->statusText = element.firstChildElement("status").text();
+    d->priority = element.firstChildElement("priority").text().toInt();
 
     QXmppElementList extensions;
     QDomElement xElement = element.firstChildElement();
@@ -275,7 +286,14 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     helperToXmlAddAttribute(xmlWriter,"to", to());
     helperToXmlAddAttribute(xmlWriter,"from", from());
     helperToXmlAddAttribute(xmlWriter,"type", presence_types[d->type]);
-    d->status.toXml(xmlWriter);
+
+    const QString show = presence_shows[d->availableStatusType];
+    if (!show.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "show", show);
+    if (d->statusText.isEmpty())
+        helperToXmlAddTextElement(xmlWriter, "status", d->statusText);
+    if (d->priority != 0)
+        helperToXmlAddTextElement(xmlWriter, "priority", QString::number(d->priority));
 
     error().toXml(xmlWriter);
 
@@ -478,81 +496,3 @@ void QXmppPresence::setMucSupported(bool supported)
 {
     d->mucSupported = supported;
 }
-
-/// \cond
-const QXmppPresence::Status& QXmppPresence::status() const
-{
-    return d->status;
-}
-
-QXmppPresence::Status& QXmppPresence::status()
-{
-    return d->status;
-}
-
-void QXmppPresence::setStatus(const QXmppPresence::Status& status)
-{
-    d->status = status;
-}
-
-QXmppPresence::Status::Status(QXmppPresence::Status::Type type,
-                             const QString statusText, int priority) :
-                                m_type(type),
-                                m_statusText(statusText), m_priority(priority)
-{
-}
-
-QXmppPresence::Status::Type QXmppPresence::Status::type() const
-{
-    return m_type;
-}
-
-void QXmppPresence::Status::setType(QXmppPresence::Status::Type type)
-{
-    m_type = type;
-}
-
-QString QXmppPresence::Status::statusText() const
-{
-    return m_statusText;
-}
-
-void QXmppPresence::Status::setStatusText(const QString& str)
-{
-    m_statusText = str;
-}
-
-int QXmppPresence::Status::priority() const
-{
-    return m_priority;
-}
-
-void QXmppPresence::Status::setPriority(int priority)
-{
-    m_priority = priority;
-}
-
-void QXmppPresence::Status::parse(const QDomElement &element)
-{
-    const QString show = element.firstChildElement("show").text();
-    for (int i = Online; i <= Invisible; i++) {
-        if (show == presence_shows[i]) {
-            m_type = static_cast<Type>(i);
-            break;
-        }
-    }
-    m_statusText = element.firstChildElement("status").text();
-    m_priority = element.firstChildElement("priority").text().toInt();
-}
-
-void QXmppPresence::Status::toXml(QXmlStreamWriter *xmlWriter) const
-{
-    const QString show = presence_shows[m_type];
-    if (!show.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "show", show);
-    if (!m_statusText.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "status", m_statusText);
-    if (m_priority != 0)
-        helperToXmlAddTextElement(xmlWriter, "priority", QString::number(m_priority));
-}
-/// \endcond

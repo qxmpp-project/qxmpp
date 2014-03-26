@@ -1,10 +1,11 @@
-QXmpp 0.7.7 (UNRELEASED)
+QXmpp 0.8.0 (UNRELEASED)
 
   - Fix QXmppServer incoming connections with Qt5 (issue 175).
   - Support for QXmppMessage extensions having tag names other than 'x'.
   - Support for retrieving the source QDomElement that has been used to
     initialize a QXmppElement.
   - Add organizations info interface to QXmppVCardIq.
+  - Remove deprecated QXmppPresence::Status type.
 
 QXmpp 0.7.6 (Mar 9, 2013)
 -------------------------

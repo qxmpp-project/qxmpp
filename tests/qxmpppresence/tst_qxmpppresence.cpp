@@ -107,11 +107,6 @@ void tst_QXmppPresence::testPresence()
     QCOMPARE(int(presence.vCardUpdateType()), vcardUpdate);
     QCOMPARE(presence.photoHash(), photoHash);
 
-    // legacy
-    QCOMPARE(presence.status().priority(), priority);
-    QCOMPARE(int(presence.status().type()), statusType);
-    QCOMPARE(presence.status().statusText(), statusText);
-
     serializePacket(presence, xml);
 }
 
