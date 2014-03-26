@@ -290,7 +290,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     const QString show = presence_shows[d->availableStatusType];
     if (!show.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "show", show);
-    if (d->statusText.isEmpty())
+    if (!d->statusText.isEmpty())
         helperToXmlAddTextElement(xmlWriter, "status", d->statusText);
     if (d->priority != 0)
         helperToXmlAddTextElement(xmlWriter, "priority", QString::number(d->priority));
