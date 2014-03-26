@@ -3,6 +3,7 @@
 import getopt
 import os
 import platform
+import subprocess
 import sys
 
 root = os.path.dirname(__file__)
@@ -36,6 +37,7 @@ else:
     os.environ['LD_LIBRARY_PATH'] = path
 
 # run tests
+failed = False
 for test in os.listdir(root):
     test_path = os.path.join(root, test)
     if os.path.isdir(test_path):
@@ -47,7 +49,15 @@ for test in os.listdir(root):
             prog = os.path.join(test_path, 'tst_' + test)
         if not os.path.exists(prog):
             continue
+
+        cmd = [ prog ]
         if report_path:
-            os.system('%s -xunitxml -o %s/%s.xml' % (prog, report_path, test))
-        else:
-            os.system(prog)
+            cmd += ['-xunitxml', '-o',  os.path.join(report_path, test + '.xml') ]
+        try:
+            subprocess.check_call(cmd)
+        except subprocess.CalledProcessError:
+            failed = True
+
+# check for failure
+if failed:
+    sys.exit(1)
