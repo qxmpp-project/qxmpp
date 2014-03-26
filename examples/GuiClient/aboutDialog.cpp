@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 The QXmpp developers
+ * Copyright (C) 2008-2014 The QXmpp developers
  *
  * Author:
  *	Manjeet Dahiya
@@ -37,7 +37,7 @@ aboutDialog::aboutDialog(QWidget *parent) :
 
     setWindowTitle(QString("About %1").arg(qApp->applicationName()));
 
-    ui->textEdit->append(QString("Copyright © 2009-2011, Manjeet Dahiya\n"));
+    ui->textEdit->append(QString("Copyright (C) 2008-2014 The QXmpp developers\n"));
     ui->textEdit->append(qApp->applicationName() + " " + qApp->applicationVersion());
     ui->textEdit->append(QString("\nBased on:"));
     ui->textEdit->append(QString("QXmpp %1").arg(QXmppVersion()));
