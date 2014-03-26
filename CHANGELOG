@@ -1,4 +1,4 @@
-QXmpp 0.8.0 (UNRELEASED)
+QXmpp 0.8.0 (Mar 26, 2014)
 
   - Fix QXmppServer incoming connections with Qt5 (issue 175).
   - Support for QXmppMessage extensions having tag names other than 'x'.
