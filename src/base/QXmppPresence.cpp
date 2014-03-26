@@ -358,7 +358,6 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 
-
 QXmppStanza::StanzaType QXmppPresence::getStanzaType() const
 {
     return Presence;
