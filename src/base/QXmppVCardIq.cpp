@@ -531,6 +531,7 @@ void QXmppVCardOrganization::setTitle(const QString &title)
     d->title = title;
 }
 
+/// \cond
 void QXmppVCardOrganization::parse(const QDomElement &cardElem)
 {
     d->title = cardElem.firstChildElement("TITLE").text();
@@ -554,6 +555,7 @@ void QXmppVCardOrganization::toXml(QXmlStreamWriter *stream) const
     helperToXmlAddTextElement(stream, "TITLE", d->title);
     helperToXmlAddTextElement(stream, "ROLE", d->role);
 }
+/// \endcond
 
 class QXmppVCardIqPrivate : public QSharedData
 {
