@@ -1,10 +1,13 @@
 language: cpp
+compiler:
+ - gcc
+ - clang
 env:
-  - QT_SELECT=qt4
-  - QT_SELECT=qt5
+  - QT_SELECT=qt4 ; CONFIG=minimal
+  - QT_SELECT=qt4 ; CONFIG=full
+  - QT_SELECT=qt5 ; CONFIG=minimal
+  - QT_SELECT=qt5 ; CONFIG=full
 install:
-  - tests/install-build-depends
+  - tests/travis/install-build-depends.sh
 script:
-  - qmake
-  - make
-  - tests/run.py
+  - tests/travis/build-and-test.sh
