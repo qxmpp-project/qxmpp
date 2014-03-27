@@ -1,0 +1,10 @@
+language: cpp
+env:
+  - QT_SELECT=qt4
+  - QT_SELECT=qt5
+install:
+  - tests/install-build-depends
+script:
+  - qmake
+  - make
+  - tests/run.py
