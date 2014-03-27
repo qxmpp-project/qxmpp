@@ -5,7 +5,7 @@
  *  Jeremy Lainé
  *
  * Source:
- *  http://code.google.com/p/qxmpp
+ *  https://github.com/jlaine/qxmpp
  *
  * This file is a part of QXmpp library.
  *
@@ -165,7 +165,7 @@ void tst_QXmppVCardIq::testVCard()
             "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
             "</BINVAL>"
         "</PHOTO>"
-        "<URL>http://code.google.com/p/qxmpp/</URL>"
+        "<URL>https://github.com/jlaine/qxmpp/</URL>"
         "<ORG>"
             "<ORGNAME>QXmpp foundation</ORGNAME>"
             "<ORGUNIT>Main QXmpp dev unit</ORGUNIT>"
@@ -201,7 +201,7 @@ void tst_QXmppVCardIq::testVCard()
         "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
         "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
     QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
-    QCOMPARE(vcard.url(), QLatin1String("http://code.google.com/p/qxmpp/"));
+    QCOMPARE(vcard.url(), QLatin1String("https://github.com/jlaine/qxmpp/"));
 
     const QXmppVCardOrganization &orgInfo = vcard.organization();
     QCOMPARE(orgInfo.organization(), QLatin1String("QXmpp foundation"));

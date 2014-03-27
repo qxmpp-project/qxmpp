@@ -5,7 +5,7 @@
  *  Manjeet Dahiya
  *
  * Source:
- *  http://code.google.com/p/qxmpp
+ *  https://github.com/jlaine/qxmpp
  *
  * This file is a part of QXmpp library.
  *
