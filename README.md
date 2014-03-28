@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jlaine/qxmpp.png)](https://travis-ci.org/jlaine/qxmpp)
+[![Build Status](https://travis-ci.org/qxmpp-project/qxmpp.png)](https://travis-ci.org/qxmpp-project/qxmpp)
 
 ABOUT QXMPP
 ===========
