@@ -6,7 +6,7 @@
  *	Jeremy Lainé
  *
  * Source:
- *	https://github.com/jlaine/qxmpp
+ *	https://github.com/qxmpp-project/qxmpp
  *
  * This file is a part of QXmpp library.
  *

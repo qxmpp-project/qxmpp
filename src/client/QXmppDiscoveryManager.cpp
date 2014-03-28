@@ -5,7 +5,7 @@
  *  Manjeet Dahiya
  *
  * Source:
- *  https://github.com/jlaine/qxmpp
+ *  https://github.com/qxmpp-project/qxmpp
  *
  * This file is a part of QXmpp library.
  *
@@ -46,7 +46,7 @@ public:
 QXmppDiscoveryManager::QXmppDiscoveryManager()
     : d(new QXmppDiscoveryManagerPrivate)
 {
-    d->clientCapabilitiesNode = "https://github.com/jlaine/qxmpp";
+    d->clientCapabilitiesNode = "https://github.com/qxmpp-project/qxmpp";
     d->clientCategory = "client";
     d->clientType = "pc";
     if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
@@ -193,7 +193,7 @@ void QXmppDiscoveryManager::setClientName(const QString& name)
 
 /// Returns the capabilities node of the local XMPP client.
 ///
-/// By default this is "https://github.com/jlaine/qxmpp".
+/// By default this is "https://github.com/qxmpp-project/qxmpp".
 
 QString QXmppDiscoveryManager::clientCapabilitiesNode() const
 {

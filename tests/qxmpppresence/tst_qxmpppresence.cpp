@@ -6,7 +6,7 @@
  *  Jeremy Lainé
  *
  * Source:
- *  https://github.com/jlaine/qxmpp
+ *  https://github.com/qxmpp-project/qxmpp
  *
  * This file is a part of QXmpp library.
  *
@@ -120,7 +120,7 @@ void tst_QXmppPresence::testPresenceWithCapability()
         "<x xmlns=\"vcard-temp:x:update\">"
         "<photo>73b908bc</photo>"
         "</x>"
-        "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"https://github.com/jlaine/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
+        "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"https://github.com/qxmpp-project/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
         "</presence>");
 
     QXmppPresence presence;
@@ -133,7 +133,7 @@ void tst_QXmppPresence::testPresenceWithCapability()
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
     QCOMPARE(presence.capabilityHash(), QString("sha-1"));
-    QCOMPARE(presence.capabilityNode(), QString("https://github.com/jlaine/qxmpp"));
+    QCOMPARE(presence.capabilityNode(), QString("https://github.com/qxmpp-project/qxmpp"));
     QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
 
     serializePacket(presence, xml);

@@ -83,7 +83,7 @@ DOCUMENTATION
 
 You can find information about QXmpp, on the project homepage:
 
-https://github.com/jlaine/qxmpp
+https://github.com/qxmpp-project/qxmpp
 
 SUPPORTED PLATFORMS
 ===================
@@ -115,7 +115,7 @@ If you think you have found a bug in QXmpp, we would like to hear about
 it so that we can fix it. Before reporting a bug, please check if the issue
 is already know at:
  
-https://github.com/jlaine/qxmpp/issues
+https://github.com/qxmpp-project/qxmpp/issues
 
 DISCUSSION GROUP
 ================

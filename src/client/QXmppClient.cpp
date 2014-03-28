@@ -5,7 +5,7 @@
  *  Manjeet Dahiya
  *
  * Source:
- *  https://github.com/jlaine/qxmpp
+ *  https://github.com/qxmpp-project/qxmpp
  *
  * This file is a part of QXmpp library.
  *
@@ -128,11 +128,11 @@ int QXmppClientPrivate::getNextReconnectTime() const
 /// <BR><BR>
 /// <B>Project Details:</B>
 ///
-/// Project Page: https://github.com/jlaine/qxmpp/
+/// Project Page: https://github.com/qxmpp-project/qxmpp/
 /// <BR>
-/// Report Issues: https://github.com/jlaine/qxmpp/issues/
+/// Report Issues: https://github.com/qxmpp-project/qxmpp/issues/
 /// <BR>
-/// New Releases: https://github.com/jlaine/qxmpp/downloads/
+/// New Releases: https://github.com/qxmpp-project/qxmpp/downloads/
 ///
 
 /// Creates a QXmppClient object.
