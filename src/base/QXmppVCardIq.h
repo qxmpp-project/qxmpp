@@ -214,7 +214,7 @@ private:
 class QXMPP_EXPORT QXmppVCardIq : public QXmppIq
 {
 public:
-    QXmppVCardIq(const QString& bareJid = "");
+    QXmppVCardIq(const QString& bareJid = QString());
     QXmppVCardIq(const QXmppVCardIq &other);
     ~QXmppVCardIq();
 

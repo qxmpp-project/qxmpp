@@ -1,3 +1,8 @@
+QXmpp 0.8.1 (UNRELEASED)
+
+  - Use QString() instead of "" for default methods arguments, to enable
+    building project which use QT_NO_CAST_FROM_ASCII.
+
 QXmpp 0.8.0 (Mar 26, 2014)
 
   - Fix QXmppServer incoming connections with Qt5 (issue 175).

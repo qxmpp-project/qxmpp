@@ -45,8 +45,8 @@ public:
 
     QXmppDiscoveryIq capabilities();
 
-    QString requestInfo(const QString& jid, const QString& node = "");
-    QString requestItems(const QString& jid, const QString& node = "");
+    QString requestInfo(const QString& jid, const QString& node = QString());
+    QString requestItems(const QString& jid, const QString& node = QString());
 
     QString clientCapabilitiesNode() const;
     void setClientCapabilitiesNode(const QString&);

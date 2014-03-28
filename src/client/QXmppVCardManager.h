@@ -61,7 +61,7 @@ public:
     QXmppVCardManager();
     ~QXmppVCardManager();
 
-    QString requestVCard(const QString& bareJid = "");
+    QString requestVCard(const QString& bareJid = QString());
 
     const QXmppVCardIq& clientVCard() const;
     void setClientVCard(const QXmppVCardIq&);

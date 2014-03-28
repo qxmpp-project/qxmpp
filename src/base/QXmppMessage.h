@@ -60,8 +60,8 @@ public:
         Paused,     ///< User had been composing but now has stopped.
     };
 
-    QXmppMessage(const QString& from = "", const QString& to = "",
-                 const QString& body = "", const QString& thread = "");
+    QXmppMessage(const QString& from = QString(), const QString& to = QString(),
+                 const QString& body = QString(), const QString& thread = QString());
     QXmppMessage(const QXmppMessage &other);
     ~QXmppMessage();
 

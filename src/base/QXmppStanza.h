@@ -129,8 +129,8 @@ public:
         };
 
         Error();
-        Error(Type type, Condition cond, const QString& text="");
-        Error(const QString& type, const QString& cond, const QString& text="");
+        Error(Type type, Condition cond, const QString& text = QString());
+        Error(const QString& type, const QString& cond, const QString& text = QString());
 
         int code() const;
         void setCode(int code);
