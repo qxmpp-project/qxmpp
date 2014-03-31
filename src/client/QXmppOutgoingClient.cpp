@@ -130,6 +130,9 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 
     // connect to host
     q->socket()->connectToHost(host, port);
+    if (config.startEncryptionOnConnect()) {
+        q->socket()->startClientEncryption();
+    }
 }
 
 /// Constructs an outgoing client stream.
