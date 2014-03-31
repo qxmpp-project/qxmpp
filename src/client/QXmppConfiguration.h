@@ -128,6 +128,9 @@ public:
     bool ignoreSslErrors() const;
     void setIgnoreSslErrors(bool);
 
+    bool startEncryptionOnConnect() const;
+    void setStartEncryptionOnConnect(bool);
+
     QXmppConfiguration::StreamSecurityMode streamSecurityMode() const;
     void setStreamSecurityMode(QXmppConfiguration::StreamSecurityMode mode);
 

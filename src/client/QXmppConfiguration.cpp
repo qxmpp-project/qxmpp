@@ -66,6 +66,8 @@ public:
     bool useNonSASLAuthentication;
     // default is true
     bool ignoreSslErrors;
+    // default is false
+    bool encryptOnConnect;
 
     QXmppConfiguration::StreamSecurityMode streamSecurityMode;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism;
@@ -88,6 +90,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , useSASLAuthentication(true)
     , useNonSASLAuthentication(true)
     , ignoreSslErrors(true)
+    , encryptOnConnect(false)
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
     , saslAuthMechanism("DIGEST-MD5")
@@ -430,6 +433,29 @@ bool QXmppConfiguration::ignoreSslErrors() const
 void QXmppConfiguration::setIgnoreSslErrors(bool value)
 {
     d->ignoreSslErrors = value;
+}
+
+/// Returns whether the connection should be encrypted immediately after it
+/// is established.
+///
+/// \return boolean value
+/// true means use QSslSocket::startClientEncryption will be called right
+/// after connecting.
+
+bool QXmppConfiguration::startEncryptionOnConnect() const
+{
+    return d->encryptOnConnect;
+}
+
+/// Specifies whether the connection should be encrypted aimmediately after it
+/// is established.
+///
+/// When true, will call QSslSocket::startClientEncryption right after
+/// connecting.
+
+void QXmppConfiguration::setStartEncryptionOnConnect(bool value)
+{
+    d->encryptOnConnect = value;
 }
 
 /// Returns whether to make use of SASL authentication.
