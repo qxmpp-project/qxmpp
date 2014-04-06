@@ -93,9 +93,9 @@ the part of this library.
 DOCUMENTATION
 =============
 
-You can find information about QXmpp, on the project homepage:
+You can find the API documentation for the latest QXmpp version here:
 
-https://github.com/qxmpp-project/qxmpp
+http://doc.qxmpp.org/qxmpp-snapshot/
 
 SUPPORTED PLATFORMS
 ===================
