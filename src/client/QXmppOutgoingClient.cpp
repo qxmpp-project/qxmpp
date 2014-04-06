@@ -129,7 +129,16 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 #endif
 
     // connect to host
-    q->socket()->connectToHost(host, port);
+    const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
+    if (localSecurity == QXmppConfiguration::LegacySSL) {
+        if (!q->socket()->supportsSsl()) {
+            q->warning("Not connecting as legacy SSL was requested, but SSL support is not available");
+            return;
+        }
+        q->socket()->connectToHostEncrypted(host, port);
+    } else {
+        q->socket()->connectToHost(host, port);
+    }
 }
 
 /// Constructs an outgoing client stream.

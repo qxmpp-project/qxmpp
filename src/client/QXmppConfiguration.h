@@ -53,10 +53,11 @@ public:
     /// Depending upon all this user can specify following options.
     enum StreamSecurityMode
     {
-        TLSEnabled = 0, ///< Encryption is used if available (default)
-        TLSDisabled,    ///< No encryption is server allows
-        TLSRequired     ///< Encryption is a must otherwise connection would not
-                        ///< be established
+        TLSEnabled = 0, ///< Encryption is used if available (default).
+        TLSDisabled,    ///< No encryption even if the server offers it.
+        TLSRequired,    ///< Encryption must be available, otherwise the
+                        ///< connection will not be established.
+        LegacySSL       ///< Use only legacy SSL mode.
     };
 
     /// An enumeration for various Non-SASL authentication mechanisms available.
