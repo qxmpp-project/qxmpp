@@ -3,7 +3,19 @@
 ABOUT QXMPP
 ===========
 
-QXmpp is cross-platform C++ client library for XMPP. It is based on Qt.
+QXmpp is a cross-platform C++ XMPP client and server library. It is written
+in C++ and uses the Qt framework.
+
+QXmpp strives to be as easy to use as possible, the underlying TCP socket,
+the core XMPP RFCs (RFC3920 and RFC3921) and XMPP extensions have been
+encapsulated into classes and functions. QXmpp comes with full API
+documentation, automatic tests and numerous examples.
+
+QXmpp uses Qt extensively, and as such users need to a have working knowledge
+of C++ and Qt basics (Signals and Slots and Qt data types).
+
+Qt is the only third party library which is required to build QXmpp, but
+libraries such as speex and theora enable additional features.
 
 QXmpp is released under the terms of the GNU Lesser General Public License,
 version 2.1 or later.
