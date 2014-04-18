@@ -56,10 +56,11 @@ the examples and library.
 INSTALLING QXMPP
 ================
 
-After building QXmpp the you can install the Headers, Libraries 
+After building QXmpp, you can install the Headers, Libraries 
 and Documentation using the following command:
 
-Installing from the command line:
+Install from command line:
+
     <respective-make-cmd = gmake, make, mingw32-make, nmake> install
 
 Path of installations:
