@@ -100,19 +100,18 @@ http://doc.qxmpp.org/qxmpp-snapshot/
 SUPPORTED PLATFORMS
 ===================
 
-For this release, the following platforms have been tested:
+It should work on all the plaforms supported by Qt. For a complete list of
+platforms support by Qt, see:
 
+http://qt-project.org/doc/supported-platforms.html
+
+In past, we have tested on variety of platforms:
     win32-g++        (Qt SDK)
     win32-msvc2008   (Qt MSVC-2008)
     win64-msvc2008   (Qt MSVC-2008)
     symbian-gcce     (Nokia Qt SDK)
     linux-g++        (32-bit and 64-bit)
     macos-g++        (32-bit and 64-bit)
-
-It should work on all the plaforms supported by Qt. For a complete list of
-platforms support by Qt, see:
-
-http://qt-project.org/doc/supported-platforms.html
 
 Please note that on Symbian, you will need to make sure your add the
 "NetworkServices" to your application to enable it to access the network.
