@@ -48,7 +48,7 @@ Note: by default QXmpp is built as a shared library. If you decide to build
 a static library instead, you will need to pass -DQXMPP_STATIC when building
 your programs against QXmpp.
 
-Building using Qt Creator:
+Build using Qt Creator:
 
 Open the qxmpp.pro file in Qt Creator and hit "Build All" to build all
 the examples and library.
