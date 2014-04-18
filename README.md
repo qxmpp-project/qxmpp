@@ -75,7 +75,8 @@ to your C++ flags.
 EXAMPLES
 ========
 
-Look at the example directory for various examples.
+Look at the example directory for various examples. Here is a description of 
+a few.
 
 * *example_0_connected*
 This example just connects to the xmpp server and start receiving presences
