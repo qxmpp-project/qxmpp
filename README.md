@@ -106,6 +106,7 @@ platforms support by Qt, see:
 http://qt-project.org/doc/supported-platforms.html
 
 In past, we have tested on variety of platforms:
+
     win32-g++        (Qt SDK)
     win32-msvc2008   (Qt MSVC-2008)
     win64-msvc2008   (Qt MSVC-2008)
