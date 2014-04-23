@@ -124,6 +124,9 @@ private:
     QSharedDataPointer<QXmppVCardEmailPrivate> d;
 };
 
+QXMPP_EXPORT bool operator==(const QXmppVCardEmail&, const QXmppVCardEmail&);
+QXMPP_EXPORT bool operator!=(const QXmppVCardEmail&, const QXmppVCardEmail&);
+
 /// \brief Represents a vCard phone number.
 
 class QXMPP_EXPORT QXmppVCardPhone
@@ -169,6 +172,9 @@ private:
     QSharedDataPointer<QXmppVCardPhonePrivate> d;
 };
 
+QXMPP_EXPORT bool operator==(const QXmppVCardPhone&, const QXmppVCardPhone&);
+QXMPP_EXPORT bool operator!=(const QXmppVCardPhone&, const QXmppVCardPhone&);
+
 /// \brief Represents organization information in XMPP vCards.
 ///
 /// This contains both information about organization itself and
@@ -203,6 +209,9 @@ public:
 private:
     QSharedDataPointer<QXmppVCardOrganizationPrivate> d;
 };
+
+QXMPP_EXPORT bool operator==(const QXmppVCardOrganization&, const QXmppVCardOrganization&);
+QXMPP_EXPORT bool operator!=(const QXmppVCardOrganization&, const QXmppVCardOrganization&);
 
 /// \brief Represents the XMPP vCard.
 ///
