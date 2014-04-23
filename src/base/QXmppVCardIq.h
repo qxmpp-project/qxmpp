@@ -291,4 +291,7 @@ private:
     QSharedDataPointer<QXmppVCardIqPrivate> d;
 };
 
+QXMPP_EXPORT bool operator==(const QXmppVCardIq&, const QXmppVCardIq&);
+QXMPP_EXPORT bool operator!=(const QXmppVCardIq&, const QXmppVCardIq&);
+
 #endif // QXMPPVCARDIQ_H

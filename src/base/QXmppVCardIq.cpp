@@ -678,6 +678,34 @@ QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
     return *this;
 }
 
+/// \brief Checks if two VCard objects represent the same VCard.
+
+bool operator==(const QXmppVCardIq &left, const QXmppVCardIq &right)
+{
+    return left.birthday() == right.birthday() &&
+            left.description() == right.description() &&
+            left.email() == right.email() &&
+            left.firstName() == right.firstName() &&
+            left.fullName() == right.fullName() &&
+            left.lastName() == right.lastName() &&
+            left.middleName() == right.middleName() &&
+            left.nickName() == right.nickName() &&
+            left.photo() == right.photo() &&
+            left.photoType() == right.photoType() &&
+            left.url() == right.url() &&
+            left.addresses() == right.addresses() &&
+            left.emails() == right.emails() &&
+            left.phones() == right.phones() &&
+            left.organization() == right.organization();
+}
+
+/// \brief Checks if two VCard objects represent different VCards.
+
+bool operator!=(const QXmppVCardIq &left, const QXmppVCardIq &right)
+{
+    return !(left == right);
+}
+
 /// Returns the date of birth of the individual associated with the vCard.
 ///
 
