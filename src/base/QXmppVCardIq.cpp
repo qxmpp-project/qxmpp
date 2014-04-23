@@ -86,6 +86,23 @@ QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
     return *this;
 }
 
+/// \brief Checks if two address objects represent the same address.
+
+bool operator==(const QXmppVCardAddress &left, const QXmppVCardAddress &right)
+{
+    return left.type() == right.type() &&
+            left.country() == right.country() &&
+            left.locality() == right.locality() &&
+            left.postcode() == right.postcode() &&
+            left.region() == right.region() &&
+            left.street() == right.street();
+}
+
+bool operator!=(const QXmppVCardAddress &left, const QXmppVCardAddress &right)
+{
+    return !(left == right);
+}
+
 /// Returns the country.
 
 QString QXmppVCardAddress::country() const

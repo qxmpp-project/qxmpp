@@ -84,6 +84,9 @@ private:
     QSharedDataPointer<QXmppVCardAddressPrivate> d;
 };
 
+QXMPP_EXPORT bool operator==(const QXmppVCardAddress&, const QXmppVCardAddress&);
+QXMPP_EXPORT bool operator!=(const QXmppVCardAddress&, const QXmppVCardAddress&);
+
 /// \brief Represents a vCard e-mail address.
 
 class QXMPP_EXPORT QXmppVCardEmail
