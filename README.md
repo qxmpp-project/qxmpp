@@ -137,3 +137,4 @@ DISCUSSION GROUP
 Join QXmpp Discussion Group for queries, discussions and updates.
 
 http://groups.google.com/group/qxmpp
+
