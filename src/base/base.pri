@@ -26,6 +26,7 @@ INSTALL_HEADERS += \
     base/QXmppRpcIq.h \
     base/QXmppRtpChannel.h \
     base/QXmppSessionIq.h \
+    base/QXmppSimpleArchiveIq.h \
     base/QXmppSocks.h \
     base/QXmppStanza.h \
     base/QXmppStream.h \
@@ -38,7 +39,11 @@ INSTALL_HEADERS += \
 HEADERS += \
     base/QXmppCodec_p.h \
     base/QXmppSasl_p.h \
-    base/QXmppStreamInitiationIq_p.h
+    base/QXmppStreamInitiationIq_p.h \
+    base/QXmppSimpleArchivePreferenceIq.h \
+    base/QXmppMessageCarbonsIq.h \
+    base/QXmppReachAddress.h \
+    base/QXmppStreamManagement.h
 
 # Source files
 SOURCES += \
@@ -70,6 +75,7 @@ SOURCES += \
     base/QXmppRtpChannel.cpp \
     base/QXmppSasl.cpp \
     base/QXmppSessionIq.cpp \
+    base/QXmppSimpleArchiveIq.cpp \
     base/QXmppSocks.cpp \
     base/QXmppStanza.cpp \
     base/QXmppStream.cpp \
@@ -78,7 +84,11 @@ SOURCES += \
     base/QXmppStun.cpp \
     base/QXmppUtils.cpp \
     base/QXmppVCardIq.cpp \
-    base/QXmppVersionIq.cpp
+    base/QXmppVersionIq.cpp \
+    base/QXmppSimpleArchivePreferenceIq.cpp \
+    base/QXmppMessageCarbonsIq.cpp \
+    base/QXmppReachAddress.cpp \
+    base/QXmppStreamManagement.cpp
 
 # DNS
 qt_version = $$QT_MAJOR_VERSION

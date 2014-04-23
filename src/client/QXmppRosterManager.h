@@ -127,6 +127,8 @@ private slots:
     void _q_connected();
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence&);
+    void _q_streamResumed(bool resumed);
+    void _q_streamResumeEnabled(bool enabled);
 
 private:
     QXmppRosterManagerPrivate *d;

@@ -181,6 +181,32 @@ QXmppClient::QXmppClient(QObject *parent)
                     this, SLOT(_q_streamError(QXmppClient::Error)));
     Q_ASSERT(check);
 
+    // XEP-0198: Stream Management
+    check = connect(d->stream, SIGNAL(messageAcknowledged(QXmppMessage,bool)),
+                    this, SIGNAL(messageAcknowledged(QXmppMessage,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(iqAcknowledged(QXmppIq,bool)),
+                    this, SIGNAL(iqAcknowledged(QXmppIq,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(presenceAcknowledged(QXmppPresence,bool)),
+                    this, SIGNAL(presenceAcknowledged(QXmppPresence,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(streamManagementError(QXmppStanza::Error::Condition)),
+                    this, SIGNAL(streamManagementError(QXmppStanza::Error::Condition)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(streamManagementEnabled(bool)),
+                    this, SIGNAL(streamManagementEnabled(bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->stream, SIGNAL(streamManagementResumed(bool)),
+                    this, SIGNAL(streamManagementResumed(bool)));
+    Q_ASSERT(check);
+
+
     // reconnection
     d->reconnectionTimer = new QTimer(this);
     d->reconnectionTimer->setSingleShot(true);
@@ -322,7 +348,7 @@ bool QXmppClient::sendPacket(const QXmppStanza& packet)
 }
 
 /// Disconnects the client and the current presence of client changes to
-/// QXmppPresence::Unavailable and status text changes to "Logged out".
+/// QXmppPresence::Unavailable.
 ///
 /// \note Make sure that the clientPresence is changed to
 /// QXmppPresence::Available, if you are again calling connectToServer() after
@@ -335,7 +361,6 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
-    d->clientPresence.setStatusText("Logged out");
     if (d->stream->isConnected())
         sendPacket(d->clientPresence);
 
@@ -481,6 +506,13 @@ QXmppVersionManager& QXmppClient::versionManager()
 {
     return *findExtension<QXmppVersionManager>();
 }
+/// Sends a stream management request XEP-0198: Stream Management
+///
+
+void QXmppClient::sendRequestStreamManagement()
+{
+    d->stream->sendStreamManagementRequest();
+}
 
 /// Give extensions a chance to handle incoming stanzas.
 ///
@@ -554,6 +586,18 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
 
     // notify managers
     emit error(err);
+}
+
+void QXmppClient::_q_streamManagementResumed(bool resumed)
+{
+    if(resumed)
+    {
+        d->receivedConflict = false;
+        d->reconnectionTries = 0;
+
+        // notify managers
+        emit stateChanged(QXmppClient::ConnectedState);
+    }
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.

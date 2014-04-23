@@ -60,8 +60,25 @@ public:
         Paused,     ///< User had been composing but now has stopped.
     };
 
+    /// This enum describes a chat marker as defined by
+    /// XEP-0333 : Char Markers
+    enum Marker {
+        NoMarker = 0,
+        Received,
+        Displayed,
+        Acknowledged
+    };
+
+    enum Hint {
+        NoPermanentStorage = 0,
+        NoStorage,
+        NoCopies,
+        AllowPermantStorage
+    };
+
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
                  const QString& body = QString(), const QString& thread = QString());
+
     QXmppMessage(const QXmppMessage &other);
     ~QXmppMessage();
 
@@ -105,11 +122,48 @@ public:
 
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
+    
+    // XEP-0297
+    bool hasForwarded() const;
+    QXmppMessage forwarded() const;
+    void setForwarded(const QXmppMessage& forwarded);
+
+    // XEP-0313
+    bool hasMaMMessage() const;
+    QXmppMessage mamMessage() const;
+    void setMaMMessage(const QXmppMessage& message);
+
+    // XEP-0280
+    bool hasMessageCarbon() const;
+    QXmppMessage carbonMessage() const;
+    void setMessagecarbon(const QXmppMessage& message);
+
+    // XEP-0334: Message Processing Hints
+    bool hasHint(const Hint& hint);
+    void addHint(const Hint& hint);
+    void removeHint(const Hint& hint);
+
+    // XEP-0333
+    bool isMarkable() const;
+    void setMarkable(const bool);
+    Marker marker() const;
+    QString markedId() const;
+    QString markedThread() const;
+    void setMarker(const Marker, const QString& id, const QString& thread = QString());
+    
+    // XEP-0308: Last Message Correction
+    bool isReplace() const;
+    void setReplace(const QString& replaceId);
+    QString replaceId() const;
 
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
+    StanzaType getStanzaType() const;
+
+protected:
+    QXmppMessage parseForward(QDomElement &element);
 
 private:
     QSharedDataPointer<QXmppMessagePrivate> d;

@@ -58,6 +58,8 @@
 #include <QXmlStreamWriter>
 #include <QTimer>
 
+#include <QXmppStreamManagement.h>
+
 class QXmppOutgoingClientPrivate
 {
 public:
@@ -92,9 +94,15 @@ public:
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
 
+    // XEP-0198: Stream Management
+    QXmppConfiguration::StreamManagementMode streamManagementMode;
+    QXmppStreamManagement *streamManagement;
+
     // Timers
     QTimer *pingTimer;
     QTimer *timeoutTimer;
+
+    QMap<QString, QString> iqIds;
 
 private:
     QXmppOutgoingClient *q;
@@ -106,6 +114,8 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     , sessionStarted(false)
     , isAuthenticated(false)
     , saslClient(0)
+    , streamManagementMode(QXmppConfiguration::SMDisabled)
+    , streamManagement(0)
     , pingTimer(0)
     , timeoutTimer(0)
     , q(qq)
@@ -192,6 +202,22 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     check = connect(this, SIGNAL(disconnected()),
                     this, SLOT(pingStop()));
     Q_ASSERT(check);
+
+    // XEP-0198: Stram Management
+    d->streamManagement = new QXmppStreamManagement(this);
+    check = connect(d->streamManagement, SIGNAL(messageAcknowledged(QXmppMessage,bool)),
+                    this, SIGNAL(messageAcknowledged(QXmppMessage,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->streamManagement, SIGNAL(presenceAcknowledged(QXmppPresence,bool)),
+                    this, SIGNAL(presenceAcknowledged(QXmppPresence,bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->streamManagement, SIGNAL(iqAcknowledged(QXmppIq,bool)),
+                    this, SIGNAL(iqAcknowledged(QXmppIq,bool)));
+    Q_ASSERT(check);
+
+
 }
 
 /// Destroys an outgoing client stream.
@@ -224,6 +250,19 @@ void QXmppOutgoingClient::connectToHost()
     d->dns.setName("_xmpp-client._tcp." + domain);
     d->dns.setType(QDnsLookup::SRV);
     d->dns.lookup();
+}
+
+void QXmppOutgoingClient::disconnectFromHost(const bool sendCloseStream)
+{
+    if(sendCloseStream)
+    {
+        d->streamManagement->disable();
+    }
+
+    if(d->streamManagement->isResumeEnabled())
+        QXmppStream::disconnectFromHost(false);
+    else
+        QXmppStream::disconnectFromHost(sendCloseStream);
 }
 
 void QXmppOutgoingClient::_q_dnsLookupFinished()
@@ -260,6 +299,12 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
     d->isAuthenticated = false;
+    d->iqIds.clear();
+    // Notify the stream management that the socket is in a disconect status
+    if(d->streamManagement->isEnabled())
+    {
+        d->streamManagement->socketDisconnected();
+    }
     if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
         d->connectToHost(d->redirectHost, d->redirectPort);
         d->redirectHost = QString();
@@ -332,6 +377,30 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
     }
 }
 
+bool QXmppOutgoingClient::sendPacket(const QXmppStanza &stanza)
+{
+    if(QXmppStream::sendPacket(stanza))
+    {
+        if( (stanza.getStanzaType() == QXmppStanza::Iq) && isConnected())
+        {
+             QXmppIq iq(static_cast<QXmppIq const &>(stanza));
+             if( iq.type() == QXmppIq::Get || iq.type()== QXmppIq::Set )
+             {
+                d->iqIds.insert(iq.id(),iq.to());
+             }
+        }
+
+        if(d->streamManagement->isOutboundEnabled())
+        {
+            d->streamManagement->stanzaSent(stanza);
+            if(d->streamManagement->outboundCounter() % 10 == 0) //every 10 packets a request is sent
+                sendStreamManagementRequest();
+        }
+        return true;
+    }
+    return false;
+}
+
 void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 {
     // if we receive any kind of data, stop the timeout timer
@@ -339,16 +408,41 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
     const QString ns = nodeRecv.namespaceURI();
 
+    // IQ Security check
+    if ( isConnected() && !iQsSecuirityCheck(nodeRecv))
+        return;
     // give client opportunity to handle stanza
     bool handled = false;
     emit elementReceived(nodeRecv, handled);
-    if (handled)
+    if (handled){
+        d->streamManagement->stanzaHandled();
         return;
+    }
+
+    if(isStreamManagement(nodeRecv))
+    {
+        handleStreamManagement(nodeRecv);
+        return;
+    }
 
     if(QXmppStreamFeatures::isStreamFeatures(nodeRecv))
     {
         QXmppStreamFeatures features;
         features.parse(nodeRecv);
+
+        // in case that the configuration and the server supports stream management, it gets enabled now
+        if(features.streamManagementMode() == QXmppStreamFeatures::Enabled)
+        {
+            // server supports stream management
+            // check client config
+            if(d->config.streamManagementMode() == QXmppConfiguration::SMEnabled )
+            {
+                d->streamManagementMode = QXmppConfiguration::SMEnabled;
+            }else if (d->config.streamManagementMode() == QXmppConfiguration::SMSessionResumptionEnabled)
+            {
+                d->streamManagementMode = QXmppConfiguration::SMSessionResumptionEnabled;
+            }
+        }
 
         if (!socket()->isEncrypted())
         {
@@ -456,12 +550,16 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether bind is available
         if (features.bindMode() != QXmppStreamFeatures::Disabled)
         {
-            QXmppBindIq bind;
-            bind.setType(QXmppIq::Set);
-            bind.setResource(configuration().resource());
-            d->bindId = bind.id();
-            sendPacket(bind);
-            return;
+            // TODO if athentificated and stream management resume is avaliable send resume
+            if(d->streamManagement->isResumeEnabled()){
+                sendStreamManagementResume();
+                return;
+            }else{
+                if(!bindResource())
+                    warning("Problem binding the resource");
+                return;
+            }
+
         }
 
         // check whether session is available
@@ -475,7 +573,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             sendPacket(session);
         } else {
             // otherwise we are done
-            d->sessionStarted = true;
+            enableStreamManagement();
             emit connected();
         }
     }
@@ -518,6 +616,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         {
             debug("Authenticated");
             d->isAuthenticated = true;
+
             handleStart();
         }
         else if(nodeRecv.tagName() == "challenge")
@@ -566,6 +665,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // xmpp connection made
                 d->sessionStarted = true;
+                enableStreamManagement();
                 emit connected();
             }
             else if(QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId)
@@ -600,6 +700,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     } else {
                         // otherwise we are done
                         d->sessionStarted = true;
+                        enableStreamManagement();
                         emit connected();
                     }
                 }
@@ -615,6 +716,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // xmpp connection made
                 d->sessionStarted = true;
+                enableStreamManagement();
                 emit connected();
             }
             else if(QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv))
@@ -677,6 +779,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     sendPacket(iq);
                 } else {
                     emit iqReceived(iqPacket);
+                    d->streamManagement->stanzaHandled();
                 }
             }
         }
@@ -687,6 +790,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // emit presence
             emit presenceReceived(presence);
+            d->streamManagement->stanzaHandled();
+
         }
         else if(nodeRecv.tagName() == "message")
         {
@@ -695,6 +800,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // emit message
             emit messageReceived(message);
+            d->streamManagement->stanzaHandled();
+
         }
     }
 }
@@ -764,6 +871,177 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
     // not attempt to guess the required fields?
     authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
+}
+
+void QXmppOutgoingClient::enableStreamManagement()
+{
+    if(d->streamManagementMode == QXmppConfiguration::SMDisabled)
+        return;
+    if(d->streamManagementMode == QXmppConfiguration::SMSessionResumptionEnabled )
+        sendStreamManagementEnable(true);
+    else if(d->streamManagementMode == QXmppConfiguration::SMEnabled)
+        sendStreamManagementEnable(false);
+
+    d->streamManagement->enableSent();
+}
+
+void QXmppOutgoingClient::sendStreamManagementEnable(const bool resume)
+{
+    debug("SM SENT ENABLE");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->enableToXml(&xmlStream, resume);
+
+    sendData(data);
+
+}
+
+void QXmppOutgoingClient::sendStreamManagementAck()
+{
+    debug("SM SENT ACK");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->ackToXml(&xmlStream);
+
+    sendData(data);
+}
+
+void QXmppOutgoingClient::sendStreamManagementResume()
+{
+    debug("SM SENDING RESUME");
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    d->streamManagement->resumeToXml(&xmlStream);
+
+    sendData(data);
+}
+
+void QXmppOutgoingClient::sendStreamManagementRequest()
+{
+    if(d->streamManagement->isEnabled() && !d->streamManagement->isResumming())
+    {
+        debug("SM SENT REQUEST");
+        QByteArray data;
+        QXmlStreamWriter xmlStream(&data);
+        d->streamManagement->requestToXml(&xmlStream);
+
+        sendData(data);
+    }
+}
+
+bool QXmppOutgoingClient::isStreamManagement(const QDomElement &element)
+{
+    if(element.namespaceURI() == ns_stream_management)
+        return true;
+    else return false;
+}
+
+bool QXmppOutgoingClient::bindResource()
+{
+    debug("Binding resource");
+    QXmppBindIq bind;
+    bind.setType(QXmppIq::Set);
+    bind.setResource(configuration().resource());
+    d->bindId = bind.id();
+    return sendPacket(bind);
+}
+
+bool QXmppOutgoingClient::iQsSecuirityCheck(const QDomElement &element)
+{
+    if( element.tagName() == "iq")
+    {
+        // Validating Info/Query (IQ) stanzas in the Extensible Messaging and Presence Protocol (XMPP)
+        // draft-alkemade-xmpp-iq-validation-00
+        // http://datatracker.ietf.org/doc/draft-alkemade-xmpp-iq-validation/?include_text=1
+
+        QXmppIq iqPacket;
+        iqPacket.parse(element);
+        if(iqPacket.type() == QXmppIq::Result || iqPacket.type() == QXmppIq::Error)
+        {
+            if(!d->iqIds.contains(iqPacket.id())){
+                warning(QString("IQ Security: IQ id %1 does not match. Packet discarded").arg(iqPacket.id()));
+                return false;
+            }else{
+                if( ( iqPacket.from() == d->iqIds.value(iqPacket.id()) ) ||
+                        ( iqPacket.from().isEmpty() ) ||
+                        ( iqPacket.from() == d->config.domain()) ||
+                        ( iqPacket.from() == d->config.jidBare() ) ||
+                        ( iqPacket.from() == d->config.jid() )
+                     )
+                {
+                    d->iqIds.remove(iqPacket.id());
+                }else{
+                    warning(QString("IQ Security: IQ id %1 from %2 does not match. Packet discarded").arg(iqPacket.id()).arg(iqPacket.from()));
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+
+
+}
+
+void QXmppOutgoingClient::handleStreamManagement(const QDomElement &element)
+{
+
+    if(element.tagName() == "enabled")
+    {
+        d->streamManagement->enabledReceived(element);
+        if(d->streamManagement->isEnabled())
+           emit streamManagementEnabled(d->streamManagement->isResumeEnabled());
+
+    }else if(element.tagName() == "r")
+    {
+        debug("SM REQUEST RECV");
+        sendStreamManagementAck();
+    }else if(element.tagName() == "a")
+    {
+        d->streamManagement->ackReceived(element);
+    }else if(element.tagName() == "resumed"){
+        if(element.hasAttribute("previd"))
+        {
+            if(element.attribute("previd") == d->streamManagement->resumeId())
+            {
+                if(element.hasAttribute("h"))
+                {
+                    foreach(const QXmppStanza *stanza, d->streamManagement->outBoundBuffer() )
+                    {
+                        sendPacket(*stanza);
+                    }
+                    d->streamManagement->resumedReceived();
+                    d->sessionStarted = true;
+                    emit streamManagementResumed(true);
+                }
+            }else{
+                warning("Resume IDs did not match");
+
+                if(!bindResource())
+                    warning("Problem binding the resource");
+
+                //notify that resume has failed
+                emit streamManagementResumed(false);
+                return;
+            }
+        }
+    }else if(element.tagName() == "failed")
+    {
+        // If resume has failed
+        if(d->streamManagement->isResumming()){
+            //bind resource
+            warning("Stream Management Resume failed");
+
+            if(!bindResource())
+                warning("Problem binding the resource");
+
+            //notify that resume has failed
+            emit streamManagementResumed(false);
+            return;
+        }
+
+        d->streamManagement->failedReceived(element, d->xmppStreamError);
+        emit streamManagementError(d->xmppStreamError);
+    }
 }
 
 /// Returns the type of the last XMPP stream error that occured.

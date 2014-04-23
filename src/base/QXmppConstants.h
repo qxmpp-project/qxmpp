@@ -86,10 +86,15 @@ extern const char* ns_compress;
 extern const char* ns_compressFeature;
 // XEP-0145: Annotations
 extern const char* ns_rosternotes;
+// XEP-0152: Reachability Addresses
+extern const char* ns_reach;
+extern const char* ns_reach_notify;
 // XEP-0153: vCard-Based Avatars
 extern const char* ns_vcard_update;
 // XEP-0158: CAPTCHA Forms
 extern const char* ns_captcha;
+// XEP-0163: Personal Eventing Protocol
+extern const char* ns_personal_eventing_protocol;
 // XEP-0166: Jingle
 extern const char* ns_jingle;
 extern const char* ns_jingle_ice_udp;
@@ -99,6 +104,8 @@ extern const char* ns_jingle_rtp_audio;
 extern const char* ns_jingle_rtp_video;
 // XEP-0184: Message Receipts
 extern const char* ns_message_receipts;
+// XEP-0198: Stream Management
+extern const char* ns_stream_management;
 // XEP-0199: XMPP Ping
 extern const char* ns_ping;
 // XEP-0202: Entity Time
@@ -115,5 +122,17 @@ extern const char* ns_attention;
 extern const char* ns_bob;
 // XEP-0249: Direct MUC Invitations
 extern const char* ns_conference;
+// XEP-0296: Message Forwarding
+extern const char* ns_stanza_forwarding;
+// XEP-0313: Message Archieve Management
+extern const char* ns_simple_archive;
+// XEP-0333: Char Markers
+extern const char* ns_chat_markers;
+// XEP-0308: Last Message Correction
+extern const char* ns_replace_message;
+// XEP-0280: Message Carbons
+extern const char* ns_message_carbons;
+// XEP-0334: Message Processing Hints:
+extern const char * ns_message_processing_hints;
 
 #endif // QXMPPCONSTANTS_H

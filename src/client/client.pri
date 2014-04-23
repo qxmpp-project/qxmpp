@@ -15,6 +15,7 @@ INSTALL_HEADERS += \
     client/QXmppRemoteMethod.h \
     client/QXmppRosterManager.h \
     client/QXmppRpcManager.h \
+    client/QXmppSimpleArchiveManager.h \
     client/QXmppTransferManager.h \
     client/QXmppTransferManager_p.h \
     client/QXmppVCardManager.h \
@@ -37,6 +38,11 @@ SOURCES += \
     client/QXmppRemoteMethod.cpp \
     client/QXmppRosterManager.cpp \
     client/QXmppRpcManager.cpp \
+    client/QXmppSimpleArchiveManager.cpp \
     client/QXmppTransferManager.cpp \
     client/QXmppVCardManager.cpp \
-    client/QXmppVersionManager.cpp
+    client/QXmppVersionManager.cpp \
+    client/QXmppPEPManager.cpp
+
+HEADERS += \
+    client/QXmppPEPManager.h

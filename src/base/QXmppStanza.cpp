@@ -29,9 +29,10 @@
 #include "QXmppConstants.h"
 
 #include <QDomElement>
+#include <QUuid>
 #include <QXmlStreamWriter>
 
-uint QXmppStanza::s_uniqeIdNo = 0;
+
 
 class QXmppExtendedAddressPrivate : public QSharedData
 {
@@ -137,7 +138,7 @@ bool QXmppExtendedAddress::isValid() const
     return !d->type.isEmpty() && !d->jid.isEmpty();
 }
 
-/// \cond
+/// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
     d->delivered = element.attribute("delivered") == "true";
@@ -157,7 +158,7 @@ void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeAttribute("type", d->type);
     xmlWriter->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 QXmppStanza::Error::Error():
     m_code(0),
@@ -416,7 +417,7 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 
     writer->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 class QXmppStanzaPrivate : public QSharedData
 {
@@ -582,8 +583,7 @@ void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addres
 void QXmppStanza::generateAndSetNextId()
 {
     // get back
-    ++s_uniqeIdNo;
-    d->id = "qxmpp" + QString::number(s_uniqeIdNo);
+    d->id = "qxmpp" + QUuid::createUuid().toString();
 }
 
 void QXmppStanza::parse(const QDomElement &element)
@@ -606,6 +606,11 @@ void QXmppStanza::parse(const QDomElement &element)
             d->extendedAddresses << address;
         addressElement = addressElement.nextSiblingElement("address");
     }
+}
+
+QXmppStanza::StanzaType QXmppStanza::getStanzaType() const
+{
+    return Unkown;
 }
 
 void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const

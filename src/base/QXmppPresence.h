@@ -73,6 +73,48 @@ public:
 /// (empty photo element) and mere support for the protocol (empty update child).
     };
 
+    /// \cond
+    // deprecated since 0.6.2
+    class QXMPP_EXPORT Status
+    {
+    public:
+        /// This enum is used to describe an availability status.
+        enum Type
+        {
+            Online = 0,  ///< The entity or resource is online.
+            Away,        ///< The entity or resource is temporarily away.
+            XA,          ///< The entity or resource is away for an extended period.
+            DND,         ///< The entity or resource is busy ("Do Not Disturb").
+            Chat,        ///< The entity or resource is actively interested in chatting.
+            Invisible    ///< obsolete XEP-0018: Invisible Presence
+        };
+
+        Status(QXmppPresence::Status::Type type = QXmppPresence::Status::Online,
+            const QString &statusText = "", int priority = 0);
+
+        QXmppPresence::Status::Type type() const;
+        void setType(QXmppPresence::Status::Type);
+
+        QString statusText() const;
+        void setStatusText(const QString&);
+
+        int priority() const;
+        void setPriority(int);
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+
+    private:
+        QXmppPresence::Status::Type m_type;
+        QString m_statusText;
+        int m_priority;
+    };
+
+    QXmppPresence::Status Q_DECL_DEPRECATED &status();
+    const QXmppPresence::Status Q_DECL_DEPRECATED &status() const;
+    void Q_DECL_DEPRECATED setStatus(const QXmppPresence::Status&);
+    /// \endcond
+
     QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available);
     QXmppPresence(const QXmppPresence &other);
     ~QXmppPresence();
@@ -94,7 +136,9 @@ public:
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    StanzaType getStanzaType()const;
     /// \endcond
+    ///
 
     // XEP-0045: Multi-User Chat
     QXmppMucItem mucItem() const;
