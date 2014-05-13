@@ -817,6 +817,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 
     // XEP-0308: Last Message Correction
     if(d->replace) {
+        if(d->body.isEmpty())
+        {
+            //Add the an empty body elemnt
+            xmlWriter->writeEmptyElement("body");
+        }
         xmlWriter->writeStartElement("replace");
         xmlWriter->writeAttribute("id",d->replaceId);
         xmlWriter->writeAttribute("xmlns",ns_replace_message);

@@ -48,6 +48,7 @@ private slots:
     void testMessageCarbons();
     void testProcessingHints();
     void testReplaceMessage();
+    void testReplaceWithEmptyMessage();
     void testSubextensions();
 };
 
@@ -622,6 +623,7 @@ void tst_QXmppMessage::testReplaceMessage()
     parsePacket(replaceMessage, replaceXml);
     QCOMPARE(replaceMessage.isReplace(), true);
     QCOMPARE(replaceMessage.replaceId(), QString("bad1"));
+    QCOMPARE(replaceMessage.body(), QString("But soft, what light through yonder window breaks?"));
 
 
     const QByteArray replaceSerialisation(
@@ -634,6 +636,34 @@ void tst_QXmppMessage::testReplaceMessage()
     serialisationMessage.setTo("juliet@capulet.net/balcony");
     serialisationMessage.setId("good1");
     serialisationMessage.setBody("But soft, what light through yonder window breaks?");
+    serialisationMessage.setReplace("bad1");
+
+    serializePacket(serialisationMessage, replaceSerialisation);
+}
+
+void tst_QXmppMessage::testReplaceWithEmptyMessage()
+{
+    const QByteArray replaceXml(
+                "<message to='juliet@capulet.net/balcony' id='good1'>"
+                  "<body/>"
+                  "<replace id='bad1' xmlns='urn:xmpp:message-correct:0'/>"
+                "</message>");
+    QXmppMessage replaceMessage;
+    parsePacket(replaceMessage, replaceXml);
+    QCOMPARE(replaceMessage.isReplace(), true);
+    QCOMPARE(replaceMessage.replaceId(), QString("bad1"));
+    QCOMPARE(replaceMessage.body(), QString(""));
+
+    const QByteArray replaceSerialisation(
+                "<message id=\"good1\" to=\"juliet@capulet.net/balcony\" type=\"chat\">"
+                  "<body/>"
+                  "<replace id=\"bad1\" xmlns=\"urn:xmpp:message-correct:0\"/>"
+                "</message>");
+
+    QXmppMessage serialisationMessage;
+    serialisationMessage.setTo("juliet@capulet.net/balcony");
+    serialisationMessage.setId("good1");
+    serialisationMessage.setBody("");
     serialisationMessage.setReplace("bad1");
 
     serializePacket(serialisationMessage, replaceSerialisation);
