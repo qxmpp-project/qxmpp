@@ -60,8 +60,18 @@ public:
         Paused,     ///< User had been composing but now has stopped.
     };
 
+    /// This enum describes a chat marker as defined by
+    /// XEP-0333 : Char Markers
+    enum Marker {
+        NoMarker = 0,
+        Received,
+        Displayed,
+        Acknowledged
+    };
+
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
                  const QString& body = QString(), const QString& thread = QString());
+
     QXmppMessage(const QXmppMessage &other);
     ~QXmppMessage();
 
@@ -106,6 +116,14 @@ public:
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
 
+    // XEP-0333
+    bool isMarkable() const;
+    void setMarkable(const bool);
+    Marker marker() const;
+    QString markedId() const;
+    QString markedThread() const;
+    void setMarker(const Marker, const QString& id, const QString& thread = QString());
+    
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
