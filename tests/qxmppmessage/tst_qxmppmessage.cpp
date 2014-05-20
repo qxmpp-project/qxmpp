@@ -324,6 +324,7 @@ void tst_QXmppMessage::testSubextensions()
         "</message>"
         "</forwarded>"
         "</result>"
+        "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
