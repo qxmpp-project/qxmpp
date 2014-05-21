@@ -338,17 +338,17 @@ void tst_QXmppMessage::testProcessingHints()
                          "to=\"juliet@capulet.lit/laptop\" "
                          "from=\"romeo@montague.lit/laptop\" "
                          "type=\"chat\">"
-                       "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
-                       "<no-copy xmlns=\"urn:xmpp:hints\"/>"
-                       "<no-store xmlns=\"urn:xmpp:hints\"/>"
-                       "<allow-permanent-storage xmlns=\"urn:xmpp:hints\"/>"
-                     "</message>");
+                         "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+                         "<no-store xmlns=\"urn:xmpp:hints\"/>"
+                         "<no-copy xmlns=\"urn:xmpp:hints\"/>"
+                         "<allow-permanent-storage xmlns=\"urn:xmpp:hints\"/>"
+                         "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.hasHint(QXmppMessage::NoCopies), true);
     QCOMPARE(message.hasHint(QXmppMessage::NoStorage), true);
-    QCOMPARE(message.hasHint(QXmppMessage::AllowPermantStorage), true);
+    QCOMPARE(message.hasHint(QXmppMessage::AllowPermanentStorage), true);
 
     QXmppMessage message2;
     message2.setType(QXmppMessage::Chat);
@@ -357,7 +357,7 @@ void tst_QXmppMessage::testProcessingHints()
     message2.setBody(QString("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
     message2.addHint(QXmppMessage::NoCopies);
     message2.addHint(QXmppMessage::NoStorage);
-    message2.addHint(QXmppMessage::AllowPermantStorage);
+    message2.addHint(QXmppMessage::AllowPermanentStorage);
     serializePacket(message2, xml);
 }
 

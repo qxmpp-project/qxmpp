@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QXmlStreamWriter>
 #include <QPair>
+#include <QSet>
 
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
@@ -89,7 +90,7 @@ public:
     QString mucInvitationReason;
 
     // XEP-0334: Message Processing Hints
-    QList<QXmppMessage::Hint> hints;
+    QSet<QXmppMessage::Hint> hints;
 
 };
 
@@ -446,13 +447,13 @@ void QXmppMessage::parse(const QDomElement &element)
 
     // XEP-0334: Message Processing Hints
     QDomElement hintElement;
-    for (int i = NoPermanentStorage; i <= AllowPermantStorage; i++)
+    for (int i = NoPermanentStorage; i <= AllowPermanentStorage; i++)
     {
         hintElement = element.firstChildElement(hint_types[i]);
         if (!hintElement.isNull() &&
             hintElement.namespaceURI() == ns_message_processing_hints)
         {
-            d->hints.append(static_cast<QXmppMessage::Hint>(i));
+            d->hints.insert(static_cast<QXmppMessage::Hint>(i));
         }
     }
 
@@ -593,23 +594,26 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 }
 /// \endcond
 
-bool QXmppMessage::hasHint(const Hint& hint)
+/// Returns true if the message contains the hint passed, as defined
+/// XEP-0334: Message Processing Hints
+
+bool QXmppMessage::hasHint(const Hint& hint) const
 {
     return d->hints.contains(hint);
 }
 
+/// Adds a hint to the message, as defined
+/// XEP-0334: Message Processing Hints
+
 void QXmppMessage::addHint(const Hint& hint)
 {
-    if (!hasHint(hint))
-    {
-        d->hints.append(hint);
-    }
+    d->hints.insert(hint);
 }
+
+/// Removes a hint from the message, as defined
+/// XEP-0334: Message Processing Hints
 
 void QXmppMessage::removeHint(const Hint& hint)
 {
-    if (hasHint(hint))
-    {
-        d->hints.removeAll(hint);
-    }
+    d->hints.remove(hint);
 }

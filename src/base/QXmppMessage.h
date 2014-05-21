@@ -65,7 +65,7 @@ public:
         NoPermanentStorage = 0,
         NoStorage,
         NoCopies,
-        AllowPermantStorage
+        AllowPermanentStorage
     };
 
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
@@ -115,7 +115,7 @@ public:
     void setXhtml(const QString &xhtml);
 
     // XEP-0334: Message Processing Hints
-    bool hasHint(const Hint& hint);
+    bool hasHint(const Hint& hint) const;
     void addHint(const Hint& hint);
     void removeHint(const Hint& hint);
 
