@@ -379,38 +379,68 @@ namespace
     }
 }
 
+/// Returns true if a message is markable, as defined
+/// XEP-0333: Chat Markers.
+
 bool QXmppMessage::isMarkable() const
 {
     return d->markable;
 }
+
+/// Sets if the message is markable, as defined
+/// XEP-0333: Chat Markers.
 
 void QXmppMessage::setMarkable(const bool markable)
 {
     d->markable = markable;
 }
 
-QXmppMessage::Marker QXmppMessage::marker() const
-{
-    return d->marker;
-}
+/// Returns the message's marker id, as defined
+/// XEP-0333: Chat Markers.
 
 QString QXmppMessage::markedId() const
 {
     return d->markedId;
 }
 
+/// Sets the message's marker id, as defined
+/// XEP-0333: Chat Markers.
+
+void QXmppMessage::setMarkerId(const QString &markerId)
+{
+    d->markedId = markerId;
+}
+
+/// Returns the message's marker thread, as defined
+/// XEP-0333: Chat Markers.
+
 QString QXmppMessage::markedThread() const
 {
     return d->markedThread;
 }
 
-void QXmppMessage::setMarker(const Marker marker,
-                             const QString& id,
-                             const QString& thread)
+/// Sets the message's marked thread, as defined
+/// XEP-0333: Chat Markers.
+
+void QXmppMessage::setMarkedThread(const QString &markedThread)
+{
+    d->markedThread = markedThread;
+}
+
+/// Returns the message's marker, as defined
+/// XEP-0333: Chat Markers.
+
+QXmppMessage::Marker QXmppMessage::marker() const
+{
+    return d->marker;
+}
+
+/// Sets the message's marker, as defined
+/// XEP-0333: Chat Markers
+
+void QXmppMessage::setMarker(const Marker marker)
 {
     d->marker = marker;
-    d->markedId = id;
-    d->markedThread = thread;
 }
 
 /// \cond

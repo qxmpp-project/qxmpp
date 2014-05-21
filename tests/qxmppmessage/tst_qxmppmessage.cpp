@@ -465,7 +465,8 @@ void tst_QXmppMessage::testChatMarkers()
                 "</message>");
 
     serialisationMessage.setMarkable(false);
-    serialisationMessage.setMarker(QXmppMessage::Received, "message-2");
+    serialisationMessage.setMarker(QXmppMessage::Received);
+    serialisationMessage.setMarkerId("message-2");
     serializePacket(serialisationMessage, receivedSerialisation);
 
     const QByteArray receivedThreadSerialisation(
@@ -479,7 +480,9 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Received, "message-2", "sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Received);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
     serializePacket(serialisationMessage, receivedThreadSerialisation);
 
     const QByteArray displayedThreadSerialisation(
@@ -493,7 +496,9 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Displayed, "message-2", "sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Displayed);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
     serializePacket(serialisationMessage, displayedThreadSerialisation);
 
     const QByteArray acknowledgedThreadSerialisation(
@@ -507,7 +512,9 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Acknowledged, "message-2", "sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Acknowledged);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
     serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
 }
 

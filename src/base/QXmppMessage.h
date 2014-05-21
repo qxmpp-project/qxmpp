@@ -119,11 +119,16 @@ public:
     // XEP-0333
     bool isMarkable() const;
     void setMarkable(const bool);
-    Marker marker() const;
+
     QString markedId() const;
+    void setMarkerId(const QString&);
+
     QString markedThread() const;
-    void setMarker(const Marker, const QString& id, const QString& thread = QString());
-    
+    void setMarkedThread(const QString&);
+
+    Marker marker() const;
+    void setMarker(const Marker);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
