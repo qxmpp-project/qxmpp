@@ -115,5 +115,7 @@ extern const char* ns_attention;
 extern const char* ns_bob;
 // XEP-0249: Direct MUC Invitations
 extern const char* ns_conference;
+// XEP-0296: Message Forwarding
+extern const char* ns_stanza_forwarding;
 
 #endif // QXMPPCONSTANTS_H

@@ -105,7 +105,12 @@ public:
 
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
-
+    
+    // XEP-0297
+    bool hasForwarded() const;
+    QXmppMessage forwarded() const;
+    void setForwarded(const QXmppMessage& forwarded);
+    
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
