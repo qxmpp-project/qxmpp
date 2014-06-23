@@ -48,6 +48,13 @@ static const char* message_types[] = {
     "headline"
 };
 
+static const char* marker_types[] = {
+    "",
+    "received",
+    "displayed",
+    "acknowledged"
+};
+
 static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 
 enum StampType
@@ -80,6 +87,12 @@ public:
     QString mucInvitationJid;
     QString mucInvitationPassword;
     QString mucInvitationReason;
+
+    // XEP-0333: Chat Markers
+    bool markable;
+    QXmppMessage::Marker marker;
+    QString markedId;
+    QString markedThread;
 };
 
 /// Constructs a QXmppMessage.
@@ -101,6 +114,9 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
     d->body = body;
     d->thread = thread;
     d->receiptRequested = false;
+
+    d->markable = false;
+    d->marker = NoMarker;
 }
 
 /// Constructs a copy of \a other.
@@ -363,6 +379,70 @@ namespace
     }
 }
 
+/// Returns true if a message is markable, as defined
+/// XEP-0333: Chat Markers.
+
+bool QXmppMessage::isMarkable() const
+{
+    return d->markable;
+}
+
+/// Sets if the message is markable, as defined
+/// XEP-0333: Chat Markers.
+
+void QXmppMessage::setMarkable(const bool markable)
+{
+    d->markable = markable;
+}
+
+/// Returns the message's marker id, as defined
+/// XEP-0333: Chat Markers.
+
+QString QXmppMessage::markedId() const
+{
+    return d->markedId;
+}
+
+/// Sets the message's marker id, as defined
+/// XEP-0333: Chat Markers.
+
+void QXmppMessage::setMarkerId(const QString &markerId)
+{
+    d->markedId = markerId;
+}
+
+/// Returns the message's marker thread, as defined
+/// XEP-0333: Chat Markers.
+
+QString QXmppMessage::markedThread() const
+{
+    return d->markedThread;
+}
+
+/// Sets the message's marked thread, as defined
+/// XEP-0333: Chat Markers.
+
+void QXmppMessage::setMarkedThread(const QString &markedThread)
+{
+    d->markedThread = markedThread;
+}
+
+/// Returns the message's marker, as defined
+/// XEP-0333: Chat Markers.
+
+QXmppMessage::Marker QXmppMessage::marker() const
+{
+    return d->marker;
+}
+
+/// Sets the message's marker, as defined
+/// XEP-0333: Chat Markers
+
+void QXmppMessage::setMarker(const Marker marker)
+{
+    d->marker = marker;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -432,6 +512,36 @@ void QXmppMessage::parse(const QDomElement &element)
 
     // XEP-0224: Attention
     d->attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
+
+    // XEP-0333: Chat Markers
+    QDomElement markableElement = element.firstChildElement("markable");
+    if (!markableElement.isNull())
+    {
+        d->markable = true;
+    }
+    // check for all the marker types
+    QDomElement chatStateElement;
+    QXmppMessage::Marker marker = QXmppMessage::NoMarker;
+    for (int i = Received; i <= Acknowledged; i++)
+    {
+        chatStateElement = element.firstChildElement(marker_types[i]);
+        if (!chatStateElement.isNull() &&
+            chatStateElement.namespaceURI() == ns_chat_markers)
+        {
+            marker = static_cast<QXmppMessage::Marker>(i);
+            break;
+        }
+    }
+    // if marker is present, check it's the right ns
+    if (!chatStateElement.isNull())
+    {
+        if (chatStateElement.namespaceURI() == ns_chat_markers)
+        {
+            d->marker = marker;
+            d->markedId = chatStateElement.attribute("id", QString());
+            d->markedThread = chatStateElement.attribute("thread", QString());
+        }
+    }
 
     const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
 
@@ -552,6 +662,22 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
             xmlWriter->writeAttribute("password", d->mucInvitationPassword);
         if (!d->mucInvitationReason.isEmpty())
             xmlWriter->writeAttribute("reason", d->mucInvitationReason);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0333: Chat Markers
+    if (d->markable) {
+        xmlWriter->writeStartElement("markable");
+        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
+        xmlWriter->writeEndElement();
+    }
+    if (d->marker != NoMarker) {
+        xmlWriter->writeStartElement(marker_types[d->marker]);
+        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
+        xmlWriter->writeAttribute("id", d->markedId);
+        if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
+            xmlWriter->writeAttribute("thread", d->markedThread);
+        }
         xmlWriter->writeEndElement();
     }
 
