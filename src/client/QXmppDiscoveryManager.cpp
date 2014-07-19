@@ -115,7 +115,8 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
         << ns_chat_states       // XEP-0085: Chat State Notifications
         << ns_capabilities      // XEP-0115: Entity Capabilities
         << ns_ping              // XEP-0199: XMPP Ping
-        << ns_attention;        // XEP-0224: Attention
+        << ns_attention         // XEP-0224: Attention
+        << ns_chat_markers;     // XEP-0333: Chat Markers
 
     foreach(QXmppClientExtension* extension, client()->extensions())
     {

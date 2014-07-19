@@ -43,6 +43,7 @@ private slots:
     void testState();
     void testXhtml();
     void testSubextensions();
+    void testChatMarkers();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -329,6 +330,192 @@ void tst_QXmppMessage::testSubextensions()
     QCOMPARE(message.extensions().size(), 1);
     QCOMPARE(message.extensions().first().tagName(), QLatin1String("result"));
     serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testChatMarkers()
+{
+    const QByteArray markableXml(
+                "<message "
+                    "from='northumberland@shakespeare.lit/westminster' "
+                    "id='message-1' "
+                    "to='ingrichard@royalty.england.lit/throne'>"
+                 "<thread>sleeping</thread>"
+                 "<body>My lord, dispatch; read o'er these articles.</body>"
+                 "<markable xmlns='urn:xmpp:chat-markers:0'/>"
+                "</message>");
+
+    QXmppMessage markableMessage;
+    parsePacket(markableMessage, markableXml);
+    QCOMPARE(markableMessage.isMarkable(), true);
+    QCOMPARE(markableMessage.marker(), QXmppMessage::NoMarker);
+    QCOMPARE(markableMessage.id(), QString("message-1"));
+    QCOMPARE(markableMessage.markedId(), QString());
+    QCOMPARE(markableMessage.thread(), QString("sleeping"));
+    QCOMPARE(markableMessage.markedThread(), QString());
+
+    const QByteArray receivedXml(
+                "<message "
+                    "from='kingrichard@royalty.england.lit/throne' "
+                    "id='message-2' "
+                    "to='northumberland@shakespeare.lit/westminster'>"
+                  "<received xmlns='urn:xmpp:chat-markers:0' "
+                               "id='message-1' "
+                           "thread='sleeping'/>"
+                "</message>");
+
+    QXmppMessage receivedMessage;
+    parsePacket(receivedMessage, receivedXml);
+    QCOMPARE(receivedMessage.isMarkable(), false);
+    QCOMPARE(receivedMessage.marker(), QXmppMessage::Received);
+    QCOMPARE(receivedMessage.id(), QString("message-2"));
+    QCOMPARE(receivedMessage.markedId(), QString("message-1"));
+    QCOMPARE(receivedMessage.thread(), QString());
+    QCOMPARE(receivedMessage.markedThread(), QString("sleeping"));
+
+    const QByteArray displayedXml(
+                "<message "
+                    "from='kingrichard@royalty.england.lit/throne' "
+                    "id='message-2' "
+                    "to='northumberland@shakespeare.lit/westminster'>"
+                  "<displayed xmlns='urn:xmpp:chat-markers:0' "
+                               "id='message-1' "
+                           "thread='sleeping'/>"
+                "</message>");
+
+    QXmppMessage displayedMessage;
+    parsePacket(displayedMessage, displayedXml);
+    QCOMPARE(displayedMessage.isMarkable(), false);
+    QCOMPARE(displayedMessage.marker(), QXmppMessage::Displayed);
+    QCOMPARE(displayedMessage.id(), QString("message-2"));
+    QCOMPARE(displayedMessage.markedId(), QString("message-1"));
+    QCOMPARE(displayedMessage.thread(), QString());
+    QCOMPARE(displayedMessage.markedThread(), QString("sleeping"));
+
+    const QByteArray acknowledgedXml(
+                "<message "
+                    "from='kingrichard@royalty.england.lit/throne' "
+                    "id='message-2' "
+                    "to='northumberland@shakespeare.lit/westminster'>"
+                  "<acknowledged xmlns='urn:xmpp:chat-markers:0' "
+                               "id='message-1' "
+                           "thread='sleeping'/>"
+                "</message>");
+
+    QXmppMessage acknowledgedMessage;
+    parsePacket(acknowledgedMessage, acknowledgedXml);
+    QCOMPARE(acknowledgedMessage.isMarkable(), false);
+    QCOMPARE(acknowledgedMessage.marker(), QXmppMessage::Acknowledged);
+    QCOMPARE(acknowledgedMessage.id(), QString("message-2"));
+    QCOMPARE(acknowledgedMessage.markedId(), QString("message-1"));
+    QCOMPARE(acknowledgedMessage.thread(), QString());
+    QCOMPARE(acknowledgedMessage.markedThread(), QString("sleeping"));
+
+    const QByteArray emptyThreadXml(
+                "<message "
+                    "from='kingrichard@royalty.england.lit/throne' "
+                    "id='message-2' "
+                    "to='northumberland@shakespeare.lit/westminster'>"
+                  "<received xmlns='urn:xmpp:chat-markers:0' "
+                               "id='message-1'/>"
+                "</message>");
+
+    QXmppMessage emptyThreadMessage;
+    parsePacket(emptyThreadMessage, emptyThreadXml);
+    QCOMPARE(emptyThreadMessage.isMarkable(), false);
+    QCOMPARE(emptyThreadMessage.marker(), QXmppMessage::Received);
+    QCOMPARE(emptyThreadMessage.id(), QString("message-2"));
+    QCOMPARE(emptyThreadMessage.markedId(), QString("message-1"));
+    QCOMPARE(emptyThreadMessage.thread(), QString());
+    QCOMPARE(emptyThreadMessage.markedThread(), QString());
+
+    const QByteArray notMarkableSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\"/>");
+
+    QXmppMessage serialisationMessage;
+    serialisationMessage.setFrom("kingrichard@royalty.england.lit/throne");
+    serialisationMessage.setTo("northumberland@shakespeare.lit/westminster");
+    serialisationMessage.setId("message-3");
+    serialisationMessage.setMarkable(false);
+    serializePacket(serialisationMessage, notMarkableSerialisation);
+
+    const QByteArray markableSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                    "<markable xmlns=\"urn:xmpp:chat-markers:0\"/>"
+                "</message>");
+
+    serialisationMessage.setMarkable(true);
+    serializePacket(serialisationMessage, markableSerialisation);
+
+    const QByteArray receivedSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                    "<received xmlns=\"urn:xmpp:chat-markers:0\" "
+                               "id=\"message-2\"/>"
+                "</message>");
+
+    serialisationMessage.setMarkable(false);
+    serialisationMessage.setMarker(QXmppMessage::Received);
+    serialisationMessage.setMarkerId("message-2");
+    serializePacket(serialisationMessage, receivedSerialisation);
+
+    const QByteArray receivedThreadSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                    "<received xmlns=\"urn:xmpp:chat-markers:0\" "
+                               "id=\"message-2\" "
+                               "thread=\"sleeping\"/>"
+                "</message>");
+
+    serialisationMessage.setMarker(QXmppMessage::Received);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
+    serializePacket(serialisationMessage, receivedThreadSerialisation);
+
+    const QByteArray displayedThreadSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                    "<displayed xmlns=\"urn:xmpp:chat-markers:0\" "
+                               "id=\"message-2\" "
+                               "thread=\"sleeping\"/>"
+                "</message>");
+
+    serialisationMessage.setMarker(QXmppMessage::Displayed);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
+    serializePacket(serialisationMessage, displayedThreadSerialisation);
+
+    const QByteArray acknowledgedThreadSerialisation(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                    "<acknowledged xmlns=\"urn:xmpp:chat-markers:0\" "
+                               "id=\"message-2\" "
+                               "thread=\"sleeping\"/>"
+                "</message>");
+
+    serialisationMessage.setMarker(QXmppMessage::Acknowledged);
+    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkedThread("sleeping");
+    serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

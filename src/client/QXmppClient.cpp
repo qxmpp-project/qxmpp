@@ -456,6 +456,14 @@ QAbstractSocket::SocketError QXmppClient::socketError()
     return d->stream->socket()->error();
 }
 
+/// Returns the human-readable description of the last socket error if error() is QXmppClient::SocketError.
+///
+
+QString QXmppClient::socketErrorString() const
+{
+    return d->stream->socket()->errorString();
+}
+
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
 ///
 

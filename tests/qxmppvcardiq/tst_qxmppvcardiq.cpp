@@ -48,18 +48,19 @@ void tst_QXmppVCardIq::testAddress_data()
     QTest::addColumn<QString>("postcode");
     QTest::addColumn<QString>("region");
     QTest::addColumn<QString>("street");
+    QTest::addColumn<bool>("equalsEmpty");
 
-    QTest::newRow("none") << QByteArray("<ADR/>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << "";
-    QTest::newRow("HOME") << QByteArray("<ADR><HOME/></ADR>") << int(QXmppVCardAddress::Home) << "" << "" << "" << "" << "";
-    QTest::newRow("WORK") << QByteArray("<ADR><WORK/></ADR>") << int(QXmppVCardAddress::Work) << "" << "" << "" << "" << "";
-    QTest::newRow("POSTAL") << QByteArray("<ADR><POSTAL/></ADR>") << int(QXmppVCardAddress::Postal) << "" << "" << "" << "" << "";
-    QTest::newRow("PREF") << QByteArray("<ADR><PREF/></ADR>") << int(QXmppVCardAddress::Preferred) << "" << "" << "" << "" << "";
+    QTest::newRow("none") << QByteArray("<ADR/>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << "" << true;
+    QTest::newRow("HOME") << QByteArray("<ADR><HOME/></ADR>") << int(QXmppVCardAddress::Home) << "" << "" << "" << "" << "" << false;
+    QTest::newRow("WORK") << QByteArray("<ADR><WORK/></ADR>") << int(QXmppVCardAddress::Work) << "" << "" << "" << "" << "" << false;
+    QTest::newRow("POSTAL") << QByteArray("<ADR><POSTAL/></ADR>") << int(QXmppVCardAddress::Postal) << "" << "" << "" << "" << "" << false;
+    QTest::newRow("PREF") << QByteArray("<ADR><PREF/></ADR>") << int(QXmppVCardAddress::Preferred) << "" << "" << "" << "" << "" << false;
 
-    QTest::newRow("country") << QByteArray("<ADR><CTRY>France</CTRY></ADR>") << int(QXmppVCardAddress::None) << "France" << "" << "" << "" << "";
-    QTest::newRow("locality") << QByteArray("<ADR><LOCALITY>Paris</LOCALITY></ADR>") << int(QXmppVCardAddress::None) << "" << "Paris" << "" << "" << "";
-    QTest::newRow("postcode") << QByteArray("<ADR><PCODE>75008</PCODE></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "75008" << "" << "";
-    QTest::newRow("region") << QByteArray("<ADR><REGION>Ile de France</REGION></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "Ile de France" << "";
-    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << QString::fromUtf8("55 rue du faubourg Saint-Honoré");
+    QTest::newRow("country") << QByteArray("<ADR><CTRY>France</CTRY></ADR>") << int(QXmppVCardAddress::None) << "France" << "" << "" << "" << "" << false;
+    QTest::newRow("locality") << QByteArray("<ADR><LOCALITY>Paris</LOCALITY></ADR>") << int(QXmppVCardAddress::None) << "" << "Paris" << "" << "" << "" << false;
+    QTest::newRow("postcode") << QByteArray("<ADR><PCODE>75008</PCODE></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "75008" << "" << "" << false;
+    QTest::newRow("region") << QByteArray("<ADR><REGION>Ile de France</REGION></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "Ile de France" << "" << false;
+    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << QString::fromUtf8("55 rue du faubourg Saint-Honoré") << false;
 }
 
 void tst_QXmppVCardIq::testAddress()
@@ -71,6 +72,7 @@ void tst_QXmppVCardIq::testAddress()
     QFETCH(QString, postcode);
     QFETCH(QString, region);
     QFETCH(QString, street);
+    QFETCH(bool, equalsEmpty);
 
     QXmppVCardAddress address;
     parsePacket(address, xml);
@@ -81,6 +83,14 @@ void tst_QXmppVCardIq::testAddress()
     QCOMPARE(address.region(), region);
     QCOMPARE(address.street(), street);
     serializePacket(address, xml);
+
+    QXmppVCardAddress addressCopy = address;
+    QVERIFY2(addressCopy == address, "QXmppVCardAddres::operator==() fails");
+    QVERIFY2(!(addressCopy != address), "QXmppVCardAddres::operator!=() fails");
+
+    QXmppVCardAddress emptyAddress;
+    QCOMPARE(emptyAddress == address, equalsEmpty);
+    QCOMPARE(emptyAddress != address, !equalsEmpty);
 }
 
 void tst_QXmppVCardIq::testEmail_data()

@@ -86,6 +86,25 @@ QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
     return *this;
 }
 
+/// \brief Checks if two address objects represent the same address.
+
+bool operator==(const QXmppVCardAddress &left, const QXmppVCardAddress &right)
+{
+    return left.type() == right.type() &&
+            left.country() == right.country() &&
+            left.locality() == right.locality() &&
+            left.postcode() == right.postcode() &&
+            left.region() == right.region() &&
+            left.street() == right.street();
+}
+
+/// \brief Checks if two address objects represent different addresses.
+
+bool operator!=(const QXmppVCardAddress &left, const QXmppVCardAddress &right)
+{
+    return !(left == right);
+}
+
 /// Returns the country.
 
 QString QXmppVCardAddress::country() const
@@ -250,6 +269,21 @@ QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
     return *this;
 }
 
+/// \brief Checks if two email objects represent the same email address.
+
+bool operator==(const QXmppVCardEmail &left, const QXmppVCardEmail &right)
+{
+    return left.type() == right.type() &&
+            left.address() == right.address();
+}
+
+/// \brief Checks if two email objects represent different email addresses.
+
+bool operator!=(const QXmppVCardEmail &left, const QXmppVCardEmail &right)
+{
+    return !(left == right);
+}
+
 /// Returns the e-mail address.
 
 QString QXmppVCardEmail::address() const
@@ -351,6 +385,21 @@ QXmppVCardPhone& QXmppVCardPhone::operator=(const QXmppVCardPhone &other)
 QString QXmppVCardPhone::number() const
 {
     return d->number;
+}
+
+/// \brief Checks if two phone objects represent the same phone number.
+
+bool operator==(const QXmppVCardPhone &left, const QXmppVCardPhone &right)
+{
+    return left.type() == right.type() &&
+            left.number() == right.number();
+}
+
+/// \brief Checks if two phone objects represent different phone numbers.
+
+bool operator!=(const QXmppVCardPhone &left, const QXmppVCardPhone &right)
+{
+    return !(left == right);
 }
 
 /// Sets the phone \a number.
@@ -473,6 +522,23 @@ QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrgani
 {
     d = other.d;
     return *this;
+}
+
+/// \brief Checks if two organization objects represent the same organization.
+
+bool operator==(const QXmppVCardOrganization &left, const QXmppVCardOrganization &right)
+{
+    return left.organization() == right.organization() &&
+            left.unit() == right.unit() &&
+            left.title() == right.title() &&
+            left.role() == right.role();
+}
+
+/// \brief Checks if two organization objects represent different organizations.
+
+bool operator!=(const QXmppVCardOrganization &left, const QXmppVCardOrganization &right)
+{
+    return !(left == right);
 }
 
 /// Returns the name of the organization.
@@ -610,6 +676,34 @@ QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
     QXmppIq::operator=(other);
     d = other.d;
     return *this;
+}
+
+/// \brief Checks if two VCard objects represent the same VCard.
+
+bool operator==(const QXmppVCardIq &left, const QXmppVCardIq &right)
+{
+    return left.birthday() == right.birthday() &&
+            left.description() == right.description() &&
+            left.email() == right.email() &&
+            left.firstName() == right.firstName() &&
+            left.fullName() == right.fullName() &&
+            left.lastName() == right.lastName() &&
+            left.middleName() == right.middleName() &&
+            left.nickName() == right.nickName() &&
+            left.photo() == right.photo() &&
+            left.photoType() == right.photoType() &&
+            left.url() == right.url() &&
+            left.addresses() == right.addresses() &&
+            left.emails() == right.emails() &&
+            left.phones() == right.phones() &&
+            left.organization() == right.organization();
+}
+
+/// \brief Checks if two VCard objects represent different VCards.
+
+bool operator!=(const QXmppVCardIq &left, const QXmppVCardIq &right)
+{
+    return !(left == right);
 }
 
 /// Returns the date of birth of the individual associated with the vCard.

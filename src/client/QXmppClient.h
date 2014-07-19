@@ -149,6 +149,7 @@ public:
     void setLogger(QXmppLogger *logger);
 
     QAbstractSocket::SocketError socketError();
+    QString socketErrorString() const;
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
