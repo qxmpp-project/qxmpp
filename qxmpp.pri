@@ -33,6 +33,21 @@ android {
     QXMPP_INTERNAL_LIBS = -ldnsapi -lws2_32
 }
 
+!isEmpty(QXMPP_USE_SPEEX) {
+    DEFINES += QXMPP_USE_SPEEX
+    QXMPP_INTERNAL_LIBS += -lspeex
+}
+
+!isEmpty(QXMPP_USE_THEORA) {
+    DEFINES += QXMPP_USE_THEORA
+    QXMPP_INTERNAL_LIBS += -ltheoradec -ltheoraenc
+}
+
+!isEmpty(QXMPP_USE_VPX) {
+    DEFINES += QXMPP_USE_VPX
+    QXMPP_INTERNAL_LIBS += -lvpx
+}
+
 # Libraries for apps which use QXmpp
 QXMPP_LIBS = -l$${QXMPP_LIBRARY_NAME}
 contains(QXMPP_LIBRARY_TYPE,staticlib) {
