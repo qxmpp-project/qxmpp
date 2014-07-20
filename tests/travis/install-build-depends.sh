@@ -10,6 +10,8 @@ else
     sudo apt-get install qtbase5-dev
 fi
 
-if [ "$CONFIG" = "full" ]; then
-    sudo apt-get install -qq  libspeex-dev libtheora-dev
-fi
+case "$CONFIG" in
+full*)
+    sudo apt-get install -qq  libspeex-dev libtheora-dev libvpx-dev
+    ;;
+esac
