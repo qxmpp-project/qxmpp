@@ -9,6 +9,6 @@ env:
   - QT_SELECT=qt5 ; CONFIG=full
   - QT_SELECT=qt5 ; CONFIG=full-static
 install:
-  - tests/travis/install-build-depends.sh
+  - tests/travis/install-build-depends
 script:
-  - tests/travis/build-and-test.sh
+  - tests/travis/build-and-test
