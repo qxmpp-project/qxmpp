@@ -1,30 +1,44 @@
 #!/bin/sh
 set -e
 
-BUILD_FLAGS=""
+QMAKE_ARGS="QXMPP_PROFILE=true"
 
 if [ -n "$CC" ]; then
-    BUILD_FLAGS="$BUILD_FLAGS QMAKE_CC=$CC"
+    QMAKE_ARGS="$QMAKE_ARGS QMAKE_CC=$CC"
 fi
 
 
 if [ -n "$CXX" ]; then
-    BUILD_FLAGS="$BUILD_FLAGS QMAKE_CXX=$CXX"
+    QMAKE_ARGS="$QMAKE_ARGS QMAKE_CXX=$CXX"
 fi
 
 case "$CONFIG" in
 full*)
-    BUILD_FLAGS="$BUILD_FLAGS QXMPP_USE_SPEEX=1 QXMPP_USE_THEORA=1"
+    QMAKE_ARGS="$QMAKE_ARGS QXMPP_USE_SPEEX=1 QXMPP_USE_THEORA=1"
     ;;
 esac
 
 case "$CONFIG" in
 *static)
-    BUILD_FLAGS="$BUILD_FLAGS QXMPP_LIBRARY_TYPE=staticlib"
+    QMAKE_ARGS="$QMAKE_ARGS QXMPP_LIBRARY_TYPE=staticlib"
     ;;
 esac
 
-qmake $BUILD_FLAGS
+# compile
+qmake $QMAKE_ARGS
 make VERBOSE=1
 
+# run tests
 tests/run.py
+exit 0
+
+# generate coverage report
+TRACEFILE=coverage.info
+rm -f $TRACEFILE
+lcov --capture --directory src -o $TRACEFILE --no-external
+lcov --remove $TRACEFILE \*moc_\* -o $TRACEFILE.clean
+mv $TRACEFILE.clean $TRACEFILE
+
+rm -rf coverage
+genhtml -o coverage $TRACEFILE
+echo "ok"

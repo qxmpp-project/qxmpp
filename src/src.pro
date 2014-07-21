@@ -40,3 +40,10 @@ equals(QXMPP_LIBRARY_TYPE,staticlib) {
     QMAKE_PKGCONFIG_CFLAGS = -DQXMPP_SHARED
 }
 unix:QMAKE_CLEAN += -r pkgconfig lib$${TARGET}.prl
+
+# profiling support
+equals(QXMPP_PROFILE,true) {
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    QMAKE_LIBS += -lgcov
+    QMAKE_CLEAN += *.gcda *.gcov *.gcno
+}
