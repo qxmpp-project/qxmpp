@@ -25,6 +25,7 @@ SUBDIRS = \
     qxmpputils \
     qxmppvcardiq \
     qxmppversioniq \
+    qxmpplastactivityiq \
     qxmppstreammanagement \
     qxmpppep
 

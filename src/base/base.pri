@@ -13,6 +13,7 @@ INSTALL_HEADERS += \
     base/QXmppIbbIq.h \
     base/QXmppIq.h \
     base/QXmppJingleIq.h \
+    base/QXmppLastActivity.h \
     base/QXmppLogger.h \
     base/QXmppMessage.h \
     base/QXmppMucIq.h \
@@ -61,6 +62,7 @@ SOURCES += \
     base/QXmppIbbIq.cpp \
     base/QXmppIq.cpp \
     base/QXmppJingleIq.cpp \
+    base/QXmppLastActivity.cpp \
     base/QXmppLogger.cpp \
     base/QXmppMessage.cpp \
     base/QXmppMucIq.cpp \
