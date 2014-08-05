@@ -23,7 +23,7 @@ version 2.1 or later.
 ADDITIONAL XEP(s) 
 ================= 
    
-From [trulabs](https://github.com/trulabs/qxmpp) branch:
+From [trulabs](https://github.com/trulabs/qxmpp) fork:
 * XEP-0060 Filtered Notifications
 * XEP-0152 Reachability Addresses
 * XEP-0163 Personal Eventing Protocol (PEP)
@@ -34,6 +34,9 @@ From [trulabs](https://github.com/trulabs/qxmpp) branch:
 * XEP-0313 Message Archive Management
 * XEP-0333 Chat Markers
 * XEP-0334 Message Processing Hints
+
+From [unisotech](https://github.com/unisontech/qxmpp) fork:
+* XEP-0012 Last Activity
 
 BUILDING QXMPP
 ==============
