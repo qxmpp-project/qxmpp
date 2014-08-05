@@ -47,13 +47,17 @@ public:
     // id of the initial roster request
     QString rosterReqId;
 
+    // Stream Management Resume Enabled
+    bool   isResumeEnabled;
+
 private:
     QXmppRosterManager *q;
 };
 
 QXmppRosterManagerPrivate::QXmppRosterManagerPrivate(QXmppRosterManager *qq)
-    : isRosterReceived(false),
-    q(qq)
+    : isRosterReceived(false)
+    , isResumeEnabled(false)
+    , q(qq)
 {
 }
 
@@ -76,6 +80,14 @@ QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
 
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
                     this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(streamManagementEnabled(bool)),
+                    this, SLOT(_q_streamResumeEnabled(bool)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(streamManagementResumed(bool)),
+                    this, SLOT(_q_streamResumed(bool)));
     Q_ASSERT(check);
 }
 
@@ -111,9 +123,15 @@ void QXmppRosterManager::_q_connected()
 
 void QXmppRosterManager::_q_disconnected()
 {
-    d->entries.clear();
-    d->presences.clear();
-    d->isRosterReceived = false;
+    // In case that resume is enabled the roster must not be cleared until the a resume is attempted
+    // where depending on the success it will be kept or cleared
+    if(!d->isResumeEnabled)
+    {
+        debug("Socket disconnected, roster kept until resume attempts");
+        d->entries.clear();
+        d->presences.clear();
+        d->isRosterReceived = false;
+    }
 }
 
 /// \cond
@@ -222,6 +240,22 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence& presence)
     }
 }
 
+void QXmppRosterManager::_q_streamResumed(bool resumed)
+{
+    if(!resumed)
+    {
+        debug("Stream resumed failed - Roster cleared");
+        d->entries.clear();
+        d->presences.clear();
+        d->isRosterReceived = false;
+    }
+}
+
+void QXmppRosterManager::_q_streamResumeEnabled(bool enabled)
+{
+      d->isResumeEnabled = enabled;
+}
+
 /// Refuses a subscription request.
 ///
 /// You can call this method in reply to the subscriptionRequest() signal.
@@ -327,6 +361,7 @@ bool QXmppRosterManager::unsubscribe(const QString &bareJid, const QString &reas
     return client()->sendPacket(packet);
 }
 
+
 /// Function to get all the bareJids present in the roster.
 ///
 /// \return QStringList list of all the bareJids
@@ -403,6 +438,7 @@ QXmppPresence QXmppRosterManager::getPresence(const QString& bareJid,
         return presence;
     }
 }
+
 
 /// Function to check whether the roster has been received or not.
 ///

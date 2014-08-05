@@ -132,6 +132,11 @@ void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
     xmlWriter->writeEndElement();
 }
 
+QXmppStanza::StanzaType QXmppIq::getStanzaType() const
+{
+    return Iq;
+}
+
 void QXmppIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
     foreach (const QXmppElement &extension, extensions())

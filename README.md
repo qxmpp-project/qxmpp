@@ -20,6 +20,21 @@ libraries such as speex and theora enable additional features.
 QXmpp is released under the terms of the GNU Lesser General Public License,
 version 2.1 or later.
 
+ADDITIONAL XEP(s) 
+================= 
+   
+From [trulabs](https://github.com/trulabs/qxmpp) branch:
+* XEP-0060 Filtered Notifications
+* XEP-0152 Reachability Addresses
+* XEP-0163 Personal Eventing Protocol (PEP)
+* XEP-0198 Stream Management
+* XEP-0280 Message Carbons
+* XEP-0297 Stanza Forwarding
+* XEP-0308 Last Message Correction
+* XEP-0313 Message Archive Management
+* XEP-0333 Chat Markers
+* XEP-0334 Message Processing Hints
+
 BUILDING QXMPP
 ==============
 
@@ -137,3 +152,4 @@ DISCUSSION GROUP
 Join QXmpp Discussion Group for queries, discussions and updates.
 
 http://groups.google.com/group/qxmpp
+
