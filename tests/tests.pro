@@ -18,12 +18,16 @@ SUBDIRS = \
     qxmpprtppacket \
     qxmppserver \
     qxmppsessioniq \
+    qxmppsimplearchiveiq \
     qxmppstanza \
     qxmppstreamfeatures \
     qxmppstunmessage \
     qxmpputils \
     qxmppvcardiq \
-    qxmppversioniq
+    qxmppversioniq \
+    qxmpplastactivityiq \
+    qxmppstreammanagement \
+    qxmpppep
 
 !isEmpty(QXMPP_AUTOTEST_INTERNAL) {
     SUBDIRS += qxmppcodec
