@@ -16,7 +16,7 @@ void tst_QXmppLastActivityIq::testLastActivityGet()
     const QByteArray xmlGet(
     "<iq id=\"last_activity_1\" to=\"juliet@capulet.com/balcony\" "
     "from=\"romeo@montague.net/orchard\" type=\"get\">"
-    "<query xmlns=\"jabber:iq:last\"/></iq>");
+    "<query xmlns=\"jabber:iq:last\"></query></iq>");
 
     QXmppLastActivityIq lastActivityIqGet;
     parsePacket(lastActivityIqGet, xmlGet);
@@ -41,7 +41,7 @@ void tst_QXmppLastActivityIq::testLastActivityResult()
     QCOMPARE(lastActivityIqResult.from(), QLatin1String("juliet@capulet.com/balcony"));
     QCOMPARE(lastActivityIqResult.type(), QXmppIq::Result);
     QCOMPARE(lastActivityIqResult.status(), QString("custom status"));
-    QCOMPARE(lastActivityIqResult.seconds(), 666);
+    QCOMPARE(lastActivityIqResult.seconds(), 666ui64);
     serializePacket(lastActivityIqResult, xmlResult);
 }
 
