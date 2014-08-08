@@ -38,6 +38,7 @@
 #include "QXmppEntityTimeManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppDiscoveryIq.h"
+#include "QXmppPEPManager.h"
 
 class QXmppClientPrivate
 {
@@ -222,6 +223,7 @@ QXmppClient::QXmppClient(QObject *parent)
     addExtension(new QXmppVersionManager);
     addExtension(new QXmppEntityTimeManager());
     addExtension(new QXmppDiscoveryManager());
+    addExtension(new QXmppPEPManager(true, true));
 }
 
 /// Destructor, destroys the QXmppClient object.
@@ -514,6 +516,15 @@ QXmppVersionManager& QXmppClient::versionManager()
 {
     return *findExtension<QXmppVersionManager>();
 }
+
+/// Returns the reference to QXmppPEPManager, implementation of XEP-0163.
+/// http://xmpp.org/extensions/xep-0163.html
+///
+QXmppPEPManager &QXmppClient::pepManager()
+{
+    return *findExtension<QXmppPEPManager>();
+}
+
 /// Sends a stream management request XEP-0198: Stream Management
 ///
 
