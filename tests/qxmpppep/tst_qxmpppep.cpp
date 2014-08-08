@@ -25,8 +25,11 @@
 #include "QXmppReachAddress.h"
 #include "QXmppPEPManager.h"
 #include "QXmppPubSubIq.h"
+#include"QXmppGaming.h"
+
 #include "util.h"
 #include "QXmppConstants.h"
+
 
 #include <QDebug>
 
@@ -41,6 +44,7 @@ private slots:
     void testHandleReachabilityAddressesEvent();
     void testReachabilityAddressReceivedSlot(const QString &jid, const QString &id, const QXmppReachAddress& reachAddres);
     void testPublishReachabilityAddress();
+    void testCreateGamingItem();
 private:
      QXmppPEPManager *m_PEPmanager;
 
@@ -226,6 +230,35 @@ void tst_QXmppPep::testPublishReachabilityAddress()
     serializePacket(publish, xml);
 }
 
+
+void tst_QXmppPep::testCreateGamingItem()
+{
+
+    // expected
+    const QByteArray expectedXml(
+                "<game xmlns=\"urn:xmpp:gaming:0\">"
+                  "<character_name>Ingralic</character_name>"
+                  "<character_profile>http://www.chesspark.com/Ingralic/</character_profile>"
+                  "<name>chess</name>"
+                  "<level>91</level>"
+                  "<server_address>http://www.chesspark.com/Server/</server_address>"
+                  "<server_name>Abyss</server_name>"
+                  "<uri>http://www.chesspark.com/</uri>"
+                "</game>");
+
+    // tests
+    QXmppGaming gaming;
+    parsePacket(gaming, expectedXml);
+    QCOMPARE(gaming.characterName(), QString("Ingralic"));
+    QCOMPARE(gaming.characterProfile(), QString("http://www.chesspark.com/Ingralic/"));
+    QCOMPARE(gaming.name(), QString("chess"));
+    QCOMPARE(gaming.level(), QString("91"));
+
+    QCOMPARE(gaming.serverAddress(), QString("http://www.chesspark.com/Server/"));
+    QCOMPARE(gaming.serverName(), QString("Abyss"));
+    QCOMPARE(gaming.uri(), QString("http://www.chesspark.com/"));
+    serializePacket(gaming, expectedXml);
+}
 
 QTEST_MAIN(tst_QXmppPep)
 #include "tst_qxmpppep.moc"

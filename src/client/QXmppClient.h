@@ -43,6 +43,7 @@ class QXmppDiscoveryIq;
 class QXmppRosterManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
+class QXmppPEPManager;
 
 /// \defgroup Core
 
@@ -156,6 +157,7 @@ public:
     QXmppRosterManager& rosterManager();
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
+    QXmppPEPManager& pepManager();
 
     void sendRequestStreamManagement();
 

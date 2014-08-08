@@ -35,7 +35,8 @@ INSTALL_HEADERS += \
     base/QXmppStun.h \
     base/QXmppUtils.h \
     base/QXmppVCardIq.h \
-    base/QXmppVersionIq.h
+    base/QXmppVersionIq.h \
+    base/QXmppGaming.h
 
 HEADERS += \
     base/QXmppCodec_p.h \
@@ -44,7 +45,8 @@ HEADERS += \
     base/QXmppSimpleArchivePreferenceIq.h \
     base/QXmppMessageCarbonsIq.h \
     base/QXmppReachAddress.h \
-    base/QXmppStreamManagement.h
+    base/QXmppStreamManagement.h \
+    base/QXmppGaming.h
 
 # Source files
 SOURCES += \
@@ -90,7 +92,8 @@ SOURCES += \
     base/QXmppSimpleArchivePreferenceIq.cpp \
     base/QXmppMessageCarbonsIq.cpp \
     base/QXmppReachAddress.cpp \
-    base/QXmppStreamManagement.cpp
+    base/QXmppStreamManagement.cpp \
+    base/QXmppGaming.cpp
 
 # DNS
 qt_version = $$QT_MAJOR_VERSION
