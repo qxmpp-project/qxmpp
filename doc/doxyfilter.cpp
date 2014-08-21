@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         setField(code, "HIDE_UNDOC_CLASSES", "YES");
         setField(code, "GENERATE_LATEX", "NO");
         setField(code, "HTML_TIMESTAMP", "NO");
-        setField(code, "INPUT", "../src");
+        setField(code, "INPUT", "index.doc ../src");
         setField(code, "INPUT_FILTER", QString::fromLocal8Bit(argv[0]));
         setField(code, "PROJECT_NAME", "QXmpp");
         setField(code, "PROJECT_NUMBER", QString("Version: %1.%2.%3").arg(

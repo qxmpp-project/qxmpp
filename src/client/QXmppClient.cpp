@@ -94,47 +94,6 @@ int QXmppClientPrivate::getNextReconnectTime() const
         return 60 * 1000;
 }
 
-/// \mainpage
-///
-/// QXmpp is a cross-platform C++ XMPP client library based on the Qt
-/// framework. It tries to use Qt's programming conventions in order to ease
-/// the learning curve for new programmers.
-///
-/// QXmpp based clients are built using QXmppClient instances which handle the
-/// establishment of the XMPP connection and provide a number of high-level
-/// "managers" to perform specific tasks. You can write your own managers to
-/// extend QXmpp by subclassing QXmppClientExtension.
-///
-/// <B>Main Class:</B>
-/// - QXmppClient
-///
-/// <B>Managers to perform specific tasks:</B>
-/// - QXmppRosterManager
-/// - QXmppVCardManager
-/// - QXmppTransferManager
-/// - QXmppMucManager
-/// - QXmppCallManager
-/// - QXmppArchiveManager
-/// - QXmppVersionManager
-/// - QXmppDiscoveryManager
-/// - QXmppEntityTimeManager
-///
-/// <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
-/// classes.
-/// - QXmppIq
-/// - QXmppMessage
-/// - QXmppPresence
-///
-/// <BR><BR>
-/// <B>Project Details:</B>
-///
-/// Project Page: https://github.com/qxmpp-project/qxmpp/
-/// <BR>
-/// Report Issues: https://github.com/qxmpp-project/qxmpp/issues/
-/// <BR>
-/// New Releases: https://github.com/qxmpp-project/qxmpp/downloads/
-///
-
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's constructor.
 /// The default value is 0.
