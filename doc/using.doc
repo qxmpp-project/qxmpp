@@ -1,0 +1,110 @@
+/*! \page using Using QXmpp
+
+
+<h2>Example: example_0_connected</h2>
+
+This example just connects to the xmpp server. And starts receiving presences (updates) from the server.
+After running this example, you can see this user online, if it's added in your roster (friends list).
+Logging type has been set to stdout. You can see the progress on the command line.
+This example is also available with the source code in the example directory.
+
+\code
+#include <QtCore/QCoreApplication>
+#include "QXmppClient.h"
+#include "QXmppLogger.h"
+
+int main(int argc, char *argv[])
+{
+    // create a Qt application
+    QCoreApplication a(argc, argv);
+   
+    // setting the logging type to stdout
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
+
+    // creating the object of the client class QXmppClient
+    // and then calling the connectToServer function to connect to gtalk server
+    QXmppClient client;
+    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
+
+    // run the application main loop
+    return a.exec();
+}
+\endcode
+
+<h2>Example: example_1_echoClient</h2>
+
+This is a very simple bot which echoes the message sent to it.
+Run this example, send it a message from a friend of this bot. You will receive the message back.
+This example shows how to receive and send messages.
+This example is also available with the source code in the example directory.
+
+\code
+// subclass the QXmppClient and create a new class echoClient
+// in the contructor the signal QXmppClient::messageReceived(const QXmppMessage&) 
+// is connected to the slot echoClient::messageReceived(const QXmppMessage&)
+// in the slot one can process the message received
+
+#include "QXmppClient.h"
+
+class echoClient : public QXmppClient
+{
+    Q_OBJECT
+
+public:
+    echoClient(QObject *parent = 0);
+    ~echoClient();
+
+public slots:
+    void messageReceived(const QXmppMessage&);
+};
+}}}
+\endcode
+
+\code
+#include "echoClient.h"
+#include "QXmppMessage.h"
+
+echoClient::echoClient(QObject *parent)
+    : QXmppClient(parent)
+{
+    bool check = connect(this, SIGNAL(messageReceived(const QXmppMessage&)),
+        SLOT(messageReceived(const QXmppMessage&)));
+    Q_ASSERT(check);
+}
+
+echoClient::~echoClient()
+{
+
+}
+
+// slot where message sent to this client is received
+// here getFrom() gives the sender and getBody() gives the message
+// using the function sendPacket message is sent back to the sender
+void echoClient::messageReceived(const QXmppMessage& message)
+{
+    QString from = message.getFrom();
+    QString msg = message.getBody();
+
+    sendPacket(QXmppMessage("", from, "Your message: " + msg));
+}
+}}}
+\endcode
+
+\code
+#include <QtCore/QCoreApplication>
+#include "echoClient.h"
+#include "QXmppLogger.h"
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+    
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
+
+    echoClient client;
+    client.connectToServer("qxmpp.test1@gmail.com", "qxmpp123");
+    return a.exec();
+}
+\endcode
+
+*/
