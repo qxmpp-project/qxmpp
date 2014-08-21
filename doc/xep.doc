@@ -1,0 +1,44 @@
+/*! \page xep XMPP Extensions
+
+This document lists the XMPP Extensions (XEP) available in QXmpp.
+
+Complete:
+- XEP-0004: Data Forms
+- XEP-0030: Service Discovery
+- XEP-0033: Extended Stanza Addressing
+- XEP-0045: Multi-User Chat
+- XEP-0047: In-Band Bytestreams
+- XEP-0048: Bookmarks
+- XEP-0054: vcard-temp
+- XEP-0059: Result Set Management
+- XEP-0065: SOCKS5 Bytestreams
+- XEP-0071: XHTML-IM
+- XEP-0078: Non-SASL Authentication
+- XEP-0082: XMPP Date and Time Profiles
+- XEP-0085: Chat State Notifications
+- XEP-0091: Legacy Delayed Delivery
+- XEP-0092: Software Version
+- XEP-0095: Stream Initiation
+- XEP-0096: SI File Transfer
+- XEP-0115: Entity Capabilities
+- XEP-0128: Service Discovery Extensions
+- XEP-0136: Message Archiving
+- XEP-0153: vCard-Based Avatars
+- XEP-0166: Jingle
+- XEP-0167: Jingle RTP Sessions
+- XEP-0176: Jingle ICE-UDP Transport Method
+- XEP-0184: Message Delivery Receipts
+- XEP-0199: XMPP Ping
+- XEP-0202: Entity Time
+- XEP-0203: Delayed Delivery
+- XEP-0221: Data Forms Media Element
+- XEP-0224: Attention
+
+Ongoing:
+- XEP-0009: Jabber-RPC
+
+TODO:
+- XEP-0060: Publish-Subscribe
+- XEP-0077: In-Band Registration
+
+*/
