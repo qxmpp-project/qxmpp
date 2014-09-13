@@ -29,7 +29,7 @@ qmake $QMAKE_ARGS
 make VERBOSE=1
 
 # run tests
-tests/run.py
+make check
 exit 0
 
 # generate coverage report
