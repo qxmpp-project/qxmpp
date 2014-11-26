@@ -890,7 +890,7 @@ QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
     encoder->setFormat(d->outgoingFormat);
     payload.setId(96);
     payload.setName("vp8");
-    payload.setClockrate(90000);
+    payload.setClockrate(256000);
     payload.setParameters(encoder->parameters());
     m_outgoingPayloadTypes << payload;
     delete encoder;
@@ -1022,7 +1022,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
 #endif
 #ifdef QXMPP_USE_VPX
         else if (payload.name().toLower() == "vp8") {
-            encoder = new QXmppVpxEncoder;
+            encoder = new QXmppVpxEncoder(payload.clockrate());
         }
 #endif
         if (encoder) {

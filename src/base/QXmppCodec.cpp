@@ -28,6 +28,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QSize>
+#include <QThread>
 
 #include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
@@ -63,6 +64,8 @@
 #define NSEGS       (8)     /* Number of A-law segments. */
 #define SEG_SHIFT   (4)     /* Left shift for segment number. */
 #define SEG_MASK    (0x70)  /* Segment field mask. */
+
+#define GOPSIZE 32
 
 enum FragmentType {
     NoFragment = 0,
@@ -1078,7 +1081,11 @@ public:
 
 bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
 {
-    if (vpx_codec_decode(&codec, (const uint8_t*)buffer.constData(), buffer.size(), NULL, 0) != VPX_CODEC_OK) {
+    if (vpx_codec_decode(&codec,
+                         (const uint8_t*)buffer.constData(),
+                         buffer.size(),
+                         NULL,
+                         VPX_DL_REALTIME) != VPX_CODEC_OK) {
         qWarning("Vpx packet could not be decoded: %s", vpx_codec_error_detail(&codec));
         return false;
     }
@@ -1117,7 +1124,15 @@ bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFra
 QXmppVpxDecoder::QXmppVpxDecoder()
 {
     d = new QXmppVpxDecoderPrivate;
-    if (vpx_codec_dec_init(&d->codec, vpx_codec_vp8_dx(), NULL, 0) != VPX_CODEC_OK) {
+    vpx_codec_flags_t flags = 0;
+
+    if (vpx_codec_get_caps(vpx_codec_vp8_dx()) & VPX_CODEC_CAP_ERROR_CONCEALMENT)
+        flags |= VPX_CODEC_USE_ERROR_CONCEALMENT;
+
+    if (vpx_codec_dec_init(&d->codec,
+                           vpx_codec_vp8_dx(),
+                           NULL,
+                           flags) != VPX_CODEC_OK) {
         qWarning("Vpx decoder could not be initialised");
     }
 }
@@ -1159,31 +1174,46 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
 #endif
 
     QXmppVideoFrame frame;
+    static quint16 sequence = 0;
 
     if (frag_type == NoFragment) {
         // unfragmented packet
-        if (d->decodeFrame(packet.payload.mid(1), &frame))
-            frames << frame;
+        if ((packet.payload[1] & 0x1) == 0 // is key frame
+            || packet.sequence == sequence) {
+            if (d->decodeFrame(packet.payload.mid(1), &frame))
+                frames << frame;
+
+            sequence = packet.sequence + 1;
+        }
+
         d->packetBuffer.resize(0);
     } else {
         // fragments
         if (frag_type == StartFragment) {
             // start fragment
-            d->packetBuffer = packet.payload.mid(1);
+            if ((packet.payload[1] & 0x1) == 0 // is key frame
+                || packet.sequence == sequence) {
+                d->packetBuffer = packet.payload.mid(1);
+                sequence = packet.sequence + 1;
+            }
         } else {
             // continuation or end fragment
-            const int packetPos = d->packetBuffer.size();
-            d->packetBuffer.resize(packetPos + packetLength);
-            stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
-        }
+            if (packet.sequence == sequence) {
+                const int packetPos = d->packetBuffer.size();
+                d->packetBuffer.resize(packetPos + packetLength);
+                stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
 
-        if (frag_type == EndFragment) {
-            // end fragment
-            if (d->decodeFrame(d->packetBuffer, &frame))
-                frames << frame;
-            d->packetBuffer.resize(0);
-        }
+                if (frag_type == EndFragment) {
+                    // end fragment
+                    if (d->decodeFrame(d->packetBuffer, &frame)) {
+                        frames << frame;
+                        d->packetBuffer.resize(0);
+                    }
+                }
 
+                sequence++;
+            }
+        }
     }
 
     return frames;
@@ -1216,12 +1246,31 @@ void QXmppVpxEncoderPrivate::writeFragment(QDataStream &stream, FragmentType fra
     stream.writeRawData(data, length);
 }
 
-QXmppVpxEncoder::QXmppVpxEncoder()
+QXmppVpxEncoder::QXmppVpxEncoder(uint clockrate)
 {
     d = new QXmppVpxEncoderPrivate;
     d->frameCount = 0;
     d->imageBuffer = 0;
     vpx_codec_enc_config_default(vpx_codec_vp8_cx(), &d->cfg, 0);
+
+    // Set the encoding threads number to use
+    int nThreads = QThread::idealThreadCount();
+
+    if (nThreads > 0)
+        d->cfg.g_threads = nThreads - 1;
+
+    // Make stream error resiliant
+    d->cfg.g_error_resilient = VPX_ERROR_RESILIENT_DEFAULT
+                               | VPX_ERROR_RESILIENT_PARTITIONS;
+
+    d->cfg.g_pass = VPX_RC_ONE_PASS;
+    d->cfg.kf_mode = VPX_KF_AUTO;
+
+    // Reduce GOP size
+    if (d->cfg.kf_max_dist > GOPSIZE)
+        d->cfg.kf_max_dist = GOPSIZE;
+
+    d->cfg.rc_target_bitrate = clockrate / 1000;
 }
 
 QXmppVpxEncoder::~QXmppVpxEncoder()
@@ -1239,8 +1288,6 @@ bool QXmppVpxEncoder::setFormat(const QXmppVideoFormat &format)
         qWarning("Vpx encoder does not support the given format");
         return false;
     }
-
-    d->cfg.rc_target_bitrate = format.frameSize().width() * format.frameSize().height() * d->cfg.rc_target_bitrate / d->cfg.g_w  / d->cfg.g_h;
     d->cfg.g_w = format.frameSize().width();
     d->cfg.g_h = format.frameSize().height();
     if (vpx_codec_enc_init(&d->codec, vpx_codec_vp8_cx(), &d->cfg, 0) != VPX_CODEC_OK) {
