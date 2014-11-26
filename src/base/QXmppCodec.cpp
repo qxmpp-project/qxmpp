@@ -38,6 +38,10 @@
 #include <speex/speex.h>
 #endif
 
+#ifdef QXMPP_USE_OPUS
+#include <opus/opus.h>
+#endif
+
 #ifdef QXMPP_USE_THEORA
 #include <theora/theoradec.h>
 #include <theora/theoraenc.h>
@@ -382,6 +386,126 @@ qint64 QXmppSpeexCodec::decode(QDataStream &input, QDataStream &output)
     speex_decode_int(decoder_state, decoder_bits, (short*)pcm_buffer.data());
     output.writeRawData(pcm_buffer.data(), pcm_buffer.size());
     return frame_samples;
+}
+
+#endif
+
+#ifdef QXMPP_USE_OPUS
+QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
+    sampleRate(clockrate),
+    nChannels(channels)
+{
+    // https://tools.ietf.org/html/draft-ietf-payload-rtp-opus-04
+
+    int error;
+    encoder = opus_encoder_create(clockrate, channels, OPUS_APPLICATION_VOIP, &error);
+
+    if (encoder || error == OPUS_OK) {
+        opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1));
+        opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(20));
+        opus_encoder_ctl(encoder, OPUS_SET_DTX(1));
+        opus_encoder_ctl(encoder, OPUS_SET_PREDICTION_DISABLED(1));
+    }
+    else
+        qCritical() << "Opus encoder initialization error:" << opus_strerror(error);
+
+    decoder = opus_decoder_create(clockrate, channels, &error);
+
+    if (!encoder || error != OPUS_OK)
+        qCritical() << "Opus decoder initialization error:" << opus_strerror(error);
+
+    validFrameSize << 2.5e-3 << 5e-3 << 10e-3 << 20e-3 << 40e-3 << 60e-3;
+
+    for (int i = 0; i < validFrameSize.size(); i++)
+        validFrameSize[i] *= clockrate;
+
+    nSamples = validFrameSize.last();
+}
+
+QXmppOpusCodec::~QXmppOpusCodec()
+{
+    if (encoder) {
+        opus_encoder_destroy(encoder);
+        encoder = NULL;
+    }
+
+    if (decoder) {
+        opus_decoder_destroy(decoder);
+        decoder = NULL;
+    }
+}
+
+qint64 QXmppOpusCodec::encode(QDataStream &input, QDataStream &output)
+{
+    QByteArray pcm_buffer(input.device()->bytesAvailable(), 0);
+    int length = input.readRawData(pcm_buffer.data(), pcm_buffer.size());
+    sampleBuffer.append(pcm_buffer.left(length));
+    int samples = readWindow(sampleBuffer.size());
+
+    if (samples < 1)
+        return 0;
+
+    QByteArray opus_buffer(sampleBuffer.size(), 0);
+
+    length = opus_encode(encoder,
+                         (opus_int16 *) sampleBuffer.constData(),
+                         samples,
+                         (uchar *) opus_buffer.data(),
+                         opus_buffer.size());
+
+    if (length < 1)
+        qWarning() << "Opus encoding error:" << opus_strerror(length);
+    else
+        output.writeRawData(opus_buffer.constData(), length);
+
+    sampleBuffer.remove(0, samples * nChannels * 2);
+
+    if (length < 1)
+        return 0;
+
+    return samples;
+}
+
+qint64 QXmppOpusCodec::decode(QDataStream &input, QDataStream &output)
+{
+    QByteArray opus_buffer(input.device()->bytesAvailable(), 0);
+    int length = input.readRawData(opus_buffer.data(), opus_buffer.size());
+
+    if (length < 1)
+        return 0;
+
+    QByteArray pcm_buffer(nSamples * nChannels * 2, 0);
+
+    int samples = opus_decode(decoder,
+                              (uchar *) opus_buffer.constData(),
+                              length,
+                              (opus_int16 *) pcm_buffer.data(),
+                              pcm_buffer.size(),
+                              0);
+
+    if (samples < 1) {
+        qWarning() << "Opus decoding error:" << opus_strerror(samples);
+
+        return 0;
+    }
+
+    output.writeRawData(pcm_buffer.constData(), samples * nChannels * 2);
+
+    return samples;
+}
+
+int QXmppOpusCodec::readWindow(int bufferSize)
+{
+    // WARNING: We are expecting 2 bytes signed samples, but this is wrong since
+    // input stream can have a different sample formats.
+
+    int nFrames = bufferSize / nChannels / 2;
+
+    for (int i = validFrameSize.size() - 1; i >= 0; i--)
+        if (validFrameSize[i] <= nFrames)
+            return validFrameSize[i];
+
+    return 0;
 }
 
 #endif

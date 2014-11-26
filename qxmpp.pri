@@ -38,6 +38,11 @@ android {
     QXMPP_INTERNAL_LIBS += -lspeex
 }
 
+!isEmpty(QXMPP_USE_OPUS) {
+    DEFINES += QXMPP_USE_OPUS
+    QXMPP_INTERNAL_LIBS += -lopus
+}
+
 !isEmpty(QXMPP_USE_THEORA) {
     DEFINES += QXMPP_USE_THEORA
     QXMPP_INTERNAL_LIBS += -ltheoradec -ltheoraenc

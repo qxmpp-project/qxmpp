@@ -108,6 +108,36 @@ private:
 };
 #endif
 
+#ifdef QXMPP_USE_OPUS
+typedef struct OpusEncoder OpusEncoder;
+typedef struct OpusDecoder OpusDecoder;
+
+/// \internal
+///
+/// The QXmppOpusCodec class represent a Opus codec.
+
+class QXMPP_AUTOTEST_EXPORT QXmppOpusCodec : public QXmppCodec
+{
+public:
+    QXmppOpusCodec(int clockrate, int channels);
+    ~QXmppOpusCodec();
+
+    qint64 encode(QDataStream &input, QDataStream &output);
+    qint64 decode(QDataStream &input, QDataStream &output);
+
+private:
+    OpusEncoder *encoder;
+    OpusDecoder *decoder;
+    int sampleRate;
+    int nChannels;
+    QList<float> validFrameSize;
+    int nSamples;
+    QByteArray sampleBuffer;
+
+    int readWindow(int bufferSize);
+};
+#endif
+
 /// \brief The QXmppVideoDecoder class is the base class for video decoders.
 ///
 

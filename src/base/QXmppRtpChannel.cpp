@@ -301,6 +301,10 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
     else if (payloadType.name().toLower() == "speex")
         return new QXmppSpeexCodec(payloadType.clockrate());
 #endif
+#ifdef QXMPP_USE_OPUS
+    else if (payloadType.name().toLower() == "opus")
+        return new QXmppOpusCodec(payloadType.clockrate(), payloadType.channels());
+#endif
     return 0;
 }
 
@@ -320,6 +324,14 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 
     // set supported codecs
     QXmppJinglePayloadType payload;
+
+#ifdef QXMPP_USE_OPUS
+    payload.setId(100);
+    payload.setChannels(1);
+    payload.setName("opus");
+    payload.setClockrate(8000);
+    m_outgoingPayloadTypes << payload;
+#endif
 
 #ifdef QXMPP_USE_SPEEX
     payload.setId(96);
