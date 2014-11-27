@@ -326,7 +326,7 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     QXmppJinglePayloadType payload;
 
 #ifdef QXMPP_USE_OPUS
-    payload.setId(100);
+    payload.setId(100); // NOTE: I don't know if this Id is ok for Opus.
     payload.setChannels(1);
     payload.setName("opus");
     payload.setClockrate(8000);

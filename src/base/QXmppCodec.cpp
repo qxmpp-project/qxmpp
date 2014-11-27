@@ -398,12 +398,11 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     sampleRate(clockrate),
     nChannels(channels)
 {
-    // https://tools.ietf.org/html/draft-ietf-payload-rtp-opus-04
-
     int error;
     encoder = opus_encoder_create(clockrate, channels, OPUS_APPLICATION_VOIP, &error);
 
     if (encoder || error == OPUS_OK) {
+        // Add some options for error correction.
         opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1));
         opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(20));
         opus_encoder_ctl(encoder, OPUS_SET_DTX(1));
@@ -417,11 +416,19 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     if (!encoder || error != OPUS_OK)
         qCritical() << "Opus decoder initialization error:" << opus_strerror(error);
 
+    // Opus only supports fixed frame durations from 2.5ms to 60ms.
+    //
+    // NOTE: https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__encoder.html
     validFrameSize << 2.5e-3 << 5e-3 << 10e-3 << 20e-3 << 40e-3 << 60e-3;
 
+    // so now, calculate the equivalent number of samples to process in each
+    // frame.
+    //
+    // nSamples = t * frameRate
     for (int i = 0; i < validFrameSize.size(); i++)
         validFrameSize[i] *= clockrate;
 
+    // Maxmimum number of samples for the audio buffer.
     nSamples = validFrameSize.last();
 }
 
@@ -440,14 +447,21 @@ QXmppOpusCodec::~QXmppOpusCodec()
 
 qint64 QXmppOpusCodec::encode(QDataStream &input, QDataStream &output)
 {
+    // Read an audio frame.
     QByteArray pcm_buffer(input.device()->bytesAvailable(), 0);
     int length = input.readRawData(pcm_buffer.data(), pcm_buffer.size());
+
+    // and append it to the sample buffer.
     sampleBuffer.append(pcm_buffer.left(length));
+
+    // Get the maximum number of samples to encode. It must be a number
+    // accepted by the Opus encoder
     int samples = readWindow(sampleBuffer.size());
 
     if (samples < 1)
         return 0;
 
+    // The encoded stream is supposed to be smaller than the raw stream, so
     QByteArray opus_buffer(sampleBuffer.size(), 0);
 
     length = opus_encode(encoder,
@@ -459,8 +473,10 @@ qint64 QXmppOpusCodec::encode(QDataStream &input, QDataStream &output)
     if (length < 1)
         qWarning() << "Opus encoding error:" << opus_strerror(length);
     else
+        // Write the encoded stream to the output.
         output.writeRawData(opus_buffer.constData(), length);
 
+    // Remove the frame from the sample buffer.
     sampleBuffer.remove(0, samples * nChannels * 2);
 
     if (length < 1)
@@ -477,8 +493,11 @@ qint64 QXmppOpusCodec::decode(QDataStream &input, QDataStream &output)
     if (length < 1)
         return 0;
 
+    // Audio frame is nSamples at maximum, so
     QByteArray pcm_buffer(nSamples * nChannels * 2, 0);
 
+    // The last argumment must be 1 to enable FEC, but I don't why it results
+    // in a SIGSEV.
     int samples = opus_decode(decoder,
                               (uchar *) opus_buffer.constData(),
                               length,
@@ -492,6 +511,7 @@ qint64 QXmppOpusCodec::decode(QDataStream &input, QDataStream &output)
         return 0;
     }
 
+    // Write the audio frame to the output.
     output.writeRawData(pcm_buffer.constData(), samples * nChannels * 2);
 
     return samples;
@@ -502,10 +522,12 @@ int QXmppOpusCodec::readWindow(int bufferSize)
     // WARNING: We are expecting 2 bytes signed samples, but this is wrong since
     // input stream can have a different sample formats.
 
-    int nFrames = bufferSize / nChannels / 2;
+    // Get the number of frames in the buffer.
+    int samples = bufferSize / nChannels / 2;
 
+    // Find an appropiate number of samples to read, according to Opus specs.
     for (int i = validFrameSize.size() - 1; i >= 0; i--)
-        if (validFrameSize[i] <= nFrames)
+        if (validFrameSize[i] <= samples)
             return validFrameSize[i];
 
     return 0;
