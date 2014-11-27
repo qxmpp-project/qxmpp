@@ -65,6 +65,7 @@
 #define SEG_SHIFT   (4)     /* Left shift for segment number. */
 #define SEG_MASK    (0x70)  /* Segment field mask. */
 
+// Distance (in frames) between two key frames (video only).
 #define GOPSIZE 32
 
 enum FragmentType {
@@ -411,6 +412,7 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     else
         qCritical() << "Opus encoder initialization error:" << opus_strerror(error);
 
+    // Here, clockrate is synonym of sampleRate.
     decoder = opus_decoder_create(clockrate, channels, &error);
 
     if (!encoder || error != OPUS_OK)
@@ -424,7 +426,7 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     // so now, calculate the equivalent number of samples to process in each
     // frame.
     //
-    // nSamples = t * frameRate
+    // nSamples = t * sampleRate
     for (int i = 0; i < validFrameSize.size(); i++)
         validFrameSize[i] *= clockrate;
 
@@ -1103,6 +1105,8 @@ public:
 
 bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
 {
+    // With the VPX_DL_REALTIME option, tries to decode the frame as quick as
+    // possible, if not possible discard it.
     if (vpx_codec_decode(&codec,
                          (const uint8_t*)buffer.constData(),
                          buffer.size(),
@@ -1148,6 +1152,7 @@ QXmppVpxDecoder::QXmppVpxDecoder()
     d = new QXmppVpxDecoderPrivate;
     vpx_codec_flags_t flags = 0;
 
+    // Enable FEC if codec support it.
     if (vpx_codec_get_caps(vpx_codec_vp8_dx()) & VPX_CODEC_CAP_ERROR_CONCEALMENT)
         flags |= VPX_CODEC_USE_ERROR_CONCEALMENT;
 
@@ -1197,6 +1202,14 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
 
     QXmppVideoFrame frame;
     static quint16 sequence = 0;
+
+    // If the incomming packet sequence is wrong discard all packets until a
+    // complete keyframe arrives.
+    // If a partition of a keyframe is missing, discard it until a next
+    // keyframe.
+    //
+    // NOTE: https://tools.ietf.org/html/draft-ietf-payload-vp8-13#section-4.3
+    // Sections: 4.3, 4.5, 4.5.1
 
     if (frag_type == NoFragment) {
         // unfragmented packet
@@ -1292,6 +1305,7 @@ QXmppVpxEncoder::QXmppVpxEncoder(uint clockrate)
     if (d->cfg.kf_max_dist > GOPSIZE)
         d->cfg.kf_max_dist = GOPSIZE;
 
+    // Here, clockrate is synonym of bitrate.
     d->cfg.rc_target_bitrate = clockrate / 1000;
 }
 
