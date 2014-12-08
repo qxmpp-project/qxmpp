@@ -107,7 +107,7 @@ QXmppElement::QXmppElement(const QXmppElement &other)
 QXmppElement::QXmppElement(QXmppElementPrivate *other)
 {
     other->counter.ref();
-    d = other;
+    d = new QXmppElementPrivate(*other);
 }
 
 QXmppElement::QXmppElement(const QDomElement &element)
@@ -123,10 +123,13 @@ QXmppElement::~QXmppElement()
 
 QXmppElement &QXmppElement::operator=(const QXmppElement &other)
 {
-    other.d->counter.ref();
-    if (!d->counter.deref())
-        delete d;
-    d = other.d;
+    if (&other!=this)
+    {
+        other.d->counter.ref();
+        if (!d->counter.deref())
+            delete d;
+        d = other.d;
+    }
     return *this;
 }
 

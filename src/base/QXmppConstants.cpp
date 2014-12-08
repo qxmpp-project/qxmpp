@@ -35,6 +35,8 @@ const char* ns_session = "urn:ietf:params:xml:ns:xmpp-session";
 const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 // XEP-0009: Jabber-RPC
 const char* ns_rpc = "jabber:iq:rpc";
+// XEP-0012: Last Activity
+const char* ns_last_activity = "jabber:iq:last";
 // XEP-0020: Feature Negotiation
 const char* ns_feature_negotiation = "http://jabber.org/protocol/feature-neg";
 // XEP-0030: Service Discovery
@@ -85,10 +87,15 @@ const char* ns_compress = "http://jabber.org/protocol/compress";
 const char* ns_compressFeature = "http://jabber.org/features/compress";
 // XEP-0145: Annotations
 const char* ns_rosternotes = "storage:rosternotes";
+// XEP-0152: Reachability Addresses
+const char* ns_reach = "urn:xmpp:reach:0";
+const char* ns_reach_notify = "urn:xmpp:reach:0+notify";
 // XEP-0153: vCard-Based Avatars
 const char* ns_vcard_update = "vcard-temp:x:update";
 // XEP-0158: CAPTCHA Forms
 const char* ns_captcha = "urn:xmpp:captcha";
+// XEP-0163: Personal Eventing Protocol
+const char* ns_personal_eventing_protocol = "http://jabber.org/protocol/pubsub#event";
 // XEP-0166: Jingle
 const char* ns_jingle = "urn:xmpp:jingle:1";
 const char* ns_jingle_raw_udp = "urn:xmpp:jingle:transports:raw-udp:1";
@@ -98,6 +105,11 @@ const char* ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char* ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 // XEP-0184: Message Receipts
 const char* ns_message_receipts = "urn:xmpp:receipts";
+// XEP-0196: User Gaming
+const char* ns_user_gaming = "urn:xmpp:gaming:0";
+const char* ns_user_gaming_notify = "urn:xmpp:gaming:0+notify";
+// XEP-0198: Stream Management
+const char* ns_stream_management = "urn:xmpp:sm:3";
 // XEP-0199: XMPP Ping
 const char* ns_ping = "urn:xmpp:ping";
 // XEP-0202: Entity Time
@@ -114,5 +126,15 @@ const char* ns_attention = "urn:xmpp:attention:0";
 const char* ns_bob = "urn:xmpp:bob";
 // XEP-0249: Direct MUC Invitations
 const char* ns_conference = "jabber:x:conference";
+// XEP-0297: Message Forwarding
+const char* ns_stanza_forwarding = "urn:xmpp:forward:0";
+// XEP-0313: Message Archieve Management
+const char* ns_simple_archive = "urn:xmpp:mam:tmp";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
+// XEP-0308: Last Message Correction
+const char* ns_replace_message = "urn:xmpp:message-correct:0";
+// XEP-0280: Message Carbons
+const char* ns_message_carbons = "urn:xmpp:carbons:2";
+// XEP-0334: Message Processing Hints
+const char* ns_message_processing_hints = "urn:xmpp:hints";

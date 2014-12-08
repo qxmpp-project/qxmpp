@@ -162,6 +162,13 @@ public:
         QString m_text;
     };
 
+    enum StanzaType {
+        Iq,
+        Message,
+        Presence,
+        Unkown
+    };
+
     QXmppStanza(const QString& from = QString(), const QString& to = QString());
     QXmppStanza(const QXmppStanza &other);
     virtual ~QXmppStanza();
@@ -192,6 +199,7 @@ public:
     /// \cond
     virtual void parse(const QDomElement &element);
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
+    virtual StanzaType getStanzaType() const;
 
 protected:
     void extensionsToXml(QXmlStreamWriter *writer) const;

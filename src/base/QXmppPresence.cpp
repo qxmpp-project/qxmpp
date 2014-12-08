@@ -184,7 +184,7 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     d->type = type;
 }
 
-/// \cond
+/// \cond
 void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
@@ -357,6 +357,12 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     xmlWriter->writeEndElement();
 }
+
+QXmppStanza::StanzaType QXmppPresence::getStanzaType() const
+{
+    return Presence;
+}
+
 /// \endcond
 
 /// Returns the photo-hash of the VCardUpdate.

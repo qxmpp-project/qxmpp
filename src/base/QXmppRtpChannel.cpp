@@ -219,7 +219,7 @@ QByteArray renderTone(QXmppRtpAudioChannel::Tone tone, int clockrate, quint32 cl
     QDataStream output(&chunk, QIODevice::WriteOnly);
     output.setByteOrder(QDataStream::LittleEndian);
     for (quint32 i = 0; i < samples; ++i) {
-        quint16 val = 16383.0 * (sin(clockMult * clockTick * tf.first) + sin(clockMult * clockTick * tf.second));
+        quint16 val = 16383.0 * (std::sin(clockMult * clockTick * tf.first) + std::sin(clockMult * clockTick * tf.second));
         output << val;
         clockTick++;
     }

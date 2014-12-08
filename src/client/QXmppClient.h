@@ -43,6 +43,7 @@ class QXmppDiscoveryIq;
 class QXmppRosterManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
+class QXmppPEPManager;
 
 /// \defgroup Core
 
@@ -156,6 +157,9 @@ public:
     QXmppRosterManager& rosterManager();
     QXmppVCardManager& vCardManager();
     QXmppVersionManager& versionManager();
+    QXmppPEPManager& pepManager();
+
+    void sendRequestStreamManagement();
 
 signals:
 
@@ -191,6 +195,11 @@ signals:
     /// know the error.
     void error(QXmppClient::Error);
 
+    /// This signal is emitted when the Stream Management encounters any error.
+    /// The QXmppStanza::Error::Condition parameter specifies the error conditions
+    /// defined in RFC 6120.
+    void streamManagementError(QXmppStanza::Error::Condition);
+
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);
 
@@ -215,6 +224,31 @@ signals:
     /// This signal is emitted when the client state changes.
     void stateChanged(QXmppClient::State state);
 
+    /// XEP-0198: Stream Management
+    /// Notifies that an XMPP message stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppMessage parameter contains the details
+    /// of the message sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void messageAcknowledged(const QXmppMessage&, const bool);
+
+    /// Notifies that an XMPP presence stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppPresence parameter contains the details
+    /// of the presence sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void presenceAcknowledged(const QXmppPresence&, const bool);
+
+    /// Notifies that an XMPP iq stanza has been acknowledged or not
+    /// acknowledged by the server. The QXmppIq parameter contains the details
+    /// of the iq sent to the server and the bool parameter contains whether it
+    /// has been acknowledged.
+    void iqAcknowledged(const QXmppIq&, const bool);
+
+    /// This signal is emitted when the Stream Management has been enabled
+    void streamManagementEnabled(bool resumeEnabled);
+
+    /// This signal is emitted when the session has been resumed
+    void streamManagementResumed(bool resumed);
+
 public slots:
     void connectToServer(const QString &jid,
                          const QString &password);
@@ -229,6 +263,7 @@ private slots:
     void _q_streamConnected();
     void _q_streamDisconnected();
     void _q_streamError(QXmppClient::Error error);
+    void _q_streamManagementResumed(bool resumed);
 
 private:
     QXmppClientPrivate * const d;

@@ -13,6 +13,7 @@ INSTALL_HEADERS += \
     base/QXmppIbbIq.h \
     base/QXmppIq.h \
     base/QXmppJingleIq.h \
+    base/QXmppLastActivityIq.h \
     base/QXmppLogger.h \
     base/QXmppMessage.h \
     base/QXmppMucIq.h \
@@ -26,6 +27,7 @@ INSTALL_HEADERS += \
     base/QXmppRpcIq.h \
     base/QXmppRtpChannel.h \
     base/QXmppSessionIq.h \
+    base/QXmppSimpleArchiveIq.h \
     base/QXmppSocks.h \
     base/QXmppStanza.h \
     base/QXmppStream.h \
@@ -33,12 +35,18 @@ INSTALL_HEADERS += \
     base/QXmppStun.h \
     base/QXmppUtils.h \
     base/QXmppVCardIq.h \
-    base/QXmppVersionIq.h
+    base/QXmppVersionIq.h \
+    base/QXmppGaming.h
 
 HEADERS += \
     base/QXmppCodec_p.h \
     base/QXmppSasl_p.h \
-    base/QXmppStreamInitiationIq_p.h
+    base/QXmppStreamInitiationIq_p.h \
+    base/QXmppSimpleArchivePreferenceIq.h \
+    base/QXmppMessageCarbonsIq.h \
+    base/QXmppReachAddress.h \
+    base/QXmppStreamManagement.h \
+    base/QXmppGaming.h
 
 # Source files
 SOURCES += \
@@ -56,6 +64,7 @@ SOURCES += \
     base/QXmppIbbIq.cpp \
     base/QXmppIq.cpp \
     base/QXmppJingleIq.cpp \
+    base/QXmppLastActivityIq.cpp \
     base/QXmppLogger.cpp \
     base/QXmppMessage.cpp \
     base/QXmppMucIq.cpp \
@@ -70,6 +79,7 @@ SOURCES += \
     base/QXmppRtpChannel.cpp \
     base/QXmppSasl.cpp \
     base/QXmppSessionIq.cpp \
+    base/QXmppSimpleArchiveIq.cpp \
     base/QXmppSocks.cpp \
     base/QXmppStanza.cpp \
     base/QXmppStream.cpp \
@@ -78,7 +88,12 @@ SOURCES += \
     base/QXmppStun.cpp \
     base/QXmppUtils.cpp \
     base/QXmppVCardIq.cpp \
-    base/QXmppVersionIq.cpp
+    base/QXmppVersionIq.cpp \
+    base/QXmppSimpleArchivePreferenceIq.cpp \
+    base/QXmppMessageCarbonsIq.cpp \
+    base/QXmppReachAddress.cpp \
+    base/QXmppStreamManagement.cpp \
+    base/QXmppGaming.cpp
 
 # DNS
 qt_version = $$QT_MAJOR_VERSION

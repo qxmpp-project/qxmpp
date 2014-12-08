@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include "QXmppMessage.h"
+#include "QXmppMessageCarbonsIq.h"
 #include "util.h"
 
 class tst_QXmppMessage : public QObject
@@ -42,8 +43,13 @@ private slots:
     void testState_data();
     void testState();
     void testXhtml();
-    void testSubextensions();
+    void testForwarding();
     void testChatMarkers();
+    void testMessageCarbons();
+    void testProcessingHints();
+    void testReplaceMessage();
+    void testReplaceWithEmptyMessage();
+    void testSubextensions();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -105,6 +111,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.state(), QXmppMessage::None);
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), false);
+    QCOMPARE(message.hasForwarded(), false);
     QCOMPARE(message.receiptId(), QString());
     QCOMPARE(message.xhtml(), QString());
     serializePacket(message, xml);
@@ -332,6 +339,32 @@ void tst_QXmppMessage::testSubextensions()
     serializePacket(message, xml);
 }
 
+void tst_QXmppMessage::testForwarding()
+{
+    const QByteArray xml("<message type=\"normal\">"
+        "<body>hi!</body>"
+        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
+        "<message xmlns=\"jabber:client\" "
+        "type=\"chat\" "
+        "from=\"bar@example.com/QXmpp\" "
+        "to=\"foo@example.com/QXmpp\">"
+        "<body>ABC</body>"
+        "</message>"
+        "</forwarded>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.hasForwarded(), true);
+
+    QXmppMessage fwd = message.forwarded();
+    QCOMPARE(fwd.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC));
+    QCOMPARE(fwd.body(), QString("ABC"));
+    QCOMPARE(fwd.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(fwd.from(), QString("bar@example.com/QXmpp"));
+}
+
 void tst_QXmppMessage::testChatMarkers()
 {
     const QByteArray markableXml(
@@ -465,8 +498,7 @@ void tst_QXmppMessage::testChatMarkers()
                 "</message>");
 
     serialisationMessage.setMarkable(false);
-    serialisationMessage.setMarker(QXmppMessage::Received);
-    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarker(QXmppMessage::Received, "message-2");
     serializePacket(serialisationMessage, receivedSerialisation);
 
     const QByteArray receivedThreadSerialisation(
@@ -480,9 +512,7 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Received);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Received, "message-2", "sleeping");
     serializePacket(serialisationMessage, receivedThreadSerialisation);
 
     const QByteArray displayedThreadSerialisation(
@@ -496,9 +526,7 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Displayed);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Displayed, "message-2", "sleeping");
     serializePacket(serialisationMessage, displayedThreadSerialisation);
 
     const QByteArray acknowledgedThreadSerialisation(
@@ -512,10 +540,133 @@ void tst_QXmppMessage::testChatMarkers()
                                "thread=\"sleeping\"/>"
                 "</message>");
 
-    serialisationMessage.setMarker(QXmppMessage::Acknowledged);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarker(QXmppMessage::Acknowledged, "message-2", "sleeping");
     serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
+}
+
+void tst_QXmppMessage::testMessageCarbons()
+{
+    const QByteArray xml("<message type=\"normal\">"
+        "<body>hi!</body>"
+        "<sent xmlns='urn:xmpp:carbons:2'>"
+        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
+        "<message xmlns=\"jabber:client\" "
+        "type=\"chat\" "
+        "from=\"bar@example.com/QXmpp\" "
+        "to=\"foo@example.com/QXmpp\">"
+        "<body>ABC</body>"
+        "</message>"
+        "</forwarded>"
+        "</sent>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.hasMessageCarbon(), true);
+
+    QXmppMessage fwd = message.carbonMessage();
+    QCOMPARE(fwd.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC));
+    QCOMPARE(fwd.body(), QString("ABC"));
+    QCOMPARE(fwd.to(), QString("foo@example.com/QXmpp"));
+    QCOMPARE(fwd.from(), QString("bar@example.com/QXmpp"));
+
+
+    const QByteArray carbonXml("<iq id=\"id1\""
+                               " type=\"set\">"
+                                   "<enable xmlns=\"urn:xmpp:carbons:2\"/>"
+                              "</iq>");
+
+    QXmppMessageCarbonsIq carbonIq;
+    carbonIq.setId("id1");
+    serializePacket(carbonIq, carbonXml);
+}
+
+void tst_QXmppMessage::testProcessingHints()
+{
+    const QByteArray xml("<message "
+                         "to=\"juliet@capulet.lit/laptop\" "
+                         "from=\"romeo@montague.lit/laptop\" "
+                         "type=\"chat\">"
+                       "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+                       "<no-copy xmlns=\"urn:xmpp:hints\"/>"
+                       "<no-store xmlns=\"urn:xmpp:hints\"/>"
+                       "<allow-permanent-storage xmlns=\"urn:xmpp:hints\"/>"
+                     "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.hasHint(QXmppMessage::NoCopies), true);
+    QCOMPARE(message.hasHint(QXmppMessage::NoStorage), true);
+    QCOMPARE(message.hasHint(QXmppMessage::AllowPermantStorage), true);
+
+    QXmppMessage message2;
+    message2.setType(QXmppMessage::Chat);
+    message2.setFrom(QString("romeo@montague.lit/laptop"));
+    message2.setTo(QString("juliet@capulet.lit/laptop"));
+    message2.setBody(QString("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
+    message2.addHint(QXmppMessage::NoCopies);
+    message2.addHint(QXmppMessage::NoStorage);
+    message2.addHint(QXmppMessage::AllowPermantStorage);
+    serializePacket(message2, xml);
+}
+
+void tst_QXmppMessage::testReplaceMessage()
+{
+    const QByteArray replaceXml(
+                "<message to='juliet@capulet.net/balcony' id='good1'>"
+                  "<body>But soft, what light through yonder window breaks?</body>"
+                  "<replace id='bad1' xmlns='urn:xmpp:message-correct:0'/>"
+                "</message>");
+
+    QXmppMessage replaceMessage;
+    parsePacket(replaceMessage, replaceXml);
+    QCOMPARE(replaceMessage.isReplace(), true);
+    QCOMPARE(replaceMessage.replaceId(), QString("bad1"));
+    QCOMPARE(replaceMessage.body(), QString("But soft, what light through yonder window breaks?"));
+
+
+    const QByteArray replaceSerialisation(
+                "<message id=\"good1\" to=\"juliet@capulet.net/balcony\" type=\"chat\">"
+                  "<body>But soft, what light through yonder window breaks?</body>"
+                  "<replace id=\"bad1\" xmlns=\"urn:xmpp:message-correct:0\"/>"
+                "</message>");
+
+    QXmppMessage serialisationMessage;
+    serialisationMessage.setTo("juliet@capulet.net/balcony");
+    serialisationMessage.setId("good1");
+    serialisationMessage.setBody("But soft, what light through yonder window breaks?");
+    serialisationMessage.setReplace("bad1");
+
+    serializePacket(serialisationMessage, replaceSerialisation);
+}
+
+void tst_QXmppMessage::testReplaceWithEmptyMessage()
+{
+    const QByteArray replaceXml(
+                "<message to='juliet@capulet.net/balcony' id='good1'>"
+                  "<body/>"
+                  "<replace id='bad1' xmlns='urn:xmpp:message-correct:0'/>"
+                "</message>");
+    QXmppMessage replaceMessage;
+    parsePacket(replaceMessage, replaceXml);
+    QCOMPARE(replaceMessage.isReplace(), true);
+    QCOMPARE(replaceMessage.replaceId(), QString("bad1"));
+    QCOMPARE(replaceMessage.body(), QString(""));
+
+    const QByteArray replaceSerialisation(
+                "<message id=\"good1\" to=\"juliet@capulet.net/balcony\" type=\"chat\">"
+                  "<body/>"
+                  "<replace id=\"bad1\" xmlns=\"urn:xmpp:message-correct:0\"/>"
+                "</message>");
+
+    QXmppMessage serialisationMessage;
+    serialisationMessage.setTo("juliet@capulet.net/balcony");
+    serialisationMessage.setId("good1");
+    serialisationMessage.setBody("");
+    serialisationMessage.setReplace("bad1");
+
+    serializePacket(serialisationMessage, replaceSerialisation);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

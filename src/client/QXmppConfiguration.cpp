@@ -69,6 +69,7 @@ public:
 
     QXmppConfiguration::StreamSecurityMode streamSecurityMode;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism;
+    QXmppConfiguration::StreamManagementMode streamManagementMode;
     QString saslAuthMechanism;
 
     QNetworkProxy networkProxy;
@@ -91,6 +92,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
     , saslAuthMechanism("DIGEST-MD5")
+    , streamManagementMode(QXmppConfiguration::SMDisabled)
 {
 }
 
@@ -498,6 +500,26 @@ void QXmppConfiguration::setNonSASLAuthMechanism(
         QXmppConfiguration::NonSASLAuthMechanism mech)
 {
     d->nonSASLAuthMechanism = mech;
+}
+
+/// Returns the Stream Management configuration.
+///
+/// \return QXmppConfiguration::StreamManagementMode
+///
+
+QXmppConfiguration::StreamManagementMode QXmppConfiguration::streamManagementMode() const
+{
+    return d->streamManagementMode;
+}
+
+/// Specifies the configuration regarding XEP-198: Stream Management by default is desabled
+///
+/// \param sm QXmppConfiguration::StreamManagementMode
+///
+
+void QXmppConfiguration::setStreamManagementMode(QXmppConfiguration::StreamManagementMode sm)
+{
+    d->streamManagementMode = sm;
 }
 
 /// Returns the preferred SASL authentication mechanism.
