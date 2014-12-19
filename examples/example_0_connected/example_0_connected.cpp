@@ -30,7 +30,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    
+
     QXmppClient client;
     client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
 

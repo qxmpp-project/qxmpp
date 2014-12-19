@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
-    
+
     passwordChecker checker;
 
     QXmppServer server;
