@@ -19,5 +19,5 @@ windows {
 docs.commands = $${DOXYFILTER} -g && $${DOXYFILTER}
 docs.depends = $${TARGET}
 
-QMAKE_CLEAN += Doxyfile
+QMAKE_CLEAN += Doxyfile doxygen_sqlite3.db
 QMAKE_EXTRA_TARGETS += docs
