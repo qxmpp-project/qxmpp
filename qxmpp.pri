@@ -33,14 +33,14 @@ android {
     QXMPP_INTERNAL_LIBS = -ldnsapi -lws2_32
 }
 
-!isEmpty(QXMPP_USE_SPEEX) {
-    DEFINES += QXMPP_USE_SPEEX
-    QXMPP_INTERNAL_LIBS += -lspeex
-}
-
 !isEmpty(QXMPP_USE_OPUS) {
     DEFINES += QXMPP_USE_OPUS
     QXMPP_INTERNAL_LIBS += -lopus
+}
+
+!isEmpty(QXMPP_USE_SPEEX) {
+    DEFINES += QXMPP_USE_SPEEX
+    QXMPP_INTERNAL_LIBS += -lspeex
 }
 
 !isEmpty(QXMPP_USE_THEORA) {

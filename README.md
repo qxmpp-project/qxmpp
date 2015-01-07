@@ -41,8 +41,8 @@ You can pass the following arguments to qmake:
     QXMPP_AUTOTEST_INTERNAL=1     to enabled internal autotests
     QXMPP_LIBRARY_TYPE=staticlib  to build a static version of QXmpp
     QXMPP_USE_DOXYGEN=1           to build the HTML documentation
-    QXMPP_USE_SPEEX=1             to enable speex audio codec
     QXMPP_USE_OPUS=1              to enable opus audio codec
+    QXMPP_USE_SPEEX=1             to enable speex audio codec
     QXMPP_USE_THEORA=1            to enable theora video codec
     QXMPP_USE_VPX=1               to enable vpx video codec
 
