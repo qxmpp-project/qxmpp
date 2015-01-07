@@ -301,6 +301,10 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
     else if (payloadType.name().toLower() == "speex")
         return new QXmppSpeexCodec(payloadType.clockrate());
 #endif
+#ifdef QXMPP_USE_OPUS
+    else if (payloadType.name().toLower() == "opus")
+        return new QXmppOpusCodec(payloadType.clockrate(), payloadType.channels());
+#endif
     return 0;
 }
 
@@ -320,6 +324,14 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 
     // set supported codecs
     QXmppJinglePayloadType payload;
+
+#ifdef QXMPP_USE_OPUS
+    payload.setId(100); // NOTE: I don't know if this Id is ok for Opus.
+    payload.setChannels(1);
+    payload.setName("opus");
+    payload.setClockrate(8000);
+    m_outgoingPayloadTypes << payload;
+#endif
 
 #ifdef QXMPP_USE_SPEEX
     payload.setId(96);
@@ -878,7 +890,7 @@ QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
     encoder->setFormat(d->outgoingFormat);
     payload.setId(96);
     payload.setName("vp8");
-    payload.setClockrate(90000);
+    payload.setClockrate(256000);
     payload.setParameters(encoder->parameters());
     m_outgoingPayloadTypes << payload;
     delete encoder;
@@ -1010,7 +1022,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
 #endif
 #ifdef QXMPP_USE_VPX
         else if (payload.name().toLower() == "vp8") {
-            encoder = new QXmppVpxEncoder;
+            encoder = new QXmppVpxEncoder(payload.clockrate());
         }
 #endif
         if (encoder) {
