@@ -7,17 +7,16 @@ SUBDIRS = src
 android {
 } else {
     SUBDIRS += tests examples doc
-    INSTALLS += htmldocs
+    INSTALLS += docs
 }
 
 CONFIG += ordered
 
-# Documentation generation
-docs.commands = cd doc/ && $(QMAKE) && $(MAKE) docs
-
-# Install rules
-htmldocs.files = doc/html
-htmldocs.path = $$PREFIX/share/doc/qxmpp
-htmldocs.CONFIG += no_check_exist directory
+# HTML documentation
+docs.commands = cd doc/ && $(MAKE) docs
+docs.depends = sub-doc
+docs.files = doc/html
+docs.path = $$PREFIX/share/doc/qxmpp
+docs.CONFIG += no_check_exist directory
 
 QMAKE_EXTRA_TARGETS += docs
