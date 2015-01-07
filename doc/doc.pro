@@ -16,7 +16,7 @@ windows {
 }
 
 # Build rules
-docs.commands = $${DOXYFILTER} -g && $${DOXYFILTER}
+docs.commands = $${DOXYFILTER} -g $${PWD} && $${DOXYFILTER}
 docs.depends = $${TARGET}
 
 QMAKE_CLEAN += Doxyfile doxygen_sqlite3.db
