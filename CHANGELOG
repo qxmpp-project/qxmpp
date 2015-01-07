@@ -5,6 +5,8 @@ QXmpp 0.8.2 (Jan 7, 2015)
     resulting in stale pkg-config files. This release fixes this issue.
   - Refactor HTML documentation so that "make docs" works in out-of-source
     builds.
+  - Add support for Opus audio codec.
+  - Enable error concealment for VPX video codec.
 
 QXmpp 0.8.1 (Dec 19, 2014)
 --------------------------
