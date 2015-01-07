@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 
 SUBDIRS = src
 
-android {
+android | ios {
 } else {
     SUBDIRS += tests examples doc
     INSTALLS += docs
