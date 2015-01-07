@@ -13,6 +13,6 @@ fi
 
 case "$CONFIG" in
 full*)
-    sudo apt-get install -qq  libspeex-dev libtheora-dev libvpx-dev
+    sudo apt-get install -qq  libopus-dev libspeex-dev libtheora-dev libvpx-dev
     ;;
 esac
