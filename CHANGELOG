@@ -1,3 +1,11 @@
+QXmpp 0.8.2 (Jan 7, 2015)
+-------------------------
+
+  - The previous release was missing an update to the VERSION definition,
+    resulting in stale pkg-config files. This release fixes this issue.
+  - Refactor HTML documentation so that "make docs" works in out-of-source
+    builds.
+
 QXmpp 0.8.1 (Dec 19, 2014)
 --------------------------
 
