@@ -52,7 +52,7 @@
 /// available.
 ///
 
-#define QXMPP_VERSION 0x000801
+#define QXMPP_VERSION 0x000802
 
 QXMPP_EXPORT QString QXmppVersion();
 
