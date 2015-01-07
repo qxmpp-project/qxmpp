@@ -407,7 +407,9 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
         opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1));
         opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(20));
         opus_encoder_ctl(encoder, OPUS_SET_DTX(1));
+#ifdef OPUS_SET_PREDICTION_DISABLED
         opus_encoder_ctl(encoder, OPUS_SET_PREDICTION_DISABLED(1));
+#endif
     }
     else
         qCritical() << "Opus encoder initialization error:" << opus_strerror(error);
