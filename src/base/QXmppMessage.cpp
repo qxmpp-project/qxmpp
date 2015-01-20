@@ -136,6 +136,7 @@ QXmppMessage::~QXmppMessage()
 
 QXmppMessage& QXmppMessage::operator=(const QXmppMessage &other)
 {
+    if (this == &other) return *this;
     QXmppStanza::operator=(other);
     d = other.d;
     return *this;

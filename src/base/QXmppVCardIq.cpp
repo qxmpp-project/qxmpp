@@ -82,6 +82,7 @@ QXmppVCardAddress::~QXmppVCardAddress()
 
 QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -265,6 +266,7 @@ QXmppVCardEmail::~QXmppVCardEmail()
 
 QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -376,6 +378,7 @@ QXmppVCardPhone::~QXmppVCardPhone()
 
 QXmppVCardPhone& QXmppVCardPhone::operator=(const QXmppVCardPhone &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -520,6 +523,7 @@ QXmppVCardOrganization::~QXmppVCardOrganization()
 
 QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrganization &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -673,6 +677,7 @@ QXmppVCardIq::~QXmppVCardIq()
 
 QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
 {
+    if (this == &other) return *this;
     QXmppIq::operator=(other);
     d = other.d;
     return *this;

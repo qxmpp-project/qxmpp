@@ -111,6 +111,7 @@ QXmppPresence::~QXmppPresence()
 
 QXmppPresence &QXmppPresence::operator=(const QXmppPresence &other)
 {
+    if (this == &other) return *this;
     QXmppStanza::operator=(other);
     d = other.d;
     return *this;
@@ -184,7 +185,7 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     d->type = type;
 }
 
-/// \cond
+/// \cond
 void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);

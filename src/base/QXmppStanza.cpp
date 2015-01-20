@@ -69,6 +69,7 @@ QXmppExtendedAddress::~QXmppExtendedAddress()
 ///
 QXmppExtendedAddress& QXmppExtendedAddress::operator=(const QXmppExtendedAddress& other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -137,7 +138,7 @@ bool QXmppExtendedAddress::isValid() const
     return !d->type.isEmpty() && !d->jid.isEmpty();
 }
 
-/// \cond
+/// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
     d->delivered = element.attribute("delivered") == "true";
@@ -157,7 +158,7 @@ void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeAttribute("type", d->type);
     xmlWriter->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 QXmppStanza::Error::Error():
     m_code(0),
@@ -416,7 +417,7 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
 
     writer->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 class QXmppStanzaPrivate : public QSharedData
 {
@@ -459,6 +460,7 @@ QXmppStanza::~QXmppStanza()
 
 QXmppStanza& QXmppStanza::operator=(const QXmppStanza &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
