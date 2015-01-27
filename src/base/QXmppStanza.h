@@ -125,7 +125,8 @@ public:
             ServiceUnavailable,
             SubscriptionRequired,
             UndefinedCondition,
-            UnexpectedRequest
+            UnexpectedRequest,
+            BadAuth
         };
 
         Error();
