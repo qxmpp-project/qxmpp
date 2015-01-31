@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1)
         return QProcess::execute("doxygen");
-    else if (argc != 2) {
+    else if (argc < 2) {
         usage();
         return 1;
     }
@@ -68,6 +68,12 @@ int main(int argc, char *argv[])
         }
         QString code = QString::fromUtf8(process.readAll());
 
+        QString docDir = (argc > 2) ? (QString::fromLocal8Bit(argv[2]) + "/") : "";
+        QStringList docFiles = QStringList() << "index.doc" << "using.doc" << "xep.doc" << "../src";
+        for (int i = 0; i < docFiles.size(); ++i) {
+            docFiles[i] = docDir + docFiles[i];
+        }
+
         // adjust Doxyfile
         setField(code, "ALPHABETICAL_INDEX", "NO");
         setField(code, "EXCLUDE_PATTERNS", "*/moc_* */mod_* */qdnslookup* */*_p.h */QXmppCodec.cpp */QXmppSasl.cpp");
@@ -75,7 +81,7 @@ int main(int argc, char *argv[])
         setField(code, "HIDE_UNDOC_CLASSES", "YES");
         setField(code, "GENERATE_LATEX", "NO");
         setField(code, "HTML_TIMESTAMP", "NO");
-        setField(code, "INPUT", "index.doc using.doc xep.doc ../src");
+        setField(code, "INPUT", docFiles.join(" "));
         setField(code, "INPUT_FILTER", QString::fromLocal8Bit(argv[0]));
         setField(code, "PROJECT_NAME", "QXmpp");
         setField(code, "PROJECT_NUMBER", QString("Version: %1.%2.%3").arg(

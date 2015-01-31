@@ -1,9 +1,23 @@
-QXmpp 0.8.1 (UNRELEASED)
-------------------------
+QXmpp 0.8.2 (Jan 7, 2015)
+-------------------------
+
+  - The previous release was missing an update to the VERSION definition,
+    resulting in stale pkg-config files. This release fixes this issue.
+  - Refactor HTML documentation so that "make docs" works in out-of-source
+    builds.
+  - Add support for Opus audio codec.
+  - Enable error concealment for VPX video codec.
+
+QXmpp 0.8.1 (Dec 19, 2014)
+--------------------------
 
   - Use QString() instead of "" for default methods arguments, to enable
     building project which use QT_NO_CAST_FROM_ASCII.
   - Add support for legacy SSL.
+  - Add XEP-0333: Chat Markers attributes to QXmppMessage.
+  - Add QXmppClient::socketErrorString to retrieve socket error string.
+  - Add equality/inequality operators for QXmppVCardIq.
+  - Add "make check" command to run tests.
 
 QXmpp 0.8.0 (Mar 26, 2014)
 --------------------------

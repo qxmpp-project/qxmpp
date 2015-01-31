@@ -14,7 +14,7 @@ fi
 
 case "$CONFIG" in
 full*)
-    QMAKE_ARGS="$QMAKE_ARGS QXMPP_USE_SPEEX=1 QXMPP_USE_THEORA=1"
+    QMAKE_ARGS="$QMAKE_ARGS QXMPP_USE_DOXYGEN=1 QXMPP_USE_OPUS=1 QXMPP_USE_SPEEX=1 QXMPP_USE_THEORA=1"
     ;;
 esac
 
@@ -29,7 +29,7 @@ qmake $QMAKE_ARGS
 make VERBOSE=1
 
 # run tests
-tests/run.py
+make check
 exit 0
 
 # generate coverage report

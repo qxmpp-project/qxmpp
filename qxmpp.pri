@@ -1,7 +1,7 @@
 # Common definitions
 
 QT += network xml
-QXMPP_VERSION = 0.8.0
+QXMPP_VERSION = 0.8.3
 QXMPP_INCLUDEPATH = $$PWD/src/base $$PWD/src/client $$PWD/src/server
 
 # Determine library name
@@ -31,6 +31,11 @@ android {
     QXMPP_INTERNAL_LIBS = -lesock
 } else:win32 {
     QXMPP_INTERNAL_LIBS = -ldnsapi -lws2_32
+}
+
+!isEmpty(QXMPP_USE_OPUS) {
+    DEFINES += QXMPP_USE_OPUS
+    QXMPP_INTERNAL_LIBS += -lopus
 }
 
 !isEmpty(QXMPP_USE_SPEEX) {

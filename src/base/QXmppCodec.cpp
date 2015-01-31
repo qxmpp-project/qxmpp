@@ -28,6 +28,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QSize>
+#include <QThread>
 
 #include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
@@ -36,6 +37,10 @@
 
 #ifdef QXMPP_USE_SPEEX
 #include <speex/speex.h>
+#endif
+
+#ifdef QXMPP_USE_OPUS
+#include <opus/opus.h>
 #endif
 
 #ifdef QXMPP_USE_THEORA
@@ -59,6 +64,9 @@
 #define NSEGS       (8)     /* Number of A-law segments. */
 #define SEG_SHIFT   (4)     /* Left shift for segment number. */
 #define SEG_MASK    (0x70)  /* Segment field mask. */
+
+// Distance (in frames) between two key frames (video only).
+#define GOPSIZE 32
 
 enum FragmentType {
     NoFragment = 0,
@@ -382,6 +390,151 @@ qint64 QXmppSpeexCodec::decode(QDataStream &input, QDataStream &output)
     speex_decode_int(decoder_state, decoder_bits, (short*)pcm_buffer.data());
     output.writeRawData(pcm_buffer.data(), pcm_buffer.size());
     return frame_samples;
+}
+
+#endif
+
+#ifdef QXMPP_USE_OPUS
+QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
+    sampleRate(clockrate),
+    nChannels(channels)
+{
+    int error;
+    encoder = opus_encoder_create(clockrate, channels, OPUS_APPLICATION_VOIP, &error);
+
+    if (encoder || error == OPUS_OK) {
+        // Add some options for error correction.
+        opus_encoder_ctl(encoder, OPUS_SET_INBAND_FEC(1));
+        opus_encoder_ctl(encoder, OPUS_SET_PACKET_LOSS_PERC(20));
+        opus_encoder_ctl(encoder, OPUS_SET_DTX(1));
+#ifdef OPUS_SET_PREDICTION_DISABLED
+        opus_encoder_ctl(encoder, OPUS_SET_PREDICTION_DISABLED(1));
+#endif
+    }
+    else
+        qCritical() << "Opus encoder initialization error:" << opus_strerror(error);
+
+    // Here, clockrate is synonym of sampleRate.
+    decoder = opus_decoder_create(clockrate, channels, &error);
+
+    if (!encoder || error != OPUS_OK)
+        qCritical() << "Opus decoder initialization error:" << opus_strerror(error);
+
+    // Opus only supports fixed frame durations from 2.5ms to 60ms.
+    //
+    // NOTE: https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__encoder.html
+    validFrameSize << 2.5e-3 << 5e-3 << 10e-3 << 20e-3 << 40e-3 << 60e-3;
+
+    // so now, calculate the equivalent number of samples to process in each
+    // frame.
+    //
+    // nSamples = t * sampleRate
+    for (int i = 0; i < validFrameSize.size(); i++)
+        validFrameSize[i] *= clockrate;
+
+    // Maxmimum number of samples for the audio buffer.
+    nSamples = validFrameSize.last();
+}
+
+QXmppOpusCodec::~QXmppOpusCodec()
+{
+    if (encoder) {
+        opus_encoder_destroy(encoder);
+        encoder = NULL;
+    }
+
+    if (decoder) {
+        opus_decoder_destroy(decoder);
+        decoder = NULL;
+    }
+}
+
+qint64 QXmppOpusCodec::encode(QDataStream &input, QDataStream &output)
+{
+    // Read an audio frame.
+    QByteArray pcm_buffer(input.device()->bytesAvailable(), 0);
+    int length = input.readRawData(pcm_buffer.data(), pcm_buffer.size());
+
+    // and append it to the sample buffer.
+    sampleBuffer.append(pcm_buffer.left(length));
+
+    // Get the maximum number of samples to encode. It must be a number
+    // accepted by the Opus encoder
+    int samples = readWindow(sampleBuffer.size());
+
+    if (samples < 1)
+        return 0;
+
+    // The encoded stream is supposed to be smaller than the raw stream, so
+    QByteArray opus_buffer(sampleBuffer.size(), 0);
+
+    length = opus_encode(encoder,
+                         (opus_int16 *) sampleBuffer.constData(),
+                         samples,
+                         (uchar *) opus_buffer.data(),
+                         opus_buffer.size());
+
+    if (length < 1)
+        qWarning() << "Opus encoding error:" << opus_strerror(length);
+    else
+        // Write the encoded stream to the output.
+        output.writeRawData(opus_buffer.constData(), length);
+
+    // Remove the frame from the sample buffer.
+    sampleBuffer.remove(0, samples * nChannels * 2);
+
+    if (length < 1)
+        return 0;
+
+    return samples;
+}
+
+qint64 QXmppOpusCodec::decode(QDataStream &input, QDataStream &output)
+{
+    QByteArray opus_buffer(input.device()->bytesAvailable(), 0);
+    int length = input.readRawData(opus_buffer.data(), opus_buffer.size());
+
+    if (length < 1)
+        return 0;
+
+    // Audio frame is nSamples at maximum, so
+    QByteArray pcm_buffer(nSamples * nChannels * 2, 0);
+
+    // The last argumment must be 1 to enable FEC, but I don't why it results
+    // in a SIGSEV.
+    int samples = opus_decode(decoder,
+                              (uchar *) opus_buffer.constData(),
+                              length,
+                              (opus_int16 *) pcm_buffer.data(),
+                              pcm_buffer.size(),
+                              0);
+
+    if (samples < 1) {
+        qWarning() << "Opus decoding error:" << opus_strerror(samples);
+
+        return 0;
+    }
+
+    // Write the audio frame to the output.
+    output.writeRawData(pcm_buffer.constData(), samples * nChannels * 2);
+
+    return samples;
+}
+
+int QXmppOpusCodec::readWindow(int bufferSize)
+{
+    // WARNING: We are expecting 2 bytes signed samples, but this is wrong since
+    // input stream can have a different sample formats.
+
+    // Get the number of frames in the buffer.
+    int samples = bufferSize / nChannels / 2;
+
+    // Find an appropiate number of samples to read, according to Opus specs.
+    for (int i = validFrameSize.size() - 1; i >= 0; i--)
+        if (validFrameSize[i] <= samples)
+            return validFrameSize[i];
+
+    return 0;
 }
 
 #endif
@@ -954,7 +1107,13 @@ public:
 
 bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFrame *frame)
 {
-    if (vpx_codec_decode(&codec, (const uint8_t*)buffer.constData(), buffer.size(), NULL, 0) != VPX_CODEC_OK) {
+    // With the VPX_DL_REALTIME option, tries to decode the frame as quick as
+    // possible, if not possible discard it.
+    if (vpx_codec_decode(&codec,
+                         (const uint8_t*)buffer.constData(),
+                         buffer.size(),
+                         NULL,
+                         VPX_DL_REALTIME) != VPX_CODEC_OK) {
         qWarning("Vpx packet could not be decoded: %s", vpx_codec_error_detail(&codec));
         return false;
     }
@@ -993,7 +1152,16 @@ bool QXmppVpxDecoderPrivate::decodeFrame(const QByteArray &buffer, QXmppVideoFra
 QXmppVpxDecoder::QXmppVpxDecoder()
 {
     d = new QXmppVpxDecoderPrivate;
-    if (vpx_codec_dec_init(&d->codec, vpx_codec_vp8_dx(), NULL, 0) != VPX_CODEC_OK) {
+    vpx_codec_flags_t flags = 0;
+
+    // Enable FEC if codec support it.
+    if (vpx_codec_get_caps(vpx_codec_vp8_dx()) & VPX_CODEC_CAP_ERROR_CONCEALMENT)
+        flags |= VPX_CODEC_USE_ERROR_CONCEALMENT;
+
+    if (vpx_codec_dec_init(&d->codec,
+                           vpx_codec_vp8_dx(),
+                           NULL,
+                           flags) != VPX_CODEC_OK) {
         qWarning("Vpx decoder could not be initialised");
     }
 }
@@ -1035,31 +1203,54 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
 #endif
 
     QXmppVideoFrame frame;
+    static quint16 sequence = 0;
+
+    // If the incomming packet sequence is wrong discard all packets until a
+    // complete keyframe arrives.
+    // If a partition of a keyframe is missing, discard it until a next
+    // keyframe.
+    //
+    // NOTE: https://tools.ietf.org/html/draft-ietf-payload-vp8-13#section-4.3
+    // Sections: 4.3, 4.5, 4.5.1
 
     if (frag_type == NoFragment) {
         // unfragmented packet
-        if (d->decodeFrame(packet.payload.mid(1), &frame))
-            frames << frame;
+        if ((packet.payload[1] & 0x1) == 0 // is key frame
+            || packet.sequence == sequence) {
+            if (d->decodeFrame(packet.payload.mid(1), &frame))
+                frames << frame;
+
+            sequence = packet.sequence + 1;
+        }
+
         d->packetBuffer.resize(0);
     } else {
         // fragments
         if (frag_type == StartFragment) {
             // start fragment
-            d->packetBuffer = packet.payload.mid(1);
+            if ((packet.payload[1] & 0x1) == 0 // is key frame
+                || packet.sequence == sequence) {
+                d->packetBuffer = packet.payload.mid(1);
+                sequence = packet.sequence + 1;
+            }
         } else {
             // continuation or end fragment
-            const int packetPos = d->packetBuffer.size();
-            d->packetBuffer.resize(packetPos + packetLength);
-            stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
-        }
+            if (packet.sequence == sequence) {
+                const int packetPos = d->packetBuffer.size();
+                d->packetBuffer.resize(packetPos + packetLength);
+                stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
 
-        if (frag_type == EndFragment) {
-            // end fragment
-            if (d->decodeFrame(d->packetBuffer, &frame))
-                frames << frame;
-            d->packetBuffer.resize(0);
-        }
+                if (frag_type == EndFragment) {
+                    // end fragment
+                    if (d->decodeFrame(d->packetBuffer, &frame)) {
+                        frames << frame;
+                        d->packetBuffer.resize(0);
+                    }
+                }
 
+                sequence++;
+            }
+        }
     }
 
     return frames;
@@ -1092,12 +1283,32 @@ void QXmppVpxEncoderPrivate::writeFragment(QDataStream &stream, FragmentType fra
     stream.writeRawData(data, length);
 }
 
-QXmppVpxEncoder::QXmppVpxEncoder()
+QXmppVpxEncoder::QXmppVpxEncoder(uint clockrate)
 {
     d = new QXmppVpxEncoderPrivate;
     d->frameCount = 0;
     d->imageBuffer = 0;
     vpx_codec_enc_config_default(vpx_codec_vp8_cx(), &d->cfg, 0);
+
+    // Set the encoding threads number to use
+    int nThreads = QThread::idealThreadCount();
+
+    if (nThreads > 0)
+        d->cfg.g_threads = nThreads - 1;
+
+    // Make stream error resiliant
+    d->cfg.g_error_resilient = VPX_ERROR_RESILIENT_DEFAULT
+                               | VPX_ERROR_RESILIENT_PARTITIONS;
+
+    d->cfg.g_pass = VPX_RC_ONE_PASS;
+    d->cfg.kf_mode = VPX_KF_AUTO;
+
+    // Reduce GOP size
+    if (d->cfg.kf_max_dist > GOPSIZE)
+        d->cfg.kf_max_dist = GOPSIZE;
+
+    // Here, clockrate is synonym of bitrate.
+    d->cfg.rc_target_bitrate = clockrate / 1000;
 }
 
 QXmppVpxEncoder::~QXmppVpxEncoder()
@@ -1115,8 +1326,6 @@ bool QXmppVpxEncoder::setFormat(const QXmppVideoFormat &format)
         qWarning("Vpx encoder does not support the given format");
         return false;
     }
-
-    d->cfg.rc_target_bitrate = format.frameSize().width() * format.frameSize().height() * d->cfg.rc_target_bitrate / d->cfg.g_w  / d->cfg.g_h;
     d->cfg.g_w = format.frameSize().width();
     d->cfg.g_h = format.frameSize().height();
     if (vpx_codec_enc_init(&d->codec, vpx_codec_vp8_cx(), &d->cfg, 0) != VPX_CODEC_OK) {

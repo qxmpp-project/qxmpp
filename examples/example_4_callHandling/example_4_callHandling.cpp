@@ -126,7 +126,7 @@ void xmppClient::slotCallReceived(QXmppCall *call)
                     this, SLOT(slotAudioModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
 
-    // accept call    
+    // accept call
     call->accept();
 }
 

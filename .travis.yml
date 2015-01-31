@@ -1,4 +1,5 @@
 language: cpp
+cache: apt
 env:
   - QT_SELECT=qt4 ; CONFIG=minimal
   - QT_SELECT=qt4 ; CONFIG=minimal-static

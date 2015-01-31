@@ -1,34 +1,22 @@
 include(qxmpp.pri)
 
+CONFIG += ordered
 TEMPLATE = subdirs
 
 SUBDIRS = src
-
-android {
+android | ios {
 } else {
-    SUBDIRS += tests examples doc
-    INSTALLS += htmldocs
+    SUBDIRS += tests examples
 }
 
-CONFIG += ordered
+!isEmpty(QXMPP_USE_DOXYGEN) {
+    docs.commands = cd doc/ && $(MAKE) docs
+    docs.depends = sub-doc
+    docs.files = doc/html
+    docs.path = $$PREFIX/share/doc/qxmpp
+    docs.CONFIG += no_check_exist directory
 
-# Documentation generation
-docs.commands = cd doc/ && $(QMAKE) && $(MAKE) docs
-
-# Source distribution
-QXMPP_ARCHIVE = qxmpp-$$QXMPP_VERSION
-dist.commands = \
-    $(DEL_FILE) -r $$QXMPP_ARCHIVE && \
-    $(MKDIR) $$QXMPP_ARCHIVE && \
-    git archive master | tar -x -C $$QXMPP_ARCHIVE && \
-    $(COPY_DIR) doc/html $$QXMPP_ARCHIVE/doc && \
-    tar czf $${QXMPP_ARCHIVE}.tar.gz $$QXMPP_ARCHIVE && \
-    $(DEL_FILE) -r $$QXMPP_ARCHIVE
-dist.depends = docs
-
-# Install rules
-htmldocs.files = doc/html
-htmldocs.path = $$PREFIX/share/doc/qxmpp
-htmldocs.CONFIG += no_check_exist directory
-
-QMAKE_EXTRA_TARGETS += dist docs
+    INSTALLS += docs
+    QMAKE_EXTRA_TARGETS += docs
+    SUBDIRS += doc
+}
