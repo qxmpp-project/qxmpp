@@ -291,6 +291,8 @@ QString QXmppStanza::Error::getConditionStr() const
         return "undefined-condition";
     case UnexpectedRequest:
         return "unexpected-request";
+    case BadAuth:
+        return "bad-auth";
     default:
         return "";
     }
@@ -358,6 +360,8 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
         setCondition(UndefinedCondition);
     else if(type == "unexpected-request")
         setCondition(UnexpectedRequest);
+    else if(type == "bad-auth")
+        setCondition(BadAuth);
     else
         setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
 }
