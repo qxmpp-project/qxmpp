@@ -118,6 +118,7 @@ bool QXmppVCardManager::handleStanza(const QDomElement &element)
             d->clientVCard = vCardIq;
             d->isClientVCardReceived = true;
             emit clientVCardReceived();
+            return true;
         }
 
         emit vCardReceived(vCardIq);
