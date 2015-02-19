@@ -24,6 +24,7 @@
 #define QXMPP_DEBUG_STUN
 
 #include <QCryptographicHash>
+#include <QDataStream>
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QUdpSocket>
