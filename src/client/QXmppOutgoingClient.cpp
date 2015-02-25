@@ -538,10 +538,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslFailure failure;
             failure.parse(nodeRecv);
 
-            if (failure.condition() == "not-authorized")
+            // RFC3920 defines the error condition as "not-authorized", but
+            // some broken servers use "bad-auth" instead. We tolerate this
+            // by remapping the error to "not-authorized".
+            if (failure.condition() == "not-authorized" || failure.condition() == "bad-auth")
                 d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-            else if (failure.condition() == "bad-auth")
-                d->xmppStreamError = QXmppStanza::Error::BadAuth;
             else
                 d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
             emit error(QXmppClient::XmppStreamError);
