@@ -1,3 +1,8 @@
+QXmpp 0.8.3 (UNRELEASED)
+------------------------
+
+  - Add a QXmppClient::sslErrors signal to report SSL errors.
+
 QXmpp 0.8.2 (Jan 7, 2015)
 -------------------------
 
