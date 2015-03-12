@@ -2,6 +2,9 @@ QXmpp 0.8.3 (UNRELEASED)
 ------------------------
 
   - Add a QXmppClient::sslErrors signal to report SSL errors.
+  - Handle broken servers which send "bad-auth" instead of "not-authorized".
+  - Fix a compilation issue with Qt 5.5 due to a missing header include.
+  - Do not install test cases.
 
 QXmpp 0.8.2 (Jan 7, 2015)
 -------------------------
