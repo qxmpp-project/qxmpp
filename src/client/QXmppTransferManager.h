@@ -102,7 +102,7 @@ public:
     enum Direction
     {
         IncomingDirection, ///< The file is being received.
-        OutgoingDirection, ///< The file is being sent.
+        OutgoingDirection  ///< The file is being sent.
     };
 
     /// This enum is used to describe the type of error encountered by a transfer job.
@@ -112,7 +112,7 @@ public:
         AbortError,       ///< The file transfer was aborted.
         FileAccessError,  ///< An error was encountered trying to access a local file.
         FileCorruptError, ///< The file is corrupt: the file size or hash do not match.
-        ProtocolError,    ///< An error was encountered in the file transfer protocol.
+        ProtocolError     ///< An error was encountered in the file transfer protocol.
     };
 
     /// This enum is used to describe a transfer method.
@@ -121,7 +121,7 @@ public:
         NoMethod = 0,     ///< No transfer method.
         InBandMethod = 1, ///< XEP-0047: In-Band Bytestreams
         SocksMethod = 2,  ///< XEP-0065: SOCKS5 Bytestreams
-        AnyMethod = 3,    ///< Any supported transfer method.
+        AnyMethod = 3     ///< Any supported transfer method.
     };
     Q_DECLARE_FLAGS(Methods, Method)
 
@@ -131,7 +131,7 @@ public:
         OfferState = 0,    ///< The transfer is being offered to the remote party.
         StartState = 1,    ///< The transfer is being connected.
         TransferState = 2, ///< The transfer is ongoing.
-        FinishedState = 3, ///< The transfer is finished.
+        FinishedState = 3  ///< The transfer is finished.
     };
 
     ~QXmppTransferJob();

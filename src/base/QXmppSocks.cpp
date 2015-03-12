@@ -33,19 +33,19 @@ const static char SocksVersion = 5;
 enum AuthenticationMethod {
     NoAuthentication = 0,
     GSSAPI = 1,
-    UsernamePassword = 2,
+    UsernamePassword = 2
 };
 
 enum Command {
     ConnectCommand = 1,
     BindCommand = 2,
-    AssociateCommand = 3,
+    AssociateCommand = 3
 };
 
 enum AddressType {
     IPv4Address = 1,
     DomainName = 3,
-    IPv6Address = 4,
+    IPv6Address = 4
 };
 
 enum ReplyType {
@@ -57,13 +57,13 @@ enum ReplyType {
     ConnectionRefused = 5,
     TtlExpired = 6,
     CommandNotSupported = 7,
-    AddressTypeNotSupported = 8,
+    AddressTypeNotSupported = 8
 };
 
 enum State {
     ConnectState = 0,
     CommandState = 1,
-    ReadyState = 2,
+    ReadyState = 2
 };
 
 static QByteArray encodeHostAndPort(quint8 type, const QByteArray &host, quint16 port)

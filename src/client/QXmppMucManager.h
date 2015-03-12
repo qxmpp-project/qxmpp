@@ -119,7 +119,7 @@ public:
         SubjectAction = 1,          ///< change the room's subject
         ConfigurationAction = 2,    ///< change the room's configuration
         PermissionsAction = 4,      ///< change the room's permissions
-        KickAction = 8,             ///< kick users from the room
+        KickAction = 8              ///< kick users from the room
     };
     Q_DECLARE_FLAGS(Actions, Action)
 

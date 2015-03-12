@@ -49,14 +49,14 @@ public:
         Send         = 0x6,
         Data         = 0x7,
         CreatePermission = 0x8,
-        ChannelBind  = 0x9,
+        ChannelBind  = 0x9
     };
 
     enum ClassType {
         Request    = 0x000,
         Indication = 0x010,
         Response   = 0x100,
-        Error      = 0x110,
+        Error      = 0x110
     };
 
     QXmppStunMessage();
@@ -201,7 +201,7 @@ public:
         UnconnectedState,
         ConnectingState,
         ConnectedState,
-        ClosingState,
+        ClosingState
     };
 
     QXmppTurnAllocation(QObject *parent = 0);

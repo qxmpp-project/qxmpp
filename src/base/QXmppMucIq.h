@@ -43,7 +43,7 @@ public:
         NoAffiliation,
         MemberAffiliation,
         AdminAffiliation,
-        OwnerAffiliation,
+        OwnerAffiliation
     };
 
     /// This enum is used to represent short-lived permissions in a room (roles).
@@ -52,7 +52,7 @@ public:
         NoRole,
         VisitorRole,
         ParticipantRole,
-        ModeratorRole,
+        ModeratorRole
     };
 
     QXmppMucItem();

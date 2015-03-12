@@ -48,7 +48,7 @@ class QXMPP_AUTOTEST_EXPORT QXmppStreamInitiationIq : public QXmppIq
 public:
     enum Profile {
         None = 0,
-        FileTransfer,
+        FileTransfer
     };
 
     QXmppDataForm featureForm() const;

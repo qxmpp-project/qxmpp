@@ -68,7 +68,7 @@ public:
         SubscribeQuery,
         SubscriptionQuery,
         SubscriptionsQuery,
-        UnsubscribeQuery,
+        UnsubscribeQuery
     };
 
     QXmppPubSubIq::QueryType queryType() const;
