@@ -271,10 +271,15 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)
 {
+    // log errors
     warning("SSL errors");
     for(int i = 0; i< error.count(); ++i)
         warning(error.at(i).errorString());
 
+    // relay signal
+    emit sslErrors(error);
+
+    // if configured, ignore the errors
     if (configuration().ignoreSslErrors())
         socket()->ignoreSslErrors();
 }
