@@ -662,8 +662,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                     if (QXmppStanza::Error::NotAuthorized == authResponse.error().condition())
                         d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-                    else if (authResponse.error().condition() == QXmppStanza::Error::BadAuth)
-                        d->xmppStreamError = QXmppStanza::Error::BadAuth;
                     else
                         d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     emit error(QXmppClient::XmppStreamError);
