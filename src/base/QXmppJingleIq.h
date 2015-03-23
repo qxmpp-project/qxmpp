@@ -90,7 +90,7 @@ public:
                                 ///< the address/port as seen from the peer.
         ServerReflexiveType,    ///< Server-reflexive candidate,
                                 ///< the address/port as seen by the STUN server
-        RelayedType,            ///< Relayed candidate, a candidate from
+        RelayedType             ///< Relayed candidate, a candidate from
                                 ///< a TURN relay.
     };
 
@@ -170,7 +170,7 @@ public:
         TransportAccept,
         TransportInfo,
         TransportReject,
-        TransportReplace,
+        TransportReplace
     };
 
     /// \internal
@@ -255,7 +255,7 @@ public:
             Success,
             Timeout,
             UnsupportedApplications,
-            UnsupportedTransports,
+            UnsupportedTransports
         };
 
         Reason();

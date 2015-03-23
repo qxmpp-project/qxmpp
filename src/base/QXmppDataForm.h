@@ -87,7 +87,7 @@ public:
             ListSingleField,
             TextMultiField,
             TextPrivateField,
-            TextSingleField,
+            TextSingleField
         };
 
         Field(QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField);
@@ -134,7 +134,7 @@ public:
                 ///< form-processing entity.
         Cancel, ///< The form-submitting entity has cancelled submission
                 ///< of data to the form-processing entity.
-        Result, ///< The form-processing entity is returning data
+        Result  ///< The form-processing entity is returning data
                 ///< (e.g., search results) to the form-submitting entity,
                 ///< or the data is a generic data set.
     };

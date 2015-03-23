@@ -72,7 +72,7 @@ public:
 
     enum QueryType {
         InfoQuery,
-        ItemsQuery,
+        ItemsQuery
     };
 
     QStringList features() const;

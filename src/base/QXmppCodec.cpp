@@ -72,7 +72,7 @@ enum FragmentType {
     NoFragment = 0,
     StartFragment,
     MiddleFragment,
-    EndFragment,
+    EndFragment
 };
 
 static qint16 seg_aend[8] = {0x1F, 0x3F, 0x7F, 0xFF,

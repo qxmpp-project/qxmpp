@@ -50,13 +50,13 @@ void tst_QXmppUtils::testCrc32()
 
 void tst_QXmppUtils::testHmac()
 {
-    QByteArray hmac = QXmppUtils::generateHmacMd5(QByteArray(16, 0x0b), QByteArray("Hi There"));
+    QByteArray hmac = QXmppUtils::generateHmacMd5(QByteArray(16, '\x0b'), QByteArray("Hi There"));
     QCOMPARE(hmac, QByteArray::fromHex("9294727a3638bb1c13f48ef8158bfc9d"));
 
     hmac = QXmppUtils::generateHmacMd5(QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
     QCOMPARE(hmac, QByteArray::fromHex("750c783e6ab0b503eaa86e310a5db738"));
 
-    hmac = QXmppUtils::generateHmacMd5(QByteArray(16, 0xaa), QByteArray(50, 0xdd));
+    hmac = QXmppUtils::generateHmacMd5(QByteArray(16, '\xaa'), QByteArray(50, '\xdd'));
     QCOMPARE(hmac, QByteArray::fromHex("56be34521d144c88dbb8c733f0e8b3f6"));
 }
 

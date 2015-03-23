@@ -57,7 +57,7 @@ public:
         Inactive,   ///< User has not been actively participating in the chat session.
         Gone,       ///< User has effectively ended their participation in the chat session.
         Composing,  ///< User is composing a message.
-        Paused,     ///< User had been composing but now has stopped.
+        Paused      ///< User had been composing but now has stopped.
     };
 
     /// This enum describes a chat marker as defined by

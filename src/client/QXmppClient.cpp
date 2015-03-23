@@ -124,6 +124,10 @@ QXmppClient::QXmppClient(QObject *parent)
                     this, SIGNAL(iqReceived(QXmppIq)));
     Q_ASSERT(check);
 
+    check = connect(d->stream, SIGNAL(sslErrors(QList<QSslError>)),
+                    this, SIGNAL(sslErrors(QList<QSslError>)));
+    Q_ASSERT(check);
+
     check = connect(d->stream->socket(), SIGNAL(stateChanged(QAbstractSocket::SocketState)),
                     this, SLOT(_q_socketStateChanged(QAbstractSocket::SocketState)));
     Q_ASSERT(check);

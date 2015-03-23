@@ -269,12 +269,17 @@ void QXmppOutgoingClient::_q_socketDisconnected()
     }
 }
 
-void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> & error)
+void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 {
+    // log errors
     warning("SSL errors");
-    for(int i = 0; i< error.count(); ++i)
-        warning(error.at(i).errorString());
+    for(int i = 0; i< errors.count(); ++i)
+        warning(errors.at(i).errorString());
 
+    // relay signal
+    emit sslErrors(errors);
+
+    // if configured, ignore the errors
     if (configuration().ignoreSslErrors())
         socket()->ignoreSslErrors();
 }
@@ -538,10 +543,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslFailure failure;
             failure.parse(nodeRecv);
 
-            if (failure.condition() == "not-authorized")
+            // RFC3920 defines the error condition as "not-authorized", but
+            // some broken servers use "bad-auth" instead. We tolerate this
+            // by remapping the error to "not-authorized".
+            if (failure.condition() == "not-authorized" || failure.condition() == "bad-auth")
                 d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-            else if (failure.condition() == "bad-auth")
-                d->xmppStreamError = QXmppStanza::Error::BadAuth;
             else
                 d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
             emit error(QXmppClient::XmppStreamError);

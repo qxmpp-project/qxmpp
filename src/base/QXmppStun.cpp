@@ -24,6 +24,7 @@
 #define QXMPP_DEBUG_STUN
 
 #include <QCryptographicHash>
+#include <QDataStream>
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QUdpSocket>
@@ -66,7 +67,7 @@ enum AttributeType {
     Fingerprint      = 0x8028, // RFC5389
     IceControlled    = 0x8029, // RFC5245
     IceControlling   = 0x802a, // RFC5245
-    OtherAddress     = 0x802c, // RFC5780
+    OtherAddress     = 0x802c  // RFC5780
 };
 
 // FIXME : we need to set local preference to discriminate between

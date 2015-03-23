@@ -66,7 +66,7 @@ public:
     enum Direction
     {
         IncomingDirection, ///< The call is incoming.
-        OutgoingDirection, ///< The call is outgoing.
+        OutgoingDirection  ///< The call is outgoing.
     };
 
     /// This enum is used to describe the state of a call.
@@ -75,7 +75,7 @@ public:
         ConnectingState = 0,    ///< The call is being connected.
         ActiveState = 1,        ///< The call is active.
         DisconnectingState = 2, ///< The call is being disconnected.
-        FinishedState = 3,      ///< The call is finished.
+        FinishedState = 3       ///< The call is finished.
     };
 
     ~QXmppCall();

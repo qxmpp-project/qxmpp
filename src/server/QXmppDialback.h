@@ -38,7 +38,7 @@ public:
     enum Command {
         Result, ///< A dialback command between the originating server
                 ///< and the receiving server.
-        Verify, ///< A dialback command between the receiving server
+        Verify  ///< A dialback command between the receiving server
                 ///< and the authoritative server.
     };
 

@@ -35,7 +35,7 @@ class QXMPP_EXPORT QXmppPasswordRequest
 public:
     /// This enum is used to describe request types.
     enum Type {
-        CheckPassword = 0,
+        CheckPassword = 0
     };
 
     QString domain() const;
@@ -64,7 +64,7 @@ public:
     enum Error {
         NoError = 0,
         AuthorizationError,
-        TemporaryError,
+        TemporaryError
     };
 
     QXmppPasswordReply(QObject *parent = 0);

@@ -23,7 +23,7 @@ version 2.1 or later.
 BUILDING QXMPP
 ==============
 
-QXmpp requires Qt 4.5 or higher (with SSL enabled) and it uses
+QXmpp requires Qt 4.5 or higher (including Qt 5.x) with SSL enabled and it uses
 the standard qmake build system of Qt.
 
 Build from command line:

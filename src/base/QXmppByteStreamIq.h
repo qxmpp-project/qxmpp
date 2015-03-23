@@ -34,7 +34,7 @@ public:
     enum Mode {
         None = 0,
         Tcp,
-        Udp,
+        Udp
     };
 
     class QXMPP_EXPORT StreamHost

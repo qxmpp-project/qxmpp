@@ -176,7 +176,7 @@ enum CodecId {
     L16Stereo = 10,
     L16Mono = 11,
     G728 = 15,
-    G729 = 18,
+    G729 = 18
 };
 
 struct ToneInfo
