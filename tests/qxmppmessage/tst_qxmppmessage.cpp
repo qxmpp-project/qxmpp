@@ -37,6 +37,7 @@ private slots:
     void testMessageReceipt();
     void testDelay_data();
     void testDelay();
+    void testDelayWithMultipleStamp();
     void testExtendedAddresses();
     void testMucInvitation();
     void testState_data();
@@ -214,6 +215,26 @@ void tst_QXmppMessage::testDelay()
     parsePacket(message, xml);
     QCOMPARE(message.stamp(), stamp);
     serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testDelayWithMultipleStamp()
+{
+    // the XEP-0203 should override XEP-0091's value since XEP-0091 was no more standard protocol
+    QByteArray xml(
+        "<message type=\"normal\">"
+            "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
+            "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
+        "</message>");
+    QByteArray resultXml(
+        "<message type=\"normal\">"
+            "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    qDebug() << message.stamp();
+    QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6, 123), Qt::UTC));
+    serializePacket(message, resultXml);
 }
 
 void tst_QXmppMessage::testExtendedAddresses()
