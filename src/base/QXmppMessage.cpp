@@ -501,15 +501,6 @@ void QXmppMessage::parse(const QDomElement &element)
     }
     d->receiptRequested = element.firstChildElement("request").namespaceURI() == ns_message_receipts;
 
-    // XEP-0203: Delayed Delivery
-    QDomElement delayElement = element.firstChildElement("delay");
-    if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
-    {
-        const QString str = delayElement.attribute("stamp");
-        d->stamp = QXmppUtils::datetimeFromString(str);
-        d->stampType = DelayedDelivery;
-    }
-
     // XEP-0224: Attention
     d->attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
 
@@ -575,6 +566,15 @@ void QXmppMessage::parse(const QDomElement &element)
         xElement = xElement.nextSiblingElement();
     }
     setExtensions(extensions);
+
+    // XEP-0203: Delayed Delivery
+    QDomElement delayElement = element.firstChildElement("delay");
+    if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
+    {
+        const QString str = delayElement.attribute("stamp");
+        d->stamp = QXmppUtils::datetimeFromString(str);
+        d->stampType = DelayedDelivery;
+    }
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
