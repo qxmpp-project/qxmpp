@@ -81,7 +81,9 @@ public:
 
     void addCaCertificates(const QString &caCertificates);
     void setLocalCertificate(const QString &path);
+    void setLocalCertificate(const QSslCertificate &certificate);
     void setPrivateKey(const QString &path);
+    void setPrivateKey(const QSslKey &key);
 
     void close();
     bool listenForClients(const QHostAddress &address = QHostAddress::Any, quint16 port = 5222);

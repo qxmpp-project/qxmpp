@@ -482,6 +482,19 @@ void QXmppServer::setLocalCertificate(const QString &path)
         server->setLocalCertificate(d->localCertificate);
 }
 
+/// Sets the local SSL certificate
+///
+/// \param certificate
+
+void QXmppServer::setLocalCertificate(const QSslCertificate &certificate)
+{
+    d->localCertificate = certificate;
+
+    // reconfigure servers
+    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+        server->setLocalCertificate(d->localCertificate);
+}
+
 /// Sets the path for the local SSL private key.
 ///
 /// \param path
@@ -499,6 +512,19 @@ void QXmppServer::setPrivateKey(const QString &path)
         d->warning(QString("SSL key is not readable %1").arg(path));
         d->privateKey = QSslKey();
     }
+
+    // reconfigure servers
+    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+        server->setPrivateKey(d->privateKey);
+}
+
+/// Sets the local SSL private key.
+///
+/// \param key
+
+void QXmppServer::setPrivateKey(const QSslKey &key)
+{
+    d->privateKey = key;
 
     // reconfigure servers
     foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
