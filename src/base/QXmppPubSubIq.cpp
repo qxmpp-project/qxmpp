@@ -208,6 +208,7 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     {
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
+    case QXmppPubSubIq::RetractQuery:
         childElement = queryElement.firstChildElement("item");
         while (!childElement.isNull())
         {
@@ -241,6 +242,7 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     {
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
+    case QXmppPubSubIq::RetractQuery:
         foreach (const QXmppPubSubItem &item, m_items)
             item.toXml(writer);
         break;
