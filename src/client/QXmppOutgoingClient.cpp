@@ -655,6 +655,20 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     }
                     sendNonSASLAuth(plainText);
                 }
+                else  if(type == "error")
+                {
+                    QXmppNonSASLAuthIq authResponse;
+                    authResponse.parse(nodeRecv);
+
+                    if (QXmppStanza::Error::NotAuthorized == authResponse.error().condition())
+                        d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                    else
+                        d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                    emit error(QXmppClient::XmppStreamError);
+
+                    warning("Authentication failure");
+                    disconnectFromHost();
+                }
             }
             // XEP-0199: XMPP Ping
             else if(QXmppPingIq::isPingIq(nodeRecv))

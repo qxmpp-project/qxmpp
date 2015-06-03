@@ -6,7 +6,9 @@ TEMPLATE = subdirs
 SUBDIRS = src
 android | ios {
 } else {
-    SUBDIRS += tests examples
+    !isEmpty(QXMPP_USE_TEST_EXAMPLES) {
+        SUBDIRS += tests examples
+    }
 }
 
 !isEmpty(QXMPP_USE_DOXYGEN) {
