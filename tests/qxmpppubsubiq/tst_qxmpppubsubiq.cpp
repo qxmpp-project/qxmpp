@@ -30,13 +30,41 @@ class tst_QXmppPubSubIq : public QObject
     Q_OBJECT
 
 private slots:
+    void testDeleteNode();
     void testItems();
     void testItemsResponse();
     void testPublish();
+    void testRetractItem();
     void testSubscribe();
     void testSubscription();
     void testSubscriptions();
 };
+
+void tst_QXmppPubSubIq::testDeleteNode()
+{
+    const QByteArray xml(
+        "<iq"
+            " id=\"delete1\""
+            " to=\"pubsub.shakespeare.lit\""
+            " from=\"hamlet@denmark.lit/elsinore\""
+            " type=\"set\">"
+            "<pubsub xmlns=\"http://jabber.org/protocol/pubsub#owner\">"
+                "<delete node=\"princely_musings\"/>"
+            "</pubsub>"
+        "</iq>");
+
+    QXmppPubSubIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.id(), QLatin1String("delete1"));
+    QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
+    QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
+    QCOMPARE(iq.type(), QXmppIq::Set);
+    qDebug() << iq.queryType();
+    QCOMPARE(iq.queryType(), QXmppPubSubIq::DeleteQuery);
+    QCOMPARE(iq.queryJid(), QString());
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
+    serializePacket(iq, xml);
+}
 
 void tst_QXmppPubSubIq::testItems()
 {
@@ -96,6 +124,8 @@ void tst_QXmppPubSubIq::testItemsResponse()
     QCOMPARE(iq.queryType(), QXmppPubSubIq::ItemsQuery);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
+    QCOMPARE(iq.items().size(), 1);
+    QCOMPARE(iq.items().at(0).id(), QString("current"));
     serializePacket(iq, xml);
 }
 
@@ -132,6 +162,37 @@ void tst_QXmppPubSubIq::testPublish()
     QCOMPARE(iq.queryType(), QXmppPubSubIq::PublishQuery);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
+    QCOMPARE(iq.items().size(), 1);
+    QCOMPARE(iq.items().at(0).id(), QString("current"));
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppPubSubIq::testRetractItem()
+{
+    const QByteArray xml(
+        "<iq"
+        " id=\"retract1\""
+        " to=\"pubsub.shakespeare.lit\""
+        " from=\"hamlet@denmark.lit/elsinore\""
+        " type=\"set\">"
+            "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
+                "<retract node=\"princely_musings\">"
+                    "<item id=\"ae890ac52d0df67ed7cfdf51b644e901\"/>"
+                "</retract>"
+            "</pubsub>"
+        "</iq>");
+
+    QXmppPubSubIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.id(), QString("retract1"));
+    QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
+    QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
+    QCOMPARE(iq.type(), QXmppIq::Set);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq::RetractQuery);
+    QCOMPARE(iq.queryJid(), QString());
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
+    QCOMPARE(iq.items().size(), 1);
+    QCOMPARE(iq.items().at(0).id(), QString("ae890ac52d0df67ed7cfdf51b644e901"));
     serializePacket(iq, xml);
 }
 

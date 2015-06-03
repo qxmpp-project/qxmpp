@@ -63,6 +63,7 @@ public:
         AffiliationsQuery,
         DefaultQuery,
         ItemsQuery,
+        DeleteQuery,
         PublishQuery,
         RetractQuery,
         SubscribeQuery,
