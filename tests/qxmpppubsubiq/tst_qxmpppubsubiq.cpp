@@ -97,8 +97,6 @@ void tst_QXmppPubSubIq::testItemsResponse()
     QCOMPARE(iq.queryType(), QXmppPubSubIq::ItemsQuery);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
-    QCOMPARE(iq.items().size(), 1);
-    QCOMPARE(iq.items().at(0).id(), QString("current"));
     serializePacket(iq, xml);
 }
 
@@ -135,8 +133,6 @@ void tst_QXmppPubSubIq::testPublish()
     QCOMPARE(iq.queryType(), QXmppPubSubIq::PublishQuery);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
-    QCOMPARE(iq.items().size(), 1);
-    QCOMPARE(iq.items().at(0).id(), QString("current"));
     serializePacket(iq, xml);
 }
 
