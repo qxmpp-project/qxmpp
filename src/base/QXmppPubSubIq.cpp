@@ -28,13 +28,11 @@
 #include "QXmppUtils.h"
 
 static const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
-static const char *ns_pubsub_owner = "http://jabber.org/protocol/pubsub#owner";
 
 static const char *pubsub_queries[] = {
     "affiliations",
     "default",
     "items",
-    "delete",
     "publish",
     "retract",
     "subscribe",
@@ -232,11 +230,7 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("pubsub");
-    if (m_queryType == QXmppPubSubIq::DeleteQuery) {
-        writer->writeAttribute("xmlns", ns_pubsub_owner);
-    } else {
-        writer->writeAttribute("xmlns", ns_pubsub);
-    }
+    writer->writeAttribute("xmlns", ns_pubsub);
 
     // write query type
     writer->writeStartElement(pubsub_queries[m_queryType]);
