@@ -32,8 +32,7 @@ const static char SocksVersion = 5;
 
 enum AuthenticationMethod {
     NoAuthentication = 0,
-    GSSAPI = 1,
-    UsernamePassword = 2
+    NoAcceptableMethod = 255
 };
 
 enum Command {
@@ -274,6 +273,12 @@ void QXmppSocksServer::slotReadyRead()
         if (!foundMethod)
         {
             qWarning("QXmppSocksServer received bad authentication method");
+
+            buffer.resize(2);
+            buffer[0] = SocksVersion;
+            buffer[1] = NoAcceptableMethod;
+            socket->write(buffer);
+
             socket->close();
             return;
         }

@@ -220,6 +220,11 @@ void tst_QXmppSocks::testServer()
     client.write(clientHandshake);
     loop.exec();
     if (!clientHandshakeWorks) {
+        // consume any last data
+        QByteArray data = client.readAll();
+        if (client.state() != QAbstractSocket::UnconnectedState)
+            loop.exec();
+
         QCOMPARE(client.state(), QAbstractSocket::UnconnectedState);
 
         QVERIFY(!m_connectionSocket);
