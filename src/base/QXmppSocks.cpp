@@ -139,8 +139,6 @@ void QXmppSocksClient::slotReadyRead()
 {
     if (m_step == ConnectState)
     {
-        m_step++;
-
         // receive connect to server response
         QByteArray buffer = readAll();
         if (buffer.size() != 2 || buffer.at(0) != SocksVersion || buffer.at(1) != NoAuthentication)
@@ -149,6 +147,9 @@ void QXmppSocksClient::slotReadyRead()
             close();
             return;
         }
+
+        // advance state
+        m_step = CommandState;
 
         // send CONNECT command
         buffer.resize(3);
@@ -162,8 +163,6 @@ void QXmppSocksClient::slotReadyRead()
         write(buffer);
 
     } else if (m_step == CommandState) {
-        m_step++;
-
         // disconnect from signal
         disconnect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 
@@ -192,6 +191,7 @@ void QXmppSocksClient::slotReadyRead()
         // FIXME : what do we do with the resulting name / port?
 
         // notify of connection
+        m_step = ReadyState;
         emit ready();
     }
 }
@@ -250,8 +250,6 @@ void QXmppSocksServer::slotReadyRead()
 
     if (m_states.value(socket) == ConnectState)
     {
-        m_states.insert(socket, CommandState);
-
         // receive connect to server request
         QByteArray buffer = socket->readAll();
         if (buffer.size() < 3 ||
@@ -280,6 +278,9 @@ void QXmppSocksServer::slotReadyRead()
             return;
         }
 
+        // advance state
+        m_states.insert(socket, CommandState);
+
         // send connect to server response
         buffer.resize(2);
         buffer[0] = SocksVersion;
@@ -287,8 +288,6 @@ void QXmppSocksServer::slotReadyRead()
         socket->write(buffer);
 
     } else if (m_states.value(socket) == CommandState) {
-        m_states.insert(socket, ReadyState);
-
         // disconnect from signals
         disconnect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 
@@ -316,6 +315,7 @@ void QXmppSocksServer::slotReadyRead()
         }
 
         // notify of connection
+        m_states.insert(socket, ReadyState);
         emit newConnection(socket, hostName, hostPort);
 
         // send response
