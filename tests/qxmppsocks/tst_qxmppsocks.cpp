@@ -35,6 +35,8 @@ private slots:
 
     void testClientAndServer();
     void testServer();
+    void testServerBadHandshake_data();
+    void testServerBadHandshake();
 
 private:
     QTcpSocket *m_connectionSocket;
@@ -107,11 +109,54 @@ void tst_QXmppSocks::testServer()
     loop.exec();
     QCOMPARE(client.readAll(), QByteArray::fromHex("050000030e7777772e676f6f676c652e636f6d0050"));
 
+    // check client
+    QCOMPARE(client.state(), QAbstractSocket::ConnectedState);
+
     // check server
     QVERIFY(m_connectionSocket);
     QCOMPARE(m_connectionSocket->state(), QAbstractSocket::ConnectedState);
     QCOMPARE(m_connectionHostName, QLatin1String("www.google.com"));
     QCOMPARE(m_connectionPort, quint16(80));
+
+    // disconnect
+    client.disconnectFromHost();
+}
+
+void tst_QXmppSocks::testServerBadHandshake_data()
+{
+    QTest::addColumn<QByteArray>("clientHandshake");
+
+    QTest::newRow("bad SOCKS version") << QByteArray::fromHex("060100");
+    QTest::newRow("no methods") << QByteArray::fromHex("0500");
+}
+
+void tst_QXmppSocks::testServerBadHandshake()
+{
+    QFETCH(QByteArray, clientHandshake);
+
+    QXmppSocksServer server;
+    QVERIFY(server.listen());
+    QVERIFY(server.serverPort() != 0);
+    connect(&server, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
+            this, SLOT(newConnectionSlot(QTcpSocket*,QString,quint16)));
+
+    QTcpSocket client;
+    client.connectToHost(QHostAddress::LocalHost, server.serverPort());
+    QVERIFY2(client.waitForConnected(), qPrintable(client.errorString()));
+
+    QEventLoop loop;
+    connect(&client, SIGNAL(disconnected()), &loop, SLOT(quit()));
+
+    client.write(clientHandshake);
+    loop.exec();
+
+    // check client
+    QCOMPARE(client.state(), QAbstractSocket::UnconnectedState);
+
+    // check server
+    QVERIFY(!m_connectionSocket);
+    QVERIFY(m_connectionHostName.isNull());
+    QCOMPARE(m_connectionPort, quint16(0));
 
     // disconnect
     client.disconnectFromHost();
