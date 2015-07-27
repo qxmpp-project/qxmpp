@@ -59,7 +59,7 @@ void tst_QXmppSocks::newConnectionSlot(QTcpSocket *socket, QString hostName, qui
 void tst_QXmppSocks::testClientAndServer()
 {
     QXmppSocksServer server;
-    QVERIFY(server.listen(1080));
+    QVERIFY(server.listen());
     QVERIFY(server.serverPort() != 0);
     connect(&server, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
             this, SLOT(newConnectionSlot(QTcpSocket*,QString,quint16)));
@@ -81,7 +81,6 @@ void tst_QXmppSocks::testClientAndServer()
     // disconnect
     client.disconnectFromHost();
 }
-
 
 void tst_QXmppSocks::testServer()
 {
