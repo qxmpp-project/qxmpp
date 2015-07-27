@@ -171,19 +171,36 @@ void tst_QXmppSocks::testServer_data()
 {
     QTest::addColumn<QByteArray>("clientHandshake");
     QTest::addColumn<bool>("clientHandshakeWorks");
+    QTest::addColumn<QByteArray>("clientConnect");
+    QTest::addColumn<bool>("clientConnectWorks");
 
-    QTest::newRow("no authentication") << QByteArray::fromHex("050100") << true;
-    QTest::newRow("no authentication or GSSAPI") << QByteArray::fromHex("05020001") << true;
+    QTest::newRow("no authentication - connect to www.google.com:80")
+        << QByteArray::fromHex("050100") << true
+        << QByteArray::fromHex("050100030e7777772e676f6f676c652e636f6d0050") << true;
+    QTest::newRow("no authentication - bad connect")
+        << QByteArray::fromHex("050100") << true
+        << QByteArray::fromHex("0500") << false;
+    QTest::newRow("no authentication or GSSAPI - connect to www.google.com:80")
+        << QByteArray::fromHex("05020001") << true
+        << QByteArray::fromHex("050100030e7777772e676f6f676c652e636f6d0050") << true;
 
-    QTest::newRow("bad SOCKS version") << QByteArray::fromHex("060100") << false;
-    QTest::newRow("no methods") << QByteArray::fromHex("0500") << false;
-    QTest::newRow("GSSAPI only") << QByteArray::fromHex("050101") << false;
+    QTest::newRow("bad SOCKS version")
+        << QByteArray::fromHex("060100") << false
+        << QByteArray() << false;
+    QTest::newRow("no methods")
+        << QByteArray::fromHex("0500") << false
+        << QByteArray() << false;
+    QTest::newRow("GSSAPI only")
+        << QByteArray::fromHex("050101") << false
+        << QByteArray() << false;
 }
 
 void tst_QXmppSocks::testServer()
 {
     QFETCH(QByteArray, clientHandshake);
     QFETCH(bool, clientHandshakeWorks);
+    QFETCH(QByteArray, clientConnect);
+    QFETCH(bool, clientConnectWorks);
 
     QXmppSocksServer server;
     QVERIFY(server.listen());
@@ -215,8 +232,18 @@ void tst_QXmppSocks::testServer()
     QCOMPARE(client.readAll(), QByteArray::fromHex("0500"));
 
     // request connect to www.google.com port 80
-    client.write(QByteArray::fromHex("050100030e7777772e676f6f676c652e636f6d0050"));
+    client.write(clientConnect);
     loop.exec();
+    if (!clientConnectWorks) {
+        QCOMPARE(client.state(), QAbstractSocket::UnconnectedState);
+
+        QVERIFY(!m_connectionSocket);
+        QVERIFY(m_connectionHostName.isNull());
+        QCOMPARE(m_connectionPort, quint16(0));
+        return;
+    }
+
+    QCOMPARE(client.state(), QAbstractSocket::ConnectedState);
     QCOMPARE(client.readAll(), QByteArray::fromHex("050000030e7777772e676f6f676c652e636f6d0050"));
 
     QCOMPARE(client.state(), QAbstractSocket::ConnectedState);
