@@ -34,6 +34,7 @@ private slots:
     void newConnectionSlot(QTcpSocket *socket, QString hostName, quint16 port);
 
     void testClientAndServer();
+    void testServer_data();
     void testServer();
     void testServerBadHandshake_data();
     void testServerBadHandshake();
@@ -84,8 +85,18 @@ void tst_QXmppSocks::testClientAndServer()
     client.disconnectFromHost();
 }
 
+void tst_QXmppSocks::testServer_data()
+{
+    QTest::addColumn<QByteArray>("clientHandshake");
+
+    QTest::newRow("no authentication") << QByteArray::fromHex("050100");
+    QTest::newRow("no authentication or GSSAPI") << QByteArray::fromHex("05020001");
+}
+
 void tst_QXmppSocks::testServer()
 {
+    QFETCH(QByteArray, clientHandshake);
+
     QXmppSocksServer server;
     QVERIFY(server.listen());
     QVERIFY(server.serverPort() != 0);
@@ -99,8 +110,8 @@ void tst_QXmppSocks::testServer()
     QEventLoop loop;
     connect(&client, SIGNAL(readyRead()), &loop, SLOT(quit()));
   
-    // SOCKS5, no authentication 
-    client.write(QByteArray::fromHex("050100"));
+    // send client handshake
+    client.write(clientHandshake);
     loop.exec();
     QCOMPARE(client.readAll(), QByteArray::fromHex("0500"));
 
@@ -128,6 +139,7 @@ void tst_QXmppSocks::testServerBadHandshake_data()
 
     QTest::newRow("bad SOCKS version") << QByteArray::fromHex("060100");
     QTest::newRow("no methods") << QByteArray::fromHex("0500");
+    QTest::newRow("GSSAPI only") << QByteArray::fromHex("050101");
 }
 
 void tst_QXmppSocks::testServerBadHandshake()
@@ -147,6 +159,7 @@ void tst_QXmppSocks::testServerBadHandshake()
     QEventLoop loop;
     connect(&client, SIGNAL(disconnected()), &loop, SLOT(quit()));
 
+    // send client handshake
     client.write(clientHandshake);
     loop.exec();
 
