@@ -3,6 +3,8 @@ QXmpp 0.8.4 (UNRELEASED)
 
   - Fix phone numbers incorrectly read from / written to vCard as "PHONE"
     element instead of "TEL" (issue 65).
+  - Make QXmppClient::connectToServer(QXmppConfiguration, QXmppPresence) a
+    slot (issue 63).
 
 QXmpp 0.8.3 (Mar 13, 2015)
 --------------------------

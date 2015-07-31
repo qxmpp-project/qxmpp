@@ -137,9 +137,6 @@ public:
         return 0;
     }
 
-    void connectToServer(const QXmppConfiguration&,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
     bool isAuthenticated() const;
     bool isConnected() const;
 
@@ -222,6 +219,9 @@ signals:
     void stateChanged(QXmppClient::State state);
 
 public slots:
+    void connectToServer(const QXmppConfiguration&,
+                         const QXmppPresence& initialPresence =
+                         QXmppPresence());
     void connectToServer(const QString &jid,
                          const QString &password);
     void disconnectFromServer();
