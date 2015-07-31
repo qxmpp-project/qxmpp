@@ -124,20 +124,20 @@ void tst_QXmppVCardIq::testPhone_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("type");
 
-    QTest::newRow("none") << QByteArray("<PHONE><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::None);
-    QTest::newRow("HOME") << QByteArray("<PHONE><HOME/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Home);
-    QTest::newRow("WORK") << QByteArray("<PHONE><WORK/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Work);
-    QTest::newRow("VOICE") << QByteArray("<PHONE><VOICE/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Voice);
-    QTest::newRow("FAX") << QByteArray("<PHONE><FAX/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Fax);
-    QTest::newRow("PAGER") << QByteArray("<PHONE><PAGER/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Pager);
-    QTest::newRow("MSG") << QByteArray("<PHONE><MSG/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Messaging);
-    QTest::newRow("CELL") << QByteArray("<PHONE><CELL/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Cell);
-    QTest::newRow("VIDEO") << QByteArray("<PHONE><VIDEO/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Video);
-    QTest::newRow("BBS") << QByteArray("<PHONE><BBS/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::BBS);
-    QTest::newRow("MODEM") << QByteArray("<PHONE><MODEM/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Modem);
-    QTest::newRow("IDSN") << QByteArray("<PHONE><ISDN/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::ISDN);
-    QTest::newRow("PCS") << QByteArray("<PHONE><PCS/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::PCS);
-    QTest::newRow("PREF") << QByteArray("<PHONE><PREF/><NUMBER>12345</NUMBER></PHONE>") << int(QXmppVCardPhone::Preferred);
+    QTest::newRow("none") << QByteArray("<TEL><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::None);
+    QTest::newRow("HOME") << QByteArray("<TEL><HOME/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Home);
+    QTest::newRow("WORK") << QByteArray("<TEL><WORK/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Work);
+    QTest::newRow("VOICE") << QByteArray("<TEL><VOICE/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Voice);
+    QTest::newRow("FAX") << QByteArray("<TEL><FAX/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Fax);
+    QTest::newRow("PAGER") << QByteArray("<TEL><PAGER/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Pager);
+    QTest::newRow("MSG") << QByteArray("<TEL><MSG/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Messaging);
+    QTest::newRow("CELL") << QByteArray("<TEL><CELL/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Cell);
+    QTest::newRow("VIDEO") << QByteArray("<TEL><VIDEO/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Video);
+    QTest::newRow("BBS") << QByteArray("<TEL><BBS/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::BBS);
+    QTest::newRow("MODEM") << QByteArray("<TEL><MODEM/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Modem);
+    QTest::newRow("IDSN") << QByteArray("<TEL><ISDN/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::ISDN);
+    QTest::newRow("PCS") << QByteArray("<TEL><PCS/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::PCS);
+    QTest::newRow("PREF") << QByteArray("<TEL><PREF/><NUMBER>12345</NUMBER></TEL>") << int(QXmppVCardPhone::Preferred);
 }
 
 void tst_QXmppVCardIq::testPhone()
@@ -165,8 +165,8 @@ void tst_QXmppVCardIq::testVCard()
         "<FN>Foo Bar!</FN>"
         "<NICKNAME>FooBar</NICKNAME>"
         "<N><GIVEN>Foo</GIVEN><FAMILY>Wiz</FAMILY><MIDDLE>Baz</MIDDLE></N>"
-        "<PHONE><HOME/><NUMBER>12345</NUMBER></PHONE>"
-        "<PHONE><WORK/><NUMBER>67890</NUMBER></PHONE>"
+        "<TEL><HOME/><NUMBER>12345</NUMBER></TEL>"
+        "<TEL><WORK/><NUMBER>67890</NUMBER></TEL>"
         "<PHOTO>"
             "<TYPE>image/png</TYPE>"
             "<BINVAL>"

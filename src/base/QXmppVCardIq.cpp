@@ -457,7 +457,7 @@ void QXmppVCardPhone::parse(const QDomElement &element)
 
 void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("PHONE");
+    writer->writeStartElement("TEL");
     if (d->type & Home)
         writer->writeEmptyElement("HOME");
     if (d->type & Work)
@@ -994,7 +994,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
             QXmppVCardEmail email;
             email.parse(child);
             d->emails << email;
-        } else if (child.tagName() == "PHONE") {
+        } else if (child.tagName() == "TEL") {
             QXmppVCardPhone phone;
             phone.parse(child);
             d->phones << phone;
