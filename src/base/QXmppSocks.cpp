@@ -79,26 +79,23 @@ static QByteArray encodeHostAndPort(quint8 type, const QByteArray &host, quint16
     return buffer;
 }
 
-static bool parseHostAndPort(const QByteArray buffer, quint8 &type, QByteArray &host, quint16 &port)
+static bool parseHostAndPort(QDataStream &stream, quint8 &type, QByteArray &host, quint16 &port)
 {
-    if (buffer.size() < 4)
-        return false;
-
-    QDataStream stream(buffer);
     // get host name
     quint8 hostLength;
     stream >> type;
     stream >> hostLength;
-    if (buffer.size() < hostLength + 4)
-    {
+    if (stream.status() != QDataStream::Ok)
+        return false;
+    host.resize(hostLength);
+    if (stream.readRawData(host.data(), hostLength) != hostLength) {
         qWarning("Invalid host length");
         return false;
     }
-    host.resize(hostLength);
-    stream.readRawData(host.data(), hostLength);
+
     // get port
     stream >> port;
-    return true;
+    return stream.status() == QDataStream::Ok;
 }
 
 QXmppSocksClient::QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent)
@@ -166,8 +163,8 @@ void QXmppSocksClient::slotReadyRead()
         disconnect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 
         // receive CONNECT response
-        QByteArray buffer = readAll();
-        if (buffer.size() < 6 ||
+        QByteArray buffer = read(3);
+        if (buffer.size() != 3 ||
             buffer.at(0) != SocksVersion ||
             buffer.at(1) != Succeeded ||
             buffer.at(2) != 0)
@@ -181,7 +178,8 @@ void QXmppSocksClient::slotReadyRead()
         quint8 hostType;
         QByteArray hostName;
         quint16 hostPort;
-        if (!parseHostAndPort(buffer.mid(3), hostType, hostName, hostPort))
+        QDataStream stream(this);
+        if (!parseHostAndPort(stream, hostType, hostName, hostPort))
         {
             qWarning("QXmppSocksClient could not parse type/host/port");
             close();
@@ -297,8 +295,8 @@ void QXmppSocksServer::slotReadyRead()
         disconnect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 
         // receive command
-        QByteArray buffer = socket->readAll();
-        if (buffer.size() < 4 ||
+        QByteArray buffer = socket->read(3);
+        if (buffer.size() != 3 ||
             buffer.at(0) != SocksVersion ||
             buffer.at(1) != ConnectCommand ||
             buffer.at(2) != 0x00)
@@ -312,7 +310,8 @@ void QXmppSocksServer::slotReadyRead()
         quint8 hostType;
         QByteArray hostName;
         quint16 hostPort;
-        if (!parseHostAndPort(buffer.mid(3), hostType, hostName, hostPort))
+        QDataStream stream(socket);
+        if (!parseHostAndPort(stream, hostType, hostName, hostPort))
         {
             qWarning("QXmppSocksServer could not parse type/host/port");
             socket->close();

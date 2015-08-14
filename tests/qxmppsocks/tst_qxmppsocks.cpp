@@ -66,16 +66,25 @@ void tst_QXmppSocks::testClient_data()
     QTest::addColumn<bool>("serverHandshakeWorks");
     QTest::addColumn<QByteArray>("serverConnect");
     QTest::addColumn<bool>("serverConnectWorks");
+    QTest::addColumn<QByteArray>("clientReceivedData");
 
     QTest::newRow("no authentication - good connect")
         << QByteArray::fromHex("0500") << true
-        << QByteArray::fromHex("050000030e7777772e676f6f676c652e636f6d0050") << true;
+        << QByteArray::fromHex("050000030e7777772e676f6f676c652e636f6d0050") << true
+        << QByteArray();
+    QTest::newRow("no authentication - good connect and data")
+        << QByteArray::fromHex("0500") << true
+        << QByteArray::fromHex("050000030e7777772e676f6f676c652e636f6d0050001122") << true
+        << QByteArray::fromHex("001122");
+
     QTest::newRow("no authentication - bad connect")
         << QByteArray::fromHex("0500") << true
-        << QByteArray::fromHex("0500") << false;
+        << QByteArray::fromHex("0500") << false
+        << QByteArray();
     QTest::newRow("bad authentication")
         << QByteArray::fromHex("05ff") << false
-        << QByteArray() << false;
+        << QByteArray() << false
+        << QByteArray();
 }
 
 void tst_QXmppSocks::testClient()
@@ -84,6 +93,7 @@ void tst_QXmppSocks::testClient()
     QFETCH(bool, serverHandshakeWorks);
     QFETCH(QByteArray, serverConnect);
     QFETCH(bool, serverConnectWorks);
+    QFETCH(QByteArray, clientReceivedData);
 
     QTcpServer server;
     QVERIFY(server.listen());
@@ -133,6 +143,8 @@ void tst_QXmppSocks::testClient()
 
     QCOMPARE(client.state(), QAbstractSocket::ConnectedState);
     QCOMPARE(m_connectionSocket->state(), QAbstractSocket::ConnectedState);
+    QByteArray received = client.readAll();
+    QCOMPARE(received, clientReceivedData);
 
     // disconnect
     client.disconnectFromHost();
