@@ -22,6 +22,7 @@ SUBDIRS = \
     qxmppstanza \
     qxmppstreamfeatures \
     qxmppstunmessage \
+    qxmpptransfermanager \
     qxmpputils \
     qxmppvcardiq \
     qxmppversioniq
