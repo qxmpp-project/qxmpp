@@ -1286,6 +1286,9 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
+/// \note The recipient's \a jid must be a full JID with a resource, for instance "user@host/resource".
+///
+
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &description)
 {
     if (jid.isEmpty()) {
@@ -1334,6 +1337,9 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
 ///
+/// \note The recipient's \a jid must be a full JID with a resource, for instance "user@host/resource".
+///
+
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid)
 {
     bool check;
