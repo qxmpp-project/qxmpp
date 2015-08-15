@@ -22,47 +22,8 @@
  */
 
 #include "QXmppClient.h"
-#include "QXmppPasswordChecker.h"
 #include "QXmppServer.h"
 #include "util.h"
-
-class TestPasswordChecker : public QXmppPasswordChecker
-{
-public:
-    TestPasswordChecker(const QString &username, const QString &password)
-        : m_getPassword(true), m_username(username), m_password(password)
-    {
-    };
-
-    /// Retrieves the password for the given username.
-    QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password)
-    {
-        if (request.username() == m_username)
-        {
-            password = m_password;
-            return QXmppPasswordReply::NoError;
-        } else {
-            return QXmppPasswordReply::AuthorizationError;
-        }
-    };
-
-    /// Sets whether getPassword() is enabled.
-    void setGetPassword(bool getPassword)
-    {
-        m_getPassword = getPassword;
-    }
-
-    /// Returns whether getPassword() is enabled.
-    bool hasGetPassword() const
-    {
-        return m_getPassword;
-    };
-
-private:
-    bool m_getPassword;
-    QString m_username;
-    QString m_password;
-};
 
 class tst_QXmppServer : public QObject
 {
@@ -104,7 +65,8 @@ void tst_QXmppServer::testConnect()
     //logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     // prepare server
-    TestPasswordChecker passwordChecker("testuser", "testpwd");
+    TestPasswordChecker passwordChecker;
+    passwordChecker.addCredentials("testuser", "testpwd");
 
     QXmppServer server;
     server.setDomain(testDomain);
