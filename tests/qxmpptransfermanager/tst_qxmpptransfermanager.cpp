@@ -155,7 +155,13 @@ void tst_QXmppTransferManager::testSendFile()
         QCOMPARE(senderJob->state(), QXmppTransferJob::FinishedState);
         QCOMPARE(senderJob->error(), QXmppTransferJob::NoError);
 
+        // finish receiving file
         QVERIFY(receiverJob);
+        connect(receiverJob, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
+
+        QCOMPARE(receiverJob->state(), QXmppTransferJob::FinishedState);
+        QCOMPARE(receiverJob->error(), QXmppTransferJob::NoError);
 
         // check received file
         QFile expectedFile(":/test.svg");
