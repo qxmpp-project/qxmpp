@@ -1282,17 +1282,19 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     emit jobStarted(job);
 }
 
-/// Send file to a remote party.
+/// Sends the file at \a filePath to a remote party.
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
+///
+/// Returns 0 if the \a jid is not valid or if the file at \a filePath cannot be read.
 ///
 /// \note The recipient's \a jid must be a full JID with a resource, for instance "user@host/resource".
 ///
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QString &filePath, const QString &description)
 {
-    if (jid.isEmpty()) {
-        warning("Refusing to send file to an empty jid");
+    if (QXmppUtils::jidToResource(jid).isEmpty()) {
+        warning("The file recipient's JID must be a full JID");
         return 0;
     }
 
@@ -1333,9 +1335,11 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     return job;
 }
 
-/// Send file to a remote party.
+/// Sends the file in \a device to a remote party.
 ///
 /// The remote party will be given the choice to accept or refuse the transfer.
+///
+/// Returns 0 if the \a jid is not valid.
 ///
 /// \note The recipient's \a jid must be a full JID with a resource, for instance "user@host/resource".
 ///
@@ -1345,8 +1349,8 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     bool check;
     Q_UNUSED(check);
 
-    if (jid.isEmpty()) {
-        warning("Refusing to send file to an empty jid");
+    if (QXmppUtils::jidToResource(jid).isEmpty()) {
+        warning("The file recipient's JID must be a full JID");
         return 0;
     }
 
