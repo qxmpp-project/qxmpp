@@ -29,28 +29,62 @@
 #include "QXmppTransferManager.h"
 #include "util.h"
 
+Q_DECLARE_METATYPE(QXmppTransferJob::Method)
+
 class tst_QXmppTransferManager : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void testByteStreams();
+    void init();
+    void testSendFile_data();
+    void testSendFile();
 
     void acceptFile(QXmppTransferJob *job);
 
 private:
     QBuffer receiverBuffer;
+    QXmppTransferJob *receiverJob;
 };
+
+void tst_QXmppTransferManager::init()
+{
+    receiverBuffer.close();
+    receiverBuffer.setData(QByteArray());
+    receiverJob = 0;
+}
 
 void tst_QXmppTransferManager::acceptFile(QXmppTransferJob *job)
 {
+    receiverJob = job;
     receiverBuffer.open(QIODevice::WriteOnly);
     job->accept(&receiverBuffer);
 }
 
-void tst_QXmppTransferManager::testByteStreams()
+void tst_QXmppTransferManager::testSendFile_data()
 {
-   QCOMPARE(1, 1);
+    QTest::addColumn<QXmppTransferJob::Method>("senderMethods");
+    QTest::addColumn<QXmppTransferJob::Method>("receiverMethods");
+    QTest::addColumn<bool>("works");
+
+    QTest::newRow("any - any") << QXmppTransferJob::AnyMethod << QXmppTransferJob::AnyMethod << true;
+    QTest::newRow("any - inband") << QXmppTransferJob::AnyMethod << QXmppTransferJob::InBandMethod << true;
+    QTest::newRow("any - socks") << QXmppTransferJob::AnyMethod << QXmppTransferJob::SocksMethod << true;
+
+    QTest::newRow("inband - any") << QXmppTransferJob::InBandMethod << QXmppTransferJob::AnyMethod << true;
+    QTest::newRow("inband - inband") << QXmppTransferJob::InBandMethod << QXmppTransferJob::InBandMethod << true;
+    QTest::newRow("inband - socks") << QXmppTransferJob::InBandMethod << QXmppTransferJob::SocksMethod << false;
+
+    QTest::newRow("socks - any") << QXmppTransferJob::SocksMethod << QXmppTransferJob::AnyMethod << true;
+    QTest::newRow("socks - inband") << QXmppTransferJob::SocksMethod << QXmppTransferJob::InBandMethod << false;
+    QTest::newRow("socks - socks") << QXmppTransferJob::SocksMethod << QXmppTransferJob::SocksMethod << true;
+}
+
+void tst_QXmppTransferManager::testSendFile()
+{
+    QFETCH(QXmppTransferJob::Method, senderMethods);
+    QFETCH(QXmppTransferJob::Method, receiverMethods);
+    QFETCH(bool, works);
 
     const QString testDomain("localhost");
     const QHostAddress testHost(QHostAddress::LocalHost);
@@ -73,6 +107,7 @@ void tst_QXmppTransferManager::testByteStreams()
     // prepare sender
     QXmppClient sender;
     QXmppTransferManager *senderManager = new QXmppTransferManager;
+    senderManager->setSupportedMethods(senderMethods);
     sender.addExtension(senderManager);
     sender.setLogger(&logger);
 
@@ -93,6 +128,7 @@ void tst_QXmppTransferManager::testByteStreams()
     // prepare receiver
     QXmppClient receiver;
     QXmppTransferManager *receiverManager = new QXmppTransferManager;
+    receiverManager->setSupportedMethods(receiverMethods);
     connect(receiverManager, SIGNAL(fileReceived(QXmppTransferJob*)),
             this, SLOT(acceptFile(QXmppTransferJob*)));
     receiver.addExtension(receiverManager);
@@ -110,16 +146,30 @@ void tst_QXmppTransferManager::testByteStreams()
 
     // send file
     QEventLoop loop;
-    connect(receiverManager, SIGNAL(jobFinished(QXmppTransferJob*)),
-            &loop, SLOT(quit()));
-    QVERIFY(senderManager->sendFile("receiver@localhost/QXmpp", ":/test.svg"));
+    QXmppTransferJob *senderJob = senderManager->sendFile("receiver@localhost/QXmpp", ":/test.svg");
+    QVERIFY(senderJob);
+    connect(senderJob, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 
-    // check received file
-    QFile expectedFile(":/test.svg");
-    QVERIFY(expectedFile.open(QIODevice::ReadOnly));
-    const QByteArray expectedData = expectedFile.readAll();
-    QCOMPARE(receiverBuffer.data(), expectedData);
+    if (works) {
+        QCOMPARE(senderJob->state(), QXmppTransferJob::FinishedState);
+        QCOMPARE(senderJob->error(), QXmppTransferJob::NoError);
+
+        QVERIFY(receiverJob);
+
+        // check received file
+        QFile expectedFile(":/test.svg");
+        QVERIFY(expectedFile.open(QIODevice::ReadOnly));
+        const QByteArray expectedData = expectedFile.readAll();
+        QCOMPARE(receiverBuffer.data(), expectedData);
+    } else {
+        QCOMPARE(senderJob->state(), QXmppTransferJob::FinishedState);
+        QCOMPARE(senderJob->error(), QXmppTransferJob::AbortError);
+
+        QVERIFY(!receiverJob);
+
+        QCOMPARE(receiverBuffer.data(), QByteArray());
+    }
 }
 
 QTEST_MAIN(tst_QXmppTransferManager)
