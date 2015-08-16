@@ -1061,6 +1061,8 @@ QString QXmppStunMessage::toString() const
     if (!iceControlled.isEmpty())
         dumpLines << QString(" * ICE-CONTROLLED %1")
             .arg(QString::fromLatin1(iceControlled.toHex()));
+    if (useCandidate)
+        dumpLines << QString(" * USE-CANDIDATE");
 
     return dumpLines.join("\n");
 }
