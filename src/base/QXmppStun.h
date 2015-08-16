@@ -286,6 +286,7 @@ public:
     QList<QXmppJingleCandidate> localCandidates() const;
     void setLocalUser(const QString &user);
     void setLocalPassword(const QString &password);
+    void setTieBreaker(const QByteArray &tieBreaker);
 
     int component() const;
     void setComponent(int component);
@@ -348,6 +349,7 @@ private:
     QList<QXmppJingleCandidate> m_localCandidates;
     QString m_localUser;
     QString m_localPassword;
+    QByteArray m_tieBreaker;
 
     Pair *m_activePair;
     Pair *m_fallbackPair;
@@ -429,6 +431,8 @@ private:
     QMap<int, QXmppIceComponent*> m_components;
     QString m_localUser;
     QString m_localPassword;
+    QByteArray m_tieBreaker;
+
     QHostAddress m_stunHost;
     quint16 m_stunPort;
     QHostAddress m_turnHost;

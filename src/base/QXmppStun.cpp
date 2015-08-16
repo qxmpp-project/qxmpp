@@ -1584,6 +1584,7 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
 
     m_localUser = QXmppUtils::generateStanzaHash(4);
     m_localPassword = QXmppUtils::generateStanzaHash(22);
+    m_tieBreaker = QXmppUtils::generateRandomBytes(8);
 
     m_timer = new QTimer(this);
     m_timer->setInterval(500);
@@ -1657,10 +1658,10 @@ void QXmppIceComponent::checkCandidates()
         message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
         if (m_iceControlling)
         {
-            message.iceControlling = QByteArray(8, 0);
+            message.iceControlling = m_tieBreaker;
             message.useCandidate = true;
         } else {
-            message.iceControlled = QByteArray(8, 0);
+            message.iceControlled = m_tieBreaker;
         }
         writeStun(message, pair);
     }
@@ -1740,6 +1741,15 @@ QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 void QXmppIceComponent::setLocalUser(const QString &user)
 {
     m_localUser = user;
+}
+
+/// Sets the tie breaker.
+///
+/// \param tieBreaker
+
+void QXmppIceComponent::setTieBreaker(const QByteArray &tieBreaker)
+{
+    m_tieBreaker = tieBreaker;
 }
 
 /// Sets the local password.
@@ -2080,7 +2090,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
             message.setPriority(m_peerReflexivePriority);
             message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
-            message.iceControlled = QByteArray(8, 0);
+            message.iceControlled = m_tieBreaker;
             writeStun(message, pair);
         }
 
@@ -2301,6 +2311,7 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
 
     m_localUser = QXmppUtils::generateStanzaHash(4);
     m_localPassword = QXmppUtils::generateStanzaHash(22);
+    m_tieBreaker = QXmppUtils::generateRandomBytes(8);
 
     // timer to limit connection time to 30 seconds
     m_connectTimer = new QTimer(this);
@@ -2342,6 +2353,7 @@ void QXmppIceConnection::addComponent(int component)
     socket->setIceControlling(m_iceControlling);
     socket->setLocalUser(m_localUser);
     socket->setLocalPassword(m_localPassword);
+    socket->setTieBreaker(m_tieBreaker);
     socket->setStunServer(m_stunHost, m_stunPort);
     socket->setTurnServer(m_turnHost, m_turnPort);
     socket->setTurnUser(m_turnUser);
