@@ -2072,7 +2072,6 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         QXmppStunMessage response;
         response.setId(message.id());
         response.setType(QXmppStunMessage::Binding | QXmppStunMessage::Response);
-        response.setUsername(message.username());
         response.xorMappedHost = pair->remote.host();
         response.xorMappedPort = pair->remote.port();
         writeStun(response, pair);
