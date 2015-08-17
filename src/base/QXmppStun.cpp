@@ -1880,7 +1880,7 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
 
         QXmppJingleCandidate candidate;
         candidate.setComponent(m_component);
-        candidate.setFoundation(foundation++);
+        candidate.setFoundation(QString::number(foundation++));
         // remove scope ID from IPv6 non-link local addresses
         QHostAddress addr(socket->localAddress());
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&

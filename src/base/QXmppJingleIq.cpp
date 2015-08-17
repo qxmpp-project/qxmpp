@@ -431,7 +431,6 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
 QXmppJingleCandidate::QXmppJingleCandidate()
     : m_component(0),
-    m_foundation(0),
     m_generation(0),
     m_network(0),
     m_port(0),
@@ -458,7 +457,7 @@ void QXmppJingleCandidate::setComponent(int component)
 
 /// Returns the candidate's foundation.
 
-int QXmppJingleCandidate::foundation() const
+QString QXmppJingleCandidate::foundation() const
 {
     return m_foundation;
 }
@@ -467,7 +466,7 @@ int QXmppJingleCandidate::foundation() const
 ///
 /// \param foundation
 
-void QXmppJingleCandidate::setFoundation(int foundation)
+void QXmppJingleCandidate::setFoundation(const QString &foundation)
 {
     m_foundation = foundation;
 }
@@ -603,7 +602,7 @@ bool QXmppJingleCandidate::isNull() const
 void QXmppJingleCandidate::parse(const QDomElement &element)
 {
     m_component = element.attribute("component").toInt();
-    m_foundation = element.attribute("foundation").toInt();
+    m_foundation = element.attribute("foundation");
     m_generation = element.attribute("generation").toInt();
     m_host = QHostAddress(element.attribute("ip"));
     m_id = element.attribute("id");
@@ -618,7 +617,7 @@ void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("candidate");
     helperToXmlAddAttribute(writer, "component", QString::number(m_component));
-    helperToXmlAddAttribute(writer, "foundation", QString::number(m_foundation));
+    helperToXmlAddAttribute(writer, "foundation", m_foundation);
     helperToXmlAddAttribute(writer, "generation", QString::number(m_generation));
     helperToXmlAddAttribute(writer, "id", m_id);
     helperToXmlAddAttribute(writer, "ip", m_host.toString());

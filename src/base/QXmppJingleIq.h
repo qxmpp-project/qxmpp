@@ -99,8 +99,8 @@ public:
     int component() const;
     void setComponent(int component);
 
-    int foundation() const;
-    void setFoundation(int foundation);
+    QString foundation() const;
+    void setFoundation(const QString &foundation);
 
     QHostAddress host() const;
     void setHost(const QHostAddress &host);
@@ -135,7 +135,7 @@ public:
 
 private:
     int m_component;
-    int m_foundation;
+    QString m_foundation;
     int m_generation;
     QHostAddress m_host;
     QString m_id;
