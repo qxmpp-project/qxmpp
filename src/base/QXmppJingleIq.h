@@ -102,6 +102,9 @@ public:
     QString foundation() const;
     void setFoundation(const QString &foundation);
 
+    int generation() const;
+    void setGeneration(int generation);
+
     QHostAddress host() const;
     void setHost(const QHostAddress &host);
 

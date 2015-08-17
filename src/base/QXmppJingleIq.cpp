@@ -471,6 +471,22 @@ void QXmppJingleCandidate::setFoundation(const QString &foundation)
     m_foundation = foundation;
 }
 
+/// Returns the candidate's generation.
+
+int QXmppJingleCandidate::generation() const
+{
+    return m_generation;
+}
+
+/// Sets the candidate's generation.
+///
+/// \param generation
+
+void QXmppJingleCandidate::setGeneration(int generation)
+{
+    m_generation = generation;
+}
+
 /// Returns the candidate's host address.
 ///
 

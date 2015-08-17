@@ -55,6 +55,7 @@ void tst_QXmppJingleIq::testCandidate()
     QXmppJingleCandidate candidate;
     parsePacket(candidate, xml);
     QCOMPARE(candidate.foundation(), QLatin1String("1"));
+    QCOMPARE(candidate.generation(), 0);
     QCOMPARE(candidate.id(), QLatin1String("el0747fg11"));
     QCOMPARE(candidate.host(), QHostAddress("10.0.1.1"));
     QCOMPARE(candidate.network(), 1);
