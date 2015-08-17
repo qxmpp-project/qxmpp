@@ -30,11 +30,39 @@ class tst_QXmppJingleIq : public QObject
     Q_OBJECT
 
 private slots:
+    void testCandidate();
     void testSession();
     void testTerminate();
     void testAudioPayloadType();
     void testVideoPayloadType();
     void testRinging();
+};
+
+void tst_QXmppJingleIq::testCandidate()
+{
+    const QByteArray xml(
+        "<candidate component=\"1\""
+        " foundation=\"1\""
+        " generation=\"0\""
+        " id=\"el0747fg11\""
+        " ip=\"10.0.1.1\""
+        " network=\"1\""
+        " port=\"8998\""
+        " priority=\"2130706431\""
+        " protocol=\"udp\""
+        " type=\"host\"/>");
+
+    QXmppJingleCandidate candidate;
+    parsePacket(candidate, xml);
+    QCOMPARE(candidate.foundation(), QLatin1String("1"));
+    QCOMPARE(candidate.id(), QLatin1String("el0747fg11"));
+    QCOMPARE(candidate.host(), QHostAddress("10.0.1.1"));
+    QCOMPARE(candidate.network(), 1);
+    QCOMPARE(candidate.port(), quint16(8998));
+    QCOMPARE(candidate.priority(), 2130706431);
+    QCOMPARE(candidate.protocol(), QLatin1String("udp"));
+    QCOMPARE(candidate.type(), QXmppJingleCandidate::HostType);
+    serializePacket(candidate, xml);
 };
 
 void tst_QXmppJingleIq::testSession()
