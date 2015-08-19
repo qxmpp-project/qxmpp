@@ -121,6 +121,7 @@ QString QXmppRtpPacket::toString() const
 QXmppRtpChannel::QXmppRtpChannel()
     : m_outgoingPayloadNumbered(false)
 {
+    m_outgoingSsrc = qrand();
 }
 
 /// Returns the local payload types.
@@ -166,6 +167,23 @@ void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> 
     // call hook
     payloadTypesChanged();
 }
+
+/// Returns the local SSRC.
+
+quint32 QXmppRtpChannel::localSsrc() const
+{
+    return m_outgoingSsrc;
+}
+
+/// Sets the local SSRC.
+///
+/// \param ssrc
+
+void QXmppRtpChannel::setLocalSsrc(quint32 ssrc)
+{
+    m_outgoingSsrc = ssrc;
+}
+
 
 enum CodecId {
     G711u = 0,
@@ -260,7 +278,6 @@ public:
     QList<ToneInfo> outgoingTones;
     QXmppJinglePayloadType outgoingTonesType;
 
-    quint32 outgoingSsrc;
     QXmppJinglePayloadType payloadType;
 
 private:
@@ -281,11 +298,9 @@ QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate(QXmppRtpAudioChannel *q
     outgoingSequence(1),
     outgoingStamp(0),
     outgoingTimer(0),
-    outgoingSsrc(0),
     q(qq)
 {
     qRegisterMetaType<QXmppRtpAudioChannel::Tone>("QXmppRtpAudioChannel::Tone");
-    outgoingSsrc = qrand();
 }
 
 /// Returns the audio codec for the given payload type.
@@ -688,7 +703,7 @@ void QXmppRtpAudioChannel::writeDatagram()
             packet.type = d->outgoingTonesType.id();
             packet.sequence = d->outgoingSequence;
             packet.stamp = info.outgoingStart;
-            packet.ssrc = d->outgoingSsrc;
+            packet.ssrc = localSsrc();
 
             QDataStream output(&packet.payload, QIODevice::WriteOnly);
             output << quint8(info.tone);
@@ -726,7 +741,7 @@ void QXmppRtpAudioChannel::writeDatagram()
         packet.type = d->payloadType.id();
         packet.sequence = d->outgoingSequence;
         packet.stamp = d->outgoingStamp;
-        packet.ssrc = d->outgoingSsrc;
+        packet.ssrc = localSsrc();
 
         // encode audio chunk
         QDataStream input(chunk);
@@ -856,17 +871,14 @@ public:
     quint8 outgoingId;
     quint16 outgoingSequence;
     quint32 outgoingStamp;
-    quint32 outgoingSsrc;
 };
 
 QXmppRtpVideoChannelPrivate::QXmppRtpVideoChannelPrivate()
     : encoder(0),
     outgoingId(0),
     outgoingSequence(1),
-    outgoingStamp(0),
-    outgoingSsrc(0)
+    outgoingStamp(0)
 {
-    outgoingSsrc = qrand();
 }
 
 /// Constructs a new RTP video channel with the given \a parent.
@@ -1057,7 +1069,7 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
     packet.version = RTP_VERSION;
     packet.marker = false;
     packet.type = d->outgoingId;
-    packet.ssrc = d->outgoingSsrc;
+    packet.ssrc = localSsrc();
     foreach (const QByteArray &payload, d->encoder->handleFrame(frame)) {
         packet.sequence = d->outgoingSequence++;
         packet.stamp = d->outgoingStamp;

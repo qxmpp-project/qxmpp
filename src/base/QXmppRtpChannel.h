@@ -77,6 +77,9 @@ public:
     QList<QXmppJinglePayloadType> localPayloadTypes();
     void setRemotePayloadTypes(const QList<QXmppJinglePayloadType> &remotePayloadTypes);
 
+    quint32 localSsrc() const;
+    void setLocalSsrc(quint32 ssrc);
+
 protected:
     /// \cond
     virtual void payloadTypesChanged() = 0;
@@ -85,6 +88,9 @@ protected:
     QList<QXmppJinglePayloadType> m_outgoingPayloadTypes;
     bool m_outgoingPayloadNumbered;
     /// \endcond
+
+private:
+    quint32 m_outgoingSsrc;
 };
 
 /// \brief The QXmppRtpAudioChannel class represents an RTP audio channel to a remote party.
