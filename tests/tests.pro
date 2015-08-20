@@ -16,6 +16,7 @@ SUBDIRS = \
     qxmppresultset \
     qxmpprosteriq \
     qxmpprpciq \
+    qxmpprtcppacket \
     qxmpprtppacket \
     qxmppserver \
     qxmppsessioniq \
