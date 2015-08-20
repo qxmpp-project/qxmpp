@@ -35,34 +35,6 @@ class QXmppJinglePayloadType;
 class QXmppRtpAudioChannelPrivate;
 class QXmppRtpVideoChannelPrivate;
 
-/// \brief The QXmppRtpPacket class represents an RTP packet.
-///
-
-class QXMPP_EXPORT QXmppRtpPacket
-{
-public:
-    bool decode(const QByteArray &ba);
-    QByteArray encode() const;
-    QString toString() const;
-
-    ///  RTP version.
-    quint8 version;
-    /// Marker flag.
-    bool marker;
-    /// Payload type.
-    quint8 type;
-    /// Synchronization source.
-    quint32 ssrc;
-    /// Contributing sources.
-    QList<quint32> csrc;
-    /// Sequence number.
-    quint16 sequence;
-    /// Timestamp.
-    quint32 stamp;
-    /// Raw payload data.
-    QByteArray payload;
-};
-
 class QXMPP_EXPORT QXmppRtpChannel
 {
 public:

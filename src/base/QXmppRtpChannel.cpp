@@ -30,6 +30,7 @@
 #include "QXmppCodec_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
+#include "QXmppRtpPacket.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
@@ -38,83 +39,6 @@
 //#define QXMPP_DEBUG_RTP
 //#define QXMPP_DEBUG_RTP_BUFFER
 #define SAMPLE_BYTES 2
-
-const quint8 RTP_VERSION = 0x02;
-
-/// Parses an RTP packet.
-///
-/// \param ba
-
-bool QXmppRtpPacket::decode(const QByteArray &ba)
-{
-    if (ba.isEmpty())
-        return false;
-
-    // fixed header
-    quint8 tmp;
-    QDataStream stream(ba);
-    stream >> tmp;
-    version = (tmp >> 6);
-    const quint8 cc = (tmp >> 1) & 0xf;
-    const int hlen = 12 + 4 * cc;
-    if (version != RTP_VERSION || ba.size() < hlen)
-        return false;
-    stream >> tmp;
-    marker = (tmp >> 7);
-    type = tmp & 0x7f;
-    stream >> sequence;
-    stream >> stamp;
-    stream >> ssrc;
-
-    // contributing source IDs
-    csrc.clear();
-    quint32 src;
-    for (int i = 0; i < cc; ++i) {
-        stream >> src;
-        csrc << src;
-    }
-
-    // retrieve payload
-    payload = ba.right(ba.size() - hlen);
-    return true;
-}
-
-/// Encodes an RTP packet.
-
-QByteArray QXmppRtpPacket::encode() const
-{
-    Q_ASSERT(csrc.size() < 16);
-
-    // fixed header
-    QByteArray ba;
-    ba.resize(payload.size() + 12 + 4 * csrc.size());
-    QDataStream stream(&ba, QIODevice::WriteOnly);
-    stream << quint8(((version & 0x3) << 6) |
-                     ((csrc.size() & 0xf) << 1));
-    stream << quint8((type & 0x7f) | (marker << 7));
-    stream << sequence;
-    stream << stamp;
-    stream << ssrc;
-
-    // contributing source ids
-    foreach (const quint32 &src, csrc)
-        stream << src;
-
-    stream.writeRawData(payload.constData(), payload.size());
-    return ba;
-}
-
-/// Returns a string representation of the RTP header.
-
-QString QXmppRtpPacket::toString() const
-{
-    return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-        QString::number(sequence),
-        QString::number(stamp),
-        QString::number(marker),
-        QString::number(type),
-        QString::number(payload.size()));
-}
 
 /// Creates a new RTP channel.
 
@@ -698,7 +622,6 @@ void QXmppRtpAudioChannel::writeDatagram()
         if (d->outgoingTonesType.id()) {
             // send RFC 2833 DTMF
             QXmppRtpPacket packet;
-            packet.version = RTP_VERSION;
             packet.marker = (info.outgoingStart == d->outgoingStamp);
             packet.type = d->outgoingTonesType.id();
             packet.sequence = d->outgoingSequence;
@@ -730,7 +653,6 @@ void QXmppRtpAudioChannel::writeDatagram()
     if (sendAudio) {
         // send audio data
         QXmppRtpPacket packet;
-        packet.version = RTP_VERSION;
         if (d->outgoingMarker)
         {
             packet.marker = true;
@@ -1066,7 +988,6 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
     }
 
     QXmppRtpPacket packet;
-    packet.version = RTP_VERSION;
     packet.marker = false;
     packet.type = d->outgoingId;
     packet.ssrc = localSsrc();

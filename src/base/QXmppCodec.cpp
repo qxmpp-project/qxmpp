@@ -32,6 +32,7 @@
 
 #include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
+#include "QXmppRtpPacket.h"
 
 #include <cstring>
 

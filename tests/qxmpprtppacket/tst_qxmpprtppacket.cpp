@@ -23,7 +23,7 @@
 
 #include <QObject>
 #include <QtTest>
-#include "QXmppRtpChannel.h"
+#include "QXmppRtpPacket.h"
 
 class tst_QXmppRtpPacket : public QObject
 {
@@ -53,7 +53,6 @@ void tst_QXmppRtpPacket::testSimple()
     QByteArray data("\x80\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\x12\x34\x56", 15);
     QXmppRtpPacket packet;
     QCOMPARE(packet.decode(data), true);
-    QCOMPARE(packet.version, quint8(2));
     QCOMPARE(packet.marker, false);
     QCOMPARE(packet.type, quint8(0));
     QCOMPARE(packet.sequence, quint16(16082));
@@ -69,7 +68,6 @@ void tst_QXmppRtpPacket::testWithCsrc()
     QByteArray data("\x84\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\xab\xcd\xef\x01\xde\xad\xbe\xef\x12\x34\x56", 23);
     QXmppRtpPacket packet;
     QCOMPARE(packet.decode(data), true);
-    QCOMPARE(packet.version, quint8(2));
     QCOMPARE(packet.marker, false);
     QCOMPARE(packet.type, quint8(0));
     QCOMPARE(packet.sequence, quint16(16082));
