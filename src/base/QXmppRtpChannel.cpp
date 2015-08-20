@@ -345,28 +345,29 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
 
     // check sequence number
 #if 0
-    if (d->incomingSequence && packet.sequence != d->incomingSequence + 1)
+    if (d->incomingSequence && packet.sequence() != d->incomingSequence + 1)
         warning(QString("RTP packet seq %1 is out of order, previous was %2")
-                .arg(QString::number(packet.sequence))
+                .arg(QString::number(packet.sequence()))
                 .arg(QString::number(d->incomingSequence)));
 #endif
-    d->incomingSequence = packet.sequence;
+    d->incomingSequence = packet.sequence();
 
     // get or create codec
     QXmppCodec *codec = 0;
-    if (!d->incomingCodecs.contains(packet.type)) {
+    const quint8 packetType = packet.type();
+    if (!d->incomingCodecs.contains(packetType)) {
         foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
-            if (packet.type == payload.id()) {
+            if (packetType == payload.id()) {
                 codec = d->codecForPayloadType(payload);
                 break;
             }
         }
         if (codec)
-            d->incomingCodecs.insert(packet.type, codec);
+            d->incomingCodecs.insert(packetType, codec);
         else
-            warning(QString("Could not find codec for RTP type %1").arg(QString::number(packet.type)));
+            warning(QString("Could not find codec for RTP type %1").arg(QString::number(packetType)));
     } else {
-        codec = d->incomingCodecs.value(packet.type);
+        codec = d->incomingCodecs.value(packetType);
     }
     if (!codec)
         return;
@@ -374,25 +375,25 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     // determine packet's position in the buffer (in bytes)
     qint64 packetOffset = 0;
     if (!d->incomingBuffer.isEmpty()) {
-        packetOffset = packet.stamp * SAMPLE_BYTES - d->incomingPos;
+        packetOffset = packet.stamp() * SAMPLE_BYTES - d->incomingPos;
         if (packetOffset < 0) {
 #ifdef QXMPP_DEBUG_RTP_BUFFER
             warning(QString("RTP packet stamp %1 is too old, buffer start is %2")
-                    .arg(QString::number(packet.stamp))
+                    .arg(QString::number(packet.stamp()))
                     .arg(QString::number(d->incomingPos)));
 #endif
             return;
         }
     } else {
-        d->incomingPos = packet.stamp * SAMPLE_BYTES + (d->incomingPos % SAMPLE_BYTES);
+        d->incomingPos = packet.stamp() * SAMPLE_BYTES + (d->incomingPos % SAMPLE_BYTES);
     }
 
     // allocate space for new packet
     // FIXME: this is wrong, we want the decoded data size!
-    qint64 packetLength = packet.payload.size();
+    const qint64 packetLength = packet.payload().size();
     if (packetOffset + packetLength > d->incomingBuffer.size())
         d->incomingBuffer += QByteArray(packetOffset + packetLength - d->incomingBuffer.size(), 0);
-    QDataStream input(packet.payload);
+    QDataStream input(packet.payload());
     QDataStream output(&d->incomingBuffer, QIODevice::WriteOnly);
     output.device()->seek(packetOffset);
     output.setByteOrder(QDataStream::LittleEndian);
@@ -622,16 +623,18 @@ void QXmppRtpAudioChannel::writeDatagram()
         if (d->outgoingTonesType.id()) {
             // send RFC 2833 DTMF
             QXmppRtpPacket packet;
-            packet.marker = (info.outgoingStart == d->outgoingStamp);
-            packet.type = d->outgoingTonesType.id();
-            packet.sequence = d->outgoingSequence;
-            packet.stamp = info.outgoingStart;
-            packet.ssrc = localSsrc();
+            packet.setMarker(info.outgoingStart == d->outgoingStamp);
+            packet.setType(d->outgoingTonesType.id());
+            packet.setSequence(d->outgoingSequence);
+            packet.setStamp(info.outgoingStart);
+            packet.setSsrc(localSsrc());
 
-            QDataStream output(&packet.payload, QIODevice::WriteOnly);
+            QByteArray payload;
+            QDataStream output(&payload, QIODevice::WriteOnly);
             output << quint8(info.tone);
             output << quint8(info.finished ? 0x80 : 0x00);
             output << quint16(d->outgoingStamp + packetTicks - info.outgoingStart);
+            packet.setPayload(payload);
 #ifdef QXMPP_DEBUG_RTP
             logSent(packet.toString());
 #endif
@@ -655,21 +658,23 @@ void QXmppRtpAudioChannel::writeDatagram()
         QXmppRtpPacket packet;
         if (d->outgoingMarker)
         {
-            packet.marker = true;
+            packet.setMarker(true);
             d->outgoingMarker = false;
         } else {
-            packet.marker = false;
+            packet.setMarker(false);
         }
-        packet.type = d->payloadType.id();
-        packet.sequence = d->outgoingSequence;
-        packet.stamp = d->outgoingStamp;
-        packet.ssrc = localSsrc();
+        packet.setType(d->payloadType.id());
+        packet.setSequence(d->outgoingSequence);
+        packet.setStamp(d->outgoingStamp);
+        packet.setSsrc(localSsrc());
 
         // encode audio chunk
         QDataStream input(chunk);
         input.setByteOrder(QDataStream::LittleEndian);
-        QDataStream output(&packet.payload, QIODevice::WriteOnly);
+        QByteArray payload;
+        QDataStream output(&payload, QIODevice::WriteOnly);
         const qint64 packetTicks = d->outgoingCodec->encode(input, output);
+        packet.setPayload(payload);
 
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
@@ -872,7 +877,7 @@ void QXmppRtpVideoChannel::datagramReceived(const QByteArray &ba)
 #endif
 
     // get codec
-    QXmppVideoDecoder *decoder = d->decoders.value(packet.type);
+    QXmppVideoDecoder *decoder = d->decoders.value(packet.type());
     if (!decoder)
         return;
     d->frames << decoder->handlePacket(packet);
@@ -988,13 +993,13 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
     }
 
     QXmppRtpPacket packet;
-    packet.marker = false;
-    packet.type = d->outgoingId;
-    packet.ssrc = localSsrc();
+    packet.setMarker(false);
+    packet.setType(d->outgoingId);
+    packet.setSsrc(localSsrc());
     foreach (const QByteArray &payload, d->encoder->handleFrame(frame)) {
-        packet.sequence = d->outgoingSequence++;
-        packet.stamp = d->outgoingStamp;
-        packet.payload = payload;
+        packet.setSequence(d->outgoingSequence++);
+        packet.setStamp(d->outgoingStamp);
+        packet.setPayload(payload);
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
 #endif

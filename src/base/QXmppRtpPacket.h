@@ -37,26 +37,38 @@ class QXMPP_EXPORT QXmppRtpPacket
 {
 public:
     QXmppRtpPacket();
+    QXmppRtpPacket(const QXmppRtpPacket &other);
     ~QXmppRtpPacket();
+
+    QXmppRtpPacket& operator=(const QXmppRtpPacket &other);
 
     bool decode(const QByteArray &ba);
     QByteArray encode() const;
     QString toString() const;
 
-    /// Marker flag.
-    bool marker;
-    /// Payload type.
-    quint8 type;
-    /// Synchronization source.
-    quint32 ssrc;
-    /// Contributing sources.
-    QList<quint32> csrc;
-    /// Sequence number.
-    quint16 sequence;
-    /// Timestamp.
-    quint32 stamp;
-    /// Raw payload data.
-    QByteArray payload;
+    QList<quint32> csrc() const;
+    void setCsrc(const QList<quint32> &csrc);
+
+    bool marker() const;
+    void setMarker(bool marker);
+
+    QByteArray payload() const;
+    void setPayload(const QByteArray &payload);
+
+    quint16 sequence() const;
+    void setSequence(quint16 sequence);
+
+    quint32 ssrc() const;
+    void setSsrc(quint32 ssrc);
+    
+    quint32 stamp() const;
+    void setStamp(quint32 stamp);
+
+    quint8 type() const;
+    void setType(quint8 type);
+
+private:
+    QSharedDataPointer<QXmppRtpPacketPrivate> d;
 };
 
 #endif

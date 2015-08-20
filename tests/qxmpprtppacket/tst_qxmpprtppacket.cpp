@@ -53,13 +53,13 @@ void tst_QXmppRtpPacket::testSimple()
     QByteArray data("\x80\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\x12\x34\x56", 15);
     QXmppRtpPacket packet;
     QCOMPARE(packet.decode(data), true);
-    QCOMPARE(packet.marker, false);
-    QCOMPARE(packet.type, quint8(0));
-    QCOMPARE(packet.sequence, quint16(16082));
-    QCOMPARE(packet.stamp, quint32(144));
-    QCOMPARE(packet.ssrc, quint32(1606227614));
-    QCOMPARE(packet.csrc, QList<quint32>());
-    QCOMPARE(packet.payload, QByteArray("\x12\x34\x56", 3));
+    QCOMPARE(packet.marker(), false);
+    QCOMPARE(packet.type(), quint8(0));
+    QCOMPARE(packet.sequence(), quint16(16082));
+    QCOMPARE(packet.stamp(), quint32(144));
+    QCOMPARE(packet.ssrc(), quint32(1606227614));
+    QCOMPARE(packet.csrc(), QList<quint32>());
+    QCOMPARE(packet.payload(), QByteArray("\x12\x34\x56", 3));
     QCOMPARE(packet.encode(), data);
 }
 
@@ -68,14 +68,13 @@ void tst_QXmppRtpPacket::testWithCsrc()
     QByteArray data("\x84\x00\x3e\xd2\x00\x00\x00\x90\x5f\xbd\x16\x9e\xab\xcd\xef\x01\xde\xad\xbe\xef\x12\x34\x56", 23);
     QXmppRtpPacket packet;
     QCOMPARE(packet.decode(data), true);
-    QCOMPARE(packet.marker, false);
-    QCOMPARE(packet.type, quint8(0));
-    QCOMPARE(packet.sequence, quint16(16082));
-    QCOMPARE(packet.stamp, quint32(144));
-    QCOMPARE(packet.ssrc, quint32(1606227614));
-    qDebug() << packet.csrc;
-    QCOMPARE(packet.csrc, QList<quint32>() << quint32(0xabcdef01) << quint32(0xdeadbeef));
-    QCOMPARE(packet.payload, QByteArray("\x12\x34\x56", 3));
+    QCOMPARE(packet.marker(), false);
+    QCOMPARE(packet.type(), quint8(0));
+    QCOMPARE(packet.sequence(), quint16(16082));
+    QCOMPARE(packet.stamp(), quint32(144));
+    QCOMPARE(packet.ssrc(), quint32(1606227614));
+    QCOMPARE(packet.csrc(), QList<quint32>() << quint32(0xabcdef01) << quint32(0xdeadbeef));
+    QCOMPARE(packet.payload(), QByteArray("\x12\x34\x56", 3));
     QCOMPARE(packet.encode(), data);
 }
 

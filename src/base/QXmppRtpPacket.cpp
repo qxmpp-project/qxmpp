@@ -22,12 +22,34 @@
  */
 
 #include <QDataStream>
+#include <QSharedData>
 
 #include "QXmppRtpPacket.h"
 
 #define RTP_VERSION 2
 
-QXmppRtpPacket::QXmppRtpPacket()
+class QXmppRtpPacketPrivate : public QSharedData
+{
+public:
+    QXmppRtpPacketPrivate();
+
+    /// Marker flag.
+    bool marker;
+    /// Payload type.
+    quint8 type;
+    /// Synchronization source.
+    quint32 ssrc;
+    /// Contributing sources.
+    QList<quint32> csrc;
+    /// Sequence number.
+    quint16 sequence;
+    /// Timestamp.
+    quint32 stamp;
+    /// Raw payload data.
+    QByteArray payload;
+};
+
+QXmppRtpPacketPrivate::QXmppRtpPacketPrivate()
     : marker(false)
     , type(0)
     , ssrc(0)
@@ -36,8 +58,34 @@ QXmppRtpPacket::QXmppRtpPacket()
 {
 }
 
+/// Constructs an empty RTP packet
+
+QXmppRtpPacket::QXmppRtpPacket()
+    : d(new QXmppRtpPacketPrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+///
+QXmppRtpPacket::QXmppRtpPacket(const QXmppRtpPacket &other)
+    : d(other.d)
+{
+}
+
 QXmppRtpPacket::~QXmppRtpPacket()
 {
+}
+
+/// Assigns the other packet to this one.
+///
+/// \param other
+///
+QXmppRtpPacket& QXmppRtpPacket::operator=(const QXmppRtpPacket& other)
+{
+    d = other.d;
+    return *this;
 }
 
 /// Parses an RTP packet.
@@ -58,22 +106,22 @@ bool QXmppRtpPacket::decode(const QByteArray &ba)
     if ((tmp >> 6) != RTP_VERSION || ba.size() < hlen)
         return false;
     stream >> tmp;
-    marker = (tmp >> 7);
-    type = tmp & 0x7f;
-    stream >> sequence;
-    stream >> stamp;
-    stream >> ssrc;
+    d->marker = (tmp >> 7);
+    d->type = tmp & 0x7f;
+    stream >> d->sequence;
+    stream >> d->stamp;
+    stream >> d->ssrc;
 
     // contributing source IDs
-    csrc.clear();
+    d->csrc.clear();
     quint32 src;
     for (int i = 0; i < cc; ++i) {
         stream >> src;
-        csrc << src;
+        d->csrc << src;
     }
 
     // retrieve payload
-    payload = ba.right(ba.size() - hlen);
+    d->payload = ba.right(ba.size() - hlen);
     return true;
 }
 
@@ -81,25 +129,95 @@ bool QXmppRtpPacket::decode(const QByteArray &ba)
 
 QByteArray QXmppRtpPacket::encode() const
 {
-    Q_ASSERT(csrc.size() < 16);
+    Q_ASSERT(d->csrc.size() < 16);
 
     // fixed header
     QByteArray ba;
-    ba.resize(payload.size() + 12 + 4 * csrc.size());
+    ba.resize(d->payload.size() + 12 + 4 * d->csrc.size());
     QDataStream stream(&ba, QIODevice::WriteOnly);
     stream << quint8((RTP_VERSION << 6) |
-                     ((csrc.size() & 0xf) << 1));
-    stream << quint8((type & 0x7f) | (marker << 7));
-    stream << sequence;
-    stream << stamp;
-    stream << ssrc;
+                     ((d->csrc.size() & 0xf) << 1));
+    stream << quint8((d->type & 0x7f) | (d->marker << 7));
+    stream << d->sequence;
+    stream << d->stamp;
+    stream << d->ssrc;
 
     // contributing source ids
-    foreach (const quint32 &src, csrc)
+    foreach (const quint32 &src, d->csrc)
         stream << src;
 
-    stream.writeRawData(payload.constData(), payload.size());
+    stream.writeRawData(d->payload.constData(), d->payload.size());
     return ba;
+}
+
+QList<quint32> QXmppRtpPacket::csrc() const
+{
+    return d->csrc;
+}
+
+void QXmppRtpPacket::setCsrc(const QList<quint32> &csrc)
+{
+    d->csrc = csrc;
+}
+
+bool QXmppRtpPacket::marker() const
+{
+    return d->marker;
+}
+
+void QXmppRtpPacket::setMarker(bool marker)
+{
+    d->marker = marker;
+}
+
+QByteArray QXmppRtpPacket::payload() const
+{
+    return d->payload;
+}
+
+void QXmppRtpPacket::setPayload(const QByteArray &payload)
+{
+    d->payload = payload;
+}
+
+quint32 QXmppRtpPacket::ssrc() const
+{
+    return d->ssrc;
+}
+
+void QXmppRtpPacket::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
+}
+
+quint16 QXmppRtpPacket::sequence() const
+{
+    return d->sequence;
+}
+
+void QXmppRtpPacket::setSequence(quint16 sequence)
+{
+    d->sequence = sequence;
+}
+
+quint32 QXmppRtpPacket::stamp() const
+{
+    return d->stamp;
+}
+
+void QXmppRtpPacket::setStamp(quint32 stamp)
+{
+    d->stamp = stamp;
+}
+
+quint8 QXmppRtpPacket::type() const
+{
+    return d->type;
+}
+
+void QXmppRtpPacket::setType(quint8 type)
+{
+    d->type = type;
 }
 
 /// Returns a string representation of the RTP header.
@@ -107,9 +225,9 @@ QByteArray QXmppRtpPacket::encode() const
 QString QXmppRtpPacket::toString() const
 {
     return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-        QString::number(sequence),
-        QString::number(stamp),
-        QString::number(marker),
-        QString::number(type),
-        QString::number(payload.size()));
+        QString::number(d->sequence),
+        QString::number(d->stamp),
+        QString::number(d->marker),
+        QString::number(d->type),
+        QString::number(d->payload.size()));
 }

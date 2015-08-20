@@ -676,7 +676,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
     QList<QXmppVideoFrame> frames;
 
     // theora deframing: draft-ietf-avt-rtp-theora-00
-    QDataStream stream(packet.payload);
+    QDataStream stream(packet.payload());
     quint32 theora_header;
     stream >> theora_header;
 
@@ -1185,9 +1185,10 @@ QXmppVideoFormat QXmppVpxDecoder::format() const
 QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packet)
 {
     QList<QXmppVideoFrame> frames;
+    const QByteArray payload = packet.payload();
 
     // vp8 deframing: http://tools.ietf.org/html/draft-westin-payload-vp8-00
-    QDataStream stream(packet.payload);
+    QDataStream stream(payload);
     quint8 vpx_header;
     stream >> vpx_header;
 
@@ -1198,7 +1199,7 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
         return frames;
     }
 
-    const int packetLength = packet.payload.size() - 1;
+    const int packetLength = payload.size() - 1;
 #ifdef QXMPP_DEBUG_VPX
     qDebug("Vpx fragment FI: %d, size %d", frag_type, packetLength);
 #endif
@@ -1216,9 +1217,9 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
 
     if (frag_type == NoFragment) {
         // unfragmented packet
-        if ((packet.payload[1] & 0x1) == 0 // is key frame
+        if ((payload[1] & 0x1) == 0 // is key frame
             || packet.sequence == sequence) {
-            if (d->decodeFrame(packet.payload.mid(1), &frame))
+            if (d->decodeFrame(payload.mid(1), &frame))
                 frames << frame;
 
             sequence = packet.sequence + 1;
@@ -1229,9 +1230,9 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
         // fragments
         if (frag_type == StartFragment) {
             // start fragment
-            if ((packet.payload[1] & 0x1) == 0 // is key frame
+            if ((payload[1] & 0x1) == 0 // is key frame
                 || packet.sequence == sequence) {
-                d->packetBuffer = packet.payload.mid(1);
+                d->packetBuffer = payload.mid(1);
                 sequence = packet.sequence + 1;
             }
         } else {
