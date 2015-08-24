@@ -1935,8 +1935,10 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
             pair->socket == socket)
             return pair;
 
+    // 7.2.1.3. Learning Peer Reflexive Candidates
     QXmppJingleCandidate candidate;
     candidate.setComponent(d->component);
+    //candidate.setFoundation(..);
     candidate.setHost(host);
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(port);
@@ -2203,7 +2205,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             pair->checked |= QIODevice::ReadOnly;
         }
 
-        if (!d->iceControlling && !d->activePair && !d->remoteUser.isEmpty())
+        if (!d->iceControlling && pair->state() != CandidatePair::SucceededState && !d->remoteUser.isEmpty())
         {
             // send a triggered connectivity test
             QXmppStunMessage message;
