@@ -2199,8 +2199,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         writeStun(response, pair);
 
         // update state
-        if (d->iceControlling || message.useCandidate)
-        {
+        if (d->iceControlling || message.useCandidate) {
             debug(QString("ICE reverse check complete %1").arg(pair->toString()));
             pair->checked |= QIODevice::ReadOnly;
         }
@@ -2220,7 +2219,8 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             pair->transaction = new QXmppStunTransaction(message, this);
         }
 
-    } else if (message.messageClass() == QXmppStunMessage::Response) {
+    } else if (message.messageClass() == QXmppStunMessage::Response
+            || message.messageClass() == QXmppStunMessage::Error) {
 
         // find the pair for this transaction
         foreach (CandidatePair *ptr, d->pairs) {
@@ -2229,10 +2229,8 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
                 break;
             }
         }
-        if (!pair) {
-            debug(QString("Unknown transaction %1").arg(QString::fromLatin1(message.id().toHex())));
+        if (!pair)
             return;
-        }
 
         // check remote host and port
         if (remoteHost != pair->remote.host() || remotePort != pair->remote.port()) {
@@ -2244,10 +2242,6 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             pair->transaction->readStun(error);
             return;
         }
-
-        // store peer-reflexive address
-        pair->reflexive.setHost(message.xorMappedHost);
-        pair->reflexive.setPort(message.xorMappedPort);
 
         pair->transaction->readStun(message);
     }
@@ -2272,7 +2266,12 @@ void QXmppIceComponent::transactionFinished()
     QXmppStunTransaction *transaction = qobject_cast<QXmppStunTransaction*>(sender());
     CandidatePair *pair = d->findPair(transaction);
     if (pair) {
-        if (transaction->response().messageClass() == QXmppStunMessage::Response) {
+        const QXmppStunMessage response = transaction->response();
+        if (response.messageClass() == QXmppStunMessage::Response) {
+            // store peer-reflexive address
+            pair->reflexive.setHost(response.xorMappedHost);
+            pair->reflexive.setPort(response.xorMappedPort);
+
             // outgoing media can flow
             pair->checked |= QIODevice::WriteOnly;
             pair->setState(CandidatePair::SucceededState);
@@ -2280,7 +2279,6 @@ void QXmppIceComponent::transactionFinished()
             debug(QString("ICE forward check failed %1 (error %2)").arg(
                 pair->toString(),
                 transaction->response().errorPhrase));
-            pair->checked |= QIODevice::WriteOnly;
             pair->setState(CandidatePair::FailedState);
         }
     }
