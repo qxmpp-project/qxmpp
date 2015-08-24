@@ -314,6 +314,8 @@ private slots:
     void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port, QUdpSocket *socket = 0);
     void readyRead();
     void turnConnected();
+    void transactionFinished();
+    void writeStun(const QXmppStunMessage &request);
 
 signals:
     /// \brief This signal is emitted once ICE negotiation succeeds.
@@ -325,41 +327,9 @@ signals:
     /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
-private slots:
-    void transactionFinished();
-    void writeStun(const QXmppStunMessage &request);
-
 private:
     CandidatePair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
     qint64 writeStun(const QXmppStunMessage &message, CandidatePair *pair);
-
-    int m_component;
-
-    QList<QXmppJingleCandidate> m_localCandidates;
-    QString m_localUser;
-    QString m_localPassword;
-    QByteArray m_tieBreaker;
-
-    CandidatePair *m_activePair;
-    CandidatePair *m_fallbackPair;
-    bool m_iceControlling;
-    quint32 m_peerReflexivePriority;
-    QString m_remoteUser;
-    QString m_remotePassword;
-
-    QList<QUdpSocket*> m_sockets;
-    QTimer *m_timer;
-
-    // STUN server
-    QByteArray m_stunId;
-    QHostAddress m_stunHost;
-    quint16 m_stunPort;
-    QTimer *m_stunTimer;
-    int m_stunTries;
-
-    // TURN server
-    QXmppTurnAllocation *m_turnAllocation;
-    bool m_turnConfigured;
 
     QXmppIceComponentPrivate *d;
 };

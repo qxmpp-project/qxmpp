@@ -1622,10 +1622,53 @@ QString CandidatePair::toString() const
 class QXmppIceComponentPrivate
 {
 public:
+    QXmppIceComponentPrivate();
     CandidatePair* findPair(QXmppStunTransaction *transaction);
 
+    CandidatePair *activePair;
+    int component;
+    CandidatePair *fallbackPair;
+    bool iceControlling;
+
+    QList<QXmppJingleCandidate> localCandidates;
+    QString localUser;
+    QString localPassword;
+    QByteArray tieBreaker;
+
+    quint32 peerReflexivePriority;
+    QString remoteUser;
+    QString remotePassword;
+
     QList<CandidatePair*> pairs;
+    QList<QUdpSocket*> sockets;
+    QTimer *timer;
+
+    // STUN server
+    QByteArray stunId;
+    QHostAddress stunHost;
+    quint16 stunPort;
+    QTimer *stunTimer;
+    int stunTries;
+
+    // TURN server
+    QXmppTurnAllocation *turnAllocation;
+    bool turnConfigured;
 };
+
+QXmppIceComponentPrivate::QXmppIceComponentPrivate()
+    : activePair(0)
+    , component(0)
+    , fallbackPair(0)
+    , iceControlling(false)
+    , peerReflexivePriority(0)
+    , timer(0)
+    , stunPort(0)
+    , stunTimer(0)
+    , stunTries(0)
+    , turnAllocation(0)
+    , turnConfigured(false)
+{
+}
 
 CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transaction)
 {
@@ -1641,42 +1684,34 @@ CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transact
 /// \param parent
 
 QXmppIceComponent::QXmppIceComponent(QObject *parent)
-    : QXmppLoggable(parent),
-    m_component(0),
-    m_activePair(0),
-    m_fallbackPair(0),
-    m_iceControlling(false),
-    m_peerReflexivePriority(0),
-    m_stunPort(0),
-    m_stunTries(0),
-    m_turnConfigured(false)
+    : QXmppLoggable(parent)
 {
     bool check;
     Q_UNUSED(check);
 
     d = new QXmppIceComponentPrivate;
 
-    m_localUser = QXmppUtils::generateStanzaHash(4);
-    m_localPassword = QXmppUtils::generateStanzaHash(22);
-    m_tieBreaker = QXmppUtils::generateRandomBytes(8);
+    d->localUser = QXmppUtils::generateStanzaHash(4);
+    d->localPassword = QXmppUtils::generateStanzaHash(22);
+    d->tieBreaker = QXmppUtils::generateRandomBytes(8);
 
-    m_timer = new QTimer(this);
-    m_timer->setInterval(500);
-    check = connect(m_timer, SIGNAL(timeout()),
+    d->timer = new QTimer(this);
+    d->timer->setInterval(500);
+    check = connect(d->timer, SIGNAL(timeout()),
                     this, SLOT(checkCandidates()));
     Q_ASSERT(check);
 
-    m_stunTimer = new QTimer(this);
-    m_stunTimer->setInterval(500);
-    check = connect(m_stunTimer, SIGNAL(timeout()),
+    d->stunTimer = new QTimer(this);
+    d->stunTimer->setInterval(500);
+    check = connect(d->stunTimer, SIGNAL(timeout()),
                     this, SLOT(checkStun()));
     Q_ASSERT(check);
 
-    m_turnAllocation = new QXmppTurnAllocation(this);
-    check = connect(m_turnAllocation, SIGNAL(connected()),
+    d->turnAllocation = new QXmppTurnAllocation(this);
+    check = connect(d->turnAllocation, SIGNAL(connected()),
                     this, SLOT(turnConnected()));
     Q_ASSERT(check);
-    check = connect(m_turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
+    check = connect(d->turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
                     this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
     Q_ASSERT(check);
 }
@@ -1695,7 +1730,7 @@ QXmppIceComponent::~QXmppIceComponent()
 
 int QXmppIceComponent::component() const
 {
-    return m_component;
+    return d->component;
 }
 
 /// Sets the component id for the current socket, e.g. 1 for RTP
@@ -1705,21 +1740,21 @@ int QXmppIceComponent::component() const
 
 void QXmppIceComponent::setComponent(int component)
 {
-    m_component = component;
+    d->component = component;
 
     // calculate peer-reflexive candidate priority
     // see RFC 5245 -  7.1.2.1. PRIORITY and USE-CANDIDATE
     QXmppJingleCandidate reflexive;
-    reflexive.setComponent(m_component);
+    reflexive.setComponent(d->component);
     reflexive.setType(QXmppJingleCandidate::PeerReflexiveType);
-    m_peerReflexivePriority = candidatePriority(reflexive);
+    d->peerReflexivePriority = candidatePriority(reflexive);
 
-    setObjectName(QString("STUN(%1)").arg(QString::number(m_component)));
+    setObjectName(QString("STUN(%1)").arg(QString::number(d->component)));
 }
 
 void QXmppIceComponent::checkCandidates()
 {
-    if (m_remoteUser.isEmpty())
+    if (d->remoteUser.isEmpty())
         return;
     debug("Checking remote candidates");
 
@@ -1732,14 +1767,13 @@ void QXmppIceComponent::checkCandidates()
         QXmppStunMessage message;
         message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        message.setPriority(m_peerReflexivePriority);
-        message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
-        if (m_iceControlling)
-        {
-            message.iceControlling = m_tieBreaker;
+        message.setPriority(d->peerReflexivePriority);
+        message.setUsername(QString("%1:%2").arg(d->remoteUser, d->localUser));
+        if (d->iceControlling) {
+            message.iceControlling = d->tieBreaker;
             message.useCandidate = true;
         } else {
-            message.iceControlled = m_tieBreaker;
+            message.iceControlled = d->tieBreaker;
         }
         pair->setState(CandidatePair::InProgressState);
         pair->transaction = new QXmppStunTransaction(message, this);
@@ -1749,68 +1783,67 @@ void QXmppIceComponent::checkCandidates()
 
 void QXmppIceComponent::checkStun()
 {
-    if (m_stunHost.isNull() || !m_stunPort || m_stunTries > 10) {
-        m_stunTimer->stop();
+    if (d->stunHost.isNull() || !d->stunPort || d->stunTries > 10) {
+        d->stunTimer->stop();
         return;
     }
 
     // Send a request to STUN server to determine server-reflexive candidate
-    foreach (QUdpSocket *socket, m_sockets)
-    {
+    foreach (QUdpSocket *socket, d->sockets) {
         QXmppStunMessage msg;
         msg.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        msg.setId(m_stunId);
+        msg.setId(d->stunId);
 #ifdef QXMPP_DEBUG_STUN
-        logSent(QString("STUN packet to %1 port %2\n%3").arg(m_stunHost.toString(),
-                QString::number(m_stunPort), msg.toString()));
+        logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunHost.toString(),
+                QString::number(d->stunPort), msg.toString()));
 #endif
-        socket->writeDatagram(msg.encode(), m_stunHost, m_stunPort);
+        socket->writeDatagram(msg.encode(), d->stunHost, d->stunPort);
     }
-    m_stunTries++;
+    d->stunTries++;
 }
 
 /// Stops ICE connectivity checks and closes the underlying sockets.
 
 void QXmppIceComponent::close()
 {
-    foreach (QUdpSocket *socket, m_sockets)
+    foreach (QUdpSocket *socket, d->sockets)
         socket->close();
-    m_turnAllocation->disconnectFromHost();
-    m_timer->stop();
-    m_stunTimer->stop();
-    m_activePair = 0;
+    d->turnAllocation->disconnectFromHost();
+    d->timer->stop();
+    d->stunTimer->stop();
+    d->activePair = 0;
 }
 
 /// Starts ICE connectivity checks.
 
 void QXmppIceComponent::connectToHost()
 {
-    if (m_activePair)
+    if (d->activePair)
         return;
 
     checkCandidates();
-    m_timer->start();
+    d->timer->start();
 }
 
 /// Returns true if ICE negotiation completed, false otherwise.
 
 bool QXmppIceComponent::isConnected() const
 {
-    return m_activePair != 0;
+    return d->activePair != 0;
 }
 
 /// Sets whether the local party has the ICE controlling role.
 
 void QXmppIceComponent::setIceControlling(bool controlling)
 {
-    m_iceControlling = controlling;
+    d->iceControlling = controlling;
 }
 
 /// Returns the list of local candidates.
 
 QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 {
-    return m_localCandidates;
+    return d->localCandidates;
 }
 
 /// Sets the local user fragment.
@@ -1819,7 +1852,7 @@ QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 
 void QXmppIceComponent::setLocalUser(const QString &user)
 {
-    m_localUser = user;
+    d->localUser = user;
 }
 
 /// Sets the tie breaker.
@@ -1828,7 +1861,7 @@ void QXmppIceComponent::setLocalUser(const QString &user)
 
 void QXmppIceComponent::setTieBreaker(const QByteArray &tieBreaker)
 {
-    m_tieBreaker = tieBreaker;
+    d->tieBreaker = tieBreaker;
 }
 
 /// Sets the local password.
@@ -1837,14 +1870,14 @@ void QXmppIceComponent::setTieBreaker(const QByteArray &tieBreaker)
 
 void QXmppIceComponent::setLocalPassword(const QString &password)
 {
-    m_localPassword = password;
+    d->localPassword = password;
 }
 
 /// Adds a remote STUN candidate.
 
 bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
-    if (candidate.component() != m_component ||
+    if (candidate.component() != d->component ||
         (candidate.type() != QXmppJingleCandidate::HostType &&
          candidate.type() != QXmppJingleCandidate::RelayedType &&
          candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
@@ -1858,14 +1891,13 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
             pair->remote.port() == candidate.port())
             return false;
 
-    foreach (QUdpSocket *socket, m_sockets)
-    {
+    foreach (QUdpSocket *socket, d->sockets) {
         // do not pair IPv4 with IPv6 or global with link-local addresses
         if (socket->localAddress().protocol() != candidate.host().protocol() ||
             isIPv6LinkLocalAddress(socket->localAddress()) != isIPv6LinkLocalAddress(candidate.host()))
             continue;
 
-        CandidatePair *pair = new CandidatePair(m_component, m_iceControlling, this);
+        CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
         pair->remote = candidate;
         if (isIPv6LinkLocalAddress(pair->remote.host()))
         {
@@ -1876,13 +1908,13 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
         pair->socket = socket;
         d->pairs << pair;
 
-        if (!m_fallbackPair)
-            m_fallbackPair = pair;
+        if (!d->fallbackPair)
+            d->fallbackPair = pair;
     }
 
     // only use relaying for IPv4 candidates
-    if (m_turnConfigured && candidate.host().protocol() == QAbstractSocket::IPv4Protocol) {
-        CandidatePair *pair = new CandidatePair(m_component, m_iceControlling, this);
+    if (d->turnConfigured && candidate.host().protocol() == QAbstractSocket::IPv4Protocol) {
+        CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
         pair->remote = candidate;
         pair->socket = 0;
         d->pairs << pair;
@@ -1904,7 +1936,7 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
             return pair;
 
     QXmppJingleCandidate candidate;
-    candidate.setComponent(m_component);
+    candidate.setComponent(d->component);
     candidate.setHost(host);
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(port);
@@ -1912,7 +1944,7 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
 
-    CandidatePair *pair = new CandidatePair(m_component, m_iceControlling, this);
+    CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
     pair->remote = candidate;
     pair->socket = socket;
     d->pairs << pair;
@@ -1929,7 +1961,7 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
 
 void QXmppIceComponent::setRemoteUser(const QString &user)
 {
-    m_remoteUser = user;
+    d->remoteUser = user;
 }
 
 /// Sets the remote password.
@@ -1938,7 +1970,7 @@ void QXmppIceComponent::setRemoteUser(const QString &user)
 
 void QXmppIceComponent::setRemotePassword(const QString &password)
 {
-    m_remotePassword = password;
+    d->remotePassword = password;
 }
 
 /// Sets the list of sockets to use for this component.
@@ -1948,20 +1980,22 @@ void QXmppIceComponent::setRemotePassword(const QString &password)
 void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
 {
     // clear previous candidates and sockets
-    m_localCandidates.clear();
-    foreach (QUdpSocket *socket, m_sockets)
+    d->localCandidates.clear();
+    foreach (CandidatePair *pair, d->pairs)
+        delete pair;
+    d->pairs.clear();
+    foreach (QUdpSocket *socket, d->sockets)
         delete socket;
-    m_sockets.clear();
+    d->sockets.clear();
 
     // store candidates
     int foundation = 0;
-    foreach (QUdpSocket *socket, sockets)
-    {
+    foreach (QUdpSocket *socket, sockets) {
         socket->setParent(this);
         connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 
         QXmppJingleCandidate candidate;
-        candidate.setComponent(m_component);
+        candidate.setComponent(d->component);
         candidate.setFoundation(QString::number(foundation++));
         // remove scope ID from IPv6 non-link local addresses
         QHostAddress addr(socket->localAddress());
@@ -1976,20 +2010,20 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         candidate.setType(QXmppJingleCandidate::HostType);
         candidate.setPriority(candidatePriority(candidate));
 
-        m_sockets << socket;
-        m_localCandidates << candidate;
+        d->sockets << socket;
+        d->localCandidates << candidate;
     }
 
     // start STUN checks
-    if (!m_stunHost.isNull() && m_stunPort) {
-        m_stunTries = 0;
+    if (!d->stunHost.isNull() && d->stunPort) {
+        d->stunTries = 0;
         checkStun();
-        m_stunTimer->start();
+        d->stunTimer->start();
     }
 
     // connect to TURN server
-    if (m_turnConfigured)
-        m_turnAllocation->connectToHost();
+    if (d->turnConfigured)
+        d->turnAllocation->connectToHost();
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses
@@ -2000,9 +2034,9 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
 
 void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
 {
-    m_stunHost = host;
-    m_stunPort = port;
-    m_stunId = QXmppUtils::generateRandomBytes(STUN_ID_SIZE);
+    d->stunHost = host;
+    d->stunPort = port;
+    d->stunId = QXmppUtils::generateRandomBytes(STUN_ID_SIZE);
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
@@ -2012,8 +2046,8 @@ void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
 
 void QXmppIceComponent::setTurnServer(const QHostAddress &host, quint16 port)
 {
-    m_turnAllocation->setServer(host, port);
-    m_turnConfigured = !host.isNull() && port;
+    d->turnAllocation->setServer(host, port);
+    d->turnConfigured = !host.isNull() && port;
 }
 
 /// Sets the \a user used for authentication with the TURN server.
@@ -2022,7 +2056,7 @@ void QXmppIceComponent::setTurnServer(const QHostAddress &host, quint16 port)
 
 void QXmppIceComponent::setTurnUser(const QString &user)
 {
-    m_turnAllocation->setUser(user);
+    d->turnAllocation->setUser(user);
 }
 
 /// Sets the \a password used for authentication with the TURN server.
@@ -2031,7 +2065,7 @@ void QXmppIceComponent::setTurnUser(const QString &user)
 
 void QXmppIceComponent::setTurnPassword(const QString &password)
 {
-    m_turnAllocation->setPassword(password);
+    d->turnAllocation->setPassword(password);
 }
 
 void QXmppIceComponent::readyRead()
@@ -2063,7 +2097,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         foreach (CandidatePair *pair, d->pairs) {
             if (pair->remote.host() == remoteHost &&
                 pair->remote.port() == remotePort) {
-                m_fallbackPair = pair;
+                d->fallbackPair = pair;
                 break;
             }
         }
@@ -2073,9 +2107,9 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
     // determine password to use
     QString messagePassword;
-    if (messageId != m_stunId)
+    if (messageId != d->stunId)
     {
-        messagePassword = (messageType & 0xFF00) ? m_remotePassword : m_localPassword;
+        messagePassword = (messageType & 0xFF00) ? d->remotePassword : d->localPassword;
         if (messagePassword.isEmpty())
             return;
     }
@@ -2097,9 +2131,9 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 #endif
 
     // check how to handle message
-    if (message.id() == m_stunId)
+    if (message.id() == d->stunId)
     {
-        m_stunTimer->stop();
+        d->stunTimer->stop();
 
         // determine server-reflexive address
         QHostAddress reflexiveHost;
@@ -2119,7 +2153,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         }
 
         // check whether this candidates is already known
-        foreach (const QXmppJingleCandidate &candidate, m_localCandidates)
+        foreach (const QXmppJingleCandidate &candidate, d->localCandidates)
         {
             if (candidate.host() == reflexiveHost &&
                 candidate.port() == reflexivePort &&
@@ -2130,14 +2164,14 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         // add the new local candidate
         debug(QString("Adding server-reflexive candidate %1 port %2").arg(reflexiveHost.toString(), QString::number(reflexivePort)));
         QXmppJingleCandidate candidate;
-        candidate.setComponent(m_component);
+        candidate.setComponent(d->component);
         candidate.setHost(reflexiveHost);
         candidate.setId(QXmppUtils::generateStanzaHash(10));
         candidate.setPort(reflexivePort);
         candidate.setProtocol("udp");
         candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
         candidate.setPriority(candidatePriority(candidate));
-        m_localCandidates << candidate;
+        d->localCandidates << candidate;
 
         emit localCandidatesChanged();
         return;
@@ -2163,21 +2197,21 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         writeStun(response, pair);
 
         // update state
-        if (m_iceControlling || message.useCandidate)
+        if (d->iceControlling || message.useCandidate)
         {
             debug(QString("ICE reverse check complete %1").arg(pair->toString()));
             pair->checked |= QIODevice::ReadOnly;
         }
 
-        if (!m_iceControlling && !m_activePair && !m_remoteUser.isEmpty())
+        if (!d->iceControlling && !d->activePair && !d->remoteUser.isEmpty())
         {
             // send a triggered connectivity test
             QXmppStunMessage message;
             message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
             message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-            message.setPriority(m_peerReflexivePriority);
-            message.setUsername(QString("%1:%2").arg(m_remoteUser, m_localUser));
-            message.iceControlled = m_tieBreaker;
+            message.setPriority(d->peerReflexivePriority);
+            message.setUsername(QString("%1:%2").arg(d->remoteUser, d->localUser));
+            message.iceControlled = d->tieBreaker;
             if (pair->transaction)
                 pair->transaction->deleteLater();
             pair->setState(CandidatePair::InProgressState);
@@ -2219,12 +2253,12 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     // signal completion
     if (pair && pair->checked == QIODevice::ReadWrite)
     {
-        m_timer->stop();
-        if (!m_activePair || pair->priority() > m_activePair->priority()) {
+        d->timer->stop();
+        if (!d->activePair || pair->priority() > d->activePair->priority()) {
             info(QString("ICE pair selected %1 (priority: %2)").arg(
                 pair->toString(), QString::number(pair->priority())));
-            const bool wasConnected = (m_activePair != 0);
-            m_activePair = pair;
+            const bool wasConnected = (d->activePair != 0);
+            d->activePair = pair;
             if (!wasConnected)
                 emit connected();
         }
@@ -2255,17 +2289,17 @@ void QXmppIceComponent::turnConnected()
 {
     // add the new local candidate
     debug(QString("Adding relayed candidate %1 port %2").arg(
-        m_turnAllocation->relayedHost().toString(),
-        QString::number(m_turnAllocation->relayedPort())));
+        d->turnAllocation->relayedHost().toString(),
+        QString::number(d->turnAllocation->relayedPort())));
     QXmppJingleCandidate candidate;
-    candidate.setComponent(m_component);
-    candidate.setHost(m_turnAllocation->relayedHost());
+    candidate.setComponent(d->component);
+    candidate.setHost(d->turnAllocation->relayedHost());
     candidate.setId(QXmppUtils::generateStanzaHash(10));
-    candidate.setPort(m_turnAllocation->relayedPort());
+    candidate.setPort(d->turnAllocation->relayedPort());
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::RelayedType);
     candidate.setPriority(candidatePriority(candidate));
-    m_localCandidates << candidate;
+    d->localCandidates << candidate;
 
     emit localCandidatesChanged();
 }
@@ -2372,13 +2406,13 @@ QList<QUdpSocket*> QXmppIceComponent::reservePorts(const QList<QHostAddress> &ad
 
 qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
 {
-    CandidatePair *pair = m_activePair ? m_activePair : m_fallbackPair;
+    CandidatePair *pair = d->activePair ? d->activePair : d->fallbackPair;
     if (!pair)
         return -1;
     if (pair->socket)
         return pair->socket->writeDatagram(datagram, pair->remote.host(), pair->remote.port());
-    else if (m_turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
-        return m_turnAllocation->writeDatagram(datagram, pair->remote.host(), pair->remote.port());
+    else if (d->turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
+        return d->turnAllocation->writeDatagram(datagram, pair->remote.host(), pair->remote.port());
     else
         return -1;
 }
@@ -2395,14 +2429,14 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
 qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, CandidatePair *pair)
 {
     qint64 ret;
-    const QString messagePassword = (message.type() & 0xFF00) ? m_localPassword : m_remotePassword;
+    const QString messagePassword = (message.type() & 0xFF00) ? d->localPassword : d->remotePassword;
     if (pair->socket)
         ret = pair->socket->writeDatagram(
             message.encode(messagePassword.toUtf8()),
             pair->remote.host(),
             pair->remote.port());
-    else if (m_turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
-        ret = m_turnAllocation->writeDatagram(
+    else if (d->turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
+        ret = d->turnAllocation->writeDatagram(
             message.encode(messagePassword.toUtf8()),
             pair->remote.host(),
             pair->remote.port());
