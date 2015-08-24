@@ -1550,6 +1550,11 @@ private:
     bool m_controlling;
 };
 
+static bool candidatePairPtrLessThan(const CandidatePair *p1, const CandidatePair *p2)
+{
+    return p1->priority() < p2->priority();
+}
+
 CandidatePair::CandidatePair(int component, bool controlling)
     : checked(QIODevice::NotOpen),
     socket(0),
@@ -1828,6 +1833,9 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
         pair->socket = 0;
         m_pairs << pair;
     }
+
+    qSort(m_pairs.begin(), m_pairs.end(), candidatePairPtrLessThan);
+
     return true;
 }
 
@@ -1854,6 +1862,8 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
     pair->remote = candidate;
     pair->socket = socket;
     m_pairs << pair;
+
+    qSort(m_pairs.begin(), m_pairs.end(), candidatePairPtrLessThan);
 
     debug(QString("Added candidate %1").arg(pair->toString()));
     return pair;
