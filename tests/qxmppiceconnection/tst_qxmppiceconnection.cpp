@@ -36,12 +36,19 @@ void tst_QXmppIceConnection::testConnect()
 {
     const int component = 1024;
 
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
+
     QXmppIceConnection clientL;
+    connect(&clientL, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientL.setIceControlling(true);
     clientL.addComponent(component);
     clientL.bind(QXmppIceComponent::discoverAddresses());
 
     QXmppIceConnection clientR;
+    connect(&clientR, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientR.setIceControlling(false);
     clientR.addComponent(component);
     clientR.bind(QXmppIceComponent::discoverAddresses());
@@ -68,8 +75,8 @@ void tst_QXmppIceConnection::testConnect()
 
     // clientR completes first
     loop.exec();
-    QVERIFY(!clientL.isConnected());
-    QVERIFY(clientR.isConnected());
+    QVERIFY(clientL.isConnected());
+    QVERIFY(!clientR.isConnected());
 
     // clientL completes second
     loop.exec();

@@ -33,6 +33,7 @@ class CandidatePair;
 class QDataStream;
 class QUdpSocket;
 class QTimer;
+class QXmppIceComponentPrivate;
 
 /// \internal
 ///
@@ -324,6 +325,10 @@ signals:
     /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
+private slots:
+    void transactionFinished();
+    void writeStun(const QXmppStunMessage &request);
+
 private:
     CandidatePair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
     qint64 writeStun(const QXmppStunMessage &message, CandidatePair *pair);
@@ -338,7 +343,6 @@ private:
     CandidatePair *m_activePair;
     CandidatePair *m_fallbackPair;
     bool m_iceControlling;
-    QList<CandidatePair*> m_pairs;
     quint32 m_peerReflexivePriority;
     QString m_remoteUser;
     QString m_remotePassword;
@@ -356,6 +360,8 @@ private:
     // TURN server
     QXmppTurnAllocation *m_turnAllocation;
     bool m_turnConfigured;
+
+    QXmppIceComponentPrivate *d;
 };
 
 /// \brief The QXmppIceConnection class represents a set of UDP sockets
