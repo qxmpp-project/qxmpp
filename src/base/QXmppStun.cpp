@@ -103,6 +103,13 @@ static quint32 candidatePriority(const QXmppJingleCandidate &candidate, int loca
            (256 - candidate.component());
 }
 
+static QString computeFoundation(QXmppJingleCandidate::Type type, const QString &protocol, const QHostAddress &baseAddress)
+{
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData((QString::number(type) + protocol + baseAddress.toString()).toUtf8());
+    return hash.result().toHex();
+}
+
 static bool isIPv6LinkLocalAddress(const QHostAddress &addr)
 {
     if (addr.protocol() != QAbstractSocket::IPv6Protocol)
@@ -1938,13 +1945,13 @@ CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const Q
     // 7.2.1.3. Learning Peer Reflexive Candidates
     QXmppJingleCandidate candidate;
     candidate.setComponent(d->component);
-    //candidate.setFoundation(..);
     candidate.setHost(host);
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(port);
     candidate.setPriority(priority);
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
+    candidate.setFoundation(QXmppUtils::generateStanzaHash(32));
 
     CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
     pair->remote = candidate;
@@ -1991,14 +1998,12 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
     d->sockets.clear();
 
     // store candidates
-    int foundation = 0;
     foreach (QUdpSocket *socket, sockets) {
         socket->setParent(this);
         connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 
         QXmppJingleCandidate candidate;
         candidate.setComponent(d->component);
-        candidate.setFoundation(QString::number(foundation++));
         // remove scope ID from IPv6 non-link local addresses
         QHostAddress addr(socket->localAddress());
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
@@ -2011,6 +2016,10 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         candidate.setProtocol("udp");
         candidate.setType(QXmppJingleCandidate::HostType);
         candidate.setPriority(candidatePriority(candidate));
+        candidate.setFoundation(computeFoundation(
+            candidate.type(),
+            candidate.protocol(),
+            candidate.host()));
 
         d->sockets << socket;
         d->localCandidates << candidate;
@@ -2173,6 +2182,11 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         candidate.setProtocol("udp");
         candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
         candidate.setPriority(candidatePriority(candidate));
+        candidate.setFoundation(computeFoundation(
+            candidate.type(),
+            candidate.protocol(),
+            socket->localAddress()));
+
         d->localCandidates << candidate;
 
         emit localCandidatesChanged();
@@ -2298,6 +2312,11 @@ void QXmppIceComponent::turnConnected()
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::RelayedType);
     candidate.setPriority(candidatePriority(candidate));
+    candidate.setFoundation(computeFoundation(
+        candidate.type(),
+        candidate.protocol(),
+        candidate.host()));
+
     d->localCandidates << candidate;
 
     emit localCandidatesChanged();
