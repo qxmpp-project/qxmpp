@@ -29,6 +29,7 @@
 #include "QXmppLogger.h"
 #include "QXmppJingleIq.h"
 
+class CandidatePair;
 class QDataStream;
 class QUdpSocket;
 class QTimer;
@@ -324,25 +325,8 @@ signals:
     void localCandidatesChanged();
 
 private:
-    class Pair {
-    public:
-        Pair(int component, bool controlling);
-        quint64 priority() const;
-        QString toString() const;
-
-        QIODevice::OpenMode checked;
-        QXmppJingleCandidate remote;
-        QXmppJingleCandidate reflexive;
-        QByteArray transaction;
-        QUdpSocket *socket;
-
-    private:
-        int m_component;
-        bool m_controlling;
-    };
-
-    Pair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
-    qint64 writeStun(const QXmppStunMessage &message, QXmppIceComponent::Pair *pair);
+    CandidatePair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
+    qint64 writeStun(const QXmppStunMessage &message, CandidatePair *pair);
 
     int m_component;
 
@@ -351,10 +335,10 @@ private:
     QString m_localPassword;
     QByteArray m_tieBreaker;
 
-    Pair *m_activePair;
-    Pair *m_fallbackPair;
+    CandidatePair *m_activePair;
+    CandidatePair *m_fallbackPair;
     bool m_iceControlling;
-    QList<Pair*> m_pairs;
+    QList<CandidatePair*> m_pairs;
     quint32 m_peerReflexivePriority;
     QString m_remoteUser;
     QString m_remotePassword;

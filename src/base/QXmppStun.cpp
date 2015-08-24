@@ -1533,7 +1533,24 @@ void QXmppTurnAllocation::writeStun(const QXmppStunMessage &message)
 #endif
 }
 
-QXmppIceComponent::Pair::Pair(int component, bool controlling)
+class CandidatePair {
+public:
+    CandidatePair(int component, bool controlling);
+    quint64 priority() const;
+    QString toString() const;
+
+    QIODevice::OpenMode checked;
+    QXmppJingleCandidate remote;
+    QXmppJingleCandidate reflexive;
+    QByteArray transaction;
+    QUdpSocket *socket;
+
+private:
+    int m_component;
+    bool m_controlling;
+};
+
+CandidatePair::CandidatePair(int component, bool controlling)
     : checked(QIODevice::NotOpen),
     socket(0),
     m_component(component),
@@ -1542,7 +1559,7 @@ QXmppIceComponent::Pair::Pair(int component, bool controlling)
     transaction = QXmppUtils::generateRandomBytes(ID_SIZE);
 }
 
-quint64 QXmppIceComponent::Pair::priority() const
+quint64 CandidatePair::priority() const
 {
     QXmppJingleCandidate local;
     local.setComponent(m_component);
@@ -1555,7 +1572,7 @@ quint64 QXmppIceComponent::Pair::priority() const
     return (quint64(1) << 32) * qMin(G, D) + 2 * qMax(G, D) + (G > D ? 1 : 0);
 }
 
-QString QXmppIceComponent::Pair::toString() const
+QString CandidatePair::toString() const
 {
     QString str = QString("%1 port %2").arg(remote.host().toString(), QString::number(remote.port()));
     if (socket)
@@ -1614,7 +1631,7 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
 
 QXmppIceComponent::~QXmppIceComponent()
 {
-    foreach (Pair *pair, m_pairs)
+    foreach (CandidatePair *pair, m_pairs)
         delete pair;
 }
 
@@ -1648,7 +1665,7 @@ void QXmppIceComponent::setComponent(int component)
 void QXmppIceComponent::checkCandidates()
 {
     debug("Checking remote candidates");
-    foreach (Pair *pair, m_pairs)
+    foreach (CandidatePair *pair, m_pairs)
     {
         if (m_remoteUser.isEmpty())
             continue;
@@ -1777,7 +1794,7 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
         return false;
 
-    foreach (Pair *pair, m_pairs)
+    foreach (CandidatePair *pair, m_pairs)
         if (pair->remote.host() == candidate.host() &&
             pair->remote.port() == candidate.port())
             return false;
@@ -1789,7 +1806,7 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
             isIPv6LinkLocalAddress(socket->localAddress()) != isIPv6LinkLocalAddress(candidate.host()))
             continue;
 
-        Pair *pair = new Pair(m_component, m_iceControlling);
+        CandidatePair *pair = new CandidatePair(m_component, m_iceControlling);
         pair->remote = candidate;
         if (isIPv6LinkLocalAddress(pair->remote.host()))
         {
@@ -1806,7 +1823,7 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
 
     // only use relaying for IPv4 candidates
     if (m_turnConfigured && candidate.host().protocol() == QAbstractSocket::IPv4Protocol) {
-        Pair *pair = new Pair(m_component, m_iceControlling);
+        CandidatePair *pair = new CandidatePair(m_component, m_iceControlling);
         pair->remote = candidate;
         pair->socket = 0;
         m_pairs << pair;
@@ -1816,9 +1833,9 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
 
 /// Adds a discovered peer-reflexive STUN candidate.
 
-QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority)
+CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority)
 {
-    foreach (Pair *pair, m_pairs)
+    foreach (CandidatePair *pair, m_pairs)
         if (pair->remote.host() == host &&
             pair->remote.port() == port &&
             pair->socket == socket)
@@ -1833,7 +1850,7 @@ QXmppIceComponent::Pair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socke
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
 
-    Pair *pair = new Pair(m_component, m_iceControlling);
+    CandidatePair *pair = new CandidatePair(m_component, m_iceControlling);
     pair->remote = candidate;
     pair->socket = socket;
     m_pairs << pair;
@@ -1979,7 +1996,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (!messageType || messageCookie != STUN_MAGIC)
     {
         // use this as an opportunity to flag a potential pair
-        foreach (Pair *pair, m_pairs) {
+        foreach (CandidatePair *pair, m_pairs) {
             if (pair->remote.host() == remoteHost &&
                 pair->remote.port() == remotePort) {
                 m_fallbackPair = pair;
@@ -2063,7 +2080,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     }
 
     // process message from peer
-    Pair *pair = 0;
+    CandidatePair *pair = 0;
     if (message.type() == (QXmppStunMessage::Binding | QXmppStunMessage::Request))
     {
         // add remote candidate
@@ -2099,7 +2116,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     } else if (message.type() == (QXmppStunMessage::Binding | QXmppStunMessage::Response)) {
 
         // find the pair for this transaction
-        foreach (Pair *ptr, m_pairs)
+        foreach (CandidatePair *ptr, m_pairs)
         {
             if (ptr->transaction == message.id())
             {
@@ -2265,7 +2282,7 @@ QList<QUdpSocket*> QXmppIceComponent::reservePorts(const QList<QHostAddress> &ad
 
 qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
 {
-    Pair *pair = m_activePair ? m_activePair : m_fallbackPair;
+    CandidatePair *pair = m_activePair ? m_activePair : m_fallbackPair;
     if (!pair)
         return -1;
     if (pair->socket)
@@ -2278,7 +2295,7 @@ qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
 
 /// Sends a STUN packet to the remote party.
 
-qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, QXmppIceComponent::Pair *pair)
+qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, CandidatePair *pair)
 {
     qint64 ret;
     const QString messagePassword = (message.type() & 0xFF00) ? m_localPassword : m_remotePassword;
