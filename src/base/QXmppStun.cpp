@@ -1604,7 +1604,7 @@ CandidatePair::State CandidatePair::state() const
 void CandidatePair::setState(CandidatePair::State state)
 {
     m_state = state;
-    info(QString("Pair %1 changed to state %2").arg(toString(), QLatin1String(pair_states[state])));
+    info(QString("ICE pair changed to state %1 %2").arg(QLatin1String(pair_states[state]), toString()));
 }
 
 QString CandidatePair::toString() const
@@ -2274,7 +2274,6 @@ void QXmppIceComponent::transactionFinished()
     if (pair) {
         if (transaction->response().messageClass() == QXmppStunMessage::Response) {
             // outgoing media can flow
-            debug(QString("ICE forward check complete %1").arg(pair->toString()));
             pair->checked |= QIODevice::WriteOnly;
             pair->setState(CandidatePair::SucceededState);
         } else {
