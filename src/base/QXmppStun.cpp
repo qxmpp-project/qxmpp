@@ -1095,9 +1095,7 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
                     this, SLOT(retry()));
 
     // send packet immediately
-    m_tries++;
-    emit writeStun(m_request);
-    m_retryTimer->start(STUN_RTO_INTERVAL);
+    m_retryTimer->start(0);
 }
 
 void QXmppStunTransaction::readStun(const QXmppStunMessage &response)
@@ -1134,9 +1132,9 @@ void QXmppStunTransaction::retry()
     }
 
     // resend request
-    m_tries++;
     emit writeStun(m_request);
-    m_retryTimer->start(2 * m_retryTimer->interval());
+    m_retryTimer->start(m_tries ? 2 * m_retryTimer->interval() : STUN_RTO_INTERVAL);
+    m_tries++;
 }
 
 /// Constructs a new QXmppTurnAllocation.
