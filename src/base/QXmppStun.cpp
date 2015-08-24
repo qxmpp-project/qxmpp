@@ -2204,7 +2204,9 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             pair->checked |= QIODevice::ReadOnly;
         }
 
-        if (!d->iceControlling && pair->state() != CandidatePair::SucceededState && !d->remoteUser.isEmpty())
+        if (!d->remoteUser.isEmpty()
+         && pair->state() != CandidatePair::InProgressState
+         && pair->state() != CandidatePair::SucceededState)
         {
             // send a triggered connectivity test
             QXmppStunMessage message;
@@ -2213,8 +2215,6 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             message.setPriority(d->peerReflexivePriority);
             message.setUsername(QString("%1:%2").arg(d->remoteUser, d->localUser));
             message.iceControlled = d->tieBreaker;
-            if (pair->transaction)
-                pair->transaction->deleteLater();
             pair->setState(CandidatePair::InProgressState);
             pair->transaction = new QXmppStunTransaction(message, this);
         }
