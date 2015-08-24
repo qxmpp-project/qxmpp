@@ -1629,8 +1629,9 @@ QString CandidatePair::toString() const
 class QXmppIceComponentPrivate
 {
 public:
-    QXmppIceComponentPrivate();
+    QXmppIceComponentPrivate(QXmppIceComponent *qq);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
+    void performCheck(CandidatePair *pair);
 
     CandidatePair *activePair;
     int component;
@@ -1660,9 +1661,12 @@ public:
     // TURN server
     QXmppTurnAllocation *turnAllocation;
     bool turnConfigured;
+
+private:
+    QXmppIceComponent *q;
 };
 
-QXmppIceComponentPrivate::QXmppIceComponentPrivate()
+QXmppIceComponentPrivate::QXmppIceComponentPrivate(QXmppIceComponent *qq)
     : activePair(0)
     , component(0)
     , fallbackPair(0)
@@ -1674,6 +1678,7 @@ QXmppIceComponentPrivate::QXmppIceComponentPrivate()
     , stunTries(0)
     , turnAllocation(0)
     , turnConfigured(false)
+    , q(qq)
 {
 }
 
@@ -1686,6 +1691,23 @@ CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transact
     return 0;
 }
 
+void QXmppIceComponentPrivate::performCheck(CandidatePair *pair)
+{
+    QXmppStunMessage message;
+    message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
+    message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+    message.setPriority(peerReflexivePriority);
+    message.setUsername(QString("%1:%2").arg(remoteUser, localUser));
+    if (iceControlling) {
+        message.iceControlling = tieBreaker;
+        message.useCandidate = true;
+    } else {
+        message.iceControlled = tieBreaker;
+    }
+    pair->setState(CandidatePair::InProgressState);
+    pair->transaction = new QXmppStunTransaction(message, q);
+}
+
 /// Constructs a new QXmppIceComponent.
 ///
 /// \param parent
@@ -1696,7 +1718,7 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    d = new QXmppIceComponentPrivate;
+    d = new QXmppIceComponentPrivate(this);
 
     d->localUser = QXmppUtils::generateStanzaHash(4);
     d->localPassword = QXmppUtils::generateStanzaHash(22);
@@ -1765,26 +1787,11 @@ void QXmppIceComponent::checkCandidates()
         return;
     debug("Checking remote candidates");
 
-    foreach (CandidatePair *pair, d->pairs)
-    {
-        if (pair->state() != CandidatePair::WaitingState)
-            continue;
-
-        // send a binding request
-        QXmppStunMessage message;
-        message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
-        message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        message.setPriority(d->peerReflexivePriority);
-        message.setUsername(QString("%1:%2").arg(d->remoteUser, d->localUser));
-        if (d->iceControlling) {
-            message.iceControlling = d->tieBreaker;
-            message.useCandidate = true;
-        } else {
-            message.iceControlled = d->tieBreaker;
+    foreach (CandidatePair *pair, d->pairs) {
+        if (pair->state() == CandidatePair::WaitingState) {
+            d->performCheck(pair);
+            break;
         }
-        pair->setState(CandidatePair::InProgressState);
-        pair->transaction = new QXmppStunTransaction(message, this);
-        break;
     }
 }
 
@@ -2220,17 +2227,9 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
         if (!d->remoteUser.isEmpty()
          && pair->state() != CandidatePair::InProgressState
-         && pair->state() != CandidatePair::SucceededState)
-        {
+         && pair->state() != CandidatePair::SucceededState) {
             // send a triggered connectivity test
-            QXmppStunMessage message;
-            message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
-            message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-            message.setPriority(d->peerReflexivePriority);
-            message.setUsername(QString("%1:%2").arg(d->remoteUser, d->localUser));
-            message.iceControlled = d->tieBreaker;
-            pair->setState(CandidatePair::InProgressState);
-            pair->transaction = new QXmppStunTransaction(message, this);
+            d->performCheck(pair);
         }
 
     } else if (message.messageClass() == QXmppStunMessage::Response
