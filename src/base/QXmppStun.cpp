@@ -1105,6 +1105,7 @@ void QXmppStunTransaction::readStun(const QXmppStunMessage &response)
     if (response.messageClass() == QXmppStunMessage::Error ||
         response.messageClass() == QXmppStunMessage::Response) {
         m_response = response;
+        m_retryTimer->stop();
         emit finished();
     }
 }
