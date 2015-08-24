@@ -1576,7 +1576,7 @@ private:
 
 static bool candidatePairPtrLessThan(const CandidatePair *p1, const CandidatePair *p2)
 {
-    return p1->priority() < p2->priority();
+    return p1->priority() > p2->priority();
 }
 
 CandidatePair::CandidatePair(int component, bool controlling, QObject *parent)
