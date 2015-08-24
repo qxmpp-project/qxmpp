@@ -33,7 +33,7 @@
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
-#define ID_SIZE 12
+#define STUN_ID_SIZE 12
 #define STUN_RTO_INTERVAL 500
 #define STUN_RTO_MAX      7
 
@@ -234,7 +234,7 @@ QXmppStunMessage::QXmppStunMessage()
     m_lifetime(0),
     m_priority(0)
 {
-    m_id = QByteArray(ID_SIZE, 0);
+    m_id = QByteArray(STUN_ID_SIZE, 0);
 }
 
 quint32 QXmppStunMessage::cookie() const
@@ -254,7 +254,7 @@ QByteArray QXmppStunMessage::id() const
 
 void QXmppStunMessage::setId(const QByteArray &id)
 {
-    Q_ASSERT(id.size() == ID_SIZE);
+    Q_ASSERT(id.size() == STUN_ID_SIZE);
     m_id = id;
 }
 
@@ -975,7 +975,7 @@ quint16 QXmppStunMessage::peekType(const QByteArray &buffer, quint32 &cookie, QB
     if (length != buffer.size() - STUN_HEADER)
         return 0;
 
-    id.resize(ID_SIZE);
+    id.resize(STUN_ID_SIZE);
     stream.readRawData(id.data(), id.size());
     return type;
 }
@@ -1197,7 +1197,7 @@ void QXmppTurnAllocation::connectToHost()
     // send allocate request
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Allocate | QXmppStunMessage::Request);
-    request.setId(QXmppUtils::generateRandomBytes(12));
+    request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     request.setLifetime(m_lifetime);
     request.setRequestedTransport(0x11);
     m_transactions << new QXmppStunTransaction(request, this);
@@ -1223,7 +1223,7 @@ void QXmppTurnAllocation::disconnectFromHost()
     if (m_state == ConnectedState) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
-        request.setId(QXmppUtils::generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1296,7 +1296,7 @@ void QXmppTurnAllocation::refresh()
 {
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
-    request.setId(QXmppUtils::generateRandomBytes(12));
+    request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     request.setNonce(m_nonce);
     request.setRealm(m_realm);
     request.setUsername(m_username);
@@ -1310,7 +1310,7 @@ void QXmppTurnAllocation::refreshChannels()
     foreach (quint16 channel, m_channels.keys()) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
-        request.setId(QXmppUtils::generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1409,7 +1409,7 @@ void QXmppTurnAllocation::transactionFinished()
 
         // retry request
         QXmppStunMessage request(transaction->request());
-        request.setId(QXmppUtils::generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1493,7 +1493,7 @@ qint64 QXmppTurnAllocation::writeDatagram(const QByteArray &data, const QHostAdd
         // bind channel
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
-        request.setId(QXmppUtils::generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
@@ -1559,7 +1559,7 @@ CandidatePair::CandidatePair(int component, bool controlling)
     m_component(component),
     m_controlling(controlling)
 {
-    transaction = QXmppUtils::generateRandomBytes(ID_SIZE);
+    transaction = QXmppUtils::generateRandomBytes(STUN_ID_SIZE);
 }
 
 quint64 CandidatePair::priority() const
@@ -1946,7 +1946,7 @@ void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
 {
     m_stunHost = host;
     m_stunPort = port;
-    m_stunId = QXmppUtils::generateRandomBytes(ID_SIZE);
+    m_stunId = QXmppUtils::generateRandomBytes(STUN_ID_SIZE);
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
@@ -2144,7 +2144,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 #if 0
         // send a binding indication
         QXmppStunMessage indication;
-        indication.setId(QXmppUtils::generateRandomBytes(ID_SIZE));
+        indication.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         indication.setType(BindingIndication);
         m_socket->writeStun(indication, pair);
 #endif
