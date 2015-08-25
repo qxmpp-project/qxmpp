@@ -198,7 +198,6 @@ public slots:
 
 private slots:
     void checkCandidates();
-    void checkStun();
     void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port);
     void turnConnected();
     void transactionFinished();
