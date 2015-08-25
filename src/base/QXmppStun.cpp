@@ -1632,6 +1632,7 @@ public:
     QXmppIceComponentPrivate(QXmppIceComponent *qq);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
     void performCheck(CandidatePair *pair);
+    void writeStun(const QXmppStunMessage &message, QUdpSocket *socket, const QHostAddress &remoteHost, quint16 remotePort);
 
     CandidatePair *activePair;
     int component;
@@ -1707,6 +1708,24 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair)
     }
     pair->setState(CandidatePair::InProgressState);
     pair->transaction = new QXmppStunTransaction(message, q);
+}
+
+void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QUdpSocket *socket, const QHostAddress &address, quint16 port)
+{
+    const QString messagePassword = (message.type() & 0xFF00) ? localPassword : remotePassword;
+    const QByteArray data = message.encode(messagePassword.toUtf8());
+    if (socket)
+        socket->writeDatagram(data, address, port);
+    else if (turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
+        socket->writeDatagram(data, address, port);
+    else
+        return;
+#ifdef QXMPP_DEBUG_STUN
+    q->logSent(QString("STUN packet to %1 port %2\n%3").arg(
+               address.toString(),
+               QString::number(port),
+               message.toString()));
+#endif
 }
 
 /// Constructs a new QXmppIceComponent.
@@ -2209,16 +2228,16 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     CandidatePair *pair = 0;
     if (message.messageClass() == QXmppStunMessage::Request)
     {
-        // add remote candidate
-        pair = addRemoteCandidate(socket, remoteHost, remotePort, message.priority());
-
         // send a binding response
         QXmppStunMessage response;
         response.setId(message.id());
         response.setType(QXmppStunMessage::Binding | QXmppStunMessage::Response);
-        response.xorMappedHost = pair->remote.host();
-        response.xorMappedPort = pair->remote.port();
-        writeStun(response, pair);
+        response.xorMappedHost = remoteHost;
+        response.xorMappedPort = remotePort;
+        d->writeStun(response, socket, remoteHost, remotePort);
+
+        // add remote candidate
+        pair = addRemoteCandidate(socket, remoteHost, remotePort, message.priority());
 
         // update state
         if (d->iceControlling || message.useCandidate) {
@@ -2439,31 +2458,7 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
 {
     CandidatePair *pair = d->findPair(qobject_cast<QXmppStunTransaction*>(sender()));
     if (pair)
-        writeStun(message, pair);
-}
-
-/// Sends a STUN packet to the remote party.
-
-qint64 QXmppIceComponent::writeStun(const QXmppStunMessage &message, CandidatePair *pair)
-{
-    qint64 ret;
-    const QString messagePassword = (message.type() & 0xFF00) ? d->localPassword : d->remotePassword;
-    if (pair->socket)
-        ret = pair->socket->writeDatagram(
-            message.encode(messagePassword.toUtf8()),
-            pair->remote.host(),
-            pair->remote.port());
-    else if (d->turnAllocation->state() == QXmppTurnAllocation::ConnectedState)
-        ret = d->turnAllocation->writeDatagram(
-            message.encode(messagePassword.toUtf8()),
-            pair->remote.host(),
-            pair->remote.port());
-    else
-        return -1;
-#ifdef QXMPP_DEBUG_STUN
-    logSent(QString("Sent to %1\n%2").arg(pair->toString(), message.toString()));
-#endif
-    return ret;
+        d->writeStun(message, pair->socket, pair->remote.host(), pair->remote.port());
 }
 
 /// Constructs a new ICE connection.

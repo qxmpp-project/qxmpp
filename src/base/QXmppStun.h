@@ -329,8 +329,8 @@ signals:
 
 private:
     CandidatePair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
-    qint64 writeStun(const QXmppStunMessage &message, CandidatePair *pair);
 
+    friend class QXmppIceComponentPrivate;
     QXmppIceComponentPrivate *d;
 };
 
