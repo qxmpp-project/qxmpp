@@ -49,7 +49,8 @@ public:
 class QXmppRtcpSourceDescriptionPrivate : public QSharedData
 {
 public:
-    bool read(QDataStream &s);
+    bool read(QDataStream &stream);
+    void write(QDataStream &stream) const;
 
     quint32 ssrc;
     QString cname;
@@ -144,10 +145,23 @@ bool QXmppRtcpPacket::read(QDataStream &stream)
 
 void QXmppRtcpPacket::write(QDataStream &stream) const
 {
-    stream << quint8((RTP_VERSION << 6) | (d->count & 0x1f));
+    QByteArray payload;
+    quint8 count;
+
+    if (d->type == SourceDescription) {
+        count = d->sourceDescriptions.size();
+        QDataStream s(&payload, QIODevice::WriteOnly);
+        foreach (const QXmppRtcpSourceDescription &desc, d->sourceDescriptions)
+            desc.d->write(s);
+    } else {
+        count = d->count;
+        payload = d->payload;
+    }
+
+    stream << quint8((RTP_VERSION << 6) | (count & 0x1f));
     stream << d->type;
-    stream << quint16(d->payload.size() >> 2);
-    stream.writeRawData(d->payload.constData(), d->payload.size());
+    stream << quint16(payload.size() >> 2);
+    stream.writeRawData(payload.constData(), payload.size());
 }
 
 /// Returns the number of report blocks.
@@ -199,7 +213,6 @@ void QXmppRtcpPacket::setType(quint8 type)
 
 bool QXmppRtcpSourceDescriptionPrivate::read(QDataStream &stream)
 {
-    QByteArray padding;
     QByteArray buffer;
     quint8 itemType, itemLength;
     quint16 chunkLength = 0;
@@ -231,13 +244,41 @@ bool QXmppRtcpSourceDescriptionPrivate::read(QDataStream &stream)
             name = QString::fromUtf8(buffer);
     }
     if (chunkLength % 4) {
-        padding.resize(4 - chunkLength % 4);
-        if (stream.readRawData(padding.data(), padding.size()) != padding.size())
+        buffer.resize(4 - chunkLength % 4);
+        if (stream.readRawData(buffer.data(), buffer.size()) != buffer.size())
             return false;
-        if (padding != QByteArray(padding.size(), 0))
+        if (buffer != QByteArray(buffer.size(), '\0'))
             return false;
     }
     return true;
+}
+
+void QXmppRtcpSourceDescriptionPrivate::write(QDataStream &stream) const
+{
+    QByteArray buffer;
+    quint16 chunkLength = 0;
+
+    stream << ssrc;
+    if (!cname.isEmpty()) {
+        buffer = cname.toUtf8();
+        stream << quint8(CnameType);
+        stream << quint8(buffer.size());
+        stream.writeRawData(buffer.constData(), buffer.size());
+        chunkLength += 2 + buffer.size();
+    }
+    if (!name.isEmpty()) {
+        buffer = name.toUtf8();
+        stream << quint8(NameType);
+        stream << quint8(buffer.size());
+        stream.writeRawData(buffer.constData(), buffer.size());
+        chunkLength += 2 + buffer.size();
+    }
+    stream << quint8(0);
+    chunkLength++;
+    if (chunkLength % 4) {
+        buffer = QByteArray(4 - chunkLength % 4, '\0');
+        stream.writeRawData(buffer.constData(), buffer.size());
+    }
 }
 
 /// Constructs an empty source description

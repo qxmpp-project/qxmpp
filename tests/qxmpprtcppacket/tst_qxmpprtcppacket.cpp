@@ -51,6 +51,7 @@ void tst_QXmppRtcpPacket::testSenderReport()
     QVERIFY(packet.decode(data));
     QCOMPARE(packet.count(), quint8(0));
     QCOMPARE(packet.type(), quint8(200));
+    QCOMPARE(packet.sourceDescriptions().size(), 0);
     QCOMPARE(packet.encode(), data);
 }
 
