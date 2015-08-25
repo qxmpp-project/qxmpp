@@ -73,12 +73,8 @@ void tst_QXmppIceConnection::testConnect()
     clientL.connectToHost();
     clientR.connectToHost();
 
-    // clientR completes first
+    // check both clients are connected
     loop.exec();
-    QVERIFY(!clientL.isConnected());
-    QVERIFY(clientR.isConnected());
-
-    // clientL completes second
     loop.exec();
     QVERIFY(clientL.isConnected());
     QVERIFY(clientR.isConnected());
