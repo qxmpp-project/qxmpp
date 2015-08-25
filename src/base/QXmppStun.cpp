@@ -1644,6 +1644,7 @@ public:
     QByteArray tieBreaker;
 
     quint32 peerReflexivePriority;
+    QList<QXmppJingleCandidate> remoteCandidates;
     QString remoteUser;
     QString remotePassword;
 
@@ -1900,10 +1901,10 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
         return false;
 
-    foreach (CandidatePair *pair, d->pairs)
-        if (pair->remote.host() == candidate.host() &&
-            pair->remote.port() == candidate.port())
+    foreach (const QXmppJingleCandidate &c, d->remoteCandidates)
+        if (c.host() == candidate.host() && c.port() == candidate.port())
             return false;
+    d->remoteCandidates << candidate;
 
     foreach (QUdpSocket *socket, d->sockets) {
         // do not pair IPv4 with IPv6 or global with link-local addresses
