@@ -328,8 +328,6 @@ signals:
     void localCandidatesChanged();
 
 private:
-    CandidatePair *addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority);
-
     friend class QXmppIceComponentPrivate;
     QXmppIceComponentPrivate *d;
 };

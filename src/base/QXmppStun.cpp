@@ -1562,7 +1562,8 @@ public:
     void setState(State state);
     QString toString() const;
 
-    QIODevice::OpenMode checked;
+    bool nominated;
+    bool nominating;
     QXmppJingleCandidate remote;
     QXmppJingleCandidate reflexive;
     QUdpSocket *socket;
@@ -1581,7 +1582,8 @@ static bool candidatePairPtrLessThan(const CandidatePair *p1, const CandidatePai
 
 CandidatePair::CandidatePair(int component, bool controlling, QObject *parent)
     : QXmppLoggable(parent)
-    , checked(QIODevice::NotOpen)
+    , nominated(false)
+    , nominating(false)
     , socket(0)
     , transaction(0)
     , m_component(component)
@@ -1631,7 +1633,7 @@ class QXmppIceComponentPrivate
 public:
     QXmppIceComponentPrivate(QXmppIceComponent *qq);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
-    void performCheck(CandidatePair *pair);
+    void performCheck(CandidatePair *pair, bool nominate);
     void writeStun(const QXmppStunMessage &message, QUdpSocket *socket, const QHostAddress &remoteHost, quint16 remotePort);
 
     CandidatePair *activePair;
@@ -1693,7 +1695,7 @@ CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transact
     return 0;
 }
 
-void QXmppIceComponentPrivate::performCheck(CandidatePair *pair)
+void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
 {
     QXmppStunMessage message;
     message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
@@ -1706,6 +1708,7 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair)
     } else {
         message.iceControlled = tieBreaker;
     }
+    pair->nominating = nominate;
     pair->setState(CandidatePair::InProgressState);
     pair->transaction = new QXmppStunTransaction(message, q);
 }
@@ -1809,7 +1812,7 @@ void QXmppIceComponent::checkCandidates()
 
     foreach (CandidatePair *pair, d->pairs) {
         if (pair->state() == CandidatePair::WaitingState) {
-            d->performCheck(pair);
+            d->performCheck(pair, d->iceControlling);
             break;
         }
     }
@@ -1957,38 +1960,6 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
     qSort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
 
     return true;
-}
-
-/// Adds a discovered peer-reflexive STUN candidate.
-
-CandidatePair *QXmppIceComponent::addRemoteCandidate(QUdpSocket *socket, const QHostAddress &host, quint16 port, quint32 priority)
-{
-    foreach (CandidatePair *pair, d->pairs)
-        if (pair->remote.host() == host &&
-            pair->remote.port() == port &&
-            pair->socket == socket)
-            return pair;
-
-    // 7.2.1.3. Learning Peer Reflexive Candidates
-    QXmppJingleCandidate candidate;
-    candidate.setComponent(d->component);
-    candidate.setHost(host);
-    candidate.setId(QXmppUtils::generateStanzaHash(10));
-    candidate.setPort(port);
-    candidate.setPriority(priority);
-    candidate.setProtocol("udp");
-    candidate.setType(QXmppJingleCandidate::PeerReflexiveType);
-    candidate.setFoundation(QXmppUtils::generateStanzaHash(32));
-
-    CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
-    pair->remote = candidate;
-    pair->socket = socket;
-    d->pairs << pair;
-
-    qSort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
-
-    debug(QString("Added candidate %1").arg(pair->toString()));
-    return pair;
 }
 
 /// Sets the remote user fragment.
@@ -2228,6 +2199,15 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     CandidatePair *pair = 0;
     if (message.messageClass() == QXmppStunMessage::Request)
     {
+        // check for role conflict
+        if (d->iceControlling && (!message.iceControlling.isEmpty() || message.useCandidate)) {
+            warning("Role conflict, expected to be controlling");
+            return;
+        } else if (!d->iceControlling && !message.iceControlled.isEmpty()) {
+            warning("Role conflict, expected to be controlled");
+            return;
+        }
+
         // send a binding response
         QXmppStunMessage response;
         response.setId(message.id());
@@ -2236,20 +2216,64 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         response.xorMappedPort = remotePort;
         d->writeStun(response, socket, remoteHost, remotePort);
 
-        // add remote candidate
-        pair = addRemoteCandidate(socket, remoteHost, remotePort, message.priority());
+        // find or create remote candidate
+        QXmppJingleCandidate remoteCandidate;
+        bool remoteCandidateFound = false;
+        foreach (const QXmppJingleCandidate &c, d->remoteCandidates) {
+            if (c.host() == remoteHost && c.port() == remotePort) {
+                remoteCandidate = c;
+                remoteCandidateFound = true;
+                break;
+            }
+        }
+        if (!remoteCandidateFound) {
+            // 7.2.1.3. Learning Peer Reflexive Candidates
+            remoteCandidate.setComponent(d->component);
+            remoteCandidate.setHost(remoteHost);
+            remoteCandidate.setId(QXmppUtils::generateStanzaHash(10));
+            remoteCandidate.setPort(remotePort);
+            remoteCandidate.setPriority(message.priority());
+            remoteCandidate.setProtocol("udp");
+            remoteCandidate.setType(QXmppJingleCandidate::PeerReflexiveType);
+            remoteCandidate.setFoundation(QXmppUtils::generateStanzaHash(32));
 
-        // update state
-        if (d->iceControlling || message.useCandidate) {
-            debug(QString("ICE reverse check complete %1").arg(pair->toString()));
-            pair->checked |= QIODevice::ReadOnly;
+            d->remoteCandidates << remoteCandidate;
         }
 
-        if (!d->remoteUser.isEmpty()
-         && pair->state() != CandidatePair::InProgressState
-         && pair->state() != CandidatePair::SucceededState) {
+        // construct pair
+        foreach (CandidatePair *ptr, d->pairs) {
+            if (ptr->socket == socket
+             && ptr->remote.host() == remoteHost
+             && ptr->remote.port() == remotePort) {
+                pair = ptr;
+                break;
+            }
+        }
+        if (!pair) {
+            pair = new CandidatePair(d->component, d->iceControlling, this);
+            pair->remote = remoteCandidate;
+            pair->socket = socket;
+            d->pairs << pair;
+
+            qSort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
+        }
+
+        switch (pair->state()) {
+        case CandidatePair::FrozenState:
+        case CandidatePair::WaitingState:
+        case CandidatePair::FailedState:
             // send a triggered connectivity test
-            d->performCheck(pair);
+            if (!d->remoteUser.isEmpty())
+                d->performCheck(pair, pair->nominating || d->iceControlling || message.useCandidate);
+            break;
+        case CandidatePair::InProgressState:
+            // FIXME: force retransmit now
+            pair->nominating = pair->nominating || message.useCandidate;
+            break;
+        case CandidatePair::SucceededState:
+            if (message.useCandidate)
+                pair->nominated = true;
+            break;
         }
 
     } else if (message.messageClass() == QXmppStunMessage::Response
@@ -2280,8 +2304,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     }
 
     // signal completion
-    if (pair && pair->checked == QIODevice::ReadWrite)
-    {
+    if (pair && pair->nominated) {
         d->timer->stop();
         if (!d->activePair || pair->priority() > d->activePair->priority()) {
             info(QString("ICE pair selected %1 (priority: %2)").arg(
@@ -2305,9 +2328,11 @@ void QXmppIceComponent::transactionFinished()
             pair->reflexive.setHost(response.xorMappedHost);
             pair->reflexive.setPort(response.xorMappedPort);
 
-            // outgoing media can flow
-            pair->checked |= QIODevice::WriteOnly;
             pair->setState(CandidatePair::SucceededState);
+            if (pair->nominating) {
+                // outgoing media can flow
+                pair->nominated = true;
+            }
         } else {
             debug(QString("ICE forward check failed %1 (error %2)").arg(
                 pair->toString(),
