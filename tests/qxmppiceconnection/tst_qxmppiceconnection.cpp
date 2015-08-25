@@ -21,6 +21,7 @@
  *
  */
 
+#include <QHostInfo>
 #include "QXmppStun.h"
 #include "util.h"
 
@@ -29,8 +30,74 @@ class tst_QXmppIceConnection : public QObject
     Q_OBJECT
 
 private slots:
+    void testBind();
+    void testBindStun();
     void testConnect();
 };
+
+void tst_QXmppIceConnection::testBind()
+{
+    const int componentId = 1024;
+
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
+
+    QXmppIceConnection client;
+    connect(&client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    client.setIceControlling(true);
+    client.addComponent(componentId);
+
+    QXmppIceComponent *component = client.component(componentId);
+    QVERIFY(component);
+
+    client.bind(QXmppIceComponent::discoverAddresses());
+    QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
+    QVERIFY(!client.localCandidates().isEmpty());
+    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+        QCOMPARE(c.component(), componentId);
+        QCOMPARE(c.type(), QXmppJingleCandidate::HostType);
+    }
+}
+
+void tst_QXmppIceConnection::testBindStun()
+{
+    const int componentId = 1024;
+
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
+
+    QHostInfo stunInfo = QHostInfo::fromName("stun.l.google.com");
+    QVERIFY(!stunInfo.addresses().isEmpty());
+
+    QXmppIceConnection client;
+    connect(&client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    client.setIceControlling(true);
+    client.setStunServer(stunInfo.addresses().first(), 19302);
+    client.addComponent(componentId);
+
+    QXmppIceComponent *component = client.component(componentId);
+    QVERIFY(component);
+
+    QEventLoop loop;
+    connect(&client, SIGNAL(localCandidatesChanged()),
+            &loop, SLOT(quit()));
+    client.bind(QXmppIceComponent::discoverAddresses());
+    loop.exec();
+
+    bool foundReflexive = false;
+    QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
+    QVERIFY(!client.localCandidates().isEmpty());
+    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+        QCOMPARE(c.component(), componentId);
+        if (c.type() == QXmppJingleCandidate::ServerReflexiveType)
+            foundReflexive = true;
+        else
+            QCOMPARE(c.type(), QXmppJingleCandidate::HostType);
+    }
+    QVERIFY(foundReflexive);
+}
 
 void tst_QXmppIceConnection::testConnect()
 {
