@@ -1157,7 +1157,7 @@ void QXmppStunTransaction::retry()
 /// \param parent
 
 QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
-    : QXmppLoggable(parent),
+    : QXmppIceTransport(parent),
     m_relayedPort(0),
     m_turnPort(0),
     m_channelNumber(0x4000),
@@ -2776,3 +2776,11 @@ void QXmppIceConnection::slotTimeout()
     emit disconnected();
 }
 
+QXmppIceTransport::QXmppIceTransport(QObject *parent)
+    : QXmppLoggable(parent)
+{
+}
+
+QXmppIceTransport::~QXmppIceTransport()
+{
+}

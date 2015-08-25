@@ -72,13 +72,28 @@ private:
     int m_tries;
 };
 
+class QXMPP_EXPORT QXmppIceTransport : public QXmppLoggable
+{
+    Q_OBJECT
+
+public:
+    QXmppIceTransport(QObject *parent = 0);
+    ~QXmppIceTransport();
+
+    virtual qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) = 0;
+
+signals:
+    /// \brief This signal is emitted when a data packet is received.
+    void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
+};
+
 /// \internal
 ///
 /// The QXmppTurnAllocation class represents a TURN allocation as defined
 /// by RFC 5766 Traversal Using Relays around NAT (TURN).
 ///
 
-class QXMPP_EXPORT QXmppTurnAllocation : public QXmppLoggable
+class QXMPP_EXPORT QXmppTurnAllocation : public QXmppIceTransport
 {
     Q_OBJECT
 
@@ -107,9 +122,6 @@ public:
 signals:
     /// \brief This signal is emitted once TURN allocation succeeds.
     void connected();
-
-    /// \brief This signal is emitted when a data packet is received.
-    void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
 
     /// \brief This signal is emitted when TURN allocation fails.
     void disconnected();
