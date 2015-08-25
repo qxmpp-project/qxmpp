@@ -40,7 +40,8 @@ INSTALL_HEADERS += \
 HEADERS += \
     base/QXmppCodec_p.h \
     base/QXmppSasl_p.h \
-    base/QXmppStreamInitiationIq_p.h
+    base/QXmppStreamInitiationIq_p.h \
+    base/QXmppStun_p.h
 
 # Source files
 SOURCES += \

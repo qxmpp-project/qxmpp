@@ -30,7 +30,7 @@
 #include <QUdpSocket>
 #include <QTimer>
 
-#include "QXmppStun.h"
+#include "QXmppStun_p.h"
 #include "QXmppUtils.h"
 
 #define STUN_ID_SIZE 12
