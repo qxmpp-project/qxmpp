@@ -80,7 +80,11 @@ public:
     QXmppIceTransport(QObject *parent = 0);
     ~QXmppIceTransport();
 
+    virtual QXmppJingleCandidate localCandidate(int component) const = 0;
     virtual qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) = 0;
+
+public slots:
+    virtual void disconnectFromHost() = 0;
 
 signals:
     /// \brief This signal is emitted when a data packet is received.
@@ -117,6 +121,7 @@ public:
     void setUser(const QString &user);
     void setPassword(const QString &password);
 
+    QXmppJingleCandidate localCandidate(int component) const;
     qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
 
 signals:
@@ -163,6 +168,32 @@ private:
     QByteArray m_nonce;
     AllocationState m_state;
     QList<QXmppStunTransaction*> m_transactions;
+};
+
+/// \internal
+///
+/// The QXmppUdpTransport class represents a UDP transport.
+///
+
+class QXMPP_EXPORT QXmppUdpTransport : public QXmppIceTransport
+{
+    Q_OBJECT
+
+public:
+    QXmppUdpTransport(QUdpSocket *socket, QObject *parent = 0);
+    ~QXmppUdpTransport();
+
+    QXmppJingleCandidate localCandidate(int component) const;
+    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+
+public slots:
+    void disconnectFromHost();
+
+private slots:
+    void readyRead();
+
+private:
+    QUdpSocket *m_socket;
 };
 
 #endif
