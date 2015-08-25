@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 SUBDIRS = \
     qxmpparchiveiq \
     qxmppbindiq \
+    qxmppcallmanager \
     qxmppdataform \
     qxmppdiscoveryiq \
     qxmppentitytimeiq \
