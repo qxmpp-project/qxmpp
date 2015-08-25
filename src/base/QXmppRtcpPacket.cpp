@@ -28,6 +28,11 @@
 
 #define RTP_VERSION 2
 
+enum DescriptionType {
+    CnameType = 1,
+    NameType  = 2
+};
+
 class QXmppRtcpPacketPrivate : public QSharedData
 {
 public:
@@ -37,6 +42,18 @@ public:
     quint8 type;
     /// Raw payload data.
     QByteArray payload;
+
+    QList<QXmppRtcpSourceDescription> sourceDescriptions;
+};
+
+class QXmppRtcpSourceDescriptionPrivate : public QSharedData
+{
+public:
+    bool read(QDataStream &s);
+
+    quint32 ssrc;
+    QString cname;
+    QString name;
 };
 
 /// Constructs an empty RTCP packet
@@ -74,11 +91,28 @@ QXmppRtcpPacket& QXmppRtcpPacket::operator=(const QXmppRtcpPacket& other)
 /// \param ba
 bool QXmppRtcpPacket::decode(const QByteArray &ba)
 {
+    QDataStream stream(ba);
+    return read(stream);
+}
+
+/// Encodes an RTCP packet.
+
+QByteArray QXmppRtcpPacket::encode() const
+{
+    QByteArray ba;
+    ba.resize(4 + d->payload.size());
+
+    QDataStream stream(&ba, QIODevice::WriteOnly);
+    write(stream);
+    return ba;
+}
+
+bool QXmppRtcpPacket::read(QDataStream &stream)
+{
     quint8 tmp, type;
     quint16 len;
 
     // fixed header
-    QDataStream stream(ba);
     stream >> tmp;
     stream >> type;
     stream >> len;
@@ -93,22 +127,27 @@ bool QXmppRtcpPacket::decode(const QByteArray &ba)
     d->count = (tmp & 0x1f);
     d->type = type;
     d->payload.resize(payloadLength);
-    return stream.readRawData(d->payload.data(), payloadLength) == payloadLength;
+    if (stream.readRawData(d->payload.data(), payloadLength) != payloadLength)
+        return false;
+
+    if (d->type == SourceDescription) {
+        QDataStream s(d->payload);
+        for (int j = 0; j < d->count; ++j) {
+            QXmppRtcpSourceDescription desc;
+            if (!desc.d->read(s))
+                return false;
+            d->sourceDescriptions << desc;
+        }
+    }
+    return true;
 }
 
-/// Encodes an RTCP packet.
-
-QByteArray QXmppRtcpPacket::encode() const
+void QXmppRtcpPacket::write(QDataStream &stream) const
 {
-    QByteArray ba;
-    ba.resize(4 + d->payload.size());
-
-    QDataStream stream(&ba, QIODevice::WriteOnly);
     stream << quint8((RTP_VERSION << 6) | (d->count & 0x1f));
     stream << d->type;
     stream << quint16(d->payload.size() >> 2);
     stream.writeRawData(d->payload.constData(), d->payload.size());
-    return ba;
 }
 
 /// Returns the number of report blocks.
@@ -127,6 +166,21 @@ void QXmppRtcpPacket::setCount(quint8 count)
     d->count = count;
 }
 
+QByteArray QXmppRtcpPacket::payload() const
+{
+    return d->payload;
+}
+
+QList<QXmppRtcpSourceDescription> QXmppRtcpPacket::sourceDescriptions() const
+{
+    return d->sourceDescriptions;
+}
+
+void QXmppRtcpPacket::setSourceDescriptions(const QList<QXmppRtcpSourceDescription> &descriptions)
+{
+    d->sourceDescriptions = descriptions;
+}
+
 /// Returns the RTCP packet type.
 
 quint8 QXmppRtcpPacket::type() const
@@ -141,4 +195,98 @@ quint8 QXmppRtcpPacket::type() const
 void QXmppRtcpPacket::setType(quint8 type)
 {
     d->type = type;
+}
+
+bool QXmppRtcpSourceDescriptionPrivate::read(QDataStream &stream)
+{
+    QByteArray padding;
+    QByteArray buffer;
+    quint8 itemType, itemLength;
+    quint16 chunkLength = 0;
+
+    stream >> ssrc;
+    if (stream.status() != QDataStream::Ok)
+        return false;
+    while (true) {
+        stream >> itemType;
+        if (stream.status() != QDataStream::Ok)
+            return false;
+        if (!itemType) {
+            chunkLength++;
+            break;
+        }
+
+        stream >> itemLength;
+        if (stream.status() != QDataStream::Ok)
+            return false;
+
+        buffer.resize(itemLength);
+        if (stream.readRawData(buffer.data(), itemLength) != itemLength)
+            return false;
+        chunkLength += itemLength + 2;
+
+        if (itemType == CnameType)
+            cname = QString::fromUtf8(buffer);
+        else if (itemType == NameType)
+            name = QString::fromUtf8(buffer);
+    }
+    if (chunkLength % 4) {
+        padding.resize(4 - chunkLength % 4);
+        if (stream.readRawData(padding.data(), padding.size()) != padding.size())
+            return false;
+        if (padding != QByteArray(padding.size(), 0))
+            return false;
+    }
+    return true;
+}
+
+/// Constructs an empty source description
+
+QXmppRtcpSourceDescription::QXmppRtcpSourceDescription()
+    : d(new QXmppRtcpSourceDescriptionPrivate())
+{
+    d->ssrc = 0;
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+///
+QXmppRtcpSourceDescription::QXmppRtcpSourceDescription(const QXmppRtcpSourceDescription &other)
+    : d(other.d)
+{
+}
+
+QXmppRtcpSourceDescription::~QXmppRtcpSourceDescription()
+{
+}
+
+QString QXmppRtcpSourceDescription::cname() const
+{
+    return d->cname;
+}
+
+void QXmppRtcpSourceDescription::setCname(const QString &cname)
+{
+    d->cname = cname;
+}
+
+QString QXmppRtcpSourceDescription::name() const
+{
+    return d->name;
+}
+
+void QXmppRtcpSourceDescription::setName(const QString &name)
+{
+    d->name = name;
+}
+
+quint32 QXmppRtcpSourceDescription::ssrc() const
+{
+    return d->ssrc;
+}
+
+void QXmppRtcpSourceDescription::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
 }

@@ -29,6 +29,28 @@
 #include "QXmppGlobal.h"
 
 class QXmppRtcpPacketPrivate;
+class QXmppRtcpSourceDescriptionPrivate;
+
+class QXMPP_EXPORT QXmppRtcpSourceDescription
+{
+public:
+    QXmppRtcpSourceDescription();
+    QXmppRtcpSourceDescription(const QXmppRtcpSourceDescription &other);
+    ~QXmppRtcpSourceDescription();
+
+    QString cname() const;
+    void setCname(const QString &name);
+
+    QString name() const;
+    void setName(const QString &name);
+
+    quint32 ssrc() const;
+    void setSsrc(const quint32 ssrc);
+
+private:
+    friend class QXmppRtcpPacket;
+    QSharedDataPointer<QXmppRtcpSourceDescriptionPrivate> d;
+};
 
 /// \brief The QXmppRtpPacket class represents an RTCP packet.
 ///
@@ -36,6 +58,13 @@ class QXmppRtcpPacketPrivate;
 class QXMPP_EXPORT QXmppRtcpPacket
 {
 public:
+    enum Type {
+        SenderReport        = 200,
+        ReceiverReport      = 201,
+        SourceDescription   = 202,
+        Goodbye             = 203,
+    };
+
     QXmppRtcpPacket();
     QXmppRtcpPacket(const QXmppRtcpPacket &other);
     virtual ~QXmppRtcpPacket();
@@ -45,11 +74,20 @@ public:
     bool decode(const QByteArray &ba);
     QByteArray encode() const;
 
+    bool read(QDataStream &stream);
+    void write(QDataStream &stream) const;
+
     quint8 count() const;
     void setCount(quint8 count);
 
+    QByteArray payload() const;
+    void setPayload(const QByteArray &payload);
+
     quint8 type() const;
     void setType(quint8 type);
+
+    QList<QXmppRtcpSourceDescription> sourceDescriptions() const;
+    void setSourceDescriptions(const QList<QXmppRtcpSourceDescription> &descriptions);
 
 private:
     QSharedDataPointer<QXmppRtcpPacketPrivate> d;

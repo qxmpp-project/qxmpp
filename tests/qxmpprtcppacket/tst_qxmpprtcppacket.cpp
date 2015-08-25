@@ -61,7 +61,11 @@ void tst_QXmppRtcpPacket::testSourceDescription()
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
     QCOMPARE(packet.count(), quint8(1));
-    QCOMPARE(packet.type(), quint8(202));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SourceDescription));
+    QCOMPARE(packet.sourceDescriptions().size(), 1);
+    QCOMPARE(packet.sourceDescriptions()[0].cname(), QLatin1String("{d03a7c48-d906-4b9a-9820-111802dcd578}"));
+    QCOMPARE(packet.sourceDescriptions()[0].name(), QString());
+    QCOMPARE(packet.sourceDescriptions()[0].ssrc(), quint32(665248961));
     QCOMPARE(packet.encode(), data);
 }
 
