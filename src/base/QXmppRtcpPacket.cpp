@@ -43,12 +43,40 @@ public:
     /// Raw payload data.
     QByteArray payload;
 
+    QXmppRtcpSenderReport senderReport;
+    QList<QXmppRtcpReceiverReport> receiverReports;
     QList<QXmppRtcpSourceDescription> sourceDescriptions;
+};
+
+class QXmppRtcpReceiverReportPrivate : public QSharedData
+{
+public:
+    QXmppRtcpReceiverReportPrivate();
+    bool read(QDataStream &stream);
+    void write(QDataStream &stream) const;
+
+    quint32 ssrc;
+    QByteArray blob;
+};
+
+class QXmppRtcpSenderReportPrivate : public QSharedData
+{
+public:
+    QXmppRtcpSenderReportPrivate();
+    bool read(QDataStream &stream);
+    void write(QDataStream &stream) const;
+
+    quint32 ssrc;
+    quint64 ntpStamp;
+    quint32 rtpStamp;
+    quint32 packetCount;
+    quint32 octetCount;
 };
 
 class QXmppRtcpSourceDescriptionPrivate : public QSharedData
 {
 public:
+    QXmppRtcpSourceDescriptionPrivate();
     bool read(QDataStream &stream);
     void write(QDataStream &stream) const;
 
@@ -67,7 +95,7 @@ QXmppRtcpPacket::QXmppRtcpPacket()
 /// Constructs a copy of other.
 ///
 /// \param other
-///
+
 QXmppRtcpPacket::QXmppRtcpPacket(const QXmppRtcpPacket &other)
     : d(other.d)
 {
@@ -75,16 +103,6 @@ QXmppRtcpPacket::QXmppRtcpPacket(const QXmppRtcpPacket &other)
 
 QXmppRtcpPacket::~QXmppRtcpPacket()
 {
-}
-
-/// Assigns the other packet to this one.
-///
-/// \param other
-///
-QXmppRtcpPacket& QXmppRtcpPacket::operator=(const QXmppRtcpPacket& other)
-{
-    d = other.d;
-    return *this;
 }
 
 /// Parses an RTCP packet.
@@ -131,8 +149,20 @@ bool QXmppRtcpPacket::read(QDataStream &stream)
     if (stream.readRawData(d->payload.data(), payloadLength) != payloadLength)
         return false;
 
-    if (d->type == SourceDescription) {
-        QDataStream s(d->payload);
+    QDataStream s(d->payload);
+    d->receiverReports.clear();
+    d->senderReport = QXmppRtcpSenderReport();
+    d->sourceDescriptions.clear();
+    if (d->type == SenderReport) {
+        if (!d->senderReport.d->read(s))
+            return false;
+        for (int j = 0; j < d->count; ++j) {
+            QXmppRtcpReceiverReport receiverReport;
+            if (!receiverReport.d->read(s))
+                return false;
+            d->receiverReports << receiverReport;
+        }
+    } else if (d->type == SourceDescription) {
         for (int j = 0; j < d->count; ++j) {
             QXmppRtcpSourceDescription desc;
             if (!desc.d->read(s))
@@ -148,9 +178,12 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
     QByteArray payload;
     quint8 count;
 
-    if (d->type == SourceDescription) {
+    QDataStream s(&payload, QIODevice::WriteOnly);
+    if (d->type == SenderReport) {
+        count = 0;
+        d->senderReport.d->write(s);
+    } else if (d->type == SourceDescription) {
         count = d->sourceDescriptions.size();
-        QDataStream s(&payload, QIODevice::WriteOnly);
         foreach (const QXmppRtcpSourceDescription &desc, d->sourceDescriptions)
             desc.d->write(s);
     } else {
@@ -164,25 +197,24 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
     stream.writeRawData(payload.constData(), payload.size());
 }
 
-/// Returns the number of report blocks.
-
-quint8 QXmppRtcpPacket::count() const
+QList<QXmppRtcpReceiverReport> QXmppRtcpPacket::receiverReports() const
 {
-    return d->count;
+    return d->receiverReports;
 }
 
-/// Sets the number of report blocks.
-///
-/// \param count
-
-void QXmppRtcpPacket::setCount(quint8 count)
+void QXmppRtcpPacket::setReceiverReports(const QList<QXmppRtcpReceiverReport> &reports)
 {
-    d->count = count;
+    d->receiverReports = reports;
 }
 
-QByteArray QXmppRtcpPacket::payload() const
+QXmppRtcpSenderReport QXmppRtcpPacket::senderReport() const
 {
-    return d->payload;
+    return d->senderReport;
+}
+
+void QXmppRtcpPacket::setSenderReport(const QXmppRtcpSenderReport &report)
+{
+    d->senderReport = report;
 }
 
 QList<QXmppRtcpSourceDescription> QXmppRtcpPacket::sourceDescriptions() const
@@ -209,6 +241,207 @@ quint8 QXmppRtcpPacket::type() const
 void QXmppRtcpPacket::setType(quint8 type)
 {
     d->type = type;
+}
+
+/// Constructs an empty receiver report.
+
+QXmppRtcpReceiverReport::QXmppRtcpReceiverReport()
+    : d(new QXmppRtcpReceiverReportPrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+
+QXmppRtcpReceiverReport::QXmppRtcpReceiverReport(const QXmppRtcpReceiverReport &other)
+    : d(other.d)
+{
+}
+
+QXmppRtcpReceiverReport::~QXmppRtcpReceiverReport()
+{
+}
+
+quint32 QXmppRtcpReceiverReport::ssrc() const
+{
+    return d->ssrc;
+}
+
+void QXmppRtcpReceiverReport::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
+}
+
+QXmppRtcpReceiverReportPrivate::QXmppRtcpReceiverReportPrivate()
+    : ssrc(0)
+{
+    blob.resize(20);
+}
+
+bool QXmppRtcpReceiverReportPrivate::read(QDataStream &stream)
+{
+    stream >> ssrc;
+    return stream.readRawData(blob.data(), blob.size()) == blob.size();
+}
+
+void QXmppRtcpReceiverReportPrivate::write(QDataStream &stream) const
+{
+    stream << ssrc;
+    stream.writeRawData(blob.constData(), blob.size());
+}
+
+/// Constructs an empty sender report.
+
+QXmppRtcpSenderReport::QXmppRtcpSenderReport()
+    : d(new QXmppRtcpSenderReportPrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+
+QXmppRtcpSenderReport::QXmppRtcpSenderReport(const QXmppRtcpSenderReport &other)
+    : d(other.d)
+{
+}
+
+QXmppRtcpSenderReport::~QXmppRtcpSenderReport()
+{
+}
+
+quint64 QXmppRtcpSenderReport::ntpStamp() const
+{
+    return d->ntpStamp;
+}
+
+void QXmppRtcpSenderReport::setNtpStamp(quint64 ntpStamp)
+{
+    d->ntpStamp = ntpStamp;
+}
+
+quint32 QXmppRtcpSenderReport::rtpStamp() const
+{
+    return d->rtpStamp;
+}
+
+void QXmppRtcpSenderReport::setRtpStamp(quint32 rtpStamp)
+{
+    d->rtpStamp = rtpStamp;
+}
+
+quint32 QXmppRtcpSenderReport::ssrc() const
+{
+    return d->ssrc;
+}
+
+void QXmppRtcpSenderReport::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
+}
+
+quint32 QXmppRtcpSenderReport::octetCount() const
+{
+    return d->octetCount;
+}
+
+void QXmppRtcpSenderReport::setOctetCount(quint32 count)
+{
+    d->octetCount = count;
+}
+
+quint32 QXmppRtcpSenderReport::packetCount() const
+{
+    return d->packetCount;
+}
+
+void QXmppRtcpSenderReport::setPacketCount(quint32 count)
+{
+    d->packetCount = count;
+}
+
+QXmppRtcpSenderReportPrivate::QXmppRtcpSenderReportPrivate()
+    : ssrc(0)
+    , ntpStamp(0)
+    , rtpStamp(0)
+    , packetCount(0)
+    , octetCount(0)
+{
+}
+
+bool QXmppRtcpSenderReportPrivate::read(QDataStream &stream)
+{
+    stream >> ssrc;
+    stream >> ntpStamp;
+    stream >> rtpStamp;
+    stream >> packetCount;
+    stream >> octetCount;
+    return stream.status() == QDataStream::Ok;
+}
+
+void QXmppRtcpSenderReportPrivate::write(QDataStream &stream) const
+{
+    stream << ssrc;
+    stream << ntpStamp;
+    stream << rtpStamp;
+    stream << packetCount;
+    stream << octetCount;
+}
+
+/// Constructs an empty source description
+
+QXmppRtcpSourceDescription::QXmppRtcpSourceDescription()
+    : d(new QXmppRtcpSourceDescriptionPrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+
+QXmppRtcpSourceDescription::QXmppRtcpSourceDescription(const QXmppRtcpSourceDescription &other)
+    : d(other.d)
+{
+}
+
+QXmppRtcpSourceDescription::~QXmppRtcpSourceDescription()
+{
+}
+
+QString QXmppRtcpSourceDescription::cname() const
+{
+    return d->cname;
+}
+
+void QXmppRtcpSourceDescription::setCname(const QString &cname)
+{
+    d->cname = cname;
+}
+
+QString QXmppRtcpSourceDescription::name() const
+{
+    return d->name;
+}
+
+void QXmppRtcpSourceDescription::setName(const QString &name)
+{
+    d->name = name;
+}
+
+quint32 QXmppRtcpSourceDescription::ssrc() const
+{
+    return d->ssrc;
+}
+
+void QXmppRtcpSourceDescription::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
+}
+
+QXmppRtcpSourceDescriptionPrivate::QXmppRtcpSourceDescriptionPrivate()
+    : ssrc(0)
+{
 }
 
 bool QXmppRtcpSourceDescriptionPrivate::read(QDataStream &stream)
@@ -279,55 +512,4 @@ void QXmppRtcpSourceDescriptionPrivate::write(QDataStream &stream) const
         buffer = QByteArray(4 - chunkLength % 4, '\0');
         stream.writeRawData(buffer.constData(), buffer.size());
     }
-}
-
-/// Constructs an empty source description
-
-QXmppRtcpSourceDescription::QXmppRtcpSourceDescription()
-    : d(new QXmppRtcpSourceDescriptionPrivate())
-{
-    d->ssrc = 0;
-}
-
-/// Constructs a copy of other.
-///
-/// \param other
-///
-QXmppRtcpSourceDescription::QXmppRtcpSourceDescription(const QXmppRtcpSourceDescription &other)
-    : d(other.d)
-{
-}
-
-QXmppRtcpSourceDescription::~QXmppRtcpSourceDescription()
-{
-}
-
-QString QXmppRtcpSourceDescription::cname() const
-{
-    return d->cname;
-}
-
-void QXmppRtcpSourceDescription::setCname(const QString &cname)
-{
-    d->cname = cname;
-}
-
-QString QXmppRtcpSourceDescription::name() const
-{
-    return d->name;
-}
-
-void QXmppRtcpSourceDescription::setName(const QString &name)
-{
-    d->name = name;
-}
-
-quint32 QXmppRtcpSourceDescription::ssrc() const
-{
-    return d->ssrc;
-}
-
-void QXmppRtcpSourceDescription::setSsrc(quint32 ssrc)
-{
-    d->ssrc = ssrc;
 }
