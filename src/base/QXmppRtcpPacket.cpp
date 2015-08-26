@@ -62,11 +62,11 @@ public:
 
     quint32 ssrc;
     quint8 fractionLost;
-    quint32 cumulativeLost;
+    quint32 totalLost;
     quint32 highestSequence;
     quint32 jitter;
-    quint32 srStamp;
-    quint32 srDelay;
+    quint32 lsr;
+    quint32 dlsr;
 };
 
 class QXmppRtcpSenderInfoPrivate : public QSharedData
@@ -375,6 +375,46 @@ QXmppRtcpReceiverReport::~QXmppRtcpReceiverReport()
 {
 }
 
+quint32 QXmppRtcpReceiverReport::dlsr() const
+{
+    return d->dlsr;
+}
+
+void QXmppRtcpReceiverReport::setDlsr(quint32 dlsr)
+{
+    d->dlsr = dlsr;
+}
+
+quint8 QXmppRtcpReceiverReport::fractionLost() const
+{
+    return d->fractionLost;
+}
+
+void QXmppRtcpReceiverReport::setFractionLost(quint8 fractionLost)
+{
+    d->fractionLost = fractionLost;
+}
+
+quint32 QXmppRtcpReceiverReport::jitter() const
+{
+    return d->jitter;
+}
+
+void QXmppRtcpReceiverReport::setJitter(quint32 jitter)
+{
+    d->jitter = jitter;
+}
+
+quint32 QXmppRtcpReceiverReport::lsr() const
+{
+    return d->lsr;
+}
+
+void QXmppRtcpReceiverReport::setLsr(quint32 lsr)
+{
+    d->lsr = lsr;
+}
+
 quint32 QXmppRtcpReceiverReport::ssrc() const
 {
     return d->ssrc;
@@ -385,14 +425,24 @@ void QXmppRtcpReceiverReport::setSsrc(quint32 ssrc)
     d->ssrc = ssrc;
 }
 
+quint32 QXmppRtcpReceiverReport::totalLost() const
+{
+    return d->totalLost;
+}
+
+void QXmppRtcpReceiverReport::setTotalLost(quint32 totalLost)
+{
+    d->totalLost = totalLost;
+}
+
 QXmppRtcpReceiverReportPrivate::QXmppRtcpReceiverReportPrivate()
     : ssrc(0)
     , fractionLost(0)
-    , cumulativeLost(0)
+    , totalLost(0)
     , highestSequence(0)
     , jitter(0)
-    , srStamp(0)
-    , srDelay(0)
+    , lsr(0)
+    , dlsr(0)
 {
 }
 
@@ -402,22 +452,22 @@ bool QXmppRtcpReceiverReportPrivate::read(QDataStream &stream)
     stream >> ssrc;
     stream >> tmp;
     fractionLost = (tmp >> 24) & 0xff;
-    cumulativeLost = tmp & 0xffffff;
+    totalLost = tmp & 0xffffff;
     stream >> highestSequence;
     stream >> jitter;
-    stream >> srStamp;
-    stream >> srDelay;
+    stream >> lsr;
+    stream >> dlsr;
     return stream.status() == QDataStream::Ok;
 }
 
 void QXmppRtcpReceiverReportPrivate::write(QDataStream &stream) const
 {
     stream << ssrc;
-    stream << quint32((fractionLost << 24) | cumulativeLost);
+    stream << quint32((fractionLost << 24) | (totalLost & 0xffffff));
     stream << highestSequence;
     stream << jitter;
-    stream << srStamp;
-    stream << srDelay;
+    stream << lsr;
+    stream << dlsr;
 }
 
 /// Constructs an empty sender report.

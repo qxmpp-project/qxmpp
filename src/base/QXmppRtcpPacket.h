@@ -91,8 +91,23 @@ public:
     QXmppRtcpReceiverReport(const QXmppRtcpReceiverReport &other);
     ~QXmppRtcpReceiverReport();
 
+    quint32 dlsr() const;
+    void setDlsr(quint32 dlsr);
+
+    quint8 fractionLost() const;
+    void setFractionLost(quint8 fractionLost);
+
+    quint32 jitter() const;
+    void setJitter(quint32 jitter);
+
+    quint32 lsr() const;
+    void setLsr(quint32 lsr);
+
     quint32 ssrc() const;
-    void setSsrc(const quint32 ssrc);
+    void setSsrc(quint32 ssrc);
+
+    quint32 totalLost() const;
+    void setTotalLost(quint32 totalLost);
 
 private:
     friend class QXmppRtcpPacket;
