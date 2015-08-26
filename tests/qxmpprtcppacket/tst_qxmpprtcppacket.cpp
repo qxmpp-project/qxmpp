@@ -53,7 +53,7 @@ void tst_QXmppRtcpPacket::testSenderReport()
 
     QCOMPARE(packet.receiverReports().size(), 0);
 
-    QCOMPARE(packet.senderReport().ntpStamp(), quint64(15672505252348484072));
+    QCOMPARE(packet.senderReport().ntpStamp(), quint64(15672505252348484072ULL));
     QCOMPARE(packet.senderReport().octetCount(), quint32(18560));
     QCOMPARE(packet.senderReport().packetCount(), quint32(116));
     QCOMPARE(packet.senderReport().rtpStamp(), quint32(3718132311));
