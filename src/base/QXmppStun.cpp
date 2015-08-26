@@ -118,6 +118,11 @@ static bool isIPv6LinkLocalAddress(const QHostAddress &addr)
     return (((ipv6addr[0] << 8) + ipv6addr[1]) & 0xffc0) == 0xfe80;
 }
 
+static bool isLoopbackAddress(const QHostAddress &addr)
+{
+    return (addr.toIPv4Address() & 0xff000000) == 0x7f000000;
+}
+
 static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &address, quint16 &port, const QByteArray &xorId = QByteArray())
 {
     if (a_length < 4)
@@ -2425,6 +2430,11 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
             if ((ip.protocol() != QAbstractSocket::IPv4Protocol &&
                  ip.protocol() != QAbstractSocket::IPv6Protocol) ||
                 entry.netmask().isNull())
+                continue;
+
+            // FIXME: for some reason we can have loopback addresses
+            // even if the interface does not have the loopback flag
+            if (isLoopbackAddress(ip))
                 continue;
 
             // FIXME: for now skip IPv6 link-local addresses, seems to upset
