@@ -123,6 +123,13 @@ static bool isLoopbackAddress(const QHostAddress &addr)
     return (addr.toIPv4Address() & 0xff000000) == 0x7f000000;
 }
 
+// Returns true if the two addresses are compatible.
+static bool isCompatibleAddress(const QHostAddress &a1, const QHostAddress &a2)
+{
+    return a1.protocol() == a2.protocol() &&
+           isIPv6LinkLocalAddress(a1) == isIPv6LinkLocalAddress(a2);
+}
+
 static bool decodeAddress(QDataStream &stream, quint16 a_length, QHostAddress &address, quint16 &port, const QByteArray &xorId = QByteArray())
 {
     if (a_length < 4)
@@ -1976,11 +1983,9 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
     d->remoteCandidates << candidate;
 
     foreach (QXmppIceTransport *transport, d->transports) {
-        // do not pair IPv4 with IPv6 or global with link-local addresses
+        // only pair compatible addresses
         const QXmppJingleCandidate local = transport->localCandidate(d->component);
-
-        if (local.host().protocol() != candidate.host().protocol() ||
-            isIPv6LinkLocalAddress(local.host()) != isIPv6LinkLocalAddress(candidate.host()))
+        if (!isCompatibleAddress(local.host(), candidate.host()))
             continue;
 
         CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
@@ -2056,6 +2061,10 @@ void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
         foreach (QXmppIceTransport *transport, d->transports) {
+            const QXmppJingleCandidate local = transport->localCandidate(d->component);
+            if (!isCompatibleAddress(local.host(), d->stunHost))
+                continue;
+
             request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
             QXmppStunTransaction *transaction = new QXmppStunTransaction(request, this);
             d->stunTransactions.insert(transaction, transport);
