@@ -44,12 +44,13 @@ public:
     quint8 type;
     /// Raw payload data.
     QByteArray payload;
-    // Sender SSRC (for receiver / sender reports only).
-    quint32 ssrc;
 
+    QString goodbyeReason;
+    QList<quint32> goodbyeSsrcs;
     QXmppRtcpSenderInfo senderInfo;
     QList<QXmppRtcpReceiverReport> receiverReports;
     QList<QXmppRtcpSourceDescription> sourceDescriptions;
+    quint32 ssrc;
 };
 
 class QXmppRtcpReceiverReportPrivate : public QSharedData
@@ -92,6 +93,27 @@ public:
     QString cname;
     QString name;
 };
+
+static bool readPadding(QDataStream &stream, int dataLength)
+{
+    if (dataLength % 4) {
+        QByteArray buffer;
+        buffer.resize(4 - dataLength % 4);
+        if (stream.readRawData(buffer.data(), buffer.size()) != buffer.size())
+            return false;
+        if (buffer != QByteArray(buffer.size(), '\0'))
+            return false;
+    }
+    return true;
+}
+
+static void writePadding(QDataStream &stream, int dataLength)
+{
+    if (dataLength % 4) {
+        const QByteArray buffer = QByteArray(4 - dataLength % 4, '\0');
+        stream.writeRawData(buffer.constData(), buffer.size());
+    }
+}
 
 /// Constructs an empty RTCP packet
 
@@ -158,11 +180,32 @@ bool QXmppRtcpPacket::read(QDataStream &stream)
         return false;
 
     QDataStream s(d->payload);
+    d->goodbyeReason.clear();
+    d->goodbyeSsrcs.clear();
     d->receiverReports.clear();
     d->senderInfo = QXmppRtcpSenderInfo();
     d->sourceDescriptions.clear();
     d->ssrc = 0;
-    if (d->type == ReceiverReport || d->type == SenderReport) {
+    if (d->type == Goodbye) {
+        quint32 ssrc;
+        for (int i = 0; i < d->count; ++i) {
+            s >> ssrc;
+            if (stream.status() != QDataStream::Ok)
+                return false;
+            d->goodbyeSsrcs << ssrc;
+        }
+        quint8 reasonLength;
+        s >> reasonLength;
+        if (reasonLength) {
+            QByteArray buffer;
+            buffer.resize(reasonLength);
+            if (s.readRawData(buffer.data(), buffer.size()) != buffer.size())
+                return false;
+            if (!readPadding(s, 1 + buffer.size()))
+                return false;
+            d->goodbyeReason = QString::fromUtf8(buffer);
+        }
+    } else if (d->type == ReceiverReport || d->type == SenderReport) {
         s >> d->ssrc;
         if (d->type == SenderReport && !d->senderInfo.d->read(s))
             return false;
@@ -189,7 +232,17 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
     quint8 count;
 
     QDataStream s(&payload, QIODevice::WriteOnly);
-    if (d->type == ReceiverReport || d->type == SenderReport) {
+    if (d->type == Goodbye) {
+        count = d->goodbyeSsrcs.size();
+        foreach (quint32 ssrc, d->goodbyeSsrcs)
+            s << ssrc;
+        if (!d->goodbyeReason.isEmpty()) {
+            const QByteArray reason = d->goodbyeReason.toUtf8();
+            s << quint8(reason.size());
+            s.writeRawData(reason.constData(), reason.size());
+            writePadding(s, 1 + reason.size());
+        }
+    } else if (d->type == ReceiverReport || d->type == SenderReport) {
         count = d->receiverReports.size();
         s << d->ssrc;
         if (d->type == SenderReport)
@@ -209,6 +262,26 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
     stream << d->type;
     stream << quint16(payload.size() >> 2);
     stream.writeRawData(payload.constData(), payload.size());
+}
+
+QString QXmppRtcpPacket::goodbyeReason() const
+{
+    return d->goodbyeReason;
+}
+
+void QXmppRtcpPacket::setGoodbyeReason(const QString &goodbyeReason)
+{
+    d->goodbyeReason = goodbyeReason;
+}
+
+QList<quint32> QXmppRtcpPacket::goodbyeSsrcs() const
+{
+    return d->goodbyeSsrcs;
+}
+
+void QXmppRtcpPacket::setGoodbyeSsrcs(const QList<quint32> &goodbyeSsrcs)
+{
+    d->goodbyeSsrcs = goodbyeSsrcs;
 }
 
 QList<QXmppRtcpReceiverReport> QXmppRtcpPacket::receiverReports() const
@@ -519,14 +592,7 @@ bool QXmppRtcpSourceDescriptionPrivate::read(QDataStream &stream)
         else if (itemType == NameType)
             name = QString::fromUtf8(buffer);
     }
-    if (chunkLength % 4) {
-        buffer.resize(4 - chunkLength % 4);
-        if (stream.readRawData(buffer.data(), buffer.size()) != buffer.size())
-            return false;
-        if (buffer != QByteArray(buffer.size(), '\0'))
-            return false;
-    }
-    return true;
+    return readPadding(stream, chunkLength);
 }
 
 void QXmppRtcpSourceDescriptionPrivate::write(QDataStream &stream) const
@@ -551,8 +617,5 @@ void QXmppRtcpSourceDescriptionPrivate::write(QDataStream &stream) const
     }
     stream << quint8(0);
     chunkLength++;
-    if (chunkLength % 4) {
-        buffer = QByteArray(4 - chunkLength % 4, '\0');
-        stream.writeRawData(buffer.constData(), buffer.size());
-    }
+    writePadding(stream, chunkLength);
 }

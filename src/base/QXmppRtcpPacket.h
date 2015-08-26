@@ -59,6 +59,12 @@ public:
     bool read(QDataStream &stream);
     void write(QDataStream &stream) const;
 
+    QString goodbyeReason() const;
+    void setGoodbyeReason(const QString &goodbyeReason);
+
+    QList<quint32> goodbyeSsrcs() const;
+    void setGoodbyeSsrcs(const QList<quint32> &goodbyeSsrcs);
+
     QList<QXmppRtcpReceiverReport> receiverReports() const;
     void setReceiverReports(const QList<QXmppRtcpReceiverReport> &reports);
 

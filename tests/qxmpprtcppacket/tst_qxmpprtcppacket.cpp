@@ -31,6 +31,8 @@ class tst_QXmppRtcpPacket : public QObject
 
 private slots:
     void testBad();
+    void testGoodbye();
+    void testGoodbyeWithReason();
     void testReceiverReport();
     void testSenderReport();
     void testSenderReportWithReceiverReport();
@@ -45,6 +47,50 @@ void tst_QXmppRtcpPacket::testBad()
     QCOMPARE(packet.decode(QByteArray()), false);
 }
 
+void tst_QXmppRtcpPacket::testGoodbye()
+{
+    const QByteArray data = QByteArray::fromHex("81cb000133425619");
+
+    QXmppRtcpPacket packet;
+    QVERIFY(packet.decode(data));
+
+    QCOMPARE(packet.goodbyeReason(), QString());
+    QCOMPARE(packet.goodbyeSsrcs().size(), 1);
+    QCOMPARE(packet.goodbyeSsrcs()[0], quint32(859985433));
+    QCOMPARE(packet.receiverReports().size(), 0);
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(0));
+    QCOMPARE(packet.sourceDescriptions().size(), 0);
+    QCOMPARE(packet.ssrc(), quint32(0));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::Goodbye));
+
+    QCOMPARE(packet.encode(), data);
+}
+
+void tst_QXmppRtcpPacket::testGoodbyeWithReason()
+{
+    const QByteArray data = QByteArray::fromHex("81cb0003334256190462796521000000");
+
+    QXmppRtcpPacket packet;
+    QVERIFY(packet.decode(data));
+
+    QCOMPARE(packet.goodbyeReason(), QLatin1String("bye!"));
+    QCOMPARE(packet.goodbyeSsrcs().size(), 1);
+    QCOMPARE(packet.goodbyeSsrcs()[0], quint32(859985433));
+    QCOMPARE(packet.receiverReports().size(), 0);
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(0));
+    QCOMPARE(packet.sourceDescriptions().size(), 0);
+    QCOMPARE(packet.ssrc(), quint32(0));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::Goodbye));
+
+    QCOMPARE(packet.encode(), data);
+}
+
 void tst_QXmppRtcpPacket::testReceiverReport()
 {
     const QByteArray data = QByteArray::fromHex("81c9000741f3bca22886dfa00000000000005eb90000001000000000fffbdae2");
@@ -52,6 +98,8 @@ void tst_QXmppRtcpPacket::testReceiverReport()
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
 
+    QCOMPARE(packet.goodbyeReason(), QString());
+    QCOMPARE(packet.goodbyeSsrcs().size(), 0);
     QCOMPARE(packet.receiverReports().size(), 1);
     QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(679927712));
     QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
@@ -72,6 +120,8 @@ void tst_QXmppRtcpPacket::testSenderReport()
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
 
+    QCOMPARE(packet.goodbyeReason(), QString());
+    QCOMPARE(packet.goodbyeSsrcs().size(), 0);
     QCOMPARE(packet.receiverReports().size(), 0);
     QCOMPARE(packet.senderInfo().ntpStamp(), quint64(15672505252348484072ULL));
     QCOMPARE(packet.senderInfo().octetCount(), quint32(18560));
@@ -91,6 +141,8 @@ void tst_QXmppRtcpPacket::testSenderReportWithReceiverReport()
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
 
+    QCOMPARE(packet.goodbyeReason(), QString());
+    QCOMPARE(packet.goodbyeSsrcs().size(), 0);
     QCOMPARE(packet.receiverReports().size(), 1);
     QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(2176590418));
     QCOMPARE(packet.senderInfo().ntpStamp(), quint64(14952153165080187948ULL));
@@ -111,6 +163,8 @@ void tst_QXmppRtcpPacket::testSourceDescription()
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
 
+    QCOMPARE(packet.goodbyeReason(), QString());
+    QCOMPARE(packet.goodbyeSsrcs().size(), 0);
     QCOMPARE(packet.receiverReports().size(), 0);
     QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
     QCOMPARE(packet.senderInfo().octetCount(), quint32(0));
