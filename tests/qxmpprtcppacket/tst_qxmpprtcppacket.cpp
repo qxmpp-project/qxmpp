@@ -31,7 +31,9 @@ class tst_QXmppRtcpPacket : public QObject
 
 private slots:
     void testBad();
+    void testReceiverReport();
     void testSenderReport();
+    void testSenderReportWithReceiverReport();
     void testSourceDescription();
 };
 
@@ -43,47 +45,83 @@ void tst_QXmppRtcpPacket::testBad()
     QCOMPARE(packet.decode(QByteArray()), false);
 }
 
-void tst_QXmppRtcpPacket::testSenderReport()
+void tst_QXmppRtcpPacket::testReceiverReport()
 {
-    QByteArray data("\x80\xc8\x00\x06\x27\xa6\xe4\xc1\xd9\x7f\xec\x7d\x92\xac\xd9\xe8\xdd\x9e\x32\x57\x00\x00\x00\x74\x00\x00\x48\x80", 28);
+    const QByteArray data = QByteArray::fromHex("81c9000741f3bca22886dfa00000000000005eb90000001000000000fffbdae2");
 
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
-    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SenderReport));
+
+    QCOMPARE(packet.receiverReports().size(), 1);
+    QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(679927712));
+    QCOMPARE(packet.senderReport().ntpStamp(), quint64(0));
+    QCOMPARE(packet.senderReport().octetCount(), quint32(0));
+    QCOMPARE(packet.senderReport().packetCount(), quint32(0));
+    QCOMPARE(packet.senderReport().rtpStamp(), quint32(0));
+    QCOMPARE(packet.sourceDescriptions().size(), 0);
+    QCOMPARE(packet.ssrc(), quint32(1106492578));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::ReceiverReport));
+
+    QCOMPARE(packet.encode(), data);
+}
+
+void tst_QXmppRtcpPacket::testSenderReport()
+{
+    const QByteArray data = QByteArray::fromHex("80c8000627a6e4c1d97fec7d92acd9e8dd9e32570000007400004880");
+
+    QXmppRtcpPacket packet;
+    QVERIFY(packet.decode(data));
 
     QCOMPARE(packet.receiverReports().size(), 0);
-
     QCOMPARE(packet.senderReport().ntpStamp(), quint64(15672505252348484072ULL));
     QCOMPARE(packet.senderReport().octetCount(), quint32(18560));
     QCOMPARE(packet.senderReport().packetCount(), quint32(116));
     QCOMPARE(packet.senderReport().rtpStamp(), quint32(3718132311));
-    QCOMPARE(packet.senderReport().ssrc(), quint32(665248961));
-
+    QCOMPARE(packet.ssrc(), quint32(665248961));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SenderReport));
     QCOMPARE(packet.sourceDescriptions().size(), 0);
+
+    QCOMPARE(packet.encode(), data);
+}
+
+void tst_QXmppRtcpPacket::testSenderReportWithReceiverReport()
+{
+    const QByteArray data = QByteArray::fromHex("81c8000c3efeb4decf80b8156fd6542c0000014000000003000001e081bc22520000000000007db50000002500000000fffbd605");
+
+    QXmppRtcpPacket packet;
+    QVERIFY(packet.decode(data));
+
+    QCOMPARE(packet.receiverReports().size(), 1);
+    QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(2176590418));
+    QCOMPARE(packet.senderReport().ntpStamp(), quint64(14952153165080187948ULL));
+    QCOMPARE(packet.senderReport().octetCount(), quint32(480));
+    QCOMPARE(packet.senderReport().packetCount(), quint32(3));
+    QCOMPARE(packet.senderReport().rtpStamp(), quint32(320));
+    QCOMPARE(packet.sourceDescriptions().size(), 0);
+    QCOMPARE(packet.ssrc(), quint32(1056879838));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SenderReport));
 
     QCOMPARE(packet.encode(), data);
 }
 
 void tst_QXmppRtcpPacket::testSourceDescription()
 {
-    QByteArray data("\x81\xca\x00\x0c\x27\xa6\xe4\xc1\x01\x26\x7b\x64\x30\x33\x61\x37\x63\x34\x38\x2d\x64\x39\x30\x36\x2d\x34\x62\x39\x61\x2d\x39\x38\x32\x30\x2d\x31\x31\x31\x38\x30\x32\x64\x63\x64\x35\x37\x38\x7d\x00\x00\x00\x00", 52);
+    const QByteArray data = QByteArray::fromHex("81ca000c27a6e4c101267b64303361376334382d643930362d346239612d393832302d3131313830326463643537387d00000000");
 
     QXmppRtcpPacket packet;
     QVERIFY(packet.decode(data));
-    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SourceDescription));
 
     QCOMPARE(packet.receiverReports().size(), 0);
-
     QCOMPARE(packet.senderReport().ntpStamp(), quint64(0));
     QCOMPARE(packet.senderReport().octetCount(), quint32(0));
     QCOMPARE(packet.senderReport().packetCount(), quint32(0));
     QCOMPARE(packet.senderReport().rtpStamp(), quint32(0));
-    QCOMPARE(packet.senderReport().ssrc(), quint32(0));
-
     QCOMPARE(packet.sourceDescriptions().size(), 1);
     QCOMPARE(packet.sourceDescriptions()[0].cname(), QLatin1String("{d03a7c48-d906-4b9a-9820-111802dcd578}"));
     QCOMPARE(packet.sourceDescriptions()[0].name(), QString());
     QCOMPARE(packet.sourceDescriptions()[0].ssrc(), quint32(665248961));
+    QCOMPARE(packet.ssrc(), quint32(0));
+    QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SourceDescription));
 
     QCOMPARE(packet.encode(), data);
 }

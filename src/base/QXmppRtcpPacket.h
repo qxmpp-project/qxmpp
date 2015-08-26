@@ -59,9 +59,6 @@ public:
     bool read(QDataStream &stream);
     void write(QDataStream &stream) const;
 
-    quint8 type() const;
-    void setType(quint8 type);
-
     QList<QXmppRtcpReceiverReport> receiverReports() const;
     void setReceiverReports(const QList<QXmppRtcpReceiverReport> &reports);
 
@@ -70,6 +67,12 @@ public:
 
     QList<QXmppRtcpSourceDescription> sourceDescriptions() const;
     void setSourceDescriptions(const QList<QXmppRtcpSourceDescription> &descriptions);
+
+    quint32 ssrc() const;
+    void setSsrc(quint32 ssrc);
+
+    quint8 type() const;
+    void setType(quint8 type);
 
 private:
     QSharedDataPointer<QXmppRtcpPacketPrivate> d;
@@ -102,9 +105,6 @@ public:
 
     quint32 rtpStamp() const;
     void setRtpStamp(quint32 rtpStamp);
-
-    quint32 ssrc() const;
-    void setSsrc(quint32 ssrc);
 
     quint32 octetCount() const;
     void setOctetCount(quint32 count);
