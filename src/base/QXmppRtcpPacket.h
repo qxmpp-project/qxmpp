@@ -31,8 +31,8 @@
 class QXmppRtcpPacketPrivate;
 class QXmppRtcpReceiverReport;
 class QXmppRtcpReceiverReportPrivate;
-class QXmppRtcpSenderReport;
-class QXmppRtcpSenderReportPrivate;
+class QXmppRtcpSenderInfo;
+class QXmppRtcpSenderInfoPrivate;
 class QXmppRtcpSourceDescription;
 class QXmppRtcpSourceDescriptionPrivate;
 
@@ -62,8 +62,8 @@ public:
     QList<QXmppRtcpReceiverReport> receiverReports() const;
     void setReceiverReports(const QList<QXmppRtcpReceiverReport> &reports);
 
-    QXmppRtcpSenderReport senderReport() const;
-    void setSenderReport(const QXmppRtcpSenderReport &report);
+    QXmppRtcpSenderInfo senderInfo() const;
+    void setSenderInfo(const QXmppRtcpSenderInfo &senderInfo);
 
     QList<QXmppRtcpSourceDescription> sourceDescriptions() const;
     void setSourceDescriptions(const QList<QXmppRtcpSourceDescription> &descriptions);
@@ -93,12 +93,12 @@ private:
     QSharedDataPointer<QXmppRtcpReceiverReportPrivate> d;
 };
 
-class QXMPP_EXPORT QXmppRtcpSenderReport
+class QXMPP_EXPORT QXmppRtcpSenderInfo
 {
 public:
-    QXmppRtcpSenderReport();
-    QXmppRtcpSenderReport(const QXmppRtcpSenderReport &other);
-    ~QXmppRtcpSenderReport();
+    QXmppRtcpSenderInfo();
+    QXmppRtcpSenderInfo(const QXmppRtcpSenderInfo &other);
+    ~QXmppRtcpSenderInfo();
 
     quint64 ntpStamp() const;
     void setNtpStamp(quint64 ntpStamp);
@@ -114,7 +114,7 @@ public:
 
 private:
     friend class QXmppRtcpPacket;
-    QSharedDataPointer<QXmppRtcpSenderReportPrivate> d;
+    QSharedDataPointer<QXmppRtcpSenderInfoPrivate> d;
 };
 
 class QXMPP_EXPORT QXmppRtcpSourceDescription

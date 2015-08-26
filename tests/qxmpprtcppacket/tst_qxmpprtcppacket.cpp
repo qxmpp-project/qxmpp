@@ -54,10 +54,10 @@ void tst_QXmppRtcpPacket::testReceiverReport()
 
     QCOMPARE(packet.receiverReports().size(), 1);
     QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(679927712));
-    QCOMPARE(packet.senderReport().ntpStamp(), quint64(0));
-    QCOMPARE(packet.senderReport().octetCount(), quint32(0));
-    QCOMPARE(packet.senderReport().packetCount(), quint32(0));
-    QCOMPARE(packet.senderReport().rtpStamp(), quint32(0));
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(0));
     QCOMPARE(packet.sourceDescriptions().size(), 0);
     QCOMPARE(packet.ssrc(), quint32(1106492578));
     QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::ReceiverReport));
@@ -73,10 +73,10 @@ void tst_QXmppRtcpPacket::testSenderReport()
     QVERIFY(packet.decode(data));
 
     QCOMPARE(packet.receiverReports().size(), 0);
-    QCOMPARE(packet.senderReport().ntpStamp(), quint64(15672505252348484072ULL));
-    QCOMPARE(packet.senderReport().octetCount(), quint32(18560));
-    QCOMPARE(packet.senderReport().packetCount(), quint32(116));
-    QCOMPARE(packet.senderReport().rtpStamp(), quint32(3718132311));
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(15672505252348484072ULL));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(18560));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(116));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(3718132311));
     QCOMPARE(packet.ssrc(), quint32(665248961));
     QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SenderReport));
     QCOMPARE(packet.sourceDescriptions().size(), 0);
@@ -93,10 +93,10 @@ void tst_QXmppRtcpPacket::testSenderReportWithReceiverReport()
 
     QCOMPARE(packet.receiverReports().size(), 1);
     QCOMPARE(packet.receiverReports()[0].ssrc(), quint32(2176590418));
-    QCOMPARE(packet.senderReport().ntpStamp(), quint64(14952153165080187948ULL));
-    QCOMPARE(packet.senderReport().octetCount(), quint32(480));
-    QCOMPARE(packet.senderReport().packetCount(), quint32(3));
-    QCOMPARE(packet.senderReport().rtpStamp(), quint32(320));
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(14952153165080187948ULL));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(480));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(3));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(320));
     QCOMPARE(packet.sourceDescriptions().size(), 0);
     QCOMPARE(packet.ssrc(), quint32(1056879838));
     QCOMPARE(packet.type(), quint8(QXmppRtcpPacket::SenderReport));
@@ -112,10 +112,10 @@ void tst_QXmppRtcpPacket::testSourceDescription()
     QVERIFY(packet.decode(data));
 
     QCOMPARE(packet.receiverReports().size(), 0);
-    QCOMPARE(packet.senderReport().ntpStamp(), quint64(0));
-    QCOMPARE(packet.senderReport().octetCount(), quint32(0));
-    QCOMPARE(packet.senderReport().packetCount(), quint32(0));
-    QCOMPARE(packet.senderReport().rtpStamp(), quint32(0));
+    QCOMPARE(packet.senderInfo().ntpStamp(), quint64(0));
+    QCOMPARE(packet.senderInfo().octetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().packetCount(), quint32(0));
+    QCOMPARE(packet.senderInfo().rtpStamp(), quint32(0));
     QCOMPARE(packet.sourceDescriptions().size(), 1);
     QCOMPARE(packet.sourceDescriptions()[0].cname(), QLatin1String("{d03a7c48-d906-4b9a-9820-111802dcd578}"));
     QCOMPARE(packet.sourceDescriptions()[0].name(), QString());

@@ -47,7 +47,7 @@ public:
     // Sender SSRC (for receiver / sender reports only).
     quint32 ssrc;
 
-    QXmppRtcpSenderReport senderReport;
+    QXmppRtcpSenderInfo senderInfo;
     QList<QXmppRtcpReceiverReport> receiverReports;
     QList<QXmppRtcpSourceDescription> sourceDescriptions;
 };
@@ -60,13 +60,18 @@ public:
     void write(QDataStream &stream) const;
 
     quint32 ssrc;
-    QByteArray blob;
+    quint8 fractionLost;
+    quint32 cumulativeLost;
+    quint32 highestSequence;
+    quint32 jitter;
+    quint32 srStamp;
+    quint32 srDelay;
 };
 
-class QXmppRtcpSenderReportPrivate : public QSharedData
+class QXmppRtcpSenderInfoPrivate : public QSharedData
 {
 public:
-    QXmppRtcpSenderReportPrivate();
+    QXmppRtcpSenderInfoPrivate();
     bool read(QDataStream &stream);
     void write(QDataStream &stream) const;
 
@@ -154,12 +159,12 @@ bool QXmppRtcpPacket::read(QDataStream &stream)
 
     QDataStream s(d->payload);
     d->receiverReports.clear();
-    d->senderReport = QXmppRtcpSenderReport();
+    d->senderInfo = QXmppRtcpSenderInfo();
     d->sourceDescriptions.clear();
     d->ssrc = 0;
     if (d->type == ReceiverReport || d->type == SenderReport) {
         s >> d->ssrc;
-        if (d->type == SenderReport && !d->senderReport.d->read(s))
+        if (d->type == SenderReport && !d->senderInfo.d->read(s))
             return false;
         for (int i = 0; i < d->count; ++i) {
             QXmppRtcpReceiverReport receiverReport;
@@ -188,7 +193,7 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
         count = d->receiverReports.size();
         s << d->ssrc;
         if (d->type == SenderReport)
-            d->senderReport.d->write(s);
+            d->senderInfo.d->write(s);
         foreach (const QXmppRtcpReceiverReport &report, d->receiverReports)
             report.d->write(s);
     } else if (d->type == SourceDescription) {
@@ -216,14 +221,14 @@ void QXmppRtcpPacket::setReceiverReports(const QList<QXmppRtcpReceiverReport> &r
     d->receiverReports = reports;
 }
 
-QXmppRtcpSenderReport QXmppRtcpPacket::senderReport() const
+QXmppRtcpSenderInfo QXmppRtcpPacket::senderInfo() const
 {
-    return d->senderReport;
+    return d->senderInfo;
 }
 
-void QXmppRtcpPacket::setSenderReport(const QXmppRtcpSenderReport &report)
+void QXmppRtcpPacket::setSenderInfo(const QXmppRtcpSenderInfo &senderInfo)
 {
-    d->senderReport = report;
+    d->senderInfo = senderInfo;
 }
 
 QList<QXmppRtcpSourceDescription> QXmppRtcpPacket::sourceDescriptions() const
@@ -309,26 +314,43 @@ void QXmppRtcpReceiverReport::setSsrc(quint32 ssrc)
 
 QXmppRtcpReceiverReportPrivate::QXmppRtcpReceiverReportPrivate()
     : ssrc(0)
+    , fractionLost(0)
+    , cumulativeLost(0)
+    , highestSequence(0)
+    , jitter(0)
+    , srStamp(0)
+    , srDelay(0)
 {
-    blob.resize(20);
 }
 
 bool QXmppRtcpReceiverReportPrivate::read(QDataStream &stream)
 {
+    quint32 tmp;
     stream >> ssrc;
-    return stream.readRawData(blob.data(), blob.size()) == blob.size();
+    stream >> tmp;
+    fractionLost = (tmp >> 24) & 0xff;
+    cumulativeLost = tmp & 0xffffff;
+    stream >> highestSequence;
+    stream >> jitter;
+    stream >> srStamp;
+    stream >> srDelay;
+    return stream.status() == QDataStream::Ok;
 }
 
 void QXmppRtcpReceiverReportPrivate::write(QDataStream &stream) const
 {
     stream << ssrc;
-    stream.writeRawData(blob.constData(), blob.size());
+    stream << quint32((fractionLost << 24) | cumulativeLost);
+    stream << highestSequence;
+    stream << jitter;
+    stream << srStamp;
+    stream << srDelay;
 }
 
 /// Constructs an empty sender report.
 
-QXmppRtcpSenderReport::QXmppRtcpSenderReport()
-    : d(new QXmppRtcpSenderReportPrivate())
+QXmppRtcpSenderInfo::QXmppRtcpSenderInfo()
+    : d(new QXmppRtcpSenderInfoPrivate())
 {
 }
 
@@ -336,56 +358,56 @@ QXmppRtcpSenderReport::QXmppRtcpSenderReport()
 ///
 /// \param other
 
-QXmppRtcpSenderReport::QXmppRtcpSenderReport(const QXmppRtcpSenderReport &other)
+QXmppRtcpSenderInfo::QXmppRtcpSenderInfo(const QXmppRtcpSenderInfo &other)
     : d(other.d)
 {
 }
 
-QXmppRtcpSenderReport::~QXmppRtcpSenderReport()
+QXmppRtcpSenderInfo::~QXmppRtcpSenderInfo()
 {
 }
 
-quint64 QXmppRtcpSenderReport::ntpStamp() const
+quint64 QXmppRtcpSenderInfo::ntpStamp() const
 {
     return d->ntpStamp;
 }
 
-void QXmppRtcpSenderReport::setNtpStamp(quint64 ntpStamp)
+void QXmppRtcpSenderInfo::setNtpStamp(quint64 ntpStamp)
 {
     d->ntpStamp = ntpStamp;
 }
 
-quint32 QXmppRtcpSenderReport::rtpStamp() const
+quint32 QXmppRtcpSenderInfo::rtpStamp() const
 {
     return d->rtpStamp;
 }
 
-void QXmppRtcpSenderReport::setRtpStamp(quint32 rtpStamp)
+void QXmppRtcpSenderInfo::setRtpStamp(quint32 rtpStamp)
 {
     d->rtpStamp = rtpStamp;
 }
 
-quint32 QXmppRtcpSenderReport::octetCount() const
+quint32 QXmppRtcpSenderInfo::octetCount() const
 {
     return d->octetCount;
 }
 
-void QXmppRtcpSenderReport::setOctetCount(quint32 count)
+void QXmppRtcpSenderInfo::setOctetCount(quint32 count)
 {
     d->octetCount = count;
 }
 
-quint32 QXmppRtcpSenderReport::packetCount() const
+quint32 QXmppRtcpSenderInfo::packetCount() const
 {
     return d->packetCount;
 }
 
-void QXmppRtcpSenderReport::setPacketCount(quint32 count)
+void QXmppRtcpSenderInfo::setPacketCount(quint32 count)
 {
     d->packetCount = count;
 }
 
-QXmppRtcpSenderReportPrivate::QXmppRtcpSenderReportPrivate()
+QXmppRtcpSenderInfoPrivate::QXmppRtcpSenderInfoPrivate()
     : ntpStamp(0)
     , rtpStamp(0)
     , packetCount(0)
@@ -393,7 +415,7 @@ QXmppRtcpSenderReportPrivate::QXmppRtcpSenderReportPrivate()
 {
 }
 
-bool QXmppRtcpSenderReportPrivate::read(QDataStream &stream)
+bool QXmppRtcpSenderInfoPrivate::read(QDataStream &stream)
 {
     stream >> ntpStamp;
     stream >> rtpStamp;
@@ -402,7 +424,7 @@ bool QXmppRtcpSenderReportPrivate::read(QDataStream &stream)
     return stream.status() == QDataStream::Ok;
 }
 
-void QXmppRtcpSenderReportPrivate::write(QDataStream &stream) const
+void QXmppRtcpSenderInfoPrivate::write(QDataStream &stream) const
 {
     stream << ntpStamp;
     stream << rtpStamp;
