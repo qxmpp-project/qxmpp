@@ -217,6 +217,7 @@ public:
 
         /// \cond
         void parse(const QDomElement &element);
+        QString toSdp() const;
         void toXml(QXmlStreamWriter *writer) const;
         /// \endcond
 

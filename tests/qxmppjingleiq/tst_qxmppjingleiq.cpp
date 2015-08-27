@@ -69,6 +69,24 @@ void tst_QXmppJingleIq::testCandidate()
 
 void tst_QXmppJingleIq::testRtpSession()
 {
+    const QString sdp(
+        "v=0\r\n"
+        "o=- NTPSTAMP NTPSTAMP IN IP4 0.0.0.0\r\n"
+        "s=-\r\n"
+        "t=0 0\r\n"
+        "m=audio 8998 RTP/AVP 96 97 18 0 103 98\r\n"
+        "c=IN IP4 10.0.1.1\r\n"
+        "a=rtpmap:96 speex/16000\r\n"
+        "a=rtpmap:97 speex/8000\r\n"
+        "a=rtpmap:18 G729/0\r\n"
+        "a=rtpmap:0 PCMU/0\r\n"
+        "a=rtpmap:103 L16/16000/2\r\n"
+        "a=rtpmap:98 x-ISAC/8000\r\n"
+        "a=candidate:1 1 udp 2130706431 10.0.1.1 8998 typ host generation 0\r\n"
+        "a=candidate:2 1 udp 1694498815 192.0.2.3 45664 typ host generation 0\r\n"
+        "a=ice-ufrag:8hhy\r\n"
+        "a=ice-pwd:asd88fgpdd777uzjYhagZg\r\n");
+
     const QByteArray xml(
 "<iq"
     " id=\"ih28sx61\""
@@ -126,6 +144,8 @@ void tst_QXmppJingleIq::testRtpSession()
     QCOMPARE(session.reason().text(), QString());
     QCOMPARE(session.reason().type(), QXmppJingleIq::Reason::None);
     serializePacket(session, xml);
+
+    QCOMPARE(session.content().toSdp().replace(QRegExp("o=- [0-9]+ [0-9]+"), "o=- NTPSTAMP NTPSTAMP"), sdp);
 }
 
 void tst_QXmppJingleIq::testSession()

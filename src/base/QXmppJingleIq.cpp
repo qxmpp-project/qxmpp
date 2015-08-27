@@ -21,11 +21,15 @@
  *
  */
 
+#include <QDate>
+#include <QDateTime>
 #include <QDomElement>
 
 #include "QXmppConstants.h"
 #include "QXmppJingleIq.h"
 #include "QXmppUtils.h"
+
+static const int RTP_COMPONENT = 1;
 
 static const char* ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
 
@@ -67,6 +71,27 @@ static const char* jingle_reasons[] = {
     "unsupported-applications",
     "unsupported-transports",
 };
+
+static QString addressToSdp(const QHostAddress &host)
+{
+    return QString("IN %1 %2").arg(
+        host.protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
+        host.toString());
+}
+
+static QString candidateToSdp(const QXmppJingleCandidate &candidate)
+{
+    return QString("candidate:%1 %2 %3 %4 %5 %6 typ %7 generation %8").arg(
+        candidate.foundation(),
+        QString::number(candidate.component()),
+        candidate.protocol(),
+        QString::number(candidate.priority()),
+        candidate.host().toString(),
+        QString::number(candidate.port()),
+        "host",
+        QString::number(candidate.generation())
+    );
+}
 
 QXmppJingleIq::Content::Content()
     : m_descriptionSsrc(0)
@@ -206,6 +231,58 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
         m_transportCandidates << candidate;
         child = child.nextSiblingElement("candidate");
     }
+}
+
+QString QXmppJingleIq::Content::toSdp() const
+{
+    const quint32 ntpSeconds = QDateTime(QDate(1900, 1, 1)).secsTo(QDateTime::currentDateTime());
+
+    // get default candidate
+    QHostAddress localRtpAddress = QHostAddress::Any;
+    quint16 localRtpPort = 0;
+    foreach (const QXmppJingleCandidate &candidate, m_transportCandidates) {
+        if (candidate.component() == RTP_COMPONENT) {
+            localRtpAddress = candidate.host();
+            localRtpPort = candidate.port();
+            break;
+        }
+    }
+
+    QStringList sdp;
+    sdp << "v=0";
+    sdp << QString("o=- %1 %2 %3").arg(
+        QString::number(ntpSeconds),
+        QString::number(ntpSeconds),
+        addressToSdp(QHostAddress::Any)
+    );
+    sdp << "s=-";
+    sdp << "t=0 0";
+
+    // media
+    QString payloads;
+    QStringList attrs;
+    foreach (const QXmppJinglePayloadType &payload, m_payloadTypes) {
+        payloads += " " + QString::number(payload.id());
+        QString rtpmap = QString::number(payload.id()) + " " + payload.name() + "/" + QString::number(payload.clockrate());
+        if (payload.channels() > 1)
+            rtpmap += "/" + QString::number(payload.channels());
+        attrs << "a=rtpmap:" + rtpmap;
+        if (payload.name() == "telephone-event")
+            attrs << "a=fmtp:" + QByteArray::number(payload.id()) + " 0-15";
+    }
+    sdp << QString("m=%1 %2 RTP/AVP%3").arg(m_descriptionMedia, QString::number(localRtpPort), payloads);
+    sdp << QString("c=%1").arg(addressToSdp(localRtpAddress));
+    sdp += attrs;
+
+    // transport
+    foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
+        sdp << QString("a=%1").arg(candidateToSdp(candidate));
+    if (!m_transportUser.isEmpty())
+        sdp << QString("a=ice-ufrag:%1").arg(m_transportUser);
+    if (!m_transportPassword.isEmpty())
+        sdp << QString("a=ice-pwd:%1").arg(m_transportPassword);
+
+    return sdp.join("\r\n") + "\r\n";
 }
 
 void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
