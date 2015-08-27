@@ -1947,33 +1947,6 @@ QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
     return d->localCandidates;
 }
 
-/// Sets the local user fragment.
-///
-/// \param user
-
-void QXmppIceComponent::setLocalUser(const QString &user)
-{
-    d->localUser = user;
-}
-
-/// Sets the tie breaker.
-///
-/// \param tieBreaker
-
-void QXmppIceComponent::setTieBreaker(const QByteArray &tieBreaker)
-{
-    d->tieBreaker = tieBreaker;
-}
-
-/// Sets the local password.
-///
-/// \param password
-
-void QXmppIceComponent::setLocalPassword(const QString &password)
-{
-    d->localPassword = password;
-}
-
 /// Adds a remote STUN candidate.
 
 bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate)
@@ -2629,11 +2602,11 @@ void QXmppIceConnection::addComponent(int component)
     QXmppIceComponent *socket = new QXmppIceComponent(this);
     socket->setComponent(component);
     socket->setIceControlling(d->iceControlling);
-    socket->setLocalUser(d->localUser);
-    socket->setLocalPassword(d->localPassword);
+    socket->d->localUser = d->localUser;
+    socket->d->localPassword = d->localPassword;
     socket->setRemoteUser(d->remoteUser);
     socket->setRemotePassword(d->remotePassword);
-    socket->setTieBreaker(d->tieBreaker);
+    socket->d->tieBreaker = d->tieBreaker;
     socket->setStunServer(d->stunHost, d->stunPort);
     socket->setTurnServer(d->turnHost, d->turnPort);
     socket->setTurnUser(d->turnUser);
@@ -2748,37 +2721,11 @@ QString QXmppIceConnection::localUser() const
     return d->localUser;
 }
 
-/// Sets the local user fragment.
-///
-/// You do not usually need to call this as one is automatically generated.
-///
-/// \param user
-
-void QXmppIceConnection::setLocalUser(const QString &user)
-{
-    d->localUser = user;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setLocalUser(user);
-}
-
 /// Returns the local password.
 
 QString QXmppIceConnection::localPassword() const
 {
     return d->localPassword;
-}
-
-/// Sets the local password.
-///
-/// You do not usually need to call this as one is automatically generated.
-///
-/// \param password
-
-void QXmppIceConnection::setLocalPassword(const QString &password)
-{
-    d->localPassword = password;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setLocalPassword(password);
 }
 
 /// Sets the remote user fragment.

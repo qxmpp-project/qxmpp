@@ -166,8 +166,8 @@ class QXMPP_EXPORT QXmppIceComponent : public QXmppLoggable
     Q_OBJECT
 
 public:
-    QXmppIceComponent(QObject *parent=0);
     ~QXmppIceComponent();
+
     void setIceControlling(bool controlling);
     void setStunServer(const QHostAddress &host, quint16 port);
     void setTurnServer(const QHostAddress &host, quint16 port);
@@ -175,9 +175,6 @@ public:
     void setTurnPassword(const QString &password);
 
     QList<QXmppJingleCandidate> localCandidates() const;
-    void setLocalUser(const QString &user);
-    void setLocalPassword(const QString &password);
-    void setTieBreaker(const QByteArray &tieBreaker);
 
     int component() const;
     void setComponent(int component);
@@ -215,8 +212,11 @@ signals:
     void localCandidatesChanged();
 
 private:
-    friend class QXmppIceComponentPrivate;
+    QXmppIceComponent(QObject *parent=0);
+
     QXmppIceComponentPrivate *d;
+    friend class QXmppIceComponentPrivate;
+    friend class QXmppIceConnection;
 };
 
 /// \brief The QXmppIceConnection class represents a set of UDP sockets
@@ -237,9 +237,7 @@ public:
 
     QList<QXmppJingleCandidate> localCandidates() const;
     QString localUser() const;
-    void setLocalUser(const QString &user);
     QString localPassword() const;
-    void setLocalPassword(const QString &password);
 
     void addRemoteCandidate(const QXmppJingleCandidate &candidate);
     void setRemoteUser(const QString &user);
