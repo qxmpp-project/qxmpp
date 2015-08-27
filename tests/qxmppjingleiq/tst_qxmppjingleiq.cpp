@@ -32,6 +32,7 @@ class tst_QXmppJingleIq : public QObject
 private slots:
     void testCandidate();
     void testRtpSession();
+    void testRtpSessionSdp();
     void testSession();
     void testTerminate();
     void testAudioPayloadType();
@@ -69,24 +70,6 @@ void tst_QXmppJingleIq::testCandidate()
 
 void tst_QXmppJingleIq::testRtpSession()
 {
-    const QString sdp(
-        "v=0\r\n"
-        "o=- NTPSTAMP NTPSTAMP IN IP4 0.0.0.0\r\n"
-        "s=-\r\n"
-        "t=0 0\r\n"
-        "m=audio 8998 RTP/AVP 96 97 18 0 103 98\r\n"
-        "c=IN IP4 10.0.1.1\r\n"
-        "a=rtpmap:96 speex/16000\r\n"
-        "a=rtpmap:97 speex/8000\r\n"
-        "a=rtpmap:18 G729/0\r\n"
-        "a=rtpmap:0 PCMU/0\r\n"
-        "a=rtpmap:103 L16/16000/2\r\n"
-        "a=rtpmap:98 x-ISAC/8000\r\n"
-        "a=candidate:1 1 udp 2130706431 10.0.1.1 8998 typ host generation 0\r\n"
-        "a=candidate:2 1 udp 1694498815 192.0.2.3 45664 typ host generation 0\r\n"
-        "a=ice-ufrag:8hhy\r\n"
-        "a=ice-pwd:asd88fgpdd777uzjYhagZg\r\n");
-
     const QByteArray xml(
 "<iq"
     " id=\"ih28sx61\""
@@ -139,13 +122,93 @@ void tst_QXmppJingleIq::testRtpSession()
     QCOMPARE(session.action(), QXmppJingleIq::SessionInitiate);
     QCOMPARE(session.initiator(), QLatin1String("romeo@montague.lit/orchard"));
     QCOMPARE(session.sid(), QLatin1String("a73sjjvkla37jfea"));
-    QCOMPARE(session.content().creator(), QLatin1String("initiator"));
-    QCOMPARE(session.content().name(), QLatin1String("voice"));
+
+    const QXmppJingleIq::Content &content = session.content();
+    QCOMPARE(content.creator(), QLatin1String("initiator"));
+    QCOMPARE(content.name(), QLatin1String("voice"));
+    QCOMPARE(content.descriptionMedia(), QLatin1String("audio"));
+    QCOMPARE(content.descriptionSsrc(), quint32(0));
+    QCOMPARE(content.payloadTypes().size(), 6);
+    QCOMPARE(content.payloadTypes()[0].id(), quint8(96));
+    QCOMPARE(content.payloadTypes()[1].id(), quint8(97));
+    QCOMPARE(content.payloadTypes()[2].id(), quint8(18));
+    QCOMPARE(content.payloadTypes()[3].id(), quint8(0));
+    QCOMPARE(content.payloadTypes()[4].id(), quint8(103));
+    QCOMPARE(content.payloadTypes()[5].id(), quint8(98));
+    QCOMPARE(content.transportCandidates().size(), 2);
+    QCOMPARE(content.transportCandidates()[0].component(), 1);
+    QCOMPARE(content.transportCandidates()[0].foundation(), QLatin1String("1"));
+    QCOMPARE(content.transportCandidates()[0].host(), QHostAddress("10.0.1.1"));
+    QCOMPARE(content.transportCandidates()[0].port(), quint16(8998));
+    QCOMPARE(content.transportCandidates()[0].priority(), 2130706431);
+    QCOMPARE(content.transportCandidates()[0].protocol(), QLatin1String("udp"));
+    QCOMPARE(content.transportCandidates()[0].type(), QXmppJingleCandidate::HostType);
+    QCOMPARE(content.transportCandidates()[1].component(), 1);
+    QCOMPARE(content.transportCandidates()[1].foundation(), QLatin1String("2"));
+    QCOMPARE(content.transportCandidates()[1].host(), QHostAddress("192.0.2.3"));
+    QCOMPARE(content.transportCandidates()[1].port(), quint16(45664));
+    QCOMPARE(content.transportCandidates()[1].priority(), 1694498815);
+    QCOMPARE(content.transportCandidates()[1].protocol(), QLatin1String("udp"));
+    QCOMPARE(content.transportCandidates()[1].type(), QXmppJingleCandidate::ServerReflexiveType);
+    QCOMPARE(content.transportUser(), QLatin1String("8hhy"));
+    QCOMPARE(content.transportPassword(), QLatin1String("asd88fgpdd777uzjYhagZg"));
+
     QCOMPARE(session.reason().text(), QString());
     QCOMPARE(session.reason().type(), QXmppJingleIq::Reason::None);
     serializePacket(session, xml);
+}
 
-    QCOMPARE(session.content().toSdp().replace(QRegExp("o=- [0-9]+ [0-9]+"), "o=- NTPSTAMP NTPSTAMP"), sdp);
+void tst_QXmppJingleIq::testRtpSessionSdp()
+{
+    const QString sdp(
+        "v=0\r\n"
+        "o=- NTPSTAMP NTPSTAMP IN IP4 0.0.0.0\r\n"
+        "s=-\r\n"
+        "t=0 0\r\n"
+        "m=audio 8998 RTP/AVP 96 97 18 0 103 98\r\n"
+        "c=IN IP4 10.0.1.1\r\n"
+        "a=rtpmap:96 speex/16000\r\n"
+        "a=rtpmap:97 speex/8000\r\n"
+        "a=rtpmap:18 G729/0\r\n"
+        "a=rtpmap:0 PCMU/0\r\n"
+        "a=rtpmap:103 L16/16000/2\r\n"
+        "a=rtpmap:98 x-ISAC/8000\r\n"
+        "a=candidate:1 1 udp 2130706431 10.0.1.1 8998 typ host generation 0\r\n"
+        "a=candidate:2 1 udp 1694498815 192.0.2.3 45664 typ srflx generation 0\r\n"
+        "a=ice-ufrag:8hhy\r\n"
+        "a=ice-pwd:asd88fgpdd777uzjYhagZg\r\n");
+
+    QXmppJingleIq::Content content;
+    QVERIFY(content.parseSdp(sdp));
+
+    QCOMPARE(content.descriptionMedia(), QLatin1String("audio"));
+    QCOMPARE(content.descriptionSsrc(), quint32(0));
+    QCOMPARE(content.payloadTypes().size(), 6);
+    QCOMPARE(content.payloadTypes()[0].id(), quint8(96));
+    QCOMPARE(content.payloadTypes()[1].id(), quint8(97));
+    QCOMPARE(content.payloadTypes()[2].id(), quint8(18));
+    QCOMPARE(content.payloadTypes()[3].id(), quint8(0));
+    QCOMPARE(content.payloadTypes()[4].id(), quint8(103));
+    QCOMPARE(content.payloadTypes()[5].id(), quint8(98));
+    QCOMPARE(content.transportCandidates().size(), 2);
+    QCOMPARE(content.transportCandidates()[0].component(), 1);
+    QCOMPARE(content.transportCandidates()[0].foundation(), QLatin1String("1"));
+    QCOMPARE(content.transportCandidates()[0].host(), QHostAddress("10.0.1.1"));
+    QCOMPARE(content.transportCandidates()[0].port(), quint16(8998));
+    QCOMPARE(content.transportCandidates()[0].priority(), 2130706431);
+    QCOMPARE(content.transportCandidates()[0].protocol(), QLatin1String("udp"));
+    QCOMPARE(content.transportCandidates()[0].type(), QXmppJingleCandidate::HostType);
+    QCOMPARE(content.transportCandidates()[1].component(), 1);
+    QCOMPARE(content.transportCandidates()[1].foundation(), QLatin1String("2"));
+    QCOMPARE(content.transportCandidates()[1].host(), QHostAddress("192.0.2.3"));
+    QCOMPARE(content.transportCandidates()[1].port(), quint16(45664));
+    QCOMPARE(content.transportCandidates()[1].priority(), 1694498815);
+    QCOMPARE(content.transportCandidates()[1].protocol(), QLatin1String("udp"));
+    QCOMPARE(content.transportCandidates()[1].type(), QXmppJingleCandidate::ServerReflexiveType);
+    QCOMPARE(content.transportUser(), QLatin1String("8hhy"));
+    QCOMPARE(content.transportPassword(), QLatin1String("asd88fgpdd777uzjYhagZg"));
+
+    QCOMPARE(content.toSdp().replace(QRegExp("o=- [0-9]+ [0-9]+"), "o=- NTPSTAMP NTPSTAMP"), sdp);
 }
 
 void tst_QXmppJingleIq::testSession()

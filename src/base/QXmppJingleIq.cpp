@@ -79,6 +79,37 @@ static QString addressToSdp(const QHostAddress &host)
         host.toString());
 }
 
+static bool candidateParseSdp(QXmppJingleCandidate *candidate, const QString &sdp)
+{
+    if (!sdp.startsWith("candidate:"))
+        return false;
+
+    const QStringList bits = sdp.mid(10).split(" ");
+    if (bits.size() < 6)
+        return false;
+
+    candidate->setFoundation(bits[0]);
+    candidate->setComponent(bits[1].toInt());
+    candidate->setProtocol(bits[2].toLower());
+    candidate->setPriority(bits[3].toInt());
+    candidate->setHost(QHostAddress(bits[4]));
+    candidate->setPort(bits[5].toInt());
+    for (int i = 6; i < bits.size() - 1; i += 2) {
+        if (bits[i] == "typ") {
+            bool ok;
+            candidate->setType(QXmppJingleCandidate::typeFromString(bits[i + 1], &ok));
+            if (!ok)
+                return false;
+        } else if (bits[i] == "generation") {
+            candidate->setGeneration(bits[i + 1].toInt());
+        } else {
+            qWarning() << "Candidate SDP contains unknown attribute" << bits[i];
+            return false;
+        }
+    }
+    return true;
+}
+
 static QString candidateToSdp(const QXmppJingleCandidate &candidate)
 {
     return QString("candidate:%1 %2 %3 %4 %5 %6 typ %7 generation %8").arg(
@@ -88,7 +119,7 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
         QString::number(candidate.priority()),
         candidate.host().toString(),
         QString::number(candidate.port()),
-        "host",
+        QXmppJingleCandidate::typeToString(candidate.type()),
         QString::number(candidate.generation())
     );
 }
@@ -233,6 +264,117 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     }
 }
 
+void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
+{
+    if (m_creator.isEmpty() || m_name.isEmpty())
+        return;
+
+    writer->writeStartElement("content");
+    helperToXmlAddAttribute(writer, "creator", m_creator);
+    helperToXmlAddAttribute(writer, "disposition", m_disposition);
+    helperToXmlAddAttribute(writer, "name", m_name);
+    helperToXmlAddAttribute(writer, "senders", m_senders);
+
+    // description
+    if (!m_descriptionType.isEmpty() || !m_payloadTypes.isEmpty())
+    {
+        writer->writeStartElement("description");
+        writer->writeAttribute("xmlns", m_descriptionType);
+        helperToXmlAddAttribute(writer, "media", m_descriptionMedia);
+        if (m_descriptionSsrc)
+            writer->writeAttribute("ssrc", QString::number(m_descriptionSsrc));
+        foreach (const QXmppJinglePayloadType &payload, m_payloadTypes)
+            payload.toXml(writer);
+        writer->writeEndElement();
+    }
+
+    // transport
+    if (!m_transportType.isEmpty() || !m_transportCandidates.isEmpty())
+    {
+        writer->writeStartElement("transport");
+        writer->writeAttribute("xmlns", m_transportType);
+        helperToXmlAddAttribute(writer, "ufrag", m_transportUser);
+        helperToXmlAddAttribute(writer, "pwd", m_transportPassword);
+        foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
+            candidate.toXml(writer);
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
+}
+
+bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
+{
+    QList<QXmppJinglePayloadType> payloads;
+    foreach (const QString &line, sdp.split("\r\n")) {
+        if (line.startsWith("a=")) {
+            int idx = line.indexOf(':');
+            const QString attrName = idx != -1 ? line.mid(2, idx - 2) : line.mid(2);
+            const QString attrValue = idx != -1 ? line.mid(idx + 1) : "";
+
+            if (attrName == "candidate") {
+                QXmppJingleCandidate candidate;
+                if (!candidateParseSdp(&candidate, line.mid(2))) {
+                    qWarning() << "Could not parse candidate" << line;
+                    return false;
+                }
+                addTransportCandidate(candidate);
+            } else if (attrName == "rtpmap") {
+                // payload type map
+                const QStringList bits = attrValue.split(' ');
+                if (bits.size() != 2)
+                    continue;
+                bool ok = false;
+                const int id = bits[0].toInt(&ok);
+                if (!ok)
+                    continue;
+
+                const QStringList args = bits[1].split('/');
+                for (int i = 0; i < payloads.size(); ++i) {
+                    if (payloads[i].id() == id) {
+                        payloads[i].setName(args[0]);
+                        if (args.size() > 1)
+                            payloads[i].setClockrate(args[1].toInt());
+                        if (args.size() > 2)
+                            payloads[i].setChannels(args[2].toInt());
+                    }
+                }
+            } else if (attrName == "ice-ufrag") {
+                m_transportUser = attrValue;
+            } else if (attrName == "ice-pwd") {
+                m_transportPassword = attrValue;
+            } else if (attrName == "ssrc") {
+                const QStringList bits = attrValue.split(' ');
+                if (bits.isEmpty()) {
+                    qWarning() << "Could not parse ssrc" << line;
+                    return false;
+                }
+                m_descriptionSsrc = bits[0].toULong();
+            }
+        } else if (line.startsWith("m=")) {
+            // FIXME: what do we do with the profile (bits[2]) ?
+            QStringList bits = line.mid(2).split(' ');
+            if (bits.size() < 3) {
+                qWarning() << "Could not parse media" << line;
+                return false;
+            }
+            m_descriptionMedia = bits[0];
+
+            // parse payload types
+            for (int i = 3; i < bits.size(); ++i) {
+                bool ok = false;
+                int id = bits[i].toInt(&ok);
+                if (!ok)
+                    continue;
+                QXmppJinglePayloadType payload;
+                payload.setId(id);
+                payloads << payload;
+            }
+        }
+    }
+    setPayloadTypes(payloads);
+    return true;
+}
+
 QString QXmppJingleIq::Content::toSdp() const
 {
     const quint32 ntpSeconds = QDateTime(QDate(1900, 1, 1)).secsTo(QDateTime::currentDateTime());
@@ -285,43 +427,7 @@ QString QXmppJingleIq::Content::toSdp() const
     return sdp.join("\r\n") + "\r\n";
 }
 
-void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
-{
-    if (m_creator.isEmpty() || m_name.isEmpty())
-        return;
 
-    writer->writeStartElement("content");
-    helperToXmlAddAttribute(writer, "creator", m_creator);
-    helperToXmlAddAttribute(writer, "disposition", m_disposition);
-    helperToXmlAddAttribute(writer, "name", m_name);
-    helperToXmlAddAttribute(writer, "senders", m_senders);
-
-    // description
-    if (!m_descriptionType.isEmpty() || !m_payloadTypes.isEmpty())
-    {
-        writer->writeStartElement("description");
-        writer->writeAttribute("xmlns", m_descriptionType);
-        helperToXmlAddAttribute(writer, "media", m_descriptionMedia);
-        if (m_descriptionSsrc)
-            writer->writeAttribute("ssrc", QString::number(m_descriptionSsrc));
-        foreach (const QXmppJinglePayloadType &payload, m_payloadTypes)
-            payload.toXml(writer);
-        writer->writeEndElement();
-    }
-
-    // transport
-    if (!m_transportType.isEmpty() || !m_transportCandidates.isEmpty())
-    {
-        writer->writeStartElement("transport");
-        writer->writeAttribute("xmlns", m_transportType);
-        helperToXmlAddAttribute(writer, "ufrag", m_transportUser);
-        helperToXmlAddAttribute(writer, "pwd", m_transportPassword);
-        foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
-            candidate.toXml(writer);
-        writer->writeEndElement();
-    }
-    writer->writeEndElement();
-}
 /// \endcond
 
 QXmppJingleIq::Reason::Reason()
