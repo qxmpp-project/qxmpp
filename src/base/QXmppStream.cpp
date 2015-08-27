@@ -86,10 +86,13 @@ QXmppStream::~QXmppStream()
 
 void QXmppStream::disconnectFromHost()
 {
-    sendData(streamRootElementEnd);
-    if (d->socket)
-    {
-        d->socket->flush();
+    if (d->socket) {
+        if (d->socket->state() == QAbstractSocket::ConnectedState) {
+            sendData(streamRootElementEnd);
+            d->socket->flush();
+        }
+        // FIXME: according to RFC 6120 section 4.4, we should wait for
+        // the incoming stream to end before closing the socket
         d->socket->disconnectFromHost();
     }
 }
