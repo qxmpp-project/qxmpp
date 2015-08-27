@@ -1985,24 +1985,6 @@ bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate
     return true;
 }
 
-/// Sets the remote user fragment.
-///
-/// \param user
-
-void QXmppIceComponent::setRemoteUser(const QString &user)
-{
-    d->remoteUser = user;
-}
-
-/// Sets the remote password.
-///
-/// \param password
-
-void QXmppIceComponent::setRemotePassword(const QString &password)
-{
-    d->remotePassword = password;
-}
-
 /// Sets the list of sockets to use for this component.
 ///
 /// \param sockets
@@ -2604,8 +2586,8 @@ void QXmppIceConnection::addComponent(int component)
     socket->setIceControlling(d->iceControlling);
     socket->d->localUser = d->localUser;
     socket->d->localPassword = d->localPassword;
-    socket->setRemoteUser(d->remoteUser);
-    socket->setRemotePassword(d->remotePassword);
+    socket->d->remoteUser = d->remoteUser;
+    socket->d->remotePassword = d->remotePassword;
     socket->d->tieBreaker = d->tieBreaker;
     socket->setStunServer(d->stunHost, d->stunPort);
     socket->setTurnServer(d->turnHost, d->turnPort);
@@ -2736,7 +2718,7 @@ void QXmppIceConnection::setRemoteUser(const QString &user)
 {
     d->remoteUser = user;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setRemoteUser(user);
+        socket->d->remoteUser = user;
 }
 
 /// Sets the remote password.
@@ -2747,7 +2729,7 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 {
     d->remotePassword = password;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setRemotePassword(password);
+        socket->d->remotePassword = password;
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses

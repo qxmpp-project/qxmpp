@@ -180,8 +180,6 @@ public:
     void setComponent(int component);
 
     bool addRemoteCandidate(const QXmppJingleCandidate &candidate);
-    void setRemoteUser(const QString &user);
-    void setRemotePassword(const QString &password);
 
     bool isConnected() const;
     void setSockets(QList<QUdpSocket*> sockets);
