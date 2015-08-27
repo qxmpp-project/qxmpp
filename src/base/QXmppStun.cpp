@@ -1743,13 +1743,13 @@ QXmppIcePrivate::QXmppIcePrivate()
 class QXmppIceComponentPrivate : public QXmppIcePrivate
 {
 public:
-    QXmppIceComponentPrivate(QXmppIceComponent *qq);
+    QXmppIceComponentPrivate(int component, QXmppIceComponent *qq);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
     void performCheck(CandidatePair *pair, bool nominate);
     void writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &remoteHost, quint16 remotePort);
 
     CandidatePair *activePair;
-    int component;
+    const int component;
     CandidatePair *fallbackPair;
 
     QList<QXmppJingleCandidate> localCandidates;
@@ -1774,9 +1774,9 @@ private:
     QXmppIceComponent *q;
 };
 
-QXmppIceComponentPrivate::QXmppIceComponentPrivate(QXmppIceComponent *qq)
+QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIceComponent *qq)
     : activePair(0)
-    , component(0)
+    , component(component_)
     , fallbackPair(0)
     , peerReflexivePriority(0)
     , timer(0)
@@ -1831,13 +1831,13 @@ void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppI
 ///
 /// \param parent
 
-QXmppIceComponent::QXmppIceComponent(QObject *parent)
+QXmppIceComponent::QXmppIceComponent(int component, QObject *parent)
     : QXmppLoggable(parent)
 {
     bool check;
     Q_UNUSED(check);
 
-    d = new QXmppIceComponentPrivate(this);
+    d = new QXmppIceComponentPrivate(component, this);
 
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
@@ -1852,6 +1852,15 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
     check = connect(d->turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
                     this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
     Q_ASSERT(check);
+
+    // calculate peer-reflexive candidate priority
+    // see RFC 5245 -  7.1.2.1. PRIORITY and USE-CANDIDATE
+    QXmppJingleCandidate reflexive;
+    reflexive.setComponent(d->component);
+    reflexive.setType(QXmppJingleCandidate::PeerReflexiveType);
+    d->peerReflexivePriority = candidatePriority(reflexive);
+
+    setObjectName(QString("STUN(%1)").arg(QString::number(d->component)));
 }
 
 /// Destroys the QXmppIceComponent.
@@ -1869,25 +1878,6 @@ QXmppIceComponent::~QXmppIceComponent()
 int QXmppIceComponent::component() const
 {
     return d->component;
-}
-
-/// Sets the component id for the current socket, e.g. 1 for RTP
-/// and 2 for RTCP.
-///
-/// \param component
-
-void QXmppIceComponent::setComponent(int component)
-{
-    d->component = component;
-
-    // calculate peer-reflexive candidate priority
-    // see RFC 5245 -  7.1.2.1. PRIORITY and USE-CANDIDATE
-    QXmppJingleCandidate reflexive;
-    reflexive.setComponent(d->component);
-    reflexive.setType(QXmppJingleCandidate::PeerReflexiveType);
-    d->peerReflexivePriority = candidatePriority(reflexive);
-
-    setObjectName(QString("STUN(%1)").arg(QString::number(d->component)));
 }
 
 void QXmppIceComponent::checkCandidates()
@@ -2581,8 +2571,7 @@ void QXmppIceConnection::addComponent(int component)
         return;
     }
 
-    QXmppIceComponent *socket = new QXmppIceComponent(this);
-    socket->setComponent(component);
+    QXmppIceComponent *socket = new QXmppIceComponent(component, this);
     socket->setIceControlling(d->iceControlling);
     socket->d->localUser = d->localUser;
     socket->d->localPassword = d->localPassword;

@@ -177,7 +177,6 @@ public:
     QList<QXmppJingleCandidate> localCandidates() const;
 
     int component() const;
-    void setComponent(int component);
 
     bool addRemoteCandidate(const QXmppJingleCandidate &candidate);
 
@@ -210,7 +209,7 @@ signals:
     void localCandidatesChanged();
 
 private:
-    QXmppIceComponent(QObject *parent=0);
+    QXmppIceComponent(int component, QObject *parent=0);
 
     QXmppIceComponentPrivate *d;
     friend class QXmppIceComponentPrivate;
