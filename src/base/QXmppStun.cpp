@@ -1740,10 +1740,10 @@ QXmppIcePrivate::QXmppIcePrivate()
     tieBreaker = QXmppUtils::generateRandomBytes(8);
 }
 
-class QXmppIceComponentPrivate : public QXmppIcePrivate
+class QXmppIceComponentPrivate
 {
 public:
-    QXmppIceComponentPrivate(int component, QXmppIceComponent *qq);
+    QXmppIceComponentPrivate(int component, QXmppIcePrivate *config, QXmppIceComponent *qq);
     bool addRemoteCandidate(const QXmppJingleCandidate &candidate);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
     void performCheck(CandidatePair *pair, bool nominate);
@@ -1752,6 +1752,7 @@ public:
 
     CandidatePair *activePair;
     const int component;
+    const QXmppIcePrivate* const config;
     CandidatePair *fallbackPair;
 
     QList<QXmppJingleCandidate> localCandidates;
@@ -1776,9 +1777,10 @@ private:
     QXmppIceComponent *q;
 };
 
-QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIceComponent *qq)
+QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIcePrivate *config_, QXmppIceComponent *qq)
     : activePair(0)
     , component(component_)
+    , config(config_)
     , fallbackPair(0)
     , peerReflexivePriority(0)
     , timer(0)
@@ -1811,7 +1813,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         if (!isCompatibleAddress(local.host(), candidate.host()))
             continue;
 
-        CandidatePair *pair = new CandidatePair(component, iceControlling, q);
+        CandidatePair *pair = new CandidatePair(component, config->iceControlling, q);
         pair->remote = candidate;
         pair->transport = transport;
         pairs << pair;
@@ -1840,12 +1842,12 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
     message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
     message.setPriority(peerReflexivePriority);
-    message.setUsername(QString("%1:%2").arg(remoteUser, localUser));
-    if (iceControlling) {
-        message.iceControlling = tieBreaker;
+    message.setUsername(QString("%1:%2").arg(config->remoteUser, config->localUser));
+    if (config->iceControlling) {
+        message.iceControlling = config->tieBreaker;
         message.useCandidate = true;
     } else {
-        message.iceControlled = tieBreaker;
+        message.iceControlled = config->tieBreaker;
     }
     pair->nominating = nominate;
     pair->setState(CandidatePair::InProgressState);
@@ -1908,7 +1910,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
 
 void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &address, quint16 port)
 {
-    const QString messagePassword = (message.type() & 0xFF00) ? localPassword : remotePassword;
+    const QString messagePassword = (message.type() & 0xFF00) ? config->localPassword : config->remotePassword;
     const QByteArray data = message.encode(messagePassword.toUtf8());
     transport->writeDatagram(data, address, port);
 #ifdef QXMPP_DEBUG_STUN
@@ -1923,13 +1925,13 @@ void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppI
 ///
 /// \param parent
 
-QXmppIceComponent::QXmppIceComponent(int component, QObject *parent)
+QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent)
     : QXmppLoggable(parent)
 {
     bool check;
     Q_UNUSED(check);
 
-    d = new QXmppIceComponentPrivate(component, this);
+    d = new QXmppIceComponentPrivate(component, config, this);
 
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
@@ -1974,13 +1976,13 @@ int QXmppIceComponent::component() const
 
 void QXmppIceComponent::checkCandidates()
 {
-    if (d->remoteUser.isEmpty())
+    if (d->config->remoteUser.isEmpty())
         return;
     debug("Checking remote candidates");
 
     foreach (CandidatePair *pair, d->pairs) {
         if (pair->state() == CandidatePair::WaitingState) {
-            d->performCheck(pair, d->iceControlling);
+            d->performCheck(pair, d->config->iceControlling);
             break;
         }
     }
@@ -2100,7 +2102,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     // determine password to use
     QString messagePassword;
     if (!stunTransaction) {
-        messagePassword = (messageType & 0xFF00) ? d->remotePassword : d->localPassword;
+        messagePassword = (messageType & 0xFF00) ? d->config->remotePassword : d->config->localPassword;
         if (messagePassword.isEmpty())
             return;
     }
@@ -2135,10 +2137,10 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (message.messageClass() == QXmppStunMessage::Request)
     {
         // check for role conflict
-        if (d->iceControlling && (!message.iceControlling.isEmpty() || message.useCandidate)) {
+        if (d->config->iceControlling && (!message.iceControlling.isEmpty() || message.useCandidate)) {
             warning("Role conflict, expected to be controlling");
             return;
-        } else if (!d->iceControlling && !message.iceControlled.isEmpty()) {
+        } else if (!d->config->iceControlling && !message.iceControlled.isEmpty()) {
             warning("Role conflict, expected to be controlled");
             return;
         }
@@ -2185,7 +2187,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             }
         }
         if (!pair) {
-            pair = new CandidatePair(d->component, d->iceControlling, this);
+            pair = new CandidatePair(d->component, d->config->iceControlling, this);
             pair->remote = remoteCandidate;
             pair->transport = transport;
             d->pairs << pair;
@@ -2198,8 +2200,8 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         case CandidatePair::WaitingState:
         case CandidatePair::FailedState:
             // send a triggered connectivity test
-            if (!d->remoteUser.isEmpty())
-                d->performCheck(pair, pair->nominating || d->iceControlling || message.useCandidate);
+            if (!d->config->remoteUser.isEmpty())
+                d->performCheck(pair, pair->nominating || d->config->iceControlling || message.useCandidate);
             break;
         case CandidatePair::InProgressState:
             // FIXME: force retransmit now
@@ -2560,13 +2562,7 @@ void QXmppIceConnection::addComponent(int component)
         return;
     }
 
-    QXmppIceComponent *socket = new QXmppIceComponent(component, this);
-    socket->d->iceControlling = d->iceControlling;
-    socket->d->localUser = d->localUser;
-    socket->d->localPassword = d->localPassword;
-    socket->d->remoteUser = d->remoteUser;
-    socket->d->remotePassword = d->remotePassword;
-    socket->d->tieBreaker = d->tieBreaker;
+    QXmppIceComponent *socket = new QXmppIceComponent(component, d, this);
     socket->setStunServer(d->stunHost, d->stunPort);
     socket->setTurnServer(d->turnHost, d->turnPort);
     socket->setTurnUser(d->turnUser);
@@ -2658,8 +2654,6 @@ bool QXmppIceConnection::isConnected() const
 void QXmppIceConnection::setIceControlling(bool controlling)
 {
     d->iceControlling = controlling;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->d->iceControlling = controlling;
 }
 
 /// Returns the list of local HOST CANDIDATES candidates by iterating
@@ -2694,8 +2688,6 @@ QString QXmppIceConnection::localPassword() const
 void QXmppIceConnection::setRemoteUser(const QString &user)
 {
     d->remoteUser = user;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->d->remoteUser = user;
 }
 
 /// Sets the remote password.
@@ -2705,8 +2697,6 @@ void QXmppIceConnection::setRemoteUser(const QString &user)
 void QXmppIceConnection::setRemotePassword(const QString &password)
 {
     d->remotePassword = password;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->d->remotePassword = password;
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses

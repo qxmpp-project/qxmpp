@@ -35,6 +35,7 @@ class QUdpSocket;
 class QTimer;
 class QXmppIceComponentPrivate;
 class QXmppIceConnectionPrivate;
+class QXmppIcePrivate;
 
 /// \internal
 ///
@@ -204,7 +205,7 @@ signals:
     void localCandidatesChanged();
 
 private:
-    QXmppIceComponent(int component, QObject *parent=0);
+    QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent=0);
 
     QXmppIceComponentPrivate *d;
     friend class QXmppIceComponentPrivate;
