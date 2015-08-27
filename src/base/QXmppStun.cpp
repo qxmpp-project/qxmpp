@@ -1729,11 +1729,14 @@ public:
     QString localPassword;
     QString remoteUser;
     QString remotePassword;
+    QHostAddress stunHost;
+    quint16 stunPort;
     QByteArray tieBreaker;
 };
 
 QXmppIcePrivate::QXmppIcePrivate()
     : iceControlling(false)
+    , stunPort(0)
 {
     localUser = QXmppUtils::generateStanzaHash(4);
     localPassword = QXmppUtils::generateStanzaHash(22);
@@ -1748,6 +1751,9 @@ public:
     CandidatePair* findPair(QXmppStunTransaction *transaction);
     void performCheck(CandidatePair *pair, bool nominate);
     void setSockets(QList<QUdpSocket*> sockets);
+    void setTurnServer(const QHostAddress &host, quint16 port);
+    void setTurnUser(const QString &user);
+    void setTurnPassword(const QString &password);
     void writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &remoteHost, quint16 remotePort);
 
     CandidatePair *activePair;
@@ -1765,8 +1771,6 @@ public:
     QTimer *timer;
 
     // STUN server
-    QHostAddress stunHost;
-    quint16 stunPort;
     QMap<QXmppStunTransaction*, QXmppIceTransport*> stunTransactions;
 
     // TURN server
@@ -1784,7 +1788,6 @@ QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIcePriva
     , fallbackPair(0)
     , peerReflexivePriority(0)
     , timer(0)
-    , stunPort(0)
     , turnAllocation(0)
     , turnConfigured(false)
     , q(qq)
@@ -1885,14 +1888,14 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
     }
 
     // start STUN checks
-    if (!stunHost.isNull() && stunPort) {
+    if (!config->stunHost.isNull() && config->stunPort) {
         stunTransactions.clear();
 
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
         foreach (QXmppIceTransport *transport, transports) {
             const QXmppJingleCandidate local = transport->localCandidate(component);
-            if (!isCompatibleAddress(local.host(), stunHost))
+            if (!isCompatibleAddress(local.host(), config->stunHost))
                 continue;
 
             request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
@@ -1906,6 +1909,22 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
         transports << turnAllocation;
         turnAllocation->connectToHost();
     }
+}
+
+void QXmppIceComponentPrivate::setTurnServer(const QHostAddress &host, quint16 port)
+{
+    turnAllocation->setServer(host, port);
+    turnConfigured = !host.isNull() && port;
+}
+
+void QXmppIceComponentPrivate::setTurnUser(const QString &user)
+{
+    turnAllocation->setUser(user);
+}
+
+void QXmppIceComponentPrivate::setTurnPassword(const QString &password)
+{
+    turnAllocation->setPassword(password);
 }
 
 void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &address, quint16 port)
@@ -2022,47 +2041,6 @@ bool QXmppIceComponent::isConnected() const
 QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 {
     return d->localCandidates;
-}
-
-/// Sets the STUN server to use to determine server-reflexive addresses
-/// and ports.
-///
-/// \param host The address of the STUN server.
-/// \param port The port of the STUN server.
-
-void QXmppIceComponent::setStunServer(const QHostAddress &host, quint16 port)
-{
-    d->stunHost = host;
-    d->stunPort = port;
-}
-
-/// Sets the TURN server to use to relay packets in double-NAT configurations.
-///
-/// \param host The address of the TURN server.
-/// \param port The port of the TURN server.
-
-void QXmppIceComponent::setTurnServer(const QHostAddress &host, quint16 port)
-{
-    d->turnAllocation->setServer(host, port);
-    d->turnConfigured = !host.isNull() && port;
-}
-
-/// Sets the \a user used for authentication with the TURN server.
-///
-/// \param user
-
-void QXmppIceComponent::setTurnUser(const QString &user)
-{
-    d->turnAllocation->setUser(user);
-}
-
-/// Sets the \a password used for authentication with the TURN server.
-///
-/// \param password
-
-void QXmppIceComponent::setTurnPassword(const QString &password)
-{
-    d->turnAllocation->setPassword(password);
 }
 
 void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddress &remoteHost, quint16 remotePort)
@@ -2479,11 +2457,11 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
     // STUN checks
     QXmppIceTransport *transport = d->stunTransactions.value(transaction);
     if (transport) {
-        transport->writeDatagram(message.encode(), d->stunHost, d->stunPort);
+        transport->writeDatagram(message.encode(), d->config->stunHost, d->config->stunPort);
 #ifdef QXMPP_DEBUG_STUN
         logSent(QString("STUN packet to %1 port %2\n%3").arg(
-                   d->stunHost.toString(),
-                   QString::number(d->stunPort),
+                   d->config->stunHost.toString(),
+                   QString::number(d->config->stunPort),
                    message.toString()));
 #endif
         return;
@@ -2498,9 +2476,6 @@ public:
     QMap<int, QXmppIceComponent*> components;
     QTimer *connectTimer;
 
-    QHostAddress stunHost;
-    quint16 stunPort;
-
     QHostAddress turnHost;
     quint16 turnPort;
     QString turnUser;
@@ -2508,8 +2483,7 @@ public:
 };
 
 QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
-    : stunPort(0)
-    , turnPort(0)
+    : turnPort(0)
 {
 }
 
@@ -2563,10 +2537,9 @@ void QXmppIceConnection::addComponent(int component)
     }
 
     QXmppIceComponent *socket = new QXmppIceComponent(component, d, this);
-    socket->setStunServer(d->stunHost, d->stunPort);
-    socket->setTurnServer(d->turnHost, d->turnPort);
-    socket->setTurnUser(d->turnUser);
-    socket->setTurnPassword(d->turnPassword);
+    socket->d->setTurnServer(d->turnHost, d->turnPort);
+    socket->d->setTurnUser(d->turnUser);
+    socket->d->setTurnPassword(d->turnPassword);
 
     check = connect(socket, SIGNAL(localCandidatesChanged()),
                     this, SIGNAL(localCandidatesChanged()));
@@ -2709,8 +2682,6 @@ void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunHost = host;
     d->stunPort = port;
-    foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setStunServer(host, port);
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
@@ -2723,7 +2694,7 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
     d->turnHost = host;
     d->turnPort = port;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setTurnServer(host, port);
+        socket->d->setTurnServer(host, port);
 }
 
 /// Sets the \a user used for authentication with the TURN server.
@@ -2734,7 +2705,7 @@ void QXmppIceConnection::setTurnUser(const QString &user)
 {
     d->turnUser = user;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setTurnUser(user);
+        socket->d->setTurnUser(user);
 }
 
 /// Sets the \a password used for authentication with the TURN server.
@@ -2745,7 +2716,7 @@ void QXmppIceConnection::setTurnPassword(const QString &password)
 {
     d->turnPassword = password;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setTurnPassword(password);
+        socket->d->setTurnPassword(password);
 }
 
 void QXmppIceConnection::slotConnected()

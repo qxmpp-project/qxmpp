@@ -169,15 +169,9 @@ class QXMPP_EXPORT QXmppIceComponent : public QXmppLoggable
 public:
     ~QXmppIceComponent();
 
-    void setStunServer(const QHostAddress &host, quint16 port);
-    void setTurnServer(const QHostAddress &host, quint16 port);
-    void setTurnUser(const QString &user);
-    void setTurnPassword(const QString &password);
-
-    QList<QXmppJingleCandidate> localCandidates() const;
-
     int component() const;
     bool isConnected() const;
+    QList<QXmppJingleCandidate> localCandidates() const;
 
     static QList<QHostAddress> discoverAddresses();
     static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = 0);
