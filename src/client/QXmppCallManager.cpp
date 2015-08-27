@@ -269,6 +269,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
         // description
         iq.content().setDescriptionMedia(stream->media);
+        iq.content().setDescriptionSsrc(stream->channel->localSsrc());
         foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
             iq.content().addPayloadType(payload);
 
