@@ -1719,7 +1719,28 @@ QString CandidatePair::toString() const
     return str;
 }
 
-class QXmppIceComponentPrivate
+class QXmppIcePrivate
+{
+public:
+    QXmppIcePrivate();
+
+    bool iceControlling;
+    QString localUser;
+    QString localPassword;
+    QString remoteUser;
+    QString remotePassword;
+    QByteArray tieBreaker;
+};
+
+QXmppIcePrivate::QXmppIcePrivate()
+    : iceControlling(false)
+{
+    localUser = QXmppUtils::generateStanzaHash(4);
+    localPassword = QXmppUtils::generateStanzaHash(22);
+    tieBreaker = QXmppUtils::generateRandomBytes(8);
+}
+
+class QXmppIceComponentPrivate : public QXmppIcePrivate
 {
 public:
     QXmppIceComponentPrivate(QXmppIceComponent *qq);
@@ -1730,17 +1751,11 @@ public:
     CandidatePair *activePair;
     int component;
     CandidatePair *fallbackPair;
-    bool iceControlling;
 
     QList<QXmppJingleCandidate> localCandidates;
-    QString localUser;
-    QString localPassword;
-    QByteArray tieBreaker;
 
     quint32 peerReflexivePriority;
     QList<QXmppJingleCandidate> remoteCandidates;
-    QString remoteUser;
-    QString remotePassword;
 
     QList<CandidatePair*> pairs;
     QList<QXmppIceTransport*> transports;
@@ -1763,7 +1778,6 @@ QXmppIceComponentPrivate::QXmppIceComponentPrivate(QXmppIceComponent *qq)
     : activePair(0)
     , component(0)
     , fallbackPair(0)
-    , iceControlling(false)
     , peerReflexivePriority(0)
     , timer(0)
     , stunPort(0)
@@ -1824,10 +1838,6 @@ QXmppIceComponent::QXmppIceComponent(QObject *parent)
     Q_UNUSED(check);
 
     d = new QXmppIceComponentPrivate(this);
-
-    d->localUser = QXmppUtils::generateStanzaHash(4);
-    d->localPassword = QXmppUtils::generateStanzaHash(22);
-    d->tieBreaker = QXmppUtils::generateRandomBytes(8);
 
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
@@ -2544,29 +2554,52 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
     }
 }
 
+class QXmppIceConnectionPrivate : public QXmppIcePrivate
+{
+public:
+    QXmppIceConnectionPrivate();
+
+    QMap<int, QXmppIceComponent*> components;
+    QTimer *connectTimer;
+
+    QHostAddress stunHost;
+    quint16 stunPort;
+
+    QHostAddress turnHost;
+    quint16 turnPort;
+    QString turnUser;
+    QString turnPassword;
+};
+
+QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
+    : stunPort(0)
+    , turnPort(0)
+{
+}
+
 /// Constructs a new ICE connection.
 ///
 /// \param parent
 
 QXmppIceConnection::QXmppIceConnection(QObject *parent)
-    : QXmppLoggable(parent),
-    m_iceControlling(false),
-    m_stunPort(0)
+    : QXmppLoggable(parent)
+    , d(new QXmppIceConnectionPrivate())
 {
     bool check;
 
-    m_localUser = QXmppUtils::generateStanzaHash(4);
-    m_localPassword = QXmppUtils::generateStanzaHash(22);
-    m_tieBreaker = QXmppUtils::generateRandomBytes(8);
-
     // timer to limit connection time to 30 seconds
-    m_connectTimer = new QTimer(this);
-    m_connectTimer->setInterval(30000);
-    m_connectTimer->setSingleShot(true);
-    check = connect(m_connectTimer, SIGNAL(timeout()),
+    d->connectTimer = new QTimer(this);
+    d->connectTimer->setInterval(30000);
+    d->connectTimer->setSingleShot(true);
+    check = connect(d->connectTimer, SIGNAL(timeout()),
                     this, SLOT(slotTimeout()));
     Q_ASSERT(check);
     Q_UNUSED(check);
+}
+
+QXmppIceConnection::~QXmppIceConnection()
+{
+    delete d;
 }
 
 /// Returns the given component of this ICE connection.
@@ -2575,7 +2608,7 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
 
 QXmppIceComponent *QXmppIceConnection::component(int component)
 {
-    return m_components.value(component);
+    return d->components.value(component);
 }
 
 /// Adds a component to this ICE connection, for instance 1 for RTP
@@ -2588,22 +2621,23 @@ void QXmppIceConnection::addComponent(int component)
     bool check;
     Q_UNUSED(check);
 
-    if (m_components.contains(component))
-    {
+    if (d->components.contains(component)) {
         warning(QString("Already have component %1").arg(QString::number(component)));
         return;
     }
 
     QXmppIceComponent *socket = new QXmppIceComponent(this);
     socket->setComponent(component);
-    socket->setIceControlling(m_iceControlling);
-    socket->setLocalUser(m_localUser);
-    socket->setLocalPassword(m_localPassword);
-    socket->setTieBreaker(m_tieBreaker);
-    socket->setStunServer(m_stunHost, m_stunPort);
-    socket->setTurnServer(m_turnHost, m_turnPort);
-    socket->setTurnUser(m_turnUser);
-    socket->setTurnPassword(m_turnPassword);
+    socket->setIceControlling(d->iceControlling);
+    socket->setLocalUser(d->localUser);
+    socket->setLocalPassword(d->localPassword);
+    socket->setRemoteUser(d->remoteUser);
+    socket->setRemotePassword(d->remotePassword);
+    socket->setTieBreaker(d->tieBreaker);
+    socket->setStunServer(d->stunHost, d->stunPort);
+    socket->setTurnServer(d->turnHost, d->turnPort);
+    socket->setTurnUser(d->turnUser);
+    socket->setTurnPassword(d->turnPassword);
 
     check = connect(socket, SIGNAL(localCandidatesChanged()),
                     this, SIGNAL(localCandidatesChanged()));
@@ -2613,7 +2647,7 @@ void QXmppIceConnection::addComponent(int component)
                     this, SLOT(slotConnected()));
     Q_ASSERT(check);
 
-    m_components[component] = socket;
+    d->components[component] = socket;
 }
 
 /// Adds a candidate for one of the remote components.
@@ -2622,7 +2656,7 @@ void QXmppIceConnection::addComponent(int component)
 
 void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
-    QXmppIceComponent *socket = m_components.value(candidate.component());
+    QXmppIceComponent *socket = d->components.value(candidate.component());
     if (!socket)
     {
         warning(QString("Not adding candidate for unknown component %1").arg(
@@ -2639,16 +2673,16 @@ void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidat
 bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
 {
     // reserve ports
-    QList<QUdpSocket*> sockets = QXmppIceComponent::reservePorts(addresses, m_components.size());
+    QList<QUdpSocket*> sockets = QXmppIceComponent::reservePorts(addresses, d->components.size());
     if (sockets.isEmpty() && !addresses.isEmpty())
         return false;
 
     // assign sockets
-    QList<int> keys = m_components.keys();
+    QList<int> keys = d->components.keys();
     qSort(keys);
     int s = 0;
     foreach (int k, keys) {
-        m_components[k]->setSockets(sockets.mid(s, addresses.size()));
+        d->components[k]->setSockets(sockets.mid(s, addresses.size()));
         s += addresses.size();
     }
 
@@ -2659,8 +2693,8 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
 
 void QXmppIceConnection::close()
 {
-    m_connectTimer->stop();
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->connectTimer->stop();
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->close();
 }
 
@@ -2668,12 +2702,12 @@ void QXmppIceConnection::close()
 
 void QXmppIceConnection::connectToHost()
 {
-    if (isConnected() || m_connectTimer->isActive())
+    if (isConnected() || d->connectTimer->isActive())
         return;
 
-    foreach (QXmppIceComponent *socket, m_components.values())
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->connectToHost();
-    m_connectTimer->start();
+    d->connectTimer->start();
 }
 
 
@@ -2681,7 +2715,7 @@ void QXmppIceConnection::connectToHost()
 
 bool QXmppIceConnection::isConnected() const
 {
-    foreach (QXmppIceComponent *socket, m_components.values())
+    foreach (QXmppIceComponent *socket, d->components.values())
         if (!socket->isConnected())
             return false;
     return true;
@@ -2691,8 +2725,8 @@ bool QXmppIceConnection::isConnected() const
 
 void QXmppIceConnection::setIceControlling(bool controlling)
 {
-    m_iceControlling = controlling;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->iceControlling = controlling;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setIceControlling(controlling);
 }
 
@@ -2702,7 +2736,7 @@ void QXmppIceConnection::setIceControlling(bool controlling)
 QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
 {
     QList<QXmppJingleCandidate> candidates;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    foreach (QXmppIceComponent *socket, d->components.values())
         candidates += socket->localCandidates();
     return candidates;
 }
@@ -2711,7 +2745,7 @@ QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
 
 QString QXmppIceConnection::localUser() const
 {
-    return m_localUser;
+    return d->localUser;
 }
 
 /// Sets the local user fragment.
@@ -2722,8 +2756,8 @@ QString QXmppIceConnection::localUser() const
 
 void QXmppIceConnection::setLocalUser(const QString &user)
 {
-    m_localUser = user;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->localUser = user;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setLocalUser(user);
 }
 
@@ -2731,7 +2765,7 @@ void QXmppIceConnection::setLocalUser(const QString &user)
 
 QString QXmppIceConnection::localPassword() const
 {
-    return m_localPassword;
+    return d->localPassword;
 }
 
 /// Sets the local password.
@@ -2742,8 +2776,8 @@ QString QXmppIceConnection::localPassword() const
 
 void QXmppIceConnection::setLocalPassword(const QString &password)
 {
-    m_localPassword = password;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->localPassword = password;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setLocalPassword(password);
 }
 
@@ -2753,7 +2787,8 @@ void QXmppIceConnection::setLocalPassword(const QString &password)
 
 void QXmppIceConnection::setRemoteUser(const QString &user)
 {
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->remoteUser = user;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setRemoteUser(user);
 }
 
@@ -2763,7 +2798,8 @@ void QXmppIceConnection::setRemoteUser(const QString &user)
 
 void QXmppIceConnection::setRemotePassword(const QString &password)
 {
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->remotePassword = password;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setRemotePassword(password);
 }
 
@@ -2775,9 +2811,9 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 
 void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 {
-    m_stunHost = host;
-    m_stunPort = port;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->stunHost = host;
+    d->stunPort = port;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setStunServer(host, port);
 }
 
@@ -2788,9 +2824,9 @@ void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 
 void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 {
-    m_turnHost = host;
-    m_turnPort = port;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->turnHost = host;
+    d->turnPort = port;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setTurnServer(host, port);
 }
 
@@ -2800,8 +2836,8 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 
 void QXmppIceConnection::setTurnUser(const QString &user)
 {
-    m_turnUser = user;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->turnUser = user;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setTurnUser(user);
 }
 
@@ -2811,25 +2847,25 @@ void QXmppIceConnection::setTurnUser(const QString &user)
 
 void QXmppIceConnection::setTurnPassword(const QString &password)
 {
-    m_turnPassword = password;
-    foreach (QXmppIceComponent *socket, m_components.values())
+    d->turnPassword = password;
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->setTurnPassword(password);
 }
 
 void QXmppIceConnection::slotConnected()
 {
-    foreach (QXmppIceComponent *socket, m_components.values())
+    foreach (QXmppIceComponent *socket, d->components.values())
         if (!socket->isConnected())
             return;
     info(QString("ICE negotiation completed"));
-    m_connectTimer->stop();
+    d->connectTimer->stop();
     emit connected();
 }
 
 void QXmppIceConnection::slotTimeout()
 {
     warning(QString("ICE negotiation timed out"));
-    foreach (QXmppIceComponent *socket, m_components.values())
+    foreach (QXmppIceComponent *socket, d->components.values())
         socket->close();
     emit disconnected();
 }

@@ -34,6 +34,7 @@ class QDataStream;
 class QUdpSocket;
 class QTimer;
 class QXmppIceComponentPrivate;
+class QXmppIceConnectionPrivate;
 
 /// \internal
 ///
@@ -228,6 +229,7 @@ class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 
 public:
     QXmppIceConnection(QObject *parent = 0);
+    ~QXmppIceConnection();
 
     QXmppIceComponent *component(int component);
     void addComponent(int component);
@@ -270,19 +272,7 @@ private slots:
     void slotTimeout();
 
 private:
-    QTimer *m_connectTimer;
-    bool m_iceControlling;
-    QMap<int, QXmppIceComponent*> m_components;
-    QString m_localUser;
-    QString m_localPassword;
-    QByteArray m_tieBreaker;
-
-    QHostAddress m_stunHost;
-    quint16 m_stunPort;
-    QHostAddress m_turnHost;
-    quint16 m_turnPort;
-    QString m_turnUser;
-    QString m_turnPassword;
+    QXmppIceConnectionPrivate *d;
 };
 
 #endif
