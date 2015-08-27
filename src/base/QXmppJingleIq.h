@@ -199,6 +199,9 @@ public:
         QString descriptionMedia() const;
         void setDescriptionMedia(const QString &media);
 
+        quint32 descriptionSsrc() const;
+        void setDescriptionSsrc(quint32 ssrc);
+
         void addPayloadType(const QXmppJinglePayloadType &payload);
         QList<QXmppJinglePayloadType> payloadTypes() const;
         void setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes);
@@ -224,6 +227,7 @@ public:
         QString m_senders;
 
         QString m_descriptionMedia;
+        quint32 m_descriptionSsrc;
         QString m_descriptionType;
         QString m_transportType;
         QString m_transportUser;

@@ -69,6 +69,7 @@ static const char* jingle_reasons[] = {
 };
 
 QXmppJingleIq::Content::Content()
+    : m_descriptionSsrc(0)
 {
 }
 
@@ -110,6 +111,16 @@ QString QXmppJingleIq::Content::descriptionMedia() const
 void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
 {
     m_descriptionMedia = media;
+}
+
+quint32 QXmppJingleIq::Content::descriptionSsrc() const
+{
+    return m_descriptionSsrc;
+}
+
+void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
+{
+    m_descriptionSsrc = ssrc;
 }
 
 void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
@@ -172,6 +183,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     QDomElement descriptionElement = element.firstChildElement("description");
     m_descriptionType = descriptionElement.namespaceURI();
     m_descriptionMedia = descriptionElement.attribute("media");
+    m_descriptionSsrc = descriptionElement.attribute("ssrc").toULong();
     QDomElement child = descriptionElement.firstChildElement("payload-type");
     while (!child.isNull())
     {
@@ -213,6 +225,8 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         writer->writeStartElement("description");
         writer->writeAttribute("xmlns", m_descriptionType);
         helperToXmlAddAttribute(writer, "media", m_descriptionMedia);
+        if (m_descriptionSsrc)
+            writer->writeAttribute("ssrc", QString::number(m_descriptionSsrc));
         foreach (const QXmppJinglePayloadType &payload, m_payloadTypes)
             payload.toXml(writer);
         writer->writeEndElement();
