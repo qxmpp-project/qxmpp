@@ -1744,8 +1744,10 @@ class QXmppIceComponentPrivate : public QXmppIcePrivate
 {
 public:
     QXmppIceComponentPrivate(int component, QXmppIceComponent *qq);
+    bool addRemoteCandidate(const QXmppJingleCandidate &candidate);
     CandidatePair* findPair(QXmppStunTransaction *transaction);
     void performCheck(CandidatePair *pair, bool nominate);
+    void setSockets(QList<QUdpSocket*> sockets);
     void writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &remoteHost, quint16 remotePort);
 
     CandidatePair *activePair;
@@ -1787,6 +1789,42 @@ QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIceCompo
 {
 }
 
+bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &candidate)
+{
+    if (candidate.component() != component ||
+        (candidate.type() != QXmppJingleCandidate::HostType &&
+         candidate.type() != QXmppJingleCandidate::RelayedType &&
+         candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
+        candidate.protocol() != "udp" ||
+        (candidate.host().protocol() != QAbstractSocket::IPv4Protocol &&
+        candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
+        return false;
+
+    foreach (const QXmppJingleCandidate &c, remoteCandidates)
+        if (c.host() == candidate.host() && c.port() == candidate.port())
+            return false;
+    remoteCandidates << candidate;
+
+    foreach (QXmppIceTransport *transport, transports) {
+        // only pair compatible addresses
+        const QXmppJingleCandidate local = transport->localCandidate(component);
+        if (!isCompatibleAddress(local.host(), candidate.host()))
+            continue;
+
+        CandidatePair *pair = new CandidatePair(component, iceControlling, q);
+        pair->remote = candidate;
+        pair->transport = transport;
+        pairs << pair;
+
+        if (!fallbackPair && local.type() == QXmppJingleCandidate::HostType)
+            fallbackPair = pair;
+    }
+
+    qSort(pairs.begin(), pairs.end(), candidatePairPtrLessThan);
+
+    return true;
+}
+
 CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transaction)
 {
     foreach (CandidatePair *pair, pairs) {
@@ -1812,6 +1850,60 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
     pair->nominating = nominate;
     pair->setState(CandidatePair::InProgressState);
     pair->transaction = new QXmppStunTransaction(message, q);
+}
+
+void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    // clear previous candidates and sockets
+    localCandidates.clear();
+    foreach (CandidatePair *pair, pairs)
+        delete pair;
+    pairs.clear();
+    foreach (QXmppIceTransport *transport, transports)
+        if (transport != turnAllocation)
+            delete transport;
+    transports.clear();
+
+    // store candidates
+    foreach (QUdpSocket *socket, sockets) {
+        socket->setParent(q);
+
+        QXmppUdpTransport *transport = new QXmppUdpTransport(socket, q);
+        check = QObject::connect(transport, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
+                                 q, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+        Q_ASSERT(check);
+
+        QXmppJingleCandidate candidate = transport->localCandidate(component);
+
+        transports << transport;
+        localCandidates << candidate;
+    }
+
+    // start STUN checks
+    if (!stunHost.isNull() && stunPort) {
+        stunTransactions.clear();
+
+        QXmppStunMessage request;
+        request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+        foreach (QXmppIceTransport *transport, transports) {
+            const QXmppJingleCandidate local = transport->localCandidate(component);
+            if (!isCompatibleAddress(local.host(), stunHost))
+                continue;
+
+            request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
+            QXmppStunTransaction *transaction = new QXmppStunTransaction(request, q);
+            stunTransactions.insert(transaction, transport);
+        }
+    }
+
+    // connect to TURN server
+    if (turnConfigured) {
+        transports << turnAllocation;
+        turnAllocation->connectToHost();
+    }
 }
 
 void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppIceTransport *transport, const QHostAddress &address, quint16 port)
@@ -1923,114 +2015,11 @@ bool QXmppIceComponent::isConnected() const
     return d->activePair != 0;
 }
 
-/// Sets whether the local party has the ICE controlling role.
-
-void QXmppIceComponent::setIceControlling(bool controlling)
-{
-    d->iceControlling = controlling;
-}
-
 /// Returns the list of local candidates.
 
 QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 {
     return d->localCandidates;
-}
-
-/// Adds a remote STUN candidate.
-
-bool QXmppIceComponent::addRemoteCandidate(const QXmppJingleCandidate &candidate)
-{
-    if (candidate.component() != d->component ||
-        (candidate.type() != QXmppJingleCandidate::HostType &&
-         candidate.type() != QXmppJingleCandidate::RelayedType &&
-         candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
-        candidate.protocol() != "udp" ||
-        (candidate.host().protocol() != QAbstractSocket::IPv4Protocol &&
-        candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
-        return false;
-
-    foreach (const QXmppJingleCandidate &c, d->remoteCandidates)
-        if (c.host() == candidate.host() && c.port() == candidate.port())
-            return false;
-    d->remoteCandidates << candidate;
-
-    foreach (QXmppIceTransport *transport, d->transports) {
-        // only pair compatible addresses
-        const QXmppJingleCandidate local = transport->localCandidate(d->component);
-        if (!isCompatibleAddress(local.host(), candidate.host()))
-            continue;
-
-        CandidatePair *pair = new CandidatePair(d->component, d->iceControlling, this);
-        pair->remote = candidate;
-        pair->transport = transport;
-        d->pairs << pair;
-
-        if (!d->fallbackPair && local.type() == QXmppJingleCandidate::HostType)
-            d->fallbackPair = pair;
-    }
-
-    qSort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
-
-    return true;
-}
-
-/// Sets the list of sockets to use for this component.
-///
-/// \param sockets
-
-void QXmppIceComponent::setSockets(QList<QUdpSocket*> sockets)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    // clear previous candidates and sockets
-    d->localCandidates.clear();
-    foreach (CandidatePair *pair, d->pairs)
-        delete pair;
-    d->pairs.clear();
-    foreach (QXmppIceTransport *transport, d->transports)
-        if (transport != d->turnAllocation)
-            delete transport;
-    d->transports.clear();
-
-    // store candidates
-    foreach (QUdpSocket *socket, sockets) {
-        socket->setParent(this);
-
-        QXmppUdpTransport *transport = new QXmppUdpTransport(socket, this);
-        check = connect(transport, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
-                        this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
-        Q_ASSERT(check);
-
-        QXmppJingleCandidate candidate = transport->localCandidate(d->component);
-
-        d->transports << transport;
-        d->localCandidates << candidate;
-    }
-
-    // start STUN checks
-    if (!d->stunHost.isNull() && d->stunPort) {
-        d->stunTransactions.clear();
-
-        QXmppStunMessage request;
-        request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        foreach (QXmppIceTransport *transport, d->transports) {
-            const QXmppJingleCandidate local = transport->localCandidate(d->component);
-            if (!isCompatibleAddress(local.host(), d->stunHost))
-                continue;
-
-            request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
-            QXmppStunTransaction *transaction = new QXmppStunTransaction(request, this);
-            d->stunTransactions.insert(transaction, transport);
-        }
-    }
-
-    // connect to TURN server
-    if (d->turnConfigured) {
-        d->transports << d->turnAllocation;
-        d->turnAllocation->connectToHost();
-    }
 }
 
 /// Sets the STUN server to use to determine server-reflexive addresses
@@ -2572,7 +2561,7 @@ void QXmppIceConnection::addComponent(int component)
     }
 
     QXmppIceComponent *socket = new QXmppIceComponent(component, this);
-    socket->setIceControlling(d->iceControlling);
+    socket->d->iceControlling = d->iceControlling;
     socket->d->localUser = d->localUser;
     socket->d->localPassword = d->localPassword;
     socket->d->remoteUser = d->remoteUser;
@@ -2601,13 +2590,12 @@ void QXmppIceConnection::addComponent(int component)
 void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
     QXmppIceComponent *socket = d->components.value(candidate.component());
-    if (!socket)
-    {
+    if (!socket) {
         warning(QString("Not adding candidate for unknown component %1").arg(
                 QString::number(candidate.component())));
         return;
     }
-    socket->addRemoteCandidate(candidate);
+    socket->d->addRemoteCandidate(candidate);
 }
 
 /// Binds the local sockets to the specified addresses.
@@ -2626,7 +2614,7 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
     qSort(keys);
     int s = 0;
     foreach (int k, keys) {
-        d->components[k]->setSockets(sockets.mid(s, addresses.size()));
+        d->components[k]->d->setSockets(sockets.mid(s, addresses.size()));
         s += addresses.size();
     }
 
@@ -2671,7 +2659,7 @@ void QXmppIceConnection::setIceControlling(bool controlling)
 {
     d->iceControlling = controlling;
     foreach (QXmppIceComponent *socket, d->components.values())
-        socket->setIceControlling(controlling);
+        socket->d->iceControlling = controlling;
 }
 
 /// Returns the list of local HOST CANDIDATES candidates by iterating
