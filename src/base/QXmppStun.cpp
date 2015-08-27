@@ -2623,6 +2623,9 @@ bool QXmppIceConnection::isConnected() const
 }
 
 /// Sets whether the local party has the ICE controlling role.
+///
+/// \a note This must be called only once, immediately after creating
+/// the connection.
 
 void QXmppIceConnection::setIceControlling(bool controlling)
 {
@@ -2675,6 +2678,8 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 /// Sets the STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
+/// \note This may only be called prior to calling bind().
+///
 /// \param host The address of the STUN server.
 /// \param port The port of the STUN server.
 
@@ -2685,6 +2690,8 @@ void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
+///
+/// \note This may only be called prior to calling bind().
 ///
 /// \param host The address of the TURN server.
 /// \param port The port of the TURN server.
@@ -2699,6 +2706,8 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 
 /// Sets the \a user used for authentication with the TURN server.
 ///
+/// \note This may only be called prior to calling bind().
+///
 /// \param user
 
 void QXmppIceConnection::setTurnUser(const QString &user)
@@ -2709,6 +2718,8 @@ void QXmppIceConnection::setTurnUser(const QString &user)
 }
 
 /// Sets the \a password used for authentication with the TURN server.
+///
+/// \note This may only be called prior to calling bind().
 ///
 /// \param password
 

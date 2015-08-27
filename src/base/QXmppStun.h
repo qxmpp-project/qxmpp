@@ -209,6 +209,30 @@ private:
 /// \brief The QXmppIceConnection class represents a set of UDP sockets
 /// capable of performing Interactive Connectivity Establishment (RFC 5245).
 ///
+/// A typical example is:
+///
+/// \code
+/// QXmppIceConnection *connection = new QXmppIceConnection();
+/// connection->setIceControlling(true);
+/// connection->addComponent(1);
+///
+/// // if needed, set STUN / TURN configuration
+/// // connection->setStunServer(..);
+/// // connection->setTurnServer(..);
+///
+/// // start listening
+/// connection->bind(QXmppIceComponent::discoverAddresses());
+///
+/// // receive remote information: user, password, candidates
+/// // ...
+///
+/// // set remote information and start connecting
+/// connection->setRemoteUser("foo");
+/// connection->setRemoteUser("bar");
+/// connection->addRemoteCandidate(..);
+/// connection->connectToHost();
+///
+/// \endcode
 
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
