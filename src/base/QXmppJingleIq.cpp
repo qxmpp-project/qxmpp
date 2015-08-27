@@ -24,6 +24,7 @@
 #include <QDate>
 #include <QDateTime>
 #include <QDomElement>
+#include <QRegExp>
 
 #include "QXmppConstants.h"
 #include "QXmppJingleIq.h"
@@ -318,6 +319,29 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     return false;
                 }
                 addTransportCandidate(candidate);
+            } else if (attrName == "fmtp") {
+                int spIdx = attrValue.indexOf(' ');
+                if (spIdx == -1) {
+                    qWarning() << "Could not parse payload parameters" << line;
+                    return false;
+                }
+                const int id = attrValue.left(spIdx).toInt();
+                const QString paramStr = attrValue.mid(spIdx + 1);
+                for (int i = 0; i < payloads.size(); ++i) {
+                    if (payloads[i].id() == id) {
+                        QMap<QString, QString> params;
+                        if (payloads[i].name() == "telephone-event") {
+                            params.insert("events", paramStr);
+                        } else {
+                            foreach (const QString p, paramStr.split(QRegExp(";\\s*"))) {
+                                QStringList bits = p.split('=');
+                                if (bits.size() == 2)
+                                    params.insert(bits[0], bits[1]);
+                            }
+                        }
+                        payloads[i].setParameters(params);
+                    }
+                }
             } else if (attrName == "rtpmap") {
                 // payload type map
                 const QStringList bits = attrValue.split(' ');
@@ -409,8 +433,20 @@ QString QXmppJingleIq::Content::toSdp() const
         if (payload.channels() > 1)
             rtpmap += "/" + QString::number(payload.channels());
         attrs << "a=rtpmap:" + rtpmap;
-        if (payload.name() == "telephone-event")
-            attrs << "a=fmtp:" + QByteArray::number(payload.id()) + " 0-15";
+
+        // payload parameters
+        QStringList paramList;
+        const QMap<QString, QString> params = payload.parameters();
+        if (payload.name() == "telephone-event") {
+            if (params.contains("events"))
+                paramList << params.value("events");
+        } else {
+            QMap<QString, QString>::const_iterator i;
+            for (i = params.begin(); i != params.end(); ++i)
+                paramList << i.key() + "=" + i.value();
+        }
+        if (!paramList.isEmpty())
+            attrs << "a=fmtp:" + QByteArray::number(payload.id()) + " " + paramList.join("; ");
     }
     sdp << QString("m=%1 %2 RTP/AVP%3").arg(m_descriptionMedia, QString::number(localRtpPort), payloads);
     sdp << QString("c=%1").arg(addressToSdp(localRtpAddress));
