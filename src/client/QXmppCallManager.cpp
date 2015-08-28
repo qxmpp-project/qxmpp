@@ -32,8 +32,6 @@
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
-static int typeId = qRegisterMetaType<QXmppCall::State>();
-
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;
 
@@ -111,6 +109,7 @@ QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     videoMode(QIODevice::NotOpen),
     q(qq)
 {
+    qRegisterMetaType<QXmppCall::State>();
 }
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &media)
