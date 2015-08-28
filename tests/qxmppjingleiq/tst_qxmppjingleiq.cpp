@@ -162,10 +162,6 @@ void tst_QXmppJingleIq::testRtpSession()
 void tst_QXmppJingleIq::testRtpSessionSdp()
 {
     const QString sdp(
-        "v=0\r\n"
-        "o=- NTPSTAMP NTPSTAMP IN IP4 0.0.0.0\r\n"
-        "s=-\r\n"
-        "t=0 0\r\n"
         "m=audio 8998 RTP/AVP 96 97 18 0 103 98\r\n"
         "c=IN IP4 10.0.1.1\r\n"
         "a=rtpmap:96 speex/16000\r\n"
@@ -209,16 +205,12 @@ void tst_QXmppJingleIq::testRtpSessionSdp()
     QCOMPARE(content.transportUser(), QLatin1String("8hhy"));
     QCOMPARE(content.transportPassword(), QLatin1String("asd88fgpdd777uzjYhagZg"));
 
-    QCOMPARE(content.toSdp().replace(QRegExp("o=- [0-9]+ [0-9]+"), "o=- NTPSTAMP NTPSTAMP"), sdp);
+    QCOMPARE(content.toSdp(), sdp);
 }
 
 void tst_QXmppJingleIq::testRtpSessionSdpParameters()
 {
     const QString sdp(
-        "v=0\r\n"
-        "o=- NTPSTAMP NTPSTAMP IN IP4 0.0.0.0\r\n"
-        "s=-\r\n"
-        "t=0 0\r\n"
         "m=audio 8998 RTP/AVP 96 100\r\n"
         "c=IN IP4 10.0.1.1\r\n"
         "a=rtpmap:96 speex/16000\r\n"
@@ -247,7 +239,7 @@ void tst_QXmppJingleIq::testRtpSessionSdpParameters()
     QCOMPARE(content.transportCandidates()[0].protocol(), QLatin1String("udp"));
     QCOMPARE(content.transportCandidates()[0].type(), QXmppJingleCandidate::HostType);
 
-    QCOMPARE(content.toSdp().replace(QRegExp("o=- [0-9]+ [0-9]+"), "o=- NTPSTAMP NTPSTAMP"), sdp);
+    QCOMPARE(content.toSdp(), sdp);
 }
 
 void tst_QXmppJingleIq::testSession()

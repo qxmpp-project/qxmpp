@@ -401,8 +401,6 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
 
 QString QXmppJingleIq::Content::toSdp() const
 {
-    const quint32 ntpSeconds = QDateTime(QDate(1900, 1, 1)).secsTo(QDateTime::currentDateTime());
-
     // get default candidate
     QHostAddress localRtpAddress = QHostAddress::Any;
     quint16 localRtpPort = 0;
@@ -415,14 +413,6 @@ QString QXmppJingleIq::Content::toSdp() const
     }
 
     QStringList sdp;
-    sdp << "v=0";
-    sdp << QString("o=- %1 %2 %3").arg(
-        QString::number(ntpSeconds),
-        QString::number(ntpSeconds),
-        addressToSdp(QHostAddress::Any)
-    );
-    sdp << "s=-";
-    sdp << "t=0 0";
 
     // media
     QString payloads;
