@@ -125,178 +125,212 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
     );
 }
 
+class QXmppJingleIqContentPrivate : public QSharedData
+{
+public:
+    QXmppJingleIqContentPrivate();
+
+    QString creator;
+    QString disposition;
+    QString name;
+    QString senders;
+
+    QString descriptionMedia;
+    quint32 descriptionSsrc;
+    QString descriptionType;
+    QString transportType;
+    QString transportUser;
+    QString transportPassword;
+    QList<QXmppJinglePayloadType> payloadTypes;
+    QList<QXmppJingleCandidate> transportCandidates;
+};
+
+QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
+    : descriptionSsrc(0)
+{
+}
+
 QXmppJingleIq::Content::Content()
-    : m_descriptionSsrc(0)
+    : d(new QXmppJingleIqContentPrivate())
+{
+}
+
+QXmppJingleIq::Content::Content(const QXmppJingleIq::Content &other)
+    : d(other.d)
+{
+}
+
+QXmppJingleIq::Content::~Content()
 {
 }
 
 QString QXmppJingleIq::Content::creator() const
 {
-    return m_creator;
+    return d->creator;
 }
 
 void QXmppJingleIq::Content::setCreator(const QString &creator)
 {
-    m_creator = creator;
+    d->creator = creator;
 }
 
 QString QXmppJingleIq::Content::name() const
 {
-    return m_name;
+    return d->name;
 }
 
 void QXmppJingleIq::Content::setName(const QString &name)
 {
-    m_name = name;
+    d->name = name;
 }
 
 QString QXmppJingleIq::Content::senders() const
 {
-    return m_senders;
+    return d->senders;
 }
 
 void QXmppJingleIq::Content::setSenders(const QString &senders)
 {
-    m_senders = senders;
+    d->senders = senders;
 }
 
 QString QXmppJingleIq::Content::descriptionMedia() const
 {
-    return m_descriptionMedia;
+    return d->descriptionMedia;
 }
 
 void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
 {
-    m_descriptionMedia = media;
+    d->descriptionMedia = media;
 }
 
 quint32 QXmppJingleIq::Content::descriptionSsrc() const
 {
-    return m_descriptionSsrc;
+    return d->descriptionSsrc;
 }
 
 void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
 {
-    m_descriptionSsrc = ssrc;
+    d->descriptionSsrc = ssrc;
 }
 
 void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
 {
-    m_descriptionType = ns_jingle_rtp;
-    m_payloadTypes << payload;
+    d->descriptionType = ns_jingle_rtp;
+    d->payloadTypes << payload;
 }
 
 QList<QXmppJinglePayloadType> QXmppJingleIq::Content::payloadTypes() const
 {
-    return m_payloadTypes;
+    return d->payloadTypes;
 }
 
 void QXmppJingleIq::Content::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
 {
-    m_descriptionType = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp;
-    m_payloadTypes = payloadTypes;
+    d->descriptionType = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp;
+    d->payloadTypes = payloadTypes;
 }
 
 void QXmppJingleIq::Content::addTransportCandidate(const QXmppJingleCandidate &candidate)
 {
-    m_transportType = ns_jingle_ice_udp;
-    m_transportCandidates << candidate;
+    d->transportType = ns_jingle_ice_udp;
+    d->transportCandidates << candidate;
 }
 
 QList<QXmppJingleCandidate> QXmppJingleIq::Content::transportCandidates() const
 {
-    return m_transportCandidates;
+    return d->transportCandidates;
 }
 
 QString QXmppJingleIq::Content::transportUser() const
 {
-    return m_transportUser;
+    return d->transportUser;
 }
 
 void QXmppJingleIq::Content::setTransportUser(const QString &user)
 {
-    m_transportUser = user;
+    d->transportUser = user;
 }
 
 QString QXmppJingleIq::Content::transportPassword() const
 {
-    return m_transportPassword;
+    return d->transportPassword;
 }
 
 void QXmppJingleIq::Content::setTransportPassword(const QString &password)
 {
-    m_transportPassword = password;
+    d->transportPassword = password;
 }
 
 /// \cond
 void QXmppJingleIq::Content::parse(const QDomElement &element)
 {
-    m_creator = element.attribute("creator");
-    m_disposition = element.attribute("disposition");
-    m_name = element.attribute("name");
-    m_senders = element.attribute("senders");
+    d->creator = element.attribute("creator");
+    d->disposition = element.attribute("disposition");
+    d->name = element.attribute("name");
+    d->senders = element.attribute("senders");
 
     // description
     QDomElement descriptionElement = element.firstChildElement("description");
-    m_descriptionType = descriptionElement.namespaceURI();
-    m_descriptionMedia = descriptionElement.attribute("media");
-    m_descriptionSsrc = descriptionElement.attribute("ssrc").toULong();
+    d->descriptionType = descriptionElement.namespaceURI();
+    d->descriptionMedia = descriptionElement.attribute("media");
+    d->descriptionSsrc = descriptionElement.attribute("ssrc").toULong();
     QDomElement child = descriptionElement.firstChildElement("payload-type");
     while (!child.isNull())
     {
         QXmppJinglePayloadType payload;
         payload.parse(child);
-        m_payloadTypes << payload;
+        d->payloadTypes << payload;
         child = child.nextSiblingElement("payload-type");
     }
 
     // transport
     QDomElement transportElement = element.firstChildElement("transport");
-    m_transportType = transportElement.namespaceURI();
-    m_transportUser = transportElement.attribute("ufrag");
-    m_transportPassword = transportElement.attribute("pwd");
+    d->transportType = transportElement.namespaceURI();
+    d->transportUser = transportElement.attribute("ufrag");
+    d->transportPassword = transportElement.attribute("pwd");
     child = transportElement.firstChildElement("candidate");
     while (!child.isNull())
     {
         QXmppJingleCandidate candidate;
         candidate.parse(child);
-        m_transportCandidates << candidate;
+        d->transportCandidates << candidate;
         child = child.nextSiblingElement("candidate");
     }
 }
 
 void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
 {
-    if (m_creator.isEmpty() || m_name.isEmpty())
+    if (d->creator.isEmpty() || d->name.isEmpty())
         return;
 
     writer->writeStartElement("content");
-    helperToXmlAddAttribute(writer, "creator", m_creator);
-    helperToXmlAddAttribute(writer, "disposition", m_disposition);
-    helperToXmlAddAttribute(writer, "name", m_name);
-    helperToXmlAddAttribute(writer, "senders", m_senders);
+    helperToXmlAddAttribute(writer, "creator", d->creator);
+    helperToXmlAddAttribute(writer, "disposition", d->disposition);
+    helperToXmlAddAttribute(writer, "name", d->name);
+    helperToXmlAddAttribute(writer, "senders", d->senders);
 
     // description
-    if (!m_descriptionType.isEmpty() || !m_payloadTypes.isEmpty())
+    if (!d->descriptionType.isEmpty() || !d->payloadTypes.isEmpty())
     {
         writer->writeStartElement("description");
-        writer->writeAttribute("xmlns", m_descriptionType);
-        helperToXmlAddAttribute(writer, "media", m_descriptionMedia);
-        if (m_descriptionSsrc)
-            writer->writeAttribute("ssrc", QString::number(m_descriptionSsrc));
-        foreach (const QXmppJinglePayloadType &payload, m_payloadTypes)
+        writer->writeAttribute("xmlns", d->descriptionType);
+        helperToXmlAddAttribute(writer, "media", d->descriptionMedia);
+        if (d->descriptionSsrc)
+            writer->writeAttribute("ssrc", QString::number(d->descriptionSsrc));
+        foreach (const QXmppJinglePayloadType &payload, d->payloadTypes)
             payload.toXml(writer);
         writer->writeEndElement();
     }
 
     // transport
-    if (!m_transportType.isEmpty() || !m_transportCandidates.isEmpty())
+    if (!d->transportType.isEmpty() || !d->transportCandidates.isEmpty())
     {
         writer->writeStartElement("transport");
-        writer->writeAttribute("xmlns", m_transportType);
-        helperToXmlAddAttribute(writer, "ufrag", m_transportUser);
-        helperToXmlAddAttribute(writer, "pwd", m_transportPassword);
-        foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
+        writer->writeAttribute("xmlns", d->transportType);
+        helperToXmlAddAttribute(writer, "ufrag", d->transportUser);
+        helperToXmlAddAttribute(writer, "pwd", d->transportPassword);
+        foreach (const QXmppJingleCandidate &candidate, d->transportCandidates)
             candidate.toXml(writer);
         writer->writeEndElement();
     }
@@ -363,16 +397,16 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     }
                 }
             } else if (attrName == "ice-ufrag") {
-                m_transportUser = attrValue;
+                d->transportUser = attrValue;
             } else if (attrName == "ice-pwd") {
-                m_transportPassword = attrValue;
+                d->transportPassword = attrValue;
             } else if (attrName == "ssrc") {
                 const QStringList bits = attrValue.split(' ');
                 if (bits.isEmpty()) {
                     qWarning() << "Could not parse ssrc" << line;
                     return false;
                 }
-                m_descriptionSsrc = bits[0].toULong();
+                d->descriptionSsrc = bits[0].toULong();
             }
         } else if (line.startsWith("m=")) {
             // FIXME: what do we do with the profile (bits[2]) ?
@@ -381,7 +415,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                 qWarning() << "Could not parse media" << line;
                 return false;
             }
-            m_descriptionMedia = bits[0];
+            d->descriptionMedia = bits[0];
 
             // parse payload types
             for (int i = 3; i < bits.size(); ++i) {
@@ -404,7 +438,7 @@ QString QXmppJingleIq::Content::toSdp() const
     // get default candidate
     QHostAddress localRtpAddress = QHostAddress::Any;
     quint16 localRtpPort = 0;
-    foreach (const QXmppJingleCandidate &candidate, m_transportCandidates) {
+    foreach (const QXmppJingleCandidate &candidate, d->transportCandidates) {
         if (candidate.component() == RTP_COMPONENT) {
             localRtpAddress = candidate.host();
             localRtpPort = candidate.port();
@@ -417,7 +451,7 @@ QString QXmppJingleIq::Content::toSdp() const
     // media
     QString payloads;
     QStringList attrs;
-    foreach (const QXmppJinglePayloadType &payload, m_payloadTypes) {
+    foreach (const QXmppJinglePayloadType &payload, d->payloadTypes) {
         payloads += " " + QString::number(payload.id());
         QString rtpmap = QString::number(payload.id()) + " " + payload.name() + "/" + QString::number(payload.clockrate());
         if (payload.channels() > 1)
@@ -438,17 +472,17 @@ QString QXmppJingleIq::Content::toSdp() const
         if (!paramList.isEmpty())
             attrs << "a=fmtp:" + QByteArray::number(payload.id()) + " " + paramList.join("; ");
     }
-    sdp << QString("m=%1 %2 RTP/AVP%3").arg(m_descriptionMedia, QString::number(localRtpPort), payloads);
+    sdp << QString("m=%1 %2 RTP/AVP%3").arg(d->descriptionMedia, QString::number(localRtpPort), payloads);
     sdp << QString("c=%1").arg(addressToSdp(localRtpAddress));
     sdp += attrs;
 
     // transport
-    foreach (const QXmppJingleCandidate &candidate, m_transportCandidates)
+    foreach (const QXmppJingleCandidate &candidate, d->transportCandidates)
         sdp << QString("a=%1").arg(candidateToSdp(candidate));
-    if (!m_transportUser.isEmpty())
-        sdp << QString("a=ice-ufrag:%1").arg(m_transportUser);
-    if (!m_transportPassword.isEmpty())
-        sdp << QString("a=ice-pwd:%1").arg(m_transportPassword);
+    if (!d->transportUser.isEmpty())
+        sdp << QString("a=ice-ufrag:%1").arg(d->transportUser);
+    if (!d->transportPassword.isEmpty())
+        sdp << QString("a=ice-pwd:%1").arg(d->transportPassword);
 
     return sdp.join("\r\n") + "\r\n";
 }

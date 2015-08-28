@@ -28,6 +28,8 @@
 
 #include "QXmppIq.h"
 
+class QXmppJingleIqContentPrivate;
+
 /// \brief The QXmppJinglePayloadType class represents a payload type
 /// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
 ///
@@ -185,6 +187,8 @@ public:
     {
     public:
         Content();
+        Content(const QXmppJingleIq::Content &other);
+        ~Content();
 
         QString creator() const;
         void setCreator(const QString &creator);
@@ -224,19 +228,7 @@ public:
         /// \endcond
 
     private:
-        QString m_creator;
-        QString m_disposition;
-        QString m_name;
-        QString m_senders;
-
-        QString m_descriptionMedia;
-        quint32 m_descriptionSsrc;
-        QString m_descriptionType;
-        QString m_transportType;
-        QString m_transportUser;
-        QString m_transportPassword;
-        QList<QXmppJinglePayloadType> m_payloadTypes;
-        QList<QXmppJingleCandidate> m_transportCandidates;
+        QSharedDataPointer<QXmppJingleIqContentPrivate> d;
     };
 
     /// \internal
