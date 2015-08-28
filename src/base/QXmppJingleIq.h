@@ -219,6 +219,16 @@ public:
         QString transportPassword() const;
         void setTransportPassword(const QString &password);
 
+        // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+        QByteArray transportFingerprint() const;
+        void setTransportFingerprint(const QByteArray &fingerprint);
+
+        QString transportFingerprintHash() const;
+        void setTransportFingerprintHash(const QString &hash);
+
+        QString transportFingerprintSetup() const;
+        void setTransportFingerprintSetup(const QString &setup);
+
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;

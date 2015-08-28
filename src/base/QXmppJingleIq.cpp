@@ -33,6 +33,7 @@
 static const int RTP_COMPONENT = 1;
 
 static const char* ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
+static const char* ns_jingle_dtls = "urn:xmpp:jingle:apps:dtls:0";
 
 static const char* jingle_actions[] = {
     "content-accept",
@@ -72,6 +73,25 @@ static const char* jingle_reasons[] = {
     "unsupported-applications",
     "unsupported-transports",
 };
+
+static QString formatFingerprint(const QByteArray &digest)
+{
+    QString fingerprint;
+    const QString hx = digest.toHex().toUpper();
+    for (int i = 0; i < hx.size(); i+=2) {
+        if (!fingerprint.isEmpty())
+            fingerprint += ':';
+        fingerprint += hx.mid(i, 2);
+    }
+    return fingerprint;
+}
+
+static QByteArray parseFingerprint(const QString &fingerprint)
+{
+    QString z = fingerprint;
+    z.replace(':', "");
+    return QByteArray::fromHex(z.toUtf8());
+}
 
 static QString addressToSdp(const QHostAddress &host)
 {
@@ -141,6 +161,11 @@ public:
     QString transportType;
     QString transportUser;
     QString transportPassword;
+
+    QByteArray transportFingerprint;
+    QString transportFingerprintHash;
+    QString transportFingerprintSetup;
+
     QList<QXmppJinglePayloadType> payloadTypes;
     QList<QXmppJingleCandidate> transportCandidates;
 };
@@ -262,6 +287,60 @@ void QXmppJingleIq::Content::setTransportPassword(const QString &password)
     d->transportPassword = password;
 }
 
+/// Returns the fingerprint hash value for the transport key.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+QByteArray QXmppJingleIq::Content::transportFingerprint() const
+{
+    return d->transportFingerprint;
+}
+
+/// Sets the fingerprint hash value for the transport key.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+void QXmppJingleIq::Content::setTransportFingerprint(const QByteArray &fingerprint)
+{
+    d->transportFingerprint = fingerprint;
+}
+
+/// Returns the fingerprint hash algorithm for the transport key.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+QString QXmppJingleIq::Content::transportFingerprintHash() const
+{
+    return d->transportFingerprintHash;
+}
+
+/// Sets the fingerprint hash algorithm for the transport key.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+void QXmppJingleIq::Content::setTransportFingerprintHash(const QString &hash)
+{
+    d->transportFingerprintHash = hash;
+}
+
+/// Returns the setup role for the encrypted transport.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+QString QXmppJingleIq::Content::transportFingerprintSetup() const
+{
+    return d->transportFingerprintSetup;
+}
+
+/// Sets the setup role for the encrypted transport.
+///
+/// This is used for DTLS-SRTP as defined in XEP-0320.
+
+void QXmppJingleIq::Content::setTransportFingerprintSetup(const QString &setup)
+{
+    d->transportFingerprintSetup = setup;
+}
+
 /// \cond
 void QXmppJingleIq::Content::parse(const QDomElement &element)
 {
@@ -290,12 +369,19 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->transportUser = transportElement.attribute("ufrag");
     d->transportPassword = transportElement.attribute("pwd");
     child = transportElement.firstChildElement("candidate");
-    while (!child.isNull())
-    {
+    while (!child.isNull()) {
         QXmppJingleCandidate candidate;
         candidate.parse(child);
         d->transportCandidates << candidate;
         child = child.nextSiblingElement("candidate");
+    }
+    child = transportElement.firstChildElement("fingerprint");
+
+    /// XEP-0320
+    if (!child.isNull()) {
+        d->transportFingerprint = parseFingerprint(child.text());
+        d->transportFingerprintHash = child.attribute("hash");
+        d->transportFingerprintSetup = child.attribute("setup");
     }
 }
 
@@ -332,6 +418,16 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "pwd", d->transportPassword);
         foreach (const QXmppJingleCandidate &candidate, d->transportCandidates)
             candidate.toXml(writer);
+
+        // XEP-0320
+        if (!d->transportFingerprint.isEmpty() && !d->transportFingerprintHash.isEmpty()) {
+            writer->writeStartElement("fingerprint");
+            writer->writeAttribute("xmlns", ns_jingle_dtls);
+            writer->writeAttribute("hash", d->transportFingerprintHash);
+            writer->writeAttribute("setup", d->transportFingerprintSetup);
+            writer->writeCharacters(formatFingerprint(d->transportFingerprint));
+            writer->writeEndElement();
+        }
         writer->writeEndElement();
     }
     writer->writeEndElement();
@@ -353,6 +449,12 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     return false;
                 }
                 addTransportCandidate(candidate);
+            } else if (attrName == "fingerprint") {
+                const QStringList bits = attrValue.split(' ');
+                if (bits.size() > 1) {
+                    d->transportFingerprintHash = bits[0];
+                    d->transportFingerprint = parseFingerprint(bits[1]);
+                }
             } else if (attrName == "fmtp") {
                 int spIdx = attrValue.indexOf(' ');
                 if (spIdx == -1) {
@@ -400,6 +502,8 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                 d->transportUser = attrValue;
             } else if (attrName == "ice-pwd") {
                 d->transportPassword = attrValue;
+            } else if (attrName == "setup") {
+                d->transportFingerprintSetup = attrValue;
             } else if (attrName == "ssrc") {
                 const QStringList bits = attrValue.split(' ');
                 if (bits.isEmpty()) {
@@ -483,6 +587,12 @@ QString QXmppJingleIq::Content::toSdp() const
         sdp << QString("a=ice-ufrag:%1").arg(d->transportUser);
     if (!d->transportPassword.isEmpty())
         sdp << QString("a=ice-pwd:%1").arg(d->transportPassword);
+    if (!d->transportFingerprint.isEmpty() && !d->transportFingerprintHash.isEmpty())
+        sdp << QString("a=fingerprint:%1 %2").arg(
+            d->transportFingerprintHash,
+            formatFingerprint(d->transportFingerprint));
+    if (!d->transportFingerprintSetup.isEmpty())
+        sdp << QString("a=setup:%1").arg(d->transportFingerprintSetup);
 
     return sdp.join("\r\n") + "\r\n";
 }
