@@ -99,7 +99,7 @@ DOCUMENTATION
 
 You can find the API documentation for the latest QXmpp version here:
 
-http://doc.qxmpp.org/qxmpp-snapshot/
+http://doc.qxmpp.org/
 
 SUPPORTED PLATFORMS
 ===================
