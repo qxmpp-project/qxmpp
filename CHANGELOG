@@ -5,6 +5,11 @@ QXmpp 0.8.4 (UNRELEASED)
     element instead of "TEL" (issue 65).
   - Make QXmppClient::connectToServer(QXmppConfiguration, QXmppPresence) a
     slot (issue 63).
+  - Correctly receive data immediately following a SOCKS5 message (issue 64).
+  - Make QXmppStream handle end of incoming stream (issue 70).
+  - Add unit tests for QXmppCallManager and QXmppTransferManager.
+  - Improve ICE implementation to follow RFC 5245 more closely and hide
+    implementation details from public API.
 
 QXmpp 0.8.3 (Mar 13, 2015)
 --------------------------
