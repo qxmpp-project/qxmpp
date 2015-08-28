@@ -30,8 +30,9 @@
 
 class QXmppRtpPacketPrivate;
 
-/// \brief The QXmppRtpPacket class represents an RTP packet.
+/// \internal
 ///
+/// The QXmppRtpPacket class represents an RTP packet.
 
 class QXMPP_EXPORT QXmppRtpPacket
 {

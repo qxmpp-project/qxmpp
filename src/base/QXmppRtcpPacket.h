@@ -36,8 +36,9 @@ class QXmppRtcpSenderInfoPrivate;
 class QXmppRtcpSourceDescription;
 class QXmppRtcpSourceDescriptionPrivate;
 
-/// \brief The QXmppRtpPacket class represents an RTCP packet.
+/// \internal
 ///
+/// The QXmppRtcpPacket class represents an RTCP packet.
 
 class QXMPP_EXPORT QXmppRtcpPacket
 {
@@ -84,6 +85,8 @@ private:
     QSharedDataPointer<QXmppRtcpPacketPrivate> d;
 };
 
+/// \internal
+
 class QXMPP_EXPORT QXmppRtcpReceiverReport
 {
 public:
@@ -114,6 +117,8 @@ private:
     QSharedDataPointer<QXmppRtcpReceiverReportPrivate> d;
 };
 
+/// \internal
+
 class QXMPP_EXPORT QXmppRtcpSenderInfo
 {
 public:
@@ -137,6 +142,8 @@ private:
     friend class QXmppRtcpPacket;
     QSharedDataPointer<QXmppRtcpSenderInfoPrivate> d;
 };
+
+/// \internal
 
 class QXMPP_EXPORT QXmppRtcpSourceDescription
 {
