@@ -1,5 +1,5 @@
-QXmpp 0.8.4 (UNRELEASED)
-------------------------
+QXmpp 0.9.0 (Aug 28, 2015)
+--------------------------
 
   - Fix phone numbers incorrectly read from / written to vCard as "PHONE"
     element instead of "TEL" (issue 65).
