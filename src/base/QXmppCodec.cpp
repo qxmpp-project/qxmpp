@@ -1218,11 +1218,11 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
     if (frag_type == NoFragment) {
         // unfragmented packet
         if ((payload[1] & 0x1) == 0 // is key frame
-            || packet.sequence == sequence) {
+            || packet.sequence() == sequence) {
             if (d->decodeFrame(payload.mid(1), &frame))
                 frames << frame;
 
-            sequence = packet.sequence + 1;
+            sequence = packet.sequence() + 1;
         }
 
         d->packetBuffer.resize(0);
@@ -1231,13 +1231,13 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
         if (frag_type == StartFragment) {
             // start fragment
             if ((payload[1] & 0x1) == 0 // is key frame
-                || packet.sequence == sequence) {
+                || packet.sequence() == sequence) {
                 d->packetBuffer = payload.mid(1);
-                sequence = packet.sequence + 1;
+                sequence = packet.sequence() + 1;
             }
         } else {
             // continuation or end fragment
-            if (packet.sequence == sequence) {
+            if (packet.sequence() == sequence) {
                 const int packetPos = d->packetBuffer.size();
                 d->packetBuffer.resize(packetPos + packetLength);
                 stream.readRawData(d->packetBuffer.data() + packetPos, packetLength);
