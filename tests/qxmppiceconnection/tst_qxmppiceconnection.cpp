@@ -101,7 +101,7 @@ void tst_QXmppIceConnection::testBindStun()
 
 void tst_QXmppIceConnection::testConnect()
 {
-    const int component = 1024;
+    const int componentId = 1024;
 
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
@@ -110,14 +110,14 @@ void tst_QXmppIceConnection::testConnect()
     connect(&clientL, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientL.setIceControlling(true);
-    clientL.addComponent(component);
+    clientL.addComponent(componentId);
     clientL.bind(QXmppIceComponent::discoverAddresses());
 
     QXmppIceConnection clientR;
     connect(&clientR, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientR.setIceControlling(false);
-    clientR.addComponent(component);
+    clientR.addComponent(componentId);
     clientR.bind(QXmppIceComponent::discoverAddresses());
 
     // exchange credentials
