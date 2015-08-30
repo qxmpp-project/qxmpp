@@ -1,3 +1,8 @@
+QXmpp 0.9.1 (Aug 30, 2015)
+--------------------------
+
+  - Fix build error when VPX support is enabled (issue 71).
+
 QXmpp 0.9.0 (Aug 28, 2015)
 --------------------------
 
