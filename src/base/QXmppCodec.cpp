@@ -1260,6 +1260,7 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
 
 bool QXmppVpxDecoder::setParameters(const QMap<QString, QString> &parameters)
 {
+    Q_UNUSED(parameters);
     return true;
 }
 
