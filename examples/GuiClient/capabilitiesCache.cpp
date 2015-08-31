@@ -23,10 +23,10 @@
 
 
 #include "capabilitiesCache.h"
+#include "utils.h"
 
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
-#include <utils.h>
 
 #include <QCoreApplication>
 #include <QXmlStreamWriter>
