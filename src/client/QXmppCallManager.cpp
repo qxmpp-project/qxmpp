@@ -54,6 +54,8 @@ public:
     Stream *createStream(const QString &media);
     Stream *findStreamByMedia(const QString &media);
     Stream *findStreamByName(const QString &name);
+    QXmppJingleIq::Content localContent(QXmppCallPrivate::Stream *stream) const;
+
     void handleAck(const QXmppIq &iq);
     bool handleDescription(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content);
     void handleRequest(const QXmppJingleIq &iq);
@@ -265,22 +267,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::ContentAccept);
         iq.setSid(q->sid());
-
-        QXmppJingleIq::Content responseContent;
-        responseContent.setCreator(stream->creator);
-        responseContent.setName(stream->name);
-
-        // description
-        responseContent.setDescriptionMedia(stream->media);
-        responseContent.setDescriptionSsrc(stream->channel->localSsrc());
-        responseContent.setPayloadTypes(stream->channel->localPayloadTypes());
-
-        // transport
-        responseContent.setTransportUser(stream->connection->localUser());
-        responseContent.setTransportPassword(stream->connection->localPassword());
-        responseContent.setTransportCandidates(stream->connection->localCandidates());
-
-        iq.addContent(responseContent);
+        iq.addContent(localContent(stream));
         sendRequest(iq);
 
     } else if (iq.action() == QXmppJingleIq::TransportInfo) {
@@ -366,6 +353,26 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     return stream;
 }
 
+QXmppJingleIq::Content QXmppCallPrivate::localContent(QXmppCallPrivate::Stream *stream) const
+{
+    QXmppJingleIq::Content content;
+    content.setCreator(stream->creator);
+    content.setName(stream->name);
+    content.setSenders("both");
+
+    // description
+    content.setDescriptionMedia(stream->media);
+    content.setDescriptionSsrc(stream->channel->localSsrc());
+    content.setPayloadTypes(stream->channel->localPayloadTypes());
+
+    // transport
+    content.setTransportUser(stream->connection->localUser());
+    content.setTransportPassword(stream->connection->localPassword());
+    content.setTransportCandidates(stream->connection->localCandidates());
+
+    return content;
+}
+
 /// Sends an acknowledgement for a Jingle IQ.
 ///
 
@@ -391,21 +398,7 @@ bool QXmppCallPrivate::sendInvite()
     QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
     Q_ASSERT(stream);
 
-    QXmppJingleIq::Content content;
-    content.setCreator(stream->creator);
-    content.setName(stream->name);
-    content.setSenders("both");
-
-    // description
-    content.setDescriptionMedia(stream->media);
-    content.setPayloadTypes(stream->channel->localPayloadTypes());
-
-    // transport
-    content.setTransportUser(stream->connection->localUser());
-    content.setTransportPassword(stream->connection->localPassword());
-    content.setTransportCandidates(stream->connection->localCandidates());
-
-    iq.addContent(content);
+    iq.addContent(localContent(stream));
     return sendRequest(iq);
 }
 
@@ -494,21 +487,7 @@ void QXmppCall::accept()
         iq.setAction(QXmppJingleIq::SessionAccept);
         iq.setResponder(d->ownJid);
         iq.setSid(d->sid);
-
-        QXmppJingleIq::Content content;
-        content.setCreator(stream->creator);
-        content.setName(stream->name);
-
-        // description
-        content.setDescriptionMedia(stream->media);
-        content.setPayloadTypes(stream->channel->localPayloadTypes());
-
-        // transport
-        content.setTransportUser(stream->connection->localUser());
-        content.setTransportPassword(stream->connection->localPassword());
-        content.setTransportCandidates(stream->connection->localCandidates());
-
-        iq.addContent(content);
+        iq.addContent(localContent(stream));
         d->sendRequest(iq);
 
         // notify user
@@ -610,17 +589,7 @@ void QXmppCall::localCandidatesChanged()
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::TransportInfo);
     iq.setSid(d->sid);
-
-    QXmppJingleIq::Content content;
-    content.setCreator(stream->creator);
-    content.setName(stream->name);
-
-    // transport
-    content.setTransportUser(stream->connection->localUser());
-    content.setTransportPassword(stream->connection->localPassword());
-    content.setTransportCandidates(stream->connection->localCandidates());
-
-    iq.addContent(content);
+    iq.addContent(d->localContent(stream));
     d->sendRequest(iq);
 }
 
@@ -706,22 +675,7 @@ void QXmppCall::startVideo()
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::ContentAdd);
     iq.setSid(d->sid);
-
-    QXmppJingleIq::Content content;
-    content.setCreator(stream->creator);
-    content.setName(stream->name);
-    content.setSenders("both");
-
-    // description
-    content.setDescriptionMedia(stream->media);
-    content.setPayloadTypes(stream->channel->localPayloadTypes());
-
-    // transport
-    content.setTransportUser(stream->connection->localUser());
-    content.setTransportPassword(stream->connection->localPassword());
-    content.setTransportCandidates(stream->connection->localCandidates());
-
-    iq.addContent(content);
+    iq.addContent(d->localContent(stream));
     d->sendRequest(iq);
 }
 
