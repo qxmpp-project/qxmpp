@@ -387,17 +387,16 @@ bool QXmppCallPrivate::sendAck(const QXmppJingleIq &iq)
 
 bool QXmppCallPrivate::sendInvite()
 {
+    // create audio stream
+    QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
+    Q_ASSERT(stream);
+
     QXmppJingleIq iq;
     iq.setTo(jid);
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::SessionInitiate);
     iq.setInitiator(ownJid);
     iq.setSid(sid);
-
-    // create audio stream
-    QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
-    Q_ASSERT(stream);
-
     iq.addContent(localContent(stream));
     return sendRequest(iq);
 }
