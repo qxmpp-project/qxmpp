@@ -19,7 +19,13 @@ full*)
 esac
 
 case "$CONFIG" in
-*static)
+*debug*)
+    QMAKE_ARGS="$QMAKE_ARGS CONFIG+=debug"
+    ;;
+esac
+
+case "$CONFIG" in
+*static*)
     QMAKE_ARGS="$QMAKE_ARGS QXMPP_LIBRARY_TYPE=staticlib"
     ;;
 esac

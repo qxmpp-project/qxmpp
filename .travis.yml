@@ -4,10 +4,12 @@ env:
   - QT_SELECT=qt4 ; CONFIG=minimal
   - QT_SELECT=qt4 ; CONFIG=minimal-static
   - QT_SELECT=qt4 ; CONFIG=full
+  - QT_SELECT=qt4 ; CONFIG=full-debug
   - QT_SELECT=qt4 ; CONFIG=full-static
   - QT_SELECT=qt5 ; CONFIG=minimal
   - QT_SELECT=qt5 ; CONFIG=minimal-static
   - QT_SELECT=qt5 ; CONFIG=full
+  - QT_SELECT=qt5 ; CONFIG=full-debug
   - QT_SELECT=qt5 ; CONFIG=full-static
 install:
   - tests/travis/install-build-depends
