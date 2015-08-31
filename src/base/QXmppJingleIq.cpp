@@ -897,21 +897,68 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 }
 /// \endcond
 
-QXmppJingleCandidate::QXmppJingleCandidate()
-    : m_component(0),
-    m_generation(0),
-    m_network(0),
-    m_port(0),
-    m_priority(0),
-    m_type(HostType)
+class QXmppJingleCandidatePrivate : public QSharedData
 {
+public:
+    QXmppJingleCandidatePrivate();
+
+    int component;
+    QString foundation;
+    int generation;
+    QHostAddress host;
+    QString id;
+    int network;
+    quint16 port;
+    QString protocol;
+    int priority;
+    QXmppJingleCandidate::Type type;
+};
+
+QXmppJingleCandidatePrivate::QXmppJingleCandidatePrivate()
+    : component(0)
+    , generation(0)
+    , network(0)
+    , port(0)
+    , priority(0)
+    , type(QXmppJingleCandidate::HostType)
+{
+}
+
+/// Constructs an empty candidate.
+
+QXmppJingleCandidate::QXmppJingleCandidate()
+    : d(new QXmppJingleCandidatePrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+
+QXmppJingleCandidate::QXmppJingleCandidate(const QXmppJingleCandidate &other)
+    : d(other.d)
+{
+}
+
+QXmppJingleCandidate::~QXmppJingleCandidate()
+{
+}
+
+/// Assigns the other candidate to this one.
+///
+/// \param other
+
+QXmppJingleCandidate& QXmppJingleCandidate::operator=(const QXmppJingleCandidate& other)
+{
+    d = other.d;
+    return *this;
 }
 
 /// Returns the candidate's component ID.
 
 int QXmppJingleCandidate::component() const
 {
-    return m_component;
+    return d->component;
 }
 
 /// Sets the candidates's component ID.
@@ -920,14 +967,14 @@ int QXmppJingleCandidate::component() const
 
 void QXmppJingleCandidate::setComponent(int component)
 {
-    m_component = component;
+    d->component = component;
 }
 
 /// Returns the candidate's foundation.
 
 QString QXmppJingleCandidate::foundation() const
 {
-    return m_foundation;
+    return d->foundation;
 }
 
 /// Sets the candidate's foundation.
@@ -936,14 +983,14 @@ QString QXmppJingleCandidate::foundation() const
 
 void QXmppJingleCandidate::setFoundation(const QString &foundation)
 {
-    m_foundation = foundation;
+    d->foundation = foundation;
 }
 
 /// Returns the candidate's generation.
 
 int QXmppJingleCandidate::generation() const
 {
-    return m_generation;
+    return d->generation;
 }
 
 /// Sets the candidate's generation.
@@ -952,7 +999,7 @@ int QXmppJingleCandidate::generation() const
 
 void QXmppJingleCandidate::setGeneration(int generation)
 {
-    m_generation = generation;
+    d->generation = generation;
 }
 
 /// Returns the candidate's host address.
@@ -960,7 +1007,7 @@ void QXmppJingleCandidate::setGeneration(int generation)
 
 QHostAddress QXmppJingleCandidate::host() const
 {
-    return m_host;
+    return d->host;
 }
 
 /// Sets the candidate's host address.
@@ -969,7 +1016,7 @@ QHostAddress QXmppJingleCandidate::host() const
 
 void QXmppJingleCandidate::setHost(const QHostAddress &host)
 {
-    m_host = host;
+    d->host = host;
 }
 
 /// Returns the candidate's unique identifier.
@@ -977,7 +1024,7 @@ void QXmppJingleCandidate::setHost(const QHostAddress &host)
 
 QString QXmppJingleCandidate::id() const
 {
-    return m_id;
+    return d->id;
 }
 
 /// Sets the candidate's unique identifier.
@@ -986,7 +1033,7 @@ QString QXmppJingleCandidate::id() const
 
 void QXmppJingleCandidate::setId(const QString &id)
 {
-    m_id = id;
+    d->id = id;
 }
 
 /// Returns the network index (starting at 0) the candidate is on.
@@ -994,7 +1041,7 @@ void QXmppJingleCandidate::setId(const QString &id)
 
 int QXmppJingleCandidate::network() const
 {
-    return m_network;
+    return d->network;
 }
 
 /// Sets the network index (starting at 0) the candidate is on.
@@ -1003,7 +1050,7 @@ int QXmppJingleCandidate::network() const
 
 void QXmppJingleCandidate::setNetwork(int network)
 {
-    m_network = network;
+    d->network = network;
 }
 
 /// Returns the candidate's port number.
@@ -1011,7 +1058,7 @@ void QXmppJingleCandidate::setNetwork(int network)
 
 quint16 QXmppJingleCandidate::port() const
 {
-    return m_port;
+    return d->port;
 }
 
 /// Sets the candidate's port number.
@@ -1020,7 +1067,7 @@ quint16 QXmppJingleCandidate::port() const
 
 void QXmppJingleCandidate::setPort(quint16 port)
 {
-    m_port = port;
+    d->port = port;
 }
 
 /// Returns the candidate's priority.
@@ -1028,7 +1075,7 @@ void QXmppJingleCandidate::setPort(quint16 port)
 
 int QXmppJingleCandidate::priority() const
 {
-    return m_priority;
+    return d->priority;
 }
 
 /// Sets the candidate's priority.
@@ -1037,7 +1084,7 @@ int QXmppJingleCandidate::priority() const
 
 void QXmppJingleCandidate::setPriority(int priority)
 {
-    m_priority = priority;
+    d->priority = priority;
 }
 
 /// Returns the candidate's protocol (e.g. "udp").
@@ -1045,7 +1092,7 @@ void QXmppJingleCandidate::setPriority(int priority)
 
 QString QXmppJingleCandidate::protocol() const
 {
-    return m_protocol;
+    return d->protocol;
 }
 
 /// Sets the candidate's protocol (e.g. "udp").
@@ -1054,7 +1101,7 @@ QString QXmppJingleCandidate::protocol() const
 
 void QXmppJingleCandidate::setProtocol(const QString &protocol)
 {
-    m_protocol = protocol;
+    d->protocol = protocol;
 }
 
 /// Returns the candidate type (e.g. "host").
@@ -1062,7 +1109,7 @@ void QXmppJingleCandidate::setProtocol(const QString &protocol)
 
 QXmppJingleCandidate::Type QXmppJingleCandidate::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 /// Sets the candidate type (e.g. "host").
@@ -1071,7 +1118,7 @@ QXmppJingleCandidate::Type QXmppJingleCandidate::type() const
 
 void QXmppJingleCandidate::setType(QXmppJingleCandidate::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// Returns true if the host address or port are empty.
@@ -1079,37 +1126,37 @@ void QXmppJingleCandidate::setType(QXmppJingleCandidate::Type type)
 
 bool QXmppJingleCandidate::isNull() const
 {
-    return m_host.isNull() || !m_port;
+    return d->host.isNull() || !d->port;
 }
 
 /// \cond
 void QXmppJingleCandidate::parse(const QDomElement &element)
 {
-    m_component = element.attribute("component").toInt();
-    m_foundation = element.attribute("foundation");
-    m_generation = element.attribute("generation").toInt();
-    m_host = QHostAddress(element.attribute("ip"));
-    m_id = element.attribute("id");
-    m_network = element.attribute("network").toInt();
-    m_port = element.attribute("port").toInt();
-    m_priority = element.attribute("priority").toInt();
-    m_protocol = element.attribute("protocol");
-    m_type = typeFromString(element.attribute("type"));
+    d->component = element.attribute("component").toInt();
+    d->foundation = element.attribute("foundation");
+    d->generation = element.attribute("generation").toInt();
+    d->host = QHostAddress(element.attribute("ip"));
+    d->id = element.attribute("id");
+    d->network = element.attribute("network").toInt();
+    d->port = element.attribute("port").toInt();
+    d->priority = element.attribute("priority").toInt();
+    d->protocol = element.attribute("protocol");
+    d->type = typeFromString(element.attribute("type"));
 }
 
 void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("candidate");
-    helperToXmlAddAttribute(writer, "component", QString::number(m_component));
-    helperToXmlAddAttribute(writer, "foundation", m_foundation);
-    helperToXmlAddAttribute(writer, "generation", QString::number(m_generation));
-    helperToXmlAddAttribute(writer, "id", m_id);
-    helperToXmlAddAttribute(writer, "ip", m_host.toString());
-    helperToXmlAddAttribute(writer, "network", QString::number(m_network));
-    helperToXmlAddAttribute(writer, "port", QString::number(m_port));
-    helperToXmlAddAttribute(writer, "priority", QString::number(m_priority));
-    helperToXmlAddAttribute(writer, "protocol", m_protocol);
-    helperToXmlAddAttribute(writer, "type", typeToString(m_type));
+    helperToXmlAddAttribute(writer, "component", QString::number(d->component));
+    helperToXmlAddAttribute(writer, "foundation", d->foundation);
+    helperToXmlAddAttribute(writer, "generation", QString::number(d->generation));
+    helperToXmlAddAttribute(writer, "id", d->id);
+    helperToXmlAddAttribute(writer, "ip", d->host.toString());
+    helperToXmlAddAttribute(writer, "network", QString::number(d->network));
+    helperToXmlAddAttribute(writer, "port", QString::number(d->port));
+    helperToXmlAddAttribute(writer, "priority", QString::number(d->priority));
+    helperToXmlAddAttribute(writer, "protocol", d->protocol);
+    helperToXmlAddAttribute(writer, "type", typeToString(d->type));
     writer->writeEndElement();
 }
 

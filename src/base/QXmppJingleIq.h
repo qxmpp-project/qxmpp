@@ -28,6 +28,7 @@
 
 #include "QXmppIq.h"
 
+class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 
@@ -98,6 +99,10 @@ public:
     };
 
     QXmppJingleCandidate();
+    QXmppJingleCandidate(const QXmppJingleCandidate &other);
+    ~QXmppJingleCandidate();
+
+    QXmppJingleCandidate& operator=(const QXmppJingleCandidate &other);
 
     int component() const;
     void setComponent(int component);
@@ -140,16 +145,7 @@ public:
     /// \endcond
 
 private:
-    int m_component;
-    QString m_foundation;
-    int m_generation;
-    QHostAddress m_host;
-    QString m_id;
-    int m_network;
-    quint16 m_port;
-    QString m_protocol;
-    int m_priority;
-    QXmppJingleCandidate::Type m_type;
+    QSharedDataPointer<QXmppJingleCandidatePrivate> d;
 };
 
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media
