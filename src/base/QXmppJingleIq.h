@@ -29,6 +29,7 @@
 #include "QXmppIq.h"
 
 class QXmppJingleIqContentPrivate;
+class QXmppJingleIqPrivate;
 
 /// \brief The QXmppJinglePayloadType class represents a payload type
 /// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
@@ -289,34 +290,30 @@ public:
     };
 
     QXmppJingleIq();
+    QXmppJingleIq(const QXmppJingleIq &other);
+    ~QXmppJingleIq();
 
     Action action() const;
     void setAction(Action action);
 
+    Content& content();
+    const Content& content() const;
+
     QString initiator() const;
     void setInitiator(const QString &initiator);
+
+    Reason& reason();
+    const Reason& reason() const;
 
     QString responder() const;
     void setResponder(const QString &responder);
 
-    QString sid() const;
-    void setSid(const QString &sid);
-
-    /// Returns a reference to the IQ's content element.
-    Content& content() { return m_content; };
-
-    /// Returns a const reference to the IQ's content element.
-    const Content& content() const { return m_content; };
-
-    /// Returns a reference to the IQ's reason element.
-    Reason& reason() { return m_reason; };
-
-    /// Returns a const reference to the IQ's reason element.
-    const Reason& reason() const { return m_reason; };
-
     // XEP-0167: Jingle RTP Sessions
     bool ringing() const;
     void setRinging(bool ringing);
+
+    QString sid() const;
+    void setSid(const QString &sid);
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);
@@ -329,14 +326,7 @@ protected:
     /// \endcond
 
 private:
-    Action m_action;
-    QString m_initiator;
-    QString m_responder;
-    QString m_sid;
-
-    Content m_content;
-    Reason m_reason;
-    bool m_ringing;
+    QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
 
 #endif

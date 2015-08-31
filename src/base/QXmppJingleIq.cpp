@@ -652,10 +652,40 @@ void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
 }
 /// \endcond
 
+class QXmppJingleIqPrivate : public QSharedData
+{
+public:
+    QXmppJingleIqPrivate();
+
+    QXmppJingleIq::Action action;
+    QString initiator;
+    QString responder;
+    QString sid;
+
+    QXmppJingleIq::Content content;
+    QXmppJingleIq::Reason reason;
+    bool ringing;
+};
+
+QXmppJingleIqPrivate::QXmppJingleIqPrivate()
+    : ringing(false)
+{
+}
+
 /// Constructs a QXmppJingleIq.
 
 QXmppJingleIq::QXmppJingleIq()
-    : m_ringing(false)
+    : d(new QXmppJingleIqPrivate())
+{
+}
+
+QXmppJingleIq::QXmppJingleIq(const QXmppJingleIq &other)
+    : QXmppIq(other)
+    , d(other.d)
+{
+}
+
+QXmppJingleIq::~QXmppJingleIq()
 {
 }
 
@@ -663,7 +693,7 @@ QXmppJingleIq::QXmppJingleIq()
 
 QXmppJingleIq::Action QXmppJingleIq::action() const
 {
-    return m_action;
+    return d->action;
 }
 
 /// Sets the Jingle IQ's action.
@@ -672,14 +702,28 @@ QXmppJingleIq::Action QXmppJingleIq::action() const
 
 void QXmppJingleIq::setAction(QXmppJingleIq::Action action)
 {
-    m_action = action;
+    d->action = action;
+}
+
+/// Returns a reference to the IQ's content element.
+
+QXmppJingleIq::Content& QXmppJingleIq::content()
+{
+    return d->content;
+}
+
+/// Returns a const reference to the IQ's content element.
+
+const QXmppJingleIq::Content& QXmppJingleIq::content() const
+{
+    return d->content;
 }
 
 /// Returns the session initiator.
 
 QString QXmppJingleIq::initiator() const
 {
-    return m_initiator;
+    return d->initiator;
 }
 
 /// Sets the session initiator.
@@ -688,14 +732,28 @@ QString QXmppJingleIq::initiator() const
 
 void QXmppJingleIq::setInitiator(const QString &initiator)
 {
-    m_initiator = initiator;
+    d->initiator = initiator;
+}
+
+/// Returns a reference to the IQ's reason element.
+
+QXmppJingleIq::Reason& QXmppJingleIq::reason()
+{
+    return d->reason;
+}
+
+/// Returns a const reference to the IQ's reason element.
+
+const QXmppJingleIq::Reason& QXmppJingleIq::reason() const
+{
+    return d->reason;
 }
 
 /// Returns the session responder.
 
 QString QXmppJingleIq::responder() const
 {
-    return m_responder;
+    return d->responder;
 }
 
 /// Sets the session responder.
@@ -704,30 +762,14 @@ QString QXmppJingleIq::responder() const
 
 void QXmppJingleIq::setResponder(const QString &responder)
 {
-    m_responder = responder;
-}
-
-/// Returns the session ID.
-
-QString QXmppJingleIq::sid() const
-{
-    return m_sid;
-}
-
-/// Sets the session ID.
-///
-/// \param sid
-
-void QXmppJingleIq::setSid(const QString &sid)
-{
-    m_sid = sid;
+    d->responder = responder;
 }
 
 /// Returns true if the call is ringing.
 
 bool QXmppJingleIq::ringing() const
 {
-    return m_ringing;
+    return d->ringing;
 }
 
 /// Set to true if the call is ringing.
@@ -736,7 +778,23 @@ bool QXmppJingleIq::ringing() const
 
 void QXmppJingleIq::setRinging(bool ringing)
 {
-    m_ringing = ringing;
+    d->ringing = ringing;
+}
+
+/// Returns the session ID.
+
+QString QXmppJingleIq::sid() const
+{
+    return d->sid;
+}
+
+/// Sets the session ID.
+///
+/// \param sid
+
+void QXmppJingleIq::setSid(const QString &sid)
+{
+    d->sid = sid;
 }
 
 /// \cond
@@ -750,43 +808,40 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement jingleElement = element.firstChildElement("jingle");
     const QString action = jingleElement.attribute("action");
-    for (int i = ContentAccept; i <= TransportReplace; i++)
-    {
-        if (action == jingle_actions[i])
-        {
-            m_action = static_cast<Action>(i);
+    for (int i = ContentAccept; i <= TransportReplace; i++) {
+        if (action == jingle_actions[i]) {
+            d->action = static_cast<Action>(i);
             break;
         }
     }
-    m_initiator = jingleElement.attribute("initiator");
-    m_responder = jingleElement.attribute("responder");
-    m_sid = jingleElement.attribute("sid");
+    d->initiator = jingleElement.attribute("initiator");
+    d->responder = jingleElement.attribute("responder");
+    d->sid = jingleElement.attribute("sid");
 
     // content
     QDomElement contentElement = jingleElement.firstChildElement("content");
-    m_content.parse(contentElement);
+    d->content.parse(contentElement);
     QDomElement reasonElement = jingleElement.firstChildElement("reason");
-    m_reason.parse(reasonElement);
+    d->reason.parse(reasonElement);
 
     // ringing
     QDomElement ringingElement = jingleElement.firstChildElement("ringing");
-    m_ringing = (ringingElement.namespaceURI() == ns_jingle_rtp_info);
+    d->ringing = (ringingElement.namespaceURI() == ns_jingle_rtp_info);
 }
 
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("jingle");
     writer->writeAttribute("xmlns", ns_jingle);
-    helperToXmlAddAttribute(writer, "action", jingle_actions[m_action]);
-    helperToXmlAddAttribute(writer, "initiator", m_initiator);
-    helperToXmlAddAttribute(writer, "responder", m_responder);
-    helperToXmlAddAttribute(writer, "sid", m_sid);
-    m_content.toXml(writer);
-    m_reason.toXml(writer);
+    helperToXmlAddAttribute(writer, "action", jingle_actions[d->action]);
+    helperToXmlAddAttribute(writer, "initiator", d->initiator);
+    helperToXmlAddAttribute(writer, "responder", d->responder);
+    helperToXmlAddAttribute(writer, "sid", d->sid);
+    d->content.toXml(writer);
+    d->reason.toXml(writer);
 
     // ringing
-    if (m_ringing)
-    {
+    if (d->ringing) {
         writer->writeStartElement("ringing");
         writer->writeAttribute("xmlns", ns_jingle_rtp_info);
         writer->writeEndElement();
