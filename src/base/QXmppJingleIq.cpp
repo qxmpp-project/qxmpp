@@ -708,6 +708,10 @@ QXmppJingleIq::QXmppJingleIq()
 {
 }
 
+/// Constructs a copy of other.
+///
+/// \param other
+
 QXmppJingleIq::QXmppJingleIq(const QXmppJingleIq &other)
     : QXmppIq(other)
     , d(other.d)
@@ -744,7 +748,7 @@ void QXmppJingleIq::setAction(QXmppJingleIq::Action action)
     d->action = action;
 }
 
-// Adds an element to the IQ's content elements.
+/// Adds an element to the IQ's content elements.
 
 void QXmppJingleIq::addContent(const QXmppJingleIq::Content &content)
 {
@@ -1211,12 +1215,44 @@ QString QXmppJingleCandidate::typeToString(QXmppJingleCandidate::Type type)
 }
 /// \endcond
 
+class QXmppJinglePayloadTypePrivate : public QSharedData
+{
+public:
+    QXmppJinglePayloadTypePrivate();
+
+    unsigned char channels;
+    unsigned int clockrate;
+    unsigned char id;
+    unsigned int maxptime;
+    QString name;
+    QMap<QString, QString> parameters;
+    unsigned int ptime;
+};
+
+QXmppJinglePayloadTypePrivate::QXmppJinglePayloadTypePrivate()
+    : channels(1)
+    , clockrate(0)
+    , id(0)
+    , maxptime(0)
+    , ptime(0)
+{
+}
+
 QXmppJinglePayloadType::QXmppJinglePayloadType()
-    : m_channels(1),
-    m_clockrate(0),
-    m_id(0),
-    m_maxptime(0),
-    m_ptime(0)
+    : d(new QXmppJinglePayloadTypePrivate())
+{
+}
+
+/// Constructs a copy of other.
+///
+/// \param other
+
+QXmppJinglePayloadType::QXmppJinglePayloadType(const QXmppJinglePayloadType &other)
+    : d(other.d)
+{
+}
+
+QXmppJinglePayloadType::~QXmppJinglePayloadType()
 {
 }
 
@@ -1225,7 +1261,7 @@ QXmppJinglePayloadType::QXmppJinglePayloadType()
 
 unsigned char QXmppJinglePayloadType::channels() const
 {
-    return m_channels;
+    return d->channels;
 }
 
 /// Sets the number of channels (e.g. 1 for mono, 2 for stereo).
@@ -1234,7 +1270,7 @@ unsigned char QXmppJinglePayloadType::channels() const
 
 void QXmppJinglePayloadType::setChannels(unsigned char channels)
 {
-    m_channels = channels;
+    d->channels = channels;
 }
 
 /// Returns the clockrate in Hz, i.e. the number of samples per second.
@@ -1242,7 +1278,7 @@ void QXmppJinglePayloadType::setChannels(unsigned char channels)
 
 unsigned int QXmppJinglePayloadType::clockrate() const
 {
-    return m_clockrate;
+    return d->clockrate;
 }
 
 /// Sets the clockrate in Hz, i.e. the number of samples per second.
@@ -1251,7 +1287,7 @@ unsigned int QXmppJinglePayloadType::clockrate() const
 
 void QXmppJinglePayloadType::setClockrate(unsigned int clockrate)
 {
-    m_clockrate = clockrate;
+    d->clockrate = clockrate;
 }
 
 /// Returns the payload type identifier.
@@ -1259,7 +1295,7 @@ void QXmppJinglePayloadType::setClockrate(unsigned int clockrate)
 
 unsigned char QXmppJinglePayloadType::id() const
 {
-    return m_id;
+    return d->id;
 }
 
 /// Sets the payload type identifier.
@@ -1268,7 +1304,7 @@ unsigned char QXmppJinglePayloadType::id() const
 void QXmppJinglePayloadType::setId(unsigned char id)
 {
     Q_ASSERT(id <= 127);
-    m_id = id;
+    d->id = id;
 }
 
 /// Returns the maximum packet time in milliseconds.
@@ -1276,7 +1312,7 @@ void QXmppJinglePayloadType::setId(unsigned char id)
 
 unsigned int QXmppJinglePayloadType::maxptime() const
 {
-    return m_maxptime;
+    return d->maxptime;
 }
 
 /// Sets the maximum packet type in milliseconds.
@@ -1285,7 +1321,7 @@ unsigned int QXmppJinglePayloadType::maxptime() const
 
 void QXmppJinglePayloadType::setMaxptime(unsigned int maxptime)
 {
-    m_maxptime = maxptime;
+    d->maxptime = maxptime;
 }
 
 /// Returns the payload type name.
@@ -1293,7 +1329,7 @@ void QXmppJinglePayloadType::setMaxptime(unsigned int maxptime)
 
 QString QXmppJinglePayloadType::name() const
 {
-    return m_name;
+    return d->name;
 }
 
 /// Sets the payload type name.
@@ -1302,21 +1338,21 @@ QString QXmppJinglePayloadType::name() const
 
 void QXmppJinglePayloadType::setName(const QString &name)
 {
-    m_name = name;
+    d->name = name;
 }
 
 /// Returns the payload parameters.
 
 QMap<QString,QString> QXmppJinglePayloadType::parameters() const
 {
-    return m_parameters;
+    return d->parameters;
 }
 
 /// Sets the payload parameters.
 
 void QXmppJinglePayloadType::setParameters(const QMap<QString, QString> &parameters)
 {
-    m_parameters = parameters;
+    d->parameters = parameters;
 }
 
 /// Returns the packet time in milliseconds (20 by default).
@@ -1324,7 +1360,7 @@ void QXmppJinglePayloadType::setParameters(const QMap<QString, QString> &paramet
 
 unsigned int QXmppJinglePayloadType::ptime() const
 {
-    return m_ptime ? m_ptime : 20;
+    return d->ptime ? d->ptime : 20;
 }
 
 /// Sets the packet time in milliseconds (20 by default).
@@ -1333,24 +1369,24 @@ unsigned int QXmppJinglePayloadType::ptime() const
 
 void QXmppJinglePayloadType::setPtime(unsigned int ptime)
 {
-    m_ptime = ptime;
+    d->ptime = ptime;
 }
 
 /// \cond
 void QXmppJinglePayloadType::parse(const QDomElement &element)
 {
-    m_id = element.attribute("id").toInt();
-    m_name = element.attribute("name");
-    m_channels = element.attribute("channels").toInt();
-    if (!m_channels)
-        m_channels = 1;
-    m_clockrate = element.attribute("clockrate").toInt();
-    m_maxptime = element.attribute("maxptime").toInt();
-    m_ptime = element.attribute("ptime").toInt();
+    d->id = element.attribute("id").toInt();
+    d->name = element.attribute("name");
+    d->channels = element.attribute("channels").toInt();
+    if (!d->channels)
+        d->channels = 1;
+    d->clockrate = element.attribute("clockrate").toInt();
+    d->maxptime = element.attribute("maxptime").toInt();
+    d->ptime = element.attribute("ptime").toInt();
 
     QDomElement child = element.firstChildElement("parameter");
     while (!child.isNull()) {
-        m_parameters.insert(child.attribute("name"), child.attribute("value"));
+        d->parameters.insert(child.attribute("name"), child.attribute("value"));
         child = child.nextSiblingElement("parameter");
     }
 }
@@ -1358,26 +1394,36 @@ void QXmppJinglePayloadType::parse(const QDomElement &element)
 void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("payload-type");
-    helperToXmlAddAttribute(writer, "id", QString::number(m_id));
-    helperToXmlAddAttribute(writer, "name", m_name);
-    if (m_channels > 1)
-        helperToXmlAddAttribute(writer, "channels", QString::number(m_channels));
-    if (m_clockrate > 0)
-        helperToXmlAddAttribute(writer, "clockrate", QString::number(m_clockrate));
-    if (m_maxptime > 0)
-        helperToXmlAddAttribute(writer, "maxptime", QString::number(m_maxptime));
-    if (m_ptime > 0)
-        helperToXmlAddAttribute(writer, "ptime", QString::number(m_ptime));
+    helperToXmlAddAttribute(writer, "id", QString::number(d->id));
+    helperToXmlAddAttribute(writer, "name", d->name);
+    if (d->channels > 1)
+        helperToXmlAddAttribute(writer, "channels", QString::number(d->channels));
+    if (d->clockrate > 0)
+        helperToXmlAddAttribute(writer, "clockrate", QString::number(d->clockrate));
+    if (d->maxptime > 0)
+        helperToXmlAddAttribute(writer, "maxptime", QString::number(d->maxptime));
+    if (d->ptime > 0)
+        helperToXmlAddAttribute(writer, "ptime", QString::number(d->ptime));
 
-    foreach (const QString &key, m_parameters.keys()) {
+    foreach (const QString &key, d->parameters.keys()) {
         writer->writeStartElement("parameter");
         writer->writeAttribute("name", key);
-        writer->writeAttribute("value", m_parameters.value(key));
+        writer->writeAttribute("value", d->parameters.value(key));
         writer->writeEndElement();
     }
     writer->writeEndElement();
 }
 /// \endcond
+
+/// Assigns the other payload type to this one.
+///
+/// \param other
+
+QXmppJinglePayloadType& QXmppJinglePayloadType::operator=(const QXmppJinglePayloadType& other)
+{
+    d = other.d;
+    return *this;
+}
 
 /// Returns true if this QXmppJinglePayloadType and \a other refer to the same payload type.
 ///
@@ -1386,10 +1432,10 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
 bool QXmppJinglePayloadType::operator==(const QXmppJinglePayloadType &other) const
 {
     // FIXME : what to do with m_ptime and m_maxptime?
-    if (m_id <= 95)
-        return other.m_id == m_id && other.m_clockrate == m_clockrate;
+    if (d->id <= 95)
+        return other.d->id == d->id && other.d->clockrate == d->clockrate;
     else
-        return other.m_channels == m_channels &&
-               other.m_clockrate == m_clockrate &&
-               other.m_name.toLower() == m_name.toLower();
+        return other.d->channels == d->channels &&
+               other.d->clockrate == d->clockrate &&
+               other.d->name.toLower() == d->name.toLower();
 }

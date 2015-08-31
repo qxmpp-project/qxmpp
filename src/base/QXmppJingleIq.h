@@ -31,6 +31,7 @@
 class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
+class QXmppJinglePayloadTypePrivate;
 
 /// \brief The QXmppJinglePayloadType class represents a payload type
 /// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
@@ -40,6 +41,8 @@ class QXMPP_EXPORT QXmppJinglePayloadType
 {
 public:
     QXmppJinglePayloadType();
+    QXmppJinglePayloadType(const QXmppJinglePayloadType &other);
+    ~QXmppJinglePayloadType();
 
     unsigned char channels() const;
     void setChannels(unsigned char channels);
@@ -67,16 +70,11 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
+    QXmppJinglePayloadType& operator=(const QXmppJinglePayloadType &other);
     bool operator==(const QXmppJinglePayloadType &other) const;
 
 private:
-    unsigned char m_channels;
-    unsigned int m_clockrate;
-    unsigned char m_id;
-    unsigned int m_maxptime;
-    QString m_name;
-    QMap<QString, QString> m_parameters;
-    unsigned int m_ptime;
+    QSharedDataPointer<QXmppJinglePayloadTypePrivate> d;
 };
 
 /// \brief The QXmppJingleCandidate class represents a transport candidate
