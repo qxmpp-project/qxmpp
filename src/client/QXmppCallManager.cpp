@@ -486,7 +486,7 @@ void QXmppCall::accept()
         iq.setAction(QXmppJingleIq::SessionAccept);
         iq.setResponder(d->ownJid);
         iq.setSid(d->sid);
-        iq.addContent(localContent(stream));
+        iq.addContent(d->localContent(stream));
         d->sendRequest(iq);
 
         // notify user
