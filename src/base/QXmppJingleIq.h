@@ -191,6 +191,8 @@ public:
         Content(const QXmppJingleIq::Content &other);
         ~Content();
 
+        Content& operator=(const Content &other);
+
         QString creator() const;
         void setCreator(const QString &creator);
 
@@ -293,6 +295,8 @@ public:
     QXmppJingleIq();
     QXmppJingleIq(const QXmppJingleIq &other);
     ~QXmppJingleIq();
+
+    QXmppJingleIq& operator=(const QXmppJingleIq &other);
 
     Action action() const;
     void setAction(Action action);

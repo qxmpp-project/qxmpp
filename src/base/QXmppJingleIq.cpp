@@ -175,14 +175,30 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 {
 }
 
+/// Constructs an empty content.
+
 QXmppJingleIq::Content::Content()
     : d(new QXmppJingleIqContentPrivate())
 {
 }
 
+/// Constructs a copy of other.
+///
+/// \param other
+
 QXmppJingleIq::Content::Content(const QXmppJingleIq::Content &other)
     : d(other.d)
 {
+}
+
+/// Assigns the other content to this one.
+///
+/// \param other
+
+QXmppJingleIq::Content& QXmppJingleIq::Content::operator=(const QXmppJingleIq::Content& other)
+{
+    d = other.d;
+    return *this;
 }
 
 QXmppJingleIq::Content::~Content()
@@ -693,6 +709,16 @@ QXmppJingleIq::QXmppJingleIq(const QXmppJingleIq &other)
 
 QXmppJingleIq::~QXmppJingleIq()
 {
+}
+
+/// Assigns the other Jingle IQ to this one.
+///
+/// \param other
+
+QXmppJingleIq& QXmppJingleIq::operator=(const QXmppJingleIq& other)
+{
+    d = other.d;
+    return *this;
 }
 
 /// Returns the Jingle IQ's action.
