@@ -344,8 +344,9 @@ void tst_QXmppJingleIq::testSession()
     QCOMPARE(session.action(), QXmppJingleIq::SessionInitiate);
     QCOMPARE(session.initiator(), QLatin1String("romeo@montague.lit/orchard"));
     QCOMPARE(session.sid(), QLatin1String("a73sjjvkla37jfea"));
-    QCOMPARE(session.content().creator(), QLatin1String("initiator"));
-    QCOMPARE(session.content().name(), QLatin1String("this-is-a-stub"));
+    QCOMPARE(session.contents().size(), 1);
+    QCOMPARE(session.contents()[0].creator(), QLatin1String("initiator"));
+    QCOMPARE(session.contents()[0].name(), QLatin1String("this-is-a-stub"));
     QCOMPARE(session.reason().text(), QString());
     QCOMPARE(session.reason().type(), QXmppJingleIq::Reason::None);
     serializePacket(session, xml);

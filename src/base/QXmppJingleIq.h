@@ -213,6 +213,7 @@ public:
 
         void addTransportCandidate(const QXmppJingleCandidate &candidate);
         QList<QXmppJingleCandidate> transportCandidates() const;
+        void setTransportCandidates(const QList<QXmppJingleCandidate> &candidates);
 
         QString transportUser() const;
         void setTransportUser(const QString &user);
@@ -296,8 +297,9 @@ public:
     Action action() const;
     void setAction(Action action);
 
-    Content& content();
-    const Content& content() const;
+    void addContent(const Content &content);
+    QList<Content> contents() const;
+    void setContents(const QList<Content> &contents);
 
     QString initiator() const;
     void setInitiator(const QString &initiator);

@@ -267,6 +267,12 @@ QList<QXmppJingleCandidate> QXmppJingleIq::Content::transportCandidates() const
     return d->transportCandidates;
 }
 
+void QXmppJingleIq::Content::setTransportCandidates(const QList<QXmppJingleCandidate> &candidates)
+{
+    d->transportType = candidates.isEmpty() ? QString() : ns_jingle_ice_udp;
+    d->transportCandidates = candidates;
+}
+
 QString QXmppJingleIq::Content::transportUser() const
 {
     return d->transportUser;
@@ -662,7 +668,7 @@ public:
     QString responder;
     QString sid;
 
-    QXmppJingleIq::Content content;
+    QList<QXmppJingleIq::Content> contents;
     QXmppJingleIq::Reason reason;
     bool ringing;
 };
@@ -705,18 +711,25 @@ void QXmppJingleIq::setAction(QXmppJingleIq::Action action)
     d->action = action;
 }
 
-/// Returns a reference to the IQ's content element.
+// Adds an element to the IQ's content elements.
 
-QXmppJingleIq::Content& QXmppJingleIq::content()
+void QXmppJingleIq::addContent(const QXmppJingleIq::Content &content)
 {
-    return d->content;
+    d->contents << content;
 }
 
-/// Returns a const reference to the IQ's content element.
+/// Returns the IQ's content elements.
 
-const QXmppJingleIq::Content& QXmppJingleIq::content() const
+QList<QXmppJingleIq::Content> QXmppJingleIq::contents() const
 {
-    return d->content;
+    return d->contents;
+}
+
+/// Sets the IQ's content elements.
+
+void QXmppJingleIq::setContents(const QList<QXmppJingleIq::Content> &contents)
+{
+    d->contents = contents;
 }
 
 /// Returns the session initiator.
@@ -819,8 +832,14 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
     d->sid = jingleElement.attribute("sid");
 
     // content
+    d->contents.clear();
     QDomElement contentElement = jingleElement.firstChildElement("content");
-    d->content.parse(contentElement);
+    while (!contentElement.isNull()) {
+        QXmppJingleIq::Content content;
+        content.parse(contentElement);
+        addContent(content);
+        contentElement = contentElement.nextSiblingElement("content");
+    }
     QDomElement reasonElement = jingleElement.firstChildElement("reason");
     d->reason.parse(reasonElement);
 
@@ -837,7 +856,8 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "initiator", d->initiator);
     helperToXmlAddAttribute(writer, "responder", d->responder);
     helperToXmlAddAttribute(writer, "sid", d->sid);
-    d->content.toXml(writer);
+    foreach (const QXmppJingleIq::Content &content, d->contents)
+        content.toXml(writer);
     d->reason.toXml(writer);
 
     // ringing
