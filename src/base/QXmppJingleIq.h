@@ -249,6 +249,7 @@ public:
     class QXMPP_EXPORT Reason
     {
     public:
+        /// This enum is used to describe a reason's type.
         enum Type {
             None,
             AlternativeSession,

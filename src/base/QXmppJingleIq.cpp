@@ -619,7 +619,6 @@ QString QXmppJingleIq::Content::toSdp() const
     return sdp.join("\r\n") + "\r\n";
 }
 
-
 /// \endcond
 
 QXmppJingleIq::Reason::Reason()
@@ -627,20 +626,28 @@ QXmppJingleIq::Reason::Reason()
 {
 }
 
+/// Returns the reason's textual description.
+
 QString QXmppJingleIq::Reason::text() const
 {
     return m_text;
 }
+
+/// Sets the reason's textual description.
 
 void QXmppJingleIq::Reason::setText(const QString &text)
 {
     m_text = text;
 }
 
+/// Gets the reason's type.
+
 QXmppJingleIq::Reason::Type QXmppJingleIq::Reason::type() const
 {
     return m_type;
 }
+
+/// Sets the reason's type.
 
 void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
 {
