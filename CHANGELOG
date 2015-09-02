@@ -1,3 +1,9 @@
+QXmpp 0.9.2 (Sep 2, 2015)
+-------------------------
+
+  - Fix build error for debug builds.
+  - Allow QXmppJingleIq to have multiple contents.
+
 QXmpp 0.9.1 (Aug 30, 2015)
 --------------------------
 
