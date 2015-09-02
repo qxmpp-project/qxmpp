@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-QMAKE_ARGS="QXMPP_PROFILE=true"
+QMAKE_ARGS=""
 
 if [ -n "$CC" ]; then
     QMAKE_ARGS="$QMAKE_ARGS QMAKE_CC=$CC"
@@ -36,15 +36,3 @@ make VERBOSE=1
 
 # run tests
 make check
-exit 0
-
-# generate coverage report
-TRACEFILE=coverage.info
-rm -f $TRACEFILE
-lcov --capture --directory src -o $TRACEFILE --no-external
-lcov --remove $TRACEFILE \*moc_\* -o $TRACEFILE.clean
-mv $TRACEFILE.clean $TRACEFILE
-
-rm -rf coverage
-genhtml -o coverage $TRACEFILE
-echo "ok"
