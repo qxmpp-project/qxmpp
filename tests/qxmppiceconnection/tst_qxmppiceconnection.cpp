@@ -51,7 +51,9 @@ void tst_QXmppIceConnection::testBind()
     QXmppIceComponent *component = client.component(componentId);
     QVERIFY(component);
 
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::NewGatheringState);
     client.bind(QXmppIceComponent::discoverAddresses());
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
     foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
@@ -80,13 +82,17 @@ void tst_QXmppIceConnection::testBindStun()
     QXmppIceComponent *component = client.component(componentId);
     QVERIFY(component);
 
-    QEventLoop loop;
-    connect(&client, SIGNAL(localCandidatesChanged()),
-            &loop, SLOT(quit()));
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::NewGatheringState);
     client.bind(QXmppIceComponent::discoverAddresses());
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::BusyGatheringState);
+
+    QEventLoop loop;
+    connect(&client, SIGNAL(gatheringStateChanged()),
+            &loop, SLOT(quit()));
     loop.exec();
 
     bool foundReflexive = false;
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
     foreach (const QXmppJingleCandidate &c, client.localCandidates()) {

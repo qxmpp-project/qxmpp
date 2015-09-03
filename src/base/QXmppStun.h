@@ -186,6 +186,7 @@ private slots:
     void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port);
     void turnConnected();
     void transactionFinished();
+    void updateGatheringState();
     void writeStun(const QXmppStunMessage &request);
 
 signals:
@@ -194,6 +195,9 @@ signals:
 
     /// \brief This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &datagram);
+
+    /// \internal This signal is emitted when the gathering state of local candidates changes.
+    void gatheringStateChanged();
 
     /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
@@ -237,8 +241,17 @@ private:
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(GatheringState)
+    Q_PROPERTY(QXmppIceConnection::GatheringState gatheringState READ gatheringState NOTIFY gatheringStateChanged)
 
 public:
+    enum GatheringState
+    {
+        NewGatheringState,
+        BusyGatheringState,
+        CompleteGatheringState
+    };
+
     QXmppIceConnection(QObject *parent = 0);
     ~QXmppIceConnection();
 
@@ -262,12 +275,17 @@ public:
     bool bind(const QList<QHostAddress> &addresses);
     bool isConnected() const;
 
+    GatheringState gatheringState() const;
+
 signals:
     /// \brief This signal is emitted once ICE negotiation succeeds.
     void connected();
 
     /// \brief This signal is emitted when ICE negotiation fails.
     void disconnected();
+
+    /// \brief This signal is emitted when the gathering state of local candidates changes.
+    void gatheringStateChanged();
 
     /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
@@ -278,6 +296,7 @@ public slots:
 
 private slots:
     void slotConnected();
+    void slotGatheringStateChanged();
     void slotTimeout();
 
 private:
