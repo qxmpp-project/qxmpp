@@ -54,6 +54,8 @@ public:
     Stream *createStream(const QString &media);
     Stream *findStreamByMedia(const QString &media);
     Stream *findStreamByName(const QString &name);
+    QXmppJingleIq::Content localContent(QXmppCallPrivate::Stream *stream) const;
+
     void handleAck(const QXmppIq &iq);
     bool handleDescription(QXmppCallPrivate::Stream *stream, const QXmppJingleIq::Content &content);
     void handleRequest(const QXmppJingleIq &iq);
@@ -171,6 +173,8 @@ bool QXmppCallPrivate::handleTransport(QXmppCallPrivate::Stream *stream, const Q
 
 void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 {
+    const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
+
     if (iq.action() == QXmppJingleIq::SessionAccept) {
 
         if (direction == QXmppCall::IncomingDirection) {
@@ -182,10 +186,10 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // check content description and transport
-        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        QXmppCallPrivate::Stream *stream = findStreamByName(content.name());
         if (!stream ||
-            !handleDescription(stream, iq.content()) ||
-            !handleTransport(stream, iq.content())) {
+            !handleDescription(stream, content) ||
+            !handleTransport(stream, content)) {
 
             // terminate call
             terminate(QXmppJingleIq::Reason::FailedApplication);
@@ -215,10 +219,10 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // check content description and transport
-        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        QXmppCallPrivate::Stream *stream = findStreamByName(content.name());
         if (!stream ||
-            !handleDescription(stream, iq.content()) ||
-            !handleTransport(stream, iq.content())) {
+            !handleDescription(stream, content) ||
+            !handleTransport(stream, content)) {
 
             // FIXME: what action?
             return;
@@ -230,20 +234,20 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // check media stream does not exist yet
-        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        QXmppCallPrivate::Stream *stream = findStreamByName(content.name());
         if (stream)
             return;
 
         // create media stream
-        stream = createStream(iq.content().descriptionMedia());
+        stream = createStream(content.descriptionMedia());
         if (!stream)
             return;
-        stream->creator = iq.content().creator();
-        stream->name = iq.content().name();
+        stream->creator = content.creator();
+        stream->name = content.name();
 
         // check content description
-        if (!handleDescription(stream, iq.content()) ||
-            !handleTransport(stream, iq.content())) {
+        if (!handleDescription(stream, content) ||
+            !handleTransport(stream, content)) {
 
             QXmppJingleIq iq;
             iq.setTo(q->jid());
@@ -263,21 +267,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         iq.setType(QXmppIq::Set);
         iq.setAction(QXmppJingleIq::ContentAccept);
         iq.setSid(q->sid());
-        iq.content().setCreator(stream->creator);
-        iq.content().setName(stream->name);
-
-        // description
-        iq.content().setDescriptionMedia(stream->media);
-        iq.content().setDescriptionSsrc(stream->channel->localSsrc());
-        foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
-            iq.content().addPayloadType(payload);
-
-        // transport
-        iq.content().setTransportUser(stream->connection->localUser());
-        iq.content().setTransportPassword(stream->connection->localPassword());
-        foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
-            iq.content().addTransportCandidate(candidate);
-
+        iq.addContent(localContent(stream));
         sendRequest(iq);
 
     } else if (iq.action() == QXmppJingleIq::TransportInfo) {
@@ -286,9 +276,9 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // check content transport
-        QXmppCallPrivate::Stream *stream = findStreamByName(iq.content().name());
+        QXmppCallPrivate::Stream *stream = findStreamByName(content.name());
         if (!stream ||
-            !handleTransport(stream, iq.content())) {
+            !handleTransport(stream, content)) {
             // FIXME: what action?
             return;
         }
@@ -363,6 +353,26 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     return stream;
 }
 
+QXmppJingleIq::Content QXmppCallPrivate::localContent(QXmppCallPrivate::Stream *stream) const
+{
+    QXmppJingleIq::Content content;
+    content.setCreator(stream->creator);
+    content.setName(stream->name);
+    content.setSenders("both");
+
+    // description
+    content.setDescriptionMedia(stream->media);
+    content.setDescriptionSsrc(stream->channel->localSsrc());
+    content.setPayloadTypes(stream->channel->localPayloadTypes());
+
+    // transport
+    content.setTransportUser(stream->connection->localUser());
+    content.setTransportPassword(stream->connection->localPassword());
+    content.setTransportCandidates(stream->connection->localCandidates());
+
+    return content;
+}
+
 /// Sends an acknowledgement for a Jingle IQ.
 ///
 
@@ -377,31 +387,17 @@ bool QXmppCallPrivate::sendAck(const QXmppJingleIq &iq)
 
 bool QXmppCallPrivate::sendInvite()
 {
+    // create audio stream
+    QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
+    Q_ASSERT(stream);
+
     QXmppJingleIq iq;
     iq.setTo(jid);
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::SessionInitiate);
     iq.setInitiator(ownJid);
     iq.setSid(sid);
-
-    // create audio stream
-    QXmppCallPrivate::Stream *stream = findStreamByMedia(AUDIO_MEDIA);
-    Q_ASSERT(stream);
-    iq.content().setCreator(stream->creator);
-    iq.content().setName(stream->name);
-    iq.content().setSenders("both");
-
-    // description
-    iq.content().setDescriptionMedia(stream->media);
-    foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
-        iq.content().addPayloadType(payload);
-
-    // transport
-    iq.content().setTransportUser(stream->connection->localUser());
-    iq.content().setTransportPassword(stream->connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
-        iq.content().addTransportCandidate(candidate);
-
+    iq.addContent(localContent(stream));
     return sendRequest(iq);
 }
 
@@ -490,20 +486,7 @@ void QXmppCall::accept()
         iq.setAction(QXmppJingleIq::SessionAccept);
         iq.setResponder(d->ownJid);
         iq.setSid(d->sid);
-        iq.content().setCreator(stream->creator);
-        iq.content().setName(stream->name);
-
-        // description
-        iq.content().setDescriptionMedia(stream->media);
-        foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
-            iq.content().addPayloadType(payload);
-
-        // transport
-        iq.content().setTransportUser(stream->connection->localUser());
-        iq.content().setTransportPassword(stream->connection->localPassword());
-        foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
-            iq.content().addTransportCandidate(candidate);
-
+        iq.addContent(d->localContent(stream));
         d->sendRequest(iq);
 
         // notify user
@@ -605,16 +588,7 @@ void QXmppCall::localCandidatesChanged()
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::TransportInfo);
     iq.setSid(d->sid);
-
-    iq.content().setCreator(stream->creator);
-    iq.content().setName(stream->name);
-
-    // transport
-    iq.content().setTransportUser(stream->connection->localUser());
-    iq.content().setTransportPassword(stream->connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
-        iq.content().addTransportCandidate(candidate);
-
+    iq.addContent(d->localContent(stream));
     d->sendRequest(iq);
 }
 
@@ -700,21 +674,7 @@ void QXmppCall::startVideo()
     iq.setType(QXmppIq::Set);
     iq.setAction(QXmppJingleIq::ContentAdd);
     iq.setSid(d->sid);
-    iq.content().setCreator(stream->creator);
-    iq.content().setName(stream->name);
-    iq.content().setSenders("both");
-
-    // description
-    iq.content().setDescriptionMedia(stream->media);
-    foreach (const QXmppJinglePayloadType &payload, stream->channel->localPayloadTypes())
-        iq.content().addPayloadType(payload);
-
-    // transport
-    iq.content().setTransportUser(stream->connection->localUser());
-    iq.content().setTransportPassword(stream->connection->localPassword());
-    foreach (const QXmppJingleCandidate &candidate, stream->connection->localCandidates())
-        iq.content().addTransportCandidate(candidate);
-
+    iq.addContent(d->localContent(stream));
     d->sendRequest(iq);
 }
 
@@ -939,18 +899,19 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
         call->d->sid = iq.sid();
 
-        QXmppCallPrivate::Stream *stream = call->d->findStreamByMedia(iq.content().descriptionMedia());
+        const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
+        QXmppCallPrivate::Stream *stream = call->d->findStreamByMedia(content.descriptionMedia());
         if (!stream)
             return;
-        stream->creator = iq.content().creator();
-        stream->name = iq.content().name();
+        stream->creator = content.creator();
+        stream->name = content.name();
 
         // send ack
         call->d->sendAck(iq);
 
         // check content description and transport
-        if (!call->d->handleDescription(stream, iq.content()) ||
-            !call->d->handleTransport(stream, iq.content())) {
+        if (!call->d->handleDescription(stream, content) ||
+            !call->d->handleTransport(stream, content)) {
 
             // terminate call
             call->d->terminate(QXmppJingleIq::Reason::FailedApplication);

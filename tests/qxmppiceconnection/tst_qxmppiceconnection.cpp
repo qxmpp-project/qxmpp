@@ -51,7 +51,9 @@ void tst_QXmppIceConnection::testBind()
     QXmppIceComponent *component = client.component(componentId);
     QVERIFY(component);
 
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::NewGatheringState);
     client.bind(QXmppIceComponent::discoverAddresses());
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
     foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
@@ -80,13 +82,17 @@ void tst_QXmppIceConnection::testBindStun()
     QXmppIceComponent *component = client.component(componentId);
     QVERIFY(component);
 
-    QEventLoop loop;
-    connect(&client, SIGNAL(localCandidatesChanged()),
-            &loop, SLOT(quit()));
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::NewGatheringState);
     client.bind(QXmppIceComponent::discoverAddresses());
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::BusyGatheringState);
+
+    QEventLoop loop;
+    connect(&client, SIGNAL(gatheringStateChanged()),
+            &loop, SLOT(quit()));
     loop.exec();
 
     bool foundReflexive = false;
+    QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
     foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
@@ -101,7 +107,7 @@ void tst_QXmppIceConnection::testBindStun()
 
 void tst_QXmppIceConnection::testConnect()
 {
-    const int component = 1024;
+    const int componentId = 1024;
 
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
@@ -110,14 +116,14 @@ void tst_QXmppIceConnection::testConnect()
     connect(&clientL, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientL.setIceControlling(true);
-    clientL.addComponent(component);
+    clientL.addComponent(componentId);
     clientL.bind(QXmppIceComponent::discoverAddresses());
 
     QXmppIceConnection clientR;
     connect(&clientR, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     clientR.setIceControlling(false);
-    clientR.addComponent(component);
+    clientR.addComponent(componentId);
     clientR.bind(QXmppIceComponent::discoverAddresses());
 
     // exchange credentials

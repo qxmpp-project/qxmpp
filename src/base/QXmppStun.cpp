@@ -42,6 +42,12 @@ static const quint16 STUN_HEADER = 20;
 static const quint8 STUN_IPV4 = 0x01;
 static const quint8 STUN_IPV6 = 0x02;
 
+static const char* gathering_states[] = {
+    "new",
+    "gathering",
+    "complete"
+};
+
 static const char* pair_states[] = {
     "frozen",
     "waiting",
@@ -1761,6 +1767,8 @@ public:
     const QXmppIcePrivate* const config;
     CandidatePair *fallbackPair;
 
+    QXmppIceConnection::GatheringState gatheringState;
+
     QList<QXmppJingleCandidate> localCandidates;
 
     quint32 peerReflexivePriority;
@@ -1786,6 +1794,7 @@ QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIcePriva
     , component(component_)
     , config(config_)
     , fallbackPair(0)
+    , gatheringState(QXmppIceConnection::NewGatheringState)
     , peerReflexivePriority(0)
     , timer(0)
     , turnAllocation(0)
@@ -1909,6 +1918,8 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
         transports << turnAllocation;
         turnAllocation->connectToHost();
     }
+
+    q->updateGatheringState();
 }
 
 void QXmppIceComponentPrivate::setTurnServer(const QHostAddress &host, quint16 port)
@@ -1964,6 +1975,9 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
     Q_ASSERT(check);
     check = connect(d->turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
                     this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+    Q_ASSERT(check);
+    check = connect(d->turnAllocation, SIGNAL(disconnected()),
+                    this, SLOT(updateGatheringState()));
     Q_ASSERT(check);
 
     // calculate peer-reflexive candidate priority
@@ -2313,6 +2327,7 @@ void QXmppIceComponent::transactionFinished()
                 transaction->response().errorPhrase));
         }
         d->stunTransactions.remove(transaction);
+        updateGatheringState();
         return;
     }
 }
@@ -2328,6 +2343,7 @@ void QXmppIceComponent::turnConnected()
     d->localCandidates << candidate;
 
     emit localCandidatesChanged();
+    updateGatheringState();
 }
 
 static QList<QUdpSocket*> reservePort(const QList<QHostAddress> &addresses, quint16 port, QObject *parent)
@@ -2443,6 +2459,23 @@ qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
     return pair->transport->writeDatagram(datagram, pair->remote.host(), pair->remote.port());
 }
 
+void QXmppIceComponent::updateGatheringState()
+{
+    QXmppIceConnection::GatheringState newGatheringState;
+    if (d->transports.isEmpty())
+        newGatheringState = QXmppIceConnection::NewGatheringState;
+    else if (!d->stunTransactions.isEmpty()
+           || d->turnAllocation->state() == QXmppTurnAllocation::ConnectingState)
+        newGatheringState = QXmppIceConnection::BusyGatheringState;
+    else
+        newGatheringState = QXmppIceConnection::CompleteGatheringState;
+
+    if (newGatheringState != d->gatheringState) {
+        d->gatheringState = newGatheringState;
+        emit gatheringStateChanged();
+    }
+}
+
 void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
 {
     QXmppStunTransaction *transaction = qobject_cast<QXmppStunTransaction*>(sender());
@@ -2476,6 +2509,8 @@ public:
     QMap<int, QXmppIceComponent*> components;
     QTimer *connectTimer;
 
+    QXmppIceConnection::GatheringState gatheringState;
+
     QHostAddress turnHost;
     quint16 turnPort;
     QString turnUser;
@@ -2483,7 +2518,8 @@ public:
 };
 
 QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
-    : turnPort(0)
+    : gatheringState(QXmppIceConnection::NewGatheringState)
+    , turnPort(0)
 {
 }
 
@@ -2547,6 +2583,10 @@ void QXmppIceConnection::addComponent(int component)
 
     check = connect(socket, SIGNAL(connected()),
                     this, SLOT(slotConnected()));
+    Q_ASSERT(check);
+
+    check = connect(socket, SIGNAL(gatheringStateChanged()),
+                    this, SLOT(slotGatheringStateChanged()));
     Q_ASSERT(check);
 
     d->components[component] = socket;
@@ -2620,6 +2660,14 @@ bool QXmppIceConnection::isConnected() const
         if (!socket->isConnected())
             return false;
     return true;
+}
+
+/// Returns the ICE gathering state, that is the discovery of
+/// local candidates.
+
+QXmppIceConnection::GatheringState QXmppIceConnection::gatheringState() const
+{
+    return d->gatheringState;
 }
 
 /// Sets whether the local party has the ICE controlling role.
@@ -2738,6 +2786,33 @@ void QXmppIceConnection::slotConnected()
     info(QString("ICE negotiation completed"));
     d->connectTimer->stop();
     emit connected();
+}
+
+void QXmppIceConnection::slotGatheringStateChanged()
+{
+    GatheringState newGatheringState;
+    bool allComplete = true;
+    bool allNew = true;
+    foreach (QXmppIceComponent *socket, d->components.values()) {
+        if (socket->d->gatheringState != CompleteGatheringState)
+            allComplete = false;
+        if (socket->d->gatheringState != NewGatheringState)
+            allNew = false;
+    }
+    if (allNew)
+        newGatheringState = NewGatheringState;
+    else if (allComplete)
+        newGatheringState = CompleteGatheringState;
+    else
+        newGatheringState = BusyGatheringState;
+
+    if (newGatheringState != d->gatheringState) {
+        info(QString("ICE gathering state changed from '%1' to '%2'").arg(
+            gathering_states[d->gatheringState],
+            gathering_states[newGatheringState]));
+        d->gatheringState = newGatheringState;
+        emit gatheringStateChanged();
+    }
 }
 
 void QXmppIceConnection::slotTimeout()

@@ -28,7 +28,10 @@
 
 #include "QXmppIq.h"
 
+class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
+class QXmppJingleIqPrivate;
+class QXmppJinglePayloadTypePrivate;
 
 /// \brief The QXmppJinglePayloadType class represents a payload type
 /// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
@@ -38,6 +41,8 @@ class QXMPP_EXPORT QXmppJinglePayloadType
 {
 public:
     QXmppJinglePayloadType();
+    QXmppJinglePayloadType(const QXmppJinglePayloadType &other);
+    ~QXmppJinglePayloadType();
 
     unsigned char channels() const;
     void setChannels(unsigned char channels);
@@ -65,16 +70,11 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
+    QXmppJinglePayloadType& operator=(const QXmppJinglePayloadType &other);
     bool operator==(const QXmppJinglePayloadType &other) const;
 
 private:
-    unsigned char m_channels;
-    unsigned int m_clockrate;
-    unsigned char m_id;
-    unsigned int m_maxptime;
-    QString m_name;
-    QMap<QString, QString> m_parameters;
-    unsigned int m_ptime;
+    QSharedDataPointer<QXmppJinglePayloadTypePrivate> d;
 };
 
 /// \brief The QXmppJingleCandidate class represents a transport candidate
@@ -97,6 +97,10 @@ public:
     };
 
     QXmppJingleCandidate();
+    QXmppJingleCandidate(const QXmppJingleCandidate &other);
+    ~QXmppJingleCandidate();
+
+    QXmppJingleCandidate& operator=(const QXmppJingleCandidate &other);
 
     int component() const;
     void setComponent(int component);
@@ -139,16 +143,7 @@ public:
     /// \endcond
 
 private:
-    int m_component;
-    QString m_foundation;
-    int m_generation;
-    QHostAddress m_host;
-    QString m_id;
-    int m_network;
-    quint16 m_port;
-    QString m_protocol;
-    int m_priority;
-    QXmppJingleCandidate::Type m_type;
+    QSharedDataPointer<QXmppJingleCandidatePrivate> d;
 };
 
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media
@@ -190,6 +185,8 @@ public:
         Content(const QXmppJingleIq::Content &other);
         ~Content();
 
+        Content& operator=(const Content &other);
+
         QString creator() const;
         void setCreator(const QString &creator);
 
@@ -212,6 +209,7 @@ public:
 
         void addTransportCandidate(const QXmppJingleCandidate &candidate);
         QList<QXmppJingleCandidate> transportCandidates() const;
+        void setTransportCandidates(const QList<QXmppJingleCandidate> &candidates);
 
         QString transportUser() const;
         void setTransportUser(const QString &user);
@@ -249,6 +247,7 @@ public:
     class QXMPP_EXPORT Reason
     {
     public:
+        /// This enum is used to describe a reason's type.
         enum Type {
             None,
             AlternativeSession,
@@ -289,34 +288,33 @@ public:
     };
 
     QXmppJingleIq();
+    QXmppJingleIq(const QXmppJingleIq &other);
+    ~QXmppJingleIq();
+
+    QXmppJingleIq& operator=(const QXmppJingleIq &other);
 
     Action action() const;
     void setAction(Action action);
 
+    void addContent(const Content &content);
+    QList<Content> contents() const;
+    void setContents(const QList<Content> &contents);
+
     QString initiator() const;
     void setInitiator(const QString &initiator);
+
+    Reason& reason();
+    const Reason& reason() const;
 
     QString responder() const;
     void setResponder(const QString &responder);
 
-    QString sid() const;
-    void setSid(const QString &sid);
-
-    /// Returns a reference to the IQ's content element.
-    Content& content() { return m_content; };
-
-    /// Returns a const reference to the IQ's content element.
-    const Content& content() const { return m_content; };
-
-    /// Returns a reference to the IQ's reason element.
-    Reason& reason() { return m_reason; };
-
-    /// Returns a const reference to the IQ's reason element.
-    const Reason& reason() const { return m_reason; };
-
     // XEP-0167: Jingle RTP Sessions
     bool ringing() const;
     void setRinging(bool ringing);
+
+    QString sid() const;
+    void setSid(const QString &sid);
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);
@@ -329,14 +327,7 @@ protected:
     /// \endcond
 
 private:
-    Action m_action;
-    QString m_initiator;
-    QString m_responder;
-    QString m_sid;
-
-    Content m_content;
-    Reason m_reason;
-    bool m_ringing;
+    QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
 
 #endif
