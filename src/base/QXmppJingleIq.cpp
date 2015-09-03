@@ -559,12 +559,22 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
     return true;
 }
 
+static bool candidateLessThan(const QXmppJingleCandidate &c1, const QXmppJingleCandidate &c2)
+{
+    if (c1.type() == c2.type())
+        return c1.priority() > c2.priority();
+    else
+        return c1.type() == QXmppJingleCandidate::ServerReflexiveType;
+}
+
 QString QXmppJingleIq::Content::toSdp() const
 {
     // get default candidate
     QHostAddress localRtpAddress = QHostAddress::Any;
     quint16 localRtpPort = 0;
-    foreach (const QXmppJingleCandidate &candidate, d->transportCandidates) {
+    QList<QXmppJingleCandidate> sortedCandidates = d->transportCandidates;
+    qSort(sortedCandidates.begin(), sortedCandidates.end(), candidateLessThan);
+    foreach (const QXmppJingleCandidate &candidate, sortedCandidates) {
         if (candidate.component() == RTP_COMPONENT) {
             localRtpAddress = candidate.host();
             localRtpPort = candidate.port();
