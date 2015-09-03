@@ -247,7 +247,7 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
 
 QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     : QIODevice(parent)
-    , d(new QXmppRtpAudioChannelPrivate(this))
+    , d(new QXmppRtpAudioChannelPrivate())
 {
     QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
