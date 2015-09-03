@@ -458,7 +458,10 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
 bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
 {
     QList<QXmppJinglePayloadType> payloads;
-    foreach (const QString &line, sdp.split("\r\n")) {
+    QString line;
+    foreach (line, sdp.split('\n')) {
+        if (line.endsWith('\r'))
+            line.resize(line.size() - 1);
         if (line.startsWith("a=")) {
             int idx = line.indexOf(':');
             const QString attrName = idx != -1 ? line.mid(2, idx - 2) : line.mid(2);
