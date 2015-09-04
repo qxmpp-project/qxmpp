@@ -171,7 +171,7 @@ QByteArray renderTone(QXmppRtpAudioChannel::Tone tone, int clockrate, quint32 cl
 class QXmppRtpAudioChannelPrivate
 {
 public:
-    QXmppRtpAudioChannelPrivate(QXmppRtpAudioChannel *qq);
+    QXmppRtpAudioChannelPrivate();
     QXmppCodec *codecForPayloadType(const QXmppJinglePayloadType &payloadType);
 
     // signals
@@ -203,26 +203,22 @@ public:
     QXmppJinglePayloadType outgoingTonesType;
 
     QXmppJinglePayloadType payloadType;
-
-private:
-    QXmppRtpAudioChannel *q;
 };
 
-QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate(QXmppRtpAudioChannel *qq)
-    : signalsEmitted(false),
-    writtenSinceLastEmit(0),
-    incomingBuffering(true),
-    incomingMinimum(0),
-    incomingMaximum(0),
-    incomingPos(0),
-    incomingSequence(0),
-    outgoingCodec(0),
-    outgoingMarker(true),
-    outgoingPayloadNumbered(false),
-    outgoingSequence(1),
-    outgoingStamp(0),
-    outgoingTimer(0),
-    q(qq)
+QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate()
+    : signalsEmitted(false)
+    , writtenSinceLastEmit(0)
+    , incomingBuffering(true)
+    , incomingMinimum(0)
+    , incomingMaximum(0)
+    , incomingPos(0)
+    , incomingSequence(0)
+    , outgoingCodec(0)
+    , outgoingMarker(true)
+    , outgoingPayloadNumbered(false)
+    , outgoingSequence(1)
+    , outgoingStamp(0)
+    , outgoingTimer(0)
 {
     qRegisterMetaType<QXmppRtpAudioChannel::Tone>("QXmppRtpAudioChannel::Tone");
 }
@@ -251,8 +247,8 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
 
 QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     : QIODevice(parent)
+    , d(new QXmppRtpAudioChannelPrivate())
 {
-    d = new QXmppRtpAudioChannelPrivate(this);
     QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
         connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),

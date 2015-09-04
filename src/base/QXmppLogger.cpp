@@ -106,23 +106,19 @@ void QXmppLoggable::childEvent(QChildEvent *event)
 class QXmppLoggerPrivate
 {
 public:
-    QXmppLoggerPrivate(QXmppLogger *qq);
+    QXmppLoggerPrivate();
 
     QXmppLogger::LoggingType loggingType;
     QFile *logFile;
     QString logFilePath;
     QXmppLogger::MessageTypes messageTypes;
-
-private:
-    QXmppLogger *q;
 };
 
-QXmppLoggerPrivate::QXmppLoggerPrivate(QXmppLogger *qq)
-    : loggingType(QXmppLogger::NoLogging),
-    logFile(0),
-    logFilePath("QXmppClientLog.log"),
-    messageTypes(QXmppLogger::AnyMessage),
-    q(qq)
+QXmppLoggerPrivate::QXmppLoggerPrivate()
+    : loggingType(QXmppLogger::NoLogging)
+    , logFile(0)
+    , logFilePath("QXmppClientLog.log")
+    , messageTypes(QXmppLogger::AnyMessage)
 {
 }
 
@@ -132,9 +128,8 @@ QXmppLoggerPrivate::QXmppLoggerPrivate(QXmppLogger *qq)
 
 QXmppLogger::QXmppLogger(QObject *parent)
     : QObject(parent)
+    , d(new QXmppLoggerPrivate())
 {
-    d = new QXmppLoggerPrivate(this);
-
     // make it possible to pass QXmppLogger::MessageType between threads
     qRegisterMetaType< QXmppLogger::MessageType >("QXmppLogger::MessageType");
 }
