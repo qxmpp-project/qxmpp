@@ -4,9 +4,11 @@ CONFIG += ordered
 TEMPLATE = subdirs
 
 SUBDIRS = src
-android | ios {
-} else {
-    SUBDIRS += tests examples
+isEmpty(QXMPP_NO_TESTS) {
+    SUBDIRS += tests
+}
+isEmpty(QXMPP_NO_EXAMPLES) {
+    SUBDIRS += examples
 }
 
 !isEmpty(QXMPP_USE_DOXYGEN) {
