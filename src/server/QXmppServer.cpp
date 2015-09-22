@@ -635,8 +635,9 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 /// Route an XMPP stanza.
 ///
 /// \param element
+/// \param recipient
 
-bool QXmppServer::sendElement(const QDomElement &element)
+bool QXmppServer::sendElement(const QDomElement &element, const QString& resource)
 {
     // serialize data
     QByteArray data;
@@ -645,14 +646,20 @@ bool QXmppServer::sendElement(const QDomElement &element)
     helperToXmlAddDomElement(&xmlStream, element, omitNamespaces);
 
     // route data
-    return d->routeData(element.attribute("to"), data);
+    if (!resource.isEmpty()) {
+        // ... to explicitly specified resource. Override original resource from "to" (if any)
+        return d->routeData(QXmppUtils::jidToBareJid(element.attribute("to")) + "/" + resource, data);
+    } else {
+        return d->routeData(element.attribute("to"), data);
+    }
 }
 
 /// Route an XMPP packet.
 ///
 /// \param packet
+/// \param recipient
 
-bool QXmppServer::sendPacket(const QXmppStanza &packet)
+bool QXmppServer::sendPacket(const QXmppStanza &packet, const QString& resource)
 {
     // serialize data
     QByteArray data;
@@ -660,7 +667,12 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
     packet.toXml(&xmlStream);
 
     // route data
-    return d->routeData(packet.to(), data);
+    if (!resource.isEmpty()) {
+        // ... to explicitly specified resource. Override original resource from "to" (if any)
+        return d->routeData(QXmppUtils::jidToBareJid(packet.to()) + "/" + resource, data);
+    } else {
+        return d->routeData(packet.to(), data);
+    }
 }
 
 /// Add a new incoming client \a stream.
