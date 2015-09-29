@@ -76,7 +76,7 @@ class QXmppServerPrivate
 public:
     QXmppServerPrivate(QXmppServer *qq);
     void loadExtensions(QXmppServer *server);
-    bool routeData(const QString &to, const QByteArray &data);
+    bool routeData(const QString &to, const QByteArray &data, const QString& resource);
     void startExtensions();
     void stopExtensions();
 
@@ -125,7 +125,7 @@ QXmppServerPrivate::QXmppServerPrivate(QXmppServer *qq)
 /// \param data
 ///
 
-bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
+bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data, const QString& resource)
 {
     // refuse to route packets to empty destination, own domain or sub-domains
     const QString toDomain = QXmppUtils::jidToDomain(to);
@@ -136,7 +136,17 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // look for a client connection
         QList<QXmppIncomingClient*> found;
-        if (QXmppUtils::jidToResource(to).isEmpty()) {
+        // issue#7: Is a specific destination resource requested?
+        if (!resource.isEmpty()){
+               if (QXmppUtils::jidToResource(to).isEmpty()) {
+                   QXmppIncomingClient *conn = incomingClientsByJid.value(to + "/" + resource);
+                   if (conn)
+                       found << conn;
+               } else {
+                   // refuse to route to a specific resource if stanza is for a full JID already
+                   return false;
+               }
+        } else if (QXmppUtils::jidToResource(to).isEmpty()) {
             foreach (QXmppIncomingClient *conn, incomingClientsByBareJid.value(to))
                 found << conn;
         } else {
@@ -646,12 +656,7 @@ bool QXmppServer::sendElement(const QDomElement &element, const QString& resourc
     helperToXmlAddDomElement(&xmlStream, element, omitNamespaces);
 
     // route data
-    if (!resource.isEmpty()) {
-        // ... to explicitly specified resource. Override original resource from "to" (if any)
-        return d->routeData(QXmppUtils::jidToBareJid(element.attribute("to")) + "/" + resource, data);
-    } else {
-        return d->routeData(element.attribute("to"), data);
-    }
+    return d->routeData(element.attribute("to"), data, resource);
 }
 
 /// Route an XMPP packet.
@@ -667,12 +672,7 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet, const QString& resource)
     packet.toXml(&xmlStream);
 
     // route data
-    if (!resource.isEmpty()) {
-        // ... to explicitly specified resource. Override original resource from "to" (if any)
-        return d->routeData(QXmppUtils::jidToBareJid(packet.to()) + "/" + resource, data);
-    } else {
-        return d->routeData(packet.to(), data);
-    }
+    return d->routeData(packet.to(), data, resource);
 }
 
 /// Add a new incoming client \a stream.
