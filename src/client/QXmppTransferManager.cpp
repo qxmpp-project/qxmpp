@@ -1307,7 +1307,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     fileInfo.setDescription(description);
 
     // open file
-    QIODevice *device = new QFile(filePath);
+    QIODevice *device = new QFile(filePath, this);
     if (!device->open(QIODevice::ReadOnly))
     {
         warning(QString("Could not read from %1").arg(filePath));
@@ -1342,6 +1342,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
 /// Returns 0 if the \a jid is not valid.
 ///
 /// \note The recipient's \a jid must be a full JID with a resource, for instance "user@host/resource".
+/// \note The ownership of the \a device should be managed by the caller.
 ///
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid)
@@ -1361,8 +1362,6 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
         job->d->sid = sid;
     job->d->fileInfo = fileInfo;
     job->d->iodevice = device;
-    if (device)
-        device->setParent(job);
 
     // check file is open
     if (!device || !device->isReadable())
