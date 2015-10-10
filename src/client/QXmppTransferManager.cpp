@@ -204,6 +204,7 @@ public:
     QString requestId;
     QXmppTransferJob::State state;
     QTime transferStart;
+    bool deviceIsOwn;
 
     // file meta-data
     QXmppTransferFileInfo fileInfo;
@@ -225,6 +226,7 @@ QXmppTransferJobPrivate::QXmppTransferJobPrivate()
     iodevice(0),
     method(QXmppTransferJob::NoMethod),
     state(QXmppTransferJob::OfferState),
+    deviceIsOwn(false),
     ibbSequence(0),
     socksSocket(0)
 {
@@ -426,7 +428,7 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
     d->state = FinishedState;
 
     // close IO device
-    if (d->iodevice)
+    if (d->iodevice && d->deviceIsOwn)
         d->iodevice->close();
 
     // close socket
@@ -1332,6 +1334,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     // create job
     QXmppTransferJob *job = sendFile(jid, device, fileInfo);
     job->setLocalFileUrl(QUrl::fromLocalFile(filePath));
+    job->d->deviceIsOwn = true;
     return job;
 }
 
