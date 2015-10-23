@@ -55,6 +55,7 @@ public:
     void connectToHost();
     bool isAuthenticated() const;
     bool isConnected() const;
+    bool isClientStateIndicationEnabled() const;
 
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();

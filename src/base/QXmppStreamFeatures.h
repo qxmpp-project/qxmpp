@@ -56,6 +56,9 @@ public:
     Mode tlsMode() const;
     void setTlsMode(Mode mode);
 
+    Mode clientStateIndicationMode() const;
+    void setclientStateIndicationMode(Mode mode);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
@@ -68,6 +71,7 @@ private:
     Mode m_sessionMode;
     Mode m_nonSaslAuthMode;
     Mode m_tlsMode;
+    Mode m_csiMode;
     QStringList m_authMechanisms;
     QStringList m_compressionMethods;
 };
