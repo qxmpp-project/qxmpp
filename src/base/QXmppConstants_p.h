@@ -136,5 +136,7 @@ extern const char* ns_forwarding;
 extern const char* ns_mam;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
+// XEP-0352: Client State Indication
+extern const char* ns_csi;
 
 #endif // QXMPPCONSTANTS_H

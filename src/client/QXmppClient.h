@@ -140,6 +140,9 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const;
 
+    bool isActive() const;
+    void setActive(bool active);
+
     QXmppPresence clientPresence() const;
     void setClientPresence(const QXmppPresence &presence);
 

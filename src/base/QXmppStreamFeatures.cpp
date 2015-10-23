@@ -31,7 +31,8 @@ QXmppStreamFeatures::QXmppStreamFeatures()
     m_sessionMode(Disabled),
     m_nonSaslAuthMode(Disabled),
     m_tlsMode(Disabled),
-    m_streamManagementMode(Disabled)
+    m_streamManagementMode(Disabled),
+    m_csiMode(Disabled)
 {
 }
 
@@ -105,6 +106,16 @@ void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode
     m_streamManagementMode = mode;
 }
 
+QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
+{
+    return m_csiMode;
+}
+
+void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode mode)
+{
+    m_csiMode = mode;
+}
+
 /// \cond
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
@@ -136,6 +147,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     m_nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
     m_tlsMode = readFeature(element, "starttls", ns_tls);
     m_streamManagementMode = readFeature(element, "sm", ns_stream_management);
+    m_csiMode = readFeature(element, "csi", ns_csi);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
@@ -181,6 +193,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "auth", ns_authFeature, m_nonSaslAuthMode);
     writeFeature(writer, "starttls", ns_tls, m_tlsMode);
     writeFeature(writer, "sm", ns_stream_management, m_streamManagementMode);
+    writeFeature(writer, "csi", ns_csi, m_csiMode);
 
     if (!m_compressionMethods.isEmpty())
     {

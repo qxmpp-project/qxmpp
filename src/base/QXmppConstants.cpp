@@ -124,3 +124,5 @@ const char* ns_forwarding = "urn:xmpp:forward:0";
 const char* ns_mam = "urn:xmpp:mam:1";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
+// XEP-0352: Client State Indication
+const char* ns_csi = "urn:xmpp:csi:0";
