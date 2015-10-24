@@ -45,6 +45,7 @@ private slots:
     void testXhtml();
     void testSubextensions();
     void testChatMarkers();
+    void testPrivateMessage();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -537,6 +538,35 @@ void tst_QXmppMessage::testChatMarkers()
     serialisationMessage.setMarkerId("message-2");
     serialisationMessage.setMarkedThread("sleeping");
     serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
+}
+
+
+void tst_QXmppMessage::testPrivateMessage()
+{
+    const QByteArray privateXml(
+                "<message "
+                    "id=\"message-3\" "
+                    "to=\"northumberland@shakespeare.lit/westminster\" "
+                    "from=\"kingrichard@royalty.england.lit/throne\" "
+                    "type=\"chat\">"
+                 "<body>My lord, dispatch; read o'er these articles.</body>"
+                 "<private xmlns='urn:xmpp:carbons:2'/>"
+                "</message>");
+
+    QXmppMessage privateMessage;
+    parsePacket(privateMessage, privateXml);
+    QCOMPARE(privateMessage.isPrivate(), true);
+    privateMessage.setPrivate(true);
+    QCOMPARE(privateMessage.isPrivate(), true);
+
+    privateMessage.setPrivate(false);
+    QCOMPARE(privateMessage.isPrivate(), false);
+
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    privateMessage.toXml(&writer);
+    QVERIFY(!buffer.data().contains("private"));
 }
 
 QTEST_MAIN(tst_QXmppMessage)
