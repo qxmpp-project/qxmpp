@@ -64,17 +64,8 @@ signals:
     /// someone else
     void messageSent(const QXmppMessage&);
 
-protected:
-    /// \cond
-    void setClient(QXmppClient* client);
-    /// \endcond
-
-private slots:
-    void _q_infoReceived(const QXmppDiscoveryIq& infoiq);
-
 private:
     bool m_carbonsEnabled;
-    bool m_carbonsSupported;
 };
 
 #endif // QXMPPCARBONSMANAGER_H

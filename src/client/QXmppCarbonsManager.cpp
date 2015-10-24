@@ -28,10 +28,11 @@
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
+#include "QXmppUtils.h"
 
 
 QXmppCarbonsManager::QXmppCarbonsManager()
-    : m_carbonsEnabled(false), m_carbonsSupported(false)
+    : m_carbonsEnabled(false)
 {
 
 }
@@ -48,7 +49,13 @@ bool QXmppCarbonsManager::carbonsEnabled() const
     return m_carbonsEnabled;
 }
 
-/// Enable or disable message carbons
+/// Enable or disable message carbons.
+/// This function does not check whether the server supports
+/// message carbons, but just sends the corresponding stanza
+/// to the server, so one must check in advance by using the
+/// discovery manager.
+///
+/// By default, carbon copies are disabled.
 
 void QXmppCarbonsManager::setCarbonsEnabled(bool enabled)
 {
@@ -57,7 +64,7 @@ void QXmppCarbonsManager::setCarbonsEnabled(bool enabled)
 
     m_carbonsEnabled = enabled;
 
-    if(m_carbonsSupported && client()) {
+    if(client()) {
         QXmppIq iq(QXmppIq::Set);
         QXmppElement carbonselement;
         carbonselement.setTagName(m_carbonsEnabled ? "enable" : "disable");
@@ -105,35 +112,4 @@ bool QXmppCarbonsManager::handleStanza(const QDomElement &element)
         emit messageReceived(message);
 
     return true;
-}
-
-void QXmppCarbonsManager::setClient(QXmppClient *client)
-{
-    QXmppClientExtension::setClient(client);
-
-    // Connect to discovery manager
-    QXmppDiscoveryManager* discoManager = client->findExtension<QXmppDiscoveryManager>();
-    if(!discoManager)
-        warning("QXmppCarbonsManager: could not find QXmppDiscoveryManager, not able to determine server support for message carbons.");
-    else {
-        bool check = connect(discoManager, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
-                        this, SLOT(_q_infoReceived(const QXmppDiscoveryIq&)));
-        Q_ASSERT(check);
-    }
-
-
-}
-
-void QXmppCarbonsManager::_q_infoReceived(const QXmppDiscoveryIq& infoiq)
-{
-     if(!m_carbonsSupported && infoiq.features().contains(ns_carbons)) {
-         m_carbonsSupported = true;
-
-         // if the user previously enabled carbons,
-         // but server support was not yet available, enable them again:
-         if(m_carbonsEnabled) {
-             m_carbonsEnabled = false; // otherwise, setCarbonsEnabled would not have any effect
-             setCarbonsEnabled(true);
-         }
-     }
 }
