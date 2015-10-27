@@ -148,6 +148,7 @@ void tst_QXmppTransferManager::testSendFile()
     QEventLoop loop;
     QXmppTransferJob *senderJob = senderManager->sendFile("receiver@localhost/QXmpp", ":/test.svg");
     QVERIFY(senderJob);
+    QCOMPARE(senderJob->localFileUrl(), QUrl::fromLocalFile(":/test.svg"));
     connect(senderJob, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
 

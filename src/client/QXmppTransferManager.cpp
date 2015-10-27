@@ -1331,7 +1331,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
 
     // create job
     QXmppTransferJob *job = sendFile(jid, device, fileInfo);
-    job->setLocalFileUrl(filePath);
+    job->setLocalFileUrl(QUrl::fromLocalFile(filePath));
     return job;
 }
 
