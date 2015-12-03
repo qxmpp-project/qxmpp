@@ -1,6 +1,9 @@
-QXmpp 0.9.3 (UNRELEASED)
+QXmpp 0.9.3 (Dec 3, 2015)
+-------------------------
 
   - Add QXmppIceConnection::gatheringState property.
+  - Improve QXmppTransferManager::sendFile's handling of QIODevice ownership.
+  - Fix QXmppTransferManagerFix convering filename to a QUrl.
 
 QXmpp 0.9.2 (Sep 2, 2015)
 -------------------------
