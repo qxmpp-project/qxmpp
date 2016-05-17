@@ -467,6 +467,14 @@ void QXmppMessage::setPrivate(const bool priv)
     d->privatemsg = priv;
 }
 
+/// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
+/// iq or presence)
+
+bool QXmppMessage::isXmppStanza() const
+{
+    return true;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {

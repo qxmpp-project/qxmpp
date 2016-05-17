@@ -74,6 +74,30 @@ protected:
     /// \param element
     virtual void handleStream(const QDomElement &element) = 0;
 
+    /// Enables Stream Management acks / reqs (XEP-0198).
+    ///
+    /// \param resetSeqno Indicates if the sequence numbers should be resetted.
+    ///                   This must be done iff the stream is not resumed.
+    void enableStreamManagement(bool resetSequenceNumber);
+
+    /// Returns the sequence number of the last incoming stanza (XEP-0198).
+    unsigned lastIncomingSequenceNumber() const;
+
+    /// Sets the last acknowledged sequence number for outgoing stanzas (XEP-0198).
+    void setAcknowledgedSequenceNumber(unsigned sequenceNumber);
+
+private:
+    /// Handles an incoming acknowledgement from XEP-0198.
+    ///
+    /// \param element
+    void handleAcknowledgement(QDomElement &element);
+
+    /// Sends an acknowledgement as defined in XEP-0198.
+    void sendAcknowledgement();
+
+    /// Sends an acknowledgement request as defined in XEP-0198.
+    void sendAcknowledgementRequest();
+
 public slots:
     virtual void disconnectFromHost();
     virtual bool sendData(const QByteArray&);

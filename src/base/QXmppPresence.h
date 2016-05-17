@@ -128,6 +128,8 @@ public:
 
     QStringList capabilityExt() const;
 
+    bool isXmppStanza() const;
+
 private:
     QSharedDataPointer<QXmppPresencePrivate> d;
 };

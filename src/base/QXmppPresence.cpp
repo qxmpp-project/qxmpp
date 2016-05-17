@@ -496,3 +496,11 @@ void QXmppPresence::setMucSupported(bool supported)
 {
     d->mucSupported = supported;
 }
+
+/// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
+/// iq or presence)
+
+bool QXmppPresence::isXmppStanza() const
+{
+    return true;
+}

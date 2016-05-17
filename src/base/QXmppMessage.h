@@ -133,6 +133,8 @@ public:
     bool isPrivate() const;
     void setPrivate(const bool);
 
+    bool isXmppStanza() const;
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

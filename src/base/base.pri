@@ -81,6 +81,7 @@ SOURCES += \
     base/QXmppStream.cpp \
     base/QXmppStreamFeatures.cpp \
     base/QXmppStreamInitiationIq.cpp \
+    base/QXmppStreamManagement.cpp \
     base/QXmppStun.cpp \
     base/QXmppUtils.cpp \
     base/QXmppVCardIq.cpp \
