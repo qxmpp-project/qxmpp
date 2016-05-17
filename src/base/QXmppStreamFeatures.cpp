@@ -104,15 +104,18 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
 {
     QDomElement subElement = element.firstChildElement(tagName);
-    if (subElement.namespaceURI() == tagNs)
-    {
-        if (!subElement.firstChildElement("required").isNull())
-            return QXmppStreamFeatures::Required;
-        else
-            return QXmppStreamFeatures::Enabled;
-    } else {
-        return QXmppStreamFeatures::Disabled;
+    QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
+    while (!subElement.isNull()) {
+        if (subElement.namespaceURI() == tagNs)
+        {
+            if (!subElement.firstChildElement("required").isNull())
+                mode = QXmppStreamFeatures::Required;
+            else if (mode != QXmppStreamFeatures::Required)
+                mode = QXmppStreamFeatures::Enabled;
+        }
+        subElement = subElement.nextSiblingElement(tagName);
     }
+    return mode;
 }
 
 void QXmppStreamFeatures::parse(const QDomElement &element)
