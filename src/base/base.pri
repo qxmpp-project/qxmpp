@@ -40,6 +40,7 @@ HEADERS += \
     base/QXmppCodec_p.h \
     base/QXmppConstants_p.h \
     base/QXmppSasl_p.h \
+    base/QXmppStanza_p.h \
     base/QXmppStreamInitiationIq_p.h \
     base/QXmppStun_p.h
 
