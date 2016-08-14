@@ -126,8 +126,8 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
                 if (room->d->permissionsQueue.isEmpty()) {
                     emit room->permissionsReceived(room->d->permissions.values());
                 }
+                return true;
             }
-            return true;
         }
         else if (QXmppMucOwnerIq::isMucOwnerIq(element))
         {
@@ -135,9 +135,10 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
             iq.parse(element);
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
-            if (room && iq.type() == QXmppIq::Result && !iq.form().isNull())
+            if (room && iq.type() == QXmppIq::Result && !iq.form().isNull()) {
                 emit room->configurationReceived(iq.form());
-            return true;
+                return true;
+            }
         }
     }
     return false;
