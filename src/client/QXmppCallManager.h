@@ -31,7 +31,7 @@
 #include "QXmppClientExtension.h"
 #include "QXmppLogger.h"
 
-class QHostAddress;
+QT_FORWARD_DECLARE_CLASS(QHostAddress)
 class QXmppCallPrivate;
 class QXmppCallManager;
 class QXmppCallManagerPrivate;

@@ -29,7 +29,7 @@
 
 #include "QXmppGlobal.h"
 
-class QTcpServer;
+QT_FORWARD_DECLARE_CLASS(QTcpServer)
 
 class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
 {

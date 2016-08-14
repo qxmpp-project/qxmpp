@@ -56,13 +56,13 @@ QT_BEGIN_NAMESPACE
 
 QT_MODULE(Network)
 
-class QHostAddress;
-class QDnsLookupPrivate;
-class QDnsDomainNameRecordPrivate;
-class QDnsHostAddressRecordPrivate;
-class QDnsMailExchangeRecordPrivate;
-class QDnsServiceRecordPrivate;
-class QDnsTextRecordPrivate;
+QT_FORWARD_DECLARE_CLASS(QHostAddress)
+QT_FORWARD_DECLARE_CLASS(QDnsLookupPrivate)
+QT_FORWARD_DECLARE_CLASS(QDnsDomainNameRecordPrivate)
+QT_FORWARD_DECLARE_CLASS(QDnsHostAddressRecordPrivate)
+QT_FORWARD_DECLARE_CLASS(QDnsMailExchangeRecordPrivate)
+QT_FORWARD_DECLARE_CLASS(QDnsServiceRecordPrivate)
+QT_FORWARD_DECLARE_CLASS(QDnsTextRecordPrivate)
 
 class QXMPP_EXPORT QDnsDomainNameRecord
 {

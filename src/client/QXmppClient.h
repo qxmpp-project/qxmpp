@@ -31,7 +31,7 @@
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
 
-class QSslError;
+QT_FORWARD_DECLARE_CLASS(QSslError)
 
 class QXmppClientExtension;
 class QXmppClientPrivate;

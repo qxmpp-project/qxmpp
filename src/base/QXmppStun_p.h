@@ -26,8 +26,8 @@
 
 #include "QXmppStun.h"
 
-class QUdpSocket;
-class QTimer;
+QT_FORWARD_DECLARE_CLASS(QUdpSocket)
+QT_FORWARD_DECLARE_CLASS(QTimer)
 
 //
 //  W A R N I N G

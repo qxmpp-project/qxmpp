@@ -30,9 +30,9 @@
 #include "QXmppJingleIq.h"
 
 class CandidatePair;
-class QDataStream;
-class QUdpSocket;
-class QTimer;
+QT_FORWARD_DECLARE_CLASS(QDataStream)
+QT_FORWARD_DECLARE_CLASS(QUdpSocket)
+QT_FORWARD_DECLARE_CLASS(QTimer)
 class QXmppIceComponentPrivate;
 class QXmppIceConnectionPrivate;
 class QXmppIcePrivate;

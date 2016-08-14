@@ -41,7 +41,9 @@ public:
     virtual QStringList keys() const = 0;
 };
 
+QT_BEGIN_NAMESPACE
 Q_DECLARE_INTERFACE(QXmppServerPluginInterface, "com.googlecode.qxmpp.ServerPlugin/1.0")
+QT_END_NAMESPACE
 
 /// \brief The QXmppServerPlugin class is the base class for QXmppServer plugins.
 ///

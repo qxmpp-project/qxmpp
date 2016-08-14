@@ -30,7 +30,7 @@
 
 #include "QXmppGlobal.h"
 
-class QDomElement;
+QT_FORWARD_DECLARE_CLASS(QDomElement)
 class QXmppElement;
 class QXmppElementPrivate;
 

@@ -34,11 +34,11 @@
 
 #include "QXmppGlobal.h"
 
-class QByteArray;
-class QDateTime;
-class QDomElement;
-class QString;
-class QStringList;
+QT_FORWARD_DECLARE_CLASS(QByteArray)
+QT_FORWARD_DECLARE_CLASS(QDateTime)
+QT_FORWARD_DECLARE_CLASS(QDomElement)
+QT_FORWARD_DECLARE_CLASS(QString)
+QT_FORWARD_DECLARE_CLASS(QStringList)
 
 /// \brief The QXmppUtils class contains static utility functions.
 ///

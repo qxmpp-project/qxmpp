@@ -31,7 +31,7 @@
 
 #include "QXmppClientExtension.h"
 
-class QTcpSocket;
+QT_FORWARD_DECLARE_CLASS(QTcpSocket)
 class QXmppByteStreamIq;
 class QXmppIbbCloseIq;
 class QXmppIbbDataIq;

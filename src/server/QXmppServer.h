@@ -29,10 +29,10 @@
 
 #include "QXmppLogger.h"
 
-class QDomElement;
-class QSslCertificate;
-class QSslKey;
-class QSslSocket;
+QT_FORWARD_DECLARE_CLASS(QDomElement)
+QT_FORWARD_DECLARE_CLASS(QSslCertificate)
+QT_FORWARD_DECLARE_CLASS(QSslKey)
+QT_FORWARD_DECLARE_CLASS(QSslSocket)
 
 class QXmppDialback;
 class QXmppIncomingClient;

@@ -28,8 +28,8 @@
 
 #include "QXmppLogger.h"
 
-class QDomElement;
-class QStringList;
+QT_FORWARD_DECLARE_CLASS(QDomElement)
+QT_FORWARD_DECLARE_CLASS(QStringList)
 
 class QXmppServer;
 class QXmppServerExtensionPrivate;

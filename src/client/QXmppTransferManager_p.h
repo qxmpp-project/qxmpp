@@ -38,7 +38,7 @@
 // We mean it.
 //
 
-class QTimer;
+QT_FORWARD_DECLARE_CLASS(QTimer)
 class QXmppSocksClient;
 
 class QXmppTransferIncomingJob : public QXmppTransferJob

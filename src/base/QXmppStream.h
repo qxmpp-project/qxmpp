@@ -30,8 +30,8 @@
 #include <QObject>
 #include "QXmppLogger.h"
 
-class QDomElement;
-class QSslSocket;
+QT_FORWARD_DECLARE_CLASS(QDomElement)
+QT_FORWARD_DECLARE_CLASS(QSslSocket)
 class QXmppStanza;
 class QXmppStreamPrivate;
 

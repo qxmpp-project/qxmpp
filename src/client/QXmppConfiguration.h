@@ -30,8 +30,8 @@
 
 #include "QXmppGlobal.h"
 
-class QNetworkProxy;
-class QSslCertificate;
+QT_FORWARD_DECLARE_CLASS(QNetworkProxy)
+QT_FORWARD_DECLARE_CLASS(QSslCertificate)
 class QXmppConfigurationPrivate;
 
 /// \brief The QXmppConfiguration class holds configuration options.

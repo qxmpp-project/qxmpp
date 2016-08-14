@@ -66,7 +66,7 @@ QT_BEGIN_NAMESPACE
 
 //#define QDNSLOOKUP_DEBUG
 
-class QDnsLookupRunnable;
+QT_FORWARD_DECLARE_CLASS(QDnsLookupRunnable)
 
 class QDnsLookupReply
 {

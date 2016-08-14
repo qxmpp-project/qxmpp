@@ -30,8 +30,8 @@
 #include "QXmppStanza.h"
 #include "QXmppStream.h"
 
-class QDomElement;
-class QSslError;
+QT_FORWARD_DECLARE_CLASS(QDomElement)
+QT_FORWARD_DECLARE_CLASS(QSslError)
 
 class QXmppConfiguration;
 class QXmppPresence;
