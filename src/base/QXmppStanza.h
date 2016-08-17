@@ -149,13 +149,13 @@ public:
         void toXml(QXmlStreamWriter *writer) const;
         /// \endcond
 
-    private:
         QString getConditionStr() const;
         void setConditionFromStr(const QString& cond);
 
         QString getTypeStr() const;
         void setTypeFromStr(const QString& type);
 
+    private:
         int m_code;
         Type m_type;
         Condition m_condition;
