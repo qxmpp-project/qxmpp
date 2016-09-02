@@ -54,6 +54,9 @@ public:
     int reconnectionTries;
     QTimer *reconnectionTimer;
 
+    // Client state indication
+    bool clientStateActive;
+
     void addProperCapability(QXmppPresence& presence);
     int getNextReconnectTime() const;
 
@@ -68,6 +71,7 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
     , receivedConflict(false)
     , reconnectionTries(0)
     , reconnectionTimer(0)
+    , clientStateActive(true)
     , q(qq)
 {
 }
@@ -318,6 +322,27 @@ bool QXmppClient::isAuthenticated() const
 bool QXmppClient::isConnected() const
 {
     return d->stream->isConnected();
+}
+
+/// Returns true if the current client state is "active", false if it is "inactive"
+/// See xep-0352.
+
+bool QXmppClient::clientState()
+{
+    return d->clientStateActive;
+}
+
+/// Sets the client state as described in to xep-0352
+
+void QXmppClient::setClientState(bool active)
+{
+    if(active != d->clientStateActive && d->stream->isClientStateIndicationEnabled()) {
+        d->clientStateActive = active;
+        if(active)
+            d->stream->sendData(QByteArray("<active xmlns='").append(ns_csi).append("'/>"));
+        else
+            d->stream->sendData(QByteArray("<inactive xmlns='").append(ns_csi).append("'/>"));
+    }
 }
 
 /// Returns the reference to QXmppRosterManager object of the client.

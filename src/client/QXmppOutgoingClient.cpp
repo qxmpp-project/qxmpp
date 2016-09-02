@@ -92,6 +92,9 @@ public:
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
 
+    // Client State Indication
+    bool clientStateIndicationEnabled;
+
     // Timers
     QTimer *pingTimer;
     QTimer *timeoutTimer;
@@ -106,6 +109,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     , sessionStarted(false)
     , isAuthenticated(false)
     , saslClient(0)
+    , clientStateIndicationEnabled(false)
     , pingTimer(0)
     , timeoutTimer(0)
     , q(qq)
@@ -256,6 +260,13 @@ bool QXmppOutgoingClient::isConnected() const
     return QXmppStream::isConnected() && d->sessionStarted;
 }
 
+/// Returns true if client state indication (xep-0352) is supported by the server
+
+bool QXmppOutgoingClient::isClientStateIndicationEnabled() const
+{
+    return d->clientStateIndicationEnabled;
+}
+
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
@@ -354,6 +365,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
     {
         QXmppStreamFeatures features;
         features.parse(nodeRecv);
+
+        if(features.clientStateIndicationMode() == QXmppStreamFeatures::Enabled)
+            d->clientStateIndicationEnabled = true;
 
         if (!socket()->isEncrypted())
         {
