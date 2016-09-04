@@ -115,6 +115,8 @@ extern const char* ns_attention;
 extern const char* ns_bob;
 // XEP-0249: Direct MUC Invitations
 extern const char* ns_conference;
+// XEP-0280: Message Carbons
+extern const char* ns_carbons;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
 
