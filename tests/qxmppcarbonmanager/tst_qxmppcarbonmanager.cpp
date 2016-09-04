@@ -24,10 +24,10 @@
 
 #include <QObject>
 #include "QXmppMessage.h"
-#include "QXmppCarbonsManager.h"
+#include "QXmppCarbonManager.h"
 #include "util.h"
 
-class QXmppCarbonsTestHelper  : public QObject
+class QXmppCarbonTestHelper  : public QObject
 {
     Q_OBJECT
 
@@ -43,7 +43,7 @@ public:
     void compareMessages(const QXmppMessage& lhs, const QXmppMessage& rhs);
 };
 
-class tst_QXmppCarbonsManager : public QObject
+class tst_QXmppCarbonManager : public QObject
 {
     Q_OBJECT
 
@@ -56,11 +56,11 @@ private slots:
 
 
 private:
-    QXmppCarbonsTestHelper m_helper;
-    QXmppCarbonsManager m_manager;
+    QXmppCarbonTestHelper m_helper;
+    QXmppCarbonManager m_manager;
 };
 
-void tst_QXmppCarbonsManager::initTestCase()
+void tst_QXmppCarbonManager::initTestCase()
 {
     connect(&m_manager, SIGNAL(messageSent(const QXmppMessage&)),
             &m_helper, SLOT(messageSent(const QXmppMessage&)));
@@ -69,7 +69,7 @@ void tst_QXmppCarbonsManager::initTestCase()
             &m_helper, SLOT(messageReceived(const QXmppMessage&)));
 }
 
-void tst_QXmppCarbonsManager::testHandleStanza_data()
+void tst_QXmppCarbonManager::testHandleStanza_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("accept");
@@ -151,7 +151,7 @@ void tst_QXmppCarbonsManager::testHandleStanza_data()
 
 }
 
-void tst_QXmppCarbonsManager::testHandleStanza()
+void tst_QXmppCarbonManager::testHandleStanza()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, accept);
@@ -176,14 +176,7 @@ void tst_QXmppCarbonsManager::testHandleStanza()
     QCOMPARE(m_helper.m_signalTriggered, accept);
 }
 
-
-
-
-
-
-
-
-void QXmppCarbonsTestHelper::messageSent(const QXmppMessage &msg)
+void QXmppCarbonTestHelper::messageSent(const QXmppMessage &msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, true);
@@ -191,7 +184,7 @@ void QXmppCarbonsTestHelper::messageSent(const QXmppMessage &msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonsTestHelper::messageReceived(const QXmppMessage &msg)
+void QXmppCarbonTestHelper::messageReceived(const QXmppMessage &msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, false);
@@ -199,7 +192,7 @@ void QXmppCarbonsTestHelper::messageReceived(const QXmppMessage &msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonsTestHelper::compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
+void QXmppCarbonTestHelper::compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
 {
     QCOMPARE(lhs.body(), rhs.body());
     QCOMPARE(lhs.from(), rhs.from());
@@ -215,5 +208,5 @@ void QXmppCarbonsTestHelper::compareMessages(const QXmppMessage &lhs, const QXmp
     QCOMPARE(lhs.type(), rhs.type());
 }
 
-QTEST_MAIN(tst_QXmppCarbonsManager)
-#include "tst_qxmppcarbonsmanager.moc"
+QTEST_MAIN(tst_QXmppCarbonManager)
+#include "tst_qxmppcarbonmanager.moc"

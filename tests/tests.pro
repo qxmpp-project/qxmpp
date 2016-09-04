@@ -3,7 +3,7 @@ SUBDIRS = \
     qxmpparchiveiq \
     qxmppbindiq \
     qxmppcallmanager \
-    qxmppcarbonsmanager \
+    qxmppcarbonmanager \
     qxmppdataform \
     qxmppdiscoveryiq \
     qxmppentitytimeiq \

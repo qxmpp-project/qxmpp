@@ -23,7 +23,7 @@
 
 #include <QDomElement>
 
-#include "QXmppCarbonsManager.h"
+#include "QXmppCarbonManager.h"
 #include "QXmppConstants.h"
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
@@ -31,20 +31,20 @@
 #include "QXmppUtils.h"
 
 
-QXmppCarbonsManager::QXmppCarbonsManager()
+QXmppCarbonManager::QXmppCarbonManager()
     : m_carbonsEnabled(false)
 {
 
 }
 
-QXmppCarbonsManager::~QXmppCarbonsManager()
+QXmppCarbonManager::~QXmppCarbonManager()
 {
 
 }
 
 /// Returns whether message carbons are currently enabled
 
-bool QXmppCarbonsManager::carbonsEnabled() const
+bool QXmppCarbonManager::carbonsEnabled() const
 {
     return m_carbonsEnabled;
 }
@@ -57,7 +57,7 @@ bool QXmppCarbonsManager::carbonsEnabled() const
 ///
 /// By default, carbon copies are disabled.
 
-void QXmppCarbonsManager::setCarbonsEnabled(bool enabled)
+void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
 {
     if(m_carbonsEnabled == enabled)
         return;
@@ -75,12 +75,12 @@ void QXmppCarbonsManager::setCarbonsEnabled(bool enabled)
     }
 }
 
-QStringList QXmppCarbonsManager::discoveryFeatures() const
+QStringList QXmppCarbonManager::discoveryFeatures() const
 {
     return QStringList() << ns_carbons;
 }
 
-bool QXmppCarbonsManager::handleStanza(const QDomElement &element)
+bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 {
     if(element.tagName() != "message")
         return false;

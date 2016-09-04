@@ -22,14 +22,14 @@
  */
 
 
-#ifndef QXMPPCARBONSMANAGER_H
-#define QXMPPCARBONSMANAGER_H
+#ifndef QXMPPCARBONMANAGER_H
+#define QXMPPCARBONMANAGER_H
 
 #include "QXmppClientExtension.h"
 
 class QXmppMessage;
 
-/// \brief The QXmppCarbonsManager class handles message carbons
+/// \brief The QXmppCarbonManager class handles message carbons
 /// as described in XEP-0280: Message Carbons.
 ///
 /// This class emits signals whenever another resource of the
@@ -37,13 +37,13 @@ class QXmppMessage;
 ///
 /// \ingroup Managers
 
-class QXMPP_EXPORT QXmppCarbonsManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppCarbonManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppCarbonsManager();
-    ~QXmppCarbonsManager();
+    QXmppCarbonManager();
+    ~QXmppCarbonManager();
 
     bool carbonsEnabled() const;
     void setCarbonsEnabled(bool enabled);
@@ -68,4 +68,4 @@ private:
     bool m_carbonsEnabled;
 };
 
-#endif // QXMPPCARBONSMANAGER_H
+#endif // QXMPPCARBONMANAGER_H

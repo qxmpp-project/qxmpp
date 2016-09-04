@@ -3,7 +3,7 @@ INSTALL_HEADERS += \
     client/QXmppArchiveManager.h \
     client/QXmppBookmarkManager.h \
     client/QXmppCallManager.h \
-    client/QXmppCarbonsManager.h \
+    client/QXmppCarbonManager.h \
     client/QXmppClient.h \
     client/QXmppClientExtension.h \
     client/QXmppConfiguration.h \
@@ -27,7 +27,7 @@ SOURCES += \
     client/QXmppArchiveManager.cpp \
     client/QXmppBookmarkManager.cpp \
     client/QXmppCallManager.cpp \
-    client/QXmppCarbonsManager.cpp \
+    client/QXmppCarbonManager.cpp \
     client/QXmppClient.cpp \
     client/QXmppClientExtension.cpp \
     client/QXmppConfiguration.cpp \
