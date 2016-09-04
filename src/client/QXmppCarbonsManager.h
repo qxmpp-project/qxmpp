@@ -30,7 +30,7 @@
 class QXmppMessage;
 
 /// \brief The QXmppCarbonsManager class handles message carbons
-/// as described in xep-0280.
+/// as described in XEP-0280: Message Carbons.
 ///
 /// This class emits signals whenever another resource of the
 /// currently connected client account sent or received a message.
