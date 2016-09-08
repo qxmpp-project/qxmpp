@@ -26,7 +26,7 @@
 
 #include "QXmppStanza.h"
 #include "QXmppUtils.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>

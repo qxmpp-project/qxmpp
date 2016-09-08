@@ -28,7 +28,7 @@
 #include <QDateTime>
 
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppUtils.h"
 

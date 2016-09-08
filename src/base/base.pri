@@ -4,7 +4,6 @@ INSTALL_HEADERS += \
     base/QXmppBindIq.h \
     base/QXmppBookmarkSet.h \
     base/QXmppByteStreamIq.h \
-    base/QXmppConstants.h \
     base/QXmppDataForm.h \
     base/QXmppDiscoveryIq.h \
     base/QXmppElement.h \
@@ -39,6 +38,7 @@ INSTALL_HEADERS += \
 
 HEADERS += \
     base/QXmppCodec_p.h \
+    base/QXmppConstants_p.h \
     base/QXmppSasl_p.h \
     base/QXmppStreamInitiationIq_p.h \
     base/QXmppStun_p.h

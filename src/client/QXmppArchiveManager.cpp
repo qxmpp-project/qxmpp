@@ -26,7 +26,7 @@
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 /// \cond
 QStringList QXmppArchiveManager::discoveryFeatures() const

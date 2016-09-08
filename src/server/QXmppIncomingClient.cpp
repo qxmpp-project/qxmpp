@@ -28,7 +28,7 @@
 #include <QTimer>
 
 #include "QXmppBindIq.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppSasl_p.h"

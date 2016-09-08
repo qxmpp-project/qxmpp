@@ -26,7 +26,7 @@
 #include <QDomElement>
 #include <QRegExp>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppUtils.h"
 

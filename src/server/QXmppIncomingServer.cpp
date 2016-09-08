@@ -26,7 +26,7 @@
 #include <QSslKey>
 #include <QSslSocket>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"

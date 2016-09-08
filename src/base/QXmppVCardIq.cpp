@@ -27,7 +27,7 @@
 
 #include "QXmppVCardIq.h"
 #include "QXmppUtils.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 static QString getImageType(const QByteArray &contents)
 {

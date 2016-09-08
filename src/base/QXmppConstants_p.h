@@ -25,6 +25,17 @@
 #ifndef QXMPPCONSTANTS_H
 #define QXMPPCONSTANTS_H
 
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QXmpp API.  It exists for the convenience
+// of the QXmppTransferManager class.  This header file may change from
+// version to version without notice, or even be removed.
+//
+// We mean it.
+//
+
 extern const char* ns_stream;
 extern const char* ns_client;
 extern const char* ns_server;

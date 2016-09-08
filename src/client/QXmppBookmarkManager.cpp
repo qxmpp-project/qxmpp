@@ -26,7 +26,7 @@
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppUtils.h"
 

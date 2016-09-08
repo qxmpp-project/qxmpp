@@ -22,7 +22,7 @@
  */
 
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 const char* ns_stream = "http://etherx.jabber.org/streams";
 const char* ns_client = "jabber:client";

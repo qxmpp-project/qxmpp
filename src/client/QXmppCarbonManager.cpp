@@ -24,7 +24,7 @@
 #include <QDomElement>
 
 #include "QXmppCarbonManager.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
