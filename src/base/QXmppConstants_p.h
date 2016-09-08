@@ -30,8 +30,8 @@
 //  -------------
 //
 // This file is not part of the QXmpp API.  It exists for the convenience
-// of the QXmppTransferManager class.  This header file may change from
-// version to version without notice, or even be removed.
+// of QXmpp's own classes.  This header file may change from version to
+// version without notice, or even be removed.
 //
 // We mean it.
 //
