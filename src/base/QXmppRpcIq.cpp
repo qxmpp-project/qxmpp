@@ -28,7 +28,7 @@
 #include <QDateTime>
 #include <QStringList>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppRpcIq.h"
 #include "QXmppUtils.h"
 

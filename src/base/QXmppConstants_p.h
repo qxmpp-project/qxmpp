@@ -25,6 +25,17 @@
 #ifndef QXMPPCONSTANTS_H
 #define QXMPPCONSTANTS_H
 
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QXmpp API.  It exists for the convenience
+// of QXmpp's own classes.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+//
+
 extern const char* ns_stream;
 extern const char* ns_client;
 extern const char* ns_server;
@@ -115,6 +126,8 @@ extern const char* ns_attention;
 extern const char* ns_bob;
 // XEP-0249: Direct MUC Invitations
 extern const char* ns_conference;
+// XEP-0280: Message Carbons
+extern const char* ns_carbons;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
 

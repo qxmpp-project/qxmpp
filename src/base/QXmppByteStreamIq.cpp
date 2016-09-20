@@ -24,7 +24,7 @@
 #include <QDomElement>
 
 #include "QXmppByteStreamIq.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 QString QXmppByteStreamIq::StreamHost::host() const

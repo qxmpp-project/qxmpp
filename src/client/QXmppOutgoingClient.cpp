@@ -33,7 +33,7 @@
 #endif
 
 #include "QXmppConfiguration.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"

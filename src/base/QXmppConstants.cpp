@@ -22,7 +22,7 @@
  */
 
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 const char* ns_stream = "http://etherx.jabber.org/streams";
 const char* ns_client = "jabber:client";
@@ -114,5 +114,7 @@ const char* ns_attention = "urn:xmpp:attention:0";
 const char* ns_bob = "urn:xmpp:bob";
 // XEP-0249: Direct MUC Invitations
 const char* ns_conference = "jabber:x:conference";
+// XEP-0280: Message Carbons
+const char* ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";

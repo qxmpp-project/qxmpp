@@ -22,7 +22,7 @@
  */
 
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppResultSet.h"
 #include "QXmppUtils.h"
 

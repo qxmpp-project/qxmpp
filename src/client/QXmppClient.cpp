@@ -26,7 +26,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppLogger.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppMessage.h"

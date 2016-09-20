@@ -27,7 +27,7 @@
 #include <QtDebug>
 #include <QDomElement>
 #include <QXmlStreamWriter>
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 static const char* presence_types[] = {
     "error",

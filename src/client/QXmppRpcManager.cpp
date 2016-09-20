@@ -22,7 +22,7 @@
  */
 
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppInvokable.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppRpcIq.h"

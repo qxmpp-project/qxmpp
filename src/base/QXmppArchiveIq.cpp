@@ -24,7 +24,7 @@
 #include <QDomElement>
 
 #include "QXmppArchiveIq.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 QXmppArchiveMessage::QXmppArchiveMessage()
