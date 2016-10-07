@@ -64,7 +64,7 @@ public:
     // which authentication systems to use (if any)
     bool useSASLAuthentication;
     bool useNonSASLAuthentication;
-    // default is true
+    // default is false
     bool ignoreSslErrors;
 
     QXmppConfiguration::StreamSecurityMode streamSecurityMode;
@@ -87,7 +87,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , autoReconnectionEnabled(true)
     , useSASLAuthentication(true)
     , useNonSASLAuthentication(true)
-    , ignoreSslErrors(true)
+    , ignoreSslErrors(false)
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
     , saslAuthMechanism("DIGEST-MD5")
