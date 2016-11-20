@@ -13,6 +13,7 @@ INSTALL_HEADERS += \
     base/QXmppIq.h \
     base/QXmppJingleIq.h \
     base/QXmppLogger.h \
+    base/QXmppMamIq.h \
     base/QXmppMessage.h \
     base/QXmppMucIq.h \
     base/QXmppNonSASLAuth.h \
@@ -61,6 +62,7 @@ SOURCES += \
     base/QXmppIq.cpp \
     base/QXmppJingleIq.cpp \
     base/QXmppLogger.cpp \
+    base/QXmppMamIq.cpp \
     base/QXmppMessage.cpp \
     base/QXmppMucIq.cpp \
     base/QXmppNonSASLAuth.cpp \

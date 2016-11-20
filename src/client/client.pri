@@ -10,6 +10,7 @@ INSTALL_HEADERS += \
     client/QXmppDiscoveryManager.h \
     client/QXmppEntityTimeManager.h \
     client/QXmppInvokable.h \
+    client/QXmppMamManager.h \
     client/QXmppMessageReceiptManager.h \
     client/QXmppMucManager.h \
     client/QXmppOutgoingClient.h \
@@ -33,6 +34,7 @@ SOURCES += \
     client/QXmppConfiguration.cpp \
     client/QXmppEntityTimeManager.cpp \
     client/QXmppInvokable.cpp \
+    client/QXmppMamManager.cpp \
     client/QXmppMessageReceiptManager.cpp \
     client/QXmppMucManager.cpp \
     client/QXmppOutgoingClient.cpp \
