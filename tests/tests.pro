@@ -10,6 +10,7 @@ SUBDIRS = \
     qxmppiceconnection \
     qxmppiq \
     qxmppjingleiq \
+    qxmppmammanager \
     qxmppmessage \
     qxmppnonsaslauthiq \
     qxmpppresence \
