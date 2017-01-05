@@ -65,6 +65,12 @@ public:
     QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const QString &host, quint16 port);
 
+    void sendNonSASLAuth(bool plaintext);
+    void sendNonSASLAuthQuery();
+    void sendBind();
+    void sendSessionStart();
+    void sendStreamManagementEnable();
+
     // This object provides the configuration
     // required for connecting to the XMPP server.
     QXmppConfiguration config;
@@ -359,7 +365,7 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled
         if(d->streamVersion.isEmpty() && configuration().useNonSASLAuthentication()) {
-            sendNonSASLAuthQuery();
+            d->sendNonSASLAuthQuery();
         }
     }
 }
@@ -478,7 +484,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
             return;
         } else if(nonSaslAvailable && configuration().useNonSASLAuthentication()) {
-            sendNonSASLAuthQuery();
+            d->sendNonSASLAuthQuery();
             return;
         }
 
@@ -500,13 +506,13 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
         // check whether bind is available
         if (d->bindModeAvailable) {
-            sendBind();
+            d->sendBind();
             return;
         }
 
         // check whether session is available
         if (d->sessionAvailable) {
-            sendSessionStart();
+            d->sendSessionStart();
             return;
         }
 
@@ -605,7 +611,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 if(d->streamManagementAvailable)
                 {
-                    sendStreamManagementEnable();
+                    d->sendStreamManagementEnable();
                 }
                 else
                 {
@@ -635,12 +641,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     }
 
                     if (d->sessionAvailable) {
-                        sendSessionStart();
+                        d->sendSessionStart();
                     } else {
                         d->sessionStarted = true;
 
                         if (d->streamManagementAvailable) {
-                            sendStreamManagementEnable();
+                            d->sendStreamManagementEnable();
                         } else {
                             // we are connected now
                             emit connected();
@@ -689,7 +695,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         disconnectFromHost();
                         return;
                     }
-                    sendNonSASLAuth(plainText);
+                    d->sendNonSASLAuth(plainText);
                 }
             }
             // XEP-0199: XMPP Ping
@@ -785,13 +791,13 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // check whether bind is available
             if (d->bindModeAvailable) {
-                sendBind();
+                d->sendBind();
                 return;
             }
 
             // check whether session is available
             if (d->sessionAvailable) {
-                sendSessionStart();
+                d->sendSessionStart();
                 return;
             }
 
@@ -847,56 +853,56 @@ void QXmppOutgoingClient::pingTimeout()
     emit error(QXmppClient::KeepAliveError);
 }
 
-void QXmppOutgoingClient::sendNonSASLAuth(bool plainText)
+void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
 {
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Set);
-    authQuery.setUsername(configuration().user());
+    authQuery.setUsername(q->configuration().user());
     if (plainText)
-        authQuery.setPassword(configuration().password());
+        authQuery.setPassword(q->configuration().password());
     else
-        authQuery.setDigest(d->streamId, configuration().password());
-    authQuery.setResource(configuration().resource());
-    d->nonSASLAuthId = authQuery.id();
-    sendPacket(authQuery);
+        authQuery.setDigest(streamId, q->configuration().password());
+    authQuery.setResource(q->configuration().resource());
+    nonSASLAuthId = authQuery.id();
+    q->sendPacket(authQuery);
 }
 
-void QXmppOutgoingClient::sendNonSASLAuthQuery()
+void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
 {
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Get);
-    authQuery.setTo(d->streamFrom);
+    authQuery.setTo(streamFrom);
     // FIXME : why are we setting the username, XEP-0078 states we should
     // not attempt to guess the required fields?
-    authQuery.setUsername(configuration().user());
-    sendPacket(authQuery);
+    authQuery.setUsername(q->configuration().user());
+    q->sendPacket(authQuery);
 }
 
-void QXmppOutgoingClient::sendBind()
+void QXmppOutgoingClientPrivate::sendBind()
 {
     QXmppBindIq bind;
     bind.setType(QXmppIq::Set);
-    bind.setResource(configuration().resource());
-    d->bindId = bind.id();
-    sendPacket(bind);
+    bind.setResource(q->configuration().resource());
+    bindId = bind.id();
+    q->sendPacket(bind);
 }
 
-void QXmppOutgoingClient::sendSessionStart()
+void QXmppOutgoingClientPrivate::sendSessionStart()
 {
     QXmppSessionIq session;
     session.setType(QXmppIq::Set);
-    session.setTo(configuration().domain());
-    d->sessionId = session.id();
-    sendPacket(session);
+    session.setTo(q->configuration().domain());
+    sessionId = session.id();
+    q->sendPacket(session);
 }
 
-void QXmppOutgoingClient::sendStreamManagementEnable()
+void QXmppOutgoingClientPrivate::sendStreamManagementEnable()
 {
     QXmppStreamManagementEnable streamManagementEnable(true);
     QByteArray data;
     QXmlStreamWriter xmlStream(&data);
     streamManagementEnable.toXml(&xmlStream);
-    sendData(data);
+    q->sendData(data);
 }
 
 /// Returns the type of the last XMPP stream error that occured.

@@ -103,12 +103,6 @@ private slots:
     void pingTimeout();
 
 private:
-    void sendNonSASLAuth(bool plaintext);
-    void sendNonSASLAuthQuery();
-    void sendBind();
-    void sendSessionStart();
-    void sendStreamManagementEnable();
-
     friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate * const d;
 };
