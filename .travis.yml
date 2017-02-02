@@ -2,6 +2,9 @@ sudo: required
 dist: trusty
 language: cpp
 cache: apt
+compiler:
+  - gcc
+  - clang
 env:
   - QT_SELECT=qt4 ; CONFIG=minimal
   - QT_SELECT=qt4 ; CONFIG=minimal-static
