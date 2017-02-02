@@ -2518,7 +2518,8 @@ public:
 };
 
 QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
-    : gatheringState(QXmppIceConnection::NewGatheringState)
+    : connectTimer(NULL)
+    , gatheringState(QXmppIceConnection::NewGatheringState)
     , turnPort(0)
 {
 }
