@@ -714,7 +714,7 @@ void QXmppTransferOutgoingJob::_q_sendData()
         terminate(QXmppTransferJob::FileAccessError);
         return;
     }
-    if (length >= 0)
+    else
     {
         d->socksSocket->write(buffer, length);
         delete [] buffer;
