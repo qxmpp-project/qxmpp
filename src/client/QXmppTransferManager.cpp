@@ -220,6 +220,7 @@ public:
 QXmppTransferJobPrivate::QXmppTransferJobPrivate()
     : blockSize(16384),
     client(0),
+    direction(QXmppTransferJob::IncomingDirection),
     done(0),
     error(QXmppTransferJob::NoError),
     hash(QCryptographicHash::Md5),

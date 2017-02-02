@@ -710,7 +710,8 @@ public:
 };
 
 QXmppJingleIqPrivate::QXmppJingleIqPrivate()
-    : ringing(false)
+    : action(QXmppJingleIq::ContentAccept)
+    , ringing(false)
 {
 }
 
