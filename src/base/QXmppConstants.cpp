@@ -98,6 +98,8 @@ const char* ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char* ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 // XEP-0184: Message Receipts
 const char* ns_message_receipts = "urn:xmpp:receipts";
+// XEP-0198: Stream Management
+const char* ns_stream_management = "urn:xmpp:sm:3";
 // XEP-0199: XMPP Ping
 const char* ns_ping = "urn:xmpp:ping";
 // XEP-0202: Entity Time

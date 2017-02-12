@@ -60,6 +60,8 @@ public:
     QXmppIq::Type type() const;
     void setType(QXmppIq::Type);
 
+    bool isXmppStanza() const;
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

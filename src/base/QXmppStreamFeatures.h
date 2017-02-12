@@ -56,6 +56,15 @@ public:
     Mode tlsMode() const;
     void setTlsMode(Mode mode);
 
+    /// Returns the mode (disabled, enabled or required) for XEP-0198: Stream
+    /// Management
+    Mode streamManagementMode() const;
+
+    /// Sets the mode for XEP-0198: Stream Management
+    ///
+    /// \pa mode The mode to set.
+    void setStreamManagementMode(Mode mode);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
@@ -68,6 +77,7 @@ private:
     Mode m_sessionMode;
     Mode m_nonSaslAuthMode;
     Mode m_tlsMode;
+    Mode m_streamManagementMode;
     QStringList m_authMechanisms;
     QStringList m_compressionMethods;
 };
