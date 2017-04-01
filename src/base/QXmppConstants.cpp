@@ -22,7 +22,7 @@
  */
 
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 const char* ns_stream = "http://etherx.jabber.org/streams";
 const char* ns_client = "jabber:client";
@@ -98,6 +98,8 @@ const char* ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char* ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 // XEP-0184: Message Receipts
 const char* ns_message_receipts = "urn:xmpp:receipts";
+// XEP-0198: Stream Management
+const char* ns_stream_management = "urn:xmpp:sm:3";
 // XEP-0199: XMPP Ping
 const char* ns_ping = "urn:xmpp:ping";
 // XEP-0202: Entity Time
@@ -114,5 +116,7 @@ const char* ns_attention = "urn:xmpp:attention:0";
 const char* ns_bob = "urn:xmpp:bob";
 // XEP-0249: Direct MUC Invitations
 const char* ns_conference = "jabber:x:conference";
+// XEP-0280: Message Carbons
+const char* ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";

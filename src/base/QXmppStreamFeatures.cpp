@@ -23,14 +23,15 @@
 
 #include <QDomElement>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppStreamFeatures.h"
 
 QXmppStreamFeatures::QXmppStreamFeatures()
     : m_bindMode(Disabled),
     m_sessionMode(Disabled),
     m_nonSaslAuthMode(Disabled),
-    m_tlsMode(Disabled)
+    m_tlsMode(Disabled),
+    m_streamManagementMode(Disabled)
 {
 }
 
@@ -94,6 +95,16 @@ void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
     m_tlsMode = mode;
 }
 
+QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
+{
+    return m_streamManagementMode;
+}
+
+void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode)
+{
+    m_streamManagementMode = mode;
+}
+
 /// \cond
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
@@ -104,15 +115,18 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
 {
     QDomElement subElement = element.firstChildElement(tagName);
-    if (subElement.namespaceURI() == tagNs)
-    {
-        if (!subElement.firstChildElement("required").isNull())
-            return QXmppStreamFeatures::Required;
-        else
-            return QXmppStreamFeatures::Enabled;
-    } else {
-        return QXmppStreamFeatures::Disabled;
+    QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
+    while (!subElement.isNull()) {
+        if (subElement.namespaceURI() == tagNs)
+        {
+            if (!subElement.firstChildElement("required").isNull())
+                mode = QXmppStreamFeatures::Required;
+            else if (mode != QXmppStreamFeatures::Required)
+                mode = QXmppStreamFeatures::Enabled;
+        }
+        subElement = subElement.nextSiblingElement(tagName);
     }
+    return mode;
 }
 
 void QXmppStreamFeatures::parse(const QDomElement &element)
@@ -121,6 +135,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     m_sessionMode = readFeature(element, "session", ns_session);
     m_nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
     m_tlsMode = readFeature(element, "starttls", ns_tls);
+    m_streamManagementMode = readFeature(element, "sm", ns_stream_management);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
@@ -165,6 +180,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "session", ns_session, m_sessionMode);
     writeFeature(writer, "auth", ns_authFeature, m_nonSaslAuthMode);
     writeFeature(writer, "starttls", ns_tls, m_tlsMode);
+    writeFeature(writer, "sm", ns_stream_management, m_streamManagementMode);
 
     if (!m_compressionMethods.isEmpty())
     {

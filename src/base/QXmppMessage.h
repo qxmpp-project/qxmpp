@@ -129,6 +129,12 @@ public:
     Marker marker() const;
     void setMarker(const Marker);
 
+    // XEP-0280: Message Carbons
+    bool isPrivate() const;
+    void setPrivate(const bool);
+
+    bool isXmppStanza() const;
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

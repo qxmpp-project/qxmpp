@@ -26,7 +26,7 @@
 #include <QSize>
 #include <QStringList>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppUtils.h"
 

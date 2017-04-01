@@ -25,7 +25,7 @@
 #include <QDomElement>
 
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppGlobal.h"
 #include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"

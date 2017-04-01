@@ -23,7 +23,7 @@
 
 #include <QDomElement>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
 #include "QXmppUtils.h"
 

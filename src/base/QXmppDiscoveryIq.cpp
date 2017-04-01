@@ -24,7 +24,7 @@
 #include <QCryptographicHash>
 #include <QDomElement>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppUtils.h"
 

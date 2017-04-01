@@ -27,7 +27,7 @@
 #include <QXmlStreamWriter>
 #include <QPair>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
@@ -93,6 +93,9 @@ public:
     QXmppMessage::Marker marker;
     QString markedId;
     QString markedThread;
+
+    // XEP-0280: Message Carbons
+    bool privatemsg;
 };
 
 /// Constructs a QXmppMessage.
@@ -117,6 +120,8 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
 
     d->markable = false;
     d->marker = NoMarker;
+
+    d->privatemsg = false;
 }
 
 /// Constructs a copy of \a other.
@@ -372,7 +377,8 @@ namespace
                << qMakePair(QString("request"), QString())
                << qMakePair(QString("delay"), QString())
                << qMakePair(QString("attention"), QString())
-               << qMakePair(QString("addresses"), QString());
+               << qMakePair(QString("addresses"), QString())
+               << qMakePair(QString("private"), QString(ns_carbons));
         for (int i = QXmppMessage::Active; i <= QXmppMessage::Paused; i++)
             result << qMakePair(QString(chat_states[i]), QString());
         return result;
@@ -441,6 +447,32 @@ QXmppMessage::Marker QXmppMessage::marker() const
 void QXmppMessage::setMarker(const Marker marker)
 {
     d->marker = marker;
+}
+
+/// Returns if the message is marked with a <private> tag,
+/// in which case it will not be forwarded to other resources
+/// according to XEP-0280: Message Carbons.
+
+bool QXmppMessage::isPrivate() const
+{
+    return d->privatemsg;
+}
+
+/// If true is passed, the message is marked with a <private> tag,
+/// in which case it will not be forwarded to other resources
+/// according to XEP-0280: Message Carbons.
+
+void QXmppMessage::setPrivate(const bool priv)
+{
+    d->privatemsg = priv;
+}
+
+/// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
+/// iq or presence)
+
+bool QXmppMessage::isXmppStanza() const
+{
+    return true;
 }
 
 /// \cond
@@ -542,6 +574,11 @@ void QXmppMessage::parse(const QDomElement &element)
             d->markedThread = chatStateElement.attribute("thread", QString());
         }
     }
+
+    // XEP-0280: Message Carbons
+    QDomElement privateElement = element.firstChildElement("private");
+    if (!privateElement.isNull())
+        d->privatemsg = true;
 
     const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
 
@@ -682,6 +719,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
             xmlWriter->writeAttribute("thread", d->markedThread);
         }
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0280: Message Carbons
+    if (d->privatemsg) {
+        xmlWriter->writeStartElement("private");
+        xmlWriter->writeAttribute("xmlns", ns_carbons);
         xmlWriter->writeEndElement();
     }
 

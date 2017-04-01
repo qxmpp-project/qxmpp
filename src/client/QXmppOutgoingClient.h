@@ -88,6 +88,9 @@ protected:
     virtual void handleStream(const QDomElement &element);
     /// \endcond
 
+public slots:
+    virtual void disconnectFromHost();
+
 private slots:
     void _q_dnsLookupFinished();
     void _q_socketDisconnected();
@@ -100,9 +103,6 @@ private slots:
     void pingTimeout();
 
 private:
-    void sendNonSASLAuth(bool plaintext);
-    void sendNonSASLAuthQuery();
-
     friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate * const d;
 };

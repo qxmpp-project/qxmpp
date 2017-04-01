@@ -189,6 +189,8 @@ public:
     QList<QXmppExtendedAddress> extendedAddresses() const;
     void setExtendedAddresses(const QList<QXmppExtendedAddress> &extendedAddresses);
 
+    virtual bool isXmppStanza() const;
+
     /// \cond
     virtual void parse(const QDomElement &element);
     virtual void toXml(QXmlStreamWriter *writer) const = 0;

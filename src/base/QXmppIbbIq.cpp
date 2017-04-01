@@ -25,7 +25,7 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppIbbIq.h"
 
 QXmppIbbOpenIq::QXmppIbbOpenIq() : QXmppIq(QXmppIq::Set), m_block_size(1024)

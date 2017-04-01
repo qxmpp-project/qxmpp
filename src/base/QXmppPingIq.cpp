@@ -21,7 +21,7 @@
  *
  */
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppPingIq.h"
 #include "QXmppUtils.h"
 

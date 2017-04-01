@@ -31,7 +31,7 @@
 #include "qdnslookup.h"
 #endif
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
 #include "QXmppStreamFeatures.h"

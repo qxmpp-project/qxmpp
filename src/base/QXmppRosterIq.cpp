@@ -26,7 +26,7 @@
 #include <QXmlStreamWriter>
 
 #include "QXmppRosterIq.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 /// Adds an item to the roster IQ.

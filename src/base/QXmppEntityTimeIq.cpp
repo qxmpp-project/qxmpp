@@ -26,7 +26,7 @@
 
 #include <QDomElement>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 /// Returns the timezone offset in seconds.

@@ -33,13 +33,14 @@
 #endif
 
 #include "QXmppConfiguration.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppPresence.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppStreamFeatures.h"
+#include "QXmppStreamManagement_p.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
@@ -64,6 +65,12 @@ public:
     QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const QString &host, quint16 port);
 
+    void sendNonSASLAuth(bool plaintext);
+    void sendNonSASLAuthQuery();
+    void sendBind();
+    void sendSessionStart();
+    void sendStreamManagementEnable();
+
     // This object provides the configuration
     // required for connecting to the XMPP server.
     QXmppConfiguration config;
@@ -84,6 +91,7 @@ public:
     // Session
     QString bindId;
     QString sessionId;
+    bool bindModeAvailable;
     bool sessionAvailable;
     bool sessionStarted;
 
@@ -91,6 +99,14 @@ public:
     bool isAuthenticated;
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
+
+    // Stream Management
+    bool streamManagementAvailable;
+    QString smId;
+    bool canResume;
+    bool isResuming;
+    QString resumeHost;
+    quint16 resumePort;
 
     // Timers
     QTimer *pingTimer;
@@ -102,10 +118,15 @@ private:
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : redirectPort(0)
+    , bindModeAvailable(false)
     , sessionAvailable(false)
     , sessionStarted(false)
     , isAuthenticated(false)
     , saslClient(0)
+    , streamManagementAvailable(false)
+    , canResume(false)
+    , isResuming(false)
+    , resumePort(0)
     , pingTimer(0)
     , timeoutTimer(0)
     , q(qq)
@@ -212,6 +233,12 @@ QXmppConfiguration& QXmppOutgoingClient::configuration()
 
 void QXmppOutgoingClient::connectToHost()
 {
+    // if a host for resumption is available, connect to it
+    if (d->canResume && !d->resumeHost.isEmpty() && d->resumePort) {
+        d->connectToHost(d->resumeHost, d->resumePort);
+        return;
+    }
+
     // if an explicit host was provided, connect to it
     if (!d->config.host().isEmpty() && d->config.port()) {
         d->connectToHost(d->config.host(), d->config.port());
@@ -224,6 +251,12 @@ void QXmppOutgoingClient::connectToHost()
     d->dns.setName("_xmpp-client._tcp." + domain);
     d->dns.setType(QDnsLookup::SRV);
     d->dns.lookup();
+}
+
+void QXmppOutgoingClient::disconnectFromHost()
+{
+    d->canResume = false;
+    QXmppStream::disconnectFromHost();
 }
 
 void QXmppOutgoingClient::_q_dnsLookupFinished()
@@ -332,7 +365,7 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled
         if(d->streamVersion.isEmpty() && configuration().useNonSASLAuthentication()) {
-            sendNonSASLAuthQuery();
+            d->sendNonSASLAuthQuery();
         }
     }
 }
@@ -451,38 +484,41 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
             return;
         } else if(nonSaslAvailable && configuration().useNonSASLAuthentication()) {
-            sendNonSASLAuthQuery();
+            d->sendNonSASLAuthQuery();
             return;
         }
 
-        // store whether session is available
+        // store which features are available
         d->sessionAvailable = (features.sessionMode() != QXmppStreamFeatures::Disabled);
+        d->bindModeAvailable = (features.bindMode() != QXmppStreamFeatures::Disabled);
+        d->streamManagementAvailable = (features.streamManagementMode() != QXmppStreamFeatures::Disabled);
+
+        // chech whether the stream can be resumed
+        if (d->streamManagementAvailable && d->canResume) {
+            d->isResuming = true;
+            QXmppStreamManagementResume streamManagementResume(lastIncomingSequenceNumber(), d->smId);
+            QByteArray data;
+            QXmlStreamWriter xmlStream(&data);
+            streamManagementResume.toXml(&xmlStream);
+            sendData(data);
+            return;
+        }
 
         // check whether bind is available
-        if (features.bindMode() != QXmppStreamFeatures::Disabled)
-        {
-            QXmppBindIq bind;
-            bind.setType(QXmppIq::Set);
-            bind.setResource(configuration().resource());
-            d->bindId = bind.id();
-            sendPacket(bind);
+        if (d->bindModeAvailable) {
+            d->sendBind();
             return;
         }
 
         // check whether session is available
-        if (d->sessionAvailable)
-        {
-            // start session if it is available
-            QXmppSessionIq session;
-            session.setType(QXmppIq::Set);
-            session.setTo(configuration().domain());
-            d->sessionId = session.id();
-            sendPacket(session);
-        } else {
-            // otherwise we are done
-            d->sessionStarted = true;
-            emit connected();
+        if (d->sessionAvailable) {
+            d->sendSessionStart();
+            return;
         }
+
+        // otherwise we are done
+        d->sessionStarted = true;
+        emit connected();
     }
     else if(ns == ns_stream && nodeRecv.tagName() == "error")
     {
@@ -494,7 +530,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 d->redirectPort = redirectRegex.cap(2).mid(1).toUShort();
             else
                 d->redirectPort = 5222;
-            disconnectFromHost();
+            QXmppStream::disconnectFromHost();
             return;
         }
 
@@ -571,10 +607,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             {
                 QXmppSessionIq session;
                 session.parse(nodeRecv);
-
-                // xmpp connection made
                 d->sessionStarted = true;
-                emit connected();
+
+                if(d->streamManagementAvailable)
+                {
+                    d->sendStreamManagementEnable();
+                }
+                else
+                {
+                    // we are connected now
+                    emit connected();
+                }
             }
             else if(QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId)
             {
@@ -597,18 +640,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         }
                     }
 
-                    if (d->sessionAvailable)
-                    {
-                        // start session if it is available
-                        QXmppSessionIq session;
-                        session.setType(QXmppIq::Set);
-                        session.setTo(configuration().domain());
-                        d->sessionId = session.id();
-                        sendPacket(session);
+                    if (d->sessionAvailable) {
+                        d->sendSessionStart();
                     } else {
-                        // otherwise we are done
                         d->sessionStarted = true;
-                        emit connected();
+
+                        if (d->streamManagementAvailable) {
+                            d->sendStreamManagementEnable();
+                        } else {
+                            // we are connected now
+                            emit connected();
+                        }
                     }
                 }
             }
@@ -653,7 +695,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         disconnectFromHost();
                         return;
                     }
-                    sendNonSASLAuth(plainText);
+                    d->sendNonSASLAuth(plainText);
                 }
             }
             // XEP-0199: XMPP Ping
@@ -705,6 +747,68 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             emit messageReceived(message);
         }
     }
+    else if(QXmppStreamManagementEnabled::isStreamManagementEnabled(nodeRecv))
+    {
+        QXmppStreamManagementEnabled streamManagementEnabled;
+        streamManagementEnabled.parse(nodeRecv);
+        d->smId = streamManagementEnabled.id();
+        d->canResume = streamManagementEnabled.resume();
+        if (streamManagementEnabled.resume() && !streamManagementEnabled.location().isEmpty()) {
+            QRegExp locationRegex("([^:]+)(:[0-9]+)?");
+            if (locationRegex.exactMatch(streamManagementEnabled.location())) {
+                d->resumeHost = locationRegex.cap(0);
+                if (!locationRegex.cap(2).isEmpty())
+                    d->resumePort = locationRegex.cap(2).mid(1).toUShort();
+                else
+                    d->resumePort = 5222;
+            } else {
+                d->resumeHost = QString();
+                d->resumePort = 0;
+            }
+        }
+
+        enableStreamManagement(true);
+        // we are connected now
+        emit connected();
+    }
+    else if(QXmppStreamManagementResumed::isStreamManagementResumed(nodeRecv))
+    {
+        QXmppStreamManagementResumed streamManagementResumed;
+        streamManagementResumed.parse(nodeRecv);
+        setAcknowledgedSequenceNumber(streamManagementResumed.h());
+        d->isResuming = false;
+
+        enableStreamManagement(false);
+        // we are connected now
+        // TODO: The stream was resumed. Therefore, we should not send presence information or request the roster.
+        emit connected();
+    }
+    else if(QXmppStreamManagementFailed::isStreamManagementFailed(nodeRecv))
+    {
+        if (d->isResuming) {
+            // resuming failed. We can try to bind a resource now.
+            d->isResuming = false;
+
+            // check whether bind is available
+            if (d->bindModeAvailable) {
+                d->sendBind();
+                return;
+            }
+
+            // check whether session is available
+            if (d->sessionAvailable) {
+                d->sendSessionStart();
+                return;
+            }
+
+            // otherwise we are done
+            d->sessionStarted = true;
+            emit connected();
+        } else {
+            // we are connected now, but stream management is disabled
+            emit connected();
+        }
+    }
 }
 /// \endcond
 
@@ -745,33 +849,60 @@ void QXmppOutgoingClient::pingSend()
 void QXmppOutgoingClient::pingTimeout()
 {
     warning("Ping timeout");
-    disconnectFromHost();
+    QXmppStream::disconnectFromHost();
     emit error(QXmppClient::KeepAliveError);
 }
 
-void QXmppOutgoingClient::sendNonSASLAuth(bool plainText)
+void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
 {
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Set);
-    authQuery.setUsername(configuration().user());
+    authQuery.setUsername(q->configuration().user());
     if (plainText)
-        authQuery.setPassword(configuration().password());
+        authQuery.setPassword(q->configuration().password());
     else
-        authQuery.setDigest(d->streamId, configuration().password());
-    authQuery.setResource(configuration().resource());
-    d->nonSASLAuthId = authQuery.id();
-    sendPacket(authQuery);
+        authQuery.setDigest(streamId, q->configuration().password());
+    authQuery.setResource(q->configuration().resource());
+    nonSASLAuthId = authQuery.id();
+    q->sendPacket(authQuery);
 }
 
-void QXmppOutgoingClient::sendNonSASLAuthQuery()
+void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
 {
     QXmppNonSASLAuthIq authQuery;
     authQuery.setType(QXmppIq::Get);
-    authQuery.setTo(d->streamFrom);
+    authQuery.setTo(streamFrom);
     // FIXME : why are we setting the username, XEP-0078 states we should
     // not attempt to guess the required fields?
-    authQuery.setUsername(configuration().user());
-    sendPacket(authQuery);
+    authQuery.setUsername(q->configuration().user());
+    q->sendPacket(authQuery);
+}
+
+void QXmppOutgoingClientPrivate::sendBind()
+{
+    QXmppBindIq bind;
+    bind.setType(QXmppIq::Set);
+    bind.setResource(q->configuration().resource());
+    bindId = bind.id();
+    q->sendPacket(bind);
+}
+
+void QXmppOutgoingClientPrivate::sendSessionStart()
+{
+    QXmppSessionIq session;
+    session.setType(QXmppIq::Set);
+    session.setTo(q->configuration().domain());
+    sessionId = session.id();
+    q->sendPacket(session);
+}
+
+void QXmppOutgoingClientPrivate::sendStreamManagementEnable()
+{
+    QXmppStreamManagementEnable streamManagementEnable(true);
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    streamManagementEnable.toXml(&xmlStream);
+    q->sendData(data);
 }
 
 /// Returns the type of the last XMPP stream error that occured.

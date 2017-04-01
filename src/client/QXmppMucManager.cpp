@@ -25,7 +25,7 @@
 #include <QMap>
 
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"

@@ -25,8 +25,9 @@
 
 
 #include "QXmppStanza.h"
+#include "QXmppStanza_p.h"
 #include "QXmppUtils.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
@@ -245,55 +246,7 @@ QString QXmppStanza::Error::getTypeStr() const
 
 QString QXmppStanza::Error::getConditionStr() const
 {
-    switch(m_condition)
-    {
-    case BadRequest:
-        return "bad-request";
-    case Conflict:
-        return "conflict";
-    case FeatureNotImplemented:
-        return "feature-not-implemented";
-    case Forbidden:
-        return "forbidden";
-    case Gone:
-        return "gone";
-    case InternalServerError:
-        return "internal-server-error";
-    case ItemNotFound:
-        return "item-not-found";
-    case JidMalformed:
-        return "jid-malformed";
-    case NotAcceptable:
-        return "not-acceptable";
-    case NotAllowed:
-        return "not-allowed";
-    case NotAuthorized:
-        return "not-authorized";
-    case PaymentRequired:
-        return "payment-required";
-    case RecipientUnavailable:
-        return "recipient-unavailable";
-    case Redirect:
-        return "redirect";
-    case RegistrationRequired:
-        return "registration-required";
-    case RemoteServerNotFound:
-        return "remote-server-not-found";
-    case RemoteServerTimeout:
-        return "remote-server-timeout";
-    case ResourceConstraint:
-        return "resource-constraint";
-    case ServiceUnavailable:
-        return "service-unavailable";
-    case SubscriptionRequired:
-        return "subscription-required";
-    case UndefinedCondition:
-        return "undefined-condition";
-    case UnexpectedRequest:
-        return "unexpected-request";
-    default:
-        return "";
-    }
+    return strFromCondition(m_condition);
 }
 
 void QXmppStanza::Error::setTypeFromStr(const QString& type)
@@ -314,52 +267,7 @@ void QXmppStanza::Error::setTypeFromStr(const QString& type)
 
 void QXmppStanza::Error::setConditionFromStr(const QString& type)
 {
-    if(type == "bad-request")
-        setCondition(BadRequest);
-    else if(type == "conflict")
-        setCondition(Conflict);
-    else if(type == "feature-not-implemented")
-        setCondition(FeatureNotImplemented);
-    else if(type == "forbidden")
-        setCondition(Forbidden);
-    else if(type == "gone")
-        setCondition(Gone);
-    else if(type == "internal-server-error")
-        setCondition(InternalServerError);
-    else if(type == "item-not-found")
-        setCondition(ItemNotFound);
-    else if(type == "jid-malformed")
-        setCondition(JidMalformed);
-    else if(type == "not-acceptable")
-        setCondition(NotAcceptable);
-    else if(type == "not-allowed")
-        setCondition(NotAllowed);
-    else if(type == "not-authorized")
-        setCondition(NotAuthorized);
-    else if(type == "payment-required")
-        setCondition(PaymentRequired);
-    else if(type == "recipient-unavailable")
-        setCondition(RecipientUnavailable);
-    else if(type == "redirect")
-        setCondition(Redirect);
-    else if(type == "registration-required")
-        setCondition(RegistrationRequired);
-    else if(type == "remote-server-not-found")
-        setCondition(RemoteServerNotFound);
-    else if(type == "remote-server-timeout")
-        setCondition(RemoteServerTimeout);
-    else if(type == "resource-constraint")
-        setCondition(ResourceConstraint);
-    else if(type == "service-unavailable")
-        setCondition(ServiceUnavailable);
-    else if(type == "subscription-required")
-        setCondition(SubscriptionRequired);
-    else if(type == "undefined-condition")
-        setCondition(UndefinedCondition);
-    else if(type == "unexpected-request")
-        setCondition(UnexpectedRequest);
-    else
-        setCondition(static_cast<QXmppStanza::Error::Condition>(-1));
+    setCondition(conditionFromStr(type));
 }
 
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
@@ -576,6 +484,14 @@ QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
 void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addresses)
 {
     d->extendedAddresses = addresses;
+}
+
+/// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
+/// iq or presence)
+
+bool QXmppStanza::isXmppStanza() const
+{
+    return false;
 }
 
 /// \cond

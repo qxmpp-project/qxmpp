@@ -25,7 +25,7 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppUtils.h"
 

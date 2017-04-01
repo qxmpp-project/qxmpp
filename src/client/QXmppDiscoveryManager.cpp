@@ -27,7 +27,7 @@
 #include <QCoreApplication>
 
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppStream.h"

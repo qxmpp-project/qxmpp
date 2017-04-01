@@ -26,7 +26,7 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
 #include "QXmppStun.h"

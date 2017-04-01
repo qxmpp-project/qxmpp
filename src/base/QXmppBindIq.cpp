@@ -28,7 +28,7 @@
 
 #include "QXmppBindIq.h"
 #include "QXmppUtils.h"
-#include "QXmppConstants.h"
+#include "QXmppConstants_p.h"
 
 /// Returns the bound JID.
 ///
