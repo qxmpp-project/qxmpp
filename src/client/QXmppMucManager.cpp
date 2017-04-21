@@ -75,10 +75,10 @@ QXmppMucManager::~QXmppMucManager()
 
 QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
 {
-    QXmppMucRoom *room = d->rooms.value(roomJid);
+    QXmppMucRoom *room = d->rooms.value(roomJid.toLower());
     if (!room) {
-        room = new QXmppMucRoom(client(), roomJid, this);
-        d->rooms.insert(roomJid, room);
+        room = new QXmppMucRoom(client(), roomJid.toLower(), this);
+        d->rooms.insert(roomJid.toLower(), room);
         connect(room, SIGNAL(destroyed(QObject*)),
             this, SLOT(_q_roomDestroyed(QObject*)));
 
