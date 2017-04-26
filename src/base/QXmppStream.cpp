@@ -112,6 +112,7 @@ void QXmppStream::disconnectFromHost()
 
 void QXmppStream::handleStart()
 {
+    d->streamManagementEnabled = false;
     d->dataBuffer.clear();
     d->streamStart.clear();
 }
