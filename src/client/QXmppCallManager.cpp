@@ -87,7 +87,7 @@ private:
 class QXmppCallManagerPrivate
 {
 public:
-    QXmppCallManagerPrivate(QXmppCallManager *qq);
+    QXmppCallManagerPrivate();
     QXmppCall *findCall(const QString &sid) const;
     QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
 
@@ -98,9 +98,6 @@ public:
     quint16 turnPort;
     QString turnUser;
     QString turnPassword;
-
-private:
-    QXmppCallManager *q;
 };
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
@@ -691,10 +688,9 @@ void QXmppCall::stopVideo()
         updateOpenMode();
 }
 
-QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
+QXmppCallManagerPrivate::QXmppCallManagerPrivate()
     : stunPort(0),
-    turnPort(0),
-    q(qq)
+    turnPort(0)
 {
 }
 
@@ -719,8 +715,8 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
 ///
 
 QXmppCallManager::QXmppCallManager()
+    : d(new QXmppCallManagerPrivate())
 {
-    d = new QXmppCallManagerPrivate(this);
 }
 
 /// Destroys the QXmppCallManager object.

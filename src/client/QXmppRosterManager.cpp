@@ -33,7 +33,7 @@
 class QXmppRosterManagerPrivate
 {
 public:
-    QXmppRosterManagerPrivate(QXmppRosterManager *qq);
+    QXmppRosterManagerPrivate();
 
     // map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> entries;
@@ -46,25 +46,20 @@ public:
 
     // id of the initial roster request
     QString rosterReqId;
-
-private:
-    QXmppRosterManager *q;
 };
 
-QXmppRosterManagerPrivate::QXmppRosterManagerPrivate(QXmppRosterManager *qq)
-    : isRosterReceived(false),
-    q(qq)
+QXmppRosterManagerPrivate::QXmppRosterManagerPrivate()
+    : isRosterReceived(false)
 {
 }
 
 /// Constructs a roster manager.
 
 QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
+    : d(new QXmppRosterManagerPrivate())
 {
     bool check;
     Q_UNUSED(check);
-
-    d = new QXmppRosterManagerPrivate(this);
 
     check = connect(client, SIGNAL(connected()),
                     this, SLOT(_q_connected()));

@@ -108,7 +108,7 @@ QXmppSocksClient::QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, 
     connect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
 }
 
-void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
+void QXmppSocksClient::establishConnection(const QString &hostName, quint16 hostPort)
 {
     m_hostName = hostName;
     m_hostPort = hostPort;
