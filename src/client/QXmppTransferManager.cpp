@@ -508,7 +508,7 @@ void QXmppTransferIncomingJob::connectToNextHost()
 
     m_candidateTimer->setSingleShot(true);
     m_candidateTimer->start(socksTimeout);
-    m_candidateClient->connectToHost(hostName, 0);
+    m_candidateClient->establishConnection(hostName, 0);
 }
 
 void QXmppTransferIncomingJob::connectToHosts(const QXmppByteStreamIq &iq)
@@ -644,7 +644,7 @@ void QXmppTransferOutgoingJob::connectToProxy()
     Q_ASSERT(check);
 
     d->socksSocket = socksClient;
-    socksClient->connectToHost(hostName, 0);
+    socksClient->establishConnection(hostName, 0);
 }
 
 void QXmppTransferOutgoingJob::startSending()
@@ -727,7 +727,7 @@ void QXmppTransferOutgoingJob::_q_sendData()
 class QXmppTransferManagerPrivate
 {
 public:
-    QXmppTransferManagerPrivate(QXmppTransferManager *qq);
+    QXmppTransferManagerPrivate();
 
     QXmppTransferIncomingJob *getIncomingJobByRequestId(const QString &jid, const QString &id);
     QXmppTransferIncomingJob *getIncomingJobBySid(const QString &jid, const QString &sid);
@@ -742,15 +742,13 @@ public:
 
 private:
     QXmppTransferJob *getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id);
-    QXmppTransferManager *q;
 };
 
-QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *qq)
+QXmppTransferManagerPrivate::QXmppTransferManagerPrivate()
     : ibbBlockSize(4096)
     , proxyOnly(false)
     , socksServer(0)
     , supportedMethods(QXmppTransferJob::AnyMethod)
-    , q(qq)
 {
 }
 
@@ -788,11 +786,10 @@ QXmppTransferOutgoingJob *QXmppTransferManagerPrivate::getOutgoingJobByRequestId
 /// file transfers.
 
 QXmppTransferManager::QXmppTransferManager()
+    : d(new QXmppTransferManagerPrivate())
 {
     bool check;
     Q_UNUSED(check);
-
-    d = new QXmppTransferManagerPrivate(this);
 
     // start SOCKS server
     d->socksServer = new QXmppSocksServer(this);

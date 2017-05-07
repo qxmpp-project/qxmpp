@@ -104,7 +104,7 @@ void tst_QXmppSocks::testClient()
     QEventLoop loop;
     connect(&server, SIGNAL(newConnection()), &loop, SLOT(quit()));
 
-    client.connectToHost("www.google.com", 80);
+    client.establishConnection("www.google.com", 80);
     loop.exec();
 
     // receive client handshake
@@ -163,7 +163,7 @@ void tst_QXmppSocks::testClientAndServer()
     QEventLoop loop;
     connect(&client, SIGNAL(ready()), &loop, SLOT(quit()));
   
-    client.connectToHost("www.google.com", 80);
+    client.establishConnection("www.google.com", 80);
     loop.exec();
 
     // check client

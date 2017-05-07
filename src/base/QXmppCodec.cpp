@@ -397,7 +397,6 @@ qint64 QXmppSpeexCodec::decode(QDataStream &input, QDataStream &output)
 
 #ifdef QXMPP_USE_OPUS
 QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
-    sampleRate(clockrate),
     nChannels(channels)
 {
     int error;
@@ -415,7 +414,7 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     else
         qCritical() << "Opus encoder initialization error:" << opus_strerror(error);
 
-    // Here, clockrate is synonym of sampleRate.
+    // Here, clockrate is synonym of sample rate.
     decoder = opus_decoder_create(clockrate, channels, &error);
 
     if (!encoder || error != OPUS_OK)
@@ -429,7 +428,7 @@ QXmppOpusCodec::QXmppOpusCodec(int clockrate, int channels):
     // so now, calculate the equivalent number of samples to process in each
     // frame.
     //
-    // nSamples = t * sampleRate
+    // nSamples = t * clockrate
     for (int i = 0; i < validFrameSize.size(); i++)
         validFrameSize[i] *= clockrate;
 
