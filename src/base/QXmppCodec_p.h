@@ -128,7 +128,6 @@ public:
 private:
     OpusEncoder *encoder;
     OpusDecoder *decoder;
-    int sampleRate;
     int nChannels;
     QList<float> validFrameSize;
     int nSamples;
