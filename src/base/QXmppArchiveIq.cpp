@@ -93,7 +93,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
     m_thread = element.attribute("thread");
     m_version = element.attribute("version").toInt();
 
-    QDateTime timeAccu = m_start;
+    QDateTime timeAccu;
 
     QDomElement child = element.firstChildElement();
     while (!child.isNull())
@@ -102,7 +102,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
         {
             QXmppArchiveMessage message;
             message.setBody(child.firstChildElement("body").text());
-            timeAccu = timeAccu.addSecs(child.attribute("secs").toInt());
+            timeAccu = m_start.addSecs(child.attribute("secs").toInt());
             message.setDate(timeAccu);
             message.setReceived(child.tagName() == "from");
             m_messages << message;
