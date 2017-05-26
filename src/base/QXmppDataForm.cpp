@@ -80,6 +80,7 @@ QXmppDataForm::Media::~Media()
 
 QXmppDataForm::Media& QXmppDataForm::Media::operator=(const QXmppDataForm::Media &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -179,6 +180,7 @@ QXmppDataForm::Field::~Field()
 
 QXmppDataForm::Field& QXmppDataForm::Field::operator=(const QXmppDataForm::Field &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -350,6 +352,7 @@ QXmppDataForm::~QXmppDataForm()
 
 QXmppDataForm& QXmppDataForm::operator=(const QXmppDataForm &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }

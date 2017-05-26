@@ -69,6 +69,7 @@ QXmppIq::~QXmppIq()
 
 QXmppIq& QXmppIq::operator=(const QXmppIq &other)
 {
+    if (this == &other) return *this;
     QXmppStanza::operator=(other);
     d = other.d;
     return *this;

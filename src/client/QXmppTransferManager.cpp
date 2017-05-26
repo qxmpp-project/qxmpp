@@ -146,6 +146,7 @@ bool QXmppTransferFileInfo::isNull() const
 
 QXmppTransferFileInfo& QXmppTransferFileInfo::operator=(const QXmppTransferFileInfo &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }

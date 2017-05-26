@@ -545,6 +545,7 @@ QString QDnsDomainNameRecord::value() const
 
 QDnsDomainNameRecord &QDnsDomainNameRecord::operator=(const QDnsDomainNameRecord &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -623,6 +624,7 @@ QHostAddress QDnsHostAddressRecord::value() const
 
 QDnsHostAddressRecord &QDnsHostAddressRecord::operator=(const QDnsHostAddressRecord &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -712,6 +714,7 @@ quint32 QDnsMailExchangeRecord::timeToLive() const
 
 QDnsMailExchangeRecord &QDnsMailExchangeRecord::operator=(const QDnsMailExchangeRecord &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -826,6 +829,7 @@ quint16 QDnsServiceRecord::weight() const
 
 QDnsServiceRecord &QDnsServiceRecord::operator=(const QDnsServiceRecord &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }
@@ -906,6 +910,7 @@ QList<QByteArray> QDnsTextRecord::values() const
 
 QDnsTextRecord &QDnsTextRecord::operator=(const QDnsTextRecord &other)
 {
+    if (this == &other) return *this;
     d = other.d;
     return *this;
 }

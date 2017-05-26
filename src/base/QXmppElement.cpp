@@ -123,6 +123,7 @@ QXmppElement::~QXmppElement()
 
 QXmppElement &QXmppElement::operator=(const QXmppElement &other)
 {
+    if (this == &other) return *this;
     other.d->counter.ref();
     if (!d->counter.deref())
         delete d;
