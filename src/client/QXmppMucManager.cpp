@@ -136,8 +136,10 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result && !iq.form().isNull())
+            {
                 emit room->configurationReceived(iq.form());
-            return true;
+                return true;
+            }
         }
     }
     return false;
