@@ -1,0 +1,27 @@
+project(qxmpp)
+
+cmake_minimum_required(VERSION 3.2)
+
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 9)
+set(VERSION_PATCH 4)
+set(SO_VERSION 0)
+set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH VERSION_STRING)
+
+find_package(Qt5 REQUIRED COMPONENTS Core Network Xml)
+set(CMAKE_AUTOMOC ON)
+
+include(GNUInstallDirs)
+
+#add_subdirectory(doc)
+add_subdirectory(src)
+#add_subdirectory(tests)
+#add_subdirectory(examples)
+
+install(
+    FILES QXmppConfig.cmake
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/qxmpp"
+    COMPONENT Devel
+)
+
