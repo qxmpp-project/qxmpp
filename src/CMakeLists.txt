@@ -157,6 +157,36 @@ set(SOURCE_FILES
     server/QXmppServerPlugin.cpp
 )
 
+option(WITH_SPEEX "Support the Speex codec" OFF)
+option(WITH_OPUS "Support the Opus codec" OFF)
+option(WITH_THEORA "Support the Theora codec" OFF)
+option(WITH_VPX "Support the VPX codec" OFF)
+
+if(WITH_SPEEX)
+    find_package(Speex REQUIRED)
+    include_directories(${Speex_INCLUDE_DIRS})
+    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Speex_LIBRARIES})
+    add_definitions(-DQXMPP_USE_SPEEX)
+endif()
+if(WITH_OPUS)
+    find_package(Opus REQUIRED)
+    include_directories(${Opus_INCLUDE_DIRS})
+    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Opus_LIBRARIES})
+    add_definitions(-DQXMPP_USE_OPUS)
+endif()
+if(WITH_THEORA)
+    find_package(Theora REQUIRED)
+    include_directories(${Theora_INCLUDE_DIRS})
+    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Theora_LIBRARIES})
+    add_definitions(-DQXMPP_USE_THEORA)
+endif()
+if(WITH_VPX)
+    find_package(VPX REQUIRED)
+    include_directories(${VPX_INCLUDE_DIRS})
+    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${VPX_LIBRARIES})
+    add_definitions(-DQXMPP_USE_VPX)
+endif()
+
 add_library(qxmpp SHARED ${SOURCE_FILES})
 
 set_target_properties(qxmpp PROPERTIES
@@ -171,6 +201,8 @@ target_link_libraries(qxmpp
     Qt5::Core
     Qt5::Network
     Qt5::Xml
+    PRIVATE
+    ${MULTIMEDIA_LIBS}
 )
 
 install(
