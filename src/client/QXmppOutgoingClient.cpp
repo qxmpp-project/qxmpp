@@ -26,11 +26,7 @@
 #include <QNetworkProxy>
 #include <QSslSocket>
 #include <QUrl>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QDnsLookup>
-#else
-#include "qdnslookup.h"
-#endif
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
@@ -144,10 +140,8 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
 
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
     // set the name the SSL certificate should match
     q->socket()->setPeerVerifyName(config.domain());
-#endif
 
     // connect to host
     const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
