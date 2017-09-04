@@ -1,0 +1,13 @@
+PROJECT_NAME           = "@CMAKE_PROJECT_NAME@"
+PROJECT_NUMBER         = @VERSION_STRING@
+INPUT                  = @DOXYGEN_INPUT@
+
+ALPHABETICAL_INDEX     = NO
+EXCLUDE_PATTERNS       = */moc_* */mod_* */*_p.h */QXmppCodec.cpp */QXmppSasl.cpp
+FULL_PATH_NAMES        = NO
+HIDE_UNDOC_CLASSES     = YES
+GENERATE_LATEX         = NO
+HTML_TIMESTAMP         = NO
+QUIET                  = YES
+RECURSIVE              = YES
+

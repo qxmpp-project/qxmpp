@@ -1,0 +1,20 @@
+find_package(Doxygen REQUIRED)
+
+set(DOXYGEN_INPUT
+    ${CMAKE_CURRENT_SOURCE_DIR}/index.doc
+    ${CMAKE_CURRENT_SOURCE_DIR}/using.doc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xep.doc
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+
+add_custom_target(
+    doc ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generate API documentation with Doxygen"
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION ${CMAKE_INSTALL_DOCDIR})
+

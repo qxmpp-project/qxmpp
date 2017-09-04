@@ -16,14 +16,18 @@ set(CMAKE_AUTORCC ON)
 include(GNUInstallDirs)
 
 option(BUILD_TESTS "Build tests." ON)
+option(BUILD_DOCUMENTATION "Build API documentation." OFF)
 
-#add_subdirectory(doc)
 add_subdirectory(src)
 #add_subdirectory(examples)
 
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(BUILD_DOCUMENTATION)
+    add_subdirectory(doc)
 endif()
 
 install(
