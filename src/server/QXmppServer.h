@@ -143,7 +143,7 @@ signals:
     void newConnection(QSslSocket *socket);
 
 private:
-    void incomingConnection(int socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
     QXmppSslServerPrivate * const d;
 };
 

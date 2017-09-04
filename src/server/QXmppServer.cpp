@@ -891,7 +891,7 @@ QXmppSslServer::~QXmppSslServer()
     delete d;
 }
 
-void QXmppSslServer::incomingConnection(int socketDescriptor)
+void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
 {
     QSslSocket *socket = new QSslSocket;
     if (!socket->setSocketDescriptor(socketDescriptor)) {
