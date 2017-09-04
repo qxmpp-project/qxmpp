@@ -12,3 +12,7 @@ Ian Reinhart Geiser <geiseri@kde.org>
 
 Georg Rudoy <0xd34df00d@gmail.com>
  * Author of receipts manager, extended stanza addressing.
+
+Niels Ole Salscheider <niels_ole@salscheider-online.de>
+ * Build system, cleanups.
+
