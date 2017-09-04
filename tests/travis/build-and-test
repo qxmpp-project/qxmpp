@@ -1,43 +1,23 @@
 #!/bin/sh
 set -e
 
-QMAKE_ARGS=""
-
-if [ -n "$CC" ]; then
-    QMAKE_ARGS="$QMAKE_ARGS QMAKE_CC=$CC"
-fi
-
-
-if [ -n "$CXX" ]; then
-    QMAKE_ARGS="$QMAKE_ARGS QMAKE_CXX=$CXX"
-fi
-
-if [ "$CXX" = "clang++" ]; then
-    QMAKE_ARGS="$QMAKE_ARGS QMAKE_LINK=clang++"
-    QMAKE_ARGS="$QMAKE_ARGS QMAKE_LINK_SHLIB=clang++"
-fi
+CMAKE_ARGS="-DBUILD_TESTS:BOOL=True"
 
 case "$CONFIG" in
 full*)
-    QMAKE_ARGS="$QMAKE_ARGS QXMPP_USE_DOXYGEN=1 QXMPP_USE_OPUS=1 QXMPP_USE_SPEEX=1 QXMPP_USE_THEORA=1 QXMPP_USE_VPX=1"
+    CMAKE_ARGS="-DBUILD_DOCUMENTATION:BOOL=True -DBUILD_EXAMPLES:BOOL=True -DWITH_OPUS:BOOL=True -DWITH_SPEEX:BOOL=True -DWITH_THEORA:BOOL=True -DWITH_VPX:BOOL=True"
     ;;
 esac
 
 case "$CONFIG" in
 *debug*)
-    QMAKE_ARGS="$QMAKE_ARGS CONFIG+=debug"
-    ;;
-esac
-
-case "$CONFIG" in
-*static*)
-    QMAKE_ARGS="$QMAKE_ARGS QXMPP_LIBRARY_TYPE=staticlib"
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Debug"
     ;;
 esac
 
 # compile
-qmake $QMAKE_ARGS
-make VERBOSE=1
+cmake $CMAKE_ARGS
+make
 
 # run tests
-make check
+make test

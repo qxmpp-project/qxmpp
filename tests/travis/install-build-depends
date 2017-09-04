@@ -2,12 +2,7 @@
 set -e
 
 sudo apt-get update -qq
-
-if [ "$QT_SELECT" = "qt4" ]; then
-    sudo apt-get install -qq libqt4-dev
-else
-    sudo apt-get install -qq qtbase5-dev
-fi
+sudo apt-get install -qq qtbase5-dev cmake
 
 case "$CONFIG" in
 full*)
