@@ -11,13 +11,20 @@ mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH VERSION_STRING)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Network Xml)
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 include(GNUInstallDirs)
 
+option(BUILD_TESTS "Build tests." ON)
+
 #add_subdirectory(doc)
 add_subdirectory(src)
-#add_subdirectory(tests)
 #add_subdirectory(examples)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 install(
     FILES QXmppConfig.cmake
