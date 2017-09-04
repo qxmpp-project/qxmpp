@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2008-2014 The QXmpp developers
+ * Copyright (C) 2008-2017 The QXmpp developers
  *
  * Author:
  *  Manjeet Dahiya
+ *  Niels Ole Salscheider
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -27,21 +28,13 @@
 
 #include <QString>
 
-#if defined(QXMPP_STATIC)
-#  define QXMPP_EXPORT
-#else
-#  if defined(QXMPP_BUILD)
+#if defined(QXMPP_BUILD)
 #    define QXMPP_EXPORT Q_DECL_EXPORT
-#  else
+#else
 #    define QXMPP_EXPORT Q_DECL_IMPORT
-#  endif
 #endif
 
-#if defined(QXMPP_AUTOTEST_INTERNAL)
-#    define QXMPP_AUTOTEST_EXPORT QXMPP_EXPORT
-#else
-#    define QXMPP_AUTOTEST_EXPORT
-#endif
+#define QXMPP_AUTOTEST_EXPORT
 
 /// This macro expands a numeric value of the form 0xMMNNPP (MM =
 /// major, NN = minor, PP = patch) that specifies QXmpp's version
@@ -52,8 +45,12 @@
 /// available.
 ///
 
-#define QXMPP_VERSION 0x000903
+#define QXMPP_VERSION (0x@VERSION_MAJOR@ << 16) | (0x@VERSION_MINOR@ << 8) | 0x@VERSION_PATCH@
 
-QXMPP_EXPORT QString QXmppVersion();
+inline QLatin1String QXmppVersion()
+{
+    return QLatin1String("@VERSION_STRING@");
+}
 
 #endif //QXMPPGLOBAL_H
+

@@ -4,7 +4,12 @@ include_directories(base)
 include_directories(client)
 include_directories(server)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppGlobal.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/base)
+
 set(INSTALL_HEADER_FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h
+
     # Base
     base/QXmppArchiveIq.h
     base/QXmppBindIq.h
@@ -14,7 +19,6 @@ set(INSTALL_HEADER_FILES
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
-    base/QXmppGlobal.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
     base/QXmppJingleIq.h
@@ -89,7 +93,6 @@ set(SOURCE_FILES
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
-    base/QXmppGlobal.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp
     base/QXmppJingleIq.cpp
