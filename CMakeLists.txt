@@ -17,9 +17,9 @@ include(GNUInstallDirs)
 
 option(BUILD_TESTS "Build tests." ON)
 option(BUILD_DOCUMENTATION "Build API documentation." OFF)
+option(BUILD_EXAMPLES "Build API documentation." OFF)
 
 add_subdirectory(src)
-#add_subdirectory(examples)
 
 if(BUILD_TESTS)
     enable_testing()
@@ -28,6 +28,10 @@ endif()
 
 if(BUILD_DOCUMENTATION)
     add_subdirectory(doc)
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
 
 install(
