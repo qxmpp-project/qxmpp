@@ -42,3 +42,11 @@ install(
     COMPONENT Devel
 )
 
+# Generate qxmpp.pc
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/qxmpp.pc @ONLY)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/qxmpp.pc
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT Devel
+)
+
