@@ -78,29 +78,29 @@ void statusWidget::presenceMenuTriggered()
     QAction* action = qobject_cast<QAction*>(sender());
     if(action == actionAvailable)
     {
-        emit presenceTypeChanged(QXmppPresence::Available);
+        Q_EMIT presenceTypeChanged(QXmppPresence::Available);
         icon = "green";
     }
     else if(action == actionBusy)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::DND);
+        Q_EMIT presenceStatusTypeChanged(QXmppPresence::DND);
         icon = "red";
     }
     else if(action == actionAway)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::Away);
+        Q_EMIT presenceStatusTypeChanged(QXmppPresence::Away);
         icon = "orange";
     }
 #if 0
     else if(action == actionInvisible)
     {
-        emit presenceStatusTypeChanged(QXmppPresence::Invisible);
+        Q_EMIT presenceStatusTypeChanged(QXmppPresence::Invisible);
         icon = "gray";
     }
 #endif
     else if(action == actionSign_out)
     {
-        emit presenceTypeChanged(QXmppPresence::Unavailable);
+        Q_EMIT presenceTypeChanged(QXmppPresence::Unavailable);
         icon = "gray";
     }
     label->setPixmap(QPixmap(":/icons/resource/"+icon+".png"));
@@ -150,7 +150,7 @@ void statusWidget::avatarSelection()
     {
         QImage scaled = image.scaled(QSize(96, 96), Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation);
-        emit avatarChanged(scaled);
+        Q_EMIT avatarChanged(scaled);
     }
     else
         QMessageBox::information(this, "Avatar selection", "Invalid image file");

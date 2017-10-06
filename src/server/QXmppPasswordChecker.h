@@ -80,11 +80,11 @@ public:
 
     bool isFinished() const;
 
-public slots:
+public Q_SLOTS:
     void finish();
     void finishLater();
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when the reply has finished.
     void finished();
 

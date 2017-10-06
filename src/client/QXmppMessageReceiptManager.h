@@ -44,7 +44,7 @@ public:
     virtual bool handleStanza(const QDomElement &stanza);
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when receipt for the message with the
     /// given id is received. The id could be previously obtained by
     /// calling QXmppMessage::id().

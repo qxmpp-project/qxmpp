@@ -176,12 +176,12 @@ public:
     static QList<QHostAddress> discoverAddresses();
     static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = 0);
 
-public slots:
+public Q_SLOTS:
     void close();
     void connectToHost();
     qint64 sendDatagram(const QByteArray &datagram);
 
-private slots:
+private Q_SLOTS:
     void checkCandidates();
     void handleDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port);
     void turnConnected();
@@ -189,7 +189,7 @@ private slots:
     void updateGatheringState();
     void writeStun(const QXmppStunMessage &request);
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted once ICE negotiation succeeds.
     void connected();
 
@@ -277,7 +277,7 @@ public:
 
     GatheringState gatheringState() const;
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted once ICE negotiation succeeds.
     void connected();
 
@@ -290,11 +290,11 @@ signals:
     /// \brief This signal is emitted when the list of local candidates changes.
     void localCandidatesChanged();
 
-public slots:
+public Q_SLOTS:
     void close();
     void connectToHost();
 
-private slots:
+private Q_SLOTS:
     void slotConnected();
     void slotGatheringStateChanged();
     void slotTimeout();

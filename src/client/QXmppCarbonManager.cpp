@@ -107,9 +107,9 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
     message.parse(messageelement);
 
     if(sent)
-        emit messageSent(message);
+        Q_EMIT messageSent(message);
     else
-        emit messageReceived(message);
+        Q_EMIT messageReceived(message);
 
     return true;
 }

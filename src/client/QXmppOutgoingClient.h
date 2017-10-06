@@ -61,7 +61,7 @@ public:
 
     QXmppConfiguration& configuration();
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an error is encountered.
     void error(QXmppClient::Error);
 
@@ -88,10 +88,10 @@ protected:
     virtual void handleStream(const QDomElement &element);
     /// \endcond
 
-public slots:
+public Q_SLOTS:
     virtual void disconnectFromHost();
 
-private slots:
+private Q_SLOTS:
     void _q_dnsLookupFinished();
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);

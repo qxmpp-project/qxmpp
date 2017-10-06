@@ -29,7 +29,7 @@ class tst_QXmppSasl : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testParsing();
     void testAuth_data();
     void testAuth();

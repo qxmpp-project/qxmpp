@@ -12,7 +12,7 @@ public:
     bool isAuthorized( const QString &jid ) const;
 
 // RPC Interface
-public slots:
+public Q_SLOTS:
     QString echoString( const QString &message );
 
 };

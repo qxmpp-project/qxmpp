@@ -67,7 +67,7 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when archive list is received
     /// after calling listCollections()
     void archiveListReceived(const QList<QXmppArchiveChat>&, const QXmppResultSetReply &rsm = QXmppResultSetReply());

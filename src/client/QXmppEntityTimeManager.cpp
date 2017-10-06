@@ -78,7 +78,7 @@ bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
             client()->sendPacket(responseIq);
         }
 
-        emit timeReceived(entityTime);
+        Q_EMIT timeReceived(entityTime);
         return true;
     }
 

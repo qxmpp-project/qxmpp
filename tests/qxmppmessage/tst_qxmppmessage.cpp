@@ -30,7 +30,7 @@ class tst_QXmppMessage : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBasic_data();
     void testBasic();
     void testMessageAttention();

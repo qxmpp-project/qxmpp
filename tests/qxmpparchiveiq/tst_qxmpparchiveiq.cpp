@@ -29,7 +29,7 @@ class tst_QXmppArchiveIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testArchiveList_data();
     void testArchiveList();
     void testArchiveChat_data();

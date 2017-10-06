@@ -51,7 +51,7 @@ public:
     void connectToHosts(const QXmppByteStreamIq &iq);
     bool writeData(const QByteArray &data);
 
-private slots:
+private Q_SLOTS:
     void _q_candidateDisconnected();
     void _q_candidateReady();
     void _q_disconnected();
@@ -77,7 +77,7 @@ public:
     void connectToProxy();
     void startSending();
 
-private slots:
+private Q_SLOTS:
     void _q_disconnected();
     void _q_proxyReady();
     void _q_sendData();

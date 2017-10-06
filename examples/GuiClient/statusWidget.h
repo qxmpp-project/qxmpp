@@ -44,11 +44,11 @@ public:
                                   QXmppPresence::AvailableStatusType statusType);
     void setAvatar(const QImage&);
 
-private slots:
+private Q_SLOTS:
     void presenceMenuTriggered();
     void avatarSelection();
 
-signals:
+Q_SIGNALS:
     void statusTextChanged(const QString&);
     void presenceTypeChanged(QXmppPresence::Type);
     void presenceStatusTypeChanged(QXmppPresence::AvailableStatusType);

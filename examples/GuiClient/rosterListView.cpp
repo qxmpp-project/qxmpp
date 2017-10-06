@@ -101,14 +101,14 @@ void rosterListView::showChatDialog_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())
-        emit showChatDialog(bareJid);
+        Q_EMIT showChatDialog(bareJid);
 }
 
 void rosterListView::showProfile_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())
-        emit showProfile(bareJid);
+        Q_EMIT showProfile(bareJid);
 }
 
 void rosterListView::keyPressEvent(QKeyEvent* event1)
@@ -124,5 +124,5 @@ void rosterListView::removeContact_helper()
 {
     QString bareJid = selectedBareJid();
     if(!bareJid.isEmpty())
-        emit removeContact(bareJid);
+        Q_EMIT removeContact(bareJid);
 }

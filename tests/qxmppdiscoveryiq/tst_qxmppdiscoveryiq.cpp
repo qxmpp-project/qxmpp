@@ -30,7 +30,7 @@ class tst_QXmppDiscoveryIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testDiscovery();
     void testDiscoveryWithForm();
 };

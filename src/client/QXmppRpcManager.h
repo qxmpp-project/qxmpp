@@ -78,7 +78,7 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// \cond
     void rpcCallResponse(const QXmppRpcResponseIq& result);
     void rpcCallError(const QXmppRpcErrorIq &err);

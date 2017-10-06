@@ -29,7 +29,7 @@ class tst_QXmppStunMessage : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testFingerprint();
     void testIntegrity();
     void testIPv4Address();

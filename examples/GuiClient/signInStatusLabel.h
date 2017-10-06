@@ -46,7 +46,7 @@ public:
 
 //    QSize sizeHint() const;
 
-private slots:
+private Q_SLOTS:
     void timeout();
 
 private:

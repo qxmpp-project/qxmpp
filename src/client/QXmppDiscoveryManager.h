@@ -69,7 +69,7 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an information response is received.
     void infoReceived(const QXmppDiscoveryIq&);
 

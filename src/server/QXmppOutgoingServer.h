@@ -53,7 +53,7 @@ public:
 
     QString remoteDomain() const;
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a dialback verify response is received.
     void dialbackResponseReceived(const QXmppDialback &response);
 
@@ -64,11 +64,11 @@ protected:
     void handleStanza(const QDomElement &stanzaElement);
     /// \endcond
 
-public slots:
+public Q_SLOTS:
     void connectToHost(const QString &domain);
     void queueData(const QByteArray &data);
 
-private slots:
+private Q_SLOTS:
     void _q_dnsLookupFinished();
     void _q_socketDisconnected();
     void sendDialback();

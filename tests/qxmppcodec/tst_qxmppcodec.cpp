@@ -29,7 +29,7 @@ class tst_QXmppCodec : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testTheoraDecoder();
     void testTheoraEncoder();
 };

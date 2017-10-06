@@ -48,10 +48,10 @@ public:
 
     QByteArray getPhotoHash(const QString& bareJid) const;
 
-signals:
+Q_SIGNALS:
     void vCardReadyToUse(const QString& bareJid);
 
-public slots:
+public Q_SLOTS:
     void vCardReceived(const QXmppVCardIq&);
 
 private:

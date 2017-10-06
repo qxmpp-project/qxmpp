@@ -415,12 +415,12 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
     if (state != newState)
     {
         state = newState;
-        emit q->stateChanged(state);
+        Q_EMIT q->stateChanged(state);
 
         if (state == QXmppCall::ActiveState)
-            emit q->connected();
+            Q_EMIT q->connected();
         else if (state == QXmppCall::FinishedState)
-            emit q->finished();
+            Q_EMIT q->finished();
     }
 }
 
@@ -612,7 +612,7 @@ void QXmppCall::updateOpenMode()
         mode = stream->channel->openMode() & QIODevice::ReadWrite;
     if (mode != d->audioMode) {
         d->audioMode = mode;
-        emit audioModeChanged(mode);
+        Q_EMIT audioModeChanged(mode);
     }
 
     // determine video mode
@@ -625,7 +625,7 @@ void QXmppCall::updateOpenMode()
     }
     if (mode != d->videoMode) {
         d->videoMode = mode;
-        emit videoModeChanged(mode);
+        Q_EMIT videoModeChanged(mode);
     }
 }
 
@@ -806,7 +806,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     check = connect(call, SIGNAL(destroyed(QObject*)),
                     this, SLOT(_q_callDestroyed(QObject*)));
     Q_ASSERT(check);
-    emit callStarted(call);
+    Q_EMIT callStarted(call);
 
     call->d->sendInvite();
 
@@ -936,7 +936,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         call->d->sendRequest(ringing);
 
         // notify user
-        emit callReceived(call);
+        Q_EMIT callReceived(call);
         return;
 
     } else {

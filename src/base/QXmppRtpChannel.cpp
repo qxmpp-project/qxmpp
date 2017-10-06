@@ -413,12 +413,12 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     if (d->incomingBuffer.size() >= d->incomingMinimum)
         d->incomingBuffering = false;
     if (!d->incomingBuffering)
-        emit readyRead();
+        Q_EMIT readyRead();
 }
 
 void QXmppRtpAudioChannel::emitSignals()
 {
-    emit bytesWritten(d->writtenSinceLastEmit);
+    Q_EMIT bytesWritten(d->writtenSinceLastEmit);
     d->writtenSinceLastEmit = 0;
     d->signalsEmitted = false;
 }
@@ -634,7 +634,7 @@ void QXmppRtpAudioChannel::writeDatagram()
 #ifdef QXMPP_DEBUG_RTP
             logSent(packet.toString());
 #endif
-            emit sendDatagram(packet.encode());
+            Q_EMIT sendDatagram(packet.encode());
             d->outgoingSequence++;
             d->outgoingStamp += packetTicks;
 
@@ -675,7 +675,7 @@ void QXmppRtpAudioChannel::writeDatagram()
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
 #endif
-        emit sendDatagram(packet.encode());
+        Q_EMIT sendDatagram(packet.encode());
         d->outgoingSequence++;
         d->outgoingStamp += packetTicks;
     }
@@ -999,7 +999,7 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
 #endif
-        emit sendDatagram(packet.encode());
+        Q_EMIT sendDatagram(packet.encode());
     }
     d->outgoingStamp += 1;
 }

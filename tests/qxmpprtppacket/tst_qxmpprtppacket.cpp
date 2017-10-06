@@ -29,7 +29,7 @@ class tst_QXmppRtpPacket : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBad();
     void testSimple();
     void testWithCsrc();

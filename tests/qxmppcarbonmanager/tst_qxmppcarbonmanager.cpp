@@ -31,7 +31,7 @@ class QXmppCarbonTestHelper  : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void messageSent(const QXmppMessage& msg);
     void messageReceived(const QXmppMessage& msg);
 
@@ -47,7 +47,7 @@ class tst_QXmppCarbonManager : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
 
     void testHandleStanza_data();

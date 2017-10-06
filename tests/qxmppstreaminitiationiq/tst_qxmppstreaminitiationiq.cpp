@@ -30,7 +30,7 @@ class tst_QXmppStreamInitiationIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testFileInfo_data();
     void testFileInfo();
     void testOffer();

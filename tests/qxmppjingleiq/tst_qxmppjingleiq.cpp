@@ -29,7 +29,7 @@ class tst_QXmppJingleIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testCandidate();
     void testContent();
     void testContentFingerprint();

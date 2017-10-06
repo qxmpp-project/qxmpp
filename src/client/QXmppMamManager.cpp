@@ -55,7 +55,7 @@ bool QXmppMamManager::handleStanza(const QDomElement &element)
                         const QString stamp = delayElement.attribute("stamp");
                         message.setStamp(QXmppUtils::datetimeFromString(stamp));
                     }
-                    emit archivedMessageReceived(queryId, message);
+                    Q_EMIT archivedMessageReceived(queryId, message);
                 }
             }
             return true;
@@ -63,7 +63,7 @@ bool QXmppMamManager::handleStanza(const QDomElement &element)
     } else if (QXmppMamResultIq::isMamResultIq(element)) {
         QXmppMamResultIq result;
         result.parse(element);
-        emit resultsRecieved(result.id(), result.resultSetReply(), result.complete());
+        Q_EMIT resultsRecieved(result.id(), result.resultSetReply(), result.complete());
         return true;
     }
 

@@ -49,7 +49,7 @@ public:
     void setPageDirection(PageDirection direction);
     void setPageSize(int size);
 
-public slots:
+public Q_SLOTS:
     void clientConnected();
     void archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply);
     void archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply);

@@ -404,7 +404,7 @@ void QXmppServer::setLogger(QXmppLogger *logger)
                     d->logger, SLOT(updateCounter(QString,qint64)));
         }
 
-        emit loggerChanged(d->logger);
+        Q_EMIT loggerChanged(d->logger);
     }
 }
 
@@ -731,8 +731,8 @@ void QXmppServer::_q_clientConnected()
     d->incomingClientsByJid.insert(jid, client);
     d->incomingClientsByBareJid[QXmppUtils::jidToBareJid(jid)].insert(client);
 
-    // emit signal
-    emit clientConnected(jid);
+    // Q_EMIT signal
+    Q_EMIT clientConnected(jid);
 }
 
 /// Handle a stream disconnection for a client.
@@ -760,9 +760,9 @@ void QXmppServer::_q_clientDisconnected()
         // destroy client
         client->deleteLater();
 
-        // emit signal
+        // Q_EMIT signal
         if (!jid.isEmpty())
-            emit clientDisconnected(jid);
+            Q_EMIT clientDisconnected(jid);
 
         // update counter
         setGauge("incoming-client.count", d->incomingClients.size());
@@ -909,7 +909,7 @@ void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
         socket->setLocalCertificate(d->localCertificate);
         socket->setPrivateKey(d->privateKey);
     }
-    emit newConnection(socket);
+    Q_EMIT newConnection(socket);
 }
 
 /// Adds the given certificates to the CA certificate database to be used

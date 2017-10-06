@@ -120,7 +120,7 @@ public:
     { }
     void run();
 
-signals:
+Q_SIGNALS:
     void finished(const QDnsLookupReply &reply);
 
 private:
@@ -137,7 +137,7 @@ public:
     QDnsLookupThreadPool();
     void start(QRunnable *runnable);
 
-private slots:
+private Q_SLOTS:
     void _q_applicationDestroyed();
 
 private:

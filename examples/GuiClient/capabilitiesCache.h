@@ -47,9 +47,9 @@ public:
     QStringList getFeatures(const QString& nodeVer);
     QStringList getIdentities(const QString& nodeVer);
 
-signals:
+Q_SIGNALS:
 
-private slots:
+private Q_SLOTS:
     void infoReceived(const QXmppDiscoveryIq&);
 
 private:

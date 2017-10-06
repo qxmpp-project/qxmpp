@@ -30,7 +30,7 @@ class tst_QXmppSocks : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void init();
     void newConnectionSlot(QTcpSocket *socket, QString hostName, quint16 port);
 

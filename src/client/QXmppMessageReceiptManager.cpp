@@ -54,7 +54,7 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
 
     // Handle receipts and cancel any further processing.
     if (!message.receiptId().isEmpty()) {
-        emit messageDelivered(message.from(), message.receiptId());
+        Q_EMIT messageDelivered(message.from(), message.receiptId());
         return true;
     }
 

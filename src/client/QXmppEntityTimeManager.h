@@ -46,7 +46,7 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a time response is received.
     void timeReceived(const QXmppEntityTimeIq&);
 };

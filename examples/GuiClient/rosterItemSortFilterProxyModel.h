@@ -34,7 +34,7 @@ class rosterItemSortFilterProxyModel : public QSortFilterProxyModel
 public:
     rosterItemSortFilterProxyModel(QObject* parent = 0);
 
-public slots:
+public Q_SLOTS:
     void setShowOfflineContacts(bool);
     void sortByName(bool);
 

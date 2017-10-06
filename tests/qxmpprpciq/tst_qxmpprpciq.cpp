@@ -52,7 +52,7 @@ class tst_QXmppRpcIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBase64();
     void testBool();
     void testDateTime();

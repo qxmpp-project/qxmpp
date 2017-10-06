@@ -39,7 +39,7 @@ public:
     xmppClient(QObject *parent = 0);
     void setRecipient(const QString &recipient);
 
-private slots:
+private Q_SLOTS:
     void slotAudioModeChanged(QIODevice::OpenMode mode);
     void slotCallReceived(QXmppCall *call);
     void slotCallStateChanged(QXmppCall::State state);

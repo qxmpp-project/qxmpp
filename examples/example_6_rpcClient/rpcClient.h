@@ -38,7 +38,7 @@ public:
     rpcClient(QObject *parent = 0);
     ~rpcClient();
 
-private slots:
+private Q_SLOTS:
     void slotInvokeRemoteMethod();
     void slotPresenceReceived(const QXmppPresence &presence);
 

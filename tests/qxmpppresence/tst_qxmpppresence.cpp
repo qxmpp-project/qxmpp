@@ -32,7 +32,7 @@ class tst_QXmppPresence : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testPresence();
     void testPresence_data();
     void testPresenceWithCapability();

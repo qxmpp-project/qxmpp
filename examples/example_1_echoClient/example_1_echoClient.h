@@ -35,7 +35,7 @@ public:
     echoClient(QObject *parent = 0);
     ~echoClient();
 
-public slots:
+public Q_SLOTS:
     void messageReceived(const QXmppMessage&);
 };
 

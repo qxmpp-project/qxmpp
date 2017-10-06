@@ -36,12 +36,12 @@ public:
     rosterListView(QWidget* parent = 0);
     bool event(QEvent* e);
 
-public slots:
+public Q_SLOTS:
     void mousePressed(const QModelIndex& index);
     void doubleClicked(const QModelIndex& index);
     void clicked(const QModelIndex& index);
 
-private slots:
+private Q_SLOTS:
     void showChatDialog_helper();
     void showProfile_helper();
     void removeContact_helper();
@@ -49,7 +49,7 @@ private slots:
 protected:
     void keyPressEvent(QKeyEvent*);
 
-signals:
+Q_SIGNALS:
     void showChatDialog(const QString& bareJid);
     void showProfile(const QString& bareJid);
     void removeContact(const QString& bareJid);

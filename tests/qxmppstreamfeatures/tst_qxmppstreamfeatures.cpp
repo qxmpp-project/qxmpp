@@ -28,7 +28,7 @@ class tst_QXmppStreamFeatures : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testEmpty();
     void testFull();
 };

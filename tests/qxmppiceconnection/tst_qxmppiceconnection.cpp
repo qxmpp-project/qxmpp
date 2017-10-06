@@ -29,7 +29,7 @@ class tst_QXmppIceConnection : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBind();
     void testBindStun();
     void testConnect();

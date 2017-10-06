@@ -30,7 +30,7 @@ class tst_QXmppEntityTimeIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testEntityTimeGet();
     void testEntityTimeResult();
 };

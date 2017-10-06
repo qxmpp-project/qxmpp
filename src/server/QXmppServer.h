@@ -94,7 +94,7 @@ public:
 
     void addIncomingClient(QXmppIncomingClient *stream);
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a client has connected.
     void clientConnected(const QString &jid);
 
@@ -104,10 +104,10 @@ signals:
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);
 
-public slots:
+public Q_SLOTS:
     void handleElement(const QDomElement &element);
 
-private slots:
+private Q_SLOTS:
     void _q_clientConnection(QSslSocket *socket);
     void _q_clientConnected();
     void _q_clientDisconnected();
@@ -138,7 +138,7 @@ public:
     void setLocalCertificate(const QSslCertificate &certificate);
     void setPrivateKey(const QSslKey &key);
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a new connection is established.
     void newConnection(QSslSocket *socket);
 

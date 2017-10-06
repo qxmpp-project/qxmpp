@@ -83,7 +83,7 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-public slots:
+public Q_SLOTS:
     bool acceptSubscription(const QString &bareJid, const QString &reason = QString());
     bool refuseSubscription(const QString &bareJid, const QString &reason = QString());
     bool addItem(const QString &bareJid, const QString &name = QString(), const QSet<QString> &groups = QSet<QString>());
@@ -92,7 +92,7 @@ public slots:
     bool subscribe(const QString &bareJid, const QString &reason = QString());
     bool unsubscribe(const QString &bareJid, const QString &reason = QString());
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when the Roster IQ is received after a successful
     /// connection. That is the roster entries are empty before this signal is emitted.
     /// One should use getRosterBareJids() and getRosterEntry() only after
@@ -123,7 +123,7 @@ signals:
     /// removed as a result of roster push.
     void itemRemoved(const QString& bareJid);
 
-private slots:
+private Q_SLOTS:
     void _q_connected();
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence&);

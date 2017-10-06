@@ -40,7 +40,7 @@ public:
     explicit xmlConsoleDialog(QWidget *parent = 0);
     ~xmlConsoleDialog();
 
-public slots:
+public Q_SLOTS:
     void message(QXmppLogger::MessageType, const QString &);
 
 private:

@@ -122,7 +122,7 @@ void statusTextWidget::textChanged()
 void statusTextWidget::statusTextChanged_helper()
 {
     addStatusTextToList(m_statusLineEdit->text());
-    emit statusTextChanged(m_statusLineEdit->text());
+    Q_EMIT statusTextChanged(m_statusLineEdit->text());
     parentWidget()->setFocus();
 }
 
@@ -168,11 +168,11 @@ void statusTextWidget::statusTextChanged_menuClick()
             m_statusTextActionList.append(action);
         }
         m_statusLineEdit->setText(action->data().toString());
-        emit statusTextChanged(action->data().toString());
+        Q_EMIT statusTextChanged(action->data().toString());
     }
 }
 
 void statusTextWidget::clearStatusTextHistory()
 {
-    emit statusTextChanged("");
+    Q_EMIT statusTextChanged("");
 }

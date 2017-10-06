@@ -50,7 +50,7 @@ public:
     void setInactivityTimeout(int secs);
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an element is received.
     void elementReceived(const QDomElement &element);
 
@@ -60,7 +60,7 @@ protected:
     void handleStanza(const QDomElement &element);
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void onDigestReply();
     void onPasswordReply();
     void onSocketDisconnected();

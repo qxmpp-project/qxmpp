@@ -340,7 +340,7 @@ void QDnsLookup::setName(const QString &name)
     Q_D(QDnsLookup);
     if (name != d->name) {
         d->name = name;
-        emit nameChanged(name);
+        Q_EMIT nameChanged(name);
     }
 }
 
@@ -359,7 +359,7 @@ void QDnsLookup::setType(Type type)
     Q_D(QDnsLookup);
     if (type != d->type) {
         d->type = type;
-        emit typeChanged(type);
+        Q_EMIT typeChanged(type);
     }
 }
 
@@ -449,7 +449,7 @@ void QDnsLookup::abort()
         d->reply.error = QDnsLookup::OperationCancelledError;
         d->reply.errorString = tr("Operation cancelled");
         d->isFinished = true;
-        emit finished();
+        Q_EMIT finished();
     }
 }
 
@@ -920,7 +920,7 @@ void QDnsLookupPrivate::_q_lookupFinished(const QDnsLookupReply &_reply)
         reply = _reply;
         runnable = 0;
         isFinished = true;
-        emit q->finished();
+        Q_EMIT q->finished();
     }
 }
 
@@ -932,7 +932,7 @@ void QDnsLookupRunnable::run()
     if (requestName.isEmpty()) {
         reply.error = QDnsLookup::InvalidRequestError;
         reply.errorString = tr("Invalid domain name");
-        emit finished(reply);
+        Q_EMIT finished(reply);
         return;
     }
 
@@ -947,7 +947,7 @@ void QDnsLookupRunnable::run()
     qt_qdnsmailexchangerecord_sort(reply.mailExchangeRecords);
     qt_qdnsservicerecord_sort(reply.serviceRecords);
 
-    emit finished(reply);
+    Q_EMIT finished(reply);
 }
 
 QDnsLookupThreadPool::QDnsLookupThreadPool()

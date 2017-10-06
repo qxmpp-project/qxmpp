@@ -29,7 +29,7 @@ class tst_QXmppServer : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testConnect_data();
     void testConnect();
 };

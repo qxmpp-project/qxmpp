@@ -30,7 +30,7 @@ class tst_QXmppVersionIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testVersionGet();
     void testVersionResult();
 };

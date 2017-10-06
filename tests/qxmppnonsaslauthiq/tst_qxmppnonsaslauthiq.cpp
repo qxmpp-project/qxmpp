@@ -29,7 +29,7 @@ class tst_QXmppNonSASLAuthIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testGet();
     void testSetPlain();
     void testSetDigest();

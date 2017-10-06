@@ -51,7 +51,7 @@ public:
     void setFullName(const QString&);
     void setStatusText(const QString&);
 
-private slots:
+private Q_SLOTS:
     void versionReceived(const QXmppVersionIq&);
     void timeReceived(const QXmppEntityTimeIq&);
 

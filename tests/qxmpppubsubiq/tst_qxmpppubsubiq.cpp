@@ -29,7 +29,7 @@ class tst_QXmppPubSubIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testItems();
     void testItemsResponse();
     void testPublish();

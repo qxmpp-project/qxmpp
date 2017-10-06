@@ -30,7 +30,7 @@ class tst_QXmppResultSet : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testQuery_data();
     void testQuery();
     void testReply_data();

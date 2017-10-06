@@ -111,16 +111,16 @@ public:
     statusTextWidget(QWidget* parent = 0);
     void setStatusText(const QString& statusText);
 
-public slots:
+public Q_SLOTS:
     void showMenu();
     void textChanged();
 
-private slots:
+private Q_SLOTS:
     void statusTextChanged_helper();
     void statusTextChanged_menuClick();
     void clearStatusTextHistory();
 
-signals:
+Q_SIGNALS:
     void statusTextChanged(const QString&);
 
 private:

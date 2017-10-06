@@ -30,7 +30,7 @@ class tst_QXmppUtils : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testCrc32();
     void testHmac();
     void testJid();

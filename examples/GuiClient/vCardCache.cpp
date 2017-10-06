@@ -49,7 +49,7 @@ void vCardCache::vCardReceived(const QXmppVCardIq& vcard)
 
     saveToFile(from);
 
-    emit vCardReadyToUse(from);
+    Q_EMIT vCardReadyToUse(from);
 }
 
 bool vCardCache::isVCardAvailable(const QString& bareJid) const

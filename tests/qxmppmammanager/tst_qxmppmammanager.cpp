@@ -30,7 +30,7 @@ class QXmppMamTestHelper  : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void archivedMessageReceived(const QString &queryId, const QXmppMessage &message);
     void resultsRecieved(const QString &queryId, const QXmppResultSetReply &resultSetReply, bool complete);
 
@@ -49,7 +49,7 @@ class tst_QXmppMamManager : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
 
     void testHandleStanza_data();

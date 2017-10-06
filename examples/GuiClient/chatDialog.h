@@ -53,7 +53,7 @@ public:
     void setQXmppClient(QXmppClient* client);
     void messageReceived(const QString& msg);
 
-private slots:
+private Q_SLOTS:
     void sendMessage();
 
 protected:

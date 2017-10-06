@@ -37,7 +37,7 @@ public:
     xmppClient(QObject *parent = 0);
     ~xmppClient();
 
-public slots:
+public Q_SLOTS:
     void clientConnected();
     void rosterReceived();
     void vCardReceived(const QXmppVCardIq&);

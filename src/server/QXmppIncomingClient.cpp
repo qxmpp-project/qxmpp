@@ -337,7 +337,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 sendPacket(bindResult);
 
                 // bound
-                emit connected();
+                Q_EMIT connected();
                 return;
             }
             else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == QLatin1String("set"))
@@ -384,8 +384,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             if (nodeFull.attribute("to").isEmpty())
                 nodeFull.setAttribute("to", d->domain);
 
-            // emit stanza for processing by server
-            emit elementReceived(nodeFull);
+            // Q_EMIT stanza for processing by server
+            Q_EMIT elementReceived(nodeFull);
         }
     }
 }
@@ -456,7 +456,7 @@ void QXmppIncomingClient::onPasswordReply()
 void QXmppIncomingClient::onSocketDisconnected()
 {
     info(QString("Socket disconnected for '%1' from %2").arg(d->jid, d->origin()));
-    emit disconnected();
+    Q_EMIT disconnected();
 }
 
 void QXmppIncomingClient::onTimeout()

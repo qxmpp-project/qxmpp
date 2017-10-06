@@ -60,7 +60,7 @@ protected:
     void keyPressEvent(QKeyEvent*);
     void closeEvent(QCloseEvent* event);
 
-private slots:
+private Q_SLOTS:
     void rosterChanged(const QString& bareJid);
     void rosterReceived();
     void presenceChanged(const QString&, const QString&);

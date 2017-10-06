@@ -29,7 +29,7 @@ class tst_QXmppRtcpPacket : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBad();
     void testGoodbye();
     void testGoodbyeWithReason();

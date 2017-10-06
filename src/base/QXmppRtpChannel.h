@@ -109,14 +109,14 @@ public:
     qint64 pos() const;
     bool seek(qint64 pos);
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
     /// \brief This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
-public slots:
+public Q_SLOTS:
     void datagramReceived(const QByteArray &ba);
     void startTone(QXmppRtpAudioChannel::Tone tone);
     void stopTone(QXmppRtpAudioChannel::Tone tone);
@@ -125,22 +125,22 @@ protected:
     /// \cond
     void debug(const QString &message)
     {
-        emit logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
     }
 
     void warning(const QString &message)
     {
-        emit logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
     }
 
     void logReceived(const QString &message)
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
     }
 
     void logSent(const QString &message)
     {
-        emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
     void payloadTypesChanged();
@@ -148,7 +148,7 @@ protected:
     qint64 writeData(const char * data, qint64 maxSize);
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void emitSignals();
     void writeDatagram();
 
@@ -272,11 +272,11 @@ public:
     void setEncoderFormat(const QXmppVideoFormat &format);
     void writeFrame(const QXmppVideoFrame &frame);
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
-public slots:
+public Q_SLOTS:
     void datagramReceived(const QByteArray &ba);
 
 protected:

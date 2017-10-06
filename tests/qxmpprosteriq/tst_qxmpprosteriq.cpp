@@ -29,7 +29,7 @@ class tst_QXmppRosterIq : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testItem_data();
     void testItem();
 };

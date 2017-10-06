@@ -1137,7 +1137,7 @@ void QXmppStunTransaction::readStun(const QXmppStunMessage &response)
         response.messageClass() == QXmppStunMessage::Response) {
         m_response = response;
         m_retryTimer->stop();
-        emit finished();
+        Q_EMIT finished();
     }
 }
 
@@ -1160,12 +1160,12 @@ void QXmppStunTransaction::retry()
     if (m_tries >= STUN_RTO_MAX) {
         m_response.setType(QXmppStunMessage::Error);
         m_response.errorPhrase = QLatin1String("Request timed out");
-        emit finished();
+        Q_EMIT finished();
         return;
     }
 
     // resend request
-    emit writeStun(m_request);
+    Q_EMIT writeStun(m_request);
     m_retryTimer->start(m_tries ? 2 * m_retryTimer->interval() : STUN_RTO_INTERVAL);
     m_tries++;
 }
@@ -1308,7 +1308,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
         stream >> channel;
         stream >> length;
         if (m_state == ConnectedState && m_channels.contains(channel) && length <= buffer.size() - 4) {
-            emit datagramReceived(buffer.mid(4, length), m_channels[channel].first,
+            Q_EMIT datagramReceived(buffer.mid(4, length), m_channels[channel].first,
                 m_channels[channel].second);
         }
         return;
@@ -1430,10 +1430,10 @@ void QXmppTurnAllocation::setState(AllocationState state)
         return;
     m_state = state;
     if (m_state == ConnectedState) {
-        emit connected();
+        Q_EMIT connected();
     } else if (m_state == UnconnectedState) {
         m_timer->stop();
-        emit disconnected();
+        Q_EMIT disconnected();
     }
 }
 
@@ -1633,7 +1633,7 @@ void QXmppUdpTransport::readyRead()
         const qint64 size = m_socket->pendingDatagramSize();
         buffer.resize(size);
         m_socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-        emit datagramReceived(buffer, remoteHost, remotePort);
+        Q_EMIT datagramReceived(buffer, remoteHost, remotePort);
     }
 }
 
@@ -2063,7 +2063,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (!transport)
         return;
 
-    // if this is not a STUN message, emit it
+    // if this is not a STUN message, Q_EMIT it
     quint32 messageCookie;
     QByteArray messageId;
     quint16 messageType = QXmppStunMessage::peekType(buffer, messageCookie, messageId);
@@ -2077,7 +2077,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
                 break;
             }
         }
-        emit datagramReceived(buffer);
+        Q_EMIT datagramReceived(buffer);
         return;
     }
 
@@ -2241,7 +2241,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             const bool wasConnected = (d->activePair != 0);
             d->activePair = pair;
             if (!wasConnected)
-                emit connected();
+                Q_EMIT connected();
         }
     }
 }
@@ -2321,7 +2321,7 @@ void QXmppIceComponent::transactionFinished()
 
             d->localCandidates << candidate;
 
-            emit localCandidatesChanged();
+            Q_EMIT localCandidatesChanged();
         } else {
             debug(QString("STUN test failed (error %1)").arg(
                 transaction->response().errorPhrase));
@@ -2342,7 +2342,7 @@ void QXmppIceComponent::turnConnected()
         QString::number(candidate.port())));
     d->localCandidates << candidate;
 
-    emit localCandidatesChanged();
+    Q_EMIT localCandidatesChanged();
     updateGatheringState();
 }
 
@@ -2472,7 +2472,7 @@ void QXmppIceComponent::updateGatheringState()
 
     if (newGatheringState != d->gatheringState) {
         d->gatheringState = newGatheringState;
-        emit gatheringStateChanged();
+        Q_EMIT gatheringStateChanged();
     }
 }
 
@@ -2785,7 +2785,7 @@ void QXmppIceConnection::slotConnected()
             return;
     info(QString("ICE negotiation completed"));
     d->connectTimer->stop();
-    emit connected();
+    Q_EMIT connected();
 }
 
 void QXmppIceConnection::slotGatheringStateChanged()
@@ -2811,7 +2811,7 @@ void QXmppIceConnection::slotGatheringStateChanged()
             gathering_states[d->gatheringState],
             gathering_states[newGatheringState]));
         d->gatheringState = newGatheringState;
-        emit gatheringStateChanged();
+        Q_EMIT gatheringStateChanged();
     }
 }
 
@@ -2820,7 +2820,7 @@ void QXmppIceConnection::slotTimeout()
     warning(QString("ICE negotiation timed out"));
     foreach (QXmppIceComponent *socket, d->components.values())
         socket->close();
-    emit disconnected();
+    Q_EMIT disconnected();
 }
 
 QXmppIceTransport::QXmppIceTransport(QObject *parent)

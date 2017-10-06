@@ -36,7 +36,7 @@ public:
     xmppClient(QObject *parent = 0);
     void setRecipient(const QString &recipient);
 
-private slots:
+private Q_SLOTS:
     void slotError(QXmppTransferJob::Error error);
     void slotFileReceived(QXmppTransferJob *job);
     void slotFinished();

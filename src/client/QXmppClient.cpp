@@ -481,7 +481,7 @@ void QXmppClient::_q_reconnect()
 void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     Q_UNUSED(socketState);
-    emit stateChanged(state());
+    Q_EMIT stateChanged(state());
 }
 
 /// At connection establishment, send initial presence.
@@ -492,8 +492,8 @@ void QXmppClient::_q_streamConnected()
     d->reconnectionTries = 0;
 
     // notify managers
-    emit connected();
-    emit stateChanged(QXmppClient::ConnectedState);
+    Q_EMIT connected();
+    Q_EMIT stateChanged(QXmppClient::ConnectedState);
 
     // send initial presence
     if (d->stream->isAuthenticated())
@@ -503,8 +503,8 @@ void QXmppClient::_q_streamConnected()
 void QXmppClient::_q_streamDisconnected()
 {
     // notify managers
-    emit disconnected();
-    emit stateChanged(QXmppClient::DisconnectedState);
+    Q_EMIT disconnected();
+    Q_EMIT stateChanged(QXmppClient::DisconnectedState);
 }
 
 void QXmppClient::_q_streamError(QXmppClient::Error err)
@@ -524,7 +524,7 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
     }
 
     // notify managers
-    emit error(err);
+    Q_EMIT error(err);
 }
 
 /// Returns the QXmppLogger associated with the current QXmppClient.
@@ -558,7 +558,7 @@ void QXmppClient::setLogger(QXmppLogger *logger)
                     d->logger, SLOT(updateCounter(QString,qint64)));
         }
 
-        emit loggerChanged(d->logger);
+        Q_EMIT loggerChanged(d->logger);
     }
 }
 
