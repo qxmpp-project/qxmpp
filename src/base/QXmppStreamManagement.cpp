@@ -132,6 +132,7 @@ void QXmppStreamManagementEnabled::parse(const QDomElement &element)
     m_resume = resume == QString("true") || resume == QString("1");
     m_max = element.attribute("max").toUInt();
     m_location = element.attribute("location");
+    m_id = element.attribute("id");
 }
 
 void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
@@ -187,6 +188,7 @@ void QXmppStreamManagementResume::parse(const QDomElement &element)
 void QXmppStreamManagementResume::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("resume");
+    writer->writeAttribute("xmlns", ns_stream_management);
     writer->writeAttribute("h", QString::number(m_h));
     writer->writeAttribute("previd", m_previd);
     writer->writeEndElement();
@@ -232,6 +234,7 @@ void QXmppStreamManagementResumed::parse(const QDomElement &element)
 void QXmppStreamManagementResumed::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("resumed");
+    writer->writeAttribute("xmlns", ns_stream_management);
     writer->writeAttribute("h", QString::number(m_h));
     writer->writeAttribute("previd", m_previd);
     writer->writeEndElement();
