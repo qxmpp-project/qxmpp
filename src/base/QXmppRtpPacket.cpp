@@ -101,7 +101,7 @@ bool QXmppRtpPacket::decode(const QByteArray &ba)
     quint8 tmp;
     QDataStream stream(ba);
     stream >> tmp;
-    const quint8 cc = (tmp >> 1) & 0xf;
+    const quint8 cc = (tmp & 0xf);
     const int hlen = 12 + 4 * cc;
     if ((tmp >> 6) != RTP_VERSION || ba.size() < hlen)
         return false;
@@ -136,7 +136,7 @@ QByteArray QXmppRtpPacket::encode() const
     ba.resize(d->payload.size() + 12 + 4 * d->csrc.size());
     QDataStream stream(&ba, QIODevice::WriteOnly);
     stream << quint8((RTP_VERSION << 6) |
-                     ((d->csrc.size() & 0xf) << 1));
+                     (d->csrc.size() & 0xf));
     stream << quint8((d->type & 0x7f) | (d->marker << 7));
     stream << d->sequence;
     stream << d->stamp;
