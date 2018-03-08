@@ -107,7 +107,7 @@ SUPPORTED PLATFORMS
 It should work on all the plaforms supported by Qt. For a complete list of
 platforms support by Qt, see:
 
-http://qt-project.org/doc/supported-platforms.html
+https://doc.qt.io/qt-5/supported-platforms.html
 
 In past, we have tested on variety of platforms:
 
@@ -138,4 +138,4 @@ DISCUSSION GROUP
 
 Join QXmpp Discussion Group for queries, discussions and updates.
 
-http://groups.google.com/group/qxmpp
+https://groups.google.com/forum/#!forum/qxmpp
