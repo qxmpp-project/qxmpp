@@ -178,11 +178,14 @@ public:
                                 ///< sub-sampled (U-Y-V-Y), i.e. two horizontally adjacent
                                 ///< pixels are stored as a 32-bit macropixel which has a Y
                                 ///< value for each pixel and common U and V values.
-        Format_YUYV = 21        ///< The frame is stored using an 8-bit per component packed
+        Format_YUYV = 21,       ///< The frame is stored using an 8-bit per component packed
                                 ///< YUV format with the U and V planes horizontally
                                 ///< sub-sampled (Y-U-Y-V), i.e. two horizontally adjacent
                                 ///< pixels are stored as a 32-bit macropixel which has a Y
                                 ///< value for each pixel and common U and V values.
+        Format_NV12 = 22        ///< YUV 4:2:0 image with a plane of 8 bit Y samples followed
+                                ///< by an interleaved U/V plane containing 8 bit 2x2
+                                ///< subsampled colour difference samples.
     };
 
     QXmppVideoFrame();

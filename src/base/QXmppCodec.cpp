@@ -1325,7 +1325,8 @@ QXmppVpxEncoder::~QXmppVpxEncoder()
 bool QXmppVpxEncoder::setFormat(const QXmppVideoFormat &format)
 {
     const QXmppVideoFrame::PixelFormat pixelFormat = format.pixelFormat();
-    if (pixelFormat != QXmppVideoFrame::Format_YUYV) {
+    if (pixelFormat != QXmppVideoFrame::Format_YUYV &&
+        pixelFormat != QXmppVideoFrame::Format_NV12) {
         qWarning("Vpx encoder does not support the given format");
         return false;
     }
@@ -1384,6 +1385,26 @@ QList<QByteArray> QXmppVpxEncoder::handleFrame(const QXmppVideoFrame &frame)
             }
             row += stride;
             y_row += d->imageBuffer->stride[VPX_PLANE_Y];
+        }
+    } else if (frame.pixelFormat() == QXmppVideoFrame::Format_NV12) {
+        // NV12 -> YUV420P
+        const int area = frame.width() * frame.height();
+        const uchar *row = frame.bits();
+
+        uchar *p = d->imageBuffer->img_data;
+        memcpy(p, row, area * 3 / 2);
+
+        const uchar *pNV = row + area;
+        uchar *pU = p + area;
+        uchar *pV = p + area + (area >> 2);
+
+        for (int i = 0; i < (area / 2); ++i) {
+            if ((i % 2) == 0) {
+                *pU++ = *(pNV + i);
+            }
+            else {
+                *pV++ = *(pNV + i);
+            }
         }
     } else {
         qWarning("Vpx encoder does not support the given format");
