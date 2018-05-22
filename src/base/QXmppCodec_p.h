@@ -27,6 +27,7 @@
 #include <QMap>
 
 #include "QXmppGlobal.h"
+#include <functional>
 
 class QXmppRtpPacket;
 class QXmppVideoFormat;
@@ -150,7 +151,7 @@ public:
     virtual QXmppVideoFormat format() const = 0;
 
     /// Handles an RTP \a packet and returns a list of decoded video frames.
-    virtual QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet) = 0;
+    virtual void handlePacket(const QXmppRtpPacket &packet, std::function<void (const QXmppVideoFrame&)> frameCallback) = 0;
 
     /// Sets the video stream's \a parameters.
     virtual bool setParameters(const QMap<QString, QString> &parameters) = 0;
@@ -185,7 +186,7 @@ public:
     ~QXmppTheoraDecoder();
 
     QXmppVideoFormat format() const;
-    QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet);
+    void handlePacket(const QXmppRtpPacket &packet, std::function<void (const QXmppVideoFrame&)> frameCallback);
     bool setParameters(const QMap<QString, QString> &parameters);
 
 private:
@@ -218,7 +219,7 @@ public:
     ~QXmppVpxDecoder();
 
     QXmppVideoFormat format() const;
-    QList<QXmppVideoFrame> handlePacket(const QXmppRtpPacket &packet);
+    void handlePacket(const QXmppRtpPacket &packet, std::function<void (const QXmppVideoFrame&)> frameCallback);
     bool setParameters(const QMap<QString, QString> &parameters);
 
 private:

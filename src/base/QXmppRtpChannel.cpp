@@ -787,7 +787,6 @@ public:
     QXmppRtpVideoChannelPrivate();
     QMap<int, QXmppVideoDecoder*> decoders;
     QXmppVideoEncoder *encoder;
-    QList<QXmppVideoFrame> frames;
 
     // local
     QXmppVideoFormat outgoingFormat;
@@ -876,7 +875,10 @@ void QXmppRtpVideoChannel::datagramReceived(const QByteArray &ba)
     QXmppVideoDecoder *decoder = d->decoders.value(packet.type());
     if (!decoder)
         return;
-    d->frames << decoder->handlePacket(packet);
+
+    decoder->handlePacket(packet, [this](const QXmppVideoFrame& frame) {
+        emit frameAvailable(frame);
+    });
 }
 
 /// Returns the video format used by the encoder.
@@ -969,15 +971,6 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     }
 }
 /// \endcond
-
-/// Decodes buffered RTP packets and returns a list of video frames.
-
-QList<QXmppVideoFrame> QXmppRtpVideoChannel::readFrames()
-{
-    const QList<QXmppVideoFrame> frames = d->frames;
-    d->frames.clear();
-    return frames;
-}
 
 /// Encodes a video \a frame and sends RTP packets.
 

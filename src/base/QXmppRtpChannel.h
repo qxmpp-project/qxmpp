@@ -268,7 +268,6 @@ public:
 
     // incoming stream
     QXmppVideoFormat decoderFormat() const;
-    QList<QXmppVideoFrame> readFrames();
 
     // outgoing stream
     QXmppVideoFormat encoderFormat() const;
@@ -278,6 +277,9 @@ public:
 signals:
     /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
+
+    /// \brief This signal is emitted when a frame is available
+    void frameAvailable(const QXmppVideoFrame& frame);
 
 public slots:
     void datagramReceived(const QByteArray &ba);

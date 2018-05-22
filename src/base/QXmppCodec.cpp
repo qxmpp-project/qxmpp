@@ -671,10 +671,8 @@ QXmppVideoFormat QXmppTheoraDecoder::format() const
     return format;
 }
 
-QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &packet)
+void QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &packet, std::function<void (const QXmppVideoFrame&)> frameCallback)
 {
-    QList<QXmppVideoFrame> frames;
-
     // theora deframing: draft-ietf-avt-rtp-theora-00
     QDataStream stream(packet.payload());
     quint32 theora_header;
@@ -690,7 +688,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
 
     // We only handle raw theora data
     if (theora_type != 0)
-        return frames;
+        return;
 
     QXmppVideoFrame frame;
     quint16 packetLength;
@@ -701,13 +699,13 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
             stream >> packetLength;
             if (packetLength > stream.device()->bytesAvailable()) {
                 qWarning("Theora unfragmented packet has an invalid length");
-                return frames;
+                return;
             }
 
             d->packetBuffer.resize(packetLength);
             stream.readRawData(d->packetBuffer.data(), packetLength);
             if (d->decodeFrame(d->packetBuffer, &frame))
-                frames << frame;
+                frameCallback(frame);
             d->packetBuffer.resize(0);
         }
     } else {
@@ -715,7 +713,7 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
         stream >> packetLength;
         if (packetLength > stream.device()->bytesAvailable()) {
             qWarning("Theora packet has an invalid length");
-            return frames;
+            return;
         }
 
         int pos;
@@ -733,11 +731,10 @@ QList<QXmppVideoFrame> QXmppTheoraDecoder::handlePacket(const QXmppRtpPacket &pa
         if (theora_frag == EndFragment) {
             // end fragment
             if (d->decodeFrame(d->packetBuffer, &frame))
-                frames << frame;
+                frameCallback(frame);
             d->packetBuffer.resize(0);
         }
     }
-    return frames;
 }
 
 bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
@@ -1182,9 +1179,8 @@ QXmppVideoFormat QXmppVpxDecoder::format() const
     return format;
 }
 
-QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packet)
+void QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packet, std::function<void (const QXmppVideoFrame&)> frameCallback)
 {
-    QList<QXmppVideoFrame> frames;
     const QByteArray payload = packet.payload();
 
     // vp8 deframing: http://tools.ietf.org/html/draft-westin-payload-vp8-00
@@ -1196,7 +1192,7 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
     const quint8 frag_type = (vpx_header & 0x6) >> 1;
     if (have_id) {
         qWarning("Vpx decoder does not support pictureId yet");
-        return frames;
+        return;
     }
 
     const int packetLength = payload.size() - 1;
@@ -1220,7 +1216,7 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
         if ((payload[1] & 0x1) == 0 // is key frame
             || packet.sequence() == sequence) {
             if (d->decodeFrame(payload.mid(1), &frame))
-                frames << frame;
+                frameCallback(frame);
 
             sequence = packet.sequence() + 1;
         }
@@ -1245,7 +1241,7 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
                 if (frag_type == EndFragment) {
                     // end fragment
                     if (d->decodeFrame(d->packetBuffer, &frame)) {
-                        frames << frame;
+                        frameCallback(frame);
                         d->packetBuffer.resize(0);
                     }
                 }
@@ -1254,8 +1250,6 @@ QList<QXmppVideoFrame> QXmppVpxDecoder::handlePacket(const QXmppRtpPacket &packe
             }
         }
     }
-
-    return frames;
 }
 
 bool QXmppVpxDecoder::setParameters(const QMap<QString, QString> &parameters)
