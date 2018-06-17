@@ -193,7 +193,15 @@ set_target_properties(qxmpp PROPERTIES
     VERSION ${VERSION_STRING}
     SOVERSION ${SO_VERSION}
     EXPORT_NAME QXmpp
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_INSTALL_FULL_INCLUDEDIR}/qxmpp"
+)
+
+target_include_directories(qxmpp
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/base>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/client>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/base>
+    $<INSTALL_INTERFACE:include/qmake>
 )
 
 target_link_libraries(qxmpp
@@ -217,6 +225,11 @@ install(
     FILE QXmpp.cmake
     NAMESPACE QXmpp::
     COMPONENT Devel
+)
+
+export(
+    TARGETS qxmpp
+    FILE QXmpp.cmake
 )
 
 install(
