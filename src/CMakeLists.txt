@@ -1,8 +1,8 @@
 add_definitions(-DQXMPP_BUILD)
 
-include_directories(base)
-include_directories(client)
-include_directories(server)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppGlobal.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/base)

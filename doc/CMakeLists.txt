@@ -4,7 +4,7 @@ set(DOXYGEN_INPUT
     ${CMAKE_CURRENT_SOURCE_DIR}/index.doc
     ${CMAKE_CURRENT_SOURCE_DIR}/using.doc
     ${CMAKE_CURRENT_SOURCE_DIR}/xep.doc
-    ${CMAKE_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)

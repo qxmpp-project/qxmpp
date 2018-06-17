@@ -8,9 +8,10 @@ macro(add_simple_test TEST_NAME)
     target_link_libraries(tst_${TEST_NAME} Qt5::Test qxmpp)
 endmacro()
 
-include_directories(../src/base)
-include_directories(../src/client)
-include_directories(../src/server)
+include_directories(${PROJECT_SOURCE_DIR}/src/base)
+include_directories(${PROJECT_SOURCE_DIR}/src/client)
+include_directories(${PROJECT_SOURCE_DIR}/src/server)
+include_directories(${PROJECT_BINARY_DIR}/src/base)
 
 add_simple_test(qxmpparchiveiq)
 add_simple_test(qxmppbindiq)
