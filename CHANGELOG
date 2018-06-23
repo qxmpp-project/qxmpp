@@ -3,6 +3,8 @@ QXmpp 0.9.4 (UNRELEASED)
 
  - Do not ignore SSL errors by default (issue 113), if you need to deal with
    broken SSL configurations, set QXmppConfiguration::ignoreSslErrors to true.
+ - Drop Qt4 support
+ - CMake based build system
 
 QXmpp 0.9.3 (Dec 3, 2015)
 -------------------------
