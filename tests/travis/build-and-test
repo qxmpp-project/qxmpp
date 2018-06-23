@@ -15,9 +15,19 @@ case "$CONFIG" in
     ;;
 esac
 
+# build with code coverage
+if [ "$CONFIG" = "full-debug" ]; then
+    export CXXFLAGS="-fprofile-arcs -ftest-coverage"
+fi
+
 # compile
 cmake $CMAKE_ARGS
 make
 
 # run tests
 make test
+
+# upload coverage report
+if [ "$CONFIG" = "full-debug" ]; then
+    coveralls --exclude-pattern '.*autogen.*' --include src
+fi
