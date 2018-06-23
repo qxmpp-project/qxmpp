@@ -201,7 +201,7 @@ target_include_directories(qxmpp
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/client>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/base>
-    $<INSTALL_INTERFACE:include/qmake>
+    $<INSTALL_INTERFACE:include/qxmpp>
 )
 
 target_link_libraries(qxmpp
