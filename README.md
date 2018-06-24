@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/qxmpp-project/qxmpp.png)](https://travis-ci.org/qxmpp-project/qxmpp)
+[![Build Status](https://img.shields.io/travis/qxmpp-project/qxmpp.svg)](https://travis-ci.org/qxmpp-project/qxmpp)
+[![Code Coverage](https://img.shields.io/coveralls/qxmpp-project/qxmpp.svg)](https://coveralls.io/github/qxmpp-project/qxmpp)
 
 ABOUT QXMPP
 ===========
