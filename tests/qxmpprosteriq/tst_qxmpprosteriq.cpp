@@ -32,6 +32,8 @@ class tst_QXmppRosterIq : public QObject
 private slots:
     void testItem_data();
     void testItem();
+    void testVersion_data();
+    void testVersion();
 };
 
 void tst_QXmppRosterIq::testItem_data()
@@ -85,6 +87,31 @@ void tst_QXmppRosterIq::testItem()
     QCOMPARE(int(item.subscriptionType()), subscriptionType);
     QCOMPARE(item.subscriptionStatus(), QString());
     serializePacket(item, xml);
+}
+
+void tst_QXmppRosterIq::testVersion_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QString>("version");
+
+    QTest::newRow("noversion")
+        << QByteArray("<iq id=\"woodyisacat\" to=\"woody@zam.tw/cat\" type=\"result\"><query xmlns=\"jabber:iq:roster\"/></iq>")
+        << "";
+
+    QTest::newRow("version")
+        << QByteArray("<iq id=\"woodyisacat\" to=\"woody@zam.tw/cat\" type=\"result\"><query xmlns=\"jabber:iq:roster\" ver=\"3345678\"/></iq>")
+        << "3345678";
+}
+
+void tst_QXmppRosterIq::testVersion()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QString, version);
+
+    QXmppRosterIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.version(), version);
+    serializePacket(iq, xml);
 }
 
 QTEST_MAIN(tst_QXmppRosterIq)
