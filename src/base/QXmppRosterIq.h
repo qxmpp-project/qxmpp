@@ -83,10 +83,13 @@ public:
         QString m_bareJid;
         SubscriptionType m_type;
         QString m_name;
-         // can be subscribe/unsubscribe (attribute "ask")
+        // can be subscribe/unsubscribe (attribute "ask")
         QString m_subscriptionStatus;
         QSet<QString> m_groups;
     };
+
+    QString version() const;
+    void setVersion(const QString&);
 
     void addItem(const Item&);
     QList<Item> items() const;
@@ -103,6 +106,8 @@ protected:
 
 private:
     QList<Item> m_items;
+    // XEP-0237 Roster Versioning
+    QString m_version;
 };
 
 #endif // QXMPPROSTERIQ_H

@@ -45,6 +45,26 @@ QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
     return m_items;
 }
 
+/// Returns the roster version of IQ.
+///
+/// \return version as a QString
+///
+
+QString QXmppRosterIq::version() const
+{
+    return m_version;
+}
+
+/// Sets the roster version of IQ.
+///
+/// \param version as a QString
+///
+
+void QXmppRosterIq::setVersion(const QString &version)
+{
+    m_version = version;
+}
+
 /// \cond
 bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 {
@@ -53,9 +73,10 @@ bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 
 void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement itemElement = element.
-                              firstChildElement("query").
-                              firstChildElement("item");
+    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement itemElement = queryElement.firstChildElement("item");
+
+    setVersion(queryElement.attribute("ver"));
     while(!itemElement.isNull())
     {
         QXmppRosterIq::Item item;
@@ -70,6 +91,9 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("query");
     writer->writeAttribute( "xmlns", ns_roster);
 
+    // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
+    if(!version().isEmpty())
+        writer->writeAttribute( "ver", version());
     for(int i = 0; i < m_items.count(); ++i)
         m_items.at(i).toXml(writer);
     writer->writeEndElement();
