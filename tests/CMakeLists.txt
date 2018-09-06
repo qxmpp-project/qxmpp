@@ -12,6 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src/base)
 include_directories(${PROJECT_SOURCE_DIR}/src/client)
 include_directories(${PROJECT_SOURCE_DIR}/src/server)
 include_directories(${PROJECT_BINARY_DIR}/src/base)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_simple_test(qxmpparchiveiq)
 add_simple_test(qxmppbindiq)

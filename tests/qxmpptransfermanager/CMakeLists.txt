@@ -1,3 +1,4 @@
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(tst_qxmpptransfermanager tst_qxmpptransfermanager.cpp tst_qxmpptransfermanager.qrc)
 add_test(tst_qxmpptransfermanager tst_qxmpptransfermanager)
 target_link_libraries(tst_qxmpptransfermanager Qt5::Test qxmpp)
