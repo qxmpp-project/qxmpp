@@ -37,8 +37,23 @@ if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    QXmppConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/qxmpp"
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfigVersion.cmake
+    VERSION ${VERSION_STRING}
+    COMPATIBILITY SameMajorVersion
+)
+
 install(
-    FILES QXmppConfig.cmake
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
+          ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfigVersion.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/qxmpp"
     COMPONENT Devel
 )
