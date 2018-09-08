@@ -19,7 +19,7 @@ include(GNUInstallDirs)
 
 option(BUILD_TESTS "Build tests." ON)
 option(BUILD_DOCUMENTATION "Build API documentation." OFF)
-option(BUILD_EXAMPLES "Build API documentation." ON)
+option(BUILD_EXAMPLES "Build examples." ON)
 
 add_subdirectory(src)
 
