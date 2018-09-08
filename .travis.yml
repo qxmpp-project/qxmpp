@@ -13,3 +13,8 @@ install:
   - tests/travis/install-build-depends
 script:
   - tests/travis/build-and-test
+after_success:
+  - |
+    if [ "$CONFIG" = "full-debug" ]; then
+      bash <(curl -s https://codecov.io/bash)
+    fi

@@ -9,7 +9,3 @@ full*)
     sudo apt-get install -qq  doxygen libopus-dev libspeex-dev libtheora-dev libvpx-dev
     ;;
 esac
-
-if [ "$CONFIG" = "full-debug" ]; then
-    pip install --user cpp-coveralls
-fi

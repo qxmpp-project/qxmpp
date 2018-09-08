@@ -26,8 +26,3 @@ make
 
 # run tests
 make test
-
-# upload coverage report
-if [ "$CONFIG" = "full-debug" ]; then
-    coveralls --exclude-pattern '.*autogen.*' --include src
-fi
