@@ -89,21 +89,6 @@ platforms support by Qt, see:
 
 https://doc.qt.io/qt-5/supported-platforms.html
 
-In past, we have tested on variety of platforms:
-
-    win32-g++        (Qt SDK)
-    win32-msvc2008   (Qt MSVC-2008)
-    win64-msvc2008   (Qt MSVC-2008)
-    symbian-gcce     (Nokia Qt SDK)
-    linux-g++        (32-bit and 64-bit)
-    macos-g++        (32-bit and 64-bit)
-
-Please note that on Symbian, you will need to make sure your add the
-"NetworkServices" to your application to enable it to access the network.
-You can do this by adding the following to your .pro file:
-
-    TARGET.CAPABILITY = "NetworkServices"
-
 HOW TO REPORT A BUG
 ===================
 
