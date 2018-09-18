@@ -274,7 +274,7 @@ void QXmppSocksServer::slotReadyRead()
 
             buffer.resize(2);
             buffer[0] = SocksVersion;
-            buffer[1] = NoAcceptableMethod;
+            buffer[1] = static_cast<unsigned char>(NoAcceptableMethod);
             socket->write(buffer);
 
             socket->close();
