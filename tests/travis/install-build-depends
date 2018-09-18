@@ -1,11 +1,22 @@
 #!/bin/sh
 set -e
 
-sudo apt-get update -qq
-sudo apt-get install -qq qtbase5-dev cmake
+if [ "$(uname -s)" = "Darwin" ]; then
+    brew update
+    brew install qt
 
-case "$CONFIG" in
-full*)
-    sudo apt-get install -qq  doxygen libopus-dev libspeex-dev libtheora-dev libvpx-dev
-    ;;
-esac
+    case "$CONFIG" in
+    full*)
+        brew install doxygen opus speex theora libvpx
+        ;;
+    esac
+else
+    sudo apt-get update -qq
+    sudo apt-get install -qq cmake qtbase5-dev
+
+    case "$CONFIG" in
+    full*)
+        sudo apt-get install -qq  doxygen libopus-dev libspeex-dev libtheora-dev libvpx-dev
+        ;;
+    esac
+fi
