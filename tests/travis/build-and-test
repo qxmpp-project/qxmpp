@@ -26,7 +26,9 @@ if [ "$CONFIG" = "full-debug" ]; then
 fi
 
 # compile
-cmake $CMAKE_ARGS
+mkdir build
+cd build
+cmake .. $CMAKE_ARGS
 make
 
 # run tests
