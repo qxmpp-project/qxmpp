@@ -11,6 +11,13 @@ env:
   - CONFIG=full-debug
 install:
   - tests/travis/install-build-depends
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+os:
+  - linux
+  - osx
 script:
   - tests/travis/build-and-test
 after_success:

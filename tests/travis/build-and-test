@@ -15,6 +15,11 @@ case "$CONFIG" in
     ;;
 esac
 
+# pick up cmake files from homebrew
+if [ "$(uname -s)" = "Darwin" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5"
+fi
+
 # build with code coverage
 if [ "$CONFIG" = "full-debug" ]; then
     export CXXFLAGS="-fprofile-arcs -ftest-coverage"
