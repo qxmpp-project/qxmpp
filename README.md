@@ -32,7 +32,7 @@ Build from command line:
     mkdir build
     cd build
     cmake ..
-    <respective-make-cmd = gmake, make, mingw32-make, nmake>
+    cmake --build .
 
 You can pass the following arguments to CMake:
 
@@ -52,7 +52,7 @@ and Documentation using the following command:
 
 Install from command line:
 
-    <respective-make-cmd = gmake, make, mingw32-make, nmake> install
+    cmake --build . --target install
 
 EXAMPLES
 ========
