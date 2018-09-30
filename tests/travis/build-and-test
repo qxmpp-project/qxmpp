@@ -35,6 +35,12 @@ case "$CONFIG" in
     ;;
 esac
 
+which cmake
+/usr/bin/cmake --version
+cmake --version
+ls /usr/local
+echo $PATH
+
 # compile
 qmake $QMAKE_ARGS
 make VERBOSE=1
