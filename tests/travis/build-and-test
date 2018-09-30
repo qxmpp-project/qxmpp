@@ -15,9 +15,13 @@ case "$CONFIG" in
     ;;
 esac
 
-# pick up cmake files from homebrew
 if [ "$(uname -s)" = "Darwin" ]; then
+    # pick up cmake files from homebrew
     CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5"
+else
+    # This hides all the paths that contain custom travis binaries like the
+    # updated version of cmake.
+    export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 fi
 
 # build with code coverage
