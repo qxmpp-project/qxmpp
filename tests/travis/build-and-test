@@ -25,6 +25,12 @@ if [ "$CONFIG" = "full-debug" ]; then
     export CXXFLAGS="-fprofile-arcs -ftest-coverage"
 fi
 
+which cmake
+/usr/bin/cmake --version
+cmake --version
+ls /usr/local
+echo $PATH
+
 # compile
 mkdir build
 cd build
