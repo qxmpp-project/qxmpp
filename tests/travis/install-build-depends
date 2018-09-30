@@ -12,7 +12,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
     esac
 else
     sudo apt-get update -qq
-    sudo apt-get install -qq cmake qtbase5-dev
+    sudo apt-get install -qq clang cmake qtbase5-dev
 
     case "$CONFIG" in
     full*)
