@@ -81,7 +81,7 @@ void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> 
         commonOutgoingTypes << outgoingType;
     }
     if (commonOutgoingTypes.isEmpty()) {
-        qWarning("QXmppRtpChannel could not negociate a common codec");
+        qWarning("QXmppRtpChannel could not negotiate a common codec");
         return;
     }
     m_incomingPayloadTypes = commonIncomingTypes;
