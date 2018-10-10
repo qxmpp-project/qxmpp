@@ -1,19 +1,21 @@
 find_package(Doxygen REQUIRED)
 
-set(DOXYGEN_INPUT
-    ${CMAKE_CURRENT_SOURCE_DIR}/index.doc
-    ${CMAKE_CURRENT_SOURCE_DIR}/using.doc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xep.doc
-    ${PROJECT_SOURCE_DIR}/src
-)
+if(NOT DOXYGEN_FOUND)
+    message(FATAL_ERROR "Doxygen is needed to build the documentation.")
+endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    @ONLY
+)
 
 add_custom_target(
     doc ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generate API documentation with Doxygen"
+    VERBATIM
 )
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION ${CMAKE_INSTALL_DOCDIR})
