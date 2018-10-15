@@ -36,13 +36,14 @@ Build from command line:
 
 You can pass the following arguments to CMake:
 
-    BUILD_DOCUMENTATION           to build the documentation
-    BUILD_EXAMPLES                to build the examples
-    BUILD_TESTS                   to build the unit tests
-    WITH_OPUS                     to enable opus audio codec
-    WITH_SPEEX                    to enable speex audio codec
-    WITH_THEORA                   to enable theora video codec
-    WITH_VPX                      to enable vpx video codec
+    BUILD_SHARED                  to build with shared type library, otherwise static (default: true)
+    BUILD_DOCUMENTATION           to build the documentation (default: false)
+    BUILD_EXAMPLES                to build the examples (default: true)
+    BUILD_TESTS                   to build the unit tests (default: true)
+    WITH_OPUS                     to enable opus audio codec (default: false)
+    WITH_SPEEX                    to enable speex audio codec (default: false)
+    WITH_THEORA                   to enable theora video codec (default: false)
+    WITH_VPX                      to enable vpx video codec (default: false)
 
 INSTALLING QXMPP
 ================

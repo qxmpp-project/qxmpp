@@ -161,6 +161,7 @@ option(WITH_SPEEX "Support the Speex codec" OFF)
 option(WITH_OPUS "Support the Opus codec" OFF)
 option(WITH_THEORA "Support the Theora codec" OFF)
 option(WITH_VPX "Support the VPX codec" OFF)
+option(BUILD_SHARED "Build SHARED library" ON)
 
 if(WITH_SPEEX)
     find_package(Speex REQUIRED)
@@ -187,7 +188,11 @@ if(WITH_VPX)
     add_definitions(-DQXMPP_USE_VPX)
 endif()
 
-add_library(qxmpp SHARED ${SOURCE_FILES})
+if(BUILD_SHARED)
+    add_library(qxmpp SHARED ${SOURCE_FILES})
+else()
+    add_library(qxmpp STATIC ${SOURCE_FILES})
+endif()
 
 set_target_properties(qxmpp PROPERTIES
     VERSION ${VERSION_STRING}
