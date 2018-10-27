@@ -23,7 +23,9 @@
 
 #include <QObject>
 #include <QtTest>
+
 #include "QXmppCodec_p.h"
+#include "QXmppRtpChannel.h"
 
 class tst_QXmppCodec : public QObject
 {
