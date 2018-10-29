@@ -94,6 +94,10 @@ public:
 
     void addIncomingClient(QXmppIncomingClient *stream);
 
+    bool hasClientStateIndication();
+    /// Enable or disable Client State Indication stream feature
+    void setClientStateIndication(bool enabled);
+
 signals:
     /// This signal is emitted when a client has connected.
     void clientConnected(const QString &jid);

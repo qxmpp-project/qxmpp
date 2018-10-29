@@ -53,6 +53,8 @@ public:
     void checkCredentials(const QByteArray &response);
     QString origin() const;
 
+    bool csiEnabled;
+
 private:
     QXmppIncomingClient *q;
 };
@@ -61,6 +63,7 @@ QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
     : idleTimer(0)
     , passwordChecker(0)
     , saslServer(0)
+    , csiEnabled(false)
     , q(qq)
 {
 }
@@ -104,7 +107,8 @@ QString QXmppIncomingClientPrivate::origin() const
 /// \param parent The parent QObject for the stream (optional).
 ///
 
-QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
+QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, bool csiEnabled,
+                                         QObject *parent)
     : QXmppStream(parent)
 {
     bool check;
@@ -112,6 +116,7 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
 
     d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
+    d->csiEnabled = csiEnabled;
 
     if (socket) {
         check = connect(socket, SIGNAL(disconnected()),
@@ -230,6 +235,10 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
         if (d->passwordChecker->hasGetPassword())
             mechanisms << "DIGEST-MD5";
         features.setAuthMechanisms(mechanisms);
+    }
+    if (d->csiEnabled)
+    {
+        features.setClientStateIndicationMode(QXmppStreamFeatures::Enabled);
     }
     sendPacket(features);
 }
@@ -467,5 +476,3 @@ void QXmppIncomingClient::onTimeout()
     // make sure disconnected() gets emitted no matter what
     QTimer::singleShot(30, this, SIGNAL(disconnected()));
 }
-
-

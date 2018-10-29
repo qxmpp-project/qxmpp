@@ -93,6 +93,7 @@ public:
     QHash<QString, QXmppIncomingClient*> incomingClientsByJid;
     QHash<QString, QSet<QXmppIncomingClient*> > incomingClientsByBareJid;
     QSet<QXmppSslServer*> serversForClients;
+    bool csiEnabled = false;
 
     // server-to-server
     QSet<QXmppIncomingServer*> incomingServers;
@@ -704,7 +705,7 @@ void QXmppServer::_q_clientConnection(QSslSocket *socket)
         return;
     }
 
-    QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
+    QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, d->csiEnabled, this);
     stream->setInactivityTimeout(120);
     socket->setParent(stream);
     addIncomingClient(stream);
@@ -936,3 +937,12 @@ void QXmppSslServer::setPrivateKey(const QSslKey &key)
     d->privateKey = key;
 }
 
+bool QXmppServer::hasClientStateIndication()
+{
+    return d->csiEnabled;
+}
+
+void QXmppServer::setClientStateIndication(bool enabled)
+{
+    d->csiEnabled = enabled;
+}
