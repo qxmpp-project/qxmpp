@@ -96,6 +96,9 @@ public:
 
     // XEP-0280: Message Carbons
     bool privatemsg;
+
+    // XEP-0066: Out of Band Data
+    QString outOfBandUrl;
 };
 
 /// Constructs a QXmppMessage.
@@ -475,6 +478,20 @@ bool QXmppMessage::isXmppStanza() const
     return true;
 }
 
+/// Returns a possibly attached URL from XEP-0066: Out of Band Data
+
+QString QXmppMessage::outOfBandUrl() const
+{
+    return d->outOfBandUrl;
+}
+
+/// Sets the attached URL for XEP-0066: Out of Band Data
+
+void QXmppMessage::setOutOfBandUrl(const QString &url)
+{
+    d->outOfBandUrl = url;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -604,6 +621,9 @@ void QXmppMessage::parse(const QDomElement &element)
                 d->mucInvitationJid = xElement.attribute("jid");
                 d->mucInvitationPassword = xElement.attribute("password");
                 d->mucInvitationReason = xElement.attribute("reason");
+            } else if (xElement.namespaceURI() == ns_oob) {
+                // XEP-0066: Out of Band Data
+                d->outOfBandUrl = xElement.firstChildElement("url").text();
             }
             else {
                 extensions << QXmppElement(xElement);
@@ -726,6 +746,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     if (d->privatemsg) {
         xmlWriter->writeStartElement("private");
         xmlWriter->writeAttribute("xmlns", ns_carbons);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0066: Out of Band Data
+    if (!d->outOfBandUrl.isEmpty()) {
+        xmlWriter->writeStartElement("x");
+        xmlWriter->writeAttribute("xmlns", ns_oob);
+        xmlWriter->writeTextElement("url", d->outOfBandUrl);
         xmlWriter->writeEndElement();
     }
 

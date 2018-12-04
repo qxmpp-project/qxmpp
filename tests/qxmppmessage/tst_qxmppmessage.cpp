@@ -46,6 +46,7 @@ private slots:
     void testSubextensions();
     void testChatMarkers();
     void testPrivateMessage();
+    void testOutOfBandUrl();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -567,6 +568,33 @@ void tst_QXmppMessage::testPrivateMessage()
     QXmlStreamWriter writer(&buffer);
     privateMessage.toXml(&writer);
     QVERIFY(!buffer.data().contains("private"));
+}
+
+void tst_QXmppMessage::testOutOfBandUrl()
+{
+    const QByteArray oobXml(
+        "<message to=\"MaineBoy@jabber.org/home\" "
+                 "from=\"stpeter@jabber.org/work\" "
+                 "type=\"chat\">"
+            "<body>Yeah, but do you have a license to Jabber?</body>"
+            "<x xmlns=\"jabber:x:oob\">"
+                "<url>http://www.jabber.org/images/psa-license.jpg</url>"
+            "</x>"
+        "</message>"
+    );
+    const QString firstUrl = "http://www.jabber.org/images/psa-license.jpg";
+    const QString newUrl = "https://xmpp.org/theme/images/xmpp-logo.svg";
+
+    QXmppMessage oobMessage;
+    parsePacket(oobMessage, oobXml);
+    QCOMPARE(oobMessage.outOfBandUrl(), firstUrl);
+
+    oobMessage.setOutOfBandUrl(newUrl);
+    QCOMPARE(oobMessage.outOfBandUrl(), newUrl);
+
+    // set first url again
+    oobMessage.setOutOfBandUrl(firstUrl);
+    serializePacket(oobMessage, oobXml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)
