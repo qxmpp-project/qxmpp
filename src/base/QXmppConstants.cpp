@@ -57,6 +57,8 @@ const char* ns_vcard = "vcard-temp";
 const char* ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
+// XEP-0066: Out of Band Data
+const char* ns_oob = "jabber:x:oob";
 // XEP-0071: XHTML-IM
 const char *ns_xhtml_im = "http://jabber.org/protocol/xhtml-im";
 // XEP-0077: In-Band Registration

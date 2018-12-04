@@ -135,6 +135,10 @@ public:
 
     bool isXmppStanza() const;
 
+    // XEP-0066: Out of Band Data
+    QString outOfBandUrl() const;
+    void setOutOfBandUrl(const QString&);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
