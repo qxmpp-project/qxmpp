@@ -48,7 +48,11 @@ QXmppDiscoveryManager::QXmppDiscoveryManager()
 {
     d->clientCapabilitiesNode = "https://github.com/qxmpp-project/qxmpp";
     d->clientCategory = "client";
+#if defined Q_OS_ANDROID || defined Q_OS_BLACKBERRY || defined Q_OS_IOS || defined Q_OS_WP
+    d->clientType = "phone";
+#else
     d->clientType = "pc";
+#endif
     if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
         d->clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
     else
@@ -212,7 +216,8 @@ QString QXmppDiscoveryManager::clientCategory() const
 
 /// Returns the type of the local XMPP client.
 ///
-/// By default this is "pc".
+/// With Qt builds for Android, Blackberry, iOS or Windows Phone this is set to
+/// "phone", otherwise it defaults to "pc".
 
 QString QXmppDiscoveryManager::clientType() const
 {
