@@ -139,6 +139,10 @@ public:
     QString outOfBandUrl() const;
     void setOutOfBandUrl(const QString&);
 
+    // XEP-0308: Last Message Correction
+    QString replaceId() const;
+    void setReplaceId(const QString&);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

@@ -47,6 +47,7 @@ private slots:
     void testChatMarkers();
     void testPrivateMessage();
     void testOutOfBandUrl();
+    void testMessageCorrect();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -595,6 +596,23 @@ void tst_QXmppMessage::testOutOfBandUrl()
     // set first url again
     oobMessage.setOutOfBandUrl(firstUrl);
     serializePacket(oobMessage, oobXml);
+}
+
+void tst_QXmppMessage::testMessageCorrect()
+{
+    const QByteArray xml(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>This is the corrected version.</body>"
+          "<replace xmlns=\"urn:xmpp:message-correct:0\" id=\"badmessage\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.replaceId(), QString("badmessage"));
+    serializePacket(message, xml);
+
+    message.setReplaceId("someotherid");
+    QCOMPARE(message.replaceId(), QString("someotherid"));
 }
 
 QTEST_MAIN(tst_QXmppMessage)
