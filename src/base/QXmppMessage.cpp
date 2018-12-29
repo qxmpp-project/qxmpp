@@ -99,6 +99,9 @@ public:
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl;
+
+    // XEP-0308: Last Message Correction
+    QString replaceId;
 };
 
 /// Constructs a QXmppMessage.
@@ -377,6 +380,7 @@ namespace
                << qMakePair(QString("thread"), QString())
                << qMakePair(QString("html"), QString())
                << qMakePair(QString("received"), QString(ns_message_receipts))
+               << qMakePair(QString("replace"), QString(ns_message_correct))
                << qMakePair(QString("request"), QString())
                << qMakePair(QString("delay"), QString())
                << qMakePair(QString("attention"), QString())
@@ -492,6 +496,23 @@ void QXmppMessage::setOutOfBandUrl(const QString &url)
     d->outOfBandUrl = url;
 }
 
+/// Returns the message id to replace with this message as used in XEP-0308:
+/// Last Message Correction. If the returned string is empty, this message is
+/// not replacing another.
+
+QString QXmppMessage::replaceId() const
+{
+    return d->replaceId;
+}
+
+/// Sets the message id to replace with this message as in XEP-0308: Last
+/// Message Correction.
+
+void QXmppMessage::setReplaceId(const QString &replaceId)
+{
+    d->replaceId = replaceId;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -596,6 +617,11 @@ void QXmppMessage::parse(const QDomElement &element)
     QDomElement privateElement = element.firstChildElement("private");
     if (!privateElement.isNull())
         d->privatemsg = true;
+
+    // XEP-0308: Last Message Correction
+    QDomElement replaceElement = element.firstChildElement("replace");
+    if (!replaceElement.isNull() && replaceElement.namespaceURI() == ns_message_correct)
+        d->replaceId = replaceElement.attribute("id");
 
     const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
 
@@ -754,6 +780,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement("x");
         xmlWriter->writeAttribute("xmlns", ns_oob);
         xmlWriter->writeTextElement("url", d->outOfBandUrl);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0308: Last Message Correction
+    if (!d->replaceId.isEmpty()) {
+        xmlWriter->writeStartElement("replace");
+        xmlWriter->writeAttribute("xmlns", ns_message_correct);
+        xmlWriter->writeAttribute("id", d->replaceId);
         xmlWriter->writeEndElement();
     }
 
