@@ -22,6 +22,7 @@
  *
  */
 
+#include <QDateTime>
 #include <QObject>
 
 #include "QXmppPresence.h"
@@ -40,6 +41,7 @@ private slots:
     void testPresenceWithMucItem();
     void testPresenceWithMucPassword();
     void testPresenceWithMucSupport();
+    void testPresenceWithLastUserInteraction();
 };
 
 void tst_QXmppPresence::testPresence_data()
@@ -229,6 +231,27 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
     QCOMPARE(presence.isMucSupported(), true);
     QVERIFY(presence.mucPassword().isEmpty());
     serializePacket(presence, xml);
+}
+
+void tst_QXmppPresence::testPresenceWithLastUserInteraction()
+{
+    const QByteArray xml(
+        "<presence to=\"coven@chat.shakespeare.lit/thirdwitch\" "
+                  "from=\"hag66@shakespeare.lit/pda\">"
+            "<idle xmlns=\"urn:xmpp:idle:1\" since=\"1969-07-21T02:56:15Z\"/>"
+        "</presence>");
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+    QVERIFY(!presence.lastUserInteraction().isNull());
+    QVERIFY(presence.lastUserInteraction().isValid());
+    QCOMPARE(presence.lastUserInteraction(), QDateTime(QDate(1969, 7, 21),
+             QTime(2, 56, 15), Qt::UTC));
+    serializePacket(presence, xml);
+
+    QDateTime another(QDate(2025, 2, 5), QTime(15, 32, 8), Qt::UTC);
+    presence.setLastUserInteraction(another);
+    QCOMPARE(presence.lastUserInteraction(), another);
 }
 
 QTEST_MAIN(tst_QXmppPresence)

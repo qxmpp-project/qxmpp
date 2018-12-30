@@ -128,6 +128,10 @@ public:
 
     QStringList capabilityExt() const;
 
+    // XEP-0319: Last User Interaction in Presence
+    QDateTime lastUserInteraction() const;
+    void setLastUserInteraction(const QDateTime&);
+
     bool isXmppStanza() const;
 
 private:

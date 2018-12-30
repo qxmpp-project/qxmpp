@@ -25,6 +25,7 @@
 #include "QXmppPresence.h"
 #include "QXmppUtils.h"
 #include <QtDebug>
+#include <QDateTime>
 #include <QDomElement>
 #include <QXmlStreamWriter>
 #include "QXmppConstants_p.h"
@@ -76,6 +77,9 @@ public:
     QString mucPassword;
     QList<int> mucStatusCodes;
     bool mucSupported;
+
+    // XEP-0319: Last User Interaction in Presence
+    QDateTime lastUserInteraction;
 };
 
 /// Constructs a QXmppPresence.
@@ -253,22 +257,17 @@ void QXmppPresence::parse(const QDomElement &element)
             d->capabilityHash = xElement.attribute("hash");
             d->capabilityExt = xElement.attribute("ext").split(" ", QString::SkipEmptyParts);
         }
-        else if (xElement.tagName() == "addresses")
+        // XEP-0319: Last User Interaction in Presence
+        else if (xElement.tagName() == "idle" && xElement.namespaceURI() == ns_idle)
         {
+            if (xElement.hasAttribute("since")) {
+                const QString since = xElement.attribute("since");
+                d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
+            }
         }
-        else if (xElement.tagName() == "error")
-        {
-        }
-        else if (xElement.tagName() == "show")
-        {
-        }
-        else if (xElement.tagName() == "status")
-        {
-        }
-        else if (xElement.tagName() == "priority")
-        {
-        }
-        else
+        else if (xElement.tagName() != "addresses" && xElement.tagName() != "error"
+                 && xElement.tagName() != "show" && xElement.tagName() != "status"
+                 && xElement.tagName() != "priority")
         {
             // other extensions
             extensions << QXmppElement(xElement);
@@ -349,6 +348,16 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddAttribute(xmlWriter, "hash", d->capabilityHash);
         helperToXmlAddAttribute(xmlWriter, "node", d->capabilityNode);
         helperToXmlAddAttribute(xmlWriter, "ver", d->capabilityVer.toBase64());
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0319: Last User Interaction in Presence
+    if (!d->lastUserInteraction.isNull() && d->lastUserInteraction.isValid())
+    {
+        xmlWriter->writeStartElement("idle");
+        xmlWriter->writeAttribute("xmlns", ns_idle);
+        helperToXmlAddAttribute(xmlWriter, "since", QXmppUtils::datetimeToString(
+                                d->lastUserInteraction));
         xmlWriter->writeEndElement();
     }
 
@@ -495,6 +504,22 @@ bool QXmppPresence::isMucSupported() const
 void QXmppPresence::setMucSupported(bool supported)
 {
     d->mucSupported = supported;
+}
+
+/// Returns when the last user interaction with the client took place. See
+/// XEP-0319: Last User Interaction in Presence for details.
+
+QDateTime QXmppPresence::lastUserInteraction() const
+{
+    return d->lastUserInteraction;
+}
+
+/// Sets the time of the last user interaction as defined in XEP-0319: Last
+/// User Interaction in Presence.
+
+void QXmppPresence::setLastUserInteraction(const QDateTime& lastUserInteraction)
+{
+    d->lastUserInteraction = lastUserInteraction;
 }
 
 /// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
