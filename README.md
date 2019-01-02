@@ -10,7 +10,9 @@ in C++ and uses Qt framework.
 QXmpp strives to be as easy to use as possible, the underlying TCP socket,
 the core XMPP RFCs (RFC3920 and RFC3921) and XMPP extensions have been
 nicely encapsulated into classes. QXmpp comes with full API
-documentation, automatic tests and many examples.
+documentation, automatic tests and many examples. A list of supported XMPP
+Extension Protocols (XEPs) can be found on our
+[wiki](https://github.com/qxmpp-project/qxmpp/wiki/XMPP-Extensions).
 
 QXmpp uses Qt extensively, and as such users need to a have working knowledge
 of C++ and Qt basics (Signals and Slots and Qt data types).
