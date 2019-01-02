@@ -53,7 +53,7 @@ QXmppVersionManager::QXmppVersionManager()
 #elif defined(Q_OS_LINUX)
     d->clientOs = QString::fromLatin1("Linux");
 #elif defined(Q_OS_MAC)
-    d->clientOs = QString::fromLatin1("Mac OS");
+    d->clientOs = QString::fromLatin1("macOS");
 #elif defined(Q_OS_SYMBIAN)
     d->clientOs = QString::fromLatin1("Symbian");
 #elif defined(Q_OS_WIN)
