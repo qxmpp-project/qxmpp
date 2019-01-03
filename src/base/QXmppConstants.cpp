@@ -132,3 +132,15 @@ const char* ns_idle = "urn:xmpp:idle:1";
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 // XEP-0352: Client State Indication
 const char* ns_csi = "urn:xmpp:csi:0";
+// XEP-0369: Mediated Information eXchange (MIX)
+const char* ns_mix = "urn:xmpp:mix:core:0";
+const char* ns_mix_create_channel = "urn:xmpp:mix:core:0#create-channel";
+const char* ns_mix_searchable = "urn:xmpp:mix:core:0#searchable";
+const char* ns_mix_node_messages = "urn:xmpp:mix:nodes:messages";
+const char* ns_mix_node_participants = "urn:xmpp:mix:nodes:participants";
+const char* ns_mix_node_presence = "urn:xmpp:mix:nodes:presence";
+const char* ns_mix_node_config = "urn:xmpp:mix:nodes:config";
+const char* ns_mix_node_info = "urn:xmpp:mix:nodes:info";
+// XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+const char* ns_mix_pam = "urn:xmpp:mix:pam:0";
+const char* ns_mix_roster = "urn:xmpp:mix:roster:0";
