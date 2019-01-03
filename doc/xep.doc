@@ -12,6 +12,7 @@ Complete:
 - XEP-0054: vcard-temp
 - XEP-0059: Result Set Management
 - XEP-0065: SOCKS5 Bytestreams
+- XEP-0066: Out of Band Data (partially)
 - XEP-0071: XHTML-IM
 - XEP-0078: Non-SASL Authentication
 - XEP-0082: XMPP Date and Time Profiles
@@ -28,18 +29,21 @@ Complete:
 - XEP-0167: Jingle RTP Sessions
 - XEP-0176: Jingle ICE-UDP Transport Method
 - XEP-0184: Message Delivery Receipts
+- XEP-0198: Stream Management
 - XEP-0199: XMPP Ping
 - XEP-0202: Entity Time
 - XEP-0203: Delayed Delivery
 - XEP-0221: Data Forms Media Element
 - XEP-0224: Attention
-- XEP-0237: Roster Versioning
+- XEP-0237: Roster Versioning (partially)
+- XEP-0280: Message Carbons
+- XEP-0308: Last Message Correction
+- XEP-0313: Message Archive Management
+- XEP-0352: Client State Indication
 
 Ongoing:
-- XEP-0009: Jabber-RPC
-
-TODO:
-- XEP-0060: Publish-Subscribe
-- XEP-0077: In-Band Registration
+- XEP-0009: Jabber-RPC (API is not finalized yet)
+- XEP-0060: Publish-Subscribe (Only basic IQ implemented)
+- XEP-0077: In-Band Registration (Only basic IQ implemented)
 
 */
