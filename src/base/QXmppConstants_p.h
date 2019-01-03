@@ -144,5 +144,17 @@ extern const char* ns_idle;
 extern const char* ns_chat_markers;
 // XEP-0352: Client State Indication
 extern const char* ns_csi;
+// XEP-0369: Mediated Information eXchange (MIX)
+extern const char* ns_mix;
+extern const char* ns_mix_create_channel;
+extern const char* ns_mix_searchable;
+extern const char* ns_mix_node_messages;
+extern const char* ns_mix_node_participants;
+extern const char* ns_mix_node_presence;
+extern const char* ns_mix_node_config;
+extern const char* ns_mix_node_info;
+// XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+extern const char* ns_mix_pam;
+extern const char* ns_mix_roster;
 
 #endif // QXMPPCONSTANTS_H

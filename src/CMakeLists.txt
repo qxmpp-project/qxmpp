@@ -25,6 +25,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppLogger.h
     base/QXmppMamIq.h
     base/QXmppMessage.h
+    base/QXmppMixIq.h
     base/QXmppMucIq.h
     base/QXmppNonSASLAuth.h
     base/QXmppPingIq.h
@@ -99,6 +100,7 @@ set(SOURCE_FILES
     base/QXmppLogger.cpp
     base/QXmppMamIq.cpp
     base/QXmppMessage.cpp
+    base/QXmppMixIq.cpp
     base/QXmppMucIq.cpp
     base/QXmppNonSASLAuth.cpp
     base/QXmppPingIq.cpp
