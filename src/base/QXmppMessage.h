@@ -143,6 +143,13 @@ public:
     QString replaceId() const;
     void setReplaceId(const QString&);
 
+    // XEP-0369: Mediated Information eXchange (MIX)
+    QString mixUserJid() const;
+    void setMixUserJid(const QString&);
+
+    QString mixUserNick() const;
+    void setMixUserNick(const QString&);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

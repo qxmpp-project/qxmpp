@@ -48,6 +48,7 @@ private slots:
     void testPrivateMessage();
     void testOutOfBandUrl();
     void testMessageCorrect();
+    void testMix();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -613,6 +614,33 @@ void tst_QXmppMessage::testMessageCorrect()
 
     message.setReplaceId("someotherid");
     QCOMPARE(message.replaceId(), QString("someotherid"));
+}
+
+void tst_QXmppMessage::testMix()
+{
+    const QByteArray xml(
+        "<message to=\"hag66@shakespeare.example\" "
+                 "from=\"coven@mix.shakespeare.example/123456\" "
+                 "type=\"groupchat\">"
+            "<body>Harpier cries: 'tis time, 'tis time.</body>"
+            "<mix xmlns=\"urn:xmpp:mix:core:0\">"
+                "<jid>hag66@shakespeare.example</jid>"
+                "<nick>thirdwitch</nick>"
+            "</mix>"
+        "</message>"
+    );
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    serializePacket(message, xml);
+
+    QCOMPARE(message.mixUserJid(), QString("hag66@shakespeare.example"));
+    QCOMPARE(message.mixUserNick(), QString("thirdwitch"));
+
+    message.setMixUserJid("alexander@example.org");
+    QCOMPARE(message.mixUserJid(), QString("alexander@example.org"));
+    message.setMixUserNick("erik");
+    QCOMPARE(message.mixUserNick(), QString("erik"));
 }
 
 QTEST_MAIN(tst_QXmppMessage)
