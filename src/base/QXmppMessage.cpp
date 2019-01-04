@@ -102,6 +102,10 @@ public:
 
     // XEP-0308: Last Message Correction
     QString replaceId;
+
+    // XEP-0369: Mediated Information eXchange (MIX)
+    QString mixUserJid;
+    QString mixUserNick;
 };
 
 /// Constructs a QXmppMessage.
@@ -513,6 +517,34 @@ void QXmppMessage::setReplaceId(const QString &replaceId)
     d->replaceId = replaceId;
 }
 
+/// Returns the actual JID of a MIX channel participant.
+
+QString QXmppMessage::mixUserJid() const
+{
+    return d->mixUserJid;
+}
+
+/// Sets the actual JID of a MIX channel participant.
+
+void QXmppMessage::setMixUserJid(const QString& mixUserJid)
+{
+    d->mixUserJid = mixUserJid;
+}
+
+/// Returns the MIX participant's nickname.
+
+QString QXmppMessage::mixUserNick() const
+{
+    return d->mixUserNick;
+}
+
+/// Sets the MIX participant's nickname.
+
+void QXmppMessage::setMixUserNick(const QString& mixUserNick)
+{
+    d->mixUserNick = mixUserNick;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -654,6 +686,10 @@ void QXmppMessage::parse(const QDomElement &element)
             else {
                 extensions << QXmppElement(xElement);
             }
+        // XEP-0369: Mediated Information eXchange (MIX)
+        } else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix) {
+            d->mixUserJid = xElement.firstChildElement("jid").text();
+            d->mixUserNick = xElement.firstChildElement("nick").text();
         } else if (!knownElems.contains(qMakePair(xElement.tagName(), xElement.namespaceURI())) &&
                    !knownElems.contains(qMakePair(xElement.tagName(), QString()))) {
             // other extensions
@@ -788,6 +824,15 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement("replace");
         xmlWriter->writeAttribute("xmlns", ns_message_correct);
         xmlWriter->writeAttribute("id", d->replaceId);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0369: Mediated Information eXchange (MIX)
+    if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
+        xmlWriter->writeStartElement("mix");
+        xmlWriter->writeAttribute("xmlns", ns_mix);
+        helperToXmlAddTextElement(xmlWriter, "jid", d->mixUserJid);
+        helperToXmlAddTextElement(xmlWriter, "nick", d->mixUserNick);
         xmlWriter->writeEndElement();
     }
 
