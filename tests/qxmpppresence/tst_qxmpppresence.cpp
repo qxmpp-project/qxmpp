@@ -42,6 +42,7 @@ private slots:
     void testPresenceWithMucPassword();
     void testPresenceWithMucSupport();
     void testPresenceWithLastUserInteraction();
+    void testPresenceWithMix();
 };
 
 void tst_QXmppPresence::testPresence_data()
@@ -252,6 +253,33 @@ void tst_QXmppPresence::testPresenceWithLastUserInteraction()
     QDateTime another(QDate(2025, 2, 5), QTime(15, 32, 8), Qt::UTC);
     presence.setLastUserInteraction(another);
     QCOMPARE(presence.lastUserInteraction(), another);
+}
+
+void tst_QXmppPresence::testPresenceWithMix()
+{
+    const QByteArray xml(
+        "<presence to=\"hag99@shakespeare.example\" "
+                  "from=\"123435#coven@mix.shakespeare.example/UUID-a1j/7533\">"
+            "<show>dnd</show>"
+            "<status>Making a Brew</status>"
+            "<mix xmlns=\"urn:xmpp:presence:0\">"
+                "<jid>hecate@shakespeare.example/UUID-x4r/2491</jid>"
+                "<nick>thirdwitch</nick>"
+            "</mix>"
+        "</presence>"
+    );
+
+    QXmppPresence presence;
+    parsePacket(presence, xml);
+
+    QCOMPARE(presence.mixUserJid(), QString("hecate@shakespeare.example/UUID-x4r/2491"));
+    QCOMPARE(presence.mixUserNick(), QString("thirdwitch"));
+    serializePacket(presence, xml);
+
+    presence.setMixUserJid("alexander@example.org");
+    QCOMPARE(presence.mixUserJid(), QString("alexander@example.org"));
+    presence.setMixUserNick("erik");
+    QCOMPARE(presence.mixUserNick(), QString("erik"));
 }
 
 QTEST_MAIN(tst_QXmppPresence)
