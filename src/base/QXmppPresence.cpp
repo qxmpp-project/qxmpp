@@ -80,6 +80,10 @@ public:
 
     // XEP-0319: Last User Interaction in Presence
     QDateTime lastUserInteraction;
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    QString mixUserJid;
+    QString mixUserNick;
 };
 
 /// Constructs a QXmppPresence.
@@ -265,6 +269,11 @@ void QXmppPresence::parse(const QDomElement &element)
                 d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
             }
         }
+        // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+        else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix_presence) {
+            d->mixUserJid = xElement.firstChildElement("jid").text();
+            d->mixUserNick = xElement.firstChildElement("nick").text();
+        }
         else if (xElement.tagName() != "addresses" && xElement.tagName() != "error"
                  && xElement.tagName() != "show" && xElement.tagName() != "status"
                  && xElement.tagName() != "priority")
@@ -358,6 +367,17 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_idle);
         helperToXmlAddAttribute(xmlWriter, "since", QXmppUtils::datetimeToString(
                                 d->lastUserInteraction));
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
+        xmlWriter->writeStartElement("mix");
+        xmlWriter->writeAttribute("xmlns", ns_mix_presence);
+        if (!d->mixUserJid.isEmpty())
+            xmlWriter->writeTextElement("jid", d->mixUserJid);
+        if (!d->mixUserNick.isEmpty())
+            xmlWriter->writeTextElement("nick", d->mixUserNick);
         xmlWriter->writeEndElement();
     }
 
@@ -522,7 +542,35 @@ void QXmppPresence::setLastUserInteraction(const QDateTime& lastUserInteraction)
     d->lastUserInteraction = lastUserInteraction;
 }
 
-/// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
+/// Returns the actual (full) JID of the MIX channel participant.
+
+QString QXmppPresence::mixUserJid() const
+{
+    return d->mixUserJid;
+}
+
+/// Sets the actual (full) JID of the MIX channel participant.
+
+void QXmppPresence::setMixUserJid(const QString& mixUserJid)
+{
+    d->mixUserJid = mixUserJid;
+}
+
+/// Returns the MIX participant's nickname.
+
+QString QXmppPresence::mixUserNick() const
+{
+    return d->mixUserNick;
+}
+
+/// Sets the MIX participant's nickname.
+
+void QXmppPresence::setMixUserNick(const QString& mixUserNick)
+{
+    d->mixUserNick = mixUserNick;
+}
+
+/// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
 /// iq or presence)
 
 bool QXmppPresence::isXmppStanza() const
