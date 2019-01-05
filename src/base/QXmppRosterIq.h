@@ -78,6 +78,13 @@ public:
         void setSubscriptionStatus(const QString&);
         void setSubscriptionType(SubscriptionType);
 
+        // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+        bool isMixChannel() const;
+        void setIsMixChannel(bool);
+
+        QString mixParticipantId() const;
+        void setMixParticipantId(const QString&);
+
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
@@ -98,6 +105,10 @@ public:
 
     void addItem(const Item&);
     QList<Item> items() const;
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    bool mixAnnotate() const;
+    void setMixAnnotate(bool);
 
     /// \cond
     static bool isRosterIq(const QDomElement &element);
