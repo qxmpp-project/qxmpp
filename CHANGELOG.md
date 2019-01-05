@@ -1,10 +1,42 @@
-QXmpp 0.9.4 (UNRELEASED)
+QXmpp 1.0.0 (UNRELEASED)
 ------------------------
 
- - Do not ignore SSL errors by default (issue 113), if you need to deal with
+New features:
+ - Add XEP-0066: Out of Band Data (partially) (#167, @lnjX)
+ - Add XEP-0198: Stream Management (#99, @olesalscheider)
+ - Add XEP-0237: Roster Versioning (#142, @LightZam)
+ - Add XEP-0280: Message Carbons (#88, @fbeutel)
+ - Add XEP-0308: Last Message Correction (#170, @lnjX)
+ - Add XEP-0313: Message Archive Management (#120, @olesalscheider)
+ - Add XEP-0319: Last User Interaction in Presence (#171, @lnjX)
+ - Add XEP-0352: Client State Indication (#159, @fbeutel, @lnjX)
+ - Auto-connect to next DNS-SRV record server on connection failure
+   (#105, @kollix)
+ - QXmppVersionManager: Use QSysInfo to determine default OS (#168, @lnjX)
+ - QXmppDiscoveryManager: Default to `phone` type on mobile platforms
+   (#168, @lnjX)
+ - CMake based build system (#131, @olesalscheider)
+ - Add BUILD_SHARED option (#160, @LightZam)
+ - Use C++11 compiler standard (@jlaine)
+
+Fixes:
+ - Do not ignore SSL errors by default (#113), if you need to deal with
    broken SSL configurations, set QXmppConfiguration::ignoreSslErrors to true.
- - Drop Qt4 support
- - CMake based build system
+   (@jlaine)
+ - Disable tests that require QXMPP_AUTOTEST_EXPORT (fixes #149) (@jlaine)
+ - Fix QXmppSslServer::incomingConnection signature (#131, @olesalscheider)
+ - Add missed variables initialization in constructors of few classes
+   (#122, @tehnick)
+
+Tests:
+ - travis: Test builds with clang (@0xd34df00d)
+ - travis: Switch to Ubuntu Xenial (#151, @tehnick)
+ - tests: Generate coverage repot (@jlaine)
+ - Build examples by default
+
+Deprecations:
+ - Drop Qt4 support (#131, @olesalscheider)
+ - Remove example_4 / GuiClient (#131, @olesalscheider)
 
 QXmpp 0.9.3 (Dec 3, 2015)
 -------------------------
