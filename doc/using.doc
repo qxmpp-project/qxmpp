@@ -40,7 +40,7 @@ This example is also available with the source code in the example directory.
 
 \code
 // subclass the QXmppClient and create a new class echoClient
-// in the contructor the signal QXmppClient::messageReceived(const QXmppMessage&)
+// in the constructor the signal QXmppClient::messageReceived(const QXmppMessage&)
 // is connected to the slot echoClient::messageReceived(const QXmppMessage&)
 // in the slot one can process the message received
 

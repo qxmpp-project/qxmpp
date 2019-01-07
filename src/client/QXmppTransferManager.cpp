@@ -1156,7 +1156,7 @@ void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
                     job->terminate(QXmppTransferJob::ProtocolError);
                 }
             } else {
-                // we could not get host/port from proxy, procede without a proxy
+                // we could not get host/port from proxy, proceed without a proxy
                 if (iq.type() == QXmppIq::Error)
                     socksServerSendOffer(job);
             }

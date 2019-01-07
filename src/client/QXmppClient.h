@@ -64,7 +64,7 @@ class QXmppVersionManager;
 /// QXmppConfiguration::setAutoReconnectionEnabled().
 ///
 /// Not all the managers or extensions have been enabled by default. One can
-/// enable/disable the managers using the funtions addExtension() and
+/// enable/disable the managers using the functions addExtension() and
 /// removeExtension(). findExtension() can be used to find reference/pointer to
 /// particular instansiated and enabled manager.
 ///

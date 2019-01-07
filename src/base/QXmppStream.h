@@ -76,7 +76,7 @@ protected:
 
     /// Enables Stream Management acks / reqs (XEP-0198).
     ///
-    /// \param resetSeqno Indicates if the sequence numbers should be resetted.
+    /// \param resetSeqno Indicates if the sequence numbers should be reset.
     ///                   This must be done iff the stream is not resumed.
     void enableStreamManagement(bool resetSequenceNumber);
 

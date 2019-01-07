@@ -339,7 +339,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
     if ( !d->sessionStarted &&
          (d->dns.serviceRecords().count() > d->nextSrvRecordIdx) )
     {
-        // some network error occured during startup -> try next available SRV record server
+        // some network error occurred during startup -> try next available SRV record server
         d->connectToNextDNSHost();
     }
     else
@@ -931,7 +931,7 @@ void QXmppOutgoingClientPrivate::sendStreamManagementEnable()
     q->sendData(data);
 }
 
-/// Returns the type of the last XMPP stream error that occured.
+/// Returns the type of the last XMPP stream error that occurred.
 
 QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 {

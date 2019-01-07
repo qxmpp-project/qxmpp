@@ -909,7 +909,7 @@ void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 /// Adds the given certificates to the CA certificate database to be used
-/// for incoming connnections.
+/// for incoming connections.
 ///
 /// \param certificates
 

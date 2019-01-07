@@ -346,7 +346,7 @@ QStringList QXmppRosterManager::getRosterBareJids() const
 QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
         const QString& bareJid) const
 {
-    // will return blank entry if bareJid does'nt exist
+    // will return blank entry if bareJid doesn't exist
     if(d->entries.contains(bareJid))
         return d->entries.value(bareJid);
     else

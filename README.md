@@ -85,7 +85,7 @@ http://doc.qxmpp.org/
 SUPPORTED PLATFORMS
 ===================
 
-It should work on all the plaforms supported by Qt. For a complete list of
+It should work on all the platforms supported by Qt. For a complete list of
 platforms support by Qt, see:
 
 https://doc.qt.io/qt-5/supported-platforms.html
