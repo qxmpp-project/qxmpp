@@ -1,5 +1,5 @@
-QXmpp 1.0.0 (UNRELEASED)
-------------------------
+QXmpp 1.0.0 (Jan 8, 2019)
+-------------------------
 
 New features:
  - Add XEP-0066: Out of Band Data (partially) (#167, @lnjX)
