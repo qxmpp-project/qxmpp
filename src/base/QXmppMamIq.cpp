@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 The QXmpp developers
+ * Copyright (C) 2008-2019 The QXmpp developers
  *
  * Author:
  *  Niels Ole Salscheider
