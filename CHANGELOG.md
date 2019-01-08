@@ -1,3 +1,8 @@
+QXmpp 1.0.1 (UNRELEASED)
+------------------------
+
+*under development*
+
 QXmpp 1.0.0 (Jan 8, 2019)
 -------------------------
 
