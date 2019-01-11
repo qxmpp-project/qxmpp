@@ -16,6 +16,7 @@ extend QXmpp by subclassing QXmppClientExtension.
 - QXmppRosterManager
 - QXmppVCardManager
 - QXmppTransferManager
+- QXmppMamManager
 - QXmppMucManager
 - QXmppCallManager
 - QXmppArchiveManager
