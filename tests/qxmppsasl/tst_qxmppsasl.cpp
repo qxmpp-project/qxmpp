@@ -49,6 +49,9 @@ private slots:
     void testClientFacebook();
     void testClientGoogle();
     void testClientPlain();
+    void testClientScramSha1();
+    void testClientScramSha1_bad();
+    void testClientScramSha256();
     void testClientWindowsLive();
 
     // server
@@ -186,7 +189,7 @@ void tst_QXmppSasl::testSuccess()
 
 void tst_QXmppSasl::testClientAvailableMechanisms()
 {
-    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2");
+    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "SCRAM-SHA-1" << "SCRAM-SHA-256" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2");
 }
 
 void tst_QXmppSasl::testClientBadMechanism()
@@ -309,6 +312,94 @@ void tst_QXmppSasl::testClientPlain()
     QByteArray response;
     QVERIFY(client->respond(QByteArray(), response));
     QCOMPARE(response, QByteArray("\0foo\0bar", 8));
+
+    // any further step is an error
+    QVERIFY(!client->respond(QByteArray(), response));
+
+    delete client;
+}
+
+void tst_QXmppSasl::testClientScramSha1()
+{
+    QXmppSaslDigestMd5::setNonce("fyko+d2lbbFgONRv9qkxdawL");
+
+    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-1");
+    QVERIFY(client != 0);
+    QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
+
+    client->setUsername("user");
+    client->setPassword("pencil");
+
+    // first step
+    QByteArray response;
+    QVERIFY(client->respond(QByteArray(), response));
+    QCOMPARE(response, QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
+
+    // second step
+    QVERIFY(client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096"), response));
+    QCOMPARE(response, QByteArray("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts="));
+
+    // third step
+    QVERIFY(client->respond(QByteArray("v=rmF9pqV8S7suAoZWja4dJRkFsKQ"), response));
+    QCOMPARE(response, QByteArray());
+
+    // any further step is an error
+    QVERIFY(!client->respond(QByteArray(), response));
+
+    delete client;
+}
+
+void tst_QXmppSasl::testClientScramSha1_bad()
+{
+    QXmppSaslDigestMd5::setNonce("fyko+d2lbbFgONRv9qkxdawL");
+
+    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-1");
+    QVERIFY(client != 0);
+    QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
+
+    client->setUsername("user");
+    client->setPassword("pencil");
+
+    // first step
+    QByteArray response;
+    QVERIFY(client->respond(QByteArray(), response));
+    QCOMPARE(response, QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
+
+    // no nonce
+    QVERIFY(!client->respond(QByteArray("s=QSXCR+Q6sek8bf92,i=4096"), response));
+
+    // no salt
+    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,i=4096"), response));
+
+    // no iterations
+    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92"), response));
+
+    delete client;
+}
+
+void tst_QXmppSasl::testClientScramSha256()
+{
+    QXmppSaslDigestMd5::setNonce("rOprNGfwEbeRWgbNEkqO");
+
+    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-256");
+    QVERIFY(client != 0);
+    QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-256"));
+
+    client->setUsername("user");
+    client->setPassword("pencil");
+
+    // first step
+    QByteArray response;
+    QVERIFY(client->respond(QByteArray(), response));
+    QCOMPARE(response, QByteArray("n,,n=user,r=rOprNGfwEbeRWgbNEkqO"));
+
+    // second step
+    QVERIFY(client->respond(QByteArray("r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096"), response));
+    QCOMPARE(response, QByteArray("c=biws,r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,p=dHzbZapWIk4jUhN+Ute9ytag9zjfMHgsqmmiz7AndVQ="));
+
+    // third step
+    QVERIFY(client->respond(QByteArray("v=6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4="), response));
+    QCOMPARE(response, QByteArray());
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray(), response));

@@ -26,6 +26,7 @@
 #define QXMPPSASL_P_H
 
 #include <QByteArray>
+#include <QCryptographicHash>
 #include <QMap>
 
 #include "QXmppGlobal.h"
@@ -260,6 +261,24 @@ public:
 
 private:
     int m_step;
+};
+
+class QXmppSaslClientScram : public QXmppSaslClient
+{
+public:
+    QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = 0);
+    QString mechanism() const;
+    bool respond(const QByteArray &challenge, QByteArray &response);
+
+private:
+    QCryptographicHash::Algorithm m_algorithm;
+    int m_step;
+    int m_dklen;
+    QString m_mechanism;
+    QByteArray m_gs2Header;
+    QByteArray m_clientFirstMessageBare;
+    QByteArray m_serverSignature;
+    QByteArray m_nonce;
 };
 
 class QXmppSaslClientWindowsLive : public QXmppSaslClient
