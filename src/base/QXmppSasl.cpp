@@ -24,9 +24,10 @@
 
 #include <cstdlib>
 
-#include <QCryptographicHash>
 #include <QDomElement>
+#include <QMessageAuthenticationCode>
 #include <QStringList>
+#include <QtEndian>
 #include <QUrlQuery>
 
 #include "QXmppSasl_p.h"
@@ -49,6 +50,36 @@ static QByteArray calculateDigest(const QByteArray &method, const QByteArray &di
     return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
+// Perform PBKFD2 key derivation, code taken from Qt 5.12
+
+static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm,
+                                  const QByteArray &data, const QByteArray &salt,
+                                  int iterations, quint64 dkLen)
+{
+    QByteArray key;
+    quint32 currentIteration = 1;
+    QMessageAuthenticationCode hmac(algorithm, data);
+    QByteArray index(4, Qt::Uninitialized);
+    while (quint64(key.length()) < dkLen) {
+        hmac.addData(salt);
+        qToBigEndian(currentIteration, reinterpret_cast<uchar*>(index.data()));
+        hmac.addData(index);
+        QByteArray u = hmac.result();
+        hmac.reset();
+        QByteArray tkey = u;
+        for (int iter = 1; iter < iterations; iter++) {
+            hmac.addData(u);
+            u = hmac.result();
+            hmac.reset();
+            std::transform(tkey.cbegin(), tkey.cend(), u.cbegin(), tkey.begin(),
+                           std::bit_xor<char>());
+        }
+        key += tkey;
+        currentIteration++;
+    }
+    return key.left(dkLen);
+}
+
 static QByteArray generateNonce()
 {
     if (!forcedNonce.isEmpty())
@@ -59,6 +90,17 @@ static QByteArray generateNonce()
     // The random data can the '=' char is not valid as it is a delimiter,
     // so to be safe, base64 the nonce
     return nonce.toBase64();
+}
+
+static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
+{
+    QMap<char, QByteArray> map;
+    foreach (const QByteArray &keyValue, ba.split(',')) {
+        if (keyValue.size() >= 2 && keyValue[1] == '=') {
+            map[keyValue[0]] = keyValue.mid(2);
+        }
+    }
+    return map;
 }
 
 QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
@@ -230,7 +272,9 @@ QXmppSaslClient::~QXmppSaslClient()
 
 QStringList QXmppSaslClient::availableMechanisms()
 {
-    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS" << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2";
+    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS"
+                         << "SCRAM-SHA-1" << "SCRAM-SHA-256"
+                         << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2";
 }
 
 /// Creates an SASL client for the given mechanism.
@@ -243,6 +287,10 @@ QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism, QObject *pare
         return new QXmppSaslClientDigestMd5(parent);
     } else if (mechanism == "ANONYMOUS") {
         return new QXmppSaslClientAnonymous(parent);
+    } else if (mechanism == "SCRAM-SHA-1") {
+        return new QXmppSaslClientScram(QCryptographicHash::Sha1, parent);
+    } else if (mechanism == "SCRAM-SHA-256") {
+        return new QXmppSaslClientScram(QCryptographicHash::Sha256, parent);
     } else if (mechanism == "X-FACEBOOK-PLATFORM") {
         return new QXmppSaslClientFacebook(parent);
     } else if (mechanism == "X-MESSENGER-OAUTH2") {
@@ -501,6 +549,76 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
         response = QString('\0' + username() + '\0' + password()).toUtf8();
         m_step++;
         return true;
+    } else {
+        warning("QXmppSaslClientPlain : Invalid step");
+        return false;
+    }
+}
+
+QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent)
+    : QXmppSaslClient(parent)
+    , m_algorithm(algorithm)
+    , m_step(0)
+{
+    Q_ASSERT(m_algorithm == QCryptographicHash::Sha1 || m_algorithm == QCryptographicHash::Sha256);
+    m_nonce = generateNonce();
+
+    if (m_algorithm == QCryptographicHash::Sha256) {
+        m_dklen = 32;
+        m_mechanism = "SCRAM-SHA-256";
+    } else {
+        m_dklen = 20;
+        m_mechanism = "SCRAM-SHA-1";
+    }
+}
+
+QString QXmppSaslClientScram::mechanism() const
+{
+    return m_mechanism;
+}
+
+bool QXmppSaslClientScram::respond(const QByteArray &challenge, QByteArray &response)
+{
+    Q_UNUSED(challenge);
+    if (m_step == 0) {
+        m_gs2Header = "n,,";
+        m_clientFirstMessageBare = "n=" + username().toUtf8() + ",r=" + m_nonce;
+
+        response = m_gs2Header + m_clientFirstMessageBare;
+        m_step++;
+        return true;
+    } else if (m_step == 1) {
+        // validate input
+        const QMap<char, QByteArray> input = parseGS2(challenge);
+        const QByteArray nonce = input.value('r');
+        const QByteArray salt = QByteArray::fromBase64(input.value('s'));
+        const int iterations = input.value('i').toInt();
+        if (!nonce.startsWith(m_nonce) || salt.isEmpty() || iterations < 1) {
+            return false;
+        }
+
+        // calculate proofs
+        const QByteArray clientFinalMessageBare = "c=" + m_gs2Header.toBase64() + ",r=" + nonce;
+        const QByteArray saltedPassword = deriveKeyPbkdf2(m_algorithm, password().toUtf8(), salt,
+                                                          iterations, m_dklen);
+        const QByteArray clientKey = QMessageAuthenticationCode::hash("Client Key", saltedPassword, m_algorithm);
+        const QByteArray storedKey = QCryptographicHash::hash(clientKey, m_algorithm);
+        const QByteArray authMessage = m_clientFirstMessageBare + "," + challenge + "," + clientFinalMessageBare;
+        QByteArray clientProof = QMessageAuthenticationCode::hash(authMessage, storedKey, m_algorithm);
+        std::transform(clientProof.cbegin(), clientProof.cend(), clientKey.cbegin(),
+                       clientProof.begin(), std::bit_xor<char>());
+
+        const QByteArray serverKey = QMessageAuthenticationCode::hash("Server Key", saltedPassword, m_algorithm);
+        m_serverSignature = QMessageAuthenticationCode::hash(authMessage, serverKey, m_algorithm);
+
+        response = clientFinalMessageBare + ",p=" + clientProof.toBase64();
+        m_step++;
+        return true;
+    } else if (m_step == 2) {
+        const QMap<char, QByteArray> input = parseGS2(challenge);
+        response = QByteArray();
+        m_step++;
+        return QByteArray::fromBase64(input.value('v')) == m_serverSignature;
     } else {
         warning("QXmppSaslClientPlain : Invalid step");
         return false;

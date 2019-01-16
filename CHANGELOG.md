@@ -1,7 +1,8 @@
 QXmpp 1.0.1 (UNRELEASED)
 ------------------------
 
-*under development*
+New features:
+ - Add support for SCRAM-SHA-1 and SCRAM-SHA-256 (#183, @jlaine)
 
 QXmpp 1.0.0 (Jan 8, 2019)
 -------------------------
