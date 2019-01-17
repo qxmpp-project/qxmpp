@@ -19,6 +19,7 @@ set(CMAKE_AUTORCC ON)
 include(GNUInstallDirs)
 
 option(BUILD_TESTS "Build tests." ON)
+option(BUILD_INTERNAL_TESTS "Build internal tests." OFF)
 option(BUILD_DOCUMENTATION "Build API documentation." OFF)
 option(BUILD_EXAMPLES "Build examples." ON)
 
