@@ -90,7 +90,6 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , ignoreSslErrors(false)
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
-    , saslAuthMechanism("DIGEST-MD5")
 {
 }
 
@@ -501,8 +500,6 @@ void QXmppConfiguration::setNonSASLAuthMechanism(
 }
 
 /// Returns the preferred SASL authentication mechanism.
-///
-/// Default value: "DIGEST-MD5"
 
 QString QXmppConfiguration::saslAuthMechanism() const
 {
@@ -511,7 +508,8 @@ QString QXmppConfiguration::saslAuthMechanism() const
 
 /// Sets the preferred SASL authentication \a mechanism.
 ///
-/// Valid values: "PLAIN", "DIGEST-MD5", "ANONYMOUS", "X-FACEBOOK-PLATFORM"
+/// Valid values: "SCRAM-SHA-256", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN", "ANONYMOUS",
+//                "X-FACEBOOK-PLATFORM", "X-MESSENGER-OAUTH2", "X-OAUTH2"
 
 void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
 {
