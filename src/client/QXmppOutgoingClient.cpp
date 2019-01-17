@@ -451,8 +451,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         if (saslAvailable && configuration().useSASLAuthentication())
         {
             // supported and preferred SASL auth mechanisms
-            QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
             const QString preferredMechanism = configuration().saslAuthMechanism();
+            QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
+            if (supportedMechanisms.contains(preferredMechanism)) {
+                supportedMechanisms.removeAll(preferredMechanism);
+                supportedMechanisms.prepend(preferredMechanism);
+            }
             if (configuration().facebookAppId().isEmpty() || configuration().facebookAccessToken().isEmpty())
                 supportedMechanisms.removeAll("X-FACEBOOK-PLATFORM");
             if (configuration().windowsLiveAccessToken().isEmpty())
@@ -463,19 +467,16 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // determine SASL Authentication mechanism to use
             QStringList commonMechanisms;
             QString usedMechanism;
-            foreach (const QString &mechanism, features.authMechanisms()) {
-                if (supportedMechanisms.contains(mechanism))
+            foreach (const QString &mechanism, supportedMechanisms) {
+                if (features.authMechanisms().contains(mechanism))
                     commonMechanisms << mechanism;
             }
             if (commonMechanisms.isEmpty()) {
                 warning("No supported SASL Authentication mechanism available");
                 disconnectFromHost();
                 return;
-            } else if (!commonMechanisms.contains(preferredMechanism)) {
-                info(QString("Desired SASL Auth mechanism '%1' is not available, selecting first available one").arg(preferredMechanism));
-                usedMechanism = commonMechanisms.first();
             } else {
-                usedMechanism = preferredMechanism;
+                usedMechanism = commonMechanisms.first();
             }
 
             d->saslClient = QXmppSaslClient::create(usedMechanism, this);

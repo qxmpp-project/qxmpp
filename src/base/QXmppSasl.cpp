@@ -272,8 +272,8 @@ QXmppSaslClient::~QXmppSaslClient()
 
 QStringList QXmppSaslClient::availableMechanisms()
 {
-    return QStringList() << "PLAIN" << "DIGEST-MD5" << "ANONYMOUS"
-                         << "SCRAM-SHA-1" << "SCRAM-SHA-256"
+    return QStringList() << "SCRAM-SHA-256" << "SCRAM-SHA-1" << "DIGEST-MD5"
+                         << "PLAIN" << "ANONYMOUS"
                          << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2";
 }
 
