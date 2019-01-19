@@ -132,6 +132,8 @@ const char* ns_idle = "urn:xmpp:idle:1";
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 // XEP-0352: Client State Indication
 const char* ns_csi = "urn:xmpp:csi:0";
+// XEP-0363: HTTP File Upload
+const char* ns_http_upload = "urn:xmpp:http:upload:0";
 // XEP-0369: Mediated Information eXchange (MIX)
 const char* ns_mix = "urn:xmpp:mix:core:1";
 const char* ns_mix_create_channel = "urn:xmpp:mix:core:1#create-channel";
