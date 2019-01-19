@@ -144,6 +144,8 @@ extern const char* ns_idle;
 extern const char* ns_chat_markers;
 // XEP-0352: Client State Indication
 extern const char* ns_csi;
+// XEP-0363: HTTP File Upload
+extern const char* ns_http_upload;
 // XEP-0369: Mediated Information eXchange (MIX)
 extern const char* ns_mix;
 extern const char* ns_mix_create_channel;

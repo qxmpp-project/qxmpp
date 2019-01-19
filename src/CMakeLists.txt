@@ -19,6 +19,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
+    base/QXmppHttpUploadIq.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
     base/QXmppJingleIq.h
@@ -95,6 +96,7 @@ set(SOURCE_FILES
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
+    base/QXmppHttpUploadIq.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp
     base/QXmppJingleIq.cpp
