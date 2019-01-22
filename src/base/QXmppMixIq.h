@@ -26,6 +26,8 @@
 
 #include "QXmppIq.h"
 
+class QXmppMixIqPrivate;
+
 /// \brief The QXmppMixIq class represents an IQ used to do actions on a MIX
 /// channel as defined by XEP-0369: Mediated Information eXchange (MIX)
 /// (v0.14.1) and XEP-0405: Mediated Information eXchange (MIX): Participant
@@ -47,6 +49,9 @@ public:
         Create,
         Destroy
     };
+
+    QXmppMixIq();
+    ~QXmppMixIq();
 
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);
@@ -74,11 +79,7 @@ protected:
     /// \endcond
 
 private:
-    QString m_jid;
-    QString m_channelName;
-    QStringList m_nodes;
-    QString m_nick;
-    QXmppMixIq::Type m_actionType = QXmppMixIq::None;
+    QXmppMixIqPrivate *d;
 };
 
 #endif // QXMPPMIXIQ_H
