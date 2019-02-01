@@ -29,6 +29,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppClient.h"
+#include "QXmppUtils.h"
 
 /// Constructs a QXmppMessageReceiptManager to handle incoming and outgoing
 /// message delivery receipts.
@@ -54,7 +55,12 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
 
     // Handle receipts and cancel any further processing.
     if (!message.receiptId().isEmpty()) {
-        emit messageDelivered(message.from(), message.receiptId());
+        // Buggy clients also mark carbon messages as received; to avoid this
+        // we check whether sender and receiver have the same bare JID.
+        if (QXmppUtils::jidToBareJid(message.from())
+            != QXmppUtils::jidToBareJid(message.to())) {
+            emit messageDelivered(message.from(), message.receiptId());
+        }
         return true;
     }
 
