@@ -18,6 +18,7 @@ add_simple_test(qxmpparchiveiq)
 add_simple_test(qxmppbindiq)
 add_simple_test(qxmppcallmanager)
 add_simple_test(qxmppcarbonmanager)
+add_simple_test(qxmppcolorgenerator)
 add_simple_test(qxmppdataform)
 add_simple_test(qxmppdiscoveryiq)
 add_simple_test(qxmppentitytimeiq)
@@ -53,4 +54,3 @@ endif()
 
 add_subdirectory(qxmpptransfermanager)
 add_subdirectory(qxmpputils)
-

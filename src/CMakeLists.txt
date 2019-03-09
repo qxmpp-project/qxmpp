@@ -11,10 +11,12 @@ set(INSTALL_HEADER_FILES
     ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h
 
     # Base
+    base/hsluv.h
     base/QXmppArchiveIq.h
     base/QXmppBindIq.h
     base/QXmppBookmarkSet.h
     base/QXmppByteStreamIq.h
+    base/QXmppColorGenerator.h
     base/QXmppDataForm.h
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
@@ -84,11 +86,13 @@ set(INSTALL_HEADER_FILES
 
 set(SOURCE_FILES
     # Base
+    base/hsluv.c
     base/QXmppArchiveIq.cpp
     base/QXmppBindIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
     base/QXmppCodec.cpp
+    base/QXmppColorGenerator.cpp
     base/QXmppConstants.cpp
     base/QXmppDataForm.cpp
     base/QXmppDiscoveryIq.cpp
