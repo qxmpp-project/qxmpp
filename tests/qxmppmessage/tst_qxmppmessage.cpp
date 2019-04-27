@@ -49,6 +49,7 @@ private slots:
     void testOutOfBandUrl();
     void testMessageCorrect();
     void testMix();
+    void testSpoiler();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -112,6 +113,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.isReceiptRequested(), false);
     QCOMPARE(message.receiptId(), QString());
     QCOMPARE(message.xhtml(), QString());
+    QVERIFY(!message.isSpoiler());
     serializePacket(message, xml);
 }
 
@@ -641,6 +643,45 @@ void tst_QXmppMessage::testMix()
     QCOMPARE(message.mixUserJid(), QString("alexander@example.org"));
     message.setMixUserNick("erik");
     QCOMPARE(message.mixUserNick(), QString("erik"));
+}
+
+void tst_QXmppMessage::testSpoiler()
+{
+    // test parsing with hint
+    const QByteArray xmlWithHint(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>And at the end of the story, both of them die! It is so tragic!</body>"
+          "<spoiler xmlns=\"urn:xmpp:spoiler:0\">Love story end</spoiler>"
+        "</message>");
+
+    QXmppMessage messageWithHint;
+    parsePacket(messageWithHint, xmlWithHint);
+    QVERIFY(messageWithHint.isSpoiler());
+    QCOMPARE(messageWithHint.spoilerHint(), QString("Love story end"));
+    serializePacket(messageWithHint, xmlWithHint);
+
+    // test parsing without hint
+    const QByteArray xmlWithoutHint(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>And at the end of the story, both of them die! It is so tragic!</body>"
+          "<spoiler xmlns=\"urn:xmpp:spoiler:0\"></spoiler>"
+        "</message>");
+
+    QXmppMessage messageWithoutHint;
+    parsePacket(messageWithoutHint, xmlWithoutHint);
+    QVERIFY(messageWithoutHint.isSpoiler());
+    QCOMPARE(messageWithoutHint.spoilerHint(), QString(""));
+    serializePacket(messageWithoutHint, xmlWithoutHint);
+
+    // test setters
+    QXmppMessage message;
+    message.setIsSpoiler(true);
+    QVERIFY(message.isSpoiler());
+
+    message.setIsSpoiler(false);
+    message.setSpoilerHint("test hint");
+    QCOMPARE(message.spoilerHint(), QString("test hint"));
+    QVERIFY(message.isSpoiler());
 }
 
 QTEST_MAIN(tst_QXmppMessage)

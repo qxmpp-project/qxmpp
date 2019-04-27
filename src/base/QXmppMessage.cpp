@@ -106,6 +106,10 @@ public:
     // XEP-0369: Mediated Information eXchange (MIX)
     QString mixUserJid;
     QString mixUserNick;
+
+    // XEP-0382: Spoiler messages
+    bool isSpoiler = false;
+    QString spoilerHint;
 };
 
 /// Constructs a QXmppMessage.
@@ -545,6 +549,52 @@ void QXmppMessage::setMixUserNick(const QString& mixUserNick)
     d->mixUserNick = mixUserNick;
 }
 
+/// Returns true, if this is a spoiler message according to XEP-0382: Spoiler
+/// messages. The spoiler hint however can still be empty.
+///
+/// A spoiler message's content should not be visible to the user by default.
+
+bool QXmppMessage::isSpoiler() const
+{
+    return d->isSpoiler;
+}
+
+/// Sets whether this is a spoiler message as specified in XEP-0382: Spoiler
+/// messages.
+///
+/// The content of spoiler messages will not be displayed by default to the
+/// user. However, clients not supporting spoiler messages will still display
+/// the content as usual.
+
+void QXmppMessage::setIsSpoiler(bool isSpoiler)
+{
+    d->isSpoiler = isSpoiler;
+}
+
+/// Returns the spoiler hint as specified in XEP-0382: Spoiler messages.
+///
+/// The hint may be empty, even if isSpoiler is true.
+
+QString QXmppMessage::spoilerHint() const
+{
+    return d->spoilerHint;
+}
+
+/// Sets a spoiler hint for XEP-0382: Spoiler messages. If the spoiler hint
+/// is not empty, isSpoiler will be set to true.
+///
+/// A spoiler hint is optional for spoiler messages.
+///
+/// Keep in mind that the spoiler hint is not displayed at all by clients not
+/// supporting spoiler messages.
+
+void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
+{
+    d->spoilerHint = spoilerHint;
+    if (!spoilerHint.isEmpty())
+        d->isSpoiler = true;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -690,6 +740,10 @@ void QXmppMessage::parse(const QDomElement &element)
         } else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix) {
             d->mixUserJid = xElement.firstChildElement("jid").text();
             d->mixUserNick = xElement.firstChildElement("nick").text();
+        // XEP-0382: Spoiler messages
+        } else if (xElement.tagName() == "spoiler" && xElement.namespaceURI() == ns_spoiler) {
+            d->isSpoiler = true;
+            d->spoilerHint = xElement.text();
         } else if (!knownElems.contains(qMakePair(xElement.tagName(), xElement.namespaceURI())) &&
                    !knownElems.contains(qMakePair(xElement.tagName(), QString()))) {
             // other extensions
@@ -833,6 +887,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_mix);
         helperToXmlAddTextElement(xmlWriter, "jid", d->mixUserJid);
         helperToXmlAddTextElement(xmlWriter, "nick", d->mixUserNick);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0382: Spoiler messages
+    if (d->isSpoiler) {
+        xmlWriter->writeStartElement("spoiler");
+        xmlWriter->writeAttribute("xmlns", ns_spoiler);
+        xmlWriter->writeCharacters(d->spoilerHint);
         xmlWriter->writeEndElement();
     }
 
