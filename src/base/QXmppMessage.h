@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
@@ -33,7 +32,6 @@ class QXmppMessagePrivate;
 /// \brief The QXmppMessage class represents an XMPP message.
 ///
 /// \ingroup Stanzas
-///
 
 class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 {
@@ -48,8 +46,8 @@ public:
         Headline
     };
 
-    /// This enum describes a chat state as defined by
-    /// XEP-0085 : Chat State Notifications.
+    /// This enum describes a chat state as defined by XEP-0085: Chat State
+    /// Notifications.
     enum State
     {
         None = 0,   ///< The message does not contain any chat state information.
@@ -60,8 +58,7 @@ public:
         Paused      ///< User had been composing but now has stopped.
     };
 
-    /// This enum describes a chat marker as defined by
-    /// XEP-0333 : Char Markers
+    /// This enum describes a chat marker as defined by XEP-0333: Chat Markers.
     enum Marker {
         NoMarker = 0,
         Received,
@@ -116,7 +113,7 @@ public:
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
 
-    // XEP-0333
+    // XEP-0333: Chat Markers
     bool isMarkable() const;
     void setMarkable(const bool);
 
@@ -142,6 +139,10 @@ public:
     // XEP-0308: Last Message Correction
     QString replaceId() const;
     void setReplaceId(const QString&);
+
+    // XEP-0367: Message Attaching
+    QString attachId() const;
+    void setAttachId(const QString&);
 
     // XEP-0369: Mediated Information eXchange (MIX)
     QString mixUserJid() const;

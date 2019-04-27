@@ -134,6 +134,8 @@ const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 const char* ns_csi = "urn:xmpp:csi:0";
 // XEP-0363: HTTP File Upload
 const char* ns_http_upload = "urn:xmpp:http:upload:0";
+// XEP-0367: Message Attaching
+const char* ns_message_attaching = "urn:xmpp:message-attaching:1";
 // XEP-0369: Mediated Information eXchange (MIX)
 const char* ns_mix = "urn:xmpp:mix:core:1";
 const char* ns_mix_create_channel = "urn:xmpp:mix:core:1#create-channel";

@@ -103,6 +103,9 @@ public:
     // XEP-0308: Last Message Correction
     QString replaceId;
 
+    // XEP-0367: Message Attaching
+    QString attachId;
+
     // XEP-0369: Mediated Information eXchange (MIX)
     QString mixUserJid;
     QString mixUserNick;
@@ -521,6 +524,25 @@ void QXmppMessage::setReplaceId(const QString &replaceId)
     d->replaceId = replaceId;
 }
 
+/// Returns the message id this message is linked/attached to. See XEP-0367:
+/// Message Attaching for details.
+
+QString QXmppMessage::attachId() const
+{
+    return d->attachId;
+}
+
+/// Sets the id of the attached message as in XEP-0367: Message Attaching. This
+/// can be used for a "reply to" or "reaction" function.
+///
+/// The used message id depends on the message context, see the Business rules
+/// section of the XEP for details about when to use which id.
+
+void QXmppMessage::setAttachId(const QString &attachId)
+{
+    d->attachId = attachId;
+}
+
 /// Returns the actual JID of a MIX channel participant.
 
 QString QXmppMessage::mixUserJid() const
@@ -736,6 +758,9 @@ void QXmppMessage::parse(const QDomElement &element)
             else {
                 extensions << QXmppElement(xElement);
             }
+        // XEP-0367: Message Attaching
+        } else if (xElement.tagName() == "attach-to" && xElement.namespaceURI() == ns_message_attaching) {
+            d->attachId = xElement.attribute("id");
         // XEP-0369: Mediated Information eXchange (MIX)
         } else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix) {
             d->mixUserJid = xElement.firstChildElement("jid").text();
@@ -878,6 +903,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement("replace");
         xmlWriter->writeAttribute("xmlns", ns_message_correct);
         xmlWriter->writeAttribute("id", d->replaceId);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0367: Message Attaching
+    if (!d->attachId.isEmpty()) {
+        xmlWriter->writeStartElement("attach-to");
+        xmlWriter->writeAttribute("xmlns", ns_message_attaching);
+        xmlWriter->writeAttribute("id", d->attachId);
         xmlWriter->writeEndElement();
     }
 

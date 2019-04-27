@@ -48,6 +48,7 @@ private slots:
     void testPrivateMessage();
     void testOutOfBandUrl();
     void testMessageCorrect();
+    void testMessageAttaching();
     void testMix();
     void testSpoiler();
 };
@@ -616,6 +617,23 @@ void tst_QXmppMessage::testMessageCorrect()
 
     message.setReplaceId("someotherid");
     QCOMPARE(message.replaceId(), QString("someotherid"));
+}
+
+void tst_QXmppMessage::testMessageAttaching()
+{
+    const QByteArray xml(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>This is the corrected version.</body>"
+          "<attach-to xmlns=\"urn:xmpp:message-attaching:1\" id=\"SD24VCzSYQ\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.attachId(), QString("SD24VCzSYQ"));
+    serializePacket(message, xml);
+
+    message.setAttachId("someotherid");
+    QCOMPARE(message.attachId(), QString("someotherid"));
 }
 
 void tst_QXmppMessage::testMix()
