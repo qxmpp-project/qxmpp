@@ -146,6 +146,8 @@ extern const char* ns_chat_markers;
 extern const char* ns_csi;
 // XEP-0363: HTTP File Upload
 extern const char* ns_http_upload;
+// XEP-0367: Message Attaching
+extern const char* ns_message_attaching;
 // XEP-0369: Mediated Information eXchange (MIX)
 extern const char* ns_mix;
 extern const char* ns_mix_create_channel;
