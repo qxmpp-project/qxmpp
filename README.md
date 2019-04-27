@@ -1,7 +1,7 @@
 [![Build Status](https://img.shields.io/travis/qxmpp-project/qxmpp.svg)](https://travis-ci.org/qxmpp-project/qxmpp)
 [![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp)
 
-ABOUT QXMPP
+About QXmpp
 ===========
 
 QXmpp is a cross-platform C++ XMPP client and server library. It is written
@@ -21,7 +21,7 @@ libraries such as speex and theora enable additional features.
 QXmpp is released under the terms of the GNU Lesser General Public License,
 version 2.1 or later.
 
-BUILDING QXMPP
+Building QXmpp
 ==============
 
 QXmpp requires Qt 5.0 or higher with SSL enabled.
@@ -45,7 +45,7 @@ You can pass the following arguments to CMake:
     WITH_THEORA                   to enable theora video codec (default: false)
     WITH_VPX                      to enable vpx video codec (default: false)
 
-INSTALLING QXMPP
+Installing QXmpp
 ================
 
 After building QXmpp, you can install the Headers, Libraries
@@ -55,7 +55,7 @@ Install from command line:
 
     cmake --build . --target install
 
-EXAMPLES
+Examples
 ========
 
 Look at the example directory for various examples. Here is a description of
@@ -75,14 +75,14 @@ receive the message back. This example shows how to receive and send messages.
 This is a full fledged Graphical XMPP client. This example will uses most of
 the part of this library.
 
-DOCUMENTATION
+Documentation
 =============
 
 You can find the API documentation for the latest QXmpp version here:
 
 http://doc.qxmpp.org/
 
-SUPPORTED PLATFORMS
+Supported Platforms
 ===================
 
 It should work on all the platforms supported by Qt. For a complete list of
@@ -90,7 +90,7 @@ platforms support by Qt, see:
 
 https://doc.qt.io/qt-5/supported-platforms.html
 
-HOW TO REPORT A BUG
+How to report a bug
 ===================
 
 If you think you have found a bug in QXmpp, we would like to hear about
@@ -99,7 +99,7 @@ is already know at:
 
 https://github.com/qxmpp-project/qxmpp/issues
 
-DISCUSSION GROUP
+Discussion Group
 ================
 
 Join QXmpp Discussion Group for queries, discussions and updates.
