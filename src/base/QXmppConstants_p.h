@@ -153,6 +153,8 @@ extern const char* ns_mix_node_participants;
 extern const char* ns_mix_node_presence;
 extern const char* ns_mix_node_config;
 extern const char* ns_mix_node_info;
+// XEP-0382: Spoiler messages
+extern const char* ns_spoiler;
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 extern const char* ns_mix_pam;
 extern const char* ns_mix_roster;

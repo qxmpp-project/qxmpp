@@ -150,6 +150,13 @@ public:
     QString mixUserNick() const;
     void setMixUserNick(const QString&);
 
+    // XEP-0382: Spoiler messages
+    bool isSpoiler() const;
+    void setIsSpoiler(bool);
+
+    QString spoilerHint() const;
+    void setSpoilerHint(const QString&);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

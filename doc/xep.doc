@@ -41,6 +41,7 @@ Complete:
 - XEP-0313: Message Archive Management
 - XEP-0319: Last User Interaction in Presence
 - XEP-0352: Client State Indication
+- XEP-0382: Spoiler messages (v0.2.0)
 
 Ongoing:
 - XEP-0009: Jabber-RPC (API is not finalized yet)
