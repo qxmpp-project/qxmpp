@@ -55,6 +55,24 @@ static const char* marker_types[] = {
     "acknowledged"
 };
 
+static const QStringList ENCRYPTION_NAMESPACES = {
+    QString(),
+    QString(),
+    ns_otr,
+    ns_legacy_openpgp,
+    ns_ox,
+    ns_omemo
+};
+
+static const QStringList ENCRYPTION_NAMES = {
+    QString(),
+    QString(),
+    QStringLiteral("OTR"),
+    QStringLiteral("Legacy OpenPGP"),
+    QStringLiteral("OpenPGP for XMPP (OX)"),
+    QStringLiteral("OMEMO")
+};
+
 static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 
 enum StampType
@@ -110,6 +128,10 @@ public:
     QString mixUserJid;
     QString mixUserNick;
 
+    // XEP-0380: Explicit Message Encryption
+    QString encryptionMethod;
+    QString encryptionName;
+
     // XEP-0382: Spoiler messages
     bool isSpoiler = false;
     QString spoilerHint;
@@ -123,7 +145,7 @@ public:
 /// \param thread
 
 QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
-                         QString& body, const QString& thread)
+                           QString& body, const QString& thread)
     : QXmppStanza(from, to)
     , d(new QXmppMessagePrivate)
 {
@@ -571,6 +593,74 @@ void QXmppMessage::setMixUserNick(const QString& mixUserNick)
     d->mixUserNick = mixUserNick;
 }
 
+/// Returns the encryption method this message is advertised to be encrypted
+/// with.
+///
+/// \note QXmppMessage::NoEncryption does not necesserily mean that the message
+/// is not encrypted; it may also be that the author of the message does not
+/// support XEP-0380: Explicit Message Encryption.
+///
+/// \note If this returns QXmppMessage::UnknownEncryption, you can still get
+/// the namespace of the encryption with \c encryptionMethodNs() and possibly
+/// also a name with \c encryptionName().
+
+QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
+{
+    if (d->encryptionMethod.isEmpty())
+        return QXmppMessage::NoEncryption;
+
+    int index = ENCRYPTION_NAMESPACES.indexOf(d->encryptionMethod);
+    if (index < 0)
+        return QXmppMessage::UnknownEncryption;
+    return static_cast<QXmppMessage::EncryptionMethod>(index);
+}
+
+/// Advertises that this message is encrypted with the given encryption method.
+/// See XEP-0380: Explicit Message Encryption for details.
+
+void QXmppMessage::setEncryptionMethod(QXmppMessage::EncryptionMethod method)
+{
+    d->encryptionMethod = ENCRYPTION_NAMESPACES.at(int(method));
+}
+
+/// Returns the namespace of the advertised encryption method via. XEP-0380:
+/// Explicit Message Encryption.
+
+QString QXmppMessage::encryptionMethodNs() const
+{
+    return d->encryptionMethod;
+}
+
+/// Sets the namespace of the encryption method this message advertises to be
+/// encrypted with. See XEP-0380: Explicit Message Encryption for details.
+
+void QXmppMessage::setEncryptionMethodNs(const QString &encryptionMethod)
+{
+    d->encryptionMethod = encryptionMethod;
+}
+
+/// Returns the associated name of the encryption method this message
+/// advertises to be encrypted with. See XEP-0380: Explicit Message Encryption
+/// for details.
+
+QString QXmppMessage::encryptionName() const
+{
+    if (!d->encryptionName.isEmpty())
+        return d->encryptionName;
+    return ENCRYPTION_NAMES.at(int(encryptionMethod()));
+}
+
+/// Sets the name of the encryption method for XEP-0380: Explicit Message
+/// Encryption.
+///
+/// \note This should only be used, if the encryption method is custom and is
+/// not one of the methods listed in the XEP.
+
+void QXmppMessage::setEncryptionName(const QString &encryptionName)
+{
+    d->encryptionName = encryptionName;
+}
+
 /// Returns true, if this is a spoiler message according to XEP-0382: Spoiler
 /// messages. The spoiler hint however can still be empty.
 ///
@@ -765,6 +855,10 @@ void QXmppMessage::parse(const QDomElement &element)
         } else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix) {
             d->mixUserJid = xElement.firstChildElement("jid").text();
             d->mixUserNick = xElement.firstChildElement("nick").text();
+        // XEP-0380: Explicit Message Encryption
+        } else if (xElement.tagName() == "encryption" && xElement.namespaceURI() == ns_eme) {
+            d->encryptionMethod = xElement.attribute("namespace");
+            d->encryptionName = xElement.attribute("name");
         // XEP-0382: Spoiler messages
         } else if (xElement.tagName() == "spoiler" && xElement.namespaceURI() == ns_spoiler) {
             d->isSpoiler = true;
@@ -920,6 +1014,15 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_mix);
         helperToXmlAddTextElement(xmlWriter, "jid", d->mixUserJid);
         helperToXmlAddTextElement(xmlWriter, "nick", d->mixUserNick);
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0380: Explicit Message Encryption
+    if (!d->encryptionMethod.isEmpty()) {
+        xmlWriter->writeStartElement("encryption");
+        xmlWriter->writeAttribute("xmlns", ns_eme);
+        xmlWriter->writeAttribute("namespace", d->encryptionMethod);
+        helperToXmlAddAttribute(xmlWriter, "name", d->encryptionName);
         xmlWriter->writeEndElement();
     }
 

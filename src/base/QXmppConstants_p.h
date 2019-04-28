@@ -49,6 +49,8 @@ extern const char* ns_stanza;
 extern const char* ns_rpc;
 // XEP-0020: Feature Negotiation
 extern const char* ns_feature_negotiation;
+// XEP-0027: Current Jabber OpenPGP Usage
+extern const char* ns_legacy_openpgp;
 // XEP-0030: Service Discovery
 extern const char* ns_disco_info;
 extern const char* ns_disco_items;
@@ -147,6 +149,8 @@ extern const char* ns_chat_markers;
 extern const char* ns_csi;
 // XEP-0363: HTTP File Upload
 extern const char* ns_http_upload;
+// XEP-0364: Current Off-the-Record Messaging Usage
+extern const char* ns_otr;
 // XEP-0367: Message Attaching
 extern const char* ns_message_attaching;
 // XEP-0369: Mediated Information eXchange (MIX)
@@ -158,8 +162,14 @@ extern const char* ns_mix_node_participants;
 extern const char* ns_mix_node_presence;
 extern const char* ns_mix_node_config;
 extern const char* ns_mix_node_info;
+// XEP-0373: OpenPGP for XMPP
+extern const char* ns_ox;
+// XEP-0380: Explicit Message Encryption
+extern const char* ns_eme;
 // XEP-0382: Spoiler messages
 extern const char* ns_spoiler;
+// XEP-0384: OMEMO Encryption
+extern const char* ns_omemo;
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 extern const char* ns_mix_pam;
 extern const char* ns_mix_roster;
