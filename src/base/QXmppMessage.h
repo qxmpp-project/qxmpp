@@ -66,6 +66,18 @@ public:
         Acknowledged
     };
 
+    /// This enum describes different end-to-end encryption methods. These can
+    /// be used to mark a message explicitly as encrypted with a specific
+    /// algothim. See XEP-0380: Explicit Message Encryption for details.
+    enum EncryptionMethod {
+        NoEncryption,      ///< No encryption
+        UnknownEncryption, ///< Unknown encryption
+        OTR,               ///< XEP-0364: Current Off-the-Record Messaging Usage
+        LegacyOpenPGP,     ///< XEP-0027: Current Jabber OpenPGP Usage
+        OX,                ///< XEP-0373: OpenPGP for XMPP
+        OMEMO              ///< XEP-0384: OMEMO Encryption
+    };
+
     QXmppMessage(const QString& from = QString(), const QString& to = QString(),
                  const QString& body = QString(), const QString& thread = QString());
 
@@ -150,6 +162,15 @@ public:
 
     QString mixUserNick() const;
     void setMixUserNick(const QString&);
+
+    // XEP-0380: Explicit Message Encryption
+    EncryptionMethod encryptionMethod() const;
+    void setEncryptionMethod(EncryptionMethod);
+    QString encryptionMethodNs() const;
+    void setEncryptionMethodNs(const QString&);
+
+    QString encryptionName() const;
+    void setEncryptionName(const QString&);
 
     // XEP-0382: Spoiler messages
     bool isSpoiler() const;

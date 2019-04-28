@@ -50,6 +50,7 @@ private slots:
     void testMessageCorrect();
     void testMessageAttaching();
     void testMix();
+    void testEme();
     void testSpoiler();
 };
 
@@ -114,6 +115,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.isReceiptRequested(), false);
     QCOMPARE(message.receiptId(), QString());
     QCOMPARE(message.xhtml(), QString());
+    QCOMPARE(message.encryptionMethod(), QXmppMessage::NoEncryption);
     QVERIFY(!message.isSpoiler());
     serializePacket(message, xml);
 }
@@ -661,6 +663,50 @@ void tst_QXmppMessage::testMix()
     QCOMPARE(message.mixUserJid(), QString("alexander@example.org"));
     message.setMixUserNick("erik");
     QCOMPARE(message.mixUserNick(), QString("erik"));
+}
+
+void tst_QXmppMessage::testEme()
+{
+    // test standard encryption: OMEMO
+    const QByteArray xmlOmemo(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>This message is encrypted with OMEMO, but your client doesn't seem to support that.</body>"
+          "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
+        "</message>");
+
+    QXmppMessage messageOmemo;
+    parsePacket(messageOmemo, xmlOmemo);
+    QCOMPARE(messageOmemo.encryptionMethodNs(), QString("eu.siacs.conversations.axolotl"));
+    QCOMPARE(messageOmemo.encryptionMethod(), QXmppMessage::OMEMO);
+    QCOMPARE(messageOmemo.encryptionName(), QString("OMEMO"));
+    serializePacket(messageOmemo, xmlOmemo);
+
+    // test custom encryption
+    const QByteArray xmlCustom(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<body>This message is encrypted with CustomCrypt, but your client doesn't seem to support that.</body>"
+          "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"im:example:customcrypt:1\" name=\"CustomCrypt\"/>"
+        "</message>");
+
+    QXmppMessage messageCustom;
+    parsePacket(messageCustom, xmlCustom);
+    QCOMPARE(messageCustom.encryptionMethodNs(), QString("im:example:customcrypt:1"));
+    QCOMPARE(messageCustom.encryptionMethod(), QXmppMessage::UnknownEncryption);
+    QCOMPARE(messageCustom.encryptionName(), QString("CustomCrypt"));
+    serializePacket(messageCustom, xmlCustom);
+
+    // test setters/getters
+    QXmppMessage message;
+    message.setEncryptionMethod(QXmppMessage::LegacyOpenPGP);
+    QCOMPARE(message.encryptionMethod(), QXmppMessage::LegacyOpenPGP);
+    QCOMPARE(message.encryptionMethodNs(), QString("jabber:x:encrypted"));
+    QCOMPARE(message.encryptionName(), QString("Legacy OpenPGP"));
+
+    message.setEncryptionMethodNs("fancyorg:encryption:fancycrypt:0");
+    message.setEncryptionName("FancyCrypt");
+    QCOMPARE(message.encryptionMethod(), QXmppMessage::UnknownEncryption);
+    QCOMPARE(message.encryptionMethodNs(), QString("fancyorg:encryption:fancycrypt:0"));
+    QCOMPARE(message.encryptionName(), QString("FancyCrypt"));
 }
 
 void tst_QXmppMessage::testSpoiler()

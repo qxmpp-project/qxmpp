@@ -42,6 +42,7 @@ Complete:
 - XEP-0319: Last User Interaction in Presence
 - XEP-0352: Client State Indication
 - XEP-0367: Message Attaching (v0.3.0)
+- XEP-0380: Explicit Message Encryption (v0.3.0)
 - XEP-0382: Spoiler messages (v0.2.0)
 
 Ongoing:
