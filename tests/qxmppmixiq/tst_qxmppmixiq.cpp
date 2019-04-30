@@ -48,8 +48,8 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<client-join xmlns=\"urn:xmpp:mix:pam:0\" channel=\"coven@mix.shakespeare.example\">"
-                "<join xmlns=\"urn:xmpp:mix:core:0\">"
+            "<client-join xmlns=\"urn:xmpp:mix:pam:1\" channel=\"coven@mix.shakespeare.example\">"
+                "<join xmlns=\"urn:xmpp:mix:core:1\">"
                     "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
                     "<subscribe node=\"urn:xmpp:mix:nodes:presence\"/>"
                     "<subscribe node=\"urn:xmpp:mix:nodes:participants\"/>"
@@ -64,7 +64,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"coven@mix.shakespeare.example\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"set\">"
-            "<join xmlns=\"urn:xmpp:mix:core:0\">"
+            "<join xmlns=\"urn:xmpp:mix:core:1\">"
                 "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
                 "<subscribe node=\"urn:xmpp:mix:nodes:presence\"/>"
                 "<subscribe node=\"urn:xmpp:mix:nodes:participants\"/>"
@@ -78,7 +78,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"coven@mix.shakespeare.example\" "
             "type=\"result\">"
-            "<join xmlns=\"urn:xmpp:mix:core:0\" jid=\"123456#coven@mix.shakespeare.example\">"
+            "<join xmlns=\"urn:xmpp:mix:core:1\" jid=\"123456#coven@mix.shakespeare.example\">"
                 "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
                 "<subscribe node=\"urn:xmpp:mix:nodes:presence\"/>"
                 "<subscribe node=\"urn:xmpp:mix:nodes:participants\"/>"
@@ -92,8 +92,8 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"result\">"
-           "<client-join xmlns=\"urn:xmpp:mix:pam:0\">"
-               "<join xmlns=\"urn:xmpp:mix:core:0\" "
+           "<client-join xmlns=\"urn:xmpp:mix:pam:1\">"
+               "<join xmlns=\"urn:xmpp:mix:core:1\" "
                      "jid=\"123456#coven@mix.shakespeare.example\">"
                    "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
                    "<subscribe node=\"urn:xmpp:mix:nodes:presence\"/>"
@@ -108,8 +108,8 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<client-leave xmlns=\"urn:xmpp:mix:pam:0\" channel=\"coven@mix.shakespeare.example\">"
-                "<leave xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<client-leave xmlns=\"urn:xmpp:mix:pam:1\" channel=\"coven@mix.shakespeare.example\">"
+                "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
             "</client-leave>"
         "</iq>"
     );
@@ -118,7 +118,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"coven@mix.shakespeare.example\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"set\">"
-            "<leave xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
         "</iq>"
     );
     QByteArray leaveS2sResultXml(
@@ -126,7 +126,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"coven@mix.shakespeare.example\" "
             "type=\"result\">"
-            "<leave xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
         "</iq>"
     );
     QByteArray leaveC2sResultXml(
@@ -134,8 +134,8 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"result\">"
-            "<client-leave xmlns=\"urn:xmpp:mix:pam:0\">"
-                "<leave xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<client-leave xmlns=\"urn:xmpp:mix:pam:1\">"
+                "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
             "</client-leave>"
         "</iq>"
     );
@@ -144,7 +144,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<update-subscription xmlns=\"urn:xmpp:mix:core:0\">"
+            "<update-subscription xmlns=\"urn:xmpp:mix:core:1\">"
                 "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
             "</update-subscription>"
         "</iq>"
@@ -154,7 +154,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"result\">"
-            "<update-subscription xmlns=\"urn:xmpp:mix:core:0\" jid=\"hag66@shakespeare.example\">"
+            "<update-subscription xmlns=\"urn:xmpp:mix:core:1\" jid=\"hag66@shakespeare.example\">"
                 "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
             "</update-subscription>"
         "</iq>"
@@ -164,7 +164,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<setnick xmlns=\"urn:xmpp:mix:core:0\">"
+            "<setnick xmlns=\"urn:xmpp:mix:core:1\">"
                 "<nick>thirdwitch</nick>"
             "</setnick>"
         "</iq>"
@@ -174,7 +174,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "from=\"hag66@shakespeare.example\" "
             "type=\"result\">"
-            "<setnick xmlns=\"urn:xmpp:mix:core:0\">"
+            "<setnick xmlns=\"urn:xmpp:mix:core:1\">"
                 "<nick>thirdwitch</nick>"
             "</setnick>"
         "</iq>"
@@ -184,7 +184,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<create xmlns=\"urn:xmpp:mix:core:0\" channel=\"coven\"/>"
+            "<create xmlns=\"urn:xmpp:mix:core:1\" channel=\"coven\"/>"
         "</iq>"
     );
     QByteArray createWithoutNameXml(
@@ -192,7 +192,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<create xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<create xmlns=\"urn:xmpp:mix:core:1\"/>"
         "</iq>"
     );
     QByteArray destroyXml(
@@ -200,7 +200,7 @@ void tst_QXmppMixIq::testBase_data()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<destroy xmlns=\"urn:xmpp:mix:core:0\" channel=\"coven\"/>"
+            "<destroy xmlns=\"urn:xmpp:mix:core:1\" channel=\"coven\"/>"
         "</iq>"
     );
     QByteArray emptyXml(
@@ -379,7 +379,7 @@ void tst_QXmppMixIq::testIsMixIq()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<destroy xmlns=\"urn:xmpp:mix:core:0\" channel=\"coven\"/>"
+            "<destroy xmlns=\"urn:xmpp:mix:core:1\" channel=\"coven\"/>"
         "</iq>"
     );
     const QByteArray truePamXml(
@@ -387,8 +387,8 @@ void tst_QXmppMixIq::testIsMixIq()
             "to=\"hag66@shakespeare.example\" "
             "from=\"hag66@shakespeare.example/UUID-a1j/7533\" "
             "type=\"set\">"
-            "<client-leave xmlns=\"urn:xmpp:mix:pam:0\" channel=\"coven@mix.shakespeare.example\">"
-                "<leave xmlns=\"urn:xmpp:mix:core:0\"/>"
+            "<client-leave xmlns=\"urn:xmpp:mix:pam:1\" channel=\"coven@mix.shakespeare.example\">"
+                "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
             "</client-leave>"
         "</iq>"
     );

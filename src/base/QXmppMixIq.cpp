@@ -187,7 +187,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter* writer) const
     if (type() == Result)
         helperToXmlAddAttribute(writer, "jid", d->jid);
 
-    for (auto node : d->nodes) {
+    for (const auto &node : d->nodes) {
         writer->writeStartElement("subscribe");
         writer->writeAttribute("node", node);
         writer->writeEndElement();

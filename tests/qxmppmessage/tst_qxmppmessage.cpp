@@ -623,7 +623,7 @@ void tst_QXmppMessage::testMix()
                  "from=\"coven@mix.shakespeare.example/123456\" "
                  "type=\"groupchat\">"
             "<body>Harpier cries: 'tis time, 'tis time.</body>"
-            "<mix xmlns=\"urn:xmpp:mix:core:0\">"
+            "<mix xmlns=\"urn:xmpp:mix:core:1\">"
                 "<jid>hag66@shakespeare.example</jid>"
                 "<nick>thirdwitch</nick>"
             "</mix>"
