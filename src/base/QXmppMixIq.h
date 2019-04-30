@@ -29,9 +29,9 @@
 class QXmppMixIqPrivate;
 
 /// \brief The QXmppMixIq class represents an IQ used to do actions on a MIX
-/// channel as defined by XEP-0369: Mediated Information eXchange (MIX)
-/// (v0.14.1) and XEP-0405: Mediated Information eXchange (MIX): Participant
-/// Server Requirements (v0.3.1).
+/// channel as defined by XEP-0369: Mediated Information eXchange (MIX) and
+/// XEP-0405: Mediated Information eXchange (MIX): Participant Server
+/// Requirements.
 ///
 /// \ingroup Stanzas
 
