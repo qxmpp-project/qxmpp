@@ -148,7 +148,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     q->socket()->setProxy(config.networkProxy());
 
     // set the name the SSL certificate should match
-    q->socket()->setPeerVerifyName(config.domain());
+    q->socket()->setPeerVerifyName(host);
 
     // connect to host
     const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
