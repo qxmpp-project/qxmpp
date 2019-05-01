@@ -71,10 +71,6 @@ This is a very simple bot which echoes the message sent to it. Run this
 example, send it a message from a friend of this bot and you will
 receive the message back. This example shows how to receive and send messages.
 
-* *GuiClient*
-This is a full fledged Graphical XMPP client. This example will uses most of
-the part of this library.
-
 Documentation
 =============
 

@@ -30,6 +30,8 @@
 #include <QList>
 #include <QSet>
 
+class QXmppRosterIqPrivate;
+
 /// \brief The QXmppRosterIq class represents a roster IQ.
 ///
 /// \ingroup Stanzas
@@ -37,6 +39,7 @@
 class QXMPP_EXPORT QXmppRosterIq : public QXmppIq
 {
 public:
+    class ItemPrivate;
 
     /// \brief The QXmppRosterIq::Item class represents a roster entry.
     class QXMPP_EXPORT Item
@@ -59,6 +62,10 @@ public:
         };
 
         Item();
+        ~Item();
+
+        Item& operator=(const Item &other);
+
         QString bareJid() const;
         QSet<QString> groups() const;
         QString name() const;
@@ -71,6 +78,13 @@ public:
         void setSubscriptionStatus(const QString&);
         void setSubscriptionType(SubscriptionType);
 
+        // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+        bool isMixChannel() const;
+        void setIsMixChannel(bool);
+
+        QString mixParticipantId() const;
+        void setMixParticipantId(const QString&);
+
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
@@ -80,19 +94,21 @@ public:
         QString getSubscriptionTypeStr() const;
         void setSubscriptionTypeFromStr(const QString&);
 
-        QString m_bareJid;
-        SubscriptionType m_type;
-        QString m_name;
-        // can be subscribe/unsubscribe (attribute "ask")
-        QString m_subscriptionStatus;
-        QSet<QString> m_groups;
+        ItemPrivate *d;
     };
+
+    QXmppRosterIq();
+    ~QXmppRosterIq();
 
     QString version() const;
     void setVersion(const QString&);
 
     void addItem(const Item&);
     QList<Item> items() const;
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    bool mixAnnotate() const;
+    void setMixAnnotate(bool);
 
     /// \cond
     static bool isRosterIq(const QDomElement &element);
@@ -105,9 +121,7 @@ protected:
     /// \endcond
 
 private:
-    QList<Item> m_items;
-    // XEP-0237 Roster Versioning
-    QString m_version;
+    QXmppRosterIqPrivate *d;
 };
 
 #endif // QXMPPROSTERIQ_H

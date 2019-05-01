@@ -132,6 +132,13 @@ public:
     QDateTime lastUserInteraction() const;
     void setLastUserInteraction(const QDateTime&);
 
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    QString mixUserJid() const;
+    void setMixUserJid(const QString&);
+
+    QString mixUserNick() const;
+    void setMixUserNick(const QString&);
+
     bool isXmppStanza() const;
 
 private:
