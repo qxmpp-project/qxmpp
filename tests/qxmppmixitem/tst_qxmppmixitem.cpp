@@ -43,7 +43,7 @@ void tst_QXmppMixItem::testInfo()
     const QByteArray xml(
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
             "<field type=\"hidden\" var=\"FORM_TYPE\">"
-                "<value>urn:xmpp:mix:core:0</value>"
+                "<value>urn:xmpp:mix:core:1</value>"
             "</field>"
             "<field type=\"text-single\" var=\"Name\">"
                 "<value>Witches Coven</value>"
@@ -88,7 +88,7 @@ void tst_QXmppMixItem::testIsInfoItem()
     const QByteArray xmlCorrect(
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
             "<field type=\"hidden\" var=\"FORM_TYPE\">"
-                "<value>urn:xmpp:mix:core:0</value>"
+                "<value>urn:xmpp:mix:core:1</value>"
             "</field>"
         "</x>"
     );
@@ -111,7 +111,7 @@ void tst_QXmppMixItem::testIsInfoItem()
 void tst_QXmppMixItem::testParticipant()
 {
     const QByteArray xml(
-        "<participant xmlns=\"urn:xmpp:mix:core:0\">"
+        "<participant xmlns=\"urn:xmpp:mix:core:1\">"
             "<jid>hag66@shakespeare.example</jid>"
             "<nick>thirdwitch</nick>"
         "</participant>"
@@ -139,7 +139,7 @@ void tst_QXmppMixItem::testIsParticipantItem()
     QDomElement element;
 
     const QByteArray xmlCorrect(
-        "<participant xmlns=\"urn:xmpp:mix:core:0\">"
+        "<participant xmlns=\"urn:xmpp:mix:core:1\">"
         "</participant>"
     );
     QCOMPARE(doc.setContent(xmlCorrect, true), true);
