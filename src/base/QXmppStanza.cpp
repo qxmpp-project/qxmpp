@@ -31,6 +31,7 @@
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+#include <QDateTime>
 
 uint QXmppStanza::s_uniqeIdNo = 0;
 
@@ -169,12 +170,18 @@ public:
     QXmppStanza::Error::Type type;
     QXmppStanza::Error::Condition condition;
     QString text;
+
+    // XEP-0363: HTTP File Upload
+    bool fileTooLarge;
+    qint64 maxFileSize;
+    QDateTime retryDate;
 };
 
 QXmppStanzaErrorPrivate::QXmppStanzaErrorPrivate()
     : code(0),
       type(static_cast<QXmppStanza::Error::Type>(-1)),
-      condition(static_cast<QXmppStanza::Error::Condition>(-1))
+      condition(static_cast<QXmppStanza::Error::Condition>(-1)),
+      fileTooLarge(false)
 {
 }
 
@@ -246,6 +253,54 @@ void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
     d->type = type;
 }
 
+/// Returns true, if an HTTP File Upload failed, because the file was too
+/// large.
+
+bool QXmppStanza::Error::fileTooLarge() const
+{
+    return d->fileTooLarge;
+}
+
+/// Sets whether the requested file for HTTP File Upload was too large.
+///
+/// You should also set maxFileSize in this case.
+
+void QXmppStanza::Error::setFileTooLarge(bool fileTooLarge)
+{
+    d->fileTooLarge = fileTooLarge;
+}
+
+/// Returns the maximum file size allowed for uploading via. HTTP File Upload.
+
+qint64 QXmppStanza::Error::maxFileSize() const
+{
+    return d->maxFileSize;
+}
+
+/// Sets the maximum file size allowed for uploading via. HTTP File Upload.
+///
+/// This sets fileTooLarge to true.
+
+void QXmppStanza::Error::setMaxFileSize(qint64 maxFileSize)
+{
+    setFileTooLarge(true);
+    d->maxFileSize = maxFileSize;
+}
+
+/// Returns when to retry the upload request via. HTTP File Upload.
+
+QDateTime QXmppStanza::Error::retryDate() const
+{
+    return d->retryDate;
+}
+
+/// Sets the datetime when the client can retry to request the upload slot.
+
+void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
+{
+    d->retryDate = retryDate;
+}
+
 /// \cond
 QString QXmppStanza::Error::getTypeStr() const
 {
@@ -297,30 +352,37 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
     setCode(errorElement.attribute("code").toInt());
     setTypeFromStr(errorElement.attribute("type"));
 
-    QString text;
-    QString cond;
     QDomElement element = errorElement.firstChildElement();
     while(!element.isNull())
     {
-        if(element.tagName() == "text")
-            text = element.text();
-        else if(element.namespaceURI() == ns_stanza)
-        {
-            cond = element.tagName();
+        if (element.namespaceURI() == ns_stanza) {
+            if (element.tagName() == "text")
+                setText(element.text());
+            else
+                setConditionFromStr(element.tagName());
+        // XEP-0363: HTTP File Upload
+        } else if (element.namespaceURI() == ns_http_upload) {
+            // file is too large
+            if (element.tagName() == "file-too-large") {
+                d->fileTooLarge = true;
+                d->maxFileSize = element.firstChildElement("max-file-size")
+                                 .text().toLongLong();
+            // retry later
+            } else if (element.tagName() == "retry") {
+                d->retryDate = QXmppUtils::datetimeFromString(
+                                element.attribute("stamp"));
+            }
         }
         element = element.nextSiblingElement();
     }
-
-    setConditionFromStr(cond);
-    setText(text);
 }
 
-void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
+void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 {
     QString cond = getConditionStr();
     QString type = getTypeStr();
 
-    if(cond.isEmpty() && type.isEmpty())
+    if (cond.isEmpty() && type.isEmpty())
         return;
 
     writer->writeStartElement("error");
@@ -329,18 +391,31 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
     if (d->code > 0)
         helperToXmlAddAttribute(writer, "code", QString::number(d->code));
 
-    if(!cond.isEmpty())
-    {
+    if (!cond.isEmpty()) {
         writer->writeStartElement(cond);
         writer->writeAttribute("xmlns", ns_stanza);
         writer->writeEndElement();
     }
-    if(!d->text.isEmpty())
-    {
+    if (!d->text.isEmpty()) {
         writer->writeStartElement("text");
         writer->writeAttribute("xml:lang", "en");
         writer->writeAttribute("xmlns", ns_stanza);
         writer->writeCharacters(d->text);
+        writer->writeEndElement();
+    }
+
+    // XEP-0363: HTTP File Upload
+    if (d->fileTooLarge) {
+        writer->writeStartElement("file-too-large");
+        writer->writeAttribute("xmlns", ns_http_upload);
+        helperToXmlAddTextElement(writer, "max-file-size",
+                                  QString::number(d->maxFileSize));
+        writer->writeEndElement();
+    } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {
+        writer->writeStartElement("retry");
+        writer->writeAttribute("xmlns", ns_http_upload);
+        writer->writeAttribute("stamp",
+                               QXmppUtils::datetimeToString(d->retryDate));
         writer->writeEndElement();
     }
 

@@ -149,6 +149,16 @@ public:
         void setType(Type type);
         Type type() const;
 
+        // XEP-0363: HTTP File Upload
+        bool fileTooLarge() const;
+        void setFileTooLarge(bool);
+
+        qint64 maxFileSize() const;
+        void setMaxFileSize(qint64);
+
+        QDateTime retryDate() const;
+        void setRetryDate(const QDateTime&);
+
         /// \cond
         void parse(const QDomElement &element);
         void toXml(QXmlStreamWriter *writer) const;
