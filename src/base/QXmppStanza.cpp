@@ -138,7 +138,7 @@ bool QXmppExtendedAddress::isValid() const
     return !d->type.isEmpty() && !d->jid.isEmpty();
 }
 
-/// \cond
+/// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
     d->delivered = element.attribute("delivered") == "true";
@@ -158,76 +158,98 @@ void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeAttribute("type", d->type);
     xmlWriter->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
-QXmppStanza::Error::Error():
-    m_code(0),
-    m_type(static_cast<QXmppStanza::Error::Type>(-1)),
-    m_condition(static_cast<QXmppStanza::Error::Condition>(-1))
+class QXmppStanzaErrorPrivate : public QSharedData
+{
+public:
+    QXmppStanzaErrorPrivate();
+
+    int code;
+    QXmppStanza::Error::Type type;
+    QXmppStanza::Error::Condition condition;
+    QString text;
+};
+
+QXmppStanzaErrorPrivate::QXmppStanzaErrorPrivate()
+    : code(0),
+      type(static_cast<QXmppStanza::Error::Type>(-1)),
+      condition(static_cast<QXmppStanza::Error::Condition>(-1))
 {
 }
 
-QXmppStanza::Error::Error(Type type, Condition cond, const QString& text):
-    m_code(0),
-    m_type(type),
-    m_condition(cond),
-    m_text(text)
+QXmppStanza::Error::Error()
+    : d(new QXmppStanzaErrorPrivate)
 {
+}
+
+QXmppStanza::Error::Error(const QXmppStanza::Error &) = default;
+
+QXmppStanza::Error::Error(Type type, Condition cond, const QString& text)
+    : d(new QXmppStanzaErrorPrivate)
+{
+    d->type = type;
+    d->condition = cond;
+    d->text = text;
 }
 
 QXmppStanza::Error::Error(const QString& type, const QString& cond,
-                          const QString& text):
-    m_code(0),
-    m_text(text)
+                          const QString& text)
+    : d(new QXmppStanzaErrorPrivate)
 {
+    d->text = text;
     setTypeFromStr(type);
     setConditionFromStr(cond);
 }
 
+QXmppStanza::Error::~Error() = default;
+
+QXmppStanza::Error &QXmppStanza::Error::operator=(const QXmppStanza::Error &) = default;
+
 QString QXmppStanza::Error::text() const
 {
-    return m_text;
+    return d->text;
 }
 
 void QXmppStanza::Error::setText(const QString& text)
 {
-    m_text = text;
+    d->text = text;
 }
 
 int QXmppStanza::Error::code() const
 {
-    return m_code;
+    return d->code;
 }
 
 void QXmppStanza::Error::setCode(int code)
 {
-    m_code = code;
+    d->code = code;
 }
 
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
-    return m_condition;
+    return d->condition;
 }
 
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 {
-    m_condition = cond;
+    d->condition = cond;
 }
 
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
 {
-    return m_type;
+    return d->type;
 }
 
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 {
-    m_type = type;
+    d->type = type;
 }
 
 /// \cond
 QString QXmppStanza::Error::getTypeStr() const
 {
-    switch(m_type)
+    switch(d->type)
     {
     case Cancel:
         return "cancel";
@@ -240,13 +262,13 @@ QString QXmppStanza::Error::getTypeStr() const
     case Wait:
         return "wait";
     default:
-        return "";
+        return {};
     }
 }
 
 QString QXmppStanza::Error::getConditionStr() const
 {
-    return strFromCondition(m_condition);
+    return strFromCondition(d->condition);
 }
 
 void QXmppStanza::Error::setTypeFromStr(const QString& type)
@@ -304,8 +326,8 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
     writer->writeStartElement("error");
     helperToXmlAddAttribute(writer, "type", type);
 
-    if (m_code > 0)
-        helperToXmlAddAttribute(writer, "code", QString::number(m_code));
+    if (d->code > 0)
+        helperToXmlAddAttribute(writer, "code", QString::number(d->code));
 
     if(!cond.isEmpty())
     {
@@ -313,18 +335,18 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
         writer->writeAttribute("xmlns", ns_stanza);
         writer->writeEndElement();
     }
-    if(!m_text.isEmpty())
+    if(!d->text.isEmpty())
     {
         writer->writeStartElement("text");
         writer->writeAttribute("xml:lang", "en");
         writer->writeAttribute("xmlns", ns_stanza);
-        writer->writeCharacters(m_text);
+        writer->writeCharacters(d->text);
         writer->writeEndElement();
     }
 
     writer->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 class QXmppStanzaPrivate : public QSharedData
 {
