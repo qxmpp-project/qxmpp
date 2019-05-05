@@ -80,6 +80,7 @@ private:
 };
 
 class QXmppStanzaPrivate;
+class QXmppStanzaErrorPrivate;
 
 /// \defgroup Stanzas
 
@@ -129,8 +130,12 @@ public:
         };
 
         Error();
+        Error(const Error &);
         Error(Type type, Condition cond, const QString& text = QString());
         Error(const QString& type, const QString& cond, const QString& text = QString());
+        ~Error();
+
+        Error &operator=(const Error &);
 
         int code() const;
         void setCode(int code);
@@ -156,10 +161,7 @@ public:
         QString getTypeStr() const;
         void setTypeFromStr(const QString& type);
 
-        int m_code;
-        Type m_type;
-        Condition m_condition;
-        QString m_text;
+        QSharedDataPointer<QXmppStanzaErrorPrivate> d;
     };
 
     QXmppStanza(const QString& from = QString(), const QString& to = QString());
