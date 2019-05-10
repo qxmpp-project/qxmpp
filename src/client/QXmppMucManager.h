@@ -63,14 +63,14 @@ class QXMPP_EXPORT QXmppMucManager : public QXmppClientExtension
 
 public:
     QXmppMucManager();
-    ~QXmppMucManager();
+    ~QXmppMucManager() override;
 
     QXmppMucRoom *addRoom(const QString &roomJid);
     QList<QXmppMucRoom*> rooms() const;
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:
@@ -82,7 +82,7 @@ signals:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client);
+    void setClient(QXmppClient* client) override;
     /// \endcond
 
 private slots:
@@ -123,7 +123,7 @@ public:
     };
     Q_DECLARE_FLAGS(Actions, Action)
 
-    ~QXmppMucRoom();
+    ~QXmppMucRoom() override;
 
     Actions allowedActions() const;
     bool isJoined() const;

@@ -90,7 +90,7 @@ public:
                  const QString& body = QString(), const QString& thread = QString());
 
     QXmppMessage(const QXmppMessage &other);
-    ~QXmppMessage();
+    ~QXmppMessage() override;
 
     QXmppMessage& operator=(const QXmppMessage &other);
 
@@ -150,7 +150,7 @@ public:
     bool isPrivate() const;
     void setPrivate(const bool);
 
-    bool isXmppStanza() const;
+    bool isXmppStanza() const override;
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;
@@ -194,8 +194,8 @@ public:
     void setSpoilerHint(const QString&);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:

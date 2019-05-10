@@ -41,9 +41,9 @@ class QXMPP_EXPORT QXmppInvokable : public QObject
 {
         Q_OBJECT
 public:
-        QXmppInvokable( QObject *parent = 0 );
+        QXmppInvokable( QObject *parent = nullptr );
 
-        ~QXmppInvokable();
+        ~QXmppInvokable() override;
 
         /**
          * Execute a method on an object. with a set of arguments. This method is reentrant, and the method

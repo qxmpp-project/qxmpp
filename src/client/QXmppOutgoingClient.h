@@ -50,11 +50,11 @@ class QXMPP_EXPORT QXmppOutgoingClient : public QXmppStream
 
 public:
     QXmppOutgoingClient(QObject *parent);
-    ~QXmppOutgoingClient();
+    ~QXmppOutgoingClient() override;
 
     void connectToHost();
     bool isAuthenticated() const;
-    bool isConnected() const;
+    bool isConnected() const override;
     bool isClientStateIndicationEnabled() const;
 
     QSslSocket *socket() const { return QXmppStream::socket(); };
@@ -84,13 +84,13 @@ signals:
 protected:
     /// \cond
     // Overridable methods
-    virtual void handleStart();
-    virtual void handleStanza(const QDomElement &element);
-    virtual void handleStream(const QDomElement &element);
+    void handleStart() override;
+    void handleStanza(const QDomElement &element) override;
+    void handleStream(const QDomElement &element) override;
     /// \endcond
 
 public slots:
-    virtual void disconnectFromHost();
+    void disconnectFromHost() override;
 
 private slots:
     void _q_dnsLookupFinished();

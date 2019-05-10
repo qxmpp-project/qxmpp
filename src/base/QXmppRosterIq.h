@@ -98,7 +98,7 @@ public:
     };
 
     QXmppRosterIq();
-    ~QXmppRosterIq();
+    ~QXmppRosterIq() override;
 
     QString version() const;
     void setVersion(const QString&);
@@ -116,8 +116,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:

@@ -228,7 +228,7 @@ class QXMPP_EXPORT QXmppVCardIq : public QXmppIq
 public:
     QXmppVCardIq(const QString& bareJid = QString());
     QXmppVCardIq(const QXmppVCardIq &other);
-    ~QXmppVCardIq();
+    ~QXmppVCardIq() override;
 
     QXmppVCardIq& operator=(const QXmppVCardIq &other);
 
@@ -283,8 +283,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement&);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement&) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:

@@ -103,8 +103,8 @@ public:
         ConnectedState      ///< Connected to the server.
     };
 
-    QXmppClient(QObject *parent = 0);
-    ~QXmppClient();
+    QXmppClient(QObject *parent = nullptr);
+    ~QXmppClient() override;
 
     bool addExtension(QXmppClientExtension* extension);
     bool insertExtension(int index, QXmppClientExtension* extension);
@@ -134,7 +134,7 @@ public:
             if(extension)
                 return extension;
         }
-        return 0;
+        return nullptr;
     }
 
     bool isAuthenticated() const;

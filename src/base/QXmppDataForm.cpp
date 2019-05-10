@@ -46,7 +46,7 @@ static field_type field_types[] = {
     {QXmppDataForm::Field::TextMultiField, "text-multi"},
     {QXmppDataForm::Field::TextPrivateField, "text-private"},
     {QXmppDataForm::Field::TextSingleField, "text-single"},
-    {static_cast<QXmppDataForm::Field::Type>(-1), NULL},
+    {static_cast<QXmppDataForm::Field::Type>(-1), nullptr},
 };
 
 class QXmppDataFormMediaPrivate : public QSharedData

@@ -52,8 +52,8 @@ class QXmppSaslServerPrivate;
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
 public:
-    QXmppSaslClient(QObject *parent = 0);
-    virtual ~QXmppSaslClient();
+    QXmppSaslClient(QObject *parent = nullptr);
+    ~QXmppSaslClient() override;
 
     QString host() const;
     void setHost(const QString &host);
@@ -71,7 +71,7 @@ public:
     virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
 
     static QStringList availableMechanisms();
-    static QXmppSaslClient* create(const QString &mechanism, QObject *parent = 0);
+    static QXmppSaslClient* create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     QXmppSaslClientPrivate *d;
@@ -87,8 +87,8 @@ public:
         InputNeeded = 3
     };
 
-    QXmppSaslServer(QObject *parent = 0);
-    virtual ~QXmppSaslServer();
+    QXmppSaslServer(QObject *parent = nullptr);
+    ~QXmppSaslServer() override;
 
     QString username() const;
     void setUsername(const QString &username);
@@ -105,7 +105,7 @@ public:
     virtual QString mechanism() const = 0;
     virtual Response respond(const QByteArray &challenge, QByteArray &response) = 0;
 
-    static QXmppSaslServer* create(const QString &mechanism, QObject *parent = 0);
+    static QXmppSaslServer* create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     QXmppSaslServerPrivate *d;
@@ -133,8 +133,8 @@ public:
     void setValue(const QByteArray &value);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:
@@ -151,8 +151,8 @@ public:
     void setValue(const QByteArray &value);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:
@@ -168,8 +168,8 @@ public:
     void setCondition(const QString &condition);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:
@@ -185,8 +185,8 @@ public:
     void setValue(const QByteArray &value);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:
@@ -199,17 +199,17 @@ public:
     QXmppSaslSuccess();
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientAnonymous(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientAnonymous(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -218,9 +218,9 @@ private:
 class QXmppSaslClientDigestMd5 : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientDigestMd5(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientDigestMd5(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     QByteArray m_cnonce;
@@ -233,9 +233,9 @@ private:
 class QXmppSaslClientFacebook : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientFacebook(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientFacebook(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -244,9 +244,9 @@ private:
 class QXmppSaslClientGoogle : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientGoogle(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientGoogle(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -255,9 +255,9 @@ private:
 class QXmppSaslClientPlain : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientPlain(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientPlain(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -266,9 +266,9 @@ private:
 class QXmppSaslClientScram : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     QCryptographicHash::Algorithm m_algorithm;
@@ -284,9 +284,9 @@ private:
 class QXmppSaslClientWindowsLive : public QXmppSaslClient
 {
 public:
-    QXmppSaslClientWindowsLive(QObject *parent = 0);
-    QString mechanism() const;
-    bool respond(const QByteArray &challenge, QByteArray &response);
+    QXmppSaslClientWindowsLive(QObject *parent = nullptr);
+    QString mechanism() const override;
+    bool respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -295,10 +295,10 @@ private:
 class QXmppSaslServerAnonymous : public QXmppSaslServer
 {
 public:
-    QXmppSaslServerAnonymous(QObject *parent = 0);
-    QString mechanism() const;
+    QXmppSaslServerAnonymous(QObject *parent = nullptr);
+    QString mechanism() const override;
 
-    Response respond(const QByteArray &challenge, QByteArray &response);
+    Response respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -307,10 +307,10 @@ private:
 class QXmppSaslServerDigestMd5 : public QXmppSaslServer
 {
 public:
-    QXmppSaslServerDigestMd5(QObject *parent = 0);
-    QString mechanism() const;
+    QXmppSaslServerDigestMd5(QObject *parent = nullptr);
+    QString mechanism() const override;
 
-    Response respond(const QByteArray &challenge, QByteArray &response);
+    Response respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     QByteArray m_cnonce;
@@ -323,10 +323,10 @@ private:
 class QXmppSaslServerFacebook : public QXmppSaslServer
 {
 public:
-    QXmppSaslServerFacebook(QObject *parent = 0);
-    QString mechanism() const;
+    QXmppSaslServerFacebook(QObject *parent = nullptr);
+    QString mechanism() const override;
 
-    Response respond(const QByteArray &challenge, QByteArray &response);
+    Response respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;
@@ -335,10 +335,10 @@ private:
 class QXmppSaslServerPlain : public QXmppSaslServer
 {
 public:
-    QXmppSaslServerPlain(QObject *parent = 0);
-    QString mechanism() const;
+    QXmppSaslServerPlain(QObject *parent = nullptr);
+    QString mechanism() const override;
 
-    Response respond(const QByteArray &challenge, QByteArray &response);
+    Response respond(const QByteArray &challenge, QByteArray &response) override;
 
 private:
     int m_step;

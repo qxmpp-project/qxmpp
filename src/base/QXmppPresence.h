@@ -75,7 +75,7 @@ public:
 
     QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available);
     QXmppPresence(const QXmppPresence &other);
-    ~QXmppPresence();
+    ~QXmppPresence() override;
 
     QXmppPresence& operator=(const QXmppPresence &other);
 
@@ -92,8 +92,8 @@ public:
     void setStatusText(const QString& statusText);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
     // XEP-0045: Multi-User Chat
@@ -139,7 +139,7 @@ public:
     QString mixUserNick() const;
     void setMixUserNick(const QString&);
 
-    bool isXmppStanza() const;
+    bool isXmppStanza() const override;
 
 private:
     QSharedDataPointer<QXmppPresencePrivate> d;

@@ -44,7 +44,7 @@ class QXMPP_EXPORT QXmppStream : public QXmppLoggable
 
 public:
     QXmppStream(QObject *parent);
-    ~QXmppStream();
+    ~QXmppStream() override;
 
     virtual bool isConnected() const;
     bool sendPacket(const QXmppStanza&);

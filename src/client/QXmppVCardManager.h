@@ -59,7 +59,7 @@ class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
 
 public:
     QXmppVCardManager();
-    ~QXmppVCardManager();
+    ~QXmppVCardManager() override;
 
     QString requestVCard(const QString& bareJid = QString());
 
@@ -70,8 +70,8 @@ public:
     bool isClientVCardReceived() const;
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:

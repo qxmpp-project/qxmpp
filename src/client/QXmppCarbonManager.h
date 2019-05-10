@@ -43,14 +43,14 @@ class QXMPP_EXPORT QXmppCarbonManager : public QXmppClientExtension
 
 public:
     QXmppCarbonManager();
-    ~QXmppCarbonManager();
+    ~QXmppCarbonManager() override;
 
     bool carbonsEnabled() const;
     void setCarbonsEnabled(bool enabled);
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:

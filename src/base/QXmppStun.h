@@ -113,7 +113,7 @@ public:
     void setUsername(const QString &username);
 
     QByteArray encode(const QByteArray &key = QByteArray(), bool addFingerprint = true) const;
-    bool decode(const QByteArray &buffer, const QByteArray &key = QByteArray(), QStringList *errors = 0);
+    bool decode(const QByteArray &buffer, const QByteArray &key = QByteArray(), QStringList *errors = nullptr);
     QString toString() const;
     static quint16 peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id);
 
@@ -167,14 +167,14 @@ class QXMPP_EXPORT QXmppIceComponent : public QXmppLoggable
     Q_OBJECT
 
 public:
-    ~QXmppIceComponent();
+    ~QXmppIceComponent() override;
 
     int component() const;
     bool isConnected() const;
     QList<QXmppJingleCandidate> localCandidates() const;
 
     static QList<QHostAddress> discoverAddresses();
-    static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = 0);
+    static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = nullptr);
 
 public slots:
     void close();
@@ -203,7 +203,7 @@ signals:
     void localCandidatesChanged();
 
 private:
-    QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent=0);
+    QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent=nullptr);
 
     QXmppIceComponentPrivate *d;
     friend class QXmppIceComponentPrivate;
@@ -252,8 +252,8 @@ public:
         CompleteGatheringState
     };
 
-    QXmppIceConnection(QObject *parent = 0);
-    ~QXmppIceConnection();
+    QXmppIceConnection(QObject *parent = nullptr);
+    ~QXmppIceConnection() override;
 
     QXmppIceComponent *component(int component);
     void addComponent(int component);

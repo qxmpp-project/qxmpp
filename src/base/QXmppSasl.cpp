@@ -298,7 +298,7 @@ QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism, QObject *pare
     } else if (mechanism == "X-OAUTH2") {
         return new QXmppSaslClientGoogle(parent);
     } else {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -491,7 +491,7 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         QUrlQuery responseUrl;
         responseUrl.addQueryItem("access_token", password());
         responseUrl.addQueryItem("api_key", username());
-        responseUrl.addQueryItem("call_id", 0);
+        responseUrl.addQueryItem("call_id", nullptr);
         responseUrl.addQueryItem("method", requestUrl.queryItemValue("method"));
         responseUrl.addQueryItem("nonce", requestUrl.queryItemValue("nonce"));
         responseUrl.addQueryItem("v", "1.0");
@@ -681,7 +681,7 @@ QXmppSaslServer* QXmppSaslServer::create(const QString &mechanism, QObject *pare
     } else if (mechanism == "ANONYMOUS") {
         return new QXmppSaslServerAnonymous(parent);
     } else {
-        return 0;
+        return nullptr;
     }
 }
 

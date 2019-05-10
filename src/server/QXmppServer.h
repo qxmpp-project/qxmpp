@@ -62,8 +62,8 @@ class QXMPP_EXPORT QXmppServer : public QXmppLoggable
     Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
 
 public:
-    QXmppServer(QObject *parent = 0);
-    ~QXmppServer();
+    QXmppServer(QObject *parent = nullptr);
+    ~QXmppServer() override;
 
     void addExtension(QXmppServerExtension *extension);
     QList<QXmppServerExtension*> extensions();
@@ -131,8 +131,8 @@ class QXMPP_EXPORT QXmppSslServer : public QTcpServer
     Q_OBJECT
 
 public:
-    QXmppSslServer(QObject *parent = 0);
-    ~QXmppSslServer();
+    QXmppSslServer(QObject *parent = nullptr);
+    ~QXmppSslServer() override;
 
     void addCaCertificates(const QList<QSslCertificate> &certificates);
     void setLocalCertificate(const QSslCertificate &certificate);

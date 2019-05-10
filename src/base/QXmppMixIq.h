@@ -51,7 +51,7 @@ public:
     };
 
     QXmppMixIq();
-    ~QXmppMixIq();
+    ~QXmppMixIq() override;
 
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);
@@ -74,8 +74,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement&);
-    void toXmlElementFromChild(QXmlStreamWriter*) const;
+    void parseElementFromChild(const QDomElement&) override;
+    void toXmlElementFromChild(QXmlStreamWriter*) const override;
     /// \endcond
 
 private:

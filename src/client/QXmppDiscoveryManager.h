@@ -41,7 +41,7 @@ class QXMPP_EXPORT QXmppDiscoveryManager : public QXmppClientExtension
 
 public:
     QXmppDiscoveryManager();
-    ~QXmppDiscoveryManager();
+    ~QXmppDiscoveryManager() override;
 
     QXmppDiscoveryIq capabilities();
 
@@ -65,8 +65,8 @@ public:
     void setClientInfoForm(const QXmppDataForm &form);
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:

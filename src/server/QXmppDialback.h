@@ -54,8 +54,8 @@ public:
     void setType(const QString &type);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
     static bool isDialback(const QDomElement &element);
     /// \endcond

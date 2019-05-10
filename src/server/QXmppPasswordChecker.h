@@ -67,7 +67,7 @@ public:
         TemporaryError
     };
 
-    QXmppPasswordReply(QObject *parent = 0);
+    QXmppPasswordReply(QObject *parent = nullptr);
 
     QByteArray digest() const;
     void setDigest(const QByteArray &digest);

@@ -48,7 +48,7 @@ private:
 
 void tst_QXmppSocks::init()
 {
-    m_connectionSocket = 0;
+    m_connectionSocket = nullptr;
     m_connectionHostName = QString();
     m_connectionPort = 0;
 }

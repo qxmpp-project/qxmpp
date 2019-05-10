@@ -46,12 +46,12 @@ public:
 };
 
 QXmppElementPrivate::QXmppElementPrivate()
-    : counter(1), parent(NULL)
+    : counter(1), parent(nullptr)
 {
 }
 
 QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
-    : counter(1), parent(NULL)
+    : counter(1), parent(nullptr)
 {
     if (element.isNull())
         return;
@@ -207,7 +207,7 @@ void QXmppElement::removeChild(const QXmppElement &child)
 
     d->children.removeAll(child.d);
     child.d->counter.deref();
-    child.d->parent = NULL;
+    child.d->parent = nullptr;
 }
 
 QString QXmppElement::tagName() const

@@ -138,7 +138,7 @@ public:
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 
-    static QXmppJingleCandidate::Type typeFromString(const QString &typeStr, bool *ok = 0);
+    static QXmppJingleCandidate::Type typeFromString(const QString &typeStr, bool *ok = nullptr);
     static QString typeToString(QXmppJingleCandidate::Type type);
     /// \endcond
 
@@ -289,7 +289,7 @@ public:
 
     QXmppJingleIq();
     QXmppJingleIq(const QXmppJingleIq &other);
-    ~QXmppJingleIq();
+    ~QXmppJingleIq() override;
 
     QXmppJingleIq& operator=(const QXmppJingleIq &other);
 
@@ -322,8 +322,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:

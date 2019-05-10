@@ -82,8 +82,8 @@ public:
     void setRegisterMode(const Mode &registerMode);
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
     static bool isStreamFeatures(const QDomElement &element);

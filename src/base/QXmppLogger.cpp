@@ -32,7 +32,7 @@
 
 #include "QXmppLogger.h"
 
-QXmppLogger* QXmppLogger::m_logger = 0;
+QXmppLogger* QXmppLogger::m_logger = nullptr;
 
 static const char *typeName(QXmppLogger::MessageType type)
 {
@@ -116,7 +116,7 @@ public:
 
 QXmppLoggerPrivate::QXmppLoggerPrivate()
     : loggingType(QXmppLogger::NoLogging)
-    , logFile(0)
+    , logFile(nullptr)
     , logFilePath("QXmppClientLog.log")
     , messageTypes(QXmppLogger::AnyMessage)
 {
@@ -268,7 +268,7 @@ void QXmppLogger::reopen()
 {
     if (d->logFile) {
         delete d->logFile;
-        d->logFile = 0;
+        d->logFile = nullptr;
     }
 }
 

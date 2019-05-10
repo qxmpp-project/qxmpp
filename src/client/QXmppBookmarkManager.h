@@ -41,14 +41,14 @@ class QXMPP_EXPORT QXmppBookmarkManager : public QXmppClientExtension
 
 public:
     QXmppBookmarkManager();
-    ~QXmppBookmarkManager();
+    ~QXmppBookmarkManager() override;
 
     bool areBookmarksReceived() const;
     QXmppBookmarkSet bookmarks() const;
     bool setBookmarks(const QXmppBookmarkSet &bookmarks);
 
     /// \cond
-    bool handleStanza(const QDomElement &stanza);
+    bool handleStanza(const QDomElement &stanza) override;
     /// \endcond
 
 signals:
@@ -57,7 +57,7 @@ signals:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client);
+    void setClient(QXmppClient* client) override;
     /// \endcond
 
 private slots:

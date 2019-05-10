@@ -41,10 +41,10 @@ class QXMPP_EXPORT QXmppIncomingClient : public QXmppStream
     Q_OBJECT
 
 public:
-    QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent = 0);
-    ~QXmppIncomingClient();
+    QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent = nullptr);
+    ~QXmppIncomingClient() override;
 
-    bool isConnected() const;
+    bool isConnected() const override;
     QString jid() const;
 
     void setInactivityTimeout(int secs);
@@ -56,8 +56,8 @@ signals:
 
 protected:
     /// \cond
-    void handleStream(const QDomElement &element);
-    void handleStanza(const QDomElement &element);
+    void handleStream(const QDomElement &element) override;
+    void handleStanza(const QDomElement &element) override;
     /// \endcond
 
 private slots:

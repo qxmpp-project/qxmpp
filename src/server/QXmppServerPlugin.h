@@ -55,11 +55,11 @@ public:
     /// Creates and returns the specified QXmppServerExtension.
     ///
     /// \param key The key for the QXmppServerExtension.
-    virtual QXmppServerExtension *create(const QString &key) = 0;
+    QXmppServerExtension *create(const QString &key) override = 0;
 
     /// Returns the list of keys supported by this plugin.
     ///
-    virtual QStringList keys() const = 0;
+    QStringList keys() const override = 0;
 };
 
 #endif

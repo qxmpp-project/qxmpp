@@ -111,8 +111,8 @@ private:
 };
 
 QXmppServerPrivate::QXmppServerPrivate(QXmppServer *qq)
-    : logger(0),
-    passwordChecker(0),
+    : logger(nullptr),
+    passwordChecker(nullptr),
     loaded(false),
     started(false),
     q(qq)
@@ -166,7 +166,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // if we did not find an outgoing server,
         // we need to establish the S2S connection
-        QXmppOutgoingServer *conn = new QXmppOutgoingServer(domain, 0);
+        QXmppOutgoingServer *conn = new QXmppOutgoingServer(domain, nullptr);
         conn->setLocalStreamKey(QXmppUtils::generateStanzaHash().toLatin1());
         conn->moveToThread(q->thread());
         conn->setParent(q);

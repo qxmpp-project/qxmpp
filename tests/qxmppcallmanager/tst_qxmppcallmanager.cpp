@@ -47,7 +47,7 @@ private:
 
 void tst_QXmppCallManager::init()
 {
-    receiverCall = 0;
+    receiverCall = nullptr;
 }
 
 void tst_QXmppCallManager::acceptCall(QXmppCall *call)

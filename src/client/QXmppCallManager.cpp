@@ -105,7 +105,7 @@ private:
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : direction(QXmppCall::IncomingDirection),
-    manager(0),
+    manager(nullptr),
     state(QXmppCall::ConnectingState),
     sendVideo(false),
     audioMode(QIODevice::NotOpen),
@@ -120,7 +120,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &med
     foreach (Stream *stream, streams)
         if (stream->media == media)
             return stream;
-    return 0;
+    return nullptr;
 }
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByName(const QString &name)
@@ -128,7 +128,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByName(const QString &name
     foreach (Stream *stream, streams)
         if (stream->name == name)
             return stream;
-    return 0;
+    return nullptr;
 }
 
 void QXmppCallPrivate::handleAck(const QXmppIq &ack)
@@ -297,7 +297,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     stream->media = media;
 
     // RTP channel
-    QObject *channelObject = 0;
+    QObject *channelObject = nullptr;
     if (media == AUDIO_MEDIA) {
         QXmppRtpAudioChannel *audioChannel = new QXmppRtpAudioChannel(q);
         stream->channel = audioChannel;
@@ -309,7 +309,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     } else {
         q->warning(QString("Unsupported media type %1").arg(media));
         delete stream;
-        return 0;
+        return nullptr;
     }
 
     // ICE connection
@@ -510,7 +510,7 @@ QXmppRtpAudioChannel *QXmppCall::audioChannel() const
     if (stream)
         return static_cast<QXmppRtpAudioChannel*>(stream->channel);
     else
-        return 0;
+        return nullptr;
 }
 
 /// Returns the audio mode.
@@ -529,7 +529,7 @@ QXmppRtpVideoChannel *QXmppCall::videoChannel() const
     if (stream)
         return static_cast<QXmppRtpVideoChannel*>(stream->channel);
     else
-        return 0;
+        return nullptr;
 }
 
 /// Returns the video mode.
@@ -574,7 +574,7 @@ void QXmppCall::localCandidatesChanged()
 {
     // find the stream
     QXmppIceConnection *conn = qobject_cast<QXmppIceConnection*>(sender());
-    QXmppCallPrivate::Stream *stream = 0;
+    QXmppCallPrivate::Stream *stream = nullptr;
     foreach (QXmppCallPrivate::Stream *ptr, d->streams) {
         if (ptr->connection == conn) {
             stream = ptr;
@@ -704,7 +704,7 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
     foreach (QXmppCall *call, calls)
         if (call->sid() == sid)
            return call;
-    return 0;
+    return nullptr;
 }
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Direction direction) const
@@ -712,7 +712,7 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
     foreach (QXmppCall *call, calls)
         if (call->sid() == sid && call->direction() == direction)
            return call;
-    return 0;
+    return nullptr;
 }
 
 /// Constructs a QXmppCallManager object to handle incoming and outgoing
@@ -791,12 +791,12 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     if (jid.isEmpty()) {
         warning("Refusing to call an empty jid");
-        return 0;
+        return nullptr;
     }
 
     if (jid == client()->configuration().jid()) {
         warning("Refusing to call self");
-        return 0;
+        return nullptr;
     }
 
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);

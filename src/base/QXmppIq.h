@@ -53,18 +53,18 @@ public:
 
     QXmppIq(QXmppIq::Type type = QXmppIq::Get);
     QXmppIq(const QXmppIq &other);
-    ~QXmppIq();
+    ~QXmppIq() override;
 
     QXmppIq& operator=(const QXmppIq &other);
 
     QXmppIq::Type type() const;
     void setType(QXmppIq::Type);
 
-    bool isXmppStanza() const;
+    bool isXmppStanza() const override;
 
     /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 protected:
     virtual void parseElementFromChild(const QDomElement &element);

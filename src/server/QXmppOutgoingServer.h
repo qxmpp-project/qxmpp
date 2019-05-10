@@ -43,9 +43,9 @@ class QXMPP_EXPORT QXmppOutgoingServer : public QXmppStream
 
 public:
     QXmppOutgoingServer(const QString &domain, QObject *parent);
-    ~QXmppOutgoingServer();
+    ~QXmppOutgoingServer() override;
 
-    bool isConnected() const;
+    bool isConnected() const override;
 
     QString localStreamKey() const;
     void setLocalStreamKey(const QString &key);
@@ -59,9 +59,9 @@ signals:
 
 protected:
     /// \cond
-    void handleStart();
-    void handleStream(const QDomElement &streamElement);
-    void handleStanza(const QDomElement &stanzaElement);
+    void handleStart() override;
+    void handleStream(const QDomElement &streamElement) override;
+    void handleStanza(const QDomElement &stanzaElement) override;
     /// \endcond
 
 public slots:
