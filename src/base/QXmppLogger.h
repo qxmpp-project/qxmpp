@@ -74,8 +74,8 @@ public:
     };
     Q_DECLARE_FLAGS(MessageTypes, MessageType)
 
-    QXmppLogger(QObject *parent = 0);
-    ~QXmppLogger();
+    QXmppLogger(QObject *parent = nullptr);
+    ~QXmppLogger() override;
 
     static QXmppLogger* getLogger();
 
@@ -113,11 +113,11 @@ class QXMPP_EXPORT QXmppLoggable : public QObject
     Q_OBJECT
 
 public:
-    QXmppLoggable(QObject *parent = 0);
+    QXmppLoggable(QObject *parent = nullptr);
 
 protected:
     /// \cond
-    virtual void childEvent(QChildEvent *event);
+    void childEvent(QChildEvent *event) override;
     /// \endcond
 
     /// Logs a debugging message.

@@ -32,8 +32,8 @@ class echoClient : public QXmppClient
     Q_OBJECT
 
 public:
-    echoClient(QObject *parent = 0);
-    ~echoClient();
+    echoClient(QObject *parent = nullptr);
+    ~echoClient() override;
 
 public slots:
     void messageReceived(const QXmppMessage&);

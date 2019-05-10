@@ -77,8 +77,8 @@ class QXMPP_EXPORT QXmppIceTransport : public QXmppLoggable
     Q_OBJECT
 
 public:
-    QXmppIceTransport(QObject *parent = 0);
-    ~QXmppIceTransport();
+    QXmppIceTransport(QObject *parent = nullptr);
+    ~QXmppIceTransport() override;
 
     virtual QXmppJingleCandidate localCandidate(int component) const = 0;
     virtual qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) = 0;
@@ -110,8 +110,8 @@ public:
         ClosingState
     };
 
-    QXmppTurnAllocation(QObject *parent = 0);
-    ~QXmppTurnAllocation();
+    QXmppTurnAllocation(QObject *parent = nullptr);
+    ~QXmppTurnAllocation() override;
 
     QHostAddress relayedHost() const;
     quint16 relayedPort() const;
@@ -121,8 +121,8 @@ public:
     void setUser(const QString &user);
     void setPassword(const QString &password);
 
-    QXmppJingleCandidate localCandidate(int component) const;
-    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+    QXmppJingleCandidate localCandidate(int component) const override;
+    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) override;
 
 signals:
     /// \brief This signal is emitted once TURN allocation succeeds.
@@ -133,7 +133,7 @@ signals:
 
 public slots:
     void connectToHost();
-    void disconnectFromHost();
+    void disconnectFromHost() override;
 
 private slots:
     void readyRead();
@@ -180,14 +180,14 @@ class QXMPP_EXPORT QXmppUdpTransport : public QXmppIceTransport
     Q_OBJECT
 
 public:
-    QXmppUdpTransport(QUdpSocket *socket, QObject *parent = 0);
-    ~QXmppUdpTransport();
+    QXmppUdpTransport(QUdpSocket *socket, QObject *parent = nullptr);
+    ~QXmppUdpTransport() override;
 
-    QXmppJingleCandidate localCandidate(int component) const;
-    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+    QXmppJingleCandidate localCandidate(int component) const override;
+    qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) override;
 
 public slots:
-    void disconnectFromHost();
+    void disconnectFromHost() override;
 
 private slots:
     void readyRead();

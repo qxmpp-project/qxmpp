@@ -38,7 +38,7 @@ public:
 QXmppServerExtension::QXmppServerExtension()
     : d(new QXmppServerExtensionPrivate)
 {
-    d->server = 0;
+    d->server = nullptr;
 }
 
 QXmppServerExtension::~QXmppServerExtension()

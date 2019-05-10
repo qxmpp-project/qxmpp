@@ -33,7 +33,7 @@ class xmppClient : public QXmppClient
     Q_OBJECT
 
 public:
-    xmppClient(QObject *parent = 0);
+    xmppClient(QObject *parent = nullptr);
     void setRecipient(const QString &recipient);
 
 private slots:

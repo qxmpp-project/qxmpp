@@ -213,12 +213,12 @@ QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate()
     , incomingMaximum(0)
     , incomingPos(0)
     , incomingSequence(0)
-    , outgoingCodec(0)
+    , outgoingCodec(nullptr)
     , outgoingMarker(true)
     , outgoingPayloadNumbered(false)
     , outgoingSequence(1)
     , outgoingStamp(0)
-    , outgoingTimer(0)
+    , outgoingTimer(nullptr)
 {
     qRegisterMetaType<QXmppRtpAudioChannel::Tone>("QXmppRtpAudioChannel::Tone");
 }
@@ -240,7 +240,7 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
     else if (payloadType.name().toLower() == "opus")
         return new QXmppOpusCodec(payloadType.clockrate(), payloadType.channels());
 #endif
-    return 0;
+    return nullptr;
 }
 
 /// Constructs a new RTP audio channel with the given \a parent.
@@ -349,7 +349,7 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     d->incomingSequence = packet.sequence();
 
     // get or create codec
-    QXmppCodec *codec = 0;
+    QXmppCodec *codec = nullptr;
     const quint8 packetType = packet.type();
     if (!d->incomingCodecs.contains(packetType)) {
         foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
@@ -497,7 +497,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
     // delete outgoing codec
     if (d->outgoingCodec) {
         delete d->outgoingCodec;
-        d->outgoingCodec = 0;
+        d->outgoingCodec = nullptr;
     }
 
     // create outgoing codec
@@ -797,7 +797,7 @@ public:
 };
 
 QXmppRtpVideoChannelPrivate::QXmppRtpVideoChannelPrivate()
-    : encoder(0),
+    : encoder(nullptr),
     outgoingId(0),
     outgoingSequence(1),
     outgoingStamp(0)
@@ -925,7 +925,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
         delete decoder;
     d->decoders.clear();
     foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
-        QXmppVideoDecoder *decoder = 0;
+        QXmppVideoDecoder *decoder = nullptr;
         if (false)
             {}
 #ifdef QXMPP_USE_THEORA
@@ -945,10 +945,10 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     // refresh encoder
     if (d->encoder) {
         delete d->encoder;
-        d->encoder = 0;
+        d->encoder = nullptr;
     }
     foreach (const QXmppJinglePayloadType &payload, m_outgoingPayloadTypes) {
-        QXmppVideoEncoder *encoder = 0;
+        QXmppVideoEncoder *encoder = nullptr;
         if (false)
             {}
 #ifdef QXMPP_USE_THEORA

@@ -37,7 +37,7 @@ public:
 QXmppClientExtension::QXmppClientExtension()
     : d(new QXmppClientExtensionPrivate)
 {
-    d->client = 0;
+    d->client = nullptr;
 }
 
 /// Destroys a QXmppClient extension.

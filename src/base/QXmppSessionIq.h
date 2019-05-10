@@ -42,7 +42,7 @@ public:
 
 private:
     /// \cond
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
 

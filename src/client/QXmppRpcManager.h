@@ -73,9 +73,9 @@ public:
                                               const QVariant &arg10 = QVariant() );
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    virtual QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:

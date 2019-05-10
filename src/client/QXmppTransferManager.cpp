@@ -219,17 +219,17 @@ public:
 
 QXmppTransferJobPrivate::QXmppTransferJobPrivate()
     : blockSize(16384),
-    client(0),
+    client(nullptr),
     direction(QXmppTransferJob::IncomingDirection),
     done(0),
     error(QXmppTransferJob::NoError),
     hash(QCryptographicHash::Md5),
-    iodevice(0),
+    iodevice(nullptr),
     method(QXmppTransferJob::NoMethod),
     state(QXmppTransferJob::OfferState),
     deviceIsOwn(false),
     ibbSequence(0),
-    socksSocket(0)
+    socksSocket(nullptr)
 {
 }
 
@@ -446,8 +446,8 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
 /// \cond
 QXmppTransferIncomingJob::QXmppTransferIncomingJob(const QString& jid, QXmppClient* client, QObject* parent)
     : QXmppTransferJob(jid, IncomingDirection, client, parent)
-    , m_candidateClient(0)
-    , m_candidateTimer(0)
+    , m_candidateClient(nullptr)
+    , m_candidateTimer(nullptr)
 {
 }
 
@@ -551,9 +551,9 @@ void QXmppTransferIncomingJob::_q_candidateReady()
 
     setState(QXmppTransferJob::TransferState);
     d->socksSocket = m_candidateClient;
-    m_candidateClient = 0;
+    m_candidateClient = nullptr;
     m_candidateTimer->deleteLater();
-    m_candidateTimer = 0;
+    m_candidateTimer = nullptr;
 
     check = connect(d->socksSocket, SIGNAL(readyRead()),
                     this, SLOT(_q_receiveData()));
@@ -583,9 +583,9 @@ void QXmppTransferIncomingJob::_q_candidateDisconnected()
             QString::number(m_candidateHost.port())));
 
     m_candidateClient->deleteLater();
-    m_candidateClient = 0;
+    m_candidateClient = nullptr;
     m_candidateTimer->deleteLater();
-    m_candidateTimer = 0;
+    m_candidateTimer = nullptr;
 
     // try next host
     connectToNextHost();
@@ -749,7 +749,7 @@ private:
 QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *qq)
     : ibbBlockSize(4096)
     , proxyOnly(false)
-    , socksServer(0)
+    , socksServer(nullptr)
     , supportedMethods(QXmppTransferJob::AnyMethod)
     , q(qq)
 {
@@ -762,7 +762,7 @@ QXmppTransferJob* QXmppTransferManagerPrivate::getJobByRequestId(QXmppTransferJo
             job->d->jid == jid &&
             job->d->requestId == id)
             return job;
-    return 0;
+    return nullptr;
 }
 
 QXmppTransferIncomingJob *QXmppTransferManagerPrivate::getIncomingJobByRequestId(const QString &jid, const QString &id)
@@ -777,7 +777,7 @@ QXmppTransferIncomingJob* QXmppTransferManagerPrivate::getIncomingJobBySid(const
             job->d->jid == jid &&
             job->d->sid == sid)
             return static_cast<QXmppTransferIncomingJob*>(job);
-    return 0;
+    return nullptr;
 }
 
 QXmppTransferOutgoingJob *QXmppTransferManagerPrivate::getOutgoingJobByRequestId(const QString &jid, const QString &id)
@@ -1298,7 +1298,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
 {
     if (QXmppUtils::jidToResource(jid).isEmpty()) {
         warning("The file recipient's JID must be a full JID");
-        return 0;
+        return nullptr;
     }
 
     QFileInfo info(filePath);
@@ -1315,7 +1315,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
     {
         warning(QString("Could not read from %1").arg(filePath));
         delete device;
-        device = 0;
+        device = nullptr;
     }
 
     // hash file
@@ -1356,7 +1356,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 
     if (QXmppUtils::jidToResource(jid).isEmpty()) {
         warning("The file recipient's JID must be a full JID");
-        return 0;
+        return nullptr;
     }
 
     QXmppTransferOutgoingJob *job = new QXmppTransferOutgoingJob(jid, client(), this);

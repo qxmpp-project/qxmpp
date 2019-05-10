@@ -58,7 +58,7 @@ QVariant QXmppInvokable::dispatch( const QByteArray & method, const QList< QVari
     const char *typeName = metaObject()->method(idx).typeName();
     int resultType = QMetaType::type(typeName);
 
-    void *result = QMetaType::create(resultType, 0);
+    void *result = QMetaType::create(resultType, nullptr);
 
     QGenericReturnArgument ret( typeName, result );
     QList<QGenericArgument> genericArgs;

@@ -47,8 +47,8 @@ public:
     static bool isMamQueryIq(const QDomElement &element);
 
 protected:
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
 
 private:
     QXmppDataForm m_form;
@@ -72,8 +72,8 @@ public:
     static bool isMamResultIq(const QDomElement &element);
 
 protected:
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
 
 private:
     QXmppResultSetReply m_resultSetReply;

@@ -51,7 +51,7 @@ void tst_QXmppTransferManager::init()
 {
     receiverBuffer.close();
     receiverBuffer.setData(QByteArray());
-    receiverJob = 0;
+    receiverJob = nullptr;
 }
 
 void tst_QXmppTransferManager::acceptFile(QXmppTransferJob *job)

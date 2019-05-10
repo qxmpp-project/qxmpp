@@ -67,7 +67,7 @@ class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
 
 public:
     QXmppRosterManager(QXmppClient* stream);
-    ~QXmppRosterManager();
+    ~QXmppRosterManager() override;
 
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
@@ -80,7 +80,7 @@ public:
                               const QString& resource) const;
 
     /// \cond
-    bool handleStanza(const QDomElement &element);
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 public slots:

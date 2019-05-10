@@ -30,7 +30,7 @@ class QXMPP_EXPORT QXmppPingIq : public QXmppIq
 {
 public:
     QXmppPingIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     static bool isPingIq(const QDomElement &element);
 };
 

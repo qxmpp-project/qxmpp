@@ -98,16 +98,16 @@ public:
         Tone_D      ///< Tone for the D key.
     };
 
-    QXmppRtpAudioChannel(QObject *parent = 0);
-    ~QXmppRtpAudioChannel();
+    QXmppRtpAudioChannel(QObject *parent = nullptr);
+    ~QXmppRtpAudioChannel() override;
 
-    qint64 bytesAvailable() const;
-    void close();
-    bool isSequential() const;
-    QIODevice::OpenMode openMode() const;
+    qint64 bytesAvailable() const override;
+    void close() override;
+    bool isSequential() const override;
+    QIODevice::OpenMode openMode() const override;
     QXmppJinglePayloadType payloadType() const;
-    qint64 pos() const;
-    bool seek(qint64 pos);
+    qint64 pos() const override;
+    bool seek(qint64 pos) override;
 
 signals:
     /// \brief This signal is emitted when a datagram needs to be sent.
@@ -143,9 +143,9 @@ protected:
         emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
-    void payloadTypesChanged();
-    qint64 readData(char * data, qint64 maxSize);
-    qint64 writeData(const char * data, qint64 maxSize);
+    void payloadTypesChanged() override;
+    qint64 readData(char * data, qint64 maxSize) override;
+    qint64 writeData(const char * data, qint64 maxSize) override;
     /// \endcond
 
 private slots:
@@ -263,11 +263,11 @@ class QXMPP_EXPORT QXmppRtpVideoChannel : public QXmppLoggable, public QXmppRtpC
     Q_OBJECT
 
 public:
-    QXmppRtpVideoChannel(QObject *parent = 0);
-    ~QXmppRtpVideoChannel();
+    QXmppRtpVideoChannel(QObject *parent = nullptr);
+    ~QXmppRtpVideoChannel() override;
 
-    void close();
-    QIODevice::OpenMode openMode() const;
+    void close() override;
+    QIODevice::OpenMode openMode() const override;
 
     // incoming stream
     QXmppVideoFormat decoderFormat() const;
@@ -287,7 +287,7 @@ public slots:
 
 protected:
     /// \cond
-    void payloadTypesChanged();
+    void payloadTypesChanged() override;
     /// \endcond
 
 private:

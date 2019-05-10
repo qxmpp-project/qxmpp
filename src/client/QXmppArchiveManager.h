@@ -63,8 +63,8 @@ public:
     void retrieveCollection(const QString &jid, const QDateTime &start, int max);
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:

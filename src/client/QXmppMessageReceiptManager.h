@@ -40,8 +40,8 @@ public:
     QXmppMessageReceiptManager();
 
     /// \cond
-    virtual QStringList discoveryFeatures() const;
-    virtual bool handleStanza(const QDomElement &stanza);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &stanza) override;
     /// \endcond
 
 signals:

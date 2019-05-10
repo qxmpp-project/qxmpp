@@ -36,7 +36,7 @@ class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
     Q_OBJECT
 
 public:
-    QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent=0);
+    QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent=nullptr);
     void connectToHost(const QString &hostName, quint16 hostPort);
 
 signals:
@@ -59,7 +59,7 @@ class QXMPP_EXPORT QXmppSocksServer : public QObject
     Q_OBJECT
 
 public:
-    QXmppSocksServer(QObject *parent=0);
+    QXmppSocksServer(QObject *parent=nullptr);
     void close();
     bool listen(quint16 port = 0);
 

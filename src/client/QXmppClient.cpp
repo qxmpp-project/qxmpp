@@ -66,11 +66,11 @@ private:
 
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
     : clientPresence(QXmppPresence::Available)
-    , logger(0)
-    , stream(0)
+    , logger(nullptr)
+    , stream(nullptr)
     , receivedConflict(false)
     , reconnectionTries(0)
-    , reconnectionTimer(0)
+    , reconnectionTimer(nullptr)
     , isActive(true)
     , q(qq)
 {

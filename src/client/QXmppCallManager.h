@@ -78,7 +78,7 @@ public:
         FinishedState = 3       ///< The call is finished.
     };
 
-    ~QXmppCall();
+    ~QXmppCall() override;
 
     QXmppCall::Direction direction() const;
     QString jid() const;
@@ -163,15 +163,15 @@ class QXMPP_EXPORT QXmppCallManager : public QXmppClientExtension
 
 public:
     QXmppCallManager();
-    ~QXmppCallManager();
+    ~QXmppCallManager() override;
     void setStunServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnUser(const QString &user);
     void setTurnPassword(const QString &password);
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:
@@ -189,7 +189,7 @@ public slots:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client);
+    void setClient(QXmppClient* client) override;
     /// \endcond
 
 private slots:

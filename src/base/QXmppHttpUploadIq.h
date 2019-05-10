@@ -42,7 +42,7 @@ class QXMPP_EXPORT QXmppHttpUploadRequestIq : public QXmppIq
 {
 public:
     QXmppHttpUploadRequestIq();
-    ~QXmppHttpUploadRequestIq();
+    ~QXmppHttpUploadRequestIq() override;
 
     QString fileName() const;
     void setFileName(const QString &filename);
@@ -57,8 +57,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:
@@ -74,7 +74,7 @@ class QXMPP_EXPORT QXmppHttpUploadSlotIq : public QXmppIq
 {
 public:
     QXmppHttpUploadSlotIq();
-    ~QXmppHttpUploadSlotIq();
+    ~QXmppHttpUploadSlotIq() override;
 
     QUrl putUrl() const;
     void setPutUrl(const QUrl &putUrl);
@@ -89,8 +89,8 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+    void parseElementFromChild(const QDomElement &element) override;
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
 private:

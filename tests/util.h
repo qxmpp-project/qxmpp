@@ -57,7 +57,7 @@ public:
     };
 
     /// Retrieves the password for the given username.
-    QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password)
+    QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password) override
     {
         if (m_credentials.contains(request.username()))
         {
@@ -69,7 +69,7 @@ public:
     };
 
     /// Returns whether getPassword() is enabled.
-    bool hasGetPassword() const
+    bool hasGetPassword() const override
     {
         return true;
     };

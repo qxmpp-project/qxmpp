@@ -7,9 +7,9 @@ class RemoteInterface : public QXmppInvokable
 {
     Q_OBJECT
 public:
-    RemoteInterface(QObject *parent = 0);
+    RemoteInterface(QObject *parent = nullptr);
 
-    bool isAuthorized( const QString &jid ) const;
+    bool isAuthorized( const QString &jid ) const override;
 
 // RPC Interface
 public slots:

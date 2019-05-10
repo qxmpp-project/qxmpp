@@ -58,9 +58,9 @@ private:
 };
 
 QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
-    : idleTimer(0)
-    , passwordChecker(0)
-    , saslServer(0)
+    : idleTimer(nullptr)
+    , passwordChecker(nullptr)
+    , saslServer(nullptr)
     , q(qq)
 {
 }
@@ -184,9 +184,9 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->idleTimer->interval())
         d->idleTimer->start();
-    if (d->saslServer != 0) {
+    if (d->saslServer != nullptr) {
         delete d->saslServer;
-        d->saslServer = 0;
+        d->saslServer = nullptr;
     }
 
     // start stream

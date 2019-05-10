@@ -43,8 +43,8 @@ public:
         PageBackwards
     };
 
-    xmppClient(QObject *parent = 0);
-    ~xmppClient();
+    xmppClient(QObject *parent = nullptr);
+    ~xmppClient() override;
 
     void setPageDirection(PageDirection direction);
     void setPageSize(int size);

@@ -34,7 +34,7 @@ class QDomElement;
 class QXmppElement;
 class QXmppElementPrivate;
 
-typedef QList<QXmppElement> QXmppElementList;
+using QXmppElementList = QList<QXmppElement>;
 class QXMPP_EXPORT QXmppElement
 {
 public:

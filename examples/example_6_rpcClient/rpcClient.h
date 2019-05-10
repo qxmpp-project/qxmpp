@@ -35,8 +35,8 @@ class rpcClient : public QXmppClient
     Q_OBJECT
 
 public:
-    rpcClient(QObject *parent = 0);
-    ~rpcClient();
+    rpcClient(QObject *parent = nullptr);
+    ~rpcClient() override;
 
 private slots:
     void slotInvokeRemoteMethod();

@@ -1683,8 +1683,8 @@ CandidatePair::CandidatePair(int component, bool controlling, QObject *parent)
     : QXmppLoggable(parent)
     , nominated(false)
     , nominating(false)
-    , transport(0)
-    , transaction(0)
+    , transport(nullptr)
+    , transaction(nullptr)
     , m_component(component)
     , m_controlling(controlling)
     , m_state(WaitingState)
@@ -1790,14 +1790,14 @@ private:
 };
 
 QXmppIceComponentPrivate::QXmppIceComponentPrivate(int component_, QXmppIcePrivate *config_, QXmppIceComponent *qq)
-    : activePair(0)
+    : activePair(nullptr)
     , component(component_)
     , config(config_)
-    , fallbackPair(0)
+    , fallbackPair(nullptr)
     , gatheringState(QXmppIceConnection::NewGatheringState)
     , peerReflexivePriority(0)
-    , timer(0)
-    , turnAllocation(0)
+    , timer(nullptr)
+    , turnAllocation(nullptr)
     , turnConfigured(false)
     , q(qq)
 {
@@ -1845,7 +1845,7 @@ CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transact
         if (pair->transaction == transaction)
             return pair;
     }
-    return 0;
+    return nullptr;
 }
 
 void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
@@ -2029,7 +2029,7 @@ void QXmppIceComponent::close()
         transport->disconnectFromHost();
     d->turnAllocation->disconnectFromHost();
     d->timer->stop();
-    d->activePair = 0;
+    d->activePair = nullptr;
 }
 
 /// Starts ICE connectivity checks.
@@ -2047,7 +2047,7 @@ void QXmppIceComponent::connectToHost()
 
 bool QXmppIceComponent::isConnected() const
 {
-    return d->activePair != 0;
+    return d->activePair != nullptr;
 }
 
 /// Returns the list of local candidates.
@@ -2082,7 +2082,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     }
 
     // check if it's STUN
-    QXmppStunTransaction *stunTransaction = 0;
+    QXmppStunTransaction *stunTransaction = nullptr;
     foreach (QXmppStunTransaction *t, d->stunTransactions.keys()) {
         if (t->request().id() == messageId &&
             d->stunTransactions.value(t) == transport) {
@@ -2125,7 +2125,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     }
 
     // process message from peer
-    CandidatePair *pair = 0;
+    CandidatePair *pair = nullptr;
     if (message.messageClass() == QXmppStunMessage::Request)
     {
         // check for role conflict
@@ -2238,7 +2238,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         if (!d->activePair || pair->priority() > d->activePair->priority()) {
             info(QString("ICE pair selected %1 (priority: %2)").arg(
                 pair->toString(), QString::number(pair->priority())));
-            const bool wasConnected = (d->activePair != 0);
+            const bool wasConnected = (d->activePair != nullptr);
             d->activePair = pair;
             if (!wasConnected)
                 emit connected();
@@ -2273,7 +2273,7 @@ void QXmppIceComponent::transactionFinished()
                 transaction->response().errorPhrase));
             pair->setState(CandidatePair::FailedState);
         }
-        pair->transaction = 0;
+        pair->transaction = nullptr;
         return;
     }
 
@@ -2518,7 +2518,7 @@ public:
 };
 
 QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
-    : connectTimer(NULL)
+    : connectTimer(nullptr)
     , gatheringState(QXmppIceConnection::NewGatheringState)
     , turnPort(0)
 {

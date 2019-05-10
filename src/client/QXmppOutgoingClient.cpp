@@ -124,14 +124,14 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     , sessionAvailable(false)
     , sessionStarted(false)
     , isAuthenticated(false)
-    , saslClient(0)
+    , saslClient(nullptr)
     , streamManagementAvailable(false)
     , canResume(false)
     , isResuming(false)
     , resumePort(0)
     , clientStateIndicationEnabled(false)
-    , pingTimer(0)
-    , timeoutTimer(0)
+    , pingTimer(nullptr)
+    , timeoutTimer(nullptr)
     , q(qq)
 {
 }
@@ -359,7 +359,7 @@ void QXmppOutgoingClient::handleStart()
     // reset authentication step
     if (d->saslClient) {
         delete d->saslClient;
-        d->saslClient = 0;
+        d->saslClient = nullptr;
     }
 
     // reset session information

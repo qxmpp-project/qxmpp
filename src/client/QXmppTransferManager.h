@@ -134,7 +134,7 @@ public:
         FinishedState = 3  ///< The transfer is finished.
     };
 
-    ~QXmppTransferJob();
+    ~QXmppTransferJob() override;
 
     QXmppTransferJob::Direction direction() const;
     QXmppTransferJob::Error error() const;
@@ -225,7 +225,7 @@ class QXMPP_EXPORT QXmppTransferManager : public QXmppClientExtension
 
 public:
     QXmppTransferManager();
-    ~QXmppTransferManager();
+    ~QXmppTransferManager() override;
 
     QString proxy() const;
     void setProxy(const QString &proxyJid);
@@ -237,8 +237,8 @@ public:
     void setSupportedMethods(QXmppTransferJob::Methods methods);
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:
@@ -262,7 +262,7 @@ public slots:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client);
+    void setClient(QXmppClient* client) override;
     /// \endcond
 
 private slots:

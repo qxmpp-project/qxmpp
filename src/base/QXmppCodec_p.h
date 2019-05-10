@@ -60,8 +60,8 @@ class QXmppG711aCodec : public QXmppCodec
 public:
     QXmppG711aCodec(int clockrate);
 
-    qint64 encode(QDataStream &input, QDataStream &output);
-    qint64 decode(QDataStream &input, QDataStream &output);
+    qint64 encode(QDataStream &input, QDataStream &output) override;
+    qint64 decode(QDataStream &input, QDataStream &output) override;
 
 private:
     int m_frequency;
@@ -76,8 +76,8 @@ class QXmppG711uCodec : public QXmppCodec
 public:
     QXmppG711uCodec(int clockrate);
 
-    qint64 encode(QDataStream &input, QDataStream &output);
-    qint64 decode(QDataStream &input, QDataStream &output);
+    qint64 encode(QDataStream &input, QDataStream &output) override;
+    qint64 decode(QDataStream &input, QDataStream &output) override;
 
 private:
     int m_frequency;

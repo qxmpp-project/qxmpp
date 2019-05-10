@@ -51,7 +51,7 @@ class QXMPP_EXPORT QXmppServerExtension : public QXmppLoggable
 
 public:
     QXmppServerExtension();
-    ~QXmppServerExtension();
+    ~QXmppServerExtension() override;
     virtual QString extensionName() const;
     virtual int extensionPriority() const;
 

@@ -35,7 +35,7 @@
 #include "example_3_transferHandling.h"
 
 xmppClient::xmppClient(QObject *parent)
-    : QXmppClient(parent), transferManager(0)
+    : QXmppClient(parent), transferManager(nullptr)
 {
     bool check;
     Q_UNUSED(check);

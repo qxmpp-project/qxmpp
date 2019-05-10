@@ -34,8 +34,8 @@ class xmppClient : public QXmppClient
     Q_OBJECT
 
 public:
-    xmppClient(QObject *parent = 0);
-    ~xmppClient();
+    xmppClient(QObject *parent = nullptr);
+    ~xmppClient() override;
 
 public slots:
     void clientConnected();

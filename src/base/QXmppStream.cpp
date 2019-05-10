@@ -61,7 +61,7 @@ public:
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate()
-    : socket(0), streamManagementEnabled(false), lastOutgoingSequenceNumber(0), lastIncomingSequenceNumber(0)
+    : socket(nullptr), streamManagementEnabled(false), lastOutgoingSequenceNumber(0), lastIncomingSequenceNumber(0)
 {
 }
 

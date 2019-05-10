@@ -40,7 +40,7 @@ class QXMPP_EXPORT QXmppVersionManager : public QXmppClientExtension
 
 public:
     QXmppVersionManager();
-    ~QXmppVersionManager();
+    ~QXmppVersionManager() override;
 
     QString requestVersion(const QString& jid);
 
@@ -53,8 +53,8 @@ public:
     QString clientOs() const;
 
     /// \cond
-    QStringList discoveryFeatures() const;
-    bool handleStanza(const QDomElement &element);
+    QStringList discoveryFeatures() const override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 signals:
