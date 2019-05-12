@@ -1,6 +1,5 @@
+cmake_minimum_required(VERSION 3.3)
 project(qxmpp)
-
-cmake_minimum_required(VERSION 3.2)
 
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 0)
