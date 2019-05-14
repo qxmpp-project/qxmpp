@@ -576,7 +576,7 @@ QString QXmppJingleIq::Content::toSdp() const
     QHostAddress localRtpAddress = QHostAddress::Any;
     quint16 localRtpPort = 0;
     QList<QXmppJingleCandidate> sortedCandidates = d->transportCandidates;
-    qSort(sortedCandidates.begin(), sortedCandidates.end(), candidateLessThan);
+    std::sort(sortedCandidates.begin(), sortedCandidates.end(), candidateLessThan);
     foreach (const QXmppJingleCandidate &candidate, sortedCandidates) {
         if (candidate.component() == RTP_COMPONENT) {
             localRtpAddress = candidate.host();

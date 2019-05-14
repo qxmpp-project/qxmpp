@@ -1834,7 +1834,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
             fallbackPair = pair;
     }
 
-    qSort(pairs.begin(), pairs.end(), candidatePairPtrLessThan);
+    std::sort(pairs.begin(), pairs.end(), candidatePairPtrLessThan);
 
     return true;
 }
@@ -2184,7 +2184,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             pair->transport = transport;
             d->pairs << pair;
 
-            qSort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
+            std::sort(d->pairs.begin(), d->pairs.end(), candidatePairPtrLessThan);
         }
 
         switch (pair->state()) {
@@ -2621,7 +2621,7 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
 
     // assign sockets
     QList<int> keys = d->components.keys();
-    qSort(keys);
+    std::sort(keys.begin(), keys.end());
     int s = 0;
     foreach (int k, keys) {
         d->components[k]->d->setSockets(sockets.mid(s, addresses.size()));
