@@ -25,6 +25,7 @@
 #include <QCryptographicHash>
 #include <QNetworkProxy>
 #include <QSslSocket>
+#include <QSslConfiguration>
 #include <QUrl>
 #include <QDnsLookup>
 
@@ -141,8 +142,11 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     q->info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
 
     // override CA certificates if requested
-    if (!config.caCertificates().isEmpty())
-        q->socket()->setCaCertificates(config.caCertificates());
+    if (!config.caCertificates().isEmpty()) {
+        QSslConfiguration newSslConfig;
+        newSslConfig.setCaCertificates(config.caCertificates());
+        q->socket()->setSslConfiguration(newSslConfig);
+    }
 
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
