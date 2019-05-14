@@ -125,8 +125,7 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
 
     QDateTime prevTime = m_start;
 
-    foreach (const QXmppArchiveMessage &message, m_messages)
-    {
+    for (const QXmppArchiveMessage &message : m_messages) {
         writer->writeStartElement(message.isReceived() ? "from" : "to");
         helperToXmlAddAttribute(writer, "secs", QString::number(prevTime.secsTo(message.date())));
         writer->writeTextElement("body", message.body());
@@ -428,7 +427,7 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         m_rsmQuery.toXml(writer);
     else if (!m_rsmReply.isNull())
         m_rsmReply.toXml(writer);
-    foreach (const QXmppArchiveChat &chat, m_chats)
+    for (const auto &chat : m_chats)
         chat.toXml(writer);
     writer->writeEndElement();
 }

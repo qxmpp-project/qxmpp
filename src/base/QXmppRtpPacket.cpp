@@ -143,7 +143,7 @@ QByteArray QXmppRtpPacket::encode() const
     stream << d->ssrc;
 
     // contributing source ids
-    foreach (const quint32 &src, d->csrc)
+    for (const auto &src : d->csrc)
         stream << src;
 
     stream.writeRawData(d->payload.constData(), d->payload.size());

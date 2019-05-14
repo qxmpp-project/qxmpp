@@ -802,7 +802,7 @@ bool QXmppTheoraDecoder::setParameters(const QMap<QString, QString> &parameters)
         packet.granulepos = -1;
         packet.packetno = 0;
 
-        foreach (int h_size, h_sizes) {
+        for (const auto h_size : h_sizes) {
             if (device->bytesAvailable() < h_size) {
                 qWarning("Theora configuration is too small");
                 return false;
@@ -971,7 +971,7 @@ bool QXmppTheoraEncoder::setFormat(const QXmppVideoFormat &format)
     stream << quint32(1);
 
     quint16 length = 0;
-    foreach (const QByteArray &header, headers)
+    for (const auto &header : headers)
         length += header.size();
 
     quint8 h_count = headers.size() - 1;

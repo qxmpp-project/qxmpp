@@ -122,9 +122,8 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
         << ns_attention         // XEP-0224: Attention
         << ns_chat_markers;     // XEP-0333: Chat Markers
 
-    foreach(QXmppClientExtension* extension, client()->extensions())
-    {
-        if(extension)
+    for (auto *extension : client()->extensions()) {
+        if (extension)
             features << extension->discoveryFeatures();
     }
 
@@ -139,9 +138,8 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identity.setName(clientName());
     identities << identity;
 
-    foreach(QXmppClientExtension* extension, client()->extensions())
-    {
-        if(extension)
+    for (auto *extension : client()->extensions()) {
+        if (extension)
             identities << extension->discoveryIdentities();
     }
 

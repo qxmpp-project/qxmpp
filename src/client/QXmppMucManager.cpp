@@ -118,7 +118,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result && room->d->permissionsQueue.remove(iq.id())) {
-                foreach (const QXmppMucItem &item, iq.items()) {
+                for (const auto &item : iq.items()) {
                     const QString jid = item.jid();
                     if (!room->d->permissions.contains(jid))
                         room->d->permissions.insert(jid, item);
@@ -510,7 +510,7 @@ bool QXmppMucRoom::requestPermissions()
 
     d->permissions.clear();
     d->permissionsQueue.clear();
-    foreach (QXmppMucItem::Affiliation affiliation, affiliations) {
+    for (const auto &affiliation : qAsConst(affiliations)) {
         QXmppMucItem item;
         item.setAffiliation(affiliation);
 
@@ -535,7 +535,7 @@ bool QXmppMucRoom::setPermissions(const QList<QXmppMucItem> &permissions)
     QList<QXmppMucItem> items;
 
     // Process changed members
-    foreach (const QXmppMucItem &item, permissions) {
+    for (const auto &item : qAsConst(permissions)) {
         const QString jid = item.jid();
         if (d->permissions.value(jid).affiliation() != item.affiliation())
             items << item;
@@ -543,7 +543,8 @@ bool QXmppMucRoom::setPermissions(const QList<QXmppMucItem> &permissions)
     }
 
     // Process deleted members
-    foreach (const QString &jid, d->permissions.keys()) {
+    const auto &jids = d->permissions.keys();
+    for (const auto &jid : jids) {
         QXmppMucItem item;
         item.setAffiliation(QXmppMucItem::NoAffiliation);
         item.setJid(jid);
@@ -569,7 +570,7 @@ void QXmppMucRoom::_q_disconnected()
     // clear chat room participants
     const QStringList removed = d->participants.keys();
     d->participants.clear();
-    foreach (const QString &jid, removed)
+    for (const auto &jid : removed)
         emit participantRemoved(jid);
     emit participantsChanged();
 
@@ -588,7 +589,8 @@ void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
 {
     if (iq.from() == d->jid) {
         QString name;
-        foreach (const QXmppDiscoveryIq::Identity &identity, iq.identities()) {
+        const auto &identities = iq.identities();
+        for (const auto &identity : identities) {
             if (identity.category() == "conference") {
                 name = identity.name();
                 break;
@@ -698,7 +700,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                 // clear chat room participants
                 const QStringList removed = d->participants.keys();
                 d->participants.clear();
-                foreach (const QString &jid, removed)
+                for (const auto &jid : removed)
                     emit participantRemoved(jid);
                 emit participantsChanged();
 

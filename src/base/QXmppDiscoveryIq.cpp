@@ -203,14 +203,14 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     QStringList sortedFeatures = m_features;
     std::sort(sortedFeatures.begin(), sortedFeatures.end());
     sortedFeatures.removeDuplicates();
-    foreach (const QXmppDiscoveryIq::Identity &identity, sortedIdentities)
+    for (const auto &identity : sortedIdentities)
         S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
-    foreach (const QString &feature, sortedFeatures)
+    for (const auto &feature : sortedFeatures)
         S += feature + QLatin1String("<");
 
     if (!m_form.isNull()) {
         QMap<QString, QXmppDataForm::Field> fieldMap;
-        foreach (const QXmppDataForm::Field &field, m_form.fields()) {
+        for (const auto &field : m_form.fields()) {
             fieldMap.insert(field.key(), field);
         }
 
@@ -220,7 +220,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 
             QStringList keys = fieldMap.keys();
             std::sort(keys.begin(), keys.end());
-            foreach (const QString &key, keys) {
+            for (const auto &key : keys) {
                 const QXmppDataForm::Field field = fieldMap.value(key);
                 S += key + QLatin1String("<");
                 if (field.value().canConvert<QStringList>()) {
@@ -311,7 +311,7 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "node", m_queryNode);
 
     if (m_queryType == InfoQuery) {
-        foreach (const QXmppDiscoveryIq::Identity& identity, m_identities) {
+        for (const auto &identity : m_identities) {
             writer->writeStartElement("identity");
             helperToXmlAddAttribute(writer, "xml:lang", identity.language());
             helperToXmlAddAttribute(writer, "category", identity.category());
@@ -320,13 +320,13 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
             writer->writeEndElement();
         }
 
-        foreach (const QString &feature, m_features) {
+        for (const auto &feature : m_features) {
             writer->writeStartElement("feature");
             helperToXmlAddAttribute(writer, "var", feature);
             writer->writeEndElement();
         }
     } else {
-        foreach (const QXmppDiscoveryIq::Item& item, m_items) {
+        for (const auto &item : m_items) {
             writer->writeStartElement("item");
             helperToXmlAddAttribute(writer, "jid", item.jid());
             helperToXmlAddAttribute(writer, "name", item.name());

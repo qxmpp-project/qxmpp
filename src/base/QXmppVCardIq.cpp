@@ -1009,13 +1009,13 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
     writer->writeAttribute("xmlns", ns_vcard);
-    foreach (const QXmppVCardAddress &address, d->addresses)
+    for (const QXmppVCardAddress &address : d->addresses)
         address.toXml(writer);
     if (d->birthday.isValid())
         helperToXmlAddTextElement(writer, "BDAY", d->birthday.toString("yyyy-MM-dd"));
     if (!d->description.isEmpty())
         helperToXmlAddTextElement(writer, "DESC", d->description);
-    foreach (const QXmppVCardEmail &email, d->emails)
+    for (const QXmppVCardEmail &email : d->emails)
         email.toXml(writer);
     if (!d->fullName.isEmpty())
         helperToXmlAddTextElement(writer, "FN", d->fullName);
@@ -1035,7 +1035,7 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
 
-    foreach (const QXmppVCardPhone &phone, d->phones)
+    for (const QXmppVCardPhone &phone : d->phones)
         phone.toXml(writer);
     if(!photo().isEmpty())
     {

@@ -117,7 +117,7 @@ QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &media)
 {
-    foreach (Stream *stream, streams)
+    for (auto *stream : streams)
         if (stream->media == media)
             return stream;
     return nullptr;
@@ -125,7 +125,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &med
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByName(const QString &name)
 {
-    foreach (Stream *stream, streams)
+    for (auto *stream : streams)
         if (stream->name == name)
             return stream;
     return nullptr;
@@ -163,7 +163,8 @@ bool QXmppCallPrivate::handleTransport(QXmppCallPrivate::Stream *stream, const Q
 {
     stream->connection->setRemoteUser(content.transportUser());
     stream->connection->setRemotePassword(content.transportPassword());
-    foreach (const QXmppJingleCandidate &candidate, content.transportCandidates())
+    const auto & candidates = content.transportCandidates();
+    for (const auto &candidate : candidates)
         stream->connection->addRemoteCandidate(candidate);
 
     // perform ICE negotiation
@@ -465,8 +466,7 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCa
 
 QXmppCall::~QXmppCall()
 {
-    foreach (QXmppCallPrivate::Stream *stream, d->streams)
-        delete stream;
+    qDeleteAll(d->streams);
     delete d;
 }
 
@@ -542,7 +542,7 @@ QIODevice::OpenMode QXmppCall::videoMode() const
 void QXmppCall::terminated()
 {
     // close streams
-    foreach (QXmppCallPrivate::Stream *stream, d->streams) {
+    for (auto *stream : d->streams) {
         stream->channel->close();
         stream->connection->close();
     }
@@ -575,7 +575,7 @@ void QXmppCall::localCandidatesChanged()
     // find the stream
     auto *conn = qobject_cast<QXmppIceConnection*>(sender());
     QXmppCallPrivate::Stream *stream = nullptr;
-    foreach (QXmppCallPrivate::Stream *ptr, d->streams) {
+    for (auto *ptr : d->streams) {
         if (ptr->connection == conn) {
             stream = ptr;
             break;
@@ -701,7 +701,7 @@ QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
 {
-    foreach (QXmppCall *call, calls)
+    for (auto *call : calls)
         if (call->sid() == sid)
            return call;
     return nullptr;
@@ -709,7 +709,7 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Direction direction) const
 {
-    foreach (QXmppCall *call, calls)
+    for (auto *call : calls)
         if (call->sid() == sid && call->direction() == direction)
            return call;
     return nullptr;
@@ -866,7 +866,7 @@ void QXmppCallManager::_q_callDestroyed(QObject *object)
 
 void QXmppCallManager::_q_disconnected()
 {
-    foreach (QXmppCall *call, d->calls)
+    for (auto *call : d->calls)
         call->d->terminate(QXmppJingleIq::Reason::Gone);
 }
 
@@ -879,7 +879,7 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
         return;
 
     // find request
-    foreach (QXmppCall *call, d->calls)
+    for (auto *call : d->calls)
         call->d->handleAck(ack);
 }
 
@@ -959,7 +959,7 @@ void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
     if (presence.type() != QXmppPresence::Unavailable)
         return;
 
-    foreach (QXmppCall *call, d->calls) {
+    for (auto *call : d->calls) {
         if (presence.from() == call->jid()) {
             // the remote party has gone away, terminate call
             call->d->terminate(QXmppJingleIq::Reason::Gone);
