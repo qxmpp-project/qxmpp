@@ -326,8 +326,7 @@ QXmppDataForm::Media QXmppDataForm::Field::media() const
     QList<QPair<QString, QString>> pairUris;
     pairUris.reserve(d->mediaSources.size());
 
-    // TODO: use qAsConst()
-    for (const auto &source : d->mediaSources) {
+    for (const auto &source : qAsConst(d->mediaSources)) {
         pairUris << qMakePair<QString, QString>(
             source.contentType().name(),
             source.uri().toString()
@@ -771,7 +770,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     if (!d->instructions.isEmpty())
         writer->writeTextElement("instructions", d->instructions);
 
-    foreach (const QXmppDataForm::Field &field, d->fields) {
+    for (const QXmppDataForm::Field &field : d->fields) {
         writer->writeStartElement("field");
 
         /* field type */
@@ -801,7 +800,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             type == QXmppDataForm::Field::JidMultiField ||
             type == QXmppDataForm::Field::TextMultiField)
         {
-            foreach (const QString &value, field.value().toStringList())
+            for (const QString &value : field.value().toStringList())
                 helperToXmlAddTextElement(writer, "value", value);
         }
         else if (!field.value().isNull())
@@ -844,8 +843,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             type == QXmppDataForm::Field::ListSingleField)
         {
             QPair<QString, QString> option;
-            foreach (option, field.options())
-            {
+            for (const auto &option : field.options()) {
                 writer->writeStartElement("option");
                 helperToXmlAddAttribute(writer, "label", option.first);
                 helperToXmlAddTextElement(writer, "value", option.second);

@@ -133,11 +133,11 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         return false;
 
     if (toDomain == domain) {
-
         // look for a client connection
         QList<QXmppIncomingClient*> found;
         if (QXmppUtils::jidToResource(to).isEmpty()) {
-            foreach (QXmppIncomingClient *conn, incomingClientsByBareJid.value(to))
+            const auto &connections = incomingClientsByBareJid.value(to);
+            for (auto *conn : connections)
                 found << conn;
         } else {
             QXmppIncomingClient *conn = incomingClientsByJid.value(to);
@@ -146,7 +146,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         }
 
         // send data
-        foreach (QXmppStream *conn, found)
+        for (auto *conn : found)
             QMetaObject::invokeMethod(conn, "sendData", Q_ARG(QByteArray, data));
         return !found.isEmpty();
 
@@ -156,7 +156,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         Q_UNUSED(check);
 
         // look for an outgoing S2S connection
-        foreach (QXmppOutgoingServer *conn, outgoingServers) {
+        for (auto *conn : qAsConst(outgoingServers)) {
             if (conn->remoteDomain() == toDomain) {
                 // send or queue data
                 QMetaObject::invokeMethod(conn, "queueData", Q_ARG(QByteArray, data));
@@ -201,7 +201,8 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 static void handleStanza(QXmppServer *server, const QDomElement &element)
 {
     // try extensions
-    foreach (QXmppServerExtension *extension, server->extensions())
+    const auto &extensions = server->extensions();
+    for (auto *extension : extensions)
         if (extension->handleStanza(element))
             return;
 
@@ -264,13 +265,13 @@ void QXmppServerPrivate::warning(const QString &message)
 void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 {
     if (!loaded) {
-        QObjectList plugins = QPluginLoader::staticInstances();
-        foreach (QObject *object, plugins) {
+        for (auto *object : QPluginLoader::staticInstances()) {
             auto *plugin = qobject_cast<QXmppServerPlugin*>(object);
             if (!plugin)
                 continue;
 
-            foreach (const QString &key, plugin->keys())
+            const auto &keys = plugin->keys();
+            for (const auto &key : keys)
                 server->addExtension(plugin->create(key));
         }
         loaded = true;
@@ -282,7 +283,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 void QXmppServerPrivate::startExtensions()
 {
     if (!started) {
-        foreach (QXmppServerExtension *extension, extensions)
+        for (auto *extension : extensions)
             if (!extension->start())
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
         started = true;
@@ -455,7 +456,7 @@ void QXmppServer::addCaCertificates(const QString &path)
     }
 
     // reconfigure servers
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+    for (auto *server : d->serversForClients + d->serversForServers)
         server->addCaCertificates(d->caCertificates);
 }
 
@@ -478,7 +479,7 @@ void QXmppServer::setLocalCertificate(const QString &path)
     }
 
     // reconfigure servers
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+    for (auto *server : d->serversForClients + d->serversForServers)
         server->setLocalCertificate(d->localCertificate);
 }
 
@@ -491,7 +492,7 @@ void QXmppServer::setLocalCertificate(const QSslCertificate &certificate)
     d->localCertificate = certificate;
 
     // reconfigure servers
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+    for (auto *server : d->serversForClients + d->serversForServers)
         server->setLocalCertificate(d->localCertificate);
 }
 
@@ -514,7 +515,7 @@ void QXmppServer::setPrivateKey(const QString &path)
     }
 
     // reconfigure servers
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+    for (auto *server : d->serversForClients + d->serversForServers)
         server->setPrivateKey(d->privateKey);
 }
 
@@ -527,7 +528,7 @@ void QXmppServer::setPrivateKey(const QSslKey &key)
     d->privateKey = key;
 
     // reconfigure servers
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers)
+    for (auto *server : d->serversForClients + d->serversForServers)
         server->setPrivateKey(d->privateKey);
 }
 
@@ -575,7 +576,7 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 void QXmppServer::close()
 {
     // prevent new connections
-    foreach (QXmppSslServer *server, d->serversForClients + d->serversForServers) {
+    for (auto *server : d->serversForClients + d->serversForServers) {
         server->close();
         delete server;
     }
@@ -586,11 +587,12 @@ void QXmppServer::close()
     d->stopExtensions();
 
     // close XMPP streams
-    foreach (QXmppIncomingClient *stream, d->incomingClients)
+    QSetIterator<QXmppIncomingClient*> itr(d->incomingClients);
+    while (itr.hasNext())
+        itr.next()->disconnectFromHost();
+    for (auto *stream : d->incomingServers)
        stream->disconnectFromHost();
-    foreach (QXmppIncomingServer *stream, d->incomingServers)
-       stream->disconnectFromHost();
-    foreach (QXmppOutgoingServer *stream, d->outgoingServers)
+    for (auto *stream : d->outgoingServers)
        stream->disconnectFromHost();
 }
 
@@ -778,7 +780,7 @@ void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
     if (dialback.command() == QXmppDialback::Verify)
     {
         // handle a verify request
-        foreach (QXmppOutgoingServer *out, d->outgoingServers) {
+        for (auto *out : qAsConst(d->outgoingServers)) {
             if (out->remoteDomain() != dialback.from())
                 continue;
 

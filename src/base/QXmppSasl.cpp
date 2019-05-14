@@ -95,7 +95,7 @@ static QByteArray generateNonce()
 static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
 {
     QMap<char, QByteArray> map;
-    foreach (const QByteArray &keyValue, ba.split(',')) {
+    for (const auto &keyValue : ba.split(',')) {
         if (keyValue.size() >= 2 && keyValue[1] == '=') {
             map[keyValue[0]] = keyValue.mid(2);
         }
@@ -923,18 +923,15 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
 QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArray> &map)
 {
     QByteArray ba;
-    foreach (const QByteArray &key, map.keys())
-    {
+    for (const auto &key : map.keys()) {
         if (!ba.isEmpty())
             ba.append(',');
         ba.append(key + "=");
         QByteArray value = map[key];
         const char *separators = "()<>@,;:\\\"/[]?={} \t";
         bool quote = false;
-        for (const char *c = separators; *c; c++)
-        {
-            if (value.contains(*c))
-            {
+        for (const char *c = separators; *c; c++) {
+            if (value.contains(*c)) {
                 quote = true;
                 break;
             }

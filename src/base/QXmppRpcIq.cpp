@@ -63,7 +63,7 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
         {
             writer->writeStartElement("array");
             writer->writeStartElement("data");
-            foreach(const QVariant &item, value.toList())
+            for (const auto &item : value.toList())
                 marshall(writer, item);
             writer->writeEndElement();
             writer->writeEndElement();
@@ -337,8 +337,7 @@ void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     else if (!m_values.isEmpty())
     {
         writer->writeStartElement("params");
-        foreach (const QVariant &arg, m_values)
-        {
+        for (const auto &arg : m_values) {
             writer->writeStartElement("param");
             QXmppRpcMarshaller::marshall(writer, arg);
             writer->writeEndElement();
@@ -433,8 +432,7 @@ void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!m_arguments.isEmpty())
     {
         writer->writeStartElement("params");
-        foreach(const QVariant &arg, m_arguments)
-        {
+        for (const auto &arg : m_arguments) {
             writer->writeStartElement("param");
             QXmppRpcMarshaller::marshall(writer, arg);
             writer->writeEndElement();

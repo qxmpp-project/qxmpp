@@ -499,10 +499,8 @@ QXmppVersionManager& QXmppClient::versionManager()
 
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
-    foreach (QXmppClientExtension *extension, d->extensions)
-    {
-        if (extension->handleStanza(element))
-        {
+    for (auto *extension : d->extensions) {
+        if (extension->handleStanza(element)) {
             handled = true;
             return;
         }

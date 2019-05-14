@@ -192,7 +192,7 @@ void QXmppPresence::setType(QXmppPresence::Type type)
     d->type = type;
 }
 
-/// \cond
+/// \cond
 void QXmppPresence::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
@@ -320,7 +320,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_muc_user);
         if (!d->mucItem.isNull())
             d->mucItem.toXml(xmlWriter);
-        foreach (int code, d->mucStatusCodes) {
+        for (const auto code : d->mucStatusCodes) {
             xmlWriter->writeStartElement("status");
             xmlWriter->writeAttribute("code", QString::number(code));
             xmlWriter->writeEndElement();

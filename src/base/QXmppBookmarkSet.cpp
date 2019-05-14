@@ -210,8 +210,7 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("storage");
     writer->writeAttribute("xmlns", ns_bookmarks);
-    foreach (const QXmppBookmarkConference &conference, m_conferences)
-    {
+    for (const auto &conference : m_conferences) {
         writer->writeStartElement("conference");
         if (conference.autoJoin())
             helperToXmlAddAttribute(writer, "autojoin", "true");
@@ -221,8 +220,7 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
             helperToXmlAddTextElement(writer, "nick", conference.nickName());
         writer->writeEndElement();
     }
-    foreach (const QXmppBookmarkUrl &url, m_urls)
-    {
+    for (const auto &url : m_urls) {
         writer->writeStartElement("url");
         helperToXmlAddAttribute(writer, "name", url.name());
         helperToXmlAddAttribute(writer, "url", url.url().toString());

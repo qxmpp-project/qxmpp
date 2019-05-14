@@ -470,7 +470,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // determine SASL Authentication mechanism to use
             QStringList commonMechanisms;
             QString usedMechanism;
-            foreach (const QString &mechanism, supportedMechanisms) {
+            for (const auto &mechanism : qAsConst(supportedMechanisms)) {
                 if (features.authMechanisms().contains(mechanism))
                     commonMechanisms << mechanism;
             }

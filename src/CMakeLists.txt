@@ -1,5 +1,8 @@
 add_definitions(-DQXMPP_BUILD)
 
+# disable Q_FOREACH()
+add_definitions(-DQT_NO_FOREACH)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)

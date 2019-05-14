@@ -143,7 +143,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
 
             // store updated entries and notify changes
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
-            foreach (const QXmppRosterIq::Item &item, items) {
+            for (const auto &item : items) {
                 const QString bareJid = item.bareJid();
                 if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
                     if (d->entries.remove(bareJid)) {
@@ -167,7 +167,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
     case QXmppIq::Result:
         {
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
-            foreach (const QXmppRosterIq::Item &item, items) {
+            for (const auto &item : items) {
                 const QString bareJid = item.bareJid();
                 d->entries.insert(bareJid, item);
             }

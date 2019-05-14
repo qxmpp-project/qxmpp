@@ -278,7 +278,7 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeAttribute("xmlns", ns_muc_admin);
-    foreach (const QXmppMucItem &item, m_items)
+    for (const QXmppMucItem &item : m_items)
         item.toXml(writer);
     writer->writeEndElement();
 }

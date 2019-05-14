@@ -56,7 +56,8 @@ void tst_QXmppIceConnection::testBind()
     QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
-    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+    const auto &localCandidates = client.localCandidates();
+    for (const auto &c : localCandidates) {
         QCOMPARE(c.component(), componentId);
         QCOMPARE(c.type(), QXmppJingleCandidate::HostType);
     }
@@ -95,7 +96,8 @@ void tst_QXmppIceConnection::testBindStun()
     QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
-    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+    const auto &localCandidates = client.localCandidates();
+    for (const auto &c : localCandidates) {
         QCOMPARE(c.component(), componentId);
         if (c.type() == QXmppJingleCandidate::ServerReflexiveType)
             foundReflexive = true;
@@ -133,9 +135,11 @@ void tst_QXmppIceConnection::testConnect()
     clientR.setRemotePassword(clientL.localPassword());
 
     // exchange candidates
-    foreach (const QXmppJingleCandidate &candidate, clientR.localCandidates())
+    const auto &rLocalCandidates = clientR.localCandidates();
+    for (const auto &candidate : rLocalCandidates)
         clientL.addRemoteCandidate(candidate);
-    foreach (const QXmppJingleCandidate &candidate, clientL.localCandidates())
+    const auto &lLocalCandidates = clientL.localCandidates();
+    for (const auto &candidate : lLocalCandidates)
         clientR.addRemoteCandidate(candidate);
 
     // start ICE

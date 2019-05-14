@@ -233,7 +233,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
                 d->ready = true;
 
                 // send queued data
-                foreach (const QByteArray &data, d->dataQueue)
+                for (const auto &data : qAsConst(d->dataQueue))
                     sendData(data);
                 d->dataQueue.clear();
 

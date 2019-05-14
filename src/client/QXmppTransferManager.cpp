@@ -758,11 +758,12 @@ QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *q
 
 QXmppTransferJob* QXmppTransferManagerPrivate::getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id)
 {
-    foreach (QXmppTransferJob *job, jobs)
+    for (auto *job : jobs) {
         if (job->d->direction == direction &&
             job->d->jid == jid &&
             job->d->requestId == id)
             return job;
+    }
     return nullptr;
 }
 
@@ -773,11 +774,12 @@ QXmppTransferIncomingJob *QXmppTransferManagerPrivate::getIncomingJobByRequestId
 
 QXmppTransferIncomingJob* QXmppTransferManagerPrivate::getIncomingJobBySid(const QString &jid, const QString &sid)
 {
-    foreach (QXmppTransferJob *job, jobs)
+    for (auto *job : jobs) {
         if (job->d->direction == QXmppTransferJob::IncomingDirection &&
             job->d->jid == jid &&
             job->d->sid == sid)
             return static_cast<QXmppTransferIncomingJob*>(job);
+    }
     return nullptr;
 }
 
@@ -814,12 +816,9 @@ QXmppTransferManager::~QXmppTransferManager()
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 {
     // handle IQ from proxy
-    foreach (QXmppTransferJob *job, d->jobs)
-    {
-        if (job->d->socksProxy.jid() == iq.from() && job->d->requestId == iq.id())
-        {
-            if (iq.type() == QXmppIq::Result && iq.streamHosts().size() > 0)
-            {
+    for (auto *job : d->jobs) {
+        if (job->d->socksProxy.jid() == iq.from() && job->d->requestId == iq.id()) {
+            if (iq.type() == QXmppIq::Result && iq.streamHosts().size() > 0) {
                 job->d->socksProxy = iq.streamHosts().first();
                 socksServerSendOffer(job);
                 return;
@@ -1138,14 +1137,11 @@ void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
     bool check;
     Q_UNUSED(check);
 
-    foreach (QXmppTransferJob *ptr, d->jobs)
-    {
+    for (auto *ptr : d->jobs) {
         // handle IQ from proxy
-        if (ptr->direction() == QXmppTransferJob::OutgoingDirection && ptr->d->socksProxy.jid() == iq.from() && ptr->d->requestId == iq.id())
-        {
+        if (ptr->direction() == QXmppTransferJob::OutgoingDirection && ptr->d->socksProxy.jid() == iq.from() && ptr->d->requestId == iq.id()) {
             auto *job = static_cast<QXmppTransferOutgoingJob*>(ptr);
-            if (job->d->socksSocket)
-            {
+            if (job->d->socksSocket) {
                 // proxy connection activation result
                 if (iq.type() == QXmppIq::Result)
                 {
@@ -1427,10 +1423,8 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 void QXmppTransferManager::_q_socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
     const QString ownJid = client()->configuration().jid();
-    foreach (QXmppTransferJob *job, d->jobs)
-    {
-        if (hostName == streamHash(job->d->sid, ownJid, job->jid()) && port == 0)
-        {
+    for (auto *job : d->jobs) {
+        if (hostName == streamHash(job->d->sid, ownJid, job->jid()) && port == 0) {
             job->d->socksSocket = socket;
             return;
         }
@@ -1446,7 +1440,8 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 
     // discover local IPs
     if (!d->proxyOnly) {
-        foreach (const QHostAddress &address, QXmppIceComponent::discoverAddresses()) {
+        const auto &addresses = QXmppIceComponent::discoverAddresses();
+        for (const auto &address : addresses) {
             QXmppByteStreamIq::StreamHost streamHost;
             streamHost.setJid(ownJid);
             streamHost.setHost(address.toString());
@@ -1493,7 +1488,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->state() != QXmppTransferJob::OfferState)
         return;
 
-    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+    const auto &fields = iq.featureForm().fields();
+    for (const auto &field : fields) {
         if (field.key() == "stream-method") {
             if ((field.value().toString() == ns_ibb) &&
                 (d->supportedMethods & QXmppTransferJob::InBandMethod))
@@ -1580,10 +1576,12 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     job->d->sid = iq.siId();
     job->d->mimeType = iq.mimeType();
     job->d->fileInfo = iq.fileInfo();
-    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+    const auto &fields = iq.featureForm().fields();
+    for (const auto &field : fields) {
         if (field.key() == "stream-method") {
             QPair<QString, QString> option;
-            foreach (option, field.options()) {
+            const auto &options = field.options();
+            for (const auto &option : options) {
                 if (option.second == ns_ibb)
                     offeredMethods = offeredMethods | QXmppTransferJob::InBandMethod;
                 else if (option.second == ns_bytestreams)

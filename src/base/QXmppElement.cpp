@@ -88,7 +88,7 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
 
 QXmppElementPrivate::~QXmppElementPrivate()
 {
-    foreach (QXmppElementPrivate *child, children)
+    for (auto *child : children)
         if (!child->counter.deref())
             delete child;
 }
@@ -178,7 +178,7 @@ void QXmppElement::appendChild(const QXmppElement &child)
 
 QXmppElement QXmppElement::firstChildElement(const QString &name) const
 {
-    foreach (QXmppElementPrivate *child_d, d->children)
+    for (auto *child_d : d->children)
         if (name.isEmpty() || child_d->name == name)
             return QXmppElement(child_d);
     return QXmppElement();
@@ -238,12 +238,12 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(d->name);
     if (d->attributes.contains("xmlns"))
         writer->writeAttribute("xmlns", d->attributes.value("xmlns"));
-    foreach (const QString &attr, d->attributes.keys())
+    for (const auto &attr : d->attributes.keys())
         if (attr != "xmlns")
             helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
     if (!d->value.isEmpty())
         writer->writeCharacters(d->value);
-    foreach (const QXmppElement &child, d->children)
-        child.toXml(writer);
+    for (auto *childPrivate : d->children)
+        QXmppElement(childPrivate).toXml(writer);
     writer->writeEndElement();
 }

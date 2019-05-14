@@ -426,7 +426,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, "media", d->descriptionMedia);
         if (d->descriptionSsrc)
             writer->writeAttribute("ssrc", QString::number(d->descriptionSsrc));
-        foreach (const QXmppJinglePayloadType &payload, d->payloadTypes)
+        for (const auto &payload : d->payloadTypes)
             payload.toXml(writer);
         writer->writeEndElement();
     }
@@ -438,7 +438,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         writer->writeAttribute("xmlns", d->transportType);
         helperToXmlAddAttribute(writer, "ufrag", d->transportUser);
         helperToXmlAddAttribute(writer, "pwd", d->transportPassword);
-        foreach (const QXmppJingleCandidate &candidate, d->transportCandidates)
+        for (const auto &candidate : d->transportCandidates)
             candidate.toXml(writer);
 
         // XEP-0320
@@ -459,7 +459,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
 {
     QList<QXmppJinglePayloadType> payloads;
     QString line;
-    foreach (line, sdp.split('\n')) {
+    for (auto &line : sdp.split('\n')) {
         if (line.endsWith('\r'))
             line.resize(line.size() - 1);
         if (line.startsWith("a=")) {
@@ -494,7 +494,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                         if (payload.name() == "telephone-event") {
                             params.insert("events", paramStr);
                         } else {
-                            foreach (const QString p, paramStr.split(QRegExp(";\\s*"))) {
+                            for (const auto &p : paramStr.split(QRegExp(";\\s*"))) {
                                 QStringList bits = p.split('=');
                                 if (bits.size() == 2)
                                     params.insert(bits[0], bits[1]);
@@ -577,7 +577,7 @@ QString QXmppJingleIq::Content::toSdp() const
     quint16 localRtpPort = 0;
     QList<QXmppJingleCandidate> sortedCandidates = d->transportCandidates;
     std::sort(sortedCandidates.begin(), sortedCandidates.end(), candidateLessThan);
-    foreach (const QXmppJingleCandidate &candidate, sortedCandidates) {
+    for (const auto &candidate : sortedCandidates) {
         if (candidate.component() == RTP_COMPONENT) {
             localRtpAddress = candidate.host();
             localRtpPort = candidate.port();
@@ -590,7 +590,7 @@ QString QXmppJingleIq::Content::toSdp() const
     // media
     QString payloads;
     QStringList attrs;
-    foreach (const QXmppJinglePayloadType &payload, d->payloadTypes) {
+    for (const QXmppJinglePayloadType &payload : d->payloadTypes) {
         payloads += " " + QString::number(payload.id());
         QString rtpmap = QString::number(payload.id()) + " " + payload.name() + "/" + QString::number(payload.clockrate());
         if (payload.channels() > 1)
@@ -616,7 +616,7 @@ QString QXmppJingleIq::Content::toSdp() const
     sdp += attrs;
 
     // transport
-    foreach (const QXmppJingleCandidate &candidate, d->transportCandidates)
+    for (const auto &candidate : d->transportCandidates)
         sdp << QString("a=%1").arg(candidateToSdp(candidate));
     if (!d->transportUser.isEmpty())
         sdp << QString("a=ice-ufrag:%1").arg(d->transportUser);
@@ -907,7 +907,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "initiator", d->initiator);
     helperToXmlAddAttribute(writer, "responder", d->responder);
     helperToXmlAddAttribute(writer, "sid", d->sid);
-    foreach (const QXmppJingleIq::Content &content, d->contents)
+    for (const auto &content : d->contents)
         content.toXml(writer);
     d->reason.toXml(writer);
 
@@ -1419,7 +1419,7 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
     if (d->ptime > 0)
         helperToXmlAddAttribute(writer, "ptime", QString::number(d->ptime));
 
-    foreach (const QString &key, d->parameters.keys()) {
+    for (const auto &key : d->parameters.keys()) {
         writer->writeStartElement("parameter");
         writer->writeAttribute("name", key);
         writer->writeAttribute("value", d->parameters.value(key));

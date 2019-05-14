@@ -1248,7 +1248,7 @@ void QXmppTurnAllocation::disconnectFromHost()
 
     // clear channels and any outstanding transactions
     m_channels.clear();
-    foreach (QXmppStunTransaction *transaction, m_transactions)
+    for (auto *transaction : m_transactions)
         delete transaction;
     m_transactions.clear();
 
@@ -1318,7 +1318,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
     QXmppStunMessage message;
     QStringList errors;
     if (!message.decode(buffer, QByteArray(), &errors)) {
-        foreach (const QString &error, errors)
+        for (const auto &error : errors)
             warning(error);
         return;
     }
@@ -1331,7 +1331,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
 #endif
 
     // find transaction
-    foreach (QXmppStunTransaction *transaction, m_transactions) {
+    for (auto *transaction : m_transactions) {
         if (transaction->request().id() == message.id() &&
             transaction->request().messageMethod() == message.messageMethod()) {
             transaction->readStun(message);
@@ -1357,7 +1357,7 @@ void QXmppTurnAllocation::refresh()
 
 void QXmppTurnAllocation::refreshChannels()
 {
-    foreach (quint16 channel, m_channels.keys()) {
+    for (const auto &channel : m_channels.keys()) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
         request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
@@ -1814,12 +1814,12 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
         return false;
 
-    foreach (const QXmppJingleCandidate &c, remoteCandidates)
+    for (const auto &c : remoteCandidates)
         if (c.host() == candidate.host() && c.port() == candidate.port())
             return false;
     remoteCandidates << candidate;
 
-    foreach (QXmppIceTransport *transport, transports) {
+    for (auto *transport : transports) {
         // only pair compatible addresses
         const QXmppJingleCandidate local = transport->localCandidate(component);
         if (!isCompatibleAddress(local.host(), candidate.host()))
@@ -1841,7 +1841,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
 
 CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transaction)
 {
-    foreach (CandidatePair *pair, pairs) {
+    for (auto *pair : pairs) {
         if (pair->transaction == transaction)
             return pair;
     }
@@ -1873,16 +1873,14 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
 
     // clear previous candidates and sockets
     localCandidates.clear();
-    foreach (CandidatePair *pair, pairs)
-        delete pair;
-    pairs.clear();
-    foreach (QXmppIceTransport *transport, transports)
+    qDeleteAll(pairs);
+    for (auto *transport : transports)
         if (transport != turnAllocation)
             delete transport;
     transports.clear();
 
     // store candidates
-    foreach (QUdpSocket *socket, sockets) {
+    for (auto *socket : sockets) {
         socket->setParent(q);
 
         auto *transport = new QXmppUdpTransport(socket, q);
@@ -1902,7 +1900,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
 
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        foreach (QXmppIceTransport *transport, transports) {
+        for (auto *transport : transports) {
             const QXmppJingleCandidate local = transport->localCandidate(component);
             if (!isCompatibleAddress(local.host(), config->stunHost))
                 continue;
@@ -1994,8 +1992,7 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
 
 QXmppIceComponent::~QXmppIceComponent()
 {
-    foreach (CandidatePair *pair, d->pairs)
-        delete pair;
+    qDeleteAll(d->pairs);
     delete d;
 }
 
@@ -2013,7 +2010,7 @@ void QXmppIceComponent::checkCandidates()
         return;
     debug("Checking remote candidates");
 
-    foreach (CandidatePair *pair, d->pairs) {
+    for (auto *pair : d->pairs) {
         if (pair->state() == CandidatePair::WaitingState) {
             d->performCheck(pair, d->config->iceControlling);
             break;
@@ -2025,7 +2022,7 @@ void QXmppIceComponent::checkCandidates()
 
 void QXmppIceComponent::close()
 {
-    foreach (QXmppIceTransport *transport, d->transports)
+    for (auto *transport : d->transports)
         transport->disconnectFromHost();
     d->turnAllocation->disconnectFromHost();
     d->timer->stop();
@@ -2070,7 +2067,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (!messageType || messageCookie != STUN_MAGIC)
     {
         // use this as an opportunity to flag a potential pair
-        foreach (CandidatePair *pair, d->pairs) {
+        for (auto *pair : d->pairs) {
             if (pair->remote.host() == remoteHost &&
                 pair->remote.port() == remotePort) {
                 d->fallbackPair = pair;
@@ -2083,7 +2080,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
     // check if it's STUN
     QXmppStunTransaction *stunTransaction = nullptr;
-    foreach (QXmppStunTransaction *t, d->stunTransactions.keys()) {
+    for (auto *t : d->stunTransactions.keys()) {
         if (t->request().id() == messageId &&
             d->stunTransactions.value(t) == transport) {
             stunTransaction = t;
@@ -2103,7 +2100,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     QXmppStunMessage message;
     QStringList errors;
     if (!message.decode(buffer, messagePassword.toUtf8(), &errors)) {
-        foreach (const QString &error, errors)
+        for (const auto &error : errors)
             warning(error);
         return;
     }
@@ -2148,7 +2145,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         // find or create remote candidate
         QXmppJingleCandidate remoteCandidate;
         bool remoteCandidateFound = false;
-        foreach (const QXmppJingleCandidate &c, d->remoteCandidates) {
+        for (const auto &c : d->remoteCandidates) {
             if (c.host() == remoteHost && c.port() == remotePort) {
                 remoteCandidate = c;
                 remoteCandidateFound = true;
@@ -2170,7 +2167,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         }
 
         // construct pair
-        foreach (CandidatePair *ptr, d->pairs) {
+        for (auto *ptr : d->pairs) {
             if (ptr->transport == transport
              && ptr->remote.host() == remoteHost
              && ptr->remote.port() == remotePort) {
@@ -2209,7 +2206,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             || message.messageClass() == QXmppStunMessage::Error) {
 
         // find the pair for this transaction
-        foreach (CandidatePair *ptr, d->pairs) {
+        for (auto *ptr : d->pairs) {
             if (ptr->transaction && ptr->transaction->request().id() == message.id()) {
                 pair = ptr;
                 break;
@@ -2297,7 +2294,7 @@ void QXmppIceComponent::transactionFinished()
             }
 
             // check whether this candidates is already known
-            foreach (const QXmppJingleCandidate &candidate, d->localCandidates) {
+            for (const auto &candidate : d->localCandidates) {
                 if (candidate.host() == reflexiveHost &&
                     candidate.port() == reflexivePort &&
                     candidate.type() == QXmppJingleCandidate::ServerReflexiveType)
@@ -2349,7 +2346,7 @@ void QXmppIceComponent::turnConnected()
 static QList<QUdpSocket*> reservePort(const QList<QHostAddress> &addresses, quint16 port, QObject *parent)
 {
     QList<QUdpSocket*> sockets;
-    foreach (const QHostAddress &address, addresses) {
+    for (const auto &address : addresses) {
         auto *socket = new QUdpSocket(parent);
         sockets << socket;
         if (!socket->bind(address, port)) {
@@ -2366,14 +2363,12 @@ static QList<QUdpSocket*> reservePort(const QList<QHostAddress> &addresses, quin
 QList<QHostAddress> QXmppIceComponent::discoverAddresses()
 {
     QList<QHostAddress> addresses;
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
+    for (const auto &interface : QNetworkInterface::allInterfaces()) {
         if (!(interface.flags() & QNetworkInterface::IsRunning) ||
             interface.flags() & QNetworkInterface::IsLoopBack)
             continue;
 
-        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-        {
+        for (const auto &entry : interface.addressEntries()) {
             QHostAddress ip = entry.ip();
             if ((ip.protocol() != QAbstractSocket::IPv4Protocol &&
                  ip.protocol() != QAbstractSocket::IPv6Protocol) ||
@@ -2621,7 +2616,7 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
     QList<int> keys = d->components.keys();
     std::sort(keys.begin(), keys.end());
     int s = 0;
-    foreach (int k, keys) {
+    for (const auto k : keys) {
         d->components[k]->d->setSockets(sockets.mid(s, addresses.size()));
         s += addresses.size();
     }
@@ -2634,7 +2629,7 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
 void QXmppIceConnection::close()
 {
     d->connectTimer->stop();
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->close();
 }
 
@@ -2645,7 +2640,7 @@ void QXmppIceConnection::connectToHost()
     if (isConnected() || d->connectTimer->isActive())
         return;
 
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->connectToHost();
     d->connectTimer->start();
 }
@@ -2655,7 +2650,7 @@ void QXmppIceConnection::connectToHost()
 
 bool QXmppIceConnection::isConnected() const
 {
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         if (!socket->isConnected())
             return false;
     return true;
@@ -2685,7 +2680,7 @@ void QXmppIceConnection::setIceControlling(bool controlling)
 QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
 {
     QList<QXmppJingleCandidate> candidates;
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         candidates += socket->localCandidates();
     return candidates;
 }
@@ -2747,7 +2742,7 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 {
     d->turnHost = host;
     d->turnPort = port;
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->d->setTurnServer(host, port);
 }
 
@@ -2760,7 +2755,7 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 void QXmppIceConnection::setTurnUser(const QString &user)
 {
     d->turnUser = user;
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->d->setTurnUser(user);
 }
 
@@ -2773,13 +2768,13 @@ void QXmppIceConnection::setTurnUser(const QString &user)
 void QXmppIceConnection::setTurnPassword(const QString &password)
 {
     d->turnPassword = password;
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->d->setTurnPassword(password);
 }
 
 void QXmppIceConnection::slotConnected()
 {
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         if (!socket->isConnected())
             return;
     info(QString("ICE negotiation completed"));
@@ -2792,7 +2787,7 @@ void QXmppIceConnection::slotGatheringStateChanged()
     GatheringState newGatheringState;
     bool allComplete = true;
     bool allNew = true;
-    foreach (QXmppIceComponent *socket, d->components.values()) {
+    for (auto *socket : d->components.values()) {
         if (socket->d->gatheringState != CompleteGatheringState)
             allComplete = false;
         if (socket->d->gatheringState != NewGatheringState)
@@ -2817,7 +2812,7 @@ void QXmppIceConnection::slotGatheringStateChanged()
 void QXmppIceConnection::slotTimeout()
 {
     warning(QString("ICE negotiation timed out"));
-    foreach (QXmppIceComponent *socket, d->components.values())
+    for (auto *socket : d->components.values())
         socket->close();
     emit disconnected();
 }
