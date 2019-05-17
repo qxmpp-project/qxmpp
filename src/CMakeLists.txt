@@ -1,3 +1,5 @@
+option(BUILD_SHARED "Build SHARED library" ON)
+
 add_definitions(-DQXMPP_BUILD)
 
 # disable Q_FOREACH()
@@ -45,9 +47,6 @@ set(INSTALL_HEADER_FILES
     base/QXmppResultSet.h
     base/QXmppRosterIq.h
     base/QXmppRpcIq.h
-    base/QXmppRtcpPacket.h
-    base/QXmppRtpChannel.h
-    base/QXmppRtpPacket.h
     base/QXmppSessionIq.h
     base/QXmppSocks.h
     base/QXmppStanza.h
@@ -62,7 +61,6 @@ set(INSTALL_HEADER_FILES
     # Client
     client/QXmppArchiveManager.h
     client/QXmppBookmarkManager.h
-    client/QXmppCallManager.h
     client/QXmppCarbonManager.h
     client/QXmppClient.h
     client/QXmppClientExtension.h
@@ -105,7 +103,6 @@ set(SOURCE_FILES
     base/QXmppBitsOfBinaryIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
-    base/QXmppCodec.cpp
     base/QXmppConstants.cpp
     base/QXmppDataForm.cpp
     base/QXmppDiscoveryIq.cpp
@@ -130,9 +127,6 @@ set(SOURCE_FILES
     base/QXmppResultSet.cpp
     base/QXmppRosterIq.cpp
     base/QXmppRpcIq.cpp
-    base/QXmppRtcpPacket.cpp
-    base/QXmppRtpChannel.cpp
-    base/QXmppRtpPacket.cpp
     base/QXmppSasl.cpp
     base/QXmppSessionIq.cpp
     base/QXmppSocks.cpp
@@ -151,7 +145,6 @@ set(SOURCE_FILES
     client/QXmppDiscoveryManager.cpp
     client/QXmppArchiveManager.cpp
     client/QXmppBookmarkManager.cpp
-    client/QXmppCallManager.cpp
     client/QXmppCarbonManager.cpp
     client/QXmppClient.cpp
     client/QXmppClientExtension.cpp
@@ -184,35 +177,24 @@ set(SOURCE_FILES
     server/QXmppServerPlugin.cpp
 )
 
-option(WITH_SPEEX "Support the Speex codec" OFF)
-option(WITH_OPUS "Support the Opus codec" OFF)
-option(WITH_THEORA "Support the Theora codec" OFF)
-option(WITH_VPX "Support the VPX codec" OFF)
-option(BUILD_SHARED "Build SHARED library" ON)
+if(WITH_GSTREAMER)
+    find_package(GStreamer REQUIRED)
+    find_package(GLIB2 REQUIRED)
+    find_package(GObject REQUIRED)
 
-if(WITH_SPEEX)
-    find_package(Speex REQUIRED)
-    include_directories(${Speex_INCLUDE_DIRS})
-    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Speex_LIBRARIES})
-    add_definitions(-DQXMPP_USE_SPEEX)
-endif()
-if(WITH_OPUS)
-    find_package(Opus REQUIRED)
-    include_directories(${Opus_INCLUDE_DIRS})
-    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Opus_LIBRARIES})
-    add_definitions(-DQXMPP_USE_OPUS)
-endif()
-if(WITH_THEORA)
-    find_package(Theora REQUIRED)
-    include_directories(${Theora_INCLUDE_DIRS})
-    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${Theora_LIBRARIES})
-    add_definitions(-DQXMPP_USE_THEORA)
-endif()
-if(WITH_VPX)
-    find_package(VPX REQUIRED)
-    include_directories(${VPX_INCLUDE_DIRS})
-    set(MULTIMEDIA_LIBS ${MULTIMEDIA_LIBS} ${VPX_LIBRARIES})
-    add_definitions(-DQXMPP_USE_VPX)
+    set(INSTALL_HEADER_FILES
+        ${INSTALL_HEADER_FILES}
+        client/QXmppCall.h
+        client/QXmppCallManager.h
+        client/QXmppCallStream.h
+    )
+
+    set(SOURCE_FILES
+        ${SOURCE_FILES}
+        client/QXmppCall.cpp
+        client/QXmppCallManager.cpp
+        client/QXmppCallStream.cpp
+    )
 endif()
 
 if(BUILD_SHARED)
@@ -234,6 +216,9 @@ target_include_directories(qxmpp
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/base>
     $<INSTALL_INTERFACE:include/qxmpp>
+    ${GLIB2_INCLUDE_DIR}
+    ${GOBJECT_INCLUDE_DIR}
+    ${GSTREAMER_INCLUDE_DIRS}
 )
 
 target_link_libraries(qxmpp
@@ -241,9 +226,16 @@ target_link_libraries(qxmpp
     Qt5::Core
     Qt5::Network
     Qt5::Xml
-    PRIVATE
-    ${MULTIMEDIA_LIBS}
 )
+
+if(WITH_GSTREAMER)
+    target_link_libraries(qxmpp
+        PUBLIC
+        ${GLIB2_LIBRARIES}
+        ${GOBJECT_LIBRARIES}
+        ${GSTREAMER_LIBRARY}
+    )
+endif()
 
 install(
     TARGETS qxmpp
