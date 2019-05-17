@@ -22,6 +22,8 @@ option(BUILD_INTERNAL_TESTS "Build internal tests." OFF)
 option(BUILD_DOCUMENTATION "Build API documentation." OFF)
 option(BUILD_EXAMPLES "Build examples." ON)
 
+option(WITH_GSTREAMER "Build with GStreamer support for Jingle" OFF)
+
 add_subdirectory(src)
 
 if(BUILD_TESTS)

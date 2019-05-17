@@ -7,7 +7,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
 
     case "$CONFIG" in
     full*)
-        brew install doxygen opus speex theora libvpx
+        brew install doxygen gstreamer gst-plugins-base gst-plugins-good gst-plugins-ugly
         ;;
     esac
 else
@@ -16,7 +16,7 @@ else
 
     case "$CONFIG" in
     full*)
-        sudo apt-get install -qq  doxygen libopus-dev libspeex-dev libtheora-dev libvpx-dev
+        sudo apt-get install -qq  doxygen libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly
         ;;
     esac
 fi

@@ -24,6 +24,7 @@
 #ifndef QXMPPCALLMANAGER_H
 #define QXMPPCALLMANAGER_H
 
+#include "QXmppCall.h"
 #include "QXmppClientExtension.h"
 #include "QXmppLogger.h"
 
@@ -32,121 +33,12 @@
 #include <QObject>
 
 class QHostAddress;
-class QXmppCallPrivate;
-class QXmppCallManager;
 class QXmppCallManagerPrivate;
 class QXmppIq;
 class QXmppJingleCandidate;
 class QXmppJingleIq;
 class QXmppJinglePayloadType;
 class QXmppPresence;
-class QXmppRtpAudioChannel;
-class QXmppRtpVideoChannel;
-
-/// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
-///
-/// To get the QIODevice from which you can read / write audio samples, call
-/// audioChannel().
-///
-/// \note THIS API IS NOT FINALIZED YET
-
-class QXMPP_EXPORT QXmppCall : public QXmppLoggable
-{
-    Q_OBJECT
-    Q_FLAGS(QIODevice::OpenModeFlag QIODevice::OpenMode)
-    Q_PROPERTY(Direction direction READ direction CONSTANT)
-    Q_PROPERTY(QString jid READ jid CONSTANT)
-    Q_PROPERTY(State state READ state NOTIFY stateChanged)
-    Q_PROPERTY(QIODevice::OpenMode audioMode READ audioMode NOTIFY audioModeChanged)
-    Q_PROPERTY(QIODevice::OpenMode videoMode READ videoMode NOTIFY videoModeChanged)
-
-public:
-    /// This enum is used to describe the direction of a call.
-    enum Direction {
-        IncomingDirection,  ///< The call is incoming.
-        OutgoingDirection   ///< The call is outgoing.
-    };
-    Q_ENUM(Direction)
-
-    /// This enum is used to describe the state of a call.
-    enum State {
-        ConnectingState = 0,     ///< The call is being connected.
-        ActiveState = 1,         ///< The call is active.
-        DisconnectingState = 2,  ///< The call is being disconnected.
-        FinishedState = 3        ///< The call is finished.
-    };
-    Q_ENUM(State)
-
-    ~QXmppCall() override;
-
-    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
-    /// Returns the call's direction.
-    QXmppCall::Direction direction() const;
-    /// Returns the remote party's JID.
-    QString jid() const;
-    ///
-    /// Returns the call's state.
-    ///
-    /// \sa stateChanged()
-    ///
-    QXmppCall::State state() const;
-
-    QString sid() const;
-
-    QXmppRtpAudioChannel *audioChannel() const;
-    QXmppRtpVideoChannel *videoChannel() const;
-
-    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
-    /// Returns the audio mode.
-    QIODevice::OpenMode audioMode() const;
-    /// Returns the video mode.
-    QIODevice::OpenMode videoMode() const;
-
-Q_SIGNALS:
-    /// \brief This signal is emitted when a call is connected.
-    ///
-    /// Once this signal is emitted, you can connect a QAudioOutput and
-    /// QAudioInput to the call. You can determine the appropriate clockrate
-    /// and the number of channels by calling payloadType().
-    void connected();
-
-    /// \brief This signal is emitted when a call is finished.
-    ///
-    /// Note: Do not delete the call in the slot connected to this signal,
-    /// instead use deleteLater().
-    void finished();
-
-    /// \brief This signal is emitted when the remote party is ringing.
-    void ringing();
-
-    /// \brief This signal is emitted when the call state changes.
-    void stateChanged(QXmppCall::State state);
-
-    /// \brief This signal is emitted when the audio channel changes.
-    void audioModeChanged(QIODevice::OpenMode mode);
-
-    /// \brief This signal is emitted when the video channel changes.
-    void videoModeChanged(QIODevice::OpenMode mode);
-
-public Q_SLOTS:
-    void accept();
-    void hangup();
-    void startVideo();
-    void stopVideo();
-
-private Q_SLOTS:
-    void localCandidatesChanged();
-    void terminated();
-    void updateOpenMode();
-
-private:
-    QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
-
-    QXmppCallPrivate *d;
-    friend class QXmppCallManager;
-    friend class QXmppCallManagerPrivate;
-    friend class QXmppCallPrivate;
-};
 
 /// \brief The QXmppCallManager class provides support for making and
 /// receiving voice calls.
@@ -217,7 +109,5 @@ private:
     friend class QXmppCallPrivate;
     friend class QXmppCallManagerPrivate;
 };
-
-Q_DECLARE_METATYPE(QXmppCall::State)
 
 #endif
