@@ -3,6 +3,9 @@ QXmpp 1.3.0 (UNRELEASED)
 
 *under development*
 
+New features:
+ - Port QXmppCallManager to GStreamer
+
 QXmpp 1.2.0 (Feb 06, 2020)
 --------------------------
 
