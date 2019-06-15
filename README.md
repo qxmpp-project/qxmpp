@@ -40,10 +40,7 @@ You can pass the following arguments to CMake:
     BUILD_DOCUMENTATION           to build the documentation (default: false)
     BUILD_EXAMPLES                to build the examples (default: true)
     BUILD_TESTS                   to build the unit tests (default: true)
-    WITH_OPUS                     to enable opus audio codec (default: false)
-    WITH_SPEEX                    to enable speex audio codec (default: false)
-    WITH_THEORA                   to enable theora video codec (default: false)
-    WITH_VPX                      to enable vpx video codec (default: false)
+    WITH_GSTREAMER                to enable audio/video over jingle (default: false)
 
 Installing QXmpp
 ================
