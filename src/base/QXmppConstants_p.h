@@ -74,6 +74,7 @@ extern const char* ns_bytestreams;
 // XEP-0066: Out of Band Data
 extern const char* ns_oob;
 // XEP-0071: XHTML-IM
+extern const char *ns_xhtml;
 extern const char *ns_xhtml_im;
 // XEP-0077: In-Band Registration
 extern const char* ns_register;
