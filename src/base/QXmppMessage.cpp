@@ -4,6 +4,7 @@
  * Authors:
  *  Manjeet Dahiya
  *  Jeremy Lainé
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -22,37 +23,37 @@
  *
  */
 
+#include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
-#include <QPair>
 
 #include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-static const char* chat_states[] = {
-    "",
-    "active",
-    "inactive",
-    "gone",
-    "composing",
-    "paused",
+static const QStringList CHAT_STATES = {
+    QString(),
+    QStringLiteral("active"),
+    QStringLiteral("inactive"),
+    QStringLiteral("gone"),
+    QStringLiteral("composing"),
+    QStringLiteral("paused")
 };
 
-static const char* message_types[] = {
-    "error",
-    "normal",
-    "chat",
-    "groupchat",
-    "headline"
+static const QStringList MESSAGE_TYPES = {
+    QStringLiteral("error"),
+    QStringLiteral("normal"),
+    QStringLiteral("chat"),
+    QStringLiteral("groupchat"),
+    QStringLiteral("headline")
 };
 
-static const char* marker_types[] = {
-    "",
-    "received",
-    "displayed",
-    "acknowledged"
+static const QStringList MARKER_TYPES = {
+    QString(),
+    QStringLiteral("received"),
+    QStringLiteral("displayed"),
+    QStringLiteral("acknowledged")
 };
 
 static const QStringList ENCRYPTION_NAMESPACES = {
@@ -80,7 +81,10 @@ static const QStringList ENCRYPTION_NAMES = {
     QStringLiteral("OMEMO")
 };
 
-static const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
+static bool checkElement(const QDomElement &element, const QString &tagName, const QString &xmlns)
+{
+    return element.tagName() == tagName && element.namespaceURI() == xmlns;
+}
 
 enum StampType
 {
@@ -91,6 +95,8 @@ enum StampType
 class QXmppMessagePrivate : public QSharedData
 {
 public:
+    QXmppMessagePrivate();
+
     QXmppMessage::Type type;
     QDateTime stamp;
     StampType stampType;
@@ -143,9 +149,23 @@ public:
     QString encryptionName;
 
     // XEP-0382: Spoiler messages
-    bool isSpoiler = false;
+    bool isSpoiler;
     QString spoilerHint;
 };
+
+QXmppMessagePrivate::QXmppMessagePrivate()
+    : type(QXmppMessage::Normal),
+      stampType(DelayedDelivery),
+      state(QXmppMessage::None),
+      attentionRequested(false),
+      receiptRequested(false),
+      markable(false),
+      marker(QXmppMessage::NoMarker),
+      privatemsg(false),
+      hints(0),
+      isSpoiler(false)
+{
+}
 
 /// Constructs a QXmppMessage.
 ///
@@ -160,45 +180,29 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
     , d(new QXmppMessagePrivate)
 {
     d->type = Chat;
-    d->stampType = DelayedDelivery;
-    d->state = None;
-    d->attentionRequested = false;
     d->body = body;
     d->thread = thread;
-    d->receiptRequested = false;
-
-    d->markable = false;
-    d->marker = NoMarker;
-
-    d->privatemsg = false;
-
-    d->hints = 0;
 }
 
 /// Constructs a copy of \a other.
 
-QXmppMessage::QXmppMessage(const QXmppMessage &other)
-    : QXmppStanza(other)
-    , d(other.d)
-{
-}
+QXmppMessage::QXmppMessage(const QXmppMessage &other) = default;
 
-QXmppMessage::~QXmppMessage()
-{
-
-}
+QXmppMessage::~QXmppMessage() = default;
 
 /// Assigns \a other to this message.
 
-QXmppMessage& QXmppMessage::operator=(const QXmppMessage &other)
+QXmppMessage& QXmppMessage::operator=(const QXmppMessage &other) = default;
+
+/// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
+/// iq or presence)
+
+bool QXmppMessage::isXmppStanza() const
 {
-    QXmppStanza::operator=(other);
-    d = other.d;
-    return *this;
+    return true;
 }
 
 /// Returns the message's body.
-///
 
 QString QXmppMessage::body() const
 {
@@ -317,7 +321,6 @@ void QXmppMessage::setMucInvitationReason(const QString &reason)
 }
 
 /// Returns the message's type.
-///
 
 QXmppMessage::Type QXmppMessage::type() const
 {
@@ -367,7 +370,6 @@ void QXmppMessage::setState(QXmppMessage::State state)
 }
 
 /// Returns the message's subject.
-///
 
 QString QXmppMessage::subject() const
 {
@@ -413,28 +415,6 @@ QString QXmppMessage::xhtml() const
 void QXmppMessage::setXhtml(const QString &xhtml)
 {
     d->xhtml = xhtml;
-}
-
-namespace
-{
-    static QList<QPair<QString, QString> > knownMessageSubelems()
-    {
-        QList<QPair<QString, QString> > result;
-        result << qMakePair(QString("body"), QString())
-               << qMakePair(QString("subject"), QString())
-               << qMakePair(QString("thread"), QString())
-               << qMakePair(QString("html"), QString())
-               << qMakePair(QString("received"), QString(ns_message_receipts))
-               << qMakePair(QString("replace"), QString(ns_message_correct))
-               << qMakePair(QString("request"), QString())
-               << qMakePair(QString("delay"), QString())
-               << qMakePair(QString("attention"), QString())
-               << qMakePair(QString("addresses"), QString())
-               << qMakePair(QString("private"), QString(ns_carbons));
-        for (int i = QXmppMessage::Active; i <= QXmppMessage::Paused; i++)
-            result << qMakePair(QString(chat_states[i]), QString());
-        return result;
-    }
 }
 
 /// Returns true if a message is markable, as defined
@@ -517,14 +497,6 @@ bool QXmppMessage::isPrivate() const
 void QXmppMessage::setPrivate(const bool priv)
 {
     d->privatemsg = priv;
-}
-
-/// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
-/// iq or presence)
-
-bool QXmppMessage::isXmppStanza() const
-{
-    return true;
 }
 
 /// Returns a possibly attached URL from XEP-0066: Out of Band Data
@@ -756,294 +728,154 @@ void QXmppMessage::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    const QString type = element.attribute("type");
-    d->type = Normal;
-    for (int i = Error; i <= Headline; i++) {
-        if (type == message_types[i]) {
-            d->type = static_cast<Type>(i);
-            break;
-        }
-    }
-
-    d->body = element.firstChildElement("body").text();
-    d->subject = element.firstChildElement("subject").text();
-    d->thread = element.firstChildElement("thread").text();
-
-    // chat states
-    for (int i = Active; i <= Paused; i++)
-    {
-        QDomElement stateElement = element.firstChildElement(chat_states[i]);
-        if (!stateElement.isNull() &&
-            stateElement.namespaceURI() == ns_chat_states)
-        {
-            d->state = static_cast<QXmppMessage::State>(i);
-            break;
-        }
-    }
-
-    // XEP-0071: XHTML-IM
-    QDomElement htmlElement = element.firstChildElement("html");
-    if (!htmlElement.isNull() && htmlElement.namespaceURI() == ns_xhtml_im) {
-        QDomElement bodyElement = htmlElement.firstChildElement("body");
-        if (!bodyElement.isNull() && bodyElement.namespaceURI() == ns_xhtml) {
-            QTextStream stream(&d->xhtml, QIODevice::WriteOnly);
-            bodyElement.save(stream, 0);
-
-            d->xhtml = d->xhtml.mid(d->xhtml.indexOf('>') + 1);
-            d->xhtml.replace(" xmlns=\"http://www.w3.org/1999/xhtml\"", "");
-            d->xhtml.replace("</body>", "");
-            d->xhtml = d->xhtml.trimmed();
-        }
-    }
-
-    // XEP-0184: Message Delivery Receipts
-    QDomElement receivedElement = element.firstChildElement("received");
-    if (!receivedElement.isNull() && receivedElement.namespaceURI() == ns_message_receipts) {
-        d->receiptId = receivedElement.attribute("id");
-
-        // compatibility with old-style XEP
-        if (d->receiptId.isEmpty())
-            d->receiptId = id();
-    } else {
-        d->receiptId = QString();
-    }
-    d->receiptRequested = element.firstChildElement("request").namespaceURI() == ns_message_receipts;
-
-    // XEP-0203: Delayed Delivery
-    QDomElement delayElement = element.firstChildElement("delay");
-    if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery)
-    {
-        const QString str = delayElement.attribute("stamp");
-        d->stamp = QXmppUtils::datetimeFromString(str);
-        d->stampType = DelayedDelivery;
-    }
-
-    // XEP-0224: Attention
-    d->attentionRequested = element.firstChildElement("attention").namespaceURI() == ns_attention;
-
-    // XEP-0333: Chat Markers
-    QDomElement markableElement = element.firstChildElement("markable");
-    if (!markableElement.isNull())
-    {
-        d->markable = true;
-    }
-    // check for all the marker types
-    QDomElement chatStateElement;
-    QXmppMessage::Marker marker = QXmppMessage::NoMarker;
-    for (int i = Received; i <= Acknowledged; i++)
-    {
-        chatStateElement = element.firstChildElement(marker_types[i]);
-        if (!chatStateElement.isNull() &&
-            chatStateElement.namespaceURI() == ns_chat_markers)
-        {
-            marker = static_cast<QXmppMessage::Marker>(i);
-            break;
-        }
-    }
-    // if marker is present, check it's the right ns
-    if (!chatStateElement.isNull())
-    {
-        if (chatStateElement.namespaceURI() == ns_chat_markers)
-        {
-            d->marker = marker;
-            d->markedId = chatStateElement.attribute("id", QString());
-            d->markedThread = chatStateElement.attribute("thread", QString());
-        }
-    }
-
-    // XEP-0280: Message Carbons
-    QDomElement privateElement = element.firstChildElement("private");
-    if (!privateElement.isNull())
-        d->privatemsg = true;
-
-    // XEP-0308: Last Message Correction
-    QDomElement replaceElement = element.firstChildElement("replace");
-    if (!replaceElement.isNull() && replaceElement.namespaceURI() == ns_message_correct)
-        d->replaceId = replaceElement.attribute("id");
-
-    const QList<QPair<QString, QString> > &knownElems = knownMessageSubelems();
+    // message type
+    int messageType = MESSAGE_TYPES.indexOf(element.attribute(QStringLiteral("type")));
+    if (messageType != -1)
+        d->type = static_cast<Type>(messageType);
+    else
+        d->type = QXmppMessage::Normal;
 
     QXmppElementList extensions;
-    QDomElement xElement = element.firstChildElement();
-    while (!xElement.isNull())
-    {
-        if (xElement.tagName() == "x")
-        {
-            if (xElement.namespaceURI() == ns_legacy_delayed_delivery)
-            {
-                // if XEP-0203 exists, XEP-0091 has no need to parse because XEP-0091 is no more standard protocol)
-                if (d->stamp.isNull())
-                {
-                    // XEP-0091: Legacy Delayed Delivery
-                    const QString str = xElement.attribute("stamp");
-                    d->stamp = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-                    d->stamp.setTimeSpec(Qt::UTC);
-                    d->stampType = LegacyDelayedDelivery;
-                }
-            } else if (xElement.namespaceURI() == ns_conference) {
-                // XEP-0249: Direct MUC Invitations
-                d->mucInvitationJid = xElement.attribute("jid");
-                d->mucInvitationPassword = xElement.attribute("password");
-                d->mucInvitationReason = xElement.attribute("reason");
-            } else if (xElement.namespaceURI() == ns_oob) {
-                // XEP-0066: Out of Band Data
-                d->outOfBandUrl = xElement.firstChildElement("url").text();
-            }
-            else {
-                extensions << QXmppElement(xElement);
-            }
-        // XEP-0334: Message Processing Hints
-        } else if (xElement.namespaceURI() == ns_message_processing_hints && HINT_TYPES.contains(xElement.tagName())) {
-            addHint(Hint(1 << HINT_TYPES.indexOf(xElement.tagName())));
-        // XEP-0367: Message Attaching
-        } else if (xElement.tagName() == "attach-to" && xElement.namespaceURI() == ns_message_attaching) {
-            d->attachId = xElement.attribute("id");
-        // XEP-0369: Mediated Information eXchange (MIX)
-        } else if (xElement.tagName() == "mix" && xElement.namespaceURI() == ns_mix) {
-            d->mixUserJid = xElement.firstChildElement("jid").text();
-            d->mixUserNick = xElement.firstChildElement("nick").text();
-        // XEP-0380: Explicit Message Encryption
-        } else if (xElement.tagName() == "encryption" && xElement.namespaceURI() == ns_eme) {
-            d->encryptionMethod = xElement.attribute("namespace");
-            d->encryptionName = xElement.attribute("name");
-        // XEP-0382: Spoiler messages
-        } else if (xElement.tagName() == "spoiler" && xElement.namespaceURI() == ns_spoiler) {
-            d->isSpoiler = true;
-            d->spoilerHint = xElement.text();
-        } else if (!knownElems.contains(qMakePair(xElement.tagName(), xElement.namespaceURI())) &&
-                   !knownElems.contains(qMakePair(xElement.tagName(), QString()))) {
-            // other extensions
-            extensions << QXmppElement(xElement);
+    QDomElement childElement = element.firstChildElement();
+    while (!childElement.isNull()) {
+        if (childElement.tagName() == QStringLiteral("body")) {
+            d->body = childElement.text();
+        } else if (childElement.tagName() == QStringLiteral("subject")) {
+            d->subject = childElement.text();
+        } else if (childElement.tagName() == QStringLiteral("thread")) {
+            d->thread = childElement.text();
+        // parse message extensions
+        // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
+        } else if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
+                   childElement.tagName() != QStringLiteral("error")) {
+            parseExtension(childElement, extensions);
         }
-        xElement = xElement.nextSiblingElement();
+        childElement = childElement.nextSiblingElement();
     }
     setExtensions(extensions);
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    xmlWriter->writeStartElement("message");
-    helperToXmlAddAttribute(xmlWriter, "xml:lang", lang());
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", message_types[d->type]);
+    xmlWriter->writeStartElement(QStringLiteral("message"));
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("xml:lang"), lang());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("id"), id());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("to"), to());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("from"), from());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), MESSAGE_TYPES.at(d->type));
     if (!d->subject.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "subject", d->subject);
+        helperToXmlAddTextElement(xmlWriter, QStringLiteral("subject"), d->subject);
     if (!d->body.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "body", d->body);
+        helperToXmlAddTextElement(xmlWriter, QStringLiteral("body"), d->body);
     if (!d->thread.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, "thread", d->thread);
+        helperToXmlAddTextElement(xmlWriter, QStringLiteral("thread"), d->thread);
     error().toXml(xmlWriter);
 
     // chat states
-    if (d->state > None && d->state <= Paused)
-    {
-        xmlWriter->writeStartElement(chat_states[d->state]);
-        xmlWriter->writeAttribute("xmlns", ns_chat_states);
+    if (d->state > None && d->state <= Paused) {
+        xmlWriter->writeStartElement(CHAT_STATES.at(d->state));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_states);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0071: XHTML-IM
     if (!d->xhtml.isEmpty()) {
-        xmlWriter->writeStartElement("html");
-        xmlWriter->writeAttribute("xmlns", ns_xhtml_im);
-        xmlWriter->writeStartElement("body");
-        xmlWriter->writeAttribute("xmlns", ns_xhtml);
-        xmlWriter->writeCharacters("");
+        xmlWriter->writeStartElement(QStringLiteral("html"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_xhtml_im);
+        xmlWriter->writeStartElement(QStringLiteral("body"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_xhtml);
+        xmlWriter->writeCharacters(QStringLiteral(""));
         xmlWriter->device()->write(d->xhtml.toUtf8());
         xmlWriter->writeEndElement();
         xmlWriter->writeEndElement();
     }
 
     // time stamp
-    if (d->stamp.isValid())
-    {
+    if (d->stamp.isValid()) {
         QDateTime utcStamp = d->stamp.toUTC();
-        if (d->stampType == DelayedDelivery)
-        {
+        if (d->stampType == DelayedDelivery) {
             // XEP-0203: Delayed Delivery
-            xmlWriter->writeStartElement("delay");
-            xmlWriter->writeAttribute("xmlns", ns_delayed_delivery);
-            helperToXmlAddAttribute(xmlWriter, "stamp", QXmppUtils::datetimeToString(utcStamp));
+            xmlWriter->writeStartElement(QStringLiteral("delay"));
+            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_delayed_delivery);
+            helperToXmlAddAttribute(xmlWriter, QStringLiteral("stamp"), QXmppUtils::datetimeToString(utcStamp));
             xmlWriter->writeEndElement();
         } else {
             // XEP-0091: Legacy Delayed Delivery
-            xmlWriter->writeStartElement("x");
-            xmlWriter->writeAttribute("xmlns", ns_legacy_delayed_delivery);
-            helperToXmlAddAttribute(xmlWriter, "stamp", utcStamp.toString("yyyyMMddThh:mm:ss"));
+            xmlWriter->writeStartElement(QStringLiteral("x"));
+            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_legacy_delayed_delivery);
+            helperToXmlAddAttribute(xmlWriter, QStringLiteral("stamp"), utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
             xmlWriter->writeEndElement();
         }
     }
 
     // XEP-0184: Message Delivery Receipts
     if (!d->receiptId.isEmpty()) {
-        xmlWriter->writeStartElement("received");
-        xmlWriter->writeAttribute("xmlns", ns_message_receipts);
-        xmlWriter->writeAttribute("id", d->receiptId);
+        xmlWriter->writeStartElement(QStringLiteral("received"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_receipts);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->receiptId);
         xmlWriter->writeEndElement();
     }
     if (d->receiptRequested) {
-        xmlWriter->writeStartElement("request");
-        xmlWriter->writeAttribute("xmlns", ns_message_receipts);
+        xmlWriter->writeStartElement(QStringLiteral("request"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_receipts);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0224: Attention
     if (d->attentionRequested) {
-        xmlWriter->writeStartElement("attention");
-        xmlWriter->writeAttribute("xmlns", ns_attention);
+        xmlWriter->writeStartElement(QStringLiteral("attention"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_attention);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0249: Direct MUC Invitations
     if (!d->mucInvitationJid.isEmpty()) {
-        xmlWriter->writeStartElement("x");
-        xmlWriter->writeAttribute("xmlns", ns_conference);
-        xmlWriter->writeAttribute("jid", d->mucInvitationJid);
+        xmlWriter->writeStartElement(QStringLiteral("x"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_conference);
+        xmlWriter->writeAttribute(QStringLiteral("jid"), d->mucInvitationJid);
         if (!d->mucInvitationPassword.isEmpty())
-            xmlWriter->writeAttribute("password", d->mucInvitationPassword);
+            xmlWriter->writeAttribute(QStringLiteral("password"), d->mucInvitationPassword);
         if (!d->mucInvitationReason.isEmpty())
-            xmlWriter->writeAttribute("reason", d->mucInvitationReason);
+            xmlWriter->writeAttribute(QStringLiteral("reason"), d->mucInvitationReason);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0333: Chat Markers
     if (d->markable) {
-        xmlWriter->writeStartElement("markable");
-        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
+        xmlWriter->writeStartElement(QStringLiteral("markable"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_markers);
         xmlWriter->writeEndElement();
     }
     if (d->marker != NoMarker) {
-        xmlWriter->writeStartElement(marker_types[d->marker]);
-        xmlWriter->writeAttribute("xmlns", ns_chat_markers);
-        xmlWriter->writeAttribute("id", d->markedId);
+        xmlWriter->writeStartElement(MARKER_TYPES.at(d->marker));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_markers);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->markedId);
         if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
-            xmlWriter->writeAttribute("thread", d->markedThread);
+            xmlWriter->writeAttribute(QStringLiteral("thread"), d->markedThread);
         }
         xmlWriter->writeEndElement();
     }
 
     // XEP-0280: Message Carbons
     if (d->privatemsg) {
-        xmlWriter->writeStartElement("private");
-        xmlWriter->writeAttribute("xmlns", ns_carbons);
+        xmlWriter->writeStartElement(QStringLiteral("private"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_carbons);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0066: Out of Band Data
     if (!d->outOfBandUrl.isEmpty()) {
-        xmlWriter->writeStartElement("x");
-        xmlWriter->writeAttribute("xmlns", ns_oob);
-        xmlWriter->writeTextElement("url", d->outOfBandUrl);
+        xmlWriter->writeStartElement(QStringLiteral("x"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_oob);
+        xmlWriter->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0308: Last Message Correction
     if (!d->replaceId.isEmpty()) {
-        xmlWriter->writeStartElement("replace");
-        xmlWriter->writeAttribute("xmlns", ns_message_correct);
-        xmlWriter->writeAttribute("id", d->replaceId);
+        xmlWriter->writeStartElement(QStringLiteral("replace"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_correct);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->replaceId);
         xmlWriter->writeEndElement();
     }
 
@@ -1051,41 +883,41 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     for (quint8 i = 0; i < HINT_TYPES.size(); i++) {
         if (hasHint(Hint(1 << i))) {
             xmlWriter->writeStartElement(HINT_TYPES.at(i));
-            xmlWriter->writeAttribute("xmlns", ns_message_processing_hints);
+            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_processing_hints);
             xmlWriter->writeEndElement();
         }
     }
 
     // XEP-0367: Message Attaching
     if (!d->attachId.isEmpty()) {
-        xmlWriter->writeStartElement("attach-to");
-        xmlWriter->writeAttribute("xmlns", ns_message_attaching);
-        xmlWriter->writeAttribute("id", d->attachId);
+        xmlWriter->writeStartElement(QStringLiteral("attach-to"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_attaching);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->attachId);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0369: Mediated Information eXchange (MIX)
     if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
-        xmlWriter->writeStartElement("mix");
-        xmlWriter->writeAttribute("xmlns", ns_mix);
-        helperToXmlAddTextElement(xmlWriter, "jid", d->mixUserJid);
-        helperToXmlAddTextElement(xmlWriter, "nick", d->mixUserNick);
+        xmlWriter->writeStartElement(QStringLiteral("mix"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_mix);
+        helperToXmlAddTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
+        helperToXmlAddTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0380: Explicit Message Encryption
     if (!d->encryptionMethod.isEmpty()) {
-        xmlWriter->writeStartElement("encryption");
-        xmlWriter->writeAttribute("xmlns", ns_eme);
-        xmlWriter->writeAttribute("namespace", d->encryptionMethod);
-        helperToXmlAddAttribute(xmlWriter, "name", d->encryptionName);
+        xmlWriter->writeStartElement(QStringLiteral("encryption"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_eme);
+        xmlWriter->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
+        helperToXmlAddAttribute(xmlWriter, QStringLiteral("name"), d->encryptionName);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0382: Spoiler messages
     if (d->isSpoiler) {
-        xmlWriter->writeStartElement("spoiler");
-        xmlWriter->writeAttribute("xmlns", ns_spoiler);
+        xmlWriter->writeStartElement(QStringLiteral("spoiler"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_spoiler);
         xmlWriter->writeCharacters(d->spoilerHint);
         xmlWriter->writeEndElement();
     }
@@ -1096,3 +928,125 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     xmlWriter->writeEndElement();
 }
 /// \endcond
+
+/// Parses message extensions
+///
+/// \param element child element of the message to be parsed
+/// \param unknownExtensions extensions not known are added to this list as QXmppElement
+
+void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &unknownExtensions)
+{
+    if (element.tagName() == QStringLiteral("x")) {
+        parseXElement(element, unknownExtensions);
+    // XEP-0071: XHTML-IM
+    } else if (checkElement(element, QStringLiteral("html"), ns_xhtml_im)) {
+        QDomElement bodyElement = element.firstChildElement(QStringLiteral("body"));
+        if (!bodyElement.isNull() && bodyElement.namespaceURI() == ns_xhtml) {
+            QTextStream stream(&d->xhtml, QIODevice::WriteOnly);
+            bodyElement.save(stream, 0);
+
+            d->xhtml = d->xhtml.mid(d->xhtml.indexOf('>') + 1);
+            d->xhtml.replace(
+                QStringLiteral(" xmlns=\"http://www.w3.org/1999/xhtml\""),
+                QString()
+            );
+            d->xhtml.replace(QStringLiteral("</body>"), QString());
+            d->xhtml = d->xhtml.trimmed();
+        }
+    // XEP-0085: Chat State Notifications
+    } else if (element.namespaceURI() == ns_chat_states) {
+        int i = CHAT_STATES.indexOf(element.tagName());
+        if (i > 0)
+            d->state = static_cast<QXmppMessage::State>(i);
+    // XEP-0184: Message Delivery Receipts
+    } else if (checkElement(element, QStringLiteral("received"), ns_message_receipts)) {
+        d->receiptId = element.attribute(QStringLiteral("id"));
+
+        // compatibility with old-style XEP
+        if (d->receiptId.isEmpty())
+            d->receiptId = id();
+    } else if (checkElement(element, QStringLiteral("request"), ns_message_receipts)) {
+        d->receiptRequested = true;
+    // XEP-0203: Delayed Delivery
+    } else if (checkElement(element, QStringLiteral("delay"), ns_delayed_delivery)) {
+        d->stamp = QXmppUtils::datetimeFromString(
+            element.attribute(QStringLiteral("stamp"))
+        );
+        d->stampType = DelayedDelivery;
+    // XEP-0224: Attention
+    } else if (checkElement(element, QStringLiteral("attention"), ns_attention)) {
+        d->attentionRequested = true;
+    // XEP-0280: Message Carbons
+    } else if (checkElement(element, QStringLiteral("private"), ns_carbons)) {
+        d->privatemsg = true;
+    // XEP-0308: Last Message Correction
+    } else if (checkElement(element, QStringLiteral("replace"), ns_message_correct)) {
+        d->replaceId = element.attribute(QStringLiteral("id"));
+    // XEP-0333: Chat Markers
+    } else if (element.namespaceURI() == ns_chat_markers) {
+        if (element.tagName() == QStringLiteral("markable")) {
+            d->markable = true;
+        } else {
+            int marker = MARKER_TYPES.indexOf(element.tagName());
+            if (marker != -1) {
+                d->marker = static_cast<QXmppMessage::Marker>(marker);
+                d->markedId = element.attribute(QStringLiteral("id"));
+                d->markedThread = element.attribute(QStringLiteral("thread"));
+            }
+        }
+    // XEP-0334: Message Processing Hints
+    } else if (element.namespaceURI() == ns_message_processing_hints &&
+               HINT_TYPES.contains(element.tagName())) {
+        addHint(Hint(1 << HINT_TYPES.indexOf(element.tagName())));
+    // XEP-0367: Message Attaching
+    } else if (checkElement(element, QStringLiteral("attach-to"), ns_message_attaching)) {
+        d->attachId = element.attribute(QStringLiteral("id"));
+    // XEP-0369: Mediated Information eXchange (MIX)
+    } else if (checkElement(element, QStringLiteral("mix"), ns_mix)) {
+        d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
+        d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
+    // XEP-0380: Explicit Message Encryption
+    } else if (checkElement(element, QStringLiteral("encryption"), ns_eme)) {
+        d->encryptionMethod = element.attribute(QStringLiteral("namespace"));
+        d->encryptionName = element.attribute(QStringLiteral("name"));
+    // XEP-0382: Spoiler messages
+    } else if (checkElement(element, QStringLiteral("spoiler"), ns_spoiler)) {
+        d->isSpoiler = true;
+        d->spoilerHint = element.text();
+    } else {
+        // other extensions
+        unknownExtensions << QXmppElement(element);
+    }
+}
+
+/// Parses <x/> child elements of the message
+///
+/// \param element child element of the message to be parsed
+/// \param unknownExtensions extensions not known are added to this list as QXmppElement
+
+void QXmppMessage::parseXElement(const QDomElement &element, QXmppElementList &unknownExtensions)
+{
+    if (element.namespaceURI() == ns_legacy_delayed_delivery) {
+        // if XEP-0203 exists, XEP-0091 has no need to parse because XEP-0091
+        // is no more standard protocol)
+        if (d->stamp.isNull()) {
+            // XEP-0091: Legacy Delayed Delivery
+            d->stamp = QDateTime::fromString(
+                element.attribute(QStringLiteral("stamp")),
+                QStringLiteral("yyyyMMddThh:mm:ss")
+            );
+            d->stamp.setTimeSpec(Qt::UTC);
+            d->stampType = LegacyDelayedDelivery;
+        }
+    } else if (element.namespaceURI() == ns_conference) {
+        // XEP-0249: Direct MUC Invitations
+        d->mucInvitationJid = element.attribute(QStringLiteral("jid"));
+        d->mucInvitationPassword = element.attribute(QStringLiteral("password"));
+        d->mucInvitationReason = element.attribute(QStringLiteral("reason"));
+    } else if (element.namespaceURI() == ns_oob) {
+        // XEP-0066: Out of Band Data
+        d->outOfBandUrl = element.firstChildElement(QStringLiteral("url")).text();
+    } else {
+        unknownExtensions << QXmppElement(element);
+    }
+}

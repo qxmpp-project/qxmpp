@@ -62,6 +62,7 @@ const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data
 const char* ns_oob = "jabber:x:oob";
 // XEP-0071: XHTML-IM
+const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
 const char *ns_xhtml_im = "http://jabber.org/protocol/xhtml-im";
 // XEP-0077: In-Band Registration
 const char* ns_register = "jabber:iq:register";
