@@ -63,6 +63,7 @@ const char* ns_oob = "jabber:x:oob";
 const char *ns_xhtml_im = "http://jabber.org/protocol/xhtml-im";
 // XEP-0077: In-Band Registration
 const char* ns_register = "jabber:iq:register";
+const char* ns_register_feature = "http://jabber.org/features/iq-register";
 // XEP-0078: Non-SASL Authentication
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
