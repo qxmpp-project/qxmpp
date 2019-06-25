@@ -88,10 +88,10 @@ public:
     /// An enumeration for type of error.
     /// Error could come due a TCP socket or XML stream or due to various stanzas.
     enum Error {
-        NoError,         ///< No error.
-        SocketError,     ///< Error due to TCP socket.
-        KeepAliveError,  ///< Error due to no response to a keep alive.
-        XmppStreamError  ///< Error due to XML stream.
+        NoError,          ///< No error.
+        SocketError,      ///< Error due to TCP socket.
+        KeepAliveError,   ///< Error due to no response to a keep alive.
+        XmppStreamError,  ///< Error due to XML stream.
     };
     Q_ENUM(Error)
 
