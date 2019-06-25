@@ -75,6 +75,7 @@ extern const char* ns_oob;
 extern const char *ns_xhtml_im;
 // XEP-0077: In-Band Registration
 extern const char* ns_register;
+extern const char* ns_register_feature;
 // XEP-0078: Non-SASL Authentication
 extern const char* ns_auth;
 extern const char* ns_authFeature;

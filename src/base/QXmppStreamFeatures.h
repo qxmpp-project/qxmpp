@@ -73,6 +73,14 @@ public:
     /// \pa mode The mode to set.
     void setClientStateIndicationMode(Mode mode);
 
+    /// Returns the mode for XEP-0077: In-Band Registration
+    Mode registerMode() const;
+
+    /// Sets the mode for XEP-0077: In-Band Registration
+    ///
+    /// \pa mode The mode to set.
+    void setRegisterMode(const Mode &registerMode);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
@@ -87,6 +95,7 @@ private:
     Mode m_tlsMode;
     Mode m_streamManagementMode;
     Mode m_csiMode;
+    Mode m_registerMode;
     QStringList m_authMechanisms;
     QStringList m_compressionMethods;
 };

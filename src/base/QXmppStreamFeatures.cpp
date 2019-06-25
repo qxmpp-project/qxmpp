@@ -116,6 +116,16 @@ void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode
     m_csiMode = mode;
 }
 
+QXmppStreamFeatures::Mode QXmppStreamFeatures::registerMode() const
+{
+    return m_registerMode;
+}
+
+void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &registerMode)
+{
+    m_registerMode = registerMode;
+}
+
 /// \cond
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
@@ -148,6 +158,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     m_tlsMode = readFeature(element, "starttls", ns_tls);
     m_streamManagementMode = readFeature(element, "sm", ns_stream_management);
     m_csiMode = readFeature(element, "csi", ns_csi);
+    m_registerMode = readFeature(element, "register", ns_register_feature);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
@@ -194,6 +205,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "starttls", ns_tls, m_tlsMode);
     writeFeature(writer, "sm", ns_stream_management, m_streamManagementMode);
     writeFeature(writer, "csi", ns_csi, m_csiMode);
+    writeFeature(writer, "register", ns_register_feature, m_registerMode);
 
     if (!m_compressionMethods.isEmpty())
     {
