@@ -30,6 +30,7 @@ class tst_QXmppStreamFeatures : public QObject
 
 private slots:
     void testEmpty();
+    void testRequired();
     void testFull();
 };
 
@@ -44,8 +45,24 @@ void tst_QXmppStreamFeatures::testEmpty()
     QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.clientStateIndicationMode(), QXmppStreamFeatures::Disabled);
+    QCOMPARE(features.registerMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.authMechanisms(), QStringList());
     QCOMPARE(features.compressionMethods(), QStringList());
+    serializePacket(features, xml);
+}
+
+void tst_QXmppStreamFeatures::testRequired()
+{
+    const QByteArray xml(
+        "<stream:features>"
+            "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\">"
+                "<required/>"
+            "</starttls>"
+        "</stream:features>");
+
+    QXmppStreamFeatures features;
+    parsePacket(features, xml);
+    QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Required);
     serializePacket(features, xml);
 }
 
@@ -57,6 +74,7 @@ void tst_QXmppStreamFeatures::testFull()
         "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
         "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
         "<csi xmlns=\"urn:xmpp:csi:0\"/>"
+        "<register xmlns=\"http://jabber.org/features/iq-register\"/>"
         "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
         "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
         "</stream:features>");
@@ -68,6 +86,7 @@ void tst_QXmppStreamFeatures::testFull()
     QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.clientStateIndicationMode(), QXmppStreamFeatures::Enabled);
+    QCOMPARE(features.registerMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.authMechanisms(), QStringList() << "PLAIN");
     QCOMPARE(features.compressionMethods(), QStringList() << "zlib");
     serializePacket(features, xml);
