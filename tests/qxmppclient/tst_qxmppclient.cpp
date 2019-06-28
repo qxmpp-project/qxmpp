@@ -3,6 +3,7 @@
  *
  * Authors:
  *  Linus Jahn
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -26,6 +27,10 @@
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppRosterManager.h"
+#include "QXmppVCardManager.h"
+#include "QXmppVersionManager.h"
+
 #include "util.h"
 
 class tst_QXmppClient : public QObject
@@ -35,14 +40,16 @@ class tst_QXmppClient : public QObject
 private slots:
     void initTestCase();
 
-    void testSendMessage();
     void handleMessageSent(QXmppLogger::MessageType type, const QString &text) const;
+    void testSendMessage();
+
+    void testIndexOfExtension();
 
 private:
     QXmppClient *client;
 };
 
-void tst_QXmppClient::handleMessageSent(QXmppLogger::MessageType type, const QString& text) const
+void tst_QXmppClient::handleMessageSent(QXmppLogger::MessageType type, const QString &text) const
 {
     QCOMPARE(type, QXmppLogger::MessageType::SentMessage);
 
@@ -69,12 +76,33 @@ void tst_QXmppClient::testSendMessage()
 
     client->sendMessage(
         QStringLiteral("support@qxmpp.org"),
-        QStringLiteral("implement XEP-* plz")
-    );
+        QStringLiteral("implement XEP-* plz"));
 
     // see handleMessageSent()
 
     client->setLogger(nullptr);
+}
+
+void tst_QXmppClient::testIndexOfExtension()
+{
+    auto client = new QXmppClient;
+
+    for (auto *ext : client->extensions()) {
+        client->removeExtension(ext);
+    }
+
+    auto rosterManager = new QXmppRosterManager(client);
+    auto vCardManager = new QXmppVCardManager;
+
+    client->addExtension(rosterManager);
+    client->addExtension(vCardManager);
+
+    // This extension is not in the list.
+    QCOMPARE(client->indexOfExtension<QXmppVersionManager>(), -1);
+
+    // These extensions are in the list.
+    QCOMPARE(client->indexOfExtension<QXmppRosterManager>(), 0);
+    QCOMPARE(client->indexOfExtension<QXmppVCardManager>(), 1);
 }
 
 QTEST_MAIN(tst_QXmppClient)
