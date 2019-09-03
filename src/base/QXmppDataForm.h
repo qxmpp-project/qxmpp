@@ -32,6 +32,8 @@
 class QXmppDataFormPrivate;
 class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;
+class QXmppDataFormItemPrivate;
+class QXmppDataFormReportedPrivate;
 
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// XEP-0004: Data Forms.
@@ -64,6 +66,8 @@ public:
 
         bool isNull() const;
 
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
     private:
         QSharedDataPointer<QXmppDataFormMediaPrivate> d;
     };
@@ -120,8 +124,48 @@ public:
         QVariant value() const;
         void setValue(const QVariant &value);
 
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
     private:
         QSharedDataPointer<QXmppDataFormFieldPrivate> d;
+    };
+
+    class QXMPP_EXPORT Item
+    {
+    public:
+        Item(const QXmppDataForm::Item &other);
+        Item();
+        ~Item();
+
+        QXmppDataForm::Item& operator=(const QXmppDataForm::Item &other);
+
+        QList<Field> fields() const;
+        QList<Field> &fields();
+        void setFields(const QList<QXmppDataForm::Field> &fields);
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+    private:
+        QSharedDataPointer<QXmppDataFormItemPrivate> d;
+    };
+
+    class QXMPP_EXPORT Reported
+    {
+    public:
+        Reported(const QXmppDataForm::Reported &other);
+        Reported();
+        ~Reported();
+
+        QXmppDataForm::Reported& operator=(const QXmppDataForm::Reported &other);
+
+        QList<Field> fields() const;
+        QList<Field> &fields();
+        void setFields(const QList<QXmppDataForm::Field> &fields);
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+    private:
+        QSharedDataPointer<QXmppDataFormReportedPrivate> d;
     };
 
     /// This enum is used to describe a form's type.
@@ -159,6 +203,13 @@ public:
     void setType(QXmppDataForm::Type type);
 
     bool isNull() const;
+
+    QList<Item> items() const;
+    QList<Item> &items();
+    void setItems(const QList<QXmppDataForm::Item> &items);
+
+    Reported reported() const;
+    void setReported(const QXmppDataForm::Reported reported);
 
     /// \cond
     void parse(const QDomElement &element);

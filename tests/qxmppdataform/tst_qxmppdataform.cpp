@@ -34,6 +34,7 @@ private slots:
     void testSimple();
     void testSubmit();
     void testMedia();
+    void testMultipleItems();
 };
 
 void tst_QXmppDataForm::testSimple()
@@ -108,6 +109,89 @@ void tst_QXmppDataForm::testMedia()
     QCOMPARE(form.fields().at(0).media().uris().at(0).second, QString("http://www.victim.com/challenges/ocr.jpeg?F3A6292C"));
     QCOMPARE(form.fields().at(0).media().uris().at(1).first, QString("image/png"));
     QCOMPARE(form.fields().at(0).media().uris().at(1).second, QString("cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"));
+
+    serializePacket(form, xml);
+}
+
+void tst_QXmppDataForm::testMultipleItems()
+{
+    const QByteArray xml(
+        "<x xmlns=\"jabber:x:data\" type=\"result\">"
+            "<reported>"
+                "<field type=\"jid-single\" label=\"JID\" var=\"jid\"/>"
+                "<field type=\"text-single\" label=\"Username\" var=\"Username\"/>"
+                "<field type=\"text-single\" label=\"Name\" var=\"Name\"/>"
+                "<field type=\"text-single\" label=\"Email\" var=\"Email\"/>"
+            "</reported>"
+            "<item>"
+                "<field type=\"text-single\" var=\"jid\">"
+                    "<value>Zam@im-BestTaiwan.com.tw</value>"
+                "</field>"
+                "<field type=\"text-single\" var=\"Username\">"
+                    "<value>Zam</value>"
+                "</field>"
+                "<field type=\"text-single\" var=\"Name\">"
+                    "<value>Zam</value>"
+                "</field>"
+                "<field type=\"text-single\" var=\"Email\">"
+                    "<value>Zam@BestTaiwan.com.tw</value>"
+                "</field>"
+            "</item>"
+        "</x>");
+
+    QXmppDataForm form;
+    parsePacket(form, xml);
+
+    QCOMPARE(form.isNull(), false);
+    QCOMPARE(form.items().size(), 1);
+
+    const QString KEY_JID = "jid";
+    const QString KEY_USERNAME = "Username";
+    const QString KEY_NAME = "Name";
+    const QString KEY_EMAIL = "Email";
+    /* reported tag test */
+    QCOMPARE(form.reported().fields().size(), 4);
+
+    QXmppDataForm::Field jidField = form.reported().fields().at(0);
+    QCOMPARE(jidField.key(), KEY_JID);
+    QCOMPARE(jidField.type(), QXmppDataForm::Field::JidSingleField);
+    QCOMPARE(jidField.label(), QString("JID"));
+
+    QXmppDataForm::Field usernameField = form.reported().fields().at(1);
+    QCOMPARE(usernameField.key(), KEY_USERNAME);
+    QCOMPARE(usernameField.type(), QXmppDataForm::Field::TextSingleField);
+    QCOMPARE(usernameField.label(), QString("Username"));
+
+    QXmppDataForm::Field nameField = form.reported().fields().at(2);
+    QCOMPARE(nameField.key(), KEY_NAME);
+    QCOMPARE(nameField.type(), QXmppDataForm::Field::TextSingleField);
+    QCOMPARE(nameField.label(), QString("Name"));
+
+    QXmppDataForm::Field emailField = form.reported().fields().at(3);
+    QCOMPARE(emailField.key(), KEY_EMAIL);
+    QCOMPARE(emailField.type(), QXmppDataForm::Field::TextSingleField);
+    QCOMPARE(emailField.label(), QString("Email"));
+
+    /* item tag test */
+    QCOMPARE(form.items().size(), 1);
+    QXmppDataForm::Item item = form.items().at(0);
+    QCOMPARE(item.fields().size(), 4);
+
+    QXmppDataForm::Field jidItemField = item.fields().at(0);
+    QCOMPARE(jidItemField.key(), KEY_JID);
+    QCOMPARE(jidItemField.value().toString(), QString("Zam@im-BestTaiwan.com.tw"));
+
+    QXmppDataForm::Field usernameItemField = item.fields().at(1);
+    QCOMPARE(usernameItemField.key(), KEY_USERNAME);
+    QCOMPARE(usernameItemField.value().toString(), QString("Zam"));
+
+    QXmppDataForm::Field nameItemField = item.fields().at(2);
+    QCOMPARE(nameItemField.key(), KEY_NAME);
+    QCOMPARE(nameItemField.value().toString(), QString("Zam"));
+
+    QXmppDataForm::Field emailItemField = item.fields().at(3);
+    QCOMPARE(emailItemField.key(), KEY_EMAIL);
+    QCOMPARE(emailItemField.value().toString(), QString("Zam@BestTaiwan.com.tw"));
 
     serializePacket(form, xml);
 }
