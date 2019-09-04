@@ -52,6 +52,7 @@ private slots:
     void testMix();
     void testEme();
     void testSpoiler();
+    void testProcessingHints();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -117,6 +118,10 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.xhtml(), QString());
     QCOMPARE(message.encryptionMethod(), QXmppMessage::NoEncryption);
     QVERIFY(!message.isSpoiler());
+    QVERIFY(!message.hasHint(QXmppMessage::NoPermanentStore));
+    QVERIFY(!message.hasHint(QXmppMessage::NoStore));
+    QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
+    QVERIFY(!message.hasHint(QXmppMessage::Store));
     serializePacket(message, xml);
 }
 
@@ -746,6 +751,52 @@ void tst_QXmppMessage::testSpoiler()
     message.setSpoilerHint("test hint");
     QCOMPARE(message.spoilerHint(), QString("test hint"));
     QVERIFY(message.isSpoiler());
+}
+
+void tst_QXmppMessage::testProcessingHints()
+{
+    const QByteArray xml(
+        "<message to=\"juliet@capulet.lit/laptop\" "
+                 "from=\"romeo@montague.lit/laptop\" "
+                 "type=\"chat\">"
+            "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+            "<no-permanent-store xmlns=\"urn:xmpp:hints\"/>"
+            "<no-store xmlns=\"urn:xmpp:hints\"/>"
+            "<no-copy xmlns=\"urn:xmpp:hints\"/>"
+            "<store xmlns=\"urn:xmpp:hints\"/>"
+        "</message>"
+    );
+
+    // test parsing
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QVERIFY(message.hasHint(QXmppMessage::NoPermanentStore));
+    QVERIFY(message.hasHint(QXmppMessage::NoStore));
+    QVERIFY(message.hasHint(QXmppMessage::NoCopy));
+    QVERIFY(message.hasHint(QXmppMessage::Store));
+
+    // test serialization
+    QXmppMessage message2;
+    message2.setType(QXmppMessage::Chat);
+    message2.setFrom(QString("romeo@montague.lit/laptop"));
+    message2.setTo(QString("juliet@capulet.lit/laptop"));
+    message2.setBody(QString("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
+    message2.addHint(QXmppMessage::NoPermanentStore);
+    message2.addHint(QXmppMessage::NoStore);
+    message2.addHint(QXmppMessage::NoCopy);
+    message2.addHint(QXmppMessage::Store);
+    serializePacket(message2, xml);
+
+    // test remove hint
+    message2.removeHint(QXmppMessage::NoCopy);
+    QVERIFY(!message2.hasHint(QXmppMessage::NoCopy));
+
+    // test remove all hints
+    message2.removeAllHints();
+    QVERIFY(!message2.hasHint(QXmppMessage::NoPermanentStore));
+    QVERIFY(!message2.hasHint(QXmppMessage::NoStore));
+    QVERIFY(!message2.hasHint(QXmppMessage::NoCopy));
+    QVERIFY(!message2.hasHint(QXmppMessage::Store));
 }
 
 QTEST_MAIN(tst_QXmppMessage)

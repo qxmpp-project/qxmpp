@@ -66,6 +66,14 @@ public:
         Acknowledged
     };
 
+    /// XEP-0334: Message Processing Hints
+    enum Hint {
+        NoPermanentStore = 1 << 0,  ///< Do not allow permanent storage
+        NoStore = 1 << 1,           ///< Do not store at all
+        NoCopy = 1 << 2,            ///< Do not copy the message
+        Store = 1 << 3              ///< Do store the message
+    };
+
     /// This enum describes different end-to-end encryption methods. These can
     /// be used to mark a message explicitly as encrypted with a specific
     /// algothim. See XEP-0380: Explicit Message Encryption for details.
@@ -151,6 +159,12 @@ public:
     // XEP-0308: Last Message Correction
     QString replaceId() const;
     void setReplaceId(const QString&);
+
+    // XEP-0334: Message Processing Hints
+    bool hasHint(const Hint hint) const;
+    void addHint(const Hint hint);
+    void removeHint(const Hint hint);
+    void removeAllHints();
 
     // XEP-0367: Message Attaching
     QString attachId() const;

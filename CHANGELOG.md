@@ -3,6 +3,8 @@ QXmpp 1.0.1 (UNRELEASED)
 
 New features:
  - Add support for SCRAM-SHA-1 and SCRAM-SHA-256 (#183, @jlaine)
+ - Add XEP-0334: Message Processing Hints (v0.3.0) (#212, @lnjX, @jaragont,
+   @sam-truscott)
  - Add XEP-0367: Message Attaching (v0.3.0) (#196, @lnjX)
  - Add XEP-0380: Explicit Message Encryption (v0.3.0) (#199, @lnjX)
  - Add XEP-0382: Spoiler messages (v0.2.0) (#195, @lnjX)
