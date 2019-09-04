@@ -40,6 +40,7 @@ Complete:
 - XEP-0308: Last Message Correction
 - XEP-0313: Message Archive Management
 - XEP-0319: Last User Interaction in Presence
+- XEP-0334: Message Processing Hints (v0.3.0)
 - XEP-0352: Client State Indication
 - XEP-0367: Message Attaching (v0.3.0)
 - XEP-0380: Explicit Message Encryption (v0.3.0)

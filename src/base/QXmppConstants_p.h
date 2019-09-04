@@ -145,6 +145,8 @@ extern const char* ns_mam;
 extern const char* ns_idle;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
+// XEP-0334: Message Processing Hints:
+extern const char* ns_message_processing_hints;
 // XEP-0352: Client State Indication
 extern const char* ns_csi;
 // XEP-0363: HTTP File Upload

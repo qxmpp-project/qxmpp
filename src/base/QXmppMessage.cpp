@@ -64,6 +64,13 @@ static const QStringList ENCRYPTION_NAMESPACES = {
     ns_omemo
 };
 
+static const QStringList HINT_TYPES = {
+    QStringLiteral("no-permanent-store"),
+    QStringLiteral("no-store"),
+    QStringLiteral("no-copy"),
+    QStringLiteral("store")
+};
+
 static const QStringList ENCRYPTION_NAMES = {
     QString(),
     QString(),
@@ -121,6 +128,9 @@ public:
     // XEP-0308: Last Message Correction
     QString replaceId;
 
+    // XEP-0334: Message Processing Hints
+    quint8 hints;
+
     // XEP-0367: Message Attaching
     QString attachId;
 
@@ -161,6 +171,8 @@ QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
     d->marker = NoMarker;
 
     d->privatemsg = false;
+
+    d->hints = 0;
 }
 
 /// Constructs a copy of \a other.
@@ -546,6 +558,38 @@ void QXmppMessage::setReplaceId(const QString &replaceId)
     d->replaceId = replaceId;
 }
 
+/// Returns true if the message contains the hint passed, as defined in
+/// XEP-0334: Message Processing Hints
+
+bool QXmppMessage::hasHint(const Hint hint) const
+{
+    return d->hints & hint;
+}
+
+/// Adds a hint to the message, as defined in XEP-0334: Message Processing
+/// Hints
+
+void QXmppMessage::addHint(const Hint hint)
+{
+    d->hints |= hint;
+}
+
+/// Removes a hint from the message, as defined in XEP-0334: Message Processing
+/// Hints
+
+void QXmppMessage::removeHint(const Hint hint)
+{
+    d->hints &= ~hint;
+}
+
+/// Removes all hints from the message, as defined in XEP-0334: Message
+/// Processing Hints
+
+void QXmppMessage::removeAllHints()
+{
+    d->hints = 0;
+}
+
 /// Returns the message id this message is linked/attached to. See XEP-0367:
 /// Message Attaching for details.
 
@@ -848,6 +892,9 @@ void QXmppMessage::parse(const QDomElement &element)
             else {
                 extensions << QXmppElement(xElement);
             }
+        // XEP-0334: Message Processing Hints
+        } else if (xElement.namespaceURI() == ns_message_processing_hints && HINT_TYPES.contains(xElement.tagName())) {
+            addHint(Hint(1 << HINT_TYPES.indexOf(xElement.tagName())));
         // XEP-0367: Message Attaching
         } else if (xElement.tagName() == "attach-to" && xElement.namespaceURI() == ns_message_attaching) {
             d->attachId = xElement.attribute("id");
@@ -998,6 +1045,15 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_message_correct);
         xmlWriter->writeAttribute("id", d->replaceId);
         xmlWriter->writeEndElement();
+    }
+
+    // XEP-0334: Message Processing Hints
+    for (quint8 i = 0; i < HINT_TYPES.size(); i++) {
+        if (hasHint(Hint(1 << i))) {
+            xmlWriter->writeStartElement(HINT_TYPES.at(i));
+            xmlWriter->writeAttribute("xmlns", ns_message_processing_hints);
+            xmlWriter->writeEndElement();
+        }
     }
 
     // XEP-0367: Message Attaching
