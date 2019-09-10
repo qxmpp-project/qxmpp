@@ -33,6 +33,8 @@ class tst_QXmppMessage : public QObject
 private slots:
     void testBasic_data();
     void testBasic();
+    void testIsXmppStanza();
+    void testUnknownXExtension();
     void testMessageAttention();
     void testMessageReceipt();
     void testDelay_data();
@@ -122,6 +124,33 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::NoStore));
     QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message.hasHint(QXmppMessage::Store));
+
+    message = QXmppMessage();
+    message.setTo(QStringLiteral("foo@example.com/QXmpp"));
+    message.setFrom(QStringLiteral("bar@example.com/QXmpp"));
+    message.setType(QXmppMessage::Type(type));
+    message.setBody(body);
+    message.setSubject(subject);
+    message.setThread(thread);
+    serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testIsXmppStanza()
+{
+    QXmppMessage msg;
+    QVERIFY(msg.isXmppStanza());
+}
+
+void tst_QXmppMessage::testUnknownXExtension()
+{
+    const QByteArray xml(
+        "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+          "<x xmlns=\"urn:xmpp:unknown:protocol\"/>"
+        "</message>"
+    );
+
+    QXmppMessage message;
+    parsePacket(message, xml);
     serializePacket(message, xml);
 }
 
@@ -133,6 +162,7 @@ void tst_QXmppMessage::testMessageAttention()
         "</message>");
 
     QXmppMessage message;
+    // parsing
     parsePacket(message, xml);
     QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
     QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
@@ -142,6 +172,11 @@ void tst_QXmppMessage::testMessageAttention()
     QCOMPARE(message.isAttentionRequested(), true);
     QCOMPARE(message.isReceiptRequested(), false);
     QCOMPARE(message.receiptId(), QString());
+
+    // serialization
+    message = QXmppMessage(QStringLiteral("bar@example.com/QXmpp"), QStringLiteral("foo@example.com/QXmpp"));
+    message.setType(QXmppMessage::Normal);
+    message.setAttentionRequested(true);
     serializePacket(message, xml);
 }
 
@@ -154,6 +189,7 @@ void tst_QXmppMessage::testMessageReceipt()
         "</message>");
 
     QXmppMessage message;
+    // parsing
     parsePacket(message, xml);
     QCOMPARE(message.id(), QString("richard2-4.1.247"));
     QCOMPARE(message.to(), QString("kingrichard@royalty.england.lit/throne"));
@@ -164,6 +200,15 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), true);
     QCOMPARE(message.receiptId(), QString());
+
+    // serialization
+    message = QXmppMessage();
+    message.setId(QStringLiteral("richard2-4.1.247"));
+    message.setTo(QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    message.setFrom(QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    message.setType(QXmppMessage::Normal);
+    message.setBody(QStringLiteral("My lord, dispatch; read o'er these articles."));
+    message.setReceiptRequested(true);
     serializePacket(message, xml);
 
     const QByteArray receiptXml(
@@ -182,6 +227,13 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(receipt.isAttentionRequested(), false);
     QCOMPARE(receipt.isReceiptRequested(), false);
     QCOMPARE(receipt.receiptId(), QString("richard2-4.1.247"));
+
+    receipt = QXmppMessage();
+    receipt.setId(QStringLiteral("bi29sg183b4v"));
+    receipt.setTo(QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    receipt.setFrom(QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    receipt.setType(QXmppMessage::Normal);
+    receipt.setReceiptId(QStringLiteral("richard2-4.1.247"));
     serializePacket(receipt, receiptXml);
 
     const QByteArray oldXml(
@@ -200,6 +252,12 @@ void tst_QXmppMessage::testMessageReceipt()
     QCOMPARE(old.isAttentionRequested(), false);
     QCOMPARE(old.isReceiptRequested(), false);
     QCOMPARE(old.receiptId(), QString("richard2-4.1.247"));
+
+    // test that an ID is generated
+    QXmppMessage message2;
+    QVERIFY(message2.id().isNull());
+    message2.setReceiptRequested(true);
+    QVERIFY(!message2.id().isEmpty());
 }
 
 void tst_QXmppMessage::testDelay_data()
@@ -285,6 +343,14 @@ void tst_QXmppMessage::testMucInvitation()
     QCOMPARE(message.mucInvitationJid(), QLatin1String("darkcave@macbeth.shakespeare.lit"));
     QCOMPARE(message.mucInvitationPassword(), QLatin1String("cauldronburn"));
     QCOMPARE(message.mucInvitationReason(), QLatin1String("Hey Hecate, this is the place for all good witches!"));
+
+    message = QXmppMessage();
+    message.setTo(QStringLiteral("hecate@shakespeare.lit"));
+    message.setFrom(QStringLiteral("crone1@shakespeare.lit/desktop"));
+    message.setType(QXmppMessage::Normal);
+    message.setMucInvitationJid(QStringLiteral("darkcave@macbeth.shakespeare.lit"));
+    message.setMucInvitationPassword(QStringLiteral("cauldronburn"));
+    message.setMucInvitationReason(QStringLiteral("Hey Hecate, this is the place for all good witches!"));
     serializePacket(message, xml);
 }
 
@@ -326,6 +392,10 @@ void tst_QXmppMessage::testState()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(int(message.state()), state);
+
+    message = QXmppMessage();
+    message.setType(QXmppMessage::Normal);
+    message.setState(QXmppMessage::State(state));
     serializePacket(message, xml);
 }
 
@@ -343,26 +413,36 @@ void tst_QXmppMessage::testXhtml()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.xhtml(), QLatin1String("<p style=\"font-weight:bold\">hi!</p>"));
+
+    message = QXmppMessage();
+    message.setBody(QStringLiteral("hi!"));
+    message.setType(QXmppMessage::Normal);
+    message.setXhtml(QStringLiteral("<p style=\"font-weight:bold\">hi!</p>"));
     serializePacket(message, xml);
 }
 
 void tst_QXmppMessage::testSubextensions()
 {
-    const QByteArray xml("<message id=\"aeb214\" to=\"juliet@capulet.lit/chamber\" type=\"normal\">"
-        "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
-        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
-        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
-        "<message from=\"juliet@capulet.lit/balcony\" id=\"8a54s\" "
-        "to=\"romeo@montague.lit/orchard\" type=\"chat\">"
-        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
+    const QByteArray xml = QByteArrayLiteral(
+        "<message id=\"aeb214\" to=\"juliet@capulet.lit/chamber\" type=\"normal\">"
+            "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
+                "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+                    "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
+                    "<message from=\"juliet@capulet.lit/balcony\" "
+                             "id=\"8a54s\" "
+                             "to=\"romeo@montague.lit/orchard\" "
+                             "type=\"chat\">"
+                        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
+                    "</message>"
+                "</forwarded>"
+            "</result>"
+            "<x xmlns=\"jabber:x:new-fancy-extension\"/>"
         "</message>"
-        "</forwarded>"
-        "</result>"
-        "</message>");
+    );
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.extensions().size(), 1);
+    QCOMPARE(message.extensions().size(), 2);
     QCOMPARE(message.extensions().first().tagName(), QLatin1String("result"));
     serializePacket(message, xml);
 }
@@ -556,30 +636,26 @@ void tst_QXmppMessage::testChatMarkers()
 
 void tst_QXmppMessage::testPrivateMessage()
 {
-    const QByteArray privateXml(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                 "<body>My lord, dispatch; read o'er these articles.</body>"
-                 "<private xmlns='urn:xmpp:carbons:2'/>"
-                "</message>");
+    const QByteArray xml = QByteArrayLiteral(
+        "<message type=\"chat\">"
+            "<body>My lord, dispatch; read o'er these articles.</body>"
+            "<private xmlns=\"urn:xmpp:carbons:2\"/>"
+        "</message>"
+    );
 
-    QXmppMessage privateMessage;
-    parsePacket(privateMessage, privateXml);
-    QCOMPARE(privateMessage.isPrivate(), true);
-    privateMessage.setPrivate(true);
-    QCOMPARE(privateMessage.isPrivate(), true);
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.isPrivate(), true);
 
-    privateMessage.setPrivate(false);
-    QCOMPARE(privateMessage.isPrivate(), false);
+    message = QXmppMessage();
+    message.setBody(QStringLiteral("My lord, dispatch; read o'er these articles."));
+    message.setPrivate(true);
+    serializePacket(message, xml);
 
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    privateMessage.toXml(&writer);
-    QVERIFY(!buffer.data().contains("private"));
+    message.setPrivate(true);
+    QCOMPARE(message.isPrivate(), true);
+    message.setPrivate(false);
+    QCOMPARE(message.isPrivate(), false);
 }
 
 void tst_QXmppMessage::testOutOfBandUrl()
