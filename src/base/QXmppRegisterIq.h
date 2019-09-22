@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -27,8 +28,8 @@
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
-class QXmppRegisterIqPrivate;
 class QXmppBitsOfBinaryDataList;
+class QXmppRegisterIqPrivate;
 
 /// \brief The QXmppRegisterIq class represents a registration IQ
 /// as defined by XEP-0077: In-Band Registration.
@@ -40,6 +41,12 @@ class QXmppBitsOfBinaryDataList;
 class QXMPP_EXPORT QXmppRegisterIq : public QXmppIq
 {
 public:
+    enum RegisterType {
+        None,        ///< No special register IQ.
+        Registered,  ///< Used by the service to indicate that an account is already registered.
+        Remove       ///< Used by the client to request account removal.
+    };
+
     QXmppRegisterIq();
     QXmppRegisterIq(const QXmppRegisterIq &other);
     ~QXmppRegisterIq();
@@ -60,6 +67,9 @@ public:
 
     QString username() const;
     void setUsername(const QString &username);
+
+    RegisterType registerType() const;
+    void setRegisterType(const RegisterType &registerType);
 
     QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
     QXmppBitsOfBinaryDataList &bitsOfBinaryData();

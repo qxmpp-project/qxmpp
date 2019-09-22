@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -22,21 +23,36 @@
  */
 
 #include <QDomElement>
+#include <QSharedData>
 
 #include "QXmppConstants_p.h"
 #include "QXmppRegisterIq.h"
 #include "QXmppBitsOfBinaryDataList.h"
 
+static const QStringList REGISTER_TYPES = {
+    QString(),
+    QStringLiteral("registered"),
+    QStringLiteral("remove")
+};
+
 class QXmppRegisterIqPrivate : public QSharedData
 {
 public:
+    QXmppRegisterIqPrivate();
+
     QXmppDataForm form;
     QString email;
     QString instructions;
     QString password;
     QString username;
+    QXmppRegisterIq::RegisterType registerType;
     QXmppBitsOfBinaryDataList bitsOfBinaryData;
 };
+
+QXmppRegisterIqPrivate::QXmppRegisterIqPrivate()
+    : registerType(QXmppRegisterIq::None)
+{
+}
 
 QXmppRegisterIq::QXmppRegisterIq()
     : d(new QXmppRegisterIqPrivate)
@@ -47,7 +63,7 @@ QXmppRegisterIq::QXmppRegisterIq(const QXmppRegisterIq &other) = default;
 
 QXmppRegisterIq::~QXmppRegisterIq() = default;
 
-QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq& other) = default;
+QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq &other) = default;
 
 /// Returns the email for this registration IQ.
 
@@ -154,6 +170,20 @@ void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsO
     d->bitsOfBinaryData = bitsOfBinaryData;
 }
 
+/// Returns the type of the action or registration state.
+
+QXmppRegisterIq::RegisterType QXmppRegisterIq::registerType() const
+{
+    return d->registerType;
+}
+
+/// Sets the type of the action or registration state.
+
+void QXmppRegisterIq::setRegisterType(const QXmppRegisterIq::RegisterType &type)
+{
+    d->registerType = type;
+}
+
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
@@ -169,14 +199,29 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
     d->email = queryElement.firstChildElement("email").text();
     d->form.parse(queryElement.firstChildElement("x"));
     d->bitsOfBinaryData.parse(queryElement);
+
+    d->registerType = QXmppRegisterIq::None;
+
+    // The loop starts with the second element, because there cannot be an
+    // empty element for QXmppRegisterIq::None
+    for (int i = 1; i < REGISTER_TYPES.size(); i++) {
+        if (!queryElement.firstChildElement(REGISTER_TYPES.at(i)).isNull()) {
+            d->registerType = RegisterType(i);
+            break;
+        }
+    }
 }
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeAttribute("xmlns", ns_register);
+
     if (!d->instructions.isEmpty())
         writer->writeTextElement("instructions", d->instructions);
+
+    if (d->registerType != QXmppRegisterIq::None)
+        writer->writeEmptyElement(REGISTER_TYPES.at(int(d->registerType)));
 
     if (!d->username.isEmpty())
         writer->writeTextElement("username", d->username);
