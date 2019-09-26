@@ -130,7 +130,6 @@ signals:
 
 protected:
     void setClient(QXmppClient *client) override;
-    bool handleStanza(const QDomElement &stanza) override;
 
 private:
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
