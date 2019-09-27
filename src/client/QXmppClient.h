@@ -155,9 +155,16 @@ public:
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
+#if QXMPP_DEPRECATED_SINCE(1, 1)
+    QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")
     QXmppRosterManager& rosterManager();
+
+    QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppVCardManager>() instead")
     QXmppVCardManager& vCardManager();
+
+    QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppVersionManager>() instead")
     QXmppVersionManager& versionManager();
+#endif
 
 signals:
 
