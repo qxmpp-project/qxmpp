@@ -344,9 +344,12 @@ void QXmppClient::setActive(bool active)
 }
 
 /// Returns the reference to QXmppRosterManager object of the client.
+///
 /// \return Reference to the roster object of the connected client. Use this to
 /// get the list of friends in the roster and their presence information.
 ///
+/// \deprecated This method is deprecated since QXmpp 1.1. Use
+/// \c QXmppClient::findExtension<QXmppRosterManager>() instead.
 
 QXmppRosterManager& QXmppClient::rosterManager()
 {
@@ -461,6 +464,8 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 /// Returns the reference to QXmppVCardManager, implementation of XEP-0054.
 /// http://xmpp.org/extensions/xep-0054.html
 ///
+/// \deprecated This method is deprecated since QXmpp 1.1. Use
+/// \c QXmppClient::findExtension<QXmppVCardManager>() instead.
 
 QXmppVCardManager& QXmppClient::vCardManager()
 {
@@ -470,6 +475,8 @@ QXmppVCardManager& QXmppClient::vCardManager()
 /// Returns the reference to QXmppVersionManager, implementation of XEP-0092.
 /// http://xmpp.org/extensions/xep-0092.html
 ///
+/// \deprecated This method is deprecated since QXmpp 1.1. Use
+/// \c QXmppClient::findExtension<QXmppVersionManager>() instead.
 
 QXmppVersionManager& QXmppClient::versionManager()
 {
