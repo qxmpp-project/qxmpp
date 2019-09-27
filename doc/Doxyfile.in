@@ -13,3 +13,7 @@ GENERATE_LATEX         = NO
 HTML_TIMESTAMP         = NO
 QUIET                  = YES
 RECURSIVE              = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = "QXMPP_DEPRECATED_SINCE(major, minor)="
