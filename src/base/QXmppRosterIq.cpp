@@ -23,6 +23,7 @@
  */
 
 #include <QDomElement>
+#include <QSharedData>
 #include <QXmlStreamWriter>
 
 #include "QXmppRosterIq.h"
@@ -44,9 +45,9 @@ QXmppRosterIq::QXmppRosterIq()
 {
 }
 
-QXmppRosterIq::~QXmppRosterIq()
-{
-}
+QXmppRosterIq::~QXmppRosterIq() = default;
+
+QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
 
 /// Adds an item to the roster IQ.
 ///
@@ -168,15 +169,11 @@ QXmppRosterIq::Item::Item()
     d->type = NotSet;
 }
 
-QXmppRosterIq::Item::~Item()
-{
-}
+QXmppRosterIq::Item::Item(const QXmppRosterIq::Item &other) = default;
 
-QXmppRosterIq::Item& QXmppRosterIq::Item::operator=(const Item &other)
-{
-    d = other.d;
-    return *this;
-}
+QXmppRosterIq::Item::~Item() = default;
+
+QXmppRosterIq::Item& QXmppRosterIq::Item::operator=(const Item &other) = default;
 
 /// Returns the bareJid of the roster entry.
 ///
