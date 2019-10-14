@@ -1,7 +1,9 @@
-QXmpp 1.0.1 (UNRELEASED)
-------------------------
+QXmpp 1.0.1 (Oct 14, 2019)
+--------------------------
 
-*under development*
+ - Fix potential SEGFAULT on connection error (#216, @0xd34df00d)
+ - Fix SO_VERSION to 1: ABI has changed since last minor release (#185, @tehnick)
+ - Add CMake option for internal tests (BUILD_INTERNAL_TESTS) (#184, @jlaine)
 
 QXmpp 1.0.0 (Jan 8, 2019)
 -------------------------
