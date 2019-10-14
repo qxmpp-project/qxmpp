@@ -24,6 +24,8 @@
 #ifndef QXMPPMIXITEM_H
 #define QXMPPMIXITEM_H
 
+#include <QSharedDataPointer>
+
 #include "QXmppElement.h"
 
 class QXmppMixInfoItemPrivate;
@@ -39,6 +41,10 @@ class QXMPP_EXPORT QXmppMixInfoItem
 {
 public:
     QXmppMixInfoItem();
+    QXmppMixInfoItem(const QXmppMixInfoItem &);
+    ~QXmppMixInfoItem();
+
+    QXmppMixInfoItem &operator=(const QXmppMixInfoItem &);
 
     QString name() const;
     void setName(const QString&);
@@ -55,7 +61,7 @@ public:
     static bool isMixChannelInfo(const QDomElement&);
 
 private:
-    QXmppMixInfoItemPrivate *d;
+    QSharedDataPointer<QXmppMixInfoItemPrivate> d;
 };
 
 /// \brief The QXmppMixParticipantItem class represents a PubSub item of a MIX
@@ -68,6 +74,10 @@ class QXMPP_EXPORT QXmppMixParticipantItem
 {
 public:
     QXmppMixParticipantItem();
+    QXmppMixParticipantItem(const QXmppMixParticipantItem &);
+    ~QXmppMixParticipantItem();
+
+    QXmppMixParticipantItem &operator=(const QXmppMixParticipantItem &);
 
     QString nick() const;
     void setNick(const QString&);
@@ -81,7 +91,7 @@ public:
     static bool isMixParticipantItem(const QDomElement&);
 
 private:
-    QXmppMixParticipantItemPrivate *d;
+    QSharedDataPointer<QXmppMixParticipantItemPrivate> d;
 };
 
 #endif // QXMPPMIXITEM_H

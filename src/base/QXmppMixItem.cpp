@@ -25,10 +25,12 @@
 #include "QXmppDataForm.h"
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
-#include <QDomElement>
-#include <QBuffer>
 
-class QXmppMixInfoItemPrivate : QSharedData
+#include <QBuffer>
+#include <QDomElement>
+#include <QSharedData>
+
+class QXmppMixInfoItemPrivate : public QSharedData
 {
 public:
     QString name;
@@ -40,6 +42,12 @@ QXmppMixInfoItem::QXmppMixInfoItem()
     : d(new QXmppMixInfoItemPrivate)
 {
 }
+
+QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem &) = default;
+
+QXmppMixInfoItem &QXmppMixInfoItem::operator=(const QXmppMixInfoItem &) = default;
+
+QXmppMixInfoItem::~QXmppMixInfoItem() = default;
 
 /// Returns the user-specified name of the MIX channel. This is not the name
 /// part of the channel's JID.
@@ -153,7 +161,7 @@ QXmppElement QXmppMixInfoItem::toElement() const
     return QXmppElement(doc.documentElement());
 }
 
-class QXmppMixParticipantItemPrivate : QSharedData
+class QXmppMixParticipantItemPrivate : public QSharedData
 {
 public:
     QString nick;
@@ -164,6 +172,12 @@ QXmppMixParticipantItem::QXmppMixParticipantItem()
     : d(new QXmppMixParticipantItemPrivate)
 {
 }
+
+QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem &) = default;
+
+QXmppMixParticipantItem &QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem &) = default;
+
+QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;
 
 /// Returns the participant's nickname.
 
