@@ -29,6 +29,7 @@
 #include "QXmppIq.h"
 #include <QList>
 #include <QSet>
+#include <QSharedDataPointer>
 
 class QXmppRosterIqPrivate;
 
@@ -62,9 +63,10 @@ public:
         };
 
         Item();
+        Item(const Item &other);
         ~Item();
 
-        Item& operator=(const Item &other);
+        Item &operator=(const Item &other);
 
         QString bareJid() const;
         QSet<QString> groups() const;
@@ -94,11 +96,14 @@ public:
         QString getSubscriptionTypeStr() const;
         void setSubscriptionTypeFromStr(const QString&);
 
-        ItemPrivate *d;
+        QSharedDataPointer<ItemPrivate> d;
     };
 
     QXmppRosterIq();
+    QXmppRosterIq(const QXmppRosterIq &);
     ~QXmppRosterIq() override;
+
+    QXmppRosterIq &operator=(const QXmppRosterIq &);
 
     QString version() const;
     void setVersion(const QString&);
@@ -121,7 +126,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppRosterIqPrivate *d;
+    QSharedDataPointer<QXmppRosterIqPrivate> d;
 };
 
 #endif // QXMPPROSTERIQ_H
