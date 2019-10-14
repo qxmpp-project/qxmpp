@@ -24,11 +24,12 @@
 #ifndef QXMPPHTTPUPLOADIQ_H
 #define QXMPPHTTPUPLOADIQ_H
 
-#include <QMap>
-#include <QMimeType>
-#include <QUrl>
+#include <QSharedDataPointer>
 
 #include "QXmppIq.h"
+
+class QUrl;
+class QMimeType;
 
 class QXmppHttpUploadRequestIqPrivate;
 class QXmppHttpUploadSlotIqPrivate;
@@ -42,7 +43,10 @@ class QXMPP_EXPORT QXmppHttpUploadRequestIq : public QXmppIq
 {
 public:
     QXmppHttpUploadRequestIq();
+    QXmppHttpUploadRequestIq(const QXmppHttpUploadRequestIq &);
     ~QXmppHttpUploadRequestIq() override;
+
+    QXmppHttpUploadRequestIq &operator=(const QXmppHttpUploadRequestIq &);
 
     QString fileName() const;
     void setFileName(const QString &filename);
@@ -62,7 +66,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppHttpUploadRequestIqPrivate* const d;
+    QSharedDataPointer<QXmppHttpUploadRequestIqPrivate> d;
 };
 
 /// \brief Represents an HTTP File Upload IQ result for receiving an upload slot as
@@ -74,7 +78,10 @@ class QXMPP_EXPORT QXmppHttpUploadSlotIq : public QXmppIq
 {
 public:
     QXmppHttpUploadSlotIq();
+    QXmppHttpUploadSlotIq(const QXmppHttpUploadSlotIq &);
     ~QXmppHttpUploadSlotIq() override;
+
+    QXmppHttpUploadSlotIq &operator=(const QXmppHttpUploadSlotIq &);
 
     QUrl putUrl() const;
     void setPutUrl(const QUrl &putUrl);
@@ -94,7 +101,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppHttpUploadSlotIqPrivate* const d;
+    QSharedDataPointer<QXmppHttpUploadSlotIqPrivate> d;
 };
 
 #endif // QXMPPHTTPUPLOADIQ_H

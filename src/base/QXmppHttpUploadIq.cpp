@@ -23,11 +23,13 @@
 
 #include <QDomElement>
 #include <QMimeDatabase>
+#include <QSharedData>
+#include <QUrl>
 
 #include "QXmppHttpUploadIq.h"
 #include "QXmppConstants_p.h"
 
-class QXmppHttpUploadRequestIqPrivate
+class QXmppHttpUploadRequestIqPrivate : public QSharedData
 {
 public:
     QString fileName;
@@ -40,10 +42,11 @@ QXmppHttpUploadRequestIq::QXmppHttpUploadRequestIq()
 {
 }
 
-QXmppHttpUploadRequestIq::~QXmppHttpUploadRequestIq()
-{
-    delete d;
-}
+QXmppHttpUploadRequestIq::QXmppHttpUploadRequestIq(const QXmppHttpUploadRequestIq &) = default;
+
+QXmppHttpUploadRequestIq::~QXmppHttpUploadRequestIq() = default;
+
+QXmppHttpUploadRequestIq &QXmppHttpUploadRequestIq::operator=(const QXmppHttpUploadRequestIq &) = default;
 
 /// Returns the file name of the file to be uploaded.
 
@@ -127,7 +130,7 @@ void QXmppHttpUploadRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer) c
 }
 /// \endcond
 
-class QXmppHttpUploadSlotIqPrivate
+class QXmppHttpUploadSlotIqPrivate : public QSharedData
 {
 public:
     QUrl putUrl;
@@ -140,10 +143,11 @@ QXmppHttpUploadSlotIq::QXmppHttpUploadSlotIq()
 {
 }
 
-QXmppHttpUploadSlotIq::~QXmppHttpUploadSlotIq()
-{
-    delete d;
-}
+QXmppHttpUploadSlotIq::QXmppHttpUploadSlotIq(const QXmppHttpUploadSlotIq &) = default;
+
+QXmppHttpUploadSlotIq::~QXmppHttpUploadSlotIq() = default;
+
+QXmppHttpUploadSlotIq &QXmppHttpUploadSlotIq::operator=(const QXmppHttpUploadSlotIq &) = default;
 
 /// Returns the URL for uploading via. HTTP PUT.
 
