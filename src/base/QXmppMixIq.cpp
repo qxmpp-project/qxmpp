@@ -25,13 +25,23 @@
 #include "QXmppDataForm.h"
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
 #include <QDomElement>
+#include <QSharedData>
 
-static const QStringList MIX_ACTION_TYPES = QStringList() << ""
-    << "client-join" << "client-leave" << "join" << "leave"
-    << "update-subscription" << "setnick" << "create" << "destroy";
+static const QStringList MIX_ACTION_TYPES = {
+    QString(),
+    QStringLiteral("client-join"),
+    QStringLiteral("client-leave"),
+    QStringLiteral("join"),
+    QStringLiteral("leave"),
+    QStringLiteral("update-subscription"),
+    QStringLiteral("setnick"),
+    QStringLiteral("create"),
+    QStringLiteral("destroy")
+};
 
-class QXmppMixIqPrivate : QSharedData
+class QXmppMixIqPrivate : public QSharedData
 {
 public:
     QString jid;
@@ -46,9 +56,11 @@ QXmppMixIq::QXmppMixIq()
 {
 }
 
-QXmppMixIq::~QXmppMixIq()
-{
-}
+QXmppMixIq::QXmppMixIq(const QXmppMixIq &) = default;
+
+QXmppMixIq::~QXmppMixIq() = default;
+
+QXmppMixIq &QXmppMixIq::operator=(const QXmppMixIq &) = default;
 
 /// Returns the channel JID. It also contains a participant id for Join/
 /// ClientJoin results.

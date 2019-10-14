@@ -25,6 +25,7 @@
 #define QXMPPMIXIQ_H
 
 #include "QXmppIq.h"
+#include <QSharedDataPointer>
 
 class QXmppMixIqPrivate;
 
@@ -51,7 +52,10 @@ public:
     };
 
     QXmppMixIq();
+    QXmppMixIq(const QXmppMixIq &);
     ~QXmppMixIq() override;
+
+    QXmppMixIq &operator=(const QXmppMixIq &);
 
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);
@@ -79,7 +83,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppMixIqPrivate *d;
+    QSharedDataPointer<QXmppMixIqPrivate> d;
 };
 
 #endif // QXMPPMIXIQ_H
