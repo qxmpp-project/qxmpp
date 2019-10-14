@@ -1,4 +1,4 @@
-QXmpp 1.0.1 (UNRELEASED)
+QXmpp 1.1.0 (UNRELEASED)
 ------------------------
 
 New features:
@@ -8,6 +8,13 @@ New features:
  - Add XEP-0367: Message Attaching (v0.3.0) (#196, @lnjX)
  - Add XEP-0380: Explicit Message Encryption (v0.3.0) (#199, @lnjX)
  - Add XEP-0382: Spoiler messages (v0.2.0) (#195, @lnjX)
+
+QXmpp 1.0.1 (Oct 14, 2019)
+--------------------------
+
+ - Fix potential SEGFAULT on connection error (#216, @0xd34df00d)
+ - Fix SO_VERSION to 1: ABI has changed since last minor release (#185, @tehnick)
+ - Add CMake option for internal tests (BUILD_INTERNAL_TESTS) (#184, @jlaine)
 
 QXmpp 1.0.0 (Jan 8, 2019)
 -------------------------

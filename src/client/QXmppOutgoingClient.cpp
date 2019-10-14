@@ -169,11 +169,10 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 
 void QXmppOutgoingClientPrivate::connectToNextDNSHost()
 {
+    auto curIdx = nextSrvRecordIdx++;
     connectToHost(
-        dns.serviceRecords().at(nextSrvRecordIdx).target(),
-        dns.serviceRecords().at(nextSrvRecordIdx).port());
-
-    nextSrvRecordIdx++;
+        dns.serviceRecords().at(curIdx).target(),
+        dns.serviceRecords().at(curIdx).port());
 }
 
 /// Constructs an outgoing client stream.
