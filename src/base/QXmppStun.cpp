@@ -1439,7 +1439,7 @@ void QXmppTurnAllocation::setState(AllocationState state)
 
 void QXmppTurnAllocation::transactionFinished()
 {
-    QXmppStunTransaction *transaction = qobject_cast<QXmppStunTransaction*>(sender());
+    auto *transaction = qobject_cast<QXmppStunTransaction*>(sender());
     if (!transaction || !m_transactions.removeAll(transaction))
         return;
     transaction->deleteLater();
@@ -1825,7 +1825,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         if (!isCompatibleAddress(local.host(), candidate.host()))
             continue;
 
-        CandidatePair *pair = new CandidatePair(component, config->iceControlling, q);
+        auto *pair = new CandidatePair(component, config->iceControlling, q);
         pair->remote = candidate;
         pair->transport = transport;
         pairs << pair;
@@ -1885,7 +1885,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
     foreach (QUdpSocket *socket, sockets) {
         socket->setParent(q);
 
-        QXmppUdpTransport *transport = new QXmppUdpTransport(socket, q);
+        auto *transport = new QXmppUdpTransport(socket, q);
         check = QObject::connect(transport, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
                                  q, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
         Q_ASSERT(check);
@@ -1908,7 +1908,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
                 continue;
 
             request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
-            QXmppStunTransaction *transaction = new QXmppStunTransaction(request, q);
+            auto *transaction = new QXmppStunTransaction(request, q);
             stunTransactions.insert(transaction, transport);
         }
     }
@@ -2059,7 +2059,7 @@ QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 
 void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddress &remoteHost, quint16 remotePort)
 {
-    QXmppIceTransport *transport = qobject_cast<QXmppIceTransport*>(sender());
+    auto *transport = qobject_cast<QXmppIceTransport*>(sender());
     if (!transport)
         return;
 
@@ -2248,7 +2248,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
 void QXmppIceComponent::transactionFinished()
 {
-    QXmppStunTransaction *transaction = qobject_cast<QXmppStunTransaction*>(sender());
+    auto *transaction = qobject_cast<QXmppStunTransaction*>(sender());
     transaction->deleteLater();
 
     // ICE checks
@@ -2350,11 +2350,10 @@ static QList<QUdpSocket*> reservePort(const QList<QHostAddress> &addresses, quin
 {
     QList<QUdpSocket*> sockets;
     foreach (const QHostAddress &address, addresses) {
-        QUdpSocket *socket = new QUdpSocket(parent);
+        auto *socket = new QUdpSocket(parent);
         sockets << socket;
         if (!socket->bind(address, port)) {
-            for (int i = 0; i < sockets.size(); ++i)
-                delete sockets[i];
+            qDeleteAll(sockets);
             sockets.clear();
             break;
         }
@@ -2439,8 +2438,7 @@ QList<QUdpSocket*> QXmppIceComponent::reservePorts(const QList<QHostAddress> &ad
 
         // cleanup if we failed
         if (sockets.size() != expectedSize) {
-            for (int i = 0; i < sockets.size(); ++i)
-                delete sockets[i];
+            qDeleteAll(sockets);
             sockets.clear();
         }
     }
@@ -2478,7 +2476,7 @@ void QXmppIceComponent::updateGatheringState()
 
 void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
 {
-    QXmppStunTransaction *transaction = qobject_cast<QXmppStunTransaction*>(sender());
+    auto *transaction = qobject_cast<QXmppStunTransaction*>(sender());
 
     // ICE checks
     CandidatePair *pair = d->findPair(transaction);
@@ -2573,7 +2571,7 @@ void QXmppIceConnection::addComponent(int component)
         return;
     }
 
-    QXmppIceComponent *socket = new QXmppIceComponent(component, d, this);
+    auto *socket = new QXmppIceComponent(component, d, this);
     socket->d->setTurnServer(d->turnHost, d->turnPort);
     socket->d->setTurnUser(d->turnUser);
     socket->d->setTurnPassword(d->turnPassword);

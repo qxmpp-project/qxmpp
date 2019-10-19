@@ -78,7 +78,7 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
 
 void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
 {
-    QXmppDiscoveryManager* ext = q->findExtension<QXmppDiscoveryManager>();
+    auto* ext = q->findExtension<QXmppDiscoveryManager>();
     if(ext) {
         presence.setCapabilityHash("sha-1");
         presence.setCapabilityNode(ext->clientCapabilitiesNode());

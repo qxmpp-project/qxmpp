@@ -431,7 +431,7 @@ void tst_QXmppJingleIq::testTerminate()
 
 void tst_QXmppJingleIq::testAudioPayloadType()
 {
-    const QByteArray xml("<payload-type id=\"103\" name=\"L16\" channels=\"2\" clockrate=\"16000\"/>");
+    const QByteArray xml(R"(<payload-type id="103" name="L16" channels="2" clockrate="16000"/>)");
     QXmppJinglePayloadType payload;
     parsePacket(payload, xml);
     QCOMPARE(payload.id(), static_cast<unsigned char>(103));

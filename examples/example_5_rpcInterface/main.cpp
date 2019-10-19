@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     QXmppClient client;
 
     // add RPC extension and register interface
-    QXmppRpcManager *manager = new QXmppRpcManager;
+    auto *manager = new QXmppRpcManager;
     client.addExtension(manager);
     manager->addInvokableInterface(new RemoteInterface(&client));
 

@@ -293,17 +293,17 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     Q_UNUSED(check);
     Q_ASSERT(manager);
 
-    Stream *stream = new Stream;
+    auto *stream = new Stream;
     stream->media = media;
 
     // RTP channel
     QObject *channelObject = nullptr;
     if (media == AUDIO_MEDIA) {
-        QXmppRtpAudioChannel *audioChannel = new QXmppRtpAudioChannel(q);
+        auto *audioChannel = new QXmppRtpAudioChannel(q);
         stream->channel = audioChannel;
         channelObject = audioChannel;
     } else if (media == VIDEO_MEDIA) {
-        QXmppRtpVideoChannel *videoChannel = new QXmppRtpVideoChannel(q);
+        auto *videoChannel = new QXmppRtpVideoChannel(q);
         stream->channel = videoChannel;
         channelObject = videoChannel;
     } else {
@@ -573,7 +573,7 @@ void QXmppCall::hangup()
 void QXmppCall::localCandidatesChanged()
 {
     // find the stream
-    QXmppIceConnection *conn = qobject_cast<QXmppIceConnection*>(sender());
+    auto *conn = qobject_cast<QXmppIceConnection*>(sender());
     QXmppCallPrivate::Stream *stream = nullptr;
     foreach (QXmppCallPrivate::Stream *ptr, d->streams) {
         if (ptr->connection == conn) {
@@ -799,7 +799,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
         return nullptr;
     }
 
-    QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
+    auto *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
     call->d->sid = QXmppUtils::generateStanzaHash();
 
     // register call

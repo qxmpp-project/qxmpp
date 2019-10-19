@@ -166,7 +166,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // if we did not find an outgoing server,
         // we need to establish the S2S connection
-        QXmppOutgoingServer *conn = new QXmppOutgoingServer(domain, nullptr);
+        auto *conn = new QXmppOutgoingServer(domain, nullptr);
         conn->setLocalStreamKey(QXmppUtils::generateStanzaHash().toLatin1());
         conn->moveToThread(q->thread());
         conn->setParent(q);
@@ -266,7 +266,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
     if (!loaded) {
         QObjectList plugins = QPluginLoader::staticInstances();
         foreach (QObject *object, plugins) {
-            QXmppServerPlugin *plugin = qobject_cast<QXmppServerPlugin*>(object);
+            auto *plugin = qobject_cast<QXmppServerPlugin*>(object);
             if (!plugin)
                 continue;
 
@@ -547,7 +547,7 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     }
 
     // create new server
-    QXmppSslServer *server = new QXmppSslServer(this);
+    auto *server = new QXmppSslServer(this);
     server->addCaCertificates(d->caCertificates);
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
@@ -610,7 +610,7 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     }
 
     // create new server
-    QXmppSslServer *server = new QXmppSslServer(this);
+    auto *server = new QXmppSslServer(this);
     server->addCaCertificates(d->caCertificates);
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
@@ -704,7 +704,7 @@ void QXmppServer::_q_clientConnection(QSslSocket *socket)
         return;
     }
 
-    QXmppIncomingClient *stream = new QXmppIncomingClient(socket, d->domain, this);
+    auto *stream = new QXmppIncomingClient(socket, d->domain, this);
     stream->setInactivityTimeout(120);
     socket->setParent(stream);
     addIncomingClient(stream);
@@ -715,7 +715,7 @@ void QXmppServer::_q_clientConnection(QSslSocket *socket)
 
 void QXmppServer::_q_clientConnected()
 {
-    QXmppIncomingClient *client = qobject_cast<QXmppIncomingClient*>(sender());
+    auto *client = qobject_cast<QXmppIncomingClient*>(sender());
     if (!client)
         return;
 
@@ -739,7 +739,7 @@ void QXmppServer::_q_clientConnected()
 
 void QXmppServer::_q_clientDisconnected()
 {
-    QXmppIncomingClient *client  = qobject_cast<QXmppIncomingClient *>(sender());
+    auto *client  = qobject_cast<QXmppIncomingClient *>(sender());
     if (!client)
         return;
 
@@ -771,7 +771,7 @@ void QXmppServer::_q_clientDisconnected()
 
 void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
 {
-    QXmppIncomingServer *stream = qobject_cast<QXmppIncomingServer *>(sender());
+    auto *stream = qobject_cast<QXmppIncomingServer *>(sender());
     if (!stream)
         return;
 
@@ -806,7 +806,7 @@ void QXmppServer::handleElement(const QDomElement &element)
 
 void QXmppServer::_q_outgoingServerDisconnected()
 {
-    QXmppOutgoingServer *outgoing = qobject_cast<QXmppOutgoingServer *>(sender());
+    auto *outgoing = qobject_cast<QXmppOutgoingServer *>(sender());
     if (!outgoing)
         return;
 
@@ -831,7 +831,7 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
         return;
     }
 
-    QXmppIncomingServer *stream = new QXmppIncomingServer(socket, d->domain, this);
+    auto *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
     check = connect(stream, SIGNAL(disconnected()),
@@ -855,7 +855,7 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
 
 void QXmppServer::_q_serverDisconnected()
 {
-    QXmppIncomingServer *incoming = qobject_cast<QXmppIncomingServer *>(sender());
+    auto *incoming = qobject_cast<QXmppIncomingServer *>(sender());
     if (!incoming)
         return;
 
@@ -893,7 +893,7 @@ QXmppSslServer::~QXmppSslServer()
 
 void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
 {
-    QSslSocket *socket = new QSslSocket;
+    auto *socket = new QSslSocket;
     if (!socket->setSocketDescriptor(socketDescriptor)) {
         delete socket;
         return;

@@ -127,10 +127,10 @@ public:
     template<typename T>
     T* findExtension()
     {
-        QList<QXmppClientExtension*> list = extensions();
-        for (int i = 0; i < list.size(); ++i)
+        const QList<QXmppClientExtension*> list = extensions();
+        for (auto ext : list)
         {
-            T* extension = qobject_cast<T*>(list.at(i));
+            T* extension = qobject_cast<T*>(ext);
             if(extension)
                 return extension;
         }

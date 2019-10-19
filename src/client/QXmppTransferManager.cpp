@@ -263,7 +263,7 @@ void QXmppTransferJob::accept(const QString &filePath)
 {
     if (d->direction == IncomingDirection && d->state == OfferState && !d->iodevice)
     {
-        QFile *file = new QFile(filePath, this);
+        auto *file = new QFile(filePath, this);
         if (!file->open(QIODevice::WriteOnly))
         {
             warning(QString("Could not write to %1").arg(filePath));
@@ -1143,7 +1143,7 @@ void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
         // handle IQ from proxy
         if (ptr->direction() == QXmppTransferJob::OutgoingDirection && ptr->d->socksProxy.jid() == iq.from() && ptr->d->requestId == iq.id())
         {
-            QXmppTransferOutgoingJob *job = static_cast<QXmppTransferOutgoingJob*>(ptr);
+            auto *job = static_cast<QXmppTransferOutgoingJob*>(ptr);
             if (job->d->socksSocket)
             {
                 // proxy connection activation result
@@ -1198,7 +1198,7 @@ void QXmppTransferManager::_q_jobDestroyed(QObject *object)
 
 void QXmppTransferManager::_q_jobError(QXmppTransferJob::Error error)
 {
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
+    auto *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !d->jobs.contains(job))
         return;
 
@@ -1217,7 +1217,7 @@ void QXmppTransferManager::_q_jobError(QXmppTransferJob::Error error)
 
 void QXmppTransferManager::_q_jobFinished()
 {
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
+    auto *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !d->jobs.contains(job))
         return;
 
@@ -1229,7 +1229,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     bool check;
     Q_UNUSED(check);
 
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob *>(sender());
+    auto *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !d->jobs.contains(job))
         return;
 
@@ -1360,7 +1360,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
         return nullptr;
     }
 
-    QXmppTransferOutgoingJob *job = new QXmppTransferOutgoingJob(jid, client(), this);
+    auto *job = new QXmppTransferOutgoingJob(jid, client(), this);
     if (sid.isEmpty())
         job->d->sid = QXmppUtils::generateStanzaHash();
     else

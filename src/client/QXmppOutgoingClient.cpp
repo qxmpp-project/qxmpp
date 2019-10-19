@@ -187,7 +187,7 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     Q_UNUSED(check);
 
     // initialise socket
-    QSslSocket *socket = new QSslSocket(this);
+    auto *socket = new QSslSocket(this);
     setSocket(socket);
 
     check = connect(socket, SIGNAL(disconnected()),

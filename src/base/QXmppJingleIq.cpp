@@ -488,10 +488,10 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                 }
                 const int id = attrValue.left(spIdx).toInt();
                 const QString paramStr = attrValue.mid(spIdx + 1);
-                for (int i = 0; i < payloads.size(); ++i) {
-                    if (payloads[i].id() == id) {
+                for (auto &payload : payloads) {
+                    if (payload.id() == id) {
                         QMap<QString, QString> params;
-                        if (payloads[i].name() == "telephone-event") {
+                        if (payload.name() == "telephone-event") {
                             params.insert("events", paramStr);
                         } else {
                             foreach (const QString p, paramStr.split(QRegExp(";\\s*"))) {
@@ -500,7 +500,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                                     params.insert(bits[0], bits[1]);
                             }
                         }
-                        payloads[i].setParameters(params);
+                        payload.setParameters(params);
                     }
                 }
             } else if (attrName == "rtpmap") {
@@ -514,13 +514,13 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     continue;
 
                 const QStringList args = bits[1].split('/');
-                for (int i = 0; i < payloads.size(); ++i) {
-                    if (payloads[i].id() == id) {
-                        payloads[i].setName(args[0]);
+                for (auto &payload : payloads) {
+                    if (payload.id() == id) {
+                        payload.setName(args[0]);
                         if (args.size() > 1)
-                            payloads[i].setClockrate(args[1].toInt());
+                            payload.setClockrate(args[1].toInt());
                         if (args.size() > 2)
-                            payloads[i].setChannels(args[2].toInt());
+                            payload.setChannels(args[2].toInt());
                     }
                 }
             } else if (attrName == "ice-ufrag") {

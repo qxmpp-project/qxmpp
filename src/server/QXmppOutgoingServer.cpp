@@ -61,7 +61,7 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     Q_UNUSED(check);
 
     // socket initialisation
-    QSslSocket *socket = new QSslSocket(this);
+    auto *socket = new QSslSocket(this);
     setSocket(socket);
 
     check = connect(socket, SIGNAL(disconnected()),

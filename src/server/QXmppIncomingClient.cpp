@@ -393,7 +393,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
 void QXmppIncomingClient::onDigestReply()
 {
-    QXmppPasswordReply *reply = qobject_cast<QXmppPasswordReply*>(sender());
+    auto *reply = qobject_cast<QXmppPasswordReply*>(sender());
     if (!reply)
         return;
     reply->deleteLater();
@@ -424,7 +424,7 @@ void QXmppIncomingClient::onDigestReply()
 
 void QXmppIncomingClient::onPasswordReply()
 {
-    QXmppPasswordReply *reply = qobject_cast<QXmppPasswordReply*>(sender());
+    auto *reply = qobject_cast<QXmppPasswordReply*>(sender());
     if (!reply)
         return;
     reply->deleteLater();

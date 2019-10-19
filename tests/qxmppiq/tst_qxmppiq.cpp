@@ -41,19 +41,19 @@ void tst_QXmppIq::testBasic_data()
     QTest::addColumn<int>("type");
 
     QTest::newRow("get")
-        << QByteArray("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"get\"/>")
+        << QByteArray(R"(<iq to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="get"/>)")
         << int(QXmppIq::Get);
 
     QTest::newRow("set")
-        << QByteArray("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"set\"/>")
+        << QByteArray(R"(<iq to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="set"/>)")
         << int(QXmppIq::Set);
 
     QTest::newRow("result")
-        << QByteArray("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"result\"/>")
+        << QByteArray(R"(<iq to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="result"/>)")
         << int(QXmppIq::Result);
 
     QTest::newRow("error")
-        << QByteArray("<iq to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"error\"/>")
+        << QByteArray(R"(<iq to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="error"/>)")
         << int(QXmppIq::Error);
 }
 
