@@ -23,6 +23,7 @@
 
 #include <QCryptographicHash>
 #include <QDomElement>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -203,7 +204,7 @@ public:
     QString mimeType;
     QString requestId;
     QXmppTransferJob::State state;
-    QTime transferStart;
+    QElapsedTimer transferStart;
     bool deviceIsOwn;
 
     // file meta-data
