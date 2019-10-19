@@ -229,7 +229,7 @@ void QXmppStream::_q_socketReadyRead()
     }
 
     // FIXME : maybe these QRegExps could be static?
-    QRegExp startStreamRegex("^(<\\?xml.*\\?>)?\\s*<stream:stream.*>");
+    QRegExp startStreamRegex(R"(^(<\?xml.*\?>)?\s*<stream:stream.*>)");
     startStreamRegex.setMinimal(true);
     QRegExp endStreamRegex("</stream:stream>$");
     endStreamRegex.setMinimal(true);

@@ -228,8 +228,8 @@ QString QXmppUtils::jidToBareJid(const QString& jid)
 quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
     quint32 result = 0xffffffff;
-    for(int n = 0; n < in.size(); ++n)
-        result = (result >> 8) ^ (crctable[(result & 0xff) ^ (quint8)in[n]]);
+    for(char n : in)
+        result = (result >> 8) ^ (crctable[(result & 0xff) ^ (quint8)n]);
     return result ^= 0xffffffff;
 }
 

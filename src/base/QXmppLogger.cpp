@@ -77,7 +77,7 @@ static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
 QXmppLoggable::QXmppLoggable(QObject *parent)
     : QObject(parent)
 {
-    QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
+    auto *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
         relaySignals(this, logParent);
     }
@@ -86,7 +86,7 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
 /// \cond
 void QXmppLoggable::childEvent(QChildEvent *event)
 {
-    QXmppLoggable *child = qobject_cast<QXmppLoggable*>(event->child());
+    auto *child = qobject_cast<QXmppLoggable*>(event->child());
     if (!child)
         return;
 

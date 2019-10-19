@@ -249,7 +249,7 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     : QIODevice(parent)
     , d(new QXmppRtpAudioChannelPrivate())
 {
-    QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
+    auto *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
         connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
                 logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
@@ -571,9 +571,9 @@ void QXmppRtpAudioChannel::startTone(QXmppRtpAudioChannel::Tone tone)
 
 void QXmppRtpAudioChannel::stopTone(QXmppRtpAudioChannel::Tone tone)
 {
-    for (int i = 0; i < d->outgoingTones.size(); ++i) {
-        if (d->outgoingTones[i].tone == tone) {
-            d->outgoingTones[i].finished = true;
+    for (auto &outgoingTone : d->outgoingTones) {
+        if (outgoingTone.tone == tone) {
+            outgoingTone.finished = true;
             break;
         }
     }

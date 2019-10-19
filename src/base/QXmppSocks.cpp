@@ -226,7 +226,7 @@ quint16 QXmppSocksServer::serverPort() const
 
 void QXmppSocksServer::slotNewConnection()
 {
-    QTcpServer *server = qobject_cast<QTcpServer*>(sender());
+    auto *server = qobject_cast<QTcpServer*>(sender());
     if (!server)
         return;
 
@@ -241,7 +241,7 @@ void QXmppSocksServer::slotNewConnection()
 
 void QXmppSocksServer::slotReadyRead()
 {
-    QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender());
+    auto *socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket || !m_states.contains(socket))
         return;
 

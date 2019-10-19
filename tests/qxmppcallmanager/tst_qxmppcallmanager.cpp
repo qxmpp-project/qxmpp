@@ -77,7 +77,7 @@ void tst_QXmppCallManager::testCall()
 
     // prepare sender
     QXmppClient sender;
-    QXmppCallManager *senderManager = new QXmppCallManager;
+    auto *senderManager = new QXmppCallManager;
     sender.addExtension(senderManager);
     sender.setLogger(&logger);
 
@@ -97,7 +97,7 @@ void tst_QXmppCallManager::testCall()
 
     // prepare receiver
     QXmppClient receiver;
-    QXmppCallManager *receiverManager = new QXmppCallManager;
+    auto *receiverManager = new QXmppCallManager;
     connect(receiverManager, SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(acceptCall(QXmppCall*)));
     receiver.addExtension(receiverManager);

@@ -93,7 +93,7 @@ void xmppClient::slotFileReceived(QXmppTransferJob *job)
     Q_ASSERT(check);
 
     // allocate a buffer to receive the file
-    QBuffer *buffer = new QBuffer(this);
+    auto *buffer = new QBuffer(this);
     buffer->open(QIODevice::WriteOnly);
     job->accept(buffer);
 }

@@ -159,7 +159,7 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
             debug(QString("Received a dialback result from '%1' on %2").arg(domain, d->origin()));
 
             // establish dialback connection
-            QXmppOutgoingServer *stream = new QXmppOutgoingServer(d->domain, this);
+            auto *stream = new QXmppOutgoingServer(d->domain, this);
             bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
                                  this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
             Q_ASSERT(check);
@@ -201,7 +201,7 @@ bool QXmppIncomingServer::isConnected() const
 
 void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dialback)
 {
-    QXmppOutgoingServer *stream = qobject_cast<QXmppOutgoingServer*>(sender());
+    auto *stream = qobject_cast<QXmppOutgoingServer*>(sender());
     if (!stream ||
         dialback.command() != QXmppDialback::Verify ||
         dialback.id() != d->localStreamId ||

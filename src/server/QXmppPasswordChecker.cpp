@@ -162,7 +162,7 @@ void QXmppPasswordReply::setPassword(const QString &password)
 
 QXmppPasswordReply *QXmppPasswordChecker::checkPassword(const QXmppPasswordRequest &request)
 {
-    QXmppPasswordReply *reply = new QXmppPasswordReply;
+    auto *reply = new QXmppPasswordReply;
 
     QString secret;
     QXmppPasswordReply::Error error = getPassword(request, secret);
@@ -187,7 +187,7 @@ QXmppPasswordReply *QXmppPasswordChecker::checkPassword(const QXmppPasswordReque
 
 QXmppPasswordReply *QXmppPasswordChecker::getDigest(const QXmppPasswordRequest &request)
 {
-    QXmppPasswordReply *reply = new QXmppPasswordReply;
+    auto *reply = new QXmppPasswordReply;
 
     QString secret;
     QXmppPasswordReply::Error error = getPassword(request, secret);

@@ -66,23 +66,23 @@ void tst_QXmppMessage::testBasic_data()
     QTest::addColumn<QString>("thread");
 
     QTest::newRow("error")
-        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"error\"/>")
+        << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="error"/>)")
         << int(QXmppMessage::Error)
         << QString() << QString() << QString();
     QTest::newRow("normal")
-        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\"/>")
+        << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="normal"/>)")
         << int(QXmppMessage::Normal)
         << QString() << QString() << QString();
     QTest::newRow("chat")
-        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"chat\"/>")
+        << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="chat"/>)")
         << int(QXmppMessage::Chat)
         << QString() << QString() << QString();
     QTest::newRow("groupchat")
-        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"groupchat\"/>")
+        << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="groupchat"/>)")
         << int(QXmppMessage::GroupChat)
         << QString() << QString() << QString();
     QTest::newRow("headline")
-        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"headline\"/>")
+        << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="headline"/>)")
         << int(QXmppMessage::Headline)
         << QString() << QString() << QString();
 
@@ -364,23 +364,23 @@ void tst_QXmppMessage::testState_data()
         << int(QXmppMessage::None);
 
     QTest::newRow("active")
-        << QByteArray("<message type=\"normal\"><active xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << QByteArray(R"(<message type="normal"><active xmlns="http://jabber.org/protocol/chatstates"/></message>)")
         << int(QXmppMessage::Active);
 
     QTest::newRow("inactive")
-        << QByteArray("<message type=\"normal\"><inactive xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << QByteArray(R"(<message type="normal"><inactive xmlns="http://jabber.org/protocol/chatstates"/></message>)")
         << int(QXmppMessage::Inactive);
 
     QTest::newRow("gone")
-        << QByteArray("<message type=\"normal\"><gone xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << QByteArray(R"(<message type="normal"><gone xmlns="http://jabber.org/protocol/chatstates"/></message>)")
         << int(QXmppMessage::Gone);
 
     QTest::newRow("composing")
-        << QByteArray("<message type=\"normal\"><composing xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << QByteArray(R"(<message type="normal"><composing xmlns="http://jabber.org/protocol/chatstates"/></message>)")
         << int(QXmppMessage::Composing);
 
     QTest::newRow("paused")
-        << QByteArray("<message type=\"normal\"><paused xmlns=\"http://jabber.org/protocol/chatstates\"/></message>")
+        << QByteArray(R"(<message type="normal"><paused xmlns="http://jabber.org/protocol/chatstates"/></message>)")
         << int(QXmppMessage::Paused);
 }
 

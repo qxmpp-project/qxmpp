@@ -106,7 +106,7 @@ void tst_QXmppTransferManager::testSendFile()
 
     // prepare sender
     QXmppClient sender;
-    QXmppTransferManager *senderManager = new QXmppTransferManager;
+    auto *senderManager = new QXmppTransferManager;
     senderManager->setSupportedMethods(senderMethods);
     sender.addExtension(senderManager);
     sender.setLogger(&logger);
@@ -127,7 +127,7 @@ void tst_QXmppTransferManager::testSendFile()
 
     // prepare receiver
     QXmppClient receiver;
-    QXmppTransferManager *receiverManager = new QXmppTransferManager;
+    auto *receiverManager = new QXmppTransferManager;
     receiverManager->setSupportedMethods(receiverMethods);
     connect(receiverManager, SIGNAL(fileReceived(QXmppTransferJob*)),
             this, SLOT(acceptFile(QXmppTransferJob*)));
