@@ -34,8 +34,6 @@ private slots:
     void testItem();
     void testVersion_data();
     void testVersion();
-    void testMixAnnotate();
-    void testMixChannel();
 };
 
 void tst_QXmppRosterIq::testItem_data()
@@ -114,46 +112,6 @@ void tst_QXmppRosterIq::testVersion()
     parsePacket(iq, xml);
     QCOMPARE(iq.version(), version);
     serializePacket(iq, xml);
-}
-
-void tst_QXmppRosterIq::testMixAnnotate()
-{
-    const QByteArray xml(
-        "<iq from=\"juliet@example.com/balcony\" "
-            "type=\"get\">"
-            "<query xmlns=\"jabber:iq:roster\">"
-                "<annotate xmlns=\"urn:xmpp:mix:roster:0\"/>"
-            "</query>"
-        "</iq>"
-    );
-
-    QXmppRosterIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.mixAnnotate(), true);
-    serializePacket(iq, xml);
-
-    iq.setMixAnnotate(false);
-    QCOMPARE(iq.mixAnnotate(), false);
-}
-
-void tst_QXmppRosterIq::testMixChannel()
-{
-    const QByteArray xml(
-        "<item jid=\"balcony@example.net\">"
-            "<channel xmlns=\"urn:xmpp:mix:roster:0\" participant-id=\"123456\"/>"
-        "</item>"
-    );
-
-    QXmppRosterIq::Item item;
-    parsePacket(item, xml);
-    QCOMPARE(item.isMixChannel(), true);
-    QCOMPARE(item.mixParticipantId(), QString("123456"));
-    serializePacket(item, xml);
-
-    item.setIsMixChannel(false);
-    QCOMPARE(item.isMixChannel(), false);
-    item.setMixParticipantId("23a7n");
-    QCOMPARE(item.mixParticipantId(), QString("23a7n"));
 }
 
 QTEST_MAIN(tst_QXmppRosterIq)
