@@ -26,6 +26,9 @@
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
+// Required for source compatibility
+#include <QDateTime>
+
 #include "QXmppStanza.h"
 
 class QXmppMessagePrivate;
