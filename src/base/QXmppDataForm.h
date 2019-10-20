@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -24,53 +25,98 @@
 #ifndef QXMPPDATAFORM_H
 #define QXMPPDATAFORM_H
 
-#include <QPair>
-#include <QVariant>
-
 #include "QXmppStanza.h"
+
+#if QXMPP_DEPRECATED_SINCE(1, 1)
+#include <QPair>
+#endif
+#include <QVariant>
+#include <QVector>
+
+class QMimeType;
+class QUrl;
 
 class QXmppDataFormPrivate;
 class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;
+class QXmppDataFormMediaSourcePrivate;
 
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// XEP-0004: Data Forms.
-///
 
 class QXMPP_EXPORT QXmppDataForm
 {
 public:
-    /// \brief The QXmppDataForm::Media class represents a media field
-    /// as defined by XEP-0221: Data Forms Media Element.
+    /// \brief The \c QXmppDataForm::MediaSource class represents a link to one
+    /// of possibly multiple sources for a media element from XEP-0221: Data
+    /// Forms Media Element consisting of a MIME type and a QUrl.
     ///
+    /// \since QXmpp 1.1
+
+    class QXMPP_EXPORT MediaSource
+    {
+    public:
+        MediaSource();
+        MediaSource(const QUrl &uri, const QMimeType &contentType);
+        MediaSource(const QXmppDataForm::MediaSource &);
+        ~MediaSource();
+
+        MediaSource &operator=(const MediaSource &);
+
+        QUrl uri() const;
+        void setUri(const QUrl &uri);
+
+        QMimeType contentType() const;
+        void setContentType(const QMimeType &contentType);
+
+        bool operator==(const MediaSource &other) const;
+
+    private:
+        QSharedDataPointer<QXmppDataFormMediaSourcePrivate> d;
+    };
+
+#if QXMPP_DEPRECATED_SINCE(1, 1)
+    /// \brief The QXmppDataForm::Media class represents a media field as
+    /// defined by XEP-0221: Data Forms Media Element.
+    ///
+    /// \deprecated This class is deprecated since QXmpp 1.1.
 
     class QXMPP_EXPORT Media
     {
     public:
+        QT_DEPRECATED_X("Use QXmppDataForm::Field() instead")
         Media();
+        QT_DEPRECATED_X("Use QXmppDataForm::Field() instead")
         Media(const QXmppDataForm::Media &other);
         ~Media();
 
         QXmppDataForm::Media& operator=(const QXmppDataForm::Media &other);
 
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSize().height() instead")
         int height() const;
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSize().setHeight() instead")
         void setHeight(int height);
 
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSize().width() instead")
         int width() const;
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSize().setWidth() instead")
         void setWidth(int width);
 
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSources() instead")
         QList<QPair<QString, QString> > uris() const;
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::setMediaSources() instead")
         void setUris(const QList<QPair<QString, QString> > &uris);
 
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSources().isEmpty() instead")
         bool isNull() const;
 
     private:
         QSharedDataPointer<QXmppDataFormMediaPrivate> d;
     };
+#endif
 
     /// \brief The QXmppDataForm::Field class represents a data form field
     /// as defined by XEP-0004: Data Forms.
-    ///
 
     class QXMPP_EXPORT Field
     {
@@ -105,8 +151,13 @@ public:
         QString label() const;
         void setLabel(const QString &label);
 
+#if QXMPP_DEPRECATED_SINCE(1, 1)
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSources() or QXmppDataForm::Field::mediaSize() instead")
         Media media() const;
+
+        QT_DEPRECATED_X("Use QXmppDataForm::Field::setMediaSources() or QXmppDataForm::Field::setMediaSize() instead")
         void setMedia(const Media &media);
+#endif
 
         QList<QPair<QString, QString> > options() const;
         void setOptions(const QList<QPair<QString, QString> > &options);
@@ -119,6 +170,16 @@ public:
 
         QVariant value() const;
         void setValue(const QVariant &value);
+
+        QVector<QXmppDataForm::MediaSource> &mediaSources();
+        QVector<QXmppDataForm::MediaSource> mediaSources() const;
+        void setMediaSources(const QVector<QXmppDataForm::MediaSource> &mediaSources);
+
+        QSize mediaSize() const;
+        QSize &mediaSize();
+        void setMediaSize(const QSize &size);
+
+        bool operator==(const Field &other) const;
 
     private:
         QSharedDataPointer<QXmppDataFormFieldPrivate> d;
