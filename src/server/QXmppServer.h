@@ -89,8 +89,8 @@ public:
     bool listenForClients(const QHostAddress &address = QHostAddress::Any, quint16 port = 5222);
     bool listenForServers(const QHostAddress &address = QHostAddress::Any, quint16 port = 5269);
 
-    bool sendElement(const QDomElement &element);
-    bool sendPacket(const QXmppStanza &stanza);
+    bool sendElement(const QDomElement &element, const QString& resource = QString());
+    bool sendPacket(const QXmppStanza &stanza, const QString& resource = QString());
 
     void addIncomingClient(QXmppIncomingClient *stream);
 
