@@ -21,10 +21,9 @@
  *
  */
 
-#include <iostream>
-
 #include <QBuffer>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QImage>
@@ -39,53 +38,43 @@
 #include "example_9_vCard.h"
 
 xmppClient::xmppClient(QObject *parent)
-    : QXmppClient(parent)
+    : QXmppClient(parent),
+      m_rosterManager(findExtension<QXmppRosterManager>()),
+      m_vCardManager(findExtension<QXmppVCardManager>())
 {
-    bool check;
-    Q_UNUSED(check);
+    connect(this, &QXmppClient::connected, this, &xmppClient::clientConnected);
 
-    check = connect(this, SIGNAL(connected()),
-                    SLOT(clientConnected()));
-    Q_ASSERT(check);
-
-    check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
-                    SLOT(rosterReceived()));
-    Q_ASSERT(check);
+    connect(m_rosterManager, &QXmppRosterManager::rosterReceived,
+            this, &xmppClient::rosterReceived);
 }
 
-xmppClient::~xmppClient()
-{
-
-}
+xmppClient::~xmppClient() = default;
 
 void xmppClient::clientConnected()
 {
-    std::cout<<"example_9_vCard:: CONNECTED"<<std::endl;
+    qDebug() << "example_9_vCard: CONNECTED";
 }
 
 void xmppClient::rosterReceived()
 {
-    std::cout<<"example_9_vCard:: Roster Received"<<std::endl;
-    bool check = connect(&this->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),
-        SLOT(vCardReceived(QXmppVCardIq)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
+    qDebug() << "example_9_vCard: Roster Received";
 
-    QStringList list = rosterManager().getRosterBareJids();
-    for(int i = 0; i < list.size(); ++i)
-    {
-        // request vCard of all the bareJids in roster
-        vCardManager().requestVCard(list.at(i));
-    }
+    connect(m_vCardManager, &QXmppVCardManager::vCardReceived,
+            this, &xmppClient::vCardReceived);
+
+    // request vCard of all the bareJids in roster
+    const QStringList jids = m_rosterManager->getRosterBareJids();
+    for (const auto &jid : jids)
+        m_vCardManager->requestVCard(jid);
 }
 
 void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
 {
     QString bareJid = vCard.from();
-    std::cout<<"example_9_vCard:: vCard Received:: " << qPrintable(bareJid) <<std::endl;
+    qDebug() << "example_9_vCard: vCard Received:" << bareJid;
 
-    QString out("FullName: %1\nNickName: %2\n");
-    std::cout<<qPrintable(out.arg(vCard.fullName()).arg(vCard.nickName())) <<std::endl;
+    qDebug() << "FullName:" << vCard.fullName();
+    qDebug() << "Nickname:" << vCard.nickName();
 
     QString vCardsDir("vCards/");
 
@@ -94,12 +83,11 @@ void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
         dir.mkdir(vCardsDir);
 
     QFile file("vCards/" + bareJid + ".xml");
-    if(file.open(QIODevice::ReadWrite))
-    {
+    if (file.open(QIODevice::ReadWrite)) {
         QXmlStreamWriter stream(&file);
         vCard.toXml(&stream);
         file.close();
-        std::cout<<"example_9_vCard:: vCard written to the file:: " << qPrintable(bareJid) <<std::endl;
+        qDebug() << "example_9_vCard: vCard written to the file:" << bareJid;
     }
 
     QString name("vCards/" + bareJid + ".png");
@@ -109,10 +97,8 @@ void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
     buffer.open(QIODevice::ReadOnly);
     QImageReader imageReader(&buffer);
     QImage image = imageReader.read();
-    if(image.save(name))
-    {
-        std::cout<<"example_9_vCard:: Avatar saved to file" <<std::endl<<std::endl;
-    }
+    if (image.save(name))
+        qDebug() << "example_9_vCard: Avatar saved to file";
 }
 
 int main(int argc, char *argv[])

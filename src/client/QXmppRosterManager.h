@@ -35,29 +35,32 @@
 
 class QXmppRosterManagerPrivate;
 
-/// \brief The QXmppRosterManager class provides access to a connected client's roster.
+/// \brief The QXmppRosterManager class provides access to a connected client's
+/// roster.
 ///
 /// \note It's object should not be created using it's constructor. Instead
-/// QXmppClient::rosterManager() should be used to get the reference of instantiated
-/// object this class.
+/// \c QXmppClient::findExtension<QXmppRosterManager>() should be used to get
+/// the instantiated object of this class.
 ///
-/// It stores all the Roster and Presence details of all the roster entries (that
-/// is all the bareJids) in the client's friend's list. It provides the
+/// It stores all the Roster and Presence details of all the roster entries
+/// (that is all the bareJids) in the client's friend's list. It provides the
 /// functionality to get all the bareJids in the client's roster and Roster and
 /// Presence details of the same.
 ///
-/// After the successful xmpp connection that after the signal QXmppClient::connected()
-/// is emitted QXmpp requests for getting the roster. Once QXmpp receives the roster
-/// the signal QXmppRosterManager::rosterReceived() is emitted and after that user can
-/// use the functions of this class to get roster entries.
+/// After the QXmpp connected successfully to the XMPP server the signal
+/// \c QXmppClient::connected() is emitted and the roster is requested from the
+/// server. Once QXmpp receives the roster the signal
+/// \c QXmppRosterManager::rosterReceived() is emitted and after that the
+/// methods of this class can be used to get the roster entries.
 ///
-/// Function QXmppRosterManager::isRosterReceived() tells whether the roster has been
-/// received or not.
+/// \c QXmppRosterManager::isRosterReceived() can be used to find out whether
+/// the roster has been received yet.
 ///
-/// The itemAdded(), itemChanged() and itemRemoved() signals are emitted whenever roster
-/// entries are added, changed or removed.
+/// The \c itemAdded(), \c itemChanged() and \c itemRemoved() signals are
+/// emitted whenever roster entries are added, changed or removed.
 ///
-/// The presenceChanged() signal is emitted whenever the presence for a roster item changes.
+/// The \c presenceChanged() signal is emitted whenever the presence for a
+/// roster item changes.
 ///
 /// \ingroup Managers
 

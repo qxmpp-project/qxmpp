@@ -34,8 +34,8 @@ class QXmppVCardManagerPrivate;
 /// implementation of XEP-0054: vcard-temp.
 ///
 /// \note It's object should not be created using it's constructor. Instead
-/// QXmppClient::vCardManager() should be used to get the reference of instantiated
-/// object this class.
+/// \c QXmppClient::findExtension<QXmppVCardManager>() should be used to get
+/// the instantiated object of this class.
 ///
 /// <B>Getting vCards of entries in Roster:</B><BR>
 /// It doesn't store vCards of the JIDs in the roster of connected user. Instead
