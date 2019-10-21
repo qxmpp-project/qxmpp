@@ -29,30 +29,22 @@
 #include "example_2_rosterHandling.h"
 
 xmppClient::xmppClient(QObject *parent)
-    : QXmppClient(parent)
+    : QXmppClient(parent),
+      m_rosterManager(findExtension<QXmppRosterManager>())
 {
-    bool check;
-    Q_UNUSED(check);
+    connect(this, &QXmppClient::connected,
+            this, &xmppClient::clientConnected);
 
-    check = connect(this, SIGNAL(connected()),
-                    SLOT(clientConnected()));
-    Q_ASSERT(check);
+    connect(m_rosterManager, &QXmppRosterManager::rosterReceived,
+            this, &xmppClient::rosterReceived);
 
-    check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
-                    SLOT(rosterReceived()));
-    Q_ASSERT(check);
-
-    /// Then QXmppRoster::presenceChanged() is emitted whenever presence of someone
-    /// in roster changes
-    check = connect(&this->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
-                    SLOT(presenceChanged(QString,QString)));
-    Q_ASSERT(check);
+    /// Then QXmppRoster::presenceChanged() is emitted whenever presence of
+    /// someone in roster changes
+    connect(m_rosterManager, &QXmppRosterManager::presenceChanged,
+            this, &xmppClient::presenceChanged);
 }
 
-xmppClient::~xmppClient()
-{
-
-}
+xmppClient::~xmppClient() = default;
 
 void xmppClient::clientConnected()
 {
@@ -62,8 +54,9 @@ void xmppClient::clientConnected()
 void xmppClient::rosterReceived()
 {
     qDebug("example_2_rosterHandling:: Roster received");
-    foreach (const QString &bareJid, rosterManager().getRosterBareJids()) {
-        QString name = rosterManager().getRosterEntry(bareJid).name();
+    const QStringList jids = m_rosterManager->getRosterBareJids();
+    for (const QString &bareJid : jids) {
+        QString name = m_rosterManager->getRosterEntry(bareJid).name();
         if(name.isEmpty())
             name = "-";
         qDebug("example_2_rosterHandling:: Roster received: %s [%s]", qPrintable(bareJid), qPrintable(name));

@@ -361,22 +361,31 @@ QXmppRosterManager& QXmppClient::rosterManager()
 /// is offline or not present in the roster, it will still send a message to
 /// the bareJid.
 ///
+/// \note Usage of this method is discouraged because most modern clients use
+/// carbon messages (XEP-0280: Message Carbons) and MAM (XEP-0313: Message
+/// Archive Management) and so could possibly receive messages multiple times
+/// or not receive them at all.
+/// \c QXmppClient::sendPacket() should be used instead with a \c QXmppMessage.
+///
 /// \param bareJid bareJid of the receiving entity
 /// \param message Message string to be sent.
 
 void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
 {
-    QStringList resources = rosterManager().getResources(bareJid);
-    if(!resources.isEmpty())
-    {
-        for(int i = 0; i < resources.size(); ++i)
-        {
-            sendPacket(QXmppMessage("", bareJid + "/" + resources.at(i), message));
+    QXmppRosterManager *rosterManager = findExtension<QXmppRosterManager>();
+
+    const QStringList resources = rosterManager
+            ? rosterManager->getResources(bareJid)
+            : QStringList();
+
+    if (!resources.isEmpty()) {
+        for (const auto &resource : resources) {
+            sendPacket(
+                QXmppMessage({}, bareJid + QStringLiteral("/") + resource, message)
+            );
         }
-    }
-    else
-    {
-        sendPacket(QXmppMessage("", bareJid, message));
+    } else {
+        sendPacket(QXmppMessage({}, bareJid, message));
     }
 }
 

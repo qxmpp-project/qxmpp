@@ -32,6 +32,10 @@ class QXmppVersionManagerPrivate;
 /// \brief The QXmppVersionManager class makes it possible to request for
 /// the software version of an entity as defined by XEP-0092: Software Version.
 ///
+/// \note It's object should not be created using it's constructor. Instead
+/// \c QXmppClient::findExtension<QXmppVersionManager>() should be used to get
+/// the instantiated object of this class.
+///
 /// \ingroup Managers
 
 class QXMPP_EXPORT QXmppVersionManager : public QXmppClientExtension

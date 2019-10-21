@@ -64,9 +64,9 @@ class QXmppVersionManager;
 /// QXmppConfiguration::setAutoReconnectionEnabled().
 ///
 /// Not all the managers or extensions have been enabled by default. One can
-/// enable/disable the managers using the functions addExtension() and
-/// removeExtension(). findExtension() can be used to find reference/pointer to
-/// particular instansiated and enabled manager.
+/// enable/disable the managers using the functions \c addExtension() and
+/// \c removeExtension(). \c findExtension() can be used to find reference/
+/// pointer to particular instansiated and enabled manager.
 ///
 /// List of managers enabled by default:
 /// - QXmppRosterManager
@@ -168,8 +168,8 @@ public:
 
 signals:
 
-    /// This signal is emitted when the client connects successfully to the XMPP
-    /// server i.e. when a successful XMPP connection is established.
+    /// This signal is emitted when the client connects successfully to the
+    /// XMPP server i.e. when a successful XMPP connection is established.
     /// XMPP Connection involves following sequential steps:
     ///     - TCP socket connection
     ///     - Client sends start stream
@@ -182,15 +182,15 @@ signals:
     /// After all these steps a successful XMPP connection is established and
     /// connected() signal is emitted.
     ///
-    /// After the connected() signal is emitted QXmpp will send the roster request
-    /// to the server. On receiving the roster, QXmpp will emit
-    /// QXmppRosterManager::rosterReceived(). After this signal, QXmppRosterManager object gets
-    /// populated and you can use rosterManager() to get the handle of QXmppRosterManager object.
-    ///
+    /// After the connected() signal is emitted QXmpp will send the roster
+    /// request to the server. On receiving the roster, QXmpp will emit
+    /// QXmppRosterManager::rosterReceived(). After this signal,
+    /// QXmppRosterManager object gets populated and you can use
+    /// \c findExtension<QXmppRosterManager>() to get the handle of
+    /// QXmppRosterManager object.
     void connected();
 
     /// This signal is emitted when the XMPP connection disconnects.
-    ///
     void disconnected();
 
     /// This signal is emitted when the XMPP connection encounters any error.

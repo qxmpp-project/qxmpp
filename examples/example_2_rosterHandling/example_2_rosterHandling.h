@@ -27,6 +27,8 @@
 
 #include "QXmppClient.h"
 
+class QXmppRosterManager;
+
 class xmppClient : public QXmppClient
 {
     Q_OBJECT
@@ -39,6 +41,9 @@ public slots:
     void clientConnected();
     void rosterReceived();
     void presenceChanged(const QString& bareJid, const QString& resource);
+
+private:
+    QXmppRosterManager *m_rosterManager;
 };
 
 #endif // XMPPCLIENT_H
