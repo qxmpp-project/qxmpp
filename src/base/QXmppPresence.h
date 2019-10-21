@@ -77,7 +77,9 @@ public:
     QXmppPresence(const QXmppPresence &other);
     ~QXmppPresence() override;
 
-    QXmppPresence& operator=(const QXmppPresence &other);
+    QXmppPresence &operator=(const QXmppPresence &other);
+
+    bool isXmppStanza() const override;
 
     AvailableStatusType availableStatusType() const;
     void setAvailableStatusType(AvailableStatusType type);
@@ -90,11 +92,6 @@ public:
 
     QString statusText() const;
     void setStatusText(const QString& statusText);
-
-    /// \cond
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
 
     // XEP-0045: Multi-User Chat
     QXmppMucItem mucItem() const;
@@ -139,9 +136,16 @@ public:
     QString mixUserNick() const;
     void setMixUserNick(const QString&);
 
-    bool isXmppStanza() const override;
+    /// \cond
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
+    /// \endcond
 
 private:
+    /// \cond
+    void parseExtension(const QDomElement &element, QXmppElementList &unknownElements);
+    /// \endcond
+
     QSharedDataPointer<QXmppPresencePrivate> d;
 };
 
