@@ -45,9 +45,13 @@ QXmppUploadService::QXmppUploadService()
 {
 }
 
+/// Copy constructor
+
 QXmppUploadService::QXmppUploadService(const QXmppUploadService &) = default;
 
 QXmppUploadService::~QXmppUploadService() = default;
+
+/// Equal operator
 
 QXmppUploadService &QXmppUploadService::operator=(const QXmppUploadService &) = default;
 
@@ -171,7 +175,7 @@ QString QXmppUploadRequestManager::requestUploadSlot(const QString &fileName,
     return {};
 }
 
-/// Returns true, if an HTTP File Upload service has been discovered.
+/// Returns true if an HTTP File Upload service has been discovered.
 
 bool QXmppUploadRequestManager::serviceFound() const
 {

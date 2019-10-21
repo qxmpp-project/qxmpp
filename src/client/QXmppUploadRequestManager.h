@@ -34,10 +34,9 @@ class QXmppHttpUploadSlotIq;
 class QXmppUploadServicePrivate;
 class QXmppUploadRequestManagerPrivate;
 
-/// \class QXmppUploadService The QXmppUploadService represents an HTTP File
-/// Upload service.
+/// \brief QXmppUploadService represents an HTTP File Upload service.
 ///
-/// It is only used to store the JID and maximum file size for uploads.
+/// It is used to store the JID and maximum file size for uploads.
 
 class QXMPP_EXPORT QXmppUploadService
 {
@@ -58,8 +57,8 @@ private:
     QSharedDataPointer<QXmppUploadServicePrivate> d;
 };
 
-/// \class QXmppUploadRequestManager This class implements the core of
-/// XEP-0369: HTTP File Upload.
+/// \brief The QXmppUploadRequestManager implements the core of XEP-0369: HTTP
+/// File Upload.
 ///
 /// It handles the discovery of QXmppUploadServices and can send upload
 /// requests and outputs the upload slots. It doesn't do the actual upload via.
@@ -94,7 +93,6 @@ private:
 class QXMPP_EXPORT QXmppUploadRequestManager : public QXmppClientExtension
 {
     Q_OBJECT
-    Q_PROPERTY(bool serviceFound READ serviceFound NOTIFY serviceFoundChanged)
 
 public:
     QXmppUploadRequestManager();
@@ -122,10 +120,10 @@ signals:
 
     /// Emitted when the slot request failed.
     ///
-    /// You can get the reason from the QXmppStanza::Error of the returned
-    /// request.
+    /// \param request The sent IQ with an QXmppStanza::Error from the server.
     void requestFailed(const QXmppHttpUploadRequestIq &request);
 
+    /// Emitted when the first upload service has been found.
     void serviceFoundChanged();
 
 protected:
