@@ -1,5 +1,5 @@
-QXmpp 1.1.0 (UNRELEASED)
-------------------------
+QXmpp 1.1.0 (Oct 23, 2019)
+--------------------------
 
 All new classes and methods in this release are marked in the documentation
 with *since QXmpp 1.1*.
