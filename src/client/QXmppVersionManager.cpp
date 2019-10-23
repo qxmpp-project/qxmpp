@@ -23,9 +23,7 @@
 
 #include <QCoreApplication>
 #include <QDomElement>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
 #include <QSysInfo>
-#endif
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
@@ -48,18 +46,7 @@ QXmppVersionManager::QXmppVersionManager()
     if (d->clientName.isEmpty())
         d->clientName = "Based on QXmpp";
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
     d->clientOs = QSysInfo::prettyProductName();
-#elif defined(Q_OS_LINUX)
-    d->clientOs = QString::fromLatin1("Linux");
-#elif defined(Q_OS_MAC)
-    d->clientOs = QString::fromLatin1("macOS");
-#elif defined(Q_OS_SYMBIAN)
-    d->clientOs = QString::fromLatin1("Symbian");
-#elif defined(Q_OS_WIN)
-    d->clientOs = QString::fromLatin1("Windows");
-#endif
-
     d->clientVersion = qApp->applicationVersion();
     if (d->clientVersion.isEmpty())
         d->clientVersion = QXmppVersion();
