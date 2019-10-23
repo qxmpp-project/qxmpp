@@ -1,20 +1,56 @@
 QXmpp 1.1.0 (UNRELEASED)
 ------------------------
 
+All new classes and methods in this release are marked in the documentation
+with *since QXmpp 1.1*.
+
 New features:
  - Add support for SCRAM-SHA-1 and SCRAM-SHA-256 (#183, @jlaine)
+ - Order SASL mechanisms to prefer the most secure (#187, @jlaine)
  - Add XEP-0334: Message Processing Hints (v0.3.0) (#212, @lnjX, @jaragont,
    @sam-truscott)
+ - Add XEP-0363: HTTP File Upload (v0.9.0) (#188, @lnjX)
  - Add XEP-0367: Message Attaching (v0.3.0) (#196, @lnjX)
+ - Add XEP-0369: Mediated Information eXchange (MIX) (v0.14.2) (partially):
+   * Add QXmppMixIq to manage/join channels (#174, @lnjX)
+   * Add QXmppMessage and QXmppPresence extensions for MIX (#175, @lnjX)
+   * Add channel info and participant PubSub/PEP items (#179, @lnjX)
  - Add XEP-0380: Explicit Message Encryption (v0.3.0) (#199, @lnjX)
  - Add XEP-0382: Spoiler messages (v0.2.0) (#195, @lnjX)
+
+Fixes:
+ - Do not accept receipts from other resources of the used account (#192, lnjX)
+ - cmake: Set minimum version before creating project() and bump to 3.3 (#205, @jbbgameich)
+
+Deprecations:
+ - Deprecate QXmppClient extension getters (#214, @lnjX):
+   * `QXmppClient::rosterManager()`:
+     Use `QXmppClient::findExtension<QXmppRosterManager>()` instead
+   * `QXmppClient::vCardManager()`:
+     Use `QXmppClient::findExtension<QXmppVCardManager>()` instead
+   * `QXmppClient::versionManager()`:
+     Use `QXmppClient::findExtension<QXmppVersionManager>()` instead
+ - Refactor data form media element, deprecate `QXmppDataForm::Media` (#222, @lnjX):
+   * `QXmppDataForm::Media`:
+     Use a list of the new `QXmppDataForm::MediaSource` in combination with a `QSize`
+   * `QXmppDataForm::Field::media()` / `QXmppDataForm::Field::setMedia()`:
+     Use `QXmppDataForm::Field::mediaSources()` and `QXmppDataForm::Field::mediaSize()`
+
+Misc:
+ - Replace deprecated `qSort()` by `std::sort()` (#206, @jbbgameich)
+ - Do not use deprecated `QSslSocket::setCaCertificates()` (#206, @jbbgameich)
+ - Modernize code by using `nullptr`, `override`, etc. (#204, @jbbgameich)
+ - Move attributes into private d-pointer for future ABI compatibility:
+   * QXmppRosterIq (#175, @lnjX)
+   * QXmppStanza::Error (#203, @lnjX)
+ - Use raw literals, range based loops and `auto` (#224, @jbbgameich)
 
 QXmpp 1.0.1 (Oct 14, 2019)
 --------------------------
 
  - Fix potential SEGFAULT on connection error (#216, @0xd34df00d)
- - Fix SO_VERSION to 1: ABI has changed since last minor release (#185, @tehnick)
- - Add CMake option for internal tests (BUILD_INTERNAL_TESTS) (#184, @jlaine)
+ - Fix `SO_VERSION` to 1: ABI has changed since last minor release (#185, @tehnick)
+ - Add CMake option for internal tests (`BUILD_INTERNAL_TESTS`) (#184, @jlaine)
 
 QXmpp 1.0.0 (Jan 8, 2019)
 -------------------------
