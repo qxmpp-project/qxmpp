@@ -88,6 +88,8 @@ private:
 /// can provide the JID of the upload service which should be used for
 /// uploading.
 ///
+/// \since QXmpp 1.1
+///
 /// \ingroup Managers
 
 class QXMPP_EXPORT QXmppUploadRequestManager : public QXmppClientExtension

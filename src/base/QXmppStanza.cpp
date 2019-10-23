@@ -255,6 +255,8 @@ void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 
 /// Returns true, if an HTTP File Upload failed, because the file was too
 /// large.
+///
+/// \since QXmpp 1.1
 
 bool QXmppStanza::Error::fileTooLarge() const
 {
@@ -264,6 +266,8 @@ bool QXmppStanza::Error::fileTooLarge() const
 /// Sets whether the requested file for HTTP File Upload was too large.
 ///
 /// You should also set maxFileSize in this case.
+///
+/// \since QXmpp 1.1
 
 void QXmppStanza::Error::setFileTooLarge(bool fileTooLarge)
 {
@@ -271,6 +275,8 @@ void QXmppStanza::Error::setFileTooLarge(bool fileTooLarge)
 }
 
 /// Returns the maximum file size allowed for uploading via. HTTP File Upload.
+///
+/// \since QXmpp 1.1
 
 qint64 QXmppStanza::Error::maxFileSize() const
 {
@@ -280,6 +286,8 @@ qint64 QXmppStanza::Error::maxFileSize() const
 /// Sets the maximum file size allowed for uploading via. HTTP File Upload.
 ///
 /// This sets fileTooLarge to true.
+///
+/// \since QXmpp 1.1
 
 void QXmppStanza::Error::setMaxFileSize(qint64 maxFileSize)
 {
@@ -288,6 +296,8 @@ void QXmppStanza::Error::setMaxFileSize(qint64 maxFileSize)
 }
 
 /// Returns when to retry the upload request via. HTTP File Upload.
+///
+/// \since QXmpp 1.1
 
 QDateTime QXmppStanza::Error::retryDate() const
 {

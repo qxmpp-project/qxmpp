@@ -69,6 +69,8 @@ public:
     };
 
     /// XEP-0334: Message Processing Hints
+    ///
+    /// \since QXmpp 1.1
     enum Hint {
         NoPermanentStore = 1 << 0,  ///< Do not allow permanent storage
         NoStore = 1 << 1,           ///< Do not store at all
@@ -79,6 +81,8 @@ public:
     /// This enum describes different end-to-end encryption methods. These can
     /// be used to mark a message explicitly as encrypted with a specific
     /// algothim. See XEP-0380: Explicit Message Encryption for details.
+    ///
+    /// \since QXmpp 1.1
     enum EncryptionMethod {
         NoEncryption,      ///< No encryption
         UnknownEncryption, ///< Unknown encryption

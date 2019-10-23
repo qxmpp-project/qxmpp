@@ -543,6 +543,8 @@ void QXmppPresence::setLastUserInteraction(const QDateTime& lastUserInteraction)
 }
 
 /// Returns the actual (full) JID of the MIX channel participant.
+///
+/// \since QXmpp 1.1
 
 QString QXmppPresence::mixUserJid() const
 {
@@ -550,6 +552,8 @@ QString QXmppPresence::mixUserJid() const
 }
 
 /// Sets the actual (full) JID of the MIX channel participant.
+///
+/// \since QXmpp 1.1
 
 void QXmppPresence::setMixUserJid(const QString& mixUserJid)
 {
@@ -557,6 +561,8 @@ void QXmppPresence::setMixUserJid(const QString& mixUserJid)
 }
 
 /// Returns the MIX participant's nickname.
+///
+/// \since QXmpp 1.1
 
 QString QXmppPresence::mixUserNick() const
 {
@@ -564,6 +570,8 @@ QString QXmppPresence::mixUserNick() const
 }
 
 /// Sets the MIX participant's nickname.
+///
+/// \since QXmpp 1.1
 
 void QXmppPresence::setMixUserNick(const QString& mixUserNick)
 {

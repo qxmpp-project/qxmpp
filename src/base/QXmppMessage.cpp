@@ -532,6 +532,8 @@ void QXmppMessage::setReplaceId(const QString &replaceId)
 
 /// Returns true if the message contains the hint passed, as defined in
 /// XEP-0334: Message Processing Hints
+///
+/// \since QXmpp 1.1
 
 bool QXmppMessage::hasHint(const Hint hint) const
 {
@@ -540,6 +542,8 @@ bool QXmppMessage::hasHint(const Hint hint) const
 
 /// Adds a hint to the message, as defined in XEP-0334: Message Processing
 /// Hints
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::addHint(const Hint hint)
 {
@@ -548,6 +552,8 @@ void QXmppMessage::addHint(const Hint hint)
 
 /// Removes a hint from the message, as defined in XEP-0334: Message Processing
 /// Hints
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::removeHint(const Hint hint)
 {
@@ -556,6 +562,8 @@ void QXmppMessage::removeHint(const Hint hint)
 
 /// Removes all hints from the message, as defined in XEP-0334: Message
 /// Processing Hints
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::removeAllHints()
 {
@@ -564,6 +572,8 @@ void QXmppMessage::removeAllHints()
 
 /// Returns the message id this message is linked/attached to. See XEP-0367:
 /// Message Attaching for details.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::attachId() const
 {
@@ -575,6 +585,8 @@ QString QXmppMessage::attachId() const
 ///
 /// The used message id depends on the message context, see the Business rules
 /// section of the XEP for details about when to use which id.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setAttachId(const QString &attachId)
 {
@@ -582,6 +594,8 @@ void QXmppMessage::setAttachId(const QString &attachId)
 }
 
 /// Returns the actual JID of a MIX channel participant.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::mixUserJid() const
 {
@@ -589,6 +603,8 @@ QString QXmppMessage::mixUserJid() const
 }
 
 /// Sets the actual JID of a MIX channel participant.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setMixUserJid(const QString& mixUserJid)
 {
@@ -596,6 +612,8 @@ void QXmppMessage::setMixUserJid(const QString& mixUserJid)
 }
 
 /// Returns the MIX participant's nickname.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::mixUserNick() const
 {
@@ -603,6 +621,8 @@ QString QXmppMessage::mixUserNick() const
 }
 
 /// Sets the MIX participant's nickname.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setMixUserNick(const QString& mixUserNick)
 {
@@ -619,6 +639,8 @@ void QXmppMessage::setMixUserNick(const QString& mixUserNick)
 /// \note If this returns QXmppMessage::UnknownEncryption, you can still get
 /// the namespace of the encryption with \c encryptionMethodNs() and possibly
 /// also a name with \c encryptionName().
+///
+/// \since QXmpp 1.1
 
 QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
 {
@@ -633,6 +655,8 @@ QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
 
 /// Advertises that this message is encrypted with the given encryption method.
 /// See XEP-0380: Explicit Message Encryption for details.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setEncryptionMethod(QXmppMessage::EncryptionMethod method)
 {
@@ -641,6 +665,8 @@ void QXmppMessage::setEncryptionMethod(QXmppMessage::EncryptionMethod method)
 
 /// Returns the namespace of the advertised encryption method via. XEP-0380:
 /// Explicit Message Encryption.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::encryptionMethodNs() const
 {
@@ -649,6 +675,8 @@ QString QXmppMessage::encryptionMethodNs() const
 
 /// Sets the namespace of the encryption method this message advertises to be
 /// encrypted with. See XEP-0380: Explicit Message Encryption for details.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setEncryptionMethodNs(const QString &encryptionMethod)
 {
@@ -658,6 +686,8 @@ void QXmppMessage::setEncryptionMethodNs(const QString &encryptionMethod)
 /// Returns the associated name of the encryption method this message
 /// advertises to be encrypted with. See XEP-0380: Explicit Message Encryption
 /// for details.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::encryptionName() const
 {
@@ -671,6 +701,8 @@ QString QXmppMessage::encryptionName() const
 ///
 /// \note This should only be used, if the encryption method is custom and is
 /// not one of the methods listed in the XEP.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setEncryptionName(const QString &encryptionName)
 {
@@ -681,6 +713,8 @@ void QXmppMessage::setEncryptionName(const QString &encryptionName)
 /// messages. The spoiler hint however can still be empty.
 ///
 /// A spoiler message's content should not be visible to the user by default.
+///
+/// \since QXmpp 1.1
 
 bool QXmppMessage::isSpoiler() const
 {
@@ -693,6 +727,8 @@ bool QXmppMessage::isSpoiler() const
 /// The content of spoiler messages will not be displayed by default to the
 /// user. However, clients not supporting spoiler messages will still display
 /// the content as usual.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setIsSpoiler(bool isSpoiler)
 {
@@ -702,6 +738,8 @@ void QXmppMessage::setIsSpoiler(bool isSpoiler)
 /// Returns the spoiler hint as specified in XEP-0382: Spoiler messages.
 ///
 /// The hint may be empty, even if isSpoiler is true.
+///
+/// \since QXmpp 1.1
 
 QString QXmppMessage::spoilerHint() const
 {
@@ -715,6 +753,8 @@ QString QXmppMessage::spoilerHint() const
 ///
 /// Keep in mind that the spoiler hint is not displayed at all by clients not
 /// supporting spoiler messages.
+///
+/// \since QXmpp 1.1
 
 void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
 {

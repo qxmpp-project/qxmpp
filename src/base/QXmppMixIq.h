@@ -34,6 +34,8 @@ class QXmppMixIqPrivate;
 /// XEP-0405: Mediated Information eXchange (MIX): Participant Server
 /// Requirements.
 ///
+/// \since QXmpp 1.1
+///
 /// \ingroup Stanzas
 
 class QXMPP_EXPORT QXmppMixIq : public QXmppIq

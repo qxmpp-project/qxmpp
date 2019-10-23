@@ -74,11 +74,15 @@ public:
     void setClientStateIndicationMode(Mode mode);
 
     /// Returns the mode for XEP-0077: In-Band Registration
+    ///
+    /// \since QXmpp 1.1
     Mode registerMode() const;
 
     /// Sets the mode for XEP-0077: In-Band Registration
     ///
     /// \pa mode The mode to set.
+    ///
+    /// \since QXmpp 1.1
     void setRegisterMode(const Mode &registerMode);
 
     /// \cond
