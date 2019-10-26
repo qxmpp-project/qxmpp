@@ -80,28 +80,27 @@ class QXmppVersionManager;
 class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
-    Q_ENUMS(Error State)
     Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
     /// An enumeration for type of error.
     /// Error could come due a TCP socket or XML stream or due to various stanzas.
-    enum Error
-    {
+    enum Error {
         NoError,            ///< No error.
         SocketError,        ///< Error due to TCP socket.
         KeepAliveError,     ///< Error due to no response to a keep alive.
         XmppStreamError     ///< Error due to XML stream.
     };
+    Q_ENUM(Error)
 
     /// This enumeration describes a client state.
-    enum State
-    {
+    enum State {
         DisconnectedState,  ///< Disconnected from the server.
         ConnectingState,    ///< Trying to connect to the server.
         ConnectedState      ///< Connected to the server.
     };
+    Q_ENUM(State)
 
     QXmppClient(QObject *parent = nullptr);
     ~QXmppClient() override;

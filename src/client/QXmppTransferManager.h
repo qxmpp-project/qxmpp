@@ -86,7 +86,6 @@ private:
 class QXMPP_EXPORT QXmppTransferJob : public QXmppLoggable
 {
     Q_OBJECT
-    Q_ENUMS(Direction Error State)
     Q_FLAGS(Method Methods)
     Q_PROPERTY(Direction direction READ direction CONSTANT)
     Q_PROPERTY(QUrl localFileUrl READ localFileUrl WRITE setLocalFileUrl NOTIFY localFileUrlChanged)
@@ -99,30 +98,30 @@ class QXMPP_EXPORT QXmppTransferJob : public QXmppLoggable
 
 public:
     /// This enum is used to describe the direction of a transfer job.
-    enum Direction
-    {
+    enum Direction {
         IncomingDirection, ///< The file is being received.
         OutgoingDirection  ///< The file is being sent.
     };
+    Q_ENUM(Direction)
 
     /// This enum is used to describe the type of error encountered by a transfer job.
-    enum Error
-    {
+    enum Error {
         NoError = 0,      ///< No error occurred.
         AbortError,       ///< The file transfer was aborted.
         FileAccessError,  ///< An error was encountered trying to access a local file.
         FileCorruptError, ///< The file is corrupt: the file size or hash do not match.
         ProtocolError     ///< An error was encountered in the file transfer protocol.
     };
+    Q_ENUM(Error)
 
     /// This enum is used to describe a transfer method.
-    enum Method
-    {
+    enum Method {
         NoMethod = 0,     ///< No transfer method.
         InBandMethod = 1, ///< XEP-0047: In-Band Bytestreams
         SocksMethod = 2,  ///< XEP-0065: SOCKS5 Bytestreams
         AnyMethod = 3     ///< Any supported transfer method.
     };
+    Q_ENUM(Method)
     Q_DECLARE_FLAGS(Methods, Method)
 
     /// This enum is used to describe the state of a transfer job.
@@ -133,6 +132,7 @@ public:
         TransferState = 2, ///< The transfer is ongoing.
         FinishedState = 3  ///< The transfer is finished.
     };
+    Q_ENUM(State)
 
     ~QXmppTransferJob() override;
 

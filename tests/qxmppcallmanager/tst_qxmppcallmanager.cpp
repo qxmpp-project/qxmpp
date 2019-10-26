@@ -29,8 +29,6 @@
 #include "QXmppServer.h"
 #include "util.h"
 
-//Q_DECLARE_METATYPE(QXmppTransferJob::Method)
-
 class tst_QXmppCallManager : public QObject
 {
     Q_OBJECT

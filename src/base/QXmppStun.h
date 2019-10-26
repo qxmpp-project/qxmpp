@@ -241,16 +241,15 @@ private:
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
-    Q_ENUMS(GatheringState)
     Q_PROPERTY(QXmppIceConnection::GatheringState gatheringState READ gatheringState NOTIFY gatheringStateChanged)
 
 public:
-    enum GatheringState
-    {
+    enum GatheringState {
         NewGatheringState,
         BusyGatheringState,
         CompleteGatheringState
     };
+    Q_ENUM(GatheringState)
 
     QXmppIceConnection(QObject *parent = nullptr);
     ~QXmppIceConnection() override;

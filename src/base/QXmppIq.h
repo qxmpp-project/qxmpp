@@ -43,8 +43,7 @@ class QXMPP_EXPORT QXmppIq : public QXmppStanza
 {
 public:
     /// This enum describes the type of IQ.
-    enum Type
-    {
+    enum Type {
         Error = 0,  ///< Error response.
         Get,        ///< Get request.
         Set,        ///< Set request.
