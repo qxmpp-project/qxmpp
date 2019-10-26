@@ -75,7 +75,6 @@ private:
 class QXMPP_EXPORT QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChannel
 {
     Q_OBJECT
-    Q_ENUMS(Tone)
 
 public:
     /// This enum is used to describe a DTMF tone.
@@ -97,6 +96,7 @@ public:
         Tone_C,     ///< Tone for the C key.
         Tone_D      ///< Tone for the D key.
     };
+    Q_ENUM(Tone)
 
     QXmppRtpAudioChannel(QObject *parent = nullptr);
     ~QXmppRtpAudioChannel() override;

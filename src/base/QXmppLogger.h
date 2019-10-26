@@ -45,7 +45,6 @@ class QXmppLoggerPrivate;
 class QXMPP_EXPORT QXmppLogger : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(LoggingType)
     Q_FLAGS(MessageType MessageTypes)
     Q_PROPERTY(QString logFilePath READ logFilePath WRITE setLogFilePath)
     Q_PROPERTY(LoggingType loggingType READ loggingType WRITE setLoggingType)
@@ -60,6 +59,7 @@ public:
         StdoutLogging = 2,  ///< Log messages are written to the standard output
         SignalLogging = 4   ///< Log messages are emitted as a signal
     };
+    Q_ENUM(LoggingType)
 
     /// This enum describes a type of log message.
     enum MessageType

@@ -53,7 +53,6 @@ class QXmppRtpVideoChannel;
 class QXMPP_EXPORT QXmppCall : public QXmppLoggable
 {
     Q_OBJECT
-    Q_ENUMS(Direction State)
     Q_FLAGS(QIODevice::OpenModeFlag QIODevice::OpenMode)
     Q_PROPERTY(Direction direction READ direction CONSTANT)
     Q_PROPERTY(QString jid READ jid CONSTANT)
@@ -63,20 +62,20 @@ class QXMPP_EXPORT QXmppCall : public QXmppLoggable
 
 public:
     /// This enum is used to describe the direction of a call.
-    enum Direction
-    {
+    enum Direction {
         IncomingDirection, ///< The call is incoming.
         OutgoingDirection  ///< The call is outgoing.
     };
+    Q_ENUM(Direction)
 
     /// This enum is used to describe the state of a call.
-    enum State
-    {
+    enum State {
         ConnectingState = 0,    ///< The call is being connected.
         ActiveState = 1,        ///< The call is active.
         DisconnectingState = 2, ///< The call is being disconnected.
         FinishedState = 3       ///< The call is finished.
     };
+    Q_ENUM(State)
 
     ~QXmppCall() override;
 
