@@ -32,6 +32,7 @@
 #include "QXmppStanza.h"
 
 class QXmppMessagePrivate;
+class QXmppBitsOfBinaryDataList;
 
 /// \brief The QXmppMessage class represents an XMPP message.
 ///
@@ -153,6 +154,11 @@ public:
 
     Marker marker() const;
     void setMarker(const Marker);
+
+    // XEP-0231: Bits of Binary
+    QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
+    QXmppBitsOfBinaryDataList &bitsOfBinaryData();
+    void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
 
     // XEP-0280: Message Carbons
     bool isPrivate() const;
