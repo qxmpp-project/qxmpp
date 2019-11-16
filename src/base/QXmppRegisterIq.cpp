@@ -25,6 +25,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppRegisterIq.h"
+#include "QXmppBitsOfBinaryDataList.h"
 
 class QXmppRegisterIqPrivate : public QSharedData
 {
@@ -34,6 +35,7 @@ public:
     QString instructions;
     QString password;
     QString username;
+    QXmppBitsOfBinaryDataList bitsOfBinaryData;
 };
 
 QXmppRegisterIq::QXmppRegisterIq()
@@ -119,6 +121,39 @@ void QXmppRegisterIq::setUsername(const QString &username)
     d->username = username;
 }
 
+/// Returns a list of data packages attached using XEP-0231: Bits of Binary.
+///
+/// This could be used to resolve a \c cid: URL of an CAPTCHA field of the
+/// form.
+///
+/// \since QXmpp 1.2
+
+QXmppBitsOfBinaryDataList QXmppRegisterIq::bitsOfBinaryData() const
+{
+    return d->bitsOfBinaryData;
+}
+
+/// Returns a list of data attached using XEP-0231: Bits of Binary.
+///
+/// This could be used to resolve a \c cid: URL of an CAPTCHA field of the
+/// form.
+///
+/// \since QXmpp 1.2
+
+QXmppBitsOfBinaryDataList &QXmppRegisterIq::bitsOfBinaryData()
+{
+    return d->bitsOfBinaryData;
+}
+
+/// Sets a list of XEP-0231: Bits of Binary attachments to be included.
+///
+/// \since QXmpp 1.2
+
+void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData)
+{
+    d->bitsOfBinaryData = bitsOfBinaryData;
+}
+
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
@@ -133,6 +168,7 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
     d->password = queryElement.firstChildElement("password").text();
     d->email = queryElement.firstChildElement("email").text();
     d->form.parse(queryElement.firstChildElement("x"));
+    d->bitsOfBinaryData.parse(queryElement);
 }
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -158,6 +194,9 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writer->writeEmptyElement("email");
 
     d->form.toXml(writer);
+    d->bitsOfBinaryData.toXml(writer);
+
     writer->writeEndElement();
 }
+
 /// \endcond
