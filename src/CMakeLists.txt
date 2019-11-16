@@ -17,6 +17,8 @@ set(INSTALL_HEADER_FILES
     base/QXmppArchiveIq.h
     base/QXmppBindIq.h
     base/QXmppBitsOfBinaryContentId.h
+    base/QXmppBitsOfBinaryData.h
+    base/QXmppBitsOfBinaryIq.h
     base/QXmppBookmarkSet.h
     base/QXmppByteStreamIq.h
     base/QXmppDataForm.h
@@ -94,6 +96,8 @@ set(SOURCE_FILES
     base/QXmppArchiveIq.cpp
     base/QXmppBindIq.cpp
     base/QXmppBitsOfBinaryContentId.cpp
+    base/QXmppBitsOfBinaryData.cpp
+    base/QXmppBitsOfBinaryIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
     base/QXmppCodec.cpp
