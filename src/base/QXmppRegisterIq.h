@@ -28,6 +28,7 @@
 #include "QXmppIq.h"
 
 class QXmppRegisterIqPrivate;
+class QXmppBitsOfBinaryDataList;
 
 /// \brief The QXmppRegisterIq class represents a registration IQ
 /// as defined by XEP-0077: In-Band Registration.
@@ -59,6 +60,10 @@ public:
 
     QString username() const;
     void setUsername(const QString &username);
+
+    QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
+    QXmppBitsOfBinaryDataList &bitsOfBinaryData();
+    void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
 
     /// \cond
     static bool isRegisterIq(const QDomElement &element);
