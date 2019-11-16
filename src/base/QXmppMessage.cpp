@@ -28,6 +28,7 @@
 #include <QTextStream>
 #include <QXmlStreamWriter>
 
+#include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
@@ -124,6 +125,9 @@ public:
     QXmppMessage::Marker marker;
     QString markedId;
     QString markedThread;
+
+    // XEP-0231: Bits of Binary
+    QXmppBitsOfBinaryDataList bitsOfBinaryData;
 
     // XEP-0280: Message Carbons
     bool privatemsg;
@@ -479,6 +483,37 @@ QXmppMessage::Marker QXmppMessage::marker() const
 void QXmppMessage::setMarker(const Marker marker)
 {
     d->marker = marker;
+}
+
+/// Returns a list of data packages attached using XEP-0231: Bits of Binary.
+///
+/// This could be used to resolve \c cid: URIs found in the X-HTML body.
+///
+/// \since QXmpp 1.2
+
+QXmppBitsOfBinaryDataList QXmppMessage::bitsOfBinaryData() const
+{
+    return d->bitsOfBinaryData;
+}
+
+/// Returns a list of data attached using XEP-0231: Bits of Binary.
+///
+/// This could be used to resolve \c cid: URIs found in the X-HTML body.
+///
+/// \since QXmpp 1.2
+
+QXmppBitsOfBinaryDataList &QXmppMessage::bitsOfBinaryData()
+{
+    return d->bitsOfBinaryData;
+}
+
+/// Sets a list of XEP-0231: Bits of Binary attachments to be included.
+///
+/// \since QXmpp 1.2
+
+void QXmppMessage::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData)
+{
+    d->bitsOfBinaryData = bitsOfBinaryData;
 }
 
 /// Returns if the message is marked with a <private> tag,
@@ -896,6 +931,10 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
+    // XEP-0231: Bits of Binary
+    for (const auto &data : qAsConst(d->bitsOfBinaryData))
+        data.toXmlElementFromChild(xmlWriter);
+
     // XEP-0280: Message Carbons
     if (d->privatemsg) {
         xmlWriter->writeStartElement(QStringLiteral("private"));
@@ -1016,6 +1055,11 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
     // XEP-0224: Attention
     } else if (checkElement(element, QStringLiteral("attention"), ns_attention)) {
         d->attentionRequested = true;
+    // XEP-0231: Bits of Binary
+    } else if (QXmppBitsOfBinaryData::isBitsOfBinaryData(element)) {
+        QXmppBitsOfBinaryData data;
+        data.parseElementFromChild(element);
+        d->bitsOfBinaryData << data;
     // XEP-0280: Message Carbons
     } else if (checkElement(element, QStringLiteral("private"), ns_carbons)) {
         d->privatemsg = true;

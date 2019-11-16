@@ -23,6 +23,8 @@
  */
 
 #include <QObject>
+#include "QXmppBitsOfBinaryContentId.h"
+#include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppMessage.h"
 #include "util.h"
 
@@ -55,6 +57,7 @@ private slots:
     void testEme();
     void testSpoiler();
     void testProcessingHints();
+    void testBobData();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -124,6 +127,7 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::NoStore));
     QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message.hasHint(QXmppMessage::Store));
+    QCOMPARE(message.bitsOfBinaryData(), QXmppBitsOfBinaryDataList());
 
     message = QXmppMessage();
     message.setTo(QStringLiteral("foo@example.com/QXmpp"));
@@ -873,6 +877,100 @@ void tst_QXmppMessage::testProcessingHints()
     QVERIFY(!message2.hasHint(QXmppMessage::NoStore));
     QVERIFY(!message2.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message2.hasHint(QXmppMessage::Store));
+}
+
+void tst_QXmppMessage::testBobData()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<message type=\"chat\">"
+            "<data xmlns=\"urn:xmpp:bob\" "
+                    "cid=\"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org\" "
+                    "max-age=\"86400\" "
+                    "type=\"image/png\">"
+                "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
+                "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
+                "RYhe2WS3MSQRCAYTf7OKY1kT0CxsRjHmh5BENIjqEk6pHVhFzdikqO7CGyP9t59Ox2z"
+                "y6UeWBVqugLzM70Nz39mqnV1lIWgBWiYXV0BYfNZ0mvwypds1r62vH/gf76ZL/88Qlc"
+                "41zeAnQrpx5H3z1Npfr5ovmHusa9SpRiNNIOcdrto6PJ5LLfb5bp9zM+VDq/vptxDEa"
+                "a1sql9I3R5KhtfQsA5gNCWYyulV3TyTUDdfL56BvdDl4x7RiybDq9uBgxh1TTPUHDvA"
+                "qNQb+LpT5sWehxJZKKcU2MZ6sDE7PMgW2mdlBGdy6ODe6fJFdMI+us95dNqftDMdwU6"
+                "+MhpuTS9slcy5TFAcwq0Jt6qssJMTQGp4BGURlmSsNoo5oHL4kqc66NdkDO75mIfCxm"
+                "RAlvHxMLdcb7JONavMJbttXXKoMSneYu3OQTlwkUh4mNayi6js55/2VcsZOQfXIYelz"
+                "xLcntEGc3WVCsCORJVCc5r0ajAcq+EO1Q0oPm7n7+X/3jEReGdL6qT7Ml6FCjY+quJC"
+                "r+D01f6BG0SaHG56ZG32DnY2jcEV1+pU0kxTaEwaGcekN7jyu50U/TV4q6YeieyiNTu"
+                "klDKZLukyjKVNwotCUB3B0XO1WjHT3c0DHSO2zACwut8GOiljJIHaJsrlof/fpWNzGM"
+                "os6TgIY0hZNpJshzSi4igOhy3cl4qK+YgnqHkAYcZEgdW6/HyrEK7afoY7RCFzArLl2"
+                "LLDdrdmmHZfROajwIDfWj8yQG+rzwlA3WvdJiMHtjUekiNrp1oCbmyZDEyKROGjFVDr"
+                "PRzlkR9UAfG/OErnPxrop5BwpoEpXQorq2zcGxbnBJndx8Bh0yljGiGv0B4E8+YP3Xp"
+                "2rGydZNy4csW8W2pIvWhvijoujRJ0luXsoymV+8AXvE9HjII72+oReS6OfomHe3xWg/"
+                "f2coSbDa1XZ1CvGMjy1nH9KBl83oPnQKi+vAXKLjCrRvvT2WCMkPmSFbquiVuTH1qjv"
+                "p4j/u7CWyI5/Hn3KAaJJ90eP0Zp1Kjets4WPaElkxheF7cpBESzXuIdLwyFjSub07tB"
+                "6JjxH3DGiu+zwHHimdtFsMvKqG/nBxm2TwbvyU6LWs5RnJX4dSldg3QhDLAAAAAElFT"
+                "kSuQmCC"
+            "</data>"
+        "</message>"
+    );
+
+    QXmppBitsOfBinaryData data;
+    data.setCid(QXmppBitsOfBinaryContentId::fromContentId(
+        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")
+    ));
+    data.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+    data.setData(QByteArray::fromBase64(QByteArrayLiteral(
+        "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
+        "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
+        "RYhe2WS3MSQRCAYTf7OKY1kT0CxsRjHmh5BENIjqEk6pHVhFzdikqO7CGyP9t59Ox2z"
+        "y6UeWBVqugLzM70Nz39mqnV1lIWgBWiYXV0BYfNZ0mvwypds1r62vH/gf76ZL/88Qlc"
+        "41zeAnQrpx5H3z1Npfr5ovmHusa9SpRiNNIOcdrto6PJ5LLfb5bp9zM+VDq/vptxDEa"
+        "a1sql9I3R5KhtfQsA5gNCWYyulV3TyTUDdfL56BvdDl4x7RiybDq9uBgxh1TTPUHDvA"
+        "qNQb+LpT5sWehxJZKKcU2MZ6sDE7PMgW2mdlBGdy6ODe6fJFdMI+us95dNqftDMdwU6"
+        "+MhpuTS9slcy5TFAcwq0Jt6qssJMTQGp4BGURlmSsNoo5oHL4kqc66NdkDO75mIfCxm"
+        "RAlvHxMLdcb7JONavMJbttXXKoMSneYu3OQTlwkUh4mNayi6js55/2VcsZOQfXIYelz"
+        "xLcntEGc3WVCsCORJVCc5r0ajAcq+EO1Q0oPm7n7+X/3jEReGdL6qT7Ml6FCjY+quJC"
+        "r+D01f6BG0SaHG56ZG32DnY2jcEV1+pU0kxTaEwaGcekN7jyu50U/TV4q6YeieyiNTu"
+        "klDKZLukyjKVNwotCUB3B0XO1WjHT3c0DHSO2zACwut8GOiljJIHaJsrlof/fpWNzGM"
+        "os6TgIY0hZNpJshzSi4igOhy3cl4qK+YgnqHkAYcZEgdW6/HyrEK7afoY7RCFzArLl2"
+        "LLDdrdmmHZfROajwIDfWj8yQG+rzwlA3WvdJiMHtjUekiNrp1oCbmyZDEyKROGjFVDr"
+        "PRzlkR9UAfG/OErnPxrop5BwpoEpXQorq2zcGxbnBJndx8Bh0yljGiGv0B4E8+YP3Xp"
+        "2rGydZNy4csW8W2pIvWhvijoujRJ0luXsoymV+8AXvE9HjII72+oReS6OfomHe3xWg/"
+        "f2coSbDa1XZ1CvGMjy1nH9KBl83oPnQKi+vAXKLjCrRvvT2WCMkPmSFbquiVuTH1qjv"
+        "p4j/u7CWyI5/Hn3KAaJJ90eP0Zp1Kjets4WPaElkxheF7cpBESzXuIdLwyFjSub07tB"
+        "6JjxH3DGiu+zwHHimdtFsMvKqG/nBxm2TwbvyU6LWs5RnJX4dSldg3QhDLAAAAAElFT"
+        "kSuQmCC"
+    )));
+    data.setMaxAge(86400);
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QCOMPARE(message.type(), QXmppMessage::Chat);
+    QCOMPARE(message.id(), QStringLiteral(""));
+    QCOMPARE(message.bitsOfBinaryData().size(), 1);
+    QCOMPARE(message.bitsOfBinaryData().first().cid().algorithm(), data.cid().algorithm());
+    QCOMPARE(message.bitsOfBinaryData().first().cid().hash(), data.cid().hash());
+    QCOMPARE(message.bitsOfBinaryData().first().cid(), data.cid());
+    QCOMPARE(message.bitsOfBinaryData().first().contentType(), data.contentType());
+    QCOMPARE(message.bitsOfBinaryData().first().maxAge(), data.maxAge());
+    QCOMPARE(message.bitsOfBinaryData().first().data(), data.data());
+    QCOMPARE(message.bitsOfBinaryData().first(), data);
+    serializePacket(message, xml);
+
+    QXmppMessage msg;
+    msg.setType(QXmppMessage::Chat);
+    msg.setId(QStringLiteral(""));
+    QXmppBitsOfBinaryDataList bobDataList;
+    bobDataList << data;
+    msg.setBitsOfBinaryData(bobDataList);
+    serializePacket(msg, xml);
+
+    QXmppMessage msg2;
+    msg2.setType(QXmppMessage::Chat);
+    msg2.setId(QStringLiteral(""));
+    msg2.bitsOfBinaryData() << data;
+    serializePacket(msg2, xml);
+
+    // test const getter
+    const QXmppMessage constMessage = msg;
+    QCOMPARE(constMessage.bitsOfBinaryData(), msg.bitsOfBinaryData());
 }
 
 QTEST_MAIN(tst_QXmppMessage)
