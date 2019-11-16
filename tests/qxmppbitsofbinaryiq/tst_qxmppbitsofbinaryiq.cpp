@@ -218,4 +218,4 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
 }
 
 QTEST_MAIN(tst_QXmppBitsOfBinaryIq)
-#include "tst_qxmppbobiq.moc"
+#include "tst_qxmppbitsofbinaryiq.moc"
