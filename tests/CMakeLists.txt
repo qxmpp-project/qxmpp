@@ -16,6 +16,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_simple_test(qxmpparchiveiq)
 add_simple_test(qxmppbindiq)
+add_simple_test(qxmppbitsofbinarycontentid)
 add_simple_test(qxmppcallmanager)
 add_simple_test(qxmppcarbonmanager)
 add_simple_test(qxmppclient)
