@@ -26,25 +26,46 @@
 #include "QXmppConstants_p.h"
 #include "QXmppRegisterIq.h"
 
+class QXmppRegisterIqPrivate : public QSharedData
+{
+public:
+    QXmppDataForm form;
+    QString email;
+    QString instructions;
+    QString password;
+    QString username;
+};
+
+QXmppRegisterIq::QXmppRegisterIq()
+    : d(new QXmppRegisterIqPrivate)
+{
+}
+
+QXmppRegisterIq::QXmppRegisterIq(const QXmppRegisterIq &other) = default;
+
+QXmppRegisterIq::~QXmppRegisterIq() = default;
+
+QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq& other) = default;
+
 /// Returns the email for this registration IQ.
 
 QString QXmppRegisterIq::email() const
 {
-    return m_email;
+    return d->email;
 }
 
 /// Sets the \a email for this registration IQ.
 
 void QXmppRegisterIq::setEmail(const QString &email)
 {
-    m_email = email;
+    d->email = email;
 }
 
 /// Returns the QXmppDataForm for this registration IQ.
 
 QXmppDataForm QXmppRegisterIq::form() const
 {
-    return m_form;
+    return d->form;
 }
 
 /// Sets the QXmppDataForm for this registration IQ.
@@ -53,49 +74,49 @@ QXmppDataForm QXmppRegisterIq::form() const
 
 void QXmppRegisterIq::setForm(const QXmppDataForm &form)
 {
-    m_form = form;
+    d->form = form;
 }
 
 /// Returns the instructions for this registration IQ.
 
 QString QXmppRegisterIq::instructions() const
 {
-    return m_instructions;
+    return d->instructions;
 }
 
 /// Sets the \a instructions for this registration IQ.
 
 void QXmppRegisterIq::setInstructions(const QString &instructions)
 {
-    m_instructions = instructions;
+    d->instructions = instructions;
 }
 
 /// Returns the password for this registration IQ.
 
 QString QXmppRegisterIq::password() const
 {
-    return m_password;
+    return d->password;
 }
 
 /// Sets the \a password for this registration IQ.
 
 void QXmppRegisterIq::setPassword(const QString &password)
 {
-    m_password = password;
+    d->password = password;
 }
 
 /// Returns the username for this registration IQ.
 
 QString QXmppRegisterIq::username() const
 {
-    return m_username;
+    return d->username;
 }
 
 /// Sets the \a username for this registration IQ.
 
 void QXmppRegisterIq::setUsername(const QString &username)
 {
-    m_username = username;
+    d->username = username;
 }
 
 /// \cond
@@ -107,36 +128,36 @@ bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
-    m_instructions = queryElement.firstChildElement("instructions").text();
-    m_username = queryElement.firstChildElement("username").text();
-    m_password = queryElement.firstChildElement("password").text();
-    m_email = queryElement.firstChildElement("email").text();
-    m_form.parse(queryElement.firstChildElement("x"));
+    d->instructions = queryElement.firstChildElement("instructions").text();
+    d->username = queryElement.firstChildElement("username").text();
+    d->password = queryElement.firstChildElement("password").text();
+    d->email = queryElement.firstChildElement("email").text();
+    d->form.parse(queryElement.firstChildElement("x"));
 }
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeAttribute("xmlns", ns_register);
-    if (!m_instructions.isEmpty())
-        writer->writeTextElement("instructions", m_instructions);
+    if (!d->instructions.isEmpty())
+        writer->writeTextElement("instructions", d->instructions);
 
-    if (!m_username.isEmpty())
-        writer->writeTextElement("username", m_username);
-    else if (!m_username.isNull())
+    if (!d->username.isEmpty())
+        writer->writeTextElement("username", d->username);
+    else if (!d->username.isNull())
         writer->writeEmptyElement("username");
 
-    if (!m_password.isEmpty())
-        writer->writeTextElement("password", m_password);
-    else if (!m_password.isNull())
+    if (!d->password.isEmpty())
+        writer->writeTextElement("password", d->password);
+    else if (!d->password.isNull())
         writer->writeEmptyElement("password");
 
-    if (!m_email.isEmpty())
-        writer->writeTextElement("email", m_email);
-    else if (!m_email.isNull())
+    if (!d->email.isEmpty())
+        writer->writeTextElement("email", d->email);
+    else if (!d->email.isNull())
         writer->writeEmptyElement("email");
 
-    m_form.toXml(writer);
+    d->form.toXml(writer);
     writer->writeEndElement();
 }
 /// \endcond
