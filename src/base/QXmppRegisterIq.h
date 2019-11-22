@@ -21,12 +21,13 @@
  *
  */
 
-
 #ifndef QXMPPREGISTERIQ_H
 #define QXMPPREGISTERIQ_H
 
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
+
+class QXmppRegisterIqPrivate;
 
 /// \brief The QXmppRegisterIq class represents a registration IQ
 /// as defined by XEP-0077: In-Band Registration.
@@ -38,6 +39,12 @@
 class QXMPP_EXPORT QXmppRegisterIq : public QXmppIq
 {
 public:
+    QXmppRegisterIq();
+    QXmppRegisterIq(const QXmppRegisterIq &other);
+    ~QXmppRegisterIq();
+
+    QXmppRegisterIq &operator=(const QXmppRegisterIq &other);
+
     QString email() const;
     void setEmail(const QString &email);
 
@@ -64,11 +71,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppDataForm m_form;
-    QString m_email;
-    QString m_instructions;
-    QString m_password;
-    QString m_username;
+    QSharedDataPointer<QXmppRegisterIqPrivate> d;
 };
 
 #endif
