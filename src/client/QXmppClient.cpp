@@ -336,7 +336,7 @@ bool QXmppClient::isActive() const
 
 void QXmppClient::setActive(bool active)
 {
-    if (active != d->isActive && d->stream->isClientStateIndicationEnabled()) {
+    if (active != d->isActive && isConnected() && d->stream->isClientStateIndicationEnabled()) {
         d->isActive = active;
         QString packet = "<%1 xmlns='%2'/>";
         d->stream->sendData(packet.arg(active ? "active" : "inactive", ns_csi).toUtf8());
