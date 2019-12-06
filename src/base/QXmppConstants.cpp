@@ -57,6 +57,8 @@ const char* ns_private = "jabber:iq:private";
 const char* ns_vcard = "vcard-temp";
 // XEP-0059: Result Set Management
 const char* ns_rsm = "http://jabber.org/protocol/rsm";
+// XEP-0060: Publish-Subscribe
+const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data

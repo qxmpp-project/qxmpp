@@ -29,23 +29,23 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
-static const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
-
-static const char *pubsub_queries[] = {
-    "affiliations",
-    "default",
-    "items",
-    "publish",
-    "retract",
-    "subscribe",
-    "subscription",
-    "subscriptions",
-    "unsubscribe",
+static const QStringList PUBSUB_QUERIES = {
+    QStringLiteral("affiliations"),
+    QStringLiteral("default"),
+    QStringLiteral("items"),
+    QStringLiteral("publish"),
+    QStringLiteral("retract"),
+    QStringLiteral("subscribe"),
+    QStringLiteral("subscription"),
+    QStringLiteral("subscriptions"),
+    QStringLiteral("unsubscribe"),
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
 {
 public:
+    QXmppPubSubIqPrivate();
+
     QXmppPubSubIq::QueryType queryType;
     QString queryJid;
     QString queryNode;
@@ -53,6 +53,11 @@ public:
     QString subscriptionId;
     QString subscriptionType;
 };
+
+QXmppPubSubIqPrivate::QXmppPubSubIqPrivate()
+    : queryType(QXmppPubSubIq::ItemsQuery)
+{
+}
 
 QXmppPubSubIq::QXmppPubSubIq()
     : d(new QXmppPubSubIqPrivate)
@@ -148,8 +153,7 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 /// \cond
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
-    const QDomElement pubSubElement = element.firstChildElement("pubsub");
-    return pubSubElement.namespaceURI() == ns_pubsub;
+    return element.firstChildElement("pubsub").namespaceURI() == ns_pubsub;
 }
 
 void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
@@ -160,21 +164,16 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 
     // determine query type
     const QString tagName = queryElement.tagName();
-    for (int i = ItemsQuery; i <= SubscriptionsQuery; i++)
-    {
-        if (tagName == pubsub_queries[i])
-        {
-            d->queryType = static_cast<QueryType>(i);
-            break;
-        }
-    }
+    int queryType = PUBSUB_QUERIES.indexOf(queryElement.tagName());
+    if (queryType > -1)
+        d->queryType = QueryType(queryType);
+
     d->queryJid = queryElement.attribute("jid");
     d->queryNode = queryElement.attribute("node");
 
     // parse contents
     QDomElement childElement;
-    switch (d->queryType)
-    {
+    switch (d->queryType) {
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
@@ -202,7 +201,7 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeAttribute("xmlns", ns_pubsub);
 
     // write query type
-    writer->writeStartElement(pubsub_queries[d->queryType]);
+    writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
     helperToXmlAddAttribute(writer, "jid", d->queryJid);
     helperToXmlAddAttribute(writer, "node", d->queryNode);
 
