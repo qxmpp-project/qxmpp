@@ -40,6 +40,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppPingIq.h
     base/QXmppPresence.h
     base/QXmppPubSubIq.h
+    base/QXmppPubSubItem.h
     base/QXmppRegisterIq.h
     base/QXmppResultSet.h
     base/QXmppRosterIq.h
@@ -122,6 +123,7 @@ set(SOURCE_FILES
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
     base/QXmppPubSubIq.cpp
+    base/QXmppPubSubItem.cpp
     base/QXmppRegisterIq.cpp
     base/QXmppResultSet.cpp
     base/QXmppRosterIq.cpp
