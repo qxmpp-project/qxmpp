@@ -2,7 +2,7 @@
  * Copyright (C) 2008-2019 The QXmpp developers
  *
  * Author:
- *  Olivier Goffart <ogoffart@woboq.com>
+ *  Olivier Goffart
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp

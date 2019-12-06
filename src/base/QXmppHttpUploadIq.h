@@ -2,7 +2,7 @@
  * Copyright (C) 2008-2019 The QXmpp developers
  *
  * Authors:
- *  Linus Jahn <lnj@kaidan.im>
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
