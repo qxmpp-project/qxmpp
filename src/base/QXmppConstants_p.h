@@ -69,6 +69,8 @@ extern const char* ns_private;
 extern const char* ns_vcard;
 // XEP-0059: Result Set Management
 extern const char* ns_rsm;
+// XEP-0060: Publish-Subscribe
+extern const char *ns_pubsub;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char* ns_bytestreams;
 // XEP-0066: Out of Band Data
