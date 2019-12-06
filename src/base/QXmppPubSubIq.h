@@ -27,36 +27,10 @@
 #include <QSharedDataPointer>
 
 #include "QXmppIq.h"
+// required for compatibility:
+#include "QXmppPubSubItem.h"
 
-class QXmppPubSubItemPrivate;
 class QXmppPubSubIqPrivate;
-
-/// \brief The QXmppPubSubItem class represents a publish-subscribe item
-/// as defined by XEP-0060: Publish-Subscribe.
-
-class QXMPP_EXPORT QXmppPubSubItem
-{
-public:
-    QXmppPubSubItem();
-    QXmppPubSubItem(const QXmppPubSubItem &iq);
-    ~QXmppPubSubItem();
-
-    QXmppPubSubItem &operator=(const QXmppPubSubItem &iq);
-
-    QString id() const;
-    void setId(const QString &id);
-
-    QXmppElement contents() const;
-    void setContents(const QXmppElement &contents);
-
-    /// \cond
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
-
-private:
-    QSharedDataPointer<QXmppPubSubItemPrivate> d;
-};
 
 /// \brief The QXmppPubSubIq class represents an IQ used for the
 /// publish-subscribe mechanisms defined by XEP-0060: Publish-Subscribe.
@@ -114,4 +88,4 @@ private:
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
 
-#endif
+#endif // QXMPPPUBSUBIQ_H
