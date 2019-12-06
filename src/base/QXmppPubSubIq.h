@@ -24,15 +24,25 @@
 #ifndef QXMPPPUBSUBIQ_H
 #define QXMPPPUBSUBIQ_H
 
+#include <QSharedDataPointer>
+
 #include "QXmppIq.h"
+
+class QXmppPubSubItemPrivate;
+class QXmppPubSubIqPrivate;
 
 /// \brief The QXmppPubSubItem class represents a publish-subscribe item
 /// as defined by XEP-0060: Publish-Subscribe.
-///
 
 class QXMPP_EXPORT QXmppPubSubItem
 {
 public:
+    QXmppPubSubItem();
+    QXmppPubSubItem(const QXmppPubSubItem &iq);
+    ~QXmppPubSubItem();
+
+    QXmppPubSubItem &operator=(const QXmppPubSubItem &iq);
+
     QString id() const;
     void setId(const QString &id);
 
@@ -45,8 +55,7 @@ public:
     /// \endcond
 
 private:
-    QString m_id;
-    QXmppElement m_contents;
+    QSharedDataPointer<QXmppPubSubItemPrivate> d;
 };
 
 /// \brief The QXmppPubSubIq class represents an IQ used for the
@@ -58,8 +67,7 @@ class QXMPP_EXPORT QXmppPubSubIq : public QXmppIq
 {
 public:
     /// This enum is used to describe a publish-subscribe query type.
-    enum QueryType
-    {
+    enum QueryType {
         AffiliationsQuery,
         DefaultQuery,
         ItemsQuery,
@@ -70,6 +78,12 @@ public:
         SubscriptionsQuery,
         UnsubscribeQuery
     };
+
+    QXmppPubSubIq();
+    QXmppPubSubIq(const QXmppPubSubIq &iq);
+    ~QXmppPubSubIq();
+
+    QXmppPubSubIq &operator=(const QXmppPubSubIq &iq);
 
     QXmppPubSubIq::QueryType queryType() const;
     void setQueryType(QXmppPubSubIq::QueryType queryType);
@@ -97,12 +111,7 @@ protected:
     /// \endcond
 
 private:
-    QXmppPubSubIq::QueryType m_queryType;
-    QString m_queryJid;
-    QString m_queryNode;
-    QList<QXmppPubSubItem> m_items;
-    QString m_subscriptionId;
-    QString m_subscriptionType;
+    QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
 
 #endif
