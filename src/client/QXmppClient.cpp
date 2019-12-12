@@ -112,47 +112,47 @@ QXmppClient::QXmppClient(QObject *parent)
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
-    check = connect(d->stream, SIGNAL(elementReceived(QDomElement,bool&)),
-                    this, SLOT(_q_elementReceived(QDomElement,bool&)));
+    check = connect(d->stream, &QXmppOutgoingClient::elementReceived,
+                    this, &QXmppClient::_q_elementReceived);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SIGNAL(messageReceived(QXmppMessage)));
+    check = connect(d->stream, &QXmppOutgoingClient::messageReceived,
+                    this, &QXmppClient::messageReceived);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SIGNAL(presenceReceived(QXmppPresence)));
+    check = connect(d->stream, &QXmppOutgoingClient::presenceReceived,
+                    this, &QXmppClient::presenceReceived);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(iqReceived(QXmppIq)),
-                    this, SIGNAL(iqReceived(QXmppIq)));
+    check = connect(d->stream, &QXmppOutgoingClient::iqReceived,
+                    this, &QXmppClient::iqReceived);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(sslErrors(QList<QSslError>)),
-                    this, SIGNAL(sslErrors(QList<QSslError>)));
+    check = connect(d->stream, &QXmppOutgoingClient::sslErrors,
+                    this, &QXmppClient::sslErrors);
     Q_ASSERT(check);
 
-    check = connect(d->stream->socket(), SIGNAL(stateChanged(QAbstractSocket::SocketState)),
-                    this, SLOT(_q_socketStateChanged(QAbstractSocket::SocketState)));
+    check = connect(d->stream->socket(), &QAbstractSocket::stateChanged,
+                    this, &QXmppClient::_q_socketStateChanged);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(connected()),
-                    this, SLOT(_q_streamConnected()));
+    check = connect(d->stream, &QXmppStream::connected,
+                    this, &QXmppClient::_q_streamConnected);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(disconnected()),
-                    this, SLOT(_q_streamDisconnected()));
+    check = connect(d->stream, &QXmppStream::disconnected,
+                    this, &QXmppClient::_q_streamDisconnected);
     Q_ASSERT(check);
 
-    check = connect(d->stream, SIGNAL(error(QXmppClient::Error)),
-                    this, SLOT(_q_streamError(QXmppClient::Error)));
+    check = connect(d->stream, &QXmppOutgoingClient::error,
+                    this, &QXmppClient::_q_streamError);
     Q_ASSERT(check);
 
     // reconnection
     d->reconnectionTimer = new QTimer(this);
     d->reconnectionTimer->setSingleShot(true);
-    connect(d->reconnectionTimer, SIGNAL(timeout()),
-            this, SLOT(_q_reconnect()));
+    connect(d->reconnectionTimer, &QTimer::timeout,
+            this, &QXmppClient::_q_reconnect);
     Q_ASSERT(check);
 
     // logging
@@ -582,22 +582,22 @@ void QXmppClient::setLogger(QXmppLogger *logger)
 {
     if (logger != d->logger) {
         if (d->logger) {
-            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                       d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
-            disconnect(this, SIGNAL(setGauge(QString,double)),
-                       d->logger, SLOT(setGauge(QString,double)));
-            disconnect(this, SIGNAL(updateCounter(QString,qint64)),
-                       d->logger, SLOT(updateCounter(QString,qint64)));
+            disconnect(this, &QXmppLoggable::logMessage,
+                       d->logger, &QXmppLogger::log);
+            disconnect(this, &QXmppLoggable::setGauge,
+                       d->logger, &QXmppLogger::setGauge);
+            disconnect(this, &QXmppLoggable::updateCounter,
+                       d->logger, &QXmppLogger::updateCounter);
         }
 
         d->logger = logger;
         if (d->logger) {
-            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                    d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
-            connect(this, SIGNAL(setGauge(QString,double)),
-                    d->logger, SLOT(setGauge(QString,double)));
-            connect(this, SIGNAL(updateCounter(QString,qint64)),
-                    d->logger, SLOT(updateCounter(QString,qint64)));
+            connect(this, &QXmppLoggable::logMessage,
+                    d->logger, &QXmppLogger::log);
+            connect(this, &QXmppLoggable::setGauge,
+                    d->logger, &QXmppLogger::setGauge);
+            connect(this, &QXmppLoggable::updateCounter,
+                    d->logger, &QXmppLogger::updateCounter);
         }
 
         emit loggerChanged(d->logger);

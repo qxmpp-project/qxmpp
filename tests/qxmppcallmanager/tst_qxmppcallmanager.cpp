@@ -80,8 +80,8 @@ void tst_QXmppCallManager::testCall()
     sender.setLogger(&logger);
 
     QEventLoop senderLoop;
-    connect(&sender, SIGNAL(connected()), &senderLoop, SLOT(quit()));
-    connect(&sender, SIGNAL(disconnected()), &senderLoop, SLOT(quit()));
+    connect(&sender, &QXmppClient::connected, &senderLoop, &QEventLoop::quit);
+    connect(&sender, &QXmppClient::disconnected, &senderLoop, &QEventLoop::quit);
 
     QXmppConfiguration config;
     config.setDomain(testDomain);
@@ -96,14 +96,14 @@ void tst_QXmppCallManager::testCall()
     // prepare receiver
     QXmppClient receiver;
     auto *receiverManager = new QXmppCallManager;
-    connect(receiverManager, SIGNAL(callReceived(QXmppCall*)),
-            this, SLOT(acceptCall(QXmppCall*)));
+    connect(receiverManager, &QXmppCallManager::callReceived,
+            this, &tst_QXmppCallManager::acceptCall);
     receiver.addExtension(receiverManager);
     receiver.setLogger(&logger);
 
     QEventLoop receiverLoop;
-    connect(&receiver, SIGNAL(connected()), &receiverLoop, SLOT(quit()));
-    connect(&receiver, SIGNAL(disconnected()), &receiverLoop, SLOT(quit()));
+    connect(&receiver, &QXmppClient::connected, &receiverLoop, &QEventLoop::quit);
+    connect(&receiver, &QXmppClient::disconnected, &receiverLoop, &QEventLoop::quit);
 
     config.setUser("receiver");
     config.setPassword("testpwd");
@@ -116,7 +116,7 @@ void tst_QXmppCallManager::testCall()
     QEventLoop loop;
     QXmppCall *senderCall = senderManager->call("receiver@localhost/QXmpp");
     QVERIFY(senderCall);
-    connect(senderCall, SIGNAL(connected()), &loop, SLOT(quit()));
+    connect(senderCall, &QXmppCall::connected, &loop, &QEventLoop::quit);
     loop.exec();
     QVERIFY(receiverCall);
 
@@ -128,12 +128,12 @@ void tst_QXmppCallManager::testCall()
 
     // exchange some media
     qDebug() << "======== TALK ========";
-    QTimer::singleShot(2000, &loop, SLOT(quit()));
+    QTimer::singleShot(2000, &loop, &QEventLoop::quit);
     loop.exec();
 
     // hangup call
     qDebug() << "======== HANGUP ========";
-    connect(senderCall, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(senderCall, &QXmppCall::finished, &loop, &QEventLoop::quit);
     senderCall->hangup();
     loop.exec();
 

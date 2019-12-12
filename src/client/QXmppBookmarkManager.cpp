@@ -150,12 +150,12 @@ void QXmppBookmarkManager::setClient(QXmppClient *client)
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(connected()),
-                    this, SLOT(slotConnected()));
+    check = connect(client, &QXmppClient::connected,
+                    this, &QXmppBookmarkManager::slotConnected);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(slotDisconnected()));
+    check = connect(client, &QXmppClient::disconnected,
+                    this, &QXmppBookmarkManager::slotDisconnected);
     Q_ASSERT(check);
 }
 

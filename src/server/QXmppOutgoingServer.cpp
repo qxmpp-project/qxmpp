@@ -64,8 +64,8 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     auto *socket = new QSslSocket(this);
     setSocket(socket);
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(_q_socketDisconnected()));
+    check = connect(socket, &QAbstractSocket::disconnected,
+                    this, &QXmppOutgoingServer::_q_socketDisconnected);
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -73,15 +73,15 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     Q_ASSERT(check);
 
     // DNS lookups
-    check = connect(&d->dns, SIGNAL(finished()),
-                    this, SLOT(_q_dnsLookupFinished()));
+    check = connect(&d->dns, &QDnsLookup::finished,
+                    this, &QXmppOutgoingServer::_q_dnsLookupFinished);
     Q_ASSERT(check);
 
     d->dialbackTimer = new QTimer(this);
     d->dialbackTimer->setInterval(5000);
     d->dialbackTimer->setSingleShot(true);
-    check = connect(d->dialbackTimer, SIGNAL(timeout()),
-                    this, SLOT(sendDialback()));
+    check = connect(d->dialbackTimer, &QTimer::timeout,
+                    this, &QXmppOutgoingServer::sendDialback);
     Q_ASSERT(check);
 
     d->localDomain = domain;

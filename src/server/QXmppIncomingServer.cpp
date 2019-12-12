@@ -78,8 +78,8 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
     d->domain = domain;
 
     if (socket) {
-        check = connect(socket, SIGNAL(disconnected()),
-                        this, SLOT(slotSocketDisconnected()));
+        check = connect(socket, &QAbstractSocket::disconnected,
+                        this, &QXmppIncomingServer::slotSocketDisconnected);
         Q_ASSERT(check);
 
         setSocket(socket);
@@ -160,8 +160,8 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 
             // establish dialback connection
             auto *stream = new QXmppOutgoingServer(d->domain, this);
-            bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
-                                 this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
+            bool check = connect(stream, &QXmppOutgoingServer::dialbackResponseReceived,
+                                 this, &QXmppIncomingServer::slotDialbackResponseReceived);
             Q_ASSERT(check);
             Q_UNUSED(check);
             stream->setVerify(d->localStreamId, request.key());

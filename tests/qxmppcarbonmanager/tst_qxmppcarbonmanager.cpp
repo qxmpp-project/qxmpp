@@ -62,11 +62,11 @@ private:
 
 void tst_QXmppCarbonManager::initTestCase()
 {
-    connect(&m_manager, SIGNAL(messageSent(const QXmppMessage&)),
-            &m_helper, SLOT(messageSent(const QXmppMessage&)));
+    connect(&m_manager, &QXmppCarbonManager::messageSent,
+            &m_helper, &QXmppCarbonTestHelper::messageSent);
 
-    connect(&m_manager, SIGNAL(messageReceived(const QXmppMessage&)),
-            &m_helper, SLOT(messageReceived(const QXmppMessage&)));
+    connect(&m_manager, &QXmppCarbonManager::messageReceived,
+            &m_helper, &QXmppCarbonTestHelper::messageReceived);
 }
 
 void tst_QXmppCarbonManager::testHandleStanza_data()

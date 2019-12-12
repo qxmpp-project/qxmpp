@@ -50,12 +50,12 @@ xmppClient::xmppClient(QObject *parent)
     // transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
     // transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
-    check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(slotPresenceReceived(QXmppPresence)));
+    check = connect(this, &QXmppClient::presenceReceived,
+                    this, &xmppClient::slotPresenceReceived);
     Q_ASSERT(check);
 
-    check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
-                    this, SLOT(slotFileReceived(QXmppTransferJob*)));
+    check = connect(transferManager, &QXmppTransferManager::fileReceived,
+                    this, &xmppClient::slotFileReceived);
     Q_ASSERT(check);
 }
 
@@ -84,12 +84,12 @@ void xmppClient::slotFileReceived(QXmppTransferJob *job)
                     this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(slotFinished()));
+    check = connect(job, &QXmppTransferJob::finished,
+                    this, &xmppClient::slotFinished);
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)),
-                    this, SLOT(slotProgress(qint64,qint64)));
+    check = connect(job, &QXmppTransferJob::progress,
+                    this, &xmppClient::slotProgress);
     Q_ASSERT(check);
 
     // allocate a buffer to receive the file
@@ -126,12 +126,12 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
                     this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(slotFinished()));
+    check = connect(job, &QXmppTransferJob::finished,
+                    this, &xmppClient::slotFinished);
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)),
-                    this, SLOT(slotProgress(qint64,qint64)));
+    check = connect(job, &QXmppTransferJob::progress,
+                    this, &xmppClient::slotProgress);
     Q_ASSERT(check);
 }
 

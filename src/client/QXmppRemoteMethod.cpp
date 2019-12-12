@@ -43,8 +43,8 @@ QXmppRemoteMethodResult QXmppRemoteMethod::call( )
     // FIXME : spinning an event loop is a VERY bad idea, it can cause
     // us to lose incoming packets
     QEventLoop loop(this);
-    connect( this, SIGNAL(callDone()), &loop, SLOT(quit()));
-    QTimer::singleShot(30000,&loop, SLOT(quit())); // Timeout in case the other end hangs...
+    connect( this, &QXmppRemoteMethod::callDone, &loop, &QEventLoop::quit);
+    QTimer::singleShot(30000,&loop, &QEventLoop::quit); // Timeout in case the other end hangs...
 
     m_client->sendPacket( m_payload );
 

@@ -62,12 +62,12 @@ static QString formatted(QXmppLogger::MessageType type, const QString& text)
 
 static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
 {
-    QObject::connect(from, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                     to, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    QObject::connect(from, SIGNAL(setGauge(QString,double)),
-                     to, SIGNAL(setGauge(QString,double)));
-    QObject::connect(from, SIGNAL(updateCounter(QString,qint64)),
-                     to, SIGNAL(updateCounter(QString,qint64)));
+    QObject::connect(from, &QXmppLoggable::logMessage,
+                     to, &QXmppLoggable::logMessage);
+    QObject::connect(from, &QXmppLoggable::setGauge,
+                     to, &QXmppLoggable::setGauge);
+    QObject::connect(from, &QXmppLoggable::updateCounter,
+                     to, &QXmppLoggable::updateCounter);
 }
 
 /// Constructs a new QXmppLoggable.
@@ -93,12 +93,12 @@ void QXmppLoggable::childEvent(QChildEvent *event)
     if (event->added()) {
         relaySignals(child, this);
     } else if (event->removed()) {
-        disconnect(child, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-        disconnect(child, SIGNAL(setGauge(QString,double)),
-                this, SIGNAL(setGauge(QString,double)));
-        disconnect(child, SIGNAL(updateCounter(QString,qint64)),
-                this, SIGNAL(updateCounter(QString,qint64)));
+        disconnect(child, &QXmppLoggable::logMessage,
+                this, &QXmppLoggable::logMessage);
+        disconnect(child, &QXmppLoggable::setGauge,
+                this, &QXmppLoggable::setGauge);
+        disconnect(child, &QXmppLoggable::updateCounter,
+                this, &QXmppLoggable::updateCounter);
     }
 }
 /// \endcond

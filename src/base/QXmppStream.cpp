@@ -181,20 +181,20 @@ void QXmppStream::setSocket(QSslSocket *socket)
         return;
 
     // socket events
-    check = connect(socket, SIGNAL(connected()),
-                    this, SLOT(_q_socketConnected()));
+    check = connect(socket, &QAbstractSocket::connected,
+                    this, &QXmppStream::_q_socketConnected);
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(encrypted()),
-                    this, SLOT(_q_socketEncrypted()));
+    check = connect(socket, &QSslSocket::encrypted,
+                    this, &QXmppStream::_q_socketEncrypted);
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
                     this, SLOT(_q_socketError(QAbstractSocket::SocketError)));
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(readyRead()),
-                    this, SLOT(_q_socketReadyRead()));
+    check = connect(socket, &QIODevice::readyRead,
+                    this, &QXmppStream::_q_socketReadyRead);
     Q_ASSERT(check);
 }
 

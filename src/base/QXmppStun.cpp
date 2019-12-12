@@ -1124,8 +1124,8 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
     // RTO timer
     m_retryTimer = new QTimer(this);
     m_retryTimer->setSingleShot(true);
-    check = connect(m_retryTimer, SIGNAL(timeout()),
-                    this, SLOT(retry()));
+    check = connect(m_retryTimer, &QTimer::timeout,
+                    this, &QXmppStunTransaction::retry);
 
     // send packet immediately
     m_retryTimer->start(0);
@@ -1186,21 +1186,21 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
     Q_UNUSED(check);
 
     socket = new QUdpSocket(this);
-    check = connect(socket, SIGNAL(readyRead()),
-                    this, SLOT(readyRead()));
+    check = connect(socket, &QIODevice::readyRead,
+                    this, &QXmppTurnAllocation::readyRead);
     Q_ASSERT(check);
 
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
-    check = connect(m_timer, SIGNAL(timeout()),
-                    this, SLOT(refresh()));
+    check = connect(m_timer, &QTimer::timeout,
+                    this, &QXmppTurnAllocation::refresh);
     Q_ASSERT(check);
 
     // channels are valid 600s, we refresh every 500s
     m_channelTimer = new QTimer(this);
     m_channelTimer->setInterval(500 * 1000);
-    check = connect(m_channelTimer, SIGNAL(timeout()),
-                    this, SLOT(refreshChannels()));
+    check = connect(m_channelTimer, &QTimer::timeout,
+                    this, &QXmppTurnAllocation::refreshChannels);
     Q_ASSERT(check);
 }
 
@@ -1588,7 +1588,7 @@ QXmppUdpTransport::QXmppUdpTransport(QUdpSocket *socket, QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    check = connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    check = connect(m_socket, &QIODevice::readyRead, this, &QXmppUdpTransport::readyRead);
     Q_ASSERT(check);
 }
 
@@ -1884,8 +1884,8 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
         socket->setParent(q);
 
         auto *transport = new QXmppUdpTransport(socket, q);
-        check = QObject::connect(transport, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
-                                 q, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+        check = QObject::connect(transport, &QXmppIceTransport::datagramReceived,
+                                 q, &QXmppIceComponent::handleDatagram);
         Q_ASSERT(check);
 
         QXmppJingleCandidate candidate = transport->localCandidate(component);
@@ -1963,19 +1963,19 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
 
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
-    check = connect(d->timer, SIGNAL(timeout()),
-                    this, SLOT(checkCandidates()));
+    check = connect(d->timer, &QTimer::timeout,
+                    this, &QXmppIceComponent::checkCandidates);
     Q_ASSERT(check);
 
     d->turnAllocation = new QXmppTurnAllocation(this);
-    check = connect(d->turnAllocation, SIGNAL(connected()),
-                    this, SLOT(turnConnected()));
+    check = connect(d->turnAllocation, &QXmppTurnAllocation::connected,
+                    this, &QXmppIceComponent::turnConnected);
     Q_ASSERT(check);
-    check = connect(d->turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
-                    this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+    check = connect(d->turnAllocation, &QXmppIceTransport::datagramReceived,
+                    this, &QXmppIceComponent::handleDatagram);
     Q_ASSERT(check);
-    check = connect(d->turnAllocation, SIGNAL(disconnected()),
-                    this, SLOT(updateGatheringState()));
+    check = connect(d->turnAllocation, &QXmppTurnAllocation::disconnected,
+                    this, &QXmppIceComponent::updateGatheringState);
     Q_ASSERT(check);
 
     // calculate peer-reflexive candidate priority
@@ -2531,8 +2531,8 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
     d->connectTimer = new QTimer(this);
     d->connectTimer->setInterval(30000);
     d->connectTimer->setSingleShot(true);
-    check = connect(d->connectTimer, SIGNAL(timeout()),
-                    this, SLOT(slotTimeout()));
+    check = connect(d->connectTimer, &QTimer::timeout,
+                    this, &QXmppIceConnection::slotTimeout);
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
@@ -2571,16 +2571,16 @@ void QXmppIceConnection::addComponent(int component)
     socket->d->setTurnUser(d->turnUser);
     socket->d->setTurnPassword(d->turnPassword);
 
-    check = connect(socket, SIGNAL(localCandidatesChanged()),
-                    this, SIGNAL(localCandidatesChanged()));
+    check = connect(socket, &QXmppIceComponent::localCandidatesChanged,
+                    this, &QXmppIceConnection::localCandidatesChanged);
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(connected()),
-                    this, SLOT(slotConnected()));
+    check = connect(socket, &QXmppIceComponent::connected,
+                    this, &QXmppIceConnection::slotConnected);
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(gatheringStateChanged()),
-                    this, SLOT(slotGatheringStateChanged()));
+    check = connect(socket, &QXmppIceComponent::gatheringStateChanged,
+                    this, &QXmppIceConnection::slotGatheringStateChanged);
     Q_ASSERT(check);
 
     d->components[component] = socket;

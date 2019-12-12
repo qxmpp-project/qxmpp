@@ -190,8 +190,8 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     auto *socket = new QSslSocket(this);
     setSocket(socket);
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(_q_socketDisconnected()));
+    check = connect(socket, &QAbstractSocket::disconnected,
+                    this, &QXmppOutgoingClient::_q_socketDisconnected);
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
@@ -203,28 +203,28 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     Q_ASSERT(check);
 
     // DNS lookups
-    check = connect(&d->dns, SIGNAL(finished()),
-                    this, SLOT(_q_dnsLookupFinished()));
+    check = connect(&d->dns, &QDnsLookup::finished,
+                    this, &QXmppOutgoingClient::_q_dnsLookupFinished);
     Q_ASSERT(check);
 
     // XEP-0199: XMPP Ping
     d->pingTimer = new QTimer(this);
-    check = connect(d->pingTimer, SIGNAL(timeout()),
-                    this, SLOT(pingSend()));
+    check = connect(d->pingTimer, &QTimer::timeout,
+                    this, &QXmppOutgoingClient::pingSend);
     Q_ASSERT(check);
 
     d->timeoutTimer = new QTimer(this);
     d->timeoutTimer->setSingleShot(true);
-    check = connect(d->timeoutTimer, SIGNAL(timeout()),
-                    this, SLOT(pingTimeout()));
+    check = connect(d->timeoutTimer, &QTimer::timeout,
+                    this, &QXmppOutgoingClient::pingTimeout);
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(connected()),
-                    this, SLOT(pingStart()));
+    check = connect(this, &QXmppStream::connected,
+                    this, &QXmppOutgoingClient::pingStart);
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(disconnected()),
-                    this, SLOT(pingStop()));
+    check = connect(this, &QXmppStream::disconnected,
+                    this, &QXmppOutgoingClient::pingStop);
     Q_ASSERT(check);
 }
 

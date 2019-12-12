@@ -204,7 +204,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
         // notify user
-        QTimer::singleShot(0, q, SIGNAL(ringing()));
+        QTimer::singleShot(0, q, &QXmppCall::ringing);
 
     } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
 
@@ -325,20 +325,20 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     stream->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    check = QObject::connect(stream->connection, SIGNAL(localCandidatesChanged()),
-        q, SLOT(localCandidatesChanged()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::localCandidatesChanged,
+        q, &QXmppCall::localCandidatesChanged);
     Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, SIGNAL(connected()),
-        q, SLOT(updateOpenMode()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::connected,
+        q, &QXmppCall::updateOpenMode);
     Q_ASSERT(check);
 
-    check = QObject::connect(q, SIGNAL(stateChanged(QXmppCall::State)),
-        q, SLOT(updateOpenMode()));
+    check = QObject::connect(q, &QXmppCall::stateChanged,
+        q, &QXmppCall::updateOpenMode);
     Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, SIGNAL(disconnected()),
-        q, SLOT(hangup()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::disconnected,
+        q, &QXmppCall::hangup);
     Q_ASSERT(check);
 
     if (channelObject) {
@@ -445,7 +445,7 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     setState(QXmppCall::DisconnectingState);
 
     // schedule forceful termination in 5s
-    QTimer::singleShot(5000, q, SLOT(terminated()));
+    QTimer::singleShot(5000, q, &QXmppCall::terminated);
 }
 
 QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent)
@@ -766,16 +766,16 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
+    check = connect(client, &QXmppClient::disconnected,
+                    this, &QXmppCallManager::_q_disconnected);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-                    this, SLOT(_q_iqReceived(QXmppIq)));
+    check = connect(client, &QXmppClient::iqReceived,
+                    this, &QXmppCallManager::_q_iqReceived);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    check = connect(client, &QXmppClient::presenceReceived,
+                    this, &QXmppCallManager::_q_presenceReceived);
     Q_ASSERT(check);
 }
 /// \endcond
@@ -804,8 +804,8 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     // register call
     d->calls << call;
-    check = connect(call, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(_q_callDestroyed(QObject*)));
+    check = connect(call, &QObject::destroyed,
+                    this, &QXmppCallManager::_q_callDestroyed);
     Q_ASSERT(check);
     emit callStarted(call);
 
@@ -923,8 +923,8 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 
         // register call
         d->calls << call;
-        check = connect(call, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(_q_callDestroyed(QObject*)));
+        check = connect(call, &QObject::destroyed,
+                        this, &QXmppCallManager::_q_callDestroyed);
         Q_ASSERT(check);
 
         // send ringing indication

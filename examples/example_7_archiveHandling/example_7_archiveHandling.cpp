@@ -53,16 +53,16 @@ xmppClient::xmppClient(QObject *parent)
     addExtension(archiveManager);
 
     // connect signals
-    check = connect(this, SIGNAL(connected()),
-                    this, SLOT(clientConnected()));
+    check = connect(this, &QXmppClient::connected,
+                    this, &xmppClient::clientConnected);
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)),
-                    SLOT(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)));
+    check = connect(archiveManager, &QXmppArchiveManager::archiveChatReceived,
+                    this, &xmppClient::archiveChatReceived);
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)),
-                    SLOT(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)));
+    check = connect(archiveManager, &QXmppArchiveManager::archiveListReceived,
+                    this, &xmppClient::archiveListReceived);
     Q_ASSERT(check);
 
     // set limits

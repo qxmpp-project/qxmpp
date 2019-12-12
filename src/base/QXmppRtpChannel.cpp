@@ -251,11 +251,11 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 {
     auto *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        connect(this, &QXmppRtpAudioChannel::logMessage,
+                logParent, &QXmppLoggable::logMessage);
     }
     d->outgoingTimer = new QTimer(this);
-    connect(d->outgoingTimer, SIGNAL(timeout()), this, SLOT(writeDatagram()));
+    connect(d->outgoingTimer, &QTimer::timeout, this, &QXmppRtpAudioChannel::writeDatagram);
 
     // set supported codecs
     QXmppJinglePayloadType payload;

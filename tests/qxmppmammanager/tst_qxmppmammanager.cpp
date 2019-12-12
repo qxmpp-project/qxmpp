@@ -65,11 +65,11 @@ private:
 
 void tst_QXmppMamManager::initTestCase()
 {
-    connect(&m_manager, SIGNAL(archivedMessageReceived(const QString&, const QXmppMessage&)),
-            &m_helper, SLOT(archivedMessageReceived(const QString&, const QXmppMessage&)));
+    connect(&m_manager, &QXmppMamManager::archivedMessageReceived,
+            &m_helper, &QXmppMamTestHelper::archivedMessageReceived);
 
-    connect(&m_manager, SIGNAL(resultsRecieved(const QString&, const QXmppResultSetReply&, bool)),
-            &m_helper, SLOT(resultsRecieved(const QString&, const QXmppResultSetReply&, bool)));
+    connect(&m_manager, &QXmppMamManager::resultsRecieved,
+            &m_helper, &QXmppMamTestHelper::resultsRecieved);
 }
 
 void tst_QXmppMamManager::testHandleStanza_data()
