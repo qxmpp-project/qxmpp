@@ -22,8 +22,10 @@
  */
 
 #include <QDomElement>
+#include <QSslError>
 #include <QSslKey>
 #include <QSslSocket>
+#include <QList>
 #include <QTimer>
 #include <QDnsLookup>
 
@@ -57,39 +59,25 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     : QXmppStream(parent),
     d(new QXmppOutgoingServerPrivate)
 {
-    bool check;
-    Q_UNUSED(check);
-
     // socket initialisation
     auto *socket = new QSslSocket(this);
     setSocket(socket);
 
-    check = connect(socket, &QAbstractSocket::disconnected,
-                    this, &QXmppOutgoingServer::_q_socketDisconnected);
-    Q_ASSERT(check);
-
-    check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-                    this, SLOT(socketError(QAbstractSocket::SocketError)));
-    Q_ASSERT(check);
+    connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingServer::_q_socketDisconnected);
+    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppOutgoingServer::socketError);
 
     // DNS lookups
-    check = connect(&d->dns, &QDnsLookup::finished,
-                    this, &QXmppOutgoingServer::_q_dnsLookupFinished);
-    Q_ASSERT(check);
+    connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingServer::_q_dnsLookupFinished);
 
     d->dialbackTimer = new QTimer(this);
     d->dialbackTimer->setInterval(5000);
     d->dialbackTimer->setSingleShot(true);
-    check = connect(d->dialbackTimer, &QTimer::timeout,
-                    this, &QXmppOutgoingServer::sendDialback);
-    Q_ASSERT(check);
+    connect(d->dialbackTimer, &QTimer::timeout, this, &QXmppOutgoingServer::sendDialback);
 
     d->localDomain = domain;
     d->ready = false;
 
-    check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
-                    this, SLOT(slotSslErrors(QList<QSslError>)));
-    Q_ASSERT(check);
+    connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingServer::slotSslErrors);
 }
 
 /// Destroys the stream.

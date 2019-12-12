@@ -173,29 +173,15 @@ QSslSocket *QXmppStream::socket() const
 
 void QXmppStream::setSocket(QSslSocket *socket)
 {
-    bool check;
-    Q_UNUSED(check);
-
     d->socket = socket;
     if (!d->socket)
         return;
 
     // socket events
-    check = connect(socket, &QAbstractSocket::connected,
-                    this, &QXmppStream::_q_socketConnected);
-    Q_ASSERT(check);
-
-    check = connect(socket, &QSslSocket::encrypted,
-                    this, &QXmppStream::_q_socketEncrypted);
-    Q_ASSERT(check);
-
-    check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-                    this, SLOT(_q_socketError(QAbstractSocket::SocketError)));
-    Q_ASSERT(check);
-
-    check = connect(socket, &QIODevice::readyRead,
-                    this, &QXmppStream::_q_socketReadyRead);
-    Q_ASSERT(check);
+    connect(socket, &QAbstractSocket::connected, this, &QXmppStream::_q_socketConnected);
+    connect(socket, &QSslSocket::encrypted, this, &QXmppStream::_q_socketEncrypted);
+    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppStream::_q_socketError);
+    connect(socket, &QIODevice::readyRead, this, &QXmppStream::_q_socketReadyRead);
 }
 
 void QXmppStream::_q_socketConnected()
