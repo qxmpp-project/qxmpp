@@ -45,25 +45,20 @@ xmppClient::xmppClient(QObject *parent)
     , m_pageDirection(PageForwards)
     , m_pageSize(10)
 {
-    bool check;
-    Q_UNUSED(check);
 
     // add archive manager
     archiveManager = new QXmppArchiveManager;
     addExtension(archiveManager);
 
     // connect signals
-    check = connect(this, &QXmppClient::connected,
+    connect(this, &QXmppClient::connected,
                     this, &xmppClient::clientConnected);
-    Q_ASSERT(check);
 
-    check = connect(archiveManager, &QXmppArchiveManager::archiveChatReceived,
+    connect(archiveManager, &QXmppArchiveManager::archiveChatReceived,
                     this, &xmppClient::archiveChatReceived);
-    Q_ASSERT(check);
 
-    check = connect(archiveManager, &QXmppArchiveManager::archiveListReceived,
+    connect(archiveManager, &QXmppArchiveManager::archiveListReceived,
                     this, &xmppClient::archiveListReceived);
-    Q_ASSERT(check);
 
     // set limits
     m_startDate = QDateTime::currentDateTime().addDays(-21);

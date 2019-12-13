@@ -508,8 +508,6 @@ void QXmppTransferIncomingJob::connectToNextHost()
 
 void QXmppTransferIncomingJob::connectToHosts(const QXmppByteStreamIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     m_streamCandidates = iq.streamHosts();
     m_streamOfferId = iq.id();
@@ -844,8 +842,6 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 /// to a stream host.
 void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppIq response;
     response.setId(iq.id());
@@ -1089,8 +1085,6 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
 
 void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     for (auto *ptr : d->jobs) {
         // handle IQ from proxy

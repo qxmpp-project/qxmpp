@@ -146,14 +146,11 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
 void QXmppMucManager::setClient(QXmppClient* client)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, &QXmppClient::messageReceived,
+    connect(client, &QXmppClient::messageReceived,
                     this, &QXmppMucManager::_q_messageReceived);
-    Q_ASSERT(check);
 }
 /// \endcond
 
@@ -182,8 +179,6 @@ void QXmppMucManager::_q_roomDestroyed(QObject *object)
 QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent)
     : QObject(parent)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppMucRoomPrivate;
     d->allowedActions = NoAction;
@@ -191,30 +186,24 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     d->discoManager = client->findExtension<QXmppDiscoveryManager>();
     d->jid = jid;
 
-    check = connect(d->client, &QXmppClient::disconnected,
+    connect(d->client, &QXmppClient::disconnected,
                     this, &QXmppMucRoom::_q_disconnected);
-    Q_ASSERT(check);
 
-    check = connect(d->client, &QXmppClient::messageReceived,
+    connect(d->client, &QXmppClient::messageReceived,
                     this, &QXmppMucRoom::_q_messageReceived);
-    Q_ASSERT(check);
 
-    check = connect(d->client, &QXmppClient::presenceReceived,
+    connect(d->client, &QXmppClient::presenceReceived,
                     this, &QXmppMucRoom::_q_presenceReceived);
-    Q_ASSERT(check);
 
     if (d->discoManager) {
-        check = connect(d->discoManager, &QXmppDiscoveryManager::infoReceived,
+        connect(d->discoManager, &QXmppDiscoveryManager::infoReceived,
                         this, &QXmppMucRoom::_q_discoveryInfoReceived);
-        Q_ASSERT(check);
     }
 
     // convenience signals for properties
-    check = connect(this, &QXmppMucRoom::joined, this, &QXmppMucRoom::isJoinedChanged);
-    Q_ASSERT(check);
+    connect(this, &QXmppMucRoom::joined, this, &QXmppMucRoom::isJoinedChanged);
 
-    check = connect(this, &QXmppMucRoom::left, this, &QXmppMucRoom::isJoinedChanged);
-    Q_ASSERT(check);
+    connect(this, &QXmppMucRoom::left, this, &QXmppMucRoom::isJoinedChanged);
 }
 
 /// Destroys a QXmppMucRoom.

@@ -38,10 +38,8 @@ rpcClient::rpcClient(QObject *parent)
     addExtension(m_rpcManager);
 
     // observe incoming presences
-    bool check = connect(this, &QXmppClient::presenceReceived,
+    connect(this, &QXmppClient::presenceReceived,
                          this, &rpcClient::slotPresenceReceived);
-    Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 rpcClient::~rpcClient()

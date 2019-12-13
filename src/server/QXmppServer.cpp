@@ -152,8 +152,6 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
     } else if (!serversForServers.isEmpty()) {
 
-        bool check;
-        Q_UNUSED(check);
 
         // look for an outgoing S2S connection
         for (auto *conn : qAsConst(outgoingServers)) {
@@ -171,9 +169,8 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         conn->moveToThread(q->thread());
         conn->setParent(q);
 
-        check = QObject::connect(conn, &QXmppStream::disconnected,
+        QObject::connect(conn, &QXmppStream::disconnected,
                                  q, &QXmppServer::_q_outgoingServerDisconnected);
-        Q_UNUSED(check);
 
         // add stream
         outgoingServers.insert(conn);
@@ -539,8 +536,6 @@ void QXmppServer::setPrivateKey(const QSslKey &key)
 
 bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 {
-    bool check;
-    Q_UNUSED(check);
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");
@@ -553,9 +548,8 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
+    connect(server, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(_q_clientConnection(QSslSocket*)));
-    Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
         d->warning(QString("Could not start listening for C2S on %1 %2").arg(address.toString(), QString::number(port)));
@@ -603,8 +597,6 @@ void QXmppServer::close()
 
 bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 {
-    bool check;
-    Q_UNUSED(check);
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");
@@ -617,9 +609,8 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
+    connect(server, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(_q_serverConnection(QSslSocket*)));
-    Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
         d->warning(QString("Could not start listening for S2S on %1 %2").arg(address.toString(), QString::number(port)));
@@ -672,22 +663,17 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
 
 void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 {
-    bool check;
-    Q_UNUSED(check);
 
     stream->setPasswordChecker(d->passwordChecker);
 
-    check = connect(stream, &QXmppStream::connected,
+    connect(stream, &QXmppStream::connected,
                     this, &QXmppServer::_q_clientConnected);
-    Q_ASSERT(check);
 
-    check = connect(stream, &QXmppStream::disconnected,
+    connect(stream, &QXmppStream::disconnected,
                     this, &QXmppServer::_q_clientDisconnected);
-    Q_ASSERT(check);
 
-    check = connect(stream, &QXmppIncomingClient::elementReceived,
+    connect(stream, &QXmppIncomingClient::elementReceived,
                     this, &QXmppServer::handleElement);
-    Q_ASSERT(check);
 
     // add stream
     d->incomingClients.insert(stream);
@@ -824,8 +810,6 @@ void QXmppServer::_q_outgoingServerDisconnected()
 
 void QXmppServer::_q_serverConnection(QSslSocket *socket)
 {
-    bool check;
-    Q_UNUSED(check);
 
     // check the socket didn't die since the signal was emitted
     if (socket->state() != QAbstractSocket::ConnectedState) {
@@ -836,17 +820,14 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
     auto *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
-    check = connect(stream, &QXmppStream::disconnected,
+    connect(stream, &QXmppStream::disconnected,
                     this, &QXmppServer::_q_serverDisconnected);
-    Q_ASSERT(check);
 
-    check = connect(stream, &QXmppIncomingServer::dialbackRequestReceived,
+    connect(stream, &QXmppIncomingServer::dialbackRequestReceived,
                     this, &QXmppServer::_q_dialbackRequestReceived);
-    Q_ASSERT(check);
 
-    check = connect(stream, &QXmppIncomingServer::elementReceived,
+    connect(stream, &QXmppIncomingServer::elementReceived,
                     this, &QXmppServer::handleElement);
-    Q_ASSERT(check);
 
     // add stream
     d->incomingServers.insert(stream);

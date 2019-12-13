@@ -145,18 +145,14 @@ bool QXmppBookmarkManager::setBookmarks(const QXmppBookmarkSet &bookmarks)
 /// \cond
 void QXmppBookmarkManager::setClient(QXmppClient *client)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, &QXmppClient::connected,
+    connect(client, &QXmppClient::connected,
                     this, &QXmppBookmarkManager::slotConnected);
-    Q_ASSERT(check);
 
-    check = connect(client, &QXmppClient::disconnected,
+    connect(client, &QXmppClient::disconnected,
                     this, &QXmppBookmarkManager::slotDisconnected);
-    Q_ASSERT(check);
 }
 
 bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)

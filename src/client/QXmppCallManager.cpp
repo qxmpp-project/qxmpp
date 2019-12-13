@@ -290,8 +290,6 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
 {
-    bool check;
-    Q_UNUSED(check);
     Q_ASSERT(manager);
 
     auto *stream = new Stream;
@@ -325,32 +323,26 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     stream->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    check = QObject::connect(stream->connection, &QXmppIceConnection::localCandidatesChanged,
+    QObject::connect(stream->connection, &QXmppIceConnection::localCandidatesChanged,
         q, &QXmppCall::localCandidatesChanged);
-    Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, &QXmppIceConnection::connected,
+    QObject::connect(stream->connection, &QXmppIceConnection::connected,
         q, &QXmppCall::updateOpenMode);
-    Q_ASSERT(check);
 
-    check = QObject::connect(q, &QXmppCall::stateChanged,
+    QObject::connect(q, &QXmppCall::stateChanged,
         q, &QXmppCall::updateOpenMode);
-    Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, &QXmppIceConnection::disconnected,
+    QObject::connect(stream->connection, &QXmppIceConnection::disconnected,
         q, &QXmppCall::hangup);
-    Q_ASSERT(check);
 
     if (channelObject) {
         QXmppIceComponent *rtpComponent = stream->connection->component(RTP_COMPONENT);
 
-        check = QObject::connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
+        QObject::connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
                         channelObject, SLOT(datagramReceived(QByteArray)));
-        Q_ASSERT(check);
 
-        check = QObject::connect(channelObject, SIGNAL(sendDatagram(QByteArray)),
+        QObject::connect(channelObject, SIGNAL(sendDatagram(QByteArray)),
                         rtpComponent, SLOT(sendDatagram(QByteArray)));
-        Q_ASSERT(check);
     }
     return stream;
 }
@@ -761,22 +753,17 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
 
 void QXmppCallManager::setClient(QXmppClient *client)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, &QXmppClient::disconnected,
+    connect(client, &QXmppClient::disconnected,
                     this, &QXmppCallManager::_q_disconnected);
-    Q_ASSERT(check);
 
-    check = connect(client, &QXmppClient::iqReceived,
+    connect(client, &QXmppClient::iqReceived,
                     this, &QXmppCallManager::_q_iqReceived);
-    Q_ASSERT(check);
 
-    check = connect(client, &QXmppClient::presenceReceived,
+    connect(client, &QXmppClient::presenceReceived,
                     this, &QXmppCallManager::_q_presenceReceived);
-    Q_ASSERT(check);
 }
 /// \endcond
 
@@ -786,8 +773,6 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
-    bool check;
-    Q_UNUSED(check);
 
     if (jid.isEmpty()) {
         warning("Refusing to call an empty jid");
@@ -804,9 +789,8 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     // register call
     d->calls << call;
-    check = connect(call, &QObject::destroyed,
+    connect(call, &QObject::destroyed,
                     this, &QXmppCallManager::_q_callDestroyed);
-    Q_ASSERT(check);
     emit callStarted(call);
 
     call->d->sendInvite();
@@ -888,8 +872,6 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     if (iq.type() != QXmppIq::Set)
         return;
@@ -923,9 +905,8 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 
         // register call
         d->calls << call;
-        check = connect(call, &QObject::destroyed,
+        connect(call, &QObject::destroyed,
                         this, &QXmppCallManager::_q_callDestroyed);
-        Q_ASSERT(check);
 
         // send ringing indication
         QXmppJingleIq ringing;

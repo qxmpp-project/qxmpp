@@ -107,16 +107,13 @@ QString QXmppIncomingClientPrivate::origin() const
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
     : QXmppStream(parent)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
 
     if (socket) {
-        check = connect(socket, &QAbstractSocket::disconnected,
+        connect(socket, &QAbstractSocket::disconnected,
                         this, &QXmppIncomingClient::onSocketDisconnected);
-        Q_ASSERT(check);
 
         setSocket(socket);
     }
@@ -126,9 +123,8 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     // create inactivity timer
     d->idleTimer = new QTimer(this);
     d->idleTimer->setSingleShot(true);
-    check = connect(d->idleTimer, &QTimer::timeout,
+    connect(d->idleTimer, &QTimer::timeout,
                     this, &QXmppIncomingClient::onTimeout);
-    Q_ASSERT(check);
 }
 
 /// Destroys the current stream.

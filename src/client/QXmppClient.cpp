@@ -106,54 +106,42 @@ QXmppClient::QXmppClient(QObject *parent)
     : QXmppLoggable(parent),
     d(new QXmppClientPrivate(this))
 {
-    bool check;
-    Q_UNUSED(check);
 
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
-    check = connect(d->stream, &QXmppOutgoingClient::elementReceived,
+    connect(d->stream, &QXmppOutgoingClient::elementReceived,
                     this, &QXmppClient::_q_elementReceived);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppOutgoingClient::messageReceived,
+    connect(d->stream, &QXmppOutgoingClient::messageReceived,
                     this, &QXmppClient::messageReceived);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppOutgoingClient::presenceReceived,
+    connect(d->stream, &QXmppOutgoingClient::presenceReceived,
                     this, &QXmppClient::presenceReceived);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppOutgoingClient::iqReceived,
+    connect(d->stream, &QXmppOutgoingClient::iqReceived,
                     this, &QXmppClient::iqReceived);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppOutgoingClient::sslErrors,
+    connect(d->stream, &QXmppOutgoingClient::sslErrors,
                     this, &QXmppClient::sslErrors);
-    Q_ASSERT(check);
 
-    check = connect(d->stream->socket(), &QAbstractSocket::stateChanged,
+    connect(d->stream->socket(), &QAbstractSocket::stateChanged,
                     this, &QXmppClient::_q_socketStateChanged);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppStream::connected,
+    connect(d->stream, &QXmppStream::connected,
                     this, &QXmppClient::_q_streamConnected);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppStream::disconnected,
+    connect(d->stream, &QXmppStream::disconnected,
                     this, &QXmppClient::_q_streamDisconnected);
-    Q_ASSERT(check);
 
-    check = connect(d->stream, &QXmppOutgoingClient::error,
+    connect(d->stream, &QXmppOutgoingClient::error,
                     this, &QXmppClient::_q_streamError);
-    Q_ASSERT(check);
 
     // reconnection
     d->reconnectionTimer = new QTimer(this);
     d->reconnectionTimer->setSingleShot(true);
     connect(d->reconnectionTimer, &QTimer::timeout,
             this, &QXmppClient::_q_reconnect);
-    Q_ASSERT(check);
 
     // logging
     setLogger(QXmppLogger::getLogger());
