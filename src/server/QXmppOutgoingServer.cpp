@@ -32,6 +32,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
+#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -162,17 +163,14 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 {
     const QString ns = stanza.namespaceURI();
 
-    if(QXmppStreamFeatures::isStreamFeatures(stanza))
-    {
+    if(QXmppStreamFeatures::isStreamFeatures(stanza)) {
         QXmppStreamFeatures features;
         features.parse(stanza);
 
-        if (!socket()->isEncrypted())
-        {
+        if (!socket()->isEncrypted()) {
             // check we can satisfy TLS constraints
             if (!socket()->supportsSsl() &&
-                 features.tlsMode() == QXmppStreamFeatures::Required)
-            {
+                 features.tlsMode() == QXmppStreamFeatures::Required) {
                 warning("Disconnecting as TLS is required, but SSL support is not available");
                 disconnectFromHost();
                 return;
@@ -180,9 +178,8 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 
             // enable TLS if possible
             if (socket()->supportsSsl() &&
-                features.tlsMode() != QXmppStreamFeatures::Disabled)
-            {
-                sendData("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+                features.tlsMode() != QXmppStreamFeatures::Disabled) {
+                sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::StartTls));
                 return;
             }
         }
@@ -190,18 +187,11 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         // send dialback if needed
         d->dialbackTimer->stop();
         sendDialback();
-    }
-    else if (ns == ns_tls)
-    {
-        if (stanza.tagName() == QLatin1String("proceed"))
-        {
-            debug("Starting encryption");
-            socket()->startClientEncryption();
-            return;
-        }
-    }
-    else if (QXmppDialback::isDialback(stanza))
-    {
+    } else if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::Proceed)) {
+        debug("Starting encryption");
+        socket()->startClientEncryption();
+        return;
+    } else if (QXmppDialback::isDialback(stanza)) {
         QXmppDialback response;
         response.parse(stanza);
 

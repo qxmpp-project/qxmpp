@@ -33,6 +33,7 @@
 #include "QXmppPasswordChecker.h"
 #include "QXmppSasl_p.h"
 #include "QXmppSessionIq.h"
+#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -237,15 +238,12 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     if (d->idleTimer->interval())
         d->idleTimer->start();
 
-    if (ns == ns_tls && nodeRecv.tagName() == QLatin1String("starttls"))
-    {
-        sendData("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+    if (QXmppStartTlsPacket::isStartTlsPacket(nodeRecv, QXmppStartTlsPacket::StartTls)) {
+        sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
         socket()->flush();
         socket()->startServerEncryption();
         return;
-    }
-    else if (ns == ns_sasl)
-    {
+    } else if (ns == ns_sasl) {
         if (!d->passwordChecker) {
             warning("Cannot perform authentication, no password checker");
             sendPacket(QXmppSaslFailure("temporary-auth-failure"));

@@ -30,6 +30,7 @@
 #include "QXmppDialback.h"
 #include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
+#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
@@ -129,15 +130,12 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 {
     const QString ns = stanza.namespaceURI();
 
-    if (ns == ns_tls && stanza.tagName() == QLatin1String("starttls"))
-    {
-        sendData("<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+    if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::StartTls)) {
+        sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
         socket()->flush();
         socket()->startServerEncryption();
         return;
-    }
-    else if (QXmppDialback::isDialback(stanza))
-    {
+    } else if (QXmppDialback::isDialback(stanza)) {
         QXmppDialback request;
         request.parse(stanza);
         // check the request is valid
