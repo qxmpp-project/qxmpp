@@ -175,6 +175,11 @@ public:
 
     QAbstractSocket::SocketError socketError();
     QString socketErrorString() const;
+
+    bool socketSupportsSsl() const;
+    bool isSocketEncrypted() const;
+    void startSocketEncryption();
+
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
