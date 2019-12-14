@@ -51,6 +51,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppSessionIq.h
     base/QXmppSocks.h
     base/QXmppStanza.h
+    base/QXmppStartTlsPacket.h
     base/QXmppStream.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
@@ -135,6 +136,7 @@ set(SOURCE_FILES
     base/QXmppSessionIq.cpp
     base/QXmppSocks.cpp
     base/QXmppStanza.cpp
+    base/QXmppStartTlsPacket.cpp
     base/QXmppStream.cpp
     base/QXmppStreamFeatures.cpp
     base/QXmppStreamInitiationIq.cpp
