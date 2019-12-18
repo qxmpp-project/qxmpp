@@ -46,7 +46,7 @@
 /// available.
 ///
 
-#define QXMPP_VERSION (0x@VERSION_MAJOR@ << 16) | (0x@VERSION_MINOR@ << 8) | 0x@VERSION_PATCH@
+#define QXMPP_VERSION QT_VERSION_CHECK(@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@)
 
 inline QLatin1String QXmppVersion()
 {
