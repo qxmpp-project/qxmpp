@@ -68,7 +68,7 @@ protected:
     virtual void setClient(QXmppClient *client);
 
 private:
-    QXmppClientExtensionPrivate * const d;
+    QXmppClientExtensionPrivate *const d;
 
     friend class QXmppClient;
 };

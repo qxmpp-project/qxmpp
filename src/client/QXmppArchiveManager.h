@@ -70,11 +70,11 @@ public:
 signals:
     /// This signal is emitted when archive list is received
     /// after calling listCollections()
-    void archiveListReceived(const QList<QXmppArchiveChat>&, const QXmppResultSetReply &rsm = QXmppResultSetReply());
+    void archiveListReceived(const QList<QXmppArchiveChat> &, const QXmppResultSetReply &rsm = QXmppResultSetReply());
 
     /// This signal is emitted when archive chat is received
     /// after calling retrieveCollection()
-    void archiveChatReceived(const QXmppArchiveChat&, const QXmppResultSetReply &rsm = QXmppResultSetReply());
+    void archiveChatReceived(const QXmppArchiveChat &, const QXmppResultSetReply &rsm = QXmppResultSetReply());
 };
 
 #endif

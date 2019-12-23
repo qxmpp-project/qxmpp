@@ -67,4 +67,4 @@ private:
     QSharedDataPointer<QXmppBitsOfBinaryContentIdPrivate> d;
 };
 
-#endif // QXMPPBITSOFBINARYCONTENTID_H
+#endif  // QXMPPBITSOFBINARYCONTENTID_H

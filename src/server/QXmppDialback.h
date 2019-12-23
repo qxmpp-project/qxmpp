@@ -36,10 +36,10 @@ class QXMPP_EXPORT QXmppDialback : public QXmppStanza
 public:
     /// This enum is used to describe a dialback command.
     enum Command {
-        Result, ///< A dialback command between the originating server
-                ///< and the receiving server.
-        Verify  ///< A dialback command between the receiving server
-                ///< and the authoritative server.
+        Result,  ///< A dialback command between the originating server
+                 ///< and the receiving server.
+        Verify   ///< A dialback command between the receiving server
+                 ///< and the authoritative server.
     };
 
     QXmppDialback();

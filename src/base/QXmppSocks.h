@@ -36,7 +36,7 @@ class QXMPP_EXPORT QXmppSocksClient : public QTcpSocket
     Q_OBJECT
 
 public:
-    QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent=nullptr);
+    QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, QObject *parent = nullptr);
     void connectToHost(const QString &hostName, quint16 hostPort);
 
 signals:
@@ -59,7 +59,7 @@ class QXMPP_EXPORT QXmppSocksServer : public QObject
     Q_OBJECT
 
 public:
-    QXmppSocksServer(QObject *parent=nullptr);
+    QXmppSocksServer(QObject *parent = nullptr);
     void close();
     bool listen(quint16 port = 0);
 
@@ -75,7 +75,7 @@ private slots:
 private:
     QTcpServer *m_server;
     QTcpServer *m_server_v6;
-    QMap<QTcpSocket*, int> m_states;
+    QMap<QTcpSocket *, int> m_states;
 };
 
 #endif

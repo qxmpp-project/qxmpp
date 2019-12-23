@@ -44,10 +44,10 @@ class QXMPP_EXPORT QXmppRtcpPacket
 {
 public:
     enum Type {
-        SenderReport        = 200,
-        ReceiverReport      = 201,
-        SourceDescription   = 202,
-        Goodbye             = 203,
+        SenderReport = 200,
+        ReceiverReport = 201,
+        SourceDescription = 202,
+        Goodbye = 203,
     };
 
     QXmppRtcpPacket();

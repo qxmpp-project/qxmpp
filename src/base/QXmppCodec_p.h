@@ -228,7 +228,7 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppVpxEncoder : public QXmppVideoEncoder
 {
 public:
-    QXmppVpxEncoder(uint clockrate=0);
+    QXmppVpxEncoder(uint clockrate = 0);
     ~QXmppVpxEncoder();
 
     bool setFormat(const QXmppVideoFormat &format);

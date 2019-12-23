@@ -59,14 +59,14 @@ class QXmppStream;
 class QXMPP_EXPORT QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
-    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
+    Q_PROPERTY(QXmppLogger *logger READ logger WRITE setLogger NOTIFY loggerChanged)
 
 public:
     QXmppServer(QObject *parent = nullptr);
     ~QXmppServer() override;
 
     void addExtension(QXmppServerExtension *extension);
-    QList<QXmppServerExtension*> extensions();
+    QList<QXmppServerExtension *> extensions();
 
     QString domain() const;
     void setDomain(const QString &domain);
@@ -144,7 +144,7 @@ signals:
 
 private:
     void incomingConnection(qintptr socketDescriptor) override;
-    QXmppSslServerPrivate * const d;
+    QXmppSslServerPrivate *const d;
 };
 
 #endif

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef IBBCLIENT_H
 #define IBBCLIENT_H
 
@@ -48,4 +47,4 @@ private:
     QXmppTransferManager *transferManager;
 };
 
-#endif // IBBCLIENT_H
+#endif  // IBBCLIENT_H

@@ -80,17 +80,17 @@ class QXmppVersionManager;
 class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
-    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
+    Q_PROPERTY(QXmppLogger *logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
     /// An enumeration for type of error.
     /// Error could come due a TCP socket or XML stream or due to various stanzas.
     enum Error {
-        NoError,            ///< No error.
-        SocketError,        ///< Error due to TCP socket.
-        KeepAliveError,     ///< Error due to no response to a keep alive.
-        XmppStreamError     ///< Error due to XML stream.
+        NoError,         ///< No error.
+        SocketError,     ///< Error due to TCP socket.
+        KeepAliveError,  ///< Error due to no response to a keep alive.
+        XmppStreamError  ///< Error due to XML stream.
     };
     Q_ENUM(Error)
 
@@ -105,11 +105,11 @@ public:
     QXmppClient(QObject *parent = nullptr);
     ~QXmppClient() override;
 
-    bool addExtension(QXmppClientExtension* extension);
-    bool insertExtension(int index, QXmppClientExtension* extension);
-    bool removeExtension(QXmppClientExtension* extension);
+    bool addExtension(QXmppClientExtension *extension);
+    bool insertExtension(int index, QXmppClientExtension *extension);
+    bool removeExtension(QXmppClientExtension *extension);
 
-    QList<QXmppClientExtension*> extensions();
+    QList<QXmppClientExtension *> extensions();
 
     /// \brief Returns the extension which can be cast into type T*, or 0
     /// if there is no such extension.
@@ -124,13 +124,12 @@ public:
     /// \endcode
     ///
     template<typename T>
-    T* findExtension()
+    T *findExtension()
     {
-        const QList<QXmppClientExtension*> list = extensions();
-        for (auto ext : list)
-        {
-            T* extension = qobject_cast<T*>(ext);
-            if(extension)
+        const QList<QXmppClientExtension *> list = extensions();
+        for (auto ext : list) {
+            T *extension = qobject_cast<T *>(ext);
+            if (extension)
                 return extension;
         }
         return nullptr;
@@ -156,13 +155,13 @@ public:
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")
-    QXmppRosterManager& rosterManager();
+    QXmppRosterManager &rosterManager();
 
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppVCardManager>() instead")
-    QXmppVCardManager& vCardManager();
+    QXmppVCardManager &vCardManager();
 
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppVersionManager>() instead")
-    QXmppVersionManager& versionManager();
+    QXmppVersionManager &versionManager();
 #endif
 
 signals:
@@ -228,14 +227,14 @@ signals:
     void stateChanged(QXmppClient::State state);
 
 public slots:
-    void connectToServer(const QXmppConfiguration&,
-                         const QXmppPresence& initialPresence =
-                         QXmppPresence());
+    void connectToServer(const QXmppConfiguration &,
+                         const QXmppPresence &initialPresence =
+                             QXmppPresence());
     void connectToServer(const QString &jid,
                          const QString &password);
     void disconnectFromServer();
-    bool sendPacket(const QXmppStanza&);
-    void sendMessage(const QString& bareJid, const QString& message);
+    bool sendPacket(const QXmppStanza &);
+    void sendMessage(const QString &bareJid, const QString &message);
 
 private slots:
     void _q_elementReceived(const QDomElement &element, bool &handled);
@@ -246,7 +245,7 @@ private slots:
     void _q_streamError(QXmppClient::Error error);
 
 private:
-    QXmppClientPrivate * const d;
+    QXmppClientPrivate *const d;
 };
 
-#endif // QXMPPCLIENT_H
+#endif  // QXMPPCLIENT_H

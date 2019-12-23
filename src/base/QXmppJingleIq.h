@@ -70,7 +70,7 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
-    QXmppJinglePayloadType& operator=(const QXmppJinglePayloadType &other);
+    QXmppJinglePayloadType &operator=(const QXmppJinglePayloadType &other);
     bool operator==(const QXmppJinglePayloadType &other) const;
 
 private:
@@ -85,22 +85,21 @@ class QXMPP_EXPORT QXmppJingleCandidate
 {
 public:
     /// This enum is used to describe a candidate's type.
-    enum Type
-    {
-        HostType,               ///< Host candidate, a local address/port.
-        PeerReflexiveType,      ///< Peer-reflexive candidate,
-                                ///< the address/port as seen from the peer.
-        ServerReflexiveType,    ///< Server-reflexive candidate,
-                                ///< the address/port as seen by the STUN server
-        RelayedType             ///< Relayed candidate, a candidate from
-                                ///< a TURN relay.
+    enum Type {
+        HostType,             ///< Host candidate, a local address/port.
+        PeerReflexiveType,    ///< Peer-reflexive candidate,
+                              ///< the address/port as seen from the peer.
+        ServerReflexiveType,  ///< Server-reflexive candidate,
+                              ///< the address/port as seen by the STUN server
+        RelayedType           ///< Relayed candidate, a candidate from
+                              ///< a TURN relay.
     };
 
     QXmppJingleCandidate();
     QXmppJingleCandidate(const QXmppJingleCandidate &other);
     ~QXmppJingleCandidate();
 
-    QXmppJingleCandidate& operator=(const QXmppJingleCandidate &other);
+    QXmppJingleCandidate &operator=(const QXmppJingleCandidate &other);
 
     int component() const;
     void setComponent(int component);
@@ -185,7 +184,7 @@ public:
         Content(const QXmppJingleIq::Content &other);
         ~Content();
 
-        Content& operator=(const Content &other);
+        Content &operator=(const Content &other);
 
         QString creator() const;
         void setCreator(const QString &creator);
@@ -291,7 +290,7 @@ public:
     QXmppJingleIq(const QXmppJingleIq &other);
     ~QXmppJingleIq() override;
 
-    QXmppJingleIq& operator=(const QXmppJingleIq &other);
+    QXmppJingleIq &operator=(const QXmppJingleIq &other);
 
     Action action() const;
     void setAction(Action action);
@@ -303,8 +302,8 @@ public:
     QString initiator() const;
     void setInitiator(const QString &initiator);
 
-    Reason& reason();
-    const Reason& reason() const;
+    Reason &reason();
+    const Reason &reason() const;
 
     QString responder() const;
     void setResponder(const QString &responder);

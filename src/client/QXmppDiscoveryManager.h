@@ -62,11 +62,11 @@ public:
     void setClientType(const QString&);
 
     QXmppDataForm clientInfoForm() const;
-    void setClientInfoForm(const QXmppDataForm &form);
+    void setClientInfoForm(const QXmppDataForm& form);
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &element) override;
+    bool handleStanza(const QDomElement& element) override;
     /// \endcond
 
 signals:
@@ -77,7 +77,7 @@ signals:
     void itemsReceived(const QXmppDiscoveryIq&);
 
 private:
-    QXmppDiscoveryManagerPrivate *d;
+    QXmppDiscoveryManagerPrivate* d;
 };
 
-#endif // QXMPPDISCOVERYMANAGER_H
+#endif  // QXMPPDISCOVERYMANAGER_H

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef ECHOCLIENT_H
 #define ECHOCLIENT_H
 
@@ -36,7 +35,7 @@ public:
     ~echoClient() override;
 
 public slots:
-    void messageReceived(const QXmppMessage&);
+    void messageReceived(const QXmppMessage &);
 };
 
-#endif // ECHOCLIENT_H
+#endif  // ECHOCLIENT_H

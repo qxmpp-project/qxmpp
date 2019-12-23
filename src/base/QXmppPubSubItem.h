@@ -61,4 +61,4 @@ private:
     QSharedDataPointer<QXmppPubSubItemPrivate> d;
 };
 
-#endif // QXMPPPUBSUBITEM_H
+#endif  // QXMPPPUBSUBITEM_H

@@ -46,11 +46,11 @@ public:
     QXmppVersionManager();
     ~QXmppVersionManager() override;
 
-    QString requestVersion(const QString& jid);
+    QString requestVersion(const QString &jid);
 
-    void setClientName(const QString&);
-    void setClientVersion(const QString&);
-    void setClientOs(const QString&);
+    void setClientName(const QString &);
+    void setClientVersion(const QString &);
+    void setClientOs(const QString &);
 
     QString clientName() const;
     QString clientVersion() const;
@@ -63,10 +63,10 @@ public:
 
 signals:
     /// \brief This signal is emitted when a version response is received.
-    void versionReceived(const QXmppVersionIq&);
+    void versionReceived(const QXmppVersionIq &);
 
 private:
     QXmppVersionManagerPrivate *d;
 };
 
-#endif // QXMPPVERSIONMANAGER_H
+#endif  // QXMPPVERSIONMANAGER_H

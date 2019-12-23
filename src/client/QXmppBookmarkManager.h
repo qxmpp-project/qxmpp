@@ -57,7 +57,7 @@ signals:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client) override;
+    void setClient(QXmppClient *client) override;
     /// \endcond
 
 private slots:
@@ -65,7 +65,7 @@ private slots:
     void slotDisconnected();
 
 private:
-    QXmppBookmarkManagerPrivate * const d;
+    QXmppBookmarkManagerPrivate *const d;
 };
 
 #endif

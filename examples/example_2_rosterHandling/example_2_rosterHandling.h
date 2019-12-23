@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
@@ -34,7 +33,7 @@ class xmppClient : public QXmppClient
     Q_OBJECT
 
 public:
-    xmppClient(QObject *parent = nullptr);
+    xmppClient(QObject* parent = nullptr);
     ~xmppClient() override;
 
 public slots:
@@ -43,7 +42,7 @@ public slots:
     void presenceChanged(const QString& bareJid, const QString& resource);
 
 private:
-    QXmppRosterManager *m_rosterManager;
+    QXmppRosterManager* m_rosterManager;
 };
 
-#endif // XMPPCLIENT_H
+#endif  // XMPPCLIENT_H

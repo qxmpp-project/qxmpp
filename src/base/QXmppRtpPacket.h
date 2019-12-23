@@ -41,7 +41,7 @@ public:
     QXmppRtpPacket(const QXmppRtpPacket &other);
     ~QXmppRtpPacket();
 
-    QXmppRtpPacket& operator=(const QXmppRtpPacket &other);
+    QXmppRtpPacket &operator=(const QXmppRtpPacket &other);
 
     bool decode(const QByteArray &ba);
     QByteArray encode() const;
@@ -61,7 +61,7 @@ public:
 
     quint32 ssrc() const;
     void setSsrc(quint32 ssrc);
-    
+
     quint32 stamp() const;
     void setStamp(quint32 stamp);
 

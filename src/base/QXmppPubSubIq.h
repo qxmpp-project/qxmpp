@@ -80,7 +80,7 @@ public:
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement&) override;
+    void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 
@@ -88,4 +88,4 @@ private:
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
 
-#endif // QXMPPPUBSUBIQ_H
+#endif  // QXMPPPUBSUBIQ_H

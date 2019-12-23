@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
@@ -42,11 +41,11 @@ public:
 public slots:
     void clientConnected();
     void rosterReceived();
-    void vCardReceived(const QXmppVCardIq&);
+    void vCardReceived(const QXmppVCardIq &);
 
 private:
     QXmppRosterManager *m_rosterManager;
     QXmppVCardManager *m_vCardManager;
 };
 
-#endif // XMPPCLIENT_H
+#endif  // XMPPCLIENT_H

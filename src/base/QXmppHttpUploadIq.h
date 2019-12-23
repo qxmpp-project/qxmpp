@@ -108,4 +108,4 @@ private:
     QSharedDataPointer<QXmppHttpUploadSlotIqPrivate> d;
 };
 
-#endif // QXMPPHTTPUPLOADIQ_H
+#endif  // QXMPPHTTPUPLOADIQ_H

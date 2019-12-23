@@ -64,7 +64,7 @@ private slots:
 
 private:
     Q_DISABLE_COPY(QXmppIncomingServer)
-    QXmppIncomingServerPrivate* d;
+    QXmppIncomingServerPrivate *d;
     friend class QXmppIncomingServerPrivate;
 };
 

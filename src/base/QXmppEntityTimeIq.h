@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPENTITYTIMEIQ_H
 #define QXMPPENTITYTIMEIQ_H
 
@@ -53,4 +52,4 @@ private:
     QDateTime m_utc;
 };
 
-#endif //QXMPPENTITYTIMEIQ_H
+#endif  //QXMPPENTITYTIMEIQ_H

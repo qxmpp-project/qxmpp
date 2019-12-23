@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef QXMPPSTANZA_H
 #define QXMPPSTANZA_H
 
@@ -51,10 +50,10 @@ class QXMPP_EXPORT QXmppExtendedAddress
 {
 public:
     QXmppExtendedAddress();
-    QXmppExtendedAddress(const QXmppExtendedAddress&);
+    QXmppExtendedAddress(const QXmppExtendedAddress &);
     ~QXmppExtendedAddress();
 
-    QXmppExtendedAddress& operator=(const QXmppExtendedAddress&);
+    QXmppExtendedAddress &operator=(const QXmppExtendedAddress &);
 
     QString description() const;
     void setDescription(const QString &description);
@@ -94,8 +93,7 @@ public:
     class QXMPP_EXPORT Error
     {
     public:
-        enum Type
-        {
+        enum Type {
             Cancel,
             Continue,
             Modify,
@@ -103,8 +101,7 @@ public:
             Wait
         };
 
-        enum Condition
-        {
+        enum Condition {
             BadRequest,
             Conflict,
             FeatureNotImplemented,
@@ -131,8 +128,8 @@ public:
 
         Error();
         Error(const Error &);
-        Error(Type type, Condition cond, const QString& text = QString());
-        Error(const QString& type, const QString& cond, const QString& text = QString());
+        Error(Type type, Condition cond, const QString &text = QString());
+        Error(const QString &type, const QString &cond, const QString &text = QString());
         ~Error();
 
         Error &operator=(const Error &);
@@ -141,7 +138,7 @@ public:
         void setCode(int code);
 
         QString text() const;
-        void setText(const QString& text);
+        void setText(const QString &text);
 
         Condition condition() const;
         void setCondition(Condition cond);
@@ -157,7 +154,7 @@ public:
         void setMaxFileSize(qint64);
 
         QDateTime retryDate() const;
-        void setRetryDate(const QDateTime&);
+        void setRetryDate(const QDateTime &);
 
         /// \cond
         void parse(const QDomElement &element);
@@ -166,34 +163,34 @@ public:
 
     private:
         QString getConditionStr() const;
-        void setConditionFromStr(const QString& cond);
+        void setConditionFromStr(const QString &cond);
 
         QString getTypeStr() const;
-        void setTypeFromStr(const QString& type);
+        void setTypeFromStr(const QString &type);
 
         QSharedDataPointer<QXmppStanzaErrorPrivate> d;
     };
 
-    QXmppStanza(const QString& from = QString(), const QString& to = QString());
+    QXmppStanza(const QString &from = QString(), const QString &to = QString());
     QXmppStanza(const QXmppStanza &other);
     virtual ~QXmppStanza();
 
-    QXmppStanza& operator=(const QXmppStanza &other);
+    QXmppStanza &operator=(const QXmppStanza &other);
 
     QString to() const;
-    void setTo(const QString&);
+    void setTo(const QString &);
 
     QString from() const;
-    void setFrom(const QString&);
+    void setFrom(const QString &);
 
     QString id() const;
-    void setId(const QString&);
+    void setId(const QString &);
 
     QString lang() const;
-    void setLang(const QString&);
+    void setLang(const QString &);
 
     QXmppStanza::Error error() const;
-    void setError(const QXmppStanza::Error& error);
+    void setError(const QXmppStanza::Error &error);
 
     QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);
@@ -217,4 +214,4 @@ private:
     static uint s_uniqeIdNo;
 };
 
-#endif // QXMPPSTANZA_H
+#endif  // QXMPPSTANZA_H

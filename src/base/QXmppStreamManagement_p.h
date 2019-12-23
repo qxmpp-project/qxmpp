@@ -100,13 +100,13 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResume
 {
 public:
-    QXmppStreamManagementResume(const unsigned h = 0, const QString& previd = QString());
+    QXmppStreamManagementResume(const unsigned h = 0, const QString &previd = QString());
 
     unsigned h() const;
     void setH(const unsigned h);
 
     QString prevId() const;
-    void setPrevId(const QString& id);
+    void setPrevId(const QString &id);
 
     static bool isStreamManagementResume(const QDomElement &element);
 
@@ -123,13 +123,13 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResumed
 {
 public:
-    QXmppStreamManagementResumed(const unsigned h = 0, const QString& previd = QString());
+    QXmppStreamManagementResumed(const unsigned h = 0, const QString &previd = QString());
 
     unsigned h() const;
     void setH(const unsigned h);
 
     QString prevId() const;
-    void setPrevId(const QString& id);
+    void setPrevId(const QString &id);
 
     static bool isStreamManagementResumed(const QDomElement &element);
 

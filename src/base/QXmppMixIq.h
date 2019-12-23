@@ -63,29 +63,29 @@ public:
     void setActionType(QXmppMixIq::Type);
 
     QString jid() const;
-    void setJid(const QString&);
+    void setJid(const QString &);
 
     QString channelName() const;
-    void setChannelName(const QString&);
+    void setChannelName(const QString &);
 
     QStringList nodes() const;
-    void setNodes(const QStringList&);
+    void setNodes(const QStringList &);
 
     QString nick() const;
-    void setNick(const QString&);
+    void setNick(const QString &);
 
     /// \cond
-    static bool isMixIq(const QDomElement&);
+    static bool isMixIq(const QDomElement &);
     /// \endcond
 
 protected:
     /// \cond
-    void parseElementFromChild(const QDomElement&) override;
-    void toXmlElementFromChild(QXmlStreamWriter*) const override;
+    void parseElementFromChild(const QDomElement &) override;
+    void toXmlElementFromChild(QXmlStreamWriter *) const override;
     /// \endcond
 
 private:
     QSharedDataPointer<QXmppMixIqPrivate> d;
 };
 
-#endif // QXMPPMIXIQ_H
+#endif  // QXMPPMIXIQ_H

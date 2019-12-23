@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPENTITYTIMEMANAGER_H
 #define QXMPPENTITYTIMEMANAGER_H
 
@@ -43,7 +42,7 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &element) override;
+    bool handleStanza(const QDomElement& element) override;
     /// \endcond
 
 signals:
@@ -51,4 +50,4 @@ signals:
     void timeReceived(const QXmppEntityTimeIq&);
 };
 
-#endif // QXMPPENTITYTIMEMANAGER_H
+#endif  // QXMPPENTITYTIMEMANAGER_H

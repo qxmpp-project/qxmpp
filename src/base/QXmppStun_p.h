@@ -102,8 +102,7 @@ class QXMPP_EXPORT QXmppTurnAllocation : public QXmppIceTransport
     Q_OBJECT
 
 public:
-    enum AllocationState
-    {
+    enum AllocationState {
         UnconnectedState,
         ConnectingState,
         ConnectedState,
@@ -167,7 +166,7 @@ private:
     QString m_realm;
     QByteArray m_nonce;
     AllocationState m_state;
-    QList<QXmppStunTransaction*> m_transactions;
+    QList<QXmppStunTransaction *> m_transactions;
 };
 
 /// \internal

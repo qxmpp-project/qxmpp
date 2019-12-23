@@ -48,4 +48,4 @@ public:
     /// \endcond
 };
 
-#endif // QXMPPBITSOFBINARYDATACONTAINER_H
+#endif  // QXMPPBITSOFBINARYDATACONTAINER_H

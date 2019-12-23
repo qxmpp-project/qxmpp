@@ -77,7 +77,7 @@ private slots:
 
 private:
     Q_DISABLE_COPY(QXmppOutgoingServer)
-    QXmppOutgoingServerPrivate* const d;
+    QXmppOutgoingServerPrivate *const d;
 };
 
 #endif

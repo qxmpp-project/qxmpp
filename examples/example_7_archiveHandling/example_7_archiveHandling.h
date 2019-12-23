@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
@@ -63,4 +62,4 @@ private:
     int m_pageSize;
 };
 
-#endif // XMPPCLIENT_H
+#endif  // XMPPCLIENT_H

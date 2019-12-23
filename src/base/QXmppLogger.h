@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef QXMPPLOGGER_H
 #define QXMPPLOGGER_H
 
@@ -52,8 +51,7 @@ class QXMPP_EXPORT QXmppLogger : public QObject
 
 public:
     /// This enum describes how log message are handled.
-    enum LoggingType
-    {
+    enum LoggingType {
         NoLogging = 0,      ///< Log messages are discarded
         FileLogging = 1,    ///< Log messages are written to a file
         StdoutLogging = 2,  ///< Log messages are written to the standard output
@@ -62,22 +60,21 @@ public:
     Q_ENUM(LoggingType)
 
     /// This enum describes a type of log message.
-    enum MessageType
-    {
-        NoMessage = 0,          ///< No message type
-        DebugMessage = 1,       ///< Debugging message
-        InformationMessage = 2, ///< Informational message
-        WarningMessage = 4,     ///< Warning message
-        ReceivedMessage = 8,    ///< Message received from server
-        SentMessage = 16,       ///< Message sent to server
-        AnyMessage = 31         ///< Any message type
+    enum MessageType {
+        NoMessage = 0,           ///< No message type
+        DebugMessage = 1,        ///< Debugging message
+        InformationMessage = 2,  ///< Informational message
+        WarningMessage = 4,      ///< Warning message
+        ReceivedMessage = 8,     ///< Message received from server
+        SentMessage = 16,        ///< Message sent to server
+        AnyMessage = 31          ///< Any message type
     };
     Q_DECLARE_FLAGS(MessageTypes, MessageType)
 
     QXmppLogger(QObject *parent = nullptr);
     ~QXmppLogger() override;
 
-    static QXmppLogger* getLogger();
+    static QXmppLogger *getLogger();
 
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType type);
@@ -92,7 +89,7 @@ public slots:
     virtual void setGauge(const QString &gauge, double value);
     virtual void updateCounter(const QString &counter, qint64 amount);
 
-    void log(QXmppLogger::MessageType type, const QString& text);
+    void log(QXmppLogger::MessageType type, const QString &text);
     void reopen();
 
 signals:
@@ -100,7 +97,7 @@ signals:
     void message(QXmppLogger::MessageType type, const QString &text);
 
 private:
-    static QXmppLogger* m_logger;
+    static QXmppLogger *m_logger;
     QXmppLoggerPrivate *d;
 };
 
@@ -177,4 +174,4 @@ signals:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppLogger::MessageTypes)
-#endif // QXMPPLOGGER_H
+#endif  // QXMPPLOGGER_H

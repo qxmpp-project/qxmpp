@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef QXMPPSTREAM_H
 #define QXMPPSTREAM_H
 
@@ -47,7 +46,7 @@ public:
     ~QXmppStream() override;
 
     virtual bool isConnected() const;
-    bool sendPacket(const QXmppStanza&);
+    bool sendPacket(const QXmppStanza &);
 
 signals:
     /// This signal is emitted when the stream is connected.
@@ -100,7 +99,7 @@ private:
 
 public slots:
     virtual void disconnectFromHost();
-    virtual bool sendData(const QByteArray&);
+    virtual bool sendData(const QByteArray &);
 
 private slots:
     void _q_socketConnected();
@@ -109,7 +108,7 @@ private slots:
     void _q_socketReadyRead();
 
 private:
-    QXmppStreamPrivate * const d;
+    QXmppStreamPrivate *const d;
 };
 
-#endif // QXMPPSTREAM_H
+#endif  // QXMPPSTREAM_H

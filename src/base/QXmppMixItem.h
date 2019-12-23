@@ -49,18 +49,18 @@ public:
     QXmppMixInfoItem &operator=(const QXmppMixInfoItem &);
 
     QString name() const;
-    void setName(const QString&);
+    void setName(const QString &);
 
     QString description() const;
-    void setDescription(const QString&);
+    void setDescription(const QString &);
 
     QStringList contactJids() const;
-    void setContactJids(const QStringList&);
+    void setContactJids(const QStringList &);
 
-    void parse(const QXmppElement& itemContent);
+    void parse(const QXmppElement &itemContent);
     QXmppElement toElement() const;
 
-    static bool isMixChannelInfo(const QDomElement&);
+    static bool isMixChannelInfo(const QDomElement &);
 
 private:
     QSharedDataPointer<QXmppMixInfoItemPrivate> d;
@@ -84,18 +84,18 @@ public:
     QXmppMixParticipantItem &operator=(const QXmppMixParticipantItem &);
 
     QString nick() const;
-    void setNick(const QString&);
+    void setNick(const QString &);
 
     QString jid() const;
-    void setJid(const QString&);
+    void setJid(const QString &);
 
-    void parse(const QXmppElement& itemContent);
+    void parse(const QXmppElement &itemContent);
     QXmppElement toElement() const;
 
-    static bool isMixParticipantItem(const QDomElement&);
+    static bool isMixParticipantItem(const QDomElement &);
 
 private:
     QSharedDataPointer<QXmppMixParticipantItemPrivate> d;
 };
 
-#endif // QXMPPMIXITEM_H
+#endif  // QXMPPMIXITEM_H
