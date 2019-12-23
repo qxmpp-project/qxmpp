@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef RPCCLIENT_H
 #define RPCCLIENT_H
 
@@ -47,4 +46,4 @@ private:
     QXmppRpcManager *m_rpcManager;
 };
 
-#endif // RPCCLIENT_H
+#endif  // RPCCLIENT_H

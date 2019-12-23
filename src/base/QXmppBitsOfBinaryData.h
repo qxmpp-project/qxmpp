@@ -68,11 +68,11 @@ public:
     void parseElementFromChild(const QDomElement &dataElement);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
-    
+
     bool operator==(const QXmppBitsOfBinaryData &other) const;
 
 private:
     QSharedDataPointer<QXmppBitsOfBinaryDataPrivate> d;
 };
 
-#endif // QXMPPBITSOFBINARYDATA_H
+#endif  // QXMPPBITSOFBINARYDATA_H

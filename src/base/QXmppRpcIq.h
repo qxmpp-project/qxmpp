@@ -31,7 +31,7 @@
 class QXMPP_EXPORT QXmppRpcMarshaller
 {
 public:
-    static void marshall( QXmlStreamWriter *writer, const QVariant &value);
+    static void marshall(QXmlStreamWriter *writer, const QVariant &value);
     static QVariant demarshall(const QDomElement &elem, QStringList &errors);
 };
 
@@ -81,7 +81,7 @@ public:
     QXmppRpcInvokeIq();
 
     QString method() const;
-    void setMethod( const QString &method );
+    void setMethod(const QString &method);
 
     QVariantList arguments() const;
     void setArguments(const QVariantList &arguments);
@@ -125,4 +125,4 @@ private:
     QXmppRpcInvokeIq m_query;
 };
 
-#endif // QXMPPRPCIQ_H
+#endif  // QXMPPRPCIQ_H

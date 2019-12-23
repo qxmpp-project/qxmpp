@@ -46,21 +46,21 @@ class QXMPP_EXPORT QXmppStunMessage
 {
 public:
     enum MethodType {
-        Binding      = 0x1,
+        Binding = 0x1,
         SharedSecret = 0x2,
-        Allocate     = 0x3,
-        Refresh      = 0x4,
-        Send         = 0x6,
-        Data         = 0x7,
+        Allocate = 0x3,
+        Refresh = 0x4,
+        Send = 0x6,
+        Data = 0x7,
         CreatePermission = 0x8,
-        ChannelBind  = 0x9
+        ChannelBind = 0x9
     };
 
     enum ClassType {
-        Request    = 0x000,
+        Request = 0x000,
         Indication = 0x010,
-        Response   = 0x100,
-        Error      = 0x110
+        Response = 0x100,
+        Error = 0x110
     };
 
     QXmppStunMessage();
@@ -174,7 +174,7 @@ public:
     QList<QXmppJingleCandidate> localCandidates() const;
 
     static QList<QHostAddress> discoverAddresses();
-    static QList<QUdpSocket*> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = nullptr);
+    static QList<QUdpSocket *> reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent = nullptr);
 
 public slots:
     void close();
@@ -203,7 +203,7 @@ signals:
     void localCandidatesChanged();
 
 private:
-    QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent=nullptr);
+    QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent = nullptr);
 
     QXmppIceComponentPrivate *d;
     friend class QXmppIceComponentPrivate;

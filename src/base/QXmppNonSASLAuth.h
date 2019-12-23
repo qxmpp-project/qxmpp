@@ -58,4 +58,4 @@ private:
     QString m_resource;
 };
 
-#endif // QXmppNonSASLAuth_H
+#endif  // QXmppNonSASLAuth_H

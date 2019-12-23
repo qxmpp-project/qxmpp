@@ -79,22 +79,22 @@ class QXMPP_EXPORT QXmppRtpAudioChannel : public QIODevice, public QXmppRtpChann
 public:
     /// This enum is used to describe a DTMF tone.
     enum Tone {
-        Tone_0 = 0, ///< Tone for the 0 key.
-        Tone_1,     ///< Tone for the 1 key.
-        Tone_2,     ///< Tone for the 2 key.
-        Tone_3,     ///< Tone for the 3 key.
-        Tone_4,     ///< Tone for the 4 key.
-        Tone_5,     ///< Tone for the 5 key.
-        Tone_6,     ///< Tone for the 6 key.
-        Tone_7,     ///< Tone for the 7 key.
-        Tone_8,     ///< Tone for the 8 key.
-        Tone_9,     ///< Tone for the 9 key.
-        Tone_Star,  ///< Tone for the * key.
-        Tone_Pound, ///< Tone for the # key.
-        Tone_A,     ///< Tone for the A key.
-        Tone_B,     ///< Tone for the B key.
-        Tone_C,     ///< Tone for the C key.
-        Tone_D      ///< Tone for the D key.
+        Tone_0 = 0,  ///< Tone for the 0 key.
+        Tone_1,      ///< Tone for the 1 key.
+        Tone_2,      ///< Tone for the 2 key.
+        Tone_3,      ///< Tone for the 3 key.
+        Tone_4,      ///< Tone for the 4 key.
+        Tone_5,      ///< Tone for the 5 key.
+        Tone_6,      ///< Tone for the 6 key.
+        Tone_7,      ///< Tone for the 7 key.
+        Tone_8,      ///< Tone for the 8 key.
+        Tone_9,      ///< Tone for the 9 key.
+        Tone_Star,   ///< Tone for the * key.
+        Tone_Pound,  ///< Tone for the # key.
+        Tone_A,      ///< Tone for the A key.
+        Tone_B,      ///< Tone for the B key.
+        Tone_C,      ///< Tone for the C key.
+        Tone_D       ///< Tone for the D key.
     };
     Q_ENUM(Tone)
 
@@ -144,8 +144,8 @@ protected:
     }
 
     void payloadTypesChanged() override;
-    qint64 readData(char * data, qint64 maxSize) override;
-    qint64 writeData(const char * data, qint64 maxSize) override;
+    qint64 readData(char *data, qint64 maxSize) override;
+    qint64 writeData(const char *data, qint64 maxSize) override;
     /// \endcond
 
 private slots:
@@ -154,7 +154,7 @@ private slots:
 
 private:
     friend class QXmppRtpAudioChannelPrivate;
-    QXmppRtpAudioChannelPrivate * d;
+    QXmppRtpAudioChannelPrivate *d;
 };
 
 /// \brief The QXmppVideoFrame class provides a representation of a frame of video data.
@@ -166,23 +166,23 @@ class QXMPP_EXPORT QXmppVideoFrame
 public:
     /// This enum describes a pixel format.
     enum PixelFormat {
-        Format_Invalid = 0,     ///< The frame is invalid.
-        Format_RGB32 = 3,       ///< The frame stored using a 32-bit RGB format (0xffRRGGBB).
-        Format_RGB24 = 4,       ///< The frame is stored using a 24-bit RGB format (8-8-8).
-        Format_YUV420P = 18,    ///< The frame is stored using an 8-bit per component planar
-                                ///< YUV format with the U and V planes horizontally and
-                                ///< vertically sub-sampled, i.e. the height and width of the
-                                ///< U and V planes are half that of the Y plane.
-        Format_UYVY = 20,       ///< The frame is stored using an 8-bit per component packed
-                                ///< YUV format with the U and V planes horizontally
-                                ///< sub-sampled (U-Y-V-Y), i.e. two horizontally adjacent
-                                ///< pixels are stored as a 32-bit macropixel which has a Y
-                                ///< value for each pixel and common U and V values.
-        Format_YUYV = 21        ///< The frame is stored using an 8-bit per component packed
-                                ///< YUV format with the U and V planes horizontally
-                                ///< sub-sampled (Y-U-Y-V), i.e. two horizontally adjacent
-                                ///< pixels are stored as a 32-bit macropixel which has a Y
-                                ///< value for each pixel and common U and V values.
+        Format_Invalid = 0,   ///< The frame is invalid.
+        Format_RGB32 = 3,     ///< The frame stored using a 32-bit RGB format (0xffRRGGBB).
+        Format_RGB24 = 4,     ///< The frame is stored using a 24-bit RGB format (8-8-8).
+        Format_YUV420P = 18,  ///< The frame is stored using an 8-bit per component planar
+                              ///< YUV format with the U and V planes horizontally and
+                              ///< vertically sub-sampled, i.e. the height and width of the
+                              ///< U and V planes are half that of the Y plane.
+        Format_UYVY = 20,     ///< The frame is stored using an 8-bit per component packed
+                              ///< YUV format with the U and V planes horizontally
+                              ///< sub-sampled (U-Y-V-Y), i.e. two horizontally adjacent
+                              ///< pixels are stored as a 32-bit macropixel which has a Y
+                              ///< value for each pixel and common U and V values.
+        Format_YUYV = 21      ///< The frame is stored using an 8-bit per component packed
+                              ///< YUV format with the U and V planes horizontally
+                              ///< sub-sampled (Y-U-Y-V), i.e. two horizontally adjacent
+                              ///< pixels are stored as a 32-bit macropixel which has a Y
+                              ///< value for each pixel and common U and V values.
     };
 
     QXmppVideoFrame();
@@ -210,40 +210,47 @@ class QXMPP_EXPORT QXmppVideoFormat
 {
 public:
     QXmppVideoFormat()
-        : m_frameRate(15.0)
-        , m_frameSize(QSize(320, 240))
-        , m_pixelFormat(QXmppVideoFrame::Format_YUYV)
-    {}
+        : m_frameRate(15.0), m_frameSize(QSize(320, 240)), m_pixelFormat(QXmppVideoFrame::Format_YUYV)
+    {
+    }
 
-    int frameHeight() const {
+    int frameHeight() const
+    {
         return m_frameSize.height();
     }
 
-    int frameWidth() const {
+    int frameWidth() const
+    {
         return m_frameSize.width();
     }
 
-    qreal frameRate() const {
+    qreal frameRate() const
+    {
         return m_frameRate;
     }
 
-    void setFrameRate(qreal frameRate) {
+    void setFrameRate(qreal frameRate)
+    {
         m_frameRate = frameRate;
     }
 
-    QSize frameSize() const {
+    QSize frameSize() const
+    {
         return m_frameSize;
     }
 
-    void setFrameSize(const QSize &frameSize) {
+    void setFrameSize(const QSize &frameSize)
+    {
         m_frameSize = frameSize;
     }
 
-    QXmppVideoFrame::PixelFormat pixelFormat() const {
+    QXmppVideoFrame::PixelFormat pixelFormat() const
+    {
         return m_pixelFormat;
     }
 
-    void setPixelFormat(QXmppVideoFrame::PixelFormat pixelFormat) {
+    void setPixelFormat(QXmppVideoFrame::PixelFormat pixelFormat)
+    {
         m_pixelFormat = pixelFormat;
     }
 
@@ -252,7 +259,6 @@ private:
     QSize m_frameSize;
     QXmppVideoFrame::PixelFormat m_pixelFormat;
 };
-
 
 /// \brief The QXmppRtpVideoChannel class represents an RTP video channel to a remote party.
 ///
@@ -292,7 +298,7 @@ protected:
 
 private:
     friend class QXmppRtpVideoChannelPrivate;
-    QXmppRtpVideoChannelPrivate * d;
+    QXmppRtpVideoChannelPrivate *d;
 };
 
 #endif

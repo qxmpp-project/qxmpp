@@ -133,13 +133,13 @@ public:
     void setChats(const QList<QXmppArchiveChat> &chats);
 
     QString with() const;
-    void setWith( const QString &with );
+    void setWith(const QString &with);
 
     QDateTime start() const;
-    void setStart(const QDateTime &start );
+    void setStart(const QDateTime &start);
 
     QDateTime end() const;
-    void setEnd(const QDateTime &end );
+    void setEnd(const QDateTime &end);
 
     QXmppResultSetQuery resultSetQuery() const;
     void setResultSetQuery(const QXmppResultSetQuery &rsm);
@@ -174,13 +174,13 @@ class QXMPP_EXPORT QXmppArchiveRemoveIq : public QXmppIq
 {
 public:
     QString with() const;
-    void setWith( const QString &with );
+    void setWith(const QString &with);
 
     QDateTime start() const;
-    void setStart(const QDateTime &start );
+    void setStart(const QDateTime &start);
 
     QDateTime end() const;
-    void setEnd(const QDateTime &end );
+    void setEnd(const QDateTime &end);
 
     /// \cond
     static bool isArchiveRemoveIq(const QDomElement &element);
@@ -244,4 +244,4 @@ protected:
     /// \endcond
 };
 
-#endif // QXMPPARCHIVEIQ_H
+#endif  // QXMPPARCHIVEIQ_H

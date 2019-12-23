@@ -59,14 +59,14 @@ class QXmppMucRoomPrivate;
 class QXMPP_EXPORT QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
-    Q_PROPERTY(QList<QXmppMucRoom*> rooms READ rooms NOTIFY roomAdded)
+    Q_PROPERTY(QList<QXmppMucRoom *> rooms READ rooms NOTIFY roomAdded)
 
 public:
     QXmppMucManager();
     ~QXmppMucManager() override;
 
     QXmppMucRoom *addRoom(const QString &roomJid);
-    QList<QXmppMucRoom*> rooms() const;
+    QList<QXmppMucRoom *> rooms() const;
 
     /// \cond
     QStringList discoveryFeatures() const override;
@@ -82,7 +82,7 @@ signals:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client) override;
+    void setClient(QXmppClient *client) override;
     /// \endcond
 
 private slots:
@@ -112,14 +112,13 @@ class QXMPP_EXPORT QXmppMucRoom : public QObject
     Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
 
 public:
-
     /// This enum is used to describe chat room actions.
     enum Action {
-        NoAction = 0,               ///< no action
-        SubjectAction = 1,          ///< change the room's subject
-        ConfigurationAction = 2,    ///< change the room's configuration
-        PermissionsAction = 4,      ///< change the room's permissions
-        KickAction = 8              ///< kick users from the room
+        NoAction = 0,             ///< no action
+        SubjectAction = 1,        ///< change the room's subject
+        ConfigurationAction = 2,  ///< change the room's configuration
+        PermissionsAction = 4,    ///< change the room's permissions
+        KickAction = 8            ///< kick users from the room
     };
     Q_DECLARE_FLAGS(Actions, Action)
 

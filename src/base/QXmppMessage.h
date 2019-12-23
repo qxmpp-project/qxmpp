@@ -85,26 +85,26 @@ public:
     ///
     /// \since QXmpp 1.1
     enum EncryptionMethod {
-        NoEncryption,      ///< No encryption
-        UnknownEncryption, ///< Unknown encryption
-        OTR,               ///< XEP-0364: Current Off-the-Record Messaging Usage
-        LegacyOpenPGP,     ///< XEP-0027: Current Jabber OpenPGP Usage
-        OX,                ///< XEP-0373: OpenPGP for XMPP
-        OMEMO              ///< XEP-0384: OMEMO Encryption
+        NoEncryption,       ///< No encryption
+        UnknownEncryption,  ///< Unknown encryption
+        OTR,                ///< XEP-0364: Current Off-the-Record Messaging Usage
+        LegacyOpenPGP,      ///< XEP-0027: Current Jabber OpenPGP Usage
+        OX,                 ///< XEP-0373: OpenPGP for XMPP
+        OMEMO               ///< XEP-0384: OMEMO Encryption
     };
 
-    QXmppMessage(const QString& from = QString(), const QString& to = QString(),
-                 const QString& body = QString(), const QString& thread = QString());
+    QXmppMessage(const QString &from = QString(), const QString &to = QString(),
+                 const QString &body = QString(), const QString &thread = QString());
 
     QXmppMessage(const QXmppMessage &other);
     ~QXmppMessage() override;
 
-    QXmppMessage& operator=(const QXmppMessage &other);
+    QXmppMessage &operator=(const QXmppMessage &other);
 
     bool isXmppStanza() const override;
 
     QString body() const;
-    void setBody(const QString&);
+    void setBody(const QString &);
 
     bool isAttentionRequested() const;
     void setAttentionRequested(bool requested);
@@ -131,10 +131,10 @@ public:
     void setState(QXmppMessage::State);
 
     QString subject() const;
-    void setSubject(const QString&);
+    void setSubject(const QString &);
 
     QString thread() const;
-    void setThread(const QString&);
+    void setThread(const QString &);
 
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
@@ -147,10 +147,10 @@ public:
     void setMarkable(const bool);
 
     QString markedId() const;
-    void setMarkerId(const QString&);
+    void setMarkerId(const QString &);
 
     QString markedThread() const;
-    void setMarkedThread(const QString&);
+    void setMarkedThread(const QString &);
 
     Marker marker() const;
     void setMarker(const Marker);
@@ -166,11 +166,11 @@ public:
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;
-    void setOutOfBandUrl(const QString&);
+    void setOutOfBandUrl(const QString &);
 
     // XEP-0308: Last Message Correction
     QString replaceId() const;
-    void setReplaceId(const QString&);
+    void setReplaceId(const QString &);
 
     // XEP-0334: Message Processing Hints
     bool hasHint(const Hint hint) const;
@@ -180,30 +180,30 @@ public:
 
     // XEP-0367: Message Attaching
     QString attachId() const;
-    void setAttachId(const QString&);
+    void setAttachId(const QString &);
 
     // XEP-0369: Mediated Information eXchange (MIX)
     QString mixUserJid() const;
-    void setMixUserJid(const QString&);
+    void setMixUserJid(const QString &);
 
     QString mixUserNick() const;
-    void setMixUserNick(const QString&);
+    void setMixUserNick(const QString &);
 
     // XEP-0380: Explicit Message Encryption
     EncryptionMethod encryptionMethod() const;
     void setEncryptionMethod(EncryptionMethod);
     QString encryptionMethodNs() const;
-    void setEncryptionMethodNs(const QString&);
+    void setEncryptionMethodNs(const QString &);
 
     QString encryptionName() const;
-    void setEncryptionName(const QString&);
+    void setEncryptionName(const QString &);
 
     // XEP-0382: Spoiler messages
     bool isSpoiler() const;
     void setIsSpoiler(bool);
 
     QString spoilerHint() const;
-    void setSpoilerHint(const QString&);
+    void setSpoilerHint(const QString &);
 
     /// \cond
     void parse(const QDomElement &element) override;
@@ -217,4 +217,4 @@ private:
     QSharedDataPointer<QXmppMessagePrivate> d;
 };
 
-#endif // QXMPPMESSAGE_H
+#endif  // QXMPPMESSAGE_H

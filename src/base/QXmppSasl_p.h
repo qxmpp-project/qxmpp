@@ -71,7 +71,7 @@ public:
     virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
 
     static QStringList availableMechanisms();
-    static QXmppSaslClient* create(const QString &mechanism, QObject *parent = nullptr);
+    static QXmppSaslClient *create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     QXmppSaslClientPrivate *d;
@@ -105,7 +105,7 @@ public:
     virtual QString mechanism() const = 0;
     virtual Response respond(const QByteArray &challenge, QByteArray &response) = 0;
 
-    static QXmppSaslServer* create(const QString &mechanism, QObject *parent = nullptr);
+    static QXmppSaslServer *create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     QXmppSaslServerPrivate *d;

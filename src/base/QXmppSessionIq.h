@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef QXMPPSESSIONIQ_H
 #define QXMPPSESSIONIQ_H
 
@@ -46,4 +45,4 @@ private:
     /// \endcond
 };
 
-#endif // QXMPPSESSION_H
+#endif  // QXMPPSESSION_H

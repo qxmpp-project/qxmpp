@@ -31,8 +31,7 @@ class QXMPP_EXPORT QXmppStreamFeatures : public QXmppStanza
 public:
     QXmppStreamFeatures();
 
-    enum Mode
-    {
+    enum Mode {
         Disabled = 0,
         Enabled,
         Required

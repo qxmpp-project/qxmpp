@@ -40,8 +40,7 @@
 
 static QString strFromCondition(const QXmppStanza::Error::Condition& condition)
 {
-    switch(condition)
-    {
+    switch (condition) {
     case QXmppStanza::Error::BadRequest:
         return "bad-request";
     case QXmppStanza::Error::Conflict:
@@ -93,53 +92,52 @@ static QString strFromCondition(const QXmppStanza::Error::Condition& condition)
 
 static QXmppStanza::Error::Condition conditionFromStr(const QString& string)
 {
-    if(string == "bad-request")
+    if (string == "bad-request")
         return QXmppStanza::Error::BadRequest;
-    else if(string == "conflict")
+    else if (string == "conflict")
         return QXmppStanza::Error::Conflict;
-    else if(string == "feature-not-implemented")
+    else if (string == "feature-not-implemented")
         return QXmppStanza::Error::FeatureNotImplemented;
-    else if(string == "forbidden")
+    else if (string == "forbidden")
         return QXmppStanza::Error::Forbidden;
-    else if(string == "gone")
+    else if (string == "gone")
         return QXmppStanza::Error::Gone;
-    else if(string == "internal-server-error")
+    else if (string == "internal-server-error")
         return QXmppStanza::Error::InternalServerError;
-    else if(string == "item-not-found")
+    else if (string == "item-not-found")
         return QXmppStanza::Error::ItemNotFound;
-    else if(string == "jid-malformed")
+    else if (string == "jid-malformed")
         return QXmppStanza::Error::JidMalformed;
-    else if(string == "not-acceptable")
+    else if (string == "not-acceptable")
         return QXmppStanza::Error::NotAcceptable;
-    else if(string == "not-allowed")
+    else if (string == "not-allowed")
         return QXmppStanza::Error::NotAllowed;
-    else if(string == "not-authorized")
+    else if (string == "not-authorized")
         return QXmppStanza::Error::NotAuthorized;
-    else if(string == "payment-required")
+    else if (string == "payment-required")
         return QXmppStanza::Error::PaymentRequired;
-    else if(string == "recipient-unavailable")
+    else if (string == "recipient-unavailable")
         return QXmppStanza::Error::RecipientUnavailable;
-    else if(string == "redirect")
+    else if (string == "redirect")
         return QXmppStanza::Error::Redirect;
-    else if(string == "registration-required")
+    else if (string == "registration-required")
         return QXmppStanza::Error::RegistrationRequired;
-    else if(string == "remote-server-not-found")
+    else if (string == "remote-server-not-found")
         return QXmppStanza::Error::RemoteServerNotFound;
-    else if(string == "remote-server-timeout")
+    else if (string == "remote-server-timeout")
         return QXmppStanza::Error::RemoteServerTimeout;
-    else if(string == "resource-constraint")
+    else if (string == "resource-constraint")
         return QXmppStanza::Error::ResourceConstraint;
-    else if(string == "service-unavailable")
+    else if (string == "service-unavailable")
         return QXmppStanza::Error::ServiceUnavailable;
-    else if(string == "subscription-required")
+    else if (string == "subscription-required")
         return QXmppStanza::Error::SubscriptionRequired;
-    else if(string == "undefined-condition")
+    else if (string == "undefined-condition")
         return QXmppStanza::Error::UndefinedCondition;
-    else if(string == "unexpected-request")
+    else if (string == "unexpected-request")
         return QXmppStanza::Error::UnexpectedRequest;
     else
         return static_cast<QXmppStanza::Error::Condition>(-1);
 }
 
 #endif
-

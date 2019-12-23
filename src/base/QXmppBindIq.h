@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef QXMPPBINDIQ_H
 #define QXMPPBINDIQ_H
 
@@ -37,10 +36,10 @@ class QXMPP_EXPORT QXmppBindIq : public QXmppIq
 {
 public:
     QString jid() const;
-    void setJid(const QString&);
+    void setJid(const QString &);
 
     QString resource() const;
-    void setResource(const QString&);
+    void setResource(const QString &);
 
     /// \cond
     static bool isBindIq(const QDomElement &element);
@@ -57,4 +56,4 @@ private:
     QString m_resource;
 };
 
-#endif // QXMPPBIND_H
+#endif  // QXMPPBIND_H

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPCONSTANTS_H
 #define QXMPPCONSTANTS_H
 
@@ -70,14 +69,14 @@ extern const char* ns_vcard;
 // XEP-0059: Result Set Management
 extern const char* ns_rsm;
 // XEP-0060: Publish-Subscribe
-extern const char *ns_pubsub;
+extern const char* ns_pubsub;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char* ns_bytestreams;
 // XEP-0066: Out of Band Data
 extern const char* ns_oob;
 // XEP-0071: XHTML-IM
-extern const char *ns_xhtml;
-extern const char *ns_xhtml_im;
+extern const char* ns_xhtml;
+extern const char* ns_xhtml_im;
 // XEP-0077: In-Band Registration
 extern const char* ns_register;
 extern const char* ns_register_feature;
@@ -180,4 +179,4 @@ extern const char* ns_mix_pam;
 extern const char* ns_mix_roster;
 extern const char* ns_mix_presence;
 
-#endif // QXMPPCONSTANTS_H
+#endif  // QXMPPCONSTANTS_H

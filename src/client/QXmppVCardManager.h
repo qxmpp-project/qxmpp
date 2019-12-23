@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPVCARDMANAGER_H
 #define QXMPPVCARDMANAGER_H
 
@@ -71,7 +70,7 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &element) override;
+    bool handleStanza(const QDomElement& element) override;
     /// \endcond
 
 signals:
@@ -84,7 +83,7 @@ signals:
     void clientVCardReceived();
 
 private:
-    QXmppVCardManagerPrivate *d;
+    QXmppVCardManagerPrivate* d;
 };
 
-#endif // QXMPPVCARDMANAGER_H
+#endif  // QXMPPVCARDMANAGER_H

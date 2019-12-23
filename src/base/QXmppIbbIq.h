@@ -27,16 +27,16 @@
 
 #include "QXmppIq.h"
 
-class QXmppIbbOpenIq: public QXmppIq
+class QXmppIbbOpenIq : public QXmppIq
 {
 public:
     QXmppIbbOpenIq();
 
     long blockSize() const;
-    void setBlockSize( long block_size );
+    void setBlockSize(long block_size);
 
     QString sid() const;
-    void setSid( const QString &sid );
+    void setSid(const QString &sid);
 
     static bool isIbbOpenIq(const QDomElement &element);
 
@@ -51,13 +51,13 @@ private:
     QString m_sid;
 };
 
-class QXmppIbbCloseIq: public QXmppIq
+class QXmppIbbCloseIq : public QXmppIq
 {
 public:
     QXmppIbbCloseIq();
 
     QString sid() const;
-    void setSid( const QString &sid );
+    void setSid(const QString &sid);
 
     static bool isIbbCloseIq(const QDomElement &element);
 
@@ -77,13 +77,13 @@ public:
     QXmppIbbDataIq();
 
     quint16 sequence() const;
-    void setSequence( quint16 seq );
+    void setSequence(quint16 seq);
 
     QString sid() const;
-    void setSid( const QString &sid );
+    void setSid(const QString &sid);
 
     QByteArray payload() const;
-    void setPayload( const QByteArray &data );
+    void setPayload(const QByteArray &data);
 
     static bool isIbbDataIq(const QDomElement &element);
 
@@ -99,4 +99,4 @@ private:
     QByteArray m_payload;
 };
 
-#endif // QXMPPIBBIQS_H
+#endif  // QXMPPIBBIQS_H

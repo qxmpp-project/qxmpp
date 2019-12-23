@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef QXMPPOUTGOINGCLIENT_H
 #define QXMPPOUTGOINGCLIENT_H
 
@@ -60,7 +59,7 @@ public:
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();
 
-    QXmppConfiguration& configuration();
+    QXmppConfiguration &configuration();
 
 signals:
     /// This signal is emitted when an error is encountered.
@@ -70,13 +69,13 @@ signals:
     void elementReceived(const QDomElement &element, bool &handled);
 
     /// This signal is emitted when a presence is received.
-    void presenceReceived(const QXmppPresence&);
+    void presenceReceived(const QXmppPresence &);
 
     /// This signal is emitted when a message is received.
-    void messageReceived(const QXmppMessage&);
+    void messageReceived(const QXmppMessage &);
 
     /// This signal is emitted when an IQ is received.
-    void iqReceived(const QXmppIq&);
+    void iqReceived(const QXmppIq &);
 
     /// This signal is emitted when SSL errors are encountered.
     void sslErrors(const QList<QSslError> &errors);
@@ -96,7 +95,7 @@ private slots:
     void _q_dnsLookupFinished();
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
-    void socketSslErrors(const QList<QSslError>&);
+    void socketSslErrors(const QList<QSslError> &);
 
     void pingStart();
     void pingStop();
@@ -105,7 +104,7 @@ private slots:
 
 private:
     friend class QXmppOutgoingClientPrivate;
-    QXmppOutgoingClientPrivate * const d;
+    QXmppOutgoingClientPrivate *const d;
 };
 
-#endif // QXMPPOUTGOINGCLIENT_H
+#endif  // QXMPPOUTGOINGCLIENT_H

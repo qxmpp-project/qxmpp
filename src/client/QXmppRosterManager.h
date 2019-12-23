@@ -69,18 +69,18 @@ class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    QXmppRosterManager(QXmppClient* stream);
+    QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;
 
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
-    QXmppRosterIq::Item getRosterEntry(const QString& bareJid) const;
+    QXmppRosterIq::Item getRosterEntry(const QString &bareJid) const;
 
-    QStringList getResources(const QString& bareJid) const;
+    QStringList getResources(const QString &bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
-            const QString& bareJid) const;
-    QXmppPresence getPresence(const QString& bareJid,
-                              const QString& resource) const;
+        const QString &bareJid) const;
+    QXmppPresence getPresence(const QString &bareJid,
+                              const QString &resource) const;
 
     /// \cond
     bool handleStanza(const QDomElement &element) override;
@@ -103,7 +103,7 @@ signals:
     void rosterReceived();
 
     /// This signal is emitted when the presence of a particular bareJid and resource changes.
-    void presenceChanged(const QString& bareJid, const QString& resource);
+    void presenceChanged(const QString &bareJid, const QString &resource);
 
     /// This signal is emitted when a contact asks to subscribe to your presence.
     ///
@@ -112,27 +112,27 @@ signals:
     ///
     /// \note If you set QXmppConfiguration::autoAcceptSubscriptions() to true, this
     /// signal will not be emitted.
-    void subscriptionReceived(const QString& bareJid);
+    void subscriptionReceived(const QString &bareJid);
 
     /// This signal is emitted when the roster entry of a particular bareJid is
     /// added as a result of roster push.
-    void itemAdded(const QString& bareJid);
+    void itemAdded(const QString &bareJid);
 
     /// This signal is emitted when the roster entry of a particular bareJid
     /// changes as a result of roster push.
-    void itemChanged(const QString& bareJid);
+    void itemChanged(const QString &bareJid);
 
     /// This signal is emitted when the roster entry of a particular bareJid is
     /// removed as a result of roster push.
-    void itemRemoved(const QString& bareJid);
+    void itemRemoved(const QString &bareJid);
 
 private slots:
     void _q_connected();
     void _q_disconnected();
-    void _q_presenceReceived(const QXmppPresence&);
+    void _q_presenceReceived(const QXmppPresence &);
 
 private:
     QXmppRosterManagerPrivate *d;
 };
 
-#endif // QXMPPROSTER_H
+#endif  // QXMPPROSTER_H

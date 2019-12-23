@@ -66,7 +66,7 @@ public:
     void setSize(qint64 size);
 
     bool isNull() const;
-    QXmppTransferFileInfo& operator=(const QXmppTransferFileInfo &other);
+    QXmppTransferFileInfo &operator=(const QXmppTransferFileInfo &other);
     bool operator==(const QXmppTransferFileInfo &other) const;
 
     /// \cond
@@ -99,38 +99,37 @@ class QXMPP_EXPORT QXmppTransferJob : public QXmppLoggable
 public:
     /// This enum is used to describe the direction of a transfer job.
     enum Direction {
-        IncomingDirection, ///< The file is being received.
-        OutgoingDirection  ///< The file is being sent.
+        IncomingDirection,  ///< The file is being received.
+        OutgoingDirection   ///< The file is being sent.
     };
     Q_ENUM(Direction)
 
     /// This enum is used to describe the type of error encountered by a transfer job.
     enum Error {
-        NoError = 0,      ///< No error occurred.
-        AbortError,       ///< The file transfer was aborted.
-        FileAccessError,  ///< An error was encountered trying to access a local file.
-        FileCorruptError, ///< The file is corrupt: the file size or hash do not match.
-        ProtocolError     ///< An error was encountered in the file transfer protocol.
+        NoError = 0,       ///< No error occurred.
+        AbortError,        ///< The file transfer was aborted.
+        FileAccessError,   ///< An error was encountered trying to access a local file.
+        FileCorruptError,  ///< The file is corrupt: the file size or hash do not match.
+        ProtocolError      ///< An error was encountered in the file transfer protocol.
     };
     Q_ENUM(Error)
 
     /// This enum is used to describe a transfer method.
     enum Method {
-        NoMethod = 0,     ///< No transfer method.
-        InBandMethod = 1, ///< XEP-0047: In-Band Bytestreams
-        SocksMethod = 2,  ///< XEP-0065: SOCKS5 Bytestreams
-        AnyMethod = 3     ///< Any supported transfer method.
+        NoMethod = 0,      ///< No transfer method.
+        InBandMethod = 1,  ///< XEP-0047: In-Band Bytestreams
+        SocksMethod = 2,   ///< XEP-0065: SOCKS5 Bytestreams
+        AnyMethod = 3      ///< Any supported transfer method.
     };
     Q_ENUM(Method)
     Q_DECLARE_FLAGS(Methods, Method)
 
     /// This enum is used to describe the state of a transfer job.
-    enum State
-    {
-        OfferState = 0,    ///< The transfer is being offered to the remote party.
-        StartState = 1,    ///< The transfer is being connected.
-        TransferState = 2, ///< The transfer is ongoing.
-        FinishedState = 3  ///< The transfer is finished.
+    enum State {
+        OfferState = 0,     ///< The transfer is being offered to the remote party.
+        StartState = 1,     ///< The transfer is being connected.
+        TransferState = 2,  ///< The transfer is ongoing.
+        FinishedState = 3   ///< The transfer is finished.
     };
     Q_ENUM(State)
 
@@ -262,11 +261,11 @@ public slots:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client) override;
+    void setClient(QXmppClient *client) override;
     /// \endcond
 
 private slots:
-    void _q_iqReceived(const QXmppIq&);
+    void _q_iqReceived(const QXmppIq &);
     void _q_jobDestroyed(QObject *object);
     void _q_jobError(QXmppTransferJob::Error error);
     void _q_jobFinished();
@@ -276,17 +275,17 @@ private slots:
 private:
     QXmppTransferManagerPrivate *d;
 
-    void byteStreamIqReceived(const QXmppByteStreamIq&);
-    void byteStreamResponseReceived(const QXmppIq&);
-    void byteStreamResultReceived(const QXmppByteStreamIq&);
-    void byteStreamSetReceived(const QXmppByteStreamIq&);
-    void ibbCloseIqReceived(const QXmppIbbCloseIq&);
-    void ibbDataIqReceived(const QXmppIbbDataIq&);
-    void ibbOpenIqReceived(const QXmppIbbOpenIq&);
-    void ibbResponseReceived(const QXmppIq&);
-    void streamInitiationIqReceived(const QXmppStreamInitiationIq&);
-    void streamInitiationResultReceived(const QXmppStreamInitiationIq&);
-    void streamInitiationSetReceived(const QXmppStreamInitiationIq&);
+    void byteStreamIqReceived(const QXmppByteStreamIq &);
+    void byteStreamResponseReceived(const QXmppIq &);
+    void byteStreamResultReceived(const QXmppByteStreamIq &);
+    void byteStreamSetReceived(const QXmppByteStreamIq &);
+    void ibbCloseIqReceived(const QXmppIbbCloseIq &);
+    void ibbDataIqReceived(const QXmppIbbDataIq &);
+    void ibbOpenIqReceived(const QXmppIbbOpenIq &);
+    void ibbResponseReceived(const QXmppIq &);
+    void streamInitiationIqReceived(const QXmppStreamInitiationIq &);
+    void streamInitiationResultReceived(const QXmppStreamInitiationIq &);
+    void streamInitiationSetReceived(const QXmppStreamInitiationIq &);
     void socksServerSendOffer(QXmppTransferJob *job);
 
     friend class QXmppTransferManagerPrivate;

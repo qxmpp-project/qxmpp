@@ -63,17 +63,17 @@ class QXMPP_EXPORT QXmppCall : public QXmppLoggable
 public:
     /// This enum is used to describe the direction of a call.
     enum Direction {
-        IncomingDirection, ///< The call is incoming.
-        OutgoingDirection  ///< The call is outgoing.
+        IncomingDirection,  ///< The call is incoming.
+        OutgoingDirection   ///< The call is outgoing.
     };
     Q_ENUM(Direction)
 
     /// This enum is used to describe the state of a call.
     enum State {
-        ConnectingState = 0,    ///< The call is being connected.
-        ActiveState = 1,        ///< The call is active.
-        DisconnectingState = 2, ///< The call is being disconnected.
-        FinishedState = 3       ///< The call is finished.
+        ConnectingState = 0,     ///< The call is being connected.
+        ActiveState = 1,         ///< The call is active.
+        DisconnectingState = 2,  ///< The call is being disconnected.
+        FinishedState = 3        ///< The call is finished.
     };
     Q_ENUM(State)
 
@@ -188,7 +188,7 @@ public slots:
 
 protected:
     /// \cond
-    void setClient(QXmppClient* client) override;
+    void setClient(QXmppClient *client) override;
     /// \endcond
 
 private slots:

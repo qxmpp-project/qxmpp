@@ -47,4 +47,4 @@ protected:
     /// \endcond
 };
 
-#endif // QXMPPBITSOFBINARYIQ_H
+#endif  // QXMPPBITSOFBINARYIQ_H

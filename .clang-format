@@ -1,0 +1,15 @@
+AlignAfterOpenBracket: Align
+AlignTrailingComments: true
+BasedOnStyle: WebKit
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeColon
+DerivePointerAlignment: true
+DisableFormat: false
+Language: Cpp
+SortIncludes: false
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 2

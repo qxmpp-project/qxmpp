@@ -90,7 +90,7 @@ public:
         Media(const QXmppDataForm::Media &other);
         ~Media();
 
-        QXmppDataForm::Media& operator=(const QXmppDataForm::Media &other);
+        QXmppDataForm::Media &operator=(const QXmppDataForm::Media &other);
 
         QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSize().height() instead")
         int height() const;
@@ -103,9 +103,9 @@ public:
         void setWidth(int width);
 
         QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSources() instead")
-        QList<QPair<QString, QString> > uris() const;
+        QList<QPair<QString, QString>> uris() const;
         QT_DEPRECATED_X("Use QXmppDataForm::Field::setMediaSources() instead")
-        void setUris(const QList<QPair<QString, QString> > &uris);
+        void setUris(const QList<QPair<QString, QString>> &uris);
 
         QT_DEPRECATED_X("Use QXmppDataForm::Field::mediaSources().isEmpty() instead")
         bool isNull() const;
@@ -122,8 +122,7 @@ public:
     {
     public:
         /// This enum is used to describe a field's type.
-        enum Type
-        {
+        enum Type {
             BooleanField,
             FixedField,
             HiddenField,
@@ -140,7 +139,7 @@ public:
         Field(const QXmppDataForm::Field &other);
         ~Field();
 
-        QXmppDataForm::Field& operator=(const QXmppDataForm::Field &other);
+        QXmppDataForm::Field &operator=(const QXmppDataForm::Field &other);
 
         QString description() const;
         void setDescription(const QString &description);
@@ -159,8 +158,8 @@ public:
         void setMedia(const Media &media);
 #endif
 
-        QList<QPair<QString, QString> > options() const;
-        void setOptions(const QList<QPair<QString, QString> > &options);
+        QList<QPair<QString, QString>> options() const;
+        void setOptions(const QList<QPair<QString, QString>> &options);
 
         bool isRequired() const;
         void setRequired(bool required);
@@ -186,25 +185,24 @@ public:
     };
 
     /// This enum is used to describe a form's type.
-    enum Type
-    {
-        None,   ///< Unknown form type
-        Form,   ///< The form-processing entity is asking the form-submitting
-                ///< entity to complete a form.
-        Submit, ///< The form-submitting entity is submitting data to the
-                ///< form-processing entity.
-        Cancel, ///< The form-submitting entity has cancelled submission
-                ///< of data to the form-processing entity.
-        Result  ///< The form-processing entity is returning data
-                ///< (e.g., search results) to the form-submitting entity,
-                ///< or the data is a generic data set.
+    enum Type {
+        None,    ///< Unknown form type
+        Form,    ///< The form-processing entity is asking the form-submitting
+                 ///< entity to complete a form.
+        Submit,  ///< The form-submitting entity is submitting data to the
+                 ///< form-processing entity.
+        Cancel,  ///< The form-submitting entity has cancelled submission
+                 ///< of data to the form-processing entity.
+        Result   ///< The form-processing entity is returning data
+                 ///< (e.g., search results) to the form-submitting entity,
+                 ///< or the data is a generic data set.
     };
 
     QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
     QXmppDataForm(const QXmppDataForm &other);
     ~QXmppDataForm();
 
-    QXmppDataForm& operator=(const QXmppDataForm &other);
+    QXmppDataForm &operator=(const QXmppDataForm &other);
 
     QString instructions() const;
     void setInstructions(const QString &instructions);

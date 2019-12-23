@@ -26,7 +26,7 @@
 #include <QtTest>
 #include "QXmppPasswordChecker.h"
 
-template <class T>
+template<class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
     //qDebug() << "parsing" << xml;
@@ -36,7 +36,7 @@ static void parsePacket(T &packet, const QByteArray &xml)
     packet.parse(element);
 }
 
-template <class T>
+template<class T>
 static void serializePacket(T &packet, const QByteArray &xml)
 {
     QBuffer buffer;
@@ -59,8 +59,7 @@ public:
     /// Retrieves the password for the given username.
     QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password) override
     {
-        if (m_credentials.contains(request.username()))
-        {
+        if (m_credentials.contains(request.username())) {
             password = m_credentials.value(request.username());
             return QXmppPasswordReply::NoError;
         } else {

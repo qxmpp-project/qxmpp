@@ -137,4 +137,4 @@ private:
     QSharedDataPointer<QXmppUploadRequestManagerPrivate> d;
 };
 
-#endif // QXMPPUPLOADREQUESTMANAGER_H
+#endif  // QXMPPUPLOADREQUESTMANAGER_H

@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPIQ_H
 #define QXMPPIQ_H
 
@@ -54,7 +53,7 @@ public:
     QXmppIq(const QXmppIq &other);
     ~QXmppIq() override;
 
-    QXmppIq& operator=(const QXmppIq &other);
+    QXmppIq &operator=(const QXmppIq &other);
 
     QXmppIq::Type type() const;
     void setType(QXmppIq::Type);
@@ -74,4 +73,4 @@ private:
     QSharedDataPointer<QXmppIqPrivate> d;
 };
 
-#endif // QXMPPIQ_H
+#endif  // QXMPPIQ_H

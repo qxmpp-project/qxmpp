@@ -21,7 +21,6 @@
  *
  */
 
-
 #ifndef QXMPPCONFIGURATION_H
 #define QXMPPCONFIGURATION_H
 
@@ -51,22 +50,20 @@ public:
     /// An enumeration for type of the Security Mode that is stream is encrypted or not.
     /// The server may or may not have TLS feature. Server may force the encryption.
     /// Depending upon all this user can specify following options.
-    enum StreamSecurityMode
-    {
-        TLSEnabled = 0, ///< Encryption is used if available (default).
-        TLSDisabled,    ///< No encryption even if the server offers it.
-        TLSRequired,    ///< Encryption must be available, otherwise the
-                        ///< connection will not be established.
-        LegacySSL       ///< Use only legacy SSL mode.
+    enum StreamSecurityMode {
+        TLSEnabled = 0,  ///< Encryption is used if available (default).
+        TLSDisabled,     ///< No encryption even if the server offers it.
+        TLSRequired,     ///< Encryption must be available, otherwise the
+                         ///< connection will not be established.
+        LegacySSL        ///< Use only legacy SSL mode.
     };
 
     /// An enumeration for various Non-SASL authentication mechanisms available.
     /// The server may or may not allow QXmppConfiguration::Plain mechanism. So
     /// specifying the mechanism is just a hint to the library.
-    enum NonSASLAuthMechanism
-    {
-        NonSASLPlain = 0,///< Plain
-        NonSASLDigest    ///< Digest (default)
+    enum NonSASLAuthMechanism {
+        NonSASLPlain = 0,  ///< Plain
+        NonSASLDigest      ///< Digest (default)
     };
 
     /// An enumeration for various SASL authentication mechanisms available.
@@ -77,25 +74,25 @@ public:
     QXmppConfiguration();
     QXmppConfiguration(const QXmppConfiguration &other);
     ~QXmppConfiguration();
-    QXmppConfiguration& operator=(const QXmppConfiguration &other);
+    QXmppConfiguration &operator=(const QXmppConfiguration &other);
 
     QString host() const;
-    void setHost(const QString&);
+    void setHost(const QString &);
 
     QString domain() const;
-    void setDomain(const QString&);
+    void setDomain(const QString &);
 
     int port() const;
     void setPort(int);
 
     QString user() const;
-    void setUser(const QString&);
+    void setUser(const QString &);
 
     QString password() const;
-    void setPassword(const QString&);
+    void setPassword(const QString &);
 
     QString resource() const;
-    void setResource(const QString&);
+    void setResource(const QString &);
 
     QString jid() const;
     void setJid(const QString &jid);
@@ -103,10 +100,10 @@ public:
     QString jidBare() const;
 
     QString facebookAccessToken() const;
-    void setFacebookAccessToken(const QString&);
+    void setFacebookAccessToken(const QString &);
 
     QString facebookAppId() const;
-    void setFacebookAppId(const QString&);
+    void setFacebookAppId(const QString &);
 
     QString googleAccessToken() const;
     void setGoogleAccessToken(const QString &accessToken);
@@ -139,7 +136,7 @@ public:
     void setSaslAuthMechanism(const QString &mechanism);
 
     QNetworkProxy networkProxy() const;
-    void setNetworkProxy(const QNetworkProxy& proxy);
+    void setNetworkProxy(const QNetworkProxy &proxy);
 
     int keepAliveInterval() const;
     void setKeepAliveInterval(int secs);
@@ -154,4 +151,4 @@ private:
     QSharedDataPointer<QXmppConfigurationPrivate> d;
 };
 
-#endif // QXMPPCONFIGURATION_H
+#endif  // QXMPPCONFIGURATION_H

@@ -43,10 +43,10 @@ public:
     void setIndex(int index);
 
     QString before() const;
-    void setBefore(const QString &before );
+    void setBefore(const QString &before);
 
     QString after() const;
-    void setAfter(const QString &after );
+    void setAfter(const QString &after);
 
     bool isNull() const;
 
@@ -71,10 +71,10 @@ public:
     QXmppResultSetReply();
 
     QString first() const;
-    void setFirst(const QString &first );
+    void setFirst(const QString &first);
 
     QString last() const;
-    void setLast(const QString &last );
+    void setLast(const QString &last);
 
     int count() const;
     void setCount(int count);
@@ -96,4 +96,4 @@ private:
     QString m_last;
 };
 
-#endif // QXMPPRESULTSET_H
+#endif  // QXMPPRESULTSET_H

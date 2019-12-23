@@ -69,7 +69,7 @@ protected:
 
 private:
     void setServer(QXmppServer *server);
-    QXmppServerExtensionPrivate * const d;
+    QXmppServerExtensionPrivate *const d;
 
     friend class QXmppServer;
 };

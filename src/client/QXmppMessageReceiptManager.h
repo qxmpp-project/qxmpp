@@ -51,4 +51,4 @@ signals:
     void messageDelivered(const QString &jid, const QString &id);
 };
 
-#endif // QXMPPMESSAGERECEIPTMANAGER_H
+#endif  // QXMPPMESSAGERECEIPTMANAGER_H
