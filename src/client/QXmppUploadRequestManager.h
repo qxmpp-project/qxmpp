@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2019 The QXmpp developers
+ * Copyright (C) 2008-2020 The QXmpp developers
  *
  * Author:
  *  Linus Jahn
