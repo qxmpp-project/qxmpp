@@ -41,6 +41,10 @@ class QXmppRegisterIqPrivate;
 class QXMPP_EXPORT QXmppRegisterIq : public QXmppIq
 {
 public:
+    /// Special type of the registration IQ.
+    ///
+    /// \since QXmpp 1.2
+
     enum RegisterType {
         None,        ///< No special register IQ.
         Registered,  ///< Used by the service to indicate that an account is already registered.

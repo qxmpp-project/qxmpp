@@ -171,6 +171,8 @@ void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsO
 }
 
 /// Returns the type of the action or registration state.
+///
+/// \since QXmpp 1.2
 
 QXmppRegisterIq::RegisterType QXmppRegisterIq::registerType() const
 {
@@ -178,6 +180,8 @@ QXmppRegisterIq::RegisterType QXmppRegisterIq::registerType() const
 }
 
 /// Sets the type of the action or registration state.
+///
+/// \since QXmpp 1.2
 
 void QXmppRegisterIq::setRegisterType(const QXmppRegisterIq::RegisterType &type)
 {
