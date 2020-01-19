@@ -183,7 +183,7 @@ QXmppRegisterIq::RegisterType QXmppRegisterIq::registerType() const
 ///
 /// \since QXmpp 1.2
 
-void QXmppRegisterIq::setRegisterType(const QXmppRegisterIq::RegisterType &type)
+void QXmppRegisterIq::setRegisterType(QXmppRegisterIq::RegisterType type)
 {
     d->registerType = type;
 }
