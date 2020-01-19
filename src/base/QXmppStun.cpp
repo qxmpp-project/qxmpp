@@ -1113,11 +1113,13 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
     bool check;
     Q_UNUSED(check)
 
-    connect(this, SIGNAL(writeStun(QXmppStunMessage)),
+    check = connect(this, SIGNAL(writeStun(QXmppStunMessage)),
                     receiver, SLOT(writeStun(QXmppStunMessage)));
+    Q_ASSERT(check);
 
-    connect(this, SIGNAL(finished()),
+    check = connect(this, SIGNAL(finished()),
                     receiver, SLOT(transactionFinished()));
+    Q_ASSERT(check);
 
     // RTO timer
     m_retryTimer = new QTimer(this);
