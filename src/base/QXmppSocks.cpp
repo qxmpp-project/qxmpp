@@ -104,8 +104,8 @@ QXmppSocksClient::QXmppSocksClient(const QString &proxyHost, quint16 proxyPort, 
     m_proxyPort(proxyPort),
     m_step(ConnectState)
 {
-    connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    connect(this, &QAbstractSocket::connected, this, &QXmppSocksClient::slotConnected);
+    connect(this, &QIODevice::readyRead, this, &QXmppSocksClient::slotReadyRead);
 }
 
 void QXmppSocksClient::connectToHost(const QString &hostName, quint16 hostPort)
@@ -120,7 +120,7 @@ void QXmppSocksClient::slotConnected()
     m_step = ConnectState;
 
     // disconnect from signal
-    disconnect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
+    disconnect(this, &QAbstractSocket::connected, this, &QXmppSocksClient::slotConnected);
 
     // send connect to server
     QByteArray buffer;
@@ -160,7 +160,7 @@ void QXmppSocksClient::slotReadyRead()
 
     } else if (m_step == CommandState) {
         // disconnect from signal
-        disconnect(this, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+        disconnect(this, &QIODevice::readyRead, this, &QXmppSocksClient::slotReadyRead);
 
         // receive CONNECT response
         QByteArray buffer = read(3);
@@ -197,10 +197,10 @@ QXmppSocksServer::QXmppSocksServer(QObject *parent)
     : QObject(parent)
 {
     m_server = new QTcpServer(this);
-    connect(m_server, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
+    connect(m_server, &QTcpServer::newConnection, this, &QXmppSocksServer::slotNewConnection);
 
     m_server_v6 = new QTcpServer(this);
-    connect(m_server_v6, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
+    connect(m_server_v6, &QTcpServer::newConnection, this, &QXmppSocksServer::slotNewConnection);
 }
 
 void QXmppSocksServer::close()
@@ -236,7 +236,7 @@ void QXmppSocksServer::slotNewConnection()
 
     // register socket
     m_states.insert(socket, ConnectState);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    connect(socket, &QIODevice::readyRead, this, &QXmppSocksServer::slotReadyRead);
 }
 
 void QXmppSocksServer::slotReadyRead()
@@ -292,7 +292,7 @@ void QXmppSocksServer::slotReadyRead()
 
     } else if (m_states.value(socket) == CommandState) {
         // disconnect from signals
-        disconnect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+        disconnect(socket, &QIODevice::readyRead, this, &QXmppSocksServer::slotReadyRead);
 
         // receive command
         QByteArray buffer = socket->read(3);

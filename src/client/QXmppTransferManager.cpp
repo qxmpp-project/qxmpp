@@ -28,6 +28,7 @@
 #include <QFileInfo>
 #include <QHash>
 #include <QHostAddress>
+#include <QMetaMethod>
 #include <QNetworkInterface>
 #include <QTime>
 #include <QTimer>
@@ -463,9 +464,6 @@ void QXmppTransferIncomingJob::checkData()
 
 void QXmppTransferIncomingJob::connectToNextHost()
 {
-    bool check;
-    Q_UNUSED(check);
-
     if (m_streamCandidates.isEmpty()) {
         // could not connect to any stream host
         QXmppByteStreamIq response;
@@ -496,17 +494,12 @@ void QXmppTransferIncomingJob::connectToNextHost()
     m_candidateClient = new QXmppSocksClient(m_candidateHost.host(), m_candidateHost.port(), this);
     m_candidateTimer = new QTimer(this);
 
-    check = connect(m_candidateClient, SIGNAL(disconnected()),
-                    this, SLOT(_q_candidateDisconnected()));
-    Q_ASSERT(check);
-
-    check = connect(m_candidateClient, SIGNAL(ready()),
-                    this, SLOT(_q_candidateReady()));
-    Q_ASSERT(check);
-
-    check = connect(m_candidateTimer, SIGNAL(timeout()),
-                    this, SLOT(_q_candidateDisconnected()));
-    Q_ASSERT(check);
+    connect(m_candidateClient, &QAbstractSocket::disconnected,
+            this, &QXmppTransferIncomingJob::_q_candidateDisconnected);
+    connect(m_candidateClient, &QXmppSocksClient::ready,
+            this, &QXmppTransferIncomingJob::_q_candidateReady);
+    connect(m_candidateTimer, &QTimer::timeout,
+            this, &QXmppTransferIncomingJob::_q_candidateDisconnected);
 
     m_candidateTimer->setSingleShot(true);
     m_candidateTimer->start(socksTimeout);
@@ -515,8 +508,6 @@ void QXmppTransferIncomingJob::connectToNextHost()
 
 void QXmppTransferIncomingJob::connectToHosts(const QXmppByteStreamIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     m_streamCandidates = iq.streamHosts();
     m_streamOfferId = iq.id();
@@ -539,9 +530,6 @@ bool QXmppTransferIncomingJob::writeData(const QByteArray &data)
 
 void QXmppTransferIncomingJob::_q_candidateReady()
 {
-    bool check;
-    Q_UNUSED(check);
-
     if (!m_candidateClient)
         return;
 
@@ -556,13 +544,8 @@ void QXmppTransferIncomingJob::_q_candidateReady()
     m_candidateTimer->deleteLater();
     m_candidateTimer = nullptr;
 
-    check = connect(d->socksSocket, SIGNAL(readyRead()),
-                    this, SLOT(_q_receiveData()));
-    Q_ASSERT(check);
-
-    check = connect(d->socksSocket, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
+    connect(d->socksSocket, &QIODevice::readyRead, this, &QXmppTransferIncomingJob::_q_receiveData);
+    connect(d->socksSocket, &QAbstractSocket::disconnected, this, &QXmppTransferIncomingJob::_q_disconnected);
 
     QXmppByteStreamIq ackIq;
     ackIq.setId(m_streamOfferId);
@@ -623,9 +606,6 @@ QXmppTransferOutgoingJob::QXmppTransferOutgoingJob(const QString& jid, QXmppClie
 
 void QXmppTransferOutgoingJob::connectToProxy()
 {
-    bool check;
-    Q_UNUSED(check);
-
     info(QString("Connecting to proxy: %1 (%2 %3)").arg(
             d->socksProxy.jid(),
             d->socksProxy.host(),
@@ -637,13 +617,8 @@ void QXmppTransferOutgoingJob::connectToProxy()
 
     QXmppSocksClient *socksClient = new QXmppSocksClient(d->socksProxy.host(), d->socksProxy.port(), this);
 
-    check = connect(socksClient, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
-
-    check = connect(socksClient, SIGNAL(ready()),
-                    this, SLOT(_q_proxyReady()));
-    Q_ASSERT(check);
+    connect(socksClient, &QAbstractSocket::disconnected, this, &QXmppTransferOutgoingJob::_q_disconnected);
+    connect(socksClient, &QXmppSocksClient::ready, this, &QXmppTransferOutgoingJob::_q_proxyReady);
 
     d->socksSocket = socksClient;
     socksClient->connectToHost(hostName, 0);
@@ -651,18 +626,10 @@ void QXmppTransferOutgoingJob::connectToProxy()
 
 void QXmppTransferOutgoingJob::startSending()
 {
-    bool check;
-    Q_UNUSED(check);
-
     setState(QXmppTransferJob::TransferState);
 
-    check = connect(d->socksSocket, SIGNAL(bytesWritten(qint64)),
-                    this, SLOT(_q_sendData()));
-    Q_ASSERT(check);
-
-    check = connect(d->iodevice, SIGNAL(readyRead()),
-                    this, SLOT(_q_sendData()));
-    Q_ASSERT(check);
+    connect(d->socksSocket, &QIODevice::bytesWritten, this, &QXmppTransferOutgoingJob::_q_sendData);
+    connect(d->iodevice, &QIODevice::readyRead, this, &QXmppTransferOutgoingJob::_q_sendData);
 
     _q_sendData();
 }
@@ -793,16 +760,12 @@ QXmppTransferOutgoingJob *QXmppTransferManagerPrivate::getOutgoingJobByRequestId
 
 QXmppTransferManager::QXmppTransferManager()
 {
-    bool check;
-    Q_UNUSED(check);
-
     d = new QXmppTransferManagerPrivate(this);
 
     // start SOCKS server
     d->socksServer = new QXmppSocksServer(this);
-    check = connect(d->socksServer, SIGNAL(newConnection(QTcpSocket*,QString,quint16)),
-                    this, SLOT(_q_socksServerConnected(QTcpSocket*,QString,quint16)));
-    Q_ASSERT(check);
+    connect(d->socksServer, &QXmppSocksServer::newConnection, this, &QXmppTransferManager::_q_socksServerConnected);
+
     if (!d->socksServer->listen()) {
         qWarning("QXmppSocksServer could not start listening");
     }
@@ -850,9 +813,6 @@ void QXmppTransferManager::byteStreamResponseReceived(const QXmppIq &iq)
 /// a stream host.
 void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
-
     QXmppTransferOutgoingJob *job = d->getOutgoingJobByRequestId(iq.from(), iq.id());
     if (!job ||
         job->method() != QXmppTransferJob::SocksMethod ||
@@ -873,10 +833,8 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
         job->terminate(QXmppTransferJob::ProtocolError);
         return;
     }
-    check = connect(job->d->socksSocket, SIGNAL(disconnected()),
-                    job, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
-
+    
+    connect(job->d->socksSocket, &QTcpSocket::disconnected, job, &QXmppTransferOutgoingJob::_q_disconnected);
     job->startSending();
 }
 
@@ -884,8 +842,6 @@ void QXmppTransferManager::byteStreamResultReceived(const QXmppByteStreamIq &iq)
 /// to a stream host.
 void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppIq response;
     response.setId(iq.id());
@@ -967,15 +923,10 @@ bool QXmppTransferManager::handleStanza(const QDomElement &element)
 
 void QXmppTransferManager::setClient(QXmppClient *client)
 {
-    bool check;
-    Q_UNUSED(check);
-
     QXmppClientExtension::setClient(client);
 
     // XEP-0047: In-Band Bytestreams
-    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-                    this, SLOT(_q_iqReceived(QXmppIq)));
-    Q_ASSERT(check);
+    connect(client, &QXmppClient::iqReceived, this, &QXmppTransferManager::_q_iqReceived);
 }
 /// \endcond
 
@@ -1134,8 +1085,6 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
 
 void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
 
     for (auto *ptr : d->jobs) {
         // handle IQ from proxy
@@ -1222,9 +1171,6 @@ void QXmppTransferManager::_q_jobFinished()
 
 void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
 {
-    bool check;
-    Q_UNUSED(check);
-
     auto *job = qobject_cast<QXmppTransferJob *>(sender());
     if (!job || !d->jobs.contains(job))
         return;
@@ -1233,8 +1179,8 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
         return;
 
     // disconnect from the signal
-    disconnect(job, SIGNAL(stateChanged(QXmppTransferJob::State)),
-               this, SLOT(_q_jobStateChanged(QXmppTransferJob::State)));
+    disconnect(job, &QXmppTransferJob::stateChanged,
+               this, &QXmppTransferManager::_q_jobStateChanged);
 
     // the job was refused by the local party
     if (state != QXmppTransferJob::StartState || !job->d->iodevice || !job->d->iodevice->isWritable())
@@ -1254,9 +1200,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     }
 
     // the job was accepted by the local party
-    check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
-            this, SLOT(_q_jobError(QXmppTransferJob::Error)));
-    Q_ASSERT(check);
+    connect(job, QOverload<QXmppTransferJob::Error>::of(&QXmppTransferJob::error), this, &QXmppTransferManager::_q_jobError);
 
     QXmppDataForm form;
     form.setType(QXmppDataForm::Submit);
@@ -1348,9 +1292,6 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, const QStri
 
 QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid)
 {
-    bool check;
-    Q_UNUSED(check);
-
     if (QXmppUtils::jidToResource(jid).isEmpty()) {
         warning("The file recipient's JID must be a full JID");
         return nullptr;
@@ -1392,17 +1333,10 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 
     // start job
     d->jobs.append(job);
-    check = connect(job, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(_q_jobDestroyed(QObject*)));
-    Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
-                    this, SLOT(_q_jobError(QXmppTransferJob::Error)));
-    Q_ASSERT(check);
-
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(_q_jobFinished()));
-    Q_ASSERT(check);
+    connect(job, &QObject::destroyed, this, &QXmppTransferManager::_q_jobDestroyed);    
+    connect(job, QOverload<QXmppTransferJob::Error>::of(&QXmppTransferJob::error), this, &QXmppTransferManager::_q_jobError);
+    connect(job, &QXmppTransferJob::finished, this, &QXmppTransferManager::_q_jobFinished);
 
     QXmppStreamInitiationIq request;
     request.setType(QXmppIq::Set);
@@ -1536,9 +1470,6 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
 
 void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiationIq &iq)
 {
-    bool check;
-    Q_UNUSED(check);
-
     QXmppIq response;
     response.setTo(iq.from());
     response.setId(iq.id());
@@ -1558,8 +1489,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     }
 
     // check there is a receiver connected to the fileReceived() signal
-    if (!receivers(SIGNAL(fileReceived(QXmppTransferJob*))))
-    {
+    if (!isSignalConnected(QMetaMethod::fromSignal(&QXmppTransferManager::fileReceived))) {
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden);
         error.setCode(403);
 
@@ -1613,17 +1543,10 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
 
     // register job
     d->jobs.append(job);
-    check = connect(job, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(_q_jobDestroyed(QObject*)));
-    Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(_q_jobFinished()));
-    Q_ASSERT(check);
-
-    check = connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)),
-                    this, SLOT(_q_jobStateChanged(QXmppTransferJob::State)));
-    Q_ASSERT(check);
+    connect(job, &QObject::destroyed, this, &QXmppTransferManager::_q_jobDestroyed);
+    connect(job, &QXmppTransferJob::finished, this, &QXmppTransferManager::_q_jobFinished);
+    connect(job, &QXmppTransferJob::stateChanged, this, &QXmppTransferManager::_q_jobStateChanged);
 
     // allow user to accept or decline the job
     emit fileReceived(job);

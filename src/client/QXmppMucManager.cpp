@@ -79,8 +79,8 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
     if (!room) {
         room = new QXmppMucRoom(client(), roomJid, this);
         d->rooms.insert(roomJid, room);
-        connect(room, SIGNAL(destroyed(QObject*)),
-            this, SLOT(_q_roomDestroyed(QObject*)));
+        connect(room, &QObject::destroyed,
+            this, &QXmppMucManager::_q_roomDestroyed);
 
         // emit signal
         emit roomAdded(room);
@@ -146,14 +146,11 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
 void QXmppMucManager::setClient(QXmppClient* client)
 {
-    bool check;
-    Q_UNUSED(check);
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(_q_messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
+    connect(client, &QXmppClient::messageReceived,
+                    this, &QXmppMucManager::_q_messageReceived);
 }
 /// \endcond
 
@@ -182,8 +179,6 @@ void QXmppMucManager::_q_roomDestroyed(QObject *object)
 QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent)
     : QObject(parent)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppMucRoomPrivate;
     d->allowedActions = NoAction;
@@ -191,30 +186,24 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     d->discoManager = client->findExtension<QXmppDiscoveryManager>();
     d->jid = jid;
 
-    check = connect(d->client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
+    connect(d->client, &QXmppClient::disconnected,
+                    this, &QXmppMucRoom::_q_disconnected);
 
-    check = connect(d->client, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(_q_messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
+    connect(d->client, &QXmppClient::messageReceived,
+                    this, &QXmppMucRoom::_q_messageReceived);
 
-    check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(_q_presenceReceived(QXmppPresence)));
-    Q_ASSERT(check);
+    connect(d->client, &QXmppClient::presenceReceived,
+                    this, &QXmppMucRoom::_q_presenceReceived);
 
     if (d->discoManager) {
-        check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                        this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
-        Q_ASSERT(check);
+        connect(d->discoManager, &QXmppDiscoveryManager::infoReceived,
+                        this, &QXmppMucRoom::_q_discoveryInfoReceived);
     }
 
     // convenience signals for properties
-    check = connect(this, SIGNAL(joined()), this, SIGNAL(isJoinedChanged()));
-    Q_ASSERT(check);
+    connect(this, &QXmppMucRoom::joined, this, &QXmppMucRoom::isJoinedChanged);
 
-    check = connect(this, SIGNAL(left()), this, SIGNAL(isJoinedChanged()));
-    Q_ASSERT(check);
+    connect(this, &QXmppMucRoom::left, this, &QXmppMucRoom::isJoinedChanged);
 }
 
 /// Destroys a QXmppMucRoom.

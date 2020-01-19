@@ -38,10 +38,8 @@ rpcClient::rpcClient(QObject *parent)
     addExtension(m_rpcManager);
 
     // observe incoming presences
-    bool check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
-                         this, SLOT(slotPresenceReceived(QXmppPresence)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
+    connect(this, &QXmppClient::presenceReceived,
+                         this, &rpcClient::slotPresenceReceived);
 }
 
 rpcClient::~rpcClient()
@@ -73,6 +71,6 @@ void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
 
     // invoke the remote method in 1 second
     m_remoteJid = presence.from();
-    QTimer::singleShot(1000, this, SLOT(slotInvokeRemoteMethod()));
+    QTimer::singleShot(1000, this, &rpcClient::slotInvokeRemoteMethod);
 }
 

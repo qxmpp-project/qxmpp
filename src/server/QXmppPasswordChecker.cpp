@@ -128,7 +128,7 @@ void QXmppPasswordReply::finish()
 
 void QXmppPasswordReply::finishLater()
 {
-    QTimer::singleShot(0, this, SLOT(finish()));
+    QTimer::singleShot(0, this, &QXmppPasswordReply::finish);
 }
 
 /// Returns true when the reply has finished.

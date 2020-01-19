@@ -183,49 +183,27 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     : QXmppStream(parent),
     d(new QXmppOutgoingClientPrivate(this))
 {
-    bool check;
-    Q_UNUSED(check);
-
     // initialise socket
     auto *socket = new QSslSocket(this);
     setSocket(socket);
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(_q_socketDisconnected()));
-    Q_ASSERT(check);
-
-    check = connect(socket, SIGNAL(sslErrors(QList<QSslError>)),
-                    this, SLOT(socketSslErrors(QList<QSslError>)));
-    Q_ASSERT(check);
-
-    check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-                    this, SLOT(socketError(QAbstractSocket::SocketError)));
-    Q_ASSERT(check);
+    connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingClient::_q_socketDisconnected);
+    connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingClient::socketSslErrors);
+    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppOutgoingClient::socketError);
 
     // DNS lookups
-    check = connect(&d->dns, SIGNAL(finished()),
-                    this, SLOT(_q_dnsLookupFinished()));
-    Q_ASSERT(check);
+    connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingClient::_q_dnsLookupFinished);
 
     // XEP-0199: XMPP Ping
     d->pingTimer = new QTimer(this);
-    check = connect(d->pingTimer, SIGNAL(timeout()),
-                    this, SLOT(pingSend()));
-    Q_ASSERT(check);
+    connect(d->pingTimer, &QTimer::timeout, this, &QXmppOutgoingClient::pingSend);
 
     d->timeoutTimer = new QTimer(this);
     d->timeoutTimer->setSingleShot(true);
-    check = connect(d->timeoutTimer, SIGNAL(timeout()),
-                    this, SLOT(pingTimeout()));
-    Q_ASSERT(check);
+    connect(d->timeoutTimer, &QTimer::timeout, this, &QXmppOutgoingClient::pingTimeout);
 
-    check = connect(this, SIGNAL(connected()),
-                    this, SLOT(pingStart()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(disconnected()),
-                    this, SLOT(pingStop()));
-    Q_ASSERT(check);
+    connect(this, &QXmppStream::connected, this, &QXmppOutgoingClient::pingStart);
+    connect(this, &QXmppStream::disconnected, this, &QXmppOutgoingClient::pingStop);
 }
 
 /// Destroys an outgoing client stream.

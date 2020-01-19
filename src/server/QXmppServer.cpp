@@ -152,8 +152,6 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
     } else if (!serversForServers.isEmpty()) {
 
-        bool check;
-        Q_UNUSED(check);
 
         // look for an outgoing S2S connection
         for (auto *conn : qAsConst(outgoingServers)) {
@@ -171,9 +169,8 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         conn->moveToThread(q->thread());
         conn->setParent(q);
 
-        check = QObject::connect(conn, SIGNAL(disconnected()),
-                                 q, SLOT(_q_outgoingServerDisconnected()));
-        Q_UNUSED(check);
+        QObject::connect(conn, &QXmppStream::disconnected,
+                                 q, &QXmppServer::_q_outgoingServerDisconnected);
 
         // add stream
         outgoingServers.insert(conn);
@@ -387,22 +384,22 @@ void QXmppServer::setLogger(QXmppLogger *logger)
 {
     if (logger != d->logger) {
         if (d->logger) {
-            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                       d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
-            disconnect(this, SIGNAL(setGauge(QString,double)),
-                       d->logger, SLOT(setGauge(QString,double)));
-            disconnect(this, SIGNAL(updateCounter(QString,qint64)),
-                       d->logger, SLOT(updateCounter(QString,qint64)));
+            disconnect(this, &QXmppLoggable::logMessage,
+                       d->logger, &QXmppLogger::log);
+            disconnect(this, &QXmppLoggable::setGauge,
+                       d->logger, &QXmppLogger::setGauge);
+            disconnect(this, &QXmppLoggable::updateCounter,
+                       d->logger, &QXmppLogger::updateCounter);
         }
 
         d->logger = logger;
         if (d->logger) {
-            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                    d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
-            connect(this, SIGNAL(setGauge(QString,double)),
-                    d->logger, SLOT(setGauge(QString,double)));
-            connect(this, SIGNAL(updateCounter(QString,qint64)),
-                    d->logger, SLOT(updateCounter(QString,qint64)));
+            connect(this, &QXmppLoggable::logMessage,
+                    d->logger, &QXmppLogger::log);
+            connect(this, &QXmppLoggable::setGauge,
+                    d->logger, &QXmppLogger::setGauge);
+            connect(this, &QXmppLoggable::updateCounter,
+                    d->logger, &QXmppLogger::updateCounter);
         }
 
         emit loggerChanged(d->logger);
@@ -540,7 +537,7 @@ void QXmppServer::setPrivateKey(const QSslKey &key)
 bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 {
     bool check;
-    Q_UNUSED(check);
+    Q_UNUSED(check)
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");
@@ -604,7 +601,7 @@ void QXmppServer::close()
 bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 {
     bool check;
-    Q_UNUSED(check);
+    Q_UNUSED(check)
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");
@@ -672,22 +669,17 @@ bool QXmppServer::sendPacket(const QXmppStanza &packet)
 
 void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 {
-    bool check;
-    Q_UNUSED(check);
 
     stream->setPasswordChecker(d->passwordChecker);
 
-    check = connect(stream, SIGNAL(connected()),
-                    this, SLOT(_q_clientConnected()));
-    Q_ASSERT(check);
+    connect(stream, &QXmppStream::connected,
+                    this, &QXmppServer::_q_clientConnected);
 
-    check = connect(stream, SIGNAL(disconnected()),
-                    this, SLOT(_q_clientDisconnected()));
-    Q_ASSERT(check);
+    connect(stream, &QXmppStream::disconnected,
+                    this, &QXmppServer::_q_clientDisconnected);
 
-    check = connect(stream, SIGNAL(elementReceived(QDomElement)),
-                    this, SLOT(handleElement(QDomElement)));
-    Q_ASSERT(check);
+    connect(stream, &QXmppIncomingClient::elementReceived,
+                    this, &QXmppServer::handleElement);
 
     // add stream
     d->incomingClients.insert(stream);
@@ -824,8 +816,6 @@ void QXmppServer::_q_outgoingServerDisconnected()
 
 void QXmppServer::_q_serverConnection(QSslSocket *socket)
 {
-    bool check;
-    Q_UNUSED(check);
 
     // check the socket didn't die since the signal was emitted
     if (socket->state() != QAbstractSocket::ConnectedState) {
@@ -836,17 +826,14 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
     auto *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
-    check = connect(stream, SIGNAL(disconnected()),
-                    this, SLOT(_q_serverDisconnected()));
-    Q_ASSERT(check);
+    connect(stream, &QXmppStream::disconnected,
+                    this, &QXmppServer::_q_serverDisconnected);
 
-    check = connect(stream, SIGNAL(dialbackRequestReceived(QXmppDialback)),
-                    this, SLOT(_q_dialbackRequestReceived(QXmppDialback)));
-    Q_ASSERT(check);
+    connect(stream, &QXmppIncomingServer::dialbackRequestReceived,
+                    this, &QXmppServer::_q_dialbackRequestReceived);
 
-    check = connect(stream, SIGNAL(elementReceived(QDomElement)),
-                    this, SLOT(handleElement(QDomElement)));
-    Q_ASSERT(check);
+    connect(stream, &QXmppIncomingServer::elementReceived,
+                    this, &QXmppServer::handleElement);
 
     // add stream
     d->incomingServers.insert(stream);

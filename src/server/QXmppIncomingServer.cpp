@@ -71,16 +71,13 @@ QString QXmppIncomingServerPrivate::origin() const
 QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent)
     : QXmppStream(parent)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppIncomingServerPrivate(this);
     d->domain = domain;
 
     if (socket) {
-        check = connect(socket, SIGNAL(disconnected()),
-                        this, SLOT(slotSocketDisconnected()));
-        Q_ASSERT(check);
+        connect(socket, &QAbstractSocket::disconnected,
+                        this, &QXmppIncomingServer::slotSocketDisconnected);
 
         setSocket(socket);
     }
@@ -160,10 +157,8 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 
             // establish dialback connection
             auto *stream = new QXmppOutgoingServer(d->domain, this);
-            bool check = connect(stream, SIGNAL(dialbackResponseReceived(QXmppDialback)),
-                                 this, SLOT(slotDialbackResponseReceived(QXmppDialback)));
-            Q_ASSERT(check);
-            Q_UNUSED(check);
+            connect(stream, &QXmppOutgoingServer::dialbackResponseReceived,
+                                 this, &QXmppIncomingServer::slotDialbackResponseReceived);
             stream->setVerify(d->localStreamId, request.key());
             stream->connectToHost(domain);
         }

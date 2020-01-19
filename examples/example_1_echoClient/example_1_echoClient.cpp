@@ -32,10 +32,7 @@
 echoClient::echoClient(QObject *parent)
     : QXmppClient(parent)
 {
-    bool check = connect(this, SIGNAL(messageReceived(QXmppMessage)),
-        SLOT(messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
+    connect(this, &QXmppClient::messageReceived, this, &echoClient::messageReceived);
 }
 
 echoClient::~echoClient()

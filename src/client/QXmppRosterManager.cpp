@@ -61,22 +61,17 @@ QXmppRosterManagerPrivate::QXmppRosterManagerPrivate(QXmppRosterManager *qq)
 
 QXmppRosterManager::QXmppRosterManager(QXmppClient* client)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppRosterManagerPrivate(this);
 
-    check = connect(client, SIGNAL(connected()),
-                    this, SLOT(_q_connected()));
-    Q_ASSERT(check);
+    connect(client, &QXmppClient::connected,
+                    this, &QXmppRosterManager::_q_connected);
 
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
+    connect(client, &QXmppClient::disconnected,
+                    this, &QXmppRosterManager::_q_disconnected);
 
-    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(_q_presenceReceived(QXmppPresence)));
-    Q_ASSERT(check);
+    connect(client, &QXmppClient::presenceReceived,
+                    this, &QXmppRosterManager::_q_presenceReceived);
 }
 
 QXmppRosterManager::~QXmppRosterManager()

@@ -79,10 +79,10 @@ void tst_QXmppServer::testConnect()
     client.setLogger(&logger);
 
     QEventLoop loop;
-    connect(&client, SIGNAL(connected()),
-            &loop, SLOT(quit()));
-    connect(&client, SIGNAL(disconnected()),
-            &loop, SLOT(quit()));
+    connect(&client, &QXmppClient::connected,
+            &loop, &QEventLoop::quit);
+    connect(&client, &QXmppClient::disconnected,
+            &loop, &QEventLoop::quit);
 
     QXmppConfiguration config;
     config.setDomain(testDomain);

@@ -77,8 +77,10 @@ public:
     void connectToProxy();
     void startSending();
 
-private slots:
+public slots:
     void _q_disconnected();
+
+private slots:
     void _q_proxyReady();
     void _q_sendData();
 };

@@ -77,14 +77,14 @@ void QXmppIncomingClientPrivate::checkCredentials(const QByteArray &response)
         QXmppPasswordReply *reply = passwordChecker->checkPassword(request);
         reply->setParent(q);
         reply->setProperty("__sasl_raw", response);
-        QObject::connect(reply, SIGNAL(finished()),
-                         q, SLOT(onPasswordReply()));
+        QObject::connect(reply, &QXmppPasswordReply::finished,
+                         q, &QXmppIncomingClient::onPasswordReply);
     } else if (saslServer->mechanism() == "DIGEST-MD5") {
         QXmppPasswordReply *reply = passwordChecker->getDigest(request);
         reply->setParent(q);
         reply->setProperty("__sasl_raw", response);
-        QObject::connect(reply, SIGNAL(finished()),
-                         q, SLOT(onDigestReply()));
+        QObject::connect(reply, &QXmppPasswordReply::finished,
+                         q, &QXmppIncomingClient::onDigestReply);
     }
 }
 
@@ -107,16 +107,13 @@ QString QXmppIncomingClientPrivate::origin() const
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
     : QXmppStream(parent)
 {
-    bool check;
-    Q_UNUSED(check);
 
     d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
 
     if (socket) {
-        check = connect(socket, SIGNAL(disconnected()),
-                        this, SLOT(onSocketDisconnected()));
-        Q_ASSERT(check);
+        connect(socket, &QAbstractSocket::disconnected,
+                        this, &QXmppIncomingClient::onSocketDisconnected);
 
         setSocket(socket);
     }
@@ -126,9 +123,8 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
     // create inactivity timer
     d->idleTimer = new QTimer(this);
     d->idleTimer->setSingleShot(true);
-    check = connect(d->idleTimer, SIGNAL(timeout()),
-                    this, SLOT(onTimeout()));
-    Q_ASSERT(check);
+    connect(d->idleTimer, &QTimer::timeout,
+                    this, &QXmppIncomingClient::onTimeout);
 }
 
 /// Destroys the current stream.
@@ -465,7 +461,7 @@ void QXmppIncomingClient::onTimeout()
     disconnectFromHost();
 
     // make sure disconnected() gets emitted no matter what
-    QTimer::singleShot(30, this, SIGNAL(disconnected()));
+    QTimer::singleShot(30, this, &QXmppStream::disconnected);
 }
 
 
