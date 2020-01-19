@@ -147,16 +147,17 @@ public:
     /// }
     /// \endcode
     ///
+    /// \since QXmpp 1.2
+    ///
     template<typename T>
     int indexOfExtension()
     {
-        int index = -1;
         auto list = extensions();
         for (int i = 0; i < list.size(); ++i) {
             if (qobject_cast<T *>(list.at(i)) != nullptr)
-                index = i;
+                return i;
         }
-        return index;
+        return -1;
     }
 
     bool isAuthenticated() const;
