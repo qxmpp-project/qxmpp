@@ -442,7 +442,7 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
     }
 
     // emit signals later
-    QTimer::singleShot(0, this, SLOT(_q_terminated()));
+    QTimer::singleShot(0, this, &QXmppTransferJob::_q_terminated);
 }
 
 /// \cond

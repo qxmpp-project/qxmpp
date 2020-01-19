@@ -290,6 +290,8 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
 {
+    bool check;
+    Q_UNUSED(check)
     Q_ASSERT(manager);
 
     auto *stream = new Stream;

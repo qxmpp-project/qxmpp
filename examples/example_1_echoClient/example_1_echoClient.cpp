@@ -32,8 +32,7 @@
 echoClient::echoClient(QObject *parent)
     : QXmppClient(parent)
 {
-    connect(this, SIGNAL(messageReceived(QXmppMessage)),
-        SLOT(messageReceived(QXmppMessage)));
+    connect(this, &QXmppClient::messageReceived, &echoClient::messageReceived);
 }
 
 echoClient::~echoClient()

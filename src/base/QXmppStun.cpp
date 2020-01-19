@@ -1110,6 +1110,8 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
     m_request(request),
     m_tries(0)
 {
+    bool check;
+    Q_UNUSED(check)
 
     connect(this, SIGNAL(writeStun(QXmppStunMessage)),
                     receiver, SLOT(writeStun(QXmppStunMessage)));

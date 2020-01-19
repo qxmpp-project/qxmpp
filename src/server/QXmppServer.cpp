@@ -536,6 +536,8 @@ void QXmppServer::setPrivateKey(const QSslKey &key)
 
 bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 {
+    bool check;
+    Q_UNUSED(check)
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");
@@ -597,6 +599,8 @@ void QXmppServer::close()
 
 bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
 {
+    bool check;
+    Q_UNUSED(check)
 
     if (d->domain.isEmpty()) {
         d->warning("No domain was specified!");

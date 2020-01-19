@@ -128,11 +128,16 @@ QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
     if( arg9.isValid() ) args << arg9;
     if( arg10.isValid() ) args << arg10;
 
+    bool check;
+    Q_UNUSED(check)
+
     QXmppRemoteMethod method( jid, interface, args, client() );
-    connect(this, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
+    check = connect(this, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
             &method, SLOT(gotResult(QXmppRpcResponseIq)));
-    connect(this, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
+    Q_ASSERT(check);
+    check = connect(this, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
             &method, SLOT(gotError(QXmppRpcErrorIq)));
+    Q_ASSERT(check);
 
     return method.call();
 }
