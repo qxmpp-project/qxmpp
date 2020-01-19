@@ -550,8 +550,9 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    connect(server, SIGNAL(newConnection(QSslSocket*)),
+    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(_q_clientConnection(QSslSocket*)));
+    Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
         d->warning(QString("Could not start listening for C2S on %1 %2").arg(address.toString(), QString::number(port)));
@@ -613,8 +614,9 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    connect(server, SIGNAL(newConnection(QSslSocket*)),
+    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
                     this, SLOT(_q_serverConnection(QSslSocket*)));
+    Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
         d->warning(QString("Could not start listening for S2S on %1 %2").arg(address.toString(), QString::number(port)));
