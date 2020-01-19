@@ -73,7 +73,7 @@ public:
     void setUsername(const QString &username);
 
     RegisterType registerType() const;
-    void setRegisterType(const RegisterType &registerType);
+    void setRegisterType(RegisterType registerType);
 
     QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
     QXmppBitsOfBinaryDataList &bitsOfBinaryData();
