@@ -33,7 +33,7 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "QXmppTlsManager.h"
+#include "QXmppTlsManager_p.h"
 #include "QXmppRosterManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"

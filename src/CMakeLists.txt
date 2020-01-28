@@ -77,7 +77,6 @@ set(INSTALL_HEADER_FILES
     client/QXmppRemoteMethod.h
     client/QXmppRosterManager.h
     client/QXmppRpcManager.h
-    client/QXmppTlsManager.h
     client/QXmppTransferManager.h
     client/QXmppTransferManager_p.h
     client/QXmppUploadRequestManager.h
