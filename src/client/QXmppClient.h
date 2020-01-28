@@ -39,6 +39,7 @@ class QXmppPresence;
 class QXmppMessage;
 class QXmppIq;
 class QXmppStream;
+class QXmppInternalClientExtension;
 
 // managers
 class QXmppDiscoveryIq;
@@ -276,6 +277,8 @@ private slots:
 
 private:
     QXmppClientPrivate *const d;
+
+    friend class QXmppInternalClientExtension;
 };
 
 #endif  // QXMPPCLIENT_H
