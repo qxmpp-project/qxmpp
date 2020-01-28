@@ -157,6 +157,7 @@ set(SOURCE_FILES
     client/QXmppClientExtension.cpp
     client/QXmppConfiguration.cpp
     client/QXmppEntityTimeManager.cpp
+    client/QXmppInternalClientExtension.cpp
     client/QXmppInvokable.cpp
     client/QXmppMamManager.cpp
     client/QXmppMessageReceiptManager.cpp
