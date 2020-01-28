@@ -25,6 +25,7 @@
 #include <QTimer>
 
 #include "QXmppClient.h"
+#include "QXmppClient_p.h"
 #include "QXmppClientExtension.h"
 #include "QXmppConstants_p.h"
 #include "QXmppLogger.h"
@@ -40,31 +41,7 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppDiscoveryIq.h"
 
-class QXmppClientPrivate
-{
-public:
-    QXmppClientPrivate(QXmppClient *qq);
-
-    QXmppPresence clientPresence;                   ///< Current presence of the client
-    QList<QXmppClientExtension*> extensions;
-    QXmppLogger *logger;
-    QXmppOutgoingClient *stream;                    ///< Pointer to the XMPP stream
-
-    // reconnection
-    bool receivedConflict;
-    int reconnectionTries;
-    QTimer *reconnectionTimer;
-
-    // Client state indication
-    bool isActive;
-
-    void addProperCapability(QXmppPresence& presence);
-    int getNextReconnectTime() const;
-
-private:
-    QXmppClient *q;
-};
-
+/// \cond
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
     : clientPresence(QXmppPresence::Available)
     , logger(nullptr)
@@ -98,6 +75,7 @@ int QXmppClientPrivate::getNextReconnectTime() const
     else
         return 60 * 1000;
 }
+/// \endcond
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's constructor.
