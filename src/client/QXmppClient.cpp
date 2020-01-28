@@ -433,47 +433,6 @@ QString QXmppClient::socketErrorString() const
     return d->stream->socket()->errorString();
 }
 
-/// Returns true, if the used socket supports SSL / TLS encryption.
-///
-/// This is useful for checking whether TLS can be enabled. It is used by the
-/// \c QXmppTlsManager.
-///
-/// \since QXmpp 1.2
-
-bool QXmppClient::socketSupportsSsl() const
-{
-    return d->stream->socket()->supportsSsl();
-}
-
-/// Returns true, if the socket used for connection to the XMPP server
-/// currently uses SSL / TLS encryption.
-///
-/// When using STARTTLS, this is false at first and becomes true later.
-///
-/// \since QXmpp 1.2
-
-bool QXmppClient::isSocketEncrypted() const
-{
-    return d->stream->socket()->isEncrypted();
-}
-
-/// If the socket supports SSL / TLS encryption, this method can be used to
-/// enable it.
-///
-/// This is used by the \c QXmppTlsManager to enable SSL / TLS encryption for
-/// STARTTLS.
-///
-/// \note You should usually not use this method manually. If you want to
-/// enable or disable TLS encryption, you can set this in the
-/// \c QXmppConfiguration provided to \c connectToServer().
-///
-/// \since QXmpp 1.2
-
-void QXmppClient::startSocketEncryption()
-{
-    d->stream->socket()->startClientEncryption();
-}
-
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
 
 QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
