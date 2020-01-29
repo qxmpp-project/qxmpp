@@ -209,7 +209,7 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
 void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("storage");
-    writer->writeAttribute("xmlns", ns_bookmarks);
+    writer->writeDefaultNamespace(ns_bookmarks);
     for (const auto &conference : m_conferences) {
         writer->writeStartElement("conference");
         if (conference.autoJoin())

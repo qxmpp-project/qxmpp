@@ -71,7 +71,7 @@ void QXmppStartTlsPacket::parse(const QDomElement &element)
 void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(STARTTLS_TYPES.at(int(m_type)));
-    writer->writeAttribute(QStringLiteral("xmlns"), ns_tls);
+    writer->writeDefaultNamespace(ns_tls);
     writer->writeEndElement();
 }
 /// \endcond

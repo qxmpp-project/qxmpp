@@ -109,7 +109,7 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
 void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("si");
-    writer->writeAttribute("xmlns", ns_stream_initiation);
+    writer->writeDefaultNamespace(ns_stream_initiation);
     helperToXmlAddAttribute(writer, "id", m_siId);
     helperToXmlAddAttribute(writer, "mime-type", m_mimeType);
     if (m_profile == FileTransfer)
@@ -118,7 +118,7 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
         m_fileInfo.toXml(writer);
     if (!m_featureForm.isNull()) {
         writer->writeStartElement("feature");
-        writer->writeAttribute("xmlns", ns_feature_negotiation);
+        writer->writeDefaultNamespace(ns_feature_negotiation);
         m_featureForm.toXml(writer);
         writer->writeEndElement();
     }

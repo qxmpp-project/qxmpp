@@ -154,7 +154,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_bytestreams);
+    writer->writeDefaultNamespace(ns_bytestreams);
     helperToXmlAddAttribute(writer, "sid", m_sid);
     QString modeStr;
     if (m_mode == Tcp)

@@ -134,7 +134,7 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
     if (isNull())
         return;
     writer->writeStartElement("set");
-    writer->writeAttribute("xmlns", ns_rsm);
+    writer->writeDefaultNamespace(ns_rsm);
     if (m_max >= 0)
         helperToXmlAddTextElement(writer, "max", QString::number(m_max));
     if (!m_after.isNull())
@@ -247,7 +247,7 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter* writer) const
     if (isNull())
         return;
     writer->writeStartElement("set");
-    writer->writeAttribute("xmlns", ns_rsm);
+    writer->writeDefaultNamespace(ns_rsm);
     if (!m_first.isNull() || m_index >= 0) {
         writer->writeStartElement("first");
         if (m_index >= 0)

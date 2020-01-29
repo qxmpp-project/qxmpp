@@ -189,7 +189,7 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
     if (mode != QXmppStreamFeatures::Disabled)
     {
         writer->writeStartElement(tagName);
-        writer->writeAttribute("xmlns", tagNs);
+        writer->writeDefaultNamespace(tagNs);
         if (mode == QXmppStreamFeatures::Required)
             writer->writeEmptyElement("required");
         writer->writeEndElement();
@@ -210,7 +210,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     if (!m_compressionMethods.isEmpty())
     {
         writer->writeStartElement("compression");
-        writer->writeAttribute("xmlns", ns_compressFeature);
+        writer->writeDefaultNamespace(ns_compressFeature);
         for (const auto &method : m_compressionMethods)
             writer->writeTextElement("method", method);
         writer->writeEndElement();
@@ -218,7 +218,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     if (!m_authMechanisms.isEmpty())
     {
         writer->writeStartElement("mechanisms");
-        writer->writeAttribute("xmlns", ns_sasl);
+        writer->writeDefaultNamespace(ns_sasl);
         for (const auto &mechanism : m_authMechanisms)
             writer->writeTextElement("mechanism",  mechanism);
         writer->writeEndElement();

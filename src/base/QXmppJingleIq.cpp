@@ -422,7 +422,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     if (!d->descriptionType.isEmpty() || !d->payloadTypes.isEmpty())
     {
         writer->writeStartElement("description");
-        writer->writeAttribute("xmlns", d->descriptionType);
+        writer->writeDefaultNamespace(d->descriptionType);
         helperToXmlAddAttribute(writer, "media", d->descriptionMedia);
         if (d->descriptionSsrc)
             writer->writeAttribute("ssrc", QString::number(d->descriptionSsrc));
@@ -435,7 +435,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     if (!d->transportType.isEmpty() || !d->transportCandidates.isEmpty())
     {
         writer->writeStartElement("transport");
-        writer->writeAttribute("xmlns", d->transportType);
+        writer->writeDefaultNamespace(d->transportType);
         helperToXmlAddAttribute(writer, "ufrag", d->transportUser);
         helperToXmlAddAttribute(writer, "pwd", d->transportPassword);
         for (const auto &candidate : d->transportCandidates)
@@ -444,7 +444,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         // XEP-0320
         if (!d->transportFingerprint.isEmpty() && !d->transportFingerprintHash.isEmpty()) {
             writer->writeStartElement("fingerprint");
-            writer->writeAttribute("xmlns", ns_jingle_dtls);
+            writer->writeDefaultNamespace(ns_jingle_dtls);
             writer->writeAttribute("hash", d->transportFingerprintHash);
             writer->writeAttribute("setup", d->transportFingerprintSetup);
             writer->writeCharacters(formatFingerprint(d->transportFingerprint));
@@ -902,7 +902,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("jingle");
-    writer->writeAttribute("xmlns", ns_jingle);
+    writer->writeDefaultNamespace(ns_jingle);
     helperToXmlAddAttribute(writer, "action", jingle_actions[d->action]);
     helperToXmlAddAttribute(writer, "initiator", d->initiator);
     helperToXmlAddAttribute(writer, "responder", d->responder);
@@ -914,7 +914,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     // ringing
     if (d->ringing) {
         writer->writeStartElement("ringing");
-        writer->writeAttribute("xmlns", ns_jingle_rtp_info);
+        writer->writeDefaultNamespace(ns_jingle_rtp_info);
         writer->writeEndElement();
     }
 

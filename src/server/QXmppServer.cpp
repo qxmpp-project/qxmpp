@@ -48,7 +48,7 @@ static void helperToXmlAddDomElement(QXmlStreamWriter* stream, const QDomElement
     /* attributes */
     QString xmlns = element.namespaceURI();
     if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns))
-        stream->writeAttribute("xmlns", xmlns);
+        stream->writeDefaultNamespace(xmlns);
     QDomNamedNodeMap attrs = element.attributes();
     for (int i = 0; i < attrs.size(); i++)
     {

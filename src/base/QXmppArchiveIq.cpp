@@ -114,7 +114,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
 void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply &rsm) const
 {
     writer->writeStartElement("chat");
-    writer->writeAttribute("xmlns", ns_archive);
+    writer->writeDefaultNamespace(ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
         helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
@@ -416,7 +416,7 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("list");
-    writer->writeAttribute("xmlns", ns_archive);
+    writer->writeDefaultNamespace(ns_archive);
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
@@ -447,7 +447,7 @@ void QXmppArchivePrefIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("pref");
-    writer->writeAttribute("xmlns", ns_archive);
+    writer->writeDefaultNamespace(ns_archive);
     writer->writeEndElement();
 }
 /// \endcond
@@ -521,7 +521,7 @@ void QXmppArchiveRemoveIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("remove");
-    writer->writeAttribute("xmlns", ns_archive);
+    writer->writeDefaultNamespace(ns_archive);
     if (!m_with.isEmpty())
         helperToXmlAddAttribute(writer, "with", m_with);
     if (m_start.isValid())
@@ -608,7 +608,7 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("retrieve");
-    writer->writeAttribute("xmlns", ns_archive);
+    writer->writeDefaultNamespace(ns_archive);
     helperToXmlAddAttribute(writer, "with", m_with);
     helperToXmlAddAttribute(writer, "start", QXmppUtils::datetimeToString(m_start));
     if (!m_rsmQuery.isNull())

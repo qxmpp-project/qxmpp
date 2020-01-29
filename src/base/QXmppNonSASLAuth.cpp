@@ -93,7 +93,7 @@ void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_auth);
+    writer->writeDefaultNamespace(ns_auth);
     if (!m_username.isEmpty())
         writer->writeTextElement("username", m_username);
     if (!m_digest.isEmpty())

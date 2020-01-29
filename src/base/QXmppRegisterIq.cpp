@@ -219,7 +219,7 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_register);
+    writer->writeDefaultNamespace(ns_register);
 
     if (!d->instructions.isEmpty())
         writer->writeTextElement("instructions", d->instructions);

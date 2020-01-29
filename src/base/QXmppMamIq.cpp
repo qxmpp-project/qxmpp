@@ -116,7 +116,7 @@ void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_mam);
+    writer->writeDefaultNamespace(ns_mam);
     if (!m_node.isEmpty()) {
         writer->writeAttribute("node", m_node);
     }
@@ -185,7 +185,7 @@ void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("fin");
-    writer->writeAttribute("xmlns", ns_mam);
+    writer->writeDefaultNamespace(ns_mam);
     if (m_complete) {
         writer->writeAttribute("complete", "true");
     }

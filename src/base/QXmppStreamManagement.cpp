@@ -67,7 +67,7 @@ void QXmppStreamManagementEnable::parse(const QDomElement &element)
 void QXmppStreamManagementEnable::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("enable");
-    writer->writeAttribute("xmlns", ns_stream_management);
+    writer->writeDefaultNamespace(ns_stream_management);
     if (m_resume)
         writer->writeAttribute("resume", "true");
     if (m_max > 0)
@@ -137,7 +137,7 @@ void QXmppStreamManagementEnabled::parse(const QDomElement &element)
 void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("enable");
-    writer->writeAttribute("xmlns", ns_stream_management);
+    writer->writeDefaultNamespace(ns_stream_management);
     if (m_resume)
         writer->writeAttribute("resume", "true");
     if (m_max > 0)
@@ -271,7 +271,7 @@ void QXmppStreamManagementFailed::toXml(QXmlStreamWriter *writer) const
     QString errorString = strFromCondition(m_error);
 
     writer->writeStartElement("failed");
-    writer->writeAttribute("xmlns", ns_stream_management);
+    writer->writeDefaultNamespace(ns_stream_management);
     writer->writeStartElement(errorString, ns_stanza);
     writer->writeEndElement();
     writer->writeEndElement();
@@ -300,7 +300,7 @@ void QXmppStreamManagementAck::parse(const QDomElement &element)
 void QXmppStreamManagementAck::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("a");
-    writer->writeAttribute("xmlns", ns_stream_management);
+    writer->writeDefaultNamespace(ns_stream_management);
     writer->writeAttribute("h", QString::number(m_seqNo));
     writer->writeEndElement();
 }
@@ -320,6 +320,6 @@ bool QXmppStreamManagementReq::isStreamManagementReq(const QDomElement &element)
 void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
 {
     writer->writeStartElement("r");
-    writer->writeAttribute("xmlns", ns_stream_management);
+    writer->writeDefaultNamespace(ns_stream_management);
     writer->writeEndElement();
 }

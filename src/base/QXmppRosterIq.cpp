@@ -107,7 +107,7 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute( "xmlns", ns_roster);
+    writer->writeDefaultNamespace(ns_roster);
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
     if(!version().isEmpty())
