@@ -1008,7 +1008,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("vCard");
-    writer->writeAttribute("xmlns", ns_vcard);
+    writer->writeDefaultNamespace(ns_vcard);
     for (const QXmppVCardAddress &address : d->addresses)
         address.toXml(writer);
     if (d->birthday.isValid())

@@ -171,7 +171,7 @@ void QXmppTransferFileInfo::parse(const QDomElement &element)
 void QXmppTransferFileInfo::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("file");
-    writer->writeAttribute("xmlns", ns_stream_initiation_file_transfer);
+    writer->writeDefaultNamespace(ns_stream_initiation_file_transfer);
     if (d->date.isValid())
         writer->writeAttribute("date", QXmppUtils::datetimeToString(d->date));
     if (!d->hash.isEmpty())

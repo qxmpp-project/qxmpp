@@ -119,7 +119,7 @@ void QXmppHttpUploadRequestIq::parseElementFromChild(const QDomElement &element)
 void QXmppHttpUploadRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("request");
-    writer->writeAttribute("xmlns", ns_http_upload);
+    writer->writeDefaultNamespace(ns_http_upload);
     // filename and size are required
     writer->writeAttribute("filename", d->fileName);
     writer->writeAttribute("size", QString::number(d->size));
@@ -231,7 +231,7 @@ void QXmppHttpUploadSlotIq::parseElementFromChild(const QDomElement &element)
 void QXmppHttpUploadSlotIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("slot");
-    writer->writeAttribute("xmlns", ns_http_upload);
+    writer->writeDefaultNamespace(ns_http_upload);
 
     writer->writeStartElement("put");
     writer->writeAttribute("url", d->putUrl.toEncoded());

@@ -306,7 +306,7 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeAttribute("xmlns",
+    writer->writeDefaultNamespace(
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
     helperToXmlAddAttribute(writer, "node", m_queryNode);
 

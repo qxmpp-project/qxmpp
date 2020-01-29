@@ -849,16 +849,16 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // chat states
     if (d->state > None && d->state <= Paused) {
         xmlWriter->writeStartElement(CHAT_STATES.at(d->state));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_states);
+        xmlWriter->writeDefaultNamespace(ns_chat_states);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0071: XHTML-IM
     if (!d->xhtml.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("html"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_xhtml_im);
+        xmlWriter->writeDefaultNamespace(ns_xhtml_im);
         xmlWriter->writeStartElement(QStringLiteral("body"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_xhtml);
+        xmlWriter->writeDefaultNamespace(ns_xhtml);
         xmlWriter->writeCharacters(QStringLiteral(""));
         xmlWriter->device()->write(d->xhtml.toUtf8());
         xmlWriter->writeEndElement();
@@ -871,13 +871,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         if (d->stampType == DelayedDelivery) {
             // XEP-0203: Delayed Delivery
             xmlWriter->writeStartElement(QStringLiteral("delay"));
-            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_delayed_delivery);
+            xmlWriter->writeDefaultNamespace(ns_delayed_delivery);
             helperToXmlAddAttribute(xmlWriter, QStringLiteral("stamp"), QXmppUtils::datetimeToString(utcStamp));
             xmlWriter->writeEndElement();
         } else {
             // XEP-0091: Legacy Delayed Delivery
             xmlWriter->writeStartElement(QStringLiteral("x"));
-            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_legacy_delayed_delivery);
+            xmlWriter->writeDefaultNamespace(ns_legacy_delayed_delivery);
             helperToXmlAddAttribute(xmlWriter, QStringLiteral("stamp"), utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
             xmlWriter->writeEndElement();
         }
@@ -886,27 +886,27 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0184: Message Delivery Receipts
     if (!d->receiptId.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("received"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_receipts);
+        xmlWriter->writeDefaultNamespace(ns_message_receipts);
         xmlWriter->writeAttribute(QStringLiteral("id"), d->receiptId);
         xmlWriter->writeEndElement();
     }
     if (d->receiptRequested) {
         xmlWriter->writeStartElement(QStringLiteral("request"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_receipts);
+        xmlWriter->writeDefaultNamespace(ns_message_receipts);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0224: Attention
     if (d->attentionRequested) {
         xmlWriter->writeStartElement(QStringLiteral("attention"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_attention);
+        xmlWriter->writeDefaultNamespace(ns_attention);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0249: Direct MUC Invitations
     if (!d->mucInvitationJid.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_conference);
+        xmlWriter->writeDefaultNamespace(ns_conference);
         xmlWriter->writeAttribute(QStringLiteral("jid"), d->mucInvitationJid);
         if (!d->mucInvitationPassword.isEmpty())
             xmlWriter->writeAttribute(QStringLiteral("password"), d->mucInvitationPassword);
@@ -918,12 +918,12 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0333: Chat Markers
     if (d->markable) {
         xmlWriter->writeStartElement(QStringLiteral("markable"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_markers);
+        xmlWriter->writeDefaultNamespace(ns_chat_markers);
         xmlWriter->writeEndElement();
     }
     if (d->marker != NoMarker) {
         xmlWriter->writeStartElement(MARKER_TYPES.at(d->marker));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_chat_markers);
+        xmlWriter->writeDefaultNamespace(ns_chat_markers);
         xmlWriter->writeAttribute(QStringLiteral("id"), d->markedId);
         if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
             xmlWriter->writeAttribute(QStringLiteral("thread"), d->markedThread);
@@ -938,14 +938,14 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0280: Message Carbons
     if (d->privatemsg) {
         xmlWriter->writeStartElement(QStringLiteral("private"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_carbons);
+        xmlWriter->writeDefaultNamespace(ns_carbons);
         xmlWriter->writeEndElement();
     }
 
     // XEP-0066: Out of Band Data
     if (!d->outOfBandUrl.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_oob);
+        xmlWriter->writeDefaultNamespace(ns_oob);
         xmlWriter->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
         xmlWriter->writeEndElement();
     }
@@ -953,7 +953,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0308: Last Message Correction
     if (!d->replaceId.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("replace"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_correct);
+        xmlWriter->writeDefaultNamespace(ns_message_correct);
         xmlWriter->writeAttribute(QStringLiteral("id"), d->replaceId);
         xmlWriter->writeEndElement();
     }
@@ -962,7 +962,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     for (quint8 i = 0; i < HINT_TYPES.size(); i++) {
         if (hasHint(Hint(1 << i))) {
             xmlWriter->writeStartElement(HINT_TYPES.at(i));
-            xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_processing_hints);
+            xmlWriter->writeDefaultNamespace(ns_message_processing_hints);
             xmlWriter->writeEndElement();
         }
     }
@@ -970,7 +970,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0367: Message Attaching
     if (!d->attachId.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("attach-to"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_message_attaching);
+        xmlWriter->writeDefaultNamespace(ns_message_attaching);
         xmlWriter->writeAttribute(QStringLiteral("id"), d->attachId);
         xmlWriter->writeEndElement();
     }
@@ -978,7 +978,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0369: Mediated Information eXchange (MIX)
     if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("mix"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_mix);
+        xmlWriter->writeDefaultNamespace(ns_mix);
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
         xmlWriter->writeEndElement();
@@ -987,7 +987,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0380: Explicit Message Encryption
     if (!d->encryptionMethod.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("encryption"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_eme);
+        xmlWriter->writeDefaultNamespace(ns_eme);
         xmlWriter->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
         helperToXmlAddAttribute(xmlWriter, QStringLiteral("name"), d->encryptionName);
         xmlWriter->writeEndElement();
@@ -996,7 +996,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0382: Spoiler messages
     if (d->isSpoiler) {
         xmlWriter->writeStartElement(QStringLiteral("spoiler"));
-        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_spoiler);
+        xmlWriter->writeDefaultNamespace(ns_spoiler);
         xmlWriter->writeCharacters(d->spoilerHint);
         xmlWriter->writeEndElement();
     }

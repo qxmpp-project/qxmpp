@@ -750,7 +750,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         return;
 
     writer->writeStartElement("x");
-    writer->writeAttribute("xmlns", ns_data);
+    writer->writeDefaultNamespace(ns_data);
 
     /* form type */
     QString typeStr;

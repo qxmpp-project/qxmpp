@@ -138,7 +138,7 @@ void QXmppSaslAuth::parse(const QDomElement &element)
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("auth");
-    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeDefaultNamespace(ns_xmpp_sasl);
     writer->writeAttribute("mechanism", m_mechanism);
     if (!m_value.isEmpty())
         writer->writeCharacters(m_value.toBase64());
@@ -168,7 +168,7 @@ void QXmppSaslChallenge::parse(const QDomElement &element)
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("challenge");
-    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeDefaultNamespace(ns_xmpp_sasl);
     if (!m_value.isEmpty())
         writer->writeCharacters(m_value.toBase64());
     writer->writeEndElement();
@@ -197,7 +197,7 @@ void QXmppSaslFailure::parse(const QDomElement &element)
 void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("failure");
-    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeDefaultNamespace(ns_xmpp_sasl);
     if (!m_condition.isEmpty())
         writer->writeEmptyElement(m_condition);
     writer->writeEndElement();
@@ -226,7 +226,7 @@ void QXmppSaslResponse::parse(const QDomElement &element)
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("response");
-    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeDefaultNamespace(ns_xmpp_sasl);
     if (!m_value.isEmpty())
         writer->writeCharacters(m_value.toBase64());
     writer->writeEndElement();
@@ -244,7 +244,7 @@ void QXmppSaslSuccess::parse(const QDomElement &element)
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("success");
-    writer->writeAttribute("xmlns", ns_xmpp_sasl);
+    writer->writeDefaultNamespace(ns_xmpp_sasl);
     writer->writeEndElement();
 }
 

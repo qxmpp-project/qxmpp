@@ -403,13 +403,13 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 
     if (!cond.isEmpty()) {
         writer->writeStartElement(cond);
-        writer->writeAttribute("xmlns", ns_stanza);
+        writer->writeDefaultNamespace(ns_stanza);
         writer->writeEndElement();
     }
     if (!d->text.isEmpty()) {
         writer->writeStartElement("text");
         writer->writeAttribute("xml:lang", "en");
-        writer->writeAttribute("xmlns", ns_stanza);
+        writer->writeDefaultNamespace(ns_stanza);
         writer->writeCharacters(d->text);
         writer->writeEndElement();
     }
@@ -417,13 +417,13 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     // XEP-0363: HTTP File Upload
     if (d->fileTooLarge) {
         writer->writeStartElement("file-too-large");
-        writer->writeAttribute("xmlns", ns_http_upload);
+        writer->writeDefaultNamespace(ns_http_upload);
         helperToXmlAddTextElement(writer, "max-file-size",
                                   QString::number(d->maxFileSize));
         writer->writeEndElement();
     } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {
         writer->writeStartElement("retry");
-        writer->writeAttribute("xmlns", ns_http_upload);
+        writer->writeDefaultNamespace(ns_http_upload);
         writer->writeAttribute("stamp",
                                QXmppUtils::datetimeToString(d->retryDate));
         writer->writeEndElement();
@@ -636,7 +636,7 @@ void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0033: Extended Stanza Addressing
     if (!d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
-        xmlWriter->writeAttribute("xmlns", ns_extended_addressing);
+        xmlWriter->writeDefaultNamespace(ns_extended_addressing);
         for (const auto &address : d->extendedAddresses)
             address.toXml(xmlWriter);
         xmlWriter->writeEndElement();

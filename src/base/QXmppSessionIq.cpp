@@ -39,7 +39,7 @@ bool QXmppSessionIq::isSessionIq(const QDomElement &element)
 void QXmppSessionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("session");;
-    writer->writeAttribute("xmlns", ns_session);
+    writer->writeDefaultNamespace(ns_session);
     writer->writeEndElement();
 }
 /// \endcond
