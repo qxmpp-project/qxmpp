@@ -45,6 +45,8 @@ private slots:
 
     void testIndexOfExtension();
 
+    void testAddExtension();
+
 private:
     QXmppClient *client;
 };
@@ -103,6 +105,46 @@ void tst_QXmppClient::testIndexOfExtension()
     // These extensions are in the list.
     QCOMPARE(client->indexOfExtension<QXmppRosterManager>(), 0);
     QCOMPARE(client->indexOfExtension<QXmppVCardManager>(), 1);
+}
+
+class PreferredIndexExtension : public QXmppClientExtension
+{
+    Q_OBJECT
+
+public:
+    int preferredInsertionIndex(QXmppClient *) const override
+    {
+        return 2;
+    }
+
+    bool handleStanza(const QDomElement &) override
+    {
+        return false;
+    }
+};
+
+void tst_QXmppClient::testAddExtension()
+{
+    auto client = new QXmppClient;
+
+    for (auto *ext : client->extensions()) {
+        client->removeExtension(ext);
+    }
+
+    auto rosterManager = new QXmppRosterManager(client);
+    auto vCardManager = new QXmppVCardManager;
+    auto versionManager = new QXmppVersionManager;
+    auto preferredIndexExtension = new PreferredIndexExtension;
+
+    client->addExtension(rosterManager);
+    client->addExtension(vCardManager);
+    client->addExtension(versionManager);
+    client->addExtension(preferredIndexExtension);
+
+    QCOMPARE(client->extensions().at(0), rosterManager);
+    QCOMPARE(client->extensions().at(1), vCardManager);
+    QCOMPARE(client->extensions().at(2), preferredIndexExtension);
+    QCOMPARE(client->extensions().at(3), versionManager);
 }
 
 QTEST_MAIN(tst_QXmppClient)

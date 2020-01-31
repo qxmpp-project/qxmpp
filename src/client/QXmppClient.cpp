@@ -143,11 +143,19 @@ QXmppClient::~QXmppClient()
 
 /// Registers a new \a extension with the client.
 ///
+/// The new extension is inserted at its preferred index
+/// (QXmppClientExtension::preferredInsertionIndex()). If the extension has no
+/// preference on this, it is appended (regular case).
+///
 /// \param extension
 
-bool QXmppClient::addExtension(QXmppClientExtension* extension)
+bool QXmppClient::addExtension(QXmppClientExtension *extension)
 {
-    return insertExtension(d->extensions.size(), extension);
+    int index = extension->preferredInsertionIndex(this);
+    if (index < 0)
+        index = d->extensions.size();
+
+    return insertExtension(index, extension);
 }
 
 /// Registers a new \a extension with the client at the given \a index.

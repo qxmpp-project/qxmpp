@@ -141,8 +141,8 @@ public:
     /// Usage example:
     /// \code
     /// int index = client->indexOfExtension<QXmppDiscoveryManager>();
-    /// if (index > 0) {
-    ///     // extension found, do stuff...
+    /// if (index >= 0) {
+    ///     // extension found at index, do stuff...
     /// } else {
     ///     // extension not found
     /// }

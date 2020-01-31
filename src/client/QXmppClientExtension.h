@@ -54,6 +54,7 @@ public:
 
     virtual QStringList discoveryFeatures() const;
     virtual QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const;
+    virtual int preferredInsertionIndex(QXmppClient *client) const;
 
     /// \brief You need to implement this method to process incoming XMPP
     /// stanzas.
