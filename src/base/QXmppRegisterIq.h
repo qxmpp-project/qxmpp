@@ -47,7 +47,7 @@ public:
 
     enum RegisterType {
         None,        ///< No special register IQ.
-        Registered,  ///< Used by the service to indicate that an account is already registered.
+        Registered,  ///< Used by the service to indicate that an account is registered.
         Remove       ///< Used by the client to request account removal.
     };
 
@@ -56,6 +56,9 @@ public:
     ~QXmppRegisterIq();
 
     QXmppRegisterIq &operator=(const QXmppRegisterIq &other);
+
+    static QXmppRegisterIq createChangePasswordRequest(const QString &username, const QString &newPassword, const QString &to = {});
+    static QXmppRegisterIq createUnregistrationRequest(const QString &to = {});
 
     QString email() const;
     void setEmail(const QString &email);

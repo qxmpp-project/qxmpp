@@ -65,6 +65,42 @@ QXmppRegisterIq::~QXmppRegisterIq() = default;
 
 QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq &other) = default;
 
+/// Constructs a regular change password request.
+///
+/// \param username The username of the account of which the password should be
+/// changed.
+/// \param newPassword The new password that should be set.
+/// \param to Optional JID of the registration service. If this is omitted, the
+/// IQ is automatically addressed to the local server.
+///
+/// \since QXmpp 1.2
+
+QXmppRegisterIq QXmppRegisterIq::createChangePasswordRequest(const QString &username, const QString &newPassword, const QString &to)
+{
+    QXmppRegisterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.setTo(to);
+    iq.setUsername(username);
+    iq.setPassword(newPassword);
+    return iq;
+}
+
+/// Constructs a regular unregistration request.
+///
+/// \param to Optional JID of the registration service. If this is omitted, the
+/// IQ is automatically addressed to the local server.
+///
+/// \since QXmpp 1.2
+
+QXmppRegisterIq QXmppRegisterIq::createUnregistrationRequest(const QString &to)
+{
+    QXmppRegisterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.setTo(to);
+    iq.setRegisterType(QXmppRegisterIq::Remove);
+    return iq;
+}
+
 /// Returns the email for this registration IQ.
 
 QString QXmppRegisterIq::email() const
