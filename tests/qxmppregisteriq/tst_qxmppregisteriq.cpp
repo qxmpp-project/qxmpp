@@ -43,6 +43,8 @@ private slots:
     void testBobData();
     void testRegistered();
     void testRemove();
+    void testChangePassword();
+    void testUnregistration();
 };
 
 void tst_QXmppRegisterIq::testGet()
@@ -341,6 +343,39 @@ void tst_QXmppRegisterIq::testRemove()
     iq.setType(QXmppIq::Result);
     iq.setRegisterType(QXmppRegisterIq::Remove);
     iq.setUsername(QStringLiteral("juliet"));
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppRegisterIq::testChangePassword()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<iq id=\"changePassword1\" to=\"shakespeare.lit\" type=\"set\">"
+        "<query xmlns=\"jabber:iq:register\">"
+        "<username>bill</username>"
+        "<password>m1cr0$0ft</password>"
+        "</query>"
+        "</iq>");
+
+    auto iq = QXmppRegisterIq::createChangePasswordRequest(
+        QStringLiteral("bill"),
+        QStringLiteral("m1cr0$0ft"),
+        QStringLiteral("shakespeare.lit")
+    );
+    iq.setId(QStringLiteral("changePassword1"));
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppRegisterIq::testUnregistration()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<iq id=\"unreg1\" to=\"shakespeare.lit\" type=\"set\">"
+        "<query xmlns=\"jabber:iq:register\">"
+        "<remove/>"
+        "</query>"
+        "</iq>");
+
+    auto iq = QXmppRegisterIq::createUnregistrationRequest(QStringLiteral("shakespeare.lit"));
+    iq.setId(QStringLiteral("unreg1"));
     serializePacket(iq, xml);
 }
 
