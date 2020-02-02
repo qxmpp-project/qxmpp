@@ -90,6 +90,9 @@ class QXmppStanzaErrorPrivate;
 class QXMPP_EXPORT QXmppStanza
 {
 public:
+    ///
+    /// \brief The Error class represents a stanza error.
+    ///
     class QXMPP_EXPORT Error
     {
     public:
