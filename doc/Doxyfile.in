@@ -5,6 +5,7 @@ INPUT                  = @PROJECT_SOURCE_DIR@/doc/index.doc \
                          @PROJECT_SOURCE_DIR@/doc/xep.doc \
                          @PROJECT_SOURCE_DIR@/src
 
+ALIASES                = "xep{1}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1</a>"
 ALPHABETICAL_INDEX     = NO
 EXCLUDE_PATTERNS       = */moc_* */mod_* */*_p.h */QXmppCodec.cpp */QXmppSasl.cpp
 FULL_PATH_NAMES        = NO
