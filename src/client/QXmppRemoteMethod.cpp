@@ -30,33 +30,31 @@
 #include <QEventLoop>
 #include <QTimer>
 
-QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, const QVariantList &args, QXmppClient *client) :
-        QObject(client), m_client(client)
+QXmppRemoteMethod::QXmppRemoteMethod(const QString &jid, const QString &method, const QVariantList &args, QXmppClient *client) : QObject(client), m_client(client)
 {
-    m_payload.setTo( jid );
-    m_payload.setFrom( client->configuration().jid() );
-    m_payload.setMethod( method );
-    m_payload.setArguments( args );
+    m_payload.setTo(jid);
+    m_payload.setFrom(client->configuration().jid());
+    m_payload.setMethod(method);
+    m_payload.setArguments(args);
 }
 
-QXmppRemoteMethodResult QXmppRemoteMethod::call( )
+QXmppRemoteMethodResult QXmppRemoteMethod::call()
 {
     // FIXME : spinning an event loop is a VERY bad idea, it can cause
     // us to lose incoming packets
     QEventLoop loop(this);
-    connect( this, &QXmppRemoteMethod::callDone, &loop, &QEventLoop::quit);
-    QTimer::singleShot(30000,&loop, &QEventLoop::quit); // Timeout in case the other end hangs...
+    connect(this, &QXmppRemoteMethod::callDone, &loop, &QEventLoop::quit);
+    QTimer::singleShot(30000, &loop, &QEventLoop::quit);  // Timeout in case the other end hangs...
 
-    m_client->sendPacket( m_payload );
+    m_client->sendPacket(m_payload);
 
-    loop.exec( QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents );
+    loop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
     return m_result;
 }
 
-void QXmppRemoteMethod::gotError( const QXmppRpcErrorIq &iq )
+void QXmppRemoteMethod::gotError(const QXmppRpcErrorIq &iq)
 {
-    if ( iq.id() == m_payload.id() )
-    {
+    if (iq.id() == m_payload.id()) {
         m_result.hasError = true;
         m_result.errorMessage = iq.error().text();
         m_result.code = iq.error().type();
@@ -64,10 +62,9 @@ void QXmppRemoteMethod::gotError( const QXmppRpcErrorIq &iq )
     }
 }
 
-void QXmppRemoteMethod::gotResult( const QXmppRpcResponseIq &iq )
+void QXmppRemoteMethod::gotResult(const QXmppRpcResponseIq &iq)
 {
-    if ( iq.id() == m_payload.id() )
-    {
+    if (iq.id() == m_payload.id()) {
         m_result.hasError = false;
         // FIXME: we don't handle multiple responses
         m_result.result = iq.values().first();

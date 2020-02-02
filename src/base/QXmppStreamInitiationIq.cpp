@@ -95,8 +95,7 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
         m_profile = None;
 
     QDomElement itemElement = siElement.firstChildElement();
-    while (!itemElement.isNull())
-    {
+    while (!itemElement.isNull()) {
         if (itemElement.tagName() == "feature" && itemElement.namespaceURI() == ns_feature_negotiation) {
             m_featureForm.parse(itemElement.firstChildElement());
         } else if (itemElement.tagName() == "file" && itemElement.namespaceURI() == ns_stream_initiation_file_transfer) {

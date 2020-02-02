@@ -69,7 +69,7 @@ QXmppExtendedAddress::~QXmppExtendedAddress()
 ///
 /// \param other
 ///
-QXmppExtendedAddress& QXmppExtendedAddress::operator=(const QXmppExtendedAddress& other)
+QXmppExtendedAddress &QXmppExtendedAddress::operator=(const QXmppExtendedAddress &other)
 {
     d = other.d;
     return *this;
@@ -192,7 +192,7 @@ QXmppStanza::Error::Error()
 
 QXmppStanza::Error::Error(const QXmppStanza::Error &) = default;
 
-QXmppStanza::Error::Error(Type type, Condition cond, const QString& text)
+QXmppStanza::Error::Error(Type type, Condition cond, const QString &text)
     : d(new QXmppStanzaErrorPrivate)
 {
     d->type = type;
@@ -200,8 +200,8 @@ QXmppStanza::Error::Error(Type type, Condition cond, const QString& text)
     d->text = text;
 }
 
-QXmppStanza::Error::Error(const QString& type, const QString& cond,
-                          const QString& text)
+QXmppStanza::Error::Error(const QString &type, const QString &cond,
+                          const QString &text)
     : d(new QXmppStanzaErrorPrivate)
 {
     d->text = text;
@@ -218,7 +218,7 @@ QString QXmppStanza::Error::text() const
     return d->text;
 }
 
-void QXmppStanza::Error::setText(const QString& text)
+void QXmppStanza::Error::setText(const QString &text)
 {
     d->text = text;
 }
@@ -314,8 +314,7 @@ void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
 /// \cond
 QString QXmppStanza::Error::getTypeStr() const
 {
-    switch(d->type)
-    {
+    switch (d->type) {
     case Cancel:
         return "cancel";
     case Continue:
@@ -336,23 +335,23 @@ QString QXmppStanza::Error::getConditionStr() const
     return strFromCondition(d->condition);
 }
 
-void QXmppStanza::Error::setTypeFromStr(const QString& type)
+void QXmppStanza::Error::setTypeFromStr(const QString &type)
 {
-    if(type == "cancel")
+    if (type == "cancel")
         setType(Cancel);
-    else if(type == "continue")
+    else if (type == "continue")
         setType(Continue);
-    else if(type == "modify")
+    else if (type == "modify")
         setType(Modify);
-    else if(type == "auth")
+    else if (type == "auth")
         setType(Auth);
-    else if(type == "wait")
+    else if (type == "wait")
         setType(Wait);
     else
         setType(static_cast<QXmppStanza::Error::Type>(-1));
 }
 
-void QXmppStanza::Error::setConditionFromStr(const QString& type)
+void QXmppStanza::Error::setConditionFromStr(const QString &type)
 {
     setCondition(conditionFromStr(type));
 }
@@ -363,24 +362,24 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
     setTypeFromStr(errorElement.attribute("type"));
 
     QDomElement element = errorElement.firstChildElement();
-    while(!element.isNull())
-    {
+    while (!element.isNull()) {
         if (element.namespaceURI() == ns_stanza) {
             if (element.tagName() == "text")
                 setText(element.text());
             else
                 setConditionFromStr(element.tagName());
-        // XEP-0363: HTTP File Upload
+            // XEP-0363: HTTP File Upload
         } else if (element.namespaceURI() == ns_http_upload) {
             // file is too large
             if (element.tagName() == "file-too-large") {
                 d->fileTooLarge = true;
                 d->maxFileSize = element.firstChildElement("max-file-size")
-                                 .text().toLongLong();
-            // retry later
+                                     .text()
+                                     .toLongLong();
+                // retry later
             } else if (element.tagName() == "retry") {
                 d->retryDate = QXmppUtils::datetimeFromString(
-                                element.attribute("stamp"));
+                    element.attribute("stamp"));
             }
         }
         element = element.nextSiblingElement();
@@ -450,7 +449,7 @@ public:
 /// \param from
 /// \param to
 
-QXmppStanza::QXmppStanza(const QString& from, const QString& to)
+QXmppStanza::QXmppStanza(const QString &from, const QString &to)
     : d(new QXmppStanzaPrivate)
 {
     d->to = to;
@@ -472,7 +471,7 @@ QXmppStanza::~QXmppStanza()
 
 /// Assigns \a other to this stanza.
 
-QXmppStanza& QXmppStanza::operator=(const QXmppStanza &other)
+QXmppStanza &QXmppStanza::operator=(const QXmppStanza &other)
 {
     d = other.d;
     return *this;
@@ -490,7 +489,7 @@ QString QXmppStanza::to() const
 ///
 /// \param to
 
-void QXmppStanza::setTo(const QString& to)
+void QXmppStanza::setTo(const QString &to)
 {
     d->to = to;
 }
@@ -506,7 +505,7 @@ QString QXmppStanza::from() const
 ///
 /// \param from
 
-void QXmppStanza::setFrom(const QString& from)
+void QXmppStanza::setFrom(const QString &from)
 {
     d->from = from;
 }
@@ -522,7 +521,7 @@ QString QXmppStanza::id() const
 ///
 /// \param id
 
-void QXmppStanza::setId(const QString& id)
+void QXmppStanza::setId(const QString &id)
 {
     d->id = id;
 }
@@ -538,7 +537,7 @@ QString QXmppStanza::lang() const
 ///
 /// \param lang
 
-void QXmppStanza::setLang(const QString& lang)
+void QXmppStanza::setLang(const QString &lang)
 {
     d->lang = lang;
 }
@@ -554,7 +553,7 @@ QXmppStanza::Error QXmppStanza::error() const
 ///
 /// \param error
 
-void QXmppStanza::setError(const QXmppStanza::Error& error)
+void QXmppStanza::setError(const QXmppStanza::Error &error)
 {
     d->error = error;
 }
@@ -617,7 +616,7 @@ void QXmppStanza::parse(const QDomElement &element)
     d->lang = element.attribute("lang");
 
     QDomElement errorElement = element.firstChildElement("error");
-    if(!errorElement.isNull())
+    if (!errorElement.isNull())
         d->error.parse(errorElement);
 
     // XEP-0033: Extended Stanza Addressing

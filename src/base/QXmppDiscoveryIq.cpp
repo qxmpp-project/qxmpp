@@ -261,14 +261,10 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
         m_queryType = InfoQuery;
 
     QDomElement itemElement = queryElement.firstChildElement();
-    while (!itemElement.isNull())
-    {
-        if (itemElement.tagName() == "feature")
-        {
+    while (!itemElement.isNull()) {
+        if (itemElement.tagName() == "feature") {
             m_features.append(itemElement.attribute("var"));
-        }
-        else if (itemElement.tagName() == "identity")
-        {
+        } else if (itemElement.tagName() == "identity") {
             QXmppDiscoveryIq::Identity identity;
             identity.setLanguage(itemElement.attribute("xml:lang"));
             identity.setCategory(itemElement.attribute("category"));
@@ -286,18 +282,14 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             }
 
             m_identities.append(identity);
-        }
-        else if (itemElement.tagName() == "item")
-        {
+        } else if (itemElement.tagName() == "item") {
             QXmppDiscoveryIq::Item item;
             item.setJid(itemElement.attribute("jid"));
             item.setName(itemElement.attribute("name"));
             item.setNode(itemElement.attribute("node"));
             m_items.append(item);
-        }
-        else if (itemElement.tagName() == "x" &&
-                 itemElement.namespaceURI() == ns_data)
-        {
+        } else if (itemElement.tagName() == "x" &&
+                   itemElement.namespaceURI() == ns_data) {
             m_form.parse(itemElement);
         }
         itemElement = itemElement.nextSiblingElement();

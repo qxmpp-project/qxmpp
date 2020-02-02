@@ -36,10 +36,9 @@ echoClient::echoClient(QObject *parent)
 
 echoClient::~echoClient()
 {
-
 }
 
-void echoClient::messageReceived(const QXmppMessage& message)
+void echoClient::messageReceived(const QXmppMessage &message)
 {
     QString from = message.from();
     QString msg = message.body();

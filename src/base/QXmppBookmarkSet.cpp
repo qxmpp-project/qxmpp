@@ -179,25 +179,21 @@ void QXmppBookmarkSet::setUrls(const QList<QXmppBookmarkUrl> &urls)
 bool QXmppBookmarkSet::isBookmarkSet(const QDomElement &element)
 {
     return element.tagName() == "storage" &&
-           element.namespaceURI() == ns_bookmarks;
+        element.namespaceURI() == ns_bookmarks;
 }
 
 void QXmppBookmarkSet::parse(const QDomElement &element)
 {
     QDomElement childElement = element.firstChildElement();
-    while (!childElement.isNull())
-    {
-        if (childElement.tagName() == "conference")
-        {
+    while (!childElement.isNull()) {
+        if (childElement.tagName() == "conference") {
             QXmppBookmarkConference conference;
             conference.setAutoJoin(childElement.attribute("autojoin") == "true" || childElement.attribute("autojoin") == "1");
             conference.setJid(childElement.attribute("jid"));
             conference.setName(childElement.attribute("name"));
             conference.setNickName(childElement.firstChildElement("nick").text());
             m_conferences << conference;
-        }
-        else if (childElement.tagName() == "url")
-        {
+        } else if (childElement.tagName() == "url") {
             QXmppBookmarkUrl url;
             url.setName(childElement.attribute("name"));
             url.setUrl(childElement.attribute("url"));

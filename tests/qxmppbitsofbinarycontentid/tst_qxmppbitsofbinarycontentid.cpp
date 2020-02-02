@@ -54,8 +54,7 @@ void tst_QXmppBitsOfBinaryContentId::testBasic()
 {
     // test fromCidUrl()
     QXmppBitsOfBinaryContentId cid = QXmppBitsOfBinaryContentId::fromCidUrl(QStringLiteral(
-        "cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"
-    ));
+        "cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
 
     QCOMPARE(cid.algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(cid.hash().toHex(), QByteArrayLiteral("8f35fef110ffc5df08d579a50083ff9308fb6242"));
@@ -64,8 +63,7 @@ void tst_QXmppBitsOfBinaryContentId::testBasic()
 
     // test fromContentId()
     cid = QXmppBitsOfBinaryContentId::fromContentId(QStringLiteral(
-        "sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"
-    ));
+        "sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
 
     QCOMPARE(cid.algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(cid.hash().toHex(), QByteArrayLiteral("8f35fef110ffc5df08d579a50083ff9308fb6242"));
@@ -154,15 +152,13 @@ void tst_QXmppBitsOfBinaryContentId::testIsValid_data()
     ROW("valid",
         "8f35fef110ffc5df08d579a50083ff9308fb6242",
         QCryptographicHash::Sha1,
-        true
-    );
+        true);
 
 #ifndef QT_CRYPTOGRAPHICHASH_ONLY_SHA1
     ROW("valid-sha256",
         "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         QCryptographicHash::Sha256,
-        true
-    );
+        true);
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
@@ -218,10 +214,8 @@ void tst_QXmppBitsOfBinaryContentId::testUnsupportedAlgorithm()
 {
     QCOMPARE(
         QXmppBitsOfBinaryContentId::fromContentId(
-            QStringLiteral("blake2s160+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org")
-        ),
-        QXmppBitsOfBinaryContentId()
-    );
+            QStringLiteral("blake2s160+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org")),
+        QXmppBitsOfBinaryContentId());
 }
 
 QTEST_MAIN(tst_QXmppBitsOfBinaryContentId)

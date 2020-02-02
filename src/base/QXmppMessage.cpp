@@ -88,8 +88,7 @@ static bool checkElement(const QDomElement &element, const QString &tagName, con
     return element.tagName() == tagName && element.namespaceURI() == xmlns;
 }
 
-enum StampType
-{
+enum StampType {
     LegacyDelayedDelivery,  // XEP-0091: Legacy Delayed Delivery
     DelayedDelivery         // XEP-0203: Delayed Delivery
 };
@@ -179,10 +178,8 @@ QXmppMessagePrivate::QXmppMessagePrivate()
 /// \param body
 /// \param thread
 
-QXmppMessage::QXmppMessage(const QString& from, const QString& to, const
-                           QString& body, const QString& thread)
-    : QXmppStanza(from, to)
-    , d(new QXmppMessagePrivate)
+QXmppMessage::QXmppMessage(const QString &from, const QString &to, const QString &body, const QString &thread)
+    : QXmppStanza(from, to), d(new QXmppMessagePrivate)
 {
     d->type = Chat;
     d->body = body;
@@ -197,7 +194,7 @@ QXmppMessage::~QXmppMessage() = default;
 
 /// Assigns \a other to this message.
 
-QXmppMessage& QXmppMessage::operator=(const QXmppMessage &other) = default;
+QXmppMessage &QXmppMessage::operator=(const QXmppMessage &other) = default;
 
 /// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
 /// iq or presence)
@@ -218,7 +215,7 @@ QString QXmppMessage::body() const
 ///
 /// \param body
 
-void QXmppMessage::setBody(const QString& body)
+void QXmppMessage::setBody(const QString &body)
 {
     d->body = body;
 }
@@ -385,7 +382,7 @@ QString QXmppMessage::subject() const
 ///
 /// \param subject
 
-void QXmppMessage::setSubject(const QString& subject)
+void QXmppMessage::setSubject(const QString &subject)
 {
     d->subject = subject;
 }
@@ -401,7 +398,7 @@ QString QXmppMessage::thread() const
 ///
 /// \param thread
 
-void QXmppMessage::setThread(const QString& thread)
+void QXmppMessage::setThread(const QString &thread)
 {
     d->thread = thread;
 }
@@ -642,7 +639,7 @@ QString QXmppMessage::mixUserJid() const
 ///
 /// \since QXmpp 1.1
 
-void QXmppMessage::setMixUserJid(const QString& mixUserJid)
+void QXmppMessage::setMixUserJid(const QString &mixUserJid)
 {
     d->mixUserJid = mixUserJid;
 }
@@ -660,7 +657,7 @@ QString QXmppMessage::mixUserNick() const
 ///
 /// \since QXmpp 1.1
 
-void QXmppMessage::setMixUserNick(const QString& mixUserNick)
+void QXmppMessage::setMixUserNick(const QString &mixUserNick)
 {
     d->mixUserNick = mixUserNick;
 }
@@ -820,8 +817,8 @@ void QXmppMessage::parse(const QDomElement &element)
             d->subject = childElement.text();
         } else if (childElement.tagName() == QStringLiteral("thread")) {
             d->thread = childElement.text();
-        // parse message extensions
-        // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
+            // parse message extensions
+            // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
         } else if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
                    childElement.tagName() != QStringLiteral("error")) {
             parseExtension(childElement, extensions);
@@ -1018,7 +1015,7 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
 {
     if (element.tagName() == QStringLiteral("x")) {
         parseXElement(element, unknownExtensions);
-    // XEP-0071: XHTML-IM
+        // XEP-0071: XHTML-IM
     } else if (checkElement(element, QStringLiteral("html"), ns_xhtml_im)) {
         QDomElement bodyElement = element.firstChildElement(QStringLiteral("body"));
         if (!bodyElement.isNull() && bodyElement.namespaceURI() == ns_xhtml) {
@@ -1028,17 +1025,16 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
             d->xhtml = d->xhtml.mid(d->xhtml.indexOf('>') + 1);
             d->xhtml.replace(
                 QStringLiteral(" xmlns=\"http://www.w3.org/1999/xhtml\""),
-                QString()
-            );
+                QString());
             d->xhtml.replace(QStringLiteral("</body>"), QString());
             d->xhtml = d->xhtml.trimmed();
         }
-    // XEP-0085: Chat State Notifications
+        // XEP-0085: Chat State Notifications
     } else if (element.namespaceURI() == ns_chat_states) {
         int i = CHAT_STATES.indexOf(element.tagName());
         if (i > 0)
             d->state = static_cast<QXmppMessage::State>(i);
-    // XEP-0184: Message Delivery Receipts
+        // XEP-0184: Message Delivery Receipts
     } else if (checkElement(element, QStringLiteral("received"), ns_message_receipts)) {
         d->receiptId = element.attribute(QStringLiteral("id"));
 
@@ -1047,27 +1043,26 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
             d->receiptId = id();
     } else if (checkElement(element, QStringLiteral("request"), ns_message_receipts)) {
         d->receiptRequested = true;
-    // XEP-0203: Delayed Delivery
+        // XEP-0203: Delayed Delivery
     } else if (checkElement(element, QStringLiteral("delay"), ns_delayed_delivery)) {
         d->stamp = QXmppUtils::datetimeFromString(
-            element.attribute(QStringLiteral("stamp"))
-        );
+            element.attribute(QStringLiteral("stamp")));
         d->stampType = DelayedDelivery;
-    // XEP-0224: Attention
+        // XEP-0224: Attention
     } else if (checkElement(element, QStringLiteral("attention"), ns_attention)) {
         d->attentionRequested = true;
-    // XEP-0231: Bits of Binary
+        // XEP-0231: Bits of Binary
     } else if (QXmppBitsOfBinaryData::isBitsOfBinaryData(element)) {
         QXmppBitsOfBinaryData data;
         data.parseElementFromChild(element);
         d->bitsOfBinaryData << data;
-    // XEP-0280: Message Carbons
+        // XEP-0280: Message Carbons
     } else if (checkElement(element, QStringLiteral("private"), ns_carbons)) {
         d->privatemsg = true;
-    // XEP-0308: Last Message Correction
+        // XEP-0308: Last Message Correction
     } else if (checkElement(element, QStringLiteral("replace"), ns_message_correct)) {
         d->replaceId = element.attribute(QStringLiteral("id"));
-    // XEP-0333: Chat Markers
+        // XEP-0333: Chat Markers
     } else if (element.namespaceURI() == ns_chat_markers) {
         if (element.tagName() == QStringLiteral("markable")) {
             d->markable = true;
@@ -1079,22 +1074,22 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
                 d->markedThread = element.attribute(QStringLiteral("thread"));
             }
         }
-    // XEP-0334: Message Processing Hints
+        // XEP-0334: Message Processing Hints
     } else if (element.namespaceURI() == ns_message_processing_hints &&
                HINT_TYPES.contains(element.tagName())) {
         addHint(Hint(1 << HINT_TYPES.indexOf(element.tagName())));
-    // XEP-0367: Message Attaching
+        // XEP-0367: Message Attaching
     } else if (checkElement(element, QStringLiteral("attach-to"), ns_message_attaching)) {
         d->attachId = element.attribute(QStringLiteral("id"));
-    // XEP-0369: Mediated Information eXchange (MIX)
+        // XEP-0369: Mediated Information eXchange (MIX)
     } else if (checkElement(element, QStringLiteral("mix"), ns_mix)) {
         d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
         d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
-    // XEP-0380: Explicit Message Encryption
+        // XEP-0380: Explicit Message Encryption
     } else if (checkElement(element, QStringLiteral("encryption"), ns_eme)) {
         d->encryptionMethod = element.attribute(QStringLiteral("namespace"));
         d->encryptionName = element.attribute(QStringLiteral("name"));
-    // XEP-0382: Spoiler messages
+        // XEP-0382: Spoiler messages
     } else if (checkElement(element, QStringLiteral("spoiler"), ns_spoiler)) {
         d->isSpoiler = true;
         d->spoilerHint = element.text();
@@ -1118,8 +1113,7 @@ void QXmppMessage::parseXElement(const QDomElement &element, QXmppElementList &u
             // XEP-0091: Legacy Delayed Delivery
             d->stamp = QDateTime::fromString(
                 element.attribute(QStringLiteral("stamp")),
-                QStringLiteral("yyyyMMddThh:mm:ss")
-            );
+                QStringLiteral("yyyyMMddThh:mm:ss"));
             d->stamp.setTimeSpec(Qt::UTC);
             d->stampType = LegacyDelayedDelivery;
         }

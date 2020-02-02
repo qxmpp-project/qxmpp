@@ -62,7 +62,7 @@ static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm,
     QByteArray index(4, Qt::Uninitialized);
     while (quint64(key.length()) < dkLen) {
         hmac.addData(salt);
-        qToBigEndian(currentIteration, reinterpret_cast<uchar*>(index.data()));
+        qToBigEndian(currentIteration, reinterpret_cast<uchar *>(index.data()));
         hmac.addData(index);
         QByteArray u = hmac.result();
         hmac.reset();
@@ -104,8 +104,7 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
 }
 
 QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
-    : m_mechanism(mechanism)
-    , m_value(value)
+    : m_mechanism(mechanism), m_value(value)
 {
 }
 
@@ -258,8 +257,7 @@ public:
 };
 
 QXmppSaslClient::QXmppSaslClient(QObject *parent)
-    : QXmppLoggable(parent)
-    , d(new QXmppSaslClientPrivate)
+    : QXmppLoggable(parent), d(new QXmppSaslClientPrivate)
 {
 }
 
@@ -272,14 +270,19 @@ QXmppSaslClient::~QXmppSaslClient()
 
 QStringList QXmppSaslClient::availableMechanisms()
 {
-    return QStringList() << "SCRAM-SHA-256" << "SCRAM-SHA-1" << "DIGEST-MD5"
-                         << "PLAIN" << "ANONYMOUS"
-                         << "X-FACEBOOK-PLATFORM" << "X-MESSENGER-OAUTH2" << "X-OAUTH2";
+    return QStringList() << "SCRAM-SHA-256"
+                         << "SCRAM-SHA-1"
+                         << "DIGEST-MD5"
+                         << "PLAIN"
+                         << "ANONYMOUS"
+                         << "X-FACEBOOK-PLATFORM"
+                         << "X-MESSENGER-OAUTH2"
+                         << "X-OAUTH2";
 }
 
 /// Creates an SASL client for the given mechanism.
 
-QXmppSaslClient* QXmppSaslClient::create(const QString &mechanism, QObject *parent)
+QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == "PLAIN") {
         return new QXmppSaslClientPlain(parent);
@@ -359,8 +362,7 @@ void QXmppSaslClient::setPassword(const QString &password)
 }
 
 QXmppSaslClientAnonymous::QXmppSaslClientAnonymous(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_step(0)
 {
 }
 
@@ -383,9 +385,7 @@ bool QXmppSaslClientAnonymous::respond(const QByteArray &challenge, QByteArray &
 }
 
 QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_nc("00000001")
-    , m_step(0)
+    : QXmppSaslClient(parent), m_nc("00000001"), m_step(0)
 {
     m_cnonce = generateNonce();
 }
@@ -462,8 +462,7 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
 }
 
 QXmppSaslClientFacebook::QXmppSaslClientFacebook(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_step(0)
 {
 }
 
@@ -507,8 +506,7 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
 }
 
 QXmppSaslClientGoogle::QXmppSaslClientGoogle(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_step(0)
 {
 }
 
@@ -532,8 +530,7 @@ bool QXmppSaslClientGoogle::respond(const QByteArray &challenge, QByteArray &res
 }
 
 QXmppSaslClientPlain::QXmppSaslClientPlain(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_step(0)
 {
 }
 
@@ -556,9 +553,7 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
 }
 
 QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_algorithm(algorithm)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_algorithm(algorithm), m_step(0)
 {
     Q_ASSERT(m_algorithm == QCryptographicHash::Sha1 || m_algorithm == QCryptographicHash::Sha256);
     m_nonce = generateNonce();
@@ -626,8 +621,7 @@ bool QXmppSaslClientScram::respond(const QByteArray &challenge, QByteArray &resp
 }
 
 QXmppSaslClientWindowsLive::QXmppSaslClientWindowsLive(QObject *parent)
-    : QXmppSaslClient(parent)
-    , m_step(0)
+    : QXmppSaslClient(parent), m_step(0)
 {
 }
 
@@ -660,8 +654,7 @@ public:
 };
 
 QXmppSaslServer::QXmppSaslServer(QObject *parent)
-    : QXmppLoggable(parent)
-    , d(new QXmppSaslServerPrivate)
+    : QXmppLoggable(parent), d(new QXmppSaslServerPrivate)
 {
 }
 
@@ -672,7 +665,7 @@ QXmppSaslServer::~QXmppSaslServer()
 
 /// Creates an SASL server for the given mechanism.
 
-QXmppSaslServer* QXmppSaslServer::create(const QString &mechanism, QObject *parent)
+QXmppSaslServer *QXmppSaslServer::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == "PLAIN") {
         return new QXmppSaslServerPlain(parent);
@@ -742,8 +735,7 @@ void QXmppSaslServer::setRealm(const QString &realm)
 }
 
 QXmppSaslServerAnonymous::QXmppSaslServerAnonymous(QObject *parent)
-    : QXmppSaslServer(parent)
-    , m_step(0)
+    : QXmppSaslServer(parent), m_step(0)
 {
 }
 
@@ -766,8 +758,7 @@ QXmppSaslServer::Response QXmppSaslServerAnonymous::respond(const QByteArray &re
 }
 
 QXmppSaslServerDigestMd5::QXmppSaslServerDigestMd5(QObject *parent)
-    : QXmppSaslServer(parent)
-    , m_step(0)
+    : QXmppSaslServer(parent), m_step(0)
 {
     m_nonce = generateNonce();
 }
@@ -835,8 +826,7 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
 }
 
 QXmppSaslServerPlain::QXmppSaslServerPlain(QObject *parent)
-    : QXmppSaslServer(parent)
-    , m_step(0)
+    : QXmppSaslServer(parent), m_step(0)
 {
 }
 
@@ -880,23 +870,20 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
     QMap<QByteArray, QByteArray> map;
     int startIndex = 0;
     int pos = 0;
-    while ((pos = ba.indexOf("=", startIndex)) >= 0)
-    {
+    while ((pos = ba.indexOf("=", startIndex)) >= 0) {
         // key get name and skip equals
         const QByteArray key = ba.mid(startIndex, pos - startIndex).trimmed();
         pos++;
 
         // check whether string is quoted
-        if (ba.at(pos) == '"')
-        {
+        if (ba.at(pos) == '"') {
             // skip opening quote
             pos++;
             int endPos = ba.indexOf('"', pos);
             // skip quoted quotes
             while (endPos >= 0 && ba.at(endPos - 1) == '\\')
                 endPos = ba.indexOf('"', endPos + 1);
-            if (endPos < 0)
-            {
+            if (endPos < 0) {
                 qWarning("Unfinished quoted string");
                 return map;
             }
@@ -936,13 +923,11 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
                 break;
             }
         }
-        if (quote)
-        {
+        if (quote) {
             value.replace("\\", "\\\\");
             value.replace("\"", "\\\"");
             ba.append("\"" + value + "\"");
-        }
-        else
+        } else
             ba.append(value);
     }
     return ba;

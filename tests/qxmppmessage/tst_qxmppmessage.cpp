@@ -92,12 +92,14 @@ void tst_QXmppMessage::testBasic_data()
 
     QTest::newRow("full")
         << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<subject>test subject</subject>"
-        "<body>test body &amp; stuff</body>"
-        "<thread>test thread</thread>"
-        "</message>")
+                      "<subject>test subject</subject>"
+                      "<body>test body &amp; stuff</body>"
+                      "<thread>test thread</thread>"
+                      "</message>")
         << int(QXmppMessage::Normal)
-        << "test body & stuff" << "test subject" << "test thread";
+        << "test body & stuff"
+        << "test subject"
+        << "test thread";
 }
 
 void tst_QXmppMessage::testBasic()
@@ -150,9 +152,8 @@ void tst_QXmppMessage::testUnknownXExtension()
 {
     const QByteArray xml(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<x xmlns=\"urn:xmpp:unknown:protocol\"/>"
-        "</message>"
-    );
+        "<x xmlns=\"urn:xmpp:unknown:protocol\"/>"
+        "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -163,7 +164,7 @@ void tst_QXmppMessage::testMessageAttention()
 {
     const QByteArray xml(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<attention xmlns=\"urn:xmpp:attention:0\"/>"
+        "<attention xmlns=\"urn:xmpp:attention:0\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -189,8 +190,8 @@ void tst_QXmppMessage::testMessageReceipt()
 {
     const QByteArray xml(
         "<message id=\"richard2-4.1.247\" to=\"kingrichard@royalty.england.lit/throne\" from=\"northumberland@shakespeare.lit/westminster\" type=\"normal\">"
-          "<body>My lord, dispatch; read o'er these articles.</body>"
-          "<request xmlns=\"urn:xmpp:receipts\"/>"
+        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<request xmlns=\"urn:xmpp:receipts\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -218,7 +219,7 @@ void tst_QXmppMessage::testMessageReceipt()
 
     const QByteArray receiptXml(
         "<message id=\"bi29sg183b4v\" to=\"northumberland@shakespeare.lit/westminster\" from=\"kingrichard@royalty.england.lit/throne\" type=\"normal\">"
-          "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
+        "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
         "</message>");
 
     QXmppMessage receipt;
@@ -243,7 +244,7 @@ void tst_QXmppMessage::testMessageReceipt()
 
     const QByteArray oldXml(
         "<message id=\"richard2-4.1.247\" to=\"northumberland@shakespeare.lit/westminster\" from=\"kingrichard@royalty.england.lit/throne\" type=\"normal\">"
-          "<received xmlns=\"urn:xmpp:receipts\"/>"
+        "<received xmlns=\"urn:xmpp:receipts\"/>"
         "</message>");
 
     QXmppMessage old;
@@ -272,14 +273,14 @@ void tst_QXmppMessage::testDelay_data()
 
     QTest::newRow("delay")
         << QByteArray("<message type=\"normal\">"
-        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
-        "</message>")
+                      "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
+                      "</message>")
         << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
 
     QTest::newRow("legacy")
         << QByteArray("<message type=\"normal\">"
-        "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
-        "</message>")
+                      "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
+                      "</message>")
         << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
 }
 
@@ -299,12 +300,12 @@ void tst_QXmppMessage::testDelayWithMultipleStamp()
     // the XEP-0203 should override XEP-0091's value since XEP-0091 was no more standard protocol
     QByteArray xml(
         "<message type=\"normal\">"
-            "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
-            "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
+        "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
         "</message>");
     QByteArray resultXml(
         "<message type=\"normal\">"
-            "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06.123Z\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -318,10 +319,10 @@ void tst_QXmppMessage::testExtendedAddresses()
 {
     QByteArray xml(
         "<message to=\"multicast.jabber.org\" type=\"normal\">"
-            "<addresses xmlns=\"http://jabber.org/protocol/address\">"
-                "<address desc=\"Joe Hildebrand\" jid=\"hildjj@jabber.org/Work\" type=\"to\"/>"
-                "<address desc=\"Jeremie Miller\" jid=\"jer@jabber.org/Home\" type=\"cc\"/>"
-            "</addresses>"
+        "<addresses xmlns=\"http://jabber.org/protocol/address\">"
+        "<address desc=\"Joe Hildebrand\" jid=\"hildjj@jabber.org/Work\" type=\"to\"/>"
+        "<address desc=\"Jeremie Miller\" jid=\"jer@jabber.org/Home\" type=\"cc\"/>"
+        "</addresses>"
         "</message>");
 
     QXmppMessage message;
@@ -340,7 +341,7 @@ void tst_QXmppMessage::testMucInvitation()
 {
     QByteArray xml(
         "<message to=\"hecate@shakespeare.lit\" from=\"crone1@shakespeare.lit/desktop\" type=\"normal\">"
-            "<x xmlns=\"jabber:x:conference\" jid=\"darkcave@macbeth.shakespeare.lit\" password=\"cauldronburn\" reason=\"Hey Hecate, this is the place for all good witches!\"/>"
+        "<x xmlns=\"jabber:x:conference\" jid=\"darkcave@macbeth.shakespeare.lit\" password=\"cauldronburn\" reason=\"Hey Hecate, this is the place for all good witches!\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -407,13 +408,13 @@ void tst_QXmppMessage::testState()
 void tst_QXmppMessage::testXhtml()
 {
     const QByteArray xml("<message type=\"normal\">"
-        "<body>hi!</body>"
-        "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
-        "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
-        "<p style=\"font-weight:bold\">hi!</p>"
-        "</body>"
-        "</html>"
-        "</message>");
+                         "<body>hi!</body>"
+                         "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
+                         "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+                         "<p style=\"font-weight:bold\">hi!</p>"
+                         "</body>"
+                         "</html>"
+                         "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -430,20 +431,19 @@ void tst_QXmppMessage::testSubextensions()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message id=\"aeb214\" to=\"juliet@capulet.lit/chamber\" type=\"normal\">"
-            "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
-                "<forwarded xmlns=\"urn:xmpp:forward:0\">"
-                    "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
-                    "<message from=\"juliet@capulet.lit/balcony\" "
-                             "id=\"8a54s\" "
-                             "to=\"romeo@montague.lit/orchard\" "
-                             "type=\"chat\">"
-                        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
-                    "</message>"
-                "</forwarded>"
-            "</result>"
-            "<x xmlns=\"jabber:x:new-fancy-extension\"/>"
+        "<result xmlns=\"urn:xmpp:mam:tmp\" id=\"5d398-28273-f7382\" queryid=\"f27\">"
+        "<forwarded xmlns=\"urn:xmpp:forward:0\">"
+        "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-07-10T23:09:32Z\"/>"
+        "<message from=\"juliet@capulet.lit/balcony\" "
+        "id=\"8a54s\" "
+        "to=\"romeo@montague.lit/orchard\" "
+        "type=\"chat\">"
+        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
         "</message>"
-    );
+        "</forwarded>"
+        "</result>"
+        "<x xmlns=\"jabber:x:new-fancy-extension\"/>"
+        "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -455,14 +455,14 @@ void tst_QXmppMessage::testSubextensions()
 void tst_QXmppMessage::testChatMarkers()
 {
     const QByteArray markableXml(
-                "<message "
-                    "from='northumberland@shakespeare.lit/westminster' "
-                    "id='message-1' "
-                    "to='ingrichard@royalty.england.lit/throne'>"
-                 "<thread>sleeping</thread>"
-                 "<body>My lord, dispatch; read o'er these articles.</body>"
-                 "<markable xmlns='urn:xmpp:chat-markers:0'/>"
-                "</message>");
+        "<message "
+        "from='northumberland@shakespeare.lit/westminster' "
+        "id='message-1' "
+        "to='ingrichard@royalty.england.lit/throne'>"
+        "<thread>sleeping</thread>"
+        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<markable xmlns='urn:xmpp:chat-markers:0'/>"
+        "</message>");
 
     QXmppMessage markableMessage;
     parsePacket(markableMessage, markableXml);
@@ -474,14 +474,14 @@ void tst_QXmppMessage::testChatMarkers()
     QCOMPARE(markableMessage.markedThread(), QString());
 
     const QByteArray receivedXml(
-                "<message "
-                    "from='kingrichard@royalty.england.lit/throne' "
-                    "id='message-2' "
-                    "to='northumberland@shakespeare.lit/westminster'>"
-                  "<received xmlns='urn:xmpp:chat-markers:0' "
-                               "id='message-1' "
-                           "thread='sleeping'/>"
-                "</message>");
+        "<message "
+        "from='kingrichard@royalty.england.lit/throne' "
+        "id='message-2' "
+        "to='northumberland@shakespeare.lit/westminster'>"
+        "<received xmlns='urn:xmpp:chat-markers:0' "
+        "id='message-1' "
+        "thread='sleeping'/>"
+        "</message>");
 
     QXmppMessage receivedMessage;
     parsePacket(receivedMessage, receivedXml);
@@ -493,14 +493,14 @@ void tst_QXmppMessage::testChatMarkers()
     QCOMPARE(receivedMessage.markedThread(), QString("sleeping"));
 
     const QByteArray displayedXml(
-                "<message "
-                    "from='kingrichard@royalty.england.lit/throne' "
-                    "id='message-2' "
-                    "to='northumberland@shakespeare.lit/westminster'>"
-                  "<displayed xmlns='urn:xmpp:chat-markers:0' "
-                               "id='message-1' "
-                           "thread='sleeping'/>"
-                "</message>");
+        "<message "
+        "from='kingrichard@royalty.england.lit/throne' "
+        "id='message-2' "
+        "to='northumberland@shakespeare.lit/westminster'>"
+        "<displayed xmlns='urn:xmpp:chat-markers:0' "
+        "id='message-1' "
+        "thread='sleeping'/>"
+        "</message>");
 
     QXmppMessage displayedMessage;
     parsePacket(displayedMessage, displayedXml);
@@ -512,14 +512,14 @@ void tst_QXmppMessage::testChatMarkers()
     QCOMPARE(displayedMessage.markedThread(), QString("sleeping"));
 
     const QByteArray acknowledgedXml(
-                "<message "
-                    "from='kingrichard@royalty.england.lit/throne' "
-                    "id='message-2' "
-                    "to='northumberland@shakespeare.lit/westminster'>"
-                  "<acknowledged xmlns='urn:xmpp:chat-markers:0' "
-                               "id='message-1' "
-                           "thread='sleeping'/>"
-                "</message>");
+        "<message "
+        "from='kingrichard@royalty.england.lit/throne' "
+        "id='message-2' "
+        "to='northumberland@shakespeare.lit/westminster'>"
+        "<acknowledged xmlns='urn:xmpp:chat-markers:0' "
+        "id='message-1' "
+        "thread='sleeping'/>"
+        "</message>");
 
     QXmppMessage acknowledgedMessage;
     parsePacket(acknowledgedMessage, acknowledgedXml);
@@ -531,13 +531,13 @@ void tst_QXmppMessage::testChatMarkers()
     QCOMPARE(acknowledgedMessage.markedThread(), QString("sleeping"));
 
     const QByteArray emptyThreadXml(
-                "<message "
-                    "from='kingrichard@royalty.england.lit/throne' "
-                    "id='message-2' "
-                    "to='northumberland@shakespeare.lit/westminster'>"
-                  "<received xmlns='urn:xmpp:chat-markers:0' "
-                               "id='message-1'/>"
-                "</message>");
+        "<message "
+        "from='kingrichard@royalty.england.lit/throne' "
+        "id='message-2' "
+        "to='northumberland@shakespeare.lit/westminster'>"
+        "<received xmlns='urn:xmpp:chat-markers:0' "
+        "id='message-1'/>"
+        "</message>");
 
     QXmppMessage emptyThreadMessage;
     parsePacket(emptyThreadMessage, emptyThreadXml);
@@ -549,11 +549,11 @@ void tst_QXmppMessage::testChatMarkers()
     QCOMPARE(emptyThreadMessage.markedThread(), QString());
 
     const QByteArray notMarkableSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\"/>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\"/>");
 
     QXmppMessage serialisationMessage;
     serialisationMessage.setFrom("kingrichard@royalty.england.lit/throne");
@@ -563,26 +563,26 @@ void tst_QXmppMessage::testChatMarkers()
     serializePacket(serialisationMessage, notMarkableSerialisation);
 
     const QByteArray markableSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                    "<markable xmlns=\"urn:xmpp:chat-markers:0\"/>"
-                "</message>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\">"
+        "<markable xmlns=\"urn:xmpp:chat-markers:0\"/>"
+        "</message>");
 
     serialisationMessage.setMarkable(true);
     serializePacket(serialisationMessage, markableSerialisation);
 
     const QByteArray receivedSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                    "<received xmlns=\"urn:xmpp:chat-markers:0\" "
-                               "id=\"message-2\"/>"
-                "</message>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\">"
+        "<received xmlns=\"urn:xmpp:chat-markers:0\" "
+        "id=\"message-2\"/>"
+        "</message>");
 
     serialisationMessage.setMarkable(false);
     serialisationMessage.setMarker(QXmppMessage::Received);
@@ -590,15 +590,15 @@ void tst_QXmppMessage::testChatMarkers()
     serializePacket(serialisationMessage, receivedSerialisation);
 
     const QByteArray receivedThreadSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                    "<received xmlns=\"urn:xmpp:chat-markers:0\" "
-                               "id=\"message-2\" "
-                               "thread=\"sleeping\"/>"
-                "</message>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\">"
+        "<received xmlns=\"urn:xmpp:chat-markers:0\" "
+        "id=\"message-2\" "
+        "thread=\"sleeping\"/>"
+        "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Received);
     serialisationMessage.setMarkerId("message-2");
@@ -606,15 +606,15 @@ void tst_QXmppMessage::testChatMarkers()
     serializePacket(serialisationMessage, receivedThreadSerialisation);
 
     const QByteArray displayedThreadSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                    "<displayed xmlns=\"urn:xmpp:chat-markers:0\" "
-                               "id=\"message-2\" "
-                               "thread=\"sleeping\"/>"
-                "</message>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\">"
+        "<displayed xmlns=\"urn:xmpp:chat-markers:0\" "
+        "id=\"message-2\" "
+        "thread=\"sleeping\"/>"
+        "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Displayed);
     serialisationMessage.setMarkerId("message-2");
@@ -622,15 +622,15 @@ void tst_QXmppMessage::testChatMarkers()
     serializePacket(serialisationMessage, displayedThreadSerialisation);
 
     const QByteArray acknowledgedThreadSerialisation(
-                "<message "
-                    "id=\"message-3\" "
-                    "to=\"northumberland@shakespeare.lit/westminster\" "
-                    "from=\"kingrichard@royalty.england.lit/throne\" "
-                    "type=\"chat\">"
-                    "<acknowledged xmlns=\"urn:xmpp:chat-markers:0\" "
-                               "id=\"message-2\" "
-                               "thread=\"sleeping\"/>"
-                "</message>");
+        "<message "
+        "id=\"message-3\" "
+        "to=\"northumberland@shakespeare.lit/westminster\" "
+        "from=\"kingrichard@royalty.england.lit/throne\" "
+        "type=\"chat\">"
+        "<acknowledged xmlns=\"urn:xmpp:chat-markers:0\" "
+        "id=\"message-2\" "
+        "thread=\"sleeping\"/>"
+        "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Acknowledged);
     serialisationMessage.setMarkerId("message-2");
@@ -638,15 +638,13 @@ void tst_QXmppMessage::testChatMarkers()
     serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
 }
 
-
 void tst_QXmppMessage::testPrivateMessage()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
-            "<body>My lord, dispatch; read o'er these articles.</body>"
-            "<private xmlns=\"urn:xmpp:carbons:2\"/>"
-        "</message>"
-    );
+        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<private xmlns=\"urn:xmpp:carbons:2\"/>"
+        "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -667,14 +665,13 @@ void tst_QXmppMessage::testOutOfBandUrl()
 {
     const QByteArray oobXml(
         "<message to=\"MaineBoy@jabber.org/home\" "
-                 "from=\"stpeter@jabber.org/work\" "
-                 "type=\"chat\">"
-            "<body>Yeah, but do you have a license to Jabber?</body>"
-            "<x xmlns=\"jabber:x:oob\">"
-                "<url>http://www.jabber.org/images/psa-license.jpg</url>"
-            "</x>"
-        "</message>"
-    );
+        "from=\"stpeter@jabber.org/work\" "
+        "type=\"chat\">"
+        "<body>Yeah, but do you have a license to Jabber?</body>"
+        "<x xmlns=\"jabber:x:oob\">"
+        "<url>http://www.jabber.org/images/psa-license.jpg</url>"
+        "</x>"
+        "</message>");
     const QString firstUrl = "http://www.jabber.org/images/psa-license.jpg";
     const QString newUrl = "https://xmpp.org/theme/images/xmpp-logo.svg";
 
@@ -694,8 +691,8 @@ void tst_QXmppMessage::testMessageCorrect()
 {
     const QByteArray xml(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>This is the corrected version.</body>"
-          "<replace xmlns=\"urn:xmpp:message-correct:0\" id=\"badmessage\"/>"
+        "<body>This is the corrected version.</body>"
+        "<replace xmlns=\"urn:xmpp:message-correct:0\" id=\"badmessage\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -711,8 +708,8 @@ void tst_QXmppMessage::testMessageAttaching()
 {
     const QByteArray xml(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>This is the corrected version.</body>"
-          "<attach-to xmlns=\"urn:xmpp:message-attaching:1\" id=\"SD24VCzSYQ\"/>"
+        "<body>This is the corrected version.</body>"
+        "<attach-to xmlns=\"urn:xmpp:message-attaching:1\" id=\"SD24VCzSYQ\"/>"
         "</message>");
 
     QXmppMessage message;
@@ -728,15 +725,14 @@ void tst_QXmppMessage::testMix()
 {
     const QByteArray xml(
         "<message to=\"hag66@shakespeare.example\" "
-                 "from=\"coven@mix.shakespeare.example/123456\" "
-                 "type=\"groupchat\">"
-            "<body>Harpier cries: 'tis time, 'tis time.</body>"
-            "<mix xmlns=\"urn:xmpp:mix:core:1\">"
-                "<jid>hag66@shakespeare.example</jid>"
-                "<nick>thirdwitch</nick>"
-            "</mix>"
-        "</message>"
-    );
+        "from=\"coven@mix.shakespeare.example/123456\" "
+        "type=\"groupchat\">"
+        "<body>Harpier cries: 'tis time, 'tis time.</body>"
+        "<mix xmlns=\"urn:xmpp:mix:core:1\">"
+        "<jid>hag66@shakespeare.example</jid>"
+        "<nick>thirdwitch</nick>"
+        "</mix>"
+        "</message>");
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -756,8 +752,8 @@ void tst_QXmppMessage::testEme()
     // test standard encryption: OMEMO
     const QByteArray xmlOmemo(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>This message is encrypted with OMEMO, but your client doesn't seem to support that.</body>"
-          "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
+        "<body>This message is encrypted with OMEMO, but your client doesn't seem to support that.</body>"
+        "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
         "</message>");
 
     QXmppMessage messageOmemo;
@@ -770,8 +766,8 @@ void tst_QXmppMessage::testEme()
     // test custom encryption
     const QByteArray xmlCustom(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>This message is encrypted with CustomCrypt, but your client doesn't seem to support that.</body>"
-          "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"im:example:customcrypt:1\" name=\"CustomCrypt\"/>"
+        "<body>This message is encrypted with CustomCrypt, but your client doesn't seem to support that.</body>"
+        "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"im:example:customcrypt:1\" name=\"CustomCrypt\"/>"
         "</message>");
 
     QXmppMessage messageCustom;
@@ -800,8 +796,8 @@ void tst_QXmppMessage::testSpoiler()
     // test parsing with hint
     const QByteArray xmlWithHint(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>And at the end of the story, both of them die! It is so tragic!</body>"
-          "<spoiler xmlns=\"urn:xmpp:spoiler:0\">Love story end</spoiler>"
+        "<body>And at the end of the story, both of them die! It is so tragic!</body>"
+        "<spoiler xmlns=\"urn:xmpp:spoiler:0\">Love story end</spoiler>"
         "</message>");
 
     QXmppMessage messageWithHint;
@@ -813,8 +809,8 @@ void tst_QXmppMessage::testSpoiler()
     // test parsing without hint
     const QByteArray xmlWithoutHint(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-          "<body>And at the end of the story, both of them die! It is so tragic!</body>"
-          "<spoiler xmlns=\"urn:xmpp:spoiler:0\"></spoiler>"
+        "<body>And at the end of the story, both of them die! It is so tragic!</body>"
+        "<spoiler xmlns=\"urn:xmpp:spoiler:0\"></spoiler>"
         "</message>");
 
     QXmppMessage messageWithoutHint;
@@ -838,15 +834,14 @@ void tst_QXmppMessage::testProcessingHints()
 {
     const QByteArray xml(
         "<message to=\"juliet@capulet.lit/laptop\" "
-                 "from=\"romeo@montague.lit/laptop\" "
-                 "type=\"chat\">"
-            "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
-            "<no-permanent-store xmlns=\"urn:xmpp:hints\"/>"
-            "<no-store xmlns=\"urn:xmpp:hints\"/>"
-            "<no-copy xmlns=\"urn:xmpp:hints\"/>"
-            "<store xmlns=\"urn:xmpp:hints\"/>"
-        "</message>"
-    );
+        "from=\"romeo@montague.lit/laptop\" "
+        "type=\"chat\">"
+        "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+        "<no-permanent-store xmlns=\"urn:xmpp:hints\"/>"
+        "<no-store xmlns=\"urn:xmpp:hints\"/>"
+        "<no-copy xmlns=\"urn:xmpp:hints\"/>"
+        "<store xmlns=\"urn:xmpp:hints\"/>"
+        "</message>");
 
     // test parsing
     QXmppMessage message;
@@ -884,38 +879,36 @@ void tst_QXmppMessage::testBobData()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
-            "<data xmlns=\"urn:xmpp:bob\" "
-                    "cid=\"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org\" "
-                    "max-age=\"86400\" "
-                    "type=\"image/png\">"
-                "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
-                "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
-                "RYhe2WS3MSQRCAYTf7OKY1kT0CxsRjHmh5BENIjqEk6pHVhFzdikqO7CGyP9t59Ox2z"
-                "y6UeWBVqugLzM70Nz39mqnV1lIWgBWiYXV0BYfNZ0mvwypds1r62vH/gf76ZL/88Qlc"
-                "41zeAnQrpx5H3z1Npfr5ovmHusa9SpRiNNIOcdrto6PJ5LLfb5bp9zM+VDq/vptxDEa"
-                "a1sql9I3R5KhtfQsA5gNCWYyulV3TyTUDdfL56BvdDl4x7RiybDq9uBgxh1TTPUHDvA"
-                "qNQb+LpT5sWehxJZKKcU2MZ6sDE7PMgW2mdlBGdy6ODe6fJFdMI+us95dNqftDMdwU6"
-                "+MhpuTS9slcy5TFAcwq0Jt6qssJMTQGp4BGURlmSsNoo5oHL4kqc66NdkDO75mIfCxm"
-                "RAlvHxMLdcb7JONavMJbttXXKoMSneYu3OQTlwkUh4mNayi6js55/2VcsZOQfXIYelz"
-                "xLcntEGc3WVCsCORJVCc5r0ajAcq+EO1Q0oPm7n7+X/3jEReGdL6qT7Ml6FCjY+quJC"
-                "r+D01f6BG0SaHG56ZG32DnY2jcEV1+pU0kxTaEwaGcekN7jyu50U/TV4q6YeieyiNTu"
-                "klDKZLukyjKVNwotCUB3B0XO1WjHT3c0DHSO2zACwut8GOiljJIHaJsrlof/fpWNzGM"
-                "os6TgIY0hZNpJshzSi4igOhy3cl4qK+YgnqHkAYcZEgdW6/HyrEK7afoY7RCFzArLl2"
-                "LLDdrdmmHZfROajwIDfWj8yQG+rzwlA3WvdJiMHtjUekiNrp1oCbmyZDEyKROGjFVDr"
-                "PRzlkR9UAfG/OErnPxrop5BwpoEpXQorq2zcGxbnBJndx8Bh0yljGiGv0B4E8+YP3Xp"
-                "2rGydZNy4csW8W2pIvWhvijoujRJ0luXsoymV+8AXvE9HjII72+oReS6OfomHe3xWg/"
-                "f2coSbDa1XZ1CvGMjy1nH9KBl83oPnQKi+vAXKLjCrRvvT2WCMkPmSFbquiVuTH1qjv"
-                "p4j/u7CWyI5/Hn3KAaJJ90eP0Zp1Kjets4WPaElkxheF7cpBESzXuIdLwyFjSub07tB"
-                "6JjxH3DGiu+zwHHimdtFsMvKqG/nBxm2TwbvyU6LWs5RnJX4dSldg3QhDLAAAAAElFT"
-                "kSuQmCC"
-            "</data>"
-        "</message>"
-    );
+        "<data xmlns=\"urn:xmpp:bob\" "
+        "cid=\"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org\" "
+        "max-age=\"86400\" "
+        "type=\"image/png\">"
+        "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
+        "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
+        "RYhe2WS3MSQRCAYTf7OKY1kT0CxsRjHmh5BENIjqEk6pHVhFzdikqO7CGyP9t59Ox2z"
+        "y6UeWBVqugLzM70Nz39mqnV1lIWgBWiYXV0BYfNZ0mvwypds1r62vH/gf76ZL/88Qlc"
+        "41zeAnQrpx5H3z1Npfr5ovmHusa9SpRiNNIOcdrto6PJ5LLfb5bp9zM+VDq/vptxDEa"
+        "a1sql9I3R5KhtfQsA5gNCWYyulV3TyTUDdfL56BvdDl4x7RiybDq9uBgxh1TTPUHDvA"
+        "qNQb+LpT5sWehxJZKKcU2MZ6sDE7PMgW2mdlBGdy6ODe6fJFdMI+us95dNqftDMdwU6"
+        "+MhpuTS9slcy5TFAcwq0Jt6qssJMTQGp4BGURlmSsNoo5oHL4kqc66NdkDO75mIfCxm"
+        "RAlvHxMLdcb7JONavMJbttXXKoMSneYu3OQTlwkUh4mNayi6js55/2VcsZOQfXIYelz"
+        "xLcntEGc3WVCsCORJVCc5r0ajAcq+EO1Q0oPm7n7+X/3jEReGdL6qT7Ml6FCjY+quJC"
+        "r+D01f6BG0SaHG56ZG32DnY2jcEV1+pU0kxTaEwaGcekN7jyu50U/TV4q6YeieyiNTu"
+        "klDKZLukyjKVNwotCUB3B0XO1WjHT3c0DHSO2zACwut8GOiljJIHaJsrlof/fpWNzGM"
+        "os6TgIY0hZNpJshzSi4igOhy3cl4qK+YgnqHkAYcZEgdW6/HyrEK7afoY7RCFzArLl2"
+        "LLDdrdmmHZfROajwIDfWj8yQG+rzwlA3WvdJiMHtjUekiNrp1oCbmyZDEyKROGjFVDr"
+        "PRzlkR9UAfG/OErnPxrop5BwpoEpXQorq2zcGxbnBJndx8Bh0yljGiGv0B4E8+YP3Xp"
+        "2rGydZNy4csW8W2pIvWhvijoujRJ0luXsoymV+8AXvE9HjII72+oReS6OfomHe3xWg/"
+        "f2coSbDa1XZ1CvGMjy1nH9KBl83oPnQKi+vAXKLjCrRvvT2WCMkPmSFbquiVuTH1qjv"
+        "p4j/u7CWyI5/Hn3KAaJJ90eP0Zp1Kjets4WPaElkxheF7cpBESzXuIdLwyFjSub07tB"
+        "6JjxH3DGiu+zwHHimdtFsMvKqG/nBxm2TwbvyU6LWs5RnJX4dSldg3QhDLAAAAAElFT"
+        "kSuQmCC"
+        "</data>"
+        "</message>");
 
     QXmppBitsOfBinaryData data;
     data.setCid(QXmppBitsOfBinaryContentId::fromContentId(
-        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")
-    ));
+        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")));
     data.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
     data.setData(QByteArray::fromBase64(QByteArrayLiteral(
         "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
@@ -937,8 +930,7 @@ void tst_QXmppMessage::testBobData()
         "f2coSbDa1XZ1CvGMjy1nH9KBl83oPnQKi+vAXKLjCrRvvT2WCMkPmSFbquiVuTH1qjv"
         "p4j/u7CWyI5/Hn3KAaJJ90eP0Zp1Kjets4WPaElkxheF7cpBESzXuIdLwyFjSub07tB"
         "6JjxH3DGiu+zwHHimdtFsMvKqG/nBxm2TwbvyU6LWs5RnJX4dSldg3QhDLAAAAAElFT"
-        "kSuQmCC"
-    )));
+        "kSuQmCC")));
     data.setMaxAge(86400);
 
     QXmppMessage message;

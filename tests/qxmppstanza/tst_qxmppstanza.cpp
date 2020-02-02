@@ -82,16 +82,15 @@ void tst_QXmppStanza::testErrorFileTooLarge()
 {
     const QByteArray xml(
         "<error type=\"modify\">"
-          "<not-acceptable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
-          "<text xml:lang=\"en\" "
-                "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
-            "File too large. The maximum file size is 20000 bytes"
-          "</text>"
-          "<file-too-large xmlns=\"urn:xmpp:http:upload:0\">"
-            "<max-file-size>20000</max-file-size>"
-          "</file-too-large>"
-        "</error>"
-    );
+        "<not-acceptable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "<text xml:lang=\"en\" "
+        "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
+        "File too large. The maximum file size is 20000 bytes"
+        "</text>"
+        "<file-too-large xmlns=\"urn:xmpp:http:upload:0\">"
+        "<max-file-size>20000</max-file-size>"
+        "</file-too-large>"
+        "</error>");
 
     QXmppStanza::Error error;
     parsePacket(error, xml);
@@ -118,16 +117,15 @@ void tst_QXmppStanza::testErrorRetry()
 {
     const QByteArray xml(
         "<error type=\"wait\">"
-          "<resource-constraint "
-            "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
-          "<text xml:lang=\"en\" "
-                "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
-            "Quota reached. You can only upload 5 files in 5 minutes"
-          "</text>"
-          "<retry xmlns=\"urn:xmpp:http:upload:0\" "
-                 "stamp=\"2017-12-03T23:42:05Z\"/>"
-        "</error>"
-    );
+        "<resource-constraint "
+        "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "<text xml:lang=\"en\" "
+        "xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
+        "Quota reached. You can only upload 5 files in 5 minutes"
+        "</text>"
+        "<retry xmlns=\"urn:xmpp:http:upload:0\" "
+        "stamp=\"2017-12-03T23:42:05Z\"/>"
+        "</error>");
 
     QXmppStanza::Error error;
     parsePacket(error, xml);
@@ -135,8 +133,7 @@ void tst_QXmppStanza::testErrorRetry()
     QCOMPARE(error.text(), QString("Quota reached. You can only upload 5 "
                                    "files in 5 minutes"));
     QCOMPARE(error.condition(), QXmppStanza::Error::ResourceConstraint);
-    QCOMPARE(error.retryDate(), QDateTime(QDate(2017, 12, 03),
-                                          QTime(23, 42, 05), Qt::UTC));
+    QCOMPARE(error.retryDate(), QDateTime(QDate(2017, 12, 03), QTime(23, 42, 05), Qt::UTC));
     serializePacket(error, xml);
 
     // test setter

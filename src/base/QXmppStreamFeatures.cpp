@@ -29,11 +29,11 @@
 
 QXmppStreamFeatures::QXmppStreamFeatures()
     : m_bindMode(Disabled),
-    m_sessionMode(Disabled),
-    m_nonSaslAuthMode(Disabled),
-    m_tlsMode(Disabled),
-    m_streamManagementMode(Disabled),
-    m_csiMode(Disabled)
+      m_sessionMode(Disabled),
+      m_nonSaslAuthMode(Disabled),
+      m_tlsMode(Disabled),
+      m_streamManagementMode(Disabled),
+      m_csiMode(Disabled)
 {
 }
 
@@ -131,7 +131,7 @@ void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &regis
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
     return element.namespaceURI() == ns_stream &&
-           element.tagName() == "features";
+        element.tagName() == "features";
 }
 
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
@@ -139,8 +139,7 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
     QDomElement subElement = element.firstChildElement(tagName);
     QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
     while (!subElement.isNull()) {
-        if (subElement.namespaceURI() == tagNs)
-        {
+        if (subElement.namespaceURI() == tagNs) {
             if (!subElement.firstChildElement("required").isNull())
                 mode = QXmppStreamFeatures::Required;
             else if (mode != QXmppStreamFeatures::Required)
@@ -163,11 +162,9 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
-    if (compression.namespaceURI() == ns_compressFeature)
-    {
+    if (compression.namespaceURI() == ns_compressFeature) {
         QDomElement subElement = compression.firstChildElement("method");
-        while(!subElement.isNull())
-        {
+        while (!subElement.isNull()) {
             m_compressionMethods << subElement.text();
             subElement = subElement.nextSiblingElement("method");
         }
@@ -175,10 +172,9 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
     // parse advertised SASL Authentication mechanisms
     QDomElement mechs = element.firstChildElement("mechanisms");
-    if (mechs.namespaceURI() == ns_sasl)
-    {
+    if (mechs.namespaceURI() == ns_sasl) {
         QDomElement subElement = mechs.firstChildElement("mechanism");
-        while(!subElement.isNull()) {
+        while (!subElement.isNull()) {
             m_authMechanisms << subElement.text();
             subElement = subElement.nextSiblingElement("mechanism");
         }
@@ -187,8 +183,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
 static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const char *tagNs, QXmppStreamFeatures::Mode mode)
 {
-    if (mode != QXmppStreamFeatures::Disabled)
-    {
+    if (mode != QXmppStreamFeatures::Disabled) {
         writer->writeStartElement(tagName);
         writer->writeDefaultNamespace(tagNs);
         if (mode == QXmppStreamFeatures::Required)
@@ -208,20 +203,18 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "csi", ns_csi, m_csiMode);
     writeFeature(writer, "register", ns_register_feature, m_registerMode);
 
-    if (!m_compressionMethods.isEmpty())
-    {
+    if (!m_compressionMethods.isEmpty()) {
         writer->writeStartElement("compression");
         writer->writeDefaultNamespace(ns_compressFeature);
         for (const auto &method : m_compressionMethods)
             writer->writeTextElement("method", method);
         writer->writeEndElement();
     }
-    if (!m_authMechanisms.isEmpty())
-    {
+    if (!m_authMechanisms.isEmpty()) {
         writer->writeStartElement("mechanisms");
         writer->writeDefaultNamespace(ns_sasl);
         for (const auto &mechanism : m_authMechanisms)
-            writer->writeTextElement("mechanism",  mechanism);
+            writer->writeTextElement("mechanism", mechanism);
         writer->writeEndElement();
     }
     writer->writeEndElement();

@@ -80,4 +80,3 @@ void QXmppClientExtension::setClient(QXmppClient *client)
 {
     d->client = client;
 }
-

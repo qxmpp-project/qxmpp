@@ -79,16 +79,18 @@ void tst_QXmppPresence::testPresence_data()
 
     // photo
     QTest::newRow("vcard-photo") << QByteArray(
-        "<presence>"
-        "<x xmlns=\"vcard-temp:x:update\">"
-        "<photo>73b908bc</photo>"
-        "</x>"
-        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateValidPhoto) << QByteArray::fromHex("73b908bc");
+                                        "<presence>"
+                                        "<x xmlns=\"vcard-temp:x:update\">"
+                                        "<photo>73b908bc</photo>"
+                                        "</x>"
+                                        "</presence>")
+                                 << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateValidPhoto) << QByteArray::fromHex("73b908bc");
 
     QTest::newRow("vard-not-ready") << QByteArray(
-        "<presence>"
-        "<x xmlns=\"vcard-temp:x:update\"/>"
-        "</presence>") << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNotReady) << QByteArray();
+                                           "<presence>"
+                                           "<x xmlns=\"vcard-temp:x:update\"/>"
+                                           "</presence>")
+                                    << int(QXmppPresence::Available) << 0 << int(QXmppPresence::Online) << "" << int(QXmppPresence::VCardUpdateNotReady) << QByteArray();
 }
 
 void tst_QXmppPresence::testPresence()
@@ -129,16 +131,15 @@ void tst_QXmppPresence::testPresenceWithCapability()
 {
     const QByteArray xml(
         "<presence to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\">"
-            "<show>away</show>"
-            "<status>In a meeting</status>"
-            "<priority>5</priority>"
-            "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"https://github.com/qxmpp-project/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
-            "<x xmlns=\"vcard-temp:x:update\">"
-                "<photo>73b908bc</photo>"
-            "</x>"
-            "<x xmlns=\"urn:other:namespace\"/>"
-        "</presence>"
-    );
+        "<show>away</show>"
+        "<status>In a meeting</status>"
+        "<priority>5</priority>"
+        "<c xmlns=\"http://jabber.org/protocol/caps\" hash=\"sha-1\" node=\"https://github.com/qxmpp-project/qxmpp\" ver=\"QgayPKawpkPSDYmwT/WM94uAlu0=\"/>"
+        "<x xmlns=\"vcard-temp:x:update\">"
+        "<photo>73b908bc</photo>"
+        "</x>"
+        "<x xmlns=\"urn:other:namespace\"/>"
+        "</presence>");
 
     // test parsing and serialization after parsing
     QXmppPresence presence;
@@ -183,10 +184,10 @@ void tst_QXmppPresence::testPresenceWithExtendedAddresses()
 {
     const QByteArray xml(
         "<presence to=\"multicast.jabber.org\" from=\"hildjj@jabber.com\" type=\"unavailable\">"
-            "<addresses xmlns=\"http://jabber.org/protocol/address\">"
-                "<address jid=\"temas@jabber.org\" type=\"bcc\"/>"
-                "<address jid=\"jer@jabber.org\" type=\"bcc\"/>"
-            "</addresses>"
+        "<addresses xmlns=\"http://jabber.org/protocol/address\">"
+        "<address jid=\"temas@jabber.org\" type=\"bcc\"/>"
+        "<address jid=\"jer@jabber.org\" type=\"bcc\"/>"
+        "</addresses>"
         "</presence>");
 
     QXmppPresence presence;
@@ -205,15 +206,15 @@ void tst_QXmppPresence::testPresenceWithMucItem()
 {
     const QByteArray xml(
         "<presence to=\"pistol@shakespeare.lit/harfleur\" "
-                  "from=\"harfleur@henryv.shakespeare.lit/pistol\" "
-                  "type=\"unavailable\">"
-            "<x xmlns=\"http://jabber.org/protocol/muc#user\">"
-                "<item affiliation=\"none\" role=\"none\">"
-                    "<actor jid=\"fluellen@shakespeare.lit\"/>"
-                    "<reason>Avaunt, you cullion!</reason>"
-                "</item>"
-                "<status code=\"307\"/>"
-            "</x>"
+        "from=\"harfleur@henryv.shakespeare.lit/pistol\" "
+        "type=\"unavailable\">"
+        "<x xmlns=\"http://jabber.org/protocol/muc#user\">"
+        "<item affiliation=\"none\" role=\"none\">"
+        "<actor jid=\"fluellen@shakespeare.lit\"/>"
+        "<reason>Avaunt, you cullion!</reason>"
+        "</item>"
+        "<status code=\"307\"/>"
+        "</x>"
         "</presence>");
 
     QXmppPresence presence;
@@ -234,10 +235,10 @@ void tst_QXmppPresence::testPresenceWithMucPassword()
 {
     const QByteArray xml(
         "<presence to=\"coven@chat.shakespeare.lit/thirdwitch\" "
-                  "from=\"hag66@shakespeare.lit/pda\">"
-            "<x xmlns=\"http://jabber.org/protocol/muc\">"
-                "<password>pass</password>"
-            "</x>"
+        "from=\"hag66@shakespeare.lit/pda\">"
+        "<x xmlns=\"http://jabber.org/protocol/muc\">"
+        "<password>pass</password>"
+        "</x>"
         "</presence>");
 
     QXmppPresence presence;
@@ -254,8 +255,8 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
 {
     const QByteArray xml(
         "<presence to=\"coven@chat.shakespeare.lit/thirdwitch\" "
-                  "from=\"hag66@shakespeare.lit/pda\">"
-            "<x xmlns=\"http://jabber.org/protocol/muc\"/>"
+        "from=\"hag66@shakespeare.lit/pda\">"
+        "<x xmlns=\"http://jabber.org/protocol/muc\"/>"
         "</presence>");
 
     QXmppPresence presence;
@@ -272,16 +273,15 @@ void tst_QXmppPresence::testPresenceWithLastUserInteraction()
 {
     const QByteArray xml(
         "<presence to=\"coven@chat.shakespeare.lit/thirdwitch\" "
-                  "from=\"hag66@shakespeare.lit/pda\">"
-            "<idle xmlns=\"urn:xmpp:idle:1\" since=\"1969-07-21T02:56:15Z\"/>"
+        "from=\"hag66@shakespeare.lit/pda\">"
+        "<idle xmlns=\"urn:xmpp:idle:1\" since=\"1969-07-21T02:56:15Z\"/>"
         "</presence>");
 
     QXmppPresence presence;
     parsePacket(presence, xml);
     QVERIFY(!presence.lastUserInteraction().isNull());
     QVERIFY(presence.lastUserInteraction().isValid());
-    QCOMPARE(presence.lastUserInteraction(), QDateTime(QDate(1969, 7, 21),
-             QTime(2, 56, 15), Qt::UTC));
+    QCOMPARE(presence.lastUserInteraction(), QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), Qt::UTC));
     serializePacket(presence, xml);
 
     QDateTime another(QDate(2025, 2, 5), QTime(15, 32, 8), Qt::UTC);
@@ -293,15 +293,14 @@ void tst_QXmppPresence::testPresenceWithMix()
 {
     const QByteArray xml(
         "<presence to=\"hag99@shakespeare.example\" "
-                  "from=\"123435#coven@mix.shakespeare.example/UUID-a1j/7533\">"
-            "<show>dnd</show>"
-            "<status>Making a Brew</status>"
-            "<mix xmlns=\"urn:xmpp:presence:0\">"
-                "<jid>hecate@shakespeare.example/UUID-x4r/2491</jid>"
-                "<nick>thirdwitch</nick>"
-            "</mix>"
-        "</presence>"
-    );
+        "from=\"123435#coven@mix.shakespeare.example/UUID-a1j/7533\">"
+        "<show>dnd</show>"
+        "<status>Making a Brew</status>"
+        "<mix xmlns=\"urn:xmpp:presence:0\">"
+        "<jid>hecate@shakespeare.example/UUID-x4r/2491</jid>"
+        "<nick>thirdwitch</nick>"
+        "</mix>"
+        "</presence>");
 
     QXmppPresence presence;
     parsePacket(presence, xml);

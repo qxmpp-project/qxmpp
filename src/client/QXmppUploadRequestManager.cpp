@@ -214,7 +214,7 @@ void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 
     for (const QXmppDiscoveryIq::Identity &identity : iq.identities()) {
         if (identity.category() == QStringLiteral("store") &&
-                identity.type() == QStringLiteral("file")) {
+            identity.type() == QStringLiteral("file")) {
             QXmppUploadService service;
             service.setJid(iq.from());
 
@@ -246,7 +246,7 @@ void QXmppUploadRequestManager::setClient(QXmppClient *client)
                 this, &QXmppUploadRequestManager::handleDiscoInfo);
 
         // on client disconnect remove all upload services
-        connect(client, &QXmppClient::disconnected, [=] () {
+        connect(client, &QXmppClient::disconnected, [=]() {
             d->uploadServices.clear();
             emit serviceFoundChanged();
         });

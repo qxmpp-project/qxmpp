@@ -149,4 +149,3 @@ void QXmppServerExtension::setServer(QXmppServer *server)
 {
     d->server = server;
 }
-

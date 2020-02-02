@@ -39,10 +39,10 @@ private slots:
 void tst_QXmppEntityTimeIq::testEntityTimeGet()
 {
     const QByteArray xml("<iq id=\"time_1\" "
-        "to=\"juliet@capulet.com/balcony\" "
-        "from=\"romeo@montague.net/orchard\" type=\"get\">"
-      "<time xmlns=\"urn:xmpp:time\"/>"
-    "</iq>");
+                         "to=\"juliet@capulet.com/balcony\" "
+                         "from=\"romeo@montague.net/orchard\" type=\"get\">"
+                         "<time xmlns=\"urn:xmpp:time\"/>"
+                         "</iq>");
 
     QXmppEntityTimeIq entityTime;
     parsePacket(entityTime, xml);
@@ -56,12 +56,12 @@ void tst_QXmppEntityTimeIq::testEntityTimeGet()
 void tst_QXmppEntityTimeIq::testEntityTimeResult()
 {
     const QByteArray xml(
-    "<iq id=\"time_1\" to=\"romeo@montague.net/orchard\" from=\"juliet@capulet.com/balcony\" type=\"result\">"
-      "<time xmlns=\"urn:xmpp:time\">"
+        "<iq id=\"time_1\" to=\"romeo@montague.net/orchard\" from=\"juliet@capulet.com/balcony\" type=\"result\">"
+        "<time xmlns=\"urn:xmpp:time\">"
         "<tzo>-06:00</tzo>"
         "<utc>2006-12-19T17:58:35Z</utc>"
-      "</time>"
-    "</iq>");
+        "</time>"
+        "</iq>");
 
     QXmppEntityTimeIq entityTime;
     parsePacket(entityTime, xml);

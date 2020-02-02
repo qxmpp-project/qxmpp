@@ -43,15 +43,14 @@ void tst_QXmppHttpUploadIq::testRequest()
 {
     const QByteArray xml(
         "<iq id=\"step_03\" "
-            "to=\"upload.montague.tld\" "
-            "from=\"romeo@montague.tld/garden\" "
-            "type=\"get\">"
-            "<request xmlns=\"urn:xmpp:http:upload:0\" "
-                     "filename=\"très cool.jpg\" "
-                     "size=\"23456\" "
-                     "content-type=\"image/jpeg\"/>"
-        "</iq>"
-    );
+        "to=\"upload.montague.tld\" "
+        "from=\"romeo@montague.tld/garden\" "
+        "type=\"get\">"
+        "<request xmlns=\"urn:xmpp:http:upload:0\" "
+        "filename=\"très cool.jpg\" "
+        "size=\"23456\" "
+        "content-type=\"image/jpeg\"/>"
+        "</iq>");
 
     QXmppHttpUploadRequestIq iq;
     parsePacket(iq, xml);
@@ -102,20 +101,19 @@ void tst_QXmppHttpUploadIq::testSlot()
 {
     const QByteArray xml(
         "<iq id=\"step_03\" "
-            "to=\"romeo@montague.tld/garden\" "
-            "from=\"upload.montague.tld\" "
-            "type=\"result\">"
-            "<slot xmlns=\"urn:xmpp:http:upload:0\">"
-                "<put url=\"https://upload.montague.tld/4a771ac1-f0b2-4a4a-970"
-                           "0-f2a26fa2bb67/tr%C3%A8s%20cool.jpg\">"
-                    "<header name=\"Authorization\">Basic Base64String==</header>"
-                    "<header name=\"Cookie\">foo=bar; user=romeo</header>"
-                "</put>"
-                "<get url=\"https://download.montague.tld/4a771ac1-f0b2-4a4a-9"
-                           "700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg\"/>"
-            "</slot>"
-        "</iq>"
-    );
+        "to=\"romeo@montague.tld/garden\" "
+        "from=\"upload.montague.tld\" "
+        "type=\"result\">"
+        "<slot xmlns=\"urn:xmpp:http:upload:0\">"
+        "<put url=\"https://upload.montague.tld/4a771ac1-f0b2-4a4a-970"
+        "0-f2a26fa2bb67/tr%C3%A8s%20cool.jpg\">"
+        "<header name=\"Authorization\">Basic Base64String==</header>"
+        "<header name=\"Cookie\">foo=bar; user=romeo</header>"
+        "</put>"
+        "<get url=\"https://download.montague.tld/4a771ac1-f0b2-4a4a-9"
+        "700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg\"/>"
+        "</slot>"
+        "</iq>");
 
     QXmppHttpUploadSlotIq iq;
     parsePacket(iq, xml);
@@ -137,7 +135,6 @@ void tst_QXmppHttpUploadIq::testSlot()
     QMap<QString, QString> emptyMap;
     iq.setPutHeaders(emptyMap);
     QCOMPARE(iq.putHeaders(), emptyMap);
-
 }
 
 void tst_QXmppHttpUploadIq::testIsSlot_data()

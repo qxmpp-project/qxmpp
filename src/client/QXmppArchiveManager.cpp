@@ -42,22 +42,17 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
         return false;
 
     // XEP-0136: Message Archiving
-    if(QXmppArchiveChatIq::isArchiveChatIq(element))
-    {
+    if (QXmppArchiveChatIq::isArchiveChatIq(element)) {
         QXmppArchiveChatIq archiveIq;
         archiveIq.parse(element);
         emit archiveChatReceived(archiveIq.chat(), archiveIq.resultSetReply());
         return true;
-    }
-    else if(QXmppArchiveListIq::isArchiveListIq(element))
-    {
+    } else if (QXmppArchiveListIq::isArchiveListIq(element)) {
         QXmppArchiveListIq archiveIq;
         archiveIq.parse(element);
         emit archiveListReceived(archiveIq.chats(), archiveIq.resultSetReply());
         return true;
-    }
-    else if(QXmppArchivePrefIq::isArchivePrefIq(element))
-    {
+    } else if (QXmppArchivePrefIq::isArchivePrefIq(element)) {
         // TODO: handle preference iq
         QXmppArchivePrefIq archiveIq;
         archiveIq.parse(element);
@@ -76,8 +71,8 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 /// \param end Optional end time.
 /// \param rsm Optional Result Set Management query
 ///
-void QXmppArchiveManager::listCollections(const QString& jid, const QDateTime& start,
-                                          const QDateTime& end, const QXmppResultSetQuery &rsm)
+void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &start,
+                                          const QDateTime &end, const QXmppResultSetQuery &rsm)
 {
     QXmppArchiveListIq packet;
     packet.setResultSetQuery(rsm);
@@ -102,7 +97,6 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
     rsm.setMax(max);
     listCollections(jid, start, end, rsm);
 }
-
 
 /// Removes the specified collection(s).
 ///

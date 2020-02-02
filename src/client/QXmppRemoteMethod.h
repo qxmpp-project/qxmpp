@@ -24,15 +24,15 @@
 #ifndef QXMPPREMOTEMETHOD_H
 #define QXMPPREMOTEMETHOD_H
 
+#include "QXmppRpcIq.h"
+
 #include <QObject>
 #include <QVariant>
-
-#include "QXmppRpcIq.h"
 
 class QXmppClient;
 
 struct QXmppRemoteMethodResult {
-    QXmppRemoteMethodResult() : hasError(false), code(0) {}
+    QXmppRemoteMethodResult() : hasError(false), code(0) { }
     bool hasError;
     int code;
     QString errorMessage;

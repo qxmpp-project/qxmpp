@@ -51,17 +51,56 @@ void tst_QXmppVCardIq::testAddress_data()
     QTest::addColumn<QString>("street");
     QTest::addColumn<bool>("equalsEmpty");
 
-    QTest::newRow("none") << QByteArray("<ADR/>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << "" << true;
-    QTest::newRow("HOME") << QByteArray("<ADR><HOME/></ADR>") << int(QXmppVCardAddress::Home) << "" << "" << "" << "" << "" << false;
-    QTest::newRow("WORK") << QByteArray("<ADR><WORK/></ADR>") << int(QXmppVCardAddress::Work) << "" << "" << "" << "" << "" << false;
-    QTest::newRow("POSTAL") << QByteArray("<ADR><POSTAL/></ADR>") << int(QXmppVCardAddress::Postal) << "" << "" << "" << "" << "" << false;
-    QTest::newRow("PREF") << QByteArray("<ADR><PREF/></ADR>") << int(QXmppVCardAddress::Preferred) << "" << "" << "" << "" << "" << false;
+    QTest::newRow("none") << QByteArray("<ADR/>") << int(QXmppVCardAddress::None) << ""
+                          << ""
+                          << ""
+                          << ""
+                          << "" << true;
+    QTest::newRow("HOME") << QByteArray("<ADR><HOME/></ADR>") << int(QXmppVCardAddress::Home) << ""
+                          << ""
+                          << ""
+                          << ""
+                          << "" << false;
+    QTest::newRow("WORK") << QByteArray("<ADR><WORK/></ADR>") << int(QXmppVCardAddress::Work) << ""
+                          << ""
+                          << ""
+                          << ""
+                          << "" << false;
+    QTest::newRow("POSTAL") << QByteArray("<ADR><POSTAL/></ADR>") << int(QXmppVCardAddress::Postal) << ""
+                            << ""
+                            << ""
+                            << ""
+                            << "" << false;
+    QTest::newRow("PREF") << QByteArray("<ADR><PREF/></ADR>") << int(QXmppVCardAddress::Preferred) << ""
+                          << ""
+                          << ""
+                          << ""
+                          << "" << false;
 
-    QTest::newRow("country") << QByteArray("<ADR><CTRY>France</CTRY></ADR>") << int(QXmppVCardAddress::None) << "France" << "" << "" << "" << "" << false;
-    QTest::newRow("locality") << QByteArray("<ADR><LOCALITY>Paris</LOCALITY></ADR>") << int(QXmppVCardAddress::None) << "" << "Paris" << "" << "" << "" << false;
-    QTest::newRow("postcode") << QByteArray("<ADR><PCODE>75008</PCODE></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "75008" << "" << "" << false;
-    QTest::newRow("region") << QByteArray("<ADR><REGION>Ile de France</REGION></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "Ile de France" << "" << false;
-    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << QString::fromUtf8("55 rue du faubourg Saint-Honoré") << false;
+    QTest::newRow("country") << QByteArray("<ADR><CTRY>France</CTRY></ADR>") << int(QXmppVCardAddress::None) << "France"
+                             << ""
+                             << ""
+                             << ""
+                             << "" << false;
+    QTest::newRow("locality") << QByteArray("<ADR><LOCALITY>Paris</LOCALITY></ADR>") << int(QXmppVCardAddress::None) << ""
+                              << "Paris"
+                              << ""
+                              << ""
+                              << "" << false;
+    QTest::newRow("postcode") << QByteArray("<ADR><PCODE>75008</PCODE></ADR>") << int(QXmppVCardAddress::None) << ""
+                              << ""
+                              << "75008"
+                              << ""
+                              << "" << false;
+    QTest::newRow("region") << QByteArray("<ADR><REGION>Ile de France</REGION></ADR>") << int(QXmppVCardAddress::None) << ""
+                            << ""
+                            << ""
+                            << "Ile de France"
+                            << "" << false;
+    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << ""
+                            << ""
+                            << ""
+                            << "" << QString::fromUtf8("55 rue du faubourg Saint-Honoré") << false;
 }
 
 void tst_QXmppVCardIq::testAddress()
@@ -153,7 +192,6 @@ void tst_QXmppVCardIq::testPhone()
     serializePacket(phone, xml);
 }
 
-
 void tst_QXmppVCardIq::testVCard()
 {
     const QByteArray xml(
@@ -169,17 +207,17 @@ void tst_QXmppVCardIq::testVCard()
         "<TEL><HOME/><NUMBER>12345</NUMBER></TEL>"
         "<TEL><WORK/><NUMBER>67890</NUMBER></TEL>"
         "<PHOTO>"
-            "<TYPE>image/png</TYPE>"
-            "<BINVAL>"
-            "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
-            "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
-            "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
-            "</BINVAL>"
+        "<TYPE>image/png</TYPE>"
+        "<BINVAL>"
+        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+        "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+        "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"
+        "</BINVAL>"
         "</PHOTO>"
         "<URL>https://github.com/qxmpp-project/qxmpp/</URL>"
         "<ORG>"
-            "<ORGNAME>QXmpp foundation</ORGNAME>"
-            "<ORGUNIT>Main QXmpp dev unit</ORGUNIT>"
+        "<ORGNAME>QXmpp foundation</ORGNAME>"
+        "<ORGUNIT>Main QXmpp dev unit</ORGUNIT>"
         "</ORG>"
         "<TITLE>Executive Director</TITLE>"
         "<ROLE>Patron Saint</ROLE>"
@@ -207,10 +245,9 @@ void tst_QXmppVCardIq::testVCard()
     QCOMPARE(int(vcard.phones()[0].type()), int(QXmppVCardEmail::Home));
     QCOMPARE(vcard.phones()[1].number(), QLatin1String("67890"));
     QCOMPARE(int(vcard.phones()[1].type()), int(QXmppVCardEmail::Work));
-    QCOMPARE(vcard.photo(), QByteArray::fromBase64(
-        "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
-        "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
-        "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
+    QCOMPARE(vcard.photo(), QByteArray::fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAAXNSR0IArs4c6QAAAAlwSFlzAAA"
+                                                   "UIgAAFCIBjw1HyAAAAAd0SU1FB9oIHQInNvuJovgAAAAiSURBVAjXY2TQ+s/AwMDAwPD/GiMDlP"
+                                                   "WfgYGBiQEHGJwSAK2BBQ1f3uvpAAAAAElFTkSuQmCC"));
     QCOMPARE(vcard.photoType(), QLatin1String("image/png"));
     QCOMPARE(vcard.url(), QLatin1String("https://github.com/qxmpp-project/qxmpp/"));
 

@@ -66,7 +66,7 @@ bool QXmppPrivateStorageIq::isPrivateStorageIq(const QDomElement &element)
 {
     const QDomElement queryElement = element.firstChildElement("query");
     return queryElement.namespaceURI() == ns_private &&
-           QXmppBookmarkSet::isBookmarkSet(queryElement.firstChildElement());
+        QXmppBookmarkSet::isBookmarkSet(queryElement.firstChildElement());
 }
 
 void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)
@@ -150,35 +150,29 @@ void QXmppBookmarkManager::setClient(QXmppClient *client)
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::connected,
-                    this, &QXmppBookmarkManager::slotConnected);
+            this, &QXmppBookmarkManager::slotConnected);
 
     connect(client, &QXmppClient::disconnected,
-                    this, &QXmppBookmarkManager::slotDisconnected);
+            this, &QXmppBookmarkManager::slotDisconnected);
 }
 
 bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() == "iq")
-    {
-        if (QXmppPrivateStorageIq::isPrivateStorageIq(stanza))
-        {
+    if (stanza.tagName() == "iq") {
+        if (QXmppPrivateStorageIq::isPrivateStorageIq(stanza)) {
             QXmppPrivateStorageIq iq;
             iq.parse(stanza);
 
-            if (iq.type() == QXmppIq::Result)
-            {
+            if (iq.type() == QXmppIq::Result) {
                 d->bookmarks = iq.bookmarks();
                 d->bookmarksReceived = true;
                 emit bookmarksReceived(d->bookmarks);
             }
             return true;
-        }
-        else if (!d->pendingId.isEmpty() && stanza.attribute("id") == d->pendingId)
-        {
+        } else if (!d->pendingId.isEmpty() && stanza.attribute("id") == d->pendingId) {
             QXmppIq iq;
             iq.parse(stanza);
-            if (iq.type() == QXmppIq::Result)
-            {
+            if (iq.type() == QXmppIq::Result) {
                 d->bookmarks = d->pendingBookmarks;
                 emit bookmarksReceived(d->bookmarks);
             }
@@ -202,4 +196,3 @@ void QXmppBookmarkManager::slotDisconnected()
     d->bookmarks = QXmppBookmarkSet();
     d->bookmarksReceived = false;
 }
-

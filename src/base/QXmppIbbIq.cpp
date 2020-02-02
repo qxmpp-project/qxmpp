@@ -38,17 +38,17 @@ long QXmppIbbOpenIq::blockSize() const
     return m_block_size;
 }
 
-void QXmppIbbOpenIq::setBlockSize( long block_size )
+void QXmppIbbOpenIq::setBlockSize(long block_size)
 {
     m_block_size = block_size;
 }
 
 QString QXmppIbbOpenIq::sid() const
 {
-   return  m_sid;
+    return m_sid;
 }
 
-void QXmppIbbOpenIq::setSid( const QString &sid )
+void QXmppIbbOpenIq::setSid(const QString &sid)
 {
     m_sid = sid;
 }
@@ -63,31 +63,30 @@ bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
 void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement openElement = element.firstChildElement("open");
-    m_sid = openElement.attribute( "sid" );
-    m_block_size = openElement.attribute( "block-size" ).toLong();
+    m_sid = openElement.attribute("sid");
+    m_block_size = openElement.attribute("block-size").toLong();
 }
 
 void QXmppIbbOpenIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("open");
     writer->writeDefaultNamespace(ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
-    writer->writeAttribute( "block-size",QString::number(m_block_size) );
+    writer->writeAttribute("sid", m_sid);
+    writer->writeAttribute("block-size", QString::number(m_block_size));
     writer->writeEndElement();
 }
 /// \endcond
 
 QXmppIbbCloseIq::QXmppIbbCloseIq() : QXmppIq(QXmppIq::Set)
 {
-
 }
 
 QString QXmppIbbCloseIq::sid() const
 {
-   return  m_sid;
+    return m_sid;
 }
 
-void QXmppIbbCloseIq::setSid( const QString &sid )
+void QXmppIbbCloseIq::setSid(const QString &sid)
 {
     m_sid = sid;
 }
@@ -102,19 +101,19 @@ bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
 void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement openElement = element.firstChildElement("close");
-    m_sid = openElement.attribute( "sid" );
+    m_sid = openElement.attribute("sid");
 }
 
 void QXmppIbbCloseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("close");
     writer->writeDefaultNamespace(ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
+    writer->writeAttribute("sid", m_sid);
     writer->writeEndElement();
 }
 /// \endcond
 
-QXmppIbbDataIq::QXmppIbbDataIq() : QXmppIq( QXmppIq::Set ), m_seq(0)
+QXmppIbbDataIq::QXmppIbbDataIq() : QXmppIq(QXmppIq::Set), m_seq(0)
 {
 }
 
@@ -123,7 +122,7 @@ quint16 QXmppIbbDataIq::sequence() const
     return m_seq;
 }
 
-void QXmppIbbDataIq::setSequence( quint16 seq )
+void QXmppIbbDataIq::setSequence(quint16 seq)
 {
     m_seq = seq;
 }
@@ -133,7 +132,7 @@ QString QXmppIbbDataIq::sid() const
     return m_sid;
 }
 
-void QXmppIbbDataIq::setSid( const QString &sid )
+void QXmppIbbDataIq::setSid(const QString &sid)
 {
     m_sid = sid;
 }
@@ -143,7 +142,7 @@ QByteArray QXmppIbbDataIq::payload() const
     return m_payload;
 }
 
-void QXmppIbbDataIq::setPayload( const QByteArray &data )
+void QXmppIbbDataIq::setPayload(const QByteArray &data)
 {
     m_payload = data;
 }
@@ -158,18 +157,18 @@ bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
 void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement dataElement = element.firstChildElement("data");
-    m_sid = dataElement.attribute( "sid" );
-    m_seq = dataElement.attribute( "seq" ).toLong();
-    m_payload = QByteArray::fromBase64( dataElement.text().toLatin1() );
+    m_sid = dataElement.attribute("sid");
+    m_seq = dataElement.attribute("seq").toLong();
+    m_payload = QByteArray::fromBase64(dataElement.text().toLatin1());
 }
 
 void QXmppIbbDataIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("data");
     writer->writeDefaultNamespace(ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
-    writer->writeAttribute( "seq",QString::number(m_seq) );
-    writer->writeCharacters( m_payload.toBase64() );
+    writer->writeAttribute("sid", m_sid);
+    writer->writeAttribute("seq", QString::number(m_seq));
+    writer->writeCharacters(m_payload.toBase64());
     writer->writeEndElement();
 }
 /// \endcond

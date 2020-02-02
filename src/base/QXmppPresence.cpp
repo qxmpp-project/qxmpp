@@ -53,7 +53,7 @@ class QXmppPresencePrivate : public QSharedData
 {
 public:
     QXmppPresencePrivate();
-    
+
     QXmppPresence::Type type;
     QXmppPresence::AvailableStatusType availableStatusType;
     QString statusText;
@@ -167,7 +167,7 @@ QString QXmppPresence::statusText() const
 ///
 /// \param statusText The status text, for example "Gone fishing".
 
-void QXmppPresence::setStatusText(const QString& statusText)
+void QXmppPresence::setStatusText(const QString &statusText)
 {
     d->statusText = statusText;
 }
@@ -206,7 +206,7 @@ QByteArray QXmppPresence::photoHash() const
 ///
 /// \param photoHash as QByteArray
 
-void QXmppPresence::setPhotoHash(const QByteArray& photoHash)
+void QXmppPresence::setPhotoHash(const QByteArray &photoHash)
 {
     d->photoHash = photoHash;
 }
@@ -236,7 +236,7 @@ QString QXmppPresence::capabilityHash() const
 }
 
 /// XEP-0115: Entity Capabilities
-void QXmppPresence::setCapabilityHash(const QString& hash)
+void QXmppPresence::setCapabilityHash(const QString &hash)
 {
     d->capabilityHash = hash;
 }
@@ -248,7 +248,7 @@ QString QXmppPresence::capabilityNode() const
 }
 
 /// XEP-0115: Entity Capabilities
-void QXmppPresence::setCapabilityNode(const QString& node)
+void QXmppPresence::setCapabilityNode(const QString &node)
 {
     d->capabilityNode = node;
 }
@@ -260,7 +260,7 @@ QByteArray QXmppPresence::capabilityVer() const
 }
 
 /// XEP-0115: Entity Capabilities
-void QXmppPresence::setCapabilityVer(const QByteArray& ver)
+void QXmppPresence::setCapabilityVer(const QByteArray &ver)
 {
     d->capabilityVer = ver;
 }
@@ -342,7 +342,7 @@ QDateTime QXmppPresence::lastUserInteraction() const
 /// Sets the time of the last user interaction as defined in XEP-0319: Last
 /// User Interaction in Presence.
 
-void QXmppPresence::setLastUserInteraction(const QDateTime& lastUserInteraction)
+void QXmppPresence::setLastUserInteraction(const QDateTime &lastUserInteraction)
 {
     d->lastUserInteraction = lastUserInteraction;
 }
@@ -360,7 +360,7 @@ QString QXmppPresence::mixUserJid() const
 ///
 /// \since QXmpp 1.1
 
-void QXmppPresence::setMixUserJid(const QString& mixUserJid)
+void QXmppPresence::setMixUserJid(const QString &mixUserJid)
 {
     d->mixUserJid = mixUserJid;
 }
@@ -378,7 +378,7 @@ QString QXmppPresence::mixUserNick() const
 ///
 /// \since QXmpp 1.1
 
-void QXmppPresence::setMixUserNick(const QString& mixUserNick)
+void QXmppPresence::setMixUserNick(const QString &mixUserNick)
 {
     d->mixUserNick = mixUserNick;
 }
@@ -405,8 +405,8 @@ void QXmppPresence::parse(const QDomElement &element)
             d->statusText = childElement.text();
         } else if (childElement.tagName() == QStringLiteral("priority")) {
             d->priority = childElement.text().toInt();
-        // parse presence extensions
-        // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
+            // parse presence extensions
+            // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
         } else if (!(childElement.tagName() == QStringLiteral("addresses") && childElement.namespaceURI() == ns_extended_addressing) &&
                    childElement.tagName() != "error") {
             parseExtension(childElement, unknownElements);
@@ -433,13 +433,13 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             d->mucStatusCodes << statusElement.attribute(QStringLiteral("code")).toInt();
             statusElement = statusElement.nextSiblingElement(QStringLiteral("status"));
         }
-    // XEP-0115: Entity Capabilities
+        // XEP-0115: Entity Capabilities
     } else if (element.tagName() == QStringLiteral("c") && element.namespaceURI() == ns_capabilities) {
         d->capabilityNode = element.attribute(QStringLiteral("node"));
         d->capabilityVer = QByteArray::fromBase64(element.attribute(QStringLiteral("ver")).toLatin1());
         d->capabilityHash = element.attribute(QStringLiteral("hash"));
         d->capabilityExt = element.attribute(QStringLiteral("ext")).split(' ', QString::SkipEmptyParts);
-    // XEP-0153: vCard-Based Avatars
+        // XEP-0153: vCard-Based Avatars
     } else if (element.namespaceURI() == ns_vcard_update) {
         QDomElement photoElement = element.firstChildElement(QStringLiteral("photo"));
         if (photoElement.isNull()) {
@@ -452,13 +452,13 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             else
                 d->vCardUpdateType = VCardUpdateValidPhoto;
         }
-    // XEP-0319: Last User Interaction in Presence
+        // XEP-0319: Last User Interaction in Presence
     } else if (element.tagName() == QStringLiteral("idle") && element.namespaceURI() == ns_idle) {
         if (element.hasAttribute(QStringLiteral("since"))) {
             const QString since = element.attribute(QStringLiteral("since"));
             d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
         }
-    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+        // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     } else if (element.tagName() == QStringLiteral("mix") && element.namespaceURI() == ns_mix_presence) {
         d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
         d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
@@ -510,8 +510,8 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     // XEP-0115: Entity Capabilities
     if (!d->capabilityNode.isEmpty() &&
-            !d->capabilityVer.isEmpty() &&
-            !d->capabilityHash.isEmpty()) {
+        !d->capabilityVer.isEmpty() &&
+        !d->capabilityHash.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("c"));
         xmlWriter->writeDefaultNamespace(ns_capabilities);
         helperToXmlAddAttribute(xmlWriter, QStringLiteral("hash"), d->capabilityHash);
@@ -524,7 +524,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (d->vCardUpdateType != VCardUpdateNone) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
         xmlWriter->writeDefaultNamespace(ns_vcard_update);
-        switch(d->vCardUpdateType) {
+        switch (d->vCardUpdateType) {
         case VCardUpdateNoPhoto:
             xmlWriter->writeEmptyElement(QStringLiteral("photo"));
             break;

@@ -80,7 +80,7 @@ QXmppVCardAddress::~QXmppVCardAddress()
 
 /// Assigns \a other to this address.
 
-QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
+QXmppVCardAddress &QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
 {
     d = other.d;
     return *this;
@@ -91,11 +91,11 @@ QXmppVCardAddress& QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
 bool operator==(const QXmppVCardAddress &left, const QXmppVCardAddress &right)
 {
     return left.type() == right.type() &&
-            left.country() == right.country() &&
-            left.locality() == right.locality() &&
-            left.postcode() == right.postcode() &&
-            left.region() == right.region() &&
-            left.street() == right.street();
+        left.country() == right.country() &&
+        left.locality() == right.locality() &&
+        left.postcode() == right.postcode() &&
+        left.region() == right.region() &&
+        left.street() == right.street();
 }
 
 /// \brief Checks if two address objects represent different addresses.
@@ -263,7 +263,7 @@ QXmppVCardEmail::~QXmppVCardEmail()
 
 /// Assigns \a other to this e-mail address.
 
-QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
+QXmppVCardEmail &QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
 {
     d = other.d;
     return *this;
@@ -274,7 +274,7 @@ QXmppVCardEmail& QXmppVCardEmail::operator=(const QXmppVCardEmail &other)
 bool operator==(const QXmppVCardEmail &left, const QXmppVCardEmail &right)
 {
     return left.type() == right.type() &&
-            left.address() == right.address();
+        left.address() == right.address();
 }
 
 /// \brief Checks if two email objects represent different email addresses.
@@ -374,7 +374,7 @@ QXmppVCardPhone::~QXmppVCardPhone()
 
 /// Assigns \a other to this phone number.
 
-QXmppVCardPhone& QXmppVCardPhone::operator=(const QXmppVCardPhone &other)
+QXmppVCardPhone &QXmppVCardPhone::operator=(const QXmppVCardPhone &other)
 {
     d = other.d;
     return *this;
@@ -392,7 +392,7 @@ QString QXmppVCardPhone::number() const
 bool operator==(const QXmppVCardPhone &left, const QXmppVCardPhone &right)
 {
     return left.type() == right.type() &&
-            left.number() == right.number();
+        left.number() == right.number();
 }
 
 /// \brief Checks if two phone objects represent different phone numbers.
@@ -518,7 +518,7 @@ QXmppVCardOrganization::~QXmppVCardOrganization()
 
 /// Assigns \a other to this organization info.
 
-QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrganization &other)
+QXmppVCardOrganization &QXmppVCardOrganization::operator=(const QXmppVCardOrganization &other)
 {
     d = other.d;
     return *this;
@@ -529,9 +529,9 @@ QXmppVCardOrganization& QXmppVCardOrganization::operator=(const QXmppVCardOrgani
 bool operator==(const QXmppVCardOrganization &left, const QXmppVCardOrganization &right)
 {
     return left.organization() == right.organization() &&
-            left.unit() == right.unit() &&
-            left.title() == right.title() &&
-            left.role() == right.role();
+        left.unit() == right.unit() &&
+        left.title() == right.title() &&
+        left.role() == right.role();
 }
 
 /// \brief Checks if two organization objects represent different organizations.
@@ -610,8 +610,7 @@ void QXmppVCardOrganization::parse(const QDomElement &cardElem)
 
 void QXmppVCardOrganization::toXml(QXmlStreamWriter *stream) const
 {
-    if (!d->unit.isEmpty() || !d->organization.isEmpty())
-    {
+    if (!d->unit.isEmpty() || !d->organization.isEmpty()) {
         stream->writeStartElement("ORG");
         stream->writeTextElement("ORGNAME", d->organization);
         stream->writeTextElement("ORGUNIT", d->unit);
@@ -649,9 +648,8 @@ public:
 ///
 /// \param jid
 
-QXmppVCardIq::QXmppVCardIq(const QString& jid)
-    : QXmppIq()
-    , d(new QXmppVCardIqPrivate)
+QXmppVCardIq::QXmppVCardIq(const QString &jid)
+    : QXmppIq(), d(new QXmppVCardIqPrivate)
 {
     // for self jid should be empty
     setTo(jid);
@@ -660,8 +658,7 @@ QXmppVCardIq::QXmppVCardIq(const QString& jid)
 /// Constructs a copy of \a other.
 
 QXmppVCardIq::QXmppVCardIq(const QXmppVCardIq &other)
-    : QXmppIq(other)
-    , d(other.d)
+    : QXmppIq(other), d(other.d)
 {
 }
 
@@ -671,7 +668,7 @@ QXmppVCardIq::~QXmppVCardIq()
 
 /// Assigns \a other to this vCard IQ.
 
-QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
+QXmppVCardIq &QXmppVCardIq::operator=(const QXmppVCardIq &other)
 {
     QXmppIq::operator=(other);
     d = other.d;
@@ -683,20 +680,20 @@ QXmppVCardIq& QXmppVCardIq::operator=(const QXmppVCardIq &other)
 bool operator==(const QXmppVCardIq &left, const QXmppVCardIq &right)
 {
     return left.birthday() == right.birthday() &&
-            left.description() == right.description() &&
-            left.email() == right.email() &&
-            left.firstName() == right.firstName() &&
-            left.fullName() == right.fullName() &&
-            left.lastName() == right.lastName() &&
-            left.middleName() == right.middleName() &&
-            left.nickName() == right.nickName() &&
-            left.photo() == right.photo() &&
-            left.photoType() == right.photoType() &&
-            left.url() == right.url() &&
-            left.addresses() == right.addresses() &&
-            left.emails() == right.emails() &&
-            left.phones() == right.phones() &&
-            left.organization() == right.organization();
+        left.description() == right.description() &&
+        left.email() == right.email() &&
+        left.firstName() == right.firstName() &&
+        left.fullName() == right.fullName() &&
+        left.lastName() == right.lastName() &&
+        left.middleName() == right.middleName() &&
+        left.nickName() == right.nickName() &&
+        left.photo() == right.photo() &&
+        left.photoType() == right.photoType() &&
+        left.url() == right.url() &&
+        left.addresses() == right.addresses() &&
+        left.emails() == right.emails() &&
+        left.phones() == right.phones() &&
+        left.organization() == right.organization();
 }
 
 /// \brief Checks if two VCard objects represent different VCards.
@@ -860,7 +857,7 @@ QString QXmppVCardIq::url() const
 ///
 /// \param url
 
-void QXmppVCardIq::setUrl(const QString& url)
+void QXmppVCardIq::setUrl(const QString &url)
 {
     d->url = url;
 }
@@ -884,7 +881,7 @@ QByteArray QXmppVCardIq::photo() const
 
 /// Sets the photo's binary contents.
 
-void QXmppVCardIq::setPhoto(const QByteArray& photo)
+void QXmppVCardIq::setPhoto(const QByteArray &photo)
 {
     d->photo = photo;
 }
@@ -898,7 +895,7 @@ QString QXmppVCardIq::photoType() const
 
 /// Sets the photo's MIME type.
 
-void QXmppVCardIq::setPhotoType(const QString& photoType)
+void QXmppVCardIq::setPhotoType(const QString &photoType)
 {
     d->photoType = photoType;
 }
@@ -965,7 +962,7 @@ bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
     return nodeRecv.firstChildElement("vCard").namespaceURI() == ns_vcard;
 }
 
-void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
+void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
 {
     // vCard
     QDomElement cardElement = nodeRecv.firstChildElement("vCard");
@@ -979,8 +976,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement& nodeRecv)
     d->middleName = nameElement.firstChildElement("MIDDLE").text();
     d->url = cardElement.firstChildElement("URL").text();
     QDomElement photoElement = cardElement.firstChildElement("PHOTO");
-    QByteArray base64data = photoElement.
-                            firstChildElement("BINVAL").text().toLatin1();
+    QByteArray base64data = photoElement.firstChildElement("BINVAL").text().toLatin1();
     d->photo = QByteArray::fromBase64(base64data);
     d->photoType = photoElement.firstChildElement("TYPE").text();
 
@@ -1019,12 +1015,11 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         email.toXml(writer);
     if (!d->fullName.isEmpty())
         helperToXmlAddTextElement(writer, "FN", d->fullName);
-    if(!d->nickName.isEmpty())
+    if (!d->nickName.isEmpty())
         helperToXmlAddTextElement(writer, "NICKNAME", d->nickName);
     if (!d->firstName.isEmpty() ||
         !d->lastName.isEmpty() ||
-        !d->middleName.isEmpty())
-    {
+        !d->middleName.isEmpty()) {
         writer->writeStartElement("N");
         if (!d->firstName.isEmpty())
             helperToXmlAddTextElement(writer, "GIVEN", d->firstName);
@@ -1037,8 +1032,7 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     for (const QXmppVCardPhone &phone : d->phones)
         phone.toXml(writer);
-    if(!photo().isEmpty())
-    {
+    if (!photo().isEmpty()) {
         writer->writeStartElement("PHOTO");
         QString photoType = d->photoType;
         if (photoType.isEmpty())

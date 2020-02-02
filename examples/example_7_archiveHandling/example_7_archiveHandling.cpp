@@ -40,10 +40,7 @@ static void logEnd(const QString &msg)
 }
 
 xmppClient::xmppClient(QObject *parent)
-    : QXmppClient(parent)
-    , m_collectionCount(-1)
-    , m_pageDirection(PageForwards)
-    , m_pageSize(10)
+    : QXmppClient(parent), m_collectionCount(-1), m_pageDirection(PageForwards), m_pageSize(10)
 {
 
     // add archive manager
@@ -52,13 +49,13 @@ xmppClient::xmppClient(QObject *parent)
 
     // connect signals
     connect(this, &QXmppClient::connected,
-                    this, &xmppClient::clientConnected);
+            this, &xmppClient::clientConnected);
 
     connect(archiveManager, &QXmppArchiveManager::archiveChatReceived,
-                    this, &xmppClient::archiveChatReceived);
+            this, &xmppClient::archiveChatReceived);
 
     connect(archiveManager, &QXmppArchiveManager::archiveListReceived,
-                    this, &xmppClient::archiveListReceived);
+            this, &xmppClient::archiveListReceived);
 
     // set limits
     m_startDate = QDateTime::currentDateTime().addDays(-21);
@@ -67,7 +64,6 @@ xmppClient::xmppClient(QObject *parent)
 
 xmppClient::~xmppClient()
 {
-
 }
 
 void xmppClient::setPageDirection(PageDirection direction)

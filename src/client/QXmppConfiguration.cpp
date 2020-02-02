@@ -78,19 +78,7 @@ public:
 };
 
 QXmppConfigurationPrivate::QXmppConfigurationPrivate()
-    : port(5222)
-    , resource("QXmpp")
-    , autoAcceptSubscriptions(false)
-    , sendIntialPresence(true)
-    , sendRosterRequest(true)
-    , keepAliveInterval(60)
-    , keepAliveTimeout(20)
-    , autoReconnectionEnabled(true)
-    , useSASLAuthentication(true)
-    , useNonSASLAuthentication(true)
-    , ignoreSslErrors(false)
-    , streamSecurityMode(QXmppConfiguration::TLSEnabled)
-    , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
+    : port(5222), resource("QXmpp"), autoAcceptSubscriptions(false), sendIntialPresence(true), sendRosterRequest(true), keepAliveInterval(60), keepAliveTimeout(20), autoReconnectionEnabled(true), useSASLAuthentication(true), useNonSASLAuthentication(true), ignoreSslErrors(false), streamSecurityMode(QXmppConfiguration::TLSEnabled), nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
 {
 }
 
@@ -103,7 +91,7 @@ QXmppConfiguration::QXmppConfiguration()
 
 /// Creates a copy of \a other.
 
-QXmppConfiguration::QXmppConfiguration(const QXmppConfiguration &other)
+QXmppConfiguration::QXmppConfiguration(const QXmppConfiguration& other)
     : d(other.d)
 {
 }
@@ -117,7 +105,7 @@ QXmppConfiguration::~QXmppConfiguration()
 
 /// Assigns \a other to this QXmppConfiguration.
 
-QXmppConfiguration& QXmppConfiguration::operator=(const QXmppConfiguration &other)
+QXmppConfiguration& QXmppConfiguration::operator=(const QXmppConfiguration& other)
 {
     d = other.d;
     return *this;
@@ -296,7 +284,7 @@ QString QXmppConfiguration::jidBare() const
     if (d->user.isEmpty())
         return d->domain;
     else
-        return d->user+"@"+d->domain;
+        return d->user + "@" + d->domain;
 }
 
 /// Returns the access token used for X-FACEBOOK-PLATFORM authentication.
@@ -474,7 +462,7 @@ QXmppConfiguration::StreamSecurityMode QXmppConfiguration::streamSecurityMode() 
 /// \param mode StreamSecurityMode
 
 void QXmppConfiguration::setStreamSecurityMode(
-        QXmppConfiguration::StreamSecurityMode mode)
+    QXmppConfiguration::StreamSecurityMode mode)
 {
     d->streamSecurityMode = mode;
 }
@@ -495,7 +483,7 @@ QXmppConfiguration::NonSASLAuthMechanism QXmppConfiguration::nonSASLAuthMechanis
 ///
 
 void QXmppConfiguration::setNonSASLAuthMechanism(
-        QXmppConfiguration::NonSASLAuthMechanism mech)
+    QXmppConfiguration::NonSASLAuthMechanism mech)
 {
     d->nonSASLAuthMechanism = mech;
 }
@@ -512,7 +500,7 @@ QString QXmppConfiguration::saslAuthMechanism() const
 /// Valid values: "SCRAM-SHA-256", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN", "ANONYMOUS",
 //                "X-FACEBOOK-PLATFORM", "X-MESSENGER-OAUTH2", "X-OAUTH2"
 
-void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
+void QXmppConfiguration::setSaslAuthMechanism(const QString& mechanism)
 {
     d->saslAuthMechanism = mechanism;
 }
@@ -584,7 +572,7 @@ int QXmppConfiguration::keepAliveTimeout() const
 
 /// Specifies a list of trusted CA certificates.
 
-void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCertificates)
+void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate>& caCertificates)
 {
     d->caCertificates = caCertificates;
 }

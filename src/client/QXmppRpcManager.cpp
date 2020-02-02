@@ -39,16 +39,16 @@ QXmppRpcManager::QXmppRpcManager()
 ///
 /// \param interface
 
-void QXmppRpcManager::addInvokableInterface( QXmppInvokable *interface )
+void QXmppRpcManager::addInvokableInterface(QXmppInvokable *interface)
 {
-    m_interfaces[ interface->metaObject()->className() ] = interface;
+    m_interfaces[interface->metaObject()->className()] = interface;
 }
 
 /// Invokes a remote interface using RPC.
 ///
 /// \param iq
 
-void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
+void QXmppRpcManager::invokeInterfaceMethod(const QXmppRpcInvokeIq &iq)
 {
     QXmppStanza::Error error;
 
@@ -58,36 +58,27 @@ void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
     const QString interface = methodBits.first();
     const QString method = methodBits.last();
     QXmppInvokable *iface = m_interfaces.value(interface);
-    if (iface)
-    {
-        if ( iface->isAuthorized( iq.from() ) )
-        {
+    if (iface) {
+        if (iface->isAuthorized(iq.from())) {
 
-            if ( iface->interfaces().contains(method) )
-            {
+            if (iface->interfaces().contains(method)) {
                 QVariant result = iface->dispatch(method.toLatin1(),
-                                                  iq.arguments() );
+                                                  iq.arguments());
                 QXmppRpcResponseIq resultIq;
                 resultIq.setId(iq.id());
                 resultIq.setTo(iq.from());
                 resultIq.setValues(QVariantList() << result);
-                client()->sendPacket( resultIq );
+                client()->sendPacket(resultIq);
                 return;
-            }
-            else
-            {
+            } else {
                 error.setType(QXmppStanza::Error::Cancel);
                 error.setCondition(QXmppStanza::Error::ItemNotFound);
             }
-        }
-        else
-        {
+        } else {
             error.setType(QXmppStanza::Error::Auth);
             error.setCondition(QXmppStanza::Error::Forbidden);
         }
-    }
-    else
-    {
+    } else {
         error.setType(QXmppStanza::Error::Cancel);
         error.setCondition(QXmppStanza::Error::ItemNotFound);
     }
@@ -104,40 +95,50 @@ void QXmppRpcManager::invokeInterfaceMethod( const QXmppRpcInvokeIq &iq )
 /// \note This method blocks until the response is received, and it may
 /// cause XMPP stanzas to be lost!
 
-QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod( const QString &jid,
-                                          const QString &interface,
-                                          const QVariant &arg1,
-                                          const QVariant &arg2,
-                                          const QVariant &arg3,
-                                          const QVariant &arg4,
-                                          const QVariant &arg5,
-                                          const QVariant &arg6,
-                                          const QVariant &arg7,
-                                          const QVariant &arg8,
-                                          const QVariant &arg9,
-                                          const QVariant &arg10 )
+QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod(const QString &jid,
+                                                          const QString &interface,
+                                                          const QVariant &arg1,
+                                                          const QVariant &arg2,
+                                                          const QVariant &arg3,
+                                                          const QVariant &arg4,
+                                                          const QVariant &arg5,
+                                                          const QVariant &arg6,
+                                                          const QVariant &arg7,
+                                                          const QVariant &arg8,
+                                                          const QVariant &arg9,
+                                                          const QVariant &arg10)
 {
     QVariantList args;
-    if( arg1.isValid() ) args << arg1;
-    if( arg2.isValid() ) args << arg2;
-    if( arg3.isValid() ) args << arg3;
-    if( arg4.isValid() ) args << arg4;
-    if( arg5.isValid() ) args << arg5;
-    if( arg6.isValid() ) args << arg6;
-    if( arg7.isValid() ) args << arg7;
-    if( arg8.isValid() ) args << arg8;
-    if( arg9.isValid() ) args << arg9;
-    if( arg10.isValid() ) args << arg10;
+    if (arg1.isValid())
+        args << arg1;
+    if (arg2.isValid())
+        args << arg2;
+    if (arg3.isValid())
+        args << arg3;
+    if (arg4.isValid())
+        args << arg4;
+    if (arg5.isValid())
+        args << arg5;
+    if (arg6.isValid())
+        args << arg6;
+    if (arg7.isValid())
+        args << arg7;
+    if (arg8.isValid())
+        args << arg8;
+    if (arg9.isValid())
+        args << arg9;
+    if (arg10.isValid())
+        args << arg10;
 
     bool check;
     Q_UNUSED(check)
 
-    QXmppRemoteMethod method( jid, interface, args, client() );
+    QXmppRemoteMethod method(jid, interface, args, client());
     check = connect(this, SIGNAL(rpcCallResponse(QXmppRpcResponseIq)),
-            &method, SLOT(gotResult(QXmppRpcResponseIq)));
+                    &method, SLOT(gotResult(QXmppRpcResponseIq)));
     Q_ASSERT(check);
     check = connect(this, SIGNAL(rpcCallError(QXmppRpcErrorIq)),
-            &method, SLOT(gotError(QXmppRpcErrorIq)));
+                    &method, SLOT(gotError(QXmppRpcErrorIq)));
     Q_ASSERT(check);
 
     return method.call();
@@ -161,22 +162,17 @@ QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const
 bool QXmppRpcManager::handleStanza(const QDomElement &element)
 {
     // XEP-0009: Jabber-RPC
-    if (QXmppRpcInvokeIq::isRpcInvokeIq(element))
-    {
+    if (QXmppRpcInvokeIq::isRpcInvokeIq(element)) {
         QXmppRpcInvokeIq rpcIqPacket;
         rpcIqPacket.parse(element);
         invokeInterfaceMethod(rpcIqPacket);
         return true;
-    }
-    else if(QXmppRpcResponseIq::isRpcResponseIq(element))
-    {
+    } else if (QXmppRpcResponseIq::isRpcResponseIq(element)) {
         QXmppRpcResponseIq rpcResponseIq;
         rpcResponseIq.parse(element);
         emit rpcCallResponse(rpcResponseIq);
         return true;
-    }
-    else if(QXmppRpcErrorIq::isRpcErrorIq(element))
-    {
+    } else if (QXmppRpcErrorIq::isRpcErrorIq(element)) {
         QXmppRpcErrorIq rpcErrorIq;
         rpcErrorIq.parse(element);
         emit rpcCallError(rpcErrorIq);

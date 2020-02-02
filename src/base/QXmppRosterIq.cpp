@@ -52,7 +52,7 @@ QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
 ///
 /// \param item
 
-void QXmppRosterIq::addItem(const Item& item)
+void QXmppRosterIq::addItem(const Item &item)
 {
     d->items.append(item);
 }
@@ -96,8 +96,7 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
     QDomElement itemElement = queryElement.firstChildElement("item");
 
     setVersion(queryElement.attribute("ver"));
-    while(!itemElement.isNull())
-    {
+    while (!itemElement.isNull()) {
         QXmppRosterIq::Item item;
         item.parse(itemElement);
         d->items.append(item);
@@ -111,9 +110,9 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_roster);
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
-    if(!version().isEmpty())
-        writer->writeAttribute( "ver", version());
-    for(int i = 0; i < d->items.count(); ++i)
+    if (!version().isEmpty())
+        writer->writeAttribute("ver", version());
+    for (int i = 0; i < d->items.count(); ++i)
         d->items.at(i).toXml(writer);
     writer->writeEndElement();
 }
@@ -142,7 +141,7 @@ QXmppRosterIq::Item::Item(const QXmppRosterIq::Item &other) = default;
 
 QXmppRosterIq::Item::~Item() = default;
 
-QXmppRosterIq::Item& QXmppRosterIq::Item::operator=(const Item &other) = default;
+QXmppRosterIq::Item &QXmppRosterIq::Item::operator=(const Item &other) = default;
 
 /// Returns the bareJid of the roster entry.
 ///
@@ -179,7 +178,7 @@ QSet<QString> QXmppRosterIq::Item::groups() const
 /// \param groups list of all the groups as a QSet<QString>
 ///
 
-void QXmppRosterIq::Item::setGroups(const QSet<QString>& groups)
+void QXmppRosterIq::Item::setGroups(const QSet<QString> &groups)
 {
     d->groups = groups;
 }
@@ -233,7 +232,7 @@ void QXmppRosterIq::Item::setSubscriptionStatus(const QString &status)
 ///
 
 QXmppRosterIq::Item::SubscriptionType
-        QXmppRosterIq::Item::subscriptionType() const
+QXmppRosterIq::Item::subscriptionType() const
 {
     return d->type;
 }
@@ -250,8 +249,7 @@ void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
 
 QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 {
-    switch(d->type)
-    {
+    switch (d->type) {
     case NotSet:
         return "";
     case None:
@@ -264,27 +262,26 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
         return "to";
     case Remove:
         return "remove";
-    default:
-        {
-            qWarning("QXmppRosterIq::Item::getTypeStr(): invalid type");
-            return "";
-        }
+    default: {
+        qWarning("QXmppRosterIq::Item::getTypeStr(): invalid type");
+        return "";
+    }
     }
 }
 
-void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString& type)
+void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
-    if(type == "")
+    if (type == "")
         setSubscriptionType(NotSet);
-    else if(type == "none")
+    else if (type == "none")
         setSubscriptionType(None);
-    else if(type == "both")
+    else if (type == "both")
         setSubscriptionType(Both);
-    else if(type == "from")
+    else if (type == "from")
         setSubscriptionType(From);
-    else if(type == "to")
+    else if (type == "to")
         setSubscriptionType(To);
-    else if(type == "remove")
+    else if (type == "remove")
         setSubscriptionType(Remove);
     else
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
@@ -299,8 +296,7 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
     setSubscriptionStatus(element.attribute("ask"));
 
     QDomElement groupElement = element.firstChildElement("group");
-    while(!groupElement.isNull())
-    {
+    while (!groupElement.isNull()) {
         d->groups << groupElement.text();
         groupElement = groupElement.nextSiblingElement("group");
     }
@@ -309,15 +305,14 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("item");
-    helperToXmlAddAttribute(writer,"jid", d->bareJid);
-    helperToXmlAddAttribute(writer,"name", d->name);
-    helperToXmlAddAttribute(writer,"subscription", getSubscriptionTypeStr());
+    helperToXmlAddAttribute(writer, "jid", d->bareJid);
+    helperToXmlAddAttribute(writer, "name", d->name);
+    helperToXmlAddAttribute(writer, "subscription", getSubscriptionTypeStr());
     helperToXmlAddAttribute(writer, "ask", subscriptionStatus());
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
-    while(i != d->groups.constEnd())
-    {
-        helperToXmlAddTextElement(writer,"group", *i);
+    while (i != d->groups.constEnd()) {
+        helperToXmlAddTextElement(writer, "group", *i);
         ++i;
     }
     writer->writeEndElement();

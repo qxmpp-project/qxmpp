@@ -45,23 +45,23 @@ void tst_QXmppArchiveIq::testArchiveList_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("max");
 
-    QTest::newRow("no rsm") <<
-        QByteArray(
-        "<iq id=\"list_1\" type=\"get\">"
-        "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\"/>"
-        "</iq>") << -1;
+    QTest::newRow("no rsm") << QByteArray(
+                                   "<iq id=\"list_1\" type=\"get\">"
+                                   "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+                                   " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\"/>"
+                                   "</iq>")
+                            << -1;
 
-    QTest::newRow("with rsm") <<
-        QByteArray(
-        "<iq id=\"list_1\" type=\"get\">"
-        "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\">"
-            "<set xmlns=\"http://jabber.org/protocol/rsm\">"
-            "<max>30</max>"
-            "</set>"
-        "</list>"
-        "</iq>") << 30;
+    QTest::newRow("with rsm") << QByteArray(
+                                     "<iq id=\"list_1\" type=\"get\">"
+                                     "<list xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+                                     " start=\"1469-07-21T02:00:00Z\" end=\"1479-07-21T04:00:00Z\">"
+                                     "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+                                     "<max>30</max>"
+                                     "</set>"
+                                     "</list>"
+                                     "</iq>")
+                              << 30;
 }
 
 void tst_QXmppArchiveIq::testArchiveList()
@@ -85,38 +85,38 @@ void tst_QXmppArchiveIq::testArchiveChat_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("count");
 
-    QTest::newRow("no rsm") <<
-        QByteArray(
-        "<iq id=\"chat_1\" type=\"result\">"
-        "<chat xmlns=\"urn:xmpp:archive\""
-        " with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:56:15Z\""
-        " subject=\"She speaks!\""
-        " version=\"4\""
-        ">"
-        "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
-        "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
-        "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
-        "</chat>"
-        "</iq>") << -1;
+    QTest::newRow("no rsm") << QByteArray(
+                                   "<iq id=\"chat_1\" type=\"result\">"
+                                   "<chat xmlns=\"urn:xmpp:archive\""
+                                   " with=\"juliet@capulet.com\""
+                                   " start=\"1469-07-21T02:56:15Z\""
+                                   " subject=\"She speaks!\""
+                                   " version=\"4\""
+                                   ">"
+                                   "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
+                                   "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
+                                   "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
+                                   "</chat>"
+                                   "</iq>")
+                            << -1;
 
-    QTest::newRow("with rsm") <<
-        QByteArray(
-        "<iq id=\"chat_1\" type=\"result\">"
-        "<chat xmlns=\"urn:xmpp:archive\""
-        " with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:56:15Z\""
-        " subject=\"She speaks!\""
-        " version=\"4\""
-        ">"
-        "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
-        "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
-        "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
-        "<set xmlns=\"http://jabber.org/protocol/rsm\">"
-        "<count>3</count>"
-        "</set>"
-        "</chat>"
-        "</iq>") << 3;
+    QTest::newRow("with rsm") << QByteArray(
+                                     "<iq id=\"chat_1\" type=\"result\">"
+                                     "<chat xmlns=\"urn:xmpp:archive\""
+                                     " with=\"juliet@capulet.com\""
+                                     " start=\"1469-07-21T02:56:15Z\""
+                                     " subject=\"She speaks!\""
+                                     " version=\"4\""
+                                     ">"
+                                     "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
+                                     "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
+                                     "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
+                                     "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+                                     "<count>3</count>"
+                                     "</set>"
+                                     "</chat>"
+                                     "</iq>")
+                              << 3;
 }
 
 void tst_QXmppArchiveIq::testArchiveChat()
@@ -166,23 +166,23 @@ void tst_QXmppArchiveIq::testArchiveRetrieve_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<int>("max");
 
-    QTest::newRow("no rsm") <<
-        QByteArray(
-        "<iq id=\"retrieve_1\" type=\"get\">"
-        "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:00:00Z\"/>"
-        "</iq>") << -1;
+    QTest::newRow("no rsm") << QByteArray(
+                                   "<iq id=\"retrieve_1\" type=\"get\">"
+                                   "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+                                   " start=\"1469-07-21T02:00:00Z\"/>"
+                                   "</iq>")
+                            << -1;
 
-    QTest::newRow("with rsm") <<
-        QByteArray(
-        "<iq id=\"retrieve_1\" type=\"get\">"
-        "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
-        " start=\"1469-07-21T02:00:00Z\">"
-            "<set xmlns=\"http://jabber.org/protocol/rsm\">"
-            "<max>30</max>"
-            "</set>"
-        "</retrieve>"
-        "</iq>") << 30;
+    QTest::newRow("with rsm") << QByteArray(
+                                     "<iq id=\"retrieve_1\" type=\"get\">"
+                                     "<retrieve xmlns=\"urn:xmpp:archive\" with=\"juliet@capulet.com\""
+                                     " start=\"1469-07-21T02:00:00Z\">"
+                                     "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+                                     "<max>30</max>"
+                                     "</set>"
+                                     "</retrieve>"
+                                     "</iq>")
+                              << 30;
 }
 
 void tst_QXmppArchiveIq::testArchiveRetrieve()

@@ -161,8 +161,7 @@ void QXmppBitsOfBinaryData::toXmlElementFromChild(QXmlStreamWriter *writer) cons
 bool QXmppBitsOfBinaryData::operator==(const QXmppBitsOfBinaryData &other) const
 {
     return d->cid == other.cid() &&
-           d->maxAge == other.maxAge() &&
-           d->contentType == other.contentType() &&
-           d->data == other.data();
+        d->maxAge == other.maxAge() &&
+        d->contentType == other.contentType() &&
+        d->data == other.data();
 }
-

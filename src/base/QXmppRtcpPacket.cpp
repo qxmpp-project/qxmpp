@@ -30,7 +30,7 @@
 
 enum DescriptionType {
     CnameType = 1,
-    NameType  = 2
+    NameType = 2
 };
 
 class QXmppRtcpPacketPrivate : public QSharedData
@@ -349,9 +349,7 @@ void QXmppRtcpPacket::setType(quint8 type)
 }
 
 QXmppRtcpPacketPrivate::QXmppRtcpPacketPrivate()
-    : count(0)
-    , type(0)
-    , ssrc(0)
+    : count(0), type(0), ssrc(0)
 {
 }
 
@@ -436,13 +434,7 @@ void QXmppRtcpReceiverReport::setTotalLost(quint32 totalLost)
 }
 
 QXmppRtcpReceiverReportPrivate::QXmppRtcpReceiverReportPrivate()
-    : ssrc(0)
-    , fractionLost(0)
-    , totalLost(0)
-    , highestSequence(0)
-    , jitter(0)
-    , lsr(0)
-    , dlsr(0)
+    : ssrc(0), fractionLost(0), totalLost(0), highestSequence(0), jitter(0), lsr(0), dlsr(0)
 {
 }
 
@@ -531,10 +523,7 @@ void QXmppRtcpSenderInfo::setPacketCount(quint32 count)
 }
 
 QXmppRtcpSenderInfoPrivate::QXmppRtcpSenderInfoPrivate()
-    : ntpStamp(0)
-    , rtpStamp(0)
-    , packetCount(0)
-    , octetCount(0)
+    : ntpStamp(0), rtpStamp(0), packetCount(0), octetCount(0)
 {
 }
 

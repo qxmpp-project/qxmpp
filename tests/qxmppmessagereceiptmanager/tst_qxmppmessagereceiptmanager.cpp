@@ -59,25 +59,23 @@ void tst_QXmppMessageReceiptManager::testReceipt_data()
     QTest::addColumn<bool>("accept");
 
     QTest::newRow("correct")
-            << QByteArray(
-                   "<message id=\"bi29sg183b4v\" "
-                        "to=\"northumberland@shakespeare.lit/westminster\" "
-                        "from=\"kingrichard@royalty.england.lit/throne\" "
-                        "type=\"normal\">"
-                     "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
-                   "</message>"
-               )
-            << true;
+        << QByteArray(
+               "<message id=\"bi29sg183b4v\" "
+               "to=\"northumberland@shakespeare.lit/westminster\" "
+               "from=\"kingrichard@royalty.england.lit/throne\" "
+               "type=\"normal\">"
+               "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
+               "</message>")
+        << true;
     QTest::newRow("from-to-equal")
-            << QByteArray(
-                   "<message id=\"bi29sg183b4v\" "
-                        "to=\"kingrichard@royalty.england.lit/westminster\" "
-                        "from=\"kingrichard@royalty.england.lit/throne\" "
-                        "type=\"normal\">"
-                     "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
-                   "</message>"
-               )
-            << false;
+        << QByteArray(
+               "<message id=\"bi29sg183b4v\" "
+               "to=\"kingrichard@royalty.england.lit/westminster\" "
+               "from=\"kingrichard@royalty.england.lit/throne\" "
+               "type=\"normal\">"
+               "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
+               "</message>")
+        << false;
 }
 
 void tst_QXmppMessageReceiptManager::testReceipt()

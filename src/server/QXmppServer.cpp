@@ -51,18 +51,15 @@ static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement
     if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns))
         stream->writeDefaultNamespace(xmlns);
     QDomNamedNodeMap attrs = element.attributes();
-    for (int i = 0; i < attrs.size(); i++)
-    {
+    for (int i = 0; i < attrs.size(); i++) {
         QDomAttr attr = attrs.item(i).toAttr();
         stream->writeAttribute(attr.name(), attr.value());
     }
 
     /* children */
     QDomNode childNode = element.firstChild();
-    while (!childNode.isNull())
-    {
-        if (childNode.isElement())
-        {
+    while (!childNode.isNull()) {
+        if (childNode.isElement()) {
             helperToXmlAddDomElement(stream, childNode.toElement(), QStringList() << xmlns);
         } else if (childNode.isText()) {
             stream->writeCharacters(childNode.toText().data());
@@ -85,20 +82,20 @@ public:
     void warning(const QString &message);
 
     QString domain;
-    QList<QXmppServerExtension*> extensions;
+    QList<QXmppServerExtension *> extensions;
     QXmppLogger *logger;
     QXmppPasswordChecker *passwordChecker;
 
     // client-to-server
-    QSet<QXmppIncomingClient*> incomingClients;
-    QHash<QString, QXmppIncomingClient*> incomingClientsByJid;
-    QHash<QString, QSet<QXmppIncomingClient*> > incomingClientsByBareJid;
-    QSet<QXmppSslServer*> serversForClients;
+    QSet<QXmppIncomingClient *> incomingClients;
+    QHash<QString, QXmppIncomingClient *> incomingClientsByJid;
+    QHash<QString, QSet<QXmppIncomingClient *>> incomingClientsByBareJid;
+    QSet<QXmppSslServer *> serversForClients;
 
     // server-to-server
-    QSet<QXmppIncomingServer*> incomingServers;
-    QSet<QXmppOutgoingServer*> outgoingServers;
-    QSet<QXmppSslServer*> serversForServers;
+    QSet<QXmppIncomingServer *> incomingServers;
+    QSet<QXmppOutgoingServer *> outgoingServers;
+    QSet<QXmppSslServer *> serversForServers;
 
     // ssl
     QList<QSslCertificate> caCertificates;
@@ -113,10 +110,10 @@ private:
 
 QXmppServerPrivate::QXmppServerPrivate(QXmppServer *qq)
     : logger(nullptr),
-    passwordChecker(nullptr),
-    loaded(false),
-    started(false),
-    q(qq)
+      passwordChecker(nullptr),
+      loaded(false),
+      started(false),
+      q(qq)
 {
 }
 
@@ -135,7 +132,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
     if (toDomain == domain) {
         // look for a client connection
-        QList<QXmppIncomingClient*> found;
+        QList<QXmppIncomingClient *> found;
         if (QXmppUtils::jidToResource(to).isEmpty()) {
             const auto &connections = incomingClientsByBareJid.value(to);
             for (auto *conn : connections)
@@ -152,7 +149,6 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         return !found.isEmpty();
 
     } else if (!serversForServers.isEmpty()) {
-
 
         // look for an outgoing S2S connection
         for (auto *conn : qAsConst(outgoingServers)) {
@@ -171,7 +167,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         conn->setParent(q);
 
         QObject::connect(conn, &QXmppStream::disconnected,
-                                 q, &QXmppServer::_q_outgoingServerDisconnected);
+                         q, &QXmppServer::_q_outgoingServerDisconnected);
 
         // add stream
         outgoingServers.insert(conn);
@@ -186,7 +182,6 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // S2S is disabled, failed to route data
         return false;
-
     }
 }
 
@@ -219,7 +214,7 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
                 response.setFrom(domain);
                 response.setTo(request.from());
                 QXmppStanza::Error error(QXmppStanza::Error::Cancel,
-                    QXmppStanza::Error::FeatureNotImplemented);
+                                         QXmppStanza::Error::FeatureNotImplemented);
                 response.setError(error);
                 server->sendPacket(response);
             }
@@ -237,7 +232,7 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
             response.setFrom(request.to());
             response.setTo(request.from());
             QXmppStanza::Error error(QXmppStanza::Error::Cancel,
-                QXmppStanza::Error::ServiceUnavailable);
+                                     QXmppStanza::Error::ServiceUnavailable);
             response.setError(error);
             server->sendPacket(response);
         }
@@ -264,7 +259,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 {
     if (!loaded) {
         for (auto *object : QPluginLoader::staticInstances()) {
-            auto *plugin = qobject_cast<QXmppServerPlugin*>(object);
+            auto *plugin = qobject_cast<QXmppServerPlugin *>(object);
             if (!plugin)
                 continue;
 
@@ -305,8 +300,7 @@ void QXmppServerPrivate::stopExtensions()
 /// \param parent
 
 QXmppServer::QXmppServer(QObject *parent)
-    : QXmppLoggable(parent)
-    , d(new QXmppServerPrivate(this))
+    : QXmppLoggable(parent), d(new QXmppServerPrivate(this))
 {
     qRegisterMetaType<QDomElement>("QDomElement");
 }
@@ -346,7 +340,7 @@ void QXmppServer::addExtension(QXmppServerExtension *extension)
 /// Returns the list of loaded extensions.
 ///
 
-QList<QXmppServerExtension*> QXmppServer::extensions()
+QList<QXmppServerExtension *> QXmppServer::extensions()
 {
     d->loadExtensions(this);
     return d->extensions;
@@ -551,8 +545,8 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
-                    this, SLOT(_q_clientConnection(QSslSocket*)));
+    check = connect(server, SIGNAL(newConnection(QSslSocket *)),
+                    this, SLOT(_q_clientConnection(QSslSocket *)));
     Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
@@ -585,13 +579,13 @@ void QXmppServer::close()
     d->stopExtensions();
 
     // close XMPP streams
-    QSetIterator<QXmppIncomingClient*> itr(d->incomingClients);
+    QSetIterator<QXmppIncomingClient *> itr(d->incomingClients);
     while (itr.hasNext())
         itr.next()->disconnectFromHost();
     for (auto *stream : d->incomingServers)
-       stream->disconnectFromHost();
+        stream->disconnectFromHost();
     for (auto *stream : d->outgoingServers)
-       stream->disconnectFromHost();
+        stream->disconnectFromHost();
 }
 
 /// Listen for incoming XMPP server connections.
@@ -615,8 +609,8 @@ bool QXmppServer::listenForServers(const QHostAddress &address, quint16 port)
     server->setLocalCertificate(d->localCertificate);
     server->setPrivateKey(d->privateKey);
 
-    check = connect(server, SIGNAL(newConnection(QSslSocket*)),
-                    this, SLOT(_q_serverConnection(QSslSocket*)));
+    check = connect(server, SIGNAL(newConnection(QSslSocket *)),
+                    this, SLOT(_q_serverConnection(QSslSocket *)));
     Q_ASSERT(check);
 
     if (!server->listen(address, port)) {
@@ -674,13 +668,13 @@ void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
     stream->setPasswordChecker(d->passwordChecker);
 
     connect(stream, &QXmppStream::connected,
-                    this, &QXmppServer::_q_clientConnected);
+            this, &QXmppServer::_q_clientConnected);
 
     connect(stream, &QXmppStream::disconnected,
-                    this, &QXmppServer::_q_clientDisconnected);
+            this, &QXmppServer::_q_clientDisconnected);
 
     connect(stream, &QXmppIncomingClient::elementReceived,
-                    this, &QXmppServer::handleElement);
+            this, &QXmppServer::handleElement);
 
     // add stream
     d->incomingClients.insert(stream);
@@ -710,7 +704,7 @@ void QXmppServer::_q_clientConnection(QSslSocket *socket)
 
 void QXmppServer::_q_clientConnected()
 {
-    auto *client = qobject_cast<QXmppIncomingClient*>(sender());
+    auto *client = qobject_cast<QXmppIncomingClient *>(sender());
     if (!client)
         return;
 
@@ -734,7 +728,7 @@ void QXmppServer::_q_clientConnected()
 
 void QXmppServer::_q_clientDisconnected()
 {
-    auto *client  = qobject_cast<QXmppIncomingClient *>(sender());
+    auto *client = qobject_cast<QXmppIncomingClient *>(sender());
     if (!client)
         return;
 
@@ -770,8 +764,7 @@ void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
     if (!stream)
         return;
 
-    if (dialback.command() == QXmppDialback::Verify)
-    {
+    if (dialback.command() == QXmppDialback::Verify) {
         // handle a verify request
         for (auto *out : qAsConst(d->outgoingServers)) {
             if (out->remoteDomain() != dialback.from())
@@ -828,13 +821,13 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
     socket->setParent(stream);
 
     connect(stream, &QXmppStream::disconnected,
-                    this, &QXmppServer::_q_serverDisconnected);
+            this, &QXmppServer::_q_serverDisconnected);
 
     connect(stream, &QXmppIncomingServer::dialbackRequestReceived,
-                    this, &QXmppServer::_q_dialbackRequestReceived);
+            this, &QXmppServer::_q_dialbackRequestReceived);
 
     connect(stream, &QXmppIncomingServer::elementReceived,
-                    this, &QXmppServer::handleElement);
+            this, &QXmppServer::handleElement);
 
     // add stream
     d->incomingServers.insert(stream);
@@ -869,7 +862,7 @@ public:
 
 QXmppSslServer::QXmppSslServer(QObject *parent)
     : QTcpServer(parent),
-    d(new QXmppSslServerPrivate)
+      d(new QXmppSslServerPrivate)
 {
 }
 
@@ -925,4 +918,3 @@ void QXmppSslServer::setPrivateKey(const QSslKey &key)
 {
     d->privateKey = key;
 }
-

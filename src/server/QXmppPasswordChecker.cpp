@@ -79,8 +79,8 @@ void QXmppPasswordRequest::setUsername(const QString &username)
 
 QXmppPasswordReply::QXmppPasswordReply(QObject *parent)
     : QObject(parent),
-    m_error(QXmppPasswordReply::NoError),
-    m_isFinished(false)
+      m_error(QXmppPasswordReply::NoError),
+      m_isFinished(false)
 {
 }
 
@@ -225,4 +225,3 @@ bool QXmppPasswordChecker::hasGetPassword() const
 {
     return false;
 }
-

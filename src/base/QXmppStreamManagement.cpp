@@ -53,7 +53,7 @@ void QXmppStreamManagementEnable::setMax(const unsigned max)
 bool QXmppStreamManagementEnable::isStreamManagementEnable(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("enable") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementEnable::parse(const QDomElement &element)
@@ -122,7 +122,7 @@ void QXmppStreamManagementEnabled::setLocation(const QString location)
 bool QXmppStreamManagementEnabled::isStreamManagementEnabled(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("enabled") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementEnabled::parse(const QDomElement &element)
@@ -146,7 +146,7 @@ void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QXmppStreamManagementResume::QXmppStreamManagementResume(const unsigned h, const QString& previd)
+QXmppStreamManagementResume::QXmppStreamManagementResume(const unsigned h, const QString &previd)
     : m_h(h), m_previd(previd)
 {
 }
@@ -166,7 +166,7 @@ QString QXmppStreamManagementResume::prevId() const
     return m_previd;
 }
 
-void QXmppStreamManagementResume::setPrevId(const QString& previd)
+void QXmppStreamManagementResume::setPrevId(const QString &previd)
 {
     m_previd = previd;
 }
@@ -174,7 +174,7 @@ void QXmppStreamManagementResume::setPrevId(const QString& previd)
 bool QXmppStreamManagementResume::isStreamManagementResume(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("resume") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementResume::parse(const QDomElement &element)
@@ -191,7 +191,7 @@ void QXmppStreamManagementResume::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QXmppStreamManagementResumed::QXmppStreamManagementResumed(const unsigned h, const QString& previd)
+QXmppStreamManagementResumed::QXmppStreamManagementResumed(const unsigned h, const QString &previd)
     : m_h(h), m_previd(previd)
 {
 }
@@ -211,7 +211,7 @@ QString QXmppStreamManagementResumed::prevId() const
     return m_previd;
 }
 
-void QXmppStreamManagementResumed::setPrevId(const QString& previd)
+void QXmppStreamManagementResumed::setPrevId(const QString &previd)
 {
     m_previd = previd;
 }
@@ -219,7 +219,7 @@ void QXmppStreamManagementResumed::setPrevId(const QString& previd)
 bool QXmppStreamManagementResumed::isStreamManagementResumed(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("resumed") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementResumed::parse(const QDomElement &element)
@@ -254,13 +254,13 @@ void QXmppStreamManagementFailed::setError(const QXmppStanza::Error::Condition e
 bool QXmppStreamManagementFailed::isStreamManagementFailed(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("failed") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementFailed::parse(const QDomElement &element)
 {
     QDomElement childElement = element.firstChildElement();
-    if(!childElement.isNull() && childElement.namespaceURI() == ns_stanza) {
+    if (!childElement.isNull() && childElement.namespaceURI() == ns_stanza) {
         m_error = conditionFromStr(childElement.tagName());
     }
 }
@@ -307,13 +307,13 @@ void QXmppStreamManagementAck::toXml(QXmlStreamWriter *writer) const
 bool QXmppStreamManagementAck::isStreamManagementAck(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("a") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 bool QXmppStreamManagementReq::isStreamManagementReq(const QDomElement &element)
 {
     return element.tagName() == QLatin1String("r") &&
-           element.namespaceURI() == ns_stream_management;
+        element.namespaceURI() == ns_stream_management;
 }
 
 void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)

@@ -24,12 +24,12 @@
 #ifndef QXMPPTRANSFERMANAGER_H
 #define QXMPPTRANSFERMANAGER_H
 
+#include "QXmppClientExtension.h"
+
 #include <QDateTime>
 #include <QSharedData>
 #include <QUrl>
 #include <QVariant>
-
-#include "QXmppClientExtension.h"
 
 class QTcpSocket;
 class QXmppByteStreamIq;
