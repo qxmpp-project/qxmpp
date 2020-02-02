@@ -24,9 +24,9 @@
 #ifndef QXMPPHTTPUPLOADIQ_H
 #define QXMPPHTTPUPLOADIQ_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppIq.h"
+
+#include <QSharedDataPointer>
 
 class QUrl;
 class QMimeType;

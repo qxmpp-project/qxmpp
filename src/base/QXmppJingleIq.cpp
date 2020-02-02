@@ -21,14 +21,15 @@
  *
  */
 
+#include "QXmppJingleIq.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QDate>
 #include <QDateTime>
 #include <QDomElement>
 #include <QRegExp>
-
-#include "QXmppConstants_p.h"
-#include "QXmppJingleIq.h"
-#include "QXmppUtils.h"
 
 static const int RTP_COMPONENT = 1;
 

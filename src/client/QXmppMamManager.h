@@ -24,10 +24,10 @@
 #ifndef QXMPPMAMMANAGER_H
 #define QXMPPMAMMANAGER_H
 
-#include <QDateTime>
-
 #include "QXmppClientExtension.h"
 #include "QXmppResultSet.h"
+
+#include <QDateTime>
 
 class QXmppMessage;
 

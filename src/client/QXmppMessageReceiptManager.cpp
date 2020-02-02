@@ -24,12 +24,12 @@
 
 #include "QXmppMessageReceiptManager.h"
 
-#include <QDomElement>
-
+#include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
-#include "QXmppClient.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 /// Constructs a QXmppMessageReceiptManager to handle incoming and outgoing
 /// message delivery receipts.

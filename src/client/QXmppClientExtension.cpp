@@ -21,9 +21,9 @@
  *
  */
 
-#include <QStringList>
-
 #include "QXmppClientExtension.h"
+
+#include <QStringList>
 
 class QXmppClientExtensionPrivate
 {

@@ -21,12 +21,13 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppArchiveManager.h"
 
 #include "QXmppArchiveIq.h"
-#include "QXmppArchiveManager.h"
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
+
+#include <QDomElement>
 
 /// \cond
 QStringList QXmppArchiveManager::discoveryFeatures() const

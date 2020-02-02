@@ -24,9 +24,9 @@
 #ifndef QXMPPENTITYTIMEIQ_H
 #define QXMPPENTITYTIMEIQ_H
 
-#include <QDateTime>
-
 #include "QXmppIq.h"
+
+#include <QDateTime>
 
 /// \ingroup Stanzas
 

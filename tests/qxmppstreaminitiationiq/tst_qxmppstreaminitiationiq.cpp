@@ -24,6 +24,7 @@
 
 #include "QXmppStreamInitiationIq_p.h"
 #include "QXmppTransferManager.h"
+
 #include "util.h"
 
 class tst_QXmppStreamInitiationIq : public QObject

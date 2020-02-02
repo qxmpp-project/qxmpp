@@ -22,25 +22,26 @@
  *
  */
 
-#include <QCryptographicHash>
-#include <QNetworkProxy>
-#include <QSslSocket>
-#include <QSslConfiguration>
-#include <QUrl>
-#include <QDnsLookup>
+#include "QXmppOutgoingClient.h"
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
-#include "QXmppOutgoingClient.h"
+#include "QXmppSasl_p.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
-#include "QXmppNonSASLAuth.h"
-#include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
+
+#include <QCryptographicHash>
+#include <QDnsLookup>
+#include <QNetworkProxy>
+#include <QSslConfiguration>
+#include <QSslSocket>
+#include <QUrl>
 
 // IQ types
 #include "QXmppBindIq.h"
@@ -50,11 +51,11 @@
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QDomDocument>
-#include <QStringList>
-#include <QRegExp>
 #include <QHostAddress>
-#include <QXmlStreamWriter>
+#include <QRegExp>
+#include <QStringList>
 #include <QTimer>
+#include <QXmlStreamWriter>
 
 class QXmppOutgoingClientPrivate
 {

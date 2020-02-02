@@ -23,10 +23,9 @@
 
 #include "QXmppInvokable.h"
 
-#include <QVariant>
 #include <QMetaMethod>
 #include <QStringList>
-
+#include <QVariant>
 #include <qdebug.h>
 
 /// Constructs a QXmppInvokable with the specified \a parent.

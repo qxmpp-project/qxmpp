@@ -21,18 +21,19 @@
  *
  */
 
-#include <QDomElement>
-#include <QHostAddress>
-#include <QSslKey>
-#include <QSslSocket>
+#include "QXmppIncomingServer.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
-#include "QXmppIncomingServer.h"
 #include "QXmppOutgoingServer.h"
 #include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QHostAddress>
+#include <QSslKey>
+#include <QSslSocket>
 
 class QXmppIncomingServerPrivate
 {

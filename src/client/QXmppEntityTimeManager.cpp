@@ -21,16 +21,15 @@
  *
  */
 
-
 #include "QXmppEntityTimeManager.h"
-
-#include <QDomElement>
-#include <QDateTime>
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppUtils.h"
+
+#include <QDateTime>
+#include <QDomElement>
 
 /// Request the time from an XMPP entity.
 ///

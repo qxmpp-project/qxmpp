@@ -24,9 +24,9 @@
 #ifndef QXMPPBITSOFBINARYDATACONTAINER_H
 #define QXMPPBITSOFBINARYDATACONTAINER_H
 
-#include <QVector>
-
 #include "QXmppBitsOfBinaryData.h"
+
+#include <QVector>
 
 class QDomElement;
 class QXmlStreamWriter;

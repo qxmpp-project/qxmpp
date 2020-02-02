@@ -9,7 +9,15 @@ BreakBeforeBraces: Custom
 BreakConstructorInitializers: BeforeColon
 DerivePointerAlignment: true
 DisableFormat: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: "^.QXmpp.*"
+    Priority: 1
+  - Regex: "^<Q(?!Xmpp).*"
+    Priority: 2
+  - Regex: "^<[^Q].*"
+    Priority: 3
 Language: Cpp
-SortIncludes: false
+SortIncludes: true
 SpaceAfterTemplateKeyword: false
 SpacesBeforeTrailingComments: 2

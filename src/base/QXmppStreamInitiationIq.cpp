@@ -21,11 +21,11 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppConstants_p.h"
 #include "QXmppStreamInitiationIq_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 QXmppDataForm QXmppStreamInitiationIq::featureForm() const
 {

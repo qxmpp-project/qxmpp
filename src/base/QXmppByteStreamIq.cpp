@@ -21,11 +21,12 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppByteStreamIq.h"
+
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 QString QXmppByteStreamIq::StreamHost::host() const
 {

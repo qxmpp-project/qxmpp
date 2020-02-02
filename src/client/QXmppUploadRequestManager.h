@@ -25,6 +25,7 @@
 #define QXMPPUPLOADREQUESTMANAGER_H
 
 #include <QXmppClientExtension.h>
+
 #include <QSharedDataPointer>
 
 class QFileInfo;

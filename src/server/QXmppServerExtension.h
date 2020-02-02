@@ -24,9 +24,9 @@
 #ifndef QXMPPSERVEREXTENSION_H
 #define QXMPPSERVEREXTENSION_H
 
-#include <QVariant>
-
 #include "QXmppLogger.h"
+
+#include <QVariant>
 
 class QDomElement;
 class QStringList;

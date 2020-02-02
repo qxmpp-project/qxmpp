@@ -21,10 +21,10 @@
  *
  */
 
-#include <QObject>
-
 #include "QXmppMixIq.h"
+
 #include "util.h"
+#include <QObject>
 
 Q_DECLARE_METATYPE(QXmppIq::Type);
 Q_DECLARE_METATYPE(QXmppMixIq::Type);

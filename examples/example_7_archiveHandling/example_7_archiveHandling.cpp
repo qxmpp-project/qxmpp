@@ -21,13 +21,13 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QDateTime>
+#include "example_7_archiveHandling.h"
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 
-#include "example_7_archiveHandling.h"
+#include <QCoreApplication>
+#include <QDateTime>
 
 static void logStart(const QString &msg)
 {

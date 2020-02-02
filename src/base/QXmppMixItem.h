@@ -24,9 +24,9 @@
 #ifndef QXMPPMIXITEM_H
 #define QXMPPMIXITEM_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppElement.h"
+
+#include <QSharedDataPointer>
 
 class QXmppMixInfoItemPrivate;
 class QXmppMixParticipantItemPrivate;

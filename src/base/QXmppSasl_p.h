@@ -25,13 +25,13 @@
 #ifndef QXMPPSASL_P_H
 #define QXMPPSASL_P_H
 
-#include <QByteArray>
-#include <QCryptographicHash>
-#include <QMap>
-
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
 #include "QXmppStanza.h"
+
+#include <QByteArray>
+#include <QCryptographicHash>
+#include <QMap>
 
 class QXmppSaslClientPrivate;
 class QXmppSaslServerPrivate;

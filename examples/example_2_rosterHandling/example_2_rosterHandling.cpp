@@ -21,12 +21,12 @@
  *
  */
 
-#include <QCoreApplication>
+#include "example_2_rosterHandling.h"
 
 #include "QXmppMessage.h"
 #include "QXmppRosterManager.h"
 
-#include "example_2_rosterHandling.h"
+#include <QCoreApplication>
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent),

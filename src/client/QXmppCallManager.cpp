@@ -21,16 +21,17 @@
  *
  */
 
-#include <QDomElement>
-#include <QTimer>
-
 #include "QXmppCallManager.h"
+
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QTimer>
 
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;

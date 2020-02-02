@@ -23,6 +23,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppServer.h"
+
 #include "util.h"
 
 class tst_QXmppServer : public QObject

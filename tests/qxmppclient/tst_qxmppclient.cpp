@@ -22,8 +22,6 @@
  *
  */
 
-#include <QObject>
-
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
@@ -32,6 +30,7 @@
 #include "QXmppVersionManager.h"
 
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppClient : public QObject
 {

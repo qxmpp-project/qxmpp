@@ -21,10 +21,10 @@
  *
  */
 
-#include <QObject>
-
 #include "QXmppStartTlsPacket.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppStartTlsPacket : public QObject
 {

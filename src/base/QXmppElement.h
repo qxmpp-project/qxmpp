@@ -24,11 +24,11 @@
 #ifndef QXMPPELEMENT_H
 #define QXMPPELEMENT_H
 
+#include "QXmppGlobal.h"
+
 #include <QMap>
 #include <QStringList>
 #include <QXmlStreamWriter>
-
-#include "QXmppGlobal.h"
 
 class QDomElement;
 class QXmppElement;

@@ -21,6 +21,13 @@
  *
  */
 
+#include "example_9_vCard.h"
+
+#include "QXmppMessage.h"
+#include "QXmppRosterManager.h"
+#include "QXmppVCardIq.h"
+#include "QXmppVCardManager.h"
+
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QDebug>
@@ -29,13 +36,6 @@
 #include <QImage>
 #include <QImageReader>
 #include <QXmlStreamWriter>
-
-#include "QXmppMessage.h"
-#include "QXmppRosterManager.h"
-#include "QXmppVCardIq.h"
-#include "QXmppVCardManager.h"
-
-#include "example_9_vCard.h"
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent),

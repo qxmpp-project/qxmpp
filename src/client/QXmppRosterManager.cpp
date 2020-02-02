@@ -22,13 +22,14 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppRosterManager.h"
 
 #include "QXmppClient.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
-#include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 class QXmppRosterManagerPrivate
 {

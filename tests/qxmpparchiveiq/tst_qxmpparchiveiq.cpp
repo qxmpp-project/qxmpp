@@ -23,6 +23,7 @@
  */
 
 #include "QXmppArchiveIq.h"
+
 #include "util.h"
 
 class tst_QXmppArchiveIq : public QObject

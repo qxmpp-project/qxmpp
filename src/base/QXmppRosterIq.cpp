@@ -22,13 +22,14 @@
  *
  */
 
+#include "QXmppRosterIq.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QDomElement>
 #include <QSharedData>
 #include <QXmlStreamWriter>
-
-#include "QXmppRosterIq.h"
-#include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
 
 class QXmppRosterIqPrivate : public QSharedData
 {

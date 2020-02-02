@@ -22,17 +22,17 @@
  *
  */
 
-#include <cstdlib>
-#include <cstdio>
-
-#include <QBuffer>
-#include <QCoreApplication>
-#include <QDebug>
+#include "example_3_transferHandling.h"
 
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "example_3_transferHandling.h"
+#include <cstdio>
+#include <cstdlib>
+
+#include <QBuffer>
+#include <QCoreApplication>
+#include <QDebug>
 
 xmppClient::xmppClient(QObject *parent)
     : QXmppClient(parent), transferManager(nullptr)

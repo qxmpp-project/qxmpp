@@ -58,4 +58,4 @@ protected:
     QXmppOutgoingClient *clientStream();
 };
 
-#endif // QXMPPINTERNALCLIENTEXTENSION_H
+#endif  // QXMPPINTERNALCLIENTEXTENSION_H

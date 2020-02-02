@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "QXmppConstants_p.h"
 
 const char* ns_stream = "http://etherx.jabber.org/streams";

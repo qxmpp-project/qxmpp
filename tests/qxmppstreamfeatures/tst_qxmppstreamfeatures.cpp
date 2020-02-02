@@ -22,6 +22,7 @@
  */
 
 #include "QXmppStreamFeatures.h"
+
 #include "util.h"
 
 class tst_QXmppStreamFeatures : public QObject

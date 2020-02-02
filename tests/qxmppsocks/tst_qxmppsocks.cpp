@@ -21,10 +21,11 @@
  *
  */
 
+#include "QXmppSocks.h"
+
+#include "util.h"
 #include <QTcpServer>
 #include <QTcpSocket>
-#include "QXmppSocks.h"
-#include "util.h"
 
 class tst_QXmppSocks : public QObject
 {

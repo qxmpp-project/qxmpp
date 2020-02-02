@@ -23,15 +23,16 @@
  *
  */
 
+#include "QXmppMessage.h"
+
+#include "QXmppBitsOfBinaryDataList.h"
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
-
-#include "QXmppBitsOfBinaryDataList.h"
-#include "QXmppConstants_p.h"
-#include "QXmppMessage.h"
-#include "QXmppUtils.h"
 
 static const QStringList CHAT_STATES = {
     QString(),

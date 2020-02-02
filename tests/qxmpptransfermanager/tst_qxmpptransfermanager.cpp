@@ -21,13 +21,13 @@
  *
  */
 
-#include <QBuffer>
-#include <QObject>
-
 #include "QXmppClient.h"
 #include "QXmppServer.h"
 #include "QXmppTransferManager.h"
+
 #include "util.h"
+#include <QBuffer>
+#include <QObject>
 
 class tst_QXmppTransferManager : public QObject
 {

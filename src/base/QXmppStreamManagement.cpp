@@ -21,10 +21,9 @@
  *
  */
 
-#include "QXmppStreamManagement_p.h"
-#include "QXmppStanza_p.h"
-
 #include "QXmppConstants_p.h"
+#include "QXmppStanza_p.h"
+#include "QXmppStreamManagement_p.h"
 
 QXmppStreamManagementEnable::QXmppStreamManagementEnable(const bool resume, const unsigned max)
     : m_resume(resume), m_max(max)

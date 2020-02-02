@@ -21,10 +21,10 @@
  *
  */
 
+#include "QXmppRtcpPacket.h"
+
 #include <QDataStream>
 #include <QDebug>
-
-#include "QXmppRtcpPacket.h"
 
 #define RTP_VERSION 2
 

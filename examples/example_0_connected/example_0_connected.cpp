@@ -21,11 +21,10 @@
  *
  */
 
-
-#include <QCoreApplication>
-
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
+
+#include <QCoreApplication>
 
 int main(int argc, char *argv[])
 {

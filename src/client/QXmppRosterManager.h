@@ -25,13 +25,13 @@
 #ifndef QXMPPROSTERMANAGER_H
 #define QXMPPROSTERMANAGER_H
 
-#include <QObject>
-#include <QMap>
-#include <QStringList>
-
 #include "QXmppClientExtension.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
+
+#include <QMap>
+#include <QObject>
+#include <QStringList>
 
 class QXmppRosterManagerPrivate;
 

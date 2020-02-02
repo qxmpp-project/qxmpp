@@ -21,12 +21,13 @@
  *
  */
 
+#include "QXmppRpcManager.h"
+
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppInvokable.h"
 #include "QXmppRemoteMethod.h"
 #include "QXmppRpcIq.h"
-#include "QXmppRpcManager.h"
 
 /// Constructs a QXmppRpcManager.
 

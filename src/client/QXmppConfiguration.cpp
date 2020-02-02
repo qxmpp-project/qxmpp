@@ -21,11 +21,12 @@
  *
  */
 
+#include "QXmppConfiguration.h"
+
+#include "QXmppUtils.h"
+
 #include <QNetworkProxy>
 #include <QSslSocket>
-
-#include "QXmppConfiguration.h"
-#include "QXmppUtils.h"
 
 class QXmppConfigurationPrivate : public QSharedData
 {

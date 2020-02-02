@@ -23,15 +23,15 @@
 
 #include "QXmppBitsOfBinaryData.h"
 
-#include <QDomElement>
-#include <QSharedData>
-#include <QMimeType>
-#include <QMimeDatabase>
-#include <QXmlStreamWriter>
-
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QMimeDatabase>
+#include <QMimeType>
+#include <QSharedData>
+#include <QXmlStreamWriter>
 
 class QXmppBitsOfBinaryDataPrivate : public QSharedData
 {

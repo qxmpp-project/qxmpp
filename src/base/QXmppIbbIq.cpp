@@ -22,15 +22,15 @@
  *
  */
 
+#include "QXmppIbbIq.h"
+
+#include "QXmppConstants_p.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-#include "QXmppConstants_p.h"
-#include "QXmppIbbIq.h"
-
 QXmppIbbOpenIq::QXmppIbbOpenIq() : QXmppIq(QXmppIq::Set), m_block_size(1024)
 {
-
 }
 
 long QXmppIbbOpenIq::blockSize() const

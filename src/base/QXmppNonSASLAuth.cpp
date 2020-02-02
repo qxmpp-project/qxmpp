@@ -21,13 +21,14 @@
  *
  */
 
+#include "QXmppNonSASLAuth.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QXmlStreamWriter>
-
-#include "QXmppConstants_p.h"
-#include "QXmppNonSASLAuth.h"
-#include "QXmppUtils.h"
 
 QXmppNonSASLAuthIq::QXmppNonSASLAuthIq()
     : QXmppIq(QXmppIq::Set)

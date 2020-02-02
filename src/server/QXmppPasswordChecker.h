@@ -24,9 +24,9 @@
 #ifndef QXMPPPASSWORDCHECKER_H
 #define QXMPPPASSWORDCHECKER_H
 
-#include <QObject>
-
 #include "QXmppGlobal.h"
+
+#include <QObject>
 
 /// \brief The QXmppPasswordRequest class represents a password request.
 ///

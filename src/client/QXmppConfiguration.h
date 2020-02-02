@@ -24,10 +24,10 @@
 #ifndef QXMPPCONFIGURATION_H
 #define QXMPPCONFIGURATION_H
 
-#include <QString>
-#include <QSharedDataPointer>
-
 #include "QXmppGlobal.h"
+
+#include <QSharedDataPointer>
+#include <QString>
 
 class QNetworkProxy;
 class QSslCertificate;

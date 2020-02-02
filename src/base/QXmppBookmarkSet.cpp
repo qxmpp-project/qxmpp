@@ -21,10 +21,11 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppBookmarkSet.h"
+
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 static const char *ns_bookmarks = "storage:bookmarks";
 

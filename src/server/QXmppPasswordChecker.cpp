@@ -21,11 +21,11 @@
  *
  */
 
+#include "QXmppPasswordChecker.h"
+
 #include <QCryptographicHash>
 #include <QString>
 #include <QTimer>
-
-#include "QXmppPasswordChecker.h"
 
 /// Returns the requested domain.
 

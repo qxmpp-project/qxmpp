@@ -21,11 +21,12 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppDialback.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppDialback.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 /// Constructs a QXmppDialback.
 

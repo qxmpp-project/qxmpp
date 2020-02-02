@@ -21,9 +21,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppJingleIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppJingleIq : public QObject
 {

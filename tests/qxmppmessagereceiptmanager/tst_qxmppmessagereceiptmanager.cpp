@@ -21,10 +21,11 @@
  *
  */
 
-#include <QObject>
 #include "QXmppClient.h"
 #include "QXmppMessageReceiptManager.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppMessageReceiptManager : public QObject
 {

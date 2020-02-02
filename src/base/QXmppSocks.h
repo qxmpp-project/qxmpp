@@ -24,10 +24,10 @@
 #ifndef QXMPPSOCKS_H
 #define QXMPPSOCKS_H
 
+#include "QXmppGlobal.h"
+
 #include <QHostAddress>
 #include <QTcpSocket>
-
-#include "QXmppGlobal.h"
 
 class QTcpServer;
 

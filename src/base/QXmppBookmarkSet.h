@@ -24,10 +24,10 @@
 #ifndef QXMPPBOOKMARKSET_H
 #define QXMPPBOOKMARKSET_H
 
+#include "QXmppStanza.h"
+
 #include <QList>
 #include <QUrl>
-
-#include "QXmppStanza.h"
 
 /// \brief The QXmppBookmarkConference class represents a bookmark for a conference room,
 /// as defined by XEP-0048: Bookmarks.

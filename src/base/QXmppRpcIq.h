@@ -26,6 +26,7 @@
 #define QXMPPRPCIQ_H
 
 #include "QXmppIq.h"
+
 #include <QVariant>
 
 class QXMPP_EXPORT QXmppRpcMarshaller

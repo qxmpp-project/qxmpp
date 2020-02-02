@@ -24,12 +24,12 @@
 #ifndef QXMPPCALLMANAGER_H
 #define QXMPPCALLMANAGER_H
 
-#include <QObject>
-#include <QIODevice>
-#include <QMetaType>
-
 #include "QXmppClientExtension.h"
 #include "QXmppLogger.h"
+
+#include <QIODevice>
+#include <QMetaType>
+#include <QObject>
 
 class QHostAddress;
 class QXmppCallPrivate;

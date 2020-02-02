@@ -21,17 +21,17 @@
  *
  */
 
-#include <QFileInfo>
-#include <QMimeDatabase>
+#include "QXmppUploadRequestManager.h"
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppDiscoveryManager.h"
-#include "QXmppDiscoveryIq.h"
 #include "QXmppDataForm.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppHttpUploadIq.h"
 
-#include "QXmppUploadRequestManager.h"
+#include <QFileInfo>
+#include <QMimeDatabase>
 
 class QXmppUploadServicePrivate : public QSharedData
 {

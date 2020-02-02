@@ -24,11 +24,11 @@
 #ifndef QXMPPSTREAMINITIATIONIQ_P_H
 #define QXMPPSTREAMINITIATIONIQ_P_H
 
-#include <QDateTime>
-
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 #include "QXmppTransferManager.h"
+
+#include <QDateTime>
 
 //
 //  W A R N I N G

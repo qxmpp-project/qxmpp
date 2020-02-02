@@ -21,16 +21,17 @@
  *
  */
 
+#include "QXmppRtpChannel.h"
+
+#include "QXmppCodec_p.h"
+#include "QXmppJingleIq.h"
+#include "QXmppRtpPacket.h"
+
 #include <cmath>
 
 #include <QDataStream>
 #include <QMetaType>
 #include <QTimer>
-
-#include "QXmppCodec_p.h"
-#include "QXmppJingleIq.h"
-#include "QXmppRtpChannel.h"
-#include "QXmppRtpPacket.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
@@ -107,7 +108,6 @@ void QXmppRtpChannel::setLocalSsrc(quint32 ssrc)
 {
     m_outgoingSsrc = ssrc;
 }
-
 
 enum CodecId {
     G711u = 0,

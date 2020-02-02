@@ -22,13 +22,12 @@
  *
  */
 
-#include <QCoreApplication>
-
 #include "QXmppClient.h"
 #include "QXmppLogger.h"
 #include "QXmppRpcManager.h"
 
 #include "remoteinterface.h"
+#include <QCoreApplication>
 
 int main(int argc, char *argv[])
 {

@@ -21,14 +21,13 @@
  *
  */
 
-
 #include "QXmppPresence.h"
-
-#include <QDateTime>
-#include <QDomElement>
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDateTime>
+#include <QDomElement>
 
 static const QStringList PRESENCE_TYPES = {
     QStringLiteral("error"),

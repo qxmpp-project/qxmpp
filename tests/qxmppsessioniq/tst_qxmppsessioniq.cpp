@@ -23,6 +23,7 @@
  */
 
 #include "QXmppSessionIq.h"
+
 #include "util.h"
 
 class TestPackets : public QObject

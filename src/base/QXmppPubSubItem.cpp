@@ -23,10 +23,10 @@
 
 #include "QXmppPubSubItem.h"
 
-#include <QDomElement>
-
 #include "QXmppElement.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 class QXmppPubSubItemPrivate : public QSharedData
 {

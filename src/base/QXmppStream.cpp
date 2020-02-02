@@ -22,11 +22,11 @@
  *
  */
 
+#include "QXmppStream.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppLogger.h"
 #include "QXmppStanza.h"
-#include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils.h"
 

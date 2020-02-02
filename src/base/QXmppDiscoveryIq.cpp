@@ -21,12 +21,13 @@
  *
  */
 
-#include <QCryptographicHash>
-#include <QDomElement>
+#include "QXmppDiscoveryIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppDiscoveryIq.h"
 #include "QXmppUtils.h"
+
+#include <QCryptographicHash>
+#include <QDomElement>
 
 static bool identityLessThan(const QXmppDiscoveryIq::Identity &i1, const QXmppDiscoveryIq::Identity &i2)
 {

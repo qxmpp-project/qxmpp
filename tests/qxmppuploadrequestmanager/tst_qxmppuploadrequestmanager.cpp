@@ -22,18 +22,18 @@
  *
  */
 
-#include <QObject>
-#include <QByteArray>
-#include <QMimeDatabase>
-
-#include "QXmppUploadRequestManager.h"
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
-#include "QXmppLogger.h"
 #include "QXmppHttpUploadIq.h"
-#include "util.h"
+#include "QXmppLogger.h"
+#include "QXmppUploadRequestManager.h"
 
-class TestHelper : public QObject 
+#include "util.h"
+#include <QByteArray>
+#include <QMimeDatabase>
+#include <QObject>
+
+class TestHelper : public QObject
 {
     Q_OBJECT
 

@@ -21,13 +21,14 @@
  *
  */
 
-#include <QDomElement>
-#include <QMetaClassInfo>
-#include <QStringList>
+#include "QXmppServerExtension.h"
 
 #include "QXmppLogger.h"
 #include "QXmppServer.h"
-#include "QXmppServerExtension.h"
+
+#include <QDomElement>
+#include <QMetaClassInfo>
+#include <QStringList>
 
 class QXmppServerExtensionPrivate
 {

@@ -22,8 +22,9 @@
  */
 
 #include "QXmppMixItem.h"
-#include "QXmppDataForm.h"
+
 #include "QXmppConstants_p.h"
+#include "QXmppDataForm.h"
 #include "QXmppUtils.h"
 
 #include <QBuffer>

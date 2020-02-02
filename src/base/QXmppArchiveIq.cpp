@@ -21,11 +21,12 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppArchiveIq.h"
+
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 QXmppArchiveMessage::QXmppArchiveMessage()
     : m_received(false)

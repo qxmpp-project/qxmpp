@@ -22,6 +22,11 @@
  *
  */
 
+#include "QXmppDataForm.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QDebug>
 #include <QDomElement>
 #include <QMimeDatabase>

@@ -22,13 +22,14 @@
  *
  */
 
+#include "QXmppBindIq.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
+
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
-
-#include "QXmppBindIq.h"
-#include "QXmppUtils.h"
-#include "QXmppConstants_p.h"
 
 /// Returns the bound JID.
 ///

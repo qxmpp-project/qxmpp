@@ -21,9 +21,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppHttpUploadIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppHttpUploadIq : public QObject
 {

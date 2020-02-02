@@ -25,6 +25,7 @@
 #define QXMPPMIXIQ_H
 
 #include "QXmppIq.h"
+
 #include <QSharedDataPointer>
 
 class QXmppMixIqPrivate;

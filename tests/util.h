@@ -22,9 +22,10 @@
  *
  */
 
+#include "QXmppPasswordChecker.h"
+
 #include <QDomDocument>
 #include <QtTest>
-#include "QXmppPasswordChecker.h"
 
 template<class T>
 static void parsePacket(T &packet, const QByteArray &xml)

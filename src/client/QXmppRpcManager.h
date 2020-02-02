@@ -24,12 +24,12 @@
 #ifndef QXMPPRPCMANAGER_H
 #define QXMPPRPCMANAGER_H
 
-#include <QMap>
-#include <QVariant>
-
 #include "QXmppClientExtension.h"
 #include "QXmppInvokable.h"
 #include "QXmppRemoteMethod.h"
+
+#include <QMap>
+#include <QVariant>
 
 class QXmppRpcErrorIq;
 class QXmppRpcInvokeIq;
