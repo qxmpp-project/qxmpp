@@ -39,7 +39,7 @@ rpcClient::rpcClient(QObject *parent)
 
     // observe incoming presences
     connect(this, &QXmppClient::presenceReceived,
-                         this, &rpcClient::slotPresenceReceived);
+            this, &rpcClient::slotPresenceReceived);
 }
 
 rpcClient::~rpcClient()
@@ -49,8 +49,8 @@ rpcClient::~rpcClient()
 void rpcClient::slotInvokeRemoteMethod()
 {
     QXmppRemoteMethodResult methodResult = m_rpcManager->callRemoteMethod(
-            m_remoteJid, "RemoteInterface.echoString", "This is a test" );
-    if( methodResult.hasError )
+        m_remoteJid, "RemoteInterface.echoString", "This is a test");
+    if (methodResult.hasError)
         qDebug() << "Error:" << methodResult.code << methodResult.errorMessage;
     else
         qDebug() << "Result:" << methodResult.result;
@@ -73,4 +73,3 @@ void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
     m_remoteJid = presence.from();
     QTimer::singleShot(1000, this, &rpcClient::slotInvokeRemoteMethod);
 }
-

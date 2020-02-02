@@ -39,8 +39,7 @@
 
 // adapted from public domain source by Ross Williams and Eric Durbin
 // FIXME : is this valid for big-endian machines?
-static quint32 crctable[256] =
-{
+static quint32 crctable[256] = {
     0x00000000L, 0x77073096L, 0xEE0E612CL, 0x990951BAL,
     0x076DC419L, 0x706AF48FL, 0xE963A535L, 0x9E6495A3L,
     0x0EDB8832L, 0x79DCB8A4L, 0xE0D5E91EL, 0x97D2D988L,
@@ -122,15 +121,13 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
     dt.setTimeSpec(Qt::UTC);
 
     // process milliseconds
-    if (tzPos > 20 && str.at(19) == '.')
-    {
+    if (tzPos > 20 && str.at(19) == '.') {
         QString millis = (str.mid(20, tzPos - 20) + "000").left(3);
         dt = dt.addMSecs(millis.toInt());
     }
 
     // process time zone
-    if (tzRe.cap(1) != "Z")
-    {
+    if (tzRe.cap(1) != "Z") {
         int offset = tzRe.cap(3).toInt() * 3600 + tzRe.cap(4).toInt() * 60;
         if (tzRe.cap(2) == "+")
             dt = dt.addSecs(-offset);
@@ -167,7 +164,7 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
 
     // Calculate offset
     const int offset = tzRe.cap(3).toInt() * 3600 +
-                       tzRe.cap(4).toInt() * 60;
+        tzRe.cap(4).toInt() * 60;
     if (tzRe.cap(2) == "-")
         return -offset;
     else
@@ -195,12 +192,12 @@ QString QXmppUtils::jidToDomain(const QString &jid)
 
 /// Returns the resource for the given \a jid.
 
-QString QXmppUtils::jidToResource(const QString& jid)
+QString QXmppUtils::jidToResource(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('/'));
     if (pos < 0)
         return QString();
-    return jid.mid(pos+1);
+    return jid.mid(pos + 1);
 }
 
 /// Returns the user for the given \a jid.
@@ -215,7 +212,7 @@ QString QXmppUtils::jidToUser(const QString &jid)
 
 /// Returns the bare jid (i.e. without resource) for the given \a jid.
 
-QString QXmppUtils::jidToBareJid(const QString& jid)
+QString QXmppUtils::jidToBareJid(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('/'));
     if (pos < 0)
@@ -228,7 +225,7 @@ QString QXmppUtils::jidToBareJid(const QString& jid)
 quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
     quint32 result = 0xffffffff;
-    for(char n : in)
+    for (char n : in)
         result = (result >> 8) ^ (crctable[(result & 0xff) ^ (quint8)n]);
     return result ^= 0xffffffff;
 }
@@ -278,7 +275,7 @@ int QXmppUtils::generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;
-    while (N <= (val = qrand() / (RAND_MAX/N))) {};
+    while (N <= (val = qrand() / (RAND_MAX / N))) { };
     return val;
 }
 
@@ -303,24 +300,23 @@ QString QXmppUtils::generateStanzaHash(int length)
     const QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const int N = somechars.size();
     QString hashResult;
-    for ( int idx = 0; idx < length; ++idx )
+    for (int idx = 0; idx < length; ++idx)
         hashResult += somechars[generateRandomInteger(N)];
     return hashResult;
 }
 
-void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
-                             const QString& value)
+void helperToXmlAddAttribute(QXmlStreamWriter *stream, const QString &name,
+                             const QString &value)
 {
-    if(!value.isEmpty())
-        stream->writeAttribute(name,value);
+    if (!value.isEmpty())
+        stream->writeAttribute(name, value);
 }
 
-void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
-                           const QString& value)
+void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
+                               const QString &value)
 {
-    if(!value.isEmpty())
-        stream->writeTextElement( name, value);
+    if (!value.isEmpty())
+        stream->writeTextElement(name, value);
     else
         stream->writeEmptyElement(name);
 }
-

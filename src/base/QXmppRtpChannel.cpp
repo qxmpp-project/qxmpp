@@ -121,8 +121,7 @@ enum CodecId {
     G729 = 18
 };
 
-struct ToneInfo
-{
+struct ToneInfo {
     QXmppRtpAudioChannel::Tone tone;
     quint32 incomingStart;
     quint32 outgoingStart;
@@ -132,29 +131,45 @@ struct ToneInfo
 static QPair<int, int> toneFreqs(QXmppRtpAudioChannel::Tone tone)
 {
     switch (tone) {
-    case QXmppRtpAudioChannel::Tone_1: return qMakePair(697, 1209);
-    case QXmppRtpAudioChannel::Tone_2: return qMakePair(697, 1336);
-    case QXmppRtpAudioChannel::Tone_3: return qMakePair(697, 1477);
-    case QXmppRtpAudioChannel::Tone_A: return qMakePair(697, 1633);
-    case QXmppRtpAudioChannel::Tone_4: return qMakePair(770, 1209);
-    case QXmppRtpAudioChannel::Tone_5: return qMakePair(770, 1336);
-    case QXmppRtpAudioChannel::Tone_6: return qMakePair(770, 1477);
-    case QXmppRtpAudioChannel::Tone_B: return qMakePair(770, 1633);
-    case QXmppRtpAudioChannel::Tone_7: return qMakePair(852, 1209);
-    case QXmppRtpAudioChannel::Tone_8: return qMakePair(852, 1336);
-    case QXmppRtpAudioChannel::Tone_9: return qMakePair(852, 1477);
-    case QXmppRtpAudioChannel::Tone_C: return qMakePair(852, 1633);
-    case QXmppRtpAudioChannel::Tone_Star: return qMakePair(941, 1209);
-    case QXmppRtpAudioChannel::Tone_0: return qMakePair(941, 1336);
-    case QXmppRtpAudioChannel::Tone_Pound: return qMakePair(941, 1477);
-    case QXmppRtpAudioChannel::Tone_D: return qMakePair(941, 1633);
+    case QXmppRtpAudioChannel::Tone_1:
+        return qMakePair(697, 1209);
+    case QXmppRtpAudioChannel::Tone_2:
+        return qMakePair(697, 1336);
+    case QXmppRtpAudioChannel::Tone_3:
+        return qMakePair(697, 1477);
+    case QXmppRtpAudioChannel::Tone_A:
+        return qMakePair(697, 1633);
+    case QXmppRtpAudioChannel::Tone_4:
+        return qMakePair(770, 1209);
+    case QXmppRtpAudioChannel::Tone_5:
+        return qMakePair(770, 1336);
+    case QXmppRtpAudioChannel::Tone_6:
+        return qMakePair(770, 1477);
+    case QXmppRtpAudioChannel::Tone_B:
+        return qMakePair(770, 1633);
+    case QXmppRtpAudioChannel::Tone_7:
+        return qMakePair(852, 1209);
+    case QXmppRtpAudioChannel::Tone_8:
+        return qMakePair(852, 1336);
+    case QXmppRtpAudioChannel::Tone_9:
+        return qMakePair(852, 1477);
+    case QXmppRtpAudioChannel::Tone_C:
+        return qMakePair(852, 1633);
+    case QXmppRtpAudioChannel::Tone_Star:
+        return qMakePair(941, 1209);
+    case QXmppRtpAudioChannel::Tone_0:
+        return qMakePair(941, 1336);
+    case QXmppRtpAudioChannel::Tone_Pound:
+        return qMakePair(941, 1477);
+    case QXmppRtpAudioChannel::Tone_D:
+        return qMakePair(941, 1633);
     }
     return qMakePair(0, 0);
 }
 
 QByteArray renderTone(QXmppRtpAudioChannel::Tone tone, int clockrate, quint32 clockTick, qint64 samples)
 {
-    QPair<int,int> tf = toneFreqs(tone);
+    QPair<int, int> tf = toneFreqs(tone);
     const float clockMult = 2.0 * M_PI / float(clockrate);
     QByteArray chunk;
     chunk.reserve(samples * SAMPLE_BYTES);
@@ -184,7 +199,7 @@ public:
 
     QByteArray incomingBuffer;
     bool incomingBuffering;
-    QMap<int, QXmppCodec*> incomingCodecs;
+    QMap<int, QXmppCodec *> incomingCodecs;
     int incomingMinimum;
     int incomingMaximum;
     // position of the head of the incoming buffer, in bytes
@@ -206,19 +221,7 @@ public:
 };
 
 QXmppRtpAudioChannelPrivate::QXmppRtpAudioChannelPrivate()
-    : signalsEmitted(false)
-    , writtenSinceLastEmit(0)
-    , incomingBuffering(true)
-    , incomingMinimum(0)
-    , incomingMaximum(0)
-    , incomingPos(0)
-    , incomingSequence(0)
-    , outgoingCodec(nullptr)
-    , outgoingMarker(true)
-    , outgoingPayloadNumbered(false)
-    , outgoingSequence(1)
-    , outgoingStamp(0)
-    , outgoingTimer(nullptr)
+    : signalsEmitted(false), writtenSinceLastEmit(0), incomingBuffering(true), incomingMinimum(0), incomingMaximum(0), incomingPos(0), incomingSequence(0), outgoingCodec(nullptr), outgoingMarker(true), outgoingPayloadNumbered(false), outgoingSequence(1), outgoingStamp(0), outgoingTimer(nullptr)
 {
     qRegisterMetaType<QXmppRtpAudioChannel::Tone>("QXmppRtpAudioChannel::Tone");
 }
@@ -246,10 +249,9 @@ QXmppCodec *QXmppRtpAudioChannelPrivate::codecForPayloadType(const QXmppJinglePa
 /// Constructs a new RTP audio channel with the given \a parent.
 
 QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
-    : QIODevice(parent)
-    , d(new QXmppRtpAudioChannelPrivate())
+    : QIODevice(parent), d(new QXmppRtpAudioChannelPrivate())
 {
-    auto *logParent = qobject_cast<QXmppLoggable*>(parent);
+    auto *logParent = qobject_cast<QXmppLoggable *>(parent);
     if (logParent) {
         connect(this, &QXmppRtpAudioChannel::logMessage,
                 logParent, &QXmppLoggable::logMessage);
@@ -261,7 +263,7 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
     QXmppJinglePayloadType payload;
 
 #ifdef QXMPP_USE_OPUS
-    payload.setId(100); // NOTE: I don't know if this Id is ok for Opus.
+    payload.setId(100);  // NOTE: I don't know if this Id is ok for Opus.
     payload.setChannels(1);
     payload.setName("opus");
     payload.setClockrate(8000);
@@ -375,8 +377,8 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
         if (packetOffset < 0) {
 #ifdef QXMPP_DEBUG_RTP_BUFFER
             warning(QString("RTP packet stamp %1 is too old, buffer start is %2")
-                    .arg(QString::number(packet.stamp()))
-                    .arg(QString::number(d->incomingPos)));
+                        .arg(QString::number(packet.stamp()))
+                        .arg(QString::number(d->incomingPos)));
 #endif
             return;
         }
@@ -396,15 +398,14 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     codec->decode(input, output);
 
     // check whether we are running late
-    if (d->incomingBuffer.size() > d->incomingMaximum)
-    {
+    if (d->incomingBuffer.size() > d->incomingMaximum) {
         qint64 droppedSize = d->incomingBuffer.size() - d->incomingMinimum;
         const int remainder = droppedSize % SAMPLE_BYTES;
         if (remainder)
             droppedSize -= remainder;
 #ifdef QXMPP_DEBUG_RTP_BUFFER
         warning(QString("Incoming RTP buffer is too full, dropping %1 bytes")
-                .arg(QString::number(droppedSize)));
+                    .arg(QString::number(droppedSize)));
 #endif
         d->incomingBuffer.remove(0, droppedSize);
         d->incomingPos += droppedSize;
@@ -449,11 +450,10 @@ QXmppJinglePayloadType QXmppRtpAudioChannel::payloadType() const
 }
 
 /// \cond
-qint64 QXmppRtpAudioChannel::readData(char * data, qint64 maxSize)
+qint64 QXmppRtpAudioChannel::readData(char *data, qint64 maxSize)
 {
     // if we are filling the buffer, return empty samples
-    if (d->incomingBuffering)
-    {
+    if (d->incomingBuffering) {
         // FIXME: if we are asked for a non-integer number of samples,
         // we will return junk on next read as we don't increment d->incomingPos
         memset(data, 0, maxSize);
@@ -463,8 +463,7 @@ qint64 QXmppRtpAudioChannel::readData(char * data, qint64 maxSize)
     qint64 readSize = qMin(maxSize, qint64(d->incomingBuffer.size()));
     memcpy(data, d->incomingBuffer.constData(), readSize);
     d->incomingBuffer.remove(0, readSize);
-    if (readSize < maxSize)
-    {
+    if (readSize < maxSize) {
 #ifdef QXMPP_DEBUG_RTP
         debug(QString("QXmppRtpAudioChannel::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
 #endif
@@ -503,8 +502,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
         // check for telephony events
         if (outgoingType.name() == "telephone-event") {
             d->outgoingTonesType = outgoingType;
-        }
-        else if (!d->outgoingCodec) {
+        } else if (!d->outgoingCodec) {
             QXmppCodec *codec = d->codecForPayloadType(outgoingType);
             if (codec) {
                 d->payloadType = outgoingType;
@@ -578,7 +576,7 @@ void QXmppRtpAudioChannel::stopTone(QXmppRtpAudioChannel::Tone tone)
 }
 
 /// \cond
-qint64 QXmppRtpAudioChannel::writeData(const char * data, qint64 maxSize)
+qint64 QXmppRtpAudioChannel::writeData(const char *data, qint64 maxSize)
 {
     if (!d->outgoingCodec) {
         warning("QXmppRtpAudioChannel::writeData before codec was set");
@@ -650,8 +648,7 @@ void QXmppRtpAudioChannel::writeDatagram()
     if (sendAudio) {
         // send audio data
         QXmppRtpPacket packet;
-        if (d->outgoingMarker)
-        {
+        if (d->outgoingMarker) {
             packet.setMarker(true);
             d->outgoingMarker = false;
         } else {
@@ -690,10 +687,10 @@ void QXmppRtpAudioChannel::writeDatagram()
  */
 QXmppVideoFrame::QXmppVideoFrame()
     : m_bytesPerLine(0),
-    m_height(0),
-    m_mappedBytes(0),
-    m_pixelFormat(Format_Invalid),
-    m_width(0)
+      m_height(0),
+      m_mappedBytes(0),
+      m_pixelFormat(Format_Invalid),
+      m_width(0)
 {
 }
 
@@ -706,10 +703,10 @@ QXmppVideoFrame::QXmppVideoFrame()
  */
 QXmppVideoFrame::QXmppVideoFrame(int bytes, const QSize &size, int bytesPerLine, PixelFormat format)
     : m_bytesPerLine(bytesPerLine),
-    m_height(size.height()),
-    m_mappedBytes(bytes),
-    m_pixelFormat(format),
-    m_width(size.width())
+      m_height(size.height()),
+      m_mappedBytes(bytes),
+      m_pixelFormat(format),
+      m_width(size.width())
 {
     m_data.resize(bytes);
 }
@@ -718,14 +715,14 @@ QXmppVideoFrame::QXmppVideoFrame(int bytes, const QSize &size, int bytesPerLine,
 
 uchar *QXmppVideoFrame::bits()
 {
-    return (uchar*)m_data.data();
+    return (uchar *)m_data.data();
 }
 
 /// Returns a pointer to the start of the frame data buffer.
 
 const uchar *QXmppVideoFrame::bits() const
 {
-    return (const uchar*)m_data.constData();
+    return (const uchar *)m_data.constData();
 }
 
 /// Returns the number of bytes in a scan line.
@@ -747,8 +744,8 @@ int QXmppVideoFrame::height() const
 bool QXmppVideoFrame::isValid() const
 {
     return m_pixelFormat != Format_Invalid &&
-           m_height > 0 && m_width > 0 &&
-           m_mappedBytes > 0;
+        m_height > 0 && m_width > 0 &&
+        m_mappedBytes > 0;
 }
 
 /// Returns the number of bytes occupied by the mapped frame data.
@@ -783,7 +780,7 @@ class QXmppRtpVideoChannelPrivate
 {
 public:
     QXmppRtpVideoChannelPrivate();
-    QMap<int, QXmppVideoDecoder*> decoders;
+    QMap<int, QXmppVideoDecoder *> decoders;
     QXmppVideoEncoder *encoder;
     QList<QXmppVideoFrame> frames;
 
@@ -796,9 +793,9 @@ public:
 
 QXmppRtpVideoChannelPrivate::QXmppRtpVideoChannelPrivate()
     : encoder(nullptr),
-    outgoingId(0),
-    outgoingSequence(1),
-    outgoingStamp(0)
+      outgoingId(0),
+      outgoingSequence(1),
+      outgoingStamp(0)
 {
 }
 
@@ -923,8 +920,8 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
 
     for (const auto &payload : qAsConst(m_incomingPayloadTypes)) {
         QXmppVideoDecoder *decoder = nullptr;
-        if (false)
-            {}
+        if (false) {
+        }
 #ifdef QXMPP_USE_THEORA
         else if (payload.name().toLower() == "theora")
             decoder = new QXmppTheoraDecoder;
@@ -946,8 +943,8 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
     }
     for (const auto &payload : m_outgoingPayloadTypes) {
         QXmppVideoEncoder *encoder = nullptr;
-        if (false)
-            {}
+        if (false) {
+        }
 #ifdef QXMPP_USE_THEORA
         else if (payload.name().toLower() == "theora")
             encoder = new QXmppTheoraEncoder;
@@ -1000,4 +997,3 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
     }
     d->outgoingStamp += 1;
 }
-

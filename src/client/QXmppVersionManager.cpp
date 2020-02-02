@@ -67,7 +67,7 @@ QString QXmppVersionManager::requestVersion(const QString& jid)
     QXmppVersionIq request;
     request.setType(QXmppIq::Get);
     request.setTo(jid);
-    if(client()->sendPacket(request))
+    if (client()->sendPacket(request))
         return request.id();
     else
         return QString();
@@ -137,10 +137,9 @@ QStringList QXmppVersionManager::discoveryFeatures() const
     return QStringList() << ns_version;
 }
 
-bool QXmppVersionManager::handleStanza(const QDomElement &element)
+bool QXmppVersionManager::handleStanza(const QDomElement& element)
 {
-    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
-    {
+    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element)) {
         QXmppVersionIq versionIq;
         versionIq.parse(element);
 

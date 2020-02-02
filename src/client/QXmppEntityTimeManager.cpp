@@ -40,7 +40,7 @@ QString QXmppEntityTimeManager::requestTime(const QString& jid)
     QXmppEntityTimeIq request;
     request.setType(QXmppIq::Get);
     request.setTo(jid);
-    if(client()->sendPacket(request))
+    if (client()->sendPacket(request))
         return request.id();
     else
         return QString();
@@ -52,15 +52,13 @@ QStringList QXmppEntityTimeManager::discoveryFeatures() const
     return QStringList() << ns_entity_time;
 }
 
-bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
+bool QXmppEntityTimeManager::handleStanza(const QDomElement& element)
 {
-    if(element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element))
-    {
+    if (element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element)) {
         QXmppEntityTimeIq entityTime;
         entityTime.parse(element);
 
-        if(entityTime.type() == QXmppIq::Get)
-        {
+        if (entityTime.type() == QXmppIq::Get) {
             // respond to query
             QXmppEntityTimeIq responseIq;
             responseIq.setType(QXmppIq::Result);

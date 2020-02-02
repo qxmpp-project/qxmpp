@@ -57,14 +57,14 @@ void xmppClient::rosterReceived()
     const QStringList jids = m_rosterManager->getRosterBareJids();
     for (const QString &bareJid : jids) {
         QString name = m_rosterManager->getRosterEntry(bareJid).name();
-        if(name.isEmpty())
+        if (name.isEmpty())
             name = "-";
         qDebug("example_2_rosterHandling:: Roster received: %s [%s]", qPrintable(bareJid), qPrintable(name));
     }
 }
 
-void xmppClient::presenceChanged(const QString& bareJid,
-                                 const QString& resource)
+void xmppClient::presenceChanged(const QString &bareJid,
+                                 const QString &resource)
 {
     qDebug("example_2_rosterHandling:: Presence changed %s/%s", qPrintable(bareJid), qPrintable(resource));
 }

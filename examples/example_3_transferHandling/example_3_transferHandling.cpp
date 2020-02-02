@@ -49,10 +49,10 @@ xmppClient::xmppClient(QObject *parent)
     // transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
     connect(this, &QXmppClient::presenceReceived,
-                    this, &xmppClient::slotPresenceReceived);
+            this, &xmppClient::slotPresenceReceived);
 
     connect(transferManager, &QXmppTransferManager::fileReceived,
-                    this, &xmppClient::slotFileReceived);
+            this, &xmppClient::slotFileReceived);
 }
 
 void xmppClient::setRecipient(const QString &recipient)
@@ -74,13 +74,13 @@ void xmppClient::slotFileReceived(QXmppTransferJob *job)
     qDebug() << "Got transfer request from:" << job->jid();
 
     connect(job, SIGNAL(error(QXmppTransferJob::Error)),
-                    this, SLOT(slotError(QXmppTransferJob::Error)));
+            this, SLOT(slotError(QXmppTransferJob::Error)));
 
     connect(job, &QXmppTransferJob::finished,
-                    this, &xmppClient::slotFinished);
+            this, &xmppClient::slotFinished);
 
     connect(job, &QXmppTransferJob::progress,
-                    this, &xmppClient::slotProgress);
+            this, &xmppClient::slotProgress);
 
     // allocate a buffer to receive the file
     auto *buffer = new QBuffer(this);
@@ -110,12 +110,12 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     QXmppTransferJob *job = transferManager->sendFile(presence.from(), ":/example_3_transferHandling.cpp", "example source code");
 
     connect(job, SIGNAL(error(QXmppTransferJob::Error)),
-                    this, SLOT(slotError(QXmppTransferJob::Error)));
+            this, SLOT(slotError(QXmppTransferJob::Error)));
     connect(job, &QXmppTransferJob::finished,
-                    this, &xmppClient::slotFinished);
+            this, &xmppClient::slotFinished);
 
     connect(job, &QXmppTransferJob::progress,
-                    this, &xmppClient::slotProgress);
+            this, &xmppClient::slotProgress);
 }
 
 /// A file transfer has made progress.
@@ -130,8 +130,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // we want one argument : "send" or "receive"
-    if (argc != 2 || (strcmp(argv[1], "send") && strcmp(argv[1], "receive")))
-    {
+    if (argc != 2 || (strcmp(argv[1], "send") && strcmp(argv[1], "receive"))) {
         fprintf(stderr, "Usage: %s send|receive\n", argv[0]);
         return EXIT_FAILURE;
     }

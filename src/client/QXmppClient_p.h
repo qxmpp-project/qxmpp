@@ -52,7 +52,7 @@ public:
 
     /// Current presence of the client
     QXmppPresence clientPresence;
-    QList<QXmppClientExtension*> extensions;
+    QList<QXmppClientExtension *> extensions;
     QXmppLogger *logger;
     /// Pointer to the XMPP stream
     QXmppOutgoingClient *stream;
@@ -72,4 +72,4 @@ private:
     QXmppClient *q;
 };
 
-#endif // QXMPPCLIENT_P_H
+#endif  // QXMPPCLIENT_P_H

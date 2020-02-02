@@ -57,14 +57,14 @@ const char* ns_vcard = "vcard-temp";
 // XEP-0059: Result Set Management
 const char* ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0060: Publish-Subscribe
-const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
+const char* ns_pubsub = "http://jabber.org/protocol/pubsub";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data
 const char* ns_oob = "jabber:x:oob";
 // XEP-0071: XHTML-IM
-const char *ns_xhtml = "http://www.w3.org/1999/xhtml";
-const char *ns_xhtml_im = "http://jabber.org/protocol/xhtml-im";
+const char* ns_xhtml = "http://www.w3.org/1999/xhtml";
+const char* ns_xhtml_im = "http://jabber.org/protocol/xhtml-im";
 // XEP-0077: In-Band Registration
 const char* ns_register = "jabber:iq:register";
 const char* ns_register_feature = "http://jabber.org/features/iq-register";

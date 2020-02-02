@@ -35,8 +35,7 @@ class passwordChecker : public QXmppPasswordChecker
     /// Retrieves the password for the given username.
     QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password) override
     {
-        if (request.username() == USERNAME)
-        {
+        if (request.username() == USERNAME) {
             password = PASSWORD;
             return QXmppPasswordReply::NoError;
         } else {
@@ -56,8 +55,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // we want one argument : the domain to serve
-    if (argc != 2)
-    {
+    if (argc != 2) {
         fprintf(stderr, "Usage: xmppServer <domain>\n");
         return EXIT_FAILURE;
     }

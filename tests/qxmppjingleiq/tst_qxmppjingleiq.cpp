@@ -76,40 +76,40 @@ void tst_QXmppJingleIq::testCandidate()
 void tst_QXmppJingleIq::testContent()
 {
     const QByteArray xml(
-    "<content creator=\"initiator\" name=\"voice\">"
-      "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
+        "<content creator=\"initiator\" name=\"voice\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
         "<payload-type id=\"96\" name=\"speex\" clockrate=\"16000\"/>"
         "<payload-type id=\"97\" name=\"speex\" clockrate=\"8000\"/>"
         "<payload-type id=\"18\" name=\"G729\"/>"
         "<payload-type id=\"0\" name=\"PCMU\"/>"
         "<payload-type id=\"103\" name=\"L16\" channels=\"2\" clockrate=\"16000\"/>"
         "<payload-type id=\"98\" name=\"x-ISAC\" clockrate=\"8000\"/>"
-      "</description>"
-      "<transport xmlns=\"urn:xmpp:jingle:transports:ice-udp:1\""
-                 " ufrag=\"8hhy\""
-                 " pwd=\"asd88fgpdd777uzjYhagZg\">"
+        "</description>"
+        "<transport xmlns=\"urn:xmpp:jingle:transports:ice-udp:1\""
+        " ufrag=\"8hhy\""
+        " pwd=\"asd88fgpdd777uzjYhagZg\">"
         "<candidate component=\"1\""
-                   " foundation=\"1\""
-                   " generation=\"0\""
-                   " id=\"el0747fg11\""
-                   " ip=\"10.0.1.1\""
-                   " network=\"1\""
-                   " port=\"8998\""
-                   " priority=\"2130706431\""
-                   " protocol=\"udp\""
-                   " type=\"host\"/>"
+        " foundation=\"1\""
+        " generation=\"0\""
+        " id=\"el0747fg11\""
+        " ip=\"10.0.1.1\""
+        " network=\"1\""
+        " port=\"8998\""
+        " priority=\"2130706431\""
+        " protocol=\"udp\""
+        " type=\"host\"/>"
         "<candidate component=\"1\""
-                   " foundation=\"2\""
-                   " generation=\"0\""
-                   " id=\"y3s2b30v3r\""
-                   " ip=\"192.0.2.3\""
-                   " network=\"1\""
-                   " port=\"45664\""
-                   " priority=\"1694498815\""
-                   " protocol=\"udp\""
-                   " type=\"srflx\"/>"
-      "</transport>"
-    "</content>");
+        " foundation=\"2\""
+        " generation=\"0\""
+        " id=\"y3s2b30v3r\""
+        " ip=\"192.0.2.3\""
+        " network=\"1\""
+        " port=\"45664\""
+        " priority=\"1694498815\""
+        " protocol=\"udp\""
+        " type=\"srflx\"/>"
+        "</transport>"
+        "</content>");
 
     QXmppJingleIq::Content content;
     parsePacket(content, xml);
@@ -149,28 +149,28 @@ void tst_QXmppJingleIq::testContent()
 void tst_QXmppJingleIq::testContentFingerprint()
 {
     const QByteArray xml(
-    "<content creator=\"initiator\" name=\"voice\">"
-      "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
+        "<content creator=\"initiator\" name=\"voice\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
         "<payload-type id=\"0\" name=\"PCMU\"/>"
-      "</description>"
-      "<transport xmlns=\"urn:xmpp:jingle:transports:ice-udp:1\""
-                 " ufrag=\"8hhy\""
-                 " pwd=\"asd88fgpdd777uzjYhagZg\">"
+        "</description>"
+        "<transport xmlns=\"urn:xmpp:jingle:transports:ice-udp:1\""
+        " ufrag=\"8hhy\""
+        " pwd=\"asd88fgpdd777uzjYhagZg\">"
         "<candidate component=\"1\""
-                   " foundation=\"1\""
-                   " generation=\"0\""
-                   " id=\"el0747fg11\""
-                   " ip=\"10.0.1.1\""
-                   " network=\"1\""
-                   " port=\"8998\""
-                   " priority=\"2130706431\""
-                   " protocol=\"udp\""
-                   " type=\"host\"/>"
+        " foundation=\"1\""
+        " generation=\"0\""
+        " id=\"el0747fg11\""
+        " ip=\"10.0.1.1\""
+        " network=\"1\""
+        " port=\"8998\""
+        " priority=\"2130706431\""
+        " protocol=\"udp\""
+        " type=\"host\"/>"
         "<fingerprint xmlns=\"urn:xmpp:jingle:apps:dtls:0\" hash=\"sha-256\" setup=\"actpass\">"
-            "02:1A:CC:54:27:AB:EB:9C:53:3F:3E:4B:65:2E:7D:46:3F:54:42:CD:54:F1:7A:03:A2:7D:F9:B0:7F:46:19:B2"
+        "02:1A:CC:54:27:AB:EB:9C:53:3F:3E:4B:65:2E:7D:46:3F:54:42:CD:54:F1:7A:03:A2:7D:F9:B0:7F:46:19:B2"
         "</fingerprint>"
-      "</transport>"
-    "</content>");
+        "</transport>"
+        "</content>");
 
     QXmppJingleIq::Content content;
     parsePacket(content, xml);
@@ -197,7 +197,6 @@ void tst_QXmppJingleIq::testContentFingerprint()
 
     serializePacket(content, xml);
 }
-
 
 void tst_QXmppJingleIq::testContentSdp()
 {
@@ -334,7 +333,6 @@ void tst_QXmppJingleIq::testContentSdpFingerprint()
     QCOMPARE(content.transportFingerprintSetup(), QLatin1String("actpass"));
 
     QCOMPARE(content.toSdp(), sdp);
-
 }
 
 void tst_QXmppJingleIq::testContentSdpParameters()
@@ -446,8 +444,8 @@ void tst_QXmppJingleIq::testVideoPayloadType()
 {
     const QByteArray xml(
         "<payload-type id=\"98\" name=\"theora\" clockrate=\"90000\">"
-            "<parameter name=\"height\" value=\"768\"/>"
-            "<parameter name=\"width\" value=\"1024\"/>"
+        "<parameter name=\"height\" value=\"768\"/>"
+        "<parameter name=\"width\" value=\"1024\"/>"
         "</payload-type>");
     QXmppJinglePayloadType payload;
     parsePacket(payload, xml);

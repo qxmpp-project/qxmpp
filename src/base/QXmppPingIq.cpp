@@ -45,4 +45,3 @@ void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_ping);
     writer->writeEndElement();
 }
-

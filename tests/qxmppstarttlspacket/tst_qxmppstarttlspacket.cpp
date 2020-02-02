@@ -42,9 +42,9 @@ void tst_QXmppStartTlsPacket::testBasic_data()
     QTest::addColumn<QXmppStartTlsPacket::Type>("type");
 
 #define ROW(name, xml, valid, type) \
-    QTest::newRow(name) \
-        << QByteArrayLiteral(xml) \
-        << valid \
+    QTest::newRow(name)             \
+        << QByteArrayLiteral(xml)   \
+        << valid                    \
         << type
 
     ROW("starttls", R"(<starttls xmlns="urn:ietf:params:xml:ns:xmpp-tls"/>)", true, QXmppStartTlsPacket::StartTls);
@@ -68,9 +68,9 @@ void tst_QXmppStartTlsPacket::testBasic()
     QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement(), type), valid);
 
     // test other types return false
-    for (auto testValue : {QXmppStartTlsPacket::StartTls,
+    for (auto testValue : { QXmppStartTlsPacket::StartTls,
                             QXmppStartTlsPacket::Proceed,
-                            QXmppStartTlsPacket::Failure}) {
+                            QXmppStartTlsPacket::Failure }) {
         QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement(), testValue), testValue == type && valid);
     }
 

@@ -68,7 +68,7 @@ void xmppClient::rosterReceived()
         m_vCardManager->requestVCard(jid);
 }
 
-void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
+void xmppClient::vCardReceived(const QXmppVCardIq &vCard)
 {
     QString bareJid = vCard.from();
     qDebug() << "example_9_vCard: vCard Received:" << bareJid;
@@ -79,7 +79,7 @@ void xmppClient::vCardReceived(const QXmppVCardIq& vCard)
     QString vCardsDir("vCards/");
 
     QDir dir;
-    if(!dir.exists(vCardsDir))
+    if (!dir.exists(vCardsDir))
         dir.mkdir(vCardsDir);
 
     QFile file("vCards/" + bareJid + ".xml");

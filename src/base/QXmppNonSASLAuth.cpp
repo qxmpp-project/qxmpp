@@ -40,7 +40,7 @@ QString QXmppNonSASLAuthIq::username() const
     return m_username;
 }
 
-void QXmppNonSASLAuthIq::setUsername( const QString &username )
+void QXmppNonSASLAuthIq::setUsername(const QString &username)
 {
     m_username = username;
 }
@@ -60,7 +60,7 @@ QString QXmppNonSASLAuthIq::password() const
     return m_password;
 }
 
-void QXmppNonSASLAuthIq::setPassword( const QString &password )
+void QXmppNonSASLAuthIq::setPassword(const QString &password)
 {
     m_password = password;
 }

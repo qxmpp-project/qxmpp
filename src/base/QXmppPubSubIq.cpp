@@ -178,8 +178,7 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
         childElement = queryElement.firstChildElement("item");
-        while (!childElement.isNull())
-        {
+        while (!childElement.isNull()) {
             QXmppPubSubItem item;
             item.parse(childElement);
             d->items << item;
@@ -206,8 +205,7 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "node", d->queryNode);
 
     // write contents
-    switch (d->queryType)
-    {
+    switch (d->queryType) {
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:

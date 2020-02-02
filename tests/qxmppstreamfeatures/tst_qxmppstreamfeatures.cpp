@@ -57,9 +57,9 @@ void tst_QXmppStreamFeatures::testRequired()
 {
     const QByteArray xml(
         "<stream:features>"
-            "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\">"
-                "<required/>"
-            "</starttls>"
+        "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\">"
+        "<required/>"
+        "</starttls>"
         "</stream:features>");
 
     QXmppStreamFeatures features;
@@ -71,15 +71,15 @@ void tst_QXmppStreamFeatures::testRequired()
 void tst_QXmppStreamFeatures::testFull()
 {
     const QByteArray xml("<stream:features>"
-        "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
-        "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
-        "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
-        "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
-        "<csi xmlns=\"urn:xmpp:csi:0\"/>"
-        "<register xmlns=\"http://jabber.org/features/iq-register\"/>"
-        "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
-        "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
-        "</stream:features>");
+                         "<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>"
+                         "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
+                         "<auth xmlns=\"http://jabber.org/features/iq-auth\"/>"
+                         "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
+                         "<csi xmlns=\"urn:xmpp:csi:0\"/>"
+                         "<register xmlns=\"http://jabber.org/features/iq-register\"/>"
+                         "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
+                         "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
+                         "</stream:features>");
 
     QXmppStreamFeatures features;
     parsePacket(features, xml);

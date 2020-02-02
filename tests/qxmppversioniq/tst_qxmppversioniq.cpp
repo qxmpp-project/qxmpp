@@ -39,9 +39,9 @@ private slots:
 void tst_QXmppVersionIq::testVersionGet()
 {
     const QByteArray xmlGet(
-    "<iq id=\"version_1\" to=\"juliet@capulet.com/balcony\" "
-    "from=\"romeo@montague.net/orchard\" type=\"get\">"
-    "<query xmlns=\"jabber:iq:version\"/></iq>");
+        "<iq id=\"version_1\" to=\"juliet@capulet.com/balcony\" "
+        "from=\"romeo@montague.net/orchard\" type=\"get\">"
+        "<query xmlns=\"jabber:iq:version\"/></iq>");
 
     QXmppVersionIq verIqGet;
     parsePacket(verIqGet, xmlGet);
@@ -55,13 +55,13 @@ void tst_QXmppVersionIq::testVersionGet()
 void tst_QXmppVersionIq::testVersionResult()
 {
     const QByteArray xmlResult(
-    "<iq id=\"version_1\" to=\"romeo@montague.net/orchard\" "
-    "from=\"juliet@capulet.com/balcony\" type=\"result\">"
-    "<query xmlns=\"jabber:iq:version\">"
+        "<iq id=\"version_1\" to=\"romeo@montague.net/orchard\" "
+        "from=\"juliet@capulet.com/balcony\" type=\"result\">"
+        "<query xmlns=\"jabber:iq:version\">"
         "<name>qxmpp</name>"
         "<os>Windows-XP</os>"
         "<version>0.2.0</version>"
-    "</query></iq>");
+        "</query></iq>");
 
     QXmppVersionIq verIqResult;
     parsePacket(verIqResult, xmlResult);

@@ -42,7 +42,8 @@ static const QLatin1String VIDEO_MEDIA("video");
 class QXmppCallPrivate
 {
 public:
-    class Stream {
+    class Stream
+    {
     public:
         QXmppRtpChannel *channel;
         QXmppIceConnection *connection;
@@ -77,7 +78,7 @@ public:
 
     // Media streams
     bool sendVideo;
-    QList<Stream*> streams;
+    QList<Stream *> streams;
     QIODevice::OpenMode audioMode;
     QIODevice::OpenMode videoMode;
 
@@ -92,7 +93,7 @@ public:
     QXmppCall *findCall(const QString &sid) const;
     QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
 
-    QList<QXmppCall*> calls;
+    QList<QXmppCall *> calls;
     QHostAddress stunHost;
     quint16 stunPort;
     QHostAddress turnHost;
@@ -106,12 +107,12 @@ private:
 
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : direction(QXmppCall::IncomingDirection),
-    manager(nullptr),
-    state(QXmppCall::ConnectingState),
-    sendVideo(false),
-    audioMode(QIODevice::NotOpen),
-    videoMode(QIODevice::NotOpen),
-    q(qq)
+      manager(nullptr),
+      state(QXmppCall::ConnectingState),
+      sendVideo(false),
+      audioMode(QIODevice::NotOpen),
+      videoMode(QIODevice::NotOpen),
+      q(qq)
 {
     qRegisterMetaType<QXmppCall::State>();
 }
@@ -164,7 +165,7 @@ bool QXmppCallPrivate::handleTransport(QXmppCallPrivate::Stream *stream, const Q
 {
     stream->connection->setRemoteUser(content.transportUser());
     stream->connection->setRemotePassword(content.transportPassword());
-    const auto & candidates = content.transportCandidates();
+    const auto &candidates = content.transportCandidates();
     for (const auto &candidate : candidates)
         stream->connection->addRemoteCandidate(candidate);
 
@@ -264,7 +265,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         }
         streams << stream;
 
-         // accept content
+        // accept content
         QXmppJingleIq iq;
         iq.setTo(q->jid());
         iq.setType(QXmppIq::Set);
@@ -285,7 +286,6 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
             // FIXME: what action?
             return;
         }
-
     }
 }
 
@@ -327,25 +327,25 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
 
     // connect signals
     QObject::connect(stream->connection, &QXmppIceConnection::localCandidatesChanged,
-        q, &QXmppCall::localCandidatesChanged);
+                     q, &QXmppCall::localCandidatesChanged);
 
     QObject::connect(stream->connection, &QXmppIceConnection::connected,
-        q, &QXmppCall::updateOpenMode);
+                     q, &QXmppCall::updateOpenMode);
 
     QObject::connect(q, &QXmppCall::stateChanged,
-        q, &QXmppCall::updateOpenMode);
+                     q, &QXmppCall::updateOpenMode);
 
     QObject::connect(stream->connection, &QXmppIceConnection::disconnected,
-        q, &QXmppCall::hangup);
+                     q, &QXmppCall::hangup);
 
     if (channelObject) {
         QXmppIceComponent *rtpComponent = stream->connection->component(RTP_COMPONENT);
 
         QObject::connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
-                        channelObject, SLOT(datagramReceived(QByteArray)));
+                         channelObject, SLOT(datagramReceived(QByteArray)));
 
         QObject::connect(channelObject, SIGNAL(sendDatagram(QByteArray)),
-                        rtpComponent, SLOT(sendDatagram(QByteArray)));
+                         rtpComponent, SLOT(sendDatagram(QByteArray)));
     }
     return stream;
 }
@@ -409,8 +409,7 @@ bool QXmppCallPrivate::sendRequest(const QXmppJingleIq &iq)
 
 void QXmppCallPrivate::setState(QXmppCall::State newState)
 {
-    if (state != newState)
-    {
+    if (state != newState) {
         state = newState;
         emit q->stateChanged(state);
 
@@ -470,8 +469,7 @@ QXmppCall::~QXmppCall()
 
 void QXmppCall::accept()
 {
-    if (d->direction == IncomingDirection && d->state == ConnectingState)
-    {
+    if (d->direction == IncomingDirection && d->state == ConnectingState) {
         Q_ASSERT(d->streams.size() == 1);
         QXmppCallPrivate::Stream *stream = d->streams.first();
 
@@ -503,7 +501,7 @@ QXmppRtpAudioChannel *QXmppCall::audioChannel() const
 {
     QXmppCallPrivate::Stream *stream = d->findStreamByMedia(AUDIO_MEDIA);
     if (stream)
-        return static_cast<QXmppRtpAudioChannel*>(stream->channel);
+        return static_cast<QXmppRtpAudioChannel *>(stream->channel);
     else
         return nullptr;
 }
@@ -522,7 +520,7 @@ QXmppRtpVideoChannel *QXmppCall::videoChannel() const
 {
     QXmppCallPrivate::Stream *stream = d->findStreamByMedia(VIDEO_MEDIA);
     if (stream)
-        return static_cast<QXmppRtpVideoChannel*>(stream->channel);
+        return static_cast<QXmppRtpVideoChannel *>(stream->channel);
     else
         return nullptr;
 }
@@ -568,7 +566,7 @@ void QXmppCall::hangup()
 void QXmppCall::localCandidatesChanged()
 {
     // find the stream
-    auto *conn = qobject_cast<QXmppIceConnection*>(sender());
+    auto *conn = qobject_cast<QXmppIceConnection *>(sender());
     QXmppCallPrivate::Stream *stream = nullptr;
     for (auto *ptr : d->streams) {
         if (ptr->connection == conn) {
@@ -689,8 +687,8 @@ void QXmppCall::stopVideo()
 
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
     : stunPort(0),
-    turnPort(0),
-    q(qq)
+      turnPort(0),
+      q(qq)
 {
 }
 
@@ -698,7 +696,7 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
 {
     for (auto *call : calls)
         if (call->sid() == sid)
-           return call;
+            return call;
     return nullptr;
 }
 
@@ -706,7 +704,7 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
 {
     for (auto *call : calls)
         if (call->sid() == sid && call->direction() == direction)
-           return call;
+            return call;
     return nullptr;
 }
 
@@ -730,20 +728,18 @@ QXmppCallManager::~QXmppCallManager()
 QStringList QXmppCallManager::discoveryFeatures() const
 {
     return QStringList()
-        << ns_jingle            // XEP-0166 : Jingle
-        << ns_jingle_rtp        // XEP-0167 : Jingle RTP Sessions
+        << ns_jingle      // XEP-0166 : Jingle
+        << ns_jingle_rtp  // XEP-0167 : Jingle RTP Sessions
         << ns_jingle_rtp_audio
         << ns_jingle_rtp_video
-        << ns_jingle_ice_udp;    // XEP-0176 : Jingle ICE-UDP Transport Method
+        << ns_jingle_ice_udp;  // XEP-0176 : Jingle ICE-UDP Transport Method
 }
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() == "iq")
-    {
+    if (element.tagName() == "iq") {
         // XEP-0166: Jingle
-        if (QXmppJingleIq::isJingleIq(element))
-        {
+        if (QXmppJingleIq::isJingleIq(element)) {
             QXmppJingleIq jingleIq;
             jingleIq.parse(element);
             _q_jingleIqReceived(jingleIq);
@@ -760,13 +756,13 @@ void QXmppCallManager::setClient(QXmppClient *client)
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::disconnected,
-                    this, &QXmppCallManager::_q_disconnected);
+            this, &QXmppCallManager::_q_disconnected);
 
     connect(client, &QXmppClient::iqReceived,
-                    this, &QXmppCallManager::_q_iqReceived);
+            this, &QXmppCallManager::_q_iqReceived);
 
     connect(client, &QXmppClient::presenceReceived,
-                    this, &QXmppCallManager::_q_presenceReceived);
+            this, &QXmppCallManager::_q_presenceReceived);
 }
 /// \endcond
 
@@ -793,7 +789,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     // register call
     d->calls << call;
     connect(call, &QObject::destroyed,
-                    this, &QXmppCallManager::_q_callDestroyed);
+            this, &QXmppCallManager::_q_callDestroyed);
     emit callStarted(call);
 
     call->d->sendInvite();
@@ -846,7 +842,7 @@ void QXmppCallManager::setTurnPassword(const QString &password)
 
 void QXmppCallManager::_q_callDestroyed(QObject *object)
 {
-    d->calls.removeAll(static_cast<QXmppCall*>(object));
+    d->calls.removeAll(static_cast<QXmppCall *>(object));
 }
 
 /// Handles disconnection from server.
@@ -879,8 +875,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
     if (iq.type() != QXmppIq::Set)
         return;
 
-    if (iq.action() == QXmppJingleIq::SessionInitiate)
-    {
+    if (iq.action() == QXmppJingleIq::SessionInitiate) {
         // build call
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
         call->d->sid = iq.sid();
@@ -909,7 +904,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         // register call
         d->calls << call;
         connect(call, &QObject::destroyed,
-                        this, &QXmppCallManager::_q_callDestroyed);
+                this, &QXmppCallManager::_q_callDestroyed);
 
         // send ringing indication
         QXmppJingleIq ringing;
@@ -950,4 +945,3 @@ void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
         }
     }
 }
-

@@ -43,7 +43,7 @@ QString QXmppBindIq::jid() const
 ///
 /// \param jid
 
-void QXmppBindIq::setJid(const QString& jid)
+void QXmppBindIq::setJid(const QString &jid)
 {
     m_jid = jid;
 }
@@ -60,7 +60,7 @@ QString QXmppBindIq::resource() const
 ///
 /// \param resource
 
-void QXmppBindIq::setResource(const QString& resource)
+void QXmppBindIq::setResource(const QString &resource)
 {
     m_resource = resource;
 }

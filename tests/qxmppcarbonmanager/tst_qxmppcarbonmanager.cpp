@@ -54,8 +54,6 @@ private slots:
     void testHandleStanza_data();
     void testHandleStanza();
 
-
-
 private:
     QXmppCarbonTestHelper m_helper;
     QXmppCarbonManager m_manager;
@@ -82,25 +80,25 @@ void tst_QXmppCarbonManager::testHandleStanza_data()
                       "from='romeo@montague.example'"
                       "to='romeo@montague.example/home'"
                       "type='chat'>"
-               "<received xmlns='urn:xmpp:carbons:2'>"
-                 "<forwarded xmlns='urn:xmpp:forward:0'>"
-                   "<message xmlns='jabber:client'"
-                            "from='juliet@capulet.example/balcony'"
-                            "to='romeo@montague.example/garden'"
-                            "type='chat'>"
-                     "<body>What man art thou that, thus bescreen'd in night, so stumblest on my counsel?</body>"
-                     "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
-                   "</message>"
-                 "</forwarded>"
-               "</received>"
-             "</message>")
+                      "<received xmlns='urn:xmpp:carbons:2'>"
+                      "<forwarded xmlns='urn:xmpp:forward:0'>"
+                      "<message xmlns='jabber:client'"
+                      "from='juliet@capulet.example/balcony'"
+                      "to='romeo@montague.example/garden'"
+                      "type='chat'>"
+                      "<body>What man art thou that, thus bescreen'd in night, so stumblest on my counsel?</body>"
+                      "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
+                      "</message>"
+                      "</forwarded>"
+                      "</received>"
+                      "</message>")
         << true << false
         << QByteArray("<message xmlns='jabber:client'"
-                            "from='juliet@capulet.example/balcony'"
-                            "to='romeo@montague.example/garden'"
-                            "type='chat'>"
-                        "<body>What man art thou that, thus bescreen'd in night, so stumblest on my counsel?</body>"
-                        "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
+                      "from='juliet@capulet.example/balcony'"
+                      "to='romeo@montague.example/garden'"
+                      "type='chat'>"
+                      "<body>What man art thou that, thus bescreen'd in night, so stumblest on my counsel?</body>"
+                      "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
                       "</message>");
 
     QTest::newRow("sent1")
@@ -108,48 +106,46 @@ void tst_QXmppCarbonManager::testHandleStanza_data()
                       "from='romeo@montague.example'"
                       "to='romeo@montague.example/garden'"
                       "type='chat'>"
-                "<sent xmlns='urn:xmpp:carbons:2'>"
-                  "<forwarded xmlns='urn:xmpp:forward:0'>"
-                    "<message xmlns='jabber:client'"
-                             "to='juliet@capulet.example/balcony'"
-                             "from='romeo@montague.example/home'"
-                             "type='chat'>"
+                      "<sent xmlns='urn:xmpp:carbons:2'>"
+                      "<forwarded xmlns='urn:xmpp:forward:0'>"
+                      "<message xmlns='jabber:client'"
+                      "to='juliet@capulet.example/balcony'"
+                      "from='romeo@montague.example/home'"
+                      "type='chat'>"
                       "<body>Neither, fair saint, if either thee dislike.</body>"
                       "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
-                    "</message>"
-                  "</forwarded>"
-                "</sent>"
-              "</message>")
+                      "</message>"
+                      "</forwarded>"
+                      "</sent>"
+                      "</message>")
         << true << true
         << QByteArray("<message xmlns='jabber:client'"
-                          "to='juliet@capulet.example/balcony'"
-                          "from='romeo@montague.example/home'"
-                          "type='chat'>"
-                   "<body>Neither, fair saint, if either thee dislike.</body>"
-                   "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
-                 "</message>");
-
+                      "to='juliet@capulet.example/balcony'"
+                      "from='romeo@montague.example/home'"
+                      "type='chat'>"
+                      "<body>Neither, fair saint, if either thee dislike.</body>"
+                      "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
+                      "</message>");
 
     QTest::newRow("forwarded_normal")
         << QByteArray("<message to='mercutio@verona.lit' from='romeo@montague.lit/orchard' type='chat' id='28gs'>"
                       "<body>A most courteous exposition!</body>"
                       "<forwarded xmlns='urn:xmpp:forward:0'>"
-                        "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
-                        "<message from='juliet@capulet.lit/orchard'"
-                                 "id='0202197'"
-                                 "to='romeo@montague.lit'"
-                                 "type='chat'"
-                                 "xmlns='jabber:client'>"
-                            "<body>Yet I should kill thee with much cherishing.</body>"
-                            "<mood xmlns='http://jabber.org/protocol/mood'>"
-                                "<amorous/>"
-                            "</mood>"
-                        "</message>"
+                      "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
+                      "<message from='juliet@capulet.lit/orchard'"
+                      "id='0202197'"
+                      "to='romeo@montague.lit'"
+                      "type='chat'"
+                      "xmlns='jabber:client'>"
+                      "<body>Yet I should kill thee with much cherishing.</body>"
+                      "<mood xmlns='http://jabber.org/protocol/mood'>"
+                      "<amorous/>"
+                      "</mood>"
+                      "</message>"
                       "</forwarded>"
-                    "</message>")
+                      "</message>")
         << false << false
         << QByteArray();
-
 }
 
 void tst_QXmppCarbonManager::testHandleStanza()
@@ -161,7 +157,7 @@ void tst_QXmppCarbonManager::testHandleStanza()
 
     m_helper.m_expectedMessage = QXmppMessage();
 
-    if(!forwardedxml.isEmpty())
+    if (!forwardedxml.isEmpty())
         parsePacket(m_helper.m_expectedMessage, forwardedxml);
 
     m_helper.m_expectSent = sent;
@@ -177,7 +173,7 @@ void tst_QXmppCarbonManager::testHandleStanza()
     QCOMPARE(m_helper.m_signalTriggered, accept);
 }
 
-void QXmppCarbonTestHelper::messageSent(const QXmppMessage &msg)
+void QXmppCarbonTestHelper::messageSent(const QXmppMessage& msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, true);
@@ -185,7 +181,7 @@ void QXmppCarbonTestHelper::messageSent(const QXmppMessage &msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonTestHelper::messageReceived(const QXmppMessage &msg)
+void QXmppCarbonTestHelper::messageReceived(const QXmppMessage& msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, false);
@@ -193,7 +189,7 @@ void QXmppCarbonTestHelper::messageReceived(const QXmppMessage &msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonTestHelper::compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
+void QXmppCarbonTestHelper::compareMessages(const QXmppMessage& lhs, const QXmppMessage& rhs)
 {
     QCOMPARE(lhs.body(), rhs.body());
     QCOMPARE(lhs.from(), rhs.from());

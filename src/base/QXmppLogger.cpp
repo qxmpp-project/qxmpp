@@ -32,14 +32,11 @@
 #include <QMetaType>
 #include <QTextStream>
 
-#include "QXmppLogger.h"
-
-QXmppLogger* QXmppLogger::m_logger = nullptr;
+QXmppLogger *QXmppLogger::m_logger = nullptr;
 
 static const char *typeName(QXmppLogger::MessageType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case QXmppLogger::DebugMessage:
         return "DEBUG";
     case QXmppLogger::InformationMessage:
@@ -55,7 +52,7 @@ static const char *typeName(QXmppLogger::MessageType type)
     }
 }
 
-static QString formatted(QXmppLogger::MessageType type, const QString& text)
+static QString formatted(QXmppLogger::MessageType type, const QString &text)
 {
     return QDateTime::currentDateTime().toString() + " " +
         QString::fromLatin1(typeName(type)) + " " +
@@ -79,7 +76,7 @@ static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
 QXmppLoggable::QXmppLoggable(QObject *parent)
     : QObject(parent)
 {
-    auto *logParent = qobject_cast<QXmppLoggable*>(parent);
+    auto *logParent = qobject_cast<QXmppLoggable *>(parent);
     if (logParent) {
         relaySignals(this, logParent);
     }
@@ -88,7 +85,7 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
 /// \cond
 void QXmppLoggable::childEvent(QChildEvent *event)
 {
-    auto *child = qobject_cast<QXmppLoggable*>(event->child());
+    auto *child = qobject_cast<QXmppLoggable *>(event->child());
     if (!child)
         return;
 
@@ -96,11 +93,11 @@ void QXmppLoggable::childEvent(QChildEvent *event)
         relaySignals(child, this);
     } else if (event->removed()) {
         disconnect(child, &QXmppLoggable::logMessage,
-                this, &QXmppLoggable::logMessage);
+                   this, &QXmppLoggable::logMessage);
         disconnect(child, &QXmppLoggable::setGauge,
-                this, &QXmppLoggable::setGauge);
+                   this, &QXmppLoggable::setGauge);
         disconnect(child, &QXmppLoggable::updateCounter,
-                this, &QXmppLoggable::updateCounter);
+                   this, &QXmppLoggable::updateCounter);
     }
 }
 /// \endcond
@@ -117,10 +114,7 @@ public:
 };
 
 QXmppLoggerPrivate::QXmppLoggerPrivate()
-    : loggingType(QXmppLogger::NoLogging)
-    , logFile(nullptr)
-    , logFilePath("QXmppClientLog.log")
-    , messageTypes(QXmppLogger::AnyMessage)
+    : loggingType(QXmppLogger::NoLogging), logFile(nullptr), logFilePath("QXmppClientLog.log"), messageTypes(QXmppLogger::AnyMessage)
 {
 }
 
@@ -129,11 +123,10 @@ QXmppLoggerPrivate::QXmppLoggerPrivate()
 /// \param parent
 
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent)
-    , d(new QXmppLoggerPrivate())
+    : QObject(parent), d(new QXmppLoggerPrivate())
 {
     // make it possible to pass QXmppLogger::MessageType between threads
-    qRegisterMetaType< QXmppLogger::MessageType >("QXmppLogger::MessageType");
+    qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
 }
 
 QXmppLogger::~QXmppLogger()
@@ -144,9 +137,9 @@ QXmppLogger::~QXmppLogger()
 /// Returns the default logger.
 ///
 
-QXmppLogger* QXmppLogger::getLogger()
+QXmppLogger *QXmppLogger::getLogger()
 {
-    if(!m_logger)
+    if (!m_logger)
         m_logger = new QXmppLogger();
 
     return m_logger;
@@ -194,14 +187,13 @@ void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 /// \param type
 /// \param text
 
-void QXmppLogger::log(QXmppLogger::MessageType type, const QString& text)
+void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
 {
     // filter messages
     if (!d->messageTypes.testFlag(type))
         return;
 
-    switch(d->loggingType)
-    {
+    switch (d->loggingType) {
     case QXmppLogger::FileLogging:
         if (!d->logFile) {
             d->logFile = new QFile(d->logFilePath);
@@ -273,4 +265,3 @@ void QXmppLogger::reopen()
         d->logFile = nullptr;
     }
 }
-

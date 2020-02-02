@@ -57,11 +57,11 @@ QXmppMixIq::QXmppMixIq()
 {
 }
 
-QXmppMixIq::QXmppMixIq(const QXmppMixIq &) = default;
+QXmppMixIq::QXmppMixIq(const QXmppMixIq&) = default;
 
 QXmppMixIq::~QXmppMixIq() = default;
 
-QXmppMixIq &QXmppMixIq::operator=(const QXmppMixIq &) = default;
+QXmppMixIq& QXmppMixIq::operator=(const QXmppMixIq&) = default;
 
 /// Returns the channel JID. It also contains a participant id for Join/
 /// ClientJoin results.
@@ -143,15 +143,14 @@ void QXmppMixIq::setActionType(QXmppMixIq::Type type)
 bool QXmppMixIq::isMixIq(const QDomElement& element)
 {
     const QDomElement& child = element.firstChildElement();
-    return !child.isNull() && (child.namespaceURI() == ns_mix
-           || child.namespaceURI() == ns_mix_pam);
+    return !child.isNull() && (child.namespaceURI() == ns_mix || child.namespaceURI() == ns_mix_pam);
 }
 
 void QXmppMixIq::parseElementFromChild(const QDomElement& element)
 {
     QDomElement child = element.firstChildElement();
     // determine action type
-    d->actionType = (QXmppMixIq::Type) MIX_ACTION_TYPES.indexOf(child.tagName());
+    d->actionType = (QXmppMixIq::Type)MIX_ACTION_TYPES.indexOf(child.tagName());
 
     if (child.namespaceURI() == ns_mix_pam) {
         if (child.hasAttribute("channel"))
@@ -200,7 +199,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter* writer) const
     if (type() == Result)
         helperToXmlAddAttribute(writer, "jid", d->jid);
 
-    for (const auto &node : d->nodes) {
+    for (const auto& node : d->nodes) {
         writer->writeStartElement("subscribe");
         writer->writeAttribute("node", node);
         writer->writeEndElement();

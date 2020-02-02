@@ -36,7 +36,7 @@
 class QXmppMucManagerPrivate
 {
 public:
-    QMap<QString, QXmppMucRoom*> rooms;
+    QMap<QString, QXmppMucRoom *> rooms;
 };
 
 class QXmppMucRoomPrivate
@@ -81,7 +81,7 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
         room = new QXmppMucRoom(client(), roomJid, this);
         d->rooms.insert(roomJid, room);
         connect(room, &QObject::destroyed,
-            this, &QXmppMucManager::_q_roomDestroyed);
+                this, &QXmppMucManager::_q_roomDestroyed);
 
         // emit signal
         emit roomAdded(room);
@@ -91,7 +91,7 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
 
 /// Returns the list of managed rooms.
 
-QList<QXmppMucRoom*> QXmppMucManager::rooms() const
+QList<QXmppMucRoom *> QXmppMucManager::rooms() const
 {
     return d->rooms.values();
 }
@@ -110,10 +110,8 @@ QStringList QXmppMucManager::discoveryFeatures() const
 
 bool QXmppMucManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq")
-    {
-        if (QXmppMucAdminIq::isMucAdminIq(element))
-        {
+    if (element.tagName() == "iq") {
+        if (QXmppMucAdminIq::isMucAdminIq(element)) {
             QXmppMucAdminIq iq;
             iq.parse(element);
 
@@ -129,9 +127,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
                 }
                 return true;
             }
-        }
-        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
-        {
+        } else if (QXmppMucOwnerIq::isMucOwnerIq(element)) {
             QXmppMucOwnerIq iq;
             iq.parse(element);
 
@@ -145,13 +141,13 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
     return false;
 }
 
-void QXmppMucManager::setClient(QXmppClient* client)
+void QXmppMucManager::setClient(QXmppClient *client)
 {
 
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::messageReceived,
-                    this, &QXmppMucManager::_q_messageReceived);
+            this, &QXmppMucManager::_q_messageReceived);
 }
 /// \endcond
 
@@ -169,7 +165,7 @@ void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
 
 void QXmppMucManager::_q_roomDestroyed(QObject *object)
 {
-    const QString key = d->rooms.key(static_cast<QXmppMucRoom*>(object));
+    const QString key = d->rooms.key(static_cast<QXmppMucRoom *>(object));
     d->rooms.remove(key);
 }
 
@@ -188,17 +184,17 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     d->jid = jid;
 
     connect(d->client, &QXmppClient::disconnected,
-                    this, &QXmppMucRoom::_q_disconnected);
+            this, &QXmppMucRoom::_q_disconnected);
 
     connect(d->client, &QXmppClient::messageReceived,
-                    this, &QXmppMucRoom::_q_messageReceived);
+            this, &QXmppMucRoom::_q_messageReceived);
 
     connect(d->client, &QXmppClient::presenceReceived,
-                    this, &QXmppMucRoom::_q_presenceReceived);
+            this, &QXmppMucRoom::_q_presenceReceived);
 
     if (d->discoManager) {
         connect(d->discoManager, &QXmppDiscoveryManager::infoReceived,
-                        this, &QXmppMucRoom::_q_discoveryInfoReceived);
+                this, &QXmppMucRoom::_q_discoveryInfoReceived);
     }
 
     // convenience signals for properties
@@ -378,8 +374,7 @@ void QXmppMucRoom::setNickName(const QString &nickName)
         packet.setTo(d->jid + "/" + nickName);
         packet.setType(QXmppPresence::Available);
         d->client->sendPacket(packet);
-    }
-    else {
+    } else {
         d->nickName = nickName;
         emit nickNameChanged(nickName);
     }
@@ -597,7 +592,7 @@ void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
 
 void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
 {
-    if (QXmppUtils::jidToBareJid(message.from())!= d->jid)
+    if (QXmppUtils::jidToBareJid(message.from()) != d->jid)
         return;
 
     // handle message subject
@@ -663,8 +658,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
         } else {
             emit participantChanged(jid);
         }
-    }
-    else if (presence.type() == QXmppPresence::Unavailable) {
+    } else if (presence.type() == QXmppPresence::Unavailable) {
         if (d->participants.contains(jid)) {
             d->participants.insert(jid, presence);
 
@@ -705,8 +699,7 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                 emit left();
             }
         }
-    }
-    else if (presence.type() == QXmppPresence::Error) {
+    } else if (presence.type() == QXmppPresence::Error) {
         if (presence.isMucSupported()) {
             // emit error
             emit error(presence.error());
@@ -714,5 +707,5 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
             // notify the user we left the room
             emit left();
         }
-   }
+    }
 }

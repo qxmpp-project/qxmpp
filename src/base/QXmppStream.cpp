@@ -49,7 +49,7 @@ public:
     QXmppStreamPrivate();
 
     QByteArray dataBuffer;
-    QSslSocket* socket;
+    QSslSocket *socket;
 
     // incoming stream state
     QByteArray streamStart;
@@ -71,12 +71,11 @@ QXmppStreamPrivate::QXmppStreamPrivate()
 
 QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
-    d(new QXmppStreamPrivate)
+      d(new QXmppStreamPrivate)
 {
     // Make sure the random number generator is seeded
-    if (!randomSeeded)
-    {
-        qsrand(QTime(0,0,0).msecsTo(QTime::currentTime()) ^ reinterpret_cast<quintptr>(this));
+    if (!randomSeeded) {
+        qsrand(QTime(0, 0, 0).msecsTo(QTime::currentTime()) ^ reinterpret_cast<quintptr>(this));
         randomSeeded = true;
     }
 }
@@ -123,7 +122,7 @@ void QXmppStream::handleStart()
 bool QXmppStream::isConnected() const
 {
     return d->socket &&
-           d->socket->state() == QAbstractSocket::ConnectedState;
+        d->socket->state() == QAbstractSocket::ConnectedState;
 }
 
 /// Sends raw data to the peer.
@@ -186,9 +185,7 @@ void QXmppStream::setSocket(QSslSocket *socket)
 
 void QXmppStream::_q_socketConnected()
 {
-    info(QString("Socket connected to %1 %2").arg(
-        d->socket->peerAddress().toString(),
-        QString::number(d->socket->peerPort())));
+    info(QString("Socket connected to %1 %2").arg(d->socket->peerAddress().toString(), QString::number(d->socket->peerPort())));
     handleStart();
 }
 
@@ -261,9 +258,9 @@ void QXmppStream::_q_socketReadyRead()
             sendAcknowledgement();
         else {
             handleStanza(nodeRecv);
-            if(nodeRecv.tagName() == QLatin1String("message") ||
-               nodeRecv.tagName() == QLatin1String("presence") ||
-               nodeRecv.tagName() == QLatin1String("iq"))
+            if (nodeRecv.tagName() == QLatin1String("message") ||
+                nodeRecv.tagName() == QLatin1String("presence") ||
+                nodeRecv.tagName() == QLatin1String("iq"))
                 ++d->lastIncomingSequenceNumber;
         }
         nodeRecv = nodeRecv.nextSiblingElement();
@@ -315,7 +312,7 @@ unsigned QXmppStream::lastIncomingSequenceNumber() const
 /// Sets the last acknowledged sequence number for outgoing stanzas (XEP-0198).
 void QXmppStream::setAcknowledgedSequenceNumber(unsigned sequenceNumber)
 {
-    for (QMap<unsigned, QByteArray>::iterator it = d->unacknowledgedStanzas.begin(); it != d->unacknowledgedStanzas.end(); ) {
+    for (QMap<unsigned, QByteArray>::iterator it = d->unacknowledgedStanzas.begin(); it != d->unacknowledgedStanzas.end();) {
         if (it.key() <= sequenceNumber)
             it = d->unacknowledgedStanzas.erase(it);
         else

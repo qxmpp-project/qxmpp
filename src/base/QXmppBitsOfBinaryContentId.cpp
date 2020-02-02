@@ -34,18 +34,18 @@
 #define CONTENTID_HASH_SEPARATOR QStringLiteral("+")
 
 static const QMap<QCryptographicHash::Algorithm, QString> HASH_ALGORITHMS = {
-    {QCryptographicHash::Sha1, QStringLiteral("sha1")},
+    { QCryptographicHash::Sha1, QStringLiteral("sha1") },
 #ifndef QT_CRYPTOGRAPHICHASH_ONLY_SHA1
-    {QCryptographicHash::Md4, QStringLiteral("md4")},
-    {QCryptographicHash::Md5, QStringLiteral("md5")},
-    {QCryptographicHash::Sha224, QStringLiteral("sha224")},
-    {QCryptographicHash::Sha256, QStringLiteral("sha256")},
-    {QCryptographicHash::Sha384, QStringLiteral("sha384")},
-    {QCryptographicHash::Sha512, QStringLiteral("sha512")},
-    {QCryptographicHash::Sha3_224, QStringLiteral("sha3-224")},
-    {QCryptographicHash::Sha3_256, QStringLiteral("sha3-256")},
-    {QCryptographicHash::Sha3_384, QStringLiteral("sha3-384")},
-    {QCryptographicHash::Sha3_512, QStringLiteral("sha3-512")},
+    { QCryptographicHash::Md4, QStringLiteral("md4") },
+    { QCryptographicHash::Md5, QStringLiteral("md5") },
+    { QCryptographicHash::Sha224, QStringLiteral("sha224") },
+    { QCryptographicHash::Sha256, QStringLiteral("sha256") },
+    { QCryptographicHash::Sha384, QStringLiteral("sha384") },
+    { QCryptographicHash::Sha512, QStringLiteral("sha512") },
+    { QCryptographicHash::Sha3_224, QStringLiteral("sha3-224") },
+    { QCryptographicHash::Sha3_256, QStringLiteral("sha3-256") },
+    { QCryptographicHash::Sha3_384, QStringLiteral("sha3-384") },
+    { QCryptographicHash::Sha3_512, QStringLiteral("sha3-512") },
 #endif
 };
 
@@ -205,7 +205,7 @@ void QXmppBitsOfBinaryContentId::setAlgorithm(QCryptographicHash::Algorithm algo
 /// later.
 ///
 /// \returns True, if the set hashing algorithm is supported, a hash value is
-/// set and its length is correct, false otherwise. 
+/// set and its length is correct, false otherwise.
 
 bool QXmppBitsOfBinaryContentId::isValid() const
 {

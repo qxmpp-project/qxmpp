@@ -50,11 +50,7 @@ public:
 };
 
 QXmppRtpPacketPrivate::QXmppRtpPacketPrivate()
-    : marker(false)
-    , type(0)
-    , ssrc(0)
-    , sequence(0)
-    , stamp(0)
+    : marker(false), type(0), ssrc(0), sequence(0), stamp(0)
 {
 }
 
@@ -82,7 +78,7 @@ QXmppRtpPacket::~QXmppRtpPacket()
 ///
 /// \param other
 ///
-QXmppRtpPacket& QXmppRtpPacket::operator=(const QXmppRtpPacket& other)
+QXmppRtpPacket &QXmppRtpPacket::operator=(const QXmppRtpPacket &other)
 {
     d = other.d;
     return *this;
@@ -224,10 +220,5 @@ void QXmppRtpPacket::setType(quint8 type)
 
 QString QXmppRtpPacket::toString() const
 {
-    return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
-        QString::number(d->sequence),
-        QString::number(d->stamp),
-        QString::number(d->marker),
-        QString::number(d->type),
-        QString::number(d->payload.size()));
+    return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(QString::number(d->sequence), QString::number(d->stamp), QString::number(d->marker), QString::number(d->type), QString::number(d->payload.size()));
 }

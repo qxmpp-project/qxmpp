@@ -44,9 +44,9 @@ QXmppMixInfoItem::QXmppMixInfoItem()
 {
 }
 
-QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem &) = default;
+QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem&) = default;
 
-QXmppMixInfoItem &QXmppMixInfoItem::operator=(const QXmppMixInfoItem &) = default;
+QXmppMixInfoItem& QXmppMixInfoItem::operator=(const QXmppMixInfoItem&) = default;
 
 QXmppMixInfoItem::~QXmppMixInfoItem() = default;
 
@@ -99,7 +99,7 @@ bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
 {
     QXmppDataForm form;
     form.parse(element);
-    for (const auto &field : form.fields()) {
+    for (const auto& field : form.fields()) {
         if (field.key() == "FORM_TYPE")
             return field.value() == ns_mix;
     }
@@ -174,9 +174,9 @@ QXmppMixParticipantItem::QXmppMixParticipantItem()
 {
 }
 
-QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem &) = default;
+QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem&) = default;
 
-QXmppMixParticipantItem &QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem &) = default;
+QXmppMixParticipantItem& QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem&) = default;
 
 QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;
 
@@ -235,7 +235,7 @@ QXmppElement QXmppMixParticipantItem::toElement() const
 
 /// Returns true, if this dom element is a MIX participant item.
 
-bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement &element)
+bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement& element)
 {
     return element.tagName() == "participant" && element.namespaceURI() == ns_mix;
 }

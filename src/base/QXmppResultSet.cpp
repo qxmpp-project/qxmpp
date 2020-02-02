@@ -30,9 +30,9 @@
 #include <QDomElement>
 
 QXmppResultSetQuery::QXmppResultSetQuery()
-    : m_index(-1)
-    , m_max(-1)
-{}
+    : m_index(-1), m_max(-1)
+{
+}
 
 /// Returns the maximum number of results.
 ///
@@ -68,7 +68,7 @@ int QXmppResultSetQuery::index() const
 
 void QXmppResultSetQuery::setIndex(int index)
 {
-    m_index=index;
+    m_index = index;
 }
 
 /// Returns the UID of the first result in the next page.
@@ -86,7 +86,7 @@ QString QXmppResultSetQuery::before() const
 
 void QXmppResultSetQuery::setBefore(const QString& before)
 {
-    m_before=before;
+    m_before = before;
 }
 
 /// Returns the UID of the last result in the previous page.
@@ -104,7 +104,7 @@ QString QXmppResultSetQuery::after() const
 
 void QXmppResultSetQuery::setAfter(const QString& after)
 {
-    m_after=after;
+    m_after = after;
 }
 
 /// Returns true if no result set information is present.
@@ -121,11 +121,13 @@ void QXmppResultSetQuery::parse(const QDomElement& element)
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
         m_max = setElement.firstChildElement("max").text().toInt(&ok);
-        if (!ok) m_max = -1;
+        if (!ok)
+            m_max = -1;
         m_after = setElement.firstChildElement("after").text();
         m_before = setElement.firstChildElement("before").text();
         m_index = setElement.firstChildElement("index").text().toInt(&ok);
-        if (!ok) m_index = -1;
+        if (!ok)
+            m_index = -1;
     }
 }
 
@@ -148,9 +150,9 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
 /// \endcond
 
 QXmppResultSetReply::QXmppResultSetReply()
-    : m_count(-1)
-    , m_index(-1)
-{}
+    : m_count(-1), m_index(-1)
+{
+}
 
 /// Returns the UID of the first result in the page.
 
@@ -163,7 +165,7 @@ QString QXmppResultSetReply::first() const
 
 void QXmppResultSetReply::setFirst(const QString& first)
 {
-    m_first=first;
+    m_first = first;
 }
 
 /// Returns the UID of the last result in the page.
@@ -177,7 +179,7 @@ QString QXmppResultSetReply::last() const
 
 void QXmppResultSetReply::setLast(const QString& last)
 {
-    m_last=last;
+    m_last = last;
 }
 
 /// Returns the total number of items in the set.
@@ -237,7 +239,8 @@ void QXmppResultSetReply::parse(const QDomElement& element)
         m_first = firstElem.text();
         bool ok = false;
         m_index = firstElem.attribute("index").toInt(&ok);
-        if(!ok) m_index = -1;
+        if (!ok)
+            m_index = -1;
         m_last = setElement.firstChildElement("last").text();
     }
 }

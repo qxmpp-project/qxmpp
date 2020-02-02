@@ -63,7 +63,7 @@ QString QXmppByteStreamIq::StreamHost::zeroconf() const
     return m_zeroconf;
 }
 
-void  QXmppByteStreamIq::StreamHost::setZeroconf(const QString &zeroconf)
+void QXmppByteStreamIq::StreamHost::setZeroconf(const QString &zeroconf)
 {
     m_zeroconf = zeroconf;
 }
@@ -137,8 +137,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
         m_mode = None;
 
     QDomElement hostElement = queryElement.firstChildElement("streamhost");
-    while (!hostElement.isNull())
-    {
+    while (!hostElement.isNull()) {
         StreamHost streamHost;
         streamHost.setHost(hostElement.attribute("host"));
         streamHost.setJid(hostElement.attribute("jid"));
@@ -173,8 +172,7 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
     if (!m_activate.isEmpty())
         helperToXmlAddTextElement(writer, "activate", m_activate);
-    if (!m_streamHostUsed.isEmpty())
-    {
+    if (!m_streamHostUsed.isEmpty()) {
         writer->writeStartElement("streamhost-used");
         helperToXmlAddAttribute(writer, "jid", m_streamHostUsed);
         writer->writeEndElement();

@@ -97,10 +97,8 @@ void QXmppArchiveChat::parse(const QDomElement &element)
     QDateTime timeAccu = m_start;
 
     QDomElement child = element.firstChildElement();
-    while (!child.isNull())
-    {
-        if ((child.tagName() == "from") || (child.tagName() == "to"))
-        {
+    while (!child.isNull()) {
+        if ((child.tagName() == "from") || (child.tagName() == "to")) {
             QXmppArchiveMessage message;
             message.setBody(child.firstChildElement("body").text());
             timeAccu = timeAccu.addSecs(child.attribute("secs").toInt());
@@ -250,7 +248,7 @@ QXmppResultSetReply QXmppArchiveChatIq::resultSetReply() const
 ///
 /// This is used for paging through messages.
 
-void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply& rsm)
+void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply &rsm)
 {
     m_rsmReply = rsm;
 }
@@ -361,7 +359,7 @@ QXmppResultSetQuery QXmppArchiveListIq::resultSetQuery() const
 ///
 /// This is used for paging through conversations.
 
-void QXmppArchiveListIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
+void QXmppArchiveListIq::setResultSetQuery(const QXmppResultSetQuery &rsm)
 {
     m_rsmQuery = rsm;
 }
@@ -379,7 +377,7 @@ QXmppResultSetReply QXmppArchiveListIq::resultSetReply() const
 ///
 /// This is used for paging through conversations.
 
-void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply& rsm)
+void QXmppArchiveListIq::setResultSetReply(const QXmppResultSetReply &rsm)
 {
     m_rsmReply = rsm;
 }
@@ -402,10 +400,8 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
     m_rsmReply.parse(listElement);
 
     QDomElement child = listElement.firstChildElement();
-    while (!child.isNull())
-    {
-        if (child.tagName() == "chat")
-        {
+    while (!child.isNull()) {
+        if (child.tagName() == "chat") {
             QXmppArchiveChat chat;
             chat.parse(child);
             m_chats << chat;
@@ -585,7 +581,7 @@ QXmppResultSetQuery QXmppArchiveRetrieveIq::resultSetQuery() const
 ///
 /// This is used for paging through messages.
 
-void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery& rsm)
+void QXmppArchiveRetrieveIq::setResultSetQuery(const QXmppResultSetQuery &rsm)
 {
     m_rsmQuery = rsm;
 }

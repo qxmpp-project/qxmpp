@@ -42,13 +42,25 @@ void tst_QXmppServer::testConnect_data()
     QTest::addColumn<QString>("mechanism");
     QTest::addColumn<bool>("connected");
 
-    QTest::newRow("plain-good") << "testuser" << "testpwd" << "PLAIN" << true;
-    QTest::newRow("plain-bad-username") << "baduser" << "testpwd" << "PLAIN" << false;
-    QTest::newRow("plain-bad-password") << "testuser" << "badpwd" << "PLAIN" << false;
+    QTest::newRow("plain-good") << "testuser"
+                                << "testpwd"
+                                << "PLAIN" << true;
+    QTest::newRow("plain-bad-username") << "baduser"
+                                        << "testpwd"
+                                        << "PLAIN" << false;
+    QTest::newRow("plain-bad-password") << "testuser"
+                                        << "badpwd"
+                                        << "PLAIN" << false;
 
-    QTest::newRow("digest-good") << "testuser" << "testpwd" << "DIGEST-MD5" << true;
-    QTest::newRow("digest-bad-username") << "baduser" << "testpwd" << "DIGEST-MD5" << false;
-    QTest::newRow("digest-bad-password") << "testuser" << "badpwd" << "DIGEST-MD5" << false;
+    QTest::newRow("digest-good") << "testuser"
+                                 << "testpwd"
+                                 << "DIGEST-MD5" << true;
+    QTest::newRow("digest-bad-username") << "baduser"
+                                         << "testpwd"
+                                         << "DIGEST-MD5" << false;
+    QTest::newRow("digest-bad-password") << "testuser"
+                                         << "badpwd"
+                                         << "DIGEST-MD5" << false;
 }
 
 void tst_QXmppServer::testConnect()

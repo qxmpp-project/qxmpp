@@ -136,7 +136,7 @@ void tst_QXmppSocks::testClient()
     connect(&client, &QXmppSocksClient::ready, &loop, &QEventLoop::quit);
     m_connectionSocket->write(serverConnect);
     loop.exec();
-    if  (!serverConnectWorks) {
+    if (!serverConnectWorks) {
         QCOMPARE(client.state(), QAbstractSocket::UnconnectedState);
         QCOMPARE(m_connectionSocket->state(), QAbstractSocket::UnconnectedState);
         return;
@@ -163,7 +163,7 @@ void tst_QXmppSocks::testClientAndServer()
 
     QEventLoop loop;
     connect(&client, &QXmppSocksClient::ready, &loop, &QEventLoop::quit);
-  
+
     client.connectToHost("www.google.com", 80);
     loop.exec();
 

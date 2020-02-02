@@ -57,17 +57,14 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     if (!message.receiptId().isEmpty()) {
         // Buggy clients also mark carbon messages as received; to avoid this
         // we check whether sender and receiver have the same bare JID.
-        if (QXmppUtils::jidToBareJid(message.from())
-            != QXmppUtils::jidToBareJid(message.to())) {
+        if (QXmppUtils::jidToBareJid(message.from()) != QXmppUtils::jidToBareJid(message.to())) {
             emit messageDelivered(message.from(), message.receiptId());
         }
         return true;
     }
 
     // If requested, send a receipt.
-    if (message.isReceiptRequested()
-        && !message.from().isEmpty()
-        && !message.id().isEmpty()) {
+    if (message.isReceiptRequested() && !message.from().isEmpty() && !message.id().isEmpty()) {
         QXmppMessage receipt;
         receipt.setTo(message.from());
         receipt.setReceiptId(message.id());

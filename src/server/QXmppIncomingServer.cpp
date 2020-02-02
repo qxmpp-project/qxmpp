@@ -79,7 +79,7 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
 
     if (socket) {
         connect(socket, &QAbstractSocket::disconnected,
-                        this, &QXmppIncomingServer::slotSocketDisconnected);
+                this, &QXmppIncomingServer::slotSocketDisconnected);
 
         setSocket(socket);
     }
@@ -112,12 +112,13 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
     // start stream
     d->localStreamId = QXmppUtils::generateStanzaHash().toLatin1();
     QString data = QString("<?xml version='1.0'?><stream:stream"
-        " xmlns='%1' xmlns:db='%2' xmlns:stream='%3'"
-        " id='%4' version=\"1.0\">").arg(
-            ns_server,
-            ns_server_dialback,
-            ns_stream,
-            d->localStreamId);
+                           " xmlns='%1' xmlns:db='%2' xmlns:stream='%3'"
+                           " id='%4' version=\"1.0\">")
+                       .arg(
+                           ns_server,
+                           ns_server_dialback,
+                           ns_stream,
+                           d->localStreamId);
     sendData(data.toUtf8());
 
     // send stream features
@@ -143,33 +144,27 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         if (!request.type().isEmpty() ||
             request.from().isEmpty() ||
             request.to() != d->domain ||
-            request.key().isEmpty())
-        {
+            request.key().isEmpty()) {
             warning(QString("Invalid dialback received on %1").arg(d->origin()));
             return;
         }
 
         const QString domain = request.from();
-        if (request.command() == QXmppDialback::Result)
-        {
+        if (request.command() == QXmppDialback::Result) {
             debug(QString("Received a dialback result from '%1' on %2").arg(domain, d->origin()));
 
             // establish dialback connection
             auto *stream = new QXmppOutgoingServer(d->domain, this);
             connect(stream, &QXmppOutgoingServer::dialbackResponseReceived,
-                                 this, &QXmppIncomingServer::slotDialbackResponseReceived);
+                    this, &QXmppIncomingServer::slotDialbackResponseReceived);
             stream->setVerify(d->localStreamId, request.key());
             stream->connectToHost(domain);
-        }
-        else if (request.command() == QXmppDialback::Verify)
-        {
+        } else if (request.command() == QXmppDialback::Verify) {
             debug(QString("Received a dialback verify from '%1' on %2").arg(domain, d->origin()));
             emit dialbackRequestReceived(request);
         }
 
-    }
-    else if (d->authenticated.contains(QXmppUtils::jidToDomain(stanza.attribute("from"))))
-    {
+    } else if (d->authenticated.contains(QXmppUtils::jidToDomain(stanza.attribute("from")))) {
         // relay stanza if the remote party is authenticated
         emit elementReceived(stanza);
     } else {
@@ -195,7 +190,7 @@ bool QXmppIncomingServer::isConnected() const
 
 void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dialback)
 {
-    auto *stream = qobject_cast<QXmppOutgoingServer*>(sender());
+    auto *stream = qobject_cast<QXmppOutgoingServer *>(sender());
     if (!stream ||
         dialback.command() != QXmppDialback::Verify ||
         dialback.id() != d->localStreamId ||
@@ -211,8 +206,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     sendPacket(response);
 
     // check for success
-    if (response.type() == QLatin1String("valid"))
-    {
+    if (response.type() == QLatin1String("valid")) {
         info(QString("Verified incoming domain '%1' on %2").arg(dialback.from(), d->origin()));
         const bool wasConnected = !d->authenticated.isEmpty();
         d->authenticated.insert(dialback.from());

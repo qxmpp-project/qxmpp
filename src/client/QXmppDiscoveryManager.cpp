@@ -75,9 +75,9 @@ QString QXmppDiscoveryManager::requestInfo(const QString& jid, const QString& no
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::InfoQuery);
     request.setTo(jid);
-    if(!node.isEmpty())
+    if (!node.isEmpty())
         request.setQueryNode(node);
-    if(client()->sendPacket(request))
+    if (client()->sendPacket(request))
         return request.id();
     else
         return QString();
@@ -94,9 +94,9 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
-    if(!node.isEmpty())
+    if (!node.isEmpty())
         request.setQueryNode(node);
-    if(client()->sendPacket(request))
+    if (client()->sendPacket(request))
         return request.id();
     else
         return QString();
@@ -113,16 +113,16 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     // features
     QStringList features;
     features
-        << ns_data              // XEP-0004: Data Forms
-        << ns_rsm               // XEP-0059: Result Set Management
-        << ns_xhtml_im          // XEP-0071: XHTML-IM
-        << ns_chat_states       // XEP-0085: Chat State Notifications
-        << ns_capabilities      // XEP-0115: Entity Capabilities
-        << ns_ping              // XEP-0199: XMPP Ping
-        << ns_attention         // XEP-0224: Attention
-        << ns_chat_markers;     // XEP-0333: Chat Markers
+        << ns_data           // XEP-0004: Data Forms
+        << ns_rsm            // XEP-0059: Result Set Management
+        << ns_xhtml_im       // XEP-0071: XHTML-IM
+        << ns_chat_states    // XEP-0085: Chat State Notifications
+        << ns_capabilities   // XEP-0115: Entity Capabilities
+        << ns_ping           // XEP-0199: XMPP Ping
+        << ns_attention      // XEP-0224: Attention
+        << ns_chat_markers;  // XEP-0333: Chat Markers
 
-    for (auto *extension : client()->extensions()) {
+    for (auto* extension : client()->extensions()) {
         if (extension)
             features << extension->discoveryFeatures();
     }
@@ -138,7 +138,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identity.setName(clientName());
     identities << identity;
 
-    for (auto *extension : client()->extensions()) {
+    for (auto* extension : client()->extensions()) {
         if (extension)
             identities << extension->discoveryIdentities();
     }
@@ -156,7 +156,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 ///
 /// \param node
 
-void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString &node)
+void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString& node)
 {
     d->clientCapabilitiesNode = node;
 }
@@ -242,7 +242,7 @@ QXmppDataForm QXmppDiscoveryManager::clientInfoForm() const
 /// Sets the client's extended information form, as defined
 /// by XEP-0128 Service Discovery Extensions.
 
-void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm &form)
+void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm& form)
 {
     d->clientInfoForm = form;
 }
@@ -253,10 +253,9 @@ QStringList QXmppDiscoveryManager::discoveryFeatures() const
     return QStringList() << ns_disco_info;
 }
 
-bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
+bool QXmppDiscoveryManager::handleStanza(const QDomElement& element)
 {
-    if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element))
-    {
+    if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element)) {
         QXmppDiscoveryIq receivedIq;
         receivedIq.parse(element);
 

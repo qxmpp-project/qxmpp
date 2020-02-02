@@ -30,7 +30,7 @@
 
 QXmppMucItem::QXmppMucItem()
     : m_affiliation(QXmppMucItem::UnspecifiedAffiliation),
-    m_role(QXmppMucItem::UnspecifiedRole)
+      m_role(QXmppMucItem::UnspecifiedRole)
 {
 }
 
@@ -39,11 +39,11 @@ QXmppMucItem::QXmppMucItem()
 bool QXmppMucItem::isNull() const
 {
     return m_actor.isEmpty() &&
-           m_affiliation == UnspecifiedAffiliation &&
-           m_jid.isEmpty() &&
-           m_nick.isEmpty() &&
-           m_reason.isEmpty() &&
-           m_role == UnspecifiedRole;
+        m_affiliation == UnspecifiedAffiliation &&
+        m_jid.isEmpty() &&
+        m_nick.isEmpty() &&
+        m_reason.isEmpty() &&
+        m_role == UnspecifiedRole;
 }
 
 /// Returns the actor for this item, for instance the admin who kicked
@@ -266,8 +266,7 @@ void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
     QDomElement child = queryElement.firstChildElement("item");
-    while (!child.isNull())
-    {
+    while (!child.isNull()) {
         QXmppMucItem item;
         item.parse(child);
         m_items << item;

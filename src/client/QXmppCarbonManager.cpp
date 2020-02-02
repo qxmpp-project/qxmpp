@@ -57,12 +57,12 @@ bool QXmppCarbonManager::carbonsEnabled() const
 
 void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
 {
-    if(m_carbonsEnabled == enabled)
+    if (m_carbonsEnabled == enabled)
         return;
 
     m_carbonsEnabled = enabled;
 
-    if(client()) {
+    if (client()) {
         QXmppIq iq(QXmppIq::Set);
         QXmppElement carbonselement;
         carbonselement.setTagName(m_carbonsEnabled ? "enable" : "disable");
@@ -80,31 +80,31 @@ QStringList QXmppCarbonManager::discoveryFeatures() const
 
 bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() != "message")
+    if (element.tagName() != "message")
         return false;
 
     bool sent = true;
     QDomElement carbon = element.firstChildElement("sent");
-    if(carbon.isNull()) {
+    if (carbon.isNull()) {
         carbon = element.firstChildElement("received");
         sent = false;
     }
 
-    if(carbon.isNull() || carbon.namespaceURI() != ns_carbons)
-        return false;   // Neither sent nor received -> no carbon message
+    if (carbon.isNull() || carbon.namespaceURI() != ns_carbons)
+        return false;  // Neither sent nor received -> no carbon message
 
     QDomElement forwarded = carbon.firstChildElement("forwarded");
-    if(forwarded.isNull())
+    if (forwarded.isNull())
         return false;
 
     QDomElement messageelement = forwarded.firstChildElement("message");
-    if(messageelement.isNull())
+    if (messageelement.isNull())
         return false;
 
     QXmppMessage message;
     message.parse(messageelement);
 
-    if(sent)
+    if (sent)
         emit messageSent(message);
     else
         emit messageReceived(message);

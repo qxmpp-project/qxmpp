@@ -54,7 +54,7 @@ QXmppVCardManager::~QXmppVCardManager()
 QString QXmppVCardManager::requestVCard(const QString& jid)
 {
     QXmppVCardIq request(jid);
-    if(client()->sendPacket(request))
+    if (client()->sendPacket(request))
         return request.id();
     else
         return QString();
@@ -107,10 +107,9 @@ QStringList QXmppVCardManager::discoveryFeatures() const
     return QStringList() << ns_vcard;
 }
 
-bool QXmppVCardManager::handleStanza(const QDomElement &element)
+bool QXmppVCardManager::handleStanza(const QDomElement& element)
 {
-    if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
-    {
+    if (element.tagName() == "iq" && QXmppVCardIq::isVCard(element)) {
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);
 
