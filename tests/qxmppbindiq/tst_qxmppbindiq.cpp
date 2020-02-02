@@ -22,9 +22,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppBindIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppBindIq : public QObject
 {

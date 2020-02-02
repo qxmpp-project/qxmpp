@@ -24,8 +24,8 @@
 #ifndef QXMPPBITSOFBINARYIQ_H
 #define QXMPPBITSOFBINARYIQ_H
 
-#include "QXmppIq.h"
 #include "QXmppBitsOfBinaryData.h"
+#include "QXmppIq.h"
 
 /// \class QXmppBitsOfBinaryIq represents a XEP-0231: Bits of Binary IQ to
 /// request and transmit Bits of Binary data elements.

@@ -25,9 +25,9 @@
 #ifndef QXMPPLOGGER_H
 #define QXMPPLOGGER_H
 
-#include <QObject>
-
 #include "QXmppGlobal.h"
+
+#include <QObject>
 
 #ifdef QXMPP_LOGGABLE_TRACE
 #define qxmpp_loggable_trace(x) QString("%1(0x%2) %3").arg(metaObject()->className(), QString::number(reinterpret_cast<qint64>(this), 16), x)

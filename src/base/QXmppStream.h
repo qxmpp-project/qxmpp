@@ -25,9 +25,10 @@
 #ifndef QXMPPSTREAM_H
 #define QXMPPSTREAM_H
 
+#include "QXmppLogger.h"
+
 #include <QAbstractSocket>
 #include <QObject>
-#include "QXmppLogger.h"
 
 class QDomElement;
 class QSslSocket;

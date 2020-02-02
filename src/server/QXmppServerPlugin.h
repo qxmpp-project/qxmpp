@@ -24,9 +24,9 @@
 #ifndef QXMPPSERVERPLUGIN_H
 #define QXMPPSERVERPLUGIN_H
 
-#include <QtPlugin>
-
 #include "QXmppGlobal.h"
+
+#include <QtPlugin>
 
 class QXmppServer;
 class QXmppServerExtension;

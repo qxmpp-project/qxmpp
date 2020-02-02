@@ -24,8 +24,8 @@
 #ifndef QXMPPPRESENCE_H
 #define QXMPPPRESENCE_H
 
-#include "QXmppStanza.h"
 #include "QXmppMucIq.h"
+#include "QXmppStanza.h"
 
 class QXmppPresencePrivate;
 

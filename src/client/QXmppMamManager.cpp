@@ -21,15 +21,16 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppMamManager.h"
-#include "QXmppMamIq.h"
+
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
+#include "QXmppMamIq.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 /// \cond
 QStringList QXmppMamManager::discoveryFeatures() const

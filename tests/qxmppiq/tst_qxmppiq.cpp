@@ -21,10 +21,10 @@
  *
  */
 
-#include <QObject>
-
 #include "QXmppIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppIq : public QObject
 {

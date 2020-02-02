@@ -24,9 +24,9 @@
 #ifndef QXMPPRTCPPACKET_H
 #define QXMPPRTCPPACKET_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppGlobal.h"
+
+#include <QSharedDataPointer>
 
 class QXmppRtcpPacketPrivate;
 class QXmppRtcpReceiverReport;

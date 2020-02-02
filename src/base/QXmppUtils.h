@@ -29,9 +29,9 @@
 // include the whole header.
 // See http://lists.trolltech.com/qt-interest/2008-07/thread00798-0.html
 // for an explanation.
-#include <QXmlStreamWriter>
-
 #include "QXmppGlobal.h"
+
+#include <QXmlStreamWriter>
 
 class QByteArray;
 class QDateTime;

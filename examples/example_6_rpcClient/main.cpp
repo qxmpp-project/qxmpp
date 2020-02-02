@@ -21,10 +21,10 @@
  *
  */
 
-
-#include <QtCore/QCoreApplication>
-#include "rpcClient.h"
 #include "QXmppLogger.h"
+
+#include "rpcClient.h"
+#include <QtCore/QCoreApplication>
 
 int main(int argc, char *argv[])
 {

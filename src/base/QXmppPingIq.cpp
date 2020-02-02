@@ -21,8 +21,9 @@
  *
  */
 
-#include "QXmppConstants_p.h"
 #include "QXmppPingIq.h"
+
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>

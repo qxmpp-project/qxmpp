@@ -24,9 +24,9 @@
 #ifndef QXMPPBITSOFBINARYDATA_H
 #define QXMPPBITSOFBINARYDATA_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppGlobal.h"
+
+#include <QSharedDataPointer>
 
 class QDomElement;
 class QMimeType;

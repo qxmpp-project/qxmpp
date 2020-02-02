@@ -24,9 +24,9 @@
 #ifndef QXMPPJINGLEIQ_H
 #define QXMPPJINGLEIQ_H
 
-#include <QHostAddress>
-
 #include "QXmppIq.h"
+
+#include <QHostAddress>
 
 class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;

@@ -24,10 +24,10 @@
 #ifndef QXMPPSTUN_H
 #define QXMPPSTUN_H
 
-#include <QObject>
-
-#include "QXmppLogger.h"
 #include "QXmppJingleIq.h"
+#include "QXmppLogger.h"
+
+#include <QObject>
 
 class CandidatePair;
 class QDataStream;

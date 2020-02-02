@@ -26,6 +26,7 @@
 #define QXMPPROSTERIQ_H
 
 #include "QXmppIq.h"
+
 #include <QList>
 #include <QSet>
 #include <QSharedDataPointer>

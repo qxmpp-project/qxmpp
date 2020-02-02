@@ -24,9 +24,9 @@
 #ifndef QXMPPPUBSUBITEM_H
 #define QXMPPPUBSUBITEM_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppGlobal.h"
+
+#include <QSharedDataPointer>
 
 class QDomElement;
 class QXmlStreamWriter;

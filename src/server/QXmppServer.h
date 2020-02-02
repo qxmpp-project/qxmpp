@@ -24,10 +24,10 @@
 #ifndef QXMPPSERVER_H
 #define QXMPPSERVER_H
 
+#include "QXmppLogger.h"
+
 #include <QTcpServer>
 #include <QVariantMap>
-
-#include "QXmppLogger.h"
 
 class QDomElement;
 class QSslCertificate;

@@ -21,11 +21,12 @@
  *
  */
 
-#include <QObject>
-#include <QDomDocument>
 #include "QXmppMixItem.h"
 #include "QXmppPubSubIq.h"
+
 #include "util.h"
+#include <QDomDocument>
+#include <QObject>
 
 class tst_QXmppMixItem : public QObject
 {

@@ -21,11 +21,11 @@
  *
  */
 
-#include <QtCore/QCoreApplication>
-
 #include "QXmppLogger.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppServer.h"
+
+#include <QtCore/QCoreApplication>
 
 #define USERNAME "qxmpp.test1"
 #define PASSWORD "qxmpp123"

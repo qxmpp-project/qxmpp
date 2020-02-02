@@ -22,13 +22,13 @@
  *
  */
 
-#include <QDebug>
-#include <QTimer>
+#include "rpcClient.h"
 
 #include "QXmppRpcManager.h"
 #include "QXmppUtils.h"
 
-#include "rpcClient.h"
+#include <QDebug>
+#include <QTimer>
 
 rpcClient::rpcClient(QObject *parent)
     : QXmppClient(parent)

@@ -24,9 +24,9 @@
 #ifndef QXMPPCODEC_H
 #define QXMPPCODEC_H
 
-#include <QMap>
-
 #include "QXmppGlobal.h"
+
+#include <QMap>
 
 class QXmppRtpPacket;
 class QXmppVideoFormat;

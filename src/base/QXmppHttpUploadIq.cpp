@@ -21,13 +21,14 @@
  *
  */
 
+#include "QXmppHttpUploadIq.h"
+
+#include "QXmppConstants_p.h"
+
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QSharedData>
 #include <QUrl>
-
-#include "QXmppHttpUploadIq.h"
-#include "QXmppConstants_p.h"
 
 class QXmppHttpUploadRequestIqPrivate : public QSharedData
 {

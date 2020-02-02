@@ -24,8 +24,8 @@
 #ifndef QXMPPMAMIQ_H
 #define QXMPPMAMIQ_H
 
-#include "QXmppIq.h"
 #include "QXmppDataForm.h"
+#include "QXmppIq.h"
 #include "QXmppResultSet.h"
 
 /// \brief The QXmppMamQueryIq class represents the query IQ for

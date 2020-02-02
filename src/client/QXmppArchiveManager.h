@@ -24,10 +24,10 @@
 #ifndef QXMPPARCHIVEMANAGER_H
 #define QXMPPARCHIVEMANAGER_H
 
-#include <QDateTime>
-
 #include "QXmppClientExtension.h"
 #include "QXmppResultSet.h"
+
+#include <QDateTime>
 
 class QXmppArchiveChat;
 class QXmppArchiveChatIq;

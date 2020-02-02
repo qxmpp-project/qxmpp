@@ -24,10 +24,10 @@
 #ifndef QXMPPBITSOFBINARYCONTENTID_H
 #define QXMPPBITSOFBINARYCONTENTID_H
 
-#include <QSharedDataPointer>
-#include <QCryptographicHash>
-
 #include "QXmppGlobal.h"
+
+#include <QCryptographicHash>
+#include <QSharedDataPointer>
 
 class QXmppBitsOfBinaryContentIdPrivate;
 

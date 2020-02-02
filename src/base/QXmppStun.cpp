@@ -23,19 +23,19 @@
 
 #define QXMPP_DEBUG_STUN
 
+#include "QXmppStun_p.h"
+#include "QXmppUtils.h"
+
 #include <QCryptographicHash>
 #include <QDataStream>
 #include <QHostInfo>
 #include <QNetworkInterface>
-#include <QUdpSocket>
 #include <QTimer>
-
-#include "QXmppStun_p.h"
-#include "QXmppUtils.h"
+#include <QUdpSocket>
 
 #define STUN_ID_SIZE 12
 #define STUN_RTO_INTERVAL 500
-#define STUN_RTO_MAX      7
+#define STUN_RTO_MAX 7
 
 static const quint32 STUN_MAGIC = 0x2112A442;
 static const quint16 STUN_HEADER = 20;

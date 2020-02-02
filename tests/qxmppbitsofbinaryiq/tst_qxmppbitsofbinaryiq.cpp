@@ -21,12 +21,12 @@
  *
  */
 
-#include <QMimeType>
-#include <QObject>
-
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryIq.h"
+
 #include "util.h"
+#include <QMimeType>
+#include <QObject>
 
 class tst_QXmppBitsOfBinaryIq : public QObject
 {

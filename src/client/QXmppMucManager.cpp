@@ -21,16 +21,17 @@
  *
  */
 
-#include <QDomElement>
-#include <QMap>
+#include "QXmppMucManager.h"
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
-#include "QXmppMucManager.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QMap>
 
 class QXmppMucManagerPrivate
 {

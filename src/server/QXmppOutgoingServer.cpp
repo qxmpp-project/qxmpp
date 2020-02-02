@@ -21,20 +21,21 @@
  *
  */
 
-#include <QDomElement>
-#include <QSslError>
-#include <QSslKey>
-#include <QSslSocket>
-#include <QList>
-#include <QTimer>
-#include <QDnsLookup>
+#include "QXmppOutgoingServer.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
-#include "QXmppOutgoingServer.h"
 #include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+
+#include <QDnsLookup>
+#include <QDomElement>
+#include <QList>
+#include <QSslError>
+#include <QSslKey>
+#include <QSslSocket>
+#include <QTimer>
 
 class QXmppOutgoingServerPrivate
 {

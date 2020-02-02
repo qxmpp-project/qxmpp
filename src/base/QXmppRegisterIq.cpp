@@ -22,12 +22,13 @@
  *
  */
 
+#include "QXmppRegisterIq.h"
+
+#include "QXmppBitsOfBinaryDataList.h"
+#include "QXmppConstants_p.h"
+
 #include <QDomElement>
 #include <QSharedData>
-
-#include "QXmppConstants_p.h"
-#include "QXmppRegisterIq.h"
-#include "QXmppBitsOfBinaryDataList.h"
 
 static const QStringList REGISTER_TYPES = {
     QString(),

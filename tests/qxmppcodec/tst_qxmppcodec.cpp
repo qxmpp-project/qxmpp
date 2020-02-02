@@ -21,11 +21,11 @@
  *
  */
 
-#include <QObject>
-#include <QtTest>
-
 #include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
+
+#include <QObject>
+#include <QtTest>
 
 class tst_QXmppCodec : public QObject
 {

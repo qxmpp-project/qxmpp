@@ -23,11 +23,11 @@
 
 #include "QXmppPubSubIq.h"
 
-#include <QDomElement>
-#include <QSharedData>
-
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QSharedData>
 
 static const QStringList PUBSUB_QUERIES = {
     QStringLiteral("affiliations"),

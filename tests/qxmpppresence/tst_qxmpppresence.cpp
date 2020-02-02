@@ -22,12 +22,11 @@
  *
  */
 
-#include <QDateTime>
-#include <QObject>
-
 #include "QXmppPresence.h"
 
 #include "util.h"
+#include <QDateTime>
+#include <QObject>
 
 class tst_QXmppPresence : public QObject
 {

@@ -22,9 +22,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppDiscoveryIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppDiscoveryIq : public QObject
 {

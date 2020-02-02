@@ -21,13 +21,12 @@
  *
  */
 
-
-#include <QCoreApplication>
+#include "example_1_echoClient.h"
 
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 
-#include "example_1_echoClient.h"
+#include <QCoreApplication>
 
 echoClient::echoClient(QObject *parent)
     : QXmppClient(parent)

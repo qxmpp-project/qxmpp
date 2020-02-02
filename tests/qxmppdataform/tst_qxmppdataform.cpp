@@ -23,14 +23,15 @@
  *
  */
 
-#include <QtGlobal>
 #include <QObject>
+#include <QtGlobal>
 
 // deprecated methods are also tested: this is used to avoid unnecessary warnings
 #undef QT_DEPRECATED_X
 #define QT_DEPRECATED_X(text)
 
 #include "QXmppDataForm.h"
+
 #include "util.h"
 
 class tst_QXmppDataForm : public QObject

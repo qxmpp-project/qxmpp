@@ -22,12 +22,13 @@
  *
  */
 
-#include <QObject>
-#include "QXmppMessage.h"
 #include "QXmppCarbonManager.h"
-#include "util.h"
+#include "QXmppMessage.h"
 
-class QXmppCarbonTestHelper  : public QObject
+#include "util.h"
+#include <QObject>
+
+class QXmppCarbonTestHelper : public QObject
 {
     Q_OBJECT
 

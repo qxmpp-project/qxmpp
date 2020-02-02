@@ -21,12 +21,12 @@
  *
  */
 
+#include "QXmppVCardManager.h"
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
-#include "QXmppVCardManager.h"
 
 class QXmppVCardManagerPrivate
 {

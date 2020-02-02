@@ -22,13 +22,13 @@
  *
  */
 
-#include <QObject>
-
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryData.h"
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppRegisterIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppRegisterIq : public QObject
 {

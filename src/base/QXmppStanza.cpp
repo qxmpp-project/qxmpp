@@ -23,15 +23,15 @@
  *
  */
 
-
 #include "QXmppStanza.h"
+
+#include "QXmppConstants_p.h"
 #include "QXmppStanza_p.h"
 #include "QXmppUtils.h"
-#include "QXmppConstants_p.h"
 
+#include <QDateTime>
 #include <QDomElement>
 #include <QXmlStreamWriter>
-#include <QDateTime>
 
 uint QXmppStanza::s_uniqeIdNo = 0;
 

@@ -23,10 +23,10 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 
-#include <QDomElement>
-
 #include "QXmppBitsOfBinaryData.h"
 #include "QXmppConstants_p.h"
+
+#include <QDomElement>
 
 QXmppBitsOfBinaryDataList::QXmppBitsOfBinaryDataList() = default;
 

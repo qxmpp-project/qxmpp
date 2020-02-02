@@ -21,25 +21,23 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppCarbonManager.h"
-#include "QXmppConstants_p.h"
+
 #include "QXmppClient.h"
+#include "QXmppConstants_p.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
+#include <QDomElement>
 
 QXmppCarbonManager::QXmppCarbonManager()
     : m_carbonsEnabled(false)
 {
-
 }
 
 QXmppCarbonManager::~QXmppCarbonManager()
 {
-
 }
 
 /// Returns whether message carbons are currently enabled

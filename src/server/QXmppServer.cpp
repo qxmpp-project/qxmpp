@@ -21,6 +21,19 @@
  *
  */
 
+#include "QXmppServer.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppDialback.h"
+#include "QXmppIncomingClient.h"
+#include "QXmppIncomingServer.h"
+#include "QXmppIq.h"
+#include "QXmppOutgoingServer.h"
+#include "QXmppPresence.h"
+#include "QXmppServerExtension.h"
+#include "QXmppServerPlugin.h"
+#include "QXmppUtils.h"
+
 #include <QCoreApplication>
 #include <QDomElement>
 #include <QFileInfo>
@@ -29,19 +42,7 @@
 #include <QSslKey>
 #include <QSslSocket>
 
-#include "QXmppConstants_p.h"
-#include "QXmppDialback.h"
-#include "QXmppIq.h"
-#include "QXmppIncomingClient.h"
-#include "QXmppIncomingServer.h"
-#include "QXmppOutgoingServer.h"
-#include "QXmppPresence.h"
-#include "QXmppServer.h"
-#include "QXmppServerExtension.h"
-#include "QXmppServerPlugin.h"
-#include "QXmppUtils.h"
-
-static void helperToXmlAddDomElement(QXmlStreamWriter* stream, const QDomElement& element, const QStringList &omitNamespaces)
+static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement &element, const QStringList &omitNamespaces)
 {
     stream->writeStartElement(element.tagName());
 

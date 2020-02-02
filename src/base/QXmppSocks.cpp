@@ -21,12 +21,12 @@
  *
  */
 
+#include "QXmppSocks.h"
+
 #include <QDataStream>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
-
-#include "QXmppSocks.h"
 
 const static char SocksVersion = 5;
 

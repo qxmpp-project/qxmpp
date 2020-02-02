@@ -22,6 +22,9 @@
  *
  */
 
+#include "QXmppUtils.h"
+
+#include "QXmppLogger.h"
 
 #include <QBuffer>
 #include <QByteArray>
@@ -33,9 +36,6 @@
 #include <QString>
 #include <QStringList>
 #include <QXmlStreamWriter>
-
-#include "QXmppUtils.h"
-#include "QXmppLogger.h"
 
 // adapted from public domain source by Ross Williams and Eric Durbin
 // FIXME : is this valid for big-endian machines?

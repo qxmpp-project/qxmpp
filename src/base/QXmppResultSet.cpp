@@ -21,13 +21,13 @@
  *
  */
 
+#include "QXmppResultSet.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppResultSet.h"
 #include "QXmppUtils.h"
 
-#include <QDomElement>
 #include <QDebug>
+#include <QDomElement>
 
 QXmppResultSetQuery::QXmppResultSetQuery()
     : m_index(-1)

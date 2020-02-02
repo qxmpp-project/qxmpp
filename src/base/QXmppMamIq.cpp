@@ -21,10 +21,11 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppMamIq.h"
+
 #include "QXmppConstants_p.h"
+
+#include <QDomElement>
 
 QXmppMamQueryIq::QXmppMamQueryIq() : QXmppIq(QXmppIq::Set)
 {
@@ -128,7 +129,6 @@ void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 /// \endcond
-
 
 QXmppMamResultIq::QXmppMamResultIq() : m_complete(false)
 {

@@ -22,12 +22,13 @@
  *
  */
 
-#include <QDomElement>
-#include <QXmlStreamWriter>
-
 #include "QXmppSessionIq.h"
+
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 /// \cond
 bool QXmppSessionIq::isSessionIq(const QDomElement &element)

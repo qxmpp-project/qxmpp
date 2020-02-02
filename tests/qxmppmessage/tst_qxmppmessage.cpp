@@ -22,11 +22,12 @@
  *
  */
 
-#include <QObject>
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppMessage.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppMessage : public QObject
 {

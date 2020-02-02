@@ -21,11 +21,12 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppVersionIq.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
-#include "QXmppVersionIq.h"
+
+#include <QDomElement>
 
 /// Returns the name of the software.
 ///

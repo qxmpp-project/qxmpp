@@ -22,9 +22,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppResultSet.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppResultSet : public QObject
 {

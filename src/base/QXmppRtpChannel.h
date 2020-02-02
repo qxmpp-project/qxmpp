@@ -24,11 +24,11 @@
 #ifndef QXMPPRTPCHANNEL_H
 #define QXMPPRTPCHANNEL_H
 
-#include <QIODevice>
-#include <QSize>
-
 #include "QXmppJingleIq.h"
 #include "QXmppLogger.h"
+
+#include <QIODevice>
+#include <QSize>
 
 class QXmppCodec;
 class QXmppJinglePayloadType;

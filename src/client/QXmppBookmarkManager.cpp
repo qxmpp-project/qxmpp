@@ -21,14 +21,15 @@
  *
  */
 
-#include <QDomElement>
-
 #include "QXmppBookmarkManager.h"
+
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 // The QXmppPrivateStorageIq class represents an XML private storage IQ
 // as defined by XEP-0049: Private XML Storage.

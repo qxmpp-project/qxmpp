@@ -21,25 +21,25 @@
  *
  */
 
-#include <QSslSocket>
-#include <QTimer>
-
 #include "QXmppClient.h"
-#include "QXmppClient_p.h"
-#include "QXmppClientExtension.h"
-#include "QXmppConstants_p.h"
-#include "QXmppLogger.h"
-#include "QXmppOutgoingClient.h"
-#include "QXmppMessage.h"
-#include "QXmppUtils.h"
 
-#include "QXmppTlsManager_p.h"
+#include "QXmppClientExtension.h"
+#include "QXmppClient_p.h"
+#include "QXmppConstants_p.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppDiscoveryManager.h"
+#include "QXmppEntityTimeManager.h"
+#include "QXmppLogger.h"
+#include "QXmppMessage.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppRosterManager.h"
+#include "QXmppTlsManager_p.h"
+#include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
-#include "QXmppEntityTimeManager.h"
-#include "QXmppDiscoveryManager.h"
-#include "QXmppDiscoveryIq.h"
+
+#include <QSslSocket>
+#include <QTimer>
 
 /// \cond
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)

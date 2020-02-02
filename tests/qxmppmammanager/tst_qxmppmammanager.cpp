@@ -21,12 +21,13 @@
  *
  */
 
-#include <QObject>
-#include "QXmppMessage.h"
 #include "QXmppMamManager.h"
-#include "util.h"
+#include "QXmppMessage.h"
 
-class QXmppMamTestHelper  : public QObject
+#include "util.h"
+#include <QObject>
+
+class QXmppMamTestHelper : public QObject
 {
     Q_OBJECT
 

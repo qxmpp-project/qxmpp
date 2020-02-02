@@ -21,9 +21,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppPubSubIq.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppPubSubIq : public QObject
 {

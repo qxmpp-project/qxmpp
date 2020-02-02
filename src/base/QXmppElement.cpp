@@ -22,6 +22,7 @@
  */
 
 #include "QXmppElement.h"
+
 #include "QXmppUtils.h"
 
 #include <QDomElement>

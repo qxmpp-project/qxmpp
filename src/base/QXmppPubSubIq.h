@@ -24,9 +24,9 @@
 #ifndef QXMPPPUBSUBIQ_H
 #define QXMPPPUBSUBIQ_H
 
-#include <QSharedDataPointer>
-
 #include "QXmppIq.h"
+
+#include <QSharedDataPointer>
 // required for compatibility:
 #include "QXmppPubSubItem.h"
 

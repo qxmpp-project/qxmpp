@@ -21,14 +21,13 @@
  *
  */
 
-#include "QXmppTlsManager_p.h"
-
-#include "QXmppConstants_p.h"
 #include "QXmppClient.h"
 #include "QXmppClient_p.h"
+#include "QXmppConstants_p.h"
 #include "QXmppOutgoingClient.h"
-#include "QXmppStreamFeatures.h"
 #include "QXmppStartTlsPacket.h"
+#include "QXmppStreamFeatures.h"
+#include "QXmppTlsManager_p.h"
 
 #include <QDomElement>
 #include <QSslSocket>

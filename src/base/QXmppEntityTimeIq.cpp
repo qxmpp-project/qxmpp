@@ -21,13 +21,12 @@
  *
  */
 
-
 #include "QXmppEntityTimeIq.h"
-
-#include <QDomElement>
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 /// Returns the timezone offset in seconds.
 ///

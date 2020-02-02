@@ -25,9 +25,10 @@
 #define QXMPPVCARDIQ_H
 
 #include "QXmppIq.h"
+
 #include <QDate>
-#include <QMap>
 #include <QDomElement>
+#include <QMap>
 
 class QXmppVCardAddressPrivate;
 class QXmppVCardEmailPrivate;

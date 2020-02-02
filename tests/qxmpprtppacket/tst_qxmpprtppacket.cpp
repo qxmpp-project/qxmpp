@@ -21,9 +21,10 @@
  *
  */
 
+#include "QXmppRtpPacket.h"
+
 #include <QObject>
 #include <QtTest>
-#include "QXmppRtpPacket.h"
 
 class tst_QXmppRtpPacket : public QObject
 {

@@ -21,9 +21,9 @@
  *
  */
 
+#include "QXmppIq.h"
 
 #include "QXmppUtils.h"
-#include "QXmppIq.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>

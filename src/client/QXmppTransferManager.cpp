@@ -21,6 +21,18 @@
  *
  */
 
+#include "QXmppTransferManager.h"
+
+#include "QXmppByteStreamIq.h"
+#include "QXmppClient.h"
+#include "QXmppConstants_p.h"
+#include "QXmppIbbIq.h"
+#include "QXmppSocks.h"
+#include "QXmppStreamInitiationIq_p.h"
+#include "QXmppStun.h"
+#include "QXmppTransferManager_p.h"
+#include "QXmppUtils.h"
+
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QElapsedTimer>
@@ -33,17 +45,6 @@
 #include <QTime>
 #include <QTimer>
 #include <QUrl>
-
-#include "QXmppByteStreamIq.h"
-#include "QXmppClient.h"
-#include "QXmppConstants_p.h"
-#include "QXmppIbbIq.h"
-#include "QXmppSocks.h"
-#include "QXmppStreamInitiationIq_p.h"
-#include "QXmppStun.h"
-#include "QXmppTransferManager.h"
-#include "QXmppTransferManager_p.h"
-#include "QXmppUtils.h"
 
 // time to try to connect to a SOCKS host (7 seconds)
 const int socksTimeout = 7000;

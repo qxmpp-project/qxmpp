@@ -21,11 +21,12 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppMucIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppMucIq.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
 
 QXmppMucItem::QXmppMucItem()
     : m_affiliation(QXmppMucItem::UnspecifiedAffiliation),

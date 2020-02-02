@@ -23,6 +23,7 @@
  */
 
 #include "QXmppNonSASLAuth.h"
+
 #include "util.h"
 
 class tst_QXmppNonSASLAuthIq : public QObject

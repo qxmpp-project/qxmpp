@@ -25,16 +25,16 @@
  *  G.711 based on reference implementation by Sun Microsystems, Inc.
  */
 
-#include <QDataStream>
-#include <QDebug>
-#include <QSize>
-#include <QThread>
-
 #include "QXmppCodec_p.h"
 #include "QXmppRtpChannel.h"
 #include "QXmppRtpPacket.h"
 
 #include <cstring>
+
+#include <QDataStream>
+#include <QDebug>
+#include <QSize>
+#include <QThread>
 
 #ifdef QXMPP_USE_SPEEX
 #include <speex/speex.h>

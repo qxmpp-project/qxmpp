@@ -22,6 +22,8 @@
  *
  */
 
+#include "QXmppLogger.h"
+
 #include <iostream>
 
 #include <QChildEvent>

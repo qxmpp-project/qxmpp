@@ -21,13 +21,13 @@
  *
  */
 
+#include "QXmppVCardIq.h"
+
+#include "QXmppConstants_p.h"
+#include "QXmppUtils.h"
 
 #include <QBuffer>
 #include <QXmlStreamWriter>
-
-#include "QXmppVCardIq.h"
-#include "QXmppUtils.h"
-#include "QXmppConstants_p.h"
 
 static QString getImageType(const QByteArray &contents)
 {

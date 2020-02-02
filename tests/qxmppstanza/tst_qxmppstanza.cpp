@@ -21,9 +21,10 @@
  *
  */
 
-#include <QObject>
 #include "QXmppStanza.h"
+
 #include "util.h"
+#include <QObject>
 
 class tst_QXmppStanza : public QObject
 {

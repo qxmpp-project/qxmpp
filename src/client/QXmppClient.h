@@ -24,12 +24,12 @@
 #ifndef QXMPPCLIENT_H
 #define QXMPPCLIENT_H
 
-#include <QObject>
-#include <QAbstractSocket>
-
 #include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
+
+#include <QAbstractSocket>
+#include <QObject>
 
 class QSslError;
 

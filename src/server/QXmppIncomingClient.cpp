@@ -21,11 +21,7 @@
  *
  */
 
-#include <QDomElement>
-#include <QHostAddress>
-#include <QSslKey>
-#include <QSslSocket>
-#include <QTimer>
+#include "QXmppIncomingClient.h"
 
 #include "QXmppBindIq.h"
 #include "QXmppConstants_p.h"
@@ -37,7 +33,11 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
-#include "QXmppIncomingClient.h"
+#include <QDomElement>
+#include <QHostAddress>
+#include <QSslKey>
+#include <QSslSocket>
+#include <QTimer>
 
 class QXmppIncomingClientPrivate
 {

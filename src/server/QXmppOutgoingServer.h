@@ -24,9 +24,9 @@
 #ifndef QXMPPOUTGOINGSERVER_H
 #define QXMPPOUTGOINGSERVER_H
 
-#include <QAbstractSocket>
-
 #include "QXmppStream.h"
+
+#include <QAbstractSocket>
 
 class QSslError;
 class QXmppDialback;

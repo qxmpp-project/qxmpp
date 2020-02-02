@@ -21,15 +21,16 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QDomElement>
-#include <QSysInfo>
+#include "QXmppVersionManager.h"
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal.h"
-#include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"
+
+#include <QCoreApplication>
+#include <QDomElement>
+#include <QSysInfo>
 
 class QXmppVersionManagerPrivate
 {

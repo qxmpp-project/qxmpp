@@ -23,15 +23,15 @@
 
 #include "QXmppDiscoveryManager.h"
 
-#include <QDomElement>
-#include <QCoreApplication>
-
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
-#include "QXmppStream.h"
 #include "QXmppGlobal.h"
+#include "QXmppStream.h"
+
+#include <QCoreApplication>
+#include <QDomElement>
 
 class QXmppDiscoveryManagerPrivate
 {

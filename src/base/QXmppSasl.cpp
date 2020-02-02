@@ -22,16 +22,16 @@
  *
  */
 
+#include "QXmppSasl_p.h"
+#include "QXmppUtils.h"
+
 #include <cstdlib>
 
 #include <QDomElement>
 #include <QMessageAuthenticationCode>
 #include <QStringList>
-#include <QtEndian>
 #include <QUrlQuery>
-
-#include "QXmppSasl_p.h"
-#include "QXmppUtils.h"
+#include <QtEndian>
 
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 

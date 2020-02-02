@@ -24,9 +24,9 @@
 #ifndef QXMPPBOOKMARKMANAGER_H
 #define QXMPPBOOKMARKMANAGER_H
 
-#include <QUrl>
-
 #include "QXmppClientExtension.h"
+
+#include <QUrl>
 
 class QXmppBookmarkManagerPrivate;
 class QXmppBookmarkSet;

@@ -21,10 +21,11 @@
  *
  */
 
-#include <QDomElement>
+#include "QXmppStreamFeatures.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppStreamFeatures.h"
+
+#include <QDomElement>
 
 QXmppStreamFeatures::QXmppStreamFeatures()
     : m_bindMode(Disabled),

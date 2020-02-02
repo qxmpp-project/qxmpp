@@ -21,10 +21,9 @@
  *
  */
 
-#include "QXmppInternalClientExtension_p.h"
-
 #include "QXmppClient.h"
 #include "QXmppClient_p.h"
+#include "QXmppInternalClientExtension_p.h"
 
 /// \cond
 QXmppInternalClientExtension::QXmppInternalClientExtension()
