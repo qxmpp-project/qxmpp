@@ -26,6 +26,10 @@
 
 #include "QXmppStanza.h"
 
+///
+/// \brief The QXmppStreamFeatures class represents the features returned by an
+/// XMPP server or client.
+///
 class QXMPP_EXPORT QXmppStreamFeatures : public QXmppStanza
 {
 public:
