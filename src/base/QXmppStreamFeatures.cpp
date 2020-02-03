@@ -33,7 +33,8 @@ QXmppStreamFeatures::QXmppStreamFeatures()
       m_nonSaslAuthMode(Disabled),
       m_tlsMode(Disabled),
       m_streamManagementMode(Disabled),
-      m_csiMode(Disabled)
+      m_csiMode(Disabled),
+      m_registerMode(Disabled)
 {
 }
 
