@@ -61,7 +61,8 @@ void tst_QXmppRegisterIq::testGet()
     QCOMPARE(iq.from(), QString());
     QCOMPARE(iq.type(), QXmppIq::Get);
     QCOMPARE(iq.instructions(), QString());
-    QCOMPARE(iq.registerType(), QXmppRegisterIq::None);
+    QVERIFY(!iq.isRegistered());
+    QVERIFY(!iq.isRemove());
     QVERIFY(iq.username().isNull());
     QVERIFY(iq.password().isNull());
     QVERIFY(iq.email().isNull());
@@ -310,14 +311,14 @@ void tst_QXmppRegisterIq::testRegistered()
 
     QXmppRegisterIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.registerType(), QXmppRegisterIq::Registered);
+    QVERIFY(iq.isRegistered());
     QCOMPARE(iq.username(), QStringLiteral("juliet"));
     serializePacket(iq, xml);
 
     iq = QXmppRegisterIq();
     iq.setId(QStringLiteral(""));
     iq.setType(QXmppIq::Result);
-    iq.setRegisterType(QXmppRegisterIq::Registered);
+    iq.setIsRegistered(true);
     iq.setUsername(QStringLiteral("juliet"));
     serializePacket(iq, xml);
 }
@@ -334,14 +335,14 @@ void tst_QXmppRegisterIq::testRemove()
 
     QXmppRegisterIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.registerType(), QXmppRegisterIq::Remove);
+    QVERIFY(iq.isRemove());
     QCOMPARE(iq.username(), QStringLiteral("juliet"));
     serializePacket(iq, xml);
 
     iq = QXmppRegisterIq();
     iq.setId(QStringLiteral(""));
     iq.setType(QXmppIq::Result);
-    iq.setRegisterType(QXmppRegisterIq::Remove);
+    iq.setIsRemove(true);
     iq.setUsername(QStringLiteral("juliet"));
     serializePacket(iq, xml);
 }

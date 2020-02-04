@@ -41,16 +41,6 @@ class QXmppRegisterIqPrivate;
 class QXMPP_EXPORT QXmppRegisterIq : public QXmppIq
 {
 public:
-    /// Special type of the registration IQ.
-    ///
-    /// \since QXmpp 1.2
-
-    enum RegisterType {
-        None,        ///< No special register IQ.
-        Registered,  ///< Used by the service to indicate that an account is registered.
-        Remove       ///< Used by the client to request account removal.
-    };
-
     QXmppRegisterIq();
     QXmppRegisterIq(const QXmppRegisterIq &other);
     ~QXmppRegisterIq();
@@ -75,8 +65,11 @@ public:
     QString username() const;
     void setUsername(const QString &username);
 
-    RegisterType registerType() const;
-    void setRegisterType(RegisterType registerType);
+    bool isRegistered() const;
+    void setIsRegistered(bool isRegistered);
+
+    bool isRemove() const;
+    void setIsRemove(bool isRemove);
 
     QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
     QXmppBitsOfBinaryDataList &bitsOfBinaryData();

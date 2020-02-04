@@ -30,11 +30,8 @@
 #include <QDomElement>
 #include <QSharedData>
 
-static const QStringList REGISTER_TYPES = {
-    QString(),
-    QStringLiteral("registered"),
-    QStringLiteral("remove")
-};
+#define ELEMENT_REGISTERED QStringLiteral("registered")
+#define ELEMENT_REMOVE QStringLiteral("remove")
 
 class QXmppRegisterIqPrivate : public QSharedData
 {
@@ -46,12 +43,14 @@ public:
     QString instructions;
     QString password;
     QString username;
-    QXmppRegisterIq::RegisterType registerType;
+    bool isRegistered;
+    bool isRemove;
     QXmppBitsOfBinaryDataList bitsOfBinaryData;
 };
 
 QXmppRegisterIqPrivate::QXmppRegisterIqPrivate()
-    : registerType(QXmppRegisterIq::None)
+    : isRegistered(false),
+      isRemove(false)
 {
 }
 
@@ -98,7 +97,7 @@ QXmppRegisterIq QXmppRegisterIq::createUnregistrationRequest(const QString &to)
     QXmppRegisterIq iq;
     iq.setType(QXmppIq::Set);
     iq.setTo(to);
-    iq.setRegisterType(QXmppRegisterIq::Remove);
+    iq.setIsRemove(true);
     return iq;
 }
 
@@ -174,6 +173,54 @@ void QXmppRegisterIq::setUsername(const QString &username)
     d->username = username;
 }
 
+///
+/// Returns whether the account is registered.
+///
+/// By default this is set to false.
+///
+/// \since QXmpp 1.2
+///
+bool QXmppRegisterIq::isRegistered() const
+{
+    return d->isRegistered;
+}
+
+///
+/// Sets whether the account is registered.
+///
+/// By default this is set to false.
+///
+/// \since QXmpp 1.2
+///
+void QXmppRegisterIq::setIsRegistered(bool isRegistered)
+{
+    d->isRegistered = isRegistered;
+}
+
+///
+/// Returns whether to remove (unregister) the account.
+///
+/// By default this is set to false.
+///
+/// \since QXmpp 1.2
+///
+bool QXmppRegisterIq::isRemove() const
+{
+    return d->isRemove;
+}
+
+///
+/// Sets whether to remove (unregister) the account.
+///
+/// By default this is set to false.
+///
+/// \since QXmpp 1.2
+///
+void QXmppRegisterIq::setIsRemove(bool isRemove)
+{
+    d->isRemove = isRemove;
+}
+
 /// Returns a list of data packages attached using XEP-0231: Bits of Binary.
 ///
 /// This could be used to resolve a \c cid: URL of an CAPTCHA field of the
@@ -207,24 +254,6 @@ void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsO
     d->bitsOfBinaryData = bitsOfBinaryData;
 }
 
-/// Returns the type of the action or registration state.
-///
-/// \since QXmpp 1.2
-
-QXmppRegisterIq::RegisterType QXmppRegisterIq::registerType() const
-{
-    return d->registerType;
-}
-
-/// Sets the type of the action or registration state.
-///
-/// \since QXmpp 1.2
-
-void QXmppRegisterIq::setRegisterType(QXmppRegisterIq::RegisterType type)
-{
-    d->registerType = type;
-}
-
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
@@ -239,18 +268,9 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
     d->password = queryElement.firstChildElement("password").text();
     d->email = queryElement.firstChildElement("email").text();
     d->form.parse(queryElement.firstChildElement("x"));
+    d->isRegistered = !queryElement.firstChildElement(ELEMENT_REGISTERED).isNull();
+    d->isRemove = !queryElement.firstChildElement(ELEMENT_REMOVE).isNull();
     d->bitsOfBinaryData.parse(queryElement);
-
-    d->registerType = QXmppRegisterIq::None;
-
-    // The loop starts with the second element, because there cannot be an
-    // empty element for QXmppRegisterIq::None
-    for (int i = 1; i < REGISTER_TYPES.size(); i++) {
-        if (!queryElement.firstChildElement(REGISTER_TYPES.at(i)).isNull()) {
-            d->registerType = RegisterType(i);
-            break;
-        }
-    }
 }
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -261,8 +281,10 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!d->instructions.isEmpty())
         writer->writeTextElement("instructions", d->instructions);
 
-    if (d->registerType != QXmppRegisterIq::None)
-        writer->writeEmptyElement(REGISTER_TYPES.at(int(d->registerType)));
+    if (d->isRegistered)
+        writer->writeEmptyElement(ELEMENT_REGISTERED);
+    if (d->isRemove)
+        writer->writeEmptyElement(ELEMENT_REMOVE);
 
     if (!d->username.isEmpty())
         writer->writeTextElement("username", d->username);
