@@ -506,8 +506,6 @@ QXmppRtpAudioChannel *QXmppCall::audioChannel() const
         return nullptr;
 }
 
-/// Returns the audio mode.
-
 QIODevice::OpenMode QXmppCall::audioMode() const
 {
     return d->audioMode;
@@ -525,8 +523,6 @@ QXmppRtpVideoChannel *QXmppCall::videoChannel() const
         return nullptr;
 }
 
-/// Returns the video mode.
-
 QIODevice::OpenMode QXmppCall::videoMode() const
 {
     return d->videoMode;
@@ -543,9 +539,6 @@ void QXmppCall::terminated()
     // update state
     d->setState(QXmppCall::FinishedState);
 }
-
-/// Returns the call's direction.
-///
 
 QXmppCall::Direction QXmppCall::direction() const
 {
@@ -585,9 +578,6 @@ void QXmppCall::localCandidatesChanged()
     iq.addContent(d->localContent(stream));
     d->sendRequest(iq);
 }
-
-/// Returns the remote party's JID.
-///
 
 QString QXmppCall::jid() const
 {
@@ -630,10 +620,6 @@ QString QXmppCall::sid() const
 {
     return d->sid;
 }
-
-/// Returns the call's state.
-///
-/// \sa stateChanged()
 
 QXmppCall::State QXmppCall::state() const
 {

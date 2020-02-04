@@ -145,9 +145,6 @@ QXmppLogger *QXmppLogger::getLogger()
     return m_logger;
 }
 
-/// Returns the handler for logging messages.
-///
-
 QXmppLogger::LoggingType QXmppLogger::loggingType()
 {
     return d->loggingType;
@@ -164,9 +161,6 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
         reopen();
     }
 }
-
-/// Returns the types of messages to log.
-///
 
 QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 {
@@ -231,10 +225,6 @@ void QXmppLogger::updateCounter(const QString &counter, qint64 amount)
     Q_UNUSED(counter);
     Q_UNUSED(amount);
 }
-
-/// Returns the path to which logging messages should be written.
-///
-/// \sa loggingType()
 
 QString QXmppLogger::logFilePath()
 {

@@ -241,6 +241,7 @@ private:
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
+    /// The ICE gathering state, that is the discovery of local candidates
     Q_PROPERTY(QXmppIceConnection::GatheringState gatheringState READ gatheringState NOTIFY gatheringStateChanged)
 
 public:
@@ -274,6 +275,9 @@ public:
     bool bind(const QList<QHostAddress> &addresses);
     bool isConnected() const;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the ICE gathering state, that is the discovery of local
+    /// candidates.
     GatheringState gatheringState() const;
 
 signals:

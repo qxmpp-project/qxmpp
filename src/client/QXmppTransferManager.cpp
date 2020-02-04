@@ -284,32 +284,23 @@ void QXmppTransferJob::accept(QIODevice *iodevice)
     }
 }
 
-/// Returns the job's transfer direction.
-///
-
 QXmppTransferJob::Direction QXmppTransferJob::direction() const
 {
     return d->direction;
 }
 
+///
 /// Returns the last error that was encountered.
 ///
-
 QXmppTransferJob::Error QXmppTransferJob::error() const
 {
     return d->error;
 }
 
-/// Returns the remote party's JID.
-///
-
 QString QXmppTransferJob::jid() const
 {
     return d->jid;
 }
-
-/// Returns the local file URL.
-///
 
 QUrl QXmppTransferJob::localFileUrl() const
 {
@@ -359,9 +350,6 @@ qint64 QXmppTransferJob::fileSize() const
 }
 /// \endcond
 
-/// Returns the job's transfer method.
-///
-
 QXmppTransferJob::Method QXmppTransferJob::method() const
 {
     return d->method;
@@ -387,9 +375,6 @@ qint64 QXmppTransferJob::speed() const
         return 0;
     return (d->done * 1000.0) / elapsed;
 }
-
-/// Returns the job's state.
-///
 
 QXmppTransferJob::State QXmppTransferJob::state() const
 {
@@ -1483,10 +1468,6 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     emit fileReceived(job);
 }
 
-/// Return the JID of the bytestream proxy to use for
-/// outgoing transfers.
-///
-
 QString QXmppTransferManager::proxy() const
 {
     return d->proxy;
@@ -1505,10 +1486,6 @@ void QXmppTransferManager::setProxy(const QString &proxyJid)
     d->proxy = proxyJid;
 }
 
-/// Return whether the proxy will systematically be used for
-/// outgoing SOCKS5 bytestream transfers.
-///
-
 bool QXmppTransferManager::proxyOnly() const
 {
     return d->proxyOnly;
@@ -1525,11 +1502,6 @@ void QXmppTransferManager::setProxyOnly(bool proxyOnly)
 {
     d->proxyOnly = proxyOnly;
 }
-
-/// Return the supported stream methods.
-///
-/// The methods are a combination of zero or more QXmppTransferJob::Method.
-///
 
 QXmppTransferJob::Methods QXmppTransferManager::supportedMethods() const
 {

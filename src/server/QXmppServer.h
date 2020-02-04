@@ -59,6 +59,7 @@ class QXmppStream;
 class QXMPP_EXPORT QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
+    /// The QXmppLogger associated with the server
     Q_PROPERTY(QXmppLogger *logger READ logger WRITE setLogger NOTIFY loggerChanged)
 
 public:
@@ -71,6 +72,8 @@ public:
     QString domain() const;
     void setDomain(const QString &domain);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the QXmppLogger associated with the server.
     QXmppLogger *logger();
     void setLogger(QXmppLogger *logger);
 

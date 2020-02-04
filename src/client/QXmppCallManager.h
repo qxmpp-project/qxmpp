@@ -79,14 +79,27 @@ public:
 
     ~QXmppCall() override;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the call's direction.
     QXmppCall::Direction direction() const;
+    /// Returns the remote party's JID.
     QString jid() const;
-    QString sid() const;
+    ///
+    /// Returns the call's state.
+    ///
+    /// \sa stateChanged()
+    ///
     QXmppCall::State state() const;
 
+    QString sid() const;
+
     QXmppRtpAudioChannel *audioChannel() const;
-    QIODevice::OpenMode audioMode() const;
     QXmppRtpVideoChannel *videoChannel() const;
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the audio mode.
+    QIODevice::OpenMode audioMode() const;
+    /// Returns the video mode.
     QIODevice::OpenMode videoMode() const;
 
 signals:

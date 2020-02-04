@@ -2568,9 +2568,6 @@ bool QXmppIceConnection::isConnected() const
     return true;
 }
 
-/// Returns the ICE gathering state, that is the discovery of
-/// local candidates.
-
 QXmppIceConnection::GatheringState QXmppIceConnection::gatheringState() const
 {
     return d->gatheringState;

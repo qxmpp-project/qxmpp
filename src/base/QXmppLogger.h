@@ -37,16 +37,21 @@
 
 class QXmppLoggerPrivate;
 
+///
 /// \brief The QXmppLogger class represents a sink for logging messages.
 ///
 /// \ingroup Core
-
+///
 class QXMPP_EXPORT QXmppLogger : public QObject
 {
     Q_OBJECT
     Q_FLAGS(MessageType MessageTypes)
+
+    /// The path to which logging messages should be written
     Q_PROPERTY(QString logFilePath READ logFilePath WRITE setLogFilePath)
+    /// The handler for logging messages
     Q_PROPERTY(LoggingType loggingType READ loggingType WRITE setLoggingType)
+    /// The types of messages to log
     Q_PROPERTY(MessageTypes messageTypes READ messageTypes WRITE setMessageTypes)
 
 public:
@@ -76,12 +81,22 @@ public:
 
     static QXmppLogger *getLogger();
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the handler for logging messages.
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType type);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    ///
+    /// Returns the path to which logging messages should be written.
+    ///
+    /// \sa loggingType()
+    ///
     QString logFilePath();
     void setLogFilePath(const QString &path);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the types of messages to log.
     QXmppLogger::MessageTypes messageTypes();
     void setMessageTypes(QXmppLogger::MessageTypes types);
 

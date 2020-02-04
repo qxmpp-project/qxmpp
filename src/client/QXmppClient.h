@@ -94,7 +94,10 @@ class QXmppVersionManager;
 class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
+
+    /// The QXmppLogger associated with the current QXmppClient
     Q_PROPERTY(QXmppLogger *logger READ logger WRITE setLogger NOTIFY loggerChanged)
+    /// The client's current state
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
@@ -184,12 +187,17 @@ public:
     void setClientPresence(const QXmppPresence &presence);
 
     QXmppConfiguration &configuration();
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the QXmppLogger associated with the current QXmppClient.
     QXmppLogger *logger() const;
     void setLogger(QXmppLogger *logger);
 
     QAbstractSocket::SocketError socketError();
     QString socketErrorString() const;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the client's current state.
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 

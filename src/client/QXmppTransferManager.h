@@ -87,13 +87,20 @@ class QXMPP_EXPORT QXmppTransferJob : public QXmppLoggable
 {
     Q_OBJECT
     Q_FLAGS(Method Methods)
+    /// The job's transfer direction
     Q_PROPERTY(Direction direction READ direction CONSTANT)
+    /// The local file URL
     Q_PROPERTY(QUrl localFileUrl READ localFileUrl WRITE setLocalFileUrl NOTIFY localFileUrlChanged)
+    /// The remote party's JID
     Q_PROPERTY(QString jid READ jid CONSTANT)
+    /// The job's transfer method
     Q_PROPERTY(Method method READ method CONSTANT)
+    /// The job's state
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
+    /// The name of the file
     Q_PROPERTY(QString fileName READ fileName CONSTANT)
+    /// The size of the file
     Q_PROPERTY(qint64 fileSize READ fileSize CONSTANT)
 
 public:
@@ -135,16 +142,24 @@ public:
 
     ~QXmppTransferJob() override;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the job's transfer direction.
     QXmppTransferJob::Direction direction() const;
-    QXmppTransferJob::Error error() const;
+    /// Returns the remote party's JID.
     QString jid() const;
+    /// Returns the job's transfer method.
     QXmppTransferJob::Method method() const;
+    /// Returns the job's state.
+    QXmppTransferJob::State state() const;
+
+    QXmppTransferJob::Error error() const;
     QString sid() const;
     qint64 speed() const;
-    QXmppTransferJob::State state() const;
 
     // XEP-0096 : File transfer
     QXmppTransferFileInfo fileInfo() const;
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the local file URL.
     QUrl localFileUrl() const;
     void setLocalFileUrl(const QUrl &localFileUrl);
 
@@ -218,20 +233,33 @@ private:
 class QXMPP_EXPORT QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT
+
+    /// The JID of the bytestream proxy to use for outgoing transfers
     Q_PROPERTY(QString proxy READ proxy WRITE setProxy)
+    /// Whether the proxy will systematically be used for outgoing SOCKS5 bytestream transfers
     Q_PROPERTY(bool proxyOnly READ proxyOnly WRITE setProxyOnly)
+    /// The supported stream methods
     Q_PROPERTY(QXmppTransferJob::Methods supportedMethods READ supportedMethods WRITE setSupportedMethods)
 
 public:
     QXmppTransferManager();
     ~QXmppTransferManager() override;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Return the JID of the bytestream proxy to use for outgoing transfers.
     QString proxy() const;
     void setProxy(const QString &proxyJid);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Return whether the proxy will systematically be used for outgoing
+    /// SOCKS5 bytestream transfers.
     bool proxyOnly() const;
     void setProxyOnly(bool proxyOnly);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Return the supported stream methods.
+    ///
+    /// The methods are a combination of zero or more QXmppTransferJob::Method.
     QXmppTransferJob::Methods supportedMethods() const;
     void setSupportedMethods(QXmppTransferJob::Methods methods);
 

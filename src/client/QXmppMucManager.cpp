@@ -89,8 +89,6 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
     return room;
 }
 
-/// Returns the list of managed rooms.
-
 QList<QXmppMucRoom *> QXmppMucManager::rooms() const
 {
     return d->rooms.values();
@@ -210,8 +208,6 @@ QXmppMucRoom::~QXmppMucRoom()
     delete d;
 }
 
-/// Returns the actions you are allowed to perform on the room.
-
 QXmppMucRoom::Actions QXmppMucRoom::allowedActions() const
 {
     return d->allowedActions;
@@ -243,14 +239,10 @@ bool QXmppMucRoom::ban(const QString &jid, const QString &reason)
     return d->client->sendPacket(iq);
 }
 
-/// Returns true if you are currently in the room.
-
 bool QXmppMucRoom::isJoined() const
 {
     return d->participants.contains(d->ownJid());
 }
-
-/// Returns the chat room's bare JID.
 
 QString QXmppMucRoom::jid() const
 {
@@ -311,16 +303,10 @@ bool QXmppMucRoom::leave(const QString &message)
     return d->client->sendPacket(packet);
 }
 
-/// Returns the chat room's human-readable name.
-///
-/// This name will only be available after the room has been joined.
-
 QString QXmppMucRoom::name() const
 {
     return d->name;
 }
-
-/// Returns your own nickname.
 
 QString QXmppMucRoom::nickName() const
 {
@@ -407,16 +393,10 @@ QXmppPresence QXmppMucRoom::participantPresence(const QString &jid) const
     return presence;
 }
 
-/// Returns the list of participant JIDs.
-///
-/// These JIDs are Occupant JIDs of the form "room@service/nick".
-
 QStringList QXmppMucRoom::participants() const
 {
     return d->participants.keys();
 }
-
-/// Returns the chat room password.
 
 QString QXmppMucRoom::password() const
 {
@@ -431,8 +411,6 @@ void QXmppMucRoom::setPassword(const QString &password)
 {
     d->password = password;
 }
-
-/// Returns the room's subject.
 
 QString QXmppMucRoom::subject() const
 {

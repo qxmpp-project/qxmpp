@@ -66,6 +66,9 @@ public:
     ~QXmppMucManager() override;
 
     QXmppMucRoom *addRoom(const QString &roomJid);
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the list of managed rooms.
     QList<QXmppMucRoom *> rooms() const;
 
     /// \cond
@@ -102,13 +105,22 @@ class QXMPP_EXPORT QXmppMucRoom : public QObject
 {
     Q_OBJECT
     Q_FLAGS(Action Actions)
+
+    /// The actions you are allowed to perform on the room
     Q_PROPERTY(QXmppMucRoom::Actions allowedActions READ allowedActions NOTIFY allowedActionsChanged)
+    /// Whether you are currently in the room
     Q_PROPERTY(bool isJoined READ isJoined NOTIFY isJoinedChanged)
+    /// The chat room's bare JID
     Q_PROPERTY(QString jid READ jid CONSTANT)
+    /// The chat room's human-readable name
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    /// Your own nickname
     Q_PROPERTY(QString nickName READ nickName WRITE setNickName NOTIFY nickNameChanged)
+    /// The list of participant JIDs
     Q_PROPERTY(QStringList participants READ participants NOTIFY participantsChanged)
+    /// The chat room password
     Q_PROPERTY(QString password READ password WRITE setPassword)
+    /// The room's subject
     Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
 
 public:
@@ -124,21 +136,49 @@ public:
 
     ~QXmppMucRoom() override;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the actions you are allowed to perform on the room.
     Actions allowedActions() const;
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns true if you are currently in the room.
     bool isJoined() const;
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the chat room's bare JID.
     QString jid() const;
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    ///
+    /// Returns the chat room's human-readable name.
+    ///
+    /// This name will only be available after the room has been joined.
+    ///
     QString name() const;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns your own nickname.
     QString nickName() const;
     void setNickName(const QString &nickName);
 
     Q_INVOKABLE QString participantFullJid(const QString &jid) const;
     QXmppPresence participantPresence(const QString &jid) const;
+
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    ///
+    /// Returns the list of participant JIDs.
+    ///
+    /// These JIDs are Occupant JIDs of the form "room@service/nick".
+    ///
     QStringList participants() const;
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the chat room password.
     QString password() const;
     void setPassword(const QString &password);
 
+    // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    /// Returns the room's subject.
     QString subject() const;
     void setSubject(const QString &subject);
 

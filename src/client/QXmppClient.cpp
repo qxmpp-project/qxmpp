@@ -351,8 +351,6 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
     }
 }
 
-/// Returns the client's current state.
-
 QXmppClient::State QXmppClient::state() const
 {
     if (d->stream->isConnected())
@@ -522,8 +520,6 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
     // notify managers
     emit error(err);
 }
-
-/// Returns the QXmppLogger associated with the current QXmppClient.
 
 QXmppLogger* QXmppClient::logger() const
 {
