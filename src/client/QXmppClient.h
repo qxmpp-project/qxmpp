@@ -47,10 +47,23 @@ class QXmppRosterManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
 
-/// \defgroup Core
+///
+/// \defgroup Core Core classes
+///
+/// Core classes include all necessary classes to build a basic client or
+/// server application. This for example also includes the logging class
+/// QXmppLogger.
+///
 
-/// \defgroup Managers
+///
+/// \defgroup Managers Managers
+///
+/// Managers are used to extend the basic QXmppClient. Some of them are loaded
+/// by default, others need to be added to the client using
+/// QXmppClient::addExtension().
+///
 
+///
 /// \brief The QXmppClient class is the main class for using QXmpp.
 ///
 /// It provides the user all the required functionality to connect to the

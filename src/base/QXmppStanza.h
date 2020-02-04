@@ -81,12 +81,18 @@ private:
 class QXmppStanzaPrivate;
 class QXmppStanzaErrorPrivate;
 
-/// \defgroup Stanzas
+///
+/// \defgroup Stanzas Stanzas
+///
+/// All packets that are sent and received are serialized in Stanzas, so this
+/// includes IQ stanzas, message stanzas, presence stanzas and other stanzas.
+///
 
+///
 /// \brief The QXmppStanza class is the base class for all XMPP stanzas.
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppStanza
 {
 public:
