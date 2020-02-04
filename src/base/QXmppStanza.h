@@ -102,37 +102,42 @@ public:
     class QXMPP_EXPORT Error
     {
     public:
+        /// The type represents the error type of stanza errors.
+        ///
+        /// The error descriptions are not detailed in here. The exact meaning
+        /// can be found in the particular protocols using them.
         enum Type {
-            Cancel,
-            Continue,
-            Modify,
-            Auth,
-            Wait
+            Cancel,   ///< The error is not temporary.
+            Continue, ///< The error was only a warning.
+            Modify,   ///< The request needs to be changed and resent.
+            Auth,     ///< The request needs to be resent after authentication.
+            Wait      ///< The error is temporary, you should wait and resend.
         };
 
+        /// A detailed condition of the error
         enum Condition {
-            BadRequest,
-            Conflict,
-            FeatureNotImplemented,
-            Forbidden,
-            Gone,
-            InternalServerError,
-            ItemNotFound,
-            JidMalformed,
-            NotAcceptable,
-            NotAllowed,
-            NotAuthorized,
-            PaymentRequired,
-            RecipientUnavailable,
-            Redirect,
-            RegistrationRequired,
-            RemoteServerNotFound,
-            RemoteServerTimeout,
-            ResourceConstraint,
-            ServiceUnavailable,
-            SubscriptionRequired,
-            UndefinedCondition,
-            UnexpectedRequest
+            BadRequest,            ///< The request does not contain a valid schema.
+            Conflict,              ///< The request conflicts with another.
+            FeatureNotImplemented, ///< The feature is not implemented.
+            Forbidden,             ///< The requesting entity does not posses the necessary privileges to perform the request.
+            Gone,                  ///< The user or server can not be contacted at the address.
+            InternalServerError,   ///< The server has expierienced an internal error and can not process the request.
+            ItemNotFound,          ///< The requested item could not be found.
+            JidMalformed,          ///< The given JID is not valid.
+            NotAcceptable,         ///< The request does not meet the defined critera.
+            NotAllowed,            ///< No entity is allowed to perform the request.
+            NotAuthorized,         ///< The request should be resent after authentication.
+            PaymentRequired,       ///< Payment is required to perform the request.
+            RecipientUnavailable,  ///< The recipient is unavailable.
+            Redirect,              ///< The requested resource is available elsewhere.
+            RegistrationRequired,  ///< The requesting entity needs to register first.
+            RemoteServerNotFound,  ///< The remote server could not be found.
+            RemoteServerTimeout,   ///< The connection to the server could not be established or timed out.
+            ResourceConstraint,    ///< The recipient lacks system resources to perform the request.
+            ServiceUnavailable,    ///< The service is currently not available.
+            SubscriptionRequired,  ///< The requester needs to subscribe first.
+            UndefinedCondition,    ///< An undefined condition was hit.
+            UnexpectedRequest      ///< The request was unexpected.
         };
 
         Error();

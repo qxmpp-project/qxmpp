@@ -56,14 +56,9 @@ QXmppExtendedAddress::QXmppExtendedAddress()
 ///
 /// \param other
 ///
-QXmppExtendedAddress::QXmppExtendedAddress(const QXmppExtendedAddress &other)
-    : d(other.d)
-{
-}
+QXmppExtendedAddress::QXmppExtendedAddress(const QXmppExtendedAddress &other) = default;
 
-QXmppExtendedAddress::~QXmppExtendedAddress()
-{
-}
+QXmppExtendedAddress::~QXmppExtendedAddress() = default;
 
 /// Assigns the other address to this one.
 ///
@@ -185,13 +180,20 @@ QXmppStanzaErrorPrivate::QXmppStanzaErrorPrivate()
 {
 }
 
+///
+/// Default constructor
+///
 QXmppStanza::Error::Error()
     : d(new QXmppStanzaErrorPrivate)
 {
 }
 
+/// Copy constructor
 QXmppStanza::Error::Error(const QXmppStanza::Error &) = default;
 
+///
+/// Initializes an error with a type, condition and text.
+///
 QXmppStanza::Error::Error(Type type, Condition cond, const QString &text)
     : d(new QXmppStanzaErrorPrivate)
 {
@@ -200,6 +202,9 @@ QXmppStanza::Error::Error(Type type, Condition cond, const QString &text)
     d->text = text;
 }
 
+///
+/// Initializes an error with a type, condition and text (all from strings).
+///
 QXmppStanza::Error::Error(const QString &type, const QString &cond,
                           const QString &text)
     : d(new QXmppStanzaErrorPrivate)
@@ -209,45 +214,71 @@ QXmppStanza::Error::Error(const QString &type, const QString &cond,
     setConditionFromStr(cond);
 }
 
+/// Default destructor
 QXmppStanza::Error::~Error() = default;
 
+/// Copy operator
 QXmppStanza::Error &QXmppStanza::Error::operator=(const QXmppStanza::Error &) = default;
 
+///
+/// Returns the human-readable description of the error.
+///
 QString QXmppStanza::Error::text() const
 {
     return d->text;
 }
 
+///
+/// Sets the description of the error.
+///
 void QXmppStanza::Error::setText(const QString &text)
 {
     d->text = text;
 }
 
+///
+/// Returns the error code.
+///
 int QXmppStanza::Error::code() const
 {
     return d->code;
 }
 
+///
+/// Sets the error code.
+///
 void QXmppStanza::Error::setCode(int code)
 {
     d->code = code;
 }
 
+///
+/// Returns the error condition.
+///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
     return d->condition;
 }
 
+///
+/// Sets the error condition.
+///
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 {
     d->condition = cond;
 }
 
+///
+/// Returns the type of the error.
+///
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
 {
     return d->type;
 }
 
+///
+/// Sets the type of the error.
+///
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 {
     d->type = type;
