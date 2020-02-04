@@ -147,7 +147,7 @@ void tst_QXmppRegistrationManager::testDeleteAccount()
         // to address must be the server or empty
         QVERIFY(iq.to() == QStringLiteral("example.org") || iq.to().isEmpty());
         QCOMPARE(iq.type(), QXmppIq::Set);
-        QCOMPARE(iq.registerType(), QXmppRegisterIq::Remove);
+        QVERIFY(iq.isRemove());
 
         delete context;  // disconnects lambda
     });
