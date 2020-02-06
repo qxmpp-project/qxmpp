@@ -27,14 +27,31 @@
 
 #include <QDomElement>
 
-QXmppMamQueryIq::QXmppMamQueryIq() : QXmppIq(QXmppIq::Set)
+class QXmppMamQueryIqPrivate : public QSharedData
+{
+public:
+    QXmppDataForm form;
+    QXmppResultSetQuery resultSetQuery;
+    QString node;
+    QString queryId;
+};
+
+QXmppMamQueryIq::QXmppMamQueryIq()
+    : QXmppIq(QXmppIq::Set),
+      d(new QXmppMamQueryIqPrivate)
 {
 }
+
+QXmppMamQueryIq::QXmppMamQueryIq(const QXmppMamQueryIq &) = default;
+
+QXmppMamQueryIq::~QXmppMamQueryIq() = default;
+
+QXmppMamQueryIq &QXmppMamQueryIq::operator=(const QXmppMamQueryIq &) = default;
 
 /// Returns the form that specifies the query.
 QXmppDataForm QXmppMamQueryIq::form() const
 {
-    return m_form;
+    return d->form;
 }
 
 /// Sets the data form that specifies the query.
@@ -42,13 +59,13 @@ QXmppDataForm QXmppMamQueryIq::form() const
 /// \param form The data form.
 void QXmppMamQueryIq::setForm(const QXmppDataForm &form)
 {
-    m_form = form;
+    d->form = form;
 }
 
 /// Returns the result set query for result set management.
 QXmppResultSetQuery QXmppMamQueryIq::resultSetQuery() const
 {
-    return m_resultSetQuery;
+    return d->resultSetQuery;
 }
 
 /// Sets the result set query for result set management.
@@ -56,13 +73,13 @@ QXmppResultSetQuery QXmppMamQueryIq::resultSetQuery() const
 /// \param resultSetQuery The result set query.
 void QXmppMamQueryIq::setResultSetQuery(const QXmppResultSetQuery &resultSetQuery)
 {
-    m_resultSetQuery = resultSetQuery;
+    d->resultSetQuery = resultSetQuery;
 }
 
 /// Returns the node to query.
 QString QXmppMamQueryIq::node() const
 {
-    return m_node;
+    return d->node;
 }
 
 /// Sets the node to query.
@@ -70,13 +87,13 @@ QString QXmppMamQueryIq::node() const
 /// \param node The node to query.
 void QXmppMamQueryIq::setNode(const QString &node)
 {
-    m_node = node;
+    d->node = node;
 }
 
 /// Returns the queryid that will be included in the results.
 QString QXmppMamQueryIq::queryId() const
 {
-    return m_queryId;
+    return d->queryId;
 }
 
 /// Sets the queryid that will be included in the results.
@@ -84,7 +101,7 @@ QString QXmppMamQueryIq::queryId() const
 /// \param id The query id.
 void QXmppMamQueryIq::setQueryId(const QString &id)
 {
-    m_queryId = id;
+    d->queryId = id;
 }
 
 /// \cond
@@ -102,15 +119,15 @@ bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
-    m_node = queryElement.attribute("node");
-    m_queryId = queryElement.attribute("queryId");
+    d->node = queryElement.attribute("node");
+    d->queryId = queryElement.attribute("queryId");
     QDomElement resultSetElement = queryElement.firstChildElement("set");
     if (!resultSetElement.isNull()) {
-        m_resultSetQuery.parse(resultSetElement);
+        d->resultSetQuery.parse(resultSetElement);
     }
     QDomElement formElement = queryElement.firstChildElement("x");
     if (!formElement.isNull()) {
-        m_form.parse(formElement);
+        d->form.parse(formElement);
     }
 }
 
@@ -118,46 +135,61 @@ void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeDefaultNamespace(ns_mam);
-    if (!m_node.isEmpty()) {
-        writer->writeAttribute("node", m_node);
+    if (!d->node.isEmpty()) {
+        writer->writeAttribute("node", d->node);
     }
-    if (!m_queryId.isEmpty()) {
-        writer->writeAttribute("queryid", m_queryId);
+    if (!d->queryId.isEmpty()) {
+        writer->writeAttribute("queryid", d->queryId);
     }
-    m_form.toXml(writer);
-    m_resultSetQuery.toXml(writer);
+    d->form.toXml(writer);
+    d->resultSetQuery.toXml(writer);
     writer->writeEndElement();
 }
 /// \endcond
 
-QXmppMamResultIq::QXmppMamResultIq() : m_complete(false)
+class QXmppMamResultIqPrivate : public QSharedData
 {
+public:
+    QXmppResultSetReply resultSetReply;
+    bool complete;
+};
+
+QXmppMamResultIq::QXmppMamResultIq()
+    : d(new QXmppMamResultIqPrivate)
+{
+    d->complete = false;
 }
+
+QXmppMamResultIq::QXmppMamResultIq(const QXmppMamResultIq &) = default;
+
+QXmppMamResultIq::~QXmppMamResultIq() = default;
+
+QXmppMamResultIq &QXmppMamResultIq::operator=(const QXmppMamResultIq &) = default;
 
 /// Returns the result set reply for result set management.
 QXmppResultSetReply QXmppMamResultIq::resultSetReply() const
 {
-    return m_resultSetReply;
+    return d->resultSetReply;
 }
 
 /// Sets the result set reply for result set management
 void QXmppMamResultIq::setResultSetReply(const QXmppResultSetReply &resultSetReply)
 {
-    m_resultSetReply = resultSetReply;
+    d->resultSetReply = resultSetReply;
 }
 
 /// Returns true if the results returned by the server are complete (not
 /// limited by the server).
 bool QXmppMamResultIq::complete() const
 {
-    return m_complete;
+    return d->complete;
 }
 
 /// Sets if the results returned by the server are complete (not limited by the
 /// server).
 void QXmppMamResultIq::setComplete(bool complete)
 {
-    m_complete = complete;
+    d->complete = complete;
 }
 
 /// \cond
@@ -175,10 +207,10 @@ bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement finElement = element.firstChildElement("fin");
-    m_complete = finElement.attribute("complete") == QString("true");
+    d->complete = finElement.attribute("complete") == QString("true");
     QDomElement resultSetElement = finElement.firstChildElement("set");
     if (!resultSetElement.isNull()) {
-        m_resultSetReply.parse(resultSetElement);
+        d->resultSetReply.parse(resultSetElement);
     }
 }
 
@@ -186,10 +218,10 @@ void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("fin");
     writer->writeDefaultNamespace(ns_mam);
-    if (m_complete) {
+    if (d->complete) {
         writer->writeAttribute("complete", "true");
     }
-    m_resultSetReply.toXml(writer);
+    d->resultSetReply.toXml(writer);
     writer->writeEndElement();
 }
 /// \endcond
