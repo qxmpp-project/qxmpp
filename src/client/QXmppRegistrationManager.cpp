@@ -47,7 +47,7 @@ public:
     QString changePasswordIqId;
     QString newPassword;
 
-    QString deleteAccountIqIq;
+    QString deleteAccountIqId;
 
     QString registrationIqId;
     QXmppRegisterIq registrationFormToSend;
@@ -105,7 +105,7 @@ void QXmppRegistrationManager::changePassword(const QString &newPassword)
 void QXmppRegistrationManager::deleteAccount()
 {
     auto iq = QXmppRegisterIq::createUnregistrationRequest();
-    d->deleteAccountIqIq = iq.id();
+    d->deleteAccountIqId = iq.id();
 
     client()->sendPacket(iq);
 }
@@ -258,7 +258,7 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             d->changePasswordIqId.clear();
             d->newPassword.clear();
             return true;
-        } else if (!id.isEmpty() && id == d->deleteAccountIqIq) {
+        } else if (!id.isEmpty() && id == d->deleteAccountIqId) {
             QXmppIq iq;
             iq.parse(stanza);
 
@@ -276,7 +276,7 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
                 break;  // should never occur
             }
 
-            d->deleteAccountIqIq.clear();
+            d->deleteAccountIqId.clear();
             return true;
         } else if (QXmppRegisterIq::isRegisterIq(stanza)) {
             QXmppRegisterIq iq;
