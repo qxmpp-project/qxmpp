@@ -1,5 +1,5 @@
-QXmpp 1.2.0 (UNRELEASED)
-------------------------
+QXmpp 1.2.0 (Feb 06, 2020)
+--------------------------
 
 QXmpp now requires Qt 5.7 or later. Unfortunately ABI compatibility was not
 kept this release again. Code coverage has been improved from 68.93% to 69.55%.
