@@ -47,8 +47,9 @@ public:
     QString changePasswordIqId;
     QString newPassword;
 
-    QString registrationIqId;
+    QString deleteAccountIqIq;
 
+    QString registrationIqId;
     QXmppRegisterIq registrationFormToSend;
 };
 
@@ -98,16 +99,15 @@ void QXmppRegistrationManager::changePassword(const QString &newPassword)
 ///
 /// Cancels an existing registration on the server.
 ///
-/// \returns The ID of the sent IQ, if it was sent successfully. A null string
-/// is returned otherwise.
+/// \sa accountDeleted()
+/// \sa accountDeletionFailed()
 ///
-QString QXmppRegistrationManager::deleteAccount()
+void QXmppRegistrationManager::deleteAccount()
 {
     auto iq = QXmppRegisterIq::createUnregistrationRequest();
+    d->deleteAccountIqIq = iq.id();
 
-    if (client()->sendPacket(iq))
-        return iq.id();
-    return {};
+    client()->sendPacket(iq);
 }
 
 bool QXmppRegistrationManager::supportedByServer() const
@@ -257,6 +257,26 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
 
             d->changePasswordIqId.clear();
             d->newPassword.clear();
+            return true;
+        } else if (!id.isEmpty() && id == d->deleteAccountIqIq) {
+            QXmppIq iq;
+            iq.parse(stanza);
+
+            switch (iq.type()) {
+            case QXmppIq::Result:
+                info(QStringLiteral("Account deleted successfully."));
+                emit accountDeleted();
+                client()->disconnectFromServer();
+                break;
+            case QXmppIq::Error:
+                warning(QStringLiteral("Failed to delete account: ").append(iq.error().text()));
+                emit accountDeletionFailed(iq.error());
+                break;
+            default:
+                break;  // should never occur
+            }
+
+            d->deleteAccountIqIq.clear();
             return true;
         } else if (QXmppRegisterIq::isRegisterIq(stanza)) {
             QXmppRegisterIq iq;

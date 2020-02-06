@@ -67,6 +67,8 @@ private slots:
     void testRegistrationResult();
     void testChangePasswordResult_data();
     void testChangePasswordResult();
+    void testDeleteAccountResult_data();
+    void testDeleteAccountResult();
     void testRegistrationFormReceived();
 
     void sendStreamFeaturesToManager(bool registrationEnabled = true);
@@ -152,9 +154,7 @@ void tst_QXmppRegistrationManager::testDeleteAccount()
         delete context;  // disconnects lambda
     });
 
-    const QString id = manager->deleteAccount();
-    // we're not connnected, so the id should be null
-    QVERIFY(id.isNull());
+    manager->deleteAccount();
 }
 
 void tst_QXmppRegistrationManager::testRequestRegistrationForm_data()
@@ -424,6 +424,63 @@ void tst_QXmppRegistrationManager::testChangePasswordResult()
 
     QXmppIq serverResult(isSuccess ? QXmppIq::Result : QXmppIq::Error);
     serverResult.setId(changePasswordRequestIqId);
+
+    manager->handleStanza(writePacketToDom(serverResult));
+
+    QVERIFY(resultSignalCalled);
+    delete resultContext;
+}
+
+void tst_QXmppRegistrationManager::testDeleteAccountResult_data()
+{
+    QTest::addColumn<bool>("isSuccess");
+
+#define ROW(name, isSuccess) \
+    QTest::newRow(name) << isSuccess
+
+    ROW("success", true);
+    ROW("error", false);
+
+#undef ROW
+}
+
+void tst_QXmppRegistrationManager::testDeleteAccountResult()
+{
+    QFETCH(bool, isSuccess);
+
+    QString deleteAccountRequestIqId;
+
+    bool requestSentSignalCalled = false;
+    QObject *requestSentSignalContext = new QObject(this);
+    connect(&logger, &QXmppLogger::message, requestSentSignalContext, [&](QXmppLogger::MessageType type, const QString &text) {
+        if (type == QXmppLogger::SentMessage) {
+            requestSentSignalCalled = true;
+
+            QXmppIq parsedIq;
+            parsePacket(parsedIq, text.toUtf8());
+            deleteAccountRequestIqId = parsedIq.id();
+        }
+    });
+
+    manager->deleteAccount();
+    QVERIFY(requestSentSignalCalled);
+    QVERIFY(!deleteAccountRequestIqId.isEmpty());
+    delete requestSentSignalContext;
+
+    bool resultSignalCalled = false;
+    QObject *resultContext = new QObject(this);
+    if (isSuccess) {
+        connect(manager, &QXmppRegistrationManager::accountDeleted, resultContext, [&]() {
+            resultSignalCalled = true;
+        });
+    } else {
+        connect(manager, &QXmppRegistrationManager::accountDeletionFailed, resultContext, [&](QXmppStanza::Error) {
+            resultSignalCalled = true;
+        });
+    }
+
+    QXmppIq serverResult(isSuccess ? QXmppIq::Result : QXmppIq::Error);
+    serverResult.setId(deleteAccountRequestIqId);
 
     manager->handleStanza(writePacketToDom(serverResult));
 
