@@ -27,105 +27,132 @@
 
 #include <QDomElement>
 
-QXmppStreamFeatures::QXmppStreamFeatures()
-    : m_bindMode(Disabled),
-      m_sessionMode(Disabled),
-      m_nonSaslAuthMode(Disabled),
-      m_tlsMode(Disabled),
-      m_streamManagementMode(Disabled),
-      m_csiMode(Disabled),
-      m_registerMode(Disabled)
+class QXmppStreamFeaturesPrivate : public QSharedData
+{
+public:
+    QXmppStreamFeaturesPrivate();
+
+    QXmppStreamFeatures::Mode bindMode;
+    QXmppStreamFeatures::Mode sessionMode;
+    QXmppStreamFeatures::Mode nonSaslAuthMode;
+    QXmppStreamFeatures::Mode tlsMode;
+    QXmppStreamFeatures::Mode streamManagementMode;
+    QXmppStreamFeatures::Mode csiMode;
+    QXmppStreamFeatures::Mode registerMode;
+    QStringList authMechanisms;
+    QStringList compressionMethods;
+};
+
+QXmppStreamFeaturesPrivate::QXmppStreamFeaturesPrivate()
+    : bindMode(QXmppStreamFeatures::Disabled),
+      sessionMode(QXmppStreamFeatures::Disabled),
+      nonSaslAuthMode(QXmppStreamFeatures::Disabled),
+      tlsMode(QXmppStreamFeatures::Disabled),
+      streamManagementMode(QXmppStreamFeatures::Disabled),
+      csiMode(QXmppStreamFeatures::Disabled),
+      registerMode(QXmppStreamFeatures::Disabled)
 {
 }
 
+QXmppStreamFeatures::QXmppStreamFeatures()
+    : d(new QXmppStreamFeaturesPrivate)
+{
+}
+
+QXmppStreamFeatures::QXmppStreamFeatures(const QXmppStreamFeatures &) = default;
+
+QXmppStreamFeatures::~QXmppStreamFeatures() = default;
+
+QXmppStreamFeatures &QXmppStreamFeatures::operator=(const QXmppStreamFeatures &) = default;
+
 QXmppStreamFeatures::Mode QXmppStreamFeatures::bindMode() const
 {
-    return m_bindMode;
+    return d->bindMode;
 }
 
 void QXmppStreamFeatures::setBindMode(QXmppStreamFeatures::Mode mode)
 {
-    m_bindMode = mode;
+    d->bindMode = mode;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::sessionMode() const
 {
-    return m_sessionMode;
+    return d->sessionMode;
 }
 
 void QXmppStreamFeatures::setSessionMode(Mode mode)
 {
-    m_sessionMode = mode;
+    d->sessionMode = mode;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::nonSaslAuthMode() const
 {
-    return m_nonSaslAuthMode;
+    return d->nonSaslAuthMode;
 }
 
 void QXmppStreamFeatures::setNonSaslAuthMode(QXmppStreamFeatures::Mode mode)
 {
-    m_nonSaslAuthMode = mode;
+    d->nonSaslAuthMode = mode;
 }
 
 QStringList QXmppStreamFeatures::authMechanisms() const
 {
-    return m_authMechanisms;
+    return d->authMechanisms;
 }
 
 void QXmppStreamFeatures::setAuthMechanisms(const QStringList &mechanisms)
 {
-    m_authMechanisms = mechanisms;
+    d->authMechanisms = mechanisms;
 }
 
 QStringList QXmppStreamFeatures::compressionMethods() const
 {
-    return m_compressionMethods;
+    return d->compressionMethods;
 }
 
 void QXmppStreamFeatures::setCompressionMethods(const QStringList &methods)
 {
-    m_compressionMethods = methods;
+    d->compressionMethods = methods;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::tlsMode() const
 {
-    return m_tlsMode;
+    return d->tlsMode;
 }
 
 void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
 {
-    m_tlsMode = mode;
+    d->tlsMode = mode;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
 {
-    return m_streamManagementMode;
+    return d->streamManagementMode;
 }
 
 void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode)
 {
-    m_streamManagementMode = mode;
+    d->streamManagementMode = mode;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
 {
-    return m_csiMode;
+    return d->csiMode;
 }
 
 void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode mode)
 {
-    m_csiMode = mode;
+    d->csiMode = mode;
 }
 
 QXmppStreamFeatures::Mode QXmppStreamFeatures::registerMode() const
 {
-    return m_registerMode;
+    return d->registerMode;
 }
 
 void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &registerMode)
 {
-    m_registerMode = registerMode;
+    d->registerMode = registerMode;
 }
 
 /// \cond
@@ -153,20 +180,20 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
 
 void QXmppStreamFeatures::parse(const QDomElement &element)
 {
-    m_bindMode = readFeature(element, "bind", ns_bind);
-    m_sessionMode = readFeature(element, "session", ns_session);
-    m_nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
-    m_tlsMode = readFeature(element, "starttls", ns_tls);
-    m_streamManagementMode = readFeature(element, "sm", ns_stream_management);
-    m_csiMode = readFeature(element, "csi", ns_csi);
-    m_registerMode = readFeature(element, "register", ns_register_feature);
+    d->bindMode = readFeature(element, "bind", ns_bind);
+    d->sessionMode = readFeature(element, "session", ns_session);
+    d->nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
+    d->tlsMode = readFeature(element, "starttls", ns_tls);
+    d->streamManagementMode = readFeature(element, "sm", ns_stream_management);
+    d->csiMode = readFeature(element, "csi", ns_csi);
+    d->registerMode = readFeature(element, "register", ns_register_feature);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement("compression");
     if (compression.namespaceURI() == ns_compressFeature) {
         QDomElement subElement = compression.firstChildElement("method");
         while (!subElement.isNull()) {
-            m_compressionMethods << subElement.text();
+            d->compressionMethods << subElement.text();
             subElement = subElement.nextSiblingElement("method");
         }
     }
@@ -176,7 +203,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     if (mechs.namespaceURI() == ns_sasl) {
         QDomElement subElement = mechs.firstChildElement("mechanism");
         while (!subElement.isNull()) {
-            m_authMechanisms << subElement.text();
+            d->authMechanisms << subElement.text();
             subElement = subElement.nextSiblingElement("mechanism");
         }
     }
@@ -196,25 +223,25 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("stream:features");
-    writeFeature(writer, "bind", ns_bind, m_bindMode);
-    writeFeature(writer, "session", ns_session, m_sessionMode);
-    writeFeature(writer, "auth", ns_authFeature, m_nonSaslAuthMode);
-    writeFeature(writer, "starttls", ns_tls, m_tlsMode);
-    writeFeature(writer, "sm", ns_stream_management, m_streamManagementMode);
-    writeFeature(writer, "csi", ns_csi, m_csiMode);
-    writeFeature(writer, "register", ns_register_feature, m_registerMode);
+    writeFeature(writer, "bind", ns_bind, d->bindMode);
+    writeFeature(writer, "session", ns_session, d->sessionMode);
+    writeFeature(writer, "auth", ns_authFeature, d->nonSaslAuthMode);
+    writeFeature(writer, "starttls", ns_tls, d->tlsMode);
+    writeFeature(writer, "sm", ns_stream_management, d->streamManagementMode);
+    writeFeature(writer, "csi", ns_csi, d->csiMode);
+    writeFeature(writer, "register", ns_register_feature, d->registerMode);
 
-    if (!m_compressionMethods.isEmpty()) {
+    if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement("compression");
         writer->writeDefaultNamespace(ns_compressFeature);
-        for (const auto &method : m_compressionMethods)
+        for (const auto &method : d->compressionMethods)
             writer->writeTextElement("method", method);
         writer->writeEndElement();
     }
-    if (!m_authMechanisms.isEmpty()) {
+    if (!d->authMechanisms.isEmpty()) {
         writer->writeStartElement("mechanisms");
         writer->writeDefaultNamespace(ns_sasl);
-        for (const auto &mechanism : m_authMechanisms)
+        for (const auto &mechanism : d->authMechanisms)
             writer->writeTextElement("mechanism", mechanism);
         writer->writeEndElement();
     }
