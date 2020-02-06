@@ -82,7 +82,7 @@ class QXmppRegistrationManagerPrivate;
 /// connect(registrationManager, &QXmppRegistrationManager::passwordChanged, [=](const QString &newPassword) {
 ///     qDebug() << "Password changed to:" << newPassword;
 /// });
-/// connect(registrationManager, &QXmppRegistrationManager::passwordChangeFailed, [=](const QXmppStanza::Error &error) {
+/// connect(registrationManager, &QXmppRegistrationManager::passwordChangeFailed, [=](QXmppStanza::Error error) {
 ///     qDebug() << "Couldn't change the password:" << error.text();
 /// });
 ///
@@ -303,7 +303,7 @@ signals:
     ///
     /// \param error Error returned from the service.
     ///
-    void passwordChangeFailed(const QXmppStanza::Error &error);
+    void passwordChangeFailed(QXmppStanza::Error error);
 
     ///
     /// Emitted, when a registration form has been received.
