@@ -417,7 +417,7 @@ void tst_QXmppRegistrationManager::testChangePasswordResult()
             resultSignalCalled = true;
         });
     } else {
-        connect(manager, &QXmppRegistrationManager::passwordChangeFailed, resultContext, [&](const QXmppStanza::Error &) {
+        connect(manager, &QXmppRegistrationManager::passwordChangeFailed, resultContext, [&](QXmppStanza::Error) {
             resultSignalCalled = true;
         });
     }
