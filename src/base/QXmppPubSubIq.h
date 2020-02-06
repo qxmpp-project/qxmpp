@@ -27,8 +27,10 @@
 #include "QXmppIq.h"
 
 #include <QSharedDataPointer>
-// required for compatibility:
+
+#if QXMPP_DEPRECATED_SINCE(1, 2)
 #include "QXmppPubSubItem.h"
+#endif
 
 class QXmppPubSubIqPrivate;
 
