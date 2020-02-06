@@ -27,12 +27,24 @@
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
 
+#include <QSharedDataPointer>
+
+class QXmppDiscoveryIdentityPrivate;
+class QXmppDiscoveryItemPrivate;
+class QXmppDiscoveryIqPrivate;
+
 class QXMPP_EXPORT QXmppDiscoveryIq : public QXmppIq
 {
 public:
     class QXMPP_EXPORT Identity
     {
     public:
+        Identity();
+        Identity(const Identity &other);
+        ~Identity();
+
+        Identity &operator=(const Identity &other);
+
         QString category() const;
         void setCategory(const QString &category);
 
@@ -46,15 +58,18 @@ public:
         void setType(const QString &type);
 
     private:
-        QString m_category;
-        QString m_language;
-        QString m_name;
-        QString m_type;
+        QSharedDataPointer<QXmppDiscoveryIdentityPrivate> d;
     };
 
     class QXMPP_EXPORT Item
     {
     public:
+        Item();
+        Item(const Item &);
+        ~Item();
+        
+        Item &operator=(const Item &);
+
         QString jid() const;
         void setJid(const QString &jid);
 
@@ -65,10 +80,14 @@ public:
         void setNode(const QString &node);
 
     private:
-        QString m_jid;
-        QString m_name;
-        QString m_node;
+        QSharedDataPointer<QXmppDiscoveryItemPrivate> d;
     };
+
+    QXmppDiscoveryIq();
+    QXmppDiscoveryIq(const QXmppDiscoveryIq &);
+    ~QXmppDiscoveryIq();
+
+    QXmppDiscoveryIq &operator=(const QXmppDiscoveryIq &);
 
     enum QueryType {
         InfoQuery,
@@ -104,12 +123,7 @@ protected:
     /// \endcond
 
 private:
-    QStringList m_features;
-    QList<QXmppDiscoveryIq::Identity> m_identities;
-    QList<QXmppDiscoveryIq::Item> m_items;
-    QXmppDataForm m_form;
-    QString m_queryNode;
-    enum QueryType m_queryType;
+    QSharedDataPointer<QXmppDiscoveryIqPrivate> d;
 };
 
 #endif
