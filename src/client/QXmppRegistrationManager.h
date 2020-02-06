@@ -92,17 +92,19 @@ class QXmppRegistrationManagerPrivate;
 /// <h3>Unregistration with the server</h3>
 ///
 /// If you want to delete your account on the server, you can do that using
-/// deleteAccount(). The result of the IQ request is not handled. If you want
-/// to do that manually, you can use the returned ID.
+/// deleteAccount(). When the result is received either accountDeleted() or
+/// accountDeletionFailed() is emitted. In case it was successful the manager
+/// automatically disconnects from the client.
 ///
 /// \code
 /// auto *registrationManager = client->findExtension<QXmppRegistrationManager>();
-/// QString deleteId = registrationManager->deleteAccount();
-/// if (deleteId.isEmpty()) {
-///     // stanza could not be sent
-/// } else {
-///     // stanza was sent, you can handle the result using deleteId
-/// }
+/// connect(registrationManager, &QXmppRegistrationManager::accountDeleted, [=]() {
+///     qDebug() << "Account deleted successfull, the client is disconnecting now";
+/// });
+/// connect(registrationManager, &QXmppRegistrationManager::accountDeletionFailed, [=](QXmppStanza::Error error) {
+///     qDebug() << "Couldn't delete account:" << error.text();
+/// });
+/// registrationManager->deleteAccount();
 /// \endcode
 ///
 /// <h3 id="register-account">Registering with a server</h3>
@@ -251,7 +253,7 @@ public:
     QStringList discoveryFeatures() const override;
 
     void changePassword(const QString &newPassword);
-    QString deleteAccount();
+    void deleteAccount();
 
     // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
     ///
@@ -321,6 +323,16 @@ signals:
     /// QXmppRegisterIq::password().isNull() => false).
     ///
     void registrationFormReceived(const QXmppRegisterIq &iq);
+
+    ///
+    /// Emitted, when the account was deleted successfully.
+    ///
+    void accountDeleted();
+
+    ///
+    /// Emitted, when the account could not be deleted.
+    ///
+    void accountDeletionFailed(QXmppStanza::Error error);
 
     ///
     /// Emitted, when the registration with a service completed successfully.
