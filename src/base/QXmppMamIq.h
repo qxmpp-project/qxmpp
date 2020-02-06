@@ -28,12 +28,21 @@
 #include "QXmppIq.h"
 #include "QXmppResultSet.h"
 
+#include <QSharedDataPointer>
+
+class QXmppMamQueryIqPrivate;
+class QXmppMamResultIqPrivate;
+
 /// \brief The QXmppMamQueryIq class represents the query IQ for
 /// XEP-0313: Message Archive Management.
 class QXmppMamQueryIq : public QXmppIq
 {
 public:
     QXmppMamQueryIq();
+    QXmppMamQueryIq(const QXmppMamQueryIq &);
+    ~QXmppMamQueryIq();
+
+    QXmppMamQueryIq &operator=(const QXmppMamQueryIq &);
 
     QXmppDataForm form() const;
     void setForm(const QXmppDataForm &form);
@@ -51,10 +60,7 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
 
 private:
-    QXmppDataForm m_form;
-    QXmppResultSetQuery m_resultSetQuery;
-    QString m_node;
-    QString m_queryId;
+    QSharedDataPointer<QXmppMamQueryIqPrivate> d;
 };
 
 /// \brief The QXmppMamQueryIq class represents the result IQ for
@@ -63,6 +69,10 @@ class QXmppMamResultIq : public QXmppIq
 {
 public:
     QXmppMamResultIq();
+    QXmppMamResultIq(const QXmppMamResultIq &);
+    ~QXmppMamResultIq();
+
+    QXmppMamResultIq &operator=(const QXmppMamResultIq &);
 
     QXmppResultSetReply resultSetReply() const;
     void setResultSetReply(const QXmppResultSetReply &resultSetReply);
@@ -76,8 +86,7 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
 
 private:
-    QXmppResultSetReply m_resultSetReply;
-    bool m_complete;
+    QSharedDataPointer<QXmppMamResultIqPrivate> d;
 };
 
 #endif
