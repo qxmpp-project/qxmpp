@@ -65,7 +65,7 @@ public:
 
     /// Sets the mode for XEP-0198: Stream Management
     ///
-    /// \pa mode The mode to set.
+    /// \param mode The mode to set.
     void setStreamManagementMode(Mode mode);
 
     /// Returns the mode for XEP-0352: Client State Indication
@@ -73,7 +73,7 @@ public:
 
     /// Sets the mode for XEP-0352: Client State Indication
     ///
-    /// \pa mode The mode to set.
+    /// \param mode The mode to set.
     void setClientStateIndicationMode(Mode mode);
 
     /// Returns the mode for XEP-0077: In-Band Registration
@@ -83,7 +83,7 @@ public:
 
     /// Sets the mode for XEP-0077: In-Band Registration
     ///
-    /// \pa mode The mode to set.
+    /// \param mode The mode to set.
     ///
     /// \since QXmpp 1.1
     void setRegisterMode(const Mode &registerMode);
