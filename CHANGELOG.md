@@ -1,7 +1,42 @@
 QXmpp 1.2.0 (UNRELEASED)
 ------------------------
 
-*under development*
+QXmpp now requires Qt 5.7 or later. Unfortunately ABI compatibility was not
+kept this release again. Code coverage has been improved from 68.93% to 69.55%.
+
+New features:
+ - Implement XEP-0077: In-band registration:
+   - Add registration manager with full unit tests (#248, @lnjX)
+   - Add `registered` and `remove` to the IQ (#240, @lnjX)
+ - Implement XEP-0231: Bits of Binary (#230, @lnjX)
+ - Add `QXmppClient::indexOfExtension<T>()` (#241, @lnjX)
+ - Add QXmppStartTlsPacket to replace fixed XML data (#236, @lnjX)
+ - Move TLS code to private QXmppTlsManager (#236, @lnjX)
+ - Add private QXmppInternalClientExtensions to access private part of the
+   client (#243, @lnjX)
+ - Add utility methods to QXmppRegisterIq to create common requests (#247, @lnjX)
+
+Fixes:
+ - QXmppMucManager: Make it possible to handle stanzas not handled by the
+   manager (#226, @kollix)
+ - Only send Client State Indication (CSI) states when connected (#232, @lnjX)
+ - Fix no documentation is generated for QXmppStanza::Error and
+   QXmppStreamFeatures (@lnjX)
+ - Fix some doxygen warnings and undocumented Q_PROPERTYs (@lnjX)
+
+Misc:
+ - Replace deprecated Q_FOREACH (#210, @lnjX)
+ - Replace deprecated Q_ENUMS with Q_ENUM (#227, @lnjX)
+ - Replace deprecated signal/slots syntax (#237, @jbbgameich)
+ - Switch to Ubuntu Bionic for Travis-CI builds (#210, @lnjX)
+ - Use QSharedDataPointers for QXmppRegisterIq, QXmppPubSubIq,
+   QXmppDiscoveryIq, QXmppMam{Query,Result}Iq, QXmppStreamFeatures
+   (#230, #235, #252, @lnjX)
+ - Refactor QXmppPubSubIq and add missing tests (#235, @lnjX)
+ - Refactor QXmppPresence and add missing tests (#231, @lnjX)
+ - Replace manual xmlns writing by writeDefaultNamespace() (#244, @lnjX)
+ - Use QT_VERSION_CHECK to generate QXMPP_VERSION (#238, @lnjX)
+ - Add clang-format file (#239, @0xd34df00d)
 
 QXmpp 1.1.0 (Oct 23, 2019)
 --------------------------
