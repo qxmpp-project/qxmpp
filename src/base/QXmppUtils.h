@@ -60,7 +60,8 @@ public:
     static QByteArray generateHmacSha1(const QByteArray& key, const QByteArray& text);
     static int generateRandomInteger(int N);
     static QByteArray generateRandomBytes(int length);
-    static QString generateStanzaHash(int length = 32);
+    static QString generateStanzaUuid();
+    static QString generateStanzaHash(int length = 36);
 };
 
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
