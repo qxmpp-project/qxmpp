@@ -35,6 +35,7 @@
 #include <QRegExp>
 #include <QString>
 #include <QStringList>
+#include <QUuid>
 #include <QXmlStreamWriter>
 
 // adapted from public domain source by Ross Williams and Eric Durbin
@@ -291,12 +292,40 @@ QByteArray QXmppUtils::generateRandomBytes(int length)
     return bytes;
 }
 
+///
+/// Creates a new stanza id in the UUID format.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppUtils::generateStanzaUuid()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+    return QUuid::createUuid().toString(QUuid::WithoutBraces);
+#else
+    return QUuid::createUuid().toString().mid(1, 36);
+#endif
+}
+
+///
 /// Returns a random alphanumerical string of the specified size.
 ///
+/// Since QXmpp 1.3 this will generate a UUID, if the specified \p length is 36
+/// which is also the new default value. The returned string is still 36
+/// characters long, but will contain dashes (as specified in the UUID format).
+///
+/// \note It is recommended to use UUIDs for cases where IDs must be unique and
+/// are possibly stored permanently. This can be done using
+/// QXmppUtils::generateStanzaUuid(). However, since that function is only
+/// available since QXmpp 1.3, you may also want to continue to use this
+/// function because of compatibility reasons.
+///
 /// \param length
-
+///
 QString QXmppUtils::generateStanzaHash(int length)
 {
+    if (length == 36)
+        return QXmppUtils::generateStanzaUuid();
+
     const QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const int N = somechars.size();
     QString hashResult;
