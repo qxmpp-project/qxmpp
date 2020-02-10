@@ -178,5 +178,7 @@ extern const char* ns_omemo;
 extern const char* ns_mix_pam;
 extern const char* ns_mix_roster;
 extern const char* ns_mix_presence;
+// XEP-0428: Fallback Indication
+extern const char* ns_fallback_indication;
 
 #endif  // QXMPPCONSTANTS_H

@@ -205,6 +205,10 @@ public:
     QString spoilerHint() const;
     void setSpoilerHint(const QString &);
 
+    // XEP-0428: Fallback Indication
+    bool isFallback() const;
+    void setIsFallback(bool isFallback);
+
     /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;

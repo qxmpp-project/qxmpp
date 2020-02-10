@@ -155,6 +155,9 @@ public:
     // XEP-0382: Spoiler messages
     bool isSpoiler;
     QString spoilerHint;
+
+    // XEP-0428: Fallback Indication
+    bool isFallback;
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
@@ -167,7 +170,8 @@ QXmppMessagePrivate::QXmppMessagePrivate()
       marker(QXmppMessage::NoMarker),
       privatemsg(false),
       hints(0),
-      isSpoiler(false)
+      isSpoiler(false),
+      isFallback(false)
 {
 }
 
@@ -796,6 +800,34 @@ void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
         d->isSpoiler = true;
 }
 
+///
+/// Sets whether this message is only a fallback according to \xep{0428}:
+/// Fallback Indication.
+///
+/// This is useful for clients not supporting end-to-end encryption to indicate
+/// that the message body does not contain the intended text of the author.
+///
+/// \since QXmpp 1.3
+///
+bool QXmppMessage::isFallback() const
+{
+    return d->isFallback;
+}
+
+///
+/// Sets whether this message is only a fallback according to \xep{0428}:
+/// Fallback Indication.
+///
+/// This is useful for clients not supporting end-to-end encryption to indicate
+/// that the message body does not contain the intended text of the author.
+///
+/// \since QXmpp 1.3
+///
+void QXmppMessage::setIsFallback(bool isFallback)
+{
+    d->isFallback = isFallback;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -999,6 +1031,13 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
+    // XEP-0428: Fallback Indication
+    if (d->isFallback) {
+        xmlWriter->writeStartElement(QStringLiteral("fallback"));
+        xmlWriter->writeDefaultNamespace(ns_fallback_indication);
+        xmlWriter->writeEndElement();
+    }
+
     // other extensions
     QXmppStanza::extensionsToXml(xmlWriter);
 
@@ -1093,6 +1132,9 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
     } else if (checkElement(element, QStringLiteral("spoiler"), ns_spoiler)) {
         d->isSpoiler = true;
         d->spoilerHint = element.text();
+    } else if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
+        // XEP-0428: Fallback Indication
+        d->isFallback = true;
     } else {
         // other extensions
         unknownExtensions << QXmppElement(element);

@@ -59,6 +59,7 @@ private slots:
     void testSpoiler();
     void testProcessingHints();
     void testBobData();
+    void testFallbackIndication();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -131,6 +132,7 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message.hasHint(QXmppMessage::Store));
     QCOMPARE(message.bitsOfBinaryData(), QXmppBitsOfBinaryDataList());
+    QVERIFY(!message.isFallback());
 
     message = QXmppMessage();
     message.setTo(QStringLiteral("foo@example.com/QXmpp"));
@@ -964,6 +966,23 @@ void tst_QXmppMessage::testBobData()
     // test const getter
     const QXmppMessage constMessage = msg;
     QCOMPARE(constMessage.bitsOfBinaryData(), msg.bitsOfBinaryData());
+}
+
+void tst_QXmppMessage::testFallbackIndication()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<message type=\"chat\">"
+        "<fallback xmlns=\"urn:xmpp:fallback:0\"/>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QVERIFY(message.isFallback());
+    serializePacket(message, xml);
+
+    QXmppMessage message2;
+    message2.setIsFallback(true);
+    serializePacket(message2, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

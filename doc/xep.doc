@@ -47,6 +47,7 @@ Complete:
 - XEP-0367: Message Attaching (v0.3.0)
 - XEP-0380: Explicit Message Encryption (v0.3.0)
 - XEP-0382: Spoiler messages (v0.2.0)
+- XEP-0428: Fallback Indication (v0.1.0)
 
 Ongoing:
 - XEP-0009: Jabber-RPC (API is not finalized yet)
