@@ -44,7 +44,7 @@ Complete:
 - XEP-0334: Message Processing Hints (v0.3)
 - XEP-0352: Client State Indication
 - XEP-0359: Unique and Stable Stanza IDs (v0.6)
-- XEP-0363: HTTP File Upload (v0.9)
+- XEP-0363: HTTP File Upload (v1.0)
 - XEP-0367: Message Attaching (v0.3)
 - XEP-0380: Explicit Message Encryption (v0.3)
 - XEP-0382: Spoiler messages (v0.2)
