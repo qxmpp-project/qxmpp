@@ -130,7 +130,7 @@ const char* ns_forwarding = "urn:xmpp:forward:0";
 // XEP-0308: Last Message Correction
 const char* ns_message_correct = "urn:xmpp:message-correct:0";
 // XEP-0313: Message Archive Management
-const char* ns_mam = "urn:xmpp:mam:1";
+const char* ns_mam = "urn:xmpp:mam:2";
 // XEP-0319: Last User Interaction in Presence
 const char* ns_idle = "urn:xmpp:idle:1";
 // XEP-0333: Chat Markers

@@ -82,7 +82,7 @@ void tst_QXmppMamManager::testHandleStanza_data()
 
     QTest::newRow("stanza1")
         << QByteArray("<message id='aeb213' to='juliet@capulet.lit/chamber'>"
-                      "<result xmlns='urn:xmpp:mam:1' queryid='f27' id='28482-98726-73623'>"
+                      "<result xmlns='urn:xmpp:mam:2' queryid='f27' id='28482-98726-73623'>"
                       "<forwarded xmlns='urn:xmpp:forward:0'>"
                       "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
                       "<message xmlns='jabber:client'"
@@ -124,7 +124,7 @@ void tst_QXmppMamManager::testHandleStanza_data()
 
     QTest::newRow("stanza3")
         << QByteArray(
-               "<message id='aeb214' xmlns='urn:xmpp:mam:1' to='juliet@capulet.lit/chamber'>"
+               "<message id='aeb214' xmlns='urn:xmpp:mam:2' to='juliet@capulet.lit/chamber'>"
                "<forwarded xmlns='urn:xmpp:forward:0'>"
                "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
                "<message xmlns='jabber:client'"
@@ -172,7 +172,7 @@ void tst_QXmppMamManager::testHandleResultIq_data()
 
     QTest::newRow("stanza1")
         << QByteArray("<iq type='result' id='juliet1'>"
-                      "<fin xmlns='urn:xmpp:mam:1'>"
+                      "<fin xmlns='urn:xmpp:mam:2'>"
                       "<set xmlns='http://jabber.org/protocol/rsm'>"
                       "<first index='0'>28482-98726-73623</first>"
                       "<last>09af3-cc343-b409f</last>"
@@ -188,7 +188,7 @@ void tst_QXmppMamManager::testHandleResultIq_data()
 
     QTest::newRow("stanza2")
         << QByteArray("<iq type='result' id='juliet1'>"
-                      "<fin xmlns='urn:xmpp:mam:1' complete='true'>"
+                      "<fin xmlns='urn:xmpp:mam:2' complete='true'>"
                       "<set xmlns='http://jabber.org/protocol/rsm'>"
                       "<first index='0'>28482-98726-73623</first>"
                       "<last>09af3-cc343-b409f</last>"
