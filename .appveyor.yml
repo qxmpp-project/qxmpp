@@ -10,6 +10,9 @@ environment:
       GENERATOR: Visual Studio 14 2015 Win64
       QTDIR: C:\Qt\5.11\msvc2015_64
 
+build:
+  parallel: true
+
 build_script:
   - mkdir build
   - cd build
