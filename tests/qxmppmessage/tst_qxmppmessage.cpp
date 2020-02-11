@@ -60,6 +60,7 @@ private slots:
     void testProcessingHints();
     void testBobData();
     void testFallbackIndication();
+    void testStanzaIds();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -133,6 +134,9 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::Store));
     QCOMPARE(message.bitsOfBinaryData(), QXmppBitsOfBinaryDataList());
     QVERIFY(!message.isFallback());
+    QVERIFY(message.stanzaId().isNull());
+    QVERIFY(message.stanzaIdBy().isNull());
+    QVERIFY(message.originId().isNull());
 
     message = QXmppMessage();
     message.setTo(QStringLiteral("foo@example.com/QXmpp"));
@@ -983,6 +987,28 @@ void tst_QXmppMessage::testFallbackIndication()
     QXmppMessage message2;
     message2.setIsFallback(true);
     serializePacket(message2, xml);
+}
+
+void tst_QXmppMessage::testStanzaIds()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<message type=\"chat\">"
+        "<stanza-id xmlns=\"urn:xmpp:sid:0\" id=\"1236\" by=\"server.tld\"/>"
+        "<origin-id xmlns=\"urn:xmpp:sid:0\" id=\"5678\"/>"
+        "</message>");
+
+    QXmppMessage msg;
+    parsePacket(msg, xml);
+    QCOMPARE(msg.stanzaId(), QStringLiteral("1236"));
+    QCOMPARE(msg.stanzaIdBy(), QStringLiteral("server.tld"));
+    QCOMPARE(msg.originId(), QStringLiteral("5678"));
+    serializePacket(msg, xml);
+
+    QXmppMessage msg2;
+    msg2.setStanzaId(QStringLiteral("1236"));
+    msg2.setStanzaIdBy(QStringLiteral("server.tld"));
+    msg2.setOriginId(QStringLiteral("5678"));
+    serializePacket(msg2, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

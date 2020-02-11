@@ -178,6 +178,16 @@ public:
     void removeHint(const Hint hint);
     void removeAllHints();
 
+    // XEP-0359: Unique and Stable Stanza IDs
+    QString stanzaId() const;
+    void setStanzaId(const QString &id);
+
+    QString stanzaIdBy() const;
+    void setStanzaIdBy(const QString &id);
+
+    QString originId() const;
+    void setOriginId(const QString &id);
+
     // XEP-0367: Message Attaching
     QString attachId() const;
     void setAttachId(const QString &);

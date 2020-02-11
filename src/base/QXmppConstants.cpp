@@ -139,6 +139,8 @@ const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 const char* ns_message_processing_hints = "urn:xmpp:hints";
 // XEP-0352: Client State Indication
 const char* ns_csi = "urn:xmpp:csi:0";
+// XEP-0359: Unique and Stable Stanza IDs
+const char* ns_sid = "urn:xmpp:sid:0";
 // XEP-0363: HTTP File Upload
 const char* ns_http_upload = "urn:xmpp:http:upload:0";
 // XEP-0364: Current Off-the-Record Messaging Usage
