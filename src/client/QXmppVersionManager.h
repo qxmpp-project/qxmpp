@@ -62,7 +62,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a version response is received.
     void versionReceived(const QXmppVersionIq &);
 

@@ -55,14 +55,14 @@ public:
     QXmppStunMessage request() const;
     QXmppStunMessage response() const;
 
-signals:
+Q_SIGNALS:
     void finished();
     void writeStun(const QXmppStunMessage &request);
 
-public slots:
+public Q_SLOTS:
     void readStun(const QXmppStunMessage &response);
 
-private slots:
+private Q_SLOTS:
     void retry();
 
 private:
@@ -83,10 +83,10 @@ public:
     virtual QXmppJingleCandidate localCandidate(int component) const = 0;
     virtual qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) = 0;
 
-public slots:
+public Q_SLOTS:
     virtual void disconnectFromHost() = 0;
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
 };
@@ -123,18 +123,18 @@ public:
     QXmppJingleCandidate localCandidate(int component) const override;
     qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) override;
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted once TURN allocation succeeds.
     void connected();
 
     /// \brief This signal is emitted when TURN allocation fails.
     void disconnected();
 
-public slots:
+public Q_SLOTS:
     void connectToHost();
     void disconnectFromHost() override;
 
-private slots:
+private Q_SLOTS:
     void readyRead();
     void refresh();
     void refreshChannels();
@@ -185,10 +185,10 @@ public:
     QXmppJingleCandidate localCandidate(int component) const override;
     qint64 writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port) override;
 
-public slots:
+public Q_SLOTS:
     void disconnectFromHost() override;
 
-private slots:
+private Q_SLOTS:
     void readyRead();
 
 private:

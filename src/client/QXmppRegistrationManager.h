@@ -160,7 +160,7 @@ class QXmppRegistrationManagerPrivate;
 /// in an error (reported by registrationFailed()) or, if everything went well,
 /// the registration form is reported by registrationFormReceived().
 ///
-/// To handle everything correctly, you need to connect to both signals:
+/// To handle everything correctly, you need to connect to both Q_SIGNALS:
 ///
 /// \code
 /// connect(registrationManager, &QXmppRegistrationManager::registrationFormReceived, [=](const QXmppRegisterIq &iq) {
@@ -282,7 +282,7 @@ public:
     bool handleStanza(const QDomElement &stanza) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     ///
     /// Emitted, when registrationSupported() changed.
     ///
@@ -361,7 +361,7 @@ signals:
 protected:
     void setClient(QXmppClient *client) override;
 
-private slots:
+private Q_SLOTS:
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
 
 private:

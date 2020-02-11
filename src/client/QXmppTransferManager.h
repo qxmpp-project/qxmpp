@@ -170,7 +170,7 @@ public:
     qint64 fileSize() const;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an error is encountered while
     /// processing the transfer job.
     void error(QXmppTransferJob::Error error);
@@ -193,12 +193,12 @@ signals:
     /// This signal is emitted when the transfer job changes state.
     void stateChanged(QXmppTransferJob::State state);
 
-public slots:
+public Q_SLOTS:
     void abort();
     void accept(const QString &filePath);
     void accept(QIODevice *output);
 
-private slots:
+private Q_SLOTS:
     void _q_terminated();
 
 private:
@@ -269,7 +269,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a new file transfer offer is received.
     ///
     /// To accept the transfer job, call the job's QXmppTransferJob::accept() method.
@@ -284,7 +284,7 @@ signals:
     /// \sa QXmppTransferJob::finished()
     void jobFinished(QXmppTransferJob *job);
 
-public slots:
+public Q_SLOTS:
     QXmppTransferJob *sendFile(const QString &jid, const QString &filePath, const QString &description = QString());
     QXmppTransferJob *sendFile(const QString &jid, QIODevice *device, const QXmppTransferFileInfo &fileInfo, const QString &sid = QString());
 
@@ -293,7 +293,7 @@ protected:
     void setClient(QXmppClient *client) override;
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void _q_iqReceived(const QXmppIq &);
     void _q_jobDestroyed(QObject *object);
     void _q_jobError(QXmppTransferJob::Error error);

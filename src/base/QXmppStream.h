@@ -49,7 +49,7 @@ public:
     virtual bool isConnected() const;
     bool sendPacket(const QXmppStanza &);
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
     void connected();
 
@@ -98,11 +98,11 @@ private:
     /// Sends an acknowledgement request as defined in \xep{0198}.
     void sendAcknowledgementRequest();
 
-public slots:
+public Q_SLOTS:
     virtual void disconnectFromHost();
     virtual bool sendData(const QByteArray &);
 
-private slots:
+private Q_SLOTS:
     void _q_socketConnected();
     void _q_socketEncrypted();
     void _q_socketError(QAbstractSocket::SocketError error);

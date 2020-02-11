@@ -76,7 +76,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an invitation to a chat room is received.
     void invitationReceived(const QString &roomJid, const QString &inviter, const QString &reason);
 
@@ -88,7 +88,7 @@ protected:
     void setClient(QXmppClient *client) override;
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void _q_messageReceived(const QXmppMessage &message);
     void _q_roomDestroyed(QObject *object);
 
@@ -182,7 +182,7 @@ public:
     QString subject() const;
     void setSubject(const QString &subject);
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when the allowed actions change.
     void allowedActionsChanged(QXmppMucRoom::Actions actions) const;
 
@@ -233,7 +233,7 @@ signals:
     /// This signal is emitted when the room's subject changes.
     void subjectChanged(const QString &subject);
 
-public slots:
+public Q_SLOTS:
     bool ban(const QString &jid, const QString &reason);
     bool join();
     bool kick(const QString &jid, const QString &reason);
@@ -245,7 +245,7 @@ public slots:
     bool sendInvitation(const QString &jid, const QString &reason);
     bool sendMessage(const QString &text);
 
-private slots:
+private Q_SLOTS:
     void _q_disconnected();
     void _q_discoveryInfoReceived(const QXmppDiscoveryIq &iq);
     void _q_messageReceived(const QXmppMessage &message);
