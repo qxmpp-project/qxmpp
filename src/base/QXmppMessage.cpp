@@ -141,6 +141,11 @@ public:
     // XEP-0334: Message Processing Hints
     quint8 hints;
 
+    // XEP-0359: Unique and Stable Stanza IDs
+    QString stanzaId;
+    QString stanzaIdBy;
+    QString originId;
+
     // XEP-0367: Message Attaching
     QString attachId;
 
@@ -607,6 +612,72 @@ void QXmppMessage::removeAllHints()
     d->hints = 0;
 }
 
+///
+/// Returns the stanza ID of the message according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::stanzaId() const
+{
+    return d->stanzaId;
+}
+
+///
+/// Sets the stanza ID of the message according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+void QXmppMessage::setStanzaId(const QString& id)
+{
+    d->stanzaId = id;
+}
+
+///
+/// Returns the creator of the stanza ID according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::stanzaIdBy() const
+{
+    return d->stanzaIdBy;
+}
+
+///
+/// Sets the creator of the stanza ID according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+void QXmppMessage::setStanzaIdBy(const QString &by)
+{
+    d->stanzaIdBy = by;
+}
+
+///
+/// Returns the origin ID of the message according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::originId() const
+{
+    return d->originId;
+}
+
+///
+/// Sets the origin ID of the message according to \xep{0359}: Unique and
+/// Stable Stanza IDs.
+///
+/// \since QXmpp 1.3
+///
+void QXmppMessage::setOriginId(const QString &id)
+{
+    d->originId = id;
+}
+
 /// Returns the message id this message is linked/attached to. See XEP-0367:
 /// Message Attaching for details.
 ///
@@ -997,6 +1068,23 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         }
     }
 
+    // XEP-0359: Unique and Stable Stanza IDs
+    if (!d->stanzaId.isNull()) {
+        xmlWriter->writeStartElement(QStringLiteral("stanza-id"));
+        xmlWriter->writeDefaultNamespace(ns_sid);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->stanzaId);
+        if (!d->stanzaIdBy.isNull())
+            xmlWriter->writeAttribute(QStringLiteral("by"), d->stanzaIdBy);
+        xmlWriter->writeEndElement();
+    }
+
+    if (!d->originId.isNull()) {
+        xmlWriter->writeStartElement(QStringLiteral("origin-id"));
+        xmlWriter->writeDefaultNamespace(ns_sid);
+        xmlWriter->writeAttribute(QStringLiteral("id"), d->originId);
+        xmlWriter->writeEndElement();
+    }
+
     // XEP-0367: Message Attaching
     if (!d->attachId.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("attach-to"));
@@ -1117,8 +1205,14 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
     } else if (element.namespaceURI() == ns_message_processing_hints &&
                HINT_TYPES.contains(element.tagName())) {
         addHint(Hint(1 << HINT_TYPES.indexOf(element.tagName())));
-        // XEP-0367: Message Attaching
+    } else if (checkElement(element, QStringLiteral("stanza-id"), ns_sid)) {
+        // XEP-0359: Unique and Stable Stanza IDs
+        d->stanzaId = element.attribute(QStringLiteral("id"));
+        d->stanzaIdBy = element.attribute(QStringLiteral("by"));
+    } else if (checkElement(element, QStringLiteral("origin-id"), ns_sid)) {
+        d->originId = element.attribute(QStringLiteral("id"));
     } else if (checkElement(element, QStringLiteral("attach-to"), ns_message_attaching)) {
+        // XEP-0367: Message Attaching
         d->attachId = element.attribute(QStringLiteral("id"));
         // XEP-0369: Mediated Information eXchange (MIX)
     } else if (checkElement(element, QStringLiteral("mix"), ns_mix)) {
