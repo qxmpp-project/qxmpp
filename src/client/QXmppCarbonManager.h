@@ -52,7 +52,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// \brief Emitted when a message was received from someone else
     /// and directed to another resource.
     /// If you connect this signal to the \s QXmppClient::messageReceived

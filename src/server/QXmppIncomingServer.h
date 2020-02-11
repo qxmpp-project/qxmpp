@@ -45,7 +45,7 @@ public:
     bool isConnected() const override;
     QString localStreamId() const;
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a dialback verify request is received.
     void dialbackRequestReceived(const QXmppDialback &result);
 
@@ -58,7 +58,7 @@ protected:
     void handleStream(const QDomElement &streamElement) override;
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void slotDialbackResponseReceived(const QXmppDialback &dialback);
     void slotSocketDisconnected();
 

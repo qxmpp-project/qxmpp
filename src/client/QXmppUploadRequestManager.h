@@ -118,7 +118,7 @@ public:
 
     bool handleStanza(const QDomElement &stanza) override;
 
-signals:
+Q_SIGNALS:
     /// Emitted when an upload slot was received.
     void slotReceived(const QXmppHttpUploadSlotIq &slot);
 

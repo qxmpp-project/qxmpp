@@ -46,11 +46,11 @@ public:
     QXmppRemoteMethod(const QString &jid, const QString &method, const QVariantList &args, QXmppClient *client);
     QXmppRemoteMethodResult call();
 
-private slots:
+private Q_SLOTS:
     void gotError(const QXmppRpcErrorIq &iq);
     void gotResult(const QXmppRpcResponseIq &iq);
 
-signals:
+Q_SIGNALS:
     void callDone();
 
 private:

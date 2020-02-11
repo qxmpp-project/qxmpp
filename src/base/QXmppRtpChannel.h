@@ -109,14 +109,14 @@ public:
     qint64 pos() const override;
     bool seek(qint64 pos) override;
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
     /// \brief This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
-public slots:
+public Q_SLOTS:
     void datagramReceived(const QByteArray &ba);
     void startTone(QXmppRtpAudioChannel::Tone tone);
     void stopTone(QXmppRtpAudioChannel::Tone tone);
@@ -148,7 +148,7 @@ protected:
     qint64 writeData(const char *data, qint64 maxSize) override;
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void emitSignals();
     void writeDatagram();
 
@@ -284,11 +284,11 @@ public:
     void setEncoderFormat(const QXmppVideoFormat &format);
     void writeFrame(const QXmppVideoFrame &frame);
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
-public slots:
+public Q_SLOTS:
     void datagramReceived(const QByteArray &ba);
 
 protected:

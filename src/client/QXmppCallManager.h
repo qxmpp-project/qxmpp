@@ -102,7 +102,7 @@ public:
     /// Returns the video mode.
     QIODevice::OpenMode videoMode() const;
 
-signals:
+Q_SIGNALS:
     /// \brief This signal is emitted when a call is connected.
     ///
     /// Once this signal is emitted, you can connect a QAudioOutput and
@@ -128,13 +128,13 @@ signals:
     /// \brief This signal is emitted when the video channel changes.
     void videoModeChanged(QIODevice::OpenMode mode);
 
-public slots:
+public Q_SLOTS:
     void accept();
     void hangup();
     void startVideo();
     void stopVideo();
 
-private slots:
+private Q_SLOTS:
     void localCandidatesChanged();
     void terminated();
     void updateOpenMode();
@@ -186,7 +186,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when a new incoming call is received.
     ///
     /// To accept the call, invoke the call's QXmppCall::accept() method.
@@ -196,7 +196,7 @@ signals:
     /// This signal is emitted when a call (incoming or outgoing) is started.
     void callStarted(QXmppCall *call);
 
-public slots:
+public Q_SLOTS:
     QXmppCall *call(const QString &jid);
 
 protected:
@@ -204,7 +204,7 @@ protected:
     void setClient(QXmppClient *client) override;
     /// \endcond
 
-private slots:
+private Q_SLOTS:
     void _q_callDestroyed(QObject *object);
     void _q_disconnected();
     void _q_iqReceived(const QXmppIq &iq);

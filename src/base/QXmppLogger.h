@@ -100,14 +100,14 @@ public:
     QXmppLogger::MessageTypes messageTypes();
     void setMessageTypes(QXmppLogger::MessageTypes types);
 
-public slots:
+public Q_SLOTS:
     virtual void setGauge(const QString &gauge, double value);
     virtual void updateCounter(const QString &counter, qint64 amount);
 
     void log(QXmppLogger::MessageType type, const QString &text);
     void reopen();
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted whenever a log message is received.
     void message(QXmppLogger::MessageType type, const QString &text);
 
@@ -177,7 +177,7 @@ protected:
         emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
-signals:
+Q_SIGNALS:
     /// Sets the given \a gauge to \a value.
     void setGauge(const QString &gauge, double value);
 

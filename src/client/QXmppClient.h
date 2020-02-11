@@ -212,7 +212,7 @@ public:
     QXmppVersionManager &versionManager();
 #endif
 
-signals:
+Q_SIGNALS:
 
     /// This signal is emitted when the client connects successfully to the
     /// XMPP server i.e. when a successful XMPP connection is established.
@@ -274,7 +274,7 @@ signals:
     /// This signal is emitted when the client state changes.
     void stateChanged(QXmppClient::State state);
 
-public slots:
+public Q_SLOTS:
     void connectToServer(const QXmppConfiguration &,
                          const QXmppPresence &initialPresence =
                              QXmppPresence());
@@ -284,7 +284,7 @@ public slots:
     bool sendPacket(const QXmppStanza &);
     void sendMessage(const QString &bareJid, const QString &message);
 
-private slots:
+private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
     void _q_reconnect();
     void _q_socketStateChanged(QAbstractSocket::SocketState state);

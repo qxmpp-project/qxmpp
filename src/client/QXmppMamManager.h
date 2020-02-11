@@ -61,7 +61,7 @@ public:
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
+Q_SIGNALS:
     /// This signal is emitted when an archived message is received
     void archivedMessageReceived(const QString &queryId,
                                  const QXmppMessage &message);
