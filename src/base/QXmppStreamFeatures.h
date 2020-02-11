@@ -67,33 +67,13 @@ public:
     Mode tlsMode() const;
     void setTlsMode(Mode mode);
 
-    /// Returns the mode (disabled, enabled or required) for XEP-0198: Stream
-    /// Management
     Mode streamManagementMode() const;
-
-    /// Sets the mode for XEP-0198: Stream Management
-    ///
-    /// \param mode The mode to set.
     void setStreamManagementMode(Mode mode);
 
-    /// Returns the mode for XEP-0352: Client State Indication
     Mode clientStateIndicationMode() const;
-
-    /// Sets the mode for XEP-0352: Client State Indication
-    ///
-    /// \param mode The mode to set.
     void setClientStateIndicationMode(Mode mode);
 
-    /// Returns the mode for XEP-0077: In-Band Registration
-    ///
-    /// \since QXmpp 1.1
     Mode registerMode() const;
-
-    /// Sets the mode for XEP-0077: In-Band Registration
-    ///
-    /// \param mode The mode to set.
-    ///
-    /// \since QXmpp 1.1
     void setRegisterMode(const Mode &registerMode);
 
     /// \cond

@@ -95,7 +95,7 @@ private:
 };
 
 /// \brief The QXmppMucAdminIq class represents a chat room administration IQ
-/// as defined by XEP-0045: Multi-User Chat.
+/// as defined by \xep{0045}: Multi-User Chat.
 ///
 /// It is used to get or modify room memberships.
 ///
@@ -122,7 +122,7 @@ private:
 };
 
 /// \brief The QXmppMucOwnerIq class represents a chat room configuration IQ as
-/// defined by XEP-0045: Multi-User Chat.
+/// defined by \xep{0045}: Multi-User Chat.
 ///
 /// It is used to get or modify room configuration options.
 ///

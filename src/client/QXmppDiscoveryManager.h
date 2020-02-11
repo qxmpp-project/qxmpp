@@ -31,7 +31,7 @@ class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
 
 /// \brief The QXmppDiscoveryManager class makes it possible to discover information
-/// about other entities as defined by XEP-0030: Service Discovery.
+/// about other entities as defined by \xep{0030}: Service Discovery.
 ///
 /// \ingroup Managers
 

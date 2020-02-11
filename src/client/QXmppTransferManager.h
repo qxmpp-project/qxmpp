@@ -124,8 +124,8 @@ public:
     /// This enum is used to describe a transfer method.
     enum Method {
         NoMethod = 0,      ///< No transfer method.
-        InBandMethod = 1,  ///< XEP-0047: In-Band Bytestreams
-        SocksMethod = 2,   ///< XEP-0065: SOCKS5 Bytestreams
+        InBandMethod = 1,  ///< \xep{0047}: In-Band Bytestreams
+        SocksMethod = 2,   ///< \xep{0065}: SOCKS5 Bytestreams
         AnyMethod = 3      ///< Any supported transfer method.
     };
     Q_ENUM(Method)
@@ -213,12 +213,13 @@ private:
     friend class QXmppTransferOutgoingJob;
 };
 
+///
 /// \brief The QXmppTransferManager class provides support for sending and
 /// receiving files.
 ///
-/// Stream initiation is performed as described in XEP-0095: Stream Initiation
-/// and XEP-0096: SI File Transfer. The actual file transfer is then performed
-/// using either XEP-0065: SOCKS5 Bytestreams or XEP-0047: In-Band Bytestreams.
+/// Stream initiation is performed as described in \xep{0095}: Stream Initiation
+/// and \xep{0096}: SI File Transfer. The actual file transfer is then performed
+/// using either \xep{0065}: SOCKS5 Bytestreams or \xep{0047}: In-Band Bytestreams.
 ///
 /// To make use of this manager, you need to instantiate it and load it into
 /// the QXmppClient instance as follows:
@@ -229,7 +230,7 @@ private:
 /// \endcode
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppTransferManager : public QXmppClientExtension
 {
     Q_OBJECT

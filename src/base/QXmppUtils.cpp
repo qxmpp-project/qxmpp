@@ -107,9 +107,10 @@ static quint32 crctable[256] = {
     0xB40BBE37L, 0xC30C8EA1L, 0x5A05DF1BL, 0x2D02EF8DL
 };
 
+///
 /// Parses a date-time from a string according to
-/// XEP-0082: XMPP Date and Time Profiles.
-
+/// \xep{0082}: XMPP Date and Time Profiles.
+///
 QDateTime QXmppUtils::datetimeFromString(const QString &str)
 {
     QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
@@ -138,9 +139,10 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
     return dt;
 }
 
+///
 /// Serializes a date-time to a string according to
-/// XEP-0082: XMPP Date and Time Profiles.
-
+/// \xep{0082}: XMPP Date and Time Profiles.
+///
 QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     QDateTime utc = dt.toUTC();
@@ -150,9 +152,10 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
         return utc.toString("yyyy-MM-ddThh:mm:ssZ");
 }
 
+///
 /// Parses a timezone offset (in seconds) from a string according to
-/// XEP-0082: XMPP Date and Time Profiles.
-
+/// \xep{0082}: XMPP Date and Time Profiles.
+///
 int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
     QRegExp tzRe("(Z|([+-])([0-9]{2}):([0-9]{2}))");
@@ -172,9 +175,10 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
         return offset;
 }
 
+///
 /// Serializes a timezone offset (in seconds) to a string according to
-/// XEP-0082: XMPP Date and Time Profiles.
-
+/// \xep{0082}: XMPP Date and Time Profiles.
+///
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
     if (!secs)

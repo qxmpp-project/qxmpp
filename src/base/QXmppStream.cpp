@@ -65,10 +65,11 @@ QXmppStreamPrivate::QXmppStreamPrivate()
 {
 }
 
+///
 /// Constructs a base XMPP stream.
 ///
 /// \param parent
-
+///
 QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
       d(new QXmppStreamPrivate)
@@ -80,16 +81,17 @@ QXmppStream::QXmppStream(QObject *parent)
     }
 }
 
+///
 /// Destroys a base XMPP stream.
-
+///
 QXmppStream::~QXmppStream()
 {
     delete d;
 }
 
+///
 /// Disconnects from the remote host.
 ///
-
 void QXmppStream::disconnectFromHost()
 {
     d->streamManagementEnabled = false;
@@ -104,11 +106,12 @@ void QXmppStream::disconnectFromHost()
     }
 }
 
+///
 /// Handles a stream start event, which occurs when the underlying transport
 /// becomes ready (socket connected, encryption started).
 ///
 /// If you redefine handleStart(), make sure to call the base class's method.
-
+///
 void QXmppStream::handleStart()
 {
     d->streamManagementEnabled = false;
@@ -116,19 +119,20 @@ void QXmppStream::handleStart()
     d->streamStart.clear();
 }
 
+///
 /// Returns true if the stream is connected.
 ///
-
 bool QXmppStream::isConnected() const
 {
     return d->socket &&
         d->socket->state() == QAbstractSocket::ConnectedState;
 }
 
+///
 /// Sends raw data to the peer.
 ///
 /// \param data
-
+///
 bool QXmppStream::sendData(const QByteArray &data)
 {
     logSent(QString::fromUtf8(data));
@@ -137,10 +141,11 @@ bool QXmppStream::sendData(const QByteArray &data)
     return d->socket->write(data) == data.size();
 }
 
+///
 /// Sends an XMPP packet to the peer.
 ///
 /// \param packet
-
+///
 bool QXmppStream::sendPacket(const QXmppStanza &packet)
 {
     // prepare packet
@@ -159,17 +164,17 @@ bool QXmppStream::sendPacket(const QXmppStanza &packet)
     return success;
 }
 
+///
 /// Returns the QSslSocket used for this stream.
 ///
-
 QSslSocket *QXmppStream::socket() const
 {
     return d->socket;
 }
 
+///
 /// Sets the QSslSocket used for this stream.
 ///
-
 void QXmppStream::setSocket(QSslSocket *socket)
 {
     d->socket = socket;
@@ -271,10 +276,12 @@ void QXmppStream::_q_socketReadyRead()
         disconnectFromHost();
 }
 
-/// Enables Stream Management acks / reqs (XEP-0198).
+///
+/// Enables Stream Management acks / reqs (\xep{0198}).
 ///
 /// \param resetSequenceNumber Indicates if the sequence numbers should be reset.
 ///                            This must be done iff the stream is not resumed.
+///
 void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
     d->streamManagementEnabled = true;
@@ -303,13 +310,18 @@ void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
     }
 }
 
-/// Returns the sequence number of the last incoming stanza (XEP-0198).
+///
+/// Returns the sequence number of the last incoming stanza (\xep{0198}).
+///
 unsigned QXmppStream::lastIncomingSequenceNumber() const
 {
     return d->lastIncomingSequenceNumber;
 }
 
-/// Sets the last acknowledged sequence number for outgoing stanzas (XEP-0198).
+///
+/// Sets the last acknowledged sequence number for outgoing stanzas
+/// (\xep{0198}).
+///
 void QXmppStream::setAcknowledgedSequenceNumber(unsigned sequenceNumber)
 {
     for (QMap<unsigned, QByteArray>::iterator it = d->unacknowledgedStanzas.begin(); it != d->unacknowledgedStanzas.end();) {
@@ -320,9 +332,11 @@ void QXmppStream::setAcknowledgedSequenceNumber(unsigned sequenceNumber)
     }
 }
 
-/// Handles an incoming acknowledgement from XEP-0198.
+///
+/// Handles an incoming acknowledgement from \xep{0198}.
 ///
 /// \param element
+///
 void QXmppStream::handleAcknowledgement(QDomElement &element)
 {
     if (!d->streamManagementEnabled)
@@ -333,7 +347,9 @@ void QXmppStream::handleAcknowledgement(QDomElement &element)
     setAcknowledgedSequenceNumber(ack.seqNo());
 }
 
-/// Sends an acknowledgement as defined in XEP-0198.
+///
+/// Sends an acknowledgement as defined in \xep{0198}.
+///
 void QXmppStream::sendAcknowledgement()
 {
     if (!d->streamManagementEnabled)
@@ -349,7 +365,9 @@ void QXmppStream::sendAcknowledgement()
     sendData(data);
 }
 
-/// Sends an acknowledgement request as defined in XEP-0198.
+///
+/// Sends an acknowledgement request as defined in \xep{0198}.
+///
 void QXmppStream::sendAcknowledgementRequest()
 {
     if (!d->streamManagementEnabled)

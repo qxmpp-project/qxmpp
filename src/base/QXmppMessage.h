@@ -50,7 +50,7 @@ public:
         Headline
     };
 
-    /// This enum describes a chat state as defined by XEP-0085: Chat State
+    /// This enum describes a chat state as defined by \xep{0085}: Chat State
     /// Notifications.
     enum State {
         None = 0,   ///< The message does not contain any chat state information.
@@ -61,7 +61,7 @@ public:
         Paused      ///< User had been composing but now has stopped.
     };
 
-    /// This enum describes a chat marker as defined by XEP-0333: Chat Markers.
+    /// This enum describes a chat marker as defined by \xep{0333}: Chat Markers.
     enum Marker {
         NoMarker = 0,
         Received,
@@ -69,7 +69,7 @@ public:
         Acknowledged
     };
 
-    /// XEP-0334: Message Processing Hints
+    /// \xep{0334}: Message Processing Hints
     ///
     /// \since QXmpp 1.1
     enum Hint {
@@ -81,16 +81,16 @@ public:
 
     /// This enum describes different end-to-end encryption methods. These can
     /// be used to mark a message explicitly as encrypted with a specific
-    /// algothim. See XEP-0380: Explicit Message Encryption for details.
+    /// algothim. See \xep{0380}: Explicit Message Encryption for details.
     ///
     /// \since QXmpp 1.1
     enum EncryptionMethod {
         NoEncryption,       ///< No encryption
         UnknownEncryption,  ///< Unknown encryption
-        OTR,                ///< XEP-0364: Current Off-the-Record Messaging Usage
-        LegacyOpenPGP,      ///< XEP-0027: Current Jabber OpenPGP Usage
-        OX,                 ///< XEP-0373: OpenPGP for XMPP
-        OMEMO               ///< XEP-0384: OMEMO Encryption
+        OTR,                ///< \xep{0364}: Current Off-the-Record Messaging Usage
+        LegacyOpenPGP,      ///< \xep{0027}: Current Jabber OpenPGP Usage
+        OX,                 ///< \xep{0373}: OpenPGP for XMPP
+        OMEMO               ///< \xep{0384}: OMEMO Encryption
     };
 
     QXmppMessage(const QString &from = QString(), const QString &to = QString(),

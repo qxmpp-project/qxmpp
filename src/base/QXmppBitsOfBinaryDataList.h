@@ -32,7 +32,7 @@ class QDomElement;
 class QXmlStreamWriter;
 
 /// \class QXmppBitsOfBinaryDataList represents a list of data elements from
-/// XEP-0231: Bits of Binary.
+/// \xep{0231}: Bits of Binary.
 ///
 /// \since QXmpp 1.2
 

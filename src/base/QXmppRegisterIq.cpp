@@ -221,34 +221,37 @@ void QXmppRegisterIq::setIsRemove(bool isRemove)
     d->isRemove = isRemove;
 }
 
-/// Returns a list of data packages attached using XEP-0231: Bits of Binary.
+///
+/// Returns a list of data packages attached using \xep{0231}: Bits of Binary.
 ///
 /// This could be used to resolve a \c cid: URL of an CAPTCHA field of the
 /// form.
 ///
 /// \since QXmpp 1.2
-
+///
 QXmppBitsOfBinaryDataList QXmppRegisterIq::bitsOfBinaryData() const
 {
     return d->bitsOfBinaryData;
 }
 
-/// Returns a list of data attached using XEP-0231: Bits of Binary.
+///
+/// Returns a list of data attached using \xep{0231}: Bits of Binary.
 ///
 /// This could be used to resolve a \c cid: URL of an CAPTCHA field of the
 /// form.
 ///
 /// \since QXmpp 1.2
-
+///
 QXmppBitsOfBinaryDataList &QXmppRegisterIq::bitsOfBinaryData()
 {
     return d->bitsOfBinaryData;
 }
 
-/// Sets a list of XEP-0231: Bits of Binary attachments to be included.
+///
+/// Sets a list of \xep{0231}: Bits of Binary attachments to be included.
 ///
 /// \since QXmpp 1.2
-
+///
 void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData)
 {
     d->bitsOfBinaryData = bitsOfBinaryData;

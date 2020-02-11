@@ -608,7 +608,7 @@ void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 }
 
 /// Returns the stanza's extended addresses as defined by
-/// XEP-0033: Extended Stanza Addressing.
+/// \xep{0033}: Extended Stanza Addressing.
 
 QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
 {
@@ -616,7 +616,7 @@ QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
 }
 
 /// Sets the stanza's extended addresses as defined by
-/// XEP-0033: Extended Stanza Addressing.
+/// \xep{0033}: Extended Stanza Addressing.
 
 void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addresses)
 {

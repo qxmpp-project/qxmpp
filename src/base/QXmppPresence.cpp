@@ -229,43 +229,43 @@ void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
     d->vCardUpdateType = type;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 QString QXmppPresence::capabilityHash() const
 {
     return d->capabilityHash;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 void QXmppPresence::setCapabilityHash(const QString &hash)
 {
     d->capabilityHash = hash;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 QString QXmppPresence::capabilityNode() const
 {
     return d->capabilityNode;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 void QXmppPresence::setCapabilityNode(const QString &node)
 {
     d->capabilityNode = node;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 QByteArray QXmppPresence::capabilityVer() const
 {
     return d->capabilityVer;
 }
 
-/// XEP-0115: Entity Capabilities
+/// \xep{0115}: Entity Capabilities
 void QXmppPresence::setCapabilityVer(const QByteArray &ver)
 {
     d->capabilityVer = ver;
 }
 
-/// Legacy XEP-0115: Entity Capabilities
+/// Legacy \xep{0115}: Entity Capabilities
 QStringList QXmppPresence::capabilityExt() const
 {
     return d->capabilityExt;
@@ -332,14 +332,14 @@ void QXmppPresence::setMucSupported(bool supported)
 }
 
 /// Returns when the last user interaction with the client took place. See
-/// XEP-0319: Last User Interaction in Presence for details.
+/// \xep{0319}: Last User Interaction in Presence for details.
 
 QDateTime QXmppPresence::lastUserInteraction() const
 {
     return d->lastUserInteraction;
 }
 
-/// Sets the time of the last user interaction as defined in XEP-0319: Last
+/// Sets the time of the last user interaction as defined in \xep{0319}: Last
 /// User Interaction in Presence.
 
 void QXmppPresence::setLastUserInteraction(const QDateTime &lastUserInteraction)

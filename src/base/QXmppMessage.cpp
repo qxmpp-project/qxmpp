@@ -230,7 +230,7 @@ void QXmppMessage::setBody(const QString &body)
 }
 
 /// Returns true if the user's attention is requested, as defined
-/// by XEP-0224: Attention.
+/// by \xep{0224}: Attention.
 
 bool QXmppMessage::isAttentionRequested() const
 {
@@ -238,7 +238,7 @@ bool QXmppMessage::isAttentionRequested() const
 }
 
 /// Sets whether the user's attention is requested, as defined
-/// by XEP-0224: Attention.
+/// by \xep{0224}: Attention.
 ///
 /// \a param requested
 
@@ -248,7 +248,7 @@ void QXmppMessage::setAttentionRequested(bool requested)
 }
 
 /// Returns true if a delivery receipt is requested, as defined
-/// by XEP-0184: Message Delivery Receipts.
+/// by \xep{0184}: Message Delivery Receipts.
 
 bool QXmppMessage::isReceiptRequested() const
 {
@@ -256,7 +256,7 @@ bool QXmppMessage::isReceiptRequested() const
 }
 
 /// Sets whether a delivery receipt is requested, as defined
-/// by XEP-0184: Message Delivery Receipts.
+/// by \xep{0184}: Message Delivery Receipts.
 ///
 /// \a param requested
 
@@ -284,7 +284,7 @@ void QXmppMessage::setReceiptId(const QString &id)
 }
 
 /// Returns the JID for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 QString QXmppMessage::mucInvitationJid() const
 {
@@ -292,7 +292,7 @@ QString QXmppMessage::mucInvitationJid() const
 }
 
 /// Sets the JID for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 void QXmppMessage::setMucInvitationJid(const QString &jid)
 {
@@ -300,7 +300,7 @@ void QXmppMessage::setMucInvitationJid(const QString &jid)
 }
 
 /// Returns the password for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 QString QXmppMessage::mucInvitationPassword() const
 {
@@ -308,7 +308,7 @@ QString QXmppMessage::mucInvitationPassword() const
 }
 
 /// Sets the \a password for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 void QXmppMessage::setMucInvitationPassword(const QString &password)
 {
@@ -316,7 +316,7 @@ void QXmppMessage::setMucInvitationPassword(const QString &password)
 }
 
 /// Returns the reason for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 QString QXmppMessage::mucInvitationReason() const
 {
@@ -324,7 +324,7 @@ QString QXmppMessage::mucInvitationReason() const
 }
 
 /// Sets the \a reason for a multi-user chat direct invitation as defined
-/// by XEP-0249: Direct MUC Invitations.
+/// by \xep{0249}: Direct MUC Invitations.
 
 void QXmppMessage::setMucInvitationReason(const QString &reason)
 {
@@ -413,7 +413,7 @@ void QXmppMessage::setThread(const QString &thread)
 }
 
 /// Returns the message's XHTML body as defined by
-/// XEP-0071: XHTML-IM.
+/// \xep{0071}: XHTML-IM.
 
 QString QXmppMessage::xhtml() const
 {
@@ -421,7 +421,7 @@ QString QXmppMessage::xhtml() const
 }
 
 /// Sets the message's XHTML body as defined by
-/// XEP-0071: XHTML-IM.
+/// \xep{0071}: XHTML-IM.
 
 void QXmppMessage::setXhtml(const QString &xhtml)
 {
@@ -429,7 +429,7 @@ void QXmppMessage::setXhtml(const QString &xhtml)
 }
 
 /// Returns true if a message is markable, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 bool QXmppMessage::isMarkable() const
 {
@@ -437,7 +437,7 @@ bool QXmppMessage::isMarkable() const
 }
 
 /// Sets if the message is markable, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 void QXmppMessage::setMarkable(const bool markable)
 {
@@ -445,7 +445,7 @@ void QXmppMessage::setMarkable(const bool markable)
 }
 
 /// Returns the message's marker id, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 QString QXmppMessage::markedId() const
 {
@@ -453,7 +453,7 @@ QString QXmppMessage::markedId() const
 }
 
 /// Sets the message's marker id, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 void QXmppMessage::setMarkerId(const QString &markerId)
 {
@@ -461,7 +461,7 @@ void QXmppMessage::setMarkerId(const QString &markerId)
 }
 
 /// Returns the message's marker thread, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 QString QXmppMessage::markedThread() const
 {
@@ -469,7 +469,7 @@ QString QXmppMessage::markedThread() const
 }
 
 /// Sets the message's marked thread, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 void QXmppMessage::setMarkedThread(const QString &markedThread)
 {
@@ -477,7 +477,7 @@ void QXmppMessage::setMarkedThread(const QString &markedThread)
 }
 
 /// Returns the message's marker, as defined
-/// XEP-0333: Chat Markers.
+/// \xep{0333}: Chat Markers.
 
 QXmppMessage::Marker QXmppMessage::marker() const
 {
@@ -485,14 +485,14 @@ QXmppMessage::Marker QXmppMessage::marker() const
 }
 
 /// Sets the message's marker, as defined
-/// XEP-0333: Chat Markers
+/// \xep{0333}: Chat Markers
 
 void QXmppMessage::setMarker(const Marker marker)
 {
     d->marker = marker;
 }
 
-/// Returns a list of data packages attached using XEP-0231: Bits of Binary.
+/// Returns a list of data packages attached using \xep{0231}: Bits of Binary.
 ///
 /// This could be used to resolve \c cid: URIs found in the X-HTML body.
 ///
@@ -503,7 +503,7 @@ QXmppBitsOfBinaryDataList QXmppMessage::bitsOfBinaryData() const
     return d->bitsOfBinaryData;
 }
 
-/// Returns a list of data attached using XEP-0231: Bits of Binary.
+/// Returns a list of data attached using \xep{0231}: Bits of Binary.
 ///
 /// This could be used to resolve \c cid: URIs found in the X-HTML body.
 ///
@@ -514,7 +514,7 @@ QXmppBitsOfBinaryDataList &QXmppMessage::bitsOfBinaryData()
     return d->bitsOfBinaryData;
 }
 
-/// Sets a list of XEP-0231: Bits of Binary attachments to be included.
+/// Sets a list of \xep{0231}: Bits of Binary attachments to be included.
 ///
 /// \since QXmpp 1.2
 
@@ -525,7 +525,7 @@ void QXmppMessage::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBi
 
 /// Returns if the message is marked with a <private> tag,
 /// in which case it will not be forwarded to other resources
-/// according to XEP-0280: Message Carbons.
+/// according to \xep{0280}: Message Carbons.
 
 bool QXmppMessage::isPrivate() const
 {
@@ -534,28 +534,28 @@ bool QXmppMessage::isPrivate() const
 
 /// If true is passed, the message is marked with a <private> tag,
 /// in which case it will not be forwarded to other resources
-/// according to XEP-0280: Message Carbons.
+/// according to \xep{0280}: Message Carbons.
 
 void QXmppMessage::setPrivate(const bool priv)
 {
     d->privatemsg = priv;
 }
 
-/// Returns a possibly attached URL from XEP-0066: Out of Band Data
+/// Returns a possibly attached URL from \xep{0066}: Out of Band Data
 
 QString QXmppMessage::outOfBandUrl() const
 {
     return d->outOfBandUrl;
 }
 
-/// Sets the attached URL for XEP-0066: Out of Band Data
+/// Sets the attached URL for \xep{0066}: Out of Band Data
 
 void QXmppMessage::setOutOfBandUrl(const QString &url)
 {
     d->outOfBandUrl = url;
 }
 
-/// Returns the message id to replace with this message as used in XEP-0308:
+/// Returns the message id to replace with this message as used in \xep{0308}:
 /// Last Message Correction. If the returned string is empty, this message is
 /// not replacing another.
 
@@ -564,7 +564,7 @@ QString QXmppMessage::replaceId() const
     return d->replaceId;
 }
 
-/// Sets the message id to replace with this message as in XEP-0308: Last
+/// Sets the message id to replace with this message as in \xep{0308}: Last
 /// Message Correction.
 
 void QXmppMessage::setReplaceId(const QString &replaceId)
@@ -573,7 +573,7 @@ void QXmppMessage::setReplaceId(const QString &replaceId)
 }
 
 /// Returns true if the message contains the hint passed, as defined in
-/// XEP-0334: Message Processing Hints
+/// \xep{0334}: Message Processing Hints
 ///
 /// \since QXmpp 1.1
 
@@ -582,7 +582,7 @@ bool QXmppMessage::hasHint(const Hint hint) const
     return d->hints & hint;
 }
 
-/// Adds a hint to the message, as defined in XEP-0334: Message Processing
+/// Adds a hint to the message, as defined in \xep{0334}: Message Processing
 /// Hints
 ///
 /// \since QXmpp 1.1
@@ -592,7 +592,7 @@ void QXmppMessage::addHint(const Hint hint)
     d->hints |= hint;
 }
 
-/// Removes a hint from the message, as defined in XEP-0334: Message Processing
+/// Removes a hint from the message, as defined in \xep{0334}: Message Processing
 /// Hints
 ///
 /// \since QXmpp 1.1
@@ -602,7 +602,7 @@ void QXmppMessage::removeHint(const Hint hint)
     d->hints &= ~hint;
 }
 
-/// Removes all hints from the message, as defined in XEP-0334: Message
+/// Removes all hints from the message, as defined in \xep{0334}: Message
 /// Processing Hints
 ///
 /// \since QXmpp 1.1
@@ -678,7 +678,7 @@ void QXmppMessage::setOriginId(const QString &id)
     d->originId = id;
 }
 
-/// Returns the message id this message is linked/attached to. See XEP-0367:
+/// Returns the message id this message is linked/attached to. See \xep{0367}:
 /// Message Attaching for details.
 ///
 /// \since QXmpp 1.1
@@ -688,7 +688,7 @@ QString QXmppMessage::attachId() const
     return d->attachId;
 }
 
-/// Sets the id of the attached message as in XEP-0367: Message Attaching. This
+/// Sets the id of the attached message as in \xep{0367}: Message Attaching. This
 /// can be used for a "reply to" or "reaction" function.
 ///
 /// The used message id depends on the message context, see the Business rules
@@ -742,7 +742,7 @@ void QXmppMessage::setMixUserNick(const QString &mixUserNick)
 ///
 /// \note QXmppMessage::NoEncryption does not necesserily mean that the message
 /// is not encrypted; it may also be that the author of the message does not
-/// support XEP-0380: Explicit Message Encryption.
+/// support \xep{0380}: Explicit Message Encryption.
 ///
 /// \note If this returns QXmppMessage::UnknownEncryption, you can still get
 /// the namespace of the encryption with \c encryptionMethodNs() and possibly
@@ -762,7 +762,7 @@ QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
 }
 
 /// Advertises that this message is encrypted with the given encryption method.
-/// See XEP-0380: Explicit Message Encryption for details.
+/// See \xep{0380}: Explicit Message Encryption for details.
 ///
 /// \since QXmpp 1.1
 
@@ -771,7 +771,7 @@ void QXmppMessage::setEncryptionMethod(QXmppMessage::EncryptionMethod method)
     d->encryptionMethod = ENCRYPTION_NAMESPACES.at(int(method));
 }
 
-/// Returns the namespace of the advertised encryption method via. XEP-0380:
+/// Returns the namespace of the advertised encryption method via. \xep{0380}:
 /// Explicit Message Encryption.
 ///
 /// \since QXmpp 1.1
@@ -782,7 +782,7 @@ QString QXmppMessage::encryptionMethodNs() const
 }
 
 /// Sets the namespace of the encryption method this message advertises to be
-/// encrypted with. See XEP-0380: Explicit Message Encryption for details.
+/// encrypted with. See \xep{0380}: Explicit Message Encryption for details.
 ///
 /// \since QXmpp 1.1
 
@@ -792,7 +792,7 @@ void QXmppMessage::setEncryptionMethodNs(const QString &encryptionMethod)
 }
 
 /// Returns the associated name of the encryption method this message
-/// advertises to be encrypted with. See XEP-0380: Explicit Message Encryption
+/// advertises to be encrypted with. See \xep{0380}: Explicit Message Encryption
 /// for details.
 ///
 /// \since QXmpp 1.1
@@ -804,7 +804,7 @@ QString QXmppMessage::encryptionName() const
     return ENCRYPTION_NAMES.at(int(encryptionMethod()));
 }
 
-/// Sets the name of the encryption method for XEP-0380: Explicit Message
+/// Sets the name of the encryption method for \xep{0380}: Explicit Message
 /// Encryption.
 ///
 /// \note This should only be used, if the encryption method is custom and is
@@ -817,7 +817,7 @@ void QXmppMessage::setEncryptionName(const QString &encryptionName)
     d->encryptionName = encryptionName;
 }
 
-/// Returns true, if this is a spoiler message according to XEP-0382: Spoiler
+/// Returns true, if this is a spoiler message according to \xep{0382}: Spoiler
 /// messages. The spoiler hint however can still be empty.
 ///
 /// A spoiler message's content should not be visible to the user by default.
@@ -829,7 +829,7 @@ bool QXmppMessage::isSpoiler() const
     return d->isSpoiler;
 }
 
-/// Sets whether this is a spoiler message as specified in XEP-0382: Spoiler
+/// Sets whether this is a spoiler message as specified in \xep{0382}: Spoiler
 /// messages.
 ///
 /// The content of spoiler messages will not be displayed by default to the
@@ -843,7 +843,7 @@ void QXmppMessage::setIsSpoiler(bool isSpoiler)
     d->isSpoiler = isSpoiler;
 }
 
-/// Returns the spoiler hint as specified in XEP-0382: Spoiler messages.
+/// Returns the spoiler hint as specified in \xep{0382}: Spoiler messages.
 ///
 /// The hint may be empty, even if isSpoiler is true.
 ///
@@ -854,7 +854,7 @@ QString QXmppMessage::spoilerHint() const
     return d->spoilerHint;
 }
 
-/// Sets a spoiler hint for XEP-0382: Spoiler messages. If the spoiler hint
+/// Sets a spoiler hint for \xep{0382}: Spoiler messages. If the spoiler hint
 /// is not empty, isSpoiler will be set to true.
 ///
 /// A spoiler hint is optional for spoiler messages.
@@ -997,7 +997,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    // XEP-0224: Attention
+    // \xep{0224}: Attention
     if (d->attentionRequested) {
         xmlWriter->writeStartElement(QStringLiteral("attention"));
         xmlWriter->writeDefaultNamespace(ns_attention);
@@ -1175,7 +1175,7 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
         d->stamp = QXmppUtils::datetimeFromString(
             element.attribute(QStringLiteral("stamp")));
         d->stampType = DelayedDelivery;
-        // XEP-0224: Attention
+        // \xep{0224}: Attention
     } else if (checkElement(element, QStringLiteral("attention"), ns_attention)) {
         d->attentionRequested = true;
         // XEP-0231: Bits of Binary

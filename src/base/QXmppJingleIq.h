@@ -34,7 +34,7 @@ class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
 
 /// \brief The QXmppJinglePayloadType class represents a payload type
-/// as specified by XEP-0167: Jingle RTP Sessions and RFC 5245.
+/// as specified by \xep{0167}: Jingle RTP Sessions and RFC 5245.
 ///
 
 class QXMPP_EXPORT QXmppJinglePayloadType
@@ -78,7 +78,7 @@ private:
 };
 
 /// \brief The QXmppJingleCandidate class represents a transport candidate
-/// as specified by XEP-0176: Jingle ICE-UDP Transport Method.
+/// as specified by \xep{0176}: Jingle ICE-UDP Transport Method.
 ///
 
 class QXMPP_EXPORT QXmppJingleCandidate
@@ -146,7 +146,7 @@ private:
 };
 
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media
-/// sessions as specified by XEP-0166: Jingle.
+/// sessions as specified by \xep{0166}: Jingle.
 ///
 /// \ingroup Stanzas
 

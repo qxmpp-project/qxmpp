@@ -29,7 +29,7 @@
 #include <QDateTime>
 
 /// \brief The QXmppResultSetQuery class represents a set element in a query
-/// as defined by XEP-0059: Result Set Management.
+/// as defined by \xep{0059}: Result Set Management.
 
 class QXMPP_EXPORT QXmppResultSetQuery
 {
@@ -63,7 +63,7 @@ private:
 };
 
 /// \brief The QXmppResultSetReply class represents a set element in a reply
-/// as defined by XEP-0059: Result Set Management.
+/// as defined by \xep{0059}: Result Set Management.
 
 class QXMPP_EXPORT QXmppResultSetReply
 {

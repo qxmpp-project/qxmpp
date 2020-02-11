@@ -35,7 +35,7 @@ class QXmppHttpUploadRequestIqPrivate;
 class QXmppHttpUploadSlotIqPrivate;
 
 /// \brief Represents an HTTP File Upload IQ for requesting an upload slot as
-/// defined by XEP-0363: HTTP File Upload.
+/// defined by \xep{0363}: HTTP File Upload.
 ///
 /// \since QXmpp 1.1
 ///
@@ -72,7 +72,7 @@ private:
 };
 
 /// \brief Represents an HTTP File Upload IQ result for receiving an upload slot as
-/// defined by XEP-0363: HTTP File Upload.
+/// defined by \xep{0363}: HTTP File Upload.
 ///
 /// \since QXmpp 1.1
 ///

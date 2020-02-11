@@ -151,8 +151,8 @@ private:
 /// \brief The QXmppCallManager class provides support for making and
 /// receiving voice calls.
 ///
-/// Session initiation is performed as described by XEP-0166: Jingle,
-/// XEP-0167: Jingle RTP Sessions and XEP-0176: Jingle ICE-UDP Transport
+/// Session initiation is performed as described by \xep{0166}: Jingle,
+/// \xep{0167}: Jingle RTP Sessions and \xep{0176}: Jingle ICE-UDP Transport
 /// Method.
 ///
 /// The data stream is connected using Interactive Connectivity Establishment

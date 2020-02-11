@@ -58,7 +58,8 @@ private:
     QSharedDataPointer<QXmppUploadServicePrivate> d;
 };
 
-/// \brief The QXmppUploadRequestManager implements the core of XEP-0369: HTTP
+///
+/// \brief The QXmppUploadRequestManager implements the core of \xep{0369}: HTTP
 /// File Upload.
 ///
 /// It handles the discovery of QXmppUploadServices and can send upload
@@ -92,7 +93,7 @@ private:
 /// \since QXmpp 1.1
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppUploadRequestManager : public QXmppClientExtension
 {
     Q_OBJECT

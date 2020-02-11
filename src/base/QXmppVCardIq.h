@@ -216,7 +216,7 @@ QXMPP_EXPORT bool operator!=(const QXmppVCardOrganization &, const QXmppVCardOrg
 /// \brief Represents the XMPP vCard.
 ///
 /// The functions names are self explanatory.
-/// Look at QXmppVCardManager and XEP-0054: vcard-temp for more details.
+/// Look at QXmppVCardManager and \xep{0054}: vcard-temp for more details.
 ///
 /// There are many field of XMPP vCard which are not present in
 /// this class. File a issue for the same. We will add the requested

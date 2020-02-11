@@ -29,8 +29,9 @@
 class QXmppVCardIq;
 class QXmppVCardManagerPrivate;
 
+///
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
-/// implementation of XEP-0054: vcard-temp.
+/// implementation of \xep{0054}: vcard-temp.
 ///
 /// \note It's object should not be created using it's constructor. Instead
 /// \c QXmppClient::findExtension<QXmppVCardManager>() should be used to get
@@ -51,7 +52,7 @@ class QXmppVCardManagerPrivate;
 /// \note Client can't set/change vCards of roster entries.
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
 {
     Q_OBJECT

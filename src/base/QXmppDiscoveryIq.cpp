@@ -217,7 +217,7 @@ void QXmppDiscoveryIq::setItems(const QList<QXmppDiscoveryIq::Item> &items)
 }
 
 /// Returns the QXmppDataForm for this IQ, as defined by
-/// XEP-0128: Service Discovery Extensions.
+/// \xep{0128}: Service Discovery Extensions.
 ///
 
 QXmppDataForm QXmppDiscoveryIq::form() const
@@ -226,7 +226,7 @@ QXmppDataForm QXmppDiscoveryIq::form() const
 }
 
 /// Sets the QXmppDataForm for this IQ, as define by
-/// XEP-0128: Service Discovery Extensions.
+/// \xep{0128}: Service Discovery Extensions.
 ///
 /// \param form
 ///
@@ -256,7 +256,7 @@ void QXmppDiscoveryIq::setQueryType(enum QXmppDiscoveryIq::QueryType type)
     d->queryType = type;
 }
 
-/// Calculate the verification string for XEP-0115 : Entity Capabilities
+/// Calculate the verification string for \xep{0115}: Entity Capabilities
 
 QByteArray QXmppDiscoveryIq::verificationString() const
 {

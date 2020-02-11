@@ -36,7 +36,7 @@ class QXmppMucRoom;
 class QXmppMucRoomPrivate;
 
 /// \brief The QXmppMucManager class makes it possible to interact with
-/// multi-user chat rooms as defined by XEP-0045: Multi-User Chat.
+/// multi-user chat rooms as defined by \xep{0045}: Multi-User Chat.
 ///
 /// To make use of this manager, you need to instantiate it and load it into
 /// the QXmppClient instance as follows:
@@ -97,7 +97,7 @@ private:
 };
 
 /// \brief The QXmppMucRoom class represents a multi-user chat room
-/// as defined by XEP-0045: Multi-User Chat.
+/// as defined by \xep{0045}: Multi-User Chat.
 ///
 /// \sa QXmppMucManager
 

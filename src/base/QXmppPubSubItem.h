@@ -35,7 +35,7 @@ class QXmppElement;
 class QXmppPubSubItemPrivate;
 
 /// \brief The QXmppPubSubItem class represents a publish-subscribe item
-/// as defined by XEP-0060: Publish-Subscribe.
+/// as defined by \xep{0060}: Publish-Subscribe.
 
 class QXMPP_EXPORT QXmppPubSubItem
 {

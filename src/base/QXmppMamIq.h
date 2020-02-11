@@ -34,7 +34,7 @@ class QXmppMamQueryIqPrivate;
 class QXmppMamResultIqPrivate;
 
 /// \brief The QXmppMamQueryIq class represents the query IQ for
-/// XEP-0313: Message Archive Management.
+/// \xep{0313}: Message Archive Management.
 class QXmppMamQueryIq : public QXmppIq
 {
 public:
@@ -64,7 +64,7 @@ private:
 };
 
 /// \brief The QXmppMamQueryIq class represents the result IQ for
-/// XEP-0313: Message Archive Management.
+/// \xep{0313}: Message Archive Management.
 class QXmppMamResultIq : public QXmppIq
 {
 public:

@@ -32,7 +32,7 @@ class QXmppBookmarkManagerPrivate;
 class QXmppBookmarkSet;
 
 /// \brief The QXmppBookmarkManager class allows you to store and retrieve
-/// bookmarks as defined by XEP-0048: Bookmarks.
+/// bookmarks as defined by \xep{0048}: Bookmarks.
 ///
 
 class QXMPP_EXPORT QXmppBookmarkManager : public QXmppClientExtension

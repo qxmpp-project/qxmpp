@@ -284,7 +284,7 @@ bool QXmppClient::isConnected() const
 }
 
 /// Returns true if the current client state is "active", false if it is
-/// "inactive". See XEP-0352: Client State Indication for details.
+/// "inactive". See \xep{0352}: Client State Indication for details.
 ///
 /// On connect this is always reset to true.
 
@@ -293,7 +293,7 @@ bool QXmppClient::isActive() const
     return d->isActive;
 }
 
-/// Sets the client state as described in XEP-0352: Client State Indication.
+/// Sets the client state as described in \xep{0352}: Client State Indication.
 ///
 /// On connect this is always reset to true.
 
@@ -325,7 +325,7 @@ QXmppRosterManager& QXmppClient::rosterManager()
 /// the bareJid.
 ///
 /// \note Usage of this method is discouraged because most modern clients use
-/// carbon messages (XEP-0280: Message Carbons) and MAM (XEP-0313: Message
+/// carbon messages (\xep{0280}: Message Carbons) and MAM (\xep{0313}: Message
 /// Archive Management) and so could possibly receive messages multiple times
 /// or not receive them at all.
 /// \c QXmppClient::sendPacket() should be used instead with a \c QXmppMessage.
@@ -426,23 +426,25 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
     return d->stream->xmppStreamError();
 }
 
-/// Returns the reference to QXmppVCardManager, implementation of XEP-0054.
+///
+/// Returns the reference to QXmppVCardManager, implementation of \xep{0054}.
 /// http://xmpp.org/extensions/xep-0054.html
 ///
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppClient::findExtension<QXmppVCardManager>() instead.
-
+///
 QXmppVCardManager& QXmppClient::vCardManager()
 {
     return *findExtension<QXmppVCardManager>();
 }
 
-/// Returns the reference to QXmppVersionManager, implementation of XEP-0092.
+///
+/// Returns the reference to QXmppVersionManager, implementation of \xep{0092}.
 /// http://xmpp.org/extensions/xep-0092.html
 ///
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppClient::findExtension<QXmppVersionManager>() instead.
-
+///
 QXmppVersionManager& QXmppClient::versionManager()
 {
     return *findExtension<QXmppVersionManager>();

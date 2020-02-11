@@ -37,7 +37,7 @@ class QXmppRpcResponseIq;
 
 /// \brief The QXmppRpcManager class make it possible to invoke remote methods
 /// and to expose local interfaces for remote procedure calls, as specified by
-/// XEP-0009: Jabber-RPC.
+/// \xep{0009}: Jabber-RPC.
 ///
 /// To make use of this manager, you need to instantiate it and load it into
 /// the QXmppClient instance as follows:

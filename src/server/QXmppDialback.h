@@ -27,7 +27,7 @@
 #include "QXmppStanza.h"
 
 /// \brief The QXmppDialback class represents a stanza used for the Server
-/// Dialback protocol as specified by XEP-0220: Server Dialback.
+/// Dialback protocol as specified by \xep{0220}: Server Dialback.
 ///
 /// \ingroup Stanzas
 

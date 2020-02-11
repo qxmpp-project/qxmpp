@@ -30,7 +30,7 @@
 #include <QUrl>
 
 /// \brief The QXmppBookmarkConference class represents a bookmark for a conference room,
-/// as defined by XEP-0048: Bookmarks.
+/// as defined by \xep{0048}: Bookmarks.
 ///
 class QXMPP_EXPORT QXmppBookmarkConference
 {
@@ -57,7 +57,7 @@ private:
 };
 
 /// \brief The QXmppBookmarkUrl class represents a bookmark for a web page,
-/// as defined by XEP-0048: Bookmarks.
+/// as defined by \xep{0048}: Bookmarks.
 ///
 class QXMPP_EXPORT QXmppBookmarkUrl
 {
@@ -74,7 +74,7 @@ private:
 };
 
 /// \brief The QXmppbookmarkSets class represents a set of bookmarks, as defined
-/// by XEP-0048: Bookmarks.
+/// by \xep{0048}: Bookmarks.
 ///
 class QXMPP_EXPORT QXmppBookmarkSet
 {

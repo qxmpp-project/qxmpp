@@ -34,7 +34,7 @@ class QXmlStreamWriter;
 class QXmppBitsOfBinaryDataPrivate;
 class QXmppBitsOfBinaryContentId;
 
-/// \class QXmppBitsOfBinaryData represents a data element for XEP-0231: Bits
+/// \class QXmppBitsOfBinaryData represents a data element for \xep{0231}: Bits
 /// of Binary. It can be used as an extension in other stanzas.
 ///
 /// \see QXmppBitsOfBinaryIq, QXmppBitsOfBinaryDataList

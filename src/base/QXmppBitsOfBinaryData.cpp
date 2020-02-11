@@ -129,7 +129,7 @@ void QXmppBitsOfBinaryData::setData(const QByteArray &data)
     d->data = data;
 }
 
-/// Returns true, if \c element is a XEP-0231: Bits of Binary data element
+/// Returns true, if \c element is a \xep{0231}: Bits of Binary data element
 
 bool QXmppBitsOfBinaryData::isBitsOfBinaryData(const QDomElement &element)
 {

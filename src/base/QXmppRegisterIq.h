@@ -32,7 +32,7 @@ class QXmppBitsOfBinaryDataList;
 class QXmppRegisterIqPrivate;
 
 /// \brief The QXmppRegisterIq class represents a registration IQ
-/// as defined by XEP-0077: In-Band Registration.
+/// as defined by \xep{0077}: In-Band Registration.
 ///
 /// It is used to create an account on the server.
 ///

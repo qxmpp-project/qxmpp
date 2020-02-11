@@ -301,7 +301,7 @@ void QXmppJingleIq::Content::setTransportPassword(const QString &password)
 
 /// Returns the fingerprint hash value for the transport key.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 QByteArray QXmppJingleIq::Content::transportFingerprint() const
 {
@@ -310,7 +310,7 @@ QByteArray QXmppJingleIq::Content::transportFingerprint() const
 
 /// Sets the fingerprint hash value for the transport key.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 void QXmppJingleIq::Content::setTransportFingerprint(const QByteArray &fingerprint)
 {
@@ -319,7 +319,7 @@ void QXmppJingleIq::Content::setTransportFingerprint(const QByteArray &fingerpri
 
 /// Returns the fingerprint hash algorithm for the transport key.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 QString QXmppJingleIq::Content::transportFingerprintHash() const
 {
@@ -328,7 +328,7 @@ QString QXmppJingleIq::Content::transportFingerprintHash() const
 
 /// Sets the fingerprint hash algorithm for the transport key.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 void QXmppJingleIq::Content::setTransportFingerprintHash(const QString &hash)
 {
@@ -337,7 +337,7 @@ void QXmppJingleIq::Content::setTransportFingerprintHash(const QString &hash)
 
 /// Returns the setup role for the encrypted transport.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 QString QXmppJingleIq::Content::transportFingerprintSetup() const
 {
@@ -346,7 +346,7 @@ QString QXmppJingleIq::Content::transportFingerprintSetup() const
 
 /// Sets the setup role for the encrypted transport.
 ///
-/// This is used for DTLS-SRTP as defined in XEP-0320.
+/// This is used for DTLS-SRTP as defined in \xep{0320}.
 
 void QXmppJingleIq::Content::setTransportFingerprintSetup(const QString &setup)
 {

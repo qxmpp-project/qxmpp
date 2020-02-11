@@ -63,7 +63,7 @@ QXmppBitsOfBinaryContentIdPrivate::QXmppBitsOfBinaryContentIdPrivate()
 {
 }
 
-/// Parses a \c QXmppBitsOfBinaryContentId from a XEP-0231: Bits of Binary
+/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231}: Bits of Binary
 /// \c cid: URL
 ///
 /// In case parsing failed, the returned \c QXmppBitsOfBinaryContentId is
@@ -79,7 +79,7 @@ QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString 
     return {};
 }
 
-/// Parses a \c QXmppBitsOfBinaryContentId from a XEP-0231: Bits of Binary
+/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231}: Bits of Binary
 /// content id
 ///
 /// In case parsing failed, the returned \c QXmppBitsOfBinaryContentId is
@@ -133,7 +133,7 @@ QXmppBitsOfBinaryContentId::QXmppBitsOfBinaryContentId(const QXmppBitsOfBinaryCo
 
 QXmppBitsOfBinaryContentId &QXmppBitsOfBinaryContentId::operator=(const QXmppBitsOfBinaryContentId &other) = default;
 
-/// Returns a XEP-0231: Bits of Binary content id
+/// Returns a \xep{0231}: Bits of Binary content id
 
 QString QXmppBitsOfBinaryContentId::toContentId() const
 {
@@ -146,7 +146,7 @@ QString QXmppBitsOfBinaryContentId::toContentId() const
         CONTENTID_POSTFIX;
 }
 
-/// Returns a XEP-0231: Bits of Binary \c cid: URL
+/// Returns a \xep{0231}: Bits of Binary \c cid: URL
 
 QString QXmppBitsOfBinaryContentId::toCidUrl() const
 {

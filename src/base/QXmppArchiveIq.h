@@ -30,7 +30,7 @@
 #include <QDateTime>
 
 /// \brief The QXmppArchiveMessage class represents an archived message
-/// as defined by XEP-0136: Message Archiving.
+/// as defined by \xep{0136}: Message Archiving.
 
 class QXMPP_EXPORT QXmppArchiveMessage
 {
@@ -53,7 +53,7 @@ private:
 };
 
 /// \brief The QXmppArchiveChat class represents an archived conversation
-/// as defined by XEP-0136: Message Archiving.
+/// as defined by \xep{0136}: Message Archiving.
 
 class QXMPP_EXPORT QXmppArchiveChat
 {
@@ -92,7 +92,7 @@ private:
     QString m_with;
 };
 
-/// \brief Represents an archive chat as defined by XEP-0136: Message Archiving.
+/// \brief Represents an archive chat as defined by \xep{0136}: Message Archiving.
 ///
 /// It is used to get chat as a QXmppArchiveChat.
 ///
@@ -120,7 +120,7 @@ private:
     QXmppResultSetReply m_rsmReply;
 };
 
-/// \brief Represents an archive list as defined by XEP-0136: Message Archiving.
+/// \brief Represents an archive list as defined by \xep{0136}: Message Archiving.
 ///
 /// \ingroup Stanzas
 
@@ -166,7 +166,7 @@ private:
     QXmppResultSetReply m_rsmReply;
 };
 
-/// \brief Represents an archive remove IQ as defined by XEP-0136: Message Archiving.
+/// \brief Represents an archive remove IQ as defined by \xep{0136}: Message Archiving.
 ///
 /// \ingroup Stanzas
 
@@ -196,7 +196,7 @@ private:
     QDateTime m_end;
 };
 
-/// \brief Represents an archive retrieve IQ as defined by XEP-0136: Message Archiving.
+/// \brief Represents an archive retrieve IQ as defined by \xep{0136}: Message Archiving.
 ///
 /// \ingroup Stanzas
 
@@ -228,7 +228,7 @@ private:
     QXmppResultSetQuery m_rsmQuery;
 };
 
-/// \brief Represents an archive preference IQ as defined by XEP-0136: Message Archiving.
+/// \brief Represents an archive preference IQ as defined by \xep{0136}: Message Archiving.
 ///
 /// \ingroup Stanzas
 

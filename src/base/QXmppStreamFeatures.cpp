@@ -125,31 +125,60 @@ void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
     d->tlsMode = mode;
 }
 
+///
+/// Returns the mode (disabled, enabled or required) for \xep{0198}: Stream
+/// Management
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
 {
     return d->streamManagementMode;
 }
 
+///
+/// Sets the mode for \xep{0198}: Stream Management
+///
+/// \param mode The mode to set.
+///
 void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode)
 {
     d->streamManagementMode = mode;
 }
 
+///
+/// Returns the mode for \xep{0352}: Client State Indication
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
 {
     return d->csiMode;
 }
 
+///
+/// Sets the mode for \xep{0352}: Client State Indication
+///
+/// \param mode The mode to set.
+///
 void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode mode)
 {
     d->csiMode = mode;
 }
 
+///
+/// Returns the mode for \xep{0077}: In-Band Registration
+///
+/// \since QXmpp 1.1
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::registerMode() const
 {
     return d->registerMode;
 }
 
+///
+/// Sets the mode for \xep{0077}: In-Band Registration
+///
+/// \param mode The mode to set.
+///
+/// \since QXmpp 1.1
+///
 void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &registerMode)
 {
     d->registerMode = registerMode;

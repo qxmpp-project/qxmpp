@@ -232,7 +232,7 @@ QString QXmppDiscoveryManager::clientName() const
 }
 
 /// Returns the client's extended information form, as defined
-/// by XEP-0128 Service Discovery Extensions.
+/// by \xep{0128}: Service Discovery Extensions.
 
 QXmppDataForm QXmppDiscoveryManager::clientInfoForm() const
 {
@@ -240,7 +240,7 @@ QXmppDataForm QXmppDiscoveryManager::clientInfoForm() const
 }
 
 /// Sets the client's extended information form, as defined
-/// by XEP-0128 Service Discovery Extensions.
+/// by \xep{0128}: Service Discovery Extensions.
 
 void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm& form)
 {

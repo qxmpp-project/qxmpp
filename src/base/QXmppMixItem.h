@@ -32,7 +32,7 @@ class QXmppMixInfoItemPrivate;
 class QXmppMixParticipantItemPrivate;
 
 /// \brief The QXmppMixInfoItem class represents a PubSub item of a MIX
-/// channel containing channel information as defined by XEP-0369: Mediated
+/// channel containing channel information as defined by \xep{0369}: Mediated
 /// Information eXchange (MIX).
 ///
 /// \since QXmpp 1.1
@@ -67,7 +67,7 @@ private:
 };
 
 /// \brief The QXmppMixParticipantItem class represents a PubSub item of a MIX
-/// channel participant as defined by XEP-0369: Mediated Information eXchange
+/// channel participant as defined by \xep{0369}: Mediated Information eXchange
 /// (MIX).
 ///
 /// \since QXmpp 1.1

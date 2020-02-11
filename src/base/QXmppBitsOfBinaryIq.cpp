@@ -32,7 +32,7 @@ QXmppBitsOfBinaryIq::QXmppBitsOfBinaryIq() = default;
 
 QXmppBitsOfBinaryIq::~QXmppBitsOfBinaryIq() = default;
 
-/// Returns true, if \c element is a XEP-0231: Bits of Binary IQ
+/// Returns true, if \c element is a \xep{0231}: Bits of Binary IQ
 ///
 /// \note This may also return true, if the IQ is not a Bits of Binary IQ in
 /// first place, but only contains a Bits of Binary data element.
