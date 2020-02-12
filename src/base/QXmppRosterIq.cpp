@@ -37,6 +37,8 @@ public:
     QList<QXmppRosterIq::Item> items;
     // XEP-0237 Roster Versioning
     QString version;
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    bool mixAnnotate = false;
 };
 
 QXmppRosterIq::QXmppRosterIq()
@@ -84,6 +86,21 @@ void QXmppRosterIq::setVersion(const QString &version)
     d->version = version;
 }
 
+/// Whether to annotate which items are MIX channels.
+
+bool QXmppRosterIq::mixAnnotate() const
+{
+    return d->mixAnnotate;
+}
+
+/// Sets whether to include which roster items are MIX channels. This MUST only
+/// be enabled in get requests.
+
+void QXmppRosterIq::setMixAnnotate(bool mixAnnotate)
+{
+    d->mixAnnotate = mixAnnotate;
+}
+
 /// \cond
 bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 {
@@ -93,15 +110,19 @@ bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
-    QDomElement itemElement = queryElement.firstChildElement("item");
-
     setVersion(queryElement.attribute("ver"));
+
+    QDomElement itemElement = queryElement.firstChildElement("item");
     while (!itemElement.isNull()) {
         QXmppRosterIq::Item item;
         item.parse(itemElement);
         d->items.append(item);
-        itemElement = itemElement.nextSiblingElement();
+        itemElement = itemElement.nextSiblingElement("item");
     }
+
+    QDomElement annotateElement = queryElement.firstChildElement("annotate");
+    setMixAnnotate(!annotateElement.isNull() && annotateElement.namespaceURI()
+                   == ns_mix_roster);
 }
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -112,6 +133,14 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
     if (!version().isEmpty())
         writer->writeAttribute("ver", version());
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    if (d->mixAnnotate) {
+        writer->writeStartElement("annotate");
+        writer->writeAttribute("xmlns", ns_mix_roster);
+        writer->writeEndElement();
+    }
+
     for (int i = 0; i < d->items.count(); ++i)
         d->items.at(i).toXml(writer);
     writer->writeEndElement();
@@ -127,6 +156,9 @@ public:
     // can be subscribe/unsubscribe (attribute "ask")
     QString subscriptionStatus;
     QSet<QString> groups;
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    bool isMixChannel = false;
+    QString mixParticipantId;
 };
 
 /// Constructs a new roster entry.
@@ -287,6 +319,34 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
 }
 
+/// Returns whether this is a MIX channel.
+
+bool QXmppRosterIq::Item::isMixChannel() const
+{
+    return d->isMixChannel;
+}
+
+/// Sets whether this is a MIX channel.
+
+void QXmppRosterIq::Item::setIsMixChannel(bool isMixChannel)
+{
+    d->isMixChannel = isMixChannel;
+}
+
+/// Returns the participant id for this MIX channel.
+
+QString QXmppRosterIq::Item::mixParticipantId() const
+{
+    return d->mixParticipantId;
+}
+
+/// Sets the participant id for this MIX channel.
+
+void QXmppRosterIq::Item::setMixParticipantId(const QString& participantId)
+{
+    d->mixParticipantId = participantId;
+}
+
 /// \cond
 void QXmppRosterIq::Item::parse(const QDomElement &element)
 {
@@ -299,6 +359,13 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
     while (!groupElement.isNull()) {
         d->groups << groupElement.text();
         groupElement = groupElement.nextSiblingElement("group");
+    }
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    QDomElement channelElement = element.firstChildElement("channel");
+    if (!channelElement.isNull() && channelElement.namespaceURI() == ns_mix_roster) {
+        d->isMixChannel = true;
+        d->mixParticipantId = channelElement.attribute("participant-id");
     }
 }
 
@@ -315,6 +382,15 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, "group", *i);
         ++i;
     }
+
+    // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
+    if (d->isMixChannel) {
+        writer->writeStartElement("channel");
+        writer->writeAttribute("xmlns", ns_mix_roster);
+        helperToXmlAddAttribute(writer, "participant-id", d->mixParticipantId);
+        writer->writeEndElement();
+    }
+
     writer->writeEndElement();
 }
 /// \endcond
