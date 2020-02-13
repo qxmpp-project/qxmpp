@@ -563,7 +563,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
         if (!nodeRecv.firstChildElement("conflict").isNull())
             d->xmppStreamError = QXmppStanza::Error::Conflict;
-        else if (!nodeRecv.firstChildElement("not-authorized").isNull() || !nodeRecv.firstChildElement("bad-auth").isNull())
+        else if (!nodeRecv.firstChildElement("not-authorized").isNull())
             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
         else
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
