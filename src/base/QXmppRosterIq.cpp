@@ -50,52 +50,60 @@ QXmppRosterIq::~QXmppRosterIq() = default;
 
 QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
 
+///
 /// Adds an item to the roster IQ.
 ///
 /// \param item
-
+///
 void QXmppRosterIq::addItem(const Item &item)
 {
     d->items.append(item);
 }
 
+///
 /// Returns the roster IQ's items.
-
+///
 QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 {
     return d->items;
 }
 
+///
 /// Returns the roster version of IQ.
 ///
 /// \return version as a QString
 ///
-
 QString QXmppRosterIq::version() const
 {
     return d->version;
 }
 
+///
 /// Sets the roster version of IQ.
 ///
 /// \param version as a QString
 ///
-
 void QXmppRosterIq::setVersion(const QString &version)
 {
     d->version = version;
 }
 
+///
 /// Whether to annotate which items are MIX channels.
-
+///
+/// \since QXmpp 1.3
+///
 bool QXmppRosterIq::mixAnnotate() const
 {
     return d->mixAnnotate;
 }
 
+///
 /// Sets whether to include which roster items are MIX channels. This MUST only
 /// be enabled in get requests.
-
+///
+/// \since QXmpp 1.3
+///
 void QXmppRosterIq::setMixAnnotate(bool mixAnnotate)
 {
     d->mixAnnotate = mixAnnotate;
@@ -161,8 +169,9 @@ public:
     QString mixParticipantId;
 };
 
+///
 /// Constructs a new roster entry.
-
+///
 QXmppRosterIq::Item::Item()
     : d(new ItemPrivate)
 {
@@ -175,11 +184,11 @@ QXmppRosterIq::Item::~Item() = default;
 
 QXmppRosterIq::Item &QXmppRosterIq::Item::operator=(const Item &other) = default;
 
+///
 /// Returns the bareJid of the roster entry.
 ///
 /// \return bareJid as a QString
 ///
-
 QString QXmppRosterIq::Item::bareJid() const
 {
     return d->bareJid;
@@ -189,91 +198,89 @@ QString QXmppRosterIq::Item::bareJid() const
 ///
 /// \param bareJid as a QString
 ///
-
 void QXmppRosterIq::Item::setBareJid(const QString &bareJid)
 {
     d->bareJid = bareJid;
 }
 
+///
 /// Returns the groups of the roster entry.
 ///
 /// \return QSet<QString> list of all the groups
 ///
-
 QSet<QString> QXmppRosterIq::Item::groups() const
 {
     return d->groups;
 }
 
+///
 /// Sets the groups of the roster entry.
 ///
 /// \param groups list of all the groups as a QSet<QString>
 ///
-
 void QXmppRosterIq::Item::setGroups(const QSet<QString> &groups)
 {
     d->groups = groups;
 }
 
+///
 /// Returns the name of the roster entry.
 ///
 /// \return name as a QString
 ///
-
 QString QXmppRosterIq::Item::name() const
 {
     return d->name;
 }
 
+///
 /// Sets the name of the roster entry.
 ///
 /// \param name as a QString
 ///
-
 void QXmppRosterIq::Item::setName(const QString &name)
 {
     d->name = name;
 }
 
+///
 /// Returns the subscription status of the roster entry. It is the "ask"
 /// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
 /// or empty.
 ///
 /// \return subscription status as a QString
 ///
-///
-
 QString QXmppRosterIq::Item::subscriptionStatus() const
 {
     return d->subscriptionStatus;
 }
 
+///
 /// Sets the subscription status of the roster entry. It is the "ask"
 /// attribute in the Roster IQ stanza. Its value can be "subscribe" or "unsubscribe"
 /// or empty.
 ///
 /// \param status as a QString
 ///
-
 void QXmppRosterIq::Item::setSubscriptionStatus(const QString &status)
 {
     d->subscriptionStatus = status;
 }
 
+///
 /// Returns the subscription type of the roster entry.
 ///
-
 QXmppRosterIq::Item::SubscriptionType
 QXmppRosterIq::Item::subscriptionType() const
 {
     return d->type;
 }
 
+///
 /// Sets the subscription type of the roster entry.
 ///
 /// \param type
 ///
-
 void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
 {
     d->type = type;
@@ -319,29 +326,41 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
 }
 
+///
 /// Returns whether this is a MIX channel.
-
+///
+/// \since QXmpp 1.3
+///
 bool QXmppRosterIq::Item::isMixChannel() const
 {
     return d->isMixChannel;
 }
 
+///
 /// Sets whether this is a MIX channel.
-
+///
+/// \since QXmpp 1.3
+///
 void QXmppRosterIq::Item::setIsMixChannel(bool isMixChannel)
 {
     d->isMixChannel = isMixChannel;
 }
 
+///
 /// Returns the participant id for this MIX channel.
-
+///
+/// \since QXmpp 1.3
+///
 QString QXmppRosterIq::Item::mixParticipantId() const
 {
     return d->mixParticipantId;
 }
 
+///
 /// Sets the participant id for this MIX channel.
-
+///
+/// \since QXmpp 1.3
+///
 void QXmppRosterIq::Item::setMixParticipantId(const QString& participantId)
 {
     d->mixParticipantId = participantId;
