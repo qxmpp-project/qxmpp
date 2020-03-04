@@ -1178,6 +1178,7 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
 {
 
     socket = new QUdpSocket(this);
+    socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, &QIODevice::readyRead,
             this, &QXmppTurnAllocation::readyRead);
 
@@ -2277,6 +2278,7 @@ static QList<QUdpSocket *> reservePort(const QList<QHostAddress> &addresses, qui
     QList<QUdpSocket *> sockets;
     for (const auto &address : addresses) {
         auto *socket = new QUdpSocket(parent);
+        socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
         sockets << socket;
         if (!socket->bind(address, port)) {
             qDeleteAll(sockets);
