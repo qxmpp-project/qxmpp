@@ -3,6 +3,7 @@ set -e
 
 if [ "$(uname -s)" = "Darwin" ]; then
     brew update
+    brew unlink python@2
     brew install qt
 
     case "$CONFIG" in
