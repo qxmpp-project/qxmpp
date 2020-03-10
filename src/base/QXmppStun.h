@@ -267,6 +267,7 @@ public:
     void setRemoteUser(const QString &user);
     void setRemotePassword(const QString &password);
 
+    void setStunServers(const QList<QPair<QHostAddress, quint16>> &servers);
     void setStunServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnServer(const QHostAddress &host, quint16 port = 3478);
     void setTurnUser(const QString &user);

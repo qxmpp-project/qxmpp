@@ -49,8 +49,7 @@ public:
     QXmppCall *findCall(const QString &sid, QXmppCall::Direction direction) const;
 
     QList<QXmppCall *> calls;
-    QHostAddress stunHost;
-    quint16 stunPort;
+    QList<QPair<QHostAddress, quint16>> stunServers;
     QHostAddress turnHost;
     quint16 turnPort;
     QString turnUser;
