@@ -78,7 +78,11 @@ void tst_QXmppIceConnection::testBindStun()
     connect(&client, &QXmppLoggable::logMessage,
             &logger, &QXmppLogger::log);
     client.setIceControlling(true);
-    client.setStunServer(stunInfo.addresses().first(), 19302);
+    QList<QPair<QHostAddress, quint16>> stunServers;
+    for (auto &address : stunInfo.addresses()) {
+        stunServers.push_back({address, 19302});
+    }
+    client.setStunServers(stunServers);
     client.addComponent(componentId);
 
     QXmppIceComponent *component = client.component(componentId);

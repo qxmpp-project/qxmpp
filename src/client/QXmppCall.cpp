@@ -450,7 +450,7 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
 
     // ICE connection
     stream->d->connection->setIceControlling(direction == QXmppCall::OutgoingDirection);
-    stream->d->connection->setStunServer(manager->d->stunHost, manager->d->stunPort);
+    stream->d->connection->setStunServers(manager->d->stunServers);
     stream->d->connection->setTurnServer(manager->d->turnHost, manager->d->turnPort);
     stream->d->connection->setTurnUser(manager->d->turnUser);
     stream->d->connection->setTurnPassword(manager->d->turnPassword);

@@ -1703,18 +1703,24 @@ public:
     QString localPassword;
     QString remoteUser;
     QString remotePassword;
-    QHostAddress stunHost;
-    quint16 stunPort;
+    QList<QPair<QHostAddress, quint16>> stunServers;
     QByteArray tieBreaker;
 };
 
 QXmppIcePrivate::QXmppIcePrivate()
-    : iceControlling(false), stunPort(0)
+    : iceControlling(false)
 {
     localUser = QXmppUtils::generateStanzaHash(4);
     localPassword = QXmppUtils::generateStanzaHash(22);
     tieBreaker = QXmppUtils::generateRandomBytes(8);
 }
+
+struct QXmppIceTransportDetails
+{
+    QXmppIceTransport *transport;
+    QHostAddress stunHost;
+    quint16 stunPort;
+};
 
 class QXmppIceComponentPrivate
 {
@@ -1746,7 +1752,7 @@ public:
     QTimer *timer;
 
     // STUN server
-    QMap<QXmppStunTransaction *, QXmppIceTransport *> stunTransactions;
+    QMap<QXmppStunTransaction *, QXmppIceTransportDetails> stunTransactions;
 
     // TURN server
     QXmppTurnAllocation *turnAllocation;
@@ -1850,19 +1856,19 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket *> sockets)
     }
 
     // start STUN checks
-    if (!config->stunHost.isNull() && config->stunPort) {
-        stunTransactions.clear();
-
+    stunTransactions.clear();
+    for (auto &stunServer : config->stunServers) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
         for (auto *transport : transports) {
             const QXmppJingleCandidate local = transport->localCandidate(component);
-            if (!isCompatibleAddress(local.host(), config->stunHost))
+            if (!isCompatibleAddress(local.host(), stunServer.first)) {
                 continue;
+            }
 
             request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
             auto *transaction = new QXmppStunTransaction(request, q);
-            stunTransactions.insert(transaction, transport);
+            stunTransactions.insert(transaction, {transport, stunServer.first, stunServer.second});
         }
     }
 
@@ -2027,7 +2033,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     QXmppStunTransaction *stunTransaction = nullptr;
     for (auto *t : d->stunTransactions.keys()) {
         if (t->request().id() == messageId &&
-            d->stunTransactions.value(t) == transport) {
+            d->stunTransactions.value(t).transport == transport) {
             stunTransaction = t;
             break;
         }
@@ -2208,7 +2214,7 @@ void QXmppIceComponent::transactionFinished()
     }
 
     // STUN checks
-    QXmppIceTransport *transport = d->stunTransactions.value(transaction);
+    QXmppIceTransport *transport = d->stunTransactions.value(transaction).transport;
     if (transport) {
         const QXmppStunMessage response = transaction->response();
         if (response.messageClass() == QXmppStunMessage::Response) {
@@ -2411,11 +2417,12 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
     }
 
     // STUN checks
-    QXmppIceTransport *transport = d->stunTransactions.value(transaction);
+    QXmppIceTransportDetails transportDetails = d->stunTransactions.value(transaction);
+    QXmppIceTransport *transport = transportDetails.transport;
     if (transport) {
-        transport->writeDatagram(message.encode(), d->config->stunHost, d->config->stunPort);
+        transport->writeDatagram(message.encode(), transportDetails.stunHost, transportDetails.stunPort);
 #ifdef QXMPP_DEBUG_STUN
-        logSent(QString("STUN packet to %1 port %2\n%3").arg(d->config->stunHost.toString(), QString::number(d->config->stunPort), message.toString()));
+        logSent(QString("STUN packet to %1 port %2\n%3").arg(transportDetails.stunHost.toString(), QString::number(transportDetails.stunPort), message.toString()));
 #endif
         return;
     }
@@ -2628,7 +2635,21 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
     d->remotePassword = password;
 }
 
-/// Sets the STUN server to use to determine server-reflexive addresses
+/// Sets multiple STUN servers to use to determine server-reflexive addresses
+/// and ports.
+///
+/// \note This may only be called prior to calling bind().
+///
+/// \param servers List of the STUN servers.
+///
+/// \since QXmpp 1.3
+
+void QXmppIceConnection::setStunServers(const QList<QPair<QHostAddress, quint16>> &servers)
+{
+    d->stunServers = servers;
+}
+
+/// Sets a single STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
 /// \note This may only be called prior to calling bind().
@@ -2638,8 +2659,8 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 
 void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 {
-    d->stunHost = host;
-    d->stunPort = port;
+    d->stunServers.clear();
+    d->stunServers.push_back(QPair<QHostAddress, quint16>(host, port));
 }
 
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
