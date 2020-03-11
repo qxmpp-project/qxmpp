@@ -35,6 +35,10 @@ class QXmppElement;
 class QXmppElementPrivate;
 
 using QXmppElementList = QList<QXmppElement>;
+
+///
+/// \brief QXmppElement represents a raw XML element with possible children.
+///
 class QXMPP_EXPORT QXmppElement
 {
 public:

@@ -26,6 +26,12 @@
 
 #include "QXmppIq.h"
 
+///
+/// \brief QXmppNonSASLAuthIq represents a Non-SASL authentication IQ as
+/// defined by \xep{0078}: Non-SASL Authentication.
+///
+/// \ingroup Stanzas
+///
 class QXMPP_EXPORT QXmppNonSASLAuthIq : public QXmppIq
 {
 public:

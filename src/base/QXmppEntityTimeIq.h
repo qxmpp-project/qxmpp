@@ -28,8 +28,12 @@
 
 #include <QDateTime>
 
+///
+/// \brief QXmppEntityTimeIq represents an entity time request/response as
+/// defined in \xep{0202}: Entity Time.
+///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppEntityTimeIq : public QXmppIq
 {
 public:

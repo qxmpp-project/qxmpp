@@ -27,6 +27,12 @@
 
 #include "QXmppIq.h"
 
+///
+/// \brief QXmppIbbOpenIq represents an IBB open request as defined by
+/// \xep{0047}: In-Band Bytestreams.
+///
+/// \ingroup Stanzas
+///
 class QXmppIbbOpenIq : public QXmppIq
 {
 public:
@@ -51,6 +57,12 @@ private:
     QString m_sid;
 };
 
+///
+/// \brief QXmppIbbCloseIq represents an IBB close request as defined by
+/// \xep{0047}: In-Band Bytestreams.
+///
+/// \ingroup Stanzas
+///
 class QXmppIbbCloseIq : public QXmppIq
 {
 public:
@@ -71,6 +83,12 @@ private:
     QString m_sid;
 };
 
+///
+/// \brief QXmppIbbCloseIq represents an IBB data request as defined by
+/// \xep{0047}: In-Band Bytestreams.
+///
+/// \ingroup Stanzas
+///
 class QXMPP_EXPORT QXmppIbbDataIq : public QXmppIq
 {
 public:

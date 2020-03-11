@@ -33,8 +33,12 @@
 class QXmppMamQueryIqPrivate;
 class QXmppMamResultIqPrivate;
 
+///
 /// \brief The QXmppMamQueryIq class represents the query IQ for
 /// \xep{0313}: Message Archive Management.
+///
+/// \ingroup Stanzas
+///
 class QXmppMamQueryIq : public QXmppIq
 {
 public:
@@ -63,8 +67,12 @@ private:
     QSharedDataPointer<QXmppMamQueryIqPrivate> d;
 };
 
+///
 /// \brief The QXmppMamQueryIq class represents the result IQ for
 /// \xep{0313}: Message Archive Management.
+///
+/// \ingroup Stanzas
+///
 class QXmppMamResultIq : public QXmppIq
 {
 public:

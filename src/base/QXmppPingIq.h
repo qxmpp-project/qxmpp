@@ -26,6 +26,12 @@
 
 #include "QXmppIq.h"
 
+///
+/// \brief QXmppPingIq represents a Ping IQ as defined by \xep{0199}: XMPP
+/// Ping.
+///
+/// \ingroup Stanzas
+///
 class QXMPP_EXPORT QXmppPingIq : public QXmppIq
 {
 public:

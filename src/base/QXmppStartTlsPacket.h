@@ -26,9 +26,12 @@
 
 #include "QXmppStanza.h"
 
+///
 /// \brief The QXmppStartTlsPacket represents packets used for initiating
 /// STARTTLS negotiation when connecting.
-
+///
+/// \ingroup Stanzas
+///
 class QXMPP_EXPORT QXmppStartTlsPacket : public QXmppStanza
 {
 public:
