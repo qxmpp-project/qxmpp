@@ -282,6 +282,10 @@ bool QXmppRosterManager::renameItem(const QString &bareJid, const QString &name)
     QXmppRosterIq::Item item = d->entries.value(bareJid);
     item.setName(name);
 
+    // If there is a pending subscription, do not include the corresponding attribute in the stanza.
+    if (!item.subscriptionStatus().isEmpty())
+        item.setSubscriptionStatus({});
+
     QXmppRosterIq iq;
     iq.setType(QXmppIq::Set);
     iq.addItem(item);
