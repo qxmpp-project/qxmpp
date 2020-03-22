@@ -32,14 +32,14 @@
 
 static const QStringList MIX_ACTION_TYPES = {
     QString(),
-    QStringLiteral("client-join"),
-    QStringLiteral("client-leave"),
-    QStringLiteral("join"),
-    QStringLiteral("leave"),
-    QStringLiteral("update-subscription"),
-    QStringLiteral("setnick"),
-    QStringLiteral("create"),
-    QStringLiteral("destroy")
+    QSL("client-join"),
+    QSL("client-leave"),
+    QSL("join"),
+    QSL("leave"),
+    QSL("update-subscription"),
+    QSL("setnick"),
+    QSL("create"),
+    QSL("destroy")
 };
 
 class QXmppMixIqPrivate : public QSharedData
@@ -153,23 +153,23 @@ void QXmppMixIq::parseElementFromChild(const QDomElement& element)
     d->actionType = (QXmppMixIq::Type)MIX_ACTION_TYPES.indexOf(child.tagName());
 
     if (child.namespaceURI() == ns_mix_pam) {
-        if (child.hasAttribute("channel"))
-            d->jid = child.attribute("channel");
+        if (child.hasAttribute(QSL("channel")))
+            d->jid = child.attribute(QSL("channel"));
 
         child = child.firstChildElement();
     }
 
     if (!child.isNull() && child.namespaceURI() == ns_mix) {
-        if (child.hasAttribute("jid"))
-            d->jid = child.attribute("jid");
-        if (child.hasAttribute("channel"))
-            d->channelName = child.attribute("channel");
+        if (child.hasAttribute(QSL("jid")))
+            d->jid = child.attribute(QSL("jid"));
+        if (child.hasAttribute(QSL("channel")))
+            d->channelName = child.attribute(QSL("channel"));
 
         QDomElement subChild = child.firstChildElement();
         while (!subChild.isNull()) {
-            if (subChild.tagName() == "subscribe")
-                d->nodes << subChild.attribute("node");
-            else if (subChild.tagName() == "nick")
+            if (subChild.tagName() == QSL("subscribe"))
+                d->nodes << subChild.attribute(QSL("node"));
+            else if (subChild.tagName() == QSL("nick"))
                 d->nick = subChild.text();
 
             subChild = subChild.nextSiblingElement();
@@ -186,26 +186,26 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter* writer) const
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeDefaultNamespace(ns_mix_pam);
         if (type() == Set)
-            helperToXmlAddAttribute(writer, "channel", d->jid);
+            helperToXmlAddAttribute(writer, QSL("channel"), d->jid);
 
         if (d->actionType == ClientJoin)
-            writer->writeStartElement("join");
+            writer->writeStartElement(QSL("join"));
         else if (d->actionType == ClientLeave)
-            writer->writeStartElement("leave");
+            writer->writeStartElement(QSL("leave"));
     }
 
     writer->writeDefaultNamespace(ns_mix);
-    helperToXmlAddAttribute(writer, "channel", d->channelName);
+    helperToXmlAddAttribute(writer, QSL("channel"), d->channelName);
     if (type() == Result)
-        helperToXmlAddAttribute(writer, "jid", d->jid);
+        helperToXmlAddAttribute(writer, QSL("jid"), d->jid);
 
     for (const auto& node : d->nodes) {
-        writer->writeStartElement("subscribe");
-        writer->writeAttribute("node", node);
+        writer->writeStartElement(QSL("subscribe"));
+        writer->writeAttribute(QSL("node"), node);
         writer->writeEndElement();
     }
     if (!d->nick.isEmpty())
-        writer->writeTextElement("nick", d->nick);
+        writer->writeTextElement(QSL("nick"), d->nick);
 
     writer->writeEndElement();
     if (d->actionType == ClientJoin || d->actionType == ClientLeave)

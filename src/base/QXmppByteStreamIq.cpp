@@ -121,60 +121,60 @@ void QXmppByteStreamIq::setStreamHostUsed(const QString &jid)
 /// \cond
 bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
 {
-    return element.firstChildElement("query").namespaceURI() == ns_bytestreams;
+    return element.firstChildElement(QSL("query")).namespaceURI() == ns_bytestreams;
 }
 
 void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_sid = queryElement.attribute("sid");
-    const QString modeStr = queryElement.attribute("mode");
-    if (modeStr == "tcp")
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    m_sid = queryElement.attribute(QSL("sid"));
+    const QString modeStr = queryElement.attribute(QSL("mode"));
+    if (modeStr == QSL("tcp"))
         m_mode = Tcp;
-    else if (modeStr == "udp")
+    else if (modeStr == QSL("udp"))
         m_mode = Udp;
     else
         m_mode = None;
 
-    QDomElement hostElement = queryElement.firstChildElement("streamhost");
+    QDomElement hostElement = queryElement.firstChildElement(QSL("streamhost"));
     while (!hostElement.isNull()) {
         StreamHost streamHost;
-        streamHost.setHost(hostElement.attribute("host"));
-        streamHost.setJid(hostElement.attribute("jid"));
-        streamHost.setPort(hostElement.attribute("port").toInt());
-        streamHost.setZeroconf(hostElement.attribute("zeroconf"));
+        streamHost.setHost(hostElement.attribute(QSL("host")));
+        streamHost.setJid(hostElement.attribute(QSL("jid")));
+        streamHost.setPort(hostElement.attribute(QSL("port")).toInt());
+        streamHost.setZeroconf(hostElement.attribute(QSL("zeroconf")));
         m_streamHosts.append(streamHost);
 
-        hostElement = hostElement.nextSiblingElement("streamhost");
+        hostElement = hostElement.nextSiblingElement(QSL("streamhost"));
     }
-    m_activate = queryElement.firstChildElement("activate").text();
-    m_streamHostUsed = queryElement.firstChildElement("streamhost-used").attribute("jid");
+    m_activate = queryElement.firstChildElement(QSL("activate")).text();
+    m_streamHostUsed = queryElement.firstChildElement(QSL("streamhost-used")).attribute(QSL("jid"));
 }
 
 void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL("query"));
     writer->writeDefaultNamespace(ns_bytestreams);
-    helperToXmlAddAttribute(writer, "sid", m_sid);
+    helperToXmlAddAttribute(writer, QSL("sid"), m_sid);
     QString modeStr;
     if (m_mode == Tcp)
-        modeStr = "tcp";
+        modeStr = QSL("tcp");
     else if (m_mode == Udp)
-        modeStr = "udp";
-    helperToXmlAddAttribute(writer, "mode", modeStr);
+        modeStr = QSL("udp");
+    helperToXmlAddAttribute(writer, QSL("mode"), modeStr);
     for (const auto &streamHost : m_streamHosts) {
-        writer->writeStartElement("streamhost");
-        helperToXmlAddAttribute(writer, "host", streamHost.host());
-        helperToXmlAddAttribute(writer, "jid", streamHost.jid());
-        helperToXmlAddAttribute(writer, "port", QString::number(streamHost.port()));
-        helperToXmlAddAttribute(writer, "zeroconf", streamHost.zeroconf());
+        writer->writeStartElement(QSL("streamhost"));
+        helperToXmlAddAttribute(writer, QSL("host"), streamHost.host());
+        helperToXmlAddAttribute(writer, QSL("jid"), streamHost.jid());
+        helperToXmlAddAttribute(writer, QSL("port"), QString::number(streamHost.port()));
+        helperToXmlAddAttribute(writer, QSL("zeroconf"), streamHost.zeroconf());
         writer->writeEndElement();
     }
     if (!m_activate.isEmpty())
-        helperToXmlAddTextElement(writer, "activate", m_activate);
+        helperToXmlAddTextElement(writer, QSL("activate"), m_activate);
     if (!m_streamHostUsed.isEmpty()) {
-        writer->writeStartElement("streamhost-used");
-        helperToXmlAddAttribute(writer, "jid", m_streamHostUsed);
+        writer->writeStartElement(QSL("streamhost-used"));
+        helperToXmlAddAttribute(writer, QSL("jid"), m_streamHostUsed);
         writer->writeEndElement();
     }
 

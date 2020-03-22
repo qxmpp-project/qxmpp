@@ -68,25 +68,25 @@ void QXmppBindIq::setResource(const QString &resource)
 /// \cond
 bool QXmppBindIq::isBindIq(const QDomElement &element)
 {
-    QDomElement bindElement = element.firstChildElement("bind");
+    QDomElement bindElement = element.firstChildElement(QSL("bind"));
     return (bindElement.namespaceURI() == ns_bind);
 }
 
 void QXmppBindIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement bindElement = element.firstChildElement("bind");
-    m_jid = bindElement.firstChildElement("jid").text();
-    m_resource = bindElement.firstChildElement("resource").text();
+    QDomElement bindElement = element.firstChildElement(QSL("bind"));
+    m_jid = bindElement.firstChildElement(QSL("jid")).text();
+    m_resource = bindElement.firstChildElement(QSL("resource")).text();
 }
 
 void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("bind");
+    writer->writeStartElement(QSL("bind"));
     writer->writeDefaultNamespace(ns_bind);
     if (!m_jid.isEmpty())
-        helperToXmlAddTextElement(writer, "jid", m_jid);
+        helperToXmlAddTextElement(writer, QSL("jid"), m_jid);
     if (!m_resource.isEmpty())
-        helperToXmlAddTextElement(writer, "resource", m_resource);
+        helperToXmlAddTextElement(writer, QSL("resource"), m_resource);
     writer->writeEndElement();
 }
 /// \endcond

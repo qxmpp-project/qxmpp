@@ -82,31 +82,31 @@ void QXmppVersionIq::setVersion(const QString &version)
 /// \cond
 bool QXmppVersionIq::isVersionIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
     return queryElement.namespaceURI() == ns_version;
 }
 
 void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_name = queryElement.firstChildElement("name").text();
-    m_os = queryElement.firstChildElement("os").text();
-    m_version = queryElement.firstChildElement("version").text();
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    m_name = queryElement.firstChildElement(QSL("name")).text();
+    m_os = queryElement.firstChildElement(QSL("os")).text();
+    m_version = queryElement.firstChildElement(QSL("version")).text();
 }
 
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL("query"));
     writer->writeDefaultNamespace(ns_version);
 
     if (!m_name.isEmpty())
-        helperToXmlAddTextElement(writer, "name", m_name);
+        helperToXmlAddTextElement(writer, QSL("name"), m_name);
 
     if (!m_os.isEmpty())
-        helperToXmlAddTextElement(writer, "os", m_os);
+        helperToXmlAddTextElement(writer, QSL("os"), m_os);
 
     if (!m_version.isEmpty())
-        helperToXmlAddTextElement(writer, "version", m_version);
+        helperToXmlAddTextElement(writer, QSL("version"), m_version);
 
     writer->writeEndElement();
 }

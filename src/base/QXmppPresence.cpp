@@ -30,23 +30,23 @@
 #include <QDomElement>
 
 static const QStringList PRESENCE_TYPES = {
-    QStringLiteral("error"),
+    QSL("error"),
     QString(),
-    QStringLiteral("unavailable"),
-    QStringLiteral("subscribe"),
-    QStringLiteral("subscribed"),
-    QStringLiteral("unsubscribe"),
-    QStringLiteral("unsubscribed"),
-    QStringLiteral("probe")
+    QSL("unavailable"),
+    QSL("subscribe"),
+    QSL("subscribed"),
+    QSL("unsubscribe"),
+    QSL("unsubscribed"),
+    QSL("probe")
 };
 
 static const QStringList AVAILABLE_STATUS_TYPES = {
     QString(),
-    QStringLiteral("away"),
-    QStringLiteral("xa"),
-    QStringLiteral("dnd"),
-    QStringLiteral("chat"),
-    QStringLiteral("invisible")
+    QSL("away"),
+    QSL("xa"),
+    QSL("dnd"),
+    QSL("chat"),
+    QSL("invisible")
 };
 
 class QXmppPresencePrivate : public QSharedData
@@ -389,7 +389,7 @@ void QXmppPresence::parse(const QDomElement &element)
     QXmppStanza::parse(element);
 
     // attributes
-    int type = PRESENCE_TYPES.indexOf(element.attribute(QStringLiteral("type")));
+    int type = PRESENCE_TYPES.indexOf(element.attribute(QSL("type")));
     if (type > -1)
         d->type = Type(type);
 
@@ -397,17 +397,17 @@ void QXmppPresence::parse(const QDomElement &element)
     QDomElement childElement = element.firstChildElement();
 
     while (!childElement.isNull()) {
-        if (childElement.tagName() == QStringLiteral("show")) {
+        if (childElement.tagName() == QSL("show")) {
             int availableStatusType = AVAILABLE_STATUS_TYPES.indexOf(childElement.text());
             if (availableStatusType > -1)
                 d->availableStatusType = AvailableStatusType(availableStatusType);
-        } else if (childElement.tagName() == QStringLiteral("status")) {
+        } else if (childElement.tagName() == QSL("status")) {
             d->statusText = childElement.text();
-        } else if (childElement.tagName() == QStringLiteral("priority")) {
+        } else if (childElement.tagName() == QSL("priority")) {
             d->priority = childElement.text().toInt();
             // parse presence extensions
             // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
-        } else if (!(childElement.tagName() == QStringLiteral("addresses") && childElement.namespaceURI() == ns_extended_addressing) &&
+        } else if (!(childElement.tagName() == QSL("addresses") && childElement.namespaceURI() == ns_extended_addressing) &&
                    childElement.tagName() != "error") {
             parseExtension(childElement, unknownElements);
         }
@@ -420,28 +420,28 @@ void QXmppPresence::parse(const QDomElement &element)
 void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList &unknownElements)
 {
     // XEP-0045: Multi-User Chat
-    if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc) {
+    if (element.tagName() == QSL("x") && element.namespaceURI() == ns_muc) {
         d->mucSupported = true;
-        d->mucPassword = element.firstChildElement(QStringLiteral("password")).text();
-    } else if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc_user) {
-        QDomElement itemElement = element.firstChildElement(QStringLiteral("item"));
+        d->mucPassword = element.firstChildElement(QSL("password")).text();
+    } else if (element.tagName() == QSL("x") && element.namespaceURI() == ns_muc_user) {
+        QDomElement itemElement = element.firstChildElement(QSL("item"));
         d->mucItem.parse(itemElement);
-        QDomElement statusElement = element.firstChildElement(QStringLiteral("status"));
+        QDomElement statusElement = element.firstChildElement(QSL("status"));
         d->mucStatusCodes.clear();
 
         while (!statusElement.isNull()) {
-            d->mucStatusCodes << statusElement.attribute(QStringLiteral("code")).toInt();
-            statusElement = statusElement.nextSiblingElement(QStringLiteral("status"));
+            d->mucStatusCodes << statusElement.attribute(QSL("code")).toInt();
+            statusElement = statusElement.nextSiblingElement(QSL("status"));
         }
         // XEP-0115: Entity Capabilities
-    } else if (element.tagName() == QStringLiteral("c") && element.namespaceURI() == ns_capabilities) {
-        d->capabilityNode = element.attribute(QStringLiteral("node"));
-        d->capabilityVer = QByteArray::fromBase64(element.attribute(QStringLiteral("ver")).toLatin1());
-        d->capabilityHash = element.attribute(QStringLiteral("hash"));
-        d->capabilityExt = element.attribute(QStringLiteral("ext")).split(' ', QString::SkipEmptyParts);
+    } else if (element.tagName() == QSL("c") && element.namespaceURI() == ns_capabilities) {
+        d->capabilityNode = element.attribute(QSL("node"));
+        d->capabilityVer = QByteArray::fromBase64(element.attribute(QSL("ver")).toLatin1());
+        d->capabilityHash = element.attribute(QSL("hash"));
+        d->capabilityExt = element.attribute(QSL("ext")).split(' ', QString::SkipEmptyParts);
         // XEP-0153: vCard-Based Avatars
     } else if (element.namespaceURI() == ns_vcard_update) {
-        QDomElement photoElement = element.firstChildElement(QStringLiteral("photo"));
+        QDomElement photoElement = element.firstChildElement(QSL("photo"));
         if (photoElement.isNull()) {
             d->photoHash = {};
             d->vCardUpdateType = VCardUpdateNotReady;
@@ -453,15 +453,15 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
                 d->vCardUpdateType = VCardUpdateValidPhoto;
         }
         // XEP-0319: Last User Interaction in Presence
-    } else if (element.tagName() == QStringLiteral("idle") && element.namespaceURI() == ns_idle) {
-        if (element.hasAttribute(QStringLiteral("since"))) {
-            const QString since = element.attribute(QStringLiteral("since"));
+    } else if (element.tagName() == QSL("idle") && element.namespaceURI() == ns_idle) {
+        if (element.hasAttribute(QSL("since"))) {
+            const QString since = element.attribute(QSL("since"));
             d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
         }
         // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
-    } else if (element.tagName() == QStringLiteral("mix") && element.namespaceURI() == ns_mix_presence) {
-        d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
-        d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
+    } else if (element.tagName() == QSL("mix") && element.namespaceURI() == ns_mix_presence) {
+        d->mixUserJid = element.firstChildElement(QSL("jid")).text();
+        d->mixUserNick = element.firstChildElement(QSL("nick")).text();
     } else {
         unknownElements << element;
     }
@@ -469,40 +469,40 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
 
 void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    xmlWriter->writeStartElement(QStringLiteral("presence"));
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("xml:lang"), lang());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("id"), id());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("to"), to());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("from"), from());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), PRESENCE_TYPES.at(d->type));
+    xmlWriter->writeStartElement(QSL("presence"));
+    helperToXmlAddAttribute(xmlWriter, QSL("xml:lang"), lang());
+    helperToXmlAddAttribute(xmlWriter, QSL("id"), id());
+    helperToXmlAddAttribute(xmlWriter, QSL("to"), to());
+    helperToXmlAddAttribute(xmlWriter, QSL("from"), from());
+    helperToXmlAddAttribute(xmlWriter, QSL("type"), PRESENCE_TYPES.at(d->type));
 
     const QString show = AVAILABLE_STATUS_TYPES.at(d->availableStatusType);
     if (!show.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("show"), show);
+        helperToXmlAddTextElement(xmlWriter, QSL("show"), show);
     if (!d->statusText.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("status"), d->statusText);
+        helperToXmlAddTextElement(xmlWriter, QSL("status"), d->statusText);
     if (d->priority != 0)
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("priority"), QString::number(d->priority));
+        helperToXmlAddTextElement(xmlWriter, QSL("priority"), QString::number(d->priority));
 
     error().toXml(xmlWriter);
 
     // XEP-0045: Multi-User Chat
     if (d->mucSupported) {
-        xmlWriter->writeStartElement(QStringLiteral("x"));
+        xmlWriter->writeStartElement(QSL("x"));
         xmlWriter->writeDefaultNamespace(ns_muc);
         if (!d->mucPassword.isEmpty())
-            xmlWriter->writeTextElement(QStringLiteral("password"), d->mucPassword);
+            xmlWriter->writeTextElement(QSL("password"), d->mucPassword);
         xmlWriter->writeEndElement();
     }
 
     if (!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty()) {
-        xmlWriter->writeStartElement(QStringLiteral("x"));
+        xmlWriter->writeStartElement(QSL("x"));
         xmlWriter->writeDefaultNamespace(ns_muc_user);
         if (!d->mucItem.isNull())
             d->mucItem.toXml(xmlWriter);
         for (const auto code : d->mucStatusCodes) {
-            xmlWriter->writeStartElement(QStringLiteral("status"));
-            xmlWriter->writeAttribute(QStringLiteral("code"), QString::number(code));
+            xmlWriter->writeStartElement(QSL("status"));
+            xmlWriter->writeAttribute(QSL("code"), QString::number(code));
             xmlWriter->writeEndElement();
         }
         xmlWriter->writeEndElement();
@@ -512,24 +512,24 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (!d->capabilityNode.isEmpty() &&
         !d->capabilityVer.isEmpty() &&
         !d->capabilityHash.isEmpty()) {
-        xmlWriter->writeStartElement(QStringLiteral("c"));
+        xmlWriter->writeStartElement(QSL("c"));
         xmlWriter->writeDefaultNamespace(ns_capabilities);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("hash"), d->capabilityHash);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("node"), d->capabilityNode);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("ver"), d->capabilityVer.toBase64());
+        helperToXmlAddAttribute(xmlWriter, QSL("hash"), d->capabilityHash);
+        helperToXmlAddAttribute(xmlWriter, QSL("node"), d->capabilityNode);
+        helperToXmlAddAttribute(xmlWriter, QSL("ver"), d->capabilityVer.toBase64());
         xmlWriter->writeEndElement();
     }
 
     // XEP-0153: vCard-Based Avatars
     if (d->vCardUpdateType != VCardUpdateNone) {
-        xmlWriter->writeStartElement(QStringLiteral("x"));
+        xmlWriter->writeStartElement(QSL("x"));
         xmlWriter->writeDefaultNamespace(ns_vcard_update);
         switch (d->vCardUpdateType) {
         case VCardUpdateNoPhoto:
-            xmlWriter->writeEmptyElement(QStringLiteral("photo"));
+            xmlWriter->writeEmptyElement(QSL("photo"));
             break;
         case VCardUpdateValidPhoto:
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("photo"), d->photoHash.toHex());
+            helperToXmlAddTextElement(xmlWriter, QSL("photo"), d->photoHash.toHex());
             break;
         default:
             break;
@@ -539,20 +539,20 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     // XEP-0319: Last User Interaction in Presence
     if (!d->lastUserInteraction.isNull() && d->lastUserInteraction.isValid()) {
-        xmlWriter->writeStartElement(QStringLiteral("idle"));
+        xmlWriter->writeStartElement(QSL("idle"));
         xmlWriter->writeDefaultNamespace(ns_idle);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("since"), QXmppUtils::datetimeToString(d->lastUserInteraction));
+        helperToXmlAddAttribute(xmlWriter, QSL("since"), QXmppUtils::datetimeToString(d->lastUserInteraction));
         xmlWriter->writeEndElement();
     }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
-        xmlWriter->writeStartElement(QStringLiteral("mix"));
+        xmlWriter->writeStartElement(QSL("mix"));
         xmlWriter->writeDefaultNamespace(ns_mix_presence);
         if (!d->mixUserJid.isEmpty())
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
+            helperToXmlAddTextElement(xmlWriter, QSL("jid"), d->mixUserJid);
         if (!d->mixUserNick.isEmpty())
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
+            helperToXmlAddTextElement(xmlWriter, QSL("nick"), d->mixUserNick);
         xmlWriter->writeEndElement();
     }
 

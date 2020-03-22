@@ -178,7 +178,7 @@ void QXmppBookmarkSet::setUrls(const QList<QXmppBookmarkUrl> &urls)
 /// \cond
 bool QXmppBookmarkSet::isBookmarkSet(const QDomElement &element)
 {
-    return element.tagName() == "storage" &&
+    return element.tagName() == QSL("storage") &&
         element.namespaceURI() == ns_bookmarks;
 }
 
@@ -186,17 +186,17 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
 {
     QDomElement childElement = element.firstChildElement();
     while (!childElement.isNull()) {
-        if (childElement.tagName() == "conference") {
+        if (childElement.tagName() == QSL("conference")) {
             QXmppBookmarkConference conference;
-            conference.setAutoJoin(childElement.attribute("autojoin") == "true" || childElement.attribute("autojoin") == "1");
-            conference.setJid(childElement.attribute("jid"));
-            conference.setName(childElement.attribute("name"));
-            conference.setNickName(childElement.firstChildElement("nick").text());
+            conference.setAutoJoin(childElement.attribute(QSL("autojoin")) == QSL("true") || childElement.attribute("autojoin") == "1");
+            conference.setJid(childElement.attribute(QSL("jid")));
+            conference.setName(childElement.attribute(QSL("name")));
+            conference.setNickName(childElement.firstChildElement(QSL("nick")).text());
             m_conferences << conference;
-        } else if (childElement.tagName() == "url") {
+        } else if (childElement.tagName() == QSL("url")) {
             QXmppBookmarkUrl url;
-            url.setName(childElement.attribute("name"));
-            url.setUrl(childElement.attribute("url"));
+            url.setName(childElement.attribute(QSL("name")));
+            url.setUrl(childElement.attribute(QSL("url")));
             m_urls << url;
         }
         childElement = childElement.nextSiblingElement();
@@ -205,22 +205,22 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
 
 void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("storage");
+    writer->writeStartElement(QSL("storage"));
     writer->writeDefaultNamespace(ns_bookmarks);
     for (const auto &conference : m_conferences) {
-        writer->writeStartElement("conference");
+        writer->writeStartElement(QSL("conference"));
         if (conference.autoJoin())
-            helperToXmlAddAttribute(writer, "autojoin", "true");
-        helperToXmlAddAttribute(writer, "jid", conference.jid());
-        helperToXmlAddAttribute(writer, "name", conference.name());
+            helperToXmlAddAttribute(writer, QSL("autojoin"), QSL("true"));
+        helperToXmlAddAttribute(writer, QSL("jid"), conference.jid());
+        helperToXmlAddAttribute(writer, QSL("name"), conference.name());
         if (!conference.nickName().isEmpty())
-            helperToXmlAddTextElement(writer, "nick", conference.nickName());
+            helperToXmlAddTextElement(writer, QSL("nick"), conference.nickName());
         writer->writeEndElement();
     }
     for (const auto &url : m_urls) {
-        writer->writeStartElement("url");
-        helperToXmlAddAttribute(writer, "name", url.name());
-        helperToXmlAddAttribute(writer, "url", url.url().toString());
+        writer->writeStartElement(QSL("url"));
+        helperToXmlAddAttribute(writer, QSL("name"), url.name());
+        helperToXmlAddAttribute(writer, QSL("url"), url.url().toString());
         writer->writeEndElement();
     }
     writer->writeEndElement();

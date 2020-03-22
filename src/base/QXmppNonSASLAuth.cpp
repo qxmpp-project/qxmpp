@@ -78,31 +78,31 @@ void QXmppNonSASLAuthIq::setResource(const QString &resource)
 /// \cond
 bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
     return queryElement.namespaceURI() == ns_auth;
 }
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_username = queryElement.firstChildElement("username").text();
-    m_password = queryElement.firstChildElement("password").text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toLatin1());
-    m_resource = queryElement.firstChildElement("resource").text();
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    m_username = queryElement.firstChildElement(QSL("username")).text();
+    m_password = queryElement.firstChildElement(QSL("password")).text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement(QSL("digest")).text().toLatin1());
+    m_resource = queryElement.firstChildElement(QSL("resource")).text();
 }
 
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL("query"));
     writer->writeDefaultNamespace(ns_auth);
     if (!m_username.isEmpty())
-        writer->writeTextElement("username", m_username);
+        writer->writeTextElement(QSL("username"), m_username);
     if (!m_digest.isEmpty())
-        writer->writeTextElement("digest", m_digest.toHex());
+        writer->writeTextElement(QSL("digest"), m_digest.toHex());
     if (!m_password.isEmpty())
-        writer->writeTextElement("password", m_password);
+        writer->writeTextElement(QSL("password"), m_password);
     if (!m_resource.isEmpty())
-        writer->writeTextElement("resource", m_resource);
+        writer->writeTextElement(QSL("resource"), m_resource);
     writer->writeEndElement();
 }
 /// \endcond

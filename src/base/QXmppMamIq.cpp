@@ -107,8 +107,8 @@ void QXmppMamQueryIq::setQueryId(const QString &id)
 /// \cond
 bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement queryElement = element.firstChildElement("query");
+    if (element.tagName() == QSL("iq")) {
+        QDomElement queryElement = element.firstChildElement(QSL("query"));
         if (!queryElement.isNull() && queryElement.namespaceURI() == ns_mam) {
             return true;
         }
@@ -118,14 +118,14 @@ bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 
 void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    d->node = queryElement.attribute("node");
-    d->queryId = queryElement.attribute("queryId");
-    QDomElement resultSetElement = queryElement.firstChildElement("set");
+    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    d->node = queryElement.attribute(QSL("node"));
+    d->queryId = queryElement.attribute(QSL("queryId"));
+    QDomElement resultSetElement = queryElement.firstChildElement(QSL("set"));
     if (!resultSetElement.isNull()) {
         d->resultSetQuery.parse(resultSetElement);
     }
-    QDomElement formElement = queryElement.firstChildElement("x");
+    QDomElement formElement = queryElement.firstChildElement(QSL("x"));
     if (!formElement.isNull()) {
         d->form.parse(formElement);
     }
@@ -133,13 +133,13 @@ void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL("query"));
     writer->writeDefaultNamespace(ns_mam);
     if (!d->node.isEmpty()) {
-        writer->writeAttribute("node", d->node);
+        writer->writeAttribute(QSL("node"), d->node);
     }
     if (!d->queryId.isEmpty()) {
-        writer->writeAttribute("queryid", d->queryId);
+        writer->writeAttribute(QSL("queryid"), d->queryId);
     }
     d->form.toXml(writer);
     d->resultSetQuery.toXml(writer);
@@ -195,8 +195,8 @@ void QXmppMamResultIq::setComplete(bool complete)
 /// \cond
 bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement finElement = element.firstChildElement("fin");
+    if (element.tagName() == QSL("iq")) {
+        QDomElement finElement = element.firstChildElement(QSL("fin"));
         if (!finElement.isNull() && finElement.namespaceURI() == ns_mam) {
             return true;
         }
@@ -206,9 +206,9 @@ bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 
 void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement finElement = element.firstChildElement("fin");
-    d->complete = finElement.attribute("complete") == QString("true");
-    QDomElement resultSetElement = finElement.firstChildElement("set");
+    QDomElement finElement = element.firstChildElement(QSL("fin"));
+    d->complete = finElement.attribute(QSL("complete")) == QSL("true");
+    QDomElement resultSetElement = finElement.firstChildElement(QSL("set"));
     if (!resultSetElement.isNull()) {
         d->resultSetReply.parse(resultSetElement);
     }
@@ -216,10 +216,10 @@ void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("fin");
+    writer->writeStartElement(QSL("fin"));
     writer->writeDefaultNamespace(ns_mam);
     if (d->complete) {
-        writer->writeAttribute("complete", "true");
+        writer->writeAttribute(QSL("complete"), QSL("true"));
     }
     d->resultSetReply.toXml(writer);
     writer->writeEndElement();

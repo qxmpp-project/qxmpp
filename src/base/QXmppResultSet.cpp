@@ -117,15 +117,15 @@ bool QXmppResultSetQuery::isNull() const
 /// \cond
 void QXmppResultSetQuery::parse(const QDomElement& element)
 {
-    QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
+    QDomElement setElement = (element.tagName() == QSL("set")) ? element : element.firstChildElement(QSL("set"));
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
-        m_max = setElement.firstChildElement("max").text().toInt(&ok);
+        m_max = setElement.firstChildElement(QSL("max")).text().toInt(&ok);
         if (!ok)
             m_max = -1;
-        m_after = setElement.firstChildElement("after").text();
-        m_before = setElement.firstChildElement("before").text();
-        m_index = setElement.firstChildElement("index").text().toInt(&ok);
+        m_after = setElement.firstChildElement(QSL("after")).text();
+        m_before = setElement.firstChildElement(QSL("before")).text();
+        m_index = setElement.firstChildElement(QSL("index")).text().toInt(&ok);
         if (!ok)
             m_index = -1;
     }
@@ -135,16 +135,16 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
 {
     if (isNull())
         return;
-    writer->writeStartElement("set");
+    writer->writeStartElement(QSL("set"));
     writer->writeDefaultNamespace(ns_rsm);
     if (m_max >= 0)
-        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
+        helperToXmlAddTextElement(writer, QSL("max"), QString::number(m_max));
     if (!m_after.isNull())
-        helperToXmlAddTextElement(writer, "after", m_after);
+        helperToXmlAddTextElement(writer, QSL("after"), m_after);
     if (!m_before.isNull())
-        helperToXmlAddTextElement(writer, "before", m_before);
+        helperToXmlAddTextElement(writer, QSL("before"), m_before);
     if (m_index >= 0)
-        helperToXmlAddTextElement(writer, "index", QString::number(m_index));
+        helperToXmlAddTextElement(writer, QSL("index"), QString::number(m_index));
     writer->writeEndElement();
 }
 /// \endcond

@@ -30,15 +30,15 @@
 #include <QSharedData>
 
 static const QStringList PUBSUB_QUERIES = {
-    QStringLiteral("affiliations"),
-    QStringLiteral("default"),
-    QStringLiteral("items"),
-    QStringLiteral("publish"),
-    QStringLiteral("retract"),
-    QStringLiteral("subscribe"),
-    QStringLiteral("subscription"),
-    QStringLiteral("subscriptions"),
-    QStringLiteral("unsubscribe"),
+    QSL("affiliations"),
+    QSL("default"),
+    QSL("items"),
+    QSL("publish"),
+    QSL("retract"),
+    QSL("subscribe"),
+    QSL("subscription"),
+    QSL("subscriptions"),
+    QSL("unsubscribe"),
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
@@ -153,12 +153,12 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 /// \cond
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
-    return element.firstChildElement("pubsub").namespaceURI() == ns_pubsub;
+    return element.firstChildElement(QSL("pubsub")).namespaceURI() == ns_pubsub;
 }
 
 void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 {
-    const QDomElement pubSubElement = element.firstChildElement("pubsub");
+    const QDomElement pubSubElement = element.firstChildElement(QSL("pubsub"));
 
     const QDomElement queryElement = pubSubElement.firstChildElement();
 
@@ -168,8 +168,8 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     if (queryType > -1)
         d->queryType = QueryType(queryType);
 
-    d->queryJid = queryElement.attribute("jid");
-    d->queryNode = queryElement.attribute("node");
+    d->queryJid = queryElement.attribute(QSL("jid"));
+    d->queryNode = queryElement.attribute(QSL("node"));
 
     // parse contents
     QDomElement childElement;
@@ -177,17 +177,17 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
-        childElement = queryElement.firstChildElement("item");
+        childElement = queryElement.firstChildElement(QSL("item"));
         while (!childElement.isNull()) {
             QXmppPubSubItem item;
             item.parse(childElement);
             d->items << item;
-            childElement = childElement.nextSiblingElement("item");
+            childElement = childElement.nextSiblingElement(QSL("item"));
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        d->subscriptionId = queryElement.attribute("subid");
-        d->subscriptionType = queryElement.attribute("subscription");
+        d->subscriptionId = queryElement.attribute(QSL("subid"));
+        d->subscriptionType = queryElement.attribute(QSL("subscription"));
         break;
     default:
         break;
@@ -196,13 +196,13 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("pubsub");
+    writer->writeStartElement(QSL("pubsub"));
     writer->writeDefaultNamespace(ns_pubsub);
 
     // write query type
     writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-    helperToXmlAddAttribute(writer, "jid", d->queryJid);
-    helperToXmlAddAttribute(writer, "node", d->queryNode);
+    helperToXmlAddAttribute(writer, QSL("jid"), d->queryJid);
+    helperToXmlAddAttribute(writer, QSL("node"), d->queryNode);
 
     // write contents
     switch (d->queryType) {
@@ -213,8 +213,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
             item.toXml(writer);
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        helperToXmlAddAttribute(writer, "subid", d->subscriptionId);
-        helperToXmlAddAttribute(writer, "subscription", d->subscriptionType);
+        helperToXmlAddAttribute(writer, QSL("subid"), d->subscriptionId);
+        helperToXmlAddAttribute(writer, QSL("subscription"), d->subscriptionType);
         break;
     default:
         break;
