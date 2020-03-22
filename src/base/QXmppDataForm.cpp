@@ -694,14 +694,14 @@ void QXmppDataForm::parse(const QDomElement &element)
             field.mediaSize().setHeight(mediaElement.attribute("height", "-1").toInt());
             field.mediaSize().setWidth(mediaElement.attribute("width", "-1").toInt());
 
-            QDomElement uriElement = mediaElement.firstChildElement(QStringLiteral("uri"));
+            QDomElement uriElement = mediaElement.firstChildElement(QSL("uri"));
 
             while (!uriElement.isNull()) {
                 field.mediaSources() << MediaSource(
                     QUrl(uriElement.text()),
                     QMimeDatabase().mimeTypeForName(
-                        uriElement.attribute(QStringLiteral("type"))));
-                uriElement = uriElement.nextSiblingElement(QStringLiteral("uri"));
+                        uriElement.attribute(QSL("type"))));
+                uriElement = uriElement.nextSiblingElement(QSL("uri"));
             }
         }
 
@@ -794,18 +794,18 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             if (field.mediaSize().width() > 0)
                 helperToXmlAddAttribute(
                     writer,
-                    QStringLiteral("width"),
+                    QSL("width"),
                     QString::number(field.mediaSize().width()));
             if (field.mediaSize().height() > 0)
                 helperToXmlAddAttribute(
                     writer,
-                    QStringLiteral("height"),
+                    QSL("height"),
                     QString::number(field.mediaSize().height()));
 
             const QVector<MediaSource> &sources = field.mediaSources();
             for (const auto &source : sources) {
-                writer->writeStartElement(QStringLiteral("uri"));
-                helperToXmlAddAttribute(writer, QStringLiteral("type"), source.contentType().name());
+                writer->writeStartElement(QSL("uri"));
+                helperToXmlAddAttribute(writer, QSL("type"), source.contentType().name());
                 writer->writeCharacters(source.uri().toString());
                 writer->writeEndElement();
             }

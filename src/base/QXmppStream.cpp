@@ -41,7 +41,7 @@
 #include <QXmlStreamWriter>
 
 static bool randomSeeded = false;
-static const QByteArray streamRootElementEnd = "</stream:stream>";
+static const QByteArray streamRootElementEnd = QBL("</stream:stream>");
 
 class QXmppStreamPrivate
 {
@@ -190,7 +190,7 @@ void QXmppStream::setSocket(QSslSocket *socket)
 
 void QXmppStream::_q_socketConnected()
 {
-    info(QString("Socket connected to %1 %2").arg(d->socket->peerAddress().toString(), QString::number(d->socket->peerPort())));
+    info(QSL("Socket connected to %1 %2").arg(d->socket->peerAddress().toString(), QString::number(d->socket->peerPort())));
     handleStart();
 }
 
@@ -203,7 +203,7 @@ void QXmppStream::_q_socketEncrypted()
 void QXmppStream::_q_socketError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
-    warning(QString("Socket error: " + socket()->errorString()));
+    warning(QSL("Socket error: ") + socket()->errorString());
 }
 
 void QXmppStream::_q_socketReadyRead()

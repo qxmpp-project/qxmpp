@@ -137,21 +137,21 @@ bool QXmppExtendedAddress::isValid() const
 /// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
-    d->delivered = element.attribute("delivered") == "true";
-    d->description = element.attribute("desc");
-    d->jid = element.attribute("jid");
-    d->type = element.attribute("type");
+    d->delivered = element.attribute(QSL("delivered")) == QSL("true");
+    d->description = element.attribute(QSL("desc"));
+    d->jid = element.attribute(QSL("jid"));
+    d->type = element.attribute(QSL("type"));
 }
 
 void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    xmlWriter->writeStartElement("address");
+    xmlWriter->writeStartElement(QSL("address"));
     if (d->delivered)
-        xmlWriter->writeAttribute("delivered", "true");
+        xmlWriter->writeAttribute(QSL("delivered"), QSL("true"));
     if (!d->description.isEmpty())
-        xmlWriter->writeAttribute("desc", d->description);
-    xmlWriter->writeAttribute("jid", d->jid);
-    xmlWriter->writeAttribute("type", d->type);
+        xmlWriter->writeAttribute(QSL("desc"), d->description);
+    xmlWriter->writeAttribute(QSL("jid"), d->jid);
+    xmlWriter->writeAttribute(QSL("type"), d->type);
     xmlWriter->writeEndElement();
 }
 /// \endcond
@@ -347,15 +347,15 @@ QString QXmppStanza::Error::getTypeStr() const
 {
     switch (d->type) {
     case Cancel:
-        return "cancel";
+        return QSL("cancel");
     case Continue:
-        return "continue";
+        return QSL("continue");
     case Modify:
-        return "modify";
+        return QSL("modify");
     case Auth:
-        return "auth";
+        return QSL("auth");
     case Wait:
-        return "wait";
+        return QSL("wait");
     default:
         return {};
     }
@@ -368,15 +368,15 @@ QString QXmppStanza::Error::getConditionStr() const
 
 void QXmppStanza::Error::setTypeFromStr(const QString &type)
 {
-    if (type == "cancel")
+    if (type == QSL("cancel"))
         setType(Cancel);
-    else if (type == "continue")
+    else if (type == QSL("continue"))
         setType(Continue);
-    else if (type == "modify")
+    else if (type == QSL("modify"))
         setType(Modify);
-    else if (type == "auth")
+    else if (type == QSL("auth"))
         setType(Auth);
-    else if (type == "wait")
+    else if (type == QSL("wait"))
         setType(Wait);
     else
         setType(static_cast<QXmppStanza::Error::Type>(-1));
@@ -389,28 +389,28 @@ void QXmppStanza::Error::setConditionFromStr(const QString &type)
 
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
-    setCode(errorElement.attribute("code").toInt());
-    setTypeFromStr(errorElement.attribute("type"));
+    setCode(errorElement.attribute(QSL("code")).toInt());
+    setTypeFromStr(errorElement.attribute(QSL("type")));
 
     QDomElement element = errorElement.firstChildElement();
     while (!element.isNull()) {
         if (element.namespaceURI() == ns_stanza) {
-            if (element.tagName() == "text")
+            if (element.tagName() == QSL("text"))
                 setText(element.text());
             else
                 setConditionFromStr(element.tagName());
             // XEP-0363: HTTP File Upload
         } else if (element.namespaceURI() == ns_http_upload) {
             // file is too large
-            if (element.tagName() == "file-too-large") {
+            if (element.tagName() == QSL("file-too-large")) {
                 d->fileTooLarge = true;
-                d->maxFileSize = element.firstChildElement("max-file-size")
+                d->maxFileSize = element.firstChildElement(QSL("max-file-size"))
                                      .text()
                                      .toLongLong();
                 // retry later
-            } else if (element.tagName() == "retry") {
+            } else if (element.tagName() == QSL("retry")) {
                 d->retryDate = QXmppUtils::datetimeFromString(
-                    element.attribute("stamp"));
+                    element.attribute(QSL("stamp")));
             }
         }
         element = element.nextSiblingElement();
@@ -425,11 +425,11 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     if (cond.isEmpty() && type.isEmpty())
         return;
 
-    writer->writeStartElement("error");
-    helperToXmlAddAttribute(writer, "type", type);
+    writer->writeStartElement(QSL("error"));
+    helperToXmlAddAttribute(writer, QSL("type"), type);
 
     if (d->code > 0)
-        helperToXmlAddAttribute(writer, "code", QString::number(d->code));
+        helperToXmlAddAttribute(writer, QSL("code"), QString::number(d->code));
 
     if (!cond.isEmpty()) {
         writer->writeStartElement(cond);
@@ -437,8 +437,8 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
     if (!d->text.isEmpty()) {
-        writer->writeStartElement("text");
-        writer->writeAttribute("xml:lang", "en");
+        writer->writeStartElement(QSL("text"));
+        writer->writeAttribute(QSL("xml:lang"), QSL("en"));
         writer->writeDefaultNamespace(ns_stanza);
         writer->writeCharacters(d->text);
         writer->writeEndElement();
@@ -446,15 +446,15 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 
     // XEP-0363: HTTP File Upload
     if (d->fileTooLarge) {
-        writer->writeStartElement("file-too-large");
+        writer->writeStartElement(QSL("file-too-large"));
         writer->writeDefaultNamespace(ns_http_upload);
-        helperToXmlAddTextElement(writer, "max-file-size",
+        helperToXmlAddTextElement(writer, QSL("max-file-size"),
                                   QString::number(d->maxFileSize));
         writer->writeEndElement();
     } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {
-        writer->writeStartElement("retry");
+        writer->writeStartElement(QSL("retry"));
         writer->writeDefaultNamespace(ns_http_upload);
-        writer->writeAttribute("stamp",
+        writer->writeAttribute(QSL("stamp"),
                                QXmppUtils::datetimeToString(d->retryDate));
         writer->writeEndElement();
     }

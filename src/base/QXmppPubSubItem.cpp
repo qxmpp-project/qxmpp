@@ -81,14 +81,14 @@ void QXmppPubSubItem::setContents(const QXmppElement &contents)
 /// \cond
 void QXmppPubSubItem::parse(const QDomElement &element)
 {
-    d->id = element.attribute("id");
+    d->id = element.attribute(QSL("id"));
     d->contents = QXmppElement(element.firstChildElement());
 }
 
 void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("item");
-    helperToXmlAddAttribute(writer, "id", d->id);
+    writer->writeStartElement(QSL("item"));
+    helperToXmlAddAttribute(writer, QSL("id"), d->id);
     d->contents.toXml(writer);
     writer->writeEndElement();
 }
