@@ -4,7 +4,6 @@ set -e
 if [ "$(uname -s)" = "Darwin" ]; then
     brew update
     brew unlink python@2
-    brew install qt
 
     case "$CONFIG" in
     full*)
@@ -13,7 +12,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
     esac
 else
     sudo apt-get update -qq
-    sudo apt-get install -qq clang cmake qtbase5-dev
+    sudo apt-get install -qq clang cmake
 
     case "$CONFIG" in
     full*)

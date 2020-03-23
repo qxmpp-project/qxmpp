@@ -1,0 +1,29 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+
+  test:
+    runs-on: ${{ matrix.os }}
+    env:
+      CONFIG: ${{ matrix.config }}
+    strategy:
+      matrix:
+        config: [minimal, full, full-debug]
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+      - name: Install extra packages
+        run: tests/travis/install-build-depends
+      - name: Disable OS X firewall
+        if: matrix.os == 'macos-latest'
+        run: |
+          sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
+      - name: Run tests
+        run: tests/travis/build-and-test
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
