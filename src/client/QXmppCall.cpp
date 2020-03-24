@@ -615,7 +615,7 @@ GstElement *QXmppCall::pipeline() const
 
 /// Returns the RTP stream for the audio data.
 ///
-/// \since QXmpp 1.2
+/// \since QXmpp 1.3
 
 QXmppCallStream *QXmppCall::audioStream() const
 {
@@ -624,7 +624,7 @@ QXmppCallStream *QXmppCall::audioStream() const
 
 /// Returns the RTP stream for the video data.
 ///
-/// \since QXmpp 1.2
+/// \since QXmpp 1.3
 
 QXmppCallStream *QXmppCall::videoStream() const
 {
