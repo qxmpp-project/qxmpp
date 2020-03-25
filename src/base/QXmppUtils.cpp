@@ -32,6 +32,9 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDomElement>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QRandomGenerator>
+#endif
 #include <QRegExp>
 #include <QString>
 #include <QStringList>
@@ -280,8 +283,13 @@ int QXmppUtils::generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    while (N <= (val = QRandomGenerator::global()->generate() / (RAND_MAX / N))) {
+    }
+#else
     while (N <= (val = qrand() / (RAND_MAX / N))) {
-    };
+    }
+#endif
     return val;
 }
 
