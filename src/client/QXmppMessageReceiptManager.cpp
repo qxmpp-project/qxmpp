@@ -64,11 +64,7 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     }
 
     // If requested, send a receipt.
-    if (message.isReceiptRequested() 
-        && !message.from().isEmpty() 
-        && !message.id().isEmpty() 
-        && message.type() != QXmppMessage::Error
-    ) {
+    if (message.isReceiptRequested() && !message.from().isEmpty() && !message.id().isEmpty() && message.type() != QXmppMessage::Error) {
         QXmppMessage receipt;
         receipt.setTo(message.from());
         receipt.setReceiptId(message.id());
