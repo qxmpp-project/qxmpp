@@ -91,10 +91,3 @@ it so that we can fix it. Before reporting a bug, please check if the issue
 is already know at:
 
 https://github.com/qxmpp-project/qxmpp/issues
-
-Discussion Group
-================
-
-Join QXmpp Discussion Group for queries, discussions and updates.
-
-https://groups.google.com/forum/#!forum/qxmpp
