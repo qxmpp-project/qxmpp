@@ -129,8 +129,7 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
     }
 
     QDomElement annotateElement = queryElement.firstChildElement(QSL("annotate"));
-    setMixAnnotate(!annotateElement.isNull() && annotateElement.namespaceURI()
-                   == ns_mix_roster);
+    setMixAnnotate(!annotateElement.isNull() && annotateElement.namespaceURI() == ns_mix_roster);
 }
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -310,7 +309,7 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 
 void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
-    if (type.isEmpty() && !type.isNull()) // TODO CHECK
+    if (type.isEmpty() && !type.isNull())  // TODO CHECK
         setSubscriptionType(NotSet);
     else if (type == QSL("none"))
         setSubscriptionType(None);
@@ -361,7 +360,7 @@ QString QXmppRosterIq::Item::mixParticipantId() const
 ///
 /// \since QXmpp 1.3
 ///
-void QXmppRosterIq::Item::setMixParticipantId(const QString& participantId)
+void QXmppRosterIq::Item::setMixParticipantId(const QString &participantId)
 {
     d->mixParticipantId = participantId;
 }

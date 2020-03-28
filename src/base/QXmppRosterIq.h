@@ -84,7 +84,7 @@ public:
         void setIsMixChannel(bool);
 
         QString mixParticipantId() const;
-        void setMixParticipantId(const QString&);
+        void setMixParticipantId(const QString &);
 
         /// \cond
         void parse(const QDomElement &element);

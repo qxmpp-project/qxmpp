@@ -629,7 +629,7 @@ QString QXmppMessage::stanzaId() const
 ///
 /// \since QXmpp 1.3
 ///
-void QXmppMessage::setStanzaId(const QString& id)
+void QXmppMessage::setStanzaId(const QString &id)
 {
     d->stanzaId = id;
 }

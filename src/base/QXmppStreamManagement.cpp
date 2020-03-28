@@ -22,10 +22,9 @@
  */
 
 #include "QXmppConstants_p.h"
+#include "QXmppGlobal.h"
 #include "QXmppStanza_p.h"
 #include "QXmppStreamManagement_p.h"
-
-#include "QXmppGlobal.h"
 
 QXmppStreamManagementEnable::QXmppStreamManagementEnable(const bool resume, const unsigned max)
     : m_resume(resume), m_max(max)

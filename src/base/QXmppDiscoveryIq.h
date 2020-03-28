@@ -83,7 +83,7 @@ public:
         Item();
         Item(const Item &);
         ~Item();
-        
+
         Item &operator=(const Item &);
 
         QString jid() const;

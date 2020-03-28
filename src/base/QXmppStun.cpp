@@ -1715,8 +1715,7 @@ QXmppIcePrivate::QXmppIcePrivate()
     tieBreaker = QXmppUtils::generateRandomBytes(8);
 }
 
-struct QXmppIceTransportDetails
-{
+struct QXmppIceTransportDetails {
     QXmppIceTransport *transport;
     QHostAddress stunHost;
     quint16 stunPort;
@@ -1868,7 +1867,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket *> sockets)
 
             request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
             auto *transaction = new QXmppStunTransaction(request, q);
-            stunTransactions.insert(transaction, {transport, stunServer.first, stunServer.second});
+            stunTransactions.insert(transaction, { transport, stunServer.first, stunServer.second });
         }
     }
 
