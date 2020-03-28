@@ -43,6 +43,7 @@ Complete:
 - XEP-0319: Last User Interaction in Presence
 - XEP-0334: Message Processing Hints (v0.3)
 - XEP-0352: Client State Indication
+- XEP-0357: Push Notifications (v0.4) (partially)
 - XEP-0359: Unique and Stable Stanza IDs (v0.6)
 - XEP-0363: HTTP File Upload (v1.0)
 - XEP-0367: Message Attaching (v0.3)

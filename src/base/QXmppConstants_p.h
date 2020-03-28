@@ -151,6 +151,8 @@ extern const char* ns_chat_markers;
 extern const char* ns_message_processing_hints;
 // XEP-0352: Client State Indication
 extern const char* ns_csi;
+// XEP-0357: Push Notifications
+extern const char* ns_push;
 // XEP-0359: Unique and Stable Stanza IDs
 extern const char* ns_sid;
 // XEP-0363: HTTP File Upload
