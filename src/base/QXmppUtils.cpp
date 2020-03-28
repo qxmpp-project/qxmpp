@@ -280,7 +280,8 @@ int QXmppUtils::generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;
-    while (N <= (val = qrand() / (RAND_MAX / N))) { };
+    while (N <= (val = qrand() / (RAND_MAX / N))) {
+    };
     return val;
 }
 
