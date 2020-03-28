@@ -133,26 +133,26 @@ void QXmppBitsOfBinaryData::setData(const QByteArray &data)
 
 bool QXmppBitsOfBinaryData::isBitsOfBinaryData(const QDomElement &element)
 {
-    return element.tagName() == QSL("data") && element.namespaceURI() == ns_bob;
+    return element.tagName() == QStringLiteral("data") && element.namespaceURI() == ns_bob;
 }
 
 /// \cond
 void QXmppBitsOfBinaryData::parseElementFromChild(const QDomElement &dataElement)
 {
-    d->cid = QXmppBitsOfBinaryContentId::fromContentId(dataElement.attribute(QSL("cid")));
-    d->maxAge = dataElement.attribute(QSL("max-age"), QSL("-1")).toInt();
-    d->contentType = QMimeDatabase().mimeTypeForName(dataElement.attribute(QSL("type")));
+    d->cid = QXmppBitsOfBinaryContentId::fromContentId(dataElement.attribute(QStringLiteral("cid")));
+    d->maxAge = dataElement.attribute(QStringLiteral("max-age"), QStringLiteral("-1")).toInt();
+    d->contentType = QMimeDatabase().mimeTypeForName(dataElement.attribute(QStringLiteral("type")));
     d->data = QByteArray::fromBase64(dataElement.text().toUtf8());
 }
 
 void QXmppBitsOfBinaryData::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("data"));
+    writer->writeStartElement(QStringLiteral("data"));
     writer->writeDefaultNamespace(ns_bob);
-    helperToXmlAddAttribute(writer, QSL("cid"), d->cid.toContentId());
+    helperToXmlAddAttribute(writer, QStringLiteral("cid"), d->cid.toContentId());
     if (d->maxAge > -1)
-        helperToXmlAddAttribute(writer, QSL("max-age"), QString::number(d->maxAge));
-    helperToXmlAddAttribute(writer, QSL("type"), d->contentType.name());
+        helperToXmlAddAttribute(writer, QStringLiteral("max-age"), QString::number(d->maxAge));
+    helperToXmlAddAttribute(writer, QStringLiteral("type"), d->contentType.name());
     writer->writeCharacters(d->data.toBase64());
     writer->writeEndElement();
 }

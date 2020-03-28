@@ -59,19 +59,19 @@ bool QXmppStreamManagementEnable::isStreamManagementEnable(const QDomElement &el
 
 void QXmppStreamManagementEnable::parse(const QDomElement &element)
 {
-    QString resume = element.attribute(QSL("resume"));
-    m_resume = resume == QSL("true") || resume == QSL("1");
-    m_max = element.attribute(QSL("max")).toUInt();
+    QString resume = element.attribute(QStringLiteral("resume"));
+    m_resume = resume == QStringLiteral("true") || resume == QStringLiteral("1");
+    m_max = element.attribute(QStringLiteral("max")).toUInt();
 }
 
 void QXmppStreamManagementEnable::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("enable"));
+    writer->writeStartElement(QStringLiteral("enable"));
     writer->writeDefaultNamespace(ns_stream_management);
     if (m_resume)
-        writer->writeAttribute(QSL("resume"), QSL("true"));
+        writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
     if (m_max > 0)
-        writer->writeAttribute(QSL("max"), QString::number(m_max));
+        writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
     writer->writeEndElement();
 }
 
@@ -128,22 +128,22 @@ bool QXmppStreamManagementEnabled::isStreamManagementEnabled(const QDomElement &
 
 void QXmppStreamManagementEnabled::parse(const QDomElement &element)
 {
-    QString resume = element.attribute(QSL("resume"));
-    m_resume = resume == QSL("true") || resume == QSL("1");
-    m_max = element.attribute(QSL("max")).toUInt();
-    m_location = element.attribute(QSL("location"));
+    QString resume = element.attribute(QStringLiteral("resume"));
+    m_resume = resume == QStringLiteral("true") || resume == QStringLiteral("1");
+    m_max = element.attribute(QStringLiteral("max")).toUInt();
+    m_location = element.attribute(QStringLiteral("location"));
 }
 
 void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("enable"));
+    writer->writeStartElement(QStringLiteral("enable"));
     writer->writeDefaultNamespace(ns_stream_management);
     if (m_resume)
-        writer->writeAttribute(QSL("resume"), QSL("true"));
+        writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
     if (m_max > 0)
-        writer->writeAttribute(QSL("max"), QString::number(m_max));
+        writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
     if (!m_location.isEmpty())
-        writer->writeAttribute(QSL("location"), m_location);
+        writer->writeAttribute(QStringLiteral("location"), m_location);
     writer->writeEndElement();
 }
 
@@ -180,15 +180,15 @@ bool QXmppStreamManagementResume::isStreamManagementResume(const QDomElement &el
 
 void QXmppStreamManagementResume::parse(const QDomElement &element)
 {
-    m_h = element.attribute(QSL("h")).toUInt();
-    m_previd = element.attribute(QSL("previd"));
+    m_h = element.attribute(QStringLiteral("h")).toUInt();
+    m_previd = element.attribute(QStringLiteral("previd"));
 }
 
 void QXmppStreamManagementResume::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("resume"));
-    writer->writeAttribute(QSL("h"), QString::number(m_h));
-    writer->writeAttribute(QSL("previd"), m_previd);
+    writer->writeStartElement(QStringLiteral("resume"));
+    writer->writeAttribute(QStringLiteral("h"), QString::number(m_h));
+    writer->writeAttribute(QStringLiteral("previd"), m_previd);
     writer->writeEndElement();
 }
 
@@ -225,15 +225,15 @@ bool QXmppStreamManagementResumed::isStreamManagementResumed(const QDomElement &
 
 void QXmppStreamManagementResumed::parse(const QDomElement &element)
 {
-    m_h = element.attribute(QSL("h")).toUInt();
-    m_previd = element.attribute(QSL("previd"));
+    m_h = element.attribute(QStringLiteral("h")).toUInt();
+    m_previd = element.attribute(QStringLiteral("previd"));
 }
 
 void QXmppStreamManagementResumed::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("resumed"));
-    writer->writeAttribute(QSL("h"), QString::number(m_h));
-    writer->writeAttribute(QSL("previd"), m_previd);
+    writer->writeStartElement(QStringLiteral("resumed"));
+    writer->writeAttribute(QStringLiteral("h"), QString::number(m_h));
+    writer->writeAttribute(QStringLiteral("previd"), m_previd);
     writer->writeEndElement();
 }
 
@@ -270,7 +270,7 @@ void QXmppStreamManagementFailed::toXml(QXmlStreamWriter *writer) const
 {
     QString errorString = strFromCondition(m_error);
 
-    writer->writeStartElement(QSL("failed"));
+    writer->writeStartElement(QStringLiteral("failed"));
     writer->writeDefaultNamespace(ns_stream_management);
     writer->writeStartElement(errorString, ns_stanza);
     writer->writeEndElement();
@@ -294,14 +294,14 @@ void QXmppStreamManagementAck::setSeqNo(const unsigned seqNo)
 
 void QXmppStreamManagementAck::parse(const QDomElement &element)
 {
-    m_seqNo = element.attribute(QSL("h")).toUInt();
+    m_seqNo = element.attribute(QStringLiteral("h")).toUInt();
 }
 
 void QXmppStreamManagementAck::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("a"));
+    writer->writeStartElement(QStringLiteral("a"));
     writer->writeDefaultNamespace(ns_stream_management);
-    writer->writeAttribute(QSL("h"), QString::number(m_seqNo));
+    writer->writeAttribute(QStringLiteral("h"), QString::number(m_seqNo));
     writer->writeEndElement();
 }
 

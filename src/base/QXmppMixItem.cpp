@@ -100,7 +100,7 @@ bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
     QXmppDataForm form;
     form.parse(element);
     for (const auto& field : form.fields()) {
-        if (field.key() == QSL("FORM_TYPE"))
+        if (field.key() == QStringLiteral("FORM_TYPE"))
             return field.value() == ns_mix;
     }
     return false;
@@ -112,11 +112,11 @@ void QXmppMixInfoItem::parse(const QXmppElement& element)
     form.parse(element.sourceDomElement());
 
     for (auto& field : form.fields()) {
-        if (field.key() == QSL("Name"))
+        if (field.key() == QStringLiteral("Name"))
             d->name = field.value().toString();
-        else if (field.key() == QSL("Description"))
+        else if (field.key() == QStringLiteral("Description"))
             d->description = field.value().toString();
-        else if (field.key() == QSL("Contact"))
+        else if (field.key() == QStringLiteral("Contact"))
             d->contactJids = field.value().toStringList();
     }
 }
@@ -129,22 +129,22 @@ QXmppElement QXmppMixInfoItem::toElement() const
 
     QXmppDataForm::Field formType;
     formType.setType(QXmppDataForm::Field::HiddenField);
-    formType.setKey(QSL("FORM_TYPE"));
+    formType.setKey(QStringLiteral("FORM_TYPE"));
     formType.setValue(ns_mix);
     fields << formType;
 
     QXmppDataForm::Field nameField;
-    nameField.setKey(QSL("Name"));
+    nameField.setKey(QStringLiteral("Name"));
     nameField.setValue(d->name);
     fields << nameField;
 
     QXmppDataForm::Field descriptionField;
-    descriptionField.setKey(QSL("Description"));
+    descriptionField.setKey(QStringLiteral("Description"));
     descriptionField.setValue(d->description);
     fields << descriptionField;
 
     QXmppDataForm::Field contactsField;
-    contactsField.setKey(QSL("Contact"));
+    contactsField.setKey(QStringLiteral("Contact"));
     contactsField.setValue(d->contactJids);
     contactsField.setType(QXmppDataForm::Field::JidMultiField);
     fields << contactsField;
@@ -210,23 +210,23 @@ void QXmppMixParticipantItem::setJid(const QString& jid)
 
 void QXmppMixParticipantItem::parse(const QXmppElement& itemContent)
 {
-    d->nick = itemContent.firstChildElement(QSL("nick")).value();
-    d->jid = itemContent.firstChildElement(QSL("jid")).value();
+    d->nick = itemContent.firstChildElement(QStringLiteral("nick")).value();
+    d->jid = itemContent.firstChildElement(QStringLiteral("jid")).value();
 }
 
 QXmppElement QXmppMixParticipantItem::toElement() const
 {
     QXmppElement element;
-    element.setTagName(QSL("participant"));
-    element.setAttribute(QSL("xmlns"), ns_mix);
+    element.setTagName(QStringLiteral("participant"));
+    element.setAttribute(QStringLiteral("xmlns"), ns_mix);
 
     QXmppElement jid;
-    jid.setTagName(QSL("jid"));
+    jid.setTagName(QStringLiteral("jid"));
     jid.setValue(d->jid);
     element.appendChild(jid);
 
     QXmppElement nick;
-    nick.setTagName(QSL("nick"));
+    nick.setTagName(QStringLiteral("nick"));
     nick.setValue(d->nick);
     element.appendChild(nick);
 
@@ -237,5 +237,5 @@ QXmppElement QXmppMixParticipantItem::toElement() const
 
 bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement& element)
 {
-    return element.tagName() == QSL("participant") && element.namespaceURI() == ns_mix;
+    return element.tagName() == QStringLiteral("participant") && element.namespaceURI() == ns_mix;
 }

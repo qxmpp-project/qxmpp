@@ -113,25 +113,25 @@ static quint32 crctable[256] = {
 ///
 QDateTime QXmppUtils::datetimeFromString(const QString &str)
 {
-    QRegExp tzRe(QSL("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
+    QRegExp tzRe(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
     int tzPos = tzRe.indexIn(str, 19);
     if (str.size() < 20 || tzPos < 0)
         return QDateTime();
 
     // process date and time
-    QDateTime dt = QDateTime::fromString(str.left(19), QSL("yyyy-MM-ddThh:mm:ss"));
+    QDateTime dt = QDateTime::fromString(str.left(19), QStringLiteral("yyyy-MM-ddThh:mm:ss"));
     dt.setTimeSpec(Qt::UTC);
 
     // process milliseconds
     if (tzPos > 20 && str.at(19) == '.') {
-        QString millis = (str.mid(20, tzPos - 20) + QSL("000")).left(3);
+        QString millis = (str.mid(20, tzPos - 20) + QStringLiteral("000")).left(3);
         dt = dt.addMSecs(millis.toInt());
     }
 
     // process time zone
-    if (tzRe.cap(1) != QSL("Z")) {
+    if (tzRe.cap(1) != QStringLiteral("Z")) {
         int offset = tzRe.cap(3).toInt() * 3600 + tzRe.cap(4).toInt() * 60;
-        if (tzRe.cap(2) == QSL("+"))
+        if (tzRe.cap(2) == QStringLiteral("+"))
             dt = dt.addSecs(-offset);
         else
             dt = dt.addSecs(offset);
@@ -147,9 +147,9 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     QDateTime utc = dt.toUTC();
     if (utc.time().msec())
-        return utc.toString(QSL("yyyy-MM-ddThh:mm:ss.zzzZ"));
+        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ss.zzzZ"));
     else
-        return utc.toString(QSL("yyyy-MM-ddThh:mm:ssZ"));
+        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ssZ"));
 }
 
 ///
@@ -158,18 +158,18 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
 ///
 int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
-    QRegExp tzRe(QSL("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
+    QRegExp tzRe(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
     if (!tzRe.exactMatch(str))
         return 0;
 
     // No offset from UTC
-    if (tzRe.cap(1) == QSL("Z"))
+    if (tzRe.cap(1) == QStringLiteral("Z"))
         return 0;
 
     // Calculate offset
     const int offset = tzRe.cap(3).toInt() * 3600 +
         tzRe.cap(4).toInt() * 60;
-    if (tzRe.cap(2) == QSL("-"))
+    if (tzRe.cap(2) == QStringLiteral("-"))
         return -offset;
     else
         return offset;
@@ -182,17 +182,17 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
     if (!secs)
-        return QSL("Z");
+        return QStringLiteral("Z");
 
     const QTime tzoTime = QTime(0, 0, 0).addSecs(qAbs(secs));
-    return (secs < 0 ? QSL("-") : QSL("+")) + tzoTime.toString(QSL("hh:mm"));
+    return (secs < 0 ? QStringLiteral("-") : QStringLiteral("+")) + tzoTime.toString(QStringLiteral("hh:mm"));
 }
 
 /// Returns the domain for the given \a jid.
 
 QString QXmppUtils::jidToDomain(const QString &jid)
 {
-    return jidToBareJid(jid).split(QSL("@")).last();
+    return jidToBareJid(jid).split(QStringLiteral("@")).last();
 }
 
 /// Returns the resource for the given \a jid.
@@ -331,7 +331,7 @@ QString QXmppUtils::generateStanzaHash(int length)
     if (length == 36)
         return QXmppUtils::generateStanzaUuid();
 
-    const QString somechars = QSL("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    const QString somechars = QStringLiteral("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
     const int N = somechars.size();
     QString hashResult;
     for (int idx = 0; idx < length; ++idx)

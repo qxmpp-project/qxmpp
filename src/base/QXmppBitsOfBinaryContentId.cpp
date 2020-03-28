@@ -27,25 +27,25 @@
 #include <QSharedData>
 #include <QString>
 
-#define CONTENTID_URL QSL("cid:")
+#define CONTENTID_URL QStringLiteral("cid:")
 #define CONTENTID_URL_LENGTH 4
-#define CONTENTID_POSTFIX QSL("@bob.xmpp.org")
+#define CONTENTID_POSTFIX QStringLiteral("@bob.xmpp.org")
 #define CONTENTID_POSTFIX_LENGTH 13
-#define CONTENTID_HASH_SEPARATOR QSL("+")
+#define CONTENTID_HASH_SEPARATOR QStringLiteral("+")
 
 static const QMap<QCryptographicHash::Algorithm, QString> HASH_ALGORITHMS = {
-    { QCryptographicHash::Sha1, QSL("sha1") },
+    { QCryptographicHash::Sha1, QStringLiteral("sha1") },
 #ifndef QT_CRYPTOGRAPHICHASH_ONLY_SHA1
-    { QCryptographicHash::Md4, QSL("md4") },
-    { QCryptographicHash::Md5, QSL("md5") },
-    { QCryptographicHash::Sha224, QSL("sha224") },
-    { QCryptographicHash::Sha256, QSL("sha256") },
-    { QCryptographicHash::Sha384, QSL("sha384") },
-    { QCryptographicHash::Sha512, QSL("sha512") },
-    { QCryptographicHash::Sha3_224, QSL("sha3-224") },
-    { QCryptographicHash::Sha3_256, QSL("sha3-256") },
-    { QCryptographicHash::Sha3_384, QSL("sha3-384") },
-    { QCryptographicHash::Sha3_512, QSL("sha3-512") },
+    { QCryptographicHash::Md4, QStringLiteral("md4") },
+    { QCryptographicHash::Md5, QStringLiteral("md5") },
+    { QCryptographicHash::Sha224, QStringLiteral("sha224") },
+    { QCryptographicHash::Sha256, QStringLiteral("sha256") },
+    { QCryptographicHash::Sha384, QStringLiteral("sha384") },
+    { QCryptographicHash::Sha512, QStringLiteral("sha512") },
+    { QCryptographicHash::Sha3_224, QStringLiteral("sha3-224") },
+    { QCryptographicHash::Sha3_256, QStringLiteral("sha3-256") },
+    { QCryptographicHash::Sha3_384, QStringLiteral("sha3-384") },
+    { QCryptographicHash::Sha3_512, QStringLiteral("sha3-512") },
 #endif
 };
 
