@@ -225,7 +225,7 @@ public:
     /// \endcond
 
 private:
-    void parseExtension(const QDomElement &element, QXmppElementList &unknownElements);
+    void parseExtension(const QDomElement &element, QXmppElementList &unknownExtensions);
     void parseXElement(const QDomElement &element, QXmppElementList &unknownElements);
 
     QSharedDataPointer<QXmppMessagePrivate> d;
