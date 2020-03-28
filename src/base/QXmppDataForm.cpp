@@ -245,6 +245,29 @@ QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type)
     d->type = type;
 }
 
+///
+/// Constructs a QXmppDataForm::Field with the specified attributes.
+///
+/// \since QXmpp 1.3
+///
+QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type,
+                            const QString &key,
+                            const QVariant &value,
+                            bool isRequired,
+                            const QString &label,
+                            const QString &description,
+                            const QList<QPair<QString, QString>> &options)
+    : d(new QXmppDataFormFieldPrivate)
+{
+    d->type = type;
+    d->key = key;
+    d->value = value;
+    d->required = isRequired;
+    d->label = label;
+    d->description = description;
+    d->options = options;
+}
+
 /// Constructs a copy of \a other.
 
 QXmppDataForm::Field::Field(const QXmppDataForm::Field &other)
@@ -524,6 +547,23 @@ QXmppDataForm::QXmppDataForm(QXmppDataForm::Type type)
     : d(new QXmppDataFormPrivate)
 {
     d->type = type;
+}
+
+///
+/// Constructs a QXmppDataForm with the specified attributes.
+///
+/// \since QXmpp 1.3
+///
+QXmppDataForm::QXmppDataForm(QXmppDataForm::Type type,
+                             const QList<QXmppDataForm::Field> &fields,
+                             const QString &title,
+                             const QString &instructions)
+    : d(new QXmppDataFormPrivate)
+{
+    d->type = type;
+    d->fields = fields;
+    d->title = title;
+    d->instructions = instructions;
 }
 
 /// Constructs a copy of \a other.

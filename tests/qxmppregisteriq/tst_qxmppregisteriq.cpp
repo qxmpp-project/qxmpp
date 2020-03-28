@@ -206,6 +206,44 @@ void tst_QXmppRegisterIq::testSetWithForm()
     QVERIFY(iq.email().isNull());
     QVERIFY(!iq.form().isNull());
     serializePacket(iq, xml);
+
+    QXmppRegisterIq sIq;
+    sIq.setId(QLatin1String("reg4"));
+    sIq.setTo(QLatin1String("contests.shakespeare.lit"));
+    sIq.setFrom(QLatin1String("juliet@capulet.com/balcony"));
+    sIq.setType(QXmppIq::Set);
+    sIq.setForm(QXmppDataForm(
+        QXmppDataForm::Submit,
+        QList<QXmppDataForm::Field>()
+            << QXmppDataForm::Field(
+                   QXmppDataForm::Field::HiddenField,
+                   QStringLiteral("FORM_TYPE"),
+                   QStringLiteral("jabber:iq:register"))
+            << QXmppDataForm::Field(
+                   QXmppDataForm::Field::TextSingleField,
+                   QStringLiteral("first"),
+                   QStringLiteral("Juliet"),
+                   false,
+                   QStringLiteral("Given Name"))
+            << QXmppDataForm::Field(
+                   QXmppDataForm::Field::TextSingleField,
+                   QStringLiteral("last"),
+                   QStringLiteral("Capulet"),
+                   false,
+                   QStringLiteral("Family Name"))
+            << QXmppDataForm::Field(
+                   QXmppDataForm::Field::TextSingleField,
+                   QStringLiteral("email"),
+                   QStringLiteral("juliet@capulet.com"),
+                   false,
+                   QStringLiteral("Email Address"))
+            << QXmppDataForm::Field(
+                   QXmppDataForm::Field::ListSingleField,
+                   QStringLiteral("x-gender"),
+                   QStringLiteral("F"),
+                   false,
+                   QStringLiteral("Gender"))));
+    serializePacket(sIq, xml);
 }
 
 void tst_QXmppRegisterIq::testBobData()
@@ -360,8 +398,7 @@ void tst_QXmppRegisterIq::testChangePassword()
     auto iq = QXmppRegisterIq::createChangePasswordRequest(
         QStringLiteral("bill"),
         QStringLiteral("m1cr0$0ft"),
-        QStringLiteral("shakespeare.lit")
-    );
+        QStringLiteral("shakespeare.lit"));
     iq.setId(QStringLiteral("changePassword1"));
     serializePacket(iq, xml);
 }

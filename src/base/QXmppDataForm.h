@@ -41,18 +41,20 @@ class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;
 class QXmppDataFormMediaSourcePrivate;
 
+///
 /// \brief The QXmppDataForm class represents a data form as defined by
 /// \xep{0004}: Data Forms.
-
+///
 class QXMPP_EXPORT QXmppDataForm
 {
 public:
+    ///
     /// \brief The \c QXmppDataForm::MediaSource class represents a link to one
     /// of possibly multiple sources for a media element from \xep{0221}: Data
     /// Forms Media Element consisting of a MIME type and a QUrl.
     ///
     /// \since QXmpp 1.1
-
+    ///
     class QXMPP_EXPORT MediaSource
     {
     public:
@@ -76,11 +78,12 @@ public:
     };
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
+    ///
     /// \brief The QXmppDataForm::Media class represents a media field as
     /// defined by \xep{0221}: Data Forms Media Element.
     ///
     /// \deprecated This class is deprecated since QXmpp 1.1.
-
+    ///
     class QXMPP_EXPORT Media
     {
     public:
@@ -115,9 +118,10 @@ public:
     };
 #endif
 
+    ///
     /// \brief The QXmppDataForm::Field class represents a data form field
     /// as defined by \xep{0004}: Data Forms.
-
+    ///
     class QXMPP_EXPORT Field
     {
     public:
@@ -135,7 +139,15 @@ public:
             TextSingleField
         };
 
+        // ### QXmpp2: merge ctors
         Field(QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField);
+        Field(QXmppDataForm::Field::Type type,
+              const QString &key,
+              const QVariant &value = {},
+              bool isRequired = false,
+              const QString &label = {},
+              const QString &description = {},
+              const QList<QPair<QString, QString>> &options = {});
         Field(const QXmppDataForm::Field &other);
         ~Field();
 
@@ -198,7 +210,12 @@ public:
                  ///< or the data is a generic data set.
     };
 
+    // ### QXmpp2: merge ctors
     QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
+    QXmppDataForm(QXmppDataForm::Type type,
+                  const QList<Field> &fields,
+                  const QString &title = {},
+                  const QString &instructions = {});
     QXmppDataForm(const QXmppDataForm &other);
     ~QXmppDataForm();
 
