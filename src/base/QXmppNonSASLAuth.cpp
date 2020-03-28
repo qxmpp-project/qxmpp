@@ -78,31 +78,31 @@ void QXmppNonSASLAuthIq::setResource(const QString &resource)
 /// \cond
 bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return queryElement.namespaceURI() == ns_auth;
 }
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
-    m_username = queryElement.firstChildElement(QSL("username")).text();
-    m_password = queryElement.firstChildElement(QSL("password")).text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement(QSL("digest")).text().toLatin1());
-    m_resource = queryElement.firstChildElement(QSL("resource")).text();
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_username = queryElement.firstChildElement(QStringLiteral("username")).text();
+    m_password = queryElement.firstChildElement(QStringLiteral("password")).text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement(QStringLiteral("digest")).text().toLatin1());
+    m_resource = queryElement.firstChildElement(QStringLiteral("resource")).text();
 }
 
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("query"));
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_auth);
     if (!m_username.isEmpty())
-        writer->writeTextElement(QSL("username"), m_username);
+        writer->writeTextElement(QStringLiteral("username"), m_username);
     if (!m_digest.isEmpty())
-        writer->writeTextElement(QSL("digest"), m_digest.toHex());
+        writer->writeTextElement(QStringLiteral("digest"), m_digest.toHex());
     if (!m_password.isEmpty())
-        writer->writeTextElement(QSL("password"), m_password);
+        writer->writeTextElement(QStringLiteral("password"), m_password);
     if (!m_resource.isEmpty())
-        writer->writeTextElement(QSL("resource"), m_resource);
+        writer->writeTextElement(QStringLiteral("resource"), m_resource);
     writer->writeEndElement();
 }
 /// \endcond

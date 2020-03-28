@@ -72,15 +72,15 @@ QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
 /// \cond
 QXmppMucItem::Affiliation QXmppMucItem::affiliationFromString(const QString &affiliationStr)
 {
-    if (affiliationStr == QSL("owner"))
+    if (affiliationStr == QStringLiteral("owner"))
         return QXmppMucItem::OwnerAffiliation;
-    else if (affiliationStr == QSL("admin"))
+    else if (affiliationStr == QStringLiteral("admin"))
         return QXmppMucItem::AdminAffiliation;
-    else if (affiliationStr == QSL("member"))
+    else if (affiliationStr == QStringLiteral("member"))
         return QXmppMucItem::MemberAffiliation;
-    else if (affiliationStr == QSL("outcast"))
+    else if (affiliationStr == QStringLiteral("outcast"))
         return QXmppMucItem::OutcastAffiliation;
-    else if (affiliationStr == QSL("none"))
+    else if (affiliationStr == QStringLiteral("none"))
         return QXmppMucItem::NoAffiliation;
     else
         return QXmppMucItem::UnspecifiedAffiliation;
@@ -172,13 +172,13 @@ QXmppMucItem::Role QXmppMucItem::role() const
 /// \cond
 QXmppMucItem::Role QXmppMucItem::roleFromString(const QString &roleStr)
 {
-    if (roleStr == QSL("moderator"))
+    if (roleStr == QStringLiteral("moderator"))
         return QXmppMucItem::ModeratorRole;
-    else if (roleStr == QSL("participant"))
+    else if (roleStr == QStringLiteral("participant"))
         return QXmppMucItem::ParticipantRole;
-    else if (roleStr == QSL("visitor"))
+    else if (roleStr == QStringLiteral("visitor"))
         return QXmppMucItem::VisitorRole;
-    else if (roleStr == QSL("none"))
+    else if (roleStr == QStringLiteral("none"))
         return QXmppMucItem::NoRole;
     else
         return QXmppMucItem::UnspecifiedRole;
@@ -188,13 +188,13 @@ QString QXmppMucItem::roleToString(Role role)
 {
     switch (role) {
     case QXmppMucItem::ModeratorRole:
-        return QSL("moderator");
+        return QStringLiteral("moderator");
     case QXmppMucItem::ParticipantRole:
-        return QSL("participant");
+        return QStringLiteral("participant");
     case QXmppMucItem::VisitorRole:
-        return QSL("visitor");
+        return QStringLiteral("visitor");
     case QXmppMucItem::NoRole:
-        return QSL("none");
+        return QStringLiteral("none");
     default:
         return QString();
     }
@@ -213,28 +213,28 @@ void QXmppMucItem::setRole(Role role)
 /// \cond
 void QXmppMucItem::parse(const QDomElement &element)
 {
-    m_affiliation = QXmppMucItem::affiliationFromString(element.attribute(QSL("affiliation")).toLower());
-    m_jid = element.attribute(QSL("jid"));
-    m_nick = element.attribute(QSL("nick"));
-    m_role = QXmppMucItem::roleFromString(element.attribute(QSL("role")).toLower());
-    m_actor = element.firstChildElement(QSL("actor")).attribute("jid");
-    m_reason = element.firstChildElement(QSL("reason")).text();
+    m_affiliation = QXmppMucItem::affiliationFromString(element.attribute(QStringLiteral("affiliation")).toLower());
+    m_jid = element.attribute(QStringLiteral("jid"));
+    m_nick = element.attribute(QStringLiteral("nick"));
+    m_role = QXmppMucItem::roleFromString(element.attribute(QStringLiteral("role")).toLower());
+    m_actor = element.firstChildElement(QStringLiteral("actor")).attribute("jid");
+    m_reason = element.firstChildElement(QStringLiteral("reason")).text();
 }
 
 void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("item"));
-    helperToXmlAddAttribute(writer, QSL("affiliation"), affiliationToString(m_affiliation));
-    helperToXmlAddAttribute(writer, QSL("jid"), m_jid);
-    helperToXmlAddAttribute(writer, QSL("nick"), m_nick);
-    helperToXmlAddAttribute(writer, QSL("role"), roleToString(m_role));
+    writer->writeStartElement(QStringLiteral("item"));
+    helperToXmlAddAttribute(writer, QStringLiteral("affiliation"), affiliationToString(m_affiliation));
+    helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_jid);
+    helperToXmlAddAttribute(writer, QStringLiteral("nick"), m_nick);
+    helperToXmlAddAttribute(writer, QStringLiteral("role"), roleToString(m_role));
     if (!m_actor.isEmpty()) {
-        writer->writeStartElement(QSL("actor"));
-        helperToXmlAddAttribute(writer, QSL("jid"), m_actor);
+        writer->writeStartElement(QStringLiteral("actor"));
+        helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_actor);
         writer->writeEndElement();
     }
     if (!m_reason.isEmpty())
-        helperToXmlAddTextElement(writer, QSL("reason"), m_reason);
+        helperToXmlAddTextElement(writer, QStringLiteral("reason"), m_reason);
     writer->writeEndElement();
 }
 /// \endcond
@@ -258,25 +258,25 @@ void QXmppMucAdminIq::setItems(const QList<QXmppMucItem> &items)
 /// \cond
 bool QXmppMucAdminIq::isMucAdminIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return (queryElement.namespaceURI() == ns_muc_admin);
 }
 
 void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
-    QDomElement child = queryElement.firstChildElement(QSL("item"));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    QDomElement child = queryElement.firstChildElement(QStringLiteral("item"));
     while (!child.isNull()) {
         QXmppMucItem item;
         item.parse(child);
         m_items << item;
-        child = child.nextSiblingElement(QSL("item"));
+        child = child.nextSiblingElement(QStringLiteral("item"));
     }
 }
 
 void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("query"));
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_muc_admin);
     for (const QXmppMucItem &item : m_items)
         item.toXml(writer);
@@ -303,19 +303,19 @@ void QXmppMucOwnerIq::setForm(const QXmppDataForm &form)
 /// \cond
 bool QXmppMucOwnerIq::isMucOwnerIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return (queryElement.namespaceURI() == ns_muc_owner);
 }
 
 void QXmppMucOwnerIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
-    m_form.parse(queryElement.firstChildElement(QSL("x")));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_form.parse(queryElement.firstChildElement(QStringLiteral("x")));
 }
 
 void QXmppMucOwnerIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("query"));
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_muc_owner);
     m_form.toXml(writer);
     writer->writeEndElement();

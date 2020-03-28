@@ -137,21 +137,21 @@ bool QXmppExtendedAddress::isValid() const
 /// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
-    d->delivered = element.attribute(QSL("delivered")) == QSL("true");
-    d->description = element.attribute(QSL("desc"));
-    d->jid = element.attribute(QSL("jid"));
-    d->type = element.attribute(QSL("type"));
+    d->delivered = element.attribute(QStringLiteral("delivered")) == QStringLiteral("true");
+    d->description = element.attribute(QStringLiteral("desc"));
+    d->jid = element.attribute(QStringLiteral("jid"));
+    d->type = element.attribute(QStringLiteral("type"));
 }
 
 void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    xmlWriter->writeStartElement(QSL("address"));
+    xmlWriter->writeStartElement(QStringLiteral("address"));
     if (d->delivered)
-        xmlWriter->writeAttribute(QSL("delivered"), QSL("true"));
+        xmlWriter->writeAttribute(QStringLiteral("delivered"), QStringLiteral("true"));
     if (!d->description.isEmpty())
-        xmlWriter->writeAttribute(QSL("desc"), d->description);
-    xmlWriter->writeAttribute(QSL("jid"), d->jid);
-    xmlWriter->writeAttribute(QSL("type"), d->type);
+        xmlWriter->writeAttribute(QStringLiteral("desc"), d->description);
+    xmlWriter->writeAttribute(QStringLiteral("jid"), d->jid);
+    xmlWriter->writeAttribute(QStringLiteral("type"), d->type);
     xmlWriter->writeEndElement();
 }
 /// \endcond
@@ -347,15 +347,15 @@ QString QXmppStanza::Error::getTypeStr() const
 {
     switch (d->type) {
     case Cancel:
-        return QSL("cancel");
+        return QStringLiteral("cancel");
     case Continue:
-        return QSL("continue");
+        return QStringLiteral("continue");
     case Modify:
-        return QSL("modify");
+        return QStringLiteral("modify");
     case Auth:
-        return QSL("auth");
+        return QStringLiteral("auth");
     case Wait:
-        return QSL("wait");
+        return QStringLiteral("wait");
     default:
         return {};
     }
@@ -368,15 +368,15 @@ QString QXmppStanza::Error::getConditionStr() const
 
 void QXmppStanza::Error::setTypeFromStr(const QString &type)
 {
-    if (type == QSL("cancel"))
+    if (type == QStringLiteral("cancel"))
         setType(Cancel);
-    else if (type == QSL("continue"))
+    else if (type == QStringLiteral("continue"))
         setType(Continue);
-    else if (type == QSL("modify"))
+    else if (type == QStringLiteral("modify"))
         setType(Modify);
-    else if (type == QSL("auth"))
+    else if (type == QStringLiteral("auth"))
         setType(Auth);
-    else if (type == QSL("wait"))
+    else if (type == QStringLiteral("wait"))
         setType(Wait);
     else
         setType(static_cast<QXmppStanza::Error::Type>(-1));
@@ -389,28 +389,28 @@ void QXmppStanza::Error::setConditionFromStr(const QString &type)
 
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
-    setCode(errorElement.attribute(QSL("code")).toInt());
-    setTypeFromStr(errorElement.attribute(QSL("type")));
+    setCode(errorElement.attribute(QStringLiteral("code")).toInt());
+    setTypeFromStr(errorElement.attribute(QStringLiteral("type")));
 
     QDomElement element = errorElement.firstChildElement();
     while (!element.isNull()) {
         if (element.namespaceURI() == ns_stanza) {
-            if (element.tagName() == QSL("text"))
+            if (element.tagName() == QStringLiteral("text"))
                 setText(element.text());
             else
                 setConditionFromStr(element.tagName());
             // XEP-0363: HTTP File Upload
         } else if (element.namespaceURI() == ns_http_upload) {
             // file is too large
-            if (element.tagName() == QSL("file-too-large")) {
+            if (element.tagName() == QStringLiteral("file-too-large")) {
                 d->fileTooLarge = true;
-                d->maxFileSize = element.firstChildElement(QSL("max-file-size"))
+                d->maxFileSize = element.firstChildElement(QStringLiteral("max-file-size"))
                                      .text()
                                      .toLongLong();
                 // retry later
-            } else if (element.tagName() == QSL("retry")) {
+            } else if (element.tagName() == QStringLiteral("retry")) {
                 d->retryDate = QXmppUtils::datetimeFromString(
-                    element.attribute(QSL("stamp")));
+                    element.attribute(QStringLiteral("stamp")));
             }
         }
         element = element.nextSiblingElement();
@@ -425,11 +425,11 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     if (cond.isEmpty() && type.isEmpty())
         return;
 
-    writer->writeStartElement(QSL("error"));
-    helperToXmlAddAttribute(writer, QSL("type"), type);
+    writer->writeStartElement(QStringLiteral("error"));
+    helperToXmlAddAttribute(writer, QStringLiteral("type"), type);
 
     if (d->code > 0)
-        helperToXmlAddAttribute(writer, QSL("code"), QString::number(d->code));
+        helperToXmlAddAttribute(writer, QStringLiteral("code"), QString::number(d->code));
 
     if (!cond.isEmpty()) {
         writer->writeStartElement(cond);
@@ -437,8 +437,8 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
     if (!d->text.isEmpty()) {
-        writer->writeStartElement(QSL("text"));
-        writer->writeAttribute(QSL("xml:lang"), QSL("en"));
+        writer->writeStartElement(QStringLiteral("text"));
+        writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
         writer->writeDefaultNamespace(ns_stanza);
         writer->writeCharacters(d->text);
         writer->writeEndElement();
@@ -446,15 +446,15 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 
     // XEP-0363: HTTP File Upload
     if (d->fileTooLarge) {
-        writer->writeStartElement(QSL("file-too-large"));
+        writer->writeStartElement(QStringLiteral("file-too-large"));
         writer->writeDefaultNamespace(ns_http_upload);
-        helperToXmlAddTextElement(writer, QSL("max-file-size"),
+        helperToXmlAddTextElement(writer, QStringLiteral("max-file-size"),
                                   QString::number(d->maxFileSize));
         writer->writeEndElement();
     } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {
-        writer->writeStartElement(QSL("retry"));
+        writer->writeStartElement(QStringLiteral("retry"));
         writer->writeDefaultNamespace(ns_http_upload);
-        writer->writeAttribute(QSL("stamp"),
+        writer->writeAttribute(QStringLiteral("stamp"),
                                QXmppUtils::datetimeToString(d->retryDate));
         writer->writeEndElement();
     }

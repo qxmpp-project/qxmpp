@@ -117,15 +117,15 @@ bool QXmppResultSetQuery::isNull() const
 /// \cond
 void QXmppResultSetQuery::parse(const QDomElement& element)
 {
-    QDomElement setElement = (element.tagName() == QSL("set")) ? element : element.firstChildElement(QSL("set"));
+    QDomElement setElement = (element.tagName() == QStringLiteral("set")) ? element : element.firstChildElement(QStringLiteral("set"));
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
-        m_max = setElement.firstChildElement(QSL("max")).text().toInt(&ok);
+        m_max = setElement.firstChildElement(QStringLiteral("max")).text().toInt(&ok);
         if (!ok)
             m_max = -1;
-        m_after = setElement.firstChildElement(QSL("after")).text();
-        m_before = setElement.firstChildElement(QSL("before")).text();
-        m_index = setElement.firstChildElement(QSL("index")).text().toInt(&ok);
+        m_after = setElement.firstChildElement(QStringLiteral("after")).text();
+        m_before = setElement.firstChildElement(QStringLiteral("before")).text();
+        m_index = setElement.firstChildElement(QStringLiteral("index")).text().toInt(&ok);
         if (!ok)
             m_index = -1;
     }
@@ -135,16 +135,16 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
 {
     if (isNull())
         return;
-    writer->writeStartElement(QSL("set"));
+    writer->writeStartElement(QStringLiteral("set"));
     writer->writeDefaultNamespace(ns_rsm);
     if (m_max >= 0)
-        helperToXmlAddTextElement(writer, QSL("max"), QString::number(m_max));
+        helperToXmlAddTextElement(writer, QStringLiteral("max"), QString::number(m_max));
     if (!m_after.isNull())
-        helperToXmlAddTextElement(writer, QSL("after"), m_after);
+        helperToXmlAddTextElement(writer, QStringLiteral("after"), m_after);
     if (!m_before.isNull())
-        helperToXmlAddTextElement(writer, QSL("before"), m_before);
+        helperToXmlAddTextElement(writer, QStringLiteral("before"), m_before);
     if (m_index >= 0)
-        helperToXmlAddTextElement(writer, QSL("index"), QString::number(m_index));
+        helperToXmlAddTextElement(writer, QStringLiteral("index"), QString::number(m_index));
     writer->writeEndElement();
 }
 /// \endcond

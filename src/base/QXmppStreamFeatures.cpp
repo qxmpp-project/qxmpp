@@ -188,7 +188,7 @@ void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &regis
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
     return element.namespaceURI() == ns_stream &&
-        element.tagName() == QSL("features");
+        element.tagName() == QStringLiteral("features");
 }
 
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
@@ -197,7 +197,7 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
     QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
     while (!subElement.isNull()) {
         if (subElement.namespaceURI() == tagNs) {
-            if (!subElement.firstChildElement(QSL("required")).isNull())
+            if (!subElement.firstChildElement(QStringLiteral("required")).isNull())
                 mode = QXmppStreamFeatures::Required;
             else if (mode != QXmppStreamFeatures::Required)
                 mode = QXmppStreamFeatures::Enabled;
@@ -218,22 +218,22 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     d->registerMode = readFeature(element, "register", ns_register_feature);
 
     // parse advertised compression methods
-    QDomElement compression = element.firstChildElement(QSL("compression"));
+    QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
     if (compression.namespaceURI() == ns_compressFeature) {
-        QDomElement subElement = compression.firstChildElement(QSL("method"));
+        QDomElement subElement = compression.firstChildElement(QStringLiteral("method"));
         while (!subElement.isNull()) {
             d->compressionMethods << subElement.text();
-            subElement = subElement.nextSiblingElement(QSL("method"));
+            subElement = subElement.nextSiblingElement(QStringLiteral("method"));
         }
     }
 
     // parse advertised SASL Authentication mechanisms
-    QDomElement mechs = element.firstChildElement(QSL("mechanisms"));
+    QDomElement mechs = element.firstChildElement(QStringLiteral("mechanisms"));
     if (mechs.namespaceURI() == ns_sasl) {
-        QDomElement subElement = mechs.firstChildElement(QSL("mechanism"));
+        QDomElement subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
         while (!subElement.isNull()) {
             d->authMechanisms << subElement.text();
-            subElement = subElement.nextSiblingElement(QSL("mechanism"));
+            subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"));
         }
     }
 }
@@ -244,14 +244,14 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
         writer->writeStartElement(tagName);
         writer->writeDefaultNamespace(tagNs);
         if (mode == QXmppStreamFeatures::Required)
-            writer->writeEmptyElement(QSL("required"));
+            writer->writeEmptyElement(QStringLiteral("required"));
         writer->writeEndElement();
     }
 }
 
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("stream:features"));
+    writer->writeStartElement(QStringLiteral("stream:features"));
     writeFeature(writer, "bind", ns_bind, d->bindMode);
     writeFeature(writer, "session", ns_session, d->sessionMode);
     writeFeature(writer, "auth", ns_authFeature, d->nonSaslAuthMode);
@@ -261,17 +261,17 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "register", ns_register_feature, d->registerMode);
 
     if (!d->compressionMethods.isEmpty()) {
-        writer->writeStartElement(QSL("compression"));
+        writer->writeStartElement(QStringLiteral("compression"));
         writer->writeDefaultNamespace(ns_compressFeature);
         for (const auto &method : d->compressionMethods)
-            writer->writeTextElement(QSL("method"), method);
+            writer->writeTextElement(QStringLiteral("method"), method);
         writer->writeEndElement();
     }
     if (!d->authMechanisms.isEmpty()) {
-        writer->writeStartElement(QSL("mechanisms"));
+        writer->writeStartElement(QStringLiteral("mechanisms"));
         writer->writeDefaultNamespace(ns_sasl);
         for (const auto &mechanism : d->authMechanisms)
-            writer->writeTextElement(QSL("mechanism"), mechanism);
+            writer->writeTextElement(QStringLiteral("mechanism"), mechanism);
         writer->writeEndElement();
     }
     writer->writeEndElement();

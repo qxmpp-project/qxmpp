@@ -112,39 +112,39 @@ void QXmppRosterIq::setMixAnnotate(bool mixAnnotate)
 /// \cond
 bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 {
-    return (element.firstChildElement(QSL("query")).namespaceURI() == ns_roster);
+    return (element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_roster);
 }
 
 void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
-    setVersion(queryElement.attribute(QSL("ver")));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    setVersion(queryElement.attribute(QStringLiteral("ver")));
 
-    QDomElement itemElement = queryElement.firstChildElement(QSL("item"));
+    QDomElement itemElement = queryElement.firstChildElement(QStringLiteral("item"));
     while (!itemElement.isNull()) {
         QXmppRosterIq::Item item;
         item.parse(itemElement);
         d->items.append(item);
-        itemElement = itemElement.nextSiblingElement(QSL("item"));
+        itemElement = itemElement.nextSiblingElement(QStringLiteral("item"));
     }
 
-    QDomElement annotateElement = queryElement.firstChildElement(QSL("annotate"));
+    QDomElement annotateElement = queryElement.firstChildElement(QStringLiteral("annotate"));
     setMixAnnotate(!annotateElement.isNull() && annotateElement.namespaceURI() == ns_mix_roster);
 }
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("query"));
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_roster);
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
     if (!version().isEmpty())
-        writer->writeAttribute(QSL("ver"), version());
+        writer->writeAttribute(QStringLiteral("ver"), version());
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->mixAnnotate) {
-        writer->writeStartElement(QSL("annotate"));
-        writer->writeAttribute(QSL("xmlns"), ns_mix_roster);
+        writer->writeStartElement(QStringLiteral("annotate"));
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
         writer->writeEndElement();
     }
 
@@ -311,15 +311,15 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
     if (type.isEmpty() && !type.isNull())  // TODO CHECK
         setSubscriptionType(NotSet);
-    else if (type == QSL("none"))
+    else if (type == QStringLiteral("none"))
         setSubscriptionType(None);
-    else if (type == QSL("both"))
+    else if (type == QStringLiteral("both"))
         setSubscriptionType(Both);
-    else if (type == QSL("from"))
+    else if (type == QStringLiteral("from"))
         setSubscriptionType(From);
-    else if (type == QSL("to"))
+    else if (type == QStringLiteral("to"))
         setSubscriptionType(To);
-    else if (type == QSL("remove"))
+    else if (type == QStringLiteral("remove"))
         setSubscriptionType(Remove);
     else
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
@@ -368,44 +368,44 @@ void QXmppRosterIq::Item::setMixParticipantId(const QString &participantId)
 /// \cond
 void QXmppRosterIq::Item::parse(const QDomElement &element)
 {
-    d->name = element.attribute(QSL("name"));
-    d->bareJid = element.attribute(QSL("jid"));
-    setSubscriptionTypeFromStr(element.attribute(QSL("subscription")));
-    setSubscriptionStatus(element.attribute(QSL("ask")));
+    d->name = element.attribute(QStringLiteral("name"));
+    d->bareJid = element.attribute(QStringLiteral("jid"));
+    setSubscriptionTypeFromStr(element.attribute(QStringLiteral("subscription")));
+    setSubscriptionStatus(element.attribute(QStringLiteral("ask")));
 
-    QDomElement groupElement = element.firstChildElement(QSL("group"));
+    QDomElement groupElement = element.firstChildElement(QStringLiteral("group"));
     while (!groupElement.isNull()) {
         d->groups << groupElement.text();
-        groupElement = groupElement.nextSiblingElement(QSL("group"));
+        groupElement = groupElement.nextSiblingElement(QStringLiteral("group"));
     }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
-    QDomElement channelElement = element.firstChildElement(QSL("channel"));
+    QDomElement channelElement = element.firstChildElement(QStringLiteral("channel"));
     if (!channelElement.isNull() && channelElement.namespaceURI() == ns_mix_roster) {
         d->isMixChannel = true;
-        d->mixParticipantId = channelElement.attribute(QSL("participant-id"));
+        d->mixParticipantId = channelElement.attribute(QStringLiteral("participant-id"));
     }
 }
 
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("item"));
-    helperToXmlAddAttribute(writer, QSL("jid"), d->bareJid);
-    helperToXmlAddAttribute(writer, QSL("name"), d->name);
-    helperToXmlAddAttribute(writer, QSL("subscription"), getSubscriptionTypeStr());
-    helperToXmlAddAttribute(writer, QSL("ask"), subscriptionStatus());
+    writer->writeStartElement(QStringLiteral("item"));
+    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->bareJid);
+    helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
+    helperToXmlAddAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
+    helperToXmlAddAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
     while (i != d->groups.constEnd()) {
-        helperToXmlAddTextElement(writer, QSL("group"), *i);
+        helperToXmlAddTextElement(writer, QStringLiteral("group"), *i);
         ++i;
     }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->isMixChannel) {
-        writer->writeStartElement(QSL("channel"));
-        writer->writeAttribute(QSL("xmlns"), ns_mix_roster);
-        helperToXmlAddAttribute(writer, QSL("participant-id"), d->mixParticipantId);
+        writer->writeStartElement(QStringLiteral("channel"));
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
+        helperToXmlAddAttribute(writer, QStringLiteral("participant-id"), d->mixParticipantId);
         writer->writeEndElement();
     }
 

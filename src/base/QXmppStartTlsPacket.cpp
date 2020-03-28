@@ -29,9 +29,9 @@
 #include <QXmlStreamWriter>
 
 const static QStringList STARTTLS_TYPES = {
-    QSL("starttls"),
-    QSL("proceed"),
-    QSL("failure")
+    QStringLiteral("starttls"),
+    QStringLiteral("proceed"),
+    QStringLiteral("failure")
 };
 
 /// Constructs a new QXmppStartTlsPacket

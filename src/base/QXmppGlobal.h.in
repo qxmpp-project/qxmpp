@@ -62,8 +62,5 @@ inline QLatin1String QXmppVersion()
 // This works exactly like QT_DEPRECATED_SINCE, but checks QXMPP_DISABLE_DEPRECATED_BEFORE instead.
 #define QXMPP_DEPRECATED_SINCE(major, minor) (QT_VERSION_CHECK(major, minor, 0) > QXMPP_DISABLE_DEPRECATED_BEFORE)
 
-#define QSL QStringLiteral
-#define QBL QByteArrayLiteral
-
 #endif //QXMPPGLOBAL_H
 

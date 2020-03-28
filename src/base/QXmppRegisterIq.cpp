@@ -30,8 +30,8 @@
 #include <QDomElement>
 #include <QSharedData>
 
-#define ELEMENT_REGISTERED QSL("registered")
-#define ELEMENT_REMOVE QSL("remove")
+#define ELEMENT_REGISTERED QStringLiteral("registered")
+#define ELEMENT_REMOVE QStringLiteral("remove")
 
 class QXmppRegisterIqPrivate : public QSharedData
 {
@@ -260,17 +260,17 @@ void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsO
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
-    return (element.firstChildElement(QSL("query")).namespaceURI() == ns_register);
+    return (element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_register);
 }
 
 void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QSL("query"));
-    d->instructions = queryElement.firstChildElement(QSL("instructions")).text();
-    d->username = queryElement.firstChildElement(QSL("username")).text();
-    d->password = queryElement.firstChildElement(QSL("password")).text();
-    d->email = queryElement.firstChildElement(QSL("email")).text();
-    d->form.parse(queryElement.firstChildElement(QSL("x")));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    d->instructions = queryElement.firstChildElement(QStringLiteral("instructions")).text();
+    d->username = queryElement.firstChildElement(QStringLiteral("username")).text();
+    d->password = queryElement.firstChildElement(QStringLiteral("password")).text();
+    d->email = queryElement.firstChildElement(QStringLiteral("email")).text();
+    d->form.parse(queryElement.firstChildElement(QStringLiteral("x")));
     d->isRegistered = !queryElement.firstChildElement(ELEMENT_REGISTERED).isNull();
     d->isRemove = !queryElement.firstChildElement(ELEMENT_REMOVE).isNull();
     d->bitsOfBinaryData.parse(queryElement);
@@ -278,11 +278,11 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("query"));
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_register);
 
     if (!d->instructions.isEmpty())
-        writer->writeTextElement(QSL("instructions"), d->instructions);
+        writer->writeTextElement(QStringLiteral("instructions"), d->instructions);
 
     if (d->isRegistered)
         writer->writeEmptyElement(ELEMENT_REGISTERED);
@@ -290,19 +290,19 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writer->writeEmptyElement(ELEMENT_REMOVE);
 
     if (!d->username.isEmpty())
-        writer->writeTextElement(QSL("username"), d->username);
+        writer->writeTextElement(QStringLiteral("username"), d->username);
     else if (!d->username.isNull())
-        writer->writeEmptyElement(QSL("username"));
+        writer->writeEmptyElement(QStringLiteral("username"));
 
     if (!d->password.isEmpty())
-        writer->writeTextElement(QSL("password"), d->password);
+        writer->writeTextElement(QStringLiteral("password"), d->password);
     else if (!d->password.isNull())
-        writer->writeEmptyElement(QSL("password"));
+        writer->writeEmptyElement(QStringLiteral("password"));
 
     if (!d->email.isEmpty())
-        writer->writeTextElement(QSL("email"), d->email);
+        writer->writeTextElement(QStringLiteral("email"), d->email);
     else if (!d->email.isNull())
-        writer->writeEmptyElement(QSL("email"));
+        writer->writeEmptyElement(QStringLiteral("email"));
 
     d->form.toXml(writer);
     d->bitsOfBinaryData.toXml(writer);

@@ -30,15 +30,15 @@
 #include <QSharedData>
 
 static const QStringList PUBSUB_QUERIES = {
-    QSL("affiliations"),
-    QSL("default"),
-    QSL("items"),
-    QSL("publish"),
-    QSL("retract"),
-    QSL("subscribe"),
-    QSL("subscription"),
-    QSL("subscriptions"),
-    QSL("unsubscribe"),
+    QStringLiteral("affiliations"),
+    QStringLiteral("default"),
+    QStringLiteral("items"),
+    QStringLiteral("publish"),
+    QStringLiteral("retract"),
+    QStringLiteral("subscribe"),
+    QStringLiteral("subscription"),
+    QStringLiteral("subscriptions"),
+    QStringLiteral("unsubscribe"),
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
@@ -153,12 +153,12 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 /// \cond
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
-    return element.firstChildElement(QSL("pubsub")).namespaceURI() == ns_pubsub;
+    return element.firstChildElement(QStringLiteral("pubsub")).namespaceURI() == ns_pubsub;
 }
 
 void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 {
-    const QDomElement pubSubElement = element.firstChildElement(QSL("pubsub"));
+    const QDomElement pubSubElement = element.firstChildElement(QStringLiteral("pubsub"));
 
     const QDomElement queryElement = pubSubElement.firstChildElement();
 
@@ -168,8 +168,8 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     if (queryType > -1)
         d->queryType = QueryType(queryType);
 
-    d->queryJid = queryElement.attribute(QSL("jid"));
-    d->queryNode = queryElement.attribute(QSL("node"));
+    d->queryJid = queryElement.attribute(QStringLiteral("jid"));
+    d->queryNode = queryElement.attribute(QStringLiteral("node"));
 
     // parse contents
     QDomElement childElement;
@@ -177,17 +177,17 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
-        childElement = queryElement.firstChildElement(QSL("item"));
+        childElement = queryElement.firstChildElement(QStringLiteral("item"));
         while (!childElement.isNull()) {
             QXmppPubSubItem item;
             item.parse(childElement);
             d->items << item;
-            childElement = childElement.nextSiblingElement(QSL("item"));
+            childElement = childElement.nextSiblingElement(QStringLiteral("item"));
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        d->subscriptionId = queryElement.attribute(QSL("subid"));
-        d->subscriptionType = queryElement.attribute(QSL("subscription"));
+        d->subscriptionId = queryElement.attribute(QStringLiteral("subid"));
+        d->subscriptionType = queryElement.attribute(QStringLiteral("subscription"));
         break;
     default:
         break;
@@ -196,13 +196,13 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL("pubsub"));
+    writer->writeStartElement(QStringLiteral("pubsub"));
     writer->writeDefaultNamespace(ns_pubsub);
 
     // write query type
     writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-    helperToXmlAddAttribute(writer, QSL("jid"), d->queryJid);
-    helperToXmlAddAttribute(writer, QSL("node"), d->queryNode);
+    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
+    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNode);
 
     // write contents
     switch (d->queryType) {
@@ -213,8 +213,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
             item.toXml(writer);
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        helperToXmlAddAttribute(writer, QSL("subid"), d->subscriptionId);
-        helperToXmlAddAttribute(writer, QSL("subscription"), d->subscriptionType);
+        helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
+        helperToXmlAddAttribute(writer, QStringLiteral("subscription"), d->subscriptionType);
         break;
     default:
         break;
