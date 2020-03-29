@@ -40,7 +40,9 @@
 #include <QTime>
 #include <QXmlStreamWriter>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 static bool randomSeeded = false;
+#endif
 static const QByteArray streamRootElementEnd = QByteArrayLiteral("</stream:stream>");
 
 class QXmppStreamPrivate
@@ -74,11 +76,13 @@ QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
       d(new QXmppStreamPrivate)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     // Make sure the random number generator is seeded
     if (!randomSeeded) {
         qsrand(QTime(0, 0, 0).msecsTo(QTime::currentTime()) ^ reinterpret_cast<quintptr>(this));
         randomSeeded = true;
     }
+#endif
 }
 
 ///
