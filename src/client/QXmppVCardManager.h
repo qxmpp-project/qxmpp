@@ -82,6 +82,12 @@ signals:
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
 
+    /// This signal is emitted when the requested vCard could not be found.
+    void noVCardFound();
+
+    /// This signal is emitted when the requested client's vCard could not be found.
+    void noClientVCardFound();
+
 private:
     QXmppVCardManagerPrivate* d;
 };

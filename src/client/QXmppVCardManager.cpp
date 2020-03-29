@@ -113,14 +113,29 @@ bool QXmppVCardManager::handleStanza(const QDomElement& element)
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);
 
-        if (vCardIq.from().isEmpty()) {
+        if (vCardIq.type() == QXmppIq::Error && vCardIq.error().type() == QXmppIq::Error::Cancel) {
+            switch(vCardIq.error().condition()) {
+            case QXmppIq::Error::ServiceUnavailable:
+                emit noVCardFound();
+                return true;
+                break;
+            case QXmppIq::Error::ItemNotFound:
+                emit noClientVCardFound();
+                return true;
+                break;
+            default:
+                return false;
+            }
+        }
+
+        if (vCardIq.from().isEmpty() || vCardIq.from() == client()->configuration().jidBare()) {
             d->clientVCard = vCardIq;
             d->isClientVCardReceived = true;
             emit clientVCardReceived();
+            return true;
         }
 
         emit vCardReceived(vCardIq);
-
         return true;
     }
 
