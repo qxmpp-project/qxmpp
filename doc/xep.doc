@@ -14,6 +14,7 @@ Complete:
 - XEP-0065: SOCKS5 Bytestreams
 - XEP-0066: Out of Band Data (partially)
 - XEP-0071: XHTML-IM
+- XEP-0077: In-Band Registration (v2.4)
 - XEP-0078: Non-SASL Authentication
 - XEP-0082: XMPP Date and Time Profiles
 - XEP-0085: Chat State Notifications
@@ -51,7 +52,6 @@ Complete:
 Ongoing:
 - XEP-0009: Jabber-RPC (API is not finalized yet)
 - XEP-0060: Publish-Subscribe (Only basic IQ implemented)
-- XEP-0077: In-Band Registration (Only basic IQ implemented)
 - XEP-0369: Mediated Information eXchange (MIX) (Only IQ queries implemented) (v0.14.2)
 - XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements (Only IQ queries implemented) (v0.4.0)
 
