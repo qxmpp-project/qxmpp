@@ -37,6 +37,7 @@ Complete:
 - XEP-0224: Attention
 - XEP-0231: Bits of Binary (v1.0)
 - XEP-0237: Roster Versioning (partially)
+- XEP-0249: Direct MUC Invitations (v1.2)
 - XEP-0280: Message Carbons
 - XEP-0308: Last Message Correction
 - XEP-0313: Message Archive Management (v0.6)
