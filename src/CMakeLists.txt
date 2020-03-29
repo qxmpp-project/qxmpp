@@ -41,6 +41,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppNonSASLAuth.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
+    base/QXmppPubSubEvent.h
     base/QXmppPubSubIq.h
     base/QXmppPubSubItem.h
     base/QXmppPushEnableIq.h
@@ -75,6 +76,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppMucManager.h
     client/QXmppOutgoingClient.h
     client/QXmppRegistrationManager.h
+    client/QXmppPubSubManager.h
     client/QXmppRemoteMethod.h
     client/QXmppRosterManager.h
     client/QXmppRpcManager.h
@@ -123,6 +125,7 @@ set(SOURCE_FILES
     base/QXmppNonSASLAuth.cpp
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
+    base/QXmppPubSubEvent.cpp
     base/QXmppPubSubIq.cpp
     base/QXmppPubSubItem.cpp
     base/QXmppPushEnableIq.cpp
@@ -162,6 +165,7 @@ set(SOURCE_FILES
     client/QXmppOutgoingClient.cpp
     client/QXmppRosterManager.cpp
     client/QXmppRegistrationManager.cpp
+    client/QXmppPubSubManager.cpp
     client/QXmppRemoteMethod.cpp
     client/QXmppRpcManager.cpp
     client/QXmppTlsManager.cpp

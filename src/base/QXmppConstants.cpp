@@ -60,6 +60,9 @@ const char* ns_vcard = "vcard-temp";
 const char* ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0060: Publish-Subscribe
 const char* ns_pubsub = "http://jabber.org/protocol/pubsub";
+const char* ns_pubsub_errors = "http://jabber.org/protocol/pubsub#errors";
+const char* ns_pubsub_event = "http://jabber.org/protocol/pubsub#event";
+const char* ns_pubsub_owner = "http://jabber.org/protocol/pubsub#owner";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data

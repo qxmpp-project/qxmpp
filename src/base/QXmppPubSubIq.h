@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Germán Márquez Mejía
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -24,7 +25,9 @@
 #ifndef QXMPPPUBSUBIQ_H
 #define QXMPPPUBSUBIQ_H
 
+#include "QXmppDataForm.h"
 #include "QXmppIq.h"
+#include "QXmppPubSubItem.h"
 
 #include <QSharedDataPointer>
 
@@ -34,11 +37,12 @@
 
 class QXmppPubSubIqPrivate;
 
+///
 /// \brief The QXmppPubSubIq class represents an IQ used for the
 /// publish-subscribe mechanisms defined by \xep{0060}: Publish-Subscribe.
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppPubSubIq : public QXmppIq
 {
 public:
@@ -52,29 +56,34 @@ public:
         SubscribeQuery,
         SubscriptionQuery,
         SubscriptionsQuery,
-        UnsubscribeQuery
+        UnsubscribeQuery,
+        CreateQuery,
+        DeleteQuery
     };
 
     QXmppPubSubIq();
-    QXmppPubSubIq(const QXmppPubSubIq &iq);
+    QXmppPubSubIq(const QXmppPubSubIq &other);
     ~QXmppPubSubIq();
 
-    QXmppPubSubIq &operator=(const QXmppPubSubIq &iq);
+    QXmppPubSubIq &operator=(const QXmppPubSubIq &other);
 
     QXmppPubSubIq::QueryType queryType() const;
     void setQueryType(QXmppPubSubIq::QueryType queryType);
 
     QString queryJid() const;
-    void setQueryJid(const QString &jid);
+    void setQueryJid(const QString &queryJid);
 
-    QString queryNode() const;
-    void setQueryNode(const QString &node);
+    QString queryNodeName() const;
+    void setQueryNodeName(const QString &queryNodeName);
 
     QList<QXmppPubSubItem> items() const;
     void setItems(const QList<QXmppPubSubItem> &items);
 
     QString subscriptionId() const;
-    void setSubscriptionId(const QString &id);
+    void setSubscriptionId(const QString &subscriptionId);
+
+    QXmppDataForm publishOptions() const;
+    void setPublishOptions(const QXmppDataForm &publishOptions);
 
     /// \cond
     static bool isPubSubIq(const QDomElement &element);

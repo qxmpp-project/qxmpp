@@ -3,6 +3,7 @@
  *
  * Author:
  *  Jeremy Lainé
+ *  Germán Márquez Mejía
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -39,6 +40,8 @@ static const QStringList PUBSUB_QUERIES = {
     QStringLiteral("subscription"),
     QStringLiteral("subscriptions"),
     QStringLiteral("unsubscribe"),
+    QStringLiteral("create"),
+    QStringLiteral("delete"),
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
@@ -48,10 +51,11 @@ public:
 
     QXmppPubSubIq::QueryType queryType;
     QString queryJid;
-    QString queryNode;
+    QString queryNodeName;
     QList<QXmppPubSubItem> items;
     QString subscriptionId;
     QString subscriptionType;
+    QXmppDataForm publishOptions;
 };
 
 QXmppPubSubIqPrivate::QXmppPubSubIqPrivate()
@@ -59,92 +63,133 @@ QXmppPubSubIqPrivate::QXmppPubSubIqPrivate()
 {
 }
 
+///
+/// Constructs a PubSub IQ.
+///
 QXmppPubSubIq::QXmppPubSubIq()
     : d(new QXmppPubSubIqPrivate)
 {
 }
 
-QXmppPubSubIq::QXmppPubSubIq(const QXmppPubSubIq &iq) = default;
+///
+/// Constructs a copy of other.
+///
+/// \param other
+///
+QXmppPubSubIq::QXmppPubSubIq(const QXmppPubSubIq &other) = default;
 
 QXmppPubSubIq::~QXmppPubSubIq() = default;
 
-QXmppPubSubIq &QXmppPubSubIq::operator=(const QXmppPubSubIq &iq) = default;
+///
+/// Assigns \a other to this IQ.
+///
+/// \param other
+///
+QXmppPubSubIq &QXmppPubSubIq::operator=(const QXmppPubSubIq &other) = default;
 
-/// Returns the PubSub queryType for this IQ.
-
+///
+/// Returns the PubSub query type for this IQ.
+///
 QXmppPubSubIq::QueryType QXmppPubSubIq::queryType() const
 {
     return d->queryType;
 }
 
-/// Sets the PubSub queryType for this IQ.
+///
+/// Sets the PubSub query type for this IQ.
 ///
 /// \param queryType
-
+///
 void QXmppPubSubIq::setQueryType(QXmppPubSubIq::QueryType queryType)
 {
     d->queryType = queryType;
 }
 
+///
 /// Returns the JID being queried.
-
+///
 QString QXmppPubSubIq::queryJid() const
 {
     return d->queryJid;
 }
 
+///
 /// Sets the JID being queried.
 ///
 /// \param queryJid
-
+///
 void QXmppPubSubIq::setQueryJid(const QString &queryJid)
 {
     d->queryJid = queryJid;
 }
 
-/// Returns the node being queried.
-
-QString QXmppPubSubIq::queryNode() const
-{
-    return d->queryNode;
-}
-
-/// Sets the node being queried.
 ///
-/// \param queryNode
-
-void QXmppPubSubIq::setQueryNode(const QString &queryNode)
+/// Returns the name of the node being queried.
+///
+QString QXmppPubSubIq::queryNodeName() const
 {
-    d->queryNode = queryNode;
+    return d->queryNodeName;
 }
 
-/// Returns the subscription ID.
+///
+/// Sets the name of the node being queried.
+///
+/// \param queryNodeName
+///
+void QXmppPubSubIq::setQueryNodeName(const QString &queryNodeName)
+{
+    d->queryNodeName = queryNodeName;
+}
 
+///
+/// Returns the subscription ID.
+///
 QString QXmppPubSubIq::subscriptionId() const
 {
     return d->subscriptionId;
 }
 
+///
 /// Sets the subscription ID.
 ///
 /// \param subscriptionId
-
+///
 void QXmppPubSubIq::setSubscriptionId(const QString &subscriptionId)
 {
     d->subscriptionId = subscriptionId;
 }
 
-/// Returns the IQ's items.
+///
+/// Returns the publish options for the IQ's items.
+///
+QXmppDataForm QXmppPubSubIq::publishOptions() const
+{
+    return d->publishOptions;
+}
 
+///
+/// Sets the publish options for the IQ's items.
+///
+/// \param publishOptions
+///
+void QXmppPubSubIq::setPublishOptions(const QXmppDataForm &publishOptions)
+{
+    d->publishOptions = publishOptions;
+}
+
+///
+/// Returns the IQ's items.
+///
 QList<QXmppPubSubItem> QXmppPubSubIq::items() const
 {
     return d->items;
 }
 
+///
 /// Sets the IQ's items.
 ///
 /// \param items
-
+///
 void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 {
     d->items = items;
@@ -153,7 +198,8 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 /// \cond
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
-    return element.firstChildElement(QStringLiteral("pubsub")).namespaceURI() == ns_pubsub;
+    QString ns = element.firstChildElement(QStringLiteral("pubsub")).namespaceURI();
+    return ns == ns_pubsub || ns == ns_pubsub_owner;
 }
 
 void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
@@ -164,15 +210,17 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 
     // determine query type
     const QString tagName = queryElement.tagName();
+
     int queryType = PUBSUB_QUERIES.indexOf(queryElement.tagName());
     if (queryType > -1)
         d->queryType = QueryType(queryType);
 
     d->queryJid = queryElement.attribute(QStringLiteral("jid"));
-    d->queryNode = queryElement.attribute(QStringLiteral("node"));
+    d->queryNodeName = queryElement.attribute(QStringLiteral("node"));
 
     // parse contents
     QDomElement childElement;
+
     switch (d->queryType) {
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
@@ -192,17 +240,29 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     default:
         break;
     }
+
+    // parse publish options
+    if (d->queryType == QXmppPubSubIq::PublishQuery) {
+        QDomElement optionsElement = pubSubElement.firstChildElement("publish-options");
+        QXmppDataForm form;
+        form.parse(optionsElement.firstChildElement());
+        d->publishOptions = form;
+    }
 }
 
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("pubsub"));
-    writer->writeDefaultNamespace(ns_pubsub);
+
+    QString defaultNamespace = ns_pubsub;
+    if (d->queryType == QXmppPubSubIq::DeleteQuery)
+        defaultNamespace = ns_pubsub_owner;
+    writer->writeDefaultNamespace(defaultNamespace);
 
     // write query type
     writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
     helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
-    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNode);
+    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNodeName);
 
     // write contents
     switch (d->queryType) {
@@ -220,6 +280,14 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         break;
     }
     writer->writeEndElement();
+
+    // write publish options
+    if (d->queryType == QXmppPubSubIq::PublishQuery && !d->publishOptions.isNull()) {
+        writer->writeStartElement("publish-options");
+        d->publishOptions.toXml(writer);
+        writer->writeEndElement();
+    }
+
     writer->writeEndElement();
 }
 /// \endcond
