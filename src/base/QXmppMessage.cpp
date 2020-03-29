@@ -523,6 +523,66 @@ void QXmppMessage::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBi
     d->bitsOfBinaryData = bitsOfBinaryData;
 }
 
+///
+/// Returns whether the given text is a '/me command' as defined in \xep{0245}:
+/// The /me Command.
+///
+/// \since QXmpp 1.3
+///
+bool QXmppMessage::isSlashMeCommand(const QString &body)
+{
+    return body.startsWith(QStringLiteral("/me "));
+}
+
+///
+/// Returns whether the body of the message is a '/me command' as defined in
+/// \xep{0245}: The /me Command.
+///
+/// \note If you want to check a custom string for the /me command, you can use
+/// the static version of this method. This can be helpful when checking user
+/// input before a message was sent.
+///
+/// \since QXmpp 1.3
+///
+bool QXmppMessage::isSlashMeCommand() const
+{
+    return isSlashMeCommand(d->body);
+}
+
+///
+/// Returns the part of the body after the /me command.
+///
+/// This cuts off '/me ' (with the space) from the body, in case the body
+/// starts with that. In case the body does not contain a /me command as
+/// defined in \xep{0245}: The /me Command, a null string is returned.
+///
+/// This is useful when displaying the /me command correctly to the user.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::slashMeCommandText(const QString &body)
+{
+    if (isSlashMeCommand(body))
+        return body.mid(4);
+    return {};
+}
+
+///
+/// Returns the part of the body after the /me command.
+///
+/// This cuts off '/me ' (with the space) from the body, in case the body
+/// starts with that. In case the body does not contain a /me command as
+/// defined in \xep{0245}: The /me Command, a null string is returned.
+///
+/// This is useful when displaying the /me command correctly to the user.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::slashMeCommandText() const
+{
+    return slashMeCommandText(d->body);
+}
+
 /// Returns if the message is marked with a <private> tag,
 /// in which case it will not be forwarded to other resources
 /// according to \xep{0280}: Message Carbons.

@@ -61,6 +61,8 @@ private slots:
     void testBobData();
     void testFallbackIndication();
     void testStanzaIds();
+    void testSlashMe_data();
+    void testSlashMe();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1009,6 +1011,52 @@ void tst_QXmppMessage::testStanzaIds()
     msg2.setStanzaIdBy(QStringLiteral("server.tld"));
     msg2.setOriginId(QStringLiteral("5678"));
     serializePacket(msg2, xml);
+}
+
+void tst_QXmppMessage::testSlashMe_data()
+{
+    QTest::addColumn<QString>("body");
+    QTest::addColumn<QString>("actionText");
+    QTest::addColumn<bool>("expected");
+
+#define POSTIIVE(name, body, actionText) \
+    QTest::newRow(QT_STRINGIFY(name)) << body << actionText << true
+
+#define NEGATIVE(name, body) \
+    QTest::newRow(QT_STRINGIFY(name)) << body << QString() << false
+
+    POSTIIVE(correct, "/me is having lunch.", "is having lunch.");
+    POSTIIVE(correct without text, "/me ", QString());
+
+    NEGATIVE(empty, "");
+    NEGATIVE(null, QString());
+    NEGATIVE(missing space, "/meshrugs in disgust");
+    NEGATIVE(with apostrophe, "/me's disgusted");
+    NEGATIVE(space at the beginning, " /me shrugs in disgust");
+    NEGATIVE(in quotation marks, R"("/me shrugs in disgust")");
+    NEGATIVE(display interpretation, "* Atlas shrugs in disgust");
+    NEGATIVE(quote, "Why did you say \"/me sleeps\"?");
+
+#undef POSTIIVE
+#undef NEGATIVE
+}
+
+void tst_QXmppMessage::testSlashMe()
+{
+    QFETCH(QString, body);
+    QFETCH(QString, actionText);
+    QFETCH(bool, expected);
+
+    QCOMPARE(QXmppMessage::isSlashMeCommand(body), expected);
+    QCOMPARE(QXmppMessage::slashMeCommandText(body), actionText);
+
+    QXmppMessage msg;
+    QVERIFY(!msg.isSlashMeCommand());
+    QVERIFY(msg.slashMeCommandText().isNull());
+
+    msg.setBody(body);
+    QCOMPARE(msg.isSlashMeCommand(), expected);
+    QCOMPARE(msg.slashMeCommandText(), actionText);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

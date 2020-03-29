@@ -160,6 +160,12 @@ public:
     QXmppBitsOfBinaryDataList &bitsOfBinaryData();
     void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
 
+    // XEP-0245: The /me Command
+    static bool isSlashMeCommand(const QString &body);
+    bool isSlashMeCommand() const;
+    static QString slashMeCommandText(const QString &body);
+    QString slashMeCommandText() const;
+
     // XEP-0280: Message Carbons
     bool isPrivate() const;
     void setPrivate(const bool);
