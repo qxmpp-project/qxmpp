@@ -130,7 +130,10 @@ public:
             NotAcceptable,          ///< The request does not meet the defined critera.
             NotAllowed,             ///< No entity is allowed to perform the request.
             NotAuthorized,          ///< The request should be resent after authentication.
-            PaymentRequired,        ///< Payment is required to perform the request.
+            /// Payment is required to perform the request.
+            /// \deprecated This error condition is deprecated since QXmpp 1.3 as it was not adopted in RFC6120.
+            QT_DEPRECATED_X("The <payment-required/> error was removed in RFC6120")
+            PaymentRequired,
             RecipientUnavailable,   ///< The recipient is unavailable.
             Redirect,               ///< The requested resource is available elsewhere.
             RegistrationRequired,   ///< The requesting entity needs to register first.
