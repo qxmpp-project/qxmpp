@@ -34,6 +34,8 @@ class QXmppDataForm;
 /// \brief This class represents an IQ to enable or disablepush notifications
 /// on the user server.
 ///
+/// \since QXmpp 1.3
+///
 class QXMPP_EXPORT QXmppPushEnableIq : public QXmppIq
 {
 public:
