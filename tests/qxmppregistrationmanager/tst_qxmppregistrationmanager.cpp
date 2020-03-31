@@ -29,20 +29,6 @@
 
 #include "util.h"
 
-template<class T>
-QDomElement writePacketToDom(T packet)
-{
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    packet.toXml(&writer);
-
-    QDomDocument doc;
-    doc.setContent(buffer.data(), true);
-
-    return doc.documentElement();
-}
-
 class tst_QXmppRegistrationManager : public QObject
 {
     Q_OBJECT
@@ -350,17 +336,17 @@ void tst_QXmppRegistrationManager::testRegistrationResult()
     registrationRequestForm.setEmail(QStringLiteral("1234@example.org"));
     registrationRequestForm.setId(QStringLiteral("register1"));
 
-    bool signalCalled = false;
+    bool succeededSignalCalled = false;
+    bool failedSignalCalled = false;
+
     QObject *context = new QObject(this);
-    if (isSuccess) {
-        connect(manager, &QXmppRegistrationManager::registrationSucceeded, context, [&]() {
-            signalCalled = true;
-        });
-    } else {
-        connect(manager, &QXmppRegistrationManager::registrationFailed, context, [&](const QXmppStanza::Error &) {
-            signalCalled = true;
-        });
-    }
+
+    connect(manager, &QXmppRegistrationManager::registrationSucceeded, context, [&]() {
+        succeededSignalCalled = true;
+    });
+    connect(manager, &QXmppRegistrationManager::registrationFailed, context, [&](const QXmppStanza::Error &) {
+        failedSignalCalled = true;
+    });
 
     manager->setRegistrationFormToSend(registrationRequestForm);
     manager->sendCachedRegistrationForm();
@@ -370,7 +356,9 @@ void tst_QXmppRegistrationManager::testRegistrationResult()
 
     manager->handleStanza(writePacketToDom(serverResult));
 
-    QVERIFY(signalCalled);
+    QCOMPARE(succeededSignalCalled, isSuccess);
+    QCOMPARE(failedSignalCalled, !isSuccess);
+
     delete context;
 }
 

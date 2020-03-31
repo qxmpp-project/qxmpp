@@ -228,9 +228,11 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             case QXmppIq::Result:
                 info(QStringLiteral("Successfully registered with the service."));
                 emit registrationSucceeded();
+                break;
             case QXmppIq::Error:
                 warning(QStringLiteral("Registering with the service failed: ").append(iq.error().text()));
                 emit registrationFailed(iq.error());
+                break;
             default:
                 break;  // should never occur
             }

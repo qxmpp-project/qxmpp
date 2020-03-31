@@ -6,6 +6,24 @@ QXmpp 1.3.0 (UNRELEASED)
 New features:
  - Port QXmppCallManager to GStreamer
 
+QXmpp 1.2.1 (Apr 01, 2020)
+--------------------------
+
+This release contains some bug fixes that have been found in the last two
+months. Also, the coverage has slightly improved due to new unit tests for the
+bug fixes.
+
+Fixes:
+ - QXmppRegistrationManager: Fix failed and succeeded signals are both emitted
+   on success (#260, @melvo)
+ - QXmppMessageReceiptManager: Fix receipts are sent on error messages
+   (#269, @TheBluestBird)
+ - QXmppVCardManager: Fix clientVCardReceived() not emitted when IQ is from the
+   bare JID of the user (#281, @melvo, @lnjX)
+ - QXmppRosterManager: Fix 'ask' attribute is included when renaming item
+   (#262, @melvo, @lnjX)
+ - QXmppRosterIq: Add missing implementation of the copy constructor (@lnjX)
+
 QXmpp 1.2.0 (Feb 06, 2020)
 --------------------------
 
