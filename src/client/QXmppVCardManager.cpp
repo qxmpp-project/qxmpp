@@ -113,7 +113,7 @@ bool QXmppVCardManager::handleStanza(const QDomElement& element)
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);
 
-        if (vCardIq.from().isEmpty()) {
+        if (vCardIq.from().isEmpty() || vCardIq.from() == client()->configuration().jidBare()) {
             d->clientVCard = vCardIq;
             d->isClientVCardReceived = true;
             emit clientVCardReceived();
