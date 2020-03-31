@@ -34,6 +34,8 @@ private slots:
     void testExtendedAddress_data();
     void testExtendedAddress();
 
+    void testErrorCases_data();
+    void testErrorCases();
     void testErrorFileTooLarge();
     void testErrorRetry();
 };
@@ -76,6 +78,173 @@ void tst_QXmppStanza::testExtendedAddress()
     QCOMPARE(address.jid(), jid);
     QCOMPARE(address.type(), type);
     serializePacket(address, xml);
+}
+
+void tst_QXmppStanza::testErrorCases_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QXmppStanza::Error::Type>("type");
+    QTest::addColumn<QXmppStanza::Error::Condition>("condition");
+    QTest::addColumn<QString>("text");
+
+#define ROW(xml, type, condition, text) \
+    QTest::newRow(QT_STRINGIFY(condition)) << QByteArrayLiteral(xml) << QXmppStanza::Error::type << QXmppStanza::Error::condition << text
+#define BASIC(xml, type, condition) \
+    ROW(xml, type, condition, QString())
+
+    ROW(
+        "<error type=\"modify\">"
+        "<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        BadRequest,
+        "");
+    BASIC(
+        "<error type=\"cancel\">"
+        "<conflict xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        Conflict);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<feature-not-implemented xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        FeatureNotImplemented);
+    BASIC(
+        "<error type=\"auth\">"
+        "<forbidden xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Auth,
+        Forbidden);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<gone xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        Gone);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<internal-server-error xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        InternalServerError);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        ItemNotFound);
+    BASIC(
+        "<error type=\"modify\">"
+        "<jid-malformed xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        JidMalformed);
+    BASIC(
+        "<error type=\"modify\">"
+        "<not-acceptable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        NotAcceptable);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<not-allowed xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        NotAllowed);
+    BASIC(
+        "<error type=\"auth\">"
+        "<not-authorized xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Auth,
+        NotAuthorized);
+    ROW(
+        "<error type=\"modify\">"
+        "<policy-violation xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "<text xml:lang=\"en\" xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">The used words are not allowed on this server.</text>"
+        "</error>",
+        Modify,
+        PolicyViolation,
+        "The used words are not allowed on this server.");
+    BASIC(
+        "<error type=\"wait\">"
+        "<recipient-unavailable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Wait,
+        RecipientUnavailable);
+    BASIC(
+        "<error type=\"modify\">"
+        "<redirect xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        Redirect);
+    BASIC(
+        "<error type=\"auth\">"
+        "<registration-required xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Auth,
+        RegistrationRequired);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<remote-server-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        RemoteServerNotFound);
+    BASIC(
+        "<error type=\"wait\">"
+        "<remote-server-timeout xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Wait,
+        RemoteServerTimeout);
+    BASIC(
+        "<error type=\"wait\">"
+        "<resource-constraint xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Wait,
+        ResourceConstraint);
+    BASIC(
+        "<error type=\"cancel\">"
+        "<service-unavailable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        ServiceUnavailable);
+    BASIC(
+        "<error type=\"auth\">"
+        "<subscription-required xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Auth,
+        SubscriptionRequired);
+    BASIC(
+        "<error type=\"modify\">"
+        "<undefined-condition xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        UndefinedCondition);
+}
+
+void tst_QXmppStanza::testErrorCases()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QXmppStanza::Error::Type, type);
+    QFETCH(QXmppStanza::Error::Condition, condition);
+    QFETCH(QString, text);
+
+    // parsing
+    QXmppStanza::Error error;
+    parsePacket(error, xml);
+    QCOMPARE(error.type(), type);
+    QCOMPARE(error.condition(), condition);
+    QCOMPARE(error.text(), text);
+    // check parsed error results in the same xml
+    serializePacket(error, xml);
+
+    // serialization from setters
+    error = QXmppStanza::Error();
+    error.setType(type);
+    error.setCondition(condition);
+    error.setText(text);
+    serializePacket(error, xml);
 }
 
 void tst_QXmppStanza::testErrorFileTooLarge()
