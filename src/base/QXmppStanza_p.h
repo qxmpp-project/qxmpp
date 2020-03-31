@@ -65,6 +65,8 @@ static QString strFromCondition(const QXmppStanza::Error::Condition& condition)
         return "not-authorized";
     case QXmppStanza::Error::PaymentRequired:
         return "payment-required";
+    case QXmppStanza::Error::PolicyViolation:
+        return "policy-violation";
     case QXmppStanza::Error::RecipientUnavailable:
         return "recipient-unavailable";
     case QXmppStanza::Error::Redirect:
@@ -116,6 +118,8 @@ static QXmppStanza::Error::Condition conditionFromStr(const QString& string)
         return QXmppStanza::Error::NotAuthorized;
     else if (string == "payment-required")
         return QXmppStanza::Error::PaymentRequired;
+    else if (string == "policy-violation")
+        return QXmppStanza::Error::PolicyViolation;
     else if (string == "recipient-unavailable")
         return QXmppStanza::Error::RecipientUnavailable;
     else if (string == "redirect")

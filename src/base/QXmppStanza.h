@@ -143,7 +143,8 @@ public:
             ServiceUnavailable,     ///< The service is currently not available.
             SubscriptionRequired,   ///< The requester needs to subscribe first.
             UndefinedCondition,     ///< An undefined condition was hit.
-            UnexpectedRequest       ///< The request was unexpected.
+            UnexpectedRequest,      ///< The request was unexpected.
+            PolicyViolation         ///< The entity has violated a local server policy. \since QXmpp 1.3
         };
 
         Error();
@@ -233,5 +234,8 @@ private:
     QSharedDataPointer<QXmppStanzaPrivate> d;
     static uint s_uniqeIdNo;
 };
+
+Q_DECLARE_METATYPE(QXmppStanza::Error::Type);
+Q_DECLARE_METATYPE(QXmppStanza::Error::Condition);
 
 #endif  // QXMPPSTANZA_H
