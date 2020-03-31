@@ -49,6 +49,20 @@ static void serializePacket(T &packet, const QByteArray &xml)
     QCOMPARE(buffer.data(), xml);
 }
 
+template<class T>
+QDomElement writePacketToDom(T packet)
+{
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    packet.toXml(&writer);
+
+    QDomDocument doc;
+    doc.setContent(buffer.data(), true);
+
+    return doc.documentElement();
+}
+
 class TestPasswordChecker : public QXmppPasswordChecker
 {
 public:
