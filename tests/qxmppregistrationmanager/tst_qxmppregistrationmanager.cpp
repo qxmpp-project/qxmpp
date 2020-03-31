@@ -29,20 +29,6 @@
 
 #include "util.h"
 
-template<class T>
-QDomElement writePacketToDom(T packet)
-{
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    packet.toXml(&writer);
-
-    QDomDocument doc;
-    doc.setContent(buffer.data(), true);
-
-    return doc.documentElement();
-}
-
 class tst_QXmppRegistrationManager : public QObject
 {
     Q_OBJECT
