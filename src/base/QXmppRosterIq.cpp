@@ -44,6 +44,8 @@ QXmppRosterIq::QXmppRosterIq()
 {
 }
 
+QXmppRosterIq::QXmppRosterIq(const QXmppRosterIq &) = default;
+
 QXmppRosterIq::~QXmppRosterIq() = default;
 
 QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
