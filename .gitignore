@@ -1,3 +1,5 @@
 CMakeLists.txt.*
 .DS_Store
 build*
+.kdev4/
+*.kdev4
