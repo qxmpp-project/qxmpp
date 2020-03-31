@@ -3,61 +3,61 @@
 This document lists the XMPP Extensions (XEP) available in QXmpp.
 
 Complete:
-- XEP-0004: Data Forms
-- XEP-0030: Service Discovery
-- XEP-0033: Extended Stanza Addressing
-- XEP-0045: Multi-User Chat
-- XEP-0047: In-Band Bytestreams
-- XEP-0048: Bookmarks
-- XEP-0054: vcard-temp
-- XEP-0059: Result Set Management
-- XEP-0065: SOCKS5 Bytestreams
-- XEP-0066: Out of Band Data (partially)
-- XEP-0071: XHTML-IM
-- XEP-0078: Non-SASL Authentication
-- XEP-0082: XMPP Date and Time Profiles
-- XEP-0085: Chat State Notifications
-- XEP-0091: Legacy Delayed Delivery
-- XEP-0092: Software Version
-- XEP-0095: Stream Initiation
-- XEP-0096: SI File Transfer
-- XEP-0115: Entity Capabilities
-- XEP-0128: Service Discovery Extensions
-- XEP-0136: Message Archiving
-- XEP-0153: vCard-Based Avatars
-- XEP-0166: Jingle
-- XEP-0167: Jingle RTP Sessions
-- XEP-0176: Jingle ICE-UDP Transport Method
-- XEP-0184: Message Delivery Receipts
-- XEP-0198: Stream Management
-- XEP-0199: XMPP Ping
-- XEP-0202: Entity Time
-- XEP-0203: Delayed Delivery
-- XEP-0221: Data Forms Media Element
-- XEP-0224: Attention
-- XEP-0231: Bits of Binary (v1.0)
-- XEP-0237: Roster Versioning (partially)
-- XEP-0245: The /me Command (v1.0)
-- XEP-0249: Direct MUC Invitations (v1.2)
-- XEP-0280: Message Carbons
-- XEP-0308: Last Message Correction
-- XEP-0313: Message Archive Management (v0.6)
-- XEP-0319: Last User Interaction in Presence
-- XEP-0334: Message Processing Hints (v0.3)
-- XEP-0352: Client State Indication
-- XEP-0357: Push Notifications (v0.4) (partially)
-- XEP-0359: Unique and Stable Stanza IDs (v0.6)
-- XEP-0363: HTTP File Upload (v1.0)
-- XEP-0367: Message Attaching (v0.3)
-- XEP-0380: Explicit Message Encryption (v0.3)
-- XEP-0382: Spoiler messages (v0.2)
-- XEP-0428: Fallback Indication (v0.1)
+- \xep{0004}: Data Forms
+- \xep{0030}: Service Discovery
+- \xep{0033}: Extended Stanza Addressing
+- \xep{0045}: Multi-User Chat
+- \xep{0047}: In-Band Bytestreams
+- \xep{0048}: Bookmarks
+- \xep{0054}: vcard-temp
+- \xep{0059}: Result Set Management
+- \xep{0065}: SOCKS5 Bytestreams
+- \xep{0066}: Out of Band Data (partially)
+- \xep{0071}: XHTML-IM
+- \xep{0078}: Non-SASL Authentication
+- \xep{0082}: XMPP Date and Time Profiles
+- \xep{0085}: Chat State Notifications
+- \xep{0091}: Legacy Delayed Delivery
+- \xep{0092}: Software Version
+- \xep{0095}: Stream Initiation
+- \xep{0096}: SI File Transfer
+- \xep{0115}: Entity Capabilities
+- \xep{0128}: Service Discovery Extensions
+- \xep{0136}: Message Archiving
+- \xep{0153}: vCard-Based Avatars
+- \xep{0166}: Jingle
+- \xep{0167}: Jingle RTP Sessions
+- \xep{0176}: Jingle ICE-UDP Transport Method
+- \xep{0184}: Message Delivery Receipts
+- \xep{0198}: Stream Management
+- \xep{0199}: XMPP Ping
+- \xep{0202}: Entity Time
+- \xep{0203}: Delayed Delivery
+- \xep{0221}: Data Forms Media Element
+- \xep{0224}: Attention
+- \xep{0231}: Bits of Binary (v1.0)
+- \xep{0237}: Roster Versioning (partially)
+- \xep{0245}: The /me Command (v1.0)
+- \xep{0249}: Direct MUC Invitations (v1.2)
+- \xep{0280}: Message Carbons
+- \xep{0308}: Last Message Correction
+- \xep{0313}: Message Archive Management (v0.6)
+- \xep{0319}: Last User Interaction in Presence
+- \xep{0334}: Message Processing Hints (v0.3)
+- \xep{0352}: Client State Indication
+- \xep{0357}: Push Notifications (v0.4) (partially)
+- \xep{0359}: Unique and Stable Stanza IDs (v0.6)
+- \xep{0363}: HTTP File Upload (v1.0)
+- \xep{0367}: Message Attaching (v0.3)
+- \xep{0380}: Explicit Message Encryption (v0.3)
+- \xep{0382}: Spoiler messages (v0.2)
+- \xep{0428}: Fallback Indication (v0.1)
 
 Ongoing:
-- XEP-0009: Jabber-RPC (API is not finalized yet)
-- XEP-0060: Publish-Subscribe (Only basic IQ implemented)
-- XEP-0077: In-Band Registration (Only basic IQ implemented)
-- XEP-0369: Mediated Information eXchange (MIX) (Only IQ queries implemented) (v0.14)
-- XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements (Only IQ queries implemented) (v0.4)
+- \xep{0009}: Jabber-RPC (API is not finalized yet)
+- \xep{0060}: Publish-Subscribe (Only basic IQ implemented)
+- \xep{0077}: In-Band Registration (Only basic IQ implemented)
+- \xep{0369}: Mediated Information eXchange (MIX) (Only IQ queries implemented) (v0.14)
+- \xep{0405}: Mediated Information eXchange (MIX): Participant Server Requirements (Only IQ queries implemented) (v0.4)
 
 */
