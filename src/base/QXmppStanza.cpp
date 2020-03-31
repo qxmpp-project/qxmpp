@@ -165,6 +165,7 @@ public:
     QXmppStanza::Error::Type type;
     QXmppStanza::Error::Condition condition;
     QString text;
+    QString redirectionUri;
 
     // XEP-0363: HTTP File Upload
     bool fileTooLarge;
@@ -255,6 +256,9 @@ void QXmppStanza::Error::setCode(int code)
 ///
 /// Returns the error condition.
 ///
+/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
+/// can be used in combination with redirectUri().
+///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
     return d->condition;
@@ -262,6 +266,9 @@ QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 
 ///
 /// Sets the error condition.
+///
+/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
+/// can be used in combination with setRedirectUri().
 ///
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 {
@@ -282,6 +289,32 @@ QXmppStanza::Error::Type QXmppStanza::Error::type() const
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 {
     d->type = type;
+}
+
+///
+/// Returns the optionally included redirection URI for the error conditions
+/// QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect.
+///
+/// \sa setRedirectionUri()
+///
+/// \since QXmpp 1.3
+///
+QString QXmppStanza::Error::redirectionUri() const
+{
+    return d->redirectionUri;
+}
+
+///
+/// Sets the optional redirection URI for the error conditions
+/// QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect.
+///
+/// \sa redirectionUri()
+///
+/// \since QXmpp 1.3
+///
+void QXmppStanza::Error::setRedirectionUri(const QString &redirectionUri)
+{
+    d->redirectionUri = redirectionUri;
 }
 
 /// Returns true, if an HTTP File Upload failed, because the file was too
@@ -395,12 +428,22 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
     QDomElement element = errorElement.firstChildElement();
     while (!element.isNull()) {
         if (element.namespaceURI() == ns_stanza) {
-            if (element.tagName() == QStringLiteral("text"))
+            if (element.tagName() == QStringLiteral("text")) {
                 setText(element.text());
-            else
+            } else {
                 setConditionFromStr(element.tagName());
-            // XEP-0363: HTTP File Upload
+
+                // redirection URI
+                if (d->condition == Gone || d->condition == Redirect) {
+                    d->redirectionUri = element.text();
+
+                    // .text() returns empty string if nothing was set
+                    if (d->redirectionUri.isEmpty())
+                        d->redirectionUri.clear();
+                }
+            }
         } else if (element.namespaceURI() == ns_http_upload) {
+            // XEP-0363: HTTP File Upload
             // file is too large
             if (element.tagName() == QStringLiteral("file-too-large")) {
                 d->fileTooLarge = true;
@@ -434,6 +477,12 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     if (!cond.isEmpty()) {
         writer->writeStartElement(cond);
         writer->writeDefaultNamespace(ns_stanza);
+
+        // redirection URI
+        if (!d->redirectionUri.isEmpty() && (d->condition == Gone || d->condition == Redirect)) {
+            writer->writeCharacters(d->redirectionUri);
+        }
+
         writer->writeEndElement();
     }
     if (!d->text.isEmpty()) {
