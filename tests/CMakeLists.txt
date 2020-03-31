@@ -51,6 +51,7 @@ add_simple_test(qxmppstarttlspacket)
 add_simple_test(qxmppstreamfeatures)
 add_simple_test(qxmppstunmessage)
 add_simple_test(qxmppvcardiq)
+add_simple_test(qxmppvcardmanager)
 add_simple_test(qxmppversioniq)
 
 if(BUILD_INTERNAL_TESTS)
