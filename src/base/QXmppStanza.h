@@ -130,21 +130,22 @@ public:
             NotAcceptable,          ///< The request does not meet the defined critera.
             NotAllowed,             ///< No entity is allowed to perform the request.
             NotAuthorized,          ///< The request should be resent after authentication.
+#if QXMPP_DEPRECATED_SINCE(1, 3)
             /// Payment is required to perform the request.
             /// \deprecated This error condition is deprecated since QXmpp 1.3 as it was not adopted in RFC6120.
-            QT_DEPRECATED_X("The <payment-required/> error was removed in RFC6120")
-            PaymentRequired,
-            RecipientUnavailable,   ///< The recipient is unavailable.
-            Redirect,               ///< The requested resource is available elsewhere. This is used in combination with a redirection URI.
-            RegistrationRequired,   ///< The requesting entity needs to register first.
-            RemoteServerNotFound,   ///< The remote server could not be found.
-            RemoteServerTimeout,    ///< The connection to the server could not be established or timed out.
-            ResourceConstraint,     ///< The recipient lacks system resources to perform the request.
-            ServiceUnavailable,     ///< The service is currently not available.
-            SubscriptionRequired,   ///< The requester needs to subscribe first.
-            UndefinedCondition,     ///< An undefined condition was hit.
-            UnexpectedRequest,      ///< The request was unexpected.
-            PolicyViolation         ///< The entity has violated a local server policy. \since QXmpp 1.3
+            QT_DEPRECATED_X("The <payment-required/> error was removed in RFC6120") PaymentRequired,
+#endif
+            RecipientUnavailable = 12,  ///< The recipient is unavailable.
+            Redirect,                   ///< The requested resource is available elsewhere. This is used in combination with a redirection URI.
+            RegistrationRequired,       ///< The requesting entity needs to register first.
+            RemoteServerNotFound,       ///< The remote server could not be found.
+            RemoteServerTimeout,        ///< The connection to the server could not be established or timed out.
+            ResourceConstraint,         ///< The recipient lacks system resources to perform the request.
+            ServiceUnavailable,         ///< The service is currently not available.
+            SubscriptionRequired,       ///< The requester needs to subscribe first.
+            UndefinedCondition,         ///< An undefined condition was hit.
+            UnexpectedRequest,          ///< The request was unexpected.
+            PolicyViolation             ///< The entity has violated a local server policy. \since QXmpp 1.3
         };
 
         Error();
