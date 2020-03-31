@@ -168,6 +168,9 @@ public:
         void setType(Type type);
         Type type() const;
 
+        QString by() const;
+        void setBy(const QString &by);
+
         QString redirectionUri() const;
         void setRedirectionUri(const QString &redirectionUri);
 
