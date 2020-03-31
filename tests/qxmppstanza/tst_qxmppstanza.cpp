@@ -86,19 +86,70 @@ void tst_QXmppStanza::testErrorCases_data()
     QTest::addColumn<QXmppStanza::Error::Type>("type");
     QTest::addColumn<QXmppStanza::Error::Condition>("condition");
     QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("redirectionUri");
 
-#define ROW(xml, type, condition, text) \
-    QTest::newRow(QT_STRINGIFY(condition)) << QByteArrayLiteral(xml) << QXmppStanza::Error::type << QXmppStanza::Error::condition << text
+#define ROW(name, xml, type, condition, text, redirect) \
+    QTest::newRow(QT_STRINGIFY(name)) << QByteArrayLiteral(xml) << QXmppStanza::Error::type << QXmppStanza::Error::condition << text << redirect
 #define BASIC(xml, type, condition) \
-    ROW(xml, type, condition, QString())
+    ROW(condition, xml, type, condition, QString(), QString())
 
     ROW(
+        empty-text,
         "<error type=\"modify\">"
         "<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
         "</error>",
         Modify,
         BadRequest,
-        "");
+        QString(),
+        QString());
+    ROW(
+        redirection-uri-gone,
+        "<error type=\"cancel\">"
+        "<gone xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
+        "xmpp:romeo@afterlife.example.net"
+        "</gone>"
+        "</error>",
+        Cancel,
+        Gone,
+        QString(),
+        "xmpp:romeo@afterlife.example.net");
+    ROW(
+        redirection-uri-redirect,
+        "<error type=\"cancel\">"
+        "<redirect xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
+        "xmpp:rms@afterlife.example.net"
+        "</redirect>"
+        "</error>",
+        Cancel,
+        Redirect,
+        QString(),
+        "xmpp:rms@afterlife.example.net");
+    ROW(
+        redirection-uri-empty,
+        "<error type=\"cancel\">"
+        "<redirect xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Cancel,
+        Redirect,
+        QString(),
+        QString());
+    ROW(
+        policy-violation-text,
+        "<error type=\"modify\">"
+        "<policy-violation xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "<text xml:lang=\"en\" xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">The used words are not allowed on this server.</text>"
+        "</error>",
+        Modify,
+        PolicyViolation,
+        "The used words are not allowed on this server.",
+        QString());
+
+    BASIC(
+        "<error type=\"modify\">"
+        "<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
+        "</error>",
+        Modify,
+        BadRequest);
     BASIC(
         "<error type=\"cancel\">"
         "<conflict xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
@@ -159,14 +210,12 @@ void tst_QXmppStanza::testErrorCases_data()
         "</error>",
         Auth,
         NotAuthorized);
-    ROW(
+    BASIC(
         "<error type=\"modify\">"
         "<policy-violation xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
-        "<text xml:lang=\"en\" xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">The used words are not allowed on this server.</text>"
         "</error>",
         Modify,
-        PolicyViolation,
-        "The used words are not allowed on this server.");
+        PolicyViolation);
     BASIC(
         "<error type=\"wait\">"
         "<recipient-unavailable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
@@ -221,6 +270,9 @@ void tst_QXmppStanza::testErrorCases_data()
         "</error>",
         Modify,
         UndefinedCondition);
+
+#undef BASIC
+#undef ROW
 }
 
 void tst_QXmppStanza::testErrorCases()
@@ -229,6 +281,7 @@ void tst_QXmppStanza::testErrorCases()
     QFETCH(QXmppStanza::Error::Type, type);
     QFETCH(QXmppStanza::Error::Condition, condition);
     QFETCH(QString, text);
+    QFETCH(QString, redirectionUri);
 
     // parsing
     QXmppStanza::Error error;
@@ -236,6 +289,7 @@ void tst_QXmppStanza::testErrorCases()
     QCOMPARE(error.type(), type);
     QCOMPARE(error.condition(), condition);
     QCOMPARE(error.text(), text);
+    QCOMPARE(error.redirectionUri(), redirectionUri);
     // check parsed error results in the same xml
     serializePacket(error, xml);
 
@@ -244,6 +298,7 @@ void tst_QXmppStanza::testErrorCases()
     error.setType(type);
     error.setCondition(condition);
     error.setText(text);
+    error.setRedirectionUri(redirectionUri);
     serializePacket(error, xml);
 }
 

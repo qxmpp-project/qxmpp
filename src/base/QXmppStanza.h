@@ -123,7 +123,7 @@ public:
             Conflict,               ///< The request conflicts with another.
             FeatureNotImplemented,  ///< The feature is not implemented.
             Forbidden,              ///< The requesting entity does not posses the necessary privileges to perform the request.
-            Gone,                   ///< The user or server can not be contacted at the address.
+            Gone,                   ///< The user or server can not be contacted at the address. This is used in combination with a redirection URI.
             InternalServerError,    ///< The server has expierienced an internal error and can not process the request.
             ItemNotFound,           ///< The requested item could not be found.
             JidMalformed,           ///< The given JID is not valid.
@@ -135,7 +135,7 @@ public:
             QT_DEPRECATED_X("The <payment-required/> error was removed in RFC6120")
             PaymentRequired,
             RecipientUnavailable,   ///< The recipient is unavailable.
-            Redirect,               ///< The requested resource is available elsewhere.
+            Redirect,               ///< The requested resource is available elsewhere. This is used in combination with a redirection URI.
             RegistrationRequired,   ///< The requesting entity needs to register first.
             RemoteServerNotFound,   ///< The remote server could not be found.
             RemoteServerTimeout,    ///< The connection to the server could not be established or timed out.
@@ -166,6 +166,9 @@ public:
 
         void setType(Type type);
         Type type() const;
+
+        QString redirectionUri() const;
+        void setRedirectionUri(const QString &redirectionUri);
 
         // XEP-0363: HTTP File Upload
         bool fileTooLarge() const;
