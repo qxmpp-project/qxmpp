@@ -71,9 +71,13 @@ receive the message back. This example shows how to receive and send messages.
 Documentation
 =============
 
-You can find the API documentation for the latest QXmpp version here:
+You can find the API documentation for the latest stable QXmpp version here:
 
-http://doc.qxmpp.org/
+https://doc.qxmpp.org/
+
+The API documentation of the master branch is also available:
+
+https://doc.qxmpp.org/qxmpp-dev/
 
 Supported Platforms
 ===================
