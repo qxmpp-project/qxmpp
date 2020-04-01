@@ -88,8 +88,8 @@ public:
     GstElement *apprtpsink;
     GstElement *apprtcpsink;
 
-    void (*sendPadCB)(GstPad *);
-    void (*receivePadCB)(GstPad *);
+    std::function<void(GstPad *)> sendPadCB;
+    std::function<void(GstPad *)> receivePadCB;
 
     QXmppIceConnection *connection;
     QString media;

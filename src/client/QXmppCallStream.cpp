@@ -28,6 +28,7 @@
 #include "QXmppStun.h"
 
 #include <cstring>
+
 #include <gst/gst.h>
 
 QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstElement *pipeline_,
@@ -344,7 +345,7 @@ int QXmppCallStream::id() const
     return d->id;
 }
 
-void QXmppCallStream::setReceivePadCallback(void (*cb)(GstPad *))
+void QXmppCallStream::setReceivePadCallback(std::function<void(GstPad *)> cb)
 {
     d->receivePadCB = cb;
     if (d->receivePad) {
@@ -352,7 +353,7 @@ void QXmppCallStream::setReceivePadCallback(void (*cb)(GstPad *))
     }
 }
 
-void QXmppCallStream::setSendPadCallback(void (*cb)(GstPad *))
+void QXmppCallStream::setSendPadCallback(std::function<void(GstPad *)> cb)
 {
     d->sendPadCB = cb;
     if (d->sendPad) {

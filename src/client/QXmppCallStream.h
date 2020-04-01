@@ -28,6 +28,8 @@
 
 #include <gst/gst.h>
 
+#include <functional>
+
 #include <QObject>
 
 class QXmppCallStreamPrivate;
@@ -50,8 +52,8 @@ public:
     QString media() const;
     QString name() const;
     int id() const;
-    void setReceivePadCallback(void (*cb)(GstPad *));
-    void setSendPadCallback(void (*cb)(GstPad *));
+    void setReceivePadCallback(std::function<void(GstPad *)> cb);
+    void setSendPadCallback(std::function<void(GstPad *)> cb);
 
 private:
     QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
