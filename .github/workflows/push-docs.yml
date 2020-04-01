@@ -1,0 +1,22 @@
+---
+name: push-docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  push-doc:
+    runs-on: ubuntu-latest
+    env:
+      PUSH_KEY_REPO_DOC_QXMPP_ORG: ${{ secrets.PUSH_KEY_REPO_DOC_QXMPP_ORG }}
+      CONFIG: full
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+      - name: Install extra packages
+        run: tests/travis/install-build-depends
+      - name: Build documentation
+        run: tests/travis/push-documentation

@@ -16,7 +16,7 @@ else
 
     case "$CONFIG" in
     full*)
-        sudo apt-get install -qq  doxygen libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly
+        sudo apt-get install -qq  doxygen graphviz libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly
         ;;
     esac
 fi

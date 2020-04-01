@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Add ssh push key
+eval "$(ssh-agent -s)"
+echo $PUSH_KEY_REPO_DOC_QXMPP_ORG | base64 -d | unxz | ssh-add -
+
+# Set up git
+git config --global user.email "docsbot@qxmpp.org"
+git config --global user.name "QXmpp Docs Bot"
+
+#
+# Build documentation
+#
+
+echo '-------------------------------------------'
+echo 'Building documentation'
+echo '-------------------------------------------'
+
+mkdir build
+cd build
+
+cmake .. -DBUILD_DOCUMENTATION=ON
+
+make doc
+
+#
+# Push documentation
+#
+
+echo '-------------------------------------------'
+echo 'Cloning doc.qxmpp.org repository'
+echo '-------------------------------------------'
+
+git clone ssh://git@github.com/qxmpp-project/doc.qxmpp.org
+
+echo '-------------------------------------------'
+echo 'Commiting and pushing documentation'
+echo '-------------------------------------------'
+
+# delete old dev docs
+rm -rf doc.qxmpp.org/qxmpp-dev
+cp -r doc/html doc.qxmpp.org/qxmpp-dev
+
+git -C doc.qxmpp.org add .
+git -C doc.qxmpp.org commit -m "Add documentation for QXmpp master"
+git -C doc.qxmpp.org push
+
