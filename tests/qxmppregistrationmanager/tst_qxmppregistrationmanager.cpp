@@ -2,8 +2,7 @@
  * Copyright (C) 2008-2020 The QXmpp developers
  *
  * Authors:
- *  Jeremy Lainé
- *  Manjeet Dahiya
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
