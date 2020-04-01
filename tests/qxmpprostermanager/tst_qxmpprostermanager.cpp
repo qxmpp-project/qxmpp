@@ -84,7 +84,7 @@ void tst_QXmppRosterManager::testRenameItem()
     bobAsk.addItem(createItem("bob@qxmpp.org", "subscribe"));
 
     QVERIFY(manager->handleStanza(writePacketToDom(bobAsk)));
-    QCOMPARE(manager->getRosterEntry("bob@qxmpp.org").subscriptionStatus(), "subscribe");
+    QCOMPARE(manager->getRosterEntry("bob@qxmpp.org").subscriptionStatus(), QStringLiteral("subscribe"));
 
     // rename bob
     bool requestSent = false;
@@ -95,8 +95,8 @@ void tst_QXmppRosterManager::testRenameItem()
             QXmppRosterIq renameRequest;
             parsePacket(renameRequest, text.toUtf8());
             QCOMPARE(renameRequest.items().size(), 1);
-            QCOMPARE(renameRequest.items().first().bareJid(), "bob@qxmpp.org");
-            QCOMPARE(renameRequest.items().first().name(), "Bob");
+            QCOMPARE(renameRequest.items().first().bareJid(), QStringLiteral("bob@qxmpp.org"));
+            QCOMPARE(renameRequest.items().first().name(), QStringLiteral("Bob"));
             // check that subscription state ('ask') for bob is not included
             QVERIFY(renameRequest.items().first().subscriptionStatus().isNull());
         }
