@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/qxmpp-project/qxmpp.svg)](https://travis-ci.org/qxmpp-project/qxmpp)
+[![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp)
 
 About QXmpp
