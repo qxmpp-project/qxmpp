@@ -133,7 +133,7 @@ public:
 #if QXMPP_DEPRECATED_SINCE(1, 3)
             /// Payment is required to perform the request.
             /// \deprecated This error condition is deprecated since QXmpp 1.3 as it was not adopted in RFC6120.
-            QT_DEPRECATED_X("The <payment-required/> error was removed in RFC6120") PaymentRequired,
+            PaymentRequired Q_DECL_ENUMERATOR_DEPRECATED_X("The <payment-required/> error was removed in RFC6120"),
 #endif
             RecipientUnavailable = 12,  ///< The recipient is unavailable.
             Redirect,                   ///< The requested resource is available elsewhere. This is used in combination with a redirection URI.
