@@ -1,9 +1,4 @@
-[![XMPP:2020 Client IM Mobile+ Compliance Badge](https://img.shields.io/badge/XMPP%3A2020%20Client-Core%20IM%20Mobile%2B-green)][xmpp-compliance]
-[![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp)
-
-About QXmpp
-===========
+# QXmpp [![XMPP:2020 Client IM Mobile+ Compliance Badge](https://img.shields.io/badge/XMPP%3A2020%20Client-Core%20IM%20Mobile%2B-green)][xmpp-compliance] [![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions) [![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp)
 
 QXmpp is a cross-platform C++ XMPP client and server library. It is written
 in C++ and uses Qt framework.
