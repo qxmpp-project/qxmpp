@@ -33,6 +33,8 @@ class tst_QXmppRosterIq : public QObject
 private slots:
     void testItem_data();
     void testItem();
+    void testApproved_data();
+    void testApproved();
     void testVersion_data();
     void testVersion();
     void testMixAnnotate();
@@ -44,36 +46,44 @@ void tst_QXmppRosterIq::testItem_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<QString>("name");
     QTest::addColumn<int>("subscriptionType");
+    QTest::addColumn<bool>("approved");
 
     QTest::newRow("none")
-        << QByteArray(R"(<item jid="foo@example.com" subscription="none"/>)")
+        << QByteArray(R"(<item jid="foo@example.com" subscription="none" approved="true"/>)")
         << ""
-        << int(QXmppRosterIq::Item::None);
+        << int(QXmppRosterIq::Item::None)
+        << true;
     QTest::newRow("from")
         << QByteArray(R"(<item jid="foo@example.com" subscription="from"/>)")
         << ""
-        << int(QXmppRosterIq::Item::From);
+        << int(QXmppRosterIq::Item::From)
+        << false;
     QTest::newRow("to")
         << QByteArray(R"(<item jid="foo@example.com" subscription="to"/>)")
         << ""
-        << int(QXmppRosterIq::Item::To);
+        << int(QXmppRosterIq::Item::To)
+        << false;
     QTest::newRow("both")
         << QByteArray(R"(<item jid="foo@example.com" subscription="both"/>)")
         << ""
-        << int(QXmppRosterIq::Item::Both);
+        << int(QXmppRosterIq::Item::Both)
+        << false;
     QTest::newRow("remove")
         << QByteArray(R"(<item jid="foo@example.com" subscription="remove"/>)")
         << ""
-        << int(QXmppRosterIq::Item::Remove);
+        << int(QXmppRosterIq::Item::Remove)
+        << false;
     QTest::newRow("notset")
         << QByteArray("<item jid=\"foo@example.com\"/>")
         << ""
-        << int(QXmppRosterIq::Item::NotSet);
+        << int(QXmppRosterIq::Item::NotSet)
+        << false;
 
     QTest::newRow("name")
         << QByteArray(R"(<item jid="foo@example.com" name="foo bar"/>)")
         << "foo bar"
-        << int(QXmppRosterIq::Item::NotSet);
+        << int(QXmppRosterIq::Item::NotSet)
+        << false;
 }
 
 void tst_QXmppRosterIq::testItem()
@@ -81,6 +91,7 @@ void tst_QXmppRosterIq::testItem()
     QFETCH(QByteArray, xml);
     QFETCH(QString, name);
     QFETCH(int, subscriptionType);
+    QFETCH(bool, approved);
 
     QXmppRosterIq::Item item;
     parsePacket(item, xml);
@@ -89,7 +100,37 @@ void tst_QXmppRosterIq::testItem()
     QCOMPARE(item.name(), name);
     QCOMPARE(int(item.subscriptionType()), subscriptionType);
     QCOMPARE(item.subscriptionStatus(), QString());
+    QCOMPARE(item.isApproved(), approved);
     serializePacket(item, xml);
+
+    item = QXmppRosterIq::Item();
+    item.setBareJid("foo@example.com");
+    item.setName(name);
+    item.setSubscriptionType(QXmppRosterIq::Item::SubscriptionType(subscriptionType));
+    item.setIsApproved(approved);
+    serializePacket(item, xml);
+}
+
+void tst_QXmppRosterIq::testApproved_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("approved");
+
+    QTest::newRow("true") << QByteArray(R"(<item jid="foo@example.com" approved="true"/>)") << true;
+    QTest::newRow("1") << QByteArray(R"(<item jid="foo@example.com" approved="1"/>)") << true;
+    QTest::newRow("false") << QByteArray(R"(<item jid="foo@example.com" approved="false"/>)") << false;
+    QTest::newRow("0") << QByteArray(R"(<item jid="foo@example.com" approved="0"/>)") << false;
+    QTest::newRow("empty") << QByteArray(R"(<item jid="foo@example.com"/>)") << false;
+}
+
+void tst_QXmppRosterIq::testApproved()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, approved);
+
+    QXmppRosterIq::Item item;
+    parsePacket(item, xml);
+    QCOMPARE(item.isApproved(), approved);
 }
 
 void tst_QXmppRosterIq::testVersion_data()

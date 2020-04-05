@@ -159,16 +159,25 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 class QXmppRosterIq::ItemPrivate : public QSharedData
 {
 public:
+    ItemPrivate();
+
     QString bareJid;
     Item::SubscriptionType type;
     QString name;
     // can be subscribe/unsubscribe (attribute "ask")
     QString subscriptionStatus;
     QSet<QString> groups;
+    bool approved;
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     bool isMixChannel = false;
     QString mixParticipantId;
 };
+
+QXmppRosterIq::ItemPrivate::ItemPrivate()
+    : type(QXmppRosterIq::Item::NotSet),
+      approved(false)
+{
+}
 
 ///
 /// Constructs a new roster entry.
@@ -176,7 +185,6 @@ public:
 QXmppRosterIq::Item::Item()
     : d(new ItemPrivate)
 {
-    d->type = NotSet;
 }
 
 QXmppRosterIq::Item::Item(const QXmppRosterIq::Item &other) = default;
@@ -277,6 +285,7 @@ QXmppRosterIq::Item::subscriptionType() const
     return d->type;
 }
 
+
 ///
 /// Sets the subscription type of the roster entry.
 ///
@@ -285,6 +294,30 @@ QXmppRosterIq::Item::subscriptionType() const
 void QXmppRosterIq::Item::setSubscriptionType(SubscriptionType type)
 {
     d->type = type;
+}
+
+///
+/// Returns whether the item has a pre-approved presence subscription.
+///
+/// \since QXmpp 1.3
+///
+bool QXmppRosterIq::Item::isApproved() const
+{
+    return d->approved;
+}
+
+///
+/// Sets whether the item has a pre-approved presence subscription.
+///
+/// This cannot be used to initiate a pre-approved subscription. For this
+/// purpose the client must send a &lt;presence/&gt; stanza of type
+/// \c subscribed to the user.
+///
+/// \since QXmpp 1.3
+///
+void QXmppRosterIq::Item::setIsApproved(bool approved)
+{
+    d->approved = approved;
 }
 
 QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
@@ -375,6 +408,11 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
     setSubscriptionTypeFromStr(element.attribute(QStringLiteral("subscription")));
     setSubscriptionStatus(element.attribute(QStringLiteral("ask")));
 
+    // pre-approved
+    const QString approved = element.attribute(QStringLiteral("approved"));
+    d->approved = (approved == QStringLiteral("1") || approved == QStringLiteral("true"));
+
+    // groups
     QDomElement groupElement = element.firstChildElement(QStringLiteral("group"));
     while (!groupElement.isNull()) {
         d->groups << groupElement.text();
@@ -396,6 +434,8 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
     helperToXmlAddAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
     helperToXmlAddAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
+    if (d->approved)
+        writer->writeAttribute(QStringLiteral("approved"), QStringLiteral("true"));
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
     while (i != d->groups.constEnd()) {

@@ -72,12 +72,14 @@ public:
         QString name() const;
         QString subscriptionStatus() const;
         SubscriptionType subscriptionType() const;
+        bool isApproved() const;
 
         void setBareJid(const QString &);
         void setGroups(const QSet<QString> &);
         void setName(const QString &);
         void setSubscriptionStatus(const QString &);
         void setSubscriptionType(SubscriptionType);
+        void setIsApproved(bool);
 
         // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
         bool isMixChannel() const;
