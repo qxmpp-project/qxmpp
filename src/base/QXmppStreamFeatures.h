@@ -76,6 +76,9 @@ public:
     Mode registerMode() const;
     void setRegisterMode(const Mode &registerMode);
 
+    bool preApprovedSubscriptionsSupported() const;
+    void setPreApprovedSubscriptionsSupported(bool);
+
     /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;

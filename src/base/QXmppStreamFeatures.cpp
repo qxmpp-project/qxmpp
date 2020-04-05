@@ -39,6 +39,7 @@ public:
     QXmppStreamFeatures::Mode streamManagementMode;
     QXmppStreamFeatures::Mode csiMode;
     QXmppStreamFeatures::Mode registerMode;
+    bool preApprovedSubscriptionsSupported;
     QStringList authMechanisms;
     QStringList compressionMethods;
 };
@@ -50,7 +51,8 @@ QXmppStreamFeaturesPrivate::QXmppStreamFeaturesPrivate()
       tlsMode(QXmppStreamFeatures::Disabled),
       streamManagementMode(QXmppStreamFeatures::Disabled),
       csiMode(QXmppStreamFeatures::Disabled),
-      registerMode(QXmppStreamFeatures::Disabled)
+      registerMode(QXmppStreamFeatures::Disabled),
+      preApprovedSubscriptionsSupported(false)
 {
 }
 
@@ -184,6 +186,26 @@ void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &regis
     d->registerMode = registerMode;
 }
 
+///
+/// Returns whether usage of Pre-Approved roster subscriptions is supported.
+///
+/// \since QXmpp 1.3
+///
+bool QXmppStreamFeatures::preApprovedSubscriptionsSupported() const
+{
+    return d->preApprovedSubscriptionsSupported;
+}
+
+///
+/// Sets whether usage of Pre-Approved roster subscriptions is supported.
+///
+/// \since QXmpp 1.3
+///
+void QXmppStreamFeatures::setPreApprovedSubscriptionsSupported(bool supported)
+{
+    d->preApprovedSubscriptionsSupported = supported;
+}
+
 /// \cond
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
@@ -207,6 +229,18 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
     return mode;
 }
 
+static bool readBooleanFeature(const QDomElement &element, const QString &tagName, const QString &xmlns)
+{
+    auto childElement = element.firstChildElement(tagName);
+    while (!childElement.isNull()) {
+        if (childElement.namespaceURI() == xmlns) {
+            return true;
+        }
+        childElement = childElement.nextSiblingElement(tagName);
+    }
+    return false;
+}
+
 void QXmppStreamFeatures::parse(const QDomElement &element)
 {
     d->bindMode = readFeature(element, "bind", ns_bind);
@@ -216,6 +250,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     d->streamManagementMode = readFeature(element, "sm", ns_stream_management);
     d->csiMode = readFeature(element, "csi", ns_csi);
     d->registerMode = readFeature(element, "register", ns_register_feature);
+    d->preApprovedSubscriptionsSupported = readBooleanFeature(element, QStringLiteral("sub"), ns_pre_approval);
 
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
@@ -259,6 +294,12 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeFeature(writer, "sm", ns_stream_management, d->streamManagementMode);
     writeFeature(writer, "csi", ns_csi, d->csiMode);
     writeFeature(writer, "register", ns_register_feature, d->registerMode);
+
+    if (d->preApprovedSubscriptionsSupported) {
+        writer->writeStartElement(QStringLiteral("sub"));
+        writer->writeDefaultNamespace(ns_pre_approval);
+        writer->writeEndElement();
+    }
 
     if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement(QStringLiteral("compression"));
