@@ -44,6 +44,7 @@ extern const char* ns_sasl;
 extern const char* ns_bind;
 extern const char* ns_session;
 extern const char* ns_stanza;
+extern const char* ns_pre_approval;
 // XEP-0009: Jabber-RPC
 extern const char* ns_rpc;
 // XEP-0020: Feature Negotiation

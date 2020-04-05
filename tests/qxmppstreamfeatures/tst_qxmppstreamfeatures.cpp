@@ -48,6 +48,7 @@ void tst_QXmppStreamFeatures::testEmpty()
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.clientStateIndicationMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.registerMode(), QXmppStreamFeatures::Disabled);
+    QCOMPARE(features.preApprovedSubscriptionsSupported(), false);
     QCOMPARE(features.authMechanisms(), QStringList());
     QCOMPARE(features.compressionMethods(), QStringList());
     serializePacket(features, xml);
@@ -77,6 +78,7 @@ void tst_QXmppStreamFeatures::testFull()
                          "<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/>"
                          "<csi xmlns=\"urn:xmpp:csi:0\"/>"
                          "<register xmlns=\"http://jabber.org/features/iq-register\"/>"
+                         "<sub xmlns=\"urn:xmpp:features:pre-approval\"/>"
                          "<compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression>"
                          "<mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>PLAIN</mechanism></mechanisms>"
                          "</stream:features>");
@@ -89,8 +91,21 @@ void tst_QXmppStreamFeatures::testFull()
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.clientStateIndicationMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.registerMode(), QXmppStreamFeatures::Enabled);
+    QCOMPARE(features.preApprovedSubscriptionsSupported(), true);
     QCOMPARE(features.authMechanisms(), QStringList() << "PLAIN");
     QCOMPARE(features.compressionMethods(), QStringList() << "zlib");
+    serializePacket(features, xml);
+
+    features = QXmppStreamFeatures();
+    features.setBindMode(QXmppStreamFeatures::Enabled);
+    features.setSessionMode(QXmppStreamFeatures::Enabled);
+    features.setNonSaslAuthMode(QXmppStreamFeatures::Enabled);
+    features.setTlsMode(QXmppStreamFeatures::Enabled);
+    features.setClientStateIndicationMode(QXmppStreamFeatures::Enabled);
+    features.setRegisterMode(QXmppStreamFeatures::Enabled);
+    features.setPreApprovedSubscriptionsSupported(true);
+    features.setAuthMechanisms(QStringList { QStringLiteral("PLAIN") });
+    features.setCompressionMethods(QStringList { QStringLiteral("zlib") });
     serializePacket(features, xml);
 }
 
