@@ -79,6 +79,9 @@ public:
     bool preApprovedSubscriptionsSupported() const;
     void setPreApprovedSubscriptionsSupported(bool);
 
+    bool rosterVersioningSupported() const;
+    void setRosterVersioningSupported(bool);
+
     /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;

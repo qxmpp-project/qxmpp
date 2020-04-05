@@ -33,6 +33,7 @@ const char* ns_bind = "urn:ietf:params:xml:ns:xmpp-bind";
 const char* ns_session = "urn:ietf:params:xml:ns:xmpp-session";
 const char* ns_stanza = "urn:ietf:params:xml:ns:xmpp-stanzas";
 const char* ns_pre_approval = "urn:xmpp:features:pre-approval";
+const char* ns_rosterver = "urn:xmpp:features:rosterver";
 // XEP-0009: Jabber-RPC
 const char* ns_rpc = "jabber:iq:rpc";
 // XEP-0020: Feature Negotiation
