@@ -136,6 +136,9 @@ public:
     QString thread() const;
     void setThread(const QString &);
 
+    QString parentThread() const;
+    void setParentThread(const QString &);
+
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
