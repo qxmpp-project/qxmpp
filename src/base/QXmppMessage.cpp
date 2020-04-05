@@ -107,6 +107,7 @@ public:
     QString body;
     QString subject;
     QString thread;
+    QString parentThread;
 
     // XEP-0071: XHTML-IM
     QString xhtml;
@@ -410,6 +411,30 @@ QString QXmppMessage::thread() const
 void QXmppMessage::setThread(const QString &thread)
 {
     d->thread = thread;
+}
+
+///
+/// Returns the optional parent thread of this message.
+///
+/// The possibility to create child threads was added in RFC6121.
+///
+/// \since QXmpp 1.3
+///
+QString QXmppMessage::parentThread() const
+{
+    return d->parentThread;
+}
+
+///
+/// Sets the optional parent thread of this message.
+///
+/// The possibility to create child threads was added in RFC6121.
+///
+/// \since QXmpp 1.3
+///
+void QXmppMessage::setParentThread(const QString &parent)
+{
+    d->parentThread = parent;
 }
 
 /// Returns the message's XHTML body as defined by
@@ -980,6 +1005,8 @@ void QXmppMessage::parse(const QDomElement &element)
             d->subject = childElement.text();
         } else if (childElement.tagName() == QStringLiteral("thread")) {
             d->thread = childElement.text();
+            d->parentThread = childElement.attribute(QStringLiteral("parent"));
+
             // parse message extensions
             // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
         } else if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
@@ -1003,8 +1030,12 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("subject"), d->subject);
     if (!d->body.isEmpty())
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("body"), d->body);
-    if (!d->thread.isEmpty())
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("thread"), d->thread);
+    if (!d->thread.isEmpty()) {
+        xmlWriter->writeStartElement(QStringLiteral("thread"));
+        helperToXmlAddAttribute(xmlWriter, QStringLiteral("parent"), d->parentThread);
+        xmlWriter->writeCharacters(d->thread);
+        xmlWriter->writeEndElement();
+    }
     error().toXml(xmlWriter);
 
     // chat states
@@ -1057,7 +1088,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
-    // \xep{0224}: Attention
+    // XEP-0224: Attention
     if (d->attentionRequested) {
         xmlWriter->writeStartElement(QStringLiteral("attention"));
         xmlWriter->writeDefaultNamespace(ns_attention);

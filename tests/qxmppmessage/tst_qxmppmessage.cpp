@@ -72,38 +72,52 @@ void tst_QXmppMessage::testBasic_data()
     QTest::addColumn<QString>("body");
     QTest::addColumn<QString>("subject");
     QTest::addColumn<QString>("thread");
+    QTest::addColumn<QString>("parentThread");
 
     QTest::newRow("error")
         << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="error"/>)")
         << int(QXmppMessage::Error)
-        << QString() << QString() << QString();
+        << QString() << QString() << QString() << QString();
     QTest::newRow("normal")
         << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="normal"/>)")
         << int(QXmppMessage::Normal)
-        << QString() << QString() << QString();
+        << QString() << QString() << QString() << QString();
     QTest::newRow("chat")
         << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="chat"/>)")
         << int(QXmppMessage::Chat)
-        << QString() << QString() << QString();
+        << QString() << QString() << QString() << QString();
     QTest::newRow("groupchat")
         << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="groupchat"/>)")
         << int(QXmppMessage::GroupChat)
-        << QString() << QString() << QString();
+        << QString() << QString() << QString() << QString();
     QTest::newRow("headline")
         << QByteArray(R"(<message to="foo@example.com/QXmpp" from="bar@example.com/QXmpp" type="headline"/>)")
         << int(QXmppMessage::Headline)
-        << QString() << QString() << QString();
+        << QString() << QString() << QString() << QString();
+
+    QTest::newRow("no-parent-thread")
+        << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
+                      "<subject>test subject</subject>"
+                      "<body>test body &amp; stuff</body>"
+                      "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
+                      "</message>")
+        << int(QXmppMessage::Normal)
+        << "test body & stuff"
+        << "test subject"
+        << "0e3141cd80894871a68e6fe6b1ec56fa"
+        << QString();
 
     QTest::newRow("full")
         << QByteArray("<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
                       "<subject>test subject</subject>"
                       "<body>test body &amp; stuff</body>"
-                      "<thread>test thread</thread>"
+                      "<thread parent=\"e0ffe42b28561960c6b12b944a092794b9683a38\">0e3141cd80894871a68e6fe6b1ec56fa</thread>"
                       "</message>")
         << int(QXmppMessage::Normal)
         << "test body & stuff"
         << "test subject"
-        << "test thread";
+        << "0e3141cd80894871a68e6fe6b1ec56fa"
+        << "e0ffe42b28561960c6b12b944a092794b9683a38";
 }
 
 void tst_QXmppMessage::testBasic()
@@ -113,6 +127,7 @@ void tst_QXmppMessage::testBasic()
     QFETCH(QString, body);
     QFETCH(QString, subject);
     QFETCH(QString, thread);
+    QFETCH(QString, parentThread);
 
     QXmppMessage message;
     parsePacket(message, xml);
@@ -123,6 +138,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.body(), body);
     QCOMPARE(message.subject(), subject);
     QCOMPARE(message.thread(), thread);
+    QCOMPARE(message.parentThread(), parentThread);
     QCOMPARE(message.state(), QXmppMessage::None);
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), false);
@@ -147,6 +163,7 @@ void tst_QXmppMessage::testBasic()
     message.setBody(body);
     message.setSubject(subject);
     message.setThread(thread);
+    message.setParentThread(parentThread);
     serializePacket(message, xml);
 }
 
