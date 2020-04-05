@@ -80,10 +80,19 @@ QXmppRosterManager::~QXmppRosterManager()
     delete d;
 }
 
-/// Accepts a subscription request.
 ///
-/// You can call this method in reply to the subscriptionRequest() signal.
-
+/// Accepts an existing subscription request or pre-approves future subscription
+/// requests.
+///
+/// You can call this method in reply to the subscriptionRequest() signal or to
+/// create a pre-approved subscription.
+///
+/// \note Pre-approving subscription requests is only allowed, if the server
+/// supports RFC6121 and advertises the 'urn:xmpp:features:pre-approval' stream
+/// feature.
+///
+/// \sa QXmppStreamFeatures::preApprovedSubscriptionsSupported()
+///
 bool QXmppRosterManager::acceptSubscription(const QString &bareJid, const QString &reason)
 {
     QXmppPresence presence;
