@@ -76,6 +76,8 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         ns_data,
         // XEP-0059: Result Set Management
         ns_rsm,
+        // XEP-0066: Out of Band Data
+        ns_oob,
         // XEP-0071: XHTML-IM
         ns_xhtml_im,
         // XEP-0085: Chat State Notifications
@@ -86,8 +88,24 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         ns_ping,
         // XEP-0224: Attention
         ns_attention,
+        // XEP-0249: Direct MUC Invitations
+        ns_conference,
+        // XEP-0308: Last Message Correction
+        ns_message_correct,
         // XEP-0333: Chat Markers
         ns_chat_markers,
+        // XEP-0334: Message Processing Hints
+        ns_message_processing_hints,
+        // XEP-0359: Unique and Stable Stanza IDs
+        ns_sid,
+        // XEP-0367: Message Attaching
+        ns_message_attaching,
+        // XEP-0380: Explicit Message Encryption
+        ns_eme,
+        // XEP-0382: Spoiler messages
+        ns_spoiler,
+        // XEP-0428: Fallback Indication
+        ns_fallback_indication,
     };
 }
 /// \endcond
