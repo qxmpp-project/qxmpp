@@ -472,10 +472,13 @@ void QXmppServer::setLocalCertificate(const QString &path)
         server->setLocalCertificate(d->localCertificate);
 }
 
+///
 /// Sets the local SSL certificate
 ///
 /// \param certificate
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppServer::setLocalCertificate(const QSslCertificate &certificate)
 {
     d->localCertificate = certificate;
@@ -508,10 +511,13 @@ void QXmppServer::setPrivateKey(const QString &path)
         server->setPrivateKey(d->privateKey);
 }
 
+///
 /// Sets the local SSL private key.
 ///
 /// \param key
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppServer::setPrivateKey(const QSslKey &key)
 {
     d->privateKey = key;

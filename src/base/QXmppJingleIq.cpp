@@ -235,11 +235,23 @@ void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
     d->descriptionMedia = media;
 }
 
+///
+/// Returns the description's 32-bit synchronization source for the media
+/// stream, as defined in RFC 3550.
+///
+/// \since QXmpp 0.9
+///
 quint32 QXmppJingleIq::Content::descriptionSsrc() const
 {
     return d->descriptionSsrc;
 }
 
+///
+/// Sets the description's 32-bit synchronization source for the media stream,
+/// as defined in RFC 3550.
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
 {
     d->descriptionSsrc = ssrc;
@@ -304,55 +316,73 @@ void QXmppJingleIq::Content::setTransportPassword(const QString &password)
     d->transportPassword = password;
 }
 
+///
 /// Returns the fingerprint hash value for the transport key.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 QByteArray QXmppJingleIq::Content::transportFingerprint() const
 {
     return d->transportFingerprint;
 }
 
+///
 /// Sets the fingerprint hash value for the transport key.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleIq::Content::setTransportFingerprint(const QByteArray &fingerprint)
 {
     d->transportFingerprint = fingerprint;
 }
 
+///
 /// Returns the fingerprint hash algorithm for the transport key.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 QString QXmppJingleIq::Content::transportFingerprintHash() const
 {
     return d->transportFingerprintHash;
 }
 
+///
 /// Sets the fingerprint hash algorithm for the transport key.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleIq::Content::setTransportFingerprintHash(const QString &hash)
 {
     d->transportFingerprintHash = hash;
 }
 
+///
 /// Returns the setup role for the encrypted transport.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 QString QXmppJingleIq::Content::transportFingerprintSetup() const
 {
     return d->transportFingerprintSetup;
 }
 
+///
 /// Sets the setup role for the encrypted transport.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleIq::Content::setTransportFingerprintSetup(const QString &setup)
 {
     d->transportFingerprintSetup = setup;
@@ -985,33 +1015,45 @@ void QXmppJingleCandidate::setComponent(int component)
     d->component = component;
 }
 
+///
 /// Returns the candidate's foundation.
-
+///
+/// \since QXmpp 0.9
+///
 QString QXmppJingleCandidate::foundation() const
 {
     return d->foundation;
 }
 
+///
 /// Sets the candidate's foundation.
 ///
 /// \param foundation
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleCandidate::setFoundation(const QString &foundation)
 {
     d->foundation = foundation;
 }
 
+///
 /// Returns the candidate's generation.
-
+///
+/// \since QXmpp 0.9
+///
 int QXmppJingleCandidate::generation() const
 {
     return d->generation;
 }
 
+///
 /// Sets the candidate's generation.
 ///
 /// \param generation
-
+///
+/// \since QXmpp 0.9
+///
 void QXmppJingleCandidate::setGeneration(int generation)
 {
     d->generation = generation;
