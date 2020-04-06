@@ -68,6 +68,8 @@ public:
     void addProperCapability(QXmppPresence &presence);
     int getNextReconnectTime() const;
 
+    static QStringList discoveryFeatures();
+
 private:
     QXmppClient *q;
 };

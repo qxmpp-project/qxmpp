@@ -68,6 +68,28 @@ int QXmppClientPrivate::getNextReconnectTime() const
     else
         return 60 * 1000;
 }
+
+QStringList QXmppClientPrivate::discoveryFeatures()
+{
+    return {
+        // XEP-0004: Data Forms
+        ns_data,
+        // XEP-0059: Result Set Management
+        ns_rsm,
+        // XEP-0071: XHTML-IM
+        ns_xhtml_im,
+        // XEP-0085: Chat State Notifications
+        ns_chat_states,
+        // XEP-0115: Entity Capabilities
+        ns_capabilities,
+        // XEP-0199: XMPP Ping
+        ns_ping,
+        // XEP-0224: Attention
+        ns_attention,
+        // XEP-0333: Chat Markers
+        ns_chat_markers,
+    };
+}
 /// \endcond
 
 /// Creates a QXmppClient object.
