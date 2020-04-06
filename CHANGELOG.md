@@ -1,10 +1,52 @@
 QXmpp 1.3.0 (UNRELEASED)
 ------------------------
 
-*under development*
+QXmpp complys with the XMPP Compliance Suites 2020 (XEP-0423) for client
+development in the Core, IM and Advanced Mobile suites now. For this prupose it
+has been updated to RFC6120 and RFC6121. ABI compatibility was kept with this
+release (apart from classes marked as 'NOT FINALIZED').
 
 New features:
- - Port QXmppCallManager to GStreamer
+ - Port QXmppCallManager to GStreamer (#207, @olesalscheider)
+ - Add XEP-0245: The /me Command (#276, @lnjX)
+ - Add XEP-0357: Push Notifications: Enable/disable IQ (#271, @jbbgameich,
+   @zatroxde)
+ - Add XEP-0359: Unique and Stable Stanza IDs (#256, @lnjX)
+ - Add XEP-0428: Fallback Indication (#253, @lnjX)
+ - Update from RFC3920 to RFC6120:
+   * Deprecate PaymentRequired stanza error condition as it was not adopted in
+     RFC6120 (#277, @lnjX)
+   * Add PolicyViolation stanza error condition added in RFC6120 (#279, @lnjX)
+   * Add redirection URI from RFC6120 for Gone and Redirect conditions (#280,
+     @lnjX)
+   * Add 'by' attribute to QXmppStanza::Error from RFC6120 (#283, @lnjX)
+ - Update from RFC3921 to RFC6121:
+   * Add pre-approved presence subscriptions (#285, @lnjX):
+     - Add 'approved' attribute to QXmppRosterIq
+     - Add stream feature for pre-approved presence subscriptions
+   * Add stream feature for roster versioning (#286, @lnjX)
+ - Use QUuid by default to generate unique stanza IDs (#255, @lnjX)
+ - Add roster extension for MIX-PAM (XEP-0405) (#175, @lnjX)
+ - Update MAM to v0.6 (including namespace bump to `urn:xmpp:mam:2`) (#254,
+   #257, @lnjX)
+ - Add not-authorized stream error condition in QXmppOutgoingClient (#191,
+   @henry61024)
+ - Add missing static service discovery features for supported message
+   extensions (#287, @lnjX)
+ - Add utility constructor to QXmppDataForm and QXmppDataForm::Field to make
+   creation of forms easier (#273, @lnjX)
+
+Misc:
+ - Make QXmpp work with projects using `QT_NO_KEYWORDS` (#258, @tomcucinotta)
+ - Add hyperlinks to XEP references in the documentation (@lnjX)
+ - Move from Travis-CI to GitHub Actions (#265, @jlaine)
+ - Replace deprecated `qsrand()` and `qrand()` by QRandomGenerator (#267,
+   @melvo)
+ - Add tests for QXmppStanza::Error parsing (#279, @lnjX)
+
+Deprecations:
+ - `QXmppStanza::Error::Condition::PaymentRequired`: The error condition was
+   unused and not adopted in RFC6120
 
 QXmpp 1.2.1 (Apr 01, 2020)
 --------------------------
