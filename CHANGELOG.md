@@ -1,5 +1,5 @@
-QXmpp 1.3.0 (UNRELEASED)
-------------------------
+QXmpp 1.3.0 (Apr 06, 2020)
+--------------------------
 
 QXmpp complys with the XMPP Compliance Suites 2020 (XEP-0423) for client
 development in the Core, IM and Advanced Mobile suites now. For this prupose it
