@@ -34,10 +34,11 @@
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
 
+///
 /// \brief The QXmppMessage class represents an XMPP message.
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 {
 public:
@@ -50,8 +51,12 @@ public:
         Headline
     };
 
+    ///
     /// This enum describes a chat state as defined by \xep{0085}: Chat State
     /// Notifications.
+    ///
+    /// \since QXmpp 0.2
+    ///
     enum State {
         None = 0,   ///< The message does not contain any chat state information.
         Active,     ///< User is actively participating in the chat session.
@@ -61,7 +66,11 @@ public:
         Paused      ///< User had been composing but now has stopped.
     };
 
+    ///
     /// This enum describes a chat marker as defined by \xep{0333}: Chat Markers.
+    ///
+    /// \since QXmpp 0.8.1
+    ///
     enum Marker {
         NoMarker = 0,
         Received,
@@ -69,9 +78,11 @@ public:
         Acknowledged
     };
 
+    ///
     /// \xep{0334}: Message Processing Hints
     ///
     /// \since QXmpp 1.1
+    ///
     enum Hint {
         NoPermanentStore = 1 << 0,  ///< Do not allow permanent storage
         NoStore = 1 << 1,           ///< Do not store at all
@@ -79,11 +90,13 @@ public:
         Store = 1 << 3              ///< Do store the message
     };
 
+    ///
     /// This enum describes different end-to-end encryption methods. These can
     /// be used to mark a message explicitly as encrypted with a specific
     /// algothim. See \xep{0380}: Explicit Message Encryption for details.
     ///
     /// \since QXmpp 1.1
+    ///
     enum EncryptionMethod {
         NoEncryption,       ///< No encryption
         UnknownEncryption,  ///< Unknown encryption
@@ -106,30 +119,6 @@ public:
     QString body() const;
     void setBody(const QString &);
 
-    bool isAttentionRequested() const;
-    void setAttentionRequested(bool requested);
-
-    bool isReceiptRequested() const;
-    void setReceiptRequested(bool requested);
-
-    QString mucInvitationJid() const;
-    void setMucInvitationJid(const QString &jid);
-
-    QString mucInvitationPassword() const;
-    void setMucInvitationPassword(const QString &password);
-
-    QString mucInvitationReason() const;
-    void setMucInvitationReason(const QString &reason);
-
-    QString receiptId() const;
-    void setReceiptId(const QString &id);
-
-    QDateTime stamp() const;
-    void setStamp(const QDateTime &stamp);
-
-    QXmppMessage::State state() const;
-    void setState(QXmppMessage::State);
-
     QString subject() const;
     void setSubject(const QString &);
 
@@ -142,8 +131,61 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
+    // XEP-0066: Out of Band Data
+    QString outOfBandUrl() const;
+    void setOutOfBandUrl(const QString &);
+
+    // XEP-0071: XHTML-IM
     QString xhtml() const;
     void setXhtml(const QString &xhtml);
+
+    // XEP-0085: Chat State Notifications
+    QXmppMessage::State state() const;
+    void setState(QXmppMessage::State);
+
+    // XEP-0091: Legacy Delayed Delivery | XEP-0203: Delayed Delivery
+    QDateTime stamp() const;
+    void setStamp(const QDateTime &stamp);
+
+    // XEP-0184: Message Delivery Receipts
+    bool isReceiptRequested() const;
+    void setReceiptRequested(bool requested);
+
+    QString receiptId() const;
+    void setReceiptId(const QString &id);
+
+    // XEP-0224: Attention
+    bool isAttentionRequested() const;
+    void setAttentionRequested(bool requested);
+
+    // XEP-0231: Bits of Binary
+    QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
+    QXmppBitsOfBinaryDataList &bitsOfBinaryData();
+    void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
+
+    // XEP-0245: The /me Command
+    static bool isSlashMeCommand(const QString &body);
+    bool isSlashMeCommand() const;
+    static QString slashMeCommandText(const QString &body);
+    QString slashMeCommandText() const;
+
+    // XEP-0249: Direct MUC Invitations
+    QString mucInvitationJid() const;
+    void setMucInvitationJid(const QString &jid);
+
+    QString mucInvitationPassword() const;
+    void setMucInvitationPassword(const QString &password);
+
+    QString mucInvitationReason() const;
+    void setMucInvitationReason(const QString &reason);
+
+    // XEP-0280: Message Carbons
+    bool isPrivate() const;
+    void setPrivate(const bool);
+
+    // XEP-0308: Last Message Correction
+    QString replaceId() const;
+    void setReplaceId(const QString &);
 
     // XEP-0333: Chat State Markers
     bool isMarkable() const;
@@ -157,29 +199,6 @@ public:
 
     Marker marker() const;
     void setMarker(const Marker);
-
-    // XEP-0231: Bits of Binary
-    QXmppBitsOfBinaryDataList bitsOfBinaryData() const;
-    QXmppBitsOfBinaryDataList &bitsOfBinaryData();
-    void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
-
-    // XEP-0245: The /me Command
-    static bool isSlashMeCommand(const QString &body);
-    bool isSlashMeCommand() const;
-    static QString slashMeCommandText(const QString &body);
-    QString slashMeCommandText() const;
-
-    // XEP-0280: Message Carbons
-    bool isPrivate() const;
-    void setPrivate(const bool);
-
-    // XEP-0066: Out of Band Data
-    QString outOfBandUrl() const;
-    void setOutOfBandUrl(const QString &);
-
-    // XEP-0308: Last Message Correction
-    QString replaceId() const;
-    void setReplaceId(const QString &);
 
     // XEP-0334: Message Processing Hints
     bool hasHint(const Hint hint) const;
