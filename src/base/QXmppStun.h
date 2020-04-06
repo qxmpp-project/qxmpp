@@ -241,10 +241,20 @@ private:
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
+
+    ///
     /// The ICE gathering state, that is the discovery of local candidates
+    ///
+    /// \since QXmpp 0.9.3
+    ///
     Q_PROPERTY(QXmppIceConnection::GatheringState gatheringState READ gatheringState NOTIFY gatheringStateChanged)
 
 public:
+    ///
+    /// This enum describes the gathering state of the ICE connection.
+    ///
+    /// \since QXmpp 0.9.3
+    ///
     enum GatheringState {
         NewGatheringState,
         BusyGatheringState,
@@ -277,8 +287,12 @@ public:
     bool isConnected() const;
 
     // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
+    ///
     /// Returns the ICE gathering state, that is the discovery of local
     /// candidates.
+    ///
+    /// \since QXmpp 0.9.3
+    ///
     GatheringState gatheringState() const;
 
 Q_SIGNALS:
@@ -288,7 +302,11 @@ Q_SIGNALS:
     /// \brief This signal is emitted when ICE negotiation fails.
     void disconnected();
 
+    ///
     /// \brief This signal is emitted when the gathering state of local candidates changes.
+    ///
+    /// \since QXmpp 0.9.3
+    ///
     void gatheringStateChanged();
 
     /// \brief This signal is emitted when the list of local candidates changes.
