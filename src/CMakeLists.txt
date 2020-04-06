@@ -61,6 +61,7 @@ set(INSTALL_HEADER_FILES
 
     # Client
     client/QXmppArchiveManager.h
+    client/QXmppAttentionManager.h
     client/QXmppBookmarkManager.h
     client/QXmppCarbonManager.h
     client/QXmppClient.h
@@ -144,13 +145,14 @@ set(SOURCE_FILES
     base/QXmppVersionIq.cpp
 
     # Client
-    client/QXmppDiscoveryManager.cpp
     client/QXmppArchiveManager.cpp
+    client/QXmppAttentionManager.cpp
     client/QXmppBookmarkManager.cpp
     client/QXmppCarbonManager.cpp
     client/QXmppClient.cpp
     client/QXmppClientExtension.cpp
     client/QXmppConfiguration.cpp
+    client/QXmppDiscoveryManager.cpp
     client/QXmppEntityTimeManager.cpp
     client/QXmppInternalClientExtension.cpp
     client/QXmppInvokable.cpp
