@@ -273,6 +273,11 @@ QList<QXmppJingleCandidate> QXmppJingleIq::Content::transportCandidates() const
     return d->transportCandidates;
 }
 
+///
+/// Sets a list of transport candidates.
+///
+/// \since QXmpp 0.9.2
+///
 void QXmppJingleIq::Content::setTransportCandidates(const QList<QXmppJingleCandidate> &candidates)
 {
     d->transportType = candidates.isEmpty() ? QString() : ns_jingle_ice_udp;
@@ -743,22 +748,31 @@ void QXmppJingleIq::setAction(QXmppJingleIq::Action action)
     d->action = action;
 }
 
+///
 /// Adds an element to the IQ's content elements.
-
+///
+/// \since QXmpp 0.9.2
+///
 void QXmppJingleIq::addContent(const QXmppJingleIq::Content &content)
 {
     d->contents << content;
 }
 
+///
 /// Returns the IQ's content elements.
-
+///
+/// \since QXmpp 0.9.2
+///
 QList<QXmppJingleIq::Content> QXmppJingleIq::contents() const
 {
     return d->contents;
 }
 
+///
 /// Sets the IQ's content elements.
-
+///
+/// \since QXmpp 0.9.2
+///
 void QXmppJingleIq::setContents(const QList<QXmppJingleIq::Content> &contents)
 {
     d->contents = contents;
