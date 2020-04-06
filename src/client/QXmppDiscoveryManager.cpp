@@ -24,6 +24,7 @@
 #include "QXmppDiscoveryManager.h"
 
 #include "QXmppClient.h"
+#include "QXmppClient_p.h"
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
@@ -102,8 +103,9 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
         return QString();
 }
 
+///
 /// Returns the client's full capabilities.
-
+///
 QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 {
     QXmppDiscoveryIq iq;
@@ -112,17 +114,12 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
 
     // features
     QStringList features;
-    features
-        << ns_data           // XEP-0004: Data Forms
-        << ns_rsm            // XEP-0059: Result Set Management
-        << ns_xhtml_im       // XEP-0071: XHTML-IM
-        << ns_chat_states    // XEP-0085: Chat State Notifications
-        << ns_capabilities   // XEP-0115: Entity Capabilities
-        << ns_ping           // XEP-0199: XMPP Ping
-        << ns_attention      // XEP-0224: Attention
-        << ns_chat_markers;  // XEP-0333: Chat Markers
+    // add base features of the client
+    features << QXmppClientPrivate::discoveryFeatures();
 
-    for (auto* extension : client()->extensions()) {
+    // add features of all registered extensions
+    const QList<QXmppClientExtension *> extensions = client()->extensions();
+    for (auto* extension : extensions) {
         if (extension)
             features << extension->discoveryFeatures();
     }
