@@ -89,9 +89,12 @@ void QXmppIq::setType(QXmppIq::Type type)
     d->type = type;
 }
 
+///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
 /// iq or presence)
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppIq::isXmppStanza() const
 {
     return true;

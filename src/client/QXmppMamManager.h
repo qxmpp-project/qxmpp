@@ -31,6 +31,7 @@
 
 class QXmppMessage;
 
+///
 /// \brief The QXmppMamManager class makes it possible to access message
 /// archives as defined by \xep{0313}: Message Archive Management.
 ///
@@ -43,7 +44,9 @@ class QXmppMessage;
 /// \endcode
 ///
 /// \ingroup Managers
-
+///
+/// \since QXmpp 1.0
+///
 class QXMPP_EXPORT QXmppMamManager : public QXmppClientExtension
 {
     Q_OBJECT

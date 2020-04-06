@@ -323,20 +323,26 @@ bool QXmppClient::isConnected() const
     return d->stream->isConnected();
 }
 
+///
 /// Returns true if the current client state is "active", false if it is
 /// "inactive". See \xep{0352}: Client State Indication for details.
 ///
 /// On connect this is always reset to true.
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppClient::isActive() const
 {
     return d->isActive;
 }
 
+///
 /// Sets the client state as described in \xep{0352}: Client State Indication.
 ///
 /// On connect this is always reset to true.
-
+///
+/// \since QXmpp 1.0
+///
 void QXmppClient::setActive(bool active)
 {
     if (active != d->isActive && isConnected() && d->stream->isClientStateIndicationEnabled()) {

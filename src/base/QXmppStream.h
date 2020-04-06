@@ -74,28 +74,15 @@ protected:
     /// \param element
     virtual void handleStream(const QDomElement &element) = 0;
 
-    /// Enables Stream Management acks / reqs (\xep{0198}).
-    ///
-    /// \param resetSeqno Indicates if the sequence numbers should be reset.
-    ///                   This must be done iff the stream is not resumed.
+    // XEP-0198: Stream Management
     void enableStreamManagement(bool resetSequenceNumber);
-
-    /// Returns the sequence number of the last incoming stanza (\xep{0198}).
     unsigned lastIncomingSequenceNumber() const;
-
-    /// Sets the last acknowledged sequence number for outgoing stanzas (\xep{0198}).
     void setAcknowledgedSequenceNumber(unsigned sequenceNumber);
 
 private:
-    /// Handles an incoming acknowledgement from \xep{0198}.
-    ///
-    /// \param element
+    // XEP-0198: Stream Management
     void handleAcknowledgement(QDomElement &element);
-
-    /// Sends an acknowledgement as defined in \xep{0198}.
     void sendAcknowledgement();
-
-    /// Sends an acknowledgement request as defined in \xep{0198}.
     void sendAcknowledgementRequest();
 
 public Q_SLOTS:

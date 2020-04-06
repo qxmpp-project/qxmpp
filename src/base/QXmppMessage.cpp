@@ -211,9 +211,12 @@ QXmppMessage::~QXmppMessage() = default;
 
 QXmppMessage &QXmppMessage::operator=(const QXmppMessage &other) = default;
 
+///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
 /// iq or presence)
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppMessage::isXmppStanza() const
 {
     return true;

@@ -132,6 +132,8 @@ void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
 /// Returns the mode (disabled, enabled or required) for \xep{0198}: Stream
 /// Management
 ///
+/// \since QXmpp 1.0
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
 {
     return d->streamManagementMode;
@@ -142,6 +144,8 @@ QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
 ///
 /// \param mode The mode to set.
 ///
+/// \since QXmpp 1.0
+///
 void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode)
 {
     d->streamManagementMode = mode;
@@ -149,6 +153,8 @@ void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode
 
 ///
 /// Returns the mode for \xep{0352}: Client State Indication
+///
+/// \since QXmpp 1.0
 ///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
 {
@@ -159,6 +165,8 @@ QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
 /// Sets the mode for \xep{0352}: Client State Indication
 ///
 /// \param mode The mode to set.
+///
+/// \since QXmpp 1.0
 ///
 void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode mode)
 {

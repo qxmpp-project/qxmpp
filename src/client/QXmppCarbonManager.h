@@ -28,6 +28,7 @@
 
 class QXmppMessage;
 
+///
 /// \brief The QXmppCarbonManager class handles message carbons
 /// as described in \xep{0280}: Message Carbons.
 ///
@@ -35,7 +36,9 @@ class QXmppMessage;
 /// currently connected client account sent or received a message.
 ///
 /// \ingroup Managers
-
+///
+/// \since QXmpp 1.0
+///
 class QXMPP_EXPORT QXmppCarbonManager : public QXmppClientExtension
 {
     Q_OBJECT

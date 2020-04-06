@@ -75,6 +75,8 @@ QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 ///
 /// \return version as a QString
 ///
+/// \since QXmpp 1.0
+///
 QString QXmppRosterIq::version() const
 {
     return d->version;
@@ -84,6 +86,8 @@ QString QXmppRosterIq::version() const
 /// Sets the roster version of IQ.
 ///
 /// \param version as a QString
+///
+/// \since QXmpp 1.0
 ///
 void QXmppRosterIq::setVersion(const QString &version)
 {

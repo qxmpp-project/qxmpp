@@ -39,6 +39,8 @@ class QXmppMamResultIqPrivate;
 ///
 /// \ingroup Stanzas
 ///
+/// \since QXmpp 1.0
+///
 class QXmppMamQueryIq : public QXmppIq
 {
 public:
@@ -72,6 +74,8 @@ private:
 /// \xep{0313}: Message Archive Management.
 ///
 /// \ingroup Stanzas
+///
+/// \since QXmpp 1.0
 ///
 class QXmppMamResultIq : public QXmppIq
 {

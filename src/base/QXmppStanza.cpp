@@ -701,9 +701,12 @@ void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addres
     d->extendedAddresses = addresses;
 }
 
+///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,
 /// iq or presence)
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppStanza::isXmppStanza() const
 {
     return false;

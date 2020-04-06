@@ -283,8 +283,10 @@ void QXmppStream::_q_socketReadyRead()
 ///
 /// Enables Stream Management acks / reqs (\xep{0198}).
 ///
-/// \param resetSequenceNumber Indicates if the sequence numbers should be reset.
-///                            This must be done iff the stream is not resumed.
+/// \param resetSequenceNumber Indicates if the sequence numbers should be
+/// reset. This must be done if the stream is not resumed.
+///
+/// \since QXmpp 1.0
 ///
 void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
@@ -317,6 +319,8 @@ void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 ///
 /// Returns the sequence number of the last incoming stanza (\xep{0198}).
 ///
+/// \since QXmpp 1.0
+///
 unsigned QXmppStream::lastIncomingSequenceNumber() const
 {
     return d->lastIncomingSequenceNumber;
@@ -325,6 +329,8 @@ unsigned QXmppStream::lastIncomingSequenceNumber() const
 ///
 /// Sets the last acknowledged sequence number for outgoing stanzas
 /// (\xep{0198}).
+///
+/// \since QXmpp 1.0
 ///
 void QXmppStream::setAcknowledgedSequenceNumber(unsigned sequenceNumber)
 {
@@ -341,6 +347,8 @@ void QXmppStream::setAcknowledgedSequenceNumber(unsigned sequenceNumber)
 ///
 /// \param element
 ///
+/// \since QXmpp 1.0
+///
 void QXmppStream::handleAcknowledgement(QDomElement &element)
 {
     if (!d->streamManagementEnabled)
@@ -353,6 +361,8 @@ void QXmppStream::handleAcknowledgement(QDomElement &element)
 
 ///
 /// Sends an acknowledgement as defined in \xep{0198}.
+///
+/// \since QXmpp 1.0
 ///
 void QXmppStream::sendAcknowledgement()
 {
@@ -371,6 +381,8 @@ void QXmppStream::sendAcknowledgement()
 
 ///
 /// Sends an acknowledgement request as defined in \xep{0198}.
+///
+/// \since QXmpp 1.0
 ///
 void QXmppStream::sendAcknowledgementRequest()
 {

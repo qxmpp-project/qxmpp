@@ -232,6 +232,11 @@ void QXmppOutgoingClient::connectToHost()
     d->nextSrvRecordIdx = 0;
 }
 
+///
+/// Disconnects from the server and resets the stream management state.
+///
+/// \since QXmpp 1.0
+///
 void QXmppOutgoingClient::disconnectFromHost()
 {
     d->canResume = false;
@@ -266,8 +271,11 @@ bool QXmppOutgoingClient::isConnected() const
     return QXmppStream::isConnected() && d->sessionStarted;
 }
 
+///
 /// Returns true if client state indication (xep-0352) is supported by the server
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppOutgoingClient::isClientStateIndicationEnabled() const
 {
     return d->clientStateIndicationEnabled;

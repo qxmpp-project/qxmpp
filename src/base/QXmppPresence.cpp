@@ -117,9 +117,12 @@ QXmppPresence::~QXmppPresence() = default;
 
 QXmppPresence &QXmppPresence::operator=(const QXmppPresence &other) = default;
 
+///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,
 /// iq or presence)
-
+///
+/// \since QXmpp 1.0
+///
 bool QXmppPresence::isXmppStanza() const
 {
     return true;
@@ -331,17 +334,23 @@ void QXmppPresence::setMucSupported(bool supported)
     d->mucSupported = supported;
 }
 
+///
 /// Returns when the last user interaction with the client took place. See
 /// \xep{0319}: Last User Interaction in Presence for details.
-
+///
+/// \since QXmpp 1.0
+///
 QDateTime QXmppPresence::lastUserInteraction() const
 {
     return d->lastUserInteraction;
 }
 
+///
 /// Sets the time of the last user interaction as defined in \xep{0319}: Last
 /// User Interaction in Presence.
-
+///
+/// \since QXmpp 1.0
+///
 void QXmppPresence::setLastUserInteraction(const QDateTime &lastUserInteraction)
 {
     d->lastUserInteraction = lastUserInteraction;
