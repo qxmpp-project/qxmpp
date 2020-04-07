@@ -86,8 +86,6 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         ns_capabilities,
         // XEP-0199: XMPP Ping
         ns_ping,
-        // XEP-0224: Attention
-        ns_attention,
         // XEP-0249: Direct MUC Invitations
         ns_conference,
         // XEP-0308: Last Message Correction
