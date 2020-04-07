@@ -261,10 +261,12 @@ Q_SIGNALS:
     /// changes Busy, Idle, Invisible etc.
     void presenceReceived(const QXmppPresence &presence);
 
-    /// Notifies that an XMPP iq stanza is received. The QXmppIq
-    /// parameter contains the details of the iq sent to this client.
-    /// IQ stanzas provide a structured request-response mechanism. Roster
-    /// management, setting-getting vCards etc is done using iq stanzas.
+    /// This signal is emitted when IQs of type result or error are received by
+    /// the client and no registered QXmppClientExtension could handle it.
+    ///
+    /// This is useful when it is only important to check whether the response
+    /// of an IQ was successful. However, the recommended way is still to use an
+    /// additional QXmppClientExtension for this kind of tasks.
     void iqReceived(const QXmppIq &iq);
 
     /// This signal is emitted to indicate that one or more SSL errors were

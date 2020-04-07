@@ -74,7 +74,8 @@ Q_SIGNALS:
     /// This signal is emitted when a message is received.
     void messageReceived(const QXmppMessage &);
 
-    /// This signal is emitted when an IQ is received.
+    /// This signal is emitted when an IQ response (type result or error) has
+    /// been received that was not handled by elementReceived().
     void iqReceived(const QXmppIq &);
 
     /// This signal is emitted when SSL errors are encountered.
