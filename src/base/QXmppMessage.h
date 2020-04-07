@@ -259,4 +259,6 @@ private:
     QSharedDataPointer<QXmppMessagePrivate> d;
 };
 
+Q_DECLARE_METATYPE(QXmppMessage)
+
 #endif  // QXMPPMESSAGE_H
