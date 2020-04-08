@@ -348,7 +348,7 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 
 void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
-    if (type.isEmpty() && !type.isNull())  // TODO CHECK
+    if (type.isEmpty())
         setSubscriptionType(NotSet);
     else if (type == QStringLiteral("none"))
         setSubscriptionType(None);
