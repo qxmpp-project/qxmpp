@@ -107,6 +107,7 @@ void QXmppRegistrationManager::deleteAccount()
     auto iq = QXmppRegisterIq::createUnregistrationRequest();
     d->deleteAccountIqId = iq.id();
 
+    client()->setIsAccountBeingDeleted(true);
     client()->sendPacket(iq);
 }
 
