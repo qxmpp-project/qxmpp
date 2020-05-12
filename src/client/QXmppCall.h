@@ -75,6 +75,8 @@ public:
     QXmppCallStream *audioStream() const;
     QXmppCallStream *videoStream() const;
 
+    bool isEncrypted() const;
+
 signals:
     /// \brief This signal is emitted when a call is connected.
     ///
@@ -108,7 +110,7 @@ private slots:
     void terminated();
 
 private:
-    QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
+    QXmppCall(const QString &jid, QXmppCall::Direction direction, bool useDtls, QXmppCallManager *parent);
 
     QXmppCallPrivate *d;
     friend class QXmppCallManager;

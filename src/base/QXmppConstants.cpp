@@ -135,6 +135,8 @@ const char* ns_message_correct = "urn:xmpp:message-correct:0";
 const char* ns_mam = "urn:xmpp:mam:2";
 // XEP-0319: Last User Interaction in Presence
 const char* ns_idle = "urn:xmpp:idle:1";
+// XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+const char* ns_jingle_dtls = "urn:xmpp:jingle:apps:dtls:0";
 // XEP-0333: Chat Markers
 const char* ns_chat_markers = "urn:xmpp:chat-markers:0";
 // XEP-0334: Message Processing Hints

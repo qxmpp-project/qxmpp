@@ -29,6 +29,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
+#include "QXmppRosterManager.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
@@ -43,6 +44,21 @@ QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
 {
     // Initialize GStreamer
     gst_init(nullptr, nullptr);
+
+    supportsDtls = true;
+    GstElementFactory *factory;
+    factory = gst_element_factory_find("dtlssrtpenc");
+    if (!factory) {
+        supportsDtls = false;
+    } else {
+        g_object_unref(factory);
+    }
+    factory = gst_element_factory_find("dtlssrtpdec");
+    if (!factory) {
+        supportsDtls = false;
+    } else {
+        g_object_unref(factory);
+    }
 }
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
@@ -80,12 +96,17 @@ QXmppCallManager::~QXmppCallManager()
 /// \cond
 QStringList QXmppCallManager::discoveryFeatures() const
 {
-    return QStringList()
+    QStringList features;
+    features
         << ns_jingle      // XEP-0166 : Jingle
         << ns_jingle_rtp  // XEP-0167 : Jingle RTP Sessions
         << ns_jingle_rtp_audio
         << ns_jingle_rtp_video
         << ns_jingle_ice_udp;  // XEP-0176 : Jingle ICE-UDP Transport Method
+    if (d->supportsDtls) {
+        features << ns_jingle_dtls;  // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+    }
+    return features;
 }
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
@@ -136,7 +157,12 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
         return nullptr;
     }
 
-    QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
+    /* Determine support for XEP-0320: Use of DTLS-SRTP in Jingle Sessions */
+    QXmppRosterManager *rosterManager = client()->findExtension<QXmppRosterManager>();
+    QXmppPresence presence = rosterManager->getPresence(QXmppUtils::jidToBareJid(jid), QXmppUtils::jidToResource(jid));
+    bool remoteSupportsDtls = presence.capabilityExt().contains(ns_jingle_dtls);
+
+    QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, remoteSupportsDtls && d->supportsDtls, this);
     QXmppCallStream *stream = call->d->createStream("audio", "initiator", "microphone");
     call->d->streams << stream;
     call->d->sid = QXmppUtils::generateStanzaHash();
@@ -247,14 +273,23 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         return;
 
     if (iq.action() == QXmppJingleIq::SessionInitiate) {
+        const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
+
         // build call
-        QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
+        bool useDtls = !content.transportFingerprint().isEmpty();
+        QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, useDtls, this);
         call->d->sid = iq.sid();
 
-        const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
-        QXmppCallStream *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
-        if (!stream)
+        if (useDtls && !d->supportsDtls) {
+            call->d->terminate(QXmppJingleIq::Reason::FailedApplication);
             return;
+        }
+
+        QXmppCallStream *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
+        if (!stream) {
+            call->d->terminate(QXmppJingleIq::Reason::FailedApplication);
+            return;
+        }
         call->d->streams << stream;
 
         // send ack

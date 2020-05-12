@@ -147,6 +147,8 @@ extern const char* ns_message_correct;
 extern const char* ns_mam;
 // XEP-0319: Last User Interaction in Presence
 extern const char* ns_idle;
+// XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+extern const char* ns_jingle_dtls;
 // XEP-0333: Char Markers
 extern const char* ns_chat_markers;
 // XEP-0334: Message Processing Hints:
