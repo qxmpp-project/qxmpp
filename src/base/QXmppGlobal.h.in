@@ -29,12 +29,14 @@
 
 #include <QString>
 
-#define QXMPP_SHARED_@BUILD_SHARED@
+#define QXMPP_BUILD_SHARED @QXMPP_BUILD_SHARED@
 
-#if defined(QXMPP_BUILD)
-#    define QXMPP_EXPORT Q_DECL_EXPORT
-#elif defined(QXMPP_SHARED_ON)
-#    define QXMPP_EXPORT Q_DECL_IMPORT
+#if QXMPP_BUILD_SHARED
+#    if defined(QXMPP_BUILD)
+#         define QXMPP_EXPORT Q_DECL_EXPORT
+#    else
+#         define QXMPP_EXPORT Q_DECL_IMPORT
+#    endif
 #else
 #    define QXMPP_EXPORT
 #endif
