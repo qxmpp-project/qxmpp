@@ -5,8 +5,8 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@/qxmpp
 
 
 Name: Qxmpp
-Description: Qxmpp Library
-Version: @VERSION_STRING@
+Description: QXmpp Library
+Version: @PROJECT_VERSION@
 Libs: -lqxmpp
 Libs.private: -lQt5Network -lQt5Xml -lQt5Core
 Cflags: -I${includedir}

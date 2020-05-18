@@ -1,5 +1,5 @@
 PROJECT_NAME           = "QXmpp"
-PROJECT_NUMBER         = Version:@VERSION_STRING@
+PROJECT_NUMBER         = "Version: @PROJECT_VERSION@"
 INPUT                  = @PROJECT_SOURCE_DIR@/doc/index.doc \
                          @PROJECT_SOURCE_DIR@/doc/using.doc \
                          @PROJECT_SOURCE_DIR@/doc/xep.doc \

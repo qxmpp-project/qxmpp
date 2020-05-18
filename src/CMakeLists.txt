@@ -214,7 +214,7 @@ else()
 endif()
 
 set_target_properties(qxmpp PROPERTIES
-    VERSION ${VERSION_STRING}
+    VERSION ${PROJECT_VERSION}
     SOVERSION ${SO_VERSION}
     EXPORT_NAME QXmpp
 )

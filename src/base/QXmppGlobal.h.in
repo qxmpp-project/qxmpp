@@ -52,17 +52,17 @@
 /// available.
 ///
 
-#define QXMPP_VERSION QT_VERSION_CHECK(@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@)
+#define QXMPP_VERSION QT_VERSION_CHECK(@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@)
 
 inline QLatin1String QXmppVersion()
 {
-    return QLatin1String("@VERSION_STRING@");
+    return QLatin1String("@PROJECT_VERSION@");
 }
 
 // This sets which deprecated functions should still be usable
 // It works exactly like QT_DISABLE_DEPRECATED_BEFORE
 #ifndef QXMPP_DISABLE_DEPRECATED_BEFORE
-#   define QXMPP_DISABLE_DEPRECATED_BEFORE 0x@VERSION_MAJOR@ << 16
+#   define QXMPP_DISABLE_DEPRECATED_BEFORE 0x0
 #endif
 
 // This works exactly like QT_DEPRECATED_SINCE, but checks QXMPP_DISABLE_DEPRECATED_BEFORE instead.
