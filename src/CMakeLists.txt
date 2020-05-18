@@ -9,6 +9,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
 
+# Configure QXmppGlobal.h.in
+if(BUILD_SHARED)
+    set(QXMPP_BUILD_SHARED true)
+else()
+    set(QXMPP_BUILD_SHARED false)
+endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppGlobal.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/base)
 
