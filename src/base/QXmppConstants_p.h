@@ -102,6 +102,8 @@ extern const char* ns_stream_initiation_file_transfer;
 extern const char* ns_activity;
 // XEP-0115: Entity Capabilities
 extern const char* ns_capabilities;
+// XEP-0118: User Tune
+extern const char* ns_tune;
 // XEP-0136: Message Archiving
 extern const char* ns_archive;
 // XEP-0138: Stream Compression
