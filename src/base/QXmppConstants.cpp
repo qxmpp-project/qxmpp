@@ -90,6 +90,8 @@ const char* ns_stream_initiation_file_transfer = "http://jabber.org/protocol/si/
 const char* ns_activity = "http://jabber.org/protocol/activity";
 // XEP-0115: Entity Capabilities
 const char* ns_capabilities = "http://jabber.org/protocol/caps";
+// XEP-0118: User Tune
+const char* ns_tune = "http://jabber.org/protocol/tune";
 // XEP-0136: Message Archiving
 const char* ns_archive = "urn:xmpp:archive";
 // XEP-0138: Stream Compression
