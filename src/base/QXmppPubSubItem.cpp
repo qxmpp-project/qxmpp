@@ -4,6 +4,7 @@
  * Author:
  *  Jeremy Lainé
  *  Germán Márquez Mejía
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -32,15 +33,49 @@
 class QXmppPubSubItemPrivate : public QSharedData
 {
 public:
+    QXmppPubSubItemPrivate(const QString &id, const QString &publisher);
+
     QString id;
-    QXmppElement payload;
+    QString publisher;
 };
 
+QXmppPubSubItemPrivate::QXmppPubSubItemPrivate(const QString &id, const QString &publisher)
+    : id(id), publisher(publisher)
+{
+}
+
 ///
-/// Constructs a PubSub item.
+/// \class QXmppPubSubItem
 ///
-QXmppPubSubItem::QXmppPubSubItem()
-    : d(new QXmppPubSubItemPrivate)
+/// The QXmppPubSubItem class represents a publish-subscribe item as defined by
+/// \xep{0060, Publish-Subscribe}.
+///
+/// To access the payload of an item, you need to create a derived class of this
+/// and override QXmppPubSubItem::parsePayload() and
+/// QXmppPubSubItem::serializePayload().
+///
+/// It is also required that you override QXmppPubSubItem::isItem() and also
+/// check for the correct payload of the PubSub item. This can be easily done by
+/// using the protected overload of isItem() with an function that checks the
+/// tag name and namespace of the payload. The function is only called if a
+/// payload exists.
+///
+/// In short, you need to reimplement these methods:
+///  * QXmppPubSubItem::parsePayload()
+///  * QXmppPubSubItem::serializePayload()
+///  * QXmppPubSubItem::isItem()
+///
+/// \since QXmpp 1.5 (new API in 1.5, the class existed before)
+///
+
+///
+/// Constructs an item with \a id and \a publisher.
+///
+/// \param id
+/// \param publisher
+///
+QXmppPubSubItem::QXmppPubSubItem(const QString &id, const QString &publisher)
+    : d(new QXmppPubSubItemPrivate(id, publisher))
 {
 }
 
@@ -51,38 +86,6 @@ QXmppPubSubItem::~QXmppPubSubItem() = default;
 
 /// Default assignment operator
 QXmppPubSubItem &QXmppPubSubItem::operator=(const QXmppPubSubItem &iq) = default;
-
-///
-/// Constructs an item with \a id but no payload.
-///
-/// \param id
-///
-QXmppPubSubItem::QXmppPubSubItem(const QString &id) : QXmppPubSubItem()
-{
-    d->id = id;
-}
-
-///
-/// Constructs an item with \a payload but no ID.
-///
-/// \param payload
-///
-QXmppPubSubItem::QXmppPubSubItem(const QXmppElement &payload) : QXmppPubSubItem()
-{
-    d->payload = payload;
-}
-
-///
-/// Constructs an item with the given \a id and \a payload.
-///
-/// \param id
-/// \param payload
-///
-QXmppPubSubItem::QXmppPubSubItem(const QString &id, const QXmppElement &payload) : QXmppPubSubItem()
-{
-    d->id = id;
-    d->payload = payload;
-}
 
 ///
 /// Returns the ID of the PubSub item.
@@ -103,38 +106,65 @@ void QXmppPubSubItem::setId(const QString &id)
 }
 
 ///
-/// Returns the contents of the PubSub item.
+/// Returns the JID of the publisher of the item.
 ///
-QXmppElement QXmppPubSubItem::payload() const
+QString QXmppPubSubItem::publisher() const
 {
-    return d->payload;
+    return d->publisher;
 }
 
 ///
-/// Sets the contents of the PubSub item.
+/// Sets the JID of the publisher of the item.
 ///
-/// \param contents
-///
-void QXmppPubSubItem::setPayload(const QXmppElement &payload)
+void QXmppPubSubItem::setPublisher(const QString &publisher)
 {
-    d->payload = payload;
+    d->publisher = publisher;
 }
 
 /// \cond
 void QXmppPubSubItem::parse(const QDomElement &element)
 {
     d->id = element.attribute(QStringLiteral("id"));
-    d->payload = QXmppElement(element.firstChildElement());
+    d->publisher = element.attribute(QStringLiteral("publisher"));
+
+    parsePayload(element.firstChildElement());
 }
 
 void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
+    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+    helperToXmlAddAttribute(writer, QStringLiteral("publisher"), d->publisher);
 
-    if (!d->id.isEmpty())
-        helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+    serializePayload(writer);
 
-    d->payload.toXml(writer);
     writer->writeEndElement();
 }
 /// \endcond
+
+///
+/// Returns true, if the element is possibly a PubSub item.
+///
+bool QXmppPubSubItem::isItem(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("item");
+}
+
+///
+/// Parses the payload of the item (the child element of the &lt;item/&gt;).
+///
+/// This method needs to be overriden to perform the payload-specific parsing.
+///
+void QXmppPubSubItem::parsePayload(const QDomElement &)
+{
+}
+
+///
+/// Serializes the payload of the item (the child element of the &lt;item/&gt;).
+///
+/// This method needs to be overriden to perform the payload-specific
+/// serialization.
+///
+void QXmppPubSubItem::serializePayload(QXmlStreamWriter *) const
+{
+}
