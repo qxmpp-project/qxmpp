@@ -2,6 +2,7 @@
  * Copyright (C) 2008-2021 The QXmpp developers
  *
  * Author:
+ *  Linus Jahn
  *  Jeremy Lainé
  *  Germán Márquez Mejía
  *
@@ -25,78 +26,161 @@
 #ifndef QXMPPPUBSUBIQ_H
 #define QXMPPPUBSUBIQ_H
 
-#include "QXmppDataForm.h"
 #include "QXmppIq.h"
-#include "QXmppPubSubItem.h"
 
+#include <QDomElement>
 #include <QSharedDataPointer>
 
-#if QXMPP_DEPRECATED_SINCE(1, 2)
-#include "QXmppPubSubItem.h"
-#endif
+#include <optional>
 
+class QXmppDataForm;
 class QXmppPubSubIqPrivate;
+class QXmppPubSubItem;
+class QXmppPubSubSubscription;
+class QXmppPubSubAffiliation;
+class QXmppResultSetReply;
 
-///
-/// \brief The QXmppPubSubIq class represents an IQ used for the
-/// publish-subscribe mechanisms defined by \xep{0060}: Publish-Subscribe.
-///
-/// \ingroup Stanzas
-///
-class QXMPP_EXPORT QXmppPubSubIq : public QXmppIq
+class QXMPP_EXPORT QXmppPubSubIqBase : public QXmppIq
 {
 public:
     /// This enum is used to describe a publish-subscribe query type.
     enum QueryType {
-        AffiliationsQuery,
-        DefaultQuery,
-        ItemsQuery,
-        PublishQuery,
-        RetractQuery,
-        SubscribeQuery,
-        SubscriptionQuery,
-        SubscriptionsQuery,
-        UnsubscribeQuery,
-        CreateQuery,
-        DeleteQuery
+        Affiliations,
+        OwnerAffiliations,
+        Configure,
+        Create,
+        Default,
+        OwnerDefault,
+        Delete,
+        Items,
+        Options,
+        Publish,
+        Purge,
+        Retract,
+        Subscribe,
+        Subscription,
+        Subscriptions,
+        OwnerSubscriptions,
+        Unsubscribe,
     };
 
-    QXmppPubSubIq();
-    QXmppPubSubIq(const QXmppPubSubIq &other);
-    ~QXmppPubSubIq();
+    QXmppPubSubIqBase();
+    QXmppPubSubIqBase(const QXmppPubSubIqBase &other);
+    ~QXmppPubSubIqBase();
 
-    QXmppPubSubIq &operator=(const QXmppPubSubIq &other);
+    QXmppPubSubIqBase &operator=(const QXmppPubSubIqBase &other);
 
-    QXmppPubSubIq::QueryType queryType() const;
-    void setQueryType(QXmppPubSubIq::QueryType queryType);
+    QXmppPubSubIqBase::QueryType queryType() const;
+    void setQueryType(QXmppPubSubIqBase::QueryType queryType);
 
     QString queryJid() const;
     void setQueryJid(const QString &queryJid);
 
-    QString queryNodeName() const;
-    void setQueryNodeName(const QString &queryNodeName);
-
-    QList<QXmppPubSubItem> items() const;
-    void setItems(const QList<QXmppPubSubItem> &items);
+    QString queryNode() const;
+    void setQueryNode(const QString &queryNode);
 
     QString subscriptionId() const;
     void setSubscriptionId(const QString &subscriptionId);
 
-    QXmppDataForm publishOptions() const;
-    void setPublishOptions(const QXmppDataForm &publishOptions);
+    QList<QXmppPubSubSubscription> subscriptions() const;
+    void setSubscriptions(const QList<QXmppPubSubSubscription> &);
+
+    std::optional<QXmppPubSubSubscription> subscription() const;
+    void setSubscription(const std::optional<QXmppPubSubSubscription> &);
+
+    QList<QXmppPubSubAffiliation> affiliations() const;
+    void setAffiliations(const QList<QXmppPubSubAffiliation> &);
+
+    quint32 maxItems() const;
+    void setMaxItems(quint32);
+
+    std::optional<QXmppDataForm> dataForm() const;
+    void setDataForm(const std::optional<QXmppDataForm> &);
+
+    std::optional<QXmppResultSetReply> itemsContinuation() const;
+    void setItemsContinuation(const std::optional<QXmppResultSetReply> &itemsContinuation);
 
     /// \cond
     static bool isPubSubIq(const QDomElement &element);
-    /// \endcond
 
 protected:
-    /// \cond
+    static bool isPubSubIq(const QDomElement &element,
+                           bool (*isItemValid)(const QDomElement &));
+
     void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
+
+    virtual void parseItems(const QDomElement &queryElement) = 0;
+    virtual void serializeItems(QXmlStreamWriter *writer) const = 0;
     /// \endcond
 
 private:
+    static std::optional<QueryType> queryTypeFromDomElement(const QDomElement &element);
+    static bool queryTypeIsOwnerIq(QueryType type);
+
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
+
+template<class T = QXmppPubSubItem>
+class QXmppPubSubIq : public QXmppPubSubIqBase
+{
+public:
+    QList<T> items() const;
+    void setItems(const QList<T> &items);
+
+    static bool isPubSubIq(const QDomElement &element);
+
+protected:
+    /// \cond
+    void parseItems(const QDomElement &queryElement) override;
+    void serializeItems(QXmlStreamWriter *writer) const override;
+    /// \endcond
+
+private:
+    QList<T> m_items;
+};
+
+template<class T>
+QList<T> QXmppPubSubIq<T>::items() const
+{
+    return m_items;
+}
+
+template<class T>
+void QXmppPubSubIq<T>::setItems(const QList<T> &items)
+{
+    m_items = items;
+}
+
+template<class T>
+bool QXmppPubSubIq<T>::isPubSubIq(const QDomElement &element)
+{
+    return QXmppPubSubIqBase::isPubSubIq(element, [](const QDomElement &item) -> bool {
+        return T::isItem(item);
+    });
+}
+
+/// \cond
+template<class T>
+void QXmppPubSubIq<T>::parseItems(const QDomElement &queryElement)
+{
+    QDomElement childElement = queryElement.firstChildElement(QStringLiteral("item"));
+    while (!childElement.isNull()) {
+        T item;
+        item.parse(childElement);
+        m_items << item;
+
+        childElement = childElement.nextSiblingElement(QStringLiteral("item"));
+    }
+}
+
+template<class T>
+void QXmppPubSubIq<T>::serializeItems(QXmlStreamWriter *writer) const
+{
+    for (const auto &item : std::as_const(m_items)) {
+        item.toXml(writer);
+    }
+}
+/// \endcond
 
 #endif  // QXMPPPUBSUBIQ_H

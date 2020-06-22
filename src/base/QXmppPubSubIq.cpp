@@ -2,6 +2,7 @@
  * Copyright (C) 2008-2021 The QXmpp developers
  *
  * Author:
+ *  Linus Jahn
  *  Jeremy Lainé
  *  Germán Márquez Mejía
  *
@@ -25,64 +26,110 @@
 #include "QXmppPubSubIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppDataForm.h"
+#include "QXmppPubSubAffiliation.h"
+#include "QXmppPubSubSubscription.h"
+#include "QXmppResultSet.h"
 #include "QXmppUtils.h"
 
-#include <QDomElement>
 #include <QSharedData>
+
+///
+/// \class QXmppPubSubIqBase
+///
+/// \brief The QXmppPubSubIqBase class is an abstract class used for parsing of
+/// generic PubSub IQs as defined by \xep{0060, Publish-Subscribe}.
+///
+/// This class does not handle queries working with items. For a full-featured
+/// PubSub-IQ, please use QXmppPubSubIq<T> with your needed item class.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \brief The QXmppPubSubIq class represents an IQ used for the
+/// publish-subscribe mechanisms defined by \xep{0060, Publish-Subscribe}.
+///
+/// \ingroup Stanzas
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \fn QXmppPubSubIq<T>::items()
+///
+/// Returns the IQ's items.
+///
+
+///
+/// \fn QXmppPubSubIq<T>::setItems()
+///
+/// Sets the IQ's items.
+///
+/// \param items
+///
+
+///
+/// \fn QXmppPubSubIq<T>::isPubSubIq()
+///
+/// Returns true, if the element is a valid PubSub IQ stanza. The payload of the
+/// &lt;item/&gt; is also checked.
+///
 
 static const QStringList PUBSUB_QUERIES = {
     QStringLiteral("affiliations"),
+    QStringLiteral("affiliations"),
+    QStringLiteral("configure"),
+    QStringLiteral("create"),
     QStringLiteral("default"),
+    QStringLiteral("default"),
+    QStringLiteral("delete"),
     QStringLiteral("items"),
+    QStringLiteral("options"),
     QStringLiteral("publish"),
+    QStringLiteral("purge"),
     QStringLiteral("retract"),
     QStringLiteral("subscribe"),
     QStringLiteral("subscription"),
     QStringLiteral("subscriptions"),
+    QStringLiteral("subscriptions"),
     QStringLiteral("unsubscribe"),
-    QStringLiteral("create"),
-    QStringLiteral("delete"),
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
 {
 public:
-    QXmppPubSubIqPrivate();
-
-    QXmppPubSubIq::QueryType queryType;
+    QXmppPubSubIqBase::QueryType queryType = QXmppPubSubIqBase::Items;
     QString queryJid;
-    QString queryNodeName;
-    QList<QXmppPubSubItem> items;
+    QString queryNode;
     QString subscriptionId;
-    QString subscriptionType;
-    QXmppDataForm publishOptions;
+    QList<QXmppPubSubSubscription> subscriptions;
+    QList<QXmppPubSubAffiliation> affiliations;
+    quint32 maxItems = 0;
+    std::optional<QXmppDataForm> dataForm;
+    std::optional<QXmppResultSetReply> itemsContinuation;
 };
-
-QXmppPubSubIqPrivate::QXmppPubSubIqPrivate()
-    : queryType(QXmppPubSubIq::ItemsQuery)
-{
-}
 
 ///
 /// Constructs a PubSub IQ.
 ///
-QXmppPubSubIq::QXmppPubSubIq()
+QXmppPubSubIqBase::QXmppPubSubIqBase()
     : d(new QXmppPubSubIqPrivate)
 {
 }
 
 /// Default copy-constructor
-QXmppPubSubIq::QXmppPubSubIq(const QXmppPubSubIq &iq) = default;
+QXmppPubSubIqBase::QXmppPubSubIqBase(const QXmppPubSubIqBase &iq) = default;
 
-QXmppPubSubIq::~QXmppPubSubIq() = default;
+QXmppPubSubIqBase::~QXmppPubSubIqBase() = default;
 
 /// Default assignment operator
-QXmppPubSubIq &QXmppPubSubIq::operator=(const QXmppPubSubIq &iq) = default;
+QXmppPubSubIqBase &QXmppPubSubIqBase::operator=(const QXmppPubSubIqBase &iq) = default;
 
 ///
 /// Returns the PubSub query type for this IQ.
 ///
-QXmppPubSubIq::QueryType QXmppPubSubIq::queryType() const
+QXmppPubSubIqBase::QueryType QXmppPubSubIqBase::queryType() const
 {
     return d->queryType;
 }
@@ -92,7 +139,7 @@ QXmppPubSubIq::QueryType QXmppPubSubIq::queryType() const
 ///
 /// \param queryType
 ///
-void QXmppPubSubIq::setQueryType(QXmppPubSubIq::QueryType queryType)
+void QXmppPubSubIqBase::setQueryType(QXmppPubSubIqBase::QueryType queryType)
 {
     d->queryType = queryType;
 }
@@ -100,7 +147,7 @@ void QXmppPubSubIq::setQueryType(QXmppPubSubIq::QueryType queryType)
 ///
 /// Returns the JID being queried.
 ///
-QString QXmppPubSubIq::queryJid() const
+QString QXmppPubSubIqBase::queryJid() const
 {
     return d->queryJid;
 }
@@ -110,7 +157,7 @@ QString QXmppPubSubIq::queryJid() const
 ///
 /// \param queryJid
 ///
-void QXmppPubSubIq::setQueryJid(const QString &queryJid)
+void QXmppPubSubIqBase::setQueryJid(const QString &queryJid)
 {
     d->queryJid = queryJid;
 }
@@ -118,9 +165,9 @@ void QXmppPubSubIq::setQueryJid(const QString &queryJid)
 ///
 /// Returns the name of the node being queried.
 ///
-QString QXmppPubSubIq::queryNodeName() const
+QString QXmppPubSubIqBase::queryNode() const
 {
-    return d->queryNodeName;
+    return d->queryNode;
 }
 
 ///
@@ -128,158 +175,535 @@ QString QXmppPubSubIq::queryNodeName() const
 ///
 /// \param queryNodeName
 ///
-void QXmppPubSubIq::setQueryNodeName(const QString &queryNodeName)
+void QXmppPubSubIqBase::setQueryNode(const QString &queryNodeName)
 {
-    d->queryNodeName = queryNodeName;
+    d->queryNode = queryNodeName;
 }
 
 ///
-/// Returns the subscription ID.
+/// Returns the subscription ID for the request.
 ///
-QString QXmppPubSubIq::subscriptionId() const
+/// This does not work for SubscriptionQuery IQs, use subscription() instead.
+///
+QString QXmppPubSubIqBase::subscriptionId() const
 {
     return d->subscriptionId;
 }
 
 ///
-/// Sets the subscription ID.
+/// Sets the subscription ID for the request.
 ///
-/// \param subscriptionId
+/// This does not work for SubscriptionQuery IQs, use setSubscription() instead.
 ///
-void QXmppPubSubIq::setSubscriptionId(const QString &subscriptionId)
+void QXmppPubSubIqBase::setSubscriptionId(const QString &subscriptionId)
 {
     d->subscriptionId = subscriptionId;
 }
 
 ///
-/// Returns the publish options for the IQ's items.
+/// Returns the included subscriptions.
 ///
-QXmppDataForm QXmppPubSubIq::publishOptions() const
+QList<QXmppPubSubSubscription> QXmppPubSubIqBase::subscriptions() const
 {
-    return d->publishOptions;
+    return d->subscriptions;
 }
 
 ///
-/// Sets the publish options for the IQ's items.
+/// Sets the included subscriptions.
 ///
-/// \param publishOptions
-///
-void QXmppPubSubIq::setPublishOptions(const QXmppDataForm &publishOptions)
+void QXmppPubSubIqBase::setSubscriptions(const QList<QXmppPubSubSubscription> &subscriptions)
 {
-    d->publishOptions = publishOptions;
+    d->subscriptions = subscriptions;
 }
 
 ///
-/// Returns the IQ's items.
+/// Returns the subscription.
 ///
-QList<QXmppPubSubItem> QXmppPubSubIq::items() const
+/// This is a utility function for subscriptions(). It returns the first
+/// subscription if existant. This can be used for both query types,
+/// Subscription and Subscriptions.
+///
+std::optional<QXmppPubSubSubscription> QXmppPubSubIqBase::subscription() const
 {
-    return d->items;
+    if (d->subscriptions.isEmpty()) {
+        return std::nullopt;
+    }
+    return d->subscriptions.first();
 }
 
 ///
-/// Sets the IQ's items.
+/// Sets the subscription.
 ///
-/// \param items
+/// This is a utility function for setSubscriptions(). It can be used for both
+/// query types, Subscription and Subscriptions.
 ///
-void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
+void QXmppPubSubIqBase::setSubscription(const std::optional<QXmppPubSubSubscription> &subscription)
 {
-    d->items = items;
+    if (subscription) {
+        d->subscriptions = { *subscription };
+    } else {
+        d->subscriptions.clear();
+    }
+}
+
+///
+/// Returns the included affiliations.
+///
+QList<QXmppPubSubAffiliation> QXmppPubSubIqBase::affiliations() const
+{
+    return d->affiliations;
+}
+
+///
+/// Sets the included affiliations.
+///
+void QXmppPubSubIqBase::setAffiliations(const QList<QXmppPubSubAffiliation> &affiliations)
+{
+    d->affiliations = affiliations;
+}
+
+///
+/// Returns the maximum of items that are requested.
+///
+/// This is only used for queries with type ItemsQuery.
+///
+quint32 QXmppPubSubIqBase::maxItems() const
+{
+    return d->maxItems;
+}
+
+///
+/// Sets the maximum of items that are requested.
+///
+/// This is only used for queries with type ItemsQuery.
+///
+void QXmppPubSubIqBase::setMaxItems(quint32 maxItems)
+{
+    d->maxItems = maxItems;
+}
+
+///
+/// Returns a data form if the IQ contains one.
+///
+std::optional<QXmppDataForm> QXmppPubSubIqBase::dataForm() const
+{
+    return d->dataForm;
+}
+
+///
+/// Sets a data form (or clears it by setting std::nullopt).
+///
+void QXmppPubSubIqBase::setDataForm(const std::optional<QXmppDataForm> &dataForm)
+{
+    d->dataForm = dataForm;
+}
+
+///
+/// Returns a description of which items have been returned.
+///
+/// If this value is set the results are incomplete.
+///
+std::optional<QXmppResultSetReply> QXmppPubSubIqBase::itemsContinuation() const
+{
+    return d->itemsContinuation;
+}
+
+///
+/// Returns a description of which items have been returned.
+///
+/// If this value is set the results are incomplete.
+///
+void QXmppPubSubIqBase::setItemsContinuation(const std::optional<QXmppResultSetReply> &itemsContinuation)
+{
+    d->itemsContinuation = itemsContinuation;
 }
 
 /// \cond
-bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
+bool QXmppPubSubIqBase::isPubSubIq(const QDomElement &element)
 {
-    QString ns = element.firstChildElement(QStringLiteral("pubsub")).namespaceURI();
-    return ns == ns_pubsub || ns == ns_pubsub_owner;
+    // no special requirements for the item / it's payload
+    return QXmppPubSubIqBase::isPubSubIq(element, [](const QDomElement &) {
+        return true;
+    });
 }
 
-void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
+bool QXmppPubSubIqBase::isPubSubIq(const QDomElement &element, bool (*isItemValid)(const QDomElement &))
 {
-    const QDomElement pubSubElement = element.firstChildElement(QStringLiteral("pubsub"));
+    // IQs must have only one direct child element.
+    const QDomElement pubSubElement = element.firstChildElement();
+    if (pubSubElement.tagName() != QStringLiteral("pubsub"))
+        return false;
 
-    const QDomElement queryElement = pubSubElement.firstChildElement();
+    // check for correct namespace
+    const bool isOwner = pubSubElement.namespaceURI() == ns_pubsub_owner;
+    if (!isOwner && pubSubElement.namespaceURI() != ns_pubsub) {
+        return false;
+    }
 
-    // determine query type
-    const QString tagName = queryElement.tagName();
+    // check that the query type is valid
+    auto queryElement = pubSubElement.firstChildElement();
+    auto optionalType = queryTypeFromDomElement(queryElement);
+    if (!optionalType) {
+        return false;
+    }
+    auto queryType = *optionalType;
 
-    int queryType = PUBSUB_QUERIES.indexOf(queryElement.tagName());
-    if (queryType > -1)
-        d->queryType = QueryType(queryType);
+    // check for the "node" attribute
+    switch (queryType) {
+    case OwnerAffiliations:
+    case Items:
+    case Publish:
+    case Retract:
+    case Delete:
+    case Purge:
+        if (!queryElement.hasAttribute(QStringLiteral("node")))
+            return false;
+    default:
+        break;
+    }
+
+    // check for the "jid" attribute
+    switch (queryType) {
+    case Options:
+    case OwnerSubscriptions:
+    case Subscribe:
+    case Unsubscribe:
+        if (!queryElement.hasAttribute(QStringLiteral("jid")))
+            return false;
+    default:
+        break;
+    }
+
+    // check the individual content
+    switch (queryType) {
+    case Items:
+    case Publish:
+    case Retract: {
+        // check the items using isItemValid()
+        auto itemElement = queryElement.firstChildElement(QStringLiteral("item"));
+        while (!itemElement.isNull()) {
+            if (!isItemValid(itemElement)) {
+                return false;
+            }
+
+            itemElement = itemElement.nextSiblingElement(QStringLiteral("item"));
+        }
+        break;
+    }
+    case Subscription:
+        if (!QXmppPubSubSubscription::isSubscription(queryElement)) {
+            return false;
+        }
+    case Delete:
+    case Purge:
+    case Configure:
+        if (!isOwner) {
+            return false;
+        }
+        break;
+    case Affiliations:
+    case OwnerAffiliations:
+    case Create:
+    case Default:
+    case OwnerDefault:
+    case Options:
+    case Subscribe:
+    case Subscriptions:
+    case OwnerSubscriptions:
+    case Unsubscribe:
+        break;
+    }
+    return true;
+}
+
+void QXmppPubSubIqBase::parseElementFromChild(const QDomElement &element)
+{
+    const auto findChildElement = [](const QDomElement &element, const QString &tag, const QString &namespaceUri) {
+        for (auto subElement = element.firstChildElement(tag);
+             !subElement.isNull();
+             subElement = subElement.nextSiblingElement(tag)) {
+            if (subElement.namespaceURI() == namespaceUri) {
+                return subElement;
+            }
+        }
+        return QDomElement();
+    };
+
+    const auto parseDataFormFromChild = [=](const QDomElement &element) -> std::optional<QXmppDataForm> {
+        if (const auto subElement = findChildElement(element, "x", ns_data);
+                !subElement.isNull()) {
+            QXmppDataForm form;
+            form.parse(subElement);
+            return form;
+        }
+        return {};
+    };
+
+    const auto pubSubElement = element.firstChildElement(QStringLiteral("pubsub"));
+    const auto queryElement = pubSubElement.firstChildElement();
+
+    // parse query type
+    if (auto type = queryTypeFromDomElement(queryElement)) {
+        d->queryType = *type;
+    } else {
+        return;
+    }
+
+    // Subscription is special: The query element is directly handled by
+    // QXmppPubSubSubscription.
+    if (d->queryType == Subscription) {
+        QXmppPubSubSubscription subscription;
+        subscription.parse(queryElement);
+        setSubscription(subscription);
+
+        // form inside following <options/>
+        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("options"));
+        return;
+    }
 
     d->queryJid = queryElement.attribute(QStringLiteral("jid"));
-    d->queryNodeName = queryElement.attribute(QStringLiteral("node"));
+    d->queryNode = queryElement.attribute(QStringLiteral("node"));
+
+    // parse subid
+    switch (d->queryType) {
+    case Items:
+    case Unsubscribe:
+    case Options:
+        d->subscriptionId = queryElement.attribute(QStringLiteral("subid"));
+    default:
+        break;
+    }
 
     // parse contents
     QDomElement childElement;
 
     switch (d->queryType) {
-    case QXmppPubSubIq::ItemsQuery:
-    case QXmppPubSubIq::PublishQuery:
-    case QXmppPubSubIq::RetractQuery:
-        childElement = queryElement.firstChildElement(QStringLiteral("item"));
-        while (!childElement.isNull()) {
-            QXmppPubSubItem item;
-            item.parse(childElement);
-            d->items << item;
-            childElement = childElement.nextSiblingElement(QStringLiteral("item"));
+    case Affiliations:
+    case OwnerAffiliations: {
+        auto subElement = queryElement.firstChildElement();
+        while (!subElement.isNull()) {
+            if (QXmppPubSubAffiliation::isAffiliation(subElement)) {
+                QXmppPubSubAffiliation affiliation;
+                affiliation.parse(subElement);
+
+                d->affiliations << affiliation;
+            }
+            subElement = subElement.nextSiblingElement();
         }
         break;
-    case QXmppPubSubIq::SubscriptionQuery:
-        d->subscriptionId = queryElement.attribute(QStringLiteral("subid"));
-        d->subscriptionType = queryElement.attribute(QStringLiteral("subscription"));
+    }
+    case Items:
+        // Result Set Management (incomplete items result received)
+        for (auto rsmEl = pubSubElement.firstChildElement(QStringLiteral("set"));
+             !rsmEl.isNull();
+             rsmEl = rsmEl.nextSiblingElement(QStringLiteral("set"))) {
+            if (rsmEl.namespaceURI() == ns_rsm) {
+                QXmppResultSetReply reply;
+                reply.parse(rsmEl);
+                d->itemsContinuation = reply;
+            }
+        }
+        [[fallthrough]];
+    case Publish:
+    case Retract:
+        parseItems(queryElement);
+
+        if (d->queryType == Items) {
+            d->maxItems = queryElement.attribute(QStringLiteral("max_items")).toUInt();
+        } else if (d->queryType == Publish) {
+            // form inside following <publish-options/>
+            d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("publish-options"));
+        }
+
         break;
-    default:
+    case Subscriptions:
+    case OwnerSubscriptions: {
+        for (auto subElement = queryElement.firstChildElement();
+             !subElement.isNull();
+             subElement = subElement.nextSiblingElement()) {
+            if (QXmppPubSubSubscription::isSubscription(subElement)) {
+                QXmppPubSubSubscription subscription;
+                subscription.parse(subElement);
+
+                d->subscriptions << subscription;
+            }
+        }
         break;
     }
-
-    // parse publish options
-    if (d->queryType == QXmppPubSubIq::PublishQuery) {
-        QDomElement optionsElement = pubSubElement.firstChildElement("publish-options");
-        QXmppDataForm form;
-        form.parse(optionsElement.firstChildElement());
-        d->publishOptions = form;
+    case Configure:
+    case Default:
+    case OwnerDefault:
+    case Options:
+        // form in direct child <x/>
+        d->dataForm = parseDataFormFromChild(queryElement);
+        break;
+    case Create:
+        // form inside following <configure/>
+        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("configure"));
+        break;
+    case Subscribe:
+    case Subscription:
+        // form inside following <options/>
+        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("options"));
+        break;
+    case Delete:
+    case Purge:
+    case Unsubscribe:
+        break;
     }
 }
 
-void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+void QXmppPubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("pubsub"));
+    writer->writeDefaultNamespace(queryTypeIsOwnerIq(d->queryType) ? ns_pubsub_owner : ns_pubsub);
 
-    QString defaultNamespace = ns_pubsub;
-    if (d->queryType == QXmppPubSubIq::DeleteQuery)
-        defaultNamespace = ns_pubsub_owner;
-    writer->writeDefaultNamespace(defaultNamespace);
+    // The SubscriptionQuery is special here: The query element is directly
+    // handled by a QXmppPubSubSubscription.
+    if (d->queryType == Subscription) {
+        subscription().value_or(QXmppPubSubSubscription()).toXml(writer);
+    } else {
+        // write query type
+        writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
+        helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
+        helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNode);
 
-    // write query type
-    writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
-    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNodeName);
+        // write subid
+        switch (d->queryType) {
+        case Items:
+        case Unsubscribe:
+        case Options:
+            helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
+        default:
+            break;
+        }
 
-    // write contents
-    switch (d->queryType) {
-    case QXmppPubSubIq::ItemsQuery:
-    case QXmppPubSubIq::PublishQuery:
-    case QXmppPubSubIq::RetractQuery:
-        for (const auto &item : d->items)
-            item.toXml(writer);
-        break;
-    case QXmppPubSubIq::SubscriptionQuery:
-        helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
-        helperToXmlAddAttribute(writer, QStringLiteral("subscription"), d->subscriptionType);
-        break;
-    default:
-        break;
+        // write contents
+        switch (d->queryType) {
+        case Affiliations:
+        case OwnerAffiliations:
+            for (const auto &affiliation : std::as_const(d->affiliations)) {
+                affiliation.toXml(writer);
+            }
+            break;
+        case Items:
+            if (d->maxItems > 0) {
+                writer->writeAttribute(QStringLiteral("max_items"), QString::number(d->maxItems));
+            }
+            [[fallthrough]];
+        case Publish:
+        case Retract:
+            serializeItems(writer);
+            break;
+        case Subscriptions:
+        case OwnerSubscriptions:
+            for (const auto &sub : std::as_const(d->subscriptions)) {
+                sub.toXml(writer);
+            }
+            break;
+        case Configure:
+        case Default:
+        case OwnerDefault:
+        case Options:
+            if (d->dataForm) {
+                d->dataForm->toXml(writer);
+            }
+            break;
+        case Create:
+        case Delete:
+        case Purge:
+        case Subscribe:
+        case Subscription:
+        case Unsubscribe:
+            break;
+        }
+
+        writer->writeEndElement();  // query type
+
+        // add extra element with data form
+        if (d->dataForm) {
+            const auto writeForm = [](QXmlStreamWriter *writer, const QXmppDataForm &form, const QString &subElementName) {
+                writer->writeStartElement(subElementName);
+                form.toXml(writer);
+                writer->writeEndElement();
+            };
+
+            switch (d->queryType) {
+            case Create:
+                writeForm(writer, *d->dataForm, QStringLiteral("configure"));
+                break;
+            case Publish:
+                writeForm(writer, *d->dataForm, QStringLiteral("publish-options"));
+                break;
+            case Subscribe:
+            case Subscription:
+                writeForm(writer, *d->dataForm, QStringLiteral("options"));
+                break;
+            default:
+                break;
+            }
+        }
+
+        // Result Set Management
+        if (d->queryType == Items && d->itemsContinuation.has_value()) {
+            d->itemsContinuation->toXml(writer);
+        }
     }
-    writer->writeEndElement();
-
-    // write publish options
-    if (d->queryType == QXmppPubSubIq::PublishQuery && !d->publishOptions.isNull()) {
-        writer->writeStartElement("publish-options");
-        d->publishOptions.toXml(writer);
-        writer->writeEndElement();
-    }
-
-    writer->writeEndElement();
+    writer->writeEndElement();  // pubsub
 }
 /// \endcond
+
+std::optional<QXmppPubSubIqBase::QueryType> QXmppPubSubIqBase::queryTypeFromDomElement(const QDomElement &element)
+{
+    auto index = PUBSUB_QUERIES.indexOf(element.tagName());
+    if (index == -1) {
+        return std::nullopt;
+    }
+
+    auto type = QueryType(index);
+
+    // Some queries can have ns_pubsub_owner and normal ns_pubsub. To
+    // distinguish those after parsing those with ns_pubsub_owner are replaced
+    // by another query type.
+
+    if (element.namespaceURI() != ns_pubsub_owner) {
+        return type;
+    }
+
+    switch (type) {
+    case Affiliations:
+        return OwnerAffiliations;
+    case Default:
+        return OwnerDefault;
+    case Subscriptions:
+        return OwnerSubscriptions;
+    default:
+        return type;
+    }
+}
+
+bool QXmppPubSubIqBase::queryTypeIsOwnerIq(QueryType type)
+{
+    switch (type) {
+    case OwnerAffiliations:
+    case OwnerSubscriptions:
+    case OwnerDefault:
+    case Configure:
+    case Delete:
+    case Purge:
+        return true;
+    case Affiliations:
+    case Create:
+    case Default:
+    case Items:
+    case Options:
+    case Publish:
+    case Retract:
+    case Subscribe:
+    case Subscription:
+    case Subscriptions:
+    case Unsubscribe:
+        return false;
+    }
+    return false;
+}
