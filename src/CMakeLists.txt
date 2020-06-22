@@ -63,6 +63,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppStream.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
+    base/QXmppTuneItem.h
     base/QXmppUtils.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
@@ -153,6 +154,7 @@ set(SOURCE_FILES
     base/QXmppStreamInitiationIq.cpp
     base/QXmppStreamManagement.cpp
     base/QXmppStun.cpp
+    base/QXmppTuneItem.cpp
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
