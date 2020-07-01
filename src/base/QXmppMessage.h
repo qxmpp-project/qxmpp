@@ -259,10 +259,11 @@ public:
     void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
-private:
-    void parseExtension(const QDomElement &element, QXmppElementList &unknownExtensions);
-    void parseXElement(const QDomElement &element, QXmppElementList &unknownElements);
+protected:
+    virtual bool parseExtension(const QDomElement &element);
+    virtual void serializeExtensions(QXmlStreamWriter *writer) const;
 
+private:
     QSharedDataPointer<QXmppMessagePrivate> d;
 };
 
