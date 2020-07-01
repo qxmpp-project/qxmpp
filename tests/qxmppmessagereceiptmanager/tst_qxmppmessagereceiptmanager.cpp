@@ -99,7 +99,7 @@ void tst_QXmppMessageReceiptManager::testReceipt_data()
         << false
         << false
         << true;
-    QTest::newRow("error")
+    QTest::newRow("error-request")
         << QByteArray(
                "<message xml:lang=\"en\" "
                "to=\"northumberland@shakespeare.lit/westminster\" "
@@ -110,6 +110,25 @@ void tst_QXmppMessageReceiptManager::testReceipt_data()
                "<stanza-id xmlns=\"urn:xmpp:sid:0\" by=\"kingrichard@royalty.england.lit\" id=\"1585254642941569\"/> "
                "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2020-03-26T20:30:41.678Z\"/> "
                "<request xmlns=\"urn:xmpp:receipts\"/> "
+               "<error code=\"500\" type=\"wait\"> "
+               "<resource-constraint xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/> "
+               "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\" xml:lang=\"en\">"
+               "Your contact offline message queue is full. The message has been discarded."
+               "</text>"
+               "</error>"
+               "<body>1</body> "
+               "</message>")
+        << false
+        << false
+        << false;
+    QTest::newRow("error-receipt")
+        << QByteArray(
+               "<message xml:lang=\"en\" "
+               "to=\"northumberland@shakespeare.lit/westminster\" "
+               "from=\"kingrichard@royalty.england.lit/throne\" "
+               "type=\"error\" id=\"bi29sg183b4v\" "
+               "> "
+               "<received xmlns=\"urn:xmpp:receipts\" id=\"richard2-4.1.247\"/>"
                "<error code=\"500\" type=\"wait\"> "
                "<resource-constraint xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/> "
                "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\" xml:lang=\"en\">"

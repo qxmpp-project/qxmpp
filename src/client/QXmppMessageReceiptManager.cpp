@@ -53,6 +53,9 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     QXmppMessage message;
     message.parse(stanza);
 
+    if (message.type() == QXmppMessage::Error)
+        return false;
+
     // Handle receipts and cancel any further processing.
     if (!message.receiptId().isEmpty()) {
         // Buggy clients also mark carbon messages as received; to avoid this
@@ -64,7 +67,7 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
     }
 
     // If requested, send a receipt.
-    if (message.isReceiptRequested() && !message.from().isEmpty() && !message.id().isEmpty() && message.type() != QXmppMessage::Error) {
+    if (message.isReceiptRequested() && !message.from().isEmpty() && !message.id().isEmpty()) {
         QXmppMessage receipt;
         receipt.setTo(message.from());
         receipt.setReceiptId(message.id());
