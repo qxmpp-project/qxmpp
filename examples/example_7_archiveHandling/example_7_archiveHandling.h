@@ -24,11 +24,11 @@
 #ifndef XMPPCLIENT_H
 #define XMPPCLIENT_H
 
+#include "QXmppArchiveIq.h"
 #include "QXmppClient.h"
 
 #include <QDateTime>
 
-class QXmppArchiveChat;
 class QXmppArchiveManager;
 class QXmppResultSetReply;
 
