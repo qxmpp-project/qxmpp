@@ -24,15 +24,11 @@
 #ifndef QXMPPARCHIVEMANAGER_H
 #define QXMPPARCHIVEMANAGER_H
 
+#include "QXmppArchiveIq.h"
 #include "QXmppClientExtension.h"
 #include "QXmppResultSet.h"
 
 #include <QDateTime>
-
-class QXmppArchiveChat;
-class QXmppArchiveChatIq;
-class QXmppArchiveListIq;
-class QXmppArchivePrefIq;
 
 /// \brief The QXmppArchiveManager class makes it possible to access message
 /// archives as defined by \xep{0136}: Message Archiving.

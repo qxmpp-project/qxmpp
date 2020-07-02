@@ -30,8 +30,7 @@
 
 #include <QAbstractSocket>
 #include <QObject>
-
-class QSslError;
+#include <QSslError>
 
 class QXmppClientExtension;
 class QXmppClientPrivate;
