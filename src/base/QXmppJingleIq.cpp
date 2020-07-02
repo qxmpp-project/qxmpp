@@ -29,7 +29,7 @@
 #include <QDate>
 #include <QDateTime>
 #include <QDomElement>
-#include <QRegExp>
+#include <QRegularExpression>
 
 static const int RTP_COMPONENT = 1;
 
@@ -516,10 +516,10 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                         if (payload.name() == QStringLiteral("telephone-event")) {
                             params.insert(QStringLiteral("events"), paramStr);
                         } else {
-                            for (const auto &p : paramStr.split(QRegExp(";\\s*"))) {
-                                QStringList bits = p.split('=');
+                            for (const auto &p : paramStr.split(QRegularExpression(";\\s*"))) {
+                                const QStringList bits = p.split('=');
                                 if (bits.size() == 2)
-                                    params.insert(bits[0], bits[1]);
+                                    params.insert(bits.at(0), bits.at(1));
                             }
                         }
                         payload.setParameters(params);
