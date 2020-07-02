@@ -233,9 +233,9 @@ target_include_directories(qxmpp
 
 target_link_libraries(qxmpp
     PUBLIC
-    Qt5::Core
-    Qt5::Network
-    Qt5::Xml
+    ${QT_TARGET}::Core
+    ${QT_TARGET}::Network
+    ${QT_TARGET}::Xml
 )
 
 if(WITH_GSTREAMER)
