@@ -237,12 +237,12 @@ void QXmppStream::_q_socketReadyRead()
     QByteArray completeXml = d->dataBuffer;
     const QString strData = QString::fromUtf8(d->dataBuffer);
     bool streamStart = false;
-    if (d->streamStart.isEmpty() && strData.contains(startStreamRegex))
+    if (d->streamStart.isEmpty() && startStreamRegex.indexIn(strData) != -1)
         streamStart = true;
     else
         completeXml.prepend(d->streamStart);
     bool streamEnd = false;
-    if (strData.contains(endStreamRegex))
+    if (endStreamRegex.indexIn(strData) != -1)
         streamEnd = true;
     else
         completeXml.append(streamRootElementEnd);
