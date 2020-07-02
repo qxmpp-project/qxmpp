@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         config: [minimal, full, full-debug]
-        qt_version: ['5.14.2']
+        qt_version: ['5.15.0']
         include:
           - os: ubuntu-latest
             config: full
