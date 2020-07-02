@@ -6,7 +6,19 @@ set(SO_VERSION 3)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
-find_package(Qt5 5.7.0 REQUIRED COMPONENTS Core Network Xml)
+# prefer Qt6
+find_package(Qt6 COMPONENTS Core Network Xml)
+if(NOT Qt6_FOUND)
+    find_package(Qt5 5.7.0 REQUIRED COMPONENTS Core Network Xml)
+endif()
+
+# target names have changed from Qt5::Core -> Qt::Core
+if(Qt6_FOUND)
+    set(QT_TARGET Qt)
+else()
+    set(QT_TARGET Qt5)
+endif()
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 

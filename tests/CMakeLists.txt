@@ -1,11 +1,14 @@
 include_directories(.)
 
-find_package(Qt5 REQUIRED COMPONENTS Test)
+find_package(Qt6 COMPONENTS Test)
+if(NOT Qt6_FOUND)
+    find_package(Qt5 REQUIRED COMPONENTS Test)
+endif()
 
 macro(add_simple_test TEST_NAME)
     add_executable(tst_${TEST_NAME} ${TEST_NAME}/tst_${TEST_NAME}.cpp)
     add_test(tst_${TEST_NAME} tst_${TEST_NAME})
-    target_link_libraries(tst_${TEST_NAME} Qt5::Test qxmpp)
+    target_link_libraries(tst_${TEST_NAME} ${QT_TARGET}::Test qxmpp)
 endmacro()
 
 include_directories(${PROJECT_SOURCE_DIR}/src/base)
@@ -66,4 +69,3 @@ endif()
 add_subdirectory(qxmpptransfermanager)
 add_subdirectory(qxmpputils)
 add_subdirectory(qxmppuploadrequestmanager)
-
