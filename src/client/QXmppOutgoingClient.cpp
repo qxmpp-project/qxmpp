@@ -176,7 +176,11 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
 
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingClient::_q_socketDisconnected);
     connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingClient::socketSslErrors);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingClient::socketError);
+#else
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppOutgoingClient::socketError);
+#endif
 
     // DNS lookups
     connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingClient::_q_dnsLookupFinished);
