@@ -75,6 +75,7 @@ extern const char* ns_pubsub;
 extern const char* ns_pubsub_errors;
 extern const char* ns_pubsub_event;
 extern const char* ns_pubsub_owner;
+extern const char* ns_pubsub_rsm;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char* ns_bytestreams;
 // XEP-0066: Out of Band Data
