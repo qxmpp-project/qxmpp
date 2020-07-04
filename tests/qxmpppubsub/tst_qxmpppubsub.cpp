@@ -24,6 +24,7 @@
 #include "QXmppPubSubAffiliation.h"
 #include "QXmppPubSubSubscription.h"
 
+#include "pubsubutil.h"
 #include "util.h"
 #include <QObject>
 
@@ -69,6 +70,10 @@ private:
     Q_SLOT void testIsAffiliation();
     Q_SLOT void testSubscription_data();
     Q_SLOT void testSubscription();
+    Q_SLOT void testItem();
+    Q_SLOT void testIsItem_data();
+    Q_SLOT void testIsItem();
+    Q_SLOT void testTestItem();
 };
 
 void tst_QXmppPubSub::testAffiliation_data()
@@ -220,6 +225,78 @@ void tst_QXmppPubSub::testSubscription()
     sub.setSubId(subid);
     sub.setConfigurationSupport(configSupport);
     serializePacket(sub, xml);
+}
+void tst_QXmppPubSub::testItem()
+{
+    const auto xml = QByteArrayLiteral("<item id=\"abc1337\" publisher=\"lnj@qxmpp.org\"/>");
+
+    QXmppPubSubItem item;
+    parsePacket(item, xml);
+
+    QCOMPARE(item.id(), QStringLiteral("abc1337"));
+    QCOMPARE(item.publisher(), QStringLiteral("lnj@qxmpp.org"));
+
+    // test serialization with parsed item
+    serializePacket(item, xml);
+
+    // test serialization with constructor values
+    item = QXmppPubSubItem("abc1337", "lnj@qxmpp.org");
+    serializePacket(item, xml);
+
+    // test serialization with setters
+    item = QXmppPubSubItem();
+    item.setId("abc1337");
+    item.setPublisher("lnj@qxmpp.org");
+    serializePacket(item, xml);
+}
+
+void tst_QXmppPubSub::testIsItem_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("valid");
+
+    QTest::newRow("valid-id-publisher")
+        << QByteArrayLiteral("<item id=\"abc1337\" publisher=\"lnj@qxmpp.org\"/>")
+        << true;
+    QTest::newRow("valid-id")
+        << QByteArrayLiteral("<item id=\"abc1337\"/>")
+        << true;
+    QTest::newRow("valid-publisher")
+        << QByteArrayLiteral("<item publisher=\"lnj@qxmpp.org\"/>")
+        << true;
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<item/>")
+        << true;
+    QTest::newRow("valid-payload")
+        << QByteArrayLiteral("<item><payload xmlns=\"blah\"/></item>")
+        << true;
+    QTest::newRow("invalid-tag-name")
+        << QByteArrayLiteral("<pubsub-item id=\"abc1337\" publisher=\"lnj@qxmpp.org\"/>")
+        << false;
+}
+
+void tst_QXmppPubSub::testIsItem()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, valid);
+
+    QCOMPARE(QXmppPubSubItem::isItem(xmlToDom(xml)), valid);
+}
+
+void tst_QXmppPubSub::testTestItem()
+{
+    const auto xml = QByteArrayLiteral("<item id=\"abc1337\" publisher=\"lnj@qxmpp.org\"><test-payload/></item>");
+
+    TestItem item;
+    parsePacket(item, xml);
+    serializePacket(item, xml);
+
+    QVERIFY(item.parseCalled);
+    QVERIFY(item.serializeCalled);
+
+    const auto invalidXml = QByteArrayLiteral("<item id=\"abc1337\"><tune/></item>");
+    QVERIFY(TestItem::isItem(xmlToDom(xml)));
+    QVERIFY(!TestItem::isItem(xmlToDom(invalidXml)));
 }
 
 QTEST_MAIN(tst_QXmppPubSub)
