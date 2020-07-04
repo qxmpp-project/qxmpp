@@ -4,6 +4,7 @@
  * Authors:
  *  Jeremy Lainé
  *  Manjeet Dahiya
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -27,14 +28,23 @@
 #include <QDomDocument>
 #include <QtTest>
 
+// QVERIFY2 with empty return value (return {};)
+#define QVERIFY_RV(statement, description)                                       \
+    if (!QTest::qVerify(statement, #statement, description, __FILE__, __LINE__)) \
+        return {};
+
+QDomElement xmlToDom(const QByteArray &xml)
+{
+    QDomDocument doc;
+    QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
+    return doc.documentElement();
+}
+
 template<class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
     //qDebug() << "parsing" << xml;
-    QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
-    QDomElement element = doc.documentElement();
-    packet.parse(element);
+    packet.parse(xmlToDom(xml));
 }
 
 template<class T>
