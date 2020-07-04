@@ -47,6 +47,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppPingIq.h
     base/QXmppPresence.h
     base/QXmppPubSubAffiliation.h
+    base/QXmppPubSubEvent.h
     base/QXmppPubSubIq.h
     base/QXmppPubSubItem.h
     base/QXmppPubSubSubscription.h
@@ -134,6 +135,7 @@ set(SOURCE_FILES
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
     base/QXmppPubSubAffiliation.cpp
+    base/QXmppPubSubEvent.cpp
     base/QXmppPubSubIq.cpp
     base/QXmppPubSubItem.cpp
     base/QXmppPubSubSubscription.cpp
