@@ -4,6 +4,7 @@
  * Author:
  *  Jeremy Lainé
  *  Germán Márquez Mejía
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -23,7 +24,11 @@
  */
 
 #include "QXmppPubSubIq.h"
+#include "QXmppPubSubItem.h"
+#include "QXmppPubSubSubscription.h"
+#include "QXmppResultSet.h"
 
+#include "pubsubutil.h"
 #include "util.h"
 #include <QObject>
 
@@ -31,22 +36,20 @@ class tst_QXmppPubSubIq : public QObject
 {
     Q_OBJECT
 
-private:
-    bool containsKeyValueField(const QList<QXmppDataForm::Field> fields, const QLatin1String &key, const QLatin1String &value);
-
 private slots:
     void testItems();
     void testItemsResponse();
     void testCreateNode();
     void testDeleteNode();
     void testPublish();
-    void testPublishWithOptions();
     void testRetractItem();
     void testSubscribe();
     void testSubscription();
     void testSubscriptions();
     void testIsPubSubIq_data();
     void testIsPubSubIq();
+
+    void testCustomItem();
 };
 
 void tst_QXmppPubSubIq::testItems()
@@ -68,9 +71,9 @@ void tst_QXmppPubSubIq::testItems()
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::ItemsQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QLatin1String("storage:bookmarks"));
+    QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
 
     iq = QXmppPubSubIq();
@@ -78,9 +81,9 @@ void tst_QXmppPubSubIq::testItems()
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("francisco@denmark.lit/barracks"));
     iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppPubSubIq::ItemsQuery);
+    iq.setQueryType(QXmppPubSubIq<>::Items);
     iq.setQueryJid({});
-    iq.setQueryNodeName(QLatin1String("storage:bookmarks"));
+    iq.setQueryNode(QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
 }
 
@@ -94,17 +97,13 @@ void tst_QXmppPubSubIq::testItemsResponse()
         " type=\"result\">"
         "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
         "<items node=\"storage:bookmarks\">"
-        "<item id=\"current\">"
-        "<storage xmlns=\"storage:bookmarks\">"
-        "<conference"
-        " autojoin=\"true\""
-        " jid=\"theplay@conference.shakespeare.lit\""
-        " name=\"The Play's the Thing\">"
-        "<nick>JC</nick>"
-        "</conference>"
-        "</storage>"
-        "</item>"
+        "<item id=\"current\"/>"
         "</items>"
+        "<set xmlns=\"http://jabber.org/protocol/rsm\">"
+        "<first index=\"0\">current</first>"
+        "<last>otheritemid</last>"
+        "<count>19</count>"
+        "</set>"
         "</pubsub>"
         "</iq>");
 
@@ -114,9 +113,14 @@ void tst_QXmppPubSubIq::testItemsResponse()
     QCOMPARE(iq.to(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.from(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::ItemsQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QLatin1String("storage:bookmarks"));
+    QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
+    QVERIFY(iq.itemsContinuation().has_value());
+    QCOMPARE(iq.itemsContinuation()->count(), 19);
+    QCOMPARE(iq.itemsContinuation()->index(), 0);
+    QCOMPARE(iq.itemsContinuation()->first(), QStringLiteral("current"));
+    QCOMPARE(iq.itemsContinuation()->last(), QStringLiteral("otheritemid"));
     serializePacket(iq, xml);
 }
 
@@ -124,11 +128,10 @@ void tst_QXmppPubSubIq::testCreateNode()
 {
     const QByteArray xml(
         "<iq id=\"create1\" to=\"pubsub.shakespeare.lit\" from=\"hamlet@denmark.lit/elsinore\" type=\"set\">"
-          "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
-            "<create node=\"princely_musings\"/>"
-          "</pubsub>"
-        "</iq>"
-    );
+        "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
+        "<create node=\"princely_musings\"/>"
+        "</pubsub>"
+        "</iq>");
 
     QXmppPubSubIq iq;
     parsePacket(iq, xml);
@@ -136,9 +139,9 @@ void tst_QXmppPubSubIq::testCreateNode()
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::CreateQuery);
-    QCOMPARE(iq.queryJid(), {});
-    QCOMPARE(iq.queryNodeName(), QLatin1String("princely_musings"));
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Create);
+    QCOMPARE(iq.queryJid(), QString());
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 
     iq = QXmppPubSubIq();
@@ -146,8 +149,8 @@ void tst_QXmppPubSubIq::testCreateNode()
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq::CreateQuery);
-    iq.setQueryNodeName(QLatin1String("princely_musings"));
+    iq.setQueryType(QXmppPubSubIq<>::Create);
+    iq.setQueryNode(QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 }
 
@@ -158,8 +161,7 @@ void tst_QXmppPubSubIq::testDeleteNode()
         "<pubsub xmlns=\"http://jabber.org/protocol/pubsub#owner\">"
         "<delete node=\"princely_musings\"/>"
         "</pubsub>"
-        "</iq>"
-        );
+        "</iq>");
 
     QXmppPubSubIq iq;
     parsePacket(iq, xml);
@@ -167,18 +169,18 @@ void tst_QXmppPubSubIq::testDeleteNode()
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::DeleteQuery);
-    QCOMPARE(iq.queryJid(), {});
-    QCOMPARE(iq.queryNodeName(), QLatin1String("princely_musings"));
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Delete);
+    QCOMPARE(iq.queryJid(), QString());
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq();
+    iq = QXmppPubSubIq<>();
     iq.setId(QLatin1String("delete1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq::DeleteQuery);
-    iq.setQueryNodeName(QLatin1String("princely_musings"));
+    iq.setQueryType(QXmppPubSubIq<>::Delete);
+    iq.setQueryNode(QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 }
 
@@ -192,113 +194,35 @@ void tst_QXmppPubSubIq::testPublish()
         " type=\"result\">"
         "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
         "<publish node=\"storage:bookmarks\">"
-        "<item id=\"current\">"
-        "<storage xmlns=\"storage:bookmarks\">"
-        "<conference"
-        " autojoin=\"true\""
-        " jid=\"theplay@conference.shakespeare.lit\""
-        " name=\"The Play's the Thing\">"
-        "<nick>JC</nick>"
-        "</conference>"
-        "</storage>"
-        "</item>"
+        "<item id=\"current\"/>"
         "</publish>"
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    QXmppPubSubIq<> iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("items1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::PublishQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Publish);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QLatin1String("storage:bookmarks"));
-    QCOMPARE(iq.items().first().payload().tagName(), QLatin1String("storage"));
+    QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
 
     // serialize using setters
-
-    QXmppElement itemContentNick;
-    itemContentNick.setTagName(QStringLiteral("nick"));
-    itemContentNick.setValue(QStringLiteral("JC"));
-
-    QXmppElement itemContentConference;
-    itemContentConference.setTagName(QStringLiteral("conference"));
-    itemContentConference.setAttribute(QStringLiteral("autojoin"), QStringLiteral("true"));
-    itemContentConference.setAttribute(QStringLiteral("jid"), QStringLiteral("theplay@conference.shakespeare.lit"));
-    itemContentConference.setAttribute(QStringLiteral("name"), QStringLiteral("The Play's the Thing"));
-    itemContentConference.appendChild(itemContentNick);
-
-    QXmppElement itemContent;
-    itemContent.setTagName(QStringLiteral("storage"));
-    itemContent.setAttribute(QStringLiteral("xmlns"), QStringLiteral("storage:bookmarks"));
-    itemContent.appendChild(itemContentConference);
-
-    QXmppPubSubItem item;
-    item.setId(QStringLiteral("current"));
-    item.setPayload(itemContent);
+    QXmppPubSubItem item(QStringLiteral("current"));
 
     iq = QXmppPubSubIq();
     iq.setId(QLatin1String("items1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("francisco@denmark.lit/barracks"));
     iq.setType(QXmppIq::Result);
-    iq.setQueryType(QXmppPubSubIq::PublishQuery);
+    iq.setQueryType(QXmppPubSubIq<>::Publish);
     iq.setQueryJid({});
-    iq.setQueryNodeName(QLatin1String("storage:bookmarks"));
+    iq.setQueryNode(QLatin1String("storage:bookmarks"));
     iq.setItems(QList<QXmppPubSubItem>() << item);
 
-    serializePacket(iq, xml);
-}
-
-void tst_QXmppPubSubIq::testPublishWithOptions()
-{
-    const QByteArray xml(
-        "<iq"
-        " id=\"items1\""
-        " to=\"pubsub.shakespeare.lit\""
-        " from=\"francisco@denmark.lit/barracks\""
-        " type=\"result\">"
-        "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
-        "<publish node=\"storage:bookmarks\">"
-        "<item id=\"current\">"
-        "<storage xmlns=\"storage:bookmarks\">"
-        "<conference"
-        " autojoin=\"true\""
-        " jid=\"theplay@conference.shakespeare.lit\""
-        " name=\"The Play's the Thing\">"
-        "<nick>JC</nick>"
-        "</conference>"
-        "</storage>"
-        "</item>"
-        "</publish>"
-        "<publish-options>"
-        "<x xmlns=\"jabber:x:data\" type=\"submit\">"
-        "<field type=\"hidden\" var=\"FORM_TYPE\">"
-        "<value>http://jabber.org/protocol/pubsub#publish-options</value>"
-        "</field>"
-        "<field type=\"text-single\" var=\"pubsub#access_model\">"
-        "<value>presence</value>"
-        "</field>"
-        "</x>"
-        "</publish-options>"
-        "</pubsub>"
-        "</iq>");
-
-    QXmppPubSubIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QLatin1String("items1"));
-    QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
-    QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
-    QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::PublishQuery);
-    QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QLatin1String("storage:bookmarks"));
-    QCOMPARE(iq.publishOptions().type(), QXmppDataForm::Type::Submit);
-    QCOMPARE(iq.publishOptions().fields().size(), 2);
-    QVERIFY(containsKeyValueField(iq.publishOptions().fields(), QLatin1String("pubsub#access_model"), QLatin1String("presence")));
     serializePacket(iq, xml);
 }
 
@@ -317,15 +241,15 @@ void tst_QXmppPubSubIq::testRetractItem()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    QXmppPubSubIq<> iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QString("retract1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::RetractQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Retract);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QLatin1String("princely_musings"));
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     QCOMPARE(iq.items().size(), 1);
     QCOMPARE(iq.items().first().id(), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
     serializePacket(iq, xml);
@@ -335,13 +259,13 @@ void tst_QXmppPubSubIq::testRetractItem()
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq::RetractQuery);
+    iq.setQueryType(QXmppPubSubIq<>::Retract);
     iq.setQueryJid({});
-    iq.setQueryNodeName(QLatin1String("princely_musings"));
+    iq.setQueryNode(QLatin1String("princely_musings"));
 
     QXmppPubSubItem item;
     item.setId(QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
-    iq.setItems(QList<QXmppPubSubItem>() << item);
+    iq.setItems({ item });
 
     serializePacket(iq, xml);
 }
@@ -365,9 +289,9 @@ void tst_QXmppPubSubIq::testSubscribe()
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::SubscribeQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscribe);
     QCOMPARE(iq.queryJid(), QLatin1String("francisco@denmark.lit"));
-    QCOMPARE(iq.queryNodeName(), QLatin1String("princely_musings"));
+    QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 }
 
@@ -388,25 +312,26 @@ void tst_QXmppPubSubIq::testSubscription()
 
     QXmppPubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QLatin1String("sub1"));
-    QCOMPARE(iq.to(), QLatin1String("francisco@denmark.lit/barracks"));
-    QCOMPARE(iq.from(), QLatin1String("pubsub.shakespeare.lit"));
+    QCOMPARE(iq.id(), QString("sub1"));
+    QCOMPARE(iq.to(), QString("francisco@denmark.lit/barracks"));
+    QCOMPARE(iq.from(), QString("pubsub.shakespeare.lit"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::SubscriptionQuery);
-    QCOMPARE(iq.queryJid(), QLatin1String("francisco@denmark.lit"));
-    QCOMPARE(iq.queryNodeName(), QLatin1String("princely_musings"));
-    QCOMPARE(iq.subscriptionId(), QLatin1String("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscription);
+    QCOMPARE(iq.subscription()->jid(), QString("francisco@denmark.lit"));
+    QCOMPARE(iq.subscription()->node(), QString("princely_musings"));
+    QCOMPARE(iq.subscription()->subId(), QStringLiteral("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
     serializePacket(iq, xml);
 
     iq = QXmppPubSubIq();
-    iq.setId(QLatin1String("sub1"));
-    iq.setTo(QLatin1String("francisco@denmark.lit/barracks"));
-    iq.setFrom(QLatin1String("pubsub.shakespeare.lit"));
+    iq.setId("sub1");
+    iq.setTo("francisco@denmark.lit/barracks");
+    iq.setFrom("pubsub.shakespeare.lit");
     iq.setType(QXmppIq::Result);
-    iq.setQueryType(QXmppPubSubIq::SubscriptionQuery);
-    iq.setQueryJid(QLatin1String("francisco@denmark.lit"));
-    iq.setQueryNodeName(QLatin1String("princely_musings"));
-    iq.setSubscriptionId(QLatin1String("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
+    iq.setQueryType(QXmppPubSubIq<>::Subscription);
+    iq.setSubscription(QXmppPubSubSubscription(
+        "francisco@denmark.lit",
+        "princely_musings",
+        "ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
     serializePacket(iq, xml);
 }
 
@@ -429,9 +354,9 @@ void tst_QXmppPubSubIq::testSubscriptions()
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq::SubscriptionsQuery);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscriptions);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNodeName(), QString());
+    QCOMPARE(iq.queryNode(), QString());
     serializePacket(iq, xml);
 }
 
@@ -441,15 +366,23 @@ void tst_QXmppPubSubIq::testIsPubSubIq_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid-pubsub-iq")
-        << QByteArrayLiteral("<iq><pubsub xmlns=\"http://jabber.org/protocol/pubsub\"></pubsub></iq>")
+        << QByteArrayLiteral("<iq><pubsub xmlns=\"http://jabber.org/protocol/pubsub\"><items node=\"smth\"/></pubsub></iq>")
         << true;
 
+    QTest::newRow("items-missing-node-name")
+        << QByteArrayLiteral("<iq><pubsub xmlns=\"http://jabber.org/protocol/pubsub\"><items/></pubsub></iq>")
+        << false;
+
+    QTest::newRow("unknown-query-type")
+        << QByteArrayLiteral("<iq><pubsub xmlns=\"http://jabber.org/protocol/pubsub\"><shuffle/></pubsub></iq>")
+        << false;
+
     QTest::newRow("wrong-element")
-        << QByteArrayLiteral("<iq><pubsub2 xmlns=\"http://jabber.org/protocol/pubsub\"></pubsub2></iq>")
+        << QByteArrayLiteral("<iq><pubsub2 xmlns=\"http://jabber.org/protocol/pubsub\"><items node=\"smth\"/></pubsub2></iq>")
         << false;
 
     QTest::newRow("wrong-namespace")
-        << QByteArrayLiteral("<iq><pubsub xmlns=\"urn:xmpp:pubsub2:0\"></pubsub></iq>")
+        << QByteArrayLiteral("<iq><pubsub xmlns=\"urn:xmpp:pubsub2:0\"><items node=\"smth\"/></pubsub></iq>")
         << false;
 }
 
@@ -462,17 +395,52 @@ void tst_QXmppPubSubIq::testIsPubSubIq()
     QCOMPARE(doc.setContent(xml, true), true);
     QDomElement element = doc.documentElement();
 
-    QCOMPARE(QXmppPubSubIq::isPubSubIq(element), isValid);
+    QCOMPARE(QXmppPubSubIq<>::isPubSubIq(element), isValid);
 }
 
-bool tst_QXmppPubSubIq::containsKeyValueField(const QList<QXmppDataForm::Field> fields, const QLatin1String &key, const QLatin1String &value) {
-    for(QXmppDataForm::Field f : fields) {
-        if (f.key() == key && f.value() == value) {
-            return true;
-        }
-    }
+void tst_QXmppPubSubIq::testCustomItem()
+{
+    const QByteArray xml(
+        "<iq id=\"a1\" type=\"result\">"
+        "<pubsub xmlns=\"http://jabber.org/protocol/pubsub\">"
+        "<items node=\"blah\">"
+        "<item id=\"42\"><test-payload/></item>"
+        "<item id=\"23\"><test-payload/></item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
-    return false;
+    // test isPubSubIq also checks item validity
+    TestItem::isItemCalled = false;
+    QVERIFY(QXmppPubSubIq<TestItem>::isPubSubIq(xmlToDom(xml)));
+    QVERIFY(TestItem::isItemCalled);
+
+    QXmppPubSubIq<TestItem> iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.type(), QXmppIq::Result);
+    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
+    QCOMPARE(iq.queryJid(), QString());
+    QCOMPARE(iq.queryNode(), QStringLiteral("blah"));
+    QCOMPARE(iq.items().size(), 2);
+    QCOMPARE(iq.items().at(0).id(), QStringLiteral("42"));
+    QCOMPARE(iq.items().at(1).id(), QStringLiteral("23"));
+    QCOMPARE(iq.items().at(0).publisher(), QString());
+    QCOMPARE(iq.items().at(1).publisher(), QString());
+
+    QVERIFY(iq.items().at(0).parseCalled);
+    QVERIFY(iq.items().at(1).parseCalled);
+    QVERIFY(!iq.items().at(0).serializeCalled);
+    QVERIFY(!iq.items().at(1).serializeCalled);
+
+    serializePacket(iq, xml);
+
+    iq = QXmppPubSubIq<TestItem>();
+    iq.setId("a1");
+    iq.setType(QXmppIq::Result);
+    iq.setQueryType(QXmppPubSubIq<>::Items);
+    iq.setQueryNode("blah");
+    iq.setItems(QList<TestItem>() << TestItem("42") << TestItem("23"));
+    serializePacket(iq, xml);
 }
 
 QTEST_MAIN(tst_QXmppPubSubIq)
