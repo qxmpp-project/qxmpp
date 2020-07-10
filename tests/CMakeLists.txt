@@ -1,6 +1,6 @@
 include_directories(.)
 
-find_package(Qt6 COMPONENTS Test)
+find_package(Qt6 QUIET COMPONENTS Test)
 if(NOT Qt6_FOUND)
     find_package(Qt5 REQUIRED COMPONENTS Test)
 endif()

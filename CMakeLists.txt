@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 # prefer Qt6
-find_package(Qt6 COMPONENTS Core Network Xml)
+find_package(Qt6 QUIET COMPONENTS Core Network Xml)
 if(NOT Qt6_FOUND)
     find_package(Qt5 5.7.0 REQUIRED COMPONENTS Core Network Xml)
 endif()

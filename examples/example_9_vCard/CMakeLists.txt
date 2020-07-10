@@ -1,4 +1,4 @@
-find_package(Qt6 COMPONENTS Gui)
+find_package(Qt6 QUIET COMPONENTS Gui)
 if(NOT Qt6_FOUND)
     find_package(Qt5 REQUIRED Gui)
 endif()
