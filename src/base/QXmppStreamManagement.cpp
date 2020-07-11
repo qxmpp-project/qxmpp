@@ -262,17 +262,18 @@ void QXmppStreamManagementFailed::parse(const QDomElement &element)
 {
     QDomElement childElement = element.firstChildElement();
     if (!childElement.isNull() && childElement.namespaceURI() == ns_stanza) {
-        m_error = conditionFromStr(childElement.tagName());
+        m_error = conditionFromString(childElement.tagName()).value_or(QXmppStanza::Error::Condition(-1));
     }
 }
 
 void QXmppStreamManagementFailed::toXml(QXmlStreamWriter *writer) const
 {
-    QString errorString = strFromCondition(m_error);
+    QString errorString = conditionToString(m_error);
 
     writer->writeStartElement(QStringLiteral("failed"));
     writer->writeDefaultNamespace(ns_stream_management);
-    writer->writeStartElement(errorString, ns_stanza);
+    writer->writeStartElement(errorString);
+    writer->writeDefaultNamespace(ns_stanza);
     writer->writeEndElement();
     writer->writeEndElement();
 }

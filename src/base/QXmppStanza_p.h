@@ -26,6 +26,8 @@
 
 #include "QXmppStanza.h"
 
+#include <optional>
+
 //  W A R N I N G
 //  -------------
 //
@@ -38,7 +40,7 @@
 // We mean it.
 //
 
-static QString strFromCondition(const QXmppStanza::Error::Condition& condition)
+static QString conditionToString(QXmppStanza::Error::Condition condition)
 {
     switch (condition) {
     case QXmppStanza::Error::BadRequest:
@@ -87,12 +89,11 @@ static QString strFromCondition(const QXmppStanza::Error::Condition& condition)
         return "undefined-condition";
     case QXmppStanza::Error::UnexpectedRequest:
         return "unexpected-request";
-    default:
-        return "";
     }
+    return {};
 }
 
-static QXmppStanza::Error::Condition conditionFromStr(const QString& string)
+static std::optional<QXmppStanza::Error::Condition> conditionFromString(const QString &string)
 {
     if (string == "bad-request")
         return QXmppStanza::Error::BadRequest;
@@ -140,8 +141,39 @@ static QXmppStanza::Error::Condition conditionFromStr(const QString& string)
         return QXmppStanza::Error::UndefinedCondition;
     else if (string == "unexpected-request")
         return QXmppStanza::Error::UnexpectedRequest;
-    else
-        return static_cast<QXmppStanza::Error::Condition>(-1);
+    return std::nullopt;
+}
+
+static QString typeToString(QXmppStanza::Error::Type type)
+{
+    switch (type) {
+    case QXmppStanza::Error::Cancel:
+        return QStringLiteral("cancel");
+    case QXmppStanza::Error::Continue:
+        return QStringLiteral("continue");
+    case QXmppStanza::Error::Modify:
+        return QStringLiteral("modify");
+    case QXmppStanza::Error::Auth:
+        return QStringLiteral("auth");
+    case QXmppStanza::Error::Wait:
+        return QStringLiteral("wait");
+    }
+    return {};
+}
+
+static std::optional<QXmppStanza::Error::Type> typeFromString(const QString &string)
+{
+    if (string == QStringLiteral("cancel"))
+        return QXmppStanza::Error::Cancel;
+    else if (string == QStringLiteral("continue"))
+        return QXmppStanza::Error::Continue;
+    else if (string == QStringLiteral("modify"))
+        return QXmppStanza::Error::Modify;
+    else if (string == QStringLiteral("auth"))
+        return QXmppStanza::Error::Auth;
+    else if (string == QStringLiteral("wait"))
+        return QXmppStanza::Error::Wait;
+    return std::nullopt;
 }
 
 #endif
