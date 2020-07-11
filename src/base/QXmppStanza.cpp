@@ -162,8 +162,8 @@ public:
     QXmppStanzaErrorPrivate();
 
     int code;
-    QXmppStanza::Error::Type type;
-    QXmppStanza::Error::Condition condition;
+    std::optional<QXmppStanza::Error::Type> type;
+    std::optional<QXmppStanza::Error::Condition> condition;
     QString text;
     QString by;
     QString redirectionUri;
@@ -176,8 +176,6 @@ public:
 
 QXmppStanzaErrorPrivate::QXmppStanzaErrorPrivate()
     : code(0),
-      type(static_cast<QXmppStanza::Error::Type>(-1)),
-      condition(static_cast<QXmppStanza::Error::Condition>(-1)),
       fileTooLarge(false)
 {
 }
@@ -212,8 +210,8 @@ QXmppStanza::Error::Error(const QString &type, const QString &cond,
     : d(new QXmppStanzaErrorPrivate)
 {
     d->text = text;
-    setTypeFromStr(type);
-    setConditionFromStr(cond);
+    d->type = typeFromString(type);
+    d->condition = conditionFromString(cond);
 }
 
 /// Default destructor
@@ -262,7 +260,7 @@ void QXmppStanza::Error::setCode(int code)
 ///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
-    return d->condition;
+    return d->condition.value_or(QXmppStanza::Error::Condition(-1));
 }
 
 ///
@@ -273,6 +271,10 @@ QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 ///
 void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 {
+    if (int(cond) < 0) {
+        d->condition = std::nullopt;
+        return;
+    }
     d->condition = cond;
 }
 
@@ -281,7 +283,7 @@ void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 ///
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
 {
-    return d->type;
+    return d->type.value_or(QXmppStanza::Error::Type(-1));
 }
 
 ///
@@ -315,6 +317,10 @@ void QXmppStanza::Error::setBy(const QString &by)
 ///
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
 {
+    if (int(type) < 0) {
+        d->type = std::nullopt;
+        return;
+    }
     d->type = type;
 }
 
@@ -403,63 +409,19 @@ void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
 }
 
 /// \cond
-QString QXmppStanza::Error::getTypeStr() const
-{
-    switch (d->type) {
-    case Cancel:
-        return QStringLiteral("cancel");
-    case Continue:
-        return QStringLiteral("continue");
-    case Modify:
-        return QStringLiteral("modify");
-    case Auth:
-        return QStringLiteral("auth");
-    case Wait:
-        return QStringLiteral("wait");
-    default:
-        return {};
-    }
-}
-
-QString QXmppStanza::Error::getConditionStr() const
-{
-    return strFromCondition(d->condition);
-}
-
-void QXmppStanza::Error::setTypeFromStr(const QString &type)
-{
-    if (type == QStringLiteral("cancel"))
-        setType(Cancel);
-    else if (type == QStringLiteral("continue"))
-        setType(Continue);
-    else if (type == QStringLiteral("modify"))
-        setType(Modify);
-    else if (type == QStringLiteral("auth"))
-        setType(Auth);
-    else if (type == QStringLiteral("wait"))
-        setType(Wait);
-    else
-        setType(static_cast<QXmppStanza::Error::Type>(-1));
-}
-
-void QXmppStanza::Error::setConditionFromStr(const QString &type)
-{
-    setCondition(conditionFromStr(type));
-}
-
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
-    setCode(errorElement.attribute(QStringLiteral("code")).toInt());
-    setTypeFromStr(errorElement.attribute(QStringLiteral("type")));
-    setBy(errorElement.attribute(QStringLiteral("by")));
+    d->code = errorElement.attribute(QStringLiteral("code")).toInt();
+    d->type = typeFromString(errorElement.attribute(QStringLiteral("type")));
+    d->by = errorElement.attribute(QStringLiteral("by"));
 
     QDomElement element = errorElement.firstChildElement();
     while (!element.isNull()) {
         if (element.namespaceURI() == ns_stanza) {
             if (element.tagName() == QStringLiteral("text")) {
-                setText(element.text());
+                d->text = element.text();
             } else {
-                setConditionFromStr(element.tagName());
+                d->condition = conditionFromString(element.tagName());
 
                 // redirection URI
                 if (d->condition == Gone || d->condition == Redirect) {
@@ -490,21 +452,20 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
 
 void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 {
-    QString cond = getConditionStr();
-    QString type = getTypeStr();
-
-    if (cond.isEmpty() && type.isEmpty())
+    if (!d->condition && !d->type)
         return;
 
     writer->writeStartElement(QStringLiteral("error"));
     helperToXmlAddAttribute(writer, QStringLiteral("by"), d->by);
-    helperToXmlAddAttribute(writer, QStringLiteral("type"), type);
+    if (d->type) {
+        writer->writeAttribute(QStringLiteral("type"), typeToString(*d->type));
+    }
 
     if (d->code > 0)
         helperToXmlAddAttribute(writer, QStringLiteral("code"), QString::number(d->code));
 
-    if (!cond.isEmpty()) {
-        writer->writeStartElement(cond);
+    if (d->condition) {
+        writer->writeStartElement(conditionToString(*d->condition));
         writer->writeDefaultNamespace(ns_stanza);
 
         // redirection URI

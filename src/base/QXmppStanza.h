@@ -190,12 +190,6 @@ public:
         /// \endcond
 
     private:
-        QString getConditionStr() const;
-        void setConditionFromStr(const QString &cond);
-
-        QString getTypeStr() const;
-        void setTypeFromStr(const QString &type);
-
         QSharedDataPointer<QXmppStanzaErrorPrivate> d;
     };
 
