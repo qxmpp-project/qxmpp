@@ -93,6 +93,12 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
     if (carbon.isNull() || carbon.namespaceURI() != ns_carbons)
         return false;  // Neither sent nor received -> no carbon message
 
+    // carbon copies must always come from our bare JID
+    if (element.attribute("from") != client()->configuration().jidBare()) {
+        info("Received carbon copy from possible attacker trying to use CVE-2017-5603.");
+        return false;
+    }
+
     QDomElement forwarded = carbon.firstChildElement("forwarded");
     if (forwarded.isNull())
         return false;
