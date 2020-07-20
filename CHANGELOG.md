@@ -1,3 +1,15 @@
+QXmpp 1.3.1 (Jul 20, 2020)
+--------------------------
+
+The most important change of this release is the fix of CVE-2017-5603. QXmpp is
+not vulnerable to roster push attacks (CVE-2016-9928).
+
+Fixes:
+ - QXmppRosterIq: Set subscriptionType to NotSet correctly (#293, @melvo)
+ - Fix `QXMPP_EXPORT` define when linking statically (#299, @leobasilio)
+ - QXmppMessageReceiptManager: Ignore all error messages (#300, @lnjX)
+ - QXmppCarbonManager: Fix CVE-2017-5603 (missing sender check) (#304, @lnjX)
+
 QXmpp 1.3.0 (Apr 06, 2020)
 --------------------------
 
