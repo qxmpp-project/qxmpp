@@ -56,14 +56,7 @@ public:
     /// \endcond
 
 Q_SIGNALS:
-    /// \brief Emitted when a message was received from someone else
-    /// and directed to another resource.
-    /// If you connect this signal to the \s QXmppClient::messageReceived
-    /// signal, they will appear as normal messages.
     void messageReceived(const QXmppMessage &);
-
-    /// \brief Emitted when another resource sent a message to
-    /// someone else
     void messageSent(const QXmppMessage &);
 
 private:
