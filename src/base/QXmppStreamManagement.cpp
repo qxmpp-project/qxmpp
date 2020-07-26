@@ -24,6 +24,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal.h"
 #include "QXmppStanza_p.h"
+#include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
 
 QXmppStreamManagementEnable::QXmppStreamManagementEnable(const bool resume, const unsigned max)
@@ -323,4 +324,133 @@ void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
     writer->writeStartElement("r");
     writer->writeDefaultNamespace(ns_stream_management);
     writer->writeEndElement();
+}
+
+QXmppStreamManager::QXmppStreamManager(QXmppStream *stream)
+    : stream(stream)
+{
+}
+
+unsigned int QXmppStreamManager::lastIncomingSequenceNumber() const
+{
+    return m_lastIncomingSequenceNumber;
+}
+
+void QXmppStreamManager::handleDisconnect()
+{
+    m_enabled = false;
+}
+
+void QXmppStreamManager::handleStart()
+{
+    m_enabled = false;
+}
+
+void QXmppStreamManager::handlePacketSent(const QXmppStanza &packet, const QByteArray &data)
+{
+    if (m_enabled && packet.isXmppStanza()) {
+        m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, data);
+        sendAcknowledgementRequest();
+    }
+}
+
+bool QXmppStreamManager::handleStanza(const QDomElement &stanza)
+{
+    if (QXmppStreamManagementAck::isStreamManagementAck(stanza)) {
+        handleAcknowledgement(stanza);
+        return true;
+    }
+    if (QXmppStreamManagementReq::isStreamManagementReq(stanza)) {
+        sendAcknowledgement();
+        return true;
+    }
+
+    if (stanza.tagName() == QLatin1String("message") ||
+        stanza.tagName() == QLatin1String("presence") ||
+        stanza.tagName() == QLatin1String("iq")) {
+        m_lastIncomingSequenceNumber++;
+    }
+    return false;
+}
+
+void QXmppStreamManager::enableStreamManagement(bool resetSequenceNumber)
+{
+    m_enabled = true;
+
+    if (resetSequenceNumber) {
+        m_lastOutgoingSequenceNumber = 0;
+        m_lastIncomingSequenceNumber = 0;
+
+        // resend unacked stanzas
+        if (!m_unacknowledgedStanzas.isEmpty()) {
+            const auto oldUnackedStanzas = m_unacknowledgedStanzas;
+            m_unacknowledgedStanzas.clear();
+
+            for (const auto &value : oldUnackedStanzas) {
+                m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, value);
+                stream->sendData(value);
+            }
+
+            sendAcknowledgementRequest();
+        }
+    } else {
+        // resend unacked stanzas
+        if (!m_unacknowledgedStanzas.isEmpty()) {
+            for (const auto &value : std::as_const(m_unacknowledgedStanzas)) {
+                stream->sendData(value);
+            }
+
+            sendAcknowledgementRequest();
+        }
+    }
+}
+
+void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumber)
+{
+    for (auto it = m_unacknowledgedStanzas.begin(); it != m_unacknowledgedStanzas.end();) {
+        if (it.key() <= sequenceNumber) {
+            it = m_unacknowledgedStanzas.erase(it);
+        } else {
+            break;
+        }
+    }
+}
+
+void QXmppStreamManager::handleAcknowledgement(const QDomElement &element)
+{
+    if (!m_enabled)
+        return;
+
+    QXmppStreamManagementAck ack;
+    ack.parse(element);
+    setAcknowledgedSequenceNumber(ack.seqNo());
+}
+
+void QXmppStreamManager::sendAcknowledgement()
+{
+    if (!m_enabled)
+        return;
+
+    // prepare packet
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    QXmppStreamManagementAck ack(m_lastIncomingSequenceNumber);
+    ack.toXml(&xmlStream);
+
+    // send packet
+    stream->sendData(data);
+}
+
+void QXmppStreamManager::sendAcknowledgementRequest()
+{
+    if (!m_enabled)
+        return;
+
+    // prepare packet
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    QXmppStreamManagementReq::toXml(&xmlStream);
+
+    // send packet
+    stream->sendData(data);
 }

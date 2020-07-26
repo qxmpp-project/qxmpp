@@ -79,12 +79,6 @@ protected:
     unsigned int lastIncomingSequenceNumber() const;
     void setAcknowledgedSequenceNumber(unsigned int sequenceNumber);
 
-private:
-    // XEP-0198: Stream Management
-    void handleAcknowledgement(QDomElement &element);
-    void sendAcknowledgement();
-    void sendAcknowledgementRequest();
-
 public Q_SLOTS:
     virtual void disconnectFromHost();
     virtual bool sendData(const QByteArray &);

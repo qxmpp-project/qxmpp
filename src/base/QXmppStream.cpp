@@ -47,7 +47,7 @@ static bool randomSeeded = false;
 class QXmppStreamPrivate
 {
 public:
-    QXmppStreamPrivate();
+    QXmppStreamPrivate(QXmppStream *stream);
 
     QString dataBuffer;
     QSslSocket *socket;
@@ -55,17 +55,13 @@ public:
     // incoming stream state
     QString streamOpenElement;
 
-    bool streamManagementEnabled;
-    QMap<unsigned int, QByteArray> unacknowledgedStanzas;
-    unsigned int lastOutgoingSequenceNumber;
-    unsigned int lastIncomingSequenceNumber;
+    // stream management
+    QXmppStreamManager streamManager;
 };
 
-QXmppStreamPrivate::QXmppStreamPrivate()
+QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(nullptr),
-      streamManagementEnabled(false),
-      lastOutgoingSequenceNumber(0),
-      lastIncomingSequenceNumber(0)
+      streamManager(stream)
 {
 }
 
@@ -76,7 +72,7 @@ QXmppStreamPrivate::QXmppStreamPrivate()
 ///
 QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
-      d(new QXmppStreamPrivate)
+      d(new QXmppStreamPrivate(this))
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     // Make sure the random number generator is seeded
@@ -100,7 +96,8 @@ QXmppStream::~QXmppStream()
 ///
 void QXmppStream::disconnectFromHost()
 {
-    d->streamManagementEnabled = false;
+    d->streamManager.handleDisconnect();
+
     if (d->socket) {
         if (d->socket->state() == QAbstractSocket::ConnectedState) {
             sendData(QByteArrayLiteral("</stream:stream>"));
@@ -120,7 +117,7 @@ void QXmppStream::disconnectFromHost()
 ///
 void QXmppStream::handleStart()
 {
-    d->streamManagementEnabled = false;
+    d->streamManager.handleStart();
     d->dataBuffer.clear();
     d->streamOpenElement.clear();
 }
@@ -159,15 +156,12 @@ bool QXmppStream::sendPacket(const QXmppStanza &packet)
     QXmlStreamWriter xmlStream(&data);
     packet.toXml(&xmlStream);
 
-    // store packet for possible later stream resumption
-    if (d->streamManagementEnabled && packet.isXmppStanza()) {
-        d->unacknowledgedStanzas.insert(++d->lastOutgoingSequenceNumber, data);
-    }
-
     // send packet
     bool success = sendData(data);
-    if (packet.isXmppStanza())
-        sendAcknowledgementRequest();
+
+    // handle stream management
+    d->streamManager.handlePacketSent(packet, data);
+
     return success;
 }
 
@@ -313,19 +307,12 @@ void QXmppStream::processData(const QString &data)
     // process stanzas
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
-        if (QXmppStreamManagementAck::isStreamManagementAck(stanza)) {
-            handleAcknowledgement(stanza);
-        } else if (QXmppStreamManagementReq::isStreamManagementReq(stanza)) {
-            sendAcknowledgement();
-        } else {
-            handleStanza(stanza);
+        // handle possible stream management packets first
+        if (d->streamManager.handleStanza(stanza))
+            continue;
 
-            if (stanza.tagName() == QLatin1String("message") ||
-                stanza.tagName() == QLatin1String("presence") ||
-                stanza.tagName() == QLatin1String("iq")) {
-                ++d->lastIncomingSequenceNumber;
-            }
-        }
+        // process all other kinds of packets
+        handleStanza(stanza);
     }
 
     // process stream end
@@ -344,34 +331,7 @@ void QXmppStream::processData(const QString &data)
 ///
 void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
-    d->streamManagementEnabled = true;
-
-    if (resetSequenceNumber) {
-        d->lastOutgoingSequenceNumber = 0;
-        d->lastIncomingSequenceNumber = 0;
-
-        // resend unacked stanzas
-        if (!d->unacknowledgedStanzas.isEmpty()) {
-            const auto oldUnackedStanzas = d->unacknowledgedStanzas;
-            d->unacknowledgedStanzas.clear();
-
-            for (const auto &value : oldUnackedStanzas) {
-                d->unacknowledgedStanzas.insert(++d->lastOutgoingSequenceNumber, value);
-                sendData(value);
-            }
-
-            sendAcknowledgementRequest();
-        }
-    } else {
-        // resend unacked stanzas
-        if (!d->unacknowledgedStanzas.isEmpty()) {
-            for (const auto &value : std::as_const(d->unacknowledgedStanzas)) {
-                sendData(value);
-            }
-
-            sendAcknowledgementRequest();
-        }
-    }
+    d->streamManager.enableStreamManagement(resetSequenceNumber);
 }
 
 ///
@@ -381,7 +341,7 @@ void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 ///
 unsigned int QXmppStream::lastIncomingSequenceNumber() const
 {
-    return d->lastIncomingSequenceNumber;
+    return d->streamManager.lastIncomingSequenceNumber();
 }
 
 ///
@@ -392,66 +352,5 @@ unsigned int QXmppStream::lastIncomingSequenceNumber() const
 ///
 void QXmppStream::setAcknowledgedSequenceNumber(unsigned int sequenceNumber)
 {
-    for (auto it = d->unacknowledgedStanzas.begin(); it != d->unacknowledgedStanzas.end();) {
-        if (it.key() <= sequenceNumber)
-            it = d->unacknowledgedStanzas.erase(it);
-        else
-            ++it;
-    }
-}
-
-///
-/// Handles an incoming acknowledgement from \xep{0198}.
-///
-/// \param element
-///
-/// \since QXmpp 1.0
-///
-void QXmppStream::handleAcknowledgement(QDomElement &element)
-{
-    if (!d->streamManagementEnabled)
-        return;
-
-    QXmppStreamManagementAck ack;
-    ack.parse(element);
-    setAcknowledgedSequenceNumber(ack.seqNo());
-}
-
-///
-/// Sends an acknowledgement as defined in \xep{0198}.
-///
-/// \since QXmpp 1.0
-///
-void QXmppStream::sendAcknowledgement()
-{
-    if (!d->streamManagementEnabled)
-        return;
-
-    // prepare packet
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    QXmppStreamManagementAck ack(d->lastIncomingSequenceNumber);
-    ack.toXml(&xmlStream);
-
-    // send packet
-    sendData(data);
-}
-
-///
-/// Sends an acknowledgement request as defined in \xep{0198}.
-///
-/// \since QXmpp 1.0
-///
-void QXmppStream::sendAcknowledgementRequest()
-{
-    if (!d->streamManagementEnabled)
-        return;
-
-    // prepare packet
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    QXmppStreamManagementReq::toXml(&xmlStream);
-
-    // send packet
-    sendData(data);
+    d->streamManager.setAcknowledgedSequenceNumber(sequenceNumber);
 }
