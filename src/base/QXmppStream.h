@@ -35,9 +35,9 @@ class QSslSocket;
 class QXmppStanza;
 class QXmppStreamPrivate;
 
+///
 /// \brief The QXmppStream class is the base class for all XMPP streams.
 ///
-
 class QXMPP_EXPORT QXmppStream : public QXmppLoggable
 {
     Q_OBJECT
@@ -76,8 +76,8 @@ protected:
 
     // XEP-0198: Stream Management
     void enableStreamManagement(bool resetSequenceNumber);
-    unsigned lastIncomingSequenceNumber() const;
-    void setAcknowledgedSequenceNumber(unsigned sequenceNumber);
+    unsigned int lastIncomingSequenceNumber() const;
+    void setAcknowledgedSequenceNumber(unsigned int sequenceNumber);
 
 private:
     // XEP-0198: Stream Management
