@@ -226,4 +226,6 @@ private:
     QSharedDataPointer<QXmppDataFormPrivate> d;
 };
 
+Q_DECLARE_METATYPE(QXmppDataForm)
+
 #endif
