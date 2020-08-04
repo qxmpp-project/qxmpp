@@ -65,7 +65,10 @@ static QString conditionToString(QXmppStanza::Error::Condition condition)
         return "not-allowed";
     case QXmppStanza::Error::NotAuthorized:
         return "not-authorized";
+        QT_WARNING_PUSH
+        QT_WARNING_DISABLE_DEPRECATED
     case QXmppStanza::Error::PaymentRequired:
+        QT_WARNING_POP
         return "payment-required";
     case QXmppStanza::Error::PolicyViolation:
         return "policy-violation";
@@ -117,9 +120,12 @@ static std::optional<QXmppStanza::Error::Condition> conditionFromString(const QS
         return QXmppStanza::Error::NotAllowed;
     else if (string == "not-authorized")
         return QXmppStanza::Error::NotAuthorized;
-    else if (string == "payment-required")
+    else if (string == "payment-required") {
+        QT_WARNING_PUSH
+        QT_WARNING_DISABLE_DEPRECATED
         return QXmppStanza::Error::PaymentRequired;
-    else if (string == "policy-violation")
+        QT_WARNING_POP
+    } else if (string == "policy-violation")
         return QXmppStanza::Error::PolicyViolation;
     else if (string == "recipient-unavailable")
         return QXmppStanza::Error::RecipientUnavailable;

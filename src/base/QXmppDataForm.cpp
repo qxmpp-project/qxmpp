@@ -337,14 +337,17 @@ void QXmppDataForm::Field::setLabel(const QString &label)
     d->label = label;
 }
 
+///
 /// Returns the field's media.
 ///
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppDataForm::Field::mediaSources() or
 /// \c QXmppDataForm::Field::mediaSize() instead.
-
+///
 QXmppDataForm::Media QXmppDataForm::Field::media() const
 {
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     Media media;
     QList<QPair<QString, QString>> pairUris;
     pairUris.reserve(d->mediaSources.size());
@@ -359,6 +362,7 @@ QXmppDataForm::Media QXmppDataForm::Field::media() const
     media.setWidth(d->mediaSize.width());
     media.setUris(pairUris);
     return media;
+    QT_WARNING_POP
 }
 
 /// Sets the field's \a media.
@@ -369,6 +373,8 @@ QXmppDataForm::Media QXmppDataForm::Field::media() const
 
 void QXmppDataForm::Field::setMedia(const QXmppDataForm::Media &media)
 {
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     const QList<QPair<QString, QString>> &uris = media.uris();
 
     QVector<QXmppDataForm::MediaSource> sources;
@@ -382,6 +388,7 @@ void QXmppDataForm::Field::setMedia(const QXmppDataForm::Media &media)
 
     d->mediaSources = sources;
     d->mediaSize = QSize(media.width(), media.height());
+    QT_WARNING_POP
 }
 
 /// Returns the field's options.
