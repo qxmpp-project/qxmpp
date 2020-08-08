@@ -36,6 +36,7 @@
 class QMimeType;
 class QUrl;
 
+class QXmppDataFormBase;
 class QXmppDataFormPrivate;
 class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;
@@ -195,6 +196,7 @@ public:
                   const QList<Field> &fields,
                   const QString &title = {},
                   const QString &instructions = {});
+    QXmppDataForm(const QXmppDataFormBase &based);
     QXmppDataForm(const QXmppDataForm &other);
     ~QXmppDataForm();
 
