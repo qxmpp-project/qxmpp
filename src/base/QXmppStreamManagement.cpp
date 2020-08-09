@@ -23,6 +23,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal.h"
+#include "QXmppPacket_p.h"
 #include "QXmppStanza_p.h"
 #include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
@@ -332,6 +333,16 @@ QXmppStreamManager::QXmppStreamManager(QXmppStream *stream)
 {
 }
 
+QXmppStreamManager::~QXmppStreamManager()
+{
+    resetCache();
+}
+
+bool QXmppStreamManager::enabled() const
+{
+    return m_enabled;
+}
+
 unsigned int QXmppStreamManager::lastIncomingSequenceNumber() const
 {
     return m_lastIncomingSequenceNumber;
@@ -340,6 +351,9 @@ unsigned int QXmppStreamManager::lastIncomingSequenceNumber() const
 void QXmppStreamManager::handleDisconnect()
 {
     m_enabled = false;
+    for (auto &packet : m_unacknowledgedStanzas) {
+        packet.reportResult(QXmpp::NotSent);
+    }
 }
 
 void QXmppStreamManager::handleStart()
@@ -347,11 +361,13 @@ void QXmppStreamManager::handleStart()
     m_enabled = false;
 }
 
-void QXmppStreamManager::handlePacketSent(const QXmppStanza &packet, const QByteArray &data)
+void QXmppStreamManager::handlePacketSent(QXmppPacket &packet)
 {
     if (m_enabled && packet.isXmppStanza()) {
-        m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, data);
+        m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
         sendAcknowledgementRequest();
+    } else {
+        packet.reportFinished();
     }
 }
 
@@ -384,12 +400,12 @@ void QXmppStreamManager::enableStreamManagement(bool resetSequenceNumber)
 
         // resend unacked stanzas
         if (!m_unacknowledgedStanzas.isEmpty()) {
-            const auto oldUnackedStanzas = m_unacknowledgedStanzas;
+            auto oldUnackedStanzas = m_unacknowledgedStanzas;
             m_unacknowledgedStanzas.clear();
 
-            for (const auto &value : oldUnackedStanzas) {
-                m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, value);
-                stream->sendData(value);
+            for (auto &packet : oldUnackedStanzas) {
+                m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
+                stream->sendPacket(packet);
             }
 
             sendAcknowledgementRequest();
@@ -397,8 +413,8 @@ void QXmppStreamManager::enableStreamManagement(bool resetSequenceNumber)
     } else {
         // resend unacked stanzas
         if (!m_unacknowledgedStanzas.isEmpty()) {
-            for (const auto &value : std::as_const(m_unacknowledgedStanzas)) {
-                stream->sendData(value);
+            for (auto &packet : m_unacknowledgedStanzas) {
+                stream->sendPacket(packet);
             }
 
             sendAcknowledgementRequest();
@@ -410,6 +426,8 @@ void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumb
 {
     for (auto it = m_unacknowledgedStanzas.begin(); it != m_unacknowledgedStanzas.end();) {
         if (it.key() <= sequenceNumber) {
+            it->reportResult(QXmpp::Acknowledged);
+            it->reportFinished();
             it = m_unacknowledgedStanzas.erase(it);
         } else {
             break;
@@ -458,6 +476,11 @@ void QXmppStreamManager::sendAcknowledgementRequest()
 
 void QXmppStreamManager::resetCache()
 {
+    for (auto &packet : m_unacknowledgedStanzas) {
+        packet.reportResult(QXmpp::NotSent);
+        packet.reportFinished();
+    }
+
     m_unacknowledgedStanzas.clear();
 }
 /// \endcond

@@ -31,7 +31,10 @@
 #include <QObject>
 
 class QDomElement;
+template<typename T>
+class QFuture;
 class QSslSocket;
+class QXmppPacket;
 class QXmppStanza;
 class QXmppStreamPrivate;
 
@@ -47,7 +50,9 @@ public:
     ~QXmppStream() override;
 
     virtual bool isConnected() const;
+
     bool sendPacket(const QXmppStanza &);
+    QFuture<QXmpp::PacketState> send(const QXmppStanza &);
 
     void resetPacketCache();
 
@@ -92,9 +97,11 @@ private Q_SLOTS:
     void _q_socketReadyRead();
 
 private:
-    void processData(const QString &data);
-
+    friend class QXmppStreamManager;
     friend class tst_QXmppStream;
+
+    void processData(const QString &data);
+    void sendPacket(QXmppPacket &packet);
 
     QXmppStreamPrivate *const d;
 };

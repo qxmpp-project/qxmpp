@@ -26,12 +26,15 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppLogger.h"
+#include "QXmppPacket_p.h"
 #include "QXmppStanza.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils.h"
 
 #include <QBuffer>
 #include <QDomDocument>
+#include <QFuture>
+#include <QFutureInterface>
 #include <QHostAddress>
 #include <QMap>
 #include <QRegularExpression>
@@ -147,22 +150,28 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 /// Sends an XMPP packet to the peer.
 ///
-/// \param packet
+/// \param stanza
 ///
-bool QXmppStream::sendPacket(const QXmppStanza &packet)
+bool QXmppStream::sendPacket(const QXmppStanza &stanza)
 {
-    // prepare packet
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    packet.toXml(&xmlStream);
+    // the first result is always reported immediately
+    return send(stanza).resultAt(0) != QXmpp::NotSent;
+}
 
-    // send packet
-    bool success = sendData(data);
+///
+/// Sends an XMPP packet to the peer.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmpp::PacketState> QXmppStream::send(const QXmppStanza &stanza)
+{
+    QXmppPacket packet(stanza);
+    sendPacket(packet);
 
     // handle stream management
-    d->streamManager.handlePacketSent(packet, data);
+    d->streamManager.handlePacketSent(packet);
 
-    return success;
+    return packet.future();
 }
 
 ///
@@ -331,6 +340,15 @@ void QXmppStream::processData(const QString &data)
     // process stream end
     if (hasStreamClose) {
         disconnectFromHost();
+    }
+}
+
+void QXmppStream::sendPacket(QXmppPacket &packet)
+{
+    if (sendData(packet.data())) {
+        packet.reportResult(QXmpp::Sent);
+    } else {
+        packet.reportResult(QXmpp::NotSent);
     }
 }
 
