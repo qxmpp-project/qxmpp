@@ -23,7 +23,6 @@
  *
  */
 
-
 #ifndef QXMPPGLOBAL_H
 #define QXMPPGLOBAL_H
 
@@ -77,5 +76,22 @@ inline QLatin1String QXmppVersion()
 #define QT_WARNING_DISABLE_DEPRECATED
 #endif
 
-#endif // QXMPPGLOBAL_H
+///
+/// \namespace QXmpp
+///
+/// Contains global functions and enumerations.
+///
+namespace QXmpp {
 
+///
+/// The state of an outgoing packet.
+///
+enum PacketState : quint8 {
+    Sent,          ///< The packet has been written to the socket.
+    Acknowledged,  ///< The packet has been acknowledged by the other peer using Stream Management.
+    NotSent,       ///< The packet could not be sent (e.g. connection broke or user disconnected).
+};
+
+}
+
+#endif  // QXMPPGLOBAL_H
