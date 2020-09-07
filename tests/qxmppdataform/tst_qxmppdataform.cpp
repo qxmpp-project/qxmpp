@@ -43,6 +43,7 @@ private slots:
     void testSubmit();
     void testMedia();
     void testMediaSource();
+    void testFormType();
 };
 
 void tst_QXmppDataForm::testSimple()
@@ -62,6 +63,7 @@ void tst_QXmppDataForm::testSimple()
     QCOMPARE(form.isNull(), false);
     QCOMPARE(form.title(), QLatin1String("Joggle Search"));
     QCOMPARE(form.instructions(), QLatin1String("Fill out this form to search for information!"));
+    QVERIFY(form.formType().isNull());
     QCOMPARE(form.fields().size(), 1);
     QCOMPARE(form.fields().at(0).type(), QXmppDataForm::Field::TextSingleField);
     QCOMPARE(form.fields().at(0).isRequired(), true);
@@ -209,6 +211,28 @@ void tst_QXmppDataForm::testMediaSource()
     QCOMPARE(source.uri(), QUrl("https://xmpp.org/index.html"));
     source.setContentType(QMimeDatabase().mimeTypeForName("application/xml"));
     QCOMPARE(source.contentType(), QMimeDatabase().mimeTypeForName("application/xml"));
+}
+
+void tst_QXmppDataForm::testFormType()
+{
+    const auto xml = QByteArrayLiteral(R"(<x xmlns='jabber:x:data' type='submit'>
+    <field var='FORM_TYPE' type='hidden'>
+        <value>http://jabber.org/protocol/pubsub#subscribe_options</value>
+    </field>
+    <field var='pubsub#deliver'><value>1</value></field>
+    <field var='pubsub#digest'><value>0</value></field>
+    <field var='pubsub#include_body'><value>false</value></field>
+    <field var='pubsub#show-values'>
+        <value>chat</value>
+        <value>online</value>
+        <value>away</value>
+    </field>
+</x>)");
+
+    QXmppDataForm form;
+    parsePacket(form, xml);
+
+    QCOMPARE(form.formType(), QStringLiteral("http://jabber.org/protocol/pubsub#subscribe_options"));
 }
 
 QTEST_MAIN(tst_QXmppDataForm)
