@@ -665,6 +665,27 @@ void QXmppDataForm::setType(QXmppDataForm::Type type)
     d->type = type;
 }
 
+///
+/// Searches for a hidden field called 'FORM_TYPE' and returns its value.
+///
+/// \returns The string value of the field or a null string if the field
+/// couldn't be found.
+///
+/// \since QXmpp 1.5
+///
+QString QXmppDataForm::formType() const
+{
+    const auto formTypeItr = std::find_if(d->fields.begin(), d->fields.end(), [](const QXmppDataForm::Field &field) {
+        return field.type() == QXmppDataForm::Field::HiddenField &&
+            field.key() == QStringLiteral("FORM_TYPE");
+    });
+
+    if (formTypeItr != d->fields.end()) {
+        return formTypeItr->value().toString();
+    }
+    return {};
+}
+
 /// Returns true if the form has an unknown type.
 
 bool QXmppDataForm::isNull() const

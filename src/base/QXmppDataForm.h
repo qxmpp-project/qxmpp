@@ -234,6 +234,8 @@ public:
     QXmppDataForm::Type type() const;
     void setType(QXmppDataForm::Type type);
 
+    QString formType() const;
+
     bool isNull() const;
 
     /// \cond
