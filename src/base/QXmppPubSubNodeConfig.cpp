@@ -24,6 +24,7 @@
 #include "QXmppPubSubNodeConfig.h"
 
 static const auto NODE_CONFIG_FORM_TYPE = QStringLiteral(u"http://jabber.org/protocol/pubsub#node_config");
+static const auto PUBLISH_OPTIONS_FORM_TYPE = QStringLiteral("http://jabber.org/protocol/pubsub#publish-options");
 
 static const auto ACCESS_MODEL = QStringLiteral("pubsub#access_model");
 static const auto BODY_XSLT = QStringLiteral("pubsub#body_xslt");
@@ -838,4 +839,9 @@ void QXmppPubSubNodeConfig::serializeForm(QXmppDataForm &form) const
                       Type::TextSingleField,
                       PAYLOAD_TYPE,
                       d->payloadType);
+}
+
+QString QXmppPubSubPublishOptions::formType() const
+{
+    return PUBLISH_OPTIONS_FORM_TYPE;
 }

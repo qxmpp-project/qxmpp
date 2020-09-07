@@ -203,6 +203,16 @@ private:
     QSharedDataPointer<QXmppPubSubNodeConfigPrivate> d;
 };
 
+class QXMPP_EXPORT QXmppPubSubPublishOptions : public QXmppPubSubNodeConfig
+{
+public:
+    static std::optional<QXmppPubSubPublishOptions> fromDataForm(const QXmppDataForm &form);
+
+protected:
+    QString formType() const override;
+};
+
 Q_DECLARE_METATYPE(QXmppPubSubNodeConfig);
+Q_DECLARE_METATYPE(QXmppPubSubPublishOptions);
 
 #endif  // QXMPPPUBSUBNODECONFIG_H
