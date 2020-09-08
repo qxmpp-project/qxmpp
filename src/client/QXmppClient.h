@@ -28,9 +28,14 @@
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
 
+#include <variant>
+
 #include <QAbstractSocket>
 #include <QObject>
 #include <QSslError>
+
+template<typename T>
+class QFuture;
 
 class QXmppClientExtension;
 class QXmppClientPrivate;
@@ -213,6 +218,8 @@ public:
     /// Returns the client's current state.
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
+
+    QFuture<QXmpp::PacketState> send(const QXmppStanza &);
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")

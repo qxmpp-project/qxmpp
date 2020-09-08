@@ -38,6 +38,7 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include <QFuture>
 #include <QSslSocket>
 #include <QTimer>
 
@@ -289,6 +290,47 @@ void QXmppClient::connectToServer(const QString& jid, const QString& password)
 bool QXmppClient::sendPacket(const QXmppStanza& packet)
 {
     return d->stream->sendPacket(packet);
+}
+
+///
+/// Sends a packet and reports the result via QFuture.
+///
+/// The QFuture might have multiple results. The first result of the future is
+/// reported immediately (it's safe to access resultAt(0)). If writing the data
+/// to the socket succeeds (that does not mean the server received it),
+/// QXmpp::Sent is reported. Otherwise QXmpp::NotSent is reported.
+///
+/// If stream management is enabled the future continues to be active until the
+/// server acknowledges the packet. On success QXmpp::Acknowledged is reported
+/// and the future finishes.
+///
+/// If connection errors occur the packet is resent if possible. If reconnecting
+/// is not possible, QXmpp::NotSent is reported.
+///
+/// For you the most important result is the last one. QXmpp::Sent means the
+/// packet has been sent without stream management (no acknowledgment).
+/// QXmpp::Acknowledged means the packet has been sent and has been received by
+/// the server, QXmpp::NotSent means no success.
+///
+/// \note <b>TL;DR</b>: The future might have multiple results, so don't do:
+/// \code
+/// send().result();
+/// \endcode
+/// Instead do the following to handle the final result:
+/// \code
+/// send().results().last();
+/// \endcode
+/// QXmpp::Sent or QXmpp::Acknowledged mean success.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \returns A QFuture that makes it possible to track the state of the packet.
+/// You can use QFutureWatcher in Qt 5 and QFuture::then() in Qt 6 to handle the
+/// results.
+///
+QFuture<QXmpp::PacketState> QXmppClient::send(const QXmppStanza &stanza)
+{
+    return d->stream->send(stanza);
 }
 
 /// Disconnects the client and the current presence of client changes to
