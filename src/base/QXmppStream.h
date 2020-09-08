@@ -49,6 +49,8 @@ public:
     virtual bool isConnected() const;
     bool sendPacket(const QXmppStanza &);
 
+    void resetPacketCache();
+
 Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
     void connected();

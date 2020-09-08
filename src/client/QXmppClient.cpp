@@ -232,17 +232,23 @@ QXmppConfiguration& QXmppClient::configuration()
     return d->stream->configuration();
 }
 
+///
 /// Attempts to connect to the XMPP server. Server details and other configurations
 /// are specified using the config parameter. Use signals connected(), error(QXmppClient::Error)
 /// and disconnected() to know the status of the connection.
+///
 /// \param config Specifies the configuration object for connecting the XMPP server.
 /// This contains the host name, user, password etc. See QXmppConfiguration for details.
 /// \param initialPresence The initial presence which will be set for this user
 /// after establishing the session. The default value is QXmppPresence::Available
-
+///
 void QXmppClient::connectToServer(const QXmppConfiguration& config,
                                   const QXmppPresence& initialPresence)
 {
+    // reset package cache from last connection
+    if (d->stream->configuration().jidBare() != config.jidBare())
+        d->stream->resetPacketCache();
+
     d->stream->configuration() = config;
     d->clientPresence = initialPresence;
     d->addProperCapability(d->clientPresence);

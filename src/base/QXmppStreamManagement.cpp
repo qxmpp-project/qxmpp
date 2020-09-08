@@ -454,3 +454,8 @@ void QXmppStreamManager::sendAcknowledgementRequest()
     // send packet
     stream->sendData(data);
 }
+
+void QXmppStreamManager::resetCache()
+{
+    m_unacknowledgedStanzas.clear();
+}
