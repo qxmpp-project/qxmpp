@@ -210,6 +210,7 @@ public:
     void handlePacketSent(const QXmppStanza &packet, const QByteArray &data);
     bool handleStanza(const QDomElement &stanza);
 
+    void resetCache();
     void enableStreamManagement(bool resetSequenceNumber);
     void setAcknowledgedSequenceNumber(unsigned int sequenceNumber);
 

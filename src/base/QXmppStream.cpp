@@ -166,6 +166,19 @@ bool QXmppStream::sendPacket(const QXmppStanza &packet)
 }
 
 ///
+/// Resets the stream management packages cache.
+///
+/// This can be done to prevent that packages from the last connection are being
+/// resent.
+///
+/// \since QXmpp 1.4
+///
+void QXmppStream::resetPacketCache()
+{
+    d->streamManager.resetCache();
+}
+
+///
 /// Returns the QSslSocket used for this stream.
 ///
 QSslSocket *QXmppStream::socket() const
