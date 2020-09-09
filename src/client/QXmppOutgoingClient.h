@@ -55,6 +55,8 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const override;
     bool isClientStateIndicationEnabled() const;
+    bool isStreamManagementEnabled() const;
+    bool isStreamResumed() const;
 
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();

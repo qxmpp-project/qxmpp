@@ -89,7 +89,7 @@ class QXmppVersionManager;
 /// - QXmppEntityTimeManager
 ///
 /// \ingroup Core
-
+///
 class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
@@ -118,6 +118,16 @@ public:
     };
     Q_ENUM(State)
 
+    /// Describes the use of \xep{0198}: Stream Management
+    enum StreamManagementState {
+        /// Stream Management is not used.
+        NoStreamManagement,
+        /// Stream Management is used and the previous stream has not been resumed.
+        NewStream,
+        /// Stream Management is used and the previous stream has been resumed.
+        ResumedStream
+    };
+
     QXmppClient(QObject *parent = nullptr);
     ~QXmppClient() override;
 
@@ -127,6 +137,7 @@ public:
 
     QList<QXmppClientExtension *> extensions();
 
+    ///
     /// \brief Returns the extension which can be cast into type T*, or 0
     /// if there is no such extension.
     ///
@@ -151,6 +162,7 @@ public:
         return nullptr;
     }
 
+    ///
     /// \brief Returns the index of an extension
     ///
     /// Usage example:
@@ -181,6 +193,8 @@ public:
 
     bool isActive() const;
     void setActive(bool active);
+
+    StreamManagementState streamManagementState() const;
 
     QXmppPresence clientPresence() const;
     void setClientPresence(const QXmppPresence &presence);
