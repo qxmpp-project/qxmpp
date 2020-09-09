@@ -107,6 +107,8 @@ public:
     bool isResuming;
     QString resumeHost;
     quint16 resumePort;
+    bool streamManagementEnabled;
+    bool streamResumed;
 
     // Client State Indication
     bool clientStateIndicationEnabled;
@@ -120,7 +122,23 @@ private:
 };
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
-    : nextSrvRecordIdx(0), redirectPort(0), bindModeAvailable(false), sessionAvailable(false), sessionStarted(false), isAuthenticated(false), saslClient(nullptr), streamManagementAvailable(false), canResume(false), isResuming(false), resumePort(0), clientStateIndicationEnabled(false), pingTimer(nullptr), timeoutTimer(nullptr), q(qq)
+    : nextSrvRecordIdx(0),
+      redirectPort(0),
+      bindModeAvailable(false),
+      sessionAvailable(false),
+      sessionStarted(false),
+      isAuthenticated(false),
+      saslClient(nullptr),
+      streamManagementAvailable(false),
+      canResume(false),
+      isResuming(false),
+      resumePort(0),
+      streamManagementEnabled(false),
+      streamResumed(false),
+      clientStateIndicationEnabled(false),
+      pingTimer(nullptr),
+      timeoutTimer(nullptr),
+      q(qq)
 {
 }
 
@@ -285,6 +303,30 @@ bool QXmppOutgoingClient::isClientStateIndicationEnabled() const
     return d->clientStateIndicationEnabled;
 }
 
+///
+/// Returns whether Stream Management is currently enabled.
+///
+/// \since QXmpp 1.4
+///
+bool QXmppOutgoingClient::isStreamManagementEnabled() const
+{
+    return d->streamManagementEnabled;
+}
+
+///
+/// Returns true if the current stream is a successful resumption of a previous
+/// stream.
+///
+/// In case a stream has been resumed, some tasks like fetching the roster again
+/// are not required.
+///
+/// \since QXmpp 1.4
+///
+bool QXmppOutgoingClient::isStreamResumed() const
+{
+    return d->streamResumed;
+}
+
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug("Socket disconnected");
@@ -345,6 +387,10 @@ void QXmppOutgoingClient::handleStart()
     d->sessionId.clear();
     d->sessionAvailable = false;
     d->sessionStarted = false;
+
+    // reset stream management
+    d->streamResumed = false;
+    d->streamManagementEnabled = false;
 
     // start stream
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
@@ -682,6 +728,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             setResumeAddress(streamManagementEnabled.location());
         }
 
+        d->streamManagementEnabled = true;
         enableStreamManagement(true);
         // we are connected now
         emit connected();
@@ -690,7 +737,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         streamManagementResumed.parse(nodeRecv);
         setAcknowledgedSequenceNumber(streamManagementResumed.h());
         d->isResuming = false;
+        d->streamResumed = true;
 
+        d->streamManagementEnabled = true;
         enableStreamManagement(false);
         // we are connected now
         // TODO: The stream was resumed. Therefore, we should not send presence information or request the roster.

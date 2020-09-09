@@ -350,6 +350,24 @@ void QXmppClient::setActive(bool active)
     }
 }
 
+///
+/// Returns the current \xep{0198}: Stream Management state of the connection.
+///
+/// Upon connection of the client this can be used to check whether the
+/// previous stream has been resumed.
+///
+/// \since QXmpp 1.4
+///
+QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
+{
+    if (d->stream->isStreamManagementEnabled()) {
+        if (d->stream->isStreamResumed())
+            return ResumedStream;
+        return NewStream;
+    }
+    return NoStreamManagement;
+}
+
 /// Returns the reference to QXmppRosterManager object of the client.
 ///
 /// \return Reference to the roster object of the connected client. Use this to
