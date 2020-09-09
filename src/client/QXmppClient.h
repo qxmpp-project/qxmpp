@@ -221,6 +221,9 @@ public:
 
     QFuture<QXmpp::PacketState> send(const QXmppStanza &);
 
+    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
+    QFuture<IqResult> sendIq(const QXmppIq &);
+
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")
     QXmppRosterManager &rosterManager();

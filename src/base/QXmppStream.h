@@ -27,6 +27,8 @@
 
 #include "QXmppLogger.h"
 
+#include <variant>
+
 #include <QAbstractSocket>
 #include <QObject>
 
@@ -34,6 +36,7 @@ class QDomElement;
 template<typename T>
 class QFuture;
 class QSslSocket;
+class QXmppIq;
 class QXmppPacket;
 class QXmppStanza;
 class QXmppStreamPrivate;
@@ -53,6 +56,10 @@ public:
 
     bool sendPacket(const QXmppStanza &);
     QFuture<QXmpp::PacketState> send(const QXmppStanza &);
+
+    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
+    QFuture<IqResult> sendIq(const QXmppIq &);
+    void cancelOngoingIqs();
 
     void resetPacketCache();
 
@@ -102,6 +109,7 @@ private:
 
     void processData(const QString &data);
     void sendPacket(QXmppPacket &packet);
+    bool handleIqResponse(const QDomElement &);
 
     QXmppStreamPrivate *const d;
 };

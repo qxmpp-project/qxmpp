@@ -25,6 +25,7 @@
 #include "QXmppStream.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppPacket_p.h"
 #include "QXmppStanza.h"
@@ -35,6 +36,7 @@
 #include <QDomDocument>
 #include <QFuture>
 #include <QFutureInterface>
+#include <QFutureWatcher>
 #include <QHostAddress>
 #include <QMap>
 #include <QRegularExpression>
@@ -46,6 +48,45 @@
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 static bool randomSeeded = false;
 #endif
+
+class IqState : public QFutureInterface<QXmppStream::IqResult>
+{
+    Q_DISABLE_COPY(IqState)
+
+public:
+    IqState(QFuture<QXmpp::PacketState> sendFuture, bool streamManagementUsed)
+        : QFutureInterface<QXmppStream::IqResult>(QFutureInterfaceBase::Started),
+          m_sendFuture(std::move(sendFuture)),
+          m_streamManagementUsed(streamManagementUsed)
+    {
+        auto *watcher = new QFutureWatcher<QXmpp::PacketState>();
+        QObject::connect(watcher, &QFutureWatcher<QXmpp::PacketState>::finished, [=]() {
+            const auto result = watcher->future().results().last();
+
+            switch (result) {
+            case QXmpp::Acknowledged:
+            case QXmpp::Sent:
+                break;
+            case QXmpp::NotSent:
+                reportResult(result);
+                reportFinished();
+                break;
+            }
+
+            watcher->deleteLater();
+        });
+        watcher->setFuture(m_sendFuture);
+    }
+
+    bool isStreamManagementUsed() const
+    {
+        return m_streamManagementUsed;
+    }
+
+private:
+    QFuture<QXmpp::PacketState> m_sendFuture;
+    bool m_streamManagementUsed;
+};
 
 class QXmppStreamPrivate
 {
@@ -60,6 +101,9 @@ public:
 
     // stream management
     QXmppStreamManager streamManager;
+
+    // iq response handling
+    QMap<QString, IqState *> runningIqs;
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
@@ -91,6 +135,7 @@ QXmppStream::QXmppStream(QObject *parent)
 ///
 QXmppStream::~QXmppStream()
 {
+    cancelOngoingIqs();
     delete d;
 }
 
@@ -172,6 +217,45 @@ QFuture<QXmpp::PacketState> QXmppStream::send(const QXmppStanza &stanza)
     d->streamManager.handlePacketSent(packet);
 
     return packet.future();
+}
+
+///
+/// Sends an IQ packet and returns the response asynchronously.
+///
+QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
+{
+    if (iq.id().isEmpty()) {
+        warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
+        auto newIq = iq;
+        newIq.setId(QXmppUtils::generateStanzaUuid());
+        return sendIq(newIq);
+    }
+    if (d->runningIqs.contains(iq.id())) {
+        warning(QStringLiteral("QXmppStream::sendIq() error:"
+                               "The IQ's ID (\"%1\") is already in use. Using random ID.")
+                    .arg(iq.id()));
+        auto newIq = iq;
+        newIq.setId(QXmppUtils::generateStanzaUuid());
+        return sendIq(newIq);
+    }
+
+    auto *interface = new IqState(send(iq), d->streamManager.enabled());
+
+    if (!interface->isFinished()) {
+        d->runningIqs.insert(iq.id(), interface);
+    }
+
+    return interface->future();
+}
+
+void QXmppStream::cancelOngoingIqs()
+{
+    for (auto *state : std::as_const(d->runningIqs)) {
+        state->reportResult(QXmpp::NotSent);
+        state->reportFinished();
+        delete state;
+    }
+    d->runningIqs.clear();
 }
 
 ///
@@ -330,7 +414,7 @@ void QXmppStream::processData(const QString &data)
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
         // handle possible stream management packets first
-        if (d->streamManager.handleStanza(stanza))
+        if (d->streamManager.handleStanza(stanza) || handleIqResponse(stanza))
             continue;
 
         // process all other kinds of packets
@@ -350,6 +434,33 @@ void QXmppStream::sendPacket(QXmppPacket &packet)
     } else {
         packet.reportResult(QXmpp::NotSent);
     }
+}
+
+bool QXmppStream::handleIqResponse(const QDomElement &stanza)
+{
+    if (stanza.tagName() != QStringLiteral("iq")) {
+        return false;
+    }
+
+    // only accept "result" and "error" types
+    const auto iqType = stanza.attribute(QStringLiteral("type"));
+    if (iqType != QStringLiteral("result") && iqType != QStringLiteral("error")) {
+        return false;
+    }
+
+    if (auto itr = d->runningIqs.find(stanza.attribute(QStringLiteral("id")));
+        itr != d->runningIqs.end()) {
+
+        auto *state = itr.value();
+        state->reportResult(stanza);
+        state->reportFinished();
+        delete state;
+
+        d->runningIqs.erase(itr);
+        return true;
+    }
+
+    return false;
 }
 
 ///
