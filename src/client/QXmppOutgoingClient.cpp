@@ -213,6 +213,20 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
 
     connect(this, &QXmppStream::connected, this, &QXmppOutgoingClient::pingStart);
     connect(this, &QXmppStream::disconnected, this, &QXmppOutgoingClient::pingStop);
+
+    // IQ response handling
+    connect(this, &QXmppStream::connected, this, [=]() {
+        if (!d->streamResumed) {
+            // we can't expect a response because this is a new stream
+            cancelOngoingIqs();
+        }
+    });
+    connect(this, &QXmppStream::disconnected, this, [=]() {
+        if (!d->canResume) {
+            // this stream can't be resumed; we can cancel all ongoing IQs
+            cancelOngoingIqs();
+        }
+    });
 }
 
 /// Destroys an outgoing client stream.
@@ -510,7 +524,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         d->bindModeAvailable = (features.bindMode() != QXmppStreamFeatures::Disabled);
         d->streamManagementAvailable = (features.streamManagementMode() != QXmppStreamFeatures::Disabled);
 
-        // chech whether the stream can be resumed
+        // check whether the stream can be resumed
         if (d->streamManagementAvailable && d->canResume) {
             d->isResuming = true;
             QXmppStreamManagementResume streamManagementResume(lastIncomingSequenceNumber(), d->smId);

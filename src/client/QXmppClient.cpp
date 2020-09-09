@@ -38,6 +38,7 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include <QDomElement>
 #include <QFuture>
 #include <QSslSocket>
 #include <QTimer>
@@ -108,6 +109,14 @@ QStringList QXmppClientPrivate::discoveryFeatures()
     };
 }
 /// \endcond
+
+///
+/// \typedef QXmppClient::IqResult
+///
+/// Result of an IQ request, either contains the QDomElement of the IQ answer
+/// (with type 'error' or 'result') or it contains the packet error, if the
+/// request couldn't be sent.
+///
 
 /// Creates a QXmppClient object.
 /// \param parent is passed to the QObject's constructor.
@@ -331,6 +340,18 @@ bool QXmppClient::sendPacket(const QXmppStanza& packet)
 QFuture<QXmpp::PacketState> QXmppClient::send(const QXmppStanza &stanza)
 {
     return d->stream->send(stanza);
+}
+
+///
+/// Sends an IQ packet and returns the response asynchronously.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppClient::IqResult> QXmppClient::sendIq(const QXmppIq &iq)
+{
+    return d->stream->sendIq(iq);
 }
 
 /// Disconnects the client and the current presence of client changes to
