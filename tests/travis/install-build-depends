@@ -3,7 +3,6 @@ set -e
 
 if [ "$(uname -s)" = "Darwin" ]; then
     brew update
-    brew unlink python@2
 
     case "$CONFIG" in
     full*)
