@@ -215,6 +215,11 @@ void QXmppStream::_q_socketError(QAbstractSocket::SocketError socketError)
 
 void QXmppStream::_q_socketReadyRead()
 {
+    processData(QString::fromUtf8(d->socket->readAll()));
+}
+
+void QXmppStream::processData(const QString &data)
+{
     // As we may only have partial XML content, we need to cache the received
     // data until it has been successfully parsed. In case it can't be parsed,
     //
@@ -226,7 +231,7 @@ void QXmppStream::_q_socketReadyRead()
     // However, both issues could only be solved using an XML stream reader
     // which would cause many other problems since we don't actually use it for
     // parsing the content.
-    d->dataBuffer.append(QString::fromUtf8(d->socket->readAll()));
+    d->dataBuffer.append(data);
 
     //
     // Check for whitespace pings

@@ -96,6 +96,10 @@ private Q_SLOTS:
     void _q_socketReadyRead();
 
 private:
+    void processData(const QString &data);
+
+    friend class tst_QXmppStream;
+
     QXmppStreamPrivate *const d;
 };
 
