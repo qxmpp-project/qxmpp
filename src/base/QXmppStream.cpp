@@ -34,7 +34,7 @@
 #include <QDomDocument>
 #include <QHostAddress>
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSslSocket>
 #include <QStringList>
 #include <QTime>
@@ -43,18 +43,17 @@
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 static bool randomSeeded = false;
 #endif
-static const QByteArray streamRootElementEnd = QByteArrayLiteral("</stream:stream>");
 
 class QXmppStreamPrivate
 {
 public:
     QXmppStreamPrivate();
 
-    QByteArray dataBuffer;
+    QString dataBuffer;
     QSslSocket *socket;
 
     // incoming stream state
-    QByteArray streamStart;
+    QString streamOpenElement;
 
     bool streamManagementEnabled;
     QMap<unsigned, QByteArray> unacknowledgedStanzas;
@@ -101,7 +100,7 @@ void QXmppStream::disconnectFromHost()
     d->streamManagementEnabled = false;
     if (d->socket) {
         if (d->socket->state() == QAbstractSocket::ConnectedState) {
-            sendData(streamRootElementEnd);
+            sendData(QByteArrayLiteral("</stream:stream>"));
             d->socket->flush();
         }
         // FIXME: according to RFC 6120 section 4.4, we should wait for
@@ -120,7 +119,7 @@ void QXmppStream::handleStart()
 {
     d->streamManagementEnabled = false;
     d->dataBuffer.clear();
-    d->streamStart.clear();
+    d->streamOpenElement.clear();
 }
 
 ///
@@ -216,49 +215,89 @@ void QXmppStream::_q_socketError(QAbstractSocket::SocketError socketError)
 
 void QXmppStream::_q_socketReadyRead()
 {
-    d->dataBuffer.append(d->socket->readAll());
+    // As we may only have partial XML content, we need to cache the received
+    // data until it has been successfully parsed. In case it can't be parsed,
+    //
+    // There are only two small problems with the current strategy:
+    //  * When we receive a full stanza + a partial one, we can't parse the
+    //    first stanza until another stanza arrives that is complete.
+    //  * We don't know when we received invalid XML (would cause a growing
+    //    cache and a timeout after some time).
+    // However, both issues could only be solved using an XML stream reader
+    // which would cause many other problems since we don't actually use it for
+    // parsing the content.
+    d->dataBuffer.append(QString::fromUtf8(d->socket->readAll()));
 
-    // handle whitespace pings
-    if (!d->dataBuffer.isEmpty() && d->dataBuffer.trimmed().isEmpty()) {
+    //
+    // Check for whitespace pings
+    //
+    if (d->dataBuffer.isEmpty() || d->dataBuffer.trimmed().isEmpty()) {
         d->dataBuffer.clear();
-        handleStanza(QDomElement());
+
+        logReceived({});
+        handleStanza({});
+        return;
     }
 
-    // FIXME : maybe these QRegExps could be static?
-    QRegExp startStreamRegex(R"(^(<\?xml.*\?>)?\s*<stream:stream.*>)");
-    startStreamRegex.setMinimal(true);
-    QRegExp endStreamRegex("</stream:stream>$");
-    endStreamRegex.setMinimal(true);
-
-    // check whether we need to add stream start / end elements
     //
-    // NOTE: as we may only have partial XML content, do not alter the stream's
-    // state until we have a valid XML document!
-    QByteArray completeXml = d->dataBuffer;
-    const QString strData = QString::fromUtf8(d->dataBuffer);
-    bool streamStart = false;
-    if (d->streamStart.isEmpty() && startStreamRegex.indexIn(strData) != -1)
-        streamStart = true;
-    else
-        completeXml.prepend(d->streamStart);
-    bool streamEnd = false;
-    if (endStreamRegex.indexIn(strData) != -1)
-        streamEnd = true;
-    else
-        completeXml.append(streamRootElementEnd);
+    // Check whether we received a stream open or closing tag
+    //
+    static const QRegularExpression streamStartRegex(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)");
+    static const QRegularExpression streamEndRegex("</stream:stream>$");
 
-    // check whether we have a valid XML document
+    QRegularExpressionMatch streamOpenMatch;
+    bool hasStreamOpen = d->streamOpenElement.isEmpty() &&
+        (streamOpenMatch = streamStartRegex.match(d->dataBuffer)).hasMatch();
+
+    bool hasStreamClose = streamEndRegex.match(d->dataBuffer).hasMatch();
+
+    //
+    // The stream start/end and stanza packets can't be parsed without any
+    // modifications with QDomDocument. This is because of multiple reasons:
+    //  * The <stream:stream> open element is not considered valid without the
+    //    closing tag.
+    //  * Only the closing tag is of course not valid too.
+    //  * Stanzas/Nonzas need to have the correct stream namespaces set:
+    //     * For being able to parse <stream:features/>
+    //     * For having the correct namespace (e.g. 'jabber:client') set to
+    //       stanzas and their child elements (e.g. <body/> of a message).
+    //
+    // The wrapping strategy looks like this:
+    //  * The stream open tag is cached once it arrives, for later access
+    //  * Incoming XML that has no <stream> open tag will be prepended by the
+    //    cached <stream> tag.
+    //  * Incoming XML that has no <stream> close tag will be appended by a
+    //    generic string "</stream:stream>"
+    //
+    // The result is parsed by QDomDocument and the child elements of the stream
+    // are processed. In case the received data contained a stream open tag,
+    // the stream is processed (before the stanzas are processed). In case we
+    // received a </stream> closing tag, the connection is closed.
+    //
+    auto wrappedStanzas = d->dataBuffer;
+    if (!hasStreamOpen) {
+        wrappedStanzas.prepend(d->streamOpenElement);
+    }
+    if (!hasStreamClose) {
+        wrappedStanzas.append(QStringLiteral("</stream:stream>"));
+    }
+
+    //
+    // Try to parse the wrapped XML
+    //
     QDomDocument doc;
-    if (!doc.setContent(completeXml, true))
+    if (!doc.setContent(wrappedStanzas, true))
         return;
 
-    // remove data from buffer
-    logReceived(strData);
+    //
+    // Success: We can clear the buffer and send a 'received' log message
+    //
     d->dataBuffer.clear();
+    logReceived(d->dataBuffer);
 
     // process stream start
-    if (streamStart) {
-        d->streamStart = startStreamRegex.cap(0).toUtf8();
+    if (hasStreamOpen) {
+        d->streamOpenElement = streamOpenMatch.captured();
         handleStream(doc.documentElement());
     }
 
@@ -280,8 +319,9 @@ void QXmppStream::_q_socketReadyRead()
     }
 
     // process stream end
-    if (streamEnd)
+    if (hasStreamClose) {
         disconnectFromHost();
+    }
 }
 
 ///
