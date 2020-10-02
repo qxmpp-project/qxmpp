@@ -35,7 +35,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <QRandomGenerator>
 #endif
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QUuid>
@@ -116,30 +116,8 @@ static quint32 crctable[256] = {
 ///
 QDateTime QXmppUtils::datetimeFromString(const QString &str)
 {
-    QRegExp tzRe(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
-    int tzPos = tzRe.indexIn(str, 19);
-    if (str.size() < 20 || tzPos < 0)
-        return QDateTime();
-
-    // process date and time
-    QDateTime dt = QDateTime::fromString(str.left(19), QStringLiteral("yyyy-MM-ddThh:mm:ss"));
-    dt.setTimeSpec(Qt::UTC);
-
-    // process milliseconds
-    if (tzPos > 20 && str.at(19) == '.') {
-        QString millis = (str.mid(20, tzPos - 20) + QStringLiteral("000")).left(3);
-        dt = dt.addMSecs(millis.toInt());
-    }
-
-    // process time zone
-    if (tzRe.cap(1) != QStringLiteral("Z")) {
-        int offset = tzRe.cap(3).toInt() * 3600 + tzRe.cap(4).toInt() * 60;
-        if (tzRe.cap(2) == QStringLiteral("+"))
-            dt = dt.addSecs(-offset);
-        else
-            dt = dt.addSecs(offset);
-    }
-    return dt;
+    // Qt::ISODate parses milliseconds, but doesn't output them
+    return QDateTime::fromString(str, Qt::ISODate).toUTC();
 }
 
 ///
@@ -148,11 +126,9 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
 ///
 QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
-    QDateTime utc = dt.toUTC();
-    if (utc.time().msec())
-        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ss.zzzZ"));
-    else
-        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ssZ"));
+    if (dt.time().msec())
+        return dt.toUTC().toString(Qt::ISODateWithMs);
+    return dt.toUTC().toString(Qt::ISODate);
 }
 
 ///
@@ -161,21 +137,23 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
 ///
 int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
-    QRegExp tzRe(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
-    if (!tzRe.exactMatch(str))
+    static const QRegularExpression timezoneRegex(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
+
+    const auto match = timezoneRegex.match(str);
+    if (!match.hasMatch())
         return 0;
 
     // No offset from UTC
-    if (tzRe.cap(1) == QStringLiteral("Z"))
+    if (match.captured(1) == u'Z')
         return 0;
 
     // Calculate offset
-    const int offset = tzRe.cap(3).toInt() * 3600 +
-        tzRe.cap(4).toInt() * 60;
-    if (tzRe.cap(2) == QStringLiteral("-"))
+    const int offset = match.captured(3).toInt() * 3600 +
+        match.captured(4).toInt() * 60;
+
+    if (match.captured(2) == u'-')
         return -offset;
-    else
-        return offset;
+    return offset;
 }
 
 ///

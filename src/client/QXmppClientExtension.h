@@ -28,7 +28,6 @@
 #include "QXmppLogger.h"
 
 class QDomElement;
-class QStringList;
 
 class QXmppClient;
 class QXmppClientExtensionPrivate;
