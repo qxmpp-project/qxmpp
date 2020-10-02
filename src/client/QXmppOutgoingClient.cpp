@@ -52,7 +52,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QHostAddress>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -492,13 +492,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         emit connected();
     } else if (ns == ns_stream && nodeRecv.tagName() == "error") {
         // handle redirects
-        QRegExp redirectRegex("([^:]+)(:[0-9]+)?");
-        if (redirectRegex.exactMatch(nodeRecv.firstChildElement("see-other-host").text())) {
-            d->redirectHost = redirectRegex.cap(0);
-            if (!redirectRegex.cap(2).isEmpty())
-                d->redirectPort = redirectRegex.cap(2).mid(1).toUShort();
-            else
-                d->redirectPort = 5222;
+        const auto otherHost = nodeRecv.firstChildElement("see-other-host");
+        if (!otherHost.isNull() && setResumeAddress(otherHost.text())) {
             QXmppStream::disconnectFromHost();
             return;
         }
@@ -573,11 +568,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 // bind result
                 if (bind.type() == QXmppIq::Result) {
                     if (!bind.jid().isEmpty()) {
-                        QRegExp jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
-                        if (jidRegex.exactMatch(bind.jid())) {
-                            configuration().setUser(jidRegex.cap(1));
-                            configuration().setDomain(jidRegex.cap(2));
-                            configuration().setResource(jidRegex.cap(3));
+                        static const QRegularExpression jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
+
+                        if (const auto match = jidRegex.match(bind.jid()); match.hasMatch()) {
+                            configuration().setUser(match.captured(1));
+                            configuration().setDomain(match.captured(2));
+                            configuration().setResource(match.captured(3));
                         } else {
                             warning("Bind IQ received with invalid JID: " + bind.jid());
                         }
@@ -683,17 +679,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         d->smId = streamManagementEnabled.id();
         d->canResume = streamManagementEnabled.resume();
         if (streamManagementEnabled.resume() && !streamManagementEnabled.location().isEmpty()) {
-            QRegExp locationRegex("([^:]+)(:[0-9]+)?");
-            if (locationRegex.exactMatch(streamManagementEnabled.location())) {
-                d->resumeHost = locationRegex.cap(0);
-                if (!locationRegex.cap(2).isEmpty())
-                    d->resumePort = locationRegex.cap(2).mid(1).toUShort();
-                else
-                    d->resumePort = 5222;
-            } else {
-                d->resumeHost = QString();
-                d->resumePort = 0;
-            }
+            setResumeAddress(streamManagementEnabled.location());
         }
 
         enableStreamManagement(true);
@@ -774,6 +760,34 @@ void QXmppOutgoingClient::pingTimeout()
     warning("Ping timeout");
     QXmppStream::disconnectFromHost();
     emit error(QXmppClient::KeepAliveError);
+}
+
+bool QXmppOutgoingClient::setResumeAddress(const QString &address)
+{
+    if (const auto location = parseHostAddress(address);
+        !location.first.isEmpty()) {
+        d->resumeHost = location.first;
+
+        if (location.second > 0) {
+            d->resumePort = location.second;
+        } else {
+            d->resumePort = 5222;
+        }
+        return true;
+    }
+
+    d->resumeHost.clear();
+    d->resumePort = 0;
+    return false;
+}
+
+std::pair<QString, int> QXmppOutgoingClient::parseHostAddress(const QString &address)
+{
+    QUrl url("//" + address);
+    if (url.isValid() && !url.host().isEmpty()) {
+        return { url.host(), url.port() };
+    }
+    return { {}, -1 };
 }
 
 void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)

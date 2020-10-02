@@ -37,7 +37,6 @@ class QByteArray;
 class QDateTime;
 class QDomElement;
 class QString;
-class QStringList;
 
 /// \brief The QXmppUtils class contains static utility functions.
 ///

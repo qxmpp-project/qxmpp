@@ -32,6 +32,7 @@
 #include <QNetworkInterface>
 #include <QTimer>
 #include <QUdpSocket>
+#include <QVariant>
 
 #define STUN_ID_SIZE 12
 #define STUN_RTO_INTERVAL 500

@@ -29,7 +29,6 @@
 #include <QVariant>
 
 class QDomElement;
-class QStringList;
 
 class QXmppServer;
 class QXmppServerExtensionPrivate;

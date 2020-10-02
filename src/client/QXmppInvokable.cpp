@@ -80,7 +80,11 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
                                   genericArgs.value(7, QGenericArgument()),
                                   genericArgs.value(8, QGenericArgument()),
                                   genericArgs.value(9, QGenericArgument()))) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QVariant returnValue(QMetaType(resultType), result);
+#else
         QVariant returnValue(resultType, result);
+#endif
         QMetaType::destroy(resultType, result);
         return returnValue;
     } else {

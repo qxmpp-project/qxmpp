@@ -104,6 +104,9 @@ private Q_SLOTS:
     void pingTimeout();
 
 private:
+    bool setResumeAddress(const QString &address);
+    static std::pair<QString, int> parseHostAddress(const QString &address);
+
     friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate *const d;
 };
