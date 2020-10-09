@@ -871,7 +871,7 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
     QMap<QByteArray, QByteArray> map;
     int startIndex = 0;
     int pos = 0;
-    while ((pos = ba.indexOf(QStringLiteral("="), startIndex)) >= 0) {
+    while ((pos = ba.indexOf('=', startIndex)) >= 0) {
         // key get name and skip equals
         const QByteArray key = ba.mid(startIndex, pos - startIndex).trimmed();
         pos++;
@@ -927,8 +927,8 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
         if (quote) {
             value.replace(QByteArrayLiteral("\\"), QByteArrayLiteral("\\\\"));
             value.replace(QByteArrayLiteral("\""), QByteArrayLiteral("\\\""));
-            ba.append(QStringLiteral("\"") + value + QStringLiteral("\""));
-        } else
+            ba.append(QByteArrayLiteral("\"") + value + QByteArrayLiteral("\""));
+         } else
             ba.append(value);
     }
     return ba;
