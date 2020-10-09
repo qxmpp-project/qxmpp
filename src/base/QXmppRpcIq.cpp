@@ -70,7 +70,7 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
     }
     case QVariant::Map: {
         writer->writeStartElement(QStringLiteral("struct"));
-        QMap<QString, QVariant> map = value.toMap();
+        const QMap<QString, QVariant> map = value.toMap();
         QMap<QString, QVariant>::ConstIterator index = map.begin();
         while (index != map.end()) {
             writer->writeStartElement(QStringLiteral("member"));

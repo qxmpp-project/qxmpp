@@ -196,7 +196,7 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
         } else if (childElement.tagName() == QStringLiteral("url")) {
             QXmppBookmarkUrl url;
             url.setName(childElement.attribute(QStringLiteral("name")));
-            url.setUrl(childElement.attribute(QStringLiteral("url")));
+            url.setUrl(QUrl(childElement.attribute(QStringLiteral("url"))));
             m_urls << url;
         }
         childElement = childElement.nextSiblingElement();
