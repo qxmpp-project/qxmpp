@@ -828,7 +828,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
                    type == QXmppDataForm::Field::TextMultiField) {
             for (const QString &value : field.value().toStringList())
                 helperToXmlAddTextElement(writer, "value", value);
-        } else if (!field.value().isNull()) {
+        } else if (!field.value().toString().isNull()) {
             helperToXmlAddTextElement(writer, "value", field.value().toString());
         }
 
