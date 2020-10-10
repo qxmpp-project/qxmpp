@@ -108,6 +108,8 @@ private:
     static std::pair<QString, int> parseHostAddress(const QString &address);
 
     friend class QXmppOutgoingClientPrivate;
+    friend class tst_QXmppOutgoingClient;
+
     QXmppOutgoingClientPrivate *const d;
 };
 
