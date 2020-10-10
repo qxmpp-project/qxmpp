@@ -25,6 +25,23 @@
 
 #include "util.h"
 
+template<class T>
+static void parsePacketWithStream(T &packet, const QByteArray &xml)
+{
+    QDomDocument doc;
+    const auto wrappedXml =
+        QByteArrayLiteral("<stream:stream xmlns:stream='http://etherx.jabber.org/streams'>") +
+        xml + QByteArrayLiteral("</stream:stream>");
+
+    QString err;
+    bool parsingSuccess = doc.setContent(wrappedXml, true, &err);
+    if (!err.isNull())
+        qDebug() << err;
+    QVERIFY(parsingSuccess);
+
+    packet.parse(doc.documentElement().firstChildElement());
+}
+
 class tst_QXmppStreamFeatures : public QObject
 {
     Q_OBJECT
@@ -41,7 +58,7 @@ void tst_QXmppStreamFeatures::testEmpty()
     const QByteArray xml("<stream:features/>");
 
     QXmppStreamFeatures features;
-    parsePacket(features, xml);
+    parsePacketWithStream(features, xml);
     QCOMPARE(features.bindMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.sessionMode(), QXmppStreamFeatures::Disabled);
     QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Disabled);
@@ -65,7 +82,7 @@ void tst_QXmppStreamFeatures::testRequired()
         "</stream:features>");
 
     QXmppStreamFeatures features;
-    parsePacket(features, xml);
+    parsePacketWithStream(features, xml);
     QCOMPARE(features.tlsMode(), QXmppStreamFeatures::Required);
     serializePacket(features, xml);
 }
@@ -86,7 +103,7 @@ void tst_QXmppStreamFeatures::testFull()
                          "</stream:features>");
 
     QXmppStreamFeatures features;
-    parsePacket(features, xml);
+    parsePacketWithStream(features, xml);
     QCOMPARE(features.bindMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.sessionMode(), QXmppStreamFeatures::Enabled);
     QCOMPARE(features.nonSaslAuthMode(), QXmppStreamFeatures::Enabled);
