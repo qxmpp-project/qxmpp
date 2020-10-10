@@ -35,7 +35,11 @@ option(BUILD_EXAMPLES "Build examples." ON)
 
 option(WITH_GSTREAMER "Build with GStreamer support for Jingle" OFF)
 
-add_definitions(-DQURL_NO_CAST_FROM_STRING -DQT_NO_CAST_TO_ASCII)
+add_definitions(
+    -DQURL_NO_CAST_FROM_STRING
+    -DQT_NO_CAST_TO_ASCII
+    -DQT_NO_FOREACH
+)
 
 add_subdirectory(src)
 

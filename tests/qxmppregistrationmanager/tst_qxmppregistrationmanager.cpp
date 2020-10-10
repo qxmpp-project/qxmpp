@@ -510,7 +510,7 @@ void tst_QXmppRegistrationManager::sendStreamFeaturesToManager(bool registration
         // hacky hack to include stream namespace
         QByteArray manipulatedXml = buffer.data();
         manipulatedXml.replace("stream:", QByteArray());
-        manipulatedXml.insert(9, QStringLiteral(" xmlns=\"%1\"").arg("http://etherx.jabber.org/streams"));
+        manipulatedXml.insert(9, QByteArrayLiteral(" xmlns=\"http://etherx.jabber.org/streams\""));
 
         QDomDocument doc;
         doc.setContent(manipulatedXml, true);
@@ -522,7 +522,7 @@ void tst_QXmppRegistrationManager::sendStreamFeaturesToManager(bool registration
 
 void tst_QXmppRegistrationManager::setManagerConfig(const QString &username, const QString &server, const QString &password)
 {
-    client.connectToServer(username + QStringLiteral("@") + server, password);
+    client.connectToServer(username + u'@' + server, password);
     client.disconnectFromServer();
 }
 

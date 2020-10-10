@@ -104,7 +104,7 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
         logEnd("no items");
     } else {
         logEnd(QString("items %1 to %2 of %3").arg(QString::number(rsmReply.index()), QString::number(rsmReply.index() + chats.size() - 1), QString::number(rsmReply.count())));
-        foreach (const QXmppArchiveChat &chat, chats) {
+        for (const auto &chat : chats) {
             qDebug("chat start %s", qPrintable(chat.start().toString()));
             // NOTE: to actually retrieve conversations, uncomment this
             //archiveManager->retrieveCollection(chat.with(), chat.start());
@@ -127,8 +127,11 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
 
 void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply)
 {
-    logEnd(QString("chat received, RSM count %1").arg(QString::number(rsmReply.count())));
-    foreach (const QXmppArchiveMessage &msg, chat.messages()) {
+    logEnd(QString("chat received, RSM count %1")
+               .arg(QString::number(rsmReply.count())));
+
+    const auto messages = chat.messages();
+    for (const auto &msg : messages) {
         qDebug("example_7_archiveHandling : %s", qPrintable(msg.body()));
     }
 }
