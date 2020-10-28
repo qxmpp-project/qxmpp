@@ -35,6 +35,7 @@
 
 class QXmppRosterManagerPrivate;
 
+///
 /// \brief The QXmppRosterManager class provides access to a connected client's
 /// roster.
 ///
@@ -63,7 +64,7 @@ class QXmppRosterManagerPrivate;
 /// roster item changes.
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
 {
     Q_OBJECT
@@ -87,13 +88,13 @@ public:
     /// \endcond
 
 public Q_SLOTS:
-    bool acceptSubscription(const QString &bareJid, const QString &reason = QString());
-    bool refuseSubscription(const QString &bareJid, const QString &reason = QString());
-    bool addItem(const QString &bareJid, const QString &name = QString(), const QSet<QString> &groups = QSet<QString>());
+    bool acceptSubscription(const QString &bareJid, const QString &reason = {});
+    bool refuseSubscription(const QString &bareJid, const QString &reason = {});
+    bool addItem(const QString &bareJid, const QString &name = {}, const QSet<QString> &groups = {});
     bool removeItem(const QString &bareJid);
     bool renameItem(const QString &bareJid, const QString &name);
-    bool subscribe(const QString &bareJid, const QString &reason = QString());
-    bool unsubscribe(const QString &bareJid, const QString &reason = QString());
+    bool subscribe(const QString &bareJid, const QString &reason = {});
+    bool unsubscribe(const QString &bareJid, const QString &reason = {});
 
 Q_SIGNALS:
     /// This signal is emitted when the Roster IQ is received after a successful
