@@ -101,6 +101,10 @@ Q_SIGNALS:
     /// connection. That is the roster entries are empty before this signal is emitted.
     /// One should use getRosterBareJids() and getRosterEntry() only after
     /// this signal has been emitted.
+    ///
+    /// \note If the previous stream could be resumed, this signal is not
+    /// emitted since QXmpp 1.4. Changes since the last connection are reported
+    /// via the itemAdded(), itemChanged() and itemRemoved() signals.
     void rosterReceived();
 
     /// This signal is emitted when the presence of a particular bareJid and resource changes.
