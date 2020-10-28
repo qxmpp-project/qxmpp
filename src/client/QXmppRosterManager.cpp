@@ -36,6 +36,8 @@ class QXmppRosterManagerPrivate
 public:
     QXmppRosterManagerPrivate();
 
+    void clear();
+
     // map of bareJid and its rosterEntry
     QMap<QString, QXmppRosterIq::Item> entries;
 
@@ -52,6 +54,14 @@ public:
 QXmppRosterManagerPrivate::QXmppRosterManagerPrivate()
     : isRosterReceived(false)
 {
+}
+
+void QXmppRosterManagerPrivate::clear()
+{
+    entries.clear();
+    presences.clear();
+    rosterReqId.clear();
+    isRosterReceived = false;
 }
 
 ///
@@ -102,19 +112,27 @@ bool QXmppRosterManager::acceptSubscription(const QString &bareJid, const QStrin
 ///
 void QXmppRosterManager::_q_connected()
 {
-    QXmppRosterIq roster;
-    roster.setType(QXmppIq::Get);
-    roster.setFrom(client()->configuration().jid());
-    d->rosterReqId = roster.id();
-    if (client()->isAuthenticated())
-        client()->sendPacket(roster);
+    // clear cache if stream has not been resumed
+    if (client()->streamManagementState() != QXmppClient::ResumedStream) {
+        d->clear();
+    }
+
+    if (!d->isRosterReceived) {
+        QXmppRosterIq roster;
+        roster.setType(QXmppIq::Get);
+        roster.setFrom(client()->configuration().jid());
+        d->rosterReqId = roster.id();
+        if (client()->isAuthenticated())
+            client()->sendPacket(roster);
+    }
 }
 
 void QXmppRosterManager::_q_disconnected()
 {
-    d->entries.clear();
-    d->presences.clear();
-    d->isRosterReceived = false;
+    // clear cache if stream cannot be resumed
+    if (client()->streamManagementState() == QXmppClient::NoStreamManagement) {
+        d->clear();
+    }
 }
 
 /// \cond
@@ -133,6 +151,9 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
     rosterIq.parse(element);
 
     bool isInitial = (d->rosterReqId == rosterIq.id());
+    if (isInitial)
+        d->rosterReqId.clear();
+
     switch (rosterIq.type()) {
     case QXmppIq::Set: {
         // send result iq
@@ -406,6 +427,9 @@ QXmppPresence QXmppRosterManager::getPresence(const QString &bareJid,
 
 ///
 /// Function to check whether the roster has been received or not.
+///
+/// On disconnecting this is reset to false if no stream management is used by
+/// the client and so the stream cannot be resumed later.
 ///
 /// \return true if roster received else false
 ///
