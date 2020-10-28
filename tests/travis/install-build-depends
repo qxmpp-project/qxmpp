@@ -3,6 +3,8 @@ set -e
 
 if [ "$(uname -s)" = "Darwin" ]; then
     brew update
+    brew unlink python@3.8
+    brew install python@3.9
 
     case "$CONFIG" in
     full*)
