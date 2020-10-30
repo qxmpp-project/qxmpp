@@ -190,14 +190,18 @@ void tst_QXmppSasl::testSuccess()
 
 void tst_QXmppSasl::testClientAvailableMechanisms()
 {
-    QCOMPARE(QXmppSaslClient::availableMechanisms(), QStringList() << "SCRAM-SHA-256"
-                                                                   << "SCRAM-SHA-1"
-                                                                   << "DIGEST-MD5"
-                                                                   << "PLAIN"
-                                                                   << "ANONYMOUS"
-                                                                   << "X-FACEBOOK-PLATFORM"
-                                                                   << "X-MESSENGER-OAUTH2"
-                                                                   << "X-OAUTH2");
+    const QStringList expectedMechanisms = {
+        "SCRAM-SHA-256",
+        "SCRAM-SHA-1",
+        "DIGEST-MD5",
+        "PLAIN",
+        "ANONYMOUS",
+        "X-FACEBOOK-PLATFORM",
+        "X-MESSENGER-OAUTH2",
+        "X-OAUTH2"
+    };
+
+    QCOMPARE(QXmppSaslClient::availableMechanisms(), expectedMechanisms);
 }
 
 void tst_QXmppSasl::testClientBadMechanism()

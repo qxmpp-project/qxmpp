@@ -38,6 +38,29 @@ const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
 static QByteArray forcedNonce;
 
+// When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
+static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
+    { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },
+    { QStringLiteral("SCRAM-SHA-256"), QCryptographicHash::Sha256 },
+};
+
+// Returns the hash length in bytes (QCH::hashLength() only exists since 5.12).
+int hashLength(QCryptographicHash::Algorithm algorithm)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    return QCryptographicHash::hashLength(algorithm);
+#else
+    switch (algorithm) {
+    case QCryptographicHash::Sha1:
+        return 160 / 8;
+    case QCryptographicHash::Sha256:
+        return 256 / 8;
+    default:
+        return QCryptographicHash::hash({}, algorithm).size();
+    }
+#endif
+}
+
 // Calculate digest response for use with XMPP/SASL.
 
 static QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri, const QByteArray &secret, const QByteArray &nonce, const QByteArray &cnonce, const QByteArray &nc)
@@ -267,22 +290,26 @@ QXmppSaslClient::~QXmppSaslClient()
     delete d;
 }
 
+///
 /// Returns a list of supported mechanisms.
-
+///
 QStringList QXmppSaslClient::availableMechanisms()
 {
-    return QStringList() << QStringLiteral("SCRAM-SHA-256")
-                         << QStringLiteral("SCRAM-SHA-1")
-                         << QStringLiteral("DIGEST-MD5")
-                         << QStringLiteral("PLAIN")
-                         << QStringLiteral("ANONYMOUS")
-                         << QStringLiteral("X-FACEBOOK-PLATFORM")
-                         << QStringLiteral("X-MESSENGER-OAUTH2")
-                         << QStringLiteral("X-OAUTH2");
+    return {
+        QStringLiteral("SCRAM-SHA-256"),
+        QStringLiteral("SCRAM-SHA-1"),
+        QStringLiteral("DIGEST-MD5"),
+        QStringLiteral("PLAIN"),
+        QStringLiteral("ANONYMOUS"),
+        QStringLiteral("X-FACEBOOK-PLATFORM"),
+        QStringLiteral("X-MESSENGER-OAUTH2"),
+        QStringLiteral("X-OAUTH2"),
+    };
 }
 
+///
 /// Creates an SASL client for the given mechanism.
-
+///
 QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == QStringLiteral("PLAIN")) {
@@ -291,10 +318,8 @@ QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *pare
         return new QXmppSaslClientDigestMd5(parent);
     } else if (mechanism == QStringLiteral("ANONYMOUS")) {
         return new QXmppSaslClientAnonymous(parent);
-    } else if (mechanism == QStringLiteral("SCRAM-SHA-1")) {
-        return new QXmppSaslClientScram(QCryptographicHash::Sha1, parent);
-    } else if (mechanism == QStringLiteral("SCRAM-SHA-256")) {
-        return new QXmppSaslClientScram(QCryptographicHash::Sha256, parent);
+    } else if (SCRAM_ALGORITHMS.contains(mechanism)) {
+        return new QXmppSaslClientScram(SCRAM_ALGORITHMS.value(mechanism), parent);
     } else if (mechanism == QStringLiteral("X-FACEBOOK-PLATFORM")) {
         return new QXmppSaslClientFacebook(parent);
     } else if (mechanism == QStringLiteral("X-MESSENGER-OAUTH2")) {
@@ -554,23 +579,20 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
 }
 
 QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent)
-    : QXmppSaslClient(parent), m_algorithm(algorithm), m_step(0)
+    : QXmppSaslClient(parent),
+      m_algorithm(algorithm),
+      m_step(0),
+      m_dklen(hashLength(algorithm))
 {
-    Q_ASSERT(m_algorithm == QCryptographicHash::Sha1 || m_algorithm == QCryptographicHash::Sha256);
-    m_nonce = generateNonce();
+    const auto itr = std::find(SCRAM_ALGORITHMS.cbegin(), SCRAM_ALGORITHMS.cend(), algorithm);
+    Q_ASSERT(itr != SCRAM_ALGORITHMS.cend());
 
-    if (m_algorithm == QCryptographicHash::Sha256) {
-        m_dklen = 32;
-        m_mechanism = QStringLiteral("SCRAM-SHA-256");
-    } else {
-        m_dklen = 20;
-        m_mechanism = QStringLiteral("SCRAM-SHA-1");
-    }
+    m_nonce = generateNonce();
 }
 
 QString QXmppSaslClientScram::mechanism() const
 {
-    return m_mechanism;
+    return SCRAM_ALGORITHMS.key(m_algorithm);
 }
 
 bool QXmppSaslClientScram::respond(const QByteArray &challenge, QByteArray &response)
