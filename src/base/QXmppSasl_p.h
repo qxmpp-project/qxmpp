@@ -274,7 +274,6 @@ private:
     QCryptographicHash::Algorithm m_algorithm;
     int m_step;
     int m_dklen;
-    QString m_mechanism;
     QByteArray m_gs2Header;
     QByteArray m_clientFirstMessageBare;
     QByteArray m_serverSignature;
