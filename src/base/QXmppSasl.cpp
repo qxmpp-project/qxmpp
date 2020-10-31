@@ -42,6 +42,7 @@ static QByteArray forcedNonce;
 static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
     { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },
     { QStringLiteral("SCRAM-SHA-256"), QCryptographicHash::Sha256 },
+    { QStringLiteral("SCRAM-SHA-512"), QCryptographicHash::Sha512 },
 };
 
 // Returns the hash length in bytes (QCH::hashLength() only exists since 5.12).
@@ -55,6 +56,8 @@ int hashLength(QCryptographicHash::Algorithm algorithm)
         return 160 / 8;
     case QCryptographicHash::Sha256:
         return 256 / 8;
+    case QCryptographicHash::Sha512:
+        return 512 / 8;
     default:
         return QCryptographicHash::hash({}, algorithm).size();
     }
@@ -296,6 +299,7 @@ QXmppSaslClient::~QXmppSaslClient()
 QStringList QXmppSaslClient::availableMechanisms()
 {
     return {
+        QStringLiteral("SCRAM-SHA-512"),
         QStringLiteral("SCRAM-SHA-256"),
         QStringLiteral("SCRAM-SHA-1"),
         QStringLiteral("DIGEST-MD5"),

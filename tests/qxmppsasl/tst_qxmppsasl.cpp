@@ -191,6 +191,7 @@ void tst_QXmppSasl::testSuccess()
 void tst_QXmppSasl::testClientAvailableMechanisms()
 {
     const QStringList expectedMechanisms = {
+        "SCRAM-SHA-512",
         "SCRAM-SHA-256",
         "SCRAM-SHA-1",
         "DIGEST-MD5",
