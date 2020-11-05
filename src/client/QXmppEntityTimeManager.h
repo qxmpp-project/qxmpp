@@ -26,28 +26,37 @@
 
 #include "QXmppClientExtension.h"
 
+#include <variant>
+
+template<class T>
+class QFuture;
 class QXmppEntityTimeIq;
 
+///
 /// \brief The QXmppEntityTimeManager class provided the functionality to get
 /// the local time of an entity as defined by \xep{0202}: Entity Time.
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppEntityTimeManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QString requestTime(const QString& jid);
+    QString requestTime(const QString &jid);
+
+    using EntityTimeResult = std::variant<QXmppEntityTimeIq, QXmppStanza::Error>;
+    QFuture<EntityTimeResult> requestEntityTime(const QString &jid);
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement& element) override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 Q_SIGNALS:
-    /// \brief This signal is emitted when a time response is received.
-    void timeReceived(const QXmppEntityTimeIq&);
+    /// \brief This signal is emitted when a time response is received. It's not
+    /// emitted when the QFuture-based request is used.
+    void timeReceived(const QXmppEntityTimeIq &);
 };
 
 #endif  // QXMPPENTITYTIMEMANAGER_H
