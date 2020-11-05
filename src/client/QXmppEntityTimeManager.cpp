@@ -26,16 +26,29 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppEntityTimeIq.h"
+#include "QXmppGlobal_p.h"
 #include "QXmppUtils.h"
 
 #include <QDateTime>
 #include <QDomElement>
 
+///
+/// \typedef QXmppEntityTimeManager::EntityTimeResult
+///
+/// Contains the requested entity time or the returned error in case of a
+/// failure.
+///
+/// \since QXmpp 1.5
+///
+
+///
 /// Request the time from an XMPP entity.
 ///
+/// The result is emitted on the timeReceived() signal.
+///
 /// \param jid
-
-QString QXmppEntityTimeManager::requestTime(const QString& jid)
+///
+QString QXmppEntityTimeManager::requestTime(const QString &jid)
 {
     QXmppEntityTimeIq request;
     request.setType(QXmppIq::Get);
@@ -46,13 +59,33 @@ QString QXmppEntityTimeManager::requestTime(const QString& jid)
         return QString();
 }
 
+///
+/// Requests the time from an XMPP entity and reports it via a QFuture.
+///
+/// The timeReceived() signal is not emitted.
+///
+/// \param jid
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+auto QXmppEntityTimeManager::requestEntityTime(const QString &jid) -> QFuture<EntityTimeResult>
+{
+    QXmppEntityTimeIq iq;
+    iq.setType(QXmppIq::Get);
+    iq.setTo(jid);
+
+    return chainIq<EntityTimeResult, QXmppEntityTimeIq>(client()->sendIq(iq), this);
+}
+
 /// \cond
 QStringList QXmppEntityTimeManager::discoveryFeatures() const
 {
     return QStringList() << ns_entity_time;
 }
 
-bool QXmppEntityTimeManager::handleStanza(const QDomElement& element)
+bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element)) {
         QXmppEntityTimeIq entityTime;
