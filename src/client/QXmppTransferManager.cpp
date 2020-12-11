@@ -1342,7 +1342,9 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->state() != QXmppTransferJob::OfferState)
         return;
 
-    const auto &fields = iq.featureForm().fields();
+    const auto &form = iq.featureForm();
+    const auto &fields = form.fields();
+
     for (const auto &field : fields) {
         if (field.key() == "stream-method") {
             if ((field.value().toString() == ns_ibb) &&
@@ -1423,7 +1425,9 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     job->d->sid = iq.siId();
     job->d->mimeType = iq.mimeType();
     job->d->fileInfo = iq.fileInfo();
-    const auto &fields = iq.featureForm().fields();
+    
+    const auto &form = iq.featureForm();
+    const auto &fields = form.fields();
     for (const auto &field : fields) {
         if (field.key() == "stream-method") {
             QPair<QString, QString> option;
