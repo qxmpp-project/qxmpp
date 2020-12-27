@@ -297,8 +297,8 @@ void QXmppStream::processData(const QString &data)
     //
     // Success: We can clear the buffer and send a 'received' log message
     //
-    d->dataBuffer.clear();
     logReceived(d->dataBuffer);
+    d->dataBuffer.clear();
 
     // process stream start
     if (hasStreamOpen) {
