@@ -144,11 +144,14 @@ void QXmppOutgoingServer::handleStart()
     QXmppStream::handleStart();
 
     QString data = QString("<?xml version='1.0'?><stream:stream"
-                           " xmlns='%1' xmlns:db='%2' xmlns:stream='%3' version='1.0'>")
+                           " xmlns='%1' xmlns:db='%2' xmlns:stream='%3' version='1.0'"
+                           " from='%4' to='%5'>")
                        .arg(
                            ns_server,
                            ns_server_dialback,
-                           ns_stream);
+                           ns_stream,
+                           d->localDomain,
+                           d->remoteDomain);
     sendData(data.toUtf8());
 }
 
