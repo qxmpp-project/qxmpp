@@ -1,3 +1,12 @@
+QXmpp 1.3.2 (Jan 09, 2021)
+--------------------------
+
+This release only contains some little bug-fixes.
+
+Fixes:
+ - TransferManager: Fix undefined behaviour when parsing features (#322, @lichtzeichner)
+ - OutgoingServer: Add missing 'to' and 'from' stream attributes (#324, @Kaffeine)
+
 QXmpp 1.3.1 (Jul 20, 2020)
 --------------------------
 
