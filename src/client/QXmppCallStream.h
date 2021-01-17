@@ -26,11 +26,12 @@
 
 #include <QXmppGlobal.h>
 
-#include <gst/gst.h>
-
 #include <functional>
 
 #include <QObject>
+
+typedef struct _GstPad GstPad;
+typedef struct _GstElement GstElement;
 
 class QXmppCallStreamPrivate;
 class QXmppIceConnection;
