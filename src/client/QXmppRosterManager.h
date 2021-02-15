@@ -39,7 +39,7 @@ class QXmppRosterManagerPrivate;
 /// \brief The QXmppRosterManager class provides access to a connected client's
 /// roster.
 ///
-/// \note It's object should not be created using it's constructor. Instead
+/// \note Its object should not be created using its constructor. Instead
 /// \c QXmppClient::findExtension<QXmppRosterManager>() should be used to get
 /// the instantiated object of this class.
 ///
