@@ -289,7 +289,6 @@ QXmppRosterIq::Item::subscriptionType() const
     return d->type;
 }
 
-
 ///
 /// Sets the subscription type of the roster entry.
 ///

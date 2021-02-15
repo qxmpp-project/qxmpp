@@ -172,5 +172,7 @@ const char* ns_omemo = "eu.siacs.conversations.axolotl";
 const char* ns_mix_pam = "urn:xmpp:mix:pam:1";
 const char* ns_mix_roster = "urn:xmpp:mix:roster:0";
 const char* ns_mix_presence = "urn:xmpp:presence:0";
+// XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
+const char* ns_mix_misc = "urn:xmpp:mix:misc:0";
 // XEP-0428: Fallback Indication
 const char* ns_fallback_indication = "urn:xmpp:fallback:0";
