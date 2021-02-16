@@ -76,6 +76,7 @@ public:
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
     QXmppRosterIq::Item getRosterEntry(const QString &bareJid) const;
+    QXmppRosterIq::Item mixChannelRosterEntry(const QString &mixParticipantId) const;
 
     QStringList getResources(const QString &bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(

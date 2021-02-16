@@ -378,6 +378,25 @@ QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
 }
 
 ///
+/// Returns a roster entry for a MIX channel by the ID the user has in that channel.
+///
+/// \param mixParticipantId ID of the user in the MIX channel
+///
+/// \return a roster entry if one exists for the given MIX participant ID, otherwise an empty entry
+///
+QXmppRosterIq::Item QXmppRosterManager::mixChannelRosterEntry(const QString &mixParticipantId) const
+{
+    if (!mixParticipantId.isEmpty()) {
+        for (const QXmppRosterIq::Item &entry : qAsConst(d->entries)) {
+            if (entry.mixParticipantId() == mixParticipantId)
+                return entry;
+        }
+    }
+
+    return {};
+}
+
+///
 /// Get all the associated resources with the given bareJid.
 ///
 /// \param bareJid as a QString
