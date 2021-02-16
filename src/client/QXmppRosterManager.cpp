@@ -121,6 +121,10 @@ void QXmppRosterManager::_q_connected()
         QXmppRosterIq roster;
         roster.setType(QXmppIq::Get);
         roster.setFrom(client()->configuration().jid());
+
+        // TODO: Request MIX annotations only when the server supports MIX-PAM.
+        roster.setMixAnnotate(true);
+
         d->rosterReqId = roster.id();
         if (client()->isAuthenticated())
             client()->sendPacket(roster);
