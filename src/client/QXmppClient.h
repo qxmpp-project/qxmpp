@@ -73,13 +73,13 @@ class QXmppVersionManager;
 /// QXmppVersionManager (software version information).
 ///
 /// By default, the client will automatically try reconnecting to the server.
-/// You can change this a behaviour using
+/// You can change that behaviour using
 /// QXmppConfiguration::setAutoReconnectionEnabled().
 ///
 /// Not all the managers or extensions have been enabled by default. One can
 /// enable/disable the managers using the functions \c addExtension() and
-/// \c removeExtension(). \c findExtension() can be used to find reference/
-/// pointer to particular instansiated and enabled manager.
+/// \c removeExtension(). \c findExtension() can be used to find a
+/// reference/pointer to a particular instantiated and enabled manager.
 ///
 /// List of managers enabled by default:
 /// - QXmppRosterManager

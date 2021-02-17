@@ -33,7 +33,7 @@ class QXmppVCardManagerPrivate;
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
 /// implementation of \xep{0054}: vcard-temp.
 ///
-/// \note It's object should not be created using it's constructor. Instead
+/// \note Its object should not be created using its constructor. Instead
 /// \c QXmppClient::findExtension<QXmppVCardManager>() should be used to get
 /// the instantiated object of this class.
 ///
