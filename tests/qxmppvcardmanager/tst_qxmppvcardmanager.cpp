@@ -22,11 +22,15 @@
  *
  */
 
-#include <QObject>
 #include "QXmppClient.h"
 #include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
+
+#include <memory>
+
+#include "IntegrationTesting.h"
 #include "util.h"
+#include <QObject>
 
 Q_DECLARE_METATYPE(QXmppVCardIq);
 
@@ -34,11 +38,13 @@ class tst_QXmppVCardManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testHandleStanza_data();
-    void testHandleStanza();
-
 private:
+    Q_SLOT void testHandleStanza_data();
+    Q_SLOT void testHandleStanza();
+
+    // integration tests
+    Q_SLOT void testSetClientVCard();
+
     QXmppClient m_client;
 };
 
@@ -102,6 +108,65 @@ void tst_QXmppVCardManager::testHandleStanza()
 
     // clean up (client deletes manager)
     m_client.removeExtension(manager);
+}
+
+void tst_QXmppVCardManager::testSetClientVCard()
+{
+    SKIP_IF_INTEGRATION_TESTS_DISABLED();
+
+    auto client = std::make_unique<QXmppClient>();
+    auto *vCardManager = client->findExtension<QXmppVCardManager>();
+    auto config = IntegrationTests::clientConfiguration();
+
+    QSignalSpy connectSpy(client.get(), &QXmppClient::connected);
+    QSignalSpy disconnectSpy(client.get(), &QXmppClient::disconnected);
+    QSignalSpy vCardSpy(vCardManager, &QXmppVCardManager::clientVCardReceived);
+
+    // connect to server
+    client->connectToServer(config);
+    QVERIFY2(connectSpy.wait(), "Could not connect to server!");
+
+    // request own vcard
+    vCardManager->requestClientVCard();
+    QVERIFY(vCardSpy.wait());
+
+    // check our vcard has the correct address
+    QCOMPARE(vCardManager->clientVCard().from(), client->configuration().jidBare());
+
+    // set a new vcard
+    QXmppVCardIq newVCard;
+    newVCard.setFirstName(QStringLiteral("Bob"));
+    newVCard.setBirthday(QDate(1, 2, 2000));
+    newVCard.setEmail(QStringLiteral("bob@qxmpp.org"));
+    vCardManager->setClientVCard(newVCard);
+
+    // there's currently no signal to see whether the change was successful...
+
+    QCoreApplication::processEvents();
+
+    // reconnect
+    client->disconnectFromServer();
+    QVERIFY(disconnectSpy.wait());
+
+    client->connectToServer(config);
+    QVERIFY2(connectSpy.wait(), "Could not connect to server!");
+
+    // request own vcard
+    vCardManager->requestClientVCard();
+    QVERIFY(vCardSpy.wait());
+
+    // check our vcard has been changed successfully
+    QCOMPARE(vCardManager->clientVCard().from(), client->configuration().jidBare());
+    QCOMPARE(vCardManager->clientVCard().firstName(), QStringLiteral("Bob"));
+    QCOMPARE(vCardManager->clientVCard().birthday(), QDate(01, 02, 2000));
+    QCOMPARE(vCardManager->clientVCard().email(), QStringLiteral("bob@qxmpp.org"));
+
+    // reset the vcard for future tests
+    vCardManager->setClientVCard(QXmppVCardIq());
+
+    // disconnect
+    client->disconnectFromServer();
+    QVERIFY(disconnectSpy.wait());
 }
 
 QTEST_MAIN(tst_QXmppVCardManager)
