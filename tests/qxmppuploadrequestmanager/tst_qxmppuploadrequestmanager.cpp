@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2020 The QXmpp developers
+ * Copyright (C) 2008-2021 The QXmpp developers
  *
  * Author:
  *  Yury Gubich <blue@macaw.me>
