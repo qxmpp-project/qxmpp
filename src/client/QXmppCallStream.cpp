@@ -27,6 +27,10 @@
 #include "QXmppCall_p.h"
 #include "QXmppStun.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QRandomGenerator>
+#endif
+
 #include <cstring>
 
 #include <gst/gst.h>
@@ -49,7 +53,11 @@ QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstEleme
       name(name_),
       id(id_)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    localSsrc = QRandomGenerator::global()->generate();
+#else
     localSsrc = qrand();
+#endif
 
     iceReceiveBin = gst_bin_new(QStringLiteral("receive_%1").arg(id).toLatin1().data());
     iceSendBin = gst_bin_new(QStringLiteral("send_%1").arg(id).toLatin1().data());
