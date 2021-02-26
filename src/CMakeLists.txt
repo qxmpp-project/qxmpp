@@ -230,9 +230,9 @@ target_include_directories(qxmpp
 
 target_link_libraries(qxmpp
     PUBLIC
-    ${QT_TARGET}::Core
-    ${QT_TARGET}::Network
-    ${QT_TARGET}::Xml
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Xml
 )
 
 if(WITH_GSTREAMER)

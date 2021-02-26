@@ -10,18 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
-# prefer Qt6
-find_package(Qt6 QUIET COMPONENTS Core Network Xml)
-if(NOT Qt6_FOUND)
-    find_package(Qt5 5.7.0 REQUIRED COMPONENTS Core Network Xml)
-endif()
-
-# target names have changed from Qt5::Core -> Qt::Core
-if(Qt6_FOUND)
-    set(QT_TARGET Qt)
-else()
-    set(QT_TARGET Qt5)
-endif()
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Xml)
+find_package(Qt${QT_VERSION_MAJOR} 5.7.0 REQUIRED COMPONENTS Core Network Xml)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
