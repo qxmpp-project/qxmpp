@@ -63,6 +63,7 @@ const char* ns_pubsub = "http://jabber.org/protocol/pubsub";
 const char* ns_pubsub_errors = "http://jabber.org/protocol/pubsub#errors";
 const char* ns_pubsub_event = "http://jabber.org/protocol/pubsub#event";
 const char* ns_pubsub_owner = "http://jabber.org/protocol/pubsub#owner";
+const char* ns_pubsub_rsm = "http://jabber.org/protocol/pubsub#rsm";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data

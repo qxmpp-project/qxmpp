@@ -2,7 +2,7 @@
  * Copyright (C) 2008-2020 The QXmpp developers
  *
  * Author:
- *  Germán Márquez Mejía
+ *  Linus Jahn
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -24,102 +24,323 @@
 #ifndef QXMPPPUBSUBMANAGER_H
 #define QXMPPPUBSUBMANAGER_H
 
+#include "QXmppClient.h"
 #include "QXmppClientExtension.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppMessage.h"
 #include "QXmppPubSubIq.h"
+#include "QXmppResultSet.h"
 
-class QXmppPubSubManagerPrivate;
+#include <QFuture>
+#include <QFutureWatcher>
 
-///
-/// \brief The QXmppPubSubManager aims to provide publish-subscribe
-/// functionality as specified in \xep{0060}: Publish-Subscribe (PubSub).
-///
-/// However, it currently only supports a few PubSub use cases but all of the
-/// \xep{0060}: Personal Eventing Protocol (PEP) ones. PEP allows
-/// a standard XMPP user account to function as a virtual PubSub service.
-///
-/// To make use of this manager, you need to instantiate it and load it into
-/// the QXmppClient instance as follows:
-///
-/// \code
-/// QXmppPubSubManager *manager = new QXmppPubSubManager;
-/// client->addExtension(manager);
-/// \endcode
-///
-/// \note To subscribe to PEP event notifications use the \ref QXmppClientExtension#discoveryFeatures
-/// method of your client extension according to section 9.2 of XEP-0060. For example:
-/// \code
-/// QStringList YourExtension::discoveryFeatures() const
-/// {
-///    return QStringList() << "http://jabber.org/protocol/tune+notify";
-/// }
-/// \endcode
-///
-/// \ingroup Managers
-///
-/// \since QXmpp 1.4
-///
+class QXmppPubSubPublishOptions;
+class QXmppPubSubSubscribeOptions;
+
+class QXMPP_EXPORT QXmppPubSubEventManager : public QXmppClientExtension
+{
+    Q_OBJECT
+
+public:
+    virtual bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) = 0;
+};
+
 class QXMPP_EXPORT QXmppPubSubManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    // PEP-specific (the PubSub service is the current account)
-    QString createPepNode(const QString &nodeName);
-    QString deletePepNode(const QString &nodeName);
-    QString publishPepItem(const QString &nodeName, const QXmppPubSubItem &item);
-    QString publishPepItem(const QString &nodeName, const QXmppPubSubItem &item, const QXmppDataForm &publishOptions);
-    QString publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items);
-    QString publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items, const QXmppDataForm &publishOptions);
-    QString retractPepItem(const QString &nodeName, const QString &itemId);
+    template<typename T>
+    struct Items
+    {
+        QList<T> items;
+        std::optional<QXmppResultSetReply> continuation;
+    };
+
+    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    using NodesResult = std::variant<QList<QString>, QXmppStanza::Error>;
+    using InstantNodeResult = std::variant<QString, QXmppStanza::Error>;
+    template<typename T>
+    using ItemResult = std::variant<std::optional<T>, QXmppStanza::Error>;
+    template<typename T>
+    using ItemsResult = std::variant<Items<T>, QXmppStanza::Error>;
+    using PublishItemResult = std::variant<QString, QXmppStanza::Error>;
+    using PublishItemsResult = std::variant<QVector<QString>, QXmppStanza::Error>;
+    using SubscriptionsResult = std::variant<QList<QXmppPubSubSubscription>, QXmppStanza::Error>;
+    using AffiliationsResult = std::variant<QList<QXmppPubSubAffiliation>, QXmppStanza::Error>;
+    using OptionsResult = std::variant<QXmppPubSubSubscribeOptions, QXmppStanza::Error>;
+
+    QXmppPubSubManager();
+    ~QXmppPubSubManager();
 
     // Generic PubSub (the PubSub service is the given entity)
-    QString createNode(const QString &jid, const QString &nodeName);
-    QString deleteNode(const QString &jid, const QString &nodeName);
-    QString publishItem(const QString &jid, const QString &nodeName, const QXmppPubSubItem &item);
-    QString publishItem(const QString &jid, const QString &nodeName, const QXmppPubSubItem &item, const QXmppDataForm &publishOptions);
-    QString publishItems(const QString &jid, const QString &nodeName, const QList<QXmppPubSubItem> &items);
-    QString publishItems(const QString &jid, const QString &nodeName, const QList<QXmppPubSubItem> &items, const QXmppDataForm &publishOptions);
-    QString retractItem(const QString &jid, const QString &nodeName, const QString &itemId);
-    QString requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
-    QString requestItems(const QString &jid, const QString &nodeName);
-    QString requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
+    QFuture<NodesResult> fetchNodes(const QString &jid);
+    QFuture<Result> createNode(const QString &jid, const QString &nodeName);
+    QFuture<InstantNodeResult> createInstantNode(const QString &jid);
+    QFuture<Result> deleteNode(const QString &jid, const QString &nodeName);
+    template<typename T>
+    QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
+    template<typename T>
+    QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName);
+    template<typename T>
+    QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
+    template<typename T>
+    QFuture<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item);
+    template<typename T>
+    QFuture<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
+    template<typename T>
+    QFuture<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QList<T> &items);
+    template<typename T>
+    QFuture<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QList<T> &items, const QXmppPubSubPublishOptions &publishOptions);
+    QFuture<Result> retractItem(const QString &jid, const QString &nodeName, const QString &itemId);
+    QFuture<Result> purgeItems(const QString &jid, const QString &nodeName);
+    QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid);
+    QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid, const QString &nodeName);
+    QFuture<AffiliationsResult> requestAffiliations(const QString &jid, const QString &nodeName);
+    QFuture<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName);
+    QFuture<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName, const QString &subscriberJid);
+    QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options);
+    QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid);
+
+    // PEP-specific (the PubSub service is the current account)
+    QFuture<Result> createPepNode(const QString &nodeName);
+    QFuture<Result> deletePepNode(const QString &nodeName);
+    template<typename T>
+    QFuture<PublishItemResult> publishPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
+    template<typename T>
+    QFuture<PublishItemResult> publishPepItem(const QString &nodeName, const T &item);
+    template<typename T>
+    QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QList<T> &items, const QXmppPubSubPublishOptions &publishOptions);
+    template<typename T>
+    QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QList<T> &items);
+    QFuture<Result> retractPepItem(const QString &nodeName, const QString &itemId);
+    QFuture<Result> purgePepItems(const QString &nodeName);
 
     /// \cond
+    QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
-signals:
-    ///
-    /// Emitted when a PubSub event notification arrives.
-    ///
-    /// \param &message
-    ///
-    void eventNotificationReceived(const QXmppMessage &message);
-
-    ///
-    /// Emitted when items are received after calling \ref QXmppPubSubManager#requestItems.
-    ///
-    /// \param &iq
-    ///
-    void itemsReceived(const QXmppPubSubIq &iq);
-
-    // QXmppClientExtension interface
-protected:
+private:
     /// \cond
-    void setClient(QXmppClient *client) override;
+    QFuture<PublishItemResult> publishItem(QXmppPubSubIqBase &&iq);
+    QFuture<PublishItemsResult> publishItems(QXmppPubSubIqBase &&iq);
+    static QXmppPubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
     /// \endcond
 
-private slots:
-    void _q_messageReceived(const QXmppMessage &message);
-
-private:
-    ///
-    /// This is here to allow adding attributes to the manager in the future
-    /// without breaking binary compatibility. Feel free to define QXmppPubSubManagerPrivate
-    /// when needed and remove this comment afterwards.
-    ///
-    QXmppPubSubManagerPrivate *d;
+    // We may need a d-ptr in the future.
+    void *d = nullptr;
 };
+
+///
+/// Requests a specific item of an entity's node.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
+/// should be an account's bare JID
+/// \param nodeName the name of the node to query
+/// \param itemId the ID of the item to retrieve
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
+                                                                           const QString &nodeName,
+                                                                           const QString &itemId)
+{
+    using namespace QXmpp::Private;
+    return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, { itemId })), this,
+                   [](QXmppPubSubIq<T> &&iq) -> ItemResult<T> {
+        if (!iq.items().isEmpty()) {
+            return iq.items().constFirst();
+        }
+        return std::nullopt;
+    });
+}
+
+///
+/// Requests all items of an entity's node.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
+/// should be an account's bare JID
+/// \param nodeName the name of the node to query
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
+                                                                             const QString &nodeName)
+{
+    return requestItems<T>(jid, nodeName, {});
+}
+
+///
+/// Requests items of an entity's node.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
+/// should be an account's bare JID
+/// \param nodeName the name of the node to query
+/// \param itemIds the IDs of the items to retrieve. If empty, retrieves all
+/// items
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
+                                                                             const QString &nodeName,
+                                                                             const QStringList &itemIds)
+{
+    using namespace QXmpp::Private;
+    return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, itemIds)), this,
+                   [](QXmppPubSubIq<T> &&iq) -> ItemsResult<T> {
+        return Items<T> {
+            iq.items(),
+            iq.itemsContinuation(),
+        };
+    });
+}
+
+///
+/// Publishs one item to a pubsub node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::publishItem with no publish options.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to publish the item to
+/// \param item the item to publish
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
+                                                                               const QString &nodeName,
+                                                                               const T &item)
+{
+    QXmppPubSubIq<T> request;
+    request.setTo(jid);
+    request.setItems({item});
+    request.setQueryNode(nodeName);
+    return publishItem(std::move(request));
+}
+
+///
+/// Publishs one item to a pubsub node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::publishItem with no publish options.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to publish the item to
+/// \param item the item to publish
+/// \param publishOptions publish-options for the items
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
+                                                                               const QString &nodeName,
+                                                                               const T &item,
+                                                                               const QXmppPubSubPublishOptions &publishOptions)
+{
+    QXmppPubSubIq<T> request;
+    request.setTo(jid);
+    request.setItems({item});
+    request.setQueryNode(nodeName);
+    request.setPublishOptions(publishOptions);
+    return publishItem(std::move(request));
+}
+
+///
+/// Publishs items to a pubsub node.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to publish the items to
+/// \param items the items to publish
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
+                                                                                 const QString &nodeName,
+                                                                                 const QList<T> &items)
+{
+    QXmppPubSubIq<T> request;
+    request.setTo(jid);
+    request.setItems(items);
+    request.setQueryNode(nodeName);
+    return publishItems(std::move(request));
+}
+
+///
+/// Publishs items to a pubsub node.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to publish the items to
+/// \param items the items to publish
+/// \param publishOptions publish-options for the items
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
+                                                                                 const QString &nodeName,
+                                                                                 const QList<T> &items,
+                                                                                 const QXmppPubSubPublishOptions &publishOptions)
+{
+    QXmppPubSubIq<T> request;
+    request.setTo(jid);
+    request.setItems(items);
+    request.setQueryNode(nodeName);
+    request.setPublishOptions(publishOptions);
+    return publishItems(std::move(request));
+}
+
+///
+/// Publishs one item to a PEP node.
+///
+/// \param nodeName the name of the PEP node to publish the item to
+/// \param item the item to publish
+/// \param publishOptions publish-options for fine tuning
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions)
+{
+    return publishItem(client()->configuration().jidBare(), nodeName, item, publishOptions);
+}
+
+///
+/// Publishs one item to a PEP node.
+///
+/// \param nodeName the name of the PEP node to publish the item to
+/// \param item the item to publish
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishPepItem(const QString &nodeName, const T &item)
+{
+    return publishItem(client()->configuration().jidBare(), nodeName, item);
+}
+
+///
+/// Publishs items to a PEP node.
+///
+/// \param nodeName the name  of the PEP node to publish the items to
+/// \param items the items to publish
+/// \param publishOptions publish-options for fine tuning (optional). Pass
+/// an empty form to honor the default options of the PEP node
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<T> &items, const QXmppPubSubPublishOptions &publishOptions)
+{
+    return publishItems(client()->configuration().jidBare(), nodeName, items, publishOptions);
+}
+
+///
+/// Publishs items to a PEP node.
+///
+/// \param nodeName the name of the PEP node to publish the items to
+/// \param items the items to publish
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<T> &items)
+{
+    return publishItems(client()->configuration().jidBare(), nodeName, items);
+}
 
 #endif // QXMPPPUBSUBMANAGER_H

@@ -2,6 +2,7 @@
  * Copyright (C) 2008-2020 The QXmpp developers
  *
  * Author:
+ *  Linus Jahn
  *  Germán Márquez Mejía
  *
  * Source:
@@ -21,145 +22,230 @@
  *
  */
 
+#include "QXmppPubSubManager.h"
+
 #include <QDomElement>
+#include <QFutureInterface>
 
 #include "QXmppClient.h"
-#include "QXmppPubSubManager.h"
+#include "QXmppConstants_p.h"
+#include "QXmppPubSubItem.h"
+#include "QXmppPubSubEventManager.h"
+#include "QXmppPubSubSubscription.h"
+#include "QXmppPubSubAffiliation.h"
+#include "QXmppPubSubSubscribeOptions.h"
+#include "QXmppStanza.h"
 #include "QXmppUtils.h"
 
+using namespace QXmpp::Private;
+
 ///
-/// Creates an empty PEP node with the default configuration.
+/// \class QXmppPubSubManager
 ///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#createNode on the current account's bare JID.
+/// \brief The QXmppPubSubManager aims to provide publish-subscribe
+/// functionality as specified in \xep{0060, Publish-Subscribe} (PubSub).
 ///
-/// Calling this before \ref QXmppPubSubManager#publishPepItems is usually not
-/// necessary when publishing to a node for the first time if the service
-/// suppports the auto-create feature (Section 7.1.4 of XEP-0060).
+/// However, it currently only supports a few PubSub use cases but all of the
+/// \xep{0060, Personal Eventing Protocol} (PEP) ones. PEP allows
+/// a standard XMPP user account to function as a virtual PubSub service.
 ///
-/// \param nodeName the name of the PEP node to be created
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// To make use of this manager, you need to instantiate it and load it into
+/// the QXmppClient instance as follows:
 ///
-QString QXmppPubSubManager::createPepNode(const QString &nodeName)
+/// \code
+/// QXmppPubSubManager *manager = new QXmppPubSubManager;
+/// client->addExtension(manager);
+/// \endcode
+///
+/// \note To subscribe to PEP event notifications use the
+/// QXmppClientExtension::discoveryFeatures method of your client extension
+/// according to section 9.2 of \xep{0060}. For example:
+/// \code
+/// QStringList YourExtension::discoveryFeatures() const
+/// {
+///    return { "http://jabber.org/protocol/tune+notify" };
+/// }
+/// \endcode
+///
+/// \todo
+///  - Item pagination:
+///    Requesting a continuation
+///  - Requesting most recent items (max_items=2):
+///    https://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-requestrecent
+///  - (Manually) subscribing to a node
+///
+/// \ingroup Managers
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \typedef QXmppPubSubManager::Items
+///
+/// Type containing a list of items and a continuation if the results were
+/// incomplete.
+///
+
+///
+/// \typedef QXmppPubSubManager::Result
+///
+/// Result of a generic request without a return value. Contains Success in case
+/// everything went well. If the returned IQ contained an error a
+/// QXmppStanza::Error is reported.
+///
+
+///
+/// \typedef QXmppPubSubManager::NodesResult
+///
+/// Type containing a list of node names or the returned IQ error
+/// (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::InstantNodeResult
+///
+/// Contains the name of the new node (QString) or the returned IQ error
+/// (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::ItemResult
+///
+/// Contains the item if it has been found (std::optional<T>) or the returned IQ
+/// error (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::ItemsResult
+///
+/// Contains all items that have been found (QList<T>) or the returned IQ error
+/// (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::PublishItemResult
+///
+/// Contains the ID of the item, if no ID was set in the request (QString) or
+/// the returned IQ error (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::PublishItemsResult
+///
+/// Contains the IDs of the items, if no IDs were set in the request
+/// (QVector<QString>) or the returned IQ error (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::SubscriptionsResult
+///
+/// Contains a list of active subscriptions (QList<QXmppPubSubSubscription>) or
+/// the returned IQ error (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::AffiliationsResult
+///
+/// Contains the list of affiliations with the node(s)
+/// (QList<QXmppPubSubAffiliation>) or the returned IQ error
+/// (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::OptionsResult
+///
+/// Contains the current subscribe options (QXmppPubSubSubscribeOptions) or the
+/// returned IQ error (QXmppStanza::Error).
+///
+
+///
+/// Default constructor.
+///
+QXmppPubSubManager::QXmppPubSubManager()
 {
-    return createNode(client()->configuration().jidBare(), nodeName);
 }
 
 ///
-/// Deletes a PEP node.
+/// Default destructor.
 ///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#deleteNode on the current account's bare JID.
-///
-/// \param nodeName the name of the PEP node to delete along with all of its items
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::deletePepNode(const QString &nodeName)
+QXmppPubSubManager::~QXmppPubSubManager()
 {
-    return deleteNode(client()->configuration().jidBare(), nodeName);
 }
 
 ///
-/// Publishs one item to a PEP node.
+/// Requests all listed nodes of a pubsub service via service discovery.
 ///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItem with no publish options.
+/// This uses a \xep{0030, Service Discovery} items request to get a list of
+/// nodes.
 ///
-/// \param nodeName the name of the PEP node to publish the item to
-/// \param item the item to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \return
 ///
-QString QXmppPubSubManager::publishPepItem(const QString &nodeName, const QXmppPubSubItem &item)
+QFuture<QXmppPubSubManager::NodesResult> QXmppPubSubManager::fetchNodes(const QString &jid)
 {
-    return publishPepItem(nodeName, item, QXmppDataForm());
-}
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    request.setTo(jid);
 
-///
-/// Publishs one item to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItems with a single item in the items list.
-///
-/// \param nodeName the name of the PEP node to publish the item to
-/// \param item the item to publish
-/// \param publishOptions publish-options for fine tuning (optional). Pass
-/// an empty form to honor the default options of the PEP node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItem(const QString &nodeName, const QXmppPubSubItem &item, const QXmppDataForm &publishOptions)
-{
-    return publishPepItems(nodeName, QList<QXmppPubSubItem>({item}), publishOptions);
-}
-
-///
-/// Publishs items to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItems with no publish options.
-///
-/// \param nodeName the name of the PEP node to publish the items to
-/// \param items the items to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items)
-{
-    return publishPepItems(nodeName, items, QXmppDataForm());
-}
-
-///
-/// Publishs items to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItems on the current account's bare JID.
-///
-/// \param nodeName the name  of the PEP node to publish the items to
-/// \param items the items to publish
-/// \param publishOptions publish-options for fine tuning (optional). Pass
-/// an empty form to honor the default options of the PEP node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items, const QXmppDataForm &publishOptions)
-{
-    return publishItems(client()->configuration().jidBare(), nodeName, items, publishOptions);
-}
-
-///
-/// Deletes an item from a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#retractItem on the current account's bare JID.
-///
-/// \param nodeName the name of the PEP node to delete the item from
-/// \param itemId the ID of the item to delete
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId)
-{
-    return retractItem(client()->configuration().jidBare(), nodeName, itemId);
+    return chainIq(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) -> NodesResult {
+        const auto items = iq.items();
+        QList<QString> nodes;
+        for (const auto &item : items) {
+            // only accept non-empty nodes
+            if (const auto node = item.node(); !node.isEmpty()) {
+                nodes << node;
+            }
+        }
+        // make unique
+        std::sort(nodes.begin(), nodes.end());
+        nodes.erase(std::unique(nodes.begin(), nodes.end()), nodes.end());
+        return nodes;
+    });
 }
 
 ///
 /// Creates an empty pubsub node with the default configuration.
 ///
-/// Calling this before \ref QXmppPubSubManager#publishItems is usually not
+/// Calling this before QXmppPubSubManager::publishItems is usually not
 /// necessary when publishing to a node for the first time if the service
-/// suppports the auto-create feature (Section 7.1.4 of XEP-0060).
+/// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
 ///
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \param nodeName the name of the node to be created
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// \return
 ///
-QString QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName)
+auto QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName) -> QFuture<Result>
 {
     QXmppPubSubIq request;
     request.setType(QXmppIq::Set);
-    request.setQueryType(QXmppPubSubIq::QueryType::CreateQuery);
-    request.setQueryNodeName(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Create);
+    request.setQueryNode(nodeName);
     request.setTo(jid);
 
-    if (client()->sendPacket(request))
-        return request.id();
-    return QString();
+    return client()->sendGenericIq(request);
+}
+
+///
+/// Creates an instant pubsub node with the default configuration.
+///
+/// The pubsub service automatically generates a random node name. On success
+/// it is returned via the QFuture.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \return
+///
+QFuture<QXmppPubSubManager::InstantNodeResult> QXmppPubSubManager::createInstantNode(const QString &jid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIq<>::Create);
+    request.setTo(jid);
+
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
+        return iq.queryNode();
+    });
 }
 
 ///
@@ -167,97 +253,17 @@ QString QXmppPubSubManager::createNode(const QString &jid, const QString &nodeNa
 ///
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \param nodeName the name of the node to delete along with all of its items
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// \return
 ///
-QString QXmppPubSubManager::deleteNode(const QString &jid, const QString &nodeName)
+auto QXmppPubSubManager::deleteNode(const QString &jid, const QString &nodeName) -> QFuture<Result>
 {
     QXmppPubSubIq request;
     request.setType(QXmppIq::Set);
-    request.setQueryType(QXmppPubSubIq::QueryType::DeleteQuery);
-    request.setQueryNodeName(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Delete);
+    request.setQueryNode(nodeName);
     request.setTo(jid);
 
-    if (client()->sendPacket(request))
-        return request.id();
-    return QString();
-}
-
-///
-/// Publishs one item to a pubsub node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItem with no publish options.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the item to
-/// \param item the item to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishItem(const QString &jid, const QString &nodeName, const QXmppPubSubItem &item)
-{
-    return publishItem(jid, nodeName, item, QXmppDataForm());
-}
-
-///
-/// Publishs one item to a pubsub node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItems with a single item in the items list.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the item to
-/// \param item the item to publish
-/// \param publishOptions publish-options for the item (optional). Pass
-/// an empty form to honor the default options of the node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishItem(const QString &jid, const QString &nodeName, const QXmppPubSubItem &item, const QXmppDataForm &publishOptions)
-{
-    return publishItems(jid, nodeName, QList<QXmppPubSubItem>({item}), publishOptions);
-}
-
-///
-/// Publishs items to a pubsub node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItems with no publish options.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the items to
-/// \param items the items to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishItems(const QString &jid, const QString &nodeName, const QList<QXmppPubSubItem> &items)
-{
-    return publishItems(jid, nodeName, items, QXmppDataForm());
-}
-
-///
-/// Publishs items to a pubsub node.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the items to
-/// \param items the items to publish
-/// \param publishOptions publish-options for the items (optional). Pass
-/// an empty form to honor the default options of the node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishItems(const QString &jid, const QString &nodeName, const QList<QXmppPubSubItem> &items, const QXmppDataForm &publishOptions)
-{
-    QXmppPubSubIq request;
-    request.setType(QXmppIq::Set);
-    request.setQueryType(QXmppPubSubIq::QueryType::PublishQuery);
-    request.setQueryNodeName(nodeName);
-    request.setItems(items);
-
-    if (!publishOptions.isNull())
-        request.setPublishOptions(publishOptions);
-
-    request.setTo(jid);
-
-    if (client()->sendPacket(request))
-        return request.id();
-    return QString();
+    return client()->sendGenericIq(request);
 }
 
 ///
@@ -266,111 +272,314 @@ QString QXmppPubSubManager::publishItems(const QString &jid, const QString &node
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \param nodeName the name of the node to delete the item from
 /// \param itemId the ID of the item to delete
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// \return
 ///
-QString QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName, const QString &itemId)
+auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName, const QString &itemId) -> QFuture<Result>
 {
     QXmppPubSubIq request;
     request.setType(QXmppIq::Set);
-    request.setQueryType(QXmppPubSubIq::QueryType::RetractQuery);
-    request.setQueryNodeName(nodeName);
-    request.setItems(QList<QXmppPubSubItem>({QXmppPubSubItem(itemId)}));
+    request.setQueryType(QXmppPubSubIq<>::Retract);
+    request.setQueryNode(nodeName);
+    request.setItems({QXmppPubSubItem(itemId)});
     request.setTo(jid);
 
-    if (client()->sendPacket(request))
-        return request.id();
-    return QString();
+    return client()->sendGenericIq(request);
 }
 
 ///
-/// Requests one item of an entity's node by ID.
+/// Purges all items from a node.
 ///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#requestItems with a list of item IDs containing
-/// only the given item ID.
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the PEP node to delete along with all of its
+/// items
+/// \return
 ///
-/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this should be an account's bare JID
-/// \param nodeName the name of the node to query
-/// \param itemId the ID of the item to retrieve
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::requestItem(const QString &jid, const QString &nodeName, const QString &itemId)
+auto QXmppPubSubManager::purgeItems(const QString &jid, const QString &nodeName) -> QFuture<Result>
 {
-    return requestItems(jid, nodeName, QStringList(itemId));
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIq<>::Purge);
+    request.setQueryNode(nodeName);
+    request.setTo(jid);
+
+    return client()->sendGenericIq(request);
 }
 
 ///
-/// Requests all items of an entity's node.
+/// Requests all subscriptions with a PubSub service.
 ///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#requestItems with an empty item ID list.
+/// \param jid JID of the pubsub service
+/// \return
 ///
-/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this should be an account's bare JID
-/// \param nodeName the name of the node to query
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::requestItems(const QString &jid, const QString &nodeName)
+QFuture<QXmppPubSubManager::SubscriptionsResult> QXmppPubSubManager::requestSubscriptions(const QString &jid)
 {
-    return requestItems(jid, nodeName, QStringList());
+    return requestSubscriptions(jid, {});
 }
 
 ///
-/// Requests items of an entity's node.
+/// Requests the subscription(s) with a specific PubSub node.
 ///
-/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this should be an account's bare JID
-/// \param nodeName the name of the node to query
-/// \param itemIds the ID's of the items to retrieve. If empty, retrieves all the items
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
+/// \param jid JID of the pubsub service
+/// \param nodeName Name of the node on the pubsub service
+/// \return
 ///
-QString QXmppPubSubManager::requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds)
+QFuture<QXmppPubSubManager::SubscriptionsResult> QXmppPubSubManager::requestSubscriptions(const QString &jid, const QString &nodeName)
 {
     QXmppPubSubIq request;
     request.setType(QXmppIq::Get);
-    request.setQueryType(QXmppPubSubIq::QueryType::ItemsQuery);
-    request.setQueryNodeName(nodeName);
+    request.setTo(jid);
+    request.setQueryType(QXmppPubSubIq<>::Subscriptions);
+    request.setQueryNode(nodeName);
+
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> SubscriptionsResult {
+        return iq.subscriptions();
+    });
+}
+
+///
+/// Requests the affiliations of all users on a PubSub node.
+///
+/// \param jid JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service.
+/// \return
+///
+QFuture<QXmppPubSubManager::AffiliationsResult> QXmppPubSubManager::requestAffiliations(const QString &jid, const QString &nodeName)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Get);
+    request.setTo(jid);
+    request.setQueryType(QXmppPubSubIq<>::Affiliations);
+    request.setQueryNode(nodeName);
+
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> AffiliationsResult {
+        return iq.affiliations();
+    });
+}
+
+///
+/// Requests the subscribe options form of the own subscription to a node.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service.
+/// \return
+///
+QFuture<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscribeOptions(const QString &service, const QString &nodeName)
+{
+    return requestSubscribeOptions(service, nodeName, client()->configuration().jidBare());
+}
+
+///
+/// Requests the subscribe options form of a user's subscription to a node.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \param subscriberJid JID of the user to request the options for
+/// \return
+///
+QFuture<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscribeOptions(const QString &service, const QString &nodeName, const QString &subscriberJid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Get);
+    request.setTo(service);
+    request.setQueryType(QXmppPubSubIq<>::Options);
+    request.setQueryNode(nodeName);
+    request.setQueryJid(subscriberJid);
+
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> OptionsResult {
+        if (const auto form = iq.dataForm()) {
+            if (const auto options = QXmppPubSubSubscribeOptions::fromDataForm(*form)) {
+                return *options;
+            }
+        }
+
+        // "real" stanza errors are already handled
+        using Error = QXmppStanza::Error;
+        return Error(Error::Cancel,
+                     Error::Condition::InternalServerError,
+                     QStringLiteral("Server returned invalid data form."));
+    });
+}
+
+///
+/// Sets the subscription options for our own account.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \param options The new options to be set
+/// \return
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options)
+{
+    return setSubscribeOptions(service, nodeName, options, client()->configuration().jidBare());
+}
+
+///
+/// Sets the subscription options for another users's account.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \param options The new options to be set
+/// \param subscriberJid The JID of the user
+/// \return
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setTo(service);
+    request.setQueryType(QXmppPubSubIq<>::Options);
+    request.setDataForm(options);
+    request.setQueryNode(nodeName);
+    request.setQueryJid(subscriberJid);
+    return client()->sendGenericIq(request);
+}
+
+///
+/// Creates an empty PEP node with the default configuration.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::createNode on the current account's bare JID.
+///
+/// Calling this before QXmppPubSubManager::publishPepItems is usually not
+/// necessary when publishing to a node for the first time if the service
+/// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
+///
+/// \param nodeName the name of the PEP node to be created
+/// \return
+///
+auto QXmppPubSubManager::createPepNode(const QString &nodeName) -> QFuture<Result>
+{
+    return createNode(client()->configuration().jidBare(), nodeName);
+}
+
+///
+/// Deletes a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::deleteNode on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete along with all of its
+/// items
+/// \return
+///
+auto QXmppPubSubManager::deletePepNode(const QString &nodeName) -> QFuture<Result>
+{
+    return deleteNode(client()->configuration().jidBare(), nodeName);
+}
+
+///
+/// Deletes an item from a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::retractItem on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete the item from
+/// \param itemId the ID of the item to delete
+/// \return
+///
+auto QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId) -> QFuture<Result>
+{
+    return retractItem(client()->configuration().jidBare(), nodeName, itemId);
+}
+
+///
+/// Purges all items from a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::purgeItems on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete along with all of its
+/// items
+/// \return
+///
+auto QXmppPubSubManager::purgePepItems(const QString &nodeName) -> QFuture<Result>
+{
+    return purgeItems(client()->configuration().jidBare(), nodeName);
+}
+
+/// \cond
+QStringList QXmppPubSubManager::discoveryFeatures() const
+{
+    return {
+        ns_pubsub_rsm
+    };
+}
+
+bool QXmppPubSubManager::handleStanza(const QDomElement &element)
+{
+    for (auto child = element.firstChildElement("event");
+         !child.isNull();
+         child = child.nextSiblingElement("event")) {
+        if (child.namespaceURI() == ns_pubsub_event) {
+            const auto service = element.attribute("from");
+            const auto node = child.attribute("node");
+
+            const auto extensions = client()->extensions();
+            for (auto *extension : extensions) {
+                if (auto *eventManager = qobject_cast<QXmppPubSubEventManager*>(extension)) {
+                    if (eventManager->handlePubSubEvent(element, service, node)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+QXmppPubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds)
+{
+    QXmppPubSubIq request;
+    request.setTo(jid);
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppPubSubIqBase::Items);
+    request.setQueryNode(nodeName);
 
     if (!itemIds.isEmpty()) {
         QList<QXmppPubSubItem> items;
-        for (const QString &id : itemIds) {
+        items.reserve(itemIds.size());
+        for (const auto &id : itemIds) {
             items << QXmppPubSubItem(id);
         }
         request.setItems(items);
     }
-
-    request.setTo(jid);
-
-    if (client()->sendPacket(request))
-        return request.id();
-    return QString();
+    return request;
 }
 
-/// \cond
-bool QXmppPubSubManager::handleStanza(const QDomElement &element)
+auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<PublishItemResult>
 {
-    if (element.tagName() == "iq" && QXmppPubSubIq::isPubSubIq(element)) {
-        QXmppPubSubIq iq;
-        iq.parse(element);
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIqBase::Publish);
 
-        if (iq.queryType() == QXmppPubSubIq::QueryType::ItemsQuery) {
-            emit itemsReceived(iq);
-            return true;
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> PublishItemResult {
+        if (!iq.items().isEmpty()) {
+            return iq.items().constFirst().id();
+        } else {
+            return QString();
         }
-    }
-
-    return false;
+    });
 }
 
-void QXmppPubSubManager::setClient(QXmppClient* client)
+auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<PublishItemsResult>
 {
-    QXmppClientExtension::setClient(client);
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIqBase::Publish);
 
-    connect(client, &QXmppClient::messageReceived,
-            this, &QXmppPubSubManager::_q_messageReceived);
+    return chainIq(client()->sendIq(request), this,
+                   [](const QXmppPubSubIq<> &iq) -> PublishItemsResult {
+        const auto itemToId = [](const QXmppPubSubItem &item) {
+            return item.id();
+        };
+
+        const auto items = iq.items();
+        QVector<QString> ids;
+        ids.reserve(items.size());
+        std::transform(items.begin(), items.end(), ids.begin(), itemToId);
+        return ids;
+    });
 }
 /// \endcond
-
-void QXmppPubSubManager::_q_messageReceived(const QXmppMessage &message)
-{
-    if (message.isPubSubEvent())
-        emit eventNotificationReceived(message);
-}
