@@ -27,7 +27,10 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
+#include "QXmppMixInvitation.h"
 #include "QXmppUtils.h"
+
+#include <optional>
 
 #include <QDateTime>
 #include <QDomElement>
@@ -166,6 +169,9 @@ public:
     // XEP-0382: Spoiler messages
     bool isSpoiler;
     QString spoilerHint;
+
+    // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
+    std::optional<QXmppMixInvitation> mixInvitation;
 
     // XEP-0428: Fallback Indication
     bool isFallback;
@@ -1074,6 +1080,30 @@ void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
 }
 
 ///
+/// Returns an included \xep{0369}: Mediated Information eXchange (MIX)
+/// invitation as defined by \xep{0407}: Mediated Information eXchange (MIX):
+/// Miscellaneous Capabilities.
+///
+/// \since QXmpp 1.4
+///
+std::optional<QXmppMixInvitation> QXmppMessage::mixInvitation() const
+{
+    return d->mixInvitation;
+}
+
+///
+/// Sets a \xep{0369}: Mediated Information eXchange (MIX) invitation as defined
+/// by \xep{0407}: Mediated Information eXchange (MIX): Miscellaneous
+/// Capabilities.
+///
+/// \since QXmpp 1.4
+///
+void QXmppMessage::setMixInvitation(const std::optional<QXmppMixInvitation> &mixInvitation)
+{
+    d->mixInvitation = mixInvitation;
+}
+
+///
 /// Sets whether this message is only a fallback according to \xep{0428}:
 /// Fallback Indication.
 ///
@@ -1327,6 +1357,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeEndElement();
     }
 
+    // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
+    if (d->mixInvitation) {
+        d->mixInvitation->toXml(xmlWriter);
+    }
+
     // XEP-0428: Fallback Indication
     if (d->isFallback) {
         xmlWriter->writeStartElement(QStringLiteral("fallback"));
@@ -1436,6 +1471,11 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
         // XEP-0382: Spoiler messages
         d->isSpoiler = true;
         d->spoilerHint = element.text();
+    } else if (checkElement(element, QStringLiteral("invitation"), ns_mix_misc)) {
+        // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
+        QXmppMixInvitation mixInvitation;
+        mixInvitation.parse(element);
+        d->mixInvitation = mixInvitation;
     } else if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
         // XEP-0428: Fallback Indication
         d->isFallback = true;

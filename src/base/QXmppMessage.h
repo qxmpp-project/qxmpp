@@ -26,13 +26,16 @@
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
-// Required for source compatibility
 #include "QXmppStanza.h"
 
+// Required for source compatibility
 #include <QDateTime>
+
+#include <optional>
 
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
+class QXmppMixInvitation;
 
 ///
 /// \brief The QXmppMessage class represents an XMPP message.
@@ -242,6 +245,10 @@ public:
 
     QString spoilerHint() const;
     void setSpoilerHint(const QString &);
+
+    // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
+    std::optional<QXmppMixInvitation> mixInvitation() const;
+    void setMixInvitation(const std::optional<QXmppMixInvitation> &mixInvitation);
 
     // XEP-0428: Fallback Indication
     bool isFallback() const;
