@@ -59,5 +59,6 @@ Ongoing:
 - \xep{0060}: Publish-Subscribe (Only basic IQ implemented)
 - \xep{0369}: Mediated Information eXchange (MIX) (Only IQ queries implemented) (v0.14)
 - \xep{0405}: Mediated Information eXchange (MIX): Participant Server Requirements (Only IQ queries implemented) (v0.4)
+- \xep{0407}: Mediated Information eXchange (MIX): Miscellaneous Capabilities (QXmppMixInvitation) (v0.1)
 
 */
