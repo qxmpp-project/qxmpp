@@ -34,7 +34,6 @@
 static const int RTP_COMPONENT = 1;
 
 static const char *ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
-static const char *ns_jingle_dtls = "urn:xmpp:jingle:apps:dtls:0";
 
 static const char *jingle_actions[] = {
     "content-accept",

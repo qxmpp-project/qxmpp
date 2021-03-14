@@ -55,6 +55,8 @@ public:
     QString turnUser;
     QString turnPassword;
 
+    bool supportsDtls;
+
 private:
     QXmppCallManager *q;
 };

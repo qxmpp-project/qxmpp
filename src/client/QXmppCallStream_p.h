@@ -57,7 +57,7 @@ class QXmppCallStreamPrivate : public QObject
 
 public:
     QXmppCallStreamPrivate(QXmppCallStream *parent, GstElement *pipeline_, GstElement *rtpbin_,
-                           QString media_, QString creator_, QString name_, int id_);
+                           QString media_, QString creator_, QString name_, int id_, bool useDtls_);
     ~QXmppCallStreamPrivate();
 
     GstFlowReturn sendDatagram(GstElement *appsink, int component);
@@ -65,8 +65,7 @@ public:
 
     void addEncoder(QXmppCallPrivate::GstCodec &codec);
     void addDecoder(GstPad *pad, QXmppCallPrivate::GstCodec &codec);
-    void addRtpSender(GstPad *pad);
-    void addRtcpSender(GstPad *pad);
+    void toDtlsClientMode();
 
     QXmppCallStream *q;
 
@@ -87,6 +86,11 @@ public:
     GstElement *apprtcpsrc;
     GstElement *apprtpsink;
     GstElement *apprtcpsink;
+    GstElement *dtlsrtpencoder;
+    GstElement *dtlsrtcpencoder;
+    GstElement *dtlsrtpdecoder;
+    GstElement *dtlsrtcpdecoder;
+    QByteArray digest;
 
     std::function<void(GstPad *)> sendPadCB;
     std::function<void(GstPad *)> receivePadCB;
@@ -96,6 +100,8 @@ public:
     QString creator;
     QString name;
     int id;
+    bool useDtls;
+    bool dtlsHandshakeComplete;
 
     QList<QXmppJinglePayloadType> payloadTypes;
 };

@@ -26,9 +26,8 @@
 
 #include <QXmppGlobal.h>
 
-#include <gst/gst.h>
-
 #include <functional>
+#include <gst/gst.h>
 
 #include <QObject>
 
@@ -57,7 +56,7 @@ public:
 
 private:
     QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
-                    QString media, QString creator, QString name, int id);
+                    QString media, QString creator, QString name, int id, bool useDtls);
 
     QXmppCallStreamPrivate *d;
 

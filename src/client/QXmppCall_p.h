@@ -77,7 +77,7 @@ public:
     QXmppCallStream *findStreamByMedia(const QString &media);
     QXmppCallStream *findStreamByName(const QString &name);
     QXmppCallStream *findStreamById(const int id);
-    QXmppJingleIq::Content localContent(QXmppCallStream *stream) const;
+    QXmppJingleIq::Content localContent(QXmppCallStream *stream, QString dtlsSetup) const;
 
     void handleAck(const QXmppIq &iq);
     bool handleDescription(QXmppCallStream *stream, const QXmppJingleIq::Content &content);
@@ -92,6 +92,7 @@ public:
     QXmppCall::Direction direction;
     QString jid;
     QString ownJid;
+    bool useDtls;
     QXmppCallManager *manager;
     QList<QXmppJingleIq> requests;
     QString sid;
@@ -106,7 +107,7 @@ public:
 
     // Supported codecs
     QList<GstCodec> videoCodecs = {
-        { .pt = 100, .name = "H264", .channels = 1, .clockrate = 90000, .gstPay = "rtph264pay", .gstDepay = "rtph264depay", .gstEnc = "x264enc", .gstDec = "avdec_h264", .encProps = { { "tune", 4 }, { "speed-preset", 3 }, {"byte-stream", true}, { "bitrate", 512 } } },
+        { .pt = 100, .name = "H264", .channels = 1, .clockrate = 90000, .gstPay = "rtph264pay", .gstDepay = "rtph264depay", .gstEnc = "x264enc", .gstDec = "avdec_h264", .encProps = { { "tune", 4 }, { "speed-preset", 3 }, { "byte-stream", true }, { "bitrate", 512 } } },
         { .pt = 99, .name = "VP8", .channels = 1, .clockrate = 90000, .gstPay = "rtpvp8pay", .gstDepay = "rtpvp8depay", .gstEnc = "vp8enc", .gstDec = "vp8dec", .encProps = { { "deadline", 20000 }, { "target-bitrate", 512000 } } },
         // vp9enc and x265enc seem to be very slow. Give them a lower priority for now.
         { .pt = 102, .name = "H265", .channels = 1, .clockrate = 90000, .gstPay = "rtph265pay", .gstDepay = "rtph265depay", .gstEnc = "x265enc", .gstDec = "avdec_h265", .encProps = { { "tune", 4 }, { "speed-preset", 3 }, { "bitrate", 512 } } },
