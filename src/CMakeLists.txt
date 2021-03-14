@@ -238,7 +238,7 @@ target_link_libraries(qxmpp
 
 if(WITH_GSTREAMER)
     target_link_libraries(qxmpp
-        PUBLIC
+        PRIVATE
         ${GLIB2_LIBRARIES}
         ${GOBJECT_LIBRARIES}
         ${GSTREAMER_LIBRARY}
