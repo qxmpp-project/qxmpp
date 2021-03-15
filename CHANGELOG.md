@@ -1,7 +1,21 @@
 QXmpp 1.4.0 (UNRELEASED)
 ------------------------
 
-*under development*
+QXmpp now requires a C++17 compliant compiler. Qt 6 support has been added. The
+new compliance suites for 2021 are fulfilled without any changes being required.
+
+New features:
+ - Qt 6 port, including many undeprecations and some refactoring (@lnjX)
+ - Add XEP-0224: Attention manager (@lnjX)
+ - Implement MIX-MISC XEP-0407: Invitation message extension (#329, @melvo)
+ - New SCRAM-SHA3-512 and SCRAM-SHA-512 SASL algorithms (#320, @lnjX)
+ - Client: Advertise stream management state (#309, @lnjX)
+ - RosterManager: Cache roster if stream can be resumed (#309, @lnjX)
+ - RosterManager: Enable MIX annotation for roster items (#331, @melvo)
+
+Fixes:
+ - Bind IQ errors are now handled properly (@Bonnie080)
+ - Fix cached stream management packets are resent with the wrong account (#335, @lnjX)
 
 QXmpp 1.3.2 (Jan 09, 2021)
 --------------------------
