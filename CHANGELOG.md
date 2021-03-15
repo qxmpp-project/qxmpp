@@ -1,5 +1,5 @@
-QXmpp 1.4.0 (UNRELEASED)
-------------------------
+QXmpp 1.4.0 (Mar 15, 2021)
+--------------------------
 
 QXmpp now requires a C++17 compliant compiler. Qt 6 support has been added. The
 new compliance suites for 2021 are fulfilled without any changes being required.
