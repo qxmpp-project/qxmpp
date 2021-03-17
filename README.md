@@ -13,7 +13,7 @@ QXmpp uses Qt extensively, and as such users need to a have working knowledge of
 C++ and Qt basics (Signals and Slots and Qt data types).
 
 Qt is the only third party library which is required to build QXmpp, but
-libraries such as speex and theora enable additional features.
+libraries such as GStreamer enable additional features.
 
 QXmpp is released under the terms of the GNU Lesser General Public License,
 version 2.1 or later.
