@@ -1263,7 +1263,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *xmlWriter) const
     }
 
     // XEP-0231: Bits of Binary
-    for (const auto &data : qAsConst(d->bitsOfBinaryData))
+    for (const auto &data : std::as_const(d->bitsOfBinaryData))
         data.toXmlElementFromChild(xmlWriter);
 
     // XEP-0280: Message Carbons

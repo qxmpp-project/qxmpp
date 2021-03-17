@@ -474,7 +474,7 @@ bool QXmppMucRoom::requestPermissions()
 
     d->permissions.clear();
     d->permissionsQueue.clear();
-    for (const auto &affiliation : qAsConst(affiliations)) {
+    for (const auto &affiliation : std::as_const(affiliations)) {
         QXmppMucItem item;
         item.setAffiliation(affiliation);
 
@@ -499,7 +499,7 @@ bool QXmppMucRoom::setPermissions(const QList<QXmppMucItem> &permissions)
     QList<QXmppMucItem> items;
 
     // Process changed members
-    for (const auto &item : qAsConst(permissions)) {
+    for (const auto &item : std::as_const(permissions)) {
         const QString jid = item.jid();
         if (d->permissions.value(jid).affiliation() != item.affiliation())
             items << item;

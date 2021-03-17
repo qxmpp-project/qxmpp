@@ -96,7 +96,7 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
 QList<QByteArray> QXmppInvokable::paramTypes(const QList<QVariant> &params)
 {
     QList<QByteArray> types;
-    for (const auto &variant : qAsConst(params))
+    for (const auto &variant : std::as_const(params))
         types << variant.typeName();
     return types;
 }
