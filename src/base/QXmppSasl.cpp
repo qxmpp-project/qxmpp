@@ -34,10 +34,6 @@
 #include <QUrlQuery>
 #include <QtEndian>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 2)
-#define QT_HAS_SHA3_SUPPORT
-#endif
-
 const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
 
 static QByteArray forcedNonce;
@@ -47,9 +43,7 @@ static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
     { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },
     { QStringLiteral("SCRAM-SHA-256"), QCryptographicHash::Sha256 },
     { QStringLiteral("SCRAM-SHA-512"), QCryptographicHash::Sha512 },
-#ifdef QT_HAS_SHA3_SUPPORT
     { QStringLiteral("SCRAM-SHA3-512"), QCryptographicHash::RealSha3_512 },
-#endif
 };
 
 // Returns the hash length in bytes (QCH::hashLength() only exists since 5.12).
@@ -64,9 +58,7 @@ int hashLength(QCryptographicHash::Algorithm algorithm)
     case QCryptographicHash::Sha256:
         return 256 / 8;
     case QCryptographicHash::Sha512:
-#ifdef QT_HAS_SHA3_SUPPORT
     case QCryptographicHash::RealSha3_512:
-#endif
         return 512 / 8;
     default:
         return QCryptographicHash::hash({}, algorithm).size();
@@ -309,9 +301,7 @@ QXmppSaslClient::~QXmppSaslClient()
 QStringList QXmppSaslClient::availableMechanisms()
 {
     return {
-#ifdef QT_HAS_SHA3_SUPPORT
         QStringLiteral("SCRAM-SHA3-512"),
-#endif
         QStringLiteral("SCRAM-SHA-512"),
         QStringLiteral("SCRAM-SHA-256"),
         QStringLiteral("SCRAM-SHA-1"),

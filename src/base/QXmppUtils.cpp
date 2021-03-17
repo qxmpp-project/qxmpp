@@ -127,11 +127,7 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
 QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     if (dt.time().msec()) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
         return dt.toUTC().toString(Qt::ISODateWithMs);
-#else
-        return dt.toUTC().toString("yyyy-MM-ddTHH:mm:ss.zzzZ");
-#endif
     }
     return dt.toUTC().toString(Qt::ISODate);
 }
