@@ -49,7 +49,7 @@ void tst_QXmppStreamInitiationIq::testFileInfo_data()
 
     QTest::newRow("normal")
         << QByteArray("<file xmlns=\"http://jabber.org/protocol/si/profile/file-transfer\" name=\"test.txt\" size=\"1022\"/>")
-        << QDateTime()
+        << QDateTime().toUTC()
         << QString()
         << QByteArray()
         << QString("test.txt")

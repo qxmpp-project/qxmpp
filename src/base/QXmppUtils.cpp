@@ -126,8 +126,13 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
 ///
 QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
-    if (dt.time().msec())
+    if (dt.time().msec()) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
         return dt.toUTC().toString(Qt::ISODateWithMs);
+#else
+        return dt.toUTC().toString("yyyy-MM-ddTHH:mm:ss.zzzZ");
+#endif
+    }
     return dt.toUTC().toString(Qt::ISODate);
 }
 
@@ -144,14 +149,14 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
         return 0;
 
     // No offset from UTC
-    if (match.captured(1) == u'Z')
+    if (match.captured(1) == QChar(u'Z'))
         return 0;
 
     // Calculate offset
     const int offset = match.captured(3).toInt() * 3600 +
         match.captured(4).toInt() * 60;
 
-    if (match.captured(2) == u'-')
+    if (match.captured(2) == QChar(u'-'))
         return -offset;
     return offset;
 }

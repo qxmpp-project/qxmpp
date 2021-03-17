@@ -26,6 +26,8 @@
 #include "util.h"
 #include <QObject>
 
+Q_DECLARE_METATYPE(QCryptographicHash::Algorithm)
+
 class tst_QXmppBitsOfBinaryContentId : public QObject
 {
     Q_OBJECT
