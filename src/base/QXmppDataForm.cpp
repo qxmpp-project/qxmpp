@@ -352,7 +352,7 @@ QXmppDataForm::Media QXmppDataForm::Field::media() const
     QList<QPair<QString, QString>> pairUris;
     pairUris.reserve(d->mediaSources.size());
 
-    for (const auto &source : qAsConst(d->mediaSources)) {
+    for (const auto &source : std::as_const(d->mediaSources)) {
         pairUris << qMakePair<QString, QString>(
             source.contentType().name(),
             source.uri().toString());
