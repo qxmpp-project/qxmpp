@@ -105,7 +105,6 @@ set(SOURCE_FILES
     base/QXmppBindIq.cpp
     base/QXmppBitsOfBinaryContentId.cpp
     base/QXmppBitsOfBinaryData.cpp
-    base/QXmppBitsOfBinaryDataList.cpp
     base/QXmppBitsOfBinaryIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
