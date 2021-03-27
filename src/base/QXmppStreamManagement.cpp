@@ -27,6 +27,7 @@
 #include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
 
+/// \cond
 QXmppStreamManagementEnable::QXmppStreamManagementEnable(const bool resume, const unsigned max)
     : m_resume(resume), m_max(max)
 {
@@ -459,3 +460,4 @@ void QXmppStreamManager::resetCache()
 {
     m_unacknowledgedStanzas.clear();
 }
+/// \endcond
