@@ -43,6 +43,7 @@
 // We mean it.
 //
 
+/// \cond
 class QXMPP_AUTOTEST_EXPORT QXmppStreamInitiationIq : public QXmppIq
 {
 public:
@@ -69,10 +70,8 @@ public:
     static bool isStreamInitiationIq(const QDomElement &element);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
-    /// \endcond
 
 private:
     QXmppDataForm m_featureForm;
@@ -81,5 +80,6 @@ private:
     Profile m_profile;
     QString m_siId;
 };
+/// \endcond
 
 #endif
