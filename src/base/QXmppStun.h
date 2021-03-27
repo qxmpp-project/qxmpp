@@ -37,11 +37,11 @@ class QXmppIceComponentPrivate;
 class QXmppIceConnectionPrivate;
 class QXmppIcePrivate;
 
+///
 /// \internal
 ///
 /// The QXmppStunMessage class represents a STUN message.
 ///
-
 class QXMPP_EXPORT QXmppStunMessage
 {
 public:
@@ -158,10 +158,11 @@ private:
     QString m_username;
 };
 
+///
 /// \brief The QXmppIceComponent class represents a piece of a media stream
 /// requiring a single transport address, as defined by RFC 5245
 /// (Interactive Connectivity Establishment).
-
+///
 class QXMPP_EXPORT QXmppIceComponent : public QXmppLoggable
 {
     Q_OBJECT
@@ -196,7 +197,7 @@ Q_SIGNALS:
     /// \brief This signal is emitted when a data packet is received.
     void datagramReceived(const QByteArray &datagram);
 
-    /// \internal This signal is emitted when the gathering state of local candidates changes.
+    /// This signal is emitted when the gathering state of local candidates changes.
     void gatheringStateChanged();
 
     /// \brief This signal is emitted when the list of local candidates changes.
@@ -210,6 +211,7 @@ private:
     friend class QXmppIceConnection;
 };
 
+///
 /// \brief The QXmppIceConnection class represents a set of UDP sockets
 /// capable of performing Interactive Connectivity Establishment (RFC 5245).
 ///
@@ -235,9 +237,8 @@ private:
 /// connection->setRemoteUser("bar");
 /// connection->addRemoteCandidate(..);
 /// connection->connectToHost();
-///
 /// \endcode
-
+///
 class QXMPP_EXPORT QXmppIceConnection : public QXmppLoggable
 {
     Q_OBJECT
