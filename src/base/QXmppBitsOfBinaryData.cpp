@@ -21,9 +21,8 @@
  *
  */
 
-#include "QXmppBitsOfBinaryData.h"
-
 #include "QXmppBitsOfBinaryContentId.h"
+#include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
