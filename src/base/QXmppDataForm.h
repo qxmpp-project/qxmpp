@@ -41,20 +41,9 @@ class QXmppDataFormFieldPrivate;
 class QXmppDataFormMediaPrivate;
 class QXmppDataFormMediaSourcePrivate;
 
-///
-/// \brief The QXmppDataForm class represents a data form as defined by
-/// \xep{0004}: Data Forms.
-///
 class QXMPP_EXPORT QXmppDataForm
 {
 public:
-    ///
-    /// \brief The \c QXmppDataForm::MediaSource class represents a link to one
-    /// of possibly multiple sources for a media element from \xep{0221}: Data
-    /// Forms Media Element consisting of a MIME type and a QUrl.
-    ///
-    /// \since QXmpp 1.1
-    ///
     class QXMPP_EXPORT MediaSource
     {
     public:
@@ -78,12 +67,6 @@ public:
     };
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
-    ///
-    /// \brief The QXmppDataForm::Media class represents a media field as
-    /// defined by \xep{0221}: Data Forms Media Element.
-    ///
-    /// \deprecated This class is deprecated since QXmpp 1.1.
-    ///
     class QXMPP_EXPORT Media
     {
     public:
@@ -118,10 +101,6 @@ public:
     };
 #endif
 
-    ///
-    /// \brief The QXmppDataForm::Field class represents a data form field
-    /// as defined by \xep{0004}: Data Forms.
-    ///
     class QXMPP_EXPORT Field
     {
     public:
