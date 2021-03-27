@@ -35,6 +35,7 @@
 
 #include <gst/gst.h>
 
+/// \cond
 QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstElement *pipeline_,
                                                GstElement *rtpbin_, QString media_, QString creator_,
                                                QString name_, int id_)
@@ -326,6 +327,17 @@ void QXmppCallStreamPrivate::addRtcpSender(GstPad *pad)
         qFatal("Failed to link rtcp pads");
     }
 }
+/// \endcond
+
+///
+/// \class QXmppCallStream
+///
+/// The QXmppCallStream class represents an RTP stream in a VoIP call.
+///
+/// \note THIS API IS NOT FINALIZED YET
+///
+/// \since QXmpp 1.3
+///
 
 QXmppCallStream::QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
                                  QString media, QString creator, QString name, int id)

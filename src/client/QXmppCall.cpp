@@ -39,6 +39,7 @@
 #include <QDomElement>
 #include <QTimer>
 
+/// \cond
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
     : direction(QXmppCall::IncomingDirection),
       manager(0),
@@ -490,9 +491,9 @@ QXmppJingleIq::Content QXmppCallPrivate::localContent(QXmppCallStream *stream) c
     return content;
 }
 
+///
 /// Sends an acknowledgement for a Jingle IQ.
 ///
-
 bool QXmppCallPrivate::sendAck(const QXmppJingleIq &iq)
 {
     QXmppIq ack;
@@ -518,9 +519,9 @@ bool QXmppCallPrivate::sendInvite()
     return sendRequest(iq);
 }
 
+///
 /// Sends a Jingle IQ and adds it to outstanding requests.
 ///
-
 bool QXmppCallPrivate::sendRequest(const QXmppJingleIq &iq)
 {
     requests << iq;
@@ -540,8 +541,9 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
+///
 /// Request graceful call termination
-
+///
 void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
 {
     if (state == QXmppCall::DisconnectingState ||
@@ -561,6 +563,15 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     // schedule forceful termination in 5s
     QTimer::singleShot(5000, q, SLOT(terminated()));
 }
+/// \endcond
+
+///
+/// \class QXmppCall
+///
+/// The QXmppCall class represents a Voice-Over-IP call to a remote party.
+///
+/// \note THIS API IS NOT FINALIZED YET
+///
 
 QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent)
     : QXmppLoggable(parent)
@@ -577,9 +588,9 @@ QXmppCall::~QXmppCall()
     delete d;
 }
 
+///
 /// Call this method if you wish to accept an incoming call.
 ///
-
 void QXmppCall::accept()
 {
     if (d->direction == IncomingDirection && d->state == ConnectingState) {
@@ -604,28 +615,31 @@ void QXmppCall::accept()
     }
 }
 
+///
 /// Returns the GStreamer pipeline.
 ///
 /// \since QXmpp 1.3
-
+///
 GstElement *QXmppCall::pipeline() const
 {
     return d->pipeline;
 }
 
+///
 /// Returns the RTP stream for the audio data.
 ///
 /// \since QXmpp 1.3
-
+///
 QXmppCallStream *QXmppCall::audioStream() const
 {
     return d->findStreamByMedia(AUDIO_MEDIA);
 }
 
+///
 /// Returns the RTP stream for the video data.
 ///
 /// \since QXmpp 1.3
-
+///
 QXmppCallStream *QXmppCall::videoStream() const
 {
     return d->findStreamByMedia(VIDEO_MEDIA);
@@ -642,25 +656,25 @@ void QXmppCall::terminated()
     d->setState(QXmppCall::FinishedState);
 }
 
+///
 /// Returns the call's direction.
 ///
-
 QXmppCall::Direction QXmppCall::direction() const
 {
     return d->direction;
 }
 
+///
 /// Hangs up the call.
 ///
-
 void QXmppCall::hangup()
 {
     d->terminate(QXmppJingleIq::Reason::None);
 }
 
+///
 /// Sends a transport-info to inform the remote party of new local candidates.
 ///
-
 void QXmppCall::localCandidatesChanged()
 {
     // find the stream
@@ -684,33 +698,35 @@ void QXmppCall::localCandidatesChanged()
     d->sendRequest(iq);
 }
 
+///
 /// Returns the remote party's JID.
 ///
-
 QString QXmppCall::jid() const
 {
     return d->jid;
 }
 
+///
 /// Returns the call's session identifier.
 ///
-
 QString QXmppCall::sid() const
 {
     return d->sid;
 }
 
+///
 /// Returns the call's state.
 ///
 /// \sa stateChanged()
-
+///
 QXmppCall::State QXmppCall::state() const
 {
     return d->state;
 }
 
+///
 /// Starts sending video to the remote party.
-
+///
 void QXmppCall::addVideo()
 {
     if (d->state != QXmppCall::ActiveState) {

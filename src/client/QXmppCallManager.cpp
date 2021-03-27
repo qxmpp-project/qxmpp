@@ -37,6 +37,7 @@
 #include <QDomElement>
 #include <QTimer>
 
+/// \cond
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
     : turnPort(0),
       q(qq)
@@ -60,18 +61,20 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
             return call;
     return nullptr;
 }
+/// \endcond
 
+///
 /// Constructs a QXmppCallManager object to handle incoming and outgoing
 /// Voice-Over-IP calls.
 ///
-
 QXmppCallManager::QXmppCallManager()
 {
     d = new QXmppCallManagerPrivate(this);
 }
 
+///
 /// Destroys the QXmppCallManager object.
-
+///
 QXmppCallManager::~QXmppCallManager()
 {
     delete d;
@@ -119,10 +122,11 @@ void QXmppCallManager::setClient(QXmppClient *client)
 }
 /// \endcond
 
+///
 /// Initiates a new outgoing call to the specified recipient.
 ///
 /// \param jid
-
+///
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
 
@@ -152,6 +156,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     return call;
 }
 
+///
 /// Sets multiple STUN servers to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -160,12 +165,13 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 /// \param servers List of the STUN servers.
 ///
 /// \since QXmpp 1.3
-
+///
 void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> &servers)
 {
     d->stunServers = servers;
 }
 
+///
 /// Sets a single STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -173,60 +179,65 @@ void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> 
 ///
 /// \param host The address of the STUN server.
 /// \param port The port of the STUN server.
-
+///
 void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunServers.clear();
     d->stunServers.push_back(QPair<QHostAddress, quint16>(host, port));
 }
 
+///
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
 ///
 /// \param host The address of the TURN server.
 /// \param port The port of the TURN server.
-
+///
 void QXmppCallManager::setTurnServer(const QHostAddress &host, quint16 port)
 {
     d->turnHost = host;
     d->turnPort = port;
 }
 
+///
 /// Sets the \a user used for authentication with the TURN server.
 ///
 /// \param user
-
+///
 void QXmppCallManager::setTurnUser(const QString &user)
 {
     d->turnUser = user;
 }
 
+///
 /// Sets the \a password used for authentication with the TURN server.
 ///
 /// \param password
-
+///
 void QXmppCallManager::setTurnPassword(const QString &password)
 {
     d->turnPassword = password;
 }
 
+///
 /// Handles call destruction.
-
+///
 void QXmppCallManager::_q_callDestroyed(QObject *object)
 {
     d->calls.removeAll(static_cast<QXmppCall *>(object));
 }
 
+///
 /// Handles disconnection from server.
-
+///
 void QXmppCallManager::_q_disconnected()
 {
     for (auto *call : d->calls)
         call->d->terminate(QXmppJingleIq::Reason::Gone);
 }
 
+///
 /// Handles acknowledgements.
 ///
-
 void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 {
     if (ack.type() != QXmppIq::Result)
@@ -237,9 +248,9 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
         call->d->handleAck(ack);
 }
 
+///
 /// Handles a Jingle IQ.
 ///
-
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
 
@@ -301,8 +312,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
     }
 }
 
+///
 /// Handles a presence.
-
+///
 void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
 {
     if (presence.type() != QXmppPresence::Unavailable)
