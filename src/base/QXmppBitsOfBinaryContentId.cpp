@@ -63,14 +63,24 @@ QXmppBitsOfBinaryContentIdPrivate::QXmppBitsOfBinaryContentIdPrivate()
 {
 }
 
-/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231}: Bits of Binary
+///
+/// \class QXmppBitsOfBinaryContentId
+///
+/// QXmppBitsOfBinaryContentId represents a link to or an identifier of
+/// \xep{0231, Bits of Binary} data.
+///
+/// \since QXmpp 1.2
+///
+
+///
+/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231, Bits of Binary}
 /// \c cid: URL
 ///
 /// In case parsing failed, the returned \c QXmppBitsOfBinaryContentId is
 /// empty.
 ///
 /// \see QXmppBitsOfBinaryContentId::fromContentId
-
+///
 QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString &input)
 {
     if (input.startsWith(CONTENTID_URL))
@@ -79,7 +89,8 @@ QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString 
     return {};
 }
 
-/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231}: Bits of Binary
+///
+/// Parses a \c QXmppBitsOfBinaryContentId from a \xep{0231, Bits of Binary}
 /// content id
 ///
 /// In case parsing failed, the returned \c QXmppBitsOfBinaryContentId is
@@ -89,7 +100,7 @@ QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString 
 /// \c QXmppBitsOfBinaryContentId::fromCidUrl for that purpose.
 ///
 /// \see QXmppBitsOfBinaryContentId::fromCidUrl
-
+///
 QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromContentId(const QString &input)
 {
     if (input.startsWith(CONTENTID_URL) || !input.endsWith(CONTENTID_POSTFIX))
@@ -113,28 +124,34 @@ QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromContentId(const QStri
     return cid;
 }
 
+///
 /// Default contructor
-
+///
 QXmppBitsOfBinaryContentId::QXmppBitsOfBinaryContentId()
     : d(new QXmppBitsOfBinaryContentIdPrivate)
 {
 }
 
+///
 /// Returns true, if two \c QXmppBitsOfBinaryContentId equal
-
+///
 bool QXmppBitsOfBinaryContentId::operator==(const QXmppBitsOfBinaryContentId &other) const
 {
     return d->algorithm == other.algorithm() && d->hash == other.hash();
 }
 
+/// Default destructor
 QXmppBitsOfBinaryContentId::~QXmppBitsOfBinaryContentId() = default;
 
+/// Default copy-constructor
 QXmppBitsOfBinaryContentId::QXmppBitsOfBinaryContentId(const QXmppBitsOfBinaryContentId &cid) = default;
 
+/// Default assignment operator
 QXmppBitsOfBinaryContentId &QXmppBitsOfBinaryContentId::operator=(const QXmppBitsOfBinaryContentId &other) = default;
 
-/// Returns a \xep{0231}: Bits of Binary content id
-
+///
+/// Returns a \xep{0231, Bits of Binary} content id
+///
 QString QXmppBitsOfBinaryContentId::toContentId() const
 {
     if (!isValid())
@@ -146,8 +163,9 @@ QString QXmppBitsOfBinaryContentId::toContentId() const
         CONTENTID_POSTFIX;
 }
 
-/// Returns a \xep{0231}: Bits of Binary \c cid: URL
-
+///
+/// Returns a \xep{0231, Bits of Binary} \c cid: URL
+///
 QString QXmppBitsOfBinaryContentId::toCidUrl() const
 {
     if (!isValid())
@@ -156,32 +174,36 @@ QString QXmppBitsOfBinaryContentId::toCidUrl() const
     return toContentId().prepend(CONTENTID_URL);
 }
 
+///
 /// Returns the hash value in binary form
-
+///
 QByteArray QXmppBitsOfBinaryContentId::hash() const
 {
     return d->hash;
 }
 
+///
 /// Sets the hash value in binary form
-
+///
 void QXmppBitsOfBinaryContentId::setHash(const QByteArray &hash)
 {
     d->hash = hash;
 }
 
+///
 /// Returns the hash algorithm used to calculate the \c hash value
 ///
 /// The default value is \c QCryptographicHash::Sha1.
 ///
 /// This currently supports MD4, MD5, SHA-1, SHA-2 (SHA224 - SHA512) and SHA-3
 /// (SHA3-224 - SHA3-512).
-
+///
 QCryptographicHash::Algorithm QXmppBitsOfBinaryContentId::algorithm() const
 {
     return d->algorithm;
 }
 
+///
 /// Sets the hash algorithm used to calculate the \c hash value
 ///
 /// The default value is \c QCryptographicHash::Sha1.
@@ -193,12 +215,13 @@ QCryptographicHash::Algorithm QXmppBitsOfBinaryContentId::algorithm() const
 /// hashing algorithms than SHA-1 to be used, but not all clients support this.
 /// Since in most cases the content id is not security relevant it is not a
 /// problem to continue using SHA-1.
-
+///
 void QXmppBitsOfBinaryContentId::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
     d->algorithm = algo;
 }
 
+///
 /// Checks whether the content id is valid and can be serialized into a string.
 ///
 /// \note Checking the hash length requires QXmpp to be built with Qt 5.12.0 or
@@ -206,7 +229,7 @@ void QXmppBitsOfBinaryContentId::setAlgorithm(QCryptographicHash::Algorithm algo
 ///
 /// \returns True, if the set hashing algorithm is supported, a hash value is
 /// set and its length is correct, false otherwise.
-
+///
 bool QXmppBitsOfBinaryContentId::isValid() const
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
@@ -218,12 +241,14 @@ bool QXmppBitsOfBinaryContentId::isValid() const
 #endif
 }
 
+///
 /// Checks whether \c input is a Bits of Binary content id or \c cid: URL
 ///
+/// \param input The string to be checked.
 /// \param checkIsCidUrl If true, it only accepts \c cid: URLs.
 ///
 /// \returns True, if \c input is valid.
-
+///
 bool QXmppBitsOfBinaryContentId::isBitsOfBinaryContentId(const QString &input, bool checkIsCidUrl)
 {
     return input.endsWith(CONTENTID_POSTFIX) &&

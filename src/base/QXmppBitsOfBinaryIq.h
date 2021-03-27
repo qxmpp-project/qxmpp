@@ -27,11 +27,6 @@
 #include "QXmppBitsOfBinaryData.h"
 #include "QXmppIq.h"
 
-/// \class QXmppBitsOfBinaryIq represents a \xep{0231}: Bits of Binary IQ to
-/// request and transmit Bits of Binary data elements.
-///
-/// \since QXmpp 1.2
-
 class QXMPP_EXPORT QXmppBitsOfBinaryIq : public QXmppIq, public QXmppBitsOfBinaryData
 {
 public:
