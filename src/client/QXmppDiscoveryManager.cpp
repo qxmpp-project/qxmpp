@@ -118,7 +118,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     features << QXmppClientPrivate::discoveryFeatures();
 
     // add features of all registered extensions
-    const QList<QXmppClientExtension *> extensions = client()->extensions();
+    const auto extensions = client()->extensions();
     for (auto* extension : extensions) {
         if (extension)
             features << extension->discoveryFeatures();
