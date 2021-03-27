@@ -26,18 +26,15 @@
 
 #include "QXmppIq.h"
 
-///
-/// \brief QXmppPingIq represents a Ping IQ as defined by \xep{0199}: XMPP
-/// Ping.
-///
-/// \ingroup Stanzas
-///
 class QXMPP_EXPORT QXmppPingIq : public QXmppIq
 {
 public:
     QXmppPingIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     static bool isPingIq(const QDomElement &element);
+
+    /// \cond
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
+    /// \endcond
 };
 
 #endif

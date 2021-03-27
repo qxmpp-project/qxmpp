@@ -28,10 +28,22 @@
 
 #include <QDomElement>
 
-QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
+///
+/// \class QXmppPingIq
+///
+/// QXmppPingIq represents a Ping IQ as defined by \xep{0199, XMPP Ping}.
+///
+/// \ingroup Stanzas
+///
+
+QXmppPingIq::QXmppPingIq()
+    : QXmppIq(QXmppIq::Get)
 {
 }
 
+///
+/// Returns true, if the element is a ping IQ.
+///
 bool QXmppPingIq::isPingIq(const QDomElement &element)
 {
     QDomElement pingElement = element.firstChildElement(QStringLiteral("ping"));
@@ -39,9 +51,11 @@ bool QXmppPingIq::isPingIq(const QDomElement &element)
             pingElement.namespaceURI() == ns_ping);
 }
 
+/// \cond
 void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("ping"));
     writer->writeDefaultNamespace(ns_ping);
     writer->writeEndElement();
 }
+/// \endcond

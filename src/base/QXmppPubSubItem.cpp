@@ -40,10 +40,12 @@ QXmppPubSubItem::QXmppPubSubItem()
 {
 }
 
+/// Default copy-constructor
 QXmppPubSubItem::QXmppPubSubItem(const QXmppPubSubItem &iq) = default;
 
 QXmppPubSubItem::~QXmppPubSubItem() = default;
 
+/// Default assignment operator
 QXmppPubSubItem &QXmppPubSubItem::operator=(const QXmppPubSubItem &iq) = default;
 
 /// Returns the ID of the PubSub item.

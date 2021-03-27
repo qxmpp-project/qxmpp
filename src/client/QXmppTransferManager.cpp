@@ -464,7 +464,9 @@ void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
 
 /// \cond
 QXmppTransferIncomingJob::QXmppTransferIncomingJob(const QString &jid, QXmppClient *client, QObject *parent)
-    : QXmppTransferJob(jid, IncomingDirection, client, parent), m_candidateClient(nullptr), m_candidateTimer(nullptr)
+    : QXmppTransferJob(jid, IncomingDirection, client, parent),
+      m_candidateClient(nullptr),
+      m_candidateTimer(nullptr)
 {
 }
 
