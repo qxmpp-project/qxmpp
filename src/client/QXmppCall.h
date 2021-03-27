@@ -36,15 +36,14 @@ class QXmppCallPrivate;
 class QXmppCallManager;
 class QXmppCallManagerPrivate;
 
-/// \brief The QXmppCall class represents a Voice-Over-IP call to a remote party.
-///
-/// \note THIS API IS NOT FINALIZED YET
-
 class QXMPP_EXPORT QXmppCall : public QXmppLoggable
 {
     Q_OBJECT
+    /// The call's direction
     Q_PROPERTY(Direction direction READ direction CONSTANT)
+    /// The remote party's JID
     Q_PROPERTY(QString jid READ jid CONSTANT)
+    /// The call's state
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
