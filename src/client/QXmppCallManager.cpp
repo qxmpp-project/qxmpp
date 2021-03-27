@@ -83,12 +83,13 @@ QXmppCallManager::~QXmppCallManager()
 /// \cond
 QStringList QXmppCallManager::discoveryFeatures() const
 {
-    return QStringList()
-        << ns_jingle      // XEP-0166 : Jingle
-        << ns_jingle_rtp  // XEP-0167 : Jingle RTP Sessions
-        << ns_jingle_rtp_audio
-        << ns_jingle_rtp_video
-        << ns_jingle_ice_udp;  // XEP-0176 : Jingle ICE-UDP Transport Method
+    return {
+        ns_jingle,      // XEP-0166 : Jingle
+        ns_jingle_rtp,  // XEP-0167 : Jingle RTP Sessions
+        ns_jingle_rtp_audio,
+        ns_jingle_rtp_video,
+        ns_jingle_ice_udp,  // XEP-0176 : Jingle ICE-UDP Transport Method
+    };
 }
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
@@ -108,7 +109,6 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
 
 void QXmppCallManager::setClient(QXmppClient *client)
 {
-
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::disconnected,
@@ -129,7 +129,6 @@ void QXmppCallManager::setClient(QXmppClient *client)
 ///
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
-
     if (jid.isEmpty()) {
         warning("Refusing to call an empty jid");
         return nullptr;
@@ -183,7 +182,7 @@ void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> 
 void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunServers.clear();
-    d->stunServers.push_back(QPair<QHostAddress, quint16>(host, port));
+    d->stunServers.push_back(QPair(host, port));
 }
 
 ///
@@ -231,8 +230,9 @@ void QXmppCallManager::_q_callDestroyed(QObject *object)
 ///
 void QXmppCallManager::_q_disconnected()
 {
-    for (auto *call : d->calls)
+    for (auto *call : std::as_const(d->calls)) {
         call->d->terminate(QXmppJingleIq::Reason::Gone);
+    }
 }
 
 ///
@@ -244,8 +244,9 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
         return;
 
     // find request
-    for (auto *call : d->calls)
+    for (auto *call : std::as_const(d->calls)) {
         call->d->handleAck(ack);
+    }
 }
 
 ///
@@ -262,8 +263,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
         call->d->sid = iq.sid();
 
-        const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
-        QXmppCallStream *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
+        const auto content = iq.contents().isEmpty() ? QXmppJingleIq::Content()
+                                                     : iq.contents().constFirst();
+        auto *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
         if (!stream)
             return;
         call->d->streams << stream;
@@ -320,7 +322,7 @@ void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
     if (presence.type() != QXmppPresence::Unavailable)
         return;
 
-    for (auto *call : d->calls) {
+    for (auto *call : std::as_const(d->calls)) {
         if (presence.from() == call->jid()) {
             // the remote party has gone away, terminate call
             call->d->terminate(QXmppJingleIq::Reason::Gone);

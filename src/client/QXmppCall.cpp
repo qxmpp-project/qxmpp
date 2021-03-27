@@ -94,9 +94,7 @@ QXmppCallPrivate::~QXmppCallPrivate()
     if (gst_element_set_state(pipeline, GST_STATE_NULL) == GST_STATE_CHANGE_FAILURE) {
         qFatal("Unable to set the pipeline to the null state");
     }
-    for (auto stream : streams) {
-        delete stream;
-    }
+    qDeleteAll(streams);
     gst_object_unref(pipeline);
 }
 
@@ -195,7 +193,7 @@ void QXmppCallPrivate::filterGStreamerFormats(QList<GstCodec> &formats)
 
 QXmppCallStream *QXmppCallPrivate::findStreamByMedia(const QString &media)
 {
-    for (auto stream : streams) {
+    for (auto stream : std::as_const(streams)) {
         if (stream->media() == media) {
             return stream;
         }
@@ -205,7 +203,7 @@ QXmppCallStream *QXmppCallPrivate::findStreamByMedia(const QString &media)
 
 QXmppCallStream *QXmppCallPrivate::findStreamByName(const QString &name)
 {
-    for (auto stream : streams) {
+    for (auto stream : std::as_const(streams)) {
         if (stream->name() == name) {
             return stream;
         }
@@ -215,7 +213,7 @@ QXmppCallStream *QXmppCallPrivate::findStreamByName(const QString &name)
 
 QXmppCallStream *QXmppCallPrivate::findStreamById(const int id)
 {
-    for (auto stream : streams) {
+    for (auto stream : std::as_const(streams)) {
         if (stream->id() == id) {
             return stream;
         }
@@ -296,7 +294,8 @@ bool QXmppCallPrivate::handleTransport(QXmppCallStream *stream, const QXmppJingl
 {
     stream->d->connection->setRemoteUser(content.transportUser());
     stream->d->connection->setRemotePassword(content.transportPassword());
-    for (const QXmppJingleCandidate &candidate : content.transportCandidates()) {
+    const auto candidates = content.transportCandidates();
+    for (const auto &candidate : candidates) {
         stream->d->connection->addRemoteCandidate(candidate);
     }
 
@@ -309,7 +308,7 @@ bool QXmppCallPrivate::handleTransport(QXmppCallStream *stream, const QXmppJingl
 
 void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 {
-    const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
+    const auto content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().constFirst();
 
     if (iq.action() == QXmppJingleIq::SessionAccept) {
 
@@ -422,8 +421,6 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
 QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QString &creator, const QString &name)
 {
-    bool check;
-    Q_UNUSED(check);
     Q_ASSERT(manager);
 
     if (media != AUDIO_MEDIA && media != VIDEO_MEDIA) {
@@ -436,7 +433,7 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
         return nullptr;
     }
 
-    QXmppCallStream *stream = new QXmppCallStream(pipeline, rtpbin, media, creator, name, ++nextId);
+    auto *stream = new QXmppCallStream(pipeline, rtpbin, media, creator, name, ++nextId);
 
     // Fill local payload payload types
     auto &codecs = media == AUDIO_MEDIA ? audioCodecs : videoCodecs;
@@ -458,15 +455,13 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
     stream->d->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    check = QObject::connect(stream->d->connection, SIGNAL(localCandidatesChanged()),
-                             q, SLOT(localCandidatesChanged()));
-    Q_ASSERT(check);
+    QObject::connect(stream->d->connection, &QXmppIceConnection::localCandidatesChanged,
+                     q, &QXmppCall::localCandidatesChanged);
 
-    check = QObject::connect(stream->d->connection, SIGNAL(disconnected()),
-                             q, SLOT(hangup()));
-    Q_ASSERT(check);
+    QObject::connect(stream->d->connection, &QXmppIceConnection::disconnected,
+                     q, &QXmppCall::hangup);
 
-    Q_EMIT q->streamCreated(stream);
+    emit q->streamCreated(stream);
 
     return stream;
 }
@@ -561,7 +556,7 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     setState(QXmppCall::DisconnectingState);
 
     // schedule forceful termination in 5s
-    QTimer::singleShot(5000, q, SLOT(terminated()));
+    QTimer::singleShot(5000, q, &QXmppCall::terminated);
 }
 /// \endcond
 
@@ -608,7 +603,7 @@ void QXmppCall::accept()
         d->sendRequest(iq);
 
         // notify user
-        d->manager->callStarted(this);
+        emit d->manager->callStarted(this);
 
         // check for call establishment
         d->setState(QXmppCall::ActiveState);
@@ -648,7 +643,7 @@ QXmppCallStream *QXmppCall::videoStream() const
 void QXmppCall::terminated()
 {
     // close streams
-    for (auto stream : d->streams) {
+    for (auto stream : std::as_const(d->streams)) {
         stream->d->connection->close();
     }
 
@@ -679,8 +674,8 @@ void QXmppCall::localCandidatesChanged()
 {
     // find the stream
     QXmppIceConnection *conn = qobject_cast<QXmppIceConnection *>(sender());
-    QXmppCallStream *stream = 0;
-    for (auto ptr : d->streams) {
+    QXmppCallStream *stream = nullptr;
+    for (auto ptr : std::as_const(d->streams)) {
         if (ptr->d->connection == conn) {
             stream = ptr;
             break;

@@ -32,7 +32,6 @@
 #endif
 
 #include <cstring>
-
 #include <gst/gst.h>
 
 /// \cond
@@ -223,7 +222,7 @@ void QXmppCallStreamPrivate::addEncoder(QXmppCallPrivate::GstCodec &codec)
         qFatal("Failed to create encoder");
         return;
     }
-    for (auto &encProp : codec.encProps) {
+    for (auto &encProp : std::as_const(codec.encProps)) {
         g_object_set(encoder, encProp.name.toLatin1().data(), encProp.value, nullptr);
     }
 
