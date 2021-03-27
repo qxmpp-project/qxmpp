@@ -27,6 +27,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
+#include <optional>
+
 #include <QDebug>
 #include <QDomElement>
 #include <QMimeDatabase>
@@ -316,23 +318,16 @@ bool QXmppDataForm::Media::isNull() const
 class QXmppDataFormFieldPrivate : public QSharedData
 {
 public:
-    QXmppDataFormFieldPrivate();
-
     QString description;
     QString key;
     QString label;
     QList<QPair<QString, QString>> options;
-    bool required;
-    QXmppDataForm::Field::Type type;
+    bool required = false;
+    QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField;
     QVariant value;
     QSize mediaSize;
     QVector<QXmppDataForm::MediaSource> mediaSources;
 };
-
-QXmppDataFormFieldPrivate::QXmppDataFormFieldPrivate()
-    : required(false), type(QXmppDataForm::Field::TextSingleField)
-{
-}
 
 ///
 /// \class QXmppDataForm::Field
@@ -373,29 +368,14 @@ QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type,
     d->options = options;
 }
 
-///
 /// Constructs a copy of \a other.
-///
-QXmppDataForm::Field::Field(const QXmppDataForm::Field &other)
-    : d(other.d)
-{
-}
+QXmppDataForm::Field::Field(const QXmppDataForm::Field &other) = default;
 
-///
 /// Destroys the form field.
-///
-QXmppDataForm::Field::~Field()
-{
-}
+QXmppDataForm::Field::~Field() = default;
 
-///
 /// Assigns \a other to this field.
-///
-QXmppDataForm::Field &QXmppDataForm::Field::operator=(const QXmppDataForm::Field &other)
-{
-    d = other.d;
-    return *this;
-}
+QXmppDataForm::Field &QXmppDataForm::Field::operator=(const QXmppDataForm::Field &other) = default;
 
 ///
 /// Returns the field's description.
@@ -665,18 +645,11 @@ bool QXmppDataForm::Field::operator==(const QXmppDataForm::Field &other) const
 class QXmppDataFormPrivate : public QSharedData
 {
 public:
-    QXmppDataFormPrivate();
-
     QString instructions;
     QList<QXmppDataForm::Field> fields;
     QString title;
-    QXmppDataForm::Type type;
+    QXmppDataForm::Type type = QXmppDataForm::None;
 };
-
-QXmppDataFormPrivate::QXmppDataFormPrivate()
-    : type(QXmppDataForm::None)
-{
-}
 
 ///
 /// \class QXmppDataForm
@@ -688,7 +661,7 @@ QXmppDataFormPrivate::QXmppDataFormPrivate()
 ///
 /// Constructs a QXmppDataForm of the specified \a type.
 ///
-QXmppDataForm::QXmppDataForm(QXmppDataForm::Type type)
+QXmppDataForm::QXmppDataForm(Type type)
     : d(new QXmppDataFormPrivate)
 {
     d->type = type;
@@ -711,29 +684,14 @@ QXmppDataForm::QXmppDataForm(Type type,
     d->instructions = instructions;
 }
 
-///
 /// Constructs a copy of \a other.
-///
-QXmppDataForm::QXmppDataForm(const QXmppDataForm &other)
-    : d(other.d)
-{
-}
+QXmppDataForm::QXmppDataForm(const QXmppDataForm &other) = default;
 
-///
 /// Destroys the form.
-///
-QXmppDataForm::~QXmppDataForm()
-{
-}
+QXmppDataForm::~QXmppDataForm() = default;
 
-///
 /// Assigns \a other to this form.
-///
-QXmppDataForm &QXmppDataForm::operator=(const QXmppDataForm &other)
-{
-    d = other.d;
-    return *this;
-}
+QXmppDataForm &QXmppDataForm::operator=(const QXmppDataForm &other) = default;
 
 ///
 /// Returns the form's fields.
@@ -851,17 +809,10 @@ void QXmppDataForm::parse(const QDomElement &element)
         return;
 
     /* form type */
-    const QString typeStr = element.attribute("type");
-    if (typeStr == "form")
-        d->type = QXmppDataForm::Form;
-    else if (typeStr == "submit")
-        d->type = QXmppDataForm::Submit;
-    else if (typeStr == "cancel")
-        d->type = QXmppDataForm::Cancel;
-    else if (typeStr == "result")
-        d->type = QXmppDataForm::Result;
-    else {
-        qWarning() << "Unknown form type" << typeStr;
+    if (const auto type = formTypeFromString(element.attribute("type"))) {
+        d->type = *type;
+    } else {
+        qWarning() << "Unknown form type" << element.attribute("type");
         return;
     }
 
@@ -869,41 +820,38 @@ void QXmppDataForm::parse(const QDomElement &element)
     d->title = element.firstChildElement("title").text();
     d->instructions = element.firstChildElement("instructions").text();
 
-    QDomElement fieldElement = element.firstChildElement("field");
-    while (!fieldElement.isNull()) {
+    for (auto fieldElement = element.firstChildElement("field");
+         !fieldElement.isNull();
+         fieldElement = fieldElement.nextSiblingElement("field")) {
         QXmppDataForm::Field field;
 
         /* field type */
-        QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField;
-        const QString typeStr = fieldElement.attribute("type");
-        struct field_type *ptr;
-        for (ptr = field_types; ptr->str; ptr++) {
-            if (typeStr == ptr->str) {
-                type = ptr->type;
-                break;
-            }
-        }
-        field.setType(type);
+        field.setType(fieldTypeFromString(fieldElement.attribute("type")).value_or(Field::TextSingleField));
 
         /* field attributes */
         field.setLabel(fieldElement.attribute("label"));
         field.setKey(fieldElement.attribute("var"));
 
         /* field value(s) */
-        if (type == QXmppDataForm::Field::BooleanField) {
-            const QString valueStr = fieldElement.firstChildElement("value").text();
+        switch (field.type()) {
+        case Field::BooleanField: {
+            const auto valueStr = fieldElement.firstChildElement("value").text();
             field.setValue(valueStr == "1" || valueStr == "true");
-        } else if (type == QXmppDataForm::Field::ListMultiField ||
-                   type == QXmppDataForm::Field::JidMultiField ||
-                   type == QXmppDataForm::Field::TextMultiField) {
+            break;
+        }
+        case Field::ListMultiField:
+        case Field::JidMultiField:
+        case Field::TextMultiField: {
             QStringList values;
-            QDomElement valueElement = fieldElement.firstChildElement("value");
-            while (!valueElement.isNull()) {
-                values.append(valueElement.text());
-                valueElement = valueElement.nextSiblingElement("value");
+            for (auto element = fieldElement.firstChildElement("value");
+                 !element.isNull();
+                 element = element.nextSiblingElement("value")) {
+                values << element.text();
             }
             field.setValue(values);
-        } else {
+            break;
+        }
+        default:
             field.setValue(fieldElement.firstChildElement("value").text());
         }
 
@@ -925,16 +873,19 @@ void QXmppDataForm::parse(const QDomElement &element)
         }
 
         /* field options */
-        if (type == QXmppDataForm::Field::ListMultiField ||
-            type == QXmppDataForm::Field::ListSingleField) {
+        switch (field.type()) {
+        case Field::ListMultiField:
+        case Field::ListSingleField: {
             QList<QPair<QString, QString>> options;
-            QDomElement optionElement = fieldElement.firstChildElement("option");
-            while (!optionElement.isNull()) {
-                options.append(QPair<QString, QString>(optionElement.attribute("label"),
-                                                       optionElement.firstChildElement("value").text()));
-                optionElement = optionElement.nextSiblingElement("option");
+            for (auto element = fieldElement.firstChildElement("option");
+                 !element.isNull();
+                 element = element.nextSiblingElement("option")) {
+                options << QPair(element.attribute("label"), element.firstChildElement("value").text());
             }
             field.setOptions(options);
+        }
+        default:
+            break;
         }
 
         /* other properties */
@@ -942,8 +893,6 @@ void QXmppDataForm::parse(const QDomElement &element)
         field.setRequired(!fieldElement.firstChildElement("required").isNull());
 
         d->fields.append(field);
-
-        fieldElement = fieldElement.nextSiblingElement("field");
     }
 }
 
@@ -956,16 +905,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_data);
 
     /* form type */
-    QString typeStr;
-    if (d->type == QXmppDataForm::Form)
-        typeStr = "form";
-    else if (d->type == QXmppDataForm::Submit)
-        typeStr = "submit";
-    else if (d->type == QXmppDataForm::Cancel)
-        typeStr = "cancel";
-    else if (d->type == QXmppDataForm::Result)
-        typeStr = "result";
-    writer->writeAttribute("type", typeStr);
+    writer->writeAttribute("type", formTypeToString(d->type));
 
     /* form properties */
     if (!d->title.isEmpty())
@@ -973,41 +913,40 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     if (!d->instructions.isEmpty())
         writer->writeTextElement("instructions", d->instructions);
 
-    for (const QXmppDataForm::Field &field : d->fields) {
+    for (const auto &field : d->fields) {
         writer->writeStartElement("field");
 
         /* field type */
-        const QXmppDataForm::Field::Type type = field.type();
-        QString typeStr;
-        struct field_type *ptr;
-        for (ptr = field_types; ptr->str; ptr++) {
-            if (type == ptr->type) {
-                typeStr = ptr->str;
-                break;
-            }
-        }
-        writer->writeAttribute("type", typeStr);
+        writer->writeAttribute("type", fieldTypeToString(field.type()));
 
         /* field attributes */
         helperToXmlAddAttribute(writer, "label", field.label());
         helperToXmlAddAttribute(writer, "var", field.key());
 
         /* field value(s) */
-        if (type == QXmppDataForm::Field::BooleanField) {
+        switch (field.type()) {
+        case Field::BooleanField:
             helperToXmlAddTextElement(writer, "value", field.value().toBool() ? "1" : "0");
-        } else if (type == QXmppDataForm::Field::ListMultiField ||
-                   type == QXmppDataForm::Field::JidMultiField ||
-                   type == QXmppDataForm::Field::TextMultiField) {
-            for (const QString &value : field.value().toStringList())
+            break;
+        case Field::ListMultiField:
+        case Field::JidMultiField:
+        case Field::TextMultiField: {
+            const auto values = field.value().toStringList();
+            for (const QString &value : values) {
                 helperToXmlAddTextElement(writer, "value", value);
-        } else if (!field.value().toString().isEmpty()) {
-            helperToXmlAddTextElement(writer, "value", field.value().toString());
+            }
+            break;
+        }
+        default:
+            if (const auto value = field.value().toString(); !value.isEmpty()) {
+                helperToXmlAddTextElement(writer, "value", value);
+            }
         }
 
         /* field media */
         if (!field.mediaSources().isEmpty()) {
             writer->writeStartElement("media");
-            helperToXmlAddAttribute(writer, "xmlns", ns_media_element);
+            writer->writeDefaultNamespace(ns_media_element);
 
             // media width and height
             if (field.mediaSize().width() > 0)
@@ -1021,7 +960,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
                     QStringLiteral("height"),
                     QString::number(field.mediaSize().height()));
 
-            const QVector<MediaSource> &sources = field.mediaSources();
+            const auto sources = field.mediaSources();
             for (const auto &source : sources) {
                 writer->writeStartElement(QStringLiteral("uri"));
                 helperToXmlAddAttribute(writer, QStringLiteral("type"), source.contentType().name());
@@ -1033,15 +972,19 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         }
 
         /* field options */
-        if (type == QXmppDataForm::Field::ListMultiField ||
-            type == QXmppDataForm::Field::ListSingleField) {
-            QPair<QString, QString> option;
-            for (const auto &option : field.options()) {
+        switch (field.type()) {
+        case Field::ListMultiField:
+        case Field::ListSingleField: {
+            const auto options = field.options();
+            for (const auto &option : options) {
                 writer->writeStartElement("option");
                 helperToXmlAddAttribute(writer, "label", option.first);
                 helperToXmlAddTextElement(writer, "value", option.second);
                 writer->writeEndElement();
             }
+        }
+        default:
+            break;
         }
 
         /* other properties */
