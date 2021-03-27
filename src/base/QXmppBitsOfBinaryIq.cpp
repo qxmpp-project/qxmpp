@@ -28,15 +28,25 @@
 #include <QDomElement>
 #include <QSharedData>
 
+///
+/// \class QXmppBitsOfBinaryIq
+///
+/// QXmppBitsOfBinaryIq represents a \xep{0231, Bits of Binary} IQ to request
+/// and transmit Bits of Binary data elements.
+///
+/// \since QXmpp 1.2
+///
+
 QXmppBitsOfBinaryIq::QXmppBitsOfBinaryIq() = default;
 
 QXmppBitsOfBinaryIq::~QXmppBitsOfBinaryIq() = default;
 
-/// Returns true, if \c element is a \xep{0231}: Bits of Binary IQ
+///
+/// Returns true, if \c element is a \xep{0231, Bits of Binary} IQ
 ///
 /// \note This may also return true, if the IQ is not a Bits of Binary IQ in
 /// first place, but only contains a Bits of Binary data element.
-
+///
 bool QXmppBitsOfBinaryIq::isBitsOfBinaryIq(const QDomElement &element)
 {
     QDomElement child = element.firstChildElement();

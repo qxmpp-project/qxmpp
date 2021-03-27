@@ -28,6 +28,15 @@
 
 #include <QDomElement>
 
+///
+/// \class QXmppBitsOfBinaryDataList
+///
+/// QXmppBitsOfBinaryDataList represents a list of data elements from
+/// \xep{0231, Bits of Binary}.
+///
+/// \since QXmpp 1.2
+///
+
 QXmppBitsOfBinaryDataList::QXmppBitsOfBinaryDataList() = default;
 
 QXmppBitsOfBinaryDataList::~QXmppBitsOfBinaryDataList() = default;
