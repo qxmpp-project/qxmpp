@@ -64,52 +64,102 @@ public:
     QString type;
 };
 
+///
+/// \class QXmppDiscoveryIq::Identity
+///
+/// \brief Identity represents one of possibly multiple identities of an
+/// XMPP entity obtained from a service discovery request as defined in
+/// \xep{0030}: Service Discovery.
+///
+
 QXmppDiscoveryIq::Identity::Identity()
     : d(new QXmppDiscoveryIdentityPrivate)
 {
 }
 
+/// Default copy-constructor
 QXmppDiscoveryIq::Identity::Identity(const QXmppDiscoveryIq::Identity &other) = default;
 
 QXmppDiscoveryIq::Identity::~Identity() = default;
 
+/// Default assignment operator
 QXmppDiscoveryIq::Identity &QXmppDiscoveryIq::Identity::operator=(const QXmppDiscoveryIq::Identity &) = default;
 
+///
+/// Returns the category (e.g. "account", "client", "conference", etc.) of the
+/// identity.
+///
+/// See https://xmpp.org/registrar/disco-categories.html for more details.
+///
 QString QXmppDiscoveryIq::Identity::category() const
 {
     return d->category;
 }
 
+///
+/// Sets the category (e.g. "account", "client", "conference", etc.) of the
+/// identity.
+///
+/// See https://xmpp.org/registrar/disco-categories.html for more details.
+///
 void QXmppDiscoveryIq::Identity::setCategory(const QString &category)
 {
     d->category = category;
 }
 
+///
+/// Returns the language code of the identity.
+///
+/// It is possible that the same identity (same type and same category) is
+/// included multiple times with different languages and localized names.
+///
 QString QXmppDiscoveryIq::Identity::language() const
 {
     return d->language;
 }
 
+///
+/// Sets the language code of the identity.
+///
+/// It is possible that the same identity (same type and same category) is
+/// included multiple times with different languages and localized names.
+///
 void QXmppDiscoveryIq::Identity::setLanguage(const QString &language)
 {
     d->language = language;
 }
 
+///
+/// Returns the human-readable name of the service.
+///
 QString QXmppDiscoveryIq::Identity::name() const
 {
     return d->name;
 }
 
+///
+/// Sets the human-readable name of the service.
+///
 void QXmppDiscoveryIq::Identity::setName(const QString &name)
 {
     d->name = name;
 }
 
+///
+/// Returns the service type in this category.
+///
+/// See https://xmpp.org/registrar/disco-categories.html for details.
+///
 QString QXmppDiscoveryIq::Identity::type() const
 {
     return d->type;
 }
 
+///
+/// Sets the service type in this category.
+///
+/// See https://xmpp.org/registrar/disco-categories.html for details.
+///
 void QXmppDiscoveryIq::Identity::setType(const QString &type)
 {
     d->type = type;
@@ -123,42 +173,69 @@ public:
     QString node;
 };
 
+///
+/// \class QXmppDiscoveryIq::Item
+///
+/// Item represents a related XMPP entity that can be queried using \xep{0030,
+/// Service Discovery}.
+///
+
 QXmppDiscoveryIq::Item::Item()
     : d(new QXmppDiscoveryItemPrivate)
 {
 }
 
+/// Default copy-constructor
 QXmppDiscoveryIq::Item::Item(const QXmppDiscoveryIq::Item &) = default;
 
 QXmppDiscoveryIq::Item::~Item() = default;
 
+/// Default assignment operator
 QXmppDiscoveryIq::Item &QXmppDiscoveryIq::Item::operator=(const QXmppDiscoveryIq::Item &) = default;
 
+///
+/// Returns the jid of the item.
+///
 QString QXmppDiscoveryIq::Item::jid() const
 {
     return d->jid;
 }
 
+///
+/// Sets the jid of the item.
+///
 void QXmppDiscoveryIq::Item::setJid(const QString &jid)
 {
     d->jid = jid;
 }
 
+///
+/// Returns the items human-readable name.
+///
 QString QXmppDiscoveryIq::Item::name() const
 {
     return d->name;
 }
 
+///
+/// Sets the items human-readable name.
+///
 void QXmppDiscoveryIq::Item::setName(const QString &name)
 {
     d->name = name;
 }
 
+///
+/// Returns a special service discovery node.
+///
 QString QXmppDiscoveryIq::Item::node() const
 {
     return d->node;
 }
 
+///
+/// Sets a special service discovery node.
+///
 void QXmppDiscoveryIq::Item::setNode(const QString &node)
 {
     d->node = node;
@@ -172,92 +249,143 @@ public:
     QList<QXmppDiscoveryIq::Item> items;
     QXmppDataForm form;
     QString queryNode;
-    enum QXmppDiscoveryIq::QueryType queryType;
+    QXmppDiscoveryIq::QueryType queryType;
 };
+
+///
+/// \class QXmppDiscoveryIq
+///
+/// QXmppDiscoveryIq represents a discovery IQ request or result containing a
+/// list of features and other information about an entity as defined by
+/// \xep{0030, Service Discovery}.
+///
+/// \ingroup Stanzas
+///
+
+///
+/// \enum QXmppDiscoveryIq::QueryType
+///
+/// Specifies the type of a service discovery query. An InfoQuery queries
+/// identities and features, an ItemsQuery queries subservices in the form of
+/// items.
+///
 
 QXmppDiscoveryIq::QXmppDiscoveryIq()
     : d(new QXmppDiscoveryIqPrivate)
 {
 }
 
+/// Default copy-constructor
 QXmppDiscoveryIq::QXmppDiscoveryIq(const QXmppDiscoveryIq &) = default;
 
 QXmppDiscoveryIq::~QXmppDiscoveryIq() = default;
 
+/// Default assignment operator
 QXmppDiscoveryIq &QXmppDiscoveryIq::operator=(const QXmppDiscoveryIq &) = default;
 
+///
+/// Returns the features of the service.
+///
 QStringList QXmppDiscoveryIq::features() const
 {
     return d->features;
 }
 
+///
+/// Sets the features of the service.
+///
 void QXmppDiscoveryIq::setFeatures(const QStringList &features)
 {
     d->features = features;
 }
 
+///
+/// Returns the list of identities for this service.
+///
 QList<QXmppDiscoveryIq::Identity> QXmppDiscoveryIq::identities() const
 {
     return d->identities;
 }
 
+///
+/// Sets the list of identities for this service.
+///
 void QXmppDiscoveryIq::setIdentities(const QList<QXmppDiscoveryIq::Identity> &identities)
 {
     d->identities = identities;
 }
 
+///
+/// Returns the list of service discovery items.
+///
 QList<QXmppDiscoveryIq::Item> QXmppDiscoveryIq::items() const
 {
     return d->items;
 }
 
+///
+/// Sets the list of service discovery items.
+///
 void QXmppDiscoveryIq::setItems(const QList<QXmppDiscoveryIq::Item> &items)
 {
     d->items = items;
 }
 
-/// Returns the QXmppDataForm for this IQ, as defined by
-/// \xep{0128}: Service Discovery Extensions.
 ///
-
+/// Returns the QXmppDataForm for this IQ, as defined by \xep{0128, Service
+/// Discovery Extensions}.
+///
 QXmppDataForm QXmppDiscoveryIq::form() const
 {
     return d->form;
 }
 
-/// Sets the QXmppDataForm for this IQ, as define by
-/// \xep{0128}: Service Discovery Extensions.
+///
+/// Sets the QXmppDataForm for this IQ, as define by \xep{0128, Service
+/// Discovery Extensions}.
 ///
 /// \param form
 ///
-
 void QXmppDiscoveryIq::setForm(const QXmppDataForm &form)
 {
     d->form = form;
 }
 
+///
+/// Returns the special node to query.
+///
 QString QXmppDiscoveryIq::queryNode() const
 {
     return d->queryNode;
 }
 
+///
+/// Sets the special node to query.
+///
 void QXmppDiscoveryIq::setQueryNode(const QString &node)
 {
     d->queryNode = node;
 }
 
-enum QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::queryType() const
+///
+/// Returns the query type (info query or items query).
+///
+QXmppDiscoveryIq::QueryType QXmppDiscoveryIq::queryType() const
 {
     return d->queryType;
 }
 
+///
+/// Sets the query type (info query or items query).
+///
 void QXmppDiscoveryIq::setQueryType(enum QXmppDiscoveryIq::QueryType type)
 {
     d->queryType = type;
 }
 
-/// Calculate the verification string for \xep{0115}: Entity Capabilities
-
+///
+/// Calculate the verification string for \xep{0115, Entity Capabilities}.
+///
 QByteArray QXmppDiscoveryIq::verificationString() const
 {
     QString S;
@@ -273,7 +401,8 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 
     if (!d->form.isNull()) {
         QMap<QString, QXmppDataForm::Field> fieldMap;
-        for (const auto &field : d->form.fields()) {
+        const auto fields = d->form.fields();
+        for (const auto &field : fields) {
             fieldMap.insert(field.key(), field);
         }
 
@@ -305,7 +434,10 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     return hasher.result();
 }
 
-/// \cond
+///
+/// Returns true, if the element is a valid service discovery IQ and can be
+/// parsed.
+///
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
@@ -313,6 +445,7 @@ bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
             queryElement.namespaceURI() == ns_disco_items);
 }
 
+/// \cond
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
