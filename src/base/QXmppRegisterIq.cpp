@@ -59,10 +59,12 @@ QXmppRegisterIq::QXmppRegisterIq()
 {
 }
 
+/// Default copy-constructor
 QXmppRegisterIq::QXmppRegisterIq(const QXmppRegisterIq &other) = default;
 
 QXmppRegisterIq::~QXmppRegisterIq() = default;
 
+/// Default assignment operator
 QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq &other) = default;
 
 /// Constructs a regular change password request.

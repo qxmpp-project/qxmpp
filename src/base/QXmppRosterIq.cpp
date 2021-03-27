@@ -46,10 +46,12 @@ QXmppRosterIq::QXmppRosterIq()
 {
 }
 
+/// Default copy-constructor
 QXmppRosterIq::QXmppRosterIq(const QXmppRosterIq &) = default;
 
 QXmppRosterIq::~QXmppRosterIq() = default;
 
+/// Default assignment operator
 QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
 
 ///
@@ -191,10 +193,12 @@ QXmppRosterIq::Item::Item()
 {
 }
 
+/// Default copy-constructor
 QXmppRosterIq::Item::Item(const QXmppRosterIq::Item &other) = default;
 
 QXmppRosterIq::Item::~Item() = default;
 
+/// Default assignment operator
 QXmppRosterIq::Item &QXmppRosterIq::Item::operator=(const Item &other) = default;
 
 ///

@@ -44,8 +44,10 @@ QXmppMixInfoItem::QXmppMixInfoItem()
 {
 }
 
+/// Default copy-constructor
 QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem&) = default;
 
+/// Default assignment operator
 QXmppMixInfoItem& QXmppMixInfoItem::operator=(const QXmppMixInfoItem&) = default;
 
 QXmppMixInfoItem::~QXmppMixInfoItem() = default;
@@ -174,8 +176,10 @@ QXmppMixParticipantItem::QXmppMixParticipantItem()
 {
 }
 
+/// Default copy-constructor
 QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem&) = default;
 
+/// Default assignment operator
 QXmppMixParticipantItem& QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem&) = default;
 
 QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;

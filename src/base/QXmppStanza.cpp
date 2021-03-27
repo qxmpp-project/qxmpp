@@ -44,91 +44,91 @@ public:
     QString type;
 };
 
+///
 /// Constructs an empty extended address.
-
+///
 QXmppExtendedAddress::QXmppExtendedAddress()
     : d(new QXmppExtendedAddressPrivate())
 {
     d->delivered = false;
 }
 
-/// Constructs a copy of other.
-///
-/// \param other
-///
+/// Default copy-constructur
 QXmppExtendedAddress::QXmppExtendedAddress(const QXmppExtendedAddress &other) = default;
 
 QXmppExtendedAddress::~QXmppExtendedAddress() = default;
 
-/// Assigns the other address to this one.
-///
-/// \param other
-///
-QXmppExtendedAddress &QXmppExtendedAddress::operator=(const QXmppExtendedAddress &other)
-{
-    d = other.d;
-    return *this;
-}
+/// Default assignment operator
+QXmppExtendedAddress &QXmppExtendedAddress::operator=(const QXmppExtendedAddress &other) = default;
 
+///
 /// Returns the human-readable description of the address.
-
+///
 QString QXmppExtendedAddress::description() const
 {
     return d->description;
 }
 
+///
 /// Sets the human-readable \a description of the address.
-
+///
 void QXmppExtendedAddress::setDescription(const QString &description)
 {
     d->description = description;
 }
 
+///
 /// Returns the JID of the address.
-
+///
 QString QXmppExtendedAddress::jid() const
 {
     return d->jid;
 }
 
+///
 /// Sets the JID of the address.
-
+///
 void QXmppExtendedAddress::setJid(const QString &jid)
 {
     d->jid = jid;
 }
 
+///
 /// Returns the type of the address.
-
+///
 QString QXmppExtendedAddress::type() const
 {
     return d->type;
 }
 
+///
 /// Sets the \a type of the address.
-
+///
 void QXmppExtendedAddress::setType(const QString &type)
 {
     d->type = type;
 }
 
+///
 /// Returns whether the stanza has been delivered to this address.
-
+///
 bool QXmppExtendedAddress::isDelivered() const
 {
     return d->delivered;
 }
 
+///
 /// Sets whether the stanza has been \a delivered to this address.
-
+///
 void QXmppExtendedAddress::setDelivered(bool delivered)
 {
     d->delivered = delivered;
 }
 
+///
 /// Checks whether this address is valid. The extended address is considered
 /// to be valid if at least type and JID fields are non-empty.
-
+///
 bool QXmppExtendedAddress::isValid() const
 {
     return !d->type.isEmpty() && !d->jid.isEmpty();
@@ -350,59 +350,65 @@ void QXmppStanza::Error::setRedirectionUri(const QString &redirectionUri)
     d->redirectionUri = redirectionUri;
 }
 
+///
 /// Returns true, if an HTTP File Upload failed, because the file was too
 /// large.
 ///
 /// \since QXmpp 1.1
-
+///
 bool QXmppStanza::Error::fileTooLarge() const
 {
     return d->fileTooLarge;
 }
 
+///
 /// Sets whether the requested file for HTTP File Upload was too large.
 ///
 /// You should also set maxFileSize in this case.
 ///
 /// \since QXmpp 1.1
-
+///
 void QXmppStanza::Error::setFileTooLarge(bool fileTooLarge)
 {
     d->fileTooLarge = fileTooLarge;
 }
 
+///
 /// Returns the maximum file size allowed for uploading via. HTTP File Upload.
 ///
 /// \since QXmpp 1.1
-
+///
 qint64 QXmppStanza::Error::maxFileSize() const
 {
     return d->maxFileSize;
 }
 
+///
 /// Sets the maximum file size allowed for uploading via. HTTP File Upload.
 ///
 /// This sets fileTooLarge to true.
 ///
 /// \since QXmpp 1.1
-
+///
 void QXmppStanza::Error::setMaxFileSize(qint64 maxFileSize)
 {
     setFileTooLarge(true);
     d->maxFileSize = maxFileSize;
 }
 
+///
 /// Returns when to retry the upload request via. HTTP File Upload.
 ///
 /// \since QXmpp 1.1
-
+///
 QDateTime QXmppStanza::Error::retryDate() const
 {
     return d->retryDate;
 }
 
+///
 /// Sets the datetime when the client can retry to request the upload slot.
-
+///
 void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
 {
     d->retryDate = retryDate;
@@ -514,11 +520,12 @@ public:
     QList<QXmppExtendedAddress> extendedAddresses;
 };
 
+///
 /// Constructs a QXmppStanza with the specified sender and recipient.
 ///
 /// \param from
 /// \param to
-
+///
 QXmppStanza::QXmppStanza(const QString &from, const QString &to)
     : d(new QXmppStanzaPrivate)
 {
@@ -527,136 +534,137 @@ QXmppStanza::QXmppStanza(const QString &from, const QString &to)
 }
 
 /// Constructs a copy of \a other.
-
-QXmppStanza::QXmppStanza(const QXmppStanza &other)
-    : d(other.d)
-{
-}
+QXmppStanza::QXmppStanza(const QXmppStanza &other) = default;
 
 /// Destroys a QXmppStanza.
-
-QXmppStanza::~QXmppStanza()
-{
-}
+QXmppStanza::~QXmppStanza() = default;
 
 /// Assigns \a other to this stanza.
+QXmppStanza &QXmppStanza::operator=(const QXmppStanza &other) = default;
 
-QXmppStanza &QXmppStanza::operator=(const QXmppStanza &other)
-{
-    d = other.d;
-    return *this;
-}
-
+///
 /// Returns the stanza's recipient JID.
 ///
-
 QString QXmppStanza::to() const
 {
     return d->to;
 }
 
+///
 /// Sets the stanza's recipient JID.
 ///
 /// \param to
-
+///
 void QXmppStanza::setTo(const QString &to)
 {
     d->to = to;
 }
 
+///
 /// Returns the stanza's sender JID.
-
+///
 QString QXmppStanza::from() const
 {
     return d->from;
 }
 
+///
 /// Sets the stanza's sender JID.
 ///
 /// \param from
-
+///
 void QXmppStanza::setFrom(const QString &from)
 {
     d->from = from;
 }
 
+///
 /// Returns the stanza's identifier.
-
+///
 QString QXmppStanza::id() const
 {
     return d->id;
 }
 
+///
 /// Sets the stanza's identifier.
 ///
 /// \param id
-
+///
 void QXmppStanza::setId(const QString &id)
 {
     d->id = id;
 }
 
+///
 /// Returns the stanza's language.
-
+///
 QString QXmppStanza::lang() const
 {
     return d->lang;
 }
 
+///
 /// Sets the stanza's language.
 ///
 /// \param lang
-
+///
 void QXmppStanza::setLang(const QString &lang)
 {
     d->lang = lang;
 }
 
+///
 /// Returns the stanza's error.
-
+///
 QXmppStanza::Error QXmppStanza::error() const
 {
     return d->error;
 }
 
+///
 /// Sets the stanza's error.
 ///
 /// \param error
-
+///
 void QXmppStanza::setError(const QXmppStanza::Error &error)
 {
     d->error = error;
 }
 
+///
 /// Returns the stanza's "extensions".
 ///
 /// Extensions are XML elements which are not handled internally by QXmpp.
-
+///
 QXmppElementList QXmppStanza::extensions() const
 {
     return d->extensions;
 }
 
+///
 /// Sets the stanza's "extensions".
 ///
 /// \param extensions
-
+///
 void QXmppStanza::setExtensions(const QXmppElementList &extensions)
 {
     d->extensions = extensions;
 }
 
-/// Returns the stanza's extended addresses as defined by
-/// \xep{0033}: Extended Stanza Addressing.
-
+///
+/// Returns the stanza's extended addresses as defined by \xep{0033, Extended
+/// Stanza Addressing}.
+///
 QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
 {
     return d->extendedAddresses;
 }
 
-/// Sets the stanza's extended addresses as defined by
-/// \xep{0033}: Extended Stanza Addressing.
-
+///
+/// Sets the stanza's extended addresses as defined by \xep{0033, Extended
+/// Stanza Addressing}.
+///
 void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addresses)
 {
     d->extendedAddresses = addresses;

@@ -57,10 +57,12 @@ QXmppMixIq::QXmppMixIq()
 {
 }
 
+/// Default copy-constructor
 QXmppMixIq::QXmppMixIq(const QXmppMixIq&) = default;
 
 QXmppMixIq::~QXmppMixIq() = default;
 
+/// Default assignment operator
 QXmppMixIq& QXmppMixIq::operator=(const QXmppMixIq&) = default;
 
 /// Returns the channel JID. It also contains a participant id for Join/

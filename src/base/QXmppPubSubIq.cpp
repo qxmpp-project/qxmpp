@@ -64,10 +64,12 @@ QXmppPubSubIq::QXmppPubSubIq()
 {
 }
 
+/// Default copy-constructor
 QXmppPubSubIq::QXmppPubSubIq(const QXmppPubSubIq &iq) = default;
 
 QXmppPubSubIq::~QXmppPubSubIq() = default;
 
+/// Default assignment operator
 QXmppPubSubIq &QXmppPubSubIq::operator=(const QXmppPubSubIq &iq) = default;
 
 /// Returns the PubSub queryType for this IQ.
