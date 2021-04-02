@@ -33,14 +33,6 @@
 class QXmppMamQueryIqPrivate;
 class QXmppMamResultIqPrivate;
 
-///
-/// \brief The QXmppMamQueryIq class represents the query IQ for
-/// \xep{0313}: Message Archive Management.
-///
-/// \ingroup Stanzas
-///
-/// \since QXmpp 1.0
-///
 class QXmppMamQueryIq : public QXmppIq
 {
 public:
@@ -59,24 +51,18 @@ public:
     QString queryId() const;
     void setQueryId(const QString &id);
 
+    /// \cond
     static bool isMamQueryIq(const QDomElement &element);
 
 protected:
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
+    /// \endcond
 
 private:
     QSharedDataPointer<QXmppMamQueryIqPrivate> d;
 };
 
-///
-/// \brief The QXmppMamQueryIq class represents the result IQ for
-/// \xep{0313}: Message Archive Management.
-///
-/// \ingroup Stanzas
-///
-/// \since QXmpp 1.0
-///
 class QXmppMamResultIq : public QXmppIq
 {
 public:
@@ -91,11 +77,13 @@ public:
     bool complete() const;
     void setComplete(bool complete);
 
+    /// \cond
     static bool isMamResultIq(const QDomElement &element);
 
 protected:
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
+    /// \endcond
 
 private:
     QSharedDataPointer<QXmppMamResultIqPrivate> d;
