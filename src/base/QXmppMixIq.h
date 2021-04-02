@@ -42,6 +42,7 @@ class QXmppMixIqPrivate;
 class QXMPP_EXPORT QXmppMixIq : public QXmppIq
 {
 public:
+    /// The action type of the MIX query IQ.
     enum Type {
         None,
         ClientJoin,
