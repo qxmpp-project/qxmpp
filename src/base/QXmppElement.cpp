@@ -31,13 +31,13 @@
 class QXmppElementPrivate
 {
 public:
-    QXmppElementPrivate();
+    QXmppElementPrivate() = default;
     QXmppElementPrivate(const QDomElement &element);
     ~QXmppElementPrivate();
 
-    QAtomicInt counter;
+    QAtomicInt counter = 1;
 
-    QXmppElementPrivate *parent;
+    QXmppElementPrivate *parent = nullptr;
     QMap<QString, QString> attributes;
     QList<QXmppElementPrivate *> children;
     QString name;
@@ -46,13 +46,7 @@ public:
     QByteArray serializedSource;
 };
 
-QXmppElementPrivate::QXmppElementPrivate()
-    : counter(1), parent(nullptr)
-{
-}
-
 QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
-    : counter(1), parent(nullptr)
 {
     if (element.isNull())
         return;
@@ -86,9 +80,11 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
 
 QXmppElementPrivate::~QXmppElementPrivate()
 {
-    for (auto *child : children)
-        if (!child->counter.deref())
+    for (auto *child : std::as_const(children)) {
+        if (!child->counter.deref()) {
             delete child;
+        }
+    }
 }
 
 ///
@@ -139,8 +135,8 @@ QXmppElement::~QXmppElement()
 ///
 QXmppElement &QXmppElement::operator=(const QXmppElement &other)
 {
-    if (this != &other)  // self-assignment check
-    {
+    // self-assignment check
+    if (this != &other) {
         other.d->counter.ref();
         if (!d->counter.deref())
             delete d;
@@ -215,9 +211,11 @@ void QXmppElement::appendChild(const QXmppElement &child)
 ///
 QXmppElement QXmppElement::firstChildElement(const QString &name) const
 {
-    for (auto *child_d : d->children)
-        if (name.isEmpty() || child_d->name == name)
+    for (auto *child_d : std::as_const(d->children)) {
+        if (name.isEmpty() || child_d->name == name) {
             return QXmppElement(child_d);
+        }
+    }
     return QXmppElement();
 }
 
@@ -300,12 +298,15 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(d->name);
     if (d->attributes.contains("xmlns"))
         writer->writeDefaultNamespace(d->attributes.value("xmlns"));
-    for (const auto &attr : d->attributes.keys())
-        if (attr != "xmlns")
-            helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
+    std::for_each(d->attributes.keyBegin(), d->attributes.keyEnd(), [this, writer](const QString &key) {
+        if (key != "xmlns") {
+            helperToXmlAddAttribute(writer, key, d->attributes.value(key));
+        }
+    });
     if (!d->value.isEmpty())
         writer->writeCharacters(d->value);
-    for (auto *childPrivate : d->children)
+    for (auto *childPrivate : std::as_const(d->children)) {
         QXmppElement(childPrivate).toXml(writer);
+    }
     writer->writeEndElement();
 }
