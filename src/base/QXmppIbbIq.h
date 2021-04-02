@@ -27,12 +27,6 @@
 
 #include "QXmppIq.h"
 
-///
-/// \brief QXmppIbbOpenIq represents an IBB open request as defined by
-/// \xep{0047}: In-Band Bytestreams.
-///
-/// \ingroup Stanzas
-///
 class QXmppIbbOpenIq : public QXmppIq
 {
 public:
@@ -44,10 +38,10 @@ public:
     QString sid() const;
     void setSid(const QString &sid);
 
+    /// \cond
     static bool isIbbOpenIq(const QDomElement &element);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
@@ -57,12 +51,6 @@ private:
     QString m_sid;
 };
 
-///
-/// \brief QXmppIbbCloseIq represents an IBB close request as defined by
-/// \xep{0047}: In-Band Bytestreams.
-///
-/// \ingroup Stanzas
-///
 class QXmppIbbCloseIq : public QXmppIq
 {
 public:
@@ -71,10 +59,10 @@ public:
     QString sid() const;
     void setSid(const QString &sid);
 
+    /// \cond
     static bool isIbbCloseIq(const QDomElement &element);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
@@ -83,12 +71,6 @@ private:
     QString m_sid;
 };
 
-///
-/// \brief QXmppIbbCloseIq represents an IBB data request as defined by
-/// \xep{0047}: In-Band Bytestreams.
-///
-/// \ingroup Stanzas
-///
 class QXMPP_EXPORT QXmppIbbDataIq : public QXmppIq
 {
 public:
@@ -103,10 +85,10 @@ public:
     QByteArray payload() const;
     void setPayload(const QByteArray &data);
 
+    /// \cond
     static bool isIbbDataIq(const QDomElement &element);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
