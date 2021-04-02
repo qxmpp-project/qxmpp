@@ -39,6 +39,18 @@ public:
     QStringList contactJids;
 };
 
+///
+/// \class QXmppMixInfoItem
+///
+/// \brief The QXmppMixInfoItem class represents a PubSub item of a MIX
+/// channel containing channel information as defined by \xep{0369, Mediated
+/// Information eXchange (MIX)}.
+///
+/// \since QXmpp 1.1
+///
+/// \ingroup Stanzas
+///
+
 QXmppMixInfoItem::QXmppMixInfoItem()
     : d(new QXmppMixInfoItemPrivate)
 {
@@ -52,51 +64,58 @@ QXmppMixInfoItem& QXmppMixInfoItem::operator=(const QXmppMixInfoItem&) = default
 
 QXmppMixInfoItem::~QXmppMixInfoItem() = default;
 
+///
 /// Returns the user-specified name of the MIX channel. This is not the name
 /// part of the channel's JID.
-
+///
 QString QXmppMixInfoItem::name() const
 {
     return d->name;
 }
 
+///
 /// Sets the name of the channel.
-
+///
 void QXmppMixInfoItem::setName(const QString& name)
 {
     d->name = name;
 }
 
+///
 /// Returns the description of the channel. This string might be very long.
-
+///
 QString QXmppMixInfoItem::description() const
 {
     return d->description;
 }
 
+///
 /// Sets the longer channel description.
-
+///
 void QXmppMixInfoItem::setDescription(const QString& description)
 {
     d->description = description;
 }
 
+///
 /// Returns a list of JIDs that are responsible for this channel.
-
+///
 QStringList QXmppMixInfoItem::contactJids() const
 {
     return d->contactJids;
 }
 
+///
 /// Sets a list of public JIDs that are responsible for this channel.
-
+///
 void QXmppMixInfoItem::setContactJids(const QStringList& contactJids)
 {
     d->contactJids = contactJids;
 }
 
+///
 /// Returns true, if the given dom element is a MIX channel info item.
-
+///
 bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
 {
     QXmppDataForm form;
@@ -108,6 +127,7 @@ bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
     return false;
 }
 
+/// \cond
 void QXmppMixInfoItem::parse(const QXmppElement& element)
 {
     QXmppDataForm form;
@@ -163,6 +183,7 @@ QXmppElement QXmppMixInfoItem::toElement() const
     doc.setContent(buffer.data());
     return QXmppElement(doc.documentElement());
 }
+/// \endcond
 
 class QXmppMixParticipantItemPrivate : public QSharedData
 {
@@ -170,6 +191,17 @@ public:
     QString nick;
     QString jid;
 };
+
+///
+/// \class QXmppMixParticipantItem
+///
+/// The QXmppMixParticipantItem class represents a PubSub item of a MIX channel
+/// participant as defined by \xep{0369, Mediated Information eXchange (MIX)}.
+///
+/// \since QXmpp 1.1
+///
+/// \ingroup Stanzas
+///
 
 QXmppMixParticipantItem::QXmppMixParticipantItem()
     : d(new QXmppMixParticipantItemPrivate)
@@ -184,34 +216,39 @@ QXmppMixParticipantItem& QXmppMixParticipantItem::operator=(const QXmppMixPartic
 
 QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;
 
+///
 /// Returns the participant's nickname.
-
+///
 QString QXmppMixParticipantItem::nick() const
 {
     return d->nick;
 }
 
+///
 /// Sets the participants nickname.
-
+///
 void QXmppMixParticipantItem::setNick(const QString& nick)
 {
     d->nick = nick;
 }
 
+///
 /// Returns the participant's JID.
-
+///
 QString QXmppMixParticipantItem::jid() const
 {
     return d->jid;
 }
 
+///
 /// Sets the participant's JID.
-
+///
 void QXmppMixParticipantItem::setJid(const QString& jid)
 {
     d->jid = jid;
 }
 
+/// \cond
 void QXmppMixParticipantItem::parse(const QXmppElement& itemContent)
 {
     d->nick = itemContent.firstChildElement(QStringLiteral("nick")).value();
@@ -236,9 +273,11 @@ QXmppElement QXmppMixParticipantItem::toElement() const
 
     return element;
 }
+/// \endcond
 
+///
 /// Returns true, if this dom element is a MIX participant item.
-
+///
 bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement& element)
 {
     return element.tagName() == QStringLiteral("participant") && element.namespaceURI() == ns_mix;
