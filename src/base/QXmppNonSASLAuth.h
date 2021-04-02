@@ -26,12 +26,6 @@
 
 #include "QXmppIq.h"
 
-///
-/// \brief QXmppNonSASLAuthIq represents a Non-SASL authentication IQ as
-/// defined by \xep{0078}: Non-SASL Authentication.
-///
-/// \ingroup Stanzas
-///
 class QXMPP_EXPORT QXmppNonSASLAuthIq : public QXmppIq
 {
 public:
@@ -49,10 +43,10 @@ public:
     QString resource() const;
     void setResource(const QString &resource);
 
+    /// \cond
     static bool isNonSASLAuthIq(const QDomElement &element);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
