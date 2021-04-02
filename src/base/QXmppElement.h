@@ -69,6 +69,7 @@ public:
 
 private:
     QXmppElement(QXmppElementPrivate *other);
+    // ### QXmpp2: Use an std::shared_ptr if possible?
     QXmppElementPrivate *d;
 };
 
