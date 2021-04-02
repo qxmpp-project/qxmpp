@@ -20,6 +20,10 @@ jobs:
           - os: macos-latest
             config: full
             qt_version: 5.9.9
+          - os: ubuntu-latest
+            config: full-debug
+            qt_version: 5.15.2
+            tests_integration: 1
     steps:
       - uses: actions/checkout@v2
       - name: Install Qt
@@ -34,6 +38,10 @@ jobs:
           sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
       - name: Run tests
         run: tests/travis/build-and-test
+        env:
+          QXMPP_TESTS_INTEGRATION_ENABLED: ${{ matrix.tests_integration }}
+          QXMPP_TESTS_JID: ${{ secrets.INTEGRATION_TEST_ACCOUNT_JID }}
+          QXMPP_TESTS_PASSWORD: ${{ secrets.INTEGRATION_TEST_ACCOUNT_PASSWORD }}
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
