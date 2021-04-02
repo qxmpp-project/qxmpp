@@ -43,6 +43,7 @@ public:
 
     QXmppStreamFeatures &operator=(const QXmppStreamFeatures &);
 
+    /// Mode of a feature
     enum Mode {
         Disabled = 0,
         Enabled,
@@ -74,7 +75,7 @@ public:
     void setClientStateIndicationMode(Mode mode);
 
     Mode registerMode() const;
-    void setRegisterMode(const Mode &registerMode);
+    void setRegisterMode(const Mode &mode);
 
     bool preApprovedSubscriptionsSupported() const;
     void setPreApprovedSubscriptionsSupported(bool);
@@ -85,9 +86,9 @@ public:
     /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
 
     static bool isStreamFeatures(const QDomElement &element);
+    /// \endcond
 
 private:
     QSharedDataPointer<QXmppStreamFeaturesPrivate> d;
