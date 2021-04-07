@@ -38,6 +38,8 @@ private slots:
     void testGet();
     void testResult();
     void testResultWithForm();
+    void testResultWithRedirection();
+    void testResultWithFormAndRedirection();
     void testSet();
     void testSetWithForm();
     void testBobData();
@@ -67,6 +69,7 @@ void tst_QXmppRegisterIq::testGet()
     QVERIFY(iq.password().isNull());
     QVERIFY(iq.email().isNull());
     QVERIFY(iq.form().isNull());
+    QVERIFY(iq.outOfBandUrl().isNull());
     serializePacket(iq, xml);
 }
 
@@ -96,6 +99,7 @@ void tst_QXmppRegisterIq::testResult()
     QVERIFY(!iq.email().isNull());
     QVERIFY(iq.email().isEmpty());
     QVERIFY(iq.form().isNull());
+    QVERIFY(iq.outOfBandUrl().isNull());
     serializePacket(iq, xml);
 }
 
@@ -143,6 +147,87 @@ void tst_QXmppRegisterIq::testResultWithForm()
     QVERIFY(iq.email().isNull());
     QVERIFY(!iq.form().isNull());
     QCOMPARE(iq.form().title(), QLatin1String("Contest Registration"));
+    QVERIFY(iq.outOfBandUrl().isNull());
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppRegisterIq::testResultWithRedirection()
+{
+    const QByteArray xml(
+        "<iq id=\"reg3\" type=\"result\">"
+          "<query xmlns=\"jabber:iq:register\">"
+            "<instructions>"
+              "To register, visit http://www.shakespeare.lit/contests.php"
+            "</instructions>"
+            "<x xmlns=\"jabber:x:oob\">"
+              "<url>http://www.shakespeare.lit/contests.php</url>"
+            "</x>"
+          "</query>"
+        "</iq>");
+
+    QXmppRegisterIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.id(), QLatin1String("reg3"));
+    QCOMPARE(iq.to(), QString());
+    QCOMPARE(iq.from(), QString());
+    QCOMPARE(iq.type(), QXmppIq::Result);
+    QCOMPARE(iq.instructions(), QLatin1String("To register, visit http://www.shakespeare.lit/contests.php"));
+    QVERIFY(iq.username().isNull());
+    QVERIFY(iq.password().isNull());
+    QVERIFY(iq.email().isNull());
+    QVERIFY(iq.form().isNull());
+    QCOMPARE(iq.outOfBandUrl(), QLatin1String("http://www.shakespeare.lit/contests.php"));
+    serializePacket(iq, xml);
+}
+
+void tst_QXmppRegisterIq::testResultWithFormAndRedirection()
+{
+    const QByteArray xml(
+        "<iq id=\"reg3\" to=\"juliet@capulet.com/balcony\" from=\"contests.shakespeare.lit\" type=\"result\">"
+        "<query xmlns=\"jabber:iq:register\">"
+        "<instructions>Use the enclosed form to register. If your Jabber client does not support Data Forms, visit http://www.shakespeare.lit/contests.php</instructions>"
+        "<x xmlns=\"jabber:x:data\" type=\"form\">"
+        "<title>Contest Registration</title>"
+        "<instructions>"
+        "Please provide the following information"
+        "to sign up for our special contests!"
+        "</instructions>"
+        "<field type=\"hidden\" var=\"FORM_TYPE\">"
+        "<value>jabber:iq:register</value>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Given Name\" var=\"first\">"
+        "<required/>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Family Name\" var=\"last\">"
+        "<required/>"
+        "</field>"
+        "<field type=\"text-single\" label=\"Email Address\" var=\"email\">"
+        "<required/>"
+        "</field>"
+        "<field type=\"list-single\" label=\"Gender\" var=\"x-gender\">"
+        "<option label=\"Male\"><value>M</value></option>"
+        "<option label=\"Female\"><value>F</value></option>"
+        "</field>"
+        "</x>"
+        "<x xmlns=\"jabber:x:oob\">"
+        "<url>http://www.shakespeare.lit/contests.php</url>"
+        "</x>"
+        "</query>"
+        "</iq>");
+
+    QXmppRegisterIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.id(), QLatin1String("reg3"));
+    QCOMPARE(iq.to(), QLatin1String("juliet@capulet.com/balcony"));
+    QCOMPARE(iq.from(), QLatin1String("contests.shakespeare.lit"));
+    QCOMPARE(iq.type(), QXmppIq::Result);
+    QCOMPARE(iq.instructions(), QLatin1String("Use the enclosed form to register. If your Jabber client does not support Data Forms, visit http://www.shakespeare.lit/contests.php"));
+    QVERIFY(iq.username().isNull());
+    QVERIFY(iq.password().isNull());
+    QVERIFY(iq.email().isNull());
+    QVERIFY(!iq.form().isNull());
+    QCOMPARE(iq.form().title(), QLatin1String("Contest Registration"));
+    QCOMPARE(iq.outOfBandUrl(), QLatin1String("http://www.shakespeare.lit/contests.php"));
     serializePacket(iq, xml);
 }
 
@@ -167,6 +252,7 @@ void tst_QXmppRegisterIq::testSet()
     QCOMPARE(iq.password(), QLatin1String("Calliope"));
     QCOMPARE(iq.email(), QLatin1String("bard@shakespeare.lit"));
     QVERIFY(iq.form().isNull());
+    QVERIFY(iq.outOfBandUrl().isNull());
     serializePacket(iq, xml);
 }
 
@@ -205,6 +291,7 @@ void tst_QXmppRegisterIq::testSetWithForm()
     QVERIFY(iq.password().isNull());
     QVERIFY(iq.email().isNull());
     QVERIFY(!iq.form().isNull());
+    QVERIFY(iq.outOfBandUrl().isNull());
     serializePacket(iq, xml);
 
     QXmppRegisterIq sIq;

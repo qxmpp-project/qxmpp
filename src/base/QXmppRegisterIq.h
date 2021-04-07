@@ -75,6 +75,9 @@ public:
     QXmppBitsOfBinaryDataList &bitsOfBinaryData();
     void setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsOfBinaryData);
 
+    QString outOfBandUrl() const;
+    void setOutOfBandUrl(const QString &outOfBandUrl);
+
     /// \cond
     static bool isRegisterIq(const QDomElement &element);
     /// \endcond
