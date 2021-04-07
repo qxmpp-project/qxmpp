@@ -46,6 +46,7 @@ public:
     bool isRegistered;
     bool isRemove;
     QXmppBitsOfBinaryDataList bitsOfBinaryData;
+    QString outOfBandUrl;
 };
 
 QXmppRegisterIqPrivate::QXmppRegisterIqPrivate()
@@ -259,6 +260,26 @@ void QXmppRegisterIq::setBitsOfBinaryData(const QXmppBitsOfBinaryDataList &bitsO
     d->bitsOfBinaryData = bitsOfBinaryData;
 }
 
+///
+/// Returns a \xep{0066, Out of Band Data} URL used for out-of-band registration.
+///
+/// \since QXmpp 1.5
+///
+QString QXmppRegisterIq::outOfBandUrl() const
+{
+    return d->outOfBandUrl;
+}
+
+///
+/// Sets a \xep{0066, Out of Band Data} URL used for out-of-band registration.
+///
+/// \since QXmpp 1.5
+///
+void QXmppRegisterIq::setOutOfBandUrl(const QString &outOfBandUrl)
+{
+    d->outOfBandUrl = outOfBandUrl;
+}
+
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
@@ -272,7 +293,17 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
     d->username = queryElement.firstChildElement(QStringLiteral("username")).text();
     d->password = queryElement.firstChildElement(QStringLiteral("password")).text();
     d->email = queryElement.firstChildElement(QStringLiteral("email")).text();
-    d->form.parse(queryElement.firstChildElement(QStringLiteral("x")));
+
+    for (auto xElement = queryElement.firstChildElement(QStringLiteral("x"));
+         !xElement.isNull();
+         xElement = xElement.nextSiblingElement(QStringLiteral("x"))) {
+        if (xElement.namespaceURI() == ns_data) {
+            d->form.parse(xElement);
+        } else if (xElement.namespaceURI() == ns_oob) {
+            d->outOfBandUrl = xElement.firstChildElement(QStringLiteral("url")).text();
+        }
+    }
+
     d->isRegistered = !queryElement.firstChildElement(ELEMENT_REGISTERED).isNull();
     d->isRemove = !queryElement.firstChildElement(ELEMENT_REMOVE).isNull();
     d->bitsOfBinaryData.parse(queryElement);
@@ -308,6 +339,13 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     d->form.toXml(writer);
     d->bitsOfBinaryData.toXml(writer);
+
+    if (!d->outOfBandUrl.isEmpty()) {
+        writer->writeStartElement(QStringLiteral("x"));
+        writer->writeDefaultNamespace(ns_oob);
+        writer->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
+        writer->writeEndElement();
+    }
 
     writer->writeEndElement();
 }
