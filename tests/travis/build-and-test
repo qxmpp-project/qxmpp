@@ -33,4 +33,4 @@ else
 fi
 
 # run tests
-make test
+make test ARGS="--rerun-failed --output-on-failure"
