@@ -3,6 +3,7 @@
  *
  * Authors:
  *  Linus Jahn
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -36,6 +37,7 @@ private slots:
 
     void testDiscoFeatures();
     void testRenameItem();
+    void subscriptionRequestReceived();
 
 private:
     QXmppClient client;
@@ -103,6 +105,26 @@ void tst_QXmppRosterManager::testRenameItem()
 
     manager->renameItem("bob@qxmpp.org", "Bob");
     QVERIFY(requestSent);
+}
+
+void tst_QXmppRosterManager::subscriptionRequestReceived()
+{
+    QXmppPresence presence;
+    presence.setType(QXmppPresence::Subscribe);
+    presence.setFrom(QStringLiteral("alice@example.org/notebook"));
+    presence.setStatusText(QStringLiteral("Hi, I'm Alice."));
+
+    bool subscriptionRequestReceived = false;
+
+    connect(manager, &QXmppRosterManager::subscriptionRequestReceived, this, [&](const QString &subscriberBareJid, const QXmppPresence &presence) {
+        subscriptionRequestReceived = true;
+
+        QCOMPARE(subscriberBareJid, QStringLiteral("alice@example.org"));
+        QCOMPARE(presence.statusText(), QStringLiteral("Hi, I'm Alice."));
+    });
+
+    emit client.presenceReceived(presence);
+    QVERIFY(subscriptionRequestReceived);
 }
 
 QTEST_MAIN(tst_QXmppRosterManager)

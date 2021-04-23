@@ -4,6 +4,7 @@
  * Authors:
  *  Manjeet Dahiya
  *  Jeremy Lainé
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -30,6 +31,23 @@
 #include "QXmppUtils.h"
 
 #include <QDomElement>
+
+///
+/// \fn QXmppRosterManager::subscriptionRequestReceived
+///
+/// This signal is emitted when a JID asks to subscribe to the user's presence.
+///
+/// The user can either accept the request by calling acceptSubscription() or refuse it
+/// by calling refuseSubscription().
+///
+/// \note If QXmppConfiguration::autoAcceptSubscriptions() is set to true, this
+/// signal will not be emitted.
+///
+/// \param subscriberBareJid bare JID that wants to subscribe to the user's presence
+/// \param presence presence stanza containing the reason / message (presence.statusText())
+///
+/// \since QXmpp 1.5
+///
 
 class QXmppRosterManagerPrivate
 {
@@ -234,6 +252,7 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
             subscribe(bareJid);
         } else {
             emit subscriptionReceived(bareJid);
+            emit subscriptionRequestReceived(bareJid, presence);
         }
         break;
     default:
