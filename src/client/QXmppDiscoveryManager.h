@@ -26,6 +26,10 @@
 
 #include "QXmppClientExtension.h"
 
+#include <variant>
+
+template<typename T>
+class QFuture;
 class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
@@ -47,6 +51,11 @@ public:
 
     QString requestInfo(const QString& jid, const QString& node = QString());
     QString requestItems(const QString& jid, const QString& node = QString());
+
+    using InfoResult = std::variant<QXmppDiscoveryIq, QXmppStanza::Error>;
+    using ItemsResult = std::variant<QList<QXmppDiscoveryIq::Item>, QXmppStanza::Error>;
+    QFuture<InfoResult> requestDiscoInfo(const QString &jid, const QString &node = {});
+    QFuture<ItemsResult> requestDiscoItems(const QString &jid, const QString &node = {});
 
     QString clientCapabilitiesNode() const;
     void setClientCapabilitiesNode(const QString&);

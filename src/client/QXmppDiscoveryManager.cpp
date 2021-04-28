@@ -29,6 +29,7 @@
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppGlobal.h"
+#include "QXmppGlobal_p.h"
 #include "QXmppStream.h"
 
 #include <QCoreApplication>
@@ -101,6 +102,50 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
         return request.id();
     else
         return QString();
+}
+
+///
+/// Requests information from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoInfo(const QString &jid, const QString &node)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    request.setTo(jid);
+    if (!node.isEmpty()) {
+        request.setQueryNode(node);
+    }
+
+    return chainIq<InfoResult, QXmppDiscoveryIq>(client()->sendIq(request), this);
+}
+
+///
+/// Requests items from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppDiscoveryManager::ItemsResult> QXmppDiscoveryManager::requestDiscoItems(const QString &jid, const QString &node)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    request.setTo(jid);
+    if (!node.isEmpty()) {
+        request.setQueryNode(node);
+    }
+
+    return chainIq<ItemsResult, QXmppDiscoveryIq>(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) {
+        return iq.items();
+    });
 }
 
 ///
