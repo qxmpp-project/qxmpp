@@ -29,6 +29,7 @@
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppGlobal.h"
+#include "QXmppGlobal_p.h"
 #include "QXmppStream.h"
 
 #include <QCoreApplication>
@@ -43,6 +44,24 @@ public:
     QString clientName;
     QXmppDataForm clientInfoForm;
 };
+
+///
+/// \typedef QXmppDiscoveryManager::InfoResult
+///
+/// Contains the discovery information result in the form of an QXmppDiscoveryIq
+/// or (in case the request did not succeed) a QXmppStanza::Error.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \typedef QXmppDiscoveryManager::ItemsResult
+///
+/// Contains a list of service discovery items or (in case the request did not
+/// succeed) a QXmppStanza::Error.
+///
+/// \since QXmpp 1.5
+///
 
 QXmppDiscoveryManager::QXmppDiscoveryManager()
     : d(new QXmppDiscoveryManagerPrivate)
@@ -101,6 +120,54 @@ QString QXmppDiscoveryManager::requestItems(const QString& jid, const QString& n
         return request.id();
     else
         return QString();
+}
+
+///
+/// Requests information from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoInfo(const QString &jid, const QString &node)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    request.setTo(jid);
+    if (!node.isEmpty()) {
+        request.setQueryNode(node);
+    }
+
+    return chainIq<InfoResult, QXmppDiscoveryIq>(client()->sendIq(request), this);
+}
+
+///
+/// Requests items from the specified XMPP entity.
+///
+/// \param jid  The target entity's JID.
+/// \param node The target node (optional).
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppDiscoveryManager::ItemsResult> QXmppDiscoveryManager::requestDiscoItems(const QString &jid, const QString &node)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    request.setTo(jid);
+    if (!node.isEmpty()) {
+        request.setQueryNode(node);
+    }
+
+    return chainIq<ItemsResult, QXmppDiscoveryIq>(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) {
+        return iq.items();
+    });
 }
 
 ///
