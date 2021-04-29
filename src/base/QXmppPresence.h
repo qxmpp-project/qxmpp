@@ -96,6 +96,9 @@ public:
     QString mucPassword() const;
     void setMucPassword(const QString &password);
 
+    QDateTime mucHistorySince() const;
+    void setMucHistorySince(const QDateTime& since);
+
     QList<int> mucStatusCodes() const;
     void setMucStatusCodes(const QList<int> &codes);
 

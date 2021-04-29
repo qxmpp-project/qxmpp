@@ -32,6 +32,7 @@
 
 #include <QDomElement>
 #include <QMap>
+#include <QDateTime>
 
 class QXmppMucManagerPrivate
 {
@@ -50,10 +51,15 @@ public:
     QString name;
     QMap<QString, QXmppPresence> participants;
     QString password;
+    QDateTime historySince;
     QMap<QString, QXmppMucItem> permissions;
     QSet<QString> permissionsQueue;
     QString nickName;
     QString subject;
+
+    QXmppMucRoomPrivate()
+    : historySince(QDateTime::currentDateTime())
+    {}
 };
 
 /// Constructs a new QXmppMucManager.
@@ -263,6 +269,7 @@ bool QXmppMucRoom::join()
     packet.setTo(d->ownJid());
     packet.setType(QXmppPresence::Available);
     packet.setMucPassword(d->password);
+    packet.setMucHistorySince(d->historySince);
     packet.setMucSupported(true);
     return d->client->sendPacket(packet);
 }
@@ -410,6 +417,20 @@ QString QXmppMucRoom::password() const
 void QXmppMucRoom::setPassword(const QString &password)
 {
     d->password = password;
+}
+
+QDateTime QXmppMucRoom::historySince() const
+{
+    return d->historySince;
+}
+
+/// Sets the beginning time to request history.
+///
+/// \param historySince
+
+void QXmppMucRoom::setHistorySince(const QDateTime &historySince)
+{
+    d->historySince = historySince;
 }
 
 QString QXmppMucRoom::subject() const

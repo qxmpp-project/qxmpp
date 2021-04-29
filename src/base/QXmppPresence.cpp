@@ -60,8 +60,11 @@ public:
     int priority;
 
     // XEP-0045: Multi-User Chat
+    // https://xmpp.org/extensions/xep-0045.html#enter-managehistory
     QXmppMucItem mucItem;
     QString mucPassword;
+    QDateTime mucHistorySince;
+
     QList<int> mucStatusCodes;
     bool mucSupported;
 
@@ -90,6 +93,7 @@ QXmppPresencePrivate::QXmppPresencePrivate()
     : type(QXmppPresence::Available),
       availableStatusType(QXmppPresence::Online),
       priority(0),
+      mucHistorySince(QDateTime::currentDateTime()),
       mucSupported(false),
       vCardUpdateType(QXmppPresence::VCardUpdateNone)
 {
@@ -304,6 +308,20 @@ void QXmppPresence::setMucPassword(const QString &password)
     d->mucPassword = password;
 }
 
+/// Returns the beginning time used to request history when join a MUC room.
+
+QDateTime QXmppPresence::mucHistorySince() const
+{
+    return d->mucHistorySince;
+}
+
+/// Sets the beginning time used to request history when join a MUC room.
+
+void QXmppPresence::setMucHistorySince(const QDateTime &mucHistorySince)
+{
+    d->mucHistorySince = mucHistorySince;
+}
+
 /// Returns the MUC status codes.
 
 QList<int> QXmppPresence::mucStatusCodes() const
@@ -432,6 +450,11 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
     if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc) {
         d->mucSupported = true;
         d->mucPassword = element.firstChildElement(QStringLiteral("password")).text();
+        QDomElement historyElement = element.firstChildElement(QStringLiteral("history"));
+        if (historyElement.hasAttribute(QStringLiteral("since"))) {
+            const QString since = historyElement.attribute(QStringLiteral("since"));
+            d->mucHistorySince = QXmppUtils::datetimeFromString(since);
+        }
     } else if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc_user) {
         QDomElement itemElement = element.firstChildElement(QStringLiteral("item"));
         d->mucItem.parse(itemElement);
@@ -505,6 +528,10 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeDefaultNamespace(ns_muc);
         if (!d->mucPassword.isEmpty())
             xmlWriter->writeTextElement(QStringLiteral("password"), d->mucPassword);
+        xmlWriter->writeStartElement(QStringLiteral ("history"));
+        xmlWriter->writeAttribute(QStringLiteral("since"), QXmppUtils::datetimeToString(d->mucHistorySince));
+        xmlWriter->writeEndElement();
+
         xmlWriter->writeEndElement();
     }
 

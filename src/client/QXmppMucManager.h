@@ -35,6 +35,8 @@ class QXmppMucManagerPrivate;
 class QXmppMucRoom;
 class QXmppMucRoomPrivate;
 
+class QDateTime;
+
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by \xep{0045}: Multi-User Chat.
 ///
@@ -120,6 +122,8 @@ class QXMPP_EXPORT QXmppMucRoom : public QObject
     Q_PROPERTY(QStringList participants READ participants NOTIFY participantsChanged)
     /// The chat room password
     Q_PROPERTY(QString password READ password WRITE setPassword)
+    /// The beginning time to request history
+    Q_PROPERTY(QDateTime historySince READ historySince WRITE setHistorySince)
     /// The room's subject
     Q_PROPERTY(QString subject READ subject WRITE setSubject NOTIFY subjectChanged)
 
@@ -181,6 +185,10 @@ public:
     /// Returns the room's subject.
     QString subject() const;
     void setSubject(const QString &subject);
+
+    // ref https://xmpp.org/extensions/xep-0045.html#enter-managehistory
+    QDateTime historySince() const;
+    void setHistorySince(const QDateTime& since);
 
 Q_SIGNALS:
     /// This signal is emitted when the allowed actions change.
