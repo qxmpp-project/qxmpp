@@ -44,8 +44,12 @@ QXmppPushEnableIq::QXmppPushEnableIq()
 {
 }
 
+/// Default copy-constructor
 QXmppPushEnableIq::QXmppPushEnableIq(const QXmppPushEnableIq &) = default;
+
 QXmppPushEnableIq::~QXmppPushEnableIq() = default;
+
+/// Default assignment operator
 QXmppPushEnableIq &QXmppPushEnableIq::operator=(const QXmppPushEnableIq &) = default;
 
 ///

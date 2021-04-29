@@ -27,6 +27,7 @@
 
 #include <QDomElement>
 
+/// \cond
 QXmppDataForm QXmppStreamInitiationIq::featureForm() const
 {
     return m_featureForm;
@@ -77,7 +78,6 @@ void QXmppStreamInitiationIq::setSiId(const QString &id)
     m_siId = id;
 }
 
-/// \cond
 bool QXmppStreamInitiationIq::isStreamInitiationIq(const QDomElement &element)
 {
     QDomElement siElement = element.firstChildElement(QStringLiteral("si"));

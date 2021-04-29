@@ -61,6 +61,7 @@ class QDateTime;
 class QXMPP_EXPORT QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
+    /// List of joined MUC rooms
     Q_PROPERTY(QList<QXmppMucRoom *> rooms READ rooms NOTIFY roomAdded)
 
 public:

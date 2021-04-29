@@ -73,5 +73,9 @@ inline QLatin1String QXmppVersion()
 #define Q_DECL_ENUMERATOR_DEPRECATED_X(msg)
 #endif
 
+#ifndef QT_WARNING_DISABLE_DEPRECATED
+#define QT_WARNING_DISABLE_DEPRECATED
+#endif
+
 #endif // QXMPPGLOBAL_H
 

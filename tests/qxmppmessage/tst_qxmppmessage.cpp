@@ -1096,7 +1096,7 @@ void tst_QXmppMessage::testMixInvitation()
     QXmppMessage message;
     parsePacket(message, xml);
 
-    QVERIFY(message.mixInvitation());
+    QVERIFY(message.mixInvitation().has_value());
 
     serializePacket(message, xml);
 }

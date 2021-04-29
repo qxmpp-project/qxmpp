@@ -62,75 +62,113 @@ QXmppStreamFeatures::QXmppStreamFeatures()
 {
 }
 
+/// Default copy-constructor
 QXmppStreamFeatures::QXmppStreamFeatures(const QXmppStreamFeatures &) = default;
 
 QXmppStreamFeatures::~QXmppStreamFeatures() = default;
 
+/// Default assignment operator
 QXmppStreamFeatures &QXmppStreamFeatures::operator=(const QXmppStreamFeatures &) = default;
 
+///
+/// Returns the resource binding mode
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::bindMode() const
 {
     return d->bindMode;
 }
 
+///
+/// Sets the resource binding mode
+///
 void QXmppStreamFeatures::setBindMode(QXmppStreamFeatures::Mode mode)
 {
     d->bindMode = mode;
 }
 
+///
+/// Returns session mode
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::sessionMode() const
 {
     return d->sessionMode;
 }
 
+///
+/// Sets session mode
+///
 void QXmppStreamFeatures::setSessionMode(Mode mode)
 {
     d->sessionMode = mode;
 }
 
+///
+/// Returns Non-SASL Authentication mode
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::nonSaslAuthMode() const
 {
     return d->nonSaslAuthMode;
 }
 
+///
+/// Sets Non-SASL Authentication mode
+///
 void QXmppStreamFeatures::setNonSaslAuthMode(QXmppStreamFeatures::Mode mode)
 {
     d->nonSaslAuthMode = mode;
 }
 
+///
+/// Returns the available authentication mechanisms
+///
 QStringList QXmppStreamFeatures::authMechanisms() const
 {
     return d->authMechanisms;
 }
 
+///
+/// Sets the available authentication mechanisms
+///
 void QXmppStreamFeatures::setAuthMechanisms(const QStringList &mechanisms)
 {
     d->authMechanisms = mechanisms;
 }
 
+///
+/// Returns the available compression methods
+///
 QStringList QXmppStreamFeatures::compressionMethods() const
 {
     return d->compressionMethods;
 }
 
+///
+/// Sets the available compression methods
+///
 void QXmppStreamFeatures::setCompressionMethods(const QStringList &methods)
 {
     d->compressionMethods = methods;
 }
 
+///
+/// Returns the mode for STARTTLS
+///
 QXmppStreamFeatures::Mode QXmppStreamFeatures::tlsMode() const
 {
     return d->tlsMode;
 }
 
+///
+/// Sets the mode for STARTTLS
+///
 void QXmppStreamFeatures::setTlsMode(QXmppStreamFeatures::Mode mode)
 {
     d->tlsMode = mode;
 }
 
 ///
-/// Returns the mode (disabled, enabled or required) for \xep{0198}: Stream
-/// Management
+/// Returns the mode (disabled, enabled or required) for \xep{0198, Stream
+/// Management}
 ///
 /// \since QXmpp 1.0
 ///
@@ -140,7 +178,7 @@ QXmppStreamFeatures::Mode QXmppStreamFeatures::streamManagementMode() const
 }
 
 ///
-/// Sets the mode for \xep{0198}: Stream Management
+/// Sets the mode for \xep{0198, Stream Management}
 ///
 /// \param mode The mode to set.
 ///
@@ -152,7 +190,7 @@ void QXmppStreamFeatures::setStreamManagementMode(QXmppStreamFeatures::Mode mode
 }
 
 ///
-/// Returns the mode for \xep{0352}: Client State Indication
+/// Returns the mode for \xep{0352, Client State Indication}
 ///
 /// \since QXmpp 1.0
 ///
@@ -162,7 +200,7 @@ QXmppStreamFeatures::Mode QXmppStreamFeatures::clientStateIndicationMode() const
 }
 
 ///
-/// Sets the mode for \xep{0352}: Client State Indication
+/// Sets the mode for \xep{0352, Client State Indication}
 ///
 /// \param mode The mode to set.
 ///
@@ -174,7 +212,7 @@ void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode
 }
 
 ///
-/// Returns the mode for \xep{0077}: In-Band Registration
+/// Returns the mode for \xep{0077, In-Band Registration}
 ///
 /// \since QXmpp 1.1
 ///
@@ -184,15 +222,15 @@ QXmppStreamFeatures::Mode QXmppStreamFeatures::registerMode() const
 }
 
 ///
-/// Sets the mode for \xep{0077}: In-Band Registration
+/// Sets the mode for \xep{0077, In-Band Registration}
 ///
 /// \param mode The mode to set.
 ///
 /// \since QXmpp 1.1
 ///
-void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &registerMode)
+void QXmppStreamFeatures::setRegisterMode(const QXmppStreamFeatures::Mode &mode)
 {
-    d->registerMode = registerMode;
+    d->registerMode = mode;
 }
 
 ///
@@ -339,14 +377,14 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement(QStringLiteral("compression"));
         writer->writeDefaultNamespace(ns_compressFeature);
-        for (const auto &method : qAsConst(d->compressionMethods))
+        for (const auto &method : std::as_const(d->compressionMethods))
             writer->writeTextElement(QStringLiteral("method"), method);
         writer->writeEndElement();
     }
     if (!d->authMechanisms.isEmpty()) {
         writer->writeStartElement(QStringLiteral("mechanisms"));
         writer->writeDefaultNamespace(ns_sasl);
-        for (const auto &mechanism : qAsConst(d->authMechanisms))
+        for (const auto &mechanism : std::as_const(d->authMechanisms))
             writer->writeTextElement(QStringLiteral("mechanism"), mechanism);
         writer->writeEndElement();
     }

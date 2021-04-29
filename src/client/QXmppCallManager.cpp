@@ -37,6 +37,7 @@
 #include <QDomElement>
 #include <QTimer>
 
+/// \cond
 QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
     : turnPort(0),
       q(qq)
@@ -60,18 +61,20 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
             return call;
     return nullptr;
 }
+/// \endcond
 
+///
 /// Constructs a QXmppCallManager object to handle incoming and outgoing
 /// Voice-Over-IP calls.
 ///
-
 QXmppCallManager::QXmppCallManager()
 {
     d = new QXmppCallManagerPrivate(this);
 }
 
+///
 /// Destroys the QXmppCallManager object.
-
+///
 QXmppCallManager::~QXmppCallManager()
 {
     delete d;
@@ -80,12 +83,13 @@ QXmppCallManager::~QXmppCallManager()
 /// \cond
 QStringList QXmppCallManager::discoveryFeatures() const
 {
-    return QStringList()
-        << ns_jingle      // XEP-0166 : Jingle
-        << ns_jingle_rtp  // XEP-0167 : Jingle RTP Sessions
-        << ns_jingle_rtp_audio
-        << ns_jingle_rtp_video
-        << ns_jingle_ice_udp;  // XEP-0176 : Jingle ICE-UDP Transport Method
+    return {
+        ns_jingle,      // XEP-0166 : Jingle
+        ns_jingle_rtp,  // XEP-0167 : Jingle RTP Sessions
+        ns_jingle_rtp_audio,
+        ns_jingle_rtp_video,
+        ns_jingle_ice_udp,  // XEP-0176 : Jingle ICE-UDP Transport Method
+    };
 }
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
@@ -105,7 +109,6 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
 
 void QXmppCallManager::setClient(QXmppClient *client)
 {
-
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::disconnected,
@@ -119,13 +122,13 @@ void QXmppCallManager::setClient(QXmppClient *client)
 }
 /// \endcond
 
+///
 /// Initiates a new outgoing call to the specified recipient.
 ///
 /// \param jid
-
+///
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
-
     if (jid.isEmpty()) {
         warning("Refusing to call an empty jid");
         return nullptr;
@@ -152,6 +155,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     return call;
 }
 
+///
 /// Sets multiple STUN servers to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -160,12 +164,13 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 /// \param servers List of the STUN servers.
 ///
 /// \since QXmpp 1.3
-
+///
 void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> &servers)
 {
     d->stunServers = servers;
 }
 
+///
 /// Sets a single STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -173,73 +178,80 @@ void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> 
 ///
 /// \param host The address of the STUN server.
 /// \param port The port of the STUN server.
-
+///
 void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunServers.clear();
-    d->stunServers.push_back(QPair<QHostAddress, quint16>(host, port));
+    d->stunServers.push_back(QPair(host, port));
 }
 
+///
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
 ///
 /// \param host The address of the TURN server.
 /// \param port The port of the TURN server.
-
+///
 void QXmppCallManager::setTurnServer(const QHostAddress &host, quint16 port)
 {
     d->turnHost = host;
     d->turnPort = port;
 }
 
+///
 /// Sets the \a user used for authentication with the TURN server.
 ///
 /// \param user
-
+///
 void QXmppCallManager::setTurnUser(const QString &user)
 {
     d->turnUser = user;
 }
 
+///
 /// Sets the \a password used for authentication with the TURN server.
 ///
 /// \param password
-
+///
 void QXmppCallManager::setTurnPassword(const QString &password)
 {
     d->turnPassword = password;
 }
 
+///
 /// Handles call destruction.
-
+///
 void QXmppCallManager::_q_callDestroyed(QObject *object)
 {
     d->calls.removeAll(static_cast<QXmppCall *>(object));
 }
 
+///
 /// Handles disconnection from server.
-
+///
 void QXmppCallManager::_q_disconnected()
 {
-    for (auto *call : d->calls)
+    for (auto *call : std::as_const(d->calls)) {
         call->d->terminate(QXmppJingleIq::Reason::Gone);
+    }
 }
 
+///
 /// Handles acknowledgements.
 ///
-
 void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 {
     if (ack.type() != QXmppIq::Result)
         return;
 
     // find request
-    for (auto *call : d->calls)
+    for (auto *call : std::as_const(d->calls)) {
         call->d->handleAck(ack);
+    }
 }
 
+///
 /// Handles a Jingle IQ.
 ///
-
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
 
@@ -251,8 +263,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         QXmppCall *call = new QXmppCall(iq.from(), QXmppCall::IncomingDirection, this);
         call->d->sid = iq.sid();
 
-        const QXmppJingleIq::Content content = iq.contents().isEmpty() ? QXmppJingleIq::Content() : iq.contents().first();
-        QXmppCallStream *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
+        const auto content = iq.contents().isEmpty() ? QXmppJingleIq::Content()
+                                                     : iq.contents().constFirst();
+        auto *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
         if (!stream)
             return;
         call->d->streams << stream;
@@ -301,14 +314,15 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
     }
 }
 
+///
 /// Handles a presence.
-
+///
 void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
 {
     if (presence.type() != QXmppPresence::Unavailable)
         return;
 
-    for (auto *call : d->calls) {
+    for (auto *call : std::as_const(d->calls)) {
         if (presence.from() == call->jid()) {
             // the remote party has gone away, terminate call
             call->d->terminate(QXmppJingleIq::Reason::Gone);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(qxmpp VERSION 1.4.0)
+project(qxmpp VERSION 1.5.0)
 
 set(SO_VERSION 3)
 
@@ -11,7 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Xml)
-find_package(Qt${QT_VERSION_MAJOR} 5.7.0 REQUIRED COMPONENTS Core Network Xml)
+find_package(Qt${QT_VERSION_MAJOR} 5.9.2 REQUIRED COMPONENTS Core Network Xml)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

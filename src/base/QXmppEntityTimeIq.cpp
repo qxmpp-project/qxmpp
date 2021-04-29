@@ -28,47 +28,52 @@
 
 #include <QDomElement>
 
+///
 /// Returns the timezone offset in seconds.
 ///
-
 int QXmppEntityTimeIq::tzo() const
 {
     return m_tzo;
 }
 
+///
 /// Sets the timezone offset in seconds.
 ///
 /// \param tzo
-
+///
 void QXmppEntityTimeIq::setTzo(int tzo)
 {
     m_tzo = tzo;
 }
 
+///
 /// Returns the date/time in Coordinated Universal Time (UTC).
 ///
-
 QDateTime QXmppEntityTimeIq::utc() const
 {
     return m_utc;
 }
 
+///
 /// Sets the date/time in Coordinated Universal Time (UTC).
 ///
 /// \param utc
-
+///
 void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
 {
     m_utc = utc;
 }
 
-/// \cond
+///
+/// Returns true, if the element is a valid entity time IQ.
+///
 bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
     return timeElement.namespaceURI() == ns_entity_time;
 }
 
+/// \cond
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");

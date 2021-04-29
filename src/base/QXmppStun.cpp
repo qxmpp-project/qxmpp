@@ -304,157 +304,175 @@ void QXmppStunMessage::setType(quint16 type)
     m_type = type;
 }
 
+///
 /// Returns the CHANGE-REQUEST attribute, indicating whether to change
 /// the IP and / or port from which the response is sent.
-
+///
 quint32 QXmppStunMessage::changeRequest() const
 {
     return m_changeRequest;
 }
 
+///
 /// Sets the CHANGE-REQUEST attribute, indicating whether to change
 /// the IP and / or port from which the response is sent.
 ///
 /// \param changeRequest
-
+///
 void QXmppStunMessage::setChangeRequest(quint32 changeRequest)
 {
     m_changeRequest = changeRequest;
     m_attributes << ChangeRequest;
 }
 
+///
 /// Returns the CHANNEL-NUMBER attribute.
-
+///
 quint16 QXmppStunMessage::channelNumber() const
 {
     return m_channelNumber;
 }
 
+///
 /// Sets the CHANNEL-NUMBER attribute.
 ///
 /// \param channelNumber
-
+///
 void QXmppStunMessage::setChannelNumber(quint16 channelNumber)
 {
     m_channelNumber = channelNumber;
     m_attributes << ChannelNumber;
 }
 
+///
 /// Returns the DATA attribute.
-
+///
 QByteArray QXmppStunMessage::data() const
 {
     return m_data;
 }
 
+///
 /// Sets the DATA attribute.
-
+///
 void QXmppStunMessage::setData(const QByteArray &data)
 {
     m_data = data;
     m_attributes << DataAttr;
 }
 
+///
 /// Returns the LIFETIME attribute, indicating the duration in seconds for
 /// which the server will maintain an allocation.
-
+///
 quint32 QXmppStunMessage::lifetime() const
 {
     return m_lifetime;
 }
 
+///
 /// Sets the LIFETIME attribute, indicating the duration in seconds for
 /// which the server will maintain an allocation.
 ///
 /// \param lifetime
-
+///
 void QXmppStunMessage::setLifetime(quint32 lifetime)
 {
     m_lifetime = lifetime;
     m_attributes << Lifetime;
 }
 
+///
 /// Returns the NONCE attribute.
-
+///
 QByteArray QXmppStunMessage::nonce() const
 {
     return m_nonce;
 }
 
+///
 /// Sets the NONCE attribute.
 ///
 /// \param nonce
-
+///
 void QXmppStunMessage::setNonce(const QByteArray &nonce)
 {
     m_nonce = nonce;
     m_attributes << Nonce;
 }
 
+///
 /// Returns the PRIORITY attribute, the priority that would be assigned to
 /// a peer reflexive candidate discovered during the ICE check.
-
+///
 quint32 QXmppStunMessage::priority() const
 {
     return m_priority;
 }
 
+///
 /// Sets the PRIORITY attribute, the priority that would be assigned to
 /// a peer reflexive candidate discovered during the ICE check.
 ///
 /// \param priority
-
+///
 void QXmppStunMessage::setPriority(quint32 priority)
 {
     m_priority = priority;
     m_attributes << Priority;
 }
 
+///
 /// Returns the REALM attribute.
-
+///
 QString QXmppStunMessage::realm() const
 {
     return m_realm;
 }
 
+///
 /// Sets the REALM attribute.
 ///
 /// \param realm
-
+///
 void QXmppStunMessage::setRealm(const QString &realm)
 {
     m_realm = realm;
     m_attributes << Realm;
 }
 
+///
 /// Returns the REQUESTED-TRANSPORT attribute.
-
+///
 quint8 QXmppStunMessage::requestedTransport() const
 {
     return m_requestedTransport;
 }
 
+///
 /// Sets the REQUESTED-TRANSPORT attribute.
 ///
 /// \param requestedTransport
-
+///
 void QXmppStunMessage::setRequestedTransport(quint8 requestedTransport)
 {
     m_requestedTransport = requestedTransport;
     m_attributes << RequestedTransport;
 }
 
+///
 /// Returns the RESERVATION-TOKEN attribute.
-
+///
 QByteArray QXmppStunMessage::reservationToken() const
 {
     return m_reservationToken;
 }
 
+///
 /// Sets the RESERVATION-TOKEN attribute.
 ///
 /// \param reservationToken
-
+///
 void QXmppStunMessage::setReservationToken(const QByteArray &reservationToken)
 {
     m_reservationToken = reservationToken;
@@ -462,50 +480,55 @@ void QXmppStunMessage::setReservationToken(const QByteArray &reservationToken)
     m_attributes << ReservationToken;
 }
 
+///
 /// Returns the SOFTWARE attribute, containing a textual description of the
 /// software being used.
-
+///
 QString QXmppStunMessage::software() const
 {
     return m_software;
 }
 
+///
 /// Sets the SOFTWARE attribute, containing a textual description of the
 /// software being used.
 ///
 /// \param software
-
+///
 void QXmppStunMessage::setSoftware(const QString &software)
 {
     m_software = software;
     m_attributes << Software;
 }
 
+///
 /// Returns the USERNAME attribute, containing the username to use for
 /// authentication.
-
+///
 QString QXmppStunMessage::username() const
 {
     return m_username;
 }
 
+///
 /// Sets the USERNAME attribute, containing the username to use for
 /// authentication.
 ///
 /// \param username
-
+///
 void QXmppStunMessage::setUsername(const QString &username)
 {
     m_username = username;
     m_attributes << Username;
 }
 
+///
 /// Decodes a QXmppStunMessage and checks its integrity using the given key.
 ///
 /// \param buffer
 /// \param key
 /// \param errors
-
+///
 bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, QStringList *errors)
 {
     QStringList silent;
@@ -782,12 +805,13 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
     return true;
 }
 
+///
 /// Encodes the current QXmppStunMessage, optionally calculating the
 /// message integrity attribute using the given key.
 ///
 /// \param key
 /// \param addFingerprint
-
+///
 QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) const
 {
     QByteArray buffer;
@@ -955,13 +979,14 @@ QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) 
     return buffer;
 }
 
+///
 /// If the given packet looks like a STUN message, returns the message
 /// type, otherwise returns 0.
 ///
 /// \param buffer
 /// \param cookie
 /// \param id
-
+///
 quint16 QXmppStunMessage::peekType(const QByteArray &buffer, quint32 &cookie, QByteArray &id)
 {
     if (buffer.size() < STUN_HEADER)
@@ -1095,11 +1120,13 @@ QString QXmppStunMessage::toString() const
     return dumpLines.join("\n");
 }
 
+/// \cond
+///
 /// Constructs a new QXmppStunTransaction.
 ///
 /// \param request
 /// \param receiver
-
+///
 QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObject *receiver)
     : QXmppLoggable(receiver),
       m_request(request),
@@ -1136,15 +1163,17 @@ void QXmppStunTransaction::readStun(const QXmppStunMessage &response)
     }
 }
 
+///
 /// Returns the STUN request.
-
+///
 QXmppStunMessage QXmppStunTransaction::request() const
 {
     return m_request;
 }
 
+///
 /// Returns the STUN response.
-
+///
 QXmppStunMessage QXmppStunTransaction::response() const
 {
     return m_response;
@@ -1165,10 +1194,11 @@ void QXmppStunTransaction::retry()
     m_tries++;
 }
 
+///
 /// Constructs a new QXmppTurnAllocation.
 ///
 /// \param parent
-
+///
 QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
     : QXmppIceTransport(parent),
       m_relayedPort(0),
@@ -1195,16 +1225,18 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
             this, &QXmppTurnAllocation::refreshChannels);
 }
 
+///
 /// Destroys the TURN allocation.
-
+///
 QXmppTurnAllocation::~QXmppTurnAllocation()
 {
     if (m_state == ConnectedState)
         disconnectFromHost();
 }
 
+///
 /// Allocates the TURN allocation.
-
+///
 void QXmppTurnAllocation::connectToHost()
 {
     if (m_state != UnconnectedState)
@@ -1230,8 +1262,9 @@ void QXmppTurnAllocation::connectToHost()
     setState(ConnectingState);
 }
 
+///
 /// Releases the TURN allocation.
-
+///
 void QXmppTurnAllocation::disconnectFromHost()
 {
     m_channelTimer->stop();
@@ -1328,8 +1361,9 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
     }
 }
 
+///
 /// Refresh allocation.
-
+///
 void QXmppTurnAllocation::refresh()
 {
     QXmppStunMessage request;
@@ -1341,8 +1375,9 @@ void QXmppTurnAllocation::refresh()
     m_transactions << new QXmppStunTransaction(request, this);
 }
 
+///
 /// Refresh channel bindings.
-
+///
 void QXmppTurnAllocation::refreshChannels()
 {
     for (const auto &channel : m_channels.keys()) {
@@ -1359,54 +1394,59 @@ void QXmppTurnAllocation::refreshChannels()
     }
 }
 
+///
 /// Returns the relayed host address, i.e. the address on the server
 /// used to communicate with peers.
-
+///
 QHostAddress QXmppTurnAllocation::relayedHost() const
 {
     return m_relayedHost;
 }
 
+///
 /// Returns the relayed port, i.e. the port on the server used to communicate
 /// with peers.
-
+///
 quint16 QXmppTurnAllocation::relayedPort() const
 {
     return m_relayedPort;
 }
 
+///
 /// Sets the password used to authenticate with the TURN server.
 ///
 /// \param password
-
+///
 void QXmppTurnAllocation::setPassword(const QString &password)
 {
     m_password = password;
 }
 
+///
 /// Sets the TURN server to use.
 ///
 /// \param host The address of the TURN server.
 /// \param port The port of the TURN server.
-
+///
 void QXmppTurnAllocation::setServer(const QHostAddress &host, quint16 port)
 {
     m_turnHost = host;
     m_turnPort = port;
 }
 
+///
 /// Sets the \a user used for authentication with the TURN server.
 ///
 /// \param user
-
+///
 void QXmppTurnAllocation::setUser(const QString &user)
 {
     m_username = user;
 }
 
+///
 /// Returns the current state of the allocation.
 ///
-
 QXmppTurnAllocation::AllocationState QXmppTurnAllocation::state() const
 {
     return m_state;
@@ -1620,6 +1660,7 @@ qint64 QXmppUdpTransport::writeDatagram(const QByteArray &data, const QHostAddre
         remoteHost.setScopeId(m_socket->localAddress().scopeId());
     return m_socket->writeDatagram(data, remoteHost, port);
 }
+/// \endcond
 
 class CandidatePair : public QXmppLoggable
 {
@@ -1907,10 +1948,9 @@ void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppI
 #endif
 }
 
+///
 /// Constructs a new QXmppIceComponent.
 ///
-/// \param parent
-
 QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent)
     : QXmppLoggable(parent)
 {
@@ -1940,17 +1980,19 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
     setObjectName(QStringLiteral("STUN(%1)").arg(QString::number(d->component)));
 }
 
+///
 /// Destroys the QXmppIceComponent.
-
+///
 QXmppIceComponent::~QXmppIceComponent()
 {
     qDeleteAll(d->pairs);
     delete d;
 }
 
+///
 /// Returns the component id for the current socket, e.g. 1 for RTP
 /// and 2 for RTCP.
-
+///
 int QXmppIceComponent::component() const
 {
     return d->component;
@@ -1970,8 +2012,9 @@ void QXmppIceComponent::checkCandidates()
     }
 }
 
+///
 /// Stops ICE connectivity checks and closes the underlying sockets.
-
+///
 void QXmppIceComponent::close()
 {
     for (auto *transport : d->transports)
@@ -1981,8 +2024,9 @@ void QXmppIceComponent::close()
     d->activePair = nullptr;
 }
 
+///
 /// Starts ICE connectivity checks.
-
+///
 void QXmppIceComponent::connectToHost()
 {
     if (d->activePair)
@@ -1992,15 +2036,17 @@ void QXmppIceComponent::connectToHost()
     d->timer->start();
 }
 
+///
 /// Returns true if ICE negotiation completed, false otherwise.
-
+///
 bool QXmppIceComponent::isConnected() const
 {
     return d->activePair != nullptr;
 }
 
+///
 /// Returns the list of local candidates.
-
+///
 QList<QXmppJingleCandidate> QXmppIceComponent::localCandidates() const
 {
     return d->localCandidates;
@@ -2295,8 +2341,9 @@ static QList<QUdpSocket *> reservePort(const QList<QHostAddress> &addresses, qui
     return sockets;
 }
 
+///
 /// Returns the list of local network addresses.
-
+///
 QList<QHostAddress> QXmppIceComponent::discoverAddresses()
 {
     QList<QHostAddress> addresses;
@@ -2329,6 +2376,7 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
     return addresses;
 }
 
+///
 /// Tries to bind \a count UDP sockets on each of the given \a addresses.
 ///
 /// The port numbers are chosen so that they are consecutive, starting at
@@ -2337,7 +2385,7 @@ QList<QHostAddress> QXmppIceComponent::discoverAddresses()
 /// \param addresses The network address on which to bind the sockets.
 /// \param count     The number of ports to reserve.
 /// \param parent    The parent object for the sockets.
-
+///
 QList<QUdpSocket *> QXmppIceComponent::reservePorts(const QList<QHostAddress> &addresses, int count, QObject *parent)
 {
     QList<QUdpSocket *> sockets;
@@ -2377,10 +2425,11 @@ QList<QUdpSocket *> QXmppIceComponent::reservePorts(const QList<QHostAddress> &a
     return sockets;
 }
 
+///
 /// Sends a data packet to the remote party.
 ///
 /// \param datagram
-
+///
 qint64 QXmppIceComponent::sendDatagram(const QByteArray &datagram)
 {
     CandidatePair *pair = d->activePair ? d->activePair : d->fallbackPair;
@@ -2449,10 +2498,11 @@ QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
 {
 }
 
+///
 /// Constructs a new ICE connection.
 ///
 /// \param parent
-
+///
 QXmppIceConnection::QXmppIceConnection(QObject *parent)
     : QXmppLoggable(parent), d(new QXmppIceConnectionPrivate())
 {
@@ -2470,20 +2520,22 @@ QXmppIceConnection::~QXmppIceConnection()
     delete d;
 }
 
+///
 /// Returns the given component of this ICE connection.
 ///
 /// \param component
-
+///
 QXmppIceComponent *QXmppIceConnection::component(int component)
 {
     return d->components.value(component);
 }
 
+///
 /// Adds a component to this ICE connection, for instance 1 for RTP
 /// or 2 for RTCP.
 ///
 /// \param component
-
+///
 void QXmppIceConnection::addComponent(int component)
 {
 
@@ -2509,10 +2561,11 @@ void QXmppIceConnection::addComponent(int component)
     d->components[component] = socket;
 }
 
+///
 /// Adds a candidate for one of the remote components.
 ///
 /// \param candidate
-
+///
 void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidate)
 {
     QXmppIceComponent *socket = d->components.value(candidate.component());
@@ -2523,10 +2576,11 @@ void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidat
     socket->d->addRemoteCandidate(candidate);
 }
 
+///
 /// Binds the local sockets to the specified addresses.
 ///
 /// \param addresses The addresses on which to listen.
-
+///
 bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
 {
     // reserve ports
@@ -2546,8 +2600,9 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
     return true;
 }
 
+///
 /// Closes the ICE connection.
-
+///
 void QXmppIceConnection::close()
 {
     d->connectTimer->stop();
@@ -2555,8 +2610,9 @@ void QXmppIceConnection::close()
         socket->close();
 }
 
+///
 /// Starts ICE connectivity checks.
-
+///
 void QXmppIceConnection::connectToHost()
 {
     if (isConnected() || d->connectTimer->isActive())
@@ -2567,8 +2623,9 @@ void QXmppIceConnection::connectToHost()
     d->connectTimer->start();
 }
 
+///
 /// Returns true if ICE negotiation completed, false otherwise.
-
+///
 bool QXmppIceConnection::isConnected() const
 {
     for (auto *socket : d->components.values())
@@ -2582,19 +2639,21 @@ QXmppIceConnection::GatheringState QXmppIceConnection::gatheringState() const
     return d->gatheringState;
 }
 
+///
 /// Sets whether the local party has the ICE controlling role.
 ///
 /// \a note This must be called only once, immediately after creating
 /// the connection.
-
+///
 void QXmppIceConnection::setIceControlling(bool controlling)
 {
     d->iceControlling = controlling;
 }
 
+///
 /// Returns the list of local HOST CANDIDATES candidates by iterating
 /// over the available network interfaces.
-
+///
 QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
 {
     QList<QXmppJingleCandidate> candidates;
@@ -2603,38 +2662,43 @@ QList<QXmppJingleCandidate> QXmppIceConnection::localCandidates() const
     return candidates;
 }
 
+///
 /// Returns the local user fragment.
-
+///
 QString QXmppIceConnection::localUser() const
 {
     return d->localUser;
 }
 
+///
 /// Returns the local password.
-
+///
 QString QXmppIceConnection::localPassword() const
 {
     return d->localPassword;
 }
 
+///
 /// Sets the remote user fragment.
 ///
 /// \param user
-
+///
 void QXmppIceConnection::setRemoteUser(const QString &user)
 {
     d->remoteUser = user;
 }
 
+///
 /// Sets the remote password.
 ///
 /// \param password
-
+///
 void QXmppIceConnection::setRemotePassword(const QString &password)
 {
     d->remotePassword = password;
 }
 
+///
 /// Sets multiple STUN servers to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -2643,12 +2707,13 @@ void QXmppIceConnection::setRemotePassword(const QString &password)
 /// \param servers List of the STUN servers.
 ///
 /// \since QXmpp 1.3
-
+///
 void QXmppIceConnection::setStunServers(const QList<QPair<QHostAddress, quint16>> &servers)
 {
     d->stunServers = servers;
 }
 
+///
 /// Sets a single STUN server to use to determine server-reflexive addresses
 /// and ports.
 ///
@@ -2656,20 +2721,21 @@ void QXmppIceConnection::setStunServers(const QList<QPair<QHostAddress, quint16>
 ///
 /// \param host The address of the STUN server.
 /// \param port The port of the STUN server.
-
+///
 void QXmppIceConnection::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunServers.clear();
     d->stunServers.push_back(QPair<QHostAddress, quint16>(host, port));
 }
 
+///
 /// Sets the TURN server to use to relay packets in double-NAT configurations.
 ///
 /// \note This may only be called prior to calling bind().
 ///
 /// \param host The address of the TURN server.
 /// \param port The port of the TURN server.
-
+///
 void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
 {
     d->turnHost = host;
@@ -2678,12 +2744,13 @@ void QXmppIceConnection::setTurnServer(const QHostAddress &host, quint16 port)
         socket->d->setTurnServer(host, port);
 }
 
+///
 /// Sets the \a user used for authentication with the TURN server.
 ///
 /// \note This may only be called prior to calling bind().
 ///
 /// \param user
-
+///
 void QXmppIceConnection::setTurnUser(const QString &user)
 {
     d->turnUser = user;
@@ -2691,12 +2758,13 @@ void QXmppIceConnection::setTurnUser(const QString &user)
         socket->d->setTurnUser(user);
 }
 
+///
 /// Sets the \a password used for authentication with the TURN server.
 ///
 /// \note This may only be called prior to calling bind().
 ///
 /// \param password
-
+///
 void QXmppIceConnection::setTurnPassword(const QString &password)
 {
     d->turnPassword = password;
@@ -2747,6 +2815,7 @@ void QXmppIceConnection::slotTimeout()
     emit disconnected();
 }
 
+/// \cond
 QXmppIceTransport::QXmppIceTransport(QObject *parent)
     : QXmppLoggable(parent)
 {
@@ -2755,3 +2824,4 @@ QXmppIceTransport::QXmppIceTransport(QObject *parent)
 QXmppIceTransport::~QXmppIceTransport()
 {
 }
+/// \endcond

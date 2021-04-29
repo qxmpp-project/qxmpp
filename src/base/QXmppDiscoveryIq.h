@@ -33,21 +33,9 @@ class QXmppDiscoveryIdentityPrivate;
 class QXmppDiscoveryItemPrivate;
 class QXmppDiscoveryIqPrivate;
 
-///
-/// \brief QXmppDiscoveryIq represents a discovery IQ request or result
-/// containing a list of features and other information about an entity as
-/// defined by \xep{0030}: Service Discovery.
-///
-/// \ingroup Stanzas
-///
 class QXMPP_EXPORT QXmppDiscoveryIq : public QXmppIq
 {
 public:
-    ///
-    /// \brief Identity represents one of possibly multiple identities of an
-    /// XMPP entity obtained from a service discovery request as defined in
-    /// \xep{0030}: Service Discovery.
-    ///
     class QXMPP_EXPORT Identity
     {
     public:
@@ -73,10 +61,6 @@ public:
         QSharedDataPointer<QXmppDiscoveryIdentityPrivate> d;
     };
 
-    ///
-    /// \brief Item represents a related XMPP entity that can be queried using
-    /// \xep{0030}: Service Discovery.
-    ///
     class QXMPP_EXPORT Item
     {
     public:

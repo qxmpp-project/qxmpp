@@ -152,7 +152,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
     } else if (!serversForServers.isEmpty()) {
 
         // look for an outgoing S2S connection
-        for (auto *conn : qAsConst(outgoingServers)) {
+        for (auto *conn : std::as_const(outgoingServers)) {
             if (conn->remoteDomain() == toDomain) {
                 // send or queue data
                 QMetaObject::invokeMethod(conn, "queueData", Q_ARG(QByteArray, data));
@@ -770,7 +770,7 @@ void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
 
     if (dialback.command() == QXmppDialback::Verify) {
         // handle a verify request
-        for (auto *out : qAsConst(d->outgoingServers)) {
+        for (auto *out : std::as_const(d->outgoingServers)) {
             if (out->remoteDomain() != dialback.from())
                 continue;
 

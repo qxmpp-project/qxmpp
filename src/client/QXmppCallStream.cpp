@@ -32,9 +32,9 @@
 #endif
 
 #include <cstring>
-
 #include <gst/gst.h>
 
+/// \cond
 QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstElement *pipeline_,
                                                GstElement *rtpbin_, QString media_, QString creator_,
                                                QString name_, int id_)
@@ -222,7 +222,7 @@ void QXmppCallStreamPrivate::addEncoder(QXmppCallPrivate::GstCodec &codec)
         qFatal("Failed to create encoder");
         return;
     }
-    for (auto &encProp : codec.encProps) {
+    for (auto &encProp : std::as_const(codec.encProps)) {
         g_object_set(encoder, encProp.name.toLatin1().data(), encProp.value, nullptr);
     }
 
@@ -326,6 +326,17 @@ void QXmppCallStreamPrivate::addRtcpSender(GstPad *pad)
         qFatal("Failed to link rtcp pads");
     }
 }
+/// \endcond
+
+///
+/// \class QXmppCallStream
+///
+/// The QXmppCallStream class represents an RTP stream in a VoIP call.
+///
+/// \note THIS API IS NOT FINALIZED YET
+///
+/// \since QXmpp 1.3
+///
 
 QXmppCallStream::QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
                                  QString media, QString creator, QString name, int id)

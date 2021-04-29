@@ -38,12 +38,6 @@ class QXmppIceConnection;
 class QXmppCall;
 class QXmppCallPrivate;
 
-/// \brief The QXmppCallStream class represents an RTP stream in a VoIP call.
-///
-/// \note THIS API IS NOT FINALIZED YET
-///
-/// \since QXmpp 1.3
-
 class QXMPP_EXPORT QXmppCallStream : public QObject
 {
     Q_OBJECT

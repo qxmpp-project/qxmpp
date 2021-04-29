@@ -58,6 +58,7 @@ public:
     bool isStreamManagementEnabled() const;
     bool isStreamResumed() const;
 
+    /// Returns the used socket
     QSslSocket *socket() const { return QXmppStream::socket(); };
     QXmppStanza::Error::Condition xmppStreamError();
 

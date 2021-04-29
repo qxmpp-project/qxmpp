@@ -36,9 +36,6 @@ class QXmppElementPrivate;
 
 using QXmppElementList = QList<QXmppElement>;
 
-///
-/// \brief QXmppElement represents a raw XML element with possible children.
-///
 class QXMPP_EXPORT QXmppElement
 {
 public:
@@ -72,6 +69,7 @@ public:
 
 private:
     QXmppElement(QXmppElementPrivate *other);
+    // ### QXmpp2: Use an std::shared_ptr if possible?
     QXmppElementPrivate *d;
 };
 

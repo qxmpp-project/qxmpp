@@ -45,6 +45,7 @@ class QXmppStream;
 // We mean it.
 //
 
+/// \cond
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnable
 {
 public:
@@ -58,10 +59,8 @@ public:
 
     static bool isStreamManagementEnable(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     bool m_resume;
@@ -88,10 +87,8 @@ public:
 
     static bool isStreamManagementEnabled(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     bool m_resume;
@@ -113,10 +110,8 @@ public:
 
     static bool isStreamManagementResume(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     unsigned m_h;
@@ -136,10 +131,8 @@ public:
 
     static bool isStreamManagementResumed(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     unsigned m_h;
@@ -156,10 +149,8 @@ public:
 
     static bool isStreamManagementFailed(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     QXmppStanza::Error::Condition m_error;
@@ -175,10 +166,8 @@ public:
 
     static bool isStreamManagementAck(const QDomElement &element);
 
-    /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
-    /// \endcond
 
 private:
     unsigned m_seqNo;
@@ -189,9 +178,7 @@ class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementReq
 public:
     static bool isStreamManagementReq(const QDomElement &element);
 
-    /// \cond
     static void toXml(QXmlStreamWriter *writer);
-    /// \endcond
 };
 
 //
@@ -227,5 +214,6 @@ private:
     unsigned int m_lastOutgoingSequenceNumber = 0;
     unsigned int m_lastIncomingSequenceNumber = 0;
 };
+/// \endcond
 
 #endif

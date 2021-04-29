@@ -31,14 +31,6 @@
 class QXmppMixInfoItemPrivate;
 class QXmppMixParticipantItemPrivate;
 
-/// \brief The QXmppMixInfoItem class represents a PubSub item of a MIX
-/// channel containing channel information as defined by \xep{0369}: Mediated
-/// Information eXchange (MIX).
-///
-/// \since QXmpp 1.1
-///
-/// \ingroup Stanzas
-
 class QXMPP_EXPORT QXmppMixInfoItem
 {
 public:
@@ -57,22 +49,16 @@ public:
     QStringList contactJids() const;
     void setContactJids(const QStringList &);
 
+    /// \cond
     void parse(const QXmppElement &itemContent);
     QXmppElement toElement() const;
+    /// \endcond
 
     static bool isMixChannelInfo(const QDomElement &);
 
 private:
     QSharedDataPointer<QXmppMixInfoItemPrivate> d;
 };
-
-/// \brief The QXmppMixParticipantItem class represents a PubSub item of a MIX
-/// channel participant as defined by \xep{0369}: Mediated Information eXchange
-/// (MIX).
-///
-/// \since QXmpp 1.1
-///
-/// \ingroup Stanzas
 
 class QXMPP_EXPORT QXmppMixParticipantItem
 {
@@ -89,8 +75,10 @@ public:
     QString jid() const;
     void setJid(const QString &);
 
+    /// \cond
     void parse(const QXmppElement &itemContent);
     QXmppElement toElement() const;
+    /// \endcond
 
     static bool isMixParticipantItem(const QDomElement &);
 

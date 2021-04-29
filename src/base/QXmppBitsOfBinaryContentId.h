@@ -31,11 +31,6 @@
 
 class QXmppBitsOfBinaryContentIdPrivate;
 
-/// \class QXmppBitsOfBinaryContentId represents a link to or an identifier of
-/// \xep{0231}: Bits of Binary data.
-///
-/// \since QXmpp 1.2
-
 class QXMPP_EXPORT QXmppBitsOfBinaryContentId
 {
 public:

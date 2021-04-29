@@ -16,10 +16,10 @@ jobs:
         include:
           - os: ubuntu-latest
             config: full
-            qt_version: 5.9
+            qt_version: 5.9.9
           - os: macos-latest
             config: full
-            qt_version: 5.9
+            qt_version: 5.9.9
     steps:
       - uses: actions/checkout@v2
       - name: Install Qt

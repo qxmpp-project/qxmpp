@@ -28,10 +28,6 @@
 
 #include <QHostAddress>
 
-///
-/// \brief QXmppByteStreamIq represents a SOCKS5 bytestreams negoatiation IQ as
-/// defined by \xep{0065}: SOCKS5 Bytestreams.
-///
 class QXMPP_EXPORT QXmppByteStreamIq : public QXmppIq
 {
 public:
@@ -41,10 +37,6 @@ public:
         Udp
     };
 
-    ///
-    /// \brief StreamHost represents information about a specific SOCKS5
-    /// bytestreams host.
-    ///
     class QXMPP_EXPORT StreamHost
     {
     public:
