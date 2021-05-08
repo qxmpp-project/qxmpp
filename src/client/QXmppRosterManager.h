@@ -4,6 +4,7 @@
  * Authors:
  *  Manjeet Dahiya
  *  Jeremy Lainé
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -118,6 +119,8 @@ Q_SIGNALS:
     /// \note If you set QXmppConfiguration::autoAcceptSubscriptions() to true, this
     /// signal will not be emitted.
     void subscriptionReceived(const QString &bareJid);
+
+    void subscriptionRequestReceived(const QString &subscriberBareJid, const QXmppPresence &presence);
 
     /// This signal is emitted when the roster entry of a particular bareJid is
     /// added as a result of roster push.
