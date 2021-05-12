@@ -43,6 +43,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMixItem.h
     base/QXmppMucIq.h
     base/QXmppNonSASLAuth.h
+    base/QXmppOmemoDeviceBundle.h
     base/QXmppOmemoDeviceList.h
     base/QXmppOmemoDeviceListElement.h
     base/QXmppPingIq.h
@@ -127,6 +128,7 @@ set(SOURCE_FILES
     base/QXmppMixItem.cpp
     base/QXmppMucIq.cpp
     base/QXmppNonSASLAuth.cpp
+    base/QXmppOmemoDeviceBundle.cpp
     base/QXmppOmemoDeviceList.cpp
     base/QXmppOmemoDeviceListElement.cpp
     base/QXmppPacket.cpp
