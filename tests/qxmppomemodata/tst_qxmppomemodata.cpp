@@ -27,6 +27,7 @@
 #include "QXmppOmemoDeviceBundle.h"
 #include "QXmppOmemoDeviceList.h"
 #include "QXmppOmemoDeviceListElement.h"
+#include <QXmppOmemoElement.h>
 #include <QXmppOmemoEnvelope.h>
 
 #include "util.h"
@@ -50,6 +51,9 @@ private slots:
     void testIsOmemoEnvelope();
     void testOmemoEnvelope_data();
     void testOmemoEnvelope();
+    void testIsOmemoElement_data();
+    void testIsOmemoElement();
+    void testOmemoElement();
 };
 
 void tst_QXmppOmemoData::testIsOmemoDeviceListElement_data()
@@ -291,20 +295,162 @@ void tst_QXmppOmemoData::testOmemoEnvelope()
     QFETCH(bool, isUsedForKeyExchange);
     QFETCH(QByteArray, data);
 
-    QXmppOmemoEnvelope envelope1;
-    parsePacket(envelope1, xml);
-    QCOMPARE(envelope1.recipientDeviceId(), recipientDeviceId);
-    QCOMPARE(envelope1.isUsedForKeyExchange(), isUsedForKeyExchange);
-    QCOMPARE(envelope1.data().toBase64(), data);
-    serializePacket(envelope1, xml);
+    QXmppOmemoEnvelope omemoEnvelope1;
+    parsePacket(omemoEnvelope1, xml);
+    QCOMPARE(omemoEnvelope1.recipientDeviceId(), recipientDeviceId);
+    QCOMPARE(omemoEnvelope1.isUsedForKeyExchange(), isUsedForKeyExchange);
+    QCOMPARE(omemoEnvelope1.data().toBase64(), data);
+    serializePacket(omemoEnvelope1, xml);
 
-    QXmppOmemoEnvelope envelope2;
-    envelope2.setRecipientDeviceId(recipientDeviceId);
-    envelope2.setIsUsedForKeyExchange(isUsedForKeyExchange);
-    envelope2.setData(data);
-    QCOMPARE(envelope2.recipientDeviceId(), recipientDeviceId);
-    QCOMPARE(envelope2.isUsedForKeyExchange(), isUsedForKeyExchange);
-    QCOMPARE(envelope2.data(), data);
+    QXmppOmemoEnvelope omemoEnvelope2;
+    omemoEnvelope2.setRecipientDeviceId(recipientDeviceId);
+    omemoEnvelope2.setIsUsedForKeyExchange(isUsedForKeyExchange);
+    omemoEnvelope2.setData(data);
+    QCOMPARE(omemoEnvelope2.recipientDeviceId(), recipientDeviceId);
+    QCOMPARE(omemoEnvelope2.isUsedForKeyExchange(), isUsedForKeyExchange);
+    QCOMPARE(omemoEnvelope2.data(), data);
+}
+
+void tst_QXmppOmemoData::testIsOmemoElement_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<encrypted xmlns=\"urn:xmpp:omemo:1\"/>")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral("<encrypted xmlns=\"invalid\"/>")
+        << false;
+}
+
+void tst_QXmppOmemoData::testIsOmemoElement()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    const QDomElement element = doc.documentElement();
+    QCOMPARE(QXmppOmemoElement::isOmemoElement(element), isValid);
+}
+
+void tst_QXmppOmemoData::testOmemoElement()
+{
+    const QByteArray xmlIn(QByteArrayLiteral(
+        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<header sid=\"27183\">"
+        "<keys jid=\"juliet@capulet.lit\">"
+        "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
+        "</keys>"
+        "<keys jid=\"romeo@montague.lit\">"
+        "<key rid=\"1337\">PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</key>"
+        "<key rid=\"12321\" kex=\"true\">a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</key>"
+        "</keys>"
+        "</header>"
+        "<payload>"
+        "Vk9NPi99bHFWKmErOUVTTkAwW1VcZjJvPlElZWUoOk90Kz03YUF7OHc/WjpaQz9ieFdsZjBsSH1w"
+        "R1d2Zzt1bEFAMSZqP0dVJj9oaygmcWRPKGU3Kjc8aV4sJSlpSXBqaENCT2NUVFFmaFNXbCxQaHsj"
+        "OnthQDJyUW9qNjwoZCtpLzpzLGpbKlJRY1NtMVVeRzdsOWRQciNnXV9tajEyWztnKiEhRHs5K2hX"
+        "ZFloaEZtUENTQWIxM0tcVkxIVWY+aGYoeEk/SldZcyNlTzk2Q2NHW1NqWEhEPmhPXl1WZV5xNE9p"
+        "WDZuck8zPGE2Rk4vKWJXd3F1YV0mSXA/NVNGNEQsK18mTlJNbl9WcGJXcVE5e1E0dlFAPVQ8THM+"
+        "QjdcdjZSNDVJclo0QVo6cDBMQDtVcUFnNDpcd1ZXSkcsXz82QjhXLl9NSVBFdipeOmF4NC5YKnNx"
+        "K2dxMGx1MDkrdnJhWTovUjk1ZCZUUSNTKHIvJUgmTyE4bjJbZlZAPl9IZi8ucSM7a2FAQWUzXUJO"
+        "LmpALilFWGRqYlh1Siw2MzJqbipsWlZRMG91MGVQVlExLCFeayMuM3dfSn1ONiU8LixZWSx3YUlV"
+        "bGtIcnVWP2Y0LGwvTzFIQy8qZVVBSVZLS1peSW0xNTRPcXRDIXBkXnhmWyNxQFxHQ19cYXVAO214"
+        "RWw1P0AmIUAlQjk7ZFBWXW1RbWxoTFE+cUxMbk5UCg=="
+        "</payload>"
+        "</encrypted>"));
+
+    // An OMEMO element having its OMEMO envelopes sorted in reverse order is
+    // needed since they are serialized in the reverse order in which they are
+    // deserialized.
+    const QByteArray xmlOut(QByteArrayLiteral(
+        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<header sid=\"27183\">"
+        "<keys jid=\"juliet@capulet.lit\">"
+        "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
+        "</keys>"
+        "<keys jid=\"romeo@montague.lit\">"
+        "<key rid=\"12321\" kex=\"true\">a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</key>"
+        "<key rid=\"1337\">PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</key>"
+        "</keys>"
+        "</header>"
+        "<payload>"
+        "Vk9NPi99bHFWKmErOUVTTkAwW1VcZjJvPlElZWUoOk90Kz03YUF7OHc/WjpaQz9ieFdsZjBsSH1w"
+        "R1d2Zzt1bEFAMSZqP0dVJj9oaygmcWRPKGU3Kjc8aV4sJSlpSXBqaENCT2NUVFFmaFNXbCxQaHsj"
+        "OnthQDJyUW9qNjwoZCtpLzpzLGpbKlJRY1NtMVVeRzdsOWRQciNnXV9tajEyWztnKiEhRHs5K2hX"
+        "ZFloaEZtUENTQWIxM0tcVkxIVWY+aGYoeEk/SldZcyNlTzk2Q2NHW1NqWEhEPmhPXl1WZV5xNE9p"
+        "WDZuck8zPGE2Rk4vKWJXd3F1YV0mSXA/NVNGNEQsK18mTlJNbl9WcGJXcVE5e1E0dlFAPVQ8THM+"
+        "QjdcdjZSNDVJclo0QVo6cDBMQDtVcUFnNDpcd1ZXSkcsXz82QjhXLl9NSVBFdipeOmF4NC5YKnNx"
+        "K2dxMGx1MDkrdnJhWTovUjk1ZCZUUSNTKHIvJUgmTyE4bjJbZlZAPl9IZi8ucSM7a2FAQWUzXUJO"
+        "LmpALilFWGRqYlh1Siw2MzJqbipsWlZRMG91MGVQVlExLCFeayMuM3dfSn1ONiU8LixZWSx3YUlV"
+        "bGtIcnVWP2Y0LGwvTzFIQy8qZVVBSVZLS1peSW0xNTRPcXRDIXBkXnhmWyNxQFxHQ19cYXVAO214"
+        "RWw1P0AmIUAlQjk7ZFBWXW1RbWxoTFE+cUxMbk5UCg=="
+        "</payload>"
+        "</encrypted>"));
+
+    QXmppOmemoElement omemoElement1;
+    parsePacket(omemoElement1, xmlIn);
+
+    QCOMPARE(omemoElement1.senderDeviceId(), 27183);
+
+    const auto omemoEnvelope1 = omemoElement1.searchEnvelope(QStringLiteral("romeo@montague.lit"), 12321);
+    QVERIFY(omemoEnvelope1);
+    QCOMPARE(omemoEnvelope1->recipientDeviceId(), 12321);
+    QVERIFY(omemoEnvelope1->isUsedForKeyExchange());
+    QCOMPARE(omemoEnvelope1->data().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
+
+    const auto omemoEnvelope2 = omemoElement1.searchEnvelope(("juliet@capulet.lit"), 31415);
+    QVERIFY(omemoEnvelope2);
+    QVERIFY(!omemoEnvelope2->isUsedForKeyExchange());
+
+    QCOMPARE(
+        omemoElement1.payload().toBase64(),
+        QByteArrayLiteral(
+             "Vk9NPi99bHFWKmErOUVTTkAwW1VcZjJvPlElZWUoOk90Kz03YUF7OHc/WjpaQz9ieFdsZjBsSH1w"
+             "R1d2Zzt1bEFAMSZqP0dVJj9oaygmcWRPKGU3Kjc8aV4sJSlpSXBqaENCT2NUVFFmaFNXbCxQaHsj"
+             "OnthQDJyUW9qNjwoZCtpLzpzLGpbKlJRY1NtMVVeRzdsOWRQciNnXV9tajEyWztnKiEhRHs5K2hX"
+             "ZFloaEZtUENTQWIxM0tcVkxIVWY+aGYoeEk/SldZcyNlTzk2Q2NHW1NqWEhEPmhPXl1WZV5xNE9p"
+             "WDZuck8zPGE2Rk4vKWJXd3F1YV0mSXA/NVNGNEQsK18mTlJNbl9WcGJXcVE5e1E0dlFAPVQ8THM+"
+             "QjdcdjZSNDVJclo0QVo6cDBMQDtVcUFnNDpcd1ZXSkcsXz82QjhXLl9NSVBFdipeOmF4NC5YKnNx"
+             "K2dxMGx1MDkrdnJhWTovUjk1ZCZUUSNTKHIvJUgmTyE4bjJbZlZAPl9IZi8ucSM7a2FAQWUzXUJO"
+             "LmpALilFWGRqYlh1Siw2MzJqbipsWlZRMG91MGVQVlExLCFeayMuM3dfSn1ONiU8LixZWSx3YUlV"
+             "bGtIcnVWP2Y0LGwvTzFIQy8qZVVBSVZLS1peSW0xNTRPcXRDIXBkXnhmWyNxQFxHQ19cYXVAO214"
+             "RWw1P0AmIUAlQjk7ZFBWXW1RbWxoTFE+cUxMbk5UCg=="
+        )
+    );
+
+    serializePacket(omemoElement1, xmlOut);
+
+    QXmppOmemoElement omemoElement2;
+    omemoElement2.setSenderDeviceId(27138);
+
+    QXmppOmemoEnvelope omemoEnvelope3;
+    omemoEnvelope3.setRecipientDeviceId(12321);
+    omemoEnvelope3.setIsUsedForKeyExchange(true);
+    omemoEnvelope3.setData(QByteArray::fromBase64("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
+    omemoElement2.addEnvelope(QStringLiteral("romeo@montague.lit"), omemoEnvelope3);
+
+    QXmppOmemoEnvelope omemoEnvelope4;
+    omemoEnvelope4.setRecipientDeviceId(31415);
+    omemoEnvelope4.setData(QByteArray::fromBase64("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
+    omemoElement2.addEnvelope(QStringLiteral("juliet@capulet.lit"), omemoEnvelope4);
+
+    QCOMPARE(omemoElement2.senderDeviceId(), 27138);
+
+    const auto omemoEnvelope5 = omemoElement2.searchEnvelope(QStringLiteral("romeo@montague.lit"), 12321);
+    QVERIFY(omemoEnvelope5);
+    QCOMPARE(omemoEnvelope5->recipientDeviceId(), 12321);
+    QVERIFY(omemoEnvelope5->isUsedForKeyExchange());
+    QCOMPARE(omemoEnvelope5->data().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
+
+    const auto omemoEnvelope6 = omemoElement2.searchEnvelope(QStringLiteral("juliet@capulet.lit"), 31415);
+    QVERIFY(omemoEnvelope6);
+    QVERIFY(!omemoEnvelope6->isUsedForKeyExchange());
 }
 
 QTEST_MAIN(tst_QXmppOmemoData)

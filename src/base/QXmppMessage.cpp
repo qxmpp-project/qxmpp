@@ -28,6 +28,7 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
 #include "QXmppMixInvitation.h"
+#include "QXmppOmemoElement.h"
 #include "QXmppUtils.h"
 
 #include <optional>
@@ -169,6 +170,9 @@ public:
     // XEP-0382: Spoiler messages
     bool isSpoiler;
     QString spoilerHint;
+
+    // XEP-0384: OMEMO Encryption
+    std::optional<QXmppOmemoElement> omemoElement;
 
     // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
     std::optional<QXmppMixInvitation> mixInvitation;
@@ -1080,6 +1084,26 @@ void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
 }
 
 ///
+/// Returns an included OMEMO element as defined by \xep{0384, OMEMO Encryption}.
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppOmemoElement> QXmppMessage::omemoElement() const
+{
+    return d->omemoElement;
+}
+
+///
+/// Sets an OMEMO element as defined by \xep{0384, OMEMO Encryption}.
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setOmemoElement(const std::optional<QXmppOmemoElement> &omemoElement)
+{
+    d->omemoElement = omemoElement;
+}
+
+///
 /// Returns an included \xep{0369}: Mediated Information eXchange (MIX)
 /// invitation as defined by \xep{0407}: Mediated Information eXchange (MIX):
 /// Miscellaneous Capabilities.
@@ -1320,6 +1344,11 @@ bool QXmppMessage::parseExtension(const QDomElement &element)
         // XEP-0382: Spoiler messages
         d->isSpoiler = true;
         d->spoilerHint = element.text();
+    } else if (QXmppOmemoElement::isOmemoElement(element)) {
+        // XEP-0384: OMEMO Encryption
+        QXmppOmemoElement omemoElement;
+        omemoElement.parse(element);
+        d->omemoElement = omemoElement;
     } else if (checkElement(element, QStringLiteral("invitation"), ns_mix_misc)) {
         // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
         QXmppMixInvitation mixInvitation;
@@ -1511,6 +1540,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeDefaultNamespace(ns_spoiler);
         xmlWriter->writeCharacters(d->spoilerHint);
         xmlWriter->writeEndElement();
+    }
+
+    // XEP-0384: OMEMO Encryption
+    if (d->omemoElement) {
+        d->omemoElement->toXml(xmlWriter);
     }
 
     // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
