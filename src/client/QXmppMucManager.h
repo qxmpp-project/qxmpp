@@ -244,6 +244,7 @@ public Q_SLOTS:
     bool setPermissions(const QList<QXmppMucItem> &permissions);
     bool sendInvitation(const QString &jid, const QString &reason);
     bool sendMessage(const QString &text);
+    bool sendMessage(const QString &text, QXmppMessage &msg);
 
 private Q_SLOTS:
     void _q_disconnected();

@@ -343,6 +343,20 @@ bool QXmppMucRoom::sendMessage(const QString &text)
     return d->client->sendPacket(msg);
 }
 
+/// Sends a message to the room. Use the parameter msg to send it.
+///
+/// msg's To, Type, and Body will be set by this function.
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::sendMessage(const QString &text, QXmppMessage &msg)
+{
+    msg.setTo(d->jid);
+    msg.setType(QXmppMessage::GroupChat);
+    msg.setBody(text);
+    return d->client->sendPacket(msg);
+}
+
 /// Sets your own nickname.
 ///
 /// You need to set your nickname before calling join().
