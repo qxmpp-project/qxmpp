@@ -330,10 +330,15 @@ bool QXmppMucRoom::sendInvitation(const QString &jid, const QString &reason)
     return d->client->sendPacket(message);
 }
 
+///
 /// Sends a message to the room.
 ///
+/// This is just a helper function, you can as well also send a message to the
+/// channel manually by setting the message type to 'groupchat' and addressing
+/// the JID of the MUC room.
+///
 /// \return true if the request was sent, false otherwise
-
+///
 bool QXmppMucRoom::sendMessage(const QString &text)
 {
     QXmppMessage msg;
