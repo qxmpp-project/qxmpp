@@ -60,6 +60,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppStream.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
+    base/QXmppTrustMessageElement.h
     base/QXmppTrustMessageKeyOwner.h
     base/QXmppUtils.h
     base/QXmppVCardIq.h
@@ -147,6 +148,7 @@ set(SOURCE_FILES
     base/QXmppStreamInitiationIq.cpp
     base/QXmppStreamManagement.cpp
     base/QXmppStun.cpp
+    base/QXmppTrustMessageElement.cpp
     base/QXmppTrustMessageKeyOwner.cpp
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
