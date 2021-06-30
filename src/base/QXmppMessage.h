@@ -36,6 +36,7 @@
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
 class QXmppMixInvitation;
+class QXmppTrustMessageElement;
 
 ///
 /// \brief The QXmppMessage class represents an XMPP message.
@@ -253,6 +254,10 @@ public:
     // XEP-0428: Fallback Indication
     bool isFallback() const;
     void setIsFallback(bool isFallback);
+
+    // XEP-0434: Trust Messages (TM)
+    std::optional<QXmppTrustMessageElement> trustMessageElement() const;
+    void setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement);
 
     /// \cond
     void parse(const QDomElement &element) override;

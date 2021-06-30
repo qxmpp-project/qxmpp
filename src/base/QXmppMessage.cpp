@@ -28,6 +28,7 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
 #include "QXmppMixInvitation.h"
+#include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 
 #include <optional>
@@ -175,6 +176,9 @@ public:
 
     // XEP-0428: Fallback Indication
     bool isFallback;
+
+    // XEP-0434: Trust Messages (TM)
+    std::optional<QXmppTrustMessageElement> trustMessageElement;
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
@@ -1131,6 +1135,27 @@ void QXmppMessage::setIsFallback(bool isFallback)
     d->isFallback = isFallback;
 }
 
+///
+/// Returns an included trust message element as defined by
+/// \xep{0434, Trust Messages (TM)}.
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppTrustMessageElement> QXmppMessage::trustMessageElement() const
+{
+    return d->trustMessageElement;
+}
+
+///
+/// Sets a trust message element as defined by \xep{0434, Trust Messages (TM)}.
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement)
+{
+    d->trustMessageElement = trustMessageElement;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -1328,6 +1353,11 @@ bool QXmppMessage::parseExtension(const QDomElement &element)
     } else if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
         // XEP-0428: Fallback Indication
         d->isFallback = true;
+    } else if (QXmppTrustMessageElement::isTrustMessageElement(element)) {
+        // XEP-0434: Trust Messages (TM)
+        QXmppTrustMessageElement trustMessageElement;
+        trustMessageElement.parse(element);
+        d->trustMessageElement = trustMessageElement;
     } else {
         return false;
     }
@@ -1523,5 +1553,10 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement(QStringLiteral("fallback"));
         xmlWriter->writeDefaultNamespace(ns_fallback_indication);
         xmlWriter->writeEndElement();
+    }
+
+    // XEP-0434: Trust Messages (TM)
+    if (d->trustMessageElement) {
+        d->trustMessageElement->toXml(xmlWriter);
     }
 }

@@ -26,6 +26,7 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
+#include "QXmppTrustMessageElement.h"
 
 #include <optional>
 
@@ -67,6 +68,7 @@ private slots:
     void testSlashMe_data();
     void testSlashMe();
     void testMixInvitation();
+    void testTrustMessageElement();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1099,6 +1101,34 @@ void tst_QXmppMessage::testMixInvitation()
     QVERIFY(message.mixInvitation().has_value());
 
     serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::testTrustMessageElement()
+{
+    const QByteArray xml(
+        "<message id=\"1\" to=\"alice@example.org/\" from=\"alice@example.org/A2\" type=\"chat\">"
+        "<store xmlns=\"urn:xmpp:hints\"/>"
+        "<trust-message xmlns=\"urn:xmpp:tm:0\" usage=\"urn:xmpp:atm:1\" encryption=\"urn:xmpp:omemo:1\">"
+        "<key-owner jid=\"alice@example.org\">"
+        "<trust>6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4</trust>"
+        "<trust>221a4f8e228b72182b006e5ca527d3bddccf8d9e6feaf4ce96e1c451e8648020</trust>"
+        "</key-owner>"
+        "<key-owner jid=\"bob@example.com\">"
+        "<trust>623548d3835c6d33ef5cb680f7944ef381cf712bf23a0119dabe5c4f252cd02f</trust>"
+        "<distrust>b423f5088de9a924d51b31581723d850c7cc67d0a4fe6b267c3d301ff56d2413</distrust>"
+        "<distrust>d9f849b6b828309c5f2c8df4f38fd891887da5aaa24a22c50d52f69b4a80817e</distrust>"
+        "</key-owner>"
+        "</trust-message>"
+        "</message>");
+
+    QXmppMessage message1;
+    parsePacket(message1, xml);
+    QVERIFY(message1.trustMessageElement());
+    serializePacket(message1, xml);
+
+    QXmppMessage message2;
+    message2.setTrustMessageElement(QXmppTrustMessageElement());
+    QVERIFY(message2.trustMessageElement());
 }
 
 QTEST_MAIN(tst_QXmppMessage)
