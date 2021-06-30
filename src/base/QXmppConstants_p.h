@@ -188,5 +188,7 @@ extern const char* ns_mix_presence;
 extern const char* ns_mix_misc;
 // XEP-0428: Fallback Indication
 extern const char* ns_fallback_indication;
+// XEP-0434: Trust Messages (TM)
+extern const char* ns_tm;
 
 #endif  // QXMPPCONSTANTS_H
