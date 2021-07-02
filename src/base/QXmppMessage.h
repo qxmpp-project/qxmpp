@@ -135,6 +135,9 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
+    std::optional<QString> senderKey() const;
+    void setSenderKey(const std::optional<QString> &keyId);
+
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;
     void setOutOfBandUrl(const QString &);

@@ -69,6 +69,7 @@ private slots:
     void testSlashMe();
     void testMixInvitation();
     void testTrustMessageElement();
+    void testSenderkey();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1129,6 +1130,13 @@ void tst_QXmppMessage::testTrustMessageElement()
     QXmppMessage message2;
     message2.setTrustMessageElement(QXmppTrustMessageElement());
     QVERIFY(message2.trustMessageElement());
+}
+
+void tst_QXmppMessage::testSenderkey()
+{
+    QXmppMessage message;
+    message.setSenderKey(QStringLiteral("6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4"));
+    QCOMPARE(message.senderKey(), QStringLiteral("6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4"));
 }
 
 QTEST_MAIN(tst_QXmppMessage)

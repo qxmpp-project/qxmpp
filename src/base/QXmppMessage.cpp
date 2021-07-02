@@ -107,6 +107,7 @@ public:
     QString thread;
     QString parentThread;
     QXmppMessage::Type type;
+    std::optional<QString> senderKey;
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl;
@@ -318,6 +319,32 @@ QString QXmppMessage::parentThread() const
 void QXmppMessage::setParentThread(const QString &parent)
 {
     d->parentThread = parent;
+}
+
+///
+/// Returns the ID of this message's sender's public long-term key.
+///
+/// The key ID can be used by trust management protocols such as
+/// \xep{0450, Automatic Trust Management (ATM)}.
+///
+/// \return the ID of the sender's key
+///
+std::optional<QString> QXmppMessage::senderKey() const
+{
+    return d->senderKey;
+}
+
+///
+/// Sets the ID of this message's sender's public long-term key.
+///
+/// The key ID must be set by the encryption protocol that decrypts this
+/// message such as \xep{0384, OMEMO Encryption}.
+///
+/// \param keyId ID of the sender's key
+///
+void QXmppMessage::setSenderKey(const std::optional<QString> &keyId)
+{
+    d->senderKey = keyId;
 }
 
 ///
