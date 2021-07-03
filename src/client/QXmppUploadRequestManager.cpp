@@ -28,12 +28,14 @@
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
-#include "QXmppGlobal_p.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppHttpUploadIq.h"
 
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMimeDatabase>
+
+using namespace QXmpp::Private;
 
 class QXmppUploadServicePrivate : public QSharedData
 {

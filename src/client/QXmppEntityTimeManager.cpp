@@ -26,11 +26,13 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppEntityTimeIq.h"
-#include "QXmppGlobal_p.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppUtils.h"
 
 #include <QDateTime>
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// \typedef QXmppEntityTimeManager::EntityTimeResult

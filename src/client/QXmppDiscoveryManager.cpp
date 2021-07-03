@@ -28,12 +28,14 @@
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppGlobal.h"
-#include "QXmppGlobal_p.h"
 #include "QXmppStream.h"
 
 #include <QCoreApplication>
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 class QXmppDiscoveryManagerPrivate
 {
