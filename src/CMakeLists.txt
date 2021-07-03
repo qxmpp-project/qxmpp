@@ -31,6 +31,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
+    base/QXmppFutureUtils_p.h
     base/QXmppHttpUploadIq.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
