@@ -26,7 +26,7 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppRosterManager.h"
 
-#include "util.h"
+#include "TestClient.h"
 
 class tst_QXmppRosterManager : public QObject
 {
@@ -38,6 +38,8 @@ private slots:
     void testDiscoFeatures();
     void testRenameItem();
     void subscriptionRequestReceived();
+    Q_SLOT void testAddItem();
+    Q_SLOT void testRemoveItem();
 
 private:
     QXmppClient client;
@@ -125,6 +127,54 @@ void tst_QXmppRosterManager::subscriptionRequestReceived()
 
     emit client.presenceReceived(presence);
     QVERIFY(subscriptionRequestReceived);
+}
+
+void tst_QXmppRosterManager::testAddItem()
+{
+    TestClient test;
+    auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
+
+    auto future = rosterManager->addRosterItem("contact@example.org");
+    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
+    test.inject("<iq id='qxmpp1' type='result'/>");
+    expectFutureVariant<QXmpp::Success>(future);
+
+    future = rosterManager->addRosterItem("contact@example.org");
+    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
+    test.inject(R"(
+<iq id='qxmpp1' type='error'>
+    <error type='modify'>
+        <not-authorized xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+        <text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>This is not allowed</text>
+    </error>
+</iq>)");
+    auto error = expectFutureVariant<QXmppStanza::Error>(future);
+    QCOMPARE(error.type(), QXmppStanza::Error::Modify);
+    QCOMPARE(error.text(), QStringLiteral("This is not allowed"));
+}
+
+void tst_QXmppRosterManager::testRemoveItem()
+{
+    TestClient test;
+    auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
+
+    auto future = rosterManager->removeRosterItem("contact@example.org");
+    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
+    test.inject("<iq id='qxmpp1' type='result'/>");
+    expectFutureVariant<QXmpp::Success>(future);
+
+    future = rosterManager->removeRosterItem("contact@example.org");
+    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
+    test.inject(R"(
+<iq id='qxmpp1' type='error'>
+    <error type='cancel'>
+        <item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+        <text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Not found</text>
+    </error>
+</iq>)");
+    auto error = expectFutureVariant<QXmppStanza::Error>(future);
+    QCOMPARE(error.type(), QXmppStanza::Error::Cancel);
+    QCOMPARE(error.text(), QStringLiteral("Not found"));
 }
 
 QTEST_MAIN(tst_QXmppRosterManager)
