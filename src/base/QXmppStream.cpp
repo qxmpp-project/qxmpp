@@ -54,12 +54,12 @@ class IqState : public QFutureInterface<QXmppStream::IqResult>
     Q_DISABLE_COPY(IqState)
 
 public:
-    IqState(QFuture<QXmpp::PacketState> sendFuture, bool streamManagementUsed)
+    IqState(QFuture<QXmpp::PacketState> sendFuture, bool streamManagementUsed, QObject *parent)
         : QFutureInterface<QXmppStream::IqResult>(QFutureInterfaceBase::Started),
           m_sendFuture(std::move(sendFuture)),
           m_streamManagementUsed(streamManagementUsed)
     {
-        auto *watcher = new QFutureWatcher<QXmpp::PacketState>();
+        auto *watcher = new QFutureWatcher<QXmpp::PacketState>(parent);
         QObject::connect(watcher, &QFutureWatcher<QXmpp::PacketState>::finished, [=]() {
             const auto result = watcher->future().results().last();
 
@@ -254,7 +254,7 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
         return sendIq(newIq);
     }
 
-    auto *interface = new IqState(send(iq), d->streamManager.enabled());
+    auto *interface = new IqState(send(iq), d->streamManager.enabled(), this);
 
     if (!interface->isFinished()) {
         d->runningIqs.insert(iq.id(), interface);
