@@ -53,17 +53,31 @@ struct overloaded : Ts... {
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
+template<typename F, typename Ret, typename A, typename... Rest>
+A lambda_helper(Ret (F::*)(A, Rest...));
+
+template<typename F, typename Ret, typename A, typename... Rest>
+A lambda_helper(Ret (F::*)(A, Rest...) const);
+
+template<typename F>
+struct first_argument {
+    using type = decltype(lambda_helper(&F::operator()));
+};
+
+template<typename F>
+using first_argument_t = typename first_argument<F>::type;
+
 template<typename T>
 QFuture<T> makeReadyFuture(T &&value)
 {
     QFutureInterface<T> interface(QFutureInterfaceBase::Started);
-    interface.reportResult(value);
+    interface.reportResult(std::move(value));
     interface.reportFinished();
     return interface.future();
 }
 
 template<typename Result, typename Input, typename Converter>
-QFuture<Result> chain(QFuture<Input> &&source, QObject *context, Converter task)
+auto chain(QFuture<Input> &&source, QObject *context, Converter task) -> QFuture<Result>
 {
     auto resultInterface = std::make_shared<QFutureInterface<Result>>(QFutureInterfaceBase::Started);
 
@@ -77,9 +91,10 @@ QFuture<Result> chain(QFuture<Input> &&source, QObject *context, Converter task)
     return resultInterface->future();
 }
 
-template<typename Result, typename IqType, typename Input, typename Converter>
-Result parseIq(Input &&sendResult, Converter convert)
+template<typename IqType, typename Input, typename Converter>
+auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
 {
+    using Result = decltype(convert({}));
     return std::visit(overloaded {
                           [convert { std::move(convert) }](const QDomElement &element) -> Result {
                               IqType iq;
@@ -98,28 +113,32 @@ Result parseIq(Input &&sendResult, Converter convert)
                       sendResult);
 }
 
-template<typename Result, typename IqType, typename Input>
-Result parseIq(Input &&sendResult)
+template<typename IqType, typename Result, typename Input>
+auto parseIq(Input &&sendResult) -> Result
 {
-    return parseIq<Result, IqType>(std::move(sendResult), [](IqType &&iq) {
+    return parseIq<IqType>(std::move(sendResult), [](IqType &&iq) -> Result {
         // no conversion
         return iq;
     });
 }
 
-template<typename Result, typename IqType, typename Input, typename Converter>
-QFuture<Result> chainIq(QFuture<Input> &&input, QObject *context, Converter convert)
+template<typename Input, typename Converter>
+auto chainIq(QFuture<Input> &&input, QObject *context, Converter convert) -> QFuture<decltype(convert({}))>
 {
+    using Result = decltype(convert({}));
+    using IqType = std::decay_t<first_argument_t<Converter>>;
     return chain<Result>(std::move(input), context, [convert { std::move(convert) }](Input &&input) -> Result {
-        return parseIq<Result, IqType>(std::move(input), convert);
+        return parseIq<IqType>(std::move(input), convert);
     });
 }
 
-template<typename Result, typename IqType, typename Input>
-QFuture<Result> chainIq(QFuture<Input> &&input, QObject *context)
+template<typename Result, typename Input>
+auto chainIq(QFuture<Input> &&input, QObject *context) -> QFuture<Result>
 {
+    // IQ type is first std::variant parameter
+    using IqType = std::decay_t<decltype(std::get<0>(Result {}))>;
     return chain<Result>(std::move(input), context, [](Input &&sendResult) {
-        return parseIq<Result, IqType>(sendResult);
+        return parseIq<IqType, Result>(sendResult);
     });
 }
 

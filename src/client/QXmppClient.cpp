@@ -387,7 +387,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(const QXmppIq &iq)
 QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(const QXmppIq &iq)
 {
     using namespace QXmpp::Private;
-    return chainIq<EmptyResult, QXmppIq>(sendIq(iq), this, [](const QXmppIq &) {
+    return chainIq(sendIq(iq), this, [](const QXmppIq &) -> EmptyResult {
         return QXmpp::Success();
     });
 }
