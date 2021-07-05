@@ -78,7 +78,7 @@ auto QXmppEntityTimeManager::requestEntityTime(const QString &jid) -> QFuture<En
     iq.setType(QXmppIq::Get);
     iq.setTo(jid);
 
-    return chainIq<EntityTimeResult, QXmppEntityTimeIq>(client()->sendIq(iq), this);
+    return chainIq<EntityTimeResult>(client()->sendIq(iq), this);
 }
 
 /// \cond

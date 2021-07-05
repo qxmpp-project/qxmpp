@@ -144,7 +144,7 @@ QFuture<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoIn
         request.setQueryNode(node);
     }
 
-    return chainIq<InfoResult, QXmppDiscoveryIq>(client()->sendIq(request), this);
+    return chainIq<InfoResult>(client()->sendIq(request), this);
 }
 
 ///
@@ -167,7 +167,7 @@ QFuture<QXmppDiscoveryManager::ItemsResult> QXmppDiscoveryManager::requestDiscoI
         request.setQueryNode(node);
     }
 
-    return chainIq<ItemsResult, QXmppDiscoveryIq>(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) {
+    return chainIq(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) -> ItemsResult {
         return iq.items();
     });
 }
