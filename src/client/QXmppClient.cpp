@@ -29,6 +29,7 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppEntityTimeManager.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppOutgoingClient.h"
@@ -116,6 +117,18 @@ QStringList QXmppClientPrivate::discoveryFeatures()
 /// Result of an IQ request, either contains the QDomElement of the IQ answer
 /// (with type 'error' or 'result') or it contains the packet error, if the
 /// request couldn't be sent.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \typedef QXmppClient::EmptyResult
+///
+/// Result of a generic request without a return value. Contains Success in case
+/// everything went well. If the returned IQ contained an error a
+/// QXmppStanza::Error is reported.
+///
+/// \since QXmpp 1.5
 ///
 
 /// Creates a QXmppClient object.
@@ -345,6 +358,10 @@ QFuture<QXmpp::PacketState> QXmppClient::send(const QXmppStanza &stanza)
 ///
 /// Sends an IQ packet and returns the response asynchronously.
 ///
+/// This is useful for further processing and parsing of the returned
+/// QDomElement. If you don't expect a special response, you may want use
+/// sendGenericIq().
+///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
 /// \since QXmpp 1.5
@@ -352,6 +369,27 @@ QFuture<QXmpp::PacketState> QXmppClient::send(const QXmppStanza &stanza)
 QFuture<QXmppClient::IqResult> QXmppClient::sendIq(const QXmppIq &iq)
 {
     return d->stream->sendIq(iq);
+}
+
+///
+/// Sends an IQ and returns possible stanza errors.
+///
+/// If you want to parse a special IQ response in the result case, you can use
+/// sendIq() and parse the returned QDomElement.
+///
+/// \returns Returns QXmpp::Success (on response type 'result') or the contained
+/// QXmppStanza::Error (on response type 'error')
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(const QXmppIq &iq)
+{
+    using namespace QXmpp::Private;
+    return chainIq<EmptyResult, QXmppIq>(sendIq(iq), this, [](const QXmppIq &) {
+        return QXmpp::Success();
+    });
 }
 
 /// Disconnects the client and the current presence of client changes to

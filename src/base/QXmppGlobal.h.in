@@ -92,6 +92,11 @@ enum PacketState : quint8 {
     NotSent,       ///< The packet could not be sent (e.g. connection broke or user disconnected).
 };
 
+///
+/// An empty struct indicating success in results.
+///
+struct Success {};
+
 }
 
 #endif  // QXMPPGLOBAL_H
