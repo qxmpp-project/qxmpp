@@ -72,6 +72,10 @@ extern const char* ns_vcard;
 extern const char* ns_rsm;
 // XEP-0060: Publish-Subscribe
 extern const char* ns_pubsub;
+extern const char* ns_pubsub_errors;
+extern const char* ns_pubsub_event;
+extern const char* ns_pubsub_owner;
+extern const char* ns_pubsub_rsm;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char* ns_bytestreams;
 // XEP-0066: Out of Band Data
@@ -99,6 +103,8 @@ extern const char* ns_stream_initiation_file_transfer;
 extern const char* ns_activity;
 // XEP-0115: Entity Capabilities
 extern const char* ns_capabilities;
+// XEP-0118: User Tune
+extern const char* ns_tune;
 // XEP-0136: Message Archiving
 extern const char* ns_archive;
 // XEP-0138: Stream Compression

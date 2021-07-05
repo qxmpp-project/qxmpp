@@ -28,6 +28,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppBookmarkSet.h
     base/QXmppByteStreamIq.h
     base/QXmppDataForm.h
+    base/QXmppDataFormBased.h
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
@@ -46,8 +47,16 @@ set(INSTALL_HEADER_FILES
     base/QXmppNonSASLAuth.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
+    base/QXmppPubSubAffiliation.h
+    base/QXmppPubSubEvent.h
     base/QXmppPubSubIq.h
     base/QXmppPubSubItem.h
+    base/QXmppPubSubMetadata.h
+    base/QXmppPubSubNodeConfig.h
+    base/QXmppPubSubPublishOptions.h
+    base/QXmppPubSubSubscribeOptions.cpp
+    base/QXmppPubSubSubscription.h
+    base/QXmppPubSubSubAuthorization.h
     base/QXmppPushEnableIq.h
     base/QXmppRegisterIq.h
     base/QXmppResultSet.h
@@ -60,6 +69,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppStream.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
+    base/QXmppTuneItem.h
     base/QXmppUtils.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
@@ -80,6 +90,8 @@ set(INSTALL_HEADER_FILES
     client/QXmppMucManager.h
     client/QXmppOutgoingClient.h
     client/QXmppRegistrationManager.h
+    client/QXmppPubSubEventManager.h
+    client/QXmppPubSubManager.h
     client/QXmppRemoteMethod.h
     client/QXmppRosterManager.h
     client/QXmppRpcManager.h
@@ -111,6 +123,7 @@ set(SOURCE_FILES
     base/QXmppByteStreamIq.cpp
     base/QXmppConstants.cpp
     base/QXmppDataForm.cpp
+    base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
@@ -129,8 +142,15 @@ set(SOURCE_FILES
     base/QXmppPacket.cpp
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
+    base/QXmppPubSubAffiliation.cpp
+    base/QXmppPubSubEvent.cpp
     base/QXmppPubSubIq.cpp
     base/QXmppPubSubItem.cpp
+    base/QXmppPubSubMetadata.cpp
+    base/QXmppPubSubNodeConfig.cpp
+    base/QXmppPubSubSubscribeOptions.cpp
+    base/QXmppPubSubSubscription.cpp
+    base/QXmppPubSubSubAuthorization.cpp
     base/QXmppPushEnableIq.cpp
     base/QXmppRegisterIq.cpp
     base/QXmppResultSet.cpp
@@ -146,6 +166,7 @@ set(SOURCE_FILES
     base/QXmppStreamInitiationIq.cpp
     base/QXmppStreamManagement.cpp
     base/QXmppStun.cpp
+    base/QXmppTuneItem.cpp
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
@@ -168,6 +189,7 @@ set(SOURCE_FILES
     client/QXmppOutgoingClient.cpp
     client/QXmppRosterManager.cpp
     client/QXmppRegistrationManager.cpp
+    client/QXmppPubSubManager.cpp
     client/QXmppRemoteMethod.cpp
     client/QXmppRpcManager.cpp
     client/QXmppTlsManager.cpp

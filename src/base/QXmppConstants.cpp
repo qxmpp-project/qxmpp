@@ -60,6 +60,10 @@ const char* ns_vcard = "vcard-temp";
 const char* ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0060: Publish-Subscribe
 const char* ns_pubsub = "http://jabber.org/protocol/pubsub";
+const char* ns_pubsub_errors = "http://jabber.org/protocol/pubsub#errors";
+const char* ns_pubsub_event = "http://jabber.org/protocol/pubsub#event";
+const char* ns_pubsub_owner = "http://jabber.org/protocol/pubsub#owner";
+const char* ns_pubsub_rsm = "http://jabber.org/protocol/pubsub#rsm";
 // XEP-0065: SOCKS5 Bytestreams
 const char* ns_bytestreams = "http://jabber.org/protocol/bytestreams";
 // XEP-0066: Out of Band Data
@@ -87,6 +91,8 @@ const char* ns_stream_initiation_file_transfer = "http://jabber.org/protocol/si/
 const char* ns_activity = "http://jabber.org/protocol/activity";
 // XEP-0115: Entity Capabilities
 const char* ns_capabilities = "http://jabber.org/protocol/caps";
+// XEP-0118: User Tune
+const char* ns_tune = "http://jabber.org/protocol/tune";
 // XEP-0136: Message Archiving
 const char* ns_archive = "urn:xmpp:archive";
 // XEP-0138: Stream Compression

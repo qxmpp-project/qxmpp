@@ -42,6 +42,7 @@
 
 #define QXMPP_AUTOTEST_EXPORT
 
+///
 /// This macro expands a numeric value of the form 0xMMNNPP (MM =
 /// major, NN = minor, PP = patch) that specifies QXmpp's version
 /// number. For example, if you compile your application against
@@ -50,9 +51,11 @@
 /// You can use QXMPP_VERSION to use the latest QXmpp features where
 /// available.
 ///
-
 #define QXMPP_VERSION QT_VERSION_CHECK(@PROJECT_VERSION_MAJOR@, @PROJECT_VERSION_MINOR@, @PROJECT_VERSION_PATCH@)
 
+///
+/// Returns the version of QXmpp used at compile time as a string.
+///
 inline QLatin1String QXmppVersion()
 {
     return QLatin1String("@PROJECT_VERSION@");
