@@ -106,6 +106,7 @@ private Q_SLOTS:
 private:
     friend class QXmppStreamManager;
     friend class tst_QXmppStream;
+    friend class TestClient;
 
     void processData(const QString &data);
     void sendPacket(QXmppPacket &packet);

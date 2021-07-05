@@ -234,6 +234,7 @@ protected:
 private:
     QSharedDataPointer<QXmppStanzaPrivate> d;
     static uint s_uniqeIdNo;
+    friend class TestClient;
 };
 
 Q_DECLARE_METATYPE(QXmppStanza::Error::Type);
