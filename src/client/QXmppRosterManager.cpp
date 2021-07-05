@@ -26,6 +26,7 @@
 #include "QXmppRosterManager.h"
 
 #include "QXmppClient.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 #include "QXmppUtils.h"
@@ -258,6 +259,122 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     default:
         break;
     }
+}
+
+///
+/// Adds a new item to the roster without sending any subscription requests.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemAdded() or itemChanged() signal to be emitted.
+///
+/// \param bareJid
+/// \param name Optional name for the item.
+/// \param groups Optional groups for the item.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QString &bareJid, const QString &name, const QSet<QString> &groups)
+{
+    QXmppRosterIq::Item item;
+    item.setBareJid(bareJid);
+    item.setName(name);
+    item.setGroups(groups);
+    item.setSubscriptionType(QXmppRosterIq::Item::NotSet);
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    return client()->sendGenericIq(iq);
+}
+
+///
+/// Removes a roster item and cancels subscriptions to and from the contact.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemRemoved() signal to be emitted.
+///
+/// \param bareJid
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const QString &bareJid)
+{
+    QXmppRosterIq::Item item;
+    item.setBareJid(bareJid);
+    item.setSubscriptionType(QXmppRosterIq::Item::Remove);
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    return client()->sendGenericIq(iq);
+}
+
+///
+/// Renames a roster item.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemChanged() signal to be emitted.
+///
+/// \param bareJid
+/// \param name
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const QString &bareJid, const QString &name)
+{
+    using Error = QXmppStanza::Error;
+    if (!d->entries.contains(bareJid)) {
+        return QXmpp::Private::makeReadyFuture<Result>(
+                    Error(Error::Modify, Error::ItemNotFound,
+                          QStringLiteral("The roster doesn't contain this user.")));
+    }
+
+    auto item = d->entries.value(bareJid);
+    item.setName(name);
+
+    // If there is a pending subscription, do not include the corresponding attribute in the stanza.
+    if (!item.subscriptionStatus().isEmpty()) {
+        item.setSubscriptionStatus({});
+    }
+
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.addItem(item);
+    return client()->sendGenericIq(iq);
+}
+
+///
+/// Requests a subscription to the given contact.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemAdded() or itemChanged() signal to be emitted.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmpp::PacketState> QXmppRosterManager::subscribeTo(const QString &bareJid, const QString &reason)
+{
+    QXmppPresence packet;
+    packet.setTo(QXmppUtils::jidToBareJid(bareJid));
+    packet.setType(QXmppPresence::Subscribe);
+    packet.setStatusText(reason);
+    return client()->send(packet);
+}
+
+///
+/// Removes a subscription to the given contact.
+///
+/// As a result, the server will initiate a roster push, causing the
+/// itemChanged() signal to be emitted.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmpp::PacketState> QXmppRosterManager::unsubscribeFrom(const QString &bareJid, const QString &reason)
+{
+    QXmppPresence packet;
+    packet.setTo(QXmppUtils::jidToBareJid(bareJid));
+    packet.setType(QXmppPresence::Unsubscribe);
+    packet.setStatusText(reason);
+    return client()->send(packet);
 }
 
 ///

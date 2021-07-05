@@ -30,10 +30,14 @@
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 
+#include <variant>
+
 #include <QMap>
 #include <QObject>
 #include <QStringList>
 
+template<typename T>
+class QFuture;
 class QXmppRosterManagerPrivate;
 
 ///
@@ -71,6 +75,9 @@ class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    /// Empty result containing QXmpp::Success or a QXmppStanza::Error
+    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+
     QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;
 
@@ -83,6 +90,12 @@ public:
         const QString &bareJid) const;
     QXmppPresence getPresence(const QString &bareJid,
                               const QString &resource) const;
+
+    QFuture<Result> addRosterItem(const QString &bareJid, const QString &name = {}, const QSet<QString> &groups = {});
+    QFuture<Result> removeRosterItem(const QString &bareJid);
+    QFuture<Result> renameRosterItem(const QString &bareJid, const QString &name);
+    QFuture<QXmpp::PacketState> subscribeTo(const QString &bareJid, const QString &reason = {});
+    QFuture<QXmpp::PacketState> unsubscribeFrom(const QString &bareJid, const QString &reason = {});
 
     /// \cond
     bool handleStanza(const QDomElement &element) override;
