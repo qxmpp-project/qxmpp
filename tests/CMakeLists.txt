@@ -3,7 +3,7 @@ include_directories(.)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
 macro(add_simple_test TEST_NAME)
-    add_executable(tst_${TEST_NAME} ${TEST_NAME}/tst_${TEST_NAME}.cpp)
+    add_executable(tst_${TEST_NAME} ${TEST_NAME}/tst_${TEST_NAME}.cpp ${ARGN})
     add_test(tst_${TEST_NAME} tst_${TEST_NAME})
     target_link_libraries(tst_${TEST_NAME} Qt${QT_VERSION_MAJOR}::Test qxmpp)
 endmacro()

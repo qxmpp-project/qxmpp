@@ -323,6 +323,7 @@ private:
     QXmppClientPrivate *const d;
 
     friend class QXmppInternalClientExtension;
+    friend class TestClient;
 };
 
 #endif  // QXMPPCLIENT_H

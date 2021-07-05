@@ -23,7 +23,12 @@
  *
  */
 
+#ifndef TESTS_UTIL_H
+#define TESTS_UTIL_H
+
 #include "QXmppPasswordChecker.h"
+
+#include <variant>
 
 #include <QDomDocument>
 #include <QtTest>
@@ -33,7 +38,7 @@
     if (!QTest::qVerify(statement, #statement, description, __FILE__, __LINE__)) \
         return {};
 
-QDomElement xmlToDom(const QByteArray &xml)
+inline QDomElement xmlToDom(const QByteArray &xml)
 {
     QDomDocument doc;
     QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
@@ -73,6 +78,17 @@ QDomElement writePacketToDom(T packet)
     return doc.documentElement();
 }
 
+template<typename T, typename Input>
+T expectFutureVariant(const QFuture<Input> &future)
+{
+#define return \
+    return { }
+    QVERIFY(future.isFinished());
+    QVERIFY2(std::holds_alternative<T>(future.result()), "Variant contains wrong type!");
+#undef return
+    return std::get<T>(future.result());
+}
+
 class TestPasswordChecker : public QXmppPasswordChecker
 {
 public:
@@ -101,3 +117,5 @@ public:
 private:
     QMap<QString, QString> m_credentials;
 };
+
+#endif  // TESTS_UTIL_H
