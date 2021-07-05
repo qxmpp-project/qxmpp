@@ -105,6 +105,9 @@ class QXMPP_EXPORT QXmppClient : public QXmppLoggable
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
+    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
+    using EmptyResult = std::variant<QXmpp::Success, QXmppStanza::Error>;
+
     /// An enumeration for type of error.
     /// Error could come due a TCP socket or XML stream or due to various stanzas.
     enum Error {
@@ -220,9 +223,8 @@ public:
     QXmppStanza::Error::Condition xmppStreamError();
 
     QFuture<QXmpp::PacketState> send(const QXmppStanza &);
-
-    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
     QFuture<IqResult> sendIq(const QXmppIq &);
+    QFuture<EmptyResult> sendGenericIq(const QXmppIq &iq);
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")
