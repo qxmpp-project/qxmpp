@@ -140,6 +140,14 @@ public:
     ~QXmppClient() override;
 
     bool addExtension(QXmppClientExtension *extension);
+    template<typename T, typename... Args>
+    T *addNewExtension(Args... args)
+    {
+        // it's impossible that addExtension() returns false: ext is a new object
+        auto *ext = new T(args...);
+        addExtension(ext);
+        return ext;
+    }
     bool insertExtension(int index, QXmppClientExtension *extension);
     bool removeExtension(QXmppClientExtension *extension);
 

@@ -52,14 +52,6 @@ public:
     {
     }
 
-    template<typename T, typename ...Args>
-    T *addNewExtension(Args... args)
-    {
-        auto *ext = new T(args...);
-        addExtension(ext);
-        return ext;
-    }
-
     void inject(const QByteArray &xml)
     {
         d->stream->handleIqResponse(xmlToDom(xml));
