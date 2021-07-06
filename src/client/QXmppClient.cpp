@@ -195,6 +195,16 @@ QXmppClient::~QXmppClient()
     delete d;
 }
 
+///
+/// \fn QXmppClient::addNewExtension()
+///
+/// Creates a new extension and adds it to the client.
+///
+/// \returns the newly created extension
+///
+/// \since QXmpp 1.5
+///
+
 /// Registers a new \a extension with the client.
 ///
 /// \param extension
