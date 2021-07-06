@@ -205,6 +205,7 @@ public:
 
     QList<Field> fields() const;
     QList<Field> &fields();
+    inline QList<Field> constFields() const { return fields(); };
     void setFields(const QList<QXmppDataForm::Field> &fields);
 
     QString title() const;

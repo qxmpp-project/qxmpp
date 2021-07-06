@@ -37,3 +37,19 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+      - name: Run tests
+        run: |
+          ${env:PATH} += ";D:/a/qxmpp/qxmpp/src/Debug"
+          cmake . && cmake --build .
+          #ctest
+          D:\a\qxmpp\qxmpp\tests\Debug\tst_qxmppattentionmanager.exe
+          D:\a\qxmpp\qxmpp\tests\qxmppuploadrequestmanager\Debug\tst_qxmppuploadrequestmanager.exe
+          D:\a\qxmpp\qxmpp\tests\qxmpptransfermanager\Debug\tst_qxmpptransfermanager.exe
+          ctest --rerun-failed --output-on-failure

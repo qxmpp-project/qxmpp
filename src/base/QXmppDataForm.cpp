@@ -710,6 +710,14 @@ QList<QXmppDataForm::Field> &QXmppDataForm::fields()
 }
 
 ///
+/// \fn QXmppDataForm::constFields
+///
+/// Returns the form's fields by value and can be used safely on temporaries.
+///
+/// \since QXmpp 1.4.1
+///
+
+///
 /// Sets the form's fields.
 ///
 /// \param fields
