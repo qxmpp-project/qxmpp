@@ -62,6 +62,8 @@ public:
     int reconnectionTries;
     QTimer *reconnectionTimer;
 
+    bool isAccountBeingDeleted = false;
+
     // Client state indication
     bool isActive;
 

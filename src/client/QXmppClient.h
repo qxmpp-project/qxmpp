@@ -3,6 +3,7 @@
  *
  * Author:
  *  Manjeet Dahiya
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -198,6 +199,8 @@ public:
 
     bool isAuthenticated() const;
     bool isConnected() const;
+
+    void setIsAccountBeingDeleted(bool isAccountBeingDeleted);
 
     bool isActive() const;
     void setActive(bool active);

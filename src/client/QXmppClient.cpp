@@ -3,6 +3,7 @@
  *
  * Author:
  *  Manjeet Dahiya
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -429,6 +430,20 @@ bool QXmppClient::isConnected() const
 }
 
 ///
+/// Sets whether there is an ongoing account deletion.
+///
+/// This is reset to false on disconnect.
+///
+/// \param isAccountBeingDeleted true if there is an ongoing account deletion, otherwise false
+///
+/// \since QXmpp 1.3
+///
+void QXmppClient::setIsAccountBeingDeleted(bool isAccountBeingDeleted)
+{
+    d->isAccountBeingDeleted = isAccountBeingDeleted;
+}
+
+///
 /// Returns true if the current client state is "active", false if it is
 /// "inactive". See \xep{0352}: Client State Indication for details.
 ///
@@ -667,6 +682,8 @@ void QXmppClient::_q_streamConnected()
 
 void QXmppClient::_q_streamDisconnected()
 {
+    d->isAccountBeingDeleted = false;
+
     // notify managers
     emit disconnected();
     emit stateChanged(QXmppClient::DisconnectedState);
@@ -674,6 +691,12 @@ void QXmppClient::_q_streamDisconnected()
 
 void QXmppClient::_q_streamError(QXmppClient::Error err)
 {
+    // Skip errors received on successful account deletion.
+    if (d->isAccountBeingDeleted && err == QXmppClient::XmppStreamError &&
+            (d->stream->xmppStreamError() == QXmppStanza::Error::Conflict ||
+             d->stream->xmppStreamError() == QXmppStanza::Error::NotAuthorized))
+        return;
+
     if (d->stream->configuration().autoReconnectionEnabled()) {
         if (err == QXmppClient::XmppStreamError) {
             // if we receive a resource conflict, inhibit reconnection
