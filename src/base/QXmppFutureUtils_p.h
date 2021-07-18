@@ -142,6 +142,17 @@ auto chainIq(QFuture<Input> &&input, QObject *context) -> QFuture<Result>
     });
 }
 
+template<typename T, typename Handler>
+void await(const QFuture<T> &future, Handler handler)
+{
+    auto *watcher = new QFutureWatcher<T>();
+    QObject::connect(watcher, &QFutureWatcherBase::finished,
+                     [watcher, handler { std::move(handler) }]() {
+                         handler(watcher->result());
+                         watcher->deleteLater();
+                     });
+    watcher->setFuture(future);
+}
 }
 
 #endif  // QXMPPFUTUREUTILS_P_H
