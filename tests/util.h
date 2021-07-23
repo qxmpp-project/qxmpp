@@ -46,6 +46,16 @@ inline QDomElement xmlToDom(const String &xml)
     return doc.documentElement();
 }
 
+template<typename T>
+static QByteArray packetToXml(const T &packet)
+{
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    packet.toXml(&writer);
+    return buffer.data();
+}
+
 template<class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
@@ -56,13 +66,10 @@ static void parsePacket(T &packet, const QByteArray &xml)
 template<class T>
 static void serializePacket(T &packet, const QByteArray &xml)
 {
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    packet.toXml(&writer);
+    const auto data = packetToXml(packet);
     qDebug() << "expect " << xml;
-    qDebug() << "writing" << buffer.data();
-    QCOMPARE(buffer.data(), xml);
+    qDebug() << "writing" << data;
+    QCOMPARE(data, xml);
 }
 
 template<class T>
