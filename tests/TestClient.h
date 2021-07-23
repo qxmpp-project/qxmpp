@@ -54,7 +54,8 @@ public:
     {
     }
 
-    void inject(const QByteArray &xml)
+    template<typename String>
+    void inject(const String &xml)
     {
         d->stream->handleIqResponse(xmlToDom(xml));
         QCoreApplication::processEvents();

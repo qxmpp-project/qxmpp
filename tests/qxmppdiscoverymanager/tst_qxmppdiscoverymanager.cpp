@@ -40,7 +40,7 @@ void tst_QXmppDiscoveryManager::testInfo()
 
     auto future = discoManager->requestDiscoInfo("user@example.org");
     test.expect("<iq id='qxmpp1' to='user@example.org' type='get'><query xmlns='http://jabber.org/protocol/disco#info'/></iq>");
-    test.inject(R"(
+    test.inject<QString>(R"(
 <iq id='qxmpp1' from='user@example.org' type='result'>
     <query xmlns='http://jabber.org/protocol/disco#info'>
         <identity category='pubsub' type='service'/>
@@ -64,7 +64,7 @@ void tst_QXmppDiscoveryManager::testItems()
     auto future = discoManager->requestDiscoItems("user@example.org");
     test.expect("<iq id='qxmpp1' to='user@example.org' type='get'><query xmlns='http://jabber.org/protocol/disco#items'/></iq>");
     qDebug() << "Moin";
-    test.inject(R"(
+    test.inject<QString>(R"(
 <iq type='result'
     from='user@example.org'
     id='qxmpp1'>

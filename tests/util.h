@@ -38,7 +38,8 @@
     if (!QTest::qVerify(statement, #statement, description, __FILE__, __LINE__)) \
         return {};
 
-inline QDomElement xmlToDom(const QByteArray &xml)
+template<typename String>
+inline QDomElement xmlToDom(const String &xml)
 {
     QDomDocument doc;
     QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
