@@ -25,8 +25,10 @@
 #define CLIENTTESTING_H
 
 #include "QXmppClient.h"
+#include "QXmppClientExtension.h"  // needed for qDeleteAll(d->extensions)
 #include "QXmppClient_p.h"
 #include "QXmppOutgoingClient.h"
+
 #include "util.h"
 
 class TestClient : public QXmppClient
@@ -80,7 +82,7 @@ private:
     void onLoggerMessage(QXmppLogger::MessageType type, const QString &text)
     {
         if (type != QXmppLogger::SentMessage ||
-                text == QLatin1String("<r xmlns=\"urn:xmpp:sm:3\"/>")) {
+            text == QLatin1String("<r xmlns=\"urn:xmpp:sm:3\"/>")) {
             return;
         }
 
@@ -95,4 +97,4 @@ private:
     QList<QString> m_sentPackets;
 };
 
-#endif // CLIENTTESTING_H
+#endif  // CLIENTTESTING_H
