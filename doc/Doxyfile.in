@@ -3,6 +3,7 @@ PROJECT_NUMBER         = "Version: @PROJECT_VERSION@"
 INPUT                  = @PROJECT_SOURCE_DIR@/doc/index.doc \
                          @PROJECT_SOURCE_DIR@/doc/using.doc \
                          @PROJECT_SOURCE_DIR@/doc/xep.doc \
+                         @CMAKE_BINARY_DIR@/src/base/QXmppGlobal.h \
                          @PROJECT_SOURCE_DIR@/src
 
 ALIASES                = "xep{1}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1</a>" \
