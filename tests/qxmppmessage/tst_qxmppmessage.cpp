@@ -221,7 +221,7 @@ void tst_QXmppMessage::testMessageReceipt()
 {
     const QByteArray xml(
         "<message id=\"richard2-4.1.247\" to=\"kingrichard@royalty.england.lit/throne\" from=\"northumberland@shakespeare.lit/westminster\" type=\"normal\">"
-        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<body>My lord, dispatch; read o&apos;er these articles.</body>"
         "<request xmlns=\"urn:xmpp:receipts\"/>"
         "</message>");
 
@@ -469,7 +469,7 @@ void tst_QXmppMessage::testSubextensions()
         "id=\"8a54s\" "
         "to=\"romeo@montague.lit/orchard\" "
         "type=\"chat\">"
-        "<body>What man art thou that thus bescreen'd in night so stumblest on my counsel?</body>"
+        "<body>What man art thou that thus bescreen&apos;d in night so stumblest on my counsel?</body>"
         "</message>"
         "</forwarded>"
         "</result>"
@@ -491,7 +491,7 @@ void tst_QXmppMessage::testChatMarkers()
         "id='message-1' "
         "to='ingrichard@royalty.england.lit/throne'>"
         "<thread>sleeping</thread>"
-        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<body>My lord, dispatch; read o&apos;er these articles.</body>"
         "<markable xmlns='urn:xmpp:chat-markers:0'/>"
         "</message>");
 
@@ -673,7 +673,7 @@ void tst_QXmppMessage::testPrivateMessage()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
-        "<body>My lord, dispatch; read o'er these articles.</body>"
+        "<body>My lord, dispatch; read o&apos;er these articles.</body>"
         "<private xmlns=\"urn:xmpp:carbons:2\"/>"
         "</message>");
 
@@ -758,7 +758,7 @@ void tst_QXmppMessage::testMix()
         "<message to=\"hag66@shakespeare.example\" "
         "from=\"coven@mix.shakespeare.example/123456\" "
         "type=\"groupchat\">"
-        "<body>Harpier cries: 'tis time, 'tis time.</body>"
+        "<body>Harpier cries: &apos;tis time, &apos;tis time.</body>"
         "<mix xmlns=\"urn:xmpp:mix:core:1\">"
         "<jid>hag66@shakespeare.example</jid>"
         "<nick>thirdwitch</nick>"
@@ -783,7 +783,7 @@ void tst_QXmppMessage::testEme()
     // test standard encryption: OMEMO
     const QByteArray xmlOmemo(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<body>This message is encrypted with OMEMO, but your client doesn't seem to support that.</body>"
+        "<body>This message is encrypted with OMEMO, but your client doesn&apos;t seem to support that.</body>"
         "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
         "</message>");
 
@@ -797,7 +797,7 @@ void tst_QXmppMessage::testEme()
     // test custom encryption
     const QByteArray xmlCustom(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<body>This message is encrypted with CustomCrypt, but your client doesn't seem to support that.</body>"
+        "<body>This message is encrypted with CustomCrypt, but your client doesn&apos;t seem to support that.</body>"
         "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"im:example:customcrypt:1\" name=\"CustomCrypt\"/>"
         "</message>");
 
@@ -867,7 +867,7 @@ void tst_QXmppMessage::testProcessingHints()
         "<message to=\"juliet@capulet.lit/laptop\" "
         "from=\"romeo@montague.lit/laptop\" "
         "type=\"chat\">"
-        "<body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>"
+        "<body>V unir avtug&apos;f pybnx gb uvqr zr sebz gurve fvtug</body>"
         "<no-permanent-store xmlns=\"urn:xmpp:hints\"/>"
         "<no-store xmlns=\"urn:xmpp:hints\"/>"
         "<no-copy xmlns=\"urn:xmpp:hints\"/>"

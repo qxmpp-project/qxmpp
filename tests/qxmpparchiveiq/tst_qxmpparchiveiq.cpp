@@ -95,7 +95,7 @@ void tst_QXmppArchiveIq::testArchiveChat_data()
                                    ">"
                                    "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
                                    "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
-                                   "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
+                                   "<from secs=\"7\"><body>How cam&apos;st thou hither, tell me, and wherefore?</body></from>"
                                    "</chat>"
                                    "</iq>")
                             << -1;
@@ -110,7 +110,7 @@ void tst_QXmppArchiveIq::testArchiveChat_data()
                                      ">"
                                      "<from secs=\"0\"><body>Art thou not Romeo, and a Montague?</body></from>"
                                      "<to secs=\"11\"><body>Neither, fair saint, if either thee dislike.</body></to>"
-                                     "<from secs=\"7\"><body>How cam'st thou hither, tell me, and wherefore?</body></from>"
+                                     "<from secs=\"7\"><body>How cam&apos;st thou hither, tell me, and wherefore?</body></from>"
                                      "<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                      "<count>3</count>"
                                      "</set>"

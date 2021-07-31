@@ -53,7 +53,9 @@ static QByteArray packetToXml(const T &packet)
     buffer.open(QIODevice::ReadWrite);
     QXmlStreamWriter writer(&buffer);
     packet.toXml(&writer);
-    return buffer.data();
+    auto data = buffer.data();
+    data.replace(u'\'', "&apos;");
+    return data;
 }
 
 template<class T>
@@ -66,10 +68,13 @@ static void parsePacket(T &packet, const QByteArray &xml)
 template<class T>
 static void serializePacket(T &packet, const QByteArray &xml)
 {
+    auto processedXml = xml;
+    processedXml.replace(u'\'', u'"');
+
     const auto data = packetToXml(packet);
-    qDebug() << "expect " << xml;
+    qDebug() << "expect " << processedXml;
     qDebug() << "writing" << data;
-    QCOMPARE(data, xml);
+    QCOMPARE(data, processedXml);
 }
 
 template<class T>
