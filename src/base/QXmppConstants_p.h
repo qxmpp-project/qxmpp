@@ -104,6 +104,7 @@ extern const char* ns_activity;
 extern const char* ns_capabilities;
 // XEP-0118: User Tune
 extern const char* ns_tune;
+extern const char* ns_tune_notify;
 // XEP-0136: Message Archiving
 extern const char* ns_archive;
 // XEP-0138: Stream Compression
