@@ -880,7 +880,7 @@ void QXmppDataForm::parse(const QDomElement &element)
             for (auto element = fieldElement.firstChildElement("option");
                  !element.isNull();
                  element = element.nextSiblingElement("option")) {
-                options << QPair(element.attribute("label"), element.firstChildElement("value").text());
+                options << qMakePair(element.attribute("label"), element.firstChildElement("value").text());
             }
             field.setOptions(options);
         }

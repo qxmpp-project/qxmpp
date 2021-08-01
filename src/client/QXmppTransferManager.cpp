@@ -1318,9 +1318,9 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     QXmppDataForm::Field methodField(QXmppDataForm::Field::ListSingleField);
     methodField.setKey("stream-method");
     if (d->supportedMethods & QXmppTransferJob::InBandMethod)
-        methodField.setOptions(methodField.options() << QPair(QString(), QString::fromLatin1(ns_ibb)));
+        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_ibb)));
     if (d->supportedMethods & QXmppTransferJob::SocksMethod)
-        methodField.setOptions(methodField.options() << QPair(QString(), QString::fromLatin1(ns_bytestreams)));
+        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_bytestreams)));
     form.setFields(QList<QXmppDataForm::Field>() << methodField);
 
     // start job
