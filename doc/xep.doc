@@ -23,6 +23,7 @@ Complete:
 - \xep{0095, Stream Initiation}
 - \xep{0096, SI File Transfer}
 - \xep{0115, Entity Capabilities}
+- \xep{0118, User Tune} (v1.3)
 - \xep{0128, Service Discovery Extensions}
 - \xep{0136, Message Archiving}
 - \xep{0153, vCard-Based Avatars}

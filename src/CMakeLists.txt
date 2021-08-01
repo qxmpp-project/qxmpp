@@ -98,6 +98,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppTransferManager.h
     client/QXmppTransferManager_p.h
     client/QXmppUploadRequestManager.h
+    client/QXmppUserTuneManager.h
     client/QXmppVCardManager.h
     client/QXmppVersionManager.h
 
@@ -196,6 +197,7 @@ set(SOURCE_FILES
     client/QXmppTlsManager.cpp
     client/QXmppTransferManager.cpp
     client/QXmppUploadRequestManager.cpp
+    client/QXmppUserTuneManager.cpp
     client/QXmppVCardManager.cpp
     client/QXmppVersionManager.cpp
 

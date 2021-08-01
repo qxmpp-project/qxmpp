@@ -92,6 +92,7 @@ const char* ns_activity = "http://jabber.org/protocol/activity";
 const char* ns_capabilities = "http://jabber.org/protocol/caps";
 // XEP-0118: User Tune
 const char* ns_tune = "http://jabber.org/protocol/tune";
+const char* ns_tune_notify = "http://jabber.org/protocol/tune+notify";
 // XEP-0136: Message Archiving
 const char* ns_archive = "urn:xmpp:archive";
 // XEP-0138: Stream Compression
