@@ -28,6 +28,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppBookmarkSet.h
     base/QXmppByteStreamIq.h
     base/QXmppDataForm.h
+    base/QXmppDataFormBase.h
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
@@ -116,6 +117,7 @@ set(SOURCE_FILES
     base/QXmppByteStreamIq.cpp
     base/QXmppConstants.cpp
     base/QXmppDataForm.cpp
+    base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
