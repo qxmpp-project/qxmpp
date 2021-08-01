@@ -182,7 +182,7 @@ void QXmppCallManager::setStunServers(const QList<QPair<QHostAddress, quint16>> 
 void QXmppCallManager::setStunServer(const QHostAddress &host, quint16 port)
 {
     d->stunServers.clear();
-    d->stunServers.push_back(QPair(host, port));
+    d->stunServers.push_back(qMakePair(host, port));
 }
 
 ///
