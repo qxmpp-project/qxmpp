@@ -1,4 +1,5 @@
 @PACKAGE_INIT@
 include("${CMAKE_CURRENT_LIST_DIR}/QXmpp.cmake")
-check_required_components(QXmpp)
+include("${CMAKE_CURRENT_LIST_DIR}/QXmppComponent.cmake")
 
+check_required_components(QXmpp)

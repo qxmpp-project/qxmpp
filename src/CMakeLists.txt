@@ -269,3 +269,4 @@ install(
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
 )
 
+add_subdirectory(component)
