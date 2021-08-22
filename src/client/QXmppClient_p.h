@@ -41,6 +41,7 @@
 
 class QXmppClient;
 class QXmppClientExtension;
+class QXmppE2eeExtension;
 class QXmppLogger;
 class QXmppOutgoingClient;
 class QTimer;
@@ -56,6 +57,8 @@ public:
     QXmppLogger *logger;
     /// Pointer to the XMPP stream
     QXmppOutgoingClient *stream;
+
+    QXmppE2eeExtension *encryptionExtension;
 
     // reconnection
     bool receivedConflict;
