@@ -38,6 +38,7 @@
 template<typename T>
 class QFuture;
 
+class QXmppE2eeExtension;
 class QXmppClientExtension;
 class QXmppClientPrivate;
 class QXmppPresence;
@@ -151,6 +152,8 @@ public:
     }
     bool insertExtension(int index, QXmppClientExtension *extension);
     bool removeExtension(QXmppClientExtension *extension);
+    QXmppE2eeExtension *encryptionExtension() const;
+    void setEncryptionExtension(QXmppE2eeExtension *);
 
     QList<QXmppClientExtension *> extensions();
 
@@ -232,7 +235,9 @@ public:
     QXmppStanza::Error::Condition xmppStreamError();
 
     QFuture<QXmpp::SendResult> send(QXmppStanza &&);
+    QFuture<QXmpp::SendResult> sendUnencrypted(QXmppStanza &&);
     QFuture<IqResult> sendIq(QXmppIq &&);
+    QFuture<IqResult> sendSensitiveIq(QXmppIq &&);
     QFuture<EmptyResult> sendGenericIq(QXmppIq &&);
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
