@@ -84,12 +84,16 @@ inline QLatin1String QXmppVersion()
 ///
 /// Contains global functions and enumerations.
 ///
+/// \since QXmpp 1.5
+///
 namespace QXmpp {
 
 ///
 /// The state of an outgoing packet.
 ///
-enum PacketState : quint8 {
+/// \since QXmpp 1.5
+///
+enum PacketState : uint8_t {
     Sent,          ///< The packet has been written to the socket.
     Acknowledged,  ///< The packet has been acknowledged by the other peer using Stream Management.
     NotSent,       ///< The packet could not be sent (e.g. connection broke or user disconnected).
@@ -97,6 +101,8 @@ enum PacketState : quint8 {
 
 ///
 /// An empty struct indicating success in results.
+///
+/// \since QXmpp 1.5
 ///
 struct Success {};
 
