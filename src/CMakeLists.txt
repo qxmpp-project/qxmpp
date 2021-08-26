@@ -44,6 +44,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMixIq.h
     base/QXmppMixItem.h
     base/QXmppMucIq.h
+    base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
@@ -141,6 +142,7 @@ set(SOURCE_FILES
     base/QXmppMixIq.cpp
     base/QXmppMixItem.cpp
     base/QXmppMucIq.cpp
+    base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
     base/QXmppPacket.cpp
     base/QXmppPingIq.cpp
