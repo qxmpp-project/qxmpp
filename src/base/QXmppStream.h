@@ -37,6 +37,7 @@ template<typename T>
 class QFuture;
 class QSslSocket;
 class QXmppIq;
+class QXmppNonza;
 class QXmppPacket;
 class QXmppStanza;
 class QXmppStreamPrivate;
@@ -54,8 +55,8 @@ public:
 
     virtual bool isConnected() const;
 
-    bool sendPacket(const QXmppStanza &);
-    QFuture<QXmpp::PacketState> send(const QXmppStanza &);
+    bool sendPacket(const QXmppNonza &);
+    QFuture<QXmpp::PacketState> send(const QXmppNonza &);
 
     using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
     QFuture<IqResult> sendIq(const QXmppIq &);

@@ -318,8 +318,7 @@ void QXmppClient::connectToServer(const QString& jid, const QString& password)
 ///
 /// \param packet A valid XMPP stanza. It can be an iq, a message or a presence stanza.
 ///
-
-bool QXmppClient::sendPacket(const QXmppStanza& packet)
+bool QXmppClient::sendPacket(const QXmppNonza &packet)
 {
     return d->stream->sendPacket(packet);
 }

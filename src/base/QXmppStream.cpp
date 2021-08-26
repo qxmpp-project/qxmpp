@@ -208,7 +208,7 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 /// \param stanza
 ///
-bool QXmppStream::sendPacket(const QXmppStanza &stanza)
+bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 {
     // the first result is always reported immediately
     return send(stanza).resultAt(0) != QXmpp::NotSent;
@@ -219,7 +219,7 @@ bool QXmppStream::sendPacket(const QXmppStanza &stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::PacketState> QXmppStream::send(const QXmppStanza &stanza)
+QFuture<QXmpp::PacketState> QXmppStream::send(const QXmppNonza &stanza)
 {
     QXmppPacket packet(stanza);
     sendPacket(packet);

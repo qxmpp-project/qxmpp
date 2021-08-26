@@ -316,7 +316,7 @@ public Q_SLOTS:
     void connectToServer(const QString &jid,
                          const QString &password);
     void disconnectFromServer();
-    bool sendPacket(const QXmppStanza &);
+    bool sendPacket(const QXmppNonza &);
     void sendMessage(const QString &bareJid, const QString &message);
 
 private Q_SLOTS:
