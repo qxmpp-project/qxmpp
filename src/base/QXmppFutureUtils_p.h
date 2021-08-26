@@ -76,6 +76,12 @@ QFuture<T> makeReadyFuture(T &&value)
     return interface.future();
 }
 
+inline QFuture<void> makeReadyFuture()
+{
+    using State = QFutureInterfaceBase::State;
+    return QFutureInterface<void>(State(State::Started | State::Finished)).future();
+}
+
 template<typename Result, typename Input, typename Converter>
 auto chain(QFuture<Input> &&source, QObject *context, Converter task) -> QFuture<Result>
 {
