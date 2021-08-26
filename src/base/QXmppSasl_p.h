@@ -121,7 +121,7 @@ public:
     static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppSaslAuth : public QXmppStanza
+class QXMPP_AUTOTEST_EXPORT QXmppSaslAuth : public QXmppNonza
 {
 public:
     QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
@@ -142,7 +142,7 @@ private:
     QByteArray m_value;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppSaslChallenge : public QXmppStanza
+class QXMPP_AUTOTEST_EXPORT QXmppSaslChallenge : public QXmppNonza
 {
 public:
     QXmppSaslChallenge(const QByteArray &value = QByteArray());
@@ -159,7 +159,7 @@ private:
     QByteArray m_value;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppStanza
+class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
 {
 public:
     QXmppSaslFailure(const QString &condition = QString());
@@ -176,7 +176,7 @@ private:
     QString m_condition;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppSaslResponse : public QXmppStanza
+class QXMPP_AUTOTEST_EXPORT QXmppSaslResponse : public QXmppNonza
 {
 public:
     QXmppSaslResponse(const QByteArray &value = QByteArray());
@@ -193,7 +193,7 @@ private:
     QByteArray m_value;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppSaslSuccess : public QXmppStanza
+class QXMPP_AUTOTEST_EXPORT QXmppSaslSuccess : public QXmppNonza
 {
 public:
     QXmppSaslSuccess();

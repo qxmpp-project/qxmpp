@@ -32,7 +32,7 @@
 ///
 /// \ingroup Stanzas
 ///
-class QXMPP_EXPORT QXmppStartTlsPacket : public QXmppStanza
+class QXMPP_EXPORT QXmppStartTlsPacket : public QXmppNonza
 {
 public:
     /// The type of the STARTTLS packet.
