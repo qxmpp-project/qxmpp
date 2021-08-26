@@ -35,6 +35,7 @@
 // See http://lists.trolltech.com/qt-interest/2008-07/thread00798-0.html
 // for an explanation.
 #include "QXmppElement.h"
+#include "QXmppNonza.h"
 
 #include <QXmlStreamWriter>
 
@@ -96,7 +97,7 @@ class QXmppStanzaErrorPrivate;
 ///
 /// \ingroup Stanzas
 ///
-class QXMPP_EXPORT QXmppStanza
+class QXMPP_EXPORT QXmppStanza : public QXmppNonza
 {
 public:
     ///
@@ -220,11 +221,8 @@ public:
     QList<QXmppExtendedAddress> extendedAddresses() const;
     void setExtendedAddresses(const QList<QXmppExtendedAddress> &extendedAddresses);
 
-    virtual bool isXmppStanza() const;
-
     /// \cond
-    virtual void parse(const QDomElement &element);
-    virtual void toXml(QXmlStreamWriter *writer) const = 0;
+    void parse(const QDomElement &element) override;
 
 protected:
     void extensionsToXml(QXmlStreamWriter *writer) const;
