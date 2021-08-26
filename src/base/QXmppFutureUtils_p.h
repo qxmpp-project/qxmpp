@@ -82,6 +82,30 @@ inline QFuture<void> makeReadyFuture()
     return QFutureInterface<void>(State(State::Started | State::Finished)).future();
 }
 
+template<typename T, typename Handler>
+void await(const QFuture<T> &future, QObject *context, Handler handler)
+{
+    auto *watcher = new QFutureWatcher<T>(context);
+    QObject::connect(watcher, &QFutureWatcherBase::finished,
+                     context, [watcher, handler { std::move(handler) }]() {
+        handler(watcher->result());
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
+}
+
+template<typename Handler>
+void await(const QFuture<void> &future, QObject *context, Handler handler)
+{
+    auto *watcher = new QFutureWatcher<void>(context);
+    QObject::connect(watcher, &QFutureWatcherBase::finished,
+                     context, [watcher, handler { std::move(handler) }]() {
+        handler();
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
+}
+
 template<typename Result, typename Input, typename Converter>
 auto chain(QFuture<Input> &&source, QObject *context, Converter task) -> QFuture<Result>
 {
