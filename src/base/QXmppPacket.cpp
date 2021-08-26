@@ -22,18 +22,18 @@
  */
 
 #include "QXmppPacket_p.h"
-#include "QXmppStanza.h"
+#include "QXmppNonza.h"
 
 #include <QFuture>
 #include <QXmlStreamWriter>
 
 /// \cond
-QXmppPacket::QXmppPacket(const QXmppStanza &stanza)
+QXmppPacket::QXmppPacket(const QXmppNonza &nonza)
     : m_interface(new QFutureInterface<QXmpp::PacketState>(QFutureInterfaceBase::Started)),
-      m_isXmppStanza(stanza.isXmppStanza())
+      m_isXmppStanza(nonza.isXmppStanza())
 {
     QXmlStreamWriter xmlStream(&m_data);
-    stanza.toXml(&xmlStream);
+    nonza.toXml(&xmlStream);
 }
 
 QByteArray QXmppPacket::data() const

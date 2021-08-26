@@ -29,12 +29,12 @@
 #include <QFutureInterface>
 #include <QSharedPointer>
 
-class QXmppStanza;
+class QXmppNonza;
 
 class QXmppPacket
 {
 public:
-    QXmppPacket(const QXmppStanza &stanza);
+    QXmppPacket(const QXmppNonza &);
 
     QByteArray data() const;
     bool isXmppStanza() const;
