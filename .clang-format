@@ -4,6 +4,7 @@ BasedOnStyle: WebKit
 BraceWrapping:
   AfterClass: true
   AfterFunction: true
+  AfterStruct: true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: BeforeColon
