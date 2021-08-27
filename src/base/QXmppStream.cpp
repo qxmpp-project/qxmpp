@@ -25,6 +25,7 @@
 #include "QXmppStream.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppIq.h"
 #include "QXmppLogger.h"
 #include "QXmppPacket_p.h"
@@ -45,48 +46,13 @@
 #include <QTime>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp::Private;
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 static bool randomSeeded = false;
 #endif
 
-class IqState : public QFutureInterface<QXmppStream::IqResult>
-{
-    Q_DISABLE_COPY(IqState)
-
-public:
-    IqState(QFuture<QXmpp::PacketState> sendFuture, bool streamManagementUsed, QObject *parent)
-        : QFutureInterface<QXmppStream::IqResult>(QFutureInterfaceBase::Started),
-          m_sendFuture(std::move(sendFuture)),
-          m_streamManagementUsed(streamManagementUsed)
-    {
-        auto *watcher = new QFutureWatcher<QXmpp::PacketState>(parent);
-        QObject::connect(watcher, &QFutureWatcher<QXmpp::PacketState>::finished, [=]() {
-            const auto result = watcher->future().results().last();
-
-            switch (result) {
-            case QXmpp::Acknowledged:
-            case QXmpp::Sent:
-                break;
-            case QXmpp::NotSent:
-                reportResult(result);
-                reportFinished();
-                break;
-            }
-
-            watcher->deleteLater();
-        });
-        watcher->setFuture(m_sendFuture);
-    }
-
-    bool isStreamManagementUsed() const
-    {
-        return m_streamManagementUsed;
-    }
-
-private:
-    QFuture<QXmpp::PacketState> m_sendFuture;
-    bool m_streamManagementUsed;
-};
+using IqState = QFutureInterface<QXmppStream::IqResult>;
 
 class QXmppStreamPrivate
 {
@@ -103,7 +69,7 @@ public:
     QXmppStreamManager streamManager;
 
     // iq response handling
-    QMap<QString, IqState *> runningIqs;
+    QMap<QString, IqState> runningIqs;
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
@@ -254,13 +220,28 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
         return sendIq(newIq);
     }
 
-    auto *interface = new IqState(send(iq), d->streamManager.enabled(), this);
+    auto sendFuture = send(iq);
+    if (sendFuture.isFinished()) {
+        if (sendFuture.result() == QXmpp::NotSent) {
+            // early exit (saves QFutureWatcher)
+            return makeReadyFuture<IqResult>(QXmpp::NotSent);
+        }
+    } else {
+        awaitLast(sendFuture, this, [this, id = iq.id()](QXmpp::PacketState result) {
+            if (result == QXmpp::NotSent) {
+                if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
+                    itr.value().reportResult(QXmpp::NotSent);
+                    itr.value().reportFinished();
 
-    if (!interface->isFinished()) {
-        d->runningIqs.insert(iq.id(), interface);
+                    d->runningIqs.erase(itr);
+                }
+            }
+        });
     }
 
-    return interface->future();
+    IqState interface(IqState::Started);
+    d->runningIqs.insert(iq.id(), interface);
+    return interface.future();
 }
 
 ///
@@ -270,10 +251,9 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
 ///
 void QXmppStream::cancelOngoingIqs()
 {
-    for (auto *state : std::as_const(d->runningIqs)) {
-        state->reportResult(QXmpp::NotSent);
-        state->reportFinished();
-        delete state;
+    for (auto &state : d->runningIqs) {
+        state.reportResult(QXmpp::NotSent);
+        state.reportFinished();
     }
     d->runningIqs.clear();
 }
@@ -471,10 +451,8 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
     if (auto itr = d->runningIqs.find(stanza.attribute(QStringLiteral("id")));
         itr != d->runningIqs.end()) {
 
-        auto *state = itr.value();
-        state->reportResult(stanza);
-        state->reportFinished();
-        delete state;
+        itr.value().reportResult(stanza);
+        itr.value().reportFinished();
 
         d->runningIqs.erase(itr);
         return true;
