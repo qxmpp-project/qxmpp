@@ -83,6 +83,19 @@ inline QFuture<void> makeReadyFuture()
 }
 
 template<typename T, typename Handler>
+void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
+{
+    auto *watcher = new QFutureWatcher<T>(context);
+    QObject::connect(watcher, &QFutureWatcherBase::finished,
+                     context, [watcher, handler { std::move(handler) }]() {
+        auto future = watcher->future();
+        handler(future.resultAt(future.resultCount() - 1));
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
+}
+
+template<typename T, typename Handler>
 void await(const QFuture<T> &future, QObject *context, Handler handler)
 {
     auto *watcher = new QFutureWatcher<T>(context);
