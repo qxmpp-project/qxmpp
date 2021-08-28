@@ -55,6 +55,7 @@ Complete:
 - \xep{0382, Spoiler messages} (v0.2)
 - \xep{0428, Fallback Indication} (v0.1)
 - \xep{0434, Trust Messages} (v0.5)
+- \xep{0450, Automatic Trust Management (ATM)} (v0.3)
 
 Ongoing:
 - \xep{0009, Jabber-RPC} (API is not finalized yet)

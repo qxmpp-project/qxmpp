@@ -198,5 +198,7 @@ extern const char* ns_mix_misc;
 extern const char* ns_fallback_indication;
 // XEP-0434: Trust Messages (TM)
 extern const char* ns_tm;
+// XEP-0450: Automatic Trust Management (ATM)
+extern const char* ns_atm;
 
 #endif  // QXMPPCONSTANTS_H
