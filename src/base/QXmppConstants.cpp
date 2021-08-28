@@ -186,3 +186,5 @@ const char* ns_mix_misc = "urn:xmpp:mix:misc:0";
 const char* ns_fallback_indication = "urn:xmpp:fallback:0";
 // XEP-0434: Trust Messages (TM)
 const char* ns_tm = "urn:xmpp:tm:0";
+// XEP-0450: Automatic Trust Management (ATM)
+const char* ns_atm = "urn:xmpp:atm:1";
