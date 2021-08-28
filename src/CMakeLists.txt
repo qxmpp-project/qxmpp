@@ -106,6 +106,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppRpcManager.h
     client/QXmppTransferManager.h
     client/QXmppTransferManager_p.h
+    client/QXmppTrustMemoryStorage.h
     client/QXmppTrustStorage.h
     client/QXmppUploadRequestManager.h
     client/QXmppUserTuneManager.h
@@ -210,6 +211,7 @@ set(SOURCE_FILES
     client/QXmppRpcManager.cpp
     client/QXmppTlsManager.cpp
     client/QXmppTransferManager.cpp
+    client/QXmppTrustMemoryStorage.cpp
     client/QXmppTrustStorage.cpp
     client/QXmppUploadRequestManager.cpp
     client/QXmppUserTuneManager.cpp
