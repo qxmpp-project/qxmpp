@@ -26,6 +26,7 @@
 #include "QXmppOmemoDeviceBundle.h"
 #include "QXmppOmemoDeviceElement.h"
 #include "QXmppOmemoDeviceList.h"
+#include "QXmppOmemoElement.h"
 #include "QXmppOmemoEnvelope.h"
 #include "QXmppUtils.h"
 
@@ -616,5 +617,191 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoEnvelope::isOmemoEnvelope(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("key") &&
+        element.namespaceURI() == ns_omemo_1;
+}
+
+///
+/// \class QXmppOmemoElement
+///
+/// \brief The QXmppOmemoElement class represents an OMEMO element as
+/// defined by \xep{0384, OMEMO Encryption}.
+///
+/// \since QXmpp 1.5
+///
+
+class QXmppOmemoElementPrivate : public QSharedData
+{
+public:
+    uint32_t senderDeviceId = 0;
+    QByteArray payload;
+    QMultiMap<QString, QXmppOmemoEnvelope> envelopes;
+};
+
+///
+/// Constructs an OMEMO element.
+///
+QXmppOmemoElement::QXmppOmemoElement()
+    : d(new QXmppOmemoElementPrivate)
+{
+}
+
+///
+/// Constructs a copy of \a other.
+///
+/// \param other
+///
+QXmppOmemoElement::QXmppOmemoElement(const QXmppOmemoElement &other) = default;
+
+QXmppOmemoElement::~QXmppOmemoElement() = default;
+
+///
+/// Assigns \a other to this OMEMO element.
+///
+/// \param other
+///
+QXmppOmemoElement &QXmppOmemoElement::operator=(const QXmppOmemoElement &other) = default;
+
+///
+/// Returns the ID of the sender's device.
+///
+/// The ID is 0 if it is unset.
+///
+/// \return the sender's device ID
+///
+uint32_t QXmppOmemoElement::senderDeviceId() const
+{
+    return d->senderDeviceId;
+}
+
+///
+/// Sets the ID of the sender's device.
+///
+/// A valid ID must be at least 1 and at most 2^32-1.
+///
+/// \param id sender's device ID
+///
+void QXmppOmemoElement::setSenderDeviceId(const uint32_t id)
+{
+    d->senderDeviceId = id;
+}
+
+///
+/// Returns the payload which consists of the encrypted SCE envelope.
+///
+/// \return the encrypted payload
+///
+QByteArray QXmppOmemoElement::payload() const
+{
+    return d->payload;
+}
+
+///
+/// Sets the payload which consists of the encrypted SCE envelope.
+///
+/// \param payload encrypted payload
+///
+void QXmppOmemoElement::setPayload(const QByteArray &payload)
+{
+    d->payload = payload;
+}
+
+///
+/// Searches for an OMEMO envelope by its recipient JID and device ID.
+///
+/// \param recipientJid bare JID of the recipient
+/// \param recipientDeviceId ID of the recipient's device
+///
+/// \return the found OMEMO envelope
+///
+std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, uint32_t recipientDeviceId) const
+{
+    for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
+        const auto &envelope = itr.value();
+        if (envelope.recipientDeviceId() == recipientDeviceId) {
+            return envelope;
+        }
+    }
+
+    return std::nullopt;
+}
+
+///
+/// Adds an OMEMO envelope.
+///
+/// If a full JID is passed as recipientJid, it is converted into a bare JID.
+///
+/// \see QXmppOmemoEnvelope
+///
+/// \param recipientJid bare JID of the recipient
+/// \param envelope OMEMO envelope
+///
+void QXmppOmemoElement::addEnvelope(const QString &recipientJid, QXmppOmemoEnvelope &envelope)
+{
+    d->envelopes.insert(QXmppUtils::jidToBareJid(recipientJid), envelope);
+}
+
+/// \cond
+void QXmppOmemoElement::parse(const QDomElement &element)
+{
+    const auto header = element.firstChildElement("header");
+
+    d->senderDeviceId = header.attribute("sid").toInt();
+
+    for (auto recipient = header.firstChildElement("keys");
+         !recipient.isNull();
+         recipient = recipient.nextSiblingElement("keys")) {
+        const auto recipientJid = recipient.attribute("jid");
+
+        for (auto envelope = recipient.firstChildElement("key");
+             !envelope.isNull();
+             envelope = envelope.nextSiblingElement("key")) {
+            QXmppOmemoEnvelope omemoEnvelope;
+            omemoEnvelope.parse(envelope);
+            addEnvelope(recipientJid, omemoEnvelope);
+        }
+    }
+
+    d->payload = QByteArray::fromBase64(element.firstChildElement("payload").text().toLatin1());
+}
+
+void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("encrypted");
+    writer->writeAttribute("xmlns", ns_omemo_1);
+
+    writer->writeStartElement("header");
+    writer->writeAttribute("sid", QString::number(d->senderDeviceId));
+
+    const auto recipientJids = d->envelopes.uniqueKeys();
+    for (const auto &recipientJid : recipientJids) {
+        writer->writeStartElement("keys");
+        writer->writeAttribute("jid", recipientJid);
+
+        for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
+            const auto &envelope = itr.value();
+            envelope.toXml(writer);
+        }
+
+        writer->writeEndElement();  // keys
+    }
+
+    writer->writeEndElement();  // header
+
+    helperToXmlAddTextElement(writer, "payload", d->payload.toBase64());
+
+    writer->writeEndElement();  // encrypted
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an OMEMO element.
+///
+/// \param element DOM element being checked
+///
+/// \return true if element is an OMEMO element, otherwise false
+///
+bool QXmppOmemoElement::isOmemoElement(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("encrypted") &&
         element.namespaceURI() == ns_omemo_1;
 }
