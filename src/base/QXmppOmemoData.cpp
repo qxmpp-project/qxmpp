@@ -24,6 +24,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppOmemoDeviceElement.h"
+#include "QXmppOmemoDeviceList.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
@@ -155,5 +156,75 @@ void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoDeviceElement::isOmemoDeviceElement(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("device") &&
+        element.namespaceURI() == ns_omemo_1;
+}
+
+///
+/// \class QXmppOmemoDeviceList
+///
+/// \brief The QXmppOmemoDeviceList class represents an OMEMO device list
+/// as defined by \xep{0384, OMEMO Encryption}.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// Constructs an OMEMO device list.
+///
+QXmppOmemoDeviceList::QXmppOmemoDeviceList()
+{
+}
+
+///
+/// Constructs a copy of \a other.
+///
+/// \param other
+///
+QXmppOmemoDeviceList::QXmppOmemoDeviceList(const QXmppOmemoDeviceList &other) = default;
+
+QXmppOmemoDeviceList::~QXmppOmemoDeviceList() = default;
+
+///
+/// Assigns \a other to this OMEMO device list.
+///
+/// \param other
+///
+QXmppOmemoDeviceList &QXmppOmemoDeviceList::operator=(const QXmppOmemoDeviceList &other) = default;
+
+/// \cond
+void QXmppOmemoDeviceList::parse(const QDomElement &element)
+{
+    for (auto device = element.firstChildElement("device");
+         !device.isNull();
+         device = device.nextSiblingElement("device")) {
+        QXmppOmemoDeviceElement deviceElement;
+        deviceElement.parse(device);
+        append(deviceElement);
+    }
+}
+
+void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("devices");
+    writer->writeDefaultNamespace(ns_omemo_1);
+
+    for (const auto &device : *this) {
+        device.toXml(writer);
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an OMEMO device list.
+///
+/// \param element DOM element being checked
+///
+/// \return true if element is an OMEMO device list, otherwise false
+///
+bool QXmppOmemoDeviceList::isOmemoDeviceList(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("devices") &&
         element.namespaceURI() == ns_omemo_1;
 }

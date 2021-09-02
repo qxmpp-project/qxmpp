@@ -46,6 +46,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMucIq.h
     base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
+    base/QXmppOmemoDeviceList.h
     base/QXmppOmemoDeviceElement.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
