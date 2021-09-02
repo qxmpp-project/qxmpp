@@ -46,6 +46,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMucIq.h
     base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
+    base/QXmppOmemoDeviceElement.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
     base/QXmppPubSubAffiliation.h
@@ -144,6 +145,7 @@ set(SOURCE_FILES
     base/QXmppMucIq.cpp
     base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
+    base/QXmppOmemoData.cpp
     base/QXmppPacket.cpp
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
@@ -301,4 +303,3 @@ install(
     FILES ${INSTALL_HEADER_FILES}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
 )
-

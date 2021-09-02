@@ -187,6 +187,7 @@ extern const char* ns_eme;
 extern const char* ns_spoiler;
 // XEP-0384: OMEMO Encryption
 extern const char* ns_omemo;
+extern const char* ns_omemo_1;
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 extern const char* ns_mix_pam;
 extern const char* ns_mix_roster;
