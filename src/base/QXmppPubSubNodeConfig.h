@@ -27,11 +27,21 @@
 #include "QXmppDataForm.h"
 #include "QXmppDataFormBase.h"
 
+#include <variant>
+
 class QXmppPubSubNodeConfigPrivate;
 
 class QXMPP_EXPORT QXmppPubSubNodeConfig : public QXmppExtensibleDataFormBase
 {
 public:
+    struct Unset
+    {
+    };
+    struct Max
+    {
+    };
+    using ItemLimit = std::variant<Unset, uint64_t, Max>;
+
     enum AccessModel : uint8_t {
         Open,
         Presence,
@@ -140,8 +150,9 @@ public:
     QString language() const;
     void setLanguage(const QString &language);
 
-    std::optional<quint32> maxItems() const;
-    void setMaxItems(std::optional<quint32> maxItems);
+    ItemLimit maxItems() const;
+    void setMaxItems(ItemLimit maxItems);
+    inline void resetMaxItems() { setMaxItems(Unset()); }
 
     std::optional<quint32> maxPayloadSize() const;
     void setMaxPayloadSize(std::optional<quint32> maxPayloadSize);

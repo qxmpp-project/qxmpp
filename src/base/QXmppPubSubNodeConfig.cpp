@@ -60,6 +60,16 @@ static const auto ALLOW_SUBSCRIPTIONS = QStringLiteral("pubsub#subscribe");
 static const auto TITLE = QStringLiteral("pubsub#title");
 static const auto PAYLOAD_TYPE = QStringLiteral("pubsub#type");
 
+// helper for std::visit
+template<class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+// explicit deduction guide (not needed as of C++20)
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
 class QXmppPubSubNodeConfigPrivate : public QSharedData
 {
 public:
@@ -78,7 +88,7 @@ public:
     std::optional<quint32> itemExpiry;
     std::optional<QXmppPubSubNodeConfig::ItemPublisher> notificationItemPublisher;
     QString language;
-    std::optional<quint32> maxItems;
+    QXmppPubSubNodeConfig::ItemLimit maxItems;
     std::optional<quint32> maxPayloadSize;
     std::optional<QXmppPubSubNodeConfig::NodeType> nodeType;
     std::optional<QXmppPubSubNodeConfig::NotificationType> notificationType;
@@ -436,12 +446,12 @@ void QXmppPubSubNodeConfig::setLanguage(const QString &language)
     d->language = language;
 }
 
-std::optional<quint32> QXmppPubSubNodeConfig::maxItems() const
+QXmppPubSubNodeConfig::ItemLimit QXmppPubSubNodeConfig::maxItems() const
 {
     return d->maxItems;
 }
 
-void QXmppPubSubNodeConfig::setMaxItems(std::optional<quint32> maxItems)
+void QXmppPubSubNodeConfig::setMaxItems(ItemLimit maxItems)
 {
     d->maxItems = maxItems;
 }
@@ -663,7 +673,14 @@ bool QXmppPubSubNodeConfig::parseField(const QXmppDataForm::Field &field)
     } else if (key == LANGUAGE) {
         d->language = value.toString();
     } else if (key == MAX_ITEMS) {
-        d->maxItems = parseUInt(value);
+        bool ok = false;
+        if (const auto maxItems = value.toULongLong(&ok); ok) {
+            d->maxItems = maxItems;
+        } else if (value.type() == QVariant::String && value.toString() == QStringLiteral("max")) {
+            d->maxItems = Max();
+        } else {
+            d->maxItems = Unset();
+        }
     } else if (key == MAX_PAYLOAD_SIZE) {
         d->maxPayloadSize = parseUInt(value);
     } else if (key == NODE_TYPE) {
@@ -767,10 +784,15 @@ void QXmppPubSubNodeConfig::serializeForm(QXmppDataForm &form) const
                       Type::TextSingleField,
                       LANGUAGE,
                       d->language);
-    serializeOptionalNumber(form,
-                            Type::TextSingleField,
-                            MAX_ITEMS,
-                            d->maxItems);
+    std::visit(overloaded {
+                   [](Unset) {},
+                   [&](uint64_t value) {
+                       serializeValue(form, Type::TextSingleField, MAX_ITEMS, QString::number(value));
+                   },
+                   [&](Max) {
+                       serializeValue(form, Type::TextSingleField, MAX_ITEMS, QStringLiteral("max"));
+                   } },
+               d->maxItems);
     serializeOptionalNumber(form,
                             Type::TextSingleField,
                             MAX_PAYLOAD_SIZE,
