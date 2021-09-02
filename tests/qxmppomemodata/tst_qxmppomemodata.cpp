@@ -23,6 +23,7 @@
  */
 
 #include "QXmppOmemoDeviceElement.h"
+#include "QXmppOmemoDeviceList.h"
 
 #include "util.h"
 #include <QObject>
@@ -36,6 +37,9 @@ private slots:
     void testIsOmemoDeviceElement();
     void testOmemoDeviceElement_data();
     void testOmemoDeviceElement();
+    void testIsOmemoDeviceList_data();
+    void testIsOmemoDeviceList();
+    void testOmemoDeviceList();
 };
 
 void tst_QXmppOmemoData::testIsOmemoDeviceElement_data()
@@ -99,6 +103,64 @@ void tst_QXmppOmemoData::testOmemoDeviceElement()
     QCOMPARE(deviceElement2.id(), id);
     QCOMPARE(deviceElement2.label(), label);
     serializePacket(deviceElement2, xml);
+}
+
+void tst_QXmppOmemoData::testIsOmemoDeviceList_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<devices xmlns=\"urn:xmpp:omemo:1\"/>")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral("<devices xmlns=\"invalid\"/>")
+        << false;
+}
+
+void tst_QXmppOmemoData::testIsOmemoDeviceList()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    const QDomElement element = doc.documentElement();
+    QCOMPARE(QXmppOmemoDeviceList::isOmemoDeviceList(element), isValid);
+}
+
+void tst_QXmppOmemoData::testOmemoDeviceList()
+{
+    const QByteArray xml(QByteArrayLiteral(
+        "<devices xmlns=\"urn:xmpp:omemo:1\">"
+        "<device id=\"12345\"/>"
+        "<device id=\"4223\" label=\"Gajim on Ubuntu Linux\"/>"
+        "</devices>"));
+
+    QXmppOmemoDeviceElement deviceElement1;
+    deviceElement1.setId(12345);
+
+    QXmppOmemoDeviceElement deviceElement2;
+    deviceElement2.setId(4223);
+    deviceElement2.setLabel(QStringLiteral("Gajim on Ubuntu Linux"));
+
+    QXmppOmemoDeviceList deviceList1;
+    parsePacket(deviceList1, xml);
+    QCOMPARE(deviceList1.size(), 2);
+    QVERIFY(deviceList1.contains(deviceElement1));
+    QVERIFY(deviceList1.contains(deviceElement2));
+    serializePacket(deviceList1, xml);
+
+    QXmppOmemoDeviceList deviceList2;
+    deviceList2.append(deviceElement1);
+    deviceList2.append(deviceElement2);
+    QCOMPARE(deviceList2.size(), 2);
+    QVERIFY(deviceList2.contains(deviceElement1));
+    QVERIFY(deviceList2.contains(deviceElement2));
+    serializePacket(deviceList2, xml);
 }
 
 QTEST_MAIN(tst_QXmppOmemoData)
