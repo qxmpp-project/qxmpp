@@ -22,6 +22,7 @@
  *
  */
 
+#include "QXmppOmemoDeviceBundle.h"
 #include "QXmppOmemoDeviceElement.h"
 #include "QXmppOmemoDeviceList.h"
 
@@ -40,6 +41,9 @@ private slots:
     void testIsOmemoDeviceList_data();
     void testIsOmemoDeviceList();
     void testOmemoDeviceList();
+    void testIsOmemoDeviceBundle_data();
+    void testIsOmemoDeviceBundle();
+    void testOmemoDeviceBundle();
 };
 
 void tst_QXmppOmemoData::testIsOmemoDeviceElement_data()
@@ -161,6 +165,74 @@ void tst_QXmppOmemoData::testOmemoDeviceList()
     QVERIFY(deviceList2.contains(deviceElement1));
     QVERIFY(deviceList2.contains(deviceElement2));
     serializePacket(deviceList2, xml);
+}
+
+void tst_QXmppOmemoData::testIsOmemoDeviceBundle_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<bundle xmlns=\"urn:xmpp:omemo:1\"/>")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral("<bundle xmlns=\"invalid\"/>")
+        << false;
+}
+
+void tst_QXmppOmemoData::testIsOmemoDeviceBundle()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    const QDomElement element = doc.documentElement();
+    QCOMPARE(QXmppOmemoDeviceBundle::isOmemoDeviceBundle(element), isValid);
+}
+
+void tst_QXmppOmemoData::testOmemoDeviceBundle()
+{
+    const QByteArray xml(QByteArrayLiteral(
+        "<bundle xmlns=\"urn:xmpp:omemo:1\">"
+        "<ik>a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</ik>"
+        "<spk id=\"1\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</spk>"
+        "<spks>PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</spks>"
+        "<prekeys>"
+        "<pk id=\"1\">eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK</pk>"
+        "<pk id=\"2\">aDRHdkcxNDNYUmJSNWVObnNWd0RCSzE1QlVKVGQ1RVEK</pk>"
+        "</prekeys>"
+        "</bundle>"));
+
+    const QMap<uint32_t, QByteArray> expectedPublicPreKeys = {
+        { 1, QByteArray::fromBase64(QByteArrayLiteral("eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK")) },
+        { 2, QByteArray::fromBase64(QByteArrayLiteral("aDRHdkcxNDNYUmJSNWVObnNWd0RCSzE1QlVKVGQ1RVEK")) }
+    };
+
+    QXmppOmemoDeviceBundle deviceBundle1;
+    parsePacket(deviceBundle1, xml);
+    QCOMPARE(deviceBundle1.publicIdentityKey().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
+    QCOMPARE(deviceBundle1.signedPublicPreKeyId(), uint32_t(1));
+    QCOMPARE(deviceBundle1.signedPublicPreKey().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
+    QCOMPARE(deviceBundle1.signedPublicPreKeySignature().toBase64(), QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
+    QCOMPARE(deviceBundle1.publicPreKeys(), expectedPublicPreKeys);
+    serializePacket(deviceBundle1, xml);
+
+    QXmppOmemoDeviceBundle deviceBundle2;
+    deviceBundle2.setPublicIdentityKey(QByteArray::fromBase64(QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK")));
+    deviceBundle2.setSignedPublicPreKeyId(1);
+    deviceBundle2.setSignedPublicPreKey(QByteArray::fromBase64(QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK")));
+    deviceBundle2.setSignedPublicPreKeySignature(QByteArray::fromBase64(QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K")));
+    deviceBundle2.setPublicPreKeys(expectedPublicPreKeys);
+    QCOMPARE(deviceBundle2.publicIdentityKey().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
+    QCOMPARE(deviceBundle2.signedPublicPreKeyId(), uint32_t(1));
+    QCOMPARE(deviceBundle2.signedPublicPreKey().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
+    QCOMPARE(deviceBundle2.signedPublicPreKeySignature().toBase64(), QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
+    QCOMPARE(deviceBundle2.publicPreKeys(), expectedPublicPreKeys);
+    serializePacket(deviceBundle2, xml);
 }
 
 QTEST_MAIN(tst_QXmppOmemoData)
