@@ -29,7 +29,7 @@
 
 /// \cond
 QXmppPacket::QXmppPacket(const QXmppNonza &nonza)
-    : m_interface(new QFutureInterface<QXmpp::PacketState>(QFutureInterfaceBase::Started)),
+    : m_interface(std::make_shared<QFutureInterface<QXmpp::SendResult>>(QFutureInterfaceBase::Started)),
       m_isXmppStanza(nonza.isXmppStanza())
 {
     QXmlStreamWriter xmlStream(&m_data);
@@ -46,7 +46,7 @@ bool QXmppPacket::isXmppStanza() const
     return m_isXmppStanza;
 }
 
-QFuture<QXmpp::PacketState> QXmppPacket::future()
+QFuture<QXmpp::SendResult> QXmppPacket::future()
 {
     return m_interface->future();
 }
@@ -56,7 +56,7 @@ void QXmppPacket::reportFinished()
     m_interface->reportFinished();
 }
 
-void QXmppPacket::reportResult(QXmpp::PacketState result)
+void QXmppPacket::reportResult(const QXmpp::SendResult &result)
 {
     m_interface->reportResult(result);
 }

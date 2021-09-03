@@ -351,7 +351,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const Q
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::PacketState> QXmppRosterManager::subscribeTo(const QString &bareJid, const QString &reason)
+QFuture<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bareJid, const QString &reason)
 {
     QXmppPresence packet;
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
@@ -368,7 +368,7 @@ QFuture<QXmpp::PacketState> QXmppRosterManager::subscribeTo(const QString &bareJ
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::PacketState> QXmppRosterManager::unsubscribeFrom(const QString &bareJid, const QString &reason)
+QFuture<QXmpp::SendResult> QXmppRosterManager::unsubscribeFrom(const QString &bareJid, const QString &reason)
 {
     QXmppPresence packet;
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));

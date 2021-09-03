@@ -25,9 +25,11 @@
 #define QXMPPPACKET_H
 
 #include "QXmppGlobal.h"
+#include "QXmppSendResult.h"
+
+#include <memory>
 
 #include <QFutureInterface>
-#include <QSharedPointer>
 
 class QXmppNonza;
 
@@ -39,13 +41,13 @@ public:
     QByteArray data() const;
     bool isXmppStanza() const;
 
-    QFuture<QXmpp::PacketState> future();
+    QFuture<QXmpp::SendResult> future();
 
     void reportFinished();
-    void reportResult(QXmpp::PacketState);
+    void reportResult(const QXmpp::SendResult &);
 
 private:
-    QSharedPointer<QFutureInterface<QXmpp::PacketState>> m_interface;
+    std::shared_ptr<QFutureInterface<QXmpp::SendResult>> m_interface;
     QByteArray m_data;
     bool m_isXmppStanza;
 };

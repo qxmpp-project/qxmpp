@@ -197,7 +197,7 @@ public:
 
     void handleDisconnect();
     void handleStart();
-    void handlePacketSent(QXmppPacket &packet);
+    void handlePacketSent(QXmppPacket &packet, bool sentData);
     bool handleStanza(const QDomElement &stanza);
 
     void resetCache();

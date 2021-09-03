@@ -176,8 +176,9 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 {
-    // the first result is always reported immediately
-    return send(stanza).resultAt(0) != QXmpp::NotSent;
+    bool success;
+    send(stanza, success);
+    return success;
 }
 
 ///
@@ -185,13 +186,19 @@ bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::PacketState> QXmppStream::send(const QXmppNonza &stanza)
+QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza)
 {
-    QXmppPacket packet(stanza);
-    sendPacket(packet);
+    bool success;
+    return send(nonza, success);
+}
+
+QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza, bool &writtenToSocket)
+{
+    QXmppPacket packet(nonza);
+    writtenToSocket = sendData(packet.data());
 
     // handle stream management
-    d->streamManager.handlePacketSent(packet);
+    d->streamManager.handlePacketSent(packet, writtenToSocket);
 
     return packet.future();
 }
@@ -222,13 +229,13 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
 
     auto sendFuture = send(iq);
     if (sendFuture.isFinished()) {
-        if (sendFuture.result() == QXmpp::NotSent) {
+        if (std::holds_alternative<QXmpp::SendError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
             return makeReadyFuture<IqResult>(QXmpp::NotSent);
         }
     } else {
-        awaitLast(sendFuture, this, [this, id = iq.id()](QXmpp::PacketState result) {
-            if (result == QXmpp::NotSent) {
+        awaitLast(sendFuture, this, [this, id = iq.id()](QXmpp::SendResult result) {
+            if (std::holds_alternative<QXmpp::SendError>(result)) {
                 if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
                     itr.value().reportResult(QXmpp::NotSent);
                     itr.value().reportFinished();
@@ -424,15 +431,6 @@ void QXmppStream::processData(const QString &data)
     // process stream end
     if (hasStreamClose) {
         disconnectFromHost();
-    }
-}
-
-void QXmppStream::sendPacket(QXmppPacket &packet)
-{
-    if (sendData(packet.data())) {
-        packet.reportResult(QXmpp::Sent);
-    } else {
-        packet.reportResult(QXmpp::NotSent);
     }
 }
 
