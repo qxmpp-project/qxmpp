@@ -26,6 +26,7 @@
 #define QXMPPSTREAM_H
 
 #include "QXmppLogger.h"
+#include "QXmppSendResult.h"
 
 #include <variant>
 
@@ -56,7 +57,7 @@ public:
     virtual bool isConnected() const;
 
     bool sendPacket(const QXmppNonza &);
-    QFuture<QXmpp::PacketState> send(const QXmppNonza &);
+    QFuture<QXmpp::SendResult> send(const QXmppNonza &);
 
     using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
     QFuture<IqResult> sendIq(const QXmppIq &);
@@ -109,8 +110,8 @@ private:
     friend class tst_QXmppStream;
     friend class TestClient;
 
+    QFuture<QXmpp::SendResult> send(const QXmppNonza &, bool &);
     void processData(const QString &data);
-    void sendPacket(QXmppPacket &packet);
     bool handleIqResponse(const QDomElement &);
 
     QXmppStreamPrivate *const d;

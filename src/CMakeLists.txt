@@ -68,6 +68,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppResultSet.h
     base/QXmppRosterIq.h
     base/QXmppRpcIq.h
+    base/QXmppSendResult.h
     base/QXmppSessionIq.h
     base/QXmppSocks.h
     base/QXmppStanza.h

@@ -27,6 +27,7 @@
 #include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
 #include "QXmppPresence.h"
+#include "QXmppSendResult.h"
 
 #include <variant>
 
@@ -230,7 +231,7 @@ public:
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
-    QFuture<QXmpp::PacketState> send(const QXmppStanza &);
+    QFuture<QXmpp::SendResult> send(const QXmppStanza &);
     QFuture<IqResult> sendIq(const QXmppIq &);
     QFuture<EmptyResult> sendGenericIq(const QXmppIq &iq);
 

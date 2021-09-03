@@ -29,6 +29,7 @@
 #include "QXmppClientExtension.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
+#include "QXmppSendResult.h"
 
 #include <variant>
 
@@ -94,8 +95,8 @@ public:
     QFuture<Result> addRosterItem(const QString &bareJid, const QString &name = {}, const QSet<QString> &groups = {});
     QFuture<Result> removeRosterItem(const QString &bareJid);
     QFuture<Result> renameRosterItem(const QString &bareJid, const QString &name);
-    QFuture<QXmpp::PacketState> subscribeTo(const QString &bareJid, const QString &reason = {});
-    QFuture<QXmpp::PacketState> unsubscribeFrom(const QString &bareJid, const QString &reason = {});
+    QFuture<QXmpp::SendResult> subscribeTo(const QString &bareJid, const QString &reason = {});
+    QFuture<QXmpp::SendResult> unsubscribeFrom(const QString &bareJid, const QString &reason = {});
 
     /// \cond
     bool handleStanza(const QDomElement &element) override;
