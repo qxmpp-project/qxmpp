@@ -89,17 +89,6 @@ inline QLatin1String QXmppVersion()
 namespace QXmpp {
 
 ///
-/// The state of an outgoing packet.
-///
-/// \since QXmpp 1.5
-///
-enum PacketState : uint8_t {
-    Sent,          ///< The packet has been written to the socket.
-    Acknowledged,  ///< The packet has been acknowledged by the other peer using Stream Management.
-    NotSent,       ///< The packet could not be sent (e.g. connection broke or user disconnected).
-};
-
-///
 /// An empty struct indicating success in results.
 ///
 /// \since QXmpp 1.5

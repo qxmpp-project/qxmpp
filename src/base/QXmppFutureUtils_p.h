@@ -34,7 +34,8 @@
 // We mean it.
 //
 
-#include <QXmppIq.h>
+#include "QXmppIq.h"
+#include "QXmppSendResult.h"
 
 #include <memory>
 #include <variant>
@@ -147,10 +148,10 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
                               }
                               return convert(std::move(iq));
                           },
-                          [](QXmpp::PacketState) -> Result {
+                          [](QXmpp::SendError error) -> Result {
                               using Error = QXmppStanza::Error;
                               return Error(Error::Wait, Error::UndefinedCondition,
-                                           QStringLiteral("Couldn't send request: lost connection."));
+                                           QStringLiteral("Couldn't send request: ") + error.text);
                           },
                       },
                       sendResult);
