@@ -106,7 +106,7 @@ class QXMPP_EXPORT QXmppClient : public QXmppLoggable
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
-    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
+    using IqResult = std::variant<QDomElement, QXmpp::SendError>;
     using EmptyResult = std::variant<QXmpp::Success, QXmppStanza::Error>;
 
     /// An enumeration for type of error.

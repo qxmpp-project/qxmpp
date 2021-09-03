@@ -212,6 +212,8 @@ QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza, bool &writ
 ///
 QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
 {
+    using namespace QXmpp;
+
     if (iq.id().isEmpty()) {
         warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
         auto newIq = iq;
@@ -229,15 +231,15 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
 
     auto sendFuture = send(iq);
     if (sendFuture.isFinished()) {
-        if (std::holds_alternative<QXmpp::SendError>(sendFuture.result())) {
+        if (std::holds_alternative<SendError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
-            return makeReadyFuture<IqResult>(QXmpp::NotSent);
+            return makeReadyFuture<IqResult>(std::get<SendError>(sendFuture.result()));
         }
     } else {
-        awaitLast(sendFuture, this, [this, id = iq.id()](QXmpp::SendResult result) {
-            if (std::holds_alternative<QXmpp::SendError>(result)) {
+        awaitLast(sendFuture, this, [this, id = iq.id()](SendResult result) {
+            if (std::holds_alternative<SendError>(result)) {
                 if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
-                    itr.value().reportResult(QXmpp::NotSent);
+                    itr.value().reportResult(std::get<SendError>(result));
                     itr.value().reportFinished();
 
                     d->runningIqs.erase(itr);
@@ -252,14 +254,17 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
 }
 
 ///
-/// Cancels all ongoing IQ requests and reports QXmpp::NotSent.
+/// Cancels all ongoing IQ requests and reports QXmpp::SendError::Disconnected.
 ///
 /// \since QXmpp 1.5
 ///
 void QXmppStream::cancelOngoingIqs()
 {
     for (auto &state : d->runningIqs) {
-        state.reportResult(QXmpp::NotSent);
+        state.reportResult(QXmpp::SendError {
+            QStringLiteral("IQ has been cancelled."),
+            QXmpp::SendError::Disconnected
+        });
         state.reportFinished();
     }
     d->runningIqs.clear();

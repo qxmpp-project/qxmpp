@@ -59,7 +59,7 @@ public:
     bool sendPacket(const QXmppNonza &);
     QFuture<QXmpp::SendResult> send(const QXmppNonza &);
 
-    using IqResult = std::variant<QDomElement, QXmpp::PacketState>;
+    using IqResult = std::variant<QDomElement, QXmpp::SendError>;
     QFuture<IqResult> sendIq(const QXmppIq &);
     void cancelOngoingIqs();
 
