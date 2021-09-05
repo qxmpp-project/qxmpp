@@ -188,7 +188,7 @@ QFuture<QXmppPubSubManager::NodesResult> QXmppPubSubManager::fetchNodes(const QS
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
 
-    return chainIq(client()->sendIq(request), this, [](QXmppDiscoveryIq &&iq) -> NodesResult {
+    return chainIq(client()->sendIq(std::move(request)), this, [](QXmppDiscoveryIq &&iq) -> NodesResult {
         const auto items = iq.items();
         QVector<QString> nodes;
         for (const auto &item : items) {
@@ -223,7 +223,7 @@ auto QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName)
     request.setQueryNode(nodeName);
     request.setTo(jid);
 
-    return client()->sendGenericIq(request);
+    return client()->sendGenericIq(std::move(request));
 }
 
 ///
@@ -242,7 +242,7 @@ QFuture<QXmppPubSubManager::InstantNodeResult> QXmppPubSubManager::createInstant
     request.setQueryType(QXmppPubSubIq<>::Create);
     request.setTo(jid);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
         return iq.queryNode();
     });
@@ -263,7 +263,7 @@ auto QXmppPubSubManager::deleteNode(const QString &jid, const QString &nodeName)
     request.setQueryNode(nodeName);
     request.setTo(jid);
 
-    return client()->sendGenericIq(request);
+    return client()->sendGenericIq(std::move(request));
 }
 
 ///
@@ -283,7 +283,7 @@ auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName
     request.setItems({QXmppPubSubItem(itemId)});
     request.setTo(jid);
 
-    return client()->sendGenericIq(request);
+    return client()->sendGenericIq(std::move(request));
 }
 
 ///
@@ -302,7 +302,7 @@ auto QXmppPubSubManager::purgeItems(const QString &jid, const QString &nodeName)
     request.setQueryNode(nodeName);
     request.setTo(jid);
 
-    return client()->sendGenericIq(request);
+    return client()->sendGenericIq(std::move(request));
 }
 
 ///
@@ -331,7 +331,7 @@ QFuture<QXmppPubSubManager::SubscriptionsResult> QXmppPubSubManager::requestSubs
     request.setQueryType(QXmppPubSubIq<>::Subscriptions);
     request.setQueryNode(nodeName);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> SubscriptionsResult {
         return iq.subscriptions();
     });
@@ -355,7 +355,7 @@ QFuture<QXmppPubSubManager::AffiliationsResult> QXmppPubSubManager::requestNodeA
     request.setQueryType(QXmppPubSubIq<>::OwnerAffiliations);
     request.setQueryNode(nodeName);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> AffiliationsResult {
         return iq.affiliations();
     });
@@ -387,7 +387,7 @@ QFuture<QXmppPubSubManager::AffiliationsResult> QXmppPubSubManager::requestAffil
     request.setQueryType(QXmppPubSubIq<>::Affiliations);
     request.setQueryNode(nodeName);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> AffiliationsResult {
         return iq.affiliations();
     });
@@ -422,7 +422,7 @@ QFuture<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscribeO
     request.setQueryNode(nodeName);
     request.setQueryJid(subscriberJid);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> OptionsResult {
         if (const auto form = iq.dataForm()) {
             if (const auto options = QXmppPubSubSubscribeOptions::fromDataForm(*form)) {
@@ -469,7 +469,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(cons
     request.setDataForm(options);
     request.setQueryNode(nodeName);
     request.setQueryJid(subscriberJid);
-    return client()->sendGenericIq(request);
+    return client()->sendGenericIq(std::move(request));
 }
 
 ///
@@ -592,7 +592,7 @@ auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<Pub
     request.setType(QXmppIq::Set);
     request.setQueryType(QXmppPubSubIqBase::Publish);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> PublishItemResult {
         if (!iq.items().isEmpty()) {
             return iq.items().constFirst().id();
@@ -607,7 +607,7 @@ auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<Pu
     request.setType(QXmppIq::Set);
     request.setQueryType(QXmppPubSubIqBase::Publish);
 
-    return chainIq(client()->sendIq(request), this,
+    return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> PublishItemsResult {
         const auto itemToId = [](const QXmppPubSubItem &item) {
             return item.id();

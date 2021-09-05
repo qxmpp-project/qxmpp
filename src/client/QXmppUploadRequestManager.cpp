@@ -267,7 +267,7 @@ auto QXmppUploadRequestManager::requestSlot(const QString &fileName,
     iq.setSize(fileSize);
     iq.setContentType(mimeType);
 
-    return chainIq<SlotResult>(client()->sendIq(iq), this);
+    return chainIq<SlotResult>(client()->sendIq(std::move(iq)), this);
 }
 
 /// Returns true if an HTTP File Upload service has been discovered.

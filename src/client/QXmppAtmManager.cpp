@@ -515,5 +515,5 @@ QFuture<QXmpp::SendResult> QXmppAtmManager::sendTrustMessage(const QString &encr
     QXmppMessage message;
     message.setTo(recipientJid);
     message.setTrustMessageElement(trustMessageElement);
-    return client()->send(message);
+    return client()->send(std::move(message));
 }

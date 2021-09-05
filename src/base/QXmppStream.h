@@ -57,10 +57,10 @@ public:
     virtual bool isConnected() const;
 
     bool sendPacket(const QXmppNonza &);
-    QFuture<QXmpp::SendResult> send(const QXmppNonza &);
+    QFuture<QXmpp::SendResult> send(QXmppNonza &&);
 
     using IqResult = std::variant<QDomElement, QXmpp::SendError>;
-    QFuture<IqResult> sendIq(const QXmppIq &);
+    QFuture<IqResult> sendIq(QXmppIq &&);
     void cancelOngoingIqs();
 
     void resetPacketCache();
@@ -110,7 +110,7 @@ private:
     friend class tst_QXmppStream;
     friend class TestClient;
 
-    QFuture<QXmpp::SendResult> send(const QXmppNonza &, bool &);
+    QFuture<QXmpp::SendResult> send(QXmppNonza &&, bool &);
     void processData(const QString &data);
     bool handleIqResponse(const QDomElement &);
 
