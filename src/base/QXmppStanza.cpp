@@ -700,10 +700,10 @@ void QXmppStanza::parse(const QDomElement &element)
     }
 }
 
-void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const
+void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter, QXmpp::SceMode sceMode) const
 {
     // XEP-0033: Extended Stanza Addressing
-    if (!d->extendedAddresses.isEmpty()) {
+    if (sceMode & QXmpp::ScePublic && !d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
         xmlWriter->writeDefaultNamespace(ns_extended_addressing);
         for (const auto &address : d->extendedAddresses)

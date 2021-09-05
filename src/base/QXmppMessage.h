@@ -28,10 +28,10 @@
 
 #include "QXmppStanza.h"
 
+#include <optional>
+
 // Required for source compatibility
 #include <QDateTime>
-
-#include <optional>
 
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
@@ -268,13 +268,14 @@ public:
     void setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement);
 
     /// \cond
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
+    void parse(const QDomElement &element) override final;
+    virtual void parse(const QDomElement &element, QXmpp::SceMode);
+    void toXml(QXmlStreamWriter *writer) const override final;
+    virtual void toXml(QXmlStreamWriter *writer, QXmpp::SceMode) const;
     /// \endcond
 
-protected:
-    virtual bool parseExtension(const QDomElement &element);
-    virtual void serializeExtensions(QXmlStreamWriter *writer) const;
+    virtual bool parseExtension(const QDomElement &element, QXmpp::SceMode);
+    virtual void serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode, const QString &baseNamespace = {}) const;
 
 private:
     QSharedDataPointer<QXmppMessagePrivate> d;

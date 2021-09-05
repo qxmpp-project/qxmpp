@@ -78,8 +78,8 @@ protected:
     /// \cond
     static bool isPubSubEvent(const QDomElement &element, std::function<bool(const QDomElement &)> isItemValid);
 
-    bool parseExtension(const QDomElement &element) override;
-    void serializeExtensions(QXmlStreamWriter *writer) const override;
+    bool parseExtension(const QDomElement &element, QXmpp::SceMode) override;
+    void serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode, const QString &baseNamespace) const override;
 
     virtual void parseItems(const QDomElement &) = 0;
     virtual void serializeItems(QXmlStreamWriter *writer) const = 0;

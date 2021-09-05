@@ -89,6 +89,32 @@ inline QLatin1String QXmppVersion()
 namespace QXmpp {
 
 ///
+/// Parsing/serialization mode when using Stanza Content Encryption.
+///
+/// \sa \xep{0420, Stanza Content Encryption}
+///
+/// \since QXmpp 1.5
+///
+enum SceMode : uint8_t {
+    SceAll,         ///< Processes all known elements.
+    ScePublic,      ///< Only processes 'public' elements (e.g. needed for routing).
+    SceSensitive,   ///< Only processes sensitive elements that should be encrypted.
+};
+
+///
+/// Checks whether a mode is enabled.
+///
+/// When an SceMode is given you can use this to check whether Public or Private
+/// elements are enabled.
+///
+/// \since QXmpp 1.5
+///
+inline constexpr bool operator&(SceMode mode1, SceMode mode2)
+{
+    return mode1 == SceAll || mode1 == mode2;
+}
+
+///
 /// An empty struct indicating success in results.
 ///
 /// \since QXmpp 1.5
