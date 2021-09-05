@@ -29,6 +29,7 @@
 #include "QXmppSendResult.h"
 
 #include <variant>
+#include <memory>
 
 #include <QAbstractSocket>
 #include <QObject>
@@ -36,6 +37,8 @@
 class QDomElement;
 template<typename T>
 class QFuture;
+template<typename T>
+class QFutureInterface;
 class QSslSocket;
 class QXmppIq;
 class QXmppNonza;
@@ -58,10 +61,13 @@ public:
 
     bool sendPacket(const QXmppNonza &);
     QFuture<QXmpp::SendResult> send(QXmppNonza &&);
+    QFuture<QXmpp::SendResult> send(QXmppPacket &&);
 
     using IqResult = std::variant<QDomElement, QXmpp::SendError>;
     QFuture<IqResult> sendIq(QXmppIq &&);
+    QFuture<IqResult> sendIq(QXmppPacket &&, const QString &id);
     void cancelOngoingIqs();
+    bool hasIqId(const QString &id) const;
 
     void resetPacketCache();
 
@@ -110,7 +116,7 @@ private:
     friend class tst_QXmppStream;
     friend class TestClient;
 
-    QFuture<QXmpp::SendResult> send(QXmppNonza &&, bool &);
+    QFuture<QXmpp::SendResult> send(QXmppPacket &&, bool &);
     void processData(const QString &data);
     bool handleIqResponse(const QDomElement &);
 

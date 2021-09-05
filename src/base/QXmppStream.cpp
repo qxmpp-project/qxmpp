@@ -172,13 +172,13 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 /// Sends an XMPP packet to the peer.
 ///
-/// \param stanza
+/// \param nonza
 ///
-bool QXmppStream::sendPacket(const QXmppNonza &stanza)
+bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 {
     bool success;
-//    send(stanza, success);
-    return false;
+    send(nonza, success);
+    return success;
 }
 
 ///
@@ -189,12 +189,24 @@ bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
 {
     bool success;
-    return send(std::move(nonza), success);
+    return send(QXmppPacket(nonza), success);
 }
 
-QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza, bool &writtenToSocket)
+///
+/// Sends an XMPP packet to the peer.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet)
 {
-    QXmppPacket packet(nonza);
+    bool success;
+    return send(std::move(packet), success);
+}
+
+QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writtenToSocket)
+{
+    // the writtenToSocket parameter is just for backwards compat (see
+    // QXmppStream::sendPacket())
     writtenToSocket = sendData(packet.data());
 
     // handle stream management
@@ -225,8 +237,28 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
 
-    const auto id = iq.id();
-    auto sendFuture = send(std::move(iq));
+    return sendIq(QXmppPacket(iq), iq.id());
+}
+
+///
+/// Sends an IQ packet and returns the response asynchronously.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const QString &id)
+{
+    using namespace QXmpp;
+
+    if (id.isEmpty() || d->runningIqs.contains(id)) {
+        return makeReadyFuture<IqResult>(QXmpp::SendError {
+            QStringLiteral("Invalid IQ id: empty or in use."),
+            SendError::Disconnected
+        });
+    }
+
+    auto sendFuture = send(std::move(packet));
     if (sendFuture.isFinished()) {
         if (std::holds_alternative<SendError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
@@ -246,7 +278,7 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
     }
 
     IqState interface(IqState::Started);
-    d->runningIqs.insert(iq.id(), interface);
+    d->runningIqs.insert(id, interface);
     return interface.future();
 }
 
@@ -265,6 +297,16 @@ void QXmppStream::cancelOngoingIqs()
         state.reportFinished();
     }
     d->runningIqs.clear();
+}
+
+///
+/// Returns whether the IQ ID is currently in use.
+///
+/// \since QXmpp 1.5
+///
+bool QXmppStream::hasIqId(const QString &id) const
+{
+    return d->runningIqs.contains(id);
 }
 
 ///

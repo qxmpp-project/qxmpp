@@ -36,7 +36,9 @@ class QXmppNonza;
 class QXmppPacket
 {
 public:
-    QXmppPacket(const QXmppNonza &);
+    QXmppPacket(const QXmppNonza &nonza);
+    QXmppPacket(const QXmppNonza &nonza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>>);
+    QXmppPacket(const QByteArray &data, bool isXmppStanza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>>);
 
     QByteArray data() const;
     bool isXmppStanza() const;
