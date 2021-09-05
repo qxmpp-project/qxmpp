@@ -308,9 +308,11 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     return true;
 }
 
-bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement)
+bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp::SceMode sceMode)
 {
-    if (eventElement.tagName() == QStringLiteral("event") && eventElement.namespaceURI() == ns_pubsub_event) {
+    if (sceMode & QXmpp::SceSensitive &&
+            eventElement.tagName() == QStringLiteral("event") &&
+            eventElement.namespaceURI() == ns_pubsub_event) {
         // check that the query type is valid
         const auto eventTypeElement = eventElement.firstChildElement();
         if (const auto index = PUBSUB_EVENTS.indexOf(eventTypeElement.tagName());
@@ -370,14 +372,20 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement)
         }
     } else {
         // handles QXmppMessage default extensions
-        return QXmppMessage::parseExtension(eventElement);
+        return QXmppMessage::parseExtension(eventElement, sceMode);
     }
 
     return true;
 }
 
-void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer) const
+void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode sceMode, const QString &baseNamespace) const
 {
+    QXmppMessage::serializeExtensions(writer, sceMode, baseNamespace);
+
+    if (!(sceMode & QXmpp::SceSensitive)) {
+        return;
+    }
+
     writer->writeStartElement(QStringLiteral("event"));
     writer->writeDefaultNamespace(ns_pubsub_event);
 
@@ -434,7 +442,5 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer) const
         writer->writeEndElement();  // close event's type element
     }
     writer->writeEndElement();  // </event>
-
-    QXmppMessage::serializeExtensions(writer);
 }
 /// \endcond

@@ -225,7 +225,7 @@ public:
     void parse(const QDomElement &element) override;
 
 protected:
-    void extensionsToXml(QXmlStreamWriter *writer) const;
+    void extensionsToXml(QXmlStreamWriter *writer, QXmpp::SceMode = QXmpp::SceAll) const;
     void generateAndSetNextId();
     /// \endcond
 

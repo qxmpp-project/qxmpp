@@ -678,8 +678,8 @@ void tst_QXmppMessage::testPrivateMessage()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
-        "<body>My lord, dispatch; read o&apos;er these articles.</body>"
         "<private xmlns=\"urn:xmpp:carbons:2\"/>"
+        "<body>My lord, dispatch; read o&apos;er these articles.</body>"
         "</message>");
 
     QXmppMessage message;
@@ -763,11 +763,11 @@ void tst_QXmppMessage::testMix()
         "<message to=\"hag66@shakespeare.example\" "
         "from=\"coven@mix.shakespeare.example/123456\" "
         "type=\"groupchat\">"
-        "<body>Harpier cries: &apos;tis time, &apos;tis time.</body>"
         "<mix xmlns=\"urn:xmpp:mix:core:1\">"
         "<jid>hag66@shakespeare.example</jid>"
         "<nick>thirdwitch</nick>"
         "</mix>"
+        "<body>Harpier cries: &apos;tis time, &apos;tis time.</body>"
         "</message>");
 
     QXmppMessage message;
@@ -788,8 +788,8 @@ void tst_QXmppMessage::testEme()
     // test standard encryption: OMEMO
     const QByteArray xmlOmemo(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<body>This message is encrypted with OMEMO, but your client doesn&apos;t seem to support that.</body>"
         "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
+        "<body>This message is encrypted with OMEMO, but your client doesn&apos;t seem to support that.</body>"
         "</message>");
 
     QXmppMessage messageOmemo;
@@ -802,8 +802,8 @@ void tst_QXmppMessage::testEme()
     // test custom encryption
     const QByteArray xmlCustom(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<body>This message is encrypted with CustomCrypt, but your client doesn&apos;t seem to support that.</body>"
         "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"im:example:customcrypt:1\" name=\"CustomCrypt\"/>"
+        "<body>This message is encrypted with CustomCrypt, but your client doesn&apos;t seem to support that.</body>"
         "</message>");
 
     QXmppMessage messageCustom;
@@ -872,11 +872,11 @@ void tst_QXmppMessage::testProcessingHints()
         "<message to=\"juliet@capulet.lit/laptop\" "
         "from=\"romeo@montague.lit/laptop\" "
         "type=\"chat\">"
-        "<body>V unir avtug&apos;f pybnx gb uvqr zr sebz gurve fvtug</body>"
         "<no-permanent-store xmlns=\"urn:xmpp:hints\"/>"
         "<no-store xmlns=\"urn:xmpp:hints\"/>"
         "<no-copy xmlns=\"urn:xmpp:hints\"/>"
         "<store xmlns=\"urn:xmpp:hints\"/>"
+        "<body>V unir avtug&apos;f pybnx gb uvqr zr sebz gurve fvtug</body>"
         "</message>");
 
     // test parsing
