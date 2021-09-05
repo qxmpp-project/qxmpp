@@ -231,9 +231,9 @@ public:
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
-    QFuture<QXmpp::SendResult> send(const QXmppStanza &);
-    QFuture<IqResult> sendIq(const QXmppIq &);
-    QFuture<EmptyResult> sendGenericIq(const QXmppIq &iq);
+    QFuture<QXmpp::SendResult> send(QXmppStanza &&);
+    QFuture<IqResult> sendIq(QXmppIq &&);
+    QFuture<EmptyResult> sendGenericIq(QXmppIq &&);
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")

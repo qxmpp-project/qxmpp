@@ -284,7 +284,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QStr
     QXmppRosterIq iq;
     iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(iq);
+    return client()->sendGenericIq(std::move(iq));
 }
 
 ///
@@ -306,7 +306,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const Q
     QXmppRosterIq iq;
     iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(iq);
+    return client()->sendGenericIq(std::move(iq));
 }
 
 ///
@@ -340,7 +340,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const Q
     QXmppRosterIq iq;
     iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(iq);
+    return client()->sendGenericIq(std::move(iq));
 }
 
 ///
@@ -357,7 +357,7 @@ QFuture<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bareJi
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Subscribe);
     packet.setStatusText(reason);
-    return client()->send(packet);
+    return client()->send(std::move(packet));
 }
 
 ///
@@ -374,7 +374,7 @@ QFuture<QXmpp::SendResult> QXmppRosterManager::unsubscribeFrom(const QString &ba
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Unsubscribe);
     packet.setStatusText(reason);
-    return client()->send(packet);
+    return client()->send(std::move(packet));
 }
 
 ///

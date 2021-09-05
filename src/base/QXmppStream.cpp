@@ -177,8 +177,8 @@ bool QXmppStream::sendData(const QByteArray &data)
 bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 {
     bool success;
-    send(stanza, success);
-    return success;
+//    send(stanza, success);
+    return false;
 }
 
 ///
@@ -186,13 +186,13 @@ bool QXmppStream::sendPacket(const QXmppNonza &stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza)
+QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
 {
     bool success;
-    return send(nonza, success);
+    return send(std::move(nonza), success);
 }
 
-QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza, bool &writtenToSocket)
+QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza, bool &writtenToSocket)
 {
     QXmppPacket packet(nonza);
     writtenToSocket = sendData(packet.data());
@@ -210,33 +210,30 @@ QFuture<QXmpp::SendResult> QXmppStream::send(const QXmppNonza &nonza, bool &writ
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppStream::IqResult> QXmppStream::sendIq(const QXmppIq &iq)
+QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
 {
     using namespace QXmpp;
 
     if (iq.id().isEmpty()) {
         warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
-        auto newIq = iq;
-        newIq.setId(QXmppUtils::generateStanzaUuid());
-        return sendIq(newIq);
+        iq.setId(QXmppUtils::generateStanzaUuid());
     }
     if (d->runningIqs.contains(iq.id())) {
         warning(QStringLiteral("QXmppStream::sendIq() error:"
                                "The IQ's ID (\"%1\") is already in use. Using random ID.")
                     .arg(iq.id()));
-        auto newIq = iq;
-        newIq.setId(QXmppUtils::generateStanzaUuid());
-        return sendIq(newIq);
+        iq.setId(QXmppUtils::generateStanzaUuid());
     }
 
-    auto sendFuture = send(iq);
+    const auto id = iq.id();
+    auto sendFuture = send(std::move(iq));
     if (sendFuture.isFinished()) {
         if (std::holds_alternative<SendError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
             return makeReadyFuture<IqResult>(std::get<SendError>(sendFuture.result()));
         }
     } else {
-        awaitLast(sendFuture, this, [this, id = iq.id()](SendResult result) {
+        awaitLast(sendFuture, this, [this, id](SendResult result) {
             if (std::holds_alternative<SendError>(result)) {
                 if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
                     itr.value().reportResult(std::get<SendError>(result));

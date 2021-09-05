@@ -339,9 +339,9 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 /// You can use QFutureWatcher in Qt 5 and QFuture::then() in Qt 6 to handle the
 /// results.
 ///
-QFuture<QXmpp::SendResult> QXmppClient::send(const QXmppStanza &stanza)
+QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 {
-    return d->stream->send(stanza);
+    return d->stream->send(std::move(stanza));
 }
 
 ///
@@ -355,9 +355,9 @@ QFuture<QXmpp::SendResult> QXmppClient::send(const QXmppStanza &stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::IqResult> QXmppClient::sendIq(const QXmppIq &iq)
+QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq)
 {
-    return d->stream->sendIq(iq);
+    return d->stream->sendIq(std::move(iq));
 }
 
 ///
@@ -373,10 +373,10 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(const QXmppIq &iq)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(const QXmppIq &iq)
+QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq)
 {
     using namespace QXmpp::Private;
-    return chainIq(sendIq(iq), this, [](const QXmppIq &) -> EmptyResult {
+    return chainIq(sendIq(std::move(iq)), this, [](const QXmppIq &) -> EmptyResult {
         return QXmpp::Success();
     });
 }
