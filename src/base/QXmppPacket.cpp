@@ -27,13 +27,31 @@
 #include <QFuture>
 #include <QXmlStreamWriter>
 
+inline QByteArray serialize(const QXmppNonza &nonza)
+{
+    QByteArray out;
+    QXmlStreamWriter xmlStream(&out);
+    nonza.toXml(&xmlStream);
+    return out;
+}
+
 /// \cond
 QXmppPacket::QXmppPacket(const QXmppNonza &nonza)
-    : m_interface(std::make_shared<QFutureInterface<QXmpp::SendResult>>(QFutureInterfaceBase::Started)),
-      m_isXmppStanza(nonza.isXmppStanza())
+    : QXmppPacket(nonza, std::make_shared<QFutureInterface<QXmpp::SendResult>>())
 {
-    QXmlStreamWriter xmlStream(&m_data);
-    nonza.toXml(&xmlStream);
+}
+
+QXmppPacket::QXmppPacket(const QXmppNonza &nonza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>> interface)
+    : QXmppPacket(serialize(nonza), nonza.isXmppStanza(), std::move(interface))
+{
+}
+
+QXmppPacket::QXmppPacket(const QByteArray &data, bool isXmppStanza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>> interface)
+    : m_interface(std::move(interface)),
+      m_data(data),
+      m_isXmppStanza(isXmppStanza)
+{
+    m_interface->reportStarted();
 }
 
 QByteArray QXmppPacket::data() const
