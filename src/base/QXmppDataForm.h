@@ -119,10 +119,8 @@ public:
             TextSingleField
         };
 
-        // ### QXmpp2: merge ctors
-        Field(QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField);
-        Field(QXmppDataForm::Field::Type type,
-              const QString &key,
+        Field(Type type = TextSingleField,
+              const QString &key = {},
               const QVariant &value = {},
               bool isRequired = false,
               const QString &label = {},
@@ -190,10 +188,8 @@ public:
                  ///< or the data is a generic data set.
     };
 
-    // ### QXmpp2: merge ctors
-    QXmppDataForm(QXmppDataForm::Type type = QXmppDataForm::None);
-    QXmppDataForm(QXmppDataForm::Type type,
-                  const QList<Field> &fields,
+    QXmppDataForm(Type type = None,
+                  const QList<Field> &fields = {},
                   const QString &title = {},
                   const QString &instructions = {});
     QXmppDataForm(const QXmppDataFormBase &based);

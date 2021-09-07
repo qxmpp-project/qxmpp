@@ -338,15 +338,6 @@ public:
 ///
 
 ///
-/// Constructs a QXmppDataForm::Field of the specified \a type.
-///
-QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type)
-    : d(new QXmppDataFormFieldPrivate)
-{
-    d->type = type;
-}
-
-///
 /// Constructs a QXmppDataForm::Field with the specified attributes.
 ///
 /// \since QXmpp 1.3
@@ -658,15 +649,6 @@ public:
 /// The QXmppDataForm class represents a data form as defined by \xep{0004,
 /// Data Forms}.
 ///
-
-///
-/// Constructs a QXmppDataForm of the specified \a type.
-///
-QXmppDataForm::QXmppDataForm(Type type)
-    : d(new QXmppDataFormPrivate)
-{
-    d->type = type;
-}
 
 ///
 /// Constructs a QXmppDataForm with the specified attributes.
