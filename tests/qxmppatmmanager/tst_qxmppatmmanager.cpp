@@ -52,6 +52,7 @@ private slots:
     void testMakePostponedTrustDecisions();
     void testDistrustAutomaticallyTrustedKeys();
     void testDistrust();
+    void testAuthenticate_data();
     void testAuthenticate();
     void testMakeTrustDecisions();
     void testHandleMessage_data();
@@ -448,9 +449,23 @@ void tst_QXmppAtmManager::testDistrust()
                     distrustedKeys) }));
 }
 
+void tst_QXmppAtmManager::testAuthenticate_data()
+{
+    QTest::addColumn<QXmppTrustStorage::SecurityPolicy>("securityPolicy");
+
+    QTest::newRow("noSecurityPolicy")
+        << QXmppTrustStorage::NoSecurityPolicy;
+
+    QTest::newRow("toakafa")
+        << QXmppTrustStorage::Toakafa;
+}
+
 void tst_QXmppAtmManager::testAuthenticate()
 {
     clearTrustStorage();
+
+    QFETCH(QXmppTrustStorage::SecurityPolicy, securityPolicy);
+    m_trustStorage->setSecurityPolicies(ns_omemo, securityPolicy);
 
     QMultiHash<QString, QString> authenticatedKeys = { { QStringLiteral("alice@example.org"),
                                                          QStringLiteral("ad020bd9a95bb924758b4e84640a75b99f37f3351e120188ab6c21c2edecf998") },
@@ -615,25 +630,53 @@ void tst_QXmppAtmManager::testAuthenticate()
                                { QStringLiteral("carol@example.net"),
                                  QStringLiteral("f82419945cb175e4c681b3dbcbb62fbd94f760855c222fb513c3799d273a4130") } };
 
-    automaticallyDistrustedKeys = { { QStringLiteral("alice@example.org"),
-                                      QStringLiteral("b5fb24aee735c5c7c2f952b3baabcb65425565c7195ff3e0e63f3cba4a6e6363") },
-                                    { QStringLiteral("bob@example.com"),
-                                      QStringLiteral("fddaafd3e44dc8520f74c42227b99210958a544c45794044bd35f13ada883038") } };
+    if (securityPolicy == QXmppTrustStorage::NoSecurityPolicy) {
+        automaticallyDistrustedKeys = { { QStringLiteral("alice@example.org"),
+                                          QStringLiteral("b5fb24aee735c5c7c2f952b3baabcb65425565c7195ff3e0e63f3cba4a6e6363") } };
+
+        automaticallyTrustedKeys = { { QStringLiteral("bob@example.com"),
+                                       QStringLiteral("fddaafd3e44dc8520f74c42227b99210958a544c45794044bd35f13ada883038") } };
+    } else if (securityPolicy == QXmppTrustStorage::Toakafa) {
+        automaticallyDistrustedKeys = { { QStringLiteral("alice@example.org"),
+                                          QStringLiteral("b5fb24aee735c5c7c2f952b3baabcb65425565c7195ff3e0e63f3cba4a6e6363") },
+                                        { QStringLiteral("bob@example.com"),
+                                          QStringLiteral("fddaafd3e44dc8520f74c42227b99210958a544c45794044bd35f13ada883038") } };
+    }
 
     future = m_trustStorage->keys(ns_omemo);
     QVERIFY(future.isFinished());
     result = future.result();
-    QCOMPARE(
-        result,
-        QHash({ std::pair(
-                    QXmppTrustStorage::Authenticated,
-                    authenticatedKeys),
-                std::pair(
-                    QXmppTrustStorage::ManuallyDistrusted,
-                    manuallyDistrustedKeys),
-                std::pair(
-                    QXmppTrustStorage::AutomaticallyDistrusted,
-                    automaticallyDistrustedKeys) }));
+    switch (securityPolicy) {
+    case QXmppTrustStorage::NoSecurityPolicy:
+        QCOMPARE(
+            result,
+            QHash({ std::pair(
+                        QXmppTrustStorage::Authenticated,
+                        authenticatedKeys),
+                    std::pair(
+                        QXmppTrustStorage::AutomaticallyTrusted,
+                        automaticallyTrustedKeys),
+                    std::pair(
+                        QXmppTrustStorage::ManuallyDistrusted,
+                        manuallyDistrustedKeys),
+                    std::pair(
+                        QXmppTrustStorage::AutomaticallyDistrusted,
+                        automaticallyDistrustedKeys) }));
+        break;
+    case QXmppTrustStorage::Toakafa:
+        QCOMPARE(
+            result,
+            QHash({ std::pair(
+                        QXmppTrustStorage::Authenticated,
+                        authenticatedKeys),
+                    std::pair(
+                        QXmppTrustStorage::ManuallyDistrusted,
+                        manuallyDistrustedKeys),
+                    std::pair(
+                        QXmppTrustStorage::AutomaticallyDistrusted,
+                        automaticallyDistrustedKeys) }));
+        break;
+    }
 
     auto futurePostponed = m_trustStorage->keysForPostponedTrustDecisions(ns_omemo,
                                                                           { QStringLiteral("470c88ff79bd978c208eef4976e1716f930426f04d4437cf7e8d44c219750c42"),
