@@ -34,7 +34,16 @@ class QXMPP_EXPORT QXmppTrustStorage
 {
 public:
     ///
-    /// trust level of public long-term keys used by end-to-end encryption
+    /// Security policy to decide which public long-term keys are used for
+    /// encryption because they are trusted
+    ///
+    enum SecurityPolicy {
+        NoSecurityPolicy,  ///< New keys must be trusted manually.
+        Toakafa,           ///< New keys are trusted automatically until the first authentication but automatically distrusted afterwards.
+    };
+
+    ///
+    /// Trust level of public long-term keys used by end-to-end encryption
     /// protocols
     ///
     enum TrustLevel {
@@ -45,6 +54,9 @@ public:
         Authenticated = 16,           ///< The key is authenticated (e.g., by QR code scanning or ATM).
     };
     Q_DECLARE_FLAGS(TrustLevels, TrustLevel)
+
+    virtual QFuture<void> setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = SecurityPolicy::NoSecurityPolicy) = 0;
+    virtual QFuture<SecurityPolicy> securityPolicy(const QString &encryption) = 0;
 
     virtual QFuture<void> addOwnKey(const QString &encryption, const QString &keyId) = 0;
     virtual QFuture<void> removeOwnKey(const QString &encryption) = 0;
@@ -64,6 +76,7 @@ public:
     virtual QFuture<QHash<bool, QMultiHash<QString, QString>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds = {}) = 0;
 };
 
+Q_DECLARE_METATYPE(QXmppTrustStorage::SecurityPolicy)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppTrustStorage::TrustLevels)
 
 #endif  // QXMPPTRUSTSTORAGE_H
