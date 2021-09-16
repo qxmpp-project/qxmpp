@@ -33,6 +33,30 @@
 ///
 
 ///
+/// \fn QXmppTrustStorage::setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = SecurityPolicy::NoSecurityPolicy)
+///
+/// Sets the security policy for an encryption protocol or resets the set
+/// security policies.
+///
+/// If securityPolicy is not passed, the set security policy for encryption is
+/// reset.
+/// If also encryption is not passed, all set security policies are reset.
+///
+/// \param encryption encryption protocol namespace
+/// \param securityPolicy security policy being applied
+///
+
+///
+/// \fn QXmppTrustStorage::securityPolicy(const QString &encryption)
+///
+/// Returns the security policy for an encryption protocol.
+///
+/// \param encryption encryption protocol namespace
+///
+/// \return the set security policy
+///
+
+///
 /// \fn QXmppTrustStorage::addOwnKey(const QString &encryption, const QString &keyId)
 ///
 /// Adds an own key (i.e., the key used by this client instance).
