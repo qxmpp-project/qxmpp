@@ -52,6 +52,13 @@ using namespace QXmpp::Private;
 /// QXmppTrustStorage *trustStorage = new QXmppTrustMemoryStorage;
 /// \endcode
 ///
+/// You can set a security policy used by ATM via the trust manager.
+/// Is is recommended to apply TOAKAFA for good security and usability when
+/// using \xep{0384, OMEMO Encryption}:
+/// \code
+/// trustStorage->setSecurityPolicy("urn:xmpp:omemo:1", QXmppTrustStorage::Toakafa);
+/// \endcode
+///
 /// Afterwards, this manager must be added with the storage:
 /// \code
 /// QXmppAtmManager *manager = new QXmppAtmManager(trustStorage);
@@ -402,13 +409,20 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
     } else {
         auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
         await(future, this, [=]() {
-            auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
-            await(future, this, [=]() {
+            if (m_trustStorage->securityPolicy(encryption) == QXmppTrustStorage::Toakafa) {
+                auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
+                await(future, this, [=]() {
+                    auto future = makePostponedTrustDecisions(encryption, keyIds.values());
+                    await(future, this, [=]() {
+                        interface->reportFinished();
+                    });
+                });
+            } else {
                 auto future = makePostponedTrustDecisions(encryption, keyIds.values());
                 await(future, this, [=]() {
                     interface->reportFinished();
                 });
-            });
+            }
         });
     }
 
