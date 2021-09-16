@@ -72,6 +72,9 @@ struct UnprocessedKey
 class QXmppTrustMemoryStoragePrivate
 {
 public:
+    // encryption protocols mapped to security policies
+    QMap<QString, QXmppTrustStorage::SecurityPolicy> securityPolicies;
+
     // encryption protocols mapped to keys of this client instance
     QMap<QString, QString> ownKeys;
 
@@ -89,6 +92,24 @@ public:
 QXmppTrustMemoryStorage::QXmppTrustMemoryStorage()
     : d(new QXmppTrustMemoryStoragePrivate)
 {
+}
+
+QFuture<void> QXmppTrustMemoryStorage::setSecurityPolicies(const QString &encryption, const QXmppTrustStorage::SecurityPolicy securityPolicy)
+{
+    if (encryption.isEmpty()) {
+        d->securityPolicies.clear();
+    } else if (securityPolicy == QXmppTrustStorage::NoSecurityPolicy) {
+        d->securityPolicies.remove(encryption);
+    } else {
+        d->securityPolicies.insert(encryption, securityPolicy);
+    }
+
+    return makeReadyFuture();
+}
+
+QFuture<QXmppTrustStorage::SecurityPolicy> QXmppTrustMemoryStorage::securityPolicy(const QString &encryption)
+{
+    return makeReadyFuture(std::move(d->securityPolicies.value(encryption)));
 }
 
 QXmppTrustMemoryStorage::~QXmppTrustMemoryStorage() = default;
