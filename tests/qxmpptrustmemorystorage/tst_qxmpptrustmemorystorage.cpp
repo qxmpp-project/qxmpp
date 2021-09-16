@@ -33,6 +33,7 @@ class tst_QXmppTrustMemoryStorage : public QObject
     Q_OBJECT
 
 private slots:
+    void testSecurityPolicies();
     void testOwnKeys();
     void testKeys();
     void testTrustLevels();
@@ -41,6 +42,41 @@ private slots:
 private:
     QXmppTrustMemoryStorage m_trustStorage;
 };
+
+void tst_QXmppTrustMemoryStorage::testSecurityPolicies()
+{
+    auto future = m_trustStorage.securityPolicy(ns_ox);
+    QVERIFY(future.isFinished());
+    auto result = future.result();
+    QCOMPARE(result, QXmppTrustStorage::NoSecurityPolicy);
+
+    m_trustStorage.setSecurityPolicies(ns_ox, QXmppTrustStorage::Toakafa);
+    m_trustStorage.setSecurityPolicies(ns_omemo, QXmppTrustStorage::Toakafa);
+
+    future = m_trustStorage.securityPolicy(ns_ox);
+    QVERIFY(future.isFinished());
+    result = future.result();
+    QCOMPARE(result, QXmppTrustStorage::Toakafa);
+
+    future = m_trustStorage.securityPolicy(ns_omemo);
+    QVERIFY(future.isFinished());
+    result = future.result();
+    QCOMPARE(result, QXmppTrustStorage::Toakafa);
+
+    m_trustStorage.setSecurityPolicies(ns_ox);
+
+    future = m_trustStorage.securityPolicy(ns_ox);
+    QVERIFY(future.isFinished());
+    result = future.result();
+    QCOMPARE(result, QXmppTrustStorage::NoSecurityPolicy);
+
+    m_trustStorage.setSecurityPolicies();
+
+    future = m_trustStorage.securityPolicy(ns_omemo);
+    QVERIFY(future.isFinished());
+    result = future.result();
+    QCOMPARE(result, QXmppTrustStorage::NoSecurityPolicy);
+}
 
 void tst_QXmppTrustMemoryStorage::testOwnKeys()
 {

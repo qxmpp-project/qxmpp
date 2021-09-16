@@ -38,6 +38,9 @@ public:
     ~QXmppTrustMemoryStorage();
 
     /// \cond
+    QFuture<void> setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = QXmppTrustStorage::NoSecurityPolicy) override;
+    QFuture<SecurityPolicy> securityPolicy(const QString &encryption) override;
+
     QFuture<void> addOwnKey(const QString &encryption, const QString &keyId) override;
     QFuture<void> removeOwnKey(const QString &encryption) override;
     QFuture<QString> ownKey(const QString &encryption) const override;
