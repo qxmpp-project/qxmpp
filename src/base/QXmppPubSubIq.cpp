@@ -632,18 +632,18 @@ void QXmppPubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
             };
 
             // make sure form type is 'submit'
-            form->setType(QXmppDataForm::Submit);
+            form->setType(type() == QXmppIq::Result ? QXmppDataForm::Result : QXmppDataForm::Submit);
 
             switch (d->queryType) {
             case Create:
-                writeForm(writer, *d->dataForm, QStringLiteral("configure"));
+                writeForm(writer, *form, QStringLiteral("configure"));
                 break;
             case Publish:
-                writeForm(writer, *d->dataForm, QStringLiteral("publish-options"));
+                writeForm(writer, *form, QStringLiteral("publish-options"));
                 break;
             case Subscribe:
             case Subscription:
-                writeForm(writer, *d->dataForm, QStringLiteral("options"));
+                writeForm(writer, *form, QStringLiteral("options"));
                 break;
             default:
                 break;
