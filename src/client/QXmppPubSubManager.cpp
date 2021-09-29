@@ -473,6 +473,8 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(cons
 }
 
 ///
+/// \fn QXmppPubSubManager::createPepNode
+///
 /// Creates an empty PEP node with the default configuration.
 ///
 /// This is a convenience method equivalent to calling
@@ -485,11 +487,9 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(cons
 /// \param nodeName the name of the PEP node to be created
 /// \return
 ///
-auto QXmppPubSubManager::createPepNode(const QString &nodeName) -> QFuture<Result>
-{
-    return createNode(client()->configuration().jidBare(), nodeName);
-}
 
+///
+/// \fn QXmppPubSubManager::deletePepNode
 ///
 /// Deletes a PEP node.
 ///
@@ -500,11 +500,9 @@ auto QXmppPubSubManager::createPepNode(const QString &nodeName) -> QFuture<Resul
 /// items
 /// \return
 ///
-auto QXmppPubSubManager::deletePepNode(const QString &nodeName) -> QFuture<Result>
-{
-    return deleteNode(client()->configuration().jidBare(), nodeName);
-}
 
+///
+/// \fn QXmppPubSubManager::retractPepItem
 ///
 /// Deletes an item from a PEP node.
 ///
@@ -515,11 +513,9 @@ auto QXmppPubSubManager::deletePepNode(const QString &nodeName) -> QFuture<Resul
 /// \param itemId the ID of the item to delete
 /// \return
 ///
-auto QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId) -> QFuture<Result>
-{
-    return retractItem(client()->configuration().jidBare(), nodeName, itemId);
-}
 
+///
+/// \fn QXmppPubSubManager::purgePepItems
 ///
 /// Purges all items from a PEP node.
 ///
@@ -530,10 +526,6 @@ auto QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &
 /// items
 /// \return
 ///
-auto QXmppPubSubManager::purgePepItems(const QString &nodeName) -> QFuture<Result>
-{
-    return purgeItems(client()->configuration().jidBare(), nodeName);
-}
 
 /// \cond
 QStringList QXmppPubSubManager::discoveryFeatures() const
