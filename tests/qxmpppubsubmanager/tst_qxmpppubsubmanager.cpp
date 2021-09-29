@@ -82,7 +82,9 @@ private:
     Q_SLOT void testFetchNodes();
     Q_SLOT void testCreateNodes_data();
     Q_SLOT void testCreateNodes();
+    Q_SLOT void testCreateNodeWithConfig();
     Q_SLOT void testCreateInstantNode();
+    Q_SLOT void testCreateInstantNodeWithConfig();
     Q_SLOT void testDeleteNodes_data();
     Q_SLOT void testDeleteNodes();
     Q_SLOT void testPublishItems_data();
@@ -170,6 +172,27 @@ void tst_QXmppPubSubManager::testCreateNodes()
     expectFutureVariant<QXmpp::Success>(future);
 }
 
+void tst_QXmppPubSubManager::testCreateNodeWithConfig()
+{
+    auto [test, psManager] = Client();
+    QXmppPubSubNodeConfig config;
+    config.setTitle("Princely Musings (Atom)");
+    auto future = psManager->createNode("pubsub.qxmpp.org", "princely_musings", config);
+    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='set'>"
+                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                "<create node='princely_musings'/>"
+                "<configure>"
+                "<x xmlns='jabber:x:data' type='submit'>"
+                "<field type='hidden' var='FORM_TYPE'><value>http://jabber.org/protocol/pubsub#node_config</value></field>"
+                "<field type='text-single' var='pubsub#title'><value>Princely Musings (Atom)</value></field>"
+                "</x>"
+                "</configure>"
+                "</pubsub>"
+                "</iq>");
+    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
 void tst_QXmppPubSubManager::testCreateInstantNode()
 {
     TestClient test;
@@ -185,6 +208,30 @@ void tst_QXmppPubSubManager::testCreateInstantNode()
 
     const auto nodeId = expectFutureVariant<QString>(future);
     QCOMPARE(nodeId, QString("25e3d37dabbab9541f7523321421edc5bfeb2dae"));
+}
+
+void tst_QXmppPubSubManager::testCreateInstantNodeWithConfig()
+{
+    auto [test, psManager] = Client();
+    QXmppPubSubNodeConfig config;
+    config.setTitle("Princely Musings (Atom)");
+    auto future = psManager->createInstantNode("pubsub.qxmpp.org", config);
+    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='set'>"
+                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                "<create/>"
+                "<configure>"
+                "<x xmlns='jabber:x:data' type='submit'>"
+                "<field type='hidden' var='FORM_TYPE'><value>http://jabber.org/protocol/pubsub#node_config</value></field>"
+                "<field type='text-single' var='pubsub#title'><value>Princely Musings (Atom)</value></field>"
+                "</x>"
+                "</configure>"
+                "</pubsub>"
+                "</iq>");
+    test.inject<QString>("<iq type='result' from='pubsub.qxmpp.org' id='qxmpp1'>"
+                         "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                         "<create node='25e3d37dabbab9541f7523321421edc5bfeb2dae'/>"
+                         "</pubsub></iq>");
+    QCOMPARE(expectFutureVariant<QString>(future), QStringLiteral("25e3d37dabbab9541f7523321421edc5bfeb2dae"));
 }
 
 void tst_QXmppPubSubManager::testDeleteNodes_data()

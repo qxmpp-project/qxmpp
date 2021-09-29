@@ -70,7 +70,9 @@ public:
     // Generic PubSub (the PubSub service is the given entity)
     QFuture<NodesResult> fetchNodes(const QString &jid);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName);
+    QFuture<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);
     QFuture<InstantNodeResult> createInstantNode(const QString &jid);
+    QFuture<InstantNodeResult> createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config);
     QFuture<Result> deleteNode(const QString &jid, const QString &nodeName);
     template<typename T = QXmppPubSubItem>
     QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
@@ -103,6 +105,7 @@ public:
 
     // PEP-specific (the PubSub service is the current account)
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
+    inline QFuture<Result> createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
     inline QFuture<Result> deletePepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
     template<typename T>
     QFuture<PublishItemResult> publishPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
