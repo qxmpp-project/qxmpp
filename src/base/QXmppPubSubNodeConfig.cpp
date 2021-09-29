@@ -93,7 +93,7 @@ public:
     std::optional<QXmppPubSubNodeConfig::NodeType> nodeType;
     std::optional<QXmppPubSubNodeConfig::NotificationType> notificationType;
     std::optional<bool> configNotificationsEnabled;
-    std::optional<bool> nodeDeleteNotificationsEnabled;
+    std::optional<bool> deleteNotificationsEnabled;
     std::optional<bool> retractNotificationsEnabled;
     std::optional<bool> subNotificationsEnabled;
     std::optional<bool> persistItems;
@@ -496,14 +496,14 @@ void QXmppPubSubNodeConfig::setConfigNotificationsEnabled(std::optional<bool> co
     d->configNotificationsEnabled = configNotificationsEnabled;
 }
 
-std::optional<bool> QXmppPubSubNodeConfig::nodeDeleteNotificationsEnabled() const
+std::optional<bool> QXmppPubSubNodeConfig::deleteNotificationsEnabled() const
 {
-    return d->nodeDeleteNotificationsEnabled;
+    return d->deleteNotificationsEnabled;
 }
 
-void QXmppPubSubNodeConfig::setNodeDeleteNotificationsEnabled(std::optional<bool> nodeDeleteNotificationsEnabled)
+void QXmppPubSubNodeConfig::setDeleteNotificationsEnabled(std::optional<bool> nodeDeleteNotificationsEnabled)
 {
-    d->nodeDeleteNotificationsEnabled = nodeDeleteNotificationsEnabled;
+    d->deleteNotificationsEnabled = nodeDeleteNotificationsEnabled;
 }
 
 std::optional<bool> QXmppPubSubNodeConfig::retractNotificationsEnabled() const
@@ -690,7 +690,7 @@ bool QXmppPubSubNodeConfig::parseField(const QXmppDataForm::Field &field)
     } else if (key == CONFIG_NOTIFICATIONS_ENABLED) {
         d->configNotificationsEnabled = parseBool(value);
     } else if (key == NODE_DELETE_NOTIFICATIONS_ENABLED) {
-        d->nodeDeleteNotificationsEnabled = parseBool(value);
+        d->deleteNotificationsEnabled = parseBool(value);
     } else if (key == RETRACT_NOTIFICATIONS_ENABLED) {
         d->retractNotificationsEnabled = parseBool(value);
     } else if (key == SUB_NOTIFICATIONS_ENABLED) {
@@ -812,7 +812,7 @@ void QXmppPubSubNodeConfig::serializeForm(QXmppDataForm &form) const
     serializeOptional(form,
                       Type::BooleanField,
                       NODE_DELETE_NOTIFICATIONS_ENABLED,
-                      d->nodeDeleteNotificationsEnabled);
+                      d->deleteNotificationsEnabled);
     serializeOptional(form,
                       Type::BooleanField,
                       RETRACT_NOTIFICATIONS_ENABLED,
