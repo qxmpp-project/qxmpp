@@ -98,8 +98,8 @@ public:
     QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid);
 
     // PEP-specific (the PubSub service is the current account)
-    QFuture<Result> createPepNode(const QString &nodeName);
-    QFuture<Result> deletePepNode(const QString &nodeName);
+    inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
+    inline QFuture<Result> deletePepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
     template<typename T>
     QFuture<PublishItemResult> publishPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>
@@ -108,8 +108,8 @@ public:
     QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>
     QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QVector<T> &items);
-    QFuture<Result> retractPepItem(const QString &nodeName, const QString &itemId);
-    QFuture<Result> purgePepItems(const QString &nodeName);
+    inline QFuture<Result> retractPepItem(const QString &nodeName, const QString &itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
+    inline QFuture<Result> purgePepItems(const QString &nodeName) { return purgeItems(client()->configuration().jidBare(), nodeName); }
 
     /// \cond
     QStringList discoveryFeatures() const override;
@@ -210,7 +210,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
 {
     QXmppPubSubIq<T> request;
     request.setTo(jid);
-    request.setItems({item});
+    request.setItems({ item });
     request.setQueryNode(nodeName);
     return publishItem(std::move(request));
 }
@@ -235,7 +235,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
 {
     QXmppPubSubIq<T> request;
     request.setTo(jid);
-    request.setItems({item});
+    request.setItems({ item });
     request.setQueryNode(nodeName);
     request.setDataForm(publishOptions.toDataForm());
     return publishItem(std::move(request));
@@ -339,4 +339,4 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishPepIt
     return publishItems(client()->configuration().jidBare(), nodeName, items);
 }
 
-#endif // QXMPPPUBSUBMANAGER_H
+#endif  // QXMPPPUBSUBMANAGER_H
