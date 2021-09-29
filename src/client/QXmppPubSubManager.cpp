@@ -234,6 +234,30 @@ auto QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName)
 }
 
 ///
+/// Creates an empty pubsub node with a custom configuration.
+///
+/// Calling this before QXmppPubSubManager::publishItems is usually not
+/// necessary when publishing to a node for the first time if the service
+/// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to be created
+/// \param config The configuration for the node
+/// \return
+///
+auto QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config) -> QFuture<Result>
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIq<>::Create);
+    request.setQueryNode(nodeName);
+    request.setTo(jid);
+    request.setDataForm(config);
+
+    return client()->sendGenericIq(std::move(request));
+}
+
+///
 /// Creates an instant pubsub node with the default configuration.
 ///
 /// The pubsub service automatically generates a random node name. On success
@@ -248,6 +272,30 @@ QFuture<QXmppPubSubManager::InstantNodeResult> QXmppPubSubManager::createInstant
     request.setType(QXmppIq::Set);
     request.setQueryType(QXmppPubSubIq<>::Create);
     request.setTo(jid);
+
+    return chainIq(client()->sendIq(std::move(request)), this,
+                   [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
+        return iq.queryNode();
+    });
+}
+
+///
+/// Creates an instant pubsub node with a custom configuration.
+///
+/// The pubsub service automatically generates a random node name. On success
+/// it is returned via the QFuture.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param config The configuration for the node
+/// \return
+///
+auto QXmppPubSubManager::createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config) -> QFuture<InstantNodeResult>
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIq<>::Create);
+    request.setTo(jid);
+    request.setDataForm(config);
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
@@ -561,7 +609,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(
 }
 
 ///
-/// \fn QXmppPubSubManager::createPepNode
+/// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName)
 ///
 /// Creates an empty PEP node with the default configuration.
 ///
@@ -573,6 +621,23 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(
 /// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
 ///
 /// \param nodeName the name of the PEP node to be created
+/// \return
+///
+
+///
+/// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config)
+///
+/// Creates an empty PEP node with a custom configuration.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::createNode on the current account's bare JID.
+///
+/// Calling this before QXmppPubSubManager::publishPepItems is usually not
+/// necessary when publishing to a node for the first time if the service
+/// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
+///
+/// \param nodeName the name of the PEP node to be created
+/// \param config The configuration for the node
 /// \return
 ///
 
