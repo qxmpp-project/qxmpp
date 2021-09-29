@@ -166,8 +166,8 @@ public:
     std::optional<bool> configNotificationsEnabled() const;
     void setConfigNotificationsEnabled(std::optional<bool> configNotificationsEnabled);
 
-    std::optional<bool> nodeDeleteNotificationsEnabled() const;
-    void setNodeDeleteNotificationsEnabled(std::optional<bool> nodeDeleteNotificationsEnabled);
+    std::optional<bool> deleteNotificationsEnabled() const;
+    void setDeleteNotificationsEnabled(std::optional<bool> nodeDeleteNotificationsEnabled);
 
     std::optional<bool> retractNotificationsEnabled() const;
     void setRetractNotificationsEnabled(std::optional<bool> retractNotificationsEnabled);
