@@ -67,6 +67,12 @@ public:
     uint m_events = 0;
 };
 
+struct Client
+{
+    TestClient test;
+    PSManager *psManager = test.addNewExtension<PSManager>();
+};
+
 class tst_QXmppPubSubManager : public QObject
 {
     Q_OBJECT
@@ -94,6 +100,9 @@ private:
     Q_SLOT void testRequestOptions();
     Q_SLOT void testRequestOptionsError();
     Q_SLOT void testSetOptions();
+    Q_SLOT void testRequestNodeConfig();
+    Q_SLOT void testConfigureNode();
+    Q_SLOT void testCancelConfig();
     Q_SLOT void testEventNotifications_data();
     Q_SLOT void testEventNotifications();
 };
@@ -760,6 +769,113 @@ void tst_QXmppPubSubManager::testSetOptions()
                 "</x></options></pubsub></iq>");
     test.inject<QString>("<iq id='qxmpp1' type='result'/>");
 
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testRequestNodeConfig()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestNodeConfiguration("pubsub.qxmpp.org", "tune");
+    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='get'>"
+                "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+                "<configure node='tune'/>"
+                "</pubsub>"
+                "</iq>");
+    test.inject<QString>("<iq id='qxmpp1' type='result'>"
+                         "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+                         "<configure node='princely_musings'>"
+                         "<x xmlns='jabber:x:data' type='form'>"
+                         "<field var='FORM_TYPE' type='hidden'><value>http://jabber.org/protocol/pubsub#node_config</value></field>"
+                         "<field var='pubsub#title' type='text-single' label='A friendly name for the node'/>"
+                         "<field var='pubsub#deliver_notifications' type='boolean' label='Whether to deliver event notifications'><value>true</value></field>"
+                         "<field var='pubsub#deliver_payloads' type='boolean' label='Whether to deliver payloads with event notifications'><value>true</value></field>"
+                         "<field var='pubsub#dataform_xslt' type='text-single' label='Payload XSLT'/>"
+                         "</x>"
+                         "</configure>"
+                         "</pubsub>"
+                         "</iq>");
+
+    const auto form = expectFutureVariant<QXmppPubSubNodeConfig>(future);
+    QCOMPARE(form.title(), QString());
+    QVERIFY(form.notificationsEnabled().has_value());
+    QCOMPARE(form.notificationsEnabled().value_or(false), true);
+    QVERIFY(form.dataFormXslt().isNull());
+}
+
+void tst_QXmppPubSubManager::testConfigureNode()
+{
+    auto [test, psManager] = Client();
+
+    QXmppPubSubNodeConfig config;
+    config.setTitle("Princely Musings (Atom)");
+    config.setNotificationsEnabled(true);
+    config.setIncludePayloads(true);
+    config.setPersistItems(true);
+    config.setMaxItems(10ULL);
+    config.setItemExpiry(604800);
+    config.setAccessModel(QXmppPubSubNodeConfig::Roster);
+    config.setAllowedRosterGroups({ "friends", "servants", "courtiers" });
+    config.setPublishModel(QXmppPubSubNodeConfig::Publishers);
+    config.setPurgeWhenOffline(false);
+    config.setSendLastItem(QXmppPubSubNodeConfig::Never);
+    config.setPresenceBasedNotifications(false);
+    config.setNotificationType(QXmppPubSubNodeConfig::Headline);
+    config.setConfigNotificationsEnabled(false);
+    config.setDeleteNotificationsEnabled(false);
+    config.setRetractNotificationsEnabled(false);
+    config.setSubNotificationsEnabled(false);
+    config.setMaxPayloadSize(1028);
+    config.setPayloadType("http://www.w3.org/2005/Atom");
+    config.setBodyXslt("http://jabxslt.jabberstudio.org/atom_body.xslt");
+
+    auto future = psManager->configureNode("pubsub.qxmpp.org", "princely_musings", config);
+    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='set'>"
+                "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+                "<configure node='princely_musings'>"
+                "<x xmlns='jabber:x:data' type='submit'>"
+                "<field type='hidden' var='FORM_TYPE'><value>http://jabber.org/protocol/pubsub#node_config</value></field>"
+                "<field type=\"list-single\" var='pubsub#access_model'><value>roster</value></field>"
+                "<field type=\"text-single\" var='pubsub#body_xslt'><value>http://jabxslt.jabberstudio.org/atom_body.xslt</value></field>"
+                "<field type=\"boolean\" var='pubsub#deliver_notifications'><value>1</value></field>"
+                "<field type=\"boolean\" var='pubsub#deliver_payloads'><value>1</value></field>"
+                "<field type=\"text-single\" var='pubsub#item_expire'><value>604800</value></field>"
+                "<field type=\"text-single\" var='pubsub#max_items'><value>10</value></field>"
+                "<field type=\"text-single\" var='pubsub#max_payload_size'><value>1028</value></field>"
+                "<field type=\"list-single\" var='pubsub#notification_type'><value>headline</value></field>"
+                "<field type=\"boolean\" var='pubsub#notify_config'><value>0</value></field>"
+                "<field type=\"boolean\" var='pubsub#notify_delete'><value>0</value></field>"
+                "<field type=\"boolean\" var='pubsub#notify_retract'><value>0</value></field>"
+                "<field type=\"boolean\" var='pubsub#notify_sub'><value>0</value></field>"
+                "<field type=\"boolean\" var='pubsub#persist_items'><value>1</value></field>"
+                "<field type=\"boolean\" var='pubsub#presence_based_delivery'><value>0</value></field>"
+                "<field type=\"list-single\" var='pubsub#publish_model'><value>publishers</value></field>"
+                "<field type=\"boolean\" var='pubsub#purge_offline'><value>0</value></field>"
+                "<field type=\"list-multi\" var='pubsub#roster_groups_allowed'><value>friends</value><value>servants</value><value>courtiers</value></field>"
+                "<field type=\"list-single\" var='pubsub#send_last_published_item'><value>never</value></field>"
+                "<field type=\"text-single\" var='pubsub#title'><value>Princely Musings (Atom)</value></field>"
+                "<field type=\"text-single\" var='pubsub#type'><value>http://www.w3.org/2005/Atom</value></field>"
+                "</x>"
+                "</configure>"
+                "</pubsub>"
+                "</iq>");
+    test.inject<QString>("<iq type='result' from='pubsub.shakespeare.lit' id='qxmpp1'/>");
+
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testCancelConfig()
+{
+    auto [test, psManager] = Client();
+    auto future = psManager->cancelNodeConfiguration("pubsub.qxmpp.org", "nodeee");
+    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='set'>"
+                "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+                "<configure node='nodeee'>"
+                "<x xmlns='jabber:x:data' type='cancel'/>"
+                "</configure>"
+                "</pubsub>"
+                "</iq>");
+    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
     expectFutureVariant<QXmpp::Success>(future);
 }
 

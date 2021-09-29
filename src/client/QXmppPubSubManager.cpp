@@ -24,18 +24,18 @@
 
 #include "QXmppPubSubManager.h"
 
-#include <QDomElement>
-#include <QFutureInterface>
-
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppPubSubItem.h"
-#include "QXmppPubSubEventManager.h"
-#include "QXmppPubSubSubscription.h"
 #include "QXmppPubSubAffiliation.h"
+#include "QXmppPubSubEventManager.h"
+#include "QXmppPubSubItem.h"
 #include "QXmppPubSubSubscribeOptions.h"
+#include "QXmppPubSubSubscription.h"
 #include "QXmppStanza.h"
 #include "QXmppUtils.h"
+
+#include <QDomElement>
+#include <QFutureInterface>
 
 using namespace QXmpp::Private;
 
@@ -156,6 +156,13 @@ using namespace QXmpp::Private;
 ///
 /// Contains the current subscribe options (QXmppPubSubSubscribeOptions) or the
 /// returned IQ error (QXmppStanza::Error).
+///
+
+///
+/// \typedef QXmppPubSubManager::NodeConfigResult
+///
+/// Contains a node configuration (QXmppPubSubNodeConfig) or the returned IQ
+/// error (QXmppStanza::Error).
 ///
 
 ///
@@ -280,7 +287,7 @@ auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName
     request.setType(QXmppIq::Set);
     request.setQueryType(QXmppPubSubIq<>::Retract);
     request.setQueryNode(nodeName);
-    request.setItems({QXmppPubSubItem(itemId)});
+    request.setItems({ QXmppPubSubItem(itemId) });
     request.setTo(jid);
 
     return client()->sendGenericIq(std::move(request));
@@ -473,6 +480,87 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(cons
 }
 
 ///
+/// Requests the node configuration and starts the configuration process.
+///
+/// Requires owner privileges. If the result is successful (a node config form
+/// has been returned) this starts the configuration process. The next step is
+/// to call configureNode() or cancelNodeConfiguration().
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \return
+///
+/// \sa configureNode()
+/// \sa cancelNodeConfiguration()
+///
+QFuture<QXmppPubSubManager::NodeConfigResult> QXmppPubSubManager::requestNodeConfiguration(const QString &service, const QString &nodeName)
+{
+    using Error = QXmppStanza::Error;
+
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Get);
+    request.setTo(service);
+    request.setQueryNode(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Configure);
+
+    return chainIq(client()->sendIq(std::move(request)), this,
+                   [](QXmppPubSubIq<> &&iq) -> NodeConfigResult {
+                       if (const auto dataForm = iq.dataForm()) {
+                           if (const auto config = QXmppPubSubNodeConfig::fromDataForm(*dataForm)) {
+                               return *config;
+                           }
+                           return Error(Error::Cancel, Error::UndefinedCondition, QStringLiteral("Server returned invalid data form."));
+                       }
+                       return Error(Error::Cancel, Error::UndefinedCondition, QStringLiteral("Server returned no data form."));
+                   });
+}
+
+///
+/// Sets a node configuration.
+///
+/// Requires owner privileges. You can use requestNodeConfiguration() to receive
+/// a data form with all valid options and default values.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \param config
+/// \return
+///
+/// \sa requestNodeConfiguration()
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::configureNode(const QString &service, const QString &nodeName, const QXmppPubSubNodeConfig &config)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setTo(service);
+    request.setQueryNode(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Configure);
+    request.setDataForm(config);
+    return client()->sendGenericIq(std::move(request));
+}
+
+///
+/// Cancels the configuration process and uses the default or exisiting
+/// configuration.
+///
+/// \param service JID of the pubsub service
+/// \param nodeName Name of the pubsub node on the service
+/// \return
+///
+/// \sa requestNodeConfiguration()
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(const QString &service, const QString &nodeName)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setTo(service);
+    request.setQueryNode(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Configure);
+    request.setDataForm(QXmppDataForm(QXmppDataForm::Cancel));
+    return client()->sendGenericIq(std::move(request));
+}
+
+///
 /// \fn QXmppPubSubManager::createPepNode
 ///
 /// Creates an empty PEP node with the default configuration.
@@ -527,6 +615,48 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(cons
 /// \return
 ///
 
+///
+/// \fn QXmppPubSubManager::requestPepNodeConfiguration
+///
+/// Requests the node configuration and starts the configuration process.
+///
+/// This is a convenience method equivalent to calling
+/// requestNodeConfiguration() the current account's bare JID.
+///
+/// \param nodeName Name of the pubsub node on the service
+/// \return
+///
+/// \sa configurePepNode()
+/// \sa cancelPepNodeConfiguration()
+///
+
+///
+/// \fn QXmppPubSubManager::configurePepNode
+///
+/// Sets a node configuration.
+///
+/// This is a convenience method equivalent to calling configureNode() the
+/// current account's bare JID.
+///
+/// \param nodeName Name of the pubsub node on the service
+/// \param config
+/// \return
+///
+/// \sa requestPepNodeConfiguration()
+///
+
+///
+/// \fn QXmppPubSubManager::cancelPepNodeConfiguration
+///
+/// This is a convenience method equivalent to calling cancelNodeConfiguration()
+/// the current account's bare JID.
+///
+/// \param nodeName Name of the pubsub node on the service
+/// \return
+///
+/// \sa requestPepNodeConfiguration()
+///
+
 /// \cond
 QStringList QXmppPubSubManager::discoveryFeatures() const
 {
@@ -549,7 +679,7 @@ bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 
             const auto extensions = client()->extensions();
             for (auto *extension : extensions) {
-                if (auto *eventManager = qobject_cast<QXmppPubSubEventManager*>(extension)) {
+                if (auto *eventManager = qobject_cast<QXmppPubSubEventManager *>(extension)) {
                     if (eventManager->handlePubSubEvent(element, service, node)) {
                         return true;
                     }

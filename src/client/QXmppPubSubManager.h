@@ -62,6 +62,7 @@ public:
     using SubscriptionsResult = std::variant<QVector<QXmppPubSubSubscription>, QXmppStanza::Error>;
     using AffiliationsResult = std::variant<QVector<QXmppPubSubAffiliation>, QXmppStanza::Error>;
     using OptionsResult = std::variant<QXmppPubSubSubscribeOptions, QXmppStanza::Error>;
+    using NodeConfigResult = std::variant<QXmppPubSubNodeConfig, QXmppStanza::Error>;
 
     QXmppPubSubManager();
     ~QXmppPubSubManager();
@@ -96,6 +97,9 @@ public:
     QFuture<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName, const QString &subscriberJid);
     QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options);
     QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid);
+    QFuture<NodeConfigResult> requestNodeConfiguration(const QString &service, const QString &nodeName);
+    QFuture<Result> configureNode(const QString &service, const QString &nodeName, const QXmppPubSubNodeConfig &config);
+    QFuture<Result> cancelNodeConfiguration(const QString &service, const QString &nodeName);
 
     // PEP-specific (the PubSub service is the current account)
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
@@ -110,6 +114,9 @@ public:
     QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QVector<T> &items);
     inline QFuture<Result> retractPepItem(const QString &nodeName, const QString &itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
     inline QFuture<Result> purgePepItems(const QString &nodeName) { return purgeItems(client()->configuration().jidBare(), nodeName); }
+    inline QFuture<NodeConfigResult> requestPepNodeConfiguration(const QString &nodeName) { return requestNodeConfiguration(client()->configuration().jidBare(), nodeName); }
+    inline QFuture<Result> configurePepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return configureNode(client()->configuration().jidBare(), nodeName, config); }
+    inline QFuture<Result> cancelPepNodeConfiguration(const QString &nodeName) { return cancelNodeConfiguration(client()->configuration().jidBare(), nodeName); }
 
     /// \cond
     QStringList discoveryFeatures() const override;
