@@ -277,7 +277,9 @@ void tst_QXmppPubSubManager::testPublishItems()
     }();
     const auto publishOptionsXml = [&]() -> QString {
         if (publishOptions) {
-            return "<publish-options>" + QString::fromUtf8(packetToXml(publishOptions->toDataForm())) + "</publish-options>";
+            auto form = publishOptions->toDataForm();
+            form.setType(QXmppDataForm::Submit);
+            return "<publish-options>" + QString::fromUtf8(packetToXml(form)) + "</publish-options>";
         }
         return {};
     }();
