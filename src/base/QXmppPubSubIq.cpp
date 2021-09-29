@@ -607,8 +607,17 @@ void QXmppPubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
         case OwnerDefault:
         case Options:
             if (auto form = d->dataForm) {
-                // make sure data form type is submit
-                form->setType(QXmppDataForm::Submit);
+                // make sure data form type is correct
+                switch (type()) {
+                case QXmppIq::Result:
+                    form->setType(QXmppDataForm::Result);
+                    break;
+                default:
+                    if (form->type() != QXmppDataForm::Cancel) {
+                        form->setType(QXmppDataForm::Submit);
+                    }
+                    break;
+                }
                 form->toXml(writer);
             }
             break;
