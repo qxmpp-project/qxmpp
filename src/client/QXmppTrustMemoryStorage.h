@@ -43,15 +43,15 @@ public:
 
     QFuture<void> addOwnKey(const QString &encryption, const QString &keyId) override;
     QFuture<void> removeOwnKey(const QString &encryption) override;
-    QFuture<QString> ownKey(const QString &encryption) const override;
+    QFuture<QString> ownKey(const QString &encryption) override;
 
     QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIds, TrustLevel trustLevel = TrustLevel::AutomaticallyDistrusted) override;
     QFuture<void> removeKeys(const QString &encryption = {}, const QList<QString> &keyIds = {}) override;
-    QFuture<QHash<TrustLevel, QMultiHash<QString, QString>>> keys(const QString &encryption, TrustLevels trustLevels = {}) const override;
+    QFuture<QHash<TrustLevel, QMultiHash<QString, QString>>> keys(const QString &encryption, TrustLevels trustLevels = {}) override;
 
     QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QString> &keyIds, const TrustLevel trustLevel) override;
     QFuture<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, const TrustLevel oldTrustLevel, const TrustLevel newTrustLevel) override;
-    QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyId) const override;
+    QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyId) override;
 
     QFuture<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QString &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) override;
     QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting) override;
