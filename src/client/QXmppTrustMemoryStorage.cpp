@@ -153,17 +153,13 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, con
     } else if (keyIds.isEmpty()) {
         d->processedKeys.remove(encryption);
     } else {
-        QList<ProcessedKey> keys;
-
-        const auto processedKeys = d->processedKeys.values(encryption);
-        for (const auto &key : processedKeys) {
-            if (keyIds.contains(key.id)) {
-                keys.append(key);
+        for (auto itr = d->processedKeys.find(encryption);
+             itr != d->processedKeys.end() && itr.key() == encryption;) {
+            if (keyIds.contains(itr.value().id)) {
+                itr = d->processedKeys.erase(itr);
+            } else {
+                itr++;
             }
-        }
-
-        for (const auto &key : std::as_const(keys)) {
-            d->processedKeys.remove(encryption, key);
         }
     }
 
@@ -193,7 +189,9 @@ QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, 
 
         auto isKeyFound = false;
 
-        for (auto itrProcessedKeys = d->processedKeys.find(encryption); itrProcessedKeys != d->processedKeys.end() && itrProcessedKeys.key() == encryption; ++itrProcessedKeys) {
+        for (auto itrProcessedKeys = d->processedKeys.find(encryption);
+             itrProcessedKeys != d->processedKeys.end() && itrProcessedKeys.key() == encryption;
+             ++itrProcessedKeys) {
             auto &key = itrProcessedKeys.value();
             if (key.id == keyId && key.ownerJid == keyOwnerJid) {
                 if (key.trustLevel != trustLevel) {
@@ -284,20 +282,16 @@ QFuture<void> QXmppTrustMemoryStorage::addKeysForPostponedTrustDecisions(const Q
 
 QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting)
 {
-    QList<UnprocessedKey> keys;
-
-    const auto unprocessedKeys = d->unprocessedKeys.values(encryption);
-    for (const auto &key : unprocessedKeys) {
+    for (auto itr = d->unprocessedKeys.find(encryption);
+         itr != d->unprocessedKeys.end() && itr.key() == encryption;) {
+        const auto &key = itr.value();
         if ((key.trust && keyIdsForAuthentication.contains(key.id)) ||
-            (!key.trust && keyIdsForDistrusting.contains(key.id))) {
-            keys.append(key);
+                (!key.trust && keyIdsForDistrusting.contains(key.id))) {
+            itr = d->unprocessedKeys.erase(itr);
+        } else {
+            ++itr;
         }
     }
-
-    for (const auto &key : std::as_const(keys)) {
-        d->unprocessedKeys.remove(encryption, key);
-    }
-
     return makeReadyFuture();
 }
 
@@ -308,17 +302,13 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(cons
     } else if (senderKeyIds.isEmpty()) {
         d->unprocessedKeys.remove(encryption);
     } else {
-        QList<UnprocessedKey> keys;
-
-        const auto unprocessedKeys = d->unprocessedKeys.values(encryption);
-        for (auto &key : unprocessedKeys) {
-            if (senderKeyIds.contains(key.senderKeyId)) {
-                keys.append(key);
+        for (auto itr = d->unprocessedKeys.find(encryption);
+             itr != d->unprocessedKeys.end() && itr.key() == encryption;) {
+            if (senderKeyIds.contains(itr.value().senderKeyId)) {
+                itr = d->unprocessedKeys.erase(itr);
+            } else {
+                ++itr;
             }
-        }
-
-        for (const auto &key : std::as_const(keys)) {
-            d->unprocessedKeys.remove(encryption, key);
         }
     }
 
