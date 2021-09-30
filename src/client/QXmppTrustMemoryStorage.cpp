@@ -41,13 +41,6 @@ using namespace QXmpp::Private;
 
 struct ProcessedKey
 {
-    bool operator==(const ProcessedKey &other) const
-    {
-        return id == other.id &&
-            ownerJid == other.ownerJid &&
-            trustLevel == other.trustLevel;
-    }
-
     QString id;
     QString ownerJid;
     QXmppTrustStorage::TrustLevel trustLevel;
@@ -55,14 +48,6 @@ struct ProcessedKey
 
 struct UnprocessedKey
 {
-    bool operator==(const UnprocessedKey &other) const
-    {
-        return id == other.id &&
-            ownerJid == other.ownerJid &&
-            senderKeyId == other.senderKeyId &&
-            trust == other.trust;
-    }
-
     QString id;
     QString ownerJid;
     QString senderKeyId;
