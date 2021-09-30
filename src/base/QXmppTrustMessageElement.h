@@ -26,11 +26,10 @@
 
 #include "QXmppGlobal.h"
 
-#include <QDomElement>
-#include <QList>
 #include <QSharedDataPointer>
-#include <QXmlStreamWriter>
 
+class QDomElement;
+class QXmlStreamWriter;
 class QXmppTrustMessageElementPrivate;
 class QXmppTrustMessageKeyOwner;
 
