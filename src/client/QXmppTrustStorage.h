@@ -55,6 +55,8 @@ public:
     };
     Q_DECLARE_FLAGS(TrustLevels, TrustLevel)
 
+    virtual ~QXmppTrustStorage() = default;
+
     virtual QFuture<void> setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = SecurityPolicy::NoSecurityPolicy) = 0;
     virtual QFuture<SecurityPolicy> securityPolicy(const QString &encryption) = 0;
 
