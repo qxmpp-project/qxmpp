@@ -74,7 +74,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::ownKey(const QString &encryption) const
+/// \fn QXmppTrustStorage::ownKey(const QString &encryption)
 ///
 /// Returns an own key (i.e., the key used by this client instance).
 ///
@@ -107,7 +107,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::keys(const QString &encryption, TrustLevels trustLevels = {}) const
+/// \fn QXmppTrustStorage::keys(const QString &encryption, TrustLevels trustLevels = {})
 ///
 /// Returns the JIDs of the key owners mapped to the IDs of their keys with a
 /// specific trust level.
@@ -144,7 +144,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QString &keyId) const
+/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QString &keyId)
 ///
 /// Returns the trust level of a key.
 ///
