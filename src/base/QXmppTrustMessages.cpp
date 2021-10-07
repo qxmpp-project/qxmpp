@@ -200,8 +200,8 @@ class QXmppTrustMessageKeyOwnerPrivate : public QSharedData
 {
 public:
     QString jid;
-    QList<QString> trustedKeys;
-    QList<QString> distrustedKeys;
+    QList<QByteArray> trustedKeys;
+    QList<QByteArray> distrustedKeys;
 };
 
 ///
@@ -255,7 +255,7 @@ void QXmppTrustMessageKeyOwner::setJid(const QString &jid)
 ///
 /// \return the IDs of trusted keys
 ///
-QList<QString> QXmppTrustMessageKeyOwner::trustedKeys() const
+QList<QByteArray> QXmppTrustMessageKeyOwner::trustedKeys() const
 {
     return d->trustedKeys;
 }
@@ -265,7 +265,7 @@ QList<QString> QXmppTrustMessageKeyOwner::trustedKeys() const
 ///
 /// \param keyIds IDs of trusted keys
 ///
-void QXmppTrustMessageKeyOwner::setTrustedKeys(const QList<QString> &keyIds)
+void QXmppTrustMessageKeyOwner::setTrustedKeys(const QList<QByteArray> &keyIds)
 {
     d->trustedKeys = keyIds;
 }
@@ -275,7 +275,7 @@ void QXmppTrustMessageKeyOwner::setTrustedKeys(const QList<QString> &keyIds)
 ///
 /// \return the IDs of distrusted keys
 ///
-QList<QString> QXmppTrustMessageKeyOwner::distrustedKeys() const
+QList<QByteArray> QXmppTrustMessageKeyOwner::distrustedKeys() const
 {
     return d->distrustedKeys;
 }
@@ -285,7 +285,7 @@ QList<QString> QXmppTrustMessageKeyOwner::distrustedKeys() const
 ///
 /// \param keyIds IDs of distrusted keys
 ///
-void QXmppTrustMessageKeyOwner::setDistrustedKeys(const QList<QString> &keyIds)
+void QXmppTrustMessageKeyOwner::setDistrustedKeys(const QList<QByteArray> &keyIds)
 {
     d->distrustedKeys = keyIds;
 }
@@ -298,10 +298,10 @@ void QXmppTrustMessageKeyOwner::parse(const QDomElement &element)
     for (auto childElement = element.firstChildElement();
          !childElement.isNull();
          childElement = childElement.nextSiblingElement()) {
-        if (childElement.tagName() == "trust") {
-            d->trustedKeys.append(childElement.text());
-        } else if (childElement.tagName() == "distrust") {
-            d->distrustedKeys.append(childElement.text());
+        if (const auto tagName = childElement.tagName(); tagName == "trust") {
+            d->trustedKeys.append(QByteArray::fromBase64(childElement.text().toLatin1()));
+        } else if (tagName == "distrust") {
+            d->distrustedKeys.append(QByteArray::fromBase64(childElement.text().toLatin1()));
         }
     }
 }
@@ -312,11 +312,11 @@ void QXmppTrustMessageKeyOwner::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute("jid", d->jid);
 
     for (const auto &keyIdentifier : d->trustedKeys) {
-        writer->writeTextElement("trust", keyIdentifier);
+        writer->writeTextElement("trust", keyIdentifier.toBase64());
     }
 
     for (const auto &keyIdentifier : d->distrustedKeys) {
-        writer->writeTextElement("distrust", keyIdentifier);
+        writer->writeTextElement("distrust", keyIdentifier.toBase64());
     }
 
     writer->writeEndElement();

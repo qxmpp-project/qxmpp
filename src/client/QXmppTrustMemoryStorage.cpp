@@ -41,16 +41,16 @@ using namespace QXmpp::Private;
 
 struct ProcessedKey
 {
-    QString id;
+    QByteArray id;
     QString ownerJid;
     QXmppTrustStorage::TrustLevel trustLevel;
 };
 
 struct UnprocessedKey
 {
-    QString id;
+    QByteArray id;
     QString ownerJid;
-    QString senderKeyId;
+    QByteArray senderKeyId;
     bool trust;
 };
 
@@ -61,7 +61,7 @@ public:
     QMap<QString, QXmppTrustStorage::SecurityPolicy> securityPolicies;
 
     // encryption protocols mapped to keys of this client instance
-    QMap<QString, QString> ownKeys;
+    QMap<QString, QByteArray> ownKeys;
 
     // encryption protocols mapped to keys with specified trust levels
     QMultiHash<QString, ProcessedKey> processedKeys;
@@ -100,7 +100,7 @@ QFuture<QXmppTrustStorage::SecurityPolicy> QXmppTrustMemoryStorage::securityPoli
     return makeReadyFuture(std::move(d->securityPolicies.value(encryption)));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::addOwnKey(const QString &encryption, const QString &keyId)
+QFuture<void> QXmppTrustMemoryStorage::addOwnKey(const QString &encryption, const QByteArray &keyId)
 {
     d->ownKeys.insert(encryption, keyId);
     return makeReadyFuture();
@@ -112,13 +112,13 @@ QFuture<void> QXmppTrustMemoryStorage::removeOwnKey(const QString &encryption)
     return makeReadyFuture();
 }
 
-QFuture<QString> QXmppTrustMemoryStorage::ownKey(const QString &encryption)
+QFuture<QByteArray> QXmppTrustMemoryStorage::ownKey(const QString &encryption)
 {
     auto key = d->ownKeys[encryption];
     return makeReadyFuture(std::move(key));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
+QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
 {
     for (const auto &keyId : keyIds) {
         ProcessedKey key;
@@ -131,7 +131,7 @@ QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const 
     return makeReadyFuture();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QList<QString> &keyIds)
+QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QList<QByteArray> &keyIds)
 {
     if (encryption.isEmpty()) {
         d->processedKeys.clear();
@@ -151,9 +151,9 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, con
     return makeReadyFuture();
 }
 
-QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QString>>> QXmppTrustMemoryStorage::keys(const QString &encryption, const TrustLevels trustLevels)
+QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keys(const QString &encryption, const TrustLevels trustLevels)
 {
-    QHash<TrustLevel, QMultiHash<QString, QString>> keys;
+    QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys;
 
     const auto processedKeys = d->processedKeys.values(encryption);
     for (const auto &key : processedKeys) {
@@ -166,7 +166,7 @@ QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QString>>> QXmp
     return makeReadyFuture(std::move(keys));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QString> &keyIds, const TrustLevel trustLevel)
+QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, const TrustLevel trustLevel)
 {
     for (auto itr = keyIds.constBegin(); itr != keyIds.constEnd(); ++itr) {
         const auto keyOwnerJid = itr.key();
@@ -214,7 +214,7 @@ QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, 
     return makeReadyFuture();
 }
 
-QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QString &keyId)
+QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QByteArray &keyId)
 {
     const auto processedKeys = d->processedKeys.values(encryption);
     for (const auto &key : processedKeys) {
@@ -226,9 +226,9 @@ QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const
     return makeReadyFuture(std::move(TrustLevel::AutomaticallyDistrusted));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::addKeysForPostponedTrustDecisions(const QString &encryption, const QString &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners)
+QFuture<void> QXmppTrustMemoryStorage::addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners)
 {
-    const auto addKeys = [&](const QXmppTrustMessageKeyOwner &keyOwner, bool trust, const QList<QString> &keyIds) {
+    const auto addKeys = [&](const QXmppTrustMessageKeyOwner &keyOwner, bool trust, const QList<QByteArray> &keyIds) {
         for (const auto &keyId : keyIds) {
             auto isKeyFound = false;
 
@@ -265,13 +265,13 @@ QFuture<void> QXmppTrustMemoryStorage::addKeysForPostponedTrustDecisions(const Q
     return makeReadyFuture();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting)
+QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
 {
     for (auto itr = d->unprocessedKeys.find(encryption);
          itr != d->unprocessedKeys.end() && itr.key() == encryption;) {
         const auto &key = itr.value();
         if ((key.trust && keyIdsForAuthentication.contains(key.id)) ||
-                (!key.trust && keyIdsForDistrusting.contains(key.id))) {
+            (!key.trust && keyIdsForDistrusting.contains(key.id))) {
             itr = d->unprocessedKeys.erase(itr);
         } else {
             ++itr;
@@ -280,7 +280,7 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(cons
     return makeReadyFuture();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds)
+QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
 {
     if (encryption.isEmpty()) {
         d->unprocessedKeys.clear();
@@ -300,9 +300,9 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeysForPostponedTrustDecisions(cons
     return makeReadyFuture();
 }
 
-QFuture<QHash<bool, QMultiHash<QString, QString>>> QXmppTrustMemoryStorage::keysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds)
+QFuture<QHash<bool, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
 {
-    QHash<bool, QMultiHash<QString, QString>> keys;
+    QHash<bool, QMultiHash<QString, QByteArray>> keys;
 
     const auto unprocessedKeys = d->unprocessedKeys.values(encryption);
     for (const auto &key : unprocessedKeys) {

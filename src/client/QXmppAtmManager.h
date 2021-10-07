@@ -36,7 +36,7 @@ class QXMPP_EXPORT QXmppAtmManager : public QXmppClientExtension
 
 public:
     QXmppAtmManager(QXmppTrustStorage *trustStorage);
-    QFuture<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting = {});
+    QFuture<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting = {});
 
     /// \cond
     bool handleStanza(const QDomElement &stanza) override;
@@ -49,14 +49,14 @@ private slots:
     /// \endcond
 
 private:
-    QFuture<void> makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QString> &keyIdsForAuthentication, const QMultiHash<QString, QString> &keyIdsForDistrusting);
+    QFuture<void> makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting);
     QFuture<void> handleMessage(const QXmppMessage &message);
 
-    QFuture<void> authenticate(const QString &encryption, const QMultiHash<QString, QString> &keyIds);
-    QFuture<void> distrust(const QString &encryption, const QMultiHash<QString, QString> &keyIds);
+    QFuture<void> authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
+    QFuture<void> distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
 
     QFuture<void> distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids);
-    QFuture<void> makePostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds);
+    QFuture<void> makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds);
 
     QFuture<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
 

@@ -5,6 +5,7 @@
  *  Manjeet Dahiya
  *  Jeremy Lainé
  *  Linus Jahn
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -136,8 +137,8 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
-    QString senderKey() const;
-    void setSenderKey(const QString &keyId);
+    QByteArray senderKey() const;
+    void setSenderKey(const QByteArray &keyId);
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;

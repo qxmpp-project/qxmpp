@@ -163,7 +163,7 @@ void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoDeviceElement::isOmemoDeviceElement(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("device") &&
-        element.namespaceURI() == ns_omemo_1;
+        element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -213,7 +213,7 @@ void QXmppOmemoDeviceList::parse(const QDomElement &element)
 void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("devices");
-    writer->writeDefaultNamespace(ns_omemo_1);
+    writer->writeDefaultNamespace(ns_omemo_2);
 
     for (const auto &device : *this) {
         device.toXml(writer);
@@ -233,7 +233,7 @@ void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoDeviceList::isOmemoDeviceList(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("devices") &&
-        element.namespaceURI() == ns_omemo_1;
+        element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -427,7 +427,7 @@ void QXmppOmemoDeviceBundle::parse(const QDomElement &element)
 void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("bundle"));
-    writer->writeDefaultNamespace(ns_omemo_1);
+    writer->writeDefaultNamespace(ns_omemo_2);
 
     writer->writeStartElement(QStringLiteral("ik"));
     writer->writeCharacters(publicIdentityKey().toBase64());
@@ -465,7 +465,7 @@ void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoDeviceBundle::isOmemoDeviceBundle(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("bundle") &&
-        element.namespaceURI() == ns_omemo_1;
+        element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -617,7 +617,7 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoEnvelope::isOmemoEnvelope(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("key") &&
-        element.namespaceURI() == ns_omemo_1;
+        element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -767,7 +767,7 @@ void QXmppOmemoElement::parse(const QDomElement &element)
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("encrypted");
-    writer->writeAttribute("xmlns", ns_omemo_1);
+    writer->writeAttribute("xmlns", ns_omemo_2);
 
     writer->writeStartElement("header");
     writer->writeAttribute("sid", QString::number(d->senderDeviceId));
@@ -803,5 +803,5 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 bool QXmppOmemoElement::isOmemoElement(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("encrypted") &&
-        element.namespaceURI() == ns_omemo_1;
+        element.namespaceURI() == ns_omemo_2;
 }

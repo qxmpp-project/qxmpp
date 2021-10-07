@@ -175,7 +175,7 @@ const char* ns_eme = "urn:xmpp:eme:0";
 const char* ns_spoiler = "urn:xmpp:spoiler:0";
 // XEP-0384: OMEMO Encryption
 const char* ns_omemo = "eu.siacs.conversations.axolotl";
-const char* ns_omemo_1 = "urn:xmpp:omemo:1";
+const char* ns_omemo_2 = "urn:xmpp:omemo:2";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 const char* ns_mix_pam = "urn:xmpp:mix:pam:1";
 const char* ns_mix_roster = "urn:xmpp:mix:roster:0";
@@ -185,6 +185,6 @@ const char* ns_mix_misc = "urn:xmpp:mix:misc:0";
 // XEP-0428: Fallback Indication
 const char* ns_fallback_indication = "urn:xmpp:fallback:0";
 // XEP-0434: Trust Messages (TM)
-const char* ns_tm = "urn:xmpp:tm:0";
+const char* ns_tm = "urn:xmpp:tm:1";
 // XEP-0450: Automatic Trust Management (ATM)
 const char* ns_atm = "urn:xmpp:atm:1";

@@ -1113,15 +1113,15 @@ void tst_QXmppMessage::testTrustMessageElement()
     const QByteArray xml(
         "<message id=\"1\" to=\"alice@example.org/\" from=\"alice@example.org/A2\" type=\"chat\">"
         "<store xmlns=\"urn:xmpp:hints\"/>"
-        "<trust-message xmlns=\"urn:xmpp:tm:0\" usage=\"urn:xmpp:atm:1\" encryption=\"urn:xmpp:omemo:1\">"
+        "<trust-message xmlns=\"urn:xmpp:tm:1\" usage=\"urn:xmpp:atm:1\" encryption=\"urn:xmpp:omemo:2\">"
         "<key-owner jid=\"alice@example.org\">"
-        "<trust>6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4</trust>"
-        "<trust>221a4f8e228b72182b006e5ca527d3bddccf8d9e6feaf4ce96e1c451e8648020</trust>"
+        "<trust>aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=</trust>"
+        "<trust>IhpPjiKLchgrAG5cpSfTvdzPjZ5v6vTOluHEUehkgCA=</trust>"
         "</key-owner>"
         "<key-owner jid=\"bob@example.com\">"
-        "<trust>623548d3835c6d33ef5cb680f7944ef381cf712bf23a0119dabe5c4f252cd02f</trust>"
-        "<distrust>b423f5088de9a924d51b31581723d850c7cc67d0a4fe6b267c3d301ff56d2413</distrust>"
-        "<distrust>d9f849b6b828309c5f2c8df4f38fd891887da5aaa24a22c50d52f69b4a80817e</distrust>"
+        "<trust>YjVI04NcbTPvXLaA95RO84HPcSvyOgEZ2r5cTyUs0C8=</trust>"
+        "<distrust>tCP1CI3pqSTVGzFYFyPYUMfMZ9Ck/msmfD0wH/VtJBM=</distrust>"
+        "<distrust>2fhJtrgoMJxfLI3084/YkYh9paqiSiLFDVL2m0qAgX4=</distrust>"
         "</key-owner>"
         "</trust-message>"
         "</message>");
@@ -1141,7 +1141,7 @@ void tst_QXmppMessage::testOmemoElement()
     const QByteArray xmlIn(QByteArrayLiteral(
         "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
         "<store xmlns=\"urn:xmpp:hints\"/>"
-        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"
         "<keys jid=\"juliet@capulet.lit\">"
         "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
@@ -1172,7 +1172,7 @@ void tst_QXmppMessage::testOmemoElement()
     const QByteArray xmlOut1(QByteArrayLiteral(
         "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
         "<store xmlns=\"urn:xmpp:hints\"/>"
-        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"
         "<keys jid=\"juliet@capulet.lit\">"
         "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
@@ -1199,7 +1199,7 @@ void tst_QXmppMessage::testOmemoElement()
 
     const QByteArray xmlOut2(QByteArrayLiteral(
         "<message type=\"chat\">"
-        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"0\"/>"
         "<payload/>"
         "</encrypted>"
@@ -1219,8 +1219,8 @@ void tst_QXmppMessage::testOmemoElement()
 void tst_QXmppMessage::testSenderkey()
 {
     QXmppMessage message;
-    message.setSenderKey(QStringLiteral("6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4"));
-    QCOMPARE(message.senderKey(), QStringLiteral("6850019d7ed0feb6d3823072498ceb4f616c6025586f8f666dc6b9c81ef7e0a4"));
+    message.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
+    QCOMPARE(message.senderKey(), QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
 }
 
 QTEST_MAIN(tst_QXmppMessage)
