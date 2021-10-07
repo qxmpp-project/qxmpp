@@ -44,11 +44,11 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
-    QList<QString> trustedKeys() const;
-    void setTrustedKeys(const QList<QString> &keyIds);
+    QList<QByteArray> trustedKeys() const;
+    void setTrustedKeys(const QList<QByteArray> &keyIds);
 
-    QList<QString> distrustedKeys() const;
-    void setDistrustedKeys(const QList<QString> &keyIds);
+    QList<QByteArray> distrustedKeys() const;
+    void setDistrustedKeys(const QList<QByteArray> &keyIds);
 
     /// \cond
     void parse(const QDomElement &element);

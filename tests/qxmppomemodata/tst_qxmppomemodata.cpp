@@ -61,10 +61,10 @@ void tst_QXmppOmemoData::testIsOmemoDeviceElement_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid")
-        << QByteArrayLiteral("<device xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<device xmlns=\"urn:xmpp:omemo:2\"/>")
         << true;
     QTest::newRow("invalidTag")
-        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:2\"/>")
         << false;
     QTest::newRow("invalidNamespace")
         << QByteArrayLiteral("<device xmlns=\"invalid\"/>")
@@ -124,10 +124,10 @@ void tst_QXmppOmemoData::testIsOmemoDeviceList_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid")
-        << QByteArrayLiteral("<devices xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<devices xmlns=\"urn:xmpp:omemo:2\"/>")
         << true;
     QTest::newRow("invalidTag")
-        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:2\"/>")
         << false;
     QTest::newRow("invalidNamespace")
         << QByteArrayLiteral("<devices xmlns=\"invalid\"/>")
@@ -148,7 +148,7 @@ void tst_QXmppOmemoData::testIsOmemoDeviceList()
 void tst_QXmppOmemoData::testOmemoDeviceList()
 {
     const QByteArray xml(QByteArrayLiteral(
-        "<devices xmlns=\"urn:xmpp:omemo:1\">"
+        "<devices xmlns=\"urn:xmpp:omemo:2\">"
         "<device id=\"12345\"/>"
         "<device id=\"4223\" label=\"Gajim on Ubuntu Linux\"/>"
         "</devices>"));
@@ -182,10 +182,10 @@ void tst_QXmppOmemoData::testIsOmemoDeviceBundle_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid")
-        << QByteArrayLiteral("<bundle xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<bundle xmlns=\"urn:xmpp:omemo:2\"/>")
         << true;
     QTest::newRow("invalidTag")
-        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:2\"/>")
         << false;
     QTest::newRow("invalidNamespace")
         << QByteArrayLiteral("<bundle xmlns=\"invalid\"/>")
@@ -206,7 +206,7 @@ void tst_QXmppOmemoData::testIsOmemoDeviceBundle()
 void tst_QXmppOmemoData::testOmemoDeviceBundle()
 {
     const QByteArray xml(QByteArrayLiteral(
-        "<bundle xmlns=\"urn:xmpp:omemo:1\">"
+        "<bundle xmlns=\"urn:xmpp:omemo:2\">"
         "<ik>a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</ik>"
         "<spk id=\"1\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</spk>"
         "<spks>PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</spks>"
@@ -250,10 +250,10 @@ void tst_QXmppOmemoData::testIsOmemoEnvelope_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid")
-        << QByteArrayLiteral("<key xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<key xmlns=\"urn:xmpp:omemo:2\"/>")
         << true;
     QTest::newRow("invalidTag")
-        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:2\"/>")
         << false;
     QTest::newRow("invalidNamespace")
         << QByteArrayLiteral("<key xmlns=\"invalid\"/>")
@@ -320,10 +320,10 @@ void tst_QXmppOmemoData::testIsOmemoElement_data()
     QTest::addColumn<bool>("isValid");
 
     QTest::newRow("valid")
-        << QByteArrayLiteral("<encrypted xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<encrypted xmlns=\"urn:xmpp:omemo:2\"/>")
         << true;
     QTest::newRow("invalidTag")
-        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:1\"/>")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:omemo:2\"/>")
         << false;
     QTest::newRow("invalidNamespace")
         << QByteArrayLiteral("<encrypted xmlns=\"invalid\"/>")
@@ -344,7 +344,7 @@ void tst_QXmppOmemoData::testIsOmemoElement()
 void tst_QXmppOmemoData::testOmemoElement()
 {
     const QByteArray xmlIn(QByteArrayLiteral(
-        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"
         "<keys jid=\"juliet@capulet.lit\">"
         "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
@@ -372,7 +372,7 @@ void tst_QXmppOmemoData::testOmemoElement()
     // needed since they are serialized in the reverse order in which they are
     // deserialized.
     const QByteArray xmlOut(QByteArrayLiteral(
-        "<encrypted xmlns=\"urn:xmpp:omemo:1\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"
         "<keys jid=\"juliet@capulet.lit\">"
         "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"

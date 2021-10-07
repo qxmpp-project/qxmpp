@@ -5,6 +5,7 @@
  *  Manjeet Dahiya
  *  Jeremy Lainé
  *  Linus Jahn
+ *  Melvin Keskin
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
@@ -108,7 +109,7 @@ public:
     QString thread;
     QString parentThread;
     QXmppMessage::Type type;
-    QString senderKey;
+    QByteArray senderKey;
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl;
@@ -339,7 +340,7 @@ void QXmppMessage::setParentThread(const QString &parent)
 ///
 /// \since QXmpp 1.5
 ///
-QString QXmppMessage::senderKey() const
+QByteArray QXmppMessage::senderKey() const
 {
     return d->senderKey;
 }
@@ -358,7 +359,7 @@ QString QXmppMessage::senderKey() const
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppMessage::setSenderKey(const QString &keyId)
+void QXmppMessage::setSenderKey(const QByteArray &keyId)
 {
     d->senderKey = keyId;
 }

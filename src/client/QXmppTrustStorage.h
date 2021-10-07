@@ -60,22 +60,22 @@ public:
     virtual QFuture<void> setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = SecurityPolicy::NoSecurityPolicy) = 0;
     virtual QFuture<SecurityPolicy> securityPolicy(const QString &encryption) = 0;
 
-    virtual QFuture<void> addOwnKey(const QString &encryption, const QString &keyId) = 0;
+    virtual QFuture<void> addOwnKey(const QString &encryption, const QByteArray &keyId) = 0;
     virtual QFuture<void> removeOwnKey(const QString &encryption) = 0;
-    virtual QFuture<QString> ownKey(const QString &encryption) = 0;
+    virtual QFuture<QByteArray> ownKey(const QString &encryption) = 0;
 
-    virtual QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIds, TrustLevel trustLevel = TrustLevel::AutomaticallyDistrusted) = 0;
-    virtual QFuture<void> removeKeys(const QString &encryption = {}, const QList<QString> &keyIds = {}) = 0;
-    virtual QFuture<QHash<TrustLevel, QMultiHash<QString, QString>>> keys(const QString &encryption, TrustLevels trustLevels = {}) = 0;
+    virtual QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, TrustLevel trustLevel = TrustLevel::AutomaticallyDistrusted) = 0;
+    virtual QFuture<void> removeKeys(const QString &encryption = {}, const QList<QByteArray> &keyIds = {}) = 0;
+    virtual QFuture<QHash<TrustLevel, QMultiHash<QString, QByteArray>>> keys(const QString &encryption, TrustLevels trustLevels = {}) = 0;
 
-    virtual QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QString> &keyIds, TrustLevel trustLevel) = 0;
+    virtual QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel) = 0;
     virtual QFuture<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel) = 0;
-    virtual QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyId) = 0;
+    virtual QFuture<TrustLevel> trustLevel(const QString &encryption, const QByteArray &keyId) = 0;
 
-    virtual QFuture<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QString &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) = 0;
-    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting) = 0;
-    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption = {}, const QList<QString> &senderKeyIds = {}) = 0;
-    virtual QFuture<QHash<bool, QMultiHash<QString, QString>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds = {}) = 0;
+    virtual QFuture<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) = 0;
+    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting) = 0;
+    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption = {}, const QList<QByteArray> &senderKeyIds = {}) = 0;
+    virtual QFuture<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) = 0;
 };
 
 Q_DECLARE_METATYPE(QXmppTrustStorage::SecurityPolicy)

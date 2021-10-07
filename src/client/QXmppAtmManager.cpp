@@ -56,7 +56,7 @@ using namespace QXmpp::Private;
 /// Is is recommended to apply TOAKAFA for good security and usability when
 /// using \xep{0384, OMEMO Encryption}:
 /// \code
-/// trustStorage->setSecurityPolicy("urn:xmpp:omemo:1", QXmppTrustStorage::Toakafa);
+/// trustStorage->setSecurityPolicy("urn:xmpp:omemo:2", QXmppTrustStorage::Toakafa);
 /// \endcode
 ///
 /// Afterwards, this manager must be added with the storage:
@@ -107,12 +107,12 @@ QXmppAtmManager::QXmppAtmManager(QXmppTrustStorage *trustStorage)
 /// \param keyIdsForAuthentication IDs of the keys being authenticated
 /// \param keyIdsForDistrusting IDs of the keys being distrusted
 ///
-QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting)
+QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
 {
     auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
 
     auto future = m_trustStorage->keys(encryption, QXmppTrustStorage::Authenticated | QXmppTrustStorage::ManuallyDistrusted);
-    await(future, this, [=](const QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QString>> &&keys) {
+    await(future, this, [=](const QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>> &&keys) {
         const auto authenticatedKeys = keys.value(QXmppTrustStorage::Authenticated);
         const auto manuallyDistrustedKeys = keys.value(QXmppTrustStorage::ManuallyDistrusted);
         const auto ownJid = client()->configuration().jidBare();
@@ -123,8 +123,8 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
         QXmppTrustMessageKeyOwner keyOwner;
         keyOwner.setJid(keyOwnerJid);
 
-        QList<QString> modifiedAuthenticatedKeys;
-        QList<QString> modifiedManuallyDistrustedKeys;
+        QList<QByteArray> modifiedAuthenticatedKeys;
+        QList<QByteArray> modifiedManuallyDistrustedKeys;
 
         for (const auto &keyId : keyIdsForAuthentication) {
             if (!authenticatedKeys.contains(keyOwnerJid, keyId)) {
@@ -145,8 +145,8 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
             keyOwner.setTrustedKeys(modifiedAuthenticatedKeys);
             keyOwner.setDistrustedKeys(modifiedManuallyDistrustedKeys);
 
-            QMultiHash<QString, QString> keysBeingAuthenticated;
-            QMultiHash<QString, QString> keysBeingDistrusted;
+            QMultiHash<QString, QByteArray> keysBeingAuthenticated;
+            QMultiHash<QString, QByteArray> keysBeingDistrusted;
 
             for (const auto &key : std::as_const(modifiedAuthenticatedKeys)) {
                 keysBeingAuthenticated.insert(keyOwnerJid, key);
@@ -299,7 +299,7 @@ void QXmppAtmManager::handleMessageReceived(const QXmppMessage &message)
 /// \param keyIdsForDistrusting key owners' bare JIDs mapped to the IDs of their
 ///        keys being distrusted
 ///
-QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QString> &keyIdsForAuthentication, const QMultiHash<QString, QString> &keyIdsForDistrusting)
+QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting)
 {
     auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
 
@@ -334,8 +334,8 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == QXmppTrustStorage::Authenticated;
 
             // key owner JIDs mapped to key IDs
-            QMultiHash<QString, QString> keysBeingAuthenticated;
-            QMultiHash<QString, QString> keysBeingDistrusted;
+            QMultiHash<QString, QByteArray> keysBeingAuthenticated;
+            QMultiHash<QString, QByteArray> keysBeingDistrusted;
 
             QList<QXmppTrustMessageKeyOwner> keyOwnersForPostponedTrustDecisions;
 
@@ -400,7 +400,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 /// \param encryption encryption protocol namespace
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 ///
-QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QString> &keyIds)
+QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
     auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
 
@@ -435,7 +435,7 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
 /// \param encryption encryption protocol namespace
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 ///
-QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QString> &keyIds)
+QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
     auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
 
@@ -476,12 +476,12 @@ QFuture<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &e
 /// \param encryption encryption protocol namespace
 /// \param senderKeyIds IDs of the keys that were used by the senders
 ///
-QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds)
+QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
 {
     auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
 
     auto future = m_trustStorage->keysForPostponedTrustDecisions(encryption, senderKeyIds);
-    await(future, this, [=](const QHash<bool, QMultiHash<QString, QString>> &&keysForPostponedTrustDecisions) {
+    await(future, this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) {
         // JIDs of key owners mapped to the IDs of their keys
         const auto keysBeingAuthenticated = keysForPostponedTrustDecisions.value(true);
         const auto keysBeingDistrusted = keysForPostponedTrustDecisions.value(false);

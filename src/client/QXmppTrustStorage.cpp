@@ -57,7 +57,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addOwnKey(const QString &encryption, const QString &keyId)
+/// \fn QXmppTrustStorage::addOwnKey(const QString &encryption, const QByteArray &keyId)
 ///
 /// Adds an own key (i.e., the key used by this client instance).
 ///
@@ -84,7 +84,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QString> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
+/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
 ///
 /// Adds keys.
 ///
@@ -95,7 +95,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::removeKeys(const QString &encryption, const QList<QString> &keyIds)
+/// \fn QXmppTrustStorage::removeKeys(const QString &encryption, const QList<QByteArray> &keyIds)
 ///
 /// Removes keys.
 ///
@@ -121,7 +121,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QString> &keyIds, TrustLevel trustLevel)
+/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
 ///
 /// Sets the trust level of keys.
 ///
@@ -144,7 +144,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QString &keyId)
+/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QByteArray &keyId)
 ///
 /// Returns the trust level of a key.
 ///
@@ -157,7 +157,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addKeysForPostponedTrustDecisions(const QString &encryption, const QString &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners)
+/// \fn QXmppTrustStorage::addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners)
 ///
 /// Adds keys that cannot be authenticated or distrusted directly because the
 /// key of the trust message's sender is not yet authenticated.
@@ -181,7 +181,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &keyIdsForAuthentication, const QList<QString> &keyIdsForDistrusting)
+/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
 ///
 /// Removes keys for postponed authentication or distrusting.
 ///
@@ -191,7 +191,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption = {}, const QList<QString> &senderKeyIds = {})
+/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption = {}, const QList<QByteArray> &senderKeyIds = {})
 ///
 /// Removes keys for postponed authentication or distrusting by the trust
 /// message's sender's key ID.
@@ -204,7 +204,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::keysForPostponedTrustDecisions(const QString &encryption, const QList<QString> &senderKeyIds = {})
+/// \fn QXmppTrustStorage::keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {})
 ///
 /// Returns the JIDs of key owners mapped to the IDs of their keys stored for
 /// postponed authentication (true) or postponed distrusting (false).
