@@ -409,7 +409,7 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
     } else {
         auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
         await(future, this, [=]() {
-            await(m_trustStorage->securityPolicy(encryption), this, [=](auto securityPolicy) {
+            await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) {
                 if (securityPolicy == QXmppTrustStorage::Toakafa) {
                     auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
                     await(future, this, [=]() {
