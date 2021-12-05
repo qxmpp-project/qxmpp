@@ -71,7 +71,7 @@ void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
 {
     auto *watcher = new QFutureWatcher<T>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
-                     context, [watcher, handler { std::move(handler) }]() {
+                     context, [watcher, handler = std::move(handler)]() mutable {
                          auto future = watcher->future();
                          handler(future.resultAt(future.resultCount() - 1));
                          watcher->deleteLater();
@@ -84,7 +84,7 @@ void await(const QFuture<T> &future, QObject *context, Handler handler)
 {
     auto *watcher = new QFutureWatcher<T>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
-                     context, [watcher, handler { std::move(handler) }]() {
+                     context, [watcher, handler = std::move(handler)]() mutable {
                          handler(watcher->result());
                          watcher->deleteLater();
                      });
@@ -96,7 +96,7 @@ void await(const QFuture<void> &future, QObject *context, Handler handler)
 {
     auto *watcher = new QFutureWatcher<void>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
-                     context, [watcher, handler { std::move(handler) }]() {
+                     context, [watcher, handler = std::move(handler)]() mutable {
                          handler();
                          watcher->deleteLater();
                      });
@@ -123,7 +123,7 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
 {
     using Result = decltype(convert({}));
     return std::visit(overloaded {
-                          [convert { std::move(convert) }](const QDomElement &element) -> Result {
+                          [convert = std::move(convert)](const QDomElement &element) -> Result {
                               IqType iq;
                               iq.parse(element);
                               if (iq.type() == QXmppIq::Error) {
