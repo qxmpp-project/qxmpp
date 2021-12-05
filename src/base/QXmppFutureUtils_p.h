@@ -106,16 +106,16 @@ void await(const QFuture<void> &future, QObject *context, Handler handler)
 template<typename Result, typename Input, typename Converter>
 auto chain(QFuture<Input> &&source, QObject *context, Converter task) -> QFuture<Result>
 {
-    auto resultInterface = std::make_shared<QFutureInterface<Result>>(QFutureInterfaceBase::Started);
+    QFutureInterface<Result> resultInterface(QFutureInterfaceBase::Started);
 
     auto *watcher = new QFutureWatcher<Input>(context);
-    QObject::connect(watcher, &QFutureWatcherBase::finished, context, [=]() {
-        resultInterface->reportResult(task(watcher->result()));
-        resultInterface->reportFinished();
+    QObject::connect(watcher, &QFutureWatcherBase::finished, context, [=]() mutable {
+        resultInterface.reportResult(task(watcher->result()));
+        resultInterface.reportFinished();
         watcher->deleteLater();
     });
     watcher->setFuture(source);
-    return resultInterface->future();
+    return resultInterface.future();
 }
 
 template<typename IqType, typename Input, typename Converter>
