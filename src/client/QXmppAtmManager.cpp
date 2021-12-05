@@ -373,31 +373,31 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 ///
 QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
+    if (keyIds.isEmpty()) {
+        return makeReadyFuture();
+    }
+
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    if (keyIds.isEmpty()) {
-        interface.reportFinished();
-    } else {
-        auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
-        await(future, this, [=]() mutable {
-            await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) mutable {
-                if (securityPolicy == QXmppTrustStorage::Toakafa) {
-                    auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
-                    await(future, this, [=]() mutable {
-                        auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                        await(future, this, [=]() mutable {
-                            interface.reportFinished();
-                        });
-                    });
-                } else {
+    auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
+    await(future, this, [=]() mutable {
+        await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) mutable {
+            if (securityPolicy == QXmppTrustStorage::Toakafa) {
+                auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
+                await(future, this, [=]() mutable {
                     auto future = makePostponedTrustDecisions(encryption, keyIds.values());
                     await(future, this, [=]() mutable {
                         interface.reportFinished();
                     });
-                }
-            });
+                });
+            } else {
+                auto future = makePostponedTrustDecisions(encryption, keyIds.values());
+                await(future, this, [=]() mutable {
+                    interface.reportFinished();
+                });
+            }
         });
-    }
+    });
 
     return interface.future();
 }
@@ -410,19 +410,19 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
 ///
 QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
+    if (keyIds.isEmpty()) {
+        return makeReadyFuture();
+    }
+
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    if (keyIds.isEmpty()) {
-        interface.reportFinished();
-    } else {
-        auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::ManuallyDistrusted);
+    auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::ManuallyDistrusted);
+    await(future, this, [=]() mutable {
+        auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
         await(future, this, [=]() mutable {
-            auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
-            await(future, this, [=]() mutable {
-                interface.reportFinished();
-            });
+            interface.reportFinished();
         });
-    }
+    });
 
     return interface.future();
 }
