@@ -17,9 +17,8 @@ class QXmppNonza;
 class QXmppPacket
 {
 public:
-    QXmppPacket(const QXmppNonza &nonza);
-    QXmppPacket(const QXmppNonza &nonza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>>);
-    QXmppPacket(const QByteArray &data, bool isXmppStanza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>>);
+    QXmppPacket(const QXmppNonza &nonza, QFutureInterface<QXmpp::SendResult> = {});
+    QXmppPacket(const QByteArray &data, bool isXmppStanza, QFutureInterface<QXmpp::SendResult> = {});
 
     QByteArray data() const;
     bool isXmppStanza() const;
@@ -30,7 +29,7 @@ public:
     void reportResult(const QXmpp::SendResult &);
 
 private:
-    std::shared_ptr<QFutureInterface<QXmpp::SendResult>> m_interface;
+    QFutureInterface<QXmpp::SendResult> m_interface;
     QByteArray m_data;
     bool m_isXmppStanza;
 };

@@ -17,22 +17,17 @@ inline QByteArray serialize(const QXmppNonza &nonza)
 }
 
 /// \cond
-QXmppPacket::QXmppPacket(const QXmppNonza &nonza)
-    : QXmppPacket(nonza, std::make_shared<QFutureInterface<QXmpp::SendResult>>())
-{
-}
-
-QXmppPacket::QXmppPacket(const QXmppNonza &nonza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>> interface)
+QXmppPacket::QXmppPacket(const QXmppNonza &nonza, QFutureInterface<QXmpp::SendResult> interface)
     : QXmppPacket(serialize(nonza), nonza.isXmppStanza(), std::move(interface))
 {
 }
 
-QXmppPacket::QXmppPacket(const QByteArray &data, bool isXmppStanza, std::shared_ptr<QFutureInterface<QXmpp::SendResult>> interface)
+QXmppPacket::QXmppPacket(const QByteArray &data, bool isXmppStanza, QFutureInterface<QXmpp::SendResult> interface)
     : m_interface(std::move(interface)),
       m_data(data),
       m_isXmppStanza(isXmppStanza)
 {
-    m_interface->reportStarted();
+    m_interface.reportStarted();
 }
 
 QByteArray QXmppPacket::data() const
@@ -47,16 +42,16 @@ bool QXmppPacket::isXmppStanza() const
 
 QFuture<QXmpp::SendResult> QXmppPacket::future()
 {
-    return m_interface->future();
+    return m_interface.future();
 }
 
 void QXmppPacket::reportFinished()
 {
-    m_interface->reportFinished();
+    m_interface.reportFinished();
 }
 
 void QXmppPacket::reportResult(const QXmpp::SendResult &result)
 {
-    m_interface->reportResult(result);
+    m_interface.reportResult(result);
 }
 /// \endcond
