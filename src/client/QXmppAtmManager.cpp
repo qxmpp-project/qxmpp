@@ -77,10 +77,10 @@ QXmppAtmManager::QXmppAtmManager(QXmppAtmTrustStorage *trustStorage)
 ///
 QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     auto future = m_trustStorage->keys(encryption, QXmppTrustStorage::Authenticated | QXmppTrustStorage::ManuallyDistrusted);
-    await(future, this, [=](const QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>> &&keys) {
+    await(future, this, [=](const QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>> &&keys) mutable {
         const auto authenticatedKeys = keys.value(QXmppTrustStorage::Authenticated);
         const auto manuallyDistrustedKeys = keys.value(QXmppTrustStorage::ManuallyDistrusted);
         const auto ownJid = client()->configuration().jidBare();
@@ -108,7 +108,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 
         if (modifiedAuthenticatedKeys.isEmpty() && modifiedManuallyDistrustedKeys.isEmpty()) {
             // Skip further processing if there are no changes.
-            interface->reportFinished();
+            interface.reportFinished();
         } else {
             keyOwner.setTrustedKeys(modifiedAuthenticatedKeys);
             keyOwner.setDistrustedKeys(modifiedManuallyDistrustedKeys);
@@ -168,7 +168,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() {
+                await(future, this, [=]() mutable {
                     // Send a trust message for all authenticated or distrusted
                     // keys to the own endpoints whose keys have been
                     // authenticated.
@@ -210,7 +210,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                         }
                     }
 
-                    interface->reportFinished();
+                    interface.reportFinished();
                 });
             } else {
                 // Send a trust message for the keys of the contact's endpoints
@@ -221,7 +221,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() {
+                await(future, this, [=]() mutable {
                     // Send a trust message for own authenticated or distrusted
                     // keys to the contact's endpoints whose keys have been
                     // authenticated.
@@ -231,13 +231,13 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                         sendTrustMessage(encryption, { ownKeyOwner }, keyOwnerJid);
                     }
 
-                    interface->reportFinished();
+                    interface.reportFinished();
                 });
             }
         }
     });
 
-    return interface->future();
+    return interface.future();
 }
 
 /// \cond
@@ -269,17 +269,17 @@ void QXmppAtmManager::handleMessageReceived(const QXmppMessage &message)
 ///
 QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     auto future = authenticate(encryption, keyIdsForAuthentication);
-    await(future, this, [=]() {
+    await(future, this, [=]() mutable {
         auto future = distrust(encryption, keyIdsForDistrusting);
-        await(future, this, [=]() {
-            interface->reportFinished();
+        await(future, this, [=]() mutable {
+            interface.reportFinished();
         });
     });
 
-    return interface->future();
+    return interface.future();
 }
 
 ///
@@ -290,15 +290,18 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 ///
 QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    if (const auto trustMessageElement = message.trustMessageElement(); trustMessageElement && trustMessageElement->usage() == ns_atm && message.from() != client()->configuration().jid()) {
+    if (const auto trustMessageElement = message.trustMessageElement();
+            trustMessageElement &&
+            trustMessageElement->usage() == ns_atm &&
+            message.from() != client()->configuration().jid()) {
         const auto senderJid = QXmppUtils::jidToBareJid(message.from());
         const auto senderKey = message.senderKey();
         const auto encryption = trustMessageElement->encryption();
 
         auto future = m_trustStorage->trustLevel(encryption, senderKey);
-        await(future, this, [=](const auto &&senderKeyTrustLevel) {
+        await(future, this, [=](const auto &&senderKeyTrustLevel) mutable {
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == QXmppTrustStorage::Authenticated;
 
             // key owner JIDs mapped to key IDs
@@ -344,10 +347,10 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
             }
 
             auto future = m_trustStorage->addKeysForPostponedTrustDecisions(encryption, senderKey, keyOwnersForPostponedTrustDecisions);
-            await(future, this, [=]() {
+            await(future, this, [=]() mutable {
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() {
-                    interface->reportFinished();
+                await(future, this, [=]() mutable {
+                    interface.reportFinished();
                 });
             });
         });
@@ -356,10 +359,10 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         // 1. The message does not contain a trust message element.
         // 2. The trust message is sent by this endpoint and reflected via
         //    Message Carbons.
-        interface->reportFinished();
+        interface.reportFinished();
     }
 
-    return interface->future();
+    return interface.future();
 }
 
 ///
@@ -370,33 +373,33 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 ///
 QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     if (keyIds.isEmpty()) {
-        interface->reportFinished();
+        interface.reportFinished();
     } else {
         auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
-        await(future, this, [=]() {
-            await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) {
+        await(future, this, [=]() mutable {
+            await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) mutable {
                 if (securityPolicy == QXmppTrustStorage::Toakafa) {
                     auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
-                    await(future, this, [=]() {
+                    await(future, this, [=]() mutable {
                         auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                        await(future, this, [=]() {
-                            interface->reportFinished();
+                        await(future, this, [=]() mutable {
+                            interface.reportFinished();
                         });
                     });
                 } else {
                     auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                    await(future, this, [=]() {
-                        interface->reportFinished();
+                    await(future, this, [=]() mutable {
+                        interface.reportFinished();
                     });
                 }
             });
         });
     }
 
-    return interface->future();
+    return interface.future();
 }
 
 ///
@@ -407,21 +410,21 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
 ///
 QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     if (keyIds.isEmpty()) {
-        interface->reportFinished();
+        interface.reportFinished();
     } else {
         auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::ManuallyDistrusted);
-        await(future, this, [=]() {
+        await(future, this, [=]() mutable {
             auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
-            await(future, this, [=]() {
-                interface->reportFinished();
+            await(future, this, [=]() mutable {
+                interface.reportFinished();
             });
         });
     }
 
-    return interface->future();
+    return interface.future();
 }
 
 ///
@@ -448,24 +451,24 @@ QFuture<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &e
 ///
 QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
 {
-    auto interface = std::make_shared<QFutureInterface<void>>(QFutureInterfaceBase::Started);
+    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     auto future = m_trustStorage->keysForPostponedTrustDecisions(encryption, senderKeyIds);
-    await(future, this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) {
+    await(future, this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
         // JIDs of key owners mapped to the IDs of their keys
         const auto keysBeingAuthenticated = keysForPostponedTrustDecisions.value(true);
         const auto keysBeingDistrusted = keysForPostponedTrustDecisions.value(false);
 
         auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keysBeingAuthenticated.values(), keysBeingDistrusted.values());
-        await(future, this, [=]() {
+        await(future, this, [=]() mutable {
             auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-            await(future, this, [=]() {
-                interface->reportFinished();
+            await(future, this, [=]() mutable {
+                interface.reportFinished();
             });
         });
     });
 
-    return interface->future();
+    return interface.future();
 }
 
 ///
