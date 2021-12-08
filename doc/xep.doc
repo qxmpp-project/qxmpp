@@ -51,7 +51,7 @@ Complete:
 - \xep{0359, Unique and Stable Stanza IDs} (v0.6)
 - \xep{0363, HTTP File Upload} (v1.0)
 - \xep{0367, Message Attaching} (v0.3)
-- \xep{0380, Explicit Message Encryption} (v0.3)
+- \xep{0380, Explicit Message Encryption} (v0.4)
 - \xep{0382, Spoiler messages} (v0.2)
 - \xep{0420, Stanza Content Encryption} (v0.4)
 - \xep{0428, Fallback Indication} (v0.1)
