@@ -99,17 +99,19 @@ public:
     ///
     /// This enum describes different end-to-end encryption methods. These can
     /// be used to mark a message explicitly as encrypted with a specific
-    /// algothim. See \xep{0380}: Explicit Message Encryption for details.
+    /// algorithm. See \xep{0380, Explicit Message Encryption} for details.
     ///
     /// \since QXmpp 1.1
     ///
     enum EncryptionMethod {
         NoEncryption,       ///< No encryption
         UnknownEncryption,  ///< Unknown encryption
-        OTR,                ///< \xep{0364}: Current Off-the-Record Messaging Usage
-        LegacyOpenPGP,      ///< \xep{0027}: Current Jabber OpenPGP Usage
-        OX,                 ///< \xep{0373}: OpenPGP for XMPP
-        OMEMO               ///< \xep{0384}: OMEMO Encryption
+        OTR,                ///< \xep{0364, Current Off-the-Record Messaging Usage}
+        LegacyOpenPGP,      ///< \xep{0027, Current Jabber OpenPGP Usage}
+        OX,                 ///< \xep{0373, OpenPGP for XMPP}
+        OMEMO,              ///< \xep{0384, OMEMO Encryption}
+        OMEMO1,             ///< \xep{0384, OMEMO Encryption} since version 0.4
+        OMEMO2              ///< \xep{0384, OMEMO Encryption} since version 0.8
     };
 
     QXmppMessage(const QString &from = QString(), const QString &to = QString(),

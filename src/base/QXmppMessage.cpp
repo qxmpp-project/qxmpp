@@ -70,7 +70,9 @@ static const QStringList ENCRYPTION_NAMESPACES = {
     ns_otr,
     ns_legacy_openpgp,
     ns_ox,
-    ns_omemo
+    ns_omemo,
+    ns_omemo_1,
+    ns_omemo_2
 };
 
 static const QStringList HINT_TYPES = {
@@ -86,7 +88,9 @@ static const QStringList ENCRYPTION_NAMES = {
     QStringLiteral("OTR"),
     QStringLiteral("Legacy OpenPGP"),
     QStringLiteral("OpenPGP for XMPP (OX)"),
-    QStringLiteral("OMEMO")
+    QStringLiteral("OMEMO"),
+    QStringLiteral("OMEMO 1"),
+    QStringLiteral("OMEMO 2")
 };
 
 static bool checkElement(const QDomElement &element, const QString &tagName, const QString &xmlns)
