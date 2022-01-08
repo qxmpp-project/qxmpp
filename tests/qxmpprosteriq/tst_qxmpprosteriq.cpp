@@ -166,12 +166,11 @@ void tst_QXmppRosterIq::testMixAnnotate()
 {
     const QByteArray xml(
         "<iq from=\"juliet@example.com/balcony\" "
-            "type=\"get\">"
-            "<query xmlns=\"jabber:iq:roster\">"
-                "<annotate xmlns=\"urn:xmpp:mix:roster:0\"/>"
-            "</query>"
-        "</iq>"
-    );
+        "type=\"get\">"
+        "<query xmlns=\"jabber:iq:roster\">"
+        "<annotate xmlns=\"urn:xmpp:mix:roster:0\"/>"
+        "</query>"
+        "</iq>");
 
     QXmppRosterIq iq;
     parsePacket(iq, xml);
@@ -186,9 +185,8 @@ void tst_QXmppRosterIq::testMixChannel()
 {
     const QByteArray xml(
         "<item jid=\"balcony@example.net\">"
-            "<channel xmlns=\"urn:xmpp:mix:roster:0\" participant-id=\"123456\"/>"
-        "</item>"
-    );
+        "<channel xmlns=\"urn:xmpp:mix:roster:0\" participant-id=\"123456\"/>"
+        "</item>");
 
     QXmppRosterIq::Item item;
     parsePacket(item, xml);

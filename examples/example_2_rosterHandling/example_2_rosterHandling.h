@@ -14,16 +14,16 @@ class xmppClient : public QXmppClient
     Q_OBJECT
 
 public:
-    xmppClient(QObject* parent = nullptr);
+    xmppClient(QObject *parent = nullptr);
     ~xmppClient() override;
 
 public slots:
     void clientConnected();
     void rosterReceived();
-    void presenceChanged(const QString& bareJid, const QString& resource);
+    void presenceChanged(const QString &bareJid, const QString &resource);
 
 private:
-    QXmppRosterManager* m_rosterManager;
+    QXmppRosterManager *m_rosterManager;
 };
 
 #endif  // XMPPCLIENT_H

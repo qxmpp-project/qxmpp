@@ -16,7 +16,9 @@ class QFuture;
 class QXmppE2eeExtension
 {
 public:
-    struct NotEncrypted {};
+    struct NotEncrypted
+    {
+    };
 
     using EncryptMessageResult = std::variant<QByteArray, QXmpp::SendError>;
     using IqEncryptResult = std::variant<QByteArray, QXmpp::SendError>;
@@ -28,4 +30,4 @@ public:
     virtual QFuture<IqDecryptResult> decryptIq(const QDomElement &) = 0;
 };
 
-#endif // QXMPPE2EEEXTENSION_H
+#endif  // QXMPPE2EEEXTENSION_H

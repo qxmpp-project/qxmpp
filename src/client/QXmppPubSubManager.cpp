@@ -256,8 +256,8 @@ QFuture<QXmppPubSubManager::InstantNodeResult> QXmppPubSubManager::createInstant
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
-        return iq.queryNode();
-    });
+                       return iq.queryNode();
+                   });
 }
 
 ///
@@ -280,8 +280,8 @@ auto QXmppPubSubManager::createInstantNode(const QString &jid, const QXmppPubSub
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> InstantNodeResult {
-        return iq.queryNode();
-    });
+                       return iq.queryNode();
+                   });
 }
 
 ///
@@ -369,8 +369,8 @@ QFuture<QXmppPubSubManager::SubscriptionsResult> QXmppPubSubManager::requestSubs
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> SubscriptionsResult {
-        return iq.subscriptions();
-    });
+                       return iq.subscriptions();
+                   });
 }
 
 ///
@@ -393,8 +393,8 @@ QFuture<QXmppPubSubManager::AffiliationsResult> QXmppPubSubManager::requestNodeA
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> AffiliationsResult {
-        return iq.affiliations();
-    });
+                       return iq.affiliations();
+                   });
 }
 
 ///
@@ -425,8 +425,8 @@ QFuture<QXmppPubSubManager::AffiliationsResult> QXmppPubSubManager::requestAffil
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> AffiliationsResult {
-        return iq.affiliations();
-    });
+                       return iq.affiliations();
+                   });
 }
 
 ///
@@ -460,18 +460,18 @@ QFuture<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscribeO
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> OptionsResult {
-        if (const auto form = iq.dataForm()) {
-            if (const auto options = QXmppPubSubSubscribeOptions::fromDataForm(*form)) {
-                return *options;
-            }
-        }
+                       if (const auto form = iq.dataForm()) {
+                           if (const auto options = QXmppPubSubSubscribeOptions::fromDataForm(*form)) {
+                               return *options;
+                           }
+                       }
 
-        // "real" stanza errors are already handled
-        using Error = QXmppStanza::Error;
-        return Error(Error::Cancel,
-                     Error::Condition::InternalServerError,
-                     QStringLiteral("Server returned invalid data form."));
-    });
+                       // "real" stanza errors are already handled
+                       using Error = QXmppStanza::Error;
+                       return Error(Error::Cancel,
+                                    Error::Condition::InternalServerError,
+                                    QStringLiteral("Server returned invalid data form."));
+                   });
 }
 
 ///
@@ -762,12 +762,12 @@ auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<Pub
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> PublishItemResult {
-        if (!iq.items().isEmpty()) {
-            return iq.items().constFirst().id();
-        } else {
-            return QString();
-        }
-    });
+                       if (!iq.items().isEmpty()) {
+                           return iq.items().constFirst().id();
+                       } else {
+                           return QString();
+                       }
+                   });
 }
 
 auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<PublishItemsResult>
@@ -777,14 +777,14 @@ auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<Pu
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const QXmppPubSubIq<> &iq) -> PublishItemsResult {
-        const auto itemToId = [](const QXmppPubSubItem &item) {
-            return item.id();
-        };
+                       const auto itemToId = [](const QXmppPubSubItem &item) {
+                           return item.id();
+                       };
 
-        const auto items = iq.items();
-        QVector<QString> ids(items.size());
-        std::transform(items.begin(), items.end(), ids.begin(), itemToId);
-        return ids;
-    });
+                       const auto items = iq.items();
+                       QVector<QString> ids(items.size());
+                       std::transform(items.begin(), items.end(), ids.begin(), itemToId);
+                       return ids;
+                   });
 }
 /// \endcond

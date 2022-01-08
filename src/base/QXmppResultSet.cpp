@@ -65,7 +65,7 @@ QString QXmppResultSetQuery::before() const
 ///
 /// This is used for for paging backwards through results.
 
-void QXmppResultSetQuery::setBefore(const QString& before)
+void QXmppResultSetQuery::setBefore(const QString &before)
 {
     m_before = before;
 }
@@ -83,7 +83,7 @@ QString QXmppResultSetQuery::after() const
 ///
 /// This is used for for paging forwards through results.
 
-void QXmppResultSetQuery::setAfter(const QString& after)
+void QXmppResultSetQuery::setAfter(const QString &after)
 {
     m_after = after;
 }
@@ -96,7 +96,7 @@ bool QXmppResultSetQuery::isNull() const
 }
 
 /// \cond
-void QXmppResultSetQuery::parse(const QDomElement& element)
+void QXmppResultSetQuery::parse(const QDomElement &element)
 {
     QDomElement setElement = (element.tagName() == QStringLiteral("set")) ? element : element.firstChildElement(QStringLiteral("set"));
     if (setElement.namespaceURI() == ns_rsm) {
@@ -112,7 +112,7 @@ void QXmppResultSetQuery::parse(const QDomElement& element)
     }
 }
 
-void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
+void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
 {
     if (isNull())
         return;
@@ -144,7 +144,7 @@ QString QXmppResultSetReply::first() const
 
 /// Sets the UID of the first result in the page.
 
-void QXmppResultSetReply::setFirst(const QString& first)
+void QXmppResultSetReply::setFirst(const QString &first)
 {
     m_first = first;
 }
@@ -158,7 +158,7 @@ QString QXmppResultSetReply::last() const
 
 /// Sets the UID of the last result in the page.
 
-void QXmppResultSetReply::setLast(const QString& last)
+void QXmppResultSetReply::setLast(const QString &last)
 {
     m_last = last;
 }
@@ -211,7 +211,7 @@ bool QXmppResultSetReply::isNull() const
 }
 
 /// \cond
-void QXmppResultSetReply::parse(const QDomElement& element)
+void QXmppResultSetReply::parse(const QDomElement &element)
 {
     QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
     if (setElement.namespaceURI() == ns_rsm) {
@@ -226,7 +226,7 @@ void QXmppResultSetReply::parse(const QDomElement& element)
     }
 }
 
-void QXmppResultSetReply::toXml(QXmlStreamWriter* writer) const
+void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
 {
     if (isNull())
         return;

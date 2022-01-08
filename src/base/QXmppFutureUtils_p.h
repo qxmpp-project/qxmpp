@@ -28,7 +28,8 @@ namespace QXmpp::Private {
 
 // helper for std::visit
 template<class... Ts>
-struct overloaded : Ts... {
+struct overloaded : Ts...
+{
     using Ts::operator()...;
 };
 // explicit deduction guide (not needed as of C++20)
@@ -42,7 +43,8 @@ template<typename F, typename Ret, typename A, typename... Rest>
 A lambda_helper(Ret (F::*)(A, Rest...) const);
 
 template<typename F>
-struct first_argument {
+struct first_argument
+{
     using type = decltype(lambda_helper(&F::operator()));
 };
 
@@ -70,10 +72,10 @@ void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
     auto *watcher = new QFutureWatcher<T>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
                      context, [watcher, handler { std::move(handler) }]() {
-        auto future = watcher->future();
-        handler(future.resultAt(future.resultCount() - 1));
-        watcher->deleteLater();
-    });
+                         auto future = watcher->future();
+                         handler(future.resultAt(future.resultCount() - 1));
+                         watcher->deleteLater();
+                     });
     watcher->setFuture(future);
 }
 
@@ -83,9 +85,9 @@ void await(const QFuture<T> &future, QObject *context, Handler handler)
     auto *watcher = new QFutureWatcher<T>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
                      context, [watcher, handler { std::move(handler) }]() {
-        handler(watcher->result());
-        watcher->deleteLater();
-    });
+                         handler(watcher->result());
+                         watcher->deleteLater();
+                     });
     watcher->setFuture(future);
 }
 
@@ -95,9 +97,9 @@ void await(const QFuture<void> &future, QObject *context, Handler handler)
     auto *watcher = new QFutureWatcher<void>(context);
     QObject::connect(watcher, &QFutureWatcherBase::finished,
                      context, [watcher, handler { std::move(handler) }]() {
-        handler();
-        watcher->deleteLater();
-    });
+                         handler();
+                         watcher->deleteLater();
+                     });
     watcher->setFuture(future);
 }
 

@@ -37,4 +37,4 @@ private:
     QDateTime m_utc;
 };
 
-#endif  //QXMPPENTITYTIMEIQ_H
+#endif  // QXMPPENTITYTIMEIQ_H

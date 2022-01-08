@@ -42,30 +42,30 @@ public:
     QXmppVCardManager();
     ~QXmppVCardManager() override;
 
-    QString requestVCard(const QString& bareJid = QString());
+    QString requestVCard(const QString &bareJid = QString());
 
-    const QXmppVCardIq& clientVCard() const;
-    void setClientVCard(const QXmppVCardIq&);
+    const QXmppVCardIq &clientVCard() const;
+    void setClientVCard(const QXmppVCardIq &);
 
     QString requestClientVCard();
     bool isClientVCardReceived() const;
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement& element) override;
+    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 Q_SIGNALS:
     /// This signal is emitted when the requested vCard is received
     /// after calling the requestVCard() function.
-    void vCardReceived(const QXmppVCardIq&);
+    void vCardReceived(const QXmppVCardIq &);
 
     /// This signal is emitted when the client's vCard is received
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
 
 private:
-    QXmppVCardManagerPrivate* d;
+    QXmppVCardManagerPrivate *d;
 };
 
 #endif  // QXMPPVCARDMANAGER_H

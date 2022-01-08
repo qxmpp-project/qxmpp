@@ -235,8 +235,7 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
     if (id.isEmpty() || d->runningIqs.contains(id)) {
         return makeReadyFuture<IqResult>(QXmpp::SendError {
             QStringLiteral("Invalid IQ id: empty or in use."),
-            SendError::Disconnected
-        });
+            SendError::Disconnected });
     }
 
     auto sendFuture = send(std::move(packet));
@@ -273,8 +272,7 @@ void QXmppStream::cancelOngoingIqs()
     for (auto &state : d->runningIqs) {
         state.reportResult(QXmpp::SendError {
             QStringLiteral("IQ has been cancelled."),
-            QXmpp::SendError::Disconnected
-        });
+            QXmpp::SendError::Disconnected });
         state.reportFinished();
     }
     d->runningIqs.clear();

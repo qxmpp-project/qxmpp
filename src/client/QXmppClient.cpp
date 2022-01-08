@@ -30,7 +30,7 @@
 using namespace QXmpp::Private;
 
 /// \cond
-QXmppClientPrivate::QXmppClientPrivate(QXmppClient* qq)
+QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
     : clientPresence(QXmppPresence::Available),
       logger(nullptr),
       stream(nullptr),
@@ -43,9 +43,9 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient* qq)
 {
 }
 
-void QXmppClientPrivate::addProperCapability(QXmppPresence& presence)
+void QXmppClientPrivate::addProperCapability(QXmppPresence &presence)
 {
-    auto* ext = q->findExtension<QXmppDiscoveryManager>();
+    auto *ext = q->findExtension<QXmppDiscoveryManager>();
     if (ext) {
         presence.setCapabilityHash("sha-1");
         presence.setCapabilityNode(ext->clientCapabilitiesNode());
@@ -128,7 +128,7 @@ QStringList QXmppClientPrivate::discoveryFeatures()
 /// \param parent is passed to the QObject's constructor.
 /// The default value is 0.
 
-QXmppClient::QXmppClient(QObject* parent)
+QXmppClient::QXmppClient(QObject *parent)
     : QXmppLoggable(parent),
       d(new QXmppClientPrivate(this))
 {
@@ -202,7 +202,7 @@ QXmppClient::~QXmppClient()
 ///
 /// \param extension
 
-bool QXmppClient::addExtension(QXmppClientExtension* extension)
+bool QXmppClient::addExtension(QXmppClientExtension *extension)
 {
     return insertExtension(d->extensions.size(), extension);
 }
@@ -212,7 +212,7 @@ bool QXmppClient::addExtension(QXmppClientExtension* extension)
 /// \param index
 /// \param extension
 
-bool QXmppClient::insertExtension(int index, QXmppClientExtension* extension)
+bool QXmppClient::insertExtension(int index, QXmppClientExtension *extension)
 {
     if (d->extensions.contains(extension)) {
         qWarning("Cannot add extension, it has already been added");
@@ -230,7 +230,7 @@ bool QXmppClient::insertExtension(int index, QXmppClientExtension* extension)
 ///
 /// \param extension
 
-bool QXmppClient::removeExtension(QXmppClientExtension* extension)
+bool QXmppClient::removeExtension(QXmppClientExtension *extension)
 {
     if (d->extensions.contains(extension)) {
         d->extensions.removeAll(extension);
@@ -265,7 +265,7 @@ void QXmppClient::setEncryptionExtension(QXmppE2eeExtension *extension)
 /// Returns a list containing all the client's extensions.
 ///
 
-QList<QXmppClientExtension*> QXmppClient::extensions()
+QList<QXmppClientExtension *> QXmppClient::extensions()
 {
     return d->extensions;
 }
@@ -273,7 +273,7 @@ QList<QXmppClientExtension*> QXmppClient::extensions()
 /// Returns a modifiable reference to the current configuration of QXmppClient.
 /// \return Reference to the QXmppClient's configuration for the connection.
 
-QXmppConfiguration& QXmppClient::configuration()
+QXmppConfiguration &QXmppClient::configuration()
 {
     return d->stream->configuration();
 }
@@ -288,8 +288,8 @@ QXmppConfiguration& QXmppClient::configuration()
 /// \param initialPresence The initial presence which will be set for this user
 /// after establishing the session. The default value is QXmppPresence::Available
 ///
-void QXmppClient::connectToServer(const QXmppConfiguration& config,
-                                  const QXmppPresence& initialPresence)
+void QXmppClient::connectToServer(const QXmppConfiguration &config,
+                                  const QXmppPresence &initialPresence)
 {
     // reset package cache from last connection
     if (d->stream->configuration().jidBare() != config.jidBare())
@@ -307,7 +307,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration& config,
 /// \param jid JID for the account.
 /// \param password Password for the account.
 
-void QXmppClient::connectToServer(const QString& jid, const QString& password)
+void QXmppClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
     config.setJid(jid);
@@ -467,8 +467,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
                         } else {
                             interface->reportResult(QXmpp::SendError {
                                 QStringLiteral("No decryption extension found."),
-                                QXmpp::SendError::EncryptionError
-                            });
+                                QXmpp::SendError::EncryptionError });
                             interface->reportFinished();
                         }
                     } else {
@@ -607,7 +606,7 @@ QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppClient::findExtension<QXmppRosterManager>() instead.
 
-QXmppRosterManager& QXmppClient::rosterManager()
+QXmppRosterManager &QXmppClient::rosterManager()
 {
     return *findExtension<QXmppRosterManager>();
 }
@@ -626,16 +625,16 @@ QXmppRosterManager& QXmppClient::rosterManager()
 /// \param bareJid bareJid of the receiving entity
 /// \param message Message string to be sent.
 
-void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
+void QXmppClient::sendMessage(const QString &bareJid, const QString &message)
 {
-    QXmppRosterManager* rosterManager = findExtension<QXmppRosterManager>();
+    QXmppRosterManager *rosterManager = findExtension<QXmppRosterManager>();
 
     const QStringList resources = rosterManager
         ? rosterManager->getResources(bareJid)
         : QStringList();
 
     if (!resources.isEmpty()) {
-        for (const auto& resource : resources) {
+        for (const auto &resource : resources) {
             sendPacket(
                 QXmppMessage({}, bareJid + QStringLiteral("/") + resource, message));
         }
@@ -676,7 +675,7 @@ QXmppPresence QXmppClient::clientPresence() const
 /// \param presence QXmppPresence object
 ///
 
-void QXmppClient::setClientPresence(const QXmppPresence& presence)
+void QXmppClient::setClientPresence(const QXmppPresence &presence)
 {
     d->clientPresence = presence;
     d->addProperCapability(d->clientPresence);
@@ -726,7 +725,7 @@ QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppClient::findExtension<QXmppVCardManager>() instead.
 ///
-QXmppVCardManager& QXmppClient::vCardManager()
+QXmppVCardManager &QXmppClient::vCardManager()
 {
     return *findExtension<QXmppVCardManager>();
 }
@@ -738,7 +737,7 @@ QXmppVCardManager& QXmppClient::vCardManager()
 /// \deprecated This method is deprecated since QXmpp 1.1. Use
 /// \c QXmppClient::findExtension<QXmppVersionManager>() instead.
 ///
-QXmppVersionManager& QXmppClient::versionManager()
+QXmppVersionManager &QXmppClient::versionManager()
 {
     return *findExtension<QXmppVersionManager>();
 }
@@ -748,9 +747,9 @@ QXmppVersionManager& QXmppClient::versionManager()
 /// \param element
 /// \param handled
 
-void QXmppClient::_q_elementReceived(const QDomElement& element, bool& handled)
+void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
-    for (auto* extension : d->extensions) {
+    for (auto *extension : d->extensions) {
         if (extension->handleStanza(element)) {
             handled = true;
             return;
@@ -816,14 +815,14 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
     emit error(err);
 }
 
-QXmppLogger* QXmppClient::logger() const
+QXmppLogger *QXmppClient::logger() const
 {
     return d->logger;
 }
 
 /// Sets the QXmppLogger associated with the current QXmppClient.
 
-void QXmppClient::setLogger(QXmppLogger* logger)
+void QXmppClient::setLogger(QXmppLogger *logger)
 {
     if (logger != d->logger) {
         if (d->logger) {

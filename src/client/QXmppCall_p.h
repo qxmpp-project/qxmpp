@@ -29,7 +29,8 @@ class QXmppCallPrivate : public QObject
 {
     Q_OBJECT
 public:
-    struct GstCodec {
+    struct GstCodec
+    {
         int pt;
         QString name;
         int channels;
@@ -38,7 +39,8 @@ public:
         QString gstDepay;
         QString gstEnc;
         QString gstDec;
-        struct Property {
+        struct Property
+        {
             QString name;
             int value;
         };

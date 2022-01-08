@@ -17,9 +17,10 @@
 #ifndef QXMPPSCEENVELOPE_P_H
 #define QXMPPSCEENVELOPE_P_H
 
-#include <QDomElement>
-#include <QDateTime>
 #include "QXmppUtils.h"
+
+#include <QDateTime>
+#include <QDomElement>
 
 class QXmppSceEnvelopeReader
 {
@@ -44,7 +45,7 @@ public:
     inline QDateTime timestamp()
     {
         return QXmppUtils::datetimeFromString(
-                    element.firstChildElement(QStringLiteral("time")).attribute(QStringLiteral("stamp")));
+            element.firstChildElement(QStringLiteral("time")).attribute(QStringLiteral("stamp")));
     }
 
     // rpad is usually not needed (but can be parsed manually if really needed)
@@ -106,4 +107,4 @@ private:
     QXmlStreamWriter &writer;
 };
 
-#endif // QXMPPSCEENVELOPE_P_H
+#endif  // QXMPPSCEENVELOPE_P_H

@@ -42,7 +42,7 @@ static QByteArray packetToXml(const T &packet)
 template<class T>
 static void parsePacket(T &packet, const QByteArray &xml)
 {
-    //qDebug() << "parsing" << xml;
+    // qDebug() << "parsing" << xml;
     packet.parse(xmlToDom(xml));
 }
 

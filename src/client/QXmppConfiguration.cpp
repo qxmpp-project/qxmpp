@@ -72,7 +72,7 @@ QXmppConfiguration::QXmppConfiguration()
 
 /// Creates a copy of \a other.
 
-QXmppConfiguration::QXmppConfiguration(const QXmppConfiguration& other)
+QXmppConfiguration::QXmppConfiguration(const QXmppConfiguration &other)
     : d(other.d)
 {
 }
@@ -86,7 +86,7 @@ QXmppConfiguration::~QXmppConfiguration()
 
 /// Assigns \a other to this QXmppConfiguration.
 
-QXmppConfiguration& QXmppConfiguration::operator=(const QXmppConfiguration& other)
+QXmppConfiguration &QXmppConfiguration::operator=(const QXmppConfiguration &other)
 {
     d = other.d;
     return *this;
@@ -99,7 +99,7 @@ QXmppConfiguration& QXmppConfiguration::operator=(const QXmppConfiguration& othe
 /// the form of a string (e.g. "192.168.1.25").
 ///
 
-void QXmppConfiguration::setHost(const QString& host)
+void QXmppConfiguration::setHost(const QString &host)
 {
     d->host = host;
 }
@@ -111,7 +111,7 @@ void QXmppConfiguration::setHost(const QString& host)
 /// domain name is gmail.com and host name is talk.google.com
 ///
 
-void QXmppConfiguration::setDomain(const QString& domain)
+void QXmppConfiguration::setDomain(const QString &domain)
 {
     d->domain = domain;
 }
@@ -134,7 +134,7 @@ void QXmppConfiguration::setPort(int port)
 /// "qxmpp.test1@gmail.com"
 ///
 
-void QXmppConfiguration::setUser(const QString& user)
+void QXmppConfiguration::setUser(const QString &user)
 {
     d->user = user;
 }
@@ -144,7 +144,7 @@ void QXmppConfiguration::setUser(const QString& user)
 /// \param password Password for the specified username
 ///
 
-void QXmppConfiguration::setPassword(const QString& password)
+void QXmppConfiguration::setPassword(const QString &password)
 {
     d->password = password;
 }
@@ -160,7 +160,7 @@ void QXmppConfiguration::setPassword(const QString& password)
 ///
 /// \param resource Resource identifier of the client in connection.
 
-void QXmppConfiguration::setResource(const QString& resource)
+void QXmppConfiguration::setResource(const QString &resource)
 {
     d->resource = resource;
 }
@@ -171,7 +171,7 @@ void QXmppConfiguration::setResource(const QString& resource)
 ///
 /// \param jid
 
-void QXmppConfiguration::setJid(const QString& jid)
+void QXmppConfiguration::setJid(const QString &jid)
 {
     d->user = QXmppUtils::jidToUser(jid);
     d->domain = QXmppUtils::jidToDomain(jid);
@@ -282,7 +282,7 @@ QString QXmppConfiguration::facebookAccessToken() const
 ///
 /// \param accessToken
 
-void QXmppConfiguration::setFacebookAccessToken(const QString& accessToken)
+void QXmppConfiguration::setFacebookAccessToken(const QString &accessToken)
 {
     d->facebookAccessToken = accessToken;
 }
@@ -298,7 +298,7 @@ QString QXmppConfiguration::facebookAppId() const
 ///
 /// \param appId
 
-void QXmppConfiguration::setFacebookAppId(const QString& appId)
+void QXmppConfiguration::setFacebookAppId(const QString &appId)
 {
     d->facebookAppId = appId;
 }
@@ -317,7 +317,7 @@ QString QXmppConfiguration::googleAccessToken() const
 ///
 /// \param accessToken
 
-void QXmppConfiguration::setGoogleAccessToken(const QString& accessToken)
+void QXmppConfiguration::setGoogleAccessToken(const QString &accessToken)
 {
     d->googleAccessToken = accessToken;
 }
@@ -336,7 +336,7 @@ QString QXmppConfiguration::windowsLiveAccessToken() const
 ///
 /// \param accessToken
 
-void QXmppConfiguration::setWindowsLiveAccessToken(const QString& accessToken)
+void QXmppConfiguration::setWindowsLiveAccessToken(const QString &accessToken)
 {
     d->windowsLiveAccessToken = accessToken;
 }
@@ -481,7 +481,7 @@ QString QXmppConfiguration::saslAuthMechanism() const
 /// Valid values: "SCRAM-SHA-256", "SCRAM-SHA-1", "DIGEST-MD5", "PLAIN", "ANONYMOUS",
 //                "X-FACEBOOK-PLATFORM", "X-MESSENGER-OAUTH2", "X-OAUTH2"
 
-void QXmppConfiguration::setSaslAuthMechanism(const QString& mechanism)
+void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
 {
     d->saslAuthMechanism = mechanism;
 }
@@ -492,7 +492,7 @@ void QXmppConfiguration::setSaslAuthMechanism(const QString& mechanism)
 /// QNetworkProxy::setApplicationProxy().
 /// \param proxy QNetworkProxy
 
-void QXmppConfiguration::setNetworkProxy(const QNetworkProxy& proxy)
+void QXmppConfiguration::setNetworkProxy(const QNetworkProxy &proxy)
 {
     d->networkProxy = proxy;
 }
@@ -553,7 +553,7 @@ int QXmppConfiguration::keepAliveTimeout() const
 
 /// Specifies a list of trusted CA certificates.
 
-void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate>& caCertificates)
+void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCertificates)
 {
     d->caCertificates = caCertificates;
 }

@@ -48,9 +48,9 @@ void tst_QXmppVCardManager::testHandleStanza_data()
     auto iqFromFull = iq;
     iqFromFull.setFrom("stpeter@jabber.org/roundabout");
 
-    ROW(client-vcard-from-empty, iq, true);
-    ROW(client-vcard-from-bare, iqFromBare, true);
-    ROW(client-vcard-from-full, iqFromFull, false);
+    ROW(client - vcard - from - empty, iq, true);
+    ROW(client - vcard - from - bare, iqFromBare, true);
+    ROW(client - vcard - from - full, iqFromFull, false);
 
 #undef ROW
 }

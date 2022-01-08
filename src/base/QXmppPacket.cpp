@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppPacket_p.h"
 #include "QXmppNonza.h"
+#include "QXmppPacket_p.h"
 
 #include <QFuture>
 #include <QXmlStreamWriter>

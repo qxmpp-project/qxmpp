@@ -306,8 +306,8 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const Q
     using Error = QXmppStanza::Error;
     if (!d->entries.contains(bareJid)) {
         return QXmpp::Private::makeReadyFuture<Result>(
-                    Error(Error::Modify, Error::ItemNotFound,
-                          QStringLiteral("The roster doesn't contain this user.")));
+            Error(Error::Modify, Error::ItemNotFound,
+                  QStringLiteral("The roster doesn't contain this user.")));
     }
 
     auto item = d->entries.value(bareJid);

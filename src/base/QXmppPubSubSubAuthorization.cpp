@@ -35,7 +35,7 @@ public:
 std::optional<QXmppPubSubSubAuthorization> QXmppPubSubSubAuthorization::fromDataForm(const QXmppDataForm &form)
 {
     if (auto parsed = QXmppPubSubSubAuthorization();
-            QXmppDataFormBase::fromDataForm(form, parsed)) {
+        QXmppDataFormBase::fromDataForm(form, parsed)) {
         return parsed;
     }
     return std::nullopt;

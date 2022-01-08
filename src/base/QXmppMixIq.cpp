@@ -39,12 +39,12 @@ QXmppMixIq::QXmppMixIq()
 }
 
 /// Default copy-constructor
-QXmppMixIq::QXmppMixIq(const QXmppMixIq&) = default;
+QXmppMixIq::QXmppMixIq(const QXmppMixIq &) = default;
 
 QXmppMixIq::~QXmppMixIq() = default;
 
 /// Default assignment operator
-QXmppMixIq& QXmppMixIq::operator=(const QXmppMixIq&) = default;
+QXmppMixIq &QXmppMixIq::operator=(const QXmppMixIq &) = default;
 
 /// Returns the channel JID. It also contains a participant id for Join/
 /// ClientJoin results.
@@ -57,7 +57,7 @@ QString QXmppMixIq::jid() const
 /// Sets the channel JID. For results of Join/ClientJoin queries this also
 /// needs to contain a participant id.
 
-void QXmppMixIq::setJid(const QString& jid)
+void QXmppMixIq::setJid(const QString &jid)
 {
     d->jid = jid;
 }
@@ -74,7 +74,7 @@ QString QXmppMixIq::channelName() const
 /// create a new channel, this can also be left empty to let the server
 /// generate a name.
 
-void QXmppMixIq::setChannelName(const QString& channelName)
+void QXmppMixIq::setChannelName(const QString &channelName)
 {
     d->channelName = channelName;
 }
@@ -89,7 +89,7 @@ QStringList QXmppMixIq::nodes() const
 /// Sets the nodes to subscribe to. Note that for UpdateSubscription queries
 /// you only need to include the new subscriptions.
 
-void QXmppMixIq::setNodes(const QStringList& nodes)
+void QXmppMixIq::setNodes(const QStringList &nodes)
 {
     d->nodes = nodes;
 }
@@ -103,7 +103,7 @@ QString QXmppMixIq::nick() const
 
 /// Sets the nickname for the channel.
 
-void QXmppMixIq::setNick(const QString& nick)
+void QXmppMixIq::setNick(const QString &nick)
 {
     d->nick = nick;
 }
@@ -123,13 +123,13 @@ void QXmppMixIq::setActionType(QXmppMixIq::Type type)
 }
 
 /// \cond
-bool QXmppMixIq::isMixIq(const QDomElement& element)
+bool QXmppMixIq::isMixIq(const QDomElement &element)
 {
-    const QDomElement& child = element.firstChildElement();
+    const QDomElement &child = element.firstChildElement();
     return !child.isNull() && (child.namespaceURI() == ns_mix || child.namespaceURI() == ns_mix_pam);
 }
 
-void QXmppMixIq::parseElementFromChild(const QDomElement& element)
+void QXmppMixIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement child = element.firstChildElement();
     // determine action type
@@ -160,7 +160,7 @@ void QXmppMixIq::parseElementFromChild(const QDomElement& element)
     }
 }
 
-void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter* writer) const
+void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     if (d->actionType == None)
         return;
@@ -182,7 +182,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter* writer) const
     if (type() == Result)
         helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->jid);
 
-    for (const auto& node : d->nodes) {
+    for (const auto &node : d->nodes) {
         writer->writeStartElement(QStringLiteral("subscribe"));
         writer->writeAttribute(QStringLiteral("node"), node);
         writer->writeEndElement();

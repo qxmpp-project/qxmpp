@@ -71,19 +71,19 @@ void tst_QXmppStanza::testErrorCases_data()
     QTest::addColumn<QString>("by");
 
 #define ROW(name, xml, type, condition, text, redirect, by) \
-    QTest::newRow(QT_STRINGIFY(name)) \
-        << QByteArrayLiteral(xml) \
-        << QXmppStanza::Error::type \
-        << QXmppStanza::Error::condition \
-        << text \
-        << redirect \
+    QTest::newRow(QT_STRINGIFY(name))                       \
+        << QByteArrayLiteral(xml)                           \
+        << QXmppStanza::Error::type                         \
+        << QXmppStanza::Error::condition                    \
+        << text                                             \
+        << redirect                                         \
         << by
 
 #define BASIC(xml, type, condition) \
     ROW(condition, xml, type, condition, QString(), QString(), QString())
 
     ROW(
-        empty-text,
+        empty - text,
         "<error type=\"modify\">"
         "<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
         "</error>",
@@ -93,7 +93,7 @@ void tst_QXmppStanza::testErrorCases_data()
         QString(),
         QString());
     ROW(
-        redirection-uri-gone,
+        redirection - uri - gone,
         "<error by=\"example.net\" type=\"cancel\">"
         "<gone xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
         "xmpp:romeo@afterlife.example.net"
@@ -105,7 +105,7 @@ void tst_QXmppStanza::testErrorCases_data()
         "xmpp:romeo@afterlife.example.net",
         "example.net");
     ROW(
-        redirection-uri-redirect,
+        redirection - uri - redirect,
         "<error type=\"cancel\">"
         "<redirect xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">"
         "xmpp:rms@afterlife.example.net"
@@ -117,7 +117,7 @@ void tst_QXmppStanza::testErrorCases_data()
         "xmpp:rms@afterlife.example.net",
         QString());
     ROW(
-        redirection-uri-empty,
+        redirection - uri - empty,
         "<error type=\"cancel\">"
         "<redirect xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
         "</error>",
@@ -127,7 +127,7 @@ void tst_QXmppStanza::testErrorCases_data()
         QString(),
         QString());
     ROW(
-        policy-violation-text,
+        policy - violation - text,
         "<error by=\"example.net\" type=\"modify\">"
         "<policy-violation xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
         "<text xml:lang=\"en\" xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\">The used words are not allowed on this server.</text>"
@@ -138,7 +138,7 @@ void tst_QXmppStanza::testErrorCases_data()
         QString(),
         "example.net");
     ROW(
-        jid-malformed-with-by,
+        jid - malformed - with - by,
         "<error by=\"muc.example.com\" type=\"modify\">"
         "<jid-malformed xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>"
         "</error>",

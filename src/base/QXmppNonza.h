@@ -21,4 +21,4 @@ public:
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
 };
 
-#endif // QXMPPNONZA_H
+#endif  // QXMPPNONZA_H
