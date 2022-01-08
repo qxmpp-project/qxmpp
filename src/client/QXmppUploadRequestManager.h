@@ -7,9 +7,9 @@
 
 #include <QXmppClientExtension.h>
 
-#include <QSharedDataPointer>
-
 #include <variant>
+
+#include <QSharedDataPointer>
 
 class QFileInfo;
 template<typename T>

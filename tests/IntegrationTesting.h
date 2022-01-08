@@ -5,21 +5,21 @@
 #ifndef INTEGRATIONTESTING_H
 #define INTEGRATIONTESTING_H
 
-#include <QtGlobal>
-#include <QDebug>
-
 #include "QXmppConfiguration.h"
+
+#include <QDebug>
+#include <QtGlobal>
 
 #define ENV_ENABLED "QXMPP_TESTS_INTEGRATION_ENABLED"
 #define ENV_JID "QXMPP_TESTS_JID"
 #define ENV_PASSWORD "QXMPP_TESTS_PASSWORD"
 
-#define SKIP_IF_INTEGRATION_TESTS_DISABLED() \
-    if (!IntegrationTests::enabled()) { \
+#define SKIP_IF_INTEGRATION_TESTS_DISABLED()                            \
+    if (!IntegrationTests::enabled()) {                                 \
         QSKIP("Export 'QXMPP_TESTS_INTEGRATION_ENABLED=1' to enable."); \
-    } else if (!IntegrationTests::credentialsAvailable()) { \
-        QFAIL("No credentials for integration tests provided! " \
-              "Export 'QXMPP_TESTS_JID' and 'QXMPP_TESTS_PASSWORD'."); \
+    } else if (!IntegrationTests::credentialsAvailable()) {             \
+        QFAIL("No credentials for integration tests provided! "         \
+              "Export 'QXMPP_TESTS_JID' and 'QXMPP_TESTS_PASSWORD'.");  \
     }
 
 class IntegrationTests
@@ -57,4 +57,4 @@ public:
 #undef ENV_JID
 #undef ENV_PASSWORD
 
-#endif // INTEGRATIONTESTING_H
+#endif  // INTEGRATIONTESTING_H

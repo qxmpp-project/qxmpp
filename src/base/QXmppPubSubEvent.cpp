@@ -292,8 +292,8 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
 bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp::SceMode sceMode)
 {
     if (sceMode & QXmpp::SceSensitive &&
-            eventElement.tagName() == QStringLiteral("event") &&
-            eventElement.namespaceURI() == ns_pubsub_event) {
+        eventElement.tagName() == QStringLiteral("event") &&
+        eventElement.namespaceURI() == ns_pubsub_event) {
         // check that the query type is valid
         const auto eventTypeElement = eventElement.firstChildElement();
         if (const auto index = PUBSUB_EVENTS.indexOf(eventTypeElement.tagName());

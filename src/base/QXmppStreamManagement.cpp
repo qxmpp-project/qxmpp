@@ -350,8 +350,7 @@ void QXmppStreamManager::handlePacketSent(QXmppPacket &packet, bool sentData)
         } else {
             packet.reportResult(QXmpp::SendError {
                 QStringLiteral("Couldn't write data to socket. No stream management enabled."),
-                QXmpp::SendError::SocketWriteError
-            });
+                QXmpp::SendError::SocketWriteError });
         }
         packet.reportFinished();
     }

@@ -18,19 +18,19 @@ private slots:
     void testReceipt_data();
     void testReceipt();
 
-    void handleMessageDelivered(const QString&, const QString&)
+    void handleMessageDelivered(const QString &, const QString &)
     {
         m_messageDelivered = true;
     }
-    void onLoggerMessage(QXmppLogger::MessageType type, const QString& text)
+    void onLoggerMessage(QXmppLogger::MessageType type, const QString &text)
     {
         m_receiptSent = true;
     }
 
 private:
-    QXmppMessageReceiptManager* m_manager;
+    QXmppMessageReceiptManager *m_manager;
     QXmppClient m_client;
-    QXmppLogger* m_logger;
+    QXmppLogger *m_logger;
     bool m_messageDelivered = false;
     bool m_receiptSent = false;
 };

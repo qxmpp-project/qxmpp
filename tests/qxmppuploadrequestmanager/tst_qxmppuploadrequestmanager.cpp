@@ -23,8 +23,8 @@ public:
     ~TestHelper();
 
 public slots:
-    void onSlotReceived(const QXmppHttpUploadSlotIq& slot);
-    void onRequestFailed(const QXmppHttpUploadRequestIq& request);
+    void onSlotReceived(const QXmppHttpUploadSlotIq &slot);
+    void onRequestFailed(const QXmppHttpUploadRequestIq &request);
 
 private:
     bool expectedEvent;
@@ -47,13 +47,13 @@ TestHelper::~TestHelper()
     QCOMPARE(error, expectedError);
 }
 
-void TestHelper::onRequestFailed(const QXmppHttpUploadRequestIq& request)
+void TestHelper::onRequestFailed(const QXmppHttpUploadRequestIq &request)
 {
     event = true;
     error = true;
 }
 
-void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq& slot)
+void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq &slot)
 {
     event = true;
     error = false;
@@ -64,7 +64,7 @@ class tst_QXmppUploadRequestManager : public QObject
     Q_OBJECT
 
 protected slots:
-    void onLoggerMessage(QXmppLogger::MessageType type, const QString& text) const;
+    void onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const;
 
 private slots:
     void initTestCase();
@@ -81,9 +81,9 @@ private slots:
     void testUploadService();
 
 private:
-    QXmppUploadRequestManager* manager;
+    QXmppUploadRequestManager *manager;
     QXmppClient client;
-    QXmppDiscoveryManager* discovery;
+    QXmppDiscoveryManager *discovery;
     QString uploadServiceName;
     qint64 maxFileSize;
 
@@ -92,7 +92,7 @@ private:
     qint64 lastFileSize;
 };
 
-void tst_QXmppUploadRequestManager::onLoggerMessage(QXmppLogger::MessageType type, const QString& text) const
+void tst_QXmppUploadRequestManager::onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const
 {
     QCOMPARE(type, QXmppLogger::SentMessage);
 
@@ -293,7 +293,7 @@ void tst_QXmppUploadRequestManager::testSending()
     QFETCH(qint64, fileSize);
     QFETCH(QString, fileType);
 
-    QXmppLogger* logger = new QXmppLogger();
+    QXmppLogger *logger = new QXmppLogger();
     logger->setLoggingType(QXmppLogger::SignalLogging);
     client.setLogger(logger);
 

@@ -9,8 +9,8 @@
 #include "QXmppLogger.h"
 #include "QXmppSendResult.h"
 
-#include <variant>
 #include <memory>
+#include <variant>
 
 #include <QAbstractSocket>
 #include <QObject>

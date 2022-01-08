@@ -27,27 +27,27 @@ public:
     ~QXmppInvokable() override;
 
     /**
-         * Execute a method on an object. with a set of arguments. This method is reentrant, and the method
-         * that is invoked will be done in a thread safe manner.  It should be noted that while this method
-         * is threadsafe and reentrant the side affects of the methods invoked may not be.
-         */
+     * Execute a method on an object. with a set of arguments. This method is reentrant, and the method
+     * that is invoked will be done in a thread safe manner.  It should be noted that while this method
+     * is threadsafe and reentrant the side affects of the methods invoked may not be.
+     */
     QVariant dispatch(const QByteArray &method, const QList<QVariant> &args = QList<QVariant>());
 
     /**
-         * Utility method to convert a QList<QVariant> to a list of types for type
-         * checking.
-         */
+     * Utility method to convert a QList<QVariant> to a list of types for type
+     * checking.
+     */
     static QList<QByteArray> paramTypes(const QList<QVariant> &params);
 
     /**
-          * Reimplement this method to return a true if the invoking JID is allowed to execute the method.
-          */
+     * Reimplement this method to return a true if the invoking JID is allowed to execute the method.
+     */
     virtual bool isAuthorized(const QString &jid) const = 0;
 
 public Q_SLOTS:
     /**
-          * This provides a list of interfaces for introspection of the presented interface.
-          */
+     * This provides a list of interfaces for introspection of the presented interface.
+     */
     QStringList interfaces() const;
 
 private:

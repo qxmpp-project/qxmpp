@@ -88,7 +88,7 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
         for (const auto &chat : chats) {
             qDebug("chat start %s", qPrintable(chat.start().toString()));
             // NOTE: to actually retrieve conversations, uncomment this
-            //archiveManager->retrieveCollection(chat.with(), chat.start());
+            // archiveManager->retrieveCollection(chat.with(), chat.start());
         }
         if (!rsmReply.isNull()) {
             // fetch next page

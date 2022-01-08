@@ -41,4 +41,4 @@ private:
     QSharedDataPointer<QXmppPubSubSubAuthorizationPrivate> d;
 };
 
-#endif // QXMPPPUBSUBSUBAUTHORIZATION_H
+#endif  // QXMPPPUBSUBSUBAUTHORIZATION_H

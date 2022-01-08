@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include <QObject>
-#include "util.h"
-#include <QXmppPushEnableIq.h>
 #include <QXmppDataForm.h>
+#include <QXmppPushEnableIq.h>
+
+#include "util.h"
+#include <QObject>
 
 class tst_QXmppPushEnableIq : public QObject
 {
@@ -112,7 +113,7 @@ void tst_QXmppPushEnableIq::testDataForm()
 
     QXmppDataForm form;
     form.setType(QXmppDataForm::Submit);
-    form.setFields({field0, field1});
+    form.setFields({ field0, field1 });
 
     sIq.setDataForm(form);
 

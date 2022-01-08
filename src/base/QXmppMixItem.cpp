@@ -38,10 +38,10 @@ QXmppMixInfoItem::QXmppMixInfoItem()
 }
 
 /// Default copy-constructor
-QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem&) = default;
+QXmppMixInfoItem::QXmppMixInfoItem(const QXmppMixInfoItem &) = default;
 
 /// Default assignment operator
-QXmppMixInfoItem& QXmppMixInfoItem::operator=(const QXmppMixInfoItem&) = default;
+QXmppMixInfoItem &QXmppMixInfoItem::operator=(const QXmppMixInfoItem &) = default;
 
 QXmppMixInfoItem::~QXmppMixInfoItem() = default;
 
@@ -57,7 +57,7 @@ QString QXmppMixInfoItem::name() const
 ///
 /// Sets the name of the channel.
 ///
-void QXmppMixInfoItem::setName(const QString& name)
+void QXmppMixInfoItem::setName(const QString &name)
 {
     d->name = name;
 }
@@ -73,7 +73,7 @@ QString QXmppMixInfoItem::description() const
 ///
 /// Sets the longer channel description.
 ///
-void QXmppMixInfoItem::setDescription(const QString& description)
+void QXmppMixInfoItem::setDescription(const QString &description)
 {
     d->description = description;
 }
@@ -89,7 +89,7 @@ QStringList QXmppMixInfoItem::contactJids() const
 ///
 /// Sets a list of public JIDs that are responsible for this channel.
 ///
-void QXmppMixInfoItem::setContactJids(const QStringList& contactJids)
+void QXmppMixInfoItem::setContactJids(const QStringList &contactJids)
 {
     d->contactJids = contactJids;
 }
@@ -97,11 +97,11 @@ void QXmppMixInfoItem::setContactJids(const QStringList& contactJids)
 ///
 /// Returns true, if the given dom element is a MIX channel info item.
 ///
-bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
+bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement &element)
 {
     QXmppDataForm form;
     form.parse(element);
-    for (const auto& field : form.fields()) {
+    for (const auto &field : form.fields()) {
         if (field.key() == QStringLiteral("FORM_TYPE"))
             return field.value() == ns_mix;
     }
@@ -109,12 +109,12 @@ bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement& element)
 }
 
 /// \cond
-void QXmppMixInfoItem::parse(const QXmppElement& element)
+void QXmppMixInfoItem::parse(const QXmppElement &element)
 {
     QXmppDataForm form;
     form.parse(element.sourceDomElement());
 
-    for (auto& field : form.fields()) {
+    for (auto &field : form.fields()) {
         if (field.key() == QStringLiteral("Name"))
             d->name = field.value().toString();
         else if (field.key() == QStringLiteral("Description"))
@@ -190,10 +190,10 @@ QXmppMixParticipantItem::QXmppMixParticipantItem()
 }
 
 /// Default copy-constructor
-QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem&) = default;
+QXmppMixParticipantItem::QXmppMixParticipantItem(const QXmppMixParticipantItem &) = default;
 
 /// Default assignment operator
-QXmppMixParticipantItem& QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem&) = default;
+QXmppMixParticipantItem &QXmppMixParticipantItem::operator=(const QXmppMixParticipantItem &) = default;
 
 QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;
 
@@ -208,7 +208,7 @@ QString QXmppMixParticipantItem::nick() const
 ///
 /// Sets the participants nickname.
 ///
-void QXmppMixParticipantItem::setNick(const QString& nick)
+void QXmppMixParticipantItem::setNick(const QString &nick)
 {
     d->nick = nick;
 }
@@ -224,13 +224,13 @@ QString QXmppMixParticipantItem::jid() const
 ///
 /// Sets the participant's JID.
 ///
-void QXmppMixParticipantItem::setJid(const QString& jid)
+void QXmppMixParticipantItem::setJid(const QString &jid)
 {
     d->jid = jid;
 }
 
 /// \cond
-void QXmppMixParticipantItem::parse(const QXmppElement& itemContent)
+void QXmppMixParticipantItem::parse(const QXmppElement &itemContent)
 {
     d->nick = itemContent.firstChildElement(QStringLiteral("nick")).value();
     d->jid = itemContent.firstChildElement(QStringLiteral("jid")).value();
@@ -259,7 +259,7 @@ QXmppElement QXmppMixParticipantItem::toElement() const
 ///
 /// Returns true, if this dom element is a MIX participant item.
 ///
-bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement& element)
+bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("participant") && element.namespaceURI() == ns_mix;
 }

@@ -19,7 +19,8 @@
 #include <QStringList>
 #include <QUrl>
 
-struct field_type {
+struct field_type
+{
     QXmppDataForm::Field::Type type;
     const char *str;
 };

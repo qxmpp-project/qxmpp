@@ -74,7 +74,8 @@ protected:
     }
 
     template<typename T, typename ValueConverter = T (*)(T)>
-    static void serializeOptional(QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, const std::optional<T> &optional, ValueConverter convert = [](T a) { return a; })
+    static void serializeOptional(
+        QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, const std::optional<T> &optional, ValueConverter convert = [](T a) { return a; })
     {
         if (optional.has_value()) {
             serializeValue(form, type, name, convert(*optional));
@@ -118,4 +119,4 @@ private:
     QSharedDataPointer<QXmppExtensibleDataFormBasePrivate> d;
 };
 
-#endif // QXMPPDATAFORMBASED_H
+#endif  // QXMPPDATAFORMBASED_H

@@ -43,7 +43,7 @@ QXmppVersionManager::~QXmppVersionManager()
 ///
 /// \param jid
 
-QString QXmppVersionManager::requestVersion(const QString& jid)
+QString QXmppVersionManager::requestVersion(const QString &jid)
 {
     QXmppVersionIq request;
     request.setType(QXmppIq::Get);
@@ -58,7 +58,7 @@ QString QXmppVersionManager::requestVersion(const QString& jid)
 ///
 /// \param name
 
-void QXmppVersionManager::setClientName(const QString& name)
+void QXmppVersionManager::setClientName(const QString &name)
 {
     d->clientName = name;
 }
@@ -67,7 +67,7 @@ void QXmppVersionManager::setClientName(const QString& name)
 ///
 /// \param version
 
-void QXmppVersionManager::setClientVersion(const QString& version)
+void QXmppVersionManager::setClientVersion(const QString &version)
 {
     d->clientVersion = version;
 }
@@ -76,7 +76,7 @@ void QXmppVersionManager::setClientVersion(const QString& version)
 ///
 /// \param os
 
-void QXmppVersionManager::setClientOs(const QString& os)
+void QXmppVersionManager::setClientOs(const QString &os)
 {
     d->clientOs = os;
 }
@@ -118,7 +118,7 @@ QStringList QXmppVersionManager::discoveryFeatures() const
     return QStringList() << ns_version;
 }
 
-bool QXmppVersionManager::handleStanza(const QDomElement& element)
+bool QXmppVersionManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element)) {
         QXmppVersionIq versionIq;

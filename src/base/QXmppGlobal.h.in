@@ -77,9 +77,9 @@ namespace QXmpp {
 /// \since QXmpp 1.5
 ///
 enum SceMode : uint8_t {
-    SceAll,         ///< Processes all known elements.
-    ScePublic,      ///< Only processes 'public' elements (e.g. needed for routing).
-    SceSensitive,   ///< Only processes sensitive elements that should be encrypted.
+    SceAll,        ///< Processes all known elements.
+    ScePublic,     ///< Only processes 'public' elements (e.g. needed for routing).
+    SceSensitive,  ///< Only processes sensitive elements that should be encrypted.
 };
 
 ///
@@ -100,7 +100,9 @@ inline constexpr bool operator&(SceMode mode1, SceMode mode2)
 ///
 /// \since QXmpp 1.5
 ///
-struct Success {};
+struct Success
+{
+};
 
 }
 

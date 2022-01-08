@@ -15,15 +15,15 @@ class QXmppCarbonTestHelper : public QObject
     Q_OBJECT
 
 public slots:
-    void messageSent(const QXmppMessage& msg);
-    void messageReceived(const QXmppMessage& msg);
+    void messageSent(const QXmppMessage &msg);
+    void messageReceived(const QXmppMessage &msg);
 
 public:
     QXmppMessage m_expectedMessage;
     bool m_expectSent;
     bool m_signalTriggered;
 
-    void compareMessages(const QXmppMessage& lhs, const QXmppMessage& rhs);
+    void compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs);
 };
 
 class tst_QXmppCarbonManager : public QObject
@@ -215,7 +215,7 @@ void tst_QXmppCarbonManager::testHandleStanza()
     QCOMPARE(m_helper.m_signalTriggered, accept);
 }
 
-void QXmppCarbonTestHelper::messageSent(const QXmppMessage& msg)
+void QXmppCarbonTestHelper::messageSent(const QXmppMessage &msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, true);
@@ -223,7 +223,7 @@ void QXmppCarbonTestHelper::messageSent(const QXmppMessage& msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonTestHelper::messageReceived(const QXmppMessage& msg)
+void QXmppCarbonTestHelper::messageReceived(const QXmppMessage &msg)
 {
     m_signalTriggered = true;
     QCOMPARE(m_expectSent, false);
@@ -231,7 +231,7 @@ void QXmppCarbonTestHelper::messageReceived(const QXmppMessage& msg)
     compareMessages(m_expectedMessage, msg);
 }
 
-void QXmppCarbonTestHelper::compareMessages(const QXmppMessage& lhs, const QXmppMessage& rhs)
+void QXmppCarbonTestHelper::compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
 {
     QCOMPARE(lhs.body(), rhs.body());
     QCOMPARE(lhs.from(), rhs.from());

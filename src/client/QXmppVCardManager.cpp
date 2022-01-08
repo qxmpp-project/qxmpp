@@ -32,7 +32,7 @@ QXmppVCardManager::~QXmppVCardManager()
 ///
 /// \param jid Jid of the specific entry in the roster
 ///
-QString QXmppVCardManager::requestVCard(const QString& jid)
+QString QXmppVCardManager::requestVCard(const QString &jid)
 {
     QXmppVCardIq request(jid);
     if (client()->sendPacket(request))
@@ -45,7 +45,7 @@ QString QXmppVCardManager::requestVCard(const QString& jid)
 ///
 /// \return QXmppVCard
 ///
-const QXmppVCardIq& QXmppVCardManager::clientVCard() const
+const QXmppVCardIq &QXmppVCardManager::clientVCard() const
 {
     return d->clientVCard;
 }
@@ -54,7 +54,7 @@ const QXmppVCardIq& QXmppVCardManager::clientVCard() const
 ///
 /// \param clientVCard QXmppVCard
 ///
-void QXmppVCardManager::setClientVCard(const QXmppVCardIq& clientVCard)
+void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
 {
     d->clientVCard = clientVCard;
     d->clientVCard.setTo("");
@@ -88,7 +88,7 @@ QStringList QXmppVCardManager::discoveryFeatures() const
     return QStringList() << ns_vcard;
 }
 
-bool QXmppVCardManager::handleStanza(const QDomElement& element)
+bool QXmppVCardManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "iq" && QXmppVCardIq::isVCard(element)) {
         QXmppVCardIq vCardIq;

@@ -50,7 +50,7 @@ public:
 
 struct Client
 {
-    Client() {}
+    Client() { }
     Client(const QString &jid)
     {
         test.configuration().setJid(jid);
@@ -100,7 +100,7 @@ void tst_QXmppPubSubManager::testDiscoFeatures()
 {
     // so the coverage report is happy:
     PSManager manager;
-    QCOMPARE(manager.discoveryFeatures(), QStringList {"http://jabber.org/protocol/pubsub#rsm"});
+    QCOMPARE(manager.discoveryFeatures(), QStringList { "http://jabber.org/protocol/pubsub#rsm" });
 }
 
 void tst_QXmppPubSubManager::testFetchNodes()
@@ -904,71 +904,71 @@ void tst_QXmppPubSubManager::testEventNotifications_data()
     QTest::addColumn<bool>("accepted");
 
     QTest::addRow("default")
-            << QStringLiteral(
-                   "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
-                   "<event xmlns='http://jabber.org/protocol/pubsub#event'>"
-                   "<items node='princely_musings'>"
-                   "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
-                   "<entry xmlns='http://www.w3.org/2005/Atom'>"
-                   "<title>Soliloquy</title>"
-                   "<summary>"
-                   "To be, or not to be: that is the question:"
-                   "Whether 'tis nobler in the mind to suffer"
-                   "The slings and arrows of outrageous fortune,"
-                   "Or to take arms against a sea of troubles,"
-                   "And by opposing end them?"
-                   "</summary>"
-                   "<link rel='alternate' type='text/html' href='http://denmark.lit/2003/12/13/atom03'/>"
-                   "<id>tag:denmark.lit,2003:entry-32397</id>"
-                   "<published>2003-12-13T18:30:02Z</published>"
-                   "<updated>2003-12-13T18:30:02Z</updated>"
-                   "</entry>"
-                   "</item>"
-                   "</items>"
-                   "</event>"
-                   "</message>")
-            << true;
+        << QStringLiteral(
+               "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
+               "<event xmlns='http://jabber.org/protocol/pubsub#event'>"
+               "<items node='princely_musings'>"
+               "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
+               "<entry xmlns='http://www.w3.org/2005/Atom'>"
+               "<title>Soliloquy</title>"
+               "<summary>"
+               "To be, or not to be: that is the question:"
+               "Whether 'tis nobler in the mind to suffer"
+               "The slings and arrows of outrageous fortune,"
+               "Or to take arms against a sea of troubles,"
+               "And by opposing end them?"
+               "</summary>"
+               "<link rel='alternate' type='text/html' href='http://denmark.lit/2003/12/13/atom03'/>"
+               "<id>tag:denmark.lit,2003:entry-32397</id>"
+               "<published>2003-12-13T18:30:02Z</published>"
+               "<updated>2003-12-13T18:30:02Z</updated>"
+               "</entry>"
+               "</item>"
+               "</items>"
+               "</event>"
+               "</message>")
+        << true;
     QTest::addRow("additional-subelement")
-            << QStringLiteral(
-                   "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
-                   "<always-store xmlns='hints2'/>"
-                   "<event xmlns='http://jabber.org/protocol/pubsub#event'>"
-                   "<items node='princely_musings'>"
-                   "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
-                   "<entry xmlns='http://www.w3.org/2005/Atom'>"
-                   "<title>Soliloquy</title>"
-                   "<summary>"
-                   "To be, or not to be: that is the question:"
-                   "Whether 'tis nobler in the mind to suffer"
-                   "The slings and arrows of outrageous fortune,"
-                   "Or to take arms against a sea of troubles,"
-                   "And by opposing end them?"
-                   "</summary>"
-                   "<link rel='alternate' type='text/html' href='http://denmark.lit/2003/12/13/atom03'/>"
-                   "<id>tag:denmark.lit,2003:entry-32397</id>"
-                   "<published>2003-12-13T18:30:02Z</published>"
-                   "<updated>2003-12-13T18:30:02Z</updated>"
-                   "</entry>"
-                   "</item>"
-                   "</items>"
-                   "</event>"
-                   "</message>")
-            << true;
+        << QStringLiteral(
+               "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
+               "<always-store xmlns='hints2'/>"
+               "<event xmlns='http://jabber.org/protocol/pubsub#event'>"
+               "<items node='princely_musings'>"
+               "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
+               "<entry xmlns='http://www.w3.org/2005/Atom'>"
+               "<title>Soliloquy</title>"
+               "<summary>"
+               "To be, or not to be: that is the question:"
+               "Whether 'tis nobler in the mind to suffer"
+               "The slings and arrows of outrageous fortune,"
+               "Or to take arms against a sea of troubles,"
+               "And by opposing end them?"
+               "</summary>"
+               "<link rel='alternate' type='text/html' href='http://denmark.lit/2003/12/13/atom03'/>"
+               "<id>tag:denmark.lit,2003:entry-32397</id>"
+               "<published>2003-12-13T18:30:02Z</published>"
+               "<updated>2003-12-13T18:30:02Z</updated>"
+               "</entry>"
+               "</item>"
+               "</items>"
+               "</event>"
+               "</message>")
+        << true;
     QTest::addRow("wrong-event-namespace")
-            << QStringLiteral(
-                   "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
-                   "<always-store xmlns='hints2'/>"
-                   "<event xmlns='pubsub2#event'>"
-                   "<items node='princely_musings'>"
-                   "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
-                   "<entry xmlns='http://www.w3.org/2005/Atom'>"
-                   "<title>Soliloquy</title>"
-                   "</entry>"
-                   "</item>"
-                   "</items>"
-                   "</event>"
-                   "</message>")
-            << false;
+        << QStringLiteral(
+               "<message from='pubsub.shakespeare.lit' to='francisco@denmark.lit' id='foo'>"
+               "<always-store xmlns='hints2'/>"
+               "<event xmlns='pubsub2#event'>"
+               "<items node='princely_musings'>"
+               "<item id='ae890ac52d0df67ed7cfdf51b644e901'>"
+               "<entry xmlns='http://www.w3.org/2005/Atom'>"
+               "<title>Soliloquy</title>"
+               "</entry>"
+               "</item>"
+               "</items>"
+               "</event>"
+               "</message>")
+        << false;
 }
 
 void tst_QXmppPubSubManager::testEventNotifications()

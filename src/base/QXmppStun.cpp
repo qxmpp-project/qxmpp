@@ -1738,7 +1738,8 @@ QXmppIcePrivate::QXmppIcePrivate()
     tieBreaker = QXmppUtils::generateRandomBytes(8);
 }
 
-struct QXmppIceTransportDetails {
+struct QXmppIceTransportDetails
+{
     QXmppIceTransport *transport;
     QHostAddress stunHost;
     quint16 stunPort;

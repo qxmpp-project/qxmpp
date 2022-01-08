@@ -61,7 +61,7 @@ void tst_QXmppIceConnection::testBindStun()
     client.setIceControlling(true);
     QList<QPair<QHostAddress, quint16>> stunServers;
     for (auto &address : stunInfo.addresses()) {
-        stunServers.push_back({address, 19302});
+        stunServers.push_back({ address, 19302 });
     }
     client.setStunServers(stunServers);
     client.addComponent(componentId);

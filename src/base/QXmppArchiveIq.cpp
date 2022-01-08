@@ -239,7 +239,7 @@ bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 {
     QDomElement chatElement = element.firstChildElement(QStringLiteral("chat"));
     return !chatElement.attribute(QStringLiteral("with")).isEmpty();
-    //return (chatElement.namespaceURI() == ns_archive);
+    // return (chatElement.namespaceURI() == ns_archive);
 }
 
 void QXmppArchiveChatIq::parseElementFromChild(const QDomElement &element)

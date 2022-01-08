@@ -136,11 +136,11 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
     using Error = QXmppStanza::Error;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, { itemId })), this,
                    [](QXmppPubSubIq<T> &&iq) -> ItemResult<T> {
-        if (!iq.items().isEmpty()) {
-            return iq.items().constFirst();
-        }
-        return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No such item has been found."));
-    });
+                       if (!iq.items().isEmpty()) {
+                           return iq.items().constFirst();
+                       }
+                       return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No such item has been found."));
+                   });
 }
 
 ///
@@ -176,11 +176,11 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
     using namespace QXmpp::Private;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, itemIds)), this,
                    [](QXmppPubSubIq<T> &&iq) -> ItemsResult<T> {
-        return Items<T> {
-            iq.items(),
-            iq.itemsContinuation(),
-        };
-    });
+                       return Items<T> {
+                           iq.items(),
+                           iq.itemsContinuation(),
+                       };
+                   });
 }
 
 ///
