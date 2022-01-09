@@ -1,4 +1,4 @@
-# QXmpp [![XMPP:2021 Client IM Mobile+ Compliance Badge](https://img.shields.io/badge/XMPP%3A2021%20Client-Core%20IM%20Mobile%2B-green)][xmpp-compliance] [![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions) [![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp) [![Latest release](https://img.shields.io/github/v/release/qxmpp-project/qxmpp)](https://github.com/qxmpp-project/qxmpp/releases/latest) [![Website](https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdoc.qxmpp.org%2F)][qxmpp-doc]
+# QXmpp [![XMPP:2022 Client IM Mobile+ Compliance Badge](https://img.shields.io/badge/XMPP%3A2022%20Client-Core%20IM%20Mobile%2B-green)][xmpp-compliance] [![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions) [![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp) [![Latest release](https://img.shields.io/github/v/release/qxmpp-project/qxmpp)](https://github.com/qxmpp-project/qxmpp/releases/latest) [![Website](https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdoc.qxmpp.org%2F)][qxmpp-doc]
 
 QXmpp is a cross-platform C++ XMPP client and server library. It is written
 in C++ and uses Qt framework.
@@ -6,7 +6,7 @@ in C++ and uses Qt framework.
 QXmpp strives to be as easy to use as possible, the underlying TCP socket, the
 core XMPP RFCs (RFC6120 and RFC6121) and XMPP extensions have been nicely
 encapsulated into classes. QXmpp is ready to build XMPP clients complying with
-the [XMPP Compliance Suites 2021][xmpp-compliance] for IM and Advanced Mobile.
+the [XMPP Compliance Suites 2022][xmpp-compliance] for IM and Advanced Mobile.
 It comes with full API documentation, automatic tests and some examples.
 
 QXmpp uses Qt extensively, and as such users need to a have working knowledge of
@@ -93,5 +93,5 @@ is already know at:
 
 https://github.com/qxmpp-project/qxmpp/issues
 
-[xmpp-compliance]: https://xmpp.org/extensions/xep-0443.html
+[xmpp-compliance]: https://xmpp.org/extensions/xep-0459.html
 [qxmpp-doc]: https://doc.qxmpp.org/
