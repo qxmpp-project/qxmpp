@@ -26,8 +26,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
-#include <QFloat16>
 #include <QDomElement>
+#include <QFloat16>
 #include <QUrl>
 #include <QXmlStreamWriter>
 

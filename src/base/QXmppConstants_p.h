@@ -91,6 +91,7 @@ extern const char* ns_auth;
 extern const char* ns_authFeature;
 // XEP-0080: User Location
 extern const char* ns_geoloc;
+extern const char* ns_geoloc_notify;
 // XEP-0085: Chat State Notifications
 extern const char* ns_chat_states;
 // XEP-0091: Legacy Delayed Delivery

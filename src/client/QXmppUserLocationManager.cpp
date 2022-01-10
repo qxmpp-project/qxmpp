@@ -25,9 +25,9 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppGeolocItem.h"
 #include "QXmppPubSubEvent.h"
 #include "QXmppPubSubManager.h"
-#include "QXmppGeolocItem.h"
 
 using namespace QXmpp::Private;
 
@@ -91,16 +91,16 @@ QFuture<QXmppUserLocationManager::LocationResult> QXmppUserLocationManager::requ
     using Error = QXmppStanza::Error;
 
     return chain<LocationResult>(pubSub()->requestItems<QXmppGeolocItem>(jid, ns_geoloc), this,
-                             [](PubSub::ItemsResult<QXmppGelocItem> &&result) -> LocationResult {
-                                 if (const auto items = std::get_if<PubSub::Items<QXmppGeolocItem>>(&result)) {
-                                     if (!items->items.isEmpty()) {
-                                         return items->items.constFirst();
+                                 [](PubSub::ItemsResult<QXmppGeolocItem> &&result) -> LocationResult {
+                                     if (const auto items = std::get_if<PubSub::Items<QXmppGeolocItem>>(&result)) {
+                                         if (!items->items.isEmpty()) {
+                                             return items->items.constFirst();
+                                         }
+                                         return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No location available."));
+                                     } else {
+                                         return std::get<QXmppStanza::Error>(result);
                                      }
-                                     return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No location available."));
-                                 } else {
-                                     return std::get<QXmppStanza::Error>(result);
-                                 }
-                             });
+                                 });
 }
 
 ///

@@ -1,4 +1,4 @@
-/*! \page xep XMPP Extensions
+﻿/*! \page xep XMPP Extensions
 
 This document lists the XMPP Extensions (XEP) available in QXmpp.
 
@@ -15,6 +15,7 @@ Complete:
 - \xep{0066, Out of Band Data} (partially)
 - \xep{0071, XHTML-IM}
 - \xep{0077, In-Band Registration} (v2.4)
+- \xep{0080, User Location} (v1.5)
 - \xep{0078, Non-SASL Authentication}
 - \xep{0082, XMPP Date and Time Profiles}
 - \xep{0085, Chat State Notifications}
