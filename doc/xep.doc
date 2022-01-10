@@ -20,6 +20,8 @@ Complete:
 - \xep{0071, XHTML-IM}
 - \xep{0077, In-Band Registration} (v2.4)
 - \xep{0078, Non-SASL Authentication}
+- \xep{0080, User Location} (v1.9)
+    - Missing some attributes of the PEP items
 - \xep{0082, XMPP Date and Time Profiles}
 - \xep{0085, Chat State Notifications}
 - \xep{0091, Legacy Delayed Delivery}
