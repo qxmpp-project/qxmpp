@@ -5,18 +5,19 @@
 #ifndef QXMPPATMMANAGER_H
 #define QXMPPATMMANAGER_H
 
+#include "QXmppAtmTrustStorage.h"
 #include "QXmppClientExtension.h"
-#include "QXmppMessage.h"
 #include "QXmppSendResult.h"
-#include "QXmppTrustMessageKeyOwner.h"
-#include "QXmppTrustStorage.h"
+
+class QXmppMessage;
+class QXmppTrustMessageKeyOwner;
 
 class QXMPP_EXPORT QXmppAtmManager : public QXmppClientExtension
 {
     Q_OBJECT
 
 public:
-    QXmppAtmManager(QXmppTrustStorage *trustStorage);
+    QXmppAtmManager(QXmppAtmTrustStorage *trustStorage);
     QFuture<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting = {});
 
     /// \cond
@@ -41,7 +42,7 @@ private:
 
     QFuture<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
 
-    QXmppTrustStorage *m_trustStorage;
+    QXmppAtmTrustStorage *m_trustStorage;
 
     friend class tst_QXmppAtmManager;
 };

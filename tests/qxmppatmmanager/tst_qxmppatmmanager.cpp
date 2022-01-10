@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppAtmManager.h"
+#include "QXmppAtmTrustMemoryStorage.h"
 #include "QXmppCarbonManager.h"
 #include "QXmppClient.h"
 #include "QXmppConstants.cpp"
 #include "QXmppConstants_p.h"
-#include "QXmppTrustMemoryStorage.h"
+#include "QXmppMessage.h"
 #include "QXmppTrustMessageElement.h"
+#include "QXmppTrustMessageKeyOwner.h"
 #include "QXmppUtils.h"
 
 #include "util.h"
@@ -57,13 +59,13 @@ private:
     QXmppClient m_client;
     QXmppLogger m_logger;
     QXmppAtmManager *m_manager;
-    QXmppTrustMemoryStorage *m_trustStorage;
+    QXmppAtmTrustMemoryStorage *m_trustStorage;
     QXmppCarbonManager *m_carbonManager;
 };
 
 void tst_QXmppAtmManager::initTestCase()
 {
-    m_trustStorage = new QXmppTrustMemoryStorage;
+    m_trustStorage = new QXmppAtmTrustMemoryStorage;
     m_manager = new QXmppAtmManager(m_trustStorage);
     m_client.addExtension(m_manager);
     m_client.configuration().setJid("alice@example.org/phone");
@@ -446,7 +448,7 @@ void tst_QXmppAtmManager::testAuthenticate()
     clearTrustStorage();
 
     QFETCH(QXmppTrustStorage::SecurityPolicy, securityPolicy);
-    m_trustStorage->setSecurityPolicies(ns_omemo, securityPolicy);
+    m_trustStorage->setSecurityPolicy(ns_omemo, securityPolicy);
 
     QMultiHash<QString, QByteArray> authenticatedKeys = { { QStringLiteral("alice@example.org"),
                                                             QByteArray::fromBase64(QByteArrayLiteral("rQIL2albuSR1i06EZAp1uZ838zUeEgGIq2whwu3s+Zg=")) },
@@ -859,7 +861,7 @@ void tst_QXmppAtmManager::testHandleMessage()
 
     // Remove the sender key as soon as the method being tested is executed.
     if (areTrustDecisionsValid) {
-        m_trustStorage->removeKeys(ns_omemo, { senderKey });
+        m_trustStorage->removeKeys(ns_omemo, QList { senderKey });
     }
 
     if (areTrustDecisionsValid) {
@@ -2070,8 +2072,8 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysDone()
 
 void tst_QXmppAtmManager::clearTrustStorage()
 {
-    m_trustStorage->removeKeys();
-    m_trustStorage->removeKeysForPostponedTrustDecisions();
+    m_trustStorage->removeKeys(ns_omemo);
+    m_trustStorage->removeKeysForPostponedTrustDecisions(ns_omemo);
 }
 
 QTEST_MAIN(tst_QXmppAtmManager)

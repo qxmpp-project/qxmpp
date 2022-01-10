@@ -8,12 +8,10 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppMessage.h"
 #include "QXmppTrustMessageElement.h"
+#include "QXmppTrustMessageKeyOwner.h"
 #include "QXmppUtils.h"
-
-#include <QCoreApplication>
-#include <QDomElement>
-#include <QList>
 
 using namespace QXmpp::Private;
 
@@ -27,21 +25,10 @@ using namespace QXmpp::Private;
 /// storage interface must be added.
 /// That implementation has to be adapted to your storage such as a database.
 /// In case you only need memory and no peristent storage, you can use the
-/// existing implementation:
+/// existing implementation and add the storage with it:
 ///
 ///\code
-/// QXmppTrustStorage *trustStorage = new QXmppTrustMemoryStorage;
-/// \endcode
-///
-/// You can set a security policy used by ATM via the trust manager.
-/// Is is recommended to apply TOAKAFA for good security and usability when
-/// using \xep{0384, OMEMO Encryption}:
-/// \code
-/// trustStorage->setSecurityPolicy("urn:xmpp:omemo:2", QXmppTrustStorage::Toakafa);
-/// \endcode
-///
-/// Afterwards, this manager must be added with the storage:
-/// \code
+/// QXmppAtmTrustStorage *trustStorage = new QXmppAtmTrustMemoryStorage;
 /// QXmppAtmManager *manager = new QXmppAtmManager(trustStorage);
 /// client->addExtension(manager);
 /// \endcode
@@ -73,7 +60,7 @@ using namespace QXmpp::Private;
 ///
 /// \param trustStorage trust storage implementation
 ///
-QXmppAtmManager::QXmppAtmManager(QXmppTrustStorage *trustStorage)
+QXmppAtmManager::QXmppAtmManager(QXmppAtmTrustStorage *trustStorage)
 {
     m_trustStorage = trustStorage;
 }

@@ -8,23 +8,28 @@
 /// \brief The QXmppTrustStorage class stores trust data for end-to-end
 /// encryption.
 ///
+/// The term "key" is used for a public long-term key.
+///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
 /// \since QXmpp 1.5
 ///
 
 ///
-/// \fn QXmppTrustStorage::setSecurityPolicies(const QString &encryption = {}, SecurityPolicy securityPolicy = SecurityPolicy::NoSecurityPolicy)
+/// \fn QXmppTrustStorage::setSecurityPolicy(const QString &encryption, SecurityPolicy securityPolicy)
 ///
-/// Sets the security policy for an encryption protocol or resets the set
-/// security policies.
-///
-/// If securityPolicy is not passed, the set security policy for encryption is
-/// reset.
-/// If also encryption is not passed, all set security policies are reset.
+/// Sets the security policy for an encryption protocol.
 ///
 /// \param encryption encryption protocol namespace
 /// \param securityPolicy security policy being applied
+///
+
+///
+/// \fn QXmppTrustStorage::resetSecurityPolicy(const QString &encryption)
+///
+/// Resets the security policy for an encryption protocol.
+///
+/// \param encryption encryption protocol namespace
 ///
 
 ///
@@ -38,18 +43,20 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addOwnKey(const QString &encryption, const QByteArray &keyId)
+/// \fn QXmppTrustStorage::setOwnKey(const QString &encryption, const QByteArray &keyId)
 ///
-/// Adds an own key (i.e., the key used by this client instance).
+/// Sets the own key (i.e., the key used by this client instance) for an
+/// encryption protocol.
 ///
 /// \param encryption encryption protocol namespace
 /// \param keyId ID of the key
 ///
 
 ///
-/// \fn QXmppTrustStorage::removeOwnKey(const QString &encryption)
+/// \fn QXmppTrustStorage::resetOwnKey(const QString &encryption)
 ///
-/// Removes an own key (i.e., the key used by this client instance).
+/// Resets the own key (i.e., the key used by this client instance) for an
+/// encryption protocol.
 ///
 /// \param encryption encryption protocol namespace
 ///
@@ -57,7 +64,8 @@
 ///
 /// \fn QXmppTrustStorage::ownKey(const QString &encryption)
 ///
-/// Returns an own key (i.e., the key used by this client instance).
+/// Returns the own key (i.e., the key used by this client instance) for an
+/// encryption protocol.
 ///
 /// \param encryption encryption protocol namespace
 ///
@@ -80,25 +88,68 @@
 ///
 /// Removes keys.
 ///
-/// If keyIds is not passed, all keys for encryption are removed.
-/// If encryption is also not passed, all keys are removed.
-///
 /// \param encryption encryption protocol namespace
 /// \param keyIds IDs of the keys
 ///
 
 ///
+/// \fn QXmppTrustStorage::removeKeys(const QString &encryption, const QString &keyOwnerJid)
+///
+/// Removes all keys of a key owner.
+///
+/// \param encryption encryption protocol namespace
+/// \param keyOwnerJid key owner's bare JID
+///
+
+///
+/// \fn QXmppTrustStorage::removeKeys(const QString &encryption)
+///
+/// Removes all keys for encryption.
+///
+/// \param encryption encryption protocol namespace
+///
+
+///
 /// \fn QXmppTrustStorage::keys(const QString &encryption, TrustLevels trustLevels = {})
 ///
-/// Returns the JIDs of the key owners mapped to the IDs of their keys with a
-/// specific trust level.
+/// Returns the JIDs of all key owners mapped to the IDs of their keys with
+/// specific trust levels.
 ///
-/// If no trust levels are passed, all keys are returned.
+/// If no trust levels are passed, all keys for encryption are returned.
 ///
 /// \param encryption encryption protocol namespace
 /// \param trustLevels trust levels of the keys
 ///
-/// \return the key owner JIDs mapped to their keys with a specific trust level
+/// \return the key owner JIDs mapped to their keys with specific trust levels
+///
+
+///
+/// \fn QXmppTrustStorage::keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels = {})
+///
+/// Returns the IDs of keys mapped to their trust levels for specific key
+/// owners.
+///
+/// If no trust levels are passed, all keys for encryption and keyOwnerJids are
+/// returned.
+///
+/// \param encryption encryption protocol namespace
+/// \param keyOwnerJids key owners' bare JIDs
+/// \param trustLevels trust levels of the keys
+///
+/// \return the key IDs mapped to their trust levels for specific key owners
+///
+
+///
+/// \fn QXmppTrustStorage::hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels)
+///
+/// Returns whether at least one key of a key owner with a specific trust level
+/// is stored.
+///
+/// \param encryption encryption protocol namespace
+/// \param keyOwnerJid key owner's bare JID
+/// \param trustLevels possible trust levels of the key
+///
+/// \return whether a key of the key owner with a passed trust level is stored
 ///
 
 ///
@@ -129,7 +180,7 @@
 ///
 /// Returns the trust level of a key.
 ///
-/// If the key is not stored, it is seen as automatically distrusted.
+/// If the key is not stored, the trust in that key is undecided.
 ///
 /// \param encryption encryption protocol namespace
 /// \param keyId ID of the key
@@ -138,62 +189,9 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners)
+/// \fn QXmppTrustStorage::resetAll(const QString &encryption)
 ///
-/// Adds keys that cannot be authenticated or distrusted directly because the
-/// key of the trust message's sender is not yet authenticated.
-///
-/// Those keys are being authenticated or distrusted once the sender's key is
-/// authenticated.
-/// Each element of keyOwners (i.e., keyOwner) can contain keys for postponed
-/// authentication as trustedKeys or for postponed distrusting as
-/// distrustedKeys.
-///
-/// If keys of keyOwner.trustedKeys() are already stored for postponed
-/// distrusting, they are changed to be used for postponed authentication.
-/// If keys of keyOwner.distrustedKeys() are already stored for postponed
-/// authentication, they are changed to be used for postponed distrusting.
-/// If the same keys are in keyOwner.trustedKeys() and
-/// keyOwner.distrustedKeys(), they are used for postponed distrusting.
+/// Resets all data for encryption.
 ///
 /// \param encryption encryption protocol namespace
-/// \param senderKeyId key ID of the trust message's sender
-/// \param keyOwners key owners containing key IDs for postponed trust decisions
-///
-
-///
-/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
-///
-/// Removes keys for postponed authentication or distrusting.
-///
-/// \param encryption encryption protocol namespace
-/// \param keyIdsForAuthentication IDs of the keys for postponed authentication
-/// \param keyIdsForDistrusting IDs of the keys for postponed distrusting
-///
-
-///
-/// \fn QXmppTrustStorage::removeKeysForPostponedTrustDecisions(const QString &encryption = {}, const QList<QByteArray> &senderKeyIds = {})
-///
-/// Removes keys for postponed authentication or distrusting by the trust
-/// message's sender's key ID.
-///
-/// If senderKeyIds is empty, all keys for encryption are removed.
-/// If encryption is empty too, all keys are removed.
-///
-/// \param encryption encryption protocol namespace
-/// \param senderKeyIds key IDs of the trust messages' senders
-///
-
-///
-/// \fn QXmppTrustStorage::keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {})
-///
-/// Returns the JIDs of key owners mapped to the IDs of their keys stored for
-/// postponed authentication (true) or postponed distrusting (false).
-///
-/// If senderKeyIds is empty, all keys for encryption are returned.
-///
-/// \param encryption encryption protocol namespace
-/// \param senderKeyIds key IDs of the trust messages' senders
-///
-/// \return the key owner JIDs mapped to their keys
 ///
