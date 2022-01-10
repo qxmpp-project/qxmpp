@@ -77,6 +77,9 @@ const char* ns_register_feature = "http://jabber.org/features/iq-register";
 // XEP-0078: Non-SASL Authentication
 const char* ns_auth = "jabber:iq:auth";
 const char* ns_authFeature = "http://jabber.org/features/iq-auth";
+// XEP-0080: User Location
+const char* ns_geoloc = "http://jabber.org/protocol/geoloc";
+const char* ns_geoloc_notify = "http://jabber.org/protocol/geoloc+notify";
 // XEP-0085: Chat State Notifications
 const char* ns_chat_states = "http://jabber.org/protocol/chatstates";
 // XEP-0091: Legacy Delayed Delivery

@@ -33,6 +33,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
     base/QXmppFutureUtils_p.h
+    base/QXmppGeolocItem.h
     base/QXmppHttpUploadIq.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
@@ -113,6 +114,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppTrustStorage.h
     client/QXmppUploadRequestManager.h
     client/QXmppUserTuneManager.h
+    client/QXmppUserLocationManager.h
     client/QXmppVCardManager.h
     client/QXmppVersionManager.h
 
@@ -142,6 +144,7 @@ set(SOURCE_FILES
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
+    base/QXmppGeolocItem.cpp
     base/QXmppHttpUploadIq.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp
@@ -218,6 +221,7 @@ set(SOURCE_FILES
     client/QXmppTrustMemoryStorage.cpp
     client/QXmppTrustStorage.cpp
     client/QXmppUploadRequestManager.cpp
+    client/QXmppUserLocationManager.cpp
     client/QXmppUserTuneManager.cpp
     client/QXmppVCardManager.cpp
     client/QXmppVersionManager.cpp
