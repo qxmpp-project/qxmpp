@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: Tim Beaulen <tbscope@gmail.com>
+# SPDX-FileCopyrightText: Helio Chissini de Castro <helio@kde.org>
+#
+# SPDX-License-Identifier: LicenseRef-MIT-variant
+
 # - Try to find GObject
 # Once done this will define
 #
@@ -6,9 +11,6 @@
 #  GOBJECT_LIBRARIES - the libraries needed to use GObject
 #  GOBJECT_DEFINITIONS - Compiler switches required for using GObject
 
-# Copyright (c) 2006, Tim Beaulen <tbscope@gmail.com>
-# Copyright (c) 2008 Helio Chissini de Castro, <helio@kde.org>
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:

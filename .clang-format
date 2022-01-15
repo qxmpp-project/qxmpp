@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Georg Rudoy <0xd34df00d@gmail.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 AlignAfterOpenBracket: Align
 AlignTrailingComments: true
 BasedOnStyle: WebKit

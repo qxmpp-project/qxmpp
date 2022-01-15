@@ -1,5 +1,6 @@
-// SPDX-FileCopyrightText: 2011 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2009 Ian Geiser <ian.geiser@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2011 Manjeet Dahiya <manjeetdahiya@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 

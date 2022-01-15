@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2018 Jeremy Lainé <jeremy.laine@m4x.org>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 platform: x64
 
 environment:

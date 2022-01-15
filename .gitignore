@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2010 Boris Pek <tehnick-8@yandex.ru>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 CMakeLists.txt.*
 .DS_Store
 build*

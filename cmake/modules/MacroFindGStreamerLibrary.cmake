@@ -1,5 +1,9 @@
-# - macro find_gstreamer_library
+# SPDX-FileCopyrightText: 2010 Collabora Ltd., George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 #
+# SPDX-License-Identifier: LicenseRef-MIT-variant
+
+# - macro find_gstreamer_library
+
 # Copyright (c) 2010, Collabora Ltd.
 #   @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 #

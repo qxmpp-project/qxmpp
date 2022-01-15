@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 This example just connects to the xmpp server. And start receiving presences (updates) from the server.
 
 After running this example, you can see this user online, if it's added in your roster (friends list).

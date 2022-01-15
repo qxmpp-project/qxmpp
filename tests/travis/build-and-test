@@ -1,4 +1,10 @@
 #!/bin/sh
+
+# SPDX-FileCopyrightText: 2014 Boris Pek <tehnick-8@yandex.ru>
+# SPDX-FileCopyrightText: 2014 Jeremy Lainé <jeremy.laine@m4x.org>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 set -e
 
 HOST_SYSTEM=$(uname -s)

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2014 Jeremy Lainé <jeremy.laine@m4x.org>
+//
+// SPDX-License-Identifier: CC0-1.0
+
 /*! \page xep XMPP Extensions
 
 This document lists the XMPP Extensions (XEP) available in QXmpp.

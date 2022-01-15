@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2010 Collabora Ltd., George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
+#
+# SPDX-License-Identifier: LicenseRef-MIT-variant
+
 # - Try to find GStreamer
 # Once done this will define
 #
@@ -13,7 +17,7 @@
 #  GSTREAMER_<plugin_lib>_LIBRARY_FOUND - system has <plugin_lib>
 #  GSTREAMER_<plugin_lib>_LIBRARY - the <plugin_lib> library
 #  GSTREAMER_<plugin_lib>_INCLUDE_DIR - the <plugin_lib> include directory
-#
+
 # Copyright (c) 2010, Collabora Ltd.
 #   @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 #

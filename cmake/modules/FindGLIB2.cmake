@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Laurent Montel <montel@kde.org>
+#
+# SPDX-License-Identifier: LicenseRef-MIT-variant
+
 # - Try to find the GLIB2 libraries
 # Once done this will define
 #
@@ -5,8 +9,6 @@
 #  GLIB2_INCLUDE_DIR - the glib2 include directory
 #  GLIB2_LIBRARIES - glib2 library
 
-# Copyright (c) 2008 Laurent Montel, <montel@kde.org>
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:

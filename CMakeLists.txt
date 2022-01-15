@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Niels Ole Salscheider <niels_ole@salscheider-online.de>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 cmake_minimum_required(VERSION 3.3)
 project(qxmpp VERSION 1.5.0)
 

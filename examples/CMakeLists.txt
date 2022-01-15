@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 Niels Ole Salscheider <niels_ole@salscheider-online.de>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 macro(add_simple_example EXAMPLE_NAME)
     add_executable(${EXAMPLE_NAME} example_${EXAMPLE_NAME}/example_${EXAMPLE_NAME}.cpp)
     target_link_libraries(${EXAMPLE_NAME} qxmpp)

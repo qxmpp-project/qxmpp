@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 This is a very simple bot which echoes the message sent to it.
 
 Run this example, send it a message from a friend of this bot. You will receive the message back.

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 # Add ssh push key
 eval "$(ssh-agent -s)"
 echo $PUSH_KEY_REPO_DOC_QXMPP_ORG | base64 -d | unxz | ssh-add -
