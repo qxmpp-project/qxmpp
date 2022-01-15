@@ -12,7 +12,6 @@ BraceWrapping:
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: BeforeColon
-DerivePointerAlignment: true
 DisableFormat: false
 IncludeBlocks: Regroup
 IncludeCategories:
@@ -23,6 +22,7 @@ IncludeCategories:
   - Regex: "^<[^Q].*"
     Priority: 3
 Language: Cpp
+PointerAlignment: Right
 SortIncludes: true
 SpaceAfterTemplateKeyword: false
 SpacesBeforeTrailingComments: 2
