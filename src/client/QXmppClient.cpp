@@ -342,12 +342,12 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 /// Sends a packet and reports the result via QFuture.
 ///
-/// If stream management is enabled the future continues to be active until the
-/// server acknowledges the packet. On success QXmpp::SendSuccess with
+/// If stream management is enabled, the future continues to be active until the
+/// server acknowledges the packet. On success, QXmpp::SendSuccess with
 /// acknowledged == true is reported and the future finishes.
 ///
-/// If connection errors occur the packet is resent if possible. If reconnecting
-/// is not possible, an error is reported.
+/// If connection errors occur, the packet is resent if possible. If
+/// reconnecting is not possible, an error is reported.
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
