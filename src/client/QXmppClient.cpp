@@ -364,10 +364,12 @@ QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 
         await(future, this, [this, interface](std::variant<QByteArray, QXmpp::SendError> result) {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
-                d->stream->send(QXmppPacket(*xml, true, interface));
+                auto future = d->stream->send(QXmppPacket(*xml, true, interface));
+                await(future, this, [=](QXmpp::SendResult &&result) {
+                    reportFinishedResult(*interface, result);
+                });
             } else {
-                interface->reportResult(std::get<QXmpp::SendError>(result));
-                interface->reportFinished();
+                reportFinishedResult(*interface, { std::get<QXmpp::SendError>(result) });
             }
         });
 
