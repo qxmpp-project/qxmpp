@@ -45,7 +45,6 @@ public:
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
 
-protected:
     virtual void parseElementFromChild(const QDomElement &element);
     virtual void toXmlElementFromChild(QXmlStreamWriter *writer) const;
     /// \endcond
