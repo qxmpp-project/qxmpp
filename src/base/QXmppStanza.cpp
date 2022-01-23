@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2015 Georg Rudoy <0xd34df00d@gmail.com>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -489,6 +490,124 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 }
 /// \endcond
 
+///
+/// \class QXmppE2eeMetadata
+///
+/// \brief The QXmppE2eeMetadata class contains data used for end-to-end
+/// encryption purposes.
+///
+/// \since QXmpp 1.5
+///
+
+class QXmppE2eeMetadataPrivate : public QSharedData
+{
+public:
+    QByteArray senderKey;
+
+    // XEP-0420: Stanza Content Encryption
+    QDateTime sceTimestamp;
+};
+
+///
+/// Constructs a class for end-to-end encryption metadata.
+///
+QXmppE2eeMetadata::QXmppE2eeMetadata()
+    : d(new QXmppE2eeMetadataPrivate)
+{
+}
+
+///
+/// Constructs a copy of \a other.
+///
+/// \param other
+///
+QXmppE2eeMetadata::QXmppE2eeMetadata(const QXmppE2eeMetadata &other) = default;
+
+QXmppE2eeMetadata::~QXmppE2eeMetadata() = default;
+
+///
+/// Assigns \a other to this end-to-end encryption metadata class.
+///
+/// \param other
+///
+QXmppE2eeMetadata &QXmppE2eeMetadata::operator=(const QXmppE2eeMetadata &other) = default;
+
+///
+/// Returns the ID of this stanza's sender's public long-term key.
+///
+/// The sender key ID is not part of a transmitted stanza and thus not de- /
+/// serialized.
+/// Instead, the key ID is set by an encryption protocol such as
+/// \xep{0384, OMEMO Encryption} during decryption.
+/// It can be used by trust management protocols such as
+/// \xep{0450, Automatic Trust Management (ATM)}.
+///
+/// \return the ID of the sender's key
+///
+/// \since QXmpp 1.5
+///
+QByteArray QXmppE2eeMetadata::senderKey() const
+{
+    return d->senderKey;
+}
+
+///
+/// Sets the ID of this stanza's sender's public long-term key.
+///
+/// The sender key ID is not part of a transmitted stanza and thus not de- /
+/// serialized.
+/// Instead, it is set by an encryption protocol such as
+/// \xep{0384, OMEMO Encryption} during decryption.
+/// It can be used by trust management protocols such as
+/// \xep{0450, Automatic Trust Management (ATM)}.
+///
+/// \param keyId ID of the sender's key
+///
+/// \since QXmpp 1.5
+///
+void QXmppE2eeMetadata::setSenderKey(const QByteArray &keyId)
+{
+    d->senderKey = keyId;
+}
+
+///
+/// Returns the timestamp affix element's content as defined by
+/// \xep{0420, Stanza Content Encryption} (SCE).
+///
+/// The SCE timestamp is part of an encrypted stanza's SCE envelope,
+/// not an unencrypted direct child of a transmitted stanza and thus not de- /
+/// serialized by it.
+/// Instead, it is set by an encryption protocol such as
+/// \xep{0384, OMEMO Encryption} after decryption.
+/// It can be used by trust management protocols such as
+/// \xep{0450, Automatic Trust Management (ATM)}.
+///
+/// \since QXmpp 1.5
+///
+QDateTime QXmppE2eeMetadata::sceTimestamp() const
+{
+    return d->sceTimestamp;
+}
+
+///
+/// Sets the timestamp affix element's content as defined by
+/// \xep{0420, Stanza Content Encryption} (SCE).
+///
+/// The SCE timestamp is part of an encrypted stanza's SCE envelope,
+/// not an unencrypted direct child of a transmitted stanza and thus not de- /
+/// serialized by it.
+/// Instead, it is set by an encryption protocol such as
+/// \xep{0384, OMEMO Encryption} after decryption.
+/// It can be used by trust management protocols such as
+/// \xep{0450, Automatic Trust Management (ATM)}.
+///
+/// \since QXmpp 1.5
+///
+void QXmppE2eeMetadata::setSceTimestamp(const QDateTime &timestamp)
+{
+    d->sceTimestamp = timestamp;
+}
+
 class QXmppStanzaPrivate : public QSharedData
 {
 public:
@@ -499,6 +618,7 @@ public:
     QXmppStanza::Error error;
     QXmppElementList extensions;
     QList<QXmppExtendedAddress> extendedAddresses;
+    QXmppE2eeMetadata e2eeMetadata;
 };
 
 ///
@@ -649,6 +769,26 @@ QList<QXmppExtendedAddress> QXmppStanza::extendedAddresses() const
 void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addresses)
 {
     d->extendedAddresses = addresses;
+}
+
+///
+/// Returns additional data for end-to-end encryption purposes.
+///
+/// \since QXmpp 1.5
+///
+QXmppE2eeMetadata QXmppStanza::e2eeMetadata() const
+{
+    return d->e2eeMetadata;
+}
+
+///
+/// Sets additional data for end-to-end encryption purposes.
+///
+/// \since QXmpp 1.5
+///
+void QXmppStanza::setE2eeMetadata(const QXmppE2eeMetadata &e2eeMetadata)
+{
+    d->e2eeMetadata = e2eeMetadata;
 }
 
 /// \cond

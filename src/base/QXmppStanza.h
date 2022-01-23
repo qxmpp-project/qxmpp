@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2015 Georg Rudoy <0xd34df00d@gmail.com>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -61,6 +62,28 @@ public:
 
 private:
     QSharedDataPointer<QXmppExtendedAddressPrivate> d;
+};
+
+class QXmppE2eeMetadataPrivate;
+
+class QXMPP_EXPORT QXmppE2eeMetadata
+{
+public:
+    QXmppE2eeMetadata();
+    QXmppE2eeMetadata(const QXmppE2eeMetadata &other);
+    ~QXmppE2eeMetadata();
+
+    QXmppE2eeMetadata &operator=(const QXmppE2eeMetadata &other);
+
+    QByteArray senderKey() const;
+    void setSenderKey(const QByteArray &keyId);
+
+    // XEP-0420: Stanza Content Encryption
+    QDateTime sceTimestamp() const;
+    void setSceTimestamp(const QDateTime &timestamp);
+
+private:
+    QSharedDataPointer<QXmppE2eeMetadataPrivate> d;
 };
 
 class QXmppStanzaPrivate;
@@ -201,6 +224,9 @@ public:
 
     QList<QXmppExtendedAddress> extendedAddresses() const;
     void setExtendedAddresses(const QList<QXmppExtendedAddress> &extendedAddresses);
+
+    QXmppE2eeMetadata e2eeMetadata() const;
+    void setE2eeMetadata(const QXmppE2eeMetadata &e2eeMetadata);
 
     /// \cond
     void parse(const QDomElement &element) override;

@@ -120,9 +120,6 @@ public:
     QXmppMessage::Type type() const;
     void setType(QXmppMessage::Type);
 
-    QByteArray senderKey() const;
-    void setSenderKey(const QByteArray &keyId);
-
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;
     void setOutOfBandUrl(const QString &);

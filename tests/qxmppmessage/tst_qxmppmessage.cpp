@@ -54,7 +54,6 @@ private slots:
     void testMixInvitation();
     void testTrustMessageElement();
     void testOmemoElement();
-    void testSenderkey();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1195,13 +1194,6 @@ void tst_QXmppMessage::testOmemoElement()
     message2.setOmemoElement(QXmppOmemoElement());
     QVERIFY(message2.omemoElement());
     serializePacket(message2, xmlOut2);
-}
-
-void tst_QXmppMessage::testSenderkey()
-{
-    QXmppMessage message;
-    message.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
-    QCOMPARE(message.senderKey(), QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
 }
 
 QTEST_MAIN(tst_QXmppMessage)
