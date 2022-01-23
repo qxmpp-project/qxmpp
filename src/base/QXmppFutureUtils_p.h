@@ -169,6 +169,13 @@ auto chainIq(QFuture<Input> &&input, QObject *context) -> QFuture<Result>
     });
 }
 
+template<typename T>
+void reportFinishedResult(QFutureInterface<T> &interface, const T &result)
+{
+    interface.reportResult(result);
+    interface.reportFinished();
+}
+
 }
 
 #endif  // QXMPPFUTUREUTILS_P_H
