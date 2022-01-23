@@ -359,10 +359,10 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 {
-    const auto sendEncrypted = [this](QFuture<std::variant<QByteArray, QXmpp::SendError>> &&future) {
+    const auto sendEncrypted = [this](QFuture<QXmppE2eeExtension::EncryptMessageResult> &&future) {
         auto interface = std::make_shared<QFutureInterface<QXmpp::SendResult>>(QFutureInterfaceBase::Started);
 
-        await(future, this, [this, interface](std::variant<QByteArray, QXmpp::SendError> result) {
+        await(future, this, [this, interface](QXmppE2eeExtension::EncryptMessageResult &&result) {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 auto future = d->stream->send(QXmppPacket(*xml, true, interface));
                 await(future, this, [=](QXmpp::SendResult &&result) {
