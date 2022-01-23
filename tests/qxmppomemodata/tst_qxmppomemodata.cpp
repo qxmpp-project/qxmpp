@@ -12,6 +12,32 @@
 #include "util.h"
 #include <QObject>
 
+///
+/// Serializes data and compares it to multiple XML representations.
+/// It fails if no comparison succeeds.
+///
+template<class T>
+static void serializePacket(T &packet, const QVector<QByteArray> &xmls)
+{
+    auto isSerializationSuccessful = false;
+    const auto data = packetToXml(packet);
+
+    for (const auto &xml : xmls) {
+        auto processedXml = xml;
+        processedXml.replace(u'\'', u'"');
+
+        qDebug() << "expect " << processedXml;
+        qDebug() << "writing" << data;
+
+        if (data == processedXml) {
+            isSerializationSuccessful = true;
+            break;
+        }
+    }
+
+    QVERIFY2(isSerializationSuccessful, "No XML data equals the serialized packet");
+}
+
 class tst_QXmppOmemoData : public QObject
 {
     Q_OBJECT
