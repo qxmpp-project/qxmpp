@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -6,6 +7,12 @@
 
 #include "util.h"
 #include <QObject>
+
+class QXmppStanzaStub : public QXmppStanza
+{
+public:
+    void toXml(QXmlStreamWriter *writer) const override {};
+};
 
 class tst_QXmppStanza : public QObject
 {
@@ -19,6 +26,9 @@ private slots:
     void testErrorCases();
     void testErrorFileTooLarge();
     void testErrorRetry();
+
+    void testSenderKey();
+    void testSceTimestamp();
 };
 
 void tst_QXmppStanza::testExtendedAddress_data()
@@ -370,6 +380,28 @@ void tst_QXmppStanza::testErrorRetry()
     // test setter
     error.setRetryDate(QDateTime(QDate(1985, 10, 26), QTime(1, 35)));
     QCOMPARE(error.retryDate(), QDateTime(QDate(1985, 10, 26), QTime(1, 35)));
+}
+
+void tst_QXmppStanza::testSenderKey()
+{
+    QXmppStanzaStub stanza;
+    auto e2eeMetadata = stanza.e2eeMetadata();
+    QVERIFY(e2eeMetadata.senderKey().isEmpty());
+    e2eeMetadata.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
+    stanza.setE2eeMetadata(e2eeMetadata);
+    e2eeMetadata = stanza.e2eeMetadata();
+    QCOMPARE(e2eeMetadata.senderKey(), QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
+}
+
+void tst_QXmppStanza::testSceTimestamp()
+{
+    QXmppStanzaStub stanza;
+    auto e2eeMetadata = stanza.e2eeMetadata();
+    QVERIFY(e2eeMetadata.sceTimestamp().isNull());
+    e2eeMetadata.setSceTimestamp(QDateTime(QDate(2022, 01, 01), QTime()));
+    stanza.setE2eeMetadata(e2eeMetadata);
+    e2eeMetadata = stanza.e2eeMetadata();
+    QCOMPARE(e2eeMetadata.sceTimestamp(), QDateTime(QDate(2022, 01, 01), QTime()));
 }
 
 QTEST_MAIN(tst_QXmppStanza)

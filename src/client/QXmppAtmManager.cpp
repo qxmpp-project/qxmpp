@@ -297,7 +297,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
             trustMessageElement->usage() == ns_atm &&
             message.from() != client()->configuration().jid()) {
         const auto senderJid = QXmppUtils::jidToBareJid(message.from());
-        const auto senderKey = message.senderKey();
+        const auto senderKey = message.e2eeMetadata().senderKey();
         const auto encryption = trustMessageElement->encryption();
 
         auto future = m_trustStorage->trustLevel(encryption, senderKey);

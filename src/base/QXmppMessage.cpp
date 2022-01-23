@@ -14,8 +14,6 @@
 #include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 
-#include <optional>
-
 #include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
@@ -94,7 +92,6 @@ public:
     QString thread;
     QString parentThread;
     QXmppMessage::Type type;
-    QByteArray senderKey;
 
     // XEP-0066: Out of Band Data
     QString outOfBandUrl;
@@ -309,44 +306,6 @@ QString QXmppMessage::parentThread() const
 void QXmppMessage::setParentThread(const QString &parent)
 {
     d->parentThread = parent;
-}
-
-///
-/// Returns the ID of this message's sender's public long-term key.
-///
-/// The key ID is not part of a transmitted message and thus not de- /
-/// serialized.
-/// Instead, the key ID is set by an encryption protocol such as
-/// \xep{0384, OMEMO Encryption} when it decrypts this message.
-/// It can be used by trust management protocols such as
-/// \xep{0450, Automatic Trust Management (ATM)}.
-///
-/// \return the ID of the sender's key
-///
-/// \since QXmpp 1.5
-///
-QByteArray QXmppMessage::senderKey() const
-{
-    return d->senderKey;
-}
-
-///
-/// Sets the ID of this message's sender's public long-term key.
-///
-/// The key ID is not part of a transmitted message and thus not de- /
-/// serialized.
-/// Instead, the key ID is set by an encryption protocol such as
-/// \xep{0384, OMEMO Encryption} when it decrypts this message.
-/// It can be used by trust management protocols such as
-/// \xep{0450, Automatic Trust Management (ATM)}.
-///
-/// \param keyId ID of the sender's key
-///
-/// \since QXmpp 1.5
-///
-void QXmppMessage::setSenderKey(const QByteArray &keyId)
-{
-    d->senderKey = keyId;
 }
 
 ///

@@ -742,6 +742,9 @@ void tst_QXmppAtmManager::testHandleMessage_data()
     keyOwnerBob.setDistrustedKeys({ { QByteArray::fromBase64(QByteArrayLiteral("b3EsvoNBgUpiQD9KRHmosP/rR7T+3BA84MQw4N6eZmU=")) },
                                     { QByteArray::fromBase64(QByteArrayLiteral("guRlZo0QVxX3TbzdhyOwzdlorG0Znndo/P9NsWtMkk4=")) } });
 
+    QXmppE2eeMetadata e2eeMetadata;
+    e2eeMetadata.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")));
+
     QList<QXmppTrustMessageKeyOwner> keyOwners;
     keyOwners << keyOwnerAlice << keyOwnerBob;
 
@@ -752,7 +755,7 @@ void tst_QXmppAtmManager::testHandleMessage_data()
 
     QXmppMessage message;
     message.setFrom(m_client.configuration().jid());
-    message.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")));
+    message.setE2eeMetadata(e2eeMetadata);
     message.setTrustMessageElement(trustMessageElement);
 
     QTest::newRow("carbonForOwnMessage")
@@ -815,8 +818,9 @@ void tst_QXmppAtmManager::testHandleMessage_data()
         << true
         << true;
 
+    e2eeMetadata.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("qfNJsEMZ8jru0dS76DtYaTxZjiVQ5lpJWBiyaUj9UGU=")));
     message.setFrom(QStringLiteral("bob@example.com/notebook"));
-    message.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("qfNJsEMZ8jru0dS76DtYaTxZjiVQ5lpJWBiyaUj9UGU=")));
+    message.setE2eeMetadata(e2eeMetadata);
 
     QTest::newRow("senderKeyFromContactNotAuthenticated")
         << message
@@ -838,7 +842,7 @@ void tst_QXmppAtmManager::testHandleMessage()
     QFETCH(bool, isSenderKeyAuthenticated);
 
     const auto senderJid = QXmppUtils::jidToBareJid(message.from());
-    const auto senderKey = message.senderKey();
+    const auto senderKey = message.e2eeMetadata().senderKey();
 
     // Add the sender key in preparation for the test.
     if (areTrustDecisionsValid) {
