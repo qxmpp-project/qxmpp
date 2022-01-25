@@ -126,12 +126,12 @@ void QXmppTrustMessageElement::addKeyOwner(const QXmppTrustMessageKeyOwner &keyO
 /// \cond
 void QXmppTrustMessageElement::parse(const QDomElement &element)
 {
-    d->usage = element.attribute("usage");
-    d->encryption = element.attribute("encryption");
+    d->usage = element.attribute(QStringLiteral("usage"));
+    d->encryption = element.attribute(QStringLiteral("encryption"));
 
-    for (auto keyOwnerElement = element.firstChildElement("key-owner");
+    for (auto keyOwnerElement = element.firstChildElement(QStringLiteral("key-owner"));
          !keyOwnerElement.isNull();
-         keyOwnerElement = keyOwnerElement.nextSiblingElement("key-owner")) {
+         keyOwnerElement = keyOwnerElement.nextSiblingElement(QStringLiteral("key-owner"))) {
         if (QXmppTrustMessageKeyOwner::isTrustMessageKeyOwner(keyOwnerElement)) {
             QXmppTrustMessageKeyOwner keyOwner;
             keyOwner.parse(keyOwnerElement);
@@ -142,10 +142,10 @@ void QXmppTrustMessageElement::parse(const QDomElement &element)
 
 void QXmppTrustMessageElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("trust-message");
+    writer->writeStartElement(QStringLiteral("trust-message"));
     writer->writeDefaultNamespace(ns_tm);
-    writer->writeAttribute("usage", d->usage);
-    writer->writeAttribute("encryption", d->encryption);
+    writer->writeAttribute(QStringLiteral("usage"), d->usage);
+    writer->writeAttribute(QStringLiteral("encryption"), d->encryption);
 
     for (const auto &keyOwner : d->keyOwners) {
         keyOwner.toXml(writer);
@@ -274,14 +274,14 @@ void QXmppTrustMessageKeyOwner::setDistrustedKeys(const QList<QByteArray> &keyId
 /// \cond
 void QXmppTrustMessageKeyOwner::parse(const QDomElement &element)
 {
-    d->jid = element.attribute("jid");
+    d->jid = element.attribute(QStringLiteral("jid"));
 
     for (auto childElement = element.firstChildElement();
          !childElement.isNull();
          childElement = childElement.nextSiblingElement()) {
-        if (const auto tagName = childElement.tagName(); tagName == "trust") {
+        if (const auto tagName = childElement.tagName(); tagName == QStringLiteral("trust")) {
             d->trustedKeys.append(QByteArray::fromBase64(childElement.text().toLatin1()));
-        } else if (tagName == "distrust") {
+        } else if (tagName == QStringLiteral("distrust")) {
             d->distrustedKeys.append(QByteArray::fromBase64(childElement.text().toLatin1()));
         }
     }
@@ -289,15 +289,15 @@ void QXmppTrustMessageKeyOwner::parse(const QDomElement &element)
 
 void QXmppTrustMessageKeyOwner::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("key-owner");
-    writer->writeAttribute("jid", d->jid);
+    writer->writeStartElement(QStringLiteral("key-owner"));
+    writer->writeAttribute(QStringLiteral("jid"), d->jid);
 
     for (const auto &keyIdentifier : d->trustedKeys) {
-        writer->writeTextElement("trust", keyIdentifier.toBase64());
+        writer->writeTextElement(QStringLiteral("trust"), keyIdentifier.toBase64());
     }
 
     for (const auto &keyIdentifier : d->distrustedKeys) {
-        writer->writeTextElement("distrust", keyIdentifier.toBase64());
+        writer->writeTextElement(QStringLiteral("distrust"), keyIdentifier.toBase64());
     }
 
     writer->writeEndElement();
