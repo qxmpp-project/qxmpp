@@ -242,8 +242,8 @@ void tst_QXmppPubSubManager::testFetchNodes()
 {
     auto [test, psManager] = Client();
 
-    auto future = psManager->fetchNodes("pepuser@qxmpp.org");
-    test.expect("<iq id='qxmpp1' to='pepuser@qxmpp.org' type='get'><query xmlns='http://jabber.org/protocol/disco#items'/></iq>");
+    auto future = psManager->fetchNodes("pubsub.shakespeare.lit");
+    test.expect("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'><query xmlns='http://jabber.org/protocol/disco#items'/></iq>");
     test.inject(QStringLiteral("<iq type='result' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' id='qxmpp1'>"
                                "<query xmlns='http://jabber.org/protocol/disco#items'>"
                                "<item jid='pubsub.shakespeare.lit' node='blogs' name='Weblog updates'/>"
