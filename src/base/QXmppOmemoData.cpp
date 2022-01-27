@@ -13,7 +13,7 @@
 #include "QXmppUtils.h"
 
 #include <QDomElement>
-#include <QMap>
+#include <QHash>
 
 ///
 /// \class QXmppOmemoDeviceElement
@@ -237,7 +237,7 @@ public:
     QByteArray signedPublicPreKey;
     uint32_t signedPublicPreKeyId = 0;
     QByteArray signedPublicPreKeySignature;
-    QMap<uint32_t, QByteArray> publicPreKeys;
+    QHash<uint32_t, QByteArray> publicPreKeys;
 };
 
 ///
@@ -359,7 +359,7 @@ void QXmppOmemoDeviceBundle::setSignedPublicPreKeySignature(const QByteArray &si
 ///
 /// \return the public pre keys
 ///
-QMap<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
+QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 {
     return d->publicPreKeys;
 }

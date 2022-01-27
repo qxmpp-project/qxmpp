@@ -212,7 +212,7 @@ void tst_QXmppOmemoData::testIsOmemoDeviceBundle()
 
 void tst_QXmppOmemoData::testOmemoDeviceBundle()
 {
-    const QByteArray xml(QByteArrayLiteral(
+    const QByteArray xml1(QByteArrayLiteral(
         "<bundle xmlns=\"urn:xmpp:omemo:2\">"
         "<ik>a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</ik>"
         "<spk id=\"1\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</spk>"
@@ -223,19 +223,45 @@ void tst_QXmppOmemoData::testOmemoDeviceBundle()
         "</prekeys>"
         "</bundle>"));
 
-    const QMap<uint32_t, QByteArray> expectedPublicPreKeys = {
+    // The pre keys can be sorted in the reverse order since it is not fixed.
+    // Thus, another representation is used for the comparision made by
+    // serializePacket().
+    const QByteArray xml2(QByteArrayLiteral(
+        "<bundle xmlns=\"urn:xmpp:omemo:2\">"
+        "<ik>a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</ik>"
+        "<spk id=\"1\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</spk>"
+        "<spks>PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</spks>"
+        "<prekeys>"
+        "<pk id=\"2\">aDRHdkcxNDNYUmJSNWVObnNWd0RCSzE1QlVKVGQ1RVEK</pk>"
+        "<pk id=\"1\">eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK</pk>"
+        "</prekeys>"
+        "</bundle>"));
+
+    const QByteArray xmlWithSinglePreKey(QByteArrayLiteral(
+        "<bundle xmlns=\"urn:xmpp:omemo:2\">"
+        "<ik>a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</ik>"
+        "<spk id=\"1\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</spk>"
+        "<spks>PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</spks>"
+        "<prekeys>"
+        "<pk id=\"1\">eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK</pk>"
+        "</prekeys>"
+        "</bundle>"));
+
+    const auto xmls = QVector({ xml1, xml2 });
+
+    QHash<uint32_t, QByteArray> expectedPublicPreKeys = {
         { 1, QByteArray::fromBase64(QByteArrayLiteral("eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK")) },
         { 2, QByteArray::fromBase64(QByteArrayLiteral("aDRHdkcxNDNYUmJSNWVObnNWd0RCSzE1QlVKVGQ1RVEK")) }
     };
 
     QXmppOmemoDeviceBundle deviceBundle1;
-    parsePacket(deviceBundle1, xml);
+    parsePacket(deviceBundle1, xml1);
     QCOMPARE(deviceBundle1.publicIdentityKey().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
     QCOMPARE(deviceBundle1.signedPublicPreKeyId(), uint32_t(1));
     QCOMPARE(deviceBundle1.signedPublicPreKey().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
     QCOMPARE(deviceBundle1.signedPublicPreKeySignature().toBase64(), QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
     QCOMPARE(deviceBundle1.publicPreKeys(), expectedPublicPreKeys);
-    serializePacket(deviceBundle1, xml);
+    serializePacket(deviceBundle1, xmls);
 
     QXmppOmemoDeviceBundle deviceBundle2;
     deviceBundle2.setPublicIdentityKey(QByteArray::fromBase64(QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK")));
@@ -248,7 +274,7 @@ void tst_QXmppOmemoData::testOmemoDeviceBundle()
     QCOMPARE(deviceBundle2.signedPublicPreKey().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
     QCOMPARE(deviceBundle2.signedPublicPreKeySignature().toBase64(), QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
     QCOMPARE(deviceBundle2.publicPreKeys(), expectedPublicPreKeys);
-    serializePacket(deviceBundle2, xml);
+    serializePacket(deviceBundle2, xmls);
 }
 
 void tst_QXmppOmemoData::testIsOmemoEnvelope_data()
