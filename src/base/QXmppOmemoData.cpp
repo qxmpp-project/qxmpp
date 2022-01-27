@@ -117,17 +117,17 @@ void QXmppOmemoDeviceElement::setLabel(const QString &label)
 /// \cond
 void QXmppOmemoDeviceElement::parse(const QDomElement &element)
 {
-    d->id = element.attribute("id").toInt();
-    d->label = element.attribute("label");
+    d->id = element.attribute(QStringLiteral("id")).toInt();
+    d->label = element.attribute(QStringLiteral("label"));
 }
 
 void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("device");
+    writer->writeStartElement(QStringLiteral("device"));
 
-    writer->writeAttribute("id", QString::number(d->id));
+    writer->writeAttribute(QStringLiteral("id"), QString::number(d->id));
     if (!d->label.isEmpty()) {
-        writer->writeAttribute("label", d->label);
+        writer->writeAttribute(QStringLiteral("label"), d->label);
     }
 
     writer->writeEndElement();  // device
@@ -182,9 +182,9 @@ QXmppOmemoDeviceList &QXmppOmemoDeviceList::operator=(const QXmppOmemoDeviceList
 /// \cond
 void QXmppOmemoDeviceList::parse(const QDomElement &element)
 {
-    for (auto device = element.firstChildElement("device");
+    for (auto device = element.firstChildElement(QStringLiteral("device"));
          !device.isNull();
-         device = device.nextSiblingElement("device")) {
+         device = device.nextSiblingElement(QStringLiteral("device"))) {
         QXmppOmemoDeviceElement deviceElement;
         deviceElement.parse(device);
         append(deviceElement);
@@ -193,7 +193,7 @@ void QXmppOmemoDeviceList::parse(const QDomElement &element)
 
 void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("devices");
+    writer->writeStartElement(QStringLiteral("devices"));
     writer->writeDefaultNamespace(ns_omemo_2);
 
     for (const auto &device : *this) {
@@ -564,10 +564,10 @@ void QXmppOmemoEnvelope::setData(const QByteArray &data)
 /// \cond
 void QXmppOmemoEnvelope::parse(const QDomElement &element)
 {
-    d->recipientDeviceId = element.attribute("rid").toInt();
+    d->recipientDeviceId = element.attribute(QStringLiteral("rid")).toInt();
 
-    const auto isUsedForKeyExchange = element.attribute("kex");
-    if (isUsedForKeyExchange == "true" || isUsedForKeyExchange == "1") {
+    const auto isUsedForKeyExchange = element.attribute(QStringLiteral("kex"));
+    if (isUsedForKeyExchange == QStringLiteral("true") || isUsedForKeyExchange == QStringLiteral("1")) {
         d->isUsedForKeyExchange = true;
     }
 
@@ -576,11 +576,11 @@ void QXmppOmemoEnvelope::parse(const QDomElement &element)
 
 void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("key");
-    writer->writeAttribute("rid", QString::number(d->recipientDeviceId));
+    writer->writeStartElement(QStringLiteral("key"));
+    writer->writeAttribute(QStringLiteral("rid"), QString::number(d->recipientDeviceId));
 
     if (d->isUsedForKeyExchange) {
-        helperToXmlAddAttribute(writer, "kex", "true");
+        helperToXmlAddAttribute(writer, QStringLiteral("kex"), QStringLiteral("true"));
     }
 
     writer->writeCharacters(d->data.toBase64());
@@ -724,39 +724,39 @@ void QXmppOmemoElement::addEnvelope(const QString &recipientJid, QXmppOmemoEnvel
 /// \cond
 void QXmppOmemoElement::parse(const QDomElement &element)
 {
-    const auto header = element.firstChildElement("header");
+    const auto header = element.firstChildElement(QStringLiteral("header"));
 
-    d->senderDeviceId = header.attribute("sid").toInt();
+    d->senderDeviceId = header.attribute(QStringLiteral("sid")).toInt();
 
-    for (auto recipient = header.firstChildElement("keys");
+    for (auto recipient = header.firstChildElement(QStringLiteral("keys"));
          !recipient.isNull();
-         recipient = recipient.nextSiblingElement("keys")) {
-        const auto recipientJid = recipient.attribute("jid");
+         recipient = recipient.nextSiblingElement(QStringLiteral("keys"))) {
+        const auto recipientJid = recipient.attribute(QStringLiteral("jid"));
 
-        for (auto envelope = recipient.firstChildElement("key");
+        for (auto envelope = recipient.firstChildElement(QStringLiteral("key"));
              !envelope.isNull();
-             envelope = envelope.nextSiblingElement("key")) {
+             envelope = envelope.nextSiblingElement(QStringLiteral("key"))) {
             QXmppOmemoEnvelope omemoEnvelope;
             omemoEnvelope.parse(envelope);
             addEnvelope(recipientJid, omemoEnvelope);
         }
     }
 
-    d->payload = QByteArray::fromBase64(element.firstChildElement("payload").text().toLatin1());
+    d->payload = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("payload")).text().toLatin1());
 }
 
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("encrypted");
-    writer->writeAttribute("xmlns", ns_omemo_2);
+    writer->writeStartElement(QStringLiteral("encrypted"));
+    writer->writeDefaultNamespace(ns_omemo_2);
 
-    writer->writeStartElement("header");
-    writer->writeAttribute("sid", QString::number(d->senderDeviceId));
+    writer->writeStartElement(QStringLiteral("header"));
+    writer->writeAttribute(QStringLiteral("sid"), QString::number(d->senderDeviceId));
 
     const auto recipientJids = d->envelopes.uniqueKeys();
     for (const auto &recipientJid : recipientJids) {
-        writer->writeStartElement("keys");
-        writer->writeAttribute("jid", recipientJid);
+        writer->writeStartElement(QStringLiteral("keys"));
+        writer->writeAttribute(QStringLiteral("jid"), recipientJid);
 
         for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
             const auto &envelope = itr.value();
@@ -768,7 +768,7 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();  // header
 
-    helperToXmlAddTextElement(writer, "payload", d->payload.toBase64());
+    helperToXmlAddTextElement(writer, QStringLiteral("payload"), d->payload.toBase64());
 
     writer->writeEndElement();  // encrypted
 }
