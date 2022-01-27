@@ -9,6 +9,7 @@
 #include "QXmppOmemoDeviceList.h"
 #include "QXmppOmemoElement.h"
 #include "QXmppOmemoEnvelope.h"
+#include "QXmppOmemoIq_p.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
@@ -789,4 +790,60 @@ bool QXmppOmemoElement::isOmemoElement(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("encrypted") &&
         element.namespaceURI() == ns_omemo_2;
+}
+
+///
+/// \class QXmppOmemoIq
+///
+/// \brief The QXmppOmemoIq class represents an encrypted IQ stanza as defined
+/// by \xep{0384, OMEMO Encryption} and \xep{0420, Stanza Content Encryption}
+/// (SCE).
+///
+/// \ingroup Stanzas
+///
+
+///
+/// Returns the OMEMO element which contains the data used by OMEMO.
+///
+/// \return the OMEMO element
+///
+QXmppOmemoElement QXmppOmemoIq::omemoElement()
+{
+    return m_omemoElement;
+}
+
+///
+/// Sets the OMEMO element which contains the data used by OMEMO.
+///
+/// \param omemoElement OMEMO element
+///
+void QXmppOmemoIq::setOmemoElement(const QXmppOmemoElement &omemoElement)
+{
+    m_omemoElement = omemoElement;
+}
+
+/// \cond
+void QXmppOmemoIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement child = element.firstChildElement();
+    m_omemoElement.parse(child);
+}
+
+void QXmppOmemoIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    m_omemoElement.toXml(writer);
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an OMEMO IQ stanza.
+///
+/// \param element DOM element being checked
+///
+/// \return true if element is an OMEMO IQ stanza, otherwise false
+///
+bool QXmppOmemoIq::isOmemoIq(const QDomElement &element)
+{
+    auto child = element.firstChildElement();
+    return !child.isNull() && QXmppOmemoElement::isOmemoElement(child);
 }
