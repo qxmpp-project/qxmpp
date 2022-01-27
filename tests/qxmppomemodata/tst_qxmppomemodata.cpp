@@ -268,13 +268,19 @@ void tst_QXmppOmemoData::testOmemoDeviceBundle()
     deviceBundle2.setSignedPublicPreKeyId(1);
     deviceBundle2.setSignedPublicPreKey(QByteArray::fromBase64(QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK")));
     deviceBundle2.setSignedPublicPreKeySignature(QByteArray::fromBase64(QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K")));
-    deviceBundle2.setPublicPreKeys(expectedPublicPreKeys);
+    deviceBundle2.addPublicPreKey(1, expectedPublicPreKeys.value(1));
+    deviceBundle2.addPublicPreKey(2, expectedPublicPreKeys.value(2));
     QCOMPARE(deviceBundle2.publicIdentityKey().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
     QCOMPARE(deviceBundle2.signedPublicPreKeyId(), uint32_t(1));
     QCOMPARE(deviceBundle2.signedPublicPreKey().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
     QCOMPARE(deviceBundle2.signedPublicPreKeySignature().toBase64(), QByteArrayLiteral("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
     QCOMPARE(deviceBundle2.publicPreKeys(), expectedPublicPreKeys);
     serializePacket(deviceBundle2, xmls);
+
+    deviceBundle2.removePublicPreKey(2);
+    expectedPublicPreKeys.remove(2);
+    QCOMPARE(deviceBundle2.publicPreKeys(), expectedPublicPreKeys);
+    serializePacket(deviceBundle2, xmlWithSinglePreKey);
 }
 
 void tst_QXmppOmemoData::testIsOmemoEnvelope_data()
