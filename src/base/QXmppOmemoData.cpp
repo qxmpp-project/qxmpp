@@ -365,23 +365,27 @@ QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 }
 
 ///
-/// Sets the public pre keys.
+/// Adds a public pre key.
 ///
-/// The key of a key-value pair represents the ID of the corresponding public
-/// pre key.
-/// The ID must be at least 1 and at most 2^32-1, otherwise the corresponding
-/// key-value pair is ignored.
-/// The value of a key-value pair represents the public pre key.
+/// The ID must be at least 1 and at most 2^32-1.
 ///
-/// \param keys public pre keys
+/// \param id ID of the public pre key
+/// \param key public pre key
 ///
-void QXmppOmemoDeviceBundle::setPublicPreKeys(const QMap<uint32_t, QByteArray> &keys)
+void QXmppOmemoDeviceBundle::addPublicPreKey(const uint32_t id, const QByteArray &key)
 {
-    for (auto it = keys.cbegin(); it != keys.cend(); it++) {
-        if (it.key() > 0) {
-            d->publicPreKeys.insert(it.key(), it.value());
-        }
-    }
+    d->publicPreKeys.insert(id, key);
+}
+
+///
+/// Removes a public pre key.
+///
+/// \param id ID of the public pre key
+/// \param key public pre key
+///
+void QXmppOmemoDeviceBundle::removePublicPreKey(const uint32_t id)
+{
+    d->publicPreKeys.remove(id);
 }
 
 /// \cond

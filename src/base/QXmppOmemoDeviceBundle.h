@@ -36,7 +36,8 @@ public:
     void setSignedPublicPreKeySignature(const QByteArray &signature);
 
     QHash<uint32_t, QByteArray> publicPreKeys() const;
-    void setPublicPreKeys(const QMap<uint32_t, QByteArray> &keys);
+    void addPublicPreKey(uint32_t id, const QByteArray &key);
+    void removePublicPreKey(uint32_t id);
 
     /// \cond
     void parse(const QDomElement &element);
