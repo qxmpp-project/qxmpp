@@ -81,7 +81,8 @@ uint32_t QXmppOmemoDeviceElement::id() const
 ///
 /// Sets the ID of this device element.
 ///
-/// A valid ID must be at least 1 and at most 2^32-1.
+/// The ID must be at least 1 and at most
+/// \c std::numeric_limits<int32_t>::max().
 ///
 /// \param id this device element's ID
 ///
@@ -321,7 +322,8 @@ uint32_t QXmppOmemoDeviceBundle::signedPublicPreKeyId() const
 ///
 /// Sets the ID of the public pre key that is signed.
 ///
-/// A valid ID must be at least 1 and at most 2^32-1.
+/// The ID must be at least 1 and at most
+/// \c std::numeric_limits<int32_t>::max().
 ///
 /// \param id ID of the signed public pre key
 ///
@@ -367,7 +369,8 @@ QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 ///
 /// Adds a public pre key.
 ///
-/// The ID must be at least 1 and at most 2^32-1.
+/// The ID must be at least 1 and at most
+/// \c std::numeric_limits<int32_t>::max().
 ///
 /// \param id ID of the public pre key
 /// \param key public pre key
@@ -510,7 +513,8 @@ uint32_t QXmppOmemoEnvelope::recipientDeviceId() const
 ///
 /// Sets the ID of the recipient's device.
 ///
-/// A valid ID must be at least 1 and at most 2^32-1.
+/// The ID must be at least 1 and at most
+/// \c std::numeric_limits<int32_t>::max().
 ///
 /// \param id recipient's device ID
 ///
@@ -662,7 +666,8 @@ uint32_t QXmppOmemoElement::senderDeviceId() const
 ///
 /// Sets the ID of the sender's device.
 ///
-/// A valid ID must be at least 1 and at most 2^32-1.
+/// The ID must be at least 1 and at most
+/// \c std::numeric_limits<int32_t>::max().
 ///
 /// \param id sender's device ID
 ///
