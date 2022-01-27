@@ -53,9 +53,18 @@ extern const char *ns_vcard;
 extern const char *ns_rsm;
 // XEP-0060: Publish-Subscribe
 extern const char *ns_pubsub;
+extern const char *ns_pubsub_auto_create;
+extern const char *ns_pubsub_config_node;
+extern const char *ns_pubsub_config_node_max;
+extern const char *ns_pubsub_create_and_configure;
+extern const char *ns_pubsub_create_nodes;
 extern const char *ns_pubsub_errors;
 extern const char *ns_pubsub_event;
+extern const char *ns_pubsub_multi_items;
+extern const char *ns_pubsub_node_config;
 extern const char *ns_pubsub_owner;
+extern const char *ns_pubsub_publish;
+extern const char *ns_pubsub_publish_options;
 extern const char *ns_pubsub_rsm;
 // XEP-0065: SOCKS5 Bytestreams
 extern const char *ns_bytestreams;

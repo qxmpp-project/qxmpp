@@ -41,9 +41,18 @@ const char *ns_vcard = "vcard-temp";
 const char *ns_rsm = "http://jabber.org/protocol/rsm";
 // XEP-0060: Publish-Subscribe
 const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
+const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
+const char *ns_pubsub_config_node = "http://jabber.org/protocol/pubsub#config-node";
+const char *ns_pubsub_config_node_max = "http://jabber.org/protocol/pubsub#config-node-max";
+const char *ns_pubsub_create_and_configure = "http://jabber.org/protocol/pubsub#create-and-configure";
+const char *ns_pubsub_create_nodes = "http://jabber.org/protocol/pubsub#create-nodes";
 const char *ns_pubsub_errors = "http://jabber.org/protocol/pubsub#errors";
 const char *ns_pubsub_event = "http://jabber.org/protocol/pubsub#event";
+const char *ns_pubsub_multi_items = "http://jabber.org/protocol/pubsub#multi-items";
+const char *ns_pubsub_node_config = "http://jabber.org/protocol/pubsub#node_config";
 const char *ns_pubsub_owner = "http://jabber.org/protocol/pubsub#owner";
+const char *ns_pubsub_publish = "http://jabber.org/protocol/pubsub#publish";
+const char *ns_pubsub_publish_options = "http://jabber.org/protocol/pubsub#publish-options";
 const char *ns_pubsub_rsm = "http://jabber.org/protocol/pubsub#rsm";
 // XEP-0065: SOCKS5 Bytestreams
 const char *ns_bytestreams = "http://jabber.org/protocol/bytestreams";
