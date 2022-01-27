@@ -33,7 +33,7 @@ public:
     void setPayload(const QByteArray &payload);
 
     std::optional<QXmppOmemoEnvelope> searchEnvelope(const QString &recipientJid, uint32_t recipientDeviceId) const;
-    void addEnvelope(const QString &recipientJid, QXmppOmemoEnvelope &envelope);
+    void addEnvelope(const QString &recipientJid, const QXmppOmemoEnvelope &envelope);
 
     /// \cond
     void parse(const QDomElement &element);

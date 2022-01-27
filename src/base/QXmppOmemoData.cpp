@@ -324,7 +324,7 @@ uint32_t QXmppOmemoDeviceBundle::signedPublicPreKeyId() const
 ///
 /// \param id ID of the signed public pre key
 ///
-void QXmppOmemoDeviceBundle::setSignedPublicPreKeyId(const uint32_t id)
+void QXmppOmemoDeviceBundle::setSignedPublicPreKeyId(uint32_t id)
 {
     d->signedPublicPreKeyId = id;
 }
@@ -694,7 +694,7 @@ void QXmppOmemoElement::setPayload(const QByteArray &payload)
 ///
 /// \return the found OMEMO envelope
 ///
-std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, uint32_t recipientDeviceId) const
+std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, const uint32_t recipientDeviceId) const
 {
     for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
         const auto &envelope = itr.value();
@@ -716,7 +716,7 @@ std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QStrin
 /// \param recipientJid bare JID of the recipient
 /// \param envelope OMEMO envelope
 ///
-void QXmppOmemoElement::addEnvelope(const QString &recipientJid, QXmppOmemoEnvelope &envelope)
+void QXmppOmemoElement::addEnvelope(const QString &recipientJid, const QXmppOmemoEnvelope &envelope)
 {
     d->envelopes.insert(QXmppUtils::jidToBareJid(recipientJid), envelope);
 }
