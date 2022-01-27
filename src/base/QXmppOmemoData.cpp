@@ -768,7 +768,11 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();  // header
 
-    helperToXmlAddTextElement(writer, QStringLiteral("payload"), d->payload.toBase64());
+    // The payload element is only included if there is a payload.
+    // An empty OMEMO message does not contain a payload.
+    if (!d->payload.isEmpty()) {
+        writer->writeTextElement(QStringLiteral("payload"), d->payload.toBase64());
+    }
 
     writer->writeEndElement();  // encrypted
 }

@@ -1181,11 +1181,12 @@ void tst_QXmppMessage::testOmemoElement()
         "<message type=\"chat\">"
         "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"0\"/>"
-        "<payload/>"
         "</encrypted>"
         "</message>"));
 
     QXmppMessage message1;
+    QVERIFY(!message1.omemoElement());
+
     parsePacket(message1, xmlIn);
     QVERIFY(message1.omemoElement());
     serializePacket(message1, xmlOut1);
