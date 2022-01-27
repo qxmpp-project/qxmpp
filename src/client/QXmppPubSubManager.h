@@ -104,6 +104,13 @@ public:
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
     inline QFuture<Result> createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
     inline QFuture<Result> deletePepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
+    template<typename T = QXmppPubSubItem>
+    inline QFuture<ItemResult<T>> requestPepItem(const QString &nodeName, const QString &itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
+    template<typename T = QXmppPubSubItem>
+    inline QFuture<ItemResult<T>> requestPepItem(const QString &nodeName, StandardItemId itemId = Current) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
+    template<typename T = QXmppPubSubItem>
+    inline QFuture<ItemsResult<T>> requestPepItems(const QString &nodeName) { return requestItems(client()->configuration().jidBare(), nodeName); }
+    inline QFuture<ItemIdsResult> requestPepItemIds(const QString &nodeName) { return requestItemIds(client()->configuration().jidBare(), nodeName); }
     template<typename T>
     QFuture<PublishItemResult> publishPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>

@@ -741,6 +741,56 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
+/// \fn QXmppPubSubManager::requestPepItem(const QString &nodeName, const QString &itemId)
+///
+/// Requests a specific item of a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::requestItem on the current account's bare JID.
+///
+/// \param nodeName name of the PEP node whose item is requested
+/// \param itemId ID of the requested item
+///
+
+///
+/// \fn QXmppPubSubManager::requestPepItem(const QString &nodeName, StandardItemId itemId)
+///
+/// Requests a specific item of a PEP node.
+///
+/// The default value of itemId is used for singleton nodes (i.e., the node's
+/// single item is requested).
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::requestItem on the current account's bare JID.
+///
+/// \param nodeName name of the PEP node whose item is requested
+/// \param itemId ID of the requested item
+///
+
+///
+/// \fn QXmppPubSubManager::requestPepItems(const QString &nodeName)
+///
+/// Requests all items of a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::requestItems on the current account's bare JID.
+///
+/// \param nodeName name of the PEP node whose items are requested
+///
+
+///
+/// \fn QXmppPubSubManager::requestPepItemIds(const QString &nodeName)
+///
+/// Requests the IDs of all items of a pubsub service node via service
+/// discovery.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::requestItemIds on the current account's bare JID.
+///
+/// \param nodeName name of the PEP node whose item IDs are requested
+///
+
+///
 /// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId)
 ///
 /// Deletes an item from a PEP node.

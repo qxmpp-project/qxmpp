@@ -85,9 +85,13 @@ private:
     Q_SLOT void testPurgeItems();
     Q_SLOT void testPurgePepItems();
     Q_SLOT void testRequestItemIds();
+    Q_SLOT void testRequestPepItemIds();
     Q_SLOT void testRequestCurrentItem();
     Q_SLOT void testRequestItems_data();
     Q_SLOT void testRequestItems();
+    Q_SLOT void testRequestCurrentPepItem();
+    Q_SLOT void testRequestPepItem();
+    Q_SLOT void testRequestPepItems();
     Q_SLOT void testRequestItemNotFound();
     Q_SLOT void testRequestNodeAffiliations();
     Q_SLOT void testRequestAffiliations();
@@ -564,6 +568,24 @@ void tst_QXmppPubSubManager::testRequestItemIds()
     QCOMPARE(itemIds, (QVector<QString> { QStringLiteral("368866411b877c30064a5f62b917cffe"), QStringLiteral("3300659945416e274474e469a1f0154c") }));
 }
 
+void tst_QXmppPubSubManager::testRequestPepItemIds()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestPepItemIds(QStringLiteral("princely_musings"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items' node='princely_musings'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items' node='princely_musings'>"
+                               "<item jid='juliet@capulet.lit' name='368866411b877c30064a5f62b917cffe'/>"
+                               "<item jid='juliet@capulet.lit' name='3300659945416e274474e469a1f0154c'/>"
+                               "</query></iq>"));
+
+    auto itemIds = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(itemIds, (QVector<QString> { QStringLiteral("368866411b877c30064a5f62b917cffe"), QStringLiteral("3300659945416e274474e469a1f0154c") }));
+}
+
 void tst_QXmppPubSubManager::testRequestCurrentItem()
 {
     auto [test, psManager] = Client();
@@ -717,6 +739,72 @@ void tst_QXmppPubSubManager::testRequestItems()
                                            return item.id() == itemId;
                                        });
     QVERIFY2(itemsEqual, "The items returned from the manager don't match the item IDs from the XML response");
+}
+
+void tst_QXmppPubSubManager::testRequestCurrentPepItem()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestPepItem(QStringLiteral("princely_musings"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+
+    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    QCOMPARE(item.id(), QStringLiteral("current"));
+}
+
+void tst_QXmppPubSubManager::testRequestPepItem()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestPepItem(QStringLiteral("princely_musings"), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='ae890ac52d0df67ed7cfdf51b644e901'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='ae890ac52d0df67ed7cfdf51b644e901'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+
+    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    QCOMPARE(item.id(), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
+}
+
+void tst_QXmppPubSubManager::testRequestPepItems()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestPepItems(QStringLiteral("princely_musings"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'/>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='368866411b877c30064a5f62b917cffe'/>"
+                               "<item id='3300659945416e274474e469a1f0154c'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+
+    const auto items = expectFutureVariant<QXmppPubSubManager::Items<QXmppPubSubItem>>(future);
+    QCOMPARE(items.items.first().id(), QStringLiteral("368866411b877c30064a5f62b917cffe"));
+    QCOMPARE(items.items.last().id(), QStringLiteral("3300659945416e274474e469a1f0154c"));
 }
 
 void tst_QXmppPubSubManager::testRequestItemNotFound()
