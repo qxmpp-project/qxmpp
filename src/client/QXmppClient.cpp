@@ -28,6 +28,9 @@
 #include <QTimer>
 
 using namespace QXmpp::Private;
+using EncryptMessageResult = QXmppE2eeExtension::EncryptMessageResult;
+using IqEncryptResult = QXmppE2eeExtension::IqEncryptResult;
+using IqDecryptResult = QXmppE2eeExtension::IqDecryptResult;
 
 /// \cond
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
@@ -359,10 +362,10 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 {
-    const auto sendEncrypted = [this](QFuture<QXmppE2eeExtension::EncryptMessageResult> &&future) {
+    const auto sendEncrypted = [this](QFuture<EncryptMessageResult> &&future) {
         auto interface = std::make_shared<QFutureInterface<QXmpp::SendResult>>(QFutureInterfaceBase::Started);
 
-        await(future, this, [this, interface](QXmppE2eeExtension::EncryptMessageResult &&result) {
+        await(future, this, [this, interface](EncryptMessageResult &&result) {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 auto future = d->stream->send(QXmppPacket(*xml, true, interface));
                 await(future, this, [=](QXmpp::SendResult &&result) {
@@ -440,10 +443,10 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq)
 ///
 QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
 {
-    const auto sendEncrypted = [this](QFuture<QXmppE2eeExtension::IqEncryptResult> &&future, const QString &id) {
+    const auto sendEncrypted = [this](QFuture<IqEncryptResult> &&future, const QString &id) {
         auto interface = std::make_shared<QFutureInterface<IqResult>>(QFutureInterfaceBase::Started);
 
-        await(future, this, [this, interface, id](QXmppE2eeExtension::IqEncryptResult result) {
+        await(future, this, [this, interface, id](IqEncryptResult result) {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 // encrypted successfully
                 auto future = d->stream->sendIq(QXmppPacket(*xml, true, std::make_shared<QFutureInterface<QXmpp::SendResult>>()), id);
@@ -453,7 +456,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
                         if (d->encryptionExtension) {
                             // decrypt
                             auto future = d->encryptionExtension->decryptIq(*encryptedDom);
-                            await(future, this, [interface, encryptedDom = *encryptedDom](QXmppE2eeExtension::IqDecryptResult result) {
+                            await(future, this, [interface, encryptedDom = *encryptedDom](IqDecryptResult result) {
                                 if (const auto dom = std::get_if<QDomElement>(&result)) {
                                     // decrypted result
                                     interface->reportResult(*dom);
