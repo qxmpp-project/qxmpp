@@ -85,14 +85,14 @@ public:
     /// \since QXmpp 1.1
     ///
     enum EncryptionMethod {
-        NoEncryption,       ///< No encryption
-        UnknownEncryption,  ///< Unknown encryption
-        OTR,                ///< \xep{0364, Current Off-the-Record Messaging Usage}
-        LegacyOpenPGP,      ///< \xep{0027, Current Jabber OpenPGP Usage}
-        OX,                 ///< \xep{0373, OpenPGP for XMPP}
-        OMEMO,              ///< \xep{0384, OMEMO Encryption}
-        OMEMO1,             ///< \xep{0384, OMEMO Encryption} since version 0.4
-        OMEMO2              ///< \xep{0384, OMEMO Encryption} since version 0.8
+        NoEncryption,                                  ///< No encryption
+        UnknownEncryption,                             ///< Unknown encryption
+        Otr, OTR = Otr,                                ///< \xep{0364, Current Off-the-Record Messaging Usage}
+        LegacyOpenPgp, LegacyOpenPGP = LegacyOpenPgp,  ///< \xep{0027, Current Jabber OpenPGP Usage}
+        Ox, OX = Ox,                                   ///< \xep{0373, OpenPGP for XMPP}
+        Omemo, OMEMO = Omemo,                          ///< \xep{0384, OMEMO Encryption}
+        Omemo1,                                        ///< \xep{0384, OMEMO Encryption} since version 0.4
+        Omemo2                                         ///< \xep{0384, OMEMO Encryption} since version 0.8
     };
 
     QXmppMessage(const QString &from = QString(), const QString &to = QString(),

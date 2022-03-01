@@ -776,7 +776,7 @@ void tst_QXmppMessage::testEme()
     QXmppMessage messageOmemo;
     parsePacket(messageOmemo, xmlOmemo);
     QCOMPARE(messageOmemo.encryptionMethodNs(), QString("eu.siacs.conversations.axolotl"));
-    QCOMPARE(messageOmemo.encryptionMethod(), QXmppMessage::OMEMO);
+    QCOMPARE(messageOmemo.encryptionMethod(), QXmppMessage::Omemo);
     QCOMPARE(messageOmemo.encryptionName(), QString("OMEMO"));
     serializePacket(messageOmemo, xmlOmemo);
 
@@ -796,8 +796,8 @@ void tst_QXmppMessage::testEme()
 
     // test setters/getters
     QXmppMessage message;
-    message.setEncryptionMethod(QXmppMessage::LegacyOpenPGP);
-    QCOMPARE(message.encryptionMethod(), QXmppMessage::LegacyOpenPGP);
+    message.setEncryptionMethod(QXmppMessage::LegacyOpenPgp);
+    QCOMPARE(message.encryptionMethod(), QXmppMessage::LegacyOpenPgp);
     QCOMPARE(message.encryptionMethodNs(), QString("jabber:x:encrypted"));
     QCOMPARE(message.encryptionName(), QString("Legacy OpenPGP"));
 
