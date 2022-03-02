@@ -386,22 +386,26 @@ void tst_QXmppStanza::testSenderKey()
 {
     QXmppStanzaStub stanza;
     auto e2eeMetadata = stanza.e2eeMetadata();
-    QVERIFY(e2eeMetadata.senderKey().isEmpty());
-    e2eeMetadata.setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
+    QVERIFY(!e2eeMetadata.has_value());
+    e2eeMetadata = QXmppE2eeMetadata();
+    e2eeMetadata->setSenderKey(QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
     stanza.setE2eeMetadata(e2eeMetadata);
     e2eeMetadata = stanza.e2eeMetadata();
-    QCOMPARE(e2eeMetadata.senderKey(), QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
+    QCOMPARE(e2eeMetadata->senderKey(), QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")));
 }
 
 void tst_QXmppStanza::testSceTimestamp()
 {
     QXmppStanzaStub stanza;
     auto e2eeMetadata = stanza.e2eeMetadata();
-    QVERIFY(e2eeMetadata.sceTimestamp().isNull());
-    e2eeMetadata.setSceTimestamp(QDateTime(QDate(2022, 01, 01), QTime()));
+    QVERIFY(!e2eeMetadata.has_value());
+    e2eeMetadata = QXmppE2eeMetadata();
+    QVERIFY(e2eeMetadata->senderKey().isEmpty());
+    QVERIFY(e2eeMetadata->sceTimestamp().isNull());
+    e2eeMetadata->setSceTimestamp(QDateTime(QDate(2022, 01, 01), QTime()));
     stanza.setE2eeMetadata(e2eeMetadata);
     e2eeMetadata = stanza.e2eeMetadata();
-    QCOMPARE(e2eeMetadata.sceTimestamp(), QDateTime(QDate(2022, 01, 01), QTime()));
+    QCOMPARE(e2eeMetadata->sceTimestamp(), QDateTime(QDate(2022, 01, 01), QTime()));
 }
 
 QTEST_MAIN(tst_QXmppStanza)

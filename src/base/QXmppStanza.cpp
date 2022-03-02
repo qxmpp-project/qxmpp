@@ -525,6 +525,24 @@ QXmppE2eeMetadata::QXmppE2eeMetadata(const QXmppE2eeMetadata &other) = default;
 
 QXmppE2eeMetadata::~QXmppE2eeMetadata() = default;
 
+/// \cond
+QXmppE2eeMetadata::QXmppE2eeMetadata(const std::optional<QXmppE2eeMetadata> &other)
+    : d(nullptr)
+{
+    if (other) {
+        *this = *other;
+    }
+}
+
+std::optional<QXmppE2eeMetadata> QXmppE2eeMetadata::toOptional() const
+{
+    if (d) {
+        return *this;
+    }
+    return {};
+}
+/// \endcond
+
 ///
 /// Assigns \a other to this end-to-end encryption metadata class.
 ///
@@ -618,7 +636,7 @@ public:
     QXmppStanza::Error error;
     QXmppElementList extensions;
     QList<QXmppExtendedAddress> extendedAddresses;
-    QXmppE2eeMetadata e2eeMetadata;
+    QXmppE2eeMetadata e2eeMetadata = QXmppE2eeMetadata(std::nullopt);
 };
 
 ///
@@ -776,9 +794,9 @@ void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addres
 ///
 /// \since QXmpp 1.5
 ///
-QXmppE2eeMetadata QXmppStanza::e2eeMetadata() const
+std::optional<QXmppE2eeMetadata> QXmppStanza::e2eeMetadata() const
 {
-    return d->e2eeMetadata;
+    return d->e2eeMetadata.toOptional();
 }
 
 ///
@@ -786,9 +804,9 @@ QXmppE2eeMetadata QXmppStanza::e2eeMetadata() const
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppStanza::setE2eeMetadata(const QXmppE2eeMetadata &e2eeMetadata)
+void QXmppStanza::setE2eeMetadata(const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
-    d->e2eeMetadata = e2eeMetadata;
+    d->e2eeMetadata = QXmppE2eeMetadata(e2eeMetadata);
 }
 
 /// \cond

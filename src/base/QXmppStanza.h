@@ -8,6 +8,8 @@
 #ifndef QXMPPSTANZA_H
 #define QXMPPSTANZA_H
 
+#include <optional>
+
 #include <QByteArray>
 #include <QSharedData>
 #include <QString>
@@ -83,6 +85,14 @@ public:
     void setSceTimestamp(const QDateTime &timestamp);
 
 private:
+    friend class QXmppStanza;
+    friend class QXmppStanzaPrivate;
+
+    /// \cond
+    explicit QXmppE2eeMetadata(const std::optional<QXmppE2eeMetadata> &other);
+    std::optional<QXmppE2eeMetadata> toOptional() const;
+    /// \endcond
+
     QSharedDataPointer<QXmppE2eeMetadataPrivate> d;
 };
 
@@ -225,8 +235,8 @@ public:
     QList<QXmppExtendedAddress> extendedAddresses() const;
     void setExtendedAddresses(const QList<QXmppExtendedAddress> &extendedAddresses);
 
-    QXmppE2eeMetadata e2eeMetadata() const;
-    void setE2eeMetadata(const QXmppE2eeMetadata &e2eeMetadata);
+    std::optional<QXmppE2eeMetadata> e2eeMetadata() const;
+    void setE2eeMetadata(const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
 
     /// \cond
     void parse(const QDomElement &element) override;
