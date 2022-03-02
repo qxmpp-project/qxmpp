@@ -842,7 +842,7 @@ void tst_QXmppAtmManager::testHandleMessage()
     QFETCH(bool, isSenderKeyAuthenticated);
 
     const auto senderJid = QXmppUtils::jidToBareJid(message.from());
-    const auto senderKey = message.e2eeMetadata().senderKey();
+    const auto senderKey = message.e2eeMetadata()->senderKey();
 
     // Add the sender key in preparation for the test.
     if (areTrustDecisionsValid) {
