@@ -28,6 +28,8 @@ using namespace QXmpp::Private;
 ///
 /// \since QXmpp 1.5
 ///
+/// \ingroup Managers
+///
 
 ///
 /// \typedef QXmppUserTuneManager::Item
