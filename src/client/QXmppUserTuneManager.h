@@ -16,17 +16,18 @@ class QXMPP_EXPORT QXmppUserTuneManager : public QXmppPubSubEventManager
     Q_OBJECT
 
 public:
-    using TuneResult = std::variant<QXmppTuneItem, QXmppStanza::Error>;
+    using Item = QXmppTuneItem;
+    using GetResult = std::variant<Item, QXmppStanza::Error>;
     using PublishResult = std::variant<QString, QXmppStanza::Error>;
 
     QXmppUserTuneManager();
 
     QStringList discoveryFeatures() const override;
 
-    QFuture<TuneResult> request(const QString &jid);
+    QFuture<GetResult> request(const QString &jid);
     QFuture<PublishResult> publish(const QXmppTuneItem &);
 
-    Q_SIGNAL void userTuneChanged(const QString &jid, const QXmppTuneItem &);
+    Q_SIGNAL void itemReceived(const QString &jid, const QXmppTuneItem &item);
 
 protected:
     /// \cond

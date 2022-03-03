@@ -88,7 +88,7 @@ void tst_QXmppUserTuneManager::testEvents()
     auto *psManager = test.addNewExtension<QXmppPubSubManager>();
     auto *tuneManager = test.addNewExtension<QXmppUserTuneManager>();
 
-    QSignalSpy spy(tuneManager, &QXmppUserTuneManager::userTuneChanged);
+    QSignalSpy spy(tuneManager, &QXmppUserTuneManager::itemReceived);
 
     psManager->handleStanza(xmlToDom(QStringLiteral("<message from='stpeter@jabber.org' to='maineboy@jabber.org'>"
                                                     "<event xmlns='http://jabber.org/protocol/pubsub#event'>"
