@@ -5,9 +5,7 @@
 #include "QXmppUserTuneManager.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppFutureUtils_p.h"
-#include "QXmppPubSubEvent.h"
-#include "QXmppPubSubManager.h"
+#include "QXmppPep_p.h"
 #include "QXmppTuneItem.h"
 
 using namespace QXmpp::Private;
@@ -75,20 +73,7 @@ QStringList QXmppUserTuneManager::discoveryFeatures() const
 auto QXmppUserTuneManager::request(const QString &jid)
     -> QFuture<GetResult>
 {
-    using PubSub = QXmppPubSubManager;
-    using Error = QXmppStanza::Error;
-
-    return chain<GetResult>(pubSub()->requestItems<Item>(jid, ns_tune), this,
-                             [](PubSub::ItemsResult<Item> &&result) -> GetResult {
-                                 if (const auto items = std::get_if<PubSub::Items<Item>>(&result)) {
-                                     if (!items->items.isEmpty()) {
-                                         return items->items.takeFirst();
-                                     }
-                                     return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No tune available."));
-                                 } else {
-                                     return std::get<Error>(result);
-                                 }
-                             });
+    return Pep::request<Item>(pubSub(), jid, ns_tune, this);
 }
 
 ///
@@ -105,19 +90,6 @@ auto QXmppUserTuneManager::publish(const QXmppTuneItem &item)
 /// \cond
 bool QXmppUserTuneManager::handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName)
 {
-    if (nodeName == ns_tune && QXmppPubSubEvent<Item>::isPubSubEvent(element)) {
-        QXmppPubSubEvent<Item> event;
-        event.parse(element);
-
-        if (event.eventType() == QXmppPubSubEventBase::Items) {
-            if (!event.items().isEmpty()) {
-                emit itemReceived(pubSubService, event.items().constFirst());
-            } else {
-                emit itemReceived(pubSubService, {});
-            }
-            return true;
-        }
-    }
-    return false;
+    return Pep::handlePubSubEvent<Item>(element, pubSubService, nodeName, ns_tune, this, &QXmppUserTuneManager::itemReceived);
 }
 /// \endcond
