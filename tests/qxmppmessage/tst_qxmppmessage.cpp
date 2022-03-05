@@ -54,6 +54,7 @@ private slots:
     void testMixInvitation();
     void testTrustMessageElement();
     void testOmemoElement();
+    void testE2eeFallbackBody();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1195,6 +1196,51 @@ void tst_QXmppMessage::testOmemoElement()
     message2.setOmemoElement(QXmppOmemoElement());
     QVERIFY(message2.omemoElement());
     serializePacket(message2, xmlOut2);
+}
+
+void tst_QXmppMessage::testE2eeFallbackBody()
+{
+    const QByteArray xml(
+        "<message type=\"chat\">"
+        "<body>This message is encrypted with OMEMO 2 but could not be decrypted</body>"
+        "</message>");
+
+    // The custom de- / serialization lambda expressions are needed because of
+    // "QXmpp::ScePublic".
+
+    const auto parsePacket = [](QXmppMessage &packet, const QByteArray &xml) {
+        // qDebug() << "parsing" << xml;
+        packet.parse(xmlToDom(xml), QXmpp::ScePublic);
+    };
+
+    const auto packetToXml = [](const QXmppMessage &packet) {
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        QXmlStreamWriter writer(&buffer);
+        packet.toXml(&writer, QXmpp::ScePublic);
+        auto data = buffer.data();
+        data.replace(u'\'', "&apos;");
+        return data;
+    };
+
+    const auto serializePacket = [=](QXmppMessage &packet, const QByteArray &xml) {
+        auto processedXml = xml;
+        processedXml.replace(u'\'', u'"');
+
+        const auto data = packetToXml(packet);
+        qDebug() << "expect " << processedXml;
+        qDebug() << "writing" << data;
+        QCOMPARE(data, processedXml);
+    };
+
+    QXmppMessage message1;
+    parsePacket(message1, xml);
+    QCOMPARE(message1.e2eeFallbackBody(), QStringLiteral("This message is encrypted with OMEMO 2 but could not be decrypted"));
+    serializePacket(message1, xml);
+
+    QXmppMessage message2;
+    message2.setE2eeFallbackBody(QStringLiteral("This message is encrypted with OMEMO 2 but could not be decrypted"));
+    serializePacket(message2, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

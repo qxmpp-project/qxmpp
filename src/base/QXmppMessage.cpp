@@ -88,6 +88,7 @@ public:
     QXmppMessagePrivate();
 
     QString body;
+    QString e2eeFallbackBody;
     QString subject;
     QString thread;
     QString parentThread;
@@ -234,6 +235,36 @@ QString QXmppMessage::body() const
 void QXmppMessage::setBody(const QString &body)
 {
     d->body = body;
+}
+
+///
+/// Returns a body that is unlike the normal body not encrypted.
+///
+/// It can be presented to users if the message could not be decrypted (e.g.,
+/// because their clients do not support the used end-to-end encryption).
+///
+/// \return the end-to-end encryption fallback body
+///
+/// \since QXmpp 1.5
+///
+QString QXmppMessage::e2eeFallbackBody() const
+{
+    return d->e2eeFallbackBody;
+}
+
+///
+/// Sets a body that is unlike the normal body not encrypted.
+///
+/// It can be presented to users if the message could not be decrypted (e.g.,
+/// because their clients do not support the used end-to-end encryption).
+///
+/// \param fallbackBody end-to-end encryption fallback body
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setE2eeFallbackBody(const QString &fallbackBody)
+{
+    d->e2eeFallbackBody = fallbackBody;
 }
 
 /// Returns the message's type.
@@ -1239,6 +1270,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
 bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sceMode)
 {
     if (sceMode & QXmpp::ScePublic) {
+        if (sceMode == QXmpp::ScePublic && element.tagName() == QStringLiteral("body")) {
+            d->e2eeFallbackBody = element.text();
+            return true;
+        }
+
         // XEP-0280: Message Carbons
         if (checkElement(element, QStringLiteral("private"), ns_carbons)) {
             d->privatemsg = true;
@@ -1445,6 +1481,10 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
 void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode sceMode, const QString &baseNamespace) const
 {
     if (sceMode & QXmpp::ScePublic) {
+        if (sceMode == QXmpp::ScePublic && !d->e2eeFallbackBody.isEmpty()) {
+            writer->writeTextElement(QStringLiteral("body"), d->e2eeFallbackBody);
+        }
+
         // XEP-0280: Message Carbons
         if (d->privatemsg) {
             writer->writeStartElement(QStringLiteral("private"));

@@ -108,6 +108,9 @@ public:
     QString body() const;
     void setBody(const QString &);
 
+    QString e2eeFallbackBody() const;
+    void setE2eeFallbackBody(const QString &fallbackBody);
+
     QString subject() const;
     void setSubject(const QString &);
 
