@@ -165,7 +165,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "type=\"get\">"
         "<data xmlns=\"urn:xmpp:bob\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QCOMPARE(doc.setContent(xmlSimple, true), true);
+    QVERIFY(doc.setContent(xmlSimple, true));
     QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), true);
 
     const QByteArray xmlMultipleElements(
@@ -176,7 +176,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "<data xmlns=\"urn:xmpp:other-data-format:0\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "<data xmlns=\"urn:xmpp:bob\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QCOMPARE(doc.setContent(xmlMultipleElements, true), true);
+    QVERIFY(doc.setContent(xmlMultipleElements, true));
     QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), true);
 
     const QByteArray xmlWithoutBobData(
@@ -186,7 +186,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "type=\"get\">"
         "<data xmlns=\"urn:xmpp:other-data-format:0\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QCOMPARE(doc.setContent(xmlWithoutBobData, true), true);
+    QVERIFY(doc.setContent(xmlWithoutBobData, true));
     QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), false);
 }
 

@@ -60,7 +60,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QCOMPARE(doc.setContent(correctInvitationWithNamespace, true), true);
+    QVERIFY(doc.setContent(correctInvitationWithNamespace, true));
     element = doc.documentElement();
     QVERIFY(QXmppMixInvitation::isMixInvitation(element));
 
@@ -71,7 +71,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QCOMPARE(doc.setContent(invitationWithoutNamespace, true), true);
+    QVERIFY(doc.setContent(invitationWithoutNamespace, true));
     element = doc.documentElement();
     QVERIFY(!QXmppMixInvitation::isMixInvitation(element));
 
@@ -82,7 +82,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QCOMPARE(doc.setContent(invitationWithIncorrectNamespace, true), true);
+    QVERIFY(doc.setContent(invitationWithIncorrectNamespace, true));
     element = doc.documentElement();
     QVERIFY(!QXmppMixInvitation::isMixInvitation(element));
 }

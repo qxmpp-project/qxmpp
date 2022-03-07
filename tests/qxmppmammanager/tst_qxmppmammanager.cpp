@@ -129,7 +129,7 @@ void tst_QXmppMamManager::testHandleStanza()
     QFETCH(QString, expectedQueryId);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
     m_helper.m_signalTriggered = false;
@@ -192,7 +192,7 @@ void tst_QXmppMamManager::testHandleResultIq()
     QFETCH(bool, expectedComplete);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
     m_helper.m_signalTriggered = false;

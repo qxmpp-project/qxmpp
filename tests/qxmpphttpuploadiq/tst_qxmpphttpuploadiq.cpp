@@ -74,7 +74,7 @@ void tst_QXmppHttpUploadIq::testIsRequest()
     QFETCH(bool, isRequest);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QCOMPARE(QXmppHttpUploadRequestIq::isHttpUploadRequestIq(doc.documentElement()), isRequest);
 }
 
@@ -143,7 +143,7 @@ void tst_QXmppHttpUploadIq::testIsSlot()
     QFETCH(bool, isSlot);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QCOMPARE(QXmppHttpUploadSlotIq::isHttpUploadSlotIq(doc.documentElement()), isSlot);
 }
 

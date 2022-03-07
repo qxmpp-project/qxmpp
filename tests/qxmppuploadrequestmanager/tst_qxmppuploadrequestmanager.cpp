@@ -97,7 +97,7 @@ void tst_QXmppUploadRequestManager::onLoggerMessage(QXmppLogger::MessageType typ
     QCOMPARE(type, QXmppLogger::SentMessage);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(text, true), true);
+    QVERIFY(doc.setContent(text, true));
     QDomElement element = doc.documentElement();
 
     QXmppHttpUploadRequestIq iq;
@@ -194,7 +194,7 @@ void tst_QXmppUploadRequestManager::testHandleStanza()
     connect(manager, &QXmppUploadRequestManager::requestFailed, &helper, &TestHelper::onRequestFailed);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
     bool realAccepted = manager->handleStanza(element);
@@ -242,7 +242,7 @@ void tst_QXmppUploadRequestManager::testDiscoveryService()
     QFETCH(bool, discovered);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
     bool accepted = discovery->handleStanza(element);
