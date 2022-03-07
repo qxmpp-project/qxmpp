@@ -223,11 +223,11 @@ QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, 
     return makeReadyFuture();
 }
 
-QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QByteArray &keyId)
+QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
 {
     const auto keys = d->keys.values(encryption);
     for (const auto &key : keys) {
-        if (key.id == keyId) {
+        if (key.id == keyId && key.ownerJid == keyOwnerJid) {
             return makeReadyFuture(std::move(QXmppTrustStorage::TrustLevel(key.trustLevel)));
         }
     }

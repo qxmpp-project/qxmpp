@@ -301,7 +301,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         const auto senderKey = e2eeMetadata ? e2eeMetadata->senderKey() : QByteArray();
         const auto encryption = trustMessageElement->encryption();
 
-        auto future = m_trustStorage->trustLevel(encryption, senderKey);
+        auto future = m_trustStorage->trustLevel(encryption, senderJid, senderKey);
         await(future, this, [=](const auto &&senderKeyTrustLevel) mutable {
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == QXmppTrustStorage::Authenticated;
 

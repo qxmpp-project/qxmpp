@@ -55,7 +55,7 @@ public:
 
     virtual QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel) = 0;
     virtual QFuture<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel) = 0;
-    virtual QFuture<TrustLevel> trustLevel(const QString &encryption, const QByteArray &keyId) = 0;
+    virtual QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId) = 0;
 
     virtual QFuture<void> resetAll(const QString &encryption) = 0;
 };

@@ -1683,6 +1683,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
     QVERIFY2(!unexpectedTrustMessageSentSpy.wait(UNEXPECTED_TRUST_MESSAGE_WAITING_TIMEOUT), "Unexpected trust message sent!");
 
     auto futureTrustLevel = m_trustStorage->trustLevel(ns_omemo,
+                                                       QStringLiteral("alice@example.org"),
                                                        QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")));
     QVERIFY(futureTrustLevel.isFinished());
     auto result = futureTrustLevel.result();
@@ -2026,6 +2027,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
     QVERIFY2(!unexpectedTrustMessageSentSpy.wait(UNEXPECTED_TRUST_MESSAGE_WAITING_TIMEOUT), "Unexpected trust message sent!");
 
     const auto futureTrustLevel = m_trustStorage->trustLevel(ns_omemo,
+                                                             QStringLiteral("bob@example.com"),
                                                              QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
     QVERIFY(futureTrustLevel.isFinished());
     const auto result = futureTrustLevel.result();
@@ -2035,18 +2037,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
 void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysDone()
 {
     auto future = m_trustStorage->trustLevel(ns_omemo,
+                                             QStringLiteral("alice@example.org"),
                                              QByteArray::fromBase64(QByteArrayLiteral("0RcVsGk3LnpEFsqqztTzAgCDgVXlfa03paSqJFOOWOU=")));
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
     future = m_trustStorage->trustLevel(ns_omemo,
+                                        QStringLiteral("alice@example.org"),
                                         QByteArray::fromBase64(QByteArrayLiteral("tYn/wcIOxBSoW4W1UfPr/zgbLipBK2KsFfC7F1bzut0=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
     future = m_trustStorage->trustLevel(ns_omemo,
+                                        QStringLiteral("alice@example.org"),
                                         QByteArray::fromBase64(QByteArrayLiteral("4iBsyJPVAfNWM/OgyA9fasOvkJ8K1/0wuYpwVGw4Q5M=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -2056,18 +2061,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysDone()
 void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysDone()
 {
     auto future = m_trustStorage->trustLevel(ns_omemo,
+                                             QStringLiteral("bob@example.com"),
                                              QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
     future = m_trustStorage->trustLevel(ns_omemo,
+                                        QStringLiteral("bob@example.com"),
                                         QByteArray::fromBase64(QByteArrayLiteral("mzDeKTQBVm1cTmzF9DjCGKa14pDADZOVLT9Kh7CK7AM=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
     future = m_trustStorage->trustLevel(ns_omemo,
+                                        QStringLiteral("bob@example.com"),
                                         QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")));
     QVERIFY(future.isFinished());
     result = future.result();
