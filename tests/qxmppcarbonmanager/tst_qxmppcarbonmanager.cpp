@@ -206,7 +206,7 @@ void tst_QXmppCarbonManager::testHandleStanza()
     m_helper.m_signalTriggered = false;
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
     bool accepted = m_manager->handleStanza(element);

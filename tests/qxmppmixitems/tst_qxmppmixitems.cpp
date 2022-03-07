@@ -73,7 +73,7 @@ void tst_QXmppMixItem::testIsInfoItem()
         "</field>"
         "</x>"
         "</item>");
-    QCOMPARE(doc.setContent(xmlCorrect, true), true);
+    QVERIFY(doc.setContent(xmlCorrect, true));
     element = doc.documentElement();
     QVERIFY(QXmppMixInfoItem::isItem(element));
 
@@ -85,7 +85,7 @@ void tst_QXmppMixItem::testIsInfoItem()
         "</field>"
         "</x>"
         "</item>");
-    QCOMPARE(doc.setContent(xmlWrong, true), true);
+    QVERIFY(doc.setContent(xmlWrong, true));
     element = doc.documentElement();
     QVERIFY(!QXmppMixInfoItem::isItem(element));
 }
@@ -125,7 +125,7 @@ void tst_QXmppMixItem::testIsParticipantItem()
         "<participant xmlns=\"urn:xmpp:mix:core:1\">"
         "</participant>"
         "</item>");
-    QCOMPARE(doc.setContent(xmlCorrect, true), true);
+    QVERIFY(doc.setContent(xmlCorrect, true));
     element = doc.documentElement();
     QVERIFY(QXmppMixParticipantItem::isItem(element));
 
@@ -134,7 +134,7 @@ void tst_QXmppMixItem::testIsParticipantItem()
         "<participant xmlns=\"other:namespace:1\">"
         "</participant>"
         "</item>");
-    QCOMPARE(doc.setContent(xmlWrong, true), true);
+    QVERIFY(doc.setContent(xmlWrong, true));
     element = doc.documentElement();
     QVERIFY(!QXmppMixParticipantItem::isItem(element));
 }

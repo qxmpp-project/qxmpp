@@ -20,7 +20,7 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
 
     // parse
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
     QStringList errors;
     QVariant test = QXmppRpcMarshaller::demarshall(element, errors);

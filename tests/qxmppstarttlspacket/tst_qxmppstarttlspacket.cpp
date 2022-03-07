@@ -44,7 +44,7 @@ void tst_QXmppStartTlsPacket::testBasic()
     QFETCH(QXmppStartTlsPacket::Type, type);
 
     QDomDocument doc;
-    QCOMPARE(doc.setContent(xml, true), true);
+    QVERIFY(doc.setContent(xml, true));
     QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement()), valid);
     QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement(), type), valid);
 
