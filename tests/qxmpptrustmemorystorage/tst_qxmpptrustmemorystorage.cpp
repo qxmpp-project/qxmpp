@@ -523,6 +523,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     auto future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")));
     QVERIFY(future.isFinished());
     auto result = future.result();
@@ -538,6 +539,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -545,6 +547,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("bob@example.com"),
         QByteArray::fromBase64(QByteArrayLiteral("9E51lG3vVmUn8CM7/AIcmIlLP2HPl6Ao0/VSf4VT/oA=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -560,6 +563,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("9w6oPjKyGSALd9gHq7sNOdOAkD5bHUVOKACNs89FjkA=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -569,6 +573,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
     // The default value is returned.
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("WXL4EDfzUGbVPQWjT9pmBeiCpCBzYZv3lUAaj+UbPyE=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -585,6 +590,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -592,6 +598,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
 
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("bob@example.com"),
         QByteArray::fromBase64(QByteArrayLiteral("9E51lG3vVmUn8CM7/AIcmIlLP2HPl6Ao0/VSf4VT/oA=")));
     QVERIFY(future.isFinished());
     result = future.result();
@@ -600,6 +607,7 @@ void tst_QXmppTrustMemoryStorage::testTrustLevels()
     // Verify that the default trust level is returned for an unknown key.
     future = m_trustStorage.trustLevel(
         ns_omemo,
+        QStringLiteral("alice@example.org"),
         QByteArray::fromBase64(QByteArrayLiteral("wE06Gwf8f4DvDLFDoaCsGs8ibcUjf84WIOA2FAjPI3o=")));
     QVERIFY(future.isFinished());
     result = future.result();

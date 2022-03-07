@@ -176,13 +176,14 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QByteArray &keyId)
+/// \fn QXmppTrustStorage::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
 ///
 /// Returns the trust level of a key.
 ///
 /// If the key is not stored, the trust in that key is undecided.
 ///
 /// \param encryption encryption protocol namespace
+/// \param keyOwnerJid key owner's bare JID
 /// \param keyId ID of the key
 ///
 /// \return the key's trust level
