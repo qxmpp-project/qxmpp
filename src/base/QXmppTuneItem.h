@@ -7,7 +7,11 @@
 
 #include "QXmppPubSubItem.h"
 
+#include <chrono>
+#include <optional>
+
 #include <QSharedDataPointer>
+#include <QTime>
 
 class QXmppTuneItemPrivate;
 class QUrl;
@@ -22,25 +26,53 @@ public:
     QXmppTuneItem &operator=(const QXmppTuneItem &other);
 
     QString artist() const;
-    void setArtist(const QString &artist);
+    void setArtist(QString artist);
 
-    quint16 length() const;
-    void setLength(quint16 length);
+    std::optional<quint16> length() const;
+    void setLength(std::optional<quint16> length);
+    inline QTime lengthAsTime() const
+    {
+        if (auto len = length()) {
+            return QTime::fromMSecsSinceStartOfDay(len.value() * 1000);
+        }
+        return {};
+    }
+    inline void setLength(const QTime &time)
+    {
+        if (time.isValid()) {
+            setLength(time.msecsSinceStartOfDay() / 1000);
+        }
+        setLength(std::optional<quint16>());
+    }
+    inline std::optional<std::chrono::seconds> lengthAsDuration() const
+    {
+        if (auto len = length()) {
+            return std::chrono::seconds(*len);
+        }
+        return {};
+    }
+    inline void setLength(std::optional<std::chrono::seconds> time)
+    {
+        if (time) {
+            setLength(quint16(time->count()));
+        }
+        setLength(std::optional<quint16>());
+    }
 
-    quint8 rating() const;
-    void setRating(quint8 rating);
+    std::optional<quint8> rating() const;
+    void setRating(std::optional<quint8> rating);
 
     QString source() const;
-    void setSource(const QString &source);
+    void setSource(QString source);
 
     QString title() const;
-    void setTitle(const QString &title);
+    void setTitle(QString title);
 
     QString track() const;
-    void setTrack(const QString &track);
+    void setTrack(QString track);
 
     QUrl uri() const;
-    void setUri(const QUrl &uri);
+    void setUri(QUrl uri);
 
     static bool isItem(const QDomElement &itemElement);
 

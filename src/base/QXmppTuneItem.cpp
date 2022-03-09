@@ -18,8 +18,8 @@ public:
     QXmppTuneItemPrivate();
 
     QString artist;
-    quint16 length;
-    quint8 rating;
+    std::optional<quint16> length;
+    std::optional<quint8> rating;
     QString source;
     QString title;
     QString track;
@@ -68,15 +68,15 @@ QString QXmppTuneItem::artist() const
 ///
 /// Sets the artist of the piece or song.
 ///
-void QXmppTuneItem::setArtist(const QString &artist)
+void QXmppTuneItem::setArtist(QString artist)
 {
-    d->artist = artist;
+    d->artist = std::move(artist);
 }
 
 ///
 /// Returns the length of the piece in seconds (0 means unknown).
 ///
-quint16 QXmppTuneItem::length() const
+std::optional<quint16> QXmppTuneItem::length() const
 {
     return d->length;
 }
@@ -84,16 +84,47 @@ quint16 QXmppTuneItem::length() const
 ///
 /// Sets the length of the piece in seconds (0 means unknown).
 ///
-void QXmppTuneItem::setLength(quint16 length)
+void QXmppTuneItem::setLength(std::optional<quint16> length)
 {
     d->length = length;
 }
 
 ///
+/// \fn QXmppTuneItem::lengthAsTime()
+///
+/// Returns the length as QTime.
+///
+
+///
+/// \fn QXmppTuneItem::setLength(const QTime &time)
+///
+/// Sets the length from QTime.
+///
+/// \overload
+///
+
+///
+/// \fn QXmppTuneItem::lengthAsDuration()
+///
+/// Returns the length as std::chrono::seconds.
+///
+/// \overload
+///
+
+///
+/// \fn QXmppTuneItem::setLength(std::optional<std::chrono::seconds> time)
+///
+/// Sets the length from std::chrono::seconds. Useful if you want to use the
+/// chrono literals.
+///
+/// \overload
+///
+
+///
 /// Returns the user's rating of the song or piece (from 1 to 10), 0 means
 /// invalid or unknown.
 ///
-quint8 QXmppTuneItem::rating() const
+std::optional<quint8> QXmppTuneItem::rating() const
 {
     return d->rating;
 }
@@ -102,12 +133,15 @@ quint8 QXmppTuneItem::rating() const
 /// Sets the user's rating of the song or piece (from 1 to 10), 0 means invalid
 /// or unknown.
 ///
-void QXmppTuneItem::setRating(quint8 rating)
+void QXmppTuneItem::setRating(std::optional<quint8> rating)
 {
-    if (rating > 10)
-        d->rating = 0;
-    else
-        d->rating = rating;
+    if (rating) {
+        if (auto r = *rating; r <= 10 && r != 0) {
+            d->rating = rating;
+            return;
+        }
+    }
+    d->rating.reset();
 }
 
 ///
@@ -123,9 +157,9 @@ QString QXmppTuneItem::source() const
 /// Sets the album, other collection or other source (e.g. website) of the
 /// piece.
 ///
-void QXmppTuneItem::setSource(const QString &source)
+void QXmppTuneItem::setSource(QString source)
 {
-    d->source = source;
+    d->source = std::move(source);
 }
 
 ///
@@ -139,9 +173,9 @@ QString QXmppTuneItem::title() const
 ///
 /// Sets the title of the piece.
 ///
-void QXmppTuneItem::setTitle(const QString &title)
+void QXmppTuneItem::setTitle(QString title)
 {
-    d->title = title;
+    d->title = std::move(title);
 }
 
 ///
@@ -155,9 +189,9 @@ QString QXmppTuneItem::track() const
 ///
 /// Sets the track number or other identifier in the collection or source.
 ///
-void QXmppTuneItem::setTrack(const QString &track)
+void QXmppTuneItem::setTrack(QString track)
 {
-    d->track = track;
+    d->track = std::move(track);
 }
 
 ///
@@ -173,9 +207,9 @@ QUrl QXmppTuneItem::uri() const
 /// Sets an URI or URL pointing to information about the song, collection or
 /// artist.
 ///
-void QXmppTuneItem::setUri(const QUrl &uri)
+void QXmppTuneItem::setUri(QUrl uri)
 {
-    d->uri = uri;
+    d->uri = std::move(uri);
 }
 
 ///
@@ -194,23 +228,20 @@ bool QXmppTuneItem::isItem(const QDomElement &itemElement)
 /// \cond
 void QXmppTuneItem::parsePayload(const QDomElement &tune)
 {
-    auto child = tune.firstChildElement();
-    while (!child.isNull()) {
+    for (auto child = tune.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
         if (child.tagName() == QStringLiteral("artist")) {
             d->artist = child.text();
         } else if (child.tagName() == QStringLiteral("length")) {
             bool ok = false;
-            d->length = child.text().toUShort(&ok);
-
-            if (!ok) {
-                d->length = 0;
+            if (auto len = child.text().toUShort(&ok); ok) {
+                d->length = len;
             }
         } else if (child.tagName() == QStringLiteral("rating")) {
             bool ok = false;
-            d->rating = child.text().toUShort(&ok);
-
-            if (!ok || d->rating > 10) {
-                d->rating = 0;
+            if (auto len = child.text().toUShort(&ok); ok) {
+                setRating(len);
             }
         } else if (child.tagName() == QStringLiteral("source")) {
             d->source = child.text();
@@ -221,7 +252,6 @@ void QXmppTuneItem::parsePayload(const QDomElement &tune)
         } else if (child.tagName() == QStringLiteral("uri")) {
             d->uri = QUrl(child.text());
         }
-        child = child.nextSiblingElement();
     }
 }
 
@@ -231,10 +261,12 @@ void QXmppTuneItem::serializePayload(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_tune);
 
     helperToXmlAddTextElement(writer, QStringLiteral("artist"), d->artist);
-    if (d->length != 0)
-        writer->writeTextElement(QStringLiteral("length"), QString::number(d->length));
-    if (d->rating != 0)
-        writer->writeTextElement(QStringLiteral("rating"), QString::number(d->rating));
+    if (d->length) {
+        writer->writeTextElement(QStringLiteral("length"), QString::number(*d->length));
+    }
+    if (d->rating) {
+        writer->writeTextElement(QStringLiteral("rating"), QString::number(*d->rating));
+    }
     helperToXmlAddTextElement(writer, QStringLiteral("source"), d->source);
     helperToXmlAddTextElement(writer, QStringLiteral("title"), d->title);
     helperToXmlAddTextElement(writer, QStringLiteral("track"), d->track);

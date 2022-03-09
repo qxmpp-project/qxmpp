@@ -595,8 +595,8 @@ void tst_QXmppPubSubManager::testRequestItems()
 
     for (const auto &item : std::as_const(returnedItems)) {
         QCOMPARE(item.artist(), QStringLiteral("Yes"));
-        QCOMPARE(item.length(), uint16_t(686));
-        QCOMPARE(item.rating(), uint8_t(8));
+        QCOMPARE(*item.length(), uint16_t(686));
+        QCOMPARE(*item.rating(), uint8_t(8));
         QCOMPARE(item.source(), QStringLiteral("Yessongs"));
         QCOMPARE(item.title(), QStringLiteral("Heart of the Sunrise"));
         QCOMPARE(item.track(), QLatin1String("3"));
