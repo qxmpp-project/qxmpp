@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 Before opening a pull-request please do:
 - [ ] Documentation:
   - [ ] Document every new public class and function
