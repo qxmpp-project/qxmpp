@@ -2,12 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppMixItem.h"
-#include "QXmppPubSubIq.h"
+#include "QXmppMixInfoItem.h"
+#include "QXmppMixParticipantItem.h"
 
 #include "util.h"
-#include <QDomDocument>
-#include <QObject>
 
 class tst_QXmppMixItem : public QObject
 {

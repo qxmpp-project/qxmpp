@@ -45,9 +45,10 @@ set(INSTALL_HEADER_FILES
     base/QXmppLogger.h
     base/QXmppMamIq.h
     base/QXmppMessage.h
+    base/QXmppMixInfoItem.h
     base/QXmppMixInvitation.h
     base/QXmppMixIq.h
-    base/QXmppMixItem.h
+    base/QXmppMixParticipantItem.h
     base/QXmppMucIq.h
     base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
