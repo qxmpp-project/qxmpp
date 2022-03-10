@@ -161,7 +161,7 @@ set(SOURCE_FILES
     base/QXmppMessage.cpp
     base/QXmppMixInvitation.cpp
     base/QXmppMixIq.cpp
-    base/QXmppMixItem.cpp
+    base/QXmppMixItems.cpp
     base/QXmppMucIq.cpp
     base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
