@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppMixItem.h"
-
 #include "QXmppConstants_p.h"
 #include "QXmppDataFormBase.h"
+#include "QXmppMixInfoItem.h"
+#include "QXmppMixParticipantItem.h"
 
 static const auto NAME = QStringLiteral("Name");
 static const auto DESCRIPTION = QStringLiteral("Description");
