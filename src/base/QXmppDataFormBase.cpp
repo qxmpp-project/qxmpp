@@ -39,11 +39,7 @@ QXmppDataForm QXmppDataFormBase::toDataForm() const
     QXmppDataForm form(QXmppDataForm::Form);
 
     // add FORM_TYPE
-    if (const auto type = formType(); !type.isEmpty()) {
-        form.fields() << QXmppDataForm::Field(QXmppDataForm::Field::HiddenField,
-                                              QStringLiteral("FORM_TYPE"),
-                                              type);
-    }
+    serializeNullable(form, QXmppDataForm::Field::HiddenField, QStringLiteral("FORM_TYPE"), formType());
 
     // manual serialization parts
     serializeForm(form);
