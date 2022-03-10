@@ -5,19 +5,56 @@
 #include "QXmppMixItem.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppDataForm.h"
-#include "QXmppUtils.h"
+#include "QXmppDataFormBase.h"
 
-#include <QBuffer>
-#include <QDomElement>
-#include <QSharedData>
+static const auto NAME = QStringLiteral("Name");
+static const auto DESCRIPTION = QStringLiteral("Description");
+static const auto CONTACT_JIDS = QStringLiteral("Contact");
 
-class QXmppMixInfoItemPrivate : public QSharedData
+class QXmppMixInfoItemPrivate : public QSharedData, public QXmppDataFormBase
 {
 public:
     QString name;
     QString description;
     QStringList contactJids;
+
+    ~QXmppMixInfoItemPrivate() override = default;
+
+    void reset()
+    {
+        name.clear();
+        description.clear();
+        contactJids.clear();
+    }
+
+    QString formType() const override
+    {
+        return ns_mix;
+    }
+
+    void parseForm(const QXmppDataForm &form) override
+    {
+        const auto fields = form.fields();
+        for (const auto &field : fields) {
+            const auto key = field.key();
+            const auto value = field.value();
+
+            if (key == NAME) {
+                name = value.toString();
+            } else if (key == DESCRIPTION) {
+                description = value.toString();
+            } else if (key == CONTACT_JIDS) {
+                contactJids = value.toStringList();
+            }
+        }
+    }
+    void serializeForm(QXmppDataForm &form) const override
+    {
+        using Type = QXmppDataForm::Field::Type;
+        serializeNullable(form, Type::TextSingleField, NAME, name);
+        serializeNullable(form, Type::TextSingleField, DESCRIPTION, description);
+        serializeEmptyable(form, Type::JidMultiField, CONTACT_JIDS, contactJids);
+    }
 };
 
 ///
@@ -27,7 +64,7 @@ public:
 /// channel containing channel information as defined by \xep{0369, Mediated
 /// Information eXchange (MIX)}.
 ///
-/// \since QXmpp 1.1
+/// \since QXmpp 1.5
 ///
 /// \ingroup Stanzas
 ///
@@ -49,7 +86,7 @@ QXmppMixInfoItem::~QXmppMixInfoItem() = default;
 /// Returns the user-specified name of the MIX channel. This is not the name
 /// part of the channel's JID.
 ///
-QString QXmppMixInfoItem::name() const
+const QString &QXmppMixInfoItem::name() const
 {
     return d->name;
 }
@@ -57,15 +94,15 @@ QString QXmppMixInfoItem::name() const
 ///
 /// Sets the name of the channel.
 ///
-void QXmppMixInfoItem::setName(const QString &name)
+void QXmppMixInfoItem::setName(QString name)
 {
-    d->name = name;
+    d->name = std::move(name);
 }
 
 ///
 /// Returns the description of the channel. This string might be very long.
 ///
-QString QXmppMixInfoItem::description() const
+const QString &QXmppMixInfoItem::description() const
 {
     return d->description;
 }
@@ -73,15 +110,15 @@ QString QXmppMixInfoItem::description() const
 ///
 /// Sets the longer channel description.
 ///
-void QXmppMixInfoItem::setDescription(const QString &description)
+void QXmppMixInfoItem::setDescription(QString description)
 {
-    d->description = description;
+    d->description = std::move(description);
 }
 
 ///
 /// Returns a list of JIDs that are responsible for this channel.
 ///
-QStringList QXmppMixInfoItem::contactJids() const
+const QStringList &QXmppMixInfoItem::contactJids() const
 {
     return d->contactJids;
 }
@@ -89,80 +126,48 @@ QStringList QXmppMixInfoItem::contactJids() const
 ///
 /// Sets a list of public JIDs that are responsible for this channel.
 ///
-void QXmppMixInfoItem::setContactJids(const QStringList &contactJids)
+void QXmppMixInfoItem::setContactJids(QStringList contactJids)
 {
-    d->contactJids = contactJids;
+    d->contactJids = std::move(contactJids);
 }
 
 ///
 /// Returns true, if the given dom element is a MIX channel info item.
 ///
-bool QXmppMixInfoItem::isMixChannelInfo(const QDomElement &element)
+bool QXmppMixInfoItem::isItem(const QDomElement &element)
 {
-    QXmppDataForm form;
-    form.parse(element);
-    for (const auto &field : form.fields()) {
-        if (field.key() == QStringLiteral("FORM_TYPE"))
-            return field.value() == ns_mix;
-    }
-    return false;
+    return QXmppPubSubItem::isItem(element, [](const QDomElement &payload) {
+        // check FORM_TYPE without parsing a full QXmppDataForm
+        if (payload.tagName() != u'x' || payload.namespaceURI() != ns_data) {
+            return false;
+        }
+        for (auto fieldEl = payload.firstChildElement();
+             !fieldEl.isNull();
+             fieldEl = fieldEl.nextSiblingElement()) {
+            if (fieldEl.attribute(QStringLiteral("var")) == QStringLiteral(u"FORM_TYPE")) {
+                return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix;
+            }
+        }
+        return false;
+    });
 }
 
 /// \cond
-void QXmppMixInfoItem::parse(const QXmppElement &element)
+void QXmppMixInfoItem::parsePayload(const QDomElement &payload)
 {
-    QXmppDataForm form;
-    form.parse(element.sourceDomElement());
+    d->reset();
 
-    for (auto &field : form.fields()) {
-        if (field.key() == QStringLiteral("Name"))
-            d->name = field.value().toString();
-        else if (field.key() == QStringLiteral("Description"))
-            d->description = field.value().toString();
-        else if (field.key() == QStringLiteral("Contact"))
-            d->contactJids = field.value().toStringList();
-    }
+    QXmppDataForm form;
+    form.parse(payload);
+
+    d->parseForm(form);
 }
 
-QXmppElement QXmppMixInfoItem::toElement() const
+void QXmppMixInfoItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    QXmppDataForm form;
+    auto form = d->toDataForm();
     form.setType(QXmppDataForm::Result);
-    QList<QXmppDataForm::Field> fields;
-
-    QXmppDataForm::Field formType;
-    formType.setType(QXmppDataForm::Field::HiddenField);
-    formType.setKey(QStringLiteral("FORM_TYPE"));
-    formType.setValue(ns_mix);
-    fields << formType;
-
-    QXmppDataForm::Field nameField;
-    nameField.setKey(QStringLiteral("Name"));
-    nameField.setValue(d->name);
-    fields << nameField;
-
-    QXmppDataForm::Field descriptionField;
-    descriptionField.setKey(QStringLiteral("Description"));
-    descriptionField.setValue(d->description);
-    fields << descriptionField;
-
-    QXmppDataForm::Field contactsField;
-    contactsField.setKey(QStringLiteral("Contact"));
-    contactsField.setValue(d->contactJids);
-    contactsField.setType(QXmppDataForm::Field::JidMultiField);
-    fields << contactsField;
-
-    form.setFields(fields);
-
-    // FIXME: this is too complicated; maybe don't use QXmppElement in QXmppPubSubItem?
-    QBuffer buffer;
-    buffer.open(QIODevice::ReadWrite);
-    QXmlStreamWriter writer(&buffer);
-    form.toXml(&writer);
-
-    QDomDocument doc;
-    doc.setContent(buffer.data());
-    return QXmppElement(doc.documentElement());
+    form.toXml(writer);
 }
 /// \endcond
 
@@ -179,7 +184,7 @@ public:
 /// The QXmppMixParticipantItem class represents a PubSub item of a MIX channel
 /// participant as defined by \xep{0369, Mediated Information eXchange (MIX)}.
 ///
-/// \since QXmpp 1.1
+/// \since QXmpp 1.5
 ///
 /// \ingroup Stanzas
 ///
@@ -200,7 +205,7 @@ QXmppMixParticipantItem::~QXmppMixParticipantItem() = default;
 ///
 /// Returns the participant's nickname.
 ///
-QString QXmppMixParticipantItem::nick() const
+const QString &QXmppMixParticipantItem::nick() const
 {
     return d->nick;
 }
@@ -208,15 +213,15 @@ QString QXmppMixParticipantItem::nick() const
 ///
 /// Sets the participants nickname.
 ///
-void QXmppMixParticipantItem::setNick(const QString &nick)
+void QXmppMixParticipantItem::setNick(QString nick)
 {
-    d->nick = nick;
+    d->nick = std::move(nick);
 }
 
 ///
 /// Returns the participant's JID.
 ///
-QString QXmppMixParticipantItem::jid() const
+const QString &QXmppMixParticipantItem::jid() const
 {
     return d->jid;
 }
@@ -224,42 +229,39 @@ QString QXmppMixParticipantItem::jid() const
 ///
 /// Sets the participant's JID.
 ///
-void QXmppMixParticipantItem::setJid(const QString &jid)
+void QXmppMixParticipantItem::setJid(QString jid)
 {
-    d->jid = jid;
+    d->jid = std::move(jid);
 }
 
 /// \cond
-void QXmppMixParticipantItem::parse(const QXmppElement &itemContent)
+void QXmppMixParticipantItem::parsePayload(const QDomElement &payload)
 {
-    d->nick = itemContent.firstChildElement(QStringLiteral("nick")).value();
-    d->jid = itemContent.firstChildElement(QStringLiteral("jid")).value();
+    d->nick = payload.firstChildElement(QStringLiteral("nick")).text();
+    d->jid = payload.firstChildElement(QStringLiteral("jid")).text();
 }
 
-QXmppElement QXmppMixParticipantItem::toElement() const
+void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    QXmppElement element;
-    element.setTagName(QStringLiteral("participant"));
-    element.setAttribute(QStringLiteral("xmlns"), ns_mix);
-
-    QXmppElement jid;
-    jid.setTagName(QStringLiteral("jid"));
-    jid.setValue(d->jid);
-    element.appendChild(jid);
-
-    QXmppElement nick;
-    nick.setTagName(QStringLiteral("nick"));
-    nick.setValue(d->nick);
-    element.appendChild(nick);
-
-    return element;
+    writer->writeStartElement(QStringLiteral("participant"));
+    writer->writeDefaultNamespace(ns_mix);
+    if (!d->jid.isEmpty()) {
+        writer->writeTextElement("jid", d->jid);
+    }
+    if (!d->nick.isEmpty()) {
+        writer->writeTextElement("nick", d->nick);
+    }
+    writer->writeEndElement();
 }
 /// \endcond
 
 ///
 /// Returns true, if this dom element is a MIX participant item.
 ///
-bool QXmppMixParticipantItem::isMixParticipantItem(const QDomElement &element)
+bool QXmppMixParticipantItem::isItem(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("participant") && element.namespaceURI() == ns_mix;
+    return QXmppPubSubItem::isItem(element, [](const QDomElement &payload) {
+        return payload.tagName() == QStringLiteral("participant") &&
+            payload.namespaceURI() == ns_mix;
+    });
 }

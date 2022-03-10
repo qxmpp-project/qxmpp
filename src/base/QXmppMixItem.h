@@ -5,14 +5,12 @@
 #ifndef QXMPPMIXITEM_H
 #define QXMPPMIXITEM_H
 
-#include "QXmppElement.h"
-
-#include <QSharedDataPointer>
+#include "QXmppPubSubItem.h"
 
 class QXmppMixInfoItemPrivate;
 class QXmppMixParticipantItemPrivate;
 
-class QXMPP_EXPORT QXmppMixInfoItem
+class QXMPP_EXPORT QXmppMixInfoItem : public QXmppPubSubItem
 {
 public:
     QXmppMixInfoItem();
@@ -21,27 +19,28 @@ public:
 
     QXmppMixInfoItem &operator=(const QXmppMixInfoItem &);
 
-    QString name() const;
-    void setName(const QString &);
+    const QString &name() const;
+    void setName(QString);
 
-    QString description() const;
-    void setDescription(const QString &);
+    const QString &description() const;
+    void setDescription(QString);
 
-    QStringList contactJids() const;
-    void setContactJids(const QStringList &);
+    const QStringList &contactJids() const;
+    void setContactJids(QStringList);
 
+    static bool isItem(const QDomElement &itemElement);
+
+protected:
     /// \cond
-    void parse(const QXmppElement &itemContent);
-    QXmppElement toElement() const;
+    void parsePayload(const QDomElement &payloadElement) override;
+    void serializePayload(QXmlStreamWriter *writer) const override;
     /// \endcond
-
-    static bool isMixChannelInfo(const QDomElement &);
 
 private:
     QSharedDataPointer<QXmppMixInfoItemPrivate> d;
 };
 
-class QXMPP_EXPORT QXmppMixParticipantItem
+class QXMPP_EXPORT QXmppMixParticipantItem : public QXmppPubSubItem
 {
 public:
     QXmppMixParticipantItem();
@@ -50,18 +49,19 @@ public:
 
     QXmppMixParticipantItem &operator=(const QXmppMixParticipantItem &);
 
-    QString nick() const;
-    void setNick(const QString &);
+    const QString &nick() const;
+    void setNick(QString);
 
-    QString jid() const;
-    void setJid(const QString &);
+    const QString &jid() const;
+    void setJid(QString);
 
+    static bool isItem(const QDomElement &);
+
+protected:
     /// \cond
-    void parse(const QXmppElement &itemContent);
-    QXmppElement toElement() const;
+    void parsePayload(const QDomElement &payloadElement) override;
+    void serializePayload(QXmlStreamWriter *writer) const override;
     /// \endcond
-
-    static bool isMixParticipantItem(const QDomElement &);
 
 private:
     QSharedDataPointer<QXmppMixParticipantItemPrivate> d;

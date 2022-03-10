@@ -23,6 +23,7 @@ private slots:
 void tst_QXmppMixItem::testInfo()
 {
     const QByteArray xml(
+        "<item>"
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
         "<field type=\"hidden\" var=\"FORM_TYPE\">"
         "<value>urn:xmpp:mix:core:1</value>"
@@ -38,7 +39,8 @@ void tst_QXmppMixItem::testInfo()
         "<value>greymalkin@shakespeare.example</value>"
         "<value>joan@shakespeare.example</value>"
         "</field>"
-        "</x>");
+        "</x>"
+        "</item>");
 
     QXmppMixInfoItem item;
     parsePacket(item, xml);
@@ -49,8 +51,7 @@ void tst_QXmppMixItem::testInfo()
     QCOMPARE(item.contactJids(), QStringList() << "greymalkin@shakespeare.example"
                                                << "joan@shakespeare.example");
 
-    QXmppElement element = item.toElement();
-    serializePacket(element, xml);
+    serializePacket(item, xml);
 
     // test setters
     item.setName("Skynet Development");
@@ -67,33 +68,39 @@ void tst_QXmppMixItem::testIsInfoItem()
     QDomElement element;
 
     const QByteArray xmlCorrect(
+        "<item>"
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
         "<field type=\"hidden\" var=\"FORM_TYPE\">"
         "<value>urn:xmpp:mix:core:1</value>"
         "</field>"
-        "</x>");
+        "</x>"
+        "</item>");
     QCOMPARE(doc.setContent(xmlCorrect, true), true);
     element = doc.documentElement();
-    QVERIFY(QXmppMixInfoItem::isMixChannelInfo(element));
+    QVERIFY(QXmppMixInfoItem::isItem(element));
 
     const QByteArray xmlWrong(
+        "<item>"
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
         "<field type=\"hidden\" var=\"FORM_TYPE\">"
         "<value>other:namespace</value>"
         "</field>"
-        "</x>");
+        "</x>"
+        "</item>");
     QCOMPARE(doc.setContent(xmlWrong, true), true);
     element = doc.documentElement();
-    QVERIFY(!QXmppMixInfoItem::isMixChannelInfo(element));
+    QVERIFY(!QXmppMixInfoItem::isItem(element));
 }
 
 void tst_QXmppMixItem::testParticipant()
 {
     const QByteArray xml(
+        "<item>"
         "<participant xmlns=\"urn:xmpp:mix:core:1\">"
         "<jid>hag66@shakespeare.example</jid>"
         "<nick>thirdwitch</nick>"
-        "</participant>");
+        "</participant>"
+        "</item>");
 
     QXmppMixParticipantItem item;
     parsePacket(item, xml);
@@ -101,8 +108,7 @@ void tst_QXmppMixItem::testParticipant()
     QCOMPARE(item.nick(), QString("thirdwitch"));
     QCOMPARE(item.jid(), QString("hag66@shakespeare.example"));
 
-    QXmppElement element = item.toElement();
-    serializePacket(element, xml);
+    serializePacket(item, xml);
 
     // test setters
     item.setNick("thomasd");
@@ -117,18 +123,22 @@ void tst_QXmppMixItem::testIsParticipantItem()
     QDomElement element;
 
     const QByteArray xmlCorrect(
+        "<item>"
         "<participant xmlns=\"urn:xmpp:mix:core:1\">"
-        "</participant>");
+        "</participant>"
+        "</item>");
     QCOMPARE(doc.setContent(xmlCorrect, true), true);
     element = doc.documentElement();
-    QVERIFY(QXmppMixParticipantItem::isMixParticipantItem(element));
+    QVERIFY(QXmppMixParticipantItem::isItem(element));
 
     const QByteArray xmlWrong(
+        "<item>"
         "<participant xmlns=\"other:namespace:1\">"
-        "</participant>");
+        "</participant>"
+        "</item>");
     QCOMPARE(doc.setContent(xmlWrong, true), true);
     element = doc.documentElement();
-    QVERIFY(!QXmppMixParticipantItem::isMixParticipantItem(element));
+    QVERIFY(!QXmppMixParticipantItem::isItem(element));
 }
 
 QTEST_MAIN(tst_QXmppMixItem)
