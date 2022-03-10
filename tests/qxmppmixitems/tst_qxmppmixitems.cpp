@@ -140,4 +140,4 @@ void tst_QXmppMixItem::testIsParticipantItem()
 }
 
 QTEST_MAIN(tst_QXmppMixItem)
-#include "tst_qxmppmixitem.moc"
+#include "tst_qxmppmixitems.moc"
