@@ -26,6 +26,7 @@ private slots:
     void testErrorCases();
     void testErrorFileTooLarge();
     void testErrorRetry();
+    void testErrorEnums();
 
     void testSenderKey();
     void testSceTimestamp();
@@ -380,6 +381,23 @@ void tst_QXmppStanza::testErrorRetry()
     // test setter
     error.setRetryDate(QDateTime(QDate(1985, 10, 26), QTime(1, 35)));
     QCOMPARE(error.retryDate(), QDateTime(QDate(1985, 10, 26), QTime(1, 35)));
+}
+
+void tst_QXmppStanza::testErrorEnums()
+{
+    QXmppStanza::Error err;
+    QVERIFY(!err.conditionOpt().has_value());
+    QVERIFY(!err.typeOpt().has_value());
+
+    err.setCondition(QXmppStanza::Error::BadRequest);
+    err.setType(QXmppStanza::Error::Cancel);
+    QVERIFY(err.conditionOpt().has_value());
+    QVERIFY(err.typeOpt().has_value());
+
+    err.setCondition(QXmppStanza::Error::Condition(-1));
+    err.setType(QXmppStanza::Error::Type(-1));
+    QVERIFY(!err.conditionOpt().has_value());
+    QVERIFY(!err.typeOpt().has_value());
 }
 
 void tst_QXmppStanza::testSenderKey()

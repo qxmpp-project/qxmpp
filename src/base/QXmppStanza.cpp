@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2015 Georg Rudoy <0xd34df00d@gmail.com>
+// SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -388,9 +389,25 @@ void QXmppStanza::Error::setCode(int code)
 /// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
 /// can be used in combination with redirectUri().
 ///
+/// \warning Due to compatibility this returns \c Condition(-1) when no
+/// condition is set. When possible you should use conditionOpt().
+///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
     return d->condition.value_or(QXmppStanza::Error::Condition(-1));
+}
+
+///
+/// Returns the error condition.
+///
+/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
+/// can be used in combination with redirectUri().
+///
+/// \since QXmpp 1.5
+///
+auto QXmppStanza::Error::conditionOpt() const -> std::optional<Condition>
+{
+    return d->condition;
 }
 
 ///
@@ -409,11 +426,37 @@ void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
 }
 
 ///
+/// Sets the error condition.
+///
+/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
+/// can be used in combination with setRedirectUri().
+///
+/// \since QXmpp 1.5
+///
+void QXmppStanza::Error::setCondition(std::optional<Condition> cond)
+{
+    d->condition = cond;
+}
+
+///
 /// Returns the type of the error.
+///
+/// \warning Due to compatibility this returns \c Type(-1) when no type is set.
+/// When possible you should use typeOpt().
 ///
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
 {
     return d->type.value_or(QXmppStanza::Error::Type(-1));
+}
+
+///
+/// Returns the type of the error.
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppStanza::Error::Type> QXmppStanza::Error::typeOpt() const
+{
+    return d->type;
 }
 
 ///
@@ -451,6 +494,16 @@ void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
         d->type = std::nullopt;
         return;
     }
+    d->type = type;
+}
+
+///
+/// Sets the type of the error.
+///
+/// \since QXmpp 1.5
+///
+void QXmppStanza::Error::setType(std::optional<Type> type)
+{
     d->type = type;
 }
 
