@@ -47,13 +47,13 @@ TestHelper::~TestHelper()
     QCOMPARE(error, expectedError);
 }
 
-void TestHelper::onRequestFailed(const QXmppHttpUploadRequestIq &request)
+void TestHelper::onRequestFailed(const QXmppHttpUploadRequestIq &)
 {
     event = true;
     error = true;
 }
 
-void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq &slot)
+void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq &)
 {
     event = true;
     error = false;

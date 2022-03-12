@@ -22,7 +22,7 @@ private slots:
     {
         m_messageDelivered = true;
     }
-    void onLoggerMessage(QXmppLogger::MessageType type, const QString &text)
+    void onLoggerMessage(QXmppLogger::MessageType, const QString &)
     {
         m_receiptSent = true;
     }
