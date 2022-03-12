@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2015 Georg Rudoy <0xd34df00d@gmail.com>
+// SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -12,7 +13,7 @@
 
 #include <QByteArray>
 #include <QSharedData>
-#include <QString>
+//#include <QString>
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
 // include the whole header.
@@ -178,10 +179,14 @@ public:
         void setText(const QString &text);
 
         Condition condition() const;
+        std::optional<Condition> conditionOpt() const;
         void setCondition(Condition cond);
+        void setCondition(std::optional<Condition> cond);
 
-        void setType(Type type);
         Type type() const;
+        std::optional<Type> typeOpt() const;
+        void setType(Type type);
+        void setType(std::optional<Type> type);
 
         QString by() const;
         void setBy(const QString &by);
