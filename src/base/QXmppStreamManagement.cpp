@@ -9,6 +9,8 @@
 #include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
 
+using namespace QXmpp::Private;
+
 /// \cond
 QXmppStreamManagementEnable::QXmppStreamManagementEnable(const bool resume, const unsigned max)
     : m_resume(resume), m_max(max)
