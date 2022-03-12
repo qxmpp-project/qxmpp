@@ -25,54 +25,54 @@ QString conditionToString(QXmppStanza::Error::Condition condition)
 {
     switch (condition) {
     case QXmppStanza::Error::BadRequest:
-        return "bad-request";
+        return QStringLiteral("bad-request");
     case QXmppStanza::Error::Conflict:
-        return "conflict";
+        return QStringLiteral("conflict");
     case QXmppStanza::Error::FeatureNotImplemented:
-        return "feature-not-implemented";
+        return QStringLiteral("feature-not-implemented");
     case QXmppStanza::Error::Forbidden:
-        return "forbidden";
+        return QStringLiteral("forbidden");
     case QXmppStanza::Error::Gone:
-        return "gone";
+        return QStringLiteral("gone");
     case QXmppStanza::Error::InternalServerError:
-        return "internal-server-error";
+        return QStringLiteral("internal-server-error");
     case QXmppStanza::Error::ItemNotFound:
-        return "item-not-found";
+        return QStringLiteral("item-not-found");
     case QXmppStanza::Error::JidMalformed:
-        return "jid-malformed";
+        return QStringLiteral("jid-malformed");
     case QXmppStanza::Error::NotAcceptable:
-        return "not-acceptable";
+        return QStringLiteral("not-acceptable");
     case QXmppStanza::Error::NotAllowed:
-        return "not-allowed";
+        return QStringLiteral("not-allowed");
     case QXmppStanza::Error::NotAuthorized:
-        return "not-authorized";
+        return QStringLiteral("not-authorized");
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
     case QXmppStanza::Error::PaymentRequired:
         QT_WARNING_POP
-        return "payment-required";
+        return QStringLiteral("payment-required");
     case QXmppStanza::Error::PolicyViolation:
-        return "policy-violation";
+        return QStringLiteral("policy-violation");
     case QXmppStanza::Error::RecipientUnavailable:
-        return "recipient-unavailable";
+        return QStringLiteral("recipient-unavailable");
     case QXmppStanza::Error::Redirect:
-        return "redirect";
+        return QStringLiteral("redirect");
     case QXmppStanza::Error::RegistrationRequired:
-        return "registration-required";
+        return QStringLiteral("registration-required");
     case QXmppStanza::Error::RemoteServerNotFound:
-        return "remote-server-not-found";
+        return QStringLiteral("remote-server-not-found");
     case QXmppStanza::Error::RemoteServerTimeout:
-        return "remote-server-timeout";
+        return QStringLiteral("remote-server-timeout");
     case QXmppStanza::Error::ResourceConstraint:
-        return "resource-constraint";
+        return QStringLiteral("resource-constraint");
     case QXmppStanza::Error::ServiceUnavailable:
-        return "service-unavailable";
+        return QStringLiteral("service-unavailable");
     case QXmppStanza::Error::SubscriptionRequired:
-        return "subscription-required";
+        return QStringLiteral("subscription-required");
     case QXmppStanza::Error::UndefinedCondition:
-        return "undefined-condition";
+        return QStringLiteral("undefined-condition");
     case QXmppStanza::Error::UnexpectedRequest:
-        return "unexpected-request";
+        return QStringLiteral("unexpected-request");
     }
     return {};
 }
