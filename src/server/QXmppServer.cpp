@@ -126,8 +126,9 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         }
 
         // send data
-        for (auto *conn : found)
+        for (auto *conn : std::as_const(found)) {
             QMetaObject::invokeMethod(conn, "sendData", Q_ARG(QByteArray, data));
+        }
         return !found.isEmpty();
 
     } else if (!serversForServers.isEmpty()) {
@@ -240,7 +241,8 @@ void QXmppServerPrivate::warning(const QString &message)
 void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 {
     if (!loaded) {
-        for (auto *object : QPluginLoader::staticInstances()) {
+        const auto pluginLoaders = QPluginLoader::staticInstances();
+        for (auto *object : pluginLoaders) {
             auto *plugin = qobject_cast<QXmppServerPlugin *>(object);
             if (!plugin)
                 continue;
@@ -258,9 +260,10 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 void QXmppServerPrivate::startExtensions()
 {
     if (!started) {
-        for (auto *extension : extensions)
+        for (auto *extension : std::as_const(extensions)) {
             if (!extension->start())
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
+        }
         started = true;
     }
 }
@@ -567,10 +570,12 @@ void QXmppServer::close()
     QSetIterator<QXmppIncomingClient *> itr(d->incomingClients);
     while (itr.hasNext())
         itr.next()->disconnectFromHost();
-    for (auto *stream : d->incomingServers)
+    for (auto *stream : std::as_const(d->incomingServers)) {
         stream->disconnectFromHost();
-    for (auto *stream : d->outgoingServers)
+    }
+    for (auto *stream : std::as_const(d->outgoingServers)) {
         stream->disconnectFromHost();
+    }
 }
 
 /// Listen for incoming XMPP server connections.

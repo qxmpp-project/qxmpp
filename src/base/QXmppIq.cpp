@@ -123,7 +123,9 @@ void QXmppIq::toXml(QXmlStreamWriter *xmlWriter) const
 
 void QXmppIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    for (const QXmppElement &extension : extensions())
+    const auto exts = extensions();
+    for (const QXmppElement &extension : exts) {
         extension.toXml(writer);
+    }
 }
 /// \endcond

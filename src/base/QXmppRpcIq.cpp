@@ -43,8 +43,10 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
     case QVariant::List: {
         writer->writeStartElement(QStringLiteral("array"));
         writer->writeStartElement(QStringLiteral("data"));
-        for (const auto &item : value.toList())
+        const auto list = value.toList();
+        for (const auto &item : list) {
             marshall(writer, item);
+        }
         writer->writeEndElement();
         writer->writeEndElement();
         break;

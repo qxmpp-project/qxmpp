@@ -105,7 +105,8 @@ static QByteArray generateNonce()
 static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
 {
     QMap<char, QByteArray> map;
-    for (const auto &keyValue : ba.split(',')) {
+    const auto keyValuePairs = ba.split(u',');
+    for (const auto &keyValue : keyValuePairs) {
         if (keyValue.size() >= 2 && keyValue[1] == '=') {
             map[keyValue[0]] = keyValue.mid(2);
         }

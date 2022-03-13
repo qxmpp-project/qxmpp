@@ -96,7 +96,8 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result && room->d->permissionsQueue.remove(iq.id())) {
-                for (const auto &item : iq.items()) {
+                const auto items = iq.items();
+                for (const auto &item : items) {
                     const QString jid = item.jid();
                     if (!room->d->permissions.contains(jid))
                         room->d->permissions.insert(jid, item);
