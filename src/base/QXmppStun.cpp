@@ -1362,16 +1362,16 @@ void QXmppTurnAllocation::refresh()
 ///
 void QXmppTurnAllocation::refreshChannels()
 {
-    for (const auto &channel : m_channels.keys()) {
+    for (auto itr = m_channels.cbegin(); itr != m_channels.cend(); itr++) {
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
         request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
-        request.setChannelNumber(channel);
-        request.xorPeerHost = m_channels[channel].first;
-        request.xorPeerPort = m_channels[channel].second;
+        request.setChannelNumber(itr.key());
+        request.xorPeerHost = itr.value().first;
+        request.xorPeerPort = itr.value().second;
         m_transactions << new QXmppStunTransaction(request, this);
     }
 }
@@ -2063,10 +2063,10 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
 
     // check if it's STUN
     QXmppStunTransaction *stunTransaction = nullptr;
-    for (auto *t : d->stunTransactions.keys()) {
-        if (t->request().id() == messageId &&
-            d->stunTransactions.value(t).transport == transport) {
-            stunTransaction = t;
+    for (auto itr = d->stunTransactions.cbegin(); itr != d->stunTransactions.cend(); itr++) {
+        if (itr.key()->request().id() == messageId &&
+            itr.value().transport == transport) {
+            stunTransaction = itr.key();
             break;
         }
     }

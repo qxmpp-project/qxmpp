@@ -922,11 +922,11 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
 QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArray> &map)
 {
     QByteArray ba;
-    for (const auto &key : map.keys()) {
+    for (auto itr = map.begin(); itr != map.end(); itr++) {
         if (!ba.isEmpty())
             ba.append(',');
-        ba.append(key + QByteArrayLiteral("="));
-        QByteArray value = map[key];
+        ba.append(itr.key() + QByteArrayLiteral("="));
+        auto value = itr.value();
         const char *separators = "()<>@,;:\\\"/[]?={} \t";
         bool quote = false;
         for (const char *c = separators; *c; c++) {
