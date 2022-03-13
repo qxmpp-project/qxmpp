@@ -936,8 +936,8 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
             }
         }
         if (quote) {
-            value.replace(QByteArrayLiteral("\\"), QByteArrayLiteral("\\\\"));
-            value.replace(QByteArrayLiteral("\""), QByteArrayLiteral("\\\""));
+            value.replace('\\', QByteArrayLiteral("\\\\"));
+            value.replace('\"', QByteArrayLiteral("\\\""));
             ba.append('"' + value + '"');
         } else {
             ba.append(value);
