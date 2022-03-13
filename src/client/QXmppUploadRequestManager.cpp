@@ -296,7 +296,8 @@ void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 
             // get size limit
             bool isFormNsCorrect = false;
-            for (const QXmppDataForm::Field &field : iq.form().fields()) {
+            const auto fields = iq.form().fields();
+            for (const QXmppDataForm::Field &field : fields) {
                 if (field.key() == QStringLiteral("FORM_TYPE")) {
                     isFormNsCorrect = field.value() == ns_http_upload;
                 } else if (isFormNsCorrect && field.key() == QStringLiteral("max-file-size")) {
