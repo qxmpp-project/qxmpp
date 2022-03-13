@@ -496,7 +496,9 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                         if (payload.name() == QStringLiteral("telephone-event")) {
                             params.insert(QStringLiteral("events"), paramStr);
                         } else {
-                            for (const auto &p : paramStr.split(QRegularExpression(";\\s*"))) {
+                            thread_local static const auto regex = QRegularExpression(";\\s*");
+                            const auto paramParts = paramStr.split(regex);
+                            for (const auto &p : paramParts) {
                                 const QStringList bits = p.split('=');
                                 if (bits.size() == 2)
                                     params.insert(bits.at(0), bits.at(1));
