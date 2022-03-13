@@ -154,7 +154,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 
         // add stream
         outgoingServers.insert(conn);
-        q->setGauge("outgoing-server.count", outgoingServers.size());
+        emit q->setGauge("outgoing-server.count", outgoingServers.size());
 
         // queue data and connect to remote server
         QMetaObject::invokeMethod(conn, "queueData", Q_ARG(QByteArray, data));
@@ -669,7 +669,7 @@ void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 
     // add stream
     d->incomingClients.insert(stream);
-    setGauge("incoming-client.count", d->incomingClients.size());
+    emit setGauge("incoming-client.count", d->incomingClients.size());
 }
 
 /// Handle a new incoming TCP connection from a client.
@@ -745,7 +745,7 @@ void QXmppServer::_q_clientDisconnected()
             emit clientDisconnected(jid);
 
         // update counter
-        setGauge("incoming-client.count", d->incomingClients.size());
+        emit setGauge("incoming-client.count", d->incomingClients.size());
     }
 }
 
@@ -791,7 +791,7 @@ void QXmppServer::_q_outgoingServerDisconnected()
 
     if (d->outgoingServers.remove(outgoing)) {
         outgoing->deleteLater();
-        setGauge("outgoing-server.count", d->outgoingServers.size());
+        emit setGauge("outgoing-server.count", d->outgoingServers.size());
     }
 }
 
@@ -822,7 +822,7 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
 
     // add stream
     d->incomingServers.insert(stream);
-    setGauge("incoming-server.count", d->incomingServers.size());
+    emit setGauge("incoming-server.count", d->incomingServers.size());
 }
 
 /// Handle a stream disconnection for an incoming server.
@@ -835,7 +835,7 @@ void QXmppServer::_q_serverDisconnected()
 
     if (d->incomingServers.remove(incoming)) {
         incoming->deleteLater();
-        setGauge("incoming-server.count", d->incomingServers.size());
+        emit setGauge("incoming-server.count", d->incomingServers.size());
     }
 }
 
