@@ -281,7 +281,7 @@ void QXmppRegistrationManager::setClient(QXmppClient *client)
         connect(disco, &QXmppDiscoveryManager::infoReceived, this, &QXmppRegistrationManager::handleDiscoInfo);
     }
 
-    connect(client, &QXmppClient::disconnected, [=]() {
+    connect(client, &QXmppClient::disconnected, this, [this]() {
         setSupportedByServer(false);
     });
 }

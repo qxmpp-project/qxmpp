@@ -323,7 +323,7 @@ void QXmppUploadRequestManager::setClient(QXmppClient *client)
                 this, &QXmppUploadRequestManager::handleDiscoInfo);
 
         // on client disconnect remove all upload services
-        connect(client, &QXmppClient::disconnected, [=]() {
+        connect(client, &QXmppClient::disconnected, this, [this]() {
             d->uploadServices.clear();
             emit serviceFoundChanged();
         });
