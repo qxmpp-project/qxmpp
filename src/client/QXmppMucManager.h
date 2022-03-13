@@ -166,7 +166,7 @@ public:
 
 Q_SIGNALS:
     /// This signal is emitted when the allowed actions change.
-    void allowedActionsChanged(QXmppMucRoom::Actions actions) const;
+    void allowedActionsChanged(QXmppMucRoom::Actions actions);
 
     /// This signal is emitted when the configuration form for the room is received.
     void configurationReceived(const QXmppDataForm &configuration);
