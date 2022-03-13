@@ -430,8 +430,12 @@ void QXmppServer::addCaCertificates(const QString &path)
     }
 
     // reconfigure servers
-    for (auto *server : d->serversForClients + d->serversForServers)
+    for (auto *server : std::as_const(d->serversForClients)) {
         server->addCaCertificates(d->caCertificates);
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
+        server->addCaCertificates(d->caCertificates);
+    }
 }
 
 /// Sets the path for the local SSL certificate.
@@ -453,8 +457,12 @@ void QXmppServer::setLocalCertificate(const QString &path)
     }
 
     // reconfigure servers
-    for (auto *server : d->serversForClients + d->serversForServers)
+    for (auto *server : std::as_const(d->serversForClients)) {
         server->setLocalCertificate(d->localCertificate);
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
+        server->setLocalCertificate(d->localCertificate);
+    }
 }
 
 ///
@@ -469,8 +477,12 @@ void QXmppServer::setLocalCertificate(const QSslCertificate &certificate)
     d->localCertificate = certificate;
 
     // reconfigure servers
-    for (auto *server : d->serversForClients + d->serversForServers)
+    for (auto *server : std::as_const(d->serversForClients)) {
         server->setLocalCertificate(d->localCertificate);
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
+        server->setLocalCertificate(d->localCertificate);
+    }
 }
 
 /// Sets the path for the local SSL private key.
@@ -492,8 +504,12 @@ void QXmppServer::setPrivateKey(const QString &path)
     }
 
     // reconfigure servers
-    for (auto *server : d->serversForClients + d->serversForServers)
+    for (auto *server : std::as_const(d->serversForClients)) {
         server->setPrivateKey(d->privateKey);
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
+        server->setPrivateKey(d->privateKey);
+    }
 }
 
 ///
@@ -508,8 +524,12 @@ void QXmppServer::setPrivateKey(const QSslKey &key)
     d->privateKey = key;
 
     // reconfigure servers
-    for (auto *server : d->serversForClients + d->serversForServers)
+    for (auto *server : std::as_const(d->serversForClients)) {
         server->setPrivateKey(d->privateKey);
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
+        server->setPrivateKey(d->privateKey);
+    }
 }
 
 /// Listen for incoming XMPP client connections.
@@ -556,7 +576,10 @@ bool QXmppServer::listenForClients(const QHostAddress &address, quint16 port)
 void QXmppServer::close()
 {
     // prevent new connections
-    for (auto *server : d->serversForClients + d->serversForServers) {
+    for (auto *server : std::as_const(d->serversForClients)) {
+        server->close();
+    }
+    for (auto *server : std::as_const(d->serversForServers)) {
         server->close();
     }
     qDeleteAll(d->serversForClients);
