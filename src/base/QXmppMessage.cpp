@@ -1547,7 +1547,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeDefaultNamespace(ns_xhtml_im);
             writer->writeStartElement(QStringLiteral("body"));
             writer->writeDefaultNamespace(ns_xhtml);
-            writer->writeCharacters(QStringLiteral(""));
+            writer->writeCharacters(QString());
             writer->device()->write(d->xhtml.toUtf8());
             writer->writeEndElement();
             writer->writeEndElement();
