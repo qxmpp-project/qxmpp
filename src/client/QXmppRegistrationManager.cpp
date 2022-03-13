@@ -139,8 +139,10 @@ void QXmppRegistrationManager::setRegistrationFormToSend(const QXmppDataForm &da
 ///
 void QXmppRegistrationManager::sendCachedRegistrationForm()
 {
-    if (!d->registrationFormToSend.form().isNull())
-        d->registrationFormToSend.form().setType(QXmppDataForm::Submit);
+    if (auto form = d->registrationFormToSend.form(); !form.isNull()) {
+        form.setType(QXmppDataForm::Submit);
+        d->registrationFormToSend.setForm(form);
+    }
 
     d->registrationFormToSend.setType(QXmppIq::Set);
 
