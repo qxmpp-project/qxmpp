@@ -461,7 +461,6 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
 bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
 {
     QList<QXmppJinglePayloadType> payloads;
-    QString line;
     for (auto &line : sdp.split('\n')) {
         if (line.endsWith('\r'))
             line.resize(line.size() - 1);
