@@ -288,7 +288,8 @@ void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
     if (!iq.features().contains(ns_http_upload))
         return;
 
-    for (const QXmppDiscoveryIq::Identity &identity : iq.identities()) {
+    const auto identities = iq.identities();
+    for (const QXmppDiscoveryIq::Identity &identity : identities) {
         if (identity.category() == QStringLiteral("store") &&
             identity.type() == QStringLiteral("file")) {
             QXmppUploadService service;
