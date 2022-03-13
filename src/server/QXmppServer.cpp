@@ -558,8 +558,9 @@ void QXmppServer::close()
     // prevent new connections
     for (auto *server : d->serversForClients + d->serversForServers) {
         server->close();
-        delete server;
     }
+    qDeleteAll(d->serversForClients);
+    qDeleteAll(d->serversForServers);
     d->serversForClients.clear();
     d->serversForServers.clear();
 

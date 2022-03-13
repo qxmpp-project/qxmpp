@@ -1252,8 +1252,7 @@ void QXmppTurnAllocation::disconnectFromHost()
 
     // clear channels and any outstanding transactions
     m_channels.clear();
-    for (auto *transaction : m_transactions)
-        delete transaction;
+    qDeleteAll(m_transactions);
     m_transactions.clear();
 
     // end allocation
