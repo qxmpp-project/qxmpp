@@ -1039,8 +1039,7 @@ QString QXmppStunMessage::toString() const
         break;
     }
     dumpLines << QStringLiteral(" type %1 (%2)")
-                     .arg(typeName)
-                     .arg(QString::number(m_type));
+                     .arg(typeName, QString::number(m_type));
     dumpLines << QStringLiteral(" id %1").arg(QString::fromLatin1(m_id.toHex()));
 
     // attributes
