@@ -1428,10 +1428,10 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
     if (d->ptime > 0)
         helperToXmlAddAttribute(writer, QStringLiteral("ptime"), QString::number(d->ptime));
 
-    for (const auto &key : d->parameters.keys()) {
+    for (auto itr = d->parameters.begin(); itr != d->parameters.end(); itr++) {
         writer->writeStartElement(QStringLiteral("parameter"));
-        writer->writeAttribute(QStringLiteral("name"), key);
-        writer->writeAttribute(QStringLiteral("value"), d->parameters.value(key));
+        writer->writeAttribute(QStringLiteral("name"), itr.key());
+        writer->writeAttribute(QStringLiteral("value"), itr.value());
         writer->writeEndElement();
     }
     writer->writeEndElement();
