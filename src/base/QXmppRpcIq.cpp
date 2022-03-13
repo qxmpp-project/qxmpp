@@ -136,8 +136,6 @@ QVariant QXmppRpcMarshaller::demarshall(const QDomElement &elem, QStringList &er
         }
         return QVariant(stct);
     } else if (typeName == QStringLiteral("base64")) {
-        QVariant returnVariant;
-        QByteArray dest;
         QByteArray src = typeData.text().toLatin1();
         return QVariant(QByteArray::fromBase64(src));
     }

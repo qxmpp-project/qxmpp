@@ -151,8 +151,6 @@ void QXmppOutgoingServer::handleStream(const QDomElement &streamElement)
 
 void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 {
-    const QString ns = stanza.namespaceURI();
-
     if (QXmppStreamFeatures::isStreamFeatures(stanza)) {
         QXmppStreamFeatures features;
         features.parse(stanza);

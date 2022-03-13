@@ -111,8 +111,6 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 
 void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 {
-    const QString ns = stanza.namespaceURI();
-
     if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::StartTls)) {
         sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
         socket()->flush();
