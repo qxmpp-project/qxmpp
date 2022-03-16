@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppAtmTrustMemoryStorage.h"
-#include "QXmppConstants.cpp"
 #include "QXmppConstants_p.h"
 #include "QXmppTrustMemoryStorage.h"
 #include "QXmppTrustMessageKeyOwner.h"
