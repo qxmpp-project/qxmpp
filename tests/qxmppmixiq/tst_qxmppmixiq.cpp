@@ -38,6 +38,7 @@ private slots:
     void testBase();
     void testDefaults();
     void testSetters();
+    void testInvalidActionType();
     void testIsMixIq();
 };
 
@@ -365,6 +366,18 @@ void tst_QXmppMixIq::testSetters()
     QCOMPARE(iq.nodes(), QStringList() << "com:example:mix:node:custom");
     iq.setNick("SMUDO");
     QCOMPARE(iq.nick(), QString("SMUDO"));
+}
+
+void tst_QXmppMixIq::testInvalidActionType()
+{
+    const QByteArray xml =
+        "<iq id='E6E10350' to='hag66@example.org'"
+        " from='hag66@example.org/123' type='set'>"
+        "<set-on-fire xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
+        "</iq>";
+    QXmppMixIq iq;
+    parsePacket(iq, xml);
+    QCOMPARE(iq.actionType(), QXmppMixIq::None);
 }
 
 void tst_QXmppMixIq::testIsMixIq()
