@@ -65,14 +65,20 @@ void QXmppStartTlsPacket::parse(const QDomElement &element)
     if (!QXmppStartTlsPacket::isStartTlsPacket(element))
         return;
 
-    m_type = Type(STARTTLS_TYPES.indexOf(element.tagName()));
+    if (auto index = STARTTLS_TYPES.indexOf(element.tagName()); index >= 0) {
+        m_type = Type(index);
+    } else {
+        m_type = Invalid;
+    }
 }
 
 void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(STARTTLS_TYPES.at(int(m_type)));
-    writer->writeDefaultNamespace(ns_tls);
-    writer->writeEndElement();
+    if (m_type != Invalid) {
+        writer->writeStartElement(STARTTLS_TYPES.at(int(m_type)));
+        writer->writeDefaultNamespace(ns_tls);
+        writer->writeEndElement();
+    }
 }
 /// \endcond
 
