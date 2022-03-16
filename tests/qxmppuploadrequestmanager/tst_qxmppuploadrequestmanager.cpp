@@ -293,12 +293,12 @@ void tst_QXmppUploadRequestManager::testSending()
     QFETCH(qint64, fileSize);
     QFETCH(QString, fileType);
 
-    QXmppLogger *logger = new QXmppLogger();
-    logger->setLoggingType(QXmppLogger::SignalLogging);
-    client.setLogger(logger);
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::SignalLogging);
+    client.setLogger(&logger);
 
     lastMimeType = QMimeDatabase().mimeTypeForName(fileType);
-    connect(logger, &QXmppLogger::message, this, &tst_QXmppUploadRequestManager::onLoggerMessage);
+    connect(&logger, &QXmppLogger::message, this, &tst_QXmppUploadRequestManager::onLoggerMessage);
 
     lastFileName = fileName;
     lastFileSize = fileSize;
