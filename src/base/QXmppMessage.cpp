@@ -1247,7 +1247,9 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         // XEP-0334: Message Processing Hints
         if (element.namespaceURI() == ns_message_processing_hints &&
             HINT_TYPES.contains(element.tagName())) {
-            addHint(Hint(1 << HINT_TYPES.indexOf(element.tagName())));
+            if (const auto index = HINT_TYPES.indexOf(element.tagName()); index >= 0) {
+                addHint(Hint(1 << index));
+            }
             return true;
         }
         // XEP-0359: Unique and Stable Stanza IDs

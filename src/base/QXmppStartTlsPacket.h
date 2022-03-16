@@ -20,7 +20,8 @@ public:
     enum Type {
         StartTls,  ///< Used by the client to initiate STARTTLS.
         Proceed,   ///< Used by the server to accept STARTTLS.
-        Failure    ///< Used by the server to reject STARTTLS.
+        Failure,   ///< Used by the server to reject STARTTLS.
+        Invalid,   ///< Invalid type
     };
 
     QXmppStartTlsPacket(Type type = StartTls);
