@@ -150,7 +150,9 @@ void QXmppMixIq::parseElementFromChild(const QDomElement& element)
 {
     QDomElement child = element.firstChildElement();
     // determine action type
-    d->actionType = (QXmppMixIq::Type)MIX_ACTION_TYPES.indexOf(child.tagName());
+    if (auto index = MIX_ACTION_TYPES.indexOf(child.tagName()); index >= 0) {
+        d->actionType = Type(index);
+    }
 
     if (child.namespaceURI() == ns_mix_pam) {
         if (child.hasAttribute(QStringLiteral("channel")))
