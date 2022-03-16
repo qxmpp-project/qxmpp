@@ -1449,7 +1449,9 @@ void QXmppMessage::parseExtension(const QDomElement &element, QXmppElementList &
     } else if (element.namespaceURI() == ns_message_processing_hints &&
                HINT_TYPES.contains(element.tagName())) {
         // XEP-0334: Message Processing Hints
-        addHint(Hint(1 << HINT_TYPES.indexOf(element.tagName())));
+        if (const auto index = HINT_TYPES.indexOf(element.tagName()); index >= 0) {
+            addHint(Hint(1 << index));
+        }
     } else if (checkElement(element, QStringLiteral("stanza-id"), ns_sid)) {
         // XEP-0359: Unique and Stable Stanza IDs
         d->stanzaId = element.attribute(QStringLiteral("id"));
