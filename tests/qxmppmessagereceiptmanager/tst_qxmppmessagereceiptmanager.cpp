@@ -30,7 +30,7 @@ private slots:
 private:
     QXmppMessageReceiptManager *m_manager;
     QXmppClient m_client;
-    QXmppLogger *m_logger;
+    QXmppLogger m_logger;
     bool m_messageDelivered = false;
     bool m_receiptSent = false;
 };
@@ -38,13 +38,12 @@ private:
 void tst_QXmppMessageReceiptManager::initTestCase()
 {
     m_manager = new QXmppMessageReceiptManager();
-    m_logger = new QXmppLogger();
 
     m_client.addExtension(m_manager);
-    m_logger->setLoggingType(QXmppLogger::SignalLogging);
-    m_client.setLogger(m_logger);
+    m_logger.setLoggingType(QXmppLogger::SignalLogging);
+    m_client.setLogger(&m_logger);
 
-    connect(m_logger, &QXmppLogger::message,
+    connect(&m_logger, &QXmppLogger::message,
             this, &tst_QXmppMessageReceiptManager::onLoggerMessage);
 
     connect(m_manager, &QXmppMessageReceiptManager::messageDelivered,
