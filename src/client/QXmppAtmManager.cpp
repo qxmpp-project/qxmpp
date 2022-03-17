@@ -293,9 +293,9 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
     if (const auto trustMessageElement = message.trustMessageElement();
-            trustMessageElement &&
-            trustMessageElement->usage() == ns_atm &&
-            message.from() != client()->configuration().jid()) {
+        trustMessageElement &&
+        trustMessageElement->usage() == ns_atm &&
+        message.from() != client()->configuration().jid()) {
         const auto senderJid = QXmppUtils::jidToBareJid(message.from());
         const auto e2eeMetadata = message.e2eeMetadata();
         const auto senderKey = e2eeMetadata ? e2eeMetadata->senderKey() : QByteArray();
