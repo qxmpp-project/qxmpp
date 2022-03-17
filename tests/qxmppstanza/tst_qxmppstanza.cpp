@@ -11,7 +11,7 @@
 class QXmppStanzaStub : public QXmppStanza
 {
 public:
-    void toXml(QXmlStreamWriter *writer) const override {};
+    void toXml(QXmlStreamWriter *) const override {};
 };
 
 class tst_QXmppStanza : public QObject
