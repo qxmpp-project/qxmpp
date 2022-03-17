@@ -6,7 +6,6 @@
 #include "QXmppAtmTrustMemoryStorage.h"
 #include "QXmppCarbonManager.h"
 #include "QXmppClient.h"
-#include "QXmppConstants_p.h"
 #include "QXmppMessage.h"
 #include "QXmppTrustMessageElement.h"
 #include "QXmppTrustMessageKeyOwner.h"
@@ -20,6 +19,10 @@ Q_DECLARE_METATYPE(QList<QXmppTrustMessageKeyOwner>)
 
 // time period (in ms) to wait for a trust message that should not be sent.
 constexpr int UNEXPECTED_TRUST_MESSAGE_WAITING_TIMEOUT = 1000;
+
+static const char *ns_atm = "urn:xmpp:atm:1";
+static const char *ns_omemo = "eu.siacs.conversations.axolotl";
+static const char *ns_ox = "urn:xmpp:openpgp:0";
 
 class tst_QXmppAtmManager : public QObject
 {
