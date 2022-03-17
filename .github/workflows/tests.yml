@@ -13,6 +13,7 @@ jobs:
     env:
       CONFIG: ${{ matrix.config }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         config: [minimal, full, full-debug]
