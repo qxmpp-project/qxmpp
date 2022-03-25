@@ -9,7 +9,7 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
-#include "QXmppOmemoElement.h"
+#include "QXmppOmemoElement_p.h"
 #include "QXmppTrustMessageElement.h"
 
 #include <optional>
@@ -53,7 +53,6 @@ private slots:
     void testSlashMe();
     void testMixInvitation();
     void testTrustMessageElement();
-    void testOmemoElement();
     void testE2eeFallbackBody();
 };
 
@@ -1115,87 +1114,6 @@ void tst_QXmppMessage::testTrustMessageElement()
     QXmppMessage message2;
     message2.setTrustMessageElement(QXmppTrustMessageElement());
     QVERIFY(message2.trustMessageElement());
-}
-
-void tst_QXmppMessage::testOmemoElement()
-{
-    const QByteArray xmlIn(QByteArrayLiteral(
-        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
-        "<store xmlns=\"urn:xmpp:hints\"/>"
-        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
-        "<header sid=\"27183\">"
-        "<keys jid=\"juliet@capulet.lit\">"
-        "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
-        "</keys>"
-        "<keys jid=\"romeo@montague.lit\">"
-        "<key rid=\"1337\">PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</key>"
-        "<key rid=\"12321\" kex=\"true\">a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</key>"
-        "</keys>"
-        "</header>"
-        "<payload>"
-        "Vk9NPi99bHFWKmErOUVTTkAwW1VcZjJvPlElZWUoOk90Kz03YUF7OHc/WjpaQz9ieFdsZjBsSH1w"
-        "R1d2Zzt1bEFAMSZqP0dVJj9oaygmcWRPKGU3Kjc8aV4sJSlpSXBqaENCT2NUVFFmaFNXbCxQaHsj"
-        "OnthQDJyUW9qNjwoZCtpLzpzLGpbKlJRY1NtMVVeRzdsOWRQciNnXV9tajEyWztnKiEhRHs5K2hX"
-        "ZFloaEZtUENTQWIxM0tcVkxIVWY+aGYoeEk/SldZcyNlTzk2Q2NHW1NqWEhEPmhPXl1WZV5xNE9p"
-        "WDZuck8zPGE2Rk4vKWJXd3F1YV0mSXA/NVNGNEQsK18mTlJNbl9WcGJXcVE5e1E0dlFAPVQ8THM+"
-        "QjdcdjZSNDVJclo0QVo6cDBMQDtVcUFnNDpcd1ZXSkcsXz82QjhXLl9NSVBFdipeOmF4NC5YKnNx"
-        "K2dxMGx1MDkrdnJhWTovUjk1ZCZUUSNTKHIvJUgmTyE4bjJbZlZAPl9IZi8ucSM7a2FAQWUzXUJO"
-        "LmpALilFWGRqYlh1Siw2MzJqbipsWlZRMG91MGVQVlExLCFeayMuM3dfSn1ONiU8LixZWSx3YUlV"
-        "bGtIcnVWP2Y0LGwvTzFIQy8qZVVBSVZLS1peSW0xNTRPcXRDIXBkXnhmWyNxQFxHQ19cYXVAO214"
-        "RWw1P0AmIUAlQjk7ZFBWXW1RbWxoTFE+cUxMbk5UCg=="
-        "</payload>"
-        "</encrypted>"
-        "</message>"));
-
-    // An OMEMO element having its OMEMO envelopes sorted in reverse order is
-    // needed since they are serialized in the reverse order in which they are
-    // deserialized.
-    const QByteArray xmlOut1(QByteArrayLiteral(
-        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
-        "<store xmlns=\"urn:xmpp:hints\"/>"
-        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
-        "<header sid=\"27183\">"
-        "<keys jid=\"juliet@capulet.lit\">"
-        "<key rid=\"31415\">Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK</key>"
-        "</keys>"
-        "<keys jid=\"romeo@montague.lit\">"
-        "<key rid=\"12321\" kex=\"true\">a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK</key>"
-        "<key rid=\"1337\">PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K</key>"
-        "</keys>"
-        "</header>"
-        "<payload>"
-        "Vk9NPi99bHFWKmErOUVTTkAwW1VcZjJvPlElZWUoOk90Kz03YUF7OHc/WjpaQz9ieFdsZjBsSH1w"
-        "R1d2Zzt1bEFAMSZqP0dVJj9oaygmcWRPKGU3Kjc8aV4sJSlpSXBqaENCT2NUVFFmaFNXbCxQaHsj"
-        "OnthQDJyUW9qNjwoZCtpLzpzLGpbKlJRY1NtMVVeRzdsOWRQciNnXV9tajEyWztnKiEhRHs5K2hX"
-        "ZFloaEZtUENTQWIxM0tcVkxIVWY+aGYoeEk/SldZcyNlTzk2Q2NHW1NqWEhEPmhPXl1WZV5xNE9p"
-        "WDZuck8zPGE2Rk4vKWJXd3F1YV0mSXA/NVNGNEQsK18mTlJNbl9WcGJXcVE5e1E0dlFAPVQ8THM+"
-        "QjdcdjZSNDVJclo0QVo6cDBMQDtVcUFnNDpcd1ZXSkcsXz82QjhXLl9NSVBFdipeOmF4NC5YKnNx"
-        "K2dxMGx1MDkrdnJhWTovUjk1ZCZUUSNTKHIvJUgmTyE4bjJbZlZAPl9IZi8ucSM7a2FAQWUzXUJO"
-        "LmpALilFWGRqYlh1Siw2MzJqbipsWlZRMG91MGVQVlExLCFeayMuM3dfSn1ONiU8LixZWSx3YUlV"
-        "bGtIcnVWP2Y0LGwvTzFIQy8qZVVBSVZLS1peSW0xNTRPcXRDIXBkXnhmWyNxQFxHQ19cYXVAO214"
-        "RWw1P0AmIUAlQjk7ZFBWXW1RbWxoTFE+cUxMbk5UCg=="
-        "</payload>"
-        "</encrypted>"
-        "</message>"));
-
-    const QByteArray xmlOut2(QByteArrayLiteral(
-        "<message type=\"chat\">"
-        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
-        "<header sid=\"0\"/>"
-        "</encrypted>"
-        "</message>"));
-
-    QXmppMessage message1;
-    QVERIFY(!message1.omemoElement());
-
-    parsePacket(message1, xmlIn);
-    QVERIFY(message1.omemoElement());
-    serializePacket(message1, xmlOut1);
-
-    QXmppMessage message2;
-    message2.setOmemoElement(QXmppOmemoElement());
-    QVERIFY(message2.omemoElement());
-    serializePacket(message2, xmlOut2);
 }
 
 void tst_QXmppMessage::testE2eeFallbackBody()

@@ -4,63 +4,31 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppConstants_p.h"
-#include "QXmppOmemoDeviceBundle.h"
-#include "QXmppOmemoDeviceElement.h"
-#include "QXmppOmemoDeviceList.h"
-#include "QXmppOmemoElement.h"
-#include "QXmppOmemoEnvelope.h"
+#include "QXmppOmemoDeviceBundle_p.h"
+#include "QXmppOmemoDeviceElement_p.h"
+#include "QXmppOmemoDeviceList_p.h"
+#include "QXmppOmemoElement_p.h"
+#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
 #include <QHash>
 
+/// \cond
 ///
 /// \class QXmppOmemoDeviceElement
 ///
 /// \brief The QXmppOmemoDeviceElement class represents an element of the
 /// OMEMO device list as defined by \xep{0384, OMEMO Encryption}.
 ///
-/// \since QXmpp 1.5
-///
-
-class QXmppOmemoDeviceElementPrivate : public QSharedData
-{
-public:
-    uint32_t id = 0;
-    QString label;
-};
-
-///
-/// Constructs an OMEMO device element.
-///
-QXmppOmemoDeviceElement::QXmppOmemoDeviceElement()
-    : d(new QXmppOmemoDeviceElementPrivate)
-{
-}
-
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
-QXmppOmemoDeviceElement::QXmppOmemoDeviceElement(const QXmppOmemoDeviceElement &other) = default;
-
-QXmppOmemoDeviceElement::~QXmppOmemoDeviceElement() = default;
-
-///
-/// Assigns \a other to this OMEMO device element.
-///
-/// \param other
-///
-QXmppOmemoDeviceElement &QXmppOmemoDeviceElement::operator=(const QXmppOmemoDeviceElement &other) = default;
 
 ///
 /// Returns true if the IDs of both elements match.
 ///
 bool QXmppOmemoDeviceElement::operator==(const QXmppOmemoDeviceElement &other) const
 {
-    return d->id == other.id();
+    return m_id == other.id();
 }
 
 ///
@@ -75,7 +43,7 @@ bool QXmppOmemoDeviceElement::operator==(const QXmppOmemoDeviceElement &other) c
 ///
 uint32_t QXmppOmemoDeviceElement::id() const
 {
-    return d->id;
+    return m_id;
 }
 
 ///
@@ -88,7 +56,7 @@ uint32_t QXmppOmemoDeviceElement::id() const
 ///
 void QXmppOmemoDeviceElement::setId(const uint32_t id)
 {
-    d->id = id;
+    m_id = id;
 }
 
 ///
@@ -101,7 +69,7 @@ void QXmppOmemoDeviceElement::setId(const uint32_t id)
 ///
 QString QXmppOmemoDeviceElement::label() const
 {
-    return d->label;
+    return m_label;
 }
 
 ///
@@ -113,28 +81,26 @@ QString QXmppOmemoDeviceElement::label() const
 ///
 void QXmppOmemoDeviceElement::setLabel(const QString &label)
 {
-    d->label = label;
+    m_label = label;
 }
 
-/// \cond
 void QXmppOmemoDeviceElement::parse(const QDomElement &element)
 {
-    d->id = element.attribute(QStringLiteral("id")).toInt();
-    d->label = element.attribute(QStringLiteral("label"));
+    m_id = element.attribute(QStringLiteral("id")).toInt();
+    m_label = element.attribute(QStringLiteral("label"));
 }
 
 void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("device"));
 
-    writer->writeAttribute(QStringLiteral("id"), QString::number(d->id));
-    if (!d->label.isEmpty()) {
-        writer->writeAttribute(QStringLiteral("label"), d->label);
+    writer->writeAttribute(QStringLiteral("id"), QString::number(m_id));
+    if (!m_label.isEmpty()) {
+        writer->writeAttribute(QStringLiteral("label"), m_label);
     }
 
     writer->writeEndElement();  // device
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO device element.
@@ -155,33 +121,7 @@ bool QXmppOmemoDeviceElement::isOmemoDeviceElement(const QDomElement &element)
 /// \brief The QXmppOmemoDeviceList class represents an OMEMO device list
 /// as defined by \xep{0384, OMEMO Encryption}.
 ///
-/// \since QXmpp 1.5
-///
 
-///
-/// Constructs an OMEMO device list.
-///
-QXmppOmemoDeviceList::QXmppOmemoDeviceList()
-{
-}
-
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
-QXmppOmemoDeviceList::QXmppOmemoDeviceList(const QXmppOmemoDeviceList &other) = default;
-
-QXmppOmemoDeviceList::~QXmppOmemoDeviceList() = default;
-
-///
-/// Assigns \a other to this OMEMO device list.
-///
-/// \param other
-///
-QXmppOmemoDeviceList &QXmppOmemoDeviceList::operator=(const QXmppOmemoDeviceList &other) = default;
-
-/// \cond
 void QXmppOmemoDeviceList::parse(const QDomElement &element)
 {
     for (auto device = element.firstChildElement(QStringLiteral("device"));
@@ -204,7 +144,6 @@ void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO device list.
@@ -228,42 +167,6 @@ bool QXmppOmemoDeviceList::isOmemoDeviceList(const QDomElement &element)
 /// It is a collection of publicly accessible data used by the X3DH key exchange.
 /// The data is used to build an encrypted session with an OMEMO device.
 ///
-/// \since QXmpp 1.5
-///
-
-class QXmppOmemoDeviceBundlePrivate : public QSharedData
-{
-public:
-    QByteArray publicIdentityKey;
-    QByteArray signedPublicPreKey;
-    uint32_t signedPublicPreKeyId = 0;
-    QByteArray signedPublicPreKeySignature;
-    QHash<uint32_t, QByteArray> publicPreKeys;
-};
-
-///
-/// Constructs an OMEMO device bundle.
-///
-QXmppOmemoDeviceBundle::QXmppOmemoDeviceBundle()
-    : d(new QXmppOmemoDeviceBundlePrivate)
-{
-}
-
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
-QXmppOmemoDeviceBundle::QXmppOmemoDeviceBundle(const QXmppOmemoDeviceBundle &other) = default;
-
-QXmppOmemoDeviceBundle::~QXmppOmemoDeviceBundle() = default;
-
-///
-/// Assigns \a other to this OMEMO device bundle.
-///
-/// \param other
-///
-QXmppOmemoDeviceBundle &QXmppOmemoDeviceBundle::operator=(const QXmppOmemoDeviceBundle &other) = default;
 
 ///
 /// Returns the public identity key.
@@ -274,7 +177,7 @@ QXmppOmemoDeviceBundle &QXmppOmemoDeviceBundle::operator=(const QXmppOmemoDevice
 ///
 QByteArray QXmppOmemoDeviceBundle::publicIdentityKey() const
 {
-    return d->publicIdentityKey;
+    return m_publicIdentityKey;
 }
 
 ///
@@ -284,7 +187,7 @@ QByteArray QXmppOmemoDeviceBundle::publicIdentityKey() const
 ///
 void QXmppOmemoDeviceBundle::setPublicIdentityKey(const QByteArray &key)
 {
-    d->publicIdentityKey = key;
+    m_publicIdentityKey = key;
 }
 
 ///
@@ -294,7 +197,7 @@ void QXmppOmemoDeviceBundle::setPublicIdentityKey(const QByteArray &key)
 ///
 QByteArray QXmppOmemoDeviceBundle::signedPublicPreKey() const
 {
-    return d->signedPublicPreKey;
+    return m_signedPublicPreKey;
 }
 
 ///
@@ -304,7 +207,7 @@ QByteArray QXmppOmemoDeviceBundle::signedPublicPreKey() const
 ///
 void QXmppOmemoDeviceBundle::setSignedPublicPreKey(const QByteArray &key)
 {
-    d->signedPublicPreKey = key;
+    m_signedPublicPreKey = key;
 }
 
 ///
@@ -316,7 +219,7 @@ void QXmppOmemoDeviceBundle::setSignedPublicPreKey(const QByteArray &key)
 ///
 uint32_t QXmppOmemoDeviceBundle::signedPublicPreKeyId() const
 {
-    return d->signedPublicPreKeyId;
+    return m_signedPublicPreKeyId;
 }
 
 ///
@@ -329,7 +232,7 @@ uint32_t QXmppOmemoDeviceBundle::signedPublicPreKeyId() const
 ///
 void QXmppOmemoDeviceBundle::setSignedPublicPreKeyId(uint32_t id)
 {
-    d->signedPublicPreKeyId = id;
+    m_signedPublicPreKeyId = id;
 }
 
 ///
@@ -339,7 +242,7 @@ void QXmppOmemoDeviceBundle::setSignedPublicPreKeyId(uint32_t id)
 ///
 QByteArray QXmppOmemoDeviceBundle::signedPublicPreKeySignature() const
 {
-    return d->signedPublicPreKeySignature;
+    return m_signedPublicPreKeySignature;
 }
 
 ///
@@ -349,7 +252,7 @@ QByteArray QXmppOmemoDeviceBundle::signedPublicPreKeySignature() const
 ///
 void QXmppOmemoDeviceBundle::setSignedPublicPreKeySignature(const QByteArray &signature)
 {
-    d->signedPublicPreKeySignature = signature;
+    m_signedPublicPreKeySignature = signature;
 }
 
 ///
@@ -363,7 +266,7 @@ void QXmppOmemoDeviceBundle::setSignedPublicPreKeySignature(const QByteArray &si
 ///
 QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 {
-    return d->publicPreKeys;
+    return m_publicPreKeys;
 }
 
 ///
@@ -377,7 +280,7 @@ QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 ///
 void QXmppOmemoDeviceBundle::addPublicPreKey(const uint32_t id, const QByteArray &key)
 {
-    d->publicPreKeys.insert(id, key);
+    m_publicPreKeys.insert(id, key);
 }
 
 ///
@@ -388,27 +291,26 @@ void QXmppOmemoDeviceBundle::addPublicPreKey(const uint32_t id, const QByteArray
 ///
 void QXmppOmemoDeviceBundle::removePublicPreKey(const uint32_t id)
 {
-    d->publicPreKeys.remove(id);
+    m_publicPreKeys.remove(id);
 }
 
-/// \cond
 void QXmppOmemoDeviceBundle::parse(const QDomElement &element)
 {
-    d->publicIdentityKey = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("ik")).text().toLatin1());
+    m_publicIdentityKey = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("ik")).text().toLatin1());
 
     const auto signedPublicPreKeyElement = element.firstChildElement(QStringLiteral("spk"));
     if (!signedPublicPreKeyElement.isNull()) {
-        d->signedPublicPreKeyId = signedPublicPreKeyElement.attribute(QStringLiteral("id")).toInt();
-        d->signedPublicPreKey = QByteArray::fromBase64(signedPublicPreKeyElement.text().toLatin1());
+        m_signedPublicPreKeyId = signedPublicPreKeyElement.attribute(QStringLiteral("id")).toInt();
+        m_signedPublicPreKey = QByteArray::fromBase64(signedPublicPreKeyElement.text().toLatin1());
     }
-    d->signedPublicPreKeySignature = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("spks")).text().toLatin1());
+    m_signedPublicPreKeySignature = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("spks")).text().toLatin1());
 
     const auto publicPreKeysElement = element.firstChildElement(QStringLiteral("prekeys"));
     if (!publicPreKeysElement.isNull()) {
         for (QDomElement publicPreKeyElement = publicPreKeysElement.firstChildElement(QStringLiteral("pk"));
              !publicPreKeyElement.isNull();
              publicPreKeyElement = publicPreKeyElement.nextSiblingElement(QStringLiteral("pk"))) {
-            d->publicPreKeys.insert(publicPreKeyElement.attribute(QStringLiteral("id")).toInt(), QByteArray::fromBase64(publicPreKeyElement.text().toLatin1()));
+            m_publicPreKeys.insert(publicPreKeyElement.attribute(QStringLiteral("id")).toInt(), QByteArray::fromBase64(publicPreKeyElement.text().toLatin1()));
         }
     }
 }
@@ -432,7 +334,7 @@ void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 
     writer->writeStartElement(QStringLiteral("prekeys"));
-    for (auto it = d->publicPreKeys.cbegin(); it != d->publicPreKeys.cend(); it++) {
+    for (auto it = m_publicPreKeys.cbegin(); it != m_publicPreKeys.cend(); it++) {
         writer->writeStartElement(QStringLiteral("pk"));
         writer->writeAttribute(QStringLiteral("id"), QString::number(it.key()));
         writer->writeCharacters(it.value().toBase64());
@@ -442,7 +344,6 @@ void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 
     writer->writeEndElement();  // bundle
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO device bundle.
@@ -463,40 +364,6 @@ bool QXmppOmemoDeviceBundle::isOmemoDeviceBundle(const QDomElement &element)
 /// \brief The QXmppOmemoEnvelope class represents an OMEMO envelope as
 /// defined by \xep{0384, OMEMO Encryption}.
 ///
-/// \since QXmpp 1.5
-///
-
-class QXmppOmemoEnvelopePrivate : public QSharedData
-{
-public:
-    uint32_t recipientDeviceId = 0;
-    bool isUsedForKeyExchange = false;
-    QByteArray data;
-};
-
-///
-/// Constructs an OMEMO envelope.
-///
-QXmppOmemoEnvelope::QXmppOmemoEnvelope()
-    : d(new QXmppOmemoEnvelopePrivate)
-{
-}
-
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
-QXmppOmemoEnvelope::QXmppOmemoEnvelope(const QXmppOmemoEnvelope &other) = default;
-
-QXmppOmemoEnvelope::~QXmppOmemoEnvelope() = default;
-
-///
-/// Assigns \a other to this OMEMO envelope.
-///
-/// \param other
-///
-QXmppOmemoEnvelope &QXmppOmemoEnvelope::operator=(const QXmppOmemoEnvelope &other) = default;
 
 ///
 /// Returns the ID of the recipient's device.
@@ -507,7 +374,7 @@ QXmppOmemoEnvelope &QXmppOmemoEnvelope::operator=(const QXmppOmemoEnvelope &othe
 ///
 uint32_t QXmppOmemoEnvelope::recipientDeviceId() const
 {
-    return d->recipientDeviceId;
+    return m_recipientDeviceId;
 }
 
 ///
@@ -520,7 +387,7 @@ uint32_t QXmppOmemoEnvelope::recipientDeviceId() const
 ///
 void QXmppOmemoEnvelope::setRecipientDeviceId(const uint32_t id)
 {
-    d->recipientDeviceId = id;
+    m_recipientDeviceId = id;
 }
 
 ///
@@ -532,7 +399,7 @@ void QXmppOmemoEnvelope::setRecipientDeviceId(const uint32_t id)
 ///
 bool QXmppOmemoEnvelope::isUsedForKeyExchange() const
 {
-    return d->isUsedForKeyExchange;
+    return m_isUsedForKeyExchange;
 }
 
 ///
@@ -542,7 +409,7 @@ bool QXmppOmemoEnvelope::isUsedForKeyExchange() const
 ///
 void QXmppOmemoEnvelope::setIsUsedForKeyExchange(const bool isUsed)
 {
-    d->isUsedForKeyExchange = isUsed;
+    m_isUsedForKeyExchange = isUsed;
 }
 
 ///
@@ -555,7 +422,7 @@ void QXmppOmemoEnvelope::setIsUsedForKeyExchange(const bool isUsed)
 ///
 QByteArray QXmppOmemoEnvelope::data() const
 {
-    return d->data;
+    return m_data;
 }
 
 ///
@@ -567,35 +434,33 @@ QByteArray QXmppOmemoEnvelope::data() const
 ///
 void QXmppOmemoEnvelope::setData(const QByteArray &data)
 {
-    d->data = data;
+    m_data = data;
 }
 
-/// \cond
 void QXmppOmemoEnvelope::parse(const QDomElement &element)
 {
-    d->recipientDeviceId = element.attribute(QStringLiteral("rid")).toInt();
+    m_recipientDeviceId = element.attribute(QStringLiteral("rid")).toInt();
 
     const auto isUsedForKeyExchange = element.attribute(QStringLiteral("kex"));
     if (isUsedForKeyExchange == QStringLiteral("true") || isUsedForKeyExchange == QStringLiteral("1")) {
-        d->isUsedForKeyExchange = true;
+        m_isUsedForKeyExchange = true;
     }
 
-    d->data = QByteArray::fromBase64(element.text().toLatin1());
+    m_data = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("key"));
-    writer->writeAttribute(QStringLiteral("rid"), QString::number(d->recipientDeviceId));
+    writer->writeAttribute(QStringLiteral("rid"), QString::number(m_recipientDeviceId));
 
-    if (d->isUsedForKeyExchange) {
+    if (m_isUsedForKeyExchange) {
         helperToXmlAddAttribute(writer, QStringLiteral("kex"), QStringLiteral("true"));
     }
 
-    writer->writeCharacters(d->data.toBase64());
+    writer->writeCharacters(m_data.toBase64());
     writer->writeEndElement();
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO envelope.
@@ -616,40 +481,6 @@ bool QXmppOmemoEnvelope::isOmemoEnvelope(const QDomElement &element)
 /// \brief The QXmppOmemoElement class represents an OMEMO element as
 /// defined by \xep{0384, OMEMO Encryption}.
 ///
-/// \since QXmpp 1.5
-///
-
-class QXmppOmemoElementPrivate : public QSharedData
-{
-public:
-    uint32_t senderDeviceId = 0;
-    QByteArray payload;
-    QMultiMap<QString, QXmppOmemoEnvelope> envelopes;
-};
-
-///
-/// Constructs an OMEMO element.
-///
-QXmppOmemoElement::QXmppOmemoElement()
-    : d(new QXmppOmemoElementPrivate)
-{
-}
-
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
-QXmppOmemoElement::QXmppOmemoElement(const QXmppOmemoElement &other) = default;
-
-QXmppOmemoElement::~QXmppOmemoElement() = default;
-
-///
-/// Assigns \a other to this OMEMO element.
-///
-/// \param other
-///
-QXmppOmemoElement &QXmppOmemoElement::operator=(const QXmppOmemoElement &other) = default;
 
 ///
 /// Returns the ID of the sender's device.
@@ -660,7 +491,7 @@ QXmppOmemoElement &QXmppOmemoElement::operator=(const QXmppOmemoElement &other) 
 ///
 uint32_t QXmppOmemoElement::senderDeviceId() const
 {
-    return d->senderDeviceId;
+    return m_senderDeviceId;
 }
 
 ///
@@ -673,7 +504,7 @@ uint32_t QXmppOmemoElement::senderDeviceId() const
 ///
 void QXmppOmemoElement::setSenderDeviceId(const uint32_t id)
 {
-    d->senderDeviceId = id;
+    m_senderDeviceId = id;
 }
 
 ///
@@ -683,7 +514,7 @@ void QXmppOmemoElement::setSenderDeviceId(const uint32_t id)
 ///
 QByteArray QXmppOmemoElement::payload() const
 {
-    return d->payload;
+    return m_payload;
 }
 
 ///
@@ -693,7 +524,7 @@ QByteArray QXmppOmemoElement::payload() const
 ///
 void QXmppOmemoElement::setPayload(const QByteArray &payload)
 {
-    d->payload = payload;
+    m_payload = payload;
 }
 
 ///
@@ -706,7 +537,7 @@ void QXmppOmemoElement::setPayload(const QByteArray &payload)
 ///
 std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, const uint32_t recipientDeviceId) const
 {
-    for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
+    for (auto itr = m_envelopes.constFind(recipientJid); itr != m_envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
         const auto &envelope = itr.value();
         if (envelope.recipientDeviceId() == recipientDeviceId) {
             return envelope;
@@ -728,15 +559,14 @@ std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QStrin
 ///
 void QXmppOmemoElement::addEnvelope(const QString &recipientJid, const QXmppOmemoEnvelope &envelope)
 {
-    d->envelopes.insert(QXmppUtils::jidToBareJid(recipientJid), envelope);
+    m_envelopes.insert(QXmppUtils::jidToBareJid(recipientJid), envelope);
 }
 
-/// \cond
 void QXmppOmemoElement::parse(const QDomElement &element)
 {
     const auto header = element.firstChildElement(QStringLiteral("header"));
 
-    d->senderDeviceId = header.attribute(QStringLiteral("sid")).toInt();
+    m_senderDeviceId = header.attribute(QStringLiteral("sid")).toInt();
 
     for (auto recipient = header.firstChildElement(QStringLiteral("keys"));
          !recipient.isNull();
@@ -752,7 +582,7 @@ void QXmppOmemoElement::parse(const QDomElement &element)
         }
     }
 
-    d->payload = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("payload")).text().toLatin1());
+    m_payload = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("payload")).text().toLatin1());
 }
 
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
@@ -761,14 +591,14 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_omemo_2);
 
     writer->writeStartElement(QStringLiteral("header"));
-    writer->writeAttribute(QStringLiteral("sid"), QString::number(d->senderDeviceId));
+    writer->writeAttribute(QStringLiteral("sid"), QString::number(m_senderDeviceId));
 
-    const auto recipientJids = d->envelopes.uniqueKeys();
+    const auto recipientJids = m_envelopes.uniqueKeys();
     for (const auto &recipientJid : recipientJids) {
         writer->writeStartElement(QStringLiteral("keys"));
         writer->writeAttribute(QStringLiteral("jid"), recipientJid);
 
-        for (auto itr = d->envelopes.constFind(recipientJid); itr != d->envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
+        for (auto itr = m_envelopes.constFind(recipientJid); itr != m_envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
             const auto &envelope = itr.value();
             envelope.toXml(writer);
         }
@@ -780,13 +610,12 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 
     // The payload element is only included if there is a payload.
     // An empty OMEMO message does not contain a payload.
-    if (!d->payload.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("payload"), d->payload.toBase64());
+    if (!m_payload.isEmpty()) {
+        writer->writeTextElement(QStringLiteral("payload"), m_payload.toBase64());
     }
 
     writer->writeEndElement();  // encrypted
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO element.
@@ -831,7 +660,6 @@ void QXmppOmemoIq::setOmemoElement(const QXmppOmemoElement &omemoElement)
     m_omemoElement = omemoElement;
 }
 
-/// \cond
 void QXmppOmemoIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement child = element.firstChildElement();
@@ -842,7 +670,6 @@ void QXmppOmemoIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     m_omemoElement.toXml(writer);
 }
-/// \endcond
 
 ///
 /// Determines whether the given DOM element is an OMEMO IQ stanza.
@@ -856,3 +683,4 @@ bool QXmppOmemoIq::isOmemoIq(const QDomElement &element)
     auto child = element.firstChildElement();
     return !child.isNull() && QXmppOmemoElement::isOmemoElement(child);
 }
+/// \endcond

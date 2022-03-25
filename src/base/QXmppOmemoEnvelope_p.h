@@ -8,21 +8,12 @@
 
 #include "QXmppGlobal.h"
 
-#include <QSharedDataPointer>
-
 class QDomElement;
-class QXmppOmemoEnvelopePrivate;
 class QXmlStreamWriter;
 
-class QXMPP_EXPORT QXmppOmemoEnvelope
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoEnvelope
 {
 public:
-    QXmppOmemoEnvelope();
-    QXmppOmemoEnvelope(const QXmppOmemoEnvelope &other);
-    ~QXmppOmemoEnvelope();
-
-    QXmppOmemoEnvelope &operator=(const QXmppOmemoEnvelope &other);
-
     uint32_t recipientDeviceId() const;
     void setRecipientDeviceId(uint32_t id);
 
@@ -40,7 +31,9 @@ public:
     static bool isOmemoEnvelope(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppOmemoEnvelopePrivate> d;
+    uint32_t m_recipientDeviceId = 0;
+    bool m_isUsedForKeyExchange = false;
+    QByteArray m_data;
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoEnvelope, Q_MOVABLE_TYPE);
