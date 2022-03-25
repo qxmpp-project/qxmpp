@@ -54,7 +54,7 @@ uint32_t QXmppOmemoDeviceElement::id() const
 ///
 /// \param id this device element's ID
 ///
-void QXmppOmemoDeviceElement::setId(const uint32_t id)
+void QXmppOmemoDeviceElement::setId(uint32_t id)
 {
     m_id = id;
 }
@@ -278,7 +278,7 @@ QHash<uint32_t, QByteArray> QXmppOmemoDeviceBundle::publicPreKeys() const
 /// \param id ID of the public pre key
 /// \param key public pre key
 ///
-void QXmppOmemoDeviceBundle::addPublicPreKey(const uint32_t id, const QByteArray &key)
+void QXmppOmemoDeviceBundle::addPublicPreKey(uint32_t id, const QByteArray &key)
 {
     m_publicPreKeys.insert(id, key);
 }
@@ -289,7 +289,7 @@ void QXmppOmemoDeviceBundle::addPublicPreKey(const uint32_t id, const QByteArray
 /// \param id ID of the public pre key
 /// \param key public pre key
 ///
-void QXmppOmemoDeviceBundle::removePublicPreKey(const uint32_t id)
+void QXmppOmemoDeviceBundle::removePublicPreKey(uint32_t id)
 {
     m_publicPreKeys.remove(id);
 }
@@ -385,7 +385,7 @@ uint32_t QXmppOmemoEnvelope::recipientDeviceId() const
 ///
 /// \param id recipient's device ID
 ///
-void QXmppOmemoEnvelope::setRecipientDeviceId(const uint32_t id)
+void QXmppOmemoEnvelope::setRecipientDeviceId(uint32_t id)
 {
     m_recipientDeviceId = id;
 }
@@ -407,7 +407,7 @@ bool QXmppOmemoEnvelope::isUsedForKeyExchange() const
 ///
 /// \param isUsed whether a pre-key was used to prepare this envelope
 ///
-void QXmppOmemoEnvelope::setIsUsedForKeyExchange(const bool isUsed)
+void QXmppOmemoEnvelope::setIsUsedForKeyExchange(bool isUsed)
 {
     m_isUsedForKeyExchange = isUsed;
 }
@@ -502,7 +502,7 @@ uint32_t QXmppOmemoElement::senderDeviceId() const
 ///
 /// \param id sender's device ID
 ///
-void QXmppOmemoElement::setSenderDeviceId(const uint32_t id)
+void QXmppOmemoElement::setSenderDeviceId(uint32_t id)
 {
     m_senderDeviceId = id;
 }
@@ -535,7 +535,7 @@ void QXmppOmemoElement::setPayload(const QByteArray &payload)
 ///
 /// \return the found OMEMO envelope
 ///
-std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, const uint32_t recipientDeviceId) const
+std::optional<QXmppOmemoEnvelope> QXmppOmemoElement::searchEnvelope(const QString &recipientJid, uint32_t recipientDeviceId) const
 {
     for (auto itr = m_envelopes.constFind(recipientJid); itr != m_envelopes.constEnd() && itr.key() == recipientJid; ++itr) {
         const auto &envelope = itr.value();
