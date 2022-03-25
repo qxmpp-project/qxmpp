@@ -8,21 +8,14 @@
 
 #include "QXmppGlobal.h"
 
-#include <QSharedDataPointer>
+#include <QHash>
 
 class QDomElement;
-class QXmppOmemoDeviceBundlePrivate;
 class QXmlStreamWriter;
 
-class QXMPP_EXPORT QXmppOmemoDeviceBundle
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoDeviceBundle
 {
 public:
-    QXmppOmemoDeviceBundle();
-    QXmppOmemoDeviceBundle(const QXmppOmemoDeviceBundle &other);
-    ~QXmppOmemoDeviceBundle();
-
-    QXmppOmemoDeviceBundle &operator=(const QXmppOmemoDeviceBundle &other);
-
     QByteArray publicIdentityKey() const;
     void setPublicIdentityKey(const QByteArray &key);
 
@@ -47,7 +40,11 @@ public:
     static bool isOmemoDeviceBundle(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppOmemoDeviceBundlePrivate> d;
+    QByteArray m_publicIdentityKey;
+    QByteArray m_signedPublicPreKey;
+    uint32_t m_signedPublicPreKeyId = 0;
+    QByteArray m_signedPublicPreKeySignature;
+    QHash<uint32_t, QByteArray> m_publicPreKeys;
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoDeviceBundle, Q_MOVABLE_TYPE);

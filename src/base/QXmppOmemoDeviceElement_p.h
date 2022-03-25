@@ -8,20 +8,12 @@
 
 #include "QXmppGlobal.h"
 
-#include <QSharedDataPointer>
-
 class QDomElement;
-class QXmppOmemoDeviceElementPrivate;
 class QXmlStreamWriter;
 
-class QXMPP_EXPORT QXmppOmemoDeviceElement
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoDeviceElement
 {
 public:
-    QXmppOmemoDeviceElement();
-    QXmppOmemoDeviceElement(const QXmppOmemoDeviceElement &other);
-    ~QXmppOmemoDeviceElement();
-
-    QXmppOmemoDeviceElement &operator=(const QXmppOmemoDeviceElement &other);
     bool operator==(const QXmppOmemoDeviceElement &other) const;
 
     uint32_t id() const;
@@ -38,7 +30,8 @@ public:
     static bool isOmemoDeviceElement(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppOmemoDeviceElementPrivate> d;
+    uint32_t m_id = 0;
+    QString m_label;
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoDeviceElement, Q_MOVABLE_TYPE);

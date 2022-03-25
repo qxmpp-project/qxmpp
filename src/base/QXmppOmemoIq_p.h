@@ -6,11 +6,9 @@
 #define QXMPPOMEMOIQ_H
 
 #include "QXmppIq.h"
-#include "QXmppOmemoElement.h"
+#include "QXmppOmemoElement_p.h"
 
-class QXmppOmemoIqPrivate;
-
-class QXmppOmemoIq : public QXmppIq
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoIq : public QXmppIq
 {
 public:
     QXmppOmemoElement omemoElement();

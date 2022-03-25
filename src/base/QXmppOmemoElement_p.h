@@ -10,22 +10,15 @@
 
 #include <optional>
 
-#include <QSharedDataPointer>
+#include <QMultiMap>
 
 class QDomElement;
-class QXmppOmemoElementPrivate;
 class QXmppOmemoEnvelope;
 class QXmlStreamWriter;
 
-class QXMPP_EXPORT QXmppOmemoElement
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoElement
 {
 public:
-    QXmppOmemoElement();
-    QXmppOmemoElement(const QXmppOmemoElement &other);
-    ~QXmppOmemoElement();
-
-    QXmppOmemoElement &operator=(const QXmppOmemoElement &other);
-
     uint32_t senderDeviceId() const;
     void setSenderDeviceId(uint32_t id);
 
@@ -43,7 +36,9 @@ public:
     static bool isOmemoElement(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppOmemoElementPrivate> d;
+    uint32_t m_senderDeviceId = 0;
+    QByteArray m_payload;
+    QMultiMap<QString, QXmppOmemoEnvelope> m_envelopes;
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoElement, Q_MOVABLE_TYPE);

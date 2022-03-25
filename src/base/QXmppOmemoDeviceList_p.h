@@ -14,15 +14,9 @@ class QDomElement;
 class QXmlStreamWriter;
 class QXmppOmemoDeviceElement;
 
-class QXMPP_EXPORT QXmppOmemoDeviceList : public QList<QXmppOmemoDeviceElement>
+class QXMPP_AUTOTEST_EXPORT QXmppOmemoDeviceList : public QList<QXmppOmemoDeviceElement>
 {
 public:
-    QXmppOmemoDeviceList();
-    QXmppOmemoDeviceList(const QXmppOmemoDeviceList &other);
-    ~QXmppOmemoDeviceList();
-
-    QXmppOmemoDeviceList &operator=(const QXmppOmemoDeviceList &other);
-
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
