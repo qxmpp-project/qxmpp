@@ -972,15 +972,15 @@ void QXmppMessage::setMixUserNick(const QString &mixUserNick)
 ///
 /// \since QXmpp 1.1
 ///
-QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
+QXmpp::Encryption QXmppMessage::encryptionMethod() const
 {
     if (d->encryptionMethod.isEmpty())
-        return QXmppMessage::NoEncryption;
+        return QXmpp::NoEncryption;
 
     int index = ENCRYPTION_NAMESPACES.indexOf(d->encryptionMethod);
     if (index < 0)
-        return QXmppMessage::UnknownEncryption;
-    return static_cast<QXmppMessage::EncryptionMethod>(index);
+        return QXmpp::UnknownEncryption;
+    return static_cast<QXmpp::Encryption>(index);
 }
 
 ///
@@ -989,7 +989,7 @@ QXmppMessage::EncryptionMethod QXmppMessage::encryptionMethod() const
 ///
 /// \since QXmpp 1.1
 ///
-void QXmppMessage::setEncryptionMethod(QXmppMessage::EncryptionMethod method)
+void QXmppMessage::setEncryptionMethod(QXmpp::Encryption method)
 {
     d->encryptionMethod = ENCRYPTION_NAMESPACES.at(int(method));
 }
