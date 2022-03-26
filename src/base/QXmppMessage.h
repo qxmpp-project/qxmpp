@@ -29,6 +29,19 @@ class QXmppTrustMessageElement;
 class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 {
 public:
+/// \cond
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+    using EncryptionMethod = QXmpp::Encryption;
+
+    static const EncryptionMethod NoEncryption = EncryptionMethod::NoEncryption;
+    static const EncryptionMethod UnknownEncryption = EncryptionMethod::UnknownEncryption;
+    static const EncryptionMethod OTR = EncryptionMethod::Otr;
+    static const EncryptionMethod LegacyOpenPGP = EncryptionMethod::LegacyOpenPgp;
+    static const EncryptionMethod OX = EncryptionMethod::Ox;
+    static const EncryptionMethod OMEMO = EncryptionMethod::Omemo;
+#endif
+/// \endcond
+
     /// This enum describes a message type.
     enum Type {
         Error = 0,
@@ -75,24 +88,6 @@ public:
         NoStore = 1 << 1,           ///< Do not store at all
         NoCopy = 1 << 2,            ///< Do not copy the message
         Store = 1 << 3              ///< Do store the message
-    };
-
-    ///
-    /// This enum describes different end-to-end encryption methods. These can
-    /// be used to mark a message explicitly as encrypted with a specific
-    /// algorithm. See \xep{0380, Explicit Message Encryption} for details.
-    ///
-    /// \since QXmpp 1.1
-    ///
-    enum EncryptionMethod {
-        NoEncryption,       ///< No encryption
-        UnknownEncryption,  ///< Unknown encryption
-        OTR,                ///< \xep{0364, Current Off-the-Record Messaging Usage}
-        LegacyOpenPGP,      ///< \xep{0027, Current Jabber OpenPGP Usage}
-        OX,                 ///< \xep{0373, OpenPGP for XMPP}
-        OMEMO,              ///< \xep{0384, OMEMO Encryption}
-        OMEMO1,             ///< \xep{0384, OMEMO Encryption} since version 0.4
-        OMEMO2              ///< \xep{0384, OMEMO Encryption} since version 0.8
     };
 
     QXmppMessage(const QString &from = QString(), const QString &to = QString(),
@@ -220,8 +215,8 @@ public:
     void setMixUserNick(const QString &);
 
     // XEP-0380: Explicit Message Encryption
-    EncryptionMethod encryptionMethod() const;
-    void setEncryptionMethod(EncryptionMethod);
+    QXmpp::Encryption encryptionMethod() const;
+    void setEncryptionMethod(QXmpp::Encryption);
     QString encryptionMethodNs() const;
     void setEncryptionMethodNs(const QString &);
 

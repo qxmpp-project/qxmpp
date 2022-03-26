@@ -136,7 +136,7 @@ void tst_QXmppMessage::testBasic()
     QCOMPARE(message.isReceiptRequested(), false);
     QCOMPARE(message.receiptId(), QString());
     QCOMPARE(message.xhtml(), QString());
-    QCOMPARE(message.encryptionMethod(), QXmppMessage::NoEncryption);
+    QCOMPARE(message.encryptionMethod(), QXmpp::NoEncryption);
     QVERIFY(!message.isSpoiler());
     QVERIFY(!message.hasHint(QXmppMessage::NoPermanentStore));
     QVERIFY(!message.hasHint(QXmppMessage::NoStore));
@@ -776,7 +776,7 @@ void tst_QXmppMessage::testEme()
     QXmppMessage messageOmemo;
     parsePacket(messageOmemo, xmlOmemo);
     QCOMPARE(messageOmemo.encryptionMethodNs(), QString("eu.siacs.conversations.axolotl"));
-    QCOMPARE(messageOmemo.encryptionMethod(), QXmppMessage::OMEMO);
+    QCOMPARE(messageOmemo.encryptionMethod(), QXmpp::OMEMO);
     QCOMPARE(messageOmemo.encryptionName(), QString("OMEMO"));
     serializePacket(messageOmemo, xmlOmemo);
 
@@ -790,20 +790,20 @@ void tst_QXmppMessage::testEme()
     QXmppMessage messageCustom;
     parsePacket(messageCustom, xmlCustom);
     QCOMPARE(messageCustom.encryptionMethodNs(), QString("im:example:customcrypt:1"));
-    QCOMPARE(messageCustom.encryptionMethod(), QXmppMessage::UnknownEncryption);
+    QCOMPARE(messageCustom.encryptionMethod(), QXmpp::UnknownEncryption);
     QCOMPARE(messageCustom.encryptionName(), QString("CustomCrypt"));
     serializePacket(messageCustom, xmlCustom);
 
     // test setters/getters
     QXmppMessage message;
-    message.setEncryptionMethod(QXmppMessage::LegacyOpenPGP);
-    QCOMPARE(message.encryptionMethod(), QXmppMessage::LegacyOpenPGP);
+    message.setEncryptionMethod(QXmpp::LegacyOpenPGP);
+    QCOMPARE(message.encryptionMethod(), QXmpp::LegacyOpenPGP);
     QCOMPARE(message.encryptionMethodNs(), QString("jabber:x:encrypted"));
     QCOMPARE(message.encryptionName(), QString("Legacy OpenPGP"));
 
     message.setEncryptionMethodNs("fancyorg:encryption:fancycrypt:0");
     message.setEncryptionName("FancyCrypt");
-    QCOMPARE(message.encryptionMethod(), QXmppMessage::UnknownEncryption);
+    QCOMPARE(message.encryptionMethod(), QXmpp::UnknownEncryption);
     QCOMPARE(message.encryptionMethodNs(), QString("fancyorg:encryption:fancycrypt:0"));
     QCOMPARE(message.encryptionName(), QString("FancyCrypt"));
 }
