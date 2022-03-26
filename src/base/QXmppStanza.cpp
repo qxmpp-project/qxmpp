@@ -703,6 +703,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 class QXmppE2eeMetadataPrivate : public QSharedData
 {
 public:
+    QXmpp::Encryption encryption;
     QByteArray senderKey;
 
     // XEP-0420: Stanza Content Encryption
@@ -750,6 +751,26 @@ std::optional<QXmppE2eeMetadata> QXmppE2eeMetadata::toOptional() const
 /// \param other
 ///
 QXmppE2eeMetadata &QXmppE2eeMetadata::operator=(const QXmppE2eeMetadata &other) = default;
+
+///
+/// Returns the used encryption protocol.
+///
+/// \return the encryption protocol
+///
+QXmpp::Encryption QXmppE2eeMetadata::encryption() const
+{
+    return d->encryption;
+}
+
+///
+/// Sets the used encryption protocol.
+///
+/// \param encryption encryption protocol
+///
+void QXmppE2eeMetadata::setEncryption(QXmpp::Encryption encryption)
+{
+    d->encryption = encryption;
+}
 
 ///
 /// Returns the ID of this stanza's sender's public long-term key.

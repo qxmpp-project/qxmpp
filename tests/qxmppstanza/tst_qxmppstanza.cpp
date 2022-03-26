@@ -28,6 +28,7 @@ private slots:
     void testErrorRetry();
     void testErrorEnums();
 
+    void testEncryption();
     void testSenderKey();
     void testSceTimestamp();
 };
@@ -398,6 +399,16 @@ void tst_QXmppStanza::testErrorEnums()
     err.setType(QXmppStanza::Error::Type(-1));
     QVERIFY(!err.conditionOpt().has_value());
     QVERIFY(!err.typeOpt().has_value());
+}
+
+void tst_QXmppStanza::testEncryption()
+{
+    QXmppStanzaStub stanza;
+    QVERIFY(!stanza.e2eeMetadata().has_value());
+    QXmppE2eeMetadata e2eeMetadata;
+    e2eeMetadata.setEncryption(QXmpp::Omemo2);
+    stanza.setE2eeMetadata(e2eeMetadata);
+    QCOMPARE(stanza.e2eeMetadata()->encryption(), QXmpp::Omemo2);
 }
 
 void tst_QXmppStanza::testSenderKey()
