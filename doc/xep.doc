@@ -51,6 +51,7 @@ Complete:
 - \xep{0308, Last Message Correction}
 - \xep{0313, Message Archive Management} (v0.6)
 - \xep{0319, Last User Interaction in Presence}
+- \xep{0333, Chat Markers} (v0.4)
 - \xep{0334, Message Processing Hints} (v0.3)
 - \xep{0352, Client State Indication}
 - \xep{0357, Push Notifications} (v0.4) (partially)
