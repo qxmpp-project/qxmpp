@@ -409,6 +409,25 @@ QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza)
 }
 
 ///
+/// Sends the stanza with the same encryption as \p e2eeMetadata.
+///
+/// When there is no e2eeMetadata given this always sends the stanza without
+/// end-to-end encryption.
+/// Intended to be used for replies to IQs and messages.
+///
+/// \since QXmpp 1.5
+///
+QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
+{
+    // This should pick the right e2ee manager as soon as multiple encryptions
+    // in parallel are supported.
+    if (e2eeMetadata) {
+        return send(std::move(stanza));
+    }
+    return sendUnencrypted(std::move(stanza));
+}
+
+///
 /// Sends an IQ packet and returns the response asynchronously.
 ///
 /// This is useful for further processing and parsing of the returned

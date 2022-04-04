@@ -217,6 +217,7 @@ public:
 
     QFuture<QXmpp::SendResult> send(QXmppStanza &&);
     QFuture<QXmpp::SendResult> sendUnencrypted(QXmppStanza &&);
+    QFuture<QXmpp::SendResult> reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
     QFuture<IqResult> sendIq(QXmppIq &&);
     QFuture<IqResult> sendSensitiveIq(QXmppIq &&);
     QFuture<EmptyResult> sendGenericIq(QXmppIq &&);
