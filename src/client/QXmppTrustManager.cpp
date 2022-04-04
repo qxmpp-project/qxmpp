@@ -264,13 +264,6 @@ QFuture<void> QXmppTrustManager::resetAll(const QString &encryption)
     return m_trustStorage->resetAll(encryption);
 }
 
-/// \cond
-bool QXmppTrustManager::handleStanza(const QDomElement &)
-{
-    return false;
-}
-/// \endcond
-
 ///
 /// \fn QXmppTrustManager::trustLevelsChanged(const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys)
 ///

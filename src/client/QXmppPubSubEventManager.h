@@ -15,12 +15,6 @@ class QXMPP_EXPORT QXmppPubSubEventManager : public QXmppClientExtension, public
 {
     Q_OBJECT
 
-public:
-    inline bool handleStanza(const QDomElement &) override
-    {
-        return false;
-    }
-
 protected:
     inline QXmppPubSubManager *pubSub()
     {

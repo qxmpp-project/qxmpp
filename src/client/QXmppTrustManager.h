@@ -38,10 +38,6 @@ public:
 
     QFuture<void> resetAll(const QString &encryption);
 
-    /// \cond
-    bool handleStanza(const QDomElement &stanza) override;
-    /// \endcond
-
     Q_SIGNAL void trustLevelsChanged(const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys);
 
 protected:

@@ -37,7 +37,6 @@ Q_SIGNALS:
 
 protected:
     void setClient(QXmppClient *client) override;
-    bool handleStanza(const QDomElement &stanza) override;
 
 private Q_SLOTS:
     void handleMessageReceived(const QXmppMessage &message);
