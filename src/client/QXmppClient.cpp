@@ -107,6 +107,20 @@ QStringList QXmppClientPrivate::discoveryFeatures()
 }
 /// \endcond
 
+namespace QXmpp::Private::StanzaPipeline {
+
+bool process(const QList<QXmppClientExtension *> &extensions, const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
+{
+    for (auto *extension : extensions) {
+        if (extension->handleStanza(element, e2eeMetadata) || extension->handleStanza(element)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+}
+
 ///
 /// \typedef QXmppClient::IqResult
 ///
@@ -765,20 +779,14 @@ QXmppVersionManager &QXmppClient::versionManager()
     return *findExtension<QXmppVersionManager>();
 }
 
+///
 /// Give extensions a chance to handle incoming stanzas.
 ///
-/// \param element
-/// \param handled
-
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
-    const std::optional<QXmppE2eeMetadata> e2eeMetadata;
-    for (auto *extension : std::as_const(d->extensions)) {
-        if (extension->handleStanza(element, e2eeMetadata) || extension->handleStanza(element)) {
-            handled = true;
-            return;
-        }
-    }
+    // The stanza comes directly from the XMPP stream, so it's not end-to-end
+    // encrypted and there's no e2ee metadata (std::nullopt).
+    handled = StanzaPipeline::process(d->extensions, element, std::nullopt);
 }
 
 void QXmppClient::_q_reconnect()
