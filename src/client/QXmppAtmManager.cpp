@@ -243,11 +243,6 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 }
 
 /// \cond
-bool QXmppAtmManager::handleStanza(const QDomElement &)
-{
-    return false;
-}
-
 void QXmppAtmManager::setClient(QXmppClient *client)
 {
     QXmppClientExtension::setClient(client);

@@ -191,14 +191,6 @@ void QXmppAttentionManager::setClient(QXmppClient *client)
             this, &QXmppAttentionManager::handleMessageReceived);
 }
 
-///
-/// Empty reimplementation
-///
-bool QXmppAttentionManager::handleStanza(const QDomElement &)
-{
-    return false;
-}
-
 void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
 {
     if (!message.isAttentionRequested() || !message.stamp().isNull()) {

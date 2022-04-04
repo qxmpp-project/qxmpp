@@ -20,10 +20,8 @@ public:
     QXmppAtmManager(QXmppAtmTrustStorage *trustStorage);
     QFuture<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting = {});
 
-    /// \cond
-    bool handleStanza(const QDomElement &stanza) override;
-
 protected:
+    /// \cond
     void setClient(QXmppClient *client) override;
 
 private slots:
