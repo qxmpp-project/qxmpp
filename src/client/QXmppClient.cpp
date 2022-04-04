@@ -111,8 +111,13 @@ namespace QXmpp::Private::StanzaPipeline {
 
 bool process(const QList<QXmppClientExtension *> &extensions, const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
+    const bool unencrypted = !e2eeMetadata.has_value();
     for (auto *extension : extensions) {
-        if (extension->handleStanza(element, e2eeMetadata) || extension->handleStanza(element)) {
+        // e2e encrypted stanzas are not passed to the old handleStanza() overload, because such
+        // managers are likely not handling the encrypted contents correctly (e.g. sending
+        // unencrypted replies and thereby leaking information).
+        if (extension->handleStanza(element, e2eeMetadata) ||
+            (unencrypted && extension->handleStanza(element))) {
             return true;
         }
     }
