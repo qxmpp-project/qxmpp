@@ -753,8 +753,9 @@ QXmppVersionManager &QXmppClient::versionManager()
 
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
+    const std::optional<QXmppE2eeMetadata> e2eeMetadata;
     for (auto *extension : std::as_const(d->extensions)) {
-        if (extension->handleStanza(element)) {
+        if (extension->handleStanza(element, e2eeMetadata) || extension->handleStanza(element)) {
             handled = true;
             return;
         }

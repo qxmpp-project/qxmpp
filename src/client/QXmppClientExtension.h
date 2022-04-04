@@ -14,6 +14,7 @@ class QXmppClient;
 class QXmppClientExtensionPrivate;
 class QXmppStream;
 
+///
 /// \brief The QXmppClientExtension class is the base class for QXmppClient
 /// extensions.
 ///
@@ -23,7 +24,7 @@ class QXmppStream;
 /// client instance using QXmppClient::addExtension().
 ///
 /// \ingroup Core
-
+///
 class QXMPP_EXPORT QXmppClientExtension : public QXmppLoggable
 {
     Q_OBJECT
@@ -35,13 +36,8 @@ public:
     virtual QStringList discoveryFeatures() const;
     virtual QList<QXmppDiscoveryIq::Identity> discoveryIdentities() const;
 
-    /// \brief You need to implement this method to process incoming XMPP
-    /// stanzas.
-    ///
-    /// You should return true if the stanza was handled and no further
-    /// processing should occur, or false to let other extensions process
-    /// the stanza.
-    virtual bool handleStanza(const QDomElement &stanza) = 0;
+    virtual bool handleStanza(const QDomElement &stanza);
+    virtual bool handleStanza(const QDomElement &stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
 
 protected:
     QXmppClient *client();
