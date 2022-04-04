@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPGLOBAL_H
-#define QXMPPGLOBAL_H
+#ifndef QXMPPBUILDCONSTANTS_H
+#define QXMPPBUILDCONSTANTS_H
 
 #include <QString>
 
@@ -106,4 +106,4 @@ struct Success
 
 }
 
-#endif  // QXMPPGLOBAL_H
+#endif  // QXMPPBUILDCONSTANTS_H

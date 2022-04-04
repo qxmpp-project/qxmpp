@@ -16,11 +16,11 @@ if(BUILD_SHARED)
 else()
     set(QXMPP_BUILD_SHARED false)
 endif()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppGlobal.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppBuildConstants.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppBuildConstants.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/base)
 
 set(INSTALL_HEADER_FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppGlobal.h
+    ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppBuildConstants.h
 
     # Base
     base/QXmppArchiveIq.h
@@ -38,6 +38,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppEntityTimeIq.h
     base/QXmppFutureUtils_p.h
     base/QXmppGeolocItem.h
+    base/QXmppGlobal.h
     base/QXmppHttpUploadIq.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
