@@ -10,7 +10,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
 
-# Configure QXmppGlobal.h.in
+# Configure QXmppBuildConstants.h.in
 if(BUILD_SHARED)
     set(QXMPP_BUILD_SHARED true)
 else()
