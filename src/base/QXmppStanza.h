@@ -13,7 +13,6 @@
 
 #include <QByteArray>
 #include <QSharedData>
-//#include <QString>
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
 // include the whole header.
