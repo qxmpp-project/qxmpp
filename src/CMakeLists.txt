@@ -153,6 +153,7 @@ set(SOURCE_FILES
     base/QXmppElement.cpp
     base/QXmppEntityTimeIq.cpp
     base/QXmppGeolocItem.cpp
+    base/QXmppGlobal.cpp
     base/QXmppHttpUploadIq.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp

@@ -9,6 +9,7 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
+#include "QXmppGlobal_p.h"
 #include "QXmppMixInvitation.h"
 #include "QXmppOmemoElement.h"
 #include "QXmppTrustMessageElement.h"
@@ -43,33 +44,11 @@ static const QStringList MARKER_TYPES = {
     QStringLiteral("acknowledged")
 };
 
-static const QStringList ENCRYPTION_NAMESPACES = {
-    QString(),
-    QString(),
-    ns_otr,
-    ns_legacy_openpgp,
-    ns_ox,
-    ns_omemo,
-    ns_omemo_1,
-    ns_omemo_2
-};
-
 static const QStringList HINT_TYPES = {
     QStringLiteral("no-permanent-store"),
     QStringLiteral("no-store"),
     QStringLiteral("no-copy"),
     QStringLiteral("store")
-};
-
-static const QStringList ENCRYPTION_NAMES = {
-    QString(),
-    QString(),
-    QStringLiteral("OTR"),
-    QStringLiteral("Legacy OpenPGP"),
-    QStringLiteral("OpenPGP for XMPP (OX)"),
-    QStringLiteral("OMEMO"),
-    QStringLiteral("OMEMO 1"),
-    QStringLiteral("OMEMO 2")
 };
 
 static bool checkElement(const QDomElement &element, const QString &tagName, const QString &xmlns)
@@ -974,13 +953,10 @@ void QXmppMessage::setMixUserNick(const QString &mixUserNick)
 ///
 QXmpp::Encryption QXmppMessage::encryptionMethod() const
 {
-    if (d->encryptionMethod.isEmpty())
+    if (d->encryptionMethod.isEmpty()) {
         return QXmpp::NoEncryption;
-
-    int index = ENCRYPTION_NAMESPACES.indexOf(d->encryptionMethod);
-    if (index < 0)
-        return QXmpp::UnknownEncryption;
-    return static_cast<QXmpp::Encryption>(index);
+    }
+    return QXmpp::Private::encryptionFromString(d->encryptionMethod).value_or(QXmpp::UnknownEncryption);
 }
 
 ///
@@ -991,7 +967,7 @@ QXmpp::Encryption QXmppMessage::encryptionMethod() const
 ///
 void QXmppMessage::setEncryptionMethod(QXmpp::Encryption method)
 {
-    d->encryptionMethod = ENCRYPTION_NAMESPACES.at(int(method));
+    d->encryptionMethod = QXmpp::Private::encryptionToString(method);
 }
 
 ///
@@ -1027,7 +1003,7 @@ QString QXmppMessage::encryptionName() const
 {
     if (!d->encryptionName.isEmpty())
         return d->encryptionName;
-    return ENCRYPTION_NAMES.at(int(encryptionMethod()));
+    return QXmpp::Private::encryptionToName(encryptionMethod());
 }
 
 ///
