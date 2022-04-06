@@ -5,6 +5,7 @@
 #ifndef QXMPPCLIENTEXTENSION_H
 #define QXMPPCLIENTEXTENSION_H
 
+#include "QXmppExtension.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppLogger.h"
 
@@ -25,7 +26,7 @@ class QXmppStream;
 ///
 /// \ingroup Core
 ///
-class QXMPP_EXPORT QXmppClientExtension : public QXmppLoggable
+class QXMPP_EXPORT QXmppClientExtension : public QXmppLoggable, public QXmppExtension
 {
     Q_OBJECT
 
