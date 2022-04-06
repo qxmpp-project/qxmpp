@@ -43,6 +43,7 @@ You can pass the following arguments to CMake:
     BUILD_DOCUMENTATION           to build the documentation (default: false)
     BUILD_EXAMPLES                to build the examples (default: true)
     BUILD_TESTS                   to build the unit tests (default: true)
+    BUILD_INTERNAL_TESTS          to build the unit tests for internal classes marked with QXMPP_AUTOTEST_EXPORT (default: false)
     WITH_GSTREAMER                to enable audio/video over jingle (default: false)
 
 Installing QXmpp
