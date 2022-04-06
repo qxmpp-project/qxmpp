@@ -15,6 +15,7 @@ Complete:
 - \xep{0048, Bookmarks}
 - \xep{0054, vcard-temp}
 - \xep{0059, Result Set Management}
+- \xep{0060, Publish-Subscribe} (partially)
 - \xep{0065, SOCKS5 Bytestreams}
 - \xep{0066, Out of Band Data} (partially)
 - \xep{0071, XHTML-IM}
@@ -33,6 +34,7 @@ Complete:
 - \xep{0128, Service Discovery Extensions}
 - \xep{0136, Message Archiving}
 - \xep{0153, vCard-Based Avatars}
+- \xep{0163, Personal Eventing Protocol}
 - \xep{0166, Jingle}
 - \xep{0167, Jingle RTP Sessions}
 - \xep{0176, Jingle ICE-UDP Transport Method}
@@ -67,7 +69,6 @@ Complete:
 
 Ongoing:
 - \xep{0009, Jabber-RPC} (API is not finalized yet)
-- \xep{0060, Publish-Subscribe} (Only basic IQ implemented)
 - \xep{0369, Mediated Information eXchange (MIX)} (Only IQ queries implemented) (v0.14)
 - \xep{0384, OMEMO Encryption} (Only wire protocol data classes implemented) (v0.8)
 - \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements} (Only IQ queries implemented) (v0.4)
