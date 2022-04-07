@@ -102,6 +102,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppEntityTimeManager.h
     client/QXmppInvokable.h
     client/QXmppMamManager.h
+    client/QXmppMessageHandler.h
     client/QXmppMessageReceiptManager.h
     client/QXmppMucManager.h
     client/QXmppOutgoingClient.h

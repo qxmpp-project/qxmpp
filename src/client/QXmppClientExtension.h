@@ -13,6 +13,7 @@ class QDomElement;
 
 class QXmppClient;
 class QXmppClientExtensionPrivate;
+class QXmppMessage;
 class QXmppStream;
 
 ///
@@ -45,6 +46,7 @@ protected:
     virtual void setClient(QXmppClient *client);
 
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
+    bool injectMessage(QXmppMessage &&message);
 
 private:
     QXmppClientExtensionPrivate *const d;

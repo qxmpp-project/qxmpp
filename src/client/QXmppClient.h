@@ -309,6 +309,7 @@ public Q_SLOTS:
 
 private:
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
+    bool injectMessage(QXmppMessage &&message);
 
 private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);

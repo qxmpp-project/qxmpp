@@ -14,6 +14,7 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppMessageHandler.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppPacket_p.h"
 #include "QXmppRosterManager.h"
@@ -122,6 +123,32 @@ bool process(const QList<QXmppClientExtension *> &extensions, const QDomElement 
         }
     }
     return false;
+}
+
+}
+
+namespace QXmpp::Private::MessagePipeline {
+
+bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extensions, QXmppMessage &&message)
+{
+    for (auto *extension : extensions) {
+        if (auto *messageHandler = dynamic_cast<QXmppMessageHandler *>(extension)) {
+            if (messageHandler->handleMessage(message)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extensions, const QDomElement &element)
+{
+    if (element.tagName() != "message") {
+        return false;
+    }
+    QXmppMessage message;
+    message.parse(element);
+    return process(client, extensions, std::move(message));
 }
 
 }
@@ -808,13 +835,27 @@ void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmpp
 }
 
 ///
+/// Processes the message with message handlers and emits messageReceived as a fallback.
+///
+bool QXmppClient::injectMessage(QXmppMessage &&message)
+{
+    auto handled = MessagePipeline::process(this, d->extensions, std::move(message));
+    if (!handled) {
+        // no extension handled the message
+        emit messageReceived(message);
+    }
+    return handled;
+}
+
+///
 /// Give extensions a chance to handle incoming stanzas.
 ///
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
     // The stanza comes directly from the XMPP stream, so it's not end-to-end
     // encrypted and there's no e2ee metadata (std::nullopt).
-    handled = StanzaPipeline::process(d->extensions, element, std::nullopt);
+    handled = StanzaPipeline::process(d->extensions, element, std::nullopt) ||
+        MessagePipeline::process(this, d->extensions, element);
 }
 
 void QXmppClient::_q_reconnect()

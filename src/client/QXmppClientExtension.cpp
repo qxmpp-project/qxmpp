@@ -119,3 +119,16 @@ void QXmppClientExtension::injectIq(const QDomElement &element, const std::optio
 {
     client()->injectIq(element, e2eeMetadata);
 }
+
+///
+/// Injects a message stanza into the client.
+///
+/// The stanza is processed by the client with all extensions implementing
+/// MessageHandler.
+///
+/// \since QXmpp 1.5
+///
+bool QXmppClientExtension::injectMessage(QXmppMessage &&message)
+{
+    return client()->injectMessage(std::move(message));
+}
