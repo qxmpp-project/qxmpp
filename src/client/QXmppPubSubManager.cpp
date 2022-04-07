@@ -643,6 +643,46 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(
 }
 
 ///
+/// Subscribes to a node.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \param serviceJid JID of the pubsub service
+/// \param nodeName name of the pubsub node being subscribed
+/// \param subscriberJid bare or full JID of the subscriber
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::subscribeToNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setTo(serviceJid);
+    request.setQueryNode(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Subscribe);
+    request.setQueryJid(subscriberJid);
+    return client()->sendGenericIq(std::move(request));
+}
+
+///
+/// Unsubscribes from a node.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \param serviceJid JID of the pubsub service
+/// \param nodeName name of the pubsub node being subscribed
+/// \param subscriberJid bare or full JID of the subscriber
+///
+QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setTo(serviceJid);
+    request.setQueryNode(nodeName);
+    request.setQueryType(QXmppPubSubIq<>::Unsubscribe);
+    request.setQueryJid(subscriberJid);
+    return client()->sendGenericIq(std::move(request));
+}
+
+///
 /// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName)
 ///
 /// Creates an empty PEP node with the default configuration.

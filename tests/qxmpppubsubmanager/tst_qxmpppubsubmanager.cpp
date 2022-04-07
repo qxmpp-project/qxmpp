@@ -97,6 +97,8 @@ private:
     Q_SLOT void testRequestNodeConfig();
     Q_SLOT void testConfigureNode();
     Q_SLOT void testCancelConfig();
+    Q_SLOT void testSubscribeToNode();
+    Q_SLOT void testUnsubscribeFromNode();
     Q_SLOT void testEventNotifications_data();
     Q_SLOT void testEventNotifications();
 };
@@ -982,6 +984,40 @@ void tst_QXmppPubSubManager::testCancelConfig()
                 "</pubsub>"
                 "</iq>");
     test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testSubscribeToNode()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->subscribeToNode(QStringLiteral("pubsub.shakespeare.lit"), QStringLiteral("princely_musings"), QStringLiteral("francisco@denmark.lit"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='set'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<subscribe jid='francisco@denmark.lit' node='princely_musings'/>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<subscription jid='francisco@denmark.lit' node='princely_musings' subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3' subscription='subscribed'/>"
+                               "</pubsub></iq>"));
+
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testUnsubscribeFromNode()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->unsubscribeFromNode(QStringLiteral("pubsub.shakespeare.lit"), QStringLiteral("princely_musings"), QStringLiteral("francisco@denmark.lit"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='set'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<unsubscribe jid='francisco@denmark.lit' node='princely_musings'/>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<subscription jid='francisco@denmark.lit' node='princely_musings' subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3' subscription='none'/>"
+                               "</pubsub></iq>"));
+
     expectFutureVariant<QXmpp::Success>(future);
 }
 

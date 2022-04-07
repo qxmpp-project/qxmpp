@@ -96,6 +96,8 @@ public:
     QFuture<NodeConfigResult> requestNodeConfiguration(const QString &service, const QString &nodeName);
     QFuture<Result> configureNode(const QString &service, const QString &nodeName, const QXmppPubSubNodeConfig &config);
     QFuture<Result> cancelNodeConfiguration(const QString &service, const QString &nodeName);
+    QFuture<Result> subscribeToNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
+    QFuture<Result> unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
 
     // PEP-specific (the PubSub service is the current account)
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
