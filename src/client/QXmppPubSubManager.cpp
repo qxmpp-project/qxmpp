@@ -105,6 +105,13 @@ using namespace QXmpp::Private;
 ///
 
 ///
+/// \typedef QXmppPubSubManager::ItemIdsResult
+///
+/// Contains all item IDs that have been found (QVector<QString>) or the
+/// returned IQ error (QXmppStanza::Error).
+///
+
+///
 /// \typedef QXmppPubSubManager::PublishItemResult
 ///
 /// Contains the ID of the item, if no ID was set in the request (QString) or
@@ -301,6 +308,36 @@ auto QXmppPubSubManager::deleteNode(const QString &jid, const QString &nodeName)
     request.setTo(jid);
 
     return client()->sendGenericIq(std::move(request));
+}
+
+///
+/// Requests the IDs of all items of a pubsub service node via service
+/// discovery.
+///
+/// This uses a \xep{0030, Service Discovery} items request to get a list of
+/// items.
+///
+/// \param serviceJid JID of the entity hosting the pubsub service
+/// \param nodeName the name of the node whose items are requested
+/// \return
+///
+QFuture<QXmppPubSubManager::ItemIdsResult> QXmppPubSubManager::requestItemIds(const QString &serviceJid, const QString &nodeName)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    request.setQueryNode(nodeName);
+    request.setTo(serviceJid);
+
+    return chainIq(client()->sendIq(std::move(request)), this, [](QXmppDiscoveryIq &&iq) -> ItemIdsResult {
+        const auto queryItems = iq.items();
+        QVector<QString> itemIds;
+        itemIds.reserve(queryItems.size());
+        for (const auto &queryItem : queryItems) {
+            itemIds << queryItem.name();
+        }
+        return itemIds;
+    });
 }
 
 ///

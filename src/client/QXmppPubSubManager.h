@@ -46,6 +46,7 @@ public:
     using ItemResult = std::variant<T, QXmppStanza::Error>;
     template<typename T>
     using ItemsResult = std::variant<Items<T>, QXmppStanza::Error>;
+    using ItemIdsResult = std::variant<QVector<QString>, QXmppStanza::Error>;
     using PublishItemResult = std::variant<QString, QXmppStanza::Error>;
     using PublishItemsResult = std::variant<QVector<QString>, QXmppStanza::Error>;
     using SubscriptionsResult = std::variant<QVector<QXmppPubSubSubscription>, QXmppStanza::Error>;
@@ -63,6 +64,7 @@ public:
     QFuture<InstantNodeResult> createInstantNode(const QString &jid);
     QFuture<InstantNodeResult> createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config);
     QFuture<Result> deleteNode(const QString &jid, const QString &nodeName);
+    QFuture<ItemIdsResult> requestItemIds(const QString &serviceJid, const QString &nodeName);
     template<typename T = QXmppPubSubItem>
     QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
     template<typename T = QXmppPubSubItem>

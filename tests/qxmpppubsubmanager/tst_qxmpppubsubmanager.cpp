@@ -83,6 +83,7 @@ private:
     Q_SLOT void testRetractCurrentPepItem();
     Q_SLOT void testPurgeItems();
     Q_SLOT void testPurgePepItems();
+    Q_SLOT void testRequestItemIds();
     Q_SLOT void testRequestCurrentItem();
     Q_SLOT void testRequestItems_data();
     Q_SLOT void testRequestItems();
@@ -522,6 +523,24 @@ void tst_QXmppPubSubManager::testPurgePepItems()
                 "</pubsub></iq>");
     test.inject(QStringLiteral("<iq type='result' from='user@qxmpp.org' id='qxmpp1'/>"));
     expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testRequestItemIds()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestItemIds(QStringLiteral("pubsub.shakespeare.lit"), QStringLiteral("princely_musings"));
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items' node='princely_musings'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items' node='princely_musings'>"
+                               "<item jid='pubsub.shakespeare.lit' name='368866411b877c30064a5f62b917cffe'/>"
+                               "<item jid='pubsub.shakespeare.lit' name='3300659945416e274474e469a1f0154c'/>"
+                               "</query></iq>"));
+
+    auto itemIds = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(itemIds, (QVector<QString> { QStringLiteral("368866411b877c30064a5f62b917cffe"), QStringLiteral("3300659945416e274474e469a1f0154c") }));
 }
 
 void tst_QXmppPubSubManager::testRequestCurrentItem()
