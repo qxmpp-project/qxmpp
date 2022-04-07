@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -24,6 +25,13 @@ class QXMPP_EXPORT QXmppPubSubManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    ///
+    /// Pre-defined ID of a PubSub item
+    ///
+    enum StandardItemId {
+        Current  ///< Item of a singleton node
+    };
+
     template<typename T>
     struct Items
     {
@@ -58,6 +66,8 @@ public:
     template<typename T = QXmppPubSubItem>
     QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
     template<typename T = QXmppPubSubItem>
+    QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
+    template<typename T = QXmppPubSubItem>
     QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName);
     template<typename T = QXmppPubSubItem>
     QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
@@ -70,6 +80,7 @@ public:
     template<typename T>
     QFuture<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
     QFuture<Result> retractItem(const QString &jid, const QString &nodeName, const QString &itemId);
+    QFuture<Result> retractItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
     QFuture<Result> purgeItems(const QString &jid, const QString &nodeName);
     QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid);
     QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid, const QString &nodeName);
@@ -97,6 +108,7 @@ public:
     template<typename T>
     QFuture<PublishItemsResult> publishPepItems(const QString &nodeName, const QVector<T> &items);
     inline QFuture<Result> retractPepItem(const QString &nodeName, const QString &itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
+    inline QFuture<Result> retractPepItem(const QString &nodeName, StandardItemId itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
     inline QFuture<Result> purgePepItems(const QString &nodeName) { return purgeItems(client()->configuration().jidBare(), nodeName); }
     inline QFuture<NodeConfigResult> requestPepNodeConfiguration(const QString &nodeName) { return requestNodeConfiguration(client()->configuration().jidBare(), nodeName); }
     inline QFuture<Result> configurePepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return configureNode(client()->configuration().jidBare(), nodeName, config); }
@@ -108,11 +120,11 @@ public:
     /// \endcond
 
 private:
-    /// \cond
     QFuture<PublishItemResult> publishItem(QXmppPubSubIqBase &&iq);
     QFuture<PublishItemsResult> publishItems(QXmppPubSubIqBase &&iq);
     static QXmppPubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
-    /// \endcond
+
+    static QString standardItemIdToString(StandardItemId itemId);
 
     // We may need a d-ptr in the future.
     void *d = nullptr;
@@ -141,6 +153,26 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
                        }
                        return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No such item has been found."));
                    });
+}
+
+///
+/// Requests a specific item of an entity's node.
+///
+/// The default value of itemId is used for singleton nodes (i.e., the node's
+/// single item is requested).
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
+/// should be an account's bare JID
+/// \param nodeName the name of the node to query
+/// \param itemId the ID of the item to retrieve
+/// \return
+///
+template<typename T>
+QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
+                                                                           const QString &nodeName,
+                                                                           StandardItemId itemId)
+{
+    return requestItem(jid, nodeName, standardItemIdToString(itemId));
 }
 
 ///

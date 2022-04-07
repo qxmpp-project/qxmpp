@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2020 Germán Márquez Mejía <mancho@olomono.de>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -323,6 +324,21 @@ auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName
 }
 
 ///
+/// Deletes an item from a pubsub node.
+///
+/// The default value of itemId is used for singleton nodes (i.e., the node's
+/// single item is deleted).
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to delete the item from
+/// \param itemId the ID of the item to delete
+///
+auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName, StandardItemId itemId) -> QFuture<Result>
+{
+    return retractItem(jid, nodeName, standardItemIdToString(itemId));
+}
+
+///
 /// Purges all items from a node.
 ///
 /// \param jid Jabber ID of the entity hosting the pubsub service
@@ -636,7 +652,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(
 ///
 
 ///
-/// \fn QXmppPubSubManager::retractPepItem
+/// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId)
 ///
 /// Deletes an item from a PEP node.
 ///
@@ -645,7 +661,21 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::cancelNodeConfiguration(
 ///
 /// \param nodeName the name of the PEP node to delete the item from
 /// \param itemId the ID of the item to delete
-/// \return
+///
+
+///
+/// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, StandardItemId itemId)
+///
+/// Deletes an item from a PEP node.
+///
+/// The default value of itemId is used for singleton nodes (i.e., the node's
+/// single item is deleted).
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::retractItem on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete the item from
+/// \param itemId the ID of the item to delete
 ///
 
 ///
@@ -753,6 +783,15 @@ QXmppPubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QSt
         request.setItems(items);
     }
     return request;
+}
+
+QString QXmppPubSubManager::standardItemIdToString(StandardItemId itemId)
+{
+    switch (itemId) {
+    case Current:
+        return QStringLiteral("current");
+    }
+    return {};
 }
 
 auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<PublishItemResult>

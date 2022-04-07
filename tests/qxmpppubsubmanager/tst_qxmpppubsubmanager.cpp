@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2020 Germán Márquez Mejía <mancho@olomono.de>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -76,10 +77,13 @@ private:
     Q_SLOT void testDeleteNodes();
     Q_SLOT void testPublishItems_data();
     Q_SLOT void testPublishItems();
+    Q_SLOT void testRetractCurrentItem();
     Q_SLOT void testRetractItem_data();
     Q_SLOT void testRetractItem();
+    Q_SLOT void testRetractCurrentPepItem();
     Q_SLOT void testPurgeItems();
     Q_SLOT void testPurgePepItems();
+    Q_SLOT void testRequestCurrentItem();
     Q_SLOT void testRequestItems_data();
     Q_SLOT void testRequestItems();
     Q_SLOT void testRequestItemNotFound();
@@ -409,6 +413,27 @@ void tst_QXmppPubSubManager::testPublishItems()
     }
 }
 
+void tst_QXmppPubSubManager::testRetractCurrentItem()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->retractItem(QStringLiteral("pubsub.shakespeare.lit"), QStringLiteral("princely_musings"), PSManager::Current);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='set'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<retract node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</retract>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<retract node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</retract>"
+                               "</pubsub></iq>"));
+
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
 void tst_QXmppPubSubManager::testRetractItem_data()
 {
     QTest::addColumn<bool>("isPep");
@@ -454,6 +479,27 @@ void tst_QXmppPubSubManager::testRetractItem()
     expectFutureVariant<QXmpp::Success>(future);
 }
 
+void tst_QXmppPubSubManager::testRetractCurrentPepItem()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->retractPepItem(QStringLiteral("princely_musings"), PSManager::Current);
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='set'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<retract node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</retract>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<retract node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</retract>"
+                               "</pubsub></iq>"));
+
+    expectFutureVariant<QXmpp::Success>(future);
+}
+
 void tst_QXmppPubSubManager::testPurgeItems()
 {
     auto [test, psManager] = Client();
@@ -476,6 +522,28 @@ void tst_QXmppPubSubManager::testPurgePepItems()
                 "</pubsub></iq>");
     test.inject(QStringLiteral("<iq type='result' from='user@qxmpp.org' id='qxmpp1'/>"));
     expectFutureVariant<QXmpp::Success>(future);
+}
+
+void tst_QXmppPubSubManager::testRequestCurrentItem()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestItem(QStringLiteral("pubsub.shakespeare.lit"), QStringLiteral("princely_musings"), PSManager::Current);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                               "<items node='princely_musings'>"
+                               "<item id='current'/>"
+                               "</items>"
+                               "</pubsub></iq>"));
+
+    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    QCOMPARE(item.id(), QStringLiteral("current"));
 }
 
 void tst_QXmppPubSubManager::testRequestItems_data()
