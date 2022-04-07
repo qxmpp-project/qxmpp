@@ -9,6 +9,7 @@
 #include "QXmppOmemoDeviceList_p.h"
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
+#include "QXmppOmemoIq_p.h"
 
 #include "util.h"
 #include <QObject>
@@ -62,6 +63,7 @@ private slots:
     void testIsOmemoElement();
     void testOmemoElement();
     void testMessageOmemoElement();
+    void testOmemoIq();
 };
 
 void tst_QXmppOmemoData::testIsOmemoDeviceElement_data()
@@ -601,6 +603,65 @@ void tst_QXmppOmemoData::testMessageOmemoElement()
     message2.setOmemoElement(QXmppOmemoElement());
     QVERIFY(message2.omemoElement());
     serializePacket(message2, xmlOut2);
+}
+
+void tst_QXmppOmemoData::testOmemoIq()
+{
+    const QByteArray xmlOtherIq(
+        "<iq id=\"qxmpp2\" type=\"get\">"
+        "<encrypted xmlns=\"urn:xmpp:encryption:stub:sce:1\">"
+        "<payload>"
+        "V2FpdCwgd2hhdD8gQXJlIHlvdSBzZXJpb3VzPyBEaWQgeW91IHJlYWxseSBqdXN0IGdyYWIgeW91"
+        "ciBmYXZvdXJpdGUgYmFzZTY0IGRlY29kZXIganVzdCB0byBjaGVjayB0aGlzIGRvY3VtZW50IGZv"
+        "ciBoaWRkZW4gbWVzc2FnZXM/IFdoYXQgYXJlIHlvdSBzb21lIGtpbmQgb2YgbmVyZD8gU29tZSBn"
+        "ZWVrIHdpdGggYSBiaW5hcnkgd3Jpc3Qgd2F0Y2g/"
+        "</payload>"
+        "</encrypted>"
+        "</iq>");
+
+    const QByteArray xmlOmemoIq(
+        "<iq id=\"qxmpp2\" type=\"get\">"
+        "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
+        "<header sid=\"27183\"/>"
+        "<payload>"
+        "V2FpdCwgd2hhdD8gQXJlIHlvdSBzZXJpb3VzPyBEaWQgeW91IHJlYWxseSBqdXN0IGdyYWIgeW91"
+        "ciBmYXZvdXJpdGUgYmFzZTY0IGRlY29kZXIganVzdCB0byBjaGVjayB0aGlzIGRvY3VtZW50IGZv"
+        "ciBoaWRkZW4gbWVzc2FnZXM/IFdoYXQgYXJlIHlvdSBzb21lIGtpbmQgb2YgbmVyZD8gU29tZSBn"
+        "ZWVrIHdpdGggYSBiaW5hcnkgd3Jpc3Qgd2F0Y2g/"
+        "</payload>"
+        "</encrypted>"
+        "</iq>");
+
+    const QByteArray omemoPayload(
+        "V2FpdCwgd2hhdD8gQXJlIHlvdSBzZXJpb3VzPyBEaWQgeW91IHJlYWxseSBqdXN0IGdyYWIgeW91"
+        "ciBmYXZvdXJpdGUgYmFzZTY0IGRlY29kZXIganVzdCB0byBjaGVjayB0aGlzIGRvY3VtZW50IGZv"
+        "ciBoaWRkZW4gbWVzc2FnZXM/IFdoYXQgYXJlIHlvdSBzb21lIGtpbmQgb2YgbmVyZD8gU29tZSBn"
+        "ZWVrIHdpdGggYSBiaW5hcnkgd3Jpc3Qgd2F0Y2g/");
+
+    QDomDocument doc;
+    doc.setContent(xmlOtherIq, true);
+    QDomElement element = doc.documentElement();
+    QVERIFY(!QXmppOmemoIq::isOmemoIq(element));
+
+    doc.setContent(xmlOmemoIq, true);
+    element = doc.documentElement();
+    QVERIFY(QXmppOmemoIq::isOmemoIq(element));
+
+    QXmppOmemoIq omemoIq1;
+    QVERIFY(omemoIq1.omemoElement().payload().isEmpty());
+
+    parsePacket(omemoIq1, xmlOmemoIq);
+    QCOMPARE(omemoIq1.omemoElement().payload(), QByteArray::fromBase64(omemoPayload));
+    serializePacket(omemoIq1, xmlOmemoIq);
+
+    QXmppOmemoElement omemoElement;
+    omemoElement.setSenderDeviceId(27183);
+    omemoElement.setPayload(QByteArray::fromBase64(omemoPayload));
+
+    QXmppOmemoIq omemoIq2;
+    omemoIq2.setOmemoElement(omemoElement);
+    QCOMPARE(omemoIq1.omemoElement().payload(), QByteArray::fromBase64(omemoPayload));
+    serializePacket(omemoIq2, xmlOmemoIq);
 }
 
 QTEST_MAIN(tst_QXmppOmemoData)
