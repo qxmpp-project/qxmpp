@@ -744,6 +744,17 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 }
 
 ///
+/// \fn QXmppPubSubManager::requestPepFeatures()
+///
+/// Requests all features of the own PEP service via service discovery.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::requestFeatures on the current account's bare JID.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+
+///
 ///
 /// \fn QXmppPubSubManager::fetchPepNodes()
 ///

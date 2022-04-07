@@ -71,6 +71,7 @@ class tst_QXmppPubSubManager : public QObject
 private:
     Q_SLOT void testDiscoFeatures();
     Q_SLOT void testRequestFeatures();
+    Q_SLOT void testRequestPepFeatures();
     Q_SLOT void testFetchNodes();
     Q_SLOT void testFetchPepNodes();
     Q_SLOT void testCreateNodes_data();
@@ -215,6 +216,25 @@ void tst_QXmppPubSubManager::testRequestFeatures()
                                "</query></iq>"));
 
     features = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+}
+
+void tst_QXmppPubSubManager::testRequestPepFeatures()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestPepFeatures();
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq type='result' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' id='qxmpp1'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='pep'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    auto features = expectFutureVariant<QVector<QString>>(future);
     QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
 }
 
