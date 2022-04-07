@@ -26,10 +26,26 @@ class QXMPP_EXPORT QXmppPubSubManager : public QXmppClientExtension
 
 public:
     ///
+    /// Type of PubSub service
+    ///
+    enum ServiceType {
+        PubSubOrPep,  ///< PubSub service or PEP service
+        PubSub,       ///< PubSub service only
+        Pep           ///< PEP service only
+    };
+
+    ///
     /// Pre-defined ID of a PubSub item
     ///
     enum StandardItemId {
         Current  ///< Item of a singleton node
+    };
+
+    ///
+    /// Used to indicate a service type mismatch.
+    ///
+    struct InvalidServiceType
+    {
     };
 
     template<typename T>
@@ -40,6 +56,7 @@ public:
     };
 
     using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    using FeaturesResult = std::variant<QVector<QString>, InvalidServiceType, QXmppStanza::Error>;
     using NodesResult = std::variant<QVector<QString>, QXmppStanza::Error>;
     using InstantNodeResult = std::variant<QString, QXmppStanza::Error>;
     template<typename T>
@@ -58,6 +75,7 @@ public:
     ~QXmppPubSubManager();
 
     // Generic PubSub (the PubSub service is the given entity)
+    QFuture<FeaturesResult> requestFeatures(const QString &serviceJid, ServiceType serviceType = PubSubOrPep);
     QFuture<NodesResult> fetchNodes(const QString &jid);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);

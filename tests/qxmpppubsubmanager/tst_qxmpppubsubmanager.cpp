@@ -26,6 +26,9 @@ using PSManager = QXmppPubSubManager;
 using Affiliation = QXmppPubSubAffiliation;
 using AffiliationType = QXmppPubSubAffiliation::Affiliation;
 
+const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
+const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
+
 class TestEventManager : public QXmppPubSubEventManager
 {
 public:
@@ -67,6 +70,7 @@ class tst_QXmppPubSubManager : public QObject
 
 private:
     Q_SLOT void testDiscoFeatures();
+    Q_SLOT void testRequestFeatures();
     Q_SLOT void testFetchNodes();
     Q_SLOT void testFetchPepNodes();
     Q_SLOT void testCreateNodes_data();
@@ -113,6 +117,105 @@ void tst_QXmppPubSubManager::testDiscoFeatures()
     // so the coverage report is happy:
     PSManager manager;
     QCOMPARE(manager.discoveryFeatures(), QStringList { "http://jabber.org/protocol/pubsub#rsm" });
+}
+
+void tst_QXmppPubSubManager::testRequestFeatures()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->requestFeatures("pubsub.shakespeare.lit");
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    expectFutureVariant<QXmppPubSubManager::InvalidServiceType>(future);
+
+    future = psManager->requestFeatures("pubsub.shakespeare.lit");
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='service'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    auto features = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+
+    future = psManager->requestFeatures("juliet@capulet.lit");
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='pep'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    features = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+
+    future = psManager->requestFeatures("juliet@capulet.lit", QXmppPubSubManager::PubSub);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='pep'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    expectFutureVariant<QXmppPubSubManager::InvalidServiceType>(future);
+
+    future = psManager->requestFeatures("pubsub.shakespeare.lit", QXmppPubSubManager::PubSub);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='service'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    features = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+
+    future = psManager->requestFeatures("pubsub.shakespeare.lit", QXmppPubSubManager::Pep);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='pubsub.shakespeare.lit' to='francisco@denmark.lit/barracks' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='service'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    expectFutureVariant<QXmppPubSubManager::InvalidServiceType>(future);
+
+    future = psManager->requestFeatures("juliet@capulet.lit", QXmppPubSubManager::Pep);
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#info'>"
+                               "<identity category='pubsub' type='pep'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub'/>"
+                               "<feature var='http://jabber.org/protocol/pubsub#auto-create'/>"
+                               "</query></iq>"));
+
+    features = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
 }
 
 void tst_QXmppPubSubManager::testFetchNodes()

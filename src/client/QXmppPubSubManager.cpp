@@ -79,6 +79,13 @@ using namespace QXmpp::Private;
 ///
 
 ///
+/// \typedef QXmppPubSubManager::FeaturesResult
+///
+/// Type containing service discovery features, InvalidServiceType if the service is not of the
+/// desired type or the returned IQ error (QXmppStanza::Error).
+///
+
+///
 /// \typedef QXmppPubSubManager::NodesResult
 ///
 /// Type containing a list of node names or the returned IQ error
@@ -168,6 +175,58 @@ QXmppPubSubManager::QXmppPubSubManager()
 ///
 QXmppPubSubManager::~QXmppPubSubManager()
 {
+}
+
+///
+/// Requests all features of a pubsub service and checks the identities via service discovery.
+///
+/// This uses a \xep{0030, Service Discovery} info request to get the service
+/// identities and features.
+///
+/// The features are only returned if the service is of type serviceType,
+/// otherwise InvalidServiceType is returned.
+///
+/// \warning THIS API IS NOT FINALIZED YET!
+///
+/// \param serviceJid JID of the entity hosting the pubsub service
+/// \param serviceType type of service to retrieve features for
+///
+QFuture<QXmppPubSubManager::FeaturesResult> QXmppPubSubManager::requestFeatures(const QString &serviceJid, ServiceType serviceType)
+{
+    QXmppDiscoveryIq request;
+    request.setType(QXmppIq::Get);
+    request.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    request.setTo(serviceJid);
+
+    return chainIq(client()->sendIq(std::move(request)), this, [=](QXmppDiscoveryIq &&iq) -> FeaturesResult {
+        const auto identities = iq.identities();
+
+        const auto isPubSubServiceFound = std::any_of(identities.cbegin(), identities.cend(), [=](const QXmppDiscoveryIq::Identity &identity) {
+            if (identity.category() == QStringLiteral("pubsub")) {
+                const auto identityType = identity.type();
+
+                switch (serviceType) {
+                case PubSubOrPep:
+                    return identityType == QStringLiteral("service") || identityType == QStringLiteral("pep");
+                case PubSub:
+                    return identityType == QStringLiteral("service");
+                case Pep:
+                    return identityType == QStringLiteral("pep");
+                }
+            }
+            return false;
+        });
+
+        if (isPubSubServiceFound) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            return iq.features();
+#else
+            return iq.features().toVector();
+#endif
+        }
+
+        return InvalidServiceType();
+    });
 }
 
 ///
