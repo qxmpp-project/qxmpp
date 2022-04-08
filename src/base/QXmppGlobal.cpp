@@ -7,6 +7,7 @@
 
 #include <QList>
 
+/// \cond
 static const QStringList ENCRYPTION_NAMESPACES = {
     QString(),
     QString(),
@@ -47,3 +48,4 @@ QString QXmpp::Private::encryptionToName(Encryption encryption)
 {
     return ENCRYPTION_NAMES.at(int(encryption));
 }
+/// \endcond
