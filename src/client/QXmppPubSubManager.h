@@ -100,6 +100,7 @@ public:
     QFuture<Result> unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
 
     // PEP-specific (the PubSub service is the current account)
+    inline QFuture<NodesResult> fetchPepNodes() { return fetchNodes(client()->configuration().jidBare()); };
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
     inline QFuture<Result> createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
     inline QFuture<Result> deletePepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }

@@ -68,6 +68,7 @@ class tst_QXmppPubSubManager : public QObject
 private:
     Q_SLOT void testDiscoFeatures();
     Q_SLOT void testFetchNodes();
+    Q_SLOT void testFetchPepNodes();
     Q_SLOT void testCreateNodes_data();
     Q_SLOT void testCreateNodes();
     Q_SLOT void testCreateNodeWithConfig();
@@ -120,6 +121,24 @@ void tst_QXmppPubSubManager::testFetchNodes()
                                "<query xmlns='http://jabber.org/protocol/disco#items'>"
                                "<item jid='pubsub.shakespeare.lit' node='blogs' name='Weblog updates'/>"
                                "<item jid='pubsub.shakespeare.lit' node='news' name='News and announcements'/>"
+                               "</query></iq>"));
+
+    const auto nodes = expectFutureVariant<QVector<QString>>(future);
+    QCOMPARE(nodes, (QVector<QString> { "blogs", "news" }));
+}
+
+void tst_QXmppPubSubManager::testFetchPepNodes()
+{
+    auto [test, psManager] = Client();
+
+    auto future = psManager->fetchPepNodes();
+    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items'/>"
+                               "</iq>"));
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
+                               "<query xmlns='http://jabber.org/protocol/disco#items'>"
+                               "<item jid='juliet@capulet.lit' node='blogs' name='Weblog updates'/>"
+                               "<item jid='juliet@capulet.lit' node='news' name='News and announcements'/>"
                                "</query></iq>"));
 
     const auto nodes = expectFutureVariant<QVector<QString>>(future);

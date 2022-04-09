@@ -685,6 +685,16 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 }
 
 ///
+///
+/// \fn QXmppPubSubManager::fetchPepNodes()
+///
+/// Requests all listed nodes of the own PEP service via service discovery.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::fetchNodes on the current account's bare JID.
+///
+
+///
 /// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName)
 ///
 /// Creates an empty PEP node with the default configuration.
