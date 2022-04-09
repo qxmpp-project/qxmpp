@@ -54,7 +54,9 @@ using namespace QXmpp::Private;
 ///    Requesting a continuation
 ///  - Requesting most recent items (max_items=x):
 ///    https://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-requestrecent
-///  - (Manually) subscribing to a node
+///  - subscribe()/unsubscribe():
+///    - return subscription on success
+///    - correctly handle configuration required (and other) cases
 ///
 /// \ingroup Managers
 ///
