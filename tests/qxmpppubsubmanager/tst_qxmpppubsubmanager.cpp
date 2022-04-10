@@ -111,6 +111,7 @@ private:
     Q_SLOT void testUnsubscribeFromNode();
     Q_SLOT void testEventNotifications_data();
     Q_SLOT void testEventNotifications();
+    Q_SLOT void testStandardItemToString();
 };
 
 void tst_QXmppPubSubManager::testDiscoFeatures()
@@ -1343,6 +1344,12 @@ void tst_QXmppPubSubManager::testEventNotifications()
     }
 
     QCOMPARE(eventManager->pubSub(), psManager);
+}
+
+void tst_QXmppPubSubManager::testStandardItemToString()
+{
+    auto standardItemString = PSManager::standardItemIdToString(PSManager::Current);
+    QCOMPARE(standardItemString, QStringLiteral("current"));
 }
 
 QTEST_MAIN(tst_QXmppPubSubManager)
