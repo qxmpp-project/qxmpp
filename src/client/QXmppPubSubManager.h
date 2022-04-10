@@ -145,6 +145,8 @@ public:
     inline QFuture<Result> configurePepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return configureNode(client()->configuration().jidBare(), nodeName, config); }
     inline QFuture<Result> cancelPepNodeConfiguration(const QString &nodeName) { return cancelNodeConfiguration(client()->configuration().jidBare(), nodeName); }
 
+    static QString standardItemIdToString(StandardItemId itemId);
+
     /// \cond
     QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &element) override;
@@ -154,8 +156,6 @@ private:
     QFuture<PublishItemResult> publishItem(QXmppPubSubIqBase &&iq);
     QFuture<PublishItemsResult> publishItems(QXmppPubSubIqBase &&iq);
     static QXmppPubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
-
-    static QString standardItemIdToString(StandardItemId itemId);
 
     // We may need a d-ptr in the future.
     void *d = nullptr;

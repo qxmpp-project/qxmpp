@@ -933,6 +933,22 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 /// \sa requestPepNodeConfiguration()
 ///
 
+///
+/// Returns a standard item ID string.
+///
+/// \param itemId standard item ID to be translated
+/// \return the item ID string or a default-constructed string if there is no
+///         corresponding one
+///
+QString QXmppPubSubManager::standardItemIdToString(StandardItemId itemId)
+{
+    switch (itemId) {
+    case Current:
+        return QStringLiteral("current");
+    }
+    return {};
+}
+
 /// \cond
 QStringList QXmppPubSubManager::discoveryFeatures() const
 {
@@ -983,15 +999,6 @@ QXmppPubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QSt
         request.setItems(items);
     }
     return request;
-}
-
-QString QXmppPubSubManager::standardItemIdToString(StandardItemId itemId)
-{
-    switch (itemId) {
-    case Current:
-        return QStringLiteral("current");
-    }
-    return {};
 }
 
 auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<PublishItemResult>
