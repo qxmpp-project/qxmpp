@@ -38,7 +38,7 @@ public:
     /// Pre-defined ID of a PubSub item
     ///
     enum StandardItemId {
-        Current  ///< Item of a singleton node
+        Current  ///< Item of a singleton node (i.e., the node's single item)
     };
 
     ///
@@ -126,7 +126,7 @@ public:
     template<typename T = QXmppPubSubItem>
     inline QFuture<ItemResult<T>> requestPepItem(const QString &nodeName, const QString &itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
     template<typename T = QXmppPubSubItem>
-    inline QFuture<ItemResult<T>> requestPepItem(const QString &nodeName, StandardItemId itemId = Current) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
+    inline QFuture<ItemResult<T>> requestPepItem(const QString &nodeName, StandardItemId itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
     template<typename T = QXmppPubSubItem>
     inline QFuture<ItemsResult<T>> requestPepItems(const QString &nodeName) { return requestItems(client()->configuration().jidBare(), nodeName); }
     inline QFuture<ItemIdsResult> requestPepItemIds(const QString &nodeName) { return requestItemIds(client()->configuration().jidBare(), nodeName); }
@@ -188,9 +188,6 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
 
 ///
 /// Requests a specific item of an entity's node.
-///
-/// The default value of itemId is used for singleton nodes (i.e., the node's
-/// single item is requested).
 ///
 /// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
 /// should be an account's bare JID

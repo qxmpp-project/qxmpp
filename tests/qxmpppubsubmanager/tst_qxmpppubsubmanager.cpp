@@ -868,7 +868,7 @@ void tst_QXmppPubSubManager::testRequestCurrentPepItem()
 {
     auto [test, psManager] = Client();
 
-    auto future = psManager->requestPepItem(QStringLiteral("princely_musings"));
+    auto future = psManager->requestPepItem(QStringLiteral("princely_musings"), PSManager::Current);
     test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<items node='princely_musings'>"

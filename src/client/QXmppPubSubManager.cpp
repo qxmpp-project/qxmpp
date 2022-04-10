@@ -424,9 +424,6 @@ auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName
 ///
 /// Deletes an item from a pubsub node.
 ///
-/// The default value of itemId is used for singleton nodes (i.e., the node's
-/// single item is deleted).
-///
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \param nodeName the name of the node to delete the item from
 /// \param itemId the ID of the item to delete
@@ -827,9 +824,6 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 /// Requests a specific item of a PEP node.
 ///
-/// The default value of itemId is used for singleton nodes (i.e., the node's
-/// single item is requested).
-///
 /// This is a convenience method equivalent to calling
 /// QXmppPubSubManager::requestItem on the current account's bare JID.
 ///
@@ -876,9 +870,6 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 /// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, StandardItemId itemId)
 ///
 /// Deletes an item from a PEP node.
-///
-/// The default value of itemId is used for singleton nodes (i.e., the node's
-/// single item is deleted).
 ///
 /// This is a convenience method equivalent to calling
 /// QXmppPubSubManager::retractItem on the current account's bare JID.
