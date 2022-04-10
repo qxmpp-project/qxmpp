@@ -29,8 +29,8 @@ class QXmppTrustMessageElement;
 class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 {
 public:
-/// \cond
 #if QXMPP_DEPRECATED_SINCE(1, 5)
+    /// \cond
     using EncryptionMethod = QXmpp::Encryption;
 
     static const EncryptionMethod NoEncryption = EncryptionMethod::NoEncryption;
@@ -39,8 +39,8 @@ public:
     static const EncryptionMethod LegacyOpenPGP = EncryptionMethod::LegacyOpenPgp;
     static const EncryptionMethod OX = EncryptionMethod::Ox;
     static const EncryptionMethod OMEMO = EncryptionMethod::Omemo;
+    /// \endcond
 #endif
-/// \endcond
 
     /// This enum describes a message type.
     enum Type {

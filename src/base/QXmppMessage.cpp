@@ -11,8 +11,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal_p.h"
 #include "QXmppMixInvitation.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoElement_p.h"
+#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 
