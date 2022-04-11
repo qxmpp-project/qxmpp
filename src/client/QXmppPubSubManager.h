@@ -200,7 +200,7 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
                                                                            const QString &nodeName,
                                                                            StandardItemId itemId)
 {
-    return requestItem(jid, nodeName, standardItemIdToString(itemId));
+    return requestItem<T>(jid, nodeName, standardItemIdToString(itemId));
 }
 
 ///
