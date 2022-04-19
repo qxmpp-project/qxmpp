@@ -5,8 +5,7 @@
 ///
 /// \class QXmppTrustStorage
 ///
-/// \brief The QXmppTrustStorage class stores trust data for end-to-end
-/// encryption.
+/// \brief The QXmppTrustStorage class stores end-to-end encryption trust data.
 ///
 /// The term "key" is used for a public long-term key.
 ///
@@ -73,7 +72,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
+/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmppTrustStorage::TrustLevel trustLevel)
 ///
 /// Adds keys.
 ///
@@ -163,6 +162,9 @@
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 /// \param trustLevel trust level being set
 ///
+/// \return the key owner JIDs mapped to their modified keys for specific
+///         encryption protocols
+///
 
 ///
 /// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
@@ -173,6 +175,9 @@
 /// \param keyOwnerJids key owners' bare JIDs
 /// \param oldTrustLevel trust level being changed
 /// \param newTrustLevel trust level being set
+///
+/// \return the key owner JIDs mapped to their modified keys for specific
+///         encryption protocols
 ///
 
 ///

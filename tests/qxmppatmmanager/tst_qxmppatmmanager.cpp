@@ -176,11 +176,11 @@ void tst_QXmppAtmManager::testMakePostponedTrustDecisions()
         QCoreApplication::processEvents();
     }
 
-    auto futurePotsponed = m_trustStorage.keysForPostponedTrustDecisions(ns_omemo,
+    auto futurePostponed = m_trustStorage.keysForPostponedTrustDecisions(ns_omemo,
                                                                          { QByteArray::fromBase64(QByteArrayLiteral("wzsLdCDtOGUIoLkHAQN3Fdt86GLjE0716F0mnci/pVY=")),
                                                                            QByteArray::fromBase64(QByteArrayLiteral("cF3Li3ddEJzt9rw/1eAmMS31/G/G4ZTpf+9wbEs51HA=")) });
-    QVERIFY(futurePotsponed.isFinished());
-    auto resultPostponed = futurePotsponed.result();
+    QVERIFY(futurePostponed.isFinished());
+    auto resultPostponed = futurePostponed.result();
     QVERIFY(resultPostponed.isEmpty());
 
     QMultiHash<QString, QByteArray> trustedKeys = { { QStringLiteral("carol@example.net"),
@@ -188,10 +188,10 @@ void tst_QXmppAtmManager::testMakePostponedTrustDecisions()
     QMultiHash<QString, QByteArray> distrustedKeys = { { QStringLiteral("carol@example.net"),
                                                          QByteArray::fromBase64(QByteArrayLiteral("TKZIGhEMc+gyCgrJEyCnf7OtuoBFhOupOWhdwFhfZBk=")) } };
 
-    futurePotsponed = m_trustStorage.keysForPostponedTrustDecisions(ns_omemo,
+    futurePostponed = m_trustStorage.keysForPostponedTrustDecisions(ns_omemo,
                                                                     { QByteArray::fromBase64(QByteArrayLiteral("Zgk0SxGFbeSgDw/Zanza/jzNrr6t1LU0jYX2d7RReKY=")) });
-    QVERIFY(futurePotsponed.isFinished());
-    resultPostponed = futurePotsponed.result();
+    QVERIFY(futurePostponed.isFinished());
+    resultPostponed = futurePostponed.result();
     QCOMPARE(
         resultPostponed,
         QHash({ std::pair(
@@ -210,8 +210,8 @@ void tst_QXmppAtmManager::testMakePostponedTrustDecisions()
                                                           { QStringLiteral("bob@example.com"),
                                                             QByteArray::fromBase64(QByteArrayLiteral("3bqdCfhQalsOp3LcrFVucCQB4pRRWCyoBTV8KM/oOhY=")) } };
 
-    auto future = m_trustStorage.keys(ns_omemo,
-                                      QXmppTrustStorage::Authenticated);
+    auto future = m_manager.keys(ns_omemo,
+                                 QXmppTrustStorage::Authenticated);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -229,8 +229,8 @@ void tst_QXmppAtmManager::testMakePostponedTrustDecisions()
                                                                { QStringLiteral("bob@example.com"),
                                                                  QByteArray::fromBase64(QByteArrayLiteral("U3+UnkTp12gusKbzWwN0lqDLEPb2CdMxP4bY85q9pxA=")) } };
 
-    future = m_trustStorage.keys(ns_omemo,
-                                 QXmppTrustStorage::ManuallyDistrusted);
+    future = m_manager.keys(ns_omemo,
+                            QXmppTrustStorage::ManuallyDistrusted);
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(
@@ -244,26 +244,26 @@ void tst_QXmppAtmManager::testDistrustAutomaticallyTrustedKeys()
 {
     clearTrustStorage();
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
           QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) },
         QXmppTrustStorage::AutomaticallyTrusted);
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) },
         QXmppTrustStorage::Authenticated);
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("dZVdoBINK2n8BkWeTzVg0lVOah4n/9IA/IvQpzUuo1w=")) },
         QXmppTrustStorage::AutomaticallyTrusted);
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("We+r1A/kixDad8e383oTmhPDy8g+F5/ircMJmEET8MA=")) },
@@ -280,8 +280,8 @@ void tst_QXmppAtmManager::testDistrustAutomaticallyTrustedKeys()
                                                                     { QStringLiteral("bob@example.com"),
                                                                       QByteArray::fromBase64(QByteArrayLiteral("dZVdoBINK2n8BkWeTzVg0lVOah4n/9IA/IvQpzUuo1w=")) } };
 
-    auto future = m_trustStorage.keys(ns_omemo,
-                                      QXmppTrustStorage::AutomaticallyDistrusted);
+    auto future = m_manager.keys(ns_omemo,
+                                 QXmppTrustStorage::AutomaticallyDistrusted);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -300,7 +300,7 @@ void tst_QXmppAtmManager::testDistrust()
                                                           { QStringLiteral("alice@example.org"),
                                                             QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         authenticatedKeys.values(),
@@ -309,7 +309,7 @@ void tst_QXmppAtmManager::testDistrust()
     QMultiHash<QString, QByteArray> automaticallyTrustedKeys = { { QStringLiteral("bob@example.com"),
                                                                    QByteArray::fromBase64(QByteArrayLiteral("mwT0Hwr7aG1p+x0q60H0UDSEnr8cr7hxvxDEhFGrLmY=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         automaticallyTrustedKeys.values(),
@@ -320,7 +320,7 @@ void tst_QXmppAtmManager::testDistrust()
                                                                { QStringLiteral("alice@example.org"),
                                                                  QByteArray::fromBase64(QByteArrayLiteral("QfXYzw7lmiD3Qoto6l2kx+HuM1tmKQYW2wCR+u78q8A=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         manuallyDistrustedKeys.values(),
@@ -356,7 +356,7 @@ void tst_QXmppAtmManager::testDistrust()
     auto futureVoid = m_manager.distrust(ns_omemo, {});
     QVERIFY(futureVoid.isFinished());
 
-    auto future = m_trustStorage.keys(ns_omemo);
+    auto future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -394,7 +394,7 @@ void tst_QXmppAtmManager::testDistrust()
                                { QStringLiteral("bob@example.com"),
                                  QByteArray::fromBase64(QByteArrayLiteral("mwT0Hwr7aG1p+x0q60H0UDSEnr8cr7hxvxDEhFGrLmY=")) } };
 
-    future = m_trustStorage.keys(ns_omemo);
+    future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(
@@ -448,20 +448,20 @@ void tst_QXmppAtmManager::testAuthenticate()
     clearTrustStorage();
 
     QFETCH(QXmppTrustStorage::SecurityPolicy, securityPolicy);
-    m_trustStorage.setSecurityPolicy(ns_omemo, securityPolicy);
+    m_manager.setSecurityPolicy(ns_omemo, securityPolicy);
 
     QMultiHash<QString, QByteArray> authenticatedKeys = { { QStringLiteral("alice@example.org"),
                                                             QByteArray::fromBase64(QByteArrayLiteral("rQIL2albuSR1i06EZAp1uZ838zUeEgGIq2whwu3s+Zg=")) },
                                                           { QStringLiteral("carol@example.net"),
                                                             QByteArray::fromBase64(QByteArrayLiteral("+CQZlFyxdeTGgbPby7YvvZT3YIVcIi+1E8N5nSc6QTA=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         authenticatedKeys.values(QStringLiteral("alice@example.org")),
         QXmppTrustStorage::Authenticated);
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         authenticatedKeys.values(QStringLiteral("carol@example.net")),
@@ -472,7 +472,7 @@ void tst_QXmppAtmManager::testAuthenticate()
                                                                  { QStringLiteral("bob@example.com"),
                                                                    QByteArray::fromBase64(QByteArrayLiteral("/dqv0+RNyFIPdMQiJ7mSEJWKVExFeUBEvTXxOtqIMDg=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         automaticallyTrustedKeys.values(),
@@ -483,7 +483,7 @@ void tst_QXmppAtmManager::testAuthenticate()
                                                                { QStringLiteral("alice@example.org"),
                                                                  QByteArray::fromBase64(QByteArrayLiteral("QfXYzw7lmiD3Qoto6l2kx+HuM1tmKQYW2wCR+u78q8A=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         manuallyDistrustedKeys.values(),
@@ -494,7 +494,7 @@ void tst_QXmppAtmManager::testAuthenticate()
                                                                     { QStringLiteral("alice@example.org"),
                                                                       QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) } };
 
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         automaticallyDistrustedKeys.values(),
@@ -556,7 +556,7 @@ void tst_QXmppAtmManager::testAuthenticate()
     auto futureVoid = m_manager.authenticate(ns_omemo, {});
     QVERIFY(futureVoid.isFinished());
 
-    auto future = m_trustStorage.keys(ns_omemo);
+    auto future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -626,7 +626,7 @@ void tst_QXmppAtmManager::testAuthenticate()
                                           QByteArray::fromBase64(QByteArrayLiteral("/dqv0+RNyFIPdMQiJ7mSEJWKVExFeUBEvTXxOtqIMDg=")) } };
     }
 
-    future = m_trustStorage.keys(ns_omemo);
+    future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     result = future.result();
     switch (securityPolicy) {
@@ -709,7 +709,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisions()
         QCoreApplication::processEvents();
     }
 
-    auto future = m_trustStorage.keys(ns_omemo);
+    auto future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -847,14 +847,14 @@ void tst_QXmppAtmManager::testHandleMessage()
     // Add the sender key in preparation for the test.
     if (areTrustDecisionsValid) {
         if (isSenderKeyAuthenticated) {
-            m_trustStorage.addKeys(ns_omemo,
-                                   senderJid,
-                                   { senderKey },
-                                   QXmppTrustStorage::Authenticated);
+            m_manager.addKeys(ns_omemo,
+                              senderJid,
+                              { senderKey },
+                              QXmppTrustStorage::Authenticated);
         } else {
-            m_trustStorage.addKeys(ns_omemo,
-                                   senderJid,
-                                   { senderKey });
+            m_manager.addKeys(ns_omemo,
+                              senderJid,
+                              { senderKey });
         }
     }
 
@@ -865,7 +865,7 @@ void tst_QXmppAtmManager::testHandleMessage()
 
     // Remove the sender key as soon as the method being tested is executed.
     if (areTrustDecisionsValid) {
-        m_trustStorage.removeKeys(ns_omemo, QList { senderKey });
+        m_manager.removeKeys(ns_omemo, QList { senderKey });
     }
 
     if (areTrustDecisionsValid) {
@@ -887,7 +887,7 @@ void tst_QXmppAtmManager::testHandleMessage()
                     }
                 }
 
-                auto future = m_trustStorage.keys(ns_omemo);
+                auto future = m_manager.keys(ns_omemo);
                 QVERIFY(future.isFinished());
                 auto result = future.result();
                 QCOMPARE(
@@ -912,7 +912,7 @@ void tst_QXmppAtmManager::testHandleMessage()
                     }
                 }
 
-                auto future = m_trustStorage.keys(ns_omemo);
+                auto future = m_manager.keys(ns_omemo);
                 QVERIFY(future.isFinished());
                 auto result = future.result();
                 QCOMPARE(
@@ -982,7 +982,7 @@ void tst_QXmppAtmManager::testHandleMessage()
             }
         }
     } else {
-        auto futureHash = m_trustStorage.keys(ns_omemo);
+        auto futureHash = m_manager.keys(ns_omemo);
         QVERIFY(futureHash.isFinished());
         auto resultHash = futureHash.result();
         QVERIFY(resultHash.isEmpty());
@@ -1001,7 +1001,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsNoKeys()
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // key of own endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
@@ -1009,7 +1009,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsNoKeys()
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) },
@@ -1042,7 +1042,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsNoKeys()
     QMultiHash<QString, QByteArray> manuallyDistrustedKeys = { { QStringLiteral("bob@example.com"),
                                                                  QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) } };
 
-    auto future = m_trustStorage.keys(ns_omemo);
+    auto future = m_manager.keys(ns_omemo);
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(
@@ -1060,32 +1060,32 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeys()
     clearTrustStorage();
 
     // keys of own endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
           QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) },
         QXmppTrustStorage::Authenticated);
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // keys of contact's endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1217,14 +1217,14 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpoints()
     clearTrustStorage();
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1347,21 +1347,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthent
     clearTrustStorage();
 
     // key of own endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1488,7 +1488,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticat
     clearTrustStorage();
 
     // keys of own endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
@@ -1496,7 +1496,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticat
         QXmppTrustStorage::Authenticated);
 
     // keys of contact's endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) },
@@ -1582,21 +1582,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // key of own endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1682,9 +1682,9 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
     QCOMPARE(sentMessagesCount, 2);
     QVERIFY2(!unexpectedTrustMessageSentSpy.wait(UNEXPECTED_TRUST_MESSAGE_WAITING_TIMEOUT), "Unexpected trust message sent!");
 
-    auto futureTrustLevel = m_trustStorage.trustLevel(ns_omemo,
-                                                      QStringLiteral("alice@example.org"),
-                                                      QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")));
+    auto futureTrustLevel = m_manager.trustLevel(ns_omemo,
+                                                 QStringLiteral("alice@example.org"),
+                                                 QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")));
     QVERIFY(futureTrustLevel.isFinished());
     auto result = futureTrustLevel.result();
     QCOMPARE(result, QXmppTrustStorage::ManuallyDistrusted);
@@ -1697,33 +1697,33 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // keys of own endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
           QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) },
         QXmppTrustStorage::Authenticated);
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // keys of contact's endpoints
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")),
           QByteArray::fromBase64(QByteArrayLiteral("T+dplAB8tGSdbYBbRiOm/jrS+8CPuzGHrH8ZmbjyvPo=")) },
         QXmppTrustStorage::Authenticated);
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1826,14 +1826,14 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpoints()
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1869,21 +1869,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAut
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // key of own endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) },
         QXmppTrustStorage::ManuallyDistrusted);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -1953,21 +1953,21 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
     QSignalSpy unexpectedTrustMessageSentSpy(this, &tst_QXmppAtmManager::unexpectedTrustMessageSent);
 
     // key of own endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("alice@example.org"),
         { QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("bob@example.com"),
         { QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) },
         QXmppTrustStorage::Authenticated);
 
     // key of contact's endpoint
-    m_trustStorage.addKeys(
+    m_manager.addKeys(
         ns_omemo,
         QStringLiteral("carol@example.net"),
         { QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) },
@@ -2026,9 +2026,9 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
     QCOMPARE(sentMessagesCount, 1);
     QVERIFY2(!unexpectedTrustMessageSentSpy.wait(UNEXPECTED_TRUST_MESSAGE_WAITING_TIMEOUT), "Unexpected trust message sent!");
 
-    const auto futureTrustLevel = m_trustStorage.trustLevel(ns_omemo,
-                                                            QStringLiteral("bob@example.com"),
-                                                            QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
+    const auto futureTrustLevel = m_manager.trustLevel(ns_omemo,
+                                                       QStringLiteral("bob@example.com"),
+                                                       QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
     QVERIFY(futureTrustLevel.isFinished());
     const auto result = futureTrustLevel.result();
     QCOMPARE(result, QXmppTrustStorage::ManuallyDistrusted);
@@ -2036,23 +2036,23 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
 
 void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysDone()
 {
-    auto future = m_trustStorage.trustLevel(ns_omemo,
-                                            QStringLiteral("alice@example.org"),
-                                            QByteArray::fromBase64(QByteArrayLiteral("0RcVsGk3LnpEFsqqztTzAgCDgVXlfa03paSqJFOOWOU=")));
+    auto future = m_manager.trustLevel(ns_omemo,
+                                       QStringLiteral("alice@example.org"),
+                                       QByteArray::fromBase64(QByteArrayLiteral("0RcVsGk3LnpEFsqqztTzAgCDgVXlfa03paSqJFOOWOU=")));
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
-    future = m_trustStorage.trustLevel(ns_omemo,
-                                       QStringLiteral("alice@example.org"),
-                                       QByteArray::fromBase64(QByteArrayLiteral("tYn/wcIOxBSoW4W1UfPr/zgbLipBK2KsFfC7F1bzut0=")));
+    future = m_manager.trustLevel(ns_omemo,
+                                  QStringLiteral("alice@example.org"),
+                                  QByteArray::fromBase64(QByteArrayLiteral("tYn/wcIOxBSoW4W1UfPr/zgbLipBK2KsFfC7F1bzut0=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
-    future = m_trustStorage.trustLevel(ns_omemo,
-                                       QStringLiteral("alice@example.org"),
-                                       QByteArray::fromBase64(QByteArrayLiteral("4iBsyJPVAfNWM/OgyA9fasOvkJ8K1/0wuYpwVGw4Q5M=")));
+    future = m_manager.trustLevel(ns_omemo,
+                                  QStringLiteral("alice@example.org"),
+                                  QByteArray::fromBase64(QByteArrayLiteral("4iBsyJPVAfNWM/OgyA9fasOvkJ8K1/0wuYpwVGw4Q5M=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::ManuallyDistrusted);
@@ -2060,23 +2060,23 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysDone()
 
 void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysDone()
 {
-    auto future = m_trustStorage.trustLevel(ns_omemo,
-                                            QStringLiteral("bob@example.com"),
-                                            QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
+    auto future = m_manager.trustLevel(ns_omemo,
+                                       QStringLiteral("bob@example.com"),
+                                       QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")));
     QVERIFY(future.isFinished());
     auto result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
-    future = m_trustStorage.trustLevel(ns_omemo,
-                                       QStringLiteral("bob@example.com"),
-                                       QByteArray::fromBase64(QByteArrayLiteral("mzDeKTQBVm1cTmzF9DjCGKa14pDADZOVLT9Kh7CK7AM=")));
+    future = m_manager.trustLevel(ns_omemo,
+                                  QStringLiteral("bob@example.com"),
+                                  QByteArray::fromBase64(QByteArrayLiteral("mzDeKTQBVm1cTmzF9DjCGKa14pDADZOVLT9Kh7CK7AM=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::Authenticated);
 
-    future = m_trustStorage.trustLevel(ns_omemo,
-                                       QStringLiteral("bob@example.com"),
-                                       QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")));
+    future = m_manager.trustLevel(ns_omemo,
+                                  QStringLiteral("bob@example.com"),
+                                  QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")));
     QVERIFY(future.isFinished());
     result = future.result();
     QCOMPARE(result, QXmppTrustStorage::ManuallyDistrusted);
@@ -2084,7 +2084,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysDone()
 
 void tst_QXmppAtmManager::clearTrustStorage()
 {
-    m_trustStorage.removeKeys(ns_omemo);
+    m_manager.removeKeys(ns_omemo);
     m_trustStorage.removeKeysForPostponedTrustDecisions(ns_omemo);
 }
 

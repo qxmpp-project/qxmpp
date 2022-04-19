@@ -50,7 +50,7 @@ QXmppTrustMemoryStorage::QXmppTrustMemoryStorage()
 QXmppTrustMemoryStorage::~QXmppTrustMemoryStorage() = default;
 
 /// \cond
-QFuture<void> QXmppTrustMemoryStorage::setSecurityPolicy(const QString &encryption, const QXmppTrustStorage::SecurityPolicy securityPolicy)
+QFuture<void> QXmppTrustMemoryStorage::setSecurityPolicy(const QString &encryption, QXmppTrustStorage::SecurityPolicy securityPolicy)
 {
     d->securityPolicies.insert(encryption, securityPolicy);
     return makeReadyFuture();
@@ -85,7 +85,7 @@ QFuture<QByteArray> QXmppTrustMemoryStorage::ownKey(const QString &encryption)
     return makeReadyFuture(std::move(key));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, const QXmppTrustStorage::TrustLevel trustLevel)
+QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmppTrustStorage::TrustLevel trustLevel)
 {
     for (const auto &keyId : keyIds) {
         Key key;
@@ -132,7 +132,7 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption)
     return makeReadyFuture();
 }
 
-QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keys(const QString &encryption, const TrustLevels trustLevels)
+QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keys(const QString &encryption, TrustLevels trustLevels)
 {
     QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys;
 
@@ -175,8 +175,10 @@ QFuture<bool> QXmppTrustMemoryStorage::hasKey(const QString &encryption, const Q
     return makeReadyFuture(std::move(false));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, const TrustLevel trustLevel)
+QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
 {
+    QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys;
+
     for (auto itr = keyIds.constBegin(); itr != keyIds.constEnd(); ++itr) {
         const auto keyOwnerJid = itr.key();
         const auto keyId = itr.value();
@@ -191,6 +193,7 @@ QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, 
                 // Update the stored trust level if it differs from the new one.
                 if (key.trustLevel != trustLevel) {
                     key.trustLevel = trustLevel;
+                    modifiedKeys[encryption].insert(keyOwnerJid, keyId);
                 }
 
                 isKeyFound = true;
@@ -205,22 +208,27 @@ QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, 
             key.ownerJid = keyOwnerJid;
             key.trustLevel = trustLevel;
             d->keys.insert(encryption, key);
+            modifiedKeys[encryption].insert(keyOwnerJid, keyId);
         }
     }
 
-    return makeReadyFuture();
+    return makeReadyFuture(std::move(modifiedKeys));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, const QXmppTrustStorage::TrustLevel oldTrustLevel, const QXmppTrustStorage::TrustLevel newTrustLevel)
+QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
 {
+    QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys;
+
     for (auto itr = d->keys.find(encryption); itr != d->keys.end() && itr.key() == encryption; ++itr) {
         auto &key = itr.value();
-        if (keyOwnerJids.contains(key.ownerJid) && key.trustLevel == oldTrustLevel) {
+        auto keyOwnerJid = key.ownerJid;
+        if (keyOwnerJids.contains(keyOwnerJid) && key.trustLevel == oldTrustLevel) {
             key.trustLevel = newTrustLevel;
+            modifiedKeys[encryption].insert(keyOwnerJid, key.id);
         }
     }
 
-    return makeReadyFuture();
+    return makeReadyFuture(std::move(modifiedKeys));
 }
 
 QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
@@ -228,7 +236,7 @@ QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustMemoryStorage::trustLevel(const
     const auto keys = d->keys.values(encryption);
     for (const auto &key : keys) {
         if (key.id == keyId && key.ownerJid == keyOwnerJid) {
-            return makeReadyFuture(std::move(QXmppTrustStorage::TrustLevel(key.trustLevel)));
+            return makeReadyFuture(std::move(TrustLevel(key.trustLevel)));
         }
     }
 

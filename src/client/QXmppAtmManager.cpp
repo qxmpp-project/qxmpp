@@ -61,8 +61,8 @@ using namespace QXmpp::Private;
 /// \param trustStorage trust storage implementation
 ///
 QXmppAtmManager::QXmppAtmManager(QXmppAtmTrustStorage *trustStorage)
+    : QXmppTrustManager(trustStorage)
 {
-    m_trustStorage = trustStorage;
 }
 
 ///
@@ -79,7 +79,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 {
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    auto future = m_trustStorage->keys(encryption, QXmppTrustStorage::Authenticated | QXmppTrustStorage::ManuallyDistrusted);
+    auto future = keys(encryption, QXmppTrustStorage::Authenticated | QXmppTrustStorage::ManuallyDistrusted);
     await(future, this, [=](const QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>> &&keys) mutable {
         const auto authenticatedKeys = keys.value(QXmppTrustStorage::Authenticated);
         const auto manuallyDistrustedKeys = keys.value(QXmppTrustStorage::ManuallyDistrusted);
@@ -301,7 +301,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         const auto senderKey = e2eeMetadata ? e2eeMetadata->senderKey() : QByteArray();
         const auto encryption = trustMessageElement->encryption();
 
-        auto future = m_trustStorage->trustLevel(encryption, senderJid, senderKey);
+        auto future = trustLevel(encryption, senderJid, senderKey);
         await(future, this, [=](const auto &&senderKeyTrustLevel) mutable {
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == QXmppTrustStorage::Authenticated;
 
@@ -347,7 +347,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
                 }
             }
 
-            auto future = m_trustStorage->addKeysForPostponedTrustDecisions(encryption, senderKey, keyOwnersForPostponedTrustDecisions);
+            auto future = trustStorage()->addKeysForPostponedTrustDecisions(encryption, senderKey, keyOwnersForPostponedTrustDecisions);
             await(future, this, [=]() mutable {
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
                 await(future, this, [=]() mutable {
@@ -380,9 +380,10 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
 
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
+    auto future = setTrustLevel(encryption, keyIds, QXmppTrustStorage::Authenticated);
     await(future, this, [=]() mutable {
-        await(m_trustStorage->securityPolicy(encryption), this, [=](const auto securityPolicy) mutable {
+        auto future = securityPolicy(encryption);
+        await(future, this, [=](auto securityPolicy) mutable {
             if (securityPolicy == QXmppTrustStorage::Toakafa) {
                 auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
                 await(future, this, [=]() mutable {
@@ -417,9 +418,9 @@ QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiH
 
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    auto future = m_trustStorage->setTrustLevel(encryption, keyIds, QXmppTrustStorage::ManuallyDistrusted);
+    auto future = setTrustLevel(encryption, keyIds, QXmppTrustStorage::ManuallyDistrusted);
     await(future, this, [=]() mutable {
-        auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
+        auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
         await(future, this, [=]() mutable {
             interface.reportFinished();
         });
@@ -437,7 +438,7 @@ QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiH
 ///
 QFuture<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids)
 {
-    return m_trustStorage->setTrustLevel(encryption, keyOwnerJids, QXmppTrustStorage::AutomaticallyTrusted, QXmppTrustStorage::AutomaticallyDistrusted);
+    return setTrustLevel(encryption, keyOwnerJids, QXmppTrustStorage::AutomaticallyTrusted, QXmppTrustStorage::AutomaticallyDistrusted);
 }
 
 ///
@@ -454,13 +455,13 @@ QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryp
 {
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
-    auto future = m_trustStorage->keysForPostponedTrustDecisions(encryption, senderKeyIds);
+    auto future = trustStorage()->keysForPostponedTrustDecisions(encryption, senderKeyIds);
     await(future, this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
         // JIDs of key owners mapped to the IDs of their keys
         const auto keysBeingAuthenticated = keysForPostponedTrustDecisions.value(true);
         const auto keysBeingDistrusted = keysForPostponedTrustDecisions.value(false);
 
-        auto future = m_trustStorage->removeKeysForPostponedTrustDecisions(encryption, keysBeingAuthenticated.values(), keysBeingDistrusted.values());
+        auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keysBeingAuthenticated.values(), keysBeingDistrusted.values());
         await(future, this, [=]() mutable {
             auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
             await(future, this, [=]() mutable {

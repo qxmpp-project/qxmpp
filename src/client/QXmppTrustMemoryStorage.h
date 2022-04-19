@@ -34,8 +34,8 @@ public:
     QFuture<QHash<QString, QHash<QByteArray, TrustLevel>>> keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels = {}) override;
     QFuture<bool> hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels) override;
 
-    QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel) override;
-    QFuture<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel) override;
+    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel) override;
+    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel) override;
     QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId) override;
 
     QFuture<void> resetAll(const QString &encryption) override;
