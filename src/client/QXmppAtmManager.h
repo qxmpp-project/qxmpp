@@ -6,13 +6,13 @@
 #define QXMPPATMMANAGER_H
 
 #include "QXmppAtmTrustStorage.h"
-#include "QXmppClientExtension.h"
 #include "QXmppSendResult.h"
+#include "QXmppTrustManager.h"
 
 class QXmppMessage;
 class QXmppTrustMessageKeyOwner;
 
-class QXMPP_EXPORT QXmppAtmManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppAtmManager : public QXmppTrustManager
 {
     Q_OBJECT
 
@@ -42,7 +42,10 @@ private:
 
     QFuture<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
 
-    QXmppAtmTrustStorage *m_trustStorage;
+    inline QXmppAtmTrustStorage *trustStorage() const
+    {
+        return reinterpret_cast<QXmppAtmTrustStorage *>(QXmppTrustManager::trustStorage());
+    }
 
     friend class tst_QXmppAtmManager;
 };
