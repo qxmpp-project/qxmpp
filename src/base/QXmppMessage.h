@@ -173,6 +173,8 @@ public:
     // XEP-0280: Message Carbons
     bool isPrivate() const;
     void setPrivate(const bool);
+    bool isCarbonForwarded() const;
+    void setCarbonForwarded(bool);
 
     // XEP-0308: Last Message Correction
     QString replaceId() const;

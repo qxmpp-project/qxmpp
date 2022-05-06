@@ -28,6 +28,7 @@ void compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
     QCOMPARE(lhs.thread(), rhs.thread());
     QCOMPARE(lhs.stamp(), rhs.stamp());
     QCOMPARE(lhs.type(), rhs.type());
+    QCOMPARE(lhs.isCarbonForwarded(), rhs.isCarbonForwarded());
 }
 
 class QXmppCarbonTestHelper : public QObject
@@ -243,6 +244,7 @@ void tst_QXmppCarbonManager::testHandleStanza()
     if (!forwardedxml.isEmpty()) {
         parsePacket(expectedMessage, forwardedxml);
     }
+    expectedMessage.setCarbonForwarded(true);
 
     {
         m_helper.m_expectedMessage = expectedMessage;

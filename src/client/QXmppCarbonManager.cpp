@@ -91,6 +91,7 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 
     QXmppMessage message;
     message.parse(messageElement);
+    message.setCarbonForwarded(true);
 
     if (sent)
         emit messageSent(message);

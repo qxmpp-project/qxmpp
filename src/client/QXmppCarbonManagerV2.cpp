@@ -101,6 +101,8 @@ auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional
 /// client.addNewExtension<QXmppCarbonManagerV2>();
 /// \endcode
 ///
+/// To distinguish carbon messages, you can use QXmppMessage::isCarbonMessage().
+///
 /// \ingroup Managers
 ///
 /// \since QXmpp 1.5
@@ -133,6 +135,7 @@ bool Manager::handleStanza(const QDomElement &element, const std::optional<QXmpp
 
     QXmppMessage message;
     message.parse(messageElement);
+    message.setCarbonForwarded(true);
 
     injectMessage(std::move(message));
     return true;
