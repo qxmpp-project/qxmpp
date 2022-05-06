@@ -7,14 +7,16 @@
 #define QXMPPMESSAGERECEIPTMANAGER_H
 
 #include "QXmppClientExtension.h"
+#include "QXmppMessageHandler.h"
 
+///
 /// \brief The QXmppMessageReceiptManager class makes it possible to
 /// send and receive message delivery receipts as defined in
 /// \xep{0184}: Message Delivery Receipts.
 ///
 /// \ingroup Managers
-
-class QXMPP_EXPORT QXmppMessageReceiptManager : public QXmppClientExtension
+///
+class QXMPP_EXPORT QXmppMessageReceiptManager : public QXmppClientExtension, public QXmppMessageHandler
 {
     Q_OBJECT
 public:
@@ -22,7 +24,7 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &stanza) override;
+    bool handleMessage(const QXmppMessage &) override;
     /// \endcond
 
 Q_SIGNALS:

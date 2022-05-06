@@ -26,17 +26,11 @@ QStringList QXmppMessageReceiptManager::discoveryFeatures() const
     return QStringList(ns_message_receipts);
 }
 
-bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
+bool QXmppMessageReceiptManager::handleMessage(const QXmppMessage &message)
 {
-    if (stanza.tagName() != "message")
+    if (message.type() == QXmppMessage::Error) {
         return false;
-
-    QXmppMessage message;
-    message.parse(stanza);
-
-    if (message.type() == QXmppMessage::Error)
-        return false;
-
+    }
     // Handle receipts and cancel any further processing.
     if (!message.receiptId().isEmpty()) {
         // Buggy clients also mark carbon messages as received; to avoid this
@@ -52,7 +46,7 @@ bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
         QXmppMessage receipt;
         receipt.setTo(message.from());
         receipt.setReceiptId(message.id());
-        client()->sendPacket(receipt);
+        client()->reply(std::move(receipt), message.e2eeMetadata());
     }
 
     // Continue processing.
