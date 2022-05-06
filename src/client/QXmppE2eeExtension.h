@@ -5,6 +5,7 @@
 #ifndef QXMPPE2EEEXTENSION_H
 #define QXMPPE2EEEXTENSION_H
 
+#include "QXmppExtension.h"
 #include "QXmppSendResult.h"
 
 class QDomElement;
@@ -13,7 +14,7 @@ class QXmppIq;
 template<typename T>
 class QFuture;
 
-class QXmppE2eeExtension
+class QXmppE2eeExtension : public QXmppExtension
 {
 public:
     struct NotEncrypted
