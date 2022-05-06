@@ -63,8 +63,14 @@ QStringList QXmppCarbonManager::discoveryFeatures() const
     return QStringList() << ns_carbons;
 }
 
-bool QXmppCarbonManager::handleStanza(const QDomElement &element)
+bool QXmppCarbonManager::handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
+    // Carbons currently don't work with incoming e2ee'd QXmppMessages (no handleMessage()
+    // implementation).  Currently this is not a problem, because the carbon itself is usually not
+    // encrypted and only the contained message is encrypted (decrypting that works).  To fix this
+    // one solution would be to implement carbons in QXmppMessage and store the carbon message in
+    // there (but that would increase the size of QXmppMessage).
+
     if (element.tagName() != "message")
         return false;
 
@@ -91,12 +97,19 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 
     QXmppMessage message;
     message.parse(messageElement);
+    message.setE2eeMetadata(e2eeMetadata);
 
-    if (sent)
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
+    if (sent) {
         emit messageSent(message);
-    else
+    } else {
         emit messageReceived(message);
+    }
+    QT_WARNING_POP
 
+    // further processing (e.g. decryption or handling)
+    injectMessage(std::move(message));
     return true;
 }
 /// \endcond

@@ -33,12 +33,15 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &element) override;
+    bool handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata) override;
     /// \endcond
 
-Q_SIGNALS:
-    void messageReceived(const QXmppMessage &);
-    void messageSent(const QXmppMessage &);
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+    QT_DEPRECATED_X("Use a client extension with handleMessage(QXmppMessage)")
+    Q_SIGNAL void messageReceived(const QXmppMessage &);
+    QT_DEPRECATED_X("Use a client extension with handleMessage(QXmppMessage)")
+    Q_SIGNAL void messageSent(const QXmppMessage &);
+#endif
 
 private:
     bool m_carbonsEnabled;
