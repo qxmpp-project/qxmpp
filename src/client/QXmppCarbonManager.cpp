@@ -98,6 +98,7 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element, const std::opt
     QXmppMessage message;
     message.parse(messageElement);
     message.setE2eeMetadata(e2eeMetadata);
+    message.setCarbonForwarded(true);
 
     QT_WARNING_PUSH
     QT_WARNING_DISABLE_DEPRECATED

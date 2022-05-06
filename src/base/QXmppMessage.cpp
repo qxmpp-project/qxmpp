@@ -104,6 +104,7 @@ public:
 
     // XEP-0280: Message Carbons
     bool privatemsg;
+    bool isCarbonForwarded;
 
     // XEP-0308: Last Message Correction
     QString replaceId;
@@ -157,6 +158,7 @@ QXmppMessagePrivate::QXmppMessagePrivate()
       receiptRequested(false),
       attentionRequested(false),
       privatemsg(false),
+      isCarbonForwarded(false),
       markable(false),
       marker(QXmppMessage::NoMarker),
       hints(0),
@@ -657,6 +659,28 @@ bool QXmppMessage::isPrivate() const
 void QXmppMessage::setPrivate(const bool priv)
 {
     d->privatemsg = priv;
+}
+
+///
+/// Returns whether this message has been forwarded using carbons.
+///
+/// \since QXmpp 1.5
+///
+bool QXmppMessage::isCarbonForwarded() const
+{
+    return d->isCarbonForwarded;
+}
+
+///
+/// Sets whether this message has been forwarded using carbons.
+///
+/// Setting this to true has no effect, this is purely informational.
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setCarbonForwarded(bool forwarded)
+{
+    d->isCarbonForwarded = forwarded;
 }
 
 ///
