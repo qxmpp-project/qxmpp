@@ -265,7 +265,7 @@ QFuture<void> QXmppTrustManager::resetAll(const QString &encryption)
 }
 
 /// \cond
-bool QXmppTrustManager::handleStanza(const QDomElement &stanza)
+bool QXmppTrustManager::handleStanza(const QDomElement &)
 {
     return false;
 }
