@@ -527,7 +527,7 @@ void tst_QXmppOmemoData::testOmemoElement()
 void tst_QXmppOmemoData::testMessageOmemoElement()
 {
     const QByteArray xmlIn(QByteArrayLiteral(
-        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
+        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"chat\">"
         "<store xmlns=\"urn:xmpp:hints\"/>"
         "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"
@@ -558,7 +558,7 @@ void tst_QXmppOmemoData::testMessageOmemoElement()
     // needed since they are serialized in the reverse order in which they are
     // deserialized.
     const QByteArray xmlOut1(QByteArrayLiteral(
-        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"normal\">"
+        "<message id=\"send1\" to=\"juliet@capulet.lit\" from=\"romeo@montague.lit\" type=\"chat\">"
         "<store xmlns=\"urn:xmpp:hints\"/>"
         "<encrypted xmlns=\"urn:xmpp:omemo:2\">"
         "<header sid=\"27183\">"

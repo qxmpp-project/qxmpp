@@ -151,7 +151,7 @@ public:
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
-    : type(QXmppMessage::Normal),
+    : type(QXmppMessage::Chat),
       state(QXmppMessage::None),
       stampType(DelayedDelivery),
       receiptRequested(false),
@@ -175,7 +175,6 @@ QXmppMessagePrivate::QXmppMessagePrivate()
 QXmppMessage::QXmppMessage(const QString &from, const QString &to, const QString &body, const QString &thread)
     : QXmppStanza(from, to), d(new QXmppMessagePrivate)
 {
-    d->type = Chat;
     d->body = body;
     d->thread = thread;
 }
