@@ -22,10 +22,12 @@ public:
     };
 
     using MessageEncryptResult = std::variant<QByteArray, QXmpp::SendError>;
+    using MessageDecryptResult = std::variant<QXmppMessage, QXmpp::SendError>;
     using IqEncryptResult = std::variant<QByteArray, QXmpp::SendError>;
     using IqDecryptResult = std::variant<QDomElement, NotEncrypted, QXmpp::SendError>;
 
     virtual QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&) = 0;
+    virtual std::variant<NotEncrypted, QFuture<MessageDecryptResult>> decryptMessage(QXmppMessage) = 0;
 
     virtual QFuture<IqEncryptResult> encryptIq(QXmppIq &&) = 0;
     virtual QFuture<IqDecryptResult> decryptIq(const QDomElement &) = 0;

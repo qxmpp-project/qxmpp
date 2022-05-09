@@ -103,6 +103,11 @@ public:
         return makeReadyFuture<MessageEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
+    std::variant<NotEncrypted, QFuture<MessageDecryptResult>> decryptMessage(QXmppMessage) override
+    {
+        return NotEncrypted();
+    };
+
     QFuture<IqEncryptResult> encryptIq(QXmppIq &&) override
     {
         iqCalled = true;
