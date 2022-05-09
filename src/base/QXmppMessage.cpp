@@ -1598,13 +1598,15 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         }
 
         // XEP-0184: Message Delivery Receipts
+        // An ack message (message containing a "received" element) must not
+        // include a receipt request ("request" element) in order to prevent
+        // looping.
         if (!d->receiptId.isEmpty()) {
             writer->writeStartElement(QStringLiteral("received"));
             writer->writeDefaultNamespace(ns_message_receipts);
             writer->writeAttribute(QStringLiteral("id"), d->receiptId);
             writer->writeEndElement();
-        }
-        if (d->receiptRequested) {
+        } else if (d->receiptRequested) {
             writer->writeStartElement(QStringLiteral("request"));
             writer->writeDefaultNamespace(ns_message_receipts);
             writer->writeEndElement();
