@@ -170,6 +170,8 @@ const char *ns_spoiler = "urn:xmpp:spoiler:0";
 const char *ns_omemo = "eu.siacs.conversations.axolotl";
 const char *ns_omemo_1 = "urn:xmpp:omemo:1";
 const char *ns_omemo_2 = "urn:xmpp:omemo:2";
+const char *ns_omemo_2_bundles = "urn:xmpp:omemo:2:bundles";
+const char *ns_omemo_2_devices = "urn:xmpp:omemo:2:devices";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 const char *ns_mix_pam = "urn:xmpp:mix:pam:1";
 const char *ns_mix_roster = "urn:xmpp:mix:roster:0";

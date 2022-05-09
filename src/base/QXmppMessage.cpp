@@ -11,8 +11,10 @@
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal_p.h"
 #include "QXmppMixInvitation.h"
+#ifdef BUILD_OMEMO
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
+#endif
 #include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 
@@ -136,10 +138,10 @@ public:
     // XEP-0382: Spoiler messages
     bool isSpoiler;
     QString spoilerHint;
-
+#ifdef BUILD_OMEMO
     // XEP-0384: OMEMO Encryption
     std::optional<QXmppOmemoElement> omemoElement;
-
+#endif
     // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
     std::optional<QXmppMixInvitation> mixInvitation;
 
@@ -1078,6 +1080,8 @@ void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
         d->isSpoiler = true;
 }
 
+#ifdef BUILD_OMEMO
+/// \cond
 ///
 /// Returns an included OMEMO element as defined by \xep{0384, OMEMO Encryption}.
 ///
@@ -1097,6 +1101,8 @@ void QXmppMessage::setOmemoElement(const std::optional<QXmppOmemoElement> &omemo
 {
     d->omemoElement = omemoElement;
 }
+/// \endcond
+#endif
 
 ///
 /// Returns an included \xep{0369}: Mediated Information eXchange (MIX)
@@ -1297,6 +1303,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             d->encryptionName = element.attribute(QStringLiteral("name"));
             return true;
         }
+#ifdef BUILD_OMEMO
         // XEP-0384: OMEMO Encryption
         if (QXmppOmemoElement::isOmemoElement(element)) {
             QXmppOmemoElement omemoElement;
@@ -1304,6 +1311,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             d->omemoElement = omemoElement;
             return true;
         }
+#endif
         // XEP-0428: Fallback Indication
         if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
             d->isFallback = true;
@@ -1523,10 +1531,12 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeEndElement();
         }
 
+#ifdef BUILD_OMEMO
         // XEP-0384: OMEMO Encryption
         if (d->omemoElement) {
             d->omemoElement->toXml(writer);
         }
+#endif
 
         // XEP-0428: Fallback Indication
         if (d->isFallback) {

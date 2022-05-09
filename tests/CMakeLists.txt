@@ -76,8 +76,17 @@ if(WITH_GSTREAMER)
     add_simple_test(qxmppcallmanager)
 endif()
 
+if(WITH_OMEMO)
+    if(BUILD_INTERNAL_TESTS)
+        add_simple_test(qxmppomemodata)
+    endif()
+    add_simple_test(qxmppomemomemorystorage)
+
+    add_simple_test(qxmppomemomanager)
+    target_link_libraries(tst_qxmppomemomanager PkgConfig::OmemoC qca-qt${QT_VERSION_MAJOR})
+endif()
+
 if(BUILD_INTERNAL_TESTS)
-    add_simple_test(qxmppomemodata)
     add_simple_test(qxmppsasl)
     add_simple_test(qxmppstreaminitiationiq)
 endif()
