@@ -18,7 +18,9 @@
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
 class QXmppMixInvitation;
+#ifdef BUILD_OMEMO
 class QXmppOmemoElement;
+#endif
 class QXmppTrustMessageElement;
 
 ///
@@ -232,10 +234,6 @@ public:
     QString spoilerHint() const;
     void setSpoilerHint(const QString &);
 
-    // XEP-0384: OMEMO Encryption
-    std::optional<QXmppOmemoElement> omemoElement() const;
-    void setOmemoElement(const std::optional<QXmppOmemoElement> &omemoElement);
-
     // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
     std::optional<QXmppMixInvitation> mixInvitation() const;
     void setMixInvitation(const std::optional<QXmppMixInvitation> &mixInvitation);
@@ -249,6 +247,12 @@ public:
     void setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement);
 
     /// \cond
+#ifdef BUILD_OMEMO
+    // XEP-0384: OMEMO Encryption
+    std::optional<QXmppOmemoElement> omemoElement() const;
+    void setOmemoElement(const std::optional<QXmppOmemoElement> &omemoElement);
+#endif
+
     void parse(const QDomElement &element) override final;
     virtual void parse(const QDomElement &element, QXmpp::SceMode);
     void toXml(QXmlStreamWriter *writer) const override final;

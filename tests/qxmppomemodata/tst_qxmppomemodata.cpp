@@ -660,7 +660,7 @@ void tst_QXmppOmemoData::testOmemoIq()
 
     QXmppOmemoIq omemoIq2;
     omemoIq2.setOmemoElement(omemoElement);
-    QCOMPARE(omemoIq1.omemoElement().payload(), QByteArray::fromBase64(omemoPayload));
+    QCOMPARE(omemoIq2.omemoElement().payload(), QByteArray::fromBase64(omemoPayload));
     serializePacket(omemoIq2, xmlOmemoIq);
 }
 

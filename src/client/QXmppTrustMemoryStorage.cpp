@@ -6,6 +6,8 @@
 
 #include "QXmppFutureUtils_p.h"
 
+#include <QMultiHash>
+
 using namespace QXmpp;
 using namespace QXmpp::Private;
 

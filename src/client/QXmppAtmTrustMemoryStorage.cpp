@@ -7,6 +7,8 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppTrustMessageKeyOwner.h"
 
+#include <QMultiHash>
+
 using namespace QXmpp::Private;
 
 ///

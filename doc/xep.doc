@@ -62,6 +62,7 @@ Complete:
 - \xep{0367, Message Attaching} (v0.3)
 - \xep{0380, Explicit Message Encryption} (v0.4)
 - \xep{0382, Spoiler messages} (v0.2)
+- \xep{0384, OMEMO Encryption} (v0.8)
 - \xep{0420, Stanza Content Encryption} (v0.4)
 - \xep{0428, Fallback Indication} (v0.1)
 - \xep{0434, Trust Messages} (v0.6)
@@ -70,7 +71,6 @@ Complete:
 Ongoing:
 - \xep{0009, Jabber-RPC} (API is not finalized yet)
 - \xep{0369, Mediated Information eXchange (MIX)} (Only IQ queries implemented) (v0.14)
-- \xep{0384, OMEMO Encryption} (Only wire protocol data classes implemented) (v0.8)
 - \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements} (Only IQ queries implemented) (v0.4)
 - \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities} (QXmppMixInvitation) (v0.1)
 

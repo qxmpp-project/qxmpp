@@ -247,7 +247,7 @@ QByteArray QXmppOmemoDeviceBundle::signedPublicPreKeySignature() const
 }
 
 ///
-/// Returns the signature of the public pre key that is signed.
+/// Sets the signature of the public pre key that is signed.
 ///
 /// \param signature signature of the signed public pre key
 ///

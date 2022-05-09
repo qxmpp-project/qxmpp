@@ -182,6 +182,8 @@ extern const char *ns_spoiler;
 extern const char *ns_omemo;
 extern const char *ns_omemo_1;
 extern const char *ns_omemo_2;
+extern const char *ns_omemo_2_bundles;
+extern const char *ns_omemo_2_devices;
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 extern const char *ns_mix_pam;
 extern const char *ns_mix_roster;

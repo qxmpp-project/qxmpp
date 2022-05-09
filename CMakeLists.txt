@@ -26,7 +26,7 @@ option(BUILD_TESTS "Build tests." ON)
 option(BUILD_INTERNAL_TESTS "Build internal tests." OFF)
 option(BUILD_DOCUMENTATION "Build API documentation." OFF)
 option(BUILD_EXAMPLES "Build examples." ON)
-
+option(BUILD_OMEMO "Build the OMEMO module" OFF)
 option(WITH_GSTREAMER "Build with GStreamer support for Jingle" OFF)
 
 add_definitions(
@@ -35,6 +35,20 @@ add_definitions(
     -DQT_NO_CAST_TO_ASCII
     -DQT_NO_FOREACH
 )
+
+if(BUILD_OMEMO)
+    add_definitions(-DBUILD_OMEMO)
+
+    # libomemo-c
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(OmemoC REQUIRED IMPORTED_TARGET libomemo-c)
+
+    # QCA
+    find_package(Qca-qt${QT_VERSION_MAJOR} REQUIRED)
+    if(${QT_VERSION_MAJOR} EQUAL 6)
+        find_package(Qt6Core5Compat REQUIRED)
+    endif()
+endif()
 
 add_subdirectory(src)
 

@@ -169,7 +169,6 @@ set(SOURCE_FILES
     base/QXmppMucIq.cpp
     base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
-    base/QXmppOmemoData.cpp
     base/QXmppPacket.cpp
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
@@ -251,6 +250,31 @@ set(SOURCE_FILES
     server/QXmppServerPlugin.cpp
 )
 
+if(BUILD_OMEMO)
+    set(INSTALL_HEADER_FILES
+        ${INSTALL_HEADER_FILES}
+
+        # Client
+        client/QXmppOmemoManager.h
+        client/QXmppOmemoMemoryStorage.h
+        client/QXmppOmemoStorage.h
+    )
+
+    set(SOURCE_FILES
+        ${SOURCE_FILES}
+
+        # Base
+        base/QXmppOmemoData.cpp
+
+        # Client
+        client/QXmppOmemoManager.cpp
+        client/QXmppOmemoManager_p.cpp
+        client/QXmppOmemoMemoryStorage.cpp
+        client/QXmppOmemoStorage.cpp
+        client/OmemoCryptoProvider.cpp
+    )
+endif()
+
 if(WITH_GSTREAMER)
     find_package(GStreamer REQUIRED)
     find_package(GLIB2 REQUIRED)
@@ -301,6 +325,14 @@ target_link_libraries(qxmpp
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Xml
 )
+
+if(WITH_OMEMO)
+    target_link_libraries(qxmpp
+        PRIVATE
+        PkgConfig::OmemoC
+        qca-qt${QT_VERSION_MAJOR}
+    )
+endif()
 
 if(WITH_GSTREAMER)
     target_link_libraries(qxmpp
