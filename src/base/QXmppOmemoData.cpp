@@ -10,6 +10,7 @@
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
+#include "QXmppOmemoItems_p.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
@@ -682,5 +683,55 @@ bool QXmppOmemoIq::isOmemoIq(const QDomElement &element)
 {
     auto child = element.firstChildElement();
     return !child.isNull() && QXmppOmemoElement::isOmemoElement(child);
+}
+
+QXmppOmemoDeviceBundle QXmppOmemoDeviceBundleItem::deviceBundle() const
+{
+    return m_deviceBundle;
+}
+
+void QXmppOmemoDeviceBundleItem::setDeviceBundle(const QXmppOmemoDeviceBundle &deviceBundle)
+{
+    m_deviceBundle = deviceBundle;
+}
+
+bool QXmppOmemoDeviceBundleItem::isItem(const QDomElement &itemElement)
+{
+    return QXmppPubSubItem::isItem(itemElement, QXmppOmemoDeviceBundle::isOmemoDeviceBundle);
+}
+
+void QXmppOmemoDeviceBundleItem::parsePayload(const QDomElement &payloadElement)
+{
+    m_deviceBundle.parse(payloadElement);
+}
+
+void QXmppOmemoDeviceBundleItem::serializePayload(QXmlStreamWriter *writer) const
+{
+    m_deviceBundle.toXml(writer);
+}
+
+QXmppOmemoDeviceList QXmppOmemoDeviceListItem::deviceList() const
+{
+    return m_deviceList;
+}
+
+void QXmppOmemoDeviceListItem::setDeviceList(const QXmppOmemoDeviceList &deviceList)
+{
+    m_deviceList = deviceList;
+}
+
+bool QXmppOmemoDeviceListItem::isItem(const QDomElement &itemElement)
+{
+    return QXmppPubSubItem::isItem(itemElement, QXmppOmemoDeviceList::isOmemoDeviceList);
+}
+
+void QXmppOmemoDeviceListItem::parsePayload(const QDomElement &payloadElement)
+{
+    m_deviceList.parse(payloadElement);
+}
+
+void QXmppOmemoDeviceListItem::serializePayload(QXmlStreamWriter *writer) const
+{
+    m_deviceList.toXml(writer);
 }
 /// \endcond
