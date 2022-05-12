@@ -253,6 +253,7 @@ public:
     virtual void toXml(QXmlStreamWriter *writer, QXmpp::SceMode) const;
     /// \endcond
 
+    void parseExtensions(const QDomElement &element, QXmpp::SceMode sceMode);
     virtual bool parseExtension(const QDomElement &element, QXmpp::SceMode);
     virtual void serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode, const QString &baseNamespace = {}) const;
 

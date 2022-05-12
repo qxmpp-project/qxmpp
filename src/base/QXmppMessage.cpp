@@ -1188,20 +1188,7 @@ void QXmppMessage::parse(const QDomElement &element, QXmpp::SceMode sceMode)
     else
         d->type = QXmppMessage::Normal;
 
-    QXmppElementList extensions;
-    for (auto childElement = element.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
-        if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
-            childElement.tagName() != QStringLiteral("error")) {
-            // try to parse; add to unknown extensions, if element couldn't be parsed
-            if (!parseExtension(childElement, sceMode)) {
-                // other extensions
-                extensions << QXmppElement(childElement);
-            }
-        }
-    }
-    setExtensions(extensions);
+    parseExtensions(element, sceMode);
 }
 
 void QXmppMessage::toXml(QXmlStreamWriter *writer) const
@@ -1228,6 +1215,30 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
     writer->writeEndElement();
 }
 /// \endcond
+
+///
+/// Parses all child elements of a message stanza.
+///
+/// \param element message element or SCE content element
+/// \param sceMode mode to decide which child elements of the message to parse
+///
+void QXmppMessage::parseExtensions(const QDomElement &element, const QXmpp::SceMode sceMode)
+{
+    QXmppElementList unknownExtensions;
+    for (auto childElement = element.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
+            childElement.tagName() != QStringLiteral("error")) {
+            // Try to parse the element and add it as an unknown extension if it
+            // fails.
+            if (!parseExtension(childElement, sceMode)) {
+                unknownExtensions << QXmppElement(childElement);
+            }
+        }
+    }
+    setExtensions(unknownExtensions);
+}
 
 ///
 /// Parses a child element of the message stanza.
