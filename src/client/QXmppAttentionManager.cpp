@@ -188,29 +188,26 @@ QString QXmppAttentionManager::requestAttention(const QString &jid, const QStrin
     return {};
 }
 
-void QXmppAttentionManager::setClient(QXmppClient *client)
+bool QXmppAttentionManager::handleMessage(const QXmppMessage &message)
 {
-    QXmppClientExtension::setClient(client);
+    // This always returns false because the message might contain a body or
+    // other elements to be processed.
 
-    connect(client, &QXmppClient::messageReceived,
-            this, &QXmppAttentionManager::handleMessageReceived);
-}
-
-void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
-{
-    if (!message.isAttentionRequested() || !message.stamp().isNull())
-        return;
+    if (!message.isAttentionRequested() || !message.stamp().isNull()) {
+        return false;
+    }
 
     const QString bareJid = QXmppUtils::jidToBareJid(message.from());
 
     // ignore messages from our own bare JID (e.g. carbon or IM-NG message)
-    if (bareJid == client()->configuration().jidBare())
-        return;
+    if (bareJid == client()->configuration().jidBare()) {
+        return false;
+    }
 
     // check rate limit
     if (!d->checkRateLimit(bareJid)) {
         emit attentionRequestRateLimited(message);
-        return;
+        return false;
     }
 
     bool isTrusted = false;
@@ -219,6 +216,7 @@ void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
     }
 
     emit attentionRequested(message, isTrusted);
+    return false;
 }
 
 QXmppAttentionManagerPrivate::QXmppAttentionManagerPrivate(QXmppAttentionManager *parent, quint8 allowedAttempts, QTime timeFrame)

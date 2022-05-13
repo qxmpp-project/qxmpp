@@ -6,13 +6,14 @@
 #define QXMPPATTENTIONMANAGER_H
 
 #include "QXmppClientExtension.h"
+#include "QXmppMessageHandler.h"
 
 #include <QTime>
 
 class QXmppAttentionManagerPrivate;
 class QXmppMessage;
 
-class QXMPP_EXPORT QXmppAttentionManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppAttentionManager : public QXmppClientExtension, public QXmppMessageHandler
 {
     Q_OBJECT
 
@@ -28,18 +29,14 @@ public:
     QTime allowedAttemptsTimeInterval() const;
     void setAllowedAttemptsTimeInterval(QTime interval);
 
+    bool handleMessage(const QXmppMessage &) override;
+
 public Q_SLOTS:
     QString requestAttention(const QString &jid, const QString &message = {});
 
 Q_SIGNALS:
     void attentionRequested(const QXmppMessage &message, bool isTrusted);
     void attentionRequestRateLimited(const QXmppMessage &message);
-
-protected:
-    void setClient(QXmppClient *client) override;
-
-private Q_SLOTS:
-    void handleMessageReceived(const QXmppMessage &message);
 
 private:
     QXmppAttentionManagerPrivate *const d;
