@@ -29,7 +29,7 @@
 #include <QTimer>
 
 using namespace QXmpp::Private;
-using EncryptMessageResult = QXmppE2eeExtension::EncryptMessageResult;
+using MessageEncryptResult = QXmppE2eeExtension::MessageEncryptResult;
 using IqEncryptResult = QXmppE2eeExtension::IqEncryptResult;
 using IqDecryptResult = QXmppE2eeExtension::IqDecryptResult;
 
@@ -408,10 +408,10 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 {
-    const auto sendEncrypted = [this](QFuture<EncryptMessageResult> &&future) {
+    const auto sendEncrypted = [this](QFuture<MessageEncryptResult> &&future) {
         QFutureInterface<QXmpp::SendResult> interface(QFutureInterfaceBase::Started);
 
-        await(future, this, [this, interface](EncryptMessageResult &&result) mutable {
+        await(future, this, [this, interface](MessageEncryptResult &&result) mutable {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 auto future = d->stream->send(QXmppPacket(*xml, true, interface));
                 await(future, this, [interface](QXmpp::SendResult &&result) mutable {

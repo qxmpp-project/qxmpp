@@ -97,10 +97,10 @@ public:
     bool messageCalled = false;
     bool iqCalled = false;
 
-    QFuture<EncryptMessageResult> encryptMessage(QXmppMessage &&) override
+    QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&) override
     {
         messageCalled = true;
-        return makeReadyFuture<EncryptMessageResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
+        return makeReadyFuture<MessageEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
     QFuture<IqEncryptResult> encryptIq(QXmppIq &&) override

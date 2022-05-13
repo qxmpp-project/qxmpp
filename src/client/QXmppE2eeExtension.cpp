@@ -19,11 +19,9 @@
 ///
 /// Indicates that the input was not encrypted and so nothing could be decrypted.
 ///
-/// \since QXmpp 1.5
-///
 
 ///
-/// \typedef QXmppE2eeExtension::EncryptMessageResult
+/// \typedef QXmppE2eeExtension::MessageEncryptResult
 ///
 /// Contains the XML serialized message stanza with encrypted contents or a
 /// QXmpp::SendError in case the message couldn't be encrypted.
