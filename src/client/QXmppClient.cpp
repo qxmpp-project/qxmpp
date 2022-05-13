@@ -786,7 +786,25 @@ QXmppVersionManager &QXmppClient::versionManager()
 
 void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
-    StanzaPipeline::process(d->extensions, element, e2eeMetadata);
+    if (element.tagName() != "iq") {
+        return;
+    }
+    if (!StanzaPipeline::process(d->extensions, element, e2eeMetadata)) {
+        const auto iqType = element.attribute("type");
+        if (iqType == "get" || iqType == "set") {
+            // send error IQ
+            using Err = QXmppStanza::Error;
+
+            QXmppIq iq(QXmppIq::Error);
+            iq.setTo(element.attribute("from"));
+            const auto errMessage = e2eeMetadata.has_value()
+                    ? QStringLiteral("Feature not implemented or not supported with end-to-end encryption.")
+                    : QStringLiteral("Feature not implemented.");
+            iq.setError(Err(Err::Cancel, Err::FeatureNotImplemented, errMessage));
+            reply(std::move(iq), e2eeMetadata);
+        }
+        // don't do anything for "result" and "error" IQs
+    }
 }
 
 ///
