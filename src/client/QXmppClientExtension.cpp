@@ -4,6 +4,8 @@
 
 #include "QXmppClientExtension.h"
 
+#include "QXmppClient.h"
+
 #include <QStringList>
 
 class QXmppClientExtensionPrivate
@@ -100,4 +102,20 @@ QXmppClient *QXmppClientExtension::client()
 void QXmppClientExtension::setClient(QXmppClient *client)
 {
     d->client = client;
+}
+
+///
+/// Injects an IQ element into the client.
+///
+/// The IQ is handled like any other stanza received via the XMPP stream.
+///
+/// \param element
+/// \param e2eeMetadata End-to-end encryption metadata for the IQ. Should
+/// be set if the stanza has been decrypted with an end-to-end encryption.
+///
+/// \since QXmpp 1.5
+///
+void QXmppClientExtension::injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
+{
+    client()->injectIq(element, e2eeMetadata);
 }

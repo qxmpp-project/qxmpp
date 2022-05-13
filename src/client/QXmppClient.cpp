@@ -784,6 +784,11 @@ QXmppVersionManager &QXmppClient::versionManager()
     return *findExtension<QXmppVersionManager>();
 }
 
+void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
+{
+    StanzaPipeline::process(d->extensions, element, e2eeMetadata);
+}
+
 ///
 /// Give extensions a chance to handle incoming stanzas.
 ///

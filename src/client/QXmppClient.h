@@ -307,6 +307,9 @@ public Q_SLOTS:
     bool sendPacket(const QXmppNonza &);
     void sendMessage(const QString &bareJid, const QString &message);
 
+private:
+    void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
+
 private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
     void _q_reconnect();
@@ -318,6 +321,7 @@ private Q_SLOTS:
 private:
     QXmppClientPrivate *const d;
 
+    friend class QXmppClientExtension;
     friend class QXmppInternalClientExtension;
     friend class TestClient;
 };
