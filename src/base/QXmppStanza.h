@@ -72,6 +72,9 @@ class QXMPP_EXPORT QXmppE2eeMetadata
 {
 public:
     QXmppE2eeMetadata();
+    /// \cond
+    QXmppE2eeMetadata(QSharedDataPointer<QXmppE2eeMetadataPrivate> d);
+    /// \endcond
     QXmppE2eeMetadata(const QXmppE2eeMetadata &other);
     ~QXmppE2eeMetadata();
 
@@ -89,12 +92,6 @@ public:
 
 private:
     friend class QXmppStanza;
-    friend class QXmppStanzaPrivate;
-
-    /// \cond
-    explicit QXmppE2eeMetadata(const std::optional<QXmppE2eeMetadata> &other);
-    std::optional<QXmppE2eeMetadata> toOptional() const;
-    /// \endcond
 
     QSharedDataPointer<QXmppE2eeMetadataPrivate> d;
 };
