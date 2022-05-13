@@ -22,6 +22,25 @@
 using namespace QXmpp::Private;
 
 ///
+/// \class QXmppPubSubEventHandler
+///
+/// Interface for handling \xep{0060, Publish-Subscribe} (PubSub) events.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \fn QXmppPubSubEventHandler::handlePubSubEvent()
+///
+/// Handles the PubSub event.
+///
+/// \param element QDomElement of the &lt;message/&gt; stanza
+/// \param pubSubService JID of the PubSub service
+/// \param nodeName Name of the PubSub node on the service
+/// \returns Whether the event has been handled and should not be handled by other event handlers.
+///
+
+///
 /// \class QXmppPubSubManager
 ///
 /// \brief The QXmppPubSubManager aims to provide publish-subscribe

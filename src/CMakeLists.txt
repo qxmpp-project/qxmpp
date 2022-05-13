@@ -106,6 +106,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppMucManager.h
     client/QXmppOutgoingClient.h
     client/QXmppRegistrationManager.h
+    client/QXmppPubSubEventHandler.h
     client/QXmppPubSubEventManager.h
     client/QXmppPubSubManager.h
     client/QXmppRemoteMethod.h
