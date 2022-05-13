@@ -718,6 +718,13 @@ QXmppE2eeMetadata::QXmppE2eeMetadata()
 {
 }
 
+/// \cond
+QXmppE2eeMetadata::QXmppE2eeMetadata(QSharedDataPointer<QXmppE2eeMetadataPrivate> d)
+    : d(d)
+{
+}
+/// \endcond
+
 ///
 /// Constructs a copy of \a other.
 ///
@@ -726,24 +733,6 @@ QXmppE2eeMetadata::QXmppE2eeMetadata()
 QXmppE2eeMetadata::QXmppE2eeMetadata(const QXmppE2eeMetadata &other) = default;
 
 QXmppE2eeMetadata::~QXmppE2eeMetadata() = default;
-
-/// \cond
-QXmppE2eeMetadata::QXmppE2eeMetadata(const std::optional<QXmppE2eeMetadata> &other)
-    : d(nullptr)
-{
-    if (other) {
-        *this = *other;
-    }
-}
-
-std::optional<QXmppE2eeMetadata> QXmppE2eeMetadata::toOptional() const
-{
-    if (d) {
-        return *this;
-    }
-    return {};
-}
-/// \endcond
 
 ///
 /// Assigns \a other to this end-to-end encryption metadata class.
@@ -858,7 +847,7 @@ public:
     QXmppStanza::Error error;
     QXmppElementList extensions;
     QList<QXmppExtendedAddress> extendedAddresses;
-    QXmppE2eeMetadata e2eeMetadata = QXmppE2eeMetadata(std::nullopt);
+    QSharedDataPointer<QXmppE2eeMetadataPrivate> e2eeMetadata;
 };
 
 ///
@@ -1018,7 +1007,10 @@ void QXmppStanza::setExtendedAddresses(const QList<QXmppExtendedAddress> &addres
 ///
 std::optional<QXmppE2eeMetadata> QXmppStanza::e2eeMetadata() const
 {
-    return d->e2eeMetadata.toOptional();
+    if (d->e2eeMetadata) {
+        return QXmppE2eeMetadata(d->e2eeMetadata);
+    }
+    return {};
 }
 
 ///
@@ -1028,7 +1020,11 @@ std::optional<QXmppE2eeMetadata> QXmppStanza::e2eeMetadata() const
 ///
 void QXmppStanza::setE2eeMetadata(const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
-    d->e2eeMetadata = QXmppE2eeMetadata(e2eeMetadata);
+    if (e2eeMetadata) {
+        d->e2eeMetadata = e2eeMetadata->d;
+    } else {
+        d->e2eeMetadata = nullptr;
+    }
 }
 
 /// \cond
