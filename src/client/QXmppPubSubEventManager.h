@@ -7,10 +7,11 @@
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
+#include "QXmppPubSubEventHandler.h"
 
 class QXmppPubSubManager;
 
-class QXMPP_EXPORT QXmppPubSubEventManager : public QXmppClientExtension
+class QXMPP_EXPORT QXmppPubSubEventManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
     Q_OBJECT
 
@@ -21,14 +22,10 @@ public:
     }
 
 protected:
-    virtual bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) = 0;
-
     inline QXmppPubSubManager *pubSub()
     {
         return client()->findExtension<QXmppPubSubManager>();
     }
-
-    friend class QXmppPubSubManager;
 };
 
 #endif

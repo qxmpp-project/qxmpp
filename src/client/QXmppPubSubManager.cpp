@@ -990,8 +990,8 @@ bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 
             const auto extensions = client()->extensions();
             for (auto *extension : extensions) {
-                if (auto *eventManager = qobject_cast<QXmppPubSubEventManager *>(extension)) {
-                    if (eventManager->handlePubSubEvent(element, service, node)) {
+                if (auto *eventHandler = dynamic_cast<QXmppPubSubEventHandler *>(extension)) {
+                    if (eventHandler->handlePubSubEvent(element, service, node)) {
                         return true;
                     }
                 }
