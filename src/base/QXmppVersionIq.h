@@ -26,6 +26,7 @@ public:
 
     /// \cond
     static bool isVersionIq(const QDomElement &element);
+    static bool checkIqType(const QString &tagName, const QString &xmlNamespace);
     /// \endcond
 
 protected:

@@ -260,6 +260,7 @@ public:
 
     /// \cond
     static bool isVCard(const QDomElement &element);
+    static bool checkIqType(const QString &tagName, const QString &xmlNamespace);
     /// \endcond
 
 protected:

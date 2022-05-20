@@ -10,6 +10,8 @@
 class QXmppVCardIq;
 class QXmppVCardManagerPrivate;
 
+class QXmppVersionIq;
+
 ///
 /// \brief The QXmppVCardManager class gets/sets XMPP vCards. It is an
 /// implementation of \xep{0054}: vcard-temp.
@@ -53,6 +55,8 @@ public:
     /// \cond
     QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &element) override;
+    bool handleIq(QXmppVCardIq);
+    bool handleIq(QXmppVersionIq);
     /// \endcond
 
 Q_SIGNALS:
