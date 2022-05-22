@@ -97,13 +97,13 @@ public:
     bool messageCalled = false;
     bool iqCalled = false;
 
-    QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&) override
+    QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&, const std::optional<QXmppSendStanzaParams> &) override
     {
         messageCalled = true;
         return makeReadyFuture<MessageEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
-    QFuture<IqEncryptResult> encryptIq(QXmppIq &&) override
+    QFuture<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) override
     {
         iqCalled = true;
         return makeReadyFuture<IqEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
