@@ -113,6 +113,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppRemoteMethod.h
     client/QXmppRosterManager.h
     client/QXmppRpcManager.h
+    client/QXmppSendStanzaParams.h
     client/QXmppTransferManager.h
     client/QXmppTransferManager_p.h
     client/QXmppTrustManager.h
@@ -225,6 +226,7 @@ set(SOURCE_FILES
     client/QXmppPubSubEventManager.h # for MOC
     client/QXmppRemoteMethod.cpp
     client/QXmppRpcManager.cpp
+    client/QXmppSendStanzaParams.cpp
     client/QXmppTlsManager.cpp
     client/QXmppTransferManager.cpp
     client/QXmppTrustManager.cpp
