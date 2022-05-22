@@ -406,7 +406,7 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
+QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
 {
     const auto sendEncrypted = [this](QFuture<MessageEncryptResult> &&future) {
         QFutureInterface<QXmpp::SendResult> interface(QFutureInterfaceBase::Started);
@@ -427,9 +427,13 @@ QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 
     if (d->encryptionExtension) {
         if (dynamic_cast<QXmppMessage *>(&stanza)) {
-            return sendEncrypted(d->encryptionExtension->encryptMessage(std::move(dynamic_cast<QXmppMessage &&>(stanza))));
+            return sendEncrypted(
+                d->encryptionExtension->encryptMessage(
+                    std::move(dynamic_cast<QXmppMessage &&>(stanza)), params));
         } else if (dynamic_cast<QXmppIq *>(&stanza)) {
-            return sendEncrypted(d->encryptionExtension->encryptIq(std::move(dynamic_cast<QXmppIq &&>(stanza))));
+            return sendEncrypted(
+                d->encryptionExtension->encryptIq(
+                    std::move(dynamic_cast<QXmppIq &&>(stanza)), params));
         }
     }
     return d->stream->send(stanza);
@@ -449,7 +453,7 @@ QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza)
+QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
 {
     return d->stream->send(stanza);
 }
@@ -463,14 +467,14 @@ QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
+QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> &params)
 {
     // This should pick the right e2ee manager as soon as multiple encryptions
     // in parallel are supported.
     if (e2eeMetadata) {
-        return send(std::move(stanza));
+        return send(std::move(stanza), params);
     }
-    return sendUnencrypted(std::move(stanza));
+    return sendUnencrypted(std::move(stanza), params);
 }
 
 ///
@@ -488,7 +492,7 @@ QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::o
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq)
+QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
 {
     return d->stream->sendIq(std::move(iq));
 }
@@ -506,7 +510,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
+QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params)
 {
     const auto sendEncrypted = [this](QFuture<IqEncryptResult> &&future, const QString &id) {
         QFutureInterface<IqResult> interface(QFutureInterfaceBase::Started);
@@ -559,7 +563,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
 
     if (d->encryptionExtension) {
         const auto id = iq.id();
-        return sendEncrypted(d->encryptionExtension->encryptIq(std::move(iq)), id);
+        return sendEncrypted(d->encryptionExtension->encryptIq(std::move(iq), params), id);
     }
     return d->stream->sendIq(std::move(iq));
 }
@@ -577,7 +581,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq)
+QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
 {
     return chainIq(sendIq(std::move(iq)), this, [](const QXmppIq &) -> EmptyResult {
         return QXmpp::Success();

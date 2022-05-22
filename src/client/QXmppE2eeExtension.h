@@ -7,6 +7,9 @@
 
 #include "QXmppExtension.h"
 #include "QXmppSendResult.h"
+#include "QXmppSendStanzaParams.h"
+
+#include <optional>
 
 class QDomElement;
 class QXmppMessage;
@@ -25,9 +28,9 @@ public:
     using IqEncryptResult = std::variant<QByteArray, QXmpp::SendError>;
     using IqDecryptResult = std::variant<QDomElement, NotEncrypted, QXmpp::SendError>;
 
-    virtual QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&) = 0;
+    virtual QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&, const std::optional<QXmppSendStanzaParams> &) = 0;
 
-    virtual QFuture<IqEncryptResult> encryptIq(QXmppIq &&) = 0;
+    virtual QFuture<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) = 0;
     virtual QFuture<IqDecryptResult> decryptIq(const QDomElement &) = 0;
 };
 
