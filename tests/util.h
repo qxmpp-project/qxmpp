@@ -76,7 +76,9 @@ template<typename T, typename Input>
 T expectFutureVariant(const QFuture<Input> &future)
 {
 #define return \
-    return { }
+    return     \
+    {          \
+    }
     QVERIFY(future.isFinished());
     QVERIFY2(std::holds_alternative<T>(future.result()), "Variant contains wrong type!");
 #undef return
