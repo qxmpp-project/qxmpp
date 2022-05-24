@@ -48,7 +48,7 @@ QVector<QString> QXmppSendStanzaParams::encryptionJids() const
 /// If this is empty, the stanza should be encrypted for the recipient.
 /// This option is useful for groupchats.
 ///
-void QXmppSendStanzaParams::sendEncryptionJids(QVector<QString> encryptionJids)
+void QXmppSendStanzaParams::setEncryptionJids(QVector<QString> encryptionJids)
 {
     d->encryptionJids = std::move(encryptionJids);
 }

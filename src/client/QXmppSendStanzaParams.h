@@ -20,7 +20,7 @@ public:
     QXmppSendStanzaParams &operator=(const QXmppSendStanzaParams &);
 
     QVector<QString> encryptionJids() const;
-    void sendEncryptionJids(QVector<QString>);
+    void setEncryptionJids(QVector<QString>);
 
 private:
     QSharedDataPointer<QXmppSendStanzaParamsPrivate> d;
