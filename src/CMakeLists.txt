@@ -36,6 +36,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppDiscoveryIq.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
+    base/QXmppExtension.h
     base/QXmppFutureUtils_p.h
     base/QXmppGeolocItem.h
     base/QXmppGlobal.h
