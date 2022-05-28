@@ -5,8 +5,8 @@
 #ifndef QXMPPCLIENTEXTENSION_H
 #define QXMPPCLIENTEXTENSION_H
 
-#include "QXmppExtension.h"
 #include "QXmppDiscoveryIq.h"
+#include "QXmppExtension.h"
 #include "QXmppLogger.h"
 
 class QDomElement;

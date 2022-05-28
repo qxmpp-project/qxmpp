@@ -17,4 +17,4 @@ public:
     virtual bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) = 0;
 };
 
-#endif // QXMPPPUBSUBEVENTHANDLER_H
+#endif  // QXMPPPUBSUBEVENTHANDLER_H
