@@ -10,6 +10,11 @@
 
 using namespace QXmpp::Private;
 
+static QXmppPubSubManager *pubSub(QXmppClient *client)
+{
+    return client->findExtension<QXmppPubSubManager>();
+}
+
 ///
 /// \class QXmppUserTuneManager
 ///
@@ -75,7 +80,7 @@ QStringList QXmppUserTuneManager::discoveryFeatures() const
 auto QXmppUserTuneManager::request(const QString &jid)
     -> QFuture<GetResult>
 {
-    return Pep::request<Item>(pubSub(), jid, ns_tune, this);
+    return Pep::request<Item>(pubSub(client()), jid, ns_tune, this);
 }
 
 ///
@@ -86,7 +91,7 @@ auto QXmppUserTuneManager::request(const QString &jid)
 auto QXmppUserTuneManager::publish(const QXmppTuneItem &item)
     -> QFuture<PublishResult>
 {
-    return pubSub()->publishPepItem(ns_tune, item);
+    return pubSub(client())->publishPepItem(ns_tune, item);
 }
 
 /// \cond

@@ -5,13 +5,16 @@
 #ifndef QXMPPUSERTUNEMANAGER_H
 #define QXMPPUSERTUNEMANAGER_H
 
-#include "QXmppPubSubEventManager.h"
+#include "QXmppClientExtension.h"
+#include "QXmppPubSubEventHandler.h"
 
 #include <variant>
 
 class QXmppTuneItem;
+template<typename T>
+class QFuture;
 
-class QXMPP_EXPORT QXmppUserTuneManager : public QXmppPubSubEventManager
+class QXMPP_EXPORT QXmppUserTuneManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
     Q_OBJECT
 
