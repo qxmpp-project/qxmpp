@@ -7,7 +7,7 @@
 #include "QXmppClient.h"
 #include "QXmppMessage.h"
 #include "QXmppPubSubAffiliation.h"
-#include "QXmppPubSubEventManager.h"
+#include "QXmppPubSubEventHandler.h"
 #include "QXmppPubSubIq.h"
 #include "QXmppPubSubItem.h"
 #include "QXmppPubSubManager.h"
@@ -29,12 +29,12 @@ using AffiliationType = QXmppPubSubAffiliation::Affiliation;
 const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
 const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
 
-class TestEventManager : public QXmppPubSubEventManager
+class TestEventManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
 public:
     QXmppPubSubManager *pubSub()
     {
-        return QXmppPubSubEventManager::pubSub();
+        return client()->findExtension<QXmppPubSubManager>();
     }
 
     bool handlePubSubEvent(const QDomElement &, const QString &pubSubService, const QString &nodeName) override

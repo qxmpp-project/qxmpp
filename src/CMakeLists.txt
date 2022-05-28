@@ -109,7 +109,6 @@ set(INSTALL_HEADER_FILES
     client/QXmppOutgoingClient.h
     client/QXmppRegistrationManager.h
     client/QXmppPubSubEventHandler.h
-    client/QXmppPubSubEventManager.h
     client/QXmppPubSubManager.h
     client/QXmppRemoteMethod.h
     client/QXmppRosterManager.h
@@ -224,7 +223,6 @@ set(SOURCE_FILES
     client/QXmppRosterManager.cpp
     client/QXmppRegistrationManager.cpp
     client/QXmppPubSubManager.cpp
-    client/QXmppPubSubEventManager.h # for MOC
     client/QXmppRemoteMethod.cpp
     client/QXmppRpcManager.cpp
     client/QXmppSendStanzaParams.cpp

@@ -11,6 +11,11 @@
 
 using namespace QXmpp::Private;
 
+static QXmppPubSubManager *pubSub(QXmppClient *client)
+{
+    return client->findExtension<QXmppPubSubManager>();
+}
+
 ///
 /// \class QXmppUserLocationManager
 ///
@@ -74,7 +79,7 @@ QStringList QXmppUserLocationManager::discoveryFeatures() const
 auto QXmppUserLocationManager::request(const QString &jid)
     -> QFuture<GetResult>
 {
-    return Pep::request<Item>(pubSub(), jid, ns_geoloc, this);
+    return Pep::request<Item>(pubSub(client()), jid, ns_geoloc, this);
 }
 
 ///
@@ -85,7 +90,7 @@ auto QXmppUserLocationManager::request(const QString &jid)
 auto QXmppUserLocationManager::publish(const QXmppGeolocItem &item)
     -> QFuture<PublishResult>
 {
-    return pubSub()->publishPepItem(ns_geoloc, item);
+    return pubSub(client())->publishPepItem(ns_geoloc, item);
 }
 
 /// \cond

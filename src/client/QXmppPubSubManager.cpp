@@ -9,7 +9,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppPubSubAffiliation.h"
-#include "QXmppPubSubEventManager.h"
+#include "QXmppPubSubEventHandler.h"
 #include "QXmppPubSubItem.h"
 #include "QXmppPubSubSubscribeOptions.h"
 #include "QXmppPubSubSubscription.h"
