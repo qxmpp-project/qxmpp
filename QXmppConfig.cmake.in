@@ -4,11 +4,29 @@
 
 @PACKAGE_INIT@
 
+set(_QXmpp_FIND_PARTS_REQUIRED)
+if(QXmpp_FIND_REQUIRED)
+    set(_QXmpp_FIND_PARTS_REQUIRED REQUIRED)
+endif()
+set(_QXmpp_FIND_PARTS_QUIET)
+if(QXmpp_FIND_QUIETLY)
+    set(_QXmpp_FIND_PARTS_QUIET QUIET)
+endif()
+
 include(CMakeFindDependencyMacro)
 find_dependency(Qt@QT_VERSION_MAJOR@Core)
 find_dependency(Qt@QT_VERSION_MAJOR@Network)
 find_dependency(Qt@QT_VERSION_MAJOR@Xml)
 
 include("${CMAKE_CURRENT_LIST_DIR}/QXmpp.cmake")
-check_required_components(QXmpp)
 
+foreach(module ${QXmpp_FIND_COMPONENTS})
+    find_package(QXmpp${module}
+        ${QXmpp_FIND_VERSION}
+        ${_QXmpp_FIND_PARTS_REQUIRED}
+        ${_QXmpp_FIND_PARTS_QUIET}
+    )
+    set(QXmpp_${module}_FOUND ${QXmpp${module}_FOUND})
+endforeach()
+
+check_required_components(QXmpp)

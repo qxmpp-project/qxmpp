@@ -5,14 +5,14 @@
 #ifndef QXMPPOMEMOMEMORYSTORAGE_H
 #define QXMPPOMEMOMEMORYSTORAGE_H
 
-#include "QXmppGlobal.h"
 #include "QXmppOmemoStorage.h"
+#include "qxmppomemo_export.h"
 
 #include <memory>
 
 class QXmppOmemoMemoryStoragePrivate;
 
-class QXMPP_EXPORT QXmppOmemoMemoryStorage : public QXmppOmemoStorage
+class QXMPPOMEMO_EXPORT QXmppOmemoMemoryStorage : public QXmppOmemoStorage
 {
 public:
     QXmppOmemoMemoryStorage();

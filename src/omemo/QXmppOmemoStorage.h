@@ -5,14 +5,14 @@
 #ifndef QXMPPOMEMOSTORAGE_H
 #define QXMPPOMEMOSTORAGE_H
 
-#include "QXmppGlobal.h"
+#include "qxmppomemo_export.h"
 
 #include <optional>
 
 #include <QDateTime>
 #include <QFuture>
 
-class QXMPP_EXPORT QXmppOmemoStorage
+class QXMPPOMEMO_EXPORT QXmppOmemoStorage
 {
 public:
     ///

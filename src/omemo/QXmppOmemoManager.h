@@ -11,13 +11,14 @@
 #include "QXmppPubSubEventHandler.h"
 #include "QXmppPubSubManager.h"
 #include "QXmppTrustSecurityPolicy.h"
+#include "qxmppomemo_export.h"
 
 class QXmppOmemoDevicePrivate;
 class QXmppOmemoManagerPrivate;
 class QXmppOmemoOwnDevicePrivate;
 class QXmppOmemoStorage;
 
-class QXMPP_EXPORT QXmppOmemoOwnDevice
+class QXMPPOMEMO_EXPORT QXmppOmemoOwnDevice
 {
 public:
     QXmppOmemoOwnDevice();
@@ -38,7 +39,7 @@ private:
     QSharedDataPointer<QXmppOmemoOwnDevicePrivate> d;
 };
 
-class QXMPP_EXPORT QXmppOmemoDevice
+class QXMPPOMEMO_EXPORT QXmppOmemoDevice
 {
 public:
     QXmppOmemoDevice();
@@ -65,7 +66,7 @@ private:
     QSharedDataPointer<QXmppOmemoDevicePrivate> d;
 };
 
-class QXMPP_EXPORT QXmppOmemoManager : public QXmppClientExtension, public QXmppE2eeExtension, public QXmppPubSubEventHandler, public QXmppMessageHandler
+class QXMPPOMEMO_EXPORT QXmppOmemoManager : public QXmppClientExtension, public QXmppE2eeExtension, public QXmppPubSubEventHandler, public QXmppMessageHandler
 {
     Q_OBJECT
 

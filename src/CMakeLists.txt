@@ -251,28 +251,8 @@ set(SOURCE_FILES
 )
 
 if(BUILD_OMEMO)
-    set(INSTALL_HEADER_FILES
-        ${INSTALL_HEADER_FILES}
-
-        # Client
-        client/QXmppOmemoManager.h
-        client/QXmppOmemoMemoryStorage.h
-        client/QXmppOmemoStorage.h
-    )
-
-    set(SOURCE_FILES
-        ${SOURCE_FILES}
-
-        # Base
-        base/QXmppOmemoData.cpp
-
-        # Client
-        client/QXmppOmemoManager.cpp
-        client/QXmppOmemoManager_p.cpp
-        client/QXmppOmemoMemoryStorage.cpp
-        client/QXmppOmemoStorage.cpp
-        client/OmemoCryptoProvider.cpp
-    )
+    # required to be used in QXmppMessage
+    set(SOURCE_FILES ${SOURCE_FILES} base/QXmppOmemoDataBase.cpp)
 endif()
 
 if(WITH_GSTREAMER)
@@ -326,14 +306,6 @@ target_link_libraries(qxmpp
     Qt${QT_VERSION_MAJOR}::Xml
 )
 
-if(WITH_OMEMO)
-    target_link_libraries(qxmpp
-        PRIVATE
-        PkgConfig::OmemoC
-        qca-qt${QT_VERSION_MAJOR}
-    )
-endif()
-
 if(WITH_GSTREAMER)
     target_link_libraries(qxmpp
         PRIVATE
@@ -366,3 +338,7 @@ install(
     FILES ${INSTALL_HEADER_FILES}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
 )
+
+if(BUILD_OMEMO)
+    add_subdirectory(omemo)
+endif()
