@@ -16,7 +16,7 @@ class QDomElement;
 class QXmppOmemoEnvelope;
 class QXmlStreamWriter;
 
-class QXMPP_AUTOTEST_EXPORT QXmppOmemoElement
+class QXMPP_EXPORT QXmppOmemoElement
 {
 public:
     uint32_t senderDeviceId() const;
