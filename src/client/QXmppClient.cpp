@@ -828,6 +828,7 @@ void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmpp
 
             QXmppIq iq(QXmppIq::Error);
             iq.setTo(element.attribute("from"));
+            iq.setId(element.attribute("id"));
             const auto errMessage = e2eeMetadata.has_value()
                 ? QStringLiteral("Feature not implemented or not supported with end-to-end encryption.")
                 : QStringLiteral("Feature not implemented.");
