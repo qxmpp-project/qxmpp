@@ -47,7 +47,7 @@
 /// Encrypts a QXmppMessage and returns the serialized XML stanza with encrypted
 /// contents via QFuture.
 ///
-/// If the message cannot be encrypted for whatever reason you can either
+/// If the message cannot be encrypted for whatever reason, you can either
 /// serialize the message unencrypted and return that or return a SendError with
 /// an error message.
 ///
@@ -58,7 +58,7 @@
 /// Encrypts a QXmppIq and returns the serialized XML stanza with encrypted
 /// contents via QFuture.
 ///
-/// If the IQ cannot be encrypted for whatever reason you can either serialize
+/// If the IQ cannot be encrypted for whatever reason, you can either serialize
 /// the IQ unencrypted and return that or return a SendError with an error
 /// message.
 ///

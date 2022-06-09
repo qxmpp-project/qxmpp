@@ -29,7 +29,7 @@ private slots:
 
     void testIndexOfExtension();
 
-    void testE2eeEncryption();
+    void testE2eeExtension();
 
 private:
     QXmppClient *client;
@@ -115,7 +115,7 @@ public:
     }
 };
 
-void tst_QXmppClient::testE2eeEncryption()
+void tst_QXmppClient::testE2eeExtension()
 {
     QXmppClient client;
     EncryptionExtension encrypter;

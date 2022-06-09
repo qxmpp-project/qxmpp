@@ -73,7 +73,7 @@ bool QXmppClientExtension::handleStanza(const QDomElement &)
 /// stanzas.
 ///
 /// \param stanza The DOM element to be handled.
-/// \param e2eeMetadata If the element has been decrypted this contains metdata
+/// \param e2eeMetadata If the element has been decrypted this contains metadata
 /// about the encryption.
 ///
 /// \return You should return true if the stanza was handled and no further
