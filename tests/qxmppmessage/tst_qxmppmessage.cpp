@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
-// SPDX-FileCopyrightText: 2012 Germán Márquez Mejía <mancho@olomono.de>
 // SPDX-FileCopyrightText: 2021 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -9,7 +8,6 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
-#include "QXmppOmemoElement_p.h"
 #include "QXmppTrustMessageElement.h"
 
 #include <optional>
