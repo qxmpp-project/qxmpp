@@ -34,7 +34,8 @@ QXmppStreamFeaturesPrivate::QXmppStreamFeaturesPrivate()
       streamManagementMode(QXmppStreamFeatures::Disabled),
       csiMode(QXmppStreamFeatures::Disabled),
       registerMode(QXmppStreamFeatures::Disabled),
-      preApprovedSubscriptionsSupported(false)
+      preApprovedSubscriptionsSupported(false),
+      rosterVersioningSupported(false)
 {
 }
 
