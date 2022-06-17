@@ -19,9 +19,11 @@ class QXmppMamQueryIq : public QXmppIq
 public:
     QXmppMamQueryIq();
     QXmppMamQueryIq(const QXmppMamQueryIq &);
+    QXmppMamQueryIq(QXmppMamQueryIq &&);
     ~QXmppMamQueryIq();
 
     QXmppMamQueryIq &operator=(const QXmppMamQueryIq &);
+    QXmppMamQueryIq &operator=(QXmppMamQueryIq &&);
 
     QXmppDataForm form() const;
     void setForm(const QXmppDataForm &form);
@@ -49,9 +51,11 @@ class QXmppMamResultIq : public QXmppIq
 public:
     QXmppMamResultIq();
     QXmppMamResultIq(const QXmppMamResultIq &);
+    QXmppMamResultIq(QXmppMamResultIq &&);
     ~QXmppMamResultIq();
 
     QXmppMamResultIq &operator=(const QXmppMamResultIq &);
+    QXmppMamResultIq &operator=(QXmppMamResultIq &&);
 
     QXmppResultSetReply resultSetReply() const;
     void setResultSetReply(const QXmppResultSetReply &resultSetReply);

@@ -186,11 +186,13 @@ QXmppExtendedAddress::QXmppExtendedAddress()
 
 /// Default copy-constructur
 QXmppExtendedAddress::QXmppExtendedAddress(const QXmppExtendedAddress &other) = default;
-
+/// Default move-constructur
+QXmppExtendedAddress::QXmppExtendedAddress(QXmppExtendedAddress &&) = default;
 QXmppExtendedAddress::~QXmppExtendedAddress() = default;
-
 /// Default assignment operator
 QXmppExtendedAddress &QXmppExtendedAddress::operator=(const QXmppExtendedAddress &other) = default;
+/// Default assignment operator
+QXmppExtendedAddress &QXmppExtendedAddress::operator=(QXmppExtendedAddress &&) = default;
 
 ///
 /// Returns the human-readable description of the address.
@@ -321,6 +323,8 @@ QXmppStanza::Error::Error()
 
 /// Copy constructor
 QXmppStanza::Error::Error(const QXmppStanza::Error &) = default;
+/// Move constructor
+QXmppStanza::Error::Error(QXmppStanza::Error &&) = default;
 
 ///
 /// Initializes an error with a type, condition and text.
@@ -347,9 +351,10 @@ QXmppStanza::Error::Error(const QString &type, const QString &cond,
 
 /// Default destructor
 QXmppStanza::Error::~Error() = default;
-
 /// Copy operator
 QXmppStanza::Error &QXmppStanza::Error::operator=(const QXmppStanza::Error &) = default;
+/// Move operator
+QXmppStanza::Error &QXmppStanza::Error::operator=(QXmppStanza::Error &&) = default;
 
 ///
 /// Returns the human-readable description of the error.
@@ -725,21 +730,15 @@ QXmppE2eeMetadata::QXmppE2eeMetadata(QSharedDataPointer<QXmppE2eeMetadataPrivate
 }
 /// \endcond
 
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
+/// Copy-constructor.
 QXmppE2eeMetadata::QXmppE2eeMetadata(const QXmppE2eeMetadata &other) = default;
-
+/// Move-constructor.
+QXmppE2eeMetadata::QXmppE2eeMetadata(QXmppE2eeMetadata &&) = default;
 QXmppE2eeMetadata::~QXmppE2eeMetadata() = default;
-
-///
-/// Assigns \a other to this end-to-end encryption metadata class.
-///
-/// \param other
-///
+/// Assignment operator.
 QXmppE2eeMetadata &QXmppE2eeMetadata::operator=(const QXmppE2eeMetadata &other) = default;
+/// Assignment move-operator.
+QXmppE2eeMetadata &QXmppE2eeMetadata::operator=(QXmppE2eeMetadata &&) = default;
 
 ///
 /// Returns the used encryption protocol.
@@ -865,12 +864,14 @@ QXmppStanza::QXmppStanza(const QString &from, const QString &to)
 
 /// Constructs a copy of \a other.
 QXmppStanza::QXmppStanza(const QXmppStanza &other) = default;
-
+/// Move constructor.
+QXmppStanza::QXmppStanza(QXmppStanza &&) = default;
 /// Destroys a QXmppStanza.
 QXmppStanza::~QXmppStanza() = default;
-
 /// Assigns \a other to this stanza.
 QXmppStanza &QXmppStanza::operator=(const QXmppStanza &other) = default;
+/// Move-assignment operator.
+QXmppStanza &QXmppStanza::operator=(QXmppStanza &&) = default;
 
 ///
 /// Returns the stanza's recipient JID.

@@ -27,19 +27,14 @@ QXmppMixInvitation::QXmppMixInvitation()
 {
 }
 
-///
-/// Copy constructor
-///
+/// Copy constructor.
 QXmppMixInvitation::QXmppMixInvitation(const QXmppMixInvitation &other) = default;
-
-///
+/// Copy constructor.
+QXmppMixInvitation::QXmppMixInvitation(QXmppMixInvitation &&) = default;
 /// Default assignment operator.
-///
 QXmppMixInvitation &QXmppMixInvitation::operator=(const QXmppMixInvitation &other) = default;
-
-///
-/// Destructor
-///
+/// Default assignment operator.
+QXmppMixInvitation &QXmppMixInvitation::operator=(QXmppMixInvitation &&) = default;
 QXmppMixInvitation::~QXmppMixInvitation() = default;
 
 ///

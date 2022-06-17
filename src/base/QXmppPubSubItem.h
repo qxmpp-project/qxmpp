@@ -20,9 +20,11 @@ class QXMPP_EXPORT QXmppPubSubItem
 public:
     QXmppPubSubItem(const QString &id = {}, const QString &publisher = {});
     QXmppPubSubItem(const QXmppPubSubItem &);
+    QXmppPubSubItem(QXmppPubSubItem &&);
     virtual ~QXmppPubSubItem();
 
     QXmppPubSubItem &operator=(const QXmppPubSubItem &);
+    QXmppPubSubItem &operator=(QXmppPubSubItem &&);
 
     QString id() const;
     void setId(const QString &id);

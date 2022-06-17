@@ -24,9 +24,11 @@ class QXMPP_EXPORT QXmppRegisterIq : public QXmppIq
 public:
     QXmppRegisterIq();
     QXmppRegisterIq(const QXmppRegisterIq &other);
+    QXmppRegisterIq(QXmppRegisterIq &&);
     ~QXmppRegisterIq();
 
     QXmppRegisterIq &operator=(const QXmppRegisterIq &other);
+    QXmppRegisterIq &operator=(QXmppRegisterIq &&);
 
     static QXmppRegisterIq createChangePasswordRequest(const QString &username, const QString &newPassword, const QString &to = {});
     static QXmppRegisterIq createUnregistrationRequest(const QString &to = {});

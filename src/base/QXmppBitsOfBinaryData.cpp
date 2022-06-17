@@ -50,12 +50,14 @@ QXmppBitsOfBinaryData::QXmppBitsOfBinaryData()
 
 /// Default copy-constructor
 QXmppBitsOfBinaryData::QXmppBitsOfBinaryData(const QXmppBitsOfBinaryData &) = default;
-
+/// Default move-constructor
+QXmppBitsOfBinaryData::QXmppBitsOfBinaryData(QXmppBitsOfBinaryData &&) = default;
 /// Default destructor
 QXmppBitsOfBinaryData::~QXmppBitsOfBinaryData() = default;
-
 /// Default assignment operator
 QXmppBitsOfBinaryData &QXmppBitsOfBinaryData::operator=(const QXmppBitsOfBinaryData &) = default;
+/// Default move-assignment operator
+QXmppBitsOfBinaryData &QXmppBitsOfBinaryData::operator=(QXmppBitsOfBinaryData &&) = default;
 
 ///
 /// Returns the content id of the data

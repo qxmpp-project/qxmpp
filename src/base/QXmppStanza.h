@@ -39,9 +39,11 @@ class QXMPP_EXPORT QXmppExtendedAddress
 public:
     QXmppExtendedAddress();
     QXmppExtendedAddress(const QXmppExtendedAddress &);
+    QXmppExtendedAddress(QXmppExtendedAddress &&);
     ~QXmppExtendedAddress();
 
     QXmppExtendedAddress &operator=(const QXmppExtendedAddress &);
+    QXmppExtendedAddress &operator=(QXmppExtendedAddress &&);
 
     QString description() const;
     void setDescription(const QString &description);
@@ -76,9 +78,11 @@ public:
     QXmppE2eeMetadata(QSharedDataPointer<QXmppE2eeMetadataPrivate> d);
     /// \endcond
     QXmppE2eeMetadata(const QXmppE2eeMetadata &other);
+    QXmppE2eeMetadata(QXmppE2eeMetadata &&);
     ~QXmppE2eeMetadata();
 
     QXmppE2eeMetadata &operator=(const QXmppE2eeMetadata &other);
+    QXmppE2eeMetadata &operator=(QXmppE2eeMetadata &&);
 
     QXmpp::Encryption encryption() const;
     void setEncryption(QXmpp::Encryption encryption);
@@ -165,11 +169,13 @@ public:
 
         Error();
         Error(const Error &);
+        Error(Error &&);
         Error(Type type, Condition cond, const QString &text = QString());
         Error(const QString &type, const QString &cond, const QString &text = QString());
         ~Error();
 
         Error &operator=(const Error &);
+        Error &operator=(Error &&);
 
         int code() const;
         void setCode(int code);
@@ -214,9 +220,11 @@ public:
 
     QXmppStanza(const QString &from = QString(), const QString &to = QString());
     QXmppStanza(const QXmppStanza &other);
+    QXmppStanza(QXmppStanza &&);
     virtual ~QXmppStanza();
 
     QXmppStanza &operator=(const QXmppStanza &other);
+    QXmppStanza &operator=(QXmppStanza &&);
 
     QString to() const;
     void setTo(const QString &);

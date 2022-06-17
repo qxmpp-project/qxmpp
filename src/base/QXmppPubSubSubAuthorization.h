@@ -16,9 +16,11 @@ public:
 
     QXmppPubSubSubAuthorization();
     QXmppPubSubSubAuthorization(const QXmppPubSubSubAuthorization &);
+    QXmppPubSubSubAuthorization(QXmppPubSubSubAuthorization &&);
     ~QXmppPubSubSubAuthorization();
 
     QXmppPubSubSubAuthorization &operator=(const QXmppPubSubSubAuthorization &);
+    QXmppPubSubSubAuthorization &operator=(QXmppPubSubSubAuthorization &&);
 
     std::optional<bool> allowSubscription() const;
     void setAllowSubscription(std::optional<bool> allowSubscription);

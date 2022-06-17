@@ -272,10 +272,10 @@ QXmppPubSubNodeConfig::QXmppPubSubNodeConfig()
 }
 
 QXmppPubSubNodeConfig::QXmppPubSubNodeConfig(const QXmppPubSubNodeConfig &) = default;
-
+QXmppPubSubNodeConfig::QXmppPubSubNodeConfig(QXmppPubSubNodeConfig &&) = default;
 QXmppPubSubNodeConfig::~QXmppPubSubNodeConfig() = default;
-
 QXmppPubSubNodeConfig &QXmppPubSubNodeConfig::operator=(const QXmppPubSubNodeConfig &) = default;
+QXmppPubSubNodeConfig &QXmppPubSubNodeConfig::operator=(QXmppPubSubNodeConfig &&) = default;
 
 std::optional<QXmppPubSubNodeConfig::AccessModel> QXmppPubSubNodeConfig::accessModel() const
 {

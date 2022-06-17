@@ -20,9 +20,11 @@ public:
 
     QXmppBitsOfBinaryContentId();
     QXmppBitsOfBinaryContentId(const QXmppBitsOfBinaryContentId &cid);
+    QXmppBitsOfBinaryContentId(QXmppBitsOfBinaryContentId &&);
     ~QXmppBitsOfBinaryContentId();
 
     QXmppBitsOfBinaryContentId &operator=(const QXmppBitsOfBinaryContentId &other);
+    QXmppBitsOfBinaryContentId &operator=(QXmppBitsOfBinaryContentId &&);
 
     QString toContentId() const;
     QString toCidUrl() const;

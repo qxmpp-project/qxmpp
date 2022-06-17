@@ -76,27 +76,25 @@ QXmppPresencePrivate::QXmppPresencePrivate()
 {
 }
 
+///
 /// Constructs a QXmppPresence.
 ///
-/// \param type
-
 QXmppPresence::QXmppPresence(QXmppPresence::Type type)
     : d(new QXmppPresencePrivate)
 {
     d->type = type;
 }
 
-/// Constructs a copy of \a other.
-
+/// Copy-constructor.
 QXmppPresence::QXmppPresence(const QXmppPresence &other) = default;
-
+/// Move-constructor.
+QXmppPresence::QXmppPresence(QXmppPresence &&) = default;
 /// Destroys a QXmppPresence.
-
 QXmppPresence::~QXmppPresence() = default;
-
-/// Assigns \a other to this presence.
-
+/// Assignemnt operator.
 QXmppPresence &QXmppPresence::operator=(const QXmppPresence &other) = default;
+/// Move-assignemnt operator.
+QXmppPresence &QXmppPresence::operator=(QXmppPresence &&) = default;
 
 ///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sence (i. e. a message,

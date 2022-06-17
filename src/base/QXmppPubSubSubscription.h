@@ -59,9 +59,11 @@ public:
                             ConfigurationSupport configurationSupport = Unavailable,
                             const QDateTime &expiry = {});
     QXmppPubSubSubscription(const QXmppPubSubSubscription &);
+    QXmppPubSubSubscription(QXmppPubSubSubscription &&);
     ~QXmppPubSubSubscription();
 
     QXmppPubSubSubscription &operator=(const QXmppPubSubSubscription &);
+    QXmppPubSubSubscription &operator=(QXmppPubSubSubscription &&);
 
     QString jid() const;
     void setJid(const QString &jid);

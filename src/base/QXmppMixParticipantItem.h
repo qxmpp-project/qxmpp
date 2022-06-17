@@ -14,9 +14,11 @@ class QXMPP_EXPORT QXmppMixParticipantItem : public QXmppPubSubItem
 public:
     QXmppMixParticipantItem();
     QXmppMixParticipantItem(const QXmppMixParticipantItem &);
+    QXmppMixParticipantItem(QXmppMixParticipantItem &&);
     ~QXmppMixParticipantItem();
 
     QXmppMixParticipantItem &operator=(const QXmppMixParticipantItem &);
+    QXmppMixParticipantItem &operator=(QXmppMixParticipantItem &&);
 
     const QString &nick() const;
     void setNick(QString);

@@ -164,8 +164,10 @@ QXmppExtensibleDataFormBase::QXmppExtensibleDataFormBase()
 
 /// \cond
 QXmppExtensibleDataFormBase::QXmppExtensibleDataFormBase(const QXmppExtensibleDataFormBase &) = default;
+QXmppExtensibleDataFormBase::QXmppExtensibleDataFormBase(QXmppExtensibleDataFormBase &&) = default;
 QXmppExtensibleDataFormBase::~QXmppExtensibleDataFormBase() = default;
 QXmppExtensibleDataFormBase &QXmppExtensibleDataFormBase::operator=(const QXmppExtensibleDataFormBase &) = default;
+QXmppExtensibleDataFormBase &QXmppExtensibleDataFormBase::operator=(QXmppExtensibleDataFormBase &&) = default;
 /// \endcond
 
 ///

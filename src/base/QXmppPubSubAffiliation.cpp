@@ -64,11 +64,13 @@ QXmppPubSubAffiliation::QXmppPubSubAffiliation(Affiliation type,
 
 /// Copy constructor.
 QXmppPubSubAffiliation::QXmppPubSubAffiliation(const QXmppPubSubAffiliation &) = default;
-
+/// Move-constructor.
+QXmppPubSubAffiliation::QXmppPubSubAffiliation(QXmppPubSubAffiliation &&) = default;
 QXmppPubSubAffiliation::~QXmppPubSubAffiliation() = default;
-
 /// Assignment operator.
 QXmppPubSubAffiliation &QXmppPubSubAffiliation::operator=(const QXmppPubSubAffiliation &) = default;
+/// Move-assignment operator.
+QXmppPubSubAffiliation &QXmppPubSubAffiliation::operator=(QXmppPubSubAffiliation &&) = default;
 
 ///
 /// Returns the type of the affiliation.

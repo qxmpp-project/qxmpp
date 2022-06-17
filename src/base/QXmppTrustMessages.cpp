@@ -34,21 +34,15 @@ QXmppTrustMessageElement::QXmppTrustMessageElement()
 {
 }
 
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
+/// Copy-constructor.
 QXmppTrustMessageElement::QXmppTrustMessageElement(const QXmppTrustMessageElement &other) = default;
-
+/// Move-constructor.
+QXmppTrustMessageElement::QXmppTrustMessageElement(QXmppTrustMessageElement &&) = default;
 QXmppTrustMessageElement::~QXmppTrustMessageElement() = default;
-
-///
-/// Assigns \a other to this trust message element.
-///
-/// \param other
-///
+/// Assignment operator.
 QXmppTrustMessageElement &QXmppTrustMessageElement::operator=(const QXmppTrustMessageElement &other) = default;
+/// Move-assignment operator.
+QXmppTrustMessageElement &QXmppTrustMessageElement::operator=(QXmppTrustMessageElement &&) = default;
 
 ///
 /// Returns the namespace of the trust management protocol.
@@ -193,21 +187,15 @@ QXmppTrustMessageKeyOwner::QXmppTrustMessageKeyOwner()
 {
 }
 
-///
-/// Constructs a copy of \a other.
-///
-/// \param other
-///
+/// Copy constructor.
 QXmppTrustMessageKeyOwner::QXmppTrustMessageKeyOwner(const QXmppTrustMessageKeyOwner &other) = default;
-
+/// Copy constructor.
+QXmppTrustMessageKeyOwner::QXmppTrustMessageKeyOwner(QXmppTrustMessageKeyOwner &&) = default;
 QXmppTrustMessageKeyOwner::~QXmppTrustMessageKeyOwner() = default;
-
-///
-/// Assigns \a other to this trust message key owner.
-///
-/// \param other
-///
+/// Assignment operator.
 QXmppTrustMessageKeyOwner &QXmppTrustMessageKeyOwner::operator=(const QXmppTrustMessageKeyOwner &other) = default;
+/// Assignment operator.
+QXmppTrustMessageKeyOwner &QXmppTrustMessageKeyOwner::operator=(QXmppTrustMessageKeyOwner &&) = default;
 
 ///
 /// Returns the bare JID of the key owner.

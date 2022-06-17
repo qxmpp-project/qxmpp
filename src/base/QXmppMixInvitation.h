@@ -25,9 +25,11 @@ class QXMPP_EXPORT QXmppMixInvitation
 public:
     QXmppMixInvitation();
     QXmppMixInvitation(const QXmppMixInvitation &other);
+    QXmppMixInvitation(QXmppMixInvitation &&);
     ~QXmppMixInvitation();
 
     QXmppMixInvitation &operator=(const QXmppMixInvitation &other);
+    QXmppMixInvitation &operator=(QXmppMixInvitation &&);
 
     QString inviterJid() const;
     void setInviterJid(const QString &inviterJid);

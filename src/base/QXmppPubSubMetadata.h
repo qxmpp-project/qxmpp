@@ -25,9 +25,11 @@ public:
 
     QXmppPubSubMetadata();
     QXmppPubSubMetadata(const QXmppPubSubMetadata &);
+    QXmppPubSubMetadata(QXmppPubSubMetadata &&);
     ~QXmppPubSubMetadata();
 
     QXmppPubSubMetadata &operator=(const QXmppPubSubMetadata &);
+    QXmppPubSubMetadata &operator=(QXmppPubSubMetadata &&);
 
     QStringList contactJids() const;
     void setContactJids(const QStringList &contactJids);

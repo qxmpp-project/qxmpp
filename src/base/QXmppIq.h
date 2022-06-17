@@ -32,9 +32,11 @@ public:
 
     QXmppIq(QXmppIq::Type type = QXmppIq::Get);
     QXmppIq(const QXmppIq &other);
+    QXmppIq(QXmppIq &&);
     ~QXmppIq() override;
 
     QXmppIq &operator=(const QXmppIq &other);
+    QXmppIq &operator=(QXmppIq &&);
 
     QXmppIq::Type type() const;
     void setType(QXmppIq::Type);

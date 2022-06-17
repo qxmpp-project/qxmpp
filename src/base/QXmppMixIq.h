@@ -11,6 +11,7 @@
 
 class QXmppMixIqPrivate;
 
+///
 /// \brief The QXmppMixIq class represents an IQ used to do actions on a MIX
 /// channel as defined by \xep{0369}: Mediated Information eXchange (MIX) and
 /// \xep{0405}: Mediated Information eXchange (MIX): Participant Server
@@ -19,7 +20,7 @@ class QXmppMixIqPrivate;
 /// \since QXmpp 1.1
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppMixIq : public QXmppIq
 {
 public:
@@ -38,9 +39,11 @@ public:
 
     QXmppMixIq();
     QXmppMixIq(const QXmppMixIq &);
+    QXmppMixIq(QXmppMixIq &&);
     ~QXmppMixIq() override;
 
     QXmppMixIq &operator=(const QXmppMixIq &);
+    QXmppMixIq &operator=(QXmppMixIq &&);
 
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);

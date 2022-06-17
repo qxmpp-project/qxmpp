@@ -101,9 +101,11 @@ public:
     QXmppExtensibleDataFormBase();
     /// \cond
     QXmppExtensibleDataFormBase(const QXmppExtensibleDataFormBase &);
+    QXmppExtensibleDataFormBase(QXmppExtensibleDataFormBase &&);
     virtual ~QXmppExtensibleDataFormBase();
 
     QXmppExtensibleDataFormBase &operator=(const QXmppExtensibleDataFormBase &);
+    QXmppExtensibleDataFormBase &operator=(QXmppExtensibleDataFormBase &&);
     /// \endcond
 
     QList<QXmppDataForm::Field> unknownFields() const;

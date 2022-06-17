@@ -20,9 +20,11 @@ class QXMPP_EXPORT QXmppBitsOfBinaryData
 public:
     QXmppBitsOfBinaryData();
     QXmppBitsOfBinaryData(const QXmppBitsOfBinaryData &);
+    QXmppBitsOfBinaryData(QXmppBitsOfBinaryData &&);
     ~QXmppBitsOfBinaryData();
 
     QXmppBitsOfBinaryData &operator=(const QXmppBitsOfBinaryData &);
+    QXmppBitsOfBinaryData &operator=(QXmppBitsOfBinaryData &&);
 
     QXmppBitsOfBinaryContentId cid() const;
     void setCid(const QXmppBitsOfBinaryContentId &cid);

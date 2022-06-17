@@ -46,11 +46,13 @@ QXmppStreamFeatures::QXmppStreamFeatures()
 
 /// Default copy-constructor
 QXmppStreamFeatures::QXmppStreamFeatures(const QXmppStreamFeatures &) = default;
-
+/// Default move-constructor
+QXmppStreamFeatures::QXmppStreamFeatures(QXmppStreamFeatures &&) = default;
 QXmppStreamFeatures::~QXmppStreamFeatures() = default;
-
 /// Default assignment operator
 QXmppStreamFeatures &QXmppStreamFeatures::operator=(const QXmppStreamFeatures &) = default;
+/// Default move-assignment operator
+QXmppStreamFeatures &QXmppStreamFeatures::operator=(QXmppStreamFeatures &&) = default;
 
 ///
 /// Returns the resource binding mode

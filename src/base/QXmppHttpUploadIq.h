@@ -15,21 +15,24 @@ class QMimeType;
 class QXmppHttpUploadRequestIqPrivate;
 class QXmppHttpUploadSlotIqPrivate;
 
+///
 /// \brief Represents an HTTP File Upload IQ for requesting an upload slot as
 /// defined by \xep{0363}: HTTP File Upload.
 ///
 /// \since QXmpp 1.1
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppHttpUploadRequestIq : public QXmppIq
 {
 public:
     QXmppHttpUploadRequestIq();
     QXmppHttpUploadRequestIq(const QXmppHttpUploadRequestIq &);
+    QXmppHttpUploadRequestIq(QXmppHttpUploadRequestIq &&);
     ~QXmppHttpUploadRequestIq() override;
 
     QXmppHttpUploadRequestIq &operator=(const QXmppHttpUploadRequestIq &);
+    QXmppHttpUploadRequestIq &operator=(QXmppHttpUploadRequestIq &&);
 
     QString fileName() const;
     void setFileName(const QString &filename);
@@ -52,21 +55,24 @@ private:
     QSharedDataPointer<QXmppHttpUploadRequestIqPrivate> d;
 };
 
+///
 /// \brief Represents an HTTP File Upload IQ result for receiving an upload slot as
 /// defined by \xep{0363}: HTTP File Upload.
 ///
 /// \since QXmpp 1.1
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppHttpUploadSlotIq : public QXmppIq
 {
 public:
     QXmppHttpUploadSlotIq();
     QXmppHttpUploadSlotIq(const QXmppHttpUploadSlotIq &);
+    QXmppHttpUploadSlotIq(QXmppHttpUploadSlotIq &&);
     ~QXmppHttpUploadSlotIq() override;
 
     QXmppHttpUploadSlotIq &operator=(const QXmppHttpUploadSlotIq &);
+    QXmppHttpUploadSlotIq &operator=(QXmppHttpUploadSlotIq &&);
 
     QUrl putUrl() const;
     void setPutUrl(const QUrl &putUrl);

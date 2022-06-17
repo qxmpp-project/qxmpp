@@ -123,12 +123,14 @@ bool QXmppBitsOfBinaryContentId::operator==(const QXmppBitsOfBinaryContentId &ot
 
 /// Default destructor
 QXmppBitsOfBinaryContentId::~QXmppBitsOfBinaryContentId() = default;
-
 /// Default copy-constructor
 QXmppBitsOfBinaryContentId::QXmppBitsOfBinaryContentId(const QXmppBitsOfBinaryContentId &cid) = default;
-
+/// Default move-constructor
+QXmppBitsOfBinaryContentId::QXmppBitsOfBinaryContentId(QXmppBitsOfBinaryContentId &&cid) = default;
 /// Default assignment operator
 QXmppBitsOfBinaryContentId &QXmppBitsOfBinaryContentId::operator=(const QXmppBitsOfBinaryContentId &other) = default;
+/// Default move-assignment operator
+QXmppBitsOfBinaryContentId &QXmppBitsOfBinaryContentId::operator=(QXmppBitsOfBinaryContentId &&other) = default;
 
 ///
 /// Returns a \xep{0231, Bits of Binary} content id

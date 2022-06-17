@@ -20,9 +20,11 @@ class QXMPP_EXPORT QXmppStreamFeatures : public QXmppNonza
 public:
     QXmppStreamFeatures();
     QXmppStreamFeatures(const QXmppStreamFeatures &);
+    QXmppStreamFeatures(QXmppStreamFeatures &&);
     ~QXmppStreamFeatures();
 
     QXmppStreamFeatures &operator=(const QXmppStreamFeatures &);
+    QXmppStreamFeatures &operator=(QXmppStreamFeatures &&);
 
     /// Mode of a feature
     enum Mode {

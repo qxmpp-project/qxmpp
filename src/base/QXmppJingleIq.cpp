@@ -147,34 +147,21 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 }
 
 /// Constructs an empty content.
-
 QXmppJingleIq::Content::Content()
     : d(new QXmppJingleIqContentPrivate())
 {
 }
 
-/// Constructs a copy of other.
-///
-/// \param other
+/// Copy-constructor.
+QXmppJingleIq::Content::Content(const QXmppJingleIq::Content &other) = default;
+/// Move-constructor.
+QXmppJingleIq::Content::Content(QXmppJingleIq::Content &&) = default;
+/// Assignment operator.
+QXmppJingleIq::Content &QXmppJingleIq::Content::operator=(const QXmppJingleIq::Content &) = default;
+/// Move-assignment operator.
+QXmppJingleIq::Content &QXmppJingleIq::Content::operator=(QXmppJingleIq::Content &&) = default;
 
-QXmppJingleIq::Content::Content(const QXmppJingleIq::Content &other)
-    : d(other.d)
-{
-}
-
-/// Assigns the other content to this one.
-///
-/// \param other
-
-QXmppJingleIq::Content &QXmppJingleIq::Content::operator=(const QXmppJingleIq::Content &other)
-{
-    d = other.d;
-    return *this;
-}
-
-QXmppJingleIq::Content::~Content()
-{
-}
+QXmppJingleIq::Content::~Content() = default;
 
 QString QXmppJingleIq::Content::creator() const
 {
@@ -715,37 +702,26 @@ QXmppJingleIqPrivate::QXmppJingleIqPrivate()
 }
 
 /// Constructs a QXmppJingleIq.
-
 QXmppJingleIq::QXmppJingleIq()
     : d(new QXmppJingleIqPrivate())
 {
 }
 
-/// Constructs a copy of other.
+/// Copy-constructor.
+QXmppJingleIq::QXmppJingleIq(const QXmppJingleIq &) = default;
+/// Move-constructor.
+QXmppJingleIq::QXmppJingleIq(QXmppJingleIq &&) = default;
+
+QXmppJingleIq::~QXmppJingleIq() = default;
+
+/// Assignment operator.
+QXmppJingleIq &QXmppJingleIq::operator=(const QXmppJingleIq &) = default;
+/// Move-assignment operator.
+QXmppJingleIq &QXmppJingleIq::operator=(QXmppJingleIq &&) = default;
+
 ///
-/// \param other
-
-QXmppJingleIq::QXmppJingleIq(const QXmppJingleIq &other)
-    : QXmppIq(other), d(other.d)
-{
-}
-
-QXmppJingleIq::~QXmppJingleIq()
-{
-}
-
-/// Assigns the other Jingle IQ to this one.
-///
-/// \param other
-
-QXmppJingleIq &QXmppJingleIq::operator=(const QXmppJingleIq &other)
-{
-    d = other.d;
-    return *this;
-}
-
 /// Returns the Jingle IQ's action.
-
+///
 QXmppJingleIq::Action QXmppJingleIq::action() const
 {
     return d->action;
@@ -951,35 +927,23 @@ QXmppJingleCandidatePrivate::QXmppJingleCandidatePrivate()
 {
 }
 
+///
 /// Constructs an empty candidate.
-
+///
 QXmppJingleCandidate::QXmppJingleCandidate()
     : d(new QXmppJingleCandidatePrivate())
 {
 }
 
-/// Constructs a copy of other.
-///
-/// \param other
-
-QXmppJingleCandidate::QXmppJingleCandidate(const QXmppJingleCandidate &other)
-    : d(other.d)
-{
-}
-
-QXmppJingleCandidate::~QXmppJingleCandidate()
-{
-}
-
-/// Assigns the other candidate to this one.
-///
-/// \param other
-
-QXmppJingleCandidate &QXmppJingleCandidate::operator=(const QXmppJingleCandidate &other)
-{
-    d = other.d;
-    return *this;
-}
+/// Copy-constructor.
+QXmppJingleCandidate::QXmppJingleCandidate(const QXmppJingleCandidate &other) = default;
+/// Move-constructor.
+QXmppJingleCandidate::QXmppJingleCandidate(QXmppJingleCandidate &&) = default;
+QXmppJingleCandidate::~QXmppJingleCandidate() = default;
+/// Assignment operator.
+QXmppJingleCandidate &QXmppJingleCandidate::operator=(const QXmppJingleCandidate &other) = default;
+/// Move-assignment operator.
+QXmppJingleCandidate &QXmppJingleCandidate::operator=(QXmppJingleCandidate &&) = default;
 
 /// Returns the candidate's component ID.
 

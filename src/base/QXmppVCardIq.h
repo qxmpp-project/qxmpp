@@ -34,9 +34,11 @@ public:
 
     QXmppVCardAddress();
     QXmppVCardAddress(const QXmppVCardAddress &other);
+    QXmppVCardAddress(QXmppVCardAddress &&);
     ~QXmppVCardAddress();
 
     QXmppVCardAddress &operator=(const QXmppVCardAddress &other);
+    QXmppVCardAddress &operator=(QXmppVCardAddress &&);
 
     QString country() const;
     void setCountry(const QString &country);

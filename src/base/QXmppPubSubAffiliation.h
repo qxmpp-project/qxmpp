@@ -34,9 +34,11 @@ public:
                            const QString &node = {},
                            const QString &jid = {});
     QXmppPubSubAffiliation(const QXmppPubSubAffiliation &);
+    QXmppPubSubAffiliation(QXmppPubSubAffiliation &&);
     ~QXmppPubSubAffiliation();
 
     QXmppPubSubAffiliation &operator=(const QXmppPubSubAffiliation &);
+    QXmppPubSubAffiliation &operator=(QXmppPubSubAffiliation &&);
 
     Affiliation type() const;
     void setType(Affiliation type);

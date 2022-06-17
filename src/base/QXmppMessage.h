@@ -94,9 +94,11 @@ public:
                  const QString &body = QString(), const QString &thread = QString());
 
     QXmppMessage(const QXmppMessage &other);
+    QXmppMessage(QXmppMessage &&);
     ~QXmppMessage() override;
 
     QXmppMessage &operator=(const QXmppMessage &other);
+    QXmppMessage &operator=(QXmppMessage &&);
 
     bool isXmppStanza() const override;
 

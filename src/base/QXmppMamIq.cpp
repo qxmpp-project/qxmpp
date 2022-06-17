@@ -36,11 +36,13 @@ QXmppMamQueryIq::QXmppMamQueryIq()
 
 /// Default copy constructor
 QXmppMamQueryIq::QXmppMamQueryIq(const QXmppMamQueryIq &) = default;
-
+/// Default move constructor
+QXmppMamQueryIq::QXmppMamQueryIq(QXmppMamQueryIq &&) = default;
 QXmppMamQueryIq::~QXmppMamQueryIq() = default;
-
 /// Default assignemnt operator
 QXmppMamQueryIq &QXmppMamQueryIq::operator=(const QXmppMamQueryIq &) = default;
+/// Default move-assignemnt operator
+QXmppMamQueryIq &QXmppMamQueryIq::operator=(QXmppMamQueryIq &&) = default;
 
 ///
 /// Returns the form that specifies the query.
@@ -181,13 +183,15 @@ QXmppMamResultIq::QXmppMamResultIq()
     d->complete = false;
 }
 
+/// Default move constructor
+QXmppMamResultIq::QXmppMamResultIq(QXmppMamResultIq &&) = default;
 /// Default copy constructor
 QXmppMamResultIq::QXmppMamResultIq(const QXmppMamResultIq &) = default;
-
 QXmppMamResultIq::~QXmppMamResultIq() = default;
-
 /// Default assignemnt operator
 QXmppMamResultIq &QXmppMamResultIq::operator=(const QXmppMamResultIq &) = default;
+/// Default move-assignemnt operator
+QXmppMamResultIq &QXmppMamResultIq::operator=(QXmppMamResultIq &&) = default;
 
 ///
 /// Returns the result set reply for result set management.

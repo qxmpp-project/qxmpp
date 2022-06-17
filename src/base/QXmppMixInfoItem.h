@@ -14,9 +14,11 @@ class QXMPP_EXPORT QXmppMixInfoItem : public QXmppPubSubItem
 public:
     QXmppMixInfoItem();
     QXmppMixInfoItem(const QXmppMixInfoItem &);
+    QXmppMixInfoItem(QXmppMixInfoItem &&);
     ~QXmppMixInfoItem();
 
     QXmppMixInfoItem &operator=(const QXmppMixInfoItem &);
+    QXmppMixInfoItem &operator=(QXmppMixInfoItem &&);
 
     const QString &name() const;
     void setName(QString);

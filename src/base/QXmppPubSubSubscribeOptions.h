@@ -47,9 +47,11 @@ public:
 
     QXmppPubSubSubscribeOptions();
     QXmppPubSubSubscribeOptions(const QXmppPubSubSubscribeOptions &);
+    QXmppPubSubSubscribeOptions(QXmppPubSubSubscribeOptions &&);
     virtual ~QXmppPubSubSubscribeOptions();
 
     QXmppPubSubSubscribeOptions &operator=(const QXmppPubSubSubscribeOptions &);
+    QXmppPubSubSubscribeOptions &operator=(QXmppPubSubSubscribeOptions &&);
 
     std::optional<bool> notificationsEnabled() const;
     void setNotificationsEnabled(std::optional<bool> notifying);

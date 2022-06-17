@@ -18,9 +18,11 @@ class QXMPP_EXPORT QXmppTrustMessageKeyOwner
 public:
     QXmppTrustMessageKeyOwner();
     QXmppTrustMessageKeyOwner(const QXmppTrustMessageKeyOwner &other);
+    QXmppTrustMessageKeyOwner(QXmppTrustMessageKeyOwner &&);
     ~QXmppTrustMessageKeyOwner();
 
     QXmppTrustMessageKeyOwner &operator=(const QXmppTrustMessageKeyOwner &other);
+    QXmppTrustMessageKeyOwner &operator=(QXmppTrustMessageKeyOwner &&);
 
     QString jid() const;
     void setJid(const QString &jid);

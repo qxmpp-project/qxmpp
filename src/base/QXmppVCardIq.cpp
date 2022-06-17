@@ -42,30 +42,20 @@ public:
 };
 
 /// Constructs an empty address.
-
 QXmppVCardAddress::QXmppVCardAddress()
     : d(new QXmppVCardAddressPrivate)
 {
 }
 
-/// Constructs a copy of \a other.
-
-QXmppVCardAddress::QXmppVCardAddress(const QXmppVCardAddress &other)
-    : d(other.d)
-{
-}
-
-QXmppVCardAddress::~QXmppVCardAddress()
-{
-}
-
-/// Assigns \a other to this address.
-
-QXmppVCardAddress &QXmppVCardAddress::operator=(const QXmppVCardAddress &other)
-{
-    d = other.d;
-    return *this;
-}
+/// Copy-constructor
+QXmppVCardAddress::QXmppVCardAddress(const QXmppVCardAddress &other) = default;
+/// Move-constructor
+QXmppVCardAddress::QXmppVCardAddress(QXmppVCardAddress &&) = default;
+QXmppVCardAddress::~QXmppVCardAddress() = default;
+/// Assignment operator.
+QXmppVCardAddress &QXmppVCardAddress::operator=(const QXmppVCardAddress &other) = default;
+/// Move-assignment operator.
+QXmppVCardAddress &QXmppVCardAddress::operator=(QXmppVCardAddress &&) = default;
 
 /// \brief Checks if two address objects represent the same address.
 

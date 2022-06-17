@@ -22,10 +22,11 @@ public:
     QXmppIq::Type type;
 };
 
+///
 /// Constructs a QXmppIq with the specified \a type.
 ///
 /// \param type
-
+///
 QXmppIq::QXmppIq(QXmppIq::Type type)
     : QXmppStanza(), d(new QXmppIqPrivate)
 {
@@ -34,37 +35,29 @@ QXmppIq::QXmppIq(QXmppIq::Type type)
 }
 
 /// Constructs a copy of \a other.
-
-QXmppIq::QXmppIq(const QXmppIq &other)
-    : QXmppStanza(other), d(other.d)
-{
-}
-
-QXmppIq::~QXmppIq()
-{
-}
+QXmppIq::QXmppIq(const QXmppIq &other) = default;
+/// Default move-constructor.
+QXmppIq::QXmppIq(QXmppIq &&) = default;
+QXmppIq::~QXmppIq() = default;
 
 /// Assigns \a other to this IQ.
+QXmppIq &QXmppIq::operator=(const QXmppIq &other) = default;
+/// Move-assignment operator.
+QXmppIq &QXmppIq::operator=(QXmppIq &&) = default;
 
-QXmppIq &QXmppIq::operator=(const QXmppIq &other)
-{
-    QXmppStanza::operator=(other);
-    d = other.d;
-    return *this;
-}
-
+///
 /// Returns the IQ's type.
 ///
-
 QXmppIq::Type QXmppIq::type() const
 {
     return d->type;
 }
 
+///
 /// Sets the IQ's type.
 ///
 /// \param type
-
+///
 void QXmppIq::setType(QXmppIq::Type type)
 {
     d->type = type;

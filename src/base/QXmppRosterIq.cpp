@@ -29,11 +29,13 @@ QXmppRosterIq::QXmppRosterIq()
 
 /// Default copy-constructor
 QXmppRosterIq::QXmppRosterIq(const QXmppRosterIq &) = default;
-
+/// Default move-constructor
+QXmppRosterIq::QXmppRosterIq(QXmppRosterIq &&) = default;
 QXmppRosterIq::~QXmppRosterIq() = default;
-
 /// Default assignment operator
 QXmppRosterIq &QXmppRosterIq::operator=(const QXmppRosterIq &) = default;
+/// Default move-assignment operator
+QXmppRosterIq &QXmppRosterIq::operator=(QXmppRosterIq &&) = default;
 
 ///
 /// Adds an item to the roster IQ.
@@ -176,11 +178,13 @@ QXmppRosterIq::Item::Item()
 
 /// Default copy-constructor
 QXmppRosterIq::Item::Item(const QXmppRosterIq::Item &other) = default;
-
+/// Default move-constructor
+QXmppRosterIq::Item::Item(QXmppRosterIq::Item &&) = default;
 QXmppRosterIq::Item::~Item() = default;
-
 /// Default assignment operator
 QXmppRosterIq::Item &QXmppRosterIq::Item::operator=(const Item &other) = default;
+/// Default assignment operator
+QXmppRosterIq::Item &QXmppRosterIq::Item::operator=(Item &&) = default;
 
 ///
 /// Returns the bareJid of the roster entry.

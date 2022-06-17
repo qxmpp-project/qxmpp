@@ -180,14 +180,14 @@ QXmppMessage::QXmppMessage(const QString &from, const QString &to, const QString
 }
 
 /// Constructs a copy of \a other.
-
 QXmppMessage::QXmppMessage(const QXmppMessage &other) = default;
-
+/// Move-constructor.
+QXmppMessage::QXmppMessage(QXmppMessage &&) = default;
 QXmppMessage::~QXmppMessage() = default;
-
-/// Assigns \a other to this message.
-
+/// Assignment operator.
 QXmppMessage &QXmppMessage::operator=(const QXmppMessage &other) = default;
+/// Move-assignment operator.
+QXmppMessage &QXmppMessage::operator=(QXmppMessage &&) = default;
 
 ///
 /// Indicates if the QXmppStanza is a stanza in the XMPP sense (i. e. a message,

@@ -78,10 +78,10 @@ QXmppPubSubSubscribeOptions::QXmppPubSubSubscribeOptions()
 }
 
 QXmppPubSubSubscribeOptions::QXmppPubSubSubscribeOptions(const QXmppPubSubSubscribeOptions &) = default;
-
+QXmppPubSubSubscribeOptions::QXmppPubSubSubscribeOptions(QXmppPubSubSubscribeOptions &&) = default;
 QXmppPubSubSubscribeOptions::~QXmppPubSubSubscribeOptions() = default;
-
 QXmppPubSubSubscribeOptions &QXmppPubSubSubscribeOptions::operator=(const QXmppPubSubSubscribeOptions &) = default;
+QXmppPubSubSubscribeOptions &QXmppPubSubSubscribeOptions::operator=(QXmppPubSubSubscribeOptions &&) = default;
 
 std::optional<bool> QXmppPubSubSubscribeOptions::notificationsEnabled() const
 {

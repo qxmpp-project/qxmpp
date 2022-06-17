@@ -24,8 +24,10 @@ class QXMPP_EXPORT QXmppPushEnableIq : public QXmppIq
 public:
     QXmppPushEnableIq();
     QXmppPushEnableIq(const QXmppPushEnableIq &);
+    QXmppPushEnableIq(QXmppPushEnableIq &&);
     ~QXmppPushEnableIq();
     QXmppPushEnableIq &operator=(const QXmppPushEnableIq &);
+    QXmppPushEnableIq &operator=(QXmppPushEnableIq &&);
 
     ///
     /// \brief The Mode enum describes whether the IQ should enable or disable

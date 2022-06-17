@@ -18,9 +18,11 @@ class QXMPP_EXPORT QXmppGeolocItem : public QXmppPubSubItem
 public:
     QXmppGeolocItem();
     QXmppGeolocItem(const QXmppGeolocItem &other);
+    QXmppGeolocItem(QXmppGeolocItem &&);
     ~QXmppGeolocItem();
 
     QXmppGeolocItem &operator=(const QXmppGeolocItem &other);
+    QXmppGeolocItem &operator=(QXmppGeolocItem &&);
 
     std::optional<double> accuracy() const;
     void setAccuracy(std::optional<double> accuracy);

@@ -56,10 +56,10 @@ QXmppPubSubMetadata::QXmppPubSubMetadata()
 }
 
 QXmppPubSubMetadata::QXmppPubSubMetadata(const QXmppPubSubMetadata &) = default;
-
+QXmppPubSubMetadata::QXmppPubSubMetadata(QXmppPubSubMetadata &&) = default;
 QXmppPubSubMetadata::~QXmppPubSubMetadata() = default;
-
 QXmppPubSubMetadata &QXmppPubSubMetadata::operator=(const QXmppPubSubMetadata &) = default;
+QXmppPubSubMetadata &QXmppPubSubMetadata::operator=(QXmppPubSubMetadata &&) = default;
 
 QStringList QXmppPubSubMetadata::contactJids() const
 {

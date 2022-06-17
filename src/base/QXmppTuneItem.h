@@ -21,9 +21,11 @@ class QXMPP_EXPORT QXmppTuneItem : public QXmppPubSubItem
 public:
     QXmppTuneItem();
     QXmppTuneItem(const QXmppTuneItem &other);
+    QXmppTuneItem(QXmppTuneItem &&);
     ~QXmppTuneItem();
 
     QXmppTuneItem &operator=(const QXmppTuneItem &other);
+    QXmppTuneItem &operator=(QXmppTuneItem &&);
 
     QString artist() const;
     void setArtist(QString artist);

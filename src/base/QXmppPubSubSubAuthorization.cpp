@@ -48,11 +48,13 @@ QXmppPubSubSubAuthorization::QXmppPubSubSubAuthorization()
 
 /// Copy-constructor.
 QXmppPubSubSubAuthorization::QXmppPubSubSubAuthorization(const QXmppPubSubSubAuthorization &) = default;
-
+/// Move-constructor.
+QXmppPubSubSubAuthorization::QXmppPubSubSubAuthorization(QXmppPubSubSubAuthorization &&) = default;
 QXmppPubSubSubAuthorization::~QXmppPubSubSubAuthorization() = default;
-
 /// Assignment operator.
 QXmppPubSubSubAuthorization &QXmppPubSubSubAuthorization::operator=(const QXmppPubSubSubAuthorization &) = default;
+/// Move-assignment operator.
+QXmppPubSubSubAuthorization &QXmppPubSubSubAuthorization::operator=(QXmppPubSubSubAuthorization &&) = default;
 
 ///
 /// Returns whether the subscription is allowed.

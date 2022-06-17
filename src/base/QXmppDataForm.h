@@ -32,9 +32,11 @@ public:
         MediaSource();
         MediaSource(const QUrl &uri, const QMimeType &contentType);
         MediaSource(const QXmppDataForm::MediaSource &);
+        MediaSource(QXmppDataForm::MediaSource &&);
         ~MediaSource();
 
         MediaSource &operator=(const MediaSource &);
+        MediaSource &operator=(MediaSource &&);
 
         QUrl uri() const;
         void setUri(const QUrl &uri);
@@ -108,9 +110,11 @@ public:
               const QString &description = {},
               const QList<QPair<QString, QString>> &options = {});
         Field(const QXmppDataForm::Field &other);
+        Field(QXmppDataForm::Field &&);
         ~Field();
 
         QXmppDataForm::Field &operator=(const QXmppDataForm::Field &other);
+        QXmppDataForm::Field &operator=(QXmppDataForm::Field &&);
 
         QString description() const;
         void setDescription(const QString &description);
@@ -175,9 +179,11 @@ public:
                   const QString &instructions = {});
     QXmppDataForm(const QXmppDataFormBase &based);
     QXmppDataForm(const QXmppDataForm &other);
+    QXmppDataForm(QXmppDataForm &&);
     ~QXmppDataForm();
 
     QXmppDataForm &operator=(const QXmppDataForm &other);
+    QXmppDataForm &operator=(QXmppDataForm &&);
 
     QString instructions() const;
     void setInstructions(const QString &instructions);

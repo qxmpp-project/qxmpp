@@ -82,9 +82,11 @@ public:
 
     QXmppPubSubNodeConfig();
     QXmppPubSubNodeConfig(const QXmppPubSubNodeConfig &);
+    QXmppPubSubNodeConfig(QXmppPubSubNodeConfig &&);
     ~QXmppPubSubNodeConfig();
 
     QXmppPubSubNodeConfig &operator=(const QXmppPubSubNodeConfig &);
+    QXmppPubSubNodeConfig &operator=(QXmppPubSubNodeConfig &&);
 
     std::optional<AccessModel> accessModel() const;
     void setAccessModel(std::optional<AccessModel> accessModel);

@@ -27,9 +27,13 @@ QXmppSendStanzaParams::QXmppSendStanzaParams()
 
 /// Copy-constructor
 QXmppSendStanzaParams::QXmppSendStanzaParams(const QXmppSendStanzaParams &other) = default;
+/// Move-constructor
+QXmppSendStanzaParams::QXmppSendStanzaParams(QXmppSendStanzaParams &&) = default;
 QXmppSendStanzaParams::~QXmppSendStanzaParams() = default;
 /// Assignment operator
 QXmppSendStanzaParams &QXmppSendStanzaParams::operator=(const QXmppSendStanzaParams &) = default;
+/// Move-assignment operator
+QXmppSendStanzaParams &QXmppSendStanzaParams::operator=(QXmppSendStanzaParams &&) = default;
 
 ///
 /// Returns the list of JIDs that the stanza should be encrypted for.

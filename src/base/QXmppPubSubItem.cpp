@@ -61,11 +61,13 @@ QXmppPubSubItem::QXmppPubSubItem(const QString &id, const QString &publisher)
 
 /// Default copy-constructor
 QXmppPubSubItem::QXmppPubSubItem(const QXmppPubSubItem &iq) = default;
-
+/// Default move-constructor
+QXmppPubSubItem::QXmppPubSubItem(QXmppPubSubItem &&) = default;
 QXmppPubSubItem::~QXmppPubSubItem() = default;
-
 /// Default assignment operator
 QXmppPubSubItem &QXmppPubSubItem::operator=(const QXmppPubSubItem &iq) = default;
+/// Default move-assignment operator
+QXmppPubSubItem &QXmppPubSubItem::operator=(QXmppPubSubItem &&iq) = default;
 
 ///
 /// Returns the ID of the PubSub item.

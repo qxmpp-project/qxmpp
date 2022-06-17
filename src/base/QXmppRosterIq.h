@@ -44,9 +44,11 @@ public:
 
         Item();
         Item(const Item &other);
+        Item(Item &&);
         ~Item();
 
         Item &operator=(const Item &other);
+        Item &operator=(Item &&);
 
         QString bareJid() const;
         QSet<QString> groups() const;
@@ -83,9 +85,11 @@ public:
 
     QXmppRosterIq();
     QXmppRosterIq(const QXmppRosterIq &);
+    QXmppRosterIq(QXmppRosterIq &&);
     ~QXmppRosterIq() override;
 
     QXmppRosterIq &operator=(const QXmppRosterIq &);
+    QXmppRosterIq &operator=(QXmppRosterIq &&);
 
     QString version() const;
     void setVersion(const QString &);

@@ -40,11 +40,13 @@ QXmppGeolocItem::QXmppGeolocItem()
 
 /// Copy-constructor.
 QXmppGeolocItem::QXmppGeolocItem(const QXmppGeolocItem &other) = default;
-
+/// Move-constructor.
+QXmppGeolocItem::QXmppGeolocItem(QXmppGeolocItem &&) = default;
 QXmppGeolocItem::~QXmppGeolocItem() = default;
-
 /// Assignment operator.
 QXmppGeolocItem &QXmppGeolocItem::operator=(const QXmppGeolocItem &other) = default;
+/// Move-assignment operator.
+QXmppGeolocItem &QXmppGeolocItem::operator=(QXmppGeolocItem &&) = default;
 
 ///
 /// Returns the horizontal GPS error in meters.

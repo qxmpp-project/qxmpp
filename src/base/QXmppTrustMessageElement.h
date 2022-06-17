@@ -19,9 +19,11 @@ class QXMPP_EXPORT QXmppTrustMessageElement
 public:
     QXmppTrustMessageElement();
     QXmppTrustMessageElement(const QXmppTrustMessageElement &other);
+    QXmppTrustMessageElement(QXmppTrustMessageElement &&);
     ~QXmppTrustMessageElement();
 
     QXmppTrustMessageElement &operator=(const QXmppTrustMessageElement &other);
+    QXmppTrustMessageElement &operator=(QXmppTrustMessageElement &&);
 
     QString usage() const;
     void setUsage(const QString &usage);

@@ -22,9 +22,11 @@ public:
     public:
         Identity();
         Identity(const Identity &other);
+        Identity(Identity &&);
         ~Identity();
 
         Identity &operator=(const Identity &other);
+        Identity &operator=(Identity &&);
 
         QString category() const;
         void setCategory(const QString &category);
@@ -47,9 +49,11 @@ public:
     public:
         Item();
         Item(const Item &);
+        Item(Item &&);
         ~Item();
 
         Item &operator=(const Item &);
+        Item &operator=(Item &&);
 
         QString jid() const;
         void setJid(const QString &jid);
@@ -66,9 +70,11 @@ public:
 
     QXmppDiscoveryIq();
     QXmppDiscoveryIq(const QXmppDiscoveryIq &);
+    QXmppDiscoveryIq(QXmppDiscoveryIq &&);
     ~QXmppDiscoveryIq();
 
     QXmppDiscoveryIq &operator=(const QXmppDiscoveryIq &);
+    QXmppDiscoveryIq &operator=(QXmppDiscoveryIq &&);
 
     enum QueryType {
         InfoQuery,

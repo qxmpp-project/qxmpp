@@ -98,11 +98,13 @@ QXmppPubSubEventBase::QXmppPubSubEventBase(EventType type, const QString &node)
 
 /// Default copy-constructor.
 QXmppPubSubEventBase::QXmppPubSubEventBase(const QXmppPubSubEventBase &other) = default;
-
+/// Default move-constructor.
+QXmppPubSubEventBase::QXmppPubSubEventBase(QXmppPubSubEventBase &&) = default;
 QXmppPubSubEventBase::~QXmppPubSubEventBase() = default;
-
 /// Default assignment operator.
 QXmppPubSubEventBase &QXmppPubSubEventBase::operator=(const QXmppPubSubEventBase &other) = default;
+/// Default move-assignment operator.
+QXmppPubSubEventBase &QXmppPubSubEventBase::operator=(QXmppPubSubEventBase &&) = default;
 
 ///
 /// Returns the event type of the PubSub event.

@@ -130,11 +130,13 @@ QXmppDataForm::MediaSource::MediaSource(const QUrl &uri, const QMimeType &conten
 
 /// Default copy-constructor
 QXmppDataForm::MediaSource::MediaSource(const QXmppDataForm::MediaSource &) = default;
-
+/// Default move-constructor
+QXmppDataForm::MediaSource::MediaSource(QXmppDataForm::MediaSource &&) = default;
 QXmppDataForm::MediaSource::~MediaSource() = default;
-
 /// Default assignment operator
 QXmppDataForm::MediaSource &QXmppDataForm::MediaSource::operator=(const QXmppDataForm::MediaSource &) = default;
+/// Default move-assignment operator
+QXmppDataForm::MediaSource &QXmppDataForm::MediaSource::operator=(QXmppDataForm::MediaSource &&) = default;
 
 ///
 /// Returns the media URI as QUrl. This can be i.e. a \c http:// URL or a
@@ -344,12 +346,14 @@ QXmppDataForm::Field::Field(QXmppDataForm::Field::Type type,
 
 /// Constructs a copy of \a other.
 QXmppDataForm::Field::Field(const QXmppDataForm::Field &other) = default;
-
+/// Default move constructor.
+QXmppDataForm::Field::Field(QXmppDataForm::Field &&) = default;
 /// Destroys the form field.
 QXmppDataForm::Field::~Field() = default;
-
 /// Assigns \a other to this field.
 QXmppDataForm::Field &QXmppDataForm::Field::operator=(const QXmppDataForm::Field &other) = default;
+/// Default move-assignment operator.
+QXmppDataForm::Field &QXmppDataForm::Field::operator=(QXmppDataForm::Field &&) = default;
 
 ///
 /// Returns the field's description.
@@ -661,12 +665,14 @@ QXmppDataForm::QXmppDataForm(const QXmppDataFormBase &based)
 
 /// Constructs a copy of \a other.
 QXmppDataForm::QXmppDataForm(const QXmppDataForm &other) = default;
-
+/// Default move constructor.
+QXmppDataForm::QXmppDataForm(QXmppDataForm &&other) = default;
 /// Destroys the form.
 QXmppDataForm::~QXmppDataForm() = default;
-
 /// Assigns \a other to this form.
 QXmppDataForm &QXmppDataForm::operator=(const QXmppDataForm &other) = default;
+/// Default move-assignment operator.
+QXmppDataForm &QXmppDataForm::operator=(QXmppDataForm &&) = default;
 
 ///
 /// Returns the form's fields.

@@ -10,9 +10,11 @@
 
 class QXmppPresencePrivate;
 
+///
 /// \brief The QXmppPresence class represents an XMPP presence stanza.
 ///
 /// \ingroup Stanzas
+///
 class QXMPP_EXPORT QXmppPresence : public QXmppStanza
 {
 public:
@@ -52,9 +54,11 @@ public:
 
     QXmppPresence(QXmppPresence::Type type = QXmppPresence::Available);
     QXmppPresence(const QXmppPresence &other);
+    QXmppPresence(QXmppPresence &&);
     ~QXmppPresence() override;
 
     QXmppPresence &operator=(const QXmppPresence &other);
+    QXmppPresence &operator=(QXmppPresence &&);
 
     bool isXmppStanza() const override;
 

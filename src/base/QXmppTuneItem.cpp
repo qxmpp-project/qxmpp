@@ -51,11 +51,13 @@ QXmppTuneItem::QXmppTuneItem()
 
 /// Copy-constructor.
 QXmppTuneItem::QXmppTuneItem(const QXmppTuneItem &other) = default;
-
+/// Move-constructor.
+QXmppTuneItem::QXmppTuneItem(QXmppTuneItem &&) = default;
 QXmppTuneItem::~QXmppTuneItem() = default;
-
 /// Assignment operator.
 QXmppTuneItem &QXmppTuneItem::operator=(const QXmppTuneItem &other) = default;
+/// Move-assignment operator.
+QXmppTuneItem &QXmppTuneItem::operator=(QXmppTuneItem &&) = default;
 
 ///
 /// Returns the artist of the piece or song.

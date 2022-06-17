@@ -16,8 +16,10 @@ class QXMPP_EXPORT QXmppSendStanzaParams
 public:
     QXmppSendStanzaParams();
     QXmppSendStanzaParams(const QXmppSendStanzaParams &other);
+    QXmppSendStanzaParams(QXmppSendStanzaParams &&);
     ~QXmppSendStanzaParams();
     QXmppSendStanzaParams &operator=(const QXmppSendStanzaParams &);
+    QXmppSendStanzaParams &operator=(QXmppSendStanzaParams &&);
 
     QVector<QString> encryptionJids() const;
     void setEncryptionJids(QVector<QString>);

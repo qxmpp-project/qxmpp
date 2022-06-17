@@ -14,10 +14,10 @@ class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
 
+///
 /// \brief The QXmppJinglePayloadType class represents a payload type
 /// as specified by \xep{0167}: Jingle RTP Sessions and RFC 5245.
 ///
-
 class QXMPP_EXPORT QXmppJinglePayloadType
 {
 public:
@@ -58,10 +58,10 @@ private:
     QSharedDataPointer<QXmppJinglePayloadTypePrivate> d;
 };
 
+///
 /// \brief The QXmppJingleCandidate class represents a transport candidate
 /// as specified by \xep{0176}: Jingle ICE-UDP Transport Method.
 ///
-
 class QXMPP_EXPORT QXmppJingleCandidate
 {
 public:
@@ -78,9 +78,11 @@ public:
 
     QXmppJingleCandidate();
     QXmppJingleCandidate(const QXmppJingleCandidate &other);
+    QXmppJingleCandidate(QXmppJingleCandidate &&);
     ~QXmppJingleCandidate();
 
     QXmppJingleCandidate &operator=(const QXmppJingleCandidate &other);
+    QXmppJingleCandidate &operator=(QXmppJingleCandidate &&);
 
     int component() const;
     void setComponent(int component);
@@ -126,11 +128,12 @@ private:
     QSharedDataPointer<QXmppJingleCandidatePrivate> d;
 };
 
+///
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media
 /// sessions as specified by \xep{0166}: Jingle.
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppJingleIq : public QXmppIq
 {
 public:
@@ -157,15 +160,17 @@ public:
     ///
     /// The QXmppJingleIq::Content class represents the "content" element of a
     /// QXmppJingleIq.
-
+    ///
     class QXMPP_EXPORT Content
     {
     public:
         Content();
         Content(const QXmppJingleIq::Content &other);
+        Content(QXmppJingleIq::Content &&);
         ~Content();
 
         Content &operator=(const Content &other);
+        Content &operator=(Content &&);
 
         QString creator() const;
         void setCreator(const QString &creator);
@@ -223,7 +228,7 @@ public:
     ///
     /// The QXmppJingleIq::Reason class represents the "reason" element of a
     /// QXmppJingleIq.
-
+    ///
     class QXMPP_EXPORT Reason
     {
     public:
@@ -269,9 +274,11 @@ public:
 
     QXmppJingleIq();
     QXmppJingleIq(const QXmppJingleIq &other);
+    QXmppJingleIq(QXmppJingleIq &&);
     ~QXmppJingleIq() override;
 
     QXmppJingleIq &operator=(const QXmppJingleIq &other);
+    QXmppJingleIq &operator=(QXmppJingleIq &&);
 
     Action action() const;
     void setAction(Action action);

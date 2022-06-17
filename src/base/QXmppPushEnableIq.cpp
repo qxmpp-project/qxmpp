@@ -27,11 +27,13 @@ QXmppPushEnableIq::QXmppPushEnableIq()
 
 /// Default copy-constructor
 QXmppPushEnableIq::QXmppPushEnableIq(const QXmppPushEnableIq &) = default;
-
+/// Default move-constructor
+QXmppPushEnableIq::QXmppPushEnableIq(QXmppPushEnableIq &&) = default;
 QXmppPushEnableIq::~QXmppPushEnableIq() = default;
-
 /// Default assignment operator
 QXmppPushEnableIq &QXmppPushEnableIq::operator=(const QXmppPushEnableIq &) = default;
+/// Default move-assignment operator
+QXmppPushEnableIq &QXmppPushEnableIq::operator=(QXmppPushEnableIq &&) = default;
 
 ///
 /// \brief Returns the jid of the app server

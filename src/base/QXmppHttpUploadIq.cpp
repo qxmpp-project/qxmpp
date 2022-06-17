@@ -26,11 +26,13 @@ QXmppHttpUploadRequestIq::QXmppHttpUploadRequestIq()
 
 /// Default copy-constructor
 QXmppHttpUploadRequestIq::QXmppHttpUploadRequestIq(const QXmppHttpUploadRequestIq &) = default;
-
+/// Default move-constructor
+QXmppHttpUploadRequestIq::QXmppHttpUploadRequestIq(QXmppHttpUploadRequestIq &&) = default;
 QXmppHttpUploadRequestIq::~QXmppHttpUploadRequestIq() = default;
-
 /// Default assignment operator
 QXmppHttpUploadRequestIq &QXmppHttpUploadRequestIq::operator=(const QXmppHttpUploadRequestIq &) = default;
+/// Default assignment operator
+QXmppHttpUploadRequestIq &QXmppHttpUploadRequestIq::operator=(QXmppHttpUploadRequestIq &&) = default;
 
 ///
 /// Returns the file name of the file to be uploaded.
@@ -138,11 +140,13 @@ QXmppHttpUploadSlotIq::QXmppHttpUploadSlotIq()
 
 /// Default copy-constructor
 QXmppHttpUploadSlotIq::QXmppHttpUploadSlotIq(const QXmppHttpUploadSlotIq &) = default;
-
+/// Default move-constructor
+QXmppHttpUploadSlotIq::QXmppHttpUploadSlotIq(QXmppHttpUploadSlotIq &&) = default;
 QXmppHttpUploadSlotIq::~QXmppHttpUploadSlotIq() = default;
-
 /// Default assignment operator
 QXmppHttpUploadSlotIq &QXmppHttpUploadSlotIq::operator=(const QXmppHttpUploadSlotIq &) = default;
+/// Default move-assignment operator
+QXmppHttpUploadSlotIq &QXmppHttpUploadSlotIq::operator=(QXmppHttpUploadSlotIq &&) = default;
 
 ///
 /// Returns the URL for uploading via. HTTP PUT.

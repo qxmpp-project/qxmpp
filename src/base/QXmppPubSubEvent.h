@@ -33,9 +33,11 @@ public:
 
     QXmppPubSubEventBase(EventType = Items, const QString &node = {});
     QXmppPubSubEventBase(const QXmppPubSubEventBase &other);
+    QXmppPubSubEventBase(QXmppPubSubEventBase &&);
     virtual ~QXmppPubSubEventBase();
 
     QXmppPubSubEventBase &operator=(const QXmppPubSubEventBase &other);
+    QXmppPubSubEventBase &operator=(QXmppPubSubEventBase &&);
 
     EventType eventType() const;
     void setEventType(EventType);

@@ -105,11 +105,13 @@ QXmppPubSubSubscription::QXmppPubSubSubscription(const QString &jid,
 
 /// Copy contructor.
 QXmppPubSubSubscription::QXmppPubSubSubscription(const QXmppPubSubSubscription &) = default;
-
+/// Move contructor.
+QXmppPubSubSubscription::QXmppPubSubSubscription(QXmppPubSubSubscription &&) = default;
 QXmppPubSubSubscription::~QXmppPubSubSubscription() = default;
-
 /// Copy assignment operator.
 QXmppPubSubSubscription &QXmppPubSubSubscription::operator=(const QXmppPubSubSubscription &) = default;
+/// Move-assignment operator.
+QXmppPubSubSubscription &QXmppPubSubSubscription::operator=(QXmppPubSubSubscription &&) = default;
 
 ///
 /// Returns the JID of the user of this subscription.
