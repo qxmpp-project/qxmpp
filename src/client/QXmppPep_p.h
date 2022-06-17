@@ -51,4 +51,4 @@ inline bool handlePubSubEvent(const QDomElement &element, const QString &pubSubS
     return false;
 }
 
-}
+}  // namespace QXmpp::Private::Pep

@@ -15,6 +15,6 @@ std::optional<Encryption> encryptionFromString(const QString &str);
 QString encryptionToString(Encryption);
 QString encryptionToName(Encryption);
 
-}
+}  // namespace QXmpp::Private
 
 #endif  // QXMPPGLOBAL_P_H

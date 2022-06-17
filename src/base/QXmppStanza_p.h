@@ -29,6 +29,6 @@ auto conditionFromString(const QString &string) -> std::optional<QXmppStanza::Er
 auto typeToString(QXmppStanza::Error::Type type) -> QString;
 auto typeFromString(const QString &string) -> std::optional<QXmppStanza::Error::Type>;
 
-}
+}  // namespace QXmpp::Private
 
 #endif

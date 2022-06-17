@@ -125,7 +125,7 @@ bool process(const QList<QXmppClientExtension *> &extensions, const QDomElement 
     return false;
 }
 
-}
+}  // namespace QXmpp::Private::StanzaPipeline
 
 namespace QXmpp::Private::MessagePipeline {
 
@@ -151,7 +151,7 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
     return process(client, extensions, std::move(message));
 }
 
-}
+}  // namespace QXmpp::Private::MessagePipeline
 
 ///
 /// \typedef QXmppClient::IqResult

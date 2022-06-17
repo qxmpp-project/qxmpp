@@ -176,6 +176,6 @@ void reportFinishedResult(QFutureInterface<T> &interface, const T &result)
     interface.reportFinished();
 }
 
-}
+}  // namespace QXmpp::Private
 
 #endif  // QXMPPFUTUREUTILS_P_H

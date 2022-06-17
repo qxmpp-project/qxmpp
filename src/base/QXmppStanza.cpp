@@ -164,7 +164,7 @@ std::optional<QXmppStanza::Error::Type> typeFromString(const QString &string)
     return std::nullopt;
 }
 
-}  // QXmpp::Private
+}  // namespace QXmpp::Private
 
 class QXmppExtendedAddressPrivate : public QSharedData
 {

@@ -11,8 +11,11 @@ BraceWrapping:
   AfterStruct: true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
+BreakStringLiterals: true
 DisableFormat: false
+FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: "^.QXmpp.*"
@@ -23,6 +26,9 @@ IncludeCategories:
     Priority: 3
 Language: Cpp
 PointerAlignment: Right
+ReflowComments: true
 SortIncludes: true
 SpaceAfterTemplateKeyword: false
 SpacesBeforeTrailingComments: 2
+SpacesInLineCommentPrefix:
+  Minimum: 1

@@ -131,6 +131,6 @@ struct Success
 {
 };
 
-}
+}  // namespace QXmpp
 
 #endif  // QXMPPGLOBAL_H

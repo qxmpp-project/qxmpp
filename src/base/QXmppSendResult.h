@@ -47,6 +47,6 @@ struct SendSuccess
 ///
 using SendResult = std::variant<SendSuccess, SendError>;
 
-}
+}  // namespace QXmpp
 
 #endif  // QXMPPSENDRESULT_H
