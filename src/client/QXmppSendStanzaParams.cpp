@@ -6,6 +6,8 @@
 
 #include <QVector>
 
+using namespace QXmpp;
+
 ///
 /// \class QXmppSendStanzaParams
 ///
@@ -17,8 +19,8 @@
 class QXmppSendStanzaParamsPrivate : public QSharedData
 {
 public:
+    TrustLevels acceptedTrustLevels;
     QVector<QString> encryptionJids;
-    QXmppTrustStorage::TrustLevels acceptedTrustLevels;
 };
 
 QXmppSendStanzaParams::QXmppSendStanzaParams()
@@ -65,7 +67,7 @@ void QXmppSendStanzaParams::setEncryptionJids(QVector<QString> encryptionJids)
 ///
 /// \return the trust levels of the keys used for encryption
 ///
-std::optional<QXmppTrustStorage::TrustLevels> QXmppSendStanzaParams::acceptedTrustLevels() const
+std::optional<TrustLevels> QXmppSendStanzaParams::acceptedTrustLevels() const
 {
     if (d->acceptedTrustLevels) {
         return d->acceptedTrustLevels;
@@ -80,7 +82,7 @@ std::optional<QXmppTrustStorage::TrustLevels> QXmppSendStanzaParams::acceptedTru
 ///
 /// \param trustLevels trust levels of the keys used for encryption
 ///
-void QXmppSendStanzaParams::setAcceptedTrustLevels(std::optional<QXmppTrustStorage::TrustLevels> trustLevels)
+void QXmppSendStanzaParams::setAcceptedTrustLevels(std::optional<TrustLevels> trustLevels)
 {
-    d->acceptedTrustLevels = trustLevels.value_or(QXmppTrustStorage::TrustLevels());
+    d->acceptedTrustLevels = trustLevels.value_or(QXmpp::TrustLevels());
 }

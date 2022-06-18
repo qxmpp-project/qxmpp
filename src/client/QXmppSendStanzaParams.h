@@ -6,7 +6,7 @@
 #define QXMPPSENDSTANZAPARAMS_H
 
 #include "QXmppGlobal.h"
-#include "QXmppTrustStorage.h"
+#include "QXmppTrustLevel.h"
 
 #include <optional>
 
@@ -27,8 +27,8 @@ public:
     QVector<QString> encryptionJids() const;
     void setEncryptionJids(QVector<QString>);
 
-    std::optional<QXmppTrustStorage::TrustLevels> acceptedTrustLevels() const;
-    void setAcceptedTrustLevels(std::optional<QXmppTrustStorage::TrustLevels> trustLevels);
+    std::optional<QXmpp::TrustLevels> acceptedTrustLevels() const;
+    void setAcceptedTrustLevels(std::optional<QXmpp::TrustLevels> trustLevels);
 
 private:
     QSharedDataPointer<QXmppSendStanzaParamsPrivate> d;

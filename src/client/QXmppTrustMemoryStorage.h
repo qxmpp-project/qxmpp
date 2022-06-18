@@ -18,25 +18,25 @@ public:
     ~QXmppTrustMemoryStorage();
 
     /// \cond
-    QFuture<void> setSecurityPolicy(const QString &encryption, SecurityPolicy securityPolicy) override;
+    QFuture<void> setSecurityPolicy(const QString &encryption, QXmpp::TrustSecurityPolicy securityPolicy) override;
     QFuture<void> resetSecurityPolicy(const QString &encryption) override;
-    QFuture<SecurityPolicy> securityPolicy(const QString &encryption) override;
+    QFuture<QXmpp::TrustSecurityPolicy> securityPolicy(const QString &encryption) override;
 
     QFuture<void> setOwnKey(const QString &encryption, const QByteArray &keyId) override;
     QFuture<void> resetOwnKey(const QString &encryption) override;
     QFuture<QByteArray> ownKey(const QString &encryption) override;
 
-    QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, TrustLevel trustLevel = TrustLevel::AutomaticallyDistrusted) override;
+    QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmpp::TrustLevel trustLevel = QXmpp::TrustLevel::AutomaticallyDistrusted) override;
     QFuture<void> removeKeys(const QString &encryption, const QList<QByteArray> &keyIds) override;
     QFuture<void> removeKeys(const QString &encryption, const QString &keyOwnerJid) override;
     QFuture<void> removeKeys(const QString &encryption) override;
-    QFuture<QHash<TrustLevel, QMultiHash<QString, QByteArray>>> keys(const QString &encryption, TrustLevels trustLevels = {}) override;
-    QFuture<QHash<QString, QHash<QByteArray, TrustLevel>>> keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels = {}) override;
-    QFuture<bool> hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels) override;
+    QFuture<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> keys(const QString &encryption, QXmpp::TrustLevels trustLevels = {}) override;
+    QFuture<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevels trustLevels = {}) override;
+    QFuture<bool> hasKey(const QString &encryption, const QString &keyOwnerJid, QXmpp::TrustLevels trustLevels) override;
 
-    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel) override;
-    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel) override;
-    QFuture<TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId) override;
+    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel) override;
+    QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevel oldTrustLevel, QXmpp::TrustLevel newTrustLevel) override;
+    QFuture<QXmpp::TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId) override;
 
     QFuture<void> resetAll(const QString &encryption) override;
     /// \endcond

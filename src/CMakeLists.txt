@@ -116,8 +116,10 @@ set(INSTALL_HEADER_FILES
     client/QXmppSendStanzaParams.h
     client/QXmppTransferManager.h
     client/QXmppTransferManager_p.h
+    client/QXmppTrustLevel.h
     client/QXmppTrustManager.h
     client/QXmppTrustMemoryStorage.h
+    client/QXmppTrustSecurityPolicy.h
     client/QXmppTrustStorage.h
     client/QXmppUploadRequestManager.h
     client/QXmppUserTuneManager.h

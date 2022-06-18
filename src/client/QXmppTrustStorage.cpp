@@ -15,7 +15,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::setSecurityPolicy(const QString &encryption, SecurityPolicy securityPolicy)
+/// \fn QXmppTrustStorage::setSecurityPolicy(const QString &encryption, QXmpp::SecurityPolicy securityPolicy)
 ///
 /// Sets the security policy for an encryption protocol.
 ///
@@ -72,7 +72,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmppTrustStorage::TrustLevel trustLevel)
+/// \fn QXmppTrustStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmpp::TrustLevel trustLevel)
 ///
 /// Adds keys.
 ///
@@ -109,7 +109,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::keys(const QString &encryption, TrustLevels trustLevels = {})
+/// \fn QXmppTrustStorage::keys(const QString &encryption, QXmpp::TrustLevels trustLevels = {})
 ///
 /// Returns the JIDs of all key owners mapped to the IDs of their keys with
 /// specific trust levels.
@@ -123,7 +123,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels = {})
+/// \fn QXmppTrustStorage::keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevels trustLevels = {})
 ///
 /// Returns the IDs of keys mapped to their trust levels for specific key
 /// owners.
@@ -139,7 +139,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels)
+/// \fn QXmppTrustStorage::hasKey(const QString &encryption, const QString &keyOwnerJid, QXmpp::TrustLevels trustLevels)
 ///
 /// Returns whether at least one key of a key owner with a specific trust level
 /// is stored.
@@ -152,7 +152,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
+/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel)
 ///
 /// Sets the trust level of keys.
 ///
@@ -167,7 +167,7 @@
 ///
 
 ///
-/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
+/// \fn QXmppTrustStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevel oldTrustLevel, QXmpp::TrustLevel newTrustLevel)
 ///
 /// Sets the trust level of keys specified by their key owner and trust level.
 ///

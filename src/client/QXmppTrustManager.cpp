@@ -5,7 +5,9 @@
 #include "QXmppTrustManager.h"
 
 #include "QXmppFutureUtils_p.h"
+#include "QXmppTrustStorage.h"
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
 
 ///
@@ -38,7 +40,7 @@ QXmppTrustManager::~QXmppTrustManager() = default;
 /// \param encryption encryption protocol namespace
 /// \param securityPolicy security policy being applied
 ///
-QFuture<void> QXmppTrustManager::setSecurityPolicy(const QString &encryption, QXmppTrustStorage::SecurityPolicy securityPolicy)
+QFuture<void> QXmppTrustManager::setSecurityPolicy(const QString &encryption, TrustSecurityPolicy securityPolicy)
 {
     return m_trustStorage->setSecurityPolicy(encryption, securityPolicy);
 }
@@ -60,7 +62,7 @@ QFuture<void> QXmppTrustManager::resetSecurityPolicy(const QString &encryption)
 ///
 /// \return the set security policy
 ///
-QFuture<QXmppTrustStorage::SecurityPolicy> QXmppTrustManager::securityPolicy(const QString &encryption)
+QFuture<TrustSecurityPolicy> QXmppTrustManager::securityPolicy(const QString &encryption)
 {
     return m_trustStorage->securityPolicy(encryption);
 }
@@ -109,7 +111,7 @@ QFuture<QByteArray> QXmppTrustManager::ownKey(const QString &encryption)
 /// \param keyIds IDs of the keys
 /// \param trustLevel trust level of the keys
 ///
-QFuture<void> QXmppTrustManager::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmppTrustStorage::TrustLevel trustLevel)
+QFuture<void> QXmppTrustManager::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, TrustLevel trustLevel)
 {
     return m_trustStorage->addKeys(encryption, keyOwnerJid, keyIds, trustLevel);
 }
@@ -157,7 +159,7 @@ QFuture<void> QXmppTrustManager::removeKeys(const QString &encryption)
 ///
 /// \return the key owner JIDs mapped to their keys with specific trust levels
 ///
-QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustManager::keys(const QString &encryption, QXmppTrustStorage::TrustLevels trustLevels)
+QFuture<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustManager::keys(const QString &encryption, QXmpp::TrustLevels trustLevels)
 {
     return m_trustStorage->keys(encryption, trustLevels);
 }
@@ -175,7 +177,7 @@ QFuture<QHash<QXmppTrustStorage::TrustLevel, QMultiHash<QString, QByteArray>>> Q
 ///
 /// \return the key IDs mapped to their trust levels for specific key owners
 ///
-QFuture<QHash<QString, QHash<QByteArray, QXmppTrustStorage::TrustLevel>>> QXmppTrustManager::keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmppTrustStorage::TrustLevels trustLevels)
+QFuture<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> QXmppTrustManager::keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevels trustLevels)
 {
     return m_trustStorage->keys(encryption, keyOwnerJids, trustLevels);
 }
@@ -190,7 +192,7 @@ QFuture<QHash<QString, QHash<QByteArray, QXmppTrustStorage::TrustLevel>>> QXmppT
 ///
 /// \return whether a key of the key owner with a passed trust level is stored
 ///
-QFuture<bool> QXmppTrustManager::hasKey(const QString &encryption, const QString &keyOwnerJid, QXmppTrustStorage::TrustLevels trustLevels)
+QFuture<bool> QXmppTrustManager::hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels)
 {
     return m_trustStorage->hasKey(encryption, keyOwnerJid, trustLevels);
 }
@@ -204,7 +206,7 @@ QFuture<bool> QXmppTrustManager::hasKey(const QString &encryption, const QString
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 /// \param trustLevel trust level being set
 ///
-QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, QXmppTrustStorage::TrustLevel trustLevel)
+QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
 {
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
@@ -225,7 +227,7 @@ QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const 
 /// \param oldTrustLevel trust level being changed
 /// \param newTrustLevel trust level being set
 ///
-QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, QXmppTrustStorage::TrustLevel oldTrustLevel, QXmppTrustStorage::TrustLevel newTrustLevel)
+QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
 {
     QFutureInterface<void> interface(QFutureInterfaceBase::Started);
 
@@ -249,7 +251,7 @@ QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const 
 ///
 /// \return the key's trust level
 ///
-QFuture<QXmppTrustStorage::TrustLevel> QXmppTrustManager::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
+QFuture<TrustLevel> QXmppTrustManager::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
 {
     return m_trustStorage->trustLevel(encryption, keyOwnerJid, keyId);
 }
