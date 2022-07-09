@@ -64,7 +64,7 @@ protected:
     /// \endcond
 
 private:
-    Mode m_mode;
+    Mode m_mode = None;
     QString m_sid;
 
     QString m_activate;
