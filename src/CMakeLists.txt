@@ -34,6 +34,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppDataForm.h
     base/QXmppDataFormBase.h
     base/QXmppDiscoveryIq.h
+    base/QXmppE2eeMetadata.h
     base/QXmppElement.h
     base/QXmppEntityTimeIq.h
     base/QXmppExtension.h

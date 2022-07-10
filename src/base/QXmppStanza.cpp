@@ -9,6 +9,7 @@
 #include "QXmppStanza.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppE2eeMetadata.h"
 #include "QXmppStanza_p.h"
 #include "QXmppUtils.h"
 

@@ -10,6 +10,7 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppE2eeExtension.h"
+#include "QXmppE2eeMetadata.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"

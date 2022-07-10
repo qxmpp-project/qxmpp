@@ -3,9 +3,11 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppE2eeMetadata.h"
 #include "QXmppStanza.h"
 
 #include "util.h"
+#include <QDateTime>
 #include <QObject>
 
 class QXmppStanzaStub : public QXmppStanza

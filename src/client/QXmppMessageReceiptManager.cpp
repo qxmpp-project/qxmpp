@@ -7,6 +7,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
+#include "QXmppE2eeMetadata.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 

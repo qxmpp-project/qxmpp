@@ -6,6 +6,7 @@
 #include "QXmppAtmTrustMemoryStorage.h"
 #include "QXmppCarbonManager.h"
 #include "QXmppClient.h"
+#include "QXmppE2eeMetadata.h"
 #include "QXmppMessage.h"
 #include "QXmppTrustMessageElement.h"
 #include "QXmppTrustMessageKeyOwner.h"
