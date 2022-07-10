@@ -38,7 +38,7 @@ public:
     static const EncryptionMethod OTR = EncryptionMethod::Otr;
     static const EncryptionMethod LegacyOpenPGP = EncryptionMethod::LegacyOpenPgp;
     static const EncryptionMethod OX = EncryptionMethod::Ox;
-    static const EncryptionMethod OMEMO = EncryptionMethod::Omemo;
+    static const EncryptionMethod OMEMO = EncryptionMethod::Omemo0;
     /// \endcond
 #endif
 

@@ -68,7 +68,7 @@ enum Encryption {
     /// \xep{0373, OpenPGP for XMPP}
     Ox,
     /// \xep{0384, OMEMO Encryption}
-    Omemo,
+    Omemo0,
     /// \xep{0384, OMEMO Encryption} since version 0.4
     Omemo1,
     /// \xep{0384, OMEMO Encryption} since version 0.8
@@ -91,8 +91,8 @@ enum Encryption {
     OX = Ox,
     /// \xep{0384, OMEMO Encryption}
     /// \deprecated This enum is deprecated since QXmpp 1.5. Use
-    /// \c QXmpp::Omemo instead.
-    OMEMO = Omemo,
+    /// \c QXmpp::Omemo0 instead.
+    OMEMO = Omemo0,
 #endif
 };
 
