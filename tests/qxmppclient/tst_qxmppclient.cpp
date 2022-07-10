@@ -71,13 +71,13 @@ void tst_QXmppClient::testSendMessage()
 
 void tst_QXmppClient::testIndexOfExtension()
 {
-    auto client = new QXmppClient;
+    auto client = std::make_unique<QXmppClient>();
 
     for (auto *ext : client->extensions()) {
         client->removeExtension(ext);
     }
 
-    auto rosterManager = new QXmppRosterManager(client);
+    auto rosterManager = new QXmppRosterManager(client.get());
     auto vCardManager = new QXmppVCardManager;
 
     client->addExtension(rosterManager);
