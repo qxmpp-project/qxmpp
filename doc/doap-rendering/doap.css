@@ -1,0 +1,272 @@
+/*
+ * SPDX-FileCopyrightText: 2019 Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *
+ * SPDX-License-Identifier: CC0-1.0
+ */
+
+:root {
+    /* Primary color in HSL: Change this to customize all colored elements */
+    --color-h: 210;
+    --color-s: 13%;
+    --color-l: 50%;
+}
+body {
+    font-family: sans-serif;
+}
+img {
+    margin-right: 1.7rem;
+    vertical-align: middle;
+}
+a {
+    text-decoration: none;
+    padding: 5px;
+    color: hsl(
+        var(--color-h),
+        calc(var(--color-s) + 15%),
+        calc(var(--color-l) - 10%)
+    );
+}
+a:hover {
+    text-decoration: none;
+    filter: brightness(110%);
+}
+a.button {
+    text-align: center;
+    text-decoration: none;
+    font-size: medium;
+    color: hsl(0, 0%, 100%);
+    background-color: hsl(
+        var(--color-h),
+        var(--color-s),
+        var(--color-l)
+    );
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    margin: 4px 12px 4px 0;
+}
+a.button:hover {
+    filter: brightness(110%);
+}
+.header {
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(
+        40deg,
+        hsl(
+            var(--color-h), var(--color-s), calc(var(--color-l) + 30%)
+        ) 0%,
+        hsl(0, 0%, 90%) 60%
+    );
+    color: hsl(0, 0%, 27%);
+    font-size: xx-large;
+    margin-bottom: 15px;
+}
+.shortdesc {
+    font-size: x-large;
+    font-weight: 300;
+    opacity: 0.8;
+}
+.description {
+    font-size: medium;
+    opacity: 0.9;
+}
+.os {
+    margin: auto;
+    margin-bottom: 30px;
+    width: 75%;
+    text-align: center;
+    opacity: 0.7;
+}
+.chip {
+    display: inline-block;
+    padding: 3px 10px;
+    margin: 3px 5px 3px 0;
+    height: 20px;
+    font-size: small;
+    font-weight: 700;
+    line-height: 20px;
+    border-radius: 12px;
+    color:hsl(0, 0%, 100%);
+    background-color: hsl(
+        var(--color-h),
+        var(--color-s),
+        calc(var(--color-l) - 20%)
+    );
+}
+
+/* XEP table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    clear: both;
+}
+th {
+    border: 1px solid hsl(
+        var(--color-h),
+        var(--color-s),
+        calc(var(--color-l) + 15%)
+    );
+    background-color: hsl(
+        var(--color-h),
+        var(--color-s),
+        var(--color-l)
+    );
+    color: hsl(0, 0%, 100%);
+    padding: 10px;
+}
+th:nth-child(1) {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+th:nth-child(5) {
+    text-align: left;
+}
+tr {
+    border: 1px solid hsl(0, 0%, 91%);
+}
+tr:nth-child(odd) {
+    background-color: hsl(0, 0%, 97%);
+}
+tr:hover {
+    background-color: hsl(0, 0%, 94%);
+}
+td {
+    padding: 10px;
+    color: hsl(0, 0%, 11%);
+}
+td:nth-child(2) {
+    text-align: end;
+}
+td:nth-child(3) {
+    text-align: center;
+}
+td:nth-child(4) {
+    text-align: end;
+}
+
+.xep-implementation-status {
+    font-size: small;
+    padding: 5px;
+}
+.complete {
+    color: hsl(120, 25%, 42%);
+    background-color: hsl(103, 46%, 90%);
+}
+.partial {
+    color: hsl(36, 66%, 43%);
+    background-color: hsl(56, 62%, 86%);
+}
+.planned {
+    color: hsl(208, 41%, 39%);
+    background-color: hsl(197, 62%, 86%);
+}
+.removed,
+.deprecated,
+.wontfix {
+    color:hsl(0, 0%, 25%);
+    background-color: hsl(0, 0%, 91%);
+}
+.version {
+    font-family: monospace;
+    margin: 1px;
+}
+.version-outdated {
+    color: hsl(36, 66%, 43%);
+    background-color: hsl(56, 62%, 86%);
+}
+.small {
+    font-size: small;
+}
+.no-info {
+    text-align: center;
+    opacity: 0.5;
+    margin: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: hsl(0, 0%, 9%);
+        color: hsl(0, 0%, 90%);
+    }
+    a {
+        color: hsl(
+            var(--color-h),
+            calc(var(--color-s) + 15%),
+            calc(var(--color-l) + 15%)
+        );
+    }
+    a.button {
+        color: hsl(0, 0%, 91%);
+        background-color: hsl(
+            var(--color-h),
+            var(--color-s),
+            calc(var(--color-l) - 20%)
+        );
+    }
+    .header {
+        color: hsl(0, 0%, 91%);
+        background: linear-gradient(
+            40deg,
+            hsl(
+                var(--color-h), var(--color-s), calc(var(--color-l) - 30%)
+            ) 0%,
+            hsl(0, 0%, 10%) 60%
+        );
+    }
+    .chip {
+        color:hsl(0, 0%, 100%);
+        background-color: hsl(0, 0%, 22%);
+    }
+
+    /* XEP table */
+    th {
+        border: 1px solid hsl(
+            var(--color-h),
+            var(--color-s),
+            calc(var(--color-l) - 20%)
+        );
+        background-color: hsl(
+            var(--color-h),
+            var(--color-s),
+            calc(var(--color-l) - 30%)
+        );
+        color: hsl(0, 0%, 90%);
+    }
+    tr {
+        border: 1px solid hsl(0, 0%, 14%);
+    }
+    tr:nth-child(odd) {
+        background-color: hsl(0, 0%, 11%);
+    }
+    tr:hover {
+        background-color: hsl(0, 0%, 9%);
+    }
+    td {
+        color: hsl(0, 0%, 93%);
+    }
+    .complete {
+        color: hsl(120, 54%, 81%);
+        background-color: hsl(105, 23%, 17%);
+    }
+    .partial {
+        color: hsl(36, 100%, 92%);
+        background-color: hsl(55, 45%, 16%);
+    }
+    .planned {
+        color: hsl(205, 80%, 76%);
+        background-color: hsl(191, 52%, 17%);
+    }
+    .removed,
+    .deprecated,
+    .wontfix {
+        color: hsl(0, 0%, 100%);
+        background-color: hsl(0, 0%, 31%);
+    }
+    .version-outdated {
+        color: hsl(36, 100%, 92%);
+        background-color: hsl(55, 45%, 16%);
+    }
+}

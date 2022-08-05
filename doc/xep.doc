@@ -2,79 +2,18 @@
 //
 // SPDX-License-Identifier: CC0-1.0
 
-/*! \page xep XMPP Extensions
+/*! \page xep XMPP Extension Protocols
 
-This document lists the XMPP Extensions (XEP) available in QXmpp.
+This document lists the XMPP Extension Protocols (XEPs) supported by QXmpp.
 
-Complete:
-- \xep{0004, Data Forms}
-- \xep{0030, Service Discovery}
-- \xep{0033, Extended Stanza Addressing}
-- \xep{0045, Multi-User Chat}
-- \xep{0047, In-Band Bytestreams}
-- \xep{0048, Bookmarks}
-- \xep{0054, vcard-temp}
-- \xep{0059, Result Set Management}
-- \xep{0060, Publish-Subscribe} (partially)
-- \xep{0065, SOCKS5 Bytestreams}
-- \xep{0066, Out of Band Data} (partially)
-- \xep{0071, XHTML-IM}
-- \xep{0077, In-Band Registration} (v2.4)
-- \xep{0078, Non-SASL Authentication}
-- \xep{0080, User Location} (v1.9)
-    - Missing some attributes of the PEP items
-- \xep{0082, XMPP Date and Time Profiles}
-- \xep{0085, Chat State Notifications}
-- \xep{0091, Legacy Delayed Delivery}
-- \xep{0092, Software Version}
-- \xep{0095, Stream Initiation}
-- \xep{0096, SI File Transfer}
-- \xep{0115, Entity Capabilities}
-- \xep{0118, User Tune} (v1.3)
-- \xep{0128, Service Discovery Extensions}
-- \xep{0136, Message Archiving}
-- \xep{0153, vCard-Based Avatars}
-- \xep{0163, Personal Eventing Protocol}
-- \xep{0166, Jingle}
-- \xep{0167, Jingle RTP Sessions}
-- \xep{0176, Jingle ICE-UDP Transport Method}
-- \xep{0184, Message Delivery Receipts}
-- \xep{0198, Stream Management}
-- \xep{0199, XMPP Ping}
-- \xep{0202, Entity Time}
-- \xep{0203, Delayed Delivery}
-- \xep{0221, Data Forms Media Element}
-- \xep{0224, Attention}
-- \xep{0231, Bits of Binary} (v1.0)
-- \xep{0237, Roster Versioning} (partially)
-- \xep{0245, The /me Command} (v1.0)
-- \xep{0249, Direct MUC Invitations} (v1.2)
-- \xep{0264, Jingle Content Thumbnails} (v0.4)
-- \xep{0280, Message Carbons}
-- \xep{0300, Use of Cryptographic Hash Functions in XMPP} (v1.0)
-- \xep{0308, Last Message Correction}
-- \xep{0313, Message Archive Management} (v0.6)
-- \xep{0319, Last User Interaction in Presence}
-- \xep{0333, Chat Markers} (v0.4)
-- \xep{0334, Message Processing Hints} (v0.3)
-- \xep{0352, Client State Indication}
-- \xep{0357, Push Notifications} (v0.4) (partially)
-- \xep{0359, Unique and Stable Stanza IDs} (v0.6)
-- \xep{0363, HTTP File Upload} (v1.0)
-- \xep{0367, Message Attaching} (v0.3)
-- \xep{0380, Explicit Message Encryption} (v0.4)
-- \xep{0382, Spoiler messages} (v0.2)
-- \xep{0384, OMEMO Encryption} (v0.8)
-- \xep{0420, Stanza Content Encryption} (v0.4)
-- \xep{0428, Fallback Indication} (v0.1)
-- \xep{0434, Trust Messages} (v0.6)
-- \xep{0446, File metadata element} (v0.2.0)
-- \xep{0450, Automatic Trust Management (ATM)} (v0.4)
-
-Ongoing:
-- \xep{0009, Jabber-RPC} (API is not finalized yet)
-- \xep{0369, Mediated Information eXchange (MIX)} (Only IQ queries implemented) (v0.14)
-- \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements} (Only IQ queries implemented) (v0.4)
-- \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities} (QXmppMixInvitation) (v0.1)
+\htmlonly
+<script>
+    <!-- Dynamic resizing of the frame is needed because its size inside of the page is unknown before rendering it. -->
+    function resizeIframe(obj) {
+        obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 20 + 'px';
+    }
+</script>
+<iframe src="doap.xml" class="xeps" style="position: absolute; height: 85%; width: 99%; border: none" frameborder="0" onload="resizeIframe(this)"/>
+\endhtmlonly
 
 */
