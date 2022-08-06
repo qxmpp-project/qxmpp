@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -302,6 +303,9 @@ public:
 
     QString sid() const;
     void setSid(const QString &sid);
+
+    QString mujiGroupChatJid() const;
+    void setMujiGroupChatJid(const QString &mujiGroupChatJid);
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);

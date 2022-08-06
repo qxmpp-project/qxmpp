@@ -1,10 +1,12 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #ifndef QXMPPPRESENCE_H
 #define QXMPPPRESENCE_H
 
+#include "QXmppJingleIq.h"
 #include "QXmppMucIq.h"
 #include "QXmppStanza.h"
 
@@ -105,6 +107,13 @@ public:
     void setCapabilityVer(const QByteArray &);
 
     QStringList capabilityExt() const;
+
+    // XEP-0272: Multiparty Jingle (Muji)
+    bool isPreparingMujiSession() const;
+    void setIsPreparingMujiSession(bool isPreparingMujiSession);
+
+    QVector<QXmppJingleIq::Content> mujiContents() const;
+    void setMujiContents(const QVector<QXmppJingleIq::Content> &mujiContents);
 
     // XEP-0319: Last User Interaction in Presence
     QDateTime lastUserInteraction() const;

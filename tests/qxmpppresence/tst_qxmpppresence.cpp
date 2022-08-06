@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Oliver Goffart <ogoffart@woboq.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -21,6 +22,7 @@ private slots:
     void testPresenceWithMucItem();
     void testPresenceWithMucPassword();
     void testPresenceWithMucSupport();
+    void testPresenceWithMuji();
     void testPresenceWithLastUserInteraction();
     void testPresenceWithMix();
     void testPresenceWithVCard();
@@ -248,6 +250,49 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
     QCOMPARE(presence.isMucSupported(), true);
     QVERIFY(presence.mucPassword().isEmpty());
     serializePacket(presence, xml);
+}
+
+void tst_QXmppPresence::testPresenceWithMuji()
+{
+    const QByteArray xml(
+        "<presence to=\"darkcave@chat.shakespeare.lit/oldhag\" from=\"wiccarocks@shakespeare.lit/laptop\">"
+        "<muji xmlns=\"urn:xmpp:jingle:muji:0\">"
+        "<preparing/>"
+        "<content creator=\"initiator\" name=\"video\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:0\" media=\"video\">"
+        "<payload-type id=\"97\" name=\"theora\" clockrate=\"90000\"/>"
+        "</description>"
+        "</content>"
+        "<content creator=\"initiator\" name=\"voice\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:0\" media=\"audio\">"
+        "<payload-type id=\"97\" name=\"speex\" clockrate=\"8000\"/>"
+        "<payload-type id=\"18\" name=\"G729\"/>"
+        "</description>"
+        "</content>"
+        "</muji>"
+        "</presence>");
+
+    QXmppPresence presence;
+    QVERIFY(!presence.isPreparingMujiSession());
+    QVERIFY(presence.mujiContents().isEmpty());
+    parsePacket(presence, xml);
+
+    QVERIFY(presence.isPreparingMujiSession());
+    QCOMPARE(presence.mujiContents().size(), 2);
+    QCOMPARE(presence.mujiContents().at(0).name(), QStringLiteral("video"));
+    QCOMPARE(presence.mujiContents().at(1).name(), QStringLiteral("voice"));
+    serializePacket(presence, xml);
+
+    presence.setIsPreparingMujiSession(false);
+    QXmppJingleIq::Content mujiContent1;
+    mujiContent1.setName(QStringLiteral("1"));
+    QXmppJingleIq::Content mujiContent2;
+    mujiContent2.setName(QStringLiteral("2"));
+    presence.setMujiContents({ mujiContent1, mujiContent2 });
+    QVERIFY(!presence.isPreparingMujiSession());
+    QCOMPARE(presence.mujiContents().size(), 2);
+    QCOMPARE(presence.mujiContents().at(0).name(), QStringLiteral("1"));
+    QCOMPARE(presence.mujiContents().at(1).name(), QStringLiteral("2"));
 }
 
 void tst_QXmppPresence::testPresenceWithLastUserInteraction()
