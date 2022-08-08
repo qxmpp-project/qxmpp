@@ -34,6 +34,12 @@ using MessageEncryptResult = QXmppE2eeExtension::MessageEncryptResult;
 using IqEncryptResult = QXmppE2eeExtension::IqEncryptResult;
 using IqDecryptResult = QXmppE2eeExtension::IqDecryptResult;
 
+static bool isIqResponse(const QDomElement &el)
+{
+    auto type = el.attribute("type");
+    return el.tagName() == "iq" && (type == "result" || type == "error");
+}
+
 /// \cond
 QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
     : clientPresence(QXmppPresence::Available),
@@ -521,9 +527,15 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const 
                 auto future = d->stream->sendIq(QXmppPacket(*xml, true), id);
                 await(future, this, [this, interface](QXmppStream::IqResult result) mutable {
                     if (const auto encryptedDom = std::get_if<QDomElement>(&result)) {
-                        // received result (should be encrypted)
-                        if (d->encryptionExtension) {
-                            // decrypt
+                        if (!isIqResponse(*encryptedDom)) {
+                            QXmpp::SendError err {
+                                QStringLiteral("Invalid IQ response received."),
+                                QXmpp::SendError::EncryptionError
+                            };
+                            interface.reportResult(err);
+                            interface.reportFinished();
+                        } else if (d->encryptionExtension) {
+                            // try to decrypt the result (should be encrypted)
                             auto future = d->encryptionExtension->decryptIq(*encryptedDom);
                             await(future, this, [interface, encryptedDom = *encryptedDom](IqDecryptResult result) mutable {
                                 if (const auto dom = std::get_if<QDomElement>(&result)) {
