@@ -7,6 +7,22 @@
 
 set -e
 
+install_cmake() {
+    NAME=$1
+    URL=$2
+    OPTS=$3
+    CURRENT_DIR=$(pwd)
+
+    cd
+    git clone $URL $NAME
+    mkdir -p $NAME-build
+    cmake $NAME -B./$NAME-build/  -DCMAKE_BUILD_TYPE=Release $OPTS
+    cmake --build $NAME-build --parallel
+    sudo cmake --build $NAME-build --target install
+
+    cd $CURRENT_DIR
+}
+
 if [ "$(uname -s)" = "Darwin" ]; then
     brew update
     brew unlink python@3
@@ -28,3 +44,16 @@ else
         ;;
     esac
 fi
+
+case "$CONFIG" in
+full*)
+    case "$QT_VERSION" in
+    5.15*)
+        # OMEMO enabled
+        # Build and install qca and libomemo-c
+        install_cmake libomemo-c https://github.com/dino/libomemo-c "-DBUILD_SHARED_LIBS=ON"
+        install_cmake qca https://invent.kde.org/libraries/qca "-DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF -DBUILD_WITH_QT6=OFF"
+        ;;
+    esac
+    ;;
+esac

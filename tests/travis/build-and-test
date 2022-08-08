@@ -13,6 +13,12 @@ CMAKE_ARGS="-DBUILD_TESTS:BOOL=True"
 case "$CONFIG" in
 full*)
     CMAKE_ARGS="-DBUILD_DOCUMENTATION:BOOL=True -DBUILD_EXAMPLES:BOOL=True -DWITH_GSTREAMER:BOOL=True"
+    case "$QT_VERSION" in
+    5.15*)
+        # Enable OMEMO
+        CMAKE_ARGS="$CMAKE_ARGS -DBUILD_OMEMO=ON"
+        ;;
+    esac
     ;;
 esac
 
