@@ -76,7 +76,7 @@ if(WITH_GSTREAMER)
     add_simple_test(qxmppcallmanager)
 endif()
 
-if(WITH_OMEMO)
+if(BUILD_OMEMO)
     if(BUILD_INTERNAL_TESTS)
         add_simple_test(qxmppomemodata)
     endif()

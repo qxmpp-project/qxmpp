@@ -12,6 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CONFIG: ${{ matrix.config }}
+      QT_VERSION: ${{ matrix.qt_version }}
     strategy:
       fail-fast: false
       matrix:
