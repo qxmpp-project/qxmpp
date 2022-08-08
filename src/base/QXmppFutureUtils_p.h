@@ -104,7 +104,7 @@ void await(const QFuture<void> &future, QObject *context, Handler handler)
 }
 
 template<typename Result, typename Input, typename Converter>
-auto chain(QFuture<Input> &&source, QObject *context, Converter task) -> QFuture<Result>
+auto chain(const QFuture<Input> &source, QObject *context, Converter task) -> QFuture<Result>
 {
     QFutureInterface<Result> resultInterface(QFutureInterfaceBase::Started);
 
