@@ -176,6 +176,21 @@ void reportFinishedResult(QFutureInterface<T> &interface, const T &result)
     interface.reportFinished();
 }
 
+template<typename T, typename Err, typename Function>
+auto mapSuccess(std::variant<T, Err> var, Function lambda)
+{
+    using MapResult = std::decay_t<decltype(lambda({}))>;
+    using MappedVariant = std::variant<MapResult, Err>;
+    return std::visit(overloaded {
+                          [lambda = std::move(lambda)](T val) -> MappedVariant {
+                              return lambda(std::move(val));
+                          },
+                          [](Err err) -> MappedVariant {
+                              return err;
+                          } },
+                      std::move(var));
+}
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPFUTUREUTILS_P_H
