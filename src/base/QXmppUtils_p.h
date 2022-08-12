@@ -1,0 +1,22 @@
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
+#ifndef QXMPPUTILS_P_H
+#define QXMPPUTILS_P_H
+
+#include "QXmppGlobal.h"
+
+#include <stdint.h>
+
+#include <QByteArray>
+
+namespace QXmpp::Private {
+
+QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
+QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
+
+}  // namespace QXmpp::Private
+
+#endif  // QXMPPUTILS_P_H
