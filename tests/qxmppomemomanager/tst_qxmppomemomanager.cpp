@@ -174,7 +174,7 @@ void tst_QXmppOmemoManager::testInit()
 
 void tst_QXmppOmemoManager::testSetUp()
 {
-    SKIP_IF_INTEGRATION_TESTS_DISABLED();
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
 
     auto isManagerSetUp = false;
     const QObject context;

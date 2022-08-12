@@ -4,6 +4,7 @@
 
 #include "QXmppStun.h"
 
+#include "IntegrationTesting.h"
 #include "util.h"
 #include <QHostInfo>
 
@@ -19,6 +20,8 @@ private slots:
 
 void tst_QXmppIceConnection::testBind()
 {
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
+
     const int componentId = 1024;
 
     QXmppLogger logger;
@@ -47,6 +50,8 @@ void tst_QXmppIceConnection::testBind()
 
 void tst_QXmppIceConnection::testBindStun()
 {
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
+
     const int componentId = 1024;
 
     QXmppLogger logger;
@@ -95,6 +100,8 @@ void tst_QXmppIceConnection::testBindStun()
 
 void tst_QXmppIceConnection::testConnect()
 {
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
+
     const int componentId = 1024;
 
     QXmppLogger logger;

@@ -6,6 +6,7 @@
 #include "QXmppServer.h"
 #include "QXmppTransferManager.h"
 
+#include "IntegrationTesting.h"
 #include "util.h"
 #include <QBuffer>
 #include <QObject>
@@ -61,6 +62,8 @@ void tst_QXmppTransferManager::testSendFile_data()
 
 void tst_QXmppTransferManager::testSendFile()
 {
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
+
     QFETCH(QXmppTransferJob::Method, senderMethods);
     QFETCH(QXmppTransferJob::Method, receiverMethods);
     QFETCH(bool, works);

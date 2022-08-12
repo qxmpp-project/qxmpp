@@ -93,7 +93,7 @@ void tst_QXmppVCardManager::testHandleStanza()
 
 void tst_QXmppVCardManager::testSetClientVCard()
 {
-    SKIP_IF_INTEGRATION_TESTS_DISABLED();
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
 
     auto client = std::make_unique<QXmppClient>();
     auto *vCardManager = client->findExtension<QXmppVCardManager>();
