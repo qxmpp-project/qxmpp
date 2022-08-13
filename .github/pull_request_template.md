@@ -1,6 +1,6 @@
 PR check list:
 - [ ] Document your code
-- [ ] Add `\since QXmpp 1.X`
+- [ ] Add `\since QXmpp 1.X`, `QXMPP_EXPORT`
 - [ ] Fix doxygen warnings (see log when building with `-DBUILD_DOCUMENTATION=ON`)
 - [ ] Update `doc/xep.doc`
 - [ ] Add unit tests
