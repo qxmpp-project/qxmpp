@@ -1,29 +1,71 @@
 // SPDX-FileCopyrightText: 2016 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2016 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppCarbonManager.h"
+#include "QXmppCarbonManagerV2.h"
 #include "QXmppClient.h"
+#include "QXmppE2eeMetadata.h"
 #include "QXmppMessage.h"
+#include "QXmppMessageHandler.h"
 
 #include "util.h"
 #include <QObject>
+
+void compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
+{
+    QCOMPARE(lhs.body(), rhs.body());
+    QCOMPARE(lhs.from(), rhs.from());
+    QCOMPARE(lhs.id(), rhs.id());
+    QCOMPARE(lhs.isAttentionRequested(), rhs.isAttentionRequested());
+    QCOMPARE(lhs.isMarkable(), rhs.isMarkable());
+    QCOMPARE(lhs.isPrivate(), rhs.isPrivate());
+    QCOMPARE(lhs.isReceiptRequested(), rhs.isReceiptRequested());
+    QCOMPARE(lhs.lang(), rhs.lang());
+    QCOMPARE(lhs.to(), rhs.to());
+    QCOMPARE(lhs.thread(), rhs.thread());
+    QCOMPARE(lhs.stamp(), rhs.stamp());
+    QCOMPARE(lhs.type(), rhs.type());
+}
 
 class QXmppCarbonTestHelper : public QObject
 {
     Q_OBJECT
 
 public slots:
-    void messageSent(const QXmppMessage &msg);
-    void messageReceived(const QXmppMessage &msg);
+    void messageSent(const QXmppMessage &msg)
+    {
+        m_signalTriggered = true;
+        QCOMPARE(m_expectSent, true);
+
+        compareMessages(m_expectedMessage, msg);
+    }
+    void messageReceived(const QXmppMessage &msg)
+    {
+        m_signalTriggered = true;
+        QCOMPARE(m_expectSent, false);
+
+        compareMessages(m_expectedMessage, msg);
+    }
 
 public:
     QXmppMessage m_expectedMessage;
     bool m_expectSent;
     bool m_signalTriggered;
+};
 
-    void compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs);
+class MessageHandler : public QXmppClientExtension, public QXmppMessageHandler
+{
+public:
+    bool handleMessage(const QXmppMessage &msg) override
+    {
+        received.push_back(msg);
+        return false;
+    }
+
+    std::vector<QXmppMessage> received;
 };
 
 class tst_QXmppCarbonManager : public QObject
@@ -38,24 +80,24 @@ private slots:
 
 private:
     QXmppCarbonTestHelper m_helper;
-    QXmppCarbonManager *m_manager;
+    MessageHandler *m_messageHandler;
+    QXmppCarbonManager *m_managerV1;
+    QXmppCarbonManagerV2 *m_managerV2;
     QXmppClient client;
 };
 
 void tst_QXmppCarbonManager::initTestCase()
 {
-    m_manager = new QXmppCarbonManager();
+    client.configuration().setJid("romeo@montague.example");
+    m_managerV1 = client.addNewExtension<QXmppCarbonManager>();
+    m_managerV2 = client.addNewExtension<QXmppCarbonManagerV2>();
+    m_messageHandler = client.addNewExtension<MessageHandler>();
 
-    connect(m_manager, &QXmppCarbonManager::messageSent,
+    connect(m_managerV1, &QXmppCarbonManager::messageSent,
             &m_helper, &QXmppCarbonTestHelper::messageSent);
 
-    connect(m_manager, &QXmppCarbonManager::messageReceived,
+    connect(m_managerV1, &QXmppCarbonManager::messageReceived,
             &m_helper, &QXmppCarbonTestHelper::messageReceived);
-
-    client.connectToServer("romeo@montague.example", "a");
-    client.disconnectFromServer();
-
-    client.addExtension(m_manager);
 }
 
 void tst_QXmppCarbonManager::testHandleStanza_data()
@@ -197,54 +239,38 @@ void tst_QXmppCarbonManager::testHandleStanza()
     QFETCH(bool, sent);
     QFETCH(QByteArray, forwardedxml);
 
-    m_helper.m_expectedMessage = QXmppMessage();
+    QXmppMessage expectedMessage;
+    if (!forwardedxml.isEmpty()) {
+        parsePacket(expectedMessage, forwardedxml);
+    }
 
-    if (!forwardedxml.isEmpty())
-        parsePacket(m_helper.m_expectedMessage, forwardedxml);
+    {
+        m_helper.m_expectedMessage = expectedMessage;
+        m_helper.m_expectSent = sent;
+        m_helper.m_signalTriggered = false;
 
-    m_helper.m_expectSent = sent;
-    m_helper.m_signalTriggered = false;
+        QDomDocument doc;
+        QVERIFY(doc.setContent(xml, true));
+        QDomElement element = doc.documentElement();
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
+        bool accepted = m_managerV1->handleStanza(element);
 
-    bool accepted = m_manager->handleStanza(element);
+        QCOMPARE(accepted, accept);
+        QCOMPARE(m_helper.m_signalTriggered, accept);
+    }
+    {
+        m_messageHandler->received.clear();
 
-    QCOMPARE(accepted, accept);
-    QCOMPARE(m_helper.m_signalTriggered, accept);
-}
+        bool accepted = m_managerV2->handleStanza(xmlToDom(xml), {});
+        QCOMPARE(accepted, accept);
 
-void QXmppCarbonTestHelper::messageSent(const QXmppMessage &msg)
-{
-    m_signalTriggered = true;
-    QCOMPARE(m_expectSent, true);
-
-    compareMessages(m_expectedMessage, msg);
-}
-
-void QXmppCarbonTestHelper::messageReceived(const QXmppMessage &msg)
-{
-    m_signalTriggered = true;
-    QCOMPARE(m_expectSent, false);
-
-    compareMessages(m_expectedMessage, msg);
-}
-
-void QXmppCarbonTestHelper::compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)
-{
-    QCOMPARE(lhs.body(), rhs.body());
-    QCOMPARE(lhs.from(), rhs.from());
-    QCOMPARE(lhs.id(), rhs.id());
-    QCOMPARE(lhs.isAttentionRequested(), rhs.isAttentionRequested());
-    QCOMPARE(lhs.isMarkable(), rhs.isMarkable());
-    QCOMPARE(lhs.isPrivate(), rhs.isPrivate());
-    QCOMPARE(lhs.isReceiptRequested(), rhs.isReceiptRequested());
-    QCOMPARE(lhs.lang(), rhs.lang());
-    QCOMPARE(lhs.to(), rhs.to());
-    QCOMPARE(lhs.thread(), rhs.thread());
-    QCOMPARE(lhs.stamp(), rhs.stamp());
-    QCOMPARE(lhs.type(), rhs.type());
+        if (accept) {
+            QCOMPARE(m_messageHandler->received.size(), size_t(1));
+            compareMessages(m_messageHandler->received[0], expectedMessage);
+        } else {
+            QCOMPARE(m_messageHandler->received.size(), size_t(0));
+        }
+    }
 }
 
 QTEST_MAIN(tst_QXmppCarbonManager)
