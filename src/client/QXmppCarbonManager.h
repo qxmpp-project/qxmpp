@@ -16,6 +16,8 @@ class QXmppMessage;
 /// This class emits signals whenever another resource of the
 /// currently connected client account sent or received a message.
 ///
+/// \warning This manager does not decrypt e2ee messages. You can use QXmppCarbonManagerV2.
+///
 /// \ingroup Managers
 ///
 /// \since QXmpp 1.0
