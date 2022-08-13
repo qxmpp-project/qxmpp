@@ -96,6 +96,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppAttentionManager.h
     client/QXmppBookmarkManager.h
     client/QXmppCarbonManager.h
+    client/QXmppCarbonManagerV2.h
     client/QXmppClient.h
     client/QXmppClientExtension.h
     client/QXmppConfiguration.h
@@ -210,6 +211,7 @@ set(SOURCE_FILES
     client/QXmppAttentionManager.cpp
     client/QXmppBookmarkManager.cpp
     client/QXmppCarbonManager.cpp
+    client/QXmppCarbonManagerV2.cpp
     client/QXmppClient.cpp
     client/QXmppClientExtension.cpp
     client/QXmppConfiguration.cpp
