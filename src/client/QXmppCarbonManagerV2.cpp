@@ -14,7 +14,6 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
-using Manager = QXmppCarbonManagerV2;
 
 class CarbonEnableIq : public QXmppIq
 {
@@ -108,7 +107,7 @@ auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional
 /// \since QXmpp 1.5
 ///
 
-bool Manager::handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &)
+bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &)
 {
     if (element.tagName() != "message") {
         return false;
@@ -141,17 +140,17 @@ bool Manager::handleStanza(const QDomElement &element, const std::optional<QXmpp
     return true;
 }
 
-void Manager::setClient(QXmppClient *newClient)
+void QXmppCarbonManagerV2::setClient(QXmppClient *newClient)
 {
     if (client()) {
-        disconnect(client(), &QXmppClient::connected, this, &Manager::enableCarbons);
+        disconnect(client(), &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
     }
 
     QXmppClientExtension::setClient(newClient);
-    connect(newClient, &QXmppClient::connected, this, &Manager::enableCarbons);
+    connect(newClient, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
 }
 
-void Manager::enableCarbons()
+void QXmppCarbonManagerV2::enableCarbons()
 {
     if (client()->streamManagementState() == QXmppClient::ResumedStream) {
         // skip re-enabling for resumed streams
