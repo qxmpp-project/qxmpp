@@ -10,6 +10,8 @@
 #include <session_cipher.h>
 #include <signal_protocol.h>
 
+#include <QByteArray>
+
 // Wraps various types of the OMEMO library.
 template<typename T, void(destruct)(T *)>
 class OmemoLibPtr
@@ -67,6 +69,11 @@ template<void(destruct)(signal_buffer *)>
 class BufferPtrBase : public OmemoLibPtr<signal_buffer, destruct>
 {
 public:
+    BufferPtrBase(signal_buffer *ptr)
+        : OmemoLibPtr<signal_buffer, destruct>(ptr)
+    {
+    }
+
     QByteArray toByteArray() const
     {
         return omemoLibBufferToByteArray(this->get());
@@ -76,6 +83,12 @@ public:
 class BufferSecurePtr : public BufferPtrBase<signal_buffer_bzero_free>
 {
 public:
+    BufferSecurePtr() : BufferPtrBase<signal_buffer_bzero_free>(nullptr) { }
+    BufferSecurePtr(signal_buffer *ptr)
+        : BufferPtrBase<signal_buffer_bzero_free>(ptr)
+    {
+    }
+
     static BufferSecurePtr fromByteArray(const QByteArray &bytes)
     {
         return { omemoLibBufferFromByteArray(bytes) };
@@ -85,6 +98,12 @@ public:
 class BufferPtr : public BufferPtrBase<signal_buffer_free>
 {
 public:
+    BufferPtr() : BufferPtrBase<signal_buffer_free>(nullptr) { }
+    BufferPtr(signal_buffer *ptr)
+        : BufferPtrBase<signal_buffer_free>(ptr)
+    {
+    }
+
     static BufferPtr fromByteArray(const QByteArray &bytes)
     {
         return { omemoLibBufferFromByteArray(bytes) };
