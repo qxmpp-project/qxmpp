@@ -12,7 +12,7 @@ using GetResult = std::variant<T, QXmppStanza::Error>;
 using PublishResult = std::variant<QString, QXmppStanza::Error>;
 
 template<typename ItemT>
-inline QFuture<GetResult<ItemT>> request(QXmppPubSubManager *pubSub, const QString &jid, const QString &nodeName, QObject *parent)
+inline QXmppTask<GetResult<ItemT>> request(QXmppPubSubManager *pubSub, const QString &jid, const QString &nodeName, QObject *parent)
 {
     using PubSub = QXmppPubSubManager;
     using Error = QXmppStanza::Error;

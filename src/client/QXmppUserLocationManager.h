@@ -12,7 +12,7 @@
 #include <variant>
 
 template<typename T>
-class QFuture;
+class QXmppTask;
 class QXmppGeolocItem;
 
 class QXMPP_EXPORT QXmppUserLocationManager : public QXmppClientExtension, public QXmppPubSubEventHandler
@@ -28,8 +28,8 @@ public:
 
     QStringList discoveryFeatures() const override;
 
-    QFuture<GetResult> request(const QString &jid);
-    QFuture<PublishResult> publish(const Item &);
+    QXmppTask<GetResult> request(const QString &jid);
+    QXmppTask<PublishResult> publish(const Item &);
 
     Q_SIGNAL void itemReceived(const QString &jid, const QXmppGeolocItem &);
 

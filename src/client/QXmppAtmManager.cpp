@@ -77,12 +77,12 @@ QXmppAtmManager::QXmppAtmManager(QXmppAtmTrustStorage *trustStorage)
 /// \param keyIdsForAuthentication IDs of the keys being authenticated
 /// \param keyIdsForDistrusting IDs of the keys being distrusted
 ///
-QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
+QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting)
 {
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     auto future = keys(encryption, TrustLevel::Authenticated | TrustLevel::ManuallyDistrusted);
-    await(future, this, [=](QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys) mutable {
+    future.then(this, [=](QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys) mutable {
         const auto authenticatedKeys = keys.value(TrustLevel::Authenticated);
         const auto manuallyDistrustedKeys = keys.value(TrustLevel::ManuallyDistrusted);
         const auto ownJid = client()->configuration().jidBare();
@@ -110,7 +110,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 
         if (modifiedAuthenticatedKeys.isEmpty() && modifiedManuallyDistrustedKeys.isEmpty()) {
             // Skip further processing if there are no changes.
-            interface.reportFinished();
+            promise.finish();
         } else {
             keyOwner.setTrustedKeys(modifiedAuthenticatedKeys);
             keyOwner.setDistrustedKeys(modifiedManuallyDistrustedKeys);
@@ -170,7 +170,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() mutable {
+                future.then(this, [=]() mutable {
                     // Send a trust message for all authenticated or distrusted
                     // keys to the own endpoints whose keys have been
                     // authenticated.
@@ -212,7 +212,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                         }
                     }
 
-                    interface.reportFinished();
+                    promise.finish();
                 });
             } else {
                 // Send a trust message for the keys of the contact's endpoints
@@ -223,7 +223,7 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() mutable {
+                future.then(this, [=]() mutable {
                     // Send a trust message for own authenticated or distrusted
                     // keys to the contact's endpoints whose keys have been
                     // authenticated.
@@ -233,13 +233,13 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
                         sendTrustMessage(encryption, { ownKeyOwner }, keyOwnerJid);
                     }
 
-                    interface.reportFinished();
+                    promise.finish();
                 });
             }
         }
     });
 
-    return interface.future();
+    return promise.task();
 }
 
 /// \cond
@@ -264,19 +264,20 @@ void QXmppAtmManager::handleMessageReceived(const QXmppMessage &message)
 /// \param keyIdsForDistrusting key owners' bare JIDs mapped to the IDs of their
 ///        keys being distrusted
 ///
-QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting)
+QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting)
 {
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     auto future = authenticate(encryption, keyIdsForAuthentication);
-    await(future, this, [=]() mutable {
+
+    future.then(this, [=]() mutable {
         auto future = distrust(encryption, keyIdsForDistrusting);
-        await(future, this, [=]() mutable {
-            interface.reportFinished();
+        future.then(this, [=]() mutable {
+            promise.finish();
         });
     });
 
-    return interface.future();
+    return promise.task();
 }
 
 ///
@@ -285,9 +286,9 @@ QFuture<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, con
 ///
 /// \param message message that can contain a trust message element
 ///
-QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
+QXmppTask<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 {
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     if (const auto trustMessageElement = message.trustMessageElement();
         trustMessageElement &&
@@ -299,7 +300,7 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         const auto encryption = trustMessageElement->encryption();
 
         auto future = trustLevel(encryption, senderJid, senderKey);
-        await(future, this, [=](const auto &&senderKeyTrustLevel) mutable {
+        future.then(this, [=](const auto &&senderKeyTrustLevel) mutable {
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == TrustLevel::Authenticated;
 
             // key owner JIDs mapped to key IDs
@@ -345,10 +346,10 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
             }
 
             auto future = trustStorage()->addKeysForPostponedTrustDecisions(encryption, senderKey, keyOwnersForPostponedTrustDecisions);
-            await(future, this, [=]() mutable {
+            future.then(this, [=]() mutable {
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                await(future, this, [=]() mutable {
-                    interface.reportFinished();
+                future.then(this, [=]() mutable {
+                    promise.finish();
                 });
             });
         });
@@ -357,10 +358,10 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         // 1. The message does not contain a trust message element.
         // 2. The trust message is sent by this endpoint and reflected via
         //    Message Carbons.
-        interface.reportFinished();
+        promise.finish();
     }
 
-    return interface.future();
+    return promise.task();
 }
 
 ///
@@ -369,36 +370,36 @@ QFuture<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
 /// \param encryption encryption protocol namespace
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 ///
-QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
+QXmppTask<void> QXmppAtmManager::authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
     if (keyIds.isEmpty()) {
-        return makeReadyFuture();
+        return makeReadyTask();
     }
 
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     auto future = setTrustLevel(encryption, keyIds, TrustLevel::Authenticated);
-    await(future, this, [=]() mutable {
+    future.then(this, [=]() mutable {
         auto future = securityPolicy(encryption);
-        await(future, this, [=](auto securityPolicy) mutable {
+        future.then(this, [=](auto securityPolicy) mutable {
             if (securityPolicy == Toakafa) {
                 auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
-                await(future, this, [=]() mutable {
+                future.then(this, [=]() mutable {
                     auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                    await(future, this, [=]() mutable {
-                        interface.reportFinished();
+                    future.then(this, [=]() mutable {
+                        promise.finish();
                     });
                 });
             } else {
                 auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                await(future, this, [=]() mutable {
-                    interface.reportFinished();
+                future.then(this, [=]() mutable {
+                    promise.finish();
                 });
             }
         });
     });
 
-    return interface.future();
+    return promise.task();
 }
 
 ///
@@ -407,23 +408,23 @@ QFuture<void> QXmppAtmManager::authenticate(const QString &encryption, const QMu
 /// \param encryption encryption protocol namespace
 /// \param keyIds key owners' bare JIDs mapped to the IDs of their keys
 ///
-QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
+QXmppTask<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds)
 {
     if (keyIds.isEmpty()) {
-        return makeReadyFuture();
+        return makeReadyTask();
     }
 
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     auto future = setTrustLevel(encryption, keyIds, TrustLevel::ManuallyDistrusted);
-    await(future, this, [=]() mutable {
+    future.then(this, [=]() mutable {
         auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
-        await(future, this, [=]() mutable {
-            interface.reportFinished();
+        future.then(this, [=]() mutable {
+            promise.finish();
         });
     });
 
-    return interface.future();
+    return promise.task();
 }
 
 ///
@@ -433,7 +434,7 @@ QFuture<void> QXmppAtmManager::distrust(const QString &encryption, const QMultiH
 /// \param encryption encryption protocol namespace
 /// \param keyOwnerJids bare JIDs of the key owners
 ///
-QFuture<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids)
+QXmppTask<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids)
 {
     return setTrustLevel(encryption, keyOwnerJids, TrustLevel::AutomaticallyTrusted, TrustLevel::AutomaticallyDistrusted);
 }
@@ -448,26 +449,26 @@ QFuture<void> QXmppAtmManager::distrustAutomaticallyTrustedKeys(const QString &e
 /// \param encryption encryption protocol namespace
 /// \param senderKeyIds IDs of the keys that were used by the senders
 ///
-QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
+QXmppTask<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds)
 {
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> promise;
 
     auto future = trustStorage()->keysForPostponedTrustDecisions(encryption, senderKeyIds);
-    await(future, this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
+    future.then(this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
         // JIDs of key owners mapped to the IDs of their keys
         const auto keysBeingAuthenticated = keysForPostponedTrustDecisions.value(true);
         const auto keysBeingDistrusted = keysForPostponedTrustDecisions.value(false);
 
         auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keysBeingAuthenticated.values(), keysBeingDistrusted.values());
-        await(future, this, [=]() mutable {
+        future.then(this, [=]() mutable {
             auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-            await(future, this, [=]() mutable {
-                interface.reportFinished();
+            future.then(this, [=]() mutable {
+                promise.finish();
             });
         });
     });
 
-    return interface.future();
+    return promise.task();
 }
 
 ///
@@ -477,7 +478,7 @@ QFuture<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encryp
 /// \param keyOwners key owners containing the data for authentication or distrusting
 /// \param recipientJid JID of the recipient
 ///
-QFuture<QXmpp::SendResult> QXmppAtmManager::sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid)
+QXmppTask<QXmpp::SendResult> QXmppAtmManager::sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid)
 {
     QXmppTrustMessageElement trustMessageElement;
     trustMessageElement.setUsage(ns_atm);

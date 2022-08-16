@@ -9,7 +9,6 @@
 #include "QXmppE2eeExtension.h"
 #include "QXmppMessageHandler.h"
 #include "QXmppPubSubEventHandler.h"
-#include "QXmppPubSubManager.h"
 #include "QXmppTrustSecurityPolicy.h"
 #include "qxmppomemo_export.h"
 
@@ -82,14 +81,14 @@ public:
     explicit QXmppOmemoManager(QXmppOmemoStorage *omemoStorage);
     ~QXmppOmemoManager() override;
 
-    QFuture<bool> load();
-    QFuture<bool> setUp();
+    QXmppTask<bool> load();
+    QXmppTask<bool> setUp();
 
-    QFuture<QByteArray> ownKey();
-    QFuture<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> keys(QXmpp::TrustLevels trustLevels = {});
-    QFuture<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> keys(const QList<QString> &jids, QXmpp::TrustLevels trustLevels = {});
+    QXmppTask<QByteArray> ownKey();
+    QXmppTask<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> keys(QXmpp::TrustLevels trustLevels = {});
+    QXmppTask<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> keys(const QList<QString> &jids, QXmpp::TrustLevels trustLevels = {});
 
-    QFuture<bool> changeDeviceLabel(const QString &deviceLabel = {});
+    QXmppTask<bool> changeDeviceLabel(const QString &deviceLabel = {});
 
     int maximumDevicesPerJid() const;
     void setMaximumDevicesPerJid(int maximum);
@@ -97,14 +96,14 @@ public:
     int maximumDevicesPerStanza() const;
     void setMaximumDevicesPerStanza(int maximum);
 
-    QFuture<QVector<DevicesResult>> requestDeviceLists(const QList<QString> &jids);
-    QFuture<QVector<DevicesResult>> subscribeToDeviceLists(const QList<QString> &jids);
-    QFuture<QVector<DevicesResult>> unsubscribeFromDeviceLists();
+    QXmppTask<QVector<DevicesResult>> requestDeviceLists(const QList<QString> &jids);
+    QXmppTask<QVector<DevicesResult>> subscribeToDeviceLists(const QList<QString> &jids);
+    QXmppTask<QVector<DevicesResult>> unsubscribeFromDeviceLists();
 
     QXmppOmemoOwnDevice ownDevice();
-    QFuture<QVector<QXmppOmemoDevice>> devices();
-    QFuture<QVector<QXmppOmemoDevice>> devices(const QList<QString> &jids);
-    QFuture<QXmppPubSubManager::Result> removeContactDevices(const QString &jid);
+    QXmppTask<QVector<QXmppOmemoDevice>> devices();
+    QXmppTask<QVector<QXmppOmemoDevice>> devices(const QList<QString> &jids);
+    QXmppTask<Result> removeContactDevices(const QString &jid);
 
     void setAcceptedSessionBuildingTrustLevels(QXmpp::TrustLevels trustLevels);
     QXmpp::TrustLevels acceptedSessionBuildingTrustLevels();
@@ -112,23 +111,23 @@ public:
     void setNewDeviceAutoSessionBuildingEnabled(bool isNewDeviceAutoSessionBuildingEnabled);
     bool isNewDeviceAutoSessionBuildingEnabled();
 
-    QFuture<void> buildMissingSessions(const QList<QString> &jids);
+    QXmppTask<void> buildMissingSessions(const QList<QString> &jids);
 
-    QFuture<bool> resetOwnDevice();
-    QFuture<bool> resetAll();
+    QXmppTask<bool> resetOwnDevice();
+    QXmppTask<bool> resetAll();
 
-    QFuture<void> setSecurityPolicy(QXmpp::TrustSecurityPolicy securityPolicy);
-    QFuture<QXmpp::TrustSecurityPolicy> securityPolicy();
+    QXmppTask<void> setSecurityPolicy(QXmpp::TrustSecurityPolicy securityPolicy);
+    QXmppTask<QXmpp::TrustSecurityPolicy> securityPolicy();
 
-    QFuture<void> setTrustLevel(const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel);
-    QFuture<QXmpp::TrustLevel> trustLevel(const QString &keyOwnerJid, const QByteArray &keyId);
+    QXmppTask<void> setTrustLevel(const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel);
+    QXmppTask<QXmpp::TrustLevel> trustLevel(const QString &keyOwnerJid, const QByteArray &keyId);
 
     /// \cond
-    QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&message, const std::optional<QXmppSendStanzaParams> &params) override;
-    QFuture<MessageDecryptResult> decryptMessage(QXmppMessage &&message) override;
+    QXmppTask<MessageEncryptResult> encryptMessage(QXmppMessage &&message, const std::optional<QXmppSendStanzaParams> &params) override;
+    QXmppTask<MessageDecryptResult> decryptMessage(QXmppMessage &&message) override;
 
-    QFuture<IqEncryptResult> encryptIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params) override;
-    QFuture<IqDecryptResult> decryptIq(const QDomElement &element) override;
+    QXmppTask<IqEncryptResult> encryptIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params) override;
+    QXmppTask<IqDecryptResult> decryptIq(const QDomElement &element) override;
 
     bool isEncrypted(const QDomElement &) override;
     bool isEncrypted(const QXmppMessage &) override;

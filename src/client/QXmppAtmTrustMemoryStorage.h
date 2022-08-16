@@ -17,13 +17,13 @@ public:
     ~QXmppAtmTrustMemoryStorage();
 
     /// \cond
-    QFuture<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) override;
-    QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting) override;
-    QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds) override;
-    QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption) override;
-    QFuture<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) override;
+    QXmppTask<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) override;
+    QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting) override;
+    QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds) override;
+    QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption) override;
+    QXmppTask<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) override;
 
-    QFuture<void> resetAll(const QString &encryption) override;
+    QXmppTask<void> resetAll(const QString &encryption) override;
     /// \endcond
 
 private:

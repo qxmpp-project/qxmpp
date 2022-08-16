@@ -16,7 +16,7 @@ class QDomElement;
 class QXmppMessage;
 class QXmppIq;
 template<typename T>
-class QFuture;
+class QXmppTask;
 
 class QXmppE2eeExtension : public QXmppExtension
 {
@@ -30,10 +30,10 @@ public:
     using IqEncryptResult = std::variant<QByteArray, QXmppError>;
     using IqDecryptResult = std::variant<QDomElement, NotEncrypted, QXmppError>;
 
-    virtual QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&, const std::optional<QXmppSendStanzaParams> &) = 0;
-    virtual QFuture<MessageDecryptResult> decryptMessage(QXmppMessage &&) = 0;
-    virtual QFuture<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) = 0;
-    virtual QFuture<IqDecryptResult> decryptIq(const QDomElement &) = 0;
+    virtual QXmppTask<MessageEncryptResult> encryptMessage(QXmppMessage &&, const std::optional<QXmppSendStanzaParams> &) = 0;
+    virtual QXmppTask<MessageDecryptResult> decryptMessage(QXmppMessage &&) = 0;
+    virtual QXmppTask<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) = 0;
+    virtual QXmppTask<IqDecryptResult> decryptIq(const QDomElement &) = 0;
     virtual bool isEncrypted(const QDomElement &) = 0;
     virtual bool isEncrypted(const QXmppMessage &) = 0;
 };

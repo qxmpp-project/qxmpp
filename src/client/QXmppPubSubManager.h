@@ -14,9 +14,6 @@
 #include "QXmppPubSubPublishOptions.h"
 #include "QXmppResultSet.h"
 
-#include <QFuture>
-#include <QFutureWatcher>
-
 class QXmppPubSubPublishOptions;
 class QXmppPubSubSubscribeOptions;
 
@@ -75,73 +72,73 @@ public:
     ~QXmppPubSubManager();
 
     // Generic PubSub (the PubSub service is the given entity)
-    QFuture<NodesResult> requestNodes(const QString &jid);
-    QFuture<Result> createNode(const QString &jid, const QString &nodeName);
-    QFuture<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);
-    QFuture<InstantNodeResult> createInstantNode(const QString &jid);
-    QFuture<InstantNodeResult> createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config);
-    QFuture<Result> deleteNode(const QString &jid, const QString &nodeName);
-    QFuture<ItemIdsResult> requestItemIds(const QString &serviceJid, const QString &nodeName);
+    QXmppTask<NodesResult> requestNodes(const QString &jid);
+    QXmppTask<Result> createNode(const QString &jid, const QString &nodeName);
+    QXmppTask<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);
+    QXmppTask<InstantNodeResult> createInstantNode(const QString &jid);
+    QXmppTask<InstantNodeResult> createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config);
+    QXmppTask<Result> deleteNode(const QString &jid, const QString &nodeName);
+    QXmppTask<ItemIdsResult> requestItemIds(const QString &serviceJid, const QString &nodeName);
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
+    QXmppTask<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
+    QXmppTask<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName);
+    QXmppTask<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName);
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
+    QXmppTask<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
     template<typename T>
-    QFuture<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item);
+    QXmppTask<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item);
     template<typename T>
-    QFuture<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
+    QXmppTask<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>
-    QFuture<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QVector<T> &items);
+    QXmppTask<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QVector<T> &items);
     template<typename T>
-    QFuture<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
-    QFuture<Result> retractItem(const QString &jid, const QString &nodeName, const QString &itemId);
-    QFuture<Result> retractItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
-    QFuture<Result> purgeItems(const QString &jid, const QString &nodeName);
-    QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid);
-    QFuture<SubscriptionsResult> requestSubscriptions(const QString &jid, const QString &nodeName);
-    QFuture<AffiliationsResult> requestNodeAffiliations(const QString &jid, const QString &nodeName);
-    QFuture<AffiliationsResult> requestAffiliations(const QString &jid);
-    QFuture<AffiliationsResult> requestAffiliations(const QString &jid, const QString &nodeName);
-    QFuture<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName);
-    QFuture<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName, const QString &subscriberJid);
-    QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options);
-    QFuture<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid);
-    QFuture<NodeConfigResult> requestNodeConfiguration(const QString &service, const QString &nodeName);
-    QFuture<Result> configureNode(const QString &service, const QString &nodeName, const QXmppPubSubNodeConfig &config);
-    QFuture<Result> cancelNodeConfiguration(const QString &service, const QString &nodeName);
-    QFuture<Result> subscribeToNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
-    QFuture<Result> unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
+    QXmppTask<PublishItemsResult> publishItems(const QString &jid, const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
+    QXmppTask<Result> retractItem(const QString &jid, const QString &nodeName, const QString &itemId);
+    QXmppTask<Result> retractItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
+    QXmppTask<Result> purgeItems(const QString &jid, const QString &nodeName);
+    QXmppTask<SubscriptionsResult> requestSubscriptions(const QString &jid);
+    QXmppTask<SubscriptionsResult> requestSubscriptions(const QString &jid, const QString &nodeName);
+    QXmppTask<AffiliationsResult> requestNodeAffiliations(const QString &jid, const QString &nodeName);
+    QXmppTask<AffiliationsResult> requestAffiliations(const QString &jid);
+    QXmppTask<AffiliationsResult> requestAffiliations(const QString &jid, const QString &nodeName);
+    QXmppTask<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName);
+    QXmppTask<OptionsResult> requestSubscribeOptions(const QString &service, const QString &nodeName, const QString &subscriberJid);
+    QXmppTask<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options);
+    QXmppTask<Result> setSubscribeOptions(const QString &service, const QString &nodeName, const QXmppPubSubSubscribeOptions &options, const QString &subscriberJid);
+    QXmppTask<NodeConfigResult> requestNodeConfiguration(const QString &service, const QString &nodeName);
+    QXmppTask<Result> configureNode(const QString &service, const QString &nodeName, const QXmppPubSubNodeConfig &config);
+    QXmppTask<Result> cancelNodeConfiguration(const QString &service, const QString &nodeName);
+    QXmppTask<Result> subscribeToNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
+    QXmppTask<Result> unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
 
     // PEP-specific (the PubSub service is the current account)
-    QFuture<NodesResult> requestOwnPepNodes() { return requestNodes(client()->configuration().jidBare()); };
-    QFuture<Result> createOwnPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
-    QFuture<Result> createOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
-    QFuture<Result> deleteOwnPepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<NodesResult> requestOwnPepNodes() { return requestNodes(client()->configuration().jidBare()); };
+    QXmppTask<Result> createOwnPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<Result> createOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
+    QXmppTask<Result> deleteOwnPepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemResult<T>> requestOwnPepItem(const QString &nodeName, const QString &itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
+    QXmppTask<ItemResult<T>> requestOwnPepItem(const QString &nodeName, const QString &itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemResult<T>> requestOwnPepItem(const QString &nodeName, StandardItemId itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
+    QXmppTask<ItemResult<T>> requestOwnPepItem(const QString &nodeName, StandardItemId itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
     template<typename T = QXmppPubSubItem>
-    QFuture<ItemsResult<T>> requestOwnPepItems(const QString &nodeName) { return requestItems(client()->configuration().jidBare(), nodeName); }
-    QFuture<ItemIdsResult> requestOwnPepItemIds(const QString &nodeName) { return requestItemIds(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<ItemsResult<T>> requestOwnPepItems(const QString &nodeName) { return requestItems(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<ItemIdsResult> requestOwnPepItemIds(const QString &nodeName) { return requestItemIds(client()->configuration().jidBare(), nodeName); }
     template<typename T>
-    QFuture<PublishItemResult> publishOwnPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
+    QXmppTask<PublishItemResult> publishOwnPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>
-    QFuture<PublishItemResult> publishOwnPepItem(const QString &nodeName, const T &item);
+    QXmppTask<PublishItemResult> publishOwnPepItem(const QString &nodeName, const T &item);
     template<typename T>
-    QFuture<PublishItemsResult> publishOwnPepItems(const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
+    QXmppTask<PublishItemsResult> publishOwnPepItems(const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions);
     template<typename T>
-    QFuture<PublishItemsResult> publishOwnPepItems(const QString &nodeName, const QVector<T> &items);
-    QFuture<Result> retractOwnPepItem(const QString &nodeName, const QString &itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
-    QFuture<Result> retractOwnPepItem(const QString &nodeName, StandardItemId itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
-    QFuture<Result> purgeOwnPepItems(const QString &nodeName) { return purgeItems(client()->configuration().jidBare(), nodeName); }
-    QFuture<NodeConfigResult> requestOwnPepNodeConfiguration(const QString &nodeName) { return requestNodeConfiguration(client()->configuration().jidBare(), nodeName); }
-    QFuture<Result> configureOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return configureNode(client()->configuration().jidBare(), nodeName, config); }
-    QFuture<Result> cancelOwnPepNodeConfiguration(const QString &nodeName) { return cancelNodeConfiguration(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<PublishItemsResult> publishOwnPepItems(const QString &nodeName, const QVector<T> &items);
+    QXmppTask<Result> retractOwnPepItem(const QString &nodeName, const QString &itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
+    QXmppTask<Result> retractOwnPepItem(const QString &nodeName, StandardItemId itemId) { return retractItem(client()->configuration().jidBare(), nodeName, itemId); }
+    QXmppTask<Result> purgeOwnPepItems(const QString &nodeName) { return purgeItems(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<NodeConfigResult> requestOwnPepNodeConfiguration(const QString &nodeName) { return requestNodeConfiguration(client()->configuration().jidBare(), nodeName); }
+    QXmppTask<Result> configureOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return configureNode(client()->configuration().jidBare(), nodeName, config); }
+    QXmppTask<Result> cancelOwnPepNodeConfiguration(const QString &nodeName) { return cancelNodeConfiguration(client()->configuration().jidBare(), nodeName); }
 
     static QString standardItemIdToString(StandardItemId itemId);
 
@@ -155,11 +152,11 @@ private:
     friend class tst_QXmppPubSubManager;
     friend class QXmppOmemoManagerPrivate;
 
-    QFuture<FeaturesResult> requestFeatures(const QString &serviceJid, ServiceType serviceType = PubSubOrPep);
-    QFuture<FeaturesResult> requestOwnPepFeatures() { return requestFeatures(client()->configuration().jidBare(), Pep); };
+    QXmppTask<FeaturesResult> requestFeatures(const QString &serviceJid, ServiceType serviceType = PubSubOrPep);
+    QXmppTask<FeaturesResult> requestOwnPepFeatures() { return requestFeatures(client()->configuration().jidBare(), Pep); };
 
-    QFuture<PublishItemResult> publishItem(QXmpp::Private::PubSubIqBase &&iq);
-    QFuture<PublishItemsResult> publishItems(QXmpp::Private::PubSubIqBase &&iq);
+    QXmppTask<PublishItemResult> publishItem(QXmpp::Private::PubSubIqBase &&iq);
+    QXmppTask<PublishItemsResult> publishItems(QXmpp::Private::PubSubIqBase &&iq);
     static QXmpp::Private::PubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
 };
 
@@ -173,9 +170,9 @@ private:
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
-                                                                           const QString &nodeName,
-                                                                           const QString &itemId)
+QXmppTask<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
+                                                                             const QString &nodeName,
+                                                                             const QString &itemId)
 {
     using namespace QXmpp::Private;
     using Error = QXmppStanza::Error;
@@ -198,9 +195,9 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
-                                                                           const QString &nodeName,
-                                                                           StandardItemId itemId)
+QXmppTask<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const QString &jid,
+                                                                             const QString &nodeName,
+                                                                             StandardItemId itemId)
 {
     return requestItem<T>(jid, nodeName, standardItemIdToString(itemId));
 }
@@ -214,8 +211,8 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
-                                                                             const QString &nodeName)
+QXmppTask<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
+                                                                               const QString &nodeName)
 {
     return requestItems<T>(jid, nodeName, {});
 }
@@ -231,9 +228,9 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
-                                                                             const QString &nodeName,
-                                                                             const QStringList &itemIds)
+QXmppTask<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(const QString &jid,
+                                                                               const QString &nodeName,
+                                                                               const QStringList &itemIds)
 {
     using namespace QXmpp::Private;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, itemIds)), this,
@@ -257,9 +254,9 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
-                                                                               const QString &nodeName,
-                                                                               const T &item)
+QXmppTask<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
+                                                                                 const QString &nodeName,
+                                                                                 const T &item)
 {
     QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
@@ -281,10 +278,10 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
-                                                                               const QString &nodeName,
-                                                                               const T &item,
-                                                                               const QXmppPubSubPublishOptions &publishOptions)
+QXmppTask<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(const QString &jid,
+                                                                                 const QString &nodeName,
+                                                                                 const T &item,
+                                                                                 const QXmppPubSubPublishOptions &publishOptions)
 {
     QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
@@ -303,9 +300,9 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
-                                                                                 const QString &nodeName,
-                                                                                 const QVector<T> &items)
+QXmppTask<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
+                                                                                   const QString &nodeName,
+                                                                                   const QVector<T> &items)
 {
     QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
@@ -324,10 +321,10 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
-                                                                                 const QString &nodeName,
-                                                                                 const QVector<T> &items,
-                                                                                 const QXmppPubSubPublishOptions &publishOptions)
+QXmppTask<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems(const QString &jid,
+                                                                                   const QString &nodeName,
+                                                                                   const QVector<T> &items,
+                                                                                   const QXmppPubSubPublishOptions &publishOptions)
 {
     QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
@@ -346,7 +343,7 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions)
+QXmppTask<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPepItem(const QString &nodeName, const T &item, const QXmppPubSubPublishOptions &publishOptions)
 {
     return publishItem(client()->configuration().jidBare(), nodeName, item, publishOptions);
 }
@@ -359,7 +356,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPep
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPepItem(const QString &nodeName, const T &item)
+QXmppTask<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPepItem(const QString &nodeName, const T &item)
 {
     return publishItem(client()->configuration().jidBare(), nodeName, item);
 }
@@ -374,7 +371,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishOwnPep
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwnPepItems(const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions)
+QXmppTask<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwnPepItems(const QString &nodeName, const QVector<T> &items, const QXmppPubSubPublishOptions &publishOptions)
 {
     return publishItems(client()->configuration().jidBare(), nodeName, items, publishOptions);
 }
@@ -387,7 +384,7 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwnPe
 /// \return
 ///
 template<typename T>
-QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwnPepItems(const QString &nodeName, const QVector<T> &items)
+QXmppTask<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwnPepItems(const QString &nodeName, const QVector<T> &items)
 {
     return publishItems(client()->configuration().jidBare(), nodeName, items);
 }

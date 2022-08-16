@@ -16,6 +16,7 @@
 //
 
 #include "QXmppIq.h"
+#include "QXmppPromise.h"
 #include "QXmppSendResult.h"
 
 #include <memory>
@@ -85,6 +86,21 @@ inline QFuture<void> makeReadyFuture()
 }
 #endif
 
+template<typename T>
+QXmppTask<T> makeReadyTask(T &&value)
+{
+    QXmppPromise<T> promise;
+    promise.finish(std::move(value));
+    return promise.task();
+}
+
+inline QXmppTask<void> makeReadyTask()
+{
+    QXmppPromise<void> promise;
+    promise.finish();
+    return promise.task();
+}
+
 template<typename T, typename Handler>
 void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
 {
@@ -123,18 +139,14 @@ void await(const QFuture<void> &future, QObject *context, Handler handler)
 }
 
 template<typename Result, typename Input, typename Converter>
-auto chain(const QFuture<Input> &source, QObject *context, Converter task) -> QFuture<Result>
+auto chain(QXmppTask<Input> &&source, QObject *context, Converter task) -> QXmppTask<Result>
 {
-    QFutureInterface<Result> resultInterface(QFutureInterfaceBase::Started);
+    QXmppPromise<Result> promise;
 
-    auto *watcher = new QFutureWatcher<Input>(context);
-    QObject::connect(watcher, &QFutureWatcherBase::finished, context, [=]() mutable {
-        resultInterface.reportResult(task(watcher->result()));
-        resultInterface.reportFinished();
-        watcher->deleteLater();
+    source.then(context, [=](Input &&input) mutable {
+        promise.finish(task(std::move(input)));
     });
-    watcher->setFuture(source);
-    return resultInterface.future();
+    return promise.task();
 }
 
 template<typename IqType, typename Input, typename Converter>
@@ -169,21 +181,21 @@ auto parseIq(Input &&sendResult) -> Result
 }
 
 template<typename Input, typename Converter>
-auto chainIq(QFuture<Input> &&input, QObject *context, Converter convert) -> QFuture<decltype(convert({}))>
+auto chainIq(QXmppTask<Input> &&input, QObject *context, Converter convert) -> QXmppTask<decltype(convert({}))>
 {
     using Result = decltype(convert({}));
     using IqType = std::decay_t<first_argument_t<Converter>>;
-    return chain<Result>(std::move(input), context, [convert { std::move(convert) }](Input &&input) -> Result {
+    return chain<Result>(std::move(input), context, [convert = std::move(convert)](Input &&input) -> Result {
         return parseIq<IqType>(std::move(input), convert);
     });
 }
 
 template<typename Result, typename Input>
-auto chainIq(QFuture<Input> &&input, QObject *context) -> QFuture<Result>
+auto chainIq(QXmppTask<Input> &&input, QObject *context) -> QXmppTask<Result>
 {
     // IQ type is first std::variant parameter
     using IqType = std::decay_t<decltype(std::get<0>(Result {}))>;
-    return chain<Result>(std::move(input), context, [](Input &&sendResult) {
+    return chain<Result>(std::move(input), context, [](Input &&sendResult) mutable {
         return parseIq<IqType, Result>(sendResult);
     });
 }
@@ -208,6 +220,24 @@ auto mapSuccess(std::variant<T, Err> var, Function lambda)
                               return err;
                           } },
                       std::move(var));
+}
+
+template<typename T>
+static auto taskFromFuture(QFuture<T> &&future) -> QXmppTask<T>
+{
+    QXmppPromise<T> promise;
+    auto *watcher = new QFutureWatcher<T>();
+    QObject::connect(watcher, &QFutureWatcher<T>::finished, [promise = std::move(promise), watcher]() mutable {
+        if constexpr (std::is_void_v<T>) {
+            promise.finish();
+        } else {
+            promise.finish(watcher->result());
+        }
+        watcher->deleteLater();
+    });
+    watcher->setFuture(future);
+
+    return promise.task();
 }
 
 }  // namespace QXmpp::Private

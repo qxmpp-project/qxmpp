@@ -13,7 +13,7 @@
 
 class QFileInfo;
 template<typename T>
-class QFuture;
+class QXmppTask;
 class QMimeType;
 class QXmppHttpUploadRequestIq;
 class QXmppHttpUploadSlotIq;
@@ -98,15 +98,15 @@ public:
                               const QString &uploadService = QString());
 
     using SlotResult = std::variant<QXmppHttpUploadSlotIq, QXmppStanza::Error>;
-    QFuture<SlotResult> requestSlot(const QFileInfo &file,
-                                    const QString &uploadService = {});
-    QFuture<SlotResult> requestSlot(const QFileInfo &file,
-                                    const QString &customFileName,
-                                    const QString &uploadService = {});
-    QFuture<SlotResult> requestSlot(const QString &fileName,
-                                    qint64 fileSize,
-                                    const QMimeType &mimeType,
-                                    const QString &uploadService = {});
+    QXmppTask<SlotResult> requestSlot(const QFileInfo &file,
+                                      const QString &uploadService = {});
+    QXmppTask<SlotResult> requestSlot(const QFileInfo &file,
+                                      const QString &customFileName,
+                                      const QString &uploadService = {});
+    QXmppTask<SlotResult> requestSlot(const QString &fileName,
+                                      qint64 fileSize,
+                                      const QMimeType &mimeType,
+                                      const QString &uploadService = {});
 
     bool serviceFound() const;
 

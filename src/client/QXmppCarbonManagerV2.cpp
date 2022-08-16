@@ -163,7 +163,7 @@ void QXmppCarbonManagerV2::enableCarbons()
         return;
     }
 
-    await(client()->sendIq(CarbonEnableIq()), this, [this](QXmppClient::IqResult domResult) {
+    client()->sendIq(CarbonEnableIq()).then(this, [this](QXmppClient::IqResult domResult) {
         if (auto err = parseIq(std::move(domResult))) {
             warning("Could not enable message carbons: " % err->description);
         } else {

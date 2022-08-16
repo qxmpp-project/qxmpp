@@ -19,7 +19,7 @@
 #include <QSslError>
 
 template<typename T>
-class QFuture;
+class QXmppTask;
 
 class QXmppE2eeExtension;
 class QXmppClientExtension;
@@ -219,12 +219,12 @@ public:
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
-    QFuture<QXmpp::SendResult> send(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
-    QFuture<QXmpp::SendResult> sendUnencrypted(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
-    QFuture<QXmpp::SendResult> reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> & = {});
-    QFuture<IqResult> sendIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
-    QFuture<IqResult> sendSensitiveIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
-    QFuture<EmptyResult> sendGenericIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<QXmpp::SendResult> send(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<QXmpp::SendResult> sendUnencrypted(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<QXmpp::SendResult> reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<IqResult> sendIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<IqResult> sendSensitiveIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
+    QXmppTask<EmptyResult> sendGenericIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
 
 #if QXMPP_DEPRECATED_SINCE(1, 1)
     QT_DEPRECATED_X("Use QXmppClient::findExtension<QXmppRosterManager>() instead")

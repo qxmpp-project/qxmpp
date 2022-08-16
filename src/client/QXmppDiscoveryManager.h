@@ -10,7 +10,7 @@
 #include <variant>
 
 template<typename T>
-class QFuture;
+class QXmppTask;
 class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
@@ -35,8 +35,8 @@ public:
 
     using InfoResult = std::variant<QXmppDiscoveryIq, QXmppStanza::Error>;
     using ItemsResult = std::variant<QList<QXmppDiscoveryIq::Item>, QXmppStanza::Error>;
-    QFuture<InfoResult> requestDiscoInfo(const QString &jid, const QString &node = {});
-    QFuture<ItemsResult> requestDiscoItems(const QString &jid, const QString &node = {});
+    QXmppTask<InfoResult> requestDiscoInfo(const QString &jid, const QString &node = {});
+    QXmppTask<ItemsResult> requestDiscoItems(const QString &jid, const QString &node = {});
 
     QString clientCapabilitiesNode() const;
     void setClientCapabilitiesNode(const QString &);

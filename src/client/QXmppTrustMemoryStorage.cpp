@@ -53,42 +53,42 @@ QXmppTrustMemoryStorage::QXmppTrustMemoryStorage()
 QXmppTrustMemoryStorage::~QXmppTrustMemoryStorage() = default;
 
 /// \cond
-QFuture<void> QXmppTrustMemoryStorage::setSecurityPolicy(const QString &encryption, TrustSecurityPolicy securityPolicy)
+QXmppTask<void> QXmppTrustMemoryStorage::setSecurityPolicy(const QString &encryption, TrustSecurityPolicy securityPolicy)
 {
     d->securityPolicies.insert(encryption, securityPolicy);
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::resetSecurityPolicy(const QString &encryption)
+QXmppTask<void> QXmppTrustMemoryStorage::resetSecurityPolicy(const QString &encryption)
 {
     d->securityPolicies.remove(encryption);
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<TrustSecurityPolicy> QXmppTrustMemoryStorage::securityPolicy(const QString &encryption)
+QXmppTask<TrustSecurityPolicy> QXmppTrustMemoryStorage::securityPolicy(const QString &encryption)
 {
-    return makeReadyFuture(std::move(d->securityPolicies.value(encryption)));
+    return makeReadyTask(std::move(d->securityPolicies.value(encryption)));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::setOwnKey(const QString &encryption, const QByteArray &keyId)
+QXmppTask<void> QXmppTrustMemoryStorage::setOwnKey(const QString &encryption, const QByteArray &keyId)
 {
     d->ownKeys.insert(encryption, keyId);
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::resetOwnKey(const QString &encryption)
+QXmppTask<void> QXmppTrustMemoryStorage::resetOwnKey(const QString &encryption)
 {
     d->ownKeys.remove(encryption);
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<QByteArray> QXmppTrustMemoryStorage::ownKey(const QString &encryption)
+QXmppTask<QByteArray> QXmppTrustMemoryStorage::ownKey(const QString &encryption)
 {
     auto key = d->ownKeys[encryption];
-    return makeReadyFuture(std::move(key));
+    return makeReadyTask(std::move(key));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, TrustLevel trustLevel)
+QXmppTask<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, TrustLevel trustLevel)
 {
     for (const auto &keyId : keyIds) {
         Key key;
@@ -98,10 +98,10 @@ QFuture<void> QXmppTrustMemoryStorage::addKeys(const QString &encryption, const 
         d->keys.insert(encryption, key);
     }
 
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QList<QByteArray> &keyIds)
+QXmppTask<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QList<QByteArray> &keyIds)
 {
     for (auto itr = d->keys.find(encryption);
          itr != d->keys.end() && itr.key() == encryption;) {
@@ -112,10 +112,10 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, con
         }
     }
 
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QString &keyOwnerJid)
+QXmppTask<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, const QString &keyOwnerJid)
 {
     for (auto itr = d->keys.find(encryption);
          itr != d->keys.end() && itr.key() == encryption;) {
@@ -126,16 +126,16 @@ QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption, con
         }
     }
 
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption)
+QXmppTask<void> QXmppTrustMemoryStorage::removeKeys(const QString &encryption)
 {
     d->keys.remove(encryption);
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 
-QFuture<QHash<TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keys(const QString &encryption, TrustLevels trustLevels)
+QXmppTask<QHash<TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::keys(const QString &encryption, TrustLevels trustLevels)
 {
     QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys;
 
@@ -147,10 +147,10 @@ QFuture<QHash<TrustLevel, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStor
         }
     }
 
-    return makeReadyFuture(std::move(keys));
+    return makeReadyTask(std::move(keys));
 }
 
-QFuture<QHash<QString, QHash<QByteArray, TrustLevel>>> QXmppTrustMemoryStorage::keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels)
+QXmppTask<QHash<QString, QHash<QByteArray, TrustLevel>>> QXmppTrustMemoryStorage::keys(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevels trustLevels)
 {
     QHash<QString, QHash<QByteArray, TrustLevel>> keys;
 
@@ -163,22 +163,22 @@ QFuture<QHash<QString, QHash<QByteArray, TrustLevel>>> QXmppTrustMemoryStorage::
         }
     }
 
-    return makeReadyFuture(std::move(keys));
+    return makeReadyTask(std::move(keys));
 }
 
-QFuture<bool> QXmppTrustMemoryStorage::hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels)
+QXmppTask<bool> QXmppTrustMemoryStorage::hasKey(const QString &encryption, const QString &keyOwnerJid, TrustLevels trustLevels)
 {
     const auto storedKeys = d->keys.values(encryption);
     for (const auto &key : storedKeys) {
         if (key.ownerJid == keyOwnerJid && trustLevels.testFlag(key.trustLevel)) {
-            return makeReadyFuture(std::move(true));
+            return makeReadyTask(std::move(true));
         }
     }
 
-    return makeReadyFuture(std::move(false));
+    return makeReadyTask(std::move(false));
 }
 
-QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
+QXmppTask<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, TrustLevel trustLevel)
 {
     QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys;
 
@@ -215,10 +215,10 @@ QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage
         }
     }
 
-    return makeReadyFuture(std::move(modifiedKeys));
+    return makeReadyTask(std::move(modifiedKeys));
 }
 
-QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
+QXmppTask<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage::setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, TrustLevel oldTrustLevel, TrustLevel newTrustLevel)
 {
     QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys;
 
@@ -231,27 +231,27 @@ QFuture<QHash<QString, QMultiHash<QString, QByteArray>>> QXmppTrustMemoryStorage
         }
     }
 
-    return makeReadyFuture(std::move(modifiedKeys));
+    return makeReadyTask(std::move(modifiedKeys));
 }
 
-QFuture<TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
+QXmppTask<TrustLevel> QXmppTrustMemoryStorage::trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId)
 {
     const auto keys = d->keys.values(encryption);
     for (const auto &key : keys) {
         if (key.id == keyId && key.ownerJid == keyOwnerJid) {
-            return makeReadyFuture(std::move(TrustLevel(key.trustLevel)));
+            return makeReadyTask(std::move(TrustLevel(key.trustLevel)));
         }
     }
 
-    return makeReadyFuture(std::move(TrustLevel::Undecided));
+    return makeReadyTask(std::move(TrustLevel::Undecided));
 }
 
-QFuture<void> QXmppTrustMemoryStorage::resetAll(const QString &encryption)
+QXmppTask<void> QXmppTrustMemoryStorage::resetAll(const QString &encryption)
 {
     d->securityPolicies.remove(encryption);
     d->ownKeys.remove(encryption);
     d->keys.remove(encryption);
 
-    return makeReadyFuture();
+    return makeReadyTask();
 }
 /// \endcond

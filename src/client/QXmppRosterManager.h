@@ -19,7 +19,7 @@
 #include <QStringList>
 
 template<typename T>
-class QFuture;
+class QXmppTask;
 class QXmppRosterManagerPrivate;
 
 ///
@@ -73,11 +73,11 @@ public:
     QXmppPresence getPresence(const QString &bareJid,
                               const QString &resource) const;
 
-    QFuture<Result> addRosterItem(const QString &bareJid, const QString &name = {}, const QSet<QString> &groups = {});
-    QFuture<Result> removeRosterItem(const QString &bareJid);
-    QFuture<Result> renameRosterItem(const QString &bareJid, const QString &name);
-    QFuture<QXmpp::SendResult> subscribeTo(const QString &bareJid, const QString &reason = {});
-    QFuture<QXmpp::SendResult> unsubscribeFrom(const QString &bareJid, const QString &reason = {});
+    QXmppTask<Result> addRosterItem(const QString &bareJid, const QString &name = {}, const QSet<QString> &groups = {});
+    QXmppTask<Result> removeRosterItem(const QString &bareJid);
+    QXmppTask<Result> renameRosterItem(const QString &bareJid, const QString &name);
+    QXmppTask<QXmpp::SendResult> subscribeTo(const QString &bareJid, const QString &reason = {});
+    QXmppTask<QXmpp::SendResult> unsubscribeFrom(const QString &bareJid, const QString &reason = {});
 
     /// \cond
     bool handleStanza(const QDomElement &element) override;

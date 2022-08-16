@@ -5,7 +5,6 @@
 #include "QXmppNonza.h"
 #include "QXmppPacket_p.h"
 
-#include <QFuture>
 #include <QXmlStreamWriter>
 
 inline QByteArray serialize(const QXmppNonza &nonza)
@@ -17,17 +16,16 @@ inline QByteArray serialize(const QXmppNonza &nonza)
 }
 
 /// \cond
-QXmppPacket::QXmppPacket(const QXmppNonza &nonza, QFutureInterface<QXmpp::SendResult> interface)
+QXmppPacket::QXmppPacket(const QXmppNonza &nonza, QXmppPromise<QXmpp::SendResult> interface)
     : QXmppPacket(serialize(nonza), nonza.isXmppStanza(), std::move(interface))
 {
 }
 
-QXmppPacket::QXmppPacket(const QByteArray &data, bool isXmppStanza, QFutureInterface<QXmpp::SendResult> interface)
-    : m_interface(std::move(interface)),
+QXmppPacket::QXmppPacket(const QByteArray &data, bool isXmppStanza, QXmppPromise<QXmpp::SendResult> interface)
+    : m_promise(std::move(interface)),
       m_data(data),
       m_isXmppStanza(isXmppStanza)
 {
-    m_interface.reportStarted();
 }
 
 QByteArray QXmppPacket::data() const
@@ -40,18 +38,13 @@ bool QXmppPacket::isXmppStanza() const
     return m_isXmppStanza;
 }
 
-QFuture<QXmpp::SendResult> QXmppPacket::future()
+QXmppTask<QXmpp::SendResult> QXmppPacket::task()
 {
-    return m_interface.future();
+    return m_promise.task();
 }
 
-void QXmppPacket::reportFinished()
+void QXmppPacket::reportFinished(QXmpp::SendResult &&result)
 {
-    m_interface.reportFinished();
-}
-
-void QXmppPacket::reportResult(const QXmpp::SendResult &result)
-{
-    m_interface.reportResult(result);
+    m_promise.finish(std::move(result));
 }
 /// \endcond

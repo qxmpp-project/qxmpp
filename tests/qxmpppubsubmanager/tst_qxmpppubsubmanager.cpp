@@ -299,13 +299,14 @@ void tst_QXmppPubSubManager::testCreateNodes()
 
     auto [test, psManager] = Client();
 
-    QFuture<PSManager::Result> future;
-    if (isPep) {
-        test.configuration().setJid(jid);
-        future = psManager->createOwnPepNode(node);
-    } else {
-        future = psManager->createNode(jid, node);
-    }
+    QXmppTask<PSManager::Result> future = [=, &t = test, psM = psManager]() {
+        if (isPep) {
+            t.configuration().setJid(jid);
+            return psM->createOwnPepNode(node);
+        } else {
+            return psM->createNode(jid, node);
+        }
+    }();
 
     test.expect(QStringLiteral("<iq id='qxmpp1' to='%1' type='set'><pubsub xmlns='http://jabber.org/protocol/pubsub'><create node='%2'/></pubsub></iq>").arg(jid, node));
     test.inject(QStringLiteral("<iq id='qxmpp1' from='%1' type='result'/>").arg(jid));
@@ -400,12 +401,13 @@ void tst_QXmppPubSubManager::testDeleteNodes()
         test.configuration().setJid(jid);
     }
 
-    QFuture<PSManager::Result> future;
-    if (isPep) {
-        future = psManager->deleteOwnPepNode(node);
-    } else {
-        future = psManager->deleteNode(jid, node);
-    }
+    QXmppTask<PSManager::Result> future = [=, psM = psManager]() {
+        if (isPep) {
+            return psM->deleteOwnPepNode(node);
+        } else {
+            return psM->deleteNode(jid, node);
+        }
+    }();
 
     // FIXME: pubsub#owner here, but not for <create/>?
     test.expect(QStringLiteral("<iq id='qxmpp1' to='%1' type='set'><pubsub xmlns='http://jabber.org/protocol/pubsub#owner'><delete node='%2'/></pubsub></iq>").arg(jid, node));
@@ -516,20 +518,21 @@ void tst_QXmppPubSubManager::testPublishItems()
     };
 
     if (items.size() == 1) {
-        QFuture<PSManager::PublishItemResult> future;
-        if (isPep) {
-            if (publishOptions) {
-                future = psManager->publishOwnPepItem(node, items.constFirst(), *publishOptions);
+        QXmppTask<PSManager::PublishItemResult> future = [=, psM = psManager]() {
+            if (isPep) {
+                if (publishOptions) {
+                    return psManager->publishOwnPepItem(node, items.constFirst(), *publishOptions);
+                } else {
+                    return psManager->publishOwnPepItem(node, items.constFirst());
+                }
             } else {
-                future = psManager->publishOwnPepItem(node, items.constFirst());
+                if (publishOptions) {
+                    return psManager->publishItem(jid, node, items.constFirst(), *publishOptions);
+                } else {
+                    return psManager->publishItem(jid, node, items.constFirst());
+                }
             }
-        } else {
-            if (publishOptions) {
-                future = psManager->publishItem(jid, node, items.constFirst(), *publishOptions);
-            } else {
-                future = psManager->publishItem(jid, node, items.constFirst());
-            }
-        }
+        }();
 
         injectXml();
         const auto id = expectFutureVariant<QString>(future);
@@ -539,20 +542,21 @@ void tst_QXmppPubSubManager::testPublishItems()
             QVERIFY(id.isNull());
         }
     } else {
-        QFuture<PSManager::PublishItemsResult> future;
-        if (isPep) {
-            if (publishOptions) {
-                future = psManager->publishOwnPepItems(node, items, *publishOptions);
+        QXmppTask<PSManager::PublishItemsResult> future = [=, psM = psManager]() {
+            if (isPep) {
+                if (publishOptions) {
+                    return psManager->publishOwnPepItems(node, items, *publishOptions);
+                } else {
+                    return psManager->publishOwnPepItems(node, items);
+                }
             } else {
-                future = psManager->publishOwnPepItems(node, items);
+                if (publishOptions) {
+                    return psManager->publishItems(jid, node, items, *publishOptions);
+                } else {
+                    return psManager->publishItems(jid, node, items);
+                }
             }
-        } else {
-            if (publishOptions) {
-                future = psManager->publishItems(jid, node, items, *publishOptions);
-            } else {
-                future = psManager->publishItems(jid, node, items);
-            }
-        }
+        }();
 
         injectXml();
         const auto ids = expectFutureVariant<QVector<QString>>(future);
@@ -614,13 +618,14 @@ void tst_QXmppPubSubManager::testRetractItem()
 
     auto [test, psManager] = Client();
 
-    QFuture<PSManager::Result> future;
-    if (isPep) {
-        test.configuration().setJid(jid);
-        future = psManager->retractOwnPepItem(node, itemId);
-    } else {
-        future = psManager->retractItem(jid, node, itemId);
-    }
+    QXmppTask<PSManager::Result> future = [=, psM = psManager, &t = test]() {
+        if (isPep) {
+            t.configuration().setJid(jid);
+            return psM->retractOwnPepItem(node, itemId);
+        } else {
+            return psM->retractItem(jid, node, itemId);
+        }
+    }();
 
     test.expect(QStringLiteral("<iq id='qxmpp1' to='%1' type='set'><pubsub xmlns='http://jabber.org/protocol/pubsub'><retract node='%2'><item id='%3'/></retract></pubsub></iq>")
                     .arg(jid, node, itemId));
@@ -1024,7 +1029,7 @@ void tst_QXmppPubSubManager::testRequestOptions()
     TestClient test;
     auto *psManager = test.addNewExtension<PSManager>();
 
-    auto testOpts = [&](QFuture<PSManager::OptionsResult> &&future) {
+    auto testOpts = [&](QXmppTask<PSManager::OptionsResult> &&future) {
         test.expect("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'><pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                     "<options jid='me@qxmpp.org' node='node1'/>"
                     "</pubsub></iq>");

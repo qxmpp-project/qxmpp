@@ -48,6 +48,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppOutOfBandUrl.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
+    base/QXmppPromise.h
     base/QXmppPubSubAffiliation.h
     base/QXmppPubSubEvent.h
     base/QXmppPubSubIq_p.h
@@ -71,6 +72,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppStream.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
+    base/QXmppTask.h
     base/QXmppThumbnail.h
     base/QXmppTrustMessageElement.h
     base/QXmppTrustMessageKeyOwner.h
@@ -203,6 +205,7 @@ set(SOURCE_FILES
     base/QXmppStreamInitiationIq.cpp
     base/QXmppStreamManagement.cpp
     base/QXmppStun.cpp
+    base/QXmppTask.cpp
     base/QXmppThumbnail.cpp
     base/QXmppTrustMessages.cpp
     base/QXmppTuneItem.cpp

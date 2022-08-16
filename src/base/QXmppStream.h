@@ -17,6 +17,8 @@
 
 class QDomElement;
 template<typename T>
+class QXmppTask;
+template<typename T>
 class QFuture;
 template<typename T>
 class QFutureInterface;
@@ -41,12 +43,12 @@ public:
     virtual bool isConnected() const;
 
     bool sendPacket(const QXmppNonza &);
-    QFuture<QXmpp::SendResult> send(QXmppNonza &&);
-    QFuture<QXmpp::SendResult> send(QXmppPacket &&);
+    QXmppTask<QXmpp::SendResult> send(QXmppNonza &&);
+    QXmppTask<QXmpp::SendResult> send(QXmppPacket &&);
 
     using IqResult = std::variant<QDomElement, QXmppError>;
-    QFuture<IqResult> sendIq(QXmppIq &&);
-    QFuture<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
+    QXmppTask<IqResult> sendIq(QXmppIq &&);
+    QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
     void cancelOngoingIqs();
     bool hasIqId(const QString &id) const;
 
@@ -97,7 +99,7 @@ private:
     friend class tst_QXmppStream;
     friend class TestClient;
 
-    QFuture<QXmpp::SendResult> send(QXmppPacket &&, bool &);
+    QXmppTask<QXmpp::SendResult> send(QXmppPacket &&, bool &);
     void processData(const QString &data);
     bool handleIqResponse(const QDomElement &);
 

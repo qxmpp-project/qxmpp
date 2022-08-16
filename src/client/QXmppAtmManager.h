@@ -11,6 +11,8 @@
 
 class QXmppMessage;
 class QXmppTrustMessageKeyOwner;
+template<typename T>
+class QXmppTask;
 
 class QXMPP_EXPORT QXmppAtmManager : public QXmppTrustManager
 {
@@ -18,7 +20,7 @@ class QXMPP_EXPORT QXmppAtmManager : public QXmppTrustManager
 
 public:
     QXmppAtmManager(QXmppAtmTrustStorage *trustStorage);
-    QFuture<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting = {});
+    QXmppTask<void> makeTrustDecisions(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting = {});
 
 protected:
     /// \cond
@@ -28,16 +30,16 @@ private:
     Q_SLOT void handleMessageReceived(const QXmppMessage &message);
     /// \endcond
 
-    QFuture<void> makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting);
-    QFuture<void> handleMessage(const QXmppMessage &message);
+    QXmppTask<void> makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting);
+    QXmppTask<void> handleMessage(const QXmppMessage &message);
 
-    QFuture<void> authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
-    QFuture<void> distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
+    QXmppTask<void> authenticate(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
+    QXmppTask<void> distrust(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds);
 
-    QFuture<void> distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids);
-    QFuture<void> makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds);
+    QXmppTask<void> distrustAutomaticallyTrustedKeys(const QString &encryption, const QList<QString> &keyOwnerJids);
+    QXmppTask<void> makePostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds);
 
-    QFuture<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
+    QXmppTask<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
 
     /// \cond
     inline QXmppAtmTrustStorage *trustStorage() const

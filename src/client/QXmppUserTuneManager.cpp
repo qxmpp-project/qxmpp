@@ -78,7 +78,7 @@ QStringList QXmppUserTuneManager::discoveryFeatures() const
 /// \param jid The account JID to request.
 ///
 auto QXmppUserTuneManager::request(const QString &jid)
-    -> QFuture<GetResult>
+    -> QXmppTask<GetResult>
 {
     return Pep::request<Item>(pubSub(client()), jid, ns_tune, this);
 }
@@ -89,7 +89,7 @@ auto QXmppUserTuneManager::request(const QString &jid)
 /// \param item The User Tune item to be published.
 ///
 auto QXmppUserTuneManager::publish(const QXmppTuneItem &item)
-    -> QFuture<PublishResult>
+    -> QXmppTask<PublishResult>
 {
     return pubSub(client())->publishOwnPepItem(ns_tune, item);
 }

@@ -53,7 +53,7 @@ namespace Private {
                                const QString &requestId,
                                const QString &requestFrom,
                                const std::optional<QXmppE2eeMetadata> &e2eeMetadata,
-                               QFuture<T> future)
+                               QXmppTask<T> future)
     {
         Private::await(future, client, [client, requestId, requestFrom, e2eeMetadata](T result) {
             processHandleIqResult(client, requestId, requestFrom, e2eeMetadata, result);
@@ -162,7 +162,7 @@ namespace Private {
 /// The return type of the handler function can be:
 ///  1. an QXmppIq based type
 ///  2. a std::variant of QXmppIq based types (multiple are possible) and optionally also QXmppStanza::Error
-///  3. a QFuture of 1. or 2.
+///  3. a QXmppTask of 1. or 2.
 ///
 /// You don't need to set the values for id or the to address on the IQ result because that's done
 /// automatically. Unless you want to return an error IQ you also don't need to set the IQ type.
@@ -254,7 +254,7 @@ bool handleIqRequests(const QDomElement &element,
 /// The return type of the handler function can be:
 ///  1. an QXmppIq based type
 ///  2. a std::variant of QXmppIq based types (multiple are possible) and optionally also QXmppStanza::Error
-///  3. a QFuture of 1. or 2.
+///  3. a QXmppTask of 1. or 2.
 ///
 /// You don't need to set the values for id or the to address on the IQ result because that's done
 /// automatically. Unless you want to return an error IQ you also don't need to set the IQ type.

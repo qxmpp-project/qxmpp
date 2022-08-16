@@ -256,7 +256,7 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QString &bareJid, const QString &name, const QSet<QString> &groups)
+QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QString &bareJid, const QString &name, const QSet<QString> &groups)
 {
     QXmppRosterIq::Item item;
     item.setBareJid(bareJid);
@@ -280,7 +280,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QStr
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const QString &bareJid)
+QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const QString &bareJid)
 {
     QXmppRosterIq::Item item;
     item.setBareJid(bareJid);
@@ -303,11 +303,11 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const Q
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const QString &bareJid, const QString &name)
+QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const QString &bareJid, const QString &name)
 {
     using Error = QXmppStanza::Error;
     if (!d->entries.contains(bareJid)) {
-        return QXmpp::Private::makeReadyFuture<Result>(
+        return QXmpp::Private::makeReadyTask<Result>(
             Error(Error::Modify, Error::ItemNotFound,
                   QStringLiteral("The roster doesn't contain this user.")));
     }
@@ -334,7 +334,7 @@ QFuture<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const Q
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bareJid, const QString &reason)
+QXmppTask<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bareJid, const QString &reason)
 {
     QXmppPresence packet;
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
@@ -351,7 +351,7 @@ QFuture<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bareJi
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppRosterManager::unsubscribeFrom(const QString &bareJid, const QString &reason)
+QXmppTask<QXmpp::SendResult> QXmppRosterManager::unsubscribeFrom(const QString &bareJid, const QString &reason)
 {
     QXmppPresence packet;
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
@@ -375,13 +375,13 @@ bool QXmppRosterManager::refuseSubscription(const QString &bareJid, const QStrin
 }
 
 ///
-/// Adds a new item to the roster without sending any subscription requests.
+/// Adds a new item  the roster without sending any subscription requests.
 ///
 /// As a result, the server will initiate a roster push, causing the
 /// itemAdded() or itemChanged() signal to be emitted.
 ///
 /// \param bareJid
-/// \param name Optional name for the item.
+/// \param name Optotional name for the item.
 /// \param groups Optional groups for the item.
 ///
 bool QXmppRosterManager::addItem(const QString &bareJid, const QString &name, const QSet<QString> &groups)

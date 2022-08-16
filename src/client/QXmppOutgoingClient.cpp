@@ -15,6 +15,7 @@
 #include "QXmppSasl_p.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
+#include "QXmppTask.h"
 #include "QXmppUtils.h"
 
 #include <QCryptographicHash>
@@ -325,7 +326,7 @@ bool QXmppOutgoingClient::isStreamResumed() const
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
+QXmppTask<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 {
     // always set a to address (the QXmppStream needs this for matching)
     if (iq.to().isEmpty()) {

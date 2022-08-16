@@ -12,7 +12,7 @@
 
 class QXmppTuneItem;
 template<typename T>
-class QFuture;
+class QXmppTask;
 
 class QXMPP_EXPORT QXmppUserTuneManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
@@ -27,8 +27,8 @@ public:
 
     QStringList discoveryFeatures() const override;
 
-    QFuture<GetResult> request(const QString &jid);
-    QFuture<PublishResult> publish(const QXmppTuneItem &);
+    QXmppTask<GetResult> request(const QString &jid);
+    QXmppTask<PublishResult> publish(const QXmppTuneItem &);
 
     Q_SIGNAL void itemReceived(const QString &jid, const QXmppTuneItem &item);
 

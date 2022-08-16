@@ -6,6 +6,7 @@
 #define QXMPPOMEMOMEMORYSTORAGE_H
 
 #include "QXmppOmemoStorage.h"
+#include "QXmppTask.h"
 #include "qxmppomemo_export.h"
 
 #include <memory>
@@ -19,21 +20,21 @@ public:
     ~QXmppOmemoMemoryStorage() override;
 
     /// \cond
-    QFuture<OmemoData> allData() override;
+    QXmppTask<OmemoData> allData() override;
 
-    QFuture<void> setOwnDevice(const std::optional<OwnDevice> &device) override;
+    QXmppTask<void> setOwnDevice(const std::optional<OwnDevice> &device) override;
 
-    QFuture<void> addSignedPreKeyPair(uint32_t keyId, const SignedPreKeyPair &keyPair) override;
-    QFuture<void> removeSignedPreKeyPair(uint32_t keyId) override;
+    QXmppTask<void> addSignedPreKeyPair(uint32_t keyId, const SignedPreKeyPair &keyPair) override;
+    QXmppTask<void> removeSignedPreKeyPair(uint32_t keyId) override;
 
-    QFuture<void> addPreKeyPairs(const QHash<uint32_t, QByteArray> &keyPairs) override;
-    QFuture<void> removePreKeyPair(uint32_t keyId) override;
+    QXmppTask<void> addPreKeyPairs(const QHash<uint32_t, QByteArray> &keyPairs) override;
+    QXmppTask<void> removePreKeyPair(uint32_t keyId) override;
 
-    QFuture<void> addDevice(const QString &jid, uint32_t deviceId, const Device &device) override;
-    QFuture<void> removeDevice(const QString &jid, uint32_t deviceId) override;
-    QFuture<void> removeDevices(const QString &jid) override;
+    QXmppTask<void> addDevice(const QString &jid, uint32_t deviceId, const Device &device) override;
+    QXmppTask<void> removeDevice(const QString &jid, uint32_t deviceId) override;
+    QXmppTask<void> removeDevices(const QString &jid) override;
 
-    QFuture<void> resetAll() override;
+    QXmppTask<void> resetAll() override;
     /// \endcond
 
 private:
