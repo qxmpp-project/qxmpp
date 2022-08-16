@@ -353,13 +353,12 @@ void QXmppStreamManager::handlePacketSent(QXmppPacket &packet, bool sentData)
         sendAcknowledgementRequest();
     } else {
         if (sentData) {
-            packet.reportResult(QXmpp::SendSuccess { false });
+            packet.reportFinished(QXmpp::SendSuccess { false });
         } else {
-            packet.reportResult(QXmppError {
+            packet.reportFinished(QXmppError {
                 QStringLiteral("Couldn't write data to socket. No stream management enabled."),
                 QXmpp::SendError::SocketWriteError });
         }
-        packet.reportFinished();
     }
 }
 
@@ -418,8 +417,7 @@ void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumb
 {
     for (auto it = m_unacknowledgedStanzas.begin(); it != m_unacknowledgedStanzas.end();) {
         if (it.key() <= sequenceNumber) {
-            it->reportResult(QXmpp::SendSuccess { true });
-            it->reportFinished();
+            it->reportFinished(QXmpp::SendSuccess { true });
             it = m_unacknowledgedStanzas.erase(it);
         } else {
             break;
@@ -472,8 +470,9 @@ void QXmppStreamManager::sendAcknowledgementRequest()
 void QXmppStreamManager::resetCache()
 {
     for (auto &packet : m_unacknowledgedStanzas) {
-        packet.reportResult(QXmppError { QStringLiteral("Disconnected"), QXmpp::SendError::Disconnected });
-        packet.reportFinished();
+        packet.reportFinished(QXmppError {
+            QStringLiteral("Disconnected"),
+            QXmpp::SendError::Disconnected });
     }
 
     m_unacknowledgedStanzas.clear();

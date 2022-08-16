@@ -185,7 +185,7 @@ QString QXmppUploadRequestManager::requestUploadSlot(const QString &fileName,
 /// \since QXmpp 1.5
 ///
 auto QXmppUploadRequestManager::requestSlot(const QFileInfo &file,
-                                            const QString &uploadService) -> QFuture<SlotResult>
+                                            const QString &uploadService) -> QXmppTask<SlotResult>
 {
     return requestSlot(file, file.fileName(), uploadService);
 }
@@ -206,7 +206,7 @@ auto QXmppUploadRequestManager::requestSlot(const QFileInfo &file,
 ///
 auto QXmppUploadRequestManager::requestSlot(const QFileInfo &file,
                                             const QString &customFileName,
-                                            const QString &uploadService) -> QFuture<SlotResult>
+                                            const QString &uploadService) -> QXmppTask<SlotResult>
 {
     return requestSlot(customFileName, file.size(),
                        QMimeDatabase().mimeTypeForFile(file),
@@ -233,12 +233,12 @@ auto QXmppUploadRequestManager::requestSlot(const QFileInfo &file,
 auto QXmppUploadRequestManager::requestSlot(const QString &fileName,
                                             qint64 fileSize,
                                             const QMimeType &mimeType,
-                                            const QString &uploadService) -> QFuture<SlotResult>
+                                            const QString &uploadService) -> QXmppTask<SlotResult>
 {
     if (!serviceFound() && uploadService.isEmpty()) {
         using Error = QXmppStanza::Error;
         const auto errorMessage = QStringLiteral("Couldn't request upload slot: No service found.");
-        return makeReadyFuture(SlotResult(Error(Error::Cancel, Error::FeatureNotImplemented, errorMessage)));
+        return makeReadyTask(SlotResult(Error(Error::Cancel, Error::FeatureNotImplemented, errorMessage)));
     }
 
     QXmppHttpUploadRequestIq iq;

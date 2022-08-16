@@ -117,7 +117,7 @@ QString QXmppDiscoveryManager::requestItems(const QString &jid, const QString &n
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoInfo(const QString &jid, const QString &node)
+QXmppTask<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoInfo(const QString &jid, const QString &node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);
@@ -140,7 +140,7 @@ QFuture<QXmppDiscoveryManager::InfoResult> QXmppDiscoveryManager::requestDiscoIn
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppDiscoveryManager::ItemsResult> QXmppDiscoveryManager::requestDiscoItems(const QString &jid, const QString &node)
+QXmppTask<QXmppDiscoveryManager::ItemsResult> QXmppDiscoveryManager::requestDiscoItems(const QString &jid, const QString &node)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);

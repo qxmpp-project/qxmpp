@@ -30,7 +30,7 @@ void tst_QXmppDiscoveryManager::testInfo()
     </query>
 </iq>)");
 
-    const auto info = expectFutureVariant<QXmppDiscoveryIq>(future);
+    const auto info = expectFutureVariant<QXmppDiscoveryIq>(future.toFuture(this));
 
     const QStringList expFeatures = { "http://jabber.org/protocol/pubsub", "urn:xmpp:mix:core:1" };
     QCOMPARE(info.features(), expFeatures);
@@ -57,7 +57,7 @@ void tst_QXmppDiscoveryManager::testItems()
   </query>
 </iq>)");
 
-    const auto items = expectFutureVariant<QList<QXmppDiscoveryIq::Item>>(future);
+    const auto items = expectFutureVariant<QList<QXmppDiscoveryIq::Item>>(future.toFuture(this));
 
     const QStringList expFeatures = { "http://jabber.org/protocol/pubsub", "urn:xmpp:mix:core:1" };
     QCOMPARE(items.size(), 4);

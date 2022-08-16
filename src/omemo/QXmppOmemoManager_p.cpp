@@ -614,10 +614,10 @@ signal_protocol_session_store ManagerPrivate::createSessionStore() const
 //
 // \return whether it succeeded
 //
-QFuture<bool> ManagerPrivate::setUpDeviceId()
+QXmppTask<bool> ManagerPrivate::setUpDeviceId()
 {
     auto future = pubSubManager->requestOwnPepItemIds(ns_omemo_2_bundles);
-    return chain<bool>(future, q, [this](QXmppPubSubManager::ItemIdsResult result) mutable {
+    return chain<bool>(std::move(future), q, [this](QXmppPubSubManager::ItemIdsResult result) mutable {
         // There can be the following cases:
         // 1. There is no PubSub node for device bundles: XEP-0030 states that a server must
         // respond with an error (at least ejabberd 22.05 responds with an empty node instead).
@@ -1026,27 +1026,27 @@ bool ManagerPrivate::generateIdentityKeyPair(ratchet_identity_key_pair **identit
 //
 // \return the result of the encryption
 //
-QFuture<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessageForRecipients(QXmppMessage &&message, QVector<QString> recipientJids, TrustLevels acceptedTrustLevels)
+QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessageForRecipients(QXmppMessage &&message, QVector<QString> recipientJids, TrustLevels acceptedTrustLevels)
 {
-    QFutureInterface<QXmppE2eeExtension::MessageEncryptResult> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<QXmppE2eeExtension::MessageEncryptResult> interface;
 
     if (!isStarted) {
         QXmppError error {
             QStringLiteral("OMEMO manager must be started before encrypting"),
             SendError::EncryptionError
         };
-        reportFinishedResult(interface, { error });
+        interface.finish(error);
     } else {
         recipientJids.append(ownBareJid());
 
         auto future = encryptStanza(message, recipientJids, acceptedTrustLevels);
-        await(future, q, [=, message = std::move(message)](std::optional<QXmppOmemoElement> omemoElement) mutable {
+        future.then(q, [=, message = std::move(message)](std::optional<QXmppOmemoElement> omemoElement) mutable {
             if (!omemoElement) {
                 QXmppError error {
                     QStringLiteral("OMEMO element could not be created"),
                     QXmpp::SendError::EncryptionError,
                 };
-                reportFinishedResult(interface, { error });
+                interface.finish(error);
             } else {
                 const auto areDeliveryReceiptsUsed = message.isReceiptRequested() || !message.receiptId().isEmpty();
 
@@ -1080,12 +1080,12 @@ QFuture<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessage
                 QXmlStreamWriter writer(&serializedEncryptedMessage);
                 message.toXml(&writer, QXmpp::ScePublic);
 
-                reportFinishedResult(interface, { serializedEncryptedMessage });
+                interface.finish(serializedEncryptedMessage);
             }
         });
     }
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -1100,11 +1100,11 @@ QFuture<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessage
 //         successful, otherwise none
 //
 template<typename T>
-QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T &stanza, const QVector<QString> &recipientJids, TrustLevels acceptedTrustLevels)
+QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T &stanza, const QVector<QString> &recipientJids, TrustLevels acceptedTrustLevels)
 {
     Q_ASSERT_X(!recipientJids.isEmpty(), "Creating OMEMO envelope", "OMEMO element could not be created because no recipient JIDs are passed");
 
-    QFutureInterface<std::optional<QXmppOmemoElement>> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<std::optional<QXmppOmemoElement>> interface;
 
     if (const auto optionalPayloadEncryptionResult = encryptPayload(createSceEnvelope(stanza))) {
         const auto &payloadEncryptionResult = *optionalPayloadEncryptionResult;
@@ -1141,7 +1141,7 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                         if (++(*skippedDevicesCount) == devicesCount) {
                             warning("OMEMO element could not be created because no recipient device responded to " %
                                     QString::number(unrespondedSentStanzasCount) % " sent stanzas");
-                            reportFinishedResult(interface, {});
+                            interface.finish(std::nullopt);
                         }
 
                         continue;
@@ -1156,11 +1156,11 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                             if (*successfullyProcessedDevicesCount == 0) {
                                 warning("OMEMO element could not be created because no recipient "
                                         "devices with keys having accepted trust levels could be found");
-                                reportFinishedResult(interface, {});
+                                interface.finish(std::nullopt);
                             } else {
                                 omemoElement->setSenderDeviceId(ownDevice.id);
                                 omemoElement->setPayload(payloadEncryptionResult.encryptedPayload);
-                                reportFinishedResult(interface, { *omemoElement });
+                                interface.finish(*omemoElement);
                             }
                         }
                     };
@@ -1217,7 +1217,7 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                     // determined and the session built.
                     if (device.keyId.isEmpty()) {
                         auto future = requestDeviceBundle(jid, deviceId);
-                        await(future, q, [=](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
+                        future.then(q, [=](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
                             // Process the device bundle only if one could be fetched and the
                             // corresponding device has not been removed by another method in
                             // the meantime.
@@ -1228,12 +1228,12 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                                 deviceBeingModified.keyId = createKeyId(key);
 
                                 auto future = q->trustLevel(jid, deviceBeingModified.keyId);
-                                await(future, q, [=](TrustLevel trustLevel) mutable {
+                                future.then(q, [=](TrustLevel trustLevel) mutable {
                                     // Store the retrieved key's trust level if it is not stored
                                     // yet.
                                     if (trustLevel == TrustLevel::Undecided) {
                                         auto future = storeKeyDependingOnSecurityPolicy(jid, key);
-                                        await(future, q, [=](TrustLevel trustLevel) mutable {
+                                        future.then(q, [=](TrustLevel trustLevel) mutable {
                                             omemoStorage->addDevice(jid, deviceId, deviceBeingModified);
                                             Q_EMIT q->deviceChanged(jid, deviceId);
                                             buildSessionDependingOnTrustLevel(deviceBundle, trustLevel);
@@ -1251,7 +1251,7 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                         });
                     } else {
                         auto future = q->trustLevel(jid, device.keyId);
-                        await(future, q, [=](TrustLevel trustLevel) mutable {
+                        future.then(q, [=](TrustLevel trustLevel) mutable {
                             // Create only OMEMO envelopes for devices that have keys with
                             // specific trust levels.
                             if (acceptedTrustLevels.testFlag(trustLevel)) {
@@ -1259,7 +1259,7 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                                 // Otherwise, use the existing session.
                                 if (device.session.isEmpty()) {
                                     auto future = requestDeviceBundle(jid, deviceId);
-                                    await(future, q, [=](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
+                                    future.then(q, [=](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
                                         if (optionalDeviceBundle) {
                                             const auto &deviceBundle = *optionalDeviceBundle;
                                             buildSessionDependingOnTrustLevel(deviceBundle, trustLevel);
@@ -1284,18 +1284,18 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
             }
         } else {
             warning("OMEMO element could not be created because no recipient devices could be found");
-            reportFinishedResult(interface, {});
+            interface.finish(std::nullopt);
         }
     } else {
         warning("OMEMO payload could not be encrypted");
-        reportFinishedResult(interface, {});
+        interface.finish(std::nullopt);
     }
 
-    return interface.future();
+    return interface.task();
 }
 
-template QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza<QXmppIq>(const QXmppIq &, const QVector<QString> &, TrustLevels);
-template QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza<QXmppMessage>(const QXmppMessage &, const QVector<QString> &, TrustLevels);
+template QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza<QXmppIq>(const QXmppIq &, const QVector<QString> &, TrustLevels);
+template QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza<QXmppMessage>(const QXmppMessage &, const QVector<QString> &, TrustLevels);
 
 //
 // Encrypts a payload symmetrically.
@@ -1440,9 +1440,9 @@ QByteArray ManagerPrivate::createOmemoEnvelopeData(const signal_protocol_address
 //
 // \return the decrypted stanza if it could be decrypted
 //
-QFuture<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage stanza)
+QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage stanza)
 {
-    QFutureInterface<std::optional<QXmppMessage>> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<std::optional<QXmppMessage>> interface;
 
     // At this point, the stanza has always an OMEMO element.
     const auto omemoElement = *stanza.omemoElement();
@@ -1460,18 +1460,20 @@ QFuture<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage
         // with this device.
         if (omemoPayload.isEmpty()) {
             auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, omemoEnvelope);
-            await(future, q, [=](QCA::SecureArray payloadDecryptionData) mutable {
-                if (payloadDecryptionData.isEmpty()) {
+            future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
+                if (!payloadDecryptionData) {
+                    warning("Empty OMEMO message could not be successfully processed");
+                } else if (payloadDecryptionData->isEmpty()) {
                     warning("Empty OMEMO message could not be successfully processed");
                 } else {
                     q->debug("Successfully processed empty OMEMO message");
                 }
 
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
             });
         } else {
             auto future = decryptStanza(stanza, senderJid, senderDeviceId, omemoEnvelope, omemoPayload);
-            await(future, q, [=](std::optional<DecryptionResult> optionalDecryptionResult) mutable {
+            future.then(q, [=](std::optional<DecryptionResult> optionalDecryptionResult) mutable {
                 if (optionalDecryptionResult) {
                     const auto decryptionResult = std::move(*optionalDecryptionResult);
                     stanza.parseExtensions(decryptionResult.sceContent, SceSensitive);
@@ -1482,15 +1484,15 @@ QFuture<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage
 
                     stanza.setE2eeMetadata(decryptionResult.e2eeMetadata);
 
-                    reportFinishedResult(interface, { stanza });
+                    interface.finish(stanza);
                 } else {
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                 }
             });
         }
     }
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -1503,7 +1505,7 @@ QFuture<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage
 //
 // \return the serialized decrypted stanza if it could be decrypted
 //
-QFuture<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDomElement &iqElement)
+QXmppTask<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDomElement &iqElement)
 {
     using Result = std::optional<IqDecryptionResult>;
 
@@ -1518,7 +1520,7 @@ QFuture<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDomE
         subscribeToNewDeviceLists(senderJid, senderDeviceId);
 
         auto future = decryptStanza(iq, senderJid, senderDeviceId, *envelope, omemoElement.payload(), false);
-        return chain<Result>(future, q, [iqElement](auto result) -> Result {
+        return chain<Result>(std::move(future), q, [iqElement](auto result) -> Result {
             if (result) {
                 auto decryptedElement = iqElement.cloneNode(true).toElement();
                 replaceChildElements(decryptedElement, result->sceContent);
@@ -1528,7 +1530,7 @@ QFuture<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDomE
             return {};
         });
     }
-    return makeReadyFuture<Result>(std::nullopt);
+    return makeReadyTask<Result>(std::nullopt);
 }
 
 //
@@ -1549,15 +1551,15 @@ QFuture<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDomE
 // \return the result of the decryption if it succeeded
 //
 template<typename T>
-QFuture<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza, const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, const QByteArray &omemoPayload, bool isMessageStanza)
+QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza, const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, const QByteArray &omemoPayload, bool isMessageStanza)
 {
-    QFutureInterface<std::optional<DecryptionResult>> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<std::optional<DecryptionResult>> interface;
 
     auto future = extractSceEnvelope(senderJid, senderDeviceId, omemoEnvelope, omemoPayload, isMessageStanza);
-    await(future, q, [=](QByteArray serializedSceEnvelope) mutable {
+    future.then(q, [=](QByteArray serializedSceEnvelope) mutable {
         if (serializedSceEnvelope.isEmpty()) {
             warning("SCE envelope could not be extracted");
-            reportFinishedResult(interface, {});
+            interface.finish(std::nullopt);
         } else {
             QDomDocument document;
             document.setContent(serializedSceEnvelope, true);
@@ -1565,7 +1567,7 @@ QFuture<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza,
 
             if (sceEnvelopeReader.from() != senderJid) {
                 warning("Sender '" % senderJid % "' of stanza does not match SCE 'from' affix element '" % sceEnvelopeReader.from() % "'");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
             } else {
                 const auto recipientJid = QXmppUtils::jidToBareJid(stanza.to());
                 auto isSceAffixElementValid = true;
@@ -1583,7 +1585,7 @@ QFuture<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza,
                 }
 
                 if (!isSceAffixElementValid) {
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                 } else {
                     auto &device = devices[senderJid][senderDeviceId];
                     device.unrespondedSentStanzasCount = 0;
@@ -1603,13 +1605,13 @@ QFuture<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza,
                     const auto &senderDevice = devices.value(senderJid).value(senderDeviceId);
                     e2eeMetadata.setSenderKey(senderDevice.keyId);
 
-                    reportFinishedResult(interface, { { sceEnvelopeReader.contentElement(), e2eeMetadata } });
+                    interface.finish(DecryptionResult { sceEnvelopeReader.contentElement(), e2eeMetadata });
                 }
             }
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -1627,21 +1629,24 @@ QFuture<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanza,
 // \return the serialized SCE envelope if it could be extracted, otherwise a
 //         default-constructed byte array
 //
-QFuture<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, const QByteArray &omemoPayload, bool isMessageStanza)
+QXmppTask<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, const QByteArray &omemoPayload, bool isMessageStanza)
 {
-    QFutureInterface<QByteArray> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<QByteArray> interface;
 
     auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, omemoEnvelope, isMessageStanza);
-    await(future, q, [=](QCA::SecureArray payloadDecryptionData) mutable {
-        if (payloadDecryptionData.isEmpty()) {
+    future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
+        if (!payloadDecryptionData) {
             warning("Data for decrypting OMEMO payload could not be extracted");
-            reportFinishedResult(interface, {});
+            interface.finish(QByteArray());
+        } else if (payloadDecryptionData->isEmpty()) {
+            warning("Data for decrypting OMEMO payload could not be extracted");
+            interface.finish(QByteArray());
         } else {
-            reportFinishedResult(interface, decryptPayload(payloadDecryptionData, omemoPayload));
+            interface.finish(decryptPayload(*payloadDecryptionData, omemoPayload));
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -1657,9 +1662,9 @@ QFuture<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJid,
 // \return the serialized payload decryption data if it could be extracted, otherwise a
 //         default-constructed secure array
 //
-QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, bool isMessageStanza)
+QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecryptionData(const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, bool isMessageStanza)
 {
-    QFutureInterface<QCA::SecureArray> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<std::optional<QCA::SecureArray>> interface;
 
     SessionCipherPtr sessionCipher;
     const auto address = Address(senderJid, senderDeviceId);
@@ -1667,7 +1672,7 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
 
     if (session_cipher_create(sessionCipher.ptrRef(), storeContext.get(), &addressData, globalContext.get()) < 0) {
         warning("Session cipher could not be created");
-        return {};
+        return makeReadyTask<std::optional<QCA::SecureArray>>(std::nullopt);
     }
 
     session_cipher_set_version(sessionCipher.get(), CIPHERTEXT_OMEMO_VERSION);
@@ -1682,7 +1687,7 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
         auto payloadDecryptionData = QCA::SecureArray(payloadDecryptionDataBufferSize);
         std::copy_n(payloadDecryptionDataPointer, payloadDecryptionDataBufferSize, payloadDecryptionData.data());
 
-        reportFinishedResult(interface, payloadDecryptionData);
+        interface.finish(std::move(payloadDecryptionData));
     };
 
     // There are three cases:
@@ -1702,13 +1707,13 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
                                                      senderDeviceId,
                                                      globalContext.get()) < 0) {
             warning("OMEMO envelope data could not be deserialized");
-            reportFinishedResult(interface, {});
+            interface.finish(std::nullopt);
         } else {
             BufferPtr publicIdentityKeyBuffer;
 
             if (ec_public_key_serialize(publicIdentityKeyBuffer.ptrRef(), pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())) < 0) {
                 warning("Public Identity key could not be retrieved");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
             } else {
                 const auto key = publicIdentityKeyBuffer.toByteArray();
                 auto &device = devices[senderJid][senderDeviceId];
@@ -1726,30 +1731,30 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
                 switch (session_cipher_decrypt_pre_key_signal_message(sessionCipher.get(), omemoEnvelopeData.get(), nullptr, payloadDecryptionDataBuffer.ptrRef())) {
                 case SG_ERR_INVALID_MESSAGE:
                     warning("OMEMO envelope data for key exchange is not valid");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 case SG_ERR_DUPLICATE_MESSAGE:
                     warning("OMEMO envelope data for key exchange is already received");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 case SG_ERR_LEGACY_MESSAGE:
                     warning("OMEMO envelope data for key exchange format is deprecated");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 case SG_ERR_INVALID_KEY_ID: {
                     const auto preKeyId = QString::number(pre_key_signal_message_get_pre_key_id(omemoEnvelopeData.get()));
                     warning("Pre key with ID '" % preKeyId %
                             "' of OMEMO envelope data for key exchange could not be found locally");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 }
                 case SG_ERR_INVALID_KEY:
                     warning("OMEMO envelope data for key exchange is incorrectly formatted");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 case SG_ERR_UNTRUSTED_IDENTITY:
                     warning("Identity key of OMEMO envelope data for key exchange is not trusted by OMEMO library");
-                    reportFinishedResult(interface, {});
+                    interface.finish(std::nullopt);
                     break;
                 case SG_SUCCESS:
                     reportResult(payloadDecryptionDataBuffer);
@@ -1764,14 +1769,14 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
 
                     // Store the key's trust level if it is not stored yet.
                     auto future = q->trustLevel(senderJid, storedKeyId);
-                    await(future, q, [=](TrustLevel trustLevel) mutable {
+                    future.then(q, [=](TrustLevel trustLevel) mutable {
                         if (trustLevel == TrustLevel::Undecided) {
                             auto future = storeKeyDependingOnSecurityPolicy(senderJid, key);
-                            await(future, q, [=](auto) mutable {
-                                interface.reportFinished();
+                            future.then(q, [=](auto) mutable {
+                                interface.finish(std::nullopt);
                             });
                         } else {
-                            interface.reportFinished();
+                            interface.finish(std::nullopt);
                         }
                     });
                 }
@@ -1782,8 +1787,8 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
                 "sending device, new session is being built");
 
         auto future = buildSessionWithDeviceBundle(senderJid, senderDeviceId, device);
-        await(future, q, [=](auto) mutable {
-            reportFinishedResult(interface, {});
+        future.then(q, [=](auto) mutable {
+            interface.finish(std::nullopt);
         });
     } else {
         RefCountedPtr<signal_message> omemoEnvelopeData;
@@ -1791,32 +1796,32 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
 
         if (signal_message_deserialize_omemo(omemoEnvelopeData.ptrRef(), reinterpret_cast<const uint8_t *>(serializedOmemoEnvelopeData.data()), serializedOmemoEnvelopeData.size(), globalContext.get()) < 0) {
             warning("OMEMO envelope data could not be deserialized");
-            reportFinishedResult(interface, {});
+            interface.finish(std::nullopt);
         } else {
             // Decrypt the OMEMO envelope data.
             switch (session_cipher_decrypt_signal_message(sessionCipher.get(), omemoEnvelopeData.get(), nullptr, payloadDecryptionDataBuffer.ptrRef())) {
             case SG_ERR_INVALID_MESSAGE:
                 warning("OMEMO envelope data is not valid");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
                 break;
             case SG_ERR_DUPLICATE_MESSAGE:
                 warning("OMEMO envelope data is already received");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
                 break;
             case SG_ERR_LEGACY_MESSAGE:
                 warning("OMEMO envelope data format is deprecated");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
                 break;
             case SG_ERR_NO_SESSION:
                 warning("Session for OMEMO envelope data could not be found");
-                reportFinishedResult(interface, {});
+                interface.finish(std::nullopt);
             case SG_SUCCESS:
                 reportResult(payloadDecryptionDataBuffer);
             }
         }
     }
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -1881,16 +1886,16 @@ QByteArray ManagerPrivate::decryptPayload(const QCA::SecureArray &payloadDecrypt
 //
 // \return whether it succeeded
 //
-QFuture<bool> ManagerPrivate::publishOmemoData()
+QXmppTask<bool> ManagerPrivate::publishOmemoData()
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     auto future = pubSubManager->requestOwnPepFeatures();
-    await(future, q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
+    future.then(q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved: " % errorToString(*error));
             warning("Device bundle and device list could not be published");
-            reportFinishedResult(interface, false);
+            interface.finish(false);
         } else {
             const auto &pepServiceFeatures = std::get<QVector<QString>>(result);
 
@@ -1904,13 +1909,13 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
             // if (pepServiceFeatures.contains(ns_pubsub_publish) && pepServiceFeatures.contains(ns_pubsub_multi_items)) {
             if (pepServiceFeatures.contains(ns_pubsub_publish)) {
                 auto future = pubSubManager->requestOwnPepNodes();
-                await(future, q, [=](QXmppPubSubManager::NodesResult result) mutable {
+                future.then(q, [=](QXmppPubSubManager::NodesResult result) mutable {
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Nodes of JID '" % ownBareJid() % "' could not be fetched to check if nodes '" %
                                 QString(ns_omemo_2_bundles) % "' and '" % QString(ns_omemo_2_devices) %
                                 "' exist: " % errorToString(*error));
                         warning("Device bundle and device list could not be published");
-                        reportFinishedResult(interface, false);
+                        interface.finish(false);
                     } else {
                         const auto &nodes = std::get<QVector<QString>>(result);
 
@@ -1943,11 +1948,11 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
                                                          if (!isPublished) {
                                                              warning("Device element could not be published");
                                                          }
-                                                         reportFinishedResult(interface, isPublished);
+                                                         interface.finish(std::move(isPublished));
                                                      });
                             } else {
                                 warning("Device bundle could not be published");
-                                reportFinishedResult(interface, false);
+                                interface.finish(false);
                             }
                         };
                         publishDeviceBundle(nodes.contains(ns_omemo_2_bundles),
@@ -1963,12 +1968,12 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
             } else {
                 warning("Publishing (multiple) items to PEP node '" % ownBareJid() % "' is not supported");
                 warning("Device bundle and device list could not be published");
-                reportFinishedResult(interface, false);
+                interface.finish(false);
             }
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -2310,23 +2315,23 @@ QXmppOmemoDeviceBundleItem ManagerPrivate::deviceBundleItem() const
 //
 // \return the device bundle on success, otherwise a nullptr
 //
-QFuture<std::optional<QXmppOmemoDeviceBundle>> ManagerPrivate::requestDeviceBundle(const QString &deviceOwnerJid, uint32_t deviceId) const
+QXmppTask<std::optional<QXmppOmemoDeviceBundle>> ManagerPrivate::requestDeviceBundle(const QString &deviceOwnerJid, uint32_t deviceId) const
 {
-    QFutureInterface<std::optional<QXmppOmemoDeviceBundle>> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<std::optional<QXmppOmemoDeviceBundle>> interface;
 
     auto future = pubSubManager->requestItem<QXmppOmemoDeviceBundleItem>(deviceOwnerJid, ns_omemo_2_bundles, QString::number(deviceId));
-    await(future, q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceBundleItem> result) mutable {
+    future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceBundleItem> result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Device bundle for JID '" % deviceOwnerJid % "' and device ID '" %
                     QString::number(deviceId) % "' could not be retrieved: " % errorToString(*error));
-            reportFinishedResult(interface, {});
+            interface.finish(std::nullopt);
         } else {
             const auto &item = std::get<QXmppOmemoDeviceBundleItem>(result);
-            reportFinishedResult(interface, { item.deviceBundle() });
+            interface.finish(item.deviceBundle());
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -2620,7 +2625,7 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
 {
     if (isDeviceListNodeExistent && otherOwnDevices().isEmpty()) {
         auto future = pubSubManager->requestOwnPepItem<QXmppOmemoDeviceListItem>(ns_omemo_2_devices, QXmppPubSubManager::Current);
-        await(future, q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
+        future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Device list for JID '" % ownBareJid() %
                         "' could not be retrieved and thus not updated: " %
@@ -2656,9 +2661,9 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
                             device.label = deviceElement.label();
 
                             auto future = omemoStorage->addDevice(jid, deviceId, device);
-                            await(future, q, [=, &device]() mutable {
+                            future.then(q, [=, &device]() mutable {
                                 auto future = buildSessionForNewDevice(jid, deviceId, device);
-                                await(future, q, [=](auto) mutable {
+                                future.then(q, [=](auto) mutable {
                                     Q_EMIT q->deviceAdded(jid, deviceId);
 
                                     if (++(*processedDevicesCount) == devicesCount) {
@@ -2805,7 +2810,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
             omemoStorage->addDevice(deviceOwnerJid, deviceId, device);
 
             auto future = buildSessionForNewDevice(deviceOwnerJid, deviceId, device);
-            await(future, q, [=](auto) {
+            future.then(q, [=](auto) {
                 Q_EMIT q->deviceAdded(deviceOwnerJid, deviceId);
             });
         }
@@ -2839,14 +2844,14 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         // item is removed, if their device list node is removed or if all
         // the node's items are removed.
         auto future = pubSubManager->deleteOwnPepNode(ns_omemo_2_devices);
-        await(future, q, [=](QXmppPubSubManager::Result result) {
+        future.then(q, [=](QXmppPubSubManager::Result result) {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Node '" % QString(ns_omemo_2_devices) % "'  of JID '" % deviceOwnerJid %
                         "' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
                 auto future = pubSubManager->requestOwnPepFeatures();
-                await(future, q, [=](QXmppPubSubManager::FeaturesResult result) {
+                future.then(q, [=](QXmppPubSubManager::FeaturesResult result) {
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Features of PEP service '" % deviceOwnerJid %
                                 "' could not be retrieved: " % errorToString(*error));
@@ -2979,7 +2984,7 @@ template<typename Function>
 void ManagerPrivate::deleteNode(const QString &node, Function continuation)
 {
     auto future = pubSubManager->deleteOwnPepNode(node);
-    await(future, q, [=, continuation = std::move(continuation)](QXmppPubSubManager::Result result) mutable {
+    future.then(q, [=, continuation = std::move(continuation)](QXmppPubSubManager::Result result) mutable {
         const auto error = std::get_if<Error>(&result);
         if (error) {
             const auto errorType = error->type();
@@ -3040,9 +3045,9 @@ void ManagerPrivate::publishItem(const QString &node, const T &item, const QXmpp
 // \param continuation function to be called after the PubSub query
 //
 template<typename T, typename Function>
-void QXmppOmemoManagerPrivate::runPubSubQueryWithContinuation(QFuture<T> future, const QString &errorMessage, Function continuation)
+void QXmppOmemoManagerPrivate::runPubSubQueryWithContinuation(QXmppTask<T> future, const QString &errorMessage, Function continuation)
 {
-    await(future, q, [this, errorMessage, continuation = std::move(continuation)](auto result) mutable {
+    future.then(q, [this, errorMessage, continuation = std::move(continuation)](auto result) mutable {
         if (auto error = std::get_if<Error>(&result)) {
             warning(errorMessage % u": " % errorToString(*error));
             continuation(false);
@@ -3053,24 +3058,24 @@ void QXmppOmemoManagerPrivate::runPubSubQueryWithContinuation(QFuture<T> future,
 }
 
 // See QXmppOmemoManager for documentation
-QFuture<bool> ManagerPrivate::changeDeviceLabel(const QString &deviceLabel)
+QXmppTask<bool> ManagerPrivate::changeDeviceLabel(const QString &deviceLabel)
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     ownDevice.label = deviceLabel;
 
     if (isStarted) {
         auto future = omemoStorage->setOwnDevice(ownDevice);
-        await(future, q, [=]() mutable {
+        future.then(q, [=]() mutable {
             publishDeviceListItem(true, [=](bool isPublished) mutable {
-                reportFinishedResult(interface, isPublished);
+                interface.finish(std::move(isPublished));
             });
         });
     } else {
-        reportFinishedResult(interface, true);
+        interface.finish(true);
     }
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3084,10 +3089,10 @@ QFuture<bool> ManagerPrivate::changeDeviceLabel(const QString &deviceLabel)
 //
 // \return the result of the request
 //
-QFuture<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> ManagerPrivate::requestDeviceList(const QString &jid)
+QXmppTask<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> ManagerPrivate::requestDeviceList(const QString &jid)
 {
     auto future = pubSubManager->requestItem<QXmppOmemoDeviceListItem>(jid, ns_omemo_2_devices, QXmppPubSubManager::Current);
-    await(future, q, [this, jid](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
+    future.then(q, [this, jid](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Device list for JID '" % jid % "' could not be retrieved: " % errorToString(*error));
         } else {
@@ -3122,26 +3127,26 @@ void ManagerPrivate::subscribeToNewDeviceLists(const QString &jid, uint32_t devi
 //
 // \return the result of the subscription and manual request
 //
-QFuture<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(const QString &jid)
+QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(const QString &jid)
 {
-    QFutureInterface<QXmppPubSubManager::Result> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<QXmppPubSubManager::Result> interface;
 
     auto future = pubSubManager->subscribeToNode(jid, ns_omemo_2_devices, ownFullJid());
-    await(future, q, [=](QXmppPubSubManager::Result result) mutable {
+    future.then(q, [=](QXmppPubSubManager::Result result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Device list for JID '" % jid % "' could not be subscribed: " % errorToString(*error));
-            reportFinishedResult(interface, { *error });
+            interface.finish(*error);
         } else {
             jidsOfManuallySubscribedDevices.append(jid);
 
             auto future = requestDeviceList(jid);
-            await(future, q, [=](auto result) mutable {
-                reportFinishedResult(interface, mapToSuccess(std::move(result)));
+            future.then(q, [=](auto result) mutable {
+                interface.finish(mapToSuccess(std::move(result)));
             });
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3154,16 +3159,17 @@ QFuture<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(const 
 //
 // \return the results of each unsubscribe request
 //
-QFuture<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDeviceLists(const QList<QString> &jids)
+QXmppTask<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDeviceLists(const QList<QString> &jids)
 {
     if (jids.isEmpty()) {
-        return makeReadyFuture(QVector<Manager::DevicesResult>());
+        return makeReadyTask(QVector<Manager::DevicesResult>());
     }
 
-    struct State {
+    struct State
+    {
         int processed = 0;
         int jidsCount = 0;
-        QFutureInterface<QVector<Manager::DevicesResult>> interface;
+        QXmppPromise<QVector<Manager::DevicesResult>> interface;
         QVector<Manager::DevicesResult> devicesResults;
     };
 
@@ -3171,19 +3177,18 @@ QFuture<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDeviceLi
     state->jidsCount = jids.count();
 
     for (const auto &jid : jids) {
-        await(unsubscribeFromDeviceList(jid), q, [jid, state](QXmppPubSubManager::Result result) mutable {
+        unsubscribeFromDeviceList(jid).then(q, [jid, state](QXmppPubSubManager::Result result) mutable {
             state->devicesResults << Manager::DevicesResult {
                 jid, result
             };
 
             if (++(state->processed) == state->jidsCount) {
-                state->interface.reportResult(state->devicesResults);
-                state->interface.reportFinished();
+                state->interface.finish(std::move(state->devicesResults));
             }
         });
     }
 
-    return state->interface.future();
+    return state->interface.task();
 }
 
 //
@@ -3195,35 +3200,35 @@ QFuture<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDeviceLi
 //
 // \return the result of the unsubscription
 //
-QFuture<QXmppPubSubManager::Result> ManagerPrivate::unsubscribeFromDeviceList(const QString &jid)
+QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::unsubscribeFromDeviceList(const QString &jid)
 {
-    QFutureInterface<QXmppPubSubManager::Result> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<QXmppPubSubManager::Result> interface;
 
     auto future = pubSubManager->unsubscribeFromNode(jid, ns_omemo_2_devices, ownFullJid());
-    await(future, q, [=](QXmppPubSubManager::Result result) mutable {
+    future.then(q, [=](QXmppPubSubManager::Result result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Device list for JID '" % jid % "' could not be unsubscribed: " % errorToString(*error));
         } else {
             jidsOfManuallySubscribedDevices.removeAll(jid);
         }
 
-        reportFinishedResult(interface, result);
+        interface.finish(std::move(result));
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 // See QXmppOmemoManager for documentation
-QFuture<bool> ManagerPrivate::resetOwnDevice()
+QXmppTask<bool> ManagerPrivate::resetOwnDevice()
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     isStarted = false;
 
     auto future = trustManager->resetAll(ns_omemo_2);
-    await(future, q, [=]() mutable {
+    future.then(q, [=]() mutable {
         auto future = omemoStorage->resetAll();
-        await(future, q, [=]() mutable {
+        future.then(q, [=]() mutable {
             deleteDeviceElement([=](bool isDeviceElementDeleted) mutable {
                 if (isDeviceElementDeleted) {
                     deleteDeviceBundle([=](bool isDeviceBundleDeleted) mutable {
@@ -3237,29 +3242,29 @@ QFuture<bool> ManagerPrivate::resetOwnDevice()
                             Q_EMIT q->allDevicesRemoved();
                         }
 
-                        reportFinishedResult(interface, isDeviceBundleDeleted);
+                        interface.finish(std::move(isDeviceBundleDeleted));
                     });
                 } else {
-                    reportFinishedResult(interface, false);
+                    interface.finish(false);
                 }
             });
         });
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 // See QXmppOmemoManager for documentation
-QFuture<bool> ManagerPrivate::resetAll()
+QXmppTask<bool> ManagerPrivate::resetAll()
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     isStarted = false;
 
     auto future = trustManager->resetAll(ns_omemo_2);
-    await(future, q, [this, interface]() mutable {
+    future.then(q, [this, interface]() mutable {
         auto future = omemoStorage->resetAll();
-        await(future, q, [this, interface]() mutable {
+        future.then(q, [this, interface]() mutable {
             deleteNode(ns_omemo_2_devices, [this, interface](bool isDevicesNodeDeleted) mutable {
                 if (isDevicesNodeDeleted) {
                     deleteNode(ns_omemo_2_bundles, [this, interface](bool isBundlesNodeDeleted) mutable {
@@ -3273,16 +3278,16 @@ QFuture<bool> ManagerPrivate::resetAll()
                             Q_EMIT q->allDevicesRemoved();
                         }
 
-                        reportFinishedResult(interface, isBundlesNodeDeleted);
+                        interface.finish(std::move(isBundlesNodeDeleted));
                     });
                 } else {
-                    reportFinishedResult(interface, false);
+                    interface.finish(false);
                 }
             });
         });
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3297,12 +3302,12 @@ QFuture<bool> ManagerPrivate::resetAll()
 // \return true if a session could be built or it is not enabled, otherwise
 //         false
 //
-QFuture<bool> ManagerPrivate::buildSessionForNewDevice(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device)
+QXmppTask<bool> ManagerPrivate::buildSessionForNewDevice(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device)
 {
     if (isNewDeviceAutoSessionBuildingEnabled) {
         return buildSessionWithDeviceBundle(jid, deviceId, device);
     } else {
-        return makeReadyFuture(true);
+        return makeReadyTask(true);
     }
 }
 
@@ -3315,19 +3320,19 @@ QFuture<bool> ManagerPrivate::buildSessionForNewDevice(const QString &jid, uint3
 //
 // \return whether a session could be built
 //
-QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device)
+QXmppTask<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device)
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     auto future = requestDeviceBundle(jid, deviceId);
-    await(future, q, [=, &device](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
+    future.then(q, [=, &device](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
         if (optionalDeviceBundle) {
             const auto &deviceBundle = *optionalDeviceBundle;
             const auto key = deviceBundle.publicIdentityKey();
             device.keyId = createKeyId(key);
 
             auto future = q->trustLevel(jid, device.keyId);
-            await(future, q, [=](TrustLevel trustLevel) mutable {
+            future.then(q, [=](TrustLevel trustLevel) mutable {
                 auto buildSessionDependingOnTrustLevel = [=](TrustLevel trustLevel) mutable {
                     // Build a session if the device's key has a specific trust
                     // level and send an empty OMEMO (key exchange) message to
@@ -3336,20 +3341,20 @@ QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, u
                         warning("Session could not be created for JID '" % jid % "' with device ID '" %
                                 QString::number(deviceId) % "' because its key's trust level '" %
                                 QString::number(int(trustLevel)) % "' is not accepted");
-                        reportFinishedResult(interface, false);
+                        interface.finish(false);
                     } else if (const auto address = Address(jid, deviceId); !buildSession(address.data(), deviceBundle)) {
                         warning("Session could not be created for JID '" % jid % "' and device ID '" %
                                 QString::number(deviceId) % "'");
-                        reportFinishedResult(interface, false);
+                        interface.finish(false);
                     } else {
                         auto future = sendEmptyMessage(jid, deviceId, true);
-                        await(future, q, [=](QXmpp::SendResult result) mutable {
+                        future.then(q, [=](QXmpp::SendResult result) mutable {
                             if (std::holds_alternative<QXmppError>(result)) {
                                 warning("Session could be created but empty message could not be sent to JID '" %
                                         jid % "' and device ID '" % QString::number(deviceId) % "'");
-                                reportFinishedResult(interface, false);
+                                interface.finish(false);
                             } else {
-                                reportFinishedResult(interface, true);
+                                interface.finish(true);
                             }
                         });
                     }
@@ -3358,7 +3363,7 @@ QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, u
                 if (trustLevel == TrustLevel::Undecided) {
                     // Store the key's trust level if it is not stored yet.
                     auto future = storeKeyDependingOnSecurityPolicy(jid, key);
-                    await(future, q, [=](TrustLevel trustLevel) mutable {
+                    future.then(q, [=](TrustLevel trustLevel) mutable {
                         buildSessionDependingOnTrustLevel(trustLevel);
                     });
                 } else {
@@ -3369,11 +3374,11 @@ QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, u
             warning("Session could not be created because no device bundle could be fetched for "
                     "JID '" %
                     jid % "' and device ID '" % QString::number(deviceId) % "'");
-            reportFinishedResult(interface, false);
+            interface.finish(false);
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3388,7 +3393,7 @@ QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, u
 //
 bool ManagerPrivate::buildSession(signal_protocol_address address, const QXmppOmemoDeviceBundle &deviceBundle)
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<bool> interface;
 
     // Choose a pre key randomly.
     const auto publicPreKeys = deviceBundle.publicPreKeys();
@@ -3577,9 +3582,9 @@ bool ManagerPrivate::deserializePublicPreKey(ec_public_key **publicPreKey, const
 //
 // \return the result of the sending
 //
-QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recipientJid, uint32_t recipientDeviceId, bool isKeyExchange) const
+QXmppTask<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recipientJid, uint32_t recipientDeviceId, bool isKeyExchange) const
 {
-    QFutureInterface<QXmpp::SendResult> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<QXmpp::SendResult> interface;
 
     const auto address = Address(recipientJid, recipientDeviceId);
     const auto decryptionData = QCA::SecureArray(EMPTY_MESSAGE_DECRYPTION_DATA_SIZE);
@@ -3592,7 +3597,7 @@ QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recip
             QStringLiteral("OMEMO envelope could not be created"),
             SendError::EncryptionError
         };
-        reportFinishedResult(interface, { error });
+        interface.finish(error);
     } else {
         QXmppOmemoEnvelope omemoEnvelope;
         omemoEnvelope.setRecipientDeviceId(recipientDeviceId);
@@ -3611,12 +3616,12 @@ QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recip
         message.setOmemoElement(omemoElement);
 
         auto future = q->client()->sendUnencrypted(std::move(message));
-        await(future, q, [=](QXmpp::SendResult result) mutable {
-            reportFinishedResult(interface, result);
+        future.then(q, [=](QXmpp::SendResult result) mutable {
+            interface.finish(std::move(result));
         });
     }
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3627,16 +3632,16 @@ QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recip
 // It corresponds to the fingerprint shown to users which also does not contain
 // the first byte.
 //
-QFuture<void> ManagerPrivate::storeOwnKey() const
+QXmppTask<void> ManagerPrivate::storeOwnKey() const
 {
-    QFutureInterface<void> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<void> interface;
 
     auto future = trustManager->setOwnKey(ns_omemo_2, createKeyId(ownDevice.publicIdentityKey));
-    await(future, q, [=]() mutable {
-        interface.reportFinished();
+    future.then(q, [=]() mutable {
+        interface.finish();
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3648,18 +3653,18 @@ QFuture<void> ManagerPrivate::storeOwnKey() const
 //
 // \return the trust level of the stored key
 //
-QFuture<TrustLevel> ManagerPrivate::storeKeyDependingOnSecurityPolicy(const QString &keyOwnerJid, const QByteArray &key)
+QXmppTask<TrustLevel> ManagerPrivate::storeKeyDependingOnSecurityPolicy(const QString &keyOwnerJid, const QByteArray &key)
 {
-    QFutureInterface<TrustLevel> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<TrustLevel> interface;
 
-    auto awaitStoreKey = [=](const QFuture<TrustLevel> &future) mutable {
-        await(future, q, [=](TrustLevel trustLevel) mutable {
-            reportFinishedResult(interface, trustLevel);
+    auto awaitStoreKey = [=](QXmppTask<TrustLevel> &future) mutable {
+        future.then(q, [=](TrustLevel trustLevel) mutable {
+            interface.finish(std::move(trustLevel));
         });
     };
 
     auto future = q->securityPolicy();
-    await(future, q, [=](TrustSecurityPolicy securityPolicy) mutable {
+    future.then(q, [=](TrustSecurityPolicy securityPolicy) mutable {
         switch (securityPolicy) {
         case NoSecurityPolicy: {
             auto future = storeKey(keyOwnerJid, key);
@@ -3668,7 +3673,7 @@ QFuture<TrustLevel> ManagerPrivate::storeKeyDependingOnSecurityPolicy(const QStr
         }
         case Toakafa: {
             auto future = trustManager->hasKey(ns_omemo_2, keyOwnerJid, TrustLevel::Authenticated);
-            await(future, q, [=](bool hasAuthenticatedKey) mutable {
+            future.then(q, [=](bool hasAuthenticatedKey) mutable {
                 if (hasAuthenticatedKey) {
                     // If there is at least one authenticated key, add the
                     // new key as an automatically distrusted one.
@@ -3688,7 +3693,7 @@ QFuture<TrustLevel> ManagerPrivate::storeKeyDependingOnSecurityPolicy(const QStr
         }
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //
@@ -3700,17 +3705,17 @@ QFuture<TrustLevel> ManagerPrivate::storeKeyDependingOnSecurityPolicy(const QStr
 //
 // \return the trust level of the stored key
 //
-QFuture<TrustLevel> ManagerPrivate::storeKey(const QString &keyOwnerJid, const QByteArray &key, TrustLevel trustLevel) const
+QXmppTask<TrustLevel> ManagerPrivate::storeKey(const QString &keyOwnerJid, const QByteArray &key, TrustLevel trustLevel) const
 {
-    QFutureInterface<TrustLevel> interface(QFutureInterfaceBase::Started);
+    QXmppPromise<TrustLevel> interface;
 
     auto future = trustManager->addKeys(ns_omemo_2, keyOwnerJid, { createKeyId(key) }, trustLevel);
-    await(future, q, [=]() mutable {
+    future.then(q, [=]() mutable {
         Q_EMIT q->trustLevelsChanged({ { keyOwnerJid, key } });
-        reportFinishedResult(interface, trustLevel);
+        interface.finish(std::move(trustLevel));
     });
 
-    return interface.future();
+    return interface.task();
 }
 
 //

@@ -35,7 +35,7 @@ static bool randomSeeded = false;
 
 struct IqState
 {
-    QFutureInterface<QXmppStream::IqResult> interface;
+    QXmppPromise<QXmppStream::IqResult> interface;
     QString jid;
 };
 
@@ -172,7 +172,7 @@ bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
+QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
 {
     bool success;
     return send(QXmppPacket(nonza), success);
@@ -183,13 +183,13 @@ QFuture<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet)
+QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet)
 {
     bool success;
     return send(std::move(packet), success);
 }
 
-QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writtenToSocket)
+QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writtenToSocket)
 {
     // the writtenToSocket parameter is just for backwards compat (see
     // QXmppStream::sendPacket())
@@ -198,7 +198,7 @@ QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &written
     // handle stream management
     d->streamManager.handlePacketSent(packet, writtenToSocket);
 
-    return packet.future();
+    return packet.task();
 }
 
 ///
@@ -208,7 +208,7 @@ QFuture<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &written
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
+QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
 {
     using namespace QXmpp;
 
@@ -233,18 +233,18 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const QString &id, const QString &to)
+QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const QString &id, const QString &to)
 {
     using namespace QXmpp;
 
     if (id.isEmpty() || d->runningIqs.contains(id)) {
-        return makeReadyFuture<IqResult>(QXmppError {
+        return makeReadyTask<IqResult>(QXmppError {
             QStringLiteral("Invalid IQ id: empty or in use."),
             SendError::Disconnected });
     }
 
     if (to.isEmpty()) {
-        return makeReadyFuture<IqResult>(QXmppError {
+        return makeReadyTask<IqResult>(QXmppError {
             QStringLiteral("The 'to' address must be set so the stream can match the response."),
             SendError::Disconnected });
     }
@@ -253,15 +253,13 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
     if (sendFuture.isFinished()) {
         if (std::holds_alternative<QXmppError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
-            return makeReadyFuture<IqResult>(std::get<QXmppError>(sendFuture.result()));
+            return makeReadyTask<IqResult>(std::get<QXmppError>(sendFuture.result()));
         }
     } else {
-        awaitLast(sendFuture, this, [this, id](SendResult result) {
+        sendFuture.then(this, [this, id](SendResult result) {
             if (std::holds_alternative<QXmppError>(result)) {
                 if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
-                    itr.value().interface.reportResult(std::get<QXmppError>(result));
-                    itr.value().interface.reportFinished();
-
+                    itr.value().interface.finish(std::get<QXmppError>(result));
                     d->runningIqs.erase(itr);
                 }
             }
@@ -269,12 +267,12 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
     }
 
     IqState state {
-        QFutureInterface<IqResult>(QFutureInterfaceBase::Started),
+        {},
         to,
     };
-    auto future = state.interface.future();
+    auto task = state.interface.task();
     d->runningIqs.insert(id, std::move(state));
-    return future;
+    return task;
 }
 
 ///
@@ -285,10 +283,9 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
 void QXmppStream::cancelOngoingIqs()
 {
     for (auto &state : d->runningIqs) {
-        state.interface.reportResult(QXmppError {
+        state.interface.finish(QXmppError {
             QStringLiteral("IQ has been cancelled."),
             QXmpp::SendError::Disconnected });
-        state.interface.reportFinished();
     }
     d->runningIqs.clear();
 }
@@ -494,8 +491,7 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
             return false;
         }
 
-        itr.value().interface.reportResult(stanza);
-        itr.value().interface.reportFinished();
+        itr.value().interface.finish(stanza);
 
         d->runningIqs.erase(itr);
         return true;

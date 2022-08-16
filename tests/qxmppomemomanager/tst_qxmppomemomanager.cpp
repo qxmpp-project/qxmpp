@@ -180,7 +180,7 @@ void tst_QXmppOmemoManager::testSetUp()
 
     connect(&m_alice1.client, &QXmppClient::connected, &context, [=, &isManagerSetUp]() {
         auto future = m_alice1.manager->setUp();
-        await(future, this, [=, &isManagerSetUp](bool isSetUp) {
+        future.then(this, [=, &isManagerSetUp](bool isSetUp) {
             if (isSetUp) {
                 isManagerSetUp = true;
             }
@@ -266,14 +266,14 @@ void tst_QXmppOmemoManager::testSendMessage()
 
     connect(&m_alice1.client, &QXmppClient::connected, &context, [=]() {
         auto future = m_alice1.manager->setUp();
-        await(future, this, [=](bool isSetUp) {
+        future.then(this, [=](bool isSetUp) {
             if (isSetUp) {
                 m_alice1.carbonManager->setCarbonsEnabled(true);
 
                 auto future = m_alice1.manager->setSecurityPolicy(Toakafa);
-                await(future, this, [=]() {
+                future.then(this, [=]() {
                     auto future = m_alice2.manager->setSecurityPolicy(Toakafa);
-                    await(future, this, [=]() {
+                    future.then(this, [=]() {
                         m_alice2.client.connectToServer(config2);
                     });
                 });
@@ -283,7 +283,7 @@ void tst_QXmppOmemoManager::testSendMessage()
 
     connect(&m_alice2.client, &QXmppClient::connected, &context, [=]() {
         auto future = m_alice2.manager->setUp();
-        await(future, this, [=](bool isSetUp) {
+        future.then(this, [=](bool isSetUp) {
             if (isSetUp) {
                 m_alice2.carbonManager->setCarbonsEnabled(true);
             }
@@ -329,7 +329,7 @@ void tst_QXmppOmemoManager::testSendMessage()
                     isEmptyOmemoMessageReceivedByAlice1 = true;
 
                     auto future = m_alice1.client.send(std::move(message2), QXmppSendStanzaParams());
-                    await(future, this, [=, &isSecondMessageSentByAlice1](QXmpp::SendResult result) {
+                    future.then(this, [=, &isSecondMessageSentByAlice1](QXmpp::SendResult result) {
                         if (std::get_if<QXmpp::SendSuccess>(&result)) {
                             isSecondMessageSentByAlice1 = true;
                         }
@@ -345,7 +345,7 @@ void tst_QXmppOmemoManager::testSendMessage()
         if (jid == m_alice2.client.configuration().jidBare()) {
             if (!isFirstMessageSentByAlice1) {
                 auto future = m_alice1.client.send(std::move(message1), QXmppSendStanzaParams());
-                await(future, this, [=, &isFirstMessageSentByAlice1](QXmpp::SendResult result) {
+                future.then(this, [=, &isFirstMessageSentByAlice1](QXmpp::SendResult result) {
                     if (std::get_if<QXmpp::SendSuccess>(&result)) {
                         isFirstMessageSentByAlice1 = true;
                     }
@@ -402,12 +402,12 @@ void tst_QXmppOmemoManager::testSendIq()
 
     connect(&m_alice1.client, &QXmppClient::connected, &context, [=]() {
         auto future = m_alice1.manager->setUp();
-        await(future, this, [=](bool isSetUp) {
+        future.then(this, [=](bool isSetUp) {
             if (isSetUp) {
                 auto future = m_alice1.manager->setSecurityPolicy(Toakafa);
-                await(future, this, [=]() {
+                future.then(this, [=]() {
                     auto future = m_alice2.manager->setSecurityPolicy(Toakafa);
-                    await(future, this, [=]() {
+                    future.then(this, [=]() {
                         m_alice2.client.connectToServer(config2);
                     });
                 });
@@ -443,7 +443,7 @@ void tst_QXmppOmemoManager::testSendIq()
         if (!isFirstRequestSent && !isSecondRequestSent) {
             auto requestIqCopy = requestIq;
             auto future = m_alice1.client.sendSensitiveIq(std::move(requestIqCopy));
-            await(future, this, [=, &isFirstRequestSent, &isErrorResponseReceived, &isSecondRequestSent, &isResultResponseReceived, &iqHandler](QXmppClient::IqResult result) {
+            future.then(this, [=, &isFirstRequestSent, &isErrorResponseReceived, &isSecondRequestSent, &isResultResponseReceived, &iqHandler](QXmppClient::IqResult result) {
                 if (const auto response = std::get_if<QDomElement>(&result)) {
                     isFirstRequestSent = true;
 
@@ -460,7 +460,7 @@ void tst_QXmppOmemoManager::testSendIq()
 
                     auto requestIqCopy = requestIq;
                     auto future = m_alice1.client.sendSensitiveIq(std::move(requestIqCopy));
-                    await(future, this, [=, &isSecondRequestSent, &isResultResponseReceived](QXmppClient::IqResult result) {
+                    future.then(this, [=, &isSecondRequestSent, &isResultResponseReceived](QXmppClient::IqResult result) {
                         if (const auto response = std::get_if<QDomElement>(&result)) {
                             isSecondRequestSent = true;
 
@@ -496,7 +496,7 @@ void tst_QXmppOmemoManager::finish(OmemoUser &omemoUser)
     bool isManagerReset = false;
 
     auto future = omemoUser.manager->resetAll();
-    await(future, this, [=, &isManagerReset, &omemoUser](bool isReset) {
+    future.then(this, [=, &isManagerReset, &omemoUser](bool isReset) {
         if (isReset) {
             isManagerReset = true;
         }

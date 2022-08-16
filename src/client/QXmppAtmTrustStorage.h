@@ -7,6 +7,8 @@
 
 #include "QXmppTrustStorage.h"
 
+#include <QList>
+
 class QXmppTrustMessageKeyOwner;
 
 class QXMPP_EXPORT QXmppAtmTrustStorage : virtual public QXmppTrustStorage
@@ -14,11 +16,11 @@ class QXMPP_EXPORT QXmppAtmTrustStorage : virtual public QXmppTrustStorage
 public:
     virtual ~QXmppAtmTrustStorage() = default;
 
-    virtual QFuture<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) = 0;
-    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting) = 0;
-    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds) = 0;
-    virtual QFuture<void> removeKeysForPostponedTrustDecisions(const QString &encryption) = 0;
-    virtual QFuture<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) = 0;
+    virtual QXmppTask<void> addKeysForPostponedTrustDecisions(const QString &encryption, const QByteArray &senderKeyId, const QList<QXmppTrustMessageKeyOwner> &keyOwners) = 0;
+    virtual QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &keyIdsForAuthentication, const QList<QByteArray> &keyIdsForDistrusting) = 0;
+    virtual QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds) = 0;
+    virtual QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption) = 0;
+    virtual QXmppTask<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) = 0;
 };
 
 #endif  // QXMPPATMTRUSTSTORAGE_H

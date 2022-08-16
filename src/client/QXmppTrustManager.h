@@ -9,7 +9,8 @@
 #include "QXmppTrustLevel.h"
 #include "QXmppTrustSecurityPolicy.h"
 
-#include <QFuture>
+template<typename T>
+class QXmppTask;
 
 class QXmppTrustStorage;
 
@@ -21,27 +22,27 @@ public:
     QXmppTrustManager(QXmppTrustStorage *trustStorage);
     ~QXmppTrustManager();
 
-    QFuture<void> setSecurityPolicy(const QString &encryption, QXmpp::TrustSecurityPolicy securityPolicy);
-    QFuture<void> resetSecurityPolicy(const QString &encryption);
-    QFuture<QXmpp::TrustSecurityPolicy> securityPolicy(const QString &encryption);
+    QXmppTask<void> setSecurityPolicy(const QString &encryption, QXmpp::TrustSecurityPolicy securityPolicy);
+    QXmppTask<void> resetSecurityPolicy(const QString &encryption);
+    QXmppTask<QXmpp::TrustSecurityPolicy> securityPolicy(const QString &encryption);
 
-    QFuture<void> setOwnKey(const QString &encryption, const QByteArray &keyId);
-    QFuture<void> resetOwnKey(const QString &encryption);
-    QFuture<QByteArray> ownKey(const QString &encryption);
+    QXmppTask<void> setOwnKey(const QString &encryption, const QByteArray &keyId);
+    QXmppTask<void> resetOwnKey(const QString &encryption);
+    QXmppTask<QByteArray> ownKey(const QString &encryption);
 
-    QFuture<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmpp::TrustLevel trustLevel = QXmpp::TrustLevel::AutomaticallyDistrusted);
-    QFuture<void> removeKeys(const QString &encryption, const QList<QByteArray> &keyIds);
-    QFuture<void> removeKeys(const QString &encryption, const QString &keyOwnerJid);
-    QFuture<void> removeKeys(const QString &encryption);
-    QFuture<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> keys(const QString &encryption, QXmpp::TrustLevels trustLevels = {});
-    QFuture<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevels trustLevels = {});
-    QFuture<bool> hasKey(const QString &encryption, const QString &keyOwnerJid, QXmpp::TrustLevels trustLevels);
+    QXmppTask<void> addKeys(const QString &encryption, const QString &keyOwnerJid, const QList<QByteArray> &keyIds, QXmpp::TrustLevel trustLevel = QXmpp::TrustLevel::AutomaticallyDistrusted);
+    QXmppTask<void> removeKeys(const QString &encryption, const QList<QByteArray> &keyIds);
+    QXmppTask<void> removeKeys(const QString &encryption, const QString &keyOwnerJid);
+    QXmppTask<void> removeKeys(const QString &encryption);
+    QXmppTask<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> keys(const QString &encryption, QXmpp::TrustLevels trustLevels = {});
+    QXmppTask<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> keys(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevels trustLevels = {});
+    QXmppTask<bool> hasKey(const QString &encryption, const QString &keyOwnerJid, QXmpp::TrustLevels trustLevels);
 
-    QFuture<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel);
-    QFuture<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevel oldTrustLevel, QXmpp::TrustLevel newTrustLevel);
-    QFuture<QXmpp::TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId);
+    QXmppTask<void> setTrustLevel(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel);
+    QXmppTask<void> setTrustLevel(const QString &encryption, const QList<QString> &keyOwnerJids, QXmpp::TrustLevel oldTrustLevel, QXmpp::TrustLevel newTrustLevel);
+    QXmppTask<QXmpp::TrustLevel> trustLevel(const QString &encryption, const QString &keyOwnerJid, const QByteArray &keyId);
 
-    QFuture<void> resetAll(const QString &encryption);
+    QXmppTask<void> resetAll(const QString &encryption);
 
     Q_SIGNAL void trustLevelsChanged(const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys);
 

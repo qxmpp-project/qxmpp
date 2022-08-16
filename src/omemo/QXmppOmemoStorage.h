@@ -5,6 +5,7 @@
 #ifndef QXMPPOMEMOSTORAGE_H
 #define QXMPPOMEMOSTORAGE_H
 
+#include "QXmppTask.h"
 #include "qxmppomemo_export.h"
 
 #include <optional>
@@ -154,21 +155,21 @@ public:
 
     virtual ~QXmppOmemoStorage() = default;
 
-    virtual QFuture<OmemoData> allData() = 0;
+    virtual QXmppTask<OmemoData> allData() = 0;
 
-    virtual QFuture<void> setOwnDevice(const std::optional<OwnDevice> &device) = 0;
+    virtual QXmppTask<void> setOwnDevice(const std::optional<OwnDevice> &device) = 0;
 
-    virtual QFuture<void> addSignedPreKeyPair(uint32_t keyId, const SignedPreKeyPair &keyPair) = 0;
-    virtual QFuture<void> removeSignedPreKeyPair(uint32_t keyId) = 0;
+    virtual QXmppTask<void> addSignedPreKeyPair(uint32_t keyId, const SignedPreKeyPair &keyPair) = 0;
+    virtual QXmppTask<void> removeSignedPreKeyPair(uint32_t keyId) = 0;
 
-    virtual QFuture<void> addPreKeyPairs(const QHash<uint32_t, QByteArray> &keyPairs) = 0;
-    virtual QFuture<void> removePreKeyPair(uint32_t keyId) = 0;
+    virtual QXmppTask<void> addPreKeyPairs(const QHash<uint32_t, QByteArray> &keyPairs) = 0;
+    virtual QXmppTask<void> removePreKeyPair(uint32_t keyId) = 0;
 
-    virtual QFuture<void> addDevice(const QString &jid, uint32_t deviceId, const Device &device) = 0;
-    virtual QFuture<void> removeDevice(const QString &jid, uint32_t deviceId) = 0;
-    virtual QFuture<void> removeDevices(const QString &jid) = 0;
+    virtual QXmppTask<void> addDevice(const QString &jid, uint32_t deviceId, const Device &device) = 0;
+    virtual QXmppTask<void> removeDevice(const QString &jid, uint32_t deviceId) = 0;
+    virtual QXmppTask<void> removeDevices(const QString &jid) = 0;
 
-    virtual QFuture<void> resetAll() = 0;
+    virtual QXmppTask<void> resetAll() = 0;
 };
 
 #endif  // QXMPPOMEMOSTORAGE_H

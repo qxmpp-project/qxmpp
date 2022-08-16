@@ -6,6 +6,7 @@
 #define QXMPPPACKET_H
 
 #include "QXmppGlobal.h"
+#include "QXmppPromise.h"
 #include "QXmppSendResult.h"
 
 #include <memory>
@@ -17,19 +18,18 @@ class QXmppNonza;
 class QXmppPacket
 {
 public:
-    QXmppPacket(const QXmppNonza &nonza, QFutureInterface<QXmpp::SendResult> = {});
-    QXmppPacket(const QByteArray &data, bool isXmppStanza, QFutureInterface<QXmpp::SendResult> = {});
+    QXmppPacket(const QXmppNonza &nonza, QXmppPromise<QXmpp::SendResult> = {});
+    QXmppPacket(const QByteArray &data, bool isXmppStanza, QXmppPromise<QXmpp::SendResult> = {});
 
     QByteArray data() const;
     bool isXmppStanza() const;
 
-    QFuture<QXmpp::SendResult> future();
+    QXmppTask<QXmpp::SendResult> task();
 
-    void reportFinished();
-    void reportResult(const QXmpp::SendResult &);
+    void reportFinished(QXmpp::SendResult &&);
 
 private:
-    QFutureInterface<QXmpp::SendResult> m_interface;
+    QXmppPromise<QXmpp::SendResult> m_promise;
     QByteArray m_data;
     bool m_isXmppStanza;
 };

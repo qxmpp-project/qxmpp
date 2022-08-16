@@ -55,7 +55,7 @@ QString QXmppEntityTimeManager::requestTime(const QString &jid)
 ///
 /// \since QXmpp 1.5
 ///
-auto QXmppEntityTimeManager::requestEntityTime(const QString &jid) -> QFuture<EntityTimeResult>
+auto QXmppEntityTimeManager::requestEntityTime(const QString &jid) -> QXmppTask<EntityTimeResult>
 {
     QXmppEntityTimeIq iq;
     iq.setType(QXmppIq::Get);

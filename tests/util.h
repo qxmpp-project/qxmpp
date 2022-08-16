@@ -8,6 +8,7 @@
 #define TESTS_UTIL_H
 
 #include "QXmppPasswordChecker.h"
+#include "QXmppTask.h"
 
 #include <memory>
 #include <variant>
@@ -93,6 +94,18 @@ T expectFutureVariant(const QFuture<Input> &future)
     [&]() {
         QVERIFY(future.isFinished());
     }();
+    return expectVariant<T>(future.result());
+}
+
+template<typename T, typename Input>
+T expectFutureVariant(QXmppTask<Input> &future)
+{
+#define return \
+    return     \
+    {          \
+    }
+    QVERIFY(future.isFinished());
+#undef return
     return expectVariant<T>(future.result());
 }
 

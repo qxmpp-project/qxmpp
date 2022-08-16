@@ -375,15 +375,15 @@ void tst_QXmppHttpUploadManager::testUpload()
     QVERIFY(test.isConnected());
 
     // get server items
-    auto items = expectVariant<QList<DiscoItem>>(wait(disco->requestDiscoItems(test.configuration().domain())));
+    auto items = expectVariant<QList<DiscoItem>>(wait(disco->requestDiscoItems(test.configuration().domain()).toFuture(this)));
     // request disco info for each item
-    std::vector<QFuture<DiscoInfoResult>> infoFutures;
+    std::vector<QXmppTask<DiscoInfoResult>> infoFutures;
     std::transform(items.cbegin(), items.cend(), std::back_inserter(infoFutures), [disco](const auto &item) {
         return disco->requestDiscoInfo(item.jid(), item.node());
     });
     auto uploadServiceJid = [&]() {
-        for (const auto &future : std::as_const(infoFutures)) {
-            auto result = expectVariant<QXmppDiscoveryIq>(wait(future));
+        for (auto &future : infoFutures) {
+            auto result = expectVariant<QXmppDiscoveryIq>(wait(future.toFuture(this)));
             for (const auto &identity : result.identities()) {
                 if (identity.category() == "store" &&
                     identity.type() == "file" &&

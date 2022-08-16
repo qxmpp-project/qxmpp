@@ -17,24 +17,21 @@
 #include <unordered_map>
 
 #include <QDomElement>
-#include <QFuture>
-#include <QFutureInterface>
 
 using namespace QXmpp::Private;
 
 struct RetrieveRequestState
 {
-    QFutureInterface<QXmppMamManager::RetrieveResult> interface;
+    QXmppPromise<QXmppMamManager::RetrieveResult> promise;
     QXmppMamResultIq iq;
     QVector<QXmppMessage> messages;
 
-    void reportFinished()
+    void finish()
     {
-        interface.reportResult(
+        promise.finish(
             QXmppMamManager::RetrievedMessages {
                 std::move(iq),
                 std::move(messages) });
-        interface.reportFinished();
     }
 };
 
@@ -89,7 +86,6 @@ QStringList QXmppMamManager::discoveryFeatures() const
 
 bool QXmppMamManager::handleStanza(const QDomElement &element)
 {
-
     if (element.tagName() == "message") {
         QDomElement resultElement = element.firstChildElement("result");
         if (!resultElement.isNull() && resultElement.namespaceURI() == ns_mam) {
@@ -241,14 +237,14 @@ QString QXmppMamManager::retrieveArchivedMessages(const QString &to,
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const QString &to, const QString &node, const QString &jid, const QDateTime &start, const QDateTime &end, const QXmppResultSetQuery &resultSetQuery)
+QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const QString &to, const QString &node, const QString &jid, const QDateTime &start, const QDateTime &end, const QXmppResultSetQuery &resultSetQuery)
 {
     auto queryIq = buildRequest(to, node, jid, start, end, resultSetQuery);
 
     auto [itr, _] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
 
     // retrieve messages
-    await(client()->sendIq(std::move(queryIq)), this, [this, queryId = queryIq.queryId()](QXmppClient::IqResult result) {
+    client()->sendIq(std::move(queryIq)).then(this, [this, queryId = queryIq.queryId()](QXmppClient::IqResult result) {
         auto itr = d->ongoingRequests.find(queryId.toStdString());
         if (itr == d->ongoingRequests.end()) {
             return;
@@ -259,8 +255,7 @@ QFuture<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const
             iq.parse(std::get<QDomElement>(result));
 
             if (iq.type() == QXmppIq::Error) {
-                itr->second.interface.reportResult(QXmppError { iq.error().text(), iq.error() });
-                itr->second.interface.reportFinished();
+                itr->second.promise.finish(QXmppError { iq.error().text(), iq.error() });
                 d->ongoingRequests.erase(itr);
                 return;
             }
@@ -277,7 +272,7 @@ QFuture<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const
 
                     auto message = messages.at(i);
                     (*running)++;
-                    await(e2eeExt->decryptMessage(std::move(message)), this, [this, i, running, queryId](auto result) {
+                    e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, running, queryId](auto result) {
                         (*running)--;
                         auto itr = d->ongoingRequests.find(queryId.toStdString());
                         if (itr == d->ongoingRequests.end()) {
@@ -290,21 +285,20 @@ QFuture<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const
                             warning(QStringLiteral("Error decrypting message."));
                         }
                         if (*running == 0) {
-                            itr->second.reportFinished();
+                            itr->second.finish();
                             d->ongoingRequests.erase(itr);
                         }
                     });
                 }
             } else {
-                itr->second.reportFinished();
+                itr->second.finish();
                 d->ongoingRequests.erase(itr);
             }
         } else {
-            itr->second.interface.reportResult(std::get<QXmppError>(result));
-            itr->second.interface.reportFinished();
+            itr->second.promise.finish(std::get<QXmppError>(result));
             d->ongoingRequests.erase(itr);
         }
     });
 
-    return itr->second.interface.future();
+    return itr->second.promise.task();
 }

@@ -18,14 +18,15 @@
 #include "QXmppMessageHandler.h"
 #include "QXmppOutgoingClient.h"
 #include "QXmppPacket_p.h"
+#include "QXmppPromise.h"
 #include "QXmppRosterManager.h"
+#include "QXmppTask.h"
 #include "QXmppTlsManager_p.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
 #include <QDomElement>
-#include <QFuture>
 #include <QSslSocket>
 #include <QTimer>
 
@@ -394,7 +395,7 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 }
 
 ///
-/// Sends a packet and reports the result via QFuture.
+/// Sends a packet and reports the result via QXmppTask.
 ///
 /// If stream management is enabled, the future continues to be active until the
 /// server acknowledges the packet. On success, QXmpp::SendSuccess with
@@ -405,29 +406,26 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
-/// \returns A QFuture that makes it possible to track the state of the packet.
-/// You can use QFutureWatcher in Qt 5 and QFuture::then() in Qt 6 to handle the
-/// results.
+/// \returns A QXmppTask that makes it possible to track the state of the packet.
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
+QXmppTask<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
 {
-    const auto sendEncrypted = [this](QFuture<MessageEncryptResult> &&future) {
-        QFutureInterface<QXmpp::SendResult> interface(QFutureInterfaceBase::Started);
-
-        await(future, this, [this, interface](MessageEncryptResult &&result) mutable {
+    const auto sendEncrypted = [this](QXmppTask<MessageEncryptResult> &&future) {
+        QXmppPromise<QXmpp::SendResult> interface;
+        future.then(this, [this, interface](MessageEncryptResult &&result) mutable {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 auto future = d->stream->send(QXmppPacket(*xml, true, interface));
-                await(future, this, [interface](QXmpp::SendResult &&result) mutable {
-                    reportFinishedResult(interface, result);
+                future.then(this, [interface](QXmpp::SendResult &&result) mutable {
+                    interface.finish(std::move(result));
                 });
             } else {
-                reportFinishedResult(interface, { std::get<QXmppError>(result) });
+                interface.finish(std::get<QXmppError>(std::move(result)));
             }
         });
 
-        return interface.future();
+        return interface.task();
     };
 
     if (d->encryptionExtension) {
@@ -452,13 +450,11 @@ QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::op
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
-/// \returns A QFuture that makes it possible to track the state of the packet.
-/// You can use QFutureWatcher in Qt 5 and QFuture::then() in Qt 6 to handle the
-/// results.
+/// \returns A QXmppTask that makes it possible to track the state of the packet.
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
+QXmppTask<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
 {
     return d->stream->send(stanza);
 }
@@ -472,7 +468,7 @@ QFuture<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza, co
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> &params)
+QXmppTask<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> &params)
 {
     // This should pick the right e2ee manager as soon as multiple encryptions
     // in parallel are supported.
@@ -497,7 +493,7 @@ QFuture<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std::o
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
+QXmppTask<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
 {
     return d->stream->sendIq(std::move(iq));
 }
@@ -515,57 +511,52 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::opti
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params)
+QXmppTask<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params)
 {
-    const auto sendEncrypted = [this](QFuture<IqEncryptResult> &&future, const QString &id, const QString &to) {
-        QFutureInterface<IqResult> interface(QFutureInterfaceBase::Started);
-        await(future, this, [this, interface, id, to](IqEncryptResult result) mutable {
+    const auto sendEncrypted = [this](QXmppTask<IqEncryptResult> &&future, const QString &id, const QString &to) {
+        QXmppPromise<IqResult> interface;
+        future.then(this, [this, interface, id, to](IqEncryptResult result) mutable {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 // encrypted successfully
                 auto future = d->stream->QXmppStream::sendIq(QXmppPacket(*xml, true), id, to);
-                await(future, this, [this, interface](QXmppStream::IqResult result) mutable {
+                future.then(this, [this, interface](QXmppStream::IqResult result) mutable {
                     if (const auto encryptedDom = std::get_if<QDomElement>(&result)) {
                         if (!isIqResponse(*encryptedDom)) {
                             QXmppError err {
                                 QStringLiteral("Invalid IQ response received."),
                                 QXmpp::SendError::EncryptionError
                             };
-                            interface.reportResult(err);
-                            interface.reportFinished();
+                            interface.finish(std::move(err));
                         } else if (d->encryptionExtension) {
                             // try to decrypt the result (should be encrypted)
                             auto future = d->encryptionExtension->decryptIq(*encryptedDom);
-                            await(future, this, [interface, encryptedDom = *encryptedDom](IqDecryptResult result) mutable {
-                                if (const auto dom = std::get_if<QDomElement>(&result)) {
+                            future.then(this, [interface, encryptedDom = *encryptedDom](IqDecryptResult result) mutable {
+                                if (auto dom = std::get_if<QDomElement>(&result)) {
                                     // decrypted result
-                                    interface.reportResult(*dom);
+                                    interface.finish(std::move(*dom));
                                 } else if (std::holds_alternative<QXmppE2eeExtension::NotEncrypted>(result)) {
                                     // the IQ response from the other entity was not encrypted
                                     // then report IQ response without modifications
-                                    interface.reportResult(encryptedDom);
-                                } else if (const auto error = std::get_if<QXmppError>(&result)) {
-                                    interface.reportResult(*error);
+                                    interface.finish(std::move(encryptedDom));
+                                } else if (auto error = std::get_if<QXmppError>(&result)) {
+                                    interface.finish(std::move(*error));
                                 }
-                                interface.reportFinished();
                             });
                         } else {
-                            interface.reportResult(QXmppError {
+                            interface.finish(QXmppError {
                                 QStringLiteral("No decryption extension found."),
                                 QXmpp::SendError::EncryptionError });
-                            interface.reportFinished();
                         }
                     } else {
-                        interface.reportResult(std::get<QXmppError>(result));
-                        interface.reportFinished();
+                        interface.finish(std::get<QXmppError>(result));
                     }
                 });
             } else {
-                interface.reportResult(std::get<QXmppError>(result));
-                interface.reportFinished();
+                interface.finish(std::get<QXmppError>(result));
             }
         });
 
-        return interface.future();
+        return interface.task();
     };
 
     if (iq.id().isEmpty() || d->stream->hasIqId(iq.id())) {
@@ -595,7 +586,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const 
 ///
 /// \since QXmpp 1.5
 ///
-QFuture<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
+QXmppTask<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &)
 {
     return chainIq(sendIq(std::move(iq)), this, [](const QXmppIq &) -> EmptyResult {
         return QXmpp::Success();

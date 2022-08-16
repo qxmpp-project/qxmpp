@@ -77,7 +77,7 @@ QStringList QXmppUserLocationManager::discoveryFeatures() const
 /// \param jid The account JID to request.
 ///
 auto QXmppUserLocationManager::request(const QString &jid)
-    -> QFuture<GetResult>
+    -> QXmppTask<GetResult>
 {
     return Pep::request<Item>(pubSub(client()), jid, ns_geoloc, this);
 }
@@ -88,7 +88,7 @@ auto QXmppUserLocationManager::request(const QString &jid)
 /// \param item The User Location item to be published.
 ///
 auto QXmppUserLocationManager::publish(const QXmppGeolocItem &item)
-    -> QFuture<PublishResult>
+    -> QXmppTask<PublishResult>
 {
     return pubSub(client())->publishOwnPepItem(ns_geoloc, item);
 }

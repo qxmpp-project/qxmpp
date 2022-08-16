@@ -10,7 +10,7 @@
 #include <variant>
 
 template<class T>
-class QFuture;
+class QXmppTask;
 class QXmppEntityTimeIq;
 
 ///
@@ -27,7 +27,7 @@ public:
     QString requestTime(const QString &jid);
 
     using EntityTimeResult = std::variant<QXmppEntityTimeIq, QXmppStanza::Error>;
-    QFuture<EntityTimeResult> requestEntityTime(const QString &jid);
+    QXmppTask<EntityTimeResult> requestEntityTime(const QString &jid);
 
     /// \cond
     QStringList discoveryFeatures() const override;
