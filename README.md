@@ -47,6 +47,9 @@ You can pass the following arguments to CMake:
     BUILD_OMEMO                   to build the OMEMO module (default: false)
     WITH_GSTREAMER                to enable audio/video over jingle (default: false)
 
+For building the OMEMO module [additional dependencies](src/omemo/README.md)
+are required.
+
 Installing QXmpp
 ================
 

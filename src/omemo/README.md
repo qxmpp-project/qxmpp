@@ -1,6 +1,23 @@
 QXmpp OMEMO module
 ==================
 
+The QXmpp OMEMO module adds support for OMEMO (v0.8+) end-to-end encryption by
+providing the `QXmppOmemoManager`.
+
+Dependencies
+------------
+
+ * [QCA (Qt Cryptographic Architecture)](https://invent.kde.org/libraries/qca)
+ * [libomemo-c](https://github.com/dino/libomemo-c)
+
+Building
+--------
+
+By default QXmpp is built without the OMEMO module. To enable it you need to
+provide `-DBUILD_OMEMO=ON` to cmake:
+
+    cmake <qxmpp folder> -DBUILD_OMEMO=ON
+
 Usage
 -----
 
