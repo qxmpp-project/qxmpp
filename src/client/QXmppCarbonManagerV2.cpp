@@ -89,7 +89,8 @@ auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional
 /// The manager automatically enables carbons when a connection is established. If the connection
 /// could be resumed, no new request is done. Carbon copied messages from other devices of the same
 /// account and carbon copied messages from other accounts are injected into the QXmppClient. This
-/// way you can handle them like any other incoming message by implementing QXmppMessageHandler.
+/// way you can handle them like any other incoming message by implementing QXmppMessageHandler or
+/// using QXmppClient::messageReceived().
 ///
 /// Checks are done to ensure that the entity sending the carbon copy is allowed to send the
 /// forwarded message.
