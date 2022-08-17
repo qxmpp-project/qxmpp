@@ -107,6 +107,9 @@ auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional
 /// \since QXmpp 1.5
 ///
 
+QXmppCarbonManagerV2::QXmppCarbonManagerV2() = default;
+QXmppCarbonManagerV2::~QXmppCarbonManagerV2() = default;
+
 bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &)
 {
     if (element.tagName() != "message") {

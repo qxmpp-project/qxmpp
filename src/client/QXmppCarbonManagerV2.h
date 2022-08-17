@@ -11,6 +11,9 @@ class QXMPP_EXPORT QXmppCarbonManagerV2 : public QXmppClientExtension
 {
     Q_OBJECT
 public:
+    QXmppCarbonManagerV2();
+    ~QXmppCarbonManagerV2();
+
     bool handleStanza(const QDomElement &, const std::optional<QXmppE2eeMetadata> &) override;
 
 protected:
