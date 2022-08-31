@@ -60,6 +60,10 @@ QXmppBitsOfBinaryContentIdPrivate::QXmppBitsOfBinaryContentIdPrivate()
 ///  * SHA-3 (SHA3-224, SHA3-256, SHA3-384, SHA3-512)
 ///  * BLAKE2 (BLAKE2b256, BLAKE2b512) (requires Qt 6, since QXmpp 1.5)
 ///
+/// \note Security notice: When using the content IDs to cache data between multiple entities it is
+/// important to avoid hash collisions. SHA-1 cannot fulfill this requirement. You SHOULD use
+/// another more secure hash algorithm if you do this.
+///
 /// \since QXmpp 1.2
 ///
 
@@ -200,8 +204,6 @@ QCryptographicHash::Algorithm QXmppBitsOfBinaryContentId::algorithm() const
 ///
 /// \note Only change this, if you know what you do. The XEP allows other
 /// hashing algorithms than SHA-1 to be used, but not all clients support this.
-/// Since in most cases the content id is not security relevant it is not a
-/// problem to continue using SHA-1.
 ///
 void QXmppBitsOfBinaryContentId::setAlgorithm(QCryptographicHash::Algorithm algo)
 {
