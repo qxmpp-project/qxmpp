@@ -52,6 +52,14 @@ QXmppBitsOfBinaryContentIdPrivate::QXmppBitsOfBinaryContentIdPrivate()
 /// QXmppBitsOfBinaryContentId represents a link to or an identifier of
 /// \xep{0231, Bits of Binary} data.
 ///
+/// Currently supported hash algorithms:
+///  * MD4
+///  * MD5
+///  * SHA-1
+///  * SHA-2 (SHA-224, SHA-256, SHA-384, SHA-512)
+///  * SHA-3 (SHA3-224, SHA3-256, SHA3-384, SHA3-512)
+///  * BLAKE2 (BLAKE2b256, BLAKE2b512) (requires Qt 6, since QXmpp 1.5)
+///
 /// \since QXmpp 1.2
 ///
 
@@ -180,9 +188,6 @@ void QXmppBitsOfBinaryContentId::setHash(const QByteArray &hash)
 ///
 /// The default value is \c QCryptographicHash::Sha1.
 ///
-/// This currently supports MD4, MD5, SHA-1, SHA-2 (SHA224 - SHA512) and SHA-3
-/// (SHA3-224 - SHA3-512).
-///
 QCryptographicHash::Algorithm QXmppBitsOfBinaryContentId::algorithm() const
 {
     return d->algorithm;
@@ -192,9 +197,6 @@ QCryptographicHash::Algorithm QXmppBitsOfBinaryContentId::algorithm() const
 /// Sets the hash algorithm used to calculate the \c hash value
 ///
 /// The default value is \c QCryptographicHash::Sha1.
-///
-/// This currently supports MD4, MD5, SHA-1, SHA-2 (SHA224 - SHA512) and SHA-3
-/// (SHA3-224 - SHA3-512).
 ///
 /// \note Only change this, if you know what you do. The XEP allows other
 /// hashing algorithms than SHA-1 to be used, but not all clients support this.
