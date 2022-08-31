@@ -26,6 +26,10 @@ static const QMap<QCryptographicHash::Algorithm, QString> HASH_ALGORITHMS = {
     { QCryptographicHash::Sha3_256, QStringLiteral("sha3-256") },
     { QCryptographicHash::Sha3_384, QStringLiteral("sha3-384") },
     { QCryptographicHash::Sha3_512, QStringLiteral("sha3-512") },
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    { QCryptographicHash::Blake2b_256, QStringLiteral("blake2b-256") },
+    { QCryptographicHash::Blake2b_512, QStringLiteral("blake2b-512") },
+#endif
 };
 
 class QXmppBitsOfBinaryContentIdPrivate : public QSharedData
