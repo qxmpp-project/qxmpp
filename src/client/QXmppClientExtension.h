@@ -9,6 +9,8 @@
 #include "QXmppExtension.h"
 #include "QXmppLogger.h"
 
+#include <memory>
+
 class QDomElement;
 
 class QXmppClient;
@@ -49,7 +51,7 @@ protected:
     bool injectMessage(QXmppMessage &&message);
 
 private:
-    QXmppClientExtensionPrivate *const d;
+    const std::unique_ptr<QXmppClientExtensionPrivate> d;
 
     friend class QXmppClient;
 };

@@ -6,7 +6,6 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppGlobal.h"
 #include "QXmppVersionIq.h"
 
 #include <QCoreApplication>
@@ -22,7 +21,7 @@ public:
 };
 
 QXmppVersionManager::QXmppVersionManager()
-    : d(new QXmppVersionManagerPrivate)
+    : d(std::make_unique<QXmppVersionManagerPrivate>())
 {
     d->clientName = qApp->applicationName();
     if (d->clientName.isEmpty())
@@ -34,10 +33,7 @@ QXmppVersionManager::QXmppVersionManager()
         d->clientVersion = QXmppVersion();
 }
 
-QXmppVersionManager::~QXmppVersionManager()
-{
-    delete d;
-}
+QXmppVersionManager::~QXmppVersionManager() = default;
 
 /// Request version information from the specified XMPP entity.
 ///

@@ -43,7 +43,7 @@ private Q_SLOTS:
     void handleMessageReceived(const QXmppMessage &message);
 
 private:
-    QXmppAttentionManagerPrivate *const d;
+    const std::unique_ptr<QXmppAttentionManagerPrivate> d;
 };
 
 #endif  // QXMPPATTENTIONMANAGER_H

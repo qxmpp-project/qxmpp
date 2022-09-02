@@ -46,7 +46,7 @@ private Q_SLOTS:
     void slotDisconnected();
 
 private:
-    QXmppBookmarkManagerPrivate *const d;
+    const std::unique_ptr<QXmppBookmarkManagerPrivate> d;
 };
 
 #endif

@@ -94,7 +94,7 @@ private:
     friend class QXmppOutgoingClientPrivate;
     friend class tst_QXmppOutgoingClient;
 
-    QXmppOutgoingClientPrivate *const d;
+    const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };
 
 #endif  // QXMPPOUTGOINGCLIENT_H

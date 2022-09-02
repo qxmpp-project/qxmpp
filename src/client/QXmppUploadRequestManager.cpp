@@ -88,7 +88,7 @@ public:
 ///
 
 QXmppUploadRequestManager::QXmppUploadRequestManager()
-    : d(new QXmppUploadRequestManagerPrivate)
+    : d(std::make_unique<QXmppUploadRequestManagerPrivate>())
 {
 }
 

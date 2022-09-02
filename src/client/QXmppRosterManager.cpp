@@ -68,7 +68,7 @@ void QXmppRosterManagerPrivate::clear()
 /// Constructs a roster manager.
 ///
 QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
-    : d(new QXmppRosterManagerPrivate())
+    : d(std::make_unique<QXmppRosterManagerPrivate>())
 {
     connect(client, &QXmppClient::connected,
             this, &QXmppRosterManager::_q_connected);
@@ -80,10 +80,7 @@ QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
             this, &QXmppRosterManager::_q_presenceReceived);
 }
 
-QXmppRosterManager::~QXmppRosterManager()
-{
-    delete d;
-}
+QXmppRosterManager::~QXmppRosterManager() = default;
 
 ///
 /// Accepts an existing subscription request or pre-approves future subscription

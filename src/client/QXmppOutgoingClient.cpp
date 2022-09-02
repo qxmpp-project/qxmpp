@@ -161,13 +161,12 @@ void QXmppOutgoingClientPrivate::connectToNextDNSHost()
         dns.serviceRecords().at(curIdx).port());
 }
 
+///
 /// Constructs an outgoing client stream.
 ///
-/// \param parent
-
 QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     : QXmppStream(parent),
-      d(new QXmppOutgoingClientPrivate(this))
+      d(std::make_unique<QXmppOutgoingClientPrivate>(this))
 {
     // initialise socket
     auto *socket = new QSslSocket(this);
@@ -210,12 +209,7 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     });
 }
 
-/// Destroys an outgoing client stream.
-
-QXmppOutgoingClient::~QXmppOutgoingClient()
-{
-    delete d;
-}
+QXmppOutgoingClient::~QXmppOutgoingClient() = default;
 
 /// Returns a reference to the stream's configuration.
 

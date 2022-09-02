@@ -11,6 +11,7 @@
 #include "QXmppSendResult.h"
 #include "QXmppSendStanzaParams.h"
 
+#include <memory>
 #include <variant>
 
 #include <QAbstractSocket>
@@ -321,7 +322,7 @@ private Q_SLOTS:
     void _q_streamError(QXmppClient::Error error);
 
 private:
-    QXmppClientPrivate *const d;
+    const std::unique_ptr<QXmppClientPrivate> d;
 
     friend class QXmppClientExtension;
     friend class QXmppInternalClientExtension;

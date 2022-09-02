@@ -254,17 +254,14 @@ QXmppTransferJobPrivate::QXmppTransferJobPrivate()
 
 QXmppTransferJob::QXmppTransferJob(const QString &jid, QXmppTransferJob::Direction direction, QXmppClient *client, QObject *parent)
     : QXmppLoggable(parent),
-      d(new QXmppTransferJobPrivate)
+      d(std::make_unique<QXmppTransferJobPrivate>())
 {
     d->client = client;
     d->direction = direction;
     d->jid = jid;
 }
 
-QXmppTransferJob::~QXmppTransferJob()
-{
-    delete d;
-}
+QXmppTransferJob::~QXmppTransferJob() = default;
 
 ///
 /// Call this method if you wish to abort on ongoing transfer job.
@@ -760,7 +757,7 @@ QXmppTransferOutgoingJob *QXmppTransferManagerPrivate::getOutgoingJobByRequestId
 /// file transfers.
 ///
 QXmppTransferManager::QXmppTransferManager()
-    : d(new QXmppTransferManagerPrivate)
+    : d(std::make_unique<QXmppTransferManagerPrivate>())
 {
     // start SOCKS server
     d->socksServer = new QXmppSocksServer(this);
@@ -771,10 +768,7 @@ QXmppTransferManager::QXmppTransferManager()
     }
 }
 
-QXmppTransferManager::~QXmppTransferManager()
-{
-    delete d;
-}
+QXmppTransferManager::~QXmppTransferManager() = default;
 
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 {

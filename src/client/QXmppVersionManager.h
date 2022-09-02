@@ -48,7 +48,7 @@ Q_SIGNALS:
     void versionReceived(const QXmppVersionIq &);
 
 private:
-    QXmppVersionManagerPrivate *d;
+    const std::unique_ptr<QXmppVersionManagerPrivate> d;
 };
 
 #endif  // QXMPPVERSIONMANAGER_H

@@ -75,7 +75,7 @@ private Q_SLOTS:
     void _q_roomDestroyed(QObject *object);
 
 private:
-    QXmppMucManagerPrivate *d;
+    const std::unique_ptr<QXmppMucManagerPrivate> d;
 };
 
 /// \brief The QXmppMucRoom class represents a multi-user chat room
@@ -235,7 +235,7 @@ private Q_SLOTS:
 
 private:
     QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent);
-    QXmppMucRoomPrivate *d;
+    const std::unique_ptr<QXmppMucRoomPrivate> d;
     friend class QXmppMucManager;
 };
 

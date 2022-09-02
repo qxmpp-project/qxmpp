@@ -67,7 +67,7 @@ Q_SIGNALS:
     void itemsReceived(const QXmppDiscoveryIq &);
 
 private:
-    QXmppDiscoveryManagerPrivate *d;
+    const std::unique_ptr<QXmppDiscoveryManagerPrivate> d;
 };
 
 #endif  // QXMPPDISCOVERYMANAGER_H

@@ -182,7 +182,7 @@ private:
     void setState(QXmppTransferJob::State state);
     void terminate(QXmppTransferJob::Error error);
 
-    QXmppTransferJobPrivate *const d;
+    const std::unique_ptr<QXmppTransferJobPrivate> d;
     friend class QXmppTransferManager;
     friend class QXmppTransferManagerPrivate;
     friend class QXmppTransferIncomingJob;
@@ -260,7 +260,7 @@ private Q_SLOTS:
     void _q_socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port);
 
 private:
-    QXmppTransferManagerPrivate *d;
+    const std::unique_ptr<QXmppTransferManagerPrivate> d;
 
     void byteStreamIqReceived(const QXmppByteStreamIq &);
     void byteStreamResponseReceived(const QXmppIq &);

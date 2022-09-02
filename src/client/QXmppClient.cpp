@@ -236,13 +236,7 @@ QXmppClient::QXmppClient(QObject *parent)
     addExtension(new QXmppDiscoveryManager());
 }
 
-/// Destructor, destroys the QXmppClient object.
-///
-
-QXmppClient::~QXmppClient()
-{
-    delete d;
-}
+QXmppClient::~QXmppClient() = default;
 
 ///
 /// \fn QXmppClient::addNewExtension()

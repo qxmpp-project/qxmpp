@@ -62,10 +62,7 @@ QXmppDiscoveryManager::QXmppDiscoveryManager()
         d->clientName = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
 }
 
-QXmppDiscoveryManager::~QXmppDiscoveryManager()
-{
-    delete d;
-}
+QXmppDiscoveryManager::~QXmppDiscoveryManager() = default;
 
 /// Requests information from the specified XMPP entity.
 ///

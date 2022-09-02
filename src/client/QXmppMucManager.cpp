@@ -37,19 +37,15 @@ public:
     QString subject;
 };
 
+///
 /// Constructs a new QXmppMucManager.
-
+///
 QXmppMucManager::QXmppMucManager()
+    : d(std::make_unique<QXmppMucManagerPrivate>())
 {
-    d = new QXmppMucManagerPrivate;
 }
 
-/// Destroys a QXmppMucManager.
-
-QXmppMucManager::~QXmppMucManager()
-{
-    delete d;
-}
+QXmppMucManager::~QXmppMucManager() = default;
 
 /// Adds the given chat room to the set of managed rooms.
 ///
@@ -123,7 +119,6 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
 void QXmppMucManager::setClient(QXmppClient *client)
 {
-
     QXmppClientExtension::setClient(client);
 
     connect(client, &QXmppClient::messageReceived,
@@ -154,10 +149,9 @@ void QXmppMucManager::_q_roomDestroyed(QObject *object)
 /// \param parent
 
 QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      d(std::make_unique<QXmppMucRoomPrivate>())
 {
-
-    d = new QXmppMucRoomPrivate;
     d->allowedActions = NoAction;
     d->client = client;
     d->discoManager = client->findExtension<QXmppDiscoveryManager>();
@@ -183,12 +177,7 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     connect(this, &QXmppMucRoom::left, this, &QXmppMucRoom::isJoinedChanged);
 }
 
-/// Destroys a QXmppMucRoom.
-
-QXmppMucRoom::~QXmppMucRoom()
-{
-    delete d;
-}
+QXmppMucRoom::~QXmppMucRoom() = default;
 
 QXmppMucRoom::Actions QXmppMucRoom::allowedActions() const
 {

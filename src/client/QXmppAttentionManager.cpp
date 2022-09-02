@@ -89,13 +89,7 @@ QXmppAttentionManager::QXmppAttentionManager(quint8 allowedAttempts, QTime timeF
 {
 }
 
-///
-/// Destructor
-///
-QXmppAttentionManager::~QXmppAttentionManager()
-{
-    delete d;
-}
+QXmppAttentionManager::~QXmppAttentionManager() = default;
 
 ///
 /// Returns the \xep{0224}: Attention feature.

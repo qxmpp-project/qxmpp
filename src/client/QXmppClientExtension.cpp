@@ -14,22 +14,16 @@ public:
     QXmppClient *client;
 };
 
+///
 /// Constructs a QXmppClient extension.
 ///
-
 QXmppClientExtension::QXmppClientExtension()
     : d(new QXmppClientExtensionPrivate)
 {
     d->client = nullptr;
 }
 
-/// Destroys a QXmppClient extension.
-///
-
-QXmppClientExtension::~QXmppClientExtension()
-{
-    delete d;
-}
+QXmppClientExtension::~QXmppClientExtension() = default;
 
 /// Returns the discovery features to add to the client.
 ///

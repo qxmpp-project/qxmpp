@@ -135,7 +135,7 @@ private Q_SLOTS:
     void _q_presenceReceived(const QXmppPresence &);
 
 private:
-    QXmppRosterManagerPrivate *d;
+    const std::unique_ptr<QXmppRosterManagerPrivate> d;
 };
 
 #endif  // QXMPPROSTER_H

@@ -27,7 +27,7 @@ public:
     /// \endcond
 
 private:
-    std::unique_ptr<QXmppAtmTrustMemoryStoragePrivate> d;
+    const std::unique_ptr<QXmppAtmTrustMemoryStoragePrivate> d;
 };
 
 #endif  // QXMPPATMTRUSTMEMORYSTORAGE_H

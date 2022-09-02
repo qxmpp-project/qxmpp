@@ -132,7 +132,7 @@ protected:
 private:
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
 
-    QSharedDataPointer<QXmppUploadRequestManagerPrivate> d;
+    const std::unique_ptr<QXmppUploadRequestManagerPrivate> d;
 };
 
 #endif  // QXMPPUPLOADREQUESTMANAGER_H

@@ -73,6 +73,7 @@ public:
     bool bookmarksReceived;
 };
 
+///
 /// Constructs a new bookmark manager.
 ///
 QXmppBookmarkManager::QXmppBookmarkManager()
@@ -81,12 +82,7 @@ QXmppBookmarkManager::QXmppBookmarkManager()
     d->bookmarksReceived = false;
 }
 
-/// Destroys a bookmark manager.
-///
-QXmppBookmarkManager::~QXmppBookmarkManager()
-{
-    delete d;
-}
+QXmppBookmarkManager::~QXmppBookmarkManager() = default;
 
 /// Returns true if the bookmarks have been received from the server,
 /// false otherwise.

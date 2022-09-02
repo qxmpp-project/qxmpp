@@ -17,15 +17,12 @@ public:
 };
 
 QXmppVCardManager::QXmppVCardManager()
-    : d(new QXmppVCardManagerPrivate)
+    : d(std::make_unique<QXmppVCardManagerPrivate>())
 {
     d->isClientVCardReceived = false;
 }
 
-QXmppVCardManager::~QXmppVCardManager()
-{
-    delete d;
-}
+QXmppVCardManager::~QXmppVCardManager() = default;
 
 /// This function requests the server for vCard of the specified jid.
 /// Once received the signal vCardReceived() is emitted.

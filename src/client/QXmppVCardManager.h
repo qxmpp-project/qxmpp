@@ -65,7 +65,7 @@ Q_SIGNALS:
     void clientVCardReceived();
 
 private:
-    QXmppVCardManagerPrivate *d;
+    const std::unique_ptr<QXmppVCardManagerPrivate> d;
 };
 
 #endif  // QXMPPVCARDMANAGER_H
