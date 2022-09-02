@@ -9,8 +9,6 @@
 #include "QXmppClientExtension.h"
 #include "QXmppRegisterIq.h"
 
-#include <QScopedPointer>
-
 class QXmppRegistrationManagerPrivate;
 
 ///
@@ -348,7 +346,7 @@ private Q_SLOTS:
 private:
     void setSupportedByServer(bool supportedByServer);
 
-    QScopedPointer<QXmppRegistrationManagerPrivate> d;
+    const std::unique_ptr<QXmppRegistrationManagerPrivate> d;
 };
 
 #endif  // QXMPPREGISTRATIONMANAGER_H

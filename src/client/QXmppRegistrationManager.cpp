@@ -44,7 +44,7 @@ QXmppRegistrationManagerPrivate::QXmppRegistrationManagerPrivate()
 /// Default constructor.
 ///
 QXmppRegistrationManager::QXmppRegistrationManager()
-    : d(new QXmppRegistrationManagerPrivate)
+    : d(std::make_unique<QXmppRegistrationManagerPrivate>())
 {
 }
 
