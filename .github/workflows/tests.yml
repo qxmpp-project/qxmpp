@@ -17,14 +17,14 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         config: [minimal, full, full-debug]
-        qt_version: ['5.15.2']
+        qt_version: ['5.15.*']
         include:
           - os: ubuntu-latest
             config: full
-            qt_version: 5.9.9
+            qt_version: 5.9.*
           - os: macos-latest
             config: full
-            qt_version: 5.9.9
+            qt_version: 5.9.*
     steps:
       - uses: actions/checkout@v2
       - name: Install Qt
