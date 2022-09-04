@@ -22,9 +22,15 @@ jobs:
           - os: ubuntu-latest
             config: full
             qt_version: 5.9.*
+          - os: ubuntu-latest
+            config: minimal
+            qt_version: 6.0.*
+          - os: ubuntu-latest
+            config: minimal
+            qt_version: 6.*.*
           - os: macos-latest
-            config: full
-            qt_version: 5.9.*
+            config: minimal
+            qt_version: 6.*.*
     steps:
       - uses: actions/checkout@v2
       - name: Install Qt
