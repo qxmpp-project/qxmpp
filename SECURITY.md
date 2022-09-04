@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # Security Policy
 
 ## Supported Versions
