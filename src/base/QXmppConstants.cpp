@@ -129,6 +129,8 @@ const char *ns_conference = "jabber:x:conference";
 const char *ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0297: Stanza Forwarding
 const char *ns_forwarding = "urn:xmpp:forward:0";
+// XEP-0300: Use of Cryptographic Hash Functions in XMPP
+const char *ns_hashes = "urn:xmpp:hashes:2";
 // XEP-0308: Last Message Correction
 const char *ns_message_correct = "urn:xmpp:message-correct:0";
 // XEP-0313: Message Archive Management
