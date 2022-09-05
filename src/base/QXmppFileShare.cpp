@@ -8,6 +8,7 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 #include "QXmppConstants_p.h"
+#include "QXmppFileMetadata.h"
 
 using Disposition = QXmppFileShare::Disposition;
 
