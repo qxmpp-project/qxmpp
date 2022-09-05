@@ -24,6 +24,8 @@ class QXMPP_EXPORT QXmppFileMetadata
 public:
     QXmppFileMetadata();
 
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppFileMetadata)
+
     /// \cond
     bool parse(const QDomElement &el);
     void toXml(QXmlStreamWriter *writer) const;
