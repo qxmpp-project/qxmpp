@@ -49,6 +49,7 @@ Complete:
 - \xep{0237, Roster Versioning} (partially)
 - \xep{0245, The /me Command} (v1.0)
 - \xep{0249, Direct MUC Invitations} (v1.2)
+- \xep{0264, Jingle Content Thumbnails} (v0.4)
 - \xep{0280, Message Carbons}
 - \xep{0300, Use of Cryptographic Hash Functions in XMPP} (v1.0)
 - \xep{0308, Last Message Correction}

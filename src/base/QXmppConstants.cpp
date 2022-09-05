@@ -125,6 +125,8 @@ const char *ns_attention = "urn:xmpp:attention:0";
 const char *ns_bob = "urn:xmpp:bob";
 // XEP-0249: Direct MUC Invitations
 const char *ns_conference = "jabber:x:conference";
+// XEP-0264: Jingle Content Thumbnails
+const char *ns_thumbs = "urn:xmpp:thumbs:1";
 // XEP-0280: Message Carbons
 const char *ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0297: Stanza Forwarding
