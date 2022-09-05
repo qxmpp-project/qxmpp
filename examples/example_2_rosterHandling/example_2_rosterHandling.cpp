@@ -38,8 +38,9 @@ void xmppClient::rosterReceived()
     const QStringList jids = m_rosterManager->getRosterBareJids();
     for (const QString &bareJid : jids) {
         QString name = m_rosterManager->getRosterEntry(bareJid).name();
-        if (name.isEmpty())
+        if (name.isEmpty()) {
             name = "-";
+        }
         qDebug("example_2_rosterHandling:: Roster received: %s [%s]", qPrintable(bareJid), qPrintable(name));
     }
 }

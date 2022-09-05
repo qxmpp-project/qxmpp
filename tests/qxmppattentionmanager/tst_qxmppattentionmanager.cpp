@@ -132,8 +132,9 @@ void tst_QXmppAttentionManager::testRateLimiting()
     QXmppMessage msg;
     msg.setAttentionRequested(true);
 
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         emit client.messageReceived(msg);
+    }
 
     QCOMPARE(signalCalled, allowed);
     QCOMPARE(rateLimitedCalled, count - allowed);
@@ -142,8 +143,9 @@ void tst_QXmppAttentionManager::testRateLimiting()
     QThread::currentThread()->usleep(1000e3 + 50e3);
     QCoreApplication::processEvents();
 
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         emit client.messageReceived(msg);
+    }
 
     QCOMPARE(signalCalled, allowed * 2);
     QCOMPARE(rateLimitedCalled, (count - allowed) * 2);

@@ -43,8 +43,9 @@ void QXmppStartTlsPacket::setType(QXmppStartTlsPacket::Type type)
 /// \cond
 void QXmppStartTlsPacket::parse(const QDomElement &element)
 {
-    if (!QXmppStartTlsPacket::isStartTlsPacket(element))
+    if (!QXmppStartTlsPacket::isStartTlsPacket(element)) {
         return;
+    }
 
     if (auto index = STARTTLS_TYPES.indexOf(element.tagName()); index >= 0) {
         m_type = Type(index);

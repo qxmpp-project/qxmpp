@@ -30,8 +30,9 @@ static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement
 
     /* attributes */
     QString xmlns = element.namespaceURI();
-    if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns))
+    if (!xmlns.isEmpty() && !omitNamespaces.contains(xmlns)) {
         stream->writeDefaultNamespace(xmlns);
+    }
     QDomNamedNodeMap attrs = element.attributes();
     for (int i = 0; i < attrs.size(); i++) {
         QDomAttr attr = attrs.item(i).toAttr();
@@ -109,20 +110,23 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 {
     // refuse to route packets to empty destination, own domain or sub-domains
     const QString toDomain = QXmppUtils::jidToDomain(to);
-    if (to.isEmpty() || to == domain || toDomain.endsWith("." + domain))
+    if (to.isEmpty() || to == domain || toDomain.endsWith("." + domain)) {
         return false;
+    }
 
     if (toDomain == domain) {
         // look for a client connection
         QList<QXmppIncomingClient *> found;
         if (QXmppUtils::jidToResource(to).isEmpty()) {
             const auto &connections = incomingClientsByBareJid.value(to);
-            for (auto *conn : connections)
+            for (auto *conn : connections) {
                 found << conn;
+            }
         } else {
             QXmppIncomingClient *conn = incomingClientsByJid.value(to);
-            if (conn)
+            if (conn) {
                 found << conn;
+            }
         }
 
         // send data
@@ -178,9 +182,11 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
 {
     // try extensions
     const auto &extensions = server->extensions();
-    for (auto *extension : extensions)
-        if (extension->handleStanza(element))
+    for (auto *extension : extensions) {
+        if (extension->handleStanza(element)) {
             return;
+        }
+    }
 
     // default handlers
     const QString domain = server->domain();
@@ -224,14 +230,16 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
 
 void QXmppServerPrivate::info(const QString &message)
 {
-    if (logger)
+    if (logger) {
         logger->log(QXmppLogger::InformationMessage, message);
+    }
 }
 
 void QXmppServerPrivate::warning(const QString &message)
 {
-    if (logger)
+    if (logger) {
         logger->log(QXmppLogger::WarningMessage, message);
+    }
 }
 
 /// Load the server's extensions.
@@ -244,12 +252,14 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
         const auto pluginLoaders = QPluginLoader::staticInstances();
         for (auto *object : pluginLoaders) {
             auto *plugin = qobject_cast<QXmppServerPlugin *>(object);
-            if (!plugin)
+            if (!plugin) {
                 continue;
+            }
 
             const auto &keys = plugin->keys();
-            for (const auto &key : keys)
+            for (const auto &key : keys) {
                 server->addExtension(plugin->create(key));
+            }
         }
         loaded = true;
     }
@@ -261,8 +271,9 @@ void QXmppServerPrivate::startExtensions()
 {
     if (!started) {
         for (auto *extension : std::as_const(extensions)) {
-            if (!extension->start())
+            if (!extension->start()) {
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
+            }
         }
         started = true;
     }
@@ -274,8 +285,9 @@ void QXmppServerPrivate::startExtensions()
 void QXmppServerPrivate::stopExtensions()
 {
     if (started) {
-        for (int i = extensions.size() - 1; i >= 0; --i)
+        for (int i = extensions.size() - 1; i >= 0; --i) {
             extensions[i]->stop();
+        }
         started = false;
     }
 }
@@ -305,8 +317,9 @@ QXmppServer::~QXmppServer()
 
 void QXmppServer::addExtension(QXmppServerExtension *extension)
 {
-    if (!extension || d->extensions.contains(extension))
+    if (!extension || d->extensions.contains(extension)) {
         return;
+    }
     d->info(QString("Added extension %1").arg(extension->extensionName()));
     extension->setParent(this);
     extension->setServer(this);
@@ -592,8 +605,9 @@ void QXmppServer::close()
 
     // close XMPP streams
     QSetIterator<QXmppIncomingClient *> itr(d->incomingClients);
-    while (itr.hasNext())
+    while (itr.hasNext()) {
         itr.next()->disconnectFromHost();
+    }
     for (auto *stream : std::as_const(d->incomingServers)) {
         stream->disconnectFromHost();
     }
@@ -719,8 +733,9 @@ void QXmppServer::_q_clientConnection(QSslSocket *socket)
 void QXmppServer::_q_clientConnected()
 {
     auto *client = qobject_cast<QXmppIncomingClient *>(sender());
-    if (!client)
+    if (!client) {
         return;
+    }
 
     // FIXME: at this point the JID must contain a resource, assert it?
     const QString jid = client->jid();
@@ -743,20 +758,23 @@ void QXmppServer::_q_clientConnected()
 void QXmppServer::_q_clientDisconnected()
 {
     auto *client = qobject_cast<QXmppIncomingClient *>(sender());
-    if (!client)
+    if (!client) {
         return;
+    }
 
     if (d->incomingClients.remove(client)) {
         // remove stream from routing tables
         const QString jid = client->jid();
         if (!jid.isEmpty()) {
-            if (d->incomingClientsByJid.value(jid) == client)
+            if (d->incomingClientsByJid.value(jid) == client) {
                 d->incomingClientsByJid.remove(jid);
+            }
             const QString bareJid = QXmppUtils::jidToBareJid(jid);
             if (d->incomingClientsByBareJid.contains(bareJid)) {
                 d->incomingClientsByBareJid[bareJid].remove(client);
-                if (d->incomingClientsByBareJid[bareJid].isEmpty())
+                if (d->incomingClientsByBareJid[bareJid].isEmpty()) {
                     d->incomingClientsByBareJid.remove(bareJid);
+                }
             }
         }
 
@@ -764,8 +782,9 @@ void QXmppServer::_q_clientDisconnected()
         client->deleteLater();
 
         // emit signal
-        if (!jid.isEmpty())
+        if (!jid.isEmpty()) {
             emit clientDisconnected(jid);
+        }
 
         // update counter
         emit setGauge("incoming-client.count", d->incomingClients.size());
@@ -775,14 +794,16 @@ void QXmppServer::_q_clientDisconnected()
 void QXmppServer::_q_dialbackRequestReceived(const QXmppDialback &dialback)
 {
     auto *stream = qobject_cast<QXmppIncomingServer *>(sender());
-    if (!stream)
+    if (!stream) {
         return;
+    }
 
     if (dialback.command() == QXmppDialback::Verify) {
         // handle a verify request
         for (auto *out : std::as_const(d->outgoingServers)) {
-            if (out->remoteDomain() != dialback.from())
+            if (out->remoteDomain() != dialback.from()) {
                 continue;
+            }
 
             bool isValid = dialback.key() == out->localStreamKey();
             QXmppDialback verify;
@@ -809,8 +830,9 @@ void QXmppServer::handleElement(const QDomElement &element)
 void QXmppServer::_q_outgoingServerDisconnected()
 {
     auto *outgoing = qobject_cast<QXmppOutgoingServer *>(sender());
-    if (!outgoing)
+    if (!outgoing) {
         return;
+    }
 
     if (d->outgoingServers.remove(outgoing)) {
         outgoing->deleteLater();
@@ -853,8 +875,9 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
 void QXmppServer::_q_serverDisconnected()
 {
     auto *incoming = qobject_cast<QXmppIncomingServer *>(sender());
-    if (!incoming)
+    if (!incoming) {
         return;
+    }
 
     if (d->incomingServers.remove(incoming)) {
         incoming->deleteLater();

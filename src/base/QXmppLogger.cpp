@@ -67,8 +67,9 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
 void QXmppLoggable::childEvent(QChildEvent *event)
 {
     auto *child = qobject_cast<QXmppLoggable *>(event->child());
-    if (!child)
+    if (!child) {
         return;
+    }
 
     if (event->added()) {
         relaySignals(child, this);
@@ -120,8 +121,9 @@ QXmppLogger::~QXmppLogger()
 
 QXmppLogger *QXmppLogger::getLogger()
 {
-    if (!m_logger)
+    if (!m_logger) {
         m_logger = new QXmppLogger();
+    }
 
     return m_logger;
 }
@@ -165,8 +167,9 @@ void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
 {
     // filter messages
-    if (!d->messageTypes.testFlag(type))
+    if (!d->messageTypes.testFlag(type)) {
         return;
+    }
 
     switch (d->loggingType) {
     case QXmppLogger::FileLogging:

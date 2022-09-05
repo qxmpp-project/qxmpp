@@ -92,8 +92,9 @@ static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm,
 
 static QByteArray generateNonce()
 {
-    if (!forcedNonce.isEmpty())
+    if (!forcedNonce.isEmpty()) {
         return forcedNonce;
+    }
 
     QByteArray nonce = QXmppUtils::generateRandomBytes(32);
 
@@ -150,8 +151,9 @@ void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("auth"));
     writer->writeDefaultNamespace(ns_xmpp_sasl);
     writer->writeAttribute(QStringLiteral("mechanism"), m_mechanism);
-    if (!m_value.isEmpty())
+    if (!m_value.isEmpty()) {
         writer->writeCharacters(m_value.toBase64());
+    }
     writer->writeEndElement();
 }
 
@@ -179,8 +181,9 @@ void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("challenge"));
     writer->writeDefaultNamespace(ns_xmpp_sasl);
-    if (!m_value.isEmpty())
+    if (!m_value.isEmpty()) {
         writer->writeCharacters(m_value.toBase64());
+    }
     writer->writeEndElement();
 }
 
@@ -208,8 +211,9 @@ void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("failure"));
     writer->writeDefaultNamespace(ns_xmpp_sasl);
-    if (!m_condition.isEmpty())
+    if (!m_condition.isEmpty()) {
         writer->writeEmptyElement(m_condition);
+    }
     writer->writeEndElement();
 }
 
@@ -237,8 +241,9 @@ void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("response"));
     writer->writeDefaultNamespace(ns_xmpp_sasl);
-    if (!m_value.isEmpty())
+    if (!m_value.isEmpty()) {
         writer->writeCharacters(m_value.toBase64());
+    }
     writer->writeEndElement();
 }
 
@@ -445,8 +450,9 @@ bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &
         // Build response
         QMap<QByteArray, QByteArray> output;
         output[QByteArrayLiteral("username")] = username().toUtf8();
-        if (!realm.isEmpty())
+        if (!realm.isEmpty()) {
             output[QByteArrayLiteral("realm")] = realm;
+        }
         output[QByteArrayLiteral("nonce")] = m_nonce;
         output[QByteArrayLiteral("qop")] = QByteArrayLiteral("auth");
         output[QByteArrayLiteral("cnonce")] = m_cnonce;
@@ -785,8 +791,9 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
     if (m_step == 0) {
         QMap<QByteArray, QByteArray> output;
         output[QByteArrayLiteral("nonce")] = m_nonce;
-        if (!realm().isEmpty())
+        if (!realm().isEmpty()) {
             output[QByteArrayLiteral("realm")] = realm().toUtf8();
+        }
         output[QByteArrayLiteral("qop")] = QByteArrayLiteral("auth");
         output[QByteArrayLiteral("charset")] = QByteArrayLiteral("utf-8");
         output[QByteArrayLiteral("algorithm")] = QByteArrayLiteral("md5-sess");
@@ -805,8 +812,9 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         }
 
         setUsername(QString::fromUtf8(input.value(QByteArrayLiteral("username"))));
-        if (password().isEmpty() && passwordDigest().isEmpty())
+        if (password().isEmpty() && passwordDigest().isEmpty()) {
             return InputNeeded;
+        }
 
         m_nc = input.value(QByteArrayLiteral("nc"));
         m_cnonce = input.value(QByteArrayLiteral("cnonce"));
@@ -818,8 +826,9 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
             m_secret = passwordDigest();
         }
 
-        if (input.value(QByteArrayLiteral("response")) != calculateDigest(QByteArrayLiteral("AUTHENTICATE"), digestUri, m_secret, m_nonce, m_cnonce, m_nc))
+        if (input.value(QByteArrayLiteral("response")) != calculateDigest(QByteArrayLiteral("AUTHENTICATE"), digestUri, m_secret, m_nonce, m_cnonce, m_nc)) {
             return Failed;
+        }
 
         QMap<QByteArray, QByteArray> output;
         output[QByteArrayLiteral("rspauth")] = calculateDigest(QByteArray(), digestUri, m_secret, m_nonce, m_cnonce, m_nc);
@@ -893,8 +902,9 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
             pos++;
             int endPos = ba.indexOf('"', pos);
             // skip quoted quotes
-            while (endPos >= 0 && ba.at(endPos - 1) == '\\')
+            while (endPos >= 0 && ba.at(endPos - 1) == '\\') {
                 endPos = ba.indexOf('"', endPos + 1);
+            }
             if (endPos < 0) {
                 qWarning("Unfinished quoted string");
                 return map;
@@ -909,8 +919,9 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
         } else {
             // non-quoted string
             int endPos = ba.indexOf(',', pos);
-            if (endPos < 0)
+            if (endPos < 0) {
                 endPos = ba.size();
+            }
             map[key] = ba.mid(pos, endPos - pos);
             // skip comma
             startIndex = endPos + 1;
@@ -923,8 +934,9 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
 {
     QByteArray ba;
     for (auto itr = map.begin(); itr != map.end(); itr++) {
-        if (!ba.isEmpty())
+        if (!ba.isEmpty()) {
             ba.append(',');
+        }
         ba.append(itr.key() + QByteArrayLiteral("="));
         auto value = itr.value();
         const char *separators = "()<>@,;:\\\"/[]?={} \t";

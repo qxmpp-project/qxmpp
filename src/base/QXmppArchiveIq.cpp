@@ -96,12 +96,14 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
     writer->writeStartElement(QStringLiteral("chat"));
     writer->writeDefaultNamespace(ns_archive);
     helperToXmlAddAttribute(writer, QStringLiteral("with"), m_with);
-    if (m_start.isValid())
+    if (m_start.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
+    }
     helperToXmlAddAttribute(writer, QStringLiteral("subject"), m_subject);
     helperToXmlAddAttribute(writer, QStringLiteral("thread"), m_thread);
-    if (m_version)
+    if (m_version) {
         helperToXmlAddAttribute(writer, QStringLiteral("version"), QString::number(m_version));
+    }
 
     QDateTime prevTime = m_start;
 
@@ -112,8 +114,9 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
         writer->writeEndElement();
         prevTime = message.date();
     }
-    if (!rsm.isNull())
+    if (!rsm.isNull()) {
         rsm.toXml(writer);
+    }
     writer->writeEndElement();
 }
 /// \endcond
@@ -395,18 +398,23 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("list"));
     writer->writeDefaultNamespace(ns_archive);
-    if (!m_with.isEmpty())
+    if (!m_with.isEmpty()) {
         helperToXmlAddAttribute(writer, QStringLiteral("with"), m_with);
-    if (m_start.isValid())
+    }
+    if (m_start.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
-    if (m_end.isValid())
+    }
+    if (m_end.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("end"), QXmppUtils::datetimeToString(m_end));
-    if (!m_rsmQuery.isNull())
+    }
+    if (!m_rsmQuery.isNull()) {
         m_rsmQuery.toXml(writer);
-    else if (!m_rsmReply.isNull())
+    } else if (!m_rsmReply.isNull()) {
         m_rsmReply.toXml(writer);
-    for (const auto &chat : m_chats)
+    }
+    for (const auto &chat : m_chats) {
         chat.toXml(writer);
+    }
     writer->writeEndElement();
 }
 
@@ -500,12 +508,15 @@ void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("remove"));
     writer->writeDefaultNamespace(ns_archive);
-    if (!m_with.isEmpty())
+    if (!m_with.isEmpty()) {
         helperToXmlAddAttribute(writer, QStringLiteral("with"), m_with);
-    if (m_start.isValid())
+    }
+    if (m_start.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
-    if (m_end.isValid())
+    }
+    if (m_end.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("end"), QXmppUtils::datetimeToString(m_end));
+    }
     writer->writeEndElement();
 }
 /// \endcond
@@ -589,8 +600,9 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
     writer->writeDefaultNamespace(ns_archive);
     helperToXmlAddAttribute(writer, QStringLiteral("with"), m_with);
     helperToXmlAddAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
-    if (!m_rsmQuery.isNull())
+    if (!m_rsmQuery.isNull()) {
         m_rsmQuery.toXml(writer);
+    }
     writer->writeEndElement();
 }
 /// \endcond

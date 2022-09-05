@@ -106,8 +106,9 @@ void QXmppHttpUploadRequestIq::parseElementFromChild(const QDomElement &element)
     if (request.hasAttribute("content-type")) {
         QMimeDatabase mimeDb;
         QMimeType type = mimeDb.mimeTypeForName(request.attribute("content-type"));
-        if (!type.isDefault() && type.isValid())
+        if (!type.isDefault() && type.isValid()) {
             d->contentType = type;
+        }
     }
 }
 
@@ -119,8 +120,9 @@ void QXmppHttpUploadRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer) c
     writer->writeAttribute("filename", d->fileName);
     writer->writeAttribute("size", QString::number(d->size));
     // content-type is optional
-    if (!d->contentType.isDefault() && d->contentType.isValid())
+    if (!d->contentType.isDefault() && d->contentType.isValid()) {
         writer->writeAttribute("content-type", d->contentType.name());
+    }
     writer->writeEndElement();
 }
 /// \endcond

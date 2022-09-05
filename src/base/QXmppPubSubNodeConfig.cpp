@@ -91,16 +91,21 @@ public:
 
 std::optional<QXmppPubSubNodeConfig::AccessModel> QXmppPubSubNodeConfig::accessModelFromString(const QString &string)
 {
-    if (string == QStringLiteral("open"))
+    if (string == QStringLiteral("open")) {
         return Open;
-    if (string == QStringLiteral("presence"))
+    }
+    if (string == QStringLiteral("presence")) {
         return Presence;
-    if (string == QStringLiteral("roster"))
+    }
+    if (string == QStringLiteral("roster")) {
         return Roster;
-    if (string == QStringLiteral("authorize"))
+    }
+    if (string == QStringLiteral("authorize")) {
         return Authorize;
-    if (string == QStringLiteral("whitelist"))
+    }
+    if (string == QStringLiteral("whitelist")) {
         return Allowlist;
+    }
     return std::nullopt;
 }
 
@@ -123,12 +128,15 @@ QString QXmppPubSubNodeConfig::accessModelToString(AccessModel model)
 
 std::optional<QXmppPubSubNodeConfig::PublishModel> QXmppPubSubNodeConfig::publishModelFromString(const QString &string)
 {
-    if (string == QStringLiteral("publishers"))
+    if (string == QStringLiteral("publishers")) {
         return Publishers;
-    if (string == QStringLiteral("subscribers"))
+    }
+    if (string == QStringLiteral("subscribers")) {
         return Subscribers;
-    if (string == QStringLiteral("open"))
+    }
+    if (string == QStringLiteral("open")) {
         return Anyone;
+    }
     return std::nullopt;
 }
 
@@ -147,12 +155,15 @@ QString QXmppPubSubNodeConfig::publishModelToString(QXmppPubSubNodeConfig::Publi
 
 std::optional<QXmppPubSubNodeConfig::ChildAssociationPolicy> QXmppPubSubNodeConfig::childAssociatationPolicyFromString(const QString &string)
 {
-    if (string == QStringLiteral("all"))
+    if (string == QStringLiteral("all")) {
         return ChildAssociationPolicy::All;
-    if (string == QStringLiteral("owners"))
+    }
+    if (string == QStringLiteral("owners")) {
         return ChildAssociationPolicy::Owners;
-    if (string == QStringLiteral("whitelist"))
+    }
+    if (string == QStringLiteral("whitelist")) {
         return ChildAssociationPolicy::Whitelist;
+    }
     return std::nullopt;
 }
 
@@ -171,10 +182,12 @@ QString QXmppPubSubNodeConfig::childAssociationPolicyToString(QXmppPubSubNodeCon
 
 std::optional<QXmppPubSubNodeConfig::ItemPublisher> QXmppPubSubNodeConfig::itemPublisherFromString(const QString &string)
 {
-    if (string == QStringLiteral("owner"))
+    if (string == QStringLiteral("owner")) {
         return NodeOwner;
-    if (string == QStringLiteral("publisher"))
+    }
+    if (string == QStringLiteral("publisher")) {
         return Publisher;
+    }
     return std::nullopt;
 }
 
@@ -191,10 +204,12 @@ QString QXmppPubSubNodeConfig::itemPublisherToString(ItemPublisher publisher)
 
 std::optional<QXmppPubSubNodeConfig::NodeType> QXmppPubSubNodeConfig::nodeTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("leaf"))
+    if (string == QStringLiteral("leaf")) {
         return Leaf;
-    if (string == QStringLiteral("collection"))
+    }
+    if (string == QStringLiteral("collection")) {
         return Collection;
+    }
     return std::nullopt;
 }
 
@@ -211,10 +226,12 @@ QString QXmppPubSubNodeConfig::nodeTypeToString(NodeType type)
 
 std::optional<QXmppPubSubNodeConfig::NotificationType> QXmppPubSubNodeConfig::notificationTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("normal"))
+    if (string == QStringLiteral("normal")) {
         return Normal;
-    if (string == QStringLiteral("headline"))
+    }
+    if (string == QStringLiteral("headline")) {
         return Headline;
+    }
     return std::nullopt;
 }
 
@@ -231,12 +248,15 @@ QString QXmppPubSubNodeConfig::notificationTypeToString(NotificationType type)
 
 std::optional<QXmppPubSubNodeConfig::SendLastItemType> QXmppPubSubNodeConfig::sendLastItemTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("never"))
+    if (string == QStringLiteral("never")) {
         return Never;
-    if (string == QStringLiteral("on_sub"))
+    }
+    if (string == QStringLiteral("on_sub")) {
         return OnSubscription;
-    if (string == QStringLiteral("on_sub_and_presence"))
+    }
+    if (string == QStringLiteral("on_sub_and_presence")) {
         return OnSubscriptionAndPresence;
+    }
     return std::nullopt;
 }
 

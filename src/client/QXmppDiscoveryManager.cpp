@@ -56,10 +56,11 @@ QXmppDiscoveryManager::QXmppDiscoveryManager()
 #else
     d->clientType = "pc";
 #endif
-    if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty())
+    if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty()) {
         d->clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
-    else
+    } else {
         d->clientName = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
+    }
 }
 
 QXmppDiscoveryManager::~QXmppDiscoveryManager() = default;
@@ -75,12 +76,14 @@ QString QXmppDiscoveryManager::requestInfo(const QString &jid, const QString &no
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::InfoQuery);
     request.setTo(jid);
-    if (!node.isEmpty())
+    if (!node.isEmpty()) {
         request.setQueryNode(node);
-    if (client()->sendPacket(request))
+    }
+    if (client()->sendPacket(request)) {
         return request.id();
-    else
+    } else {
         return QString();
+    }
 }
 
 /// Requests items from the specified XMPP entity.
@@ -94,12 +97,14 @@ QString QXmppDiscoveryManager::requestItems(const QString &jid, const QString &n
     request.setType(QXmppIq::Get);
     request.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     request.setTo(jid);
-    if (!node.isEmpty())
+    if (!node.isEmpty()) {
         request.setQueryNode(node);
-    if (client()->sendPacket(request))
+    }
+    if (client()->sendPacket(request)) {
         return request.id();
-    else
+    } else {
         return QString();
+    }
 }
 
 ///
@@ -167,8 +172,9 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     // add features of all registered extensions
     const auto extensions = client()->extensions();
     for (auto *extension : extensions) {
-        if (extension)
+        if (extension) {
             features << extension->discoveryFeatures();
+        }
     }
 
     iq.setFeatures(features);
@@ -183,15 +189,17 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identities << identity;
 
     for (auto *extension : client()->extensions()) {
-        if (extension)
+        if (extension) {
             identities << extension->discoveryIdentities();
+        }
     }
 
     iq.setIdentities(identities);
 
     // extended information
-    if (!d->clientInfoForm.isNull())
+    if (!d->clientInfoForm.isNull()) {
         iq.setForm(d->clientInfoForm);
+    }
 
     return iq;
 }

@@ -292,8 +292,9 @@ void QXmppRegistrationManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 {
     // check features of own server
     if (iq.from().isEmpty() || iq.from() == client()->configuration().domain()) {
-        if (iq.features().contains(ns_register))
+        if (iq.features().contains(ns_register)) {
             setSupportedByServer(true);
+        }
     }
 }
 

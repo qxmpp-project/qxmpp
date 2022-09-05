@@ -123,19 +123,22 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
     static const QRegularExpression timezoneRegex(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
 
     const auto match = timezoneRegex.match(str);
-    if (!match.hasMatch())
+    if (!match.hasMatch()) {
         return 0;
+    }
 
     // No offset from UTC
-    if (match.captured(1) == QChar(u'Z'))
+    if (match.captured(1) == QChar(u'Z')) {
         return 0;
+    }
 
     // Calculate offset
     const int offset = match.captured(3).toInt() * 3600 +
         match.captured(4).toInt() * 60;
 
-    if (match.captured(2) == QChar(u'-'))
+    if (match.captured(2) == QChar(u'-')) {
         return -offset;
+    }
     return offset;
 }
 
@@ -145,8 +148,9 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
 ///
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
-    if (!secs)
+    if (!secs) {
         return QStringLiteral("Z");
+    }
 
     const QTime tzoTime = QTime(0, 0, 0).addSecs(qAbs(secs));
     return (secs < 0 ? QStringLiteral("-") : QStringLiteral("+")) + tzoTime.toString(QStringLiteral("hh:mm"));
@@ -164,8 +168,9 @@ QString QXmppUtils::jidToDomain(const QString &jid)
 QString QXmppUtils::jidToResource(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('/'));
-    if (pos < 0)
+    if (pos < 0) {
         return QString();
+    }
     return jid.mid(pos + 1);
 }
 
@@ -174,8 +179,9 @@ QString QXmppUtils::jidToResource(const QString &jid)
 QString QXmppUtils::jidToUser(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('@'));
-    if (pos < 0)
+    if (pos < 0) {
         return QString();
+    }
     return jid.left(pos);
 }
 
@@ -184,8 +190,9 @@ QString QXmppUtils::jidToUser(const QString &jid)
 QString QXmppUtils::jidToBareJid(const QString &jid)
 {
     const int pos = jid.indexOf(QChar('/'));
-    if (pos < 0)
+    if (pos < 0) {
         return jid;
+    }
     return jid.left(pos);
 }
 
@@ -194,8 +201,9 @@ QString QXmppUtils::jidToBareJid(const QString &jid)
 quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
     quint32 result = 0xffffffff;
-    for (char n : in)
+    for (char n : in) {
         result = (result >> 8) ^ (crctable[(result & 0xff) ^ (quint8)n]);
+    }
     return result ^= 0xffffffff;
 }
 
@@ -207,12 +215,14 @@ static QByteArray generateHmac(QCryptographicHash::Algorithm algorithm, const QB
     QByteArray kpad = key + QByteArray(B - key.size(), 0);
 
     QByteArray ba;
-    for (int i = 0; i < B; ++i)
+    for (int i = 0; i < B; ++i) {
         ba += kpad[i] ^ 0x5c;
+    }
 
     QByteArray tmp;
-    for (int i = 0; i < B; ++i)
+    for (int i = 0; i < B; ++i) {
         tmp += kpad[i] ^ 0x36;
+    }
     hasher.addData(tmp);
     hasher.addData(text);
     ba += hasher.result();
@@ -261,8 +271,9 @@ int QXmppUtils::generateRandomInteger(int N)
 QByteArray QXmppUtils::generateRandomBytes(int length)
 {
     QByteArray bytes(length, 'm');
-    for (int i = 0; i < length; ++i)
+    for (int i = 0; i < length; ++i) {
         bytes[i] = (char)generateRandomInteger(256);
+    }
     return bytes;
 }
 
@@ -297,31 +308,35 @@ QString QXmppUtils::generateStanzaUuid()
 ///
 QString QXmppUtils::generateStanzaHash(int length)
 {
-    if (length == 36)
+    if (length == 36) {
         return QXmppUtils::generateStanzaUuid();
+    }
 
     const QString somechars = QStringLiteral("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
     const int N = somechars.size();
     QString hashResult;
-    for (int idx = 0; idx < length; ++idx)
+    for (int idx = 0; idx < length; ++idx) {
         hashResult += somechars[generateRandomInteger(N)];
+    }
     return hashResult;
 }
 
 void helperToXmlAddAttribute(QXmlStreamWriter *stream, const QString &name,
                              const QString &value)
 {
-    if (!value.isEmpty())
+    if (!value.isEmpty()) {
         stream->writeAttribute(name, value);
+    }
 }
 
 void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
                                const QString &value)
 {
-    if (!value.isEmpty())
+    if (!value.isEmpty()) {
         stream->writeTextElement(name, value);
-    else
+    } else {
         stream->writeEmptyElement(name);
+    }
 }
 
 /// \cond

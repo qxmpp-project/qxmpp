@@ -123,8 +123,9 @@ void QXmppRosterManager::_q_connected()
         roster.setMixAnnotate(true);
 
         d->rosterReqId = roster.id();
-        if (client()->isAuthenticated())
+        if (client()->isAuthenticated()) {
             client()->sendPacket(roster);
+        }
     }
 }
 
@@ -139,21 +140,24 @@ void QXmppRosterManager::_q_disconnected()
 /// \cond
 bool QXmppRosterManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "iq" || !QXmppRosterIq::isRosterIq(element))
+    if (element.tagName() != "iq" || !QXmppRosterIq::isRosterIq(element)) {
         return false;
+    }
 
     // Security check: only server should send this iq
     // from() should be either empty or bareJid of the user
     const auto fromJid = element.attribute("from");
-    if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare())
+    if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare()) {
         return false;
+    }
 
     QXmppRosterIq rosterIq;
     rosterIq.parse(element);
 
     bool isInitial = (d->rosterReqId == rosterIq.id());
-    if (isInitial)
+    if (isInitial) {
         d->rosterReqId.clear();
+    }
 
     switch (rosterIq.type()) {
     case QXmppIq::Set: {
@@ -210,8 +214,9 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     const auto bareJid = QXmppUtils::jidToBareJid(jid);
     const auto resource = QXmppUtils::jidToResource(jid);
 
-    if (bareJid.isEmpty())
+    if (bareJid.isEmpty()) {
         return;
+    }
 
     switch (presence.type()) {
     case QXmppPresence::Available:
@@ -424,15 +429,17 @@ bool QXmppRosterManager::removeItem(const QString &bareJid)
 ///
 bool QXmppRosterManager::renameItem(const QString &bareJid, const QString &name)
 {
-    if (!d->entries.contains(bareJid))
+    if (!d->entries.contains(bareJid)) {
         return false;
+    }
 
     auto item = d->entries.value(bareJid);
     item.setName(name);
 
     // If there is a pending subscription, do not include the corresponding attribute in the stanza.
-    if (!item.subscriptionStatus().isEmpty())
+    if (!item.subscriptionStatus().isEmpty()) {
         item.setSubscriptionStatus({});
+    }
 
     QXmppRosterIq iq;
     iq.setType(QXmppIq::Set);
@@ -490,8 +497,9 @@ QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
     const QString &bareJid) const
 {
     // will return blank entry if bareJid doesn't exist
-    if (d->entries.contains(bareJid))
+    if (d->entries.contains(bareJid)) {
         return d->entries.value(bareJid);
+    }
     return {};
 }
 
@@ -503,8 +511,9 @@ QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
 ///
 QStringList QXmppRosterManager::getResources(const QString &bareJid) const
 {
-    if (d->presences.contains(bareJid))
+    if (d->presences.contains(bareJid)) {
         return d->presences[bareJid].keys();
+    }
     return {};
 }
 
@@ -519,8 +528,9 @@ QStringList QXmppRosterManager::getResources(const QString &bareJid) const
 QMap<QString, QXmppPresence> QXmppRosterManager::getAllPresencesForBareJid(
     const QString &bareJid) const
 {
-    if (d->presences.contains(bareJid))
+    if (d->presences.contains(bareJid)) {
         return d->presences.value(bareJid);
+    }
     return {};
 }
 

@@ -140,24 +140,28 @@ void QXmppMixIq::parseElementFromChild(const QDomElement &element)
     }
 
     if (child.namespaceURI() == ns_mix_pam) {
-        if (child.hasAttribute(QStringLiteral("channel")))
+        if (child.hasAttribute(QStringLiteral("channel"))) {
             d->jid = child.attribute(QStringLiteral("channel"));
+        }
 
         child = child.firstChildElement();
     }
 
     if (!child.isNull() && child.namespaceURI() == ns_mix) {
-        if (child.hasAttribute(QStringLiteral("jid")))
+        if (child.hasAttribute(QStringLiteral("jid"))) {
             d->jid = child.attribute(QStringLiteral("jid"));
-        if (child.hasAttribute(QStringLiteral("channel")))
+        }
+        if (child.hasAttribute(QStringLiteral("channel"))) {
             d->channelName = child.attribute(QStringLiteral("channel"));
+        }
 
         QDomElement subChild = child.firstChildElement();
         while (!subChild.isNull()) {
-            if (subChild.tagName() == QStringLiteral("subscribe"))
+            if (subChild.tagName() == QStringLiteral("subscribe")) {
                 d->nodes << subChild.attribute(QStringLiteral("node"));
-            else if (subChild.tagName() == QStringLiteral("nick"))
+            } else if (subChild.tagName() == QStringLiteral("nick")) {
                 d->nick = subChild.text();
+            }
 
             subChild = subChild.nextSiblingElement();
         }
@@ -166,36 +170,42 @@ void QXmppMixIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    if (d->actionType == None)
+    if (d->actionType == None) {
         return;
+    }
 
     writer->writeStartElement(MIX_ACTION_TYPES.at(d->actionType));
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeDefaultNamespace(ns_mix_pam);
-        if (type() == Set)
+        if (type() == Set) {
             helperToXmlAddAttribute(writer, QStringLiteral("channel"), d->jid);
+        }
 
-        if (d->actionType == ClientJoin)
+        if (d->actionType == ClientJoin) {
             writer->writeStartElement(QStringLiteral("join"));
-        else if (d->actionType == ClientLeave)
+        } else if (d->actionType == ClientLeave) {
             writer->writeStartElement(QStringLiteral("leave"));
+        }
     }
 
     writer->writeDefaultNamespace(ns_mix);
     helperToXmlAddAttribute(writer, QStringLiteral("channel"), d->channelName);
-    if (type() == Result)
+    if (type() == Result) {
         helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->jid);
+    }
 
     for (const auto &node : d->nodes) {
         writer->writeStartElement(QStringLiteral("subscribe"));
         writer->writeAttribute(QStringLiteral("node"), node);
         writer->writeEndElement();
     }
-    if (!d->nick.isEmpty())
+    if (!d->nick.isEmpty()) {
         writer->writeTextElement(QStringLiteral("nick"), d->nick);
+    }
 
     writer->writeEndElement();
-    if (d->actionType == ClientJoin || d->actionType == ClientLeave)
+    if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeEndElement();
+    }
 }
 /// \endcond

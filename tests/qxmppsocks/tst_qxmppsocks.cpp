@@ -216,8 +216,9 @@ void tst_QXmppSocks::testServer()
     if (!clientHandshakeWorks) {
         // consume any last data
         QByteArray data = client.readAll();
-        if (client.state() != QAbstractSocket::UnconnectedState)
+        if (client.state() != QAbstractSocket::UnconnectedState) {
             loop.exec();
+        }
 
         QCOMPARE(client.state(), QAbstractSocket::UnconnectedState);
 

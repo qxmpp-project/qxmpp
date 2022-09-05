@@ -53,18 +53,19 @@ QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
 /// \cond
 QXmppMucItem::Affiliation QXmppMucItem::affiliationFromString(const QString &affiliationStr)
 {
-    if (affiliationStr == QStringLiteral("owner"))
+    if (affiliationStr == QStringLiteral("owner")) {
         return QXmppMucItem::OwnerAffiliation;
-    else if (affiliationStr == QStringLiteral("admin"))
+    } else if (affiliationStr == QStringLiteral("admin")) {
         return QXmppMucItem::AdminAffiliation;
-    else if (affiliationStr == QStringLiteral("member"))
+    } else if (affiliationStr == QStringLiteral("member")) {
         return QXmppMucItem::MemberAffiliation;
-    else if (affiliationStr == QStringLiteral("outcast"))
+    } else if (affiliationStr == QStringLiteral("outcast")) {
         return QXmppMucItem::OutcastAffiliation;
-    else if (affiliationStr == QStringLiteral("none"))
+    } else if (affiliationStr == QStringLiteral("none")) {
         return QXmppMucItem::NoAffiliation;
-    else
+    } else {
         return QXmppMucItem::UnspecifiedAffiliation;
+    }
 }
 
 QString QXmppMucItem::affiliationToString(Affiliation affiliation)
@@ -153,16 +154,17 @@ QXmppMucItem::Role QXmppMucItem::role() const
 /// \cond
 QXmppMucItem::Role QXmppMucItem::roleFromString(const QString &roleStr)
 {
-    if (roleStr == QStringLiteral("moderator"))
+    if (roleStr == QStringLiteral("moderator")) {
         return QXmppMucItem::ModeratorRole;
-    else if (roleStr == QStringLiteral("participant"))
+    } else if (roleStr == QStringLiteral("participant")) {
         return QXmppMucItem::ParticipantRole;
-    else if (roleStr == QStringLiteral("visitor"))
+    } else if (roleStr == QStringLiteral("visitor")) {
         return QXmppMucItem::VisitorRole;
-    else if (roleStr == QStringLiteral("none"))
+    } else if (roleStr == QStringLiteral("none")) {
         return QXmppMucItem::NoRole;
-    else
+    } else {
         return QXmppMucItem::UnspecifiedRole;
+    }
 }
 
 QString QXmppMucItem::roleToString(Role role)
@@ -214,8 +216,9 @@ void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_actor);
         writer->writeEndElement();
     }
-    if (!m_reason.isEmpty())
+    if (!m_reason.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("reason"), m_reason);
+    }
     writer->writeEndElement();
 }
 /// \endcond
@@ -259,8 +262,9 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_muc_admin);
-    for (const QXmppMucItem &item : m_items)
+    for (const QXmppMucItem &item : m_items) {
         item.toXml(writer);
+    }
     writer->writeEndElement();
 }
 /// \endcond

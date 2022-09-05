@@ -24,13 +24,15 @@ QXmppVersionManager::QXmppVersionManager()
     : d(std::make_unique<QXmppVersionManagerPrivate>())
 {
     d->clientName = qApp->applicationName();
-    if (d->clientName.isEmpty())
+    if (d->clientName.isEmpty()) {
         d->clientName = "Based on QXmpp";
+    }
 
     d->clientOs = QSysInfo::prettyProductName();
     d->clientVersion = qApp->applicationVersion();
-    if (d->clientVersion.isEmpty())
+    if (d->clientVersion.isEmpty()) {
         d->clientVersion = QXmppVersion();
+    }
 }
 
 QXmppVersionManager::~QXmppVersionManager() = default;
@@ -44,10 +46,11 @@ QString QXmppVersionManager::requestVersion(const QString &jid)
     QXmppVersionIq request;
     request.setType(QXmppIq::Get);
     request.setTo(jid);
-    if (client()->sendPacket(request))
+    if (client()->sendPacket(request)) {
         return request.id();
-    else
+    } else {
         return QString();
+    }
 }
 
 /// Sets the local XMPP client's name.

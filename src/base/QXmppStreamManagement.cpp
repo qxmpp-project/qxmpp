@@ -54,10 +54,12 @@ void QXmppStreamManagementEnable::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("enable"));
     writer->writeDefaultNamespace(ns_stream_management);
-    if (m_resume)
+    if (m_resume) {
         writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
-    if (m_max > 0)
+    }
+    if (m_max > 0) {
         writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
+    }
     writer->writeEndElement();
 }
 
@@ -124,12 +126,15 @@ void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("enable"));
     writer->writeDefaultNamespace(ns_stream_management);
-    if (m_resume)
+    if (m_resume) {
         writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
-    if (m_max > 0)
+    }
+    if (m_max > 0) {
         writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
-    if (!m_location.isEmpty())
+    }
+    if (!m_location.isEmpty()) {
         writer->writeAttribute(QStringLiteral("location"), m_location);
+    }
     writer->writeEndElement();
 }
 
@@ -424,8 +429,9 @@ void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumb
 
 void QXmppStreamManager::handleAcknowledgement(const QDomElement &element)
 {
-    if (!m_enabled)
+    if (!m_enabled) {
         return;
+    }
 
     QXmppStreamManagementAck ack;
     ack.parse(element);
@@ -434,8 +440,9 @@ void QXmppStreamManager::handleAcknowledgement(const QDomElement &element)
 
 void QXmppStreamManager::sendAcknowledgement()
 {
-    if (!m_enabled)
+    if (!m_enabled) {
         return;
+    }
 
     // prepare packet
     QByteArray data;
@@ -449,8 +456,9 @@ void QXmppStreamManager::sendAcknowledgement()
 
 void QXmppStreamManager::sendAcknowledgementRequest()
 {
-    if (!m_enabled)
+    if (!m_enabled) {
         return;
+    }
 
     // prepare packet
     QByteArray data;

@@ -270,10 +270,11 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
     QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
     while (!subElement.isNull()) {
         if (subElement.namespaceURI() == tagNs) {
-            if (!subElement.firstChildElement(QStringLiteral("required")).isNull())
+            if (!subElement.firstChildElement(QStringLiteral("required")).isNull()) {
                 mode = QXmppStreamFeatures::Required;
-            else if (mode != QXmppStreamFeatures::Required)
+            } else if (mode != QXmppStreamFeatures::Required) {
                 mode = QXmppStreamFeatures::Enabled;
+            }
         }
         subElement = subElement.nextSiblingElement(tagName);
     }
@@ -330,8 +331,9 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
     if (mode != QXmppStreamFeatures::Disabled) {
         writer->writeStartElement(tagName);
         writer->writeDefaultNamespace(tagNs);
-        if (mode == QXmppStreamFeatures::Required)
+        if (mode == QXmppStreamFeatures::Required) {
             writer->writeEmptyElement(QStringLiteral("required"));
+        }
         writer->writeEndElement();
     }
 }
@@ -361,15 +363,17 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement(QStringLiteral("compression"));
         writer->writeDefaultNamespace(ns_compressFeature);
-        for (const auto &method : std::as_const(d->compressionMethods))
+        for (const auto &method : std::as_const(d->compressionMethods)) {
             writer->writeTextElement(QStringLiteral("method"), method);
+        }
         writer->writeEndElement();
     }
     if (!d->authMechanisms.isEmpty()) {
         writer->writeStartElement(QStringLiteral("mechanisms"));
         writer->writeDefaultNamespace(ns_sasl);
-        for (const auto &mechanism : std::as_const(d->authMechanisms))
+        for (const auto &mechanism : std::as_const(d->authMechanisms)) {
             writer->writeTextElement(QStringLiteral("mechanism"), mechanism);
+        }
         writer->writeEndElement();
     }
     writer->writeEndElement();

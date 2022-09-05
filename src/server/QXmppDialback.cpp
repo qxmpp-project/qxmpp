@@ -75,26 +75,29 @@ bool QXmppDialback::isDialback(const QDomElement &element)
 void QXmppDialback::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
-    if (element.tagName() == QLatin1String("result"))
+    if (element.tagName() == QLatin1String("result")) {
         m_command = Result;
-    else
+    } else {
         m_command = Verify;
+    }
     m_type = element.attribute("type");
     m_key = element.text();
 }
 
 void QXmppDialback::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    if (m_command == Result)
+    if (m_command == Result) {
         xmlWriter->writeStartElement("db:result");
-    else
+    } else {
         xmlWriter->writeStartElement("db:verify");
+    }
     helperToXmlAddAttribute(xmlWriter, "id", id());
     helperToXmlAddAttribute(xmlWriter, "to", to());
     helperToXmlAddAttribute(xmlWriter, "from", from());
     helperToXmlAddAttribute(xmlWriter, "type", m_type);
-    if (!m_key.isEmpty())
+    if (!m_key.isEmpty()) {
         xmlWriter->writeCharacters(m_key);
+    }
     xmlWriter->writeEndElement();
 }
 /// \endcond

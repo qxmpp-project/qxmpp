@@ -33,32 +33,42 @@ public:
 QXmppPubSubSubscribeOptions::PresenceStates QXmppPubSubSubscribeOptions::presenceStatesFromStringList(const QStringList &values)
 {
     PresenceStates states;
-    if (values.contains(QStringLiteral("away")))
+    if (values.contains(QStringLiteral("away"))) {
         states |= Away;
-    if (values.contains(QStringLiteral("chat")))
+    }
+    if (values.contains(QStringLiteral("chat"))) {
         states |= Chat;
-    if (values.contains(QStringLiteral("dnd")))
+    }
+    if (values.contains(QStringLiteral("dnd"))) {
         states |= DoNotDisturb;
-    if (values.contains(QStringLiteral("online")))
+    }
+    if (values.contains(QStringLiteral("online"))) {
         states |= Online;
-    if (values.contains(QStringLiteral("xa")))
+    }
+    if (values.contains(QStringLiteral("xa"))) {
         states |= ExtendedAway;
+    }
     return states;
 }
 
 QStringList QXmppPubSubSubscribeOptions::presenceStatesToStringList(PresenceStates states)
 {
     QStringList output;
-    if (states & Away)
+    if (states & Away) {
         output << QStringLiteral("away");
-    if (states & Chat)
+    }
+    if (states & Chat) {
         output << QStringLiteral("chat");
-    if (states & DoNotDisturb)
+    }
+    if (states & DoNotDisturb) {
         output << QStringLiteral("dnd");
-    if (states & Online)
+    }
+    if (states & Online) {
         output << QStringLiteral("online");
-    if (states & ExtendedAway)
+    }
+    if (states & ExtendedAway) {
         output << QStringLiteral("xa");
+    }
     return output;
 }
 

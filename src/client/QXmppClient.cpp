@@ -66,14 +66,15 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence &presence)
 
 int QXmppClientPrivate::getNextReconnectTime() const
 {
-    if (reconnectionTries < 5)
+    if (reconnectionTries < 5) {
         return 10 * 1000;
-    else if (reconnectionTries < 10)
+    } else if (reconnectionTries < 10) {
         return 20 * 1000;
-    else if (reconnectionTries < 15)
+    } else if (reconnectionTries < 15) {
         return 40 * 1000;
-    else
+    } else {
         return 60 * 1000;
+    }
 }
 
 QStringList QXmppClientPrivate::discoveryFeatures()
@@ -342,8 +343,9 @@ void QXmppClient::connectToServer(const QXmppConfiguration &config,
                                   const QXmppPresence &initialPresence)
 {
     // reset package cache from last connection
-    if (d->stream->configuration().jidBare() != config.jidBare())
+    if (d->stream->configuration().jidBare() != config.jidBare()) {
         d->stream->resetPacketCache();
+    }
 
     d->stream->configuration() = config;
     d->clientPresence = initialPresence;
@@ -610,8 +612,9 @@ void QXmppClient::disconnectFromServer()
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
     d->clientPresence.setStatusText("Logged out");
-    if (d->stream->isConnected())
+    if (d->stream->isConnected()) {
         sendPacket(d->clientPresence);
+    }
 
     d->stream->disconnectFromHost();
 }
@@ -671,8 +674,9 @@ void QXmppClient::setActive(bool active)
 QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
 {
     if (d->stream->isStreamManagementEnabled()) {
-        if (d->stream->isStreamResumed())
+        if (d->stream->isStreamResumed()) {
             return ResumedStream;
+        }
         return NewStream;
     }
     return NoStreamManagement;
@@ -725,13 +729,14 @@ void QXmppClient::sendMessage(const QString &bareJid, const QString &message)
 
 QXmppClient::State QXmppClient::state() const
 {
-    if (d->stream->isConnected())
+    if (d->stream->isConnected()) {
         return QXmppClient::ConnectedState;
-    else if (d->stream->socket()->state() != QAbstractSocket::UnconnectedState &&
-             d->stream->socket()->state() != QAbstractSocket::ClosingState)
+    } else if (d->stream->socket()->state() != QAbstractSocket::UnconnectedState &&
+               d->stream->socket()->state() != QAbstractSocket::ClosingState) {
         return QXmppClient::ConnectingState;
-    else
+    } else {
         return QXmppClient::DisconnectedState;
+    }
 }
 
 /// Returns the client's current presence.
@@ -766,14 +771,16 @@ void QXmppClient::setClientPresence(const QXmppPresence &presence)
 
         // NOTE: we can't call disconnect() because it alters
         // the client presence
-        if (d->stream->isConnected())
+        if (d->stream->isConnected()) {
             sendPacket(d->clientPresence);
+        }
 
         d->stream->disconnectFromHost();
-    } else if (d->stream->isConnected())
+    } else if (d->stream->isConnected()) {
         sendPacket(d->clientPresence);
-    else
+    } else {
         connectToServer(d->stream->configuration(), presence);
+    }
 }
 
 /// Returns the socket error if error() is QXmppClient::SocketError.
@@ -897,8 +904,9 @@ void QXmppClient::_q_streamConnected()
     emit stateChanged(QXmppClient::ConnectedState);
 
     // send initial presence
-    if (d->stream->isAuthenticated())
+    if (d->stream->isAuthenticated()) {
         sendPacket(d->clientPresence);
+    }
 }
 
 void QXmppClient::_q_streamDisconnected()
@@ -913,8 +921,9 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
     if (d->stream->configuration().autoReconnectionEnabled()) {
         if (err == QXmppClient::XmppStreamError) {
             // if we receive a resource conflict, inhibit reconnection
-            if (d->stream->xmppStreamError() == QXmppStanza::Error::Conflict)
+            if (d->stream->xmppStreamError() == QXmppStanza::Error::Conflict) {
                 d->receivedConflict = true;
+            }
         } else if (err == QXmppClient::SocketError && !d->receivedConflict) {
             // schedule reconnect
             d->reconnectionTimer->start(d->getNextReconnectTime());

@@ -429,8 +429,9 @@ bool QXmppMessage::isReceiptRequested() const
 void QXmppMessage::setReceiptRequested(bool requested)
 {
     d->receiptRequested = requested;
-    if (requested && id().isEmpty())
+    if (requested && id().isEmpty()) {
         generateAndSetNextId();
+    }
 }
 
 ///
@@ -551,8 +552,9 @@ bool QXmppMessage::isSlashMeCommand() const
 ///
 QString QXmppMessage::slashMeCommandText(const QString &body)
 {
-    if (isSlashMeCommand(body))
+    if (isSlashMeCommand(body)) {
         return body.mid(4);
+    }
     return {};
 }
 
@@ -1027,8 +1029,9 @@ void QXmppMessage::setEncryptionMethodNs(const QString &encryptionMethod)
 ///
 QString QXmppMessage::encryptionName() const
 {
-    if (!d->encryptionName.isEmpty())
+    if (!d->encryptionName.isEmpty()) {
         return d->encryptionName;
+    }
     return QXmpp::Private::encryptionToName(encryptionMethod());
 }
 
@@ -1100,8 +1103,9 @@ QString QXmppMessage::spoilerHint() const
 void QXmppMessage::setSpoilerHint(const QString &spoilerHint)
 {
     d->spoilerHint = spoilerHint;
-    if (!spoilerHint.isEmpty())
+    if (!spoilerHint.isEmpty()) {
         d->isSpoiler = true;
+    }
 }
 
 #ifdef BUILD_OMEMO
@@ -1213,10 +1217,11 @@ void QXmppMessage::parse(const QDomElement &element, QXmpp::SceMode sceMode)
 
     // message type
     int messageType = MESSAGE_TYPES.indexOf(element.attribute(QStringLiteral("type")));
-    if (messageType != -1)
+    if (messageType != -1) {
         d->type = static_cast<Type>(messageType);
-    else
+    } else {
         d->type = QXmppMessage::Normal;
+    }
 
     parseExtensions(element, sceMode);
 }
@@ -1402,8 +1407,9 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         // XEP-0085: Chat State Notifications
         if (element.namespaceURI() == ns_chat_states) {
             int i = CHAT_STATES.indexOf(element.tagName());
-            if (i > 0)
+            if (i > 0) {
                 d->state = static_cast<QXmppMessage::State>(i);
+            }
             return true;
         }
         // XEP-0184: Message Delivery Receipts
@@ -1411,8 +1417,9 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             d->receiptId = element.attribute(QStringLiteral("id"));
 
             // compatibility with old-style XEP
-            if (d->receiptId.isEmpty())
+            if (d->receiptId.isEmpty()) {
                 d->receiptId = id();
+            }
             return true;
         }
         if (checkElement(element, QStringLiteral("request"), ns_message_receipts)) {
@@ -1525,8 +1532,9 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement(QStringLiteral("stanza-id"));
             writer->writeDefaultNamespace(ns_sid);
             writer->writeAttribute(QStringLiteral("id"), d->stanzaId);
-            if (!d->stanzaIdBy.isNull())
+            if (!d->stanzaIdBy.isNull()) {
                 writer->writeAttribute(QStringLiteral("by"), d->stanzaIdBy);
+            }
             writer->writeEndElement();
         }
 
@@ -1668,16 +1676,19 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement(QStringLiteral("x"));
             writer->writeDefaultNamespace(ns_conference);
             writer->writeAttribute(QStringLiteral("jid"), d->mucInvitationJid);
-            if (!d->mucInvitationPassword.isEmpty())
+            if (!d->mucInvitationPassword.isEmpty()) {
                 writer->writeAttribute(QStringLiteral("password"), d->mucInvitationPassword);
-            if (!d->mucInvitationReason.isEmpty())
+            }
+            if (!d->mucInvitationReason.isEmpty()) {
                 writer->writeAttribute(QStringLiteral("reason"), d->mucInvitationReason);
+            }
             writer->writeEndElement();
         }
 
         // XEP-0231: Bits of Binary
-        for (const auto &data : std::as_const(d->bitsOfBinaryData))
+        for (const auto &data : std::as_const(d->bitsOfBinaryData)) {
             data.toXmlElementFromChild(writer);
+        }
 
         // XEP-0308: Last Message Correction
         if (!d->replaceId.isEmpty()) {

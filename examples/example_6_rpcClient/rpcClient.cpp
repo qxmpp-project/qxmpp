@@ -31,10 +31,11 @@ void rpcClient::slotInvokeRemoteMethod()
 {
     QXmppRemoteMethodResult methodResult = m_rpcManager->callRemoteMethod(
         m_remoteJid, "RemoteInterface.echoString", "This is a test");
-    if (methodResult.hasError)
+    if (methodResult.hasError) {
         qDebug() << "Error:" << methodResult.code << methodResult.errorMessage;
-    else
+    } else {
         qDebug() << "Result:" << methodResult.result;
+    }
 }
 
 /// A presence was received.
@@ -47,8 +48,9 @@ void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
     // do nothing
     if (QXmppUtils::jidToBareJid(configuration().jid()) == recipient ||
         QXmppUtils::jidToBareJid(presence.from()) != recipient ||
-        presence.type() != QXmppPresence::Available)
+        presence.type() != QXmppPresence::Available) {
         return;
+    }
 
     // invoke the remote method in 1 second
     m_remoteJid = presence.from();

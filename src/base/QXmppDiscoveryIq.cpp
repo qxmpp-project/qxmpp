@@ -13,25 +13,29 @@
 
 static bool identityLessThan(const QXmppDiscoveryIq::Identity &i1, const QXmppDiscoveryIq::Identity &i2)
 {
-    if (i1.category() < i2.category())
+    if (i1.category() < i2.category()) {
         return true;
-    else if (i1.category() > i2.category())
+    } else if (i1.category() > i2.category()) {
         return false;
+    }
 
-    if (i1.type() < i2.type())
+    if (i1.type() < i2.type()) {
         return true;
-    else if (i1.type() > i2.type())
+    } else if (i1.type() > i2.type()) {
         return false;
+    }
 
-    if (i1.language() < i2.language())
+    if (i1.language() < i2.language()) {
         return true;
-    else if (i1.language() > i2.language())
+    } else if (i1.language() > i2.language()) {
         return false;
+    }
 
-    if (i1.name() < i2.name())
+    if (i1.name() < i2.name()) {
         return true;
-    else if (i1.name() > i2.name())
+    } else if (i1.name() > i2.name()) {
         return false;
+    }
 
     return false;
 }
@@ -381,10 +385,12 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     QStringList sortedFeatures = d->features;
     std::sort(sortedFeatures.begin(), sortedFeatures.end());
     sortedFeatures.removeDuplicates();
-    for (const auto &identity : sortedIdentities)
+    for (const auto &identity : sortedIdentities) {
         S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
-    for (const auto &feature : sortedFeatures)
+    }
+    for (const auto &feature : sortedFeatures) {
         S += feature + QLatin1String("<");
+    }
 
     if (!d->form.isNull()) {
         QMap<QString, QXmppDataForm::Field> fieldMap;
@@ -437,10 +443,11 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");
     d->queryNode = queryElement.attribute("node");
-    if (queryElement.namespaceURI() == ns_disco_items)
+    if (queryElement.namespaceURI() == ns_disco_items) {
         d->queryType = ItemsQuery;
-    else
+    } else {
         d->queryType = InfoQuery;
+    }
 
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull()) {

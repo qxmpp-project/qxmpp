@@ -38,10 +38,11 @@ QXmppIncomingServerPrivate::QXmppIncomingServerPrivate(QXmppIncomingServer *qq)
 QString QXmppIncomingServerPrivate::origin() const
 {
     QSslSocket *socket = q->socket();
-    if (socket)
+    if (socket) {
         return socket->peerAddress().toString() + " " + QString::number(socket->peerPort());
-    else
+    } else {
         return "<unknown>";
+    }
 }
 
 /// Constructs a new incoming server stream.
@@ -87,8 +88,9 @@ QString QXmppIncomingServer::localStreamId() const
 void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 {
     const QString from = streamElement.attribute("from");
-    if (!from.isEmpty())
+    if (!from.isEmpty()) {
         info(QString("Incoming server stream from %1 on %2").arg(from, d->origin()));
+    }
 
     // start stream
     d->localStreamId = QXmppUtils::generateStanzaHash().toLatin1();
@@ -104,8 +106,9 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 
     // send stream features
     QXmppStreamFeatures features;
-    if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
+    if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull()) {
         features.setTlsMode(QXmppStreamFeatures::Enabled);
+    }
     sendPacket(features);
 }
 
@@ -173,8 +176,9 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     if (!stream ||
         dialback.command() != QXmppDialback::Verify ||
         dialback.id() != d->localStreamId ||
-        dialback.from() != stream->remoteDomain())
+        dialback.from() != stream->remoteDomain()) {
         return;
+    }
 
     // relay verify response
     QXmppDialback response;
@@ -189,8 +193,9 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
         info(QString("Verified incoming domain '%1' on %2").arg(dialback.from(), d->origin()));
         const bool wasConnected = !d->authenticated.isEmpty();
         d->authenticated.insert(dialback.from());
-        if (!wasConnected)
+        if (!wasConnected) {
             emit connected();
+        }
     } else {
         warning(QString("Failed to verify incoming domain '%1' on %2").arg(dialback.from(), d->origin()));
         disconnectFromHost();

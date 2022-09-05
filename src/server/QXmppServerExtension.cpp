@@ -50,8 +50,9 @@ QStringList QXmppServerExtension::discoveryItems() const
 QString QXmppServerExtension::extensionName() const
 {
     int index = metaObject()->indexOfClassInfo("ExtensionName");
-    if (index < 0)
+    if (index < 0) {
         return QString();
+    }
     const char *name = metaObject()->classInfo(index).value();
     return QString::fromLatin1(name);
 }

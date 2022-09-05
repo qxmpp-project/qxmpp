@@ -12,20 +12,21 @@
 
 static QString getImageType(const QByteArray &contents)
 {
-    if (contents.startsWith("\x89PNG\x0d\x0a\x1a\x0a"))
+    if (contents.startsWith("\x89PNG\x0d\x0a\x1a\x0a")) {
         return QStringLiteral("image/png");
-    else if (contents.startsWith("\x8aMNG"))
+    } else if (contents.startsWith("\x8aMNG")) {
         return QStringLiteral("video/x-mng");
-    else if (contents.startsWith("GIF8"))
+    } else if (contents.startsWith("GIF8")) {
         return QStringLiteral("image/gif");
-    else if (contents.startsWith("BM"))
+    } else if (contents.startsWith("BM")) {
         return QStringLiteral("image/bmp");
-    else if (contents.contains("/* XPM */"))
+    } else if (contents.contains("/* XPM */")) {
         return QStringLiteral("image/x-xpm");
-    else if (contents.contains("<?xml") && contents.contains("<svg"))
+    } else if (contents.contains("<?xml") && contents.contains("<svg")) {
         return QStringLiteral("image/svg+xml");
-    else if (contents.startsWith("\xFF\xD8\xFF\xE0"))
+    } else if (contents.startsWith("\xFF\xD8\xFF\xE0")) {
         return QStringLiteral("image/jpeg");
+    }
     return QStringLiteral("image/unknown");
 }
 
@@ -163,14 +164,18 @@ void QXmppVCardAddress::setType(QXmppVCardAddress::Type type)
 /// \cond
 void QXmppVCardAddress::parse(const QDomElement &element)
 {
-    if (!element.firstChildElement(QStringLiteral("HOME")).isNull())
+    if (!element.firstChildElement(QStringLiteral("HOME")).isNull()) {
         d->type |= Home;
-    if (!element.firstChildElement(QStringLiteral("WORK")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("WORK")).isNull()) {
         d->type |= Work;
-    if (!element.firstChildElement(QStringLiteral("POSTAL")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("POSTAL")).isNull()) {
         d->type |= Postal;
-    if (!element.firstChildElement(QStringLiteral("PREF")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("PREF")).isNull()) {
         d->type |= Preferred;
+    }
 
     d->country = element.firstChildElement(QStringLiteral("CTRY")).text();
     d->locality = element.firstChildElement(QStringLiteral("LOCALITY")).text();
@@ -182,25 +187,34 @@ void QXmppVCardAddress::parse(const QDomElement &element)
 void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("ADR"));
-    if (d->type & Home)
+    if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
-    if (d->type & Work)
+    }
+    if (d->type & Work) {
         writer->writeEmptyElement(QStringLiteral("WORK"));
-    if (d->type & Postal)
+    }
+    if (d->type & Postal) {
         writer->writeEmptyElement(QStringLiteral("POSTAL"));
-    if (d->type & Preferred)
+    }
+    if (d->type & Preferred) {
         writer->writeEmptyElement(QStringLiteral("PREF"));
+    }
 
-    if (!d->country.isEmpty())
+    if (!d->country.isEmpty()) {
         writer->writeTextElement(QStringLiteral("CTRY"), d->country);
-    if (!d->locality.isEmpty())
+    }
+    if (!d->locality.isEmpty()) {
         writer->writeTextElement(QStringLiteral("LOCALITY"), d->locality);
-    if (!d->postcode.isEmpty())
+    }
+    if (!d->postcode.isEmpty()) {
         writer->writeTextElement(QStringLiteral("PCODE"), d->postcode);
-    if (!d->region.isEmpty())
+    }
+    if (!d->region.isEmpty()) {
         writer->writeTextElement(QStringLiteral("REGION"), d->region);
-    if (!d->street.isEmpty())
+    }
+    if (!d->street.isEmpty()) {
         writer->writeTextElement(QStringLiteral("STREET"), d->street);
+    }
 
     writer->writeEndElement();
 }
@@ -286,32 +300,42 @@ void QXmppVCardEmail::setType(QXmppVCardEmail::Type type)
 /// \cond
 void QXmppVCardEmail::parse(const QDomElement &element)
 {
-    if (!element.firstChildElement(QStringLiteral("HOME")).isNull())
+    if (!element.firstChildElement(QStringLiteral("HOME")).isNull()) {
         d->type |= Home;
-    if (!element.firstChildElement(QStringLiteral("WORK")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("WORK")).isNull()) {
         d->type |= Work;
-    if (!element.firstChildElement(QStringLiteral("INTERNET")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("INTERNET")).isNull()) {
         d->type |= Internet;
-    if (!element.firstChildElement(QStringLiteral("PREF")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("PREF")).isNull()) {
         d->type |= Preferred;
-    if (!element.firstChildElement(QStringLiteral("X400")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("X400")).isNull()) {
         d->type |= X400;
+    }
     d->address = element.firstChildElement(QStringLiteral("USERID")).text();
 }
 
 void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("EMAIL"));
-    if (d->type & Home)
+    if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
-    if (d->type & Work)
+    }
+    if (d->type & Work) {
         writer->writeEmptyElement(QStringLiteral("WORK"));
-    if (d->type & Internet)
+    }
+    if (d->type & Internet) {
         writer->writeEmptyElement(QStringLiteral("INTERNET"));
-    if (d->type & Preferred)
+    }
+    if (d->type & Preferred) {
         writer->writeEmptyElement(QStringLiteral("PREF"));
-    if (d->type & X400)
+    }
+    if (d->type & X400) {
         writer->writeEmptyElement(QStringLiteral("X400"));
+    }
     writer->writeTextElement(QStringLiteral("USERID"), d->address);
     writer->writeEndElement();
 }
@@ -397,64 +421,90 @@ void QXmppVCardPhone::setType(QXmppVCardPhone::Type type)
 /// \cond
 void QXmppVCardPhone::parse(const QDomElement &element)
 {
-    if (!element.firstChildElement(QStringLiteral("HOME")).isNull())
+    if (!element.firstChildElement(QStringLiteral("HOME")).isNull()) {
         d->type |= Home;
-    if (!element.firstChildElement(QStringLiteral("WORK")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("WORK")).isNull()) {
         d->type |= Work;
-    if (!element.firstChildElement(QStringLiteral("VOICE")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("VOICE")).isNull()) {
         d->type |= Voice;
-    if (!element.firstChildElement(QStringLiteral("FAX")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("FAX")).isNull()) {
         d->type |= Fax;
-    if (!element.firstChildElement(QStringLiteral("PAGER")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("PAGER")).isNull()) {
         d->type |= Pager;
-    if (!element.firstChildElement(QStringLiteral("MSG")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("MSG")).isNull()) {
         d->type |= Messaging;
-    if (!element.firstChildElement(QStringLiteral("CELL")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("CELL")).isNull()) {
         d->type |= Cell;
-    if (!element.firstChildElement(QStringLiteral("VIDEO")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("VIDEO")).isNull()) {
         d->type |= Video;
-    if (!element.firstChildElement(QStringLiteral("BBS")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("BBS")).isNull()) {
         d->type |= BBS;
-    if (!element.firstChildElement(QStringLiteral("MODEM")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("MODEM")).isNull()) {
         d->type |= Modem;
-    if (!element.firstChildElement(QStringLiteral("ISDN")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("ISDN")).isNull()) {
         d->type |= ISDN;
-    if (!element.firstChildElement(QStringLiteral("PCS")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("PCS")).isNull()) {
         d->type |= PCS;
-    if (!element.firstChildElement(QStringLiteral("PREF")).isNull())
+    }
+    if (!element.firstChildElement(QStringLiteral("PREF")).isNull()) {
         d->type |= Preferred;
+    }
     d->number = element.firstChildElement(QStringLiteral("NUMBER")).text();
 }
 
 void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("TEL"));
-    if (d->type & Home)
+    if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
-    if (d->type & Work)
+    }
+    if (d->type & Work) {
         writer->writeEmptyElement(QStringLiteral("WORK"));
-    if (d->type & Voice)
+    }
+    if (d->type & Voice) {
         writer->writeEmptyElement(QStringLiteral("VOICE"));
-    if (d->type & Fax)
+    }
+    if (d->type & Fax) {
         writer->writeEmptyElement(QStringLiteral("FAX"));
-    if (d->type & Pager)
+    }
+    if (d->type & Pager) {
         writer->writeEmptyElement(QStringLiteral("PAGER"));
-    if (d->type & Messaging)
+    }
+    if (d->type & Messaging) {
         writer->writeEmptyElement(QStringLiteral("MSG"));
-    if (d->type & Cell)
+    }
+    if (d->type & Cell) {
         writer->writeEmptyElement(QStringLiteral("CELL"));
-    if (d->type & Video)
+    }
+    if (d->type & Video) {
         writer->writeEmptyElement(QStringLiteral("VIDEO"));
-    if (d->type & BBS)
+    }
+    if (d->type & BBS) {
         writer->writeEmptyElement(QStringLiteral("BBS"));
-    if (d->type & Modem)
+    }
+    if (d->type & Modem) {
         writer->writeEmptyElement(QStringLiteral("MODEM"));
-    if (d->type & ISDN)
+    }
+    if (d->type & ISDN) {
         writer->writeEmptyElement(QStringLiteral("ISDN"));
-    if (d->type & PCS)
+    }
+    if (d->type & PCS) {
         writer->writeEmptyElement(QStringLiteral("PCS"));
-    if (d->type & Preferred)
+    }
+    if (d->type & Preferred) {
         writer->writeEmptyElement(QStringLiteral("PREF"));
+    }
     writer->writeTextElement(QStringLiteral("NUMBER"), d->number);
     writer->writeEndElement();
 }
@@ -710,10 +760,11 @@ void QXmppVCardIq::setDescription(const QString &description)
 
 QString QXmppVCardIq::email() const
 {
-    if (d->emails.isEmpty())
+    if (d->emails.isEmpty()) {
         return QString();
-    else
+    } else {
         return d->emails.first().address();
+    }
 }
 
 /// Sets the email address.
@@ -976,44 +1027,56 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("vCard"));
     writer->writeDefaultNamespace(ns_vcard);
-    for (const QXmppVCardAddress &address : d->addresses)
+    for (const QXmppVCardAddress &address : d->addresses) {
         address.toXml(writer);
-    if (d->birthday.isValid())
+    }
+    if (d->birthday.isValid()) {
         helperToXmlAddTextElement(writer, QStringLiteral("BDAY"), d->birthday.toString(QStringLiteral("yyyy-MM-dd")));
-    if (!d->description.isEmpty())
+    }
+    if (!d->description.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("DESC"), d->description);
-    for (const QXmppVCardEmail &email : d->emails)
+    }
+    for (const QXmppVCardEmail &email : d->emails) {
         email.toXml(writer);
-    if (!d->fullName.isEmpty())
+    }
+    if (!d->fullName.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("FN"), d->fullName);
-    if (!d->nickName.isEmpty())
+    }
+    if (!d->nickName.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("NICKNAME"), d->nickName);
+    }
     if (!d->firstName.isEmpty() ||
         !d->lastName.isEmpty() ||
         !d->middleName.isEmpty()) {
         writer->writeStartElement("N");
-        if (!d->firstName.isEmpty())
+        if (!d->firstName.isEmpty()) {
             helperToXmlAddTextElement(writer, QStringLiteral("GIVEN"), d->firstName);
-        if (!d->lastName.isEmpty())
+        }
+        if (!d->lastName.isEmpty()) {
             helperToXmlAddTextElement(writer, QStringLiteral("FAMILY"), d->lastName);
-        if (!d->middleName.isEmpty())
+        }
+        if (!d->middleName.isEmpty()) {
             helperToXmlAddTextElement(writer, QStringLiteral("MIDDLE"), d->middleName);
+        }
         writer->writeEndElement();
     }
 
-    for (const QXmppVCardPhone &phone : d->phones)
+    for (const QXmppVCardPhone &phone : d->phones) {
         phone.toXml(writer);
+    }
     if (!photo().isEmpty()) {
         writer->writeStartElement(QStringLiteral("PHOTO"));
         QString photoType = d->photoType;
-        if (photoType.isEmpty())
+        if (photoType.isEmpty()) {
             photoType = getImageType(d->photo);
+        }
         helperToXmlAddTextElement(writer, QStringLiteral("TYPE"), photoType);
         helperToXmlAddTextElement(writer, QStringLiteral("BINVAL"), d->photo.toBase64());
         writer->writeEndElement();
     }
-    if (!d->url.isEmpty())
+    if (!d->url.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("URL"), d->url);
+    }
 
     d->organization.toXml(writer);
 

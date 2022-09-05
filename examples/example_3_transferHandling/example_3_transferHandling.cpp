@@ -84,8 +84,9 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
     // do nothing
     if (m_recipient.isEmpty() ||
         QXmppUtils::jidToBareJid(presence.from()) != m_recipient ||
-        presence.type() != QXmppPresence::Available)
+        presence.type() != QXmppPresence::Available) {
         return;
+    }
 
     // send the file and connect to the job's signals
     QXmppTransferJob *job = transferManager->sendFile(presence.from(), ":/example_3_transferHandling.cpp", "example source code");

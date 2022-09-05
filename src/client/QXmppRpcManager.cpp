@@ -34,8 +34,9 @@ void QXmppRpcManager::invokeInterfaceMethod(const QXmppRpcInvokeIq &iq)
     QXmppStanza::Error error;
 
     const QStringList methodBits = iq.method().split('.');
-    if (methodBits.size() != 2)
+    if (methodBits.size() != 2) {
         return;
+    }
     const QString interface = methodBits.first();
     const QString method = methodBits.last();
     QXmppInvokable *iface = m_interfaces.value(interface);
@@ -90,26 +91,36 @@ QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod(const QString &jid,
                                                           const QVariant &arg10)
 {
     QVariantList args;
-    if (arg1.isValid())
+    if (arg1.isValid()) {
         args << arg1;
-    if (arg2.isValid())
+    }
+    if (arg2.isValid()) {
         args << arg2;
-    if (arg3.isValid())
+    }
+    if (arg3.isValid()) {
         args << arg3;
-    if (arg4.isValid())
+    }
+    if (arg4.isValid()) {
         args << arg4;
-    if (arg5.isValid())
+    }
+    if (arg5.isValid()) {
         args << arg5;
-    if (arg6.isValid())
+    }
+    if (arg6.isValid()) {
         args << arg6;
-    if (arg7.isValid())
+    }
+    if (arg7.isValid()) {
         args << arg7;
-    if (arg8.isValid())
+    }
+    if (arg8.isValid()) {
         args << arg8;
-    if (arg9.isValid())
+    }
+    if (arg9.isValid()) {
         args << arg9;
-    if (arg10.isValid())
+    }
+    if (arg10.isValid()) {
         args << arg10;
+    }
 
     bool check;
     Q_UNUSED(check)

@@ -81,55 +81,56 @@ QString conditionToString(QXmppStanza::Error::Condition condition)
 
 std::optional<QXmppStanza::Error::Condition> conditionFromString(const QString &string)
 {
-    if (string == "bad-request")
+    if (string == "bad-request") {
         return QXmppStanza::Error::BadRequest;
-    else if (string == "conflict")
+    } else if (string == "conflict") {
         return QXmppStanza::Error::Conflict;
-    else if (string == "feature-not-implemented")
+    } else if (string == "feature-not-implemented") {
         return QXmppStanza::Error::FeatureNotImplemented;
-    else if (string == "forbidden")
+    } else if (string == "forbidden") {
         return QXmppStanza::Error::Forbidden;
-    else if (string == "gone")
+    } else if (string == "gone") {
         return QXmppStanza::Error::Gone;
-    else if (string == "internal-server-error")
+    } else if (string == "internal-server-error") {
         return QXmppStanza::Error::InternalServerError;
-    else if (string == "item-not-found")
+    } else if (string == "item-not-found") {
         return QXmppStanza::Error::ItemNotFound;
-    else if (string == "jid-malformed")
+    } else if (string == "jid-malformed") {
         return QXmppStanza::Error::JidMalformed;
-    else if (string == "not-acceptable")
+    } else if (string == "not-acceptable") {
         return QXmppStanza::Error::NotAcceptable;
-    else if (string == "not-allowed")
+    } else if (string == "not-allowed") {
         return QXmppStanza::Error::NotAllowed;
-    else if (string == "not-authorized")
+    } else if (string == "not-authorized") {
         return QXmppStanza::Error::NotAuthorized;
-    else if (string == "payment-required") {
+    } else if (string == "payment-required") {
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
         return QXmppStanza::Error::PaymentRequired;
         QT_WARNING_POP
-    } else if (string == "policy-violation")
+    } else if (string == "policy-violation") {
         return QXmppStanza::Error::PolicyViolation;
-    else if (string == "recipient-unavailable")
+    } else if (string == "recipient-unavailable") {
         return QXmppStanza::Error::RecipientUnavailable;
-    else if (string == "redirect")
+    } else if (string == "redirect") {
         return QXmppStanza::Error::Redirect;
-    else if (string == "registration-required")
+    } else if (string == "registration-required") {
         return QXmppStanza::Error::RegistrationRequired;
-    else if (string == "remote-server-not-found")
+    } else if (string == "remote-server-not-found") {
         return QXmppStanza::Error::RemoteServerNotFound;
-    else if (string == "remote-server-timeout")
+    } else if (string == "remote-server-timeout") {
         return QXmppStanza::Error::RemoteServerTimeout;
-    else if (string == "resource-constraint")
+    } else if (string == "resource-constraint") {
         return QXmppStanza::Error::ResourceConstraint;
-    else if (string == "service-unavailable")
+    } else if (string == "service-unavailable") {
         return QXmppStanza::Error::ServiceUnavailable;
-    else if (string == "subscription-required")
+    } else if (string == "subscription-required") {
         return QXmppStanza::Error::SubscriptionRequired;
-    else if (string == "undefined-condition")
+    } else if (string == "undefined-condition") {
         return QXmppStanza::Error::UndefinedCondition;
-    else if (string == "unexpected-request")
+    } else if (string == "unexpected-request") {
         return QXmppStanza::Error::UnexpectedRequest;
+    }
     return std::nullopt;
 }
 
@@ -152,16 +153,17 @@ QString typeToString(QXmppStanza::Error::Type type)
 
 std::optional<QXmppStanza::Error::Type> typeFromString(const QString &string)
 {
-    if (string == QStringLiteral("cancel"))
+    if (string == QStringLiteral("cancel")) {
         return QXmppStanza::Error::Cancel;
-    else if (string == QStringLiteral("continue"))
+    } else if (string == QStringLiteral("continue")) {
         return QXmppStanza::Error::Continue;
-    else if (string == QStringLiteral("modify"))
+    } else if (string == QStringLiteral("modify")) {
         return QXmppStanza::Error::Modify;
-    else if (string == QStringLiteral("auth"))
+    } else if (string == QStringLiteral("auth")) {
         return QXmppStanza::Error::Auth;
-    else if (string == QStringLiteral("wait"))
+    } else if (string == QStringLiteral("wait")) {
         return QXmppStanza::Error::Wait;
+    }
     return std::nullopt;
 }
 
@@ -280,10 +282,12 @@ void QXmppExtendedAddress::parse(const QDomElement &element)
 void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement(QStringLiteral("address"));
-    if (d->delivered)
+    if (d->delivered) {
         xmlWriter->writeAttribute(QStringLiteral("delivered"), QStringLiteral("true"));
-    if (!d->description.isEmpty())
+    }
+    if (!d->description.isEmpty()) {
         xmlWriter->writeAttribute(QStringLiteral("desc"), d->description);
+    }
     xmlWriter->writeAttribute(QStringLiteral("jid"), d->jid);
     xmlWriter->writeAttribute(QStringLiteral("type"), d->type);
     xmlWriter->writeEndElement();
@@ -623,8 +627,9 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
                     d->redirectionUri = element.text();
 
                     // .text() returns empty string if nothing was set
-                    if (d->redirectionUri.isEmpty())
+                    if (d->redirectionUri.isEmpty()) {
                         d->redirectionUri.clear();
+                    }
                 }
             }
         } else if (element.namespaceURI() == ns_http_upload) {
@@ -647,8 +652,9 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
 
 void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 {
-    if (!d->condition && !d->type)
+    if (!d->condition && !d->type) {
         return;
+    }
 
     writer->writeStartElement(QStringLiteral("error"));
     helperToXmlAddAttribute(writer, QStringLiteral("by"), d->by);
@@ -656,8 +662,9 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
         writer->writeAttribute(QStringLiteral("type"), typeToString(*d->type));
     }
 
-    if (d->code > 0)
+    if (d->code > 0) {
         helperToXmlAddAttribute(writer, QStringLiteral("code"), QString::number(d->code));
+    }
 
     if (d->condition) {
         writer->writeStartElement(conditionToString(*d->condition));
@@ -1045,16 +1052,18 @@ void QXmppStanza::parse(const QDomElement &element)
     d->lang = element.attribute("lang");
 
     QDomElement errorElement = element.firstChildElement("error");
-    if (!errorElement.isNull())
+    if (!errorElement.isNull()) {
         d->error.parse(errorElement);
+    }
 
     // XEP-0033: Extended Stanza Addressing
     QDomElement addressElement = element.firstChildElement("addresses").firstChildElement("address");
     while (!addressElement.isNull()) {
         QXmppExtendedAddress address;
         address.parse(addressElement);
-        if (address.isValid())
+        if (address.isValid()) {
             d->extendedAddresses << address;
+        }
         addressElement = addressElement.nextSiblingElement("address");
     }
 }
@@ -1065,14 +1074,16 @@ void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter, QXmpp::SceMode sc
     if (sceMode & QXmpp::ScePublic && !d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
         xmlWriter->writeDefaultNamespace(ns_extended_addressing);
-        for (const auto &address : d->extendedAddresses)
+        for (const auto &address : d->extendedAddresses) {
             address.toXml(xmlWriter);
+        }
         xmlWriter->writeEndElement();
     }
 
     // other extensions
-    for (const auto &extension : d->extensions)
+    for (const auto &extension : d->extensions) {
         extension.toXml(xmlWriter);
+    }
 }
 
 /// \endcond

@@ -196,8 +196,9 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
                 d->ready = true;
 
                 // send queued data
-                for (const auto &data : std::as_const(d->dataQueue))
+                for (const auto &data : std::as_const(d->dataQueue)) {
                     sendData(data);
+                }
                 d->dataQueue.clear();
 
                 // emit signal
@@ -251,10 +252,11 @@ void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 
 void QXmppOutgoingServer::queueData(const QByteArray &data)
 {
-    if (isConnected())
+    if (isConnected()) {
         sendData(data);
-    else
+    } else {
         d->dataQueue.append(data);
+    }
 }
 
 /// Returns the remote server's domain.
@@ -291,8 +293,9 @@ void QXmppOutgoingServer::sendDialback()
 void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
 {
     warning("SSL errors");
-    for (int i = 0; i < errors.count(); ++i)
+    for (int i = 0; i < errors.count(); ++i) {
         warning(errors.at(i).errorString());
+    }
     socket()->ignoreSslErrors();
 }
 

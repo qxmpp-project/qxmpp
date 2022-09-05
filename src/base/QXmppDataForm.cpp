@@ -63,14 +63,18 @@ QString fieldTypeToString(QXmppDataForm::Field::Type type)
 
 std::optional<QXmppDataForm::Type> formTypeFromString(const QString &type)
 {
-    if (type == "form")
+    if (type == "form") {
         return QXmppDataForm::Form;
-    if (type == "submit")
+    }
+    if (type == "submit") {
         return QXmppDataForm::Submit;
-    if (type == "cancel")
+    }
+    if (type == "cancel") {
         return QXmppDataForm::Cancel;
-    if (type == "result")
+    }
+    if (type == "result") {
         return QXmppDataForm::Result;
+    }
     return {};
 }
 
@@ -786,8 +790,9 @@ bool QXmppDataForm::isNull() const
 /// \cond
 void QXmppDataForm::parse(const QDomElement &element)
 {
-    if (element.isNull())
+    if (element.isNull()) {
         return;
+    }
 
     /* form type */
     if (const auto type = formTypeFromString(element.attribute("type"))) {
@@ -879,8 +884,9 @@ void QXmppDataForm::parse(const QDomElement &element)
 
 void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 {
-    if (isNull())
+    if (isNull()) {
         return;
+    }
 
     writer->writeStartElement("x");
     writer->writeDefaultNamespace(ns_data);
@@ -889,10 +895,12 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute("type", formTypeToString(d->type));
 
     /* form properties */
-    if (!d->title.isEmpty())
+    if (!d->title.isEmpty()) {
         writer->writeTextElement("title", d->title);
-    if (!d->instructions.isEmpty())
+    }
+    if (!d->instructions.isEmpty()) {
         writer->writeTextElement("instructions", d->instructions);
+    }
 
     for (const auto &field : d->fields) {
         writer->writeStartElement("field");
@@ -930,16 +938,18 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             writer->writeDefaultNamespace(ns_media_element);
 
             // media width and height
-            if (field.mediaSize().width() > 0)
+            if (field.mediaSize().width() > 0) {
                 helperToXmlAddAttribute(
                     writer,
                     QStringLiteral("width"),
                     QString::number(field.mediaSize().width()));
-            if (field.mediaSize().height() > 0)
+            }
+            if (field.mediaSize().height() > 0) {
                 helperToXmlAddAttribute(
                     writer,
                     QStringLiteral("height"),
                     QString::number(field.mediaSize().height()));
+            }
 
             const auto sources = field.mediaSources();
             for (const auto &source : sources) {
@@ -969,10 +979,12 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         }
 
         /* other properties */
-        if (!field.description().isEmpty())
+        if (!field.description().isEmpty()) {
             helperToXmlAddTextElement(writer, "description", field.description());
-        if (field.isRequired())
+        }
+        if (field.isRequired()) {
             helperToXmlAddTextElement(writer, "required", "");
+        }
 
         writer->writeEndElement();
     }

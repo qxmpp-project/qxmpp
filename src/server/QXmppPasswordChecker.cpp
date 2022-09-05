@@ -148,8 +148,9 @@ QXmppPasswordReply *QXmppPasswordChecker::checkPassword(const QXmppPasswordReque
     QString secret;
     QXmppPasswordReply::Error error = getPassword(request, secret);
     if (error == QXmppPasswordReply::NoError) {
-        if (request.password() != secret)
+        if (request.password() != secret) {
             reply->setError(QXmppPasswordReply::AuthorizationError);
+        }
     } else {
         reply->setError(error);
     }
