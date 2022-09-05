@@ -162,3 +162,43 @@ void QXmppHashUsed::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 /// \endcond
+
+///
+/// Returns the algorithm used to create the hash.
+///
+HashAlgorithm QXmppHash::algorithm() const
+{
+    return m_algorithm;
+}
+
+///
+/// Set the algorithm that was used to create the hashed data
+///
+void QXmppHash::setAlgorithm(QXmpp::HashAlgorithm algorithm)
+{
+    m_algorithm = algorithm;
+}
+
+///
+/// Returns the binary data of the hash.
+///
+QByteArray QXmppHash::hash() const
+{
+    return m_hash;
+}
+
+///
+/// Set the hashed data.
+///
+void QXmppHash::setHash(const QByteArray &data)
+{
+    m_hash = data;
+}
+
+///
+/// Returns the algorithm that is supposed to be used for hashing.
+///
+HashAlgorithm QXmppHashUsed::algorithm() const
+{
+    return m_algorithm;
+}
