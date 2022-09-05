@@ -141,6 +141,8 @@ extern const char *ns_conference;
 extern const char *ns_carbons;
 // XEP-0297: Stanza Forwarding
 extern const char *ns_forwarding;
+// XEP-0300: Use of Cryptographic Hash Functions in XMPP
+extern const char *ns_hashes;
 // XEP-0308: Last Message Correction
 extern const char *ns_message_correct;
 // XEP-0313: Message Archive Management
