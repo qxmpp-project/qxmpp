@@ -137,6 +137,8 @@ extern const char *ns_attention;
 extern const char *ns_bob;
 // XEP-0249: Direct MUC Invitations
 extern const char *ns_conference;
+// XEP-0264: Jingle Content Thumbnails
+extern const char *ns_thumbs;
 // XEP-0280: Message Carbons
 extern const char *ns_carbons;
 // XEP-0297: Stanza Forwarding
