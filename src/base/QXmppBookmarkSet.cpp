@@ -190,12 +190,14 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_bookmarks);
     for (const auto &conference : m_conferences) {
         writer->writeStartElement(QStringLiteral("conference"));
-        if (conference.autoJoin())
+        if (conference.autoJoin()) {
             helperToXmlAddAttribute(writer, QStringLiteral("autojoin"), QStringLiteral("true"));
+        }
         helperToXmlAddAttribute(writer, QStringLiteral("jid"), conference.jid());
         helperToXmlAddAttribute(writer, QStringLiteral("name"), conference.name());
-        if (!conference.nickName().isEmpty())
+        if (!conference.nickName().isEmpty()) {
             helperToXmlAddTextElement(writer, QStringLiteral("nick"), conference.nickName());
+        }
         writer->writeEndElement();
     }
     for (const auto &url : m_urls) {

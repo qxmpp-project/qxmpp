@@ -145,8 +145,9 @@ bool QXmppStream::isConnected() const
 bool QXmppStream::sendData(const QByteArray &data)
 {
     logSent(QString::fromUtf8(data));
-    if (!d->socket || d->socket->state() != QAbstractSocket::ConnectedState)
+    if (!d->socket || d->socket->state() != QAbstractSocket::ConnectedState) {
         return false;
+    }
     return d->socket->write(data) == data.size();
 }
 
@@ -315,8 +316,9 @@ QSslSocket *QXmppStream::socket() const
 void QXmppStream::setSocket(QSslSocket *socket)
 {
     d->socket = socket;
-    if (!d->socket)
+    if (!d->socket) {
         return;
+    }
 
     // socket events
     connect(socket, &QAbstractSocket::connected, this, &QXmppStream::_q_socketConnected);
@@ -425,8 +427,9 @@ void QXmppStream::processData(const QString &data)
     // Try to parse the wrapped XML
     //
     QDomDocument doc;
-    if (!doc.setContent(wrappedStanzas, true))
+    if (!doc.setContent(wrappedStanzas, true)) {
         return;
+    }
 
     //
     // Success: We can clear the buffer and send a 'received' log message
@@ -444,8 +447,9 @@ void QXmppStream::processData(const QString &data)
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
         // handle possible stream management packets first
-        if (d->streamManager.handleStanza(stanza) || handleIqResponse(stanza))
+        if (d->streamManager.handleStanza(stanza) || handleIqResponse(stanza)) {
             continue;
+        }
 
         // process all other kinds of packets
         handleStanza(stanza);

@@ -151,21 +151,24 @@ QString QXmppUploadRequestManager::requestUploadSlot(const QString &fileName,
                                                      const QMimeType &mimeType,
                                                      const QString &uploadService)
 {
-    if (!serviceFound() && uploadService.isEmpty())
+    if (!serviceFound() && uploadService.isEmpty()) {
         return {};
+    }
 
     QXmppHttpUploadRequestIq iq;
-    if (uploadService.isEmpty())
+    if (uploadService.isEmpty()) {
         iq.setTo(d->uploadServices.first().jid());
-    else
+    } else {
         iq.setTo(uploadService);
+    }
     iq.setType(QXmppIq::Get);
     iq.setFileName(fileName);
     iq.setSize(fileSize);
     iq.setContentType(mimeType);
 
-    if (client()->sendPacket(iq))
+    if (client()->sendPacket(iq)) {
         return iq.id();
+    }
     return {};
 }
 
@@ -239,10 +242,11 @@ auto QXmppUploadRequestManager::requestSlot(const QString &fileName,
     }
 
     QXmppHttpUploadRequestIq iq;
-    if (uploadService.isEmpty())
+    if (uploadService.isEmpty()) {
         iq.setTo(d->uploadServices.first().jid());
-    else
+    } else {
         iq.setTo(uploadService);
+    }
     iq.setType(QXmppIq::Get);
     iq.setFileName(fileName);
     iq.setSize(fileSize);
@@ -285,8 +289,9 @@ bool QXmppUploadRequestManager::handleStanza(const QDomElement &element)
 
 void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 {
-    if (!iq.features().contains(ns_http_upload))
+    if (!iq.features().contains(ns_http_upload)) {
         return;
+    }
 
     const auto identities = iq.identities();
     for (const QXmppDiscoveryIq::Identity &identity : identities) {

@@ -70,10 +70,11 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
     QDomElement siElement = element.firstChildElement(QStringLiteral("si"));
     m_siId = siElement.attribute(QStringLiteral("id"));
     m_mimeType = siElement.attribute(QStringLiteral("mime-type"));
-    if (siElement.attribute(QStringLiteral("profile")) == ns_stream_initiation_file_transfer)
+    if (siElement.attribute(QStringLiteral("profile")) == ns_stream_initiation_file_transfer) {
         m_profile = FileTransfer;
-    else
+    } else {
         m_profile = None;
+    }
 
     QDomElement itemElement = siElement.firstChildElement();
     while (!itemElement.isNull()) {
@@ -92,10 +93,12 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
     writer->writeDefaultNamespace(ns_stream_initiation);
     helperToXmlAddAttribute(writer, QStringLiteral("id"), m_siId);
     helperToXmlAddAttribute(writer, QStringLiteral("mime-type"), m_mimeType);
-    if (m_profile == FileTransfer)
+    if (m_profile == FileTransfer) {
         helperToXmlAddAttribute(writer, QStringLiteral("profile"), ns_stream_initiation_file_transfer);
-    if (!m_fileInfo.isNull())
+    }
+    if (!m_fileInfo.isNull()) {
         m_fileInfo.toXml(writer);
+    }
     if (!m_featureForm.isNull()) {
         writer->writeStartElement(QStringLiteral("feature"));
         writer->writeDefaultNamespace(ns_feature_negotiation);

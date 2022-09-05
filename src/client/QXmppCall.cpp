@@ -212,8 +212,9 @@ void QXmppCallPrivate::handleAck(const QXmppIq &ack)
             q->debug(QString("Received ACK for packet %1").arg(id));
 
             // handle termination
-            if (request.action() == QXmppJingleIq::SessionTerminate)
+            if (request.action() == QXmppJingleIq::SessionTerminate) {
                 q->terminated();
+            }
             return;
         }
     }
@@ -351,13 +352,15 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
 
         // check media stream does not exist yet
         QXmppCallStream *stream = findStreamByName(content.name());
-        if (stream)
+        if (stream) {
             return;
+        }
 
         // create media stream
         stream = createStream(content.descriptionMedia(), content.creator(), content.name());
-        if (!stream)
+        if (!stream) {
             return;
+        }
         streams << stream;
 
         // check content description
@@ -510,10 +513,11 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
         state = newState;
         Q_EMIT q->stateChanged(state);
 
-        if (state == QXmppCall::ActiveState)
+        if (state == QXmppCall::ActiveState) {
             Q_EMIT q->connected();
-        else if (state == QXmppCall::FinishedState)
+        } else if (state == QXmppCall::FinishedState) {
             Q_EMIT q->finished();
+        }
     }
 }
 
@@ -523,8 +527,9 @@ void QXmppCallPrivate::setState(QXmppCall::State newState)
 void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
 {
     if (state == QXmppCall::DisconnectingState ||
-        state == QXmppCall::FinishedState)
+        state == QXmppCall::FinishedState) {
         return;
+    }
 
     // hangup call
     QXmppJingleIq iq;
@@ -662,8 +667,9 @@ void QXmppCall::localCandidatesChanged()
             break;
         }
     }
-    if (!stream)
+    if (!stream) {
         return;
+    }
 
     QXmppJingleIq iq;
     iq.setTo(d->jid);

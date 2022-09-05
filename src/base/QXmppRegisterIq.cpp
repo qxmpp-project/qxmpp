@@ -297,28 +297,34 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_register);
 
-    if (!d->instructions.isEmpty())
+    if (!d->instructions.isEmpty()) {
         writer->writeTextElement(QStringLiteral("instructions"), d->instructions);
+    }
 
-    if (d->isRegistered)
+    if (d->isRegistered) {
         writer->writeEmptyElement(ELEMENT_REGISTERED);
-    if (d->isRemove)
+    }
+    if (d->isRemove) {
         writer->writeEmptyElement(ELEMENT_REMOVE);
+    }
 
-    if (!d->username.isEmpty())
+    if (!d->username.isEmpty()) {
         writer->writeTextElement(QStringLiteral("username"), d->username);
-    else if (!d->username.isNull())
+    } else if (!d->username.isNull()) {
         writer->writeEmptyElement(QStringLiteral("username"));
+    }
 
-    if (!d->password.isEmpty())
+    if (!d->password.isEmpty()) {
         writer->writeTextElement(QStringLiteral("password"), d->password);
-    else if (!d->password.isNull())
+    } else if (!d->password.isNull()) {
         writer->writeEmptyElement(QStringLiteral("password"));
+    }
 
-    if (!d->email.isEmpty())
+    if (!d->email.isEmpty()) {
         writer->writeTextElement(QStringLiteral("email"), d->email);
-    else if (!d->email.isNull())
+    } else if (!d->email.isNull()) {
         writer->writeEmptyElement(QStringLiteral("email"));
+    }
 
     d->form.toXml(writer);
     d->bitsOfBinaryData.toXml(writer);

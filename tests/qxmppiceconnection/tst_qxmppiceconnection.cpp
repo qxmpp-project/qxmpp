@@ -85,10 +85,11 @@ void tst_QXmppIceConnection::testBindStun()
     const auto &localCandidates = client.localCandidates();
     for (const auto &c : localCandidates) {
         QCOMPARE(c.component(), componentId);
-        if (c.type() == QXmppJingleCandidate::ServerReflexiveType)
+        if (c.type() == QXmppJingleCandidate::ServerReflexiveType) {
             foundReflexive = true;
-        else
+        } else {
             QCOMPARE(c.type(), QXmppJingleCandidate::HostType);
+        }
     }
     QVERIFY(foundReflexive);
 }
@@ -122,11 +123,13 @@ void tst_QXmppIceConnection::testConnect()
 
     // exchange candidates
     const auto &rLocalCandidates = clientR.localCandidates();
-    for (const auto &candidate : rLocalCandidates)
+    for (const auto &candidate : rLocalCandidates) {
         clientL.addRemoteCandidate(candidate);
+    }
     const auto &lLocalCandidates = clientL.localCandidates();
-    for (const auto &candidate : lLocalCandidates)
+    for (const auto &candidate : lLocalCandidates) {
         clientR.addRemoteCandidate(candidate);
+    }
 
     // start ICE
     QEventLoop loop;

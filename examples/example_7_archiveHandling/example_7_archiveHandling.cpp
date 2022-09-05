@@ -78,8 +78,9 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
         logStart("fetching collection first page");
         QXmppResultSetQuery rsmQuery;
         rsmQuery.setMax(m_pageSize);
-        if (m_pageDirection == PageBackwards)
+        if (m_pageDirection == PageBackwards) {
             rsmQuery.setBefore("");
+        }
         archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
     } else if (!chats.size()) {
         logEnd("no items");

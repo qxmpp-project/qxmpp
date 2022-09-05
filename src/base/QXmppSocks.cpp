@@ -66,8 +66,9 @@ static bool parseHostAndPort(QDataStream &stream, quint8 &type, QByteArray &host
     quint8 hostLength;
     stream >> type;
     stream >> hostLength;
-    if (stream.status() != QDataStream::Ok)
+    if (stream.status() != QDataStream::Ok) {
         return false;
+    }
     host.resize(hostLength);
     if (stream.readRawData(host.data(), hostLength) != hostLength) {
         qWarning("Invalid host length");
@@ -188,8 +189,9 @@ void QXmppSocksServer::close()
 
 bool QXmppSocksServer::listen(quint16 port)
 {
-    if (!m_server->listen(QHostAddress::Any, port))
+    if (!m_server->listen(QHostAddress::Any, port)) {
         return false;
+    }
 
     // FIXME: this fails on Linux if /proc/sys/net/ipv6/bindv6only is 0
     m_server_v6->listen(QHostAddress::AnyIPv6, m_server->serverPort());
@@ -204,12 +206,14 @@ quint16 QXmppSocksServer::serverPort() const
 void QXmppSocksServer::slotNewConnection()
 {
     auto *server = qobject_cast<QTcpServer *>(sender());
-    if (!server)
+    if (!server) {
         return;
+    }
 
     QTcpSocket *socket = server->nextPendingConnection();
-    if (!socket)
+    if (!socket) {
         return;
+    }
 
     // register socket
     m_states.insert(socket, ConnectState);
@@ -219,8 +223,9 @@ void QXmppSocksServer::slotNewConnection()
 void QXmppSocksServer::slotReadyRead()
 {
     auto *socket = qobject_cast<QTcpSocket *>(sender());
-    if (!socket || !m_states.contains(socket))
+    if (!socket || !m_states.contains(socket)) {
         return;
+    }
 
     if (m_states.value(socket) == ConnectState) {
         // receive connect to server request

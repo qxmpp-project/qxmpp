@@ -129,8 +129,9 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_roster);
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
-    if (!version().isEmpty())
+    if (!version().isEmpty()) {
         writer->writeAttribute(QStringLiteral("ver"), version());
+    }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->mixAnnotate) {
@@ -139,8 +140,9 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
 
-    for (int i = 0; i < d->items.count(); ++i)
+    for (int i = 0; i < d->items.count(); ++i) {
         d->items.at(i).toXml(writer);
+    }
     writer->writeEndElement();
 }
 /// \endcond
@@ -336,20 +338,21 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 
 void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
-    if (type.isEmpty())
+    if (type.isEmpty()) {
         setSubscriptionType(NotSet);
-    else if (type == QStringLiteral("none"))
+    } else if (type == QStringLiteral("none")) {
         setSubscriptionType(None);
-    else if (type == QStringLiteral("both"))
+    } else if (type == QStringLiteral("both")) {
         setSubscriptionType(Both);
-    else if (type == QStringLiteral("from"))
+    } else if (type == QStringLiteral("from")) {
         setSubscriptionType(From);
-    else if (type == QStringLiteral("to"))
+    } else if (type == QStringLiteral("to")) {
         setSubscriptionType(To);
-    else if (type == QStringLiteral("remove"))
+    } else if (type == QStringLiteral("remove")) {
         setSubscriptionType(Remove);
-    else
+    } else {
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
+    }
 }
 
 ///
@@ -426,8 +429,9 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
     helperToXmlAddAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
     helperToXmlAddAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
-    if (d->approved)
+    if (d->approved) {
         writer->writeAttribute(QStringLiteral("approved"), QStringLiteral("true"));
+    }
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
     while (i != d->groups.constEnd()) {

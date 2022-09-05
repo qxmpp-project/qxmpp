@@ -177,8 +177,9 @@ QString QXmppAttentionManager::requestAttention(const QString &jid, const QStrin
     msg.setBody(message);
     msg.setAttentionRequested(true);
 
-    if (client()->sendPacket(msg))
+    if (client()->sendPacket(msg)) {
         return msg.id();
+    }
     return {};
 }
 
@@ -200,14 +201,16 @@ bool QXmppAttentionManager::handleStanza(const QDomElement &)
 
 void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
 {
-    if (!message.isAttentionRequested() || !message.stamp().isNull())
+    if (!message.isAttentionRequested() || !message.stamp().isNull()) {
         return;
+    }
 
     const QString bareJid = QXmppUtils::jidToBareJid(message.from());
 
     // ignore messages from our own bare JID (e.g. carbon or IM-NG message)
-    if (bareJid == client()->configuration().jidBare())
+    if (bareJid == client()->configuration().jidBare()) {
         return;
+    }
 
     // check rate limit
     if (!d->checkRateLimit(bareJid)) {
@@ -242,8 +245,9 @@ bool QXmppAttentionManagerPrivate::checkRateLimit(const QString &bareJid)
     previousRequests << PastRequest { bareJid, QDateTime::currentDateTimeUtc() };
 
     // start timer to remove request again
-    if (!cleanUpTimer->isActive())
+    if (!cleanUpTimer->isActive()) {
         cleanUpTimer->start(allowedAttemptsTimeInterval.msecsSinceStartOfDay());
+    }
 
     // check whether there are too many requests
     int count = std::count_if(previousRequests.cbegin(), previousRequests.cend(), [=](const PastRequest &request) {
@@ -264,9 +268,10 @@ void QXmppAttentionManagerPrivate::cleanUp()
         int next = allowedAttemptsTimeInterval.msecsSinceStartOfDay() -
             previousRequests.first().timestamp.msecsTo(QDateTime::currentDateTimeUtc());
 
-        if (next < 1)
+        if (next < 1) {
             cleanUp();
-        else
+        } else {
             cleanUpTimer->start(next);
+        }
     }
 }

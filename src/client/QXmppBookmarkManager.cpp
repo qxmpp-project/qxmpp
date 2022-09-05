@@ -112,8 +112,9 @@ bool QXmppBookmarkManager::setBookmarks(const QXmppBookmarkSet &bookmarks)
     QXmppPrivateStorageIq iq;
     iq.setType(QXmppIq::Set);
     iq.setBookmarks(bookmarks);
-    if (!client()->sendPacket(iq))
+    if (!client()->sendPacket(iq)) {
         return false;
+    }
 
     d->pendingBookmarks = bookmarks;
     d->pendingId = iq.id();

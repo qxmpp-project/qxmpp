@@ -45,8 +45,9 @@ void xmppClient::rosterReceived()
 
     // request vCard of all the bareJids in roster
     const QStringList jids = m_rosterManager->getRosterBareJids();
-    for (const auto &jid : jids)
+    for (const auto &jid : jids) {
         m_vCardManager->requestVCard(jid);
+    }
 }
 
 void xmppClient::vCardReceived(const QXmppVCardIq &vCard)
@@ -60,8 +61,9 @@ void xmppClient::vCardReceived(const QXmppVCardIq &vCard)
     QString vCardsDir("vCards/");
 
     QDir dir;
-    if (!dir.exists(vCardsDir))
+    if (!dir.exists(vCardsDir)) {
         dir.mkdir(vCardsDir);
+    }
 
     QFile file("vCards/" + bareJid + ".xml");
     if (file.open(QIODevice::ReadWrite)) {
@@ -78,8 +80,9 @@ void xmppClient::vCardReceived(const QXmppVCardIq &vCard)
     buffer.open(QIODevice::ReadOnly);
     QImageReader imageReader(&buffer);
     QImage image = imageReader.read();
-    if (image.save(name))
+    if (image.save(name)) {
         qDebug() << "example_9_vCard: Avatar saved to file";
+    }
 }
 
 int main(int argc, char *argv[])

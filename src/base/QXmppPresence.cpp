@@ -378,8 +378,9 @@ void QXmppPresence::parse(const QDomElement &element)
 
     // attributes
     int type = PRESENCE_TYPES.indexOf(element.attribute(QStringLiteral("type")));
-    if (type > -1)
+    if (type > -1) {
         d->type = Type(type);
+    }
 
     QXmppElementList unknownElements;
     QDomElement childElement = element.firstChildElement();
@@ -387,8 +388,9 @@ void QXmppPresence::parse(const QDomElement &element)
     while (!childElement.isNull()) {
         if (childElement.tagName() == QStringLiteral("show")) {
             int availableStatusType = AVAILABLE_STATUS_TYPES.indexOf(childElement.text());
-            if (availableStatusType > -1)
+            if (availableStatusType > -1) {
                 d->availableStatusType = AvailableStatusType(availableStatusType);
+            }
         } else if (childElement.tagName() == QStringLiteral("status")) {
             d->statusText = childElement.text();
         } else if (childElement.tagName() == QStringLiteral("priority")) {
@@ -439,10 +441,11 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             d->vCardUpdateType = VCardUpdateNotReady;
         } else {
             d->photoHash = QByteArray::fromHex(photoElement.text().toLatin1());
-            if (d->photoHash.isEmpty())
+            if (d->photoHash.isEmpty()) {
                 d->vCardUpdateType = VCardUpdateNoPhoto;
-            else
+            } else {
                 d->vCardUpdateType = VCardUpdateValidPhoto;
+            }
         }
         // XEP-0319: Last User Interaction in Presence
     } else if (element.tagName() == QStringLiteral("idle") && element.namespaceURI() == ns_idle) {
@@ -469,12 +472,15 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), PRESENCE_TYPES.at(d->type));
 
     const QString show = AVAILABLE_STATUS_TYPES.at(d->availableStatusType);
-    if (!show.isEmpty())
+    if (!show.isEmpty()) {
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("show"), show);
-    if (!d->statusText.isEmpty())
+    }
+    if (!d->statusText.isEmpty()) {
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("status"), d->statusText);
-    if (d->priority != 0)
+    }
+    if (d->priority != 0) {
         helperToXmlAddTextElement(xmlWriter, QStringLiteral("priority"), QString::number(d->priority));
+    }
 
     error().toXml(xmlWriter);
 
@@ -482,16 +488,18 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (d->mucSupported) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
         xmlWriter->writeDefaultNamespace(ns_muc);
-        if (!d->mucPassword.isEmpty())
+        if (!d->mucPassword.isEmpty()) {
             xmlWriter->writeTextElement(QStringLiteral("password"), d->mucPassword);
+        }
         xmlWriter->writeEndElement();
     }
 
     if (!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
         xmlWriter->writeDefaultNamespace(ns_muc_user);
-        if (!d->mucItem.isNull())
+        if (!d->mucItem.isNull()) {
             d->mucItem.toXml(xmlWriter);
+        }
         for (const auto code : d->mucStatusCodes) {
             xmlWriter->writeStartElement(QStringLiteral("status"));
             xmlWriter->writeAttribute(QStringLiteral("code"), QString::number(code));
@@ -541,10 +549,12 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("mix"));
         xmlWriter->writeDefaultNamespace(ns_mix_presence);
-        if (!d->mixUserJid.isEmpty())
+        if (!d->mixUserJid.isEmpty()) {
             helperToXmlAddTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
-        if (!d->mixUserNick.isEmpty())
+        }
+        if (!d->mixUserNick.isEmpty()) {
             helperToXmlAddTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
+        }
         xmlWriter->writeEndElement();
     }
 

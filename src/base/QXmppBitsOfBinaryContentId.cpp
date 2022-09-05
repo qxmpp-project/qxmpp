@@ -78,8 +78,9 @@ QXmppBitsOfBinaryContentIdPrivate::QXmppBitsOfBinaryContentIdPrivate()
 ///
 QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString &input)
 {
-    if (input.startsWith(CONTENTID_URL))
+    if (input.startsWith(CONTENTID_URL)) {
         return fromContentId(input.mid(CONTENTID_URL_LENGTH));
+    }
 
     return {};
 }
@@ -98,19 +99,22 @@ QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromCidUrl(const QString 
 ///
 QXmppBitsOfBinaryContentId QXmppBitsOfBinaryContentId::fromContentId(const QString &input)
 {
-    if (input.startsWith(CONTENTID_URL) || !input.endsWith(CONTENTID_POSTFIX))
+    if (input.startsWith(CONTENTID_URL) || !input.endsWith(CONTENTID_POSTFIX)) {
         return {};
+    }
 
     // remove '@bob.xmpp.org'
     QString hashAndAlgoStr = input.left(input.size() - CONTENTID_POSTFIX_LENGTH);
     // get size of hash algo id
     QStringList algoAndHash = hashAndAlgoStr.split(CONTENTID_HASH_SEPARATOR);
-    if (algoAndHash.size() != 2)
+    if (algoAndHash.size() != 2) {
         return {};
+    }
 
     QCryptographicHash::Algorithm algo = HASH_ALGORITHMS.key(algoAndHash.first(), QCryptographicHash::Algorithm(-1));
-    if (int(algo) == -1)
+    if (int(algo) == -1) {
         return {};
+    }
 
     QXmppBitsOfBinaryContentId cid;
     cid.setAlgorithm(algo);
@@ -151,8 +155,9 @@ QXmppBitsOfBinaryContentId &QXmppBitsOfBinaryContentId::operator=(QXmppBitsOfBin
 ///
 QString QXmppBitsOfBinaryContentId::toContentId() const
 {
-    if (!isValid())
+    if (!isValid()) {
         return {};
+    }
 
     return HASH_ALGORITHMS.value(d->algorithm) +
         CONTENTID_HASH_SEPARATOR +
@@ -165,8 +170,9 @@ QString QXmppBitsOfBinaryContentId::toContentId() const
 ///
 QString QXmppBitsOfBinaryContentId::toCidUrl() const
 {
-    if (!isValid())
+    if (!isValid()) {
         return {};
+    }
 
     return toContentId().prepend(CONTENTID_URL);
 }

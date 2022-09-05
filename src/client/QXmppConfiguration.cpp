@@ -176,8 +176,9 @@ void QXmppConfiguration::setJid(const QString &jid)
     d->user = QXmppUtils::jidToUser(jid);
     d->domain = QXmppUtils::jidToDomain(jid);
     const QString resource = QXmppUtils::jidToResource(jid);
-    if (!resource.isEmpty())
+    if (!resource.isEmpty()) {
         d->resource = resource;
+    }
 }
 
 /// Returns the host name.
@@ -248,10 +249,11 @@ QString QXmppConfiguration::resource() const
 
 QString QXmppConfiguration::jid() const
 {
-    if (d->user.isEmpty())
+    if (d->user.isEmpty()) {
         return d->domain;
-    else
+    } else {
         return jidBare() + "/" + d->resource;
+    }
 }
 
 /// Returns the bare jabber id (jid), without the resource identifier.
@@ -262,10 +264,11 @@ QString QXmppConfiguration::jid() const
 
 QString QXmppConfiguration::jidBare() const
 {
-    if (d->user.isEmpty())
+    if (d->user.isEmpty()) {
         return d->domain;
-    else
+    } else {
         return d->user + "@" + d->domain;
+    }
 }
 
 /// Returns the access token used for X-FACEBOOK-PLATFORM authentication.

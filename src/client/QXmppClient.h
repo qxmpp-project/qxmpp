@@ -159,8 +159,9 @@ public:
         const QList<QXmppClientExtension *> list = extensions();
         for (auto ext : list) {
             T *extension = qobject_cast<T *>(ext);
-            if (extension)
+            if (extension) {
                 return extension;
+            }
         }
         return nullptr;
     }
@@ -185,8 +186,9 @@ public:
     {
         auto list = extensions();
         for (int i = 0; i < list.size(); ++i) {
-            if (qobject_cast<T *>(list.at(i)) != nullptr)
+            if (qobject_cast<T *>(list.at(i)) != nullptr) {
                 return i;
+            }
         }
         return -1;
     }

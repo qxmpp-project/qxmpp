@@ -158,8 +158,9 @@ void QXmppBitsOfBinaryData::toXmlElementFromChild(QXmlStreamWriter *writer) cons
     writer->writeStartElement(QStringLiteral("data"));
     writer->writeDefaultNamespace(ns_bob);
     helperToXmlAddAttribute(writer, QStringLiteral("cid"), d->cid.toContentId());
-    if (d->maxAge > -1)
+    if (d->maxAge > -1) {
         helperToXmlAddAttribute(writer, QStringLiteral("max-age"), QString::number(d->maxAge));
+    }
     helperToXmlAddAttribute(writer, QStringLiteral("type"), d->contentType.name());
     writer->writeCharacters(d->data.toBase64());
     writer->writeEndElement();

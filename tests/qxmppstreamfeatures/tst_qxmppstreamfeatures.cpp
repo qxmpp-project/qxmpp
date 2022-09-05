@@ -16,8 +16,9 @@ static void parsePacketWithStream(T &packet, const QByteArray &xml)
 
     QString err;
     bool parsingSuccess = doc.setContent(wrappedXml, true, &err);
-    if (!err.isNull())
+    if (!err.isNull()) {
         qDebug() << err;
+    }
     QVERIFY(parsingSuccess);
 
     packet.parse(doc.documentElement().firstChildElement());

@@ -32,10 +32,11 @@ QXmppVCardManager::~QXmppVCardManager() = default;
 QString QXmppVCardManager::requestVCard(const QString &jid)
 {
     QXmppVCardIq request(jid);
-    if (client()->sendPacket(request))
+    if (client()->sendPacket(request)) {
         return request.id();
-    else
+    } else {
         return QString();
+    }
 }
 
 /// Returns the vCard of the connected client.

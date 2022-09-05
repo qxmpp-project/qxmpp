@@ -102,30 +102,37 @@ void QXmppResultSetQuery::parse(const QDomElement &element)
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
         m_max = setElement.firstChildElement(QStringLiteral("max")).text().toInt(&ok);
-        if (!ok)
+        if (!ok) {
             m_max = -1;
+        }
         m_after = setElement.firstChildElement(QStringLiteral("after")).text();
         m_before = setElement.firstChildElement(QStringLiteral("before")).text();
         m_index = setElement.firstChildElement(QStringLiteral("index")).text().toInt(&ok);
-        if (!ok)
+        if (!ok) {
             m_index = -1;
+        }
     }
 }
 
 void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
 {
-    if (isNull())
+    if (isNull()) {
         return;
+    }
     writer->writeStartElement(QStringLiteral("set"));
     writer->writeDefaultNamespace(ns_rsm);
-    if (m_max >= 0)
+    if (m_max >= 0) {
         helperToXmlAddTextElement(writer, QStringLiteral("max"), QString::number(m_max));
-    if (!m_after.isNull())
+    }
+    if (!m_after.isNull()) {
         helperToXmlAddTextElement(writer, QStringLiteral("after"), m_after);
-    if (!m_before.isNull())
+    }
+    if (!m_before.isNull()) {
         helperToXmlAddTextElement(writer, QStringLiteral("before"), m_before);
-    if (m_index >= 0)
+    }
+    if (m_index >= 0) {
         helperToXmlAddTextElement(writer, QStringLiteral("index"), QString::number(m_index));
+    }
     writer->writeEndElement();
 }
 /// \endcond
@@ -220,30 +227,35 @@ void QXmppResultSetReply::parse(const QDomElement &element)
         m_first = firstElem.text();
         bool ok = false;
         m_index = firstElem.attribute("index").toInt(&ok);
-        if (!ok)
+        if (!ok) {
             m_index = -1;
+        }
         m_last = setElement.firstChildElement("last").text();
     }
 }
 
 void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
 {
-    if (isNull())
+    if (isNull()) {
         return;
+    }
     writer->writeStartElement("set");
     writer->writeDefaultNamespace(ns_rsm);
     if (!m_first.isNull() || m_index >= 0) {
         writer->writeStartElement("first");
-        if (m_index >= 0)
+        if (m_index >= 0) {
             writer->writeAttribute("index", QString::number(m_index));
+        }
         writer->writeCharacters(m_first);
         writer->writeEndElement();
     }
-    if (!m_last.isNull())
+    if (!m_last.isNull()) {
         helperToXmlAddTextElement(writer, "last", m_last);
+    }
 
-    if (m_count >= 0)
+    if (m_count >= 0) {
         helperToXmlAddTextElement(writer, "count", QString::number(m_count));
+    }
     writer->writeEndElement();
 }
 /// \endcond

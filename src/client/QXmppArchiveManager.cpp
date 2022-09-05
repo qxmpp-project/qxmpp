@@ -19,8 +19,9 @@ QStringList QXmppArchiveManager::discoveryFeatures() const
 
 bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "iq")
+    if (element.tagName() != "iq") {
         return false;
+    }
 
     // XEP-0136: Message Archiving
     if (QXmppArchiveChatIq::isArchiveChatIq(element)) {

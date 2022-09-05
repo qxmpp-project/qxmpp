@@ -70,10 +70,11 @@ void QXmppIncomingClientPrivate::checkCredentials(const QByteArray &response)
 QString QXmppIncomingClientPrivate::origin() const
 {
     QSslSocket *socket = q->socket();
-    if (socket)
+    if (socket) {
         return socket->peerAddress().toString() + " " + QString::number(socket->peerPort());
-    else
+    } else {
         return "<unknown>";
+    }
 }
 
 /// Constructs a new incoming client stream.
@@ -140,8 +141,9 @@ void QXmppIncomingClient::setInactivityTimeout(int secs)
 {
     d->idleTimer->stop();
     d->idleTimer->setInterval(secs * 1000);
-    if (d->idleTimer->interval())
+    if (d->idleTimer->interval()) {
         d->idleTimer->start();
+    }
 }
 
 /// Sets the password checker used to verify client credentials.
@@ -157,8 +159,9 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 /// \cond
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
-    if (d->idleTimer->interval())
+    if (d->idleTimer->interval()) {
         d->idleTimer->start();
+    }
     if (d->saslServer != nullptr) {
         delete d->saslServer;
         d->saslServer = nullptr;
@@ -192,16 +195,18 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 
     // send stream features
     QXmppStreamFeatures features;
-    if (socket() && !socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull())
+    if (socket() && !socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull()) {
         features.setTlsMode(QXmppStreamFeatures::Enabled);
+    }
     if (!d->jid.isEmpty()) {
         features.setBindMode(QXmppStreamFeatures::Required);
         features.setSessionMode(QXmppStreamFeatures::Enabled);
     } else if (d->passwordChecker) {
         QStringList mechanisms;
         mechanisms << "PLAIN";
-        if (d->passwordChecker->hasGetPassword())
+        if (d->passwordChecker->hasGetPassword()) {
             mechanisms << "DIGEST-MD5";
+        }
         features.setAuthMechanisms(mechanisms);
     }
     sendPacket(features);
@@ -211,8 +216,9 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 {
     const QString ns = nodeRecv.namespaceURI();
 
-    if (d->idleTimer->interval())
+    if (d->idleTimer->interval()) {
         d->idleTimer->start();
+    }
 
     if (QXmppStartTlsPacket::isStartTlsPacket(nodeRecv, QXmppStartTlsPacket::StartTls)) {
         sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
@@ -290,8 +296,9 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 QXmppBindIq bindSet;
                 bindSet.parse(nodeRecv);
                 d->resource = bindSet.resource().trimmed();
-                if (d->resource.isEmpty())
+                if (d->resource.isEmpty()) {
                     d->resource = QXmppUtils::generateStanzaHash();
+                }
                 d->jid = QString("%1/%2").arg(QXmppUtils::jidToBareJid(d->jid), d->resource);
 
                 QXmppBindIq bindResult;
@@ -333,15 +340,17 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             if (nodeFull.attribute("from").isEmpty()) {
                 if (nodeFull.tagName() == QLatin1String("presence") &&
                     (nodeFull.attribute("type") == QLatin1String("subscribe") ||
-                     nodeFull.attribute("type") == QLatin1String("subscribed")))
+                     nodeFull.attribute("type") == QLatin1String("subscribed"))) {
                     nodeFull.setAttribute("from", QXmppUtils::jidToBareJid(d->jid));
-                else
+                } else {
                     nodeFull.setAttribute("from", d->jid);
+                }
             }
 
             // if the recipient is empty, set it to the local domain
-            if (nodeFull.attribute("to").isEmpty())
+            if (nodeFull.attribute("to").isEmpty()) {
                 nodeFull.setAttribute("to", d->domain);
+            }
 
             // emit stanza for processing by server
             emit elementReceived(nodeFull);
@@ -353,8 +362,9 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 void QXmppIncomingClient::onDigestReply()
 {
     auto *reply = qobject_cast<QXmppPasswordReply *>(sender());
-    if (!reply)
+    if (!reply) {
         return;
+    }
     reply->deleteLater();
 
     if (reply->error() == QXmppPasswordReply::TemporaryError) {
@@ -384,8 +394,9 @@ void QXmppIncomingClient::onDigestReply()
 void QXmppIncomingClient::onPasswordReply()
 {
     auto *reply = qobject_cast<QXmppPasswordReply *>(sender());
-    if (!reply)
+    if (!reply) {
         return;
+    }
     reply->deleteLater();
 
     const QString jid = QString("%1@%2").arg(d->saslServer->username(), d->domain);

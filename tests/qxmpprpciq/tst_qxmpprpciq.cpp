@@ -24,8 +24,9 @@ static void checkVariant(const QVariant &value, const QByteArray &xml)
     QDomElement element = doc.documentElement();
     QStringList errors;
     QVariant test = QXmppRpcMarshaller::demarshall(element, errors);
-    if (!errors.isEmpty())
+    if (!errors.isEmpty()) {
         qDebug() << errors;
+    }
     QCOMPARE(errors, QStringList());
     QCOMPARE(test, value);
 }

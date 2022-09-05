@@ -161,10 +161,11 @@ void tst_QXmppRegistrationManager::testRequestRegistrationForm()
         }
     });
 
-    if (triggerManually)
+    if (triggerManually) {
         manager->requestRegistrationForm();
-    else
+    } else {
         sendStreamFeaturesToManager(true);
+    }
 
     QVERIFY(signalCalled);
     delete context;
@@ -251,10 +252,11 @@ void tst_QXmppRegistrationManager::testSendCachedRegistrationForm()
     });
 
     manager->setRegistrationFormToSend(iq);
-    if (triggerSendingManually)
+    if (triggerSendingManually) {
         manager->sendCachedRegistrationForm();
-    else
+    } else {
         sendStreamFeaturesToManager(true);
+    }
 
     delete context;
 }
@@ -479,8 +481,9 @@ void tst_QXmppRegistrationManager::sendStreamFeaturesToManager(bool registration
 {
     QXmppStreamFeatures features;
     features.setBindMode(QXmppStreamFeatures::Enabled);
-    if (registrationEnabled)
+    if (registrationEnabled) {
         features.setRegisterMode(QXmppStreamFeatures::Enabled);
+    }
 
     auto writeFeaturesToDom = [&]() -> QDomElement {
         QBuffer buffer;

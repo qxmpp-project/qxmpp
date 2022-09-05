@@ -29,17 +29,21 @@ QXmppCallManagerPrivate::QXmppCallManagerPrivate(QXmppCallManager *qq)
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid) const
 {
-    for (auto *call : calls)
-        if (call->sid() == sid)
+    for (auto *call : calls) {
+        if (call->sid() == sid) {
             return call;
+        }
+    }
     return nullptr;
 }
 
 QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Direction direction) const
 {
-    for (auto *call : calls)
-        if (call->sid() == sid && call->direction() == direction)
+    for (auto *call : calls) {
+        if (call->sid() == sid && call->direction() == direction) {
             return call;
+        }
+    }
     return nullptr;
 }
 /// \endcond
@@ -221,8 +225,9 @@ void QXmppCallManager::_q_disconnected()
 ///
 void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 {
-    if (ack.type() != QXmppIq::Result)
+    if (ack.type() != QXmppIq::Result) {
         return;
+    }
 
     // find request
     for (auto *call : std::as_const(d->calls)) {
@@ -236,8 +241,9 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 {
 
-    if (iq.type() != QXmppIq::Set)
+    if (iq.type() != QXmppIq::Set) {
         return;
+    }
 
     if (iq.action() == QXmppJingleIq::SessionInitiate) {
         // build call
@@ -247,8 +253,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         const auto content = iq.contents().isEmpty() ? QXmppJingleIq::Content()
                                                      : iq.contents().constFirst();
         auto *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
-        if (!stream)
+        if (!stream) {
             return;
+        }
         call->d->streams << stream;
 
         // send ack
@@ -300,8 +307,9 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 ///
 void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
 {
-    if (presence.type() != QXmppPresence::Unavailable)
+    if (presence.type() != QXmppPresence::Unavailable) {
         return;
+    }
 
     for (auto *call : std::as_const(d->calls)) {
         if (presence.from() == call->jid()) {

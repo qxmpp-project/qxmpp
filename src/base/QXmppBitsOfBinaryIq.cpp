@@ -32,8 +32,9 @@ bool QXmppBitsOfBinaryIq::isBitsOfBinaryIq(const QDomElement &element)
 {
     QDomElement child = element.firstChildElement();
     while (!child.isNull()) {
-        if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child))
+        if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child)) {
             return true;
+        }
         child = child.nextSiblingElement();
     }
     return false;

@@ -304,10 +304,11 @@ void tst_QXmppUploadRequestManager::testSending()
     lastFileSize = fileSize;
 
     QString returnId;
-    if (!fileInfo.baseName().isEmpty())
+    if (!fileInfo.baseName().isEmpty()) {
         returnId = manager->requestUploadSlot(fileInfo);
-    else
+    } else {
         returnId = manager->requestUploadSlot(fileName, fileSize, lastMimeType);
+    }
 
     // The client is not connected, so we never get an ID back (the packet was not sent).
     QVERIFY(returnId.isNull());

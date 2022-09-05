@@ -41,8 +41,9 @@ bool QXmppCarbonManager::carbonsEnabled() const
 ///
 void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
 {
-    if (m_carbonsEnabled == enabled)
+    if (m_carbonsEnabled == enabled) {
         return;
+    }
 
     m_carbonsEnabled = enabled;
 
@@ -65,8 +66,9 @@ QStringList QXmppCarbonManager::discoveryFeatures() const
 
 bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "message")
+    if (element.tagName() != "message") {
         return false;
+    }
 
     bool sent = true;
     QDomElement carbon = element.firstChildElement("sent");
@@ -75,8 +77,9 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
         sent = false;
     }
 
-    if (carbon.isNull() || carbon.namespaceURI() != ns_carbons)
+    if (carbon.isNull() || carbon.namespaceURI() != ns_carbons) {
         return false;
+    }
 
     // carbon copies must always come from our bare JID
     if (element.attribute("from") != client()->configuration().jidBare()) {
@@ -86,17 +89,19 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 
     auto forwarded = carbon.firstChildElement("forwarded");
     auto messageElement = forwarded.firstChildElement("message");
-    if (messageElement.isNull())
+    if (messageElement.isNull()) {
         return false;
+    }
 
     QXmppMessage message;
     message.parse(messageElement);
     message.setCarbonForwarded(true);
 
-    if (sent)
+    if (sent) {
         emit messageSent(message);
-    else
+    } else {
         emit messageReceived(message);
+    }
 
     return true;
 }

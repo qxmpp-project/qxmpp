@@ -28,12 +28,14 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
 {
     buildMethodHash();
 
-    if (!m_methodHash.contains(method))
+    if (!m_methodHash.contains(method)) {
         return QVariant();
+    }
 
     int idx = m_methodHash[method];
-    if (paramTypes(args) != metaObject()->method(idx).parameterTypes())
+    if (paramTypes(args) != metaObject()->method(idx).parameterTypes()) {
         return QVariant();
+    }
 
     const char *typeName = metaObject()->method(idx).typeName();
     int resultType = QMetaType::type(typeName);
@@ -77,16 +79,18 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
 QList<QByteArray> QXmppInvokable::paramTypes(const QList<QVariant> &params)
 {
     QList<QByteArray> types;
-    for (const auto &variant : std::as_const(params))
+    for (const auto &variant : std::as_const(params)) {
         types << variant.typeName();
+    }
     return types;
 }
 
 void QXmppInvokable::buildMethodHash()
 {
     QWriteLocker locker(&m_lock);
-    if (m_methodHash.size() > 0)
+    if (m_methodHash.size() > 0) {
         return;
+    }
 
     int methodCount = metaObject()->methodCount();
     for (int idx = 0; idx < methodCount; ++idx) {
