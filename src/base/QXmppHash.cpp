@@ -146,6 +146,14 @@ void QXmppHash::toXml(QXmlStreamWriter *writer) const
 
 QXmppHashUsed::QXmppHashUsed() = default;
 
+///
+/// Creates an object that tells other XMPP entities to use this hash algorithm.
+///
+QXmppHashUsed::QXmppHashUsed(QXmpp::HashAlgorithm algorithm)
+    : m_algorithm(algorithm)
+{
+}
+
 /// \cond
 bool QXmppHashUsed::parse(const QDomElement &el)
 {
@@ -162,3 +170,51 @@ void QXmppHashUsed::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 /// \endcond
+
+///
+/// Returns the algorithm used to create the hash.
+///
+HashAlgorithm QXmppHash::algorithm() const
+{
+    return m_algorithm;
+}
+
+///
+/// Sets the algorithm that was used to create the hashed data
+///
+void QXmppHash::setAlgorithm(QXmpp::HashAlgorithm algorithm)
+{
+    m_algorithm = algorithm;
+}
+
+///
+/// Returns the binary data of the hash.
+///
+QByteArray QXmppHash::hash() const
+{
+    return m_hash;
+}
+
+///
+/// Sets the hashed data.
+///
+void QXmppHash::setHash(const QByteArray &data)
+{
+    m_hash = data;
+}
+
+///
+/// Returns the algorithm that is supposed to be used for hashing.
+///
+HashAlgorithm QXmppHashUsed::algorithm() const
+{
+    return m_algorithm;
+}
+
+///
+/// Sets the algorithm that was used to create the hashed data
+///
+void QXmppHashUsed::setAlgorithm(QXmpp::HashAlgorithm algorithm)
+{
+    m_algorithm = algorithm;
+}

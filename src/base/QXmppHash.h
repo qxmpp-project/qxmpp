@@ -43,6 +43,12 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
+    QXmpp::HashAlgorithm algorithm() const;
+    void setAlgorithm(QXmpp::HashAlgorithm algorithm);
+
+    QByteArray hash() const;
+    void setHash(const QByteArray &data);
+
 private:
     QXmpp::HashAlgorithm m_algorithm = QXmpp::HashAlgorithm::Unknown;
     QByteArray m_hash;
@@ -52,11 +58,15 @@ class QXMPP_EXPORT QXmppHashUsed
 {
 public:
     QXmppHashUsed();
+    QXmppHashUsed(QXmpp::HashAlgorithm algorithm);
 
     /// \cond
     bool parse(const QDomElement &el);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
+
+    QXmpp::HashAlgorithm algorithm() const;
+    void setAlgorithm(QXmpp::HashAlgorithm algorithm);
 
 private:
     QXmpp::HashAlgorithm m_algorithm = QXmpp::HashAlgorithm::Unknown;
