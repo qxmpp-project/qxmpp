@@ -24,6 +24,7 @@ IncludeCategories:
     Priority: 2
   - Regex: "^<[^Q].*"
     Priority: 3
+InsertBraces: true
 Language: Cpp
 PointerAlignment: Right
 ReflowComments: true
