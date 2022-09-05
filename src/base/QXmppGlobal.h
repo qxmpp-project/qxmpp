@@ -40,6 +40,20 @@
 #define QT_WARNING_DISABLE_DEPRECATED
 #endif
 
+#define QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(name) \
+    name(const name &);                         \
+    name(name &&);                              \
+    ~name();                                    \
+    name &operator=(const name &);              \
+    name &operator=(name &&);
+
+#define QXMPP_PRIVATE_DEFINE_ROLE_OF_SIX(name)     \
+    name::name(const name &) = default;            \
+    name::name(name &&) = default;                 \
+    name::~name() = default;                       \
+    name &name::operator=(const name &) = default; \
+    name &name::operator=(name &&) = default;
+
 ///
 /// \namespace QXmpp
 ///
