@@ -198,6 +198,8 @@ extern const char *ns_mix_misc;
 extern const char *ns_fallback_indication;
 // XEP-0434: Trust Messages (TM)
 extern const char *ns_tm;
+// XEP-0446: File metadata element
+extern const char *ns_file_metadata;
 // XEP-0450: Automatic Trust Management (ATM)
 extern const char *ns_atm;
 

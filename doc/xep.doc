@@ -68,6 +68,7 @@ Complete:
 - \xep{0420, Stanza Content Encryption} (v0.4)
 - \xep{0428, Fallback Indication} (v0.1)
 - \xep{0434, Trust Messages} (v0.6)
+- \xep{0446, File metadata element} (v0.2.0)
 - \xep{0450, Automatic Trust Management (ATM)} (v0.4)
 
 Ongoing:
