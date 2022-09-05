@@ -1514,7 +1514,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0448: Stateless file sharing
-        if (checkElement(element, QStringLiteral("file-sharing"), ns_file_metadata)) {
+        if (checkElement(element, QStringLiteral("file-sharing"), ns_sfs)) {
             QXmppFileShare share;
             if (share.parse(element)) {
                 d->sharedFiles.push_back(std::move(share));
