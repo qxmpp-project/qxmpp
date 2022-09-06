@@ -107,6 +107,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppDiscoveryManager.h
     client/QXmppE2eeExtension.h
     client/QXmppEntityTimeManager.h
+    client/QXmppHttpUploadManager.h
     client/QXmppInvokable.h
     client/QXmppMamManager.h
     client/QXmppMessageHandler.h
@@ -226,6 +227,7 @@ set(SOURCE_FILES
     client/QXmppDiscoveryManager.cpp
     client/QXmppE2eeExtension.cpp
     client/QXmppEntityTimeManager.cpp
+    client/QXmppHttpUploadManager.cpp
     client/QXmppInternalClientExtension.cpp
     client/QXmppInvokable.cpp
     client/QXmppMamManager.cpp
