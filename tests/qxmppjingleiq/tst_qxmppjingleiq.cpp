@@ -20,10 +20,12 @@ private slots:
     void testContentSdpReflexive();
     void testContentSdpFingerprint();
     void testContentSdpParameters();
+    void testContentRtpFeedbackNegotiation();
     void testSession();
     void testTerminate();
     void testAudioPayloadType();
     void testVideoPayloadType();
+    void testPayloadTypeRtpFeedbackNegotiation();
     void testRinging();
 };
 
@@ -371,6 +373,51 @@ void tst_QXmppJingleIq::testContentSdpParameters()
     QCOMPARE(content.toSdp(), sdp);
 }
 
+void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
+{
+    const QByteArray xml(
+        "<content creator=\"initiator\" name=\"voice\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"nack\" subtype=\"pli\"/>"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"test-type\">"
+        "<parameter name=\"test-name\" value=\"test-value\"/>"
+        "<parameter name=\"test-name-2\"/>"
+        "</rtcp-fb>"
+        "<rtcp-fb-trr-int xmlns='urn:xmpp:jingle:apps:rtp:rtcp-fb:0' value='60'/>"
+        "<rtcp-fb-trr-int xmlns='urn:xmpp:jingle:apps:rtp:rtcp-fb:0' value='80'/>"
+        "<payload-type id=\"96\" name=\"H264\" clockrate=\"90000\">"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"nack\" subtype=\"sli\"/>"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"test-type-3\">"
+        "<parameter name=\"test-name-3\" value=\"test-value-3\"/>"
+        "<parameter name=\"test-name-4\"/>"
+        "</rtcp-fb>"
+        "<rtcp-fb-trr-int xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" value=\"100\"/>"
+        "<rtcp-fb-trr-int xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" value=\"120\"/>"
+        "</payload-type>"
+        "</description>"
+        "</content>");
+
+    QXmppJingleIq::Content content;
+    parsePacket(content, xml);
+
+    const auto rtpFeedbackTypesAndParameters = content.rtpFeedbackTypesAndParameters();
+    QCOMPARE(rtpFeedbackTypesAndParameters[0].type(), QStringLiteral("nack"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[0].subtype(), QStringLiteral("pli"));
+    QVERIFY(rtpFeedbackTypesAndParameters[0].parameters().isEmpty());
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].type(), QStringLiteral("test-type"));
+    QVERIFY(rtpFeedbackTypesAndParameters[1].subtype().isEmpty());
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].name(), QStringLiteral("test-name"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].value(), QStringLiteral("test-value"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[1].name(), QStringLiteral("test-name-2"));
+    QVERIFY(rtpFeedbackTypesAndParameters[1].parameters()[1].value().isEmpty());
+
+    const auto rtpFeedbackIntervals = content.rtpFeedbackIntervals();
+    QCOMPARE(rtpFeedbackIntervals[0].value(), 60);
+    QCOMPARE(rtpFeedbackIntervals[1].value(), 80);
+
+    serializePacket(content, xml);
+}
+
 void tst_QXmppJingleIq::testSession()
 {
     const QByteArray xml(
@@ -460,6 +507,62 @@ void tst_QXmppJingleIq::testVideoPayloadType()
     QCOMPARE(payload.parameters().value("height"), QLatin1String("768"));
     QCOMPARE(payload.parameters().value("width"), QLatin1String("1024"));
     serializePacket(payload, xml);
+}
+
+void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
+{
+    const QByteArray xml(
+        "<payload-type id=\"96\" name=\"H264\" clockrate=\"90000\">"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"nack\" subtype=\"sli\"/>"
+        "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"test-type-3\">"
+        "<parameter name=\"test-name-3\" value=\"test-value-3\"/>"
+        "<parameter name=\"test-name-4\"/>"
+        "</rtcp-fb>"
+        "<rtcp-fb-trr-int xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" value=\"100\"/>"
+        "<rtcp-fb-trr-int xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" value=\"120\"/>"
+        "</payload-type>");
+
+    QXmppJinglePayloadType payload;
+    QVERIFY(payload.rtpFeedbackTypesAndParameters().isEmpty());
+    QVERIFY(payload.rtpFeedbackIntervals().isEmpty());
+    parsePacket(payload, xml);
+
+    const auto rtpFeedbackTypesAndParameters = payload.rtpFeedbackTypesAndParameters();
+    QCOMPARE(rtpFeedbackTypesAndParameters[0].type(), QStringLiteral("nack"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[0].subtype(), QStringLiteral("sli"));
+    QVERIFY(rtpFeedbackTypesAndParameters[0].parameters().isEmpty());
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].type(), QStringLiteral("test-type-3"));
+    QVERIFY(rtpFeedbackTypesAndParameters[1].subtype().isEmpty());
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].name(), QStringLiteral("test-name-3"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].value(), QStringLiteral("test-value-3"));
+    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[1].name(), QStringLiteral("test-name-4"));
+    QVERIFY(rtpFeedbackTypesAndParameters[1].parameters()[1].value().isEmpty());
+
+    const auto rtpFeedbackIntervals = payload.rtpFeedbackIntervals();
+    QCOMPARE(rtpFeedbackIntervals[0].value(), 100);
+    QCOMPARE(rtpFeedbackIntervals[1].value(), 120);
+
+    serializePacket(payload, xml);
+
+    QXmppJingleRtpFeedbackTypeAndParameters rtpFeedbackTypeAndParameters;
+    rtpFeedbackTypeAndParameters.setType(QStringLiteral("ack"));
+    rtpFeedbackTypeAndParameters.setSubtype(QStringLiteral("rpsi"));
+
+    QXmppSdpParameter parameter;
+    parameter.setName(QStringLiteral("test-name-5"));
+    parameter.setValue(QStringLiteral("test-value-5"));
+    rtpFeedbackTypeAndParameters.setParameters({ parameter });
+
+    QXmppJingleRtpFeedbackInterval rtpFeedbackInterval;
+    rtpFeedbackInterval.setValue(60);
+    payload.setRtpFeedbackTypesAndParameters({ rtpFeedbackTypeAndParameters });
+    payload.setRtpFeedbackIntervals({ rtpFeedbackInterval });
+
+    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].type(), QStringLiteral("ack"));
+    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].subtype(), QStringLiteral("rpsi"));
+    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].parameters()[0].name(), QStringLiteral("test-name-5"));
+    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].parameters()[0].value(), QStringLiteral("test-value-5"));
+    QCOMPARE(payload.rtpFeedbackIntervals()[0].value(), 60);
 }
 
 void tst_QXmppJingleIq::testRinging()

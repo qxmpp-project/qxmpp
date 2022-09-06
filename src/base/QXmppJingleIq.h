@@ -14,6 +14,83 @@ class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
+class QXmppJingleRtpFeedbackIntervalPrivate;
+class QXmppJingleRtpFeedbackTypeAndParametersPrivate;
+class QXmppSdpParameterPrivate;
+
+// TODO: Use QXMPP_PRIVATE_DECLARE_RULE_OF_SIX and QXMPP_PRIVATE_DEFINE_ROLE_OF_SIX
+
+class QXMPP_EXPORT QXmppSdpParameter
+{
+public:
+    QXmppSdpParameter();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppSdpParameter)
+
+    QString name() const;
+    void setName(const QString &name);
+
+    QString value() const;
+    void setValue(const QString &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isSdpParameter(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppSdpParameterPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpFeedbackTypeAndParameters
+{
+public:
+    QXmppJingleRtpFeedbackTypeAndParameters();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackTypeAndParameters)
+
+    QString type() const;
+    void setType(const QString &type);
+
+    QString subtype() const;
+    void setSubtype(const QString &subtype);
+
+    QVector<QXmppSdpParameter> parameters() const;
+    void setParameters(const QVector<QXmppSdpParameter> &parameters);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpFeedbackTypeAndParameters(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpFeedbackTypeAndParametersPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpFeedbackInterval
+{
+public:
+    QXmppJingleRtpFeedbackInterval();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackInterval)
+
+    uint32_t value() const;
+    void setValue(uint32_t value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpFeedbackInterval(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpFeedbackIntervalPrivate> d;
+};
 
 ///
 /// \brief The QXmppJinglePayloadType class represents a payload type
@@ -46,6 +123,12 @@ public:
 
     unsigned int ptime() const;
     void setPtime(unsigned int ptime);
+
+    QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters() const;
+    void setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters);
+
+    QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
+    void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -206,6 +289,12 @@ public:
         QString transportPassword() const;
         void setTransportPassword(const QString &password);
 
+        QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters() const;
+        void setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters);
+
+        QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
+        void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
+
         // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
         QByteArray transportFingerprint() const;
         void setTransportFingerprint(const QByteArray &fingerprint);
@@ -323,5 +412,8 @@ protected:
 private:
     QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
+
+static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, QVector<QXmppJingleRtpFeedbackInterval> &intervals);
+static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, const QVector<QXmppJingleRtpFeedbackInterval> &intervals);
 
 #endif
