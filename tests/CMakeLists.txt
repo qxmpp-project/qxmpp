@@ -98,4 +98,4 @@ endif()
 
 add_subdirectory(qxmpptransfermanager)
 add_subdirectory(qxmpputils)
-add_subdirectory(qxmppuploadrequestmanager)
+add_subdirectory(qxmpphttpuploadmanager)

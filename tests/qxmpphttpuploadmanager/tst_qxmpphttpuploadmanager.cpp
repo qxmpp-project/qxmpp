@@ -59,7 +59,7 @@ void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq &)
     error = false;
 }
 
-class tst_QXmppUploadRequestManager : public QObject
+class tst_QXmppHttpUploadManager : public QObject
 {
     Q_OBJECT
 
@@ -92,7 +92,7 @@ private:
     qint64 lastFileSize;
 };
 
-void tst_QXmppUploadRequestManager::onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const
+void tst_QXmppHttpUploadManager::onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const
 {
     QCOMPARE(type, QXmppLogger::SentMessage);
 
@@ -110,7 +110,7 @@ void tst_QXmppUploadRequestManager::onLoggerMessage(QXmppLogger::MessageType typ
     QCOMPARE(iq.contentType(), lastMimeType);
 }
 
-void tst_QXmppUploadRequestManager::initTestCase()
+void tst_QXmppHttpUploadManager::initTestCase()
 {
     uploadServiceName = "upload.montague.tld";
     maxFileSize = 500UL * 1024UL * 1024UL;
@@ -119,7 +119,7 @@ void tst_QXmppUploadRequestManager::initTestCase()
     client.addExtension(manager);
 }
 
-void tst_QXmppUploadRequestManager::testHandleStanza_data()
+void tst_QXmppHttpUploadManager::testHandleStanza_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("accepted");
@@ -182,7 +182,7 @@ void tst_QXmppUploadRequestManager::testHandleStanza_data()
         << true << true << true;
 }
 
-void tst_QXmppUploadRequestManager::testHandleStanza()
+void tst_QXmppHttpUploadManager::testHandleStanza()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, accepted);
@@ -202,7 +202,7 @@ void tst_QXmppUploadRequestManager::testHandleStanza()
     QCOMPARE(realAccepted, accepted);
 }
 
-void tst_QXmppUploadRequestManager::testDiscoveryService_data()
+void tst_QXmppHttpUploadManager::testDiscoveryService_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("discovered");
@@ -236,7 +236,7 @@ void tst_QXmppUploadRequestManager::testDiscoveryService_data()
         << true;
 }
 
-void tst_QXmppUploadRequestManager::testDiscoveryService()
+void tst_QXmppHttpUploadManager::testDiscoveryService()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, discovered);
@@ -255,7 +255,7 @@ void tst_QXmppUploadRequestManager::testDiscoveryService()
     }
 }
 
-void tst_QXmppUploadRequestManager::testSending_data()
+void tst_QXmppHttpUploadManager::testSending_data()
 {
     QTest::addColumn<QFileInfo>("fileInfo");
     QTest::addColumn<QString>("fileName");
@@ -286,7 +286,7 @@ void tst_QXmppUploadRequestManager::testSending_data()
     // Is it something to worry about?
 }
 
-void tst_QXmppUploadRequestManager::testSending()
+void tst_QXmppHttpUploadManager::testSending()
 {
     QFETCH(QFileInfo, fileInfo);
     QFETCH(QString, fileName);
@@ -298,7 +298,7 @@ void tst_QXmppUploadRequestManager::testSending()
     client.setLogger(&logger);
 
     lastMimeType = QMimeDatabase().mimeTypeForName(fileType);
-    connect(&logger, &QXmppLogger::message, this, &tst_QXmppUploadRequestManager::onLoggerMessage);
+    connect(&logger, &QXmppLogger::message, this, &tst_QXmppHttpUploadManager::onLoggerMessage);
 
     lastFileName = fileName;
     lastFileSize = fileSize;
@@ -314,7 +314,7 @@ void tst_QXmppUploadRequestManager::testSending()
     QVERIFY(returnId.isNull());
 }
 
-void tst_QXmppUploadRequestManager::testUploadService()
+void tst_QXmppHttpUploadManager::testUploadService()
 {
     QXmppUploadService service;
     QCOMPARE(service.sizeLimit(), -1LL);
@@ -327,5 +327,5 @@ void tst_QXmppUploadRequestManager::testUploadService()
     QCOMPARE(service.jid(), QStringLiteral("upload.shakespeare.lit"));
 }
 
-QTEST_MAIN(tst_QXmppUploadRequestManager)
-#include "tst_qxmppuploadrequestmanager.moc"
+QTEST_MAIN(tst_QXmppHttpUploadManager)
+#include "tst_qxmpphttpuploadmanager.moc"
