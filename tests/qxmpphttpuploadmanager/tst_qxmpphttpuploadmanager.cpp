@@ -6,23 +6,47 @@
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppHttpUploadIq.h"
-#include "QXmppLogger.h"
 #include "QXmppUploadRequestManager.h"
 
 #include "TestClient.h"
 #include "util.h"
 #include <QMimeDatabase>
 
+static const auto UPLOAD_SERVICE_NAME = QStringLiteral("upload.montague.tld");
+constexpr quint64 MAX_FILE_SIZE = 500UL * 1024UL * 1024UL;
+
+static void addUploadService(QXmppClient &client)
+{
+    QVERIFY(client.findExtension<QXmppUploadRequestManager>());
+    QVERIFY(client.findExtension<QXmppDiscoveryManager>());
+
+    QByteArray xml =
+        "<iq from='" +
+        UPLOAD_SERVICE_NAME.toUtf8() +
+        "' id='step_02' to='romeo@montague.tld/garden' type='result'>"
+        "<query xmlns='http://jabber.org/protocol/disco#info'>"
+        "<identity category='store' type='file' name='HTTP File Upload' />"
+        "<feature var='urn:xmpp:http:upload:0' />"
+        "<x type='result' xmlns='jabber:x:data'>"
+        "<field var='FORM_TYPE' type='hidden'>"
+        "<value>urn:xmpp:http:upload:0</value>"
+        "</field>"
+        "<field var='max-file-size'>"
+        "<value>" +
+        QByteArray::number(MAX_FILE_SIZE) +
+        "</value>"
+        "</field>"
+        "</x>"
+        "</query>"
+        "</iq>";
+    auto *discovery = client.findExtension<QXmppDiscoveryManager>();
+    QVERIFY(discovery->handleStanza(xmlToDom(xml)));
+}
+
 class tst_QXmppHttpUploadManager : public QObject
 {
     Q_OBJECT
-
-protected:
-    Q_SLOT void onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const;
-
 private:
-    Q_SLOT void initTestCase();
-
     Q_SLOT void testDiscoveryService_data();
     Q_SLOT void testDiscoveryService();
 
@@ -33,45 +57,7 @@ private:
     Q_SLOT void testSending();
 
     Q_SLOT void testUploadService();
-
-private:
-    QXmppUploadRequestManager *manager;
-    QXmppClient client;
-    QXmppDiscoveryManager *discovery;
-    QString uploadServiceName;
-    qint64 maxFileSize;
-
-    QMimeType lastMimeType;
-    QString lastFileName;
-    qint64 lastFileSize;
 };
-
-void tst_QXmppHttpUploadManager::onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const
-{
-    QCOMPARE(type, QXmppLogger::SentMessage);
-
-    QDomDocument doc;
-    QVERIFY(doc.setContent(text, true));
-    QDomElement element = doc.documentElement();
-
-    QXmppHttpUploadRequestIq iq;
-    iq.parse(element);
-
-    QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.to(), uploadServiceName);
-    QCOMPARE(iq.fileName(), lastFileName);
-    QCOMPARE(iq.size(), lastFileSize);
-    QCOMPARE(iq.contentType(), lastMimeType);
-}
-
-void tst_QXmppHttpUploadManager::initTestCase()
-{
-    uploadServiceName = "upload.montague.tld";
-    maxFileSize = 500UL * 1024UL * 1024UL;
-    manager = new QXmppUploadRequestManager();
-    discovery = client.findExtension<QXmppDiscoveryManager>();
-    client.addExtension(manager);
-}
 
 void tst_QXmppHttpUploadManager::testHandleStanza_data()
 {
@@ -183,7 +169,7 @@ void tst_QXmppHttpUploadManager::testDiscoveryService_data()
 
     QTest::newRow("HTTPUploadDiscoveryStanzaIq")
         << "<iq from='" +
-            uploadServiceName.toUtf8() +
+            UPLOAD_SERVICE_NAME.toUtf8() +
             "' id='step_02' to='romeo@montague.tld/garden' type='result'>"
             "<query xmlns='http://jabber.org/protocol/disco#info'>"
             "<identity category='store' type='file' name='HTTP File Upload' />"
@@ -194,7 +180,7 @@ void tst_QXmppHttpUploadManager::testDiscoveryService_data()
             "</field>"
             "<field var='max-file-size'>"
             "<value>" +
-            QByteArray::number(maxFileSize) +
+            QByteArray::number(MAX_FILE_SIZE) +
             "</value>"
             "</field>"
             "</x>"
@@ -208,17 +194,17 @@ void tst_QXmppHttpUploadManager::testDiscoveryService()
     QFETCH(QByteArray, xml);
     QFETCH(bool, discovered);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
+    TestClient test;
+    auto *discovery = test.addNewExtension<QXmppDiscoveryManager>();
+    auto *manager = test.addNewExtension<QXmppUploadRequestManager>();
 
-    bool accepted = discovery->handleStanza(element);
+    bool accepted = discovery->handleStanza(xmlToDom(xml));
     QCOMPARE(accepted, true);
     QCOMPARE(manager->serviceFound(), discovered);
 
     if (manager->serviceFound()) {
-        QCOMPARE(manager->uploadServices().at(0).jid(), uploadServiceName);
-        QCOMPARE(manager->uploadServices().at(0).sizeLimit(), maxFileSize);
+        QCOMPARE(manager->uploadServices().at(0).jid(), UPLOAD_SERVICE_NAME);
+        QCOMPARE(manager->uploadServices().at(0).sizeLimit(), MAX_FILE_SIZE);
     }
 }
 
@@ -260,22 +246,29 @@ void tst_QXmppHttpUploadManager::testSending()
     QFETCH(qint64, fileSize);
     QFETCH(QString, fileType);
 
-    QXmppLogger logger;
-    logger.setLoggingType(QXmppLogger::SignalLogging);
-    client.setLogger(&logger);
+    auto expectedMimeType = QMimeDatabase().mimeTypeForName(fileType);
 
-    lastMimeType = QMimeDatabase().mimeTypeForName(fileType);
-    connect(&logger, &QXmppLogger::message, this, &tst_QXmppHttpUploadManager::onLoggerMessage);
+    TestClient test;
+    test.addNewExtension<QXmppDiscoveryManager>();
+    auto *manager = test.addNewExtension<QXmppUploadRequestManager>();
 
-    lastFileName = fileName;
-    lastFileSize = fileSize;
+    addUploadService(test);
 
     QString returnId;
     if (!fileInfo.baseName().isEmpty()) {
         returnId = manager->requestUploadSlot(fileInfo);
     } else {
-        returnId = manager->requestUploadSlot(fileName, fileSize, lastMimeType);
+        returnId = manager->requestUploadSlot(fileName, fileSize, expectedMimeType);
     }
+
+    QXmppHttpUploadRequestIq iq;
+    parsePacket(iq, test.takePacket().toUtf8());
+
+    QCOMPARE(iq.type(), QXmppIq::Get);
+    QCOMPARE(iq.to(), UPLOAD_SERVICE_NAME);
+    QCOMPARE(iq.fileName(), fileName);
+    QCOMPARE(iq.size(), fileSize);
+    QCOMPARE(iq.contentType(), expectedMimeType);
 
     // The client is not connected, so we never get an ID back (the packet was not sent).
     QVERIFY(returnId.isNull());
