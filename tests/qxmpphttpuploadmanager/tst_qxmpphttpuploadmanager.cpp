@@ -9,76 +9,30 @@
 #include "QXmppLogger.h"
 #include "QXmppUploadRequestManager.h"
 
+#include "TestClient.h"
 #include "util.h"
-#include <QByteArray>
 #include <QMimeDatabase>
-#include <QObject>
-
-class TestHelper : public QObject
-{
-    Q_OBJECT
-
-public:
-    TestHelper(bool expectedEvent, bool expectedError);
-    ~TestHelper();
-
-public slots:
-    void onSlotReceived(const QXmppHttpUploadSlotIq &slot);
-    void onRequestFailed(const QXmppHttpUploadRequestIq &request);
-
-private:
-    bool expectedEvent;
-    bool expectedError;
-    bool event;
-    bool error;
-};
-
-TestHelper::TestHelper(bool p_expectedEvent, bool p_expectedError) : QObject(),
-                                                                     expectedEvent(p_expectedEvent),
-                                                                     expectedError(p_expectedError),
-                                                                     event(false),
-                                                                     error(false)
-{
-}
-
-TestHelper::~TestHelper()
-{
-    QCOMPARE(event, expectedEvent);
-    QCOMPARE(error, expectedError);
-}
-
-void TestHelper::onRequestFailed(const QXmppHttpUploadRequestIq &)
-{
-    event = true;
-    error = true;
-}
-
-void TestHelper::onSlotReceived(const QXmppHttpUploadSlotIq &)
-{
-    event = true;
-    error = false;
-}
 
 class tst_QXmppHttpUploadManager : public QObject
 {
     Q_OBJECT
 
-protected slots:
-    void onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const;
+protected:
+    Q_SLOT void onLoggerMessage(QXmppLogger::MessageType type, const QString &text) const;
 
-private slots:
-    void initTestCase();
+private:
+    Q_SLOT void initTestCase();
 
-    void testDiscoveryService_data();
-    void testDiscoveryService();
+    Q_SLOT void testDiscoveryService_data();
+    Q_SLOT void testDiscoveryService();
 
-    void testHandleStanza_data();
-    void testHandleStanza();
+    Q_SLOT void testHandleStanza_data();
+    Q_SLOT void testHandleStanza();
 
-    void testSending_data();
-    void testSending();
+    Q_SLOT void testSending_data();
+    Q_SLOT void testSending();
 
-    void testUploadService();
+    Q_SLOT void testUploadService();
 
 private:
     QXmppUploadRequestManager *manager;
@@ -189,17 +143,27 @@ void tst_QXmppHttpUploadManager::testHandleStanza()
     QFETCH(bool, event);
     QFETCH(bool, error);
 
-    TestHelper helper(event, error);
-    connect(manager, &QXmppUploadRequestManager::slotReceived, &helper, &TestHelper::onSlotReceived);
-    connect(manager, &QXmppUploadRequestManager::requestFailed, &helper, &TestHelper::onRequestFailed);
+    TestClient test;
+    auto *manager = test.addNewExtension<QXmppUploadRequestManager>();
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
+    bool eventReceived = false;
+    bool errorReceived = false;
 
-    bool realAccepted = manager->handleStanza(element);
+    QObject context;
+    connect(manager, &QXmppUploadRequestManager::slotReceived, &context, [&](const auto &) {
+        eventReceived = true;
+        errorReceived = false;
+    });
+    connect(manager, &QXmppUploadRequestManager::requestFailed, &context, [&](const auto &) {
+        eventReceived = true;
+        errorReceived = true;
+    });
+
+    bool realAccepted = manager->handleStanza(xmlToDom(xml));
 
     QCOMPARE(realAccepted, accepted);
+    QCOMPARE(eventReceived, event);
+    QCOMPARE(errorReceived, error);
 }
 
 void tst_QXmppHttpUploadManager::testDiscoveryService_data()
@@ -218,21 +182,24 @@ void tst_QXmppHttpUploadManager::testDiscoveryService_data()
         << false;
 
     QTest::newRow("HTTPUploadDiscoveryStanzaIq")
-        << QByteArray("<iq from='" + uploadServiceName.toUtf8() + "' id='step_02' to='romeo@montague.tld/garden' type='result'>"
-                                                                  "<query xmlns='http://jabber.org/protocol/disco#info'>"
-                                                                  "<identity category='store' type='file' name='HTTP File Upload' />"
-                                                                  "<feature var='urn:xmpp:http:upload:0' />"
-                                                                  "<x type='result' xmlns='jabber:x:data'>"
-                                                                  "<field var='FORM_TYPE' type='hidden'>"
-                                                                  "<value>urn:xmpp:http:upload:0</value>"
-                                                                  "</field>"
-                                                                  "<field var='max-file-size'>"
-                                                                  "<value>" +
-                      QByteArray::number(maxFileSize) + "</value>"
-                                                        "</field>"
-                                                        "</x>"
-                                                        "</query>"
-                                                        "</iq>")
+        << "<iq from='" +
+            uploadServiceName.toUtf8() +
+            "' id='step_02' to='romeo@montague.tld/garden' type='result'>"
+            "<query xmlns='http://jabber.org/protocol/disco#info'>"
+            "<identity category='store' type='file' name='HTTP File Upload' />"
+            "<feature var='urn:xmpp:http:upload:0' />"
+            "<x type='result' xmlns='jabber:x:data'>"
+            "<field var='FORM_TYPE' type='hidden'>"
+            "<value>urn:xmpp:http:upload:0</value>"
+            "</field>"
+            "<field var='max-file-size'>"
+            "<value>" +
+            QByteArray::number(maxFileSize) +
+            "</value>"
+            "</field>"
+            "</x>"
+            "</query>"
+            "</iq>"
         << true;
 }
 
