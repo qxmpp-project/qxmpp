@@ -6,8 +6,11 @@
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppHttpUploadIq.h"
+#include "QXmppHttpUploadManager.h"
+#include "QXmppTlsManager_p.h"
 #include "QXmppUploadRequestManager.h"
 
+#include "IntegrationTesting.h"
 #include "TestClient.h"
 #include "util.h"
 #include <QMimeDatabase>
@@ -47,18 +50,19 @@ class tst_QXmppHttpUploadManager : public QObject
 {
     Q_OBJECT
 private:
+    // UploadRequestManager
     Q_SLOT void testDiscoveryService_data();
     Q_SLOT void testDiscoveryService();
-
     Q_SLOT void testHandleStanza_data();
     Q_SLOT void testHandleStanza();
-
     Q_SLOT void testSending_data();
     Q_SLOT void testSending();
     Q_SLOT void testSendingFuture_data();
     Q_SLOT void testSendingFuture();
-
     Q_SLOT void testUploadService();
+
+    // HttpUploadManager
+    Q_SLOT void testUpload();
 };
 
 void tst_QXmppHttpUploadManager::testHandleStanza_data()
@@ -351,6 +355,84 @@ void tst_QXmppHttpUploadManager::testUploadService()
 
     service.setJid(QStringLiteral("upload.shakespeare.lit"));
     QCOMPARE(service.jid(), QStringLiteral("upload.shakespeare.lit"));
+}
+
+void tst_QXmppHttpUploadManager::testUpload()
+{
+    using DiscoInfoResult = QXmppDiscoveryManager::InfoResult;
+    using DiscoItem = QXmppDiscoveryIq::Item;
+
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
+
+    TestClient test;
+    test.addNewExtension<QXmppTlsManager>();
+    auto *disco = test.addNewExtension<QXmppDiscoveryManager>();
+    test.addNewExtension<QXmppUploadRequestManager>();
+    auto *uploadManager = test.addNewExtension<QXmppHttpUploadManager>();
+
+    test.connectToServer(IntegrationTests::clientConfiguration());
+    QSignalSpy(&test, &QXmppClient::connected).wait();
+    QVERIFY(test.isConnected());
+
+    // get server items
+    auto items = expectVariant<QList<DiscoItem>>(wait(disco->requestDiscoItems(test.configuration().domain())));
+    // request disco info for each item
+    std::vector<QFuture<DiscoInfoResult>> infoFutures;
+    std::transform(items.cbegin(), items.cend(), std::back_inserter(infoFutures), [disco](const auto &item) {
+        return disco->requestDiscoInfo(item.jid(), item.node());
+    });
+    auto uploadServiceJid = [&]() {
+        for (const auto &future : std::as_const(infoFutures)) {
+            auto result = expectVariant<QXmppDiscoveryIq>(wait(future));
+            for (const auto &identity : result.identities()) {
+                if (identity.category() == "store" &&
+                    identity.type() == "file" &&
+                    result.features().contains("urn:xmpp:http:upload:0")) {
+                    return result.from();
+                }
+            }
+        }
+        return QString();
+    }();
+
+    // check whether the server supports HTTP File Upload
+    if (uploadServiceJid.isEmpty()) {
+        QSKIP("The server does not support HTTP File Upload.");
+    }
+
+    auto upload = uploadManager->uploadFile(QFileInfo(":/test.svg"), "test_renamed.png", uploadServiceJid);
+    QVERIFY2(!upload->isFinished(), "Uploading resulted instantly in an error");
+
+    {
+        // check sent request
+        QXmppHttpUploadRequestIq iq;
+        parsePacket(iq, test.takeLastPacket().toUtf8());
+
+        QCOMPARE(iq.contentType().name(), "image/svg+xml");
+        QCOMPARE(iq.fileName(), "test_renamed.png");
+        QCOMPARE(iq.size(), 2280LL);
+    }
+
+    // test signals
+    QSignalSpy finishedSpy(upload.get(), &QXmppHttpUpload::finished);
+    QSignalSpy progressSpy(upload.get(), &QXmppHttpUpload::progressChanged);
+    finishedSpy.wait();
+    QCOMPARE(finishedSpy.size(), 1);
+    QVERIFY(!progressSpy.empty());
+
+    // test result
+    auto result = upload->result().value();
+    if (std::holds_alternative<QXmppError>(result)) {
+        qDebug() << "Upload failed:" << std::get<QXmppError>(result).description;
+        QVERIFY2(false, "Uploading the file failed");
+    }
+
+    auto url = expectVariant<QUrl>(std::move(result));
+    QCOMPARE(upload->bytesSent(), 2280LL);
+    QCOMPARE(upload->bytesTotal(), 2280LL);
+    QCOMPARE(upload->progress(), 1.0);
+
+    qDebug() << "Uploaded file to" << url.toDisplayString();
 }
 
 QTEST_MAIN(tst_QXmppHttpUploadManager)
