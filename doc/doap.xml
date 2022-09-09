@@ -122,8 +122,7 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0060.html'/>
         <xmpp:status>partial</xmpp:status>
         <xmpp:version>1.24</xmpp:version>
-        <xmpp:since>0.3</xmpp:since>
-        <xmpp:note>Manager since 1.5</xmpp:note>
+        <xmpp:since>1.5</xmpp:since>
       </xmpp:SupportedXep>
     </implements>
     <implements>
