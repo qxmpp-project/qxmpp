@@ -403,4 +403,15 @@ void QXmpp::Private::generateRandomBytes(uint8_t *bytes, uint32_t byteCount)
 #endif
 }
 
+float QXmpp::Private::calculateProgress(qint64 transferred, qint64 total)
+{
+    if (total > 0) {
+        if (transferred > total) {
+            return 1;
+        }
+        return float(transferred) / total;
+    }
+
+    return 0;
+}
 /// \endcond

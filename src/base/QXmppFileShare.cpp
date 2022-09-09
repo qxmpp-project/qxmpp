@@ -125,6 +125,29 @@ void QXmppFileShare::setEncryptedSourecs(const QVector<QXmppEncryptedFileSource>
 }
 
 /// \cond
+void QXmppFileShare::visitSources(std::function<bool(const std::any &)> &&visitor) const
+{
+    for (const auto &httpSource : d->httpSources) {
+        if (visitor(httpSource)) {
+            return;
+        }
+    }
+    for (const auto &encryptedSource : d->encryptedSources) {
+        if (visitor(encryptedSource)) {
+            return;
+        }
+    }
+}
+
+void QXmppFileShare::addSource(const std::any &source)
+{
+    if (source.type() == typeid(QXmppHttpFileSource)) {
+        d->httpSources.push_back(std::any_cast<QXmppHttpFileSource>(source));
+    } else if (source.type() == typeid(QXmppEncryptedFileSource)) {
+        d->encryptedSources.push_back(std::any_cast<QXmppEncryptedFileSource>(source));
+    }
+}
+
 bool QXmppFileShare::parse(const QDomElement &el)
 {
     if (el.tagName() == "file-sharing" && el.namespaceURI() == ns_sfs) {

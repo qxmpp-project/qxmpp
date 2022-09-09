@@ -8,6 +8,7 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppHttpUploadIq.h"
 #include "QXmppUploadRequestManager.h"
+#include "QXmppUtils_p.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -149,13 +150,7 @@ QXmppHttpUpload::~QXmppHttpUpload() = default;
 ///
 float QXmppHttpUpload::progress() const
 {
-    if (d->bytesTotal > 0) {
-        if (d->bytesSent > d->bytesTotal) {
-            return 1;
-        }
-        return float(d->bytesSent) / d->bytesTotal;
-    }
-    return 0;
+    return calculateProgress(d->bytesSent, d->bytesTotal);
 }
 
 ///
