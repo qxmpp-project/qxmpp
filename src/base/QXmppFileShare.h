@@ -7,6 +7,9 @@
 
 #include "QXmppGlobal.h"
 
+#include <any>
+#include <functional>
+
 #include <QSharedDataPointer>
 
 class QDomElement;
@@ -43,6 +46,13 @@ public:
     /// \cond
     bool parse(const QDomElement &el);
     void toXml(QXmlStreamWriter *writer) const;
+
+protected:
+    friend class QXmppFileSharingManager;
+
+    // Private, internally used API:
+    void visitSources(std::function<bool(const std::any &)> &&visitor) const;
+    void addSource(const std::any &source);
     /// \endcond
 
 private:
