@@ -55,6 +55,8 @@ private:
 
     Q_SLOT void testSending_data();
     Q_SLOT void testSending();
+    Q_SLOT void testSendingFuture_data();
+    Q_SLOT void testSendingFuture();
 
     Q_SLOT void testUploadService();
 };
@@ -272,6 +274,70 @@ void tst_QXmppHttpUploadManager::testSending()
 
     // The client is not connected, so we never get an ID back (the packet was not sent).
     QVERIFY(returnId.isNull());
+}
+
+void tst_QXmppHttpUploadManager::testSendingFuture_data()
+{
+    testSending_data();
+}
+
+void tst_QXmppHttpUploadManager::testSendingFuture()
+{
+    QFETCH(QFileInfo, fileInfo);
+    QFETCH(QString, fileName);
+    QFETCH(qint64, fileSize);
+    QFETCH(QString, fileType);
+
+    auto expectedMimeType = QMimeDatabase().mimeTypeForName(fileType);
+
+    TestClient test;
+    test.addNewExtension<QXmppDiscoveryManager>();
+    auto *manager = test.addNewExtension<QXmppUploadRequestManager>();
+
+    addUploadService(test);
+
+    auto future = [=]() {
+        if (!fileInfo.baseName().isEmpty()) {
+            return manager->requestSlot(fileInfo);
+        } else {
+            return manager->requestSlot(fileName, fileSize, expectedMimeType);
+        }
+    }();
+
+    QVERIFY(!future.isFinished());
+
+    // check sent packet
+    QXmppHttpUploadRequestIq iq;
+    parsePacket(iq, test.takePacket().toUtf8());
+
+    QCOMPARE(iq.type(), QXmppIq::Get);
+    QCOMPARE(iq.to(), UPLOAD_SERVICE_NAME);
+    QCOMPARE(iq.fileName(), fileName);
+    QCOMPARE(iq.size(), fileSize);
+    QCOMPARE(iq.contentType(), expectedMimeType);
+
+    // inject reply
+    QByteArray reply =
+        "<iq from='" + iq.to().toUtf8() + "' id='" + iq.id().toUtf8() + "' to='" + iq.from().toUtf8() +
+        "' type='result'>"
+        "<slot xmlns='urn:xmpp:http:upload:0'>"
+        "<put url='https://upload.montague.tld/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg'>"
+        "<header name='Authorization'>Basic Base64String==</header>"
+        "<header name='Content-type'>application/json</header>"
+        "<header name='Cookie'>foo=bar; user=romeo</header>"
+        "</put>"
+        "<get url='https://download.montague.tld/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg' />"
+        "</slot>"
+        "</iq>";
+    test.inject(reply);
+    auto slot = expectFutureVariant<QXmppHttpUploadSlotIq>(future);
+
+    QCOMPARE(slot.getUrl(), QUrl("https://download.montague.tld/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg"));
+    QCOMPARE(slot.putUrl(), QUrl("https://upload.montague.tld/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg"));
+    // checks that the disallowed 'Content-type' header is not set
+    QCOMPARE(slot.putHeaders().size(), 2);
+    QCOMPARE(slot.putHeaders().keys()[0], QStringLiteral("Authorization"));
+    QCOMPARE(slot.putHeaders().keys()[1], QStringLiteral("Cookie"));
 }
 
 void tst_QXmppHttpUploadManager::testUploadService()
