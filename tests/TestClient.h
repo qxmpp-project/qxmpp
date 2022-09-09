@@ -49,6 +49,16 @@ public:
         QCOMPARE(m_sentPackets.takeFirst(), packet.replace(u'\'', u'"'));
         resetIdCount();
     }
+    QString takePacket()
+    {
+        [this]() { QVERIFY(!m_sentPackets.isEmpty()); }();
+        return m_sentPackets.takeFirst();
+    }
+    QString takeLastPacket()
+    {
+        [this]() { QVERIFY(!m_sentPackets.isEmpty()); }();
+        return m_sentPackets.takeLast();
+    }
     void ignore()
     {
         m_sentPackets.takeFirst();
