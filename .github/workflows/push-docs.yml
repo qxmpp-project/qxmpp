@@ -22,5 +22,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
       - name: Install extra packages
         run: tests/travis/install-build-depends
+      - name: Update XEP metadata
+        run: doc/doap-rendering/update-xeplist.sh
       - name: Build documentation
         run: tests/travis/push-documentation
