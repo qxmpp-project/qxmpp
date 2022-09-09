@@ -72,17 +72,26 @@ QDomElement writePacketToDom(T packet)
     return doc.documentElement();
 }
 
+template<typename T, typename Variant>
+T expectVariant(Variant var)
+{
+    using namespace std::string_literals;
+    [&]() {
+        std::string message =
+            "Variant ("s + typeid(Variant).name() +
+            ") contains wrong type; expected '"s + typeid(T).name() + "'."s;
+        QVERIFY2(std::holds_alternative<T>(var), message.c_str());
+    }();
+    return std::get<T>(std::move(var));
+}
+
 template<typename T, typename Input>
 T expectFutureVariant(const QFuture<Input> &future)
 {
-#define return \
-    return     \
-    {          \
-    }
-    QVERIFY(future.isFinished());
-    QVERIFY2(std::holds_alternative<T>(future.result()), "Variant contains wrong type!");
-#undef return
-    return std::get<T>(future.result());
+    [&]() {
+        QVERIFY(future.isFinished());
+    }();
+    return expectVariant<T>(future.result());
 }
 
 class TestPasswordChecker : public QXmppPasswordChecker
