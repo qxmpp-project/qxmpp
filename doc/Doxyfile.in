@@ -9,7 +9,10 @@ INPUT                  = @PROJECT_SOURCE_DIR@/doc/index.doc \
                          @PROJECT_SOURCE_DIR@/doc/xep.doc \
                          @CMAKE_BINARY_DIR@/src/base/QXmppBuildConstants.h \
                          @PROJECT_SOURCE_DIR@/src
-
+HTML_EXTRA_FILES       = @PROJECT_SOURCE_DIR@/doc/doap.xml \
+                         @PROJECT_SOURCE_DIR@/doc/doap-rendering/doap.xsl \
+                         @PROJECT_SOURCE_DIR@/doc/doap-rendering/xeplist.xml \
+                         @PROJECT_SOURCE_DIR@/doc/doap-rendering/doap.css
 ALIASES                = "xep{1}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1</a>" \
                          "xep{2}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1: \2</a>"
 ALPHABETICAL_INDEX     = NO
