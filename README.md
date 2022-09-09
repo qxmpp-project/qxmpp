@@ -94,6 +94,25 @@ The API documentation of the master branch is also available:
 
 https://doc.qxmpp.org/qxmpp-dev/
 
+You can also generate the documentation for your local repository (after
+configuring it with the corresponding CMake argument specified above):
+```
+cd build
+make doc
+```
+
+The generated files are located in `build/doc/html/`.
+Open `build/doc/html/index.html` for reading the documentation.
+
+You maybe need to open a local web server to display the list of supported
+[XEPs][xeps] in case your web browser prohibits the request to
+`doc/doap-rendering/doap.xsl`.
+Here is an example with Python's built-in web server and Firefox:
+```
+python3 -m http.server
+firefox http://0.0.0.0:8000/xep.html
+```
+
 Supported Platforms
 ===================
 
@@ -114,3 +133,4 @@ https://github.com/qxmpp-project/qxmpp/issues
 [dev-chat]: xmpp:qxmpp@muc.kaidan.im?join
 [xmpp-compliance]: https://xmpp.org/extensions/xep-0459.html
 [qxmpp-doc]: https://doc.qxmpp.org/
+[xeps]: https://xmpp.org/extensions/
