@@ -310,7 +310,6 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>complete</xmpp:status>
         <xmpp:version>1.5</xmpp:version>
         <xmpp:since>1.0</xmpp:since>
-        <xmpp:note>No server-side support</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
