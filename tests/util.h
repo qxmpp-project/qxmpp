@@ -94,6 +94,18 @@ T expectFutureVariant(const QFuture<Input> &future)
     return expectVariant<T>(future.result());
 }
 
+template<typename T>
+T wait(const QFuture<T> &future)
+{
+    auto watcher = std::make_unique<QFutureWatcher<T>>();
+    QSignalSpy spy(watcher.get(), &QFutureWatcherBase::finished);
+    watcher->setFuture(future);
+    spy.wait();
+    if constexpr (!std::is_same_v<T, void>) {
+        return future.result();
+    }
+}
+
 class TestPasswordChecker : public QXmppPasswordChecker
 {
 public:
