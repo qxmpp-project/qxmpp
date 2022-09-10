@@ -329,26 +329,45 @@ QXmppCallStream::QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
     d = new QXmppCallStreamPrivate(this, pipeline, rtpbin, media, creator, name, id);
 }
 
+///
+/// Returns the JID of the creator of the call stream.
+///
 QString QXmppCallStream::creator() const
 {
     return d->creator;
 }
 
+///
+/// Returns the media type of the stream, "audio" or "video".
+///
 QString QXmppCallStream::media() const
 {
     return d->media;
 }
 
+///
+/// Returns the name of the stream (e.g. "webcam" or "voice").
+///
+/// There is no defined format and there are no predefined values for this.
+///
 QString QXmppCallStream::name() const
 {
     return d->name;
 }
 
+///
+/// Returns the local ID of the stream.
+///
 int QXmppCallStream::id() const
 {
     return d->id;
 }
 
+///
+/// Sets a gstreamer receive pad callback.
+///
+/// Can be used to process or display the received data.
+///
 void QXmppCallStream::setReceivePadCallback(std::function<void(GstPad *)> cb)
 {
     d->receivePadCB = cb;
@@ -357,6 +376,11 @@ void QXmppCallStream::setReceivePadCallback(std::function<void(GstPad *)> cb)
     }
 }
 
+///
+/// Sets a gstreamer send pad callback.
+///
+/// Can be used to send the stream input.
+///
 void QXmppCallStream::setSendPadCallback(std::function<void(GstPad *)> cb)
 {
     d->sendPadCB = cb;
