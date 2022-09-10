@@ -278,6 +278,13 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(QIODevice *d
 
     std::shared_ptr<QXmppHttpUpload> upload(new QXmppHttpUpload);
 
+    auto *uploadRequestManager = client()->findExtension<QXmppUploadRequestManager>();
+    if (!uploadRequestManager) {
+        upload->d->reportError({ QStringLiteral("QXmppUploadRequestManager has not been added to the client."), std::any() });
+        upload->d->reportFinished();
+        return upload;
+    }
+
     if (!data->isOpen()) {
         upload->d->reportError({ QStringLiteral("Input data device MUST be open."), std::any() });
         upload->d->reportFinished();
