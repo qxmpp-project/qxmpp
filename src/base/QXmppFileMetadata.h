@@ -18,12 +18,14 @@ class QXmlStreamWriter;
 class QXmppHash;
 class QXmppThumbnail;
 class QXmppFileMetadataPrivate;
+class QFileInfo;
 
 class QXMPP_EXPORT QXmppFileMetadata
 {
 public:
-    QXmppFileMetadata();
+    static QXmppFileMetadata fromFileInfo(const QFileInfo &info);
 
+    QXmppFileMetadata();
     QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppFileMetadata)
 
     /// \cond

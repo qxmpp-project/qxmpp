@@ -13,6 +13,7 @@
 
 #include <QDateTime>
 #include <QDomElement>
+#include <QFileInfo>
 #include <QMimeDatabase>
 
 class QXmppFileMetadataPrivate : public QSharedData
@@ -37,6 +38,21 @@ public:
 ///
 /// \since QXmpp 1.5
 ///
+
+///
+/// \brief Creates a QXmppFileMetadata object from information from QFileInfo.
+///
+/// Sets the filename, file size, media type and the last modification date.
+///
+QXmppFileMetadata QXmppFileMetadata::fromFileInfo(const QFileInfo &info)
+{
+    QXmppFileMetadata metadata;
+    metadata.setFilename(info.fileName());
+    metadata.setSize(info.size());
+    metadata.setMediaType(QMimeDatabase().mimeTypeForFile(info));
+    metadata.setLastModified(info.lastModified());
+    return metadata;
+}
 
 QXmppFileMetadata::QXmppFileMetadata()
     : d(new QXmppFileMetadataPrivate())
