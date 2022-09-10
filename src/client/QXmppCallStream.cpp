@@ -29,9 +29,9 @@ QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstEleme
       decoderBin(nullptr),
       sendPadCB(nullptr),
       receivePadCB(nullptr),
-      media(media_),
-      creator(creator_),
-      name(name_),
+      media(std::move(media_)),
+      creator(std::move(creator_)),
+      name(std::move(name_)),
       id(id_)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
@@ -325,8 +325,8 @@ void QXmppCallStreamPrivate::addRtcpSender(GstPad *pad)
 
 QXmppCallStream::QXmppCallStream(GstElement *pipeline, GstElement *rtpbin,
                                  QString media, QString creator, QString name, int id)
+    : d(new QXmppCallStreamPrivate(this, pipeline, rtpbin, std::move(media), std::move(creator), std::move(name), id))
 {
-    d = new QXmppCallStreamPrivate(this, pipeline, rtpbin, media, creator, name, id);
 }
 
 ///
@@ -370,7 +370,7 @@ int QXmppCallStream::id() const
 ///
 void QXmppCallStream::setReceivePadCallback(std::function<void(GstPad *)> cb)
 {
-    d->receivePadCB = cb;
+    d->receivePadCB = std::move(cb);
     if (d->receivePad) {
         d->receivePadCB(d->receivePad);
     }
@@ -383,7 +383,7 @@ void QXmppCallStream::setReceivePadCallback(std::function<void(GstPad *)> cb)
 ///
 void QXmppCallStream::setSendPadCallback(std::function<void(GstPad *)> cb)
 {
-    d->sendPadCB = cb;
+    d->sendPadCB = std::move(cb);
     if (d->sendPad) {
         d->sendPadCB(d->sendPad);
     }
