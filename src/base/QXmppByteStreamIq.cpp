@@ -10,6 +10,12 @@
 #include <QDomElement>
 
 ///
+/// \enum QXmppByteStreamIq::Mode
+///
+/// Used to select the transport layer protocol (TCP or UDP).
+///
+
+///
 /// \class QXmppByteStreamIq::StreamHost
 ///
 /// StreamHost represents information about a specific SOCKS5 bytestreams host.
@@ -63,11 +69,17 @@ void QXmppByteStreamIq::StreamHost::setPort(quint16 port)
     m_port = port;
 }
 
+///
+/// Returns the zero-configuration service available for bytestreaming.
+///
 QString QXmppByteStreamIq::StreamHost::zeroconf() const
 {
     return m_zeroconf;
 }
 
+///
+/// Sets the zero-configuration service available for bytestreaming.
+///
 void QXmppByteStreamIq::StreamHost::setZeroconf(const QString &zeroconf)
 {
     m_zeroconf = zeroconf;
@@ -96,21 +108,33 @@ void QXmppByteStreamIq::setMode(QXmppByteStreamIq::Mode mode)
     m_mode = mode;
 }
 
+///
+/// Returns the bytestream stream ID.
+///
 QString QXmppByteStreamIq::sid() const
 {
     return m_sid;
 }
 
+///
+/// Sets the bytestream stream ID.
+///
 void QXmppByteStreamIq::setSid(const QString &sid)
 {
     m_sid = sid;
 }
 
+///
+/// Returns the jid of the target.
+///
 QString QXmppByteStreamIq::activate() const
 {
     return m_activate;
 }
 
+///
+/// Sets the jid of the target.
+///
 void QXmppByteStreamIq::setActivate(const QString &activate)
 {
     m_activate = activate;
@@ -148,12 +172,15 @@ void QXmppByteStreamIq::setStreamHostUsed(const QString &jid)
     m_streamHostUsed = jid;
 }
 
-/// \cond
+///
+/// Returns whether \a element is an IQ element with a bytestream query.
+///
 bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
 {
     return element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_bytestreams;
 }
 
+/// \cond
 void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 {
     auto queryElement = element.firstChildElement(QStringLiteral("query"));
