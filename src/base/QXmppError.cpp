@@ -32,6 +32,20 @@
 ///
 
 ///
+/// Constructs a QXmppError from an QIODevice
+///
+/// It tries to cast the IO device to different known IO devices to get a useful more specific
+/// error, i.e. it returns a QXmppError with QFileDevice::FileError for QFileDevices.
+///
+QXmppError QXmppError::fromIoDevice(const QIODevice &device)
+{
+    if (const auto *file = dynamic_cast<const QFileDevice *>(&device)) {
+        return QXmppError { file->errorString(), file->error() };
+    }
+    return QXmppError { device.errorString(), std::any() };
+}
+
+///
 /// Returns whether the error is a QNetworkReply::NetworkError.
 ///
 bool QXmppError::isFileError() const

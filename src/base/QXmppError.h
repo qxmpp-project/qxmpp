@@ -10,10 +10,14 @@
 #include <any>
 #include <optional>
 
+class QIODevice;
+
 struct QXMPP_EXPORT QXmppError
 {
     QString description;
     std::any error;
+
+    static QXmppError fromIoDevice(const QIODevice &device);
 
     bool isFileError() const;
     bool isNetworkError() const;
