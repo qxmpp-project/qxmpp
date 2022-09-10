@@ -80,7 +80,8 @@ T expectVariant(Variant var)
     [&]() {
         std::string message =
             "Variant ("s + typeid(Variant).name() +
-            ") contains wrong type; expected '"s + typeid(T).name() + "'."s;
+            ") contains wrong type ("s + std::to_string(var.index()) +
+            "); expected '"s + typeid(T).name() + "'."s;
         QVERIFY2(std::holds_alternative<T>(var), message.c_str());
     }();
     return std::get<T>(std::move(var));
