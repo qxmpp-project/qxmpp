@@ -14,7 +14,7 @@ Dependencies
 ------------
 
  * [QCA (Qt Cryptographic Architecture)](https://invent.kde.org/libraries/qca)
- * [libomemo-c](https://github.com/dino/libomemo-c)
+ * [libomemo-c](https://github.com/dino/libomemo-c) (built with `-DBUILD_SHARED_LIBS=ON`)
 
 Building
 --------
