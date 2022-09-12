@@ -51,6 +51,9 @@ struct first_argument
 template<typename F>
 using first_argument_t = typename first_argument<F>::type;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 1, 0)
+using QtFuture::makeReadyFuture;
+#else
 template<typename T>
 QFuture<T> makeReadyFuture(T &&value)
 {
@@ -59,6 +62,7 @@ QFuture<T> makeReadyFuture(T &&value)
     interface.reportFinished();
     return interface.future();
 }
+#endif
 
 inline QFuture<void> makeReadyFuture()
 {
