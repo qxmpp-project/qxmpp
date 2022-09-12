@@ -6,8 +6,8 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppHash.h"
-#include "QXmppUtils.h"
 #include "QXmppThumbnail.h"
+#include "QXmppUtils.h"
 
 #include <utility>
 
