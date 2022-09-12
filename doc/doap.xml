@@ -30,9 +30,7 @@ SPDX-License-Identifier: CC0-1.0
     <os>Linux</os>
     <os>macOS</os>
     <os>tvOS</os>
-    <os>Universal Windows Platform (UWP)</os>
     <os>watchOS</os>
-    <os>WebAssembly</os>
     <os>Windows</os>
     <category rdf:resource='https://linkmauve.fr/ns/xmpp-doap#category-library'/>
     <repository>
