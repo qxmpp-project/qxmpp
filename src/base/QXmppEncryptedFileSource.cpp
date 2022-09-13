@@ -24,6 +24,8 @@ QXmppEncryptedFileSource::QXmppEncryptedFileSource()
 {
 }
 
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppEncryptedFileSource);
+
 QXmppEncryptedFileSource::Cipher QXmppEncryptedFileSource::cipher() const
 {
     return d->cipher;

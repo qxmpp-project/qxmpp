@@ -27,6 +27,7 @@ public:
     };
 
     QXmppEncryptedFileSource();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppEncryptedFileSource);
     
     Cipher cipher() const;
     void setCipher(Cipher newCipher);
