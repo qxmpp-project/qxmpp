@@ -1,6 +1,14 @@
+// SPDX-FileCopyrightText: 2022 <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 <jbb@kaidan.im>
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 #include "QXmppEncryptedFileSource.h"
+#include "QXmppConstants_p.h"
+#include "QXmppHttpFileSource.h"
 
 #include <QDomElement>
+#include <QXmlStreamWriter>
 
 class QXmppEncryptedFileSourcePrivate : public QSharedData {
 public:
@@ -8,7 +16,7 @@ public:
     QByteArray key;
     QByteArray iv;
     QVector<QXmppHash> hashes;
-    QVector<QUrl> httpSources;
+    QVector<QXmppHttpFileSource> httpSources;
 };
 
 QXmppEncryptedFileSource::QXmppEncryptedFileSource()
@@ -56,12 +64,12 @@ void QXmppEncryptedFileSource::setHashes(const QVector<QXmppHash> &newHashes)
     d->hashes = newHashes;
 }
 
-const QVector<QUrl> &QXmppEncryptedFileSource::httpSources() const
+const QVector<QXmppHttpFileSource> &QXmppEncryptedFileSource::httpSources() const
 {
     return d->httpSources;
 }
 
-void QXmppEncryptedFileSource::setHttpSources(const QVector<QUrl> &newHttpSources)
+void QXmppEncryptedFileSource::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
 {
     d->httpSources = newHttpSources;
 }
@@ -97,7 +105,9 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
     for (auto childEl = el.firstChildElement(QStringLiteral("url-data"));
          !childEl.isNull();
          childEl = childEl.nextSiblingElement(QStringLiteral("url-data"))) {
-        d->httpSources.push_back(QUrl(childEl.text()));
+        QXmppHttpFileSource source;
+        source.parse(childEl);
+        d->httpSources.push_back(std::move(source));
     }
 
     return true;
@@ -105,5 +115,17 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 
 void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
 {
-
+    writer->writeStartElement(QStringLiteral("encrypted"));
+    writer->writeDefaultNamespace(ns_esfs);
+    writer->writeTextElement(QStringLiteral("key"), d->key.toBase64());
+    writer->writeTextElement(QStringLiteral("iv"), d->iv.toBase64());
+    for (const auto &hash : d->hashes) {
+        hash.toXml(writer);
+    }
+    writer->writeStartElement(QStringLiteral("sources"));
+    for (const auto &source : d->httpSources) {
+        source.toXml(writer);
+    }
+    writer->writeEndElement();
+    writer->writeEndElement();
 }

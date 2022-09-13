@@ -1,7 +1,13 @@
+// SPDX-FileCopyrightText: 2022 <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 <jbb@kaidan.im>
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 #ifndef QXMPPENCRYPTEDFILESOURCE_H
 #define QXMPPENCRYPTEDFILESOURCE_H
 
 #include "QXmppGlobal.h"
+#include "QXmppHttpFileSource.h"
 
 #include <QSharedDataPointer>
 #include <QVector>
@@ -34,8 +40,8 @@ public:
     const QVector<QXmppHash> &hashes() const;
     void setHashes(const QVector<QXmppHash> &newHashes);
     
-    const QVector<QUrl> &httpSources() const;
-    void setHttpSources(const QVector<QUrl> &newHttpSources);
+    const QVector<QXmppHttpFileSource> &httpSources() const;
+    void setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources);
 
     /// \cond
     bool parse(const QDomElement &el);
