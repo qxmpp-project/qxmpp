@@ -4,8 +4,11 @@
 #include "QXmppGlobal.h"
 
 #include <QSharedDataPointer>
+#include <QVector>
+#include <QUrl>
 
-class QXmppHash;
+#include "QXmppHash.h"
+
 class QXmppEncryptedFileSourcePrivate;
 
 class QXMPP_EXPORT QXmppEncryptedFileSource
@@ -33,14 +36,14 @@ public:
     
     const QVector<QUrl> &httpSources() const;
     void setHttpSources(const QVector<QUrl> &newHttpSources);
+
+    /// \cond
+    bool parse(const QDomElement &el);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
     
 private:
     QSharedDataPointer<QXmppEncryptedFileSourcePrivate> d;
-    Cipher m_cipher;
-    QByteArray m_key;
-    QByteArray m_iv;
-    QVector<QXmppHash> m_hashes;
-    QVector<QUrl> m_httpSources;
 };
 
 #endif // QXMPPENCRYPTEDFILESOURCE_H

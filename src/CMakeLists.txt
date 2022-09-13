@@ -36,6 +36,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppDiscoveryIq.h
     base/QXmppE2eeMetadata.h
     base/QXmppElement.h
+    base/QXmppEncryptedFileSource.h
     base/QXmppEntityTimeIq.h
     base/QXmppError.h
     base/QXmppExtension.h
@@ -161,6 +162,7 @@ set(SOURCE_FILES
     base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
+    base/QXmppEncryptedFileSource.cpp
     base/QXmppEntityTimeIq.cpp
     base/QXmppError.cpp
     base/QXmppFileMetadata.cpp
