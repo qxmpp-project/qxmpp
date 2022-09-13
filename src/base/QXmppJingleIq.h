@@ -237,6 +237,30 @@ public:
         TransportReplace
     };
 
+    ///
+    /// Contains the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+    /// Informational Messages.
+    ///
+    /// \since QXmpp 1.5
+    ///
+    enum RtpSessionState {
+        /// No session state specified
+        None,
+        /// Actively participating in the session after having been on mute or having put the other
+        /// party on hold
+        Active,
+        /// Temporarily not listening for media from the other party
+        Hold,
+        /// Ending hold state
+        Unhold,
+        /// Temporarily not sending media to the other party but continuing to accept media from it
+        Mute,
+        /// Ending mute state
+        Unmute,
+        /// State after the callee acknowledged the call but did not yet interacted with it
+        Ringing
+    };
+
     /// \internal
     ///
     /// The QXmppJingleIq::Content class represents the "content" element of a
@@ -386,15 +410,19 @@ public:
     QString responder() const;
     void setResponder(const QString &responder);
 
-    // XEP-0167: Jingle RTP Sessions
-    bool ringing() const;
-    void setRinging(bool ringing);
-
     QString sid() const;
     void setSid(const QString &sid);
 
     QString mujiGroupChatJid() const;
     void setMujiGroupChatJid(const QString &mujiGroupChatJid);
+
+    RtpSessionState rtpSessionState() const;
+    void setRtpSessionState(RtpSessionState rtpSessionState);
+
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+    bool ringing() const;
+    void setRinging(bool ringing);
+#endif
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);

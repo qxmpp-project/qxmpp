@@ -57,6 +57,16 @@ static const char *jingle_reasons[] = {
     "unsupported-transports",
 };
 
+static const QStringList JINGLE_RTP_SESSION_STATES = {
+    QStringLiteral(),
+    QStringLiteral("active"),
+    QStringLiteral("hold"),
+    QStringLiteral("unhold"),
+    QStringLiteral("mute"),
+    QStringLiteral("unmute"),
+    QStringLiteral("ringing")
+};
+
 static QString formatFingerprint(const QByteArray &digest)
 {
     QString fingerprint;
@@ -849,11 +859,12 @@ public:
 
     QList<QXmppJingleIq::Content> contents;
     QXmppJingleIq::Reason reason;
-    bool ringing;
+
+    QXmppJingleIq::RtpSessionState rtpSessionState = QXmppJingleIq::None;
 };
 
 QXmppJingleIqPrivate::QXmppJingleIqPrivate()
-    : action(QXmppJingleIq::ContentAccept), ringing(false)
+    : action(QXmppJingleIq::ContentAccept)
 {
 }
 
@@ -968,24 +979,7 @@ void QXmppJingleIq::setResponder(const QString &responder)
     d->responder = responder;
 }
 
-/// Returns true if the call is ringing.
-
-bool QXmppJingleIq::ringing() const
-{
-    return d->ringing;
-}
-
-/// Set to true if the call is ringing.
-///
-/// \param ringing
-
-void QXmppJingleIq::setRinging(bool ringing)
-{
-    d->ringing = ringing;
-}
-
 /// Returns the session ID.
-
 QString QXmppJingleIq::sid() const
 {
     return d->sid;
@@ -999,6 +993,62 @@ void QXmppJingleIq::setSid(const QString &sid)
 {
     d->sid = sid;
 }
+
+///
+/// Returns the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \return the session's state
+///
+/// \since QXmpp 1.5
+///
+QXmppJingleIq::RtpSessionState QXmppJingleIq::rtpSessionState() const
+{
+    return d->rtpSessionState;
+}
+
+///
+/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \param rtpSessionState session' state
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::setRtpSessionState(RtpSessionState rtpSessionState)
+{
+    d->rtpSessionState = rtpSessionState;
+}
+
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+///
+/// Returns true if the call is ringing.
+///
+/// \deprecated This method is deprecated since QXmpp 1.5. Use\c QXmpp::rtpSessionState()
+/// instead.
+///
+bool QXmppJingleIq::ringing() const
+{
+    return d->rtpSessionState == QXmppJingleIq::Ringing;
+}
+
+///
+/// Set to true if the call is ringing.
+///
+/// \param ringing
+///
+/// \deprecated This method is deprecated since QXmpp 1.5. Use\c QXmpp::setRtpSessionState()
+/// instead.
+///
+void QXmppJingleIq::setRinging(bool ringing)
+{
+    if (ringing) {
+        d->rtpSessionState = QXmppJingleIq::Ringing;
+    } else {
+        d->rtpSessionState = QXmppJingleIq::None;
+    }
+}
+#endif
 
 ///
 /// Returns the JID of the \xep{0272, Multiparty Jingle (Muji)} group chat.
@@ -1063,9 +1113,16 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
     QDomElement reasonElement = jingleElement.firstChildElement(QStringLiteral("reason"));
     d->reason.parse(reasonElement);
 
-    // ringing
-    QDomElement ringingElement = jingleElement.firstChildElement(QStringLiteral("ringing"));
-    d->ringing = (ringingElement.namespaceURI() == ns_jingle_rtp_info);
+    for (auto childElement = jingleElement.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (childElement.namespaceURI() == ns_jingle_rtp_info) {
+            if (const auto rtpSessionState = JINGLE_RTP_SESSION_STATES.indexOf(childElement.tagName()); rtpSessionState != -1) {
+                d->rtpSessionState = static_cast<QXmppJingleIq::RtpSessionState>(rtpSessionState);
+                break;
+            }
+        }
+    }
 }
 
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -1091,9 +1148,8 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     d->reason.toXml(writer);
 
-    // ringing
-    if (d->ringing) {
-        writer->writeStartElement(QStringLiteral("ringing"));
+    if (const auto rtpSessionState = d->rtpSessionState; rtpSessionState != QXmppJingleIq::None) {
+        writer->writeStartElement(JINGLE_RTP_SESSION_STATES.at(rtpSessionState));
         writer->writeDefaultNamespace(ns_jingle_rtp_info);
         writer->writeEndElement();
     }

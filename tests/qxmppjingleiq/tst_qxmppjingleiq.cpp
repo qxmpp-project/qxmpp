@@ -38,6 +38,7 @@ private slots:
     void testVideoPayloadType();
     void testPayloadTypeRtpFeedbackNegotiation();
     void testRinging();
+    void testRtpSessionInfoType();
 };
 
 void tst_QXmppJingleIq::testIsSdpParameter_data()
@@ -806,6 +807,11 @@ void tst_QXmppJingleIq::testRinging()
     parsePacket(iq, xml);
     QCOMPARE(iq.ringing(), true);
     serializePacket(iq, xml);
+}
+
+void tst_QXmppJingleIq::testRtpSessionInfoType()
+{
+
 }
 
 QTEST_MAIN(tst_QXmppJingleIq)
