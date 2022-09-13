@@ -1210,7 +1210,7 @@ void QXmppMessage::setTrustMessageElement(const std::optional<QXmppTrustMessageE
 }
 
 ///
-/// Returns the via \xep{0447, Stateless file sharing} shared files included in this message.
+/// Returns the via \xep{0447, Stateless file sharing} shared files attached to this message.
 ///
 /// \since QXmpp 1.5
 ///
@@ -1220,7 +1220,7 @@ const QVector<QXmppFileShare> &QXmppMessage::sharedFiles() const
 }
 
 ///
-/// Sets the via \xep{0447, Stateless file sharing} shared files in this message.
+/// Sets the via \xep{0447, Stateless file sharing} shared files attached to this message.
 ///
 /// \since QXmpp 1.5
 ///
