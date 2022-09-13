@@ -40,6 +40,8 @@
 #define QT_WARNING_DISABLE_DEPRECATED
 #endif
 
+// Adds constructor and operator declarations to a ".h" file corresponding to the rule of six.
+// A default constructor has to be declared manually.
 #define QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(name) \
     name(const name &);                         \
     name(name &&);                              \
@@ -47,6 +49,8 @@
     name &operator=(const name &);              \
     name &operator=(name &&);
 
+// Adds constructor and operator definitions to a ".cpp" file corresponding to the rule of six.
+// A default constructor has to be defined manually.
 #define QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(name)     \
     name::name(const name &) = default;            \
     name::name(name &&) = default;                 \
