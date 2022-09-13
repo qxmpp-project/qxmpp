@@ -16,6 +16,7 @@
 #include <QNetworkReply>
 #include <QPointer>
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
 
 struct QXmppHttpUploadPrivate
@@ -69,7 +70,7 @@ struct QXmppHttpUploadPrivate
             return *error;
         }
         if (cancelled) {
-            return QXmppHttpUpload::Cancelled();
+            return Cancelled();
         }
         return getUrl;
     }

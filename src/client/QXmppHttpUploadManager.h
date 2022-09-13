@@ -25,11 +25,7 @@ class QXMPP_EXPORT QXmppHttpUpload : public QObject
     Q_PROPERTY(quint64 bytesTotal READ bytesTotal NOTIFY progressChanged)
 
 public:
-    struct Cancelled
-    {
-    };
-
-    using Result = std::variant<QUrl, Cancelled, QXmppError>;
+    using Result = std::variant<QUrl, QXmpp::Cancelled, QXmppError>;
 
     ~QXmppHttpUpload();
 

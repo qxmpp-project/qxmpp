@@ -145,6 +145,15 @@ struct Success
 {
 };
 
+///
+/// Unit struct used to indicate that a process has been cancelled.
+///
+/// \since QXmpp 1.5
+///
+struct Cancelled
+{
+};
+
 }  // namespace QXmpp
 
 #endif  // QXMPPGLOBAL_H
