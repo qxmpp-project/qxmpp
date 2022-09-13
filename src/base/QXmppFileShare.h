@@ -13,7 +13,7 @@ class QXmlStreamWriter;
 class QXmppFileSharePrivate;
 class QXmppFileMetadata;
 
-class QXmppFileShare
+class QXMPP_EXPORT QXmppFileShare
 {
 public:
     enum Disposition {
