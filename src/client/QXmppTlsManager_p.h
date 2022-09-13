@@ -26,7 +26,7 @@
 ///
 /// \ingroup Managers
 ///
-class QXmppTlsManager : public QXmppInternalClientExtension
+class QXMPP_EXPORT QXmppTlsManager : public QXmppInternalClientExtension
 {
     Q_OBJECT
 
