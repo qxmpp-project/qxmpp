@@ -8,6 +8,7 @@
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
+#include "QXmppFileShare.h"
 #include "QXmppStanza.h"
 
 #include <optional>
@@ -247,6 +248,10 @@ public:
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement() const;
     void setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement);
+
+    // XEP-0447: Stateless file sharing
+    const QVector<QXmppFileShare> &sharedFiles() const;
+    void setSharedFiles(const QVector<QXmppFileShare> &sharedFiles);
 
     /// \cond
 #ifdef BUILD_OMEMO

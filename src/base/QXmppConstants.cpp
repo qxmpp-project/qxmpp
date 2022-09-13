@@ -80,6 +80,8 @@ const char *ns_data = "jabber:x:data";
 // XEP-0095: Stream Initiation
 const char *ns_stream_initiation = "http://jabber.org/protocol/si";
 const char *ns_stream_initiation_file_transfer = "http://jabber.org/protocol/si/profile/file-transfer";
+// XEP-0103: URL Address Information
+const char *ns_url_data = "http://jabber.org/protocol/url-data";
 // XEP-0108: User Activity
 const char *ns_activity = "http://jabber.org/protocol/activity";
 // XEP-0115: Entity Capabilities
@@ -188,5 +190,7 @@ const char *ns_fallback_indication = "urn:xmpp:fallback:0";
 const char *ns_tm = "urn:xmpp:tm:1";
 // XEP-0446: File metadata element
 const char *ns_file_metadata = "urn:xmpp:file:metadata:0";
+// XEP-0447: Stateless file sharing
+const char *ns_sfs = "urn:xmpp:sfs:0";
 // XEP-0450: Automatic Trust Management (ATM)
 const char *ns_atm = "urn:xmpp:atm:1";

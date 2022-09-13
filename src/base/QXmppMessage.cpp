@@ -9,6 +9,7 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
+#include "QXmppFileShare.h"
 #include "QXmppGlobal_p.h"
 #include "QXmppMixInvitation.h"
 #ifdef BUILD_OMEMO
@@ -151,6 +152,9 @@ public:
 
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement;
+
+    // XEP-0448: Encryption for stateless file sharing
+    QVector<QXmppFileShare> sharedFiles;
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
@@ -1205,6 +1209,26 @@ void QXmppMessage::setTrustMessageElement(const std::optional<QXmppTrustMessageE
     d->trustMessageElement = trustMessageElement;
 }
 
+///
+/// Returns the via \xep{0447, Stateless file sharing} shared files attached to this message.
+///
+/// \since QXmpp 1.5
+///
+const QVector<QXmppFileShare> &QXmppMessage::sharedFiles() const
+{
+    return d->sharedFiles;
+}
+
+///
+/// Sets the via \xep{0447, Stateless file sharing} shared files attached to this message.
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setSharedFiles(const QVector<QXmppFileShare> &sharedFiles)
+{
+    d->sharedFiles = sharedFiles;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -1489,6 +1513,14 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             d->trustMessageElement = trustMessageElement;
             return true;
         }
+        // XEP-0448: Stateless file sharing
+        if (checkElement(element, QStringLiteral("file-sharing"), ns_sfs)) {
+            QXmppFileShare share;
+            if (share.parse(element)) {
+                d->sharedFiles.push_back(std::move(share));
+            }
+            return true;
+        }
     }
     return false;
 }
@@ -1738,6 +1770,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         // XEP-0434: Trust Messages (TM)
         if (d->trustMessageElement) {
             d->trustMessageElement->toXml(writer);
+        }
+
+        // XEP-0448: Stateless file sharing
+        for (const auto &fileShare : d->sharedFiles) {
+            fileShare.toXml(writer);
         }
     }
 }

@@ -92,6 +92,8 @@ extern const char *ns_data;
 // XEP-0095: Stream Initiation
 extern const char *ns_stream_initiation;
 extern const char *ns_stream_initiation_file_transfer;
+// XEP-0103: URL Address Information
+extern const char *ns_url_data;
 // XEP-0108: User Activity
 extern const char *ns_activity;
 // XEP-0115: Entity Capabilities
@@ -200,6 +202,8 @@ extern const char *ns_fallback_indication;
 extern const char *ns_tm;
 // XEP-0446: File metadata element
 extern const char *ns_file_metadata;
+// XEP-0447: Stateless file sharing
+extern const char *ns_sfs;
 // XEP-0450: Automatic Trust Management (ATM)
 extern const char *ns_atm;
 

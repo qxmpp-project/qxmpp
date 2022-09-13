@@ -52,6 +52,7 @@ private slots:
     void testMixInvitation();
     void testTrustMessageElement();
     void testE2eeFallbackBody();
+    void testFileSharing();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1157,6 +1158,32 @@ void tst_QXmppMessage::testE2eeFallbackBody()
     QXmppMessage message2;
     message2.setE2eeFallbackBody(QStringLiteral("This message is encrypted with OMEMO 2 but could not be decrypted"));
     serializePacket(message2, xml);
+}
+
+void tst_QXmppMessage::testFileSharing()
+{
+    const QByteArray xml(
+        "<message id='sharing-a-file' to='juliet@shakespeare.lit' from='romeo@montague.lit/resource' type='normal'>"
+        "<file-sharing xmlns='urn:xmpp:sfs:0' disposition='inline'>"
+        "<file xmlns='urn:xmpp:file:metadata:0'>"
+        "<desc>Photo from the summit.</desc>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='sha3-256'>2XarmwTlNxDAMkvymloX3S5+VbylNrJt/l5QyPa+YoU=</hash>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='blake2b-256'>2AfMGH8O7UNPTvUVAM9aK13mpCY=</hash>"
+        "<media-type>image/jpeg</media-type>"
+        "<name>summit.jpg</name>"
+        "<size>3032449</size>"
+        "<thumbnail xmlns='urn:xmpp:thumbs:1' uri='cid:sha1+ffd7c8d28e9c5e82afea41f97108c6b4@bob.xmpp.org' media-type='image/png' width='128' height='96'/>"
+        "</file>"
+        "<sources>"
+        "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/summit.jpg'/>"
+        "</sources>"
+        "</file-sharing>"
+        "</message>");
+
+    QXmppMessage message1;
+    parsePacket(message1, xml);
+    QVERIFY(!message1.sharedFiles().empty());
+    serializePacket(message1, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)

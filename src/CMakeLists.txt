@@ -39,8 +39,9 @@ set(INSTALL_HEADER_FILES
     base/QXmppEntityTimeIq.h
     base/QXmppError.h
     base/QXmppExtension.h
-    base/QXmppFutureUtils_p.h
     base/QXmppFileMetadata.h
+    base/QXmppFileShare.h
+    base/QXmppFutureUtils_p.h
     base/QXmppGeolocItem.h
     base/QXmppGlobal.h
     base/QXmppHash.h
@@ -162,6 +163,7 @@ set(SOURCE_FILES
     base/QXmppEntityTimeIq.cpp
     base/QXmppError.cpp
     base/QXmppFileMetadata.cpp
+    base/QXmppFileShare.cpp
     base/QXmppGeolocItem.cpp
     base/QXmppGlobal.cpp
     base/QXmppHash.cpp
