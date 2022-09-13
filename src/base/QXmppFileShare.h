@@ -5,10 +5,12 @@
 #ifndef QXMPPFILESHARE_H
 #define QXMPPFILESHARE_H
 
+#include "QXmppGlobal.h"
+
 #include <QSharedDataPointer>
-#include <QUrl>
 
 class QDomElement;
+class QUrl;
 class QXmlStreamWriter;
 class QXmppFileSharePrivate;
 class QXmppFileMetadata;

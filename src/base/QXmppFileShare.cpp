@@ -10,6 +10,7 @@
 #include <optional>
 
 #include <QDomElement>
+#include <QUrl>
 #include <QXmlStreamWriter>
 
 using Disposition = QXmppFileShare::Disposition;
