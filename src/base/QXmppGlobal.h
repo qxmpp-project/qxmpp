@@ -47,7 +47,7 @@
     name &operator=(const name &);              \
     name &operator=(name &&);
 
-#define QXMPP_PRIVATE_DEFINE_ROLE_OF_SIX(name)     \
+#define QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(name)     \
     name::name(const name &) = default;            \
     name::name(name &&) = default;                 \
     name::~name() = default;                       \

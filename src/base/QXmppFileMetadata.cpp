@@ -45,7 +45,7 @@ QXmppFileMetadata::QXmppFileMetadata()
 {
 }
 
-QXMPP_PRIVATE_DEFINE_ROLE_OF_SIX(QXmppFileMetadata)
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppFileMetadata)
 
 /// \cond
 QVector<QDomElement> allChildElements(const QDomElement &el, const QString &name)
