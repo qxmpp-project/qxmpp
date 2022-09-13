@@ -4,11 +4,13 @@
 
 #include "QXmppFileShare.h"
 
-#include <optional>
-#include <QDomElement>
-#include <QXmlStreamWriter>
 #include "QXmppConstants_p.h"
 #include "QXmppFileMetadata.h"
+
+#include <optional>
+
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 using Disposition = QXmppFileShare::Disposition;
 
@@ -105,7 +107,7 @@ bool QXmppFileShare::parse(const QDomElement &el)
     if (el.tagName() == "file-sharing" && el.namespaceURI() == ns_sfs) {
         // disposition
         d->disposition = dispositionFromString(el.attribute("disposition"))
-                .value_or(Disposition::Inline);
+                             .value_or(Disposition::Inline);
 
         // file metadata
         auto fileEl = el.firstChildElement("file");

@@ -5,8 +5,8 @@
 #ifndef QXMPPFILESHARE_H
 #define QXMPPFILESHARE_H
 
-#include <QUrl>
 #include <QSharedDataPointer>
+#include <QUrl>
 
 class QDomElement;
 class QXmlStreamWriter;
@@ -42,9 +42,9 @@ public:
     bool parse(const QDomElement &el);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
-    
+
 private:
     QSharedDataPointer<QXmppFileSharePrivate> d;
 };
 
-#endif // QXMPPFILESHARE_H
+#endif  // QXMPPFILESHARE_H
