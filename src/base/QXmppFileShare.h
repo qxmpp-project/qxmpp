@@ -14,6 +14,7 @@ class QUrl;
 class QXmlStreamWriter;
 class QXmppFileSharePrivate;
 class QXmppFileMetadata;
+class QXmppHttpFileSource;
 
 class QXMPP_EXPORT QXmppFileShare
 {
@@ -37,8 +38,8 @@ public:
     const QXmppFileMetadata &metadata() const;
     void setMetadata(const QXmppFileMetadata &);
 
-    const QVector<QUrl> &httpSources() const;
-    void setHttpSources(const QVector<QUrl> &newHttpSources);
+    const QVector<QXmppHttpFileSource> &httpSources() const;
+    void setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources);
 
     /// \cond
     bool parse(const QDomElement &el);

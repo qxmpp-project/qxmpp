@@ -6,6 +6,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppFileMetadata.h"
+#include "QXmppHttpFileSource.h"
 
 #include <optional>
 
@@ -42,7 +43,7 @@ class QXmppFileSharePrivate : public QSharedData
 {
 public:
     QXmppFileMetadata metadata;
-    QVector<QUrl> httpSources;
+    QVector<QXmppHttpFileSource> httpSources;
     QXmppFileShare::Disposition disposition = Disposition::Inline;
 };
 /// \endcond
@@ -92,12 +93,12 @@ void QXmppFileShare::setMetadata(const QXmppFileMetadata &metadata)
     d->metadata = metadata;
 }
 
-const QVector<QUrl> &QXmppFileShare::httpSources() const
+const QVector<QXmppHttpFileSource> &QXmppFileShare::httpSources() const
 {
     return d->httpSources;
 }
 
-void QXmppFileShare::setHttpSources(const QVector<QUrl> &newHttpSources)
+void QXmppFileShare::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
 {
     d->httpSources = newHttpSources;
 }
@@ -123,8 +124,9 @@ bool QXmppFileShare::parse(const QDomElement &el)
         for (auto urlEl = sources.firstChildElement("url-data");
              !urlEl.isNull();
              urlEl = urlEl.nextSiblingElement("url-data")) {
-            if (urlEl.namespaceURI() == "http://jabber.org/protocol/url-data") {
-                d->httpSources.append(QUrl(urlEl.attribute("target")));
+            QXmppHttpFileSource source;
+            if (source.parse(urlEl)) {
+                d->httpSources.push_back(std::move(source));
             }
         }
         return true;
@@ -140,10 +142,7 @@ void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
     d->metadata.toXml(writer);
     writer->writeStartElement("sources");
     for (const auto &source : d->httpSources) {
-        writer->writeStartElement("url-data");
-        writer->writeDefaultNamespace(ns_url_data);
-        writer->writeAttribute("target", source.toString());
-        writer->writeEndElement();
+        source.toXml(writer);
     }
     writer->writeEndElement();
     writer->writeEndElement();
