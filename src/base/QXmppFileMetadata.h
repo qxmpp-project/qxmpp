@@ -6,16 +6,16 @@
 #define QXMPPFILEMETADATA_H
 
 #include "QXmppGlobal.h"
-#include "QXmppHash.h"
 
 #include <optional>
 
-#include <QMimeType>
 #include <QSharedDataPointer>
 
 class QDomElement;
 class QDateTime;
+class QMimeType;
 class QXmlStreamWriter;
+class QXmppHash;
 class QXmppThumbnail;
 class QXmppFileMetadataPrivate;
 

@@ -6,16 +6,14 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppHash.h"
-#include "QXmppUtils.h"
 #include "QXmppThumbnail.h"
+#include "QXmppUtils.h"
 
 #include <utility>
 
 #include <QDateTime>
 #include <QDomElement>
 #include <QMimeDatabase>
-#include <QMimeType>
-#include <QSharedData>
 
 class QXmppFileMetadataPrivate : public QSharedData
 {
@@ -70,8 +68,9 @@ QVector<std::invoke_result_t<Func, QDomElement>> forAllChildElements(const QDomE
 
 bool QXmppFileMetadata::parse(const QDomElement &el)
 {
-    if (el.isNull())
+    if (el.isNull()) {
         return false;
+    }
 
     if (auto dateEl = el.firstChildElement("date"); !dateEl.isNull()) {
         d->date = QXmppUtils::datetimeFromString(dateEl.text());
