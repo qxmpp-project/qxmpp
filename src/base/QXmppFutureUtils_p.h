@@ -62,13 +62,13 @@ QFuture<T> makeReadyFuture(T &&value)
     interface.reportFinished();
     return interface.future();
 }
-#endif
 
 inline QFuture<void> makeReadyFuture()
 {
     using State = QFutureInterfaceBase::State;
     return QFutureInterface<void>(State(State::Started | State::Finished)).future();
 }
+#endif
 
 template<typename T, typename Handler>
 void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
