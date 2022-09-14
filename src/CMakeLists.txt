@@ -333,6 +333,12 @@ if(WITH_GSTREAMER)
     )
 endif()
 
+if(WITH_QCA)
+    target_sources(qxmpp PRIVATE client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
+    target_link_libraries(qxmpp PRIVATE qca-qt${QT_VERSION_MAJOR})
+    target_compile_definitions(qxmpp PRIVATE -DWITH_QCA)
+endif()
+
 install(
     TARGETS qxmpp
     DESTINATION "${CMAKE_INSTALL_LIBDIR}"
