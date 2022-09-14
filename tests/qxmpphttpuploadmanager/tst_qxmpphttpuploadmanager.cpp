@@ -210,7 +210,7 @@ void tst_QXmppHttpUploadManager::testDiscoveryService()
 
     if (manager->serviceFound()) {
         QCOMPARE(manager->uploadServices().at(0).jid(), UPLOAD_SERVICE_NAME);
-        QCOMPARE(manager->uploadServices().at(0).sizeLimit(), MAX_FILE_SIZE);
+        QCOMPARE(manager->uploadServices().at(0).sizeLimit(), qint64(MAX_FILE_SIZE));
     }
 }
 
@@ -408,8 +408,8 @@ void tst_QXmppHttpUploadManager::testUpload()
         QXmppHttpUploadRequestIq iq;
         parsePacket(iq, test.takeLastPacket().toUtf8());
 
-        QCOMPARE(iq.contentType().name(), "image/svg+xml");
-        QCOMPARE(iq.fileName(), "test_renamed.png");
+        QCOMPARE(iq.contentType().name(), QStringLiteral("image/svg+xml"));
+        QCOMPARE(iq.fileName(), QStringLiteral("test_renamed.png"));
         QCOMPARE(iq.size(), 2280LL);
     }
 
@@ -428,8 +428,8 @@ void tst_QXmppHttpUploadManager::testUpload()
     }
 
     auto url = expectVariant<QUrl>(std::move(result));
-    QCOMPARE(upload->bytesSent(), 2280LL);
-    QCOMPARE(upload->bytesTotal(), 2280LL);
+    QCOMPARE(upload->bytesSent(), 2280ULL);
+    QCOMPARE(upload->bytesTotal(), 2280ULL);
     QCOMPARE(upload->progress(), 1.0);
 
     qDebug() << "Uploaded file to" << url.toDisplayString();
