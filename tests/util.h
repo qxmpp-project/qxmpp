@@ -9,6 +9,7 @@
 
 #include "QXmppPasswordChecker.h"
 
+#include <memory>
 #include <variant>
 
 #include <QDomDocument>
