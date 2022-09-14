@@ -16,6 +16,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules"
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Xml)
 find_package(Qt${QT_VERSION_MAJOR} 5.9.2 REQUIRED COMPONENTS Core Network Xml)
+# QCA (optional)
+find_package(Qca-qt${QT_VERSION_MAJOR})
+if(${QT_VERSION_MAJOR} EQUAL 6)
+    find_package(Qt6Core5Compat)
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -28,6 +33,7 @@ option(BUILD_DOCUMENTATION "Build API documentation." OFF)
 option(BUILD_EXAMPLES "Build examples." ON)
 option(BUILD_OMEMO "Build the OMEMO module" OFF)
 option(WITH_GSTREAMER "Build with GStreamer support for Jingle" OFF)
+option(WITH_QCA "Build with QCA for OMEMO or encrypted file sharing" ${Qca-qt${QT_VERSION_MAJOR}_FOUND})
 
 add_definitions(
     -DQT_DISABLE_DEPRECATED_BEFORE=0x050F00
@@ -44,10 +50,13 @@ if(BUILD_OMEMO)
     pkg_check_modules(OmemoC REQUIRED IMPORTED_TARGET libomemo-c)
 
     # QCA
-    find_package(Qca-qt${QT_VERSION_MAJOR} REQUIRED)
-    if(${QT_VERSION_MAJOR} EQUAL 6)
-        find_package(Qt6Core5Compat REQUIRED)
+    if(NOT WITH_QCA)
+        message(FATAL_ERROR "OMEMO requires QCA (Qt Cryptographic Architecture)")
     endif()
+endif()
+
+if(WITH_QCA)
+    add_definitions(-DWITH_QCA)
 endif()
 
 add_subdirectory(src)

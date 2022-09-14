@@ -77,6 +77,10 @@ add_simple_test(qxmppvcardiq)
 add_simple_test(qxmppvcardmanager)
 add_simple_test(qxmppversioniq)
 
+if(WITH_QCA)
+    add_simple_test(qxmppfileencryption)
+endif()
+
 if(WITH_GSTREAMER)
     add_simple_test(qxmppcallmanager)
 endif()
