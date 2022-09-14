@@ -18,6 +18,8 @@ class QXmppBitsOfBinaryContentId;
 class QXMPP_EXPORT QXmppBitsOfBinaryData
 {
 public:
+    static QXmppBitsOfBinaryData fromByteArray(QByteArray data);
+
     QXmppBitsOfBinaryData();
     QXmppBitsOfBinaryData(const QXmppBitsOfBinaryData &);
     QXmppBitsOfBinaryData(QXmppBitsOfBinaryData &&);

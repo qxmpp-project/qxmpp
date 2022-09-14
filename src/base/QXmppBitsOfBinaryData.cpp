@@ -41,6 +41,29 @@ QXmppBitsOfBinaryDataPrivate::QXmppBitsOfBinaryDataPrivate()
 ///
 
 ///
+/// Creates bits of binary data from a QByteArray.
+///
+/// This hashes the data to generate a content ID. The MIME type is not set.
+///
+/// \note This blocks while hashing the data. You may want to run this via QtConcurrent or a
+/// QThreadPool to run this on for large amounts of data.
+///
+/// \since QXmpp 1.5
+///
+QXmppBitsOfBinaryData QXmppBitsOfBinaryData::fromByteArray(QByteArray data)
+{
+    QXmppBitsOfBinaryContentId cid;
+    cid.setHash(QCryptographicHash::hash(data, QCryptographicHash::Sha1));
+    cid.setAlgorithm(QCryptographicHash::Sha1);
+
+    QXmppBitsOfBinaryData bobData;
+    bobData.d->cid = std::move(cid);
+    bobData.d->data = std::move(data);
+
+    return bobData;
+}
+
+///
 /// Default constructor
 ///
 QXmppBitsOfBinaryData::QXmppBitsOfBinaryData()
