@@ -979,47 +979,6 @@ void QXmppJingleIq::setResponder(const QString &responder)
     d->responder = responder;
 }
 
-/// Returns the session ID.
-QString QXmppJingleIq::sid() const
-{
-    return d->sid;
-}
-
-/// Sets the session ID.
-///
-/// \param sid
-
-void QXmppJingleIq::setSid(const QString &sid)
-{
-    d->sid = sid;
-}
-
-///
-/// Returns the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
-/// Informational Messages.
-///
-/// \return the session's state
-///
-/// \since QXmpp 1.5
-///
-QXmppJingleIq::RtpSessionState QXmppJingleIq::rtpSessionState() const
-{
-    return d->rtpSessionState;
-}
-
-///
-/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
-/// Informational Messages.
-///
-/// \param rtpSessionState session' state
-///
-/// \since QXmpp 1.5
-///
-void QXmppJingleIq::setRtpSessionState(RtpSessionState rtpSessionState)
-{
-    d->rtpSessionState = rtpSessionState;
-}
-
 #if QXMPP_DEPRECATED_SINCE(1, 5)
 ///
 /// Returns true if the call is ringing.
@@ -1050,6 +1009,21 @@ void QXmppJingleIq::setRinging(bool ringing)
 }
 #endif
 
+/// Returns the session ID.
+QString QXmppJingleIq::sid() const
+{
+    return d->sid;
+}
+
+/// Sets the session ID.
+///
+/// \param sid
+
+void QXmppJingleIq::setSid(const QString &sid)
+{
+    d->sid = sid;
+}
+
 ///
 /// Returns the JID of the \xep{0272, Multiparty Jingle (Muji)} group chat.
 ///
@@ -1072,6 +1046,32 @@ QString QXmppJingleIq::mujiGroupChatJid() const
 void QXmppJingleIq::setMujiGroupChatJid(const QString &mujiGroupChatJid)
 {
     d->mujiGroupChatJid = mujiGroupChatJid;
+}
+
+///
+/// Returns the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \return the session's state
+///
+/// \since QXmpp 1.5
+///
+QXmppJingleIq::RtpSessionState QXmppJingleIq::rtpSessionState() const
+{
+    return d->rtpSessionState;
+}
+
+///
+/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \param rtpSessionState session' state
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::setRtpSessionState(RtpSessionState rtpSessionState)
+{
+    d->rtpSessionState = rtpSessionState;
 }
 
 /// \cond

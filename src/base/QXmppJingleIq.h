@@ -410,6 +410,11 @@ public:
     QString responder() const;
     void setResponder(const QString &responder);
 
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+    bool ringing() const;
+    void setRinging(bool ringing);
+#endif
+
     QString sid() const;
     void setSid(const QString &sid);
 
@@ -418,11 +423,6 @@ public:
 
     RtpSessionState rtpSessionState() const;
     void setRtpSessionState(RtpSessionState rtpSessionState);
-
-#if QXMPP_DEPRECATED_SINCE(1, 5)
-    bool ringing() const;
-    void setRinging(bool ringing);
-#endif
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);
