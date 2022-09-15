@@ -1118,7 +1118,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
          childElement = childElement.nextSiblingElement()) {
         if (childElement.namespaceURI() == ns_jingle_rtp_info) {
             if (const auto rtpSessionState = JINGLE_RTP_SESSION_STATES.indexOf(childElement.tagName()); rtpSessionState != -1) {
-                d->rtpSessionState = static_cast<QXmppJingleIq::RtpSessionState>(rtpSessionState);
+                d->rtpSessionState = QXmppJingleIq::RtpSessionState(rtpSessionState);
                 break;
             }
         }
