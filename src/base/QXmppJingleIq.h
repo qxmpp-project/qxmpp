@@ -411,7 +411,9 @@ public:
     void setResponder(const QString &responder);
 
 #if QXMPP_DEPRECATED_SINCE(1, 5)
+    QT_DEPRECATED_X("Use QXmpp::rtpSessionState() instead")
     bool ringing() const;
+    QT_DEPRECATED_X("Use QXmpp::setRtpSessionState() instead")
     void setRinging(bool ringing);
 #endif
 
