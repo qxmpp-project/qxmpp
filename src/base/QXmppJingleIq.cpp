@@ -1148,8 +1148,8 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     d->reason.toXml(writer);
 
-    if (const auto rtpSessionState = d->rtpSessionState; rtpSessionState != QXmppJingleIq::None) {
-        writer->writeStartElement(JINGLE_RTP_SESSION_STATES.at(rtpSessionState));
+    if (d->rtpSessionState != QXmppJingleIq::None) {
+        writer->writeStartElement(JINGLE_RTP_SESSION_STATES.at(d->rtpSessionState));
         writer->writeDefaultNamespace(ns_jingle_rtp_info);
         writer->writeEndElement();
     }
