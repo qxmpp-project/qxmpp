@@ -18,8 +18,6 @@ class QXmppJingleRtpFeedbackIntervalPrivate;
 class QXmppJingleRtpFeedbackTypeAndParametersPrivate;
 class QXmppSdpParameterPrivate;
 
-// TODO: Use QXMPP_PRIVATE_DECLARE_RULE_OF_SIX and QXMPP_PRIVATE_DEFINE_ROLE_OF_SIX
-
 class QXMPP_EXPORT QXmppSdpParameter
 {
 public:
