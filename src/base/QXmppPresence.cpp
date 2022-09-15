@@ -613,7 +613,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             xmlWriter->writeEmptyElement(QStringLiteral("preparing"));
         }
 
-        for (const auto &mujiContent : std::as_const(d->mujiContents)) {
+        for (const auto &mujiContent : d->mujiContents) {
             mujiContent.toXml(xmlWriter);
         }
 
