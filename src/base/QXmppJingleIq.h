@@ -410,8 +410,4 @@ protected:
 private:
     QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
-
-static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, QVector<QXmppJingleRtpFeedbackInterval> &intervals);
-static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, const QVector<QXmppJingleRtpFeedbackInterval> &intervals);
-
 #endif

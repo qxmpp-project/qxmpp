@@ -121,6 +121,50 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
     return QStringLiteral("candidate:%1 %2 %3 %4 %5 %6 typ %7 generation %8").arg(candidate.foundation(), QString::number(candidate.component()), candidate.protocol(), QString::number(candidate.priority()), candidate.host().toString(), QString::number(candidate.port()), QXmppJingleCandidate::typeToString(candidate.type()), QString::number(candidate.generation()));
 }
 
+/// \cond
+///
+/// Parses the RTP Feedback Negotation elements.
+///
+/// \param parent element to parse which might contain RTP Feedback Negotiation elements
+/// \param typesAndParameters RTP Feedback Negotation types and parameters to be set
+/// \param intervals RTP Feedback Negotiation intervals to be set
+///
+static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
+{
+    for (auto child = parent.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
+        if (QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParameters(child)) {
+            QXmppJingleRtpFeedbackTypeAndParameters typeAndParameters;
+            typeAndParameters.parse(child);
+            typesAndParameters.append(typeAndParameters);
+        } else if (QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(child)) {
+            QXmppJingleRtpFeedbackInterval interval;
+            interval.parse(child);
+            intervals.append(interval);
+        }
+    }
+}
+
+///
+/// Serializes the RTP Feedback Negotation elements.
+///
+/// \param writer writer to write the serialized elements
+/// \param typesAndParameters RTP Feedback Negotation types and parameters to be serialized
+/// \param intervals RTP Feedback Negotiation intervals to be serialized
+///
+static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, const QVector<QXmppJingleRtpFeedbackInterval> &intervals)
+{
+    for (const auto &typeAndParameters : typesAndParameters) {
+        typeAndParameters.toXml(writer);
+    }
+
+    for (const auto &interval : intervals) {
+        interval.toXml(writer);
+    }
+}
+/// \endcond
+
 class QXmppJingleIqContentPrivate : public QSharedData
 {
 public:
@@ -1967,47 +2011,3 @@ bool QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(const QDomEleme
     return element.tagName() == QStringLiteral("rtcp-fb-trr-int") &&
         element.namespaceURI() == ns_jingle_rtp_feedback_negotiation;
 }
-
-/// \cond
-///
-/// Parses the RTP Feedback Negotation elements.
-///
-/// \param parent element to parse which might contain RTP Feedback Negotiation elements
-/// \param typesAndParameters RTP Feedback Negotation types and parameters to be set
-/// \param intervals RTP Feedback Negotiation intervals to be set
-///
-void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
-{
-    for (auto child = parent.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParameters(child)) {
-            QXmppJingleRtpFeedbackTypeAndParameters typeAndParameters;
-            typeAndParameters.parse(child);
-            typesAndParameters.append(typeAndParameters);
-        } else if (QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(child)) {
-            QXmppJingleRtpFeedbackInterval interval;
-            interval.parse(child);
-            intervals.append(interval);
-        }
-    }
-}
-
-///
-/// Serializes the RTP Feedback Negotation elements.
-///
-/// \param writer writer to write the serialized elements
-/// \param typesAndParameters RTP Feedback Negotation types and parameters to be serialized
-/// \param intervals RTP Feedback Negotiation intervals to be serialized
-///
-void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, const QVector<QXmppJingleRtpFeedbackInterval> &intervals)
-{
-    for (const auto &typeAndParameters : typesAndParameters) {
-        typeAndParameters.toXml(writer);
-    }
-
-    for (const auto &interval : intervals) {
-        interval.toXml(writer);
-    }
-}
-/// \endcond
