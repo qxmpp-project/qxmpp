@@ -1914,7 +1914,7 @@ void QXmppJingleRtpFeedbackTypeAndParameters::toXml(QXmlStreamWriter *writer) co
 
     // If there are parameters, they must be used instead of the subtype.
     if (const auto subtype = d->subtype; subtype.isEmpty()) {
-        for (const auto &parameter : std::as_const(d->parameters)) {
+        for (const auto &parameter : d->parameters) {
             parameter.toXml(writer);
         }
     } else {
