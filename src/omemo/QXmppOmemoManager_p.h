@@ -12,6 +12,7 @@
 #include "QXmppOmemoStorage.h"
 
 #include "OmemoLibWrappers.h"
+#include "QcaInitializer_p.h"
 #include <QDomElement>
 #include <QTimer>
 #include <QtCrypto>
@@ -117,6 +118,7 @@ QByteArray createKeyId(const QByteArray &key);
 
 }  // namespace QXmpp::Omemo::Private
 
+using namespace QXmpp::Private;
 using namespace QXmpp::Omemo::Private;
 
 class QXmppOmemoManagerPrivate
@@ -133,7 +135,7 @@ public:
     QXmppTrustManager *trustManager = nullptr;
     QXmppPubSubManager *pubSubManager = nullptr;
 
-    QCA::Initializer cryptoLibInitializer;
+    QcaInitializer cryptoLibInitializer;
     QTimer signedPreKeyPairsRenewalTimer;
     QTimer deviceRemovalTimer;
 
