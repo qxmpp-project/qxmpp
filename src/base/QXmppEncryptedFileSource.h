@@ -20,17 +20,11 @@ class QXmppEncryptedFileSourcePrivate;
 class QXMPP_EXPORT QXmppEncryptedFileSource
 {
 public:
-    enum Cipher {
-        Aes128GcmNopadding,
-        Aes256GcmNopadding,
-        Aes256CbcPkcs7,
-    };
-
     QXmppEncryptedFileSource();
     QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppEncryptedFileSource)
 
-    Cipher cipher() const;
-    void setCipher(Cipher newCipher);
+    QXmpp::Cipher cipher() const;
+    void setCipher(QXmpp::Cipher newCipher);
 
     const QByteArray &key() const;
     void setKey(const QByteArray &newKey);

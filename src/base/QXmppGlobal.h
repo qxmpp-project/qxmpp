@@ -141,6 +141,17 @@ inline constexpr bool operator&(SceMode mode1, SceMode mode2)
 }
 
 ///
+/// Cipher for encrypting data streams and files.
+///
+/// \since QXmpp 1.5
+///
+enum Cipher {
+    Aes128GcmNoPad,
+    Aes256GcmNoPad,
+    Aes256CbcPkcs7,
+};
+
+///
 /// An empty struct indicating success in results.
 ///
 /// \since QXmpp 1.5
