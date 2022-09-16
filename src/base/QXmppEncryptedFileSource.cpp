@@ -3,14 +3,44 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppEncryptedFileSource.h"
 #include "QXmppConstants_p.h"
+#include "QXmppEncryptedFileSource_p.h"
 #include "QXmppHttpFileSource.h"
+
+#include <optional>
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-class QXmppEncryptedFileSourcePrivate : public QSharedData {
+QString cipherToString(QXmppEncryptedFileSource::Cipher cipher)
+{
+    switch (cipher) {
+    case QXmppEncryptedFileSource::Aes128GcmNopadding:
+        return "urn:xmpp:ciphers:aes-128-gcm-nopadding:0";
+    case QXmppEncryptedFileSource::Aes256GcmNopadding:
+        return "urn:xmpp:ciphers:aes-256-gcm-nopadding:0";
+    case QXmppEncryptedFileSource::Aes256CbcPkcs7:
+        return "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0";
+    }
+
+    Q_UNREACHABLE();
+}
+
+std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QString &cipher)
+{
+    if (cipher == "urn:xmpp:ciphers:aes-128-gcm-nopadding:0") {
+        return QXmppEncryptedFileSource::Aes128GcmNopadding;
+    } else if (cipher == "urn:xmpp:ciphers:aes-256-gcm-nopadding:0") {
+        return QXmppEncryptedFileSource::Aes256GcmNopadding;
+    } else if (cipher == "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0") {
+        return QXmppEncryptedFileSource::Aes256CbcPkcs7;
+    }
+
+    return {};
+}
+
+class QXmppEncryptedFileSourcePrivate : public QSharedData
+{
 public:
     QXmppEncryptedFileSource::Cipher cipher = QXmppEncryptedFileSource::Aes128GcmNopadding;
     QByteArray key;
@@ -78,6 +108,13 @@ void QXmppEncryptedFileSource::setHttpSources(const QVector<QXmppHttpFileSource>
 
 bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 {
+    QString cipher = el.attribute(QStringLiteral("cipher"));
+    if (auto parsedCipher = cipherFromString(cipher)) {
+        d->cipher = *parsedCipher;
+    } else {
+        return false;
+    }
+
     auto keyEl = el.firstChildElement(QStringLiteral("key"));
     if (keyEl.isNull()) {
         return false;
@@ -104,7 +141,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
     if (sourcesEl.isNull()) {
         return false;
     }
-    for (auto childEl = el.firstChildElement(QStringLiteral("url-data"));
+    for (auto childEl = sourcesEl.firstChildElement(QStringLiteral("url-data"));
          !childEl.isNull();
          childEl = childEl.nextSiblingElement(QStringLiteral("url-data"))) {
         QXmppHttpFileSource source;
@@ -119,12 +156,14 @@ void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("encrypted"));
     writer->writeDefaultNamespace(ns_esfs);
+    writer->writeAttribute(QStringLiteral("cipher"), cipherToString(d->cipher));
     writer->writeTextElement(QStringLiteral("key"), d->key.toBase64());
     writer->writeTextElement(QStringLiteral("iv"), d->iv.toBase64());
     for (const auto &hash : d->hashes) {
         hash.toXml(writer);
     }
     writer->writeStartElement(QStringLiteral("sources"));
+    writer->writeDefaultNamespace(ns_sfs);
     for (const auto &source : d->httpSources) {
         source.toXml(writer);
     }
