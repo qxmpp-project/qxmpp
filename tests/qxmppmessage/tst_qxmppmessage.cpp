@@ -6,6 +6,7 @@
 
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
+#include "QXmppEncryptedFileSource_p.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
 #include "QXmppTrustMessageElement.h"
@@ -53,6 +54,7 @@ private slots:
     void testTrustMessageElement();
     void testE2eeFallbackBody();
     void testFileSharing();
+    void testEncryptedFileSource();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1184,6 +1186,65 @@ void tst_QXmppMessage::testFileSharing()
     parsePacket(message1, xml);
     QVERIFY(!message1.sharedFiles().empty());
     serializePacket(message1, xml);
+}
+
+void tst_QXmppMessage::testEncryptedFileSource()
+{
+    {
+        QByteArray xml(
+            "<encrypted xmlns='urn:xmpp:esfs:0' cipher='urn:xmpp:ciphers:aes-256-gcm-nopadding:0'>"
+            "<key>SuRJ2agVm/pQbJQlPq/B23Xt1YOOJCcEGJA5HrcYOGQ=</key>"
+            "<iv>T8RDMBaiqn6Ci4Nw</iv>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='sha3-256'>BgKI2gp2kNCRsARNvhFmw5kFf9BBo2pTbV2D8XHTMWI=</hash>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='blake2b-256'>id4cnqqy9/ssfCkM4vYSkiXXrlE=</hash>"
+            "<sources xmlns='urn:xmpp:sfs:0'>"
+            "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/encrypted.jpg'/>"
+            "</sources>"
+            "</encrypted>");
+
+        QXmppEncryptedFileSource encryptedSource;
+        parsePacket(encryptedSource, xml);
+        QCOMPARE(encryptedSource.key(), QByteArray::fromBase64("SuRJ2agVm/pQbJQlPq/B23Xt1YOOJCcEGJA5HrcYOGQ="));
+        QCOMPARE(encryptedSource.iv(), QByteArray::fromBase64("T8RDMBaiqn6Ci4Nw"));
+        QCOMPARE(encryptedSource.httpSources().front().url(), QUrl("https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/encrypted.jpg"));
+        QCOMPARE(encryptedSource.cipher(), QXmppEncryptedFileSource::Aes256GcmNopadding);
+        QVERIFY(!encryptedSource.hashes().empty());
+        serializePacket(encryptedSource, xml);
+    }
+
+    {
+        QByteArray xml(
+            "<encrypted xmlns='urn:xmpp:esfs:0' cipher='urn:xmpp:ciphers:aes-128-gcm-nopadding:0'>"
+            "<key>SuRJ2agVm/pQbJQlPq/B23Xt1YOOJCcEGJA5HrcYOGQ=</key>"
+            "<iv>T8RDMBaiqn6Ci4Nw</iv>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='sha3-256'>BgKI2gp2kNCRsARNvhFmw5kFf9BBo2pTbV2D8XHTMWI=</hash>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='blake2b-256'>id4cnqqy9/ssfCkM4vYSkiXXrlE=</hash>"
+            "<sources xmlns='urn:xmpp:sfs:0'>"
+            "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/encrypted.jpg'/>"
+            "</sources>"
+            "</encrypted>");
+
+        QXmppEncryptedFileSource encryptedSource;
+        parsePacket(encryptedSource, xml);
+        serializePacket(encryptedSource, xml);
+    }
+
+    {
+        QByteArray xml(
+            "<encrypted xmlns='urn:xmpp:esfs:0' cipher='urn:xmpp:ciphers:aes-256-cbc-pkcs7:0'>"
+            "<key>SuRJ2agVm/pQbJQlPq/B23Xt1YOOJCcEGJA5HrcYOGQ=</key>"
+            "<iv>T8RDMBaiqn6Ci4Nw</iv>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='sha3-256'>BgKI2gp2kNCRsARNvhFmw5kFf9BBo2pTbV2D8XHTMWI=</hash>"
+            "<hash xmlns='urn:xmpp:hashes:2' algo='blake2b-256'>id4cnqqy9/ssfCkM4vYSkiXXrlE=</hash>"
+            "<sources xmlns='urn:xmpp:sfs:0'>"
+            "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/encrypted.jpg'/>"
+            "</sources>"
+            "</encrypted>");
+
+        QXmppEncryptedFileSource encryptedSource;
+        parsePacket(encryptedSource, xml);
+        serializePacket(encryptedSource, xml);
+    }
 }
 
 QTEST_MAIN(tst_QXmppMessage)

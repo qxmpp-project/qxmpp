@@ -161,6 +161,7 @@ set(SOURCE_FILES
     base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp
     base/QXmppElement.cpp
+    base/QXmppEncryptedFileSource.cpp
     base/QXmppEntityTimeIq.cpp
     base/QXmppError.cpp
     base/QXmppFileMetadata.cpp

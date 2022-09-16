@@ -123,6 +123,7 @@ bool QXmppHash::parse(const QDomElement &el)
 #else
         m_hash = QByteArray::fromBase64(el.text().toUtf8());
 #endif
+        return true;
     }
     return false;
 }

@@ -192,5 +192,7 @@ const char *ns_tm = "urn:xmpp:tm:1";
 const char *ns_file_metadata = "urn:xmpp:file:metadata:0";
 // XEP-0447: Stateless file sharing
 const char *ns_sfs = "urn:xmpp:sfs:0";
+// XEP-0448: Encryption for stateless file sharing
+const char *ns_esfs = "urn:xmpp:esfs:0";
 // XEP-0450: Automatic Trust Management (ATM)
 const char *ns_atm = "urn:xmpp:atm:1";
