@@ -13,12 +13,13 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-/// \cond
+using namespace QXmpp;
 
+/// \cond
 class QXmppEncryptedFileSourcePrivate : public QSharedData
 {
 public:
-    QXmppEncryptedFileSource::Cipher cipher = QXmppEncryptedFileSource::Aes128GcmNopadding;
+    Cipher cipher = Aes128GcmNoPad;
     QByteArray key;
     QByteArray iv;
     QVector<QXmppHash> hashes;
@@ -27,27 +28,27 @@ public:
 
 QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppEncryptedFileSource)
 
-static QString cipherToString(QXmppEncryptedFileSource::Cipher cipher)
+static QString cipherToString(Cipher cipher)
 {
     switch (cipher) {
-    case QXmppEncryptedFileSource::Aes128GcmNopadding:
+    case Aes128GcmNoPad:
         return "urn:xmpp:ciphers:aes-128-gcm-nopadding:0";
-    case QXmppEncryptedFileSource::Aes256GcmNopadding:
+    case Aes256GcmNoPad:
         return "urn:xmpp:ciphers:aes-256-gcm-nopadding:0";
-    case QXmppEncryptedFileSource::Aes256CbcPkcs7:
+    case Aes256CbcPkcs7:
         return "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0";
     }
     Q_UNREACHABLE();
 }
 
-static std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QString &cipher)
+static std::optional<Cipher> cipherFromString(const QString &cipher)
 {
     if (cipher == "urn:xmpp:ciphers:aes-128-gcm-nopadding:0") {
-        return QXmppEncryptedFileSource::Aes128GcmNopadding;
+        return Aes128GcmNoPad;
     } else if (cipher == "urn:xmpp:ciphers:aes-256-gcm-nopadding:0") {
-        return QXmppEncryptedFileSource::Aes256GcmNopadding;
+        return Aes256GcmNoPad;
     } else if (cipher == "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0") {
-        return QXmppEncryptedFileSource::Aes256CbcPkcs7;
+        return Aes256CbcPkcs7;
     }
     return {};
 }
@@ -67,7 +68,7 @@ QXmppEncryptedFileSource::QXmppEncryptedFileSource()
 }
 
 /// Returns the cipher that was used to encrypt the data in this file source
-QXmppEncryptedFileSource::Cipher QXmppEncryptedFileSource::cipher() const
+Cipher QXmppEncryptedFileSource::cipher() const
 {
     return d->cipher;
 }

@@ -1207,7 +1207,7 @@ void tst_QXmppMessage::testEncryptedFileSource()
         QCOMPARE(encryptedSource.key(), QByteArray::fromBase64("SuRJ2agVm/pQbJQlPq/B23Xt1YOOJCcEGJA5HrcYOGQ="));
         QCOMPARE(encryptedSource.iv(), QByteArray::fromBase64("T8RDMBaiqn6Ci4Nw"));
         QCOMPARE(encryptedSource.httpSources().front().url(), QUrl("https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/encrypted.jpg"));
-        QCOMPARE(encryptedSource.cipher(), QXmppEncryptedFileSource::Aes256GcmNopadding);
+        QCOMPARE(encryptedSource.cipher(), QXmpp::Aes256GcmNoPad);
         QVERIFY(!encryptedSource.hashes().empty());
         serializePacket(encryptedSource, xml);
     }
