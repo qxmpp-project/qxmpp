@@ -12,7 +12,8 @@
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
-QString cipherToString(QXmppEncryptedFileSource::Cipher cipher)
+/// \cond
+static QString cipherToString(QXmppEncryptedFileSource::Cipher cipher)
 {
     switch (cipher) {
     case QXmppEncryptedFileSource::Aes128GcmNopadding:
@@ -22,11 +23,10 @@ QString cipherToString(QXmppEncryptedFileSource::Cipher cipher)
     case QXmppEncryptedFileSource::Aes256CbcPkcs7:
         return "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0";
     }
-
     Q_UNREACHABLE();
 }
 
-std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QString &cipher)
+static std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QString &cipher)
 {
     if (cipher == "urn:xmpp:ciphers:aes-128-gcm-nopadding:0") {
         return QXmppEncryptedFileSource::Aes128GcmNopadding;
@@ -35,7 +35,6 @@ std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QString &
     } else if (cipher == "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0") {
         return QXmppEncryptedFileSource::Aes256CbcPkcs7;
     }
-
     return {};
 }
 
@@ -170,3 +169,4 @@ void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
     writer->writeEndElement();
 }
+/// \endcond
