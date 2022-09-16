@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2022 <lnj@kaidan.im>
-// SPDX-FileCopyrightText: 2022 <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -16,6 +16,7 @@
 
 class QXmppEncryptedFileSourcePrivate;
 
+// exported for tests
 class QXMPP_EXPORT QXmppEncryptedFileSource
 {
 public:
@@ -26,7 +27,6 @@ public:
     };
 
     QXmppEncryptedFileSource();
-    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppEncryptedFileSource);
 
     Cipher cipher() const;
     void setCipher(Cipher newCipher);
@@ -49,7 +49,11 @@ public:
     /// \endcond
 
 private:
-    QSharedDataPointer<QXmppEncryptedFileSourcePrivate> d;
+    Cipher m_cipher = Aes128GcmNopadding;
+    QByteArray m_key;
+    QByteArray m_iv;
+    QVector<QXmppHash> m_hashes;
+    QVector<QXmppHttpFileSource> m_httpSources;
 };
 
 #endif  // QXMPPENCRYPTEDFILESOURCE_H

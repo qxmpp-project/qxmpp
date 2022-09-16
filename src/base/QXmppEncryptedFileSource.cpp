@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2022 <lnj@kaidan.im>
-// SPDX-FileCopyrightText: 2022 <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -41,75 +41,65 @@ static std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QS
 class QXmppEncryptedFileSourcePrivate : public QSharedData
 {
 public:
-    QXmppEncryptedFileSource::Cipher cipher = QXmppEncryptedFileSource::Aes128GcmNopadding;
-    QByteArray key;
-    QByteArray iv;
-    QVector<QXmppHash> hashes;
-    QVector<QXmppHttpFileSource> httpSources;
 };
 
-QXmppEncryptedFileSource::QXmppEncryptedFileSource()
-    : d(new QXmppEncryptedFileSourcePrivate())
-{
-}
-
-QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppEncryptedFileSource);
+QXmppEncryptedFileSource::QXmppEncryptedFileSource() = default;
 
 QXmppEncryptedFileSource::Cipher QXmppEncryptedFileSource::cipher() const
 {
-    return d->cipher;
+    return m_cipher;
 }
 
 void QXmppEncryptedFileSource::setCipher(Cipher newCipher)
 {
-    d->cipher = newCipher;
+    m_cipher = newCipher;
 }
 
 const QByteArray &QXmppEncryptedFileSource::key() const
 {
-    return d->key;
+    return m_key;
 }
 
 void QXmppEncryptedFileSource::setKey(const QByteArray &newKey)
 {
-    d->key = newKey;
+    m_key = newKey;
 }
 
 const QByteArray &QXmppEncryptedFileSource::iv() const
 {
-    return d->iv;
+    return m_iv;
 }
 
 void QXmppEncryptedFileSource::setIv(const QByteArray &newIv)
 {
-    d->iv = newIv;
+    m_iv = newIv;
 }
 
 const QVector<QXmppHash> &QXmppEncryptedFileSource::hashes() const
 {
-    return d->hashes;
+    return m_hashes;
 }
 
 void QXmppEncryptedFileSource::setHashes(const QVector<QXmppHash> &newHashes)
 {
-    d->hashes = newHashes;
+    m_hashes = newHashes;
 }
 
 const QVector<QXmppHttpFileSource> &QXmppEncryptedFileSource::httpSources() const
 {
-    return d->httpSources;
+    return m_httpSources;
 }
 
 void QXmppEncryptedFileSource::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
 {
-    d->httpSources = newHttpSources;
+    m_httpSources = newHttpSources;
 }
 
 bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 {
     QString cipher = el.attribute(QStringLiteral("cipher"));
     if (auto parsedCipher = cipherFromString(cipher)) {
-        d->cipher = *parsedCipher;
+        m_cipher = *parsedCipher;
     } else {
         return false;
     }
@@ -118,13 +108,13 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
     if (keyEl.isNull()) {
         return false;
     }
-    d->key = QByteArray::fromBase64(keyEl.text().toUtf8());
+    m_key = QByteArray::fromBase64(keyEl.text().toUtf8());
 
     auto ivEl = el.firstChildElement(QStringLiteral("iv"));
     if (ivEl.isNull()) {
         return false;
     }
-    d->iv = QByteArray::fromBase64(ivEl.text().toUtf8());
+    m_iv = QByteArray::fromBase64(ivEl.text().toUtf8());
 
     for (auto childEl = el.firstChildElement(QStringLiteral("hash"));
          !childEl.isNull();
@@ -133,7 +123,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
         if (!hash.parse(childEl)) {
             return false;
         }
-        d->hashes.push_back(std::move(hash));
+        m_hashes.push_back(std::move(hash));
     }
 
     auto sourcesEl = el.firstChildElement(QStringLiteral("sources"));
@@ -145,7 +135,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
          childEl = childEl.nextSiblingElement(QStringLiteral("url-data"))) {
         QXmppHttpFileSource source;
         source.parse(childEl);
-        d->httpSources.push_back(std::move(source));
+        m_httpSources.push_back(std::move(source));
     }
 
     return true;
@@ -155,15 +145,15 @@ void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("encrypted"));
     writer->writeDefaultNamespace(ns_esfs);
-    writer->writeAttribute(QStringLiteral("cipher"), cipherToString(d->cipher));
-    writer->writeTextElement(QStringLiteral("key"), d->key.toBase64());
-    writer->writeTextElement(QStringLiteral("iv"), d->iv.toBase64());
-    for (const auto &hash : d->hashes) {
+    writer->writeAttribute(QStringLiteral("cipher"), cipherToString(m_cipher));
+    writer->writeTextElement(QStringLiteral("key"), m_key.toBase64());
+    writer->writeTextElement(QStringLiteral("iv"), m_iv.toBase64());
+    for (const auto &hash : m_hashes) {
         hash.toXml(writer);
     }
     writer->writeStartElement(QStringLiteral("sources"));
     writer->writeDefaultNamespace(ns_sfs);
-    for (const auto &source : d->httpSources) {
+    for (const auto &source : m_httpSources) {
         source.toXml(writer);
     }
     writer->writeEndElement();
