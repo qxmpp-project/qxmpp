@@ -38,11 +38,6 @@ static std::optional<QXmppEncryptedFileSource::Cipher> cipherFromString(const QS
     return {};
 }
 
-class QXmppEncryptedFileSourcePrivate : public QSharedData
-{
-public:
-};
-
 QXmppEncryptedFileSource::QXmppEncryptedFileSource() = default;
 
 QXmppEncryptedFileSource::Cipher QXmppEncryptedFileSource::cipher() const
