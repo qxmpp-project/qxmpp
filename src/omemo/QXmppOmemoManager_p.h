@@ -31,6 +31,9 @@ class QXmppOmemoDeviceBundleItem;
 using namespace QXmpp;
 using namespace std::chrono_literals;
 
+#undef min
+#undef max
+
 namespace QXmpp::Omemo::Private {
 
 // default possible trust levels a key must have to be used for encryption
