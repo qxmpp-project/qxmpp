@@ -59,6 +59,7 @@ void tst_QXmppJingleIq::testContent()
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
         "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
+        "<rtcp-mux/>"
         "<payload-type id=\"96\"/>"
         "<payload-type id=\"97\"/>"
         "</description>"
@@ -87,6 +88,7 @@ void tst_QXmppJingleIq::testContent()
     QVERIFY(content1.name().isEmpty());
     QVERIFY(content1.descriptionMedia().isEmpty());
     QCOMPARE(content1.descriptionSsrc(), quint32(0));
+    QVERIFY(!content1.isRtpMultiplexingSupported());
     QCOMPARE(content1.payloadTypes().size(), 0);
     QVERIFY(content1.transportUser().isEmpty());
     QVERIFY(content1.transportPassword().isEmpty());
@@ -97,6 +99,7 @@ void tst_QXmppJingleIq::testContent()
     QCOMPARE(content1.name(), QStringLiteral("voice"));
     QCOMPARE(content1.descriptionMedia(), QStringLiteral("audio"));
     QCOMPARE(content1.descriptionSsrc(), quint32(0));
+    QVERIFY(content1.isRtpMultiplexingSupported());
     QCOMPARE(content1.payloadTypes().size(), 2);
     QCOMPARE(content1.payloadTypes().at(0).id(), quint8(96));
     QCOMPARE(content1.payloadTypes().at(1).id(), quint8(97));
@@ -112,6 +115,7 @@ void tst_QXmppJingleIq::testContent()
     content2.setName(QStringLiteral("voice"));
     content2.setDescriptionMedia(QStringLiteral("audio"));
     content2.setDescriptionSsrc(quint32(0));
+    content2.setRtpMultiplexingSupported(true);
     QXmppJinglePayloadType payloadType1;
     payloadType1.setId(quint8(96));
     content2.setPayloadTypes({ payloadType1 });
@@ -131,6 +135,7 @@ void tst_QXmppJingleIq::testContent()
     QCOMPARE(content2.name(), QStringLiteral("voice"));
     QCOMPARE(content2.descriptionMedia(), QStringLiteral("audio"));
     QCOMPARE(content2.descriptionSsrc(), quint32(0));
+    QVERIFY(content2.isRtpMultiplexingSupported());
     QCOMPARE(content2.payloadTypes().size(), 2);
     QCOMPARE(content2.payloadTypes().at(0).id(), quint8(96));
     QCOMPARE(content2.payloadTypes().at(1).id(), quint8(97));

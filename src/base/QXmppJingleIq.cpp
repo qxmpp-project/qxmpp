@@ -133,6 +133,8 @@ public:
     QString descriptionMedia;
     quint32 descriptionSsrc;
     QString descriptionType;
+    bool isRtpMultiplexingSupported = false;
+
     QString transportType;
     QString transportUser;
     QString transportPassword;
@@ -227,6 +229,33 @@ quint32 QXmppJingleIq::Content::descriptionSsrc() const
 void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
 {
     d->descriptionSsrc = ssrc;
+}
+
+///
+/// Returns whether multiplexing of RTP data and control packets on a single port is supported as
+/// specified by \xep{0167, Jingle RTP Sessions} and  RFC 5761.
+///
+/// \return whether multiplexing of RTP data and control packets is supported
+///
+/// \since QXmpp 1.5
+///
+bool QXmppJingleIq::Content::isRtpMultiplexingSupported() const
+{
+    return d->isRtpMultiplexingSupported;
+}
+
+///
+/// Sets whether multiplexing of RTP data and control packets on a single port is supported as
+/// specified by \xep{0167, Jingle RTP Sessions} and  RFC 5761.
+///
+/// \param isRtpMultiplexingSupported whether multiplexing of RTP data and control packets is
+///        supported
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Content::setRtpMultiplexingSupported(bool isRtpMultiplexingSupported)
+{
+    d->isRtpMultiplexingSupported = isRtpMultiplexingSupported;
 }
 
 void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
@@ -373,6 +402,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->descriptionType = descriptionElement.namespaceURI();
     d->descriptionMedia = descriptionElement.attribute(QStringLiteral("media"));
     d->descriptionSsrc = descriptionElement.attribute(QStringLiteral("ssrc")).toULong();
+    d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
     QDomElement child = descriptionElement.firstChildElement(QStringLiteral("payload-type"));
     while (!child.isNull()) {
         QXmppJinglePayloadType payload;
@@ -422,6 +452,9 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddAttribute(writer, QStringLiteral("media"), d->descriptionMedia);
         if (d->descriptionSsrc) {
             writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->descriptionSsrc));
+        }
+        if (d->isRtpMultiplexingSupported) {
+            writer->writeEmptyElement(QStringLiteral("rtcp-mux"));
         }
         for (const auto &payload : d->payloadTypes) {
             payload.toXml(writer);
