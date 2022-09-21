@@ -1939,12 +1939,6 @@ bool QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParamete
         element.namespaceURI() == ns_jingle_rtp_feedback_negotiation;
 }
 
-class QXmppJingleRtpFeedbackIntervalPrivate : public QSharedData
-{
-public:
-    uint32_t value;
-};
-
 ///
 /// \class QXmppJingleRtpFeedbackInterval
 ///
@@ -1958,7 +1952,6 @@ public:
 /// Constructs a Jingle RTP Feedback Negotiation interval.
 ///
 QXmppJingleRtpFeedbackInterval::QXmppJingleRtpFeedbackInterval()
-    : d(new QXmppJingleRtpFeedbackIntervalPrivate())
 {
 }
 
@@ -1969,9 +1962,9 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpFeedbackInterval)
 ///
 /// \return the RTP Feedback Negotiation interval value
 ///
-uint32_t QXmppJingleRtpFeedbackInterval::value() const
+uint64_t QXmppJingleRtpFeedbackInterval::value() const
 {
-    return d->value;
+    return m_value;
 }
 
 ///
@@ -1979,22 +1972,22 @@ uint32_t QXmppJingleRtpFeedbackInterval::value() const
 ///
 /// \param value RTP Feedback Negotiation interval value
 ///
-void QXmppJingleRtpFeedbackInterval::setValue(uint32_t value)
+void QXmppJingleRtpFeedbackInterval::setValue(uint64_t value)
 {
-    d->value = value;
+    m_value = value;
 }
 
 /// \cond
 void QXmppJingleRtpFeedbackInterval::parse(const QDomElement &element)
 {
-    d->value = element.attribute(QStringLiteral("value")).toUInt();
+    m_value = element.attribute(QStringLiteral("value")).toUInt();
 }
 
 void QXmppJingleRtpFeedbackInterval::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb-trr-int"));
     writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
-    helperToXmlAddAttribute(writer, QStringLiteral("value"), QString::number(d->value));
+    helperToXmlAddAttribute(writer, QStringLiteral("value"), QString::number(m_value));
     writer->writeEndElement();
 }
 /// \endcond

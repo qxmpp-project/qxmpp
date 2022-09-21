@@ -14,7 +14,6 @@ class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
-class QXmppJingleRtpFeedbackIntervalPrivate;
 class QXmppJingleRtpFeedbackTypeAndParametersPrivate;
 class QXmppSdpParameterPrivate;
 
@@ -76,8 +75,8 @@ public:
 
     QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackInterval)
 
-    uint32_t value() const;
-    void setValue(uint32_t value);
+    uint64_t value() const;
+    void setValue(uint64_t value);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -87,7 +86,7 @@ public:
     static bool isJingleRtpFeedbackInterval(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppJingleRtpFeedbackIntervalPrivate> d;
+    uint64_t m_value;
 };
 
 ///
