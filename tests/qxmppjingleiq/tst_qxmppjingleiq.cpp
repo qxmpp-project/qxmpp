@@ -59,72 +59,87 @@ void tst_QXmppJingleIq::testContent()
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
         "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\" media=\"audio\">"
-        "<payload-type id=\"96\" name=\"speex\" clockrate=\"16000\"/>"
-        "<payload-type id=\"97\" name=\"speex\" clockrate=\"8000\"/>"
-        "<payload-type id=\"18\" name=\"G729\"/>"
-        "<payload-type id=\"0\" name=\"PCMU\"/>"
-        "<payload-type id=\"103\" name=\"L16\" channels=\"2\" clockrate=\"16000\"/>"
-        "<payload-type id=\"98\" name=\"x-ISAC\" clockrate=\"8000\"/>"
+        "<payload-type id=\"96\"/>"
+        "<payload-type id=\"97\"/>"
         "</description>"
         "<transport xmlns=\"urn:xmpp:jingle:transports:ice-udp:1\""
         " ufrag=\"8hhy\""
         " pwd=\"asd88fgpdd777uzjYhagZg\">"
-        "<candidate component=\"1\""
-        " foundation=\"1\""
+        "<candidate component=\"0\""
         " generation=\"0\""
         " id=\"el0747fg11\""
-        " ip=\"10.0.1.1\""
-        " network=\"1\""
-        " port=\"8998\""
-        " priority=\"2130706431\""
-        " protocol=\"udp\""
+        " network=\"0\""
+        " port=\"0\""
+        " priority=\"0\""
         " type=\"host\"/>"
-        "<candidate component=\"1\""
-        " foundation=\"2\""
+        "<candidate component=\"0\""
         " generation=\"0\""
         " id=\"y3s2b30v3r\""
-        " ip=\"192.0.2.3\""
-        " network=\"1\""
-        " port=\"45664\""
-        " priority=\"1694498815\""
-        " protocol=\"udp\""
-        " type=\"srflx\"/>"
+        " network=\"0\""
+        " port=\"0\""
+        " priority=\"0\""
+        " type=\"host\"/>"
         "</transport>"
         "</content>");
 
-    QXmppJingleIq::Content content;
-    parsePacket(content, xml);
+    QXmppJingleIq::Content content1;
+    QVERIFY(content1.creator().isEmpty());
+    QVERIFY(content1.name().isEmpty());
+    QVERIFY(content1.descriptionMedia().isEmpty());
+    QCOMPARE(content1.descriptionSsrc(), quint32(0));
+    QCOMPARE(content1.payloadTypes().size(), 0);
+    QVERIFY(content1.transportUser().isEmpty());
+    QVERIFY(content1.transportPassword().isEmpty());
+    QCOMPARE(content1.transportCandidates().size(), 0);
+    parsePacket(content1, xml);
 
-    QCOMPARE(content.creator(), QLatin1String("initiator"));
-    QCOMPARE(content.name(), QLatin1String("voice"));
-    QCOMPARE(content.descriptionMedia(), QLatin1String("audio"));
-    QCOMPARE(content.descriptionSsrc(), quint32(0));
-    QCOMPARE(content.payloadTypes().size(), 6);
-    QCOMPARE(content.payloadTypes()[0].id(), quint8(96));
-    QCOMPARE(content.payloadTypes()[1].id(), quint8(97));
-    QCOMPARE(content.payloadTypes()[2].id(), quint8(18));
-    QCOMPARE(content.payloadTypes()[3].id(), quint8(0));
-    QCOMPARE(content.payloadTypes()[4].id(), quint8(103));
-    QCOMPARE(content.payloadTypes()[5].id(), quint8(98));
-    QCOMPARE(content.transportCandidates().size(), 2);
-    QCOMPARE(content.transportCandidates()[0].component(), 1);
-    QCOMPARE(content.transportCandidates()[0].foundation(), QLatin1String("1"));
-    QCOMPARE(content.transportCandidates()[0].host(), QHostAddress("10.0.1.1"));
-    QCOMPARE(content.transportCandidates()[0].port(), quint16(8998));
-    QCOMPARE(content.transportCandidates()[0].priority(), 2130706431);
-    QCOMPARE(content.transportCandidates()[0].protocol(), QLatin1String("udp"));
-    QCOMPARE(content.transportCandidates()[0].type(), QXmppJingleCandidate::HostType);
-    QCOMPARE(content.transportCandidates()[1].component(), 1);
-    QCOMPARE(content.transportCandidates()[1].foundation(), QLatin1String("2"));
-    QCOMPARE(content.transportCandidates()[1].host(), QHostAddress("192.0.2.3"));
-    QCOMPARE(content.transportCandidates()[1].port(), quint16(45664));
-    QCOMPARE(content.transportCandidates()[1].priority(), 1694498815);
-    QCOMPARE(content.transportCandidates()[1].protocol(), QLatin1String("udp"));
-    QCOMPARE(content.transportCandidates()[1].type(), QXmppJingleCandidate::ServerReflexiveType);
-    QCOMPARE(content.transportUser(), QLatin1String("8hhy"));
-    QCOMPARE(content.transportPassword(), QLatin1String("asd88fgpdd777uzjYhagZg"));
+    QCOMPARE(content1.creator(), QStringLiteral("initiator"));
+    QCOMPARE(content1.name(), QStringLiteral("voice"));
+    QCOMPARE(content1.descriptionMedia(), QStringLiteral("audio"));
+    QCOMPARE(content1.descriptionSsrc(), quint32(0));
+    QCOMPARE(content1.payloadTypes().size(), 2);
+    QCOMPARE(content1.payloadTypes().at(0).id(), quint8(96));
+    QCOMPARE(content1.payloadTypes().at(1).id(), quint8(97));
+    QCOMPARE(content1.transportUser(), QStringLiteral("8hhy"));
+    QCOMPARE(content1.transportPassword(), QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    QCOMPARE(content1.transportCandidates().size(), 2);
+    QCOMPARE(content1.transportCandidates().at(0).id(), QStringLiteral("el0747fg11"));
+    QCOMPARE(content1.transportCandidates().at(1).id(), QStringLiteral("y3s2b30v3r"));
+    serializePacket(content1, xml);
 
-    serializePacket(content, xml);
+    QXmppJingleIq::Content content2;
+    content2.setCreator(QStringLiteral("initiator"));
+    content2.setName(QStringLiteral("voice"));
+    content2.setDescriptionMedia(QStringLiteral("audio"));
+    content2.setDescriptionSsrc(quint32(0));
+    QXmppJinglePayloadType payloadType1;
+    payloadType1.setId(quint8(96));
+    content2.setPayloadTypes({ payloadType1 });
+    QXmppJinglePayloadType payloadType2;
+    payloadType2.setId(quint8(97));
+    content2.addPayloadType(payloadType2);
+    content2.setTransportUser(QStringLiteral("8hhy"));
+    content2.setTransportPassword(QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    QXmppJingleCandidate transportCandidate1;
+    transportCandidate1.setId(QStringLiteral("el0747fg11"));
+    content2.setTransportCandidates({ transportCandidate1 });
+    QXmppJingleCandidate transportCandidate2;
+    transportCandidate2.setId(QStringLiteral("y3s2b30v3r"));
+    content2.addTransportCandidate(transportCandidate2);
+
+    QCOMPARE(content2.creator(), QStringLiteral("initiator"));
+    QCOMPARE(content2.name(), QStringLiteral("voice"));
+    QCOMPARE(content2.descriptionMedia(), QStringLiteral("audio"));
+    QCOMPARE(content2.descriptionSsrc(), quint32(0));
+    QCOMPARE(content2.payloadTypes().size(), 2);
+    QCOMPARE(content2.payloadTypes().at(0).id(), quint8(96));
+    QCOMPARE(content2.payloadTypes().at(1).id(), quint8(97));
+    QCOMPARE(content2.transportUser(), QStringLiteral("8hhy"));
+    QCOMPARE(content2.transportPassword(), QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    QCOMPARE(content2.transportCandidates().size(), 2);
+    QCOMPARE(content2.transportCandidates().at(0).id(), QStringLiteral("el0747fg11"));
+    QCOMPARE(content2.transportCandidates().at(1).id(), QStringLiteral("y3s2b30v3r"));
+    serializePacket(content2, xml);
 }
 
 void tst_QXmppJingleIq::testContentFingerprint()
