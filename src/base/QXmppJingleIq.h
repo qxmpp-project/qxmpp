@@ -189,6 +189,9 @@ public:
         quint32 descriptionSsrc() const;
         void setDescriptionSsrc(quint32 ssrc);
 
+        bool isRtpMultiplexingSupported() const;
+        void setRtpMultiplexingSupported(bool isRtpMultiplexingSupported);
+
         void addPayloadType(const QXmppJinglePayloadType &payload);
         QList<QXmppJinglePayloadType> payloadTypes() const;
         void setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes);
