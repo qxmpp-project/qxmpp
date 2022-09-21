@@ -255,44 +255,40 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
 void tst_QXmppPresence::testPresenceWithMuji()
 {
     const QByteArray xml(
-        "<presence to=\"darkcave@chat.shakespeare.lit/oldhag\" from=\"wiccarocks@shakespeare.lit/laptop\">"
+        "<presence>"
         "<muji xmlns=\"urn:xmpp:jingle:muji:0\">"
         "<preparing/>"
-        "<content creator=\"initiator\" name=\"video\">"
-        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:0\" media=\"video\">"
-        "<payload-type id=\"97\" name=\"theora\" clockrate=\"90000\"/>"
-        "</description>"
-        "</content>"
-        "<content creator=\"initiator\" name=\"voice\">"
-        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:0\" media=\"audio\">"
-        "<payload-type id=\"97\" name=\"speex\" clockrate=\"8000\"/>"
-        "<payload-type id=\"18\" name=\"G729\"/>"
-        "</description>"
-        "</content>"
+        "<content creator=\"initiator\" name=\"video\"/>"
+        "<content creator=\"initiator\" name=\"voice\"/>"
         "</muji>"
         "</presence>");
 
-    QXmppPresence presence;
-    QVERIFY(!presence.isPreparingMujiSession());
-    QVERIFY(presence.mujiContents().isEmpty());
-    parsePacket(presence, xml);
+    QXmppPresence presence1;
+    QVERIFY(!presence1.isPreparingMujiSession());
+    QVERIFY(presence1.mujiContents().isEmpty());
+    parsePacket(presence1, xml);
 
-    QVERIFY(presence.isPreparingMujiSession());
-    QCOMPARE(presence.mujiContents().size(), 2);
-    QCOMPARE(presence.mujiContents().at(0).name(), QStringLiteral("video"));
-    QCOMPARE(presence.mujiContents().at(1).name(), QStringLiteral("voice"));
-    serializePacket(presence, xml);
+    QVERIFY(presence1.isPreparingMujiSession());
+    QCOMPARE(presence1.mujiContents().size(), 2);
+    QCOMPARE(presence1.mujiContents().at(0).name(), QStringLiteral("video"));
+    QCOMPARE(presence1.mujiContents().at(1).name(), QStringLiteral("voice"));
+    serializePacket(presence1, xml);
 
-    presence.setIsPreparingMujiSession(false);
+    QXmppPresence presence2;
+    presence2.setIsPreparingMujiSession(true);
     QXmppJingleIq::Content mujiContent1;
-    mujiContent1.setName(QStringLiteral("1"));
+    mujiContent1.setCreator(QStringLiteral("initiator"));
+    mujiContent1.setName(QStringLiteral("video"));
     QXmppJingleIq::Content mujiContent2;
-    mujiContent2.setName(QStringLiteral("2"));
-    presence.setMujiContents({ mujiContent1, mujiContent2 });
-    QVERIFY(!presence.isPreparingMujiSession());
-    QCOMPARE(presence.mujiContents().size(), 2);
-    QCOMPARE(presence.mujiContents().at(0).name(), QStringLiteral("1"));
-    QCOMPARE(presence.mujiContents().at(1).name(), QStringLiteral("2"));
+    mujiContent2.setCreator(QStringLiteral("initiator"));
+    mujiContent2.setName(QStringLiteral("voice"));
+    presence2.setMujiContents({ mujiContent1, mujiContent2 });
+
+    QVERIFY(presence2.isPreparingMujiSession());
+    QCOMPARE(presence2.mujiContents().size(), 2);
+    QCOMPARE(presence2.mujiContents().at(0).name(), QStringLiteral("video"));
+    QCOMPARE(presence2.mujiContents().at(1).name(), QStringLiteral("voice"));
+    serializePacket(presence2, xml);
 }
 
 void tst_QXmppPresence::testPresenceWithLastUserInteraction()
