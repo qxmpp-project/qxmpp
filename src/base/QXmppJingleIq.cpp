@@ -58,7 +58,7 @@ static const char *jingle_reasons[] = {
 };
 
 static const QStringList JINGLE_RTP_SESSION_STATES = {
-    QStringLiteral(),
+    QString(),
     QStringLiteral("active"),
     QStringLiteral("hold"),
     QStringLiteral("unhold"),
