@@ -400,16 +400,16 @@ void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
     QXmppJingleIq::Content content;
     parsePacket(content, xml);
 
-    const auto rtpFeedbackTypesAndParameters = content.rtpFeedbackTypesAndParameters();
-    QCOMPARE(rtpFeedbackTypesAndParameters[0].type(), QStringLiteral("nack"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[0].subtype(), QStringLiteral("pli"));
-    QVERIFY(rtpFeedbackTypesAndParameters[0].parameters().isEmpty());
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].type(), QStringLiteral("test-type"));
-    QVERIFY(rtpFeedbackTypesAndParameters[1].subtype().isEmpty());
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].name(), QStringLiteral("test-name"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].value(), QStringLiteral("test-value"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[1].name(), QStringLiteral("test-name-2"));
-    QVERIFY(rtpFeedbackTypesAndParameters[1].parameters()[1].value().isEmpty());
+    const auto rtpFeedbackProperties = content.rtpFeedbackProperties();
+    QCOMPARE(rtpFeedbackProperties[0].type(), QStringLiteral("nack"));
+    QCOMPARE(rtpFeedbackProperties[0].subtype(), QStringLiteral("pli"));
+    QVERIFY(rtpFeedbackProperties[0].parameters().isEmpty());
+    QCOMPARE(rtpFeedbackProperties[1].type(), QStringLiteral("test-type"));
+    QVERIFY(rtpFeedbackProperties[1].subtype().isEmpty());
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[0].name(), QStringLiteral("test-name"));
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[0].value(), QStringLiteral("test-value"));
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[1].name(), QStringLiteral("test-name-2"));
+    QVERIFY(rtpFeedbackProperties[1].parameters()[1].value().isEmpty());
 
     const auto rtpFeedbackIntervals = content.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals[0].value(), 60);
@@ -523,20 +523,20 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
         "</payload-type>");
 
     QXmppJinglePayloadType payload;
-    QVERIFY(payload.rtpFeedbackTypesAndParameters().isEmpty());
+    QVERIFY(payload.rtpFeedbackProperties().isEmpty());
     QVERIFY(payload.rtpFeedbackIntervals().isEmpty());
     parsePacket(payload, xml);
 
-    const auto rtpFeedbackTypesAndParameters = payload.rtpFeedbackTypesAndParameters();
-    QCOMPARE(rtpFeedbackTypesAndParameters[0].type(), QStringLiteral("nack"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[0].subtype(), QStringLiteral("sli"));
-    QVERIFY(rtpFeedbackTypesAndParameters[0].parameters().isEmpty());
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].type(), QStringLiteral("test-type-3"));
-    QVERIFY(rtpFeedbackTypesAndParameters[1].subtype().isEmpty());
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].name(), QStringLiteral("test-name-3"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[0].value(), QStringLiteral("test-value-3"));
-    QCOMPARE(rtpFeedbackTypesAndParameters[1].parameters()[1].name(), QStringLiteral("test-name-4"));
-    QVERIFY(rtpFeedbackTypesAndParameters[1].parameters()[1].value().isEmpty());
+    const auto rtpFeedbackProperties = payload.rtpFeedbackProperties();
+    QCOMPARE(rtpFeedbackProperties[0].type(), QStringLiteral("nack"));
+    QCOMPARE(rtpFeedbackProperties[0].subtype(), QStringLiteral("sli"));
+    QVERIFY(rtpFeedbackProperties[0].parameters().isEmpty());
+    QCOMPARE(rtpFeedbackProperties[1].type(), QStringLiteral("test-type-3"));
+    QVERIFY(rtpFeedbackProperties[1].subtype().isEmpty());
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[0].name(), QStringLiteral("test-name-3"));
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[0].value(), QStringLiteral("test-value-3"));
+    QCOMPARE(rtpFeedbackProperties[1].parameters()[1].name(), QStringLiteral("test-name-4"));
+    QVERIFY(rtpFeedbackProperties[1].parameters()[1].value().isEmpty());
 
     const auto rtpFeedbackIntervals = payload.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals[0].value(), 100);
@@ -544,24 +544,24 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
 
     serializePacket(payload, xml);
 
-    QXmppJingleRtpFeedbackTypeAndParameters rtpFeedbackTypeAndParameters;
-    rtpFeedbackTypeAndParameters.setType(QStringLiteral("ack"));
-    rtpFeedbackTypeAndParameters.setSubtype(QStringLiteral("rpsi"));
+    QXmppJingleRtpFeedbackProperty rtpFeedbackProperty;
+    rtpFeedbackProperty.setType(QStringLiteral("ack"));
+    rtpFeedbackProperty.setSubtype(QStringLiteral("rpsi"));
 
     QXmppSdpParameter parameter;
     parameter.setName(QStringLiteral("test-name-5"));
     parameter.setValue(QStringLiteral("test-value-5"));
-    rtpFeedbackTypeAndParameters.setParameters({ parameter });
+    rtpFeedbackProperty.setParameters({ parameter });
 
     QXmppJingleRtpFeedbackInterval rtpFeedbackInterval;
     rtpFeedbackInterval.setValue(60);
-    payload.setRtpFeedbackTypesAndParameters({ rtpFeedbackTypeAndParameters });
+    payload.setRtpFeedbackProperties({ rtpFeedbackProperty });
     payload.setRtpFeedbackIntervals({ rtpFeedbackInterval });
 
-    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].type(), QStringLiteral("ack"));
-    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].subtype(), QStringLiteral("rpsi"));
-    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].parameters()[0].name(), QStringLiteral("test-name-5"));
-    QCOMPARE(payload.rtpFeedbackTypesAndParameters()[0].parameters()[0].value(), QStringLiteral("test-value-5"));
+    QCOMPARE(payload.rtpFeedbackProperties()[0].type(), QStringLiteral("ack"));
+    QCOMPARE(payload.rtpFeedbackProperties()[0].subtype(), QStringLiteral("rpsi"));
+    QCOMPARE(payload.rtpFeedbackProperties()[0].parameters()[0].name(), QStringLiteral("test-name-5"));
+    QCOMPARE(payload.rtpFeedbackProperties()[0].parameters()[0].value(), QStringLiteral("test-value-5"));
     QCOMPARE(payload.rtpFeedbackIntervals()[0].value(), 60);
 }
 

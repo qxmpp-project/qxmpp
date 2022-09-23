@@ -14,7 +14,7 @@ class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
-class QXmppJingleRtpFeedbackTypeAndParametersPrivate;
+class QXmppJingleRtpFeedbackPropertyPrivate;
 class QXmppSdpParameterPrivate;
 
 class QXMPP_EXPORT QXmppSdpParameter
@@ -41,12 +41,12 @@ private:
     QSharedDataPointer<QXmppSdpParameterPrivate> d;
 };
 
-class QXMPP_EXPORT QXmppJingleRtpFeedbackTypeAndParameters
+class QXMPP_EXPORT QXmppJingleRtpFeedbackProperty
 {
 public:
-    QXmppJingleRtpFeedbackTypeAndParameters();
+    QXmppJingleRtpFeedbackProperty();
 
-    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackTypeAndParameters)
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackProperty)
 
     QString type() const;
     void setType(const QString &type);
@@ -62,10 +62,10 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 
-    static bool isJingleRtpFeedbackTypeAndParameters(const QDomElement &element);
+    static bool isJingleRtpFeedbackProperty(const QDomElement &element);
 
 private:
-    QSharedDataPointer<QXmppJingleRtpFeedbackTypeAndParametersPrivate> d;
+    QSharedDataPointer<QXmppJingleRtpFeedbackPropertyPrivate> d;
 };
 
 class QXMPP_EXPORT QXmppJingleRtpFeedbackInterval
@@ -121,8 +121,8 @@ public:
     unsigned int ptime() const;
     void setPtime(unsigned int ptime);
 
-    QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters() const;
-    void setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters);
+    QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties() const;
+    void setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties);
 
     QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
     void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
@@ -286,8 +286,8 @@ public:
         QString transportPassword() const;
         void setTransportPassword(const QString &password);
 
-        QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters() const;
-        void setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters);
+        QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties() const;
+        void setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties);
 
         QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
         void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);

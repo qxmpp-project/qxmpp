@@ -126,18 +126,18 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
 /// Parses the RTP Feedback Negotation elements.
 ///
 /// \param parent element to parse which might contain RTP Feedback Negotiation elements
-/// \param typesAndParameters RTP Feedback Negotation types and parameters to be set
-/// \param intervals RTP Feedback Negotiation intervals to be set
+/// \param properties RTP feedback properties to be set
+/// \param intervals RTP feedback intervals to be set
 ///
-static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
+static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackProperty> &properties, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
 {
     for (auto child = parent.firstChildElement();
          !child.isNull();
          child = child.nextSiblingElement()) {
-        if (QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParameters(child)) {
-            QXmppJingleRtpFeedbackTypeAndParameters typeAndParameters;
-            typeAndParameters.parse(child);
-            typesAndParameters.append(typeAndParameters);
+        if (QXmppJingleRtpFeedbackProperty::isJingleRtpFeedbackProperty(child)) {
+            QXmppJingleRtpFeedbackProperty property;
+            property.parse(child);
+            properties.append(property);
         } else if (QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(child)) {
             QXmppJingleRtpFeedbackInterval interval;
             interval.parse(child);
@@ -150,13 +150,13 @@ static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent,
 /// Serializes the RTP Feedback Negotation elements.
 ///
 /// \param writer writer to write the serialized elements
-/// \param typesAndParameters RTP Feedback Negotation types and parameters to be serialized
-/// \param intervals RTP Feedback Negotiation intervals to be serialized
+/// \param properties RTP feedback properties to be serialized
+/// \param intervals RTP feedback intervals to be serialized
 ///
-static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &typesAndParameters, const QVector<QXmppJingleRtpFeedbackInterval> &intervals)
+static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackProperty> &properties, const QVector<QXmppJingleRtpFeedbackInterval> &intervals)
 {
-    for (const auto &typeAndParameters : typesAndParameters) {
-        typeAndParameters.toXml(writer);
+    for (const auto &property : properties) {
+        property.toXml(writer);
     }
 
     for (const auto &interval : intervals) {
@@ -192,7 +192,7 @@ public:
     QList<QXmppJingleCandidate> transportCandidates;
 
     // XEP-0293: Jingle RTP Feedback Negotiation
-    QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters;
+    QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties;
     QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals;
 };
 
@@ -367,33 +367,33 @@ void QXmppJingleIq::Content::setTransportPassword(const QString &password)
 }
 
 ///
-/// Returns the types and parameters for RTP Feedback Negotiation.
+/// Returns the properties of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation types and parameters
-///
-/// \since QXmpp 1.5
-///
-QVector<QXmppJingleRtpFeedbackTypeAndParameters> QXmppJingleIq::Content::rtpFeedbackTypesAndParameters() const
-{
-    return d->rtpFeedbackTypesAndParameters;
-}
-
-///
-/// Sets the types and parameters for RTP Feedback Negotiation.
-///
-/// \param type RTP Feedback Negotiation types and parameters
+/// \return the RTP feedback properties
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppJingleIq::Content::setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters)
+QVector<QXmppJingleRtpFeedbackProperty> QXmppJingleIq::Content::rtpFeedbackProperties() const
 {
-    d->rtpFeedbackTypesAndParameters = rtpFeedbackTypesAndParameters;
+    return d->rtpFeedbackProperties;
 }
 
 ///
-/// Returns the intervals for RTP Feedback Negotiation.
+/// Sets the properties of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation intervals
+/// \param rtpFeedbackProperties RTP feedback properties
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Content::setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties)
+{
+    d->rtpFeedbackProperties = rtpFeedbackProperties;
+}
+
+///
+/// Returns the intervals of RTP feedback.
+///
+/// \return the RTP feedback intervals
 ///
 QVector<QXmppJingleRtpFeedbackInterval> QXmppJingleIq::Content::rtpFeedbackIntervals() const
 {
@@ -401,9 +401,9 @@ QVector<QXmppJingleRtpFeedbackInterval> QXmppJingleIq::Content::rtpFeedbackInter
 }
 
 ///
-/// Sets the intervals for RTP Feedback Negotiation.
+/// Sets the intervals of RTP feedback.
 ///
-/// \param type RTP Feedback Negotiation intervals
+/// \param rtpFeedbackIntervals RTP feedback intervals
 ///
 void QXmppJingleIq::Content::setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals)
 {
@@ -496,6 +496,9 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->descriptionMedia = descriptionElement.attribute(QStringLiteral("media"));
     d->descriptionSsrc = descriptionElement.attribute(QStringLiteral("ssrc")).toULong();
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
+
+    parseJingleRtpFeedbackNegotiationElements(descriptionElement, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
+
     QDomElement child = descriptionElement.firstChildElement(QStringLiteral("payload-type"));
     while (!child.isNull()) {
         QXmppJinglePayloadType payload;
@@ -516,8 +519,6 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
         d->transportCandidates << candidate;
         child = child.nextSiblingElement(QStringLiteral("candidate"));
     }
-
-    parseJingleRtpFeedbackNegotiationElements(descriptionElement, d->rtpFeedbackTypesAndParameters, d->rtpFeedbackIntervals);
 
     /// XEP-0320
     child = transportElement.firstChildElement(QStringLiteral("fingerprint"));
@@ -554,7 +555,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
             writer->writeEmptyElement(QStringLiteral("rtcp-mux"));
         }
 
-        jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackTypesAndParameters, d->rtpFeedbackIntervals);
+        jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
 
         for (const auto &payload : d->payloadTypes) {
             payload.toXml(writer);
@@ -1427,7 +1428,7 @@ public:
     unsigned int ptime;
 
     // XEP-0293: Jingle RTP Feedback Negotiation
-    QVector<QXmppJingleRtpFeedbackTypeAndParameters> rtpFeedbackTypesAndParameters;
+    QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties;
     QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals;
 };
 
@@ -1571,33 +1572,33 @@ void QXmppJinglePayloadType::setPtime(unsigned int ptime)
 }
 
 ///
-/// Returns the types and parameters for RTP Feedback Negotiation.
+/// Returns the properties of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation types and parameters
-///
-/// \since QXmpp 1.5
-///
-QVector<QXmppJingleRtpFeedbackTypeAndParameters> QXmppJinglePayloadType::rtpFeedbackTypesAndParameters() const
-{
-    return d->rtpFeedbackTypesAndParameters;
-}
-
-///
-/// Sets the types and parameters for RTP Feedback Negotiation.
-///
-/// \param rtpFeedbackTypesAndParameters RTP Feedback Negotiation types and parameters
+/// \return the RTP feedback properties
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppJinglePayloadType::setRtpFeedbackTypesAndParameters(const QVector<QXmppJingleRtpFeedbackTypeAndParameters> &rtpFeedbackTypesAndParameters)
+QVector<QXmppJingleRtpFeedbackProperty> QXmppJinglePayloadType::rtpFeedbackProperties() const
 {
-    d->rtpFeedbackTypesAndParameters = rtpFeedbackTypesAndParameters;
+    return d->rtpFeedbackProperties;
 }
 
 ///
-/// Returns the intervals for RTP Feedback Negotiation.
+/// Sets the properties of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation intervals
+/// \param rtpFeedbackProperties RTP feedback properties
+///
+/// \since QXmpp 1.5
+///
+void QXmppJinglePayloadType::setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties)
+{
+    d->rtpFeedbackProperties = rtpFeedbackProperties;
+}
+
+///
+/// Returns the intervals of RTP feedback.
+///
+/// \return the RTP feedback intervals
 ///
 QVector<QXmppJingleRtpFeedbackInterval> QXmppJinglePayloadType::rtpFeedbackIntervals() const
 {
@@ -1605,9 +1606,9 @@ QVector<QXmppJingleRtpFeedbackInterval> QXmppJinglePayloadType::rtpFeedbackInter
 }
 
 ///
-/// Sets the intervals for RTP Feedback Negotiation.
+/// Sets the intervals of RTP feedback.
 ///
-/// \param rtpFeedbackIntervals RTP Feedback Negotiation intervals
+/// \param rtpFeedbackIntervals RTP feedback intervals
 ///
 void QXmppJinglePayloadType::setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals)
 {
@@ -1633,7 +1634,7 @@ void QXmppJinglePayloadType::parse(const QDomElement &element)
         child = child.nextSiblingElement(QStringLiteral("parameter"));
     }
 
-    parseJingleRtpFeedbackNegotiationElements(element, d->rtpFeedbackTypesAndParameters, d->rtpFeedbackIntervals);
+    parseJingleRtpFeedbackNegotiationElements(element, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
 }
 
 void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
@@ -1661,7 +1662,7 @@ void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
 
-    jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackTypesAndParameters, d->rtpFeedbackIntervals);
+    jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
 
     writer->writeEndElement();
 }
@@ -1752,6 +1753,10 @@ QString QXmppSdpParameter::value() const
 ///
 /// Sets the value of the parameter.
 ///
+/// A parameter in the form "a=b" can be created by this method.
+/// Any other form of parameters can be created by not using this method.
+/// The value stays a default-constructed QString then.
+///
 /// \param value parameter's value
 ///
 void QXmppSdpParameter::setValue(const QString &value)
@@ -1791,7 +1796,7 @@ bool QXmppSdpParameter::isSdpParameter(const QDomElement &element)
     return element.tagName() == QStringLiteral("parameter");
 }
 
-class QXmppJingleRtpFeedbackTypeAndParametersPrivate : public QSharedData
+class QXmppJingleRtpFeedbackPropertyPrivate : public QSharedData
 {
 public:
     QString type;
@@ -1800,95 +1805,93 @@ public:
 };
 
 ///
-/// \class QXmppJingleRtpFeedbackTypeAndParameters
+/// \class QXmppJingleRtpFeedbackProperty
 ///
-/// \brief The QXmppJingleRtpFeedbackTypeAndParameters class represents the
-/// \xep{0293, Jingle RTP Feedback Negotiation} type and parameters element "rtcp-fb".
+/// \brief The QXmppJingleRtpFeedbackProperty class represents the
+/// \xep{0293, Jingle RTP Feedback Negotiation} "rtcp-fb" element.
 ///
 /// \since QXmpp 1.5
 ///
 
 ///
-/// Constructs a Jingle RTP Feedback Negotiation type and its parameters.
+/// Constructs a Jingle RTP feedback property.
 ///
-QXmppJingleRtpFeedbackTypeAndParameters::QXmppJingleRtpFeedbackTypeAndParameters()
-    : d(new QXmppJingleRtpFeedbackTypeAndParametersPrivate())
+QXmppJingleRtpFeedbackProperty::QXmppJingleRtpFeedbackProperty()
+    : d(new QXmppJingleRtpFeedbackPropertyPrivate())
 {
 }
 
-QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpFeedbackTypeAndParameters)
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpFeedbackProperty)
 
 ///
-/// Returns the type for RTP Feedback Negotiation.
+/// Returns the type of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation type
+/// \return the RTP feedback type
 ///
-QString QXmppJingleRtpFeedbackTypeAndParameters::type() const
+QString QXmppJingleRtpFeedbackProperty::type() const
 {
     return d->type;
 }
 
 ///
-/// Sets the type for RTP Feedback Negotiation.
+/// Sets the type of RTP feedback.
 ///
-/// \param type RTP Feedback Negotiation type
+/// \param type RTP feedback type
 ///
-void QXmppJingleRtpFeedbackTypeAndParameters::setType(const QString &type)
+void QXmppJingleRtpFeedbackProperty::setType(const QString &type)
 {
     d->type = type;
 }
 
 ///
-/// Returns the subtype for RTP Feedback Negotiation.
+/// Returns the subtype for RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation subtype
+/// \return the RTP feedback subtype
 ///
-QString QXmppJingleRtpFeedbackTypeAndParameters::subtype() const
+QString QXmppJingleRtpFeedbackProperty::subtype() const
 {
     return d->subtype;
 }
 
 ///
-/// Sets the subtype for RTP Feedback Negotiation.
+/// Sets the subtype of RTP feedback.
 ///
-/// If there is more than one parameter, use QXmppJingleRtpFeedbackTypeAndParameters::setParameter()
+/// If there is more than one parameter, use QXmppJingleRtpFeedbackProperty::setParameters()
 /// instead of this method.
 ///
-/// \param subtype RTP Feedback Negotiation subtype
+/// \param subtype RTP feedback subtype
 ///
-void QXmppJingleRtpFeedbackTypeAndParameters::setSubtype(const QString &subtype)
+void QXmppJingleRtpFeedbackProperty::setSubtype(const QString &subtype)
 {
     d->subtype = subtype;
 }
 
 ///
-/// Returns the parameters for RTP Feedback Negotiation.
+/// Returns the parameters of RTP feedback.
 ///
-/// \return the RTP Feedback Negotiation parameters
+/// \return the RTP feedback parameters
 ///
-QVector<QXmppSdpParameter> QXmppJingleRtpFeedbackTypeAndParameters::parameters() const
+QVector<QXmppSdpParameter> QXmppJingleRtpFeedbackProperty::parameters() const
 {
     return d->parameters;
 }
 
 ///
-/// Sets the parameters for RTP Feedback Negotiation.
+/// Sets the parameters of RTP feedback.
 ///
-/// Additional parameters in the form "a=b" can be set by this method.
-/// Any other form of parameters can be provided by setting the name and a default-constructed
-/// QString as the value of QXmppJingleRtpFeedbackTypeAndParameters::Parameter.
-/// If there is only one parameter, use QXmppJingleRtpFeedbackTypeAndParameters::setSubtype()
+/// Additional parameters can be set by this method.
+/// If there is only one parameter, use QXmppJingleRtpFeedbackProperty::setSubtype()
 /// instead of this method.
 ///
-/// \param parameters RTP Feedback Negotiation parameters
+/// \param parameters RTP feedback parameters
 ///
-void QXmppJingleRtpFeedbackTypeAndParameters::setParameters(const QVector<QXmppSdpParameter> &parameters)
+void QXmppJingleRtpFeedbackProperty::setParameters(const QVector<QXmppSdpParameter> &parameters)
 {
     d->parameters = parameters;
 }
 
 /// \cond
-void QXmppJingleRtpFeedbackTypeAndParameters::parse(const QDomElement &element)
+void QXmppJingleRtpFeedbackProperty::parse(const QDomElement &element)
 {
     d->type = element.attribute(QStringLiteral("type"));
     d->subtype = element.attribute(QStringLiteral("subtype"));
@@ -1906,7 +1909,7 @@ void QXmppJingleRtpFeedbackTypeAndParameters::parse(const QDomElement &element)
     d->parameters = parameters;
 }
 
-void QXmppJingleRtpFeedbackTypeAndParameters::toXml(QXmlStreamWriter *writer) const
+void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb"));
     writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
@@ -1926,14 +1929,13 @@ void QXmppJingleRtpFeedbackTypeAndParameters::toXml(QXmlStreamWriter *writer) co
 /// \endcond
 
 ///
-/// Determines whether the given DOM element is an RTP Feedback Negotiation type and parameters
-/// element.
+/// Determines whether the given DOM element is an RTP feedback property element.
 ///
 /// \param element DOM element being checked
 ///
-/// \return whether element is an RTP Feedback Negotiation type and parameters element
+/// \return whether element is an RTP feedback property element
 ///
-bool QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParameters(const QDomElement &element)
+bool QXmppJingleRtpFeedbackProperty::isJingleRtpFeedbackProperty(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("rtcp-fb") &&
         element.namespaceURI() == ns_jingle_rtp_feedback_negotiation;
@@ -1943,13 +1945,13 @@ bool QXmppJingleRtpFeedbackTypeAndParameters::isJingleRtpFeedbackTypeAndParamete
 /// \class QXmppJingleRtpFeedbackInterval
 ///
 /// \brief The QXmppJingleRtpFeedbackInterval class represents the
-/// \xep{0293, Jingle RTP Feedback Negotiation} interval element "rtcp-fb-trr-int".
+/// \xep{0293, Jingle RTP Feedback Negotiation} "rtcp-fb-trr-int" element.
 ///
 /// \since QXmpp 1.5
 ///
 
 ///
-/// Constructs a Jingle RTP Feedback Negotiation interval.
+/// Constructs a Jingle RTP feedback interval.
 ///
 QXmppJingleRtpFeedbackInterval::QXmppJingleRtpFeedbackInterval()
 {
@@ -1958,9 +1960,9 @@ QXmppJingleRtpFeedbackInterval::QXmppJingleRtpFeedbackInterval()
 QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpFeedbackInterval)
 
 ///
-/// Returns the value of the interval for RTP Feedback Negotiation.
+/// Returns the value of the RTP feedback interval.
 ///
-/// \return the RTP Feedback Negotiation interval value
+/// \return the RTP feedback interval value
 ///
 uint64_t QXmppJingleRtpFeedbackInterval::value() const
 {
@@ -1968,9 +1970,9 @@ uint64_t QXmppJingleRtpFeedbackInterval::value() const
 }
 
 ///
-/// Sets the value of the interval for RTP Feedback Negotiation.
+/// Sets the value of the RTP feedback interval.
 ///
-/// \param value RTP Feedback Negotiation interval value
+/// \param value RTP feedback interval value
 ///
 void QXmppJingleRtpFeedbackInterval::setValue(uint64_t value)
 {
@@ -1993,11 +1995,11 @@ void QXmppJingleRtpFeedbackInterval::toXml(QXmlStreamWriter *writer) const
 /// \endcond
 
 ///
-/// Determines whether the given DOM element is an RTP Feedback Negotiation interval element.
+/// Determines whether the given DOM element is an RTP feedback interval element.
 ///
 /// \param element DOM element being checked
 ///
-/// \return whether element is an RTP Feedback Negotiation interval element
+/// \return whether element is an RTP feedback interval element
 ///
 bool QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(const QDomElement &element)
 {
