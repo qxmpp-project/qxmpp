@@ -25,12 +25,7 @@ public:
     };
 
     QXmppFileShare();
-    QXmppFileShare(const QXmppFileShare &);
-    QXmppFileShare(QXmppFileShare &&) noexcept;
-    ~QXmppFileShare();
-
-    QXmppFileShare &operator=(const QXmppFileShare &);
-    QXmppFileShare &operator=(QXmppFileShare &&) noexcept;
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppFileShare)
 
     Disposition disposition() const;
     void setDisposition(Disposition);

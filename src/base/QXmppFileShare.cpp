@@ -49,7 +49,7 @@ public:
 /// \endcond
 
 ///
-/// \class QXmppFileSharePrivate
+/// \class QXmppFileShare
 ///
 /// File sharing element from \xep{0447, Stateless file sharing}. Contains
 /// metadata and source URLs.
@@ -59,17 +59,20 @@ public:
 /// \since QXmpp 1.5
 ///
 
+///
+/// \enum QXmppFileShare::Disposition
+///
+/// \brief Decides whether to display the file contents (e.g. an image) inline in the chat or as
+/// a file.
+///
+
 /// Default constructor
 QXmppFileShare::QXmppFileShare()
     : d(new QXmppFileSharePrivate)
 {
 }
 
-QXmppFileShare::QXmppFileShare(const QXmppFileShare &) = default;
-QXmppFileShare::QXmppFileShare(QXmppFileShare &&) noexcept = default;
-QXmppFileShare::~QXmppFileShare() = default;
-QXmppFileShare &QXmppFileShare::operator=(const QXmppFileShare &) = default;
-QXmppFileShare &QXmppFileShare::operator=(QXmppFileShare &&) noexcept = default;
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppFileShare)
 
 /// Returns the disposition setting for this file.
 QXmppFileShare::Disposition QXmppFileShare::disposition() const
@@ -83,21 +86,25 @@ void QXmppFileShare::setDisposition(Disposition disp)
     d->disposition = disp;
 }
 
+/// Returns the metadata of the shared file.
 const QXmppFileMetadata &QXmppFileShare::metadata() const
 {
     return d->metadata;
 }
 
+/// Sets the metadata of the shared file.
 void QXmppFileShare::setMetadata(const QXmppFileMetadata &metadata)
 {
     d->metadata = metadata;
 }
 
+/// Returns the HTTP sources for this file.
 const QVector<QXmppHttpFileSource> &QXmppFileShare::httpSources() const
 {
     return d->httpSources;
 }
 
+/// Sets the HTTP sources for this file.
 void QXmppFileShare::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
 {
     d->httpSources = newHttpSources;
