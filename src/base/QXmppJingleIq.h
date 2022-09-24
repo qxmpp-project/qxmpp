@@ -409,4 +409,5 @@ protected:
 private:
     QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
+
 #endif
