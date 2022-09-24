@@ -60,7 +60,7 @@ bool QXmppOmemoEnvelope::isUsedForKeyExchange() const
 ///
 /// \param isUsed whether a pre-key was used to prepare this envelope
 ///
-void QXmppOmemoEnvelope::setIsUsedForKeyExchange(bool isUsed)
+void QXmppOmemoEnvelope::setUsedForKeyExchange(bool isUsed)
 {
     m_isUsedForKeyExchange = isUsed;
 }

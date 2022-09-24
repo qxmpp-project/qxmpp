@@ -1155,7 +1155,7 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                             QXmppOmemoEnvelope omemoEnvelope;
                             omemoEnvelope.setRecipientDeviceId(deviceId);
                             if (isKeyExchange) {
-                                omemoEnvelope.setIsUsedForKeyExchange(true);
+                                omemoEnvelope.setUsedForKeyExchange(true);
                             }
                             omemoEnvelope.setData(data);
                             omemoElement->addEnvelope(jid, omemoEnvelope);
@@ -3554,7 +3554,7 @@ QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recip
         QXmppOmemoEnvelope omemoEnvelope;
         omemoEnvelope.setRecipientDeviceId(recipientDeviceId);
         if (isKeyExchange) {
-            omemoEnvelope.setIsUsedForKeyExchange(true);
+            omemoEnvelope.setUsedForKeyExchange(true);
         }
         omemoEnvelope.setData(data);
 
