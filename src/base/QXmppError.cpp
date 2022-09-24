@@ -46,6 +46,16 @@ QXmppError QXmppError::fromIoDevice(const QIODevice &device)
 }
 
 ///
+/// \brief Constructs a QXmppError from a QNetworkReply
+///
+/// It creates a QXmppError with the error string and network error from the reply.
+///
+QXmppError QXmppError::fromNetworkReply(const QNetworkReply &reply)
+{
+    return { reply.errorString(), reply.error() };
+}
+
+///
 /// Returns whether the error is a QNetworkReply::NetworkError.
 ///
 bool QXmppError::isFileError() const
