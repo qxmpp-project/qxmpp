@@ -979,7 +979,6 @@ void QXmppJingleIq::setResponder(const QString &responder)
     d->responder = responder;
 }
 
-#if QXMPP_DEPRECATED_SINCE(1, 5)
 ///
 /// Returns true if the call is ringing.
 ///
@@ -1007,7 +1006,6 @@ void QXmppJingleIq::setRinging(bool ringing)
         d->rtpSessionState = QXmppJingleIq::None;
     }
 }
-#endif
 
 /// Returns the session ID.
 QString QXmppJingleIq::sid() const
