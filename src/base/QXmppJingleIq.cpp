@@ -1776,8 +1776,8 @@ void QXmppSdpParameter::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("parameter"));
     helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
 
-    if (const auto value = d->value; !value.isEmpty()) {
-        helperToXmlAddAttribute(writer, QStringLiteral("value"), value);
+    if (d->value.isEmpty()) {
+        helperToXmlAddAttribute(writer, QStringLiteral("value"), d->value);
     }
 
     writer->writeEndElement();
@@ -1916,12 +1916,12 @@ void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, QStringLiteral("type"), d->type);
 
     // If there are parameters, they must be used instead of the subtype.
-    if (const auto subtype = d->subtype; subtype.isEmpty()) {
+    if (d->subtype.isEmpty()) {
         for (const auto &parameter : d->parameters) {
             parameter.toXml(writer);
         }
     } else {
-        helperToXmlAddAttribute(writer, QStringLiteral("subtype"), subtype);
+        helperToXmlAddAttribute(writer, QStringLiteral("subtype"), d->subtype);
     }
 
     writer->writeEndElement();
