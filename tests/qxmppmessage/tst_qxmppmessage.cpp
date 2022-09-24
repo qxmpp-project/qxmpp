@@ -6,7 +6,7 @@
 
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
-#include "QXmppEncryptedFileSource_p.h"
+#include "QXmppEncryptedFileSource.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
 #include "QXmppTrustMessageElement.h"
