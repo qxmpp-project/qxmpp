@@ -27,6 +27,7 @@ public:
     };
 
     QXmppEncryptedFileSource();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppEncryptedFileSource)
 
     Cipher cipher() const;
     void setCipher(Cipher newCipher);
@@ -49,11 +50,7 @@ public:
     /// \endcond
 
 private:
-    Cipher m_cipher = Aes128GcmNopadding;
-    QByteArray m_key;
-    QByteArray m_iv;
-    QVector<QXmppHash> m_hashes;
-    QVector<QXmppHttpFileSource> m_httpSources;
+    QSharedDataPointer<QXmppEncryptedFileSourcePrivate> d;
 };
 
 #endif  // QXMPPENCRYPTEDFILESOURCE_H
