@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Oliver Goffart <ogoffart@woboq.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -21,6 +22,7 @@ private slots:
     void testPresenceWithMucItem();
     void testPresenceWithMucPassword();
     void testPresenceWithMucSupport();
+    void testPresenceWithMuji();
     void testPresenceWithLastUserInteraction();
     void testPresenceWithMix();
     void testPresenceWithVCard();
@@ -248,6 +250,45 @@ void tst_QXmppPresence::testPresenceWithMucSupport()
     QCOMPARE(presence.isMucSupported(), true);
     QVERIFY(presence.mucPassword().isEmpty());
     serializePacket(presence, xml);
+}
+
+void tst_QXmppPresence::testPresenceWithMuji()
+{
+    const QByteArray xml(
+        "<presence>"
+        "<muji xmlns=\"urn:xmpp:jingle:muji:0\">"
+        "<preparing/>"
+        "<content creator=\"initiator\" name=\"video\"/>"
+        "<content creator=\"initiator\" name=\"voice\"/>"
+        "</muji>"
+        "</presence>");
+
+    QXmppPresence presence1;
+    QVERIFY(!presence1.isPreparingMujiSession());
+    QVERIFY(presence1.mujiContents().isEmpty());
+    parsePacket(presence1, xml);
+
+    QVERIFY(presence1.isPreparingMujiSession());
+    QCOMPARE(presence1.mujiContents().size(), 2);
+    QCOMPARE(presence1.mujiContents().at(0).name(), QStringLiteral("video"));
+    QCOMPARE(presence1.mujiContents().at(1).name(), QStringLiteral("voice"));
+    serializePacket(presence1, xml);
+
+    QXmppPresence presence2;
+    presence2.setIsPreparingMujiSession(true);
+    QXmppJingleIq::Content mujiContent1;
+    mujiContent1.setCreator(QStringLiteral("initiator"));
+    mujiContent1.setName(QStringLiteral("video"));
+    QXmppJingleIq::Content mujiContent2;
+    mujiContent2.setCreator(QStringLiteral("initiator"));
+    mujiContent2.setName(QStringLiteral("voice"));
+    presence2.setMujiContents({ mujiContent1, mujiContent2 });
+
+    QVERIFY(presence2.isPreparingMujiSession());
+    QCOMPARE(presence2.mujiContents().size(), 2);
+    QCOMPARE(presence2.mujiContents().at(0).name(), QStringLiteral("video"));
+    QCOMPARE(presence2.mujiContents().at(1).name(), QStringLiteral("voice"));
+    serializePacket(presence2, xml);
 }
 
 void tst_QXmppPresence::testPresenceWithLastUserInteraction()

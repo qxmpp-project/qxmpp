@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -362,6 +363,7 @@ void tst_QXmppJingleIq::testSession()
         " action=\"session-initiate\""
         " initiator=\"romeo@montague.lit/orchard\""
         " sid=\"a73sjjvkla37jfea\">"
+        "<muji xmlns=\"urn:xmpp:jingle:muji:0\" room=\"darkcave@chat.shakespeare.lit\"/>"
         "<content creator=\"initiator\" name=\"this-is-a-stub\">"
         "<description xmlns=\"urn:xmpp:jingle:apps:stub:0\"/>"
         "<transport xmlns=\"urn:xmpp:jingle:transports:stub:0\"/>"
@@ -374,6 +376,7 @@ void tst_QXmppJingleIq::testSession()
     QCOMPARE(session.action(), QXmppJingleIq::SessionInitiate);
     QCOMPARE(session.initiator(), QLatin1String("romeo@montague.lit/orchard"));
     QCOMPARE(session.sid(), QLatin1String("a73sjjvkla37jfea"));
+    QCOMPARE(session.mujiGroupChatJid(), QStringLiteral("darkcave@chat.shakespeare.lit"));
     QCOMPARE(session.contents().size(), 1);
     QCOMPARE(session.contents()[0].creator(), QLatin1String("initiator"));
     QCOMPARE(session.contents()[0].name(), QLatin1String("this-is-a-stub"));

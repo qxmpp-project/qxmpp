@@ -129,6 +129,8 @@ const char *ns_bob = "urn:xmpp:bob";
 const char *ns_conference = "jabber:x:conference";
 // XEP-0264: Jingle Content Thumbnails
 const char *ns_thumbs = "urn:xmpp:thumbs:1";
+// XEP-0272: Multiparty Jingle (Muji)
+const char *ns_muji = "urn:xmpp:jingle:muji:0";
 // XEP-0280: Message Carbons
 const char *ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0297: Stanza Forwarding

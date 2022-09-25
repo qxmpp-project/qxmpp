@@ -141,6 +141,8 @@ extern const char *ns_bob;
 extern const char *ns_conference;
 // XEP-0264: Jingle Content Thumbnails
 extern const char *ns_thumbs;
+// XEP-0272: Multiparty Jingle (Muji)
+extern const char *ns_muji;
 // XEP-0280: Message Carbons
 extern const char *ns_carbons;
 // XEP-0297: Stanza Forwarding
