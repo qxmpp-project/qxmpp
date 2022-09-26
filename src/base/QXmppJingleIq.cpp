@@ -57,16 +57,6 @@ static const char *jingle_reasons[] = {
     "unsupported-transports",
 };
 
-static const QStringList JINGLE_RTP_SESSION_STATES = {
-    QString(),
-    QStringLiteral("active"),
-    QStringLiteral("hold"),
-    QStringLiteral("unhold"),
-    QStringLiteral("mute"),
-    QStringLiteral("unmute"),
-    QStringLiteral("ringing")
-};
-
 static QString formatFingerprint(const QByteArray &digest)
 {
     QString fingerprint;
@@ -860,7 +850,7 @@ public:
     QList<QXmppJingleIq::Content> contents;
     QXmppJingleIq::Reason reason;
 
-    QXmppJingleIq::RtpSessionState rtpSessionState = QXmppJingleIq::None;
+    std::optional<QXmppJingleIq::RtpSessionState> rtpSessionState;
 };
 
 QXmppJingleIqPrivate::QXmppJingleIqPrivate()
@@ -987,7 +977,11 @@ void QXmppJingleIq::setResponder(const QString &responder)
 ///
 bool QXmppJingleIq::ringing() const
 {
-    return d->rtpSessionState == QXmppJingleIq::Ringing;
+    if (d->rtpSessionState) {
+        return std::holds_alternative<RtpSessionStateRinging>(*d->rtpSessionState);
+    }
+
+    return false;
 }
 
 ///
@@ -1001,9 +995,9 @@ bool QXmppJingleIq::ringing() const
 void QXmppJingleIq::setRinging(bool ringing)
 {
     if (ringing) {
-        d->rtpSessionState = QXmppJingleIq::Ringing;
+        d->rtpSessionState = RtpSessionStateRinging();
     } else {
-        d->rtpSessionState = QXmppJingleIq::None;
+        d->rtpSessionState = std::nullopt;
     }
 }
 
@@ -1054,7 +1048,7 @@ void QXmppJingleIq::setMujiGroupChatJid(const QString &mujiGroupChatJid)
 ///
 /// \since QXmpp 1.5
 ///
-QXmppJingleIq::RtpSessionState QXmppJingleIq::rtpSessionState() const
+std::optional<QXmppJingleIq::RtpSessionState> QXmppJingleIq::rtpSessionState() const
 {
     return d->rtpSessionState;
 }
@@ -1067,7 +1061,7 @@ QXmppJingleIq::RtpSessionState QXmppJingleIq::rtpSessionState() const
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppJingleIq::setRtpSessionState(RtpSessionState rtpSessionState)
+void QXmppJingleIq::setRtpSessionState(const std::optional<RtpSessionState> &rtpSessionState)
 {
     d->rtpSessionState = rtpSessionState;
 }
@@ -1115,9 +1109,29 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
          !childElement.isNull();
          childElement = childElement.nextSiblingElement()) {
         if (childElement.namespaceURI() == ns_jingle_rtp_info) {
-            if (const auto rtpSessionState = JINGLE_RTP_SESSION_STATES.indexOf(childElement.tagName()); rtpSessionState != -1) {
-                d->rtpSessionState = QXmppJingleIq::RtpSessionState(rtpSessionState);
-                break;
+            const auto elementTag = childElement.tagName();
+
+            if (elementTag == QStringLiteral("active")) {
+                d->rtpSessionState = QXmppJingleIq::RtpSessionStateActive();
+            } else if (elementTag == QStringLiteral("hold")) {
+                d->rtpSessionState = QXmppJingleIq::RtpSessionStateHold();
+            } else if (elementTag == QStringLiteral("unhold")) {
+                d->rtpSessionState = QXmppJingleIq::RtpSessionStateUnhold();
+            } else if (const auto isMute = elementTag == QStringLiteral("mute"); isMute || elementTag == QStringLiteral("unmute")) {
+                QXmppJingleIq::RtpSessionStateMuting muting;
+                muting.isMute = isMute;
+
+                if (const auto creator = childElement.attribute(QStringLiteral("creator")); creator == QStringLiteral("initiator")) {
+                    muting.creator = RtpSessionStateMutingCreator::Initiator;
+                } else if (creator == QStringLiteral("responder")) {
+                    muting.creator = RtpSessionStateMutingCreator::Responder;
+                }
+
+                muting.name = childElement.attribute(QStringLiteral("name"));
+
+                d->rtpSessionState = muting;
+            } else if (elementTag == QStringLiteral("ringing")) {
+                d->rtpSessionState = QXmppJingleIq::RtpSessionStateRinging();
             }
         }
     }
@@ -1146,9 +1160,37 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     d->reason.toXml(writer);
 
-    if (d->rtpSessionState != QXmppJingleIq::None) {
-        writer->writeStartElement(JINGLE_RTP_SESSION_STATES.at(d->rtpSessionState));
-        writer->writeDefaultNamespace(ns_jingle_rtp_info);
+    if (d->rtpSessionState) {
+        if (std::holds_alternative<RtpSessionStateActive>(*d->rtpSessionState)) {
+            writer->writeStartElement(QStringLiteral("active"));
+        } else if (std::holds_alternative<RtpSessionStateHold>(*d->rtpSessionState)) {
+            writer->writeStartElement(QStringLiteral("hold"));
+        } else if (std::holds_alternative<RtpSessionStateUnhold>(*d->rtpSessionState)) {
+            writer->writeStartElement(QStringLiteral("unhold"));
+        } else if (auto rtpSessionStateMuting = std::get_if<RtpSessionStateMuting>(&(*d->rtpSessionState))) {
+            if (rtpSessionStateMuting->isMute) {
+                writer->writeStartElement(QStringLiteral("mute"));
+            } else {
+                writer->writeStartElement(QStringLiteral("unmute"));
+            }
+
+            writer->writeDefaultNamespace(ns_jingle_rtp_info);
+
+            if (rtpSessionStateMuting->creator == RtpSessionStateMutingCreator::Initiator) {
+                helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("initiator"));
+            } else if (rtpSessionStateMuting->creator == RtpSessionStateMutingCreator::Responder) {
+                helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("responder"));
+            }
+
+            helperToXmlAddAttribute(writer, QStringLiteral("name"), rtpSessionStateMuting->name);
+        } else {
+            writer->writeStartElement(QStringLiteral("ringing"));
+        }
+
+        if (!std::holds_alternative<RtpSessionStateMuting>(*d->rtpSessionState)) {
+            writer->writeDefaultNamespace(ns_jingle_rtp_info);
+        }
+
         writer->writeEndElement();
     }
 

@@ -34,11 +34,11 @@ private slots:
     void testContentRtpFeedbackNegotiation();
     void testSession();
     void testTerminate();
+    void testRtpSessionState_data();
+    void testRtpSessionState();
     void testAudioPayloadType();
     void testVideoPayloadType();
     void testPayloadTypeRtpFeedbackNegotiation();
-    void testRinging();
-    void testRtpSessionInfoType();
 };
 
 void tst_QXmppJingleIq::testIsSdpParameter_data()
@@ -698,6 +698,108 @@ void tst_QXmppJingleIq::testTerminate()
     serializePacket(session, xml);
 }
 
+void tst_QXmppJingleIq::testRtpSessionState_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QString>("state");
+
+    QTest::newRow("active")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<active xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("active");
+    QTest::newRow("hold")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<hold xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("hold");
+    QTest::newRow("unhold")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<unhold xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("unhold");
+    QTest::newRow("mute")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<mute xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\" creator=\"initiator\" name=\"voice\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("mute");
+    QTest::newRow("unmute")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<unmute xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\" creator=\"responder\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("unmute");
+    QTest::newRow("ringing")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\""
+                             " action=\"session-info\""
+                             " initiator=\"romeo@montague.lit/orchard\""
+                             " sid=\"a73sjjvkla37jfea\">"
+                             "<ringing xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
+                             "</jingle>"
+                             "</iq>")
+        << QStringLiteral("ringing");
+}
+
+void tst_QXmppJingleIq::testRtpSessionState()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QString, state);
+
+    QXmppJingleIq iq;
+    QVERIFY(!iq.rtpSessionState());
+    parsePacket(iq, xml);
+
+    if (state == QStringLiteral("active")) {
+        QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateActive>(*iq.rtpSessionState()));
+    } else if (state == QStringLiteral("hold")) {
+        QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateHold>(*iq.rtpSessionState()));
+    } else if (state == QStringLiteral("unhold")) {
+        QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateUnhold>(*iq.rtpSessionState()));
+    } else if (const auto isMute = state == QStringLiteral("mute"); isMute || state == QStringLiteral("unmute")) {
+        QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateMuting>(*iq.rtpSessionState()));
+
+        const auto stateMuting = std::get<QXmppJingleIq::RtpSessionStateMuting>(*iq.rtpSessionState());
+        QCOMPARE(stateMuting.isMute, isMute);
+
+        if (isMute) {
+            QCOMPARE(stateMuting.creator, QXmppJingleIq::Initiator);
+            QCOMPARE(stateMuting.name, QStringLiteral("voice"));
+        } else {
+            QCOMPARE(stateMuting.creator, QXmppJingleIq::Responder);
+            QVERIFY(stateMuting.name.isEmpty());
+        }
+    } else if (state == QStringLiteral("ringing")) {
+        QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateRinging>(*iq.rtpSessionState()));
+    }
+
+    serializePacket(iq, xml);
+}
+
 void tst_QXmppJingleIq::testAudioPayloadType()
 {
     const QByteArray xml(R"(<payload-type id="103" name="L16" channels="2" clockrate="16000"/>)");
@@ -785,33 +887,6 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
     QCOMPARE(rtpFeedbackIntervals2[1].value(), uint64_t(80));
 
     serializePacket(payload2, xml);
-}
-
-void tst_QXmppJingleIq::testRinging()
-{
-    const QByteArray xml(
-        "<iq"
-        " id=\"tgr515bt\""
-        " to=\"romeo@montague.lit/orchard\""
-        " from=\"juliet@capulet.lit/balcony\""
-        " type=\"set\">"
-        "<jingle xmlns=\"urn:xmpp:jingle:1\""
-        " action=\"session-info\""
-        " initiator=\"romeo@montague.lit/orchard\""
-        " sid=\"a73sjjvkla37jfea\">"
-        "<ringing xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
-        "</jingle>"
-        "</iq>");
-
-    QXmppJingleIq iq;
-    parsePacket(iq, xml);
-    QCOMPARE(iq.ringing(), true);
-    serializePacket(iq, xml);
-}
-
-void tst_QXmppJingleIq::testRtpSessionInfoType()
-{
-
 }
 
 QTEST_MAIN(tst_QXmppJingleIq)
