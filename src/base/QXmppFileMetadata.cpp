@@ -26,7 +26,7 @@ public:
     std::optional<QMimeType> mediaType;
     std::optional<QString> name;
     std::optional<uint64_t> size;
-    std::optional<QXmppThumbnail> thumbnail;
+    QVector<QXmppThumbnail> thumbnails;
     std::optional<uint32_t> width;
 };
 
@@ -101,10 +101,12 @@ bool QXmppFileMetadata::parse(const QDomElement &el)
     if (auto sizeEl = el.firstChildElement("size"); !sizeEl.isNull()) {
         d->size = sizeEl.text().toULong();
     }
-    if (auto thumbEl = el.firstChildElement("thumbnail"); !thumbEl.isNull()) {
-        d->thumbnail = QXmppThumbnail();
-        if (!d->thumbnail->parse(thumbEl)) {
-            d->thumbnail.reset();
+    for (auto thumbEl = el.firstChildElement("thumbnail");
+         !thumbEl.isNull();
+         thumbEl = thumbEl.nextSiblingElement("thumbnail")) {
+        QXmppThumbnail thumbnail;
+        if (thumbnail.parse(thumbEl)) {
+            d->thumbnails.append(std::move(thumbnail));
         }
     }
     if (auto widthEl = el.firstChildElement("width"); !widthEl.isNull()) {
@@ -144,8 +146,8 @@ void QXmppFileMetadata::toXml(QXmlStreamWriter *writer) const
     if (d->size) {
         writer->writeTextElement("size", QString::number(*d->size));
     }
-    if (d->thumbnail) {
-        d->thumbnail->toXml(writer);
+    for (const auto &thumbnail : d->thumbnails) {
+        thumbnail.toXml(writer);
     }
     if (d->width) {
         writer->writeTextElement("width", QString::number(*d->width));
@@ -250,16 +252,16 @@ void QXmppFileMetadata::setSize(std::optional<uint64_t> size)
     d->size = size;
 }
 
-/// Returns the thumbnail reference.
-const std::optional<QXmppThumbnail> &QXmppFileMetadata::thumbnail() const
+/// Returns the thumbnail references.
+const QVector<QXmppThumbnail> &QXmppFileMetadata::thumbnails() const
 {
-    return d->thumbnail;
+    return d->thumbnails;
 }
 
-/// Sets the thumbnail reference.
-void QXmppFileMetadata::setThumbnail(const std::optional<QXmppThumbnail> &thumbnail)
+/// Sets the thumbnail references.
+void QXmppFileMetadata::setThumbnails(const QVector<QXmppThumbnail> &thumbnail)
 {
-    d->thumbnail = thumbnail;
+    d->thumbnails = thumbnail;
 }
 
 /// Returns the width of the image or video.
