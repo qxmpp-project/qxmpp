@@ -982,7 +982,7 @@ void QXmppJingleIq::setResponder(const QString &responder)
 ///
 /// Returns true if the call is ringing.
 ///
-/// \deprecated This method is deprecated since QXmpp 1.5. Use\c QXmpp::rtpSessionState()
+/// \deprecated This method is deprecated since QXmpp 1.5. Use \c QXmpp::rtpSessionState()
 /// instead.
 ///
 bool QXmppJingleIq::ringing() const
@@ -995,7 +995,7 @@ bool QXmppJingleIq::ringing() const
 ///
 /// \param ringing
 ///
-/// \deprecated This method is deprecated since QXmpp 1.5. Use\c QXmpp::setRtpSessionState()
+/// \deprecated This method is deprecated since QXmpp 1.5. Use \c QXmpp::setRtpSessionState()
 /// instead.
 ///
 void QXmppJingleIq::setRinging(bool ringing)
