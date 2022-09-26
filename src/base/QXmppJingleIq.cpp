@@ -121,14 +121,8 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
     return QStringLiteral("candidate:%1 %2 %3 %4 %5 %6 typ %7 generation %8").arg(candidate.foundation(), QString::number(candidate.component()), candidate.protocol(), QString::number(candidate.priority()), candidate.host().toString(), QString::number(candidate.port()), QXmppJingleCandidate::typeToString(candidate.type()), QString::number(candidate.generation()));
 }
 
-/// \cond
-///
-/// Parses the RTP Feedback Negotation elements.
-///
-/// \param parent element to parse which might contain RTP Feedback Negotiation elements
-/// \param properties RTP feedback properties to be set
-/// \param intervals RTP feedback intervals to be set
-///
+// Parses all found RTP Feedback Negotiation elements inside of parent into properties and
+// intervals.
 static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackProperty> &properties, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
 {
     for (auto child = parent.firstChildElement();
@@ -146,13 +140,7 @@ static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent,
     }
 }
 
-///
-/// Serializes the RTP Feedback Negotation elements.
-///
-/// \param writer writer to write the serialized elements
-/// \param properties RTP feedback properties to be serialized
-/// \param intervals RTP feedback intervals to be serialized
-///
+// Serializes the RTP feedback properties and intervals.
 static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpFeedbackProperty> &properties, const QVector<QXmppJingleRtpFeedbackInterval> &intervals)
 {
     for (const auto &property : properties) {
@@ -163,7 +151,6 @@ static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, 
         interval.toXml(writer);
     }
 }
-/// \endcond
 
 class QXmppJingleIqContentPrivate : public QSharedData
 {
