@@ -55,8 +55,8 @@ public:
     std::optional<uint64_t> size() const;
     void setSize(std::optional<uint64_t> size);
 
-    const std::optional<QXmppThumbnail> &thumbnail() const;
-    void setThumbnail(const std::optional<QXmppThumbnail> &thumbnail);
+    const QVector<QXmppThumbnail> &thumbnails() const;
+    void setThumbnails(const QVector<QXmppThumbnail> &thumbnail);
 
     std::optional<uint32_t> width() const;
     void setWidth(std::optional<uint32_t> width);
