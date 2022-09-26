@@ -592,6 +592,7 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>partial</xmpp:status>
         <xmpp:version>0.2</xmpp:version>
         <xmpp:since>1.5</xmpp:since>
+      </xmpp:SupportedXep>
     </implements>
     <implements>
       <xmpp:SupportedXep>
