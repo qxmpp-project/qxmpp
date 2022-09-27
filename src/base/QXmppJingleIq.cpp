@@ -382,6 +382,8 @@ void QXmppJingleIq::Content::setRtpFeedbackProperties(const QVector<QXmppJingleR
 ///
 /// \return the RTP feedback intervals
 ///
+/// \since QXmpp 1.5
+///
 QVector<QXmppJingleRtpFeedbackInterval> QXmppJingleIq::Content::rtpFeedbackIntervals() const
 {
     return d->rtpFeedbackIntervals;
@@ -391,6 +393,8 @@ QVector<QXmppJingleRtpFeedbackInterval> QXmppJingleIq::Content::rtpFeedbackInter
 /// Sets the intervals of RTP feedback.
 ///
 /// \param rtpFeedbackIntervals RTP feedback intervals
+///
+/// \since QXmpp 1.5
 ///
 void QXmppJingleIq::Content::setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals)
 {
