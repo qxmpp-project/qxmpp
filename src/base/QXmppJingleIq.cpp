@@ -1054,16 +1054,20 @@ std::optional<QXmppJingleIq::RtpSessionState> QXmppJingleIq::rtpSessionState() c
 }
 
 ///
-/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
-/// Informational Messages.
+/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions} Informational
+/// Messages.
 ///
-/// \param rtpSessionState session' state
+/// The appropriate action is set as well.
+/// Thus, it is not needed to set it manually.
+///
+/// \param rtpSessionState session's state
 ///
 /// \since QXmpp 1.5
 ///
 void QXmppJingleIq::setRtpSessionState(const std::optional<RtpSessionState> &rtpSessionState)
 {
     d->rtpSessionState = rtpSessionState;
+    d->action = Action::SessionInfo;
 }
 
 /// \cond
