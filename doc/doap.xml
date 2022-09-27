@@ -41,6 +41,8 @@ SPDX-License-Identifier: CC0-1.0
     </repository>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc6120.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc6121.html'/>
+    <implements rdf:resource='https://xmpp.org/rfcs/rfc7590.html'/>
+    <implements rdf:resource='https://xmpp.org/rfcs/rfc7622.html'/>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0004.html'/>
@@ -542,8 +544,8 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0407.html'/>
         <xmpp:status>partial</xmpp:status>
         <xmpp:version>0.1</xmpp:version>
-        <xmpp:note>Only invitations implemented</xmpp:note>
         <xmpp:since>1.4</xmpp:since>
+        <xmpp:note>Only invitations implemented</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
