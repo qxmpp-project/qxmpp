@@ -1763,7 +1763,7 @@ void QXmppSdpParameter::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("parameter"));
     helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
 
-    if (d->value.isEmpty()) {
+    if (!d->value.isEmpty()) {
         helperToXmlAddAttribute(writer, QStringLiteral("value"), d->value);
     }
 
