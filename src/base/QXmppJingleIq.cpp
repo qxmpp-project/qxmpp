@@ -121,6 +121,27 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
     return QStringLiteral("candidate:%1 %2 %3 %4 %5 %6 typ %7 generation %8").arg(candidate.foundation(), QString::number(candidate.component()), candidate.protocol(), QString::number(candidate.priority()), candidate.host().toString(), QString::number(candidate.port()), QXmppJingleCandidate::typeToString(candidate.type()), QString::number(candidate.generation()));
 }
 
+// Parses all found SDP parameter elements of parent into parameters.
+static void parseSdpParameters(const QDomElement &parent, QVector<QXmppSdpParameter> &parameters)
+{
+    for (auto childElement = parent.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (QXmppSdpParameter::isSdpParameter(childElement)) {
+            QXmppSdpParameter parameter;
+            parameter.parse(childElement);
+            parameters.append(parameter);
+        }
+    }
+}
+
+// Serializes the SDP parameters.
+static void sdpParametersToXml(QXmlStreamWriter *writer, const QVector<QXmppSdpParameter> &parameters) {
+    for (const auto &parameter : parameters) {
+        parameter.toXml(writer);
+    }
+}
+
 // Parses all found RTP Feedback Negotiation elements inside of parent into properties and
 // intervals.
 static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackProperty> &properties, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
@@ -2043,18 +2064,7 @@ void QXmppJingleRtpFeedbackProperty::parse(const QDomElement &element)
 {
     d->type = element.attribute(QStringLiteral("type"));
     d->subtype = element.attribute(QStringLiteral("subtype"));
-
-    QVector<QXmppSdpParameter> parameters;
-    for (auto childElement = element.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
-        if (QXmppSdpParameter::isSdpParameter(childElement)) {
-            QXmppSdpParameter parameter;
-            parameter.parse(childElement);
-            parameters.append(parameter);
-        }
-    }
-    d->parameters = parameters;
+    parseSdpParameters(element, d->parameters);
 }
 
 void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
@@ -2065,9 +2075,7 @@ void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
 
     // If there are parameters, they must be used instead of the subtype.
     if (d->subtype.isEmpty()) {
-        for (const auto &parameter : d->parameters) {
-            parameter.toXml(writer);
-        }
+        sdpParametersToXml(writer, d->parameters);
     } else {
         helperToXmlAddAttribute(writer, QStringLiteral("subtype"), d->subtype);
     }
