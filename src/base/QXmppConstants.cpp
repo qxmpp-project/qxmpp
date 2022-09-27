@@ -135,6 +135,8 @@ const char *ns_muji = "urn:xmpp:jingle:muji:0";
 const char *ns_carbons = "urn:xmpp:carbons:2";
 // XEP-0293: Jingle RTP Feedback Negotiation
 const char *ns_jingle_rtp_feedback_negotiation = "urn:xmpp:jingle:apps:rtp:rtcp-fb:0";
+// XEP-0294: Jingle RTP Header Extensions Negotiation
+const char *ns_jingle_rtp_header_extensions_negotiation = "urn:xmpp:jingle:apps:rtp:rtp-hdrext:0";
 // XEP-0297: Stanza Forwarding
 const char *ns_forwarding = "urn:xmpp:forward:0";
 // XEP-0300: Use of Cryptographic Hash Functions in XMPP

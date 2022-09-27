@@ -57,6 +57,12 @@ static const char *jingle_reasons[] = {
     "unsupported-transports",
 };
 
+static const QStringList JINGLE_RTP_HEADER_EXTENSIONS_SENDERS = {
+    QStringLiteral("both"),
+    QStringLiteral("initiator"),
+    QStringLiteral("responder")
+};
+
 static QString formatFingerprint(const QByteArray &digest)
 {
     QString fingerprint;
@@ -136,7 +142,8 @@ static void parseSdpParameters(const QDomElement &parent, QVector<QXmppSdpParame
 }
 
 // Serializes the SDP parameters.
-static void sdpParametersToXml(QXmlStreamWriter *writer, const QVector<QXmppSdpParameter> &parameters) {
+static void sdpParametersToXml(QXmlStreamWriter *writer, const QVector<QXmppSdpParameter> &parameters)
+{
     for (const auto &parameter : parameters) {
         parameter.toXml(writer);
     }
@@ -173,6 +180,37 @@ static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, 
     }
 }
 
+// Parses all found RTP Header Extensions Negotiation elements inside of parent into properties and
+// isRtpHeaderExtensionMixingAllowed.
+static void parseJingleRtpHeaderExtensionsNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpHeaderExtensionProperty> &properties, bool &isRtpHeaderExtensionMixingAllowed)
+{
+    for (auto child = parent.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
+        if (QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(child)) {
+            QXmppJingleRtpHeaderExtensionProperty property;
+            property.parse(child);
+            properties.append(property);
+        } else if (child.tagName() == QStringLiteral("extmap-allow-mixed") && child.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation) {
+            isRtpHeaderExtensionMixingAllowed = true;
+        }
+    }
+}
+
+// Serializes the RTP header extension properties and isRtpHeaderExtensionMixingAllowed.
+static void jingleRtpHeaderExtensionsNegotiationElementsToXml(QXmlStreamWriter *writer, const QVector<QXmppJingleRtpHeaderExtensionProperty> &properties, bool isRtpHeaderExtensionMixingAllowed)
+{
+    for (const auto &property : properties) {
+        property.toXml(writer);
+    }
+
+    if (isRtpHeaderExtensionMixingAllowed) {
+        writer->writeStartElement(QStringLiteral("extmap-allow-mixed"));
+        writer->writeDefaultNamespace(ns_jingle_rtp_header_extensions_negotiation);
+        writer->writeEndElement();
+    }
+}
+
 class QXmppJingleIqContentPrivate : public QSharedData
 {
 public:
@@ -202,6 +240,10 @@ public:
     // XEP-0293: Jingle RTP Feedback Negotiation
     QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties;
     QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals;
+
+    // XEP-0294: Jingle RTP Header Extensions Negotiation
+    QVector<QXmppJingleRtpHeaderExtensionProperty> rtpHeaderExtensionProperties;
+    bool isRtpHeaderExtensionMixingAllowed = false;
 };
 
 QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
@@ -481,6 +523,58 @@ void QXmppJingleIq::Content::setRtpFeedbackIntervals(const QVector<QXmppJingleRt
 }
 
 ///
+/// Returns the RTP header extension properties.
+///
+/// \return the RTP header extension properties
+///
+/// \since QXmpp 1.5
+///
+QVector<QXmppJingleRtpHeaderExtensionProperty> QXmppJingleIq::Content::rtpHeaderExtensionProperties() const
+{
+    return d->rtpHeaderExtensionProperties;
+}
+
+///
+/// Sets the RTP header extension properties.
+///
+/// \param rtpHeaderExtensionProperties RTP header extension properties
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Content::setRtpHeaderExtensionProperties(const QVector<QXmppJingleRtpHeaderExtensionProperty> &rtpHeaderExtensionProperties)
+{
+    d->rtpHeaderExtensionProperties = rtpHeaderExtensionProperties;
+}
+
+///
+/// Returns whether mixing of RTP header extensions is allowed corresponding to the
+/// "extmap-allow-mixed" element as specified by
+/// \xep{0293, Jingle RTP Header Extensions Negotiation}.
+///
+/// \return whether mixing of RTP header extensions is allowed
+///
+/// \since QXmpp 1.5
+///
+bool QXmppJingleIq::Content::isRtpHeaderExtensionMixingAllowed() const
+{
+    return d->isRtpHeaderExtensionMixingAllowed;
+}
+
+///
+/// Sets whether mixing of RTP header extensions is allowed corresponding to the
+/// "extmap-allow-mixed" element as specified by
+/// \xep{0293, Jingle RTP Header Extensions Negotiation}.
+///
+/// \param isAllowed whether mixing of RTP header extensions is allowed
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Content::setRtpHeaderExtensionMixingAllowed(bool isRtpHeaderExtensionMixingAllowed)
+{
+    d->isRtpHeaderExtensionMixingAllowed = isRtpHeaderExtensionMixingAllowed;
+}
+
+///
 /// Returns the fingerprint hash value for the transport key.
 ///
 /// This is used for DTLS-SRTP as defined in \xep{0320}.
@@ -568,6 +662,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
 
     parseJingleRtpFeedbackNegotiationElements(descriptionElement, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
+    parseJingleRtpHeaderExtensionsNegotiationElements(descriptionElement, d->rtpHeaderExtensionProperties, d->isRtpHeaderExtensionMixingAllowed);
 
     QDomElement child = descriptionElement.firstChildElement(QStringLiteral("payload-type"));
     while (!child.isNull()) {
@@ -626,6 +721,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         }
 
         jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
+        jingleRtpHeaderExtensionsNegotiationElementsToXml(writer, d->rtpHeaderExtensionProperties, d->isRtpHeaderExtensionMixingAllowed);
 
         for (const auto &payload : d->payloadTypes) {
             payload.toXml(writer);
@@ -2161,4 +2257,169 @@ bool QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(const QDomEleme
 {
     return element.tagName() == QStringLiteral("rtcp-fb-trr-int") &&
         element.namespaceURI() == ns_jingle_rtp_feedback_negotiation;
+}
+
+class QXmppJingleRtpHeaderExtensionPropertyPrivate : public QSharedData
+{
+public:
+    uint32_t id = 0;
+    QString uri;
+    QXmppJingleRtpHeaderExtensionProperty::Senders senders = QXmppJingleRtpHeaderExtensionProperty::Both;
+    QVector<QXmppSdpParameter> parameters;
+};
+
+///
+/// \enum QXmppJingleRtpHeaderExtensionProperty::Senders
+///
+/// Parties that are allowed to send the negotiated RTP header extension
+///
+
+///
+/// \class QXmppJingleRtpHeaderExtensionProperty
+///
+/// \brief The QXmppJingleRtpHeaderExtensionProperty class represents the
+/// \xep{0294, Jingle RTP Header Extensions Negotiation} "rtp-hdrext" element.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// Constructs a Jingle RTP header extension property.
+///
+QXmppJingleRtpHeaderExtensionProperty::QXmppJingleRtpHeaderExtensionProperty()
+    : d(new QXmppJingleRtpHeaderExtensionPropertyPrivate())
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpHeaderExtensionProperty)
+
+///
+/// Returns the ID of the RTP header extension.
+///
+/// The ID is 0 if it is unset.
+///
+/// \return the RTP header extension's ID
+///
+uint32_t QXmppJingleRtpHeaderExtensionProperty::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the ID of the RTP header extension.
+///
+/// The ID must either be at least 1 and at most 256 or at least 4096 and at most 4351.
+///
+/// \param id RTP header extension's ID
+///
+void QXmppJingleRtpHeaderExtensionProperty::setId(uint32_t id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the URI defning the RTP header extension.
+///
+/// \return the RTP header extension's URI
+///
+QString QXmppJingleRtpHeaderExtensionProperty::uri() const
+{
+    return d->uri;
+}
+
+///
+/// Sets the URI defning the RTP header extension.
+///
+/// \param uri RTP header extension's URI
+///
+void QXmppJingleRtpHeaderExtensionProperty::setUri(const QString &uri)
+{
+    d->uri = uri;
+}
+
+///
+/// Returns the parties that are allowed to send the negotiated RTP header extensions.
+///
+/// \return the parties that are allowed to send the RTP header extensions
+///
+QXmppJingleRtpHeaderExtensionProperty::Senders QXmppJingleRtpHeaderExtensionProperty::senders() const
+{
+    return d->senders;
+}
+
+///
+/// Sets the parties that are allowed to send the negotiated RTP header extensions.
+///
+/// \param senders parties that are allowed to send the RTP header extensions
+///
+void QXmppJingleRtpHeaderExtensionProperty::setSenders(Senders senders)
+{
+    d->senders = senders;
+}
+
+///
+/// Returns the parameters of the RTP header extension.
+///
+/// \return the RTP header extension's parameters
+///
+QVector<QXmppSdpParameter> QXmppJingleRtpHeaderExtensionProperty::parameters() const
+{
+    return d->parameters;
+}
+
+///
+/// Sets the parameters of the RTP header extension.
+///
+/// Additional parameters can be set by this method.
+///
+/// \param parameters RTP header extension's parameters
+///
+void QXmppJingleRtpHeaderExtensionProperty::setParameters(const QVector<QXmppSdpParameter> &parameters)
+{
+    d->parameters = parameters;
+}
+
+/// \cond
+void QXmppJingleRtpHeaderExtensionProperty::parse(const QDomElement &element)
+{
+    if (element.tagName() == QStringLiteral("rtp-hdrext") && element.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation) {
+        d->id = element.attribute(QStringLiteral("id")).toUInt();
+        d->uri = element.attribute(QStringLiteral("uri"));
+
+        if (const auto senders = JINGLE_RTP_HEADER_EXTENSIONS_SENDERS.indexOf(element.attribute(QStringLiteral("senders"))); senders > QXmppJingleRtpHeaderExtensionProperty::Both) {
+            d->senders = static_cast<QXmppJingleRtpHeaderExtensionProperty::Senders>(senders);
+        }
+
+        parseSdpParameters(element, d->parameters);
+    }
+}
+
+void QXmppJingleRtpHeaderExtensionProperty::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QStringLiteral("rtp-hdrext"));
+    writer->writeDefaultNamespace(ns_jingle_rtp_header_extensions_negotiation);
+    helperToXmlAddAttribute(writer, QStringLiteral("id"), QString::number(d->id));
+    helperToXmlAddAttribute(writer, QStringLiteral("uri"), d->uri);
+
+    if (d->senders != QXmppJingleRtpHeaderExtensionProperty::Both) {
+        helperToXmlAddAttribute(writer, QStringLiteral("senders"), JINGLE_RTP_HEADER_EXTENSIONS_SENDERS.at(d->senders));
+    }
+
+    sdpParametersToXml(writer, d->parameters);
+
+    writer->writeEndElement();
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an RTP header extensions property element.
+///
+/// \param element DOM element being checked
+///
+/// \return whether element is an RTP header extension property element
+///
+bool QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("rtp-hdrext") &&
+        element.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation;
 }

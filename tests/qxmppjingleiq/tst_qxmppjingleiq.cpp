@@ -24,6 +24,11 @@ private slots:
     void testIsRtpFeedbackInterval_data();
     void testIsRtpFeedbackInterval();
     void testRtpFeedbackInterval();
+    void testIsRtpHeaderExtensionProperty_data();
+    void testIsRtpHeaderExtensionProperty();
+    void testRtpHeaderExtensionProperty();
+    void testRtpHeaderExtensionPropertyWithSenders();
+    void testRtpHeaderExtensionPropertyWithParameters();
     void testCandidate();
     void testContent();
     void testContentFingerprint();
@@ -32,6 +37,7 @@ private slots:
     void testContentSdpFingerprint();
     void testContentSdpParameters();
     void testContentRtpFeedbackNegotiation();
+    void testContentRtpHeaderExtensionsNegotiation();
     void testSession();
     void testTerminate();
     void testRtpSessionState_data();
@@ -227,6 +233,115 @@ void tst_QXmppJingleIq::testRtpFeedbackInterval()
     QCOMPARE(interval1.value(), uint64_t(100));
 
     serializePacket(interval2, xml);
+}
+
+void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\"/>")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral("<invalid xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\"/>")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral("<rtp-hdrext xmlns=\"invalid\"/>")
+        << false;
+}
+
+void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QCOMPARE(QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(xmlToDom(xml)), isValid);
+}
+
+void tst_QXmppJingleIq::testRtpHeaderExtensionProperty()
+{
+    const QByteArray xml("<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\"/>");
+
+    QXmppJingleRtpHeaderExtensionProperty property1;
+    QCOMPARE(property1.id(), 0);
+    QVERIFY(property1.uri().isEmpty());
+    QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Both);
+
+    parsePacket(property1, xml);
+    QCOMPARE(property1.id(), 1);
+    QCOMPARE(property1.uri(), QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Both);
+
+    serializePacket(property1, xml);
+
+    QXmppJingleRtpHeaderExtensionProperty property2;
+    property2.setId(1);
+    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    property2.setSenders(QXmppJingleRtpHeaderExtensionProperty::Both);
+
+    QCOMPARE(property1.id(), 1);
+    QCOMPARE(property1.uri(), QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Both);
+
+    serializePacket(property2, xml);
+}
+
+void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithSenders()
+{
+    const QByteArray xml("<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\" senders=\"initiator\"/>");
+
+    QXmppJingleRtpHeaderExtensionProperty property1;
+
+    parsePacket(property1, xml);
+    QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Initiator);
+
+    serializePacket(property1, xml);
+
+    QXmppJingleRtpHeaderExtensionProperty property2;
+    property2.setId(1);
+    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    property2.setSenders(QXmppJingleRtpHeaderExtensionProperty::Initiator);
+
+    QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Initiator);
+
+    serializePacket(property2, xml);
+}
+
+void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithParameters()
+{
+    const QByteArray xml(
+        "<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\">"
+        "<parameter name=\"test-name-1\"/>"
+        "<parameter name=\"test-name-2\"/>"
+        "</rtp-hdrext>");
+
+    QXmppJingleRtpHeaderExtensionProperty property1;
+
+    parsePacket(property1, xml);
+    QCOMPARE(property1.parameters().size(), 2);
+    QCOMPARE(property1.parameters().at(0).name(), QStringLiteral("test-name-1"));
+    QCOMPARE(property1.parameters().at(1).name(), QStringLiteral("test-name-2"));
+
+    serializePacket(property1, xml);
+
+    QXmppJingleRtpHeaderExtensionProperty property2;
+    property2.setId(1);
+    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+
+    QXmppSdpParameter parameter1;
+    parameter1.setName(QStringLiteral("test-name-1"));
+
+    QXmppSdpParameter parameter2;
+    parameter2.setName(QStringLiteral("test-name-2"));
+
+    property2.setParameters({ parameter1, parameter2 });
+
+    QCOMPARE(property2.parameters().size(), 2);
+    QCOMPARE(property2.parameters().at(0).name(), QStringLiteral("test-name-1"));
+    QCOMPARE(property2.parameters().at(1).name(), QStringLiteral("test-name-2"));
+
+    serializePacket(property2, xml);
 }
 
 void tst_QXmppJingleIq::testCandidate()
@@ -637,6 +752,62 @@ void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
     QCOMPARE(rtpFeedbackIntervals2.size(), 2);
     QCOMPARE(rtpFeedbackIntervals2[0].value(), uint64_t(60));
     QCOMPARE(rtpFeedbackIntervals2[1].value(), uint64_t(80));
+
+    serializePacket(content2, xml);
+}
+
+void tst_QXmppJingleIq::testContentRtpHeaderExtensionsNegotiation()
+{
+    const QByteArray xml(
+        "<content creator=\"initiator\" name=\"voice\">"
+        "<description xmlns=\"urn:xmpp:jingle:apps:rtp:1\">"
+        "<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\"/>"
+        "<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"2\" uri=\"urn:ietf:params:rtp-hdrext:ntp-64\"/>"
+        "<extmap-allow-mixed xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\"/>"
+        "<payload-type id=\"96\" name=\"speex\"/>"
+        "</description>"
+        "</content>");
+
+    QXmppJingleIq::Content content1;
+    QVERIFY(content1.rtpHeaderExtensionProperties().isEmpty());
+    QVERIFY(!content1.isRtpHeaderExtensionMixingAllowed());
+    parsePacket(content1, xml);
+
+    const auto rtpHeaderExtensionProperties1 = content1.rtpHeaderExtensionProperties();
+    QCOMPARE(rtpHeaderExtensionProperties1.size(), 2);
+    QCOMPARE(rtpHeaderExtensionProperties1[0].id(), 1);
+    QCOMPARE(rtpHeaderExtensionProperties1[1].id(), 2);
+
+    QVERIFY(content1.isRtpHeaderExtensionMixingAllowed());
+
+    serializePacket(content1, xml);
+
+    QXmppJingleRtpHeaderExtensionProperty rtpHeaderExtensionProperty1;
+    rtpHeaderExtensionProperty1.setId(1);
+    rtpHeaderExtensionProperty1.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+
+    QXmppJingleRtpHeaderExtensionProperty rtpHeaderExtensionProperty2;
+    rtpHeaderExtensionProperty2.setId(2);
+    rtpHeaderExtensionProperty2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:ntp-64"));
+
+
+    QXmppJinglePayloadType payloadType;
+    payloadType.setId(96);
+    payloadType.setName(QStringLiteral("speex"));
+
+    QXmppJingleIq::Content content2;
+    content2.setCreator(QStringLiteral("initiator"));
+    content2.setName(QStringLiteral("voice"));
+    content2.addPayloadType(payloadType);
+    content2.setRtpHeaderExtensionProperties({ rtpHeaderExtensionProperty1, rtpHeaderExtensionProperty2 });
+    content2.setRtpHeaderExtensionMixingAllowed(true);
+
+    const auto rtpHeaderExtensionProperties2 = content2.rtpHeaderExtensionProperties();
+    QCOMPARE(rtpHeaderExtensionProperties2.size(), 2);
+    QCOMPARE(rtpHeaderExtensionProperties2[0].id(), 1);
+    QCOMPARE(rtpHeaderExtensionProperties2[1].id(), 2);
+
+    QVERIFY(content2.isRtpHeaderExtensionMixingAllowed());
 
     serializePacket(content2, xml);
 }
