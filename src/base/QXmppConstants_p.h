@@ -147,6 +147,8 @@ extern const char *ns_muji;
 extern const char *ns_carbons;
 // XEP-0293: Jingle RTP Feedback Negotiation
 extern const char *ns_jingle_rtp_feedback_negotiation;
+// XEP-0294: Jingle RTP Header Extensions Negotiation
+extern const char *ns_jingle_rtp_header_extensions_negotiation;
 // XEP-0297: Stanza Forwarding
 extern const char *ns_forwarding;
 // XEP-0300: Use of Cryptographic Hash Functions in XMPP

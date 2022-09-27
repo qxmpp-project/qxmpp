@@ -17,6 +17,7 @@ class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
 class QXmppJingleRtpFeedbackPropertyPrivate;
+class QXmppJingleRtpHeaderExtensionPropertyPrivate;
 class QXmppSdpParameterPrivate;
 
 class QXMPP_EXPORT QXmppSdpParameter
@@ -89,6 +90,45 @@ public:
 
 private:
     uint64_t m_value;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpHeaderExtensionProperty
+{
+public:
+    enum Senders {
+        /// The initiator and the sender are allowed.
+        Both,
+        /// Only the initiator is allowed.
+        Initiator,
+        /// Only the responder is allowed.
+        Responder
+    };
+
+    QXmppJingleRtpHeaderExtensionProperty();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpHeaderExtensionProperty)
+
+    uint32_t id() const;
+    void setId(uint32_t id);
+
+    QString uri() const;
+    void setUri(const QString &uri);
+
+    Senders senders() const;
+    void setSenders(Senders senders);
+
+    QVector<QXmppSdpParameter> parameters() const;
+    void setParameters(const QVector<QXmppSdpParameter> &parameters);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpHeaderExtensionProperty(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpHeaderExtensionPropertyPrivate> d;
 };
 
 ///
@@ -329,6 +369,12 @@ public:
 
         QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
         void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
+
+        QVector<QXmppJingleRtpHeaderExtensionProperty> rtpHeaderExtensionProperties() const;
+        void setRtpHeaderExtensionProperties(const QVector<QXmppJingleRtpHeaderExtensionProperty> &rtpHeaderExtensionProperties);
+
+        bool isRtpHeaderExtensionMixingAllowed() const;
+        void setRtpHeaderExtensionMixingAllowed(bool isRtpHeaderExtensionMixingAllowed);
 
         // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
         QByteArray transportFingerprint() const;
