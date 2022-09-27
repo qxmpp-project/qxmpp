@@ -215,6 +215,26 @@ QXmppBitsOfBinaryDataList::QXmppBitsOfBinaryDataList() = default;
 QXmppBitsOfBinaryDataList::~QXmppBitsOfBinaryDataList() = default;
 
 /// \cond
+
+///
+/// \brief Finds the data for a uri
+/// \return Data belonging to the uri
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppBitsOfBinaryData> QXmppBitsOfBinaryDataList::find(const QXmppBitsOfBinaryContentId &cid) const
+{
+    const auto thumbnailData = std::find_if(begin(), end(), [&](const auto &bobBlob) {
+        return bobBlob.cid() == cid;
+    });
+
+    if (thumbnailData != end()) {
+        return *thumbnailData;
+    } else {
+        return {};
+    }
+}
+
 void QXmppBitsOfBinaryDataList::parse(const QDomElement &element)
 {
     // clear previous data elements
