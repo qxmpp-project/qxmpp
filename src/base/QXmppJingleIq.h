@@ -10,6 +10,8 @@
 
 #include <QHostAddress>
 
+#include <variant>
+
 class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
