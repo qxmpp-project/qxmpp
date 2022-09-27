@@ -8,9 +8,9 @@
 
 #include "QXmppIq.h"
 
-#include <QHostAddress>
-
 #include <variant>
+
+#include <QHostAddress>
 
 class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
