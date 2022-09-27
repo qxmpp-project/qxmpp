@@ -214,7 +214,7 @@ void tst_QXmppJingleIq::testRtpFeedbackInterval()
     QXmppJingleRtpFeedbackInterval interval1;
 
     parsePacket(interval1, xml);
-    QCOMPARE(interval1.value(), 100);
+    QCOMPARE(interval1.value(), uint64_t(100));
 
     serializePacket(interval1, xml);
 
@@ -593,8 +593,8 @@ void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
 
     const auto rtpFeedbackIntervals1 = content1.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals1.size(), 2);
-    QCOMPARE(rtpFeedbackIntervals1[0].value(), 60);
-    QCOMPARE(rtpFeedbackIntervals1[1].value(), 80);
+    QCOMPARE(rtpFeedbackIntervals1[0].value(), uint64_t(60));
+    QCOMPARE(rtpFeedbackIntervals1[1].value(), uint64_t(80));
 
     serializePacket(content1, xml);
 
@@ -630,8 +630,8 @@ void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
 
     const auto rtpFeedbackIntervals2 = content2.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals2.size(), 2);
-    QCOMPARE(rtpFeedbackIntervals2[0].value(), 60);
-    QCOMPARE(rtpFeedbackIntervals2[1].value(), 80);
+    QCOMPARE(rtpFeedbackIntervals2[0].value(), uint64_t(60));
+    QCOMPARE(rtpFeedbackIntervals2[1].value(), uint64_t(80));
 
     serializePacket(content2, xml);
 }
@@ -749,8 +749,8 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
 
     const auto rtpFeedbackIntervals1 = payload1.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals1.size(), 2);
-    QCOMPARE(rtpFeedbackIntervals1[0].value(), 60);
-    QCOMPARE(rtpFeedbackIntervals1[1].value(), 80);
+    QCOMPARE(rtpFeedbackIntervals1[0].value(), uint64_t(60));
+    QCOMPARE(rtpFeedbackIntervals1[1].value(), uint64_t(80));
 
     serializePacket(payload1, xml);
 
@@ -780,8 +780,8 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
 
     const auto rtpFeedbackIntervals2 = payload2.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals2.size(), 2);
-    QCOMPARE(rtpFeedbackIntervals2[0].value(), 60);
-    QCOMPARE(rtpFeedbackIntervals2[1].value(), 80);
+    QCOMPARE(rtpFeedbackIntervals2[0].value(), uint64_t(60));
+    QCOMPARE(rtpFeedbackIntervals2[1].value(), uint64_t(80));
 
     serializePacket(payload2, xml);
 }
