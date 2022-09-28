@@ -9,6 +9,7 @@
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppMessage.h"
 #include "QXmppMixInvitation.h"
+#include "QXmppOutOfBandUrl.h"
 #include "QXmppTrustMessageElement.h"
 
 #include <optional>
@@ -688,6 +689,10 @@ void tst_QXmppMessage::testOutOfBandUrl()
         "<x xmlns=\"jabber:x:oob\">"
         "<url>http://www.jabber.org/images/psa-license.jpg</url>"
         "</x>"
+        "<x xmlns=\"jabber:x:oob\">"
+        "<url>https://xmpp.org/images/logos/xmpp-logo.svg</url>"
+        "<desc>XMPP logo</desc>"
+        "</x>"
         "</message>");
     const QString firstUrl = "http://www.jabber.org/images/psa-license.jpg";
     const QString newUrl = "https://xmpp.org/theme/images/xmpp-logo.svg";
@@ -696,12 +701,19 @@ void tst_QXmppMessage::testOutOfBandUrl()
     parsePacket(oobMessage, oobXml);
     QCOMPARE(oobMessage.outOfBandUrl(), firstUrl);
 
+    QCOMPARE(oobMessage.outOfBandUrls().size(), 2);
+
+    QCOMPARE(oobMessage.outOfBandUrls().front().url(), QStringLiteral("http://www.jabber.org/images/psa-license.jpg"));
+    QVERIFY(!oobMessage.outOfBandUrls().front().description().has_value());
+
+    QCOMPARE(oobMessage.outOfBandUrls().at(1).url(), QStringLiteral("https://xmpp.org/images/logos/xmpp-logo.svg"));
+    QCOMPARE(oobMessage.outOfBandUrls().at(1).description().value(), QStringLiteral("XMPP logo"));
+
+    serializePacket(oobMessage, oobXml);
+
     oobMessage.setOutOfBandUrl(newUrl);
     QCOMPARE(oobMessage.outOfBandUrl(), newUrl);
-
-    // set first url again
-    oobMessage.setOutOfBandUrl(firstUrl);
-    serializePacket(oobMessage, oobXml);
+    QCOMPARE(oobMessage.outOfBandUrls().size(), 1);
 }
 
 void tst_QXmppMessage::testMessageCorrect()

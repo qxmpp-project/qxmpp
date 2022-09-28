@@ -60,6 +60,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMucIq.h
     base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
+    base/QXmppOutOfBandUrl.h
     base/QXmppPingIq.h
     base/QXmppPresence.h
     base/QXmppPubSubAffiliation.h
@@ -184,6 +185,7 @@ set(SOURCE_FILES
     base/QXmppMucIq.cpp
     base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
+    base/QXmppOutOfBandUrl.cpp
     base/QXmppPacket.cpp
     base/QXmppPingIq.cpp
     base/QXmppPresence.cpp
