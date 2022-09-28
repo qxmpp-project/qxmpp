@@ -16,6 +16,7 @@
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
 #endif
+#include "QXmppOutOfBandUrl.h"
 #include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 
@@ -78,7 +79,7 @@ public:
     QXmppMessage::Type type;
 
     // XEP-0066: Out of Band Data
-    QString outOfBandUrl;
+    QVector<QXmppOutOfBandUrl> outOfBandUrls;
 
     // XEP-0071: XHTML-IM
     QString xhtml;
@@ -333,17 +334,45 @@ void QXmppMessage::setParentThread(const QString &parent)
 ///
 QString QXmppMessage::outOfBandUrl() const
 {
-    return d->outOfBandUrl;
+    if (d->outOfBandUrls.empty()) {
+        return {};
+    }
+
+    return d->outOfBandUrls.front().url();
 }
 
 ///
 /// Sets the attached URL for \xep{0066}: Out of Band Data
 ///
+/// This overrides all other urls that may be contained in the list of out of band urls.
+///
 /// \since QXmpp 1.0
 ///
 void QXmppMessage::setOutOfBandUrl(const QString &url)
 {
-    d->outOfBandUrl = url;
+    QXmppOutOfBandUrl data;
+    data.setUrl(url);
+    d->outOfBandUrls = { std::move(data) };
+}
+
+///
+/// Returns possibly attached URLs from \xep{0066}: Out of Band Data
+///
+/// \since QXmpp 1.5
+///
+QVector<QXmppOutOfBandUrl> QXmppMessage::outOfBandUrls() const
+{
+    return d->outOfBandUrls;
+}
+
+///
+/// Sets the attached URLs for \xep{0066}: Out of Band Data
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setOutOfBandUrls(const QVector<QXmppOutOfBandUrl> &urls)
+{
+    d->outOfBandUrls = urls;
 }
 
 ///
@@ -1408,7 +1437,9 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             // XEP-0066: Out of Band Data
             if (element.namespaceURI() == ns_oob) {
-                d->outOfBandUrl = element.firstChildElement(QStringLiteral("url")).text();
+                QXmppOutOfBandUrl data;
+                data.parse(element);
+                d->outOfBandUrls.push_back(std::move(data));
                 return true;
             }
         }
@@ -1637,11 +1668,8 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         }
 
         // XEP-0066: Out of Band Data
-        if (!d->outOfBandUrl.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("x"));
-            writer->writeDefaultNamespace(ns_oob);
-            writer->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
-            writer->writeEndElement();
+        for (const auto &url : d->outOfBandUrls) {
+            url.toXml(writer);
         }
 
         // XEP-0071: XHTML-IM

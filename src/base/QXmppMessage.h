@@ -23,6 +23,7 @@ class QXmppMixInvitation;
 class QXmppOmemoElement;
 #endif
 class QXmppTrustMessageElement;
+class QXmppOutOfBandUrl;
 
 ///
 /// \brief The QXmppMessage class represents an XMPP message.
@@ -126,6 +127,9 @@ public:
     // XEP-0066: Out of Band Data
     QString outOfBandUrl() const;
     void setOutOfBandUrl(const QString &);
+
+    QVector<QXmppOutOfBandUrl> outOfBandUrls() const;
+    void setOutOfBandUrls(const QVector<QXmppOutOfBandUrl> &urls);
 
     // XEP-0071: XHTML-IM
     QString xhtml() const;
