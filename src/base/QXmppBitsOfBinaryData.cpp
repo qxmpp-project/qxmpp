@@ -230,9 +230,8 @@ std::optional<QXmppBitsOfBinaryData> QXmppBitsOfBinaryDataList::find(const QXmpp
 
     if (thumbnailData != end()) {
         return *thumbnailData;
-    } else {
-        return {};
     }
+    return {};
 }
 
 void QXmppBitsOfBinaryDataList::parse(const QDomElement &element)
