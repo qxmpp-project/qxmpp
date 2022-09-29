@@ -35,7 +35,7 @@ class QXMPP_EXPORT QXmppMessage : public QXmppStanza
 public:
 #if QXMPP_DEPRECATED_SINCE(1, 5)
     /// \cond
-    using EncryptionMethod = QXmpp::Encryption;
+    using EncryptionMethod = QXmpp::EncryptionMethod;
 
     static const EncryptionMethod NoEncryption = EncryptionMethod::NoEncryption;
     static const EncryptionMethod UnknownEncryption = EncryptionMethod::UnknownEncryption;
@@ -226,8 +226,8 @@ public:
     void setMixUserNick(const QString &);
 
     // XEP-0380: Explicit Message Encryption
-    QXmpp::Encryption encryptionMethod() const;
-    void setEncryptionMethod(QXmpp::Encryption);
+    QXmpp::EncryptionMethod encryptionMethod() const;
+    void setEncryptionMethod(QXmpp::EncryptionMethod);
     QString encryptionMethodNs() const;
     void setEncryptionMethodNs(const QString &);
 

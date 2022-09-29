@@ -716,7 +716,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 class QXmppE2eeMetadataPrivate : public QSharedData
 {
 public:
-    QXmpp::Encryption encryption;
+    QXmpp::EncryptionMethod encryption;
     QByteArray senderKey;
 
     // XEP-0420: Stanza Content Encryption
@@ -753,7 +753,7 @@ QXmppE2eeMetadata &QXmppE2eeMetadata::operator=(QXmppE2eeMetadata &&) = default;
 ///
 /// \return the encryption protocol
 ///
-QXmpp::Encryption QXmppE2eeMetadata::encryption() const
+QXmpp::EncryptionMethod QXmppE2eeMetadata::encryption() const
 {
     return d->encryption;
 }
@@ -763,7 +763,7 @@ QXmpp::Encryption QXmppE2eeMetadata::encryption() const
 ///
 /// \param encryption encryption protocol
 ///
-void QXmppE2eeMetadata::setEncryption(QXmpp::Encryption encryption)
+void QXmppE2eeMetadata::setEncryption(QXmpp::EncryptionMethod encryption)
 {
     d->encryption = encryption;
 }

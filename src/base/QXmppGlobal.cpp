@@ -30,21 +30,21 @@ static const QStringList ENCRYPTION_NAMES = {
     QStringLiteral("OMEMO 2")
 };
 
-std::optional<QXmpp::Encryption> QXmpp::Private::encryptionFromString(const QString &str)
+std::optional<QXmpp::EncryptionMethod> QXmpp::Private::encryptionFromString(const QString &str)
 {
     int index = ENCRYPTION_NAMESPACES.indexOf(str);
     if (index < 0) {
         return {};
     }
-    return QXmpp::Encryption(index);
+    return QXmpp::EncryptionMethod(index);
 }
 
-QString QXmpp::Private::encryptionToString(Encryption encryption)
+QString QXmpp::Private::encryptionToString(EncryptionMethod encryption)
 {
     return ENCRYPTION_NAMESPACES.at(int(encryption));
 }
 
-QString QXmpp::Private::encryptionToName(Encryption encryption)
+QString QXmpp::Private::encryptionToName(EncryptionMethod encryption)
 {
     return ENCRYPTION_NAMES.at(int(encryption));
 }

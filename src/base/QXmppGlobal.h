@@ -74,7 +74,7 @@ namespace QXmpp {
 ///
 /// \since QXmpp 1.5
 ///
-enum Encryption {
+enum EncryptionMethod {
     /// No encryption
     NoEncryption,
     /// Unknown encryption

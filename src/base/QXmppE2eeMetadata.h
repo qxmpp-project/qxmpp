@@ -26,8 +26,8 @@ public:
     QXmppE2eeMetadata &operator=(const QXmppE2eeMetadata &other);
     QXmppE2eeMetadata &operator=(QXmppE2eeMetadata &&);
 
-    QXmpp::Encryption encryption() const;
-    void setEncryption(QXmpp::Encryption encryption);
+    QXmpp::EncryptionMethod encryption() const;
+    void setEncryption(QXmpp::EncryptionMethod encryption);
 
     QByteArray senderKey() const;
     void setSenderKey(const QByteArray &keyId);

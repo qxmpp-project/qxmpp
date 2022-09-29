@@ -1012,7 +1012,7 @@ void QXmppMessage::setMixUserNick(const QString &mixUserNick)
 ///
 /// \since QXmpp 1.1
 ///
-QXmpp::Encryption QXmppMessage::encryptionMethod() const
+QXmpp::EncryptionMethod QXmppMessage::encryptionMethod() const
 {
     if (d->encryptionMethod.isEmpty()) {
         return QXmpp::NoEncryption;
@@ -1026,7 +1026,7 @@ QXmpp::Encryption QXmppMessage::encryptionMethod() const
 ///
 /// \since QXmpp 1.1
 ///
-void QXmppMessage::setEncryptionMethod(QXmpp::Encryption method)
+void QXmppMessage::setEncryptionMethod(QXmpp::EncryptionMethod method)
 {
     d->encryptionMethod = QXmpp::Private::encryptionToString(method);
 }
