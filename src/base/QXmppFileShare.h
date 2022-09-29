@@ -15,6 +15,7 @@ class QXmlStreamWriter;
 class QXmppFileSharePrivate;
 class QXmppFileMetadata;
 class QXmppHttpFileSource;
+class QXmppEncryptedFileSource;
 
 class QXMPP_EXPORT QXmppFileShare
 {
@@ -35,6 +36,9 @@ public:
 
     const QVector<QXmppHttpFileSource> &httpSources() const;
     void setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources);
+
+    const QVector<QXmppEncryptedFileSource> &encryptedSources() const;
+    void setEncryptedSourecs(const QVector<QXmppEncryptedFileSource> &newEncryptedSources);
 
     /// \cond
     bool parse(const QDomElement &el);

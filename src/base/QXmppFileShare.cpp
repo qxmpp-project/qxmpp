@@ -5,6 +5,7 @@
 #include "QXmppFileShare.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppEncryptedFileSource.h"
 #include "QXmppFileMetadata.h"
 #include "QXmppHttpFileSource.h"
 
@@ -44,6 +45,7 @@ class QXmppFileSharePrivate : public QSharedData
 public:
     QXmppFileMetadata metadata;
     QVector<QXmppHttpFileSource> httpSources;
+    QVector<QXmppEncryptedFileSource> encryptedSources;
     QXmppFileShare::Disposition disposition = Disposition::Inline;
 };
 /// \endcond
@@ -110,6 +112,18 @@ void QXmppFileShare::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpS
     d->httpSources = newHttpSources;
 }
 
+/// Returns the encrypted sources for this file.
+const QVector<QXmppEncryptedFileSource> &QXmppFileShare::encryptedSources() const
+{
+    return d->encryptedSources;
+}
+
+/// Sets the encrypted sources for this file.
+void QXmppFileShare::setEncryptedSourecs(const QVector<QXmppEncryptedFileSource> &newEncryptedSources)
+{
+    d->encryptedSources = newEncryptedSources;
+}
+
 /// \cond
 bool QXmppFileShare::parse(const QDomElement &el)
 {
@@ -128,12 +142,19 @@ bool QXmppFileShare::parse(const QDomElement &el)
         // sources:
         // expect that there's only one sources element with the correct namespace
         auto sources = el.firstChildElement("sources");
-        for (auto urlEl = sources.firstChildElement("url-data");
-             !urlEl.isNull();
-             urlEl = urlEl.nextSiblingElement("url-data")) {
-            QXmppHttpFileSource source;
-            if (source.parse(urlEl)) {
-                d->httpSources.push_back(std::move(source));
+        for (auto sourceEl = sources.firstChildElement();
+             !sourceEl.isNull();
+             sourceEl = sourceEl.nextSiblingElement()) {
+            if (sourceEl.tagName() == QStringLiteral("url-data")) {
+                QXmppHttpFileSource source;
+                if (source.parse(sourceEl)) {
+                    d->httpSources.push_back(std::move(source));
+                }
+            } else if (sourceEl.tagName() == QStringLiteral("encrypted")) {
+                QXmppEncryptedFileSource source;
+                if (source.parse(sourceEl)) {
+                    d->encryptedSources.push_back(std::move(source));
+                }
             }
         }
         return true;
@@ -149,6 +170,9 @@ void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
     d->metadata.toXml(writer);
     writer->writeStartElement("sources");
     for (const auto &source : d->httpSources) {
+        source.toXml(writer);
+    }
+    for (const auto &source : d->encryptedSources) {
         source.toXml(writer);
     }
     writer->writeEndElement();
