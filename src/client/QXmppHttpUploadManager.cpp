@@ -273,7 +273,7 @@ QXmppHttpUploadManager::~QXmppHttpUploadManager() = default;
 ///         });
 ///         \endcode
 ///
-std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(QIODevice *data, const QString &filename, const QMimeType &mimeType, qint64 fileSize, const QString &uploadServiceJid)
+std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_ptr<QIODevice> data, const QString &filename, const QMimeType &mimeType, qint64 fileSize, const QString &uploadServiceJid)
 {
     using SlotResult = QXmppUploadRequestManager::SlotResult;
 
@@ -304,7 +304,7 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(QIODevice *d
     }
 
     auto future = client()->findExtension<QXmppUploadRequestManager>()->requestSlot(filename, fileSize, mimeType, uploadServiceJid);
-    await(future, this, [this, upload, data](SlotResult result) {
+    await(future, this, [this, upload, data = std::move(data)](SlotResult result) mutable {
         // first check whether upload was cancelled in the meantime
         if (upload->d->cancelled) {
             upload->d->reportFinished();
@@ -331,7 +331,10 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(QIODevice *d
             for (auto itr = headers.cbegin(); itr != headers.cend(); ++itr) {
                 request.setRawHeader(itr.key().toUtf8(), itr.value().toUtf8());
             }
-            auto *reply = d->netManager->put(request, data);
+
+            auto *rawSourceDevice = data.release();
+            auto *reply = d->netManager->put(request, rawSourceDevice);
+            rawSourceDevice->setParent(reply);
             upload->d->reply = reply;
 
             connect(reply, &QNetworkReply::finished, this, [reply, upload]() {
@@ -400,12 +403,10 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(const QFileI
     }
 
     auto upload = uploadFile(
-        file.get(),
+        std::move(file),
         filename.isEmpty() ? fileInfo.fileName() : filename,
         QMimeDatabase().mimeTypeForFile(fileInfo),
         -1,
         uploadServiceJid);
-    // from now on lifetime is bound to the upload
-    file.release()->setParent(upload.get());
     return upload;
 }
