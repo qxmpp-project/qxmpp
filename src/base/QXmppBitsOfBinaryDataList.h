@@ -19,6 +19,9 @@ public:
     ~QXmppBitsOfBinaryDataList();
 
     /// \cond
+    QXmppBitsOfBinaryDataList(const QVector<QXmppBitsOfBinaryData> &data) : QVector<QXmppBitsOfBinaryData>(data) { }
+    QXmppBitsOfBinaryDataList(QVector<QXmppBitsOfBinaryData> &&data) : QVector<QXmppBitsOfBinaryData>(std::move(data)) { }
+
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
