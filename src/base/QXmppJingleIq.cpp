@@ -246,8 +246,8 @@ void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
 }
 
 ///
-/// Returns the description's 32-bit synchronization source for the media
-/// stream, as defined in RFC 3550.
+/// Returns the description's 32-bit synchronization source for the media stream as specified by
+/// \xep{0167, Jingle RTP Sessions} and RFC 3550.
 ///
 /// \since QXmpp 0.9
 ///
@@ -257,8 +257,8 @@ quint32 QXmppJingleIq::Content::descriptionSsrc() const
 }
 
 ///
-/// Sets the description's 32-bit synchronization source for the media stream,
-/// as defined in RFC 3550.
+/// Sets the description's 32-bit synchronization source for the media stream as specified by
+/// \xep{0167, Jingle RTP Sessions} and RFC 3550.
 ///
 /// \since QXmpp 0.9
 ///
