@@ -58,7 +58,7 @@ public:
     explicit QXmppHttpUploadManager(QNetworkAccessManager *netManager);
     ~QXmppHttpUploadManager();
 
-    std::shared_ptr<QXmppHttpUpload> uploadFile(QIODevice *data, const QString &filename, const QMimeType &mimeType, qint64 fileSize = -1, const QString &uploadServiceJid = {});
+    std::shared_ptr<QXmppHttpUpload> uploadFile(std::unique_ptr<QIODevice> data, const QString &filename, const QMimeType &mimeType, qint64 fileSize = -1, const QString &uploadServiceJid = {});
     std::shared_ptr<QXmppHttpUpload> uploadFile(const QFileInfo &fileInfo, const QString &filename = {}, const QString &uploadServiceJid = {});
 
 private:
