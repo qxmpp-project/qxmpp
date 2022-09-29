@@ -220,6 +220,11 @@ qint64 EncryptionDevice::writeData(const char *, qint64)
     return 0;
 }
 
+bool EncryptionDevice::atEnd() const
+{
+    return m_finalized && m_outputBuffer.empty();
+}
+
 DecryptionDevice::DecryptionDevice(std::unique_ptr<QIODevice> input,
                                    Cipher config,
                                    const QByteArray &key,
