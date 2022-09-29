@@ -239,15 +239,10 @@ public:
         TransportReplace
     };
 
-    ///
-    /// Party muting or unmuting itself
-    ///
-    /// \since QXmpp 1.5
-    ///
-    enum RtpSessionStateMutingCreator {
-        /// The initiator is un/muted.
+    enum Creator {
+        /// The initiator generated the content type.
         Initiator,
-        /// The responder is un/muted.
+        /// The responder generated the content type.
         Responder
     };
 
@@ -268,8 +263,8 @@ public:
         /// True when temporarily not sending media to the other party but continuing to accept
         /// media from it, false for ending mute state
         bool isMute = true;
-        /// Creator of the mute state
-        RtpSessionStateMutingCreator creator;
+        /// Creator of the corresponding session
+        Creator creator;
         /// Session to be muted (e.g., only audio or video)
         QString name;
     };

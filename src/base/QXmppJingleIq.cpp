@@ -189,6 +189,14 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 }
 
 ///
+/// \enum QXmppJingleIq::Creator
+///
+/// Party that originially generated the content type
+///
+/// \since QXmpp 1.5
+///
+
+///
 /// \enum QXmppJingleIq::RtpSessionStateActive
 ///
 /// Actively participating in the session after having been on mute or having put the other party on
@@ -1176,9 +1184,9 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
                 muting.isMute = isMute;
 
                 if (const auto creator = childElement.attribute(QStringLiteral("creator")); creator == QStringLiteral("initiator")) {
-                    muting.creator = RtpSessionStateMutingCreator::Initiator;
+                    muting.creator = QXmppJingleIq::Initiator;
                 } else if (creator == QStringLiteral("responder")) {
-                    muting.creator = RtpSessionStateMutingCreator::Responder;
+                    muting.creator = QXmppJingleIq::Responder;
                 }
 
                 muting.name = childElement.attribute(QStringLiteral("name"));
@@ -1233,9 +1241,9 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
                 writeStartElementWithNamespace(QStringLiteral("unmute"));
             }
 
-            if (rtpSessionStateMuting->creator == RtpSessionStateMutingCreator::Initiator) {
+            if (rtpSessionStateMuting->creator == Creator::Initiator) {
                 helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("initiator"));
-            } else if (rtpSessionStateMuting->creator == RtpSessionStateMutingCreator::Responder) {
+            } else if (rtpSessionStateMuting->creator == Creator::Responder) {
                 helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("responder"));
             }
 
