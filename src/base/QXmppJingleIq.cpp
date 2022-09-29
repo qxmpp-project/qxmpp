@@ -188,6 +188,56 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 {
 }
 
+///
+/// \enum QXmppJingleIq::RtpSessionStateActive
+///
+/// Actively participating in the session after having been on mute or having put the other party on
+/// hold
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \enum QXmppJingleIq::RtpSessionStateHold
+///
+/// Temporarily not listening for media from the other party
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \enum QXmppJingleIq::RtpSessionStateUnhold
+///
+/// Ending hold state
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \enum QXmppJingleIq::RtpSessionStateMuting
+///
+/// State for muting or unmuting
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \enum QXmppJingleIq::RtpSessionStateRinging
+///
+/// State after the callee acknowledged the call but did not yet interacted with it
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \typedef QXmppJingleIq::RtpSessionState
+///
+/// Contains the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \since QXmpp 1.5
+///
+
 /// Constructs an empty content.
 QXmppJingleIq::Content::Content()
     : d(new QXmppJingleIqContentPrivate())

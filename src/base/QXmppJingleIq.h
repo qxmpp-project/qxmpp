@@ -251,39 +251,18 @@ public:
         Responder
     };
 
-    ///
-    /// Actively participating in the session after having been on mute or having put the other
-    /// party on hold
-    ///
-    /// \since QXmpp 1.5
-    ///
     struct RtpSessionStateActive
     {
     };
 
-    ///
-    /// Temporarily not listening for media from the other party
-    ///
-    /// \since QXmpp 1.5
-    ///
     struct RtpSessionStateHold
     {
     };
 
-    ///
-    /// Ending hold state
-    ///
-    /// \since QXmpp 1.5
-    ///
     struct RtpSessionStateUnhold
     {
     };
 
-    ///
-    /// State for muting or unmuting
-    ///
-    /// \since QXmpp 1.5
-    ///
     struct RtpSessionStateMuting
     {
         /// True when temporarily not sending media to the other party but continuing to accept
@@ -295,21 +274,10 @@ public:
         QString name;
     };
 
-    ///
-    /// State after the callee acknowledged the call but did not yet interacted with it
-    ///
-    /// \since QXmpp 1.5
-    ///
     struct RtpSessionStateRinging
     {
     };
 
-    ///
-    /// Contains the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
-    /// Informational Messages.
-    ///
-    /// \since QXmpp 1.5
-    ///
     using RtpSessionState = std::variant<RtpSessionStateActive, RtpSessionStateHold, RtpSessionStateUnhold, RtpSessionStateMuting, RtpSessionStateRinging>;
 
     /// \internal
