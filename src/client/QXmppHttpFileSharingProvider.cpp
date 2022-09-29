@@ -195,9 +195,10 @@ auto QXmppHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
     -> std::shared_ptr<QXmppUpload>
 {
     Q_ASSERT(d->manager);
+
     auto upload = d->manager->uploadFile(
         std::move(data),
-        QXmppUtils::generateStanzaHash(10),
+        info.filename().value_or(QXmppUtils::generateStanzaHash(10)),
         info.mediaType().value_or(QMimeDatabase().mimeTypeForName("application/octet-stream")),
         info.size() ? info.size().value() : -1);
 
