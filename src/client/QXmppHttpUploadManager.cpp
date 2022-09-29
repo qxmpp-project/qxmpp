@@ -319,7 +319,7 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(QIODevice *d
 
             if (slot.getUrl().scheme() != "https" || slot.putUrl().scheme() != "https") {
                 auto message = QStringLiteral("The server replied with an insecure non-https url. This is forbidden by XEP-0363.");
-                upload->d->reportError(QXmppError { message, {} });
+                upload->d->reportError(QXmppError { std::move(message), {} });
                 upload->d->reportFinished();
                 return;
             }
