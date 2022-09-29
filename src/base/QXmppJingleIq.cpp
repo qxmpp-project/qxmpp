@@ -197,7 +197,7 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 ///
 
 ///
-/// \enum QXmppJingleIq::RtpSessionStateActive
+/// \struct QXmppJingleIq::RtpSessionStateActive
 ///
 /// Actively participating in the session after having been on mute or having put the other party on
 /// hold
@@ -206,7 +206,7 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 ///
 
 ///
-/// \enum QXmppJingleIq::RtpSessionStateHold
+/// \struct QXmppJingleIq::RtpSessionStateHold
 ///
 /// Temporarily not listening for media from the other party
 ///
@@ -214,7 +214,7 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 ///
 
 ///
-/// \enum QXmppJingleIq::RtpSessionStateUnhold
+/// \struct QXmppJingleIq::RtpSessionStateUnhold
 ///
 /// Ending hold state
 ///
@@ -222,7 +222,7 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 ///
 
 ///
-/// \enum QXmppJingleIq::RtpSessionStateMuting
+/// \struct QXmppJingleIq::RtpSessionStateMuting
 ///
 /// State for muting or unmuting
 ///
@@ -230,7 +230,7 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 ///
 
 ///
-/// \enum QXmppJingleIq::RtpSessionStateRinging
+/// \struct QXmppJingleIq::RtpSessionStateRinging
 ///
 /// State after the callee acknowledged the call but did not yet interacted with it
 ///
