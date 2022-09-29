@@ -14,6 +14,80 @@ class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
+class QXmppJingleRtpFeedbackPropertyPrivate;
+class QXmppSdpParameterPrivate;
+
+class QXMPP_EXPORT QXmppSdpParameter
+{
+public:
+    QXmppSdpParameter();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppSdpParameter)
+
+    QString name() const;
+    void setName(const QString &name);
+
+    QString value() const;
+    void setValue(const QString &value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isSdpParameter(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppSdpParameterPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpFeedbackProperty
+{
+public:
+    QXmppJingleRtpFeedbackProperty();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackProperty)
+
+    QString type() const;
+    void setType(const QString &type);
+
+    QString subtype() const;
+    void setSubtype(const QString &subtype);
+
+    QVector<QXmppSdpParameter> parameters() const;
+    void setParameters(const QVector<QXmppSdpParameter> &parameters);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpFeedbackProperty(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpFeedbackPropertyPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpFeedbackInterval
+{
+public:
+    QXmppJingleRtpFeedbackInterval();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpFeedbackInterval)
+
+    uint64_t value() const;
+    void setValue(uint64_t value);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpFeedbackInterval(const QDomElement &element);
+
+private:
+    uint64_t m_value;
+};
 
 ///
 /// \brief The QXmppJinglePayloadType class represents a payload type
@@ -46,6 +120,12 @@ public:
 
     unsigned int ptime() const;
     void setPtime(unsigned int ptime);
+
+    QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties() const;
+    void setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties);
+
+    QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
+    void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
 
     /// \cond
     void parse(const QDomElement &element);
@@ -205,6 +285,12 @@ public:
 
         QString transportPassword() const;
         void setTransportPassword(const QString &password);
+
+        QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties() const;
+        void setRtpFeedbackProperties(const QVector<QXmppJingleRtpFeedbackProperty> &rtpFeedbackProperties);
+
+        QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals() const;
+        void setRtpFeedbackIntervals(const QVector<QXmppJingleRtpFeedbackInterval> &rtpFeedbackIntervals);
 
         // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
         QByteArray transportFingerprint() const;
