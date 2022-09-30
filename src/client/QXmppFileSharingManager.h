@@ -52,9 +52,10 @@ public:
     ///
     /// \brief Register a provider for automatic downloads
     /// \param manager A shared_ptr to a QXmppFileSharingProvider subclass
+    /// The provider must define SourceType to the type of the accepted file source.
     ///
     template<typename ProviderType>
-    void registerProivder(std::shared_ptr<ProviderType> manager)
+    void registerProvider(std::shared_ptr<ProviderType> manager)
     {
         std::type_index index(typeid(typename ProviderType::SourceType));
         internalRegisterProvider(index, manager);
