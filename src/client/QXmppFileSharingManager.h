@@ -10,7 +10,6 @@
 #include "QXmppFileSharingProvider.h"
 #include "QXmppGlobal.h"
 
-#include <any>
 #include <functional>
 #include <memory>
 #include <typeindex>
@@ -18,11 +17,11 @@
 
 #include <QFuture>
 #include <QMimeType>
-#include <QObject>
 #include <QSize>
 
 class QIODevice;
 class QXmppFileMetadata;
+class QXmppFileSharingManagerPrivate;
 
 class QXMPP_EXPORT QXmppFileSharingManager : public QXmppClientExtension
 {
@@ -46,6 +45,7 @@ public:
     using MetadataGenerator = std::function<QFuture<std::shared_ptr<MetadataGeneratorResult>>(std::unique_ptr<QIODevice>)>;
 
     QXmppFileSharingManager();
+    ~QXmppFileSharingManager();
 
     void setMetadataGenerator(MetadataGenerator &&generator);
 
@@ -71,8 +71,7 @@ public:
 private:
     void internalRegisterProvider(std::type_index, std::shared_ptr<QXmppFileSharingProvider> provider);
 
-    MetadataGenerator m_metadataGenerator;
-    std::unordered_map<std::type_index, std::shared_ptr<QXmppFileSharingProvider>> m_providers;
+    std::unique_ptr<QXmppFileSharingManagerPrivate> d;
 };
 
 #endif  // QXMPPFILESHARINGMANAGER_H

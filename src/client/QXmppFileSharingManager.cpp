@@ -17,6 +17,7 @@
 #include "QXmppUploadRequestManager.h"
 
 #include <any>
+#include <unordered_map>
 
 #include <QFile>
 #include <QFileInfo>
@@ -27,6 +28,18 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
+
+using MetadataGenerator = QXmppFileSharingManager::MetadataGenerator;
+using MetadataGeneratorResult = QXmppFileSharingManager::MetadataGeneratorResult;
+
+class QXmppFileSharingManagerPrivate
+{
+public:
+    MetadataGenerator metadataGenerator = [](std::unique_ptr<QIODevice>) -> QFuture<std::shared_ptr<MetadataGeneratorResult>> {
+        return makeReadyFuture(std::make_shared<MetadataGeneratorResult>());
+    };
+    std::unordered_map<std::type_index, std::shared_ptr<QXmppFileSharingProvider>> providers;
+};
 
 ///
 /// \class QXmppFileSharingProvider
@@ -49,11 +62,11 @@ using namespace QXmpp::Private;
 ///
 
 QXmppFileSharingManager::QXmppFileSharingManager()
-    : m_metadataGenerator([](std::unique_ptr<QIODevice> &&) -> QFuture<std::shared_ptr<MetadataGeneratorResult>> {
-          return makeReadyFuture(std::make_shared<MetadataGeneratorResult>());
-      })
+    : d(std::make_unique<QXmppFileSharingManagerPrivate>())
 {
 }
+
+QXmppFileSharingManager::~QXmppFileSharingManager() = default;
 
 ///
 /// \typedef QXmppFileSharingManager::MetadataGenerator
@@ -71,7 +84,7 @@ QXmppFileSharingManager::QXmppFileSharingManager()
 ///
 void QXmppFileSharingManager::setMetadataGenerator(MetadataGenerator &&generator)
 {
-    m_metadataGenerator = std::move(generator);
+    d->metadataGenerator = std::move(generator);
 }
 
 ///
@@ -102,7 +115,7 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
         return device;
     };
 
-    auto metadataFuture = m_metadataGenerator(openFile());
+    auto metadataFuture = d->metadataGenerator(openFile());
     auto hashesFuture = calculateHashes(openFile(), { HashAlgorithm::Sha256 });
 
     upload = provider->uploadFile(openFile(), metadata);
@@ -193,7 +206,7 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
     fileShare.visitSources([&](const std::any &source) {
         std::type_index index(source.type());
         try {
-            auto provider = m_providers.at(index);
+            auto provider = d->providers.at(index);
             download = provider->downloadFile(source, std::move(output));
             return true;
         } catch (const std::out_of_range &) {
@@ -206,5 +219,5 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
 
 void QXmppFileSharingManager::internalRegisterProvider(std::type_index index, std::shared_ptr<QXmppFileSharingProvider> provider)
 {
-    m_providers.insert_or_assign(index, provider);
+    d->providers.insert_or_assign(index, provider);
 }
