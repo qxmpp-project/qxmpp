@@ -349,7 +349,7 @@ endif()
 
 if(WITH_QCA)
     target_sources(qxmpp PRIVATE client/QXmppEncryptedHttpFileSharingProvider.cpp client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
-    set(HEADER_FILES ${HEADER_FILES} client/QXmppEncryptedHttpFileSharingProvider.h)
+    set(INSTALL_HEADER_FILES ${INSTALL_HEADER_FILES} client/QXmppEncryptedHttpFileSharingProvider.h)
     target_link_libraries(qxmpp PRIVATE qca-qt${QT_VERSION_MAJOR})
     target_compile_definitions(qxmpp PRIVATE -DWITH_QCA)
 endif()
