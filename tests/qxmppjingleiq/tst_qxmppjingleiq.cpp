@@ -142,6 +142,9 @@ void tst_QXmppJingleIq::testRtpFeedbackProperty()
     property2.setType(QStringLiteral("nack"));
     property2.setSubtype(QStringLiteral("sli"));
 
+    QCOMPARE(property1.type(), QStringLiteral("nack"));
+    QCOMPARE(property1.subtype(), QStringLiteral("sli"));
+
     serializePacket(property2, xml);
 }
 
@@ -175,7 +178,6 @@ void tst_QXmppJingleIq::testRtpFeedbackPropertyWithParameters()
 
     property2.setParameters({ parameter1, parameter2 });
 
-    QCOMPARE(property2.type(), QStringLiteral("test-type"));
     QCOMPARE(property2.parameters().size(), 2);
     QCOMPARE(property2.parameters().at(0).name(), QStringLiteral("test-name-1"));
     QCOMPARE(property2.parameters().at(1).name(), QStringLiteral("test-name-2"));
@@ -220,6 +222,8 @@ void tst_QXmppJingleIq::testRtpFeedbackInterval()
 
     QXmppJingleRtpFeedbackInterval interval2;
     interval2.setValue(100);
+
+    QCOMPARE(interval1.value(), uint64_t(100));
 
     serializePacket(interval2, xml);
 }
