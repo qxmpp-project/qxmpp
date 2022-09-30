@@ -299,7 +299,11 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
     }
 
     auto future = client()->findExtension<QXmppUploadRequestManager>()->requestSlot(filename, fileSize, mimeType, uploadServiceJid);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     await(future, this, [this, upload, data = std::move(data)](SlotResult result) mutable {
+#else
+    await(future, this, [this, upload, rawSourceDevice = data.release()](SlotResult result) mutable {
+#endif
         // first check whether upload was cancelled in the meantime
         if (upload->d->cancelled) {
             upload->d->reportFinished();
@@ -327,7 +331,11 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
                 request.setRawHeader(itr.key().toUtf8(), itr.value().toUtf8());
             }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             auto *rawSourceDevice = data.release();
+#else
+            // already defined in lambda capture
+#endif
             auto *reply = d->netManager->put(request, rawSourceDevice);
             rawSourceDevice->setParent(reply);
             upload->d->reply = reply;

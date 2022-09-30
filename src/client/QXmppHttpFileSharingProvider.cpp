@@ -164,9 +164,16 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source, std::uni
         reply->deleteLater();
     });
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     QObject::connect(reply, &QNetworkReply::readyRead, [file = std::move(target), reply]() {
         file->write(reply->readAll());
     });
+#else
+    auto file = std::shared_ptr<QIODevice>(std::move(target));
+    QObject::connect(reply, &QNetworkReply::readyRead, [file, reply]() {
+        file->write(reply->readAll());
+    });
+#endif
 
     QObject::connect(reply, &QNetworkReply::downloadProgress, [=](qint64 bytesReceived, qint64 bytesTotal) {
         download->reportProgress(bytesReceived, bytesTotal);
