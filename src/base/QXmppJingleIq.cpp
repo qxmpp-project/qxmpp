@@ -54,6 +54,12 @@ static const char *jingle_reasons[] = {
     "unsupported-transports",
 };
 
+static const QStringList JINGLE_RTP_ERROR_CONDITIONS = {
+    {},
+    "invalid-crypto",
+    "crypto-required"
+};
+
 static const QStringList JINGLE_RTP_HEADER_EXTENSIONS_SENDERS = {
     QStringLiteral("both"),
     QStringLiteral("initiator"),
@@ -947,6 +953,14 @@ QString QXmppJingleIq::Content::toSdp() const
 
 /// \endcond
 
+///
+/// \enum QXmppJingleIq::Reason::RtpErrorCondition
+///
+/// Condition of an RTP-specific error
+///
+/// \since QXmpp 1.5
+///
+
 QXmppJingleIq::Reason::Reason()
     : m_type(None)
 {
@@ -980,6 +994,30 @@ void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
     m_type = type;
 }
 
+///
+/// Returns the RTP error condition as specified by \xep{0167, Jingle RTP Sessions}.
+///
+/// \return the RTP error condition
+///
+/// \since QXmpp 1.5
+///
+QXmppJingleIq::Reason::RtpErrorCondition QXmppJingleIq::Reason::rtpErrorCondition() const
+{
+    return m_rtpErrorCondition;
+}
+
+///
+/// Sets the RTP error condition as specified by \xep{0167, Jingle RTP Sessions}.
+///
+/// \param rtpErrorCondition RTP error condition
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Reason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition)
+{
+    m_rtpErrorCondition = rtpErrorCondition;
+}
+
 /// \cond
 void QXmppJingleIq::Reason::parse(const QDomElement &element)
 {
@@ -987,6 +1025,13 @@ void QXmppJingleIq::Reason::parse(const QDomElement &element)
     for (int i = AlternativeSession; i <= UnsupportedTransports; i++) {
         if (!element.firstChildElement(jingle_reasons[i]).isNull()) {
             m_type = static_cast<Type>(i);
+            break;
+        }
+    }
+
+    for (int i = NoErrorCondition + 1; i < JINGLE_RTP_ERROR_CONDITIONS.size(); i++) {
+        if (!element.firstChildElement(JINGLE_RTP_ERROR_CONDITIONS.at(i)).isNull()) {
+            m_rtpErrorCondition = RtpErrorCondition(i);
             break;
         }
     }
@@ -1003,6 +1048,13 @@ void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
         helperToXmlAddTextElement(writer, QStringLiteral("text"), m_text);
     }
     writer->writeEmptyElement(jingle_reasons[m_type]);
+
+    if (m_rtpErrorCondition != NoErrorCondition) {
+        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(m_rtpErrorCondition));
+        writer->writeDefaultNamespace(ns_jingle_rtp_errors);
+        writer->writeEndElement();
+    }
+
     writer->writeEndElement();
 }
 /// \endcond

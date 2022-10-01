@@ -109,6 +109,7 @@ const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
 const char *ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
+const char *ns_jingle_rtp_errors = "urn:xmpp:jingle:apps:rtp:errors:1";
 // XEP-0184: Message Receipts
 const char *ns_message_receipts = "urn:xmpp:receipts";
 // XEP-0198: Stream Management
