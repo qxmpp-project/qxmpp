@@ -285,7 +285,7 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>partial</xmpp:status>
         <xmpp:version>1.2</xmpp:version>
         <xmpp:since>0.2</xmpp:since>
-        <xmpp:note>'rtcp-mux' of https://xmpp.org/extensions/xep-0167.html#format, informational messages for session states 'active', 'hold', 'unhold', 'mute', 'unmute' since 1.5; Missing 'encryption' of https://xmpp.org/extensions/xep-0167.html#srtp</xmpp:note>
+        <xmpp:note>Multiplexing, encryption via SRTP, informational messages for session states 'active', 'hold', 'unhold', 'mute', 'unmute' since 1.5</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
