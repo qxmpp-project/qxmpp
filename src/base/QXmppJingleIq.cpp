@@ -15,9 +15,6 @@
 
 static const int RTP_COMPONENT = 1;
 
-static const char *ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
-static const char *ns_jingle_dtls = "urn:xmpp:jingle:apps:dtls:0";
-
 static const char *jingle_actions[] = {
     "content-accept",
     "content-add",
@@ -740,7 +737,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
             candidate.toXml(writer);
         }
 
-        // XEP-0320
+        // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
         if (!d->transportFingerprint.isEmpty() && !d->transportFingerprintHash.isEmpty()) {
             writer->writeStartElement(QStringLiteral("fingerprint"));
             writer->writeDefaultNamespace(ns_jingle_dtls);

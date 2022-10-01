@@ -104,9 +104,11 @@ const char *ns_captcha = "urn:xmpp:captcha";
 const char *ns_jingle = "urn:xmpp:jingle:1";
 const char *ns_jingle_raw_udp = "urn:xmpp:jingle:transports:raw-udp:1";
 const char *ns_jingle_ice_udp = "urn:xmpp:jingle:transports:ice-udp:1";
+// XEP-0167: Jingle RTP Sessions
 const char *ns_jingle_rtp = "urn:xmpp:jingle:apps:rtp:1";
 const char *ns_jingle_rtp_audio = "urn:xmpp:jingle:apps:rtp:audio";
 const char *ns_jingle_rtp_video = "urn:xmpp:jingle:apps:rtp:video";
+const char *ns_jingle_rtp_info = "urn:xmpp:jingle:apps:rtp:info:1";
 // XEP-0184: Message Receipts
 const char *ns_message_receipts = "urn:xmpp:receipts";
 // XEP-0198: Stream Management
@@ -147,6 +149,8 @@ const char *ns_message_correct = "urn:xmpp:message-correct:0";
 const char *ns_mam = "urn:xmpp:mam:2";
 // XEP-0319: Last User Interaction in Presence
 const char *ns_idle = "urn:xmpp:idle:1";
+// XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+const char *ns_jingle_dtls = "urn:xmpp:jingle:apps:dtls:0";
 // XEP-0333: Chat Markers
 const char *ns_chat_markers = "urn:xmpp:chat-markers:0";
 // XEP-0334: Message Processing Hints

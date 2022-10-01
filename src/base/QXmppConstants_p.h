@@ -116,9 +116,11 @@ extern const char *ns_captcha;
 extern const char *ns_jingle;
 extern const char *ns_jingle_ice_udp;
 extern const char *ns_jingle_raw_udp;
+// XEP-0167: Jingle RTP Sessions
 extern const char *ns_jingle_rtp;
 extern const char *ns_jingle_rtp_audio;
 extern const char *ns_jingle_rtp_video;
+extern const char *ns_jingle_rtp_info;
 // XEP-0184: Message Receipts
 extern const char *ns_message_receipts;
 // XEP-0198: Stream Management
@@ -159,6 +161,8 @@ extern const char *ns_message_correct;
 extern const char *ns_mam;
 // XEP-0319: Last User Interaction in Presence
 extern const char *ns_idle;
+// XEP-0320: Use of DTLS-SRTP in Jingle Sessions
+extern const char *ns_jingle_dtls;
 // XEP-0333: Char Markers
 extern const char *ns_chat_markers;
 // XEP-0334: Message Processing Hints:
