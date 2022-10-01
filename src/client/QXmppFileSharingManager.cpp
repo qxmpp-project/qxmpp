@@ -32,6 +32,19 @@ using namespace QXmpp::Private;
 using MetadataGenerator = QXmppFileSharingManager::MetadataGenerator;
 using MetadataGeneratorResult = QXmppFileSharingManager::MetadataGeneratorResult;
 
+// The manager generates a hash with each hash algorithm
+static std::vector<HashAlgorithm> hashAlgorithms()
+{
+    return {
+        HashAlgorithm::Sha256,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        HashAlgorithm::Blake2b_256,
+#else
+        HashAlgorithm::Sha3_256,
+#endif
+    };
+}
+
 class QXmppFileSharingManagerPrivate
 {
 public:
@@ -116,7 +129,7 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
     };
 
     auto metadataFuture = d->metadataGenerator(openFile());
-    auto hashesFuture = calculateHashes(openFile(), { HashAlgorithm::Sha256 });
+    auto hashesFuture = calculateHashes(openFile(), hashAlgorithms());
 
     upload = provider->uploadFile(openFile(), metadata);
     upload->metadata = metadata;
