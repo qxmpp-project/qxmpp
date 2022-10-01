@@ -35,12 +35,13 @@ using MetadataGeneratorResult = QXmppFileSharingManager::MetadataGeneratorResult
 // The manager generates a hash with each hash algorithm
 static std::vector<HashAlgorithm> hashAlgorithms()
 {
-    return {
+    return
+    {
         HashAlgorithm::Sha256,
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        HashAlgorithm::Blake2b_256,
+            HashAlgorithm::Blake2b_256,
 #else
-        HashAlgorithm::Sha3_256,
+            HashAlgorithm::Sha3_256,
 #endif
     };
 }
