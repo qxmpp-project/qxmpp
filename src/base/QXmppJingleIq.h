@@ -8,6 +8,8 @@
 
 #include "QXmppIq.h"
 
+#include <variant>
+
 #include <QHostAddress>
 
 class QXmppJingleCandidatePrivate;
@@ -237,6 +239,42 @@ public:
         TransportReplace
     };
 
+    enum Creator {
+        /// The initiator generated the content type.
+        Initiator,
+        /// The responder generated the content type.
+        Responder
+    };
+
+    struct RtpSessionStateActive
+    {
+    };
+
+    struct RtpSessionStateHold
+    {
+    };
+
+    struct RtpSessionStateUnhold
+    {
+    };
+
+    struct RtpSessionStateMuting
+    {
+        /// True when temporarily not sending media to the other party but continuing to accept
+        /// media from it, false for ending mute state
+        bool isMute = true;
+        /// Creator of the corresponding session
+        Creator creator;
+        /// Session to be muted (e.g., only audio or video)
+        QString name;
+    };
+
+    struct RtpSessionStateRinging
+    {
+    };
+
+    using RtpSessionState = std::variant<RtpSessionStateActive, RtpSessionStateHold, RtpSessionStateUnhold, RtpSessionStateMuting, RtpSessionStateRinging>;
+
     /// \internal
     ///
     /// The QXmppJingleIq::Content class represents the "content" element of a
@@ -386,15 +424,21 @@ public:
     QString responder() const;
     void setResponder(const QString &responder);
 
-    // XEP-0167: Jingle RTP Sessions
+#if QXMPP_DEPRECATED_SINCE(1, 5)
+    QT_DEPRECATED_X("Use QXmpp::rtpSessionState() instead")
     bool ringing() const;
+    QT_DEPRECATED_X("Use QXmpp::setRtpSessionState() instead")
     void setRinging(bool ringing);
+#endif
 
     QString sid() const;
     void setSid(const QString &sid);
 
     QString mujiGroupChatJid() const;
     void setMujiGroupChatJid(const QString &mujiGroupChatJid);
+
+    std::optional<RtpSessionState> rtpSessionState() const;
+    void setRtpSessionState(const std::optional<RtpSessionState> &rtpSessionState);
 
     /// \cond
     static bool isJingleIq(const QDomElement &element);

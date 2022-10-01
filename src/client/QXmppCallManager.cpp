@@ -281,9 +281,8 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         QXmppJingleIq ringing;
         ringing.setTo(call->jid());
         ringing.setType(QXmppIq::Set);
-        ringing.setAction(QXmppJingleIq::SessionInfo);
         ringing.setSid(call->sid());
-        ringing.setRinging(true);
+        ringing.setRtpSessionState(QXmppJingleIq::RtpSessionStateRinging());
         call->d->sendRequest(ringing);
 
         // notify user

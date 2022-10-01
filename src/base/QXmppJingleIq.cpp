@@ -188,6 +188,64 @@ QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
 {
 }
 
+///
+/// \enum QXmppJingleIq::Creator
+///
+/// Party that originially generated the content type
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \struct QXmppJingleIq::RtpSessionStateActive
+///
+/// Actively participating in the session after having been on mute or having put the other party on
+/// hold
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \struct QXmppJingleIq::RtpSessionStateHold
+///
+/// Temporarily not listening for media from the other party
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \struct QXmppJingleIq::RtpSessionStateUnhold
+///
+/// Ending hold state
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \struct QXmppJingleIq::RtpSessionStateMuting
+///
+/// State for muting or unmuting
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \struct QXmppJingleIq::RtpSessionStateRinging
+///
+/// State after the callee acknowledged the call but did not yet interacted with it
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \typedef QXmppJingleIq::RtpSessionState
+///
+/// Contains the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \since QXmpp 1.5
+///
+
 /// Constructs an empty content.
 QXmppJingleIq::Content::Content()
     : d(new QXmppJingleIqContentPrivate())
@@ -849,11 +907,12 @@ public:
 
     QList<QXmppJingleIq::Content> contents;
     QXmppJingleIq::Reason reason;
-    bool ringing;
+
+    std::optional<QXmppJingleIq::RtpSessionState> rtpSessionState;
 };
 
 QXmppJingleIqPrivate::QXmppJingleIqPrivate()
-    : action(QXmppJingleIq::ContentAccept), ringing(false)
+    : action(QXmppJingleIq::ContentAccept)
 {
 }
 
@@ -968,24 +1027,39 @@ void QXmppJingleIq::setResponder(const QString &responder)
     d->responder = responder;
 }
 
+///
 /// Returns true if the call is ringing.
-
+///
+/// \deprecated This method is deprecated since QXmpp 1.5. Use \c QXmppJingleIq::rtpSessionState()
+/// instead.
+///
 bool QXmppJingleIq::ringing() const
 {
-    return d->ringing;
+    if (d->rtpSessionState) {
+        return std::holds_alternative<RtpSessionStateRinging>(*d->rtpSessionState);
+    }
+
+    return false;
 }
 
+///
 /// Set to true if the call is ringing.
 ///
 /// \param ringing
-
+///
+/// \deprecated This method is deprecated since QXmpp 1.5. Use
+/// \c QXmppJingleIq::setRtpSessionState() instead.
+///
 void QXmppJingleIq::setRinging(bool ringing)
 {
-    d->ringing = ringing;
+    if (ringing) {
+        d->rtpSessionState = RtpSessionStateRinging();
+    } else {
+        d->rtpSessionState = std::nullopt;
+    }
 }
 
 /// Returns the session ID.
-
 QString QXmppJingleIq::sid() const
 {
     return d->sid;
@@ -1024,6 +1098,36 @@ void QXmppJingleIq::setMujiGroupChatJid(const QString &mujiGroupChatJid)
     d->mujiGroupChatJid = mujiGroupChatJid;
 }
 
+///
+/// Returns the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions}
+/// Informational Messages.
+///
+/// \return the session's state
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppJingleIq::RtpSessionState> QXmppJingleIq::rtpSessionState() const
+{
+    return d->rtpSessionState;
+}
+
+///
+/// Sets the state of an RTP session as specified by \xep{0167, Jingle RTP Sessions} Informational
+/// Messages.
+///
+/// The appropriate action is set as well.
+/// Thus, it is not needed to set it manually.
+///
+/// \param rtpSessionState session's state
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::setRtpSessionState(const std::optional<RtpSessionState> &rtpSessionState)
+{
+    d->rtpSessionState = rtpSessionState;
+    d->action = Action::SessionInfo;
+}
+
 /// \cond
 bool QXmppJingleIq::isJingleIq(const QDomElement &element)
 {
@@ -1055,7 +1159,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
     d->contents.clear();
     QDomElement contentElement = jingleElement.firstChildElement(QStringLiteral("content"));
     while (!contentElement.isNull()) {
-        QXmppJingleIq::Content content;
+        Content content;
         content.parse(contentElement);
         addContent(content);
         contentElement = contentElement.nextSiblingElement(QStringLiteral("content"));
@@ -1063,9 +1167,36 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
     QDomElement reasonElement = jingleElement.firstChildElement(QStringLiteral("reason"));
     d->reason.parse(reasonElement);
 
-    // ringing
-    QDomElement ringingElement = jingleElement.firstChildElement(QStringLiteral("ringing"));
-    d->ringing = (ringingElement.namespaceURI() == ns_jingle_rtp_info);
+    for (auto childElement = jingleElement.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (childElement.namespaceURI() == ns_jingle_rtp_info) {
+            const auto elementTag = childElement.tagName();
+
+            if (elementTag == QStringLiteral("active")) {
+                d->rtpSessionState = RtpSessionStateActive();
+            } else if (elementTag == QStringLiteral("hold")) {
+                d->rtpSessionState = RtpSessionStateHold();
+            } else if (elementTag == QStringLiteral("unhold")) {
+                d->rtpSessionState = RtpSessionStateUnhold();
+            } else if (const auto isMute = elementTag == QStringLiteral("mute"); isMute || elementTag == QStringLiteral("unmute")) {
+                RtpSessionStateMuting muting;
+                muting.isMute = isMute;
+
+                if (const auto creator = childElement.attribute(QStringLiteral("creator")); creator == QStringLiteral("initiator")) {
+                    muting.creator = Initiator;
+                } else if (creator == QStringLiteral("responder")) {
+                    muting.creator = Responder;
+                }
+
+                muting.name = childElement.attribute(QStringLiteral("name"));
+
+                d->rtpSessionState = muting;
+            } else if (elementTag == QStringLiteral("ringing")) {
+                d->rtpSessionState = RtpSessionStateRinging();
+            }
+        }
+    }
 }
 
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -1091,10 +1222,36 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     d->reason.toXml(writer);
 
-    // ringing
-    if (d->ringing) {
-        writer->writeStartElement(QStringLiteral("ringing"));
+    const auto writeStartElementWithNamespace = [=](const QString &tagName) {
+        writer->writeStartElement(tagName);
         writer->writeDefaultNamespace(ns_jingle_rtp_info);
+    };
+
+    if (d->rtpSessionState) {
+        if (std::holds_alternative<RtpSessionStateActive>(*d->rtpSessionState)) {
+            writeStartElementWithNamespace(QStringLiteral("active"));
+        } else if (std::holds_alternative<RtpSessionStateHold>(*d->rtpSessionState)) {
+            writeStartElementWithNamespace(QStringLiteral("hold"));
+        } else if (std::holds_alternative<RtpSessionStateUnhold>(*d->rtpSessionState)) {
+            writeStartElementWithNamespace(QStringLiteral("unhold"));
+        } else if (auto rtpSessionStateMuting = std::get_if<RtpSessionStateMuting>(&(*d->rtpSessionState))) {
+            if (rtpSessionStateMuting->isMute) {
+                writeStartElementWithNamespace(QStringLiteral("mute"));
+            } else {
+                writeStartElementWithNamespace(QStringLiteral("unmute"));
+            }
+
+            if (rtpSessionStateMuting->creator == Initiator) {
+                helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("initiator"));
+            } else if (rtpSessionStateMuting->creator == Responder) {
+                helperToXmlAddAttribute(writer, QStringLiteral("creator"), QStringLiteral("responder"));
+            }
+
+            helperToXmlAddAttribute(writer, QStringLiteral("name"), rtpSessionStateMuting->name);
+        } else {
+            writeStartElementWithNamespace(QStringLiteral("ringing"));
+        }
+
         writer->writeEndElement();
     }
 
