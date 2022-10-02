@@ -1029,9 +1029,13 @@ void QXmppJingleIq::Reason::parse(const QDomElement &element)
         }
     }
 
-    for (int i = NoErrorCondition + 1; i < JINGLE_RTP_ERROR_CONDITIONS.size(); i++) {
-        if (!element.firstChildElement(JINGLE_RTP_ERROR_CONDITIONS.at(i)).isNull()) {
-            m_rtpErrorCondition = RtpErrorCondition(i);
+    for (auto child = element.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
+        if (child.namespaceURI() == ns_jingle_rtp_errors) {
+            if (const auto rtpErrorConditionIndex = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName()); rtpErrorConditionIndex != -1) {
+                m_rtpErrorCondition = RtpErrorCondition(rtpErrorConditionIndex);
+            }
             break;
         }
     }
