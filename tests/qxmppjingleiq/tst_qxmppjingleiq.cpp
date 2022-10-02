@@ -1174,6 +1174,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition()
         break;
     case QXmppJingleIq::Reason::CryptoRequired:
         iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::CryptoRequired);
+        break;
     }
 
     iq2.reason().setType(QXmppJingleIq::Reason::SecurityError);
