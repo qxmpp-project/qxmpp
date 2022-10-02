@@ -40,7 +40,10 @@
 QXmppError QXmppError::fromIoDevice(const QIODevice &device)
 {
     if (const auto *file = dynamic_cast<const QFileDevice *>(&device)) {
-        return QXmppError { file->errorString(), file->error() };
+        return QXmppError::fromFileDevice(*file);
+    }
+    if (const auto *networkReply = dynamic_cast<const QNetworkReply *>(&device)) {
+        return QXmppError::fromNetworkReply(*networkReply);
     }
     return QXmppError { device.errorString(), std::any() };
 }
@@ -53,6 +56,16 @@ QXmppError QXmppError::fromIoDevice(const QIODevice &device)
 QXmppError QXmppError::fromNetworkReply(const QNetworkReply &reply)
 {
     return { reply.errorString(), reply.error() };
+}
+
+///
+/// \brief Constructs a QXmppError from a QFileDevice
+///
+/// It creates a QXmppError with the error string and a QFileDevice::FileError.
+///
+QXmppError QXmppError::fromFileDevice(const QFileDevice &file)
+{
+    return QXmppError { file.errorString(), file.error() };
 }
 
 ///
