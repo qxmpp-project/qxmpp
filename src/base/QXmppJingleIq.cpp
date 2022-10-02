@@ -56,8 +56,8 @@ static const char *jingle_reasons[] = {
 
 static const QStringList JINGLE_RTP_ERROR_CONDITIONS = {
     {},
-    "invalid-crypto",
-    "crypto-required"
+    QStringLiteral("invalid-crypto"),
+    QStringLiteral("crypto-required")
 };
 
 static const QStringList JINGLE_RTP_HEADER_EXTENSIONS_SENDERS = {
