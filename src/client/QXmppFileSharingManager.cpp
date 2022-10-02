@@ -402,9 +402,9 @@ void QXmppFileSharingManager::setMetadataGenerator(MetadataGenerator &&generator
 /// \return An object that allows to track the progress of the upload.
 ///         Once the upload is finished, the finished signal is emitted on it.
 ///
-std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<QXmppFileSharingProvider> provider,
-                                                                   const QString &filePath,
-                                                                   const std::optional<QString> &description)
+std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::uploadFile(std::shared_ptr<QXmppFileSharingProvider> provider,
+                                                                     const QString &filePath,
+                                                                     const std::optional<QString> &description)
 {
     QFileInfo fileInfo(filePath);
     auto metadata = QXmppFileMetadata::fromFileInfo(fileInfo);
