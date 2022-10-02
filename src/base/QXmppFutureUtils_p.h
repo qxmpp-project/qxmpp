@@ -36,6 +36,21 @@ struct overloaded : Ts...
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
+// Variation of std::visit allowing to forward unhandled types
+template<typename ReturnType, typename T, typename Visitor>
+auto visitForward(T variant, Visitor visitor)
+{
+    return std::visit([&](auto &&value) -> ReturnType {
+        using ValueType = std::decay_t<decltype(value)>;
+        if constexpr (std::is_invocable_v<Visitor, ValueType>) {
+            return visitor(std::move(value));
+        } else {
+            return value;
+        }
+    },
+                      std::forward<T>(variant));
+}
+
 template<typename F, typename Ret, typename A, typename... Rest>
 A lambda_helper(Ret (F::*)(A, Rest...));
 
