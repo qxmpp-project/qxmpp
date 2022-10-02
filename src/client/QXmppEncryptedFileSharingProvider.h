@@ -10,17 +10,17 @@
 #include "QXmppHttpFileSharingProvider.h"
 
 class QXmppFileSharingManager;
-class QXmppEncryptedHttpFileSharingProviderPrivate;
+class QXmppEncryptedFileSharingProviderPrivate;
 
-class QXMPP_EXPORT QXmppEncryptedHttpFileSharingProvider : public QXmppFileSharingProvider
+class QXMPP_EXPORT QXmppEncryptedFileSharingProvider : public QXmppFileSharingProvider
 {
 public:
     /// \cond
     using SourceType = QXmppEncryptedFileSource;
     /// \endcond
 
-    QXmppEncryptedHttpFileSharingProvider(QXmppFileSharingManager *manager, std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider);
-    ~QXmppEncryptedHttpFileSharingProvider() override;
+    QXmppEncryptedFileSharingProvider(QXmppFileSharingManager *manager, std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider);
+    ~QXmppEncryptedFileSharingProvider() override;
 
     auto downloadFile(const std::any &source,
                       std::unique_ptr<QIODevice> target,
@@ -33,7 +33,7 @@ public:
                     std::function<void(UploadResult)> reportFinished) -> std::shared_ptr<Upload> override;
 
 private:
-    std::unique_ptr<QXmppEncryptedHttpFileSharingProviderPrivate> d;
+    std::unique_ptr<QXmppEncryptedFileSharingProviderPrivate> d;
 };
 
 #endif  // QXMPPENCRYPTEDHTTPFILESHARINGPROVIDER_H
