@@ -17,11 +17,11 @@ class QXMPP_EXPORT QXmppFileTransfer : public QObject
 
 public:
     /// Returns the current progress between 0.0 and 1.0.
-    virtual float progress() = 0;
+    virtual float progress() const = 0;
     virtual void cancel() = 0;
-    virtual bool isFinished() = 0;
-    virtual quint64 bytesTransferred() = 0;
-    virtual quint64 bytesTotal() = 0;
+    virtual bool isFinished() const = 0;
+    virtual quint64 bytesTransferred() const = 0;
+    virtual quint64 bytesTotal() const = 0;
 
     // TODO consider adding speed getter
 
