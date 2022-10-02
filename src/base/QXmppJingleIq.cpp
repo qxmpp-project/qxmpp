@@ -2323,7 +2323,7 @@ void QXmppJingleRtpEncryption::parse(const QDomElement &element)
         if (QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(childElement)) {
             QXmppJingleRtpCryptoElement cryptoElement;
             cryptoElement.parse(childElement);
-            d->cryptoElements.append(cryptoElement);
+            d->cryptoElements.append(std::move(cryptoElement));
         }
     }
 }
