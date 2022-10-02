@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -8,11 +9,6 @@
 #include "QXmppFileSharingProvider.h"
 #include "QXmppHttpFileSource.h"
 
-#include <any>
-#include <memory>
-
-class QXmppClient;
-class QIODevice;
 class QXmppHttpUploadManager;
 class QNetworkAccessManager;
 
@@ -25,7 +21,7 @@ public:
     using SourceType = QXmppHttpFileSource;
     /// \endcond
 
-    QXmppHttpFileSharingProvider(QXmppClient *client, QNetworkAccessManager *netManager);
+    QXmppHttpFileSharingProvider(QXmppHttpUploadManager *manager, QNetworkAccessManager *netManager);
     ~QXmppHttpFileSharingProvider() override;
 
     auto downloadFile(const std::any &source,
