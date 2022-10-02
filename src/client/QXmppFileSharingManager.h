@@ -69,7 +69,10 @@ public:
                                                 std::unique_ptr<QIODevice> output);
 
 private:
+    friend class QXmppEncryptedHttpFileSharingProvider;
+
     void internalRegisterProvider(std::type_index, std::shared_ptr<QXmppFileSharingProvider> provider);
+    std::shared_ptr<QXmppFileSharingProvider> providerForSource(const std::any &source) const;
 
     std::unique_ptr<QXmppFileSharingManagerPrivate> d;
 };
