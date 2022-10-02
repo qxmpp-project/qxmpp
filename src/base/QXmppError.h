@@ -10,6 +10,7 @@
 #include <any>
 #include <optional>
 
+class QFileDevice;
 class QIODevice;
 class QNetworkReply;
 
@@ -20,6 +21,7 @@ struct QXMPP_EXPORT QXmppError
 
     static QXmppError fromIoDevice(const QIODevice &device);
     static QXmppError fromNetworkReply(const QNetworkReply &reply);
+    static QXmppError fromFileDevice(const QFileDevice &file);
 
     bool isFileError() const;
     bool isNetworkError() const;
