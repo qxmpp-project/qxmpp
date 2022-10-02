@@ -55,13 +55,15 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
     {
         ~State() override = default;
 
+        std::function<void(DownloadResult)> reportFinished;
+        std::optional<QXmppError> error;
         QNetworkReply *reply = nullptr;
         bool finished = false;
         bool cancelled = false;
 
         void cancel() override
         {
-            if (!cancelled) {
+            if (!cancelled && !finished) {
                 cancelled = true;
                 reply->abort();
             }
@@ -76,45 +78,53 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
     }
 
     auto state = std::make_shared<State>();
+    state->reportFinished = std::move(reportFinished);
     state->reply = d->netManager->get(QNetworkRequest(httpSource.url()));
 
-    QObject::connect(state->reply, &QNetworkReply::finished, [state, reportFinished = std::move(reportFinished)]() mutable {
-        Q_ASSERT(state);
-
+    QObject::connect(state->reply, &QNetworkReply::finished, [state]() mutable {
         if (!state->finished) {
-            if (state->reply->error() != QNetworkReply::NoError) {
-                reportFinished(QXmppError::fromNetworkReply(*state->reply));
+            if (state->error) {
+                state->reportFinished(std::move(*state->error));
             } else if (state->cancelled) {
-                reportFinished(Cancelled());
+                state->reportFinished(Cancelled());
             } else {
-                reportFinished(Success());
+                state->reportFinished(Success());
             }
             state->finished = true;
+            state->reply->deleteLater();
         }
-        state->reply->deleteLater();
-
-        // reduce ref count
-        state.reset();
     });
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(state->reply, &QNetworkReply::readyRead, [file = std::move(target), reply = state->reply]() {
-        file->write(reply->readAll());
-    });
+    QObject::connect(state->reply, &QNetworkReply::readyRead, [state, file = std::move(target)]() {
 #else
     auto file = std::shared_ptr<QIODevice>(std::move(target));
-    QObject::connect(state->reply, &QNetworkReply::readyRead, [file, reply = state->reply]() {
-        file->write(reply->readAll());
-    });
+    QObject::connect(state->reply, &QNetworkReply::readyRead, [state, file]() {
 #endif
-
-    QObject::connect(state->reply, &QNetworkReply::downloadProgress, [stateRef = std::weak_ptr(state), reportProgress = std::move(reportProgress)](qint64 bytesReceived, qint64 bytesTotal) {
-        if (auto state = stateRef.lock()) {
-            if (!state->finished) {
-                reportProgress(bytesReceived, bytesTotal);
-            }
+        auto data = state->reply->readAll();
+        if (file->write(data) != data.size()) {
+            state->error = QXmppError::fromIoDevice(*file);
         }
     });
+
+    QObject::connect(state->reply, &QNetworkReply::downloadProgress, [state, reportProgress = std::move(reportProgress)](qint64 bytesReceived, qint64 bytesTotal) {
+        if (!state->finished) {
+            reportProgress(bytesReceived, bytesTotal);
+        }
+    });
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    QObject::connect(state->reply, &QNetworkReply::errorOccurred,
+#else
+    QObject::connect(state->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+#endif
+                     [state](QNetworkReply::NetworkError) {
+                         // Qt doc: the finished() signal will "probably" follow
+                         // => we can't be sure that finished() is going to be called
+                         state->reportFinished(QXmppError::fromNetworkReply(*state->reply));
+                         state->finished = true;
+                         state->reply->deleteLater();
+                     });
 
     return std::dynamic_pointer_cast<QXmppFileSharingProvider::Download>(state);
 }
