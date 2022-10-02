@@ -149,6 +149,7 @@ public:
     QString name;
     QString summary;
     QVector<QXmppStickerItem> items;
+    bool restricted;
     QXmppHash hash;
 };
 
@@ -230,6 +231,7 @@ void QXmppStickerPackItem::parsePayload(const QDomElement &payloadElement)
     }
 
     d->hash.parse(payloadElement.firstChildElement("hash"));
+    d->restricted = !payloadElement.firstChildElement("restricted").isNull();
 }
 
 void QXmppStickerPackItem::serializePayload(QXmlStreamWriter *writer) const
@@ -245,5 +247,9 @@ void QXmppStickerPackItem::serializePayload(QXmlStreamWriter *writer) const
     }
 
     d->hash.toXml(writer);
+
+    if (d->restricted) {
+        writer->writeEmptyElement("restricted");
+    }
     writer->writeEndElement();
 }
