@@ -1189,6 +1189,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition()
         break;
     case QXmppJingleIq::Reason::CryptoRequired:
         QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::CryptoRequired);
+        break;
     }
 
     serializePacket(iq2, xml);
