@@ -1843,6 +1843,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement("sticker");
             writer->writeDefaultNamespace(ns_stickers);
             writer->writeAttribute("pack", *d->stickerPackId);
+            writer->writeEndElement();
         }
     }
 }

@@ -56,6 +56,7 @@ private slots:
     void testE2eeFallbackBody();
     void testFileSharing();
     void testEncryptedFileSource();
+    void testStickers();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1257,6 +1258,32 @@ void tst_QXmppMessage::testEncryptedFileSource()
         parsePacket(encryptedSource, xml);
         serializePacket(encryptedSource, xml);
     }
+}
+
+void tst_QXmppMessage::testStickers()
+{
+    QByteArray xml(
+        "<message id='sharing-a-file' to='juliet@shakespeare.lit' from='romeo@montague.lit/pda' type='normal'>"
+        "<body>😘</body>"
+        "<file-sharing xmlns='urn:xmpp:sfs:0' disposition='inline'>"
+        "<file xmlns='urn:xmpp:file:metadata:0'>"
+        "<desc>😘</desc>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='sha-256'>gw+6xdCgOcvCYSKuQNrXH33lV9NMzuDf/s0huByCDsY=</hash>"
+        "<media-type>image/png</media-type>"
+        "<size>67016</size>"
+        "</file>"
+        "<sources>"
+        "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_kiss.png'/>"
+        "</sources>"
+        "</file-sharing>"
+        "<sticker xmlns='urn:xmpp:stickers:0' pack='EpRv28DHHzFrE4zd+xaNpVb4'/>"
+        "</message>");
+
+    QXmppMessage message1;
+    parsePacket(message1, xml);
+    QVERIFY(!message1.sharedFiles().empty());
+    QVERIFY(message1.stickerPackId().has_value());
+    serializePacket(message1, xml);
 }
 
 QTEST_MAIN(tst_QXmppMessage)
