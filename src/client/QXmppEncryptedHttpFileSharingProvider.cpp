@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppEncryptedHttpFileSharingProvider.h"
 
-#include "QXmppClient.h"
 #include "QXmppFileEncryption.h"
 #include "QXmppFileMetadata.h"
+#include "QXmppFileSharingManager.h"
 #include "QXmppFutureUtils_p.h"
-#include "QXmppHttpUploadManager.h"
 #include "QXmppUtils.h"
 
 #include "QcaInitializer_p.h"
@@ -20,7 +20,7 @@ using namespace QXmpp::Private;
 ///
 /// \class QXmppEncryptedHttpFileSharingProvider
 ///
-/// Support for storing files encrypted on an HTTP server
+/// Encrypts or decrypts files on the fly when uploading or downloading.
 ///
 /// \since QXmpp 1.5
 ///
@@ -28,19 +28,25 @@ using namespace QXmpp::Private;
 class QXmppEncryptedHttpFileSharingProviderPrivate
 {
 public:
-    QXmpp::Private::QcaInitializer init;
-    QXmppHttpFileSharingProvider *httpProvider;
+    QcaInitializer init;
+    QXmppFileSharingManager *manager;
+    std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider;
 };
 
 ///
 /// \brief Create a new QXmppEncryptedHttpFileSharingProvider
-/// \param client
-/// \param netManager QNetworkAccessManager that can be reused all over your application.
 ///
-QXmppEncryptedHttpFileSharingProvider::QXmppEncryptedHttpFileSharingProvider(QXmppClient *client, QNetworkAccessManager *netManager)
+/// \param manager QXmppFileSharingManager to be used to find other providers for downloading
+/// encrypted files.
+/// \param uploadBaseProvider Provider to be used for uploading the encrypted files.
+///
+QXmppEncryptedHttpFileSharingProvider::QXmppEncryptedHttpFileSharingProvider(
+    QXmppFileSharingManager *manager,
+    std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider)
     : d(std::make_unique<QXmppEncryptedHttpFileSharingProviderPrivate>())
 {
-    d->httpProvider = new QXmppHttpFileSharingProvider(client, netManager);
+    d->manager = manager;
+    d->uploadBaseProvider = std::move(uploadBaseProvider);
 }
 
 QXmppEncryptedHttpFileSharingProvider::~QXmppEncryptedHttpFileSharingProvider() = default;
@@ -58,9 +64,16 @@ auto QXmppEncryptedHttpFileSharingProvider::downloadFile(const std::any &source,
         qFatal("QXmppEncryptedHttpFileSharingProvider::downloadFile can only handle QXmppEncryptedFileSource sources");
     }
 
-    auto httpSource = encryptedSource.httpSources().front();
     auto output = std::make_unique<Encryption::DecryptionDevice>(std::move(target), encryptedSource.cipher(), encryptedSource.iv(), encryptedSource.key());
-    return d->httpProvider->downloadFile(httpSource, std::move(output), std::move(reportProgress), std::move(reportFinished));
+
+    // find provider for source of encrypted file
+    std::any httpSource = encryptedSource.httpSources().front();
+    if (auto provider = d->manager->providerForSource(httpSource)) {
+        return provider->downloadFile(httpSource, std::move(output), std::move(reportProgress), std::move(reportFinished));
+    }
+
+    reportFinished(QXmppError { QStringLiteral("No basic file sharing provider available for encrypted file."), {} });
+    return {};
 }
 
 auto QXmppEncryptedHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
@@ -81,7 +94,9 @@ auto QXmppEncryptedHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice
     metadata.setMediaType(QMimeDatabase().mimeTypeForName("application/octet-stream"));
     metadata.setSize(encryptedSize);
 
-    return d->httpProvider->uploadFile(
+    // find provider for source of encrypted file
+    Q_ASSERT(d->uploadBaseProvider);
+    return d->uploadBaseProvider->uploadFile(
         std::move(encDevice),
         metadata,
         std::move(reportProgress),

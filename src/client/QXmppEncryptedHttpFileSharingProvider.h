@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -8,6 +9,7 @@
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppHttpFileSharingProvider.h"
 
+class QXmppFileSharingManager;
 class QXmppEncryptedHttpFileSharingProviderPrivate;
 
 class QXMPP_EXPORT QXmppEncryptedHttpFileSharingProvider : public QXmppFileSharingProvider
@@ -17,7 +19,7 @@ public:
     using SourceType = QXmppEncryptedFileSource;
     /// \endcond
 
-    QXmppEncryptedHttpFileSharingProvider(QXmppClient *client, QNetworkAccessManager *netManager);
+    QXmppEncryptedHttpFileSharingProvider(QXmppFileSharingManager *manager, std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider);
     ~QXmppEncryptedHttpFileSharingProvider() override;
 
     auto downloadFile(const std::any &source,

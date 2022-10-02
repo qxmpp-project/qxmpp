@@ -312,13 +312,11 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
     };
 
     fileShare.visitSources([&](const std::any &source) {
-        std::type_index index(source.type());
-        try {
-            download->m_providerDownload = d->providers.at(index)->downloadFile(source, std::move(output), std::move(onProgress), std::move(onFinished));
+        if (auto provider = providerForSource(source)) {
+            download->m_providerDownload = provider->downloadFile(source, std::move(output), std::move(onProgress), std::move(onFinished));
             return true;
-        } catch (const std::out_of_range &) {
-            return false;
         }
+        return false;
     });
 
     return download;
@@ -327,6 +325,15 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
 void QXmppFileSharingManager::internalRegisterProvider(std::type_index index, std::shared_ptr<QXmppFileSharingProvider> provider)
 {
     d->providers.insert_or_assign(index, provider);
+}
+
+std::shared_ptr<QXmppFileSharingProvider> QXmppFileSharingManager::providerForSource(const std::any &source) const
+{
+    if (auto provider = d->providers.find(std::type_index(source.type()));
+        provider != d->providers.cend()) {
+        return provider->second;
+    }
+    return {};
 }
 
 #include "QXmppFileSharingManager.moc"
