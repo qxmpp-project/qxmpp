@@ -45,6 +45,8 @@ private slots:
     void testAudioPayloadType();
     void testVideoPayloadType();
     void testPayloadTypeRtpFeedbackNegotiation();
+    void testRtpErrorCondition_data();
+    void testRtpErrorCondition();
 };
 
 void tst_QXmppJingleIq::testIsSdpParameter_data()
@@ -790,7 +792,6 @@ void tst_QXmppJingleIq::testContentRtpHeaderExtensionsNegotiation()
     rtpHeaderExtensionProperty2.setId(uint32_t(2));
     rtpHeaderExtensionProperty2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:ntp-64"));
 
-
     QXmppJinglePayloadType payloadType;
     payloadType.setId(96);
     payloadType.setName(QStringLiteral("speex"));
@@ -1097,6 +1098,101 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
     QCOMPARE(rtpFeedbackIntervals2[1].value(), uint64_t(80));
 
     serializePacket(payload2, xml);
+}
+
+void tst_QXmppJingleIq::testRtpErrorCondition_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<QXmppJingleIq::Reason::RtpErrorCondition>("condition");
+
+    QTest::newRow("NoErrorCondition")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
+                             "<reason>"
+                             "<security-error/>"
+                             "</reason>"
+                             "</jingle>"
+                             "</iq>")
+        << QXmppJingleIq::Reason::NoErrorCondition;
+    QTest::newRow("InvalidCrypto")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
+                             "<reason>"
+                             "<security-error/>"
+                             "<invalid-crypto xmlns=\"urn:xmpp:jingle:apps:rtp:errors:1\"/>"
+                             "</reason>"
+                             "</jingle>"
+                             "</iq>")
+        << QXmppJingleIq::Reason::InvalidCrypto;
+    QTest::newRow("CryptoRequired")
+        << QByteArrayLiteral("<iq type=\"set\">"
+                             "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
+                             "<reason>"
+                             "<security-error/>"
+                             "<crypto-required xmlns=\"urn:xmpp:jingle:apps:rtp:errors:1\"/>"
+                             "</reason>"
+                             "</jingle>"
+                             "</iq>")
+        << QXmppJingleIq::Reason::CryptoRequired;
+}
+
+void tst_QXmppJingleIq::testRtpErrorCondition()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(QXmppJingleIq::Reason::RtpErrorCondition, condition);
+
+    QXmppJingleIq iq1;
+    QCOMPARE(iq1.reason().rtpErrorCondition(), QXmppJingleIq::Reason::NoErrorCondition);
+    parsePacket(iq1, xml);
+
+    const auto rtpErrorCondition1 = iq1.reason().rtpErrorCondition();
+    switch (condition) {
+    case QXmppJingleIq::Reason::NoErrorCondition:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::NoErrorCondition);
+        break;
+    case QXmppJingleIq::Reason::InvalidCrypto:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::InvalidCrypto);
+        break;
+    case QXmppJingleIq::Reason::CryptoRequired:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::CryptoRequired);
+        break;
+    }
+
+    serializePacket(iq1, xml);
+
+    QXmppJingleIq iq2;
+    iq2.setType(QXmppIq::Set);
+    iq2.setId({});
+    iq2.setAction(QXmppJingleIq::SessionTerminate);
+
+    switch (condition) {
+    case QXmppJingleIq::Reason::NoErrorCondition:
+        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::NoErrorCondition);
+        break;
+    case QXmppJingleIq::Reason::InvalidCrypto:
+        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::InvalidCrypto);
+        break;
+    case QXmppJingleIq::Reason::CryptoRequired:
+        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::CryptoRequired);
+        break;
+    }
+
+    iq2.reason().setType(QXmppJingleIq::Reason::SecurityError);
+
+    const auto rtpErrorCondition2 = iq2.reason().rtpErrorCondition();
+    switch (condition) {
+    case QXmppJingleIq::Reason::NoErrorCondition:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::NoErrorCondition);
+        break;
+    case QXmppJingleIq::Reason::InvalidCrypto:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::InvalidCrypto);
+        break;
+    case QXmppJingleIq::Reason::CryptoRequired:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::CryptoRequired);
+        break;
+    }
+
+    serializePacket(iq2, xml);
 }
 
 QTEST_MAIN(tst_QXmppJingleIq)

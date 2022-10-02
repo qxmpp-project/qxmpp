@@ -428,6 +428,15 @@ public:
             UnsupportedTransports
         };
 
+        enum RtpErrorCondition {
+            /// There is no error condition.
+            NoErrorCondition,
+            /// The encryption offer is rejected.
+            InvalidCrypto,
+            /// Encryption is required but not offered.
+            CryptoRequired
+        };
+
         Reason();
 
         QString text() const;
@@ -435,6 +444,9 @@ public:
 
         Type type() const;
         void setType(Type type);
+
+        RtpErrorCondition rtpErrorCondition() const;
+        void setRtpErrorCondition(RtpErrorCondition rtpErrorCondition);
 
         /// \cond
         void parse(const QDomElement &element);
@@ -444,6 +456,7 @@ public:
     private:
         QString m_text;
         Type m_type;
+        RtpErrorCondition m_rtpErrorCondition = NoErrorCondition;
     };
 
     QXmppJingleIq();
@@ -499,5 +512,7 @@ protected:
 private:
     QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
+
+Q_DECLARE_METATYPE(QXmppJingleIq::Reason::RtpErrorCondition)
 
 #endif

@@ -121,6 +121,7 @@ extern const char *ns_jingle_rtp;
 extern const char *ns_jingle_rtp_audio;
 extern const char *ns_jingle_rtp_video;
 extern const char *ns_jingle_rtp_info;
+extern const char *ns_jingle_rtp_errors;
 // XEP-0184: Message Receipts
 extern const char *ns_message_receipts;
 // XEP-0198: Stream Management
