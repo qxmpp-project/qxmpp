@@ -17,7 +17,7 @@ public:
     QXmppFileMetadata metadata;
     QVector<QXmppHttpFileSource> httpSources;
     QVector<QXmppEncryptedFileSource> encryptedSources;
-    std::optional<QString> suggest;
+    QVector<QString> suggest;
 };
 
 QXmppStickerItem::QXmppStickerItem()
@@ -83,12 +83,18 @@ void QXmppStickerItem::setEncryptedSources(const QVector<QXmppEncryptedFileSourc
     d->encryptedSources = encryptedSources;
 }
 
-const std::optional<QString> &QXmppStickerItem::suggest() const
+///
+/// \brief Returns words for which apps can suggest the use of this sticker
+///
+const QVector<QString> &QXmppStickerItem::suggestedWords() const
 {
     return d->suggest;
 }
 
-void QXmppStickerItem::setSuggest(const std::optional<QString> &suggest)
+///
+/// \brief Sets the words for which apps can suggest the use of this sticker
+///
+void QXmppStickerItem::setSuggestedWords(const QVector<QString> &suggest)
 {
     d->suggest = suggest;
 }
@@ -107,8 +113,8 @@ void QXmppStickerItem::toXml(QXmlStreamWriter *writer) const
         encryptedSource.toXml(writer);
     }
     writer->writeEndElement();
-    if (d->suggest) {
-        writer->writeTextElement("suggest", *d->suggest);
+    for (const auto &word : d->suggest) {
+        writer->writeTextElement("suggest", word);
     }
     writer->writeEndElement();
 }
@@ -135,8 +141,10 @@ bool QXmppStickerItem::parse(const QDomElement &element)
         }
     }
 
-    if (auto el = element.firstChildElement("suggest"); !el.isNull()) {
-        d->suggest = el.text();
+    for (auto suggestEl = element.firstChildElement("suggest");
+         !suggestEl.isNull();
+         suggestEl = suggestEl.nextSiblingElement("suggest")) {
+        d->suggest.push_back(suggestEl.text());
     }
 
     return true;

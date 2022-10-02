@@ -303,6 +303,7 @@ void tst_QXmppPubSub::testStickerPackItem()
         "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_thumbs_up.png'/>"
         "</sources>"
         "<suggest>+1</suggest>"
+        "<suggest>thumbsup</suggest>"
         "</item>"
         "<item>"
         "<file xmlns='urn:xmpp:file:metadata:0'>"
@@ -328,7 +329,7 @@ void tst_QXmppPubSub::testStickerPackItem()
     QCOMPARE(item.summary(), QStringLiteral("Be cute or be cynical, this little kitten works both ways."));
 
     auto &firstItem = item.items().front();
-    QVERIFY(firstItem.suggest().has_value());
+    QCOMPARE(firstItem.suggestedWords().size(), 2);
     QCOMPARE(firstItem.httpSource().front().url(), QUrl("https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_thumbs_up.png"));
     serializePacket(item, xml);
 }

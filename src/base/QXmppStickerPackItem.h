@@ -33,8 +33,8 @@ public:
     const QVector<QXmppEncryptedFileSource> &encryptedSources() const;
     void setEncryptedSources(const QVector<QXmppEncryptedFileSource> &encryptedSources);
 
-    const std::optional<QString> &suggest() const;
-    void setSuggest(const std::optional<QString> &suggest);
+    const QVector<QString> &suggestedWords() const;
+    void setSuggestedWords(const QVector<QString> &suggest);
 
     /// \cond
     bool parse(const QDomElement &element);
