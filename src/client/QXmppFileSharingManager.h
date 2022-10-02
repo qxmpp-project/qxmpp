@@ -155,9 +155,9 @@ public:
         internalRegisterProvider(index, manager);
     }
 
-    std::shared_ptr<QXmppFileUpload> sendFile(std::shared_ptr<QXmppFileSharingProvider> provider,
-                                              const QString &filePath,
-                                              const std::optional<QString> &description = {});
+    std::shared_ptr<QXmppFileUpload> uploadFile(std::shared_ptr<QXmppFileSharingProvider> provider,
+                                                const QString &filePath,
+                                                const std::optional<QString> &description = {});
 
     std::shared_ptr<QXmppFileDownload> downloadFile(const QXmppFileShare &fileShare,
                                                     std::unique_ptr<QIODevice> output);
