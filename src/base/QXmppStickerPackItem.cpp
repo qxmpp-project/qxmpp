@@ -7,7 +7,6 @@
 #include "QXmppConstants_p.h"
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppFileMetadata.h"
-#include "qdebug.h"
 
 #include <QXmlStreamWriter>
 
