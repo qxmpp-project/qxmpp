@@ -109,12 +109,10 @@ set(INSTALL_HEADER_FILES
     client/QXmppClientExtension.h
     client/QXmppConfiguration.h
     client/QXmppDiscoveryManager.h
-    client/QXmppDownload.h
     client/QXmppE2eeExtension.h
     client/QXmppEntityTimeManager.h
     client/QXmppFileSharingManager.h
     client/QXmppFileSharingProvider.h
-    client/QXmppFileTransfer.h
     client/QXmppHttpFileSharingProvider.h
     client/QXmppHttpUploadManager.h
     client/QXmppInvokable.h
@@ -137,7 +135,6 @@ set(INSTALL_HEADER_FILES
     client/QXmppTrustMemoryStorage.h
     client/QXmppTrustSecurityPolicy.h
     client/QXmppTrustStorage.h
-    client/QXmppUpload.h
     client/QXmppUploadRequestManager.h
     client/QXmppUserTuneManager.h
     client/QXmppUserLocationManager.h
@@ -239,12 +236,10 @@ set(SOURCE_FILES
     client/QXmppClient.cpp
     client/QXmppClientExtension.cpp
     client/QXmppConfiguration.cpp
-    client/QXmppDownload.cpp
     client/QXmppDiscoveryManager.cpp
     client/QXmppE2eeExtension.cpp
     client/QXmppEntityTimeManager.cpp
     client/QXmppFileSharingManager.cpp
-    client/QXmppFileTransfer.cpp
     client/QXmppHttpFileSharingProvider.cpp
     client/QXmppHttpUploadManager.cpp
     client/QXmppInternalClientExtension.cpp
@@ -264,7 +259,6 @@ set(SOURCE_FILES
     client/QXmppTrustManager.cpp
     client/QXmppTrustMemoryStorage.cpp
     client/QXmppTrustStorage.cpp
-    client/QXmppUpload.cpp
     client/QXmppUploadRequestManager.cpp
     client/QXmppUserLocationManager.cpp
     client/QXmppUserTuneManager.cpp
