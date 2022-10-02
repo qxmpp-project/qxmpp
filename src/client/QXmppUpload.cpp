@@ -37,7 +37,7 @@
 /// \typedef QXmppUpload::Result
 ///
 /// \brief Contains FileResult (successfully finished), QXmpp::Cancelled (manually cancelled)
-/// or QXmppError (an error occured while downloading).
+/// or QXmppError (an error occured while uploading).
 ///
 
 ///

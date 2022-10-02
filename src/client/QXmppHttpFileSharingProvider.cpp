@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppHttpFileSharingProvider.h"
 
 #include "QXmppClient.h"
-#include "QXmppDownload.h"
+#include "QXmppFileMetadata.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppHttpUploadManager.h"
-#include "QXmppUpload.h"
 #include "QXmppUtils.h"
-#include "QXmppUtils_p.h"
 
 #include <QMimeDatabase>
 #include <QNetworkReply>
@@ -24,96 +24,6 @@ using namespace QXmpp::Private;
 ///
 /// \since QXmpp 1.5
 ///
-
-class QXmppSfsHttpUpload : public QXmppUpload
-{
-    Q_OBJECT
-
-public:
-    QXmppSfsHttpUpload(std::shared_ptr<QXmppHttpUpload> &&httpUpload)
-        : inner(std::move(httpUpload))
-    {
-        connect(inner.get(), &QXmppHttpUpload::finished, this, [this](const QXmppHttpUpload::Result &result) {
-            Q_EMIT uploadFinished(std::visit([](auto &&value) -> QXmpp::Private::UploadResult {
-                using T = std::decay_t<decltype(value)>;
-                if constexpr (std::is_same_v<T, QUrl>) {
-                    return std::any(QXmppHttpFileSource(value));
-                } else if constexpr (std::is_same_v<T, Cancelled>) {
-                    return Cancelled {};
-                } else if constexpr (std::is_same_v<T, QXmppError>) {
-                    return value;
-                }
-            },
-                                             result));
-        });
-        connect(inner.get(), &QXmppHttpUpload::progressChanged,
-                this, &QXmppSfsHttpUpload::progressChanged);
-    }
-
-    float progress() override { return inner->progress(); }
-    void cancel() override { inner->cancel(); }
-    bool isFinished() override { return inner->isFinished(); }
-    quint64 bytesTransferred() override { return inner->bytesSent(); }
-    quint64 bytesTotal() override { return inner->bytesTotal(); }
-
-private:
-    std::shared_ptr<QXmppHttpUpload> inner;
-};
-
-class QXmppHttpDownload : public QXmppDownload
-{
-    float progress() override
-    {
-        return calculateProgress(m_bytesSent, m_bytesTotal);
-    }
-
-    void cancel() override
-    {
-        m_aborted = true;
-        reply->abort();
-    }
-
-    bool isFinished() override
-    {
-        return m_isFinished;
-    }
-
-    quint64 bytesTransferred() override
-    {
-        return m_bytesSent;
-    }
-
-    quint64 bytesTotal() override
-    {
-        return m_bytesTotal;
-    }
-
-public:
-    void reportProgress(quint64 bytesSent, quint64 bytesTotal)
-    {
-        m_bytesSent = bytesSent;
-        m_bytesTotal = bytesTotal;
-        Q_EMIT progressChanged();
-    }
-
-    void reportFinished(Result &&result)
-    {
-        Q_EMIT finished(result);
-        m_isFinished = true;
-    }
-
-    [[nodiscard]] bool aborted() const
-    {
-        return m_aborted;
-    }
-
-private:
-    QNetworkReply *reply = nullptr;
-    quint64 m_bytesSent = 0;
-    quint64 m_bytesTotal = 0;
-    bool m_isFinished = false;
-    bool m_aborted = false;
-};
 
 class QXmppHttpFileSharingProviderPrivate
 {
@@ -130,7 +40,6 @@ public:
 QXmppHttpFileSharingProvider::QXmppHttpFileSharingProvider(QXmppClient *client, QNetworkAccessManager *netManager)
     : d(std::make_unique<QXmppHttpFileSharingProviderPrivate>())
 {
-    qRegisterMetaType<QXmpp::Private::UploadResult>();
     Q_ASSERT(client);
     d->manager = client->findExtension<QXmppHttpUploadManager>();
     Q_ASSERT(d->manager);
@@ -139,77 +48,116 @@ QXmppHttpFileSharingProvider::QXmppHttpFileSharingProvider(QXmppClient *client, 
 
 QXmppHttpFileSharingProvider::~QXmppHttpFileSharingProvider() = default;
 
-auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source, std::unique_ptr<QIODevice> &&target)
-    -> std::shared_ptr<QXmppDownload>
+auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
+                                                std::unique_ptr<QIODevice> target,
+                                                std::function<void(quint64, quint64)> reportProgress,
+                                                std::function<void(DownloadResult)> reportFinished)
+    -> std::shared_ptr<Download>
 {
+    struct State : Download
+    {
+        ~State() override = default;
+
+        QNetworkReply *reply = nullptr;
+        bool finished = false;
+        bool cancelled = false;
+
+        void cancel() override
+        {
+            if (!cancelled) {
+                cancelled = true;
+                reply->abort();
+            }
+        }
+    };
+
     QXmppHttpFileSource httpSource;
     try {
         httpSource = std::any_cast<QXmppHttpFileSource>(source);
     } catch (const std::bad_any_cast &) {
-        qFatal("QXmppHttpFileSharingProvider::downloadFile can only handle QXmppHttpFileSharingProvider sources");
+        qFatal("QXmppHttpFileSharingProvider::downloadFile can only handle QXmppHttpFileSource.");
     }
 
-    auto *reply = d->netManager->get(QNetworkRequest(httpSource.url()));
+    auto state = std::make_shared<State>();
+    state->reply = d->netManager->get(QNetworkRequest(httpSource.url()));
 
-    auto download = std::make_shared<QXmppHttpDownload>();
+    QObject::connect(state->reply, &QNetworkReply::finished, [state, reportFinished = std::move(reportFinished)]() mutable {
+        Q_ASSERT(state);
 
-    QObject::connect(reply, &QNetworkReply::finished, [=]() {
-        if (reply->error() != QNetworkReply::NoError) {
-            download->reportFinished(QXmppError::fromIoDevice(*reply));
-        } else if (download->aborted()) {
-            download->reportFinished(Cancelled());
-        } else {
-            download->reportFinished(Success());
+        if (!state->finished) {
+            if (state->reply->error() != QNetworkReply::NoError) {
+                reportFinished(QXmppError::fromNetworkReply(*state->reply));
+            } else if (state->cancelled) {
+                reportFinished(Cancelled());
+            } else {
+                reportFinished(Success());
+            }
+            state->finished = true;
         }
-        reply->deleteLater();
+        state->reply->deleteLater();
+
+        // reduce ref count
+        state.reset();
     });
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(reply, &QNetworkReply::readyRead, [file = std::move(target), reply]() {
+    QObject::connect(state->reply, &QNetworkReply::readyRead, [file = std::move(target), reply = state->reply]() {
         file->write(reply->readAll());
     });
 #else
     auto file = std::shared_ptr<QIODevice>(std::move(target));
-    QObject::connect(reply, &QNetworkReply::readyRead, [file, reply]() {
+    QObject::connect(state->reply, &QNetworkReply::readyRead, [file, reply = state->reply]() {
         file->write(reply->readAll());
     });
 #endif
 
-    QObject::connect(reply, &QNetworkReply::downloadProgress, [=](qint64 bytesReceived, qint64 bytesTotal) {
-        download->reportProgress(bytesReceived, bytesTotal);
+    QObject::connect(state->reply, &QNetworkReply::downloadProgress, [stateRef = std::weak_ptr(state), reportProgress = std::move(reportProgress)](qint64 bytesReceived, qint64 bytesTotal) {
+        if (auto state = stateRef.lock()) {
+            if (!state->finished) {
+                reportProgress(bytesReceived, bytesTotal);
+            }
+        }
     });
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(reply, &QNetworkReply::errorOccurred,
-#else
-    QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-#endif
-                     [download, reply]() {
-                         download->reportFinished(QXmppError::fromNetworkReply(*reply));
-                     });
-
-    QObject::connect(reply, &QNetworkReply::uploadProgress, [download](qint64 sent, qint64 total) {
-        quint64 sentBytes = sent < 0 ? 0 : quint64(sent);
-        quint64 totalBytes = total < 0 ? 0 : quint64(total);
-        download->reportProgress(sentBytes, totalBytes);
-    });
-
-    return download;
+    return std::dynamic_pointer_cast<QXmppFileSharingProvider::Download>(state);
 }
 
 auto QXmppHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
-                                              const QXmppFileMetadata &info)
-    -> std::shared_ptr<QXmppUpload>
+                                              const QXmppFileMetadata &info,
+                                              std::function<void(quint64, quint64)> reportProgress,
+                                              std::function<void(UploadResult)> reportFinished)
+    -> std::shared_ptr<Upload>
 {
+    struct State : Upload
+    {
+        ~State() override = default;
+
+        std::shared_ptr<QXmppHttpUpload> upload;
+        void cancel() override { upload->cancel(); }
+    };
+
     Q_ASSERT(d->manager);
 
-    auto upload = d->manager->uploadFile(
+    auto state = std::make_shared<State>();
+    state->upload = d->manager->uploadFile(
         std::move(data),
         info.filename().value_or(QXmppUtils::generateStanzaHash(10)),
         info.mediaType().value_or(QMimeDatabase().mimeTypeForName("application/octet-stream")),
         info.size() ? info.size().value() : -1);
 
-    return std::make_shared<QXmppSfsHttpUpload>(std::move(upload));
-}
+    QObject::connect(state->upload.get(), &QXmppHttpUpload::finished, [state, reportFinished = std::move(reportFinished)](const QXmppHttpUpload::Result &result) mutable {
+        reportFinished(visitForward<UploadResult>(result, [](QUrl url) {
+            return std::any(QXmppHttpFileSource(std::move(url)));
+        }));
 
-#include "QXmppHttpFileSharingProvider.moc"
+        // reduce ref count, so the signal connection doesn't keep the state alive forever
+        state.reset();
+    });
+    QObject::connect(state->upload.get(), &QXmppHttpUpload::progressChanged, [stateRef = std::weak_ptr(state), reportProgress = std::move(reportProgress)]() {
+        if (auto state = stateRef.lock()) {
+            reportProgress(state->upload->bytesSent(), state->upload->bytesTotal());
+        }
+    });
+
+    return std::dynamic_pointer_cast<QXmppFileSharingProvider::Upload>(state);
+}

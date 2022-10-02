@@ -21,10 +21,14 @@ public:
     ~QXmppEncryptedHttpFileSharingProvider() override;
 
     auto downloadFile(const std::any &source,
-                      std::unique_ptr<QIODevice> &&target) -> std::shared_ptr<QXmppDownload> override;
-    auto uploadFile(
-        std::unique_ptr<QIODevice> data,
-        const QXmppFileMetadata &info) -> std::shared_ptr<QXmppUpload> override;
+                      std::unique_ptr<QIODevice> target,
+                      std::function<void(quint64, quint64)> reportProgress,
+                      std::function<void(DownloadResult)> reportFinished) -> std::shared_ptr<Download> override;
+
+    auto uploadFile(std::unique_ptr<QIODevice> source,
+                    const QXmppFileMetadata &info,
+                    std::function<void(quint64, quint64)> reportProgress,
+                    std::function<void(UploadResult)> reportFinished) -> std::shared_ptr<Upload> override;
 
 private:
     std::unique_ptr<QXmppEncryptedHttpFileSharingProviderPrivate> d;
