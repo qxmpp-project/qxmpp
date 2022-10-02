@@ -8,13 +8,11 @@
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryData.h"
 #include "QXmppClient.h"
-#include "QXmppDownload.h"
 #include "QXmppFileMetadata.h"
 #include "QXmppFileShare.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppHashing_p.h"
 #include "QXmppThumbnail.h"
-#include "QXmppUpload.h"
 #include "QXmppUploadRequestManager.h"
 #include "QXmppUtils_p.h"
 
@@ -58,76 +56,245 @@ auto transform(T &input, Converter convert)
     return output;
 }
 
-class UploadImpl : public QXmppUpload
+class QXmppFileUploadPrivate
 {
-    Q_OBJECT
 public:
-    float progress() const override { return calculateProgress(m_bytesSent, m_bytesTotal); }
-    void cancel() override
-    {
-        if (m_providerUpload) {
-            m_providerUpload->cancel();
-        }
-        m_metadataFuture.cancel();
-        m_hashesFuture.cancel();
-    }
-    bool isFinished() const override { return m_finished; }
-    quint64 bytesTransferred() const override { return m_bytesSent; }
-    quint64 bytesTotal() const override { return m_bytesTotal; }
-
-    void reportFinished(Result result)
-    {
-        if (!m_finished) {
-            m_finished = true;
-            Q_EMIT finished(std::move(result));
-        }
-    }
-
-    std::shared_ptr<QXmppFileSharingProvider::Upload> m_providerUpload;
-    QFuture<std::shared_ptr<MetadataGeneratorResult>> m_metadataFuture;
-    QFuture<HashingResultPtr> m_hashesFuture;
-    QXmppFileMetadata m_metadata;
-    QXmppBitsOfBinaryDataList m_dataBlobs;
-    std::any m_source;
-    quint64 m_bytesSent = 0;
-    quint64 m_bytesTotal = 0;
-    bool m_finished = false;
+    std::shared_ptr<QXmppFileSharingProvider::Upload> providerUpload;
+    QFuture<std::shared_ptr<MetadataGeneratorResult>> metadataFuture;
+    QFuture<HashingResultPtr> hashesFuture;
+    QXmppFileMetadata metadata;
+    QXmppBitsOfBinaryDataList dataBlobs;
+    std::any source;
+    quint64 bytesSent = 0;
+    quint64 bytesTotal = 0;
+    bool finished = false;
 };
 
-class DownloadImpl : public QXmppDownload
-{
-    float progress() const override { return calculateProgress(m_bytesReceived, m_bytesTotal); }
-    void cancel() override
-    {
-        if (m_providerDownload) {
-            m_providerDownload->cancel();
-        }
-        m_hashesFuture.cancel();
-    }
-    bool isFinished() const override { return m_finished; }
-    quint64 bytesTransferred() const override { return m_bytesReceived; }
-    quint64 bytesTotal() const override { return m_bytesTotal; }
+///
+/// \class QXmppFileUpload
+///
+/// \brief Provides progress of stateless file sharing uploads.
+///
+/// \since QXmpp 1.5
+///
 
-public:
-    void reportProgress(quint64 bytesReceived, quint64 bytesTotal)
-    {
-        m_bytesReceived = bytesReceived;
-        m_bytesTotal = bytesTotal;
-        Q_EMIT progressChanged();
+///
+/// \class QXmppFileUpload::FileResult
+///
+/// \brief Contains QXmppFileShare of the uploaded file and possible data blobs containing
+/// referenced thumbnails.
+///
+
+///
+/// \var QXmppFileUpload::FileResult::fileShare
+///
+/// \brief File share with file metadata and file shares of the uploaded file.
+///
+
+///
+/// \var QXmppFileUpload::FileResult::dataBlobs
+///
+/// \brief Data blobs of possibly in the metadata referenced thumbnails.
+///
+/// The QXmppFileSharingManager may generate file thumbnails.
+///
+
+///
+/// \typedef QXmppFileUpload::Result
+///
+/// \brief Contains FileResult (successfully finished), QXmpp::Cancelled (manually cancelled)
+/// or QXmppError (an error occured while uploading).
+///
+
+QXmppFileUpload::~QXmppFileUpload() = default;
+
+///
+/// Returns the current progress between 0.0 and 1.0.
+///
+float QXmppFileUpload::progress() const
+{
+    return calculateProgress(d->bytesSent, d->bytesTotal);
+}
+
+///
+/// \fn QXmppFileUpload::progressChanged()
+///
+/// \brief Emitted when new bytes have been transferred.
+///
+
+///
+/// \brief Cancels the file transfer. finished() will be emitted.
+///
+void QXmppFileUpload::cancel()
+{
+    if (d->providerUpload) {
+        d->providerUpload->cancel();
     }
-    void reportFinished(Result result)
-    {
-        m_finished = true;
+    d->metadataFuture.cancel();
+    d->hashesFuture.cancel();
+}
+
+///
+/// \brief Returns whether the file transfer is finished.
+///
+bool QXmppFileUpload::isFinished() const
+{
+    return d->finished;
+}
+
+///
+/// \brief Returns the number of bytes that have been uploaded or downloaded.
+///
+quint64 QXmppFileUpload::bytesTransferred() const
+{
+    return d->bytesSent;
+}
+
+///
+/// \brief Returns the number of bytes that totally need to be transferred.
+///
+quint64 QXmppFileUpload::bytesTotal() const
+{
+    return d->bytesTotal;
+}
+
+///
+/// \fn QXmppFileUpload::finished
+///
+/// Emitted when the upload has finished.
+///
+
+QXmppFileUpload::QXmppFileUpload()
+    : d(std::make_unique<QXmppFileUploadPrivate>())
+{
+}
+
+void QXmppFileUpload::reportFinished(Result result)
+{
+    if (!d->finished) {
+        d->finished = true;
         Q_EMIT finished(std::move(result));
     }
+}
 
-    std::shared_ptr<QXmppFileSharingProvider::Download> m_providerDownload;
-    QFuture<HashVerificationResultPtr> m_hashesFuture;
-    QVector<QXmppHash> m_hashes;
-    quint64 m_bytesReceived = 0;
-    quint64 m_bytesTotal = 0;
-    bool m_finished = false;
+class QXmppFileDownloadPrivate
+{
+public:
+    std::shared_ptr<QXmppFileSharingProvider::Download> providerDownload;
+    QFuture<HashVerificationResultPtr> hashesFuture;
+    QVector<QXmppHash> hashes;
+    quint64 bytesReceived = 0;
+    quint64 bytesTotal = 0;
+    bool finished = false;
 };
+
+///
+/// \class QXmppFileDownload
+///
+/// \brief Provides progress of stateless file sharing uploads.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// \enum QXmppFileDownload::HashVerificationResult
+///
+/// Describes the result of the hash verification.
+///
+
+///
+/// \struct QXmppFileDownload::Downloaded
+///
+/// Indicates that the file could be downloaded.
+///
+
+///
+/// \var QXmppFileDownload::Downloaded::hashVerificationResult
+///
+/// Describes the result of the hash verification.
+///
+
+///
+/// \typedef QXmppFileDownload::Result
+///
+/// \brief Contains QXmpp::Success (successfully finished), QXmpp::Cancelled (manually cancelled)
+/// or QXmppError (an error occured while downloading).
+///
+
+QXmppFileDownload::~QXmppFileDownload() = default;
+
+///
+/// Returns the current progress between 0.0 and 1.0.
+///
+float QXmppFileDownload::progress() const
+{
+    return calculateProgress(d->bytesReceived, d->bytesTotal);
+}
+
+///
+/// \fn QXmppFileDownload::progressChanged
+///
+/// \brief Emitted when new bytes have been transferred.
+///
+
+///
+/// \brief Cancels the file transfer. finished() will be emitted.
+///
+void QXmppFileDownload::cancel()
+{
+    if (d->providerDownload) {
+        d->providerDownload->cancel();
+    }
+    d->hashesFuture.cancel();
+}
+
+///
+/// \brief Returns whether the file transfer is finished.
+///
+bool QXmppFileDownload::isFinished() const
+{
+    return d->finished;
+}
+
+///
+/// \brief Returns the number of bytes that have been uploaded or downloaded.
+///
+quint64 QXmppFileDownload::bytesTransferred() const
+{
+    return d->bytesReceived;
+}
+
+///
+/// \brief Returns the number of bytes that totally need to be transferred.
+///
+quint64 QXmppFileDownload::bytesTotal() const
+{
+    return d->bytesTotal;
+}
+
+///
+/// \fn QXmppFileDownload::finished
+///
+/// Emitted when the download has finished.
+///
+
+QXmppFileDownload::QXmppFileDownload()
+    : d(std::make_unique<QXmppFileDownloadPrivate>())
+{
+}
+
+void QXmppFileDownload::reportProgress(quint64 bytesReceived, quint64 bytesTotal)
+{
+    d->bytesReceived = bytesReceived;
+    d->bytesTotal = bytesTotal;
+    Q_EMIT progressChanged();
+}
+
+void QXmppFileDownload::reportFinished(Result result)
+{
+    d->finished = true;
+    Q_EMIT finished(std::move(result));
+}
 
 class QXmppFileSharingManagerPrivate
 {
@@ -192,16 +359,16 @@ void QXmppFileSharingManager::setMetadataGenerator(MetadataGenerator &&generator
 /// \return An object that allows to track the progress of the upload.
 ///         Once the upload is finished, the finished signal is emitted on it.
 ///
-std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<QXmppFileSharingProvider> provider,
-                                                               const QString &filePath,
-                                                               const std::optional<QString> &description)
+std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<QXmppFileSharingProvider> provider,
+                                                                   const QString &filePath,
+                                                                   const std::optional<QString> &description)
 {
     QFileInfo fileInfo(filePath);
     auto metadata = QXmppFileMetadata::fromFileInfo(fileInfo);
     metadata.setDescription(description);
 
-    auto upload = std::make_shared<UploadImpl>();
-    upload->m_metadata = std::move(metadata);
+    std::shared_ptr<QXmppFileUpload> upload(new QXmppFileUpload());
+    upload->d->metadata = std::move(metadata);
 
     auto openFile = [=]() -> std::unique_ptr<QIODevice> {
         auto device = std::make_unique<QFile>(fileInfo.absoluteFilePath());
@@ -215,37 +382,37 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
     auto hashesIoDevice = openFile();
     auto uploadIoDevice = openFile();
 
-    if (upload->m_finished) {
+    if (upload->d->finished) {
         // error occurred while opening file
         return upload;
     }
 
-    upload->m_metadataFuture = d->metadataGenerator(std::move(metadataIoDevice));
-    upload->m_hashesFuture = calculateHashes(std::move(hashesIoDevice), hashAlgorithms());
+    upload->d->metadataFuture = d->metadataGenerator(std::move(metadataIoDevice));
+    upload->d->hashesFuture = calculateHashes(std::move(hashesIoDevice), hashAlgorithms());
 
     auto onProgress = [upload](quint64 sent, quint64 total) {
-        upload->m_bytesSent = sent;
-        upload->m_bytesTotal = total;
+        upload->d->bytesSent = sent;
+        upload->d->bytesTotal = total;
         Q_EMIT upload->progressChanged();
     };
     auto onFinished = [this, upload](QXmppFileSharingProvider::UploadResult uploadResult) {
         // free memory
-        upload->m_providerUpload.reset();
+        upload->d->providerUpload.reset();
         if (std::holds_alternative<std::any>(uploadResult)) {
-            upload->m_source = std::get<std::any>(std::move(uploadResult));
-            await(upload->m_metadataFuture, this, [this, upload](auto &&result) mutable {
+            upload->d->source = std::get<std::any>(std::move(uploadResult));
+            await(upload->d->metadataFuture, this, [this, upload](auto &&result) mutable {
                 if (result->dimensions) {
-                    upload->m_metadata.setWidth(result->dimensions->width());
-                    upload->m_metadata.setHeight(result->dimensions->height());
+                    upload->d->metadata.setWidth(result->dimensions->width());
+                    upload->d->metadata.setHeight(result->dimensions->height());
                 }
                 if (result->length) {
-                    upload->m_metadata.setLength(*result->length);
+                    upload->d->metadata.setLength(*result->length);
                 }
 
                 if (!result->thumbnails.empty()) {
                     QVector<QXmppThumbnail> thumbnails;
                     thumbnails.reserve(result->thumbnails.size());
-                    upload->m_dataBlobs.reserve(result->thumbnails.size());
+                    upload->d->dataBlobs.reserve(result->thumbnails.size());
 
                     for (const auto &metadataThumb : result->thumbnails) {
                         auto bobData = QXmppBitsOfBinaryData::fromByteArray(metadataThumb.data);
@@ -258,12 +425,12 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
                         thumbnail.setUri(bobData.cid().toCidUrl());
 
                         thumbnails.append(std::move(thumbnail));
-                        upload->m_dataBlobs.append(std::move(bobData));
+                        upload->d->dataBlobs.append(std::move(bobData));
                     }
-                    upload->m_metadata.setThumbnails(thumbnails);
+                    upload->d->metadata.setThumbnails(thumbnails);
                 }
 
-                await(upload->m_hashesFuture, this, [upload](auto hashResult) mutable {
+                await(upload->d->hashesFuture, this, [upload](auto hashResult) mutable {
                     auto &hashValue = hashResult->result;
                     if (std::holds_alternative<std::vector<QXmppHash>>(hashValue)) {
                         const auto &hashesVector = std::get<std::vector<QXmppHash>>(hashValue);
@@ -273,13 +440,13 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
                                        std::back_inserter(hashes), [](auto &&hash) {
                                            return hash;
                                        });
-                        upload->m_metadata.setHashes(hashes);
+                        upload->d->metadata.setHashes(hashes);
 
                         QXmppFileShare fs;
-                        fs.setMetadata(upload->m_metadata);
-                        fs.addSource(upload->m_source);
+                        fs.setMetadata(upload->d->metadata);
+                        fs.addSource(upload->d->source);
 
-                        upload->reportFinished(QXmppUpload::FileResult { fs, std::move(upload->m_dataBlobs) });
+                        upload->reportFinished(QXmppFileUpload::FileResult { fs, std::move(upload->d->dataBlobs) });
                     } else if (std::holds_alternative<Cancelled>(hashValue)) {
                         upload->reportFinished(Cancelled());
                     } else if (std::holds_alternative<QXmppError>(hashValue)) {
@@ -294,7 +461,7 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
         }
     };
 
-    upload->m_providerUpload = provider->uploadFile(std::move(uploadIoDevice), upload->m_metadata, std::move(onProgress), std::move(onFinished));
+    upload->d->providerUpload = provider->uploadFile(std::move(uploadIoDevice), upload->d->metadata, std::move(onProgress), std::move(onFinished));
     return upload;
 }
 
@@ -311,12 +478,12 @@ std::shared_ptr<QXmppUpload> QXmppFileSharingManager::sendFile(std::shared_ptr<Q
 ///               In most cases, a QFile
 /// \return An object that allows to track the progress of the download.
 ///
-std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
+std::shared_ptr<QXmppFileDownload> QXmppFileSharingManager::downloadFile(
     const QXmppFileShare &fileShare,
     std::unique_ptr<QIODevice> output)
 {
-    auto download = std::make_shared<DownloadImpl>();
-    download->m_hashes = fileShare.metadata().hashes();
+    std::shared_ptr<QXmppFileDownload> download(new QXmppFileDownload());
+    download->d->hashes = fileShare.metadata().hashes();
 
     // currently hashing does only work with QFiles
     auto filePath = [&]() -> QString {
@@ -331,7 +498,7 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
     };
     auto onFinished = [this, download, filePath](QXmppFileSharingProvider::DownloadResult result) mutable {
         // reduce ref count
-        download->m_providerDownload.reset();
+        download->d->providerDownload.reset();
 
         // pass errors directly
         if (std::holds_alternative<Cancelled>(result)) {
@@ -346,7 +513,7 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
         // try to do hash verification
         if (filePath.isEmpty()) {
             warning(QStringLiteral("Can't verify hashes of other io devices than QFile!"));
-            download->reportFinished(QXmppDownload::Downloaded { QXmppDownload::NoStrongHashes });
+            download->reportFinished(QXmppFileDownload::Downloaded { QXmppFileDownload::NoStrongHashes });
             return;
         }
 
@@ -356,15 +523,15 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
             return;
         }
 
-        download->m_hashesFuture = verifyHashes(
+        download->d->hashesFuture = verifyHashes(
             std::move(file),
-            transform(download->m_hashes, [](auto hash) { return hash; }));
+            transform(download->d->hashes, [](auto hash) { return hash; }));
 
-        await(download->m_hashesFuture, this, [download = std::move(download)](HashVerificationResultPtr hashResult) {
-            download->reportFinished(visitForward<QXmppDownload::Result>(hashResult->result, overloaded {
+        await(download->d->hashesFuture, this, [download = std::move(download)](HashVerificationResultPtr hashResult) {
+            auto convert = overloaded {
                 [](HashVerificationResult::NoStrongHashes) {
-                    return QXmppDownload::Downloaded {
-                        QXmppDownload::NoStrongHashes
+                    return QXmppFileDownload::Downloaded {
+                        QXmppFileDownload::NoStrongHashes
                     };
                 },
                 [](HashVerificationResult::NotMatching) {
@@ -374,17 +541,18 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
                     };
                 },
                 [](HashVerificationResult::Verified) {
-                    return QXmppDownload::Downloaded {
-                        QXmppDownload::HashVerified
+                    return QXmppFileDownload::Downloaded {
+                        QXmppFileDownload::HashVerified
                     };
                 }
-            }));
+            };
+            download->reportFinished(visitForward<QXmppFileDownload::Result>(hashResult->result, convert));
         });
     };
 
     fileShare.visitSources([&](const std::any &source) {
         if (auto provider = providerForSource(source)) {
-            download->m_providerDownload = provider->downloadFile(source, std::move(output), std::move(onProgress), std::move(onFinished));
+            download->d->providerDownload = provider->downloadFile(source, std::move(output), std::move(onProgress), std::move(onFinished));
             return true;
         }
         return false;
@@ -406,5 +574,3 @@ std::shared_ptr<QXmppFileSharingProvider> QXmppFileSharingManager::providerForSo
     }
     return {};
 }
-
-#include "QXmppFileSharingManager.moc"
