@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppEncryptedHttpFileSharingProvider.h"
+#include "QXmppEncryptedFileSharingProvider.h"
 
 #include "QXmppFileEncryption.h"
 #include "QXmppFileMetadata.h"
@@ -18,14 +18,14 @@ using namespace QXmpp;
 using namespace QXmpp::Private;
 
 ///
-/// \class QXmppEncryptedHttpFileSharingProvider
+/// \class QXmppEncryptedFileSharingProvider
 ///
 /// Encrypts or decrypts files on the fly when uploading or downloading.
 ///
 /// \since QXmpp 1.5
 ///
 
-class QXmppEncryptedHttpFileSharingProviderPrivate
+class QXmppEncryptedFileSharingProviderPrivate
 {
 public:
     QcaInitializer init;
@@ -34,34 +34,34 @@ public:
 };
 
 ///
-/// \brief Create a new QXmppEncryptedHttpFileSharingProvider
+/// \brief Create a new QXmppEncryptedFileSharingProvider
 ///
 /// \param manager QXmppFileSharingManager to be used to find other providers for downloading
 /// encrypted files.
 /// \param uploadBaseProvider Provider to be used for uploading the encrypted files.
 ///
-QXmppEncryptedHttpFileSharingProvider::QXmppEncryptedHttpFileSharingProvider(
+QXmppEncryptedFileSharingProvider::QXmppEncryptedFileSharingProvider(
     QXmppFileSharingManager *manager,
     std::shared_ptr<QXmppFileSharingProvider> uploadBaseProvider)
-    : d(std::make_unique<QXmppEncryptedHttpFileSharingProviderPrivate>())
+    : d(std::make_unique<QXmppEncryptedFileSharingProviderPrivate>())
 {
     d->manager = manager;
     d->uploadBaseProvider = std::move(uploadBaseProvider);
 }
 
-QXmppEncryptedHttpFileSharingProvider::~QXmppEncryptedHttpFileSharingProvider() = default;
+QXmppEncryptedFileSharingProvider::~QXmppEncryptedFileSharingProvider() = default;
 
-auto QXmppEncryptedHttpFileSharingProvider::downloadFile(const std::any &source,
-                                                         std::unique_ptr<QIODevice> target,
-                                                         std::function<void(quint64, quint64)> reportProgress,
-                                                         std::function<void(DownloadResult)> reportFinished)
+auto QXmppEncryptedFileSharingProvider::downloadFile(const std::any &source,
+                                                     std::unique_ptr<QIODevice> target,
+                                                     std::function<void(quint64, quint64)> reportProgress,
+                                                     std::function<void(DownloadResult)> reportFinished)
     -> std::shared_ptr<Download>
 {
     QXmppEncryptedFileSource encryptedSource;
     try {
         encryptedSource = std::any_cast<QXmppEncryptedFileSource>(source);
     } catch (const std::bad_any_cast &) {
-        qFatal("QXmppEncryptedHttpFileSharingProvider::downloadFile can only handle QXmppEncryptedFileSource sources");
+        qFatal("QXmppEncryptedFileSharingProvider::downloadFile can only handle QXmppEncryptedFileSource sources");
     }
 
     auto output = std::make_unique<Encryption::DecryptionDevice>(std::move(target), encryptedSource.cipher(), encryptedSource.iv(), encryptedSource.key());
@@ -76,10 +76,10 @@ auto QXmppEncryptedHttpFileSharingProvider::downloadFile(const std::any &source,
     return {};
 }
 
-auto QXmppEncryptedHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
-                                                       const QXmppFileMetadata &,
-                                                       std::function<void(quint64, quint64)> reportProgress,
-                                                       std::function<void(UploadResult)> reportFinished)
+auto QXmppEncryptedFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
+                                                   const QXmppFileMetadata &,
+                                                   std::function<void(quint64, quint64)> reportProgress,
+                                                   std::function<void(UploadResult)> reportFinished)
     -> std::shared_ptr<Upload>
 {
     auto cipher = Aes256CbcPkcs7;
