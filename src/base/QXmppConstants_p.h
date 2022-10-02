@@ -216,6 +216,8 @@ extern const char *ns_file_metadata;
 extern const char *ns_sfs;
 // XEP-0448: Encryption for stateless file sharing
 extern const char *ns_esfs;
+// XEP-0449: Stickers
+extern const char *ns_stickers;
 // XEP-0450: Automatic Trust Management (ATM)
 extern const char *ns_atm;
 

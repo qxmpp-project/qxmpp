@@ -257,6 +257,10 @@ public:
     const QVector<QXmppFileShare> &sharedFiles() const;
     void setSharedFiles(const QVector<QXmppFileShare> &sharedFiles);
 
+	// XEP-0449: Stickers
+	const std::optional<QString> &stickerPackId() const;
+	void setStickerPackId(const std::optional<QString> &stickerPackId);
+
     /// \cond
 #ifdef BUILD_OMEMO
     // XEP-0384: OMEMO Encryption
