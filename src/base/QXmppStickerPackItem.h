@@ -63,6 +63,9 @@ public:
     const QVector<QXmppStickerItem> &items() const;
     void setItems(const QVector<QXmppStickerItem> &items);
 
+    bool restricted() const;
+    void setRestricted(bool restricted);
+
     void parsePayload(const QDomElement &payloadElement) override;
     void serializePayload(QXmlStreamWriter *writer) const override;
 

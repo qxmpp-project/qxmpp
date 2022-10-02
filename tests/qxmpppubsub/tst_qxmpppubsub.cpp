@@ -327,6 +327,7 @@ void tst_QXmppPubSub::testStickerPackItem()
     QCOMPARE(item.items().size(), 2);
     QCOMPARE(item.name(), QStringLiteral("Marsey the Cat"));
     QCOMPARE(item.summary(), QStringLiteral("Be cute or be cynical, this little kitten works both ways."));
+    QVERIFY(!item.restricted());
 
     auto &firstItem = item.items().front();
     QCOMPARE(firstItem.suggestedWords().size(), 2);

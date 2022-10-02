@@ -157,7 +157,7 @@ public:
     QString name;
     QString summary;
     QVector<QXmppStickerItem> items;
-    bool restricted;
+    bool restricted = false;
     QXmppHash hash;
 };
 
@@ -222,6 +222,22 @@ const QVector<QXmppStickerItem> &QXmppStickerPackItem::items() const
 void QXmppStickerPackItem::setItems(const QVector<QXmppStickerItem> &items)
 {
     d->items = items;
+}
+
+///
+/// \brief Returns whether this sticker pack can be freely imported
+///
+bool QXmppStickerPackItem::restricted() const
+{
+    return d->restricted;
+}
+
+///
+/// \brief Set whether this sticker pack should be importable by others
+///
+void QXmppStickerPackItem::setRestricted(bool restricted)
+{
+    d->restricted = restricted;
 }
 
 void QXmppStickerPackItem::parsePayload(const QDomElement &payloadElement)
