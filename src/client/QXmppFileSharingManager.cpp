@@ -52,7 +52,7 @@ class UploadImpl : public QXmppUpload
 {
     Q_OBJECT
 public:
-    float progress() override { return calculateProgress(m_bytesSent, m_bytesTotal); }
+    float progress() const override { return calculateProgress(m_bytesSent, m_bytesTotal); }
     void cancel() override
     {
         if (m_providerUpload) {
@@ -61,9 +61,9 @@ public:
         m_metadataFuture.cancel();
         m_hashesFuture.cancel();
     }
-    bool isFinished() override { return m_finished; }
-    quint64 bytesTransferred() override { return m_bytesSent; }
-    quint64 bytesTotal() override { return m_bytesTotal; }
+    bool isFinished() const override { return m_finished; }
+    quint64 bytesTransferred() const override { return m_bytesSent; }
+    quint64 bytesTotal() const override { return m_bytesTotal; }
 
     void reportFinished(Result result)
     {
@@ -86,16 +86,16 @@ public:
 
 class DownloadImpl : public QXmppDownload
 {
-    float progress() override { return calculateProgress(m_bytesReceived, m_bytesTotal); }
+    float progress() const override { return calculateProgress(m_bytesReceived, m_bytesTotal); }
     void cancel() override
     {
         if (m_providerDownload) {
             m_providerDownload->cancel();
         }
     }
-    bool isFinished() override { return m_finished; }
-    quint64 bytesTransferred() override { return m_bytesReceived; }
-    quint64 bytesTotal() override { return m_bytesTotal; }
+    bool isFinished() const override { return m_finished; }
+    quint64 bytesTransferred() const override { return m_bytesReceived; }
+    quint64 bytesTotal() const override { return m_bytesTotal; }
 
 public:
     void reportProgress(quint64 bytesReceived, quint64 bytesTotal)
