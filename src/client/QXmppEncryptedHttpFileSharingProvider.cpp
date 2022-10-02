@@ -6,8 +6,9 @@
 
 #include "QXmppClient.h"
 #include "QXmppFileEncryption.h"
+#include "QXmppFileMetadata.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppHttpUploadManager.h"
-#include "QXmppUpload.h"
 #include "QXmppUtils.h"
 
 #include "QcaInitializer_p.h"
@@ -15,43 +16,6 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
-
-class QXmppSfsEncryptedHttpUpload : public QXmppUpload
-{
-    Q_OBJECT
-
-public:
-    QXmppSfsEncryptedHttpUpload(std::shared_ptr<QXmppHttpUpload> &&httpUpload, const QByteArray &key, const QByteArray &iv)
-        : inner(std::move(httpUpload))
-    {
-        connect(inner.get(), &QXmppHttpUpload::finished, this, [=](const QXmppHttpUpload::Result &result) {
-            Q_EMIT uploadFinished(std::visit([=](auto &&value) -> QXmpp::Private::UploadResult {
-                using T = std::decay_t<decltype(value)>;
-                if constexpr (std::is_same_v<T, QUrl>) {
-                    QXmppEncryptedFileSource encryptedSource;
-                    encryptedSource.setKey(key);
-                    encryptedSource.setIv(iv);
-                    encryptedSource.setHttpSources({ QXmppHttpFileSource(value) });
-                    return std::any(encryptedSource);
-                } else if constexpr (std::is_same_v<T, Cancelled>) {
-                    return Cancelled {};
-                } else if constexpr (std::is_same_v<T, QXmppError>) {
-                    return value;
-                }
-            },
-                                             result));
-        });
-    }
-
-    float progress() override { return inner->progress(); }
-    void cancel() override { inner->cancel(); }
-    bool isFinished() override { return inner->isFinished(); }
-    quint64 bytesTransferred() override { return inner->bytesSent(); }
-    quint64 bytesTotal() override { return inner->bytesTotal(); }
-
-private:
-    std::shared_ptr<QXmppHttpUpload> inner;
-};
 
 ///
 /// \class QXmppEncryptedHttpFileSharingProvider
@@ -65,7 +29,6 @@ class QXmppEncryptedHttpFileSharingProviderPrivate
 {
 public:
     QXmpp::Private::QcaInitializer init;
-    QXmppHttpUploadManager *manager;
     QXmppHttpFileSharingProvider *httpProvider;
 };
 
@@ -77,16 +40,16 @@ public:
 QXmppEncryptedHttpFileSharingProvider::QXmppEncryptedHttpFileSharingProvider(QXmppClient *client, QNetworkAccessManager *netManager)
     : d(std::make_unique<QXmppEncryptedHttpFileSharingProviderPrivate>())
 {
-    qRegisterMetaType<QXmpp::Private::UploadResult>();
-    Q_ASSERT(client);
-    d->manager = client->findExtension<QXmppHttpUploadManager>();
-    Q_ASSERT(d->manager);
     d->httpProvider = new QXmppHttpFileSharingProvider(client, netManager);
 }
 
 QXmppEncryptedHttpFileSharingProvider::~QXmppEncryptedHttpFileSharingProvider() = default;
 
-std::shared_ptr<QXmppDownload> QXmppEncryptedHttpFileSharingProvider::downloadFile(const std::any &source, std::unique_ptr<QIODevice> &&target)
+auto QXmppEncryptedHttpFileSharingProvider::downloadFile(const std::any &source,
+                                                         std::unique_ptr<QIODevice> target,
+                                                         std::function<void(quint64, quint64)> reportProgress,
+                                                         std::function<void(DownloadResult)> reportFinished)
+    -> std::shared_ptr<Download>
 {
     QXmppEncryptedFileSource encryptedSource;
     try {
@@ -97,12 +60,14 @@ std::shared_ptr<QXmppDownload> QXmppEncryptedHttpFileSharingProvider::downloadFi
 
     auto httpSource = encryptedSource.httpSources().front();
     auto output = std::make_unique<Encryption::DecryptionDevice>(std::move(target), encryptedSource.cipher(), encryptedSource.iv(), encryptedSource.key());
-    return d->httpProvider->downloadFile(httpSource, std::move(output));
+    return d->httpProvider->downloadFile(httpSource, std::move(output), std::move(reportProgress), std::move(reportFinished));
 }
 
-std::shared_ptr<QXmppUpload> QXmppEncryptedHttpFileSharingProvider::uploadFile(
-    std::unique_ptr<QIODevice> data,
-    const QXmppFileMetadata &info)
+auto QXmppEncryptedHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
+                                                       const QXmppFileMetadata &,
+                                                       std::function<void(quint64, quint64)> reportProgress,
+                                                       std::function<void(UploadResult)> reportFinished)
+    -> std::shared_ptr<Upload>
 {
     auto cipher = Aes256CbcPkcs7;
     auto key = Encryption::generateKey(cipher);
@@ -111,13 +76,24 @@ std::shared_ptr<QXmppUpload> QXmppEncryptedHttpFileSharingProvider::uploadFile(
     auto encDevice = std::make_unique<Encryption::EncryptionDevice>(std::move(data), cipher, key, iv);
     auto encryptedSize = encDevice->size();
 
-    auto upload = d->manager->uploadFile(
+    QXmppFileMetadata metadata;
+    metadata.setFilename(QXmppUtils::generateStanzaHash(10));
+    metadata.setMediaType(QMimeDatabase().mimeTypeForName("application/octet-stream"));
+    metadata.setSize(encryptedSize);
+
+    return d->httpProvider->uploadFile(
         std::move(encDevice),
-        QXmppUtils::generateStanzaHash(10),
-        QMimeDatabase().mimeTypeForName("application/octet-stream"),
-        encryptedSize);
+        metadata,
+        std::move(reportProgress),
+        [=, reportFinished = std::move(reportFinished)](UploadResult result) {
+            auto encryptedResult = visitForward<UploadResult>(std::move(result), [&](std::any httpSourceAny) {
+                QXmppEncryptedFileSource encryptedSource;
+                encryptedSource.setKey(key);
+                encryptedSource.setIv(iv);
+                encryptedSource.setHttpSources({ std::any_cast<QXmppHttpFileSource>(std::move(httpSourceAny)) });
 
-    return std::make_shared<QXmppSfsEncryptedHttpUpload>(std::move(upload), key, iv);
+                return encryptedSource;
+            });
+            reportFinished(std::move(encryptedResult));
+        });
 }
-
-#include "QXmppEncryptedHttpFileSharingProvider.moc"

@@ -6,7 +6,6 @@
 #define QXMPPFILESHARINGMANAGER_H
 
 #include "QXmppClientExtension.h"
-#include "QXmppFileShare.h"
 #include "QXmppFileSharingProvider.h"
 #include "QXmppGlobal.h"
 
@@ -21,6 +20,7 @@
 
 class QIODevice;
 class QXmppFileMetadata;
+class QXmppFileShare;
 class QXmppFileSharingManagerPrivate;
 
 class QXMPP_EXPORT QXmppFileSharingManager : public QXmppClientExtension
@@ -66,7 +66,7 @@ public:
                                           const std::optional<QString> &description = {});
 
     std::shared_ptr<QXmppDownload> downloadFile(const QXmppFileShare &fileShare,
-                                                std::unique_ptr<QIODevice> &&output);
+                                                std::unique_ptr<QIODevice> output);
 
 private:
     void internalRegisterProvider(std::type_index, std::shared_ptr<QXmppFileSharingProvider> provider);
