@@ -48,6 +48,16 @@ static std::vector<HashAlgorithm> hashAlgorithms()
     };
 }
 
+template<typename T, typename Converter>
+auto transform(T &input, Converter convert)
+{
+    using Output = std::decay_t<decltype(convert(input.front()))>;
+    std::vector<Output> output;
+    output.reserve(input.size());
+    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
+    return output;
+}
+
 class UploadImpl : public QXmppUpload
 {
     Q_OBJECT
@@ -92,6 +102,7 @@ class DownloadImpl : public QXmppDownload
         if (m_providerDownload) {
             m_providerDownload->cancel();
         }
+        m_hashesFuture.cancel();
     }
     bool isFinished() const override { return m_finished; }
     quint64 bytesTransferred() const override { return m_bytesReceived; }
@@ -111,6 +122,8 @@ public:
     }
 
     std::shared_ptr<QXmppFileSharingProvider::Download> m_providerDownload;
+    QFuture<HashVerificationResultPtr> m_hashesFuture;
+    QVector<QXmppHash> m_hashes;
     quint64 m_bytesReceived = 0;
     quint64 m_bytesTotal = 0;
     bool m_finished = false;
@@ -303,12 +316,70 @@ std::shared_ptr<QXmppDownload> QXmppFileSharingManager::downloadFile(
     std::unique_ptr<QIODevice> output)
 {
     auto download = std::make_shared<DownloadImpl>();
+    download->m_hashes = fileShare.metadata().hashes();
+
+    // currently hashing does only work with QFiles
+    auto filePath = [&]() -> QString {
+        if (auto *file = dynamic_cast<QFile *>(output.get())) {
+            return file->fileName();
+        }
+        return {};
+    }();
 
     auto onProgress = [download](quint64 received, quint64 total) {
         download->reportProgress(received, total);
     };
-    auto onFinished = [download](QXmppFileSharingProvider::DownloadResult result) {
-        download->reportFinished(std::move(result));
+    auto onFinished = [this, download, filePath](QXmppFileSharingProvider::DownloadResult result) mutable {
+        // reduce ref count
+        download->m_providerDownload.reset();
+
+        // pass errors directly
+        if (std::holds_alternative<Cancelled>(result)) {
+            download->reportFinished(Cancelled());
+            return;
+        }
+        if (std::holds_alternative<QXmppError>(result)) {
+            download->reportFinished(std::get<QXmppError>(std::move(result)));
+            return;
+        }
+
+        // try to do hash verification
+        if (filePath.isEmpty()) {
+            warning(QStringLiteral("Can't verify hashes of other io devices than QFile!"));
+            download->reportFinished(QXmppDownload::Downloaded { QXmppDownload::NoStrongHashes });
+            return;
+        }
+
+        auto file = std::make_unique<QFile>(filePath);
+        if (!file->open(QIODevice::ReadOnly)) {
+            download->reportFinished(QXmppError::fromFileDevice(*file));
+            return;
+        }
+
+        download->m_hashesFuture = verifyHashes(
+            std::move(file),
+            transform(download->m_hashes, [](auto hash) { return hash; }));
+
+        await(download->m_hashesFuture, this, [download = std::move(download)](HashVerificationResultPtr hashResult) {
+            download->reportFinished(visitForward<QXmppDownload::Result>(hashResult->result, overloaded {
+                [](HashVerificationResult::NoStrongHashes) {
+                    return QXmppDownload::Downloaded {
+                        QXmppDownload::NoStrongHashes
+                    };
+                },
+                [](HashVerificationResult::NotMatching) {
+                    return QXmppError {
+                        QStringLiteral("Checksum does not match"),
+                        {}
+                    };
+                },
+                [](HashVerificationResult::Verified) {
+                    return QXmppDownload::Downloaded {
+                        QXmppDownload::HashVerified
+                    };
+                }
+            }));
+        });
     };
 
     fileShare.visitSources([&](const std::any &source) {
