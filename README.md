@@ -4,14 +4,33 @@ SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-# QXmpp
+<h1 align="center">
+    QXmpp
+    <a href="https://xmpp.org/extensions/xep-0459.html">
+        <img alt="XMPP:2022 Client IM Mobile+ Compliance Badge" src="https://img.shields.io/badge/XMPP%3A2022%20Client-Core%20IM%20Mobile%2B-green">
+    </a>
+</h1>
 
-[![XMPP:2022 Client IM Mobile+ Compliance Badge](https://img.shields.io/badge/XMPP%3A2022%20Client-Core%20IM%20Mobile%2B-green)][xmpp-compliance]
-[![Build Status](https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg)](https://github.com/qxmpp-project/qxmpp/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg)](https://codecov.io/gh/qxmpp-project/qxmpp)
-[![Latest release](https://img.shields.io/github/v/release/qxmpp-project/qxmpp)](https://github.com/qxmpp-project/qxmpp/releases/latest)
-[![Documentation](https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdoc.qxmpp.org%2F)][qxmpp-doc]
-[![Development Chat](https://search.jabbercat.org/api/1.0/badge?address=qxmpp@muc.kaidan.im)][dev-chat]
+<p align="center">
+    <a href="https://github.com/qxmpp-project/qxmpp/actions">
+        <img alt="Build Status" src="https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg">
+    </a>
+    <a href="https://codecov.io/gh/qxmpp-project/qxmpp">
+        <img alt="Code Coverage" src="https://img.shields.io/codecov/c/github/qxmpp-project/qxmpp.svg">
+    </a>
+    <a href="https://github.com/qxmpp-project/qxmpp/releases/latest">
+        <img alt="Latest release" src="https://img.shields.io/github/v/release/qxmpp-project/qxmpp">
+    </a>
+    <a href="https://doc.qxmpp.org/">
+        <img alt="Documentation" src="https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdoc.qxmpp.org%2F">
+    </a>
+    <a href="xmpp:qxmpp@muc.kaidan.im?join">
+        <img alt="Development Chat" src="https://search.jabbercat.org/api/1.0/badge?address=qxmpp@muc.kaidan.im">
+    </a>
+    <a href="https://liberapay.com/QXmpp/donate">
+        <img alt="Donate using Liberapay" src="https://img.shields.io/liberapay/patrons/QXmpp.svg?logo=liberapay">
+    </a>
+</p>
 
 QXmpp is a cross-platform C++ XMPP client and server library. It is written
 in C++ and uses Qt framework.
@@ -111,6 +130,4 @@ is already know at:
 
 https://github.com/qxmpp-project/qxmpp/issues
 
-[dev-chat]: xmpp:qxmpp@muc.kaidan.im?join
 [xmpp-compliance]: https://xmpp.org/extensions/xep-0459.html
-[qxmpp-doc]: https://doc.qxmpp.org/
