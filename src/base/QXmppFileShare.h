@@ -49,6 +49,7 @@ public:
 
 protected:
     friend class QXmppFileSharingManager;
+    friend class QXmppFileUpload;
 
     // Private, internally used API:
     void visitSources(std::function<bool(const std::any &)> &&visitor) const;

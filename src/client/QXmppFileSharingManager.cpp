@@ -62,12 +62,15 @@ public:
     std::shared_ptr<QXmppFileSharingProvider::Upload> providerUpload;
     QFuture<std::shared_ptr<MetadataGeneratorResult>> metadataFuture;
     QFuture<HashingResultPtr> hashesFuture;
+    std::optional<QXmppError> error;
     QXmppFileMetadata metadata;
     QXmppBitsOfBinaryDataList dataBlobs;
     std::any source;
     quint64 bytesSent = 0;
     quint64 bytesTotal = 0;
     bool finished = false;
+    bool cancelled = false;
+    bool success = false;
 };
 
 ///
@@ -159,6 +162,32 @@ quint64 QXmppFileUpload::bytesTotal() const
 }
 
 ///
+/// \brief Returns the result of the upload.
+///
+/// The upload must be finished when calling this.
+///
+QXmppFileUpload::Result QXmppFileUpload::result() const
+{
+    Q_ASSERT(d->finished);
+
+    if (d->error) {
+        return *d->error;
+    }
+    if (d->cancelled) {
+        return Cancelled();
+    }
+    if (d->success) {
+        QXmppFileShare fs;
+        fs.setMetadata(d->metadata);
+        fs.addSource(d->source);
+
+        return FileResult { std::move(fs), d->dataBlobs };
+    }
+
+    Q_UNREACHABLE();
+}
+
+///
 /// \fn QXmppFileUpload::finished
 ///
 /// Emitted when the upload has finished.
@@ -169,11 +198,12 @@ QXmppFileUpload::QXmppFileUpload()
 {
 }
 
-void QXmppFileUpload::reportFinished(Result result)
+void QXmppFileUpload::reportFinished()
 {
+    Q_ASSERT(d->error || d->cancelled || d->success);
     if (!d->finished) {
         d->finished = true;
-        Q_EMIT finished(std::move(result));
+        Q_EMIT finished();
     }
 }
 
@@ -183,6 +213,7 @@ public:
     std::shared_ptr<QXmppFileSharingProvider::Download> providerDownload;
     QFuture<HashVerificationResultPtr> hashesFuture;
     QVector<QXmppHash> hashes;
+    QXmppFileDownload::Result result;
     quint64 bytesReceived = 0;
     quint64 bytesTotal = 0;
     bool finished = false;
@@ -273,6 +304,17 @@ quint64 QXmppFileDownload::bytesTotal() const
 }
 
 ///
+/// \brief Returns the result of the download.
+///
+/// The download must be finished when calling this.
+///
+QXmppFileDownload::Result QXmppFileDownload::result() const
+{
+    Q_ASSERT(d->finished);
+    return d->result;
+}
+
+///
 /// \fn QXmppFileDownload::finished
 ///
 /// Emitted when the download has finished.
@@ -293,7 +335,8 @@ void QXmppFileDownload::reportProgress(quint64 bytesReceived, quint64 bytesTotal
 void QXmppFileDownload::reportFinished(Result result)
 {
     d->finished = true;
-    Q_EMIT finished(std::move(result));
+    d->result = std::move(result);
+    Q_EMIT finished();
 }
 
 class QXmppFileSharingManagerPrivate
@@ -373,7 +416,8 @@ std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::sendFile(std::shared_p
     auto openFile = [=]() -> std::unique_ptr<QIODevice> {
         auto device = std::make_unique<QFile>(fileInfo.absoluteFilePath());
         if (!device->open(QIODevice::ReadOnly)) {
-            upload->reportFinished(QXmppError::fromIoDevice(*device));
+            upload->d->error = QXmppError::fromIoDevice(*device);
+            upload->reportFinished();
         }
         return device;
     };
@@ -441,23 +485,21 @@ std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::sendFile(std::shared_p
                                            return hash;
                                        });
                         upload->d->metadata.setHashes(hashes);
-
-                        QXmppFileShare fs;
-                        fs.setMetadata(upload->d->metadata);
-                        fs.addSource(upload->d->source);
-
-                        upload->reportFinished(QXmppFileUpload::FileResult { fs, std::move(upload->d->dataBlobs) });
+                        upload->d->success = true;
                     } else if (std::holds_alternative<Cancelled>(hashValue)) {
-                        upload->reportFinished(Cancelled());
+                        upload->d->cancelled = true;
                     } else if (std::holds_alternative<QXmppError>(hashValue)) {
-                        upload->reportFinished(std::get<QXmppError>(std::move(hashValue)));
+                        upload->d->error = std::get<QXmppError>(std::move(hashValue));
                     }
+                    upload->reportFinished();
                 });
             });
         } else if (std::holds_alternative<Cancelled>(uploadResult)) {
-            upload->reportFinished(Cancelled());
+            upload->d->cancelled = true;
+            upload->reportFinished();
         } else if (std::holds_alternative<QXmppError>(uploadResult)) {
-            upload->reportFinished(std::get<QXmppError>(std::move(uploadResult)));
+            upload->d->error = std::get<QXmppError>(std::move(uploadResult));
+            upload->reportFinished();
         }
     };
 

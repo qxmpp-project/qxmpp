@@ -51,13 +51,14 @@ public:
     bool isFinished() const;
     quint64 bytesTransferred() const;
     quint64 bytesTotal() const;
+    Result result() const;
 
-    Q_SIGNAL void finished(QXmppFileUpload::Result);
+    Q_SIGNAL void finished();
 
 private:
     QXmppFileUpload();
 
-    void reportFinished(Result);
+    void reportFinished();
 
     std::unique_ptr<QXmppFileUploadPrivate> d;
     friend class QXmppFileSharingManager;
@@ -100,8 +101,9 @@ public:
     bool isFinished() const;
     quint64 bytesTransferred() const;
     quint64 bytesTotal() const;
+    Result result() const;
 
-    Q_SIGNAL void finished(QXmppFileDownload::Result);
+    Q_SIGNAL void finished();
 
 private:
     QXmppFileDownload();
