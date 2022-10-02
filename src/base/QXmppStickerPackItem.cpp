@@ -7,6 +7,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppFileMetadata.h"
+#include "qdebug.h"
 
 #include <QXmlStreamWriter>
 
@@ -16,6 +17,7 @@ public:
     QXmppFileMetadata metadata;
     QVector<QXmppHttpFileSource> httpSources;
     QVector<QXmppEncryptedFileSource> encryptedSources;
+    std::optional<QString> suggest;
 };
 
 QXmppStickerItem::QXmppStickerItem()
@@ -23,10 +25,14 @@ QXmppStickerItem::QXmppStickerItem()
 {
 }
 
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppStickerItem)
+
 ///
 /// \class QXmppStickerItem
 ///
 /// This class represents a single sticker when publishing or retrieving it.
+///
+/// \since QXmpp 1.5
 ///
 
 ///
@@ -77,18 +83,32 @@ void QXmppStickerItem::setEncryptedSources(const QVector<QXmppEncryptedFileSourc
     d->encryptedSources = encryptedSources;
 }
 
-QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppStickerItem)
+const std::optional<QString> &QXmppStickerItem::suggest() const
+{
+    return d->suggest;
+}
+
+void QXmppStickerItem::setSuggest(const std::optional<QString> &suggest)
+{
+    d->suggest = suggest;
+}
 
 /// \cond
 void QXmppStickerItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("item");
     d->metadata.toXml(writer);
+    writer->writeStartElement("sources");
+    writer->writeDefaultNamespace(ns_sfs);
     for (const auto &httpSource : d->httpSources) {
         httpSource.toXml(writer);
     }
     for (const auto &encryptedSource : d->encryptedSources) {
         encryptedSource.toXml(writer);
+    }
+    writer->writeEndElement();
+    if (d->suggest) {
+        writer->writeTextElement("suggest", *d->suggest);
     }
     writer->writeEndElement();
 }
@@ -115,6 +135,10 @@ bool QXmppStickerItem::parse(const QDomElement &element)
         }
     }
 
+    if (auto el = element.firstChildElement("suggest"); !el.isNull()) {
+        d->suggest = el.text();
+    }
+
     return true;
 }
 /// \endcond
@@ -125,6 +149,7 @@ public:
     QString name;
     QString summary;
     QVector<QXmppStickerItem> items;
+    QXmppHash hash;
 };
 
 QXmppStickerPackItem::QXmppStickerPackItem()
@@ -132,10 +157,14 @@ QXmppStickerPackItem::QXmppStickerPackItem()
 {
 }
 
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppStickerPackItem)
+
 ///
 /// \class QXmppStickerPackitem
 ///
-/// A pubsub item for a sticker pack.
+/// A pubsub item that represents a sticker pack.
+///
+/// \since QXmpp 1.5
 ///
 
 ///
@@ -186,8 +215,6 @@ void QXmppStickerPackItem::setItems(const QVector<QXmppStickerItem> &items)
     d->items = items;
 }
 
-QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppStickerPackItem)
-
 void QXmppStickerPackItem::parsePayload(const QDomElement &payloadElement)
 {
     d->name = payloadElement.firstChildElement("name").text();
@@ -195,12 +222,14 @@ void QXmppStickerPackItem::parsePayload(const QDomElement &payloadElement)
 
     for (auto firstChild = payloadElement.firstChildElement("item");
          !firstChild.isNull();
-         firstChild.nextSibling()) {
+         firstChild = firstChild.nextSiblingElement("item")) {
         QXmppStickerItem stickerItem;
-        stickerItem.parse(payloadElement);
+        stickerItem.parse(firstChild);
 
         d->items.push_back(std::move(stickerItem));
     }
+
+    d->hash.parse(payloadElement.firstChildElement("hash"));
 }
 
 void QXmppStickerPackItem::serializePayload(QXmlStreamWriter *writer) const
@@ -215,5 +244,6 @@ void QXmppStickerPackItem::serializePayload(QXmlStreamWriter *writer) const
         item.toXml(writer);
     }
 
+    d->hash.toXml(writer);
     writer->writeEndElement();
 }

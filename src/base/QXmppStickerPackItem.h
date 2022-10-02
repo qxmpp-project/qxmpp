@@ -9,6 +9,8 @@
 
 #include <QVector>
 
+#include <optional>
+
 class QXmppFileMetadata;
 class QXmppHttpFileSource;
 class QXmppEncryptedFileSource;
@@ -30,6 +32,9 @@ public:
 
     const QVector<QXmppEncryptedFileSource> &encryptedSources() const;
     void setEncryptedSources(const QVector<QXmppEncryptedFileSource> &encryptedSources);
+
+    const std::optional<QString> &suggest() const;
+    void setSuggest(const std::optional<QString> &suggest);
 
     /// \cond
     bool parse(const QDomElement &element);
