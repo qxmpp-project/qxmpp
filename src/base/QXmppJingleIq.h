@@ -16,6 +16,8 @@ class QXmppJingleCandidatePrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
+class QXmppJingleRtpCryptoElementPrivate;
+class QXmppJingleRtpEncryptionPrivate;
 class QXmppJingleRtpFeedbackPropertyPrivate;
 class QXmppJingleRtpHeaderExtensionPropertyPrivate;
 class QXmppSdpParameterPrivate;
@@ -42,6 +44,60 @@ public:
 
 private:
     QSharedDataPointer<QXmppSdpParameterPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpCryptoElement
+{
+public:
+    QXmppJingleRtpCryptoElement();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpCryptoElement)
+
+    uint32_t tag() const;
+    void setTag(uint32_t tag);
+
+    QString cryptoSuite() const;
+    void setCryptoSuite(const QString &cryptoSuite);
+
+    QString keyParams() const;
+    void setKeyParams(const QString &keyParams);
+
+    QString sessionParams() const;
+    void setSessionParams(const QString &sessionParams);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpCryptoElement(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpCryptoElementPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppJingleRtpEncryption
+{
+public:
+    QXmppJingleRtpEncryption();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleRtpEncryption)
+
+    bool isRequired() const;
+    void setRequired(bool isRequired);
+
+    QVector<QXmppJingleRtpCryptoElement> cryptoElements() const;
+    void setCryptoElements(const QVector<QXmppJingleRtpCryptoElement> &cryptoElements);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleRtpEncryption(const QDomElement &element);
+
+private:
+    QSharedDataPointer<QXmppJingleRtpEncryptionPrivate> d;
 };
 
 class QXMPP_EXPORT QXmppJingleRtpFeedbackProperty
@@ -349,6 +405,9 @@ public:
 
         bool isRtpMultiplexingSupported() const;
         void setRtpMultiplexingSupported(bool isRtpMultiplexingSupported);
+
+        std::optional<QXmppJingleRtpEncryption> rtpEncryption() const;
+        void setRtpEncryption(const std::optional<QXmppJingleRtpEncryption> &rtpEncryption);
 
         void addPayloadType(const QXmppJinglePayloadType &payload);
         QList<QXmppJinglePayloadType> payloadTypes() const;

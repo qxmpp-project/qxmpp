@@ -240,6 +240,9 @@ public:
     QList<QXmppJinglePayloadType> payloadTypes;
     QList<QXmppJingleCandidate> transportCandidates;
 
+    // XEP-0167: Jingle RTP Sessions
+    std::optional<QXmppJingleRtpEncryption> rtpEncryption;
+
     // XEP-0293: Jingle RTP Feedback Negotiation
     QVector<QXmppJingleRtpFeedbackProperty> rtpFeedbackProperties;
     QVector<QXmppJingleRtpFeedbackInterval> rtpFeedbackIntervals;
@@ -416,6 +419,31 @@ bool QXmppJingleIq::Content::isRtpMultiplexingSupported() const
 void QXmppJingleIq::Content::setRtpMultiplexingSupported(bool isRtpMultiplexingSupported)
 {
     d->isRtpMultiplexingSupported = isRtpMultiplexingSupported;
+}
+
+///
+/// Returns the encryption used for SRTP negotiation as specified by
+/// \xep{0167, Jingle RTP Sessions}.
+///
+/// \return the RTP encryption via SRTP
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppJingleRtpEncryption> QXmppJingleIq::Content::rtpEncryption() const
+{
+    return d->rtpEncryption;
+}
+
+///
+/// Sets the encryption used for SRTP negotiation as specified by \xep{0167, Jingle RTP Sessions}.
+///
+/// \param rtpEncryption RTP encryption via SRTP
+///
+/// \since QXmpp 1.5
+///
+void QXmppJingleIq::Content::setRtpEncryption(const std::optional<QXmppJingleRtpEncryption> &rtpEncryption)
+{
+    d->rtpEncryption = rtpEncryption;
 }
 
 void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
@@ -664,6 +692,17 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->descriptionSsrc = descriptionElement.attribute(QStringLiteral("ssrc")).toULong();
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
 
+    for (auto childElement = descriptionElement.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (QXmppJingleRtpEncryption::isJingleRtpEncryption(childElement)) {
+            QXmppJingleRtpEncryption encryption;
+            encryption.parse(childElement);
+            d->rtpEncryption = encryption;
+            break;
+        }
+    }
+
     parseJingleRtpFeedbackNegotiationElements(descriptionElement, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
     parseJingleRtpHeaderExtensionsNegotiationElements(descriptionElement, d->rtpHeaderExtensionProperties, d->isRtpHeaderExtensionMixingAllowed);
 
@@ -721,6 +760,10 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
 
         if (d->isRtpMultiplexingSupported) {
             writer->writeEmptyElement(QStringLiteral("rtcp-mux"));
+        }
+
+        if (d->rtpEncryption) {
+            d->rtpEncryption->toXml(writer);
         }
 
         jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
@@ -2113,6 +2156,265 @@ void QXmppSdpParameter::toXml(QXmlStreamWriter *writer) const
 bool QXmppSdpParameter::isSdpParameter(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("parameter");
+}
+
+class QXmppJingleRtpCryptoElementPrivate : public QSharedData
+{
+public:
+    uint32_t tag = 0;
+    QString cryptoSuite;
+    QString keyParams;
+    QString sessionParams;
+};
+
+///
+/// \class QXmppJingleRtpCryptoElement
+///
+/// \brief The QXmppJingleRtpCryptoElement class represents the \xep{0167: Jingle RTP Sessions}
+/// "crypto" element used for SRTP negotiation.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// Constructs a Jingle RTP crypto element.
+///
+QXmppJingleRtpCryptoElement::QXmppJingleRtpCryptoElement()
+    : d(new QXmppJingleRtpCryptoElementPrivate())
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpCryptoElement)
+
+///
+/// Returns the tag used as an identifier for the crypto element.
+///
+/// \return the identifying tag
+///
+uint32_t QXmppJingleRtpCryptoElement::tag() const
+{
+    return d->tag;
+}
+
+///
+/// Sets the tag used as an identifier for the crypto element.
+///
+/// \param tag identifying tag
+///
+void QXmppJingleRtpCryptoElement::setTag(uint32_t tag)
+{
+    d->tag = tag;
+}
+
+///
+/// Returns the crypto suite used as an identifier for describing the encryption and authentication
+/// algorithms.
+///
+/// \return the identifying crypto suite
+///
+QString QXmppJingleRtpCryptoElement::cryptoSuite() const
+{
+    return d->cryptoSuite;
+}
+
+///
+/// Sets the crypto suite used as an identifier for describing the encryption and authentication
+/// algorithms.
+///
+/// \param cryptoSuite identifying crypto suite
+///
+void QXmppJingleRtpCryptoElement::setCryptoSuite(const QString &cryptoSuite)
+{
+    d->cryptoSuite = cryptoSuite;
+}
+
+///
+/// Returns the key parameters providing one or more sets of keying material for the crypto suite.
+///
+/// \return the key parameters providing one or more sets of keying material
+///
+QString QXmppJingleRtpCryptoElement::keyParams() const
+{
+    return d->keyParams;
+}
+
+///
+/// Sets the key parameters providing one or more sets of keying material for the crypto suite.
+///
+/// \param keyParams key parameters providing one or more sets of keying material
+///
+void QXmppJingleRtpCryptoElement::setKeyParams(const QString &keyParams)
+{
+    d->keyParams = keyParams;
+}
+
+///
+/// Returns the session parameters providing transport-specific data.
+///
+/// \return the session parameters providing transport-specific data
+///
+QString QXmppJingleRtpCryptoElement::sessionParams() const
+{
+    return d->sessionParams;
+}
+
+///
+/// Sets the session parameters providing transport-specific data.
+///
+/// \param sessionParams session parameters providing transport-specific data
+///
+void QXmppJingleRtpCryptoElement::setSessionParams(const QString &sessionParams)
+{
+    d->sessionParams = sessionParams;
+}
+
+/// \cond
+void QXmppJingleRtpCryptoElement::parse(const QDomElement &element)
+{
+    d->tag = element.attribute(QStringLiteral("tag")).toUInt();
+    d->cryptoSuite = element.attribute(QStringLiteral("crypto-suite"));
+    d->keyParams = element.attribute(QStringLiteral("key-params"));
+    d->sessionParams = element.attribute(QStringLiteral("session-params"));
+}
+
+void QXmppJingleRtpCryptoElement::toXml(QXmlStreamWriter *writer) const
+{
+    if (!d->cryptoSuite.isEmpty() && !d->keyParams.isEmpty()) {
+        writer->writeStartElement(QStringLiteral("crypto"));
+        writer->writeAttribute(QStringLiteral("tag"), QString::number(d->tag));
+        writer->writeAttribute(QStringLiteral("crypto-suite"), d->cryptoSuite);
+        writer->writeAttribute(QStringLiteral("key-params"), d->keyParams);
+        helperToXmlAddAttribute(writer, QStringLiteral("session-params"), d->sessionParams);
+        writer->writeEndElement();
+    }
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an RTP crypto element.
+///
+/// \param element DOM element being checked
+///
+/// \return whether element is an RTP crypto element
+///
+bool QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("crypto");
+}
+
+class QXmppJingleRtpEncryptionPrivate : public QSharedData
+{
+public:
+    bool isRequired = false;
+    QVector<QXmppJingleRtpCryptoElement> cryptoElements;
+};
+
+///
+/// \class QXmppJingleRtpEncryption
+///
+/// \brief The QXmppJingleRtpEncryption class represents the \xep{0167: Jingle RTP Sessions}
+/// "encryption" element used for SRTP negotiation.
+///
+/// \since QXmpp 1.5
+///
+
+///
+/// Constructs a Jingle RTP encryption.
+///
+QXmppJingleRtpEncryption::QXmppJingleRtpEncryption()
+    : d(new QXmppJingleRtpEncryptionPrivate())
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleRtpEncryption)
+
+///
+/// Returns whether encryption via SRTP is required.
+///
+/// \return whether encryption is required
+///
+bool QXmppJingleRtpEncryption::isRequired() const
+{
+    return d->isRequired;
+}
+
+///
+/// Sets whether encryption via SRTP is required.
+///
+/// \param isRequired whether encryption is required
+///
+void QXmppJingleRtpEncryption::setRequired(bool isRequired)
+{
+    d->isRequired = isRequired;
+}
+
+///
+/// Returns the crypto elements used for encryption via SRTP.
+///
+/// \return the crypto elements
+///
+QVector<QXmppJingleRtpCryptoElement> QXmppJingleRtpEncryption::cryptoElements() const
+{
+    return d->cryptoElements;
+}
+
+///
+/// Sets the crypto elements used for encryption via SRTP.
+///
+/// \param cryptoElements the crypto elements
+///
+void QXmppJingleRtpEncryption::setCryptoElements(const QVector<QXmppJingleRtpCryptoElement> &cryptoElements)
+{
+    d->cryptoElements = cryptoElements;
+}
+
+/// \cond
+void QXmppJingleRtpEncryption::parse(const QDomElement &element)
+{
+    d->isRequired = element.attribute(QStringLiteral("required")) == QStringLiteral("true") ||
+        element.attribute(QStringLiteral("required")) == QStringLiteral("1");
+
+    for (auto childElement = element.firstChildElement();
+         !childElement.isNull();
+         childElement = childElement.nextSiblingElement()) {
+        if (QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(childElement)) {
+            QXmppJingleRtpCryptoElement cryptoElement;
+            cryptoElement.parse(childElement);
+            d->cryptoElements.append(std::move(cryptoElement));
+        }
+    }
+}
+
+void QXmppJingleRtpEncryption::toXml(QXmlStreamWriter *writer) const
+{
+    if (!d->cryptoElements.isEmpty()) {
+        writer->writeStartElement(QStringLiteral("encryption"));
+        writer->writeDefaultNamespace(ns_jingle_rtp);
+
+        if (d->isRequired) {
+            writer->writeAttribute(QStringLiteral("required"), QStringLiteral("1"));
+        }
+
+        for (const auto &cryptoElement : std::as_const(d->cryptoElements)) {
+            cryptoElement.toXml(writer);
+        }
+
+        writer->writeEndElement();
+    }
+}
+/// \endcond
+
+///
+/// Determines whether the given DOM element is an RTP encryption element.
+///
+/// \param element DOM element being checked
+///
+/// \return whether element is an RTP encryption element
+///
+bool QXmppJingleRtpEncryption::isJingleRtpEncryption(const QDomElement &element)
+{
+    return element.tagName() == QStringLiteral("encryption") &&
+        element.namespaceURI() == ns_jingle_rtp;
 }
 
 class QXmppJingleRtpFeedbackPropertyPrivate : public QSharedData
