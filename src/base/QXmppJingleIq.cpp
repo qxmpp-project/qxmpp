@@ -2104,7 +2104,7 @@ bool QXmppSdpParameter::isSdpParameter(const QDomElement &element)
 class QXmppJingleRtpCryptoElementPrivate : public QSharedData
 {
 public:
-    uint32_t tag;
+    uint32_t tag = 0;
     QString cryptoSuite;
     QString keyParams;
     QString sessionParams;
