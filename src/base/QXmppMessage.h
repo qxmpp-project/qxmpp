@@ -18,6 +18,7 @@
 
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
+class QXmppMessageReaction;
 class QXmppMixInvitation;
 #ifdef BUILD_OMEMO
 class QXmppOmemoElement;
@@ -252,6 +253,10 @@ public:
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement() const;
     void setTrustMessageElement(const std::optional<QXmppTrustMessageElement> &trustMessageElement);
+
+    // XEP-0444: Message Reactions
+    std::optional<QXmppMessageReaction> reaction() const;
+    void setReaction(const std::optional<QXmppMessageReaction> &reaction);
 
     // XEP-0447: Stateless file sharing
     const QVector<QXmppFileShare> &sharedFiles() const;
