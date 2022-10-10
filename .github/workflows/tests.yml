@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt update && sudo apt install -y libxml2-utils
-      - run: xmllint --noout $(find . -type f -name *.xml* ! -name *.license)
+      - run: xmllint --noout $(find . -type f -name *.xml)
   reuse:
     runs-on: ubuntu-latest
     steps:
