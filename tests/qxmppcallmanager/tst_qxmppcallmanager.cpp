@@ -8,35 +8,19 @@
 
 #include "util.h"
 #include <QBuffer>
-#include <QObject>
 
 class tst_QXmppCallManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void init();
-    void testCall();
-
-    void acceptCall(QXmppCall *call);
-
 private:
-    QXmppCall *receiverCall;
+    Q_SLOT void testCall();
 };
-
-void tst_QXmppCallManager::init()
-{
-    receiverCall = nullptr;
-}
-
-void tst_QXmppCallManager::acceptCall(QXmppCall *call)
-{
-    receiverCall = call;
-    call->accept();
-}
 
 void tst_QXmppCallManager::testCall()
 {
+    QXmppCall *receiverCall = nullptr;
+
     const QString testDomain("localhost");
     const QHostAddress testHost(QHostAddress::LocalHost);
     const quint16 testPort = 12345;
@@ -77,8 +61,10 @@ void tst_QXmppCallManager::testCall()
     // prepare receiver
     QXmppClient receiver;
     auto *receiverManager = new QXmppCallManager;
-    connect(receiverManager, &QXmppCallManager::callReceived,
-            this, &tst_QXmppCallManager::acceptCall);
+    connect(receiverManager, &QXmppCallManager::callReceived, this, [&receiverCall](QXmppCall *call) {
+        receiverCall = call;
+        call->accept();
+    });
     receiver.addExtension(receiverManager);
     receiver.setLogger(&logger);
 
