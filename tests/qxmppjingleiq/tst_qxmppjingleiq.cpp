@@ -17,6 +17,10 @@ private slots:
     void testIsSdpParameter();
     void testSdpParameter();
     void testSdpParameterWithoutValue();
+    void testIsRtpCryptoElement_data();
+    void testIsRtpCryptoElement();
+    void testRtpCryptoElement_data();
+    void testRtpCryptoElement();
     void testIsRtpEncryption_data();
     void testIsRtpEncryption();
     void testRtpEncryption_data();
@@ -113,6 +117,91 @@ void tst_QXmppJingleIq::testSdpParameterWithoutValue()
     serializePacket(parameter2, xml);
 }
 
+void tst_QXmppJingleIq::testIsRtpCryptoElement_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral("<crypto/>")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral("<invalid/>")
+        << false;
+}
+
+void tst_QXmppJingleIq::testIsRtpCryptoElement()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QCOMPARE(QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(xmlToDom(xml)), isValid);
+}
+
+void tst_QXmppJingleIq::testRtpCryptoElement_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("hasSessionParams");
+
+    QTest::newRow("withoutSessionParams")
+        << QByteArrayLiteral("<crypto"
+                             " tag=\"1\""
+                             " crypto-suite=\"AES_CM_128_HMAC_SHA1_80\""
+                             " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\"/>")
+        << false;
+    QTest::newRow("withSessionParams")
+        << QByteArrayLiteral("<crypto"
+                             " tag=\"1\""
+                             " crypto-suite=\"AES_CM_128_HMAC_SHA1_80\""
+                             " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\""
+                             " session-params=\"KDR=1 UNENCRYPTED_SRTCP\"/>")
+        << true;
+}
+
+void tst_QXmppJingleIq::testRtpCryptoElement()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, hasSessionParams);
+
+    QXmppJingleRtpCryptoElement rtpCryptoElement1;
+    QCOMPARE(rtpCryptoElement1.tag(), uint32_t(0));
+    QVERIFY(rtpCryptoElement1.cryptoSuite().isEmpty());
+    QVERIFY(rtpCryptoElement1.keyParams().isEmpty());
+    QVERIFY(rtpCryptoElement1.sessionParams().isEmpty());
+    parsePacket(rtpCryptoElement1, xml);
+
+    QCOMPARE(rtpCryptoElement1.tag(), uint32_t(1));
+    QCOMPARE(rtpCryptoElement1.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
+    QCOMPARE(rtpCryptoElement1.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    if (hasSessionParams) {
+        QCOMPARE(rtpCryptoElement1.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+    } else {
+        QVERIFY(rtpCryptoElement1.sessionParams().isEmpty());
+    }
+
+    serializePacket(rtpCryptoElement1, xml);
+
+    QXmppJingleRtpCryptoElement rtpCryptoElement2;
+    rtpCryptoElement2.setTag(1);
+    rtpCryptoElement2.setCryptoSuite(QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
+    rtpCryptoElement2.setKeyParams(QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+
+    if (hasSessionParams) {
+        rtpCryptoElement2.setSessionParams(QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+    }
+
+    QCOMPARE(rtpCryptoElement2.tag(), uint32_t(1));
+    QCOMPARE(rtpCryptoElement2.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
+    QCOMPARE(rtpCryptoElement2.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    if (hasSessionParams) {
+        QCOMPARE(rtpCryptoElement2.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+    } else {
+        QVERIFY(rtpCryptoElement2.sessionParams().isEmpty());
+    }
+
+    serializePacket(rtpCryptoElement2, xml);
+}
+
 void tst_QXmppJingleIq::testIsRtpEncryption_data()
 {
     QTest::addColumn<QByteArray>("xml");
@@ -141,7 +230,6 @@ void tst_QXmppJingleIq::testRtpEncryption_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isRequired");
-    QTest::addColumn<bool>("hasSessionParams");
     QTest::addColumn<int>("cryptoElementCount");
 
     QTest::newRow("required")
@@ -152,7 +240,6 @@ void tst_QXmppJingleIq::testRtpEncryption_data()
                              " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\"/>"
                              "</encryption>")
         << true
-        << false
         << 1;
     QTest::newRow("optional")
         << QByteArrayLiteral("<encryption xmlns=\"urn:xmpp:jingle:apps:rtp:1\">"
@@ -162,18 +249,6 @@ void tst_QXmppJingleIq::testRtpEncryption_data()
                              " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\"/>"
                              "</encryption>")
         << false
-        << false
-        << 1;
-    QTest::newRow("optionalWithSessionParams")
-        << QByteArrayLiteral("<encryption xmlns=\"urn:xmpp:jingle:apps:rtp:1\">"
-                             "<crypto"
-                             " tag=\"1\""
-                             " crypto-suite=\"AES_CM_128_HMAC_SHA1_80\""
-                             " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\""
-                             " session-params=\"KDR=1 UNENCRYPTED_SRTCP\"/>"
-                             "</encryption>")
-        << false
-        << true
         << 1;
     QTest::newRow("optionalWithMultipleCryptoElements")
         << QByteArrayLiteral("<encryption xmlns=\"urn:xmpp:jingle:apps:rtp:1\">"
@@ -187,7 +262,6 @@ void tst_QXmppJingleIq::testRtpEncryption_data()
                              " key-params=\"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32\"/>"
                              "</encryption>")
         << false
-        << false
         << 2;
 }
 
@@ -195,30 +269,16 @@ void tst_QXmppJingleIq::testRtpEncryption()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isRequired);
-    QFETCH(bool, hasSessionParams);
     QFETCH(int, cryptoElementCount);
 
     QXmppJingleRtpEncryption rtpEncryption1;
     QVERIFY(!rtpEncryption1.isRequired());
     QVERIFY(rtpEncryption1.cryptoElements().isEmpty());
+
     parsePacket(rtpEncryption1, xml);
 
     QCOMPARE(rtpEncryption1.isRequired(), isRequired);
     QCOMPARE(rtpEncryption1.cryptoElements().size(), cryptoElementCount);
-
-    const auto rtpCryptoElement1 = rtpEncryption1.cryptoElements().at(0);
-    QCOMPARE(rtpCryptoElement1.tag(), 1);
-    QCOMPARE(rtpCryptoElement1.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    QCOMPARE(rtpCryptoElement1.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
-    if (hasSessionParams) {
-        QCOMPARE(rtpCryptoElement1.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
-    } else {
-        QVERIFY(rtpCryptoElement1.sessionParams().isEmpty());
-    }
-
-    if (cryptoElementCount == 2) {
-        QCOMPARE(rtpEncryption1.cryptoElements().at(1).tag(), 2);
-    }
 
     serializePacket(rtpEncryption1, xml);
 
@@ -226,10 +286,6 @@ void tst_QXmppJingleIq::testRtpEncryption()
     rtpCryptoElement2.setTag(1);
     rtpCryptoElement2.setCryptoSuite(QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
     rtpCryptoElement2.setKeyParams(QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
-
-    if (hasSessionParams) {
-        rtpCryptoElement2.setSessionParams(QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
-    }
 
     QXmppJingleRtpEncryption rtpEncryption2;
     rtpEncryption2.setRequired(isRequired);
@@ -245,19 +301,10 @@ void tst_QXmppJingleIq::testRtpEncryption()
 
     QCOMPARE(rtpEncryption2.isRequired(), isRequired);
     QCOMPARE(rtpEncryption2.cryptoElements().size(), cryptoElementCount);
-
-    const auto rtpCryptoElement4 = rtpEncryption2.cryptoElements().at(0);
-    QCOMPARE(rtpCryptoElement4.tag(), 1);
-    QCOMPARE(rtpCryptoElement4.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    QCOMPARE(rtpCryptoElement4.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
-    if (hasSessionParams) {
-        QCOMPARE(rtpCryptoElement4.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
-    } else {
-        QVERIFY(rtpCryptoElement4.sessionParams().isEmpty());
-    }
+    QCOMPARE(rtpEncryption2.cryptoElements().at(0).tag(), uint32_t(1));
 
     if (cryptoElementCount == 2) {
-        QCOMPARE(rtpEncryption2.cryptoElements().at(1).tag(), 2);
+        QCOMPARE(rtpEncryption2.cryptoElements().at(1).tag(), uint32_t(2));
     }
 
     serializePacket(rtpEncryption2, xml);
