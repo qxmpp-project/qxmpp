@@ -7,7 +7,7 @@
 
 #include "QXmppGlobal.h"
 
-#include "QList"
+#include "QVector"
 
 class QDomElement;
 class QXmlStreamWriter;
