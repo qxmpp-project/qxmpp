@@ -1575,7 +1575,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         if (QXmppMessageReaction::isMessageReaction(element)) {
             QXmppMessageReaction reaction;
             reaction.parse(element);
-            d->reaction = reaction;
+            d->reaction = std::move(reaction);
             return true;
         }
         // XEP-0448: Stateless file sharing
