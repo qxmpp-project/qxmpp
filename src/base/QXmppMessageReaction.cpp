@@ -7,16 +7,20 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
-#include "QDomElement"
+#include <QDomElement>
+
+class QXmppMessageReactionPrivate : public QSharedData
+{
+public:
+    QString id;
+    QVector<QString> emojis;
+};
 
 ///
 /// \class QXmppMessageReaction
 ///
-/// \brief The QXmppMessageReaction class represents a reaction to a message as specified by
-/// \xep{0444: Message Reactions} containing emojis.
-///
-/// Each element should only consist of unicode codepoints that can be displayed as a single emoji.
-/// Duplicates are not allowed.
+/// \brief The QXmppMessageReaction class represents a reaction to a message in the form of emojis
+/// as specified by \xep{0444: Message Reactions}.
 ///
 /// \since QXmpp 1.5
 ///
@@ -24,7 +28,10 @@
 ///
 /// Constructs a message reaction.
 ///
-QXmppMessageReaction::QXmppMessageReaction() = default;
+QXmppMessageReaction::QXmppMessageReaction()
+    : d(new QXmppMessageReactionPrivate)
+{
+}
 
 QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMessageReaction)
 
@@ -35,7 +42,7 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMessageReaction)
 ///
 QString QXmppMessageReaction::id() const
 {
-    return m_id;
+    return d->id;
 }
 
 ///
@@ -45,32 +52,55 @@ QString QXmppMessageReaction::id() const
 ///
 void QXmppMessageReaction::setId(const QString &id)
 {
-    m_id = id;
+    d->id = id;
+}
+
+///
+/// Returns the emojis in reaction to a message.
+///
+/// \return the emoji reactions
+///
+QVector<QString> QXmppMessageReaction::emojis() const
+{
+    return d->emojis;
+}
+
+///
+/// Sets the emojis in reaction to a message.
+///
+/// Each reaction should only consist of unicode codepoints that can be displayed as a single emoji.
+/// Duplicates are not allowed.
+///
+/// \param emojis emoji reactions
+///
+void QXmppMessageReaction::setEmojis(const QVector<QString> &emojis)
+{
+    d->emojis = emojis;
 }
 
 /// \cond
 void QXmppMessageReaction::parse(const QDomElement &element)
 {
-    m_id = element.attribute(QStringLiteral("id"));
+    d->id = element.attribute(QStringLiteral("id"));
 
     for (auto childElement = element.firstChildElement();
         !childElement.isNull();
         childElement = childElement.nextSiblingElement()) {
-        append(childElement.text());
+        d->emojis.append(childElement.text());
     }
 
     // Remove duplicate emojis.
-    std::sort(this->begin(), this->end());
-    this->erase(std::unique(this->begin(), this->end()), this->end());
+    std::sort(d->emojis.begin(), d->emojis.end());
+    d->emojis.erase(std::unique(d->emojis.begin(), d->emojis.end()), d->emojis.end());
 }
 
 void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("reactions"));
     writer->writeDefaultNamespace(ns_reactions);
-    writer->writeAttribute(QStringLiteral("id"), m_id);
+    writer->writeAttribute(QStringLiteral("id"), d->id);
 
-    for (const auto &reaction : *this) {
+    for (const auto &reaction : d->emojis) {
         helperToXmlAddTextElement(writer, QStringLiteral("reaction"), reaction);
     }
     writer->writeEndElement();

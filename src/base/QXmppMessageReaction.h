@@ -7,12 +7,13 @@
 
 #include "QXmppGlobal.h"
 
-#include "QVector"
+#include <QSharedDataPointer>
 
 class QDomElement;
 class QXmlStreamWriter;
+class QXmppMessageReactionPrivate;
 
-class QXMPP_EXPORT QXmppMessageReaction : public QVector<QString>
+class QXMPP_EXPORT QXmppMessageReaction
 {
 public:
     QXmppMessageReaction();
@@ -22,6 +23,9 @@ public:
     QString id() const;
     void setId(const QString &id);
 
+    QVector<QString> emojis() const;
+    void setEmojis(const QVector<QString> &emojis);
+
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
@@ -30,7 +34,7 @@ public:
     static bool isMessageReaction(const QDomElement &element);
 
 private:
-    QString m_id;
+    QSharedDataPointer<QXmppMessageReactionPrivate> d;
 };
 
 #endif  // QXMPPMESSAGEREACTION_H
