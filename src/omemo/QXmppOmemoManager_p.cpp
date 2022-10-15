@@ -1895,7 +1895,14 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
                         // The device bundle is published before the device data is published.
                         // That way, it ensures that other devices are notified about this new
                         // device only after the corresponding device bundle is published.
-                        auto handleResult = [=, this](bool isPublished) mutable {
+                        auto handleResult = [this,
+                                             interface,
+                                             deviceListNodeExists,
+                                             arePublishOptionsSupported,
+                                             isAutomaticCreationSupported,
+                                             isCreationAndConfigurationSupported,
+                                             isCreationSupported,
+                                             isConfigurationSupported](bool isPublished) mutable {
                             if (isPublished) {
                                 publishDeviceElement(deviceListNodeExists,
                                                      arePublishOptionsSupported,
