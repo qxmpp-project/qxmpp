@@ -1150,6 +1150,7 @@ void tst_QXmppMessage::testReaction()
     serializePacket(message1, xml);
 
     QXmppMessage message2;
+    message2.addHint(QXmppMessage::Store);
     message2.setReaction(QXmppMessageReaction());
     QVERIFY(message2.reaction());
 }

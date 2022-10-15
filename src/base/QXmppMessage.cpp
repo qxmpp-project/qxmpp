@@ -1255,14 +1255,16 @@ std::optional<QXmppMessageReaction> QXmppMessage::reaction() const
 ///
 /// Sets a reaction to a message as defined by \xep{0444, Message Reactions}.
 ///
-/// The corresponding storage hint is automatically set.
+/// The corresponding hint must be set manually:
+/// \code
+/// QXmppMessage::addHint(QXmppMessage::Store)
+/// \endcode
 ///
 /// \since QXmpp 1.5
 ///
 void QXmppMessage::setReaction(const std::optional<QXmppMessageReaction> &reaction)
 {
     d->reaction = reaction;
-    d->hints &= Store;
 }
 
 ///
