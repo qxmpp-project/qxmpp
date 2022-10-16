@@ -6,11 +6,14 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
+#include "QXmppIqHandling.h"
 #include "QXmppVersionIq.h"
 
 #include <QCoreApplication>
 #include <QDomElement>
 #include <QSysInfo>
+
+using namespace QXmpp;
 
 class QXmppVersionManagerPrivate
 {
@@ -119,23 +122,15 @@ QStringList QXmppVersionManager::discoveryFeatures() const
 
 bool QXmppVersionManager::handleStanza(const QDomElement &element)
 {
+    if (QXmpp::handleIqRequests<QXmppVersionIq>(element, client(), this)) {
+        return true;
+    }
+
     if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element)) {
         QXmppVersionIq versionIq;
         versionIq.parse(element);
 
-        if (versionIq.type() == QXmppIq::Get) {
-            // respond to query
-            QXmppVersionIq responseIq;
-            responseIq.setType(QXmppIq::Result);
-            responseIq.setId(versionIq.id());
-            responseIq.setTo(versionIq.from());
-
-            responseIq.setName(clientName());
-            responseIq.setVersion(clientVersion());
-            responseIq.setOs(clientOs());
-
-            client()->sendPacket(responseIq);
-        } else if (versionIq.type() == QXmppIq::Result) {
+        if (versionIq.type() == QXmppIq::Result) {
             // emit response
             emit versionReceived(versionIq);
         }
@@ -144,5 +139,15 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
     }
 
     return false;
+}
+
+QXmppVersionIq QXmppVersionManager::handleIq(QXmppVersionIq &&iq)
+{
+    QXmppVersionIq response;
+    response.setType(QXmppIq::Result);
+    response.setName(clientName());
+    response.setVersion(clientVersion());
+    response.setOs(clientOs());
+    return response;
 }
 /// \endcond
