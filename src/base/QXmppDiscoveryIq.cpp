@@ -433,12 +433,17 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 ///
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    return (queryElement.namespaceURI() == ns_disco_info ||
-            queryElement.namespaceURI() == ns_disco_items);
+    QDomElement queryElement = element.firstChildElement();
+    return checkIqType(queryElement.tagName(), queryElement.namespaceURI());
 }
 
 /// \cond
+bool QXmppDiscoveryIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
+{
+    return tagName == QStringLiteral("query") &&
+        (xmlNamespace == ns_disco_info || xmlNamespace == ns_disco_items);
+}
+
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement("query");

@@ -25,9 +25,10 @@ public:
     void setUtc(const QDateTime &utc);
 
     static bool isEntityTimeIq(const QDomElement &element);
+    /// \cond
+    static bool checkIqType(const QString &tagName, const QString &xmlns);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond

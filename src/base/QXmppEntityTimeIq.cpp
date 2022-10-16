@@ -55,6 +55,11 @@ bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 }
 
 /// \cond
+bool QXmppEntityTimeIq::checkIqType(const QString &tagName, const QString &xmlns)
+{
+    return tagName == QStringLiteral("time") && xmlns == ns_entity_time;
+}
+
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement timeElement = element.firstChildElement("time");
