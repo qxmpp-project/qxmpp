@@ -20,7 +20,7 @@ public:
 /// \class QXmppMessageReaction
 ///
 /// \brief The QXmppMessageReaction class represents a reaction to a message in the form of emojis
-/// as specified by \xep{0444: Message Reactions}.
+/// as specified by \xep{0444, Message Reactions}.
 ///
 /// \since QXmpp 1.5
 ///
