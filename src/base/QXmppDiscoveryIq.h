@@ -102,9 +102,10 @@ public:
     QByteArray verificationString() const;
 
     static bool isDiscoveryIq(const QDomElement &element);
+    /// \cond
+    static bool checkIqType(const QString &tagName, const QString &xmlNamespace);
 
 protected:
-    /// \cond
     void parseElementFromChild(const QDomElement &element) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond

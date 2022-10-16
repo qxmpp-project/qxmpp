@@ -984,6 +984,11 @@ bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
     return nodeRecv.firstChildElement(QStringLiteral("vCard")).namespaceURI() == ns_vcard;
 }
 
+bool QXmppVCardIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
+{
+    return tagName == "vCard" && xmlNamespace == ns_vcard;
+}
+
 void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
 {
     // vCard
