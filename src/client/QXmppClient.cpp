@@ -112,6 +112,8 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         ns_spoiler,
         // XEP-0428: Fallback Indication
         ns_fallback_indication,
+        // XEP-0444: Message Reactions
+        ns_reactions,
     };
 }
 /// \endcond

@@ -199,6 +199,8 @@ const char *ns_mix_misc = "urn:xmpp:mix:misc:0";
 const char *ns_fallback_indication = "urn:xmpp:fallback:0";
 // XEP-0434: Trust Messages (TM)
 const char *ns_tm = "urn:xmpp:tm:1";
+// XEP-0444: Message Reactions
+const char *ns_reactions = "urn:xmpp:reactions:0";
 // XEP-0446: File metadata element
 const char *ns_file_metadata = "urn:xmpp:file:metadata:0";
 // XEP-0447: Stateless file sharing

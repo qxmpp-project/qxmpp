@@ -8,6 +8,7 @@
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppMessage.h"
+#include "QXmppMessageReaction.h"
 #include "QXmppMixInvitation.h"
 #include "QXmppOutOfBandUrl.h"
 #include "QXmppTrustMessageElement.h"
@@ -53,6 +54,7 @@ private slots:
     void testSlashMe();
     void testMixInvitation();
     void testTrustMessageElement();
+    void testReaction();
     void testE2eeFallbackBody();
     void testFileSharing();
     void testEncryptedFileSource();
@@ -1127,6 +1129,30 @@ void tst_QXmppMessage::testTrustMessageElement()
     QXmppMessage message2;
     message2.setTrustMessageElement(QXmppTrustMessageElement());
     QVERIFY(message2.trustMessageElement());
+}
+
+void tst_QXmppMessage::testReaction()
+{
+    const QByteArray xml(
+        "<message id=\"96d73204-a57a-11e9-88b8-4889e7820c76\" to=\"romeo@capulet.net/orchard\" type=\"chat\">"
+        "<store xmlns=\"urn:xmpp:hints\"/>"
+        "<reactions xmlns=\"urn:xmpp:reactions:0\" id=\"744f6e18-a57a-11e9-a656-4889e7820c76\">"
+        "<reaction>🐢</reaction>"
+        "<reaction>👋</reaction>"
+        "</reactions>"
+        "</message>");
+
+    QXmppMessage message1;
+    QVERIFY(!message1.reaction());
+
+    parsePacket(message1, xml);
+    QVERIFY(message1.reaction());
+    serializePacket(message1, xml);
+
+    QXmppMessage message2;
+    message2.addHint(QXmppMessage::Store);
+    message2.setReaction(QXmppMessageReaction());
+    QVERIFY(message2.reaction());
 }
 
 void tst_QXmppMessage::testE2eeFallbackBody()
