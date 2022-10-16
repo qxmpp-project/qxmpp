@@ -19,6 +19,10 @@ private:
 
 void tst_QXmppCallManager::testCall()
 {
+    if (!qEnvironmentVariableIsEmpty("QXMPP_TESTS_SKIP_CALL_MANAGER")) {
+        QSKIP("Skipping because 'QXMPP_TESTS_SKIP_CALL_MANAGER' was set.");
+    }
+
     QXmppCall *receiverCall = nullptr;
 
     const QString testDomain("localhost");
