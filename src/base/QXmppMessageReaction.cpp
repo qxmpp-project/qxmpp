@@ -38,6 +38,11 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMessageReaction)
 ///
 /// Returns the ID of the message for that the reaction is sent.
 ///
+/// For a group chat message, \code QXmppMessage::stanzaId() \endcode is used.
+///
+/// For other message types, \code QXmppMessage::originId() \endcode is used.
+/// If that is not available, \code QXmppMessage::id() \endcode is used.
+///
 /// \return the message's ID
 ///
 QString QXmppMessageReaction::messageId() const
@@ -47,6 +52,12 @@ QString QXmppMessageReaction::messageId() const
 
 ///
 /// Sets the ID of the message for that the reaction is sent.
+///
+/// For a group chat message, \code QXmppMessage::stanzaId() \endcode must be used.
+/// If there is no such ID, a message reaction must not be sent.
+///
+/// For other message types, \code QXmppMessage::originId() \endcode should be used.
+/// If that is not available, \code QXmppMessage::id() \endcode should be used.
 ///
 /// \param messageId message's ID
 ///
