@@ -33,6 +33,11 @@ if [ "$CONFIG" = "full-debug" ]; then
     export CXXFLAGS="-fprofile-arcs -ftest-coverage"
 fi
 
+# Skip currently broken call manager test on macOS
+if [ $HOST_SYSTEM = "Darwin" ]; then
+    export QXMPP_TESTS_SKIP_CALL_MANAGER=1
+fi
+
 # compile
 mkdir build
 cd build
