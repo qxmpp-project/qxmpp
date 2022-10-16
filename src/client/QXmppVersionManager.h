@@ -41,6 +41,7 @@ public:
     /// \cond
     QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &element) override;
+    QXmppVersionIq handleIq(QXmppVersionIq &&iq);
     /// \endcond
 
 Q_SIGNALS:
