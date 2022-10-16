@@ -1257,7 +1257,8 @@ std::optional<QXmppMessageReaction> QXmppMessage::reaction() const
 ///
 /// The corresponding hint must be set manually:
 /// \code
-/// QXmppMessage::addHint(QXmppMessage::Store)
+/// QXmppMessage message;
+/// message.addHint(QXmppMessage::Store);
 /// \endcode
 ///
 /// \since QXmpp 1.5
