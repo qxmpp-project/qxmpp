@@ -57,6 +57,7 @@ public:
     /// \cond
     QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &element) override;
+    std::variant<QXmppDiscoveryIq, QXmppStanza::Error> handleIq(QXmppDiscoveryIq &&iq);
     /// \endcond
 
 Q_SIGNALS:
