@@ -10,7 +10,7 @@
 #include "QXmppDataForm.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppFutureUtils_p.h"
-#include "QXmppGlobal.h"
+#include "QXmppIqHandling.h"
 #include "QXmppStream.h"
 
 #include <QCoreApplication>
@@ -307,28 +307,17 @@ QStringList QXmppDiscoveryManager::discoveryFeatures() const
 
 bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
 {
+    if (QXmpp::handleIqRequests<QXmppDiscoveryIq>(element, client(), this)) {
+        return true;
+    }
+
     if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element)) {
         QXmppDiscoveryIq receivedIq;
         receivedIq.parse(element);
 
         switch (receivedIq.type()) {
         case QXmppIq::Get:
-            if (receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery &&
-                (receivedIq.queryNode().isEmpty() ||
-                 receivedIq.queryNode().startsWith(d->clientCapabilitiesNode))) {
-
-                // respond to info queries for the client itself
-                QXmppDiscoveryIq qxmppFeatures = capabilities();
-                qxmppFeatures.setId(receivedIq.id());
-                qxmppFeatures.setTo(receivedIq.from());
-                qxmppFeatures.setQueryNode(receivedIq.queryNode());
-                client()->sendPacket(qxmppFeatures);
-                return true;
-            } else {
-                // let other managers handle other queries
-                return false;
-            }
-
+            break;
         case QXmppIq::Result:
         case QXmppIq::Error:
             // handle all replies
@@ -345,5 +334,29 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         }
     }
     return false;
+}
+
+std::variant<QXmppDiscoveryIq, QXmppStanza::Error> QXmppDiscoveryManager::handleIq(QXmppDiscoveryIq &&iq)
+{
+    using Error = QXmppStanza::Error;
+
+    if (!iq.queryNode().isEmpty() && !iq.queryNode().startsWith(d->clientCapabilitiesNode)) {
+        return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("Unknown node."));
+    }
+
+    switch (iq.queryType()) {
+    case QXmppDiscoveryIq::InfoQuery: {
+        // respond to info queries for the client itself
+        QXmppDiscoveryIq features = capabilities();
+        features.setQueryNode(iq.queryNode());
+        return features;
+    }
+    case QXmppDiscoveryIq::ItemsQuery: {
+        QXmppDiscoveryIq reply;
+        reply.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+        return reply;
+    }
+    }
+    Q_UNREACHABLE();
 }
 /// \endcond
