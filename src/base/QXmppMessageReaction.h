@@ -20,8 +20,8 @@ public:
 
     QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppMessageReaction)
 
-    QString id() const;
-    void setId(const QString &id);
+    QString messageId() const;
+    void setMessageId(const QString &messageId);
 
     QVector<QString> emojis() const;
     void setEmojis(const QVector<QString> &emojis);

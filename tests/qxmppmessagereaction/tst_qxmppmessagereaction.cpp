@@ -52,21 +52,21 @@ void tst_QXmppMessageReaction::testMessageReaction()
         "</reactions>");
 
     QXmppMessageReaction reaction1;
-    QVERIFY(reaction1.id().isEmpty());
+    QVERIFY(reaction1.messageId().isEmpty());
     QVERIFY(reaction1.emojis().isEmpty());
 
     parsePacket(reaction1, xml);
-    QCOMPARE(reaction1.id(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
+    QCOMPARE(reaction1.messageId(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
     QCOMPARE(reaction1.emojis().at(0), QStringLiteral("🐢"));
     QCOMPARE(reaction1.emojis().at(1), QStringLiteral("👋"));
 
     serializePacket(reaction1, xml);
 
     QXmppMessageReaction reaction2;
-    reaction2.setId(QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
+    reaction2.setMessageId(QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
     reaction2.setEmojis({ QStringLiteral("🐢"), QStringLiteral("👋") });
 
-    QCOMPARE(reaction1.id(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
+    QCOMPARE(reaction1.messageId(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
     QCOMPARE(reaction1.emojis().at(0), QStringLiteral("🐢"));
     QCOMPARE(reaction1.emojis().at(1), QStringLiteral("👋"));
 
@@ -86,7 +86,7 @@ void tst_QXmppMessageReaction::testMessageReactionWithDuplicateEmojis()
     QXmppMessageReaction reaction;
 
     parsePacket(reaction, xml);
-    QCOMPARE(reaction.id(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
+    QCOMPARE(reaction.messageId(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
     QCOMPARE(reaction.emojis().size(), 2);
     QCOMPARE(reaction.emojis().at(0), QStringLiteral("🐢"));
     QCOMPARE(reaction.emojis().at(1), QStringLiteral("👋"));
@@ -100,7 +100,7 @@ void tst_QXmppMessageReaction::testMessageReactionRemoval()
     QXmppMessageReaction reaction;
 
     parsePacket(reaction, xml);
-    QCOMPARE(reaction.id(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
+    QCOMPARE(reaction.messageId(), QStringLiteral("744f6e18-a57a-11e9-a656-4889e7820c76"));
     QCOMPARE(reaction.emojis().size(), 0);
 
     serializePacket(reaction, xml);

@@ -12,7 +12,7 @@
 class QXmppMessageReactionPrivate : public QSharedData
 {
 public:
-    QString id;
+    QString messageId;
     QVector<QString> emojis;
 };
 
@@ -40,19 +40,19 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMessageReaction)
 ///
 /// \return the message's ID
 ///
-QString QXmppMessageReaction::id() const
+QString QXmppMessageReaction::messageId() const
 {
-    return d->id;
+    return d->messageId;
 }
 
 ///
 /// Sets the ID of the message for that the reaction is sent.
 ///
-/// \param id message's ID
+/// \param messageId message's ID
 ///
-void QXmppMessageReaction::setId(const QString &id)
+void QXmppMessageReaction::setMessageId(const QString &messageId)
 {
-    d->id = id;
+    d->messageId = messageId;
 }
 
 ///
@@ -81,7 +81,7 @@ void QXmppMessageReaction::setEmojis(const QVector<QString> &emojis)
 /// \cond
 void QXmppMessageReaction::parse(const QDomElement &element)
 {
-    d->id = element.attribute(QStringLiteral("id"));
+    d->messageId = element.attribute(QStringLiteral("id"));
 
     for (auto childElement = element.firstChildElement();
          !childElement.isNull();
@@ -98,7 +98,7 @@ void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("reactions"));
     writer->writeDefaultNamespace(ns_reactions);
-    writer->writeAttribute(QStringLiteral("id"), d->id);
+    writer->writeAttribute(QStringLiteral("id"), d->messageId);
 
     for (const auto &reaction : d->emojis) {
         helperToXmlAddTextElement(writer, QStringLiteral("reaction"), reaction);
