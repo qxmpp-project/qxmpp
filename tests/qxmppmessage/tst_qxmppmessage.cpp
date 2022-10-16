@@ -1283,7 +1283,7 @@ void tst_QXmppMessage::testStickers()
     parsePacket(message1, xml);
     QVERIFY(!message1.sharedFiles().empty());
     QVERIFY(message1.stickerPackId().has_value());
-    Q_ASSERT(message1.stickerPackId().value() == QStringLiteral("EpRv28DHHzFrE4zd"));
+    QCOMPARE(message1.stickerPackId().value(), QStringLiteral("EpRv28DHHzFrE4zd+xaNpVb4"));
     serializePacket(message1, xml);
 }
 
