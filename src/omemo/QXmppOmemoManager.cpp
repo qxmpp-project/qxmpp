@@ -1017,6 +1017,30 @@ QFuture<QXmppE2eeExtension::MessageEncryptResult> Manager::encryptMessage(QXmppM
     return d->encryptMessageForRecipients(std::move(message), recipientJids, *acceptedTrustLevels);
 }
 
+QFuture<QXmppE2eeExtension::MessageDecryptResult> QXmppOmemoManager::decryptMessage(QXmppMessage &&message)
+{
+    if (!d->isStarted) {
+        return makeReadyFuture<MessageDecryptResult>(QXmppError {
+            QStringLiteral("OMEMO manager must be started before decrypting"),
+            SendError::EncryptionError });
+    }
+
+    auto omemoElement = message.omemoElement();
+    if (!omemoElement) {
+        return makeReadyFuture<MessageDecryptResult>(NotEncrypted());
+    }
+
+    return chain<MessageDecryptResult>(d->decryptMessage(message), this, [](std::optional<QXmppMessage> message) -> MessageDecryptResult {
+        if (message) {
+            return std::move(*message);
+        }
+        return QXmppError {
+            QStringLiteral("Couldn't decrypt message"),
+            {}
+        };
+    });
+}
+
 QFuture<QXmppE2eeExtension::IqEncryptResult> Manager::encryptIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params)
 {
     QFutureInterface<QXmppE2eeExtension::IqEncryptResult> interface(QFutureInterfaceBase::Started);
@@ -1088,6 +1112,23 @@ QFuture<QXmppE2eeExtension::IqDecryptResult> Manager::decryptIq(const QDomElemen
     }
 
     return makeReadyFuture<IqDecryptResult>(NotEncrypted());
+}
+
+bool QXmppOmemoManager::isEncrypted(const QDomElement &el)
+{
+    for (auto subEl = el.firstChildElement();
+         !subEl.isNull();
+         subEl = subEl.nextSiblingElement()) {
+        if (subEl.tagName() == "encrypted" && subEl.namespaceURI() == ns_omemo_2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QXmppOmemoManager::isEncrypted(const QXmppMessage &message)
+{
+    return message.omemoElement().has_value();
 }
 
 QStringList Manager::discoveryFeatures() const
