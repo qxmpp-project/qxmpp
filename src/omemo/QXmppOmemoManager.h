@@ -125,9 +125,13 @@ public:
 
     /// \cond
     QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&message, const std::optional<QXmppSendStanzaParams> &params) override;
+    QFuture<MessageDecryptResult> decryptMessage(QXmppMessage &&message) override;
 
     QFuture<IqEncryptResult> encryptIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params) override;
     QFuture<IqDecryptResult> decryptIq(const QDomElement &element) override;
+
+    bool isEncrypted(const QDomElement &) override;
+    bool isEncrypted(const QXmppMessage &) override;
 
     QStringList discoveryFeatures() const override;
     bool handleStanza(const QDomElement &stanza) override;
