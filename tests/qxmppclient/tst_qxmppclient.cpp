@@ -103,6 +103,8 @@ public:
         return makeReadyFuture<MessageEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
+    QFuture<MessageDecryptResult> decryptMessage(QXmppMessage &&) override { return {}; };
+
     QFuture<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) override
     {
         iqCalled = true;
@@ -113,6 +115,9 @@ public:
     {
         return makeReadyFuture<IqDecryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
+
+    bool isEncrypted(const QDomElement &) override { return false; };
+    bool isEncrypted(const QXmppMessage &) override { return false; };
 };
 
 void tst_QXmppClient::testE2eeExtension()

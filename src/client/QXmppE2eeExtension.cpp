@@ -28,6 +28,12 @@
 ///
 
 ///
+/// \typedef QXmppE2eeExtension::MessageDecryptResult
+///
+/// Contains the decrypted QXmppMessage, NotEncrypted or an QXmppError.
+///
+
+///
 /// \typedef QXmppE2eeExtension::IqEncryptResult
 ///
 /// Contains the XML serialized IQ stanza with encrypted contents or a
@@ -53,6 +59,13 @@
 ///
 
 ///
+/// \fn QXmppE2eeExtension::decryptMessage
+///
+/// Decrypts a QXmppMessage and returns the decrypted QXmppMessage. In case the message was not
+/// encrypted, QXmppE2eeExtension::NotEncrypted should be returned.
+///
+
+///
 /// \fn QXmppE2eeExtension::encryptIq
 ///
 /// Encrypts a QXmppIq and returns the serialized XML stanza with encrypted
@@ -69,4 +82,16 @@
 /// Decrypts an IQ from a DOM element and returns a fully decrypted IQ as a DOM
 /// element via QFuture. If the input was not encrypted,
 /// QXmppE2eeExtension::NotEncrypted should be returned.
+///
+
+///
+/// \fn QXmppE2eeExtension::isEncrypted(const QDomElement &)
+///
+/// Returns whether the DOM element of an IQ or message stanza is encrypted with this encryption.
+///
+
+///
+/// \fn QXmppE2eeExtension::isEncrypted(const QXmppMessage &)
+///
+/// Returns whether the message is encrypted with this encryption.
 ///
