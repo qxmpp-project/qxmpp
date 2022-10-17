@@ -6,11 +6,18 @@
 #define QXMPPMAMMANAGER_H
 
 #include "QXmppClientExtension.h"
+#include "QXmppError.h"
+#include "QXmppMamIq.h"
 #include "QXmppResultSet.h"
+
+#include <variant>
 
 #include <QDateTime>
 
+template<typename T>
+class QFuture;
 class QXmppMessage;
+class QXmppMamManagerPrivate;
 
 ///
 /// \brief The QXmppMamManager class makes it possible to access message
@@ -33,12 +40,29 @@ class QXMPP_EXPORT QXmppMamManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    struct RetrievedMessages
+    {
+        QXmppMamResultIq result;
+        QVector<QXmppMessage> messages;
+    };
+
+    using RetrieveResult = std::variant<RetrievedMessages, QXmppError>;
+
+    QXmppMamManager();
+    ~QXmppMamManager();
+
     QString retrieveArchivedMessages(const QString &to = QString(),
                                      const QString &node = QString(),
                                      const QString &jid = QString(),
                                      const QDateTime &start = QDateTime(),
                                      const QDateTime &end = QDateTime(),
                                      const QXmppResultSetQuery &resultSetQuery = QXmppResultSetQuery());
+    QFuture<RetrieveResult> retrieveMessages(const QString &to = QString(),
+                                             const QString &node = QString(),
+                                             const QString &jid = QString(),
+                                             const QDateTime &start = QDateTime(),
+                                             const QDateTime &end = QDateTime(),
+                                             const QXmppResultSetQuery &resultSetQuery = QXmppResultSetQuery());
 
     /// \cond
     QStringList discoveryFeatures() const override;
@@ -54,6 +78,9 @@ Q_SIGNALS:
     void resultsRecieved(const QString &queryId,
                          const QXmppResultSetReply &resultSetReply,
                          bool complete);
+
+private:
+    std::unique_ptr<QXmppMamManagerPrivate> d;
 };
 
 #endif
