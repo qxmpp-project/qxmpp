@@ -620,24 +620,44 @@ QFuture<bool> ManagerPrivate::setUpDeviceId()
 
     auto future = pubSubManager->requestPepItemIds(ns_omemo_2_bundles);
     await(future, q, [=](QXmppPubSubManager::ItemIdsResult result) mutable {
-        if (auto error = std::get_if<Error>(&result)) {
-            warning("Existing / Published device IDs could not be retrieved");
+        // There can be the following cases:
+        // 1. There is no PubSub node for device bundles: XEP-0030 states that a server must
+        // respond with an error (at least ejabberd 22.05 responds with an empty node instead).
+        // 2. There is an empty PubSub node for device bundles: XEP-0030 states that a server must
+        // respond with a node without included items.
+        if (auto error = std::get_if<Error>(&result); error && !(error->type() == Error::Cancel && error->condition() == Error::ItemNotFound)) {
+            warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
             reportFinishedResult(interface, false);
         } else {
-            const auto &deviceIds = std::get<QVector<QString>>(result);
-
-            while (true) {
-                uint32_t deviceId = 0;
+            auto generateDeviceId = [this, interface](uint32_t &deviceId) mutable -> bool {
                 if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
                     warning("Device ID could not be generated");
                     reportFinishedResult(interface, false);
-                    break;
+                    return false;
                 }
 
-                if (!deviceIds.contains(QString::number(deviceId))) {
+                return true;
+            };
+
+            // The first generated device ID can be used if no device bundle node exists.
+            // Otherwise, duplicates must be avoided.
+            if (error) {
+                uint32_t deviceId = 0;
+                if (generateDeviceId(deviceId)) {
                     ownDevice.id = deviceId;
                     reportFinishedResult(interface, true);
-                    break;
+                }
+            } else {
+                const auto &deviceIds = std::get<QVector<QString>>(result);
+
+                while (true) {
+                    uint32_t deviceId = 0;
+
+                    if (generateDeviceId(deviceId) && !deviceIds.contains(QString::number(deviceId))) {
+                        ownDevice.id = deviceId;
+                        reportFinishedResult(interface, true);
+                        break;
+                    }
                 }
             }
         }
