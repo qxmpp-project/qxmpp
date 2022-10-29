@@ -1859,7 +1859,7 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
     auto future = pubSubManager->requestPepFeatures();
     await(future, q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
-            warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved" % errorToString(*error));
+            warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved: " % errorToString(*error));
             warning("Device bundle and device list could not be published");
             reportFinishedResult(interface, false);
         } else {
@@ -1879,7 +1879,7 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Nodes of JID '" % ownBareJid() % "' could not be fetched to check if nodes '" %
                                 QString(ns_omemo_2_bundles) % "' and '" % QString(ns_omemo_2_devices) %
-                                "' exist" % errorToString(*error));
+                                "' exist: " % errorToString(*error));
                         warning("Device bundle and device list could not be published");
                         reportFinishedResult(interface, false);
                     } else {
@@ -2289,7 +2289,7 @@ QFuture<std::optional<QXmppOmemoDeviceBundle>> ManagerPrivate::requestDeviceBund
     await(future, q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceBundleItem> result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Device bundle for JID '" % deviceOwnerJid % "' and device ID '" %
-                    QString::number(deviceId) % "' could not be retrieved" % errorToString(*error));
+                    QString::number(deviceId) % "' could not be retrieved: " % errorToString(*error));
             reportFinishedResult(interface, {});
         } else {
             const auto &item = std::get<QXmppOmemoDeviceBundleItem>(result);
@@ -2594,7 +2594,7 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
         await(future, q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Device list for JID '" % ownBareJid() %
-                        "' could not be retrieved and thus not updated" %
+                        "' could not be retrieved and thus not updated: " %
                         errorToString(*error));
                 continuation(false);
             } else {
@@ -2813,14 +2813,14 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         await(future, q, [=](QXmppPubSubManager::Result result) {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Node '" % QString(ns_omemo_2_devices) % "'  of JID '" % deviceOwnerJid %
-                        "' could not be deleted in order to recover from an inconsistent node" %
+                        "' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
                 auto future = pubSubManager->requestPepFeatures();
                 await(future, q, [=](QXmppPubSubManager::FeaturesResult result) {
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Features of PEP service '" % deviceOwnerJid %
-                                "' could not be retrieved" % errorToString(*error));
+                                "' could not be retrieved: " % errorToString(*error));
                         warning("Device list could not be published");
                     } else {
                         const auto &pepServiceFeatures = std::get<QVector<QString>>(result);
@@ -2958,7 +2958,7 @@ void ManagerPrivate::deleteNode(const QString &node, Function continuation)
 
             // Skip the error handling if the node is already deleted.
             if (!(errorType == Error::Cancel && errorCondition == Error::ItemNotFound)) {
-                warning("Node '" % node % "' of JID '" % ownBareJid() % "' could not be deleted" %
+                warning("Node '" % node % "' of JID '" % ownBareJid() % "' could not be deleted: " %
                         errorToString(*error));
                 continuation(false);
             } else {
