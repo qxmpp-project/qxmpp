@@ -249,14 +249,12 @@ void QXmppOmemoDevice::setTrustLevel(TrustLevel trustLevel)
 ///
 /// A trust manager using its storage must be added to the client:
 /// \code
-/// QXmppTrustManager *trustManager = new QXmppAtmManager(trustStorage);
-/// client->addExtension(trustManager);
+/// client->addNewExtension<QXmppAtmManager>(trustStorage);
 /// \endcode
 ///
 /// Afterwards, the OMEMO manager using its storage must be added to the client:
 /// \code
-/// QXmppOmemoManager *manager = new QXmppOmemoManager(omemoStorage);
-/// client->addExtension(manager);
+/// auto *manager = client->addNewExtension<QXmppOmemoManager>(omemoStorage);
 /// \endcode
 ///
 /// You can set a security policy used by OMEMO.
@@ -268,16 +266,10 @@ void QXmppOmemoDevice::setTrustLevel(TrustLevel trustLevel)
 ///
 /// \xep{0280, Message Carbons} should be used for delivering messages to all endpoints of a user:
 /// \code
-/// QXmppCarbonManager *carbonManager = new QXmppCarbonManager;
-/// client->addExtension(carbonManager);
-/// connect(client, &QXmppClient::connected, this, [=]() {
-///     carbonManager->setCarbonsEnabled(true);
-/// });
-/// connect(carbonManager, &QXmppCarbonManager::messageSent, manager,
-///     &QXmppOmemoManager::handleMessage);
-/// connect(carbonManager, &QXmppCarbonManager::messageReceived, manager,
-///     &QXmppOmemoManager::handleMessage);
+/// client->addNewExtension<QXmppCarbonManagerV2>();
 /// \endcode
+///
+/// The old QXmppCarbonManager cannot be used with OMEMO.
 ///
 /// The OMEMO data must be loaded before connecting to the server:
 /// \code
@@ -940,8 +932,6 @@ QFuture<bool> Manager::resetAll()
 }
 
 ///
-/// \fn QXmppOmemoManager::setSecurityPolicy(QXmpp::TrustSecurityPolicy securityPolicy)
-///
 /// Sets the security policy used by this E2EE extension.
 ///
 /// \param securityPolicy security policy being set
@@ -952,8 +942,6 @@ QFuture<void> Manager::setSecurityPolicy(QXmpp::TrustSecurityPolicy securityPoli
 }
 
 ///
-/// \fn QXmppOmemoManager::securityPolicy()
-///
 /// Returns the security policy used by this E2EE extension.
 ///
 /// \return the used security policy
@@ -963,8 +951,6 @@ QFuture<QXmpp::TrustSecurityPolicy> Manager::securityPolicy()
     return d->trustManager->securityPolicy(ns_omemo_2);
 }
 
-///
-/// \fn QXmppOmemoManager::setTrustLevel(const QMultiHash<QString, QByteArray> &keyIds, QXmpp::TrustLevel trustLevel)
 ///
 /// Sets the trust level of keys.
 ///
@@ -978,8 +964,6 @@ QFuture<void> Manager::setTrustLevel(const QMultiHash<QString, QByteArray> &keyI
     return d->trustManager->setTrustLevel(ns_omemo_2, keyIds, trustLevel);
 }
 
-///
-/// \fn QXmppOmemoManager::trustLevel(const QString &keyOwnerJid, const QByteArray &keyId)
 ///
 /// Returns the trust level of a key.
 ///
