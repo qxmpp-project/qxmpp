@@ -31,6 +31,7 @@ extend QXmpp by subclassing QXmppClientExtension.
 - QXmppRegistrationManager
 - QXmppAttentionManager
 - QXmppPubSubManager
+- QXmppOmemoManager
 
 <B>XMPP stanzas:</B> If you are interested in a more low-level API, you can refer to these
 classes.
