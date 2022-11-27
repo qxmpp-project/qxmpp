@@ -38,6 +38,7 @@ target_include_directories(QXmppOmemo
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+target_link_directories(QXmppOmemo PRIVATE ${CMAKE_BINARY_DIR})
 
 generate_export_header(QXmppOmemo)
 
