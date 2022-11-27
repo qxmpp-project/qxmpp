@@ -7,6 +7,10 @@
 #include <QByteArray>
 #include <QtCrypto>
 
+#undef min
+#undef max
+#undef interface
+
 using namespace QCA;
 
 constexpr std::size_t AES128_BLOCK_SIZE = 128 / 8;
