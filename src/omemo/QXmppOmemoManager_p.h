@@ -178,6 +178,8 @@ public:
     signal_protocol_session_store createSessionStore() const;
 
     QFuture<bool> setUpDeviceId();
+    std::optional<uint32_t> generateDeviceId();
+    std::optional<uint32_t> generateDeviceId(const QVector<QString> &existingIds);
     bool setUpIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair);
     void schedulePeriodicTasks();
     void renewSignedPreKeyPairs();

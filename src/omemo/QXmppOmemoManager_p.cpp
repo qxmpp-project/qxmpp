@@ -629,41 +629,51 @@ QFuture<bool> ManagerPrivate::setUpDeviceId()
             warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
             reportFinishedResult(interface, false);
         } else {
-            auto generateDeviceId = [this, interface](uint32_t &deviceId) mutable -> bool {
-                if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
-                    warning("Device ID could not be generated");
-                    reportFinishedResult(interface, false);
-                    return false;
-                }
-
-                return true;
-            };
-
             // The first generated device ID can be used if no device bundle node exists.
             // Otherwise, duplicates must be avoided.
-            if (error) {
-                uint32_t deviceId = 0;
-                if (generateDeviceId(deviceId)) {
-                    ownDevice.id = deviceId;
-                    reportFinishedResult(interface, true);
-                }
-            } else {
-                const auto &deviceIds = std::get<QVector<QString>>(result);
-
-                while (true) {
-                    uint32_t deviceId = 0;
-
-                    if (generateDeviceId(deviceId) && !deviceIds.contains(QString::number(deviceId))) {
-                        ownDevice.id = deviceId;
-                        reportFinishedResult(interface, true);
-                        break;
-                    }
-                }
+            auto deviceId = error ? generateDeviceId() : generateDeviceId(std::get<QVector<QString>>(result));
+            if (deviceId) {
+                ownDevice.id = *deviceId;
             }
+            reportFinishedResult(interface, deviceId.has_value());
         }
     });
 
     return interface.future();
+}
+
+//
+// Generates a new device ID.
+//
+// Returns the device ID or an empty optional on errors.
+//
+std::optional<uint32_t> QXmppOmemoManagerPrivate::generateDeviceId()
+{
+    uint32_t deviceId = 0;
+    if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
+        warning("Device ID could not be generated");
+        return {};
+    }
+    return deviceId;
+}
+
+//
+// Generates a new device ID that does not exist yet.
+//
+// Returns the device ID or an empty optional on errors.
+//
+std::optional<uint32_t> QXmppOmemoManagerPrivate::generateDeviceId(const QVector<QString> &existingIds)
+{
+    uint32_t deviceId = 0;
+
+    do {
+        if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
+            warning("Device ID could not be generated");
+            return {};
+        }
+    } while (existingIds.contains(QString::number(deviceId)));
+
+    return deviceId;
 }
 
 //
