@@ -616,10 +616,8 @@ signal_protocol_session_store ManagerPrivate::createSessionStore() const
 //
 QFuture<bool> ManagerPrivate::setUpDeviceId()
 {
-    QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
-
     auto future = pubSubManager->requestPepItemIds(ns_omemo_2_bundles);
-    await(future, q, [=](QXmppPubSubManager::ItemIdsResult result) mutable {
+    return chain<bool>(future, q, [this](QXmppPubSubManager::ItemIdsResult result) mutable {
         // There can be the following cases:
         // 1. There is no PubSub node for device bundles: XEP-0030 states that a server must
         // respond with an error (at least ejabberd 22.05 responds with an empty node instead).
@@ -627,7 +625,7 @@ QFuture<bool> ManagerPrivate::setUpDeviceId()
         // respond with a node without included items.
         if (auto error = std::get_if<Error>(&result); error && !(error->type() == Error::Cancel && error->condition() == Error::ItemNotFound)) {
             warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
-            reportFinishedResult(interface, false);
+            return false;
         } else {
             // The first generated device ID can be used if no device bundle node exists.
             // Otherwise, duplicates must be avoided.
@@ -635,11 +633,9 @@ QFuture<bool> ManagerPrivate::setUpDeviceId()
             if (deviceId) {
                 ownDevice.id = *deviceId;
             }
-            reportFinishedResult(interface, deviceId.has_value());
+            return deviceId.has_value();
         }
     });
-
-    return interface.future();
 }
 
 //
