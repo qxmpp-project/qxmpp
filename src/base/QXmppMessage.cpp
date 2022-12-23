@@ -160,6 +160,9 @@ public:
 
     // XEP-0448: Encryption for stateless file sharing
     QVector<QXmppFileShare> sharedFiles;
+
+    // XEP-0449: Stickers
+    std::optional<QString> stickerPackId;
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
@@ -1288,6 +1291,30 @@ void QXmppMessage::setSharedFiles(const QVector<QXmppFileShare> &sharedFiles)
     d->sharedFiles = sharedFiles;
 }
 
+///
+/// \brief Returns the sticker pack id for the sticker contained in this message
+///
+/// This is used for \xep{0449, Stickers}.
+///
+/// \since QXmpp 1.5
+///
+const std::optional<QString> &QXmppMessage::stickerPackId() const
+{
+    return d->stickerPackId;
+}
+
+///
+/// \brief Sets the sticker pack id for the sticker contained in this message
+///
+/// This is used for \xep{0449, Stickers}.
+///
+/// \since QXmpp 1.5
+///
+void QXmppMessage::setStickerPackId(const std::optional<QString> &stickerPackId)
+{
+    d->stickerPackId = stickerPackId;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -1589,6 +1616,12 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             return true;
         }
+
+        // XEP-0449: Stickers
+        if (checkElement(element, QStringLiteral("sticker"), ns_stickers)) {
+            d->stickerPackId = element.attribute("pack");
+            return true;
+        }
     }
     return false;
 }
@@ -1845,6 +1878,14 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         // XEP-0448: Stateless file sharing
         for (const auto &fileShare : d->sharedFiles) {
             fileShare.toXml(writer);
+        }
+
+        // XEP-0449: Sticker
+        if (d->stickerPackId) {
+            writer->writeStartElement("sticker");
+            writer->writeDefaultNamespace(ns_stickers);
+            writer->writeAttribute("pack", *d->stickerPackId);
+            writer->writeEndElement();
         }
     }
 }

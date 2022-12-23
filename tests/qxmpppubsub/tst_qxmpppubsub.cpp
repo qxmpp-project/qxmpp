@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppHttpFileSource.h"
 #include "QXmppPubSubAffiliation.h"
 #include "QXmppPubSubSubscription.h"
+#include "QXmppStickerPackItem.h"
 
 #include "pubsubutil.h"
 #include "util.h"
@@ -55,6 +57,7 @@ private:
     Q_SLOT void testIsItem_data();
     Q_SLOT void testIsItem();
     Q_SLOT void testTestItem();
+    Q_SLOT void testStickerPackItem();
 };
 
 void tst_QXmppPubSub::testAffiliation_data()
@@ -278,6 +281,58 @@ void tst_QXmppPubSub::testTestItem()
     const auto invalidXml = QByteArrayLiteral("<item id=\"abc1337\"><tune/></item>");
     QVERIFY(TestItem::isItem(xmlToDom(xml)));
     QVERIFY(!TestItem::isItem(xmlToDom(invalidXml)));
+}
+
+void tst_QXmppPubSub::testStickerPackItem()
+{
+    QByteArray xml(
+        "<item id='EpRv28DHHzFrE4zd+xaNpVb4'>"
+        "<pack xmlns='urn:xmpp:stickers:0'>"
+        "<name>Marsey the Cat</name>"
+        "<summary>Be cute or be cynical, this little kitten works both ways.</summary>"
+        "<item>"
+        "<file xmlns='urn:xmpp:file:metadata:0'>"
+        "<desc>👍</desc>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='sha-256'>0AdP8lJOWJrugSKOIAqfEKqFatIpG5JBCjjxY253ojQ=</hash>"
+        "<height>512</height>"
+        "<media-type>image/png</media-type>"
+        "<size>71045</size>"
+        "<width>512</width>"
+        "</file>"
+        "<sources xmlns='urn:xmpp:sfs:0'>"
+        "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_thumbs_up.png'/>"
+        "</sources>"
+        "<suggest>+1</suggest>"
+        "<suggest>thumbsup</suggest>"
+        "</item>"
+        "<item>"
+        "<file xmlns='urn:xmpp:file:metadata:0'>"
+        "<desc>😘</desc>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='sha-256'>gw+6xdCgOcvCYSKuQNrXH33lV9NMzuDf/s0huByCDsY=</hash>"
+        "<height>512</height>"
+        "<media-type>image/png</media-type>"
+        "<size>67016</size>"
+        "<width>512</width>"
+        "</file>"
+        "<sources xmlns='urn:xmpp:sfs:0'>"
+        "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_kiss.png'/>"
+        "</sources>"
+        "</item>"
+        "<hash xmlns='urn:xmpp:hashes:2' algo='sha-256'>EpRv28DHHzFrE4zd+xaNpVb4jbu4s74XtioExNjQzZ0=</hash>"
+        "</pack>"
+        "</item>");
+
+    QXmppStickerPackItem item;
+    parsePacket(item, xml);
+    QCOMPARE(item.items().size(), 2);
+    QCOMPARE(item.name(), QStringLiteral("Marsey the Cat"));
+    QCOMPARE(item.summary(), QStringLiteral("Be cute or be cynical, this little kitten works both ways."));
+    QVERIFY(!item.restricted());
+
+    auto &firstItem = item.items().front();
+    QCOMPARE(firstItem.suggestedWords().size(), 2);
+    QCOMPARE(firstItem.httpSource().front().url(), QUrl("https://download.montague.lit/51078299-d071-46e1-b6d3-3de4a8ab67d6/sticker_marsey_thumbs_up.png"));
+    serializePacket(item, xml);
 }
 
 QTEST_MAIN(tst_QXmppPubSub)
