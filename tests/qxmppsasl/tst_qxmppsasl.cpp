@@ -11,37 +11,37 @@ class tst_QXmppSasl : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testParsing();
-    void testAuth_data();
-    void testAuth();
-    void testChallenge_data();
-    void testChallenge();
-    void testFailure();
-    void testResponse_data();
-    void testResponse();
-    void testSuccess();
+private:
+    Q_SLOT void testParsing();
+    Q_SLOT void testAuth_data();
+    Q_SLOT void testAuth();
+    Q_SLOT void testChallenge_data();
+    Q_SLOT void testChallenge();
+    Q_SLOT void testFailure();
+    Q_SLOT void testResponse_data();
+    Q_SLOT void testResponse();
+    Q_SLOT void testSuccess();
 
     // client
-    void testClientAvailableMechanisms();
-    void testClientBadMechanism();
-    void testClientAnonymous();
-    void testClientDigestMd5();
-    void testClientDigestMd5_data();
-    void testClientFacebook();
-    void testClientGoogle();
-    void testClientPlain();
-    void testClientScramSha1();
-    void testClientScramSha1_bad();
-    void testClientScramSha256();
-    void testClientWindowsLive();
+    Q_SLOT void testClientAvailableMechanisms();
+    Q_SLOT void testClientBadMechanism();
+    Q_SLOT void testClientAnonymous();
+    Q_SLOT void testClientDigestMd5();
+    Q_SLOT void testClientDigestMd5_data();
+    Q_SLOT void testClientFacebook();
+    Q_SLOT void testClientGoogle();
+    Q_SLOT void testClientPlain();
+    Q_SLOT void testClientScramSha1();
+    Q_SLOT void testClientScramSha1_bad();
+    Q_SLOT void testClientScramSha256();
+    Q_SLOT void testClientWindowsLive();
 
     // server
-    void testServerBadMechanism();
-    void testServerAnonymous();
-    void testServerDigestMd5();
-    void testServerPlain();
-    void testServerPlainChallenge();
+    Q_SLOT void testServerBadMechanism();
+    Q_SLOT void testServerAnonymous();
+    Q_SLOT void testServerDigestMd5();
+    Q_SLOT void testServerPlain();
+    Q_SLOT void testServerPlainChallenge();
 };
 
 void tst_QXmppSasl::testParsing()

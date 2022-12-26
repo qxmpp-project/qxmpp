@@ -17,10 +17,10 @@ class tst_QXmppPubSubEvent : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBasic_data();
-    void testBasic();
-    void testCustomItem();
+private:
+    Q_SLOT void testBasic_data();
+    Q_SLOT void testBasic();
+    Q_SLOT void testCustomItem();
 };
 
 void tst_QXmppPubSubEvent::testBasic_data()

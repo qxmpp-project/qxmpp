@@ -10,14 +10,13 @@ class tst_QXmppOmemoMemoryStorage : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testOwnDevice();
-    void testSignedPreKeyPairs();
-    void testPreKeyPairs();
-    void testDevices();
-    void testResetAll();
-
 private:
+    Q_SLOT void testOwnDevice();
+    Q_SLOT void testSignedPreKeyPairs();
+    Q_SLOT void testPreKeyPairs();
+    Q_SLOT void testDevices();
+    Q_SLOT void testResetAll();
+
     QXmppOmemoMemoryStorage m_omemoStorage;
 };
 

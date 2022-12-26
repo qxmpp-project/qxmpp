@@ -22,42 +22,42 @@ class tst_QXmppMessage : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBasic_data();
-    void testBasic();
-    void testIsXmppStanza();
-    void testUnknownXExtension();
-    void testMessageAttention();
-    void testMessageReceipt();
-    void testDelay_data();
-    void testDelay();
-    void testDelayWithMultipleStamp();
-    void testExtendedAddresses();
-    void testMucInvitation();
-    void testState_data();
-    void testState();
-    void testXhtml();
-    void testSubextensions();
-    void testChatMarkers();
-    void testPrivateMessage();
-    void testOutOfBandUrl();
-    void testMessageCorrect();
-    void testMessageAttaching();
-    void testMix();
-    void testEme();
-    void testSpoiler();
-    void testProcessingHints();
-    void testBobData();
-    void testFallbackIndication();
-    void testStanzaIds();
-    void testSlashMe_data();
-    void testSlashMe();
-    void testMixInvitation();
-    void testTrustMessageElement();
-    void testReaction();
-    void testE2eeFallbackBody();
-    void testFileSharing();
-    void testEncryptedFileSource();
+private:
+    Q_SLOT void testBasic_data();
+    Q_SLOT void testBasic();
+    Q_SLOT void testIsXmppStanza();
+    Q_SLOT void testUnknownXExtension();
+    Q_SLOT void testMessageAttention();
+    Q_SLOT void testMessageReceipt();
+    Q_SLOT void testDelay_data();
+    Q_SLOT void testDelay();
+    Q_SLOT void testDelayWithMultipleStamp();
+    Q_SLOT void testExtendedAddresses();
+    Q_SLOT void testMucInvitation();
+    Q_SLOT void testState_data();
+    Q_SLOT void testState();
+    Q_SLOT void testXhtml();
+    Q_SLOT void testSubextensions();
+    Q_SLOT void testChatMarkers();
+    Q_SLOT void testPrivateMessage();
+    Q_SLOT void testOutOfBandUrl();
+    Q_SLOT void testMessageCorrect();
+    Q_SLOT void testMessageAttaching();
+    Q_SLOT void testMix();
+    Q_SLOT void testEme();
+    Q_SLOT void testSpoiler();
+    Q_SLOT void testProcessingHints();
+    Q_SLOT void testBobData();
+    Q_SLOT void testFallbackIndication();
+    Q_SLOT void testStanzaIds();
+    Q_SLOT void testSlashMe_data();
+    Q_SLOT void testSlashMe();
+    Q_SLOT void testMixInvitation();
+    Q_SLOT void testTrustMessageElement();
+    Q_SLOT void testReaction();
+    Q_SLOT void testE2eeFallbackBody();
+    Q_SLOT void testFileSharing();
+    Q_SLOT void testEncryptedFileSource();
 };
 
 void tst_QXmppMessage::testBasic_data()

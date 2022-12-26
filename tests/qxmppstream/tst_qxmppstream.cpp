@@ -21,17 +21,17 @@ public:
     void handleStart() override
     {
         QXmppStream::handleStart();
-        emit started();
+        Q_EMIT started();
     }
 
     void handleStream(const QDomElement &element) override
     {
-        emit streamReceived(element);
+        Q_EMIT streamReceived(element);
     }
 
     void handleStanza(const QDomElement &element) override
     {
-        emit stanzaReceived(element);
+        Q_EMIT stanzaReceived(element);
     }
 
     Q_SIGNAL void started();

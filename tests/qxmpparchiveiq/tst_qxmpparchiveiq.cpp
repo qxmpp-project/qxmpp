@@ -11,14 +11,14 @@ class tst_QXmppArchiveIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testArchiveList_data();
-    void testArchiveList();
-    void testArchiveChat_data();
-    void testArchiveChat();
-    void testArchiveRemove();
-    void testArchiveRetrieve_data();
-    void testArchiveRetrieve();
+private:
+    Q_SLOT void testArchiveList_data();
+    Q_SLOT void testArchiveList();
+    Q_SLOT void testArchiveChat_data();
+    Q_SLOT void testArchiveChat();
+    Q_SLOT void testArchiveRemove();
+    Q_SLOT void testArchiveRetrieve_data();
+    Q_SLOT void testArchiveRetrieve();
 };
 
 void tst_QXmppArchiveIq::testArchiveList_data()

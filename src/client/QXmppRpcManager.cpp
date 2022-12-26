@@ -162,12 +162,12 @@ bool QXmppRpcManager::handleStanza(const QDomElement &element)
     } else if (QXmppRpcResponseIq::isRpcResponseIq(element)) {
         QXmppRpcResponseIq rpcResponseIq;
         rpcResponseIq.parse(element);
-        emit rpcCallResponse(rpcResponseIq);
+        Q_EMIT rpcCallResponse(rpcResponseIq);
         return true;
     } else if (QXmppRpcErrorIq::isRpcErrorIq(element)) {
         QXmppRpcErrorIq rpcErrorIq;
         rpcErrorIq.parse(element);
-        emit rpcCallError(rpcErrorIq);
+        Q_EMIT rpcCallError(rpcErrorIq);
         return true;
     }
     return false;

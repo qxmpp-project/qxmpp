@@ -16,14 +16,13 @@ public:
     xmppClient(QObject *parent = nullptr);
     void setRecipient(const QString &recipient);
 
-private slots:
-    void slotError(QXmppTransferJob::Error error);
-    void slotFileReceived(QXmppTransferJob *job);
-    void slotFinished();
-    void slotPresenceReceived(const QXmppPresence &presence);
-    void slotProgress(qint64 done, qint64 total);
-
 private:
+    Q_SLOT void slotError(QXmppTransferJob::Error error);
+    Q_SLOT void slotFileReceived(QXmppTransferJob *job);
+    Q_SLOT void slotFinished();
+    Q_SLOT void slotPresenceReceived(const QXmppPresence &presence);
+    Q_SLOT void slotProgress(qint64 done, qint64 total);
+
     QString m_recipient;
     QXmppTransferManager *transferManager;
 };

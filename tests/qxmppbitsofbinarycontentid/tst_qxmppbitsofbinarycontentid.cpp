@@ -13,24 +13,24 @@ class tst_QXmppBitsOfBinaryContentId : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBasic();
+private:
+    Q_SLOT void testBasic();
 
-    void testFromContentId_data();
-    void testFromContentId();
+    Q_SLOT void testFromContentId_data();
+    Q_SLOT void testFromContentId();
 
-    void testFromCidUrl_data();
-    void testFromCidUrl();
+    Q_SLOT void testFromCidUrl_data();
+    Q_SLOT void testFromCidUrl();
 
-    void testEmpty();
+    Q_SLOT void testEmpty();
 
-    void testIsValid_data();
-    void testIsValid();
+    Q_SLOT void testIsValid_data();
+    Q_SLOT void testIsValid();
 
-    void testIsBobContentId_data();
-    void testIsBobContentId();
+    Q_SLOT void testIsBobContentId_data();
+    Q_SLOT void testIsBobContentId();
 
-    void testUnsupportedAlgorithm();
+    Q_SLOT void testUnsupportedAlgorithm();
 };
 
 void tst_QXmppBitsOfBinaryContentId::testBasic()

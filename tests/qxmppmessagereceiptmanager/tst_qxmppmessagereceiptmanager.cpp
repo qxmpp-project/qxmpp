@@ -12,11 +12,11 @@ class tst_QXmppMessageReceiptManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
+private:
+    Q_SLOT void initTestCase();
 
-    void testReceipt_data();
-    void testReceipt();
+    Q_SLOT void testReceipt_data();
+    Q_SLOT void testReceipt();
 
     void handleMessageDelivered(const QString &, const QString &)
     {
@@ -27,7 +27,6 @@ private slots:
         m_receiptSent = true;
     }
 
-private:
     QXmppMessageReceiptManager *m_manager;
     QXmppClient m_client;
     QXmppLogger m_logger;

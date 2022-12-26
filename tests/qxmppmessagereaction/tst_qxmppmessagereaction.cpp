@@ -11,12 +11,12 @@ class tst_QXmppMessageReaction : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testIsMessageReaction_data();
-    void testIsMessageReaction();
-    void testMessageReaction();
-    void testMessageReactionWithDuplicateEmojis();
-    void testMessageReactionRemoval();
+private:
+    Q_SLOT void testIsMessageReaction_data();
+    Q_SLOT void testIsMessageReaction();
+    Q_SLOT void testMessageReaction();
+    Q_SLOT void testMessageReactionWithDuplicateEmojis();
+    Q_SLOT void testMessageReactionRemoval();
 };
 
 void tst_QXmppMessageReaction::testIsMessageReaction_data()

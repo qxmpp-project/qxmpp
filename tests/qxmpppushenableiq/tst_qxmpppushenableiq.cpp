@@ -12,12 +12,12 @@ class tst_QXmppPushEnableIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testPushEnable();
-    void testPushDisable();
-    void testXmlNs();
-    void testDataForm();
-    void testIsEnableIq();
+private:
+    Q_SLOT void testPushEnable();
+    Q_SLOT void testPushDisable();
+    Q_SLOT void testXmlNs();
+    Q_SLOT void testDataForm();
+    Q_SLOT void testIsEnableIq();
 };
 
 void tst_QXmppPushEnableIq::testPushEnable()

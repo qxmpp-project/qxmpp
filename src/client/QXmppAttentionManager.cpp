@@ -206,7 +206,7 @@ void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
 
     // check rate limit
     if (!d->checkRateLimit(bareJid)) {
-        emit attentionRequestRateLimited(message);
+        Q_EMIT attentionRequestRateLimited(message);
         return;
     }
 
@@ -215,7 +215,7 @@ void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)
         isTrusted = rosterManager->getRosterBareJids().contains(bareJid);
     }
 
-    emit attentionRequested(message, isTrusted);
+    Q_EMIT attentionRequested(message, isTrusted);
 }
 
 QXmppAttentionManagerPrivate::QXmppAttentionManagerPrivate(QXmppAttentionManager *parent, quint8 allowedAttempts, QTime timeFrame)

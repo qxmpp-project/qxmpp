@@ -11,13 +11,13 @@ class tst_QXmppStunMessage : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testFingerprint();
-    void testIntegrity();
-    void testIPv4Address();
-    void testIPv6Address();
-    void testXorIPv4Address();
-    void testXorIPv6Address();
+private:
+    Q_SLOT void testFingerprint();
+    Q_SLOT void testIntegrity();
+    Q_SLOT void testIPv4Address();
+    Q_SLOT void testIPv6Address();
+    Q_SLOT void testXorIPv4Address();
+    Q_SLOT void testXorIPv6Address();
 };
 
 void tst_QXmppStunMessage::testFingerprint()

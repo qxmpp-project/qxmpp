@@ -27,12 +27,12 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
     if (QXmppArchiveChatIq::isArchiveChatIq(element)) {
         QXmppArchiveChatIq archiveIq;
         archiveIq.parse(element);
-        emit archiveChatReceived(archiveIq.chat(), archiveIq.resultSetReply());
+        Q_EMIT archiveChatReceived(archiveIq.chat(), archiveIq.resultSetReply());
         return true;
     } else if (QXmppArchiveListIq::isArchiveListIq(element)) {
         QXmppArchiveListIq archiveIq;
         archiveIq.parse(element);
-        emit archiveListReceived(archiveIq.chats(), archiveIq.resultSetReply());
+        Q_EMIT archiveListReceived(archiveIq.chats(), archiveIq.resultSetReply());
         return true;
     } else if (QXmppArchivePrefIq::isArchivePrefIq(element)) {
         // TODO: handle preference iq

@@ -76,17 +76,17 @@ class tst_QXmppOmemoManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-    void testSecurityPolicies();
-    void testTrustLevels();
-    void initOmemoUser(OmemoUser &omemoUser);
-    void testInit();
-    void testSetUp();
-    void testLoad();
-    void testSendMessage();
-    void testSendIq();
-    void finish(OmemoUser &omemoUser);
+private:
+    Q_SLOT void initTestCase();
+    Q_SLOT void testSecurityPolicies();
+    Q_SLOT void testTrustLevels();
+    Q_SLOT void initOmemoUser(OmemoUser &omemoUser);
+    Q_SLOT void testInit();
+    Q_SLOT void testSetUp();
+    Q_SLOT void testLoad();
+    Q_SLOT void testSendMessage();
+    Q_SLOT void testSendIq();
+    Q_SLOT void finish(OmemoUser &omemoUser);
 
 private:
     OmemoUser m_alice1;

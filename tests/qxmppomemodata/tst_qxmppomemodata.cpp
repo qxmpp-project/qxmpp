@@ -44,26 +44,26 @@ class tst_QXmppOmemoData : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testIsOmemoDeviceElement_data();
-    void testIsOmemoDeviceElement();
-    void testOmemoDeviceElement_data();
-    void testOmemoDeviceElement();
-    void testIsOmemoDeviceList_data();
-    void testIsOmemoDeviceList();
-    void testOmemoDeviceList();
-    void testIsOmemoDeviceBundle_data();
-    void testIsOmemoDeviceBundle();
-    void testOmemoDeviceBundle();
-    void testIsOmemoEnvelope_data();
-    void testIsOmemoEnvelope();
-    void testOmemoEnvelope_data();
-    void testOmemoEnvelope();
-    void testIsOmemoElement_data();
-    void testIsOmemoElement();
-    void testOmemoElement();
-    void testMessageOmemoElement();
-    void testOmemoIq();
+private:
+    Q_SLOT void testIsOmemoDeviceElement_data();
+    Q_SLOT void testIsOmemoDeviceElement();
+    Q_SLOT void testOmemoDeviceElement_data();
+    Q_SLOT void testOmemoDeviceElement();
+    Q_SLOT void testIsOmemoDeviceList_data();
+    Q_SLOT void testIsOmemoDeviceList();
+    Q_SLOT void testOmemoDeviceList();
+    Q_SLOT void testIsOmemoDeviceBundle_data();
+    Q_SLOT void testIsOmemoDeviceBundle();
+    Q_SLOT void testOmemoDeviceBundle();
+    Q_SLOT void testIsOmemoEnvelope_data();
+    Q_SLOT void testIsOmemoEnvelope();
+    Q_SLOT void testOmemoEnvelope_data();
+    Q_SLOT void testOmemoEnvelope();
+    Q_SLOT void testIsOmemoElement_data();
+    Q_SLOT void testIsOmemoElement();
+    Q_SLOT void testOmemoElement();
+    Q_SLOT void testMessageOmemoElement();
+    Q_SLOT void testOmemoIq();
 };
 
 void tst_QXmppOmemoData::testIsOmemoDeviceElement_data()

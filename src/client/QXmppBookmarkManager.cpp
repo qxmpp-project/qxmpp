@@ -144,7 +144,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
             if (iq.type() == QXmppIq::Result) {
                 d->bookmarks = iq.bookmarks();
                 d->bookmarksReceived = true;
-                emit bookmarksReceived(d->bookmarks);
+                Q_EMIT bookmarksReceived(d->bookmarks);
             }
             return true;
         } else if (!d->pendingId.isEmpty() && stanza.attribute("id") == d->pendingId) {
@@ -152,7 +152,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
             iq.parse(stanza);
             if (iq.type() == QXmppIq::Result) {
                 d->bookmarks = d->pendingBookmarks;
-                emit bookmarksReceived(d->bookmarks);
+                Q_EMIT bookmarksReceived(d->bookmarks);
             }
             d->pendingId = QString();
             return true;

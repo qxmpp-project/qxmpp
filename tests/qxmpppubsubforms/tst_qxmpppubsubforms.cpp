@@ -12,10 +12,8 @@ class tst_QXmppPubSubForms : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void subAuthorization();
-
 private:
+    Q_SLOT void subAuthorization();
 };
 
 void tst_QXmppPubSubForms::subAuthorization()

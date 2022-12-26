@@ -12,11 +12,10 @@ class QXmppMamTestHelper : public QObject
 {
     Q_OBJECT
 
-public slots:
-    void archivedMessageReceived(const QString &queryId, const QXmppMessage &message);
-    void resultsRecieved(const QString &queryId, const QXmppResultSetReply &resultSetReply, bool complete);
-
 public:
+    Q_SLOT void archivedMessageReceived(const QString &queryId, const QXmppMessage &message);
+    Q_SLOT void resultsRecieved(const QString &queryId, const QXmppResultSetReply &resultSetReply, bool complete);
+
     QXmppMessage m_expectedMessage;
     QXmppResultSetReply m_expectedResultSetReply;
     QString m_expectedQueryId;
@@ -31,16 +30,15 @@ class tst_QXmppMamManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-
-    void testHandleStanza_data();
-    void testHandleStanza();
-
-    void testHandleResultIq_data();
-    void testHandleResultIq();
-
 private:
+    Q_SLOT void initTestCase();
+
+    Q_SLOT void testHandleStanza_data();
+    Q_SLOT void testHandleStanza();
+
+    Q_SLOT void testHandleResultIq_data();
+    Q_SLOT void testHandleResultIq();
+
     QXmppMamTestHelper m_helper;
     QXmppMamManager m_manager;
 };

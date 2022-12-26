@@ -12,9 +12,9 @@ class tst_QXmppEntityTimeIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testEntityTimeGet();
-    void testEntityTimeResult();
+private:
+    Q_SLOT void testEntityTimeGet();
+    Q_SLOT void testEntityTimeResult();
 };
 
 void tst_QXmppEntityTimeIq::testEntityTimeGet()

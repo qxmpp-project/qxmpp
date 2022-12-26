@@ -14,14 +14,13 @@ class tst_QXmppTransferManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void init();
-    void testSendFile_data();
-    void testSendFile();
-
-    void acceptFile(QXmppTransferJob *job);
-
 private:
+    Q_SLOT void init();
+    Q_SLOT void testSendFile_data();
+    Q_SLOT void testSendFile();
+
+    Q_SLOT void acceptFile(QXmppTransferJob *job);
+
     QBuffer receiverBuffer;
     QXmppTransferJob *receiverJob;
 };

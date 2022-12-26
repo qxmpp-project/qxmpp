@@ -102,7 +102,7 @@ void QXmppPasswordReply::setError(QXmppPasswordReply::Error error)
 void QXmppPasswordReply::finish()
 {
     m_isFinished = true;
-    emit finished();
+    Q_EMIT finished();
 }
 
 /// Delay marking reply as finished.

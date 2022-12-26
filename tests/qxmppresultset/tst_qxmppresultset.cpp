@@ -12,11 +12,11 @@ class tst_QXmppResultSet : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testQuery_data();
-    void testQuery();
-    void testReply_data();
-    void testReply();
+private:
+    Q_SLOT void testQuery_data();
+    Q_SLOT void testQuery();
+    Q_SLOT void testReply_data();
+    Q_SLOT void testReply();
 };
 
 void tst_QXmppResultSet::testQuery_data()

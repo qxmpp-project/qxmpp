@@ -17,7 +17,6 @@ public:
     xmppClient(QObject *parent = nullptr);
     ~xmppClient() override;
 
-public slots:
     void clientConnected();
     void rosterReceived();
     void presenceChanged(const QString &bareJid, const QString &resource);

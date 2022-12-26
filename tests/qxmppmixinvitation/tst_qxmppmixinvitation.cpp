@@ -12,9 +12,9 @@ class tst_QXmppMixInvitation : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testInvitation();
-    void testIsInvitation();
+private:
+    Q_SLOT void testInvitation();
+    Q_SLOT void testIsInvitation();
 };
 
 void tst_QXmppMixInvitation::testInvitation()

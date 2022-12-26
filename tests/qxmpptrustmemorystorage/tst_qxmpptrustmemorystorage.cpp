@@ -17,19 +17,18 @@ class tst_QXmppTrustMemoryStorage : public QObject
 {
     Q_OBJECT
 
-private slots:
+private:
     // QXmppTrustMemoryStorage
-    void testSecurityPolicy();
-    void testOwnKeys();
-    void testKeys();
-    void testTrustLevels();
-    void testResetAll();
+    Q_SLOT void testSecurityPolicy();
+    Q_SLOT void testOwnKeys();
+    Q_SLOT void testKeys();
+    Q_SLOT void testTrustLevels();
+    Q_SLOT void testResetAll();
 
     // QXmppAtmTrustMemoryStorage
-    void atmTestKeysForPostponedTrustDecisions();
-    void atmTestResetAll();
+    Q_SLOT void atmTestKeysForPostponedTrustDecisions();
+    Q_SLOT void atmTestResetAll();
 
-private:
     QXmppTrustMemoryStorage m_trustStorage;
     QXmppAtmTrustMemoryStorage m_atmTrustStorage;
 };

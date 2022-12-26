@@ -12,9 +12,9 @@ class tst_QXmppDiscoveryIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testDiscovery();
-    void testDiscoveryWithForm();
+private:
+    Q_SLOT void testDiscovery();
+    Q_SLOT void testDiscoveryWithForm();
 };
 
 void tst_QXmppDiscoveryIq::testDiscovery()

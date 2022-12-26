@@ -13,12 +13,12 @@ class tst_QXmppRosterManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
+private:
+    Q_SLOT void initTestCase();
 
-    void testDiscoFeatures();
-    void testRenameItem();
-    void subscriptionRequestReceived();
+    Q_SLOT void testDiscoFeatures();
+    Q_SLOT void testRenameItem();
+    Q_SLOT void subscriptionRequestReceived();
     Q_SLOT void testAddItem();
     Q_SLOT void testRemoveItem();
 
@@ -106,7 +106,7 @@ void tst_QXmppRosterManager::subscriptionRequestReceived()
         QCOMPARE(presence.statusText(), QStringLiteral("Hi, I'm Alice."));
     });
 
-    emit client.presenceReceived(presence);
+    Q_EMIT client.presenceReceived(presence);
     QVERIFY(subscriptionRequestReceived);
 }
 

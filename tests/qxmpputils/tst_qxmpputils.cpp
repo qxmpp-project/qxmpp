@@ -20,15 +20,13 @@ class tst_QXmppUtils : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testCrc32();
-    void testHmac();
-    void testJid();
-    void testMime();
-    void testTimezoneOffset();
-    void testStanzaHash();
-
 private:
+    Q_SLOT void testCrc32();
+    Q_SLOT void testHmac();
+    Q_SLOT void testJid();
+    Q_SLOT void testMime();
+    Q_SLOT void testTimezoneOffset();
+    Q_SLOT void testStanzaHash();
     Q_SLOT void testCalculateHashes_data();
     Q_SLOT void testCalculateHashes();
 };

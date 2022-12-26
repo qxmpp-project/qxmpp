@@ -12,9 +12,9 @@ class tst_QXmppVersionIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testVersionGet();
-    void testVersionResult();
+private:
+    Q_SLOT void testVersionGet();
+    Q_SLOT void testVersionResult();
 };
 
 void tst_QXmppVersionIq::testVersionGet()

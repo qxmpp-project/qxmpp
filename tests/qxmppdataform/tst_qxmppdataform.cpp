@@ -19,12 +19,12 @@ class tst_QXmppDataForm : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testSimple();
-    void testSubmit();
-    void testMedia();
-    void testMediaSource();
-    void testFormType();
+private:
+    Q_SLOT void testSimple();
+    Q_SLOT void testSubmit();
+    Q_SLOT void testMedia();
+    Q_SLOT void testMediaSource();
+    Q_SLOT void testFormType();
 };
 
 void tst_QXmppDataForm::testSimple()

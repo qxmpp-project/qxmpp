@@ -863,7 +863,7 @@ bool QXmppClient::injectMessage(QXmppMessage &&message)
     auto handled = MessagePipeline::process(this, d->extensions, std::move(message));
     if (!handled) {
         // no extension handled the message
-        emit messageReceived(message);
+        Q_EMIT messageReceived(message);
     }
     return handled;
 }
@@ -890,7 +890,7 @@ void QXmppClient::_q_reconnect()
 void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
     Q_UNUSED(socketState);
-    emit stateChanged(state());
+    Q_EMIT stateChanged(state());
 }
 
 /// At connection establishment, send initial presence.
@@ -902,8 +902,8 @@ void QXmppClient::_q_streamConnected()
     d->isActive = true;
 
     // notify managers
-    emit connected();
-    emit stateChanged(QXmppClient::ConnectedState);
+    Q_EMIT connected();
+    Q_EMIT stateChanged(QXmppClient::ConnectedState);
 
     // send initial presence
     if (d->stream->isAuthenticated()) {
@@ -914,8 +914,8 @@ void QXmppClient::_q_streamConnected()
 void QXmppClient::_q_streamDisconnected()
 {
     // notify managers
-    emit disconnected();
-    emit stateChanged(QXmppClient::DisconnectedState);
+    Q_EMIT disconnected();
+    Q_EMIT stateChanged(QXmppClient::DisconnectedState);
 }
 
 void QXmppClient::_q_streamError(QXmppClient::Error err)
@@ -936,7 +936,7 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
     }
 
     // notify managers
-    emit error(err);
+    Q_EMIT error(err);
 }
 
 QXmppLogger *QXmppClient::logger() const
@@ -968,6 +968,6 @@ void QXmppClient::setLogger(QXmppLogger *logger)
                     d->logger, &QXmppLogger::updateCounter);
         }
 
-        emit loggerChanged(d->logger);
+        Q_EMIT loggerChanged(d->logger);
     }
 }

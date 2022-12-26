@@ -18,11 +18,10 @@ public:
     rpcClient(QObject *parent = nullptr);
     ~rpcClient() override;
 
-private slots:
-    void slotInvokeRemoteMethod();
-    void slotPresenceReceived(const QXmppPresence &presence);
-
 private:
+    Q_SLOT void slotInvokeRemoteMethod();
+    Q_SLOT void slotPresenceReceived(const QXmppPresence &presence);
+
     QString m_remoteJid;
     QXmppRpcManager *m_rpcManager;
 };

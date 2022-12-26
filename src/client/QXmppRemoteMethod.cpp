@@ -39,7 +39,7 @@ void QXmppRemoteMethod::gotError(const QXmppRpcErrorIq &iq)
         m_result.hasError = true;
         m_result.errorMessage = iq.error().text();
         m_result.code = iq.error().type();
-        emit callDone();
+        Q_EMIT callDone();
     }
 }
 
@@ -50,6 +50,6 @@ void QXmppRemoteMethod::gotResult(const QXmppRpcResponseIq &iq)
         // FIXME: we don't handle multiple responses
         const auto values = iq.values();
         m_result.result = values.first();
-        emit callDone();
+        Q_EMIT callDone();
     }
 }

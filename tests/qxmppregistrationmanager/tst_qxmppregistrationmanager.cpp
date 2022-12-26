@@ -13,34 +13,33 @@ class tst_QXmppRegistrationManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-
-    void testDiscoFeatures();
-
-    void testChangePassword_data();
-    void testChangePassword();
-    void testDeleteAccount();
-    void testRequestRegistrationForm_data();
-    void testRequestRegistrationForm();
-    void testRegisterOnConnectGetSet();
-    void testServiceDiscovery();
-    void testSendCachedRegistrationForm_data();
-    void testSendCachedRegistrationForm();
-    void testStreamFeaturesCheck_data();
-    void testStreamFeaturesCheck();
-    void testRegistrationResult_data();
-    void testRegistrationResult();
-    void testChangePasswordResult_data();
-    void testChangePasswordResult();
-    void testDeleteAccountResult_data();
-    void testDeleteAccountResult();
-    void testRegistrationFormReceived();
-
-    void sendStreamFeaturesToManager(bool registrationEnabled = true);
-    void setManagerConfig(const QString &username, const QString &server = QStringLiteral("example.org"), const QString &password = {});
-
 private:
+    Q_SLOT void initTestCase();
+
+    Q_SLOT void testDiscoFeatures();
+
+    Q_SLOT void testChangePassword_data();
+    Q_SLOT void testChangePassword();
+    Q_SLOT void testDeleteAccount();
+    Q_SLOT void testRequestRegistrationForm_data();
+    Q_SLOT void testRequestRegistrationForm();
+    Q_SLOT void testRegisterOnConnectGetSet();
+    Q_SLOT void testServiceDiscovery();
+    Q_SLOT void testSendCachedRegistrationForm_data();
+    Q_SLOT void testSendCachedRegistrationForm();
+    Q_SLOT void testStreamFeaturesCheck_data();
+    Q_SLOT void testStreamFeaturesCheck();
+    Q_SLOT void testRegistrationResult_data();
+    Q_SLOT void testRegistrationResult();
+    Q_SLOT void testChangePasswordResult_data();
+    Q_SLOT void testChangePasswordResult();
+    Q_SLOT void testDeleteAccountResult_data();
+    Q_SLOT void testDeleteAccountResult();
+    Q_SLOT void testRegistrationFormReceived();
+
+    Q_SLOT void sendStreamFeaturesToManager(bool registrationEnabled = true);
+    Q_SLOT void setManagerConfig(const QString &username, const QString &server = QStringLiteral("example.org"), const QString &password = {});
+
     QXmppClient client;
     QXmppLogger logger;
     QXmppRegistrationManager *manager;
@@ -206,7 +205,7 @@ void tst_QXmppRegistrationManager::testServiceDiscovery()
     delete context;
 
     // on disconnect, supportedByServer needs to be reset
-    emit client.disconnected();
+    Q_EMIT client.disconnected();
     QVERIFY(!manager->supportedByServer());
 }
 

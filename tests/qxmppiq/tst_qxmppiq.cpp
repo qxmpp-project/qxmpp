@@ -11,9 +11,9 @@ class tst_QXmppIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBasic_data();
-    void testBasic();
+private:
+    Q_SLOT void testBasic_data();
+    Q_SLOT void testBasic();
 };
 
 void tst_QXmppIq::testBasic_data()

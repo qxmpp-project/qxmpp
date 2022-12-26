@@ -21,17 +21,16 @@ class tst_QXmppClient : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-
-    void handleMessageSent(QXmppLogger::MessageType type, const QString &text) const;
-    void testSendMessage();
-
-    void testIndexOfExtension();
-
-    void testE2eeExtension();
-
 private:
+    Q_SLOT void initTestCase();
+
+    Q_SLOT void handleMessageSent(QXmppLogger::MessageType type, const QString &text) const;
+    Q_SLOT void testSendMessage();
+
+    Q_SLOT void testIndexOfExtension();
+
+    Q_SLOT void testE2eeExtension();
+
     QXmppClient *client;
 };
 

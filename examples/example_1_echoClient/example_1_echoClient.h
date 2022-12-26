@@ -15,7 +15,6 @@ public:
     echoClient(QObject *parent = nullptr);
     ~echoClient() override;
 
-public slots:
     void messageReceived(const QXmppMessage &);
 };
 

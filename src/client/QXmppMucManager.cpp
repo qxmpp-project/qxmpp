@@ -61,7 +61,7 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
                 this, &QXmppMucManager::_q_roomDestroyed);
 
         // emit signal
-        emit roomAdded(room);
+        Q_EMIT roomAdded(room);
     }
     return room;
 }
@@ -100,7 +100,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
                     }
                 }
                 if (room->d->permissionsQueue.isEmpty()) {
-                    emit room->permissionsReceived(room->d->permissions.values());
+                    Q_EMIT room->permissionsReceived(room->d->permissions.values());
                 }
                 return true;
             }
@@ -110,7 +110,7 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
 
             QXmppMucRoom *room = d->rooms.value(iq.from());
             if (room && iq.type() == QXmppIq::Result && !iq.form().isNull()) {
-                emit room->configurationReceived(iq.form());
+                Q_EMIT room->configurationReceived(iq.form());
                 return true;
             }
         }
@@ -136,7 +136,7 @@ void QXmppMucManager::_q_messageReceived(const QXmppMessage &msg)
     // process room invitations
     const QString roomJid = msg.mucInvitationJid();
     if (!roomJid.isEmpty() && (!d->rooms.contains(roomJid) || !d->rooms.value(roomJid)->isJoined())) {
-        emit invitationReceived(roomJid, msg.from(), msg.mucInvitationReason());
+        Q_EMIT invitationReceived(roomJid, msg.from(), msg.mucInvitationReason());
     }
 }
 
@@ -342,7 +342,7 @@ void QXmppMucRoom::setNickName(const QString &nickName)
         d->client->sendPacket(packet);
     } else {
         d->nickName = nickName;
-        emit nickNameChanged(nickName);
+        Q_EMIT nickNameChanged(nickName);
     }
 }
 
@@ -520,19 +520,19 @@ void QXmppMucRoom::_q_disconnected()
     const QStringList removed = d->participants.keys();
     d->participants.clear();
     for (const auto &jid : removed) {
-        emit participantRemoved(jid);
+        Q_EMIT participantRemoved(jid);
     }
-    emit participantsChanged();
+    Q_EMIT participantsChanged();
 
     // update available actions
     if (d->allowedActions != NoAction) {
         d->allowedActions = NoAction;
-        emit allowedActionsChanged(d->allowedActions);
+        Q_EMIT allowedActionsChanged(d->allowedActions);
     }
 
     // emit "left" signal if we had joined the room
     if (wasJoined) {
-        emit left();
+        Q_EMIT left();
     }
 }
 
@@ -550,7 +550,7 @@ void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
 
         if (name != d->name) {
             d->name = name;
-            emit nameChanged(name);
+            Q_EMIT nameChanged(name);
         }
     }
 }
@@ -565,10 +565,10 @@ void QXmppMucRoom::_q_messageReceived(const QXmppMessage &message)
     const QString subject = message.subject();
     if (!subject.isEmpty()) {
         d->subject = subject;
-        emit subjectChanged(subject);
+        Q_EMIT subjectChanged(subject);
     }
 
-    emit messageReceived(message);
+    Q_EMIT messageReceived(message);
 }
 
 void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
@@ -610,38 +610,38 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
 
             if (newActions != d->allowedActions) {
                 d->allowedActions = newActions;
-                emit allowedActionsChanged(d->allowedActions);
+                Q_EMIT allowedActionsChanged(d->allowedActions);
             }
         }
 
         if (added) {
-            emit participantAdded(jid);
-            emit participantsChanged();
+            Q_EMIT participantAdded(jid);
+            Q_EMIT participantsChanged();
             if (jid == d->ownJid()) {
                 // request room information
                 if (d->discoManager) {
                     d->discoManager->requestInfo(d->jid);
                 }
 
-                emit joined();
+                Q_EMIT joined();
             }
         } else {
-            emit participantChanged(jid);
+            Q_EMIT participantChanged(jid);
         }
     } else if (presence.type() == QXmppPresence::Unavailable) {
         if (d->participants.contains(jid)) {
             d->participants.insert(jid, presence);
 
-            emit participantRemoved(jid);
+            Q_EMIT participantRemoved(jid);
             d->participants.remove(jid);
-            emit participantsChanged();
+            Q_EMIT participantsChanged();
 
             // check whether this was our own presence
             if (jid == d->ownJid()) {
                 const QString newNick = presence.mucItem().nick();
                 if (!newNick.isEmpty() && newNick != d->nickName) {
                     d->nickName = newNick;
-                    emit nickNameChanged(newNick);
+                    Q_EMIT nickNameChanged(newNick);
                     return;
                 }
 
@@ -649,34 +649,34 @@ void QXmppMucRoom::_q_presenceReceived(const QXmppPresence &presence)
                 if (presence.mucStatusCodes().contains(307)) {
                     const QString actor = presence.mucItem().actor();
                     const QString reason = presence.mucItem().reason();
-                    emit kicked(actor, reason);
+                    Q_EMIT kicked(actor, reason);
                 }
 
                 // clear chat room participants
                 const QStringList removed = d->participants.keys();
                 d->participants.clear();
                 for (const auto &jid : removed) {
-                    emit participantRemoved(jid);
+                    Q_EMIT participantRemoved(jid);
                 }
-                emit participantsChanged();
+                Q_EMIT participantsChanged();
 
                 // update available actions
                 if (d->allowedActions != NoAction) {
                     d->allowedActions = NoAction;
-                    emit allowedActionsChanged(d->allowedActions);
+                    Q_EMIT allowedActionsChanged(d->allowedActions);
                 }
 
                 // notify user we left the room
-                emit left();
+                Q_EMIT left();
             }
         }
     } else if (presence.type() == QXmppPresence::Error) {
         if (presence.isMucSupported()) {
             // emit error
-            emit error(presence.error());
+            Q_EMIT error(presence.error());
 
             // notify the user we left the room
-            emit left();
+            Q_EMIT left();
         }
     }
 }

@@ -119,7 +119,7 @@ protected:
 
     void debug(const QString &message)
     {
-        emit logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::DebugMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs an informational message.
@@ -128,7 +128,7 @@ protected:
 
     void info(const QString &message)
     {
-        emit logMessage(QXmppLogger::InformationMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::InformationMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a warning message.
@@ -137,7 +137,7 @@ protected:
 
     void warning(const QString &message)
     {
-        emit logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::WarningMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a received packet.
@@ -146,7 +146,7 @@ protected:
 
     void logReceived(const QString &message)
     {
-        emit logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::ReceivedMessage, qxmpp_loggable_trace(message));
     }
 
     /// Logs a sent packet.
@@ -155,7 +155,7 @@ protected:
 
     void logSent(const QString &message)
     {
-        emit logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
+        Q_EMIT logMessage(QXmppLogger::SentMessage, qxmpp_loggable_trace(message));
     }
 
 Q_SIGNALS:

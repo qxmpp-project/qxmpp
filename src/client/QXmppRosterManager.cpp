@@ -173,17 +173,17 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
             if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
                 if (d->entries.remove(bareJid)) {
                     // notify the user that the item was removed
-                    emit itemRemoved(bareJid);
+                    Q_EMIT itemRemoved(bareJid);
                 }
             } else {
                 const bool added = !d->entries.contains(bareJid);
                 d->entries.insert(bareJid, item);
                 if (added) {
                     // notify the user that the item was added
-                    emit itemAdded(bareJid);
+                    Q_EMIT itemAdded(bareJid);
                 } else {
                     // notify the user that the item changed
-                    emit itemChanged(bareJid);
+                    Q_EMIT itemChanged(bareJid);
                 }
             }
         }
@@ -196,7 +196,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
         }
         if (isInitial) {
             d->isRosterReceived = true;
-            emit rosterReceived();
+            Q_EMIT rosterReceived();
         }
         break;
     }
@@ -221,11 +221,11 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     switch (presence.type()) {
     case QXmppPresence::Available:
         d->presences[bareJid][resource] = presence;
-        emit presenceChanged(bareJid, resource);
+        Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Unavailable:
         d->presences[bareJid].remove(resource);
-        emit presenceChanged(bareJid, resource);
+        Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Subscribe:
         if (client()->configuration().autoAcceptSubscriptions()) {
@@ -235,8 +235,8 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
             // ask for reciprocal subscription
             subscribe(bareJid);
         } else {
-            emit subscriptionReceived(bareJid);
-            emit subscriptionRequestReceived(bareJid, presence);
+            Q_EMIT subscriptionReceived(bareJid);
+            Q_EMIT subscriptionRequestReceived(bareJid, presence);
         }
         break;
     default:

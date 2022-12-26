@@ -20,19 +20,19 @@ class tst_QXmppStanza : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testExtendedAddress_data();
-    void testExtendedAddress();
+private:
+    Q_SLOT void testExtendedAddress_data();
+    Q_SLOT void testExtendedAddress();
 
-    void testErrorCases_data();
-    void testErrorCases();
-    void testErrorFileTooLarge();
-    void testErrorRetry();
-    void testErrorEnums();
+    Q_SLOT void testErrorCases_data();
+    Q_SLOT void testErrorCases();
+    Q_SLOT void testErrorFileTooLarge();
+    Q_SLOT void testErrorRetry();
+    Q_SLOT void testErrorEnums();
 
-    void testEncryption();
-    void testSenderKey();
-    void testSceTimestamp();
+    Q_SLOT void testEncryption();
+    Q_SLOT void testSenderKey();
+    Q_SLOT void testSceTimestamp();
 };
 
 void tst_QXmppStanza::testExtendedAddress_data()
