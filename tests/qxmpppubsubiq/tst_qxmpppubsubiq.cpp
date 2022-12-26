@@ -12,6 +12,8 @@
 #include "util.h"
 #include <QObject>
 
+using namespace QXmpp::Private;
+
 class tst_QXmppPubSubIq : public QObject
 {
     Q_OBJECT
@@ -45,23 +47,23 @@ void tst_QXmppPubSubIq::testItems()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("items1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq();
+    iq = PubSubIq();
     iq.setId(QLatin1String("items1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("francisco@denmark.lit/barracks"));
     iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppPubSubIq<>::Items);
+    iq.setQueryType(PubSubIq<>::Items);
     iq.setQueryJid({});
     iq.setQueryNode(QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
@@ -87,13 +89,13 @@ void tst_QXmppPubSubIq::testItemsResponse()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("items1"));
     QCOMPARE(iq.to(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.from(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
     QVERIFY(iq.itemsContinuation().has_value());
@@ -113,23 +115,23 @@ void tst_QXmppPubSubIq::testCreateNode()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QString("create1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Create);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Create);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq();
+    iq = PubSubIq();
     iq.setId(QLatin1String("create1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq<>::Create);
+    iq.setQueryType(PubSubIq<>::Create);
     iq.setQueryNode(QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 }
@@ -143,23 +145,23 @@ void tst_QXmppPubSubIq::testDeleteNode()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QString("delete1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Delete);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Delete);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq<>();
+    iq = PubSubIq<>();
     iq.setId(QLatin1String("delete1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq<>::Delete);
+    iq.setQueryType(PubSubIq<>::Delete);
     iq.setQueryNode(QLatin1String("princely_musings"));
     serializePacket(iq, xml);
 }
@@ -179,13 +181,13 @@ void tst_QXmppPubSubIq::testPublish()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq<> iq;
+    PubSubIq<> iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("items1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Publish);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Publish);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("storage:bookmarks"));
     serializePacket(iq, xml);
@@ -193,12 +195,12 @@ void tst_QXmppPubSubIq::testPublish()
     // serialize using setters
     QXmppPubSubItem item(QStringLiteral("current"));
 
-    iq = QXmppPubSubIq();
+    iq = PubSubIq();
     iq.setId(QLatin1String("items1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("francisco@denmark.lit/barracks"));
     iq.setType(QXmppIq::Result);
-    iq.setQueryType(QXmppPubSubIq<>::Publish);
+    iq.setQueryType(PubSubIq<>::Publish);
     iq.setQueryJid({});
     iq.setQueryNode(QLatin1String("storage:bookmarks"));
     iq.setItems({ item });
@@ -221,25 +223,25 @@ void tst_QXmppPubSubIq::testRetractItem()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq<> iq;
+    PubSubIq<> iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QString("retract1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Retract);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Retract);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     QCOMPARE(iq.items().size(), 1);
     QCOMPARE(iq.items().first().id(), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq();
+    iq = PubSubIq();
     iq.setId(QLatin1String("retract1"));
     iq.setTo(QLatin1String("pubsub.shakespeare.lit"));
     iq.setFrom(QLatin1String("hamlet@denmark.lit/elsinore"));
     iq.setType(QXmppIq::Set);
-    iq.setQueryType(QXmppPubSubIq<>::Retract);
+    iq.setQueryType(PubSubIq<>::Retract);
     iq.setQueryJid({});
     iq.setQueryNode(QLatin1String("princely_musings"));
 
@@ -263,13 +265,13 @@ void tst_QXmppPubSubIq::testSubscribe()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("sub1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscribe);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Subscribe);
     QCOMPARE(iq.queryJid(), QLatin1String("francisco@denmark.lit"));
     QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     serializePacket(iq, xml);
@@ -290,24 +292,24 @@ void tst_QXmppPubSubIq::testSubscription()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QString("sub1"));
     QCOMPARE(iq.to(), QString("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.from(), QString("pubsub.shakespeare.lit"));
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscription);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Subscription);
     QCOMPARE(iq.subscription()->jid(), QString("francisco@denmark.lit"));
     QCOMPARE(iq.subscription()->node(), QString("princely_musings"));
     QCOMPARE(iq.subscription()->subId(), QStringLiteral("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq();
+    iq = PubSubIq();
     iq.setId("sub1");
     iq.setTo("francisco@denmark.lit/barracks");
     iq.setFrom("pubsub.shakespeare.lit");
     iq.setType(QXmppIq::Result);
-    iq.setQueryType(QXmppPubSubIq<>::Subscription);
+    iq.setQueryType(PubSubIq<>::Subscription);
     iq.setSubscription(QXmppPubSubSubscription(
         "francisco@denmark.lit",
         "princely_musings",
@@ -328,13 +330,13 @@ void tst_QXmppPubSubIq::testSubscriptions()
         "</pubsub>"
         "</iq>");
 
-    QXmppPubSubIq iq;
+    PubSubIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.id(), QLatin1String("subscriptions1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("francisco@denmark.lit/barracks"));
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Subscriptions);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Subscriptions);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QString());
     serializePacket(iq, xml);
@@ -375,7 +377,7 @@ void tst_QXmppPubSubIq::testIsPubSubIq()
     QVERIFY(doc.setContent(xml, true));
     QDomElement element = doc.documentElement();
 
-    QCOMPARE(QXmppPubSubIq<>::isPubSubIq(element), isValid);
+    QCOMPARE(PubSubIq<>::isPubSubIq(element), isValid);
 }
 
 void tst_QXmppPubSubIq::testCustomItem()
@@ -392,13 +394,13 @@ void tst_QXmppPubSubIq::testCustomItem()
 
     // test isPubSubIq also checks item validity
     TestItem::isItemCalled = false;
-    QVERIFY(QXmppPubSubIq<TestItem>::isPubSubIq(xmlToDom(xml)));
+    QVERIFY(PubSubIq<TestItem>::isPubSubIq(xmlToDom(xml)));
     QVERIFY(TestItem::isItemCalled);
 
-    QXmppPubSubIq<TestItem> iq;
+    PubSubIq<TestItem> iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.queryType(), QXmppPubSubIq<>::Items);
+    QCOMPARE(iq.queryType(), PubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QStringLiteral("blah"));
     QCOMPARE(iq.items().size(), 2);
@@ -414,10 +416,10 @@ void tst_QXmppPubSubIq::testCustomItem()
 
     serializePacket(iq, xml);
 
-    iq = QXmppPubSubIq<TestItem>();
+    iq = PubSubIq<TestItem>();
     iq.setId("a1");
     iq.setType(QXmppIq::Result);
-    iq.setQueryType(QXmppPubSubIq<>::Items);
+    iq.setQueryType(PubSubIq<>::Items);
     iq.setQueryNode("blah");
     iq.setItems({ TestItem("42"), TestItem("23") });
     serializePacket(iq, xml);
