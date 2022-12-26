@@ -8,7 +8,6 @@
 #include "QXmppMessage.h"
 #include "QXmppPubSubAffiliation.h"
 #include "QXmppPubSubEventHandler.h"
-#include "QXmppPubSubIq.h"
 #include "QXmppPubSubItem.h"
 #include "QXmppPubSubManager.h"
 #include "QXmppPubSubPublishOptions.h"
