@@ -14,13 +14,13 @@ class tst_QXmppMixIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBase_data();
-    void testBase();
-    void testDefaults();
-    void testSetters();
-    void testInvalidActionType();
-    void testIsMixIq();
+private:
+    Q_SLOT void testBase_data();
+    Q_SLOT void testBase();
+    Q_SLOT void testDefaults();
+    Q_SLOT void testSetters();
+    Q_SLOT void testInvalidActionType();
+    Q_SLOT void testIsMixIq();
 };
 
 void tst_QXmppMixIq::testBase_data()

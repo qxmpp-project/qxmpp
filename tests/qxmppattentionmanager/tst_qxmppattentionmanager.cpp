@@ -15,16 +15,15 @@ class tst_QXmppAttentionManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-
-    void testDiscoFeatures();
-    void testReceived_data();
-    void testReceived();
-    void testRateLimiting();
-    void testSendRequest();
-
 private:
+    Q_SLOT void initTestCase();
+
+    Q_SLOT void testDiscoFeatures();
+    Q_SLOT void testReceived_data();
+    Q_SLOT void testReceived();
+    Q_SLOT void testRateLimiting();
+    Q_SLOT void testSendRequest();
+
     void setOwnJid(const QString &jid);
     void addToRoster(const QString &jid);
 
@@ -100,7 +99,7 @@ void tst_QXmppAttentionManager::testReceived()
         limitedCalled = true;
     });
 
-    emit client.messageReceived(msg);
+    Q_EMIT client.messageReceived(msg);
 
     QCOMPARE(signalCalled, accepted);
     QVERIFY(!limitedCalled);
@@ -133,7 +132,7 @@ void tst_QXmppAttentionManager::testRateLimiting()
     msg.setAttentionRequested(true);
 
     for (int i = 0; i < count; i++) {
-        emit client.messageReceived(msg);
+        Q_EMIT client.messageReceived(msg);
     }
 
     QCOMPARE(signalCalled, allowed);
@@ -144,7 +143,7 @@ void tst_QXmppAttentionManager::testRateLimiting()
     QCoreApplication::processEvents();
 
     for (int i = 0; i < count; i++) {
-        emit client.messageReceived(msg);
+        Q_EMIT client.messageReceived(msg);
     }
 
     QCOMPARE(signalCalled, allowed * 2);

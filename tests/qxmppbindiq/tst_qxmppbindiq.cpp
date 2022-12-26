@@ -12,10 +12,10 @@ class tst_QXmppBindIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testNoResource();
-    void testResource();
-    void testResult();
+private:
+    Q_SLOT void testNoResource();
+    Q_SLOT void testResource();
+    Q_SLOT void testResult();
 };
 
 void tst_QXmppBindIq::testNoResource()

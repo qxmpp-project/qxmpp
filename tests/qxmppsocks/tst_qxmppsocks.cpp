@@ -12,17 +12,16 @@ class tst_QXmppSocks : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void init();
-    void newConnectionSlot(QTcpSocket *socket, QString hostName, quint16 port);
-
-    void testClient_data();
-    void testClient();
-    void testClientAndServer();
-    void testServer_data();
-    void testServer();
-
 private:
+    Q_SLOT void init();
+    Q_SLOT void newConnectionSlot(QTcpSocket *socket, QString hostName, quint16 port);
+
+    Q_SLOT void testClient_data();
+    Q_SLOT void testClient();
+    Q_SLOT void testClientAndServer();
+    Q_SLOT void testServer_data();
+    Q_SLOT void testServer();
+
     QTcpSocket *m_connectionSocket;
     QString m_connectionHostName;
     quint16 m_connectionPort;

@@ -11,10 +11,10 @@ class tst_QXmppIceConnection : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBind();
-    void testBindStun();
-    void testConnect();
+private:
+    Q_SLOT void testBind();
+    Q_SLOT void testBindStun();
+    Q_SLOT void testConnect();
 };
 
 void tst_QXmppIceConnection::testBind()

@@ -47,7 +47,7 @@ struct QXmppHttpUploadPrivate
     {
         if (!finished) {
             finished = true;
-            emit q->finished(result());
+            Q_EMIT q->finished(result());
         }
     }
     void reportProgress(quint64 sent, quint64 total)
@@ -61,7 +61,7 @@ struct QXmppHttpUploadPrivate
         if (bytesSent != sent || bytesTotal != total) {
             bytesSent = sent;
             bytesTotal = total;
-            emit q->progressChanged();
+            Q_EMIT q->progressChanged();
         }
     }
     [[nodiscard]] QXmppHttpUpload::Result result() const

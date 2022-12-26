@@ -28,11 +28,11 @@ class tst_QXmppStreamFeatures : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testEmpty();
-    void testRequired();
-    void testFull();
-    void testSetters();
+private:
+    Q_SLOT void testEmpty();
+    Q_SLOT void testRequired();
+    Q_SLOT void testFull();
+    Q_SLOT void testSetters();
 };
 
 void tst_QXmppStreamFeatures::testEmpty()

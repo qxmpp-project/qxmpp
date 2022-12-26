@@ -132,7 +132,7 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
 
         if (versionIq.type() == QXmppIq::Result) {
             // emit response
-            emit versionReceived(versionIq);
+            Q_EMIT versionReceived(versionIq);
         }
 
         return true;

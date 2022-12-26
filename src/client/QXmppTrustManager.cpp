@@ -212,7 +212,7 @@ QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const 
 
     auto future = m_trustStorage->setTrustLevel(encryption, keyIds, trustLevel);
     await(future, this, [=](QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys) mutable {
-        emit trustLevelsChanged(modifiedKeys);
+        Q_EMIT trustLevelsChanged(modifiedKeys);
         interface.reportFinished();
     });
 
@@ -233,7 +233,7 @@ QFuture<void> QXmppTrustManager::setTrustLevel(const QString &encryption, const 
 
     auto future = m_trustStorage->setTrustLevel(encryption, keyOwnerJids, oldTrustLevel, newTrustLevel);
     await(future, this, [=](QHash<QString, QMultiHash<QString, QByteArray>> modifiedKeys) mutable {
-        emit trustLevelsChanged(modifiedKeys);
+        Q_EMIT trustLevelsChanged(modifiedKeys);
         interface.reportFinished();
     });
 

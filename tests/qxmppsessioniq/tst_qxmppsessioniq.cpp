@@ -11,8 +11,8 @@ class TestPackets : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testSession();
+private:
+    Q_SLOT void testSession();
 };
 
 void TestPackets::testSession()

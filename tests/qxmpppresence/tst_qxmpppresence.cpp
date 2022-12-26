@@ -14,18 +14,18 @@ class tst_QXmppPresence : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testPresence();
-    void testPresence_data();
-    void testPresenceWithCapability();
-    void testPresenceWithExtendedAddresses();
-    void testPresenceWithMucItem();
-    void testPresenceWithMucPassword();
-    void testPresenceWithMucSupport();
-    void testPresenceWithMuji();
-    void testPresenceWithLastUserInteraction();
-    void testPresenceWithMix();
-    void testPresenceWithVCard();
+private:
+    Q_SLOT void testPresence();
+    Q_SLOT void testPresence_data();
+    Q_SLOT void testPresenceWithCapability();
+    Q_SLOT void testPresenceWithExtendedAddresses();
+    Q_SLOT void testPresenceWithMucItem();
+    Q_SLOT void testPresenceWithMucPassword();
+    Q_SLOT void testPresenceWithMucSupport();
+    Q_SLOT void testPresenceWithMuji();
+    Q_SLOT void testPresenceWithLastUserInteraction();
+    Q_SLOT void testPresenceWithMix();
+    Q_SLOT void testPresenceWithVCard();
 };
 
 void tst_QXmppPresence::testPresence_data()

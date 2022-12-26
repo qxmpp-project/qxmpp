@@ -339,7 +339,7 @@ void QXmppTransferJob::setLocalFileUrl(const QUrl &localFileUrl)
 {
     if (localFileUrl != d->localFileUrl) {
         d->localFileUrl = localFileUrl;
-        emit localFileUrlChanged(localFileUrl);
+        Q_EMIT localFileUrlChanged(localFileUrl);
     }
 }
 
@@ -412,17 +412,17 @@ void QXmppTransferJob::setState(QXmppTransferJob::State state)
         if (d->state == QXmppTransferJob::TransferState) {
             d->transferStart.start();
         }
-        emit stateChanged(d->state);
+        Q_EMIT stateChanged(d->state);
     }
 }
 
 void QXmppTransferJob::_q_terminated()
 {
-    emit stateChanged(d->state);
+    Q_EMIT stateChanged(d->state);
     if (d->error != NoError) {
-        emit error(d->error);
+        Q_EMIT error(d->error);
     }
-    emit finished();
+    Q_EMIT finished();
 }
 
 void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
@@ -528,7 +528,7 @@ bool QXmppTransferIncomingJob::writeData(const QByteArray &data)
     if (!d->fileInfo.hash().isEmpty()) {
         d->hash.addData(data);
     }
-    emit progress(d->done, d->fileInfo.size());
+    Q_EMIT progress(d->done, d->fileInfo.size());
     return true;
 }
 
@@ -688,7 +688,7 @@ void QXmppTransferOutgoingJob::_q_sendData()
         d->socksSocket->write(buffer, length);
         delete[] buffer;
         d->done += length;
-        emit progress(d->done, fileSize());
+        Q_EMIT progress(d->done, fileSize());
     }
 }
 /// \endcond
@@ -1073,7 +1073,7 @@ void QXmppTransferManager::ibbResponseReceived(const QXmppIq &iq)
             client()->sendPacket(dataIq);
 
             job->d->done += buffer.size();
-            emit job->progress(job->d->done, job->fileSize());
+            Q_EMIT job->progress(job->d->done, job->fileSize());
         } else {
             // close the bytestream
             QXmppIbbCloseIq closeIq;
@@ -1173,7 +1173,7 @@ void QXmppTransferManager::_q_jobFinished()
         return;
     }
 
-    emit jobFinished(job);
+    Q_EMIT jobFinished(job);
 }
 
 void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
@@ -1232,7 +1232,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     client()->sendPacket(response);
 
     // notify user
-    emit jobStarted(job);
+    Q_EMIT jobStarted(job);
 }
 
 ///
@@ -1355,7 +1355,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     client()->sendPacket(request);
 
     // notify user
-    emit jobStarted(job);
+    Q_EMIT jobStarted(job);
 
     return job;
 }
@@ -1559,7 +1559,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     connect(job, &QXmppTransferJob::stateChanged, this, &QXmppTransferManager::_q_jobStateChanged);
 
     // allow user to accept or decline the job
-    emit fileReceived(job);
+    Q_EMIT fileReceived(job);
 }
 
 QString QXmppTransferManager::proxy() const

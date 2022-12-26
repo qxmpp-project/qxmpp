@@ -15,19 +15,19 @@ class tst_QXmppRegisterIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testGet();
-    void testResult();
-    void testResultWithForm();
-    void testResultWithRedirection();
-    void testResultWithFormAndRedirection();
-    void testSet();
-    void testSetWithForm();
-    void testBobData();
-    void testRegistered();
-    void testRemove();
-    void testChangePassword();
-    void testUnregistration();
+private:
+    Q_SLOT void testGet();
+    Q_SLOT void testResult();
+    Q_SLOT void testResultWithForm();
+    Q_SLOT void testResultWithRedirection();
+    Q_SLOT void testResultWithFormAndRedirection();
+    Q_SLOT void testSet();
+    Q_SLOT void testSetWithForm();
+    Q_SLOT void testBobData();
+    Q_SLOT void testRegistered();
+    Q_SLOT void testRemove();
+    Q_SLOT void testChangePassword();
+    Q_SLOT void testUnregistration();
 };
 
 void tst_QXmppRegisterIq::testGet()

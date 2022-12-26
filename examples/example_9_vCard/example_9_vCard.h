@@ -19,7 +19,6 @@ public:
     xmppClient(QObject *parent = nullptr);
     ~xmppClient() override;
 
-public slots:
     void clientConnected();
     void rosterReceived();
     void vCardReceived(const QXmppVCardIq &);

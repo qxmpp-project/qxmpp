@@ -322,9 +322,9 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         case QXmppIq::Error:
             // handle all replies
             if (receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
-                emit infoReceived(receivedIq);
+                Q_EMIT infoReceived(receivedIq);
             } else if (receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
-                emit itemsReceived(receivedIq);
+                Q_EMIT itemsReceived(receivedIq);
             }
             return true;
 

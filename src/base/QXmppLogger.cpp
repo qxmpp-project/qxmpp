@@ -183,7 +183,7 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
         std::cout << qPrintable(formatted(type, text)) << std::endl;
         break;
     case QXmppLogger::SignalLogging:
-        emit message(type, text);
+        Q_EMIT message(type, text);
         break;
     default:
         break;

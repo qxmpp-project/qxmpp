@@ -183,9 +183,9 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
         if (features.registerMode() == QXmppStreamFeatures::Disabled) {
             warning(QStringLiteral("Could not request the registration form, because the server does not advertise the register stream feature."));
             client()->disconnectFromServer();
-            emit registrationFailed({ QXmppStanza::Error::Cancel,
-                                      QXmppStanza::Error::FeatureNotImplemented,
-                                      QStringLiteral("The server does not advertise the register stream feature.") });
+            Q_EMIT registrationFailed({ QXmppStanza::Error::Cancel,
+                                        QXmppStanza::Error::FeatureNotImplemented,
+                                        QStringLiteral("The server does not advertise the register stream feature.") });
             return true;
         }
 
@@ -210,11 +210,11 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             switch (iq.type()) {
             case QXmppIq::Result:
                 info(QStringLiteral("Successfully registered with the service."));
-                emit registrationSucceeded();
+                Q_EMIT registrationSucceeded();
                 break;
             case QXmppIq::Error:
                 warning(QStringLiteral("Registering with the service failed: ").append(iq.error().text()));
-                emit registrationFailed(iq.error());
+                Q_EMIT registrationFailed(iq.error());
                 break;
             default:
                 break;  // should never occur
@@ -230,11 +230,11 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             case QXmppIq::Result:
                 info(QStringLiteral("Changed password successfully."));
                 client()->configuration().setPassword(d->newPassword);
-                emit passwordChanged(d->newPassword);
+                Q_EMIT passwordChanged(d->newPassword);
                 break;
             case QXmppIq::Error:
                 warning(QStringLiteral("Failed to change password: ").append(iq.error().text()));
-                emit passwordChangeFailed(iq.error());
+                Q_EMIT passwordChangeFailed(iq.error());
                 break;
             default:
                 break;  // should never occur
@@ -250,12 +250,12 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             switch (iq.type()) {
             case QXmppIq::Result:
                 info(QStringLiteral("Account deleted successfully."));
-                emit accountDeleted();
+                Q_EMIT accountDeleted();
                 client()->disconnectFromServer();
                 break;
             case QXmppIq::Error:
                 warning(QStringLiteral("Failed to delete account: ").append(iq.error().text()));
-                emit accountDeletionFailed(iq.error());
+                Q_EMIT accountDeletionFailed(iq.error());
                 break;
             default:
                 break;  // should never occur
@@ -267,7 +267,7 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             QXmppRegisterIq iq;
             iq.parse(stanza);
 
-            emit registrationFormReceived(iq);
+            Q_EMIT registrationFormReceived(iq);
         }
     }
     return false;
@@ -302,6 +302,6 @@ void QXmppRegistrationManager::setSupportedByServer(bool registrationSupported)
 {
     if (d->supportedByServer != registrationSupported) {
         d->supportedByServer = registrationSupported;
-        emit supportedByServerChanged();
+        Q_EMIT supportedByServerChanged();
     }
 }

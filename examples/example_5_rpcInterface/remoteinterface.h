@@ -16,8 +16,8 @@ public:
     bool isAuthorized(const QString &jid) const override;
 
     // RPC Interface
-public slots:
-    QString echoString(const QString &message);
+public:
+    Q_SLOT QString echoString(const QString &message);
 };
 
 #endif  // REMOTEINTERFACE_H

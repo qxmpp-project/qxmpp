@@ -35,15 +35,15 @@ class QXmppCarbonTestHelper : public QObject
 {
     Q_OBJECT
 
-public slots:
-    void messageSent(const QXmppMessage &msg)
+public:
+    Q_SLOT void messageSent(const QXmppMessage &msg)
     {
         m_signalTriggered = true;
         QCOMPARE(m_expectSent, true);
 
         compareMessages(m_expectedMessage, msg);
     }
-    void messageReceived(const QXmppMessage &msg)
+    Q_SLOT void messageReceived(const QXmppMessage &msg)
     {
         m_signalTriggered = true;
         QCOMPARE(m_expectSent, false);
@@ -51,7 +51,6 @@ public slots:
         compareMessages(m_expectedMessage, msg);
     }
 
-public:
     QXmppMessage m_expectedMessage;
     bool m_expectSent;
     bool m_signalTriggered;
@@ -73,13 +72,12 @@ class tst_QXmppCarbonManager : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void initTestCase();
-
-    void testHandleStanza_data();
-    void testHandleStanza();
-
 private:
+    Q_SLOT void initTestCase();
+
+    Q_SLOT void testHandleStanza_data();
+    Q_SLOT void testHandleStanza();
+
     QXmppCarbonTestHelper m_helper;
     MessageHandler *m_messageHandler;
     QXmppCarbonManager *m_managerV1;

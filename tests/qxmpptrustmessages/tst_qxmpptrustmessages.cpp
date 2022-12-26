@@ -12,14 +12,14 @@ class tst_QXmppTrustMessages : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testIsTrustMessageKeyOwner_data();
-    void testIsTrustMessageKeyOwner();
-    void testTrustMessageKeyOwner_data();
-    void testTrustMessageKeyOwner();
-    void testIsTrustMessageElement_data();
-    void testIsTrustMessageElement();
-    void testTrustMessageElement();
+private:
+    Q_SLOT void testIsTrustMessageKeyOwner_data();
+    Q_SLOT void testIsTrustMessageKeyOwner();
+    Q_SLOT void testTrustMessageKeyOwner_data();
+    Q_SLOT void testTrustMessageKeyOwner();
+    Q_SLOT void testIsTrustMessageElement_data();
+    Q_SLOT void testIsTrustMessageElement();
+    Q_SLOT void testTrustMessageElement();
 };
 
 void tst_QXmppTrustMessages::testIsTrustMessageKeyOwner_data()

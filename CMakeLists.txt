@@ -40,6 +40,7 @@ add_definitions(
     -DQURL_NO_CAST_FROM_STRING
     -DQT_NO_CAST_TO_ASCII
     -DQT_NO_FOREACH
+    -DQT_NO_KEYWORDS
 )
 
 if(BUILD_OMEMO)

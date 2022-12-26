@@ -120,14 +120,14 @@ bool QXmppMamManager::handleStanza(const QDomElement &element)
                 itr->second.messages.append(std::move(message));
             } else {
                 // signal-based API
-                emit archivedMessageReceived(queryId, message);
+                Q_EMIT archivedMessageReceived(queryId, message);
             }
             return true;
         }
     } else if (QXmppMamResultIq::isMamResultIq(element)) {
         QXmppMamResultIq result;
         result.parse(element);
-        emit resultsRecieved(result.id(), result.resultSetReply(), result.complete());
+        Q_EMIT resultsRecieved(result.id(), result.resultSetReply(), result.complete());
         return true;
     }
 

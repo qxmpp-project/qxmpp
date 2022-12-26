@@ -24,11 +24,10 @@ protected:
     /// \cond
     void setClient(QXmppClient *client) override;
 
-private slots:
-    void handleMessageReceived(const QXmppMessage &message);
+private:
+    Q_SLOT void handleMessageReceived(const QXmppMessage &message);
     /// \endcond
 
-private:
     QFuture<void> makeTrustDecisions(const QString &encryption, const QMultiHash<QString, QByteArray> &keyIdsForAuthentication, const QMultiHash<QString, QByteArray> &keyIdsForDistrusting);
     QFuture<void> handleMessage(const QXmppMessage &message);
 
@@ -40,10 +39,12 @@ private:
 
     QFuture<QXmpp::SendResult> sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid);
 
+    /// \cond
     inline QXmppAtmTrustStorage *trustStorage() const
     {
         return dynamic_cast<QXmppAtmTrustStorage *>(QXmppTrustManager::trustStorage());
     }
+    /// \endcond
 
     friend class tst_QXmppAtmManager;
 };

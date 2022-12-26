@@ -11,10 +11,10 @@ class tst_QXmppNonSASLAuthIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testGet();
-    void testSetPlain();
-    void testSetDigest();
+private:
+    Q_SLOT void testGet();
+    Q_SLOT void testSetPlain();
+    Q_SLOT void testSetDigest();
 };
 
 void tst_QXmppNonSASLAuthIq::testGet()

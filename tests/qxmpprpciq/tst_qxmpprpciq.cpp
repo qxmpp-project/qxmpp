@@ -35,21 +35,21 @@ class tst_QXmppRpcIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBase64();
-    void testBool();
-    void testDateTime();
-    void testDouble();
-    void testInt();
-    void testNil();
-    void testString();
+private:
+    Q_SLOT void testBase64();
+    Q_SLOT void testBool();
+    Q_SLOT void testDateTime();
+    Q_SLOT void testDouble();
+    Q_SLOT void testInt();
+    Q_SLOT void testNil();
+    Q_SLOT void testString();
 
-    void testArray();
-    void testStruct();
+    Q_SLOT void testArray();
+    Q_SLOT void testStruct();
 
-    void testInvoke();
-    void testResponse();
-    void testResponseFault();
+    Q_SLOT void testInvoke();
+    Q_SLOT void testResponse();
+    Q_SLOT void testResponseFault();
 };
 void tst_QXmppRpcIq::testBase64()
 {

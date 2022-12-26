@@ -275,13 +275,13 @@ bool QXmppUploadRequestManager::handleStanza(const QDomElement &element)
         QXmppHttpUploadSlotIq slot;
         slot.parse(element);
 
-        emit slotReceived(slot);
+        Q_EMIT slotReceived(slot);
         return true;
     } else if (QXmppHttpUploadRequestIq::isHttpUploadRequestIq(element)) {
         QXmppHttpUploadRequestIq requestError;
         requestError.parse(element);
 
-        emit requestFailed(requestError);
+        Q_EMIT requestFailed(requestError);
         return true;
     }
     return false;
@@ -312,7 +312,7 @@ void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
             }
 
             d->uploadServices.append(service);
-            emit serviceFoundChanged();
+            Q_EMIT serviceFoundChanged();
         }
     }
     return;
@@ -331,7 +331,7 @@ void QXmppUploadRequestManager::setClient(QXmppClient *client)
         // on client disconnect remove all upload services
         connect(client, &QXmppClient::disconnected, this, [this]() {
             d->uploadServices.clear();
-            emit serviceFoundChanged();
+            Q_EMIT serviceFoundChanged();
         });
     }
 }

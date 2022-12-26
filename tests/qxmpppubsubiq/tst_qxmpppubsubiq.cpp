@@ -18,20 +18,20 @@ class tst_QXmppPubSubIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testItems();
-    void testItemsResponse();
-    void testCreateNode();
-    void testDeleteNode();
-    void testPublish();
-    void testRetractItem();
-    void testSubscribe();
-    void testSubscription();
-    void testSubscriptions();
-    void testIsPubSubIq_data();
-    void testIsPubSubIq();
+private:
+    Q_SLOT void testItems();
+    Q_SLOT void testItemsResponse();
+    Q_SLOT void testCreateNode();
+    Q_SLOT void testDeleteNode();
+    Q_SLOT void testPublish();
+    Q_SLOT void testRetractItem();
+    Q_SLOT void testSubscribe();
+    Q_SLOT void testSubscription();
+    Q_SLOT void testSubscriptions();
+    Q_SLOT void testIsPubSubIq_data();
+    Q_SLOT void testIsPubSubIq();
 
-    void testCustomItem();
+    Q_SLOT void testCustomItem();
 };
 
 void tst_QXmppPubSubIq::testItems()

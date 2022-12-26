@@ -11,11 +11,11 @@ class tst_QXmppMixItem : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testInfo();
-    void testIsInfoItem();
-    void testParticipant();
-    void testIsParticipantItem();
+private:
+    Q_SLOT void testInfo();
+    Q_SLOT void testIsInfoItem();
+    Q_SLOT void testParticipant();
+    Q_SLOT void testIsParticipantItem();
 };
 
 void tst_QXmppMixItem::testInfo()

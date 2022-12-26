@@ -11,13 +11,13 @@ class tst_QXmppHttpUploadIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testRequest();
-    void testIsRequest_data();
-    void testIsRequest();
-    void testSlot();
-    void testIsSlot_data();
-    void testIsSlot();
+private:
+    Q_SLOT void testRequest();
+    Q_SLOT void testIsRequest_data();
+    Q_SLOT void testIsRequest();
+    Q_SLOT void testSlot();
+    Q_SLOT void testIsSlot_data();
+    Q_SLOT void testIsSlot();
 };
 
 void tst_QXmppHttpUploadIq::testRequest()

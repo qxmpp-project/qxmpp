@@ -167,7 +167,7 @@ void QXmppSocksClient::slotReadyRead()
 
         // notify of connection
         m_step = ReadyState;
-        emit ready();
+        Q_EMIT ready();
     }
 }
 
@@ -295,7 +295,7 @@ void QXmppSocksServer::slotReadyRead()
 
         // notify of connection
         m_states.insert(socket, ReadyState);
-        emit newConnection(socket, hostName, hostPort);
+        Q_EMIT newConnection(socket, hostName, hostPort);
 
         // send response
         buffer.resize(3);

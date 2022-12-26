@@ -31,32 +31,31 @@ class tst_QXmppAtmManager : public QObject
 {
     Q_OBJECT
 
-signals:
-    void unexpectedTrustMessageSent();
-
-private slots:
-    void initTestCase();
-    void testSendTrustMessage();
-    void testMakePostponedTrustDecisions();
-    void testDistrustAutomaticallyTrustedKeys();
-    void testDistrust();
-    void testAuthenticate_data();
-    void testAuthenticate();
-    void testMakeTrustDecisions();
-    void testHandleMessage_data();
-    void testHandleMessage();
-    void testMakeTrustDecisionsNoKeys();
-    void testMakeTrustDecisionsOwnKeys();
-    void testMakeTrustDecisionsOwnKeysNoOwnEndpoints();
-    void testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthenticatedKeys();
-    void testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticatedKeys();
-    void testMakeTrustDecisionsSoleOwnKeyDistrusted();
-    void testMakeTrustDecisionsContactKeys();
-    void testMakeTrustDecisionsContactKeysNoOwnEndpoints();
-    void testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAuthenticatedKeys();
-    void testMakeTrustDecisionsSoleContactKeyDistrusted();
+public:
+    Q_SIGNAL void unexpectedTrustMessageSent();
 
 private:
+    Q_SLOT void initTestCase();
+    Q_SLOT void testSendTrustMessage();
+    Q_SLOT void testMakePostponedTrustDecisions();
+    Q_SLOT void testDistrustAutomaticallyTrustedKeys();
+    Q_SLOT void testDistrust();
+    Q_SLOT void testAuthenticate_data();
+    Q_SLOT void testAuthenticate();
+    Q_SLOT void testMakeTrustDecisions();
+    Q_SLOT void testHandleMessage_data();
+    Q_SLOT void testHandleMessage();
+    Q_SLOT void testMakeTrustDecisionsNoKeys();
+    Q_SLOT void testMakeTrustDecisionsOwnKeys();
+    Q_SLOT void testMakeTrustDecisionsOwnKeysNoOwnEndpoints();
+    Q_SLOT void testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthenticatedKeys();
+    Q_SLOT void testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticatedKeys();
+    Q_SLOT void testMakeTrustDecisionsSoleOwnKeyDistrusted();
+    Q_SLOT void testMakeTrustDecisionsContactKeys();
+    Q_SLOT void testMakeTrustDecisionsContactKeysNoOwnEndpoints();
+    Q_SLOT void testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAuthenticatedKeys();
+    Q_SLOT void testMakeTrustDecisionsSoleContactKeyDistrusted();
+
     void testMakeTrustDecisionsOwnKeysDone();
     void testMakeTrustDecisionsContactKeysDone();
     void clearTrustStorage();
@@ -1023,7 +1022,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsNoKeys()
     // unexpected trust message
     connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &) {
         if (type == QXmppLogger::SentMessage) {
-            emit unexpectedTrustMessageSent();
+            Q_EMIT unexpectedTrustMessageSent();
         }
     });
 
@@ -1669,7 +1668,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
             parsePacket(message, text.toUtf8());
 
             if (message.to() == QStringLiteral("alice@example.org")) {
-                emit unexpectedTrustMessageSent();
+                Q_EMIT unexpectedTrustMessageSent();
             }
         }
     });
@@ -1800,7 +1799,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
             parsePacket(message, text.toUtf8());
 
             if (message.to() == QStringLiteral("carol@example.net")) {
-                emit unexpectedTrustMessageSent();
+                Q_EMIT unexpectedTrustMessageSent();
             }
         }
     });
@@ -1850,7 +1849,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpoints()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            emit unexpectedTrustMessageSent();
+            Q_EMIT unexpectedTrustMessageSent();
         }
     });
 
@@ -1929,7 +1928,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAut
             parsePacket(message, text.toUtf8());
 
             if (message.to() != QStringLiteral("bob@example.com")) {
-                emit unexpectedTrustMessageSent();
+                Q_EMIT unexpectedTrustMessageSent();
             }
         }
     });
@@ -2013,7 +2012,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
             parsePacket(message, text.toUtf8());
 
             if (message.to() != QStringLiteral("alice@example.org")) {
-                emit unexpectedTrustMessageSent();
+                Q_EMIT unexpectedTrustMessageSent();
             }
         }
     });

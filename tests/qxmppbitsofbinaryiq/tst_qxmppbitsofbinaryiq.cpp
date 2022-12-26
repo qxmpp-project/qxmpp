@@ -13,11 +13,11 @@ class tst_QXmppBitsOfBinaryIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testBasic();
-    void testResult();
-    void testOtherSubelement();
-    void testIsBobIq();
+private:
+    Q_SLOT void testBasic();
+    Q_SLOT void testResult();
+    Q_SLOT void testOtherSubelement();
+    Q_SLOT void testIsBobIq();
     Q_SLOT void fromByteArray();
 };
 

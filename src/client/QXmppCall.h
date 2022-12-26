@@ -55,39 +55,36 @@ public:
     QXmppCallStream *audioStream() const;
     QXmppCallStream *videoStream() const;
 
-signals:
     /// \brief This signal is emitted when a call is connected.
     ///
     /// Once this signal is emitted, you can connect a QAudioOutput and
     /// QAudioInput to the call. You can determine the appropriate clockrate
     /// and the number of channels by calling payloadType().
-    void connected();
+    Q_SIGNAL void connected();
 
     /// \brief This signal is emitted when a call is finished.
     ///
     /// Note: Do not delete the call in the slot connected to this signal,
     /// instead use deleteLater().
-    void finished();
+    Q_SIGNAL void finished();
 
     /// \brief This signal is emitted when the remote party is ringing.
-    void ringing();
+    Q_SIGNAL void ringing();
 
     /// \brief This signal is emitted when the call state changes.
-    void stateChanged(QXmppCall::State state);
+    Q_SIGNAL void stateChanged(QXmppCall::State state);
 
     /// \brief This signal is emitted when a stream is created.
-    void streamCreated(QXmppCallStream *stream);
+    Q_SIGNAL void streamCreated(QXmppCallStream *stream);
 
-public slots:
-    void accept();
-    void hangup();
-    void addVideo();
-
-private slots:
-    void localCandidatesChanged();
-    void terminated();
+    Q_SLOT void accept();
+    Q_SLOT void hangup();
+    Q_SLOT void addVideo();
 
 private:
+    Q_SLOT void localCandidatesChanged();
+    Q_SLOT void terminated();
+
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
 
     QXmppCallPrivate *d;

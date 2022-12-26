@@ -11,14 +11,14 @@ class tst_QXmppVCardIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testAddress_data();
-    void testAddress();
-    void testEmail_data();
-    void testEmail();
-    void testPhone_data();
-    void testPhone();
-    void testVCard();
+private:
+    Q_SLOT void testAddress_data();
+    Q_SLOT void testAddress();
+    Q_SLOT void testEmail_data();
+    Q_SLOT void testEmail();
+    Q_SLOT void testPhone_data();
+    Q_SLOT void testPhone();
+    Q_SLOT void testVCard();
 };
 
 void tst_QXmppVCardIq::testAddress_data()

@@ -11,15 +11,15 @@ class tst_QXmppRosterIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testItem_data();
-    void testItem();
-    void testApproved_data();
-    void testApproved();
-    void testVersion_data();
-    void testVersion();
-    void testMixAnnotate();
-    void testMixChannel();
+private:
+    Q_SLOT void testItem_data();
+    Q_SLOT void testItem();
+    Q_SLOT void testApproved_data();
+    Q_SLOT void testApproved();
+    Q_SLOT void testVersion_data();
+    Q_SLOT void testVersion();
+    Q_SLOT void testMixAnnotate();
+    Q_SLOT void testMixChannel();
 };
 
 void tst_QXmppRosterIq::testItem_data()
