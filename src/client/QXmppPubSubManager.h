@@ -153,9 +153,9 @@ public:
     /// \endcond
 
 private:
-    QFuture<PublishItemResult> publishItem(QXmppPubSubIqBase &&iq);
-    QFuture<PublishItemsResult> publishItems(QXmppPubSubIqBase &&iq);
-    static QXmppPubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
+    QFuture<PublishItemResult> publishItem(QXmpp::Private::PubSubIqBase &&iq);
+    QFuture<PublishItemsResult> publishItems(QXmpp::Private::PubSubIqBase &&iq);
+    static QXmpp::Private::PubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
 
     // We may need a d-ptr in the future.
     void *d = nullptr;
@@ -178,7 +178,7 @@ QFuture<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(const
     using namespace QXmpp::Private;
     using Error = QXmppStanza::Error;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, { itemId })), this,
-                   [](QXmppPubSubIq<T> &&iq) -> ItemResult<T> {
+                   [](PubSubIq<T> &&iq) -> ItemResult<T> {
                        if (!iq.items().isEmpty()) {
                            return iq.items().constFirst();
                        }
@@ -235,7 +235,7 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
 {
     using namespace QXmpp::Private;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, itemIds)), this,
-                   [](QXmppPubSubIq<T> &&iq) -> ItemsResult<T> {
+                   [](PubSubIq<T> &&iq) -> ItemsResult<T> {
                        return Items<T> {
                            iq.items(),
                            iq.itemsContinuation(),
@@ -259,7 +259,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
                                                                                const QString &nodeName,
                                                                                const T &item)
 {
-    QXmppPubSubIq<T> request;
+    QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
     request.setItems({ item });
     request.setQueryNode(nodeName);
@@ -284,7 +284,7 @@ QFuture<QXmppPubSubManager::PublishItemResult> QXmppPubSubManager::publishItem(c
                                                                                const T &item,
                                                                                const QXmppPubSubPublishOptions &publishOptions)
 {
-    QXmppPubSubIq<T> request;
+    QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
     request.setItems({ item });
     request.setQueryNode(nodeName);
@@ -305,7 +305,7 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems
                                                                                  const QString &nodeName,
                                                                                  const QVector<T> &items)
 {
-    QXmppPubSubIq<T> request;
+    QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
     request.setItems(items);
     request.setQueryNode(nodeName);
@@ -327,7 +327,7 @@ QFuture<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishItems
                                                                                  const QVector<T> &items,
                                                                                  const QXmppPubSubPublishOptions &publishOptions)
 {
-    QXmppPubSubIq<T> request;
+    QXmpp::Private::PubSubIq<T> request;
     request.setTo(jid);
     request.setItems(items);
     request.setQueryNode(nodeName);
