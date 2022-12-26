@@ -67,7 +67,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppPresence.h
     base/QXmppPubSubAffiliation.h
     base/QXmppPubSubEvent.h
-    base/QXmppPubSubIq.h
+    base/QXmppPubSubIq_p.h
     base/QXmppPubSubItem.h
     base/QXmppPubSubMetadata.h
     base/QXmppPubSubNodeConfig.h

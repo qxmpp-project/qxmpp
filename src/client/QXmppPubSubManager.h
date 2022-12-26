@@ -10,7 +10,7 @@
 #include "QXmppClientExtension.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppMessage.h"
-#include "QXmppPubSubIq.h"
+#include "QXmppPubSubIq_p.h"
 #include "QXmppPubSubPublishOptions.h"
 #include "QXmppResultSet.h"
 
