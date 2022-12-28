@@ -960,7 +960,7 @@ void ManagerPrivate::removeDevicesRemovedFromServer()
                 devicesItr = userDevices.erase(devicesItr);
                 omemoStorage->removeDevice(jid, deviceId);
                 trustManager->removeKeys(ns_omemo_2, QList { device.keyId });
-                emit q->deviceRemoved(jid, deviceId);
+                Q_EMIT q->deviceRemoved(jid, deviceId);
             } else {
                 ++devicesItr;
             }
@@ -1231,12 +1231,12 @@ QFuture<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const T 
                                         auto future = storeKeyDependingOnSecurityPolicy(jid, key);
                                         await(future, q, [=](TrustLevel trustLevel) mutable {
                                             omemoStorage->addDevice(jid, deviceId, deviceBeingModified);
-                                            emit q->deviceChanged(jid, deviceId);
+                                            Q_EMIT q->deviceChanged(jid, deviceId);
                                             buildSessionDependingOnTrustLevel(deviceBundle, trustLevel);
                                         });
                                     } else {
                                         omemoStorage->addDevice(jid, deviceId, deviceBeingModified);
-                                        emit q->deviceChanged(jid, deviceId);
+                                        Q_EMIT q->deviceChanged(jid, deviceId);
                                         buildSessionDependingOnTrustLevel(deviceBundle, trustLevel);
                                     }
                                 });
@@ -1716,7 +1716,7 @@ QFuture<QCA::SecureArray> ManagerPrivate::extractPayloadDecryptionData(const QSt
                 if (storedKeyId != createdKeyId) {
                     storedKeyId = createdKeyId;
                     omemoStorage->addDevice(senderJid, senderDeviceId, device);
-                    emit q->deviceChanged(senderJid, senderDeviceId);
+                    Q_EMIT q->deviceChanged(senderJid, senderDeviceId);
                 }
 
                 // Decrypt the OMEMO envelope data and build a session.
@@ -2656,7 +2656,7 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
                             await(future, q, [=, &device]() mutable {
                                 auto future = buildSessionForNewDevice(jid, deviceId, device);
                                 await(future, q, [=](auto) mutable {
-                                    emit q->deviceAdded(jid, deviceId);
+                                    Q_EMIT q->deviceAdded(jid, deviceId);
 
                                     if (++(*processedDevicesCount) == devicesCount) {
                                         continuation(true);
@@ -2784,7 +2784,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
                     omemoStorage->addDevice(deviceOwnerJid, deviceId, device);
 
                     if (isDeviceLabelModified) {
-                        emit q->deviceChanged(deviceOwnerJid, deviceId);
+                        Q_EMIT q->deviceChanged(deviceOwnerJid, deviceId);
                     }
                 }
 
@@ -2803,7 +2803,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
 
             auto future = buildSessionForNewDevice(deviceOwnerJid, deviceId, device);
             await(future, q, [=](auto) {
-                emit q->deviceAdded(deviceOwnerJid, deviceId);
+                Q_EMIT q->deviceAdded(deviceOwnerJid, deviceId);
             });
         }
     }
@@ -3227,7 +3227,7 @@ QFuture<bool> ManagerPrivate::resetOwnDevice()
                             deviceBundle = {};
                             devices.clear();
 
-                            emit q->allDevicesRemoved();
+                            Q_EMIT q->allDevicesRemoved();
                         }
 
                         reportFinishedResult(interface, isDeviceBundleDeleted);
@@ -3263,7 +3263,7 @@ QFuture<bool> ManagerPrivate::resetAll()
                             deviceBundle = {};
                             devices.clear();
 
-                            emit q->allDevicesRemoved();
+                            Q_EMIT q->allDevicesRemoved();
                         }
 
                         reportFinishedResult(interface, isBundlesNodeDeleted);
@@ -3696,7 +3696,7 @@ QFuture<TrustLevel> ManagerPrivate::storeKey(const QString &keyOwnerJid, const Q
 
     auto future = trustManager->addKeys(ns_omemo_2, keyOwnerJid, { createKeyId(key) }, trustLevel);
     await(future, q, [=]() mutable {
-        emit q->trustLevelsChanged({ { keyOwnerJid, key } });
+        Q_EMIT q->trustLevelsChanged({ { keyOwnerJid, key } });
         reportFinishedResult(interface, trustLevel);
     });
 

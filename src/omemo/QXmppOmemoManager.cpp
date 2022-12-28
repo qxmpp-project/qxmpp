@@ -756,7 +756,7 @@ QFuture<QXmppPubSubManager::Result> Manager::removeContactDevices(const QString 
                 auto future = d->trustManager->removeKeys(ns_omemo_2, jid);
                 await(future, this, [=]() mutable {
                     reportFinishedResult(interface, result);
-                    emit devicesRemoved(jid);
+                    Q_EMIT devicesRemoved(jid);
                 });
             });
         }
@@ -1234,7 +1234,7 @@ void Manager::setClient(QXmppClient *client)
 
     connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
         const auto &modifiedOmemoKeys = modifiedKeys.value(ns_omemo_2);
-        emit trustLevelsChanged(modifiedOmemoKeys);
+        Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
 
         for (auto itr = modifiedOmemoKeys.cbegin(); itr != modifiedOmemoKeys.cend(); ++itr) {
             const auto &keyOwnerJid = itr.key();
@@ -1244,7 +1244,7 @@ void Manager::setClient(QXmppClient *client)
             const auto &devices = d->devices.value(keyOwnerJid);
             for (auto itr = devices.cbegin(); itr != devices.cend(); ++itr) {
                 if (itr->keyId == keyId) {
-                    emit deviceChanged(keyOwnerJid, itr.key());
+                    Q_EMIT deviceChanged(keyOwnerJid, itr.key());
                     return;
                 }
             }
