@@ -156,9 +156,6 @@ private:
     QFuture<PublishItemResult> publishItem(QXmpp::Private::PubSubIqBase &&iq);
     QFuture<PublishItemsResult> publishItems(QXmpp::Private::PubSubIqBase &&iq);
     static QXmpp::Private::PubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
-
-    // We may need a d-ptr in the future.
-    void *d = nullptr;
 };
 
 ///
