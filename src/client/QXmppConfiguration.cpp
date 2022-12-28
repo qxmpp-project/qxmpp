@@ -181,72 +181,72 @@ void QXmppConfiguration::setJid(const QString &jid)
     }
 }
 
-/// Returns the host name.
 ///
-/// \return host name
+/// Returns the custom hostname to connect to.
 ///
-
+/// \return hostname
+///
 QString QXmppConfiguration::host() const
 {
     return d->host;
 }
 
-/// Returns the domain name.
+///
+/// Returns the domain part of the JID.
 ///
 /// \return domain name
 ///
-
 QString QXmppConfiguration::domain() const
 {
     return d->domain;
 }
 
+///
 /// Returns the port number.
 ///
 /// \return port number
 ///
-
 int QXmppConfiguration::port() const
 {
     return d->port;
 }
 
-/// Returns the username.
+///
+/// Returns the localpart of the JID.
 ///
 /// \return username
 ///
-
 QString QXmppConfiguration::user() const
 {
     return d->user;
 }
 
+///
 /// Returns the password.
 ///
 /// \return password
 ///
-
 QString QXmppConfiguration::password() const
 {
     return d->password;
 }
 
+///
 /// Returns the resource identifier.
 ///
 /// \return resource identifier
 ///
-
 QString QXmppConfiguration::resource() const
 {
     return d->resource;
 }
 
-/// Returns the jabber id (jid).
 ///
-/// \return jabber id (jid)
+/// Returns the Jabber-ID (JID).
+///
+/// \return Jabber-ID (JID)
 /// (e.g. "qxmpp.test1@gmail.com/resource" or qxmpptest@jabber.org/QXmpp156)
 ///
-
 QString QXmppConfiguration::jid() const
 {
     if (d->user.isEmpty()) {
