@@ -16,7 +16,6 @@
 #include "QXmppOmemoManager.h"
 #include "QXmppOmemoManager_p.h"
 #include "QXmppOmemoMemoryStorage.h"
-#include "QXmppPubSubIq.h"
 #include "QXmppPubSubItem.h"
 #include "QXmppPubSubManager.h"
 
