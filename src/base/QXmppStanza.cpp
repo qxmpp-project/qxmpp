@@ -399,12 +399,12 @@ void QXmppStanza::Error::setCode(int code)
 /// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
 /// can be used in combination with redirectUri().
 ///
-/// \warning Due to compatibility this returns \c Condition(-1) when no
-/// condition is set. When possible you should use conditionOpt().
+/// \warning This returns NoCondition when no condition is set. When possible you should use
+/// conditionOpt().
 ///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
 {
-    return d->condition.value_or(QXmppStanza::Error::Condition(-1));
+    return d->condition.value_or(NoCondition);
 }
 
 ///
@@ -426,7 +426,7 @@ auto QXmppStanza::Error::conditionOpt() const -> std::optional<Condition>
 /// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
 /// can be used in combination with setRedirectUri().
 ///
-void QXmppStanza::Error::setCondition(QXmppStanza::Error::Condition cond)
+void QXmppStanza::Error::setCondition(Condition cond)
 {
     if (int(cond) < 0) {
         d->condition = std::nullopt;
@@ -451,12 +451,11 @@ void QXmppStanza::Error::setCondition(std::optional<Condition> cond)
 ///
 /// Returns the type of the error.
 ///
-/// \warning Due to compatibility this returns \c Type(-1) when no type is set.
-/// When possible you should use typeOpt().
+/// \warning This returns NoType when no type is set. When possible you should use typeOpt().
 ///
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
 {
-    return d->type.value_or(QXmppStanza::Error::Type(-1));
+    return d->type.value_or(NoType);
 }
 
 ///

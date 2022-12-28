@@ -98,6 +98,7 @@ public:
         /// The error descriptions are not detailed in here. The exact meaning
         /// can be found in the particular protocols using them.
         enum Type {
+            NoType = -1,
             Cancel,    ///< The error is not temporary.
             Continue,  ///< The error was only a warning.
             Modify,    ///< The request needs to be changed and resent.
@@ -107,6 +108,7 @@ public:
 
         /// A detailed condition of the error
         enum Condition {
+            NoCondition = -1,
             BadRequest,             ///< The request does not contain a valid schema.
             Conflict,               ///< The request conflicts with another.
             FeatureNotImplemented,  ///< The feature is not implemented.
