@@ -75,7 +75,6 @@ public:
     ~QXmppPubSubManager();
 
     // Generic PubSub (the PubSub service is the given entity)
-    QFuture<FeaturesResult> requestFeatures(const QString &serviceJid, ServiceType serviceType = PubSubOrPep);
     QFuture<NodesResult> fetchNodes(const QString &jid);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);
@@ -118,7 +117,6 @@ public:
     QFuture<Result> unsubscribeFromNode(const QString &serviceJid, const QString &nodeName, const QString &subscriberJid);
 
     // PEP-specific (the PubSub service is the current account)
-    inline QFuture<FeaturesResult> requestPepFeatures() { return requestFeatures(client()->configuration().jidBare(), Pep); };
     inline QFuture<NodesResult> fetchPepNodes() { return fetchNodes(client()->configuration().jidBare()); };
     inline QFuture<Result> createPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
     inline QFuture<Result> createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
@@ -153,6 +151,13 @@ public:
     /// \endcond
 
 private:
+    // for private requestFeatures() API
+    friend class tst_QXmppPubSubManager;
+    friend class QXmppOmemoManagerPrivate;
+
+    QFuture<FeaturesResult> requestFeatures(const QString &serviceJid, ServiceType serviceType = PubSubOrPep);
+    QFuture<FeaturesResult> requestPepFeatures() { return requestFeatures(client()->configuration().jidBare(), Pep); };
+
     QFuture<PublishItemResult> publishItem(QXmpp::Private::PubSubIqBase &&iq);
     QFuture<PublishItemsResult> publishItems(QXmpp::Private::PubSubIqBase &&iq);
     static QXmpp::Private::PubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);

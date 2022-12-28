@@ -196,6 +196,7 @@ QXmppPubSubManager::~QXmppPubSubManager()
 {
 }
 
+/// \cond
 ///
 /// Requests all features of a pubsub service and checks the identities via service discovery.
 ///
@@ -247,6 +248,7 @@ QFuture<QXmppPubSubManager::FeaturesResult> QXmppPubSubManager::requestFeatures(
         return InvalidServiceType();
     });
 }
+/// \endcond
 
 ///
 /// Requests all listed nodes of a pubsub service via service discovery.
@@ -759,6 +761,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
     return client()->sendGenericIq(std::move(request));
 }
 
+/// \cond
 ///
 /// \fn QXmppPubSubManager::requestPepFeatures()
 ///
@@ -769,6 +772,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
+/// \endcond
 
 ///
 ///
