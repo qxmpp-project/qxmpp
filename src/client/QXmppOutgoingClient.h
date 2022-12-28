@@ -38,6 +38,7 @@ public:
     bool isClientStateIndicationEnabled() const;
     bool isStreamManagementEnabled() const;
     bool isStreamResumed() const;
+    QFuture<IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
     QSslSocket *socket() const { return QXmppStream::socket(); };

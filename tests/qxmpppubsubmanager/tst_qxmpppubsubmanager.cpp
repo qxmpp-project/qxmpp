@@ -222,9 +222,10 @@ void tst_QXmppPubSubManager::testRequestFeatures()
 void tst_QXmppPubSubManager::testRequestPepFeatures()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid("juliet@capulet.lit");
 
     auto future = psManager->requestOwnPepFeatures();
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<query xmlns='http://jabber.org/protocol/disco#info'/>"
                                "</iq>"));
     test.inject(QStringLiteral("<iq type='result' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' id='qxmpp1'>"
@@ -257,9 +258,10 @@ void tst_QXmppPubSubManager::testFetchNodes()
 void tst_QXmppPubSubManager::testFetchPepNodes()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid("juliet@capulet.lit");
 
     auto future = psManager->requestOwnPepNodes();
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<query xmlns='http://jabber.org/protocol/disco#items'/>"
                                "</iq>"));
     test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
@@ -306,7 +308,7 @@ void tst_QXmppPubSubManager::testCreateNodes()
     }
 
     test.expect(QStringLiteral("<iq id='qxmpp1' to='%1' type='set'><pubsub xmlns='http://jabber.org/protocol/pubsub'><create node='%2'/></pubsub></iq>").arg(jid, node));
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='%1' type='result'/>").arg(jid));
     expectFutureVariant<QXmpp::Success>(future);
 }
 
@@ -327,7 +329,7 @@ void tst_QXmppPubSubManager::testCreateNodeWithConfig()
                 "</configure>"
                 "</pubsub>"
                 "</iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.inject<QString>("<iq id='qxmpp1' from='pubsub.qxmpp.org' type='result'/>");
     expectFutureVariant<QXmpp::Success>(future);
 }
 
@@ -407,7 +409,7 @@ void tst_QXmppPubSubManager::testDeleteNodes()
 
     // FIXME: pubsub#owner here, but not for <create/>?
     test.expect(QStringLiteral("<iq id='qxmpp1' to='%1' type='set'><pubsub xmlns='http://jabber.org/protocol/pubsub#owner'><delete node='%2'/></pubsub></iq>").arg(jid, node));
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.inject(QStringLiteral("<iq id='qxmpp1' from='%1' type='result'/>").arg(jid));
     expectFutureVariant<QXmpp::Success>(future);
 }
 
@@ -509,7 +511,7 @@ void tst_QXmppPubSubManager::testPublishItems()
                 </iq>)")
                             .arg(jid, node, itemIdsXml));
         } else {
-            test.inject(QStringLiteral("<iq id='qxmpp1' type='result'/>"));
+            test.inject(QStringLiteral("<iq id='qxmpp1' from='%1' type='result'/>").arg(jid));
         }
     };
 
@@ -631,9 +633,10 @@ void tst_QXmppPubSubManager::testRetractItem()
 void tst_QXmppPubSubManager::testRetractCurrentPepItem()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
 
     auto future = psManager->retractOwnPepItem(QStringLiteral("princely_musings"), PSManager::Current);
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='set'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='set'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<retract node='princely_musings'>"
                                "<item id='current'/>"
@@ -694,9 +697,10 @@ void tst_QXmppPubSubManager::testRequestItemIds()
 void tst_QXmppPubSubManager::testRequestPepItemIds()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
 
     auto future = psManager->requestOwnPepItemIds(QStringLiteral("princely_musings"));
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<query xmlns='http://jabber.org/protocol/disco#items' node='princely_musings'/>"
                                "</iq>"));
     test.inject(QStringLiteral("<iq id='qxmpp1' from='juliet@capulet.lit' to='juliet@capulet.lit/balcony' type='result'>"
@@ -867,9 +871,10 @@ void tst_QXmppPubSubManager::testRequestItems()
 void tst_QXmppPubSubManager::testRequestCurrentPepItem()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
 
     auto future = psManager->requestOwnPepItem(QStringLiteral("princely_musings"), PSManager::Current);
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<items node='princely_musings'>"
                                "<item id='current'/>"
@@ -889,9 +894,10 @@ void tst_QXmppPubSubManager::testRequestCurrentPepItem()
 void tst_QXmppPubSubManager::testRequestPepItem()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
 
     auto future = psManager->requestOwnPepItem(QStringLiteral("princely_musings"), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<items node='princely_musings'>"
                                "<item id='ae890ac52d0df67ed7cfdf51b644e901'/>"
@@ -911,9 +917,10 @@ void tst_QXmppPubSubManager::testRequestPepItem()
 void tst_QXmppPubSubManager::testRequestPepItems()
 {
     auto [test, psManager] = Client();
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
 
     auto future = psManager->requestOwnPepItems(QStringLiteral("princely_musings"));
-    test.expect(QStringLiteral("<iq id='qxmpp1' type='get'>"
+    test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<items node='princely_musings'/>"
                                "</pubsub></iq>"));
@@ -954,7 +961,7 @@ void tst_QXmppPubSubManager::testRequestNodeAffiliations()
                 "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
                 "<affiliations node='news'/>"
                 "</pubsub></iq>");
-    test.inject(QStringLiteral("<iq id='qxmpp1' type='result' from='pubsub.shakespeare.lit'>"
+    test.inject(QStringLiteral("<iq id='qxmpp1' type='result' from='pubsub.qxmpp.org'>"
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
                                "<affiliations node='news'>"
                                "<affiliation jid='hamlet@denmark.lit' affiliation='owner'/>"
@@ -1018,7 +1025,7 @@ void tst_QXmppPubSubManager::testRequestOptions()
     auto *psManager = test.addNewExtension<PSManager>();
 
     auto testOpts = [&](QFuture<PSManager::OptionsResult> &&future) {
-        test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='get'><pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        test.expect("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'><pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                     "<options jid='me@qxmpp.org' node='node1'/>"
                     "</pubsub></iq>");
         test.inject<QString>("<iq id='qxmpp1' from='pubsub.shakespeare.lit' type='result'>"
@@ -1047,17 +1054,17 @@ void tst_QXmppPubSubManager::testRequestOptions()
         QCOMPARE(form.unknownFields().size(), 0);
     };
 
-    testOpts(psManager->requestSubscribeOptions("pubsub.qxmpp.org", "node1", "me@qxmpp.org"));
+    testOpts(psManager->requestSubscribeOptions("pubsub.shakespeare.lit", "node1", "me@qxmpp.org"));
 
     test.configuration().setJid("me@qxmpp.org");
-    testOpts(psManager->requestSubscribeOptions("pubsub.qxmpp.org", "node1"));
+    testOpts(psManager->requestSubscribeOptions("pubsub.shakespeare.lit", "node1"));
 }
 
 void tst_QXmppPubSubManager::testRequestOptionsError()
 {
     auto [test, psManager] = Client();
-    auto future = psManager->requestSubscribeOptions("pubsub.qxmpp.org", "node1", "me@qxmpp.org");
-    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='get'><pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+    auto future = psManager->requestSubscribeOptions("pubsub.shakespeare.lit", "node1", "me@qxmpp.org");
+    test.expect("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'><pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                 "<options jid='me@qxmpp.org' node='node1'/>"
                 "</pubsub></iq>");
     test.inject<QString>("<iq id='qxmpp1' from='pubsub.shakespeare.lit' type='result'>"
@@ -1105,7 +1112,7 @@ void tst_QXmppPubSubManager::testSetOptions()
                 "<field type=\"boolean\" var='pubsub#include_body'><value>0</value></field>"
                 "<field type=\"list-multi\" var='pubsub#show-values'><value>away</value><value>chat</value><value>online</value></field>"
                 "</x></options></pubsub></iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.inject<QString>("<iq id='qxmpp1' from='pubsub.shakespeare.lit' type='result'/>");
 
     expectFutureVariant<QXmpp::Success>(future);
 }
@@ -1120,7 +1127,7 @@ void tst_QXmppPubSubManager::testRequestNodeConfig()
                 "<configure node='tune'/>"
                 "</pubsub>"
                 "</iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'>"
+    test.inject<QString>("<iq id='qxmpp1' from='pubsub.qxmpp.org' type='result'>"
                          "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
                          "<configure node='princely_musings'>"
                          "<x xmlns='jabber:x:data' type='form'>"
@@ -1167,8 +1174,8 @@ void tst_QXmppPubSubManager::testConfigureNode()
     config.setPayloadType("http://www.w3.org/2005/Atom");
     config.setBodyXslt("http://jabxslt.jabberstudio.org/atom_body.xslt");
 
-    auto future = psManager->configureNode("pubsub.qxmpp.org", "princely_musings", config);
-    test.expect("<iq id='qxmpp1' to='pubsub.qxmpp.org' type='set'>"
+    auto future = psManager->configureNode("pubsub.shakespeare.lit", "princely_musings", config);
+    test.expect("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='set'>"
                 "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
                 "<configure node='princely_musings'>"
                 "<x xmlns='jabber:x:data' type='submit'>"
@@ -1213,7 +1220,7 @@ void tst_QXmppPubSubManager::testCancelConfig()
                 "</configure>"
                 "</pubsub>"
                 "</iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.inject<QString>("<iq id='qxmpp1' from='pubsub.qxmpp.org' type='result'/>");
     expectFutureVariant<QXmpp::Success>(future);
 }
 

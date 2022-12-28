@@ -46,7 +46,7 @@ public:
 
     using IqResult = std::variant<QDomElement, QXmpp::SendError>;
     QFuture<IqResult> sendIq(QXmppIq &&);
-    QFuture<IqResult> sendIq(QXmppPacket &&, const QString &id);
+    QFuture<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
     void cancelOngoingIqs();
     bool hasIqId(const QString &id) const;
 

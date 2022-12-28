@@ -113,17 +113,18 @@ void tst_QXmppRosterManager::subscriptionRequestReceived()
 void tst_QXmppRosterManager::testAddItem()
 {
     TestClient test;
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
     auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
 
     auto future = rosterManager->addRosterItem("contact@example.org");
-    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.expect("<iq id='qxmpp1' to='capulet.lit' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
+    test.inject<QString>("<iq id='qxmpp1' from='capulet.lit' type='result'/>");
     expectFutureVariant<QXmpp::Success>(future);
 
     future = rosterManager->addRosterItem("contact@example.org");
-    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
+    test.expect("<iq id='qxmpp1' to='capulet.lit' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org'/></query></iq>");
     test.inject<QString>(R"(
-<iq id='qxmpp1' type='error'>
+<iq id='qxmpp1' from='capulet.lit' type='error'>
     <error type='modify'>
         <not-authorized xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
         <text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>This is not allowed</text>
@@ -137,17 +138,18 @@ void tst_QXmppRosterManager::testAddItem()
 void tst_QXmppRosterManager::testRemoveItem()
 {
     TestClient test;
+    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
     auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
 
     auto future = rosterManager->removeRosterItem("contact@example.org");
-    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
-    test.inject<QString>("<iq id='qxmpp1' type='result'/>");
+    test.expect("<iq id='qxmpp1' to='capulet.lit' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
+    test.inject<QString>("<iq id='qxmpp1' from='capulet.lit' type='result'/>");
     expectFutureVariant<QXmpp::Success>(future);
 
     future = rosterManager->removeRosterItem("contact@example.org");
-    test.expect("<iq id='qxmpp1' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
+    test.expect("<iq id='qxmpp1' to='capulet.lit' type='set'><query xmlns='jabber:iq:roster'><item jid='contact@example.org' subscription='remove'/></query></iq>");
     test.inject<QString>(R"(
-<iq id='qxmpp1' type='error'>
+<iq id='qxmpp1' from='capulet.lit' type='error'>
     <error type='cancel'>
         <item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
         <text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Not found</text>

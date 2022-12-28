@@ -517,12 +517,12 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::opti
 ///
 QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const std::optional<QXmppSendStanzaParams> &params)
 {
-    const auto sendEncrypted = [this](QFuture<IqEncryptResult> &&future, const QString &id) {
+    const auto sendEncrypted = [this](QFuture<IqEncryptResult> &&future, const QString &id, const QString &to) {
         QFutureInterface<IqResult> interface(QFutureInterfaceBase::Started);
-        await(future, this, [this, interface, id](IqEncryptResult result) mutable {
+        await(future, this, [this, interface, id, to](IqEncryptResult result) mutable {
             if (const auto *xml = std::get_if<QByteArray>(&result)) {
                 // encrypted successfully
-                auto future = d->stream->sendIq(QXmppPacket(*xml, true), id);
+                auto future = d->stream->QXmppStream::sendIq(QXmppPacket(*xml, true), id, to);
                 await(future, this, [this, interface](QXmppStream::IqResult result) mutable {
                     if (const auto encryptedDom = std::get_if<QDomElement>(&result)) {
                         if (!isIqResponse(*encryptedDom)) {
@@ -571,10 +571,13 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const 
     if (iq.id().isEmpty() || d->stream->hasIqId(iq.id())) {
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
+    if (iq.to().isEmpty()) {
+        iq.setTo(d->stream->configuration().domain());
+    }
 
     if (d->encryptionExtension) {
         const auto id = iq.id();
-        return sendEncrypted(d->encryptionExtension->encryptIq(std::move(iq), params), id);
+        return sendEncrypted(d->encryptionExtension->encryptIq(std::move(iq), params), id, iq.to());
     }
     return d->stream->sendIq(std::move(iq));
 }

@@ -19,6 +19,7 @@
 
 #include <QCryptographicHash>
 #include <QDnsLookup>
+#include <QFuture>
 #include <QNetworkProxy>
 #include <QSslConfiguration>
 #include <QSslSocket>
@@ -314,6 +315,15 @@ bool QXmppOutgoingClient::isStreamManagementEnabled() const
 bool QXmppOutgoingClient::isStreamResumed() const
 {
     return d->streamResumed;
+}
+
+QFuture<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
+{
+    // always set a to address (the QXmppStream needs this for matching)
+    if (iq.to().isEmpty()) {
+        iq.setTo(d->config.domain());
+    }
+    return QXmppStream::sendIq(std::move(iq));
 }
 
 void QXmppOutgoingClient::_q_socketDisconnected()
