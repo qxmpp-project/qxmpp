@@ -75,7 +75,7 @@ public:
     ~QXmppPubSubManager();
 
     // Generic PubSub (the PubSub service is the given entity)
-    QFuture<NodesResult> fetchNodes(const QString &jid);
+    QFuture<NodesResult> requestNodes(const QString &jid);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName);
     QFuture<Result> createNode(const QString &jid, const QString &nodeName, const QXmppPubSubNodeConfig &config);
     QFuture<InstantNodeResult> createInstantNode(const QString &jid);

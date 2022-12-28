@@ -259,7 +259,7 @@ QFuture<QXmppPubSubManager::FeaturesResult> QXmppPubSubManager::requestFeatures(
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \return
 ///
-QFuture<QXmppPubSubManager::NodesResult> QXmppPubSubManager::fetchNodes(const QString &jid)
+QFuture<QXmppPubSubManager::NodesResult> QXmppPubSubManager::requestNodes(const QString &jid)
 {
     QXmppDiscoveryIq request;
     request.setType(QXmppIq::Get);
