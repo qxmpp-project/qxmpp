@@ -27,6 +27,7 @@ public:
         Configuration,
         Delete,
         Items,
+        Retract,
         Purge,
         Subscription,
     };

@@ -50,6 +50,7 @@ static const QStringList PUBSUB_EVENTS = {
     QStringLiteral("configuration"),
     QStringLiteral("delete"),
     QStringLiteral("items"),
+    QStringLiteral("items"),  // virtual retract type
     QStringLiteral("purge"),
     QStringLiteral("subscription"),
 };
@@ -248,6 +249,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     switch (eventType) {
     case Delete:
     case Items:
+    case Retract:
     case Purge:
         if (!eventTypeElement.hasAttribute(QStringLiteral("node"))) {
             return false;
@@ -267,7 +269,8 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
         }
         break;
     }
-    case Items: {
+    case Items:
+    case Retract: {
         // check validity of the items using isItemValid()
         for (auto itemElement = eventTypeElement.firstChildElement(QStringLiteral("item"));
              !itemElement.isNull();
@@ -305,11 +308,23 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
             return false;
         }
 
+        // Detect our virtual retract event type
+        if (d->eventType == Items) {
+            auto child = eventTypeElement.firstChildElement();
+            if (!child.isNull()) {
+                if (child.tagName() == QStringLiteral("retract")) {
+                    d->eventType = Retract;
+                }
+            }
+            // Don't support mixed retract/item events.
+        }
+
         // parse "node" attribute
         switch (d->eventType) {
         case Configuration:
         case Delete:
         case Items:
+        case Retract:
         case Purge:
             d->node = eventTypeElement.attribute(QStringLiteral("node"));
             break;
@@ -328,7 +343,8 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         case Items:
             // parse items
             parseItems(eventTypeElement);
-
+            break;
+        case Retract:
             // parse retract ids
             for (auto retract = eventTypeElement.firstChildElement(QStringLiteral("retract"));
                  !retract.isNull();
@@ -381,6 +397,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
         switch (d->eventType) {
         case Delete:
         case Items:
+        case Retract:
         case Purge:
             // node attribute is required
             writer->writeAttribute(QStringLiteral("node"), d->node);
@@ -409,6 +426,8 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
             // serialize items
             serializeItems(writer);
 
+            break;
+        case Retract:
             // serialize retract ids
             for (const auto &id : std::as_const(d->retractIds)) {
                 writer->writeStartElement(QStringLiteral("retract"));

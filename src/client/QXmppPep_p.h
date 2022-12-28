@@ -46,6 +46,9 @@ inline bool handlePubSubEvent(const QDomElement &element, const QString &pubSubS
                 (manager->*itemReceived)(pubSubService, {});
             }
             return true;
+        } else if (event.eventType() == QXmppPubSubEventBase::Retract) {
+            (manager->*itemReceived)(pubSubService, {});
+            return true;
         }
     }
     return false;

@@ -69,7 +69,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         "</items>"
         "</event>"
         "</message>",
-        QXmppPubSubEventBase::Items,
+        QXmppPubSubEventBase::Retract,
         "princely_musings",
         QStringList() << "ae890ac52d0df67ed7cfdf51b644e901"
                       << "34324897shdfjk948577342343243243",
