@@ -90,7 +90,7 @@ auto QXmppUserLocationManager::request(const QString &jid)
 auto QXmppUserLocationManager::publish(const QXmppGeolocItem &item)
     -> QFuture<PublishResult>
 {
-    return pubSub(client())->publishPepItem(ns_geoloc, item);
+    return pubSub(client())->publishOwnPepItem(ns_geoloc, item);
 }
 
 /// \cond

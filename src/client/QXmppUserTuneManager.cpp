@@ -91,7 +91,7 @@ auto QXmppUserTuneManager::request(const QString &jid)
 auto QXmppUserTuneManager::publish(const QXmppTuneItem &item)
     -> QFuture<PublishResult>
 {
-    return pubSub(client())->publishPepItem(ns_tune, item);
+    return pubSub(client())->publishOwnPepItem(ns_tune, item);
 }
 
 /// \cond

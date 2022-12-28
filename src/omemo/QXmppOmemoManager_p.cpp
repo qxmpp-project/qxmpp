@@ -616,7 +616,7 @@ signal_protocol_session_store ManagerPrivate::createSessionStore() const
 //
 QFuture<bool> ManagerPrivate::setUpDeviceId()
 {
-    auto future = pubSubManager->requestPepItemIds(ns_omemo_2_bundles);
+    auto future = pubSubManager->requestOwnPepItemIds(ns_omemo_2_bundles);
     return chain<bool>(future, q, [this](QXmppPubSubManager::ItemIdsResult result) mutable {
         // There can be the following cases:
         // 1. There is no PubSub node for device bundles: XEP-0030 states that a server must
@@ -1882,7 +1882,7 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
 {
     QFutureInterface<bool> interface(QFutureInterfaceBase::Started);
 
-    auto future = pubSubManager->requestPepFeatures();
+    auto future = pubSubManager->requestOwnPepFeatures();
     await(future, q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
         if (const auto error = std::get_if<Error>(&result)) {
             warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved: " % errorToString(*error));
@@ -1900,7 +1900,7 @@ QFuture<bool> ManagerPrivate::publishOmemoData()
             // TODO: Uncomment the following line and remove the other one once ejabberd released version > 21.12
             // if (pepServiceFeatures.contains(ns_pubsub_publish) && pepServiceFeatures.contains(ns_pubsub_multi_items)) {
             if (pepServiceFeatures.contains(ns_pubsub_publish)) {
-                auto future = pubSubManager->fetchPepNodes();
+                auto future = pubSubManager->requestOwnPepNodes();
                 await(future, q, [=](QXmppPubSubManager::NodesResult result) mutable {
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Nodes of JID '" % ownBareJid() % "' could not be fetched to check if nodes '" %
@@ -2616,7 +2616,7 @@ template<typename Function>
 void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Function continuation)
 {
     if (isDeviceListNodeExistent && otherOwnDevices().isEmpty()) {
-        auto future = pubSubManager->requestPepItem<QXmppOmemoDeviceListItem>(ns_omemo_2_devices, QXmppPubSubManager::Current);
+        auto future = pubSubManager->requestOwnPepItem<QXmppOmemoDeviceListItem>(ns_omemo_2_devices, QXmppPubSubManager::Current);
         await(future, q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Device list for JID '" % ownBareJid() %
@@ -2835,14 +2835,14 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         // Publish a new device list for the own devices if their device list
         // item is removed, if their device list node is removed or if all
         // the node's items are removed.
-        auto future = pubSubManager->deletePepNode(ns_omemo_2_devices);
+        auto future = pubSubManager->deleteOwnPepNode(ns_omemo_2_devices);
         await(future, q, [=](QXmppPubSubManager::Result result) {
             if (const auto error = std::get_if<Error>(&result)) {
                 warning("Node '" % QString(ns_omemo_2_devices) % "'  of JID '" % deviceOwnerJid %
                         "' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
-                auto future = pubSubManager->requestPepFeatures();
+                auto future = pubSubManager->requestOwnPepFeatures();
                 await(future, q, [=](QXmppPubSubManager::FeaturesResult result) {
                     if (const auto error = std::get_if<Error>(&result)) {
                         warning("Features of PEP service '" % deviceOwnerJid %
@@ -2915,7 +2915,7 @@ void ManagerPrivate::deleteDeviceElement(Function continuation)
 template<typename Function>
 void ManagerPrivate::createNode(const QString &node, Function continuation)
 {
-    runPubSubQueryWithContinuation(pubSubManager->createPepNode(node),
+    runPubSubQueryWithContinuation(pubSubManager->createOwnPepNode(node),
                                    "Node '" % node % "' of JID '" % ownBareJid() % "' could not be created",
                                    std::move(continuation));
 }
@@ -2930,7 +2930,7 @@ void ManagerPrivate::createNode(const QString &node, Function continuation)
 template<typename Function>
 void ManagerPrivate::createNode(const QString &node, const QXmppPubSubNodeConfig &config, Function continuation)
 {
-    runPubSubQueryWithContinuation(pubSubManager->createPepNode(node, config),
+    runPubSubQueryWithContinuation(pubSubManager->createOwnPepNode(node, config),
                                    "Node '" % node % "' of JID '" % ownBareJid() % "' could not be created",
                                    std::move(continuation));
 }
@@ -2945,7 +2945,7 @@ void ManagerPrivate::createNode(const QString &node, const QXmppPubSubNodeConfig
 template<typename Function>
 void ManagerPrivate::configureNode(const QString &node, const QXmppPubSubNodeConfig &config, Function continuation)
 {
-    runPubSubQueryWithContinuation(pubSubManager->configurePepNode(node, config),
+    runPubSubQueryWithContinuation(pubSubManager->configureOwnPepNode(node, config),
                                    "Node '" % node % "' of JID '" % ownBareJid() % "' could not be configured",
                                    std::move(continuation));
 }
@@ -2961,7 +2961,7 @@ template<typename Function>
 void ManagerPrivate::retractItem(const QString &node, uint32_t itemId, Function continuation)
 {
     const auto itemIdString = QString::number(itemId);
-    runPubSubQueryWithContinuation(pubSubManager->retractPepItem(node, itemIdString),
+    runPubSubQueryWithContinuation(pubSubManager->retractOwnPepItem(node, itemIdString),
                                    "Item '" % itemIdString % "' of node '" % node % "' and JID '" % ownBareJid() % "' could not be retracted",
                                    std::move(continuation));
 }
@@ -2975,7 +2975,7 @@ void ManagerPrivate::retractItem(const QString &node, uint32_t itemId, Function 
 template<typename Function>
 void ManagerPrivate::deleteNode(const QString &node, Function continuation)
 {
-    auto future = pubSubManager->deletePepNode(node);
+    auto future = pubSubManager->deleteOwnPepNode(node);
     await(future, q, [=, continuation = std::move(continuation)](QXmppPubSubManager::Result result) mutable {
         const auto error = std::get_if<Error>(&result);
         if (error) {
@@ -3006,7 +3006,7 @@ void ManagerPrivate::deleteNode(const QString &node, Function continuation)
 template<typename T, typename Function>
 void ManagerPrivate::publishItem(const QString &node, const T &item, Function continuation)
 {
-    runPubSubQueryWithContinuation(pubSubManager->publishPepItem(node, item),
+    runPubSubQueryWithContinuation(pubSubManager->publishOwnPepItem(node, item),
                                    "Item with ID '" % item.id() %
                                        "' could not be published to node '" % node % "' of JID '" %
                                        ownBareJid() % "'",
@@ -3024,7 +3024,7 @@ void ManagerPrivate::publishItem(const QString &node, const T &item, Function co
 template<typename T, typename Function>
 void ManagerPrivate::publishItem(const QString &node, const T &item, const QXmppPubSubPublishOptions &publishOptions, Function continuation)
 {
-    runPubSubQueryWithContinuation(pubSubManager->publishPepItem(node, item, publishOptions),
+    runPubSubQueryWithContinuation(pubSubManager->publishOwnPepItem(node, item, publishOptions),
                                    "Item with ID '" % item.id() % "' could not be published to node '" % node % "' of JID '" % ownBareJid() % "'",
                                    std::move(continuation));
 }
