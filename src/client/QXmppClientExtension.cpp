@@ -6,36 +6,27 @@
 
 #include "QXmppClient.h"
 
-#include <QStringList>
-
-class QXmppClientExtensionPrivate
-{
-public:
-    QXmppClient *client;
-};
-
 ///
 /// Constructs a QXmppClient extension.
 ///
 QXmppClientExtension::QXmppClientExtension()
-    : d(new QXmppClientExtensionPrivate)
+    : m_client(nullptr)
 {
-    d->client = nullptr;
 }
 
 QXmppClientExtension::~QXmppClientExtension() = default;
 
+///
 /// Returns the discovery features to add to the client.
 ///
-
 QStringList QXmppClientExtension::discoveryFeatures() const
 {
     return QStringList();
 }
 
+///
 /// Returns the discovery identities to add to the client.
 ///
-
 QList<QXmppDiscoveryIq::Identity> QXmppClientExtension::discoveryIdentities() const
 {
     return QList<QXmppDiscoveryIq::Identity>();
@@ -81,21 +72,22 @@ bool QXmppClientExtension::handleStanza(const QDomElement &, const std::optional
     return false;
 }
 
+///
 /// Returns the client which loaded this extension.
 ///
-
 QXmppClient *QXmppClientExtension::client()
 {
-    return d->client;
+    return m_client;
 }
 
+///
 /// Sets the client which loaded this extension.
 ///
 /// \param client
-
+///
 void QXmppClientExtension::setClient(QXmppClient *client)
 {
-    d->client = client;
+    m_client = client;
 }
 
 ///

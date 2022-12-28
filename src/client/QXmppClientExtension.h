@@ -51,7 +51,8 @@ protected:
     bool injectMessage(QXmppMessage &&message);
 
 private:
-    const std::unique_ptr<QXmppClientExtensionPrivate> d;
+    // m_client can be replaced with a d-ptr if needed (same size)
+    QXmppClient *m_client;
 
     friend class QXmppClient;
 };
