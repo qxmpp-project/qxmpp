@@ -6,8 +6,6 @@ include(GenerateExportHeader)
 
 option(BUILD_SHARED "Build SHARED library" ON)
 
-add_definitions(-DQXMPP_BUILD)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
