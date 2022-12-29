@@ -445,7 +445,7 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
     QObject::connect(stream->d->connection, &QXmppIceConnection::disconnected,
                      q, &QXmppCall::hangup);
 
-    emit q->streamCreated(stream);
+    Q_EMIT q->streamCreated(stream);
 
     return stream;
 }
@@ -589,7 +589,7 @@ void QXmppCall::accept()
         d->sendRequest(iq);
 
         // notify user
-        emit d->manager->callStarted(this);
+        Q_EMIT d->manager->callStarted(this);
 
         // check for call establishment
         d->setState(QXmppCall::ActiveState);

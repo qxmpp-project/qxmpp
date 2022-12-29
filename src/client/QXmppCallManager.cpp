@@ -133,7 +133,7 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     d->calls << call;
     connect(call, &QObject::destroyed,
             this, &QXmppCallManager::_q_callDestroyed);
-    emit callStarted(call);
+    Q_EMIT callStarted(call);
 
     call->d->sendInvite();
 
@@ -254,6 +254,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
                                                      : iq.contents().constFirst();
         auto *stream = call->d->createStream(content.descriptionMedia(), content.creator(), content.name());
         if (!stream) {
+            // FIXME: delete call here?
             return;
         }
         call->d->streams << stream;
@@ -286,7 +287,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         call->d->sendRequest(ringing);
 
         // notify user
-        emit callReceived(call);
+        Q_EMIT callReceived(call);
         return;
 
     } else {
