@@ -143,6 +143,9 @@ public:
         Error(Error &&);
         Error(Type type, Condition cond, const QString &text = QString());
         Error(const QString &type, const QString &cond, const QString &text = QString());
+        /// \cond
+        Error(QSharedDataPointer<QXmppStanzaErrorPrivate> d);
+        /// \endcond
         ~Error();
 
         Error &operator=(const Error &);
@@ -186,6 +189,8 @@ public:
         /// \endcond
 
     private:
+        friend class QXmppStanza;
+
         QSharedDataPointer<QXmppStanzaErrorPrivate> d;
     };
 
@@ -210,7 +215,9 @@ public:
     void setLang(const QString &);
 
     QXmppStanza::Error error() const;
+    std::optional<Error> errorOptional() const;
     void setError(const QXmppStanza::Error &error);
+    void setError(const std::optional<Error> &error);
 
     QXmppElementList extensions() const;
     void setExtensions(const QXmppElementList &elements);

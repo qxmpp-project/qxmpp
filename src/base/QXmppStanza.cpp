@@ -354,6 +354,13 @@ QXmppStanza::Error::Error(const QString &type, const QString &cond,
     d->condition = conditionFromString(cond);
 }
 
+/// \cond
+QXmppStanza::Error::Error(QSharedDataPointer<QXmppStanzaErrorPrivate> d)
+    : d(std::move(d))
+{
+}
+/// \endcond
+
 /// Default destructor
 QXmppStanza::Error::~Error() = default;
 /// Copy operator
@@ -850,7 +857,7 @@ public:
     QString from;
     QString id;
     QString lang;
-    QXmppStanza::Error error;
+    QSharedDataPointer<QXmppStanzaErrorPrivate> error;
     QXmppElementList extensions;
     QList<QXmppExtendedAddress> extendedAddresses;
     QSharedDataPointer<QXmppE2eeMetadataPrivate> e2eeMetadata;
@@ -955,9 +962,24 @@ void QXmppStanza::setLang(const QString &lang)
 ///
 /// Returns the stanza's error.
 ///
+/// If the stanza has no error a default constructed QXmppStanza::Error is returned.
+///
 QXmppStanza::Error QXmppStanza::error() const
 {
-    return d->error;
+    return d->error ? Error { d->error } : Error();
+}
+
+///
+/// Returns the stanza's error.
+///
+/// \since QXmpp 1.5
+///
+std::optional<QXmppStanza::Error> QXmppStanza::errorOptional() const
+{
+    if (d->error) {
+        return Error { d->error };
+    }
+    return {};
 }
 
 ///
@@ -967,7 +989,23 @@ QXmppStanza::Error QXmppStanza::error() const
 ///
 void QXmppStanza::setError(const QXmppStanza::Error &error)
 {
-    d->error = error;
+    d->error = error.d;
+}
+
+///
+/// Sets the stanza's error.
+///
+/// If you set an empty optional, this will remove the error.
+///
+/// \since QXmpp 1.5
+///
+void QXmppStanza::setError(const std::optional<Error> &error)
+{
+    if (error) {
+        d->error = error->d;
+    } else {
+        d->error = nullptr;
+    }
 }
 
 ///
@@ -1052,7 +1090,9 @@ void QXmppStanza::parse(const QDomElement &element)
 
     QDomElement errorElement = element.firstChildElement("error");
     if (!errorElement.isNull()) {
-        d->error.parse(errorElement);
+        Error error;
+        error.parse(errorElement);
+        d->error = error.d;
     }
 
     // XEP-0033: Extended Stanza Addressing
