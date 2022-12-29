@@ -10,7 +10,7 @@ endmacro()
 include_directories(${PROJECT_SOURCE_DIR}/src/base)
 include_directories(${PROJECT_SOURCE_DIR}/src/client)
 include_directories(${PROJECT_SOURCE_DIR}/src/server)
-include_directories(${PROJECT_BINARY_DIR}/src/base)
+include_directories(${PROJECT_BINARY_DIR}/src)
 
 add_simple_example(0_connected)
 add_simple_example(1_echoClient)

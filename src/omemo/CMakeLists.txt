@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: CC0-1.0
 
 include(CMakePackageConfigHelpers)
-include(GenerateExportHeader)
 
 set(OMEMO_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/QXmppOmemo")
 set(OMEMO_HEADER_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/qxmpp/omemo")
@@ -37,6 +36,7 @@ target_include_directories(QXmppOmemo
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${PROJECT_BINARY_DIR}/src
 )
 
 generate_export_header(QXmppOmemo)

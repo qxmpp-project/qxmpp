@@ -8,19 +8,31 @@
 #ifndef QXMPPGLOBAL_H
 #define QXMPPGLOBAL_H
 
-#include "QXmppBuildConstants.h"
+#include "qxmpp_export.h"
 
-#if QXMPP_BUILD_SHARED
-#if defined(QXMPP_BUILD)
-#define QXMPP_EXPORT Q_DECL_EXPORT
-#else
-#define QXMPP_EXPORT Q_DECL_IMPORT
-#endif
-#else
-#define QXMPP_EXPORT
-#endif
+#include <QString>
 
 #define QXMPP_AUTOTEST_EXPORT
+
+///
+/// This macro expands a numeric value of the form 0xMMNNPP (MM =
+/// major, NN = minor, PP = patch) that specifies QXmpp's version
+/// number. For example, if you compile your application against
+/// QXmpp 1.2.3, the QXMPP_VERSION macro will expand to 0x010203.
+///
+/// You can use QXMPP_VERSION to use the latest QXmpp features where
+/// available.
+///
+#define QXMPP_VERSION QT_VERSION_CHECK(QXMPP_VERSION_MAJOR, QXMPP_VERSION_MINOR, QXMPP_VERSION_PATCH)
+
+///
+/// Returns the version of QXmpp used at compile time as a string.
+///
+inline QLatin1String QXmppVersion()
+{
+    return QLatin1String(
+        QT_STRINGIFY(QXMPP_VERSION_MAJOR) "." QT_STRINGIFY(QXMPP_VERSION_MINOR) "." QT_STRINGIFY(QXMPP_VERSION_PATCH));
+}
 
 // This sets which deprecated functions should still be usable
 // It works exactly like QT_DISABLE_DEPRECATED_BEFORE

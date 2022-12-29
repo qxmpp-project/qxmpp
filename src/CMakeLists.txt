@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+include(GenerateExportHeader)
+
 option(BUILD_SHARED "Build SHARED library" ON)
 
 add_definitions(-DQXMPP_BUILD)
@@ -10,18 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
 
-# Configure QXmppBuildConstants.h.in
-if(BUILD_SHARED)
-    set(QXMPP_BUILD_SHARED true)
-else()
-    set(QXMPP_BUILD_SHARED false)
-endif()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/base/QXmppBuildConstants.h.in ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppBuildConstants.h @ONLY)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/base)
-
 set(INSTALL_HEADER_FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/base/QXmppBuildConstants.h
-
     # Base
     base/QXmppArchiveIq.h
     base/QXmppBindIq.h
@@ -317,6 +308,23 @@ set_target_properties(qxmpp PROPERTIES
     EXPORT_NAME QXmpp
 )
 
+if(BUILD_SHARED)
+    set(QXMPP_BUILD_SHARED true)
+else()
+    set(QXMPP_BUILD_SHARED false)
+endif()
+
+set(QXMPP_CUSTOM_EXPORT_CONTENT "
+#define QXMPP_BUILD_SHARED ${QXMPP_BUILD_SHARED}
+#define QXMPP_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
+#define QXMPP_VERSION_MINOR ${PROJECT_VERSION_MINOR}
+#define QXMPP_VERSION_PATCH ${PROJECT_VERSION_PATCH}
+")
+
+generate_export_header(qxmpp
+    CUSTOM_CONTENT_FROM_VARIABLE QXMPP_CUSTOM_EXPORT_CONTENT
+)
+
 target_include_directories(qxmpp
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/base>
@@ -327,6 +335,8 @@ target_include_directories(qxmpp
     ${GLIB2_INCLUDE_DIR}
     ${GOBJECT_INCLUDE_DIR}
     ${GSTREAMER_INCLUDE_DIRS}
+    PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(qxmpp
@@ -372,7 +382,7 @@ export(
 )
 
 install(
-    FILES ${INSTALL_HEADER_FILES}
+    FILES ${INSTALL_HEADER_FILES} ${CMAKE_CURRENT_BINARY_DIR}/qxmpp_export.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
 )
 
