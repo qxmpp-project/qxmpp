@@ -158,14 +158,10 @@ public:
         void setText(const QString &text);
 
         Condition condition() const;
-        std::optional<Condition> conditionOpt() const;
         void setCondition(Condition cond);
-        void setCondition(std::optional<Condition> cond);
 
         Type type() const;
-        std::optional<Type> typeOpt() const;
         void setType(Type type);
-        void setType(std::optional<Type> type);
 
         QString by() const;
         void setBy(const QString &by);

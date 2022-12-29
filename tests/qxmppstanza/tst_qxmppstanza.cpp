@@ -389,18 +389,17 @@ void tst_QXmppStanza::testErrorRetry()
 void tst_QXmppStanza::testErrorEnums()
 {
     QXmppStanza::Error err;
-    QVERIFY(!err.conditionOpt().has_value());
-    QVERIFY(!err.typeOpt().has_value());
+    QCOMPARE(err.condition(), QXmppStanza::Error::NoCondition);
+    QCOMPARE(err.type(), QXmppStanza::Error::NoType);
 
     err.setCondition(QXmppStanza::Error::BadRequest);
     err.setType(QXmppStanza::Error::Cancel);
-    QVERIFY(err.conditionOpt().has_value());
-    QVERIFY(err.typeOpt().has_value());
 
     err.setCondition(QXmppStanza::Error::Condition(-1));
     err.setType(QXmppStanza::Error::Type(-1));
-    QVERIFY(!err.conditionOpt().has_value());
-    QVERIFY(!err.typeOpt().has_value());
+
+    QCOMPARE(err.condition(), QXmppStanza::Error::NoCondition);
+    QCOMPARE(err.type(), QXmppStanza::Error::NoType);
 }
 
 void tst_QXmppStanza::testEncryption()

@@ -297,26 +297,18 @@ void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 class QXmppStanzaErrorPrivate : public QSharedData
 {
 public:
-    QXmppStanzaErrorPrivate();
-
-    int code;
-    std::optional<QXmppStanza::Error::Type> type;
-    std::optional<QXmppStanza::Error::Condition> condition;
+    int code = 0;
+    QXmppStanza::Error::Type type = QXmppStanza::Error::NoType;
+    QXmppStanza::Error::Condition condition = QXmppStanza::Error::NoCondition;
     QString text;
     QString by;
     QString redirectionUri;
 
     // XEP-0363: HTTP File Upload
-    bool fileTooLarge;
+    bool fileTooLarge = false;
     qint64 maxFileSize;
     QDateTime retryDate;
 };
-
-QXmppStanzaErrorPrivate::QXmppStanzaErrorPrivate()
-    : code(0),
-      fileTooLarge(false)
-{
-}
 
 ///
 /// Default constructor
@@ -350,8 +342,8 @@ QXmppStanza::Error::Error(const QString &type, const QString &cond,
     : d(new QXmppStanzaErrorPrivate)
 {
     d->text = text;
-    d->type = typeFromString(type);
-    d->condition = conditionFromString(cond);
+    d->type = typeFromString(type).value_or(NoType);
+    d->condition = conditionFromString(cond).value_or(NoCondition);
 }
 
 /// \cond
@@ -406,23 +398,7 @@ void QXmppStanza::Error::setCode(int code)
 /// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
 /// can be used in combination with redirectUri().
 ///
-/// \warning This returns NoCondition when no condition is set. When possible you should use
-/// conditionOpt().
-///
 QXmppStanza::Error::Condition QXmppStanza::Error::condition() const
-{
-    return d->condition.value_or(NoCondition);
-}
-
-///
-/// Returns the error condition.
-///
-/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
-/// can be used in combination with redirectUri().
-///
-/// \since QXmpp 1.5
-///
-auto QXmppStanza::Error::conditionOpt() const -> std::optional<Condition>
 {
     return d->condition;
 }
@@ -435,42 +411,13 @@ auto QXmppStanza::Error::conditionOpt() const -> std::optional<Condition>
 ///
 void QXmppStanza::Error::setCondition(Condition cond)
 {
-    if (int(cond) < 0) {
-        d->condition = std::nullopt;
-        return;
-    }
-    d->condition = cond;
-}
-
-///
-/// Sets the error condition.
-///
-/// The conditions QXmppStanza::Error::Gone and QXmppStanza::Error::Redirect
-/// can be used in combination with setRedirectUri().
-///
-/// \since QXmpp 1.5
-///
-void QXmppStanza::Error::setCondition(std::optional<Condition> cond)
-{
     d->condition = cond;
 }
 
 ///
 /// Returns the type of the error.
-///
-/// \warning This returns NoType when no type is set. When possible you should use typeOpt().
 ///
 QXmppStanza::Error::Type QXmppStanza::Error::type() const
-{
-    return d->type.value_or(NoType);
-}
-
-///
-/// Returns the type of the error.
-///
-/// \since QXmpp 1.5
-///
-std::optional<QXmppStanza::Error::Type> QXmppStanza::Error::typeOpt() const
 {
     return d->type;
 }
@@ -505,20 +452,6 @@ void QXmppStanza::Error::setBy(const QString &by)
 /// Sets the type of the error.
 ///
 void QXmppStanza::Error::setType(QXmppStanza::Error::Type type)
-{
-    if (int(type) < 0) {
-        d->type = std::nullopt;
-        return;
-    }
-    d->type = type;
-}
-
-///
-/// Sets the type of the error.
-///
-/// \since QXmpp 1.5
-///
-void QXmppStanza::Error::setType(std::optional<Type> type)
 {
     d->type = type;
 }
@@ -617,7 +550,7 @@ void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
     d->code = errorElement.attribute(QStringLiteral("code")).toInt();
-    d->type = typeFromString(errorElement.attribute(QStringLiteral("type")));
+    d->type = typeFromString(errorElement.attribute(QStringLiteral("type"))).value_or(NoType);
     d->by = errorElement.attribute(QStringLiteral("by"));
 
     QDomElement element = errorElement.firstChildElement();
@@ -626,7 +559,7 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
             if (element.tagName() == QStringLiteral("text")) {
                 d->text = element.text();
             } else {
-                d->condition = conditionFromString(element.tagName());
+                d->condition = conditionFromString(element.tagName()).value_or(NoCondition);
 
                 // redirection URI
                 if (d->condition == Gone || d->condition == Redirect) {
@@ -658,22 +591,22 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
 
 void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 {
-    if (!d->condition && !d->type) {
+    if (d->condition == NoCondition && d->type == NoType) {
         return;
     }
 
     writer->writeStartElement(QStringLiteral("error"));
     helperToXmlAddAttribute(writer, QStringLiteral("by"), d->by);
-    if (d->type) {
-        writer->writeAttribute(QStringLiteral("type"), typeToString(*d->type));
+    if (d->type != NoType) {
+        writer->writeAttribute(QStringLiteral("type"), typeToString(d->type));
     }
 
     if (d->code > 0) {
         helperToXmlAddAttribute(writer, QStringLiteral("code"), QString::number(d->code));
     }
 
-    if (d->condition) {
-        writer->writeStartElement(conditionToString(*d->condition));
+    if (d->condition != NoCondition) {
+        writer->writeStartElement(conditionToString(d->condition));
         writer->writeDefaultNamespace(ns_stanza);
 
         // redirection URI

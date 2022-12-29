@@ -1374,9 +1374,8 @@ QByteArray ManagerPrivate::createSceEnvelope(const T &stanza)
         } else {
             // If the IQ stanza contains an error (i.e., it is an error response), that error is
             // serialized instead of actual content.
-            const auto error = stanza.error();
-            if (error.typeOpt()) {
-                error.toXml(&writer);
+            if (auto err = stanza.errorOptional()) {
+                err->toXml(&writer);
             } else {
                 stanza.toXmlElementFromChild(&writer);
             }
