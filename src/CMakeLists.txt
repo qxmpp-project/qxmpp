@@ -4,12 +4,6 @@
 
 include(GenerateExportHeader)
 
-option(BUILD_SHARED "Build SHARED library" ON)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/base)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/client)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/server)
-
 set(INSTALL_HEADER_FILES
     # Base
     base/QXmppArchiveIq.h
@@ -269,10 +263,34 @@ set(SOURCE_FILES
     server/QXmppServerPlugin.cpp
 )
 
-if(BUILD_OMEMO)
-    # required to be used in QXmppMessage
-    set(SOURCE_FILES ${SOURCE_FILES} base/QXmppOmemoDataBase.cpp)
+if(BUILD_SHARED)
+    add_library(qxmpp SHARED ${SOURCE_FILES})
+else()
+    add_library(qxmpp STATIC ${SOURCE_FILES})
 endif()
+
+set_target_properties(qxmpp PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${SO_VERSION}
+    EXPORT_NAME QXmpp
+)
+
+target_include_directories(qxmpp
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/base>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/client>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
+    $<INSTALL_INTERFACE:include/qxmpp>
+    PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_link_libraries(qxmpp
+    PUBLIC
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Xml
+)
 
 if(WITH_GSTREAMER)
     find_package(GStreamer REQUIRED)
@@ -286,26 +304,40 @@ if(WITH_GSTREAMER)
         client/QXmppCallStream.h
     )
 
-    set(SOURCE_FILES
-        ${SOURCE_FILES}
+    target_sources(qxmpp
+        PRIVATE
         client/QXmppCall.cpp
         client/QXmppCallManager.cpp
         client/QXmppCallStream.cpp
     )
+
+    target_link_libraries(qxmpp
+        PRIVATE
+        ${GLIB2_LIBRARIES}
+        ${GOBJECT_LIBRARIES}
+        ${GSTREAMER_LIBRARY}
+    )
+
+    target_include_directories(qxmpp
+        PRIVATE
+        ${GLIB2_INCLUDE_DIR}
+        ${GOBJECT_INCLUDE_DIR}
+        ${GSTREAMER_INCLUDE_DIRS}
+    )
 endif()
 
-if(BUILD_SHARED)
-    add_library(qxmpp SHARED ${SOURCE_FILES})
-else()
-    add_library(qxmpp STATIC ${SOURCE_FILES})
+if(BUILD_OMEMO)
+    # required to be used in QXmppMessage
+    target_sources(qxmpp PRIVATE base/QXmppOmemoDataBase.cpp)
 endif()
 
-set_target_properties(qxmpp PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${SO_VERSION}
-    EXPORT_NAME QXmpp
-)
+if(WITH_QCA)
+    target_sources(qxmpp PRIVATE client/QXmppEncryptedFileSharingProvider.cpp client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
+    set(INSTALL_HEADER_FILES ${INSTALL_HEADER_FILES} client/QXmppEncryptedFileSharingProvider.h)
+    target_link_libraries(qxmpp PRIVATE qca-qt${QT_VERSION_MAJOR})
+endif()
 
+# qxmpp_export.h generation
 if(BUILD_SHARED)
     set(QXMPP_BUILD_SHARED true)
 else()
@@ -322,43 +354,6 @@ set(QXMPP_CUSTOM_EXPORT_CONTENT "
 generate_export_header(qxmpp
     CUSTOM_CONTENT_FROM_VARIABLE QXMPP_CUSTOM_EXPORT_CONTENT
 )
-
-target_include_directories(qxmpp
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/base>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/client>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/base>
-    $<INSTALL_INTERFACE:include/qxmpp>
-    ${GLIB2_INCLUDE_DIR}
-    ${GOBJECT_INCLUDE_DIR}
-    ${GSTREAMER_INCLUDE_DIRS}
-    PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-target_link_libraries(qxmpp
-    PUBLIC
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Xml
-)
-
-if(WITH_GSTREAMER)
-    target_link_libraries(qxmpp
-        PRIVATE
-        ${GLIB2_LIBRARIES}
-        ${GOBJECT_LIBRARIES}
-        ${GSTREAMER_LIBRARY}
-    )
-endif()
-
-if(WITH_QCA)
-    target_sources(qxmpp PRIVATE client/QXmppEncryptedFileSharingProvider.cpp client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
-    set(INSTALL_HEADER_FILES ${INSTALL_HEADER_FILES} client/QXmppEncryptedFileSharingProvider.h)
-    target_link_libraries(qxmpp PRIVATE qca-qt${QT_VERSION_MAJOR})
-    target_compile_definitions(qxmpp PRIVATE -DWITH_QCA)
-endif()
 
 install(
     TARGETS qxmpp
@@ -384,6 +379,7 @@ install(
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
 )
 
+# submodules
 if(BUILD_OMEMO)
     add_subdirectory(omemo)
 endif()
