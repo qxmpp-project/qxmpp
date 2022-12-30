@@ -1030,10 +1030,10 @@ QFuture<QXmppE2eeExtension::IqEncryptResult> Manager::encryptIq(QXmppIq &&iq, co
     QFutureInterface<QXmppE2eeExtension::IqEncryptResult> interface(QFutureInterfaceBase::Started);
 
     if (!d->isStarted) {
-        QXmpp::SendError error;
-        error.text = QStringLiteral("OMEMO manager must be started before encrypting");
-        error.type = QXmpp::SendError::EncryptionError;
-        reportFinishedResult(interface, { error });
+        interface.reportResult(QXmppError {
+            QStringLiteral("OMEMO manager must be started before encrypting"),
+            SendError::EncryptionError });
+        interface.reportFinished();
     } else {
         std::optional<TrustLevels> acceptedTrustLevels;
 
@@ -1048,10 +1048,10 @@ QFuture<QXmppE2eeExtension::IqEncryptResult> Manager::encryptIq(QXmppIq &&iq, co
         auto future = d->encryptStanza(iq, { QXmppUtils::jidToBareJid(iq.to()) }, *acceptedTrustLevels);
         await(future, this, [=, iq = std::move(iq)](std::optional<QXmppOmemoElement> omemoElement) mutable {
             if (!omemoElement) {
-                QXmpp::SendError error;
-                error.text = QStringLiteral("OMEMO element could not be created");
-                error.type = QXmpp::SendError::EncryptionError;
-                reportFinishedResult(interface, { error });
+                interface.reportResult(QXmppError {
+                    QStringLiteral("OMEMO element could not be created"),
+                    SendError::EncryptionError });
+                interface.reportFinished();
             } else {
                 QXmppOmemoIq omemoIq;
                 omemoIq.setId(iq.id());
@@ -1077,7 +1077,7 @@ QFuture<QXmppE2eeExtension::IqDecryptResult> Manager::decryptIq(const QDomElemen
 {
     if (!d->isStarted) {
         // TODO: Add decryption queue to avoid this error
-        return makeReadyFuture<IqDecryptResult>(SendError {
+        return makeReadyFuture<IqDecryptResult>(QXmppError {
             QStringLiteral("OMEMO manager must be started before decrypting"),
             SendError::EncryptionError });
     }
@@ -1088,7 +1088,7 @@ QFuture<QXmppE2eeExtension::IqDecryptResult> Manager::decryptIq(const QDomElemen
             if (result) {
                 return result->iq;
             }
-            return SendError {
+            return QXmppError {
                 QStringLiteral("OMEMO message could not be decrypted"),
                 SendError::EncryptionError
             };

@@ -1031,7 +1031,10 @@ QFuture<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessage
     QFutureInterface<QXmppE2eeExtension::MessageEncryptResult> interface(QFutureInterfaceBase::Started);
 
     if (!isStarted) {
-        QXmpp::SendError error = { QStringLiteral("OMEMO manager must be started before encrypting"), QXmpp::SendError::EncryptionError };
+        QXmppError error {
+            QStringLiteral("OMEMO manager must be started before encrypting"),
+            SendError::EncryptionError
+        };
         reportFinishedResult(interface, { error });
     } else {
         recipientJids.append(ownBareJid());
@@ -1039,9 +1042,10 @@ QFuture<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessage
         auto future = encryptStanza(message, recipientJids, acceptedTrustLevels);
         await(future, q, [=, message = std::move(message)](std::optional<QXmppOmemoElement> omemoElement) mutable {
             if (!omemoElement) {
-                QXmpp::SendError error;
-                error.text = QStringLiteral("OMEMO element could not be created");
-                error.type = QXmpp::SendError::EncryptionError;
+                QXmppError error {
+                    QStringLiteral("OMEMO element could not be created"),
+                    QXmpp::SendError::EncryptionError,
+                };
                 reportFinishedResult(interface, { error });
             } else {
                 const auto areDeliveryReceiptsUsed = message.isReceiptRequested() || !message.receiptId().isEmpty();
@@ -3336,7 +3340,7 @@ QFuture<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid, u
                     } else {
                         auto future = sendEmptyMessage(jid, deviceId, true);
                         await(future, q, [=](QXmpp::SendResult result) mutable {
-                            if (std::holds_alternative<QXmpp::SendError>(result)) {
+                            if (std::holds_alternative<QXmppError>(result)) {
                                 warning("Session could be created but empty message could not be sent to JID '" %
                                         jid % "' and device ID '" % QString::number(deviceId) % "'");
                                 reportFinishedResult(interface, false);
@@ -3580,7 +3584,10 @@ QFuture<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &recip
         warning("OMEMO envelope for recipient JID '" % recipientJid % "' and device ID '" %
                 QString::number(recipientDeviceId) %
                 "' could not be created because its data could not be encrypted");
-        SendError error = { QStringLiteral("OMEMO envelope could not be created"), SendError::EncryptionError };
+        QXmppError error {
+            QStringLiteral("OMEMO envelope could not be created"),
+            SendError::EncryptionError
+        };
         reportFinishedResult(interface, { error });
     } else {
         QXmppOmemoEnvelope omemoEnvelope;

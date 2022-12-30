@@ -150,10 +150,10 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
                               }
                               return convert(std::move(iq));
                           },
-                          [](QXmpp::SendError error) -> Result {
+                          [](QXmppError error) -> Result {
                               using Error = QXmppStanza::Error;
                               return Error(Error::Wait, Error::UndefinedCondition,
-                                           QStringLiteral("Couldn't send request: ") + error.text);
+                                           QStringLiteral("Couldn't send request: ") + error.description);
                           },
                       },
                       sendResult);

@@ -423,7 +423,7 @@ QFuture<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::op
                     reportFinishedResult(interface, result);
                 });
             } else {
-                reportFinishedResult(interface, { std::get<QXmpp::SendError>(result) });
+                reportFinishedResult(interface, { std::get<QXmppError>(result) });
             }
         });
 
@@ -526,7 +526,7 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const 
                 await(future, this, [this, interface](QXmppStream::IqResult result) mutable {
                     if (const auto encryptedDom = std::get_if<QDomElement>(&result)) {
                         if (!isIqResponse(*encryptedDom)) {
-                            QXmpp::SendError err {
+                            QXmppError err {
                                 QStringLiteral("Invalid IQ response received."),
                                 QXmpp::SendError::EncryptionError
                             };
@@ -543,24 +543,24 @@ QFuture<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, const 
                                     // the IQ response from the other entity was not encrypted
                                     // then report IQ response without modifications
                                     interface.reportResult(encryptedDom);
-                                } else if (const auto error = std::get_if<QXmpp::SendError>(&result)) {
+                                } else if (const auto error = std::get_if<QXmppError>(&result)) {
                                     interface.reportResult(*error);
                                 }
                                 interface.reportFinished();
                             });
                         } else {
-                            interface.reportResult(QXmpp::SendError {
+                            interface.reportResult(QXmppError {
                                 QStringLiteral("No decryption extension found."),
                                 QXmpp::SendError::EncryptionError });
                             interface.reportFinished();
                         }
                     } else {
-                        interface.reportResult(std::get<QXmpp::SendError>(result));
+                        interface.reportResult(std::get<QXmppError>(result));
                         interface.reportFinished();
                     }
                 });
             } else {
-                interface.reportResult(std::get<QXmpp::SendError>(result));
+                interface.reportResult(std::get<QXmppError>(result));
                 interface.reportFinished();
             }
         });

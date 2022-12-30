@@ -355,7 +355,7 @@ void QXmppStreamManager::handlePacketSent(QXmppPacket &packet, bool sentData)
         if (sentData) {
             packet.reportResult(QXmpp::SendSuccess { false });
         } else {
-            packet.reportResult(QXmpp::SendError {
+            packet.reportResult(QXmppError {
                 QStringLiteral("Couldn't write data to socket. No stream management enabled."),
                 QXmpp::SendError::SocketWriteError });
         }
@@ -472,7 +472,7 @@ void QXmppStreamManager::sendAcknowledgementRequest()
 void QXmppStreamManager::resetCache()
 {
     for (auto &packet : m_unacknowledgedStanzas) {
-        packet.reportResult(QXmpp::SendError { QStringLiteral("Disconnected"), QXmpp::SendError::Disconnected });
+        packet.reportResult(QXmppError { QStringLiteral("Disconnected"), QXmpp::SendError::Disconnected });
         packet.reportFinished();
     }
 

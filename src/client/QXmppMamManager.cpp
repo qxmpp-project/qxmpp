@@ -300,8 +300,7 @@ QFuture<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const
                 d->ongoingRequests.erase(itr);
             }
         } else {
-            auto &error = std::get<QXmpp::SendError>(result);
-            itr->second.interface.reportResult(QXmppError { error.text, error });
+            itr->second.interface.reportResult(std::get<QXmppError>(result));
             itr->second.interface.reportFinished();
             d->ongoingRequests.erase(itr);
         }

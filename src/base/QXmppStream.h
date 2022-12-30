@@ -44,7 +44,7 @@ public:
     QFuture<QXmpp::SendResult> send(QXmppNonza &&);
     QFuture<QXmpp::SendResult> send(QXmppPacket &&);
 
-    using IqResult = std::variant<QDomElement, QXmpp::SendError>;
+    using IqResult = std::variant<QDomElement, QXmppError>;
     QFuture<IqResult> sendIq(QXmppIq &&);
     QFuture<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
     void cancelOngoingIqs();

@@ -238,28 +238,28 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
     using namespace QXmpp;
 
     if (id.isEmpty() || d->runningIqs.contains(id)) {
-        return makeReadyFuture<IqResult>(QXmpp::SendError {
+        return makeReadyFuture<IqResult>(QXmppError {
             QStringLiteral("Invalid IQ id: empty or in use."),
             SendError::Disconnected });
     }
 
     if (to.isEmpty()) {
-        return makeReadyFuture<IqResult>(SendError {
+        return makeReadyFuture<IqResult>(QXmppError {
             QStringLiteral("The 'to' address must be set so the stream can match the response."),
             SendError::Disconnected });
     }
 
     auto sendFuture = send(std::move(packet));
     if (sendFuture.isFinished()) {
-        if (std::holds_alternative<SendError>(sendFuture.result())) {
+        if (std::holds_alternative<QXmppError>(sendFuture.result())) {
             // early exit (saves QFutureWatcher)
-            return makeReadyFuture<IqResult>(std::get<SendError>(sendFuture.result()));
+            return makeReadyFuture<IqResult>(std::get<QXmppError>(sendFuture.result()));
         }
     } else {
         awaitLast(sendFuture, this, [this, id](SendResult result) {
-            if (std::holds_alternative<SendError>(result)) {
+            if (std::holds_alternative<QXmppError>(result)) {
                 if (auto itr = d->runningIqs.find(id); itr != d->runningIqs.end()) {
-                    itr.value().interface.reportResult(std::get<SendError>(result));
+                    itr.value().interface.reportResult(std::get<QXmppError>(result));
                     itr.value().interface.reportFinished();
 
                     d->runningIqs.erase(itr);
@@ -285,7 +285,7 @@ QFuture<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const Q
 void QXmppStream::cancelOngoingIqs()
 {
     for (auto &state : d->runningIqs) {
-        state.interface.reportResult(QXmpp::SendError {
+        state.interface.reportResult(QXmppError {
             QStringLiteral("IQ has been cancelled."),
             QXmpp::SendError::Disconnected });
         state.interface.reportFinished();

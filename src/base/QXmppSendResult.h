@@ -5,30 +5,24 @@
 #ifndef QXMPPSENDRESULT_H
 #define QXMPPSENDRESULT_H
 
-#include "QXmppGlobal.h"
+#include "QXmppError.h"
 
 #include <variant>
 
 namespace QXmpp {
 
 ///
-/// A struct containing a packet send error type and error message.
+/// Describes the type of a packet sending error.
 ///
 /// \since QXmpp 1.5
 ///
-struct SendError
-{
-    /// Describes the type of an error.
-    enum Type : uint8_t {
-        SocketWriteError,  ///< The packet was written to the socket with no success (only happens when Stream Management is disabled).
-        Disconnected,      ///< The packet couldn't be sent because the connection hasn't been (re)established.
-        EncryptionError,   ///< The packet couldn't be sent because prior encryption failed.
-    };
-
-    /// Text describing the error.
-    QString text;
-    /// Type of the occured error.
-    Type type;
+enum class SendError : uint8_t {
+    /// The packet was written to the socket with no success (only happens when Stream Management is disabled).
+    SocketWriteError,
+    /// The packet couldn't be sent because the connection hasn't been (re)established.
+    Disconnected,
+    /// The packet couldn't be sent because prior encryption failed.
+    EncryptionError,
 };
 
 ///
@@ -43,9 +37,11 @@ struct SendSuccess
 };
 
 ///
-/// A variant containing either a SendSuccess object or a SendError.
+/// A variant containing either a SendSuccess object or a QXmppError.
 ///
-using SendResult = std::variant<SendSuccess, SendError>;
+/// The QXmppError will likely contain a SendError.
+///
+using SendResult = std::variant<SendSuccess, QXmppError>;
 
 }  // namespace QXmpp
 

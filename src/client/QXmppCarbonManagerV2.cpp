@@ -62,7 +62,7 @@ auto firstChildElement(const QDomElement &el, const char *tagName, const char *x
     return QDomElement();
 }
 
-auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional<QXmppStanza::Error>
+auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optional<QXmppError>
 {
     if (auto el = std::get_if<QDomElement>(&sendResult)) {
         auto iqType = el->attribute(QStringLiteral("type"));
@@ -71,11 +71,13 @@ auto parseIq(std::variant<QDomElement, SendError> &&sendResult) -> std::optional
         }
         QXmppIq iq;
         iq.parse(*el);
-        return iq.error();
-    } else if (auto err = std::get_if<SendError>(&sendResult)) {
-        using Error = QXmppStanza::Error;
-        return Error(Error::Wait, Error::UndefinedCondition,
-                     QStringLiteral("Couldn't send request: ") + err->text);
+        if (auto error = iq.errorOptional()) {
+            return QXmppError { error->text(), std::move(*error) };
+        }
+        // Only happens with IQs with type=error, but no <error/> element
+        return QXmppError { QStringLiteral("Unknown error received."), QXmppStanza::Error() };
+    } else if (auto err = std::get_if<QXmppError>(&sendResult)) {
+        return *err;
     }
     return {};
 }
@@ -163,7 +165,7 @@ void QXmppCarbonManagerV2::enableCarbons()
 
     await(client()->sendIq(CarbonEnableIq()), this, [this](QXmppClient::IqResult domResult) {
         if (auto err = parseIq(std::move(domResult))) {
-            warning("Could not enable message carbons: " % err->text());
+            warning("Could not enable message carbons: " % err->description);
         } else {
             info("Message Carbons enabled.");
         }

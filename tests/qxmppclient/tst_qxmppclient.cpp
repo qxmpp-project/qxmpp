@@ -99,7 +99,7 @@ public:
     QFuture<MessageEncryptResult> encryptMessage(QXmppMessage &&, const std::optional<QXmppSendStanzaParams> &) override
     {
         messageCalled = true;
-        return makeReadyFuture<MessageEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
+        return makeReadyFuture<MessageEncryptResult>(QXmppError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
     QFuture<MessageDecryptResult> decryptMessage(QXmppMessage &&) override { return {}; };
@@ -107,12 +107,12 @@ public:
     QFuture<IqEncryptResult> encryptIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> &) override
     {
         iqCalled = true;
-        return makeReadyFuture<IqEncryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
+        return makeReadyFuture<IqEncryptResult>(QXmppError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
     QFuture<IqDecryptResult> decryptIq(const QDomElement &) override
     {
-        return makeReadyFuture<IqDecryptResult>(QXmpp::SendError { "it's only a test", QXmpp::SendError::EncryptionError });
+        return makeReadyFuture<IqDecryptResult>(QXmppError { "it's only a test", QXmpp::SendError::EncryptionError });
     }
 
     bool isEncrypted(const QDomElement &) override { return false; };
@@ -129,7 +129,7 @@ void tst_QXmppClient::testE2eeExtension()
     QVERIFY(encrypter.messageCalled);
     QVERIFY(!encrypter.iqCalled);
     QCoreApplication::processEvents();
-    expectFutureVariant<QXmpp::SendError>(result);
+    expectFutureVariant<QXmppError>(result);
 
     encrypter.messageCalled = false;
     result = client.send(QXmppPresence(QXmppPresence::Available));
