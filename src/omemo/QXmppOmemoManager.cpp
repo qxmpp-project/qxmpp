@@ -564,31 +564,38 @@ void Manager::setMaximumDevicesPerStanza(int maximum)
 ///
 /// \return the results of the requests for each JID
 ///
-QFuture<Manager::DevicesResult> Manager::requestDeviceLists(const QList<QString> &jids)
+QFuture<QVector<Manager::DevicesResult>> Manager::requestDeviceLists(const QList<QString> &jids)
 {
     if (const auto jidsCount = jids.size()) {
-        QFutureInterface<Manager::DevicesResult> interface(QFutureInterfaceBase::Started);
-        auto processedJidsCount = std::make_shared<int>(0);
+        struct State {
+            int processed = 0;
+            int jidsCount = 0;
+            QFutureInterface<QVector<Manager::DevicesResult>> interface;
+            QVector<Manager::DevicesResult> devicesResults;
+        };
+
+        auto state = std::make_shared<State>();
+        state->jidsCount = jids.count();
 
         for (const auto &jid : jids) {
             Q_ASSERT_X(jid != d->ownBareJid(), "Requesting contact's device list", "Own JID passed");
 
             auto future = d->requestDeviceList(jid);
-            await(future, this, [=](auto result) mutable {
-                DevicesResult devicesResult {
+            await(future, this, [jid, state](auto result) mutable {
+                state->devicesResults << DevicesResult {
                     jid,
                     mapSuccess(std::move(result), [](QXmppOmemoDeviceListItem) { return Success(); })
                 };
-                interface.reportResult(devicesResult);
 
-                if (++(*processedJidsCount) == jidsCount) {
-                    interface.reportFinished();
+                if (++(state->processed) == state->jidsCount) {
+                    state->interface.reportResult(state->devicesResults);
+                    state->interface.reportFinished();
                 }
             });
         }
-        return interface.future();
+        return state->interface.future();
     }
-    return QFutureInterface<DevicesResult>(QFutureInterfaceBase::Finished).future();
+    return makeReadyFuture(QVector<Manager::DevicesResult>());
 }
 
 ///
@@ -605,31 +612,36 @@ QFuture<Manager::DevicesResult> Manager::requestDeviceLists(const QList<QString>
 ///
 /// \return the results of the subscription for each JID
 ///
-QFuture<Manager::DevicesResult> Manager::subscribeToDeviceLists(const QList<QString> &jids)
+QFuture<QVector<Manager::DevicesResult>> Manager::subscribeToDeviceLists(const QList<QString> &jids)
 {
-    QFutureInterface<Manager::DevicesResult> interface(QFutureInterfaceBase::Started);
-
     if (const auto jidsCount = jids.size()) {
-        auto processedJidsCount = std::make_shared<int>(0);
+        struct State {
+            int processed = 0;
+            int jidsCount = 0;
+            QFutureInterface<QVector<Manager::DevicesResult>> interface;
+            QVector<Manager::DevicesResult> devicesResults;
+        };
+
+        auto state = std::make_shared<State>();
+        state->jidsCount = jids.size();
 
         for (const auto &jid : jids) {
             auto future = d->subscribeToDeviceList(jid);
-            await(future, this, [=](QXmppPubSubManager::Result result) mutable {
+            await(future, this, [state, jid](QXmppPubSubManager::Result result) mutable {
                 Manager::DevicesResult devicesResult;
                 devicesResult.jid = jid;
                 devicesResult.result = result;
-                interface.reportResult(devicesResult);
+                state->devicesResults << devicesResult;
 
-                if (++(*processedJidsCount) == jidsCount) {
-                    interface.reportFinished();
+                if (++(state->processed) == state->jidsCount) {
+                    state->interface.reportResult(state->devicesResults);
+                    state->interface.reportFinished();
                 }
             });
         }
-    } else {
-        interface.reportFinished();
+        return state->interface.future();
     }
-
-    return interface.future();
+    return makeReadyFuture(QVector<Manager::DevicesResult>());
 }
 
 ///
@@ -641,7 +653,7 @@ QFuture<Manager::DevicesResult> Manager::subscribeToDeviceLists(const QList<QStr
 ///
 /// \return the results of the unsubscription for each JID
 ///
-QFuture<Manager::DevicesResult> Manager::unsubscribeFromDeviceLists()
+QFuture<QVector<Manager::DevicesResult>> Manager::unsubscribeFromDeviceLists()
 {
     return d->unsubscribeFromDeviceLists(d->jidsOfManuallySubscribedDevices);
 }

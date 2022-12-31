@@ -3154,32 +3154,36 @@ QFuture<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(const 
 //
 // \return the results of each unsubscribe request
 //
-QFuture<Manager::DevicesResult> ManagerPrivate::unsubscribeFromDeviceLists(const QList<QString> &jids)
+QFuture<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDeviceLists(const QList<QString> &jids)
 {
-    QFutureInterface<Manager::DevicesResult> interface = (QFutureInterfaceBase::Started);
-
-    const auto jidsCount = jids.size();
-    auto processedJidsCount = std::make_shared<int>(0);
-
-    if (jidsCount == 0) {
-        interface.reportFinished();
+    if (jids.isEmpty()) {
+        return makeReadyFuture(QVector<Manager::DevicesResult>());
     }
 
-    for (const auto &jid : jids) {
-        auto future = unsubscribeFromDeviceList(jid);
-        await(future, q, [=](QXmppPubSubManager::Result result) mutable {
-            Manager::DevicesResult devicesResult;
-            devicesResult.jid = jid;
-            devicesResult.result = result;
-            interface.reportResult(devicesResult);
+    struct State {
+        int processed = 0;
+        int jidsCount = 0;
+        QFutureInterface<QVector<Manager::DevicesResult>> interface;
+        QVector<Manager::DevicesResult> devicesResults;
+    };
 
-            if (++(*processedJidsCount) == jidsCount) {
-                interface.reportFinished();
+    auto state = std::make_shared<State>();
+    state->jidsCount = jids.count();
+
+    for (const auto &jid : jids) {
+        await(unsubscribeFromDeviceList(jid), q, [jid, state](QXmppPubSubManager::Result result) mutable {
+            state->devicesResults << Manager::DevicesResult {
+                jid, result
+            };
+
+            if (++(state->processed) == state->jidsCount) {
+                state->interface.reportResult(state->devicesResults);
+                state->interface.reportFinished();
             }
         });
     }
 
-    return interface.future();
+    return state->interface.future();
 }
 
 //

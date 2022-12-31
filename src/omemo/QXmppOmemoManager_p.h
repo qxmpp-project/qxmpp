@@ -312,7 +312,7 @@ public:
     QFuture<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> requestDeviceList(const QString &jid);
     void subscribeToNewDeviceLists(const QString &jid, uint32_t deviceId);
     QFuture<Result> subscribeToDeviceList(const QString &jid);
-    QFuture<QXmppOmemoManager::DevicesResult> unsubscribeFromDeviceLists(const QList<QString> &jids);
+    QFuture<QVector<QXmppOmemoManager::DevicesResult>> unsubscribeFromDeviceLists(const QList<QString> &jids);
     QFuture<Result> unsubscribeFromDeviceList(const QString &jid);
 
     QFuture<bool> resetOwnDevice();

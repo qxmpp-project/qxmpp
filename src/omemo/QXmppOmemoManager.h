@@ -97,9 +97,9 @@ public:
     int maximumDevicesPerStanza() const;
     void setMaximumDevicesPerStanza(int maximum);
 
-    QFuture<DevicesResult> requestDeviceLists(const QList<QString> &jids);
-    QFuture<DevicesResult> subscribeToDeviceLists(const QList<QString> &jids);
-    QFuture<DevicesResult> unsubscribeFromDeviceLists();
+    QFuture<QVector<DevicesResult>> requestDeviceLists(const QList<QString> &jids);
+    QFuture<QVector<DevicesResult>> subscribeToDeviceLists(const QList<QString> &jids);
+    QFuture<QVector<DevicesResult>> unsubscribeFromDeviceLists();
 
     QXmppOmemoOwnDevice ownDevice();
     QFuture<QVector<QXmppOmemoDevice>> devices();
