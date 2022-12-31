@@ -763,7 +763,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 
 /// \cond
 ///
-/// \fn QXmppPubSubManager::requestPepFeatures()
+/// \fn QXmppPubSubManager::requestOwnPepFeatures()
 ///
 /// Requests all features of the own PEP service via service discovery.
 ///
@@ -776,7 +776,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 
 ///
 ///
-/// \fn QXmppPubSubManager::fetchPepNodes()
+/// \fn QXmppPubSubManager::requestOwnPepNodes()
 ///
 /// Requests all listed nodes of the own PEP service via service discovery.
 ///
@@ -785,14 +785,14 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName)
+/// \fn QFuture<Result> QXmppPubSubManager::createOwnPepNode(const QString &nodeName)
 ///
 /// Creates an empty PEP node with the default configuration.
 ///
 /// This is a convenience method equivalent to calling
 /// QXmppPubSubManager::createNode on the current account's bare JID.
 ///
-/// Calling this before QXmppPubSubManager::publishPepItems is usually not
+/// Calling this before QXmppPubSubManager::publishOwnPepItems is usually not
 /// necessary when publishing to a node for the first time if the service
 /// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
 ///
@@ -801,14 +801,14 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QFuture<Result> QXmppPubSubManager::createPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config)
+/// \fn QFuture<Result> QXmppPubSubManager::createOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config)
 ///
 /// Creates an empty PEP node with a custom configuration.
 ///
 /// This is a convenience method equivalent to calling
 /// QXmppPubSubManager::createNode on the current account's bare JID.
 ///
-/// Calling this before QXmppPubSubManager::publishPepItems is usually not
+/// Calling this before QXmppPubSubManager::publishOwnPepItems is usually not
 /// necessary when publishing to a node for the first time if the service
 /// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
 ///
@@ -818,7 +818,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::deletePepNode
+/// \fn QXmppPubSubManager::deleteOwnPepNode
 ///
 /// Deletes a PEP node.
 ///
@@ -831,7 +831,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::requestPepItem(const QString &nodeName, const QString &itemId)
+/// \fn QXmppPubSubManager::requestOwnPepItem(const QString &nodeName, const QString &itemId)
 ///
 /// Requests a specific item of a PEP node.
 ///
@@ -843,7 +843,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::requestPepItem(const QString &nodeName, StandardItemId itemId)
+/// \fn QXmppPubSubManager::requestOwnPepItem(const QString &nodeName, StandardItemId itemId)
 ///
 /// Requests a specific item of a PEP node.
 ///
@@ -855,7 +855,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::requestPepItems(const QString &nodeName)
+/// \fn QXmppPubSubManager::requestOwnPepItems(const QString &nodeName)
 ///
 /// Requests all items of a PEP node.
 ///
@@ -866,7 +866,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::requestPepItemIds(const QString &nodeName)
+/// \fn QXmppPubSubManager::requestOwnPepItemIds(const QString &nodeName)
 ///
 /// Requests the IDs of all items of a pubsub service node via service
 /// discovery.
@@ -878,7 +878,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId)
+/// \fn QXmppPubSubManager::retractOwnPepItem(const QString &nodeName, const QString &itemId)
 ///
 /// Deletes an item from a PEP node.
 ///
@@ -890,7 +890,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::retractPepItem(const QString &nodeName, StandardItemId itemId)
+/// \fn QXmppPubSubManager::retractOwnPepItem(const QString &nodeName, StandardItemId itemId)
 ///
 /// Deletes an item from a PEP node.
 ///
@@ -902,7 +902,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::purgePepItems
+/// \fn QXmppPubSubManager::purgeOwnPepItems
 ///
 /// Purges all items from a PEP node.
 ///
@@ -915,7 +915,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 ///
 
 ///
-/// \fn QXmppPubSubManager::requestPepNodeConfiguration
+/// \fn QXmppPubSubManager::requestOwnPepNodeConfiguration
 ///
 /// Requests the node configuration and starts the configuration process.
 ///
@@ -925,12 +925,12 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 /// \param nodeName Name of the pubsub node on the service
 /// \return
 ///
-/// \sa configurePepNode()
-/// \sa cancelPepNodeConfiguration()
+/// \sa configureOwnPepNode()
+/// \sa cancelOwnPepNodeConfiguration()
 ///
 
 ///
-/// \fn QXmppPubSubManager::configurePepNode
+/// \fn QXmppPubSubManager::configureOwnPepNode
 ///
 /// Sets a node configuration.
 ///
@@ -941,11 +941,11 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 /// \param config
 /// \return
 ///
-/// \sa requestPepNodeConfiguration()
+/// \sa requestOwnPepNodeConfiguration()
 ///
 
 ///
-/// \fn QXmppPubSubManager::cancelPepNodeConfiguration
+/// \fn QXmppPubSubManager::cancelOwnPepNodeConfiguration
 ///
 /// This is a convenience method equivalent to calling cancelNodeConfiguration()
 /// the current account's bare JID.
@@ -953,7 +953,7 @@ QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::unsubscribeFromNode(cons
 /// \param nodeName Name of the pubsub node on the service
 /// \return
 ///
-/// \sa requestPepNodeConfiguration()
+/// \sa requestOwnPepNodeConfiguration()
 ///
 
 ///

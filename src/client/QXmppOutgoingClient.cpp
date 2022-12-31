@@ -317,6 +317,14 @@ bool QXmppOutgoingClient::isStreamResumed() const
     return d->streamResumed;
 }
 
+///
+/// Sends an IQ and reports the response asynchronously.
+///
+/// It makes sure that the to address is set so the stream can correctly check the reponse's
+/// sender.
+///
+/// \since QXmpp 1.5
+///
 QFuture<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 {
     // always set a to address (the QXmppStream needs this for matching)
