@@ -26,6 +26,8 @@ namespace QXmpp::Private {
 QString conditionToString(QXmppStanza::Error::Condition condition)
 {
     switch (condition) {
+    case QXmppStanza::Error::NoCondition:
+        return {};
     case QXmppStanza::Error::BadRequest:
         return QStringLiteral("bad-request");
     case QXmppStanza::Error::Conflict:
@@ -137,6 +139,8 @@ std::optional<QXmppStanza::Error::Condition> conditionFromString(const QString &
 QString typeToString(QXmppStanza::Error::Type type)
 {
     switch (type) {
+    case QXmppStanza::Error::NoType:
+        return {};
     case QXmppStanza::Error::Cancel:
         return QStringLiteral("cancel");
     case QXmppStanza::Error::Continue:
