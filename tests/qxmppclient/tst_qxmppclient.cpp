@@ -8,6 +8,8 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppPromise.h"
+#include "QXmppRegisterIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
@@ -26,10 +28,10 @@ private:
 
     Q_SLOT void handleMessageSent(QXmppLogger::MessageType type, const QString &text) const;
     Q_SLOT void testSendMessage();
-
     Q_SLOT void testIndexOfExtension();
-
     Q_SLOT void testE2eeExtension();
+    Q_SLOT void testTaskDirect();
+    Q_SLOT void testTaskStore();
 
     QXmppClient *client;
 };
@@ -161,6 +163,69 @@ void tst_QXmppClient::testE2eeExtension()
     client.sendSensitiveIq(createRequest());
     QVERIFY(encrypter.iqCalled);
     encrypter.iqCalled = false;
+}
+
+void tst_QXmppClient::testTaskDirect()
+{
+    QXmppPromise<QXmppIq> p;
+    QXmppRegisterIq iq;
+    iq.setUsername("username");
+
+    bool thenCalled = false;
+    p.task().then(this, [&thenCalled](QXmppIq &&iq) {
+        thenCalled = true;
+        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
+        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+    });
+    p.finish(std::move(iq));
+
+    QVERIFY(thenCalled);
+    QVERIFY(p.task().isFinished());
+    QVERIFY(!p.task().hasResult());
+}
+
+static QXmppTask<QXmppIq> generateRegisterIq()
+{
+    QXmppPromise<QXmppIq> p;
+    QXmppRegisterIq iq;
+    iq.setFrom("juliet");
+    iq.setUsername("username");
+    p.finish(std::move(iq));
+    return p.task();
+}
+
+void tst_QXmppClient::testTaskStore()
+{
+    auto task = generateRegisterIq();
+
+    bool thenCalled = false;
+    task.then(this, [&thenCalled](QXmppIq &&iq) {
+        thenCalled = true;
+
+        QCOMPARE(iq.from(), QStringLiteral("juliet"));
+        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
+        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+    });
+    QVERIFY(thenCalled);
+
+    QXmppPromise<QXmppIq> p;
+    QXmppRegisterIq iq;
+    iq.setUsername("username");
+    p.finish(std::move(iq));
+
+    QVERIFY(p.task().hasResult());
+    QVERIFY(p.task().isFinished());
+
+    thenCalled = false;
+    p.task().then(this, [&thenCalled](QXmppIq &&iq) {
+        thenCalled = true;
+        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
+        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+    });
+    QVERIFY(thenCalled);
+
+    QVERIFY(p.task().isFinished());
+    QVERIFY(!p.task().hasResult());
 }
 
 QTEST_MAIN(tst_QXmppClient)
