@@ -6,7 +6,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppPep_p.h"
-#include "QXmppTuneItem.h"
+#include "QXmppUserTuneItem.h"
 
 using namespace QXmpp::Private;
 

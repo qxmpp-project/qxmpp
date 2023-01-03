@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppTuneItem.h"
+#include "QXmppUserTuneItem.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"

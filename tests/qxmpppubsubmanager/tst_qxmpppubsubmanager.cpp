@@ -12,7 +12,7 @@
 #include "QXmppPubSubManager.h"
 #include "QXmppPubSubPublishOptions.h"
 #include "QXmppPubSubSubscribeOptions.h"
-#include "QXmppTuneItem.h"
+#include "QXmppUserTuneItem.h"
 
 #include "TestClient.h"
 #include "util.h"
