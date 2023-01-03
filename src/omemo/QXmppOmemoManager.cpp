@@ -1061,19 +1061,15 @@ QXmppTask<QXmppE2eeExtension::IqEncryptResult> Manager::encryptIq(QXmppIq &&iq, 
                     SendError::EncryptionError });
 
             } else {
-                QXmppOmemoIq omemoIq;
-                omemoIq.setId(iq.id());
-                omemoIq.setType(iq.type());
-                omemoIq.setLang(iq.lang());
-                omemoIq.setFrom(iq.from());
-                omemoIq.setTo(iq.to());
-                omemoIq.setOmemoElement(*omemoElement);
+                auto omemoIq = std::make_unique<QXmppOmemoIq>();
+                omemoIq->setId(iq.id());
+                omemoIq->setType(iq.type());
+                omemoIq->setLang(iq.lang());
+                omemoIq->setFrom(iq.from());
+                omemoIq->setTo(iq.to());
+                omemoIq->setOmemoElement(*omemoElement);
 
-                QByteArray serializedEncryptedIq;
-                QXmlStreamWriter writer(&serializedEncryptedIq);
-                omemoIq.toXml(&writer);
-
-                interface.finish(serializedEncryptedIq);
+                interface.finish(std::move(omemoIq));
             }
         });
     }

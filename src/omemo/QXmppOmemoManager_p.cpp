@@ -1090,11 +1090,7 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
 
                 message.setOmemoElement(omemoElement);
 
-                QByteArray serializedEncryptedMessage;
-                QXmlStreamWriter writer(&serializedEncryptedMessage);
-                message.toXml(&writer, QXmpp::ScePublic);
-
-                interface.finish(serializedEncryptedMessage);
+                interface.finish(std::make_unique<QXmppMessage>(std::move(message)));
             }
         });
     }
