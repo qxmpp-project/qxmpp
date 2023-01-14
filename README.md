@@ -3,14 +3,16 @@ SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 
 SPDX-License-Identifier: CC0-1.0
 -->
-
 <h1 align="center">
-    QXmpp
+<picture>
+    <img alt="QXmpp logo" src="./logo.svg" height="150">
+</picture>
+</h1>
+<p align="center">
     <a href="https://xmpp.org/extensions/xep-0459.html">
         <img alt="XMPP:2022 Client IM Mobile+ Compliance Badge" src="https://img.shields.io/badge/XMPP%3A2022%20Client-Core%20IM%20Mobile%2B-green">
     </a>
-</h1>
-
+</p>
 <p align="center">
     <a href="https://github.com/qxmpp-project/qxmpp/actions">
         <img alt="Build Status" src="https://github.com/qxmpp-project/qxmpp/workflows/tests/badge.svg">
