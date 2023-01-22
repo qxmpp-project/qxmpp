@@ -104,10 +104,11 @@ public:
 #endif
     void then(QObject *context, Continuation continuation)
     {
-        static_assert(
-            std::is_void_v<T> && std::is_invocable_v<Continuation> ||
-                !std::is_void_v<T> /* && invocable with T && causes forming ref to void error */,
-            "Function needs to be invocable with T && or without params for T=void.");
+        if constexpr (!std::is_void_v<T>) {
+            static_assert(std::is_invocable_v<Continuation, T &&>, "Function needs to be invocable with T &&.");
+        } else {
+            static_assert(std::is_invocable_v<Continuation>, "Function needs to be invocable without arguments.");
+        }
         using namespace QXmpp::Private;
 
         if (d.isFinished()) {
