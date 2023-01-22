@@ -55,7 +55,7 @@ namespace Private {
                                const std::optional<QXmppE2eeMetadata> &e2eeMetadata,
                                QXmppTask<T> future)
     {
-        Private::await(future, client, [client, requestId, requestFrom, e2eeMetadata](T result) {
+        future.then(client, [client, requestId, requestFrom, e2eeMetadata](T result) {
             processHandleIqResult(client, requestId, requestFrom, e2eeMetadata, result);
         });
     }
@@ -97,6 +97,7 @@ namespace Private {
                 client,
                 iq.id(),
                 iq.from(),
+                e2eeMetadata,
                 invokeIqHandler(std::forward<Handler>(handler), std::move(iq)));
             return true;
         }
@@ -271,7 +272,7 @@ bool handleIqRequests(const QDomElement &element,
 template<typename... IqTypes, typename Handler>
 bool handleIqRequests(const QDomElement &element, QXmppClient *client, Handler handler)
 {
-    return handleIqRequests(element, std::nullopt, client, std::forward<Handler>(handler));
+    return handleIqRequests<IqTypes...>(element, std::nullopt, client, std::forward<Handler>(handler));
 }
 
 }  // namespace QXmpp

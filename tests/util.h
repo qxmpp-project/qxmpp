@@ -25,7 +25,11 @@ template<typename String>
 inline QDomElement xmlToDom(const String &xml)
 {
     QDomDocument doc;
-    QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
+    if constexpr (std::is_same_v<String, QString> || std::is_same_v<String, QByteArray>) {
+        QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
+    } else {
+        QVERIFY_RV(doc.setContent(QString(xml), true), "XML is not valid");
+    }
     return doc.documentElement();
 }
 
