@@ -6,6 +6,7 @@
 #define QXMPPUSERTUNEMANAGER_H
 
 #include "QXmppClientExtension.h"
+#include "QXmppError.h"
 #include "QXmppPubSubEventHandler.h"
 
 #include <variant>
@@ -20,8 +21,8 @@ class QXMPP_EXPORT QXmppUserTuneManager : public QXmppClientExtension, public QX
 
 public:
     using Item = QXmppTuneItem;
-    using GetResult = std::variant<Item, QXmppStanza::Error>;
-    using PublishResult = std::variant<QString, QXmppStanza::Error>;
+    using GetResult = std::variant<Item, QXmppError>;
+    using PublishResult = std::variant<QString, QXmppError>;
 
     QXmppUserTuneManager();
 

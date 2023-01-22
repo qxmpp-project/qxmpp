@@ -178,6 +178,14 @@ static QString errorToString(const QXmppStanza::Error &err)
         QString::number(err.condition()) % u")";
 }
 
+static QString errorToString(const QXmppError &err)
+{
+    if (auto sErr = err.value<QXmppStanza::Error>()) {
+        return errorToString(*sErr);
+    }
+    return err.description;
+}
+
 static void replaceChildElements(QDomElement &oldElement, const QDomElement &newElement)
 {
     // remove old child elements
@@ -623,18 +631,24 @@ QXmppTask<bool> ManagerPrivate::setUpDeviceId()
         // respond with an error (at least ejabberd 22.05 responds with an empty node instead).
         // 2. There is an empty PubSub node for device bundles: XEP-0030 states that a server must
         // respond with a node without included items.
-        if (auto error = std::get_if<Error>(&result); error && !(error->type() == Error::Cancel && error->condition() == Error::ItemNotFound)) {
-            warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
-            return false;
-        } else {
-            // The first generated device ID can be used if no device bundle node exists.
-            // Otherwise, duplicates must be avoided.
-            auto deviceId = error ? generateDeviceId() : generateDeviceId(std::get<QVector<QString>>(result));
-            if (deviceId) {
-                ownDevice.id = *deviceId;
+        auto error = std::get_if<QXmppError>(&result);
+        if (auto stanzaErr = error->value<QXmppStanza::Error>()) {
+            // allow Cancel|ItemNotFound here
+            if (!(stanzaErr->type() == Error::Cancel && stanzaErr->condition() == Error::ItemNotFound)) {
+                warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
+                return false;
             }
-            return deviceId.has_value();
+        } else {
+            return false;
         }
+
+        // The first generated device ID can be used if no device bundle node exists.
+        // Otherwise, duplicates must be avoided.
+        auto deviceId = error ? generateDeviceId() : generateDeviceId(std::get<QVector<QString>>(result));
+        if (deviceId) {
+            ownDevice.id = *deviceId;
+        }
+        return deviceId.has_value();
     });
 }
 
@@ -1892,7 +1906,7 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
 
     auto future = pubSubManager->requestOwnPepFeatures();
     future.then(q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
-        if (const auto error = std::get_if<Error>(&result)) {
+        if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved: " % errorToString(*error));
             warning("Device bundle and device list could not be published");
             interface.finish(false);
@@ -1910,7 +1924,7 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
             if (pepServiceFeatures.contains(ns_pubsub_publish)) {
                 auto future = pubSubManager->requestOwnPepNodes();
                 future.then(q, [=](QXmppPubSubManager::NodesResult result) mutable {
-                    if (const auto error = std::get_if<Error>(&result)) {
+                    if (const auto error = std::get_if<QXmppError>(&result)) {
                         warning("Nodes of JID '" % ownBareJid() % "' could not be fetched to check if nodes '" %
                                 QString(ns_omemo_2_bundles) % "' and '" % QString(ns_omemo_2_devices) %
                                 "' exist: " % errorToString(*error));
@@ -2321,7 +2335,7 @@ QXmppTask<std::optional<QXmppOmemoDeviceBundle>> ManagerPrivate::requestDeviceBu
 
     auto future = pubSubManager->requestItem<QXmppOmemoDeviceBundleItem>(deviceOwnerJid, ns_omemo_2_bundles, QString::number(deviceId));
     future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceBundleItem> result) mutable {
-        if (const auto error = std::get_if<Error>(&result)) {
+        if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Device bundle for JID '" % deviceOwnerJid % "' and device ID '" %
                     QString::number(deviceId) % "' could not be retrieved: " % errorToString(*error));
             interface.finish(std::nullopt);
@@ -2626,7 +2640,7 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
     if (isDeviceListNodeExistent && otherOwnDevices().isEmpty()) {
         auto future = pubSubManager->requestOwnPepItem<QXmppOmemoDeviceListItem>(ns_omemo_2_devices, QXmppPubSubManager::Current);
         future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
-            if (const auto error = std::get_if<Error>(&result)) {
+            if (const auto error = std::get_if<QXmppError>(&result)) {
                 warning("Device list for JID '" % ownBareJid() %
                         "' could not be retrieved and thus not updated: " %
                         errorToString(*error));
@@ -2845,14 +2859,14 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         // the node's items are removed.
         auto future = pubSubManager->deleteOwnPepNode(ns_omemo_2_devices);
         future.then(q, [=](QXmppPubSubManager::Result result) {
-            if (const auto error = std::get_if<Error>(&result)) {
+            if (const auto error = std::get_if<QXmppError>(&result)) {
                 warning("Node '" % QString(ns_omemo_2_devices) % "'  of JID '" % deviceOwnerJid %
                         "' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
                 auto future = pubSubManager->requestOwnPepFeatures();
                 future.then(q, [=](QXmppPubSubManager::FeaturesResult result) {
-                    if (const auto error = std::get_if<Error>(&result)) {
+                    if (const auto error = std::get_if<QXmppError>(&result)) {
                         warning("Features of PEP service '" % deviceOwnerJid %
                                 "' could not be retrieved: " % errorToString(*error));
                         warning("Device list could not be published");
@@ -2985,18 +2999,18 @@ void ManagerPrivate::deleteNode(const QString &node, Function continuation)
 {
     auto future = pubSubManager->deleteOwnPepNode(node);
     future.then(q, [=, continuation = std::move(continuation)](QXmppPubSubManager::Result result) mutable {
-        const auto error = std::get_if<Error>(&result);
-        if (error) {
-            const auto errorType = error->type();
-            const auto errorCondition = error->condition();
-
-            // Skip the error handling if the node is already deleted.
-            if (!(errorType == Error::Cancel && errorCondition == Error::ItemNotFound)) {
-                warning("Node '" % node % "' of JID '" % ownBareJid() % "' could not be deleted: " %
-                        errorToString(*error));
-                continuation(false);
+        if (auto error = std::get_if<QXmppError>(&result)) {
+            if (auto err = error->value<QXmppStanza::Error>()) {
+                // Skip the error handling if the node is already deleted.
+                if (!(err->type() == Error::Cancel && err->condition() == Error::ItemNotFound)) {
+                    warning("Node '" % node % "' of JID '" % ownBareJid() % "' could not be deleted: " %
+                            errorToString(*error));
+                    continuation(false);
+                } else {
+                    continuation(true);
+                }
             } else {
-                continuation(true);
+                continuation(false);
             }
         } else {
             continuation(true);
@@ -3048,7 +3062,7 @@ template<typename T, typename Function>
 void QXmppOmemoManagerPrivate::runPubSubQueryWithContinuation(QXmppTask<T> future, const QString &errorMessage, Function continuation)
 {
     future.then(q, [this, errorMessage, continuation = std::move(continuation)](auto result) mutable {
-        if (auto error = std::get_if<Error>(&result)) {
+        if (auto error = std::get_if<QXmppError>(&result)) {
             warning(errorMessage % u": " % errorToString(*error));
             continuation(false);
         } else {
@@ -3093,7 +3107,7 @@ QXmppTask<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> ManagerPriva
 {
     auto future = pubSubManager->requestItem<QXmppOmemoDeviceListItem>(jid, ns_omemo_2_devices, QXmppPubSubManager::Current);
     future.then(q, [this, jid](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
-        if (const auto error = std::get_if<Error>(&result)) {
+        if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Device list for JID '" % jid % "' could not be retrieved: " % errorToString(*error));
         } else {
             const auto &item = std::get<QXmppOmemoDeviceListItem>(result);
@@ -3133,9 +3147,9 @@ QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(cons
 
     auto future = pubSubManager->subscribeToNode(jid, ns_omemo_2_devices, ownFullJid());
     future.then(q, [=](QXmppPubSubManager::Result result) mutable {
-        if (const auto error = std::get_if<Error>(&result)) {
+        if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Device list for JID '" % jid % "' could not be subscribed: " % errorToString(*error));
-            interface.finish(*error);
+            interface.finish(std::move(*error));
         } else {
             jidsOfManuallySubscribedDevices.append(jid);
 
@@ -3206,7 +3220,7 @@ QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::unsubscribeFromDeviceList(
 
     auto future = pubSubManager->unsubscribeFromNode(jid, ns_omemo_2_devices, ownFullJid());
     future.then(q, [=](QXmppPubSubManager::Result result) mutable {
-        if (const auto error = std::get_if<Error>(&result)) {
+        if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Device list for JID '" % jid % "' could not be unsubscribed: " % errorToString(*error));
         } else {
             jidsOfManuallySubscribedDevices.removeAll(jid);

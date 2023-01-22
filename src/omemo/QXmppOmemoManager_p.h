@@ -125,7 +125,7 @@ using namespace QXmpp::Omemo::Private;
 class QXmppOmemoManagerPrivate
 {
 public:
-    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    using Result = std::variant<QXmpp::Success, QXmppError>;
 
     QXmppOmemoManager *q;
 

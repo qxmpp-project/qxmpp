@@ -5,7 +5,8 @@
 #ifndef QXMPPUPLOADREQUESTMANAGER_H
 #define QXMPPUPLOADREQUESTMANAGER_H
 
-#include <QXmppClientExtension.h>
+#include "QXmppError.h"
+#include "QXmppClientExtension.h"
 
 #include <variant>
 
@@ -20,10 +21,11 @@ class QXmppHttpUploadSlotIq;
 class QXmppUploadServicePrivate;
 class QXmppUploadRequestManagerPrivate;
 
+///
 /// \brief QXmppUploadService represents an HTTP File Upload service.
 ///
 /// It is used to store the JID and maximum file size for uploads.
-
+///
 class QXMPP_EXPORT QXmppUploadService
 {
 public:
@@ -97,7 +99,7 @@ public:
                               const QMimeType &mimeType,
                               const QString &uploadService = QString());
 
-    using SlotResult = std::variant<QXmppHttpUploadSlotIq, QXmppStanza::Error>;
+    using SlotResult = std::variant<QXmppHttpUploadSlotIq, QXmppError>;
     QXmppTask<SlotResult> requestSlot(const QFileInfo &file,
                                       const QString &uploadService = {});
     QXmppTask<SlotResult> requestSlot(const QFileInfo &file,

@@ -22,7 +22,6 @@ using namespace QXmpp;
 using namespace QXmpp::Private;
 using namespace QXmpp::Omemo::Private;
 
-using Error = QXmppStanza::Error;
 using Manager = QXmppOmemoManager;
 using ManagerPrivate = QXmppOmemoManagerPrivate;
 
@@ -629,8 +628,7 @@ QXmppTask<QVector<Manager::DevicesResult>> Manager::subscribeToDeviceLists(const
         state->jidsCount = jids.size();
 
         for (const auto &jid : jids) {
-            auto future = d->subscribeToDeviceList(jid);
-            future.then(this, [state, jid](QXmppPubSubManager::Result result) mutable {
+            d->subscribeToDeviceList(jid).then(this, [state, jid](QXmppPubSubManager::Result result) mutable {
                 Manager::DevicesResult devicesResult;
                 devicesResult.jid = jid;
                 devicesResult.result = result;
@@ -759,7 +757,7 @@ QXmppTask<QXmppPubSubManager::Result> Manager::removeContactDevices(const QStrin
 
     auto future = d->unsubscribeFromDeviceList(jid);
     future.then(this, [=](QXmppPubSubManager::Result result) mutable {
-        if (std::holds_alternative<QXmppStanza::Error>(result)) {
+        if (std::holds_alternative<QXmppError>(result)) {
             warning("Contact '" % jid % "' could not be removed because the device list subscription could not be removed");
             interface.finish(std::move(result));
         } else {

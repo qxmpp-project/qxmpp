@@ -57,8 +57,8 @@ class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    /// Empty result containing QXmpp::Success or a QXmppStanza::Error
-    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    /// Empty result containing QXmpp::Success or a QXmppError
+    using Result = std::variant<QXmpp::Success, QXmppError>;
 
     QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;

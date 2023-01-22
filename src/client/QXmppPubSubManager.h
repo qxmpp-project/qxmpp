@@ -52,21 +52,21 @@ public:
         std::optional<QXmppResultSetReply> continuation;
     };
 
-    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
-    using FeaturesResult = std::variant<QVector<QString>, InvalidServiceType, QXmppStanza::Error>;
-    using NodesResult = std::variant<QVector<QString>, QXmppStanza::Error>;
-    using InstantNodeResult = std::variant<QString, QXmppStanza::Error>;
+    using Result = std::variant<QXmpp::Success, QXmppError>;
+    using FeaturesResult = std::variant<QVector<QString>, InvalidServiceType, QXmppError>;
+    using NodesResult = std::variant<QVector<QString>, QXmppError>;
+    using InstantNodeResult = std::variant<QString, QXmppError>;
     template<typename T>
-    using ItemResult = std::variant<T, QXmppStanza::Error>;
+    using ItemResult = std::variant<T, QXmppError>;
     template<typename T>
-    using ItemsResult = std::variant<Items<T>, QXmppStanza::Error>;
-    using ItemIdsResult = std::variant<QVector<QString>, QXmppStanza::Error>;
-    using PublishItemResult = std::variant<QString, QXmppStanza::Error>;
-    using PublishItemsResult = std::variant<QVector<QString>, QXmppStanza::Error>;
-    using SubscriptionsResult = std::variant<QVector<QXmppPubSubSubscription>, QXmppStanza::Error>;
-    using AffiliationsResult = std::variant<QVector<QXmppPubSubAffiliation>, QXmppStanza::Error>;
-    using OptionsResult = std::variant<QXmppPubSubSubscribeOptions, QXmppStanza::Error>;
-    using NodeConfigResult = std::variant<QXmppPubSubNodeConfig, QXmppStanza::Error>;
+    using ItemsResult = std::variant<Items<T>, QXmppError>;
+    using ItemIdsResult = std::variant<QVector<QString>, QXmppError>;
+    using PublishItemResult = std::variant<QString, QXmppError>;
+    using PublishItemsResult = std::variant<QVector<QString>, QXmppError>;
+    using SubscriptionsResult = std::variant<QVector<QXmppPubSubSubscription>, QXmppError>;
+    using AffiliationsResult = std::variant<QVector<QXmppPubSubAffiliation>, QXmppError>;
+    using OptionsResult = std::variant<QXmppPubSubSubscribeOptions, QXmppError>;
+    using NodeConfigResult = std::variant<QXmppPubSubNodeConfig, QXmppError>;
 
     QXmppPubSubManager();
     ~QXmppPubSubManager();
@@ -175,13 +175,12 @@ QXmppTask<QXmppPubSubManager::ItemResult<T>> QXmppPubSubManager::requestItem(con
                                                                              const QString &itemId)
 {
     using namespace QXmpp::Private;
-    using Error = QXmppStanza::Error;
     return chainIq(client()->sendIq(requestItemsIq(jid, nodeName, { itemId })), this,
                    [](PubSubIq<T> &&iq) -> ItemResult<T> {
                        if (!iq.items().isEmpty()) {
                            return iq.items().constFirst();
                        }
-                       return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("No such item has been found."));
+                       return QXmppError { QStringLiteral("No such item has been found."), {} };
                    });
 }
 

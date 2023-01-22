@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -12,6 +13,7 @@
 template<class T>
 class QXmppTask;
 class QXmppEntityTimeIq;
+class QXmppError;
 
 ///
 /// \brief The QXmppEntityTimeManager class provided the functionality to get
@@ -26,7 +28,7 @@ class QXMPP_EXPORT QXmppEntityTimeManager : public QXmppClientExtension
 public:
     QString requestTime(const QString &jid);
 
-    using EntityTimeResult = std::variant<QXmppEntityTimeIq, QXmppStanza::Error>;
+    using EntityTimeResult = std::variant<QXmppEntityTimeIq, QXmppError>;
     QXmppTask<EntityTimeResult> requestEntityTime(const QString &jid);
 
     /// \cond

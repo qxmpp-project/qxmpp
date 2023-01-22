@@ -953,9 +953,10 @@ void tst_QXmppPubSubManager::testRequestItemNotFound()
                                "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
                                "<items node='features'/>"
                                "</pubsub></iq>"));
-    const auto error = expectFutureVariant<QXmppStanza::Error>(future);
-    QCOMPARE(error.type(), QXmppStanza::Error::Cancel);
-    QCOMPARE(error.condition(), QXmppStanza::Error::ItemNotFound);
+    auto error = expectFutureVariant<QXmppError>(future);
+    auto err = error.value<QXmppStanza::Error>().value();
+    QCOMPARE(err.type(), QXmppStanza::Error::Cancel);
+    QCOMPARE(err.condition(), QXmppStanza::Error::ItemNotFound);
 }
 
 void tst_QXmppPubSubManager::testRequestNodeAffiliations()
@@ -1089,7 +1090,8 @@ void tst_QXmppPubSubManager::testRequestOptionsError()
                          "<value>chat</value>"
                          "<value>online</value></field>"
                          "</x></options></pubsub></iq>");
-    const auto error = expectFutureVariant<QXmppStanza::Error>(future);
+    auto err = expectFutureVariant<QXmppError>(future);
+    auto error = err.value<QXmppStanza::Error>().value();
     QCOMPARE(error.type(), QXmppStanza::Error::Cancel);
     QCOMPARE(error.condition(), QXmppStanza::Error::InternalServerError);
     QVERIFY(!error.text().isEmpty());

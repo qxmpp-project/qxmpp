@@ -91,7 +91,7 @@ class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 
 public:
     using IqResult = std::variant<QDomElement, QXmppError>;
-    using EmptyResult = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    using EmptyResult = std::variant<QXmpp::Success, QXmppError>;
 
     /// An enumeration for type of error.
     /// Error could come due a TCP socket or XML stream or due to various stanzas.

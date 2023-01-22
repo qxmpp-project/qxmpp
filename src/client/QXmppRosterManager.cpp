@@ -14,6 +14,8 @@
 
 #include <QDomElement>
 
+using namespace QXmpp::Private;
+
 ///
 /// \fn QXmppRosterManager::subscriptionRequestReceived
 ///
@@ -307,9 +309,8 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const
 {
     using Error = QXmppStanza::Error;
     if (!d->entries.contains(bareJid)) {
-        return QXmpp::Private::makeReadyTask<Result>(
-            Error(Error::Modify, Error::ItemNotFound,
-                  QStringLiteral("The roster doesn't contain this user.")));
+        return makeReadyTask<Result>(
+                    QXmppError { QStringLiteral("The roster doesn't contain this user."), {} });
     }
 
     auto item = d->entries.value(bareJid);

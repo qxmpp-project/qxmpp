@@ -8,23 +8,22 @@
 namespace QXmpp::Private::Pep {
 
 template<typename T>
-using GetResult = std::variant<T, QXmppStanza::Error>;
-using PublishResult = std::variant<QString, QXmppStanza::Error>;
+using GetResult = std::variant<T, QXmppError>;
+using PublishResult = std::variant<QString, QXmppError>;
 
 template<typename ItemT>
 inline QXmppTask<GetResult<ItemT>> request(QXmppPubSubManager *pubSub, const QString &jid, const QString &nodeName, QObject *parent)
 {
     using PubSub = QXmppPubSubManager;
-    using Error = QXmppStanza::Error;
 
     auto process = [](PubSub::ItemsResult<ItemT> &&result) -> GetResult<ItemT> {
         if (const auto itemsResult = std::get_if<PubSub::Items<ItemT>>(&result)) {
             if (!itemsResult->items.isEmpty()) {
                 return itemsResult->items.takeFirst();
             }
-            return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("User has no published items."));
+            return QXmppError { QStringLiteral("User has no published items."), {} };
         } else {
-            return std::get<Error>(result);
+            return std::get<QXmppError>(std::move(result));
         }
     };
     return chain<GetResult<ItemT>>(pubSub->requestItems<ItemT>(jid, nodeName), parent, process);

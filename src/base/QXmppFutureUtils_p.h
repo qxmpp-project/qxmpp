@@ -158,14 +158,15 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
                               IqType iq;
                               iq.parse(element);
                               if (iq.type() == QXmppIq::Error) {
-                                  return iq.error();
+                                  if (auto err = iq.errorOptional()) {
+                                      return QXmppError { err->text(), std::move(*err) };
+                                  }
+                                  return QXmppError { QStringLiteral("Unknown error.") };
                               }
                               return convert(std::move(iq));
                           },
                           [](QXmppError error) -> Result {
-                              using Error = QXmppStanza::Error;
-                              return Error(Error::Wait, Error::UndefinedCondition,
-                                           QStringLiteral("Couldn't send request: ") + error.description);
+                              return error;
                           },
                       },
                       sendResult);

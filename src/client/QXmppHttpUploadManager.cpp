@@ -307,8 +307,8 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
             return;
         }
 
-        if (std::holds_alternative<QXmppStanza::Error>(result)) {
-            upload->d->reportError(std::get<QXmppStanza::Error>(std::move(result)));
+        if (std::holds_alternative<QXmppError>(result)) {
+            upload->d->reportError(std::get<QXmppError>(std::move(result)));
             upload->d->reportFinished();
         } else {
             auto slot = std::get<QXmppHttpUploadSlotIq>(std::move(result));

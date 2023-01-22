@@ -596,12 +596,7 @@ QXmppTask<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscrib
                                return *options;
                            }
                        }
-
-                       // "real" stanza errors are already handled
-                       using Error = QXmppStanza::Error;
-                       return Error(Error::Cancel,
-                                    Error::Condition::InternalServerError,
-                                    QStringLiteral("Server returned invalid data form."));
+                       return QXmppError { QStringLiteral("Server returned invalid data form."), {} };
                    });
 }
 
@@ -655,8 +650,6 @@ QXmppTask<QXmppPubSubManager::Result> QXmppPubSubManager::setSubscribeOptions(co
 ///
 QXmppTask<QXmppPubSubManager::NodeConfigResult> QXmppPubSubManager::requestNodeConfiguration(const QString &service, const QString &nodeName)
 {
-    using Error = QXmppStanza::Error;
-
     PubSubIq request;
     request.setType(QXmppIq::Get);
     request.setTo(service);
@@ -669,9 +662,9 @@ QXmppTask<QXmppPubSubManager::NodeConfigResult> QXmppPubSubManager::requestNodeC
                            if (const auto config = QXmppPubSubNodeConfig::fromDataForm(*dataForm)) {
                                return *config;
                            }
-                           return Error(Error::Cancel, Error::UndefinedCondition, QStringLiteral("Server returned invalid data form."));
+                           return QXmppError { QStringLiteral("Server returned invalid data form."), {} };
                        }
-                       return Error(Error::Cancel, Error::UndefinedCondition, QStringLiteral("Server returned no data form."));
+                       return QXmppError { QStringLiteral("Server returned no data form."), {} };
                    });
 }
 

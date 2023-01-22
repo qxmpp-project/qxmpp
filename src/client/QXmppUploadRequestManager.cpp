@@ -236,9 +236,8 @@ auto QXmppUploadRequestManager::requestSlot(const QString &fileName,
                                             const QString &uploadService) -> QXmppTask<SlotResult>
 {
     if (!serviceFound() && uploadService.isEmpty()) {
-        using Error = QXmppStanza::Error;
-        const auto errorMessage = QStringLiteral("Couldn't request upload slot: No service found.");
-        return makeReadyTask(SlotResult(Error(Error::Cancel, Error::FeatureNotImplemented, errorMessage)));
+        return makeReadyTask(SlotResult(QXmppError {
+            QStringLiteral("Couldn't request upload slot: No service found."), {} }));
     }
 
     QXmppHttpUploadRequestIq iq;

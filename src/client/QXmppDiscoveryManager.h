@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -14,6 +15,7 @@ class QXmppTask;
 class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
+class QXmppError;
 
 /// \brief The QXmppDiscoveryManager class makes it possible to discover information
 /// about other entities as defined by \xep{0030}: Service Discovery.
@@ -33,8 +35,8 @@ public:
     QString requestInfo(const QString &jid, const QString &node = QString());
     QString requestItems(const QString &jid, const QString &node = QString());
 
-    using InfoResult = std::variant<QXmppDiscoveryIq, QXmppStanza::Error>;
-    using ItemsResult = std::variant<QList<QXmppDiscoveryIq::Item>, QXmppStanza::Error>;
+    using InfoResult = std::variant<QXmppDiscoveryIq, QXmppError>;
+    using ItemsResult = std::variant<QList<QXmppDiscoveryIq::Item>, QXmppError>;
     QXmppTask<InfoResult> requestDiscoInfo(const QString &jid, const QString &node = {});
     QXmppTask<ItemsResult> requestDiscoItems(const QString &jid, const QString &node = {});
 

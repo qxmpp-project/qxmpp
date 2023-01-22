@@ -70,7 +70,7 @@ class QXMPPOMEMO_EXPORT QXmppOmemoManager : public QXmppClientExtension, public 
     Q_OBJECT
 
 public:
-    using Result = std::variant<QXmpp::Success, QXmppStanza::Error>;
+    using Result = std::variant<QXmpp::Success, QXmppError>;
 
     struct DevicesResult
     {

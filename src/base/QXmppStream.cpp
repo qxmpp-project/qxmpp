@@ -251,8 +251,8 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
 
     auto sendFuture = send(std::move(packet));
     if (sendFuture.isFinished()) {
-        if (std::holds_alternative<QXmppError>(sendFuture.result())) {
-            // early exit (saves QFutureWatcher)
+        if (std::holds_alternative<QXmppError>(sendFuture.takeResult())) {
+            // early exit
             return makeReadyTask<IqResult>(std::get<QXmppError>(sendFuture.result()));
         }
     } else {
@@ -266,10 +266,7 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
         });
     }
 
-    IqState state {
-        {},
-        to,
-    };
+    IqState state { {}, to };
     auto task = state.interface.task();
     d->runningIqs.insert(id, std::move(state));
     return task;
