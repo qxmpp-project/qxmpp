@@ -310,7 +310,7 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const
     using Error = QXmppStanza::Error;
     if (!d->entries.contains(bareJid)) {
         return makeReadyTask<Result>(
-                    QXmppError { QStringLiteral("The roster doesn't contain this user."), {} });
+            QXmppError { QStringLiteral("The roster doesn't contain this user."), {} });
     }
 
     auto item = d->entries.value(bareJid);

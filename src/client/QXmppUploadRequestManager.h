@@ -5,8 +5,8 @@
 #ifndef QXMPPUPLOADREQUESTMANAGER_H
 #define QXMPPUPLOADREQUESTMANAGER_H
 
-#include "QXmppError.h"
 #include "QXmppClientExtension.h"
+#include "QXmppError.h"
 
 #include <variant>
 
