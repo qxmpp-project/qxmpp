@@ -251,9 +251,9 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
 
     auto sendFuture = send(std::move(packet));
     if (sendFuture.isFinished()) {
-        if (std::holds_alternative<QXmppError>(sendFuture.takeResult())) {
+        if (std::holds_alternative<QXmppError>(sendFuture.result())) {
             // early exit
-            return makeReadyTask<IqResult>(std::get<QXmppError>(sendFuture.result()));
+            return makeReadyTask<IqResult>(std::get<QXmppError>(sendFuture.takeResult()));
         }
     } else {
         sendFuture.then(this, [this, id](SendResult result) {
