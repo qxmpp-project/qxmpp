@@ -399,7 +399,7 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 /// If stream management is enabled, the future continues to be active until the
 /// server acknowledges the packet. On success, QXmpp::SendSuccess with
-/// acknowledged == true is reported and the future finishes.
+/// acknowledged == true is reported.
 ///
 /// If connection errors occur, the packet is resent if possible. If
 /// reconnecting is not possible, an error is reported.
@@ -410,7 +410,7 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 /// \since QXmpp 1.5
 ///
-QXmppTask<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
+QXmppTask<QXmpp::SendResult> QXmppClient::sendSensitive(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
 {
     const auto sendEncrypted = [this](QXmppTask<MessageEncryptResult> &&future) {
         QXmppPromise<QXmpp::SendResult> interface;
@@ -454,7 +454,7 @@ QXmppTask<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::
 ///
 /// \since QXmpp 1.5
 ///
-QXmppTask<QXmpp::SendResult> QXmppClient::sendUnencrypted(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
+QXmppTask<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
 {
     return d->stream->send(stanza);
 }
@@ -473,9 +473,9 @@ QXmppTask<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std:
     // This should pick the right e2ee manager as soon as multiple encryptions
     // in parallel are supported.
     if (e2eeMetadata) {
-        return send(std::move(stanza), params);
+        return sendSensitive(std::move(stanza), params);
     }
-    return sendUnencrypted(std::move(stanza), params);
+    return send(std::move(stanza), params);
 }
 
 ///

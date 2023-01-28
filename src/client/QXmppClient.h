@@ -219,8 +219,8 @@ public:
     State state() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
+    QXmppTask<QXmpp::SendResult> sendSensitive(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
     QXmppTask<QXmpp::SendResult> send(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
-    QXmppTask<QXmpp::SendResult> sendUnencrypted(QXmppStanza &&, const std::optional<QXmppSendStanzaParams> & = {});
     QXmppTask<QXmpp::SendResult> reply(QXmppStanza &&stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata, const std::optional<QXmppSendStanzaParams> & = {});
     QXmppTask<IqResult> sendIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});
     QXmppTask<IqResult> sendSensitiveIq(QXmppIq &&, const std::optional<QXmppSendStanzaParams> & = {});

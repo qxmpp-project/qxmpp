@@ -3629,7 +3629,7 @@ QXmppTask<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &rec
         message.addHint(QXmppMessage::Store);
         message.setOmemoElement(omemoElement);
 
-        auto future = q->client()->sendUnencrypted(std::move(message));
+        auto future = q->client()->send(std::move(message));
         future.then(q, [=](QXmpp::SendResult result) mutable {
             interface.finish(std::move(result));
         });

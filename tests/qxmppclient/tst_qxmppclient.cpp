@@ -129,14 +129,14 @@ void tst_QXmppClient::testE2eeExtension()
     EncryptionExtension encrypter;
     client.setEncryptionExtension(&encrypter);
 
-    auto result = client.send(QXmppMessage("me@qxmpp.org", "somebody@qxmpp.org", "Hello"));
+    auto result = client.sendSensitive(QXmppMessage("me@qxmpp.org", "somebody@qxmpp.org", "Hello"));
     QVERIFY(encrypter.messageCalled);
     QVERIFY(!encrypter.iqCalled);
     QCoreApplication::processEvents();
     expectFutureVariant<QXmppError>(result.toFuture(this));
 
     encrypter.messageCalled = false;
-    result = client.send(QXmppPresence(QXmppPresence::Available));
+    result = client.sendSensitive(QXmppPresence(QXmppPresence::Available));
     QVERIFY(!encrypter.messageCalled);
     QVERIFY(!encrypter.iqCalled);
 
@@ -148,11 +148,11 @@ void tst_QXmppClient::testE2eeExtension()
         return request;
     };
 
-    client.send(createRequest());
+    client.sendSensitive(createRequest());
     QVERIFY(encrypter.iqCalled);
     encrypter.iqCalled = false;
 
-    client.sendUnencrypted(createRequest());
+    client.send(createRequest());
     QVERIFY(!encrypter.iqCalled);
     encrypter.iqCalled = false;
 

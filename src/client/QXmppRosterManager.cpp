@@ -341,7 +341,7 @@ QXmppTask<QXmpp::SendResult> QXmppRosterManager::subscribeTo(const QString &bare
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Subscribe);
     packet.setStatusText(reason);
-    return client()->send(std::move(packet));
+    return client()->sendSensitive(std::move(packet));
 }
 
 ///
@@ -358,7 +358,7 @@ QXmppTask<QXmpp::SendResult> QXmppRosterManager::unsubscribeFrom(const QString &
     packet.setTo(QXmppUtils::jidToBareJid(bareJid));
     packet.setType(QXmppPresence::Unsubscribe);
     packet.setStatusText(reason);
-    return client()->send(std::move(packet));
+    return client()->sendSensitive(std::move(packet));
 }
 
 ///

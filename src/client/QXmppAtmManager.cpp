@@ -492,5 +492,5 @@ QXmppTask<QXmpp::SendResult> QXmppAtmManager::sendTrustMessage(const QString &en
     QXmppSendStanzaParams params;
     params.setAcceptedTrustLevels(TrustLevel::Authenticated);
 
-    return client()->send(std::move(message), params);
+    return client()->sendSensitive(std::move(message), params);
 }

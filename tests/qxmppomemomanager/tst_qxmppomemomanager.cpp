@@ -328,7 +328,7 @@ void tst_QXmppOmemoManager::testSendMessage()
                 if (const auto optionalOmemoElement = message.omemoElement(); optionalOmemoElement && optionalOmemoElement.value().payload().isEmpty()) {
                     isEmptyOmemoMessageReceivedByAlice1 = true;
 
-                    auto future = m_alice1.client.send(std::move(message2), QXmppSendStanzaParams());
+                    auto future = m_alice1.client.sendSensitive(std::move(message2), QXmppSendStanzaParams());
                     future.then(this, [=, &isSecondMessageSentByAlice1](QXmpp::SendResult result) {
                         if (std::get_if<QXmpp::SendSuccess>(&result)) {
                             isSecondMessageSentByAlice1 = true;
@@ -344,7 +344,7 @@ void tst_QXmppOmemoManager::testSendMessage()
     connect(m_alice1.manager, &QXmppOmemoManager::deviceAdded, &context, [=, &isFirstMessageSentByAlice1](const QString &jid, uint32_t) mutable {
         if (jid == m_alice2.client.configuration().jidBare()) {
             if (!isFirstMessageSentByAlice1) {
-                auto future = m_alice1.client.send(std::move(message1), QXmppSendStanzaParams());
+                auto future = m_alice1.client.sendSensitive(std::move(message1), QXmppSendStanzaParams());
                 future.then(this, [=, &isFirstMessageSentByAlice1](QXmpp::SendResult result) {
                     if (std::get_if<QXmpp::SendSuccess>(&result)) {
                         isFirstMessageSentByAlice1 = true;
