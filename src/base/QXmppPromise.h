@@ -22,6 +22,7 @@ template<typename T>
 class QXmppPromise
 {
     static_assert(!std::is_abstract_v<T>);
+
 public:
     template<typename U = T, std::enable_if_t<std::is_void_v<U>> * = nullptr>
     QXmppPromise()

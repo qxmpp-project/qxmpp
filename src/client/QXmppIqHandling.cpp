@@ -25,3 +25,16 @@ void QXmpp::Private::sendIqReply(QXmppClient *client,
     iq.setId(requestId);
     client->reply(std::move(iq), e2eeMetadata);
 }
+
+std::tuple<bool, QString, QString> QXmpp::Private::checkIsIqRequest(const QDomElement &el)
+{
+    if (el.tagName() != QStringLiteral("iq")) {
+        return { false, {}, {} };
+    }
+    auto queryElement = el.firstChildElement();
+    auto iqType = el.attribute(QStringLiteral("type"));
+    if (iqType != QStringLiteral("get") && iqType != QStringLiteral("set")) {
+        return { false, {}, {} };
+    }
+    return { true, queryElement.tagName(), queryElement.namespaceURI() };
+}

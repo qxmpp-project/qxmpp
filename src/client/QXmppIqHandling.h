@@ -22,6 +22,8 @@ namespace Private {
                                   const std::optional<QXmppE2eeMetadata> &e2eeMetadata,
                                   QXmppIq &&iq);
 
+    QXMPP_EXPORT std::tuple<bool, QString, QString> checkIsIqRequest(const QDomElement &el);
+
     template<typename... VariantTypes>
     void processHandleIqResult(QXmppClient *client,
                                const QString &requestId,
@@ -188,11 +190,7 @@ bool handleIqRequests(const QDomElement &element,
                       QXmppClient *client,
                       Handler handler)
 {
-    if (element.tagName() == "iq") {
-        auto queryElement = element.firstChildElement();
-        auto tagName = queryElement.tagName();
-        auto xmlns = queryElement.namespaceURI();
-
+    if (auto [isRequest, tagName, xmlns] = Private::checkIsIqRequest(element); isRequest) {
         return (Private::handleIqType<IqTypes>(handler, client, element, e2eeMetadata, tagName, xmlns) || ...);
     }
     return false;
