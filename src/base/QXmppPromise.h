@@ -21,6 +21,7 @@
 template<typename T>
 class QXmppPromise
 {
+    static_assert(!std::is_abstract_v<T>);
 public:
     template<typename U = T, std::enable_if_t<std::is_void_v<U>> * = nullptr>
     QXmppPromise()
@@ -43,7 +44,7 @@ public:
 #ifdef QXMPP_DOC
     void reportFinished(T &&value)
 #else
-    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_base_of_v<T, U>> * = nullptr>
+    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_same_v<T, U>> * = nullptr>
     void finish(U &&value)
 #endif
     {
@@ -59,7 +60,7 @@ public:
     }
 
     /// \cond
-    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_constructible_v<T, U> && !std::is_base_of_v<T, U>> * = nullptr>
+    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_constructible_v<T, U> && !std::is_same_v<T, U>> * = nullptr>
     void finish(U &&value)
     {
         Q_ASSERT(!d.isFinished());

@@ -174,8 +174,8 @@ void tst_QXmppClient::testTaskDirect()
     bool thenCalled = false;
     p.task().then(this, [&thenCalled](QXmppIq &&iq) {
         thenCalled = true;
-        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
-        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+        // casting not supported
+        QVERIFY(!dynamic_cast<QXmppRegisterIq *>(&iq));
     });
     p.finish(std::move(iq));
 
@@ -203,8 +203,8 @@ void tst_QXmppClient::testTaskStore()
         thenCalled = true;
 
         QCOMPARE(iq.from(), QStringLiteral("juliet"));
-        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
-        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+        // casting not supported
+        QVERIFY(!dynamic_cast<QXmppRegisterIq *>(&iq));
     });
     QVERIFY(thenCalled);
 
@@ -219,8 +219,8 @@ void tst_QXmppClient::testTaskStore()
     thenCalled = false;
     p.task().then(this, [&thenCalled](QXmppIq &&iq) {
         thenCalled = true;
-        QVERIFY(dynamic_cast<QXmppRegisterIq *>(&iq));
-        QCOMPARE(dynamic_cast<QXmppRegisterIq &>(iq).username(), QStringLiteral("username"));
+        // casting not supported
+        QVERIFY(!dynamic_cast<QXmppRegisterIq *>(&iq));
     });
     QVERIFY(thenCalled);
 
