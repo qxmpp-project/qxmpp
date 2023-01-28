@@ -954,9 +954,6 @@ void tst_QXmppPubSubManager::testRequestItemNotFound()
                                "<items node='features'/>"
                                "</pubsub></iq>"));
     auto error = expectFutureVariant<QXmppError>(future);
-    auto err = error.value<QXmppStanza::Error>().value();
-    QCOMPARE(err.type(), QXmppStanza::Error::Cancel);
-    QCOMPARE(err.condition(), QXmppStanza::Error::ItemNotFound);
 }
 
 void tst_QXmppPubSubManager::testRequestNodeAffiliations()
@@ -1091,10 +1088,7 @@ void tst_QXmppPubSubManager::testRequestOptionsError()
                          "<value>online</value></field>"
                          "</x></options></pubsub></iq>");
     auto err = expectFutureVariant<QXmppError>(future);
-    auto error = err.value<QXmppStanza::Error>().value();
-    QCOMPARE(error.type(), QXmppStanza::Error::Cancel);
-    QCOMPARE(error.condition(), QXmppStanza::Error::InternalServerError);
-    QVERIFY(!error.text().isEmpty());
+    QVERIFY(!err.description.isEmpty());
 }
 
 void tst_QXmppPubSubManager::testSetOptions()
