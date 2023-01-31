@@ -14,9 +14,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDomElement>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <QRandomGenerator>
-#endif
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>
@@ -254,13 +252,8 @@ int QXmppUtils::generateRandomInteger(int N)
 {
     Q_ASSERT(N > 0 && N <= RAND_MAX);
     int val;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     while (N <= (val = QRandomGenerator::global()->generate() / (RAND_MAX / N))) {
     }
-#else
-    while (N <= (val = qrand() / (RAND_MAX / N))) {
-    }
-#endif
     return val;
 }
 
@@ -284,11 +277,7 @@ QByteArray QXmppUtils::generateRandomBytes(int length)
 ///
 QString QXmppUtils::generateStanzaUuid()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     return QUuid::createUuid().toString(QUuid::WithoutBraces);
-#else
-    return QUuid::createUuid().toString().mid(1, 36);
-#endif
 }
 
 ///
@@ -351,11 +340,7 @@ void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
 //
 QByteArray QXmpp::Private::generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     const auto byteCount = QRandomGenerator::system()->bounded(minimumByteCount, maximumByteCount);
-#else
-    const auto byteCount = (qrand() % (maximumByteCount - minimumByteCount)) + minimumByteCount;
-#endif
     QByteArray bytes;
     bytes.resize(byteCount);
     generateRandomBytes(reinterpret_cast<uint8_t *>(bytes.data()), byteCount);
@@ -377,7 +362,6 @@ void QXmpp::Private::generateRandomBytes(uint8_t *bytes, uint32_t byteCount)
     constexpr uint32_t intSize = sizeof(uint32_t);
     auto intCount = byteCount / intSize;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     auto *randomGenerator = QRandomGenerator::system();
 
     // Fill the space with intCount unsigned integers.
@@ -389,18 +373,6 @@ void QXmpp::Private::generateRandomBytes(uint8_t *bytes, uint32_t byteCount)
     for (size_t i = byteCount - byteCount % intSize; i < byteCount; i++) {
         bytes[i] = randomGenerator->bounded(std::numeric_limits<uint8_t>::max() + 1);
     }
-#else
-    // Fill the range with intCount unsigned integers.
-    for (size_t i = 0; i < intCount; i++) {
-        reinterpret_cast<int *>(bytes)[i] = qrand();
-    }
-
-    // Fill the remaining space with single bytes.
-    for (size_t i = byteCount - byteCount % intSize; i < byteCount; i++) {
-        auto rand = qrand();
-        bytes[i] = *reinterpret_cast<uint *>(&rand) % (std::numeric_limits<uint8_t>::max() + 1);
-    }
-#endif
 }
 
 float QXmpp::Private::calculateProgress(qint64 transferred, qint64 total)

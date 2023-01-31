@@ -482,11 +482,7 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
         d->capabilityNode = element.attribute(QStringLiteral("node"));
         d->capabilityVer = QByteArray::fromBase64(element.attribute(QStringLiteral("ver")).toLatin1());
         d->capabilityHash = element.attribute(QStringLiteral("hash"));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         d->capabilityExt = element.attribute(QStringLiteral("ext")).split(' ', Qt::SkipEmptyParts);
-#else
-        d->capabilityExt = element.attribute(QStringLiteral("ext")).split(' ', QString::SkipEmptyParts);
-#endif
         // XEP-0153: vCard-Based Avatars
     } else if (element.namespaceURI() == ns_vcard_update) {
         QDomElement photoElement = element.firstChildElement(QStringLiteral("photo"));

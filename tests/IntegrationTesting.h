@@ -27,11 +27,7 @@ class IntegrationTests
 public:
     static QString environmentVariable(const char *varName, const QString &defaultValue = {})
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
         return qEnvironmentVariable(varName, defaultValue);
-#else
-        return qEnvironmentVariableIsSet(varName) ? QString::fromLocal8Bit(qgetenv(varName)) : QString();
-#endif
     }
 
     static bool enabled()

@@ -95,12 +95,7 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
         }
     });
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     QObject::connect(state->reply, &QNetworkReply::readyRead, [state, file = std::move(target)]() {
-#else
-    auto file = std::shared_ptr<QIODevice>(std::move(target));
-    QObject::connect(state->reply, &QNetworkReply::readyRead, [state, file]() {
-#endif
         auto data = state->reply->readAll();
         if (file->write(data) != data.size()) {
             state->error = QXmppError::fromIoDevice(*file);
@@ -113,11 +108,7 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
         }
     });
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     QObject::connect(state->reply, &QNetworkReply::errorOccurred,
-#else
-    QObject::connect(state->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-#endif
                      [state](QNetworkReply::NetworkError) {
                          // Qt doc: the finished() signal will "probably" follow
                          // => we can't be sure that finished() is going to be called

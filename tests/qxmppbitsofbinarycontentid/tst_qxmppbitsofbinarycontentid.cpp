@@ -78,10 +78,8 @@ void tst_QXmppBitsOfBinaryContentId::testFromContentId_data()
     ROW("url", "cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org", false);
     ROW("url-and-wrong-namespace", "cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob_222.xmpp.org", false);
     ROW("too-many-pluses", "sha1+sha256+sha3-256+blake2b256+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org", false);
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     ROW("wrong-hash-length", "cid:sha1+08d579a50083ff9308fb6242@bob.xmpp.org", false);
-#endif
+
 #undef ROW
 }
 
@@ -136,17 +134,12 @@ void tst_QXmppBitsOfBinaryContentId::testIsValid_data()
         "8f35fef110ffc5df08d579a50083ff9308fb6242",
         QCryptographicHash::Sha1,
         true);
-
-#ifndef QT_CRYPTOGRAPHICHASH_ONLY_SHA1
     ROW("valid-sha256",
         "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         QCryptographicHash::Sha256,
         true);
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     ROW("wrong-hash-length", "8f35fef110ffc5df08", QCryptographicHash::Sha1, false);
-#endif
+
 #undef ROW
 }
 

@@ -29,10 +29,6 @@
 
 using namespace QXmpp::Private;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-static bool randomSeeded = false;
-#endif
-
 struct IqState
 {
     QXmppPromise<QXmppStream::IqResult> interface;
@@ -83,13 +79,6 @@ QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
       d(new QXmppStreamPrivate(this))
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-    // Make sure the random number generator is seeded
-    if (!randomSeeded) {
-        qsrand(QTime(0, 0, 0).msecsTo(QTime::currentTime()) ^ reinterpret_cast<quintptr>(this));
-        randomSeeded = true;
-    }
-#endif
 }
 
 ///
@@ -331,11 +320,7 @@ void QXmppStream::setSocket(QSslSocket *socket)
     // socket events
     connect(socket, &QAbstractSocket::connected, this, &QXmppStream::_q_socketConnected);
     connect(socket, &QSslSocket::encrypted, this, &QXmppStream::_q_socketEncrypted);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppStream::_q_socketError);
-#else
-    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppStream::_q_socketError);
-#endif
     connect(socket, &QIODevice::readyRead, this, &QXmppStream::_q_socketReadyRead);
 }
 

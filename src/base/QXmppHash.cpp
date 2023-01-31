@@ -114,15 +114,11 @@ bool QXmppHash::parse(const QDomElement &el)
 {
     if (el.tagName() == "hash" && el.namespaceURI() == ns_hashes) {
         m_algorithm = hashAlgorithmFromString(el.attribute("algo"));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
         if (auto hashResult = QByteArray::fromBase64Encoding(el.text().toUtf8())) {
             m_hash = std::move(*hashResult);
         } else {
             return false;
         }
-#else
-        m_hash = QByteArray::fromBase64(el.text().toUtf8());
-#endif
         return true;
     }
     return false;

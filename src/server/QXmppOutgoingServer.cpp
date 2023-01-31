@@ -47,11 +47,7 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     setSocket(socket);
 
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingServer::_q_socketDisconnected);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingServer::socketError);
-#else
-    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QSslSocket::error), this, &QXmppOutgoingServer::socketError);
-#endif
 
     // DNS lookups
     connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingServer::_q_dnsLookupFinished);

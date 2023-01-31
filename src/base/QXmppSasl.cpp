@@ -27,26 +27,6 @@ static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
     { QStringLiteral("SCRAM-SHA3-512"), QCryptographicHash::RealSha3_512 },
 };
 
-// Returns the hash length in bytes (QCH::hashLength() only exists since 5.12).
-int hashLength(QCryptographicHash::Algorithm algorithm)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-    return QCryptographicHash::hashLength(algorithm);
-#else
-    switch (algorithm) {
-    case QCryptographicHash::Sha1:
-        return 160 / 8;
-    case QCryptographicHash::Sha256:
-        return 256 / 8;
-    case QCryptographicHash::Sha512:
-    case QCryptographicHash::RealSha3_512:
-        return 512 / 8;
-    default:
-        return QCryptographicHash::hash({}, algorithm).size();
-    }
-#endif
-}
-
 // Calculate digest response for use with XMPP/SASL.
 
 static QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri, const QByteArray &secret, const QByteArray &nonce, const QByteArray &cnonce, const QByteArray &nc)
@@ -577,7 +557,7 @@ QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorit
     : QXmppSaslClient(parent),
       m_algorithm(algorithm),
       m_step(0),
-      m_dklen(hashLength(algorithm))
+      m_dklen(QCryptographicHash::hashLength(algorithm))
 {
     const auto itr = std::find(SCRAM_ALGORITHMS.cbegin(), SCRAM_ALGORITHMS.cend(), algorithm);
     Q_ASSERT(itr != SCRAM_ALGORITHMS.cend());

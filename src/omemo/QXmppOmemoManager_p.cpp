@@ -22,10 +22,7 @@
 #include <protocol.h>
 
 #include "OmemoCryptoProvider.h"
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <QRandomGenerator>
-#endif
 #include <QStringBuilder>
 
 using namespace QXmpp;
@@ -3411,11 +3408,7 @@ bool ManagerPrivate::buildSession(signal_protocol_address address, const QXmppOm
         warning("No public pre key could be found in device bundle");
     }
     const auto publicPreKeyIds = publicPreKeys.keys();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     const auto publicPreKeyIndex = QRandomGenerator::system()->bounded(publicPreKeyIds.size());
-#else
-    const auto publicPreKeyIndex = qrand() % publicPreKeyIds.size();
-#endif
     const auto publicPreKeyId = publicPreKeyIds.at(publicPreKeyIndex);
     const auto publicPreKey = publicPreKeys.value(publicPreKeyId);
 

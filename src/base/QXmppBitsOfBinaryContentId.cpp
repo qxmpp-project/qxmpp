@@ -219,21 +219,16 @@ void QXmppBitsOfBinaryContentId::setAlgorithm(QCryptographicHash::Algorithm algo
 ///
 /// Checks whether the content id is valid and can be serialized into a string.
 ///
-/// \note Checking the hash length requires QXmpp to be built with Qt 5.12.0 or
-/// later.
+/// Also checks the length of the hash.
 ///
 /// \returns True, if the set hashing algorithm is supported, a hash value is
 /// set and its length is correct, false otherwise.
 ///
 bool QXmppBitsOfBinaryContentId::isValid() const
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     return !d->hash.isEmpty() &&
         HASH_ALGORITHMS.contains(d->algorithm) &&
         d->hash.length() == QCryptographicHash::hashLength(d->algorithm);
-#else
-    return !d->hash.isEmpty() && HASH_ALGORITHMS.contains(d->algorithm);
-#endif
 }
 
 ///
