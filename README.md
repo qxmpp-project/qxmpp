@@ -53,7 +53,7 @@ version 2.1 or later.
 Building QXmpp
 ==============
 
-QXmpp requires Qt 5.9 or higher with SSL enabled.
+QXmpp requires Qt 5.15 or Qt 6.0 or higher with SSL enabled.
 It uses CMake as build system.
 
 Build from command line:
