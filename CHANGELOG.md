@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.5.0 (UNRELEASED)
-------------------------
+QXmpp 1.5.0 (Jan 31, 2023)
+--------------------------
 
 New features:
  - New asynchronous APIs:
