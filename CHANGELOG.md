@@ -7,7 +7,40 @@ SPDX-License-Identifier: CC0-1.0
 QXmpp 1.5.0 (UNRELEASED)
 ------------------------
 
-*under development*
+New features:
+ - New asynchronous APIs:
+   - New QXmppTask/Promise for asynchronous APIs (@lnjX, @JBBgameich)
+   - Packet sending result reporting (sent, stream management acks) (@lnjX)
+   - IQ response recognition and mapping to requests via QXmppTask (@lnjX)
+   - Add QXmppTask-based APIs to most of the managers (@lnjX)
+ - PubSub:
+   - Implement XEP-0060: Publish-Subscribe (nearly complete) (@lnjX)
+   - Implement XEP-0118: User Tune (@lnjX)
+   - Implement XEP-0080: User Location (@lnjX, @c-cesar)
+   - Rewrite MIX items with new PubSubItem (@lnjX)
+   - Add specified data forms parsing utilities (@lnjX)
+ - Encryption:
+   - Implement XEP-0384: OMEMO Encryption (@melvo)
+   - Implement XEP-0434: Trust Messages (TM) (@melvo)
+   - Implement XEP-0450: Automatic Trust Management (ATM) (@melvo)
+   - Implement XEP-0420: Stanza Content Encryption (@lnjX)
+   - Add new Message Carbons manager capable of end-to-end-encryption (@lnjX)
+   - Adapt QXmppClient to support end-to-end-encryptions (@lnjX)
+ - File sharing:
+   - Implement XEP-0446: File metadata element (@JBBgameich)
+   - Implement XEP-0300: Use of Cryptographic Hash Functions in XMPP (@lnjX)
+   - Implement XEP-0264: Jingle Content Thumbnails (@lnjX)
+   - Implement XEP-0447: Stateless file sharing (@lnjX, @JBBgameich)
+   - Implement XEP-0448: Encryption for stateless file sharing (@lnjX, @JBBgameich)
+   - Add new HTTP File Upload Manager for slot requesting and uploading (@lnjX, @JBBgameich)
+ - Implement stanza parsing for modern audio-video calls (@melvo)
+ - Implement XEP-0444: Message Reactions (@melvo)
+ - Add QXmppNonza as base for stanzas and nonzas (@lnjX)
+ - RosterManager: Add subscription request signal with full presence (#346, @melvo)
+
+Breaking changes:
+ - Removed old unused MIX items
+ - Removed old unfinished PubSubIq
 
 QXmpp 1.4.0 (Mar 15, 2021)
 --------------------------
