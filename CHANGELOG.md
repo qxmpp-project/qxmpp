@@ -9,6 +9,12 @@ QXmpp 1.6.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.5.1 (Feb 01, 2023)
+--------------------------
+
+Fixes:
+ - Fix build with clang (usage of auto in template argument) (@lnjX)
+
 QXmpp 1.5.0 (Jan 31, 2023)
 --------------------------
 

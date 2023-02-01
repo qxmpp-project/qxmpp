@@ -412,7 +412,7 @@ bool QXmppClient::sendPacket(const QXmppNonza &packet)
 ///
 QXmppTask<QXmpp::SendResult> QXmppClient::sendSensitive(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &params)
 {
-    const auto sendEncrypted = [this](QXmppTask<auto> &&task) {
+    const auto sendEncrypted = [this](auto &&task) {
         QXmppPromise<QXmpp::SendResult> interface;
         task.then(this, [this, interface](auto &&result) mutable {
             std::visit(overloaded {
