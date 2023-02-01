@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.1 (Feb 01, 2023)
+--------------------------
+
+Fixes:
+ - Fix build with clang (usage of auto in template argument) (@lnjX)
+
 QXmpp 1.5.0 (Jan 31, 2023)
 --------------------------
 
