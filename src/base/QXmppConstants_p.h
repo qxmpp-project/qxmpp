@@ -132,6 +132,8 @@ extern const char *ns_ping;
 extern const char *ns_entity_time;
 // XEP-0203: Delayed Delivery
 extern const char *ns_delayed_delivery;
+// XEP-0215: External Service Discovery
+extern const char *ns_external_service_discovery;
 // XEP-0220: Server Dialback
 extern const char *ns_server_dialback;
 // XEP-0221: Data Forms Media Element

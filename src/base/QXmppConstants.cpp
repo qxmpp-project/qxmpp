@@ -120,6 +120,8 @@ const char *ns_ping = "urn:xmpp:ping";
 const char *ns_entity_time = "urn:xmpp:time";
 // XEP-0203: Delayed Delivery
 const char *ns_delayed_delivery = "urn:xmpp:delay";
+// XEP-0215: External Service Discovery
+const char *ns_external_service_discovery = "urn:xmpp:extdisco:2";
 // XEP-0220: Server Dialback
 const char *ns_server_dialback = "jabber:server:dialback";
 // XEP-0221: Data Forms Media Element
