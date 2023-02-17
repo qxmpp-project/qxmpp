@@ -24,6 +24,7 @@ SPDX-License-Identifier: CC0-1.0
     <support-forum rdf:resource='xmpp:qxmpp@muc.kaidan.im?join'/>
     <license rdf:resource='https://github.com/qxmpp-project/qxmpp/tree/master/LICENSES'/>
     <language>en</language>
+    <schema:logo rdf:resource='https://raw.githubusercontent.com/qxmpp-project/qxmpp/master/logo.svg'/>
     <programming-language>C++</programming-language>
     <os>Android</os>
     <os>iOS</os>
