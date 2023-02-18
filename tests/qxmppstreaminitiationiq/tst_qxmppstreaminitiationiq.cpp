@@ -12,11 +12,11 @@ class tst_QXmppStreamInitiationIq : public QObject
 {
     Q_OBJECT
 
-private slots:
-    void testFileInfo_data();
-    void testFileInfo();
-    void testOffer();
-    void testResult();
+private:
+    Q_SLOT void testFileInfo_data();
+    Q_SLOT void testFileInfo();
+    Q_SLOT void testOffer();
+    Q_SLOT void testResult();
 };
 
 void tst_QXmppStreamInitiationIq::testFileInfo_data()
