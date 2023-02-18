@@ -7,3 +7,4 @@ CMakeLists.txt.*
 build*
 .kdev4/
 *.kdev4
+support-chat-avatar.png
