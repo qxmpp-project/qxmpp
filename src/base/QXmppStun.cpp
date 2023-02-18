@@ -916,6 +916,10 @@ QByteArray QXmppStunMessage::encode(const QByteArray &key, bool addFingerprint) 
         stream << quint16(Nonce);
         stream << quint16(m_nonce.size());
         stream.writeRawData(m_nonce.data(), m_nonce.size());
+        if (m_nonce.size() % 4) {
+            const QByteArray padding(4 - (m_nonce.size() % 4), 0);
+            stream.writeRawData(padding.data(), padding.size());
+        }
     }
 
     // REALM
