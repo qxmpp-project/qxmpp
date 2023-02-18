@@ -12,7 +12,6 @@ class tst_QXmppStreamInitiationIq : public QObject
 {
     Q_OBJECT
 
-private:
     Q_SLOT void testFileInfo_data();
     Q_SLOT void testFileInfo();
     Q_SLOT void testOffer();
