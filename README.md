@@ -68,7 +68,7 @@ Build from command line:
 You can pass the following arguments to CMake:
 
     BUILD_SHARED                  to build with shared type library, otherwise static (default: true)
-    BUILD_DOCUMENTATION           to build the documentation (default: false)
+    BUILD_DOCUMENTATION           to build the documentation, requires Doxygen (default: false)
     BUILD_EXAMPLES                to build the examples (default: true)
     BUILD_TESTS                   to build the unit tests (default: true)
     BUILD_INTERNAL_TESTS          to build the unit tests testing private parts of the API (default: false)
