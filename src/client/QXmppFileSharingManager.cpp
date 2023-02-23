@@ -569,7 +569,7 @@ std::shared_ptr<QXmppFileDownload> QXmppFileSharingManager::downloadFile(
             std::move(file),
             transform(download->d->hashes, [](auto hash) { return hash; }));
 
-        await(download->d->hashesFuture, this, [download = std::move(download)](HashVerificationResultPtr hashResult) {
+        await(download->d->hashesFuture, this, [download](HashVerificationResultPtr hashResult) {
             auto convert = overloaded {
                 [](HashVerificationResult::NoStrongHashes) {
                     return QXmppFileDownload::Downloaded {
