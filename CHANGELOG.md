@@ -4,6 +4,14 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.2 (Feb 23, 2023)
+--------------------------
+
+Fixes:
+ - Fix undefined behaviour in OmemoManager and FileSharingManager (@lnjX)
+ - STUN: Fix nonce attribute is not padded (@Choochmeque)
+
+
 QXmpp 1.5.1 (Feb 01, 2023)
 --------------------------
 
