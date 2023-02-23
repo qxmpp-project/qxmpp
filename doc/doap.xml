@@ -27,11 +27,8 @@ SPDX-License-Identifier: CC0-1.0
     <schema:logo rdf:resource='https://raw.githubusercontent.com/qxmpp-project/qxmpp/master/logo.svg'/>
     <programming-language>C++</programming-language>
     <os>Android</os>
-    <os>iOS</os>
     <os>Linux</os>
     <os>macOS</os>
-    <os>tvOS</os>
-    <os>watchOS</os>
     <os>Windows</os>
     <category rdf:resource='https://linkmauve.fr/ns/xmpp-doap#category-library'/>
     <repository>
