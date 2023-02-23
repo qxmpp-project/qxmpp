@@ -629,14 +629,17 @@ QXmppTask<bool> ManagerPrivate::setUpDeviceId()
         // 2. There is an empty PubSub node for device bundles: XEP-0030 states that a server must
         // respond with a node without included items.
         auto error = std::get_if<QXmppError>(&result);
-        if (auto stanzaErr = error->value<QXmppStanza::Error>()) {
-            // allow Cancel|ItemNotFound here
-            if (!(stanzaErr->type() == Error::Cancel && stanzaErr->condition() == Error::ItemNotFound)) {
-                warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
+        if (error) {
+            if (auto stanzaErr = error->value<QXmppStanza::Error>()) {
+                // allow Cancel|ItemNotFound here
+                if (!(stanzaErr->type() == Error::Cancel && stanzaErr->condition() == Error::ItemNotFound)) {
+                    warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
+                    return false;
+                }
+                // do not return here
+            } else {
                 return false;
             }
-        } else {
-            return false;
         }
 
         // The first generated device ID can be used if no device bundle node exists.

@@ -9,6 +9,13 @@ QXmpp 1.6.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.5.2 (Feb 23, 2023)
+--------------------------
+
+Fixes:
+ - Fix undefined behaviour in OmemoManager and FileSharingManager (@lnjX)
+ - STUN: Fix nonce attribute is not padded (@Choochmeque)
+
 QXmpp 1.5.1 (Feb 01, 2023)
 --------------------------
 
