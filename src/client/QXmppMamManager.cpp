@@ -264,11 +264,14 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
             if (auto *e2eeExt = client()->encryptionExtension()) {
                 auto &messages = itr->second.messages;
                 auto running = std::make_shared<uint>(0);
+                // handle case when no message is encrypted
+                auto hasEncryptedMessages = false;
 
                 for (auto i = 0; i < messages.size(); i++) {
                     if (!e2eeExt->isEncrypted(messages.at(i))) {
                         continue;
                     }
+                    hasEncryptedMessages = true;
 
                     auto message = messages.at(i);
                     (*running)++;
@@ -289,6 +292,12 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
                             d->ongoingRequests.erase(itr);
                         }
                     });
+                }
+
+                if (!hasEncryptedMessages) {
+                    // finish here, no decryptMessage callback will do it
+                    itr->second.finish();
+                    d->ongoingRequests.erase(itr);
                 }
             } else {
                 itr->second.finish();
