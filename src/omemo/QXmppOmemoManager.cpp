@@ -669,7 +669,7 @@ QXmppOmemoOwnDevice Manager::ownDevice()
 
     QXmppOmemoOwnDevice device;
     device.setLabel(ownDevice.label);
-    device.setKeyId(createKeyId(ownDevice.publicIdentityKey));
+    device.setKeyId(ownDevice.publicIdentityKey);
 
     return device;
 }
