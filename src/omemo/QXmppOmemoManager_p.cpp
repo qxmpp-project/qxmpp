@@ -1441,8 +1441,6 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
             future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
                 if (!payloadDecryptionData) {
                     warning("Empty OMEMO message could not be successfully processed");
-                } else if (payloadDecryptionData->isEmpty()) {
-                    warning("Empty OMEMO message could not be successfully processed");
                 } else {
                     q->debug("Successfully processed empty OMEMO message");
                 }
@@ -1616,9 +1614,6 @@ QXmppTask<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJi
         if (!payloadDecryptionData) {
             warning("Data for decrypting OMEMO payload could not be extracted");
             interface.finish(QByteArray());
-        } else if (payloadDecryptionData->isEmpty()) {
-            warning("Data for decrypting OMEMO payload could not be extracted");
-            interface.finish(QByteArray());
         } else {
             interface.finish(decryptPayload(*payloadDecryptionData, omemoPayload));
         }
@@ -1637,8 +1632,7 @@ QXmppTask<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJi
 // \param omemoEnvelope OMEMO envelope containing the payload decryption data
 // \param isMessageStanza whether the received stanza is a message stanza
 //
-// \return the serialized payload decryption data if it could be extracted, otherwise a
-//         default-constructed secure array
+// \return the serialized payload decryption data if it could be extracted, otherwise std::nullopt
 //
 QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecryptionData(const QString &senderJid, uint32_t senderDeviceId, const QXmppOmemoEnvelope &omemoEnvelope, bool isMessageStanza)
 {
@@ -1748,12 +1742,7 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
                     auto future = q->trustLevel(senderJid, storedKeyId);
                     future.then(q, [=](TrustLevel trustLevel) mutable {
                         if (trustLevel == TrustLevel::Undecided) {
-                            auto future = storeKeyDependingOnSecurityPolicy(senderJid, key);
-                            future.then(q, [=](auto) mutable {
-                                interface.finish(std::nullopt);
-                            });
-                        } else {
-                            interface.finish(std::nullopt);
+                            storeKeyDependingOnSecurityPolicy(senderJid, key);
                         }
                     });
                 }
