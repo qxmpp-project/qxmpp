@@ -115,8 +115,6 @@ struct IqDecryptionResult
     QXmppE2eeMetadata e2eeMetadata;
 };
 
-QByteArray createKeyId(const QByteArray &key);
-
 }  // namespace QXmpp::Omemo::Private
 
 using namespace QXmpp::Private;

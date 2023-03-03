@@ -40,23 +40,6 @@ namespace QXmpp::Omemo::Private {
 
 const QString PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE = QStringLiteral("hmac(sha256)");
 
-//
-// Creates a key ID.
-//
-// The first byte representing a version string used by the OMEMO library but
-// not needed for trust management is removed.
-// It corresponds to the fingerprint shown to users which also does not contain
-// the first byte.
-//
-// \param key key for whom its ID is created
-//
-// \return the key ID
-//
-QByteArray createKeyId(const QByteArray &key)
-{
-    return QByteArray(key).remove(0, 1);
-}
-
 }  // namespace QXmpp::Omemo::Private
 
 //
@@ -713,13 +696,7 @@ bool ManagerPrivate::setUpIdentityKeyPair(ratchet_identity_key_pair **identityKe
     const auto privateIdentityKey = privateIdentityKeyBuffer.toByteArray();
     ownDevice.privateIdentityKey = privateIdentityKey;
 
-    BufferPtr publicIdentityKeyBuffer;
-
-    if (ec_public_key_serialize(publicIdentityKeyBuffer.ptrRef(), ratchet_identity_key_pair_get_public(*identityKeyPair)) < 0) {
-        warning("Public identity key could not be serialized");
-        return false;
-    }
-
+    BufferPtr publicIdentityKeyBuffer(ec_public_key_get_ed(ratchet_identity_key_pair_get_public(*identityKeyPair)));
     const auto publicIdentityKey = publicIdentityKeyBuffer.toByteArray();
     deviceBundle.setPublicIdentityKey(publicIdentityKey);
     ownDevice.publicIdentityKey = publicIdentityKey;
@@ -835,18 +812,12 @@ bool ManagerPrivate::updateSignedPreKeyPair(ratchet_identity_key_pair *identityK
     signedPreKeyPairs.insert(latestSignedPreKeyId, signedPreKeyPairForStorage);
     omemoStorage->addSignedPreKeyPair(latestSignedPreKeyId, signedPreKeyPairForStorage);
 
-    BufferPtr signedPublicPreKeyBuffer;
-
-    if (ec_public_key_serialize(signedPublicPreKeyBuffer.ptrRef(), ec_key_pair_get_public(session_signed_pre_key_get_key_pair(signedPreKeyPair.get()))) < 0) {
-        warning("Signed public pre key could not be serialized");
-        return false;
-    }
-
+    BufferPtr signedPublicPreKeyBuffer(ec_public_key_get_mont(ec_key_pair_get_public(session_signed_pre_key_get_key_pair(signedPreKeyPair.get()))));
     const auto signedPublicPreKeyByteArray = signedPublicPreKeyBuffer.toByteArray();
 
     deviceBundle.setSignedPublicPreKeyId(latestSignedPreKeyId);
     deviceBundle.setSignedPublicPreKey(signedPublicPreKeyByteArray);
-    deviceBundle.setSignedPublicPreKeySignature(QByteArray(reinterpret_cast<const char *>(session_signed_pre_key_get_signature(signedPreKeyPair.get())), session_signed_pre_key_get_signature_len(signedPreKeyPair.get())));
+    deviceBundle.setSignedPublicPreKeySignature(QByteArray(reinterpret_cast<const char *>(session_signed_pre_key_get_signature_omemo(signedPreKeyPair.get())), session_signed_pre_key_get_signature_omemo_len(signedPreKeyPair.get())));
 
     ownDevice.latestSignedPreKeyId = latestSignedPreKeyId;
 
@@ -924,7 +895,6 @@ bool ManagerPrivate::updatePreKeyPairs(uint32_t count)
          node != nullptr;
          node = signal_protocol_key_helper_key_list_next(node)) {
         BufferSecurePtr preKeyPairBuffer;
-        BufferPtr publicPreKeyBuffer;
 
         auto preKeyPair = signal_protocol_key_helper_key_list_element(node);
 
@@ -937,11 +907,7 @@ bool ManagerPrivate::updatePreKeyPairs(uint32_t count)
 
         serializedPreKeyPairs.insert(preKeyId, preKeyPairBuffer.toByteArray());
 
-        if (ec_public_key_serialize(publicPreKeyBuffer.ptrRef(), ec_key_pair_get_public(session_pre_key_get_key_pair(preKeyPair))) < 0) {
-            warning("Public pre key could not be serialized");
-            return false;
-        }
-
+        BufferPtr publicPreKeyBuffer(ec_public_key_get_mont(ec_key_pair_get_public(session_pre_key_get_key_pair(preKeyPair))));
         const auto serializedPublicPreKey = publicPreKeyBuffer.toByteArray();
         deviceBundle.addPublicPreKey(preKeyId, serializedPublicPreKey);
     }
@@ -1020,7 +986,7 @@ bool ManagerPrivate::generateIdentityKeyPair(ratchet_identity_key_pair **identit
 
     RefCountedPtr<ec_public_key> publicIdentityKey;
 
-    if (curve_decode_point(publicIdentityKey.ptrRef(), signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
+    if (curve_decode_point_ed(publicIdentityKey.ptrRef(), signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
         warning("Public identity key could not be deserialized");
         return false;
     }
@@ -1237,15 +1203,14 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                             if (optionalDeviceBundle && devices.value(jid).contains(deviceId)) {
                                 auto &deviceBeingModified = devices[jid][deviceId];
                                 const auto &deviceBundle = *optionalDeviceBundle;
-                                const auto key = deviceBundle.publicIdentityKey();
-                                deviceBeingModified.keyId = createKeyId(key);
+                                deviceBeingModified.keyId = deviceBundle.publicIdentityKey();
 
                                 auto future = q->trustLevel(jid, deviceBeingModified.keyId);
                                 future.then(q, [=](TrustLevel trustLevel) mutable {
                                     // Store the retrieved key's trust level if it is not stored
                                     // yet.
                                     if (trustLevel == TrustLevel::Undecided) {
-                                        auto future = storeKeyDependingOnSecurityPolicy(jid, key);
+                                        auto future = storeKeyDependingOnSecurityPolicy(jid, deviceBeingModified.keyId);
                                         future.then(q, [=](TrustLevel trustLevel) mutable {
                                             omemoStorage->addDevice(jid, deviceId, deviceBeingModified);
                                             Q_EMIT q->deviceChanged(jid, deviceId);
@@ -1731,11 +1696,10 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
                 const auto key = publicIdentityKeyBuffer.toByteArray();
                 auto &device = devices[senderJid][senderDeviceId];
                 auto &storedKeyId = device.keyId;
-                const auto createdKeyId = createKeyId(key);
 
                 // Store the key if its ID has changed.
-                if (storedKeyId != createdKeyId) {
-                    storedKeyId = createdKeyId;
+                if (storedKeyId != key) {
+                    storedKeyId = key;
                     omemoStorage->addDevice(senderJid, senderDeviceId, device);
                     Q_EMIT q->deviceChanged(senderJid, senderDeviceId);
                 }
@@ -3341,8 +3305,7 @@ QXmppTask<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid,
     future.then(q, [=, &device](std::optional<QXmppOmemoDeviceBundle> optionalDeviceBundle) mutable {
         if (optionalDeviceBundle) {
             const auto &deviceBundle = *optionalDeviceBundle;
-            const auto key = deviceBundle.publicIdentityKey();
-            device.keyId = createKeyId(key);
+            device.keyId = deviceBundle.publicIdentityKey();
 
             auto future = q->trustLevel(jid, device.keyId);
             future.then(q, [=](TrustLevel trustLevel) mutable {
@@ -3375,7 +3338,7 @@ QXmppTask<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid,
 
                 if (trustLevel == TrustLevel::Undecided) {
                     // Store the key's trust level if it is not stored yet.
-                    auto future = storeKeyDependingOnSecurityPolicy(jid, key);
+                    auto future = storeKeyDependingOnSecurityPolicy(jid, device.keyId);
                     future.then(q, [=](TrustLevel trustLevel) mutable {
                         buildSessionDependingOnTrustLevel(trustLevel);
                     });
@@ -3524,7 +3487,7 @@ bool ManagerPrivate::deserializePublicIdentityKey(ec_public_key **publicIdentity
         return false;
     }
 
-    if (curve_decode_point(publicIdentityKey, signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
+    if (curve_decode_point_ed(publicIdentityKey, signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
         warning("Public identity key could not be deserialized");
         return false;
     }
@@ -3549,7 +3512,7 @@ bool ManagerPrivate::deserializeSignedPublicPreKey(ec_public_key **signedPublicP
         return false;
     }
 
-    if (curve_decode_point(signedPublicPreKey, signal_buffer_data(signedPublicPreKeyBuffer.get()), signal_buffer_len(signedPublicPreKeyBuffer.get()), globalContext.get()) < 0) {
+    if (curve_decode_point_mont(signedPublicPreKey, signal_buffer_data(signedPublicPreKeyBuffer.get()), signal_buffer_len(signedPublicPreKeyBuffer.get()), globalContext.get()) < 0) {
         warning("Signed public pre key could not be deserialized");
         return false;
     }
@@ -3574,7 +3537,7 @@ bool ManagerPrivate::deserializePublicPreKey(ec_public_key **publicPreKey, const
         return false;
     }
 
-    if (curve_decode_point(publicPreKey, signal_buffer_data(publicPreKeyBuffer.get()), signal_buffer_len(publicPreKeyBuffer.get()), globalContext.get()) < 0) {
+    if (curve_decode_point_mont(publicPreKey, signal_buffer_data(publicPreKeyBuffer.get()), signal_buffer_len(publicPreKeyBuffer.get()), globalContext.get()) < 0) {
         warning("Public pre key could not be deserialized");
         return false;
     }
@@ -3640,16 +3603,11 @@ QXmppTask<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &rec
 //
 // Sets the key of this client instance's device.
 //
-// The first byte representing a version string used by the OMEMO library but
-// not needed for trust management is removed before storing it.
-// It corresponds to the fingerprint shown to users which also does not contain
-// the first byte.
-//
 QXmppTask<void> ManagerPrivate::storeOwnKey() const
 {
     QXmppPromise<void> interface;
 
-    auto future = trustManager->setOwnKey(ns_omemo_2, createKeyId(ownDevice.publicIdentityKey));
+    auto future = trustManager->setOwnKey(ns_omemo_2, ownDevice.publicIdentityKey);
     future.then(q, [=]() mutable {
         interface.finish();
     });
@@ -3722,7 +3680,7 @@ QXmppTask<TrustLevel> ManagerPrivate::storeKey(const QString &keyOwnerJid, const
 {
     QXmppPromise<TrustLevel> interface;
 
-    auto future = trustManager->addKeys(ns_omemo_2, keyOwnerJid, { createKeyId(key) }, trustLevel);
+    auto future = trustManager->addKeys(ns_omemo_2, keyOwnerJid, { key }, trustLevel);
     future.then(q, [=]() mutable {
         Q_EMIT q->trustLevelsChanged({ { keyOwnerJid, key } });
         interface.finish(std::move(trustLevel));
