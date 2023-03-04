@@ -8,10 +8,8 @@
 #include "QXmppOmemoDeviceElement_p.h"
 #include "QXmppOmemoDeviceList_p.h"
 #include "QXmppOmemoElement_p.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"
-#include "QXmppUtils.h"
 
 #include <QDomElement>
 #include <QHash>

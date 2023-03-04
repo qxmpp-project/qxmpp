@@ -12,11 +12,9 @@
 #include "QXmppE2eeMetadata.h"
 #include "QXmppMessage.h"
 #include "QXmppOmemoElement_p.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoManager.h"
 #include "QXmppOmemoManager_p.h"
 #include "QXmppOmemoMemoryStorage.h"
-#include "QXmppPubSubItem.h"
 #include "QXmppPubSubManager.h"
 
 #include "IntegrationTesting.h"

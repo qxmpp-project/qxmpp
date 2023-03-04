@@ -5,10 +5,7 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppOmemoDeviceElement_p.h"
-#include "QXmppOmemoDeviceList_p.h"
 #include "QXmppOmemoElement_p.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"
 #include "QXmppOmemoManager_p.h"

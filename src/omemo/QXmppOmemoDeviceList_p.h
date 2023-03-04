@@ -7,12 +7,12 @@
 #define QXMPPOMEMODEVICELIST_H
 
 #include "QXmppGlobal.h"
+#include "QXmppOmemoDeviceElement_p.h"
 
 #include "QList"
 
 class QDomElement;
 class QXmlStreamWriter;
-class QXmppOmemoDeviceElement;
 
 class QXMPP_AUTOTEST_EXPORT QXmppOmemoDeviceList : public QList<QXmppOmemoDeviceElement>
 {
