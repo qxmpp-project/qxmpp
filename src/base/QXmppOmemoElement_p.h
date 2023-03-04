@@ -7,13 +7,13 @@
 #define QXMPPOMEMOELEMENT_H
 
 #include "QXmppGlobal.h"
+#include "QXmppOmemoEnvelope_p.h"
 
 #include <optional>
 
 #include <QMultiMap>
 
 class QDomElement;
-class QXmppOmemoEnvelope;
 class QXmlStreamWriter;
 
 class QXMPP_EXPORT QXmppOmemoElement
