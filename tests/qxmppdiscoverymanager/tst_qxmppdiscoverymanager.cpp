@@ -59,7 +59,6 @@ void tst_QXmppDiscoveryManager::testItems()
 
     const auto items = expectFutureVariant<QList<QXmppDiscoveryIq::Item>>(future.toFuture(this));
 
-    const QStringList expFeatures = { "http://jabber.org/protocol/pubsub", "urn:xmpp:mix:core:1" };
     QCOMPARE(items.size(), 4);
     QCOMPARE(items.at(0).name(), QStringLiteral("368866411b877c30064a5f62b917cffe"));
     QCOMPARE(items.at(1).name(), QStringLiteral("3300659945416e274474e469a1f0154c"));
