@@ -1659,7 +1659,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement(QStringLiteral("encryption"));
             writer->writeDefaultNamespace(ns_eme);
             writer->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
-            helperToXmlAddAttribute(writer, QStringLiteral("name"), d->encryptionName);
+            helperToXmlAddAttribute(writer, QStringLiteral("name"), encryptionName());
             writer->writeEndElement();
         }
 
