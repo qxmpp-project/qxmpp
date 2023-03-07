@@ -18,9 +18,10 @@ using namespace QXmpp::Private;
 class CarbonEnableIq : public QXmppIq
 {
 public:
-    CarbonEnableIq()
+    CarbonEnableIq(const QString &jid)
         : QXmppIq()
     {
+        setTo(jid);
         setType(QXmppIq::Set);
     }
 
@@ -30,7 +31,8 @@ public:
     }
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
-        writer->writeStartElement(ns_carbons, "enable");
+        writer->writeStartElement(QStringLiteral("enable"));
+        writer->writeDefaultNamespace(ns_carbons);
         writer->writeEndElement();
     }
 };
@@ -163,7 +165,7 @@ void QXmppCarbonManagerV2::enableCarbons()
         return;
     }
 
-    client()->sendIq(CarbonEnableIq()).then(this, [this](QXmppClient::IqResult domResult) {
+    client()->sendIq(CarbonEnableIq(client()->configuration().jidBare())).then(this, [this](QXmppClient::IqResult domResult) {
         if (auto err = parseIq(std::move(domResult))) {
             warning("Could not enable message carbons: " % err->description);
         } else {
