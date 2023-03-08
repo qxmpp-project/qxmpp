@@ -26,9 +26,8 @@ void tst_QXmppSceEnvelope::testReader()
         "<from jid=\"opportunity@mars.planet\"/>"
         "<rpad>C1DHN9HK-9A25tSmwK4hU!Jji9%GKYK^syIlHJT9TnI4</rpad>"
         "</envelope>");
-    const auto dom = xmlToDom(xml);
 
-    QXmppSceEnvelopeReader reader(dom);
+    QXmppSceEnvelopeReader reader(xmlToDom(xml));
     QCOMPARE(reader.from(), QStringLiteral("opportunity@mars.planet"));
     QCOMPARE(reader.to(), QStringLiteral("missioncontrol@houston.nasa.gov"));
     QCOMPARE(reader.timestamp(), QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, Qt::UTC));
