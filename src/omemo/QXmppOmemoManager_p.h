@@ -173,6 +173,7 @@ public:
     QXmppOmemoManagerPrivate(QXmppOmemoManager *parent, QXmppOmemoStorage *omemoStorage);
 
     void init();
+    // exports for unit tests
     QXMPP_EXPORT bool initGlobalContext();
     QXMPP_EXPORT bool initLocking();
     QXMPP_EXPORT bool initCryptoProvider();
