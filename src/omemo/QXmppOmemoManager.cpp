@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppClient.h"
-#include "QXmppConstants_p.h"
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"

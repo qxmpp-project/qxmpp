@@ -34,6 +34,11 @@ using namespace std::chrono_literals;
 
 namespace QXmpp::Omemo::Private {
 
+// XMPP namespaces
+constexpr auto ns_omemo_2 = "urn:xmpp:omemo:2";
+constexpr auto ns_omemo_2_bundles = "urn:xmpp:omemo:2:bundles";
+constexpr auto ns_omemo_2_devices = "urn:xmpp:omemo:2:devices";
+
 // default possible trust levels a key must have to be used for encryption
 // The class documentation must be adapted if the trust levels are modified.
 constexpr auto ACCEPTED_TRUST_LEVELS = TrustLevel::AutomaticallyTrusted | TrustLevel::ManuallyTrusted | TrustLevel::Authenticated;
