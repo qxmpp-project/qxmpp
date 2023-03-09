@@ -23,6 +23,8 @@ set(INSTALL_HEADER_FILES
     base/QXmppEntityTimeIq.h
     base/QXmppError.h
     base/QXmppExtension.h
+    base/QXmppExternalService.h
+    base/QXmppExternalServiceDiscoveryIq.h
     base/QXmppFileMetadata.h
     base/QXmppFileShare.h
     base/QXmppFutureUtils_p.h
@@ -97,6 +99,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppDiscoveryManager.h
     client/QXmppE2eeExtension.h
     client/QXmppEntityTimeManager.h
+    client/QXmppExternalServiceDiscoveryManager.h
     client/QXmppFileSharingManager.h
     client/QXmppFileSharingProvider.h
     client/QXmppHttpFileSharingProvider.h
@@ -156,6 +159,7 @@ set(SOURCE_FILES
     base/QXmppEncryptedFileSource.cpp
     base/QXmppEntityTimeIq.cpp
     base/QXmppError.cpp
+    base/QXmppExternalServiceDiscoveryIq.cpp
     base/QXmppFileMetadata.cpp
     base/QXmppFileShare.cpp
     base/QXmppGeolocItem.cpp
@@ -228,6 +232,7 @@ set(SOURCE_FILES
     client/QXmppDiscoveryManager.cpp
     client/QXmppE2eeExtension.cpp
     client/QXmppEntityTimeManager.cpp
+    client/QXmppExternalServiceDiscoveryManager.cpp
     client/QXmppFileSharingManager.cpp
     client/QXmppHttpFileSharingProvider.cpp
     client/QXmppHttpUploadManager.cpp
