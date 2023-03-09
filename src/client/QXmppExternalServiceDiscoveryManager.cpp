@@ -7,6 +7,7 @@
 #include "QXmppClient.h"
 #include "QXmppIqHandling.h"
 #include "QXmppConstants_p.h"
+#include "QXmppExternalServiceDiscoveryIq.h"
 
 using namespace QXmpp::Private;
 

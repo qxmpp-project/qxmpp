@@ -7,9 +7,11 @@
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
-#include "QXmppExternalServiceDiscoveryIq.h"
+#include "QXmppExternalService.h"
 #include "QXmppTask.h"
 
+class QDateTime;
+class QXmppExternalServicePrivate;
 class QXMPP_EXPORT QXmppExternalServiceDiscoveryManager : public QXmppClientExtension
 {
     Q_OBJECT

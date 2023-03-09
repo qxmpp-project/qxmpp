@@ -23,6 +23,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppEntityTimeIq.h
     base/QXmppError.h
     base/QXmppExtension.h
+    base/QXmppExternalService.h
     base/QXmppExternalServiceDiscoveryIq.h
     base/QXmppFileMetadata.h
     base/QXmppFileShare.h
