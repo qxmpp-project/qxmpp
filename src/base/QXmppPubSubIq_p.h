@@ -151,7 +151,7 @@ void PubSubIq<T>::parseItems(const QDomElement &queryElement)
          childElement = childElement.nextSiblingElement(QStringLiteral("item"))) {
         T item;
         item.parse(childElement);
-        m_items << std::move(item);
+        m_items.push_back(std::move(item));
     }
 }
 

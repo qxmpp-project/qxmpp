@@ -40,7 +40,7 @@ class QXMPP_EXPORT QXmppMamManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    struct RetrievedMessages
+    struct QXMPP_EXPORT RetrievedMessages
     {
         QXmppMamResultIq result;
         QVector<QXmppMessage> messages;
