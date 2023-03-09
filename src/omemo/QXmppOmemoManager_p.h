@@ -18,6 +18,8 @@
 #include <QTimer>
 #include <QtCrypto>
 
+#undef max
+
 class QXmppTrustManager;
 class QXmppOmemoManager;
 class QXmppPubSubManager;
@@ -168,9 +170,9 @@ public:
     QXmppOmemoManagerPrivate(QXmppOmemoManager *parent, QXmppOmemoStorage *omemoStorage);
 
     void init();
-    bool initGlobalContext();
-    bool initLocking();
-    bool initCryptoProvider();
+    QXMPP_EXPORT bool initGlobalContext();
+    QXMPP_EXPORT bool initLocking();
+    QXMPP_EXPORT bool initCryptoProvider();
     void initStores();
 
     signal_protocol_identity_key_store createIdentityKeyStore() const;
