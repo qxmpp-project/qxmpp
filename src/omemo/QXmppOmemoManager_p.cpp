@@ -12,7 +12,7 @@
 #include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 #include "QXmppSceEnvelope_p.h"
 #include "QXmppTrustManager.h"
 #include "QXmppUtils.h"

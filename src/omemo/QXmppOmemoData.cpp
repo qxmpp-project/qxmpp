@@ -424,7 +424,7 @@ void QXmppOmemoDeviceBundleItem::setDeviceBundle(const QXmppOmemoDeviceBundle &d
 
 bool QXmppOmemoDeviceBundleItem::isItem(const QDomElement &itemElement)
 {
-    return QXmppPubSubItem::isItem(itemElement, QXmppOmemoDeviceBundle::isOmemoDeviceBundle);
+    return QXmppPubSubBaseItem::isItem(itemElement, QXmppOmemoDeviceBundle::isOmemoDeviceBundle);
 }
 
 void QXmppOmemoDeviceBundleItem::parsePayload(const QDomElement &payloadElement)
@@ -449,7 +449,7 @@ void QXmppOmemoDeviceListItem::setDeviceList(const QXmppOmemoDeviceList &deviceL
 
 bool QXmppOmemoDeviceListItem::isItem(const QDomElement &itemElement)
 {
-    return QXmppPubSubItem::isItem(itemElement, QXmppOmemoDeviceList::isOmemoDeviceList);
+    return QXmppPubSubBaseItem::isItem(itemElement, QXmppOmemoDeviceList::isOmemoDeviceList);
 }
 
 void QXmppOmemoDeviceListItem::parsePayload(const QDomElement &payloadElement)

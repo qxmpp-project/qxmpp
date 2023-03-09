@@ -15,7 +15,7 @@
 
 class QXmppDataForm;
 class QXmppPubSubEventPrivate;
-class QXmppPubSubItem;
+class QXmppPubSubBaseItem;
 
 class QXMPP_EXPORT QXmppPubSubEventBase : public QXmppMessage
 {
@@ -73,7 +73,7 @@ private:
     QSharedDataPointer<QXmppPubSubEventPrivate> d;
 };
 
-template<typename T = QXmppPubSubItem>
+template<typename T = QXmppPubSubBaseItem>
 class QXmppPubSubEvent : public QXmppPubSubEventBase
 {
 public:

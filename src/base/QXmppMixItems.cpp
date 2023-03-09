@@ -138,7 +138,7 @@ void QXmppMixInfoItem::setContactJids(QStringList contactJids)
 ///
 bool QXmppMixInfoItem::isItem(const QDomElement &element)
 {
-    return QXmppPubSubItem::isItem(element, [](const QDomElement &payload) {
+    return QXmppPubSubBaseItem::isItem(element, [](const QDomElement &payload) {
         // check FORM_TYPE without parsing a full QXmppDataForm
         if (payload.tagName() != u'x' || payload.namespaceURI() != ns_data) {
             return false;
@@ -264,7 +264,7 @@ void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const
 ///
 bool QXmppMixParticipantItem::isItem(const QDomElement &element)
 {
-    return QXmppPubSubItem::isItem(element, [](const QDomElement &payload) {
+    return QXmppPubSubBaseItem::isItem(element, [](const QDomElement &payload) {
         return payload.tagName() == QStringLiteral("participant") &&
             payload.namespaceURI() == ns_mix;
     });

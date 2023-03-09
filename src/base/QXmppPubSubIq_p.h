@@ -15,7 +15,7 @@
 
 class QXmppDataForm;
 class QXmppPubSubIqPrivate;
-class QXmppPubSubItem;
+class QXmppPubSubBaseItem;
 class QXmppPubSubSubscription;
 class QXmppPubSubAffiliation;
 class QXmppResultSetReply;
@@ -103,7 +103,7 @@ private:
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
 
-template<typename T = QXmppPubSubItem>
+template<typename T = QXmppPubSubBaseItem>
 class PubSubIq : public PubSubIqBase
 {
 public:

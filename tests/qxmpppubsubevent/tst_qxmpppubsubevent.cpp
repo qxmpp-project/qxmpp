@@ -4,7 +4,7 @@
 
 #include "QXmppDataForm.h"
 #include "QXmppPubSubEvent.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include "pubsubutil.h"
 #include "util.h"
@@ -31,7 +31,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
     QTest::addColumn<QStringList>("retractIds");
     QTest::addColumn<QString>("redirectUri");
     QTest::addColumn<std::optional<QXmppPubSubSubscription>>("subscription");
-    QTest::addColumn<QVector<QXmppPubSubItem>>("items");
+    QTest::addColumn<QVector<QXmppPubSubBaseItem>>("items");
     QTest::addColumn<std::optional<QXmppDataForm>>("configurationForm");
 
 #define ROW(name, xml, type, node, retractIds, redirectUri, subscription, items, configForm) \
@@ -57,7 +57,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         std::nullopt,
-        QVector<QXmppPubSubItem>() << QXmppPubSubItem("ae890ac52d0df67ed7cfdf51b644e901"),
+        QVector<QXmppPubSubBaseItem>() << QXmppPubSubBaseItem("ae890ac52d0df67ed7cfdf51b644e901"),
         std::nullopt);
 
     ROW("retract",
@@ -75,7 +75,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
                       << "34324897shdfjk948577342343243243",
         QString(),
         std::nullopt,
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
     ROW("configuration-notify",
@@ -89,7 +89,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         std::nullopt,
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
     ROW("configuration",
@@ -112,7 +112,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         std::nullopt,
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         QXmppDataForm(QXmppDataForm::Result,
                       QList<QXmppDataForm::Field>()
                           << QXmppDataForm::Field(QXmppDataForm::Field::HiddenField,
@@ -133,7 +133,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         std::nullopt,
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
     ROW("subscription-subscribed",
@@ -147,7 +147,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         QXmppPubSubSubscription("horatio@denmark.lit", "princely_musings", {}, QXmppPubSubSubscription::Subscribed),
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
     ROW("subscription-none",
@@ -161,7 +161,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
         QStringList(),
         QString(),
         QXmppPubSubSubscription("polonius@denmark.lit", "princely_musings", {}, QXmppPubSubSubscription::None),
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
     ROW("subscription-expiry",
@@ -180,7 +180,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
                                 QXmppPubSubSubscription::Subscribed,
                                 QXmppPubSubSubscription::Unavailable,
                                 QDateTime({ 2006, 02, 28 }, { 23, 59, 59 }, Qt::UTC)),
-        QVector<QXmppPubSubItem>(),
+        QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 
 #undef ROW
@@ -194,7 +194,7 @@ void tst_QXmppPubSubEvent::testBasic()
     QFETCH(QStringList, retractIds);
     QFETCH(QString, redirectUri);
     QFETCH(std::optional<QXmppPubSubSubscription>, subscription);
-    QFETCH(QVector<QXmppPubSubItem>, items);
+    QFETCH(QVector<QXmppPubSubBaseItem>, items);
     QFETCH(std::optional<QXmppDataForm>, configurationForm);
 
     // parse

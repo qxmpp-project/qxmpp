@@ -146,7 +146,7 @@ bool QXmppGeolocItem::isItem(const QDomElement &itemElement)
             payload.namespaceURI() == ns_geoloc;
     };
 
-    return QXmppPubSubItem::isItem(itemElement, isPayloadValid);
+    return QXmppPubSubBaseItem::isItem(itemElement, isPayloadValid);
 }
 
 /// \cond

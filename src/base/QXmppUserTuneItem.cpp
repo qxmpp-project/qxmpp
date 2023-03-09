@@ -224,7 +224,7 @@ bool QXmppTuneItem::isItem(const QDomElement &itemElement)
             payload.namespaceURI() == ns_tune;
     };
 
-    return QXmppPubSubItem::isItem(itemElement, isPayloadValid);
+    return QXmppPubSubBaseItem::isItem(itemElement, isPayloadValid);
 }
 
 /// \cond

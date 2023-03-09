@@ -52,7 +52,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppPubSubAffiliation.h
     base/QXmppPubSubEvent.h
     base/QXmppPubSubIq_p.h
-    base/QXmppPubSubItem.h
+    base/QXmppPubSubBaseItem.h
     base/QXmppPubSubMetadata.h
     base/QXmppPubSubNodeConfig.h
     base/QXmppPubSubPublishOptions.h
@@ -184,7 +184,7 @@ set(SOURCE_FILES
     base/QXmppPubSubAffiliation.cpp
     base/QXmppPubSubEvent.cpp
     base/QXmppPubSubIq.cpp
-    base/QXmppPubSubItem.cpp
+    base/QXmppPubSubBaseItem.cpp
     base/QXmppPubSubMetadata.cpp
     base/QXmppPubSubNodeConfig.cpp
     base/QXmppPubSubSubscribeOptions.cpp

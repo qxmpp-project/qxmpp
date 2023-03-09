@@ -5,17 +5,17 @@
 #ifndef PUBSUBUTIL_H
 #define PUBSUBUTIL_H
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
 #include <QtTest/QTest>
 
-class TestItem : public QXmppPubSubItem
+class TestItem : public QXmppPubSubBaseItem
 {
 public:
     TestItem(const QString &id = {})
-        : QXmppPubSubItem(id)
+        : QXmppPubSubBaseItem(id)
     {
     }
 
@@ -34,7 +34,7 @@ public:
     static bool isItem(const QDomElement &element)
     {
         isItemCalled = true;
-        return QXmppPubSubItem::isItem(element, [](const QDomElement &payload) {
+        return QXmppPubSubBaseItem::isItem(element, [](const QDomElement &payload) {
             return payload.tagName() == "test-payload";
         });
     }

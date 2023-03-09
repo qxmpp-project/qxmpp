@@ -8,7 +8,7 @@
 #include "QXmppMessage.h"
 #include "QXmppPubSubAffiliation.h"
 #include "QXmppPubSubEventHandler.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 #include "QXmppPubSubManager.h"
 #include "QXmppPubSubPublishOptions.h"
 #include "QXmppPubSubSubscribeOptions.h"
@@ -421,7 +421,7 @@ void tst_QXmppPubSubManager::testPublishItems_data()
     QTest::addColumn<bool>("isPep");
     QTest::addColumn<QString>("jid");
     QTest::addColumn<QString>("node");
-    QTest::addColumn<QVector<QXmppPubSubItem>>("items");
+    QTest::addColumn<QVector<QXmppPubSubBaseItem>>("items");
     QTest::addColumn<OptionsOpt>("publishOptions");
     QTest::addColumn<bool>("returnIds");
 
@@ -434,14 +434,14 @@ void tst_QXmppPubSubManager::testPublishItems_data()
     item2.setArtist("Rick Astley");
     item2.setTitle("Never gonna give you up");
 
-    QVector<QXmppPubSubItem> items1 { item1 };
-    QVector<QXmppPubSubItem> items2 { item1, item2 };
+    QVector<QXmppPubSubBaseItem> items1 { item1 };
+    QVector<QXmppPubSubBaseItem> items2 { item1, item2 };
 
     QXmppPubSubPublishOptions publishOptions;
     publishOptions.setAccessModel(QXmppPubSubPublishOptions::Presence);
 
     auto addRow = [&](const char *name, bool isPep, QString &&jid,
-                      QString &&node, const QVector<QXmppPubSubItem> &items) {
+                      QString &&node, const QVector<QXmppPubSubBaseItem> &items) {
         QTest::addRow("%s", name) << isPep << jid << node << items << OptionsOpt() << false;
         QTest::addRow("%s%s", name, "ReturnIds") << isPep << jid << node << items << OptionsOpt() << true;
         QTest::addRow("%s%s", name, "WithOptions") << isPep << jid << node << items << std::make_optional(publishOptions) << false;
@@ -459,7 +459,7 @@ void tst_QXmppPubSubManager::testPublishItems()
     QFETCH(bool, isPep);
     QFETCH(QString, jid);
     QFETCH(QString, node);
-    QFETCH(QVector<QXmppPubSubItem>, items);
+    QFETCH(QVector<QXmppPubSubBaseItem>, items);
     QFETCH(std::optional<QXmppPubSubPublishOptions>, publishOptions);
     QFETCH(bool, returnIds);
 
@@ -736,7 +736,7 @@ void tst_QXmppPubSubManager::testRequestCurrentItem()
                                "</items>"
                                "</pubsub></iq>"));
 
-    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    const auto item = expectFutureVariant<QXmppPubSubBaseItem>(future);
     QCOMPARE(item.id(), QStringLiteral("current"));
 }
 
@@ -892,7 +892,7 @@ void tst_QXmppPubSubManager::testRequestCurrentPepItem()
                                "</items>"
                                "</pubsub></iq>"));
 
-    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    const auto item = expectFutureVariant<QXmppPubSubBaseItem>(future);
     QCOMPARE(item.id(), QStringLiteral("current"));
 }
 
@@ -915,7 +915,7 @@ void tst_QXmppPubSubManager::testRequestPepItem()
                                "</items>"
                                "</pubsub></iq>"));
 
-    const auto item = expectFutureVariant<QXmppPubSubItem>(future);
+    const auto item = expectFutureVariant<QXmppPubSubBaseItem>(future);
     QCOMPARE(item.id(), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
 }
 
@@ -937,7 +937,7 @@ void tst_QXmppPubSubManager::testRequestPepItems()
                                "</items>"
                                "</pubsub></iq>"));
 
-    const auto items = expectFutureVariant<QXmppPubSubManager::Items<QXmppPubSubItem>>(future);
+    const auto items = expectFutureVariant<QXmppPubSubManager::Items<QXmppPubSubBaseItem>>(future);
     QCOMPARE(items.items.first().id(), QStringLiteral("368866411b877c30064a5f62b917cffe"));
     QCOMPARE(items.items.last().id(), QStringLiteral("3300659945416e274474e469a1f0154c"));
 }

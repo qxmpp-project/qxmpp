@@ -3,47 +3,47 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include "QXmppElement.h"
 #include "QXmppUtils.h"
 
 #include <QDomElement>
 
-class QXmppPubSubItemPrivate : public QSharedData
+class QXmppPubSubBaseItemPrivate : public QSharedData
 {
 public:
-    QXmppPubSubItemPrivate(const QString &id, const QString &publisher);
+    QXmppPubSubBaseItemPrivate(const QString &id, const QString &publisher);
 
     QString id;
     QString publisher;
 };
 
-QXmppPubSubItemPrivate::QXmppPubSubItemPrivate(const QString &id, const QString &publisher)
+QXmppPubSubBaseItemPrivate::QXmppPubSubBaseItemPrivate(const QString &id, const QString &publisher)
     : id(id), publisher(publisher)
 {
 }
 
 ///
-/// \class QXmppPubSubItem
+/// \class QXmppPubSubBaseItem
 ///
-/// The QXmppPubSubItem class represents a publish-subscribe item as defined by
+/// The QXmppPubSubBaseItem class represents a publish-subscribe item as defined by
 /// \xep{0060, Publish-Subscribe}.
 ///
 /// To access the payload of an item, you need to create a derived class of this
-/// and override QXmppPubSubItem::parsePayload() and
-/// QXmppPubSubItem::serializePayload().
+/// and override QXmppPubSubBaseItem::parsePayload() and
+/// QXmppPubSubBaseItem::serializePayload().
 ///
-/// It is also required that you override QXmppPubSubItem::isItem() and also
+/// It is also required that you override QXmppPubSubBaseItem::isItem() and also
 /// check for the correct payload of the PubSub item. This can be easily done by
 /// using the protected overload of isItem() with an function that checks the
 /// tag name and namespace of the payload. The function is only called if a
 /// payload exists.
 ///
 /// In short, you need to reimplement these methods:
-///  * QXmppPubSubItem::parsePayload()
-///  * QXmppPubSubItem::serializePayload()
-///  * QXmppPubSubItem::isItem()
+///  * QXmppPubSubBaseItem::parsePayload()
+///  * QXmppPubSubBaseItem::serializePayload()
+///  * QXmppPubSubBaseItem::isItem()
 ///
 /// \since QXmpp 1.5
 ///
@@ -54,25 +54,25 @@ QXmppPubSubItemPrivate::QXmppPubSubItemPrivate(const QString &id, const QString 
 /// \param id
 /// \param publisher
 ///
-QXmppPubSubItem::QXmppPubSubItem(const QString &id, const QString &publisher)
-    : d(new QXmppPubSubItemPrivate(id, publisher))
+QXmppPubSubBaseItem::QXmppPubSubBaseItem(const QString &id, const QString &publisher)
+    : d(new QXmppPubSubBaseItemPrivate(id, publisher))
 {
 }
 
 /// Default copy-constructor
-QXmppPubSubItem::QXmppPubSubItem(const QXmppPubSubItem &iq) = default;
+QXmppPubSubBaseItem::QXmppPubSubBaseItem(const QXmppPubSubBaseItem &iq) = default;
 /// Default move-constructor
-QXmppPubSubItem::QXmppPubSubItem(QXmppPubSubItem &&) = default;
-QXmppPubSubItem::~QXmppPubSubItem() = default;
+QXmppPubSubBaseItem::QXmppPubSubBaseItem(QXmppPubSubBaseItem &&) = default;
+QXmppPubSubBaseItem::~QXmppPubSubBaseItem() = default;
 /// Default assignment operator
-QXmppPubSubItem &QXmppPubSubItem::operator=(const QXmppPubSubItem &iq) = default;
+QXmppPubSubBaseItem &QXmppPubSubBaseItem::operator=(const QXmppPubSubBaseItem &iq) = default;
 /// Default move-assignment operator
-QXmppPubSubItem &QXmppPubSubItem::operator=(QXmppPubSubItem &&iq) = default;
+QXmppPubSubBaseItem &QXmppPubSubBaseItem::operator=(QXmppPubSubBaseItem &&iq) = default;
 
 ///
 /// Returns the ID of the PubSub item.
 ///
-QString QXmppPubSubItem::id() const
+QString QXmppPubSubBaseItem::id() const
 {
     return d->id;
 }
@@ -82,7 +82,7 @@ QString QXmppPubSubItem::id() const
 ///
 /// \param id
 ///
-void QXmppPubSubItem::setId(const QString &id)
+void QXmppPubSubBaseItem::setId(const QString &id)
 {
     d->id = id;
 }
@@ -90,7 +90,7 @@ void QXmppPubSubItem::setId(const QString &id)
 ///
 /// Returns the JID of the publisher of the item.
 ///
-QString QXmppPubSubItem::publisher() const
+QString QXmppPubSubBaseItem::publisher() const
 {
     return d->publisher;
 }
@@ -98,13 +98,13 @@ QString QXmppPubSubItem::publisher() const
 ///
 /// Sets the JID of the publisher of the item.
 ///
-void QXmppPubSubItem::setPublisher(const QString &publisher)
+void QXmppPubSubBaseItem::setPublisher(const QString &publisher)
 {
     d->publisher = publisher;
 }
 
 /// \cond
-void QXmppPubSubItem::parse(const QDomElement &element)
+void QXmppPubSubBaseItem::parse(const QDomElement &element)
 {
     d->id = element.attribute(QStringLiteral("id"));
     d->publisher = element.attribute(QStringLiteral("publisher"));
@@ -112,7 +112,7 @@ void QXmppPubSubItem::parse(const QDomElement &element)
     parsePayload(element.firstChildElement());
 }
 
-void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
+void QXmppPubSubBaseItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
     helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
@@ -127,7 +127,7 @@ void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
 ///
 /// Returns true, if the element is possibly a PubSub item.
 ///
-bool QXmppPubSubItem::isItem(const QDomElement &element)
+bool QXmppPubSubBaseItem::isItem(const QDomElement &element)
 {
     return element.tagName() == QStringLiteral("item");
 }
@@ -137,7 +137,7 @@ bool QXmppPubSubItem::isItem(const QDomElement &element)
 ///
 /// This method needs to be overriden to perform the payload-specific parsing.
 ///
-void QXmppPubSubItem::parsePayload(const QDomElement &)
+void QXmppPubSubBaseItem::parsePayload(const QDomElement &)
 {
 }
 
@@ -147,6 +147,6 @@ void QXmppPubSubItem::parsePayload(const QDomElement &)
 /// This method needs to be overriden to perform the payload-specific
 /// serialization.
 ///
-void QXmppPubSubItem::serializePayload(QXmlStreamWriter *) const
+void QXmppPubSubBaseItem::serializePayload(QXmlStreamWriter *) const
 {
 }

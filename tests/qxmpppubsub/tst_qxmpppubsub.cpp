@@ -211,7 +211,7 @@ void tst_QXmppPubSub::testItem()
 {
     const auto xml = QByteArrayLiteral("<item id=\"abc1337\" publisher=\"lnj@qxmpp.org\"/>");
 
-    QXmppPubSubItem item;
+    QXmppPubSubBaseItem item;
     parsePacket(item, xml);
 
     QCOMPARE(item.id(), QStringLiteral("abc1337"));
@@ -221,11 +221,11 @@ void tst_QXmppPubSub::testItem()
     serializePacket(item, xml);
 
     // test serialization with constructor values
-    item = QXmppPubSubItem("abc1337", "lnj@qxmpp.org");
+    item = QXmppPubSubBaseItem("abc1337", "lnj@qxmpp.org");
     serializePacket(item, xml);
 
     // test serialization with setters
-    item = QXmppPubSubItem();
+    item = QXmppPubSubBaseItem();
     item.setId("abc1337");
     item.setPublisher("lnj@qxmpp.org");
     serializePacket(item, xml);
@@ -261,7 +261,7 @@ void tst_QXmppPubSub::testIsItem()
     QFETCH(QByteArray, xml);
     QFETCH(bool, valid);
 
-    QCOMPARE(QXmppPubSubItem::isItem(xmlToDom(xml)), valid);
+    QCOMPARE(QXmppPubSubBaseItem::isItem(xmlToDom(xml)), valid);
 }
 
 void tst_QXmppPubSub::testTestItem()
