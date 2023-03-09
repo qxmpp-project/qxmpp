@@ -896,8 +896,12 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
         const QByteArray key = ba.mid(startIndex, pos - startIndex).trimmed();
         pos++;
 
-        // check whether string is quoted
-        if (ba.at(pos) == '"') {
+        if (pos == ba.size()) {
+            // end of the input
+            map.insert(key, QByteArray());
+            startIndex = pos;
+        } else if (ba.at(pos) == '"') {
+            // check whether string is quoted
             // skip opening quote
             pos++;
             int endPos = ba.indexOf('"', pos);

@@ -28,6 +28,7 @@ private:
     Q_SLOT void testClientAnonymous();
     Q_SLOT void testClientDigestMd5();
     Q_SLOT void testClientDigestMd5_data();
+    Q_SLOT void testDigestMd5ParseMessage();
     Q_SLOT void testClientFacebook();
     Q_SLOT void testClientGoogle();
     Q_SLOT void testClientPlain();
@@ -218,6 +219,15 @@ void tst_QXmppSasl::testClientDigestMd5_data()
     QTest::newRow("qop-none") << QByteArray();
     QTest::newRow("qop-auth") << QByteArray(",qop=\"auth\"");
     QTest::newRow("qop-multi") << QByteArray(",qop=\"auth,auth-int\"");
+}
+
+void tst_QXmppSasl::testDigestMd5ParseMessage()
+{
+    auto result = QXmppSaslDigestMd5::parseMessage("charset=utf-8,digest-uri=\"xmpp/0.0.0.0\",nc=00000001,qop=auth,realm=0.0.0.0,response=9c3ee0a919d714c9d72853ff51c0a4f3,username=");
+    QCOMPARE(result["username"], QByteArray());
+
+    result = QXmppSaslDigestMd5::parseMessage("nc=00000001,username=,qop=auth,realm=0.0.0.0,response=9c3ee0a919d714c9d72853ff51c0a4f3");
+    QCOMPARE(result["username"], QByteArray());
 }
 
 void tst_QXmppSasl::testClientDigestMd5()
