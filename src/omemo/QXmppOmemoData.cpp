@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppConstants_p.h"
 #include "QXmppOmemoDeviceBundle_p.h"
 #include "QXmppOmemoDeviceElement_p.h"
 #include "QXmppOmemoDeviceList_p.h"
@@ -13,6 +12,8 @@
 
 #include <QDomElement>
 #include <QHash>
+
+const char *ns_omemo_2 = "urn:xmpp:omemo:2";
 
 /// \cond
 ///
