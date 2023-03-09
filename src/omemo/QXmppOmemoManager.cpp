@@ -885,13 +885,16 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
                     auto future = d->buildSessionWithDeviceBundle(jid, deviceId, device);
                     future.then(this, [=](auto) mutable {
                         if (++(*processedDevicesCount) == devicesCount) {
+                            interface.finish()
                         }
                     });
                 } else if (++(*processedDevicesCount) == devicesCount) {
+                    interface.finish()
                 }
             }
         }
     } else {
+        interface.finish()
     }
 
     return interface.task();
