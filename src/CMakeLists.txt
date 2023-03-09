@@ -81,6 +81,8 @@ set(INSTALL_HEADER_FILES
     base/QXmppUtils.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
+    base/compat/QXmppPubSubIq.h
+    base/compat/QXmppPubSubItem.h
 
     # Client
     client/QXmppArchiveManager.h
@@ -212,6 +214,8 @@ set(SOURCE_FILES
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
+    base/compat/QXmppPubSubIq.cpp
+    base/compat/QXmppPubSubItem.cpp
 
     # Client
     client/QXmppArchiveManager.cpp
