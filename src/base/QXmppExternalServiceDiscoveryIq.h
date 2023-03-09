@@ -7,7 +7,6 @@
 
 #include "QXmppIq.h"
 
-#include <QDateTime>
 #include <QSharedDataPointer>
 
 class QDateTime;

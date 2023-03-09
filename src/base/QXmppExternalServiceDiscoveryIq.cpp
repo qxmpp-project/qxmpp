@@ -90,6 +90,8 @@ public:
 /// QXmppExternalService represents a related XMPP entity that can be queried using \xep{0215,
 /// External Service Discovery}.
 ///
+/// \since QXmpp 1.6
+///
 
 QXmppExternalService::QXmppExternalService()
     : d(new QXmppExternalServicePrivate)
@@ -275,7 +277,7 @@ bool QXmppExternalService::isExternalService(const QDomElement &element)
 ///
 void QXmppExternalService::parse(const QDomElement &el)
 {
-    QDomNamedNodeMap attributes { el.attributes() };
+    QDomNamedNodeMap attributes = el.attributes();
 
     setHost(el.attribute("host"));
     setType(el.attribute("type"));
@@ -411,7 +413,7 @@ void QXmppExternalServiceDiscoveryIq::addExternalService(const QXmppExternalServ
 ///
 bool QXmppExternalServiceDiscoveryIq::isExternalServiceDiscoveryIq(const QDomElement &element)
 {
-    const QDomElement &child { element.firstChildElement() };
+    auto child = element.firstChildElement();
     return checkIqType(child.tagName(), child.namespaceURI());
 }
 
@@ -426,17 +428,14 @@ bool QXmppExternalServiceDiscoveryIq::checkIqType(const QString &tagName, const 
 /// \cond
 void QXmppExternalServiceDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement el { element.firstChildElement("services").firstChildElement() };
-
-    while (!el.isNull()) {
-        QXmppExternalService service;
-
+    for (auto el = element.firstChildElement("services").firstChildElement();
+         !el.isNull();
+         el = el.nextSiblingElement()) {
         if (QXmppExternalService::isExternalService(el)) {
+            QXmppExternalService service;
             service.parse(el);
-            d->externalServices.append(service);
+            d->externalServices.append(std::move(service));
         }
-
-        el = el.nextSiblingElement();
     }
 }
 

@@ -4,20 +4,16 @@
 
 #include "QXmppExternalServiceDiscoveryManager.h"
 
-#include "QXmppConstants_p.h"
-#include "QXmppExternalServiceDiscoveryIq.h"
-#include "QXmppFutureUtils_p.h"
+#include "QXmppClient.h"
 #include "QXmppIqHandling.h"
-
-#include <QCoreApplication>
-#include <QDomElement>
+#include "QXmppConstants_p.h"
 
 using namespace QXmpp::Private;
 
 ///
 /// \brief The QXmppExternalServiceDiscoveryManager class makes it possible to
 /// discover information about external services from providers
-/// as defined by \xep{0215}: External Service Discovery.
+/// as defined by \xep{0215, External Service Discovery}.
 ///
 /// To make use of this manager, you need to instantiate it and load it into
 /// the QXmppClient instance as follows:
