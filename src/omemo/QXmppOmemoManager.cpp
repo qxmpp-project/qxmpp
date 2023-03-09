@@ -14,6 +14,9 @@
 
 #include <QStringBuilder>
 
+#undef max
+#undef interface
+
 using namespace QXmpp;
 using namespace QXmpp::Private;
 using namespace QXmpp::Omemo::Private;
