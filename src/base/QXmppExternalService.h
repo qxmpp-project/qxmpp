@@ -6,9 +6,13 @@
 
 #include "QXmppGlobal.h"
 
+#include <optional>
+
 #include <QSharedDataPointer>
 
 class QDateTime;
+class QDomElement;
+class QXmlStreamWriter;
 class QXmppExternalServicePrivate;
 
 class QXMPP_EXPORT QXmppExternalService
@@ -25,11 +29,11 @@ public:
         Modify
     };
 
-            ///
-            /// Describes the packet type of an external service IQ.
-            ///
-            /// \since QXmpp 1.6
-            ///
+    ///
+    /// Describes the packet type of an external service IQ.
+    ///
+    /// \since QXmpp 1.6
+    ///
     enum class Transport {
         Tcp,
         Udp

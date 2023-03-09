@@ -5,8 +5,8 @@
 #ifndef QXMPPEXTERNALSERVICEDISCOVERYIQ_H
 #define QXMPPEXTERNALSERVICEDISCOVERYIQ_H
 
-#include "QXmppIq.h"
 #include "QXmppExternalService.h"
+#include "QXmppIq.h"
 
 class QXmppExternalServiceDiscoveryIqPrivate;
 

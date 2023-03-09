@@ -7,9 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
-#include <QTimeZone>
+#include <QDateTime>
 #include <QDomElement>
-#include <QRegularExpression>
 
 using Action = QXmppExternalService::Action;
 using Transport = QXmppExternalService::Transport;
@@ -161,7 +160,7 @@ std::optional<QDateTime> QXmppExternalService::expires() const
 ///
 void QXmppExternalService::setExpires(std::optional<QDateTime> expires)
 {
-    d->expires = expires;
+    d->expires = std::move(expires);
 }
 
 ///
@@ -177,7 +176,7 @@ std::optional<QString> QXmppExternalService::name() const
 ///
 void QXmppExternalService::setName(std::optional<QString> name)
 {
-    d->name = name;
+    d->name = std::move(name);
 }
 
 ///
@@ -193,7 +192,7 @@ std::optional<QString> QXmppExternalService::password() const
 ///
 void QXmppExternalService::setPassword(std::optional<QString> password)
 {
-    d->password = password;
+    d->password = std::move(password);
 }
 
 ///
@@ -256,7 +255,7 @@ std::optional<QString> QXmppExternalService::username() const
 ///
 void QXmppExternalService::setUsername(std::optional<QString> username)
 {
-    d->username = username;
+    d->username = std::move(username);
 }
 
 ///
