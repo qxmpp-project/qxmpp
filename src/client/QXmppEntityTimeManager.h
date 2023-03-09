@@ -13,7 +13,7 @@
 template<class T>
 class QXmppTask;
 class QXmppEntityTimeIq;
-class QXmppError;
+struct QXmppError;
 
 ///
 /// \brief The QXmppEntityTimeManager class provided the functionality to get
