@@ -4,13 +4,29 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.3 (Mar 11, 2023)
+--------------------------
+
+Fixes:
+ - MAM: Fix task is never finished when none of the messages is encrypted but
+   e2ee is enabled (@lnjX)
+ - SaslDigestMd5: Fix undefined behaviour with Qt 6 when parsing empty property
+   at the end of the input (@lnjX)
+ - CarbonManagerV2: Fix enable IQ sending (@melvo)
+ - Fix various OMEMO issues and update to libomemo-c 0.5 (@melvo)
+ - Fix compilation (inclunding omemo module) with MSVC 2019 (@JBBgameich)
+ - Fix library files installation directory on windows (@lnjX)
+
+Misc:
+ - Add CMake option to manually specify Qt major version (@TheBluestBird)
+ - Readd old PubSubIq and PubSubItem after justified complaints (@lnjX)
+
 QXmpp 1.5.2 (Feb 23, 2023)
 --------------------------
 
 Fixes:
  - Fix undefined behaviour in OmemoManager and FileSharingManager (@lnjX)
  - STUN: Fix nonce attribute is not padded (@Choochmeque)
-
 
 QXmpp 1.5.1 (Feb 01, 2023)
 --------------------------
