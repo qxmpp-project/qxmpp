@@ -25,8 +25,8 @@
 class QXmppSceEnvelopeReader
 {
 public:
-    QXmppSceEnvelopeReader(const QDomElement &element)
-        : element(element)
+    QXmppSceEnvelopeReader(QDomElement &&element)
+        : element(std::move(element))
     {
     }
 
@@ -51,7 +51,7 @@ public:
     // rpad is usually not needed (but can be parsed manually if really needed)
 
 private:
-    const QDomElement &element;
+    QDomElement element;
 };
 
 class QXmppSceEnvelopeWriter

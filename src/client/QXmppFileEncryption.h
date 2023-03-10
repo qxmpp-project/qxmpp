@@ -23,9 +23,9 @@ enum Direction {
     Decode,
 };
 
-QByteArray process(const QByteArray &data, Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv);
-QByteArray generateKey(Cipher cipher);
-QByteArray generateInitializationVector(Cipher);
+QXMPP_EXPORT QByteArray process(const QByteArray &data, Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv);
+QXMPP_EXPORT QByteArray generateKey(Cipher cipher);
+QXMPP_EXPORT QByteArray generateInitializationVector(Cipher);
 
 // export for tests
 class QXMPP_EXPORT EncryptionDevice : public QIODevice
@@ -50,7 +50,7 @@ private:
     std::unique_ptr<QCA::Cipher> m_cipher;
 };
 
-class DecryptionDevice : public QIODevice
+class QXMPP_EXPORT DecryptionDevice : public QIODevice
 {
 public:
     DecryptionDevice(std::unique_ptr<QIODevice> output, Cipher config, const QByteArray &key, const QByteArray &iv);

@@ -4,11 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppClient.h"
-#include "QXmppConstants_p.h"
-#include "QXmppOmemoDeviceElement_p.h"
-#include "QXmppOmemoDeviceList_p.h"
 #include "QXmppOmemoElement_p.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"
 #include "QXmppOmemoManager_p.h"
@@ -17,6 +13,9 @@
 #include "QXmppUtils.h"
 
 #include <QStringBuilder>
+
+#undef max
+#undef interface
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
@@ -669,7 +668,7 @@ QXmppOmemoOwnDevice Manager::ownDevice()
 
     QXmppOmemoOwnDevice device;
     device.setLabel(ownDevice.label);
-    device.setKeyId(createKeyId(ownDevice.publicIdentityKey));
+    device.setKeyId(ownDevice.publicIdentityKey);
 
     return device;
 }
@@ -885,13 +884,16 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
                     auto future = d->buildSessionWithDeviceBundle(jid, deviceId, device);
                     future.then(this, [=](auto) mutable {
                         if (++(*processedDevicesCount) == devicesCount) {
+                            interface.finish();
                         }
                     });
                 } else if (++(*processedDevicesCount) == devicesCount) {
+                    interface.finish();
                 }
             }
         }
     } else {
+        interface.finish();
     }
 
     return interface.task();

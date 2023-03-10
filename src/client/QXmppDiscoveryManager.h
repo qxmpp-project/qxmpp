@@ -15,7 +15,7 @@ class QXmppTask;
 class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManagerPrivate;
-class QXmppError;
+struct QXmppError;
 
 /// \brief The QXmppDiscoveryManager class makes it possible to discover information
 /// about other entities as defined by \xep{0030}: Service Discovery.

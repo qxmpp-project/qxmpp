@@ -79,13 +79,13 @@ public:
     QXmppTask<InstantNodeResult> createInstantNode(const QString &jid, const QXmppPubSubNodeConfig &config);
     QXmppTask<Result> deleteNode(const QString &jid, const QString &nodeName);
     QXmppTask<ItemIdsResult> requestItemIds(const QString &serviceJid, const QString &nodeName);
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, const QString &itemId);
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemResult<T>> requestItem(const QString &jid, const QString &nodeName, StandardItemId itemId);
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName);
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemsResult<T>> requestItems(const QString &jid, const QString &nodeName, const QStringList &itemIds);
     template<typename T>
     QXmppTask<PublishItemResult> publishItem(const QString &jid, const QString &nodeName, const T &item);
@@ -118,11 +118,11 @@ public:
     QXmppTask<Result> createOwnPepNode(const QString &nodeName) { return createNode(client()->configuration().jidBare(), nodeName); }
     QXmppTask<Result> createOwnPepNode(const QString &nodeName, const QXmppPubSubNodeConfig &config) { return createNode(client()->configuration().jidBare(), nodeName, config); }
     QXmppTask<Result> deleteOwnPepNode(const QString &nodeName) { return deleteNode(client()->configuration().jidBare(), nodeName); }
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemResult<T>> requestOwnPepItem(const QString &nodeName, const QString &itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemResult<T>> requestOwnPepItem(const QString &nodeName, StandardItemId itemId) { return requestItem<T>(client()->configuration().jidBare(), nodeName, itemId); }
-    template<typename T = QXmppPubSubItem>
+    template<typename T = QXmppPubSubBaseItem>
     QXmppTask<ItemsResult<T>> requestOwnPepItems(const QString &nodeName) { return requestItems(client()->configuration().jidBare(), nodeName); }
     QXmppTask<ItemIdsResult> requestOwnPepItemIds(const QString &nodeName) { return requestItemIds(client()->configuration().jidBare(), nodeName); }
     template<typename T>

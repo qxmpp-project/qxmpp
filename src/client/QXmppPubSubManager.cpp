@@ -10,7 +10,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppPubSubAffiliation.h"
 #include "QXmppPubSubEventHandler.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 #include "QXmppPubSubSubscribeOptions.h"
 #include "QXmppPubSubSubscription.h"
 #include "QXmppStanza.h"
@@ -435,7 +435,7 @@ auto QXmppPubSubManager::retractItem(const QString &jid, const QString &nodeName
     request.setType(QXmppIq::Set);
     request.setQueryType(PubSubIq<>::Retract);
     request.setQueryNode(nodeName);
-    request.setItems({ QXmppPubSubItem(itemId) });
+    request.setItems({ QXmppPubSubBaseItem(itemId) });
     request.setTo(jid);
 
     return client()->sendGenericIq(std::move(request));
@@ -1006,10 +1006,10 @@ PubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QString 
     request.setQueryNode(nodeName);
 
     if (!itemIds.isEmpty()) {
-        QVector<QXmppPubSubItem> items;
+        QVector<QXmppPubSubBaseItem> items;
         items.reserve(itemIds.size());
         for (const auto &id : itemIds) {
-            items << QXmppPubSubItem(id);
+            items << QXmppPubSubBaseItem(id);
         }
         request.setItems(items);
     }
@@ -1038,7 +1038,7 @@ auto QXmppPubSubManager::publishItems(PubSubIqBase &&request) -> QXmppTask<Publi
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const PubSubIq<> &iq) -> PublishItemsResult {
-                       const auto itemToId = [](const QXmppPubSubItem &item) {
+                       const auto itemToId = [](const QXmppPubSubBaseItem &item) {
                            return item.id();
                        };
 

@@ -5,7 +5,7 @@
 #ifndef QXMPPGEOLOCITEM_H
 #define QXMPPGEOLOCITEM_H
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include <optional>
 
@@ -13,7 +13,7 @@
 
 class QXmppGeolocItemPrivate;
 
-class QXMPP_EXPORT QXmppGeolocItem : public QXmppPubSubItem
+class QXMPP_EXPORT QXmppGeolocItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppGeolocItem();

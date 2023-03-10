@@ -45,7 +45,7 @@ public:
 #ifdef QXMPP_DOC
     void reportFinished(T &&value)
 #else
-    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_same_v<T, U>> * = nullptr>
+    template<typename U, typename TT = T, std::enable_if_t<!std::is_void_v<TT> && std::is_same_v<TT, U>> * = nullptr>
     void finish(U &&value)
 #endif
     {
@@ -61,7 +61,7 @@ public:
     }
 
     /// \cond
-    template<typename U, std::enable_if_t<!std::is_void_v<T> && std::is_constructible_v<T, U> && !std::is_same_v<T, U>> * = nullptr>
+    template<typename U, typename TT = T, std::enable_if_t<!std::is_void_v<TT> && std::is_constructible_v<TT, U> && !std::is_same_v<TT, U>> * = nullptr>
     void finish(U &&value)
     {
         Q_ASSERT(!d.isFinished());

@@ -54,7 +54,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppPubSubAffiliation.h
     base/QXmppPubSubEvent.h
     base/QXmppPubSubIq_p.h
-    base/QXmppPubSubItem.h
+    base/QXmppPubSubBaseItem.h
     base/QXmppPubSubMetadata.h
     base/QXmppPubSubNodeConfig.h
     base/QXmppPubSubPublishOptions.h
@@ -83,6 +83,8 @@ set(INSTALL_HEADER_FILES
     base/QXmppUtils.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
+    base/compat/QXmppPubSubIq.h
+    base/compat/QXmppPubSubItem.h
 
     # Client
     client/QXmppArchiveManager.h
@@ -188,7 +190,7 @@ set(SOURCE_FILES
     base/QXmppPubSubAffiliation.cpp
     base/QXmppPubSubEvent.cpp
     base/QXmppPubSubIq.cpp
-    base/QXmppPubSubItem.cpp
+    base/QXmppPubSubBaseItem.cpp
     base/QXmppPubSubMetadata.cpp
     base/QXmppPubSubNodeConfig.cpp
     base/QXmppPubSubSubscribeOptions.cpp
@@ -216,6 +218,8 @@ set(SOURCE_FILES
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
+    base/compat/QXmppPubSubIq.cpp
+    base/compat/QXmppPubSubItem.cpp
 
     # Client
     client/QXmppArchiveManager.cpp
@@ -365,8 +369,10 @@ generate_export_header(qxmpp
 
 install(
     TARGETS qxmpp
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     EXPORT QXmppTarget
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(

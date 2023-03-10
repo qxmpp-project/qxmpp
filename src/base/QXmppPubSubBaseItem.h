@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBITEM_H
-#define QXMPPPUBSUBITEM_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -13,18 +12,18 @@
 #include <QSharedDataPointer>
 
 class QXmlStreamWriter;
-class QXmppPubSubItemPrivate;
+class QXmppPubSubBaseItemPrivate;
 
-class QXMPP_EXPORT QXmppPubSubItem
+class QXMPP_EXPORT QXmppPubSubBaseItem
 {
 public:
-    QXmppPubSubItem(const QString &id = {}, const QString &publisher = {});
-    QXmppPubSubItem(const QXmppPubSubItem &);
-    QXmppPubSubItem(QXmppPubSubItem &&);
-    virtual ~QXmppPubSubItem();
+    QXmppPubSubBaseItem(const QString &id = {}, const QString &publisher = {});
+    QXmppPubSubBaseItem(const QXmppPubSubBaseItem &);
+    QXmppPubSubBaseItem(QXmppPubSubBaseItem &&);
+    virtual ~QXmppPubSubBaseItem();
 
-    QXmppPubSubItem &operator=(const QXmppPubSubItem &);
-    QXmppPubSubItem &operator=(QXmppPubSubItem &&);
+    QXmppPubSubBaseItem &operator=(const QXmppPubSubBaseItem &);
+    QXmppPubSubBaseItem &operator=(QXmppPubSubBaseItem &&);
 
     QString id() const;
     void setId(const QString &id);
@@ -47,7 +46,7 @@ protected:
     static bool isItem(const QDomElement &element, PayloadChecker isPayloadValid);
 
 private:
-    QSharedDataPointer<QXmppPubSubItemPrivate> d;
+    QSharedDataPointer<QXmppPubSubBaseItemPrivate> d;
 };
 
 ///
@@ -70,7 +69,7 @@ private:
 /// \endcode
 ///
 template<typename PayloadChecker>
-bool QXmppPubSubItem::isItem(const QDomElement &element, PayloadChecker isPayloadValid)
+bool QXmppPubSubBaseItem::isItem(const QDomElement &element, PayloadChecker isPayloadValid)
 {
     if (!isItem(element)) {
         return false;
@@ -85,6 +84,4 @@ bool QXmppPubSubItem::isItem(const QDomElement &element, PayloadChecker isPayloa
     return true;
 }
 
-Q_DECLARE_METATYPE(QXmppPubSubItem)
-
-#endif  // QXMPPPUBSUBITEM_H
+Q_DECLARE_METATYPE(QXmppPubSubBaseItem)

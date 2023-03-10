@@ -14,9 +14,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Xml)
+if(NOT DEFINED QT_VERSION_MAJOR)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Xml)
+endif()
 message("-- Choosing Qt ${QT_VERSION_MAJOR}")
 find_package(Qt${QT_VERSION_MAJOR} 5.15.0 REQUIRED COMPONENTS Core Network Xml)
+
 # QCA (optional)
 find_package(Qca-qt${QT_VERSION_MAJOR} QUIET)
 if(${QT_VERSION_MAJOR} EQUAL 6)

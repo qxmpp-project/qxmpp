@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppPubSubIq_p.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 #include "QXmppPubSubSubscription.h"
 #include "QXmppResultSet.h"
 
@@ -193,7 +193,7 @@ void tst_QXmppPubSubIq::testPublish()
     serializePacket(iq, xml);
 
     // serialize using setters
-    QXmppPubSubItem item(QStringLiteral("current"));
+    QXmppPubSubBaseItem item(QStringLiteral("current"));
 
     iq = PubSubIq();
     iq.setId(QLatin1String("items1"));
@@ -245,7 +245,7 @@ void tst_QXmppPubSubIq::testRetractItem()
     iq.setQueryJid({});
     iq.setQueryNode(QLatin1String("princely_musings"));
 
-    QXmppPubSubItem item;
+    QXmppPubSubBaseItem item;
     item.setId(QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
     iq.setItems({ item });
 

@@ -5,11 +5,11 @@
 #ifndef QXMPPMIXPARTICIPANTITEM_H
 #define QXMPPMIXPARTICIPANTITEM_H
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 class QXmppMixParticipantItemPrivate;
 
-class QXMPP_EXPORT QXmppMixParticipantItem : public QXmppPubSubItem
+class QXMPP_EXPORT QXmppMixParticipantItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppMixParticipantItem();

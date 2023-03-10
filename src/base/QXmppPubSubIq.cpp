@@ -81,7 +81,9 @@ static const QStringList PUBSUB_QUERIES = {
     QStringLiteral("unsubscribe"),
 };
 
-class QXmppPubSubIqPrivate : public QSharedData
+namespace QXmpp::Private {
+
+class PubSubIqPrivate : public QSharedData
 {
 public:
     PubSubIqBase::QueryType queryType = PubSubIqBase::Items;
@@ -95,11 +97,13 @@ public:
     std::optional<QXmppResultSetReply> itemsContinuation;
 };
 
+}
+
 ///
 /// Constructs a PubSub IQ.
 ///
 PubSubIqBase::PubSubIqBase()
-    : d(new QXmppPubSubIqPrivate)
+    : d(new PubSubIqPrivate)
 {
 }
 

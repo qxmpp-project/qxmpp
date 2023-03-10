@@ -7,9 +7,9 @@
 
 #include "QXmppOmemoDeviceBundle_p.h"
 #include "QXmppOmemoDeviceList_p.h"
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
-class QXmppOmemoDeviceBundleItem : public QXmppPubSubItem
+class QXmppOmemoDeviceBundleItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppOmemoDeviceBundle deviceBundle() const;
@@ -25,7 +25,7 @@ private:
     QXmppOmemoDeviceBundle m_deviceBundle;
 };
 
-class QXmppOmemoDeviceListItem : public QXmppPubSubItem
+class QXmppOmemoDeviceListItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppOmemoDeviceList deviceList() const;

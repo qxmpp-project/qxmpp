@@ -5,11 +5,11 @@
 #ifndef QXMPPMIXINFOITEM_H
 #define QXMPPMIXINFOITEM_H
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 class QXmppMixInfoItemPrivate;
 
-class QXMPP_EXPORT QXmppMixInfoItem : public QXmppPubSubItem
+class QXMPP_EXPORT QXmppMixInfoItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppMixInfoItem();

@@ -6,17 +6,15 @@
 #include "QXmppAtmTrustMemoryStorage.h"
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryIq.h"
-#include "QXmppCarbonManager.h"
+#include "QXmppCarbonManagerV2.h"
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppE2eeMetadata.h"
 #include "QXmppMessage.h"
 #include "QXmppOmemoElement_p.h"
-#include "QXmppOmemoEnvelope_p.h"
 #include "QXmppOmemoManager.h"
 #include "QXmppOmemoManager_p.h"
 #include "QXmppOmemoMemoryStorage.h"
-#include "QXmppPubSubItem.h"
 #include "QXmppPubSubManager.h"
 
 #include "IntegrationTesting.h"
@@ -31,7 +29,7 @@ struct OmemoUser
     QXmppClient client;
     QXmppLogger logger;
     QXmppOmemoManager *manager;
-    QXmppCarbonManager *carbonManager;
+    QXmppCarbonManagerV2 *carbonManager;
     QXmppDiscoveryManager *discoveryManager;
     QXmppPubSubManager *pubSubManager;
     std::unique_ptr<QXmppOmemoMemoryStorage> omemoStorage;
@@ -151,11 +149,8 @@ void tst_QXmppOmemoManager::initOmemoUser(OmemoUser &omemoUser)
     omemoUser.manager = new QXmppOmemoManager(omemoUser.omemoStorage.get());
     omemoUser.client.addExtension(omemoUser.manager);
 
-    omemoUser.carbonManager = new QXmppCarbonManager;
+    omemoUser.carbonManager = new QXmppCarbonManagerV2;
     omemoUser.client.addExtension(omemoUser.carbonManager);
-
-    connect(omemoUser.carbonManager, &QXmppCarbonManager::messageSent, omemoUser.manager, &QXmppOmemoManager::handleMessage);
-    connect(omemoUser.carbonManager, &QXmppCarbonManager::messageReceived, omemoUser.manager, &QXmppOmemoManager::handleMessage);
 
     omemoUser.logger.setLoggingType(QXmppLogger::SignalLogging);
     omemoUser.client.setLogger(&omemoUser.logger);
@@ -231,7 +226,7 @@ void tst_QXmppOmemoManager::testLoad()
     QVERIFY(result);
 
     const auto storedOwnDevice = m_alice1.manager->ownDevice();
-    //    QCOMPARE(storedOwnDevice.keyId(), m_alice1.manager->d->createKeyId(ownDevice.publicIdentityKey));
+    //    QCOMPARE(storedOwnDevice.keyId(), ownDevice.publicIdentityKey);
     QCOMPARE(storedOwnDevice.label(), ownDevice.label);
 
     m_alice1.omemoStorage->resetAll();
@@ -268,8 +263,6 @@ void tst_QXmppOmemoManager::testSendMessage()
         auto future = m_alice1.manager->setUp();
         future.then(this, [=](bool isSetUp) {
             if (isSetUp) {
-                m_alice1.carbonManager->setCarbonsEnabled(true);
-
                 auto future = m_alice1.manager->setSecurityPolicy(Toakafa);
                 future.then(this, [=]() {
                     auto future = m_alice2.manager->setSecurityPolicy(Toakafa);
@@ -282,12 +275,7 @@ void tst_QXmppOmemoManager::testSendMessage()
     });
 
     connect(&m_alice2.client, &QXmppClient::connected, &context, [=]() {
-        auto future = m_alice2.manager->setUp();
-        future.then(this, [=](bool isSetUp) {
-            if (isSetUp) {
-                m_alice2.carbonManager->setCarbonsEnabled(true);
-            }
-        });
+        m_alice2.manager->setUp();
     });
 
     connect(&m_alice2.logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {

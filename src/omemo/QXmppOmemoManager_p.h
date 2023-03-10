@@ -18,6 +18,8 @@
 #include <QTimer>
 #include <QtCrypto>
 
+#undef max
+
 class QXmppTrustManager;
 class QXmppOmemoManager;
 class QXmppPubSubManager;
@@ -33,6 +35,11 @@ using namespace QXmpp;
 using namespace std::chrono_literals;
 
 namespace QXmpp::Omemo::Private {
+
+// XMPP namespaces
+constexpr auto ns_omemo_2 = "urn:xmpp:omemo:2";
+constexpr auto ns_omemo_2_bundles = "urn:xmpp:omemo:2:bundles";
+constexpr auto ns_omemo_2_devices = "urn:xmpp:omemo:2:devices";
 
 // default possible trust levels a key must have to be used for encryption
 // The class documentation must be adapted if the trust levels are modified.
@@ -84,14 +91,14 @@ constexpr QCA::Cipher::Padding PAYLOAD_CIPHER_PADDING = QCA::Cipher::PKCS7;
 constexpr auto HKDF_INFO = "OMEMO Payload";
 constexpr int HKDF_KEY_SIZE = 32;
 constexpr int HKDF_SALT_SIZE = 32;
-constexpr int HKDF_OUTPUT_SIZE = 60;
+constexpr int HKDF_OUTPUT_SIZE = 80;
 
 extern const QString PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE;
 constexpr uint32_t PAYLOAD_MESSAGE_AUTHENTICATION_CODE_SIZE = 16;
 
 constexpr int PAYLOAD_KEY_SIZE = 32;
 constexpr uint32_t PAYLOAD_INITIALIZATION_VECTOR_SIZE = 16;
-constexpr uint32_t PAYLOAD_AUTHENTICATION_KEY_SIZE = 16;
+constexpr uint32_t PAYLOAD_AUTHENTICATION_KEY_SIZE = 32;
 
 // boundaries for the count of characters in SCE's <rpad/> element
 constexpr uint32_t SCE_RPAD_SIZE_MIN = 0;
@@ -114,8 +121,6 @@ struct IqDecryptionResult
     QDomElement iq;
     QXmppE2eeMetadata e2eeMetadata;
 };
-
-QByteArray createKeyId(const QByteArray &key);
 
 }  // namespace QXmpp::Omemo::Private
 
@@ -168,9 +173,10 @@ public:
     QXmppOmemoManagerPrivate(QXmppOmemoManager *parent, QXmppOmemoStorage *omemoStorage);
 
     void init();
-    bool initGlobalContext();
-    bool initLocking();
-    bool initCryptoProvider();
+    // exports for unit tests
+    QXMPP_EXPORT bool initGlobalContext();
+    QXMPP_EXPORT bool initLocking();
+    QXMPP_EXPORT bool initCryptoProvider();
     void initStores();
 
     signal_protocol_identity_key_store createIdentityKeyStore() const;

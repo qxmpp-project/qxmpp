@@ -5,7 +5,7 @@
 #ifndef QXMPPUSERTUNEITEM_H
 #define QXMPPUSERTUNEITEM_H
 
-#include "QXmppPubSubItem.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include <chrono>
 #include <optional>
@@ -16,7 +16,7 @@
 class QXmppTuneItemPrivate;
 class QUrl;
 
-class QXMPP_EXPORT QXmppTuneItem : public QXmppPubSubItem
+class QXMPP_EXPORT QXmppTuneItem : public QXmppPubSubBaseItem
 {
 public:
     QXmppTuneItem();
