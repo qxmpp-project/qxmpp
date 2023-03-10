@@ -1553,48 +1553,38 @@ QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanz
             QXmppSceEnvelopeReader sceEnvelopeReader(document.documentElement());
 
             if (sceEnvelopeReader.from() != senderJid) {
-                warning("Sender '" % senderJid % "' of stanza does not match SCE 'from' affix element '" % sceEnvelopeReader.from() % "'");
-                interface.finish(std::nullopt);
-            } else {
-                const auto recipientJid = QXmppUtils::jidToBareJid(stanza.to());
-                auto isSceAffixElementValid = true;
-
-                if (isMessageStanza) {
-                    if (const auto &message = dynamic_cast<const QXmppMessage &>(stanza); message.type() == QXmppMessage::GroupChat && (sceEnvelopeReader.to() != recipientJid)) {
-                        warning("Recipient of group chat message does not match SCE affix element '<to/>'");
-                        isSceAffixElementValid = false;
-                    }
-                } else {
-                    if (sceEnvelopeReader.to() != recipientJid) {
-                        warning("Recipient of IQ does not match SCE affix element '<to/>'");
-                        isSceAffixElementValid = false;
-                    }
-                }
-
-                if (!isSceAffixElementValid) {
-                    interface.finish(std::nullopt);
-                } else {
-                    auto &device = devices[senderJid][senderDeviceId];
-                    device.unrespondedSentStanzasCount = 0;
-
-                    // Send a heartbeat message to the sender if too many stanzas were
-                    // received responding to none.
-                    if (device.unrespondedReceivedStanzasCount == UNRESPONDED_STANZAS_UNTIL_HEARTBEAT_MESSAGE_IS_SENT) {
-                        sendEmptyMessage(senderJid, senderDeviceId);
-                        device.unrespondedReceivedStanzasCount = 0;
-                    } else {
-                        ++device.unrespondedReceivedStanzasCount;
-                    }
-
-                    QXmppE2eeMetadata e2eeMetadata;
-                    e2eeMetadata.setSceTimestamp(sceEnvelopeReader.timestamp());
-                    e2eeMetadata.setEncryption(QXmpp::Omemo2);
-                    const auto &senderDevice = devices.value(senderJid).value(senderDeviceId);
-                    e2eeMetadata.setSenderKey(senderDevice.keyId);
-
-                    interface.finish(DecryptionResult { sceEnvelopeReader.contentElement(), e2eeMetadata });
-                }
+                q->info("Sender '" % senderJid % "' of stanza does not match SCE 'from' affix element '" % sceEnvelopeReader.from() % "'");
             }
+
+            if (const auto recipientJid = QXmppUtils::jidToBareJid(stanza.to()); isMessageStanza) {
+                if (const auto &message = dynamic_cast<const QXmppMessage &>(stanza); message.type() == QXmppMessage::GroupChat && (sceEnvelopeReader.to() != recipientJid)) {
+                    warning("Recipient of group chat message does not match SCE affix element '<to/>'");
+                    interface.finish(std::nullopt);
+                    return;
+                }
+            } else if (sceEnvelopeReader.to() != recipientJid) {
+                q->info("Recipient of IQ does not match SCE affix element '<to/>'");
+            }
+
+            auto &device = devices[senderJid][senderDeviceId];
+            device.unrespondedSentStanzasCount = 0;
+
+            // Send a heartbeat message to the sender if too many stanzas were
+            // received responding to none.
+            if (device.unrespondedReceivedStanzasCount == UNRESPONDED_STANZAS_UNTIL_HEARTBEAT_MESSAGE_IS_SENT) {
+                sendEmptyMessage(senderJid, senderDeviceId);
+                device.unrespondedReceivedStanzasCount = 0;
+            } else {
+                ++device.unrespondedReceivedStanzasCount;
+            }
+
+            QXmppE2eeMetadata e2eeMetadata;
+            e2eeMetadata.setSceTimestamp(sceEnvelopeReader.timestamp());
+            e2eeMetadata.setEncryption(QXmpp::Omemo2);
+            const auto &senderDevice = devices.value(senderJid).value(senderDeviceId);
+            e2eeMetadata.setSenderKey(senderDevice.keyId);
+
+            interface.finish(DecryptionResult { sceEnvelopeReader.contentElement(), e2eeMetadata });
         }
     });
 
