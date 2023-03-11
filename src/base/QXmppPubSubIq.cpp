@@ -97,7 +97,7 @@ public:
     std::optional<QXmppResultSetReply> itemsContinuation;
 };
 
-}
+}  // namespace QXmpp::Private
 
 ///
 /// Constructs a PubSub IQ.

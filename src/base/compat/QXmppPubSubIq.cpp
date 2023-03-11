@@ -149,8 +149,9 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     // determine query type
     const QString tagName = queryElement.tagName();
     int queryType = PUBSUB_QUERIES.indexOf(queryElement.tagName());
-    if (queryType > -1)
+    if (queryType > -1) {
         d->queryType = QueryType(queryType);
+    }
 
     d->queryJid = queryElement.attribute(QStringLiteral("jid"));
     d->queryNode = queryElement.attribute(QStringLiteral("node"));
@@ -193,8 +194,9 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
-        for (const auto &item : d->items)
+        for (const auto &item : d->items) {
             item.toXml(writer);
+        }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
         helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);

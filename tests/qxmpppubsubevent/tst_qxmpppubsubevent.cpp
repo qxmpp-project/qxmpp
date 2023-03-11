@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppDataForm.h"
-#include "QXmppPubSubEvent.h"
 #include "QXmppPubSubBaseItem.h"
+#include "QXmppPubSubEvent.h"
 
 #include "pubsubutil.h"
 #include "util.h"
