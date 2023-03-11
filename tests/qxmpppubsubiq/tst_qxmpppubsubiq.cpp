@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppPubSubIq_p.h"
 #include "QXmppPubSubBaseItem.h"
+#include "QXmppPubSubIq_p.h"
 #include "QXmppPubSubSubscription.h"
 #include "QXmppResultSet.h"
 
