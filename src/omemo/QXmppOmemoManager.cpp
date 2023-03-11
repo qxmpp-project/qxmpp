@@ -340,7 +340,7 @@ QXmppOmemoManager::~QXmppOmemoManager() = default;
 ///
 /// This should be called after starting the client and before the login.
 /// It must only be called after \c setUp() has been called once for the user
-/// during one of the past login session.
+/// during one of the past login sessions.
 /// It does not need to be called if setUp() has been called during the current
 /// login session.
 ///

@@ -2798,7 +2798,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
 
 //
 // Corrects the own device list on the PEP service by the locally stored
-// devices or set a contact device to be removed locally in the future.
+// devices or sets a contact device to be removed locally in the future.
 //
 // \param deviceOwnerJid bare JID of the devices' owner
 //
@@ -2813,7 +2813,7 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         auto future = pubSubManager->deleteOwnPepNode(ns_omemo_2_devices);
         future.then(q, [=](QXmppPubSubManager::Result result) {
             if (const auto error = std::get_if<QXmppError>(&result)) {
-                warning("Node '" % QString(ns_omemo_2_devices) % "'  of JID '" % deviceOwnerJid %
+                warning("Node '" % QString(ns_omemo_2_devices) % "' of JID '" % deviceOwnerJid %
                         "' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
