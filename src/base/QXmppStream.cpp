@@ -481,10 +481,14 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
         return false;
     }
 
-    if (auto itr = d->runningIqs.find(stanza.attribute(QStringLiteral("id")));
+    const auto id = stanza.attribute(QStringLiteral("id"));
+    if (auto itr = d->runningIqs.find(id);
         itr != d->runningIqs.end()) {
-        if (stanza.attribute("from") != itr.value().jid) {
-            warning(QStringLiteral("Received IQ response to one of our requests from wrong sender. Ignoring."));
+        const auto expectedSenderJid = itr.value().jid;
+        // Stanzas coming from the server on behalf of the user's account must have no "from"
+        // attribute or have it set to the user's bare JID.
+        if (const auto senderJid = stanza.attribute("from"); !senderJid.isEmpty() && senderJid != expectedSenderJid) {
+            warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'").arg(id, senderJid, expectedSenderJid));
             return false;
         }
 
