@@ -1267,29 +1267,33 @@ bool Manager::handlePubSubEvent(const QDomElement &element, const QString &pubSu
         switch (event.eventType()) {
         // Items have been published.
         case QXmppPubSubEventBase::Items: {
-            const auto items = event.items();
-
             // Only process items if the event notification contains one.
-            // That is necessary because PubSub allows publishing without
-            // items leading to notification-only events.
-            if (!items.isEmpty()) {
-                const auto &deviceListItem = items.constFirst();
-                if (deviceListItem.id() == QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current)) {
-                    d->updateDevices(pubSubService, event.items().constFirst());
+            // That is necessary because PubSub allows publishing without items leading to
+            // notification-only events.
+            if (const auto &items = event.items(); !items.isEmpty()) {
+                // Since the usage of the item ID \c QXmppPubSubManager::Current is only RECOMMENDED
+                // by \xep{0060, Publish-Subscribe} (PubSub) but not obligatory, an appropriate
+                // contact device list is determined.
+                // In case of the own device list node, it is sctrictly processed as a recommended
+                // singleton item and changed to fit that if needed.
+                const auto isOwnDeviceListNode = d->ownBareJid() == pubSubService;
+                if (isOwnDeviceListNode) {
+                    const auto &deviceListItem = items.constFirst();
+                    if (deviceListItem.id() == QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current)) {
+                        d->updateDevices(pubSubService, event.items().constFirst());
+                    } else {
+                        d->handleIrregularDeviceListChanges(pubSubService);
+                    }
                 } else {
-                    d->handleIrregularDeviceListChanges(pubSubService);
+                    d->updateContactDevices(pubSubService, items);
                 }
             }
 
             break;
         }
-        // Items have been retracted.
+        // Specific items are deleted.
         case QXmppPubSubEventBase::Retract: {
-            // Specific items are deleted.
-            const auto &retractedItem = event.retractIds().constFirst();
-            if (retractedItem == QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current)) {
-                d->handleIrregularDeviceListChanges(pubSubService);
-            }
+            d->handleIrregularDeviceListChanges(pubSubService);
         }
         // All items are deleted.
         case QXmppPubSubEventBase::Purge:

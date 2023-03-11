@@ -2651,6 +2651,36 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
 }
 
 //
+// Updates all locally stored devices of a contact.
+//
+// \param deviceOwnerJid bare JID of the devices' owner
+// \param deviceListItems PEP items that may contain a device list
+//
+// \returns a found device list item
+//
+std::optional<QXmppOmemoDeviceListItem> QXmppOmemoManagerPrivate::updateContactDevices(const QString &deviceOwnerJid, const QVector<QXmppOmemoDeviceListItem> &deviceListItems)
+{
+    if (deviceListItems.size() > 1) {
+        const auto itr = std::find_if(deviceListItems.cbegin(), deviceListItems.cend(), [=](const QXmppOmemoDeviceListItem &item) {
+            return item.id() == QXmppPubSubManager::Current;
+        });
+
+        if (itr != deviceListItems.cend()) {
+            updateDevices(deviceOwnerJid, *itr);
+            return *itr;
+        } else {
+            warning("Device list for JID '" % deviceOwnerJid % "' could not be updated because the node contains more than one item but none with the singleton node's specific ID '" % QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current) % "'");
+            handleIrregularDeviceListChanges(deviceOwnerJid);
+            return {};
+        }
+    }
+
+    const auto &item = deviceListItems.constFirst();
+    updateDevices(deviceOwnerJid, item);
+    return item;
+}
+
+//
 // Updates all locally stored devices by a passed device list item.
 //
 // \param deviceOwnerJid bare JID of the devices' owner
@@ -3058,16 +3088,27 @@ QXmppTask<bool> ManagerPrivate::changeDeviceLabel(const QString &deviceLabel)
 //
 QXmppTask<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> ManagerPrivate::requestDeviceList(const QString &jid)
 {
-    auto future = pubSubManager->requestItem<QXmppOmemoDeviceListItem>(jid, ns_omemo_2_devices, QXmppPubSubManager::Current);
-    future.then(q, [this, jid](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
+    QXmppPromise<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> interface;
+
+    // Since the usage of the item ID \c QXmppPubSubManager::Current is only RECOMMENDED by
+    // \xep{0060, Publish-Subscribe} (PubSub) but not obligatory, all items are requested even if
+    // the node should contain only one item.
+    auto future = pubSubManager->requestItems<QXmppOmemoDeviceListItem>(jid, ns_omemo_2_devices);
+    future.then(q, [this, interface, jid](QXmppPubSubManager::ItemsResult<QXmppOmemoDeviceListItem> result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
             warning("Device list for JID '" % jid % "' could not be retrieved: " % errorToString(*error));
+            interface.finish(*error);
+        } else if (const auto &items = std::get<QXmppPubSubManager::Items<QXmppOmemoDeviceListItem>>(result).items; items.isEmpty()) {
+            const auto errorMessage = "Device list for JID '" % jid % "' could not be retrieved because the node does not contain any item";
+            warning(errorMessage);
+            interface.finish(QXmppError { errorMessage });
+        } else if (const auto item = updateContactDevices(jid, items); item) {
+            interface.finish(*item);
         } else {
-            const auto &item = std::get<QXmppOmemoDeviceListItem>(result);
-            updateDevices(jid, item);
+            interface.finish(QXmppError { "Device list for JID '" % jid % "' could not be retrieved because the node does not contain an appropriate item" });
         }
     });
-    return future;
+    return interface.task();
 }
 
 //
