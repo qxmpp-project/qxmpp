@@ -923,7 +923,7 @@ bool ManagerPrivate::updatePreKeyPairs(uint32_t count)
         deviceBundle.addPublicPreKey(preKeyId, serializedPublicPreKey);
     }
 
-    this->preKeyPairs.insert(serializedPreKeyPairs);
+    preKeyPairs.insert(serializedPreKeyPairs);
     omemoStorage->addPreKeyPairs(serializedPreKeyPairs);
     ownDevice.latestPreKeyId = latestPreKeyId - 1 + count;
 
@@ -2786,7 +2786,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
     // Publish an own correct device list if the PEP service's one is incorrect
     // and the devices are already set up locally.
     if (isOwnDeviceListIncorrect) {
-        if (!this->devices.isEmpty()) {
+        if (!devices.isEmpty()) {
             publishDeviceListItem(true, [=](bool isPublished) {
                 if (!isPublished) {
                     warning("Own device list item could not be published in order to correct the PEP service's one");
@@ -2848,7 +2848,7 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
             }
         });
     } else {
-        auto &ownerDevices = this->devices[deviceOwnerJid];
+        auto &ownerDevices = devices[deviceOwnerJid];
 
         // Set a timestamp for locally stored contact devices being removed
         // later if their device list item is removed, if their device list node
