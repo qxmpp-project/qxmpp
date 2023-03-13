@@ -41,4 +41,6 @@ private:
     QString m_version;
 };
 
+Q_DECLARE_METATYPE(QXmppVersionIq);
+
 #endif
