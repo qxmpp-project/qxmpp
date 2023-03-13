@@ -95,12 +95,10 @@ namespace Private {
             iq.parse(element);
             iq.setE2eeMetadata(e2eeMetadata);
 
-            processHandleIqResult(
-                client,
-                iq.id(),
-                iq.from(),
-                e2eeMetadata,
-                invokeIqHandler(std::forward<Handler>(handler), std::move(iq)));
+            auto id = iq.id(), from = iq.from();
+
+            processHandleIqResult(client, id, from, e2eeMetadata,
+                                  invokeIqHandler(std::forward<Handler>(handler), std::move(iq)));
             return true;
         }
         return false;
