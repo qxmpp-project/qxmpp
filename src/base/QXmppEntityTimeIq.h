@@ -38,4 +38,6 @@ private:
     QDateTime m_utc;
 };
 
+Q_DECLARE_METATYPE(QXmppEntityTimeIq);
+
 #endif  // QXMPPENTITYTIMEIQ_H
