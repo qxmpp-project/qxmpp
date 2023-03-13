@@ -77,6 +77,7 @@ add_simple_test(qxmppusertunemanager TestClient.h)
 add_simple_test(qxmppvcardiq)
 add_simple_test(qxmppvcardmanager)
 add_simple_test(qxmppversioniq)
+add_simple_test(qxmppversionmanager TestClient.h)
 
 if(WITH_QCA)
     add_simple_test(qxmppfileencryption)
