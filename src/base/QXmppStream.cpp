@@ -208,7 +208,7 @@ QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writt
 ///
 /// \since QXmpp 1.5
 ///
-QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
+QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq, const QString &to)
 {
     using namespace QXmpp;
 
@@ -223,7 +223,7 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq)
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
 
-    return sendIq(QXmppPacket(iq), iq.id(), iq.to());
+    return sendIq(QXmppPacket(iq), iq.id(), to);
 }
 
 ///

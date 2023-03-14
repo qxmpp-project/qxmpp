@@ -47,7 +47,7 @@ public:
     QXmppTask<QXmpp::SendResult> send(QXmppPacket &&);
 
     using IqResult = std::variant<QDomElement, QXmppError>;
-    QXmppTask<IqResult> sendIq(QXmppIq &&);
+    QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
     QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
     void cancelOngoingIqs();
     bool hasIqId(const QString &id) const;

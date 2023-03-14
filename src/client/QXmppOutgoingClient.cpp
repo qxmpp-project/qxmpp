@@ -328,11 +328,8 @@ bool QXmppOutgoingClient::isStreamResumed() const
 ///
 QXmppTask<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 {
-    // always set a to address (the QXmppStream needs this for matching)
-    if (iq.to().isEmpty()) {
-        iq.setTo(d->config.domain());
-    }
-    return QXmppStream::sendIq(std::move(iq));
+    auto to = iq.to();
+    return QXmppStream::sendIq(std::move(iq), to.isEmpty() ? d->config.domain() : to);
 }
 
 void QXmppOutgoingClient::_q_socketDisconnected()
