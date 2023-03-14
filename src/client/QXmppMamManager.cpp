@@ -243,6 +243,9 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
 
     auto [itr, _] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
 
+    // create task here; promise could finish immediately after client()->sendIq()
+    auto task = itr->second.promise.task();
+
     // retrieve messages
     client()->sendIq(std::move(queryIq)).then(this, [this, queryId = queryIq.queryId()](QXmppClient::IqResult result) {
         auto itr = d->ongoingRequests.find(queryId.toStdString());
@@ -309,5 +312,5 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
         }
     });
 
-    return itr->second.promise.task();
+    return task;
 }
