@@ -20,6 +20,22 @@
 
 using namespace QXmpp::Private;
 
+template<typename T, typename Converter>
+auto transform(const T &input, Converter convert)
+{
+    using Output = std::decay_t<decltype(convert(*input.begin()))>;
+    QVector<Output> output;
+    output.reserve(input.size());
+    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
+    return output;
+}
+
+template<typename T>
+auto sum(const T &c)
+{
+    return std::accumulate(c.begin(), c.end(), 0);
+}
+
 std::optional<std::tuple<QXmppMessage, QString>> parseMamMessageResult(const QDomElement &messageEl)
 {
     auto resultElement = messageEl.firstChildElement("result");
@@ -56,6 +72,7 @@ struct RetrieveRequestState
     QXmppPromise<QXmppMamManager::RetrieveResult> promise;
     QXmppMamResultIq iq;
     QVector<QXmppMessage> messages;
+    uint runningDecryptionJobs = 0;
 
     void finish()
     {
@@ -288,26 +305,28 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
         // decrypt encrypted messages
         if (auto *e2eeExt = client()->encryptionExtension()) {
             auto &messages = state.messages;
-            auto running = std::make_shared<uint>(0);
 
-            // handle case when no message is encrypted
-            auto hasEncryptedMessages = false;
+            // check for encrypted messages (once)
+            auto messagesEncrypted = transform(state.messages, [&](const auto &m) {
+                return e2eeExt->isEncrypted(m);
+            });
+            auto encryptedCount = sum(messagesEncrypted);
+
+            // We can't do this on the fly (with ++ and --) in the for loop
+            // because some decryptMessage() jobs could finish instantly
+            state.runningDecryptionJobs = encryptedCount;
 
             for (auto i = 0; i < messages.size(); i++) {
-                if (!e2eeExt->isEncrypted(messages.at(i))) {
+                if (!messagesEncrypted[i]) {
                     continue;
                 }
-                hasEncryptedMessages = true;
 
                 auto message = messages.at(i);
-                (*running)++;
-                e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, running, queryId](auto result) {
-                    (*running)--;
-
+                state.runningDecryptionJobs++;
+                e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, queryId](auto result) {
                     auto itr = d->ongoingRequests.find(queryId.toStdString());
-                    if (itr == d->ongoingRequests.end()) {
-                        return;
-                    }
+                    Q_ASSERT(itr != d->ongoingRequests.end());
+
                     auto &state = itr->second;
 
                     if (std::holds_alternative<QXmppMessage>(result)) {
@@ -316,7 +335,8 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
                         warning(QStringLiteral("Error decrypting message."));
                     }
 
-                    if (*running == 0) {
+                    state.runningDecryptionJobs--;
+                    if (state.runningDecryptionJobs == 0) {
                         state.finish();
                         d->ongoingRequests.erase(itr);
                     }
@@ -324,7 +344,7 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
             }
 
             // finishing the promise is done after decryptMessage()
-            if (hasEncryptedMessages) {
+            if (encryptedCount > 0) {
                 return;
             }
         }
