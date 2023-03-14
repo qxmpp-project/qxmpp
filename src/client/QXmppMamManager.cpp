@@ -240,14 +240,16 @@ QString QXmppMamManager::retrieveArchivedMessages(const QString &to,
 QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const QString &to, const QString &node, const QString &jid, const QDateTime &start, const QDateTime &end, const QXmppResultSetQuery &resultSetQuery)
 {
     auto queryIq = buildRequest(to, node, jid, start, end, resultSetQuery);
+    auto queryId = queryIq.queryId();
 
-    auto [itr, _] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
+    auto [itr, inserted] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
+    Q_ASSERT(inserted);
 
     // create task here; promise could finish immediately after client()->sendIq()
     auto task = itr->second.promise.task();
 
     // retrieve messages
-    client()->sendIq(std::move(queryIq)).then(this, [this, queryId = queryIq.queryId()](QXmppClient::IqResult result) {
+    client()->sendIq(std::move(queryIq)).then(this, [this, queryId](QXmppClient::IqResult result) {
         auto itr = d->ongoingRequests.find(queryId.toStdString());
         if (itr == d->ongoingRequests.end()) {
             return;
