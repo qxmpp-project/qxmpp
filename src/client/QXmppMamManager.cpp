@@ -20,6 +20,37 @@
 
 using namespace QXmpp::Private;
 
+std::optional<std::tuple<QXmppMessage, QString>> parseMamMessageResult(const QDomElement &messageEl)
+{
+    auto resultElement = messageEl.firstChildElement("result");
+    if (resultElement.isNull() || resultElement.namespaceURI() != ns_mam) {
+        return {};
+    }
+
+    auto forwardedElement = resultElement.firstChildElement("forwarded");
+    if (forwardedElement.isNull() || forwardedElement.namespaceURI() != ns_forwarding) {
+        return {};
+    }
+
+    auto queryId = resultElement.attribute("queryid");
+
+    auto messageElement = forwardedElement.firstChildElement("message");
+    if (messageElement.isNull()) {
+        return {};
+    }
+
+    QXmppMessage message;
+    message.parse(messageElement);
+
+    auto delayElement = forwardedElement.firstChildElement("delay");
+    if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery) {
+        const auto stamp = delayElement.attribute("stamp");
+        message.setStamp(QXmppUtils::datetimeFromString(stamp));
+    }
+
+    return { { message, queryId } };
+}
+
 struct RetrieveRequestState
 {
     QXmppPromise<QXmppMamManager::RetrieveResult> promise;
@@ -87,28 +118,8 @@ QStringList QXmppMamManager::discoveryFeatures() const
 bool QXmppMamManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "message") {
-        QDomElement resultElement = element.firstChildElement("result");
-        if (!resultElement.isNull() && resultElement.namespaceURI() == ns_mam) {
-            QDomElement forwardedElement = resultElement.firstChildElement("forwarded");
-            QString queryId = resultElement.attribute("queryid");
-
-            if (forwardedElement.isNull() || forwardedElement.namespaceURI() != ns_forwarding) {
-                return false;
-            }
-
-            auto messageElement = forwardedElement.firstChildElement("message");
-            auto delayElement = forwardedElement.firstChildElement("delay");
-
-            if (messageElement.isNull()) {
-                return false;
-            }
-
-            QXmppMessage message;
-            message.parse(messageElement);
-            if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery) {
-                const QString stamp = delayElement.attribute("stamp");
-                message.setStamp(QXmppUtils::datetimeFromString(stamp));
-            }
+        if (auto result = parseMamMessageResult(element)) {
+            auto &[message, queryId] = *result;
 
             auto itr = d->ongoingRequests.find(queryId.toStdString());
             if (itr != d->ongoingRequests.end()) {
