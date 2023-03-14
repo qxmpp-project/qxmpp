@@ -265,64 +265,72 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
         if (itr == d->ongoingRequests.end()) {
             return;
         }
+        auto &state = itr->second;
 
-        if (std::holds_alternative<QDomElement>(result)) {
-            auto &iq = itr->second.iq;
-            iq.parse(std::get<QDomElement>(result));
+        // handle IQ sending errors
+        if (std::holds_alternative<QXmppError>(result)) {
+            state.promise.finish(std::get<QXmppError>(result));
+            d->ongoingRequests.erase(itr);
+            return;
+        }
 
-            if (iq.type() == QXmppIq::Error) {
-                itr->second.promise.finish(QXmppError { iq.error().text(), iq.error() });
-                d->ongoingRequests.erase(itr);
+        // parse IQ
+        auto &iq = state.iq;
+        iq.parse(std::get<QDomElement>(result));
+
+        // handle MAM error result IQ
+        if (iq.type() == QXmppIq::Error) {
+            state.promise.finish(QXmppError { iq.error().text(), iq.error() });
+            d->ongoingRequests.erase(itr);
+            return;
+        }
+
+        // decrypt encrypted messages
+        if (auto *e2eeExt = client()->encryptionExtension()) {
+            auto &messages = state.messages;
+            auto running = std::make_shared<uint>(0);
+
+            // handle case when no message is encrypted
+            auto hasEncryptedMessages = false;
+
+            for (auto i = 0; i < messages.size(); i++) {
+                if (!e2eeExt->isEncrypted(messages.at(i))) {
+                    continue;
+                }
+                hasEncryptedMessages = true;
+
+                auto message = messages.at(i);
+                (*running)++;
+                e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, running, queryId](auto result) {
+                    (*running)--;
+
+                    auto itr = d->ongoingRequests.find(queryId.toStdString());
+                    if (itr == d->ongoingRequests.end()) {
+                        return;
+                    }
+                    auto &state = itr->second;
+
+                    if (std::holds_alternative<QXmppMessage>(result)) {
+                        state.messages[i] = std::get<QXmppMessage>(std::move(result));
+                    } else {
+                        warning(QStringLiteral("Error decrypting message."));
+                    }
+
+                    if (*running == 0) {
+                        state.finish();
+                        d->ongoingRequests.erase(itr);
+                    }
+                });
+            }
+
+            // finishing the promise is done after decryptMessage()
+            if (hasEncryptedMessages) {
                 return;
             }
-
-            // decrypt encrypted messages
-            if (auto *e2eeExt = client()->encryptionExtension()) {
-                auto &messages = itr->second.messages;
-                auto running = std::make_shared<uint>(0);
-                // handle case when no message is encrypted
-                auto hasEncryptedMessages = false;
-
-                for (auto i = 0; i < messages.size(); i++) {
-                    if (!e2eeExt->isEncrypted(messages.at(i))) {
-                        continue;
-                    }
-                    hasEncryptedMessages = true;
-
-                    auto message = messages.at(i);
-                    (*running)++;
-                    e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, running, queryId](auto result) {
-                        (*running)--;
-                        auto itr = d->ongoingRequests.find(queryId.toStdString());
-                        if (itr == d->ongoingRequests.end()) {
-                            return;
-                        }
-
-                        if (std::holds_alternative<QXmppMessage>(result)) {
-                            itr->second.messages[i] = std::get<QXmppMessage>(std::move(result));
-                        } else {
-                            warning(QStringLiteral("Error decrypting message."));
-                        }
-                        if (*running == 0) {
-                            itr->second.finish();
-                            d->ongoingRequests.erase(itr);
-                        }
-                    });
-                }
-
-                if (!hasEncryptedMessages) {
-                    // finish here, no decryptMessage callback will do it
-                    itr->second.finish();
-                    d->ongoingRequests.erase(itr);
-                }
-            } else {
-                itr->second.finish();
-                d->ongoingRequests.erase(itr);
-            }
-        } else {
-            itr->second.promise.finish(std::get<QXmppError>(result));
-            d->ongoingRequests.erase(itr);
         }
+
+        state.finish();
+        d->ongoingRequests.erase(itr);
     });
 
     return task;
