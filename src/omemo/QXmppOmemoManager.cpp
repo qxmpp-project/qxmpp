@@ -675,11 +675,13 @@ QXmppOmemoOwnDevice Manager::ownDevice()
 
 /// Returns all locally stored devices except the own device.
 ///
-/// Only devices that have been received after subscribing the corresponding
-/// device lists on the server are stored locally.
+/// Only devices that have been received after subscribing the corresponding device lists on the
+/// server are stored locally.
 /// Thus, only those are returned.
-/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without
-/// presence subscription before.
+/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without presence subscription
+/// before.
+///
+/// You must build sessions before you can get devices with corresponding keys.
 ///
 /// /\return all devices except the own device
 ///
@@ -691,11 +693,13 @@ QXmppTask<QVector<QXmppOmemoDevice>> Manager::devices()
 ///
 /// Returns locally stored devices except the own device.
 ///
-/// Only devices that have been received after subscribing the corresponding
-/// device lists on the server are stored locally.
+/// Only devices that have been received after subscribing the corresponding device lists on the
+/// server are stored locally.
 /// Thus, only those are returned.
-/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without
-/// presence subscription before.
+/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without presence subscription
+/// before.
+///
+/// You must build sessions before you can get devices with corresponding keys.
 ///
 /// \param jids JIDs whose devices are being retrieved
 ///
@@ -835,16 +839,15 @@ bool Manager::isNewDeviceAutoSessionBuildingEnabled()
 ///
 /// Builds sessions manually with devices for whom no sessions are available.
 ///
-/// Usually, sessions are built during sending a first message to a device or
-/// after a first message is received from a device.
+/// Usually, sessions are built during sending a first message to a device or after a first message
+/// is received from a device.
 /// This can be called in order to speed up the sending of a message.
-/// If this method is called before sending the first message, all sessions can
-/// be built and when the first message is sent, the message has only be
-/// encrypted.
-/// Especially chats with multiple devices, that can decrease the noticeable
-/// time a user has to wait for sending a message.
-/// Additionally, the keys are automatically retrieved from the server which is
-/// helpful in order to get them when calling \c QXmppOmemoManager::devices().
+/// If this method is called before sending the first message, all sessions can be built and when
+/// the first message is being sent, the message only needs to be encrypted.
+/// Especially for chats with multiple devices, that can decrease the noticeable time a user has to
+/// wait for sending a message.
+/// Additionally, the keys are automatically retrieved from the server which is helpful in order to
+/// get them when calling \c QXmppOmemoManager::devices().
 ///
 /// The user must be logged in while calling this.
 ///
