@@ -328,8 +328,9 @@ bool QXmppOutgoingClient::isStreamResumed() const
 ///
 QXmppTask<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 {
+    // If 'to' is empty the user's bare JID is meant implicitly (see RFC6120, section 10.3.3.).
     auto to = iq.to();
-    return QXmppStream::sendIq(std::move(iq), to.isEmpty() ? d->config.domain() : to);
+    return QXmppStream::sendIq(std::move(iq), to.isEmpty() ? d->config.jidBare() : to);
 }
 
 void QXmppOutgoingClient::_q_socketDisconnected()
