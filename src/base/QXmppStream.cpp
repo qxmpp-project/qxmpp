@@ -484,10 +484,13 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
     const auto id = stanza.attribute(QStringLiteral("id"));
     if (auto itr = d->runningIqs.find(id);
         itr != d->runningIqs.end()) {
-        const auto expectedSenderJid = itr.value().jid;
+        const auto expectedFrom = itr.value().jid;
+	// Check that the sender of the response matches the recipient of the request.
         // Stanzas coming from the server on behalf of the user's account must have no "from"
         // attribute or have it set to the user's bare JID.
-        if (const auto senderJid = stanza.attribute("from"); !senderJid.isEmpty() && senderJid != expectedSenderJid) {
+	// If 'from' is empty, the IQ has been sent by the server. In this case we don't need to
+	// do the check as we trust the server anyways.
+        if (const auto from = stanza.attribute("from"); !from.isEmpty() && from != expectedFrom) {
             warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'").arg(id, senderJid, expectedSenderJid));
             return false;
         }
