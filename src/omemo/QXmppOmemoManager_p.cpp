@@ -987,20 +987,8 @@ bool ManagerPrivate::generateIdentityKeyPair(ratchet_identity_key_pair **identit
         return false;
     }
 
-    const auto &serializedPublicIdentityKey = ownDevice.publicIdentityKey;
-    BufferPtr publicIdentityKeyBuffer = BufferPtr::fromByteArray(serializedPublicIdentityKey);
-
-    if (!publicIdentityKeyBuffer) {
-        warning("Buffer for serialized public identity key could not be created");
-        return false;
-    }
-
     RefCountedPtr<ec_public_key> publicIdentityKey;
-
-    if (curve_decode_point_ed(publicIdentityKey.ptrRef(), signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Public identity key could not be deserialized");
-        return false;
-    }
+    deserializePublicIdentityKey(publicIdentityKey.ptrRef(), ownDevice.publicIdentityKey);
 
     if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
         warning("Identity key pair could not be deserialized");
