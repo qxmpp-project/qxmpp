@@ -757,7 +757,7 @@ void ManagerPrivate::renewSignedPreKeyPairs()
 
     if (isSignedPreKeyPairRemoved) {
         RefCountedPtr<ratchet_identity_key_pair> identityKeyPair;
-        generateIdentityKeyPair(identityKeyPair.ptrRef());
+        deserializeIdentityKeyPair(identityKeyPair.ptrRef());
         updateSignedPreKeyPair(identityKeyPair.get());
 
         // Store the own device containing the new signed pre key ID.
@@ -960,42 +960,6 @@ void ManagerPrivate::removeDevicesRemovedFromServer()
             }
         }
     }
-}
-
-//
-// Generates an identity key pair.
-//
-// The identity key pair is the pair of private and a public long-term key.
-//
-// \param identityKeyPair identity key pair location
-//
-// \return whether it succeeded
-//
-bool ManagerPrivate::generateIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const
-{
-    BufferSecurePtr privateIdentityKeyBuffer = BufferSecurePtr::fromByteArray(ownDevice.privateIdentityKey);
-
-    if (!privateIdentityKeyBuffer) {
-        warning("Buffer for serialized private identity key could not be created");
-        return false;
-    }
-
-    RefCountedPtr<ec_private_key> privateIdentityKey;
-
-    if (curve_decode_private_point(privateIdentityKey.ptrRef(), signal_buffer_data(privateIdentityKeyBuffer.get()), signal_buffer_len(privateIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Private identity key could not be deserialized");
-        return false;
-    }
-
-    RefCountedPtr<ec_public_key> publicIdentityKey;
-    deserializePublicIdentityKey(publicIdentityKey.ptrRef(), ownDevice.publicIdentityKey);
-
-    if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
-        warning("Identity key pair could not be deserialized");
-        return false;
-    }
-
-    return true;
 }
 
 //
@@ -3487,6 +3451,56 @@ bool ManagerPrivate::createSessionBundle(session_pre_key_bundle **sessionBundle,
         warning("Session bundle data could not be deserialized");
         return false;
     }
+}
+
+//
+// Deserializes the locally stored identity key pair.
+//
+// The identity key pair is the pair of private and a public long-term keys.
+//
+// \param identityKeyPair identity key pair location
+//
+// \return whether it succeeded
+//
+bool ManagerPrivate::deserializeIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const
+{
+    RefCountedPtr<ec_private_key> privateIdentityKey;
+    deserializePrivateIdentityKey(privateIdentityKey.ptrRef(), ownDevice.privateIdentityKey);
+
+    RefCountedPtr<ec_public_key> publicIdentityKey;
+    deserializePublicIdentityKey(publicIdentityKey.ptrRef(), ownDevice.publicIdentityKey);
+
+    if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
+        warning("Identity key pair could not be deserialized");
+        return false;
+    }
+
+    return true;
+}
+
+//
+// Deserializes a private identity key.
+//
+// \param privateIdentityKey private identity key location
+// \param serializedPrivateIdentityKey serialized private identity key
+//
+// \return whether it succeeded
+//
+bool ManagerPrivate::deserializePrivateIdentityKey(ec_private_key **privateIdentityKey, const QByteArray &serializedPrivateIdentityKey) const
+{
+    BufferSecurePtr privateIdentityKeyBuffer = BufferSecurePtr::fromByteArray(serializedPrivateIdentityKey);
+
+    if (!privateIdentityKeyBuffer) {
+        warning("Buffer for serialized private identity key could not be created");
+        return false;
+    }
+
+    if (curve_decode_private_point(privateIdentityKey, signal_buffer_data(privateIdentityKeyBuffer.get()), signal_buffer_len(privateIdentityKeyBuffer.get()), globalContext.get()) < 0) {
+        warning("Private identity key could not be deserialized");
+        return false;
+    }
+
+    return true;
 }
 
 //
