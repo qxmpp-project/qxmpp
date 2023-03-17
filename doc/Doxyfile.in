@@ -7,7 +7,6 @@ PROJECT_NUMBER         = "Version: @PROJECT_VERSION@"
 INPUT                  = @PROJECT_SOURCE_DIR@/doc/index.doc \
                          @PROJECT_SOURCE_DIR@/doc/using.doc \
                          @PROJECT_SOURCE_DIR@/doc/xep.doc \
-                         @CMAKE_BINARY_DIR@/src/base/QXmppBuildConstants.h \
                          @PROJECT_SOURCE_DIR@/src
 HTML_EXTRA_FILES       = @PROJECT_SOURCE_DIR@/doc/doap.xml \
                          @PROJECT_SOURCE_DIR@/doc/doap-rendering/doap.xsl \
