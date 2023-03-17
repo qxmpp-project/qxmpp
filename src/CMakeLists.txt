@@ -93,6 +93,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppAtmTrustMemoryStorage.h
     client/QXmppAtmTrustStorage.h
     client/QXmppAttentionManager.h
+    client/QXmppBlockingManager.h
     client/QXmppBookmarkManager.h
     client/QXmppCallInviteManager.h
     client/QXmppCarbonManager.h
@@ -230,6 +231,7 @@ set(SOURCE_FILES
     client/QXmppAtmTrustMemoryStorage.cpp
     client/QXmppAtmTrustStorage.cpp
     client/QXmppAttentionManager.cpp
+    client/QXmppBlockingManager.cpp
     client/QXmppBookmarkManager.cpp
     client/QXmppCallInviteManager.cpp
     client/QXmppCarbonManager.cpp
