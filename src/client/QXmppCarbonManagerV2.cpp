@@ -18,10 +18,9 @@ using namespace QXmpp::Private;
 class CarbonEnableIq : public QXmppIq
 {
 public:
-    CarbonEnableIq(const QString &jid)
+    CarbonEnableIq()
         : QXmppIq()
     {
-        setTo(jid);
         setType(QXmppIq::Set);
     }
 
@@ -165,7 +164,7 @@ void QXmppCarbonManagerV2::enableCarbons()
         return;
     }
 
-    client()->sendIq(CarbonEnableIq(client()->configuration().jidBare())).then(this, [this](QXmppClient::IqResult domResult) {
+    client()->sendIq(CarbonEnableIq()).then(this, [this](QXmppClient::IqResult domResult) {
         if (auto err = parseIq(std::move(domResult))) {
             warning("Could not enable message carbons: " % err->description);
         } else {

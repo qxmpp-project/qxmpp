@@ -290,6 +290,7 @@ public:
     QXmppOmemoDeviceListItem deviceListItem(bool addOwnDevice = true);
     template<typename Function>
     void updateOwnDevicesLocally(bool isDeviceListNodeExistent, Function continuation);
+    std::optional<QXmppOmemoDeviceListItem> updateContactDevices(const QString &deviceOwnerJid, const QVector<QXmppOmemoDeviceListItem> &deviceListItems);
     void updateDevices(const QString &deviceOwnerJid, const QXmppOmemoDeviceListItem &deviceListItem);
     void handleIrregularDeviceListChanges(const QString &deviceOwnerJid);
     template<typename Function>

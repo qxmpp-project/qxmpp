@@ -783,7 +783,7 @@ void tst_QXmppMessage::testEme()
     // test standard encryption: OMEMO
     const QByteArray xmlOmemo(
         "<message to=\"foo@example.com/QXmpp\" from=\"bar@example.com/QXmpp\" type=\"normal\">"
-        "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\"/>"
+        "<encryption xmlns=\"urn:xmpp:eme:0\" namespace=\"eu.siacs.conversations.axolotl\" name=\"OMEMO\"/>"
         "<body>This message is encrypted with OMEMO, but your client doesn&apos;t seem to support that.</body>"
         "</message>");
 

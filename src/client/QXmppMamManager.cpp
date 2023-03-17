@@ -9,29 +9,98 @@
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
 #include "QXmppE2eeExtension.h"
-#include "QXmppFutureUtils_p.h"
 #include "QXmppMamIq.h"
 #include "QXmppMessage.h"
+#include "QXmppPromise.h"
 #include "QXmppUtils.h"
 
 #include <unordered_map>
 
 #include <QDomElement>
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
+
+template<typename T, typename Converter>
+auto transform(const T &input, Converter convert)
+{
+    using Output = std::decay_t<decltype(convert(*input.begin()))>;
+    QVector<Output> output;
+    output.reserve(input.size());
+    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
+    return output;
+}
+
+template<typename T>
+auto sum(const T &c)
+{
+    return std::accumulate(c.begin(), c.end(), 0);
+}
+
+struct MamMessage
+{
+    QDomElement element;
+    std::optional<QDateTime> delay;
+};
+
+enum EncryptedType { Unencrypted,
+                     Encrypted };
+
+QXmppMessage parseMamMessage(const MamMessage &mamMessage, EncryptedType encrypted)
+{
+    QXmppMessage m;
+    m.parse(mamMessage.element, encrypted == Encrypted ? ScePublic : SceAll);
+    if (mamMessage.delay) {
+        m.setStamp(*mamMessage.delay);
+    }
+    return m;
+}
+
+std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomElement &messageEl)
+{
+    auto resultElement = messageEl.firstChildElement("result");
+    if (resultElement.isNull() || resultElement.namespaceURI() != ns_mam) {
+        return {};
+    }
+
+    auto forwardedElement = resultElement.firstChildElement("forwarded");
+    if (forwardedElement.isNull() || forwardedElement.namespaceURI() != ns_forwarding) {
+        return {};
+    }
+
+    auto queryId = resultElement.attribute("queryid");
+
+    auto messageElement = forwardedElement.firstChildElement("message");
+    if (messageElement.isNull()) {
+        return {};
+    }
+
+    auto parseDelay = [](const auto &forwardedEl) -> std::optional<QDateTime> {
+        auto delayEl = forwardedEl.firstChildElement("delay");
+        if (!delayEl.isNull() && delayEl.namespaceURI() == ns_delayed_delivery) {
+            return QXmppUtils::datetimeFromString(delayEl.attribute("stamp"));
+        }
+        return {};
+    };
+
+    return { { MamMessage { messageElement, parseDelay(forwardedElement) }, queryId } };
+}
 
 struct RetrieveRequestState
 {
     QXmppPromise<QXmppMamManager::RetrieveResult> promise;
     QXmppMamResultIq iq;
-    QVector<QXmppMessage> messages;
+    QVector<MamMessage> messages;
+    QVector<QXmppMessage> processedMessages;
+    uint runningDecryptionJobs = 0;
 
     void finish()
     {
+        Q_ASSERT(messages.count() == processedMessages.count());
         promise.finish(
             QXmppMamManager::RetrievedMessages {
                 std::move(iq),
-                std::move(messages) });
+                std::move(processedMessages) });
     }
 };
 
@@ -87,28 +156,8 @@ QStringList QXmppMamManager::discoveryFeatures() const
 bool QXmppMamManager::handleStanza(const QDomElement &element)
 {
     if (element.tagName() == "message") {
-        QDomElement resultElement = element.firstChildElement("result");
-        if (!resultElement.isNull() && resultElement.namespaceURI() == ns_mam) {
-            QDomElement forwardedElement = resultElement.firstChildElement("forwarded");
-            QString queryId = resultElement.attribute("queryid");
-
-            if (forwardedElement.isNull() || forwardedElement.namespaceURI() != ns_forwarding) {
-                return false;
-            }
-
-            auto messageElement = forwardedElement.firstChildElement("message");
-            auto delayElement = forwardedElement.firstChildElement("delay");
-
-            if (messageElement.isNull()) {
-                return false;
-            }
-
-            QXmppMessage message;
-            message.parse(messageElement);
-            if (!delayElement.isNull() && delayElement.namespaceURI() == ns_delayed_delivery) {
-                const QString stamp = delayElement.attribute("stamp");
-                message.setStamp(QXmppUtils::datetimeFromString(stamp));
-            }
+        if (auto result = parseMamMessageResult(element)) {
+            auto &[message, queryId] = *result;
 
             auto itr = d->ongoingRequests.find(queryId.toStdString());
             if (itr != d->ongoingRequests.end()) {
@@ -116,7 +165,7 @@ bool QXmppMamManager::handleStanza(const QDomElement &element)
                 itr->second.messages.append(std::move(message));
             } else {
                 // signal-based API
-                Q_EMIT archivedMessageReceived(queryId, message);
+                Q_EMIT archivedMessageReceived(queryId, parseMamMessage(message, Unencrypted));
             }
             return true;
         }
@@ -240,74 +289,97 @@ QString QXmppMamManager::retrieveArchivedMessages(const QString &to,
 QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(const QString &to, const QString &node, const QString &jid, const QDateTime &start, const QDateTime &end, const QXmppResultSetQuery &resultSetQuery)
 {
     auto queryIq = buildRequest(to, node, jid, start, end, resultSetQuery);
+    auto queryId = queryIq.queryId();
 
-    auto [itr, _] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
+    auto [itr, inserted] = d->ongoingRequests.insert({ queryIq.queryId().toStdString(), RetrieveRequestState() });
+    Q_ASSERT(inserted);
+
+    // create task here; promise could finish immediately after client()->sendIq()
+    auto task = itr->second.promise.task();
 
     // retrieve messages
-    client()->sendIq(std::move(queryIq)).then(this, [this, queryId = queryIq.queryId()](QXmppClient::IqResult result) {
+    client()->sendIq(std::move(queryIq)).then(this, [this, queryId](QXmppClient::IqResult result) {
         auto itr = d->ongoingRequests.find(queryId.toStdString());
         if (itr == d->ongoingRequests.end()) {
             return;
         }
+        auto &state = itr->second;
 
-        if (std::holds_alternative<QDomElement>(result)) {
-            auto &iq = itr->second.iq;
-            iq.parse(std::get<QDomElement>(result));
+        // handle IQ sending errors
+        if (std::holds_alternative<QXmppError>(result)) {
+            state.promise.finish(std::get<QXmppError>(result));
+            d->ongoingRequests.erase(itr);
+            return;
+        }
 
-            if (iq.type() == QXmppIq::Error) {
-                itr->second.promise.finish(QXmppError { iq.error().text(), iq.error() });
-                d->ongoingRequests.erase(itr);
+        // parse IQ
+        auto &iq = state.iq;
+        iq.parse(std::get<QDomElement>(result));
+
+        // handle MAM error result IQ
+        if (iq.type() == QXmppIq::Error) {
+            state.promise.finish(QXmppError { iq.error().text(), iq.error() });
+            d->ongoingRequests.erase(itr);
+            return;
+        }
+
+        // decrypt encrypted messages
+        if (auto *e2eeExt = client()->encryptionExtension()) {
+            // initialize processed messages (we need random access because
+            // decryptMessage() may finish in random order)
+            state.processedMessages.resize(state.messages.size());
+
+            // check for encrypted messages (once)
+            auto messagesEncrypted = transform(state.messages, [&](const auto &m) {
+                return e2eeExt->isEncrypted(m.element);
+            });
+            auto encryptedCount = sum(messagesEncrypted);
+
+            // We can't do this on the fly (with ++ and --) in the for loop
+            // because some decryptMessage() jobs could finish instantly
+            state.runningDecryptionJobs = encryptedCount;
+
+            for (auto i = 0; i < state.messages.size(); i++) {
+                if (!messagesEncrypted[i]) {
+                    continue;
+                }
+
+                e2eeExt->decryptMessage(parseMamMessage(state.messages.at(i), Encrypted)).then(this, [this, i, queryId](auto result) {
+                    auto itr = d->ongoingRequests.find(queryId.toStdString());
+                    Q_ASSERT(itr != d->ongoingRequests.end());
+
+                    auto &state = itr->second;
+
+                    // store decrypted message, fallback to encrypted message
+                    if (std::holds_alternative<QXmppMessage>(result)) {
+                        state.processedMessages[i] = std::get<QXmppMessage>(std::move(result));
+                    } else {
+                        warning(QStringLiteral("Error decrypting message."));
+                        state.processedMessages[i] = parseMamMessage(state.messages[i], Unencrypted);
+                    }
+
+                    // finish promise if this was the last job
+                    state.runningDecryptionJobs--;
+                    if (state.runningDecryptionJobs == 0) {
+                        state.finish();
+                        d->ongoingRequests.erase(itr);
+                    }
+                });
+            }
+
+            // finishing the promise is done after decryptMessage()
+            if (encryptedCount > 0) {
                 return;
             }
-
-            // decrypt encrypted messages
-            if (auto *e2eeExt = client()->encryptionExtension()) {
-                auto &messages = itr->second.messages;
-                auto running = std::make_shared<uint>(0);
-                // handle case when no message is encrypted
-                auto hasEncryptedMessages = false;
-
-                for (auto i = 0; i < messages.size(); i++) {
-                    if (!e2eeExt->isEncrypted(messages.at(i))) {
-                        continue;
-                    }
-                    hasEncryptedMessages = true;
-
-                    auto message = messages.at(i);
-                    (*running)++;
-                    e2eeExt->decryptMessage(std::move(message)).then(this, [this, i, running, queryId](auto result) {
-                        (*running)--;
-                        auto itr = d->ongoingRequests.find(queryId.toStdString());
-                        if (itr == d->ongoingRequests.end()) {
-                            return;
-                        }
-
-                        if (std::holds_alternative<QXmppMessage>(result)) {
-                            itr->second.messages[i] = std::get<QXmppMessage>(std::move(result));
-                        } else {
-                            warning(QStringLiteral("Error decrypting message."));
-                        }
-                        if (*running == 0) {
-                            itr->second.finish();
-                            d->ongoingRequests.erase(itr);
-                        }
-                    });
-                }
-
-                if (!hasEncryptedMessages) {
-                    // finish here, no decryptMessage callback will do it
-                    itr->second.finish();
-                    d->ongoingRequests.erase(itr);
-                }
-            } else {
-                itr->second.finish();
-                d->ongoingRequests.erase(itr);
-            }
-        } else {
-            itr->second.promise.finish(std::get<QXmppError>(result));
-            d->ongoingRequests.erase(itr);
         }
+
+        // for the case without decryption, finish here
+        state.processedMessages = transform(state.messages, [](const auto &m) {
+            return parseMamMessage(m, Unencrypted);
+        });
+        state.finish();
+        d->ongoingRequests.erase(itr);
     });
 
-    return itr->second.promise.task();
+    return task;
 }
