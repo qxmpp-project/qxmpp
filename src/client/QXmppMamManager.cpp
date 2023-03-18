@@ -339,7 +339,8 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
             // because some decryptMessage() jobs could finish instantly
             state.runningDecryptionJobs = encryptedCount;
 
-            for (auto i = 0; i < state.messages.size(); i++) {
+            int size = state.messages.size();
+            for (auto i = 0; i < size; i++) {
                 if (!messagesEncrypted[i]) {
                     continue;
                 }
