@@ -38,14 +38,14 @@ using Error = QXmppStanza::Error;
 using Manager = QXmppOmemoManager;
 using ManagerPrivate = QXmppOmemoManagerPrivate;
 
-const char *ns_client = "jabber:client";
-const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
-const char *ns_pubsub_config_node = "http://jabber.org/protocol/pubsub#config-node";
-const char *ns_pubsub_config_node_max = "http://jabber.org/protocol/pubsub#config-node-max";
-const char *ns_pubsub_create_and_configure = "http://jabber.org/protocol/pubsub#create-and-configure";
-const char *ns_pubsub_create_nodes = "http://jabber.org/protocol/pubsub#create-nodes";
-const char *ns_pubsub_publish = "http://jabber.org/protocol/pubsub#publish";
-const char *ns_pubsub_publish_options = "http://jabber.org/protocol/pubsub#publish-options";
+constexpr auto ns_client = "jabber:client";
+constexpr auto ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
+constexpr auto ns_pubsub_config_node = "http://jabber.org/protocol/pubsub#config-node";
+constexpr auto ns_pubsub_config_node_max = "http://jabber.org/protocol/pubsub#config-node-max";
+constexpr auto ns_pubsub_create_and_configure = "http://jabber.org/protocol/pubsub#create-and-configure";
+constexpr auto ns_pubsub_create_nodes = "http://jabber.org/protocol/pubsub#create-nodes";
+constexpr auto ns_pubsub_publish = "http://jabber.org/protocol/pubsub#publish";
+constexpr auto ns_pubsub_publish_options = "http://jabber.org/protocol/pubsub#publish-options";
 
 namespace QXmpp::Omemo::Private {
 
