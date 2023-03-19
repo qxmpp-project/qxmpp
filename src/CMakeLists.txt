@@ -271,28 +271,28 @@ set(SOURCE_FILES
 )
 
 if(BUILD_SHARED)
-    add_library(qxmpp SHARED ${SOURCE_FILES})
+    add_library(${QXMPP_TARGET} SHARED ${SOURCE_FILES})
 else()
-    add_library(qxmpp STATIC ${SOURCE_FILES})
+    add_library(${QXMPP_TARGET} STATIC ${SOURCE_FILES})
 endif()
 
-set_target_properties(qxmpp PROPERTIES
+set_target_properties(${QXMPP_TARGET} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${SO_VERSION}
     EXPORT_NAME QXmpp
 )
 
-target_include_directories(qxmpp
+target_include_directories(${QXMPP_TARGET}
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/base>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/client>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/server>
-    $<INSTALL_INTERFACE:include/qxmpp>
+    $<INSTALL_INTERFACE:include/${QXMPP_TARGET}>
     PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(qxmpp
+target_link_libraries(${QXMPP_TARGET}
     PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Network
@@ -311,21 +311,21 @@ if(WITH_GSTREAMER)
         client/QXmppCallStream.h
     )
 
-    target_sources(qxmpp
+    target_sources(${QXMPP_TARGET}
         PRIVATE
         client/QXmppCall.cpp
         client/QXmppCallManager.cpp
         client/QXmppCallStream.cpp
     )
 
-    target_link_libraries(qxmpp
+    target_link_libraries(${QXMPP_TARGET}
         PRIVATE
         ${GLIB2_LIBRARIES}
         ${GOBJECT_LIBRARIES}
         ${GSTREAMER_LIBRARY}
     )
 
-    target_include_directories(qxmpp
+    target_include_directories(${QXMPP_TARGET}
         PRIVATE
         ${GLIB2_INCLUDE_DIR}
         ${GOBJECT_INCLUDE_DIR}
@@ -335,13 +335,13 @@ endif()
 
 if(BUILD_OMEMO)
     # required to be used in QXmppMessage
-    target_sources(qxmpp PRIVATE base/QXmppOmemoDataBase.cpp)
+    target_sources(${QXMPP_TARGET} PRIVATE base/QXmppOmemoDataBase.cpp)
 endif()
 
 if(WITH_QCA)
-    target_sources(qxmpp PRIVATE client/QXmppEncryptedFileSharingProvider.cpp client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
+    target_sources(${QXMPP_TARGET} PRIVATE client/QXmppEncryptedFileSharingProvider.cpp client/QXmppFileEncryption.cpp client/QcaInitializer.cpp)
     set(INSTALL_HEADER_FILES ${INSTALL_HEADER_FILES} client/QXmppEncryptedFileSharingProvider.h)
-    target_link_libraries(qxmpp PRIVATE qca-qt${QT_VERSION_MAJOR})
+    target_link_libraries(${QXMPP_TARGET} PRIVATE qca-qt${QT_VERSION_MAJOR})
 endif()
 
 # qxmpp_export.h generation
@@ -358,12 +358,13 @@ set(QXMPP_CUSTOM_EXPORT_CONTENT "
 #define QXMPP_VERSION_PATCH ${PROJECT_VERSION_PATCH}
 ")
 
-generate_export_header(qxmpp
+generate_export_header(${QXMPP_TARGET}
+    BASE_NAME qxmpp
     CUSTOM_CONTENT_FROM_VARIABLE QXMPP_CUSTOM_EXPORT_CONTENT
 )
 
 install(
-    TARGETS qxmpp
+    TARGETS ${QXMPP_TARGET}
     EXPORT QXmppTarget
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -372,20 +373,20 @@ install(
 
 install(
     EXPORT QXmppTarget
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/qxmpp"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${QXMPP_TARGET}"
     FILE QXmpp.cmake
     NAMESPACE QXmpp::
     COMPONENT Devel
 )
 
 export(
-    TARGETS qxmpp
+    TARGETS ${QXMPP_TARGET}
     FILE QXmpp.cmake
 )
 
 install(
     FILES ${INSTALL_HEADER_FILES} ${CMAKE_CURRENT_BINARY_DIR}/qxmpp_export.h
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qxmpp"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${QXMPP_TARGET}"
 )
 
 # submodules

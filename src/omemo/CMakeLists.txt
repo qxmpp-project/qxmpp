@@ -4,8 +4,8 @@
 
 include(CMakePackageConfigHelpers)
 
-set(OMEMO_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/QXmppOmemo")
-set(OMEMO_HEADER_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/qxmpp/omemo")
+set(OMEMO_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${QXMPPOMEMO_TARGET}")
+set(OMEMO_HEADER_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/${QXMPP_TARGET}/Omemo")
 set(OMEMO_INSTALL_HEADER_FILES
     QXmppOmemoManager.h
     QXmppOmemoMemoryStorage.h
@@ -20,17 +20,17 @@ set(OMEMO_SOURCE_FILES
     QXmppOmemoStorage.cpp
 )
 
-add_library(QXmppOmemo SHARED ${OMEMO_SOURCE_FILES})
+add_library(${QXMPPOMEMO_TARGET} SHARED ${OMEMO_SOURCE_FILES})
 
-target_link_libraries(QXmppOmemo
+target_link_libraries(${QXMPPOMEMO_TARGET}
     PUBLIC
-    qxmpp
+    ${QXMPP_TARGET}
     Qt${QT_VERSION_MAJOR}::Core
     PRIVATE
     PkgConfig::OmemoC
     qca-qt${QT_VERSION_MAJOR}
 )
-target_include_directories(QXmppOmemo
+target_include_directories(${QXMPPOMEMO_TARGET}
     PUBLIC
     ${OMEMO_HEADER_DIR}
     PRIVATE
@@ -39,21 +39,21 @@ target_include_directories(QXmppOmemo
     ${PROJECT_BINARY_DIR}/src
 )
 
-generate_export_header(QXmppOmemo)
+generate_export_header(${QXMPPOMEMO_TARGET} BASE_NAME qxmppomemo)
 
 install(
     FILES ${OMEMO_INSTALL_HEADER_FILES} ${CMAKE_CURRENT_BINARY_DIR}/qxmppomemo_export.h
     DESTINATION ${OMEMO_HEADER_DIR}
 )
 
-set_target_properties(QXmppOmemo PROPERTIES
+set_target_properties(${QXMPPOMEMO_TARGET} PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${SO_VERSION}
     EXPORT_NAME Omemo
 )
 
 install(
-    TARGETS QXmppOmemo
+    TARGETS ${QXMPPOMEMO_TARGET}
     EXPORT QXmppOmemoTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -69,25 +69,25 @@ install(
 )
 
 export(
-    TARGETS QXmppOmemo
+    TARGETS ${QXMPPOMEMO_TARGET}
     FILE QXmppOmemo.cmake
 )
 
 configure_package_config_file(
     QXmppOmemoConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/QXmppOmemoConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${QXMPPOMEMO_TARGET}Config.cmake
     INSTALL_DESTINATION ${OMEMO_CMAKE_DIR}
 )
 
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/QXmppOmemoConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${QXMPPOMEMO_TARGET}ConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/QXmppOmemoConfig.cmake
-          ${CMAKE_CURRENT_BINARY_DIR}/QXmppOmemoConfigVersion.cmake
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${QXMPPOMEMO_TARGET}Config.cmake
+          ${CMAKE_CURRENT_BINARY_DIR}/${QXMPPOMEMO_TARGET}ConfigVersion.cmake
     DESTINATION ${OMEMO_CMAKE_DIR}
     COMPONENT Devel
 )

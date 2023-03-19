@@ -4,7 +4,7 @@
 
 macro(add_simple_example EXAMPLE_NAME)
     add_executable(${EXAMPLE_NAME} example_${EXAMPLE_NAME}/example_${EXAMPLE_NAME}.cpp)
-    target_link_libraries(${EXAMPLE_NAME} qxmpp)
+    target_link_libraries(${EXAMPLE_NAME} ${QXMPP_TARGET})
 endmacro()
 
 include_directories(${PROJECT_SOURCE_DIR}/src/base)
