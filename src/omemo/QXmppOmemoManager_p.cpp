@@ -1383,12 +1383,12 @@ QByteArray ManagerPrivate::createOmemoEnvelopeData(const signal_protocol_address
 //
 QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage stanza)
 {
-    QXmppPromise<std::optional<QXmppMessage>> interface;
-
     // At this point, the stanza has always an OMEMO element.
     const auto omemoElement = *stanza.omemoElement();
 
     if (auto optionalOmemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+        QXmppPromise<std::optional<QXmppMessage>> interface;
+
         const auto senderJid = QXmppUtils::jidToBareJid(stanza.from());
         const auto senderDeviceId = omemoElement.senderDeviceId();
         const auto omemoEnvelope = *optionalOmemoEnvelope;
@@ -1429,9 +1429,11 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
                 }
             });
         }
-    }
 
-    return interface.task();
+        return interface.task();
+    } else {
+        return makeReadyTask<std::optional<QXmppMessage>>(std::nullopt);
+    }
 }
 
 //
