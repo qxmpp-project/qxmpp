@@ -2614,7 +2614,7 @@ std::optional<QXmppOmemoDeviceListItem> QXmppOmemoManagerPrivate::updateContactD
 {
     if (deviceListItems.size() > 1) {
         const auto itr = std::find_if(deviceListItems.cbegin(), deviceListItems.cend(), [=](const QXmppOmemoDeviceListItem &item) {
-            return item.id() == QXmppPubSubManager::Current;
+            return item.id() == QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current);
         });
 
         if (itr != deviceListItems.cend()) {
