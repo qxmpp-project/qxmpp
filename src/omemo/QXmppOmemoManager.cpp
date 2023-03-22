@@ -1243,7 +1243,9 @@ void Manager::setClient(QXmppClient *client)
 
     connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
         const auto &modifiedOmemoKeys = modifiedKeys.value(ns_omemo_2);
-        Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
+        if (!modifiedOmemoKeys.isEmpty()) {
+            Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
+        }
 
         for (auto itr = modifiedOmemoKeys.cbegin(); itr != modifiedOmemoKeys.cend(); ++itr) {
             const auto &keyOwnerJid = itr.key();
