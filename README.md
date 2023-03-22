@@ -74,6 +74,7 @@ You can pass the following arguments to CMake:
     BUILD_INTERNAL_TESTS          to build the unit tests testing private parts of the API (default: false)
     BUILD_OMEMO                   to build the OMEMO module (default: false)
     WITH_GSTREAMER                to enable audio/video over jingle (default: false)
+    QT_VERSION_MAJOR=5/6          to build with a specific Qt major version (default behaviour: prefer 6)
 
 For building the OMEMO module [additional dependencies](src/omemo/README.md)
 are required.
