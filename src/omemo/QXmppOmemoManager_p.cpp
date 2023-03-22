@@ -1453,13 +1453,13 @@ QXmppTask<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDo
     iq.parse(iqElement);
     auto omemoElement = iq.omemoElement();
 
-    if (const auto envelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+    if (const auto omemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
         const auto senderJid = QXmppUtils::jidToBareJid(iq.from());
         const auto senderDeviceId = omemoElement.senderDeviceId();
 
         subscribeToNewDeviceLists(senderJid, senderDeviceId);
 
-        auto future = decryptStanza(iq, senderJid, senderDeviceId, *envelope, omemoElement.payload(), false);
+        auto future = decryptStanza(iq, senderJid, senderDeviceId, *omemoEnvelope, omemoElement.payload(), false);
         return chain<Result>(std::move(future), q, [iqElement](auto result) -> Result {
             if (result) {
                 auto decryptedElement = iqElement.cloneNode(true).toElement();
