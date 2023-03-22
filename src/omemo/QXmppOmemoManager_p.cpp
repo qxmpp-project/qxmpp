@@ -1386,12 +1386,11 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
     // At this point, the stanza has always an OMEMO element.
     const auto omemoElement = *stanza.omemoElement();
 
-    if (auto optionalOmemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+    if (const auto omemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
         QXmppPromise<std::optional<QXmppMessage>> interface;
 
         const auto senderJid = QXmppUtils::jidToBareJid(stanza.from());
         const auto senderDeviceId = omemoElement.senderDeviceId();
-        const auto omemoEnvelope = *optionalOmemoEnvelope;
         const auto omemoPayload = omemoElement.payload();
 
         subscribeToNewDeviceLists(senderJid, senderDeviceId);
@@ -1400,7 +1399,7 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
         // for it after building the initial session or sent by devices to build a new session
         // with this device.
         if (omemoPayload.isEmpty()) {
-            auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, omemoEnvelope);
+            auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, *omemoEnvelope);
             future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
                 if (!payloadDecryptionData) {
                     warning("Empty OMEMO message could not be successfully processed");
@@ -1411,7 +1410,7 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
                 interface.finish(std::nullopt);
             });
         } else {
-            auto future = decryptStanza(stanza, senderJid, senderDeviceId, omemoEnvelope, omemoPayload);
+            auto future = decryptStanza(stanza, senderJid, senderDeviceId, *omemoEnvelope, omemoPayload);
             future.then(q, [=](std::optional<DecryptionResult> optionalDecryptionResult) mutable {
                 if (optionalDecryptionResult) {
                     const auto decryptionResult = std::move(*optionalDecryptionResult);
