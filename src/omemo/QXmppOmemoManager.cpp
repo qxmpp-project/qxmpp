@@ -1248,18 +1248,24 @@ void Manager::setClient(QXmppClient *client)
             Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
         }
 
+        QMultiHash<QString, uint32_t> modifiedDevices;
+
         for (auto itr = modifiedOmemoKeys.cbegin(); itr != modifiedOmemoKeys.cend(); ++itr) {
             const auto &keyOwnerJid = itr.key();
             const auto &keyId = itr.value();
 
-            // Emit 'deviceChanged()' only if there is a device with the key.
+            // Ensure to emit 'deviceChanged()' later only if there is a device with the key.
             const auto &devices = d->devices.value(keyOwnerJid);
             for (auto devicesItr = devices.cbegin(); devicesItr != devices.cend(); ++devicesItr) {
                 if (devicesItr->keyId == keyId) {
-                    Q_EMIT deviceChanged(keyOwnerJid, devicesItr.key());
-                    return;
+                    modifiedDevices.insert(keyOwnerJid, devicesItr.key());
+                    break;
                 }
             }
+        }
+
+        for (auto modifiedDevicesItr = modifiedDevices.cbegin(); modifiedDevicesItr != modifiedDevices.cend(); ++modifiedDevicesItr) {
+            Q_EMIT deviceChanged(modifiedDevicesItr.key(), modifiedDevicesItr.value());
         }
     });
 }
