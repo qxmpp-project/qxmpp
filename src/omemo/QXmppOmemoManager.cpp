@@ -1243,6 +1243,7 @@ void Manager::setClient(QXmppClient *client)
 
     connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
         const auto &modifiedOmemoKeys = modifiedKeys.value(ns_omemo_2);
+
         if (!modifiedOmemoKeys.isEmpty()) {
             Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
         }
@@ -1253,9 +1254,9 @@ void Manager::setClient(QXmppClient *client)
 
             // Emit 'deviceChanged()' only if there is a device with the key.
             const auto &devices = d->devices.value(keyOwnerJid);
-            for (auto itr = devices.cbegin(); itr != devices.cend(); ++itr) {
-                if (itr->keyId == keyId) {
-                    Q_EMIT deviceChanged(keyOwnerJid, itr.key());
+            for (auto devicesItr = devices.cbegin(); devicesItr != devices.cend(); ++devicesItr) {
+                if (devicesItr->keyId == keyId) {
+                    Q_EMIT deviceChanged(keyOwnerJid, devicesItr.key());
                     return;
                 }
             }
