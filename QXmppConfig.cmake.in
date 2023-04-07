@@ -5,11 +5,11 @@
 @PACKAGE_INIT@
 
 set(_QXmpp_FIND_PARTS_REQUIRED)
-if(QXmpp_FIND_REQUIRED)
+if(QXmppQt@QT_VERSION_MAJOR@_FIND_REQUIRED)
     set(_QXmpp_FIND_PARTS_REQUIRED REQUIRED)
 endif()
 set(_QXmpp_FIND_PARTS_QUIET)
-if(QXmpp_FIND_QUIETLY)
+if(QXmppQt@QT_VERSION_MAJOR@_FIND_QUIETLY)
     set(_QXmpp_FIND_PARTS_QUIET QUIET)
 endif()
 
@@ -20,13 +20,13 @@ find_dependency(Qt@QT_VERSION_MAJOR@Xml)
 
 include("${CMAKE_CURRENT_LIST_DIR}/QXmpp.cmake")
 
-foreach(module ${QXmpp_FIND_COMPONENTS})
-    find_package(QXmpp${module}
-        ${QXmpp_FIND_VERSION}
+foreach(module ${QXmppQt@QT_VERSION_MAJOR@_FIND_COMPONENTS})
+    find_package(QXmpp${module}Qt@QT_VERSION_MAJOR@
+        ${QXmppQt@QT_VERSION_MAJOR@_FIND_VERSION}
         ${_QXmpp_FIND_PARTS_REQUIRED}
         ${_QXmpp_FIND_PARTS_QUIET}
     )
-    set(QXmpp_${module}_FOUND ${QXmpp${module}_FOUND})
+    set(QXmppQt@QT_VERSION_MAJOR@_${module}_FOUND ${QXmpp${module}Qt@QT_VERSION_MAJOR@_FOUND})
 endforeach()
 
 check_required_components(QXmpp)

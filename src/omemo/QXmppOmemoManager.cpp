@@ -675,11 +675,13 @@ QXmppOmemoOwnDevice Manager::ownDevice()
 
 /// Returns all locally stored devices except the own device.
 ///
-/// Only devices that have been received after subscribing the corresponding
-/// device lists on the server are stored locally.
+/// Only devices that have been received after subscribing the corresponding device lists on the
+/// server are stored locally.
 /// Thus, only those are returned.
-/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without
-/// presence subscription before.
+/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without presence subscription
+/// before.
+///
+/// You must build sessions before you can get devices with corresponding keys.
 ///
 /// /\return all devices except the own device
 ///
@@ -691,11 +693,13 @@ QXmppTask<QVector<QXmppOmemoDevice>> Manager::devices()
 ///
 /// Returns locally stored devices except the own device.
 ///
-/// Only devices that have been received after subscribing the corresponding
-/// device lists on the server are stored locally.
+/// Only devices that have been received after subscribing the corresponding device lists on the
+/// server are stored locally.
 /// Thus, only those are returned.
-/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without
-/// presence subscription before.
+/// Call \c QXmppOmemoManager::subscribeToDeviceLists() for contacts without presence subscription
+/// before.
+///
+/// You must build sessions before you can get devices with corresponding keys.
 ///
 /// \param jids JIDs whose devices are being retrieved
 ///
@@ -835,16 +839,15 @@ bool Manager::isNewDeviceAutoSessionBuildingEnabled()
 ///
 /// Builds sessions manually with devices for whom no sessions are available.
 ///
-/// Usually, sessions are built during sending a first message to a device or
-/// after a first message is received from a device.
+/// Usually, sessions are built during sending a first message to a device or after a first message
+/// is received from a device.
 /// This can be called in order to speed up the sending of a message.
-/// If this method is called before sending the first message, all sessions can
-/// be built and when the first message is sent, the message has only be
-/// encrypted.
-/// Especially chats with multiple devices, that can decrease the noticeable
-/// time a user has to wait for sending a message.
-/// Additionally, the keys are automatically retrieved from the server which is
-/// helpful in order to get them when calling \c QXmppOmemoManager::devices().
+/// If this method is called before sending the first message, all sessions can be built and when
+/// the first message is being sent, the message only needs to be encrypted.
+/// Especially for chats with multiple devices, that can decrease the noticeable time a user has to
+/// wait for sending a message.
+/// Additionally, the keys are automatically retrieved from the server which is helpful in order to
+/// get them when calling \c QXmppOmemoManager::devices().
 ///
 /// The user must be logged in while calling this.
 ///
@@ -1240,20 +1243,29 @@ void Manager::setClient(QXmppClient *client)
 
     connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
         const auto &modifiedOmemoKeys = modifiedKeys.value(ns_omemo_2);
-        Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
+
+        if (!modifiedOmemoKeys.isEmpty()) {
+            Q_EMIT trustLevelsChanged(modifiedOmemoKeys);
+        }
+
+        QMultiHash<QString, uint32_t> modifiedDevices;
 
         for (auto itr = modifiedOmemoKeys.cbegin(); itr != modifiedOmemoKeys.cend(); ++itr) {
             const auto &keyOwnerJid = itr.key();
             const auto &keyId = itr.value();
 
-            // Emit 'deviceChanged()' only if there is a device with the key.
+            // Ensure to emit 'deviceChanged()' later only if there is a device with the key.
             const auto &devices = d->devices.value(keyOwnerJid);
-            for (auto itr = devices.cbegin(); itr != devices.cend(); ++itr) {
-                if (itr->keyId == keyId) {
-                    Q_EMIT deviceChanged(keyOwnerJid, itr.key());
-                    return;
+            for (auto devicesItr = devices.cbegin(); devicesItr != devices.cend(); ++devicesItr) {
+                if (devicesItr->keyId == keyId) {
+                    modifiedDevices.insert(keyOwnerJid, devicesItr.key());
+                    break;
                 }
             }
+        }
+
+        for (auto modifiedDevicesItr = modifiedDevices.cbegin(); modifiedDevicesItr != modifiedDevices.cend(); ++modifiedDevicesItr) {
+            Q_EMIT deviceChanged(modifiedDevicesItr.key(), modifiedDevicesItr.value());
         }
     });
 }

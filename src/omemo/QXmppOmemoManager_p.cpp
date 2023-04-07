@@ -35,14 +35,14 @@ using Error = QXmppStanza::Error;
 using Manager = QXmppOmemoManager;
 using ManagerPrivate = QXmppOmemoManagerPrivate;
 
-const char *ns_client = "jabber:client";
-const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
-const char *ns_pubsub_config_node = "http://jabber.org/protocol/pubsub#config-node";
-const char *ns_pubsub_config_node_max = "http://jabber.org/protocol/pubsub#config-node-max";
-const char *ns_pubsub_create_and_configure = "http://jabber.org/protocol/pubsub#create-and-configure";
-const char *ns_pubsub_create_nodes = "http://jabber.org/protocol/pubsub#create-nodes";
-const char *ns_pubsub_publish = "http://jabber.org/protocol/pubsub#publish";
-const char *ns_pubsub_publish_options = "http://jabber.org/protocol/pubsub#publish-options";
+constexpr auto ns_client = "jabber:client";
+constexpr auto ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
+constexpr auto ns_pubsub_config_node = "http://jabber.org/protocol/pubsub#config-node";
+constexpr auto ns_pubsub_config_node_max = "http://jabber.org/protocol/pubsub#config-node-max";
+constexpr auto ns_pubsub_create_and_configure = "http://jabber.org/protocol/pubsub#create-and-configure";
+constexpr auto ns_pubsub_create_nodes = "http://jabber.org/protocol/pubsub#create-nodes";
+constexpr auto ns_pubsub_publish = "http://jabber.org/protocol/pubsub#publish";
+constexpr auto ns_pubsub_publish_options = "http://jabber.org/protocol/pubsub#publish-options";
 
 namespace QXmpp::Omemo::Private {
 
@@ -754,7 +754,7 @@ void ManagerPrivate::renewSignedPreKeyPairs()
 
     if (isSignedPreKeyPairRemoved) {
         RefCountedPtr<ratchet_identity_key_pair> identityKeyPair;
-        generateIdentityKeyPair(identityKeyPair.ptrRef());
+        deserializeIdentityKeyPair(identityKeyPair.ptrRef());
         updateSignedPreKeyPair(identityKeyPair.get());
 
         // Store the own device containing the new signed pre key ID.
@@ -957,54 +957,6 @@ void ManagerPrivate::removeDevicesRemovedFromServer()
             }
         }
     }
-}
-
-//
-// Generates an identity key pair.
-//
-// The identity key pair is the pair of private and a public long-term key.
-//
-// \param identityKeyPair identity key pair location
-//
-// \return whether it succeeded
-//
-bool ManagerPrivate::generateIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const
-{
-    BufferSecurePtr privateIdentityKeyBuffer = BufferSecurePtr::fromByteArray(ownDevice.privateIdentityKey);
-
-    if (!privateIdentityKeyBuffer) {
-        warning("Buffer for serialized private identity key could not be created");
-        return false;
-    }
-
-    RefCountedPtr<ec_private_key> privateIdentityKey;
-
-    if (curve_decode_private_point(privateIdentityKey.ptrRef(), signal_buffer_data(privateIdentityKeyBuffer.get()), signal_buffer_len(privateIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Private identity key could not be deserialized");
-        return false;
-    }
-
-    const auto &serializedPublicIdentityKey = ownDevice.publicIdentityKey;
-    BufferPtr publicIdentityKeyBuffer = BufferPtr::fromByteArray(serializedPublicIdentityKey);
-
-    if (!publicIdentityKeyBuffer) {
-        warning("Buffer for serialized public identity key could not be created");
-        return false;
-    }
-
-    RefCountedPtr<ec_public_key> publicIdentityKey;
-
-    if (curve_decode_point_ed(publicIdentityKey.ptrRef(), signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Public identity key could not be deserialized");
-        return false;
-    }
-
-    if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
-        warning("Identity key pair could not be deserialized");
-        return false;
-    }
-
-    return true;
 }
 
 //
@@ -1428,15 +1380,14 @@ QByteArray ManagerPrivate::createOmemoEnvelopeData(const signal_protocol_address
 //
 QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessage stanza)
 {
-    QXmppPromise<std::optional<QXmppMessage>> interface;
-
     // At this point, the stanza has always an OMEMO element.
     const auto omemoElement = *stanza.omemoElement();
 
-    if (auto optionalOmemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+    if (const auto omemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+        QXmppPromise<std::optional<QXmppMessage>> interface;
+
         const auto senderJid = QXmppUtils::jidToBareJid(stanza.from());
         const auto senderDeviceId = omemoElement.senderDeviceId();
-        const auto omemoEnvelope = *optionalOmemoEnvelope;
         const auto omemoPayload = omemoElement.payload();
 
         subscribeToNewDeviceLists(senderJid, senderDeviceId);
@@ -1445,7 +1396,7 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
         // for it after building the initial session or sent by devices to build a new session
         // with this device.
         if (omemoPayload.isEmpty()) {
-            auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, omemoEnvelope);
+            auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, *omemoEnvelope);
             future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
                 if (!payloadDecryptionData) {
                     warning("Empty OMEMO message could not be successfully processed");
@@ -1456,7 +1407,7 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
                 interface.finish(std::nullopt);
             });
         } else {
-            auto future = decryptStanza(stanza, senderJid, senderDeviceId, omemoEnvelope, omemoPayload);
+            auto future = decryptStanza(stanza, senderJid, senderDeviceId, *omemoEnvelope, omemoPayload);
             future.then(q, [=](std::optional<DecryptionResult> optionalDecryptionResult) mutable {
                 if (optionalDecryptionResult) {
                     const auto decryptionResult = std::move(*optionalDecryptionResult);
@@ -1474,9 +1425,11 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
                 }
             });
         }
-    }
 
-    return interface.task();
+        return interface.task();
+    } else {
+        return makeReadyTask<std::optional<QXmppMessage>>(std::nullopt);
+    }
 }
 
 //
@@ -1497,13 +1450,13 @@ QXmppTask<std::optional<IqDecryptionResult>> ManagerPrivate::decryptIq(const QDo
     iq.parse(iqElement);
     auto omemoElement = iq.omemoElement();
 
-    if (const auto envelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
+    if (const auto omemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
         const auto senderJid = QXmppUtils::jidToBareJid(iq.from());
         const auto senderDeviceId = omemoElement.senderDeviceId();
 
         subscribeToNewDeviceLists(senderJid, senderDeviceId);
 
-        auto future = decryptStanza(iq, senderJid, senderDeviceId, *envelope, omemoElement.payload(), false);
+        auto future = decryptStanza(iq, senderJid, senderDeviceId, *omemoEnvelope, omemoElement.payload(), false);
         return chain<Result>(std::move(future), q, [iqElement](auto result) -> Result {
             if (result) {
                 auto decryptedElement = iqElement.cloneNode(true).toElement();
@@ -2659,7 +2612,7 @@ std::optional<QXmppOmemoDeviceListItem> QXmppOmemoManagerPrivate::updateContactD
 {
     if (deviceListItems.size() > 1) {
         const auto itr = std::find_if(deviceListItems.cbegin(), deviceListItems.cend(), [=](const QXmppOmemoDeviceListItem &item) {
-            return item.id() == QXmppPubSubManager::Current;
+            return item.id() == QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current);
         });
 
         if (itr != deviceListItems.cend()) {
@@ -3492,6 +3445,56 @@ bool ManagerPrivate::createSessionBundle(session_pre_key_bundle **sessionBundle,
         warning("Session bundle data could not be deserialized");
         return false;
     }
+}
+
+//
+// Deserializes the locally stored identity key pair.
+//
+// The identity key pair is the pair of private and a public long-term keys.
+//
+// \param identityKeyPair identity key pair location
+//
+// \return whether it succeeded
+//
+bool ManagerPrivate::deserializeIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const
+{
+    RefCountedPtr<ec_private_key> privateIdentityKey;
+    deserializePrivateIdentityKey(privateIdentityKey.ptrRef(), ownDevice.privateIdentityKey);
+
+    RefCountedPtr<ec_public_key> publicIdentityKey;
+    deserializePublicIdentityKey(publicIdentityKey.ptrRef(), ownDevice.publicIdentityKey);
+
+    if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
+        warning("Identity key pair could not be deserialized");
+        return false;
+    }
+
+    return true;
+}
+
+//
+// Deserializes a private identity key.
+//
+// \param privateIdentityKey private identity key location
+// \param serializedPrivateIdentityKey serialized private identity key
+//
+// \return whether it succeeded
+//
+bool ManagerPrivate::deserializePrivateIdentityKey(ec_private_key **privateIdentityKey, const QByteArray &serializedPrivateIdentityKey) const
+{
+    BufferSecurePtr privateIdentityKeyBuffer = BufferSecurePtr::fromByteArray(serializedPrivateIdentityKey);
+
+    if (!privateIdentityKeyBuffer) {
+        warning("Buffer for serialized private identity key could not be created");
+        return false;
+    }
+
+    if (curve_decode_private_point(privateIdentityKey, signal_buffer_data(privateIdentityKeyBuffer.get()), signal_buffer_len(privateIdentityKeyBuffer.get()), globalContext.get()) < 0) {
+        warning("Private identity key could not be deserialized");
+        return false;
+    }
+
+    return true;
 }
 
 //

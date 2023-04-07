@@ -5,8 +5,8 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(QXmpp)
+find_dependency(QXmppQt@QT_VERSION_MAJOR@)
 
 include("${CMAKE_CURRENT_LIST_DIR}/QXmppOmemo.cmake")
 
-check_required_components(QXmppOmemo)
+check_required_components(QXmppOmemoQt@QT_VERSION_MAJOR@)

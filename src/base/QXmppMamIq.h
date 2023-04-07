@@ -14,7 +14,7 @@
 class QXmppMamQueryIqPrivate;
 class QXmppMamResultIqPrivate;
 
-class QXmppMamQueryIq : public QXmppIq
+class QXMPP_EXPORT QXmppMamQueryIq : public QXmppIq
 {
 public:
     QXmppMamQueryIq();
@@ -46,7 +46,7 @@ private:
     QSharedDataPointer<QXmppMamQueryIqPrivate> d;
 };
 
-class QXmppMamResultIq : public QXmppIq
+class QXMPP_EXPORT QXmppMamResultIq : public QXmppIq
 {
 public:
     QXmppMamResultIq();

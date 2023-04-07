@@ -194,7 +194,6 @@ public:
     bool renewPreKeyPairs(uint32_t keyPairBeingRenewed);
     bool updatePreKeyPairs(uint32_t count = 1);
     void removeDevicesRemovedFromServer();
-    bool generateIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const;
 
     QXmppTask<QXmppE2eeExtension::MessageEncryptResult> encryptMessageForRecipients(QXmppMessage &&message,
                                                                                     QVector<QString> recipientJids,
@@ -336,6 +335,9 @@ public:
                              const QByteArray &serializedSignedPublicPreKeySignature,
                              const QByteArray &serializedPublicPreKey,
                              uint32_t publicPreKeyId);
+
+    bool deserializeIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair) const;
+    bool deserializePrivateIdentityKey(ec_private_key **privateIdentityKey, const QByteArray &serializedPrivateIdentityKey) const;
     bool deserializePublicIdentityKey(ec_public_key **publicIdentityKey, const QByteArray &serializedPublicIdentityKey) const;
     bool deserializeSignedPublicPreKey(ec_public_key **signedPublicPreKey, const QByteArray &serializedSignedPublicPreKey) const;
     bool deserializePublicPreKey(ec_public_key **publicPreKey, const QByteArray &serializedPublicPreKey) const;

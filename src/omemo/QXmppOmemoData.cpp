@@ -13,7 +13,7 @@
 #include <QDomElement>
 #include <QHash>
 
-const char *ns_omemo_2 = "urn:xmpp:omemo:2";
+constexpr auto ns_omemo_2 = "urn:xmpp:omemo:2";
 
 /// \cond
 ///
