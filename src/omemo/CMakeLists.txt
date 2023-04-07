@@ -20,7 +20,11 @@ set(OMEMO_SOURCE_FILES
     QXmppOmemoStorage.cpp
 )
 
-add_library(${QXMPPOMEMO_TARGET} SHARED ${OMEMO_SOURCE_FILES})
+if(BUILD_SHARED)
+    add_library(${QXMPPOMEMO_TARGET} SHARED ${OMEMO_SOURCE_FILES})
+else()
+    add_library(${QXMPPOMEMO_TARGET} STATIC ${OMEMO_SOURCE_FILES})
+endif()
 
 target_link_libraries(${QXMPPOMEMO_TARGET}
     PUBLIC
