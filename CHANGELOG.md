@@ -4,6 +4,20 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.4 (Apr 07, 2023)
+--------------------------
+
+Fixes:
+ - OMEMO fixes (@melvo)
+ - Fix use-after-move in EntityTimeManager (@lnjX)
+ - EME: Always send encryption name text (@melvo)
+ - Fix interpretation of empty to/from address in the client (@lnjX)
+ - MSVC related build fixes (@JBBgameich)
+
+Misc:
+ - Support installing QXmpp with Qt 5 and Qt 6 in parallel (@lnjX)
+ - Support building QXmppOmemo statically (@lnjX)
+
 QXmpp 1.5.3 (Mar 11, 2023)
 --------------------------
 
