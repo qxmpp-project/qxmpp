@@ -160,7 +160,7 @@ auto QXmppHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
         // reduce ref count, so the signal connection doesn't keep the state alive forever
         state.reset();
     });
-    QObject::connect(state->upload.get(), &QXmppHttpUpload::progressChanged, [stateRef = std::weak_ptr(state), reportProgress = std::move(reportProgress)]() {
+    QObject::connect(state->upload.get(), &QXmppHttpUpload::progressChanged, [stateRef = std::weak_ptr<State>(state), reportProgress = std::move(reportProgress)]() {
         if (auto state = stateRef.lock()) {
             reportProgress(state->upload->bytesSent(), state->upload->bytesTotal());
         }
