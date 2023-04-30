@@ -4,6 +4,13 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.5 (Apr 30, 2023)
+--------------------------
+
+Fixes:
+ - Fix dependencies in generated pkg-config files (@krop)
+ - Fix compilation with android/clang (@lnjX)
+
 QXmpp 1.5.4 (Apr 07, 2023)
 --------------------------
 
