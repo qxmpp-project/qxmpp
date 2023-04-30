@@ -9,6 +9,13 @@ QXmpp 1.6.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.5.5 (Apr 30, 2023)
+--------------------------
+
+Fixes:
+ - Fix dependencies in generated pkg-config files (@krop)
+ - Fix compilation with android/clang (@lnjX)
+
 QXmpp 1.5.4 (Apr 07, 2023)
 --------------------------
 
