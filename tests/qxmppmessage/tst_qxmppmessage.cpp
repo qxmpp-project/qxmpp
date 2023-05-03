@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2021 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2023 Tibor Csötönyi <work@taibsu.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppEncryptedFileSource.h"
+#include "QXmppJingleData.h"
 #include "QXmppMessage.h"
 #include "QXmppMessageReaction.h"
 #include "QXmppMixInvitation.h"
@@ -58,6 +60,7 @@ private:
     Q_SLOT void testE2eeFallbackBody();
     Q_SLOT void testFileSharing();
     Q_SLOT void testEncryptedFileSource();
+    Q_SLOT void testJingleMessageInitiationElement();
 };
 
 void tst_QXmppMessage::testBasic_data()
@@ -1283,6 +1286,27 @@ void tst_QXmppMessage::testEncryptedFileSource()
         parsePacket(encryptedSource, xml);
         serializePacket(encryptedSource, xml);
     }
+}
+
+void tst_QXmppMessage::testJingleMessageInitiationElement()
+{
+    const QByteArray xml(
+        "<message to='romeo@montague.example' from='juliet@capulet.example/phone' type='chat'>"
+        "<store xmlns=\"urn:xmpp:hints\"/>"
+        "<proceed xmlns='urn:xmpp:jingle-message:0' id='ca3cf894-5325-482f-a412-a6e9f832298d'/>"
+        "</message>");
+
+    QXmppMessage message1;
+    QVERIFY(!message1.jingleMessageInitiationElement());
+
+    parsePacket(message1, xml);
+    QVERIFY(message1.jingleMessageInitiationElement());
+    serializePacket(message1, xml);
+
+    QXmppMessage message2;
+    message2.addHint(QXmppMessage::Store);
+    message2.setJingleMessageInitiationElement(QXmppJingleMessageInitiationElement());
+    QVERIFY(message2.jingleMessageInitiationElement());
 }
 
 QTEST_MAIN(tst_QXmppMessage)

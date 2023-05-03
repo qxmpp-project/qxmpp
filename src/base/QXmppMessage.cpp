@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2018 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2021 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2023 Tibor Csötönyi <work@taibsu.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -11,6 +12,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppFileShare.h"
 #include "QXmppGlobal_p.h"
+#include "QXmppJingleData.h"
 #include "QXmppMessageReaction.h"
 #include "QXmppMixInvitation.h"
 #ifdef BUILD_OMEMO
@@ -122,6 +124,9 @@ public:
 
     // XEP-0334: Message Processing Hints
     quint8 hints;
+
+    // XEP-0353: Jingle Message Initiation
+    std::optional<QXmppJingleMessageInitiationElement> jingleMessageInitiationElement;
 
     // XEP-0359: Unique and Stable Stanza IDs
     QString stanzaId;
@@ -872,6 +877,24 @@ void QXmppMessage::removeAllHints()
 }
 
 ///
+/// Returns a Jingle Message Initiation element as defined in \xep{0353}: Jingle Message
+/// Initiation.
+///
+std::optional<QXmppJingleMessageInitiationElement> QXmppMessage::jingleMessageInitiationElement() const
+{
+    return d->jingleMessageInitiationElement;
+}
+
+///
+/// Sets a Jingle Message Initiation element as defined in \xep{0353}: Jingle Message
+/// Initiation.
+///
+void QXmppMessage::setJingleMessageInitiationElement(const std::optional<QXmppJingleMessageInitiationElement> &jingleMessageInitiationElement)
+{
+    d->jingleMessageInitiationElement = jingleMessageInitiationElement;
+}
+
+///
 /// Returns the stanza ID of the message according to \xep{0359}: Unique and
 /// Stable Stanza IDs.
 ///
@@ -1393,6 +1416,13 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             return true;
         }
+        // XEP-0353: Jingle Message Initiation
+        if (QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(element)) {
+            QXmppJingleMessageInitiationElement jingleMessageInitiationElement;
+            jingleMessageInitiationElement.parse(element);
+            d->jingleMessageInitiationElement = jingleMessageInitiationElement;
+            return true;
+        }
         // XEP-0359: Unique and Stable Stanza IDs
         if (checkElement(element, QStringLiteral("stanza-id"), ns_sid)) {
             d->stanzaId = element.attribute(QStringLiteral("id"));
@@ -1809,6 +1839,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
                 writer->writeAttribute(QStringLiteral("thread"), d->markedThread);
             }
             writer->writeEndElement();
+        }
+
+        // XEP-0353: Jingle Message Initiation
+        if (d->jingleMessageInitiationElement) {
+            d->jingleMessageInitiationElement->toXml(writer);
         }
 
         // XEP-0367: Message Attaching

@@ -56,6 +56,10 @@ private:
     Q_SLOT void testPayloadTypeRtpFeedbackNegotiation();
     Q_SLOT void testRtpErrorCondition_data();
     Q_SLOT void testRtpErrorCondition();
+
+    Q_SLOT void testIsJingleMessageInitiationElement_data();
+    Q_SLOT void testIsJingleMessageInitiationElement();
+    Q_SLOT void testJingleMessageInitiationElement();
 };
 
 void tst_QXmppJingleIq::testIsSdpParameter_data()
@@ -1390,33 +1394,287 @@ void tst_QXmppJingleIq::testRtpErrorCondition()
     iq2.setAction(QXmppJingleIq::SessionTerminate);
 
     switch (condition) {
-    case QXmppJingleIq::Reason::NoErrorCondition:
-        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::NoErrorCondition);
+    case QXmppJingleReason::NoErrorCondition:
+        iq2.reason().setRtpErrorCondition(QXmppJingleReason::NoErrorCondition);
         break;
-    case QXmppJingleIq::Reason::InvalidCrypto:
-        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::InvalidCrypto);
+    case QXmppJingleReason::InvalidCrypto:
+        iq2.reason().setRtpErrorCondition(QXmppJingleReason::InvalidCrypto);
         break;
-    case QXmppJingleIq::Reason::CryptoRequired:
-        iq2.reason().setRtpErrorCondition(QXmppJingleIq::Reason::CryptoRequired);
+    case QXmppJingleReason::CryptoRequired:
+        iq2.reason().setRtpErrorCondition(QXmppJingleReason::CryptoRequired);
         break;
     }
 
-    iq2.reason().setType(QXmppJingleIq::Reason::SecurityError);
+    iq2.reason().setType(QXmppJingleReason::SecurityError);
 
     const auto rtpErrorCondition2 = iq2.reason().rtpErrorCondition();
     switch (condition) {
-    case QXmppJingleIq::Reason::NoErrorCondition:
-        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::NoErrorCondition);
+    case QXmppJingleReason::NoErrorCondition:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleReason::NoErrorCondition);
         break;
-    case QXmppJingleIq::Reason::InvalidCrypto:
-        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::InvalidCrypto);
+    case QXmppJingleReason::InvalidCrypto:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleReason::InvalidCrypto);
         break;
-    case QXmppJingleIq::Reason::CryptoRequired:
-        QVERIFY(rtpErrorCondition2 == QXmppJingleIq::Reason::CryptoRequired);
+    case QXmppJingleReason::CryptoRequired:
+        QVERIFY(rtpErrorCondition2 == QXmppJingleReason::CryptoRequired);
         break;
     }
 
     serializePacket(iq2, xml);
+}
+
+void tst_QXmppJingleIq::testIsJingleMessageInitiationElement_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("isValid");
+
+    // --- Propose ---
+
+    QTest::newRow("validPropose")
+        << QByteArrayLiteral(
+               "<propose xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+               "<description xmlns='urn:xmpp:jingle:apps:rtp:1' media='audio'/>"
+               "</propose>")
+        << true;
+    QTest::newRow("invalidProposeIdMissing")
+        << QByteArrayLiteral(
+               "<propose xmlns='urn:xmpp:jingle-message:0'>"
+               "<description xmlns='urn:xmpp:jingle:apps:rtp:1' media='audio'/>"
+               "</propose>")
+        << false;
+    QTest::newRow("invalidProposeNamespaceMissing")
+        << QByteArrayLiteral(
+               "<propose id='a73sjjvkla37jfea'>"
+               "<description xmlns='urn:xmpp:jingle:apps:rtp:1' media='audio'/>"
+               "</propose>")
+        << false;
+
+    // --- Ringing ---
+
+    QTest::newRow("validRinging")
+        << QByteArrayLiteral("<ringing xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'/>")
+        << true;
+    QTest::newRow("invalidRingingIdMissing")
+        << QByteArrayLiteral("<ringing xmlns='urn:xmpp:jingle-message:0'/>")
+        << false;
+    QTest::newRow("invalidRingingNamespaceMissing")
+        << QByteArrayLiteral("<ringing id='a73sjjvkla37jfea'/>")
+        << false;
+
+    // --- Proceed ---
+
+    QTest::newRow("validProceed")
+        << QByteArrayLiteral("<proceed xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'/>")
+        << true;
+    QTest::newRow("invalidProceedIdMissing")
+        << QByteArrayLiteral("<proceed xmlns='urn:xmpp:jingle-message:0'/>")
+        << false;
+    QTest::newRow("invalidProceedNamespaceMissing")
+        << QByteArrayLiteral("<proceed id='a73sjjvkla37jfea'/>")
+        << false;
+
+    // --- Reject ---
+
+    QTest::newRow("validReject")
+        << QByteArrayLiteral(
+               "<reject xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Busy</text>"
+               "<busy/>"
+               "</reason>"
+               "</reject>")
+        << true;
+    QTest::newRow("invalidRejectIdMissing")
+        << QByteArrayLiteral(
+               "<reject xmlns='urn:xmpp:jingle-message:0'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Busy</text>"
+               "<busy/>"
+               "</reason>"
+               "</reject>")
+        << false;
+    QTest::newRow("invalidRejectNamespaceMissing")
+        << QByteArrayLiteral(
+               "<reject id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Busy</text>"
+               "<busy/>"
+               "</reason>"
+               "</reject>")
+        << false;
+
+    // --- Retract ---
+
+    QTest::newRow("validRetract")
+        << QByteArrayLiteral(
+               "<retract xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Retracted</text>"
+               "<cancel/>"
+               "</reason>"
+               "</retract>")
+        << true;
+    QTest::newRow("invalidRetractIdMissing")
+        << QByteArrayLiteral(
+               "<retract xmlns='urn:xmpp:jingle-message:0'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Retracted</text>"
+               "<cancel/>"
+               "</reason>"
+               "</retract>")
+        << false;
+    QTest::newRow("invalidRetractNamespaceMissing")
+        << QByteArrayLiteral(
+               "<retract id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Retracted</text>"
+               "<cancel/>"
+               "</reason>"
+               "</retract>")
+        << false;
+
+    // --- Finish ---
+
+    QTest::newRow("validFinish")
+        << QByteArrayLiteral(
+               "<finish xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Success</text>"
+               "<success/>"
+               "</reason>"
+               "</finish>")
+        << true;
+    QTest::newRow("invalidFinishIdMissing")
+        << QByteArrayLiteral(
+               "<finish xmlns='urn:xmpp:jingle-message:0'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Success</text>"
+               "<success/>"
+               "</reason>"
+               "</finish>")
+        << false;
+    QTest::newRow("invalidFinishNamespaceMissing")
+        << QByteArrayLiteral(
+               "<finish id='a73sjjvkla37jfea'>"
+               "<reason xmlns=\"urn:xmpp:jingle:1\">"
+               "<text>Success</text>"
+               "<success/>"
+               "</reason>"
+               "</finish>")
+        << false;
+}
+
+void tst_QXmppJingleIq::testIsJingleMessageInitiationElement()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, isValid);
+
+    QCOMPARE(QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(xmlToDom(xml)), isValid);
+}
+
+void tst_QXmppJingleIq::testJingleMessageInitiationElement()
+{
+    using JmiType = QXmppJingleMessageInitiationElement::Type;
+
+    // --- Propose ---
+
+    const QByteArray proposeXml(
+        "<propose xmlns='urn:xmpp:jingle-message:0' id='ca3cf894-5325-482f-a412-a6e9f832298d'>"
+        "<description xmlns='urn:xmpp:jingle:apps:rtp:1' media='audio'/>"
+        "</propose>");
+    QXmppJingleMessageInitiationElement proposeElement;
+    proposeElement.setType(JmiType::Propose);
+
+    parsePacket(proposeElement, proposeXml);
+    QCOMPARE(proposeElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
+    QCOMPARE(proposeElement.description()->type(), QStringLiteral("urn:xmpp:jingle:apps:rtp:1"));
+    QCOMPARE(proposeElement.description()->media(), QStringLiteral("audio"));
+    QCOMPARE(proposeElement.containsTieBreak(), false);  // single check if containsTieBreak is set correctly when unused
+    QCOMPARE(proposeElement.reason(), std::nullopt);     // single check if reason is set correctly when unused
+    serializePacket(proposeElement, proposeXml);
+
+    // --- Ringing ---
+
+    const QByteArray ringingXml("<ringing xmlns='urn:xmpp:jingle-message:0' id='ca3cf894-5325-482f-a412-a6e9f832298d'/>");
+    QXmppJingleMessageInitiationElement ringingElement;
+    ringingElement.setType(JmiType::Ringing);
+
+    parsePacket(ringingElement, ringingXml);
+    QCOMPARE(ringingElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
+    serializePacket(ringingElement, ringingXml);
+
+    // --- Proceed ---
+
+    const QByteArray proceedXml("<proceed xmlns='urn:xmpp:jingle-message:0' id='ca3cf894-5325-482f-a412-a6e9f832298d'/>");
+    QXmppJingleMessageInitiationElement proceedElement;
+    proceedElement.setType(JmiType::Proceed);
+
+    parsePacket(proceedElement, proceedXml);
+    QCOMPARE(proceedElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
+    serializePacket(proceedElement, proceedXml);
+
+    // --- Reject ---
+
+    using ReasonType = QXmppJingleReason::Type;
+
+    const QByteArray rejectXml(
+        "<reject xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+        "<reason xmlns=\"urn:xmpp:jingle:1\">"
+        "<text>Busy</text>"
+        "<busy/>"
+        "</reason>"
+        "<tie-break/>"
+        "</reject>");
+    QXmppJingleMessageInitiationElement rejectElement;
+    rejectElement.setType(JmiType::Reject);
+
+    parsePacket(rejectElement, rejectXml);
+    QCOMPARE(rejectElement.id(), QStringLiteral("a73sjjvkla37jfea"));
+    QCOMPARE(rejectElement.reason()->text(), QStringLiteral("Busy"));
+    QCOMPARE(rejectElement.reason()->type(), ReasonType::Busy);
+    QCOMPARE(rejectElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
+    QCOMPARE(rejectElement.containsTieBreak(), true);
+    serializePacket(rejectElement, rejectXml);
+
+    // --- Retract ---
+
+    const QByteArray retractXml(
+        "<retract xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+        "<reason xmlns=\"urn:xmpp:jingle:1\">"
+        "<text>Retracted</text>"
+        "<cancel/>"
+        "</reason>"
+        "</retract>");
+    QXmppJingleMessageInitiationElement retractElement;
+    retractElement.setType(JmiType::Retract);
+
+    parsePacket(retractElement, retractXml);
+    QCOMPARE(retractElement.id(), QStringLiteral("a73sjjvkla37jfea"));
+    QCOMPARE(retractElement.reason()->text(), QStringLiteral("Retracted"));
+    QCOMPARE(retractElement.reason()->type(), ReasonType::Cancel);
+    QCOMPARE(retractElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
+    serializePacket(retractElement, retractXml);
+
+    // --- Finish ---
+
+    const QByteArray finishXml(
+        "<finish xmlns='urn:xmpp:jingle-message:0' id='a73sjjvkla37jfea'>"
+        "<reason xmlns=\"urn:xmpp:jingle:1\">"
+        "<text>Success</text>"
+        "<success/>"
+        "</reason>"
+        "<migrated to='989a46a6-f202-4910-a7c3-83c6ba3f3947'/>"
+        "</finish>");
+    QXmppJingleMessageInitiationElement finishElement;
+    finishElement.setType(JmiType::Finish);
+
+    parsePacket(finishElement, finishXml);
+    QCOMPARE(finishElement.id(), QStringLiteral("a73sjjvkla37jfea"));
+    QCOMPARE(finishElement.reason()->text(), QStringLiteral("Success"));
+    QCOMPARE(finishElement.reason()->type(), ReasonType::Success);
+    QCOMPARE(finishElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
+    QCOMPARE(finishElement.migratedTo(), QStringLiteral("989a46a6-f202-4910-a7c3-83c6ba3f3947"));
+    serializePacket(finishElement, finishXml);
 }
 
 QTEST_MAIN(tst_QXmppJingleIq)

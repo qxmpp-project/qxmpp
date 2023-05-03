@@ -24,6 +24,7 @@ class QXmppJingleRtpEncryptionPrivate;
 class QXmppJingleRtpFeedbackPropertyPrivate;
 class QXmppJingleRtpHeaderExtensionPropertyPrivate;
 class QXmppSdpParameterPrivate;
+class QXmppJingleMessageInitiationElementPrivate;
 
 class QXMPP_EXPORT QXmppSdpParameter
 {
@@ -595,6 +596,54 @@ private:
     QSharedDataPointer<QXmppJingleIqPrivate> d;
 };
 
-Q_DECLARE_METATYPE(QXmppJingleIq::Reason::RtpErrorCondition)
+class QXMPP_EXPORT QXmppJingleMessageInitiationElement
+{
+public:
+    enum class Type {
+        None,
+        Propose,
+        Ringing,
+        Proceed,
+        Reject,
+        Retract,
+        Finish
+    };
+
+    QXmppJingleMessageInitiationElement();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleMessageInitiationElement)
+
+    Type type() const;
+    void setType(Type type);
+
+    QString id() const;
+    void setId(const QString &id);
+
+    std::optional<QXmppJingleDescription> description() const;
+    void setDescription(std::optional<QXmppJingleDescription> description);
+
+    std::optional<QXmppJingleReason> reason() const;
+    void setReason(std::optional<QXmppJingleReason> reason);
+
+    bool containsTieBreak() const;
+    void setContainsTieBreak(bool containsTieBreak);
+
+    QString migratedTo() const;
+    void setMigratedTo(const QString &migratedTo);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isJingleMessageInitiationElement(const QDomElement &);
+
+private:
+    QString jmiElementTypeToString(Type type) const;
+    Type stringToJmiElementType(const QString &typeStr) const;
+
+    QSharedDataPointer<QXmppJingleMessageInitiationElementPrivate> d;
+};
+
+Q_DECLARE_METATYPE(QXmppJingleReason::RtpErrorCondition)
 
 #endif

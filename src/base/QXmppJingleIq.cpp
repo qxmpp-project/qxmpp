@@ -2930,3 +2930,278 @@ bool QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(c
     return element.tagName() == QStringLiteral("rtp-hdrext") &&
         element.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation;
 }
+
+class QXmppJingleMessageInitiationElementPrivate : public QSharedData
+{
+public:
+    QXmppJingleMessageInitiationElementPrivate() = default;
+
+    QXmppJingleMessageInitiationElement::Type type { QXmppJingleMessageInitiationElement::Type::None };
+    QString id;
+
+    std::optional<QXmppJingleDescription> description;
+    std::optional<QXmppJingleReason> reason;
+    QString migratedTo;
+
+    bool containsTieBreak;
+};
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleReason)
+
+///
+/// \enum QXmppJingleMessageInitiationElement::Type
+///
+/// Possible types of Jingle Message Initiation elements
+///
+
+///
+/// \class QXmppJingleMessageInitiationElement
+///
+/// \brief The QXmppJingleMessageInitiationElement class represents a Jingle Message Initiation
+/// element as specified by \xep{0353}: Jingle Message Initiation.
+///
+/// \ingroup Stanzas
+///
+/// \since QXmpp 1.6
+///
+
+///
+/// \brief Constructs a Jingle Message Initiation element.
+/// \param type The JMI element type
+///
+QXmppJingleMessageInitiationElement::QXmppJingleMessageInitiationElement()
+    : d(new QXmppJingleMessageInitiationElementPrivate())
+{
+}
+
+///
+/// Returns the Jingle Message Initiation element type
+///
+QXmppJingleMessageInitiationElement::Type QXmppJingleMessageInitiationElement::type() const
+{
+    return d->type;
+}
+
+///
+/// Sets the Jingle Message Initiation element type.
+///
+void QXmppJingleMessageInitiationElement::setType(Type type)
+{
+    d->type = type;
+}
+
+///
+/// Returns the Jingle Message Initiation element id.
+///
+QString QXmppJingleMessageInitiationElement::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the Jingle Message Initiation element id.
+///
+void QXmppJingleMessageInitiationElement::setId(const QString &id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the Jingle Message Initiation element description.
+///
+std::optional<QXmppJingleDescription> QXmppJingleMessageInitiationElement::description() const
+{
+    return d->description;
+}
+
+///
+/// Sets the Jingle Message Initiation element description.
+///
+void QXmppJingleMessageInitiationElement::setDescription(std::optional<QXmppJingleDescription> description)
+{
+    d->description = description;
+}
+
+///
+/// Returns the Jingle Message Initiation element reason.
+///
+std::optional<QXmppJingleReason> QXmppJingleMessageInitiationElement::reason() const
+{
+    return d->reason;
+}
+
+///
+/// Sets the Jingle Message Initiation element reason.
+///
+void QXmppJingleMessageInitiationElement::setReason(std::optional<QXmppJingleReason> reason)
+{
+    d->reason = reason;
+
+    if (d->reason) {
+        d->reason->setNamespaceUri(ns_jingle);
+    }
+}
+
+///
+/// Returns true if the Jingle Message Initiation element contains a <tie-break/> tag.
+///
+bool QXmppJingleMessageInitiationElement::containsTieBreak() const
+{
+    return d->containsTieBreak;
+}
+
+///
+/// Sets if the Jingle Message Initiation element contains a <tie-break/> tag.
+///
+void QXmppJingleMessageInitiationElement::setContainsTieBreak(bool containsTieBreak)
+{
+    d->containsTieBreak = containsTieBreak;
+}
+
+///
+/// Returns the Jingle Message Initiation element ID migrated to if the Jingle is being migrated
+/// to a different device.
+///
+QString QXmppJingleMessageInitiationElement::migratedTo() const
+{
+    return d->migratedTo;
+}
+
+///
+/// Sets the Jingle Message Initiation element ID migrated to if the Jingle is being migrated
+/// to a different device.
+///
+void QXmppJingleMessageInitiationElement::setMigratedTo(const QString &migratedTo)
+{
+    d->migratedTo = migratedTo;
+}
+
+/// \cond
+void QXmppJingleMessageInitiationElement::parse(const QDomElement &element)
+{
+    d->type = stringToJmiElementType(element.nodeName());
+
+    if (d->type == Type::None) {
+        return;
+    }
+
+    d->id = element.attribute(QStringLiteral("id"));
+
+    // Type::Proceed and Type::Ringing don't need any parsing aside of the id.
+    switch (d->type) {
+    case Type::Propose: {
+        if (const auto &descriptionElement = element.firstChildElement("description"); !descriptionElement.isNull()) {
+            d->description = QXmppJingleDescription();
+            d->description->parse(descriptionElement);
+        }
+
+        break;
+    }
+    case Type::Reject:
+    case Type::Retract:
+        d->containsTieBreak = !element.firstChildElement("tie-break").isNull();
+
+        if (const auto &reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
+            d->reason = QXmppJingleReason();
+            d->reason->parse(reasonElement);
+        }
+
+        break;
+    case Type::Finish:
+        if (const auto &reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
+            d->reason = QXmppJingleReason();
+            d->reason->parse(reasonElement);
+        }
+
+        if (const auto &migratedToElement = element.firstChildElement("migrated"); !migratedToElement.isNull()) {
+            d->migratedTo = migratedToElement.attribute("to");
+        }
+
+        break;
+    default:
+        break;
+    }
+}
+
+void QXmppJingleMessageInitiationElement::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(jmiElementTypeToString(d->type));
+    writer->writeDefaultNamespace(ns_jingle_message_initiation);
+
+    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+
+    if (d->description) {
+        d->description->toXml(writer);
+    }
+
+    if (d->reason) {
+        d->reason->toXml(writer);
+    }
+
+    if (d->containsTieBreak) {
+        writer->writeEmptyElement(QStringLiteral("tie-break"));
+    }
+
+    if (!d->migratedTo.isEmpty()) {
+        writer->writeEmptyElement(QStringLiteral("migrated"));
+        helperToXmlAddAttribute(writer, QStringLiteral("to"), d->migratedTo);
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleMessageInitiationElement)
+
+///
+/// Returns true if passed QDomElement is a Jingle Message Initiation element
+///
+bool QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(const QDomElement &element)
+{
+    return (element.nodeName() == QStringLiteral("propose") || element.nodeName() == QStringLiteral("ringing") || element.nodeName() == QStringLiteral("proceed") || element.nodeName() == QStringLiteral("retract") || element.nodeName() == QStringLiteral("reject") || element.nodeName() == QStringLiteral("finish")) && element.hasAttribute(QStringLiteral("id")) && element.namespaceURI() == ns_jingle_message_initiation;
+}
+
+///
+/// Takes a Jingle Message Initiation element type and parses it to a string.
+///
+QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type) const
+{
+    switch (type) {
+    case Type::Propose:
+        return "propose";
+    case Type::Ringing:
+        return "ringing";
+    case Type::Proceed:
+        return "proceed";
+    case Type::Reject:
+        return "reject";
+    case Type::Retract:
+        return "retract";
+    case Type::Finish:
+        return "finish";
+    default:
+        return {};
+    }
+}
+
+///
+/// Takes a string and parses it to a Jingle Message Initiation element type.
+///
+QXmppJingleMessageInitiationElement::Type QXmppJingleMessageInitiationElement::stringToJmiElementType(const QString &typeStr) const
+{
+    if (typeStr == "propose") {
+        return Type::Propose;
+    } else if (typeStr == "ringing") {
+        return Type::Ringing;
+    } else if (typeStr == "proceed") {
+        return Type::Proceed;
+    } else if (typeStr == "reject") {
+        return Type::Reject;
+    } else if (typeStr == "retract") {
+        return Type::Retract;
+    } else if (typeStr == "finish") {
+        return Type::Finish;
+    }
+
+    return Type::None;
+}
