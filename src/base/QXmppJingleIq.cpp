@@ -961,45 +961,69 @@ QString QXmppJingleIq::Content::toSdp() const
 
 /// \endcond
 
+class QXmppJingleIqReasonPrivate : public QSharedData
+{
+public:
+    QXmppJingleIqReasonPrivate();
+
+    QString m_text;
+    QXmppJingleReason::Type m_type;
+    QXmppJingleReason::RtpErrorCondition m_rtpErrorCondition;
+    QString m_namespaceUri;
+};
+
+QXmppJingleIqReasonPrivate::QXmppJingleIqReasonPrivate()
+    : m_type(QXmppJingleReason::Type::None),
+      m_rtpErrorCondition(QXmppJingleReason::RtpErrorCondition::NoErrorCondition)
+{
+}
+
 ///
-/// \enum QXmppJingleIq::Reason::RtpErrorCondition
+/// \enum QXmppJingleIqReason::RtpErrorCondition
 ///
 /// Condition of an RTP-specific error
 ///
 /// \since QXmpp 1.5
 ///
 
-QXmppJingleIq::Reason::Reason()
-    : m_type(None)
+///
+/// \class QXmppJingleReason
+///
+/// The QXmppJingleReason class represents the "reason" element of a
+/// QXmppJingle element.
+///
+
+QXmppJingleReason::QXmppJingleReason()
+    : d(new QXmppJingleIqReasonPrivate())
 {
 }
 
 /// Returns the reason's textual description.
 
-QString QXmppJingleIq::Reason::text() const
+QString QXmppJingleReason::text() const
 {
-    return m_text;
+    return d->m_text;
 }
 
 /// Sets the reason's textual description.
 
-void QXmppJingleIq::Reason::setText(const QString &text)
+void QXmppJingleReason::setText(const QString &text)
 {
-    m_text = text;
+    d->m_text = text;
 }
 
 /// Gets the reason's type.
 
-QXmppJingleIq::Reason::Type QXmppJingleIq::Reason::type() const
+QXmppJingleReason::Type QXmppJingleReason::type() const
 {
-    return m_type;
+    return d->m_type;
 }
 
 /// Sets the reason's type.
 
-void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
+void QXmppJingleReason::setType(QXmppJingleReason::Type type)
 {
-    m_type = type;
+    d->m_type = type;
 }
 
 ///
@@ -1009,9 +1033,9 @@ void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
 ///
 /// \since QXmpp 1.5
 ///
-QXmppJingleIq::Reason::RtpErrorCondition QXmppJingleIq::Reason::rtpErrorCondition() const
+QXmppJingleReason::RtpErrorCondition QXmppJingleReason::rtpErrorCondition() const
 {
-    return m_rtpErrorCondition;
+    return d->m_rtpErrorCondition;
 }
 
 ///
@@ -1021,18 +1045,34 @@ QXmppJingleIq::Reason::RtpErrorCondition QXmppJingleIq::Reason::rtpErrorConditio
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppJingleIq::Reason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition)
+void QXmppJingleReason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition)
 {
-    m_rtpErrorCondition = rtpErrorCondition;
+    d->m_rtpErrorCondition = rtpErrorCondition;
+}
+
+///
+/// Returns the namespace URI of a reason element.
+///
+QString QXmppJingleReason::namespaceUri() const
+{
+    return d->m_namespaceUri;
+}
+
+///
+/// Sets the namespace URI of a reason element.
+///
+void QXmppJingleReason::setNamespaceUri(const QString &namespaceUri)
+{
+    d->m_namespaceUri = namespaceUri;
 }
 
 /// \cond
-void QXmppJingleIq::Reason::parse(const QDomElement &element)
+void QXmppJingleReason::parse(const QDomElement &element)
 {
-    m_text = element.firstChildElement(QStringLiteral("text")).text();
+    d->m_text = element.firstChildElement(QStringLiteral("text")).text();
     for (int i = AlternativeSession; i <= UnsupportedTransports; i++) {
         if (!element.firstChildElement(jingle_reasons[i]).isNull()) {
-            m_type = static_cast<Type>(i);
+            d->m_type = static_cast<Type>(i);
             break;
         }
     }
@@ -1043,27 +1083,36 @@ void QXmppJingleIq::Reason::parse(const QDomElement &element)
         if (child.namespaceURI() == ns_jingle_rtp_errors) {
             if (const auto index = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName());
                 index != -1) {
-                m_rtpErrorCondition = RtpErrorCondition(index);
+                d->m_rtpErrorCondition = RtpErrorCondition(index);
             }
             break;
         }
     }
+
+    if (!element.namespaceURI().isEmpty() && !element.parentNode().isNull() && element.parentNode().namespaceURI() != element.namespaceURI()) {
+        d->m_namespaceUri = element.namespaceURI();
+    }
 }
 
-void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
+void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
 {
-    if (m_type < AlternativeSession || m_type > UnsupportedTransports) {
+    if (d->m_type < AlternativeSession || d->m_type > UnsupportedTransports) {
         return;
     }
 
     writer->writeStartElement(QStringLiteral("reason"));
-    if (!m_text.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("text"), m_text);
-    }
-    writer->writeEmptyElement(jingle_reasons[m_type]);
 
-    if (m_rtpErrorCondition != NoErrorCondition) {
-        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(m_rtpErrorCondition));
+    if (!d->m_namespaceUri.isEmpty()) {
+        writer->writeDefaultNamespace(d->m_namespaceUri);
+    }
+
+    if (!d->m_text.isEmpty()) {
+        helperToXmlAddTextElement(writer, QStringLiteral("text"), d->m_text);
+    }
+    writer->writeEmptyElement(jingle_reasons[d->m_type]);
+
+    if (d->m_rtpErrorCondition != NoErrorCondition) {
+        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(d->m_rtpErrorCondition));
         writer->writeDefaultNamespace(ns_jingle_rtp_errors);
         writer->writeEndElement();
     }
@@ -1085,7 +1134,7 @@ public:
     QString mujiGroupChatJid;
 
     QList<QXmppJingleIq::Content> contents;
-    QXmppJingleIq::Reason reason;
+    QXmppJingleReason reason;
 
     std::optional<QXmppJingleIq::RtpSessionState> rtpSessionState;
 };
@@ -1178,14 +1227,14 @@ void QXmppJingleIq::setInitiator(const QString &initiator)
 
 /// Returns a reference to the IQ's reason element.
 
-QXmppJingleIq::Reason &QXmppJingleIq::reason()
+QXmppJingleReason &QXmppJingleIq::reason()
 {
     return d->reason;
 }
 
 /// Returns a const reference to the IQ's reason element.
 
-const QXmppJingleIq::Reason &QXmppJingleIq::reason() const
+const QXmppJingleReason &QXmppJingleIq::reason() const
 {
     return d->reason;
 }
@@ -1343,6 +1392,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
         addContent(content);
         contentElement = contentElement.nextSiblingElement(QStringLiteral("content"));
     }
+
     QDomElement reasonElement = jingleElement.firstChildElement(QStringLiteral("reason"));
     d->reason.parse(reasonElement);
 

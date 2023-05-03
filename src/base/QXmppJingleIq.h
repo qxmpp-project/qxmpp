@@ -16,6 +16,7 @@
 class QXmppJingleCandidatePrivate;
 class QXmppJingleDescriptionPrivate;
 class QXmppJingleIqContentPrivate;
+class QXmppJingleIqReasonPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
 class QXmppJingleRtpCryptoElementPrivate;
@@ -337,6 +338,66 @@ private:
     QSharedDataPointer<QXmppJingleCandidatePrivate> d;
 };
 
+class QXMPP_EXPORT QXmppJingleReason
+{
+public:
+    /// This enum is used to describe a reason's type.
+    enum Type {
+        None,
+        AlternativeSession,
+        Busy,
+        Cancel,
+        ConnectivityError,
+        Decline,
+        Expired,
+        FailedApplication,
+        FailedTransport,
+        GeneralError,
+        Gone,
+        IncompatibleParameters,
+        MediaError,
+        SecurityError,
+        Success,
+        Timeout,
+        UnsupportedApplications,
+        UnsupportedTransports
+    };
+
+    enum RtpErrorCondition {
+        /// There is no error condition.
+        NoErrorCondition,
+        /// The encryption offer is rejected.
+        InvalidCrypto,
+        /// Encryption is required but not offered.
+        CryptoRequired
+    };
+
+    QXmppJingleReason();
+
+    QString text() const;
+    void setText(const QString &text);
+
+    Type type() const;
+    void setType(Type type);
+
+    RtpErrorCondition rtpErrorCondition() const;
+    void setRtpErrorCondition(RtpErrorCondition rtpErrorCondition);
+
+    QString namespaceUri() const;
+    void setNamespaceUri(const QString &namespaceUri);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    /// \endcond
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleReason)
+
+private:
+    QSharedDataPointer<QXmppJingleIqReasonPrivate> d;
+};
+
 ///
 /// \brief The QXmppJingleIq class represents an IQ used for initiating media
 /// sessions as specified by \xep{0166}: Jingle.
@@ -480,67 +541,6 @@ public:
         QSharedDataPointer<QXmppJingleIqContentPrivate> d;
     };
 
-    /// \internal
-    ///
-    /// The QXmppJingleIq::Reason class represents the "reason" element of a
-    /// QXmppJingleIq.
-    ///
-    class QXMPP_EXPORT Reason
-    {
-    public:
-        /// This enum is used to describe a reason's type.
-        enum Type {
-            None,
-            AlternativeSession,
-            Busy,
-            Cancel,
-            ConnectivityError,
-            Decline,
-            Expired,
-            FailedApplication,
-            FailedTransport,
-            GeneralError,
-            Gone,
-            IncompatibleParameters,
-            MediaError,
-            SecurityError,
-            Success,
-            Timeout,
-            UnsupportedApplications,
-            UnsupportedTransports
-        };
-
-        enum RtpErrorCondition {
-            /// There is no error condition.
-            NoErrorCondition,
-            /// The encryption offer is rejected.
-            InvalidCrypto,
-            /// Encryption is required but not offered.
-            CryptoRequired
-        };
-
-        Reason();
-
-        QString text() const;
-        void setText(const QString &text);
-
-        Type type() const;
-        void setType(Type type);
-
-        RtpErrorCondition rtpErrorCondition() const;
-        void setRtpErrorCondition(RtpErrorCondition rtpErrorCondition);
-
-        /// \cond
-        void parse(const QDomElement &element);
-        void toXml(QXmlStreamWriter *writer) const;
-        /// \endcond
-
-    private:
-        QString m_text;
-        Type m_type;
-        RtpErrorCondition m_rtpErrorCondition = NoErrorCondition;
-    };
-
     QXmppJingleIq();
     QXmppJingleIq(const QXmppJingleIq &other);
     QXmppJingleIq(QXmppJingleIq &&);
@@ -559,8 +559,8 @@ public:
     QString initiator() const;
     void setInitiator(const QString &initiator);
 
-    Reason &reason();
-    const Reason &reason() const;
+    QXmppJingleReason &reason();
+    const QXmppJingleReason &reason() const;
 
     QString responder() const;
     void setResponder(const QString &responder);

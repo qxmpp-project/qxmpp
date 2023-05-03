@@ -1067,7 +1067,7 @@ void tst_QXmppJingleIq::testSession()
     QCOMPARE(session.contents()[0].creator(), QLatin1String("initiator"));
     QCOMPARE(session.contents()[0].name(), QLatin1String("this-is-a-stub"));
     QCOMPARE(session.reason().text(), QString());
-    QCOMPARE(session.reason().type(), QXmppJingleIq::Reason::None);
+    QCOMPARE(session.reason().type(), QXmppJingleReason::None);
     serializePacket(session, xml);
 }
 
@@ -1094,7 +1094,7 @@ void tst_QXmppJingleIq::testTerminate()
     QCOMPARE(session.initiator(), QString());
     QCOMPARE(session.sid(), QLatin1String("a73sjjvkla37jfea"));
     QCOMPARE(session.reason().text(), QString());
-    QCOMPARE(session.reason().type(), QXmppJingleIq::Reason::Success);
+    QCOMPARE(session.reason().type(), QXmppJingleReason::Success);
     serializePacket(session, xml);
 }
 
@@ -1327,7 +1327,7 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
 void tst_QXmppJingleIq::testRtpErrorCondition_data()
 {
     QTest::addColumn<QByteArray>("xml");
-    QTest::addColumn<QXmppJingleIq::Reason::RtpErrorCondition>("condition");
+    QTest::addColumn<QXmppJingleReason::RtpErrorCondition>("condition");
 
     QTest::newRow("NoErrorCondition")
         << QByteArrayLiteral("<iq type=\"set\">"
@@ -1337,7 +1337,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition_data()
                              "</reason>"
                              "</jingle>"
                              "</iq>")
-        << QXmppJingleIq::Reason::NoErrorCondition;
+        << QXmppJingleReason::NoErrorCondition;
     QTest::newRow("InvalidCrypto")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
@@ -1347,7 +1347,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition_data()
                              "</reason>"
                              "</jingle>"
                              "</iq>")
-        << QXmppJingleIq::Reason::InvalidCrypto;
+        << QXmppJingleReason::InvalidCrypto;
     QTest::newRow("CryptoRequired")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
@@ -1357,28 +1357,28 @@ void tst_QXmppJingleIq::testRtpErrorCondition_data()
                              "</reason>"
                              "</jingle>"
                              "</iq>")
-        << QXmppJingleIq::Reason::CryptoRequired;
+        << QXmppJingleReason::CryptoRequired;
 }
 
 void tst_QXmppJingleIq::testRtpErrorCondition()
 {
     QFETCH(QByteArray, xml);
-    QFETCH(QXmppJingleIq::Reason::RtpErrorCondition, condition);
+    QFETCH(QXmppJingleReason::RtpErrorCondition, condition);
 
     QXmppJingleIq iq1;
-    QCOMPARE(iq1.reason().rtpErrorCondition(), QXmppJingleIq::Reason::NoErrorCondition);
+    QCOMPARE(iq1.reason().rtpErrorCondition(), QXmppJingleReason::NoErrorCondition);
     parsePacket(iq1, xml);
 
     const auto rtpErrorCondition1 = iq1.reason().rtpErrorCondition();
     switch (condition) {
-    case QXmppJingleIq::Reason::NoErrorCondition:
-        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::NoErrorCondition);
+    case QXmppJingleReason::NoErrorCondition:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleReason::NoErrorCondition);
         break;
-    case QXmppJingleIq::Reason::InvalidCrypto:
-        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::InvalidCrypto);
+    case QXmppJingleReason::InvalidCrypto:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleReason::InvalidCrypto);
         break;
-    case QXmppJingleIq::Reason::CryptoRequired:
-        QVERIFY(rtpErrorCondition1 == QXmppJingleIq::Reason::CryptoRequired);
+    case QXmppJingleReason::CryptoRequired:
+        QVERIFY(rtpErrorCondition1 == QXmppJingleReason::CryptoRequired);
         break;
     }
 
