@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2023 Tibor Csötönyi <work@taibsu.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -13,6 +14,7 @@
 #include <QHostAddress>
 
 class QXmppJingleCandidatePrivate;
+class QXmppJingleDescriptionPrivate;
 class QXmppJingleIqContentPrivate;
 class QXmppJingleIqPrivate;
 class QXmppJinglePayloadTypePrivate;
@@ -237,6 +239,34 @@ private:
     QSharedDataPointer<QXmppJinglePayloadTypePrivate> d;
 };
 
+class QXMPP_EXPORT QXmppJingleDescription
+{
+public:
+    QXmppJingleDescription();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppJingleDescription)
+
+    QString media() const;
+    void setMedia(const QString &media);
+
+    quint32 ssrc() const;
+    void setSsrc(quint32 ssrc);
+
+    QString type() const;
+    void setType(const QString &type);
+
+    void addPayloadType(const QXmppJinglePayloadType &payload);
+    const QList<QXmppJinglePayloadType> &payloadTypes() const;
+    void setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+private:
+    QSharedDataPointer<QXmppJingleDescriptionPrivate> d;
+};
+
 ///
 /// \brief The QXmppJingleCandidate class represents a transport candidate
 /// as specified by \xep{0176}: Jingle ICE-UDP Transport Method.
@@ -397,21 +427,14 @@ public:
         void setSenders(const QString &senders);
 
         // XEP-0167: Jingle RTP Sessions
-        QString descriptionMedia() const;
-        void setDescriptionMedia(const QString &media);
-
-        quint32 descriptionSsrc() const;
-        void setDescriptionSsrc(quint32 ssrc);
+        QXmppJingleDescription description() const;
+        void setDescription(const QXmppJingleDescription &description);
 
         bool isRtpMultiplexingSupported() const;
         void setRtpMultiplexingSupported(bool isRtpMultiplexingSupported);
 
         std::optional<QXmppJingleRtpEncryption> rtpEncryption() const;
         void setRtpEncryption(const std::optional<QXmppJingleRtpEncryption> &rtpEncryption);
-
-        void addPayloadType(const QXmppJinglePayloadType &payload);
-        QList<QXmppJinglePayloadType> payloadTypes() const;
-        void setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes);
 
         void addTransportCandidate(const QXmppJingleCandidate &candidate);
         QList<QXmppJingleCandidate> transportCandidates() const;
