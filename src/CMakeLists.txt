@@ -108,6 +108,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppHttpUploadManager.h
     client/QXmppInvokable.h
     client/QXmppIqHandling.h
+    client/QXmppJingleMessageInitiationManager.h
     client/QXmppMamManager.h
     client/QXmppMessageHandler.h
     client/QXmppMessageReceiptManager.h
@@ -243,6 +244,7 @@ set(SOURCE_FILES
     client/QXmppInternalClientExtension.cpp
     client/QXmppInvokable.cpp
     client/QXmppIqHandling.cpp
+    client/QXmppJingleMessageInitiationManager.cpp
     client/QXmppMamManager.cpp
     client/QXmppMessageReceiptManager.cpp
     client/QXmppMucManager.cpp
