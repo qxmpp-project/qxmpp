@@ -4,12 +4,12 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppJingleIq.h"
+#include "QXmppJingleData.h"
 
 #include "util.h"
 #include <QObject>
 
-class tst_QXmppJingleIq : public QObject
+class tst_QXmppJingleData : public QObject
 {
     Q_OBJECT
 
@@ -62,7 +62,7 @@ private:
     Q_SLOT void testJingleMessageInitiationElement();
 };
 
-void tst_QXmppJingleIq::testIsSdpParameter_data()
+void tst_QXmppJingleData::testIsSdpParameter_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -75,7 +75,7 @@ void tst_QXmppJingleIq::testIsSdpParameter_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsSdpParameter()
+void tst_QXmppJingleData::testIsSdpParameter()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -83,7 +83,7 @@ void tst_QXmppJingleIq::testIsSdpParameter()
     QCOMPARE(QXmppSdpParameter::isSdpParameter(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testSdpParameter()
+void tst_QXmppJingleData::testSdpParameter()
 {
     const QByteArray xml("<parameter name=\"test-name\" value=\"test-value\"/>");
 
@@ -104,7 +104,7 @@ void tst_QXmppJingleIq::testSdpParameter()
     serializePacket(parameter2, xml);
 }
 
-void tst_QXmppJingleIq::testSdpParameterWithoutValue()
+void tst_QXmppJingleData::testSdpParameterWithoutValue()
 {
     const QByteArray xml("<parameter name=\"test-name\"/>");
 
@@ -122,7 +122,7 @@ void tst_QXmppJingleIq::testSdpParameterWithoutValue()
     serializePacket(parameter2, xml);
 }
 
-void tst_QXmppJingleIq::testIsRtpCryptoElement_data()
+void tst_QXmppJingleData::testIsRtpCryptoElement_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -135,7 +135,7 @@ void tst_QXmppJingleIq::testIsRtpCryptoElement_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsRtpCryptoElement()
+void tst_QXmppJingleData::testIsRtpCryptoElement()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -143,7 +143,7 @@ void tst_QXmppJingleIq::testIsRtpCryptoElement()
     QCOMPARE(QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testRtpCryptoElement_data()
+void tst_QXmppJingleData::testRtpCryptoElement_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("hasSessionParams");
@@ -163,7 +163,7 @@ void tst_QXmppJingleIq::testRtpCryptoElement_data()
         << true;
 }
 
-void tst_QXmppJingleIq::testRtpCryptoElement()
+void tst_QXmppJingleData::testRtpCryptoElement()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, hasSessionParams);
@@ -207,7 +207,7 @@ void tst_QXmppJingleIq::testRtpCryptoElement()
     serializePacket(rtpCryptoElement2, xml);
 }
 
-void tst_QXmppJingleIq::testIsRtpEncryption_data()
+void tst_QXmppJingleData::testIsRtpEncryption_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -223,7 +223,7 @@ void tst_QXmppJingleIq::testIsRtpEncryption_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsRtpEncryption()
+void tst_QXmppJingleData::testIsRtpEncryption()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -231,7 +231,7 @@ void tst_QXmppJingleIq::testIsRtpEncryption()
     QCOMPARE(QXmppJingleRtpEncryption::isJingleRtpEncryption(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testRtpEncryption_data()
+void tst_QXmppJingleData::testRtpEncryption_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isRequired");
@@ -270,7 +270,7 @@ void tst_QXmppJingleIq::testRtpEncryption_data()
         << 2;
 }
 
-void tst_QXmppJingleIq::testRtpEncryption()
+void tst_QXmppJingleData::testRtpEncryption()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isRequired);
@@ -315,7 +315,7 @@ void tst_QXmppJingleIq::testRtpEncryption()
     serializePacket(rtpEncryption2, xml);
 }
 
-void tst_QXmppJingleIq::testIsRtpFeedbackProperty_data()
+void tst_QXmppJingleData::testIsRtpFeedbackProperty_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -331,7 +331,7 @@ void tst_QXmppJingleIq::testIsRtpFeedbackProperty_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsRtpFeedbackProperty()
+void tst_QXmppJingleData::testIsRtpFeedbackProperty()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -339,7 +339,7 @@ void tst_QXmppJingleIq::testIsRtpFeedbackProperty()
     QCOMPARE(QXmppJingleRtpFeedbackProperty::isJingleRtpFeedbackProperty(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testRtpFeedbackProperty()
+void tst_QXmppJingleData::testRtpFeedbackProperty()
 {
     const QByteArray xml("<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"nack\" subtype=\"sli\"/>");
 
@@ -363,7 +363,7 @@ void tst_QXmppJingleIq::testRtpFeedbackProperty()
     serializePacket(property2, xml);
 }
 
-void tst_QXmppJingleIq::testRtpFeedbackPropertyWithParameters()
+void tst_QXmppJingleData::testRtpFeedbackPropertyWithParameters()
 {
     const QByteArray xml(
         "<rtcp-fb xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" type=\"test-type\">"
@@ -400,7 +400,7 @@ void tst_QXmppJingleIq::testRtpFeedbackPropertyWithParameters()
     serializePacket(property2, xml);
 }
 
-void tst_QXmppJingleIq::testIsRtpFeedbackInterval_data()
+void tst_QXmppJingleData::testIsRtpFeedbackInterval_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -416,7 +416,7 @@ void tst_QXmppJingleIq::testIsRtpFeedbackInterval_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsRtpFeedbackInterval()
+void tst_QXmppJingleData::testIsRtpFeedbackInterval()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -424,7 +424,7 @@ void tst_QXmppJingleIq::testIsRtpFeedbackInterval()
     QCOMPARE(QXmppJingleRtpFeedbackInterval::isJingleRtpFeedbackInterval(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testRtpFeedbackInterval()
+void tst_QXmppJingleData::testRtpFeedbackInterval()
 {
     const QByteArray xml("<rtcp-fb-trr-int xmlns=\"urn:xmpp:jingle:apps:rtp:rtcp-fb:0\" value=\"100\"/>");
 
@@ -443,7 +443,7 @@ void tst_QXmppJingleIq::testRtpFeedbackInterval()
     serializePacket(interval2, xml);
 }
 
-void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty_data()
+void tst_QXmppJingleData::testIsRtpHeaderExtensionProperty_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -459,7 +459,7 @@ void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty()
+void tst_QXmppJingleData::testIsRtpHeaderExtensionProperty()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -467,7 +467,7 @@ void tst_QXmppJingleIq::testIsRtpHeaderExtensionProperty()
     QCOMPARE(QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testRtpHeaderExtensionProperty()
+void tst_QXmppJingleData::testRtpHeaderExtensionProperty()
 {
     const QByteArray xml("<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\"/>");
 
@@ -495,7 +495,7 @@ void tst_QXmppJingleIq::testRtpHeaderExtensionProperty()
     serializePacket(property2, xml);
 }
 
-void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithSenders()
+void tst_QXmppJingleData::testRtpHeaderExtensionPropertyWithSenders()
 {
     const QByteArray xml("<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\" senders=\"initiator\"/>");
 
@@ -516,7 +516,7 @@ void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithSenders()
     serializePacket(property2, xml);
 }
 
-void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithParameters()
+void tst_QXmppJingleData::testRtpHeaderExtensionPropertyWithParameters()
 {
     const QByteArray xml(
         "<rtp-hdrext xmlns=\"urn:xmpp:jingle:apps:rtp:rtp-hdrext:0\" id=\"1\" uri=\"urn:ietf:params:rtp-hdrext:toffset\">"
@@ -552,7 +552,7 @@ void tst_QXmppJingleIq::testRtpHeaderExtensionPropertyWithParameters()
     serializePacket(property2, xml);
 }
 
-void tst_QXmppJingleIq::testCandidate()
+void tst_QXmppJingleData::testCandidate()
 {
     const QByteArray xml(
         "<candidate component=\"1\""
@@ -580,7 +580,7 @@ void tst_QXmppJingleIq::testCandidate()
     serializePacket(candidate, xml);
 };
 
-void tst_QXmppJingleIq::testContent()
+void tst_QXmppJingleData::testContent()
 {
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
@@ -691,7 +691,7 @@ void tst_QXmppJingleIq::testContent()
     serializePacket(content2, xml);
 }
 
-void tst_QXmppJingleIq::testContentFingerprint()
+void tst_QXmppJingleData::testContentFingerprint()
 {
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
@@ -743,7 +743,7 @@ void tst_QXmppJingleIq::testContentFingerprint()
     serializePacket(content, xml);
 }
 
-void tst_QXmppJingleIq::testContentSdp()
+void tst_QXmppJingleData::testContentSdp()
 {
     const QString sdp(
         "m=audio 8998 RTP/AVP 96 97 18 0 103 98\r\n"
@@ -792,7 +792,7 @@ void tst_QXmppJingleIq::testContentSdp()
     QCOMPARE(content.toSdp(), sdp);
 }
 
-void tst_QXmppJingleIq::testContentSdpReflexive()
+void tst_QXmppJingleData::testContentSdpReflexive()
 {
     const QString sdp(
         "m=audio 45664 RTP/AVP 96 97 18 0 103 98\r\n"
@@ -841,7 +841,7 @@ void tst_QXmppJingleIq::testContentSdpReflexive()
     QCOMPARE(content.toSdp(), sdp);
 }
 
-void tst_QXmppJingleIq::testContentSdpFingerprint()
+void tst_QXmppJingleData::testContentSdpFingerprint()
 {
     const QString sdp(
         "m=audio 8998 RTP/AVP 96 100\r\n"
@@ -880,7 +880,7 @@ void tst_QXmppJingleIq::testContentSdpFingerprint()
     QCOMPARE(content.toSdp(), sdp);
 }
 
-void tst_QXmppJingleIq::testContentSdpParameters()
+void tst_QXmppJingleData::testContentSdpParameters()
 {
     const QString sdp(
         "m=audio 8998 RTP/AVP 96 100\r\n"
@@ -914,7 +914,7 @@ void tst_QXmppJingleIq::testContentSdpParameters()
     QCOMPARE(content.toSdp(), sdp);
 }
 
-void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
+void tst_QXmppJingleData::testContentRtpFeedbackNegotiation()
 {
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
@@ -984,7 +984,7 @@ void tst_QXmppJingleIq::testContentRtpFeedbackNegotiation()
     serializePacket(content2, xml);
 }
 
-void tst_QXmppJingleIq::testContentRtpHeaderExtensionsNegotiation()
+void tst_QXmppJingleData::testContentRtpHeaderExtensionsNegotiation()
 {
     const QByteArray xml(
         "<content creator=\"initiator\" name=\"voice\">"
@@ -1041,7 +1041,7 @@ void tst_QXmppJingleIq::testContentRtpHeaderExtensionsNegotiation()
     serializePacket(content2, xml);
 }
 
-void tst_QXmppJingleIq::testSession()
+void tst_QXmppJingleData::testSession()
 {
     const QByteArray xml(
         "<iq"
@@ -1075,7 +1075,7 @@ void tst_QXmppJingleIq::testSession()
     serializePacket(session, xml);
 }
 
-void tst_QXmppJingleIq::testTerminate()
+void tst_QXmppJingleData::testTerminate()
 {
     const QByteArray xml(
         "<iq"
@@ -1102,7 +1102,7 @@ void tst_QXmppJingleIq::testTerminate()
     serializePacket(session, xml);
 }
 
-void tst_QXmppJingleIq::testRtpSessionState_data()
+void tst_QXmppJingleData::testRtpSessionState_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<QString>("state");
@@ -1151,7 +1151,7 @@ void tst_QXmppJingleIq::testRtpSessionState_data()
         << QStringLiteral("ringing");
 }
 
-void tst_QXmppJingleIq::testRtpSessionState()
+void tst_QXmppJingleData::testRtpSessionState()
 {
     QFETCH(QByteArray, xml);
     QFETCH(QString, state);
@@ -1239,7 +1239,7 @@ void tst_QXmppJingleIq::testRtpSessionState()
     serializePacket(iq2, xml);
 }
 
-void tst_QXmppJingleIq::testAudioPayloadType()
+void tst_QXmppJingleData::testAudioPayloadType()
 {
     const QByteArray xml(R"(<payload-type id="103" name="L16" channels="2" clockrate="16000"/>)");
     QXmppJinglePayloadType payload;
@@ -1251,7 +1251,7 @@ void tst_QXmppJingleIq::testAudioPayloadType()
     serializePacket(payload, xml);
 }
 
-void tst_QXmppJingleIq::testVideoPayloadType()
+void tst_QXmppJingleData::testVideoPayloadType()
 {
     const QByteArray xml(
         "<payload-type id=\"98\" name=\"theora\" clockrate=\"90000\">"
@@ -1269,7 +1269,7 @@ void tst_QXmppJingleIq::testVideoPayloadType()
     serializePacket(payload, xml);
 }
 
-void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
+void tst_QXmppJingleData::testPayloadTypeRtpFeedbackNegotiation()
 {
     const QByteArray xml(
         "<payload-type id=\"96\">"
@@ -1328,7 +1328,7 @@ void tst_QXmppJingleIq::testPayloadTypeRtpFeedbackNegotiation()
     serializePacket(payload2, xml);
 }
 
-void tst_QXmppJingleIq::testRtpErrorCondition_data()
+void tst_QXmppJingleData::testRtpErrorCondition_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<QXmppJingleReason::RtpErrorCondition>("condition");
@@ -1364,7 +1364,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition_data()
         << QXmppJingleReason::CryptoRequired;
 }
 
-void tst_QXmppJingleIq::testRtpErrorCondition()
+void tst_QXmppJingleData::testRtpErrorCondition()
 {
     QFETCH(QByteArray, xml);
     QFETCH(QXmppJingleReason::RtpErrorCondition, condition);
@@ -1423,7 +1423,7 @@ void tst_QXmppJingleIq::testRtpErrorCondition()
     serializePacket(iq2, xml);
 }
 
-void tst_QXmppJingleIq::testIsJingleMessageInitiationElement_data()
+void tst_QXmppJingleData::testIsJingleMessageInitiationElement_data()
 {
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isValid");
@@ -1564,7 +1564,7 @@ void tst_QXmppJingleIq::testIsJingleMessageInitiationElement_data()
         << false;
 }
 
-void tst_QXmppJingleIq::testIsJingleMessageInitiationElement()
+void tst_QXmppJingleData::testIsJingleMessageInitiationElement()
 {
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
@@ -1572,7 +1572,7 @@ void tst_QXmppJingleIq::testIsJingleMessageInitiationElement()
     QCOMPARE(QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(xmlToDom(xml)), isValid);
 }
 
-void tst_QXmppJingleIq::testJingleMessageInitiationElement()
+void tst_QXmppJingleData::testJingleMessageInitiationElement()
 {
     using JmiType = QXmppJingleMessageInitiationElement::Type;
 
@@ -1677,5 +1677,5 @@ void tst_QXmppJingleIq::testJingleMessageInitiationElement()
     serializePacket(finishElement, finishXml);
 }
 
-QTEST_MAIN(tst_QXmppJingleIq)
-#include "tst_qxmppjingleiq.moc"
+QTEST_MAIN(tst_QXmppJingleData)
+#include "tst_qxmppjingledata.moc"

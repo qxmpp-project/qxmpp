@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppJingleIq.h"
+#include "QXmppJingleData.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
