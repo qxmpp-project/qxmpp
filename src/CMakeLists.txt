@@ -35,7 +35,8 @@ set(INSTALL_HEADER_FILES
     base/QXmppHttpUploadIq.h
     base/QXmppIbbIq.h
     base/QXmppIq.h
-	base/QXmppJingleData.h
+    base/QXmppJingleIq.h
+    base/QXmppJingleData.h
     base/QXmppLogger.h
     base/QXmppMamIq.h
     base/QXmppMessage.h
@@ -173,7 +174,7 @@ set(SOURCE_FILES
     base/QXmppHttpUploadIq.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp
-	base/QXmppJingleData.cpp
+    base/QXmppJingleData.cpp
     base/QXmppLogger.cpp
     base/QXmppMamIq.cpp
     base/QXmppMessage.cpp

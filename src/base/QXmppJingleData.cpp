@@ -375,6 +375,60 @@ void QXmppJingleIq::Content::setDescription(const QXmppJingleDescription &descri
     d->description = description;
 }
 
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().media() instead.
+QString QXmppJingleIq::Content::descriptionMedia() const
+{
+    return d->description.media();
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setMedia() instead.
+void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
+{
+    d->description.setMedia(media);
+}
+
+/// Returns the description's 32-bit synchronization source for the media stream as specified by
+/// \xep{0167, Jingle RTP Sessions} and RFC 3550.
+///
+/// \since QXmpp 0.9
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Content::description().setSsrc() instead.
+///
+quint32 QXmppJingleIq::Content::descriptionSsrc() const
+{
+    return d->description.ssrc();
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setSsrc() instead.
+void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
+{
+    d->description.setSsrc(ssrc);
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().addPayloadType() instead.
+void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
+{
+    d->description.addPayloadType(payload);
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().payloadTypes() instead.
+QList<QXmppJinglePayloadType> QXmppJingleIq::Content::payloadTypes() const
+{
+    return d->description.payloadTypes();
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setPayloadTypes() instead.
+void QXmppJingleIq::Content::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
+{
+    d->description.setPayloadTypes(payloadTypes);
+}
+
 ///
 /// Returns whether multiplexing of RTP data and control packets on a single port is supported as
 /// specified by \xep{0167, Jingle RTP Sessions} and  RFC 5761.
@@ -3079,12 +3133,13 @@ void QXmppJingleMessageInitiationElement::setMigratedTo(const QString &migratedT
 /// \cond
 void QXmppJingleMessageInitiationElement::parse(const QDomElement &element)
 {
-    d->type = stringToJmiElementType(element.nodeName());
+    std::optional<Type> type { stringToJmiElementType(element.nodeName()) };
 
-    if (d->type == Type::None) {
+    if (!type.has_value()) {
         return;
     }
 
+    d->type = type.value();
     d->id = element.attribute(QStringLiteral("id"));
 
     // Type::Proceed and Type::Ringing don't need any parsing aside of the id.
@@ -3108,12 +3163,12 @@ void QXmppJingleMessageInitiationElement::parse(const QDomElement &element)
 
         break;
     case Type::Finish:
-        if (const auto &reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
+        if (auto reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
             d->reason = QXmppJingleReason();
             d->reason->parse(reasonElement);
         }
 
-        if (const auto &migratedToElement = element.firstChildElement("migrated"); !migratedToElement.isNull()) {
+        if (auto migratedToElement = element.firstChildElement("migrated"); !migratedToElement.isNull()) {
             d->migratedTo = migratedToElement.attribute("to");
         }
 
@@ -3158,13 +3213,13 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleMessageInitiationElement)
 ///
 bool QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(const QDomElement &element)
 {
-    return (element.nodeName() == QStringLiteral("propose") || element.nodeName() == QStringLiteral("ringing") || element.nodeName() == QStringLiteral("proceed") || element.nodeName() == QStringLiteral("retract") || element.nodeName() == QStringLiteral("reject") || element.nodeName() == QStringLiteral("finish")) && element.hasAttribute(QStringLiteral("id")) && element.namespaceURI() == ns_jingle_message_initiation;
+    return stringToJmiElementType(element.tagName()).has_value() && element.hasAttribute(QStringLiteral("id")) && element.namespaceURI() == ns_jingle_message_initiation;
 }
 
 ///
 /// Takes a Jingle Message Initiation element type and parses it to a string.
 ///
-QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type) const
+QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type)
 {
     switch (type) {
     case Type::Propose:
@@ -3187,7 +3242,7 @@ QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type) c
 ///
 /// Takes a string and parses it to a Jingle Message Initiation element type.
 ///
-QXmppJingleMessageInitiationElement::Type QXmppJingleMessageInitiationElement::stringToJmiElementType(const QString &typeStr) const
+std::optional<QXmppJingleMessageInitiationElement::Type> QXmppJingleMessageInitiationElement::stringToJmiElementType(const QString &typeStr)
 {
     if (typeStr == "propose") {
         return Type::Propose;
@@ -3203,5 +3258,5 @@ QXmppJingleMessageInitiationElement::Type QXmppJingleMessageInitiationElement::s
         return Type::Finish;
     }
 
-    return Type::None;
+    return std::nullopt;
 }

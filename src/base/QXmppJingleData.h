@@ -463,6 +463,8 @@ public:
 
     using RtpSessionState = std::variant<RtpSessionStateActive, RtpSessionStateHold, RtpSessionStateUnhold, RtpSessionStateMuting, RtpSessionStateRinging>;
 
+    using Reason = QXmppJingleReason;
+
     /// \internal
     ///
     /// The QXmppJingleIq::Content class represents the "content" element of a
@@ -491,6 +493,18 @@ public:
         // XEP-0167: Jingle RTP Sessions
         QXmppJingleDescription description() const;
         void setDescription(const QXmppJingleDescription &description);
+
+#if QXMPP_DEPRECATED_SINCE(1, 6)
+        QString descriptionMedia() const;
+        void setDescriptionMedia(const QString &media);
+
+        quint32 descriptionSsrc() const;
+        void setDescriptionSsrc(quint32 ssrc);
+
+        void addPayloadType(const QXmppJinglePayloadType &payload);
+        QList<QXmppJinglePayloadType> payloadTypes() const;
+        void setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes);
+#endif
 
         bool isRtpMultiplexingSupported() const;
         void setRtpMultiplexingSupported(bool isRtpMultiplexingSupported);
@@ -636,11 +650,10 @@ public:
     /// \endcond
 
     static bool isJingleMessageInitiationElement(const QDomElement &);
+    static QString jmiElementTypeToString(Type type);
+    static std::optional<Type> stringToJmiElementType(const QString &typeStr);
 
 private:
-    QString jmiElementTypeToString(Type type) const;
-    Type stringToJmiElementType(const QString &typeStr) const;
-
     QSharedDataPointer<QXmppJingleMessageInitiationElementPrivate> d;
 };
 
