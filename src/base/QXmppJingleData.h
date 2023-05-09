@@ -384,9 +384,6 @@ public:
     RtpErrorCondition rtpErrorCondition() const;
     void setRtpErrorCondition(RtpErrorCondition rtpErrorCondition);
 
-    QString namespaceUri() const;
-    void setNamespaceUri(const QString &namespaceUri);
-
     /// \cond
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

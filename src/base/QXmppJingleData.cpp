@@ -1023,7 +1023,6 @@ public:
     QString m_text;
     QXmppJingleReason::Type m_type;
     QXmppJingleReason::RtpErrorCondition m_rtpErrorCondition;
-    QString m_namespaceUri;
 };
 
 QXmppJingleIqReasonPrivate::QXmppJingleIqReasonPrivate()
@@ -1104,22 +1103,6 @@ void QXmppJingleReason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition
     d->m_rtpErrorCondition = rtpErrorCondition;
 }
 
-///
-/// Returns the namespace URI of a reason element.
-///
-QString QXmppJingleReason::namespaceUri() const
-{
-    return d->m_namespaceUri;
-}
-
-///
-/// Sets the namespace URI of a reason element.
-///
-void QXmppJingleReason::setNamespaceUri(const QString &namespaceUri)
-{
-    d->m_namespaceUri = namespaceUri;
-}
-
 /// \cond
 void QXmppJingleReason::parse(const QDomElement &element)
 {
@@ -1142,10 +1125,6 @@ void QXmppJingleReason::parse(const QDomElement &element)
             break;
         }
     }
-
-    if (!element.namespaceURI().isEmpty() && !element.parentNode().isNull() && element.parentNode().namespaceURI() != element.namespaceURI()) {
-        d->m_namespaceUri = element.namespaceURI();
-    }
 }
 
 void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
@@ -1155,10 +1134,7 @@ void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(QStringLiteral("reason"));
-
-    if (!d->m_namespaceUri.isEmpty()) {
-        writer->writeDefaultNamespace(d->m_namespaceUri);
-    }
+    writer->writeDefaultNamespace(ns_jingle);
 
     if (!d->m_text.isEmpty()) {
         helperToXmlAddTextElement(writer, QStringLiteral("text"), d->m_text);
@@ -3090,10 +3066,6 @@ std::optional<QXmppJingleReason> QXmppJingleMessageInitiationElement::reason() c
 void QXmppJingleMessageInitiationElement::setReason(std::optional<QXmppJingleReason> reason)
 {
     d->reason = reason;
-
-    if (d->reason) {
-        d->reason->setNamespaceUri(ns_jingle);
-    }
 }
 
 ///

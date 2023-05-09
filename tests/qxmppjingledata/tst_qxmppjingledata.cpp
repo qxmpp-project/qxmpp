@@ -1086,7 +1086,7 @@ void tst_QXmppJingleData::testTerminate()
         "<jingle xmlns=\"urn:xmpp:jingle:1\""
         " action=\"session-terminate\""
         " sid=\"a73sjjvkla37jfea\">"
-        "<reason>"
+        "<reason xmlns=\"urn:xmpp:jingle:1\">"
         "<success/>"
         "</reason>"
         "</jingle>"
@@ -1336,7 +1336,7 @@ void tst_QXmppJingleData::testRtpErrorCondition_data()
     QTest::newRow("NoErrorCondition")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
-                             "<reason>"
+                             "<reason xmlns=\"urn:xmpp:jingle:1\">"
                              "<security-error/>"
                              "</reason>"
                              "</jingle>"
@@ -1345,7 +1345,7 @@ void tst_QXmppJingleData::testRtpErrorCondition_data()
     QTest::newRow("InvalidCrypto")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
-                             "<reason>"
+                             "<reason xmlns=\"urn:xmpp:jingle:1\">"
                              "<security-error/>"
                              "<invalid-crypto xmlns=\"urn:xmpp:jingle:apps:rtp:errors:1\"/>"
                              "</reason>"
@@ -1355,7 +1355,7 @@ void tst_QXmppJingleData::testRtpErrorCondition_data()
     QTest::newRow("CryptoRequired")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-terminate\">"
-                             "<reason>"
+                             "<reason xmlns=\"urn:xmpp:jingle:1\">"
                              "<security-error/>"
                              "<crypto-required xmlns=\"urn:xmpp:jingle:apps:rtp:errors:1\"/>"
                              "</reason>"
@@ -1632,7 +1632,6 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     QCOMPARE(rejectElement.id(), QStringLiteral("a73sjjvkla37jfea"));
     QCOMPARE(rejectElement.reason()->text(), QStringLiteral("Busy"));
     QCOMPARE(rejectElement.reason()->type(), ReasonType::Busy);
-    QCOMPARE(rejectElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
     QCOMPARE(rejectElement.containsTieBreak(), true);
     serializePacket(rejectElement, rejectXml);
 
@@ -1652,7 +1651,6 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     QCOMPARE(retractElement.id(), QStringLiteral("a73sjjvkla37jfea"));
     QCOMPARE(retractElement.reason()->text(), QStringLiteral("Retracted"));
     QCOMPARE(retractElement.reason()->type(), ReasonType::Cancel);
-    QCOMPARE(retractElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
     serializePacket(retractElement, retractXml);
 
     // --- Finish ---
@@ -1672,7 +1670,6 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     QCOMPARE(finishElement.id(), QStringLiteral("a73sjjvkla37jfea"));
     QCOMPARE(finishElement.reason()->text(), QStringLiteral("Success"));
     QCOMPARE(finishElement.reason()->type(), ReasonType::Success);
-    QCOMPARE(finishElement.reason()->namespaceUri(), QStringLiteral("urn:xmpp:jingle:1"));
     QCOMPARE(finishElement.migratedTo(), QStringLiteral("989a46a6-f202-4910-a7c3-83c6ba3f3947"));
     serializePacket(finishElement, finishXml);
 }

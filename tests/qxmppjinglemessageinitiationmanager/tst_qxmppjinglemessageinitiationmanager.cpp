@@ -154,7 +154,6 @@ void tst_QXmppJingleMessageInitiationManager::testReject()
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Decline);
     reason.setText("Declined");
-    reason.setNamespaceUri(ns_jingle);
 
     connect(&m_logger, &QXmppLogger::message, this, [jmiCallPartnerJid = jmi->callPartnerJid()](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
@@ -166,7 +165,6 @@ void tst_QXmppJingleMessageInitiationManager::testReject()
                 QCOMPARE(message.jingleMessageInitiationElement()->type(), JmiType::Reject);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->type(), QXmppJingleReason::Decline);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->text(), "Declined");
-                QCOMPARE(message.jingleMessageInitiationElement()->reason()->namespaceUri(), ns_jingle);
                 QCOMPARE(message.jingleMessageInitiationElement()->containsTieBreak(), true);
             }
         }
@@ -190,7 +188,6 @@ void tst_QXmppJingleMessageInitiationManager::testRetract()
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Gone);
     reason.setText("Gone");
-    reason.setNamespaceUri(ns_jingle);
 
     connect(&m_logger, &QXmppLogger::message, this, [jmicallPartnerJid = jmi->callPartnerJid()](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
@@ -202,7 +199,6 @@ void tst_QXmppJingleMessageInitiationManager::testRetract()
                 QCOMPARE(message.jingleMessageInitiationElement()->type(), JmiType::Retract);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->type(), QXmppJingleReason::Gone);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->text(), "Gone");
-                QCOMPARE(message.jingleMessageInitiationElement()->reason()->namespaceUri(), ns_jingle);
                 QCOMPARE(message.jingleMessageInitiationElement()->containsTieBreak(), true);
             }
         }
@@ -226,7 +222,6 @@ void tst_QXmppJingleMessageInitiationManager::testFinish()
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Success);
     reason.setText("Finished");
-    reason.setNamespaceUri(ns_jingle);
 
     connect(&m_logger, &QXmppLogger::message, this, [jmicallPartnerJid = jmi->callPartnerJid()](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
@@ -238,7 +233,6 @@ void tst_QXmppJingleMessageInitiationManager::testFinish()
                 QCOMPARE(message.jingleMessageInitiationElement()->type(), JmiType::Finish);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->type(), QXmppJingleReason::Success);
                 QCOMPARE(message.jingleMessageInitiationElement()->reason()->text(), "Finished");
-                QCOMPARE(message.jingleMessageInitiationElement()->reason()->namespaceUri(), ns_jingle);
                 QCOMPARE(message.jingleMessageInitiationElement()->migratedTo(), "fecbea35-08d3-404f-9ec7-2b57c566fa74");
             }
         }
@@ -347,7 +341,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleNonExistingSessionLowerI
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
     reason.setText("Tie-Break");
-    reason.setNamespaceUri(ns_jingle);
 
     // make sure that request with higher ID is being retracted
     connect(&m_logger, &QXmppLogger::message, this, [jmiWithHigherId, reason](QXmppLogger::MessageType type, const QString &text) {
@@ -364,7 +357,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleNonExistingSessionLowerI
                 QVERIFY(jmiElement->reason());
                 QCOMPARE(jmiElement->reason()->type(), reason.type());
                 QCOMPARE(jmiElement->reason()->text(), reason.text());
-                QCOMPARE(jmiElement->reason()->namespaceUri(), reason.namespaceUri());
 
                 SKIP_IF_INTEGRATION_TESTS_DISABLED()
 
@@ -397,7 +389,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleNonExistingSessionHigher
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
     reason.setText("Tie-Break");
-    reason.setNamespaceUri(ns_jingle);
 
     auto jmiWithLowerId { m_manager.addJmi("julietNonExistingSession@capulet.example") };
     jmiWithLowerId->setId("ca3cf894-5325-482f-a412-a6e9f832298d");
@@ -417,7 +408,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleNonExistingSessionHigher
                 QVERIFY(jmiElement->reason());
                 QCOMPARE(jmiElement->reason()->type(), reason.type());
                 QCOMPARE(jmiElement->reason()->text(), reason.text());
-                QCOMPARE(jmiElement->reason()->namespaceUri(), reason.namespaceUri());
             }
         }
     });
@@ -449,7 +439,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingSession()
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
     reason.setText("Session migrated");
-    reason.setNamespaceUri(ns_jingle);
 
     connect(&m_logger, &QXmppLogger::message, this, [jmi, reason](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
@@ -466,7 +455,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingSession()
                 QVERIFY(jmiElement->reason());
                 QCOMPARE(jmiElement->reason()->type(), reason.type());
                 QCOMPARE(jmiElement->reason()->text(), reason.text());
-                QCOMPARE(jmiElement->reason()->namespaceUri(), reason.namespaceUri());
             }
         }
     });
@@ -593,7 +581,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
     reason.setText("Rejected because expired.");
-    reason.setNamespaceUri(ns_jingle);
 
     jmiElement.setType(JmiType::Reject);
     jmiElement.setReason(reason);
@@ -607,7 +594,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
         QVERIFY(rejectedJmiElement.reason);
         QCOMPARE(rejectedJmiElement.reason->type(), jmiElement.reason()->type());
         QCOMPARE(rejectedJmiElement.reason->text(), jmiElement.reason()->text());
-        QCOMPARE(rejectedJmiElement.reason->namespaceUri(), jmiElement.reason()->namespaceUri());
         QCOMPARE(rejectedJmiElement.containsTieBreak, jmiElement.containsTieBreak());
     });
 
@@ -621,7 +607,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
 
     reason.setType(QXmppJingleReason::ConnectivityError);
     reason.setText("Retracted due to connectivity error.");
-    reason.setNamespaceUri(ns_jingle);
 
     jmiElement.setType(JmiType::Retract);
     jmiElement.setReason(reason);
@@ -635,7 +620,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
         QVERIFY(rejectedJmiElement.reason);
         QCOMPARE(rejectedJmiElement.reason->type(), jmiElement.reason()->type());
         QCOMPARE(rejectedJmiElement.reason->text(), jmiElement.reason()->text());
-        QCOMPARE(rejectedJmiElement.reason->namespaceUri(), jmiElement.reason()->namespaceUri());
         QCOMPARE(rejectedJmiElement.containsTieBreak, jmiElement.containsTieBreak());
     });
 
@@ -649,7 +633,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
 
     reason.setType(QXmppJingleReason::Success);
     reason.setText("Finished.");
-    reason.setNamespaceUri(ns_jingle);
 
     jmiElement.setType(JmiType::Finish);
     jmiElement.setReason(reason);
@@ -664,7 +647,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleExistingJmi()
         QVERIFY(rejectedJmiElement.reason);
         QCOMPARE(rejectedJmiElement.reason->type(), jmiElement.reason()->type());
         QCOMPARE(rejectedJmiElement.reason->text(), jmiElement.reason()->text());
-        QCOMPARE(rejectedJmiElement.reason->namespaceUri(), jmiElement.reason()->namespaceUri());
         QCOMPARE(rejectedJmiElement.migratedTo, jmiElement.migratedTo());
     });
 
@@ -839,7 +821,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleMessageClosedRejected()
 
         QCOMPARE(rejectedJmiElement.reason->type(), QXmppJingleReason::Busy);
         QCOMPARE(rejectedJmiElement.reason->text(), "Busy");
-        QCOMPARE(rejectedJmiElement.reason->namespaceUri(), ns_jingle);
     });
 
     message.parse(xmlToDom(xmlReject));
@@ -874,7 +855,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleMessageClosedRetracted()
 
         QCOMPARE(retractedJmiElement.reason->type(), QXmppJingleReason::Cancel);
         QCOMPARE(retractedJmiElement.reason->text(), "Retracted");
-        QCOMPARE(retractedJmiElement.reason->namespaceUri(), ns_jingle);
     });
 
     message.parse(xmlToDom(xmlRetract));
@@ -910,7 +890,6 @@ void tst_QXmppJingleMessageInitiationManager::testHandleMessageClosedFinished()
 
         QCOMPARE(finishedJmiElement.reason->type(), QXmppJingleReason::Success);
         QCOMPARE(finishedJmiElement.reason->text(), "Success");
-        QCOMPARE(finishedJmiElement.reason->namespaceUri(), ns_jingle);
         QCOMPARE(finishedJmiElement.migratedTo, "989a46a6-f202-4910-a7c3-83c6ba3f3947");
     });
 
