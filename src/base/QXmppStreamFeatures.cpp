@@ -266,9 +266,11 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
 {
-    QDomElement subElement = element.firstChildElement(tagName);
     QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
-    while (!subElement.isNull()) {
+
+    for (auto subElement = element.firstChildElement(tagName);
+         !subElement.isNull();
+         subElement = subElement.nextSiblingElement(tagName)) {
         if (subElement.namespaceURI() == tagNs) {
             if (!subElement.firstChildElement(QStringLiteral("required")).isNull()) {
                 mode = QXmppStreamFeatures::Required;
@@ -276,7 +278,6 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
                 mode = QXmppStreamFeatures::Enabled;
             }
         }
-        subElement = subElement.nextSiblingElement(tagName);
     }
     return mode;
 }
@@ -308,20 +309,20 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
     if (compression.namespaceURI() == ns_compressFeature) {
-        QDomElement subElement = compression.firstChildElement(QStringLiteral("method"));
-        while (!subElement.isNull()) {
+        for (auto subElement = element.firstChildElement(QStringLiteral("method"));
+             !subElement.isNull();
+             subElement = subElement.nextSiblingElement(QStringLiteral("method"))) {
             d->compressionMethods << subElement.text();
-            subElement = subElement.nextSiblingElement(QStringLiteral("method"));
         }
     }
 
     // parse advertised SASL Authentication mechanisms
     QDomElement mechs = element.firstChildElement(QStringLiteral("mechanisms"));
     if (mechs.namespaceURI() == ns_sasl) {
-        QDomElement subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
-        while (!subElement.isNull()) {
+        for (auto subElement = element.firstChildElement(QStringLiteral("mechanism"));
+             !subElement.isNull();
+             subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"))) {
             d->authMechanisms << subElement.text();
-            subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"));
         }
     }
 }

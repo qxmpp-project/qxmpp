@@ -557,8 +557,9 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
     d->type = typeFromString(errorElement.attribute(QStringLiteral("type"))).value_or(NoType);
     d->by = errorElement.attribute(QStringLiteral("by"));
 
-    QDomElement element = errorElement.firstChildElement();
-    while (!element.isNull()) {
+    for (auto element = errorElement.firstChildElement();
+         !element.isNull();
+         element = element.nextSiblingElement()) {
         if (element.namespaceURI() == ns_stanza) {
             if (element.tagName() == QStringLiteral("text")) {
                 d->text = element.text();
@@ -589,7 +590,6 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
                     element.attribute(QStringLiteral("stamp")));
             }
         }
-        element = element.nextSiblingElement();
     }
 }
 
@@ -1033,14 +1033,14 @@ void QXmppStanza::parse(const QDomElement &element)
     }
 
     // XEP-0033: Extended Stanza Addressing
-    QDomElement addressElement = element.firstChildElement("addresses").firstChildElement("address");
-    while (!addressElement.isNull()) {
+    for (auto addressElement = element.firstChildElement("addresses").firstChildElement("address");
+         !addressElement.isNull();
+         addressElement = addressElement.nextSiblingElement("address")) {
         QXmppExtendedAddress address;
         address.parse(addressElement);
         if (address.isValid()) {
             d->extendedAddresses << address;
         }
-        addressElement = addressElement.nextSiblingElement("address");
     }
 }
 

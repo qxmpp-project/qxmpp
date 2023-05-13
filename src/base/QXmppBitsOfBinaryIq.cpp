@@ -30,12 +30,12 @@ QXmppBitsOfBinaryIq::~QXmppBitsOfBinaryIq() = default;
 ///
 bool QXmppBitsOfBinaryIq::isBitsOfBinaryIq(const QDomElement &element)
 {
-    QDomElement child = element.firstChildElement();
-    while (!child.isNull()) {
+    for (auto child = element.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
         if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child)) {
             return true;
         }
-        child = child.nextSiblingElement();
     }
     return false;
 }
@@ -43,13 +43,13 @@ bool QXmppBitsOfBinaryIq::isBitsOfBinaryIq(const QDomElement &element)
 /// \cond
 void QXmppBitsOfBinaryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement child = element.firstChildElement();
-    while (!child.isNull()) {
+    for (auto child = element.firstChildElement();
+         !child.isNull();
+         child = child.nextSiblingElement()) {
         if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child)) {
             QXmppBitsOfBinaryData::parseElementFromChild(child);
             break;
         }
-        child = child.nextSiblingElement();
     }
 }
 

@@ -45,8 +45,9 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
         attributes.insert(attr.name(), attr.value());
     }
 
-    QDomNode childNode = element.firstChild();
-    while (!childNode.isNull()) {
+    for (auto childNode = element.firstChild();
+         !childNode.isNull();
+         childNode = childNode.nextSibling()) {
         if (childNode.isElement()) {
             QXmppElementPrivate *child = new QXmppElementPrivate(childNode.toElement());
             child->parent = this;
@@ -54,7 +55,6 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
         } else if (childNode.isText()) {
             value += childNode.toText().data();
         }
-        childNode = childNode.nextSibling();
     }
 
     QTextStream stream(&serializedSource);
