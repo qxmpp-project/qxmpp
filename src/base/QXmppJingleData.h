@@ -364,6 +364,8 @@ public:
         UnsupportedTransports
     };
 
+    /// Condition of an RTP-specific error
+    /// \since QXmpp 1.5
     enum RtpErrorCondition {
         /// There is no error condition.
         NoErrorCondition,
@@ -460,6 +462,7 @@ public:
 
     using RtpSessionState = std::variant<RtpSessionStateActive, RtpSessionStateHold, RtpSessionStateUnhold, RtpSessionStateMuting, RtpSessionStateRinging>;
 
+    /// Alias to QXmppJingleReason for compatibility.
     using Reason = QXmppJingleReason;
 
     /// \internal

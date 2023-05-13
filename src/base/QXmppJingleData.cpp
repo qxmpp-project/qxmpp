@@ -1032,14 +1032,6 @@ QXmppJingleIqReasonPrivate::QXmppJingleIqReasonPrivate()
 }
 
 ///
-/// \enum QXmppJingleIqReason::RtpErrorCondition
-///
-/// Condition of an RTP-specific error
-///
-/// \since QXmpp 1.5
-///
-
-///
 /// \class QXmppJingleReason
 ///
 /// The QXmppJingleReason class represents the "reason" element of a
