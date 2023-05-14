@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppJingleIq.h"
+#include "QXmppJingleData.h"
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
@@ -224,9 +224,7 @@ public:
     QString name;
     QString senders;
 
-    QString descriptionMedia;
-    quint32 descriptionSsrc;
-    QString descriptionType;
+    QXmppJingleDescription description;
     bool isRtpMultiplexingSupported = false;
 
     QString transportType;
@@ -237,7 +235,6 @@ public:
     QString transportFingerprintHash;
     QString transportFingerprintSetup;
 
-    QList<QXmppJinglePayloadType> payloadTypes;
     QList<QXmppJingleCandidate> transportCandidates;
 
     // XEP-0167: Jingle RTP Sessions
@@ -253,8 +250,8 @@ public:
 };
 
 QXmppJingleIqContentPrivate::QXmppJingleIqContentPrivate()
-    : descriptionSsrc(0)
 {
+    description.setSsrc(0);
 }
 
 ///
@@ -362,36 +359,74 @@ void QXmppJingleIq::Content::setSenders(const QString &senders)
     d->senders = senders;
 }
 
+///
+/// Returns the description as specified by
+/// \xep{0167, Jingle RTP Sessions} and RFC 3550.
+///
+/// \since QXmpp 0.9
+///
+QXmppJingleDescription QXmppJingleIq::Content::description() const
+{
+    return d->description;
+}
+
+void QXmppJingleIq::Content::setDescription(const QXmppJingleDescription &description)
+{
+    d->description = description;
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().media() instead.
 QString QXmppJingleIq::Content::descriptionMedia() const
 {
-    return d->descriptionMedia;
+    return d->description.media();
 }
 
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setMedia() instead.
 void QXmppJingleIq::Content::setDescriptionMedia(const QString &media)
 {
-    d->descriptionMedia = media;
+    d->description.setMedia(media);
 }
 
-///
 /// Returns the description's 32-bit synchronization source for the media stream as specified by
 /// \xep{0167, Jingle RTP Sessions} and RFC 3550.
 ///
 /// \since QXmpp 0.9
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Content::description().setSsrc() instead.
 ///
 quint32 QXmppJingleIq::Content::descriptionSsrc() const
 {
-    return d->descriptionSsrc;
+    return d->description.ssrc();
 }
 
-///
-/// Sets the description's 32-bit synchronization source for the media stream as specified by
-/// \xep{0167, Jingle RTP Sessions} and RFC 3550.
-///
-/// \since QXmpp 0.9
-///
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setSsrc() instead.
 void QXmppJingleIq::Content::setDescriptionSsrc(quint32 ssrc)
 {
-    d->descriptionSsrc = ssrc;
+    d->description.setSsrc(ssrc);
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().addPayloadType() instead.
+void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
+{
+    d->description.addPayloadType(payload);
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().payloadTypes() instead.
+QList<QXmppJinglePayloadType> QXmppJingleIq::Content::payloadTypes() const
+{
+    return d->description.payloadTypes();
+}
+
+/// \deprecated This method is deprecated since QXmpp 1.6. Use
+/// \c QXmppJingleIq::Conent::description().setPayloadTypes() instead.
+void QXmppJingleIq::Content::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
+{
+    d->description.setPayloadTypes(payloadTypes);
 }
 
 ///
@@ -444,23 +479,6 @@ std::optional<QXmppJingleRtpEncryption> QXmppJingleIq::Content::rtpEncryption() 
 void QXmppJingleIq::Content::setRtpEncryption(const std::optional<QXmppJingleRtpEncryption> &rtpEncryption)
 {
     d->rtpEncryption = rtpEncryption;
-}
-
-void QXmppJingleIq::Content::addPayloadType(const QXmppJinglePayloadType &payload)
-{
-    d->descriptionType = ns_jingle_rtp;
-    d->payloadTypes << payload;
-}
-
-QList<QXmppJinglePayloadType> QXmppJingleIq::Content::payloadTypes() const
-{
-    return d->payloadTypes;
-}
-
-void QXmppJingleIq::Content::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
-{
-    d->descriptionType = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp;
-    d->payloadTypes = payloadTypes;
 }
 
 void QXmppJingleIq::Content::addTransportCandidate(const QXmppJingleCandidate &candidate)
@@ -687,9 +705,9 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
 
     // description
     QDomElement descriptionElement = element.firstChildElement(QStringLiteral("description"));
-    d->descriptionType = descriptionElement.namespaceURI();
-    d->descriptionMedia = descriptionElement.attribute(QStringLiteral("media"));
-    d->descriptionSsrc = descriptionElement.attribute(QStringLiteral("ssrc")).toULong();
+    d->description.setType(descriptionElement.namespaceURI());
+    d->description.setMedia(descriptionElement.attribute(QStringLiteral("media")));
+    d->description.setSsrc(descriptionElement.attribute(QStringLiteral("ssrc")).toULong());
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
 
     for (auto childElement = descriptionElement.firstChildElement();
@@ -710,7 +728,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     while (!child.isNull()) {
         QXmppJinglePayloadType payload;
         payload.parse(child);
-        d->payloadTypes << payload;
+        d->description.addPayloadType(payload);
         child = child.nextSiblingElement(QStringLiteral("payload-type"));
     }
 
@@ -749,13 +767,13 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, QStringLiteral("senders"), d->senders);
 
     // description
-    if (!d->descriptionType.isEmpty() || !d->payloadTypes.isEmpty()) {
+    if (!d->description.type().isEmpty() || !d->description.payloadTypes().isEmpty()) {
         writer->writeStartElement(QStringLiteral("description"));
-        writer->writeDefaultNamespace(d->descriptionType);
-        helperToXmlAddAttribute(writer, QStringLiteral("media"), d->descriptionMedia);
+        writer->writeDefaultNamespace(d->description.type());
+        helperToXmlAddAttribute(writer, QStringLiteral("media"), d->description.media());
 
-        if (d->descriptionSsrc) {
-            writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->descriptionSsrc));
+        if (d->description.ssrc()) {
+            writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->description.ssrc()));
         }
 
         if (d->isRtpMultiplexingSupported) {
@@ -769,7 +787,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         jingleRtpFeedbackNegotiationElementsToXml(writer, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
         jingleRtpHeaderExtensionsNegotiationElementsToXml(writer, d->rtpHeaderExtensionProperties, d->isRtpHeaderExtensionMixingAllowed);
 
-        for (const auto &payload : d->payloadTypes) {
+        for (const auto &payload : d->description.payloadTypes()) {
             payload.toXml(writer);
         }
 
@@ -888,7 +906,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     qWarning() << "Could not parse ssrc" << line;
                     return false;
                 }
-                d->descriptionSsrc = bits[0].toULong();
+                d->description.setSsrc(bits[0].toULong());
             }
         } else if (line.startsWith(QStringLiteral("m="))) {
             // FIXME: what do we do with the profile (bits[2]) ?
@@ -897,7 +915,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                 qWarning() << "Could not parse media" << line;
                 return false;
             }
-            d->descriptionMedia = bits[0];
+            d->description.setMedia(bits[0]);
 
             // parse payload types
             for (int i = 3; i < bits.size(); ++i) {
@@ -912,7 +930,8 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
             }
         }
     }
-    setPayloadTypes(payloads);
+
+    d->description.setPayloadTypes(payloads);
     return true;
 }
 
@@ -945,7 +964,7 @@ QString QXmppJingleIq::Content::toSdp() const
     // media
     QString payloads;
     QStringList attrs;
-    for (const QXmppJinglePayloadType &payload : d->payloadTypes) {
+    for (const QXmppJinglePayloadType &payload : d->description.payloadTypes()) {
         payloads += " " + QString::number(payload.id());
         QString rtpmap = QString::number(payload.id()) + " " + payload.name() + "/" + QString::number(payload.clockrate());
         if (payload.channels() > 1) {
@@ -970,7 +989,7 @@ QString QXmppJingleIq::Content::toSdp() const
             attrs << QStringLiteral("a=fmtp:") + QByteArray::number(payload.id()) + QStringLiteral(" ") + paramList.join("; ");
         }
     }
-    sdp << QStringLiteral("m=%1 %2 RTP/AVP%3").arg(d->descriptionMedia, QString::number(localRtpPort), payloads);
+    sdp << QStringLiteral("m=%1 %2 RTP/AVP%3").arg(d->description.media(), QString::number(localRtpPort), payloads);
     sdp << QStringLiteral("c=%1").arg(addressToSdp(localRtpAddress));
     sdp += attrs;
 
@@ -996,45 +1015,60 @@ QString QXmppJingleIq::Content::toSdp() const
 
 /// \endcond
 
+class QXmppJingleIqReasonPrivate : public QSharedData
+{
+public:
+    QXmppJingleIqReasonPrivate();
+
+    QString m_text;
+    QXmppJingleReason::Type m_type;
+    QXmppJingleReason::RtpErrorCondition m_rtpErrorCondition;
+};
+
+QXmppJingleIqReasonPrivate::QXmppJingleIqReasonPrivate()
+    : m_type(QXmppJingleReason::Type::None),
+      m_rtpErrorCondition(QXmppJingleReason::RtpErrorCondition::NoErrorCondition)
+{
+}
+
 ///
-/// \enum QXmppJingleIq::Reason::RtpErrorCondition
+/// \class QXmppJingleReason
 ///
-/// Condition of an RTP-specific error
-///
-/// \since QXmpp 1.5
+/// The QXmppJingleReason class represents the "reason" element of a
+/// QXmppJingle element.
 ///
 
-QXmppJingleIq::Reason::Reason()
-    : m_type(None)
+QXmppJingleReason::QXmppJingleReason()
+    : d(new QXmppJingleIqReasonPrivate())
 {
 }
 
 /// Returns the reason's textual description.
 
-QString QXmppJingleIq::Reason::text() const
+QString QXmppJingleReason::text() const
 {
-    return m_text;
+    return d->m_text;
 }
 
 /// Sets the reason's textual description.
 
-void QXmppJingleIq::Reason::setText(const QString &text)
+void QXmppJingleReason::setText(const QString &text)
 {
-    m_text = text;
+    d->m_text = text;
 }
 
 /// Gets the reason's type.
 
-QXmppJingleIq::Reason::Type QXmppJingleIq::Reason::type() const
+QXmppJingleReason::Type QXmppJingleReason::type() const
 {
-    return m_type;
+    return d->m_type;
 }
 
 /// Sets the reason's type.
 
-void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
+void QXmppJingleReason::setType(QXmppJingleReason::Type type)
 {
-    m_type = type;
+    d->m_type = type;
 }
 
 ///
@@ -1044,9 +1078,9 @@ void QXmppJingleIq::Reason::setType(QXmppJingleIq::Reason::Type type)
 ///
 /// \since QXmpp 1.5
 ///
-QXmppJingleIq::Reason::RtpErrorCondition QXmppJingleIq::Reason::rtpErrorCondition() const
+QXmppJingleReason::RtpErrorCondition QXmppJingleReason::rtpErrorCondition() const
 {
-    return m_rtpErrorCondition;
+    return d->m_rtpErrorCondition;
 }
 
 ///
@@ -1056,18 +1090,18 @@ QXmppJingleIq::Reason::RtpErrorCondition QXmppJingleIq::Reason::rtpErrorConditio
 ///
 /// \since QXmpp 1.5
 ///
-void QXmppJingleIq::Reason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition)
+void QXmppJingleReason::setRtpErrorCondition(RtpErrorCondition rtpErrorCondition)
 {
-    m_rtpErrorCondition = rtpErrorCondition;
+    d->m_rtpErrorCondition = rtpErrorCondition;
 }
 
 /// \cond
-void QXmppJingleIq::Reason::parse(const QDomElement &element)
+void QXmppJingleReason::parse(const QDomElement &element)
 {
-    m_text = element.firstChildElement(QStringLiteral("text")).text();
+    d->m_text = element.firstChildElement(QStringLiteral("text")).text();
     for (int i = AlternativeSession; i <= UnsupportedTransports; i++) {
         if (!element.firstChildElement(jingle_reasons[i]).isNull()) {
-            m_type = static_cast<Type>(i);
+            d->m_type = static_cast<Type>(i);
             break;
         }
     }
@@ -1078,27 +1112,29 @@ void QXmppJingleIq::Reason::parse(const QDomElement &element)
         if (child.namespaceURI() == ns_jingle_rtp_errors) {
             if (const auto index = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName());
                 index != -1) {
-                m_rtpErrorCondition = RtpErrorCondition(index);
+                d->m_rtpErrorCondition = RtpErrorCondition(index);
             }
             break;
         }
     }
 }
 
-void QXmppJingleIq::Reason::toXml(QXmlStreamWriter *writer) const
+void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
 {
-    if (m_type < AlternativeSession || m_type > UnsupportedTransports) {
+    if (d->m_type < AlternativeSession || d->m_type > UnsupportedTransports) {
         return;
     }
 
     writer->writeStartElement(QStringLiteral("reason"));
-    if (!m_text.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("text"), m_text);
-    }
-    writer->writeEmptyElement(jingle_reasons[m_type]);
+    writer->writeDefaultNamespace(ns_jingle);
 
-    if (m_rtpErrorCondition != NoErrorCondition) {
-        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(m_rtpErrorCondition));
+    if (!d->m_text.isEmpty()) {
+        helperToXmlAddTextElement(writer, QStringLiteral("text"), d->m_text);
+    }
+    writer->writeEmptyElement(jingle_reasons[d->m_type]);
+
+    if (d->m_rtpErrorCondition != NoErrorCondition) {
+        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(d->m_rtpErrorCondition));
         writer->writeDefaultNamespace(ns_jingle_rtp_errors);
         writer->writeEndElement();
     }
@@ -1120,7 +1156,7 @@ public:
     QString mujiGroupChatJid;
 
     QList<QXmppJingleIq::Content> contents;
-    QXmppJingleIq::Reason reason;
+    QXmppJingleReason reason;
 
     std::optional<QXmppJingleIq::RtpSessionState> rtpSessionState;
 };
@@ -1213,14 +1249,14 @@ void QXmppJingleIq::setInitiator(const QString &initiator)
 
 /// Returns a reference to the IQ's reason element.
 
-QXmppJingleIq::Reason &QXmppJingleIq::reason()
+QXmppJingleReason &QXmppJingleIq::reason()
 {
     return d->reason;
 }
 
 /// Returns a const reference to the IQ's reason element.
 
-const QXmppJingleIq::Reason &QXmppJingleIq::reason() const
+const QXmppJingleReason &QXmppJingleIq::reason() const
 {
     return d->reason;
 }
@@ -1378,6 +1414,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
         addContent(content);
         contentElement = contentElement.nextSiblingElement(QStringLiteral("content"));
     }
+
     QDomElement reasonElement = jingleElement.firstChildElement(QStringLiteral("reason"));
     d->reason.parse(reasonElement);
 
@@ -2055,6 +2092,142 @@ bool QXmppJinglePayloadType::operator==(const QXmppJinglePayloadType &other) con
             other.d->name.toLower() == d->name.toLower();
     }
 }
+
+class QXmppJingleDescriptionPrivate : public QSharedData
+{
+public:
+    QXmppJingleDescriptionPrivate() = default;
+
+    QString media;
+    quint32 ssrc;
+    QString type;
+    QList<QXmppJinglePayloadType> payloadTypes;
+};
+
+///
+/// \class QXmppJingleDescription
+///
+/// \brief The QXmppJingleDescription class represents descriptions for Jingle elements including
+/// media type, streaming source, namespace and payload types.
+///
+/// \since QXmpp 1.6
+///
+
+QXmppJingleDescription::QXmppJingleDescription()
+    : d(new QXmppJingleDescriptionPrivate())
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleDescription)
+
+///
+/// Returns the media type.
+///
+QString QXmppJingleDescription::media() const
+{
+    return d->media;
+}
+
+///
+/// Sets the media type.
+///
+void QXmppJingleDescription::setMedia(const QString &media)
+{
+    d->media = media;
+}
+
+///
+/// Returns the streaming source.
+///
+quint32 QXmppJingleDescription::ssrc() const
+{
+    return d->ssrc;
+}
+
+///
+/// Sets the streaming source.
+///
+void QXmppJingleDescription::setSsrc(quint32 ssrc)
+{
+    d->ssrc = ssrc;
+}
+
+///
+/// Returns the description namespace.
+///
+QString QXmppJingleDescription::type() const
+{
+    return d->type;
+}
+
+///
+/// Sets the description namespace.
+///
+void QXmppJingleDescription::setType(const QString &type)
+{
+    d->type = type;
+}
+
+///
+/// Adds a payload type to the list of payload types.
+///
+void QXmppJingleDescription::addPayloadType(const QXmppJinglePayloadType &payload)
+{
+    d->type = ns_jingle_rtp;
+    d->payloadTypes.append(payload);
+}
+
+///
+/// Returns a list of payload types.
+///
+const QList<QXmppJinglePayloadType> &QXmppJingleDescription::payloadTypes() const
+{
+    return d->payloadTypes;
+}
+
+///
+/// Sets the list of payload types.
+///
+void QXmppJingleDescription::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
+{
+    d->type = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp;
+    d->payloadTypes = payloadTypes;
+}
+
+/// \cond
+void QXmppJingleDescription::parse(const QDomElement &element)
+{
+    d->type = element.namespaceURI();
+    d->media = element.attribute(QStringLiteral("media"));
+    d->ssrc = element.attribute(QStringLiteral("ssrc")).toULong();
+
+    QDomElement child { element.firstChildElement(QStringLiteral("payload-type")) };
+    while (!child.isNull()) {
+        QXmppJinglePayloadType payload;
+        payload.parse(child);
+        d->payloadTypes.append(payload);
+        child = child.nextSiblingElement(QStringLiteral("payload-type"));
+    }
+}
+
+void QXmppJingleDescription::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QStringLiteral("description"));
+    writer->writeDefaultNamespace(d->type);
+
+    helperToXmlAddAttribute(writer, QStringLiteral("media"), d->media);
+
+    if (d->ssrc) {
+        writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->ssrc));
+    }
+
+    for (const auto &payloadType : d->payloadTypes) {
+        payloadType.toXml(writer);
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
 
 class QXmppSdpParameterPrivate : public QSharedData
 {
@@ -2778,4 +2951,276 @@ bool QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(c
 {
     return element.tagName() == QStringLiteral("rtp-hdrext") &&
         element.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation;
+}
+
+class QXmppJingleMessageInitiationElementPrivate : public QSharedData
+{
+public:
+    QXmppJingleMessageInitiationElementPrivate() = default;
+
+    QXmppJingleMessageInitiationElement::Type type { QXmppJingleMessageInitiationElement::Type::None };
+    QString id;
+
+    std::optional<QXmppJingleDescription> description;
+    std::optional<QXmppJingleReason> reason;
+    QString migratedTo;
+
+    bool containsTieBreak;
+};
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleReason)
+
+///
+/// \enum QXmppJingleMessageInitiationElement::Type
+///
+/// Possible types of Jingle Message Initiation elements
+///
+
+///
+/// \class QXmppJingleMessageInitiationElement
+///
+/// \brief The QXmppJingleMessageInitiationElement class represents a Jingle Message Initiation
+/// element as specified by \xep{0353}: Jingle Message Initiation.
+///
+/// \ingroup Stanzas
+///
+/// \since QXmpp 1.6
+///
+
+///
+/// \brief Constructs a Jingle Message Initiation element.
+/// \param type The JMI element type
+///
+QXmppJingleMessageInitiationElement::QXmppJingleMessageInitiationElement()
+    : d(new QXmppJingleMessageInitiationElementPrivate())
+{
+}
+
+///
+/// Returns the Jingle Message Initiation element type
+///
+QXmppJingleMessageInitiationElement::Type QXmppJingleMessageInitiationElement::type() const
+{
+    return d->type;
+}
+
+///
+/// Sets the Jingle Message Initiation element type.
+///
+void QXmppJingleMessageInitiationElement::setType(Type type)
+{
+    d->type = type;
+}
+
+///
+/// Returns the Jingle Message Initiation element id.
+///
+QString QXmppJingleMessageInitiationElement::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the Jingle Message Initiation element id.
+///
+void QXmppJingleMessageInitiationElement::setId(const QString &id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the Jingle Message Initiation element description.
+///
+std::optional<QXmppJingleDescription> QXmppJingleMessageInitiationElement::description() const
+{
+    return d->description;
+}
+
+///
+/// Sets the Jingle Message Initiation element description.
+///
+void QXmppJingleMessageInitiationElement::setDescription(std::optional<QXmppJingleDescription> description)
+{
+    d->description = description;
+}
+
+///
+/// Returns the Jingle Message Initiation element reason.
+///
+std::optional<QXmppJingleReason> QXmppJingleMessageInitiationElement::reason() const
+{
+    return d->reason;
+}
+
+///
+/// Sets the Jingle Message Initiation element reason.
+///
+void QXmppJingleMessageInitiationElement::setReason(std::optional<QXmppJingleReason> reason)
+{
+    d->reason = reason;
+}
+
+///
+/// Returns true if the Jingle Message Initiation element contains a <tie-break/> tag.
+///
+bool QXmppJingleMessageInitiationElement::containsTieBreak() const
+{
+    return d->containsTieBreak;
+}
+
+///
+/// Sets if the Jingle Message Initiation element contains a <tie-break/> tag.
+///
+void QXmppJingleMessageInitiationElement::setContainsTieBreak(bool containsTieBreak)
+{
+    d->containsTieBreak = containsTieBreak;
+}
+
+///
+/// Returns the Jingle Message Initiation element ID migrated to if the Jingle is being migrated
+/// to a different device.
+///
+QString QXmppJingleMessageInitiationElement::migratedTo() const
+{
+    return d->migratedTo;
+}
+
+///
+/// Sets the Jingle Message Initiation element ID migrated to if the Jingle is being migrated
+/// to a different device.
+///
+void QXmppJingleMessageInitiationElement::setMigratedTo(const QString &migratedTo)
+{
+    d->migratedTo = migratedTo;
+}
+
+/// \cond
+void QXmppJingleMessageInitiationElement::parse(const QDomElement &element)
+{
+    std::optional<Type> type { stringToJmiElementType(element.nodeName()) };
+
+    if (!type.has_value()) {
+        return;
+    }
+
+    d->type = type.value();
+    d->id = element.attribute(QStringLiteral("id"));
+
+    // Type::Proceed and Type::Ringing don't need any parsing aside of the id.
+    switch (d->type) {
+    case Type::Propose: {
+        if (const auto &descriptionElement = element.firstChildElement("description"); !descriptionElement.isNull()) {
+            d->description = QXmppJingleDescription();
+            d->description->parse(descriptionElement);
+        }
+
+        break;
+    }
+    case Type::Reject:
+    case Type::Retract:
+        d->containsTieBreak = !element.firstChildElement("tie-break").isNull();
+
+        if (const auto &reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
+            d->reason = QXmppJingleReason();
+            d->reason->parse(reasonElement);
+        }
+
+        break;
+    case Type::Finish:
+        if (auto reasonElement = element.firstChildElement("reason"); !reasonElement.isNull()) {
+            d->reason = QXmppJingleReason();
+            d->reason->parse(reasonElement);
+        }
+
+        if (auto migratedToElement = element.firstChildElement("migrated"); !migratedToElement.isNull()) {
+            d->migratedTo = migratedToElement.attribute("to");
+        }
+
+        break;
+    default:
+        break;
+    }
+}
+
+void QXmppJingleMessageInitiationElement::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(jmiElementTypeToString(d->type));
+    writer->writeDefaultNamespace(ns_jingle_message_initiation);
+
+    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+
+    if (d->description) {
+        d->description->toXml(writer);
+    }
+
+    if (d->reason) {
+        d->reason->toXml(writer);
+    }
+
+    if (d->containsTieBreak) {
+        writer->writeEmptyElement(QStringLiteral("tie-break"));
+    }
+
+    if (!d->migratedTo.isEmpty()) {
+        writer->writeEmptyElement(QStringLiteral("migrated"));
+        helperToXmlAddAttribute(writer, QStringLiteral("to"), d->migratedTo);
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleMessageInitiationElement)
+
+///
+/// Returns true if passed QDomElement is a Jingle Message Initiation element
+///
+bool QXmppJingleMessageInitiationElement::isJingleMessageInitiationElement(const QDomElement &element)
+{
+    return stringToJmiElementType(element.tagName()).has_value() && element.hasAttribute(QStringLiteral("id")) && element.namespaceURI() == ns_jingle_message_initiation;
+}
+
+///
+/// Takes a Jingle Message Initiation element type and parses it to a string.
+///
+QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type)
+{
+    switch (type) {
+    case Type::Propose:
+        return "propose";
+    case Type::Ringing:
+        return "ringing";
+    case Type::Proceed:
+        return "proceed";
+    case Type::Reject:
+        return "reject";
+    case Type::Retract:
+        return "retract";
+    case Type::Finish:
+        return "finish";
+    default:
+        return {};
+    }
+}
+
+///
+/// Takes a string and parses it to a Jingle Message Initiation element type.
+///
+std::optional<QXmppJingleMessageInitiationElement::Type> QXmppJingleMessageInitiationElement::stringToJmiElementType(const QString &typeStr)
+{
+    if (typeStr == "propose") {
+        return Type::Propose;
+    } else if (typeStr == "ringing") {
+        return Type::Ringing;
+    } else if (typeStr == "proceed") {
+        return Type::Proceed;
+    } else if (typeStr == "reject") {
+        return Type::Reject;
+    } else if (typeStr == "retract") {
+        return Type::Retract;
+    } else if (typeStr == "finish") {
+        return Type::Finish;
+    }
+
+    return std::nullopt;
 }

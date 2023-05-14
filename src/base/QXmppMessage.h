@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2018 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2020 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2023 Tibor Csötönyi <work@taibsu.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -18,6 +19,7 @@
 
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
+class QXmppJingleMessageInitiationElement;
 class QXmppMessageReaction;
 class QXmppMixInvitation;
 #ifdef BUILD_OMEMO
@@ -204,6 +206,10 @@ public:
     void addHint(const Hint hint);
     void removeHint(const Hint hint);
     void removeAllHints();
+
+    // XEP-0353: Jingle Message Initiation
+    std::optional<QXmppJingleMessageInitiationElement> jingleMessageInitiationElement() const;
+    void setJingleMessageInitiationElement(const std::optional<QXmppJingleMessageInitiationElement> &jingleMessageInitiationElement);
 
     // XEP-0359: Unique and Stable Stanza IDs
     QString stanzaId() const;

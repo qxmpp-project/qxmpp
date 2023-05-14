@@ -36,6 +36,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppIbbIq.h
     base/QXmppIq.h
     base/QXmppJingleIq.h
+    base/QXmppJingleData.h
     base/QXmppLogger.h
     base/QXmppMamIq.h
     base/QXmppMessage.h
@@ -108,6 +109,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppHttpUploadManager.h
     client/QXmppInvokable.h
     client/QXmppIqHandling.h
+    client/QXmppJingleMessageInitiationManager.h
     client/QXmppMamManager.h
     client/QXmppMessageHandler.h
     client/QXmppMessageReceiptManager.h
@@ -172,7 +174,7 @@ set(SOURCE_FILES
     base/QXmppHttpUploadIq.cpp
     base/QXmppIbbIq.cpp
     base/QXmppIq.cpp
-    base/QXmppJingleIq.cpp
+    base/QXmppJingleData.cpp
     base/QXmppLogger.cpp
     base/QXmppMamIq.cpp
     base/QXmppMessage.cpp
@@ -243,6 +245,7 @@ set(SOURCE_FILES
     client/QXmppInternalClientExtension.cpp
     client/QXmppInvokable.cpp
     client/QXmppIqHandling.cpp
+    client/QXmppJingleMessageInitiationManager.cpp
     client/QXmppMamManager.cpp
     client/QXmppMessageReceiptManager.cpp
     client/QXmppMucManager.cpp

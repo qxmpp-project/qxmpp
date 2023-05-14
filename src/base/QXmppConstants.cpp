@@ -160,6 +160,8 @@ const char *ns_chat_markers = "urn:xmpp:chat-markers:0";
 const char *ns_message_processing_hints = "urn:xmpp:hints";
 // XEP-0352: Client State Indication
 const char *ns_csi = "urn:xmpp:csi:0";
+// XEP-0353: Jingle Message Initiation
+const char *ns_jingle_message_initiation = "urn:xmpp:jingle-message:0";
 // XEP-0357: Push Notifications
 const char *ns_push = "urn:xmpp:push:0";
 // XEP-0359: Unique and Stable Stanza IDs
