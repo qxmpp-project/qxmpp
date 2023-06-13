@@ -6,11 +6,12 @@
 #define QXMPPMUCHISTORY_H
 
 #include "QXmppStanza.h"
+
 #include <QDateTime>
 
 /// \brief The QXmppMucHistory class represents a room history request
 ///
-/// It is used to manage how much history should be requested and received 
+/// It is used to manage how much history should be requested and received
 /// when joining a room.
 ///
 /// \ingroup Stanzas
@@ -22,13 +23,13 @@ public:
     bool isNull() const;
 
     int maxchars() const;
-	void setMaxchars(int maxchars);
+    void setMaxchars(int maxchars);
 
     int maxstanzas() const;
-	void setMaxstanzas(int maxstanzas);
+    void setMaxstanzas(int maxstanzas);
 
     int seconds() const;
-	void setSeconds(int seconds);
+    void setSeconds(int seconds);
 
     QDateTime since() const;
     void setSince(QDateTime &since);

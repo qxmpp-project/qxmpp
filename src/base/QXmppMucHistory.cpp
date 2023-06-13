@@ -93,25 +93,20 @@ void QXmppMucHistory::parse(const QDomElement &element)
 
 void QXmppMucHistory::toXml(QXmlStreamWriter *writer) const
 {
-	if (isNull())
-    {
+    if (isNull()) {
         return;
     }
     writer->writeStartElement(QStringLiteral("history"));
-    if (m_maxchars >= 0)
-    {
+    if (m_maxchars >= 0) {
         helperToXmlAddAttribute(writer, QStringLiteral("maxchars"), QString::number(m_maxchars));
     }
-    if (m_maxstanzas >= 0)
-    {
+    if (m_maxstanzas >= 0) {
         helperToXmlAddAttribute(writer, QStringLiteral("maxstanzas"), QString::number(m_maxstanzas));
     }
-    if (m_seconds >= 0)
-    {
+    if (m_seconds >= 0) {
         helperToXmlAddAttribute(writer, QStringLiteral("seconds"), QString::number(m_seconds));
     }
-    if (m_since.isValid())
-    {
+    if (m_since.isValid()) {
         helperToXmlAddAttribute(writer, QStringLiteral("since"), QXmppUtils::datetimeToString(m_since));
     }
     writer->writeEndElement();
