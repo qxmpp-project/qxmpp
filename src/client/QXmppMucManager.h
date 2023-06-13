@@ -6,6 +6,7 @@
 #define QXMPPMUCMANAGER_H
 
 #include "QXmppClientExtension.h"
+#include "QXmppMucHistory.h"
 #include "QXmppMucIq.h"
 #include "QXmppPresence.h"
 
@@ -218,6 +219,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     bool ban(const QString &jid, const QString &reason);
     bool join();
+    bool join(QXmppMucHistory &history);
     bool kick(const QString &jid, const QString &reason);
     bool leave(const QString &message = QString());
     bool requestConfiguration();

@@ -241,6 +241,26 @@ bool QXmppMucRoom::join()
     return d->client->sendPacket(packet);
 }
 
+/// Joins the chat room with history parameters.
+///
+/// \return true if the request was sent, false otherwise
+
+bool QXmppMucRoom::join(QXmppMucHistory &history)
+{
+    if (isJoined() || d->nickName.isEmpty()) {
+        return false;
+    }
+
+    // reflect our current presence in the chat room
+    QXmppPresence packet = d->client->clientPresence();
+    packet.setTo(d->ownJid());
+    packet.setType(QXmppPresence::Available);
+    packet.setMucPassword(d->password);
+    packet.setMucHistory(history);
+    packet.setMucSupported(true);
+    return d->client->sendPacket(packet);
+}
+
 /// Kicks the specified user from the chat room.
 ///
 /// The specified \a jid is the Occupant JID of the form "room@service/nick".
