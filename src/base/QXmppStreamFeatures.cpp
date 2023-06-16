@@ -319,7 +319,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     // parse advertised SASL Authentication mechanisms
     QDomElement mechs = element.firstChildElement(QStringLiteral("mechanisms"));
     if (mechs.namespaceURI() == ns_sasl) {
-        for (auto subElement = element.firstChildElement(QStringLiteral("mechanism"));
+        for (auto subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
              !subElement.isNull();
              subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"))) {
             d->authMechanisms << subElement.text();
