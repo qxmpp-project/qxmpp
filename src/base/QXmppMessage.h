@@ -27,6 +27,7 @@ class QXmppOmemoElement;
 #endif
 class QXmppTrustMessageElement;
 class QXmppOutOfBandUrl;
+class QXmppCallInviteElement;
 
 ///
 /// \brief The QXmppMessage class represents an XMPP message.
@@ -267,6 +268,10 @@ public:
     // XEP-0447: Stateless file sharing
     const QVector<QXmppFileShare> &sharedFiles() const;
     void setSharedFiles(const QVector<QXmppFileShare> &sharedFiles);
+
+    // XEP-0482: Call Invites
+    std::optional<QXmppCallInviteElement> callInviteElement() const;
+    void setCallInviteElement(std::optional<QXmppCallInviteElement> callInviteElement);
 
     /// \cond
 #ifdef BUILD_OMEMO
