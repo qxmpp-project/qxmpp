@@ -309,7 +309,7 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     // parse advertised compression methods
     QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
     if (compression.namespaceURI() == ns_compressFeature) {
-        for (auto subElement = element.firstChildElement(QStringLiteral("method"));
+        for (auto subElement = compression.firstChildElement(QStringLiteral("method"));
              !subElement.isNull();
              subElement = subElement.nextSiblingElement(QStringLiteral("method"))) {
             d->compressionMethods << subElement.text();
