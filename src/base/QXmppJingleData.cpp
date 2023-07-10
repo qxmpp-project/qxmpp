@@ -3224,3 +3224,310 @@ std::optional<QXmppJingleMessageInitiationElement::Type> QXmppJingleMessageIniti
 
     return std::nullopt;
 }
+
+class QXmppCallInviteElementPrivate : public QSharedData
+{
+public:
+    QXmppCallInviteElement::Type type { QXmppCallInviteElement::Type::None };
+    QString id;
+
+    std::optional<QXmppCallInviteElement::Jingle> jingle;
+    std::optional<QVector<QXmppCallInviteElement::External>> external;
+
+    bool audio = true;
+    bool video = false;
+};
+
+///
+/// \enum QXmppCallInviteElement::Type
+///
+/// Possible types of Call Invite elements
+///
+
+///
+/// \class QXmppCallInviteElement
+///
+/// \brief The QXmppCallInviteElement class represents a Call Invite
+/// element as specified by \xep{0482, Call Invites}.
+///
+/// \ingroup Stanzas
+///
+/// \since QXmpp 1.6
+///
+
+///
+/// \brief Constructs a Call Invite element.
+///
+QXmppCallInviteElement::QXmppCallInviteElement()
+    : d(new QXmppCallInviteElementPrivate())
+{
+}
+
+///
+/// Returns the Call Invite element type.
+///
+QXmppCallInviteElement::Type QXmppCallInviteElement::type() const
+{
+    return d->type;
+}
+
+///
+/// Sets the Call Invite element type.
+///
+void QXmppCallInviteElement::setType(Type type)
+{
+    d->type = type;
+}
+
+///
+/// Returns the Call Invite element id.
+///
+QString QXmppCallInviteElement::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the Call Invite element id.
+///
+void QXmppCallInviteElement::setId(const QString &id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the Call Invite element audio flag.
+///
+bool QXmppCallInviteElement::audio() const
+{
+    return d->audio;
+}
+
+///
+/// Sets the Call Invite element audio flag.
+///
+void QXmppCallInviteElement::setAudio(bool audio)
+{
+    d->audio = audio;
+}
+
+///
+/// Returns the Call Invite element video flag.
+///
+bool QXmppCallInviteElement::video() const
+{
+    return d->video;
+}
+
+///
+/// Sets the Call Invite element video flag.
+///
+void QXmppCallInviteElement::setVideo(bool video)
+{
+    d->video = video;
+}
+
+///
+/// Returns a possible Call Invite element "jingle" sub element.
+///
+std::optional<QXmppCallInviteElement::Jingle> QXmppCallInviteElement::jingle() const
+{
+    return d->jingle;
+}
+
+///
+/// Sets a possible Call Invite "jingle" sub element.
+///
+void QXmppCallInviteElement::setJingle(std::optional<Jingle> jingle)
+{
+    d->jingle = jingle;
+}
+
+///
+/// Returns possible Call Invite "external" sub elements.
+///
+std::optional<QVector<QXmppCallInviteElement::External>> QXmppCallInviteElement::external() const
+{
+    return d->external;
+}
+
+///
+/// Sets possible Call Invite "external" sub elements.
+///
+void QXmppCallInviteElement::setExternal(std::optional<QVector<External>> external)
+{
+    d->external = external;
+}
+
+/// \cond
+void QXmppCallInviteElement::parse(const QDomElement &element)
+{
+    std::optional<Type> type { stringToCallInviteElementType(element.nodeName()) };
+
+    if (!type) {
+        return;
+    }
+
+    d->type = type.value();
+    d->id = element.attribute(QStringLiteral("id"));
+
+    switch (d->type) {
+    case Type::Invite:
+        d->audio = element.attribute(QStringLiteral("audio"), QStringLiteral("true")) == QStringLiteral("true") ? true : false;
+        d->video = element.attribute(QStringLiteral("video"), QStringLiteral("false")) == QStringLiteral("true") ? true : false;
+        // fall through
+    case Type::Accept: {
+        if (auto jingleElement = element.firstChildElement("jingle"); !jingleElement.isNull()) {
+            d->jingle = Jingle();
+            d->jingle->parse(jingleElement);
+        }
+
+        QDomElement externalItr = element.firstChildElement("external");
+
+        if (externalItr.isNull()) {
+            break;
+        }
+
+        if (!d->external.has_value()) {
+            d->external = QVector<External>();
+        }
+
+        for (; !externalItr.isNull(); externalItr = externalItr.nextSiblingElement("external")) {
+            d->external->append({ External { externalItr.attribute(QStringLiteral("uri")) } });
+        }
+
+        break;
+    }
+    case Type::Retract:
+    case Type::Reject:
+    case Type::Left:
+    default:
+        break;
+    }
+}
+
+void QXmppCallInviteElement::toXml(QXmlStreamWriter *writer) const
+{
+    // write starting tag.
+    writer->writeStartElement(callInviteElementTypeToString(d->type));
+
+    // write namespace and ID.
+    writer->writeDefaultNamespace(ns_call_invites);
+    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+
+    switch (d->type) {
+    case Type::Reject:
+    case Type::Retract:
+    case Type::Left:
+        // no need to go on for reject, retract and left tags.
+        break;
+    default:
+        if (d->type == Type::Invite) {
+            // only overwrite defaults.
+            if (!d->audio) {
+                helperToXmlAddAttribute(writer, QStringLiteral("audio"), "false");
+            }
+            if (d->video) {
+                helperToXmlAddAttribute(writer, QStringLiteral("video"), "true");
+            }
+        }
+
+        if (d->jingle) {
+            d->jingle->toXml(writer);
+        }
+
+        if (d->external) {
+            for (const External &ext : d->external.value()) {
+                ext.toXml(writer);
+            }
+        }
+
+        break;
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppCallInviteElement)
+
+///
+/// Returns true if passed QDomElement is a Call Invite element
+///
+bool QXmppCallInviteElement::isCallInviteElement(const QDomElement &element)
+{
+    return stringToCallInviteElementType(element.tagName()).has_value() &&
+        // "invite" tags don't have an ID yet.
+        (element.hasAttribute(QStringLiteral("id")) || element.tagName() == callInviteElementTypeToString(Type::Invite)) &&
+        element.namespaceURI() == ns_call_invites;
+}
+
+///
+/// Takes a Call Invite element type and parses it to a string.
+///
+QString QXmppCallInviteElement::callInviteElementTypeToString(Type type)
+{
+    switch (type) {
+    case Type::Invite:
+        return "invite";
+    case Type::Accept:
+        return "accept";
+    case Type::Reject:
+        return "reject";
+    case Type::Retract:
+        return "retract";
+    case Type::Left:
+        return "left";
+    default:
+        return {};
+    }
+}
+
+///
+/// Takes a string and parses it to a Call Invite element type.
+///
+std::optional<QXmppCallInviteElement::Type> QXmppCallInviteElement::stringToCallInviteElementType(const QString &typeStr)
+{
+    if (typeStr == "invite") {
+        return Type::Invite;
+    } else if (typeStr == "accept") {
+        return Type::Accept;
+    } else if (typeStr == "reject") {
+        return Type::Reject;
+    } else if (typeStr == "retract") {
+        return Type::Retract;
+    } else if (typeStr == "left") {
+        return Type::Left;
+    }
+
+    return std::nullopt;
+}
+
+/// \cond
+void QXmppCallInviteElement::Jingle::parse(const QDomElement &element)
+{
+    if (element.hasAttribute(QStringLiteral("sid"))) {
+        sid = element.attribute(QStringLiteral("sid"));
+    }
+
+    if (element.hasAttribute(QStringLiteral("jid"))) {
+        jid = element.attribute(QStringLiteral("jid"));
+    }
+}
+
+void QXmppCallInviteElement::Jingle::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeEmptyElement(QStringLiteral("jingle"));
+    helperToXmlAddAttribute(writer, QStringLiteral("sid"), sid);
+
+    if (jid) {
+        helperToXmlAddAttribute(writer, QStringLiteral("jid"), *jid);
+    }
+}
+
+void QXmppCallInviteElement::External::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeEmptyElement(QStringLiteral("external"));
+    helperToXmlAddAttribute(writer, QStringLiteral("uri"), uri);
+}
+/// \endcond

@@ -225,5 +225,7 @@ extern const char *ns_sfs;
 extern const char *ns_esfs;
 // XEP-0450: Automatic Trust Management (ATM)
 extern const char *ns_atm;
+// XEP-0482: Call Invites
+extern const char *ns_call_invites;
 
 #endif  // QXMPPCONSTANTS_H

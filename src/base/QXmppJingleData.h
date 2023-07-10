@@ -25,6 +25,7 @@ class QXmppJingleRtpFeedbackPropertyPrivate;
 class QXmppJingleRtpHeaderExtensionPropertyPrivate;
 class QXmppSdpParameterPrivate;
 class QXmppJingleMessageInitiationElementPrivate;
+class QXmppCallInviteElementPrivate;
 
 class QXMPP_EXPORT QXmppSdpParameter
 {
@@ -655,6 +656,73 @@ public:
 
 private:
     QSharedDataPointer<QXmppJingleMessageInitiationElementPrivate> d;
+};
+
+class QXMPP_EXPORT QXmppCallInviteElement
+{
+public:
+    enum class Type {
+        None,
+        Invite,
+        Retract,
+        Accept,
+        Reject,
+        Left
+    };
+
+    struct Jingle
+    {
+        QString sid;
+        std::optional<QString> jid;
+
+        bool operator==(const Jingle &other) const { return other.sid == sid && other.jid == jid; }
+
+        void parse(const QDomElement &element);
+        void toXml(QXmlStreamWriter *writer) const;
+    };
+
+    struct External
+    {
+        QString uri;
+
+        bool operator==(const External &other) const { return other.uri == uri; }
+
+        void toXml(QXmlStreamWriter *writer) const;
+    };
+
+    QXmppCallInviteElement();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppCallInviteElement)
+
+    Type type() const;
+    void setType(Type type);
+
+    QString id() const;
+    void setId(const QString &id);
+
+    bool audio() const;
+    void setAudio(bool audio);
+
+    bool video() const;
+    void setVideo(bool video);
+
+    std::optional<Jingle> jingle() const;
+    void setJingle(std::optional<Jingle> jingle);
+
+    std::optional<QVector<External>> external() const;
+    void setExternal(std::optional<QVector<External>> external);
+
+    /// \cond
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+    /// \endcond
+
+    static bool isCallInviteElement(const QDomElement &);
+
+private:
+    static QString callInviteElementTypeToString(Type type);
+    static std::optional<Type> stringToCallInviteElementType(const QString &typeStr);
+
+    QSharedDataPointer<QXmppCallInviteElementPrivate> d;
 };
 
 Q_DECLARE_METATYPE(QXmppJingleReason::RtpErrorCondition)

@@ -165,6 +165,9 @@ public:
 
     // XEP-0448: Encryption for stateless file sharing
     QVector<QXmppFileShare> sharedFiles;
+
+    // XEP-0482: Call Invites
+    std::optional<QXmppCallInviteElement> callInviteElement;
 };
 
 QXmppMessagePrivate::QXmppMessagePrivate()
@@ -1311,6 +1314,22 @@ void QXmppMessage::setSharedFiles(const QVector<QXmppFileShare> &sharedFiles)
     d->sharedFiles = sharedFiles;
 }
 
+///
+/// Returns a Call Invite element as defined in \xep{0482, Call Invites}.
+///
+std::optional<QXmppCallInviteElement> QXmppMessage::callInviteElement() const
+{
+    return d->callInviteElement;
+}
+
+///
+/// Sets a Call Invite element as defined in \xep{0482, Call Invites}.
+///
+void QXmppMessage::setCallInviteElement(std::optional<QXmppCallInviteElement> callInviteElement)
+{
+    d->callInviteElement = callInviteElement;
+}
+
 /// \cond
 void QXmppMessage::parse(const QDomElement &element)
 {
@@ -1457,6 +1476,13 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         // XEP-0428: Fallback Indication
         if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
             d->isFallback = true;
+            return true;
+        }
+        // XEP-0482: Call Invites
+        if (QXmppCallInviteElement::isCallInviteElement(element)) {
+            QXmppCallInviteElement callInviteElement;
+            callInviteElement.parse(element);
+            d->callInviteElement = callInviteElement;
             return true;
         }
     }
@@ -1880,6 +1906,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         // XEP-0448: Stateless file sharing
         for (const auto &fileShare : d->sharedFiles) {
             fileShare.toXml(writer);
+        }
+
+        // XEP-0482: Call Invites
+        if (d->callInviteElement) {
+            d->callInviteElement->toXml(writer);
         }
     }
 }

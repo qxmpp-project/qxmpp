@@ -213,3 +213,5 @@ const char *ns_sfs = "urn:xmpp:sfs:0";
 const char *ns_esfs = "urn:xmpp:esfs:0";
 // XEP-0450: Automatic Trust Management (ATM)
 const char *ns_atm = "urn:xmpp:atm:1";
+// XEP-0482: Call Invites
+const char *ns_call_invites = "urn:xmpp:call-invites:0";
