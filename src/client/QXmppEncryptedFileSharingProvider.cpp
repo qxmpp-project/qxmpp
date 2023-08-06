@@ -17,6 +17,8 @@
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
+constexpr auto ENCRYPTION_DEFAULT_CIPHER = Aes256CbcPkcs7;
+
 ///
 /// \class QXmppEncryptedFileSharingProvider
 ///
@@ -82,7 +84,7 @@ auto QXmppEncryptedFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> da
                                                    std::function<void(UploadResult)> reportFinished)
     -> std::shared_ptr<Upload>
 {
-    auto cipher = Aes256CbcPkcs7;
+    auto cipher = ENCRYPTION_DEFAULT_CIPHER;
     auto key = Encryption::generateKey(cipher);
     auto iv = Encryption::generateInitializationVector(cipher);
 
@@ -103,6 +105,7 @@ auto QXmppEncryptedFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> da
         [=, reportFinished = std::move(reportFinished)](UploadResult result) {
             auto encryptedResult = visitForward<UploadResult>(std::move(result), [&](std::any httpSourceAny) {
                 QXmppEncryptedFileSource encryptedSource;
+                encryptedSource.setCipher(ENCRYPTION_DEFAULT_CIPHER);
                 encryptedSource.setKey(key);
                 encryptedSource.setIv(iv);
                 encryptedSource.setHttpSources({ std::any_cast<QXmppHttpFileSource>(std::move(httpSourceAny)) });
