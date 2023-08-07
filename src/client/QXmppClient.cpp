@@ -152,13 +152,17 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
     return false;
 }
 
-bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extensions, const QDomElement &element)
+bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extensions, QXmppE2eeExtension *e2eeExt, const QDomElement &element)
 {
     if (element.tagName() != "message") {
         return false;
     }
     QXmppMessage message;
-    message.parse(element);
+    if (e2eeExt) {
+        message.parse(element, e2eeExt->isEncrypted(element) ? ScePublic : SceSensitive);
+    } else {
+        message.parse(element);
+    }
     return process(client, extensions, std::move(message));
 }
 
@@ -876,7 +880,7 @@ void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
     // The stanza comes directly from the XMPP stream, so it's not end-to-end
     // encrypted and there's no e2ee metadata (std::nullopt).
     handled = StanzaPipeline::process(d->extensions, element, std::nullopt) ||
-        MessagePipeline::process(this, d->extensions, element);
+        MessagePipeline::process(this, d->extensions, d->encryptionExtension, element);
 }
 
 void QXmppClient::_q_reconnect()
