@@ -192,14 +192,11 @@ qint64 EncryptionDevice::readData(char *data, qint64 len)
         inputBuffer.resize(m_input->read(inputBuffer.data(), inputBufferSize));
 
         // process input buffer
-        auto processed = [&]() {
-            if (inputBuffer.isEmpty()) {
-                m_finalized = true;
-                return m_cipher->final();
-            }
-            // encrypt data
-            return m_cipher->process(MemoryRegion(inputBuffer));
-        }();
+        auto processed = m_cipher->update(MemoryRegion(inputBuffer));
+        if (m_input->atEnd()) {
+            m_finalized = true;
+            processed = processed + m_cipher->final();
+        }
 
         // split up into part for user and put rest into output buffer
         auto processedReadBytes = std::min(qint64(processed.size()), len);
