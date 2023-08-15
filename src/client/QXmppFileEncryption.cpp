@@ -82,6 +82,12 @@ static std::size_t roundUpToBlockSize(qint64 size, std::size_t blockSize)
     return (size / blockSize + 1) * blockSize;
 }
 
+bool isSupported(Cipher config)
+{
+    auto cipherString = QCA::Cipher::withAlgorithms(cipherName(config), cipherMode(config), padding(config));
+    return QCA::isSupported({ cipherString });
+}
+
 QByteArray process(const QByteArray &data, QXmpp::Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv)
 {
     return QCA::Cipher(cipherName(cipherConfig),

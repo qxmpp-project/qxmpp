@@ -23,6 +23,7 @@ enum Direction {
     Decode,
 };
 
+QXMPP_EXPORT bool isSupported(Cipher);
 QXMPP_EXPORT QByteArray process(const QByteArray &data, Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv);
 QXMPP_EXPORT QByteArray generateKey(Cipher cipher);
 QXMPP_EXPORT QByteArray generateInitializationVector(Cipher);

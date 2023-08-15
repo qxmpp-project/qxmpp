@@ -17,6 +17,7 @@ class tst_QXmppFileEncryption : public QObject
 
 private:
     Q_SLOT void basic();
+    Q_SLOT void qcaFeatures();
     Q_SLOT void deviceEncrypt();
     Q_SLOT void deviceDecrypt();
     Q_SLOT void paddingSize();
@@ -35,6 +36,14 @@ void tst_QXmppFileEncryption::basic()
     qDebug() << data.size() << "->" << encrypted.size();
     auto decrypted = process(encrypted, Aes256CbcPkcs7, Decode, key, iv);
     QCOMPARE(decrypted, data);
+}
+
+void tst_QXmppFileEncryption::qcaFeatures()
+{
+    QcaInitializer init;
+    QVERIFY(isSupported(Aes128GcmNoPad));
+    QVERIFY(isSupported(Aes256GcmNoPad));
+    QVERIFY(isSupported(Aes256CbcPkcs7));
 }
 
 void tst_QXmppFileEncryption::deviceEncrypt()
