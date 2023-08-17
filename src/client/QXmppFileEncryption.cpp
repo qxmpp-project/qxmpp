@@ -90,14 +90,15 @@ bool isSupported(Cipher config)
 
 QByteArray process(const QByteArray &data, QXmpp::Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv)
 {
-    return QCA::Cipher(cipherName(cipherConfig),
-                       cipherMode(cipherConfig),
-                       padding(cipherConfig),
-                       toQcaDirection(direction),
-                       SymmetricKey(key),
-                       InitializationVector(iv))
-        .process(MemoryRegion(data))
-        .toByteArray();
+    auto cipher = QCA::Cipher(cipherName(cipherConfig),
+                              cipherMode(cipherConfig),
+                              padding(cipherConfig),
+                              toQcaDirection(direction),
+                              SymmetricKey(key),
+                              InitializationVector(iv));
+    auto output = cipher.update(MemoryRegion(data)).toByteArray();
+    output += cipher.final().toByteArray();
+    return output;
 }
 
 QByteArray generateKey(QXmpp::Cipher cipher)
