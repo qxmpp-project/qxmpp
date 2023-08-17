@@ -63,6 +63,7 @@ public:
     qint64 size() const override;
     qint64 readData(char *data, qint64 maxlen) override;
     qint64 writeData(const char *data, qint64 len) override;
+    void finish();
 
 private:
     Cipher m_cipherConfig;

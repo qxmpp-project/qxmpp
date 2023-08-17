@@ -97,7 +97,19 @@ QByteArray process(const QByteArray &data, QXmpp::Cipher cipherConfig, Direction
                               SymmetricKey(key),
                               InitializationVector(iv));
     auto output = cipher.update(MemoryRegion(data)).toByteArray();
-    output += cipher.final().toByteArray();
+
+    switch (cipherConfig) {
+    case Aes128GcmNoPad:
+    case Aes256GcmNoPad:
+        // For GCM no-padding algorithms QCA / OpenSSL adds a '\0' byte at the end.
+        // We don't want that, it breaks our checksums.
+        // The unit tests verify that the data is still decrypted correctly.
+        break;
+    case Aes256CbcPkcs7:
+        output += cipher.final().toByteArray();
+        break;
+    }
+
     return output;
 }
 
@@ -268,6 +280,7 @@ bool DecryptionDevice::open(OpenMode mode)
 
 void DecryptionDevice::close()
 {
+    finish();
     m_output->close();
 }
 
@@ -288,9 +301,26 @@ qint64 DecryptionDevice::readData(char *, qint64)
 
 qint64 DecryptionDevice::writeData(const char *data, qint64 len)
 {
-    auto decrypted = m_cipher->process(QByteArray(data, len));
+    auto decrypted = m_cipher->update(QByteArray(data, len));
     m_output->write(decrypted.constData(), decrypted.size());
     return len;
+}
+
+void DecryptionDevice::finish()
+{
+    switch (m_cipherConfig) {
+    case Aes128GcmNoPad:
+    case Aes256GcmNoPad:
+        // For GCM no-padding algorithms QCA / OpenSSL adds a '\0' byte at the end.
+        // We don't want that, it breaks our checksums.
+        // The unit tests verify that the data is still decrypted correctly.
+        return;
+    case Aes256CbcPkcs7: {
+        auto decrypted = m_cipher->final();
+        m_output->write(decrypted.constData(), decrypted.size());
+        break;
+    }
+    }
 }
 
 }  // namespace QXmpp::Private::Encryption
