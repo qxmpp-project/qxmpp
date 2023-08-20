@@ -10,6 +10,8 @@
 #include "QXmppExternalService.h"
 #include "QXmppTask.h"
 
+#include <variant>
+
 class QDateTime;
 class QXmppExternalServicePrivate;
 class QXMPP_EXPORT QXmppExternalServiceDiscoveryManager : public QXmppClientExtension
