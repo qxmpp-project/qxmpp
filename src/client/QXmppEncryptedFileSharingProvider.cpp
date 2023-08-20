@@ -71,7 +71,12 @@ auto QXmppEncryptedFileSharingProvider::downloadFile(const std::any &source,
     // find provider for source of encrypted file
     std::any httpSource = encryptedSource.httpSources().front();
     if (auto provider = d->manager->providerForSource(httpSource)) {
-        return provider->downloadFile(httpSource, std::move(output), std::move(reportProgress), std::move(reportFinished));
+        auto onFinished = [decryptDevice = output.get(), reportFinished = std::move(reportFinished)](DownloadResult result) {
+            decryptDevice->finish();
+            reportFinished(std::move(result));
+        };
+
+        return provider->downloadFile(httpSource, std::move(output), std::move(reportProgress), std::move(onFinished));
     }
 
     reportFinished(QXmppError { QStringLiteral("No basic file sharing provider available for encrypted file."), {} });

@@ -23,6 +23,7 @@ enum Direction {
     Decode,
 };
 
+QXMPP_EXPORT bool isSupported(Cipher);
 QXMPP_EXPORT QByteArray process(const QByteArray &data, Cipher cipherConfig, Direction direction, const QByteArray &key, const QByteArray &iv);
 QXMPP_EXPORT QByteArray generateKey(Cipher cipher);
 QXMPP_EXPORT QByteArray generateInitializationVector(Cipher);
@@ -62,6 +63,7 @@ public:
     qint64 size() const override;
     qint64 readData(char *data, qint64 maxlen) override;
     qint64 writeData(const char *data, qint64 len) override;
+    void finish();
 
 private:
     Cipher m_cipherConfig;
