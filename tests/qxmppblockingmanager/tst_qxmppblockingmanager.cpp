@@ -21,47 +21,6 @@ private:
     Q_SLOT void blockedState();
 };
 
-/*
-void tst_QXmppBlockingManager::testHandleStanza_data()
-{
-    QTest::addColumn<QByteArray>("xml");
-    QTest::addColumn<bool>("accepted");
-    QTest::addColumn<bool>("event");
-    QTest::addColumn<bool>("error");
-
-    QTest::newRow("notAccepted")
-        << QByteArray("<message xmlns='jabber:client' "
-                      "from='romeo@montague.example' "
-                      "to='romeo@montague.example/home' "
-                      "type='chat'>"
-                      "<received xmlns='urn:xmpp:carbons:2'>"
-                      "<forwarded xmlns='urn:xmpp:forward:0'>"
-                      "<message xmlns='jabber:client' "
-                      "from='juliet@capulet.example/balcony' "
-                      "to='romeo@montague.example/garden' "
-                      "type='chat'>"
-                      "<body>What man art thou that, thus bescreen'd in night, so stumblest on my counsel?</body>"
-                      "<thread>0e3141cd80894871a68e6fe6b1ec56fa</thread>"
-                      "</message>"
-                      "</forwarded>"
-                      "</received>"
-                      "</message>")
-        << false << false << false;
-}
-
-void tst_QXmppBlockingManager::testHandleStanza()
-{
-    QFETCH(QByteArray, xml);
-    QFETCH(bool, accepted);
-    QFETCH(bool, event);
-    QFETCH(bool, error);
-
-    TestClient test;
-    auto *manager = test.addNewExtension<QXmppUploadRequestManager>();
-
-}
-*/
-
 void tst_QXmppBlockingManager::basic()
 {
     QXmppBlockingManager m;
