@@ -66,7 +66,7 @@ auto QXmppEncryptedFileSharingProvider::downloadFile(const std::any &source,
         qFatal("QXmppEncryptedFileSharingProvider::downloadFile can only handle QXmppEncryptedFileSource sources");
     }
 
-    auto output = std::make_unique<Encryption::DecryptionDevice>(std::move(target), encryptedSource.cipher(), encryptedSource.iv(), encryptedSource.key());
+    auto output = std::make_unique<Encryption::DecryptionDevice>(std::move(target), encryptedSource.cipher(), encryptedSource.key(), encryptedSource.iv());
 
     // find provider for source of encrypted file
     std::any httpSource = encryptedSource.httpSources().front();
