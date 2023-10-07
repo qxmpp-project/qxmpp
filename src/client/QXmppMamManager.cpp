@@ -345,15 +345,19 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
                     continue;
                 }
 
-                e2eeExt->decryptMessage(parseMamMessage(state.messages.at(i), Encrypted)).then(this, [this, i, queryId](auto result) {
+                e2eeExt->decryptMessage(parseMamMessage(state.messages.at(i), Encrypted)).then(this, [this, i, queryId](QXmppE2eeExtension::MessageDecryptResult &&result) {
                     auto itr = d->ongoingRequests.find(queryId.toStdString());
                     Q_ASSERT(itr != d->ongoingRequests.end());
 
                     auto &state = itr->second;
 
-                    // store decrypted message, fallback to encrypted message
-                    if (std::holds_alternative<QXmppMessage>(result)) {
-                        state.processedMessages[i] = std::get<QXmppMessage>(std::move(result));
+                    // Store the decrypted message and enable other managers to process it if the
+                    // message could be decrypted.
+                    // E.g., delivery receipts for encrypted messages can be sent by that.
+                    // Otherwise, store the (original) encrypted message.
+                    if (auto message = std::get_if<QXmppMessage>(std::move(&result))) {
+                        state.processedMessages[i] = *message;
+                        injectMessage(std::move(*message));
                     } else {
                         warning(QStringLiteral("Error decrypting message."));
                         state.processedMessages[i] = parseMamMessage(state.messages[i], Unencrypted);
