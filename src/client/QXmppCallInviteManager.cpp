@@ -179,6 +179,12 @@ void QXmppCallInvite::setIsAccepted(bool isAccepted)
 }
 
 ///
+/// \fn QXmppCallInvite::invited()
+///
+/// Emitted when a call invitation was sent.
+///
+
+///
 /// \fn QXmppCallInvite::accepted()
 ///
 /// Emitted when a call was accepted.
