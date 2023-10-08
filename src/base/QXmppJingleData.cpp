@@ -2989,7 +2989,6 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppJingleReason)
 
 ///
 /// \brief Constructs a Jingle Message Initiation element.
-/// \param type The JMI element type
 ///
 QXmppJingleMessageInitiationElement::QXmppJingleMessageInitiationElement()
     : d(new QXmppJingleMessageInitiationElementPrivate())
