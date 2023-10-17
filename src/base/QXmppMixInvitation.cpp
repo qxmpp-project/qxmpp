@@ -135,10 +135,10 @@ void QXmppMixInvitation::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QSL65("invitation"));
     writer->writeDefaultNamespace(toString65(ns_mix_misc));
 
-    writeXmlTextElement(writer, u"inviter", d->inviterJid);
-    writeXmlTextElement(writer, u"invitee", d->inviteeJid);
-    writeXmlTextElement(writer, u"channel", d->channelJid);
-    writeXmlTextElement(writer, u"token", d->token);
+    writeOptionalXmlTextElement(writer, u"inviter", d->inviterJid);
+    writeOptionalXmlTextElement(writer, u"invitee", d->inviteeJid);
+    writeOptionalXmlTextElement(writer, u"channel", d->channelJid);
+    writeOptionalXmlTextElement(writer, u"token", d->token);
 
     writer->writeEndElement();
 }
