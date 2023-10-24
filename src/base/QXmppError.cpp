@@ -10,7 +10,7 @@
 #include <QNetworkReply>
 
 ///
-/// \class QXmppError
+/// \struct QXmppError
 ///
 /// Generic error class holding a description and a more specific error object. The specific error
 /// usually is something like a QXmppStanza::Error or an enum.
