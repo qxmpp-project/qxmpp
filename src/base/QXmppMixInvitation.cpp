@@ -22,6 +22,16 @@ public:
 };
 
 ///
+/// \brief The QXmppMixInvitation class is used to invite a user to a
+/// \xep{0369}: Mediated Information eXchange (MIX) channel as defined by
+/// \xep{0407}: Mediated Information eXchange (MIX): Miscellaneous Capabilities.
+///
+/// \ingroup Stanzas
+///
+/// \since QXmpp 1.4
+///
+
+///
 /// Default constructor
 ///
 QXmppMixInvitation::QXmppMixInvitation()
