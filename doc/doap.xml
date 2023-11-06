@@ -540,10 +540,10 @@ SPDX-License-Identifier: CC0-1.0
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0369.html'/>
-        <xmpp:status>partial</xmpp:status>
+        <xmpp:status>complete</xmpp:status>
         <xmpp:version>0.14</xmpp:version>
         <xmpp:since>1.1</xmpp:since>
-        <xmpp:note>Only IQ queries implemented</xmpp:note>
+        <xmpp:note>IQ stanzas for participants and channel information since 1.5; Manager since 1.7</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -581,10 +581,18 @@ SPDX-License-Identifier: CC0-1.0
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0405.html'/>
-        <xmpp:status>partial</xmpp:status>
+        <xmpp:status>complete</xmpp:status>
         <xmpp:version>0.5</xmpp:version>
         <xmpp:since>1.3</xmpp:since>
-        <xmpp:note>Only IQ queries implemented</xmpp:note>
+        <xmpp:note>Manager since 1.7</xmpp:note>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0406.html'/>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:version>0.3</xmpp:version>
+        <xmpp:since>1.7</xmpp:since>
       </xmpp:SupportedXep>
     </implements>
     <implements>
@@ -593,7 +601,7 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>partial</xmpp:status>
         <xmpp:version>0.1</xmpp:version>
         <xmpp:since>1.4</xmpp:since>
-        <xmpp:note>Only invitations implemented</xmpp:note>
+        <xmpp:note>Only invitations implemented; Manager since 1.7</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
