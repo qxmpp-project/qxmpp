@@ -41,8 +41,11 @@ void tst_QXmppMixItem::testInfo()
         "</item>");
 
     QXmppMixInfoItem item;
-    parsePacket(item, xml);
+    QVERIFY(item.name().isEmpty());
+    QVERIFY(item.description().isEmpty());
+    QVERIFY(item.contactJids().isEmpty());
 
+    parsePacket(item, xml);
     QCOMPARE(item.name(), QStringLiteral("Witches Coven"));
     QCOMPARE(item.description(), QStringLiteral("A location not far from the blasted "
                                                 "heath where the three witches meet"));
@@ -100,11 +103,12 @@ void tst_QXmppMixItem::testParticipant()
         "</item>");
 
     QXmppMixParticipantItem item;
-    parsePacket(item, xml);
+    QVERIFY(item.nick().isEmpty());
+    QVERIFY(item.jid().isEmpty());
 
+    parsePacket(item, xml);
     QCOMPARE(item.nick(), QStringLiteral("thirdwitch"));
     QCOMPARE(item.jid(), QStringLiteral("hag66@shakespeare.example"));
-
     serializePacket(item, xml);
 
     // test setters
