@@ -34,6 +34,24 @@ public:
     QXmppMixIq::Type actionType = QXmppMixIq::None;
 };
 
+///
+/// \class QXmppMixIq
+///
+/// This class represents an IQ used to do actions on a MIX channel as defined by
+/// \xep{0369, Mediated Information eXchange (MIX)} and
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
+///
+/// \since QXmpp 1.1
+///
+/// \ingroup Stanzas
+///
+
+///
+/// \enum QXmppMixIq::Type
+///
+/// Action type of the MIX IQ stanza.
+///
+
 QXmppMixIq::QXmppMixIq()
     : d(new QXmppMixIqPrivate)
 {
