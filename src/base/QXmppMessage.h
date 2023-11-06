@@ -6,8 +6,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMESSAGE_H
-#define QXMPPMESSAGE_H
+#pragma once
 
 #include "QXmppFileShare.h"
 #include "QXmppStanza.h"
@@ -295,5 +294,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppMessage)
-
-#endif  // QXMPPMESSAGE_H

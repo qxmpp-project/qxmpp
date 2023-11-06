@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPENTITYTIMEMANAGER_H
-#define QXMPPENTITYTIMEMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -42,5 +41,3 @@ Q_SIGNALS:
     /// emitted when the QFuture-based request is used.
     void timeReceived(const QXmppEntityTimeIq &);
 };
-
-#endif  // QXMPPENTITYTIMEMANAGER_H

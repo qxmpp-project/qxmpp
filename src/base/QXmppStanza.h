@@ -6,8 +6,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTANZA_H
-#define QXMPPSTANZA_H
+#pragma once
 
 #include <optional>
 
@@ -240,5 +239,3 @@ private:
 
 Q_DECLARE_METATYPE(QXmppStanza::Error::Type);
 Q_DECLARE_METATYPE(QXmppStanza::Error::Condition);
-
-#endif  // QXMPPSTANZA_H

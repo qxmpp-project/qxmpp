@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBSUBSCRIPTION_H
-#define QXMPPPUBSUBSUBSCRIPTION_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -100,5 +99,3 @@ Q_DECLARE_TYPEINFO(QXmppPubSubSubscription, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QXmppPubSubSubscription)
 Q_DECLARE_METATYPE(QXmppPubSubSubscription::State)
 Q_DECLARE_METATYPE(QXmppPubSubSubscription::ConfigurationSupport)
-
-#endif  // QXMPPPUBSUBSUBSCRIPTION_H

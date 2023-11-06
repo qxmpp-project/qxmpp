@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSERVERPLUGIN_H
-#define QXMPPSERVERPLUGIN_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -42,5 +41,3 @@ public:
     ///
     QStringList keys() const override = 0;
 };
-
-#endif

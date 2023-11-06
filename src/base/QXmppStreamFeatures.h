@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTREAMFEATURES_H
-#define QXMPPSTREAMFEATURES_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -76,5 +75,3 @@ public:
 private:
     QSharedDataPointer<QXmppStreamFeaturesPrivate> d;
 };
-
-#endif

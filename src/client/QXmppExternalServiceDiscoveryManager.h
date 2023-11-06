@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPEXTERNALSERVICEDISCOVERYMANAGER_H
-#define QXMPPEXTERNALSERVICEDISCOVERYMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -30,5 +29,3 @@ public:
     QStringList discoveryFeatures() const override;
     /// \endcond
 };
-
-#endif  // QXMPPEXTERNALSERVICEDISCOVERYMANAGER_H

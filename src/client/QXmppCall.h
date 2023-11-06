@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCALL_H
-#define QXMPPCALL_H
+#pragma once
 
 #include "QXmppCallStream.h"
 #include "QXmppClientExtension.h"
@@ -94,5 +93,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppCall::State)
-
-#endif

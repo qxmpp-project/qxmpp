@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRUSTSTORAGE_H
-#define QXMPPTRUSTSTORAGE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppTrustLevel.h"
@@ -39,5 +38,3 @@ public:
 
     virtual QXmppTask<void> resetAll(const QString &encryption) = 0;
 };
-
-#endif  // QXMPPTRUSTSTORAGE_H

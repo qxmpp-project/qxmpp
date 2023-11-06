@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFUTUREUTILS_P_H
-#define QXMPPFUTUREUTILS_P_H
+#pragma once
 
 //
 //  W A R N I N G
@@ -242,5 +241,3 @@ static auto taskFromFuture(QFuture<T> &&future) -> QXmppTask<T>
 }
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPPFUTUREUTILS_P_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRUSTSECURITYPOLICY_H
-#define QXMPPTRUSTSECURITYPOLICY_H
+#pragma once
 
 #include <QMetaType>
 
@@ -26,5 +25,3 @@ enum TrustSecurityPolicy {
 }  // namespace QXmpp
 
 Q_DECLARE_METATYPE(QXmpp::TrustSecurityPolicy)
-
-#endif  // QXMPPTRUSTSECURITYPOLICY_H

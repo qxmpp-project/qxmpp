@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRUSTLEVEL_H
-#define QXMPPTRUSTLEVEL_H
+#pragma once
 
 #include <QFlags>
 #include <QHashFunctions>
@@ -44,5 +43,3 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(TrustLevels)
 // Scoped enums (enum class) are not implicitly converted to int
 inline uint qHash(QXmpp::TrustLevel key, uint seed) noexcept { return qHash(std::underlying_type_t<QXmpp::TrustLevel>(key), seed); }
 /// \endcond
-
-#endif  // QXMPPTRUSTLEVEL_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBITSOFBINARYDATACONTAINER_H
-#define QXMPPBITSOFBINARYDATACONTAINER_H
+#pragma once
 
 #include "QXmppBitsOfBinaryData.h"
 
@@ -26,5 +25,3 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
     /// \endcond
 };
-
-#endif  // QXMPPBITSOFBINARYDATACONTAINER_H

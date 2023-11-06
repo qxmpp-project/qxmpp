@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBINDIQ_H
-#define QXMPPBINDIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -36,5 +35,3 @@ private:
     QString m_jid;
     QString m_resource;
 };
-
-#endif  // QXMPPBIND_H

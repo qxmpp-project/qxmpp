@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPJINGLEMESSAGEINITIATIONMANAGER_H
-#define QXMPPJINGLEMESSAGEINITIATIONMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -122,5 +121,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppJingleMessageInitiation::Result)
-
-#endif  // QXMPPJINGLEMESSAGEINITIATIONMANAGER_H

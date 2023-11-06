@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSASL_P_H
-#define QXMPPSASL_P_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
@@ -323,5 +322,3 @@ public:
 private:
     int m_step;
 };
-
-#endif

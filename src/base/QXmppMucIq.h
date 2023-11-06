@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMUCIQ_H
-#define QXMPPMUCIQ_H
+#pragma once
 
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
@@ -129,5 +128,3 @@ protected:
 private:
     QXmppDataForm m_form;
 };
-
-#endif

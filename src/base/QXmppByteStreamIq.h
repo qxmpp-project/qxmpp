@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBYTESTREAMIQ_H
-#define QXMPPBYTESTREAMIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -71,5 +70,3 @@ private:
     QList<StreamHost> m_streamHosts;
     QString m_streamHostUsed;
 };
-
-#endif

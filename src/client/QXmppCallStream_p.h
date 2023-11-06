@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCALLSTREAM_P_H
-#define QXMPPCALLSTREAM_P_H
+#pragma once
 
 #include "QXmppCall_p.h"
 #include "QXmppJingleIq.h"
@@ -80,5 +79,3 @@ public:
 
     QList<QXmppJinglePayloadType> payloadTypes;
 };
-
-#endif

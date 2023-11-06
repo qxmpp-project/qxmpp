@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBITEM_H
-#define QXMPPPUBSUBITEM_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -38,5 +37,3 @@ private:
     QSharedDataPointer<QXmppPubSubItemPrivate> d;
 };
 #endif
-
-#endif  // QXMPPPUBSUBITEM_H

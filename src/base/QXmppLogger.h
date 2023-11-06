@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPLOGGER_H
-#define QXMPPLOGGER_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -170,4 +169,3 @@ Q_SIGNALS:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppLogger::MessageTypes)
-#endif  // QXMPPLOGGER_H

@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOENVELOPE_H
-#define QXMPPOMEMOENVELOPE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -37,5 +36,3 @@ private:
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoEnvelope, Q_MOVABLE_TYPE);
-
-#endif  // QXMPPOMEMOENVELOPE_H

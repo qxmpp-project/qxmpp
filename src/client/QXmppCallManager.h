@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCALLMANAGER_H
-#define QXMPPCALLMANAGER_H
+#pragma once
 
 #include "QXmppCall.h"
 #include "QXmppClientExtension.h"
@@ -91,5 +90,3 @@ private:
     friend class QXmppCallPrivate;
     friend class QXmppCallManagerPrivate;
 };
-
-#endif

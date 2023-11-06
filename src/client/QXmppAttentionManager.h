@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPATTENTIONMANAGER_H
-#define QXMPPATTENTIONMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -44,5 +43,3 @@ private Q_SLOTS:
 private:
     const std::unique_ptr<QXmppAttentionManagerPrivate> d;
 };
-
-#endif  // QXMPPATTENTIONMANAGER_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFILESHARE_H
-#define QXMPPFILESHARE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -59,5 +58,3 @@ protected:
 private:
     QSharedDataPointer<QXmppFileSharePrivate> d;
 };
-
-#endif  // QXMPPFILESHARE_H

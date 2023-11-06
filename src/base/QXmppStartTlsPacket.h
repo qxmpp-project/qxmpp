@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTARTTLSPACKET_H
-#define QXMPPSTARTTLSPACKET_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -43,5 +42,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppStartTlsPacket::Type);
-
-#endif  // QXMPPSTARTTLSPACKET_H

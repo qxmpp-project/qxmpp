@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFILESHARINGMANAGER_H
-#define QXMPPFILESHARINGMANAGER_H
+#pragma once
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppClientExtension.h"
@@ -170,5 +169,3 @@ private:
 
     std::unique_ptr<QXmppFileSharingManagerPrivate> d;
 };
-
-#endif  // QXMPPFILESHARINGMANAGER_H

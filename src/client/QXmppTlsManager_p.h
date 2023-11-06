@@ -14,8 +14,7 @@
 // We mean it.
 //
 
-#ifndef QXMPPTLSMANAGER_H
-#define QXMPPTLSMANAGER_H
+#pragma once
 
 #include "QXmppInternalClientExtension_p.h"
 
@@ -35,5 +34,3 @@ public:
 
     bool handleStanza(const QDomElement &stanza) override;
 };
-
-#endif  // QXMPPTLSMANAGER_H

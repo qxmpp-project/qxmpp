@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPDATAFORMBASED_H
-#define QXMPPDATAFORMBASED_H
+#pragma once
 
 #include "QXmppDataForm.h"
 
@@ -120,5 +119,3 @@ protected:
 private:
     QSharedDataPointer<QXmppExtensibleDataFormBasePrivate> d;
 };
-
-#endif  // QXMPPDATAFORMBASED_H

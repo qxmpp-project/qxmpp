@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTREAMINITIATIONIQ_P_H
-#define QXMPPSTREAMINITIATIONIQ_P_H
+#pragma once
 
 #include "QXmppDataForm.h"
 #include "QXmppIq.h"
@@ -62,5 +61,3 @@ private:
     QString m_siId;
 };
 /// \endcond
-
-#endif

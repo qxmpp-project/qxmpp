@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPGLOBAL_P_H
-#define QXMPPGLOBAL_P_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -16,5 +15,3 @@ QString encryptionToString(EncryptionMethod);
 QString encryptionToName(EncryptionMethod);
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPPGLOBAL_P_H

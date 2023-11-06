@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOUTGOINGSERVER_H
-#define QXMPPOUTGOINGSERVER_H
+#pragma once
 
 #include "QXmppStream.h"
 
@@ -60,5 +59,3 @@ private:
     Q_DISABLE_COPY(QXmppOutgoingServer)
     QXmppOutgoingServerPrivate *const d;
 };
-
-#endif

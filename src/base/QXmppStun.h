@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTUN_H
-#define QXMPPSTUN_H
+#pragma once
 
 #include "QXmppJingleIq.h"
 #include "QXmppLogger.h"
@@ -306,5 +305,3 @@ private Q_SLOTS:
 private:
     QXmppIceConnectionPrivate *d;
 };
-
-#endif

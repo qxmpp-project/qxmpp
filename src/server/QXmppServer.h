@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSERVER_H
-#define QXMPPSERVER_H
+#pragma once
 
 #include "QXmppLogger.h"
 
@@ -130,5 +129,3 @@ private:
     void incomingConnection(qintptr socketDescriptor) override;
     QXmppSslServerPrivate *const d;
 };
-
-#endif

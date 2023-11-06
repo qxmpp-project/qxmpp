@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPVCARDIQ_H
-#define QXMPPVCARDIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -277,5 +276,3 @@ private:
 
 QXMPP_EXPORT bool operator==(const QXmppVCardIq &, const QXmppVCardIq &);
 QXMPP_EXPORT bool operator!=(const QXmppVCardIq &, const QXmppVCardIq &);
-
-#endif  // QXMPPVCARDIQ_H

@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMODEVICELIST_H
-#define QXMPPOMEMODEVICELIST_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppOmemoDeviceElement_p.h"
@@ -26,5 +25,3 @@ public:
 };
 
 Q_DECLARE_TYPEINFO(QXmppOmemoDeviceList, Q_MOVABLE_TYPE);
-
-#endif  // QXMPPOMEMODEVICELIST_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPUPLOADREQUESTMANAGER_H
-#define QXMPPUPLOADREQUESTMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -136,5 +135,3 @@ private:
 
     const std::unique_ptr<QXmppUploadRequestManagerPrivate> d;
 };
-
-#endif  // QXMPPUPLOADREQUESTMANAGER_H

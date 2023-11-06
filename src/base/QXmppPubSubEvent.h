@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBEVENT_H
-#define QXMPPPUBSUBEVENT_H
+#pragma once
 
 #include "QXmppMessage.h"
 #include "QXmppPubSubSubscription.h"
@@ -146,5 +145,3 @@ void QXmppPubSubEvent<T>::serializeItems(QXmlStreamWriter *writer) const
 /// \endcond
 
 Q_DECLARE_METATYPE(QXmppPubSubEventBase::EventType)
-
-#endif  // QXMPPPUBSUBEVENT_H

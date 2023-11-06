@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMUCMANAGER_H
-#define QXMPPMUCMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppMucIq.h"
@@ -240,5 +239,3 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppMucRoom::Actions)
-
-#endif

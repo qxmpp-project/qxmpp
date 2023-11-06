@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFILESHARINGPROVIDER_H
-#define QXMPPFILESHARINGPROVIDER_H
+#pragma once
 
 #include "QXmppError.h"
 #include "QXmppGlobal.h"
@@ -86,5 +85,3 @@ public:
                             std::function<void(quint64, quint64)> reportProgress,
                             std::function<void(UploadResult)> reportFinished) -> std::shared_ptr<Upload> = 0;
 };
-
-#endif  // QXMPPFILESHARINGPROVIDER_H

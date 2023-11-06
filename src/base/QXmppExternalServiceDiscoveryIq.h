@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPEXTERNALSERVICEDISCOVERYIQ_H
-#define QXMPPEXTERNALSERVICEDISCOVERYIQ_H
+#pragma once
 
 #include "QXmppExternalService.h"
 #include "QXmppIq.h"
@@ -33,5 +32,3 @@ protected:
 private:
     QSharedDataPointer<QXmppExternalServiceDiscoveryIqPrivate> d;
 };
-
-#endif  // QXMPPEXTERNALSERVICEDISCOVERYIQ_H

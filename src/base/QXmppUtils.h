@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPUTILS_H
-#define QXMPPUTILS_H
+#pragma once
 
 // forward declarations of QXmlStream* classes will not work on Mac, we need to
 // include the whole header.
@@ -48,5 +47,3 @@ void helperToXmlAddAttribute(QXmlStreamWriter *stream, const QString &name,
                              const QString &value);
 void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
                                const QString &value);
-
-#endif  // QXMPPUTILS_H

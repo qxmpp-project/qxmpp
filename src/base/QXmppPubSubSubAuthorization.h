@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBSUBAUTHORIZATION_H
-#define QXMPPPUBSUBSUBAUTHORIZATION_H
+#pragma once
 
 #include "QXmppDataFormBase.h"
 
@@ -42,5 +41,3 @@ protected:
 private:
     QSharedDataPointer<QXmppPubSubSubAuthorizationPrivate> d;
 };
-
-#endif  // QXMPPPUBSUBSUBAUTHORIZATION_H

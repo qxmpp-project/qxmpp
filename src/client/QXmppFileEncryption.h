@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFILEENCRYPTION_H
-#define QXMPPFILEENCRYPTION_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -73,5 +72,3 @@ private:
 };
 
 }  // namespace QXmpp::Private::Encryption
-
-#endif  // QXMPPFILEENCRYPTION_H

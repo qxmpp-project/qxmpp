@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSOCKS_H
-#define QXMPPSOCKS_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -58,5 +57,3 @@ private:
     QTcpServer *m_server_v6;
     QMap<QTcpSocket *, int> m_states;
 };
-
-#endif

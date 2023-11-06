@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPINVOKABLE_H
-#define QXMPPINVOKABLE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -55,5 +54,3 @@ private:
     QHash<QByteArray, int> m_methodHash;
     QReadWriteLock m_lock;
 };
-
-#endif

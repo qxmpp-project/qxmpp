@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPIBBIQ_H
-#define QXMPPIBBIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -79,5 +78,3 @@ private:
     QString m_sid;
     QByteArray m_payload;
 };
-
-#endif  // QXMPPIBBIQS_H

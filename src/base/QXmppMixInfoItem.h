@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMIXINFOITEM_H
-#define QXMPPMIXINFOITEM_H
+#pragma once
 
 #include "QXmppPubSubBaseItem.h"
 
@@ -40,5 +39,3 @@ protected:
 private:
     QSharedDataPointer<QXmppMixInfoItemPrivate> d;
 };
-
-#endif  // QXMPPMIXINFOITEM_H

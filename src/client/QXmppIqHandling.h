@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPIQHANDLING_H
-#define QXMPPIQHANDLING_H
+#pragma once
 
 #include "QXmppClient.h"
 #include "QXmppE2eeMetadata.h"
@@ -272,5 +271,3 @@ bool handleIqRequests(const QDomElement &element, QXmppClient *client, Handler h
 }
 
 }  // namespace QXmpp
-
-#endif  // QXMPPIQHANDLING_H

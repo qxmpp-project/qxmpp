@@ -14,8 +14,7 @@
 // We mean it.
 //
 
-#ifndef QXMPPINTERNALCLIENTEXTENSION_H
-#define QXMPPINTERNALCLIENTEXTENSION_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -38,5 +37,3 @@ public:
 protected:
     QXmppOutgoingClient *clientStream();
 };
-
-#endif  // QXMPPINTERNALCLIENTEXTENSION_H

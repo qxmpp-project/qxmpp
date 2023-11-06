@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPDISCOVERYMANAGER_H
-#define QXMPPDISCOVERYMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -72,5 +71,3 @@ Q_SIGNALS:
 private:
     const std::unique_ptr<QXmppDiscoveryManagerPrivate> d;
 };
-
-#endif  // QXMPPDISCOVERYMANAGER_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPATMMANAGER_H
-#define QXMPPATMMANAGER_H
+#pragma once
 
 #include "QXmppAtmTrustStorage.h"
 #include "QXmppSendResult.h"
@@ -50,5 +49,3 @@ private:
 
     friend class tst_QXmppAtmManager;
 };
-
-#endif  // QXMPPATMMANAGER_H

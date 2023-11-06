@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCLIENTEXTENSION_H
-#define QXMPPCLIENTEXTENSION_H
+#pragma once
 
 #include "QXmppDiscoveryIq.h"
 #include "QXmppExtension.h"
@@ -56,5 +55,3 @@ private:
 
     friend class QXmppClient;
 };
-
-#endif

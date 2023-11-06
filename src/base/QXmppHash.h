@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPHASH_H
-#define QXMPPHASH_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -71,5 +70,3 @@ public:
 private:
     QXmpp::HashAlgorithm m_algorithm = QXmpp::HashAlgorithm::Unknown;
 };
-
-#endif  // QXMPPHASH_H

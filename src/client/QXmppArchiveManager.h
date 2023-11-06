@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPARCHIVEMANAGER_H
-#define QXMPPARCHIVEMANAGER_H
+#pragma once
 
 #include "QXmppArchiveIq.h"
 #include "QXmppClientExtension.h"
@@ -53,5 +52,3 @@ Q_SIGNALS:
     /// after calling retrieveCollection()
     void archiveChatReceived(const QXmppArchiveChat &, const QXmppResultSetReply &rsm = QXmppResultSetReply());
 };
-
-#endif

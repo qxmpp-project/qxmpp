@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPHTTPFILESHARINGPROVIDER_H
-#define QXMPPHTTPFILESHARINGPROVIDER_H
+#pragma once
 
 #include "QXmppFileSharingProvider.h"
 #include "QXmppHttpFileSource.h"
@@ -36,5 +35,3 @@ public:
 private:
     std::unique_ptr<QXmppHttpFileSharingProviderPrivate> d;
 };
-
-#endif  // QXMPPHTTPFILESHARINGPROVIDER_H

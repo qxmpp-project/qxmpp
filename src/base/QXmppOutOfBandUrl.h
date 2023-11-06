@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOUTOFBANDURL_H
-#define QXMPPOUTOFBANDURL_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -36,5 +35,3 @@ public:
 private:
     QSharedDataPointer<QXmppOutOfBandUrlPrivate> d;
 };
-
-#endif  // QXMPPOUTOFBANDURL_H

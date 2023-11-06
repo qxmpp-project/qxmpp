@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPREGISTRATIONMANAGER_H
-#define QXMPPREGISTRATIONMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppRegisterIq.h"
@@ -348,5 +347,3 @@ private:
 
     const std::unique_ptr<QXmppRegistrationManagerPrivate> d;
 };
-
-#endif  // QXMPPREGISTRATIONMANAGER_H

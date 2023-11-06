@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPUTILS_P_H
-#define QXMPPUTILS_P_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -19,5 +18,3 @@ QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
 float calculateProgress(qint64 transferred, qint64 total);
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPPUTILS_P_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMIXINVITATION_H
-#define QXMPPMIXINVITATION_H
+#pragma once
 
 #include "QXmppElement.h"
 
@@ -53,5 +52,3 @@ public:
 private:
     QSharedDataPointer<QXmppMixInvitationPrivate> d;
 };
-
-#endif  // QXMPPMIXINVITATION_H

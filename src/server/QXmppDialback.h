@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPDIALBACK_H
-#define QXMPPDIALBACK_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -46,5 +45,3 @@ private:
     QString m_key;
     QString m_type;
 };
-
-#endif

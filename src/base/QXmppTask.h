@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTASK_H
-#define QXMPPTASK_H
+#pragma once
 
 #include "qxmpp_export.h"
 
@@ -220,5 +219,3 @@ private:
 
     QXmpp::Private::TaskPrivate d;
 };
-
-#endif  // QXMPPTASK_H

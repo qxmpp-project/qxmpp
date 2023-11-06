@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCONSTANTS_H
-#define QXMPPCONSTANTS_H
+#pragma once
 
 //
 //  W A R N I N G
@@ -227,5 +226,3 @@ extern const char *ns_esfs;
 extern const char *ns_atm;
 // XEP-0482: Call Invites
 extern const char *ns_call_invites;
-
-#endif  // QXMPPCONSTANTS_H

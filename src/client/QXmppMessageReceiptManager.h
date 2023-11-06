@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMESSAGERECEIPTMANAGER_H
-#define QXMPPMESSAGERECEIPTMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppMessageHandler.h"
@@ -33,5 +32,3 @@ Q_SIGNALS:
     /// calling QXmppMessage::id().
     void messageDelivered(const QString &jid, const QString &id);
 };
-
-#endif  // QXMPPMESSAGERECEIPTMANAGER_H

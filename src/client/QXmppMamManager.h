@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMAMMANAGER_H
-#define QXMPPMAMMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -82,5 +81,3 @@ Q_SIGNALS:
 private:
     std::unique_ptr<QXmppMamManagerPrivate> d;
 };
-
-#endif

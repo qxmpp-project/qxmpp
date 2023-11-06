@@ -2,9 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBAFFILIATION_H
-#define QXMPPPUBSUBAFFILIATION_H
-
 #include "QXmppGlobal.h"
 
 #include <QMetaType>
@@ -62,5 +59,3 @@ private:
 
 Q_DECLARE_METATYPE(QXmppPubSubAffiliation)
 Q_DECLARE_METATYPE(QXmppPubSubAffiliation::Affiliation)
-
-#endif  // QXMPPPUBSUBAFFILIATION_H

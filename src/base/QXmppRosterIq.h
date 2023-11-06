@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPROSTERIQ_H
-#define QXMPPROSTERIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -114,5 +113,3 @@ protected:
 private:
     QSharedDataPointer<QXmppRosterIqPrivate> d;
 };
-
-#endif  // QXMPPROSTERIQ_H

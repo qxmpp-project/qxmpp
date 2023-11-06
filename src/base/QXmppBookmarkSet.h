@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBOOKMARKSET_H
-#define QXMPPBOOKMARKSET_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -76,5 +75,3 @@ private:
     QList<QXmppBookmarkConference> m_conferences;
     QList<QXmppBookmarkUrl> m_urls;
 };
-
-#endif

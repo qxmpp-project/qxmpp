@@ -14,8 +14,7 @@
 // We mean it.
 //
 
-#ifndef QXMPPSCEENVELOPE_P_H
-#define QXMPPSCEENVELOPE_P_H
+#pragma once
 
 #include "QXmppUtils.h"
 
@@ -106,5 +105,3 @@ public:
 private:
     QXmlStreamWriter &writer;
 };
-
-#endif  // QXMPPSCEENVELOPE_P_H

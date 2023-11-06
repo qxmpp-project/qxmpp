@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCARBONMANAGER_H
-#define QXMPPCARBONMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -45,5 +44,3 @@ Q_SIGNALS:
 private:
     bool m_carbonsEnabled;
 };
-
-#endif  // QXMPPCARBONMANAGER_H

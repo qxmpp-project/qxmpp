@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTREAM_H
-#define QXMPPSTREAM_H
+#pragma once
 
 #include "QXmppLogger.h"
 #include "QXmppSendResult.h"
@@ -105,5 +104,3 @@ private:
 
     QXmppStreamPrivate *const d;
 };
-
-#endif  // QXMPPSTREAM_H

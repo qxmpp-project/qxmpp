@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPASSWORDCHECKER_H
-#define QXMPPPASSWORDCHECKER_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -89,5 +88,3 @@ public:
 protected:
     virtual QXmppPasswordReply::Error getPassword(const QXmppPasswordRequest &request, QString &password);
 };
-
-#endif

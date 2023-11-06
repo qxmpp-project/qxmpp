@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTHUMBNAIL_H
-#define QXMPPTHUMBNAIL_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -47,5 +46,3 @@ public:
 private:
     QSharedDataPointer<QXmppThumbnailPrivate> d;
 };
-
-#endif  // QXMPPTHUMBNAIL_H

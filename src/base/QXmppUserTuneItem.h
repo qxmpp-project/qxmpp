@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPUSERTUNEITEM_H
-#define QXMPPUSERTUNEITEM_H
+#pragma once
 
 #include "QXmppPubSubBaseItem.h"
 
@@ -89,5 +88,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppTuneItem)
-
-#endif  // QXMPPUSERTUNEITEM_H

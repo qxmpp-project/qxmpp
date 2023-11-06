@@ -15,8 +15,7 @@
 // We mean it.
 //
 
-#ifndef QXMPPCLIENT_P_H
-#define QXMPPCLIENT_P_H
+#pragma once
 
 #include "QXmppPresence.h"
 
@@ -57,5 +56,3 @@ public:
 private:
     QXmppClient *q;
 };
-
-#endif  // QXMPPCLIENT_P_H

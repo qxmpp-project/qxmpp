@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRANSFERMANAGER_P_H
-#define QXMPPTRANSFERMANAGER_P_H
+#pragma once
 
 #include "QXmppByteStreamIq.h"
 #include "QXmppTransferManager.h"
@@ -65,5 +64,3 @@ private Q_SLOTS:
     void _q_proxyReady();
     void _q_sendData();
 };
-
-#endif

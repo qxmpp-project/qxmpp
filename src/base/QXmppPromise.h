@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPROMISE_H
-#define QXMPPPROMISE_H
+#pragma once
 
 #include "QXmppTask.h"
 
@@ -101,5 +100,3 @@ public:
 private:
     QXmpp::Private::TaskPrivate d;
 };
-
-#endif  // QXMPPPROMISE_H

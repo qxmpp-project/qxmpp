@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPFILEMETADATA_H
-#define QXMPPFILEMETADATA_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -66,5 +65,3 @@ public:
 private:
     QSharedDataPointer<QXmppFileMetadataPrivate> d;
 };
-
-#endif

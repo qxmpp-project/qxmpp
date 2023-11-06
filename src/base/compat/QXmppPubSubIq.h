@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBIQ_H
-#define QXMPPPUBSUBIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -62,5 +61,3 @@ private:
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
 #endif
-
-#endif  // QXMPPPUBSUBIQ_H

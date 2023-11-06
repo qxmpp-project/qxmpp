@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRANSFERMANAGER_H
-#define QXMPPTRANSFERMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -279,5 +278,3 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppTransferJob::Methods)
-
-#endif

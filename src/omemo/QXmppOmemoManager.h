@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOMANAGER_H
-#define QXMPPOMEMOMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppE2eeExtension.h"
@@ -157,5 +156,3 @@ private:
     friend class QXmppOmemoManagerPrivate;
     friend class tst_QXmppOmemoManager;
 };
-
-#endif  // QXMPPOMEMOMANAGER_H

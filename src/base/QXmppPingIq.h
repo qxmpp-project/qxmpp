@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPINGIQ_H
-#define QXMPPPINGIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -17,5 +16,3 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
-
-#endif

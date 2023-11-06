@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPRPCMANAGER_H
-#define QXMPPRPCMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppInvokable.h"
@@ -70,5 +69,3 @@ private:
 
     QMap<QString, QXmppInvokable *> m_interfaces;
 };
-
-#endif

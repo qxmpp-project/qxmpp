@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOIQ_H
-#define QXMPPOMEMOIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 #include "QXmppOmemoElement_p.h"
@@ -24,5 +23,3 @@ public:
 private:
     QXmppOmemoElement m_omemoElement;
 };
-
-#endif  // QXMPPOMEMOIQ_H

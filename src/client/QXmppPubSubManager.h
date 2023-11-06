@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBMANAGER_H
-#define QXMPPPUBSUBMANAGER_H
+#pragma once
 
 #include "QXmppClient.h"
 #include "QXmppClientExtension.h"
@@ -387,5 +386,3 @@ QXmppTask<QXmppPubSubManager::PublishItemsResult> QXmppPubSubManager::publishOwn
 {
     return publishItems(client()->configuration().jidBare(), nodeName, items);
 }
-
-#endif  // QXMPPPUBSUBMANAGER_H

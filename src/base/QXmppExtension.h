@@ -2,13 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPEXTENSION_H
-#define QXMPPEXTENSION_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
 class QXMPP_EXPORT QXmppExtension
 {
 };
-
-#endif  // QXMPPEXTENSION_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPELEMENT_H
-#define QXMPPELEMENT_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -53,5 +52,3 @@ private:
     // ### QXmpp2: Use an std::shared_ptr if possible?
     QXmppElementPrivate *d;
 };
-
-#endif

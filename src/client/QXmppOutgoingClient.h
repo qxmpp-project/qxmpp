@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOUTGOINGCLIENT_H
-#define QXMPPOUTGOINGCLIENT_H
+#pragma once
 
 #include "QXmppClient.h"
 #include "QXmppStanza.h"
@@ -97,5 +96,3 @@ private:
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };
-
-#endif  // QXMPPOUTGOINGCLIENT_H

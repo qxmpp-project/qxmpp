@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPHTTPUPLOADIQ_H
-#define QXMPPHTTPUPLOADIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -94,5 +93,3 @@ protected:
 private:
     QSharedDataPointer<QXmppHttpUploadSlotIqPrivate> d;
 };
-
-#endif  // QXMPPHTTPUPLOADIQ_H

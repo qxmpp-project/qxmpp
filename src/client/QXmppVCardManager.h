@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPVCARDMANAGER_H
-#define QXMPPVCARDMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -67,5 +66,3 @@ Q_SIGNALS:
 private:
     const std::unique_ptr<QXmppVCardManagerPrivate> d;
 };
-
-#endif  // QXMPPVCARDMANAGER_H

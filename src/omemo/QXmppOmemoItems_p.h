@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOITEMS_H
-#define QXMPPOMEMOITEMS_H
+#pragma once
 
 #include "QXmppOmemoDeviceBundle_p.h"
 #include "QXmppOmemoDeviceList_p.h"
@@ -40,5 +39,3 @@ protected:
 private:
     QXmppOmemoDeviceList m_deviceList;
 };
-
-#endif  // QXMPPOMEMOITEMS_H

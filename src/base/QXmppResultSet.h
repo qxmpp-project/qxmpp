@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPRESULTSET_H
-#define QXMPPRESULTSET_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -76,5 +75,3 @@ private:
     QString m_first;
     QString m_last;
 };
-
-#endif  // QXMPPRESULTSET_H

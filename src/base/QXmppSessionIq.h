@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSESSIONIQ_H
-#define QXMPPSESSIONIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -25,5 +24,3 @@ private:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
-
-#endif  // QXMPPSESSION_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOMEMORYSTORAGE_H
-#define QXMPPOMEMOMEMORYSTORAGE_H
+#pragma once
 
 #include "QXmppOmemoStorage.h"
 #include "QXmppTask.h"
@@ -40,5 +39,3 @@ public:
 private:
     std::unique_ptr<QXmppOmemoMemoryStoragePrivate> d;
 };
-
-#endif  // QXMPPOMEMOMEMORYSTORAGE_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBSUBSCRIBEOPTIONS_H
-#define QXMPPPUBSUBSUBSCRIBEOPTIONS_H
+#pragma once
 
 #include "QXmppDataForm.h"
 #include "QXmppDataFormBase.h"
@@ -88,5 +87,3 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QXmppPubSubSubscribeOptions::PresenceStates)
 Q_DECLARE_METATYPE(QXmppPubSubSubscribeOptions)
-
-#endif  // QXMPPPUBSUBSUBSCRIBEOPTIONS_H

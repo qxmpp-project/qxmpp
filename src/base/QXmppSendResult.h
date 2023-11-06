@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSENDRESULT_H
-#define QXMPPSENDRESULT_H
+#pragma once
 
 #include "QXmppError.h"
 
@@ -44,5 +43,3 @@ struct SendSuccess
 using SendResult = std::variant<SendSuccess, QXmppError>;
 
 }  // namespace QXmpp
-
-#endif  // QXMPPSENDRESULT_H

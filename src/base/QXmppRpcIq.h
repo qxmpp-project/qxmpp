@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPRPCIQ_H
-#define QXMPPRPCIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -106,5 +105,3 @@ protected:
 private:
     QXmppRpcInvokeIq m_query;
 };
-
-#endif  // QXMPPRPCIQ_H

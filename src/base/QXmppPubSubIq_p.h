@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBIQ_H
-#define QXMPPPUBSUBIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -166,5 +165,3 @@ void PubSubIq<T>::serializeItems(QXmlStreamWriter *writer) const
 /// \endcond
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPPPUBSUBIQ_H

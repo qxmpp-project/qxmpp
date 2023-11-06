@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTANZA_P_H
-#define QXMPPSTANZA_P_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -30,5 +29,3 @@ auto typeToString(QXmppStanza::Error::Type type) -> QString;
 auto typeFromString(const QString &string) -> std::optional<QXmppStanza::Error::Type>;
 
 }  // namespace QXmpp::Private
-
-#endif

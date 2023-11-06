@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBITSOFBINARYIQ_H
-#define QXMPPBITSOFBINARYIQ_H
+#pragma once
 
 #include "QXmppBitsOfBinaryData.h"
 #include "QXmppIq.h"
@@ -22,5 +21,3 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
-
-#endif  // QXMPPBITSOFBINARYIQ_H

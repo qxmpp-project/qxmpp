@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOMANAGER_P_H
-#define QXMPPOMEMOMANAGER_P_H
+#pragma once
 
 #include "QXmppE2eeMetadata.h"
 #include "QXmppOmemoDeviceBundle_p.h"
@@ -352,5 +351,3 @@ public:
 
     void warning(const QString &msg) const;
 };
-
-#endif  // QXMPPOMEMOMANAGER_P_H

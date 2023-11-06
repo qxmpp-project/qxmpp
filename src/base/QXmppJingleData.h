@@ -4,8 +4,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPJINGLEIQ_H
-#define QXMPPJINGLEIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -726,5 +725,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppJingleReason::RtpErrorCondition)
-
-#endif

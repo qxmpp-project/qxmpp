@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPOMEMOSTORAGE_H
-#define QXMPPOMEMOSTORAGE_H
+#pragma once
 
 #include "QXmppTask.h"
 #include "qxmppomemo_export.h"
@@ -171,5 +170,3 @@ public:
 
     virtual QXmppTask<void> resetAll() = 0;
 };
-
-#endif  // QXMPPOMEMOSTORAGE_H

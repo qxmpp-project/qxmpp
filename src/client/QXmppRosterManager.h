@@ -4,8 +4,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPROSTERMANAGER_H
-#define QXMPPROSTERMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppPresence.h"
@@ -137,5 +136,3 @@ private Q_SLOTS:
 private:
     const std::unique_ptr<QXmppRosterManagerPrivate> d;
 };
-
-#endif  // QXMPPROSTER_H

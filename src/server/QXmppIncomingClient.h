@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPINCOMINGCLIENT_H
-#define QXMPPINCOMINGCLIENT_H
+#pragma once
 
 #include "QXmppStream.h"
 
@@ -52,5 +51,3 @@ private:
     QXmppIncomingClientPrivate *d;
     friend class QXmppIncomingClientPrivate;
 };
-
-#endif

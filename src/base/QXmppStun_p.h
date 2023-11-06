@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTUN_P_H
-#define QXMPPSTUN_P_H
+#pragma once
 
 #include "QXmppStun.h"
 
@@ -169,5 +168,3 @@ private Q_SLOTS:
 private:
     QUdpSocket *m_socket;
 };
-
-#endif

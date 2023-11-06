@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPUSERLOCATIONMANAGER_H
-#define QXMPPUSERLOCATIONMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -39,5 +38,3 @@ protected:
     bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) override;
     /// \endcond
 };
-
-#endif  // QXMPPUSERLOCATIONMANAGER_H

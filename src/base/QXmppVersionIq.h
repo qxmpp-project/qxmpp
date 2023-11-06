@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPVERSIONIQ_H
-#define QXMPPVERSIONIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -40,5 +39,3 @@ private:
     QString m_os;
     QString m_version;
 };
-
-#endif

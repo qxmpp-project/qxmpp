@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPRESENCE_H
-#define QXMPPPRESENCE_H
+#pragma once
 
 #include "QXmppJingleIq.h"
 #include "QXmppMucIq.h"
@@ -138,5 +137,3 @@ private:
 
     QSharedDataPointer<QXmppPresencePrivate> d;
 };
-
-#endif  // QXMPPPRESENCE_H

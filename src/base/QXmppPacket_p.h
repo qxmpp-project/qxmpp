@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPACKET_H
-#define QXMPPPACKET_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppPromise.h"
@@ -33,5 +32,3 @@ private:
     QByteArray m_data;
     bool m_isXmppStanza;
 };
-
-#endif  // QXMPPPACKET_H

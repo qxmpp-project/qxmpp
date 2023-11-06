@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRUSTMANAGER_H
-#define QXMPPTRUSTMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppTrustLevel.h"
@@ -57,5 +56,3 @@ protected:
 private:
     QXmppTrustStorage *m_trustStorage;
 };
-
-#endif  // QXMPPTRUSTMANAGER_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPATMTRUSTMEMORYSTORAGE_H
-#define QXMPPATMTRUSTMEMORYSTORAGE_H
+#pragma once
 
 #include "QXmppAtmTrustStorage.h"
 #include "QXmppTrustMemoryStorage.h"
@@ -29,5 +28,3 @@ public:
 private:
     const std::unique_ptr<QXmppAtmTrustMemoryStoragePrivate> d;
 };
-
-#endif  // QXMPPATMTRUSTMEMORYSTORAGE_H

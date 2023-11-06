@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPENCRYPTEDFILESOURCE_H
-#define QXMPPENCRYPTEDFILESOURCE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppHash.h"
@@ -46,5 +45,3 @@ public:
 private:
     QSharedDataPointer<QXmppEncryptedFileSourcePrivate> d;
 };
-
-#endif  // QXMPPENCRYPTEDFILESOURCE_H

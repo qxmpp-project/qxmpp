@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPHASHING_H
-#define QXMPPHASHING_H
+#pragma once
 
 #include "QXmppError.h"
 #include "QXmppGlobal.h"
@@ -67,5 +66,3 @@ QXMPP_EXPORT QFuture<HashingResultPtr> calculateHashes(std::unique_ptr<QIODevice
 QFuture<HashVerificationResultPtr> verifyHashes(std::unique_ptr<QIODevice> data, std::vector<QXmppHash> hashes);
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPPHASHING_H

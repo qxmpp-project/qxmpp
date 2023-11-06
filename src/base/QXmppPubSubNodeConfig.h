@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPPUBSUBNODECONFIG_H
-#define QXMPPPUBSUBNODECONFIG_H
+#pragma once
 
 #include "QXmppDataForm.h"
 #include "QXmppDataFormBase.h"
@@ -208,5 +207,3 @@ protected:
 
 Q_DECLARE_METATYPE(QXmppPubSubNodeConfig);
 Q_DECLARE_METATYPE(QXmppPubSubPublishOptions);
-
-#endif  // QXMPPPUBSUBNODECONFIG_H

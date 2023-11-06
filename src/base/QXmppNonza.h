@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPNONZA_H
-#define QXMPPNONZA_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -20,5 +19,3 @@ public:
     virtual void parse(const QDomElement &) = 0;
     virtual void toXml(QXmlStreamWriter *writer) const = 0;
 };
-
-#endif  // QXMPPNONZA_H

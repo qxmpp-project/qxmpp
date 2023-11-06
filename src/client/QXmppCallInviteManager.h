@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCALLINVITEMANAGER_H
-#define QXMPPCALLINVITEMANAGER_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 #include "QXmppError.h"
@@ -120,5 +119,3 @@ private:
 };
 Q_DECLARE_METATYPE(QXmppCallInvite::Result)
 Q_DECLARE_METATYPE(std::shared_ptr<QXmppCallInvite>)
-
-#endif  // QXMPPJINGLEMESSAGEINITIATIONMANAGER_H

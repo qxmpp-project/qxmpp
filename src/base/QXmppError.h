@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPERROR_H
-#define QXMPPERROR_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -55,5 +54,3 @@ struct QXMPP_EXPORT QXmppError
         return {};
     }
 };
-
-#endif  // QXMPPERROR_H

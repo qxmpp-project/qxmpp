@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPARCHIVEIQ_H
-#define QXMPPARCHIVEIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 #include "QXmppResultSet.h"
@@ -224,5 +223,3 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
     /// \endcond
 };
-
-#endif  // QXMPPARCHIVEIQ_H

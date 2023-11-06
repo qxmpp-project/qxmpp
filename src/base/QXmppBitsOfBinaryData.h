@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPBITSOFBINARYDATA_H
-#define QXMPPBITSOFBINARYDATA_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -52,5 +51,3 @@ public:
 private:
     QSharedDataPointer<QXmppBitsOfBinaryDataPrivate> d;
 };
-
-#endif  // QXMPPBITSOFBINARYDATA_H

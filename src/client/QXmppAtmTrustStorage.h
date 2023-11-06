@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPATMTRUSTSTORAGE_H
-#define QXMPPATMTRUSTSTORAGE_H
+#pragma once
 
 #include "QXmppTrustStorage.h"
 
@@ -22,5 +21,3 @@ public:
     virtual QXmppTask<void> removeKeysForPostponedTrustDecisions(const QString &encryption) = 0;
     virtual QXmppTask<QHash<bool, QMultiHash<QString, QByteArray>>> keysForPostponedTrustDecisions(const QString &encryption, const QList<QByteArray> &senderKeyIds = {}) = 0;
 };
-
-#endif  // QXMPPATMTRUSTSTORAGE_H

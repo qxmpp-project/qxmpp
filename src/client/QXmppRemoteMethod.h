@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPREMOTEMETHOD_H
-#define QXMPPREMOTEMETHOD_H
+#pragma once
 
 #include "QXmppRpcIq.h"
 
@@ -40,5 +39,3 @@ private:
     QXmppClient *m_client;
     QXmppRemoteMethodResult m_result;
 };
-
-#endif  // QXMPPREMOTEMETHOD_H

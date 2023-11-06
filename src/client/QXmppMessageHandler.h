@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPMESSAGEHANDLER_H
-#define QXMPPMESSAGEHANDLER_H
+#pragma once
 
 #include "QXmppExtension.h"
 #include "QXmppMessage.h"
@@ -17,5 +16,3 @@ class QXMPP_EXPORT QXmppMessageHandler : public QXmppExtension
 public:
     virtual bool handleMessage(const QXmppMessage &) = 0;
 };
-
-#endif  // QXMPPMESSAGEHANDLER_H

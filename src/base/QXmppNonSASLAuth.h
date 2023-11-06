@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXmppNonSASLAuth_H
-#define QXmppNonSASLAuth_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -38,5 +37,3 @@ private:
     QString m_password;
     QString m_resource;
 };
-
-#endif  // QXmppNonSASLAuth_H

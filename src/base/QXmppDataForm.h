@@ -3,8 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPDATAFORM_H
-#define QXMPPDATAFORM_H
+#pragma once
 
 #include "QXmppStanza.h"
 
@@ -212,5 +211,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppDataForm)
-
-#endif

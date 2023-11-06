@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPCARBONMANAGERV2_H
-#define QXMPPCARBONMANAGERV2_H
+#pragma once
 
 #include "QXmppClientExtension.h"
 
@@ -25,5 +24,3 @@ private:
     // placeholder (we may need a d-ptr in the future)
     void *d;
 };
-
-#endif  // QXMPPCARBONMANAGERV2_H

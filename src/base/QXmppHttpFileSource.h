@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPHTTPFILESOURCE_H
-#define QXMPPHTTPFILESOURCE_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -31,5 +30,3 @@ private:
     static_assert(sizeof(QUrl) == sizeof(void *));
     QUrl m_url;
 };
-
-#endif  // QXMPPHTTPFILESOURCE_H

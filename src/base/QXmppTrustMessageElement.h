@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPTRUSTMESSAGEELEMENT_H
-#define QXMPPTRUSTMESSAGEELEMENT_H
+#pragma once
 
 #include "QXmppGlobal.h"
 
@@ -47,5 +46,3 @@ private:
 };
 
 Q_DECLARE_TYPEINFO(QXmppTrustMessageElement, Q_MOVABLE_TYPE);
-
-#endif  // QXMPPTRUSTMESSAGEELEMENT_H

@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPENTITYTIMEIQ_H
-#define QXMPPENTITYTIMEIQ_H
+#pragma once
 
 #include "QXmppIq.h"
 
@@ -37,5 +36,3 @@ private:
     int m_tzo;
     QDateTime m_utc;
 };
-
-#endif  // QXMPPENTITYTIMEIQ_H

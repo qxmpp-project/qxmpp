@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPGEOLOCITEM_H
-#define QXMPPGEOLOCITEM_H
+#pragma once
 
 #include "QXmppPubSubBaseItem.h"
 
@@ -52,5 +51,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QXmppGeolocItem)
-
-#endif  // QXMPPGEOLOCITEM_H

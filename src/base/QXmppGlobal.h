@@ -5,8 +5,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPGLOBAL_H
-#define QXMPPGLOBAL_H
+#pragma once
 
 #include "qxmpp_export.h"
 
@@ -182,5 +181,3 @@ struct Cancelled
 };
 
 }  // namespace QXmpp
-
-#endif  // QXMPPGLOBAL_H

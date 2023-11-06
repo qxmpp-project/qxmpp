@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPE2EEEXTENSION_H
-#define QXMPPE2EEEXTENSION_H
+#pragma once
 
 #include "QXmppError.h"
 #include "QXmppExtension.h"
@@ -38,5 +37,3 @@ public:
     virtual bool isEncrypted(const QDomElement &) = 0;
     virtual bool isEncrypted(const QXmppMessage &) = 0;
 };
-
-#endif  // QXMPPE2EEEXTENSION_H

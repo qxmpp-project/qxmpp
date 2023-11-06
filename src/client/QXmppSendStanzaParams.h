@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSENDSTANZAPARAMS_H
-#define QXMPPSENDSTANZAPARAMS_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppTrustLevel.h"
@@ -33,5 +32,3 @@ public:
 private:
     QSharedDataPointer<QXmppSendStanzaParamsPrivate> d;
 };
-
-#endif  // QXMPPSENDSTANZAPARAMS_H

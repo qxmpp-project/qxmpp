@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#ifndef QXMPPSTREAMMANAGEMENT_P_H
-#define QXMPPSTREAMMANAGEMENT_P_H
+#pragma once
 
 #include "QXmppGlobal.h"
 #include "QXmppStanza.h"
@@ -199,5 +198,3 @@ private:
     unsigned int m_lastIncomingSequenceNumber = 0;
 };
 /// \endcond
-
-#endif
