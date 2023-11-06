@@ -41,11 +41,13 @@ void tst_QXmppMixItem::testInfo()
         "</item>");
 
     QXmppMixInfoItem item;
+    QCOMPARE(item.formType(), QXmppDataForm::None);
     QVERIFY(item.name().isEmpty());
     QVERIFY(item.description().isEmpty());
     QVERIFY(item.contactJids().isEmpty());
 
     parsePacket(item, xml);
+    QCOMPARE(item.formType(), QXmppDataForm::Result);
     QCOMPARE(item.name(), QStringLiteral("Witches Coven"));
     QCOMPARE(item.description(), QStringLiteral("A location not far from the blasted "
                                                 "heath where the three witches meet"));
@@ -54,6 +56,8 @@ void tst_QXmppMixItem::testInfo()
     serializePacket(item, xml);
 
     // test setters
+    item.setFormType(QXmppDataForm::Submit);
+    QCOMPARE(item.formType(), QXmppDataForm::Submit);
     item.setName("Skynet Development");
     QCOMPARE(item.name(), QStringLiteral("Skynet Development"));
     item.setDescription("Very cool development group.");

@@ -1,10 +1,12 @@
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #ifndef QXMPPMIXINFOITEM_H
 #define QXMPPMIXINFOITEM_H
 
+#include "QXmppDataForm.h"
 #include "QXmppPubSubBaseItem.h"
 
 class QXmppMixInfoItemPrivate;
@@ -19,6 +21,9 @@ public:
 
     QXmppMixInfoItem &operator=(const QXmppMixInfoItem &);
     QXmppMixInfoItem &operator=(QXmppMixInfoItem &&);
+
+    QXmppDataForm::Type formType() const;
+    void setFormType(QXmppDataForm::Type formType);
 
     const QString &name() const;
     void setName(QString);
