@@ -224,6 +224,8 @@ inline constexpr QStringView ns_sasl_2 = u"urn:xmpp:sasl:2";
 inline constexpr QStringView ns_mix_pam = u"urn:xmpp:mix:pam:1";
 inline constexpr QStringView ns_mix_roster = u"urn:xmpp:mix:roster:0";
 inline constexpr QStringView ns_mix_presence = u"urn:xmpp:presence:0";
+// XEP-0406: Mediated Information eXchange (MIX): MIX Administration
+inline constexpr QStringView ns_mix_admin = u"urn:xmpp:mix:admin:0";
 // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
 inline constexpr QStringView ns_mix_misc = u"urn:xmpp:mix:misc:0";
 // XEP-0428: Fallback Indication
