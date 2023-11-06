@@ -47,6 +47,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMamIq.h
     base/QXmppMessage.h
     base/QXmppMessageReaction.h
+    base/QXmppMixConfigItem.h
     base/QXmppMixInfoItem.h
     base/QXmppMixInvitation.h
     base/QXmppMixIq.h
