@@ -17,6 +17,7 @@ static const auto CONTACT_JIDS = QStringLiteral("Contact");
 class QXmppMixInfoItemPrivate : public QSharedData, public QXmppDataFormBase
 {
 public:
+    QXmppDataForm::Type dataFormType = QXmppDataForm::None;
     QString name;
     QString description;
     QStringList contactJids;
@@ -25,6 +26,7 @@ public:
 
     void reset()
     {
+        dataFormType = QXmppDataForm::None;
         name.clear();
         description.clear();
         contactJids.clear();
@@ -37,7 +39,9 @@ public:
 
     void parseForm(const QXmppDataForm &form) override
     {
+        dataFormType = form.type();
         const auto fields = form.fields();
+
         for (const auto &field : fields) {
             const auto key = field.key();
             const auto value = field.value();
@@ -51,8 +55,11 @@ public:
             }
         }
     }
+
     void serializeForm(QXmppDataForm &form) const override
     {
+        form.setType(dataFormType);
+
         using Type = QXmppDataForm::Field::Type;
         serializeNullable(form, Type::TextSingleField, NAME, name);
         serializeNullable(form, Type::TextSingleField, DESCRIPTION, description);
@@ -86,6 +93,26 @@ QXmppMixInfoItem &QXmppMixInfoItem::operator=(const QXmppMixInfoItem &) = defaul
 /// Default move-assignment operator
 QXmppMixInfoItem &QXmppMixInfoItem::operator=(QXmppMixInfoItem &&) = default;
 QXmppMixInfoItem::~QXmppMixInfoItem() = default;
+
+///
+/// Returns the type of the data form that contains the channel information.
+///
+/// \return the data form's type
+///
+QXmppDataForm::Type QXmppMixInfoItem::formType() const
+{
+    return d->dataFormType;
+}
+
+///
+/// Sets the type of the data form that contains the channel information.
+///
+/// \param formType data form's type
+///
+void QXmppMixInfoItem::setFormType(QXmppDataForm::Type formType)
+{
+    d->dataFormType = formType;
+}
 
 ///
 /// Returns the user-specified name of the MIX channel. This is not the name
@@ -168,9 +195,7 @@ void QXmppMixInfoItem::parsePayload(const QDomElement &payload)
 
 void QXmppMixInfoItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    auto form = d->toDataForm();
-    form.setType(QXmppDataForm::Result);
-    form.toXml(writer);
+    d->toDataForm().toXml(writer);
 }
 /// \endcond
 
