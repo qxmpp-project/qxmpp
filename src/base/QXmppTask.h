@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2022 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2022 Jonah Brüchert <jbb@kaidan.im>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -31,7 +32,7 @@ public:
     bool isFinished() const;
     void setFinished(bool);
     bool isContextAlive();
-    void setContext(QObject *);
+    void setContext(const QObject *);
     void *result() const;
     void setResult(void *);
     void resetResult() { setResult(nullptr); }
@@ -98,7 +99,7 @@ public:
 #ifndef QXMPP_DOC
     template<typename Continuation>
 #endif
-    void then(QObject *context, Continuation continuation)
+    void then(const QObject *context, Continuation continuation)
     {
         if constexpr (!std::is_void_v<T>) {
             static_assert(std::is_invocable_v<Continuation, T &&>, "Function needs to be invocable with T &&.");
@@ -192,7 +193,7 @@ public:
     ///
     /// Converts the Task into a QFuture. Afterwards the QXmppTask object is invalid.
     ///
-    QFuture<T> toFuture(QObject *context)
+    QFuture<T> toFuture(const QObject *context)
     {
         QFutureInterface<T> interface;
 
