@@ -366,7 +366,7 @@ void QXmppClient::setEncryptionExtension(QXmppE2eeExtension *extension)
 }
 
 /// Returns a list containing all the client's extensions.
-QList<QXmppClientExtension *> QXmppClient::extensions()
+QList<QXmppClientExtension *> QXmppClient::extensions() const
 {
     return d->extensions;
 }
