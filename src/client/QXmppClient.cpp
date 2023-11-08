@@ -188,15 +188,16 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 /// \since QXmpp 1.5
 ///
 
+///
 /// Creates a QXmppClient object.
-/// \param parent is passed to the QObject's constructor.
-/// The default value is 0.
-
-QXmppClient::QXmppClient(QObject *parent)
+///
+/// \param initialExtensions can be used to set the initial set of extensions.
+/// \param parent is passed to the QObject's constructor. The default value is 0.
+///
+QXmppClient::QXmppClient(InitialExtensions initialExtensions, QObject *parent)
     : QXmppLoggable(parent),
       d(new QXmppClientPrivate(this))
 {
-
     d->stream = new QXmppOutgoingClient(this);
     d->addProperCapability(d->clientPresence);
 
@@ -236,12 +237,29 @@ QXmppClient::QXmppClient(QObject *parent)
     // logging
     setLogger(QXmppLogger::getLogger());
 
+    // always add TLS manager (it is private and can't be added by the user)
     addExtension(new QXmppTlsManager);
-    addExtension(new QXmppRosterManager(this));
-    addExtension(new QXmppVCardManager);
-    addExtension(new QXmppVersionManager);
-    addExtension(new QXmppEntityTimeManager());
-    addExtension(new QXmppDiscoveryManager());
+
+    switch (initialExtensions) {
+    case NoExtensions:
+        break;
+    case BasicExtensions:
+        addExtension(new QXmppRosterManager(this));
+        addExtension(new QXmppVCardManager);
+        addExtension(new QXmppVersionManager);
+        addExtension(new QXmppEntityTimeManager());
+        addExtension(new QXmppDiscoveryManager());
+        break;
+    }
+}
+
+///
+/// Creates a QXmppClient object.
+/// \param parent is passed to the QObject's constructor.
+///
+QXmppClient::QXmppClient(QObject *parent)
+    : QXmppClient(BasicExtensions, parent)
+{
 }
 
 QXmppClient::~QXmppClient() = default;
