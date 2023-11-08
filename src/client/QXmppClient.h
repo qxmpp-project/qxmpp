@@ -121,6 +121,16 @@ public:
         ResumedStream
     };
 
+    /// Used to decide which extensions should be added by default.
+    /// \since QXmpp 1.6
+    enum InitialExtensions {
+        /// Creates a client without any extensions.
+        NoExtensions,
+        /// Creates a client with the default set of extensions.
+        BasicExtensions,
+    };
+
+    QXmppClient(InitialExtensions, QObject *parent = nullptr);
     QXmppClient(QObject *parent = nullptr);
     ~QXmppClient() override;
 
