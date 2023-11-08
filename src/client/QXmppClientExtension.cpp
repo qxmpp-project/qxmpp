@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -54,7 +55,7 @@ bool QXmppClientExtension::handleStanza(const QDomElement &, const std::optional
 ///
 /// Returns the client which loaded this extension.
 ///
-QXmppClient *QXmppClientExtension::client()
+QXmppClient *QXmppClientExtension::client() const
 {
     return m_client;
 }
