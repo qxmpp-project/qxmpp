@@ -44,7 +44,7 @@ public:
     virtual bool handleStanza(const QDomElement &stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
 
 protected:
-    QXmppClient *client();
+    QXmppClient *client() const;
     virtual void setClient(QXmppClient *client);
 
     virtual void onRegistered(QXmppClient *client);
