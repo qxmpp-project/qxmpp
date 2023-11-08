@@ -240,17 +240,17 @@ QXmppClient::QXmppClient(InitialExtensions initialExtensions, QObject *parent)
     setLogger(QXmppLogger::getLogger());
 
     // always add TLS manager (it is private and can't be added by the user)
-    addExtension(new QXmppTlsManager);
+    addNewExtension<QXmppTlsManager>();
 
     switch (initialExtensions) {
     case NoExtensions:
         break;
     case BasicExtensions:
-        addExtension(new QXmppRosterManager(this));
-        addExtension(new QXmppVCardManager);
-        addExtension(new QXmppVersionManager);
-        addExtension(new QXmppEntityTimeManager());
-        addExtension(new QXmppDiscoveryManager());
+        addNewExtension<QXmppRosterManager>(this);
+        addNewExtension<QXmppVCardManager>();
+        addNewExtension<QXmppVersionManager>();
+        addNewExtension<QXmppEntityTimeManager>();
+        addNewExtension<QXmppDiscoveryManager>();
         break;
     }
 }
