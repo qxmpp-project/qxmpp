@@ -54,7 +54,7 @@ bool QXmppClientExtension::handleStanza(const QDomElement &, const std::optional
 ///
 /// Returns the client which loaded this extension.
 ///
-QXmppClient *QXmppClientExtension::client()
+QXmppClient *QXmppClientExtension::client() const
 {
     return m_client;
 }
