@@ -8,9 +8,6 @@
 
 #include <QObject>
 
-Q_DECLARE_METATYPE(QXmppIq::Type);
-Q_DECLARE_METATYPE(QXmppMixIq::Type);
-
 class tst_QXmppMixIq : public QObject
 {
     Q_OBJECT

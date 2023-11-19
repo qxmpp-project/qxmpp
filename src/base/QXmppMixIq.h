@@ -74,4 +74,6 @@ private:
     QSharedDataPointer<QXmppMixIqPrivate> d;
 };
 
+Q_DECLARE_METATYPE(QXmppMixIq::Type)
+
 #endif  // QXMPPMIXIQ_H
