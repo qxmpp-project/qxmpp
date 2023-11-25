@@ -991,7 +991,7 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                 };
                 interface.finish(error);
             } else {
-                const auto areDeliveryReceiptsUsed = message.isReceiptRequested() || !message.receiptId().isEmpty();
+                const auto deliveryReceiptsUsed = message.isReceiptRequested() || !message.receiptId().isEmpty();
                 const auto chatMarkerUsed = message.marker() != QXmppMessage::NoMarker;
 
                 // The following cases are covered:
@@ -1003,15 +1003,15 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                 //       in case of delivery receipts or chat marker usage
                 //  2.2. Other message (e.g., trust message) => usage of EME and fallback body to
                 //       look like a normal message
-                if (!message.body().isEmpty() || (message.state() == QXmppMessage::None && !areDeliveryReceiptsUsed && !chatMarkerUsed)) {
+                if (!message.body().isEmpty() || (message.state() == QXmppMessage::None && !deliveryReceiptsUsed && !chatMarkerUsed)) {
                     message.setEncryptionMethod(QXmpp::Omemo2);
 
                     // A message processing hint for instructing the server to store the message is
                     // not needed because of the public fallback body.
                     message.setE2eeFallbackBody(QStringLiteral("This message is encrypted with %1 but could not be decrypted").arg(message.encryptionName()));
                     message.setIsFallback(true);
-                } else if (areDeliveryReceiptsUsed || chatMarkerUsed) {
-                    // A message processing hint for instructing the server to tore the message is
+                } else if (deliveryReceiptsUsed || chatMarkerUsed) {
+                    // A message processing hint for instructing the server to store the message is
                     // needed because of the missing public fallback body.
                     message.addHint(QXmppMessage::Store);
                 }
