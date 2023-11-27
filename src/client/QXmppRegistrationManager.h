@@ -161,12 +161,10 @@ class QXmppRegistrationManagerPrivate;
 /// <h4>Filling out the registration form</h4>
 ///
 /// Now you need to fill out the registration form. The server can close the connection during that
-/// time. If that happens, QXmppClient::errorOccurred() is emitted with
-/// QXmpp::StreamError::ConnectionTimeout as its parameter. That is due to some servers kicking
-/// unauthorized clients after some time when the clients are inactive. That is often the case when
-/// user interaction is required before the completed form is submitted to the server. In order to
-/// support account creation for both servers closing the connection and servers keeping it open,
-/// you need to handle those cases appropriately.
+/// time. It is due to some servers kicking unauthorized clients after some time when the clients
+/// are inactive. That is often the case when user interaction is required before the completed form
+/// is submitted to the server. In order to support account creation for both servers closing the
+/// connection and servers keeping it open, you need to handle those cases appropriately.
 ///
 /// If the returned IQ contains a data form, that can be displayed to a user or
 /// can be filled out in another way.
@@ -339,11 +337,10 @@ protected:
     void onRegistered(QXmppClient *client) override;
     void onUnregistered(QXmppClient *client) override;
 
-private Q_SLOTS:
-    void handleDiscoInfo(const QXmppDiscoveryIq &iq);
-
 private:
+    void handleDiscoInfo(const QXmppDiscoveryIq &iq);
     void setSupportedByServer(bool supportedByServer);
+    void handleAccountDeleted();
 
     const std::unique_ptr<QXmppRegistrationManagerPrivate> d;
 };

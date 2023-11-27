@@ -91,6 +91,7 @@ void QXmppRegistrationManager::deleteAccount()
     auto iq = QXmppRegisterIq::createUnregistrationRequest();
     d->deleteAccountIqId = iq.id();
 
+    client()->setIgnoredStreamErrors({ QXmpp::StreamError::Conflict, QXmpp::StreamError::NotAuthorized });
     client()->sendPacket(iq);
 }
 
@@ -174,6 +175,12 @@ bool QXmppRegistrationManager::registerOnConnectEnabled() const
 void QXmppRegistrationManager::setRegisterOnConnectEnabled(bool enabled)
 {
     d->registerOnConnectEnabled = enabled;
+
+    if (enabled) {
+        client()->setIgnoredStreamErrors({ QXmpp::StreamError::ConnectionTimeout });
+    } else {
+        client()->setIgnoredStreamErrors({});
+    }
 }
 
 /// \cond
@@ -258,8 +265,7 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
 
             switch (iq.type()) {
             case QXmppIq::Result:
-                info(u"Account deleted successfully."_s);
-                Q_EMIT accountDeleted();
+                handleAccountDeleted();
                 client()->disconnectFromServer();
                 break;
             case QXmppIq::Error:
@@ -291,8 +297,14 @@ void QXmppRegistrationManager::onRegistered(QXmppClient *client)
         connect(disco, &QXmppDiscoveryManager::infoReceived, this, &QXmppRegistrationManager::handleDiscoInfo);
     }
 
-    connect(client, &QXmppClient::disconnected, this, [this]() {
+    connect(client, &QXmppClient::disconnected, this, [this, client]() {
         setSupportedByServer(false);
+        client->setIgnoredStreamErrors({});
+
+        if (!d->deleteAccountIqId.isEmpty()) {
+            handleAccountDeleted();
+            d->deleteAccountIqId.clear();
+        }
     });
 }
 
@@ -318,4 +330,10 @@ void QXmppRegistrationManager::setSupportedByServer(bool registrationSupported)
         d->supportedByServer = registrationSupported;
         Q_EMIT supportedByServerChanged();
     }
+}
+
+void QXmppRegistrationManager::handleAccountDeleted()
+{
+    info(u"Account deleted successfully."_s);
+    Q_EMIT accountDeleted();
 }
