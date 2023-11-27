@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -123,6 +124,13 @@ QStringList QXmppClientPrivate::discoveryFeatures()
 
 void QXmppClientPrivate::onErrorOccurred(const QString &text, const QXmppOutgoingClient::ConnectionError &err, QXmppClient::Error oldError)
 {
+    // Skip stream errors that are valid during special procedures such as account
+    // creation/deletion.
+    if (const auto streamError = std::get_if<QXmpp::StreamError>(&err);
+        streamError && ignoredStreamErrors.contains(*streamError)) {
+        return;
+    }
+
     if (q->configuration().autoReconnectionEnabled()) {
         if (oldError == QXmppClient::XmppStreamError) {
             // if we receive a resource conflict, inhibit reconnection
@@ -929,6 +937,18 @@ bool QXmppClient::injectMessage(QXmppMessage &&message)
         Q_EMIT messageReceived(message);
     }
     return handled;
+}
+
+///
+/// Sets stream errors that are ignored if they occur.
+///
+/// \param errors stream errors to be ignored
+///
+/// \since QXmpp 1.9
+///
+void QXmppClient::setIgnoredStreamErrors(const QVector<QXmpp::StreamError> &errors)
+{
+    d->ignoredStreamErrors = errors;
 }
 
 ///

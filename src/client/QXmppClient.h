@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -11,6 +12,7 @@
 #include "QXmppPresence.h"
 #include "QXmppSendResult.h"
 #include "QXmppSendStanzaParams.h"
+#include "QXmppStreamError.h"
 
 #include <memory>
 #include <variant>
@@ -320,6 +322,8 @@ private:
     QXmppOutgoingClient *stream() const;
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
     bool injectMessage(QXmppMessage &&message);
+
+    void setIgnoredStreamErrors(const QVector<QXmpp::StreamError> &);
 
 private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
