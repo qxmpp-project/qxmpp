@@ -16,7 +16,6 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppTask.h"
-#include "QXmppUtils.h"
 
 #include <QCryptographicHash>
 #include <QDnsLookup>

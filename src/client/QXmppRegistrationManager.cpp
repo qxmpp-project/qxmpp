@@ -10,7 +10,6 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppRegisterIq.h"
 #include "QXmppStreamFeatures.h"
-#include "QXmppUtils.h"
 
 #include <QDomElement>
 

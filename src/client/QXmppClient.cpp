@@ -22,7 +22,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppTask.h"
 #include "QXmppTlsManager_p.h"
-#include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
