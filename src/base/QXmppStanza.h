@@ -137,6 +137,7 @@ public:
             UnexpectedRequest,          ///< The request was unexpected.
             PolicyViolation,            ///< The entity has violated a local server policy. \since QXmpp 1.3
             EmailConfirmationRequired,  ///< The server requires the entitiy to confirm an email message that the server sent to the entity. \since QXmpp 1.6
+            ConnectionTimeout,          ///< The server closed the connection to the entity because the server did not receive a response to a request from it. \since QXmpp 1.6
         };
 
         Error();

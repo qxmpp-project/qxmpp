@@ -561,6 +561,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             d->xmppStreamError = QXmppStanza::Error::Conflict;
         } else if (!nodeRecv.firstChildElement("not-authorized").isNull()) {
             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+        } else if (!nodeRecv.firstChildElement("connection-timeout").isNull()) {
+            d->xmppStreamError = QXmppStanza::Error::ConnectionTimeout;
         } else {
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
         }
