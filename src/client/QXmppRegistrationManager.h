@@ -154,9 +154,8 @@ class QXmppRegistrationManagerPrivate;
 /// <h4>Filling out the registration form</h4>
 ///
 /// Now you need to fill out the registration form. If that takes some time, which is often the case
-/// when user interaction is required, the server can close the connection triggering
-/// QXmppClient::error() to emit QXmppStanza::Error::ConnectionTimeout before the completed form is
-/// submitted to the server. That is due to some servers kicking unauthorized clients after a few
+/// when user interaction is required, the server can close the connection before the completed form
+/// is submitted to the server. That is due to some servers kicking unauthorized clients after a few
 /// seconds when they are inactive. In order to support account creation for both servers closing
 /// the connection and servers keeping it open, you need to handle those cases appropriately.
 ///

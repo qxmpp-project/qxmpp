@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2020 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -18,9 +19,9 @@
 #ifndef QXMPPCLIENT_P_H
 #define QXMPPCLIENT_P_H
 
+#include "QXmppClient.h"
 #include "QXmppPresence.h"
 
-class QXmppClient;
 class QXmppClientExtension;
 class QXmppE2eeExtension;
 class QXmppLogger;
@@ -38,6 +39,7 @@ public:
     QXmppLogger *logger;
     /// Pointer to the XMPP stream
     QXmppOutgoingClient *stream;
+    QMap<QXmppClient::Error, QVector<QXmppStanza::Error::Condition>> ignoredErrors;
 
     QXmppE2eeExtension *encryptionExtension;
 
