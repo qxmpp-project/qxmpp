@@ -207,12 +207,17 @@ class QXmppRegistrationManagerPrivate;
 ///
 /// <h4>Connecting with the newly created account</h4>
 ///
-/// You need to disconnect now. The user can then enter their credentials and
-/// connect as usually.
+/// You need to disconnect now. The user can then enter their credentials and connect as usual.
 ///
 /// It is also possible to extract username and password from the sent form,
 /// but that does not work always. There might also be forms that have no clear
 /// username or password fields.
+///
+/// Some servers require new users to confirm their account creation via instructions within an
+/// email message sent by the server to the user after a successful registration. That usually
+/// involves opening a URL. Afterwards, the account is activated and the user can log in. In order
+/// to cover that case, you need to handle QXmppStanza::Error::EmailConfirmationRequired emitted via
+/// QXmppClient::error() during the login attempt.
 ///
 /// \ingroup Managers
 ///

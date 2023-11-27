@@ -135,7 +135,8 @@ public:
             SubscriptionRequired,       ///< The requester needs to subscribe first.
             UndefinedCondition,         ///< An undefined condition was hit.
             UnexpectedRequest,          ///< The request was unexpected.
-            PolicyViolation             ///< The entity has violated a local server policy. \since QXmpp 1.3
+            PolicyViolation,            ///< The entity has violated a local server policy. \since QXmpp 1.3
+            EmailConfirmationRequired,  ///< The server requires the entitiy to confirm an email message that the server sent to the entity. \since QXmpp 1.6
         };
 
         Error();

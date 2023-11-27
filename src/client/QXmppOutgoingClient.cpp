@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -587,12 +588,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         } else if (nodeRecv.tagName() == "failure") {
             QXmppSaslFailure failure;
             failure.parse(nodeRecv);
+            const auto condition = failure.condition();
 
             // RFC3920 defines the error condition as "not-authorized", but
             // some broken servers use "bad-auth" instead. We tolerate this
             // by remapping the error to "not-authorized".
-            if (failure.condition() == "not-authorized" || failure.condition() == "bad-auth") {
+            if (condition == "not-authorized" || condition == "bad-auth") {
                 d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+            } else if (const auto text = failure.text();
+                       (condition == "account-disabled" || condition == "temporary-auth-failure") &&
+                       text.contains("activat") && text.contains("mail")) {
+                d->xmppStreamError = QXmppStanza::Error::EmailConfirmationRequired;
             } else {
                 d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
             }
