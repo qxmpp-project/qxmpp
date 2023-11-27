@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -189,9 +190,20 @@ void QXmppSaslFailure::setCondition(const QString &condition)
     m_condition = condition;
 }
 
+QString QXmppSaslFailure::text() const
+{
+    return m_text;
+}
+
+void QXmppSaslFailure::setText(const QString &text)
+{
+    m_text = text;
+}
+
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
     m_condition = element.firstChildElement().tagName();
+    m_text = element.firstChildElement(QStringLiteral("text")).text();
 }
 
 void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
@@ -201,6 +213,14 @@ void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
     if (!m_condition.isEmpty()) {
         writer->writeEmptyElement(m_condition);
     }
+
+    if (!m_text.isEmpty()) {
+        writer->writeStartElement(QStringLiteral("text"));
+        writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
+        writer->writeCharacters(m_text);
+        writer->writeEndElement();
+    }
+
     writer->writeEndElement();
 }
 

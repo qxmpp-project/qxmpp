@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -126,6 +127,7 @@ void tst_QXmppSasl::testFailure()
     QXmppSaslFailure failure;
     parsePacket(failure, xml);
     QCOMPARE(failure.condition(), QString());
+    QVERIFY(failure.text().isEmpty());
     serializePacket(failure, xml);
 
     // not authorized
@@ -134,6 +136,24 @@ void tst_QXmppSasl::testFailure()
     parsePacket(failure2, xml2);
     QCOMPARE(failure2.condition(), QLatin1String("not-authorized"));
     serializePacket(failure2, xml2);
+
+    // email verification required
+    const QByteArray xml3 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\">"
+                            "<account-disabled/>"
+                            "<text xml:lang=\"en\">Your account has not been activated yet. Please check your email inbox for an activation link</text>"
+                            "</failure>";
+
+    QXmppSaslFailure failure3;
+    parsePacket(failure3, xml3);
+    QCOMPARE(failure3.condition(), QLatin1String("account-disabled"));
+    QCOMPARE(failure3.text(), QStringLiteral("Your account has not been activated yet. Please check your email inbox for an activation link"));
+    serializePacket(failure3, xml3);
+
+    QXmppSaslFailure failure4;
+    failure4.setCondition(QStringLiteral("account-disabled"));
+    failure4.setText("Your account has not been activated yet. Please check your email inbox for an activation link");
+    QCOMPARE(failure4.text(), QStringLiteral("Your account has not been activated yet. Please check your email inbox for an activation link"));
+    serializePacket(failure4, xml3);
 }
 
 void tst_QXmppSasl::testResponse_data()

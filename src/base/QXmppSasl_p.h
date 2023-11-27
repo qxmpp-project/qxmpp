@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -154,6 +155,9 @@ public:
     QString condition() const;
     void setCondition(const QString &condition);
 
+    QString text() const;
+    void setText(const QString &text);
+
     /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
@@ -161,6 +165,7 @@ public:
 
 private:
     QString m_condition;
+    QString m_text;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslResponse : public QXmppNonza
