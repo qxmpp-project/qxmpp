@@ -87,7 +87,35 @@ QXmppClient *QXmppClientExtension::client()
 ///
 void QXmppClientExtension::setClient(QXmppClient *client)
 {
+    if (m_client != nullptr) {
+        onUnregistered(m_client);
+    }
+
     m_client = client;
+
+    if (client != nullptr) {
+        onRegistered(client);
+    }
+}
+
+///
+/// Called after the extension has been added to a QXmppClient.
+///
+/// \param client
+///
+void QXmppClientExtension::onRegistered(QXmppClient *client)
+{
+    Q_UNUSED(client);
+}
+
+///
+/// Called after the extension has been removed from a QXmppClient.
+///
+/// \param client
+///
+void QXmppClientExtension::onUnregistered(QXmppClient *client)
+{
+    Q_UNUSED(client);
 }
 
 ///

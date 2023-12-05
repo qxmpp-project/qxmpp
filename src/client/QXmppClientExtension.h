@@ -47,6 +47,9 @@ protected:
     QXmppClient *client();
     virtual void setClient(QXmppClient *client);
 
+    virtual void onRegistered(QXmppClient *client);
+    virtual void onUnregistered(QXmppClient *client);
+
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
     bool injectMessage(QXmppMessage &&message);
 

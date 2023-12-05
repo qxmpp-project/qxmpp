@@ -298,20 +298,20 @@ bool QXmppClient::insertExtension(int index, QXmppClientExtension *extension)
     }
 
     extension->setParent(this);
-    extension->setClient(this);
     d->extensions.insert(index, extension);
+    extension->setClient(this);
     return true;
 }
 
+///
 /// Unregisters the given extension from the client. If the extension
 /// is found, it will be destroyed.
 ///
-/// \param extension
-
 bool QXmppClient::removeExtension(QXmppClientExtension *extension)
 {
     if (d->extensions.contains(extension)) {
         d->extensions.removeAll(extension);
+        extension->setClient(nullptr);
         delete extension;
         return true;
     } else {
