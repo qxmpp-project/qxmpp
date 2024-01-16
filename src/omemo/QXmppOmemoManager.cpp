@@ -683,7 +683,7 @@ QXmppOmemoOwnDevice Manager::ownDevice()
 ///
 /// You must build sessions before you can get devices with corresponding keys.
 ///
-/// /\return all devices except the own device
+/// \return all devices except the own device
 ///
 QXmppTask<QVector<QXmppOmemoDevice>> Manager::devices()
 {
