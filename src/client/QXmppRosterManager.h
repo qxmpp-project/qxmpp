@@ -129,6 +129,10 @@ Q_SIGNALS:
     /// removed as a result of roster push.
     void itemRemoved(const QString &bareJid);
 
+protected:
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
+
 private Q_SLOTS:
     void _q_connected();
     void _q_disconnected();

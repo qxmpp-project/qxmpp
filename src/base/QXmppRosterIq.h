@@ -12,6 +12,10 @@
 #include <QSet>
 #include <QSharedDataPointer>
 
+namespace QXmpp::Private {
+struct RosterData;
+}
+
 class QXmppRosterIqPrivate;
 
 ///
@@ -78,6 +82,8 @@ public:
         /// \endcond
 
     private:
+        friend struct QXmpp::Private::RosterData;
+
         void toXml(QXmlStreamWriter *writer, bool external) const;
 
         QString getSubscriptionTypeStr() const;
