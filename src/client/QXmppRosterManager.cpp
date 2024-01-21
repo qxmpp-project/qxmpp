@@ -6,15 +6,58 @@
 
 #include "QXmppRosterManager.h"
 
+#include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
+#include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
+
+namespace QXmpp::Private {
+
+struct RosterData {
+    QList<QXmppRosterIq::Item> items;
+
+    static std::variant<RosterData, QXmppError> fromDom(const QDomElement &el)
+    {
+        if (el.tagName() != u"roster" && el.namespaceURI() != ns_qxmpp_export) {
+            return QXmppError { QStringLiteral("Invalid element."), {} };
+        }
+
+        RosterData d;
+
+        for (const auto &itemEl : iterChildElements(el, u"item", ns_roster)) {
+            QXmppRosterIq::Item item;
+            item.parse(itemEl);
+            d.items.push_back(std::move(item));
+        }
+
+        return d;
+    }
+
+    void toXml(QXmlStreamWriter &writer) const
+    {
+        writer.writeStartElement(QSL65("roster"));
+        for (const auto &item : items) {
+            item.toXml(&writer, true);
+        }
+        writer.writeEndElement();
+    }
+};
+
+static void serializeRosterData(const RosterData &d, QXmlStreamWriter &writer)
+{
+    d.toXml(writer);
+}
+
+}  // namespace QXmpp::Private
 
 ///
 /// \fn QXmppRosterManager::subscriptionRequestReceived
@@ -68,6 +111,8 @@ void QXmppRosterManagerPrivate::clear()
 QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
     : d(std::make_unique<QXmppRosterManagerPrivate>())
 {
+    QXmppExportData::registerExtension<RosterData, RosterData::fromDom, serializeRosterData>(u"roster", ns_qxmpp_export);
+
     connect(client, &QXmppClient::connected,
             this, &QXmppRosterManager::_q_connected);
 
@@ -470,6 +515,34 @@ bool QXmppRosterManager::unsubscribe(const QString &bareJid, const QString &reas
     packet.setType(QXmppPresence::Unsubscribe);
     packet.setStatusText(reason);
     return client()->sendPacket(packet);
+}
+
+void QXmppRosterManager::onRegistered(QXmppClient *client)
+{
+    // data import/export
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        auto importData = [this](const RosterData &data) -> QXmppTask<std::variant<Success, QXmppError>> {
+            QXmppRosterIq iq;
+            iq.setItems(data.items);
+            iq.setType(QXmppIq::Set);
+            return this->client()->sendGenericIq(std::move(iq));
+        };
+
+        auto exportData = [this]() {
+            return chainMapSuccess(requestRoster(), this, [](QXmppRosterIq &&iq) -> RosterData {
+                return { iq.items() };
+            });
+        };
+
+        manager->registerExportData<RosterData>(importData, exportData);
+    }
+}
+
+void QXmppRosterManager::onUnregistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        manager->unregisterExportData<RosterData>();
+    }
 }
 
 ///
