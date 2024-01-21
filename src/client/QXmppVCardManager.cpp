@@ -4,27 +4,65 @@
 
 #include "QXmppVCardManager.h"
 
+#include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppError.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppTask.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 #include "QXmppVCardIq.h"
 
 using namespace QXmpp::Private;
+
+namespace QXmpp::Private {
+
+struct VCardData {
+    QXmppVCardIq vCard;
+
+    static std::variant<VCardData, QXmppError> fromDom(const QDomElement &el)
+    {
+        Q_ASSERT(el.tagName() == u"vcard");
+        Q_ASSERT(el.namespaceURI() == ns_qxmpp_export);
+
+        auto vCardEl = firstChildElement(el, u"vCard", ns_vcard);
+        if (vCardEl.isNull()) {
+            return QXmppError { QStringLiteral("Missing required <vCard/> element."), {} };
+        }
+
+        VCardData d;
+        // element needs to be the parent of <vCard/>
+        d.vCard.parseElementFromChild(el);
+        return d;
+    }
+
+    void toXml(QXmlStreamWriter &writer) const
+    {
+        writer.writeStartElement(QSL65("vcard"));
+        vCard.toXmlElementFromChild(&writer);
+        writer.writeEndElement();
+    }
+};
+
+void serializeVCardData(const VCardData &data, QXmlStreamWriter &writer)
+{
+    data.toXml(writer);
+}
+
+}  // namespace QXmpp::Private
 
 class QXmppVCardManagerPrivate
 {
 public:
     QXmppVCardIq clientVCard;
-    bool isClientVCardReceived;
+    bool isClientVCardReceived = false;
 };
 
 QXmppVCardManager::QXmppVCardManager()
     : d(std::make_unique<QXmppVCardManagerPrivate>())
 {
-    d->isClientVCardReceived = false;
+    QXmppExportData::registerExtension<VCardData, VCardData::fromDom, serializeVCardData>(u"vcard", ns_qxmpp_export);
 }
 
 QXmppVCardManager::~QXmppVCardManager() = default;
@@ -128,5 +166,31 @@ bool QXmppVCardManager::handleStanza(const QDomElement &element)
     }
 
     return false;
+}
+
+void QXmppVCardManager::onRegistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        using DataResult = std::variant<VCardData, QXmppError>;
+
+        auto importData = [this](const VCardData &data) {
+            return setVCard(data.vCard);
+        };
+
+        auto exportData = [this]() {
+            return chain<DataResult>(fetchVCard(this->client()->configuration().jidBare()), this, [](auto &&result) {
+                return mapSuccess(std::move(result), [](QXmppVCardIq &&iq) -> VCardData { return { iq }; });
+            });
+        };
+
+        manager->registerExportData<VCardData>(importData, exportData);
+    }
+}
+
+void QXmppVCardManager::onUnregistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        manager->unregisterExportData<QXmppVCardIq>();
+    }
 }
 /// \endcond

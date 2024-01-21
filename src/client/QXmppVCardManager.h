@@ -77,6 +77,10 @@ Q_SIGNALS:
     /// after calling the requestClientVCard() function.
     void clientVCardReceived();
 
+protected:
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
+
 private:
     const std::unique_ptr<QXmppVCardManagerPrivate> d;
 };

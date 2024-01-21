@@ -11,6 +11,10 @@
 #include <QDomElement>
 #include <QMap>
 
+namespace QXmpp::Private {
+struct VCardData;
+}
+
 class QXmppVCardAddressPrivate;
 class QXmppVCardEmailPrivate;
 class QXmppVCardPhonePrivate;
@@ -266,6 +270,8 @@ public:
     /// \endcond
 
 protected:
+    friend struct QXmpp::Private::VCardData;
+
     /// \cond
     void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
