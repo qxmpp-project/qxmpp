@@ -5,6 +5,7 @@
 
 #include "QXmppVCardManager.h"
 
+#include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
@@ -24,6 +25,21 @@ public:
 QXmppVCardManager::QXmppVCardManager()
     : d(std::make_unique<QXmppVCardManagerPrivate>())
 {
+    const auto parseIq = [](const QDomElement &element) -> QXmppAccountData::ExtensionParserResult<QXmppVCardIq> {
+        if (QXmppVCardIq::isVCard(element)) {
+            QXmppVCardIq iq;
+            iq.parse(element);
+            return iq;
+        }
+
+        return QXmppError { QStringLiteral("Not a QXmppVCardIq"), {} };
+    };
+    const auto serializeIq = [](const QXmppVCardIq &iq, QXmlStreamWriter &writer) -> QXmppAccountData::ExtensionSerializerResult<QXmppVCardIq> {
+        iq.toXml(&writer);
+    };
+
+    QXmppAccountData::registerExtension<QXmppVCardIq, parseIq, serializeIq>(u"vCard", ns_vcard);
+
     d->isClientVCardReceived = false;
 }
 
@@ -90,6 +106,31 @@ QStringList QXmppVCardManager::discoveryFeatures() const
     };
 }
 /// \endcond
+
+void QXmppVCardManager::onRegistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        auto importData = [this](QXmppVCardIq data) -> QXmppAccountMigrationManager::ImportDataTask {
+            return setClientVCard(data);
+        };
+        auto exportData = [this]() -> QXmppAccountMigrationManager::ExportDataTask<QXmppVCardIq> {
+            if (isClientVCardReceived()) {
+                return makeReadyTask<IqResult>(clientVCard());
+            }
+
+            return requestClientVCard();
+        };
+
+        manager->registerExtension<QXmppVCardIq>(importData, exportData);
+    }
+}
+
+void QXmppVCardManager::onUnregistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        manager->unregisterExtension<QXmppVCardIq>();
+    }
+}
 
 void QXmppVCardManager::handleReceivedVCard(const QXmppVCardIq &vcard)
 {

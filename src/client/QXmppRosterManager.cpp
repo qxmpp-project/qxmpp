@@ -7,7 +7,9 @@
 
 #include "QXmppRosterManager.h"
 
+#include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
+#include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
@@ -69,6 +71,21 @@ void QXmppRosterManagerPrivate::clear()
 QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
     : d(std::make_unique<QXmppRosterManagerPrivate>())
 {
+    const auto parseIq = [](const QDomElement &element) -> QXmppAccountData::ExtensionParserResult<QXmppRosterIq> {
+        if (QXmppRosterIq::isRosterIq(element)) {
+            QXmppRosterIq iq;
+            iq.parse(element);
+            return iq;
+        }
+
+        return QXmppError { QStringLiteral("Not a QXmppRosterIq"), {} };
+    };
+    const auto serializeIq = [](const QXmppRosterIq &iq, QXmlStreamWriter &writer) -> QXmppAccountData::ExtensionSerializerResult<QXmppRosterIq> {
+        iq.toXml(&writer);
+    };
+
+    QXmppAccountData::registerExtension<QXmppRosterIq, parseIq, serializeIq>(u"query", ns_roster);
+
     connect(client, &QXmppClient::connected,
             this, &QXmppRosterManager::_q_connected);
 
@@ -423,6 +440,31 @@ bool QXmppRosterManager::unsubscribe(const QString &bareJid, const QString &reas
     packet.setType(QXmppPresence::Unsubscribe);
     packet.setStatusText(reason);
     return client()->sendPacket(packet);
+}
+
+void QXmppRosterManager::onRegistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        auto importData = [this](QXmppRosterIq data) -> QXmppAccountMigrationManager::ImportDataTask {
+            return setRoster(data);
+        };
+        auto exportData = [this]() -> QXmppAccountMigrationManager::ExportDataTask<QXmppRosterIq> {
+            if (isRosterReceived()) {
+                return makeReadyTask<IqResult>(roster());
+            }
+
+            return requestRoster();
+        };
+
+        manager->registerExtension<QXmppRosterIq>(importData, exportData);
+    }
+}
+
+void QXmppRosterManager::onUnregistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        manager->unregisterExtension<QXmppRosterIq>();
+    }
 }
 
 bool QXmppRosterManager::handleReceivedRoster(const QXmppRosterIq &roster)
