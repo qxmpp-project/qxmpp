@@ -634,7 +634,6 @@ bool operator==(const QXmppVCardIq &left, const QXmppVCardIq &right)
 {
     return left.birthday() == right.birthday() &&
         left.description() == right.description() &&
-        left.email() == right.email() &&
         left.firstName() == right.firstName() &&
         left.fullName() == right.fullName() &&
         left.lastName() == right.lastName() &&
