@@ -97,6 +97,7 @@ set(INSTALL_HEADER_FILES
     base/compat/QXmppPubSubItem.h
 
     # Client
+    client/QXmppAccountMigrationManager.h
     client/QXmppArchiveManager.h
     client/QXmppAtmManager.h
     client/QXmppAtmTrustMemoryStorage.h
@@ -237,6 +238,7 @@ set(SOURCE_FILES
     base/XmppSocket.h
 
     # Client
+    client/QXmppAccountMigrationManager.cpp
     client/QXmppArchiveManager.cpp
     client/QXmppAtmManager.cpp
     client/QXmppAtmTrustMemoryStorage.cpp
