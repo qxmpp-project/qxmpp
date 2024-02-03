@@ -323,7 +323,6 @@ QXmppStreamManager::QXmppStreamManager(QXmppStream *stream)
 
 QXmppStreamManager::~QXmppStreamManager()
 {
-    resetCache();
 }
 
 bool QXmppStreamManager::enabled() const
