@@ -19,7 +19,6 @@ EXCLUDE_PATTERNS       = */moc_* */mod_* */*_p.h */QXmppCodec.cpp */QXmppSasl.cp
 FULL_PATH_NAMES        = NO
 HIDE_UNDOC_CLASSES     = YES
 GENERATE_LATEX         = NO
-HTML_TIMESTAMP         = NO
 QUIET                  = YES
 RECURSIVE              = YES
 ENABLE_PREPROCESSING   = YES
