@@ -13,18 +13,12 @@ CMAKE_ARGS="-DBUILD_TESTS:BOOL=True"
 case "$CONFIG" in
 full*)
     CMAKE_ARGS="-DBUILD_DOCUMENTATION:BOOL=True -DBUILD_EXAMPLES:BOOL=True -DWITH_GSTREAMER:BOOL=True"
-    case "$QT_VERSION" in
-    5.15* | 6*)
-        if [ $HOST_SYSTEM = "Linux" ]; then
-            # Enable OMEMO
-            CMAKE_ARGS="$CMAKE_ARGS -DBUILD_OMEMO=ON"
-        fi
-        ;;
-    esac
-    ;;
-esac
 
-case "$CONFIG" in
+    # Enable OMEMO
+    if [ $HOST_SYSTEM = "Linux" ]; then
+        CMAKE_ARGS="$CMAKE_ARGS -DBUILD_OMEMO=ON"
+    fi
+    ;;
 *debug*)
     CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Debug -DBUILD_INTERNAL_TESTS:BOOL=True"
     ;;

@@ -34,13 +34,8 @@ full*)
         libprotobuf-c-dev \
         libssl-dev
 
-    # Enable OMEMO for Qt > 5.15 (including Qt 6)
     # Build and install qca and libomemo-c
-    case "$QT_VERSION" in
-    5.15* | 6)
-        install_cmake libomemo-c https://github.com/dino/libomemo-c "-DBUILD_SHARED_LIBS=ON"
-        install_cmake qca https://invent.kde.org/libraries/qca "-DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF -DBUILD_WITH_QT6=OFF"
-        ;;
-    esac
+    install_cmake libomemo-c https://github.com/dino/libomemo-c "-DBUILD_SHARED_LIBS=ON"
+    install_cmake qca https://invent.kde.org/libraries/qca "-DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF -DBUILD_WITH_QT6=OFF"
     ;;
 esac
