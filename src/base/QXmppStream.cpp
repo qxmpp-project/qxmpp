@@ -39,6 +39,7 @@ class QXmppStreamPrivate
 {
 public:
     QXmppStreamPrivate(QXmppStream *stream);
+    ~QXmppStreamPrivate();
 
     QString dataBuffer;
     QSslSocket *socket;
@@ -57,6 +58,12 @@ QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(nullptr),
       streamManager(stream)
 {
+}
+
+QXmppStreamPrivate::~QXmppStreamPrivate()
+{
+    // causes access to runningIqs, so call here
+    streamManager.resetCache();
 }
 
 ///
