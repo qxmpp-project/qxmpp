@@ -31,16 +31,21 @@ if [ "$(uname -s)" = "Darwin" ]; then
 
     case "$CONFIG" in
     full*)
-        brew install doxygen gstreamer gst-plugins-base gst-plugins-good gst-plugins-ugly
+        brew install doxygen \
+            gstreamer gst-plugins-base gst-plugins-good gst-plugins-ugly
         ;;
     esac
 else
     sudo apt-get update -qq
-    sudo apt-get install -qq clang cmake
+    sudo apt-get install -qq clang cmake git
 
     case "$CONFIG" in
     full*)
-        sudo apt-get install -qq  doxygen graphviz libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly
+        sudo apt-get install -qq \
+            doxygen graphviz \
+            libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly \
+            libprotobuf-c-dev \
+            libssl-dev
         ;;
     esac
 fi
