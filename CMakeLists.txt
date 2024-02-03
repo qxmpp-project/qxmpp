@@ -40,6 +40,7 @@ option(BUILD_EXAMPLES "Build examples." ON)
 option(BUILD_OMEMO "Build the OMEMO module" OFF)
 option(WITH_GSTREAMER "Build with GStreamer support for Jingle" OFF)
 option(WITH_QCA "Build with QCA for OMEMO or encrypted file sharing" ${Qca-qt${QT_VERSION_MAJOR}_FOUND})
+option(ENABLE_ASAN "Build with address sanitizer" OFF)
 
 set(QXMPP_TARGET QXmppQt${QT_VERSION_MAJOR})
 set(QXMPPOMEMO_TARGET QXmppOmemoQt${QT_VERSION_MAJOR})
@@ -51,6 +52,12 @@ add_definitions(
     -DQT_NO_FOREACH
     -DQT_NO_KEYWORDS
 )
+
+# Address sanitizer
+if(ENABLE_ASAN)
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
+endif()
 
 if(BUILD_OMEMO)
     add_definitions(-DBUILD_OMEMO)
