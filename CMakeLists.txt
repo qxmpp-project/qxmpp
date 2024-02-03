@@ -113,25 +113,6 @@ install(
     COMPONENT Devel
 )
 
-# QXmpp package with Qt version autodetect
-configure_package_config_file(
-    cmake/QXmppQtAutoConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
-)
-
-install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
-    COMPONENT Devel
-)
-install(
-    FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/QXmppQtAutoConfigVersion.cmake
-    RENAME QXmppConfigVersion.cmake
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
-    COMPONENT Devel
-)
-
 # Generate QXmppQt5/6.pc
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${QXMPP_TARGET}.pc @ONLY)
 install(
@@ -140,8 +121,27 @@ install(
     COMPONENT Devel
 )
 
-# "qxmpp.pc" for backwards-compatibility
 if(QT_VERSION_MAJOR EQUAL 5)
+    # "QXmpp" cmake package for backwards-compatibility
+    configure_package_config_file(
+        cmake/QXmppLegacyConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
+    )
+
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/QXmppConfig.cmake
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
+        COMPONENT Devel
+    )
+    install(
+        FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/QXmppLegacyConfigVersion.cmake
+        RENAME QXmppConfigVersion.cmake
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QXmpp"
+        COMPONENT Devel
+    )
+
+    # "qxmpp.pc" for backwards-compatibility
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp_legacy.pc.in ${CMAKE_CURRENT_BINARY_DIR}/qxmpp.pc @ONLY)
     install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/qxmpp.pc

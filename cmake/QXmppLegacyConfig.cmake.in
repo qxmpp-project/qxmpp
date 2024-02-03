@@ -4,18 +4,6 @@
 
 @PACKAGE_INIT@
 
-# Detect Qt version
-if(NOT DEFINED QT_VERSION_MAJOR)
-    if(TARGET Qt6::Core)
-        set(QT_VERSION_MAJOR 6)
-    elseif(TARGET Qt5::Core)
-        set(QT_VERSION_MAJOR 5)
-    else()
-        # default to Qt 6
-        set(QT_VERSION_MAJOR 6)
-    endif()
-endif()
-
 set(_QXmpp_FIND_PARTS_REQUIRED)
 if(QXmpp_FIND_REQUIRED)
     set(_QXmpp_FIND_PARTS_REQUIRED REQUIRED)
@@ -25,13 +13,13 @@ if(QXmpp_FIND_QUIETLY)
     set(_QXmpp_FIND_PARTS_QUIET QUIET)
 endif()
 
-# Pass through arguments to QXmppQt5/6
+# Pass through arguments to QXmppQt5
 include(CMakeFindDependencyMacro)
-find_package(QXmppQt${QT_VERSION_MAJOR}
+find_package(QXmppQt5
     ${QXmpp_FIND_VERSION}
     ${_QXmpp_FIND_PARTS_REQUIRED}
     ${_QXmpp_FIND_PARTS_QUIET}
     COMPONENTS ${QXmpp_FIND_COMPONENTS}
 )
 
-set(QXmpp_FOUND ${QXmppQt${QT_VERSION_MAJOR}_FOUND})
+set(QXmpp_FOUND ${QXmppQt5_FOUND})
