@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppClient.h"
-#include "QXmppConstants_p.h"
 #include "QXmppJingleMessageInitiationManager.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
@@ -15,6 +14,8 @@
 using Jmi = QXmppJingleMessageInitiation;
 using JmiType = QXmppJingleMessageInitiationElement::Type;
 using Result = QXmppJingleMessageInitiation::Result;
+
+constexpr QStringView ns_jingle_rtp = u"urn:xmpp:jingle:apps:rtp:1";
 
 class tst_QXmppJingleMessageInitiationManager : public QObject
 {
@@ -255,7 +256,7 @@ void tst_QXmppJingleMessageInitiationManager::testPropose()
     QXmppJingleDescription description;
     description.setMedia(QStringLiteral("audio"));
     description.setSsrc(123);
-    description.setType(ns_jingle_rtp);
+    description.setType(ns_jingle_rtp.toString());
 
     connect(&m_logger, &QXmppLogger::message, this, [&, jid, description](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
