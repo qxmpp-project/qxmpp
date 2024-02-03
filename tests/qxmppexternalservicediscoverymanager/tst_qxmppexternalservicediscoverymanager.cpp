@@ -8,8 +8,6 @@
 #include "util.h"
 #include <QObject>
 
-const char *ns_external_service_discovery = "urn:xmpp:extdisco:2";
-
 class tst_QXmppExternalServiceDiscoveryManager : public QObject
 {
     Q_OBJECT
@@ -80,7 +78,7 @@ void tst_QXmppExternalServiceDiscoveryManager::testDiscoveryFeatures()
     TestClient test;
     auto *m = test.addNewExtension<QXmppExternalServiceDiscoveryManager>();
 
-    QCOMPARE(m->discoveryFeatures().contains(ns_external_service_discovery), true);
+    QVERIFY(m->discoveryFeatures().contains(u"urn:xmpp:extdisco:2"));
 }
 
 QTEST_MAIN(tst_QXmppExternalServiceDiscoveryManager)
