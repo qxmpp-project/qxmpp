@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#pragma once
+#ifndef QXMPPEXTERNALSERVICE_H
+#define QXMPPEXTERNALSERVICE_H
 
 #include "QXmppGlobal.h"
 
@@ -81,3 +82,5 @@ public:
 private:
     QSharedDataPointer<QXmppExternalServicePrivate> d;
 };
+
+#endif  // QXMPPEXTERNALSERVICE_H
