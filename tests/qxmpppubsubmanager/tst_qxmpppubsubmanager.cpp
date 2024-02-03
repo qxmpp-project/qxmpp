@@ -25,8 +25,8 @@ using PSManager = QXmppPubSubManager;
 using Affiliation = QXmppPubSubAffiliation;
 using AffiliationType = QXmppPubSubAffiliation::Affiliation;
 
-const char *ns_pubsub = "http://jabber.org/protocol/pubsub";
-const char *ns_pubsub_auto_create = "http://jabber.org/protocol/pubsub#auto-create";
+const char *XMLNS_PUBSUB = "http://jabber.org/protocol/pubsub";
+const char *XMLNS_PUBSUB_AUTO_CREATE = "http://jabber.org/protocol/pubsub#auto-create";
 
 class TestEventManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
@@ -148,7 +148,7 @@ void tst_QXmppPubSubManager::testRequestFeatures()
                                "</query></iq>"));
 
     auto features = expectFutureVariant<QVector<QString>>(future);
-    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+    QCOMPARE(features, (QVector<QString> { XMLNS_PUBSUB, XMLNS_PUBSUB_AUTO_CREATE }));
 
     future = psManager->requestFeatures("juliet@capulet.lit");
     test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
@@ -162,7 +162,7 @@ void tst_QXmppPubSubManager::testRequestFeatures()
                                "</query></iq>"));
 
     features = expectFutureVariant<QVector<QString>>(future);
-    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+    QCOMPARE(features, (QVector<QString> { XMLNS_PUBSUB, XMLNS_PUBSUB_AUTO_CREATE }));
 
     future = psManager->requestFeatures("juliet@capulet.lit", QXmppPubSubManager::PubSub);
     test.expect(QStringLiteral("<iq id='qxmpp1' to='juliet@capulet.lit' type='get'>"
@@ -189,7 +189,7 @@ void tst_QXmppPubSubManager::testRequestFeatures()
                                "</query></iq>"));
 
     features = expectFutureVariant<QVector<QString>>(future);
-    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+    QCOMPARE(features, (QVector<QString> { XMLNS_PUBSUB, XMLNS_PUBSUB_AUTO_CREATE }));
 
     future = psManager->requestFeatures("pubsub.shakespeare.lit", QXmppPubSubManager::Pep);
     test.expect(QStringLiteral("<iq id='qxmpp1' to='pubsub.shakespeare.lit' type='get'>"
@@ -216,7 +216,7 @@ void tst_QXmppPubSubManager::testRequestFeatures()
                                "</query></iq>"));
 
     features = expectFutureVariant<QVector<QString>>(future);
-    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+    QCOMPARE(features, (QVector<QString> { XMLNS_PUBSUB, XMLNS_PUBSUB_AUTO_CREATE }));
 }
 
 void tst_QXmppPubSubManager::testRequestPepFeatures()
@@ -236,7 +236,7 @@ void tst_QXmppPubSubManager::testRequestPepFeatures()
                                "</query></iq>"));
 
     auto features = expectFutureVariant<QVector<QString>>(future);
-    QCOMPARE(features, (QVector<QString> { ns_pubsub, ns_pubsub_auto_create }));
+    QCOMPARE(features, (QVector<QString> { XMLNS_PUBSUB, XMLNS_PUBSUB_AUTO_CREATE }));
 }
 
 void tst_QXmppPubSubManager::testFetchNodes()
