@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2014 Boris Pek <tehnick-8@yandex.ru>
+# SPDX-FileCopyrightText: 2018 Jeremy Lainé <jeremy.laine@m4x.org>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+set -e
+
+brew update
+brew unlink python@3
+brew install python@3 || true
+brew link --overwrite python@3
+
+case "$CONFIG" in
+full*)
+    brew install doxygen \
+        gstreamer gst-plugins-base gst-plugins-good gst-plugins-ugly
+    ;;
+esac

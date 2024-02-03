@@ -36,7 +36,7 @@ jobs:
           version: ${{ matrix.qt_version }}
           setup-python: true
       - name: Install extra packages
-        run: tests/travis/install-build-depends
+        run: tests/travis/install-build-depends-debian
       - name: Run tests
         run: tests/travis/build-and-test
       - uses: codecov/codecov-action@v1
@@ -64,7 +64,7 @@ jobs:
           version: ${{ matrix.qt_version }}
           setup-python: false
       - name: Install extra packages
-        run: tests/travis/install-build-depends
+        run: tests/travis/install-build-depends-macos
       - name: Disable OS X firewall
         run: |
           sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
