@@ -3,7 +3,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#pragma once
+#ifndef QXMPPPUBSUBBASEITEM_H
+#define QXMPPPUBSUBBASEITEM_H
 
 #include "QXmppGlobal.h"
 
@@ -85,3 +86,5 @@ bool QXmppPubSubBaseItem::isItem(const QDomElement &element, PayloadChecker isPa
 }
 
 Q_DECLARE_METATYPE(QXmppPubSubBaseItem)
+
+#endif  // QXMPPPUBSUBBASEITEM_H
