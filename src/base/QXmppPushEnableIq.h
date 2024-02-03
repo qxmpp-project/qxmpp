@@ -4,7 +4,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#pragma once
+#ifndef QXMPPPUSHENABLEIQ_H
+#define QXMPPPUSHENABLEIQ_H
 
 #include <QXmppIq.h>
 
@@ -61,3 +62,5 @@ protected:
 private:
     QSharedDataPointer<QXmppPushEnableIqPrivate> d;
 };
+
+#endif  // QXMPPPUSHENABLEIQ_H

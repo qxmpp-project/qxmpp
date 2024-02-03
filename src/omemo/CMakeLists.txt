@@ -35,7 +35,7 @@ target_link_libraries(${QXMPPOMEMO_TARGET}
     qca-qt${QT_VERSION_MAJOR}
 )
 target_include_directories(${QXMPPOMEMO_TARGET}
-    PUBLIC
+    INTERFACE
     ${OMEMO_HEADER_DIR}
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
