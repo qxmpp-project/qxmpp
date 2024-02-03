@@ -20,8 +20,6 @@ jobs:
         config: [minimal, full, full-debug]
         qt_version: ['5.15.*']
         include:
-          - config: full
-            qt_version: 5.9.*
           - config: minimal
             qt_version: 6.1.*
           - config: minimal
