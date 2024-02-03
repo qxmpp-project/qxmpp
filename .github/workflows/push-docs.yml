@@ -13,11 +13,15 @@ on:
 jobs:
   push-doc:
     runs-on: ubuntu-latest
+    container:
+      image: debian:stable
     env:
       PUSH_KEY_REPO_DOC_QXMPP_ORG: ${{ secrets.PUSH_KEY_REPO_DOC_QXMPP_ORG }}
       CONFIG: full
     steps:
-      - uses: actions/checkout@v2
+      - name: Install sudo
+        run: apt update && apt install -qq -y sudo curl
+      - uses: actions/checkout@v3
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
       - name: Install extra packages
