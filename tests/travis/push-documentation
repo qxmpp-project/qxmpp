@@ -35,6 +35,7 @@ echo '-------------------------------------------'
 echo 'Cloning doc.qxmpp.org repository'
 echo '-------------------------------------------'
 
+export GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 git clone ssh://git@github.com/qxmpp-project/doc.qxmpp.org
 
 echo '-------------------------------------------'
