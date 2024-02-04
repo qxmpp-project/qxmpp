@@ -171,9 +171,9 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 ///
 /// \typedef QXmppClient::IqResult
 ///
-/// Result of an IQ request, either contains the QDomElement of the IQ answer
-/// (with type 'error' or 'result') or it contains the packet error, if the
-/// request couldn't be sent.
+/// Result of an IQ request, either contains the QDomElement of the IQ reponse (in case of an
+/// 'result' IQ type) or it contains an QXmppError with a QXmppStanza::Error (on type 'error') or
+/// a QXmpp::SendError.
 ///
 /// \since QXmpp 1.5
 ///
@@ -516,6 +516,9 @@ QXmppTask<QXmpp::SendResult> QXmppClient::reply(QXmppStanza &&stanza, const std:
 /// QDomElement. If you don't expect a special response, you may want use
 /// sendGenericIq().
 ///
+/// IQs of type 'error' are parsed automatically and returned as QXmppError with a contained
+/// QXmppStanza::Error.
+///
 /// This does not do any end-to-encryption on the IQ.
 ///
 /// \sa sendSensitiveIq()
@@ -537,6 +540,9 @@ QXmppTask<QXmppClient::IqResult> QXmppClient::sendIq(QXmppIq &&iq, const std::op
 /// Most IQ requests like service discovery requests cannot be end-to-end
 /// encrypted or it only makes little sense to do so. This is why the default
 /// sendIq() does not do any additional end-to-end encryption.
+///
+/// IQs of type 'error' are parsed automatically and returned as QXmppError with a contained
+/// QXmppStanza::Error.
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///

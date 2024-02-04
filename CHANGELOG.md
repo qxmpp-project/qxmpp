@@ -9,6 +9,20 @@ QXmpp 1.6.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.5.6 (Feb 4, 2024)
+-------------------------
+
+Changes:
+ - Behaviour change: sendIq() automatically parses stanza errors (returned as QXmppError) (@lnjX)
+ - CMake: "QXmpp" legacy cmake package is now only installed for Qt 5 builds (@lnjX)
+ - Fix unit test with Qt 6! (@lnjX)
+ - EncryptedFileSharingProvider: Fix wrong cipher set in sent file share element (@lnjX)
+ - Fix SCE parsing mode when parsing encrypted messages (@lnjX)
+ - Fix file encryption with QCA issues (@lnjX)
+ - Fix picking by strength of hashing algorithms (@lnjX)
+ - Fix github ci (@lnjX)
+ - Add unit tests for all file encryption ciphers (@lnjX)
+
 QXmpp 1.5.5 (Apr 30, 2023)
 --------------------------
 

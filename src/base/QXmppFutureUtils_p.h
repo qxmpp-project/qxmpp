@@ -157,12 +157,6 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
                           [convert = std::move(convert)](const QDomElement &element) -> Result {
                               IqType iq;
                               iq.parse(element);
-                              if (iq.type() == QXmppIq::Error) {
-                                  if (auto err = iq.errorOptional()) {
-                                      return QXmppError { err->text(), std::move(*err) };
-                                  }
-                                  return QXmppError { QStringLiteral("Unknown error.") };
-                              }
                               return convert(std::move(iq));
                           },
                           [](QXmppError error) -> Result {
