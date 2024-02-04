@@ -76,10 +76,18 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    env:
+      QT_VERSION: ${{ matrix.qt_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version: ['5.15.*', '6.*.*']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt_version }}
       - name: Run tests
         run: |
           ${env:PATH} += ";D:/a/qxmpp/qxmpp/src/Debug"
