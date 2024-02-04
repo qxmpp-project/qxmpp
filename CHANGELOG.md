@@ -4,6 +4,19 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.5.6 (Feb 4, 2024)
+-------------------------
+
+Changes:
+ - Behaviour change: sendIq() automatically parses stanza errors (returned as QXmppError) (@lnjX)
+ - CMake: "QXmpp" legacy cmake package is now only installed for Qt 5 builds (@lnjX)
+ - EncryptedFileSharingProvider: Fix wrong cipher set in sent file share element (@lnjX)
+ - Fix SCE parsing mode when parsing encrypted messages (@lnjX)
+ - Fix file encryption with QCA issues (@lnjX)
+ - Fix picking by strength of hashing algorithms (@lnjX)
+ - Fix github ci (@lnjX)
+ - Add unit tests for all file encryption ciphers (@lnjX)
+
 QXmpp 1.5.5 (Apr 30, 2023)
 --------------------------
 
