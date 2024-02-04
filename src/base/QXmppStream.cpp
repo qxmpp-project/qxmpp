@@ -73,8 +73,8 @@ QXmppStreamPrivate::~QXmppStreamPrivate()
 ///
 /// \typedef QXmppStream::IqResult
 ///
-/// Contains a QDomElement containing the IQ response or if the request couldn't
-/// be sent a QXmpp::PacketState.
+/// Contains a QDomElement if an IQ response of type 'result' has been received. In case of an
+/// error response of if an error occurred while sending the IQ request, a QXmppError is used.
 ///
 /// \warning THIS API IS NOT FINALIZED YET!
 ///
@@ -503,7 +503,23 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
             return false;
         }
 
-        itr.value().interface.finish(stanza);
+        // report IQ errors as QXmppError (this makes it impossible to parse the full error IQ,
+        // but that is okay for now)
+        if (iqType == QStringLiteral("error")) {
+            QXmppIq iq;
+            iq.parse(stanza);
+            if (auto err = iq.errorOptional()) {
+                // report stanza error
+                itr.value().interface.finish(QXmppError { err->text(), *err });
+            } else {
+                // this shouldn't happen (no <error/> element in IQ of type error)
+                using Err = QXmppStanza::Error;
+                itr.value().interface.finish(QXmppError { QStringLiteral("IQ error"), Err(Err::Cancel, Err::UndefinedCondition) });
+            }
+        } else {
+            // report stanza element for parsing
+            itr.value().interface.finish(stanza);
+        }
 
         d->runningIqs.erase(itr);
         return true;
