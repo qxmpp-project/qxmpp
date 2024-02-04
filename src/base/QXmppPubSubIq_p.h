@@ -13,8 +13,9 @@
 #include <QDomElement>
 #include <QSharedDataPointer>
 
+#include "QXmppPubSubBaseItem.h"
+
 class QXmppDataForm;
-class QXmppPubSubBaseItem;
 class QXmppPubSubSubscription;
 class QXmppPubSubAffiliation;
 class QXmppResultSetReply;

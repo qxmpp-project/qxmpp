@@ -19,12 +19,12 @@ class QXMPP_EXPORT QXmppPubSubBaseItem
 {
 public:
     QXmppPubSubBaseItem(const QString &id = {}, const QString &publisher = {});
-    QXmppPubSubBaseItem(const QXmppPubSubBaseItem &);
-    QXmppPubSubBaseItem(QXmppPubSubBaseItem &&);
-    virtual ~QXmppPubSubBaseItem();
+    QXmppPubSubBaseItem(const QXmppPubSubBaseItem &) noexcept;
+    QXmppPubSubBaseItem(QXmppPubSubBaseItem &&) noexcept;
+    virtual ~QXmppPubSubBaseItem() noexcept;
 
-    QXmppPubSubBaseItem &operator=(const QXmppPubSubBaseItem &);
-    QXmppPubSubBaseItem &operator=(QXmppPubSubBaseItem &&);
+    QXmppPubSubBaseItem &operator=(const QXmppPubSubBaseItem &) noexcept;
+    QXmppPubSubBaseItem &operator=(QXmppPubSubBaseItem &&) noexcept;
 
     QString id() const;
     void setId(const QString &id);
