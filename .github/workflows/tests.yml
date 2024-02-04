@@ -24,7 +24,7 @@ jobs:
             qt_version: 5.9.*
           - config: minimal
             qt_version: 6.1.*
-          - config: minimal
+          - config: full-debug
             qt_version: 6.6.*
     steps:
       - name: Install sudo
@@ -34,6 +34,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
+          modules: ${{ (startsWith(matrix.qt_version, '6.') && 'qt5compat') || '' }}
           setup-python: true
       - name: Install extra packages
         run: tests/travis/install-build-depends-debian
@@ -54,7 +55,7 @@ jobs:
         config: [minimal, full, full-debug]
         qt_version: ['5.15.*']
         include:
-          - config: minimal
+          - config: full-debug
             qt_version: 6.*.*
     steps:
       - uses: actions/checkout@v2
@@ -62,6 +63,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
+          modules: ${{ matrix.qt_version[0] == '6' && 'qt5compat' || '' }}
           setup-python: false
       - name: Install extra packages
         run: tests/travis/install-build-depends-macos
