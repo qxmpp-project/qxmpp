@@ -16,16 +16,28 @@ install_cmake() {
     cd
     git clone $URL $NAME
     mkdir -p $NAME-build
-    cmake $NAME -B./$NAME-build/  -DCMAKE_BUILD_TYPE=Release $OPTS
+    cmake $NAME -B./$NAME-build/ -DCMAKE_INSTALL_PREFIX="/usr/local" -DCMAKE_BUILD_TYPE=Release $OPTS
     cmake --build $NAME-build --parallel
     sudo cmake --build $NAME-build --target install
 
     cd $CURRENT_DIR
 }
 
+# Used for QCA cmake options
+case "$QT_VERSION" in
+6*)
+    BUILD_WITH_QT6="ON"
+    ;;
+5*)
+    BUILD_WITH_QT6="OFF"
+    ;;
+esac
+
+# install base tools
 sudo apt-get update -qq
 sudo apt-get install -qq clang cmake git
 
+# install extra dependencies
 case "$CONFIG" in
 full*)
     sudo apt-get install -qq \
@@ -37,9 +49,9 @@ full*)
     # Enable OMEMO for Qt > 5.15 (including Qt 6)
     # Build and install qca and libomemo-c
     case "$QT_VERSION" in
-    5.15* | 6)
+    5.15* | 6*)
         install_cmake libomemo-c https://github.com/dino/libomemo-c "-DBUILD_SHARED_LIBS=ON"
-        install_cmake qca https://invent.kde.org/libraries/qca "-DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF -DBUILD_WITH_QT6=OFF"
+        install_cmake qca https://invent.kde.org/libraries/qca "-DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF -DBUILD_WITH_QT6=${BUILD_WITH_QT6}"
         ;;
     esac
     ;;
