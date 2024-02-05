@@ -773,17 +773,30 @@ void tst_QXmppMessage::testMix()
         "<body>Harpier cries: &apos;tis time, &apos;tis time.</body>"
         "</message>");
 
-    QXmppMessage message;
-    parsePacket(message, xml);
-    serializePacket(message, xml);
+    QXmppMessage message1;
 
-    QCOMPARE(message.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(message.mixUserNick(), QStringLiteral("thirdwitch"));
+    QVERIFY(message1.mixUserJid().isEmpty());
+    QVERIFY(message1.mixUserNick().isEmpty());
 
-    message.setMixUserJid("alexander@example.org");
-    QCOMPARE(message.mixUserJid(), QStringLiteral("alexander@example.org"));
-    message.setMixUserNick("erik");
-    QCOMPARE(message.mixUserNick(), QStringLiteral("erik"));
+    parsePacket(message1, xml);
+    serializePacket(message1, xml);
+
+    QCOMPARE(message1.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(message1.mixUserNick(), QStringLiteral("thirdwitch"));
+
+    QXmppMessage message2;
+
+    message2.setType(QXmppMessage::GroupChat);
+    message2.setFrom(QStringLiteral("coven@mix.shakespeare.example/123456"));
+    message2.setTo(QStringLiteral("hag66@shakespeare.example"));
+    message2.setBody(QStringLiteral("Harpier cries: 'tis time, 'tis time."));
+
+    message2.setMixUserJid(QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(message2.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
+    message2.setMixUserNick(QStringLiteral("thirdwitch"));
+    QCOMPARE(message2.mixUserNick(), QStringLiteral("thirdwitch"));
+
+    serializePacket(message2, xml);
 }
 
 void tst_QXmppMessage::testEme()
