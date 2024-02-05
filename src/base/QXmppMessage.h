@@ -228,6 +228,8 @@ public:
     void setAttachId(const QString &);
 
     // XEP-0369: Mediated Information eXchange (MIX)
+    QString mixParticipantId() const;
+
     QString mixUserJid() const;
     void setMixUserJid(const QString &);
 
