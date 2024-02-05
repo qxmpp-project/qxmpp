@@ -775,12 +775,14 @@ void tst_QXmppMessage::testMix()
 
     QXmppMessage message1;
 
+    QVERIFY(message1.mixParticipantId().isEmpty());
     QVERIFY(message1.mixUserJid().isEmpty());
     QVERIFY(message1.mixUserNick().isEmpty());
 
     parsePacket(message1, xml);
     serializePacket(message1, xml);
 
+    QCOMPARE(message1.mixParticipantId(), QStringLiteral("123456"));
     QCOMPARE(message1.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
     QCOMPARE(message1.mixUserNick(), QStringLiteral("thirdwitch"));
 
@@ -790,10 +792,11 @@ void tst_QXmppMessage::testMix()
     message2.setFrom(QStringLiteral("coven@mix.shakespeare.example/123456"));
     message2.setTo(QStringLiteral("hag66@shakespeare.example"));
     message2.setBody(QStringLiteral("Harpier cries: 'tis time, 'tis time."));
-
     message2.setMixUserJid(QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(message2.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
     message2.setMixUserNick(QStringLiteral("thirdwitch"));
+
+    QCOMPARE(message2.mixParticipantId(), QStringLiteral("123456"));
+    QCOMPARE(message2.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
     QCOMPARE(message2.mixUserNick(), QStringLiteral("thirdwitch"));
 
     serializePacket(message2, xml);
