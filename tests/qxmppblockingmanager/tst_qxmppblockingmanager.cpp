@@ -35,18 +35,28 @@ void tst_QXmppBlockingManager::fetch()
 
     QVERIFY(!m->isSubscribed());
 
+    // multiple calls should only trigger one IQ request
     auto task = m->fetchBlocklist();
+    auto task2 = m->fetchBlocklist();
+    auto task3 = m->fetchBlocklist();
+
+    // expect only one IQ
     t.expect("<iq id='qxmpp1' type='get'><blocklist xmlns='urn:xmpp:blocking'/></iq>");
     t.inject("<iq type='result' id='qxmpp1'><blocklist xmlns='urn:xmpp:blocking'><item jid='romeo@montague.net'/><item jid='iago@shakespeare.lit'/></blocklist></iq>");
 
+    // we should be subscribed to the blocklist now
     QVERIFY(m->isSubscribed());
-    auto blocklist = expectFutureVariant<QXmppBlocklist>(task);
+
+    // check all three results
     QVector<QString> expected { "romeo@montague.net", "iago@shakespeare.lit" };
-    QCOMPARE(blocklist.entries(), expected);
+    for (auto t : { task, task2, task3 }) {
+        auto blocklist = expectFutureVariant<QXmppBlocklist>(t);
+        QCOMPARE(blocklist.entries(), expected);
+    }
 
     // now the blocklist is cached
     task = m->fetchBlocklist();
-    blocklist = expectFutureVariant<QXmppBlocklist>(task);
+    auto blocklist = expectFutureVariant<QXmppBlocklist>(task);
     QCOMPARE(blocklist.entries(), expected);
 
     QVERIFY(m->isSubscribed());
