@@ -4,7 +4,7 @@
 
 CMakeLists.txt.*
 .DS_Store
-build*
+/build*
 .kdev4/
 *.kdev4
 support-chat-avatar.png
