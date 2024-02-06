@@ -128,6 +128,7 @@ public:
 struct QXmppBlockingManagerPrivate
 {
     std::optional<QVector<QString>> blocklist;
+    std::vector<QXmppPromise<QXmppBlockingManager::BlocklistResult>> openFetchBlocklistPromises;
 };
 
 ///
@@ -261,7 +262,9 @@ bool QXmppBlockingManager::isSubscribed() const
 /// \brief Fetches the list of blocked JIDs and subscribes to blocklist updates.
 ///
 /// The manager will cache the blocklist and keep track of updates for the rest of the session.
-/// Later calls of this function will report the cached result immediately.
+/// Later calls of this function will report the cached result immediately. Even calling this
+/// function multiple times before the first request has finished, will not trigger more than one
+/// IQ request being sent.
 ///
 QXmppTask<QXmppBlockingManager::BlocklistResult> QXmppBlockingManager::fetchBlocklist()
 {
@@ -270,16 +273,45 @@ QXmppTask<QXmppBlockingManager::BlocklistResult> QXmppBlockingManager::fetchBloc
         return makeReadyTask<BlocklistResult>(QXmppBlocklist(d->blocklist.value()));
     }
 
-    // request blocklist from server
-    return chainIq(client()->sendIq(BlocklistIq()), this, [this](BlocklistIq &&iq) -> BlocklistResult {
-        // initially store blocklist
-        if (!d->blocklist) {
-            d->blocklist = iq.jids;
-            Q_EMIT subscribedChanged();
-        }
+    // This function is designed so that you can call it multiple times and the actual IQ request
+    // to the server is only done once.
+    //
+    // If there's no data yet, we cache all open promises. When the IQ request finishes, the result
+    // is reported to all promises.
 
-        return QXmppBlocklist(iq.jids);
-    });
+    // Create promise and cache it
+    QXmppPromise<BlocklistResult> promise;
+    auto task = promise.task();
+
+    d->openFetchBlocklistPromises.push_back(std::move(promise));
+
+    // send IQ request, if this is the first request
+    if (d->openFetchBlocklistPromises.size() == 1) {
+        client()->sendIq(BlocklistIq()).then(this, [this](QXmppClient::IqResult &&result) {
+            // parse into QXmppBlocklist/Error variant
+            auto blocklistResult = parseIq<BlocklistIq>(std::move(result), [](BlocklistIq &&iq) -> BlocklistResult {
+                return QXmppBlocklist(std::move(iq.jids));
+            });
+
+            // store blocklist on success
+            if (!d->blocklist) {
+                if (auto *blocklist = std::get_if<QXmppBlocklist>(&blocklistResult)) {
+                    d->blocklist = blocklist->entries();
+                    Q_EMIT subscribedChanged();
+                }
+            }
+
+            // report result to all promises
+            for (auto &promise : d->openFetchBlocklistPromises) {
+                auto copy = blocklistResult;
+                promise.finish(std::move(copy));
+            }
+            // delete cached promises
+            d->openFetchBlocklistPromises.clear();
+        });
+    }
+
+    return task;
 }
 
 ///
