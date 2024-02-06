@@ -4,10 +4,18 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.6.0 (UNRELEASED)
-------------------------
+QXmpp 1.6.0 (Feb 6, 2024)
+-------------------------
 
-*under development*
+QXmpp requires Qt 5.15 or 6.0+ now, the previous release was still compatible with Qt 5.9.
+
+New features:
+ - First QXmpp logo (#528, @raghu-kamath)
+ - Implement XEP-0215: External Service Discovery (#542, @taiBsu)
+ - Implement XEP-0353: Jingle Message Initiation (#570, @taiBsu)
+ - Implement XEP-0482: Call Invites (#575, @taiBsu)
+ - Implement XEP-0191: Blocking Command (#577, @lnjX)
+ - Client: New constructor for creating without any extensions (@lnjX)
 
 QXmpp 1.5.6 (Feb 4, 2024)
 -------------------------
