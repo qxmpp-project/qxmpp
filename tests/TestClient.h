@@ -47,7 +47,7 @@ public:
     void expect(QString &&packet)
     {
         QVERIFY2(!m_sentPackets.empty(), "No packet was sent!");
-        QCOMPARE(m_sentPackets.takeFirst(), packet.replace(u'\'', u'"'));
+        QCOMPARE(m_sentPackets.takeFirst().replace(u'\'', u'"'), packet.replace(u'\'', u'"'));
         resetIdCount();
     }
     QString takePacket()
