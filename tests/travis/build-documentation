@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2024 Linus Jahn <lnj@kaidan.im>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+set -e
+
+# Make warnings errors
+echo "WARN_AS_ERROR = FAIL_ON_WARNINGS" >> doc/Doxyfile.in
+
+mkdir build
+cd build
+cmake .. -DBUILD_DOCUMENTATION=ON
+
+make doc
