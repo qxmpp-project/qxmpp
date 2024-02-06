@@ -316,13 +316,6 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
         auto &iq = state.iq;
         iq.parse(std::get<QDomElement>(result));
 
-        // handle MAM error result IQ
-        if (iq.type() == QXmppIq::Error) {
-            state.promise.finish(QXmppError { iq.error().text(), iq.error() });
-            d->ongoingRequests.erase(itr);
-            return;
-        }
-
         // decrypt encrypted messages
         if (auto *e2eeExt = client()->encryptionExtension()) {
             // initialize processed messages (we need random access because
