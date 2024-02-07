@@ -5,10 +5,12 @@
 #include "QXmppVCardIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QBuffer>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 static QString getImageType(const QByteArray &contents)
 {
@@ -638,8 +640,8 @@ void QXmppVCardOrganization::toXml(QXmlStreamWriter *stream) const
         stream->writeEndElement();
     }
 
-    helperToXmlAddTextElement(stream, QStringLiteral("TITLE"), d->title);
-    helperToXmlAddTextElement(stream, QStringLiteral("ROLE"), d->role);
+    writeXmlTextElement(stream, QStringLiteral("TITLE"), d->title);
+    writeXmlTextElement(stream, QStringLiteral("ROLE"), d->role);
 }
 /// \endcond
 
@@ -1036,32 +1038,32 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         address.toXml(writer);
     }
     if (d->birthday.isValid()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("BDAY"), d->birthday.toString(QStringLiteral("yyyy-MM-dd")));
+        writeXmlTextElement(writer, QStringLiteral("BDAY"), d->birthday.toString(QStringLiteral("yyyy-MM-dd")));
     }
     if (!d->description.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("DESC"), d->description);
+        writeXmlTextElement(writer, QStringLiteral("DESC"), d->description);
     }
     for (const QXmppVCardEmail &email : d->emails) {
         email.toXml(writer);
     }
     if (!d->fullName.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("FN"), d->fullName);
+        writeXmlTextElement(writer, QStringLiteral("FN"), d->fullName);
     }
     if (!d->nickName.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("NICKNAME"), d->nickName);
+        writeXmlTextElement(writer, QStringLiteral("NICKNAME"), d->nickName);
     }
     if (!d->firstName.isEmpty() ||
         !d->lastName.isEmpty() ||
         !d->middleName.isEmpty()) {
         writer->writeStartElement("N");
         if (!d->firstName.isEmpty()) {
-            helperToXmlAddTextElement(writer, QStringLiteral("GIVEN"), d->firstName);
+            writeXmlTextElement(writer, QStringLiteral("GIVEN"), d->firstName);
         }
         if (!d->lastName.isEmpty()) {
-            helperToXmlAddTextElement(writer, QStringLiteral("FAMILY"), d->lastName);
+            writeXmlTextElement(writer, QStringLiteral("FAMILY"), d->lastName);
         }
         if (!d->middleName.isEmpty()) {
-            helperToXmlAddTextElement(writer, QStringLiteral("MIDDLE"), d->middleName);
+            writeXmlTextElement(writer, QStringLiteral("MIDDLE"), d->middleName);
         }
         writer->writeEndElement();
     }
@@ -1075,12 +1077,12 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         if (photoType.isEmpty()) {
             photoType = getImageType(d->photo);
         }
-        helperToXmlAddTextElement(writer, QStringLiteral("TYPE"), photoType);
-        helperToXmlAddTextElement(writer, QStringLiteral("BINVAL"), d->photo.toBase64());
+        writeXmlTextElement(writer, QStringLiteral("TYPE"), photoType);
+        writeXmlTextElement(writer, QStringLiteral("BINVAL"), d->photo.toBase64());
         writer->writeEndElement();
     }
     if (!d->url.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("URL"), d->url);
+        writeXmlTextElement(writer, QStringLiteral("URL"), d->url);
     }
 
     d->organization.toXml(writer);

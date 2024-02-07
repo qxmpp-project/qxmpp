@@ -5,9 +5,11 @@
 #include "QXmppByteStreamIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// \enum QXmppByteStreamIq::Mode
@@ -213,28 +215,28 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_bytestreams);
-    helperToXmlAddAttribute(writer, QStringLiteral("sid"), m_sid);
+    writeOptionalXmlAttribute(writer, QStringLiteral("sid"), m_sid);
     QString modeStr;
     if (m_mode == Tcp) {
         modeStr = QStringLiteral("tcp");
     } else if (m_mode == Udp) {
         modeStr = QStringLiteral("udp");
     }
-    helperToXmlAddAttribute(writer, QStringLiteral("mode"), modeStr);
+    writeOptionalXmlAttribute(writer, QStringLiteral("mode"), modeStr);
     for (const auto &streamHost : m_streamHosts) {
         writer->writeStartElement(QStringLiteral("streamhost"));
-        helperToXmlAddAttribute(writer, QStringLiteral("host"), streamHost.host());
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), streamHost.jid());
-        helperToXmlAddAttribute(writer, QStringLiteral("port"), QString::number(streamHost.port()));
-        helperToXmlAddAttribute(writer, QStringLiteral("zeroconf"), streamHost.zeroconf());
+        writeOptionalXmlAttribute(writer, QStringLiteral("host"), streamHost.host());
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), streamHost.jid());
+        writeOptionalXmlAttribute(writer, QStringLiteral("port"), QString::number(streamHost.port()));
+        writeOptionalXmlAttribute(writer, QStringLiteral("zeroconf"), streamHost.zeroconf());
         writer->writeEndElement();
     }
     if (!m_activate.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("activate"), m_activate);
+        writeXmlTextElement(writer, QStringLiteral("activate"), m_activate);
     }
     if (!m_streamHostUsed.isEmpty()) {
         writer->writeStartElement(QStringLiteral("streamhost-used"));
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_streamHostUsed);
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_streamHostUsed);
         writer->writeEndElement();
     }
 

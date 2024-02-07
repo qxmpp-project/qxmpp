@@ -4,10 +4,12 @@
 
 #include "QXmppElement.h"
 
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QTextStream>
+
+using namespace QXmpp::Private;
 
 class QXmppElementPrivate
 {
@@ -294,7 +296,7 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     }
     std::for_each(d->attributes.keyBegin(), d->attributes.keyEnd(), [this, writer](const QString &key) {
         if (key != "xmlns") {
-            helperToXmlAddAttribute(writer, key, d->attributes.value(key));
+            writeOptionalXmlAttribute(writer, key, d->attributes.value(key));
         }
     });
     if (!d->value.isEmpty()) {

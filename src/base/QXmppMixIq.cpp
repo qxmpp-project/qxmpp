@@ -5,11 +5,12 @@
 #include "QXmppMixIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppDataForm.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 static const QStringList MIX_ACTION_TYPES = {
     QString(),
@@ -178,7 +179,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeDefaultNamespace(ns_mix_pam);
         if (type() == Set) {
-            helperToXmlAddAttribute(writer, QStringLiteral("channel"), d->jid);
+            writeOptionalXmlAttribute(writer, QStringLiteral("channel"), d->jid);
         }
 
         if (d->actionType == ClientJoin) {
@@ -189,9 +190,9 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 
     writer->writeDefaultNamespace(ns_mix);
-    helperToXmlAddAttribute(writer, QStringLiteral("channel"), d->channelName);
+    writeOptionalXmlAttribute(writer, QStringLiteral("channel"), d->channelName);
     if (type() == Result) {
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->jid);
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->jid);
     }
 
     for (const auto &node : d->nodes) {

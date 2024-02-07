@@ -5,7 +5,6 @@
 
 #include "QXmppUtils.h"
 
-#include "QXmppLogger.h"
 #include "QXmppUtils_p.h"
 
 #include <QBuffer>
@@ -310,16 +309,17 @@ QString QXmppUtils::generateStanzaHash(int length)
     return hashResult;
 }
 
-void helperToXmlAddAttribute(QXmlStreamWriter *stream, const QString &name,
-                             const QString &value)
+/// \cond
+void QXmpp::Private::writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name,
+                                               const QString &value)
 {
     if (!value.isEmpty()) {
         stream->writeAttribute(name, value);
     }
 }
 
-void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
-                               const QString &value)
+void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, const QString &name,
+                                         const QString &value)
 {
     if (!value.isEmpty()) {
         stream->writeTextElement(name, value);
@@ -327,8 +327,6 @@ void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
         stream->writeEmptyElement(name);
     }
 }
-
-/// \cond
 
 //
 // Generates a random count of random bytes.

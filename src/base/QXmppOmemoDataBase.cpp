@@ -7,9 +7,12 @@
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 /// \cond
 ///
@@ -109,7 +112,7 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QStringLiteral("rid"), QString::number(m_recipientDeviceId));
 
     if (m_isUsedForKeyExchange) {
-        helperToXmlAddAttribute(writer, QStringLiteral("kex"), QStringLiteral("true"));
+        writeOptionalXmlAttribute(writer, QStringLiteral("kex"), QStringLiteral("true"));
     }
 
     writer->writeCharacters(m_data.toBase64());

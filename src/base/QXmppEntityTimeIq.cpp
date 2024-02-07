@@ -6,8 +6,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// Returns the timezone offset in seconds.
@@ -73,8 +76,8 @@ void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_entity_time);
 
     if (m_utc.isValid()) {
-        helperToXmlAddTextElement(writer, "tzo", QXmppUtils::timezoneOffsetToString(m_tzo));
-        helperToXmlAddTextElement(writer, "utc", QXmppUtils::datetimeToString(m_utc));
+        writeXmlTextElement(writer, "tzo", QXmppUtils::timezoneOffsetToString(m_tzo));
+        writeXmlTextElement(writer, "utc", QXmppUtils::datetimeToString(m_utc));
     }
     writer->writeEndElement();
 }

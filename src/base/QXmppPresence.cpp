@@ -8,9 +8,12 @@
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDateTime>
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 static const QStringList PRESENCE_TYPES = {
     QStringLiteral("error"),
@@ -528,21 +531,21 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
 void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement(QStringLiteral("presence"));
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("xml:lang"), lang());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("id"), id());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("to"), to());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("from"), from());
-    helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), PRESENCE_TYPES.at(d->type));
+    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("xml:lang"), lang());
+    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("id"), id());
+    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("to"), to());
+    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("from"), from());
+    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("type"), PRESENCE_TYPES.at(d->type));
 
     const QString show = AVAILABLE_STATUS_TYPES.at(d->availableStatusType);
     if (!show.isEmpty()) {
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("show"), show);
+        writeXmlTextElement(xmlWriter, QStringLiteral("show"), show);
     }
     if (!d->statusText.isEmpty()) {
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("status"), d->statusText);
+        writeXmlTextElement(xmlWriter, QStringLiteral("status"), d->statusText);
     }
     if (d->priority != 0) {
-        helperToXmlAddTextElement(xmlWriter, QStringLiteral("priority"), QString::number(d->priority));
+        writeXmlTextElement(xmlWriter, QStringLiteral("priority"), QString::number(d->priority));
     }
 
     error().toXml(xmlWriter);
@@ -577,9 +580,9 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         !d->capabilityHash.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("c"));
         xmlWriter->writeDefaultNamespace(ns_capabilities);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("hash"), d->capabilityHash);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("node"), d->capabilityNode);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("ver"), d->capabilityVer.toBase64());
+        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("hash"), d->capabilityHash);
+        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("node"), d->capabilityNode);
+        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("ver"), d->capabilityVer.toBase64());
         xmlWriter->writeEndElement();
     }
 
@@ -592,7 +595,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             xmlWriter->writeEmptyElement(QStringLiteral("photo"));
             break;
         case VCardUpdateValidPhoto:
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("photo"), d->photoHash.toHex());
+            writeXmlTextElement(xmlWriter, QStringLiteral("photo"), d->photoHash.toHex());
             break;
         default:
             break;
@@ -620,7 +623,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (!d->lastUserInteraction.isNull() && d->lastUserInteraction.isValid()) {
         xmlWriter->writeStartElement(QStringLiteral("idle"));
         xmlWriter->writeDefaultNamespace(ns_idle);
-        helperToXmlAddAttribute(xmlWriter, QStringLiteral("since"), QXmppUtils::datetimeToString(d->lastUserInteraction));
+        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("since"), QXmppUtils::datetimeToString(d->lastUserInteraction));
         xmlWriter->writeEndElement();
     }
 
@@ -629,10 +632,10 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement(QStringLiteral("mix"));
         xmlWriter->writeDefaultNamespace(ns_mix_presence);
         if (!d->mixUserJid.isEmpty()) {
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
+            writeXmlTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
         }
         if (!d->mixUserNick.isEmpty()) {
-            helperToXmlAddTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
+            writeXmlTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
         }
         xmlWriter->writeEndElement();
     }

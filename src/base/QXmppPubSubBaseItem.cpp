@@ -6,9 +6,11 @@
 #include "QXmppPubSubBaseItem.h"
 
 #include "QXmppElement.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 class QXmppPubSubBaseItemPrivate : public QSharedData
 {
@@ -115,8 +117,8 @@ void QXmppPubSubBaseItem::parse(const QDomElement &element)
 void QXmppPubSubBaseItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
-    helperToXmlAddAttribute(writer, QStringLiteral("publisher"), d->publisher);
+    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
+    writeOptionalXmlAttribute(writer, QStringLiteral("publisher"), d->publisher);
 
     serializePayload(writer);
 

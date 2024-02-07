@@ -5,9 +5,11 @@
 #include "QXmppPubSubItem.h"
 
 #include "QXmppElement.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 /// \cond
 class QXmppPubSubItemPrivate : public QSharedData
@@ -69,7 +71,7 @@ void QXmppPubSubItem::parse(const QDomElement &element)
 void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    helperToXmlAddAttribute(writer, QStringLiteral("id"), d->id);
+    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
     d->contents.toXml(writer);
     writer->writeEndElement();
 }

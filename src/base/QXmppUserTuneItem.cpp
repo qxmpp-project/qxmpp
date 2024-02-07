@@ -5,11 +5,13 @@
 #include "QXmppUserTuneItem.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QUrl>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 /// \cond
 class QXmppTuneItemPrivate : public QSharedData
@@ -262,17 +264,17 @@ void QXmppTuneItem::serializePayload(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("tune"));
     writer->writeDefaultNamespace(ns_tune);
 
-    helperToXmlAddTextElement(writer, QStringLiteral("artist"), d->artist);
+    writeXmlTextElement(writer, QStringLiteral("artist"), d->artist);
     if (d->length) {
         writer->writeTextElement(QStringLiteral("length"), QString::number(*d->length));
     }
     if (d->rating) {
         writer->writeTextElement(QStringLiteral("rating"), QString::number(*d->rating));
     }
-    helperToXmlAddTextElement(writer, QStringLiteral("source"), d->source);
-    helperToXmlAddTextElement(writer, QStringLiteral("title"), d->title);
-    helperToXmlAddTextElement(writer, QStringLiteral("track"), d->track);
-    helperToXmlAddTextElement(writer, QStringLiteral("uri"), d->uri.toString(QUrl::FullyEncoded));
+    writeXmlTextElement(writer, QStringLiteral("source"), d->source);
+    writeXmlTextElement(writer, QStringLiteral("title"), d->title);
+    writeXmlTextElement(writer, QStringLiteral("track"), d->track);
+    writeXmlTextElement(writer, QStringLiteral("uri"), d->uri.toString(QUrl::FullyEncoded));
 
     writer->writeEndElement();
 }

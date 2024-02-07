@@ -44,9 +44,4 @@ public:
     static QString generateStanzaHash(int length = 36);
 };
 
-void helperToXmlAddAttribute(QXmlStreamWriter *stream, const QString &name,
-                             const QString &value);
-void helperToXmlAddTextElement(QXmlStreamWriter *stream, const QString &name,
-                               const QString &value);
-
 #endif  // QXMPPUTILS_H

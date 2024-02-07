@@ -4,9 +4,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppStreamInitiationIq_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 /// \cond
 QXmppDataForm QXmppStreamInitiationIq::featureForm() const
@@ -91,10 +93,10 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
 {
     writer->writeStartElement(QStringLiteral("si"));
     writer->writeDefaultNamespace(ns_stream_initiation);
-    helperToXmlAddAttribute(writer, QStringLiteral("id"), m_siId);
-    helperToXmlAddAttribute(writer, QStringLiteral("mime-type"), m_mimeType);
+    writeOptionalXmlAttribute(writer, QStringLiteral("id"), m_siId);
+    writeOptionalXmlAttribute(writer, QStringLiteral("mime-type"), m_mimeType);
     if (m_profile == FileTransfer) {
-        helperToXmlAddAttribute(writer, QStringLiteral("profile"), ns_stream_initiation_file_transfer);
+        writeOptionalXmlAttribute(writer, QStringLiteral("profile"), ns_stream_initiation_file_transfer);
     }
     if (!m_fileInfo.isNull()) {
         m_fileInfo.toXml(writer);

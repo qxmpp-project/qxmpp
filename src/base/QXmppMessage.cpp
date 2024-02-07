@@ -22,11 +22,14 @@
 #include "QXmppOutOfBandUrl.h"
 #include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 static const QStringList CHAT_STATES = {
     QString(),
@@ -1359,11 +1362,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer) const
 void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
 {
     writer->writeStartElement(QStringLiteral("message"));
-    helperToXmlAddAttribute(writer, QStringLiteral("xml:lang"), lang());
-    helperToXmlAddAttribute(writer, QStringLiteral("id"), id());
-    helperToXmlAddAttribute(writer, QStringLiteral("to"), to());
-    helperToXmlAddAttribute(writer, QStringLiteral("from"), from());
-    helperToXmlAddAttribute(writer, QStringLiteral("type"), MESSAGE_TYPES.at(d->type));
+    writeOptionalXmlAttribute(writer, QStringLiteral("xml:lang"), lang());
+    writeOptionalXmlAttribute(writer, QStringLiteral("id"), id());
+    writeOptionalXmlAttribute(writer, QStringLiteral("to"), to());
+    writeOptionalXmlAttribute(writer, QStringLiteral("from"), from());
+    writeOptionalXmlAttribute(writer, QStringLiteral("type"), MESSAGE_TYPES.at(d->type));
     error().toXml(writer);
 
     // extensions
@@ -1705,8 +1708,8 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
             writer->writeStartElement(QStringLiteral("mix"));
             writer->writeDefaultNamespace(ns_mix);
-            helperToXmlAddTextElement(writer, QStringLiteral("jid"), d->mixUserJid);
-            helperToXmlAddTextElement(writer, QStringLiteral("nick"), d->mixUserNick);
+            writeXmlTextElement(writer, QStringLiteral("jid"), d->mixUserJid);
+            writeXmlTextElement(writer, QStringLiteral("nick"), d->mixUserNick);
             writer->writeEndElement();
         }
 
@@ -1715,7 +1718,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement(QStringLiteral("encryption"));
             writer->writeDefaultNamespace(ns_eme);
             writer->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
-            helperToXmlAddAttribute(writer, QStringLiteral("name"), encryptionName());
+            writeOptionalXmlAttribute(writer, QStringLiteral("name"), encryptionName());
             writer->writeEndElement();
         }
 
@@ -1755,7 +1758,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             if (!baseNamespace.isNull()) {
                 writer->writeDefaultNamespace(baseNamespace);
             }
-            helperToXmlAddAttribute(writer, QStringLiteral("parent"), d->parentThread);
+            writeOptionalXmlAttribute(writer, QStringLiteral("parent"), d->parentThread);
             writer->writeCharacters(d->thread);
             writer->writeEndElement();
         }
@@ -1791,13 +1794,13 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
                 // XEP-0203: Delayed Delivery
                 writer->writeStartElement(QStringLiteral("delay"));
                 writer->writeDefaultNamespace(ns_delayed_delivery);
-                helperToXmlAddAttribute(writer, QStringLiteral("stamp"), QXmppUtils::datetimeToString(utcStamp));
+                writeOptionalXmlAttribute(writer, QStringLiteral("stamp"), QXmppUtils::datetimeToString(utcStamp));
                 writer->writeEndElement();
             } else {
                 // XEP-0091: Legacy Delayed Delivery
                 writer->writeStartElement(QStringLiteral("x"));
                 writer->writeDefaultNamespace(ns_legacy_delayed_delivery);
-                helperToXmlAddAttribute(writer, QStringLiteral("stamp"), utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
+                writeOptionalXmlAttribute(writer, QStringLiteral("stamp"), utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
                 writer->writeEndElement();
             }
         }

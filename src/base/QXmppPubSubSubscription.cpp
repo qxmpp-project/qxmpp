@@ -6,10 +6,13 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDateTime>
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppPubSubSubscription
@@ -297,9 +300,9 @@ void QXmppPubSubSubscription::toXml(QXmlStreamWriter *writer) const
 
     // jid is required
     writer->writeAttribute(QStringLiteral("jid"), d->jid);
-    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->node);
-    helperToXmlAddAttribute(writer, QStringLiteral("subscription"), stateToString(d->state));
-    helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subId);
+    writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->node);
+    writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), stateToString(d->state));
+    writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subId);
     if (d->expiry.isValid()) {
         writer->writeAttribute(QStringLiteral("expiry"),
                                QXmppUtils::datetimeToString(d->expiry));

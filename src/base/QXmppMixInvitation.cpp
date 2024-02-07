@@ -5,10 +5,12 @@
 #include "QXmppMixInvitation.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 class QXmppMixInvitationPrivate : public QSharedData
 {
@@ -133,10 +135,10 @@ void QXmppMixInvitation::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("invitation"));
     writer->writeDefaultNamespace(ns_mix_misc);
 
-    helperToXmlAddTextElement(writer, QStringLiteral("inviter"), d->inviterJid);
-    helperToXmlAddTextElement(writer, QStringLiteral("invitee"), d->inviteeJid);
-    helperToXmlAddTextElement(writer, QStringLiteral("channel"), d->channelJid);
-    helperToXmlAddTextElement(writer, QStringLiteral("token"), d->token);
+    writeXmlTextElement(writer, QStringLiteral("inviter"), d->inviterJid);
+    writeXmlTextElement(writer, QStringLiteral("invitee"), d->inviteeJid);
+    writeXmlTextElement(writer, QStringLiteral("channel"), d->channelJid);
+    writeXmlTextElement(writer, QStringLiteral("token"), d->token);
 
     writer->writeEndElement();
 }

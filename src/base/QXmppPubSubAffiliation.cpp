@@ -5,10 +5,12 @@
 #include "QXmppPubSubAffiliation.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppPubSubAffiliation
@@ -158,8 +160,8 @@ void QXmppPubSubAffiliation::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("affiliation"));
     writer->writeAttribute(QStringLiteral("affiliation"), PUBSUB_AFFILIATIONS.at(int(d->type)));
-    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->node);
-    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->jid);
+    writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->node);
+    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->jid);
     writer->writeEndElement();
 }
 /// \endcond

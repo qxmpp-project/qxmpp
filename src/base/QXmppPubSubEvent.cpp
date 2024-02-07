@@ -6,9 +6,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppPubSubEventBase
@@ -404,7 +406,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
             break;
         case Configuration:
             // node attribute is optional
-            helperToXmlAddAttribute(writer, QStringLiteral("node"), d->node);
+            writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->node);
             break;
         case Subscription:
             break;

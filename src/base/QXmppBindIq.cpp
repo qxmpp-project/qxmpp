@@ -6,11 +6,13 @@
 #include "QXmppBindIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 /// Returns the bound JID.
 ///
@@ -65,10 +67,10 @@ void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("bind"));
     writer->writeDefaultNamespace(ns_bind);
     if (!m_jid.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("jid"), m_jid);
+        writeXmlTextElement(writer, QStringLiteral("jid"), m_jid);
     }
     if (!m_resource.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("resource"), m_resource);
+        writeXmlTextElement(writer, QStringLiteral("resource"), m_resource);
     }
     writer->writeEndElement();
 }
