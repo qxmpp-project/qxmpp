@@ -5,9 +5,11 @@
 #include "QXmppDialback.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 /// Constructs a QXmppDialback.
 
@@ -91,10 +93,10 @@ void QXmppDialback::toXml(QXmlStreamWriter *xmlWriter) const
     } else {
         xmlWriter->writeStartElement("db:verify");
     }
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", m_type);
+    writeOptionalXmlAttribute(xmlWriter, "id", id());
+    writeOptionalXmlAttribute(xmlWriter, "to", to());
+    writeOptionalXmlAttribute(xmlWriter, "from", from());
+    writeOptionalXmlAttribute(xmlWriter, "type", m_type);
     if (!m_key.isEmpty()) {
         xmlWriter->writeCharacters(m_key);
     }

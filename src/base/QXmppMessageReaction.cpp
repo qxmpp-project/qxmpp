@@ -5,9 +5,12 @@
 #include "QXmppMessageReaction.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+#include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppMessageReactionPrivate : public QSharedData
 {
@@ -112,7 +115,7 @@ void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QStringLiteral("id"), d->messageId);
 
     for (const auto &reaction : d->emojis) {
-        helperToXmlAddTextElement(writer, QStringLiteral("reaction"), reaction);
+        writeXmlTextElement(writer, QStringLiteral("reaction"), reaction);
     }
     writer->writeEndElement();
 }

@@ -4,10 +4,12 @@
 
 #include "QXmppIq.h"
 
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 static const char *iq_types[] = {
     "error",
@@ -106,10 +108,10 @@ void QXmppIq::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement("iq");
 
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", iq_types[d->type]);
+    writeOptionalXmlAttribute(xmlWriter, "id", id());
+    writeOptionalXmlAttribute(xmlWriter, "to", to());
+    writeOptionalXmlAttribute(xmlWriter, "from", from());
+    writeOptionalXmlAttribute(xmlWriter, "type", iq_types[d->type]);
     toXmlElementFromChild(xmlWriter);
     error().toXml(xmlWriter);
     xmlWriter->writeEndElement();

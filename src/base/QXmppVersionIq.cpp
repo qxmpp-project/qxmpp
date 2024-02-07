@@ -5,9 +5,11 @@
 #include "QXmppVersionIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 /// Returns the name of the software.
 ///
@@ -86,15 +88,15 @@ void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_version);
 
     if (!m_name.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("name"), m_name);
+        writeXmlTextElement(writer, QStringLiteral("name"), m_name);
     }
 
     if (!m_os.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("os"), m_os);
+        writeXmlTextElement(writer, QStringLiteral("os"), m_os);
     }
 
     if (!m_version.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("version"), m_version);
+        writeXmlTextElement(writer, QStringLiteral("version"), m_version);
     }
 
     writer->writeEndElement();

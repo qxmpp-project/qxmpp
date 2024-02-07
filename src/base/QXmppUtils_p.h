@@ -12,7 +12,12 @@
 
 #include <QByteArray>
 
+class QXmlStreamWriter;
+
 namespace QXmpp::Private {
+
+void writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name, const QString &value);
+void writeXmlTextElement(QXmlStreamWriter *stream, const QString &name, const QString &value);
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);

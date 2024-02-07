@@ -5,9 +5,11 @@
 #include "QXmppMucIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 QXmppMucItem::QXmppMucItem()
     : m_affiliation(QXmppMucItem::UnspecifiedAffiliation),
@@ -207,17 +209,17 @@ void QXmppMucItem::parse(const QDomElement &element)
 void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    helperToXmlAddAttribute(writer, QStringLiteral("affiliation"), affiliationToString(m_affiliation));
-    helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_jid);
-    helperToXmlAddAttribute(writer, QStringLiteral("nick"), m_nick);
-    helperToXmlAddAttribute(writer, QStringLiteral("role"), roleToString(m_role));
+    writeOptionalXmlAttribute(writer, QStringLiteral("affiliation"), affiliationToString(m_affiliation));
+    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_jid);
+    writeOptionalXmlAttribute(writer, QStringLiteral("nick"), m_nick);
+    writeOptionalXmlAttribute(writer, QStringLiteral("role"), roleToString(m_role));
     if (!m_actor.isEmpty()) {
         writer->writeStartElement(QStringLiteral("actor"));
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), m_actor);
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_actor);
         writer->writeEndElement();
     }
     if (!m_reason.isEmpty()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("reason"), m_reason);
+        writeXmlTextElement(writer, QStringLiteral("reason"), m_reason);
     }
     writer->writeEndElement();
 }

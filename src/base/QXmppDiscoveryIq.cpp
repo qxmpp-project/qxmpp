@@ -5,11 +5,13 @@
 #include "QXmppDiscoveryIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 static bool identityLessThan(const QXmppDiscoveryIq::Identity &i1, const QXmppDiscoveryIq::Identity &i2)
 {
@@ -495,29 +497,29 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("query");
     writer->writeDefaultNamespace(
         d->queryType == InfoQuery ? ns_disco_info : ns_disco_items);
-    helperToXmlAddAttribute(writer, "node", d->queryNode);
+    writeOptionalXmlAttribute(writer, "node", d->queryNode);
 
     if (d->queryType == InfoQuery) {
         for (const auto &identity : d->identities) {
             writer->writeStartElement("identity");
-            helperToXmlAddAttribute(writer, "xml:lang", identity.language());
-            helperToXmlAddAttribute(writer, "category", identity.category());
-            helperToXmlAddAttribute(writer, "name", identity.name());
-            helperToXmlAddAttribute(writer, "type", identity.type());
+            writeOptionalXmlAttribute(writer, "xml:lang", identity.language());
+            writeOptionalXmlAttribute(writer, "category", identity.category());
+            writeOptionalXmlAttribute(writer, "name", identity.name());
+            writeOptionalXmlAttribute(writer, "type", identity.type());
             writer->writeEndElement();
         }
 
         for (const auto &feature : d->features) {
             writer->writeStartElement("feature");
-            helperToXmlAddAttribute(writer, "var", feature);
+            writeOptionalXmlAttribute(writer, "var", feature);
             writer->writeEndElement();
         }
     } else {
         for (const auto &item : d->items) {
             writer->writeStartElement("item");
-            helperToXmlAddAttribute(writer, "jid", item.jid());
-            helperToXmlAddAttribute(writer, "name", item.name());
-            helperToXmlAddAttribute(writer, "node", item.node());
+            writeOptionalXmlAttribute(writer, "jid", item.jid());
+            writeOptionalXmlAttribute(writer, "name", item.name());
+            writeOptionalXmlAttribute(writer, "node", item.node());
             writer->writeEndElement();
         }
     }

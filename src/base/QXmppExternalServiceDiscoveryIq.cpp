@@ -6,9 +6,12 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDateTime>
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 using Action = QXmppExternalService::Action;
 using Transport = QXmppExternalService::Transport;
@@ -326,39 +329,39 @@ void QXmppExternalService::parse(const QDomElement &el)
 void QXmppExternalService::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("service");
-    helperToXmlAddAttribute(writer, "host", d->host);
-    helperToXmlAddAttribute(writer, "type", d->type);
+    writeOptionalXmlAttribute(writer, "host", d->host);
+    writeOptionalXmlAttribute(writer, "type", d->type);
 
     if (d->action) {
-        helperToXmlAddAttribute(writer, "action", actionToString(d->action.value()));
+        writeOptionalXmlAttribute(writer, "action", actionToString(d->action.value()));
     }
 
     if (d->expires) {
-        helperToXmlAddAttribute(writer, "expires", d->expires->toString(Qt::ISODateWithMs));
+        writeOptionalXmlAttribute(writer, "expires", d->expires->toString(Qt::ISODateWithMs));
     }
 
     if (d->name) {
-        helperToXmlAddAttribute(writer, "name", d->name.value());
+        writeOptionalXmlAttribute(writer, "name", d->name.value());
     }
 
     if (d->password) {
-        helperToXmlAddAttribute(writer, "password", d->password.value());
+        writeOptionalXmlAttribute(writer, "password", d->password.value());
     }
 
     if (d->port) {
-        helperToXmlAddAttribute(writer, "port", QString::number(d->port.value()));
+        writeOptionalXmlAttribute(writer, "port", QString::number(d->port.value()));
     }
 
     if (d->restricted) {
-        helperToXmlAddAttribute(writer, "restricted", d->restricted.value() ? "true" : "false");
+        writeOptionalXmlAttribute(writer, "restricted", d->restricted.value() ? "true" : "false");
     }
 
     if (d->transport) {
-        helperToXmlAddAttribute(writer, "transport", transportToString(d->transport.value()));
+        writeOptionalXmlAttribute(writer, "transport", transportToString(d->transport.value()));
     }
 
     if (d->username) {
-        helperToXmlAddAttribute(writer, "username", d->username.value());
+        writeOptionalXmlAttribute(writer, "username", d->username.value());
     }
 
     writer->writeEndElement();

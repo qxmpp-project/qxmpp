@@ -5,10 +5,12 @@
 #include "QXmppResultSet.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDebug>
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 QXmppResultSetQuery::QXmppResultSetQuery()
     : m_index(-1), m_max(-1)
@@ -122,16 +124,16 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("set"));
     writer->writeDefaultNamespace(ns_rsm);
     if (m_max >= 0) {
-        helperToXmlAddTextElement(writer, QStringLiteral("max"), QString::number(m_max));
+        writeXmlTextElement(writer, QStringLiteral("max"), QString::number(m_max));
     }
     if (!m_after.isNull()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("after"), m_after);
+        writeXmlTextElement(writer, QStringLiteral("after"), m_after);
     }
     if (!m_before.isNull()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("before"), m_before);
+        writeXmlTextElement(writer, QStringLiteral("before"), m_before);
     }
     if (m_index >= 0) {
-        helperToXmlAddTextElement(writer, QStringLiteral("index"), QString::number(m_index));
+        writeXmlTextElement(writer, QStringLiteral("index"), QString::number(m_index));
     }
     writer->writeEndElement();
 }
@@ -250,11 +252,11 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
     if (!m_last.isNull()) {
-        helperToXmlAddTextElement(writer, "last", m_last);
+        writeXmlTextElement(writer, "last", m_last);
     }
 
     if (m_count >= 0) {
-        helperToXmlAddTextElement(writer, "count", QString::number(m_count));
+        writeXmlTextElement(writer, "count", QString::number(m_count));
     }
     writer->writeEndElement();
 }

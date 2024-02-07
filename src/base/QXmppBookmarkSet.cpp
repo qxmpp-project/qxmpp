@@ -4,9 +4,11 @@
 
 #include "QXmppBookmarkSet.h"
 
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 static const char *ns_bookmarks = "storage:bookmarks";
 
@@ -191,19 +193,19 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
     for (const auto &conference : m_conferences) {
         writer->writeStartElement(QStringLiteral("conference"));
         if (conference.autoJoin()) {
-            helperToXmlAddAttribute(writer, QStringLiteral("autojoin"), QStringLiteral("true"));
+            writeOptionalXmlAttribute(writer, QStringLiteral("autojoin"), QStringLiteral("true"));
         }
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), conference.jid());
-        helperToXmlAddAttribute(writer, QStringLiteral("name"), conference.name());
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), conference.jid());
+        writeOptionalXmlAttribute(writer, QStringLiteral("name"), conference.name());
         if (!conference.nickName().isEmpty()) {
-            helperToXmlAddTextElement(writer, QStringLiteral("nick"), conference.nickName());
+            writeXmlTextElement(writer, QStringLiteral("nick"), conference.nickName());
         }
         writer->writeEndElement();
     }
     for (const auto &url : m_urls) {
         writer->writeStartElement(QStringLiteral("url"));
-        helperToXmlAddAttribute(writer, QStringLiteral("name"), url.name());
-        helperToXmlAddAttribute(writer, QStringLiteral("url"), url.url().toString());
+        writeOptionalXmlAttribute(writer, QStringLiteral("name"), url.name());
+        writeOptionalXmlAttribute(writer, QStringLiteral("url"), url.url().toString());
         writer->writeEndElement();
     }
     writer->writeEndElement();

@@ -7,7 +7,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppDataFormBase.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <optional>
 
@@ -18,6 +18,8 @@
 #include <QSize>
 #include <QStringList>
 #include <QUrl>
+
+using namespace QXmpp::Private;
 
 struct field_type
 {
@@ -909,26 +911,26 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         writer->writeAttribute("type", fieldTypeToString(field.type()));
 
         /* field attributes */
-        helperToXmlAddAttribute(writer, "label", field.label());
-        helperToXmlAddAttribute(writer, "var", field.key());
+        writeOptionalXmlAttribute(writer, "label", field.label());
+        writeOptionalXmlAttribute(writer, "var", field.key());
 
         /* field value(s) */
         switch (field.type()) {
         case Field::BooleanField:
-            helperToXmlAddTextElement(writer, "value", field.value().toBool() ? "1" : "0");
+            writeXmlTextElement(writer, "value", field.value().toBool() ? "1" : "0");
             break;
         case Field::ListMultiField:
         case Field::JidMultiField:
         case Field::TextMultiField: {
             const auto values = field.value().toStringList();
             for (const QString &value : values) {
-                helperToXmlAddTextElement(writer, "value", value);
+                writeXmlTextElement(writer, "value", value);
             }
             break;
         }
         default:
             if (const auto value = field.value().toString(); !value.isEmpty()) {
-                helperToXmlAddTextElement(writer, "value", value);
+                writeXmlTextElement(writer, "value", value);
             }
         }
 
@@ -939,13 +941,13 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
             // media width and height
             if (field.mediaSize().width() > 0) {
-                helperToXmlAddAttribute(
+                writeOptionalXmlAttribute(
                     writer,
                     QStringLiteral("width"),
                     QString::number(field.mediaSize().width()));
             }
             if (field.mediaSize().height() > 0) {
-                helperToXmlAddAttribute(
+                writeOptionalXmlAttribute(
                     writer,
                     QStringLiteral("height"),
                     QString::number(field.mediaSize().height()));
@@ -954,7 +956,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             const auto sources = field.mediaSources();
             for (const auto &source : sources) {
                 writer->writeStartElement(QStringLiteral("uri"));
-                helperToXmlAddAttribute(writer, QStringLiteral("type"), source.contentType().name());
+                writeOptionalXmlAttribute(writer, QStringLiteral("type"), source.contentType().name());
                 writer->writeCharacters(source.uri().toString());
                 writer->writeEndElement();
             }
@@ -969,8 +971,8 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             const auto options = field.options();
             for (const auto &option : options) {
                 writer->writeStartElement("option");
-                helperToXmlAddAttribute(writer, "label", option.first);
-                helperToXmlAddTextElement(writer, "value", option.second);
+                writeOptionalXmlAttribute(writer, "label", option.first);
+                writeXmlTextElement(writer, "value", option.second);
                 writer->writeEndElement();
             }
         }
@@ -980,10 +982,10 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
         /* other properties */
         if (!field.description().isEmpty()) {
-            helperToXmlAddTextElement(writer, "description", field.description());
+            writeXmlTextElement(writer, "description", field.description());
         }
         if (field.isRequired()) {
-            helperToXmlAddTextElement(writer, "required", "");
+            writeXmlTextElement(writer, "required", "");
         }
 
         writer->writeEndElement();

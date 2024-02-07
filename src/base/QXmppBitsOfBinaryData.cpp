@@ -5,13 +5,15 @@
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QMimeType>
 #include <QSharedData>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppBitsOfBinaryDataPrivate : public QSharedData
 {
@@ -180,11 +182,11 @@ void QXmppBitsOfBinaryData::toXmlElementFromChild(QXmlStreamWriter *writer) cons
 {
     writer->writeStartElement(QStringLiteral("data"));
     writer->writeDefaultNamespace(ns_bob);
-    helperToXmlAddAttribute(writer, QStringLiteral("cid"), d->cid.toContentId());
+    writeOptionalXmlAttribute(writer, QStringLiteral("cid"), d->cid.toContentId());
     if (d->maxAge > -1) {
-        helperToXmlAddAttribute(writer, QStringLiteral("max-age"), QString::number(d->maxAge));
+        writeOptionalXmlAttribute(writer, QStringLiteral("max-age"), QString::number(d->maxAge));
     }
-    helperToXmlAddAttribute(writer, QStringLiteral("type"), d->contentType.name());
+    writeOptionalXmlAttribute(writer, QStringLiteral("type"), d->contentType.name());
     writer->writeCharacters(d->data.toBase64());
     writer->writeEndElement();
 }

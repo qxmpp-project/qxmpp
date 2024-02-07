@@ -5,10 +5,12 @@
 #include "QXmppPubSubIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 /// \cond
 QT_WARNING_PUSH
@@ -186,8 +188,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     // write query type
     writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
-    helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNode);
+    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->queryJid);
+    writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->queryNode);
 
     // write contents
     switch (d->queryType) {
@@ -199,8 +201,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
-        helperToXmlAddAttribute(writer, QStringLiteral("subscription"), d->subscriptionType);
+        writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
+        writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), d->subscriptionType);
         break;
     default:
         break;

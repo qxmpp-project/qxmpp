@@ -9,7 +9,7 @@
 #include "QXmppPubSubIq_p.h"
 #include "QXmppPubSubSubscription.h"
 #include "QXmppResultSet.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QSharedData>
 
@@ -553,15 +553,15 @@ void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
     } else {
         // write query type
         writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-        helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->queryJid);
-        helperToXmlAddAttribute(writer, QStringLiteral("node"), d->queryNode);
+        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->queryJid);
+        writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->queryNode);
 
         // write subid
         switch (d->queryType) {
         case Items:
         case Unsubscribe:
         case Options:
-            helperToXmlAddAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
+            writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
         default:
             break;
         }

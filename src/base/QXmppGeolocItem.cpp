@@ -5,10 +5,12 @@
 #include "QXmppGeolocItem.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 /// \cond
 class QXmppGeolocItemPrivate : public QSharedData
@@ -185,7 +187,7 @@ auto writeTextEl(QXmlStreamWriter *writer, const QString &name, const std::optio
 }
 auto writeTextEl(QXmlStreamWriter *writer, const QString &name, const QString &val)
 {
-    helperToXmlAddTextElement(writer, name, val);
+    writeXmlTextElement(writer, name, val);
 }
 
 void QXmppGeolocItem::serializePayload(QXmlStreamWriter *writer) const

@@ -6,11 +6,13 @@
 #include "QXmppRosterIq.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppRosterIqPrivate : public QSharedData
 {
@@ -425,17 +427,17 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    helperToXmlAddAttribute(writer, QStringLiteral("jid"), d->bareJid);
-    helperToXmlAddAttribute(writer, QStringLiteral("name"), d->name);
-    helperToXmlAddAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
-    helperToXmlAddAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
+    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->bareJid);
+    writeOptionalXmlAttribute(writer, QStringLiteral("name"), d->name);
+    writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
+    writeOptionalXmlAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
     if (d->approved) {
         writer->writeAttribute(QStringLiteral("approved"), QStringLiteral("true"));
     }
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
     while (i != d->groups.constEnd()) {
-        helperToXmlAddTextElement(writer, QStringLiteral("group"), *i);
+        writeXmlTextElement(writer, QStringLiteral("group"), *i);
         ++i;
     }
 
@@ -443,7 +445,7 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     if (d->isMixChannel) {
         writer->writeStartElement(QStringLiteral("channel"));
         writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
-        helperToXmlAddAttribute(writer, QStringLiteral("participant-id"), d->mixParticipantId);
+        writeOptionalXmlAttribute(writer, QStringLiteral("participant-id"), d->mixParticipantId);
         writer->writeEndElement();
     }
 
