@@ -4,20 +4,15 @@
 
 #include "QXmppNonza.h"
 #include "QXmppPacket_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QXmlStreamWriter>
 
-inline QByteArray serialize(const QXmppNonza &nonza)
-{
-    QByteArray out;
-    QXmlStreamWriter xmlStream(&out);
-    nonza.toXml(&xmlStream);
-    return out;
-}
+using namespace QXmpp::Private;
 
 /// \cond
 QXmppPacket::QXmppPacket(const QXmppNonza &nonza, QXmppPromise<QXmpp::SendResult> interface)
-    : QXmppPacket(serialize(nonza), nonza.isXmppStanza(), std::move(interface))
+    : QXmppPacket(serializeNonza(nonza), nonza.isXmppStanza(), std::move(interface))
 {
 }
 

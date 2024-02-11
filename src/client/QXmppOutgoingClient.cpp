@@ -529,11 +529,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether the stream can be resumed
         if (d->streamManagementAvailable && d->canResume) {
             d->isResuming = true;
-            QXmppStreamManagementResume streamManagementResume(streamManager().lastIncomingSequenceNumber(), d->smId);
-            QByteArray data;
-            QXmlStreamWriter xmlStream(&data);
-            streamManagementResume.toXml(&xmlStream);
-            sendData(data);
+            sendData(serializeNonza(QXmppStreamManagementResume(streamManager().lastIncomingSequenceNumber(), d->smId)));
             return;
         }
 
@@ -902,11 +898,7 @@ void QXmppOutgoingClientPrivate::sendSessionStart()
 
 void QXmppOutgoingClientPrivate::sendStreamManagementEnable()
 {
-    QXmppStreamManagementEnable streamManagementEnable(true);
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    streamManagementEnable.toXml(&xmlStream);
-    q->sendData(data);
+    q->sendData(serializeNonza(QXmppStreamManagementEnable(true)));
 }
 
 /// Returns the type of the last XMPP stream error that occurred.

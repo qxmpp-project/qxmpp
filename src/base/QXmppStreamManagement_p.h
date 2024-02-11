@@ -28,7 +28,7 @@ class QXmppPacket;
 //
 
 /// \cond
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnable
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnable : public QXmppNonza
 {
 public:
     QXmppStreamManagementEnable(const bool resume = false, const unsigned max = 0);
@@ -41,15 +41,15 @@ public:
 
     static bool isStreamManagementEnable(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     bool m_resume;
     unsigned m_max;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnabled
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnabled : public QXmppNonza
 {
 public:
     QXmppStreamManagementEnabled(const bool resume = false, const QString id = QString(),
@@ -69,8 +69,8 @@ public:
 
     static bool isStreamManagementEnabled(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     bool m_resume;
@@ -79,7 +79,7 @@ private:
     QString m_location;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResume
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResume : public QXmppNonza
 {
 public:
     QXmppStreamManagementResume(const unsigned h = 0, const QString &previd = QString());
@@ -92,15 +92,15 @@ public:
 
     static bool isStreamManagementResume(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     unsigned m_h;
     QString m_previd;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResumed
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResumed : public QXmppNonza
 {
 public:
     QXmppStreamManagementResumed(const unsigned h = 0, const QString &previd = QString());
@@ -113,15 +113,15 @@ public:
 
     static bool isStreamManagementResumed(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     unsigned m_h;
     QString m_previd;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementFailed
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementFailed : public QXmppNonza
 {
 public:
     QXmppStreamManagementFailed(const QXmppStanza::Error::Condition error = QXmppStanza::Error::UndefinedCondition);
@@ -131,14 +131,14 @@ public:
 
     static bool isStreamManagementFailed(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     QXmppStanza::Error::Condition m_error;
 };
 
-class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementAck
+class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementAck : public QXmppNonza
 {
 public:
     QXmppStreamManagementAck(const unsigned seqNo = 0);
@@ -148,8 +148,8 @@ public:
 
     static bool isStreamManagementAck(const QDomElement &element);
 
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
+    void parse(const QDomElement &element) override;
+    void toXml(QXmlStreamWriter *writer) const override;
 
 private:
     unsigned m_seqNo;
