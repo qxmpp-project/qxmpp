@@ -20,6 +20,7 @@
 #include "QXmppPacket_p.h"
 #include "QXmppPromise.h"
 #include "QXmppRosterManager.h"
+#include "QXmppStreamManagement_p.h"
 #include "QXmppTask.h"
 #include "QXmppTlsManager_p.h"
 #include "QXmppUtils.h"
@@ -363,7 +364,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration &config,
 {
     // reset package cache from last connection
     if (d->stream->configuration().jidBare() != config.jidBare()) {
-        d->stream->resetPacketCache();
+        d->stream->streamManager().resetCache();
     }
 
     d->stream->configuration() = config;
