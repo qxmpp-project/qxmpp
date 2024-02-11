@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -10,6 +11,7 @@
 #include "QXmppSendResult.h"
 
 #include <memory>
+#include <unordered_map>
 #include <variant>
 
 #include <QAbstractSocket>
@@ -29,6 +31,13 @@ class QXmppPacket;
 class QXmppStanza;
 class QXmppStreamManager;
 class QXmppStreamPrivate;
+
+namespace QXmpp::Private {
+
+struct IqState;
+class OutgoingIqManager;
+
+}  // namespace QXmpp::Private
 
 ///
 /// \brief The QXmppStream class is the base class for all XMPP streams.
@@ -50,10 +59,9 @@ public:
     using IqResult = std::variant<QDomElement, QXmppError>;
     QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
     QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
-    void cancelOngoingIqs();
-    bool hasIqId(const QString &id) const;
 
     QXmppStreamManager &streamManager() const;
+    QXmpp::Private::OutgoingIqManager &iqManager() const;
 
 Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
@@ -97,12 +105,39 @@ private:
 
     QXmppTask<QXmpp::SendResult> send(QXmppPacket &&, bool &);
     void processData(const QString &data);
-    bool handleIqResponse(const QDomElement &);
 
     // for unit tests, see TestClient
     void enableStreamManagement(bool resetSequenceNumber);
+    bool handleIqResponse(const QDomElement &);
 
     const std::unique_ptr<QXmppStreamPrivate> d;
 };
+
+namespace QXmpp::Private {
+
+class OutgoingIqManager
+{
+    using IqResult = std::variant<QDomElement, QXmppError>;
+
+public:
+    explicit OutgoingIqManager(QXmppLoggable *l);
+
+    bool hasId(const QString &id) const;
+    bool isIdValid(const QString &id) const;
+
+    QXmppTask<IqResult> start(const QString &id, const QString &to);
+    void finish(const QString &id, IqResult &&result);
+    void cancelAll();
+
+    bool handleStanza(const QDomElement &stanza);
+
+private:
+    void warning(const QString &message);
+
+    QXmppLoggable *l;
+    std::unordered_map<QString, IqState> m_requests;
+};
+
+}  // namespace QXmpp::Private
 
 #endif  // QXMPPSTREAM_H
