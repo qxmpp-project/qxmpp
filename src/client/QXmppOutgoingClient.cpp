@@ -8,7 +8,6 @@
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppIq.h"
-#include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
@@ -855,15 +854,6 @@ bool QXmppOutgoingClient::setResumeAddress(const QString &address)
     d->resumeHost.clear();
     d->resumePort = 0;
     return false;
-}
-
-std::pair<QString, int> QXmppOutgoingClient::parseHostAddress(const QString &address)
-{
-    QUrl url(u"//" % address);
-    if (url.isValid() && !url.host().isEmpty()) {
-        return { url.host(), url.port() };
-    }
-    return { {}, -1 };
 }
 
 void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)

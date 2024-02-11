@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -7,6 +8,7 @@
 #include "QXmppHash.h"
 #include "QXmppHashing_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include "util.h"
 #include <QObject>
@@ -29,6 +31,8 @@ private:
     Q_SLOT void testStanzaHash();
     Q_SLOT void testCalculateHashes_data();
     Q_SLOT void testCalculateHashes();
+    Q_SLOT void testParseHostAddress_data();
+    Q_SLOT void testParseHostAddress();
 };
 
 void tst_QXmppUtils::testCrc32()
@@ -199,6 +203,54 @@ void tst_QXmppUtils::testCalculateHashes()
     auto hashes = expectVariant<std::vector<QXmppHash>>(std::move(result));
     QCOMPARE(int(hashes.size()), int(3));
     QCOMPARE(hashes.front().hash(), hash);
+}
+
+void tst_QXmppUtils::testParseHostAddress_data()
+{
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<QString>("resultHost");
+    QTest::addColumn<int>("resultPort");
+
+    QTest::newRow("host-and-port")
+        << QStringLiteral("qxmpp.org:443")
+        << QStringLiteral("qxmpp.org")
+        << 443;
+
+    QTest::newRow("no-port")
+        << QStringLiteral("qxmpp.org")
+        << QStringLiteral("qxmpp.org")
+        << -1;
+
+    QTest::newRow("ipv4-with-port")
+        << QStringLiteral("127.0.0.1:443")
+        << QStringLiteral("127.0.0.1")
+        << 443;
+
+    QTest::newRow("ipv4-no-port")
+        << QStringLiteral("127.0.0.1")
+        << QStringLiteral("127.0.0.1")
+        << -1;
+
+    QTest::newRow("ipv6-with-port")
+        << QStringLiteral("[2001:41D0:1:A49b::1]:9222")
+        << QStringLiteral("2001:41d0:1:a49b::1")
+        << 9222;
+
+    QTest::newRow("ipv6-no-port")
+        << QStringLiteral("[2001:41D0:1:A49b::1]")
+        << QStringLiteral("2001:41d0:1:a49b::1")
+        << -1;
+}
+
+void tst_QXmppUtils::testParseHostAddress()
+{
+    QFETCH(QString, input);
+    QFETCH(QString, resultHost);
+    QFETCH(int, resultPort);
+
+    const auto address = parseHostAddress(input);
+    QCOMPARE(address.first, resultHost);
+    QCOMPARE(address.second, resultPort);
 }
 
 QTEST_MAIN(tst_QXmppUtils)

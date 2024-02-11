@@ -20,10 +20,10 @@ class QXmppMessage;
 
 class QXmppOutgoingClientPrivate;
 
+///
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
 /// to an XMPP server.
 ///
-
 class QXMPP_EXPORT QXmppOutgoingClient : public QXmppStream
 {
     Q_OBJECT
@@ -90,10 +90,8 @@ private Q_SLOTS:
 
 private:
     bool setResumeAddress(const QString &address);
-    static std::pair<QString, int> parseHostAddress(const QString &address);
 
     friend class QXmppOutgoingClientPrivate;
-    friend class tst_QXmppOutgoingClient;
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };

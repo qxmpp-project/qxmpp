@@ -102,6 +102,8 @@ QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t 
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
 float calculateProgress(qint64 transferred, qint64 total);
 
+QXMPP_EXPORT std::pair<QString, int> parseHostAddress(const QString &address);
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPUTILS_P_H

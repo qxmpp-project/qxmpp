@@ -15,8 +15,9 @@
 #include <QDomElement>
 #include <QRandomGenerator>
 #include <QRegularExpression>
-#include <QString>
+#include <QStringBuilder>
 #include <QStringList>
+#include <QUrl>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -411,5 +412,14 @@ float QXmpp::Private::calculateProgress(qint64 transferred, qint64 total)
     }
 
     return 0;
+}
+
+std::pair<QString, int> QXmpp::Private::parseHostAddress(const QString &address)
+{
+    QUrl url(u"//" % address);
+    if (url.isValid() && !url.host().isEmpty()) {
+        return { url.host(), url.port() };
+    }
+    return { {}, -1 };
 }
 /// \endcond
