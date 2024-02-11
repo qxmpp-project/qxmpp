@@ -8,24 +8,14 @@
 
 #include "QXmppFutureUtils_p.h"
 #include "QXmppIq.h"
-#include "QXmppLogger.h"
 #include "QXmppPacket_p.h"
-#include "QXmppStanza.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils.h"
 
-#include <QBuffer>
 #include <QDomDocument>
-#include <QFuture>
-#include <QFutureInterface>
-#include <QFutureWatcher>
 #include <QHostAddress>
-#include <QMap>
 #include <QRegularExpression>
 #include <QSslSocket>
-#include <QStringList>
-#include <QTime>
-#include <QXmlStreamWriter>
 
 using namespace QXmpp;
 using namespace QXmpp::Private;

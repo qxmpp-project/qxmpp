@@ -442,14 +442,7 @@ void QXmppStreamManager::sendAcknowledgement()
         return;
     }
 
-    // prepare packet
-    QByteArray data;
-    QXmlStreamWriter xmlStream(&data);
-    QXmppStreamManagementAck ack(m_lastIncomingSequenceNumber);
-    ack.toXml(&xmlStream);
-
-    // send packet
-    stream->sendData(data);
+    stream->sendData(serializeNonza(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
 }
 
 void QXmppStreamManager::sendAcknowledgementRequest()

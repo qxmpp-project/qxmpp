@@ -16,6 +16,7 @@
 
 class QDomElement;
 class QXmlStreamWriter;
+class QXmppNonza;
 
 namespace QXmpp::Private {
 
@@ -97,6 +98,8 @@ struct DomChildElements {
 };
 
 inline DomChildElements iterChildElements(const QDomElement &el, QStringView tagName = {}, QStringView namespaceUri = {}) { return DomChildElements { el, tagName, namespaceUri }; }
+
+QByteArray serializeNonza(const QXmppNonza &);
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);

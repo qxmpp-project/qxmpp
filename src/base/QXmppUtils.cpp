@@ -5,6 +5,7 @@
 
 #include "QXmppUtils.h"
 
+#include "QXmppNonza.h"
 #include "QXmppUtils_p.h"
 
 #include <QBuffer>
@@ -355,6 +356,14 @@ QDomElement QXmpp::Private::nextSiblingElement(const QDomElement &el, QStringVie
         }
     }
     return {};
+}
+
+QByteArray QXmpp::Private::serializeNonza(const QXmppNonza &nonza)
+{
+    QByteArray data;
+    QXmlStreamWriter xmlStream(&data);
+    nonza.toXml(&xmlStream);
+    return data;
 }
 
 //
