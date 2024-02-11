@@ -385,16 +385,11 @@ bool QXmppStream::hasIqId(const QString &id) const
 }
 
 ///
-/// Resets the stream management packages cache.
+/// Returns the manager for Stream Management
 ///
-/// This can be done to prevent that packages from the last connection are being
-/// resent.
-///
-/// \since QXmpp 1.4
-///
-void QXmppStream::resetPacketCache()
+QXmppStreamManager &QXmppStream::streamManager() const
 {
-    d->streamManager.resetCache();
+    return d->streamManager;
 }
 
 ///
@@ -557,36 +552,7 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
     return d->iqManager.handleStanza(stanza);
 }
 
-///
-/// Enables Stream Management acks / reqs (\xep{0198}).
-///
-/// \param resetSequenceNumber Indicates if the sequence numbers should be
-/// reset. This must be done if the stream is not resumed.
-///
-/// \since QXmpp 1.0
-///
 void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
     d->streamManager.enableStreamManagement(resetSequenceNumber);
-}
-
-///
-/// Returns the sequence number of the last incoming stanza (\xep{0198}).
-///
-/// \since QXmpp 1.0
-///
-unsigned int QXmppStream::lastIncomingSequenceNumber() const
-{
-    return d->streamManager.lastIncomingSequenceNumber();
-}
-
-///
-/// Sets the last acknowledged sequence number for outgoing stanzas
-/// (\xep{0198}).
-///
-/// \since QXmpp 1.0
-///
-void QXmppStream::setAcknowledgedSequenceNumber(unsigned int sequenceNumber)
-{
-    d->streamManager.setAcknowledgedSequenceNumber(sequenceNumber);
 }

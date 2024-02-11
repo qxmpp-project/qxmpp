@@ -27,6 +27,7 @@ class QXmppIq;
 class QXmppNonza;
 class QXmppPacket;
 class QXmppStanza;
+class QXmppStreamManager;
 class QXmppStreamPrivate;
 
 ///
@@ -52,7 +53,7 @@ public:
     void cancelOngoingIqs();
     bool hasIqId(const QString &id) const;
 
-    void resetPacketCache();
+    QXmppStreamManager &streamManager() const;
 
 Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
@@ -79,11 +80,6 @@ protected:
     /// \param element
     virtual void handleStream(const QDomElement &element) = 0;
 
-    // XEP-0198: Stream Management
-    void enableStreamManagement(bool resetSequenceNumber);
-    unsigned int lastIncomingSequenceNumber() const;
-    void setAcknowledgedSequenceNumber(unsigned int sequenceNumber);
-
 public Q_SLOTS:
     virtual void disconnectFromHost();
     virtual bool sendData(const QByteArray &);
@@ -102,6 +98,9 @@ private:
     QXmppTask<QXmpp::SendResult> send(QXmppPacket &&, bool &);
     void processData(const QString &data);
     bool handleIqResponse(const QDomElement &);
+
+    // for unit tests, see TestClient
+    void enableStreamManagement(bool resetSequenceNumber);
 
     const std::unique_ptr<QXmppStreamPrivate> d;
 };
