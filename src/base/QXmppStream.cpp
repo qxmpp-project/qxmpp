@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -28,128 +29,6 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
-
-struct IqState {
-    QXmppPromise<QXmppStream::IqResult> interface;
-    QString jid;
-};
-
-class OutgoingIqManager
-{
-    using IqResult = QXmppStream::IqResult;
-
-public:
-    OutgoingIqManager(QXmppLoggable *l) : l(l) { }
-
-    bool hasId(const QString &id) const
-    {
-        return m_requests.find(id) != m_requests.end();
-    }
-
-    bool isIdValid(const QString &id) const
-    {
-        return !id.isEmpty() && !hasId(id);
-    }
-
-    QXmppTask<IqResult> start(const QString &id, const QString &to)
-    {
-        if (!isIdValid(id)) {
-            return makeReadyTask<IqResult>(QXmppError {
-                QStringLiteral("Invalid IQ id: empty or in use."),
-                SendError::Disconnected });
-        }
-
-        if (to.isEmpty()) {
-            return makeReadyTask<IqResult>(QXmppError {
-                QStringLiteral("The 'to' address must be set so the stream can match the response."),
-                SendError::Disconnected });
-        }
-
-        auto [itr, success] = m_requests.emplace(id, IqState { {}, to });
-        return itr->second.interface.task();
-    }
-
-    void finish(const QString &id, IqResult &&result)
-    {
-        if (auto itr = m_requests.find(id); itr != m_requests.end()) {
-            itr->second.interface.finish(std::move(result));
-            m_requests.erase(itr);
-        }
-    }
-
-    void cancelAll()
-    {
-        for (auto &[id, state] : m_requests) {
-            state.interface.finish(QXmppError {
-                QStringLiteral("IQ has been cancelled."),
-                QXmpp::SendError::Disconnected });
-        }
-        m_requests.clear();
-    }
-
-    bool handleStanza(const QDomElement &stanza)
-    {
-        if (stanza.tagName() != u"iq") {
-            return false;
-        }
-
-        // only accept "result" and "error" types
-        const auto iqType = stanza.attribute(QStringLiteral("type"));
-        if (iqType != u"result" && iqType != u"error") {
-            return false;
-        }
-
-        const auto id = stanza.attribute(QStringLiteral("id"));
-        auto itr = m_requests.find(id);
-        if (itr == m_requests.end()) {
-            return false;
-        }
-
-        auto &promise = itr->second.interface;
-        const auto &expectedFrom = itr->second.jid;
-
-        // Check that the sender of the response matches the recipient of the request.
-        // Stanzas coming from the server on behalf of the user's account must have no "from"
-        // attribute or have it set to the user's bare JID.
-        // If 'from' is empty, the IQ has been sent by the server. In this case we don't need to
-        // do the check as we trust the server anyways.
-        if (auto from = stanza.attribute(QStringLiteral("from")); !from.isEmpty() && from != expectedFrom) {
-            warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'")
-                        .arg(id, from, expectedFrom));
-            return false;
-        }
-
-        // report IQ errors as QXmppError (this makes it impossible to parse the full error IQ,
-        // but that is okay for now)
-        if (iqType == u"error") {
-            QXmppIq iq;
-            iq.parse(stanza);
-            if (auto err = iq.errorOptional()) {
-                // report stanza error
-                promise.finish(QXmppError { err->text(), *err });
-            } else {
-                // this shouldn't happen (no <error/> element in IQ of type error)
-                using Err = QXmppStanza::Error;
-                promise.finish(QXmppError { QStringLiteral("IQ error"), Err(Err::Cancel, Err::UndefinedCondition) });
-            }
-        } else {
-            // report stanza element for parsing
-            promise.finish(stanza);
-        }
-
-        m_requests.erase(itr);
-        return true;
-    }
-
-private:
-    void warning(const QString &message)
-    {
-        Q_EMIT l->logMessage(QXmppLogger::WarningMessage, message);
-    }
-
-    QXmppLoggable *l;
-    std::unordered_map<QString, IqState> m_requests;
-};
 
 class QXmppStreamPrivate
 {
@@ -210,7 +89,7 @@ QXmppStream::QXmppStream(QObject *parent)
 ///
 QXmppStream::~QXmppStream()
 {
-    cancelOngoingIqs();
+    d->iqManager.cancelAll();
 }
 
 ///
@@ -365,31 +244,19 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
 }
 
 ///
-/// Cancels all ongoing IQ requests and reports QXmpp::SendError::Disconnected.
-///
-/// \since QXmpp 1.5
-///
-void QXmppStream::cancelOngoingIqs()
-{
-    d->iqManager.cancelAll();
-}
-
-///
-/// Returns whether the IQ ID is currently in use.
-///
-/// \since QXmpp 1.5
-///
-bool QXmppStream::hasIqId(const QString &id) const
-{
-    return d->iqManager.hasId(id);
-}
-
-///
 /// Returns the manager for Stream Management
 ///
 QXmppStreamManager &QXmppStream::streamManager() const
 {
     return d->streamManager;
+}
+
+///
+/// Returns the manager for outgoing IQ request tracking.
+///
+OutgoingIqManager &QXmppStream::iqManager() const
+{
+    return d->iqManager;
 }
 
 ///
@@ -547,12 +414,128 @@ void QXmppStream::processData(const QString &data)
     }
 }
 
+void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
+{
+    d->streamManager.enableStreamManagement(resetSequenceNumber);
+}
+
 bool QXmppStream::handleIqResponse(const QDomElement &stanza)
 {
     return d->iqManager.handleStanza(stanza);
 }
 
-void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
+namespace QXmpp::Private {
+
+struct IqState {
+    QXmppPromise<QXmppStream::IqResult> interface;
+    QString jid;
+};
+
+OutgoingIqManager::OutgoingIqManager(QXmppLoggable *l) : l(l) { }
+
+bool OutgoingIqManager::hasId(const QString &id) const
 {
-    d->streamManager.enableStreamManagement(resetSequenceNumber);
+    return m_requests.find(id) != m_requests.end();
 }
+
+bool OutgoingIqManager::isIdValid(const QString &id) const
+{
+    return !id.isEmpty() && !hasId(id);
+}
+
+QXmppTask<OutgoingIqManager::IqResult> OutgoingIqManager::start(const QString &id, const QString &to)
+{
+    if (!isIdValid(id)) {
+        return makeReadyTask<IqResult>(
+            QXmppError { QStringLiteral("Invalid IQ id: empty or in use."),
+                         SendError::Disconnected });
+    }
+
+    if (to.isEmpty()) {
+        return makeReadyTask<IqResult>(
+            QXmppError { QStringLiteral("The 'to' address must be set so the stream can match the response."),
+                         SendError::Disconnected });
+    }
+
+    auto [itr, success] = m_requests.emplace(id, IqState { {}, to });
+    return itr->second.interface.task();
+}
+
+void OutgoingIqManager::finish(const QString &id, IqResult &&result)
+{
+    if (auto itr = m_requests.find(id); itr != m_requests.end()) {
+        itr->second.interface.finish(std::move(result));
+        m_requests.erase(itr);
+    }
+}
+
+void OutgoingIqManager::cancelAll()
+{
+    for (auto &[id, state] : m_requests) {
+        state.interface.finish(QXmppError {
+            QStringLiteral("IQ has been cancelled."),
+            QXmpp::SendError::Disconnected });
+    }
+    m_requests.clear();
+}
+
+bool OutgoingIqManager::handleStanza(const QDomElement &stanza)
+{
+    if (stanza.tagName() != u"iq") {
+        return false;
+    }
+
+    // only accept "result" and "error" types
+    const auto iqType = stanza.attribute(QStringLiteral("type"));
+    if (iqType != u"result" && iqType != u"error") {
+        return false;
+    }
+
+    const auto id = stanza.attribute(QStringLiteral("id"));
+    auto itr = m_requests.find(id);
+    if (itr == m_requests.end()) {
+        return false;
+    }
+
+    auto &promise = itr->second.interface;
+    const auto &expectedFrom = itr->second.jid;
+
+    // Check that the sender of the response matches the recipient of the request.
+    // Stanzas coming from the server on behalf of the user's account must have no "from"
+    // attribute or have it set to the user's bare JID.
+    // If 'from' is empty, the IQ has been sent by the server. In this case we don't need to
+    // do the check as we trust the server anyways.
+    if (auto from = stanza.attribute(QStringLiteral("from")); !from.isEmpty() && from != expectedFrom) {
+        warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'")
+                    .arg(id, from, expectedFrom));
+        return false;
+    }
+
+    // report IQ errors as QXmppError (this makes it impossible to parse the full error IQ,
+    // but that is okay for now)
+    if (iqType == u"error") {
+        QXmppIq iq;
+        iq.parse(stanza);
+        if (auto err = iq.errorOptional()) {
+            // report stanza error
+            promise.finish(QXmppError { err->text(), *err });
+        } else {
+            // this shouldn't happen (no <error/> element in IQ of type error)
+            using Err = QXmppStanza::Error;
+            promise.finish(QXmppError { QStringLiteral("IQ error"), Err(Err::Cancel, Err::UndefinedCondition) });
+        }
+    } else {
+        // report stanza element for parsing
+        promise.finish(stanza);
+    }
+
+    m_requests.erase(itr);
+    return true;
+}
+
+void OutgoingIqManager::warning(const QString &message)
+{
+    Q_EMIT l->logMessage(QXmppLogger::WarningMessage, message);
+}
+
+}  // namespace QXmpp::Private

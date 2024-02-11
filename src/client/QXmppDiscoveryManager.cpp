@@ -11,7 +11,6 @@
 #include "QXmppDiscoveryIq.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppIqHandling.h"
-#include "QXmppStream.h"
 
 #include <QCoreApplication>
 #include <QDomElement>

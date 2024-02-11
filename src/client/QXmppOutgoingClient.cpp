@@ -199,13 +199,13 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     connect(this, &QXmppStream::connected, this, [=]() {
         if (!d->streamResumed) {
             // we can't expect a response because this is a new stream
-            cancelOngoingIqs();
+            iqManager().cancelAll();
         }
     });
     connect(this, &QXmppStream::disconnected, this, [=]() {
         if (!d->canResume) {
             // this stream can't be resumed; we can cancel all ongoing IQs
-            cancelOngoingIqs();
+            iqManager().cancelAll();
         }
     });
 }
