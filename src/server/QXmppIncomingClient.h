@@ -48,8 +48,7 @@ private Q_SLOTS:
     void onTimeout();
 
 private:
-    Q_DISABLE_COPY(QXmppIncomingClient)
-    QXmppIncomingClientPrivate *d;
+    const std::unique_ptr<QXmppIncomingClientPrivate> d;
     friend class QXmppIncomingClientPrivate;
 };
 

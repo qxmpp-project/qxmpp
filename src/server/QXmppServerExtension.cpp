@@ -18,15 +18,12 @@ public:
 };
 
 QXmppServerExtension::QXmppServerExtension()
-    : d(new QXmppServerExtensionPrivate)
+    : d(std::make_unique<QXmppServerExtensionPrivate>())
 {
     d->server = nullptr;
 }
 
-QXmppServerExtension::~QXmppServerExtension()
-{
-    delete d;
-}
+QXmppServerExtension::~QXmppServerExtension() = default;
 
 /// Returns the discovery features to add to the server.
 QStringList QXmppServerExtension::discoveryFeatures() const

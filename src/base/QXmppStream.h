@@ -103,7 +103,7 @@ private:
     void processData(const QString &data);
     bool handleIqResponse(const QDomElement &);
 
-    QXmppStreamPrivate *const d;
+    const std::unique_ptr<QXmppStreamPrivate> d;
 };
 
 #endif  // QXMPPSTREAM_H

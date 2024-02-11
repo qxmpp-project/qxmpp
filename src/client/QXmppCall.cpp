@@ -555,19 +555,16 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
 ///
 
 QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent)
-    : QXmppLoggable(parent)
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppCallPrivate>(this))
 {
-    d = new QXmppCallPrivate(this);
     d->direction = direction;
     d->jid = jid;
     d->ownJid = parent->client()->configuration().jid();
     d->manager = parent;
 }
 
-QXmppCall::~QXmppCall()
-{
-    delete d;
-}
+QXmppCall::~QXmppCall() = default;
 
 ///
 /// Call this method if you wish to accept an incoming call.

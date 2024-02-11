@@ -57,8 +57,7 @@ private Q_SLOTS:
     void socketError(QAbstractSocket::SocketError error);
 
 private:
-    Q_DISABLE_COPY(QXmppOutgoingServer)
-    QXmppOutgoingServerPrivate *const d;
+    const std::unique_ptr<QXmppOutgoingServerPrivate> d;
 };
 
 #endif

@@ -87,7 +87,7 @@ private Q_SLOTS:
     void _q_presenceReceived(const QXmppPresence &presence);
 
 private:
-    QXmppCallManagerPrivate *d;
+    const std::unique_ptr<QXmppCallManagerPrivate> d;
     friend class QXmppCall;
     friend class QXmppCallPrivate;
     friend class QXmppCallManagerPrivate;

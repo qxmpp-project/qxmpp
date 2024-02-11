@@ -264,14 +264,12 @@ public:
 };
 
 QXmppSaslClient::QXmppSaslClient(QObject *parent)
-    : QXmppLoggable(parent), d(new QXmppSaslClientPrivate)
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppSaslClientPrivate>())
 {
 }
 
-QXmppSaslClient::~QXmppSaslClient()
-{
-    delete d;
-}
+QXmppSaslClient::~QXmppSaslClient() = default;
 
 ///
 /// Returns a list of supported mechanisms.
@@ -655,14 +653,12 @@ public:
 };
 
 QXmppSaslServer::QXmppSaslServer(QObject *parent)
-    : QXmppLoggable(parent), d(new QXmppSaslServerPrivate)
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppSaslServerPrivate>())
 {
 }
 
-QXmppSaslServer::~QXmppSaslServer()
-{
-    delete d;
-}
+QXmppSaslServer::~QXmppSaslServer() = default;
 
 /// Creates an SASL server for the given mechanism.
 QXmppSaslServer *QXmppSaslServer::create(const QString &mechanism, QObject *parent)

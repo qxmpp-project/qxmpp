@@ -102,25 +102,24 @@ QXmppLoggerPrivate::QXmppLoggerPrivate()
 {
 }
 
+///
 /// Constructs a new QXmppLogger.
 ///
 /// \param parent
-
+///
 QXmppLogger::QXmppLogger(QObject *parent)
-    : QObject(parent), d(new QXmppLoggerPrivate())
+    : QObject(parent),
+      d(std::make_unique<QXmppLoggerPrivate>())
 {
     // make it possible to pass QXmppLogger::MessageType between threads
     qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
 }
 
-QXmppLogger::~QXmppLogger()
-{
-    delete d;
-}
+QXmppLogger::~QXmppLogger() = default;
 
+///
 /// Returns the default logger.
 ///
-
 QXmppLogger *QXmppLogger::getLogger()
 {
     if (!m_logger) {

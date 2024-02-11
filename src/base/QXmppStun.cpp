@@ -2003,11 +2003,9 @@ void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppI
 /// Constructs a new QXmppIceComponent.
 ///
 QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent)
-    : QXmppLoggable(parent)
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppIceComponentPrivate>(component, config, this))
 {
-
-    d = new QXmppIceComponentPrivate(component, config, this);
-
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
     connect(d->timer, &QTimer::timeout,
@@ -2037,7 +2035,6 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
 QXmppIceComponent::~QXmppIceComponent()
 {
     qDeleteAll(d->pairs);
-    delete d;
 }
 
 ///
@@ -2579,9 +2576,9 @@ QXmppIceConnectionPrivate::QXmppIceConnectionPrivate()
 /// \param parent
 ///
 QXmppIceConnection::QXmppIceConnection(QObject *parent)
-    : QXmppLoggable(parent), d(new QXmppIceConnectionPrivate())
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppIceConnectionPrivate>())
 {
-
     // timer to limit connection time to 30 seconds
     d->connectTimer = new QTimer(this);
     d->connectTimer->setInterval(30000);
@@ -2590,10 +2587,7 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
             this, &QXmppIceConnection::slotTimeout);
 }
 
-QXmppIceConnection::~QXmppIceConnection()
-{
-    delete d;
-}
+QXmppIceConnection::~QXmppIceConnection() = default;
 
 ///
 /// Returns the given component of this ICE connection.
@@ -2619,7 +2613,7 @@ void QXmppIceConnection::addComponent(int component)
         return;
     }
 
-    auto *socket = new QXmppIceComponent(component, d, this);
+    auto *socket = new QXmppIceComponent(component, d.get(), this);
     socket->d->setTurnServer(d->turnHost, d->turnPort);
     socket->d->setTurnUser(d->turnUser);
     socket->d->setTurnPassword(d->turnPassword);

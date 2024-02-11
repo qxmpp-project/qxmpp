@@ -77,18 +77,17 @@ QString QXmppIncomingClientPrivate::origin() const
     }
 }
 
+///
 /// Constructs a new incoming client stream.
 ///
 /// \param socket The socket for the XMPP stream.
 /// \param domain The local domain.
 /// \param parent The parent QObject for the stream (optional).
 ///
-
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent)
+    : QXmppStream(parent),
+      d(std::make_unique<QXmppIncomingClientPrivate>(this))
 {
-
-    d = new QXmppIncomingClientPrivate(this);
     d->domain = domain;
 
     if (socket) {
@@ -107,18 +106,12 @@ QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &doma
             this, &QXmppIncomingClient::onTimeout);
 }
 
-/// Destroys the current stream.
+QXmppIncomingClient::~QXmppIncomingClient() = default;
+
 ///
-
-QXmppIncomingClient::~QXmppIncomingClient()
-{
-    delete d;
-}
-
 /// Returns true if the socket is connected, the client is authenticated
 /// and a resource is bound.
 ///
-
 bool QXmppIncomingClient::isConnected() const
 {
     return QXmppStream::isConnected() &&

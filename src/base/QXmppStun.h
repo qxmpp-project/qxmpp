@@ -187,7 +187,7 @@ Q_SIGNALS:
 private:
     QXmppIceComponent(int component, QXmppIcePrivate *config, QObject *parent = nullptr);
 
-    QXmppIceComponentPrivate *d;
+    const std::unique_ptr<QXmppIceComponentPrivate> d;
     friend class QXmppIceComponentPrivate;
     friend class QXmppIceConnection;
 };
@@ -304,7 +304,7 @@ private Q_SLOTS:
     void slotTimeout();
 
 private:
-    QXmppIceConnectionPrivate *d;
+    const std::unique_ptr<QXmppIceConnectionPrivate> d;
 };
 
 #endif

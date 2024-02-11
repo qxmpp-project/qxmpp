@@ -283,16 +283,15 @@ void QXmppServerPrivate::stopExtensions()
 
 /// Constructs a new XMPP server instance.
 QXmppServer::QXmppServer(QObject *parent)
-    : QXmppLoggable(parent), d(new QXmppServerPrivate(this))
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppServerPrivate>(this))
 {
     qRegisterMetaType<QDomElement>("QDomElement");
 }
 
-/// Destroys an XMPP server instance.
 QXmppServer::~QXmppServer()
 {
     close();
-    delete d;
 }
 
 /// Registers a new extension with the server.
@@ -823,15 +822,11 @@ public:
 /// Constructs a new SSL server instance.
 QXmppSslServer::QXmppSslServer(QObject *parent)
     : QTcpServer(parent),
-      d(new QXmppSslServerPrivate)
+      d(std::make_unique<QXmppSslServerPrivate>())
 {
 }
 
-/// Destroys an SSL server instance.
-QXmppSslServer::~QXmppSslServer()
-{
-    delete d;
-}
+QXmppSslServer::~QXmppSslServer() = default;
 
 void QXmppSslServer::incomingConnection(qintptr socketDescriptor)
 {

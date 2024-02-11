@@ -8,6 +8,8 @@
 
 #include "QXmppGlobal.h"
 
+#include <memory>
+
 #include <QObject>
 
 #ifdef QXMPP_LOGGABLE_TRACE
@@ -94,7 +96,7 @@ Q_SIGNALS:
 
 private:
     static QXmppLogger *m_logger;
-    QXmppLoggerPrivate *d;
+    const std::unique_ptr<QXmppLoggerPrivate> d;
 };
 
 /// \brief The QXmppLoggable class represents a source of logging messages.

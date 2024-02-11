@@ -52,17 +52,14 @@ QXmppCall *QXmppCallManagerPrivate::findCall(const QString &sid, QXmppCall::Dire
 /// Voice-Over-IP calls.
 ///
 QXmppCallManager::QXmppCallManager()
+    : d(std::make_unique<QXmppCallManagerPrivate>(this))
 {
-    d = new QXmppCallManagerPrivate(this);
 }
 
 ///
 /// Destroys the QXmppCallManager object.
 ///
-QXmppCallManager::~QXmppCallManager()
-{
-    delete d;
-}
+QXmppCallManager::~QXmppCallManager() = default;
 
 /// \cond
 QStringList QXmppCallManager::discoveryFeatures() const

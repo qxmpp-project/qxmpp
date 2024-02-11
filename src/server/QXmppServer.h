@@ -26,6 +26,7 @@ class QXmppSslServer;
 class QXmppStanza;
 class QXmppStream;
 
+///
 /// \brief The QXmppServer class represents an XMPP server.
 ///
 /// It provides support for both client-to-server and server-to-server
@@ -36,7 +37,7 @@ class QXmppStream;
 /// your own extensions for QXmppServer by subclassing QXmppServerExtension.
 ///
 /// \ingroup Core
-
+///
 class QXMPP_EXPORT QXmppServer : public QXmppLoggable
 {
     Q_OBJECT
@@ -102,7 +103,7 @@ private Q_SLOTS:
 
 private:
     friend class QXmppServerPrivate;
-    QXmppServerPrivate *d;
+    const std::unique_ptr<QXmppServerPrivate> d;
 };
 
 class QXmppSslServerPrivate;
@@ -128,7 +129,7 @@ Q_SIGNALS:
 
 private:
     void incomingConnection(qintptr socketDescriptor) override;
-    QXmppSslServerPrivate *const d;
+    const std::unique_ptr<QXmppSslServerPrivate> d;
 };
 
 #endif

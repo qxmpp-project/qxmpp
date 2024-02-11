@@ -45,18 +45,17 @@ QString QXmppIncomingServerPrivate::origin() const
     }
 }
 
+///
 /// Constructs a new incoming server stream.
 ///
 /// \param socket The socket for the XMPP stream.
 /// \param domain The local domain.
 /// \param parent The parent QObject for the stream (optional).
 ///
-
 QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent)
+    : QXmppStream(parent),
+      d(std::make_unique<QXmppIncomingServerPrivate>(this))
 {
-
-    d = new QXmppIncomingServerPrivate(this);
     d->domain = domain;
 
     if (socket) {
@@ -69,16 +68,11 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
     info(QStringLiteral("Incoming server connection from %1").arg(d->origin()));
 }
 
-/// Destroys the current stream.
+QXmppIncomingServer::~QXmppIncomingServer() = default;
 
-QXmppIncomingServer::~QXmppIncomingServer()
-{
-    delete d;
-}
-
+///
 /// Returns the stream's identifier.
 ///
-
 QString QXmppIncomingServer::localStreamId() const
 {
     return d->localStreamId;

@@ -87,7 +87,7 @@ private:
 
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
 
-    QXmppCallPrivate *d;
+    const std::unique_ptr<QXmppCallPrivate> d;
     friend class QXmppCallManager;
     friend class QXmppCallManagerPrivate;
     friend class QXmppCallPrivate;

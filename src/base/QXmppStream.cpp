@@ -83,7 +83,7 @@ QXmppStreamPrivate::~QXmppStreamPrivate()
 ///
 QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
-      d(new QXmppStreamPrivate(this))
+      d(std::make_unique<QXmppStreamPrivate>(this))
 {
 }
 
@@ -93,7 +93,6 @@ QXmppStream::QXmppStream(QObject *parent)
 QXmppStream::~QXmppStream()
 {
     cancelOngoingIqs();
-    delete d;
 }
 
 ///

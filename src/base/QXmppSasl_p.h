@@ -55,7 +55,7 @@ public:
     static QXmppSaslClient *create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
-    QXmppSaslClientPrivate *d;
+    const std::unique_ptr<QXmppSaslClientPrivate> d;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslServer : public QXmppLoggable
@@ -89,7 +89,7 @@ public:
     static QXmppSaslServer *create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
-    QXmppSaslServerPrivate *d;
+    const std::unique_ptr<QXmppSaslServerPrivate> d;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslDigestMd5

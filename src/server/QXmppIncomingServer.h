@@ -44,8 +44,7 @@ private Q_SLOTS:
     void slotSocketDisconnected();
 
 private:
-    Q_DISABLE_COPY(QXmppIncomingServer)
-    QXmppIncomingServerPrivate *d;
+    const std::unique_ptr<QXmppIncomingServerPrivate> d;
     friend class QXmppIncomingServerPrivate;
 };
 

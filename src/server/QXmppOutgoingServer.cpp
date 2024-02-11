@@ -32,15 +32,15 @@ public:
     bool ready;
 };
 
+///
 /// Constructs a new outgoing server-to-server stream.
 ///
 /// \param domain the local domain
 /// \param parent the parent object
 ///
-
 QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     : QXmppStream(parent),
-      d(new QXmppOutgoingServerPrivate)
+      d(std::make_unique<QXmppOutgoingServerPrivate>())
 {
     // socket initialisation
     auto *socket = new QSslSocket(this);
@@ -63,18 +63,13 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingServer::slotSslErrors);
 }
 
-/// Destroys the stream.
+QXmppOutgoingServer::~QXmppOutgoingServer() = default;
+
 ///
-
-QXmppOutgoingServer::~QXmppOutgoingServer()
-{
-    delete d;
-}
-
 /// Attempts to connect to an XMPP server for the specified \a domain.
 ///
 /// \param domain
-
+///
 void QXmppOutgoingServer::connectToHost(const QString &domain)
 {
     d->remoteDomain = domain;

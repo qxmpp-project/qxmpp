@@ -49,7 +49,7 @@ protected:
 
 private:
     void setServer(QXmppServer *server);
-    QXmppServerExtensionPrivate *const d;
+    const std::unique_ptr<QXmppServerExtensionPrivate> d;
 
     friend class QXmppServer;
 };
