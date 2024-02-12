@@ -779,7 +779,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         d->streamManagementEnabled = true;
         streamManager().enableStreamManagement(false);
         // we are connected now
-        // TODO: The stream was resumed. Therefore, we should not send presence information or request the roster.
         Q_EMIT connected();
     } else if (QXmppStreamManagementFailed::isStreamManagementFailed(nodeRecv)) {
         if (d->isResuming) {
