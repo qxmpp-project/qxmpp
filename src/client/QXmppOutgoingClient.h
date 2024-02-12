@@ -20,6 +20,10 @@ class QXmppMessage;
 
 class QXmppOutgoingClientPrivate;
 
+namespace QXmpp::Private {
+class PingManager;
+}
+
 ///
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
 /// to an XMPP server.
@@ -82,15 +86,12 @@ private Q_SLOTS:
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError> &);
 
-    void pingStart();
-    void pingStop();
-    void pingSend();
-    void pingTimeout();
-
 private:
+    void throwKeepAliveError();
     bool setResumeAddress(const QString &address);
 
     friend class QXmppOutgoingClientPrivate;
+    friend class QXmpp::Private::PingManager;
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };

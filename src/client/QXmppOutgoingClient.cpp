@@ -65,6 +65,23 @@ QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObje
     return task;
 }
 
+// XEP-0199: XMPP Ping
+class PingManager
+{
+public:
+    explicit PingManager(QXmppOutgoingClient *q);
+
+    void onDataReceived();
+    bool handleIq(const QDomElement &el);
+
+private:
+    void sendPing();
+
+    QXmppOutgoingClient *q;
+    QTimer *pingTimer;
+    QTimer *timeoutTimer;
+};
+
 }  // namespace QXmpp::Private
 
 class QXmppOutgoingClientPrivate
@@ -123,9 +140,7 @@ public:
     // Client State Indication
     bool clientStateIndicationEnabled;
 
-    // Timers
-    QTimer *pingTimer;
-    QTimer *timeoutTimer;
+    PingManager pingManager;
 
 private:
     QXmppOutgoingClient *q;
@@ -146,8 +161,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       streamManagementEnabled(false),
       streamResumed(false),
       clientStateIndicationEnabled(false),
-      pingTimer(nullptr),
-      timeoutTimer(nullptr),
+      pingManager(qq),
       q(qq)
 {
 }
@@ -202,17 +216,6 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingClient::_q_socketDisconnected);
     connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingClient::socketSslErrors);
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingClient::socketError);
-
-    // XEP-0199: XMPP Ping
-    d->pingTimer = new QTimer(this);
-    connect(d->pingTimer, &QTimer::timeout, this, &QXmppOutgoingClient::pingSend);
-
-    d->timeoutTimer = new QTimer(this);
-    d->timeoutTimer->setSingleShot(true);
-    connect(d->timeoutTimer, &QTimer::timeout, this, &QXmppOutgoingClient::pingTimeout);
-
-    connect(this, &QXmppStream::connected, this, &QXmppOutgoingClient::pingStart);
-    connect(this, &QXmppStream::disconnected, this, &QXmppOutgoingClient::pingStop);
 
     // IQ response handling
     connect(this, &QXmppStream::connected, this, [=]() {
@@ -449,7 +452,7 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
 void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 {
     // if we receive any kind of data, stop the timeout timer
-    d->timeoutTimer->stop();
+    d->pingManager.onDataReceived();
 
     const QString ns = nodeRecv.namespaceURI();
 
@@ -720,16 +723,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     }
                     d->sendNonSASLAuth(plainText);
                 }
-            }
-            // XEP-0199: XMPP Ping
-            else if (QXmppPingIq::isPingIq(nodeRecv)) {
-                QXmppPingIq req;
-                req.parse(nodeRecv);
-
-                QXmppIq iq(QXmppIq::Result);
-                iq.setId(req.id());
-                iq.setTo(req.from());
-                sendPacket(iq);
+            } else if (d->pingManager.handleIq(nodeRecv)) {
+                // handled in manager
             } else {
                 QXmppIq iqPacket;
                 iqPacket.parse(nodeRecv);
@@ -814,39 +809,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 }
 /// \endcond
 
-void QXmppOutgoingClient::pingStart()
-{
-    const int interval = configuration().keepAliveInterval();
-    // start ping timer
-    if (interval > 0) {
-        d->pingTimer->setInterval(interval * 1000);
-        d->pingTimer->start();
-    }
-}
-
-void QXmppOutgoingClient::pingStop()
-{
-    // stop all timers
-    d->pingTimer->stop();
-    d->timeoutTimer->stop();
-}
-
-void QXmppOutgoingClient::pingSend()
-{
-    // send ping packet
-    QXmppPingIq ping;
-    ping.setTo(configuration().domain());
-    sendPacket(ping);
-
-    // start timeout timer
-    const int timeout = configuration().keepAliveTimeout();
-    if (timeout > 0) {
-        d->timeoutTimer->setInterval(timeout * 1000);
-        d->timeoutTimer->start();
-    }
-}
-
-void QXmppOutgoingClient::pingTimeout()
+void QXmppOutgoingClient::throwKeepAliveError()
 {
     warning(QStringLiteral("Ping timeout"));
     QXmppStream::disconnectFromHost();
@@ -927,3 +890,72 @@ QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 {
     return d->xmppStreamError;
 }
+
+namespace QXmpp::Private {
+
+PingManager::PingManager(QXmppOutgoingClient *q)
+    : q(q),
+      pingTimer(new QTimer(q)),
+      timeoutTimer(new QTimer(q))
+{
+    // send ping timer
+    pingTimer->callOnTimeout(q, [this]() { sendPing(); });
+
+    // timeout triggers connection error
+    timeoutTimer->setSingleShot(true);
+    timeoutTimer->callOnTimeout(q, &QXmppOutgoingClient::throwKeepAliveError);
+
+    // on connect: start ping timer
+    QObject::connect(q, &QXmppStream::connected, q, [this]() {
+        const auto interval = this->q->configuration().keepAliveInterval();
+
+        // start ping timer
+        if (interval > 0) {
+            pingTimer->setInterval(interval * 1000);
+            pingTimer->start();
+        }
+    });
+
+    // on disconnect: stop all timers
+    QObject::connect(q, &QXmppStream::disconnected, q, [this]() {
+        pingTimer->stop();
+        timeoutTimer->stop();
+    });
+}
+
+void PingManager::onDataReceived()
+{
+    timeoutTimer->stop();
+}
+
+bool PingManager::handleIq(const QDomElement &el)
+{
+    if (QXmppPingIq::isPingIq(el)) {
+        QXmppPingIq req;
+        req.parse(el);
+
+        QXmppIq iq(QXmppIq::Result);
+        iq.setId(req.id());
+        iq.setTo(req.from());
+        q->sendPacket(iq);
+        return true;
+    }
+    return false;
+}
+
+void PingManager::sendPing()
+{
+    // send ping packet
+    QXmppPingIq ping;
+    ping.setTo(q->configuration().domain());
+    q->sendPacket(ping);
+
+    // start timeout timer
+    const int timeout = q->configuration().keepAliveTimeout();
+    if (timeout > 0) {
+        timeoutTimer->setInterval(timeout * 1000);
+        timeoutTimer->start();
+    }
+}
+
+}  // namespace QXmpp::Private
