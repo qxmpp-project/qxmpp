@@ -78,7 +78,6 @@ public Q_SLOTS:
     void disconnectFromHost() override;
 
 private Q_SLOTS:
-    void _q_dnsLookupFinished();
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError> &);
