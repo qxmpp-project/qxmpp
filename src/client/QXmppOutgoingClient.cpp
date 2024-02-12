@@ -11,6 +11,7 @@
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPresence.h"
+#include "QXmppPromise.h"
 #include "QXmppSasl_p.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
@@ -32,16 +33,39 @@
 #include "QXmppPingIq.h"
 #include "QXmppSessionIq.h"
 
-#include <QBuffer>
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QHostAddress>
 #include <QRegularExpression>
-#include <QStringList>
+#include <QStringBuilder>
 #include <QTimer>
 #include <QXmlStreamWriter>
 
 using namespace QXmpp::Private;
+
+namespace QXmpp::Private {
+
+using DnsRecordsResult = std::variant<QList<QDnsServiceRecord>, QXmppError>;
+
+QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObject *context)
+{
+    QXmppPromise<DnsRecordsResult> p;
+    auto task = p.task();
+
+    auto *dns = new QDnsLookup(QDnsLookup::SRV, u"_xmpp-client._tcp." % domain, context);
+    QObject::connect(dns, &QDnsLookup::finished, context, [dns, p = std::move(p)]() mutable {
+        if (auto error = dns->error(); error != QDnsLookup::NoError) {
+            p.finish(QXmppError { dns->errorString(), error });
+        } else {
+            p.finish(dns->serviceRecords());
+        }
+    });
+
+    dns->lookup();
+    return task;
+}
+
+}  // namespace QXmpp::Private
 
 class QXmppOutgoingClientPrivate
 {
@@ -62,7 +86,7 @@ public:
     QXmppStanza::Error::Condition xmppStreamError;
 
     // DNS
-    QDnsLookup dns;
+    QList<QDnsServiceRecord> srvRecords;
     int nextSrvRecordIdx;
 
     // Stream
@@ -161,9 +185,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 void QXmppOutgoingClientPrivate::connectToNextDNSHost()
 {
     auto curIdx = nextSrvRecordIdx++;
-    connectToHost(
-        dns.serviceRecords().at(curIdx).target(),
-        dns.serviceRecords().at(curIdx).port());
+    connectToHost(srvRecords.at(curIdx).target(), srvRecords.at(curIdx).port());
 }
 
 ///
@@ -180,9 +202,6 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingClient::_q_socketDisconnected);
     connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingClient::socketSslErrors);
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingClient::socketError);
-
-    // DNS lookups
-    connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingClient::_q_dnsLookupFinished);
 
     // XEP-0199: XMPP Ping
     d->pingTimer = new QTimer(this);
@@ -213,14 +232,12 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
 QXmppOutgoingClient::~QXmppOutgoingClient() = default;
 
 /// Returns a reference to the stream's configuration.
-
 QXmppConfiguration &QXmppOutgoingClient::configuration()
 {
     return d->config;
 }
 
 /// Attempts to connect to the XMPP server.
-
 void QXmppOutgoingClient::connectToHost()
 {
     // if a host for resumption is available, connect to it
@@ -236,12 +253,31 @@ void QXmppOutgoingClient::connectToHost()
     }
 
     // otherwise, lookup server
-    const QString domain = configuration().domain();
-    debug(QStringLiteral("Looking up server for domain %1").arg(domain));
-    d->dns.setName(QStringLiteral("_xmpp-client._tcp.") + domain);
-    d->dns.setType(QDnsLookup::SRV);
-    d->dns.lookup();
-    d->nextSrvRecordIdx = 0;
+    const auto domain = configuration().domain();
+    debug(QStringLiteral("Looking up service records for domain %1").arg(domain));
+    lookupXmppClientRecords(domain, this).then(this, [this, domain](auto result) {
+        if (auto error = std::get_if<QXmppError>(&result)) {
+            warning(QStringLiteral("Lookup for domain %1 failed: %2")
+                        .arg(domain, error->description));
+
+            // as a fallback, use domain as the host name
+            d->connectToHost(d->config.domain(), d->config.port());
+            return;
+        }
+
+        d->srvRecords = std::get<QList<QDnsServiceRecord>>(std::move(result));
+        d->nextSrvRecordIdx = 0;
+
+        if (d->srvRecords.isEmpty()) {
+            warning(QStringLiteral("'%1' has no xmpp-client service records.").arg(domain));
+
+            // as a fallback, use domain as the host name
+            d->connectToHost(d->config.domain(), d->config.port());
+            return;
+        }
+
+        d->connectToNextDNSHost();
+    });
 }
 
 ///
@@ -255,29 +291,13 @@ void QXmppOutgoingClient::disconnectFromHost()
     QXmppStream::disconnectFromHost();
 }
 
-void QXmppOutgoingClient::_q_dnsLookupFinished()
-{
-    if (d->dns.error() == QDnsLookup::NoError &&
-        !d->dns.serviceRecords().isEmpty()) {
-        // take the first returned record
-        d->connectToNextDNSHost();
-    } else {
-        // as a fallback, use domain as the host name
-        warning(QStringLiteral("Lookup for domain %1 failed: %2")
-                    .arg(d->dns.name(), d->dns.errorString()));
-        d->connectToHost(d->config.domain(), d->config.port());
-    }
-}
-
 /// Returns true if authentication has succeeded.
-
 bool QXmppOutgoingClient::isAuthenticated() const
 {
     return d->isAuthenticated;
 }
 
 /// Returns true if the socket is connected and a session has been started.
-
 bool QXmppOutgoingClient::isConnected() const
 {
     return QXmppStream::isConnected() && d->sessionStarted;
@@ -366,7 +386,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
     if (!d->sessionStarted &&
-        (d->dns.serviceRecords().count() > d->nextSrvRecordIdx)) {
+        (d->srvRecords.count() > d->nextSrvRecordIdx)) {
         // some network error occurred during startup -> try next available SRV record server
         d->connectToNextDNSHost();
     } else {
