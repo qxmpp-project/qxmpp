@@ -888,7 +888,7 @@ void QXmppClient::_q_streamConnected()
     Q_EMIT stateChanged(QXmppClient::ConnectedState);
 
     // send initial presence
-    if (d->stream->isAuthenticated()) {
+    if (d->stream->isAuthenticated() && streamManagementState() != ResumedStream) {
         sendPacket(d->clientPresence);
     }
 }
