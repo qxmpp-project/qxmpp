@@ -696,8 +696,8 @@ void QXmppClient::setActive(bool active)
 ///
 QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
 {
-    if (d->stream->isStreamManagementEnabled()) {
-        if (d->stream->isStreamResumed()) {
+    if (d->stream->c2sStreamManager().enabled()) {
+        if (d->stream->c2sStreamManager().streamResumed()) {
             return ResumedStream;
         }
         return NewStream;

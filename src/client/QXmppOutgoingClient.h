@@ -17,12 +17,15 @@ class QXmppConfiguration;
 class QXmppPresence;
 class QXmppIq;
 class QXmppMessage;
+class QXmppStreamFeatures;
 
+class QXmppOutgoingClient;
 class QXmppOutgoingClientPrivate;
 
 namespace QXmpp::Private {
 class PingManager;
-}
+class C2sStreamManager;
+}  // namespace QXmpp::Private
 
 ///
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
@@ -40,8 +43,6 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const override;
     bool isClientStateIndicationEnabled() const;
-    bool isStreamManagementEnabled() const;
-    bool isStreamResumed() const;
     QXmppTask<IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
@@ -49,6 +50,8 @@ public:
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppConfiguration &configuration();
+
+    QXmpp::Private::C2sStreamManager &c2sStreamManager();
 
 Q_SIGNALS:
     /// This signal is emitted when an error is encountered.
@@ -87,13 +90,53 @@ private Q_SLOTS:
     void socketSslErrors(const QList<QSslError> &);
 
 private:
+    void onSMResumeFinished();
+    void onSMEnableFinished();
     void throwKeepAliveError();
-    bool setResumeAddress(const QString &address);
 
     friend class QXmppOutgoingClientPrivate;
     friend class QXmpp::Private::PingManager;
+    friend class QXmpp::Private::C2sStreamManager;
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };
+
+namespace QXmpp::Private {
+
+class C2sStreamManager
+{
+public:
+    explicit C2sStreamManager(QXmppOutgoingClient *q);
+
+    bool handleElement(const QDomElement &);
+    bool hasResumeAddress() const { return m_canResume && !m_resumeHost.isEmpty() && m_resumePort; }
+    std::pair<QString, quint16> resumeAddress() const { return { m_resumeHost, m_resumePort }; }
+    void onStreamStart();
+    void onStreamFeatures(const QXmppStreamFeatures &);
+    void onDisconnecting();
+    bool canResume() const { return m_canResume; }
+    bool enabled() const { return m_enabled; }
+    bool streamResumed() const { return m_streamResumed; }
+    bool canRequestResume() const { return m_smAvailable && m_canResume; }
+    void requestResume();
+    bool canRequestEnable() const { return m_smAvailable; }
+    void requestEnable();
+
+private:
+    bool setResumeAddress(const QString &address);
+
+    QXmppOutgoingClient *q;
+
+    bool m_smAvailable = false;
+    QString m_smId;
+    bool m_canResume = false;
+    bool m_isResuming = false;
+    QString m_resumeHost;
+    quint16 m_resumePort = 0;
+    bool m_enabled = false;
+    bool m_streamResumed = false;
+};
+
+}  // namespace QXmpp::Private
 
 #endif  // QXMPPOUTGOINGCLIENT_H

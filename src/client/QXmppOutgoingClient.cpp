@@ -95,7 +95,6 @@ public:
     void sendNonSASLAuthQuery();
     void sendBind();
     void sendSessionStart();
-    void sendStreamManagementEnable();
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -127,19 +126,10 @@ public:
     QString nonSASLAuthId;
     QXmppSaslClient *saslClient;
 
-    // Stream Management
-    bool streamManagementAvailable;
-    QString smId;
-    bool canResume;
-    bool isResuming;
-    QString resumeHost;
-    quint16 resumePort;
-    bool streamManagementEnabled;
-    bool streamResumed;
-
     // Client State Indication
     bool clientStateIndicationEnabled;
 
+    C2sStreamManager c2sStreamManager;
     PingManager pingManager;
 
 private:
@@ -154,13 +144,8 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       sessionStarted(false),
       isAuthenticated(false),
       saslClient(nullptr),
-      streamManagementAvailable(false),
-      canResume(false),
-      isResuming(false),
-      resumePort(0),
-      streamManagementEnabled(false),
-      streamResumed(false),
       clientStateIndicationEnabled(false),
+      c2sStreamManager(qq),
       pingManager(qq),
       q(qq)
 {
@@ -219,13 +204,13 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
 
     // IQ response handling
     connect(this, &QXmppStream::connected, this, [=]() {
-        if (!d->streamResumed) {
+        if (!d->c2sStreamManager.streamResumed()) {
             // we can't expect a response because this is a new stream
             iqManager().cancelAll();
         }
     });
     connect(this, &QXmppStream::disconnected, this, [=]() {
-        if (!d->canResume) {
+        if (!d->c2sStreamManager.canResume()) {
             // this stream can't be resumed; we can cancel all ongoing IQs
             iqManager().cancelAll();
         }
@@ -240,12 +225,19 @@ QXmppConfiguration &QXmppOutgoingClient::configuration()
     return d->config;
 }
 
+/// Returns the manager for C2s Stream Management.
+C2sStreamManager &QXmppOutgoingClient::c2sStreamManager()
+{
+    return d->c2sStreamManager;
+}
+
 /// Attempts to connect to the XMPP server.
 void QXmppOutgoingClient::connectToHost()
 {
     // if a host for resumption is available, connect to it
-    if (d->canResume && !d->resumeHost.isEmpty() && d->resumePort) {
-        d->connectToHost(d->resumeHost, d->resumePort);
+    if (d->c2sStreamManager.hasResumeAddress()) {
+        auto [host, port] = d->c2sStreamManager.resumeAddress();
+        d->connectToHost(host, port);
         return;
     }
 
@@ -290,7 +282,7 @@ void QXmppOutgoingClient::connectToHost()
 ///
 void QXmppOutgoingClient::disconnectFromHost()
 {
-    d->canResume = false;
+    d->c2sStreamManager.onDisconnecting();
     QXmppStream::disconnectFromHost();
 }
 
@@ -314,30 +306,6 @@ bool QXmppOutgoingClient::isConnected() const
 bool QXmppOutgoingClient::isClientStateIndicationEnabled() const
 {
     return d->clientStateIndicationEnabled;
-}
-
-///
-/// Returns whether Stream Management is currently enabled.
-///
-/// \since QXmpp 1.4
-///
-bool QXmppOutgoingClient::isStreamManagementEnabled() const
-{
-    return d->streamManagementEnabled;
-}
-
-///
-/// Returns true if the current stream is a successful resumption of a previous
-/// stream.
-///
-/// In case a stream has been resumed, some tasks like fetching the roster again
-/// are not required.
-///
-/// \since QXmpp 1.4
-///
-bool QXmppOutgoingClient::isStreamResumed() const
-{
-    return d->streamResumed;
 }
 
 ///
@@ -385,6 +353,37 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
     }
 }
 
+void QXmppOutgoingClient::onSMResumeFinished()
+{
+    if (d->c2sStreamManager.streamResumed()) {
+        // we are connected now
+        Q_EMIT connected();
+    } else {
+        // check whether bind is available
+        if (d->bindModeAvailable) {
+            d->sendBind();
+            return;
+        }
+
+        // check whether session is available
+        if (d->sessionAvailable) {
+            d->sendSessionStart();
+            return;
+        }
+
+        // otherwise we are done
+        d->sessionStarted = true;
+        Q_EMIT connected();
+    }
+}
+
+void QXmppOutgoingClient::onSMEnableFinished()
+{
+    // enabling of stream management may or may not have succeeded
+    // we are connected now
+    Q_EMIT connected();
+}
+
 void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
@@ -419,9 +418,7 @@ void QXmppOutgoingClient::handleStart()
     d->sessionAvailable = false;
     d->sessionStarted = false;
 
-    // reset stream management
-    d->streamResumed = false;
-    d->streamManagementEnabled = false;
+    d->c2sStreamManager.onStreamStart();
 
     // start stream
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
@@ -547,12 +544,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // store which features are available
         d->sessionAvailable = (features.sessionMode() != QXmppStreamFeatures::Disabled);
         d->bindModeAvailable = (features.bindMode() != QXmppStreamFeatures::Disabled);
-        d->streamManagementAvailable = (features.streamManagementMode() != QXmppStreamFeatures::Disabled);
+        d->c2sStreamManager.onStreamFeatures(features);
 
         // check whether the stream can be resumed
-        if (d->streamManagementAvailable && d->canResume) {
-            d->isResuming = true;
-            sendData(serializeNonza(QXmppStreamManagementResume(streamManager().lastIncomingSequenceNumber(), d->smId)));
+        if (d->c2sStreamManager.canRequestResume()) {
+            d->c2sStreamManager.requestResume();
             return;
         }
 
@@ -645,8 +641,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 session.parse(nodeRecv);
                 d->sessionStarted = true;
 
-                if (d->streamManagementAvailable) {
-                    d->sendStreamManagementEnable();
+                if (d->c2sStreamManager.canRequestEnable()) {
+                    d->c2sStreamManager.requestEnable();
                 } else {
                     // we are connected now
                     Q_EMIT connected();
@@ -674,8 +670,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     } else {
                         d->sessionStarted = true;
 
-                        if (d->streamManagementAvailable) {
-                            d->sendStreamManagementEnable();
+                        if (d->c2sStreamManager.canRequestEnable()) {
+                            d->c2sStreamManager.requestEnable();
                         } else {
                             // we are connected now
                             Q_EMIT connected();
@@ -756,54 +752,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // emit message
             Q_EMIT messageReceived(message);
         }
-    } else if (QXmppStreamManagementEnabled::isStreamManagementEnabled(nodeRecv)) {
-        QXmppStreamManagementEnabled streamManagementEnabled;
-        streamManagementEnabled.parse(nodeRecv);
-        d->smId = streamManagementEnabled.id();
-        d->canResume = streamManagementEnabled.resume();
-        if (streamManagementEnabled.resume() && !streamManagementEnabled.location().isEmpty()) {
-            setResumeAddress(streamManagementEnabled.location());
-        }
-
-        d->streamManagementEnabled = true;
-        streamManager().enableStreamManagement(true);
-        // we are connected now
-        Q_EMIT connected();
-    } else if (QXmppStreamManagementResumed::isStreamManagementResumed(nodeRecv)) {
-        QXmppStreamManagementResumed streamManagementResumed;
-        streamManagementResumed.parse(nodeRecv);
-        streamManager().setAcknowledgedSequenceNumber(streamManagementResumed.h());
-        d->isResuming = false;
-        d->streamResumed = true;
-
-        d->streamManagementEnabled = true;
-        streamManager().enableStreamManagement(false);
-        // we are connected now
-        Q_EMIT connected();
-    } else if (QXmppStreamManagementFailed::isStreamManagementFailed(nodeRecv)) {
-        if (d->isResuming) {
-            // resuming failed. We can try to bind a resource now.
-            d->isResuming = false;
-
-            // check whether bind is available
-            if (d->bindModeAvailable) {
-                d->sendBind();
-                return;
-            }
-
-            // check whether session is available
-            if (d->sessionAvailable) {
-                d->sendSessionStart();
-                return;
-            }
-
-            // otherwise we are done
-            d->sessionStarted = true;
-            Q_EMIT connected();
-        } else {
-            // we are connected now, but stream management is disabled
-            Q_EMIT connected();
-        }
+    } else {
+        d->c2sStreamManager.handleElement(nodeRecv);
     }
 }
 /// \endcond
@@ -813,25 +763,6 @@ void QXmppOutgoingClient::throwKeepAliveError()
     warning(QStringLiteral("Ping timeout"));
     QXmppStream::disconnectFromHost();
     Q_EMIT error(QXmppClient::KeepAliveError);
-}
-
-bool QXmppOutgoingClient::setResumeAddress(const QString &address)
-{
-    if (const auto location = parseHostAddress(address);
-        !location.first.isEmpty()) {
-        d->resumeHost = location.first;
-
-        if (location.second > 0) {
-            d->resumePort = location.second;
-        } else {
-            d->resumePort = 5222;
-        }
-        return true;
-    }
-
-    d->resumeHost.clear();
-    d->resumePort = 0;
-    return false;
 }
 
 void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
@@ -878,13 +809,7 @@ void QXmppOutgoingClientPrivate::sendSessionStart()
     q->sendPacket(session);
 }
 
-void QXmppOutgoingClientPrivate::sendStreamManagementEnable()
-{
-    q->sendData(serializeNonza(QXmppStreamManagementEnable(true)));
-}
-
 /// Returns the type of the last XMPP stream error that occurred.
-
 QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 {
     return d->xmppStreamError;
@@ -955,6 +880,109 @@ void PingManager::sendPing()
         timeoutTimer->setInterval(timeout * 1000);
         timeoutTimer->start();
     }
+}
+
+C2sStreamManager::C2sStreamManager(QXmppOutgoingClient *q)
+    : q(q)
+{
+}
+
+bool C2sStreamManager::handleElement(const QDomElement &el)
+{
+    // enable succeeded
+    if (QXmppStreamManagementEnabled::isStreamManagementEnabled(el)) {
+        QXmppStreamManagementEnabled streamManagementEnabled;
+        streamManagementEnabled.parse(el);
+
+        m_smId = streamManagementEnabled.id();
+        m_canResume = streamManagementEnabled.resume();
+        if (streamManagementEnabled.resume() && !streamManagementEnabled.location().isEmpty()) {
+            setResumeAddress(streamManagementEnabled.location());
+        }
+
+        m_enabled = true;
+        q->streamManager().enableStreamManagement(true);
+
+        q->onSMEnableFinished();
+        return true;
+    }
+
+    // resume succeeded
+    if (QXmppStreamManagementResumed::isStreamManagementResumed(el)) {
+        QXmppStreamManagementResumed streamManagementResumed;
+        streamManagementResumed.parse(el);
+        q->streamManager().setAcknowledgedSequenceNumber(streamManagementResumed.h());
+        m_isResuming = false;
+        m_streamResumed = true;
+
+        m_enabled = true;
+        q->streamManager().enableStreamManagement(false);
+
+        q->onSMResumeFinished();
+        return true;
+    }
+
+    // enable/resume failed
+    if (QXmppStreamManagementFailed::isStreamManagementFailed(el)) {
+        if (m_isResuming) {
+            // resuming failed. We can try to bind a resource now.
+            m_isResuming = false;
+
+            q->onSMResumeFinished();
+        } else {
+            q->onSMEnableFinished();
+        }
+        return true;
+    }
+    return false;
+}
+
+void C2sStreamManager::onStreamStart()
+{
+    m_streamResumed = false;
+    m_enabled = false;
+}
+
+void C2sStreamManager::onStreamFeatures(const QXmppStreamFeatures &features)
+{
+    m_smAvailable = features.streamManagementMode() != QXmppStreamFeatures::Disabled;
+}
+
+void C2sStreamManager::onDisconnecting()
+{
+    m_canResume = false;
+}
+
+void C2sStreamManager::requestResume()
+{
+    m_isResuming = true;
+
+    auto lastAckNumber = q->streamManager().lastIncomingSequenceNumber();
+    q->sendData(serializeNonza(QXmppStreamManagementResume(lastAckNumber, m_smId)));
+}
+
+void C2sStreamManager::requestEnable()
+{
+    q->sendData(serializeNonza(QXmppStreamManagementEnable(true)));
+}
+
+bool C2sStreamManager::setResumeAddress(const QString &address)
+{
+    if (const auto location = parseHostAddress(address);
+        !location.first.isEmpty()) {
+        m_resumeHost = location.first;
+
+        if (location.second > 0) {
+            m_resumePort = location.second;
+        } else {
+            m_resumePort = 5222;
+        }
+        return true;
+    }
+
+    m_resumeHost.clear();
+    m_resumePort = 0;
+    return false;
 }
 
 }  // namespace QXmpp::Private
