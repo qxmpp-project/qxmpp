@@ -31,7 +31,7 @@ class QXmppPacket;
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnable : public QXmppNonza
 {
 public:
-    QXmppStreamManagementEnable(const bool resume = false, const unsigned max = 0);
+    explicit QXmppStreamManagementEnable(const bool resume = false, const unsigned max = 0);
 
     bool resume() const;
     void setResume(const bool resume);
@@ -52,8 +52,8 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementEnabled : public QXmppNonza
 {
 public:
-    QXmppStreamManagementEnabled(const bool resume = false, const QString id = QString(),
-                                 const unsigned max = 0, const QString location = QString());
+    explicit QXmppStreamManagementEnabled(const bool resume = false, const QString id = QString(),
+                                          const unsigned max = 0, const QString location = QString());
 
     bool resume() const;
     void setResume(const bool resume);
@@ -82,7 +82,7 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResume : public QXmppNonza
 {
 public:
-    QXmppStreamManagementResume(const unsigned h = 0, const QString &previd = QString());
+    explicit QXmppStreamManagementResume(const unsigned h = 0, const QString &previd = QString());
 
     unsigned h() const;
     void setH(const unsigned h);
@@ -103,7 +103,7 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementResumed : public QXmppNonza
 {
 public:
-    QXmppStreamManagementResumed(const unsigned h = 0, const QString &previd = QString());
+    explicit QXmppStreamManagementResumed(const unsigned h = 0, const QString &previd = QString());
 
     unsigned h() const;
     void setH(const unsigned h);
@@ -124,7 +124,7 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementFailed : public QXmppNonza
 {
 public:
-    QXmppStreamManagementFailed(const QXmppStanza::Error::Condition error = QXmppStanza::Error::UndefinedCondition);
+    explicit QXmppStreamManagementFailed(const QXmppStanza::Error::Condition error = QXmppStanza::Error::UndefinedCondition);
 
     QXmppStanza::Error::Condition error() const;
     void setError(const QXmppStanza::Error::Condition error);
@@ -141,7 +141,7 @@ private:
 class QXMPP_AUTOTEST_EXPORT QXmppStreamManagementAck : public QXmppNonza
 {
 public:
-    QXmppStreamManagementAck(const unsigned seqNo = 0);
+    explicit QXmppStreamManagementAck(const unsigned seqNo = 0);
 
     unsigned seqNo() const;
     void setSeqNo(const unsigned seqNo);
