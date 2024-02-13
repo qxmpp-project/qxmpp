@@ -328,6 +328,13 @@ void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, const QString
     }
 }
 
+bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, const char *xmlns)
+{
+    // IQs must have only one child element, so we do not need to iterate over the child elements.
+    auto child = element.firstChildElement();
+    return child.tagName() == tagName && child.namespaceURI() == xmlns;
+}
+
 QDomElement QXmpp::Private::firstChildElement(const QDomElement &el, QStringView tagName, QStringView xmlNs)
 {
     for (auto child = el.firstChild(); !child.isNull(); child = child.nextSibling()) {
