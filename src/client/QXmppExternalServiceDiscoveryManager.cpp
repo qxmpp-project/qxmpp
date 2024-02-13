@@ -55,6 +55,6 @@ QXmppTask<QXmppExternalServiceDiscoveryManager::ServicesResult> QXmppExternalSer
 /// \cond
 QStringList QXmppExternalServiceDiscoveryManager::discoveryFeatures() const
 {
-    return { ns_external_service_discovery };
+    return { ns_external_service_discovery.toString() };
 }
 /// \endcond

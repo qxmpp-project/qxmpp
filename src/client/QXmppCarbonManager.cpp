@@ -53,7 +53,7 @@ void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
         QXmppIq iq(QXmppIq::Set);
         QXmppElement carbonselement;
         carbonselement.setTagName(m_carbonsEnabled ? "enable" : "disable");
-        carbonselement.setAttribute("xmlns", ns_carbons);
+        carbonselement.setAttribute("xmlns", ns_carbons.toString());
 
         iq.setExtensions(QXmppElementList() << carbonselement);
         client()->sendPacket(iq);
@@ -63,7 +63,7 @@ void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
 /// \cond
 QStringList QXmppCarbonManager::discoveryFeatures() const
 {
-    return QStringList() << ns_carbons;
+    return { ns_carbons.toString() };
 }
 
 bool QXmppCarbonManager::handleStanza(const QDomElement &element)

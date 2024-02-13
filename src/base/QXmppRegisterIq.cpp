@@ -295,7 +295,7 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_register);
+    writer->writeDefaultNamespace(toString65(ns_register));
 
     if (!d->instructions.isEmpty()) {
         writer->writeTextElement(QStringLiteral("instructions"), d->instructions);
@@ -331,7 +331,7 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     if (!d->outOfBandUrl.isEmpty()) {
         writer->writeStartElement(QStringLiteral("x"));
-        writer->writeDefaultNamespace(ns_oob);
+        writer->writeDefaultNamespace(toString65(ns_oob));
         writer->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
         writer->writeEndElement();
     }

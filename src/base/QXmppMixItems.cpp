@@ -6,6 +6,9 @@
 #include "QXmppDataFormBase.h"
 #include "QXmppMixInfoItem.h"
 #include "QXmppMixParticipantItem.h"
+#include "QXmppUtils_p.h"
+
+using namespace QXmpp::Private;
 
 static const auto NAME = QStringLiteral("Name");
 static const auto DESCRIPTION = QStringLiteral("Description");
@@ -29,7 +32,7 @@ public:
 
     QString formType() const override
     {
-        return ns_mix;
+        return ns_mix.toString();
     }
 
     void parseForm(const QXmppDataForm &form) override
@@ -248,7 +251,7 @@ void QXmppMixParticipantItem::parsePayload(const QDomElement &payload)
 void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("participant"));
-    writer->writeDefaultNamespace(ns_mix);
+    writer->writeDefaultNamespace(toString65(ns_mix));
     if (!d->jid.isEmpty()) {
         writer->writeTextElement("jid", d->jid);
     }

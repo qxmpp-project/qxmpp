@@ -263,7 +263,7 @@ void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_muc_admin);
+    writer->writeDefaultNamespace(toString65(ns_muc_admin));
     for (const QXmppMucItem &item : m_items) {
         item.toXml(writer);
     }
@@ -303,7 +303,7 @@ void QXmppMucOwnerIq::parseElementFromChild(const QDomElement &element)
 void QXmppMucOwnerIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_muc_owner);
+    writer->writeDefaultNamespace(toString65(ns_muc_owner));
     m_form.toXml(writer);
     writer->writeEndElement();
 }

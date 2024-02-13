@@ -302,7 +302,7 @@ void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm &form)
 /// \cond
 QStringList QXmppDiscoveryManager::discoveryFeatures() const
 {
-    return QStringList() << ns_disco_info;
+    return { ns_disco_info.toString() };
 }
 
 bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)

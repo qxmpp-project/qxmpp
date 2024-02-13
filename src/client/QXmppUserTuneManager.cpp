@@ -67,8 +67,8 @@ QXmppUserTuneManager::QXmppUserTuneManager()
 QStringList QXmppUserTuneManager::discoveryFeatures() const
 {
     return {
-        ns_tune,
-        ns_tune_notify,
+        ns_tune.toString(),
+        ns_tune_notify.toString(),
     };
 }
 
@@ -80,7 +80,7 @@ QStringList QXmppUserTuneManager::discoveryFeatures() const
 auto QXmppUserTuneManager::request(const QString &jid)
     -> QXmppTask<GetResult>
 {
-    return Pep::request<Item>(pubSub(client()), jid, ns_tune, this);
+    return Pep::request<Item>(pubSub(client()), jid, ns_tune.toString(), this);
 }
 
 ///
@@ -91,12 +91,12 @@ auto QXmppUserTuneManager::request(const QString &jid)
 auto QXmppUserTuneManager::publish(const QXmppTuneItem &item)
     -> QXmppTask<PublishResult>
 {
-    return pubSub(client())->publishOwnPepItem(ns_tune, item);
+    return pubSub(client())->publishOwnPepItem(ns_tune.toString(), item);
 }
 
 /// \cond
 bool QXmppUserTuneManager::handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName)
 {
-    return Pep::handlePubSubEvent<Item>(element, pubSubService, nodeName, ns_tune, this, &QXmppUserTuneManager::itemReceived);
+    return Pep::handlePubSubEvent<Item>(element, pubSubService, nodeName, ns_tune.toString(), this, &QXmppUserTuneManager::itemReceived);
 }
 /// \endcond

@@ -375,7 +375,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
     }
 
     writer->writeStartElement(QStringLiteral("event"));
-    writer->writeDefaultNamespace(ns_pubsub_event);
+    writer->writeDefaultNamespace(toString65(ns_pubsub_event));
 
     if (d->eventType == Subscription && d->subscription) {
         d->subscription->toXml(writer);

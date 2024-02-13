@@ -8,6 +8,7 @@
 #include "QXmppStanza_p.h"
 #include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
+#include "QXmppUtils_p.h"
 
 using namespace QXmpp::Private;
 
@@ -53,7 +54,7 @@ void QXmppStreamManagementEnable::parse(const QDomElement &element)
 void QXmppStreamManagementEnable::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("enable"));
-    writer->writeDefaultNamespace(ns_stream_management);
+    writer->writeDefaultNamespace(toString65(ns_stream_management));
     if (m_resume) {
         writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
     }
@@ -125,7 +126,7 @@ void QXmppStreamManagementEnabled::parse(const QDomElement &element)
 void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("enable"));
-    writer->writeDefaultNamespace(ns_stream_management);
+    writer->writeDefaultNamespace(toString65(ns_stream_management));
     if (m_resume) {
         writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
     }
@@ -262,9 +263,9 @@ void QXmppStreamManagementFailed::toXml(QXmlStreamWriter *writer) const
     QString errorString = conditionToString(m_error);
 
     writer->writeStartElement(QStringLiteral("failed"));
-    writer->writeDefaultNamespace(ns_stream_management);
+    writer->writeDefaultNamespace(toString65(ns_stream_management));
     writer->writeStartElement(errorString);
-    writer->writeDefaultNamespace(ns_stanza);
+    writer->writeDefaultNamespace(toString65(ns_stanza));
     writer->writeEndElement();
     writer->writeEndElement();
 }
@@ -292,7 +293,7 @@ void QXmppStreamManagementAck::parse(const QDomElement &element)
 void QXmppStreamManagementAck::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("a"));
-    writer->writeDefaultNamespace(ns_stream_management);
+    writer->writeDefaultNamespace(toString65(ns_stream_management));
     writer->writeAttribute(QStringLiteral("h"), QString::number(m_seqNo));
     writer->writeEndElement();
 }
@@ -312,7 +313,7 @@ bool QXmppStreamManagementReq::isStreamManagementReq(const QDomElement &element)
 void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
 {
     writer->writeStartElement("r");
-    writer->writeDefaultNamespace(ns_stream_management);
+    writer->writeDefaultNamespace(toString65(ns_stream_management));
     writer->writeEndElement();
 }
 

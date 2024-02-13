@@ -78,7 +78,7 @@ void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
 void QXmppIbbOpenIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("open");
-    writer->writeDefaultNamespace(ns_ibb);
+    writer->writeDefaultNamespace(toString65(ns_ibb));
     writer->writeAttribute("sid", m_sid);
     writer->writeAttribute("block-size", QString::number(m_block_size));
     writer->writeEndElement();
@@ -131,7 +131,7 @@ void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
 void QXmppIbbCloseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("close");
-    writer->writeDefaultNamespace(ns_ibb);
+    writer->writeDefaultNamespace(toString65(ns_ibb));
     writer->writeAttribute("sid", m_sid);
     writer->writeEndElement();
 }
@@ -225,7 +225,7 @@ void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 void QXmppIbbDataIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("data");
-    writer->writeDefaultNamespace(ns_ibb);
+    writer->writeDefaultNamespace(toString65(ns_ibb));
     writer->writeAttribute("sid", m_sid);
     writer->writeAttribute("seq", QString::number(m_seq));
     writer->writeCharacters(m_payload.toBase64());

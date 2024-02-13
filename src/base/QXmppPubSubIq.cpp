@@ -410,19 +410,8 @@ bool PubSubIqBase::isPubSubIq(const QDomElement &element, bool (*isItemValid)(co
 
 void PubSubIqBase::parseElementFromChild(const QDomElement &element)
 {
-    const auto findChildElement = [](const QDomElement &element, const QString &tag, const QString &namespaceUri) {
-        for (auto subElement = element.firstChildElement(tag);
-             !subElement.isNull();
-             subElement = subElement.nextSiblingElement(tag)) {
-            if (subElement.namespaceURI() == namespaceUri) {
-                return subElement;
-            }
-        }
-        return QDomElement();
-    };
-
     const auto parseDataFormFromChild = [=](const QDomElement &element) -> std::optional<QXmppDataForm> {
-        if (const auto subElement = findChildElement(element, "x", ns_data);
+        if (const auto subElement = firstChildElement(element, u"x", ns_data);
             !subElement.isNull()) {
             QXmppDataForm form;
             form.parse(subElement);
@@ -544,7 +533,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
 void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("pubsub"));
-    writer->writeDefaultNamespace(queryTypeIsOwnerIq(d->queryType) ? ns_pubsub_owner : ns_pubsub);
+    writer->writeDefaultNamespace(toString65(queryTypeIsOwnerIq(d->queryType) ? ns_pubsub_owner : ns_pubsub));
 
     // The SubscriptionQuery is special here: The query element is directly
     // handled by a QXmppPubSubSubscription.

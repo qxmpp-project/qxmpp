@@ -1033,7 +1033,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("vCard"));
-    writer->writeDefaultNamespace(ns_vcard);
+    writer->writeDefaultNamespace(toString65(ns_vcard));
     for (const QXmppVCardAddress &address : d->addresses) {
         address.toXml(writer);
     }

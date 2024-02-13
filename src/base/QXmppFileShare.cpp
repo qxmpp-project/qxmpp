@@ -8,6 +8,7 @@
 #include "QXmppEncryptedFileSource.h"
 #include "QXmppFileMetadata.h"
 #include "QXmppHttpFileSource.h"
+#include "QXmppUtils_p.h"
 
 #include <optional>
 
@@ -15,6 +16,7 @@
 #include <QUrl>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp::Private;
 using Disposition = QXmppFileShare::Disposition;
 
 static std::optional<Disposition> dispositionFromString(const QString &str)
@@ -188,7 +190,7 @@ bool QXmppFileShare::parse(const QDomElement &el)
 void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("file-sharing");
-    writer->writeDefaultNamespace(ns_sfs);
+    writer->writeDefaultNamespace(toString65(ns_sfs));
     writer->writeAttribute("disposition", dispositionToString(d->disposition));
     d->metadata.toXml(writer);
     writer->writeStartElement("sources");

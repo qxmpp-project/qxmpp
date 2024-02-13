@@ -116,8 +116,10 @@ QString QXmppVersionManager::clientOs() const
 /// \cond
 QStringList QXmppVersionManager::discoveryFeatures() const
 {
-    // XEP-0092: Software Version
-    return QStringList() << ns_version;
+    return {
+        // XEP-0092: Software Version
+        ns_version.toString(),
+    };
 }
 
 bool QXmppVersionManager::handleStanza(const QDomElement &element)

@@ -5,9 +5,12 @@
 #include "QXmppStartTlsPacket.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 const static QStringList STARTTLS_TYPES = {
     QStringLiteral("starttls"),
@@ -58,7 +61,7 @@ void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 {
     if (m_type != Invalid) {
         writer->writeStartElement(STARTTLS_TYPES.at(int(m_type)));
-        writer->writeDefaultNamespace(ns_tls);
+        writer->writeDefaultNamespace(toString65(ns_tls));
         writer->writeEndElement();
     }
 }

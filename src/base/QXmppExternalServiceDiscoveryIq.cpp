@@ -443,7 +443,7 @@ void QXmppExternalServiceDiscoveryIq::parseElementFromChild(const QDomElement &e
 void QXmppExternalServiceDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("services");
-    writer->writeDefaultNamespace(ns_external_service_discovery);
+    writer->writeDefaultNamespace(toString65(ns_external_service_discovery));
 
     for (const QXmppExternalService &item : d->externalServices) {
         item.toXml(writer);

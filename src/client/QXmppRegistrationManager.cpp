@@ -56,7 +56,7 @@ QXmppRegistrationManager::~QXmppRegistrationManager() = default;
 QStringList QXmppRegistrationManager::discoveryFeatures() const
 {
     return QStringList {
-        ns_register
+        ns_register.toString()
     };
 }
 

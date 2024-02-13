@@ -139,8 +139,10 @@ QXmppRemoteMethodResult QXmppRpcManager::callRemoteMethod(const QString &jid,
 /// \cond
 QStringList QXmppRpcManager::discoveryFeatures() const
 {
-    // XEP-0009: Jabber-RPC
-    return QStringList() << ns_rpc;
+    return {
+        // XEP-0009: Jabber-RPC
+        ns_rpc.toString(),
+    };
 }
 
 QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const

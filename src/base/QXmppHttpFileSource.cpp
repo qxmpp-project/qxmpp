@@ -5,9 +5,12 @@
 #include "QXmppHttpFileSource.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppHttpFileSource
@@ -57,7 +60,7 @@ bool QXmppHttpFileSource::parse(const QDomElement &el)
 void QXmppHttpFileSource::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("url-data");
-    writer->writeDefaultNamespace(ns_url_data);
+    writer->writeDefaultNamespace(toString65(ns_url_data));
     writer->writeAttribute("target", m_url.toString());
     writer->writeEndElement();
 }

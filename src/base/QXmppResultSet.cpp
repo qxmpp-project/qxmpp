@@ -122,7 +122,7 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
         return;
     }
     writer->writeStartElement(QStringLiteral("set"));
-    writer->writeDefaultNamespace(ns_rsm);
+    writer->writeDefaultNamespace(toString65(ns_rsm));
     if (m_max >= 0) {
         writeXmlTextElement(writer, u"max", QString::number(m_max));
     }
@@ -242,7 +242,7 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
         return;
     }
     writer->writeStartElement("set");
-    writer->writeDefaultNamespace(ns_rsm);
+    writer->writeDefaultNamespace(toString65(ns_rsm));
     if (!m_first.isNull() || m_index >= 0) {
         writer->writeStartElement("first");
         if (m_index >= 0) {

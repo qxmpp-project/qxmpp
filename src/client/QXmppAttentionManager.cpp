@@ -97,7 +97,7 @@ QXmppAttentionManager::~QXmppAttentionManager() = default;
 QStringList QXmppAttentionManager::discoveryFeatures() const
 {
     return {
-        ns_attention
+        ns_attention.toString(),
     };
 }
 

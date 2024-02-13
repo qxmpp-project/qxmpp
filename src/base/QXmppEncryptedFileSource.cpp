@@ -7,6 +7,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppHttpFileSource.h"
+#include "QXmppUtils_p.h"
 
 #include <optional>
 
@@ -14,6 +15,7 @@
 #include <QXmlStreamWriter>
 
 using namespace QXmpp;
+using namespace QXmpp::Private;
 
 /// \cond
 class QXmppEncryptedFileSourcePrivate : public QSharedData
@@ -177,7 +179,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("encrypted"));
-    writer->writeDefaultNamespace(ns_esfs);
+    writer->writeDefaultNamespace(toString65(ns_esfs));
     writer->writeAttribute(QStringLiteral("cipher"), cipherToString(d->cipher));
     writer->writeTextElement(QStringLiteral("key"), d->key.toBase64());
     writer->writeTextElement(QStringLiteral("iv"), d->iv.toBase64());
@@ -185,7 +187,7 @@ void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
         hash.toXml(writer);
     }
     writer->writeStartElement(QStringLiteral("sources"));
-    writer->writeDefaultNamespace(ns_sfs);
+    writer->writeDefaultNamespace(toString65(ns_sfs));
     for (const auto &source : d->httpSources) {
         source.toXml(writer);
     }

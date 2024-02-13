@@ -97,7 +97,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
 void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply &rsm) const
 {
     writer->writeStartElement(QStringLiteral("chat"));
-    writer->writeDefaultNamespace(ns_archive);
+    writer->writeDefaultNamespace(toString65(ns_archive));
     writeOptionalXmlAttribute(writer, u"with", m_with);
     if (m_start.isValid()) {
         writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
@@ -398,7 +398,7 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("list"));
-    writer->writeDefaultNamespace(ns_archive);
+    writer->writeDefaultNamespace(toString65(ns_archive));
     if (!m_with.isEmpty()) {
         writeOptionalXmlAttribute(writer, u"with", m_with);
     }
@@ -433,7 +433,7 @@ void QXmppArchivePrefIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("pref"));
-    writer->writeDefaultNamespace(ns_archive);
+    writer->writeDefaultNamespace(toString65(ns_archive));
     writer->writeEndElement();
 }
 /// \endcond
@@ -506,7 +506,7 @@ void QXmppArchiveRemoveIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("remove"));
-    writer->writeDefaultNamespace(ns_archive);
+    writer->writeDefaultNamespace(toString65(ns_archive));
     if (!m_with.isEmpty()) {
         writeOptionalXmlAttribute(writer, u"with", m_with);
     }
@@ -595,7 +595,7 @@ void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("retrieve"));
-    writer->writeDefaultNamespace(ns_archive);
+    writer->writeDefaultNamespace(toString65(ns_archive));
     writeOptionalXmlAttribute(writer, u"with", m_with);
     writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
     if (!m_rsmQuery.isNull()) {
