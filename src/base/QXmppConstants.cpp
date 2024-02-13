@@ -19,8 +19,6 @@ const char *ns_rosterver = "urn:xmpp:features:rosterver";
 const char *ns_rpc = "jabber:iq:rpc";
 // XEP-0020: Feature Negotiation
 const char *ns_feature_negotiation = "http://jabber.org/protocol/feature-neg";
-// XEP-0027: Current Jabber OpenPGP Usage
-const char *ns_legacy_openpgp = "jabber:x:encrypted";
 // XEP-0030: Service Discovery
 const char *ns_disco_info = "http://jabber.org/protocol/disco#info";
 const char *ns_disco_items = "http://jabber.org/protocol/disco#items";
@@ -168,8 +166,6 @@ const char *ns_push = "urn:xmpp:push:0";
 const char *ns_sid = "urn:xmpp:sid:0";
 // XEP-0363: HTTP File Upload
 const char *ns_http_upload = "urn:xmpp:http:upload:0";
-// XEP-0364: Current Off-the-Record Messaging Usage
-const char *ns_otr = "urn:xmpp:otr:0";
 // XEP-0367: Message Attaching
 const char *ns_message_attaching = "urn:xmpp:message-attaching:1";
 // XEP-0369: Mediated Information eXchange (MIX)
@@ -181,18 +177,10 @@ const char *ns_mix_node_participants = "urn:xmpp:mix:nodes:participants";
 const char *ns_mix_node_presence = "urn:xmpp:mix:nodes:presence";
 const char *ns_mix_node_config = "urn:xmpp:mix:nodes:config";
 const char *ns_mix_node_info = "urn:xmpp:mix:nodes:info";
-// XEP-0373: OpenPGP for XMPP
-const char *ns_ox = "urn:xmpp:openpgp:0";
 // XEP-0380: Explicit Message Encryption
 const char *ns_eme = "urn:xmpp:eme:0";
 // XEP-0382: Spoiler messages
 const char *ns_spoiler = "urn:xmpp:spoiler:0";
-// XEP-0384: OMEMO Encryption
-const char *ns_omemo = "eu.siacs.conversations.axolotl";
-const char *ns_omemo_1 = "urn:xmpp:omemo:1";
-const char *ns_omemo_2 = "urn:xmpp:omemo:2";
-const char *ns_omemo_2_bundles = "urn:xmpp:omemo:2:bundles";
-const char *ns_omemo_2_devices = "urn:xmpp:omemo:2:devices";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 const char *ns_mix_pam = "urn:xmpp:mix:pam:1";
 const char *ns_mix_roster = "urn:xmpp:mix:roster:0";

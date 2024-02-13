@@ -1061,7 +1061,7 @@ QXmpp::EncryptionMethod QXmppMessage::encryptionMethod() const
 ///
 void QXmppMessage::setEncryptionMethod(QXmpp::EncryptionMethod method)
 {
-    d->encryptionMethod = QXmpp::Private::encryptionToString(method);
+    d->encryptionMethod = QXmpp::Private::encryptionToString(method).toString();
 }
 
 ///
@@ -1098,7 +1098,7 @@ QString QXmppMessage::encryptionName() const
     if (!d->encryptionName.isEmpty()) {
         return d->encryptionName;
     }
-    return QXmpp::Private::encryptionToName(encryptionMethod());
+    return QXmpp::Private::encryptionToName(encryptionMethod()).toString();
 }
 
 ///

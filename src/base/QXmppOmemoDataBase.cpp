@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppConstants_p.h"
+#include "QXmppGlobal_p.h"
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
 #include "QXmppUtils.h"
@@ -247,7 +248,7 @@ void QXmppOmemoElement::parse(const QDomElement &element)
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("encrypted"));
-    writer->writeDefaultNamespace(ns_omemo_2);
+    writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
     writer->writeStartElement(QStringLiteral("header"));
     writer->writeAttribute(QStringLiteral("sid"), QString::number(m_senderDeviceId));
