@@ -393,7 +393,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
             break;
         case Configuration:
             // node attribute is optional
-            writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->node);
+            writeOptionalXmlAttribute(writer, u"node", d->node);
             break;
         case Subscription:
             break;

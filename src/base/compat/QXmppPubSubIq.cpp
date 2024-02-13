@@ -188,8 +188,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     // write query type
     writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->queryJid);
-    writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->queryNode);
+    writeOptionalXmlAttribute(writer, u"jid", d->queryJid);
+    writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
     // write contents
     switch (d->queryType) {
@@ -201,8 +201,8 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
-        writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), d->subscriptionType);
+        writeOptionalXmlAttribute(writer, u"subid", d->subscriptionId);
+        writeOptionalXmlAttribute(writer, u"subscription", d->subscriptionType);
         break;
     default:
         break;

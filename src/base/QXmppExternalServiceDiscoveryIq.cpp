@@ -329,39 +329,39 @@ void QXmppExternalService::parse(const QDomElement &el)
 void QXmppExternalService::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("service");
-    writeOptionalXmlAttribute(writer, "host", d->host);
-    writeOptionalXmlAttribute(writer, "type", d->type);
+    writeOptionalXmlAttribute(writer, u"host", d->host);
+    writeOptionalXmlAttribute(writer, u"type", d->type);
 
     if (d->action) {
-        writeOptionalXmlAttribute(writer, "action", actionToString(d->action.value()));
+        writeOptionalXmlAttribute(writer, u"action", actionToString(d->action.value()));
     }
 
     if (d->expires) {
-        writeOptionalXmlAttribute(writer, "expires", d->expires->toString(Qt::ISODateWithMs));
+        writeOptionalXmlAttribute(writer, u"expires", d->expires->toString(Qt::ISODateWithMs));
     }
 
     if (d->name) {
-        writeOptionalXmlAttribute(writer, "name", d->name.value());
+        writeOptionalXmlAttribute(writer, u"name", d->name.value());
     }
 
     if (d->password) {
-        writeOptionalXmlAttribute(writer, "password", d->password.value());
+        writeOptionalXmlAttribute(writer, u"password", d->password.value());
     }
 
     if (d->port) {
-        writeOptionalXmlAttribute(writer, "port", QString::number(d->port.value()));
+        writeOptionalXmlAttribute(writer, u"port", QString::number(d->port.value()));
     }
 
     if (d->restricted) {
-        writeOptionalXmlAttribute(writer, "restricted", d->restricted.value() ? "true" : "false");
+        writeOptionalXmlAttribute(writer, u"restricted", d->restricted.value() ? u"true" : u"false");
     }
 
     if (d->transport) {
-        writeOptionalXmlAttribute(writer, "transport", transportToString(d->transport.value()));
+        writeOptionalXmlAttribute(writer, u"transport", transportToString(d->transport.value()));
     }
 
     if (d->username) {
-        writeOptionalXmlAttribute(writer, "username", d->username.value());
+        writeOptionalXmlAttribute(writer, u"username", d->username.value());
     }
 
     writer->writeEndElement();

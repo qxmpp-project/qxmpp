@@ -115,7 +115,7 @@ void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QStringLiteral("id"), d->messageId);
 
     for (const auto &reaction : d->emojis) {
-        writeXmlTextElement(writer, QStringLiteral("reaction"), reaction);
+        writeXmlTextElement(writer, u"reaction", reaction);
     }
     writer->writeEndElement();
 }

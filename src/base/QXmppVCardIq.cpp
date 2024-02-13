@@ -1038,32 +1038,32 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         address.toXml(writer);
     }
     if (d->birthday.isValid()) {
-        writeXmlTextElement(writer, QStringLiteral("BDAY"), d->birthday.toString(QStringLiteral("yyyy-MM-dd")));
+        writeXmlTextElement(writer, u"BDAY", d->birthday.toString(QStringLiteral("yyyy-MM-dd")));
     }
     if (!d->description.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("DESC"), d->description);
+        writeXmlTextElement(writer, u"DESC", d->description);
     }
     for (const QXmppVCardEmail &email : d->emails) {
         email.toXml(writer);
     }
     if (!d->fullName.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("FN"), d->fullName);
+        writeXmlTextElement(writer, u"FN", d->fullName);
     }
     if (!d->nickName.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("NICKNAME"), d->nickName);
+        writeXmlTextElement(writer, u"NICKNAME", d->nickName);
     }
     if (!d->firstName.isEmpty() ||
         !d->lastName.isEmpty() ||
         !d->middleName.isEmpty()) {
         writer->writeStartElement("N");
         if (!d->firstName.isEmpty()) {
-            writeXmlTextElement(writer, QStringLiteral("GIVEN"), d->firstName);
+            writeXmlTextElement(writer, u"GIVEN", d->firstName);
         }
         if (!d->lastName.isEmpty()) {
-            writeXmlTextElement(writer, QStringLiteral("FAMILY"), d->lastName);
+            writeXmlTextElement(writer, u"FAMILY", d->lastName);
         }
         if (!d->middleName.isEmpty()) {
-            writeXmlTextElement(writer, QStringLiteral("MIDDLE"), d->middleName);
+            writeXmlTextElement(writer, u"MIDDLE", d->middleName);
         }
         writer->writeEndElement();
     }
@@ -1077,12 +1077,12 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         if (photoType.isEmpty()) {
             photoType = getImageType(d->photo);
         }
-        writeXmlTextElement(writer, QStringLiteral("TYPE"), photoType);
-        writeXmlTextElement(writer, QStringLiteral("BINVAL"), d->photo.toBase64());
+        writeXmlTextElement(writer, u"TYPE", photoType);
+        writeXmlTextElement(writer, u"BINVAL", QString::fromUtf8(d->photo.toBase64()));
         writer->writeEndElement();
     }
     if (!d->url.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("URL"), d->url);
+        writeXmlTextElement(writer, u"URL", d->url);
     }
 
     d->organization.toXml(writer);

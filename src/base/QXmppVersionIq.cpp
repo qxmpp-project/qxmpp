@@ -87,15 +87,15 @@ void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_version);
 
     if (!m_name.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("name"), m_name);
+        writeXmlTextElement(writer, u"name", m_name);
     }
 
     if (!m_os.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("os"), m_os);
+        writeXmlTextElement(writer, u"os", m_os);
     }
 
     if (!m_version.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("version"), m_version);
+        writeXmlTextElement(writer, u"version", m_version);
     }
 
     writer->writeEndElement();

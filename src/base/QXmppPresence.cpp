@@ -531,21 +531,21 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
 void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement(QStringLiteral("presence"));
-    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("xml:lang"), lang());
-    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("id"), id());
-    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("to"), to());
-    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("from"), from());
-    writeOptionalXmlAttribute(xmlWriter, QStringLiteral("type"), PRESENCE_TYPES.at(d->type));
+    writeOptionalXmlAttribute(xmlWriter, u"xml:lang", lang());
+    writeOptionalXmlAttribute(xmlWriter, u"id", id());
+    writeOptionalXmlAttribute(xmlWriter, u"to", to());
+    writeOptionalXmlAttribute(xmlWriter, u"from", from());
+    writeOptionalXmlAttribute(xmlWriter, u"type", PRESENCE_TYPES.at(d->type));
 
     const QString show = AVAILABLE_STATUS_TYPES.at(d->availableStatusType);
     if (!show.isEmpty()) {
-        writeXmlTextElement(xmlWriter, QStringLiteral("show"), show);
+        writeXmlTextElement(xmlWriter, u"show", show);
     }
     if (!d->statusText.isEmpty()) {
-        writeXmlTextElement(xmlWriter, QStringLiteral("status"), d->statusText);
+        writeXmlTextElement(xmlWriter, u"status", d->statusText);
     }
     if (d->priority != 0) {
-        writeXmlTextElement(xmlWriter, QStringLiteral("priority"), QString::number(d->priority));
+        writeXmlTextElement(xmlWriter, u"priority", QString::number(d->priority));
     }
 
     error().toXml(xmlWriter);
@@ -580,9 +580,9 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         !d->capabilityHash.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("c"));
         xmlWriter->writeDefaultNamespace(ns_capabilities);
-        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("hash"), d->capabilityHash);
-        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("node"), d->capabilityNode);
-        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("ver"), d->capabilityVer.toBase64());
+        writeOptionalXmlAttribute(xmlWriter, u"hash", d->capabilityHash);
+        writeOptionalXmlAttribute(xmlWriter, u"node", d->capabilityNode);
+        writeOptionalXmlAttribute(xmlWriter, u"ver", QString::fromUtf8(d->capabilityVer.toBase64()));
         xmlWriter->writeEndElement();
     }
 
@@ -595,7 +595,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             xmlWriter->writeEmptyElement(QStringLiteral("photo"));
             break;
         case VCardUpdateValidPhoto:
-            writeXmlTextElement(xmlWriter, QStringLiteral("photo"), d->photoHash.toHex());
+            writeXmlTextElement(xmlWriter, u"photo", QString::fromUtf8(d->photoHash.toHex()));
             break;
         default:
             break;
@@ -623,7 +623,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (!d->lastUserInteraction.isNull() && d->lastUserInteraction.isValid()) {
         xmlWriter->writeStartElement(QStringLiteral("idle"));
         xmlWriter->writeDefaultNamespace(ns_idle);
-        writeOptionalXmlAttribute(xmlWriter, QStringLiteral("since"), QXmppUtils::datetimeToString(d->lastUserInteraction));
+        writeOptionalXmlAttribute(xmlWriter, u"since", QXmppUtils::datetimeToString(d->lastUserInteraction));
         xmlWriter->writeEndElement();
     }
 
@@ -632,10 +632,10 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeStartElement(QStringLiteral("mix"));
         xmlWriter->writeDefaultNamespace(ns_mix_presence);
         if (!d->mixUserJid.isEmpty()) {
-            writeXmlTextElement(xmlWriter, QStringLiteral("jid"), d->mixUserJid);
+            writeXmlTextElement(xmlWriter, u"jid", d->mixUserJid);
         }
         if (!d->mixUserNick.isEmpty()) {
-            writeXmlTextElement(xmlWriter, QStringLiteral("nick"), d->mixUserNick);
+            writeXmlTextElement(xmlWriter, u"nick", d->mixUserNick);
         }
         xmlWriter->writeEndElement();
     }

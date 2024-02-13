@@ -911,26 +911,26 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         writer->writeAttribute("type", fieldTypeToString(field.type()));
 
         /* field attributes */
-        writeOptionalXmlAttribute(writer, "label", field.label());
-        writeOptionalXmlAttribute(writer, "var", field.key());
+        writeOptionalXmlAttribute(writer, u"label", field.label());
+        writeOptionalXmlAttribute(writer, u"var", field.key());
 
         /* field value(s) */
         switch (field.type()) {
         case Field::BooleanField:
-            writeXmlTextElement(writer, "value", field.value().toBool() ? "1" : "0");
+            writeXmlTextElement(writer, u"value", field.value().toBool() ? u"1" : u"0");
             break;
         case Field::ListMultiField:
         case Field::JidMultiField:
         case Field::TextMultiField: {
             const auto values = field.value().toStringList();
             for (const QString &value : values) {
-                writeXmlTextElement(writer, "value", value);
+                writeXmlTextElement(writer, u"value", value);
             }
             break;
         }
         default:
             if (const auto value = field.value().toString(); !value.isEmpty()) {
-                writeXmlTextElement(writer, "value", value);
+                writeXmlTextElement(writer, u"value", value);
             }
         }
 
@@ -956,7 +956,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             const auto sources = field.mediaSources();
             for (const auto &source : sources) {
                 writer->writeStartElement(QStringLiteral("uri"));
-                writeOptionalXmlAttribute(writer, QStringLiteral("type"), source.contentType().name());
+                writeOptionalXmlAttribute(writer, u"type", source.contentType().name());
                 writer->writeCharacters(source.uri().toString());
                 writer->writeEndElement();
             }
@@ -971,8 +971,8 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             const auto options = field.options();
             for (const auto &option : options) {
                 writer->writeStartElement("option");
-                writeOptionalXmlAttribute(writer, "label", option.first);
-                writeXmlTextElement(writer, "value", option.second);
+                writeOptionalXmlAttribute(writer, u"label", option.first);
+                writeXmlTextElement(writer, u"value", option.second);
                 writer->writeEndElement();
             }
         }
@@ -982,10 +982,10 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
         /* other properties */
         if (!field.description().isEmpty()) {
-            writeXmlTextElement(writer, "description", field.description());
+            writeXmlTextElement(writer, u"description", field.description());
         }
         if (field.isRequired()) {
-            writeXmlTextElement(writer, "required", "");
+            writeXmlTextElement(writer, u"required", u"");
         }
 
         writer->writeEndElement();

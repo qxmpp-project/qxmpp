@@ -124,16 +124,16 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("set"));
     writer->writeDefaultNamespace(ns_rsm);
     if (m_max >= 0) {
-        writeXmlTextElement(writer, QStringLiteral("max"), QString::number(m_max));
+        writeXmlTextElement(writer, u"max", QString::number(m_max));
     }
     if (!m_after.isNull()) {
-        writeXmlTextElement(writer, QStringLiteral("after"), m_after);
+        writeXmlTextElement(writer, u"after", m_after);
     }
     if (!m_before.isNull()) {
-        writeXmlTextElement(writer, QStringLiteral("before"), m_before);
+        writeXmlTextElement(writer, u"before", m_before);
     }
     if (m_index >= 0) {
-        writeXmlTextElement(writer, QStringLiteral("index"), QString::number(m_index));
+        writeXmlTextElement(writer, u"index", QString::number(m_index));
     }
     writer->writeEndElement();
 }
@@ -252,11 +252,11 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
         writer->writeEndElement();
     }
     if (!m_last.isNull()) {
-        writeXmlTextElement(writer, "last", m_last);
+        writeXmlTextElement(writer, u"last", m_last);
     }
 
     if (m_count >= 0) {
-        writeXmlTextElement(writer, "count", QString::number(m_count));
+        writeXmlTextElement(writer, u"count", QString::number(m_count));
     }
     writer->writeEndElement();
 }

@@ -193,19 +193,19 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
     for (const auto &conference : m_conferences) {
         writer->writeStartElement(QStringLiteral("conference"));
         if (conference.autoJoin()) {
-            writeOptionalXmlAttribute(writer, QStringLiteral("autojoin"), QStringLiteral("true"));
+            writeOptionalXmlAttribute(writer, u"autojoin", QStringLiteral("true"));
         }
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), conference.jid());
-        writeOptionalXmlAttribute(writer, QStringLiteral("name"), conference.name());
+        writeOptionalXmlAttribute(writer, u"jid", conference.jid());
+        writeOptionalXmlAttribute(writer, u"name", conference.name());
         if (!conference.nickName().isEmpty()) {
-            writeXmlTextElement(writer, QStringLiteral("nick"), conference.nickName());
+            writeXmlTextElement(writer, u"nick", conference.nickName());
         }
         writer->writeEndElement();
     }
     for (const auto &url : m_urls) {
         writer->writeStartElement(QStringLiteral("url"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("name"), url.name());
-        writeOptionalXmlAttribute(writer, QStringLiteral("url"), url.url().toString());
+        writeOptionalXmlAttribute(writer, u"name", url.name());
+        writeOptionalXmlAttribute(writer, u"url", url.url().toString());
         writer->writeEndElement();
     }
     writer->writeEndElement();

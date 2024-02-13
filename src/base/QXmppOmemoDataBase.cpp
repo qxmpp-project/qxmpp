@@ -113,7 +113,7 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QStringLiteral("rid"), QString::number(m_recipientDeviceId));
 
     if (m_isUsedForKeyExchange) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("kex"), QStringLiteral("true"));
+        writeOptionalXmlAttribute(writer, u"kex", QStringLiteral("true"));
     }
 
     writer->writeCharacters(m_data.toBase64());
