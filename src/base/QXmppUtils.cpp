@@ -348,19 +348,6 @@ QDomElement QXmpp::Private::firstChildElement(const QDomElement &el, QStringView
     return {};
 }
 
-QDomElement QXmpp::Private::firstChildElement(const QDomElement &el, QStringView tagName, const char *xmlNs)
-{
-    for (auto child = el.firstChild(); !child.isNull(); child = child.nextSibling()) {
-        if (child.isElement() && child.namespaceURI() == xmlNs) {
-            auto elt = child.toElement();
-            if (elt.tagName() == tagName) {
-                return elt;
-            }
-        }
-    }
-    return {};
-}
-
 //
 // Generates a random count of random bytes.
 //

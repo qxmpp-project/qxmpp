@@ -59,7 +59,6 @@ void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView
 // DOM
 bool isIqType(const QDomElement &, QStringView tagName, QStringView xmlns);
 QDomElement firstChildElement(const QDomElement &, QStringView tagName, QStringView xmlNs = {});
-QDomElement firstChildElement(const QDomElement &, QStringView tagName, const char *xmlNs);
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
