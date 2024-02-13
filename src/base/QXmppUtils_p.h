@@ -49,6 +49,7 @@ void writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name, co
 void writeXmlTextElement(QXmlStreamWriter *stream, const QString &name, const QString &value);
 
 // DOM
+bool isIqType(const QDomElement &, QStringView tagName, const char *xmlns);
 QDomElement firstChildElement(const QDomElement &, QStringView tagName, QStringView xmlNs = {});
 QDomElement firstChildElement(const QDomElement &, QStringView tagName, const char *xmlNs);
 
