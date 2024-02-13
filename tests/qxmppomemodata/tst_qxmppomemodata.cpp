@@ -251,7 +251,7 @@ void tst_QXmppOmemoData::testOmemoDeviceBundle()
         "</prekeys>"
         "</bundle>"));
 
-    const auto xmls = QVector({ xml1, xml2 });
+    QVector<QByteArray> xmls = { xml1, xml2 };
 
     QHash<uint32_t, QByteArray> expectedPublicPreKeys = {
         { 1, QByteArray::fromBase64(QByteArrayLiteral("eDM2cnBiTmo4MmRGQ1RYTkZ0YnVwajJtNWdPdzkxZ0gK")) },
