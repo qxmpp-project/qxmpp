@@ -62,7 +62,7 @@ static const QStringList HINT_TYPES = {
     QStringLiteral("store")
 };
 
-static bool checkElement(const QDomElement &element, const QString &tagName, const QString &xmlns)
+static bool checkElement(const QDomElement &element, QStringView tagName, const QString &xmlns)
 {
     return element.tagName() == tagName && element.namespaceURI() == xmlns;
 }
@@ -1391,8 +1391,8 @@ void QXmppMessage::parseExtensions(const QDomElement &element, const QXmpp::SceM
     for (auto childElement = element.firstChildElement();
          !childElement.isNull();
          childElement = childElement.nextSiblingElement()) {
-        if (!checkElement(childElement, QStringLiteral("addresses"), ns_extended_addressing) &&
-            childElement.tagName() != QStringLiteral("error")) {
+        if (!checkElement(childElement, u"addresses", ns_extended_addressing) &&
+            childElement.tagName() != u"error") {
             // Try to parse the element and add it as an unknown extension if it
             // fails.
             if (!parseExtension(childElement, sceMode)) {
@@ -1426,7 +1426,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
 
         // XEP-0280: Message Carbons
-        if (checkElement(element, QStringLiteral("private"), ns_carbons)) {
+        if (checkElement(element, u"private", ns_carbons)) {
             d->privatemsg = true;
             return true;
         }
@@ -1446,23 +1446,23 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0359: Unique and Stable Stanza IDs
-        if (checkElement(element, QStringLiteral("stanza-id"), ns_sid)) {
+        if (checkElement(element, u"stanza-id", ns_sid)) {
             d->stanzaId = element.attribute(QStringLiteral("id"));
             d->stanzaIdBy = element.attribute(QStringLiteral("by"));
             return true;
         }
-        if (checkElement(element, QStringLiteral("origin-id"), ns_sid)) {
+        if (checkElement(element, u"origin-id", ns_sid)) {
             d->originId = element.attribute(QStringLiteral("id"));
             return true;
         }
         // XEP-0369: Mediated Information eXchange (MIX)
-        if (checkElement(element, QStringLiteral("mix"), ns_mix)) {
+        if (checkElement(element, u"mix", ns_mix)) {
             d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
             d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
             return true;
         }
         // XEP-0380: Explicit Message Encryption
-        if (checkElement(element, QStringLiteral("encryption"), ns_eme)) {
+        if (checkElement(element, u"encryption", ns_eme)) {
             d->encryptionMethod = element.attribute(QStringLiteral("namespace"));
             d->encryptionName = element.attribute(QStringLiteral("name"));
             return true;
@@ -1477,7 +1477,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
 #endif
         // XEP-0428: Fallback Indication
-        if (checkElement(element, QStringLiteral("fallback"), ns_fallback_indication)) {
+        if (checkElement(element, u"fallback", ns_fallback_indication)) {
             d->isFallback = true;
             return true;
         }
@@ -1533,7 +1533,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
         }
         // XEP-0071: XHTML-IM
-        if (checkElement(element, QStringLiteral("html"), ns_xhtml_im)) {
+        if (checkElement(element, u"html", ns_xhtml_im)) {
             QDomElement bodyElement = element.firstChildElement(QStringLiteral("body"));
             if (!bodyElement.isNull() && bodyElement.namespaceURI() == ns_xhtml) {
                 QTextStream stream(&d->xhtml, QIODevice::WriteOnly);
@@ -1557,7 +1557,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0184: Message Delivery Receipts
-        if (checkElement(element, QStringLiteral("received"), ns_message_receipts)) {
+        if (checkElement(element, u"received", ns_message_receipts)) {
             d->receiptId = element.attribute(QStringLiteral("id"));
 
             // compatibility with old-style XEP
@@ -1566,19 +1566,19 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             return true;
         }
-        if (checkElement(element, QStringLiteral("request"), ns_message_receipts)) {
+        if (checkElement(element, u"request", ns_message_receipts)) {
             d->receiptRequested = true;
             return true;
         }
         // XEP-0203: Delayed Delivery
-        if (checkElement(element, QStringLiteral("delay"), ns_delayed_delivery)) {
+        if (checkElement(element, u"delay", ns_delayed_delivery)) {
             d->stamp = QXmppUtils::datetimeFromString(
                 element.attribute(QStringLiteral("stamp")));
             d->stampType = DelayedDelivery;
             return true;
         }
         // XEP-0224: Attention
-        if (checkElement(element, QStringLiteral("attention"), ns_attention)) {
+        if (checkElement(element, u"attention", ns_attention)) {
             d->attentionRequested = true;
             return true;
         }
@@ -1590,7 +1590,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0308: Last Message Correction
-        if (checkElement(element, QStringLiteral("replace"), ns_message_correct)) {
+        if (checkElement(element, u"replace", ns_message_correct)) {
             d->replaceId = element.attribute(QStringLiteral("id"));
             return true;
         }
@@ -1609,18 +1609,18 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0367: Message Attaching
-        if (checkElement(element, QStringLiteral("attach-to"), ns_message_attaching)) {
+        if (checkElement(element, u"attach-to", ns_message_attaching)) {
             d->attachId = element.attribute(QStringLiteral("id"));
             return true;
         }
         // XEP-0382: Spoiler messages
-        if (checkElement(element, QStringLiteral("spoiler"), ns_spoiler)) {
+        if (checkElement(element, u"spoiler", ns_spoiler)) {
             d->isSpoiler = true;
             d->spoilerHint = element.text();
             return true;
         }
         // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
-        if (checkElement(element, QStringLiteral("invitation"), ns_mix_misc)) {
+        if (checkElement(element, u"invitation", ns_mix_misc)) {
             QXmppMixInvitation mixInvitation;
             mixInvitation.parse(element);
             d->mixInvitation = mixInvitation;
@@ -1641,7 +1641,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
         // XEP-0448: Stateless file sharing
-        if (checkElement(element, QStringLiteral("file-sharing"), ns_sfs)) {
+        if (checkElement(element, u"file-sharing", ns_sfs)) {
             QXmppFileShare share;
             if (share.parse(element)) {
                 d->sharedFiles.push_back(std::move(share));
