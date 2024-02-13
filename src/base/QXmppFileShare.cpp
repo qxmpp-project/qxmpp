@@ -166,20 +166,17 @@ bool QXmppFileShare::parse(const QDomElement &el)
 
         // sources:
         // expect that there's only one sources element with the correct namespace
-        auto sources = el.firstChildElement("sources");
-        for (auto sourceEl = sources.firstChildElement();
-             !sourceEl.isNull();
-             sourceEl = sourceEl.nextSiblingElement()) {
-            if (sourceEl.tagName() == QStringLiteral("url-data")) {
-                QXmppHttpFileSource source;
-                if (source.parse(sourceEl)) {
-                    d->httpSources.push_back(std::move(source));
-                }
-            } else if (sourceEl.tagName() == QStringLiteral("encrypted")) {
-                QXmppEncryptedFileSource source;
-                if (source.parse(sourceEl)) {
-                    d->encryptedSources.push_back(std::move(source));
-                }
+        auto sources = firstChildElement(el, u"sources");
+        for (const auto &sourceEl : iterChildElements(sources, u"url-data")) {
+            QXmppHttpFileSource source;
+            if (source.parse(sourceEl)) {
+                d->httpSources.push_back(std::move(source));
+            }
+        }
+        for (const auto &sourceEl : iterChildElements(sources, u"encrypted")) {
+            QXmppEncryptedFileSource source;
+            if (source.parse(sourceEl)) {
+                d->encryptedSources.push_back(std::move(source));
             }
         }
         return true;

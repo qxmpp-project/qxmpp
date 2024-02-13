@@ -96,9 +96,7 @@ void QXmppIq::parseElementFromChild(const QDomElement &element)
 {
     QXmppElementList extensions;
 
-    for (auto itemElement = element.firstChildElement();
-         !itemElement.isNull();
-         itemElement = itemElement.nextSiblingElement()) {
+    for (const auto &itemElement : iterChildElements(element)) {
         extensions.append(QXmppElement(itemElement));
     }
     setExtensions(extensions);

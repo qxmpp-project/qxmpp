@@ -251,12 +251,10 @@ bool QXmppMucAdminIq::isMucAdminIq(const QDomElement &element)
 void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    QDomElement child = queryElement.firstChildElement(QStringLiteral("item"));
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(queryElement, u"item")) {
         QXmppMucItem item;
         item.parse(child);
         m_items << item;
-        child = child.nextSiblingElement(QStringLiteral("item"));
     }
 }
 

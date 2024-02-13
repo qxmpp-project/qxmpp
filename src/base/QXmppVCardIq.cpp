@@ -1009,22 +1009,20 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
     d->photo = QByteArray::fromBase64(base64data);
     d->photoType = photoElement.firstChildElement(QStringLiteral("TYPE")).text();
 
-    QDomElement child = cardElement.firstChildElement();
-    while (!child.isNull()) {
-        if (child.tagName() == QStringLiteral("ADR")) {
+    for (const auto &child : iterChildElements(cardElement)) {
+        if (child.tagName() == u"ADR") {
             QXmppVCardAddress address;
             address.parse(child);
             d->addresses << address;
-        } else if (child.tagName() == QStringLiteral("EMAIL")) {
+        } else if (child.tagName() == u"EMAIL") {
             QXmppVCardEmail email;
             email.parse(child);
             d->emails << email;
-        } else if (child.tagName() == QStringLiteral("TEL")) {
+        } else if (child.tagName() == u"TEL") {
             QXmppVCardPhone phone;
             phone.parse(child);
             d->phones << phone;
         }
-        child = child.nextSiblingElement();
     }
 
     d->organization.parse(cardElement);

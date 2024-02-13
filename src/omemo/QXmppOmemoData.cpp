@@ -3,17 +3,19 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppConstants_p.h"
 #include "QXmppOmemoDeviceBundle_p.h"
 #include "QXmppOmemoDeviceElement_p.h"
 #include "QXmppOmemoDeviceList_p.h"
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoIq_p.h"
 #include "QXmppOmemoItems_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QHash>
 
-constexpr auto ns_omemo_2 = "urn:xmpp:omemo:2";
+using namespace QXmpp::Private;
 
 /// \cond
 ///
@@ -124,9 +126,7 @@ bool QXmppOmemoDeviceElement::isOmemoDeviceElement(const QDomElement &element)
 
 void QXmppOmemoDeviceList::parse(const QDomElement &element)
 {
-    for (auto device = element.firstChildElement(QStringLiteral("device"));
-         !device.isNull();
-         device = device.nextSiblingElement(QStringLiteral("device"))) {
+    for (const auto &device : iterChildElements(element, u"device")) {
         QXmppOmemoDeviceElement deviceElement;
         deviceElement.parse(device);
         append(deviceElement);
@@ -136,7 +136,7 @@ void QXmppOmemoDeviceList::parse(const QDomElement &element)
 void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("devices"));
-    writer->writeDefaultNamespace(ns_omemo_2);
+    writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
     for (const auto &device : *this) {
         device.toXml(writer);
@@ -318,7 +318,7 @@ void QXmppOmemoDeviceBundle::parse(const QDomElement &element)
 void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("bundle"));
-    writer->writeDefaultNamespace(ns_omemo_2);
+    writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
     writer->writeStartElement(QStringLiteral("ik"));
     writer->writeCharacters(publicIdentityKey().toBase64());

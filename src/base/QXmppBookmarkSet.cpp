@@ -167,22 +167,20 @@ bool QXmppBookmarkSet::isBookmarkSet(const QDomElement &element)
 
 void QXmppBookmarkSet::parse(const QDomElement &element)
 {
-    QDomElement childElement = element.firstChildElement();
-    while (!childElement.isNull()) {
-        if (childElement.tagName() == QStringLiteral("conference")) {
-            QXmppBookmarkConference conference;
-            conference.setAutoJoin(childElement.attribute(QStringLiteral("autojoin")) == QStringLiteral("true") || childElement.attribute("autojoin") == "1");
-            conference.setJid(childElement.attribute(QStringLiteral("jid")));
-            conference.setName(childElement.attribute(QStringLiteral("name")));
-            conference.setNickName(firstChildElement(childElement, u"nick").text());
-            m_conferences << conference;
-        } else if (childElement.tagName() == QStringLiteral("url")) {
-            QXmppBookmarkUrl url;
-            url.setName(childElement.attribute(QStringLiteral("name")));
-            url.setUrl(QUrl(childElement.attribute(QStringLiteral("url"))));
-            m_urls << url;
-        }
-        childElement = childElement.nextSiblingElement();
+    for (const auto &childElement : iterChildElements(element, u"conference")) {
+        QXmppBookmarkConference conference;
+        conference.setAutoJoin(childElement.attribute(QStringLiteral("autojoin")) == QStringLiteral("true") || childElement.attribute("autojoin") == "1");
+        conference.setJid(childElement.attribute(QStringLiteral("jid")));
+        conference.setName(childElement.attribute(QStringLiteral("name")));
+        conference.setNickName(firstChildElement(childElement, u"nick").text());
+        m_conferences << conference;
+    }
+
+    for (const auto &childElement : iterChildElements(element, u"url")) {
+        QXmppBookmarkUrl url;
+        url.setName(childElement.attribute(QStringLiteral("name")));
+        url.setUrl(QUrl(childElement.attribute(QStringLiteral("url"))));
+        m_urls << url;
     }
 }
 

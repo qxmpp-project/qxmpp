@@ -455,11 +455,10 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
         d->queryType = InfoQuery;
     }
 
-    QDomElement itemElement = queryElement.firstChildElement();
-    while (!itemElement.isNull()) {
-        if (itemElement.tagName() == "feature") {
+    for (const auto &itemElement : iterChildElements(queryElement)) {
+        if (itemElement.tagName() == u"feature") {
             d->features.append(itemElement.attribute("var"));
-        } else if (itemElement.tagName() == "identity") {
+        } else if (itemElement.tagName() == u"identity") {
             QXmppDiscoveryIq::Identity identity;
             identity.setLanguage(itemElement.attribute("xml:lang"));
             identity.setCategory(itemElement.attribute("category"));
@@ -477,17 +476,16 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             }
 
             d->identities.append(identity);
-        } else if (itemElement.tagName() == "item") {
+        } else if (itemElement.tagName() == u"item") {
             QXmppDiscoveryIq::Item item;
             item.setJid(itemElement.attribute("jid"));
             item.setName(itemElement.attribute("name"));
             item.setNode(itemElement.attribute("node"));
             d->items.append(item);
-        } else if (itemElement.tagName() == "x" &&
+        } else if (itemElement.tagName() == u"x" &&
                    itemElement.namespaceURI() == ns_data) {
             d->form.parse(itemElement);
         }
-        itemElement = itemElement.nextSiblingElement();
     }
 }
 

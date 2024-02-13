@@ -80,8 +80,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
 
     QDateTime timeAccu = m_start;
 
-    QDomElement child = element.firstChildElement();
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(element)) {
         if ((child.tagName() == u"from") || (child.tagName() == u"to")) {
             QXmppArchiveMessage message;
             message.setBody(firstChildElement(child, u"body").text());
@@ -90,7 +89,6 @@ void QXmppArchiveChat::parse(const QDomElement &element)
             message.setReceived(child.tagName() == u"from");
             m_messages << message;
         }
-        child = child.nextSiblingElement();
     }
 }
 
@@ -384,14 +382,10 @@ void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
     m_rsmQuery.parse(listElement);
     m_rsmReply.parse(listElement);
 
-    QDomElement child = listElement.firstChildElement();
-    while (!child.isNull()) {
-        if (child.tagName() == QStringLiteral("chat")) {
-            QXmppArchiveChat chat;
-            chat.parse(child);
-            m_chats << chat;
-        }
-        child = child.nextSiblingElement();
+    for (const auto &child : iterChildElements(listElement, u"chat")) {
+        QXmppArchiveChat chat;
+        chat.parse(child);
+        m_chats << chat;
     }
 }
 

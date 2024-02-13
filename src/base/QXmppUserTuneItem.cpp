@@ -232,28 +232,26 @@ bool QXmppTuneItem::isItem(const QDomElement &itemElement)
 /// \cond
 void QXmppTuneItem::parsePayload(const QDomElement &tune)
 {
-    for (auto child = tune.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (child.tagName() == QStringLiteral("artist")) {
+    for (const auto &child : iterChildElements(tune)) {
+        if (child.tagName() == u"artist") {
             d->artist = child.text();
-        } else if (child.tagName() == QStringLiteral("length")) {
+        } else if (child.tagName() == u"length") {
             bool ok = false;
             if (auto len = child.text().toUShort(&ok); ok) {
                 d->length = len;
             }
-        } else if (child.tagName() == QStringLiteral("rating")) {
+        } else if (child.tagName() == u"rating") {
             bool ok = false;
             if (auto len = child.text().toUShort(&ok); ok) {
                 setRating(len);
             }
-        } else if (child.tagName() == QStringLiteral("source")) {
+        } else if (child.tagName() == u"source") {
             d->source = child.text();
-        } else if (child.tagName() == QStringLiteral("title")) {
+        } else if (child.tagName() == u"title") {
             d->title = child.text();
-        } else if (child.tagName() == QStringLiteral("track")) {
+        } else if (child.tagName() == u"track") {
             d->track = child.text();
-        } else if (child.tagName() == QStringLiteral("uri")) {
+        } else if (child.tagName() == u"uri") {
             d->uri = QUrl(child.text());
         }
     }

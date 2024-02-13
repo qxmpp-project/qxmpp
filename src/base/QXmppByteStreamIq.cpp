@@ -196,16 +196,13 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
         m_mode = None;
     }
 
-    QDomElement hostElement = firstChildElement(queryElement, u"streamhost");
-    while (!hostElement.isNull()) {
+    for (const auto &hostElement : iterChildElements(queryElement, u"streamhost")) {
         StreamHost streamHost;
         streamHost.setHost(hostElement.attribute(QStringLiteral("host")));
         streamHost.setJid(hostElement.attribute(QStringLiteral("jid")));
         streamHost.setPort(hostElement.attribute(QStringLiteral("port")).toInt());
         streamHost.setZeroconf(hostElement.attribute(QStringLiteral("zeroconf")));
         m_streamHosts.append(streamHost);
-
-        hostElement = hostElement.nextSiblingElement(QStringLiteral("streamhost"));
     }
     m_activate = firstChildElement(queryElement, u"activate").text();
     m_streamHostUsed = firstChildElement(queryElement, u"streamhost-used").attribute(QStringLiteral("jid"));

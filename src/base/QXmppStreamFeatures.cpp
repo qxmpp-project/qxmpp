@@ -293,17 +293,13 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
 
     // parse advertised compression methods
     auto compression = firstChildElement(element, u"compression", ns_compressFeature);
-    for (auto subElement = compression.firstChildElement(QStringLiteral("method"));
-         !subElement.isNull();
-         subElement = subElement.nextSiblingElement(QStringLiteral("method"))) {
+    for (const auto &subElement : iterChildElements(compression, u"method")) {
         d->compressionMethods << subElement.text();
     }
 
     // parse advertised SASL Authentication mechanisms
     auto mechs = firstChildElement(element, u"mechanisms", ns_sasl);
-    for (auto subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
-         !subElement.isNull();
-         subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"))) {
+    for (const auto &subElement : iterChildElements(mechs, u"mechanism")) {
         d->authMechanisms << subElement.text();
     }
 }

@@ -135,9 +135,7 @@ static QString candidateToSdp(const QXmppJingleCandidate &candidate)
 // Parses all found SDP parameter elements of parent into parameters.
 static void parseSdpParameters(const QDomElement &parent, QVector<QXmppSdpParameter> &parameters)
 {
-    for (auto childElement = parent.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(parent)) {
         if (QXmppSdpParameter::isSdpParameter(childElement)) {
             QXmppSdpParameter parameter;
             parameter.parse(childElement);
@@ -158,9 +156,7 @@ static void sdpParametersToXml(QXmlStreamWriter *writer, const QVector<QXmppSdpP
 // intervals.
 static void parseJingleRtpFeedbackNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpFeedbackProperty> &properties, QVector<QXmppJingleRtpFeedbackInterval> &intervals)
 {
-    for (auto child = parent.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
+    for (const auto &child : iterChildElements(parent)) {
         if (QXmppJingleRtpFeedbackProperty::isJingleRtpFeedbackProperty(child)) {
             QXmppJingleRtpFeedbackProperty property;
             property.parse(child);
@@ -189,9 +185,7 @@ static void jingleRtpFeedbackNegotiationElementsToXml(QXmlStreamWriter *writer, 
 // isRtpHeaderExtensionMixingAllowed.
 static void parseJingleRtpHeaderExtensionsNegotiationElements(const QDomElement &parent, QVector<QXmppJingleRtpHeaderExtensionProperty> &properties, bool &isRtpHeaderExtensionMixingAllowed)
 {
-    for (auto child = parent.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
+    for (const auto &child : iterChildElements(parent)) {
         if (QXmppJingleRtpHeaderExtensionProperty::isJingleRtpHeaderExtensionProperty(child)) {
             QXmppJingleRtpHeaderExtensionProperty property;
             property.parse(child);
@@ -712,9 +706,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->description.setSsrc(descriptionElement.attribute(QStringLiteral("ssrc")).toULong());
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
 
-    for (auto childElement = descriptionElement.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(descriptionElement)) {
         if (QXmppJingleRtpEncryption::isJingleRtpEncryption(childElement)) {
             QXmppJingleRtpEncryption encryption;
             encryption.parse(childElement);
@@ -726,12 +718,10 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     parseJingleRtpFeedbackNegotiationElements(descriptionElement, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
     parseJingleRtpHeaderExtensionsNegotiationElements(descriptionElement, d->rtpHeaderExtensionProperties, d->isRtpHeaderExtensionMixingAllowed);
 
-    QDomElement child = descriptionElement.firstChildElement(QStringLiteral("payload-type"));
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(descriptionElement, u"payload-type")) {
         QXmppJinglePayloadType payload;
         payload.parse(child);
         d->description.addPayloadType(payload);
-        child = child.nextSiblingElement(QStringLiteral("payload-type"));
     }
 
     // transport
@@ -739,16 +729,14 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     d->transportType = transportElement.namespaceURI();
     d->transportUser = transportElement.attribute(QStringLiteral("ufrag"));
     d->transportPassword = transportElement.attribute(QStringLiteral("pwd"));
-    child = transportElement.firstChildElement(QStringLiteral("candidate"));
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(transportElement, u"candidate")) {
         QXmppJingleCandidate candidate;
         candidate.parse(child);
         d->transportCandidates << candidate;
-        child = child.nextSiblingElement(QStringLiteral("candidate"));
     }
 
     /// XEP-0320
-    child = transportElement.firstChildElement(QStringLiteral("fingerprint"));
+    auto child = firstChildElement(transportElement, u"fingerprint");
     if (!child.isNull()) {
         d->transportFingerprint = parseFingerprint(child.text());
         d->transportFingerprintHash = child.attribute(QStringLiteral("hash"));
@@ -1108,16 +1096,10 @@ void QXmppJingleReason::parse(const QDomElement &element)
         }
     }
 
-    for (auto child = element.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (child.namespaceURI() == ns_jingle_rtp_errors) {
-            if (const auto index = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName());
-                index != -1) {
-                d->m_rtpErrorCondition = RtpErrorCondition(index);
-            }
-            break;
-        }
+    auto child = firstChildElement(element, {}, ns_jingle_rtp_errors);
+    if (const auto index = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName());
+        index != -1) {
+        d->m_rtpErrorCondition = RtpErrorCondition(index);
     }
 }
 
@@ -1409,45 +1391,38 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
 
     // content
     d->contents.clear();
-    QDomElement contentElement = jingleElement.firstChildElement(QStringLiteral("content"));
-    while (!contentElement.isNull()) {
+    for (const auto &contentElement : iterChildElements(jingleElement, u"content")) {
         Content content;
         content.parse(contentElement);
         addContent(content);
-        contentElement = contentElement.nextSiblingElement(QStringLiteral("content"));
     }
 
-    QDomElement reasonElement = jingleElement.firstChildElement(QStringLiteral("reason"));
-    d->reason.parse(reasonElement);
+    d->reason.parse(firstChildElement(jingleElement, u"reason"));
 
-    for (auto childElement = jingleElement.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
-        if (childElement.namespaceURI() == ns_jingle_rtp_info) {
-            const auto elementTag = childElement.tagName();
+    for (const auto &childElement : iterChildElements(jingleElement, {}, ns_jingle_rtp_info)) {
+        const auto elementTag = childElement.tagName();
 
-            if (elementTag == QStringLiteral("active")) {
-                d->rtpSessionState = RtpSessionStateActive();
-            } else if (elementTag == QStringLiteral("hold")) {
-                d->rtpSessionState = RtpSessionStateHold();
-            } else if (elementTag == QStringLiteral("unhold")) {
-                d->rtpSessionState = RtpSessionStateUnhold();
-            } else if (const auto isMute = elementTag == QStringLiteral("mute"); isMute || elementTag == QStringLiteral("unmute")) {
-                RtpSessionStateMuting muting;
-                muting.isMute = isMute;
+        if (elementTag == u"active") {
+            d->rtpSessionState = RtpSessionStateActive();
+        } else if (elementTag == u"hold") {
+            d->rtpSessionState = RtpSessionStateHold();
+        } else if (elementTag == u"unhold") {
+            d->rtpSessionState = RtpSessionStateUnhold();
+        } else if (const auto isMute = elementTag == u"mute"; isMute || elementTag == u"unmute") {
+            RtpSessionStateMuting muting;
+            muting.isMute = isMute;
 
-                if (const auto creator = childElement.attribute(QStringLiteral("creator")); creator == QStringLiteral("initiator")) {
-                    muting.creator = Initiator;
-                } else if (creator == QStringLiteral("responder")) {
-                    muting.creator = Responder;
-                }
-
-                muting.name = childElement.attribute(QStringLiteral("name"));
-
-                d->rtpSessionState = muting;
-            } else if (elementTag == QStringLiteral("ringing")) {
-                d->rtpSessionState = RtpSessionStateRinging();
+            if (const auto creator = childElement.attribute(QStringLiteral("creator")); creator == u"initiator") {
+                muting.creator = Initiator;
+            } else if (creator == u"responder") {
+                muting.creator = Responder;
             }
+
+            muting.name = childElement.attribute(QStringLiteral("name"));
+
+            d->rtpSessionState = muting;
+        } else if (elementTag == u"ringing") {
+            d->rtpSessionState = RtpSessionStateRinging();
         }
     }
 }
@@ -2029,10 +2004,8 @@ void QXmppJinglePayloadType::parse(const QDomElement &element)
     d->maxptime = element.attribute(QStringLiteral("maxptime")).toInt();
     d->ptime = element.attribute(QStringLiteral("ptime")).toInt();
 
-    QDomElement child = element.firstChildElement(QStringLiteral("parameter"));
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(element, u"parameter")) {
         d->parameters.insert(child.attribute(QStringLiteral("name")), child.attribute(QStringLiteral("value")));
-        child = child.nextSiblingElement(QStringLiteral("parameter"));
     }
 
     parseJingleRtpFeedbackNegotiationElements(element, d->rtpFeedbackProperties, d->rtpFeedbackIntervals);
@@ -2203,12 +2176,10 @@ void QXmppJingleDescription::parse(const QDomElement &element)
     d->media = element.attribute(QStringLiteral("media"));
     d->ssrc = element.attribute(QStringLiteral("ssrc")).toULong();
 
-    QDomElement child { element.firstChildElement(QStringLiteral("payload-type")) };
-    while (!child.isNull()) {
+    for (const auto &child : iterChildElements(element, u"payload-type")) {
         QXmppJinglePayloadType payload;
         payload.parse(child);
         d->payloadTypes.append(payload);
-        child = child.nextSiblingElement(QStringLiteral("payload-type"));
     }
 }
 
@@ -2549,9 +2520,7 @@ void QXmppJingleRtpEncryption::parse(const QDomElement &element)
     d->isRequired = element.attribute(QStringLiteral("required")) == QStringLiteral("true") ||
         element.attribute(QStringLiteral("required")) == QStringLiteral("1");
 
-    for (auto childElement = element.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(element)) {
         if (QXmppJingleRtpCryptoElement::isJingleRtpCryptoElement(childElement)) {
             QXmppJingleRtpCryptoElement cryptoElement;
             cryptoElement.parse(childElement);

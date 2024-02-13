@@ -113,12 +113,10 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
     QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     setVersion(queryElement.attribute(QStringLiteral("ver")));
 
-    QDomElement itemElement = queryElement.firstChildElement(QStringLiteral("item"));
-    while (!itemElement.isNull()) {
+    for (const auto &itemElement : iterChildElements(queryElement, u"item")) {
         QXmppRosterIq::Item item;
         item.parse(itemElement);
         d->items.append(item);
-        itemElement = itemElement.nextSiblingElement(QStringLiteral("item"));
     }
 
     setMixAnnotate(!firstChildElement(queryElement, u"annotate", ns_mix_roster).isNull());
@@ -409,15 +407,13 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
     d->approved = (approved == QStringLiteral("1") || approved == QStringLiteral("true"));
 
     // groups
-    QDomElement groupElement = element.firstChildElement(QStringLiteral("group"));
-    while (!groupElement.isNull()) {
+    for (const auto &groupElement : iterChildElements(element, u"group")) {
         d->groups << groupElement.text();
-        groupElement = groupElement.nextSiblingElement(QStringLiteral("group"));
     }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
-    QDomElement channelElement = element.firstChildElement(QStringLiteral("channel"));
-    if (!channelElement.isNull() && channelElement.namespaceURI() == ns_mix_roster) {
+    auto channelElement = firstChildElement(element, u"channel", ns_mix_roster);
+    if (!channelElement.isNull()) {
         d->isMixChannel = true;
         d->mixParticipantId = channelElement.attribute(QStringLiteral("participant-id"));
     }

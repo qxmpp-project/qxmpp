@@ -429,9 +429,7 @@ bool QXmppExternalServiceDiscoveryIq::checkIqType(const QString &tagName, const 
 /// \cond
 void QXmppExternalServiceDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
-    for (auto el = element.firstChildElement("services").firstChildElement();
-         !el.isNull();
-         el = el.nextSiblingElement()) {
+    for (const auto &el : iterChildElements(firstChildElement(element, u"services"))) {
         if (QXmppExternalService::isExternalService(el)) {
             QXmppExternalService service;
             service.parse(el);

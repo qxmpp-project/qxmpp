@@ -808,9 +808,7 @@ void QXmppDataForm::parse(const QDomElement &element)
     d->title = element.firstChildElement("title").text();
     d->instructions = element.firstChildElement("instructions").text();
 
-    for (auto fieldElement = element.firstChildElement("field");
-         !fieldElement.isNull();
-         fieldElement = fieldElement.nextSiblingElement("field")) {
+    for (const auto &fieldElement : iterChildElements(element, u"field")) {
         QXmppDataForm::Field field;
 
         /* field type */
@@ -831,9 +829,7 @@ void QXmppDataForm::parse(const QDomElement &element)
         case Field::JidMultiField:
         case Field::TextMultiField: {
             QStringList values;
-            for (auto element = fieldElement.firstChildElement("value");
-                 !element.isNull();
-                 element = element.nextSiblingElement("value")) {
+            for (const auto &element : iterChildElements(fieldElement, u"value")) {
                 values << element.text();
             }
             field.setValue(values);
@@ -851,9 +847,7 @@ void QXmppDataForm::parse(const QDomElement &element)
 
             QMimeDatabase database;
 
-            for (auto element = mediaElement.firstChildElement(QStringLiteral("uri"));
-                 !element.isNull();
-                 element = element.nextSiblingElement(QStringLiteral("uri"))) {
+            for (const auto &element : iterChildElements(mediaElement, u"uri")) {
                 field.mediaSources() << MediaSource(
                     QUrl(element.text()),
                     database.mimeTypeForName(element.attribute(QStringLiteral("type"))));
@@ -865,9 +859,7 @@ void QXmppDataForm::parse(const QDomElement &element)
         case Field::ListMultiField:
         case Field::ListSingleField: {
             QList<QPair<QString, QString>> options;
-            for (auto element = fieldElement.firstChildElement("option");
-                 !element.isNull();
-                 element = element.nextSiblingElement("option")) {
+            for (const auto &element : iterChildElements(fieldElement, u"option")) {
                 options << qMakePair(element.attribute("label"), element.firstChildElement("value").text());
             }
             field.setOptions(options);

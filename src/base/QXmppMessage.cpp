@@ -1388,9 +1388,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
 void QXmppMessage::parseExtensions(const QDomElement &element, const QXmpp::SceMode sceMode)
 {
     QXmppElementList unknownExtensions;
-    for (auto childElement = element.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(element)) {
         if (!checkElement(childElement, u"addresses", ns_extended_addressing) &&
             childElement.tagName() != u"error") {
             // Try to parse the element and add it as an unknown extension if it

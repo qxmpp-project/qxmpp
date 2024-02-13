@@ -156,16 +156,10 @@ void QXmppMixIq::parseElementFromChild(const QDomElement &element)
             d->channelName = child.attribute(QStringLiteral("channel"));
         }
 
-        QDomElement subChild = child.firstChildElement();
-        while (!subChild.isNull()) {
-            if (subChild.tagName() == QStringLiteral("subscribe")) {
-                d->nodes << subChild.attribute(QStringLiteral("node"));
-            } else if (subChild.tagName() == QStringLiteral("nick")) {
-                d->nick = subChild.text();
-            }
-
-            subChild = subChild.nextSiblingElement();
+        for (const auto &node : iterChildElements(child, u"subscribe")) {
+            d->nodes << node.attribute(QStringLiteral("node"));
         }
+        d->nick = firstChildElement(child, u"nick").text();
     }
 }
 

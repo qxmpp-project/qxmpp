@@ -69,7 +69,7 @@ QVector<QDomElement> allChildElements(const QDomElement &el, const QString &name
 {
     QVector<QDomElement> out;
 
-    for (auto childEl = el.firstChildElement(name); !childEl.isNull(); childEl = childEl.nextSiblingElement(name)) {
+    for (const auto &childEl : iterChildElements(el, name)) {
         out.push_back(childEl);
     }
 
@@ -120,9 +120,7 @@ bool QXmppFileMetadata::parse(const QDomElement &el)
     if (auto sizeEl = el.firstChildElement("size"); !sizeEl.isNull()) {
         d->size = sizeEl.text().toULong();
     }
-    for (auto thumbEl = el.firstChildElement("thumbnail");
-         !thumbEl.isNull();
-         thumbEl = thumbEl.nextSiblingElement("thumbnail")) {
+    for (const auto &thumbEl : iterChildElements(el, u"thumbnail")) {
         QXmppThumbnail thumbnail;
         if (thumbnail.parse(thumbEl)) {
             d->thumbnails.append(std::move(thumbnail));

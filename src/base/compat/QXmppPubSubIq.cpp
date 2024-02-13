@@ -164,12 +164,10 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
-        childElement = queryElement.firstChildElement(QStringLiteral("item"));
-        while (!childElement.isNull()) {
+        for (const auto &childElement : iterChildElements(queryElement, u"item")) {
             QXmppPubSubItem item;
             item.parse(childElement);
             d->items << item;
-            childElement = childElement.nextSiblingElement(QStringLiteral("item"));
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:

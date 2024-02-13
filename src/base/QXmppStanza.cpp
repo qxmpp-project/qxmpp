@@ -558,9 +558,7 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
     d->type = typeFromString(errorElement.attribute(QStringLiteral("type"))).value_or(NoType);
     d->by = errorElement.attribute(QStringLiteral("by"));
 
-    for (auto element = errorElement.firstChildElement();
-         !element.isNull();
-         element = element.nextSiblingElement()) {
+    for (const auto &element : iterChildElements(errorElement)) {
         if (element.namespaceURI() == ns_stanza) {
             if (element.tagName() == QStringLiteral("text")) {
                 d->text = element.text();
@@ -1034,9 +1032,7 @@ void QXmppStanza::parse(const QDomElement &element)
     }
 
     // XEP-0033: Extended Stanza Addressing
-    for (auto addressElement = element.firstChildElement("addresses").firstChildElement("address");
-         !addressElement.isNull();
-         addressElement = addressElement.nextSiblingElement("address")) {
+    for (const auto &addressElement : iterChildElements(element.firstChildElement("addresses"), u"address")) {
         QXmppExtendedAddress address;
         address.parse(addressElement);
         if (address.isValid()) {

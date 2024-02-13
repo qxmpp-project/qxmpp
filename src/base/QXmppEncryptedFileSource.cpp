@@ -151,9 +151,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
     }
     d->iv = QByteArray::fromBase64(ivEl.text().toUtf8());
 
-    for (auto childEl = el.firstChildElement(QStringLiteral("hash"));
-         !childEl.isNull();
-         childEl = childEl.nextSiblingElement(QStringLiteral("hash"))) {
+    for (const auto &childEl : iterChildElements(el, u"hash", ns_hashes)) {
         QXmppHash hash;
         if (!hash.parse(childEl)) {
             return false;
@@ -165,9 +163,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
     if (sourcesEl.isNull()) {
         return false;
     }
-    for (auto childEl = sourcesEl.firstChildElement(QStringLiteral("url-data"));
-         !childEl.isNull();
-         childEl = childEl.nextSiblingElement(QStringLiteral("url-data"))) {
+    for (const auto &childEl : iterChildElements(sourcesEl, u"url-data", ns_url_data)) {
         QXmppHttpFileSource source;
         source.parse(childEl);
         d->httpSources.push_back(std::move(source));
