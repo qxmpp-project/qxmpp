@@ -228,14 +228,10 @@ void QXmppOmemoElement::parse(const QDomElement &element)
 
     m_senderDeviceId = header.attribute(QStringLiteral("sid")).toInt();
 
-    for (auto recipient = header.firstChildElement(QStringLiteral("keys"));
-         !recipient.isNull();
-         recipient = recipient.nextSiblingElement(QStringLiteral("keys"))) {
+    for (const auto &recipient : iterChildElements(header, u"keys")) {
         const auto recipientJid = recipient.attribute(QStringLiteral("jid"));
 
-        for (auto envelope = recipient.firstChildElement(QStringLiteral("key"));
-             !envelope.isNull();
-             envelope = envelope.nextSiblingElement(QStringLiteral("key"))) {
+        for (const auto &envelope : iterChildElements(recipient, u"key")) {
             QXmppOmemoEnvelope omemoEnvelope;
             omemoEnvelope.parse(envelope);
             addEnvelope(recipientJid, omemoEnvelope);

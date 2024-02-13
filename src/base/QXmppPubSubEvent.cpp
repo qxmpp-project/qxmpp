@@ -261,9 +261,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     case Items:
     case Retract: {
         // check validity of the items using isItemValid()
-        for (auto itemElement = eventTypeElement.firstChildElement(QStringLiteral("item"));
-             !itemElement.isNull();
-             itemElement = itemElement.nextSiblingElement(QStringLiteral("item"))) {
+        for (const auto &itemElement : iterChildElements(eventTypeElement, u"item")) {
             if (!isItemValid(itemElement)) {
                 return false;
             }
@@ -335,9 +333,7 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
             break;
         case Retract:
             // parse retract ids
-            for (auto retract = eventTypeElement.firstChildElement(QStringLiteral("retract"));
-                 !retract.isNull();
-                 retract = retract.nextSiblingElement(QStringLiteral("retract"))) {
+            for (const auto &retract : iterChildElements(eventTypeElement, u"retract")) {
                 d->retractIds << retract.attribute(QStringLiteral("id"));
             }
             break;

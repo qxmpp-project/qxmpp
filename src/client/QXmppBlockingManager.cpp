@@ -29,9 +29,7 @@ static void makeUnique(T &vec)
 static QVector<QString> parseItems(const QDomElement &el)
 {
     QVector<QString> jids;
-    for (auto item = firstChildElement(el, u"item");
-         !item.isNull();
-         item = item.nextSiblingElement("item")) {
+    for (const auto &item : iterChildElements(el, u"item")) {
         jids.append(item.attribute("jid"));
     }
     return jids;

@@ -146,9 +146,7 @@ bool QXmppMixInfoItem::isItem(const QDomElement &element)
         if (payload.tagName() != u'x' || payload.namespaceURI() != ns_data) {
             return false;
         }
-        for (auto fieldEl = payload.firstChildElement();
-             !fieldEl.isNull();
-             fieldEl = fieldEl.nextSiblingElement()) {
+        for (const auto &fieldEl : iterChildElements(payload)) {
             if (fieldEl.attribute(QStringLiteral("var")) == QStringLiteral(u"FORM_TYPE")) {
                 return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix;
             }

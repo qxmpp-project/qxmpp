@@ -440,25 +440,22 @@ void QXmppPresence::parse(const QDomElement &element)
     }
 
     QXmppElementList unknownElements;
-    QDomElement childElement = element.firstChildElement();
-
-    while (!childElement.isNull()) {
-        if (childElement.tagName() == QStringLiteral("show")) {
+    for (const auto &childElement : iterChildElements(element)) {
+        if (childElement.tagName() == u"show") {
             int availableStatusType = AVAILABLE_STATUS_TYPES.indexOf(childElement.text());
             if (availableStatusType > -1) {
                 d->availableStatusType = AvailableStatusType(availableStatusType);
             }
-        } else if (childElement.tagName() == QStringLiteral("status")) {
+        } else if (childElement.tagName() == u"status") {
             d->statusText = childElement.text();
-        } else if (childElement.tagName() == QStringLiteral("priority")) {
+        } else if (childElement.tagName() == u"priority") {
             d->priority = childElement.text().toInt();
             // parse presence extensions
             // XEP-0033: Extended Stanza Addressing and errors are parsed by QXmppStanza
-        } else if (!(childElement.tagName() == QStringLiteral("addresses") && childElement.namespaceURI() == ns_extended_addressing) &&
-                   childElement.tagName() != "error") {
+        } else if (!(childElement.tagName() == u"addresses" && childElement.namespaceURI() == ns_extended_addressing) &&
+                   childElement.tagName() != u"error") {
             parseExtension(childElement, unknownElements);
         }
-        childElement = childElement.nextSiblingElement();
     }
 
     setExtensions(unknownElements);
@@ -471,14 +468,11 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
         d->mucSupported = true;
         d->mucPassword = element.firstChildElement(QStringLiteral("password")).text();
     } else if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc_user) {
-        QDomElement itemElement = element.firstChildElement(QStringLiteral("item"));
-        d->mucItem.parse(itemElement);
-        QDomElement statusElement = element.firstChildElement(QStringLiteral("status"));
-        d->mucStatusCodes.clear();
+        d->mucItem.parse(firstChildElement(element, u"item"));
 
-        while (!statusElement.isNull()) {
+        d->mucStatusCodes.clear();
+        for (const auto &statusElement : iterChildElements(element, u"status")) {
             d->mucStatusCodes << statusElement.attribute(QStringLiteral("code")).toInt();
-            statusElement = statusElement.nextSiblingElement(QStringLiteral("status"));
         }
         // XEP-0115: Entity Capabilities
     } else if (element.tagName() == QStringLiteral("c") && element.namespaceURI() == ns_capabilities) {
@@ -506,9 +500,7 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             d->isPreparingMujiSession = true;
         }
 
-        for (auto contentElement = element.firstChildElement(QStringLiteral("content"));
-             !contentElement.isNull();
-             contentElement = contentElement.nextSiblingElement(QStringLiteral("content"))) {
+        for (const auto &contentElement : iterChildElements(element, u"content")) {
             QXmppJingleIq::Content content;
             content.parse(contentElement);
             d->mujiContents.append(content);

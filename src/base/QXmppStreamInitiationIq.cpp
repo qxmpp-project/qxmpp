@@ -78,14 +78,12 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
         m_profile = None;
     }
 
-    QDomElement itemElement = siElement.firstChildElement();
-    while (!itemElement.isNull()) {
-        if (itemElement.tagName() == QStringLiteral("feature") && itemElement.namespaceURI() == ns_feature_negotiation) {
+    for (const auto &itemElement : iterChildElements(siElement)) {
+        if (itemElement.tagName() == u"feature" && itemElement.namespaceURI() == ns_feature_negotiation) {
             m_featureForm.parse(itemElement.firstChildElement());
-        } else if (itemElement.tagName() == QStringLiteral("file") && itemElement.namespaceURI() == ns_stream_initiation_file_transfer) {
+        } else if (itemElement.tagName() == u"file" && itemElement.namespaceURI() == ns_stream_initiation_file_transfer) {
             m_fileInfo.parse(itemElement);
         }
-        itemElement = itemElement.nextSiblingElement();
     }
 }
 

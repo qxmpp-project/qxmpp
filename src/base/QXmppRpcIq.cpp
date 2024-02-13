@@ -257,18 +257,16 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
     QDomElement methodElement = queryElement.firstChildElement(QStringLiteral("methodResponse"));
 
     const QDomElement contents = methodElement.firstChildElement();
-    if (contents.tagName().toLower() == QStringLiteral("params")) {
-        QDomNode param = contents.firstChildElement(QStringLiteral("param"));
-        while (!param.isNull()) {
+    if (contents.tagName().toLower() == u"params") {
+        for (const auto &param : iterChildElements(contents, u"param")) {
             QStringList errors;
             const QVariant value = QXmppRpcMarshaller::demarshall(param.firstChildElement(QStringLiteral("value")), errors);
             if (!errors.isEmpty()) {
                 break;
             }
             m_values << value;
-            param = param.nextSiblingElement(QStringLiteral("param"));
         }
-    } else if (contents.tagName().toLower() == QStringLiteral("fault")) {
+    } else if (contents.tagName().toLower() == u"fault") {
         QStringList errors;
         const QDomElement errElement = contents.firstChildElement(QStringLiteral("value"));
         const QVariant error = QXmppRpcMarshaller::demarshall(errElement, errors);

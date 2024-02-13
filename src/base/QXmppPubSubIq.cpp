@@ -374,9 +374,7 @@ bool PubSubIqBase::isPubSubIq(const QDomElement &element, bool (*isItemValid)(co
     case Publish:
     case Retract:
         // check the items using isItemValid()
-        for (auto itemElement = queryElement.firstChildElement(QStringLiteral("item"));
-             !itemElement.isNull();
-             itemElement = itemElement.nextSiblingElement(QStringLiteral("item"))) {
+        for (const auto &itemElement : iterChildElements(queryElement, u"item")) {
             if (!isItemValid(itemElement)) {
                 return false;
             }
@@ -459,9 +457,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
     switch (d->queryType) {
     case Affiliations:
     case OwnerAffiliations:
-        for (auto subElement = queryElement.firstChildElement();
-             !subElement.isNull();
-             subElement = subElement.nextSiblingElement()) {
+        for (const auto &subElement : iterChildElements(queryElement, u"affiliation")) {
             if (QXmppPubSubAffiliation::isAffiliation(subElement)) {
                 QXmppPubSubAffiliation affiliation;
                 affiliation.parse(subElement);
@@ -472,9 +468,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
         break;
     case Items:
         // Result Set Management (incomplete items result received)
-        for (auto rsmEl = pubSubElement.firstChildElement(QStringLiteral("set"));
-             !rsmEl.isNull();
-             rsmEl = rsmEl.nextSiblingElement(QStringLiteral("set"))) {
+        for (const auto &rsmEl : iterChildElements(pubSubElement, u"set")) {
             if (rsmEl.namespaceURI() == ns_rsm) {
                 QXmppResultSetReply reply;
                 reply.parse(rsmEl);
@@ -496,9 +490,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
         break;
     case Subscriptions:
     case OwnerSubscriptions:
-        for (auto subElement = queryElement.firstChildElement();
-             !subElement.isNull();
-             subElement = subElement.nextSiblingElement()) {
+        for (const auto &subElement : iterChildElements(queryElement)) {
             if (QXmppPubSubSubscription::isSubscription(subElement)) {
                 QXmppPubSubSubscription subscription;
                 subscription.parse(subElement);

@@ -97,9 +97,7 @@ void QXmppMessageReaction::parse(const QDomElement &element)
 {
     d->messageId = element.attribute(QStringLiteral("id"));
 
-    for (auto childElement = element.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(element)) {
         d->emojis.append(childElement.text());
     }
 

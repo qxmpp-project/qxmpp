@@ -163,17 +163,17 @@ std::optional<double> parseOptDouble(const QDomElement &element)
 
 void QXmppGeolocItem::parsePayload(const QDomElement &tune)
 {
-    for (auto child = tune.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
+    for (const auto &child : iterChildElements(tune)) {
         const auto tagName = child.tagName();
-        if (tagName == QStringLiteral("accuracy")) {
+        if (tagName == u"accuracy") {
             d->accuracy = parseOptDouble(child);
-        } else if (tagName == QStringLiteral("country")) {
+        } else if (tagName == u"country") {
             d->country = child.text();
-        } else if (tagName == QStringLiteral("lat")) {
+        } else if (tagName == u"lat") {
             setLatitude(parseOptDouble(child));
-        } else if (tagName == QStringLiteral("locality")) {
+        } else if (tagName == u"locality") {
             d->locality = child.text();
-        } else if (tagName == QStringLiteral("lon")) {
+        } else if (tagName == u"lon") {
             setLongitude(parseOptDouble(child));
         }
     }

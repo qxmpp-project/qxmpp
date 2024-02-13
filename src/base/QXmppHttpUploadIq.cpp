@@ -224,11 +224,8 @@ void QXmppHttpUploadSlotIq::parseElementFromChild(const QDomElement &element)
     d->putUrl = QUrl::fromEncoded(put.attribute("url").toUtf8());
     if (put.hasChildNodes()) {
         QMap<QString, QString> headers;
-        QDomElement header = put.firstChildElement("header");
-        while (!header.isNull()) {
+        for (const auto &header : iterChildElements(put, u"header")) {
             headers[header.attribute("name")] = header.text();
-
-            header = header.nextSiblingElement("header");
         }
 
         setPutHeaders(headers);

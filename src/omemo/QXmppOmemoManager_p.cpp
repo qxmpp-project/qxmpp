@@ -179,9 +179,7 @@ static void replaceChildElements(QDomElement &oldElement, const QDomElement &new
         }
     }
     // append new child elements
-    for (auto childElement = newElement.firstChildElement();
-         !childElement.isNull();
-         childElement = childElement.nextSiblingElement()) {
+    for (const auto &childElement : iterChildElements(newElement)) {
         oldElement.appendChild(childElement);
     }
 }
