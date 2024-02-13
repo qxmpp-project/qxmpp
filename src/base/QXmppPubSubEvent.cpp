@@ -57,19 +57,6 @@ static const QStringList PUBSUB_EVENTS = {
     QStringLiteral("subscription"),
 };
 
-static QDomElement firstChildElement(const QDomElement &element, const QString &tagName, const QString &namespaceURI)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull(); child = child.nextSibling()) {
-        if (child.isElement() && child.namespaceURI() == namespaceURI) {
-            QDomElement elt = child.toElement();
-            if (tagName.isEmpty() || elt.tagName() == tagName) {
-                return elt;
-            }
-        }
-    }
-    return QDomElement();
-}
-
 class QXmppPubSubEventPrivate : public QSharedData
 {
 public:
