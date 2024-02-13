@@ -553,15 +553,15 @@ void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
     } else {
         // write query type
         writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->queryJid);
-        writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->queryNode);
+        writeOptionalXmlAttribute(writer, u"jid", d->queryJid);
+        writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
         // write subid
         switch (d->queryType) {
         case Items:
         case Unsubscribe:
         case Options:
-            writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subscriptionId);
+            writeOptionalXmlAttribute(writer, u"subid", d->subscriptionId);
         default:
             break;
         }

@@ -300,9 +300,9 @@ void QXmppPubSubSubscription::toXml(QXmlStreamWriter *writer) const
 
     // jid is required
     writer->writeAttribute(QStringLiteral("jid"), d->jid);
-    writeOptionalXmlAttribute(writer, QStringLiteral("node"), d->node);
-    writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), stateToString(d->state));
-    writeOptionalXmlAttribute(writer, QStringLiteral("subid"), d->subId);
+    writeOptionalXmlAttribute(writer, u"node", d->node);
+    writeOptionalXmlAttribute(writer, u"subscription", stateToString(d->state));
+    writeOptionalXmlAttribute(writer, u"subid", d->subId);
     if (d->expiry.isValid()) {
         writer->writeAttribute(QStringLiteral("expiry"),
                                QXmppUtils::datetimeToString(d->expiry));

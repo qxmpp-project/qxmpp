@@ -45,8 +45,8 @@ inline auto toString65(QStringView s)
 }
 
 // XML streams
-void writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name, const QString &value);
-void writeXmlTextElement(QXmlStreamWriter *stream, const QString &name, const QString &value);
+void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStringView value);
+void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView value);
 
 // DOM
 bool isIqType(const QDomElement &, QStringView tagName, const char *xmlns);

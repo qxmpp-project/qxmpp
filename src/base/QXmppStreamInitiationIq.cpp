@@ -93,10 +93,10 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
 {
     writer->writeStartElement(QStringLiteral("si"));
     writer->writeDefaultNamespace(ns_stream_initiation);
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), m_siId);
-    writeOptionalXmlAttribute(writer, QStringLiteral("mime-type"), m_mimeType);
+    writeOptionalXmlAttribute(writer, u"id", m_siId);
+    writeOptionalXmlAttribute(writer, u"mime-type", m_mimeType);
     if (m_profile == FileTransfer) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("profile"), ns_stream_initiation_file_transfer);
+        writeOptionalXmlAttribute(writer, u"profile", QString::fromLocal8Bit(ns_stream_initiation_file_transfer));
     }
     if (!m_fileInfo.isNull()) {
         m_fileInfo.toXml(writer);

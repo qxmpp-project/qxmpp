@@ -66,10 +66,10 @@ void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("bind"));
     writer->writeDefaultNamespace(ns_bind);
     if (!m_jid.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("jid"), m_jid);
+        writeXmlTextElement(writer, u"jid", m_jid);
     }
     if (!m_resource.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("resource"), m_resource);
+        writeXmlTextElement(writer, u"resource", m_resource);
     }
     writer->writeEndElement();
 }

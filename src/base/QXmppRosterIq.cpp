@@ -426,17 +426,17 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), d->bareJid);
-    writeOptionalXmlAttribute(writer, QStringLiteral("name"), d->name);
-    writeOptionalXmlAttribute(writer, QStringLiteral("subscription"), getSubscriptionTypeStr());
-    writeOptionalXmlAttribute(writer, QStringLiteral("ask"), subscriptionStatus());
+    writeOptionalXmlAttribute(writer, u"jid", d->bareJid);
+    writeOptionalXmlAttribute(writer, u"name", d->name);
+    writeOptionalXmlAttribute(writer, u"subscription", getSubscriptionTypeStr());
+    writeOptionalXmlAttribute(writer, u"ask", subscriptionStatus());
     if (d->approved) {
         writer->writeAttribute(QStringLiteral("approved"), QStringLiteral("true"));
     }
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
     while (i != d->groups.constEnd()) {
-        writeXmlTextElement(writer, QStringLiteral("group"), *i);
+        writeXmlTextElement(writer, u"group", *i);
         ++i;
     }
 
@@ -444,7 +444,7 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     if (d->isMixChannel) {
         writer->writeStartElement(QStringLiteral("channel"));
         writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
-        writeOptionalXmlAttribute(writer, QStringLiteral("participant-id"), d->mixParticipantId);
+        writeOptionalXmlAttribute(writer, u"participant-id", d->mixParticipantId);
         writer->writeEndElement();
     }
 

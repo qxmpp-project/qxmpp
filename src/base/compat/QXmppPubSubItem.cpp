@@ -71,7 +71,7 @@ void QXmppPubSubItem::parse(const QDomElement &element)
 void QXmppPubSubItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
+    writeOptionalXmlAttribute(writer, u"id", d->id);
     d->contents.toXml(writer);
     writer->writeEndElement();
 }

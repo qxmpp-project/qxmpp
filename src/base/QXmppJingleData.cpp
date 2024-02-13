@@ -763,16 +763,16 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(QStringLiteral("content"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("creator"), d->creator);
-    writeOptionalXmlAttribute(writer, QStringLiteral("disposition"), d->disposition);
-    writeOptionalXmlAttribute(writer, QStringLiteral("name"), d->name);
-    writeOptionalXmlAttribute(writer, QStringLiteral("senders"), d->senders);
+    writeOptionalXmlAttribute(writer, u"creator", d->creator);
+    writeOptionalXmlAttribute(writer, u"disposition", d->disposition);
+    writeOptionalXmlAttribute(writer, u"name", d->name);
+    writeOptionalXmlAttribute(writer, u"senders", d->senders);
 
     // description
     if (!d->description.type().isEmpty() || !d->description.payloadTypes().isEmpty()) {
         writer->writeStartElement(QStringLiteral("description"));
         writer->writeDefaultNamespace(d->description.type());
-        writeOptionalXmlAttribute(writer, QStringLiteral("media"), d->description.media());
+        writeOptionalXmlAttribute(writer, u"media", d->description.media());
 
         if (d->description.ssrc()) {
             writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->description.ssrc()));
@@ -800,8 +800,8 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
     if (!d->transportType.isEmpty() || !d->transportCandidates.isEmpty()) {
         writer->writeStartElement(QStringLiteral("transport"));
         writer->writeDefaultNamespace(d->transportType);
-        writeOptionalXmlAttribute(writer, QStringLiteral("ufrag"), d->transportUser);
-        writeOptionalXmlAttribute(writer, QStringLiteral("pwd"), d->transportPassword);
+        writeOptionalXmlAttribute(writer, u"ufrag", d->transportUser);
+        writeOptionalXmlAttribute(writer, u"pwd", d->transportPassword);
         for (const auto &candidate : d->transportCandidates) {
             candidate.toXml(writer);
         }
@@ -1131,7 +1131,7 @@ void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(ns_jingle);
 
     if (!d->m_text.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("text"), d->m_text);
+        writeXmlTextElement(writer, u"text", d->m_text);
     }
     writer->writeEmptyElement(jingle_reasons[d->m_type]);
 
@@ -1456,16 +1456,16 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("jingle"));
     writer->writeDefaultNamespace(ns_jingle);
-    writeOptionalXmlAttribute(writer, QStringLiteral("action"), jingle_actions[d->action]);
-    writeOptionalXmlAttribute(writer, QStringLiteral("initiator"), d->initiator);
-    writeOptionalXmlAttribute(writer, QStringLiteral("responder"), d->responder);
-    writeOptionalXmlAttribute(writer, QStringLiteral("sid"), d->sid);
+    writeOptionalXmlAttribute(writer, u"action", QString::fromLocal8Bit(jingle_actions[d->action]));
+    writeOptionalXmlAttribute(writer, u"initiator", d->initiator);
+    writeOptionalXmlAttribute(writer, u"responder", d->responder);
+    writeOptionalXmlAttribute(writer, u"sid", d->sid);
 
     // XEP-0272: Multiparty Jingle (Muji)
     if (!d->mujiGroupChatJid.isEmpty()) {
         writer->writeStartElement(QStringLiteral("muji"));
         writer->writeDefaultNamespace(ns_muji);
-        writeOptionalXmlAttribute(writer, QStringLiteral("room"), d->mujiGroupChatJid);
+        writeOptionalXmlAttribute(writer, u"room", d->mujiGroupChatJid);
         writer->writeEndElement();
     }
 
@@ -1495,12 +1495,12 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
             }
 
             if (rtpSessionStateMuting->creator == Initiator) {
-                writeOptionalXmlAttribute(writer, QStringLiteral("creator"), QStringLiteral("initiator"));
+                writeOptionalXmlAttribute(writer, u"creator", QStringLiteral("initiator"));
             } else if (rtpSessionStateMuting->creator == Responder) {
-                writeOptionalXmlAttribute(writer, QStringLiteral("creator"), QStringLiteral("responder"));
+                writeOptionalXmlAttribute(writer, u"creator", QStringLiteral("responder"));
             }
 
-            writeOptionalXmlAttribute(writer, QStringLiteral("name"), rtpSessionStateMuting->name);
+            writeOptionalXmlAttribute(writer, u"name", rtpSessionStateMuting->name);
         } else {
             writeStartElementWithNamespace(QStringLiteral("ringing"));
         }
@@ -1757,16 +1757,16 @@ void QXmppJingleCandidate::parse(const QDomElement &element)
 void QXmppJingleCandidate::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("candidate"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("component"), QString::number(d->component));
-    writeOptionalXmlAttribute(writer, QStringLiteral("foundation"), d->foundation);
-    writeOptionalXmlAttribute(writer, QStringLiteral("generation"), QString::number(d->generation));
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
-    writeOptionalXmlAttribute(writer, QStringLiteral("ip"), d->host.toString());
-    writeOptionalXmlAttribute(writer, QStringLiteral("network"), QString::number(d->network));
-    writeOptionalXmlAttribute(writer, QStringLiteral("port"), QString::number(d->port));
-    writeOptionalXmlAttribute(writer, QStringLiteral("priority"), QString::number(d->priority));
-    writeOptionalXmlAttribute(writer, QStringLiteral("protocol"), d->protocol);
-    writeOptionalXmlAttribute(writer, QStringLiteral("type"), typeToString(d->type));
+    writeOptionalXmlAttribute(writer, u"component", QString::number(d->component));
+    writeOptionalXmlAttribute(writer, u"foundation", d->foundation);
+    writeOptionalXmlAttribute(writer, u"generation", QString::number(d->generation));
+    writeOptionalXmlAttribute(writer, u"id", d->id);
+    writeOptionalXmlAttribute(writer, u"ip", d->host.toString());
+    writeOptionalXmlAttribute(writer, u"network", QString::number(d->network));
+    writeOptionalXmlAttribute(writer, u"port", QString::number(d->port));
+    writeOptionalXmlAttribute(writer, u"priority", QString::number(d->priority));
+    writeOptionalXmlAttribute(writer, u"protocol", d->protocol);
+    writeOptionalXmlAttribute(writer, u"type", typeToString(d->type));
     writer->writeEndElement();
 }
 
@@ -2041,19 +2041,19 @@ void QXmppJinglePayloadType::parse(const QDomElement &element)
 void QXmppJinglePayloadType::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("payload-type"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), QString::number(d->id));
-    writeOptionalXmlAttribute(writer, QStringLiteral("name"), d->name);
+    writeOptionalXmlAttribute(writer, u"id", QString::number(d->id));
+    writeOptionalXmlAttribute(writer, u"name", d->name);
     if (d->channels > 1) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("channels"), QString::number(d->channels));
+        writeOptionalXmlAttribute(writer, u"channels", QString::number(d->channels));
     }
     if (d->clockrate > 0) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("clockrate"), QString::number(d->clockrate));
+        writeOptionalXmlAttribute(writer, u"clockrate", QString::number(d->clockrate));
     }
     if (d->maxptime > 0) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("maxptime"), QString::number(d->maxptime));
+        writeOptionalXmlAttribute(writer, u"maxptime", QString::number(d->maxptime));
     }
     if (d->ptime > 0) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("ptime"), QString::number(d->ptime));
+        writeOptionalXmlAttribute(writer, u"ptime", QString::number(d->ptime));
     }
 
     for (auto itr = d->parameters.begin(); itr != d->parameters.end(); itr++) {
@@ -2217,7 +2217,7 @@ void QXmppJingleDescription::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("description"));
     writer->writeDefaultNamespace(d->type);
 
-    writeOptionalXmlAttribute(writer, QStringLiteral("media"), d->media);
+    writeOptionalXmlAttribute(writer, u"media", d->media);
 
     if (d->ssrc) {
         writer->writeAttribute(QStringLiteral("ssrc"), QString::number(d->ssrc));
@@ -2311,10 +2311,10 @@ void QXmppSdpParameter::parse(const QDomElement &element)
 void QXmppSdpParameter::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("parameter"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("name"), d->name);
+    writeOptionalXmlAttribute(writer, u"name", d->name);
 
     if (!d->value.isEmpty()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("value"), d->value);
+        writeOptionalXmlAttribute(writer, u"value", d->value);
     }
 
     writer->writeEndElement();
@@ -2459,7 +2459,7 @@ void QXmppJingleRtpCryptoElement::toXml(QXmlStreamWriter *writer) const
         writer->writeAttribute(QStringLiteral("tag"), QString::number(d->tag));
         writer->writeAttribute(QStringLiteral("crypto-suite"), d->cryptoSuite);
         writer->writeAttribute(QStringLiteral("key-params"), d->keyParams);
-        writeOptionalXmlAttribute(writer, QStringLiteral("session-params"), d->sessionParams);
+        writeOptionalXmlAttribute(writer, u"session-params", d->sessionParams);
         writer->writeEndElement();
     }
 }
@@ -2698,13 +2698,13 @@ void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb"));
     writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
-    writeOptionalXmlAttribute(writer, QStringLiteral("type"), d->type);
+    writeOptionalXmlAttribute(writer, u"type", d->type);
 
     // If there are parameters, they must be used instead of the subtype.
     if (d->subtype.isEmpty()) {
         sdpParametersToXml(writer, d->parameters);
     } else {
-        writeOptionalXmlAttribute(writer, QStringLiteral("subtype"), d->subtype);
+        writeOptionalXmlAttribute(writer, u"subtype", d->subtype);
     }
 
     writer->writeEndElement();
@@ -2772,7 +2772,7 @@ void QXmppJingleRtpFeedbackInterval::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb-trr-int"));
     writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
-    writeOptionalXmlAttribute(writer, QStringLiteral("value"), QString::number(m_value));
+    writeOptionalXmlAttribute(writer, u"value", QString::number(m_value));
     writer->writeEndElement();
 }
 /// \endcond
@@ -2929,11 +2929,11 @@ void QXmppJingleRtpHeaderExtensionProperty::toXml(QXmlStreamWriter *writer) cons
 {
     writer->writeStartElement(QStringLiteral("rtp-hdrext"));
     writer->writeDefaultNamespace(ns_jingle_rtp_header_extensions_negotiation);
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), QString::number(d->id));
-    writeOptionalXmlAttribute(writer, QStringLiteral("uri"), d->uri);
+    writeOptionalXmlAttribute(writer, u"id", QString::number(d->id));
+    writeOptionalXmlAttribute(writer, u"uri", d->uri);
 
     if (d->senders != QXmppJingleRtpHeaderExtensionProperty::Both) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("senders"), JINGLE_RTP_HEADER_EXTENSIONS_SENDERS.at(d->senders));
+        writeOptionalXmlAttribute(writer, u"senders", JINGLE_RTP_HEADER_EXTENSIONS_SENDERS.at(d->senders));
     }
 
     sdpParametersToXml(writer, d->parameters);
@@ -3148,7 +3148,7 @@ void QXmppJingleMessageInitiationElement::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(jmiElementTypeToString(d->type));
     writer->writeDefaultNamespace(ns_jingle_message_initiation);
 
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
+    writeOptionalXmlAttribute(writer, u"id", d->id);
 
     if (d->description) {
         d->description->toXml(writer);
@@ -3164,7 +3164,7 @@ void QXmppJingleMessageInitiationElement::toXml(QXmlStreamWriter *writer) const
 
     if (!d->migratedTo.isEmpty()) {
         writer->writeEmptyElement(QStringLiteral("migrated"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("to"), d->migratedTo);
+        writeOptionalXmlAttribute(writer, u"to", d->migratedTo);
     }
 
     writer->writeEndElement();
@@ -3209,17 +3209,17 @@ QString QXmppJingleMessageInitiationElement::jmiElementTypeToString(Type type)
 ///
 std::optional<QXmppJingleMessageInitiationElement::Type> QXmppJingleMessageInitiationElement::stringToJmiElementType(const QString &typeStr)
 {
-    if (typeStr == "propose") {
+    if (typeStr == u"propose") {
         return Type::Propose;
-    } else if (typeStr == "ringing") {
+    } else if (typeStr == u"ringing") {
         return Type::Ringing;
-    } else if (typeStr == "proceed") {
+    } else if (typeStr == u"proceed") {
         return Type::Proceed;
-    } else if (typeStr == "reject") {
+    } else if (typeStr == u"reject") {
         return Type::Reject;
-    } else if (typeStr == "retract") {
+    } else if (typeStr == u"retract") {
         return Type::Retract;
-    } else if (typeStr == "finish") {
+    } else if (typeStr == u"finish") {
         return Type::Finish;
     }
 
@@ -3414,7 +3414,7 @@ void QXmppCallInviteElement::toXml(QXmlStreamWriter *writer) const
 
     // write namespace and ID.
     writer->writeDefaultNamespace(ns_call_invites);
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
+    writeOptionalXmlAttribute(writer, u"id", d->id);
 
     switch (d->type) {
     case Type::Reject:
@@ -3426,10 +3426,10 @@ void QXmppCallInviteElement::toXml(QXmlStreamWriter *writer) const
         if (d->type == Type::Invite) {
             // only overwrite defaults.
             if (!d->audio) {
-                writeOptionalXmlAttribute(writer, QStringLiteral("audio"), "false");
+                writeOptionalXmlAttribute(writer, u"audio", u"false");
             }
             if (d->video) {
-                writeOptionalXmlAttribute(writer, QStringLiteral("video"), "true");
+                writeOptionalXmlAttribute(writer, u"video", u"true");
             }
         }
 
@@ -3519,16 +3519,16 @@ void QXmppCallInviteElement::Jingle::parse(const QDomElement &element)
 void QXmppCallInviteElement::Jingle::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeEmptyElement(QStringLiteral("jingle"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("sid"), sid);
+    writeOptionalXmlAttribute(writer, u"sid", sid);
 
     if (jid) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), *jid);
+        writeOptionalXmlAttribute(writer, u"jid", *jid);
     }
 }
 
 void QXmppCallInviteElement::External::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeEmptyElement(QStringLiteral("external"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("uri"), uri);
+    writeOptionalXmlAttribute(writer, u"uri", uri);
 }
 /// \endcond

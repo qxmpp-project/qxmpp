@@ -209,17 +209,17 @@ void QXmppMucItem::parse(const QDomElement &element)
 void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("affiliation"), affiliationToString(m_affiliation));
-    writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_jid);
-    writeOptionalXmlAttribute(writer, QStringLiteral("nick"), m_nick);
-    writeOptionalXmlAttribute(writer, QStringLiteral("role"), roleToString(m_role));
+    writeOptionalXmlAttribute(writer, u"affiliation", affiliationToString(m_affiliation));
+    writeOptionalXmlAttribute(writer, u"jid", m_jid);
+    writeOptionalXmlAttribute(writer, u"nick", m_nick);
+    writeOptionalXmlAttribute(writer, u"role", roleToString(m_role));
     if (!m_actor.isEmpty()) {
         writer->writeStartElement(QStringLiteral("actor"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_actor);
+        writeOptionalXmlAttribute(writer, u"jid", m_actor);
         writer->writeEndElement();
     }
     if (!m_reason.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("reason"), m_reason);
+        writeXmlTextElement(writer, u"reason", m_reason);
     }
     writer->writeEndElement();
 }

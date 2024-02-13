@@ -601,13 +601,13 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(QStringLiteral("error"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("by"), d->by);
+    writeOptionalXmlAttribute(writer, u"by", d->by);
     if (d->type != NoType) {
         writer->writeAttribute(QStringLiteral("type"), typeToString(d->type));
     }
 
     if (d->code > 0) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("code"), QString::number(d->code));
+        writeOptionalXmlAttribute(writer, u"code", QString::number(d->code));
     }
 
     if (d->condition != NoCondition) {
@@ -633,7 +633,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     if (d->fileTooLarge) {
         writer->writeStartElement(QStringLiteral("file-too-large"));
         writer->writeDefaultNamespace(ns_http_upload);
-        writeXmlTextElement(writer, QStringLiteral("max-file-size"),
+        writeXmlTextElement(writer, u"max-file-size",
                             QString::number(d->maxFileSize));
         writer->writeEndElement();
     } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {

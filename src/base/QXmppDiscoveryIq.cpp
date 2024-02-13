@@ -496,29 +496,29 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement("query");
     writer->writeDefaultNamespace(
         d->queryType == InfoQuery ? ns_disco_info : ns_disco_items);
-    writeOptionalXmlAttribute(writer, "node", d->queryNode);
+    writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
     if (d->queryType == InfoQuery) {
         for (const auto &identity : d->identities) {
             writer->writeStartElement("identity");
-            writeOptionalXmlAttribute(writer, "xml:lang", identity.language());
-            writeOptionalXmlAttribute(writer, "category", identity.category());
-            writeOptionalXmlAttribute(writer, "name", identity.name());
-            writeOptionalXmlAttribute(writer, "type", identity.type());
+            writeOptionalXmlAttribute(writer, u"xml:lang", identity.language());
+            writeOptionalXmlAttribute(writer, u"category", identity.category());
+            writeOptionalXmlAttribute(writer, u"name", identity.name());
+            writeOptionalXmlAttribute(writer, u"type", identity.type());
             writer->writeEndElement();
         }
 
         for (const auto &feature : d->features) {
             writer->writeStartElement("feature");
-            writeOptionalXmlAttribute(writer, "var", feature);
+            writeOptionalXmlAttribute(writer, u"var", feature);
             writer->writeEndElement();
         }
     } else {
         for (const auto &item : d->items) {
             writer->writeStartElement("item");
-            writeOptionalXmlAttribute(writer, "jid", item.jid());
-            writeOptionalXmlAttribute(writer, "name", item.name());
-            writeOptionalXmlAttribute(writer, "node", item.node());
+            writeOptionalXmlAttribute(writer, u"jid", item.jid());
+            writeOptionalXmlAttribute(writer, u"name", item.name());
+            writeOptionalXmlAttribute(writer, u"node", item.node());
             writer->writeEndElement();
         }
     }

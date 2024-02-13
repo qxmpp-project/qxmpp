@@ -310,21 +310,21 @@ QString QXmppUtils::generateStanzaHash(int length)
 }
 
 /// \cond
-void QXmpp::Private::writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name,
-                                               const QString &value)
+void QXmpp::Private::writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name,
+                                               QStringView value)
 {
     if (!value.isEmpty()) {
-        stream->writeAttribute(name, value);
+        stream->writeAttribute(toString65(name), toString65(value));
     }
 }
 
-void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, const QString &name,
-                                         const QString &value)
+void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, QStringView name,
+                                         QStringView value)
 {
     if (!value.isEmpty()) {
-        stream->writeTextElement(name, value);
+        stream->writeTextElement(toString65(name), toString65(value));
     } else {
-        stream->writeEmptyElement(name);
+        stream->writeEmptyElement(toString65(name));
     }
 }
 

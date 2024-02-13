@@ -117,8 +117,8 @@ void QXmppPubSubBaseItem::parse(const QDomElement &element)
 void QXmppPubSubBaseItem::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("item"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), d->id);
-    writeOptionalXmlAttribute(writer, QStringLiteral("publisher"), d->publisher);
+    writeOptionalXmlAttribute(writer, u"id", d->id);
+    writeOptionalXmlAttribute(writer, u"publisher", d->publisher);
 
     serializePayload(writer);
 

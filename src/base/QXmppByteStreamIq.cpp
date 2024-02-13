@@ -215,28 +215,28 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
     writer->writeDefaultNamespace(ns_bytestreams);
-    writeOptionalXmlAttribute(writer, QStringLiteral("sid"), m_sid);
+    writeOptionalXmlAttribute(writer, u"sid", m_sid);
     QString modeStr;
     if (m_mode == Tcp) {
         modeStr = QStringLiteral("tcp");
     } else if (m_mode == Udp) {
         modeStr = QStringLiteral("udp");
     }
-    writeOptionalXmlAttribute(writer, QStringLiteral("mode"), modeStr);
+    writeOptionalXmlAttribute(writer, u"mode", modeStr);
     for (const auto &streamHost : m_streamHosts) {
         writer->writeStartElement(QStringLiteral("streamhost"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("host"), streamHost.host());
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), streamHost.jid());
-        writeOptionalXmlAttribute(writer, QStringLiteral("port"), QString::number(streamHost.port()));
-        writeOptionalXmlAttribute(writer, QStringLiteral("zeroconf"), streamHost.zeroconf());
+        writeOptionalXmlAttribute(writer, u"host", streamHost.host());
+        writeOptionalXmlAttribute(writer, u"jid", streamHost.jid());
+        writeOptionalXmlAttribute(writer, u"port", QString::number(streamHost.port()));
+        writeOptionalXmlAttribute(writer, u"zeroconf", streamHost.zeroconf());
         writer->writeEndElement();
     }
     if (!m_activate.isEmpty()) {
-        writeXmlTextElement(writer, QStringLiteral("activate"), m_activate);
+        writeXmlTextElement(writer, u"activate", m_activate);
     }
     if (!m_streamHostUsed.isEmpty()) {
         writer->writeStartElement(QStringLiteral("streamhost-used"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("jid"), m_streamHostUsed);
+        writeOptionalXmlAttribute(writer, u"jid", m_streamHostUsed);
         writer->writeEndElement();
     }
 

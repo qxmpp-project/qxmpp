@@ -264,17 +264,17 @@ void QXmppTuneItem::serializePayload(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("tune"));
     writer->writeDefaultNamespace(ns_tune);
 
-    writeXmlTextElement(writer, QStringLiteral("artist"), d->artist);
+    writeXmlTextElement(writer, u"artist", d->artist);
     if (d->length) {
         writer->writeTextElement(QStringLiteral("length"), QString::number(*d->length));
     }
     if (d->rating) {
         writer->writeTextElement(QStringLiteral("rating"), QString::number(*d->rating));
     }
-    writeXmlTextElement(writer, QStringLiteral("source"), d->source);
-    writeXmlTextElement(writer, QStringLiteral("title"), d->title);
-    writeXmlTextElement(writer, QStringLiteral("track"), d->track);
-    writeXmlTextElement(writer, QStringLiteral("uri"), d->uri.toString(QUrl::FullyEncoded));
+    writeXmlTextElement(writer, u"source", d->source);
+    writeXmlTextElement(writer, u"title", d->title);
+    writeXmlTextElement(writer, u"track", d->track);
+    writeXmlTextElement(writer, u"uri", d->uri.toString(QUrl::FullyEncoded));
 
     writer->writeEndElement();
 }

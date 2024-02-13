@@ -1362,11 +1362,11 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer) const
 void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
 {
     writer->writeStartElement(QStringLiteral("message"));
-    writeOptionalXmlAttribute(writer, QStringLiteral("xml:lang"), lang());
-    writeOptionalXmlAttribute(writer, QStringLiteral("id"), id());
-    writeOptionalXmlAttribute(writer, QStringLiteral("to"), to());
-    writeOptionalXmlAttribute(writer, QStringLiteral("from"), from());
-    writeOptionalXmlAttribute(writer, QStringLiteral("type"), MESSAGE_TYPES.at(d->type));
+    writeOptionalXmlAttribute(writer, u"xml:lang", lang());
+    writeOptionalXmlAttribute(writer, u"id", id());
+    writeOptionalXmlAttribute(writer, u"to", to());
+    writeOptionalXmlAttribute(writer, u"from", from());
+    writeOptionalXmlAttribute(writer, u"type", MESSAGE_TYPES.at(d->type));
     error().toXml(writer);
 
     // extensions
@@ -1708,8 +1708,8 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
             writer->writeStartElement(QStringLiteral("mix"));
             writer->writeDefaultNamespace(ns_mix);
-            writeXmlTextElement(writer, QStringLiteral("jid"), d->mixUserJid);
-            writeXmlTextElement(writer, QStringLiteral("nick"), d->mixUserNick);
+            writeXmlTextElement(writer, u"jid", d->mixUserJid);
+            writeXmlTextElement(writer, u"nick", d->mixUserNick);
             writer->writeEndElement();
         }
 
@@ -1718,7 +1718,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeStartElement(QStringLiteral("encryption"));
             writer->writeDefaultNamespace(ns_eme);
             writer->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
-            writeOptionalXmlAttribute(writer, QStringLiteral("name"), encryptionName());
+            writeOptionalXmlAttribute(writer, u"name", encryptionName());
             writer->writeEndElement();
         }
 
@@ -1758,7 +1758,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             if (!baseNamespace.isNull()) {
                 writer->writeDefaultNamespace(baseNamespace);
             }
-            writeOptionalXmlAttribute(writer, QStringLiteral("parent"), d->parentThread);
+            writeOptionalXmlAttribute(writer, u"parent", d->parentThread);
             writer->writeCharacters(d->thread);
             writer->writeEndElement();
         }
@@ -1794,13 +1794,13 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
                 // XEP-0203: Delayed Delivery
                 writer->writeStartElement(QStringLiteral("delay"));
                 writer->writeDefaultNamespace(ns_delayed_delivery);
-                writeOptionalXmlAttribute(writer, QStringLiteral("stamp"), QXmppUtils::datetimeToString(utcStamp));
+                writeOptionalXmlAttribute(writer, u"stamp", QXmppUtils::datetimeToString(utcStamp));
                 writer->writeEndElement();
             } else {
                 // XEP-0091: Legacy Delayed Delivery
                 writer->writeStartElement(QStringLiteral("x"));
                 writer->writeDefaultNamespace(ns_legacy_delayed_delivery);
-                writeOptionalXmlAttribute(writer, QStringLiteral("stamp"), utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
+                writeOptionalXmlAttribute(writer, u"stamp", utcStamp.toString(QStringLiteral("yyyyMMddThh:mm:ss")));
                 writer->writeEndElement();
             }
         }

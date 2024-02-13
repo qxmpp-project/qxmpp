@@ -98,21 +98,21 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
 {
     writer->writeStartElement(QStringLiteral("chat"));
     writer->writeDefaultNamespace(ns_archive);
-    writeOptionalXmlAttribute(writer, QStringLiteral("with"), m_with);
+    writeOptionalXmlAttribute(writer, u"with", m_with);
     if (m_start.isValid()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
+        writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
     }
-    writeOptionalXmlAttribute(writer, QStringLiteral("subject"), m_subject);
-    writeOptionalXmlAttribute(writer, QStringLiteral("thread"), m_thread);
+    writeOptionalXmlAttribute(writer, u"subject", m_subject);
+    writeOptionalXmlAttribute(writer, u"thread", m_thread);
     if (m_version) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("version"), QString::number(m_version));
+        writeOptionalXmlAttribute(writer, u"version", QString::number(m_version));
     }
 
     QDateTime prevTime = m_start;
 
     for (const QXmppArchiveMessage &message : m_messages) {
         writer->writeStartElement(message.isReceived() ? QStringLiteral("from") : QStringLiteral("to"));
-        writeOptionalXmlAttribute(writer, QStringLiteral("secs"), QString::number(prevTime.secsTo(message.date())));
+        writeOptionalXmlAttribute(writer, u"secs", QString::number(prevTime.secsTo(message.date())));
         writer->writeTextElement(QStringLiteral("body"), message.body());
         writer->writeEndElement();
         prevTime = message.date();
@@ -400,13 +400,13 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("list"));
     writer->writeDefaultNamespace(ns_archive);
     if (!m_with.isEmpty()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("with"), m_with);
+        writeOptionalXmlAttribute(writer, u"with", m_with);
     }
     if (m_start.isValid()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
+        writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
     }
     if (m_end.isValid()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("end"), QXmppUtils::datetimeToString(m_end));
+        writeOptionalXmlAttribute(writer, u"end", QXmppUtils::datetimeToString(m_end));
     }
     if (!m_rsmQuery.isNull()) {
         m_rsmQuery.toXml(writer);
@@ -508,13 +508,13 @@ void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QStringLiteral("remove"));
     writer->writeDefaultNamespace(ns_archive);
     if (!m_with.isEmpty()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("with"), m_with);
+        writeOptionalXmlAttribute(writer, u"with", m_with);
     }
     if (m_start.isValid()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
+        writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
     }
     if (m_end.isValid()) {
-        writeOptionalXmlAttribute(writer, QStringLiteral("end"), QXmppUtils::datetimeToString(m_end));
+        writeOptionalXmlAttribute(writer, u"end", QXmppUtils::datetimeToString(m_end));
     }
     writer->writeEndElement();
 }
@@ -596,8 +596,8 @@ void QXmppArchiveRetrieveIq::toXmlElementFromChild(QXmlStreamWriter *writer) con
 {
     writer->writeStartElement(QStringLiteral("retrieve"));
     writer->writeDefaultNamespace(ns_archive);
-    writeOptionalXmlAttribute(writer, QStringLiteral("with"), m_with);
-    writeOptionalXmlAttribute(writer, QStringLiteral("start"), QXmppUtils::datetimeToString(m_start));
+    writeOptionalXmlAttribute(writer, u"with", m_with);
+    writeOptionalXmlAttribute(writer, u"start", QXmppUtils::datetimeToString(m_start));
     if (!m_rsmQuery.isNull()) {
         m_rsmQuery.toXml(writer);
     }

@@ -93,10 +93,10 @@ void QXmppDialback::toXml(QXmlStreamWriter *xmlWriter) const
     } else {
         xmlWriter->writeStartElement("db:verify");
     }
-    writeOptionalXmlAttribute(xmlWriter, "id", id());
-    writeOptionalXmlAttribute(xmlWriter, "to", to());
-    writeOptionalXmlAttribute(xmlWriter, "from", from());
-    writeOptionalXmlAttribute(xmlWriter, "type", m_type);
+    writeOptionalXmlAttribute(xmlWriter, u"id", id());
+    writeOptionalXmlAttribute(xmlWriter, u"to", to());
+    writeOptionalXmlAttribute(xmlWriter, u"from", from());
+    writeOptionalXmlAttribute(xmlWriter, u"type", m_type);
     if (!m_key.isEmpty()) {
         xmlWriter->writeCharacters(m_key);
     }
