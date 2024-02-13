@@ -5,8 +5,12 @@
 #include "QXmppStreamFeatures.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppGlobal_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 class QXmppStreamFeaturesPrivate : public QSharedData
 {
@@ -264,73 +268,50 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
         element.tagName() == QStringLiteral("features");
 }
 
-static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
+static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, QStringView tagName, const char *tagNs)
 {
-    QXmppStreamFeatures::Mode mode = QXmppStreamFeatures::Disabled;
-
-    for (auto subElement = element.firstChildElement(tagName);
-         !subElement.isNull();
-         subElement = subElement.nextSiblingElement(tagName)) {
-        if (subElement.namespaceURI() == tagNs) {
-            if (!subElement.firstChildElement(QStringLiteral("required")).isNull()) {
-                mode = QXmppStreamFeatures::Required;
-            } else if (mode != QXmppStreamFeatures::Required) {
-                mode = QXmppStreamFeatures::Enabled;
-            }
+    if (auto subEl = firstChildElement(element, tagName, tagNs); !subEl.isNull()) {
+        if (!firstChildElement(subEl, u"required").isNull()) {
+            return QXmppStreamFeatures::Required;
         }
+        return QXmppStreamFeatures::Enabled;
     }
-    return mode;
-}
-
-static bool readBooleanFeature(const QDomElement &element, const QString &tagName, const QString &xmlns)
-{
-    auto childElement = element.firstChildElement(tagName);
-    while (!childElement.isNull()) {
-        if (childElement.namespaceURI() == xmlns) {
-            return true;
-        }
-        childElement = childElement.nextSiblingElement(tagName);
-    }
-    return false;
+    return QXmppStreamFeatures::Disabled;
 }
 
 void QXmppStreamFeatures::parse(const QDomElement &element)
 {
-    d->bindMode = readFeature(element, "bind", ns_bind);
-    d->sessionMode = readFeature(element, "session", ns_session);
-    d->nonSaslAuthMode = readFeature(element, "auth", ns_authFeature);
-    d->tlsMode = readFeature(element, "starttls", ns_tls);
-    d->streamManagementMode = readFeature(element, "sm", ns_stream_management);
-    d->csiMode = readFeature(element, "csi", ns_csi);
-    d->registerMode = readFeature(element, "register", ns_register_feature);
-    d->preApprovedSubscriptionsSupported = readBooleanFeature(element, QStringLiteral("sub"), ns_pre_approval);
-    d->rosterVersioningSupported = readBooleanFeature(element, QStringLiteral("ver"), ns_rosterver);
+    d->bindMode = readFeature(element, u"bind", ns_bind);
+    d->sessionMode = readFeature(element, u"session", ns_session);
+    d->nonSaslAuthMode = readFeature(element, u"auth", ns_authFeature);
+    d->tlsMode = readFeature(element, u"starttls", ns_tls);
+    d->streamManagementMode = readFeature(element, u"sm", ns_stream_management);
+    d->csiMode = readFeature(element, u"csi", ns_csi);
+    d->registerMode = readFeature(element, u"register", ns_register_feature);
+    d->preApprovedSubscriptionsSupported = !firstChildElement(element, u"sub", ns_pre_approval).isNull();
+    d->rosterVersioningSupported = !firstChildElement(element, u"ver", ns_rosterver).isNull();
 
     // parse advertised compression methods
-    QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
-    if (compression.namespaceURI() == ns_compressFeature) {
-        for (auto subElement = compression.firstChildElement(QStringLiteral("method"));
-             !subElement.isNull();
-             subElement = subElement.nextSiblingElement(QStringLiteral("method"))) {
-            d->compressionMethods << subElement.text();
-        }
+    auto compression = firstChildElement(element, u"compression", ns_compressFeature);
+    for (auto subElement = compression.firstChildElement(QStringLiteral("method"));
+         !subElement.isNull();
+         subElement = subElement.nextSiblingElement(QStringLiteral("method"))) {
+        d->compressionMethods << subElement.text();
     }
 
     // parse advertised SASL Authentication mechanisms
-    QDomElement mechs = element.firstChildElement(QStringLiteral("mechanisms"));
-    if (mechs.namespaceURI() == ns_sasl) {
-        for (auto subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
-             !subElement.isNull();
-             subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"))) {
-            d->authMechanisms << subElement.text();
-        }
+    auto mechs = firstChildElement(element, u"mechanisms", ns_sasl);
+    for (auto subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
+         !subElement.isNull();
+         subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"))) {
+        d->authMechanisms << subElement.text();
     }
 }
 
-static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const char *tagNs, QXmppStreamFeatures::Mode mode)
+static void writeFeature(QXmlStreamWriter *writer, QStringView tagName, const char *tagNs, QXmppStreamFeatures::Mode mode)
 {
     if (mode != QXmppStreamFeatures::Disabled) {
-        writer->writeStartElement(tagName);
+        writer->writeStartElement(toString65(tagName));
         writer->writeDefaultNamespace(tagNs);
         if (mode == QXmppStreamFeatures::Required) {
             writer->writeEmptyElement(QStringLiteral("required"));
@@ -339,10 +320,10 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
     }
 }
 
-static void writeBoolenFeature(QXmlStreamWriter *writer, const QString &tagName, const QString &xmlns, bool enabled)
+static void writeBoolenFeature(QXmlStreamWriter *writer, QStringView tagName, const QString &xmlns, bool enabled)
 {
     if (enabled) {
-        writer->writeStartElement(tagName);
+        writer->writeStartElement(toString65(tagName));
         writer->writeDefaultNamespace(xmlns);
         writer->writeEndElement();
     }
@@ -351,15 +332,15 @@ static void writeBoolenFeature(QXmlStreamWriter *writer, const QString &tagName,
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("stream:features"));
-    writeFeature(writer, "bind", ns_bind, d->bindMode);
-    writeFeature(writer, "session", ns_session, d->sessionMode);
-    writeFeature(writer, "auth", ns_authFeature, d->nonSaslAuthMode);
-    writeFeature(writer, "starttls", ns_tls, d->tlsMode);
-    writeFeature(writer, "sm", ns_stream_management, d->streamManagementMode);
-    writeFeature(writer, "csi", ns_csi, d->csiMode);
-    writeFeature(writer, "register", ns_register_feature, d->registerMode);
-    writeBoolenFeature(writer, QStringLiteral("sub"), ns_pre_approval, d->preApprovedSubscriptionsSupported);
-    writeBoolenFeature(writer, QStringLiteral("ver"), ns_rosterver, d->rosterVersioningSupported);
+    writeFeature(writer, u"bind", ns_bind, d->bindMode);
+    writeFeature(writer, u"session", ns_session, d->sessionMode);
+    writeFeature(writer, u"auth", ns_authFeature, d->nonSaslAuthMode);
+    writeFeature(writer, u"starttls", ns_tls, d->tlsMode);
+    writeFeature(writer, u"sm", ns_stream_management, d->streamManagementMode);
+    writeFeature(writer, u"csi", ns_csi, d->csiMode);
+    writeFeature(writer, u"register", ns_register_feature, d->registerMode);
+    writeBoolenFeature(writer, u"sub", ns_pre_approval, d->preApprovedSubscriptionsSupported);
+    writeBoolenFeature(writer, u"ver", ns_rosterver, d->rosterVersioningSupported);
 
     if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement(QStringLiteral("compression"));
