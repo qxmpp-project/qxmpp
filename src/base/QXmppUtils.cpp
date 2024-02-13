@@ -328,6 +328,32 @@ void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, const QString
     }
 }
 
+QDomElement QXmpp::Private::firstChildElement(const QDomElement &el, QStringView tagName, QStringView xmlNs)
+{
+    for (auto child = el.firstChild(); !child.isNull(); child = child.nextSibling()) {
+        if (child.isElement() && (xmlNs.isEmpty() || child.namespaceURI() == xmlNs)) {
+            auto elt = child.toElement();
+            if (tagName.isEmpty() || elt.tagName() == tagName) {
+                return elt;
+            }
+        }
+    }
+    return {};
+}
+
+QDomElement QXmpp::Private::firstChildElement(const QDomElement &el, QStringView tagName, const char *xmlNs)
+{
+    for (auto child = el.firstChild(); !child.isNull(); child = child.nextSibling()) {
+        if (child.isElement() && child.namespaceURI() == xmlNs) {
+            auto elt = child.toElement();
+            if (elt.tagName() == tagName) {
+                return elt;
+            }
+        }
+    }
+    return {};
+}
+
 //
 // Generates a random count of random bytes.
 //
