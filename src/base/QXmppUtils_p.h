@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include <QByteArray>
+#include <QDomElement>
 
 class QDomElement;
 class QXmlStreamWriter;
@@ -56,9 +57,43 @@ inline auto toString65(QStringView s)
 void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStringView value);
 void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView value);
 
+//
 // DOM
+//
+
 bool isIqType(const QDomElement &, QStringView tagName, QStringView xmlns);
-QDomElement firstChildElement(const QDomElement &, QStringView tagName, QStringView xmlNs = {});
+QDomElement firstChildElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
+QDomElement nextSiblingElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
+
+struct DomChildElements
+{
+    QDomElement parent;
+    QStringView tagName;
+    QStringView namespaceUri;
+
+    struct EndIterator
+    {
+    };
+    struct Iterator
+    {
+        Iterator operator++()
+        {
+            el = nextSiblingElement(el, tagName, namespaceUri);
+            return *this;
+        }
+        bool operator!=(EndIterator) const { return !el.isNull(); }
+        const QDomElement &operator*() const { return el; }
+
+        QDomElement el;
+        QStringView tagName;
+        QStringView namespaceUri;
+    };
+
+    Iterator begin() const { return { firstChildElement(parent, tagName, namespaceUri), tagName, namespaceUri }; }
+    EndIterator end() const { return {}; }
+};
+
+inline DomChildElements iterChildElements(const QDomElement &el, QStringView tagName = {}, QStringView namespaceUri = {}) { return DomChildElements { el, tagName, namespaceUri }; }
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
