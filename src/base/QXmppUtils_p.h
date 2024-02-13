@@ -35,6 +35,14 @@ constexpr std::array<std::remove_cv_t<T>, N> to_array(T (&&a)[N])
 }
 
 // Helper for Q(Any)StringView overloads that were added later
+inline auto toString60(QStringView s)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return s;
+#else
+    return s.toString();
+#endif
+}
 inline auto toString65(QStringView s)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)

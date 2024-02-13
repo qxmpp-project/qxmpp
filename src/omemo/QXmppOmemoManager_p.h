@@ -6,6 +6,7 @@
 #ifndef QXMPPOMEMOMANAGER_P_H
 #define QXMPPOMEMOMANAGER_P_H
 
+#include "QXmppConstants_p.h"
 #include "QXmppE2eeMetadata.h"
 #include "QXmppOmemoDeviceBundle_p.h"
 #include "QXmppOmemoManager.h"
@@ -35,11 +36,6 @@ using namespace QXmpp;
 using namespace std::chrono_literals;
 
 namespace QXmpp::Omemo::Private {
-
-// XMPP namespaces
-constexpr auto ns_omemo_2 = "urn:xmpp:omemo:2";
-constexpr auto ns_omemo_2_bundles = "urn:xmpp:omemo:2:bundles";
-constexpr auto ns_omemo_2_devices = "urn:xmpp:omemo:2:devices";
 
 // default possible trust levels a key must have to be used for encryption
 // The class documentation must be adapted if the trust levels are modified.
