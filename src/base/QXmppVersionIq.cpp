@@ -84,7 +84,7 @@ void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_version);
+    writer->writeDefaultNamespace(toString65(ns_version));
 
     if (!m_name.isEmpty()) {
         writeXmlTextElement(writer, u"name", m_name);

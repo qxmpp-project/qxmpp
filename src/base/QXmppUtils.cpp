@@ -328,7 +328,7 @@ void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, QStringView n
     }
 }
 
-bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, const char *xmlns)
+bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, QStringView xmlns)
 {
     // IQs must have only one child element, so we do not need to iterate over the child elements.
     auto child = element.firstChildElement();

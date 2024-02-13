@@ -177,7 +177,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     writer->writeStartElement(MIX_ACTION_TYPES.at(d->actionType));
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
-        writer->writeDefaultNamespace(ns_mix_pam);
+        writer->writeDefaultNamespace(toString65(ns_mix_pam));
         if (type() == Set) {
             writeOptionalXmlAttribute(writer, u"channel", d->jid);
         }
@@ -189,7 +189,7 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         }
     }
 
-    writer->writeDefaultNamespace(ns_mix);
+    writer->writeDefaultNamespace(toString65(ns_mix));
     writeOptionalXmlAttribute(writer, u"channel", d->channelName);
     if (type() == Result) {
         writeOptionalXmlAttribute(writer, u"jid", d->jid);

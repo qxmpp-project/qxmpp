@@ -5,12 +5,15 @@
 #include "QXmppThumbnail.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QMimeType>
 #include <QUrl>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppThumbnailPrivate : public QSharedData
 {
@@ -128,7 +131,7 @@ bool QXmppThumbnail::parse(const QDomElement &el)
 void QXmppThumbnail::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("thumbnail"));
-    writer->writeDefaultNamespace(ns_thumbs);
+    writer->writeDefaultNamespace(toString65(ns_thumbs));
     writer->writeAttribute(QStringLiteral("uri"), d->uri);
     if (d->mediaType.isValid()) {
         writer->writeAttribute("media-type", d->mediaType.name());

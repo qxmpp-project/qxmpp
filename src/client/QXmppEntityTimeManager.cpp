@@ -67,7 +67,7 @@ auto QXmppEntityTimeManager::requestEntityTime(const QString &jid) -> QXmppTask<
 /// \cond
 QStringList QXmppEntityTimeManager::discoveryFeatures() const
 {
-    return QStringList() << ns_entity_time;
+    return { ns_entity_time.toString() };
 }
 
 bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)

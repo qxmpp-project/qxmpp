@@ -5,11 +5,13 @@
 #include "QXmppHash.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
 using namespace QXmpp;
+using namespace QXmpp::Private;
 
 ///
 /// \enum QXmpp::HashAlgorithm
@@ -126,7 +128,7 @@ bool QXmppHash::parse(const QDomElement &el)
 
 void QXmppHash::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeDefaultNamespace(ns_hashes);
+    writer->writeDefaultNamespace(toString65(ns_hashes));
     writer->writeStartElement("hash");
     writer->writeAttribute("algo", algorithmToString(m_algorithm));
     writer->writeCharacters(m_hash.toBase64());
@@ -163,7 +165,7 @@ bool QXmppHashUsed::parse(const QDomElement &el)
 
 void QXmppHashUsed::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeDefaultNamespace(ns_hashes);
+    writer->writeDefaultNamespace(toString65(ns_hashes));
     writer->writeStartElement("hash-used");
     writer->writeAttribute("algo", algorithmToString(m_algorithm));
     writer->writeEndElement();

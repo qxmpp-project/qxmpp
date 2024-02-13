@@ -66,8 +66,8 @@ QXmppUserLocationManager::QXmppUserLocationManager() = default;
 QStringList QXmppUserLocationManager::discoveryFeatures() const
 {
     return {
-        ns_geoloc,
-        ns_geoloc_notify,
+        ns_geoloc.toString(),
+        ns_geoloc_notify.toString(),
     };
 }
 
@@ -79,7 +79,7 @@ QStringList QXmppUserLocationManager::discoveryFeatures() const
 auto QXmppUserLocationManager::request(const QString &jid)
     -> QXmppTask<GetResult>
 {
-    return Pep::request<Item>(pubSub(client()), jid, ns_geoloc, this);
+    return Pep::request<Item>(pubSub(client()), jid, ns_geoloc.toString(), this);
 }
 
 ///
@@ -90,12 +90,12 @@ auto QXmppUserLocationManager::request(const QString &jid)
 auto QXmppUserLocationManager::publish(const QXmppGeolocItem &item)
     -> QXmppTask<PublishResult>
 {
-    return pubSub(client())->publishOwnPepItem(ns_geoloc, item);
+    return pubSub(client())->publishOwnPepItem(ns_geoloc.toString(), item);
 }
 
 /// \cond
 bool QXmppUserLocationManager::handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName)
 {
-    return Pep::handlePubSubEvent<Item>(element, pubSubService, nodeName, ns_geoloc, this, &QXmppUserLocationManager::itemReceived);
+    return Pep::handlePubSubEvent<Item>(element, pubSubService, nodeName, ns_geoloc.toString(), this, &QXmppUserLocationManager::itemReceived);
 }
 /// \endcond

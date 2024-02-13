@@ -891,7 +891,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement("x");
-    writer->writeDefaultNamespace(ns_data);
+    writer->writeDefaultNamespace(toString65(ns_data));
 
     /* form type */
     writer->writeAttribute("type", formTypeToString(d->type));
@@ -937,7 +937,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         /* field media */
         if (!field.mediaSources().isEmpty()) {
             writer->writeStartElement("media");
-            writer->writeDefaultNamespace(ns_media_element);
+            writer->writeDefaultNamespace(toString65(ns_media_element));
 
             // media width and height
             if (field.mediaSize().width() > 0) {

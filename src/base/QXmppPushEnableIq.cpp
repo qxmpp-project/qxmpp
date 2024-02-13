@@ -150,7 +150,7 @@ void QXmppPushEnableIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         break;
     }
 
-    writer->writeDefaultNamespace(ns_push);
+    writer->writeDefaultNamespace(toString65(ns_push));
     writer->writeAttribute(QStringLiteral("jid"), d->jid);
     writer->writeAttribute(QStringLiteral("node"), d->node);
 

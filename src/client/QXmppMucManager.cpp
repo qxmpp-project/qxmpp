@@ -75,17 +75,18 @@ QList<QXmppMucRoom *> QXmppMucManager::rooms() const
 QStringList QXmppMucManager::discoveryFeatures() const
 {
     // XEP-0045: Multi-User Chat
-    return QStringList()
-        << ns_muc
-        << ns_muc_admin
-        << ns_muc_owner
-        << ns_muc_user
-        << ns_conference;
+    return {
+        ns_muc.toString(),
+        ns_muc_admin.toString(),
+        ns_muc_owner.toString(),
+        ns_muc_user.toString(),
+        ns_conference.toString(),
+    };
 }
 
 bool QXmppMucManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
+    if (element.tagName() == u"iq") {
         if (QXmppMucAdminIq::isMucAdminIq(element)) {
             QXmppMucAdminIq iq;
             iq.parse(element);

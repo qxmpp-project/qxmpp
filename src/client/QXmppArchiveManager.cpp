@@ -14,7 +14,7 @@
 QStringList QXmppArchiveManager::discoveryFeatures() const
 {
     // XEP-0036: Message Archiving
-    return QStringList() << ns_archive;
+    return { ns_archive.toString() };
 }
 
 bool QXmppArchiveManager::handleStanza(const QDomElement &element)

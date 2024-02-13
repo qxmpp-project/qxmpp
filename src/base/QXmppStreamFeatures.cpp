@@ -268,7 +268,7 @@ bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
         element.tagName() == QStringLiteral("features");
 }
 
-static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, QStringView tagName, const char *tagNs)
+static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, QStringView tagName, QStringView tagNs)
 {
     if (auto subEl = firstChildElement(element, tagName, tagNs); !subEl.isNull()) {
         if (!firstChildElement(subEl, u"required").isNull()) {
@@ -308,11 +308,11 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     }
 }
 
-static void writeFeature(QXmlStreamWriter *writer, QStringView tagName, const char *tagNs, QXmppStreamFeatures::Mode mode)
+static void writeFeature(QXmlStreamWriter *writer, QStringView tagName, QStringView tagNs, QXmppStreamFeatures::Mode mode)
 {
     if (mode != QXmppStreamFeatures::Disabled) {
         writer->writeStartElement(toString65(tagName));
-        writer->writeDefaultNamespace(tagNs);
+        writer->writeDefaultNamespace(toString65(tagNs));
         if (mode == QXmppStreamFeatures::Required) {
             writer->writeEmptyElement(QStringLiteral("required"));
         }
@@ -320,11 +320,11 @@ static void writeFeature(QXmlStreamWriter *writer, QStringView tagName, const ch
     }
 }
 
-static void writeBoolenFeature(QXmlStreamWriter *writer, QStringView tagName, const QString &xmlns, bool enabled)
+static void writeBoolenFeature(QXmlStreamWriter *writer, QStringView tagName, QStringView xmlns, bool enabled)
 {
     if (enabled) {
         writer->writeStartElement(toString65(tagName));
-        writer->writeDefaultNamespace(xmlns);
+        writer->writeDefaultNamespace(toString65(xmlns));
         writer->writeEndElement();
     }
 }
@@ -344,7 +344,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 
     if (!d->compressionMethods.isEmpty()) {
         writer->writeStartElement(QStringLiteral("compression"));
-        writer->writeDefaultNamespace(ns_compressFeature);
+        writer->writeDefaultNamespace(toString65(ns_compressFeature));
         for (const auto &method : std::as_const(d->compressionMethods)) {
             writer->writeTextElement(QStringLiteral("method"), method);
         }
@@ -352,7 +352,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     }
     if (!d->authMechanisms.isEmpty()) {
         writer->writeStartElement(QStringLiteral("mechanisms"));
-        writer->writeDefaultNamespace(ns_sasl);
+        writer->writeDefaultNamespace(toString65(ns_sasl));
         for (const auto &mechanism : std::as_const(d->authMechanisms)) {
             writer->writeTextElement(QStringLiteral("mechanism"), mechanism);
         }

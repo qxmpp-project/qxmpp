@@ -157,7 +157,6 @@ set(SOURCE_FILES
     base/QXmppBitsOfBinaryIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
-    base/QXmppConstants.cpp
     base/QXmppDataForm.cpp
     base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp

@@ -5,9 +5,12 @@
 #include "QXmppOutOfBandUrl.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppOutOfBandUrlPrivate : public QSharedData
 {
@@ -78,7 +81,7 @@ bool QXmppOutOfBandUrl::parse(const QDomElement &el)
 void QXmppOutOfBandUrl::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("x"));
-    writer->writeDefaultNamespace(ns_oob);
+    writer->writeDefaultNamespace(toString65(ns_oob));
     writer->writeTextElement(QStringLiteral("url"), d->url);
     if (d->description) {
         writer->writeTextElement(QStringLiteral("desc"), *d->description);

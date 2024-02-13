@@ -230,7 +230,7 @@ QXmppCallInviteManager::~QXmppCallInviteManager() = default;
 /// \cond
 QStringList QXmppCallInviteManager::discoveryFeatures() const
 {
-    return { ns_call_invites };
+    return { ns_call_invites.toString() };
 }
 /// \endcond
 

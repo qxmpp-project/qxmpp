@@ -8,6 +8,7 @@
 #include "QXmppHash.h"
 #include "QXmppThumbnail.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <utility>
 
@@ -15,6 +16,8 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMimeDatabase>
+
+using namespace QXmpp::Private;
 
 class QXmppFileMetadataPrivate : public QSharedData
 {
@@ -134,7 +137,7 @@ bool QXmppFileMetadata::parse(const QDomElement &el)
 void QXmppFileMetadata::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("file");
-    writer->writeDefaultNamespace(ns_file_metadata);
+    writer->writeDefaultNamespace(toString65(ns_file_metadata));
     if (d->date) {
         writer->writeTextElement("date", QXmppUtils::datetimeToString(*d->date));
     }

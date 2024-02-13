@@ -61,7 +61,7 @@ void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)
 void QXmppPrivateStorageIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeDefaultNamespace(ns_private);
+    writer->writeDefaultNamespace(toString65(ns_private));
     m_bookmarks.toXml(writer);
     writer->writeEndElement();
 }

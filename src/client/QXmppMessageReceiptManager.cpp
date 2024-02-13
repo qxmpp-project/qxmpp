@@ -25,7 +25,7 @@ QXmppMessageReceiptManager::QXmppMessageReceiptManager()
 /// \cond
 QStringList QXmppMessageReceiptManager::discoveryFeatures() const
 {
-    return QStringList(ns_message_receipts);
+    return { ns_message_receipts.toString() };
 }
 
 bool QXmppMessageReceiptManager::handleMessage(const QXmppMessage &message)

@@ -72,7 +72,7 @@ void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("time");
-    writer->writeDefaultNamespace(ns_entity_time);
+    writer->writeDefaultNamespace(toString65(ns_entity_time));
 
     if (m_utc.isValid()) {
         writeXmlTextElement(writer, u"tzo", QXmppUtils::timezoneOffsetToString(m_tzo));

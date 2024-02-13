@@ -32,7 +32,7 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
         writer->writeStartElement(QStringLiteral("enable"));
-        writer->writeDefaultNamespace(ns_carbons);
+        writer->writeDefaultNamespace(toString65(ns_carbons));
         writer->writeEndElement();
     }
 };

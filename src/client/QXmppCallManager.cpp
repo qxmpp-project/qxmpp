@@ -10,7 +10,6 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
-#include "QXmppStun.h"
 #include "QXmppUtils.h"
 
 #include <gst/gst.h>
@@ -69,11 +68,11 @@ QXmppCallManager::~QXmppCallManager()
 QStringList QXmppCallManager::discoveryFeatures() const
 {
     return {
-        ns_jingle,      // XEP-0166 : Jingle
-        ns_jingle_rtp,  // XEP-0167 : Jingle RTP Sessions
-        ns_jingle_rtp_audio,
-        ns_jingle_rtp_video,
-        ns_jingle_ice_udp,  // XEP-0176 : Jingle ICE-UDP Transport Method
+        ns_jingle.toString(),      // XEP-0166: Jingle
+        ns_jingle_rtp.toString(),  // XEP-0167: Jingle RTP Sessions
+        ns_jingle_rtp_audio.toString(),
+        ns_jingle_rtp_video.toString(),
+        ns_jingle_ice_udp.toString(),  // XEP-0176: Jingle ICE-UDP Transport Method
     };
 }
 

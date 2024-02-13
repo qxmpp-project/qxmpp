@@ -111,7 +111,7 @@ void QXmppMessageReaction::parse(const QDomElement &element)
 void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("reactions"));
-    writer->writeDefaultNamespace(ns_reactions);
+    writer->writeDefaultNamespace(toString65(ns_reactions));
     writer->writeAttribute(QStringLiteral("id"), d->messageId);
 
     for (const auto &reaction : d->emojis) {

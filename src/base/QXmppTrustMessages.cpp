@@ -6,8 +6,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppTrustMessageElement
@@ -137,7 +140,7 @@ void QXmppTrustMessageElement::parse(const QDomElement &element)
 void QXmppTrustMessageElement::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("trust-message"));
-    writer->writeDefaultNamespace(ns_tm);
+    writer->writeDefaultNamespace(toString65(ns_tm));
     writer->writeAttribute(QStringLiteral("usage"), d->usage);
     writer->writeAttribute(QStringLiteral("encryption"), d->encryption);
 

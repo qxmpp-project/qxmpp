@@ -13,6 +13,7 @@
 #include "QXmppStun.h"
 #include "QXmppTransferManager_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QCryptographicHash>
 #include <QDomElement>
@@ -26,6 +27,8 @@
 #include <QTime>
 #include <QTimer>
 #include <QUrl>
+
+using namespace QXmpp::Private;
 
 // time to try to connect to a SOCKS host (7 seconds)
 const int socksTimeout = 7000;
@@ -179,7 +182,7 @@ void QXmppTransferFileInfo::parse(const QDomElement &element)
 void QXmppTransferFileInfo::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("file");
-    writer->writeDefaultNamespace(ns_stream_initiation_file_transfer);
+    writer->writeDefaultNamespace(toString65(ns_stream_initiation_file_transfer));
     if (d->date.isValid()) {
         writer->writeAttribute("date", QXmppUtils::datetimeToString(d->date));
     }
@@ -893,10 +896,10 @@ void QXmppTransferManager::byteStreamSetReceived(const QXmppByteStreamIq &iq)
 QStringList QXmppTransferManager::discoveryFeatures() const
 {
     return {
-        ns_ibb,                              // XEP-0047: In-Band Bytestreams
-        ns_bytestreams,                      // XEP-0065: SOCKS5 Bytestreams
-        ns_stream_initiation,                // XEP-0095: Stream Initiation
-        ns_stream_initiation_file_transfer,  // XEP-0096: SI File Transfer
+        ns_ibb.toString(),                              // XEP-0047: In-Band Bytestreams
+        ns_bytestreams.toString(),                      // XEP-0065: SOCKS5 Bytestreams
+        ns_stream_initiation.toString(),                // XEP-0095: Stream Initiation
+        ns_stream_initiation_file_transfer.toString(),  // XEP-0096: SI File Transfer
     };
 }
 
@@ -1216,9 +1219,9 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     QXmppDataForm::Field methodField(QXmppDataForm::Field::ListSingleField);
     methodField.setKey("stream-method");
     if (job->method() == QXmppTransferJob::InBandMethod) {
-        methodField.setValue(ns_ibb);
+        methodField.setValue(ns_ibb.toString());
     } else if (job->method() == QXmppTransferJob::SocksMethod) {
-        methodField.setValue(ns_bytestreams);
+        methodField.setValue(ns_bytestreams.toString());
     }
     form.setFields(QList<QXmppDataForm::Field>() << methodField);
 
@@ -1330,10 +1333,10 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     QXmppDataForm::Field methodField(QXmppDataForm::Field::ListSingleField);
     methodField.setKey("stream-method");
     if (d->supportedMethods & QXmppTransferJob::InBandMethod) {
-        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_ibb)));
+        methodField.setOptions(methodField.options() << qMakePair(QString(), ns_ibb.toString()));
     }
     if (d->supportedMethods & QXmppTransferJob::SocksMethod) {
-        methodField.setOptions(methodField.options() << qMakePair(QString(), QString::fromLatin1(ns_bytestreams)));
+        methodField.setOptions(methodField.options() << qMakePair(QString(), ns_bytestreams.toString()));
     }
     form.setFields(QList<QXmppDataForm::Field>() << methodField);
 

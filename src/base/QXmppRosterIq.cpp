@@ -127,7 +127,7 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_roster);
+    writer->writeDefaultNamespace(toString65(ns_roster));
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
     if (!version().isEmpty()) {
@@ -137,7 +137,7 @@ void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->mixAnnotate) {
         writer->writeStartElement(QStringLiteral("annotate"));
-        writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
+        writer->writeAttribute(QStringLiteral("xmlns"), toString65(ns_mix_roster));
         writer->writeEndElement();
     }
 
@@ -443,7 +443,7 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->isMixChannel) {
         writer->writeStartElement(QStringLiteral("channel"));
-        writer->writeAttribute(QStringLiteral("xmlns"), ns_mix_roster);
+        writer->writeAttribute(QStringLiteral("xmlns"), toString65(ns_mix_roster));
         writeOptionalXmlAttribute(writer, u"participant-id", d->mixParticipantId);
         writer->writeEndElement();
     }

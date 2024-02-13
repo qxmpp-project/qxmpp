@@ -262,7 +262,7 @@ void QXmppTuneItem::parsePayload(const QDomElement &tune)
 void QXmppTuneItem::serializePayload(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("tune"));
-    writer->writeDefaultNamespace(ns_tune);
+    writer->writeDefaultNamespace(toString65(ns_tune));
 
     writeXmlTextElement(writer, u"artist", d->artist);
     if (d->length) {

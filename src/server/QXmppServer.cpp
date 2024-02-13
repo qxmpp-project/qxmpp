@@ -10,7 +10,6 @@
 #include "QXmppIncomingServer.h"
 #include "QXmppIq.h"
 #include "QXmppOutgoingServer.h"
-#include "QXmppPresence.h"
 #include "QXmppServerExtension.h"
 #include "QXmppServerPlugin.h"
 #include "QXmppUtils.h"
@@ -24,7 +23,7 @@
 #include <QSslKey>
 #include <QSslSocket>
 
-static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement &element, const QStringList &omitNamespaces)
+static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement &element, const QVector<QStringView> &omitNamespaces)
 {
     stream->writeStartElement(element.tagName());
 
@@ -43,7 +42,7 @@ static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement
     QDomNode childNode = element.firstChild();
     while (!childNode.isNull()) {
         if (childNode.isElement()) {
-            helperToXmlAddDomElement(stream, childNode.toElement(), QStringList() << xmlns);
+            helperToXmlAddDomElement(stream, childNode.toElement(), { xmlns });
         } else if (childNode.isText()) {
             stream->writeCharacters(childNode.toText().data());
         }
@@ -663,8 +662,7 @@ bool QXmppServer::sendElement(const QDomElement &element)
     // serialize data
     QByteArray data;
     QXmlStreamWriter xmlStream(&data);
-    const QStringList omitNamespaces = QStringList() << ns_client << ns_server;
-    helperToXmlAddDomElement(&xmlStream, element, omitNamespaces);
+    helperToXmlAddDomElement(&xmlStream, element, { ns_client, ns_server });
 
     // route data
     return d->routeData(element.attribute("to"), data);

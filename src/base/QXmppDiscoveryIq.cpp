@@ -494,8 +494,7 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
-    writer->writeDefaultNamespace(
-        d->queryType == InfoQuery ? ns_disco_info : ns_disco_items);
+    writer->writeDefaultNamespace(toString65(d->queryType == InfoQuery ? ns_disco_info : ns_disco_items));
     writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
     if (d->queryType == InfoQuery) {

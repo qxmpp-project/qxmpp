@@ -7,12 +7,15 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDateTime>
 #include <QDomElement>
 #include <QMap>
 #include <QStringList>
 #include <QVariant>
+
+using namespace QXmpp::Private;
 
 void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &value)
 {
@@ -280,7 +283,7 @@ void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
 void QXmppRpcResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_rpc);
+    writer->writeDefaultNamespace(toString65(ns_rpc));
 
     writer->writeStartElement(QStringLiteral("methodResponse"));
     if (m_faultCode) {
@@ -379,7 +382,7 @@ void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)
 void QXmppRpcInvokeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("query"));
-    writer->writeDefaultNamespace(ns_rpc);
+    writer->writeDefaultNamespace(toString65(ns_rpc));
 
     writer->writeStartElement(QStringLiteral("methodCall"));
     writer->writeTextElement(QStringLiteral("methodName"), m_method);

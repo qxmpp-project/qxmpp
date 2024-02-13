@@ -553,7 +553,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0045: Multi-User Chat
     if (d->mucSupported) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
-        xmlWriter->writeDefaultNamespace(ns_muc);
+        xmlWriter->writeDefaultNamespace(toString65(ns_muc));
         if (!d->mucPassword.isEmpty()) {
             xmlWriter->writeTextElement(QStringLiteral("password"), d->mucPassword);
         }
@@ -562,7 +562,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
 
     if (!d->mucItem.isNull() || !d->mucStatusCodes.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
-        xmlWriter->writeDefaultNamespace(ns_muc_user);
+        xmlWriter->writeDefaultNamespace(toString65(ns_muc_user));
         if (!d->mucItem.isNull()) {
             d->mucItem.toXml(xmlWriter);
         }
@@ -579,7 +579,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         !d->capabilityVer.isEmpty() &&
         !d->capabilityHash.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("c"));
-        xmlWriter->writeDefaultNamespace(ns_capabilities);
+        xmlWriter->writeDefaultNamespace(toString65(ns_capabilities));
         writeOptionalXmlAttribute(xmlWriter, u"hash", d->capabilityHash);
         writeOptionalXmlAttribute(xmlWriter, u"node", d->capabilityNode);
         writeOptionalXmlAttribute(xmlWriter, u"ver", QString::fromUtf8(d->capabilityVer.toBase64()));
@@ -589,7 +589,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0153: vCard-Based Avatars
     if (d->vCardUpdateType != VCardUpdateNone) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
-        xmlWriter->writeDefaultNamespace(ns_vcard_update);
+        xmlWriter->writeDefaultNamespace(toString65(ns_vcard_update));
         switch (d->vCardUpdateType) {
         case VCardUpdateNoPhoto:
             xmlWriter->writeEmptyElement(QStringLiteral("photo"));
@@ -606,7 +606,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0272: Multiparty Jingle (Muji)
     if (d->isPreparingMujiSession || !d->mujiContents.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("muji"));
-        xmlWriter->writeDefaultNamespace(ns_muji);
+        xmlWriter->writeDefaultNamespace(toString65(ns_muji));
 
         if (d->isPreparingMujiSession) {
             xmlWriter->writeEmptyElement(QStringLiteral("preparing"));
@@ -622,7 +622,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0319: Last User Interaction in Presence
     if (!d->lastUserInteraction.isNull() && d->lastUserInteraction.isValid()) {
         xmlWriter->writeStartElement(QStringLiteral("idle"));
-        xmlWriter->writeDefaultNamespace(ns_idle);
+        xmlWriter->writeDefaultNamespace(toString65(ns_idle));
         writeOptionalXmlAttribute(xmlWriter, u"since", QXmppUtils::datetimeToString(d->lastUserInteraction));
         xmlWriter->writeEndElement();
     }
@@ -630,7 +630,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
         xmlWriter->writeStartElement(QStringLiteral("mix"));
-        xmlWriter->writeDefaultNamespace(ns_mix_presence);
+        xmlWriter->writeDefaultNamespace(toString65(ns_mix_presence));
         if (!d->mixUserJid.isEmpty()) {
             writeXmlTextElement(xmlWriter, u"jid", d->mixUserJid);
         }

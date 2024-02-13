@@ -13,6 +13,7 @@
 #include "QXmppTrustMessageElement.h"
 #include "QXmppTrustMessageKeyOwner.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
@@ -481,7 +482,7 @@ QXmppTask<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encr
 QXmppTask<QXmpp::SendResult> QXmppAtmManager::sendTrustMessage(const QString &encryption, const QList<QXmppTrustMessageKeyOwner> &keyOwners, const QString &recipientJid)
 {
     QXmppTrustMessageElement trustMessageElement;
-    trustMessageElement.setUsage(ns_atm);
+    trustMessageElement.setUsage(ns_atm.toString());
     trustMessageElement.setEncryption(encryption);
     trustMessageElement.setKeyOwners(keyOwners);
 

@@ -82,8 +82,10 @@ bool QXmppVCardManager::isClientVCardReceived() const
 /// \cond
 QStringList QXmppVCardManager::discoveryFeatures() const
 {
-    // XEP-0054: vcard-temp
-    return QStringList() << ns_vcard;
+    return {
+        // XEP-0054: vcard-temp
+        ns_vcard.toString(),
+    };
 }
 
 bool QXmppVCardManager::handleStanza(const QDomElement &element)

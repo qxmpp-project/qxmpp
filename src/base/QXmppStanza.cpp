@@ -612,7 +612,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
 
     if (d->condition != NoCondition) {
         writer->writeStartElement(conditionToString(d->condition));
-        writer->writeDefaultNamespace(ns_stanza);
+        writer->writeDefaultNamespace(toString65(ns_stanza));
 
         // redirection URI
         if (!d->redirectionUri.isEmpty() && (d->condition == Gone || d->condition == Redirect)) {
@@ -624,7 +624,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     if (!d->text.isEmpty()) {
         writer->writeStartElement(QStringLiteral("text"));
         writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
-        writer->writeDefaultNamespace(ns_stanza);
+        writer->writeDefaultNamespace(toString65(ns_stanza));
         writer->writeCharacters(d->text);
         writer->writeEndElement();
     }
@@ -632,13 +632,13 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     // XEP-0363: HTTP File Upload
     if (d->fileTooLarge) {
         writer->writeStartElement(QStringLiteral("file-too-large"));
-        writer->writeDefaultNamespace(ns_http_upload);
+        writer->writeDefaultNamespace(toString65(ns_http_upload));
         writeXmlTextElement(writer, u"max-file-size",
                             QString::number(d->maxFileSize));
         writer->writeEndElement();
     } else if (!d->retryDate.isNull() && d->retryDate.isValid()) {
         writer->writeStartElement(QStringLiteral("retry"));
-        writer->writeDefaultNamespace(ns_http_upload);
+        writer->writeDefaultNamespace(toString65(ns_http_upload));
         writer->writeAttribute(QStringLiteral("stamp"),
                                QXmppUtils::datetimeToString(d->retryDate));
         writer->writeEndElement();
@@ -1050,7 +1050,7 @@ void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter, QXmpp::SceMode sc
     // XEP-0033: Extended Stanza Addressing
     if (sceMode & QXmpp::ScePublic && !d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
-        xmlWriter->writeDefaultNamespace(ns_extended_addressing);
+        xmlWriter->writeDefaultNamespace(toString65(ns_extended_addressing));
         for (const auto &address : d->extendedAddresses) {
             address.toXml(xmlWriter);
         }

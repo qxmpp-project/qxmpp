@@ -211,7 +211,7 @@ static void jingleRtpHeaderExtensionsNegotiationElementsToXml(QXmlStreamWriter *
 
     if (isRtpHeaderExtensionMixingAllowed) {
         writer->writeStartElement(QStringLiteral("extmap-allow-mixed"));
-        writer->writeDefaultNamespace(ns_jingle_rtp_header_extensions_negotiation);
+        writer->writeDefaultNamespace(toString65(ns_jingle_rtp_header_extensions_negotiation));
         writer->writeEndElement();
     }
 }
@@ -485,7 +485,7 @@ void QXmppJingleIq::Content::setRtpEncryption(const std::optional<QXmppJingleRtp
 
 void QXmppJingleIq::Content::addTransportCandidate(const QXmppJingleCandidate &candidate)
 {
-    d->transportType = ns_jingle_ice_udp;
+    d->transportType = ns_jingle_ice_udp.toString();
     d->transportCandidates << candidate;
 }
 
@@ -501,7 +501,7 @@ QList<QXmppJingleCandidate> QXmppJingleIq::Content::transportCandidates() const
 ///
 void QXmppJingleIq::Content::setTransportCandidates(const QList<QXmppJingleCandidate> &candidates)
 {
-    d->transportType = candidates.isEmpty() ? QString() : ns_jingle_ice_udp;
+    d->transportType = candidates.isEmpty() ? QString() : ns_jingle_ice_udp.toString();
     d->transportCandidates = candidates;
 }
 
@@ -809,7 +809,7 @@ void QXmppJingleIq::Content::toXml(QXmlStreamWriter *writer) const
         // XEP-0320: Use of DTLS-SRTP in Jingle Sessions
         if (!d->transportFingerprint.isEmpty() && !d->transportFingerprintHash.isEmpty()) {
             writer->writeStartElement(QStringLiteral("fingerprint"));
-            writer->writeDefaultNamespace(ns_jingle_dtls);
+            writer->writeDefaultNamespace(toString65(ns_jingle_dtls));
             writer->writeAttribute(QStringLiteral("hash"), d->transportFingerprintHash);
             writer->writeAttribute(QStringLiteral("setup"), d->transportFingerprintSetup);
             writer->writeCharacters(formatFingerprint(d->transportFingerprint));
@@ -1128,7 +1128,7 @@ void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(QStringLiteral("reason"));
-    writer->writeDefaultNamespace(ns_jingle);
+    writer->writeDefaultNamespace(toString65(ns_jingle));
 
     if (!d->m_text.isEmpty()) {
         writeXmlTextElement(writer, u"text", d->m_text);
@@ -1137,7 +1137,7 @@ void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
 
     if (d->m_rtpErrorCondition != NoErrorCondition) {
         writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(d->m_rtpErrorCondition));
-        writer->writeDefaultNamespace(ns_jingle_rtp_errors);
+        writer->writeDefaultNamespace(toString65(ns_jingle_rtp_errors));
         writer->writeEndElement();
     }
 
@@ -1455,7 +1455,7 @@ void QXmppJingleIq::parseElementFromChild(const QDomElement &element)
 void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("jingle"));
-    writer->writeDefaultNamespace(ns_jingle);
+    writer->writeDefaultNamespace(toString65(ns_jingle));
     writeOptionalXmlAttribute(writer, u"action", QString::fromLocal8Bit(jingle_actions[d->action]));
     writeOptionalXmlAttribute(writer, u"initiator", d->initiator);
     writeOptionalXmlAttribute(writer, u"responder", d->responder);
@@ -1464,7 +1464,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     // XEP-0272: Multiparty Jingle (Muji)
     if (!d->mujiGroupChatJid.isEmpty()) {
         writer->writeStartElement(QStringLiteral("muji"));
-        writer->writeDefaultNamespace(ns_muji);
+        writer->writeDefaultNamespace(toString65(ns_muji));
         writeOptionalXmlAttribute(writer, u"room", d->mujiGroupChatJid);
         writer->writeEndElement();
     }
@@ -1477,7 +1477,7 @@ void QXmppJingleIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     const auto writeStartElementWithNamespace = [=](const QString &tagName) {
         writer->writeStartElement(tagName);
-        writer->writeDefaultNamespace(ns_jingle_rtp_info);
+        writer->writeDefaultNamespace(toString65(ns_jingle_rtp_info));
     };
 
     if (d->rtpSessionState) {
@@ -2175,7 +2175,7 @@ void QXmppJingleDescription::setType(const QString &type)
 ///
 void QXmppJingleDescription::addPayloadType(const QXmppJinglePayloadType &payload)
 {
-    d->type = ns_jingle_rtp;
+    d->type = ns_jingle_rtp.toString();
     d->payloadTypes.append(payload);
 }
 
@@ -2192,7 +2192,7 @@ const QList<QXmppJinglePayloadType> &QXmppJingleDescription::payloadTypes() cons
 ///
 void QXmppJingleDescription::setPayloadTypes(const QList<QXmppJinglePayloadType> &payloadTypes)
 {
-    d->type = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp;
+    d->type = payloadTypes.isEmpty() ? QString() : ns_jingle_rtp.toString();
     d->payloadTypes = payloadTypes;
 }
 
@@ -2564,7 +2564,7 @@ void QXmppJingleRtpEncryption::toXml(QXmlStreamWriter *writer) const
 {
     if (!d->cryptoElements.isEmpty()) {
         writer->writeStartElement(QStringLiteral("encryption"));
-        writer->writeDefaultNamespace(ns_jingle_rtp);
+        writer->writeDefaultNamespace(toString65(ns_jingle_rtp));
 
         if (d->isRequired) {
             writer->writeAttribute(QStringLiteral("required"), QStringLiteral("1"));
@@ -2697,7 +2697,7 @@ void QXmppJingleRtpFeedbackProperty::parse(const QDomElement &element)
 void QXmppJingleRtpFeedbackProperty::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb"));
-    writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
+    writer->writeDefaultNamespace(toString65(ns_jingle_rtp_feedback_negotiation));
     writeOptionalXmlAttribute(writer, u"type", d->type);
 
     // If there are parameters, they must be used instead of the subtype.
@@ -2771,7 +2771,7 @@ void QXmppJingleRtpFeedbackInterval::parse(const QDomElement &element)
 void QXmppJingleRtpFeedbackInterval::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtcp-fb-trr-int"));
-    writer->writeDefaultNamespace(ns_jingle_rtp_feedback_negotiation);
+    writer->writeDefaultNamespace(toString65(ns_jingle_rtp_feedback_negotiation));
     writeOptionalXmlAttribute(writer, u"value", QString::number(m_value));
     writer->writeEndElement();
 }
@@ -2928,7 +2928,7 @@ void QXmppJingleRtpHeaderExtensionProperty::parse(const QDomElement &element)
 void QXmppJingleRtpHeaderExtensionProperty::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("rtp-hdrext"));
-    writer->writeDefaultNamespace(ns_jingle_rtp_header_extensions_negotiation);
+    writer->writeDefaultNamespace(toString65(ns_jingle_rtp_header_extensions_negotiation));
     writeOptionalXmlAttribute(writer, u"id", QString::number(d->id));
     writeOptionalXmlAttribute(writer, u"uri", d->uri);
 
@@ -3146,7 +3146,7 @@ void QXmppJingleMessageInitiationElement::parse(const QDomElement &element)
 void QXmppJingleMessageInitiationElement::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(jmiElementTypeToString(d->type));
-    writer->writeDefaultNamespace(ns_jingle_message_initiation);
+    writer->writeDefaultNamespace(toString65(ns_jingle_message_initiation));
 
     writeOptionalXmlAttribute(writer, u"id", d->id);
 
@@ -3413,7 +3413,7 @@ void QXmppCallInviteElement::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(callInviteElementTypeToString(d->type));
 
     // write namespace and ID.
-    writer->writeDefaultNamespace(ns_call_invites);
+    writer->writeDefaultNamespace(toString65(ns_call_invites));
     writeOptionalXmlAttribute(writer, u"id", d->id);
 
     switch (d->type) {
