@@ -13,6 +13,7 @@
 #include "QXmppMessage.h"
 #include "QXmppPromise.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <unordered_map>
 
@@ -58,26 +59,26 @@ QXmppMessage parseMamMessage(const MamMessage &mamMessage, EncryptedType encrypt
 
 std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomElement &messageEl)
 {
-    auto resultElement = messageEl.firstChildElement("result");
-    if (resultElement.isNull() || resultElement.namespaceURI() != ns_mam) {
+    auto resultElement = firstChildElement(messageEl, u"result", ns_mam);
+    if (resultElement.isNull()) {
         return {};
     }
 
-    auto forwardedElement = resultElement.firstChildElement("forwarded");
-    if (forwardedElement.isNull() || forwardedElement.namespaceURI() != ns_forwarding) {
+    auto forwardedElement = firstChildElement(resultElement, u"forwarded", ns_forwarding);
+    if (forwardedElement.isNull()) {
         return {};
     }
 
     auto queryId = resultElement.attribute("queryid");
 
-    auto messageElement = forwardedElement.firstChildElement("message");
+    auto messageElement = firstChildElement(forwardedElement, u"message", ns_client);
     if (messageElement.isNull()) {
         return {};
     }
 
     auto parseDelay = [](const auto &forwardedEl) -> std::optional<QDateTime> {
-        auto delayEl = forwardedEl.firstChildElement("delay");
-        if (!delayEl.isNull() && delayEl.namespaceURI() == ns_delayed_delivery) {
+        auto delayEl = firstChildElement(forwardedEl, u"delay", ns_delayed_delivery);
+        if (!delayEl.isNull()) {
             return QXmppUtils::datetimeFromString(delayEl.attribute("stamp"));
         }
         return {};

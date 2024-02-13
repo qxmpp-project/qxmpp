@@ -174,7 +174,7 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
             conference.setAutoJoin(childElement.attribute(QStringLiteral("autojoin")) == QStringLiteral("true") || childElement.attribute("autojoin") == "1");
             conference.setJid(childElement.attribute(QStringLiteral("jid")));
             conference.setName(childElement.attribute(QStringLiteral("name")));
-            conference.setNickName(childElement.firstChildElement(QStringLiteral("nick")).text());
+            conference.setNickName(firstChildElement(childElement, u"nick").text());
             m_conferences << conference;
         } else if (childElement.tagName() == QStringLiteral("url")) {
             QXmppBookmarkUrl url;

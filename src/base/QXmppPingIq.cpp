@@ -6,8 +6,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppPingIq
@@ -27,9 +30,7 @@ QXmppPingIq::QXmppPingIq()
 ///
 bool QXmppPingIq::isPingIq(const QDomElement &element)
 {
-    QDomElement pingElement = element.firstChildElement(QStringLiteral("ping"));
-    return (element.attribute(QStringLiteral("type")) == QStringLiteral("get") &&
-            pingElement.namespaceURI() == ns_ping);
+    return isIqType(element, u"ping", ns_ping) && element.attribute(QStringLiteral("type")) == u"get";
 }
 
 /// \cond

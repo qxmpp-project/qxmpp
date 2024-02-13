@@ -179,13 +179,13 @@ void QXmppByteStreamIq::setStreamHostUsed(const QString &jid)
 ///
 bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
 {
-    return element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_bytestreams;
+    return isIqType(element, u"query", ns_bytestreams);
 }
 
 /// \cond
 void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 {
-    auto queryElement = element.firstChildElement(QStringLiteral("query"));
+    auto queryElement = firstChildElement(element, u"query", ns_bytestreams);
     m_sid = queryElement.attribute(QStringLiteral("sid"));
     const auto modeStr = queryElement.attribute(QStringLiteral("mode"));
     if (modeStr == QStringLiteral("tcp")) {
@@ -196,7 +196,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
         m_mode = None;
     }
 
-    QDomElement hostElement = queryElement.firstChildElement(QStringLiteral("streamhost"));
+    QDomElement hostElement = firstChildElement(queryElement, u"streamhost");
     while (!hostElement.isNull()) {
         StreamHost streamHost;
         streamHost.setHost(hostElement.attribute(QStringLiteral("host")));
@@ -207,8 +207,8 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 
         hostElement = hostElement.nextSiblingElement(QStringLiteral("streamhost"));
     }
-    m_activate = queryElement.firstChildElement(QStringLiteral("activate")).text();
-    m_streamHostUsed = queryElement.firstChildElement(QStringLiteral("streamhost-used")).attribute(QStringLiteral("jid"));
+    m_activate = firstChildElement(queryElement, u"activate").text();
+    m_streamHostUsed = firstChildElement(queryElement, u"streamhost-used").attribute(QStringLiteral("jid"));
 }
 
 void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

@@ -11,6 +11,7 @@
 #include "QXmppPubSubEvent.h"
 #include "QXmppTrustManager.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QStringBuilder>
 
@@ -1109,14 +1110,7 @@ QXmppTask<QXmppE2eeExtension::IqDecryptResult> Manager::decryptIq(const QDomElem
 
 bool QXmppOmemoManager::isEncrypted(const QDomElement &el)
 {
-    for (auto subEl = el.firstChildElement();
-         !subEl.isNull();
-         subEl = subEl.nextSiblingElement()) {
-        if (subEl.tagName() == "encrypted" && subEl.namespaceURI() == ns_omemo_2) {
-            return true;
-        }
-    }
-    return false;
+    return !firstChildElement(el, u"encrypted", ns_omemo_2).isNull();
 }
 
 bool QXmppOmemoManager::isEncrypted(const QXmppMessage &message)

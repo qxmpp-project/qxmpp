@@ -169,6 +169,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
     QVERIFY(doc.setContent(xmlSimple, true));
     QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), true);
 
+    // IQs must have only one child element
     const QByteArray xmlMultipleElements(
         "<iq id=\"get-data-1\" "
         "to=\"ladymacbeth@shakespeare.lit/castle\" "
@@ -178,7 +179,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "<data xmlns=\"urn:xmpp:bob\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
     QVERIFY(doc.setContent(xmlMultipleElements, true));
-    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), true);
+    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), false);
 
     const QByteArray xmlWithoutBobData(
         "<iq id=\"get-data-1\" "

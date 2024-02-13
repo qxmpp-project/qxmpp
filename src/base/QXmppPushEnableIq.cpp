@@ -8,8 +8,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppDataForm.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 class QXmppPushEnableIqPrivate : public QSharedData
 {
@@ -111,35 +114,28 @@ void QXmppPushEnableIq::setDataForm(const QXmppDataForm &form)
 ///
 bool QXmppPushEnableIq::isPushEnableIq(const QDomElement &element)
 {
-    auto childElement = element.firstChildElement();
-    return childElement.namespaceURI() == ns_push &&
-        (childElement.tagName() == QStringLiteral("enable") || childElement.tagName() == QStringLiteral("disable"));
+    return isIqType(element, u"enable", ns_push) || isIqType(element, u"disable", ns_push);
 }
 
 /// \cond
 void QXmppPushEnableIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement childElement = element.firstChildElement();
-    while (!childElement.isNull()) {
-        if (childElement.namespaceURI() == ns_push) {
-            if (childElement.tagName() == QStringLiteral("enable")) {
-                d->mode = Enable;
+    if (childElement.namespaceURI() == ns_push) {
+        if (childElement.tagName() == u"enable") {
+            d->mode = Enable;
 
-                auto dataFormElement = childElement.firstChildElement("x");
-                if (!dataFormElement.isNull() && dataFormElement.namespaceURI() == ns_data) {
-                    QXmppDataForm dataForm;
-                    dataForm.parse(dataFormElement);
-                    d->dataForm = dataForm;
-                }
-            } else {
-                d->mode = Disable;
+            auto dataFormElement = firstChildElement(childElement, u"x", ns_data);
+            if (!dataFormElement.isNull()) {
+                QXmppDataForm dataForm;
+                dataForm.parse(dataFormElement);
+                d->dataForm = dataForm;
             }
-            d->jid = childElement.attribute(QStringLiteral("jid"));
-            d->node = childElement.attribute(QStringLiteral("node"));
-            break;
+        } else {
+            d->mode = Disable;
         }
-
-        childElement = childElement.nextSiblingElement();
+        d->jid = childElement.attribute(QStringLiteral("jid"));
+        d->node = childElement.attribute(QStringLiteral("node"));
     }
 }
 

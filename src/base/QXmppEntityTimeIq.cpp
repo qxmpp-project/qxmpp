@@ -53,14 +53,13 @@ void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
 ///
 bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 {
-    QDomElement timeElement = element.firstChildElement("time");
-    return timeElement.namespaceURI() == ns_entity_time;
+    return isIqType(element, u"time", ns_entity_time);
 }
 
 /// \cond
 bool QXmppEntityTimeIq::checkIqType(const QString &tagName, const QString &xmlns)
 {
-    return tagName == QStringLiteral("time") && xmlns == ns_entity_time;
+    return tagName == u"time" && xmlns == ns_entity_time;
 }
 
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)

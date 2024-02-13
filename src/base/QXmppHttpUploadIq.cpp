@@ -5,11 +5,14 @@
 #include "QXmppHttpUploadIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QSharedData>
 #include <QUrl>
+
+using namespace QXmpp::Private;
 
 class QXmppHttpUploadRequestIqPrivate : public QSharedData
 {
@@ -90,11 +93,7 @@ void QXmppHttpUploadRequestIq::setContentType(const QMimeType &type)
 ///
 bool QXmppHttpUploadRequestIq::isHttpUploadRequestIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement request = element.firstChildElement("request");
-        return !request.isNull() && request.namespaceURI() == ns_http_upload;
-    }
-    return false;
+    return isIqType(element, u"request", ns_http_upload);
 }
 
 /// \cond
@@ -213,11 +212,7 @@ void QXmppHttpUploadSlotIq::setPutHeaders(const QMap<QString, QString> &putHeade
 ///
 bool QXmppHttpUploadSlotIq::isHttpUploadSlotIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement slot = element.firstChildElement("slot");
-        return !slot.isNull() && slot.namespaceURI() == ns_http_upload;
-    }
-    return false;
+    return isIqType(element, u"slot", ns_http_upload);
 }
 
 /// \cond

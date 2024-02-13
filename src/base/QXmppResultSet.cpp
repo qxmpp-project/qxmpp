@@ -100,7 +100,7 @@ bool QXmppResultSetQuery::isNull() const
 /// \cond
 void QXmppResultSetQuery::parse(const QDomElement &element)
 {
-    QDomElement setElement = (element.tagName() == QStringLiteral("set")) ? element : element.firstChildElement(QStringLiteral("set"));
+    QDomElement setElement = (element.tagName() == u"set") ? element : element.firstChildElement(QStringLiteral("set"));
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
         m_max = setElement.firstChildElement(QStringLiteral("max")).text().toInt(&ok);

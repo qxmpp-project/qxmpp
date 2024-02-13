@@ -6,6 +6,7 @@
 
 #include "QXmppIqHandling.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QStringBuilder>
@@ -28,7 +29,7 @@ static void makeUnique(T &vec)
 static QVector<QString> parseItems(const QDomElement &el)
 {
     QVector<QString> jids;
-    for (auto item = el.firstChildElement("item");
+    for (auto item = firstChildElement(el, u"item");
          !item.isNull();
          item = item.nextSiblingElement("item")) {
         jids.append(item.attribute("jid"));

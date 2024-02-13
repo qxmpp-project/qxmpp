@@ -105,7 +105,7 @@ void QXmppRosterIq::setMixAnnotate(bool mixAnnotate)
 /// \cond
 bool QXmppRosterIq::isRosterIq(const QDomElement &element)
 {
-    return (element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_roster);
+    return isIqType(element, u"query", ns_roster);
 }
 
 void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
@@ -121,8 +121,7 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
         itemElement = itemElement.nextSiblingElement(QStringLiteral("item"));
     }
 
-    QDomElement annotateElement = queryElement.firstChildElement(QStringLiteral("annotate"));
-    setMixAnnotate(!annotateElement.isNull() && annotateElement.namespaceURI() == ns_mix_roster);
+    setMixAnnotate(!firstChildElement(queryElement, u"annotate", ns_mix_roster).isNull());
 }
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

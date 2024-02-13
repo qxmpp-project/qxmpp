@@ -981,9 +981,9 @@ void QXmppVCardIq::setOrganization(const QXmppVCardOrganization &org)
 }
 
 /// \cond
-bool QXmppVCardIq::isVCard(const QDomElement &nodeRecv)
+bool QXmppVCardIq::isVCard(const QDomElement &el)
 {
-    return nodeRecv.firstChildElement(QStringLiteral("vCard")).namespaceURI() == ns_vcard;
+    return isIqType(el, u"vCard", ns_vcard);
 }
 
 bool QXmppVCardIq::checkIqType(const QString &tagName, const QString &xmlNamespace)

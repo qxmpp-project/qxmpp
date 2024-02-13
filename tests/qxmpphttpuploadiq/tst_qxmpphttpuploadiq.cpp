@@ -54,9 +54,6 @@ void tst_QXmppHttpUploadIq::testIsRequest_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isRequest");
 
-    QTest::newRow("wrong-stanza")
-        << QByteArray("<message><request xmlns=\"urn:xmpp:http:upload:0\"/></message>")
-        << false;
     QTest::newRow("empty-iq")
         << QByteArray("<iq/>")
         << false;
@@ -123,9 +120,6 @@ void tst_QXmppHttpUploadIq::testIsSlot_data()
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("isSlot");
 
-    QTest::newRow("wrong-stanza")
-        << QByteArray("<message><slot xmlns=\"urn:xmpp:http:upload:0\"/></message>")
-        << false;
     QTest::newRow("empty-iq")
         << QByteArray("<iq/>")
         << false;

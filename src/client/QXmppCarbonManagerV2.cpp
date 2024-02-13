@@ -8,6 +8,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppMessage.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QStringBuilder>
@@ -36,38 +37,11 @@ public:
     }
 };
 
-auto firstXmlnsElement(const QDomElement &el, const char *xmlns)
-{
-    for (auto child = el.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (child.namespaceURI() == xmlns) {
-            return child;
-        }
-    }
-    return QDomElement();
-}
-
-auto firstChildElement(const QDomElement &el, const char *tagName, const char *xmlns)
-{
-    for (auto child = el.firstChild();
-         !child.isNull();
-         child = child.nextSibling()) {
-        if (child.isElement() && child.namespaceURI() == xmlns) {
-            auto childEl = child.toElement();
-            if (childEl.tagName() == tagName) {
-                return childEl;
-            }
-        }
-    }
-    return QDomElement();
-}
-
 auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optional<QXmppError>
 {
     if (auto el = std::get_if<QDomElement>(&sendResult)) {
         auto iqType = el->attribute(QStringLiteral("type"));
-        if (iqType == "result") {
+        if (iqType == u"result") {
             return {};
         }
         QXmppIq iq;
@@ -116,12 +90,12 @@ QXmppCarbonManagerV2::~QXmppCarbonManagerV2() = default;
 
 bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &)
 {
-    if (element.tagName() != "message") {
+    if (element.tagName() != u"message") {
         return false;
     }
 
-    auto carbon = firstXmlnsElement(element, ns_carbons);
-    if (carbon.isNull() || (carbon.tagName() != "sent" && carbon.tagName() != "received")) {
+    auto carbon = firstChildElement(element, {}, ns_carbons);
+    if (carbon.isNull() || (carbon.tagName() != u"sent" && carbon.tagName() != u"received")) {
         return false;
     }
 
@@ -133,8 +107,8 @@ bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::o
         return false;
     }
 
-    auto forwarded = firstChildElement(carbon, "forwarded", ns_forwarding);
-    auto messageElement = firstChildElement(forwarded, "message", ns_client);
+    auto forwarded = firstChildElement(carbon, u"forwarded", ns_forwarding);
+    auto messageElement = firstChildElement(forwarded, u"message", ns_client);
     if (messageElement.isNull()) {
         return false;
     }

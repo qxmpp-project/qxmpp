@@ -15,6 +15,7 @@
 #include "QXmppPubSubSubscription.h"
 #include "QXmppStanza.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 
@@ -974,22 +975,20 @@ QStringList QXmppPubSubManager::discoveryFeatures() const
 
 bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "message") {
+    if (element.tagName() != u"message") {
         return false;
     }
-    for (auto event = element.firstChildElement("event");
-         !event.isNull();
-         event = event.nextSiblingElement("event")) {
-        if (event.namespaceURI() == ns_pubsub_event) {
-            const auto service = element.attribute("from");
-            const auto node = event.firstChildElement().attribute("node");
 
-            const auto extensions = client()->extensions();
-            for (auto *extension : extensions) {
-                if (auto *eventHandler = dynamic_cast<QXmppPubSubEventHandler *>(extension)) {
-                    if (eventHandler->handlePubSubEvent(element, service, node)) {
-                        return true;
-                    }
+    auto event = firstChildElement(element, u"event", ns_pubsub_event);
+    if (!event.isNull()) {
+        const auto service = element.attribute("from");
+        const auto node = event.firstChildElement().attribute("node");
+
+        const auto extensions = client()->extensions();
+        for (auto *extension : extensions) {
+            if (auto *eventHandler = dynamic_cast<QXmppPubSubEventHandler *>(extension)) {
+                if (eventHandler->handlePubSubEvent(element, service, node)) {
+                    return true;
                 }
             }
         }

@@ -6,9 +6,12 @@
 #include "QXmppIbbIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppIbbOpenIq
@@ -62,8 +65,7 @@ void QXmppIbbOpenIq::setSid(const QString &sid)
 /// \cond
 bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("open");
-    return openElement.namespaceURI() == ns_ibb;
+    return isIqType(element, u"open", ns_ibb);
 }
 
 void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
@@ -117,8 +119,7 @@ void QXmppIbbCloseIq::setSid(const QString &sid)
 /// \cond
 bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("close");
-    return openElement.namespaceURI() == ns_ibb;
+    return isIqType(element, u"close", ns_ibb);
 }
 
 void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
@@ -210,8 +211,7 @@ void QXmppIbbDataIq::setPayload(const QByteArray &data)
 /// \cond
 bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
 {
-    QDomElement dataElement = element.firstChildElement("data");
-    return dataElement.namespaceURI() == ns_ibb;
+    return isIqType(element, u"data", ns_ibb);
 }
 
 void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
