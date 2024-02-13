@@ -552,9 +552,15 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
     } else if (ns == ns_stream && nodeRecv.tagName() == "error") {
         // handle redirects
         const auto otherHost = nodeRecv.firstChildElement("see-other-host");
-        if (!otherHost.isNull() && setResumeAddress(otherHost.text())) {
-            QXmppStream::disconnectFromHost();
-            return;
+        if (!otherHost.isNull()) {
+            // try to parse address
+            if (auto [host, port] = parseHostAddress(otherHost.text()); !host.isEmpty()) {
+                d->redirectHost = host;
+                d->redirectPort = port > 0 ? port : 5222;
+
+                QXmppStream::disconnectFromHost();
+                return;
+            }
         }
 
         if (!nodeRecv.firstChildElement("conflict").isNull()) {
