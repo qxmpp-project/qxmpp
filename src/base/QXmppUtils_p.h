@@ -17,6 +17,16 @@ class QXmlStreamWriter;
 
 namespace QXmpp::Private {
 
+// Helper for Q(Any)StringView overloads that were added later
+inline auto toString65(QStringView s)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    return s;
+#else
+    return s.toString();
+#endif
+}
+
 // XML streams
 void writeOptionalXmlAttribute(QXmlStreamWriter *stream, const QString &name, const QString &value);
 void writeXmlTextElement(QXmlStreamWriter *stream, const QString &name, const QString &value);
