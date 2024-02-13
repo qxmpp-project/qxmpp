@@ -435,8 +435,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 ///
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement();
-    return checkIqType(queryElement.tagName(), queryElement.namespaceURI());
+    return isIqType(element, u"query", ns_disco_info) || isIqType(element, u"query", ns_disco_items);
 }
 
 /// \cond
@@ -448,7 +447,7 @@ bool QXmppDiscoveryIq::checkIqType(const QString &tagName, const QString &xmlNam
 
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement queryElement = firstChildElement(element, u"query");
     d->queryNode = queryElement.attribute("node");
     if (queryElement.namespaceURI() == ns_disco_items) {
         d->queryType = ItemsQuery;

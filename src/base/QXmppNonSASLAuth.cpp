@@ -6,10 +6,13 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppNonSASLAuthIq
@@ -93,8 +96,7 @@ void QXmppNonSASLAuthIq::setResource(const QString &resource)
 /// \cond
 bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    return queryElement.namespaceURI() == ns_auth;
+    return isIqType(element, u"query", ns_auth);
 }
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)

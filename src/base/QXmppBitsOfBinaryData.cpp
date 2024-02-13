@@ -166,7 +166,7 @@ void QXmppBitsOfBinaryData::setData(const QByteArray &data)
 ///
 bool QXmppBitsOfBinaryData::isBitsOfBinaryData(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("data") && element.namespaceURI() == ns_bob;
+    return element.tagName() == u"data" && element.namespaceURI() == ns_bob;
 }
 
 /// \cond

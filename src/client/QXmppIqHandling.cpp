@@ -33,7 +33,7 @@ std::tuple<bool, QString, QString> QXmpp::Private::checkIsIqRequest(const QDomEl
     }
     auto queryElement = el.firstChildElement();
     auto iqType = el.attribute(QStringLiteral("type"));
-    if (iqType != QStringLiteral("get") && iqType != QStringLiteral("set")) {
+    if (iqType != u"get" && iqType != u"set") {
         return { false, {}, {} };
     }
     return { true, queryElement.tagName(), queryElement.namespaceURI() };

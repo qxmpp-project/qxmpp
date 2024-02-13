@@ -415,8 +415,7 @@ void QXmppExternalServiceDiscoveryIq::addExternalService(const QXmppExternalServ
 ///
 bool QXmppExternalServiceDiscoveryIq::isExternalServiceDiscoveryIq(const QDomElement &element)
 {
-    auto child = element.firstChildElement();
-    return checkIqType(child.tagName(), child.namespaceURI());
+    return isIqType(element, u"services", ns_external_service_discovery);
 }
 
 ///

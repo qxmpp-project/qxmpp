@@ -65,8 +65,7 @@ void QXmppVersionIq::setVersion(const QString &version)
 /// \cond
 bool QXmppVersionIq::isVersionIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    return queryElement.namespaceURI() == ns_version;
+    return isIqType(element, u"query", ns_version);
 }
 
 bool QXmppVersionIq::checkIqType(const QString &tagName, const QString &xmlNamespace)

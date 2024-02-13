@@ -5,9 +5,12 @@
 #include "QXmppBitsOfBinaryIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 ///
 /// \class QXmppBitsOfBinaryIq
@@ -30,26 +33,15 @@ QXmppBitsOfBinaryIq::~QXmppBitsOfBinaryIq() = default;
 ///
 bool QXmppBitsOfBinaryIq::isBitsOfBinaryIq(const QDomElement &element)
 {
-    for (auto child = element.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child)) {
-            return true;
-        }
-    }
-    return false;
+    return isIqType(element, u"data", ns_bob);
 }
 
 /// \cond
 void QXmppBitsOfBinaryIq::parseElementFromChild(const QDomElement &element)
 {
-    for (auto child = element.firstChildElement();
-         !child.isNull();
-         child = child.nextSiblingElement()) {
-        if (QXmppBitsOfBinaryData::isBitsOfBinaryData(child)) {
-            QXmppBitsOfBinaryData::parseElementFromChild(child);
-            break;
-        }
+    auto child = firstChildElement(element, u"data", ns_bob);
+    if (!child.isNull()) {
+        QXmppBitsOfBinaryData::parseElementFromChild(child);
     }
 }
 

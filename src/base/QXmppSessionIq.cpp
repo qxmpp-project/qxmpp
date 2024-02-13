@@ -7,21 +7,22 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp::Private;
+
 /// \cond
 bool QXmppSessionIq::isSessionIq(const QDomElement &element)
 {
-    QDomElement sessionElement = element.firstChildElement(QStringLiteral("session"));
-    return (sessionElement.namespaceURI() == ns_session);
+    return isIqType(element, u"session", ns_session);
 }
 
 void QXmppSessionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QStringLiteral("session"));
-    ;
     writer->writeDefaultNamespace(ns_session);
     writer->writeEndElement();
 }

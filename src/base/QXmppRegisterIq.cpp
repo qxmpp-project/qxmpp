@@ -7,9 +7,12 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QSharedData>
+
+using namespace QXmpp::Private;
 
 #define ELEMENT_REGISTERED QStringLiteral("registered")
 #define ELEMENT_REMOVE QStringLiteral("remove")
@@ -266,7 +269,7 @@ void QXmppRegisterIq::setOutOfBandUrl(const QString &outOfBandUrl)
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
-    return (element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_register);
+    return isIqType(element, u"query", ns_register);
 }
 
 void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
@@ -277,14 +280,11 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
     d->password = queryElement.firstChildElement(QStringLiteral("password")).text();
     d->email = queryElement.firstChildElement(QStringLiteral("email")).text();
 
-    for (auto xElement = queryElement.firstChildElement(QStringLiteral("x"));
-         !xElement.isNull();
-         xElement = xElement.nextSiblingElement(QStringLiteral("x"))) {
-        if (xElement.namespaceURI() == ns_data) {
-            d->form.parse(xElement);
-        } else if (xElement.namespaceURI() == ns_oob) {
-            d->outOfBandUrl = xElement.firstChildElement(QStringLiteral("url")).text();
-        }
+    if (auto formEl = firstChildElement(queryElement, u"x", ns_data); !formEl.isNull()) {
+        d->form.parse(formEl);
+    }
+    if (auto oobEl = firstChildElement(queryElement, u"x", ns_oob); !oobEl.isNull()) {
+        d->outOfBandUrl = oobEl.firstChildElement(QStringLiteral("url")).text();
     }
 
     d->isRegistered = !queryElement.firstChildElement(ELEMENT_REGISTERED).isNull();

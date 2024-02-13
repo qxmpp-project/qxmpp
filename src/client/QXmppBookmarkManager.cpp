@@ -9,8 +9,11 @@
 #include "QXmppConstants_p.h"
 #include "QXmppIq.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 // The QXmppPrivateStorageIq class represents an XML private storage IQ
 // as defined by XEP-0049: Private XML Storage.
@@ -45,9 +48,8 @@ void QXmppPrivateStorageIq::setBookmarks(const QXmppBookmarkSet &bookmarks)
 
 bool QXmppPrivateStorageIq::isPrivateStorageIq(const QDomElement &element)
 {
-    const QDomElement queryElement = element.firstChildElement("query");
-    return queryElement.namespaceURI() == ns_private &&
-        QXmppBookmarkSet::isBookmarkSet(queryElement.firstChildElement());
+    return isIqType(element, u"query", ns_private) &&
+        QXmppBookmarkSet::isBookmarkSet(element.firstChildElement().firstChildElement());
 }
 
 void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)

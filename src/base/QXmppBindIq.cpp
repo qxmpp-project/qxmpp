@@ -51,15 +51,14 @@ void QXmppBindIq::setResource(const QString &resource)
 /// \cond
 bool QXmppBindIq::isBindIq(const QDomElement &element)
 {
-    QDomElement bindElement = element.firstChildElement(QStringLiteral("bind"));
-    return (bindElement.namespaceURI() == ns_bind);
+    return isIqType(element, u"bind", ns_bind);
 }
 
 void QXmppBindIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement bindElement = element.firstChildElement(QStringLiteral("bind"));
-    m_jid = bindElement.firstChildElement(QStringLiteral("jid")).text();
-    m_resource = bindElement.firstChildElement(QStringLiteral("resource")).text();
+    QDomElement bindElement = firstChildElement(element, u"bind");
+    m_jid = firstChildElement(bindElement, u"jid").text();
+    m_resource = firstChildElement(bindElement, u"resource").text();
 }
 
 void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

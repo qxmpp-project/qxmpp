@@ -5,8 +5,11 @@
 #include "QXmppMamIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 class QXmppMamQueryIqPrivate : public QSharedData
 {
@@ -119,13 +122,7 @@ void QXmppMamQueryIq::setQueryId(const QString &id)
 /// \cond
 bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 {
-    if (element.tagName() == QStringLiteral("iq")) {
-        QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-        if (!queryElement.isNull() && queryElement.namespaceURI() == ns_mam) {
-            return true;
-        }
-    }
-    return false;
+    return isIqType(element, u"query", ns_mam);
 }
 
 void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)

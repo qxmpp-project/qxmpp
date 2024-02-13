@@ -6,11 +6,13 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
+
+using namespace QXmpp::Private;
 
 QXmppCarbonManager::QXmppCarbonManager()
     : m_carbonsEnabled(false)
@@ -66,18 +68,18 @@ QStringList QXmppCarbonManager::discoveryFeatures() const
 
 bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "message") {
+    if (element.tagName() != u"message") {
         return false;
     }
 
     bool sent = true;
-    QDomElement carbon = element.firstChildElement("sent");
+    QDomElement carbon = firstChildElement(element, u"sent", ns_carbons);
     if (carbon.isNull()) {
-        carbon = element.firstChildElement("received");
+        carbon = firstChildElement(element, u"received", ns_carbons);
         sent = false;
     }
 
-    if (carbon.isNull() || carbon.namespaceURI() != ns_carbons) {
+    if (carbon.isNull()) {
         return false;
     }
 
@@ -87,8 +89,8 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
         return false;
     }
 
-    auto forwarded = carbon.firstChildElement("forwarded");
-    auto messageElement = forwarded.firstChildElement("message");
+    auto forwarded = firstChildElement(carbon, u"forwarded", ns_forwarding);
+    auto messageElement = firstChildElement(forwarded, u"message", ns_client);
     if (messageElement.isNull()) {
         return false;
     }

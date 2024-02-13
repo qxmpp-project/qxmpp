@@ -844,8 +844,8 @@ void QXmppDataForm::parse(const QDomElement &element)
         }
 
         /* field media */
-        if (const auto mediaElement = fieldElement.firstChildElement("media");
-            mediaElement.namespaceURI() == ns_media_element) {
+        if (const auto mediaElement = firstChildElement(fieldElement, u"media", ns_media_element);
+            !mediaElement.isNull()) {
             field.mediaSize().setHeight(mediaElement.attribute("height", "-1").toInt());
             field.mediaSize().setWidth(mediaElement.attribute("width", "-1").toInt());
 
