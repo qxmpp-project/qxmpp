@@ -11,9 +11,10 @@
 
 namespace QXmpp::Private {
 
-std::optional<EncryptionMethod> encryptionFromString(const QString &str);
-QString encryptionToString(EncryptionMethod);
-QString encryptionToName(EncryptionMethod);
+// Encryption enum
+std::optional<EncryptionMethod> encryptionFromString(QStringView str);
+QStringView encryptionToString(EncryptionMethod);
+QStringView encryptionToName(EncryptionMethod);
 
 }  // namespace QXmpp::Private
 

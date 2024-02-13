@@ -8,6 +8,7 @@
 
 #include "QXmppGlobal.h"
 
+#include <array>
 #include <stdint.h>
 
 #include <QByteArray>
@@ -16,6 +17,22 @@ class QDomElement;
 class QXmlStreamWriter;
 
 namespace QXmpp::Private {
+
+// std::array helper
+namespace detail {
+    template<class T, std::size_t N, std::size_t... I>
+    constexpr std::array<std::remove_cv_t<T>, N>
+    to_array_impl(T (&&a)[N], std::index_sequence<I...>)
+    {
+        return { { std::move(a[I])... } };
+    }
+}  // namespace detail
+
+template<class T, std::size_t N>
+constexpr std::array<std::remove_cv_t<T>, N> to_array(T (&&a)[N])
+{
+    return detail::to_array_impl(std::move(a), std::make_index_sequence<N> {});
+}
 
 // Helper for Q(Any)StringView overloads that were added later
 inline auto toString65(QStringView s)

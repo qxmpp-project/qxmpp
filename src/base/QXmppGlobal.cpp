@@ -4,48 +4,51 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal_p.h"
+#include "QXmppUtils_p.h"
 
-#include <QList>
+#include <array>
+
+using namespace QXmpp::Private;
 
 /// \cond
-static const QStringList ENCRYPTION_NAMESPACES = {
-    QString(),
-    QString(),
+constexpr auto ENCRYPTION_NAMESPACES = to_array<QStringView>({
+    {},
+    {},
     ns_otr,
     ns_legacy_openpgp,
     ns_ox,
     ns_omemo,
     ns_omemo_1,
-    ns_omemo_2
-};
+    ns_omemo_2,
+});
 
-static const QStringList ENCRYPTION_NAMES = {
-    QString(),
-    QString(),
-    QStringLiteral("OTR"),
-    QStringLiteral("Legacy OpenPGP"),
-    QStringLiteral("OpenPGP for XMPP (OX)"),
-    QStringLiteral("OMEMO"),
-    QStringLiteral("OMEMO 1"),
-    QStringLiteral("OMEMO 2")
-};
+constexpr auto ENCRYPTION_NAMES = to_array<QStringView>({
+    {},
+    {},
+    u"OTR",
+    u"Legacy OpenPGP",
+    u"OpenPGP for XMPP (OX)",
+    u"OMEMO",
+    u"OMEMO 1",
+    u"OMEMO 2",
+});
 
-std::optional<QXmpp::EncryptionMethod> QXmpp::Private::encryptionFromString(const QString &str)
+std::optional<QXmpp::EncryptionMethod> QXmpp::Private::encryptionFromString(QStringView str)
 {
-    int index = ENCRYPTION_NAMESPACES.indexOf(str);
-    if (index < 0) {
-        return {};
+    auto itr = std::find(ENCRYPTION_NAMESPACES.begin(), ENCRYPTION_NAMESPACES.end(), str);
+    if (itr != ENCRYPTION_NAMESPACES.end()) {
+        return QXmpp::EncryptionMethod(std::distance(ENCRYPTION_NAMESPACES.begin(), itr));
     }
-    return QXmpp::EncryptionMethod(index);
+    return {};
 }
 
-QString QXmpp::Private::encryptionToString(EncryptionMethod encryption)
+QStringView QXmpp::Private::encryptionToString(EncryptionMethod encryption)
 {
-    return ENCRYPTION_NAMESPACES.at(int(encryption));
+    return ENCRYPTION_NAMESPACES[std::size_t(encryption)];
 }
 
-QString QXmpp::Private::encryptionToName(EncryptionMethod encryption)
+QStringView QXmpp::Private::encryptionToName(EncryptionMethod encryption)
 {
-    return ENCRYPTION_NAMES.at(int(encryption));
+    return ENCRYPTION_NAMES[std::size_t(encryption)];
 }
 /// \endcond

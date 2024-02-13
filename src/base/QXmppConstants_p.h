@@ -5,6 +5,8 @@
 #ifndef QXMPPCONSTANTS_H
 #define QXMPPCONSTANTS_H
 
+#include <QStringView>
+
 //
 //  W A R N I N G
 //  -------------
@@ -32,7 +34,7 @@ extern const char *ns_rpc;
 // XEP-0020: Feature Negotiation
 extern const char *ns_feature_negotiation;
 // XEP-0027: Current Jabber OpenPGP Usage
-extern const char *ns_legacy_openpgp;
+inline constexpr QStringView ns_legacy_openpgp = u"jabber:x:encrypted";
 // XEP-0030: Service Discovery
 extern const char *ns_disco_info;
 extern const char *ns_disco_items;
@@ -181,7 +183,7 @@ extern const char *ns_sid;
 // XEP-0363: HTTP File Upload
 extern const char *ns_http_upload;
 // XEP-0364: Current Off-the-Record Messaging Usage
-extern const char *ns_otr;
+inline constexpr QStringView ns_otr = u"urn:xmpp:otr:0";
 // XEP-0367: Message Attaching
 extern const char *ns_message_attaching;
 // XEP-0369: Mediated Information eXchange (MIX)
@@ -194,17 +196,17 @@ extern const char *ns_mix_node_presence;
 extern const char *ns_mix_node_config;
 extern const char *ns_mix_node_info;
 // XEP-0373: OpenPGP for XMPP
-extern const char *ns_ox;
+inline constexpr QStringView ns_ox = u"urn:xmpp:openpgp:0";
 // XEP-0380: Explicit Message Encryption
 extern const char *ns_eme;
 // XEP-0382: Spoiler messages
 extern const char *ns_spoiler;
 // XEP-0384: OMEMO Encryption
-extern const char *ns_omemo;
-extern const char *ns_omemo_1;
-extern const char *ns_omemo_2;
-extern const char *ns_omemo_2_bundles;
-extern const char *ns_omemo_2_devices;
+inline constexpr QStringView ns_omemo = u"eu.siacs.conversations.axolotl";
+inline constexpr QStringView ns_omemo_1 = u"urn:xmpp:omemo:1";
+inline constexpr QStringView ns_omemo_2 = u"urn:xmpp:omemo:2";
+inline constexpr QStringView ns_omemo_2_bundles = u"urn:xmpp:omemo:2:bundles";
+inline constexpr QStringView ns_omemo_2_devices = u"urn:xmpp:omemo:2:devices";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 extern const char *ns_mix_pam;
 extern const char *ns_mix_roster;
