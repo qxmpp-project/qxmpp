@@ -324,9 +324,8 @@ void QXmppStream::processData(const QString &data)
     static const QRegularExpression streamStartRegex(QStringLiteral(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"));
     static const QRegularExpression streamEndRegex(QStringLiteral("</stream:stream>$"));
 
-    QRegularExpressionMatch streamOpenMatch;
-    bool hasStreamOpen = d->streamOpenElement.isEmpty() &&
-        (streamOpenMatch = streamStartRegex.match(d->dataBuffer)).hasMatch();
+    auto streamOpenMatch = streamStartRegex.match(d->dataBuffer);
+    bool hasStreamOpen = streamOpenMatch.hasMatch();
 
     bool hasStreamClose = streamEndRegex.match(d->dataBuffer).hasMatch();
 
