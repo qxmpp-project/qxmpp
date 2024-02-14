@@ -34,6 +34,11 @@ public:
         Q_EMIT stanzaReceived(element);
     }
 
+    void processData(const QString &data)
+    {
+        xmppSocket().processData(data);
+    }
+
     Q_SIGNAL void started();
     Q_SIGNAL void streamReceived(const QDomElement &element);
     Q_SIGNAL void stanzaReceived(const QDomElement &element);
