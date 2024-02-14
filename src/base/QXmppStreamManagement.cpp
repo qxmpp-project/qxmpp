@@ -317,36 +317,38 @@ void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
     writer->writeEndElement();
 }
 
-QXmppStreamManager::QXmppStreamManager(QXmppStream *stream)
+namespace QXmpp::Private {
+
+StreamAckManager::StreamAckManager(QXmppStream *stream)
     : stream(stream)
 {
 }
 
-QXmppStreamManager::~QXmppStreamManager()
+StreamAckManager::~StreamAckManager()
 {
 }
 
-bool QXmppStreamManager::enabled() const
+bool StreamAckManager::enabled() const
 {
     return m_enabled;
 }
 
-unsigned int QXmppStreamManager::lastIncomingSequenceNumber() const
+unsigned int StreamAckManager::lastIncomingSequenceNumber() const
 {
     return m_lastIncomingSequenceNumber;
 }
 
-void QXmppStreamManager::handleDisconnect()
+void StreamAckManager::handleDisconnect()
 {
     m_enabled = false;
 }
 
-void QXmppStreamManager::handleStart()
+void StreamAckManager::handleStart()
 {
     m_enabled = false;
 }
 
-void QXmppStreamManager::handlePacketSent(QXmppPacket &packet, bool sentData)
+void StreamAckManager::handlePacketSent(QXmppPacket &packet, bool sentData)
 {
     if (m_enabled && packet.isXmppStanza()) {
         m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
@@ -362,7 +364,7 @@ void QXmppStreamManager::handlePacketSent(QXmppPacket &packet, bool sentData)
     }
 }
 
-bool QXmppStreamManager::handleStanza(const QDomElement &stanza)
+bool StreamAckManager::handleStanza(const QDomElement &stanza)
 {
     if (QXmppStreamManagementAck::isStreamManagementAck(stanza)) {
         handleAcknowledgement(stanza);
@@ -381,7 +383,7 @@ bool QXmppStreamManager::handleStanza(const QDomElement &stanza)
     return false;
 }
 
-void QXmppStreamManager::enableStreamManagement(bool resetSequenceNumber)
+void StreamAckManager::enableStreamManagement(bool resetSequenceNumber)
 {
     m_enabled = true;
 
@@ -413,7 +415,7 @@ void QXmppStreamManager::enableStreamManagement(bool resetSequenceNumber)
     }
 }
 
-void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumber)
+void StreamAckManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumber)
 {
     for (auto it = m_unacknowledgedStanzas.begin(); it != m_unacknowledgedStanzas.end();) {
         if (it.key() <= sequenceNumber) {
@@ -425,7 +427,7 @@ void QXmppStreamManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumb
     }
 }
 
-void QXmppStreamManager::handleAcknowledgement(const QDomElement &element)
+void StreamAckManager::handleAcknowledgement(const QDomElement &element)
 {
     if (!m_enabled) {
         return;
@@ -436,7 +438,7 @@ void QXmppStreamManager::handleAcknowledgement(const QDomElement &element)
     setAcknowledgedSequenceNumber(ack.seqNo());
 }
 
-void QXmppStreamManager::sendAcknowledgement()
+void StreamAckManager::sendAcknowledgement()
 {
     if (!m_enabled) {
         return;
@@ -445,7 +447,7 @@ void QXmppStreamManager::sendAcknowledgement()
     stream->sendData(serializeNonza(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
 }
 
-void QXmppStreamManager::sendAcknowledgementRequest()
+void StreamAckManager::sendAcknowledgementRequest()
 {
     if (!m_enabled) {
         return;
@@ -460,7 +462,7 @@ void QXmppStreamManager::sendAcknowledgementRequest()
     stream->sendData(data);
 }
 
-void QXmppStreamManager::resetCache()
+void StreamAckManager::resetCache()
 {
     for (auto &packet : m_unacknowledgedStanzas) {
         packet.reportFinished(QXmppError {
@@ -470,4 +472,6 @@ void QXmppStreamManager::resetCache()
 
     m_unacknowledgedStanzas.clear();
 }
+
+}  // namespace QXmpp::Private
 /// \endcond

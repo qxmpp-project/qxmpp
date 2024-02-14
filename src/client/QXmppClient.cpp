@@ -364,7 +364,7 @@ void QXmppClient::connectToServer(const QXmppConfiguration &config,
 {
     // reset package cache from last connection
     if (d->stream->configuration().jidBare() != config.jidBare()) {
-        d->stream->streamManager().resetCache();
+        d->stream->streamAckManager().resetCache();
     }
 
     d->stream->configuration() = config;
