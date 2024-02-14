@@ -31,12 +31,14 @@ class QXmppPacket;
 class QXmppStanza;
 class QXmppStreamManager;
 class QXmppStreamPrivate;
+class TestStream;
 
 namespace QXmpp::Private {
 
+class XmppSocket;
 class StreamAckManager;
-struct IqState;
 class OutgoingIqManager;
+struct IqState;
 
 }  // namespace QXmpp::Private
 
@@ -61,6 +63,7 @@ public:
     QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
     QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
 
+    QXmpp::Private::XmppSocket &xmppSocket() const;
     QXmpp::Private::StreamAckManager &streamAckManager() const;
     QXmpp::Private::OutgoingIqManager &iqManager() const;
 
@@ -93,19 +96,14 @@ public Q_SLOTS:
     virtual void disconnectFromHost();
     virtual bool sendData(const QByteArray &);
 
-private Q_SLOTS:
-    void _q_socketConnected();
-    void _q_socketEncrypted();
-    void _q_socketError(QAbstractSocket::SocketError error);
-    void _q_socketReadyRead();
-
 private:
-    friend class QXmppStreamManager;
+    friend class QXmpp::Private::XmppSocket;
     friend class tst_QXmppStream;
     friend class TestClient;
 
+    void onStanzaReceived(const QDomElement &);
+
     QXmppTask<QXmpp::SendResult> send(QXmppPacket &&, bool &);
-    void processData(const QString &data);
 
     // for unit tests, see TestClient
     void enableStreamManagement(bool resetSequenceNumber);
@@ -137,6 +135,32 @@ private:
 
     QXmppLoggable *l;
     std::unordered_map<QString, IqState> m_requests;
+};
+
+class QXMPP_EXPORT XmppSocket
+{
+public:
+    XmppSocket(QXmppStream *q);
+
+    QSslSocket *socket() const { return m_socket; }
+    void setSocket(QSslSocket *socket);
+
+    bool isConnected() const;
+    void disconnectFromHost();
+    bool sendData(const QByteArray &);
+
+private:
+    void processData(const QString &data);
+
+    friend class ::TestStream;
+
+    QXmppStream *q;
+
+    QString m_dataBuffer;
+    QSslSocket *m_socket = nullptr;
+
+    // incoming stream state
+    QString m_streamOpenElement;
 };
 
 }  // namespace QXmpp::Private

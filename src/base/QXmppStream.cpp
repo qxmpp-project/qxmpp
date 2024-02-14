@@ -25,11 +25,7 @@ class QXmppStreamPrivate
 public:
     QXmppStreamPrivate(QXmppStream *stream);
 
-    QString dataBuffer;
-    QSslSocket *socket;
-
-    // incoming stream state
-    QString streamOpenElement;
+    XmppSocket socket;
 
     // stream management
     StreamAckManager streamAckManager;
@@ -39,7 +35,7 @@ public:
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
-    : socket(nullptr),
+    : socket(stream),
       streamAckManager(stream),
       iqManager(stream)
 {
@@ -83,16 +79,7 @@ QXmppStream::~QXmppStream()
 void QXmppStream::disconnectFromHost()
 {
     d->streamAckManager.handleDisconnect();
-
-    if (d->socket) {
-        if (d->socket->state() == QAbstractSocket::ConnectedState) {
-            sendData(QByteArrayLiteral("</stream:stream>"));
-            d->socket->flush();
-        }
-        // FIXME: according to RFC 6120 section 4.4, we should wait for
-        // the incoming stream to end before closing the socket
-        d->socket->disconnectFromHost();
-    }
+    d->socket.disconnectFromHost();
 }
 
 ///
@@ -104,8 +91,6 @@ void QXmppStream::disconnectFromHost()
 void QXmppStream::handleStart()
 {
     d->streamAckManager.handleStart();
-    d->dataBuffer.clear();
-    d->streamOpenElement.clear();
 }
 
 ///
@@ -113,8 +98,7 @@ void QXmppStream::handleStart()
 ///
 bool QXmppStream::isConnected() const
 {
-    return d->socket &&
-        d->socket->state() == QAbstractSocket::ConnectedState;
+    return d->socket.isConnected();
 }
 
 ///
@@ -124,11 +108,7 @@ bool QXmppStream::isConnected() const
 ///
 bool QXmppStream::sendData(const QByteArray &data)
 {
-    logSent(QString::fromUtf8(data));
-    if (!d->socket || d->socket->state() != QAbstractSocket::ConnectedState) {
-        return false;
-    }
-    return d->socket->write(data) == data.size();
+    return d->socket.sendData(data);
 }
 
 ///
@@ -229,6 +209,14 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
 }
 
 ///
+/// Returns access to the XMPP socket.
+///
+XmppSocket &QXmppStream::xmppSocket() const
+{
+    return d->socket;
+}
+
+///
 /// Returns the manager for Stream Management
 ///
 StreamAckManager &QXmppStream::streamAckManager() const
@@ -249,7 +237,7 @@ OutgoingIqManager &QXmppStream::iqManager() const
 ///
 QSslSocket *QXmppStream::socket() const
 {
-    return d->socket;
+    return d->socket.socket();
 }
 
 ///
@@ -257,42 +245,94 @@ QSslSocket *QXmppStream::socket() const
 ///
 void QXmppStream::setSocket(QSslSocket *socket)
 {
-    d->socket = socket;
-    if (!d->socket) {
+    d->socket.setSocket(socket);
+}
+
+void QXmppStream::onStanzaReceived(const QDomElement &stanza)
+{
+    // handle possible stream management packets first
+    if (streamAckManager().handleStanza(stanza) || iqManager().handleStanza(stanza)) {
         return;
     }
 
-    // socket events
-    connect(socket, &QAbstractSocket::connected, this, &QXmppStream::_q_socketConnected);
-    connect(socket, &QSslSocket::encrypted, this, &QXmppStream::_q_socketEncrypted);
-    connect(socket, &QSslSocket::errorOccurred, this, &QXmppStream::_q_socketError);
-    connect(socket, &QIODevice::readyRead, this, &QXmppStream::_q_socketReadyRead);
+    // process all other kinds of packets
+    handleStanza(stanza);
 }
 
-void QXmppStream::_q_socketConnected()
+void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
-    info(QStringLiteral("Socket connected to %1 %2").arg(d->socket->peerAddress().toString(), QString::number(d->socket->peerPort())));
-    handleStart();
+    d->streamAckManager.enableStreamManagement(resetSequenceNumber);
 }
 
-void QXmppStream::_q_socketEncrypted()
+bool QXmppStream::handleIqResponse(const QDomElement &stanza)
 {
-    debug(QStringLiteral("Socket encrypted"));
-    handleStart();
+    return d->iqManager.handleStanza(stanza);
 }
 
-void QXmppStream::_q_socketError(QAbstractSocket::SocketError socketError)
+namespace QXmpp::Private {
+
+XmppSocket::XmppSocket(QXmppStream *q)
+    : q(q)
 {
-    Q_UNUSED(socketError);
-    warning(QStringLiteral("Socket error: ") + socket()->errorString());
 }
 
-void QXmppStream::_q_socketReadyRead()
+void XmppSocket::setSocket(QSslSocket *socket)
 {
-    processData(QString::fromUtf8(d->socket->readAll()));
+    m_socket = socket;
+    if (!m_socket) {
+        return;
+    }
+
+    QObject::connect(socket, &QAbstractSocket::connected, q, [this]() {
+        q->info(QStringLiteral("Socket connected to %1 %2")
+                    .arg(m_socket->peerAddress().toString(),
+                         QString::number(m_socket->peerPort())));
+        m_dataBuffer.clear();
+        m_streamOpenElement.clear();
+        q->handleStart();
+    });
+    QObject::connect(socket, &QSslSocket::encrypted, q, [this]() {
+        q->debug(QStringLiteral("Socket encrypted"));
+        m_dataBuffer.clear();
+        m_streamOpenElement.clear();
+        q->handleStart();
+    });
+    QObject::connect(socket, &QSslSocket::errorOccurred, q, [this](QAbstractSocket::SocketError) {
+        q->warning(QStringLiteral("Socket error: ") + m_socket->errorString());
+    });
+    QObject::connect(socket, &QSslSocket::readyRead, q, [this]() {
+        processData(QString::fromUtf8(m_socket->readAll()));
+    });
 }
 
-void QXmppStream::processData(const QString &data)
+bool XmppSocket::isConnected() const
+{
+    return m_socket && m_socket->state() == QAbstractSocket::ConnectedState;
+}
+
+void XmppSocket::disconnectFromHost()
+{
+    if (m_socket) {
+        if (m_socket->state() == QAbstractSocket::ConnectedState) {
+            sendData(QByteArrayLiteral("</stream:stream>"));
+            m_socket->flush();
+        }
+        // FIXME: according to RFC 6120 section 4.4, we should wait for
+        // the incoming stream to end before closing the socket
+        m_socket->disconnectFromHost();
+    }
+}
+
+bool XmppSocket::sendData(const QByteArray &data)
+{
+    q->logSent(QString::fromUtf8(data));
+    if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState) {
+        return false;
+    }
+    return m_socket->write(data) == data.size();
+}
+
+void XmppSocket::processData(const QString &data)
 {
     // As we may only have partial XML content, we need to cache the received
     // data until it has been successfully parsed. In case it can't be parsed,
@@ -305,16 +345,16 @@ void QXmppStream::processData(const QString &data)
     // However, both issues could only be solved using an XML stream reader
     // which would cause many other problems since we don't actually use it for
     // parsing the content.
-    d->dataBuffer.append(data);
+    m_dataBuffer.append(data);
 
     //
     // Check for whitespace pings
     //
-    if (d->dataBuffer.isEmpty() || d->dataBuffer.trimmed().isEmpty()) {
-        d->dataBuffer.clear();
+    if (m_dataBuffer.isEmpty() || m_dataBuffer.trimmed().isEmpty()) {
+        m_dataBuffer.clear();
 
-        logReceived({});
-        handleStanza({});
+        q->logReceived({});
+        q->onStanzaReceived(QDomElement());
         return;
     }
 
@@ -324,10 +364,10 @@ void QXmppStream::processData(const QString &data)
     static const QRegularExpression streamStartRegex(QStringLiteral(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"));
     static const QRegularExpression streamEndRegex(QStringLiteral("</stream:stream>$"));
 
-    auto streamOpenMatch = streamStartRegex.match(d->dataBuffer);
+    auto streamOpenMatch = streamStartRegex.match(m_dataBuffer);
     bool hasStreamOpen = streamOpenMatch.hasMatch();
 
-    bool hasStreamClose = streamEndRegex.match(d->dataBuffer).hasMatch();
+    bool hasStreamClose = streamEndRegex.match(m_dataBuffer).hasMatch();
 
     //
     // The stream start/end and stanza packets can't be parsed without any
@@ -352,9 +392,9 @@ void QXmppStream::processData(const QString &data)
     // the stream is processed (before the stanzas are processed). In case we
     // received a </stream> closing tag, the connection is closed.
     //
-    auto wrappedStanzas = d->dataBuffer;
+    auto wrappedStanzas = m_dataBuffer;
     if (!hasStreamOpen) {
-        wrappedStanzas.prepend(d->streamOpenElement);
+        wrappedStanzas.prepend(m_streamOpenElement);
     }
     if (!hasStreamClose) {
         wrappedStanzas.append(QStringLiteral("</stream:stream>"));
@@ -371,44 +411,26 @@ void QXmppStream::processData(const QString &data)
     //
     // Success: We can clear the buffer and send a 'received' log message
     //
-    logReceived(d->dataBuffer);
-    d->dataBuffer.clear();
+    q->logReceived(m_dataBuffer);
+    m_dataBuffer.clear();
 
     // process stream start
     if (hasStreamOpen) {
-        d->streamOpenElement = streamOpenMatch.captured();
-        handleStream(doc.documentElement());
+        m_streamOpenElement = streamOpenMatch.captured();
+        q->handleStream(doc.documentElement());
     }
 
     // process stanzas
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
-        // handle possible stream management packets first
-        if (d->streamAckManager.handleStanza(stanza) || d->iqManager.handleStanza(stanza)) {
-            continue;
-        }
-
-        // process all other kinds of packets
-        handleStanza(stanza);
+        q->onStanzaReceived(stanza);
     }
 
     // process stream end
     if (hasStreamClose) {
-        disconnectFromHost();
+        q->disconnectFromHost();
     }
 }
-
-void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
-{
-    d->streamAckManager.enableStreamManagement(resetSequenceNumber);
-}
-
-bool QXmppStream::handleIqResponse(const QDomElement &stanza)
-{
-    return d->iqManager.handleStanza(stanza);
-}
-
-namespace QXmpp::Private {
 
 struct IqState {
     QXmppPromise<QXmppStream::IqResult> interface;
