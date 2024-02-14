@@ -23,7 +23,7 @@ jobs:
           - config: minimal
             qt_version: 6.1.*
           - config: full-debug
-            qt_version: 6.6.*
+            qt_version: 6.5.3
     steps:
       - name: Install sudo
         run: apt update && apt install -qq -y sudo
