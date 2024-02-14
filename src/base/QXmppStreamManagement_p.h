@@ -163,15 +163,17 @@ public:
     static void toXml(QXmlStreamWriter *writer);
 };
 
+namespace QXmpp::Private {
+
 //
 // This manager is used in the QXmppStream. It contains the parts of stream
 // management that are shared between server and client connections.
 //
-class QXmppStreamManager
+class StreamAckManager
 {
 public:
-    explicit QXmppStreamManager(QXmppStream *stream);
-    ~QXmppStreamManager();
+    explicit StreamAckManager(QXmppStream *stream);
+    ~StreamAckManager();
 
     bool enabled() const;
     unsigned int lastIncomingSequenceNumber() const;
@@ -198,6 +200,8 @@ private:
     unsigned int m_lastOutgoingSequenceNumber = 0;
     unsigned int m_lastIncomingSequenceNumber = 0;
 };
+
+}  // namespace QXmpp::Private
 /// \endcond
 
 #endif

@@ -901,7 +901,7 @@ bool C2sStreamManager::handleElement(const QDomElement &el)
         }
 
         m_enabled = true;
-        q->streamManager().enableStreamManagement(true);
+        q->streamAckManager().enableStreamManagement(true);
 
         q->onSMEnableFinished();
         return true;
@@ -911,12 +911,12 @@ bool C2sStreamManager::handleElement(const QDomElement &el)
     if (QXmppStreamManagementResumed::isStreamManagementResumed(el)) {
         QXmppStreamManagementResumed streamManagementResumed;
         streamManagementResumed.parse(el);
-        q->streamManager().setAcknowledgedSequenceNumber(streamManagementResumed.h());
+        q->streamAckManager().setAcknowledgedSequenceNumber(streamManagementResumed.h());
         m_isResuming = false;
         m_streamResumed = true;
 
         m_enabled = true;
-        q->streamManager().enableStreamManagement(false);
+        q->streamAckManager().enableStreamManagement(false);
 
         q->onSMResumeFinished();
         return true;
@@ -957,7 +957,7 @@ void C2sStreamManager::requestResume()
 {
     m_isResuming = true;
 
-    auto lastAckNumber = q->streamManager().lastIncomingSequenceNumber();
+    auto lastAckNumber = q->streamAckManager().lastIncomingSequenceNumber();
     q->sendData(serializeNonza(QXmppStreamManagementResume(lastAckNumber, m_smId)));
 }
 

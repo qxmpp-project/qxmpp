@@ -32,7 +32,7 @@ public:
     QString streamOpenElement;
 
     // stream management
-    QXmppStreamManager streamManager;
+    StreamAckManager streamAckManager;
 
     // iq response handling
     OutgoingIqManager iqManager;
@@ -40,7 +40,7 @@ public:
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(nullptr),
-      streamManager(stream),
+      streamAckManager(stream),
       iqManager(stream)
 {
 }
@@ -73,7 +73,7 @@ QXmppStream::QXmppStream(QObject *parent)
 QXmppStream::~QXmppStream()
 {
     // causes tasks to be finished
-    d->streamManager.resetCache();
+    d->streamAckManager.resetCache();
     d->iqManager.cancelAll();
 }
 
@@ -82,7 +82,7 @@ QXmppStream::~QXmppStream()
 ///
 void QXmppStream::disconnectFromHost()
 {
-    d->streamManager.handleDisconnect();
+    d->streamAckManager.handleDisconnect();
 
     if (d->socket) {
         if (d->socket->state() == QAbstractSocket::ConnectedState) {
@@ -103,7 +103,7 @@ void QXmppStream::disconnectFromHost()
 ///
 void QXmppStream::handleStart()
 {
-    d->streamManager.handleStart();
+    d->streamAckManager.handleStart();
     d->dataBuffer.clear();
     d->streamOpenElement.clear();
 }
@@ -172,7 +172,7 @@ QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writt
     writtenToSocket = sendData(packet.data());
 
     // handle stream management
-    d->streamManager.handlePacketSent(packet, writtenToSocket);
+    d->streamAckManager.handlePacketSent(packet, writtenToSocket);
 
     return packet.task();
 }
@@ -231,9 +231,9 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
 ///
 /// Returns the manager for Stream Management
 ///
-QXmppStreamManager &QXmppStream::streamManager() const
+StreamAckManager &QXmppStream::streamAckManager() const
 {
-    return d->streamManager;
+    return d->streamAckManager;
 }
 
 ///
@@ -385,7 +385,7 @@ void QXmppStream::processData(const QString &data)
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
         // handle possible stream management packets first
-        if (d->streamManager.handleStanza(stanza) || d->iqManager.handleStanza(stanza)) {
+        if (d->streamAckManager.handleStanza(stanza) || d->iqManager.handleStanza(stanza)) {
             continue;
         }
 
@@ -401,7 +401,7 @@ void QXmppStream::processData(const QString &data)
 
 void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
 {
-    d->streamManager.enableStreamManagement(resetSequenceNumber);
+    d->streamAckManager.enableStreamManagement(resetSequenceNumber);
 }
 
 bool QXmppStream::handleIqResponse(const QDomElement &stanza)

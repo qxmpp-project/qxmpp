@@ -34,6 +34,7 @@ class QXmppStreamPrivate;
 
 namespace QXmpp::Private {
 
+class StreamAckManager;
 struct IqState;
 class OutgoingIqManager;
 
@@ -60,7 +61,7 @@ public:
     QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
     QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
 
-    QXmppStreamManager &streamManager() const;
+    QXmpp::Private::StreamAckManager &streamAckManager() const;
     QXmpp::Private::OutgoingIqManager &iqManager() const;
 
 Q_SIGNALS:
