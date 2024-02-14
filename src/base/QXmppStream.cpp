@@ -24,7 +24,6 @@ class QXmppStreamPrivate
 {
 public:
     QXmppStreamPrivate(QXmppStream *stream);
-    ~QXmppStreamPrivate();
 
     QString dataBuffer;
     QSslSocket *socket;
@@ -44,12 +43,6 @@ QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
       streamManager(stream),
       iqManager(stream)
 {
-}
-
-QXmppStreamPrivate::~QXmppStreamPrivate()
-{
-    // causes access to runningIqs, so call here
-    streamManager.resetCache();
 }
 
 ///
@@ -79,6 +72,8 @@ QXmppStream::QXmppStream(QObject *parent)
 ///
 QXmppStream::~QXmppStream()
 {
+    // causes tasks to be finished
+    d->streamManager.resetCache();
     d->iqManager.cancelAll();
 }
 
