@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -22,7 +23,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppTask.h"
 #include "QXmppTlsManager_p.h"
-#include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
@@ -899,6 +899,18 @@ bool QXmppClient::injectMessage(QXmppMessage &&message)
 }
 
 ///
+/// Sets errors that are ignored if they occur.
+///
+/// \param ignoredErrors errors to be ignored
+///
+/// \since QXmpp 1.6
+///
+void QXmppClient::setIgnoredErrors(const QMap<QXmppClient::Error, QVector<QXmppStanza::Error::Condition>> &ignoredErrors)
+{
+    d->ignoredErrors = ignoredErrors;
+}
+
+///
 /// Give extensions a chance to handle incoming stanzas.
 ///
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
@@ -950,6 +962,13 @@ void QXmppClient::_q_streamDisconnected()
 
 void QXmppClient::_q_streamError(QXmppClient::Error err)
 {
+    // SKip errors that are valid during special procedures such as account creation/deletion.
+    if (d->ignoredErrors.contains(err) &&
+        (err != QXmppClient::XmppStreamError ||
+         d->ignoredErrors.value(err).contains(d->stream->xmppStreamError()))) {
+        return;
+    }
+
     if (d->stream->configuration().autoReconnectionEnabled()) {
         if (err == QXmppClient::XmppStreamError) {
             // if we receive a resource conflict, inhibit reconnection

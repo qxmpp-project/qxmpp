@@ -10,7 +10,6 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppRegisterIq.h"
 #include "QXmppStreamFeatures.h"
-#include "QXmppUtils.h"
 
 #include <QDomElement>
 
@@ -88,6 +87,8 @@ void QXmppRegistrationManager::deleteAccount()
     auto iq = QXmppRegisterIq::createUnregistrationRequest();
     d->deleteAccountIqId = iq.id();
 
+    client()->setIgnoredErrors({ { QXmppClient::KeepAliveError, {} },
+                                 { QXmppClient::XmppStreamError, { QXmppStanza::Error::Conflict, QXmppStanza::Error::NotAuthorized } } });
     client()->sendPacket(iq);
 }
 
@@ -171,6 +172,12 @@ bool QXmppRegistrationManager::registerOnConnectEnabled() const
 void QXmppRegistrationManager::setRegisterOnConnectEnabled(bool enabled)
 {
     d->registerOnConnectEnabled = enabled;
+
+    if (enabled) {
+        client()->setIgnoredErrors({ { QXmppClient::XmppStreamError, { QXmppStanza::Error::ConnectionTimeout } } });
+    } else {
+        client()->setIgnoredErrors({});
+    }
 }
 
 /// \cond
@@ -283,8 +290,15 @@ void QXmppRegistrationManager::setClient(QXmppClient *client)
         connect(disco, &QXmppDiscoveryManager::infoReceived, this, &QXmppRegistrationManager::handleDiscoInfo);
     }
 
-    connect(client, &QXmppClient::disconnected, this, [this]() {
+    connect(client, &QXmppClient::disconnected, this, [this, client]() {
         setSupportedByServer(false);
+        client->setIgnoredErrors({});
+
+        if (!d->deleteAccountIqId.isEmpty()) {
+            info(QStringLiteral("Account deleted successfully."));
+            Q_EMIT accountDeleted();
+            d->deleteAccountIqId.clear();
+        }
     });
 }
 

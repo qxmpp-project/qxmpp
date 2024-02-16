@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -325,6 +326,8 @@ private:
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
     bool injectMessage(QXmppMessage &&message);
 
+    void setIgnoredErrors(const QMap<QXmppClient::Error, QVector<QXmppStanza::Error::Condition>> &ignoredErrors);
+
 private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
     void _q_reconnect();
@@ -339,6 +342,7 @@ private:
     friend class QXmppClientExtension;
     friend class QXmppInternalClientExtension;
     friend class TestClient;
+    friend class QXmppRegistrationManager;
 };
 
 #endif  // QXMPPCLIENT_H
